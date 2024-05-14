@@ -384,8 +384,6 @@ namespace gdjs {
               return;
             }
 
-            const isPlayerTheServer =
-              gdjs.multiplayer.playerPositionInLobby === 1;
             const currentPlayerObjectOwnership = behavior.getPlayerObjectOwnership();
             // Change is coherent if:
             const ownershipChangeIsCoherent =
@@ -393,7 +391,10 @@ namespace gdjs {
               currentPlayerObjectOwnership === previousOwner ||
               // the object is already owned by the new owner. (may have been changed by another player faster)
               currentPlayerObjectOwnership === newOwner;
-            if (isPlayerTheServer && !ownershipChangeIsCoherent) {
+            if (
+              gdjs.multiplayer.isPlayerServer() &&
+              !ownershipChangeIsCoherent
+            ) {
               // We received an ownership change message for an object which is in an unexpected state.
               // There may be some lag, and multiple ownership changes may have been sent by the other players.
               // As the server, let's not change the ownership and let the player revert it.
@@ -422,7 +423,7 @@ namespace gdjs {
             // If we are player number 1, we are the server,
             // so we need to relay the ownership change to others,
             // and expect an acknowledgment from them.
-            if (gdjs.multiplayer.playerPositionInLobby === 1) {
+            if (gdjs.multiplayer.isPlayerServer()) {
               const connectedPeerIds = gdjs.evtTools.p2p.getAllPeers();
               // We don't need to send the message to the player who sent the ownership change message.
               const otherPeerIds = connectedPeerIds.filter(
@@ -494,7 +495,7 @@ namespace gdjs {
               return;
             }
             const ownerPlayerNumber = parseInt(matches[1], 10);
-            if (ownerPlayerNumber === gdjs.multiplayer.playerPositionInLobby) {
+            if (ownerPlayerNumber === gdjs.multiplayer.playerNumber) {
               // Do not update the object if we receive an message from ourselves.
               // Should not happen but let's be safe.
               return;
@@ -544,10 +545,10 @@ namespace gdjs {
             //   ownership and then update the object.
             if (
               behavior.getPlayerObjectOwnership() ===
-              gdjs.multiplayer.playerPositionInLobby
+              gdjs.multiplayer.playerNumber
             ) {
               logger.info(
-                `Object ${objectName} with instance network ID ${instanceNetworkId} is owned by us ${gdjs.multiplayer.playerPositionInLobby}, ignoring update message from ${ownerPlayerNumber}.`
+                `Object ${objectName} with instance network ID ${instanceNetworkId} is owned by us ${gdjs.multiplayer.playerNumber}, ignoring update message from ${ownerPlayerNumber}.`
               );
               return;
             }
@@ -564,9 +565,9 @@ namespace gdjs {
               instanceNetworkId
             ] = messageInstanceClock;
 
-            // If we are player number 1, we are the server,
-            // so we need to relay the position to others except the player who sent the update message.
-            if (gdjs.multiplayer.playerPositionInLobby === 1) {
+            // If we are are the server,
+            // we need to relay the position to others except the player who sent the update message.
+            if (gdjs.multiplayer.isPlayerServer()) {
               const connectedPeerIds = gdjs.evtTools.p2p.getAllPeers();
               // We don't need to send the message to the player who sent the update message.
               const otherPeerIds = connectedPeerIds.filter(
@@ -578,9 +579,6 @@ namespace gdjs {
               }
 
               for (const peerId of otherPeerIds) {
-                logger.info(
-                  `Relaying position of object ${objectName} with instance network ID ${instanceNetworkId} to ${peerId}.`
-                );
                 sendDataTo(peerId, messageName, data);
               }
             }
@@ -842,7 +840,7 @@ namespace gdjs {
               return;
             }
             const playerNumber = parseInt(matches[1], 10);
-            if (playerNumber === gdjs.multiplayer.playerPositionInLobby) {
+            if (playerNumber === gdjs.multiplayer.playerNumber) {
               // Do not destroy the object if we receive an message from ourselves.
               // Should probably never happen.
               return;
@@ -893,9 +891,9 @@ namespace gdjs {
             // Once the object is destroyed, we need to acknowledge it to the player who sent the destroy message.
             sendDataTo(messageSender, destroyedMessageName, {});
 
-            // If we are player number 1, we need to relay the destruction to others.
+            // If we are the server, we need to relay the destruction to others.
             // And expect an acknowledgment from everyone else as well.
-            if (gdjs.multiplayer.playerPositionInLobby === 1) {
+            if (gdjs.multiplayer.isPlayerServer()) {
               const connectedPeerIds = gdjs.evtTools.p2p.getAllPeers();
               // We don't need to send the message to the player who sent the destroy message.
               const otherPeerIds = connectedPeerIds.filter(
@@ -913,9 +911,6 @@ namespace gdjs {
                 otherPeerIds,
               });
               for (const peerId of otherPeerIds) {
-                logger.info(
-                  `Relaying destruction of object ${objectName} with instance network ID ${instanceNetworkId} to ${peerId}.`
-                );
                 sendDataTo(peerId, messageName, data);
               }
             }
@@ -980,9 +975,9 @@ namespace gdjs {
         sendDataTo(peerId, messageName, messageData);
       }
 
-      // If we are player number 1, we are the server so we can consider this messaged as received
+      // If we are the server, we can consider this messaged as received
       // and add it to the list of custom messages to process on top of the messages received.
-      if (gdjs.multiplayer.playerPositionInLobby === 1) {
+      if (gdjs.multiplayer.isPlayerServer()) {
         const message = gdjs.evtTools.p2p.getEvent(messageName);
         message.pushData(
           new gdjs.evtTools.p2p.EventData(
@@ -1068,7 +1063,7 @@ namespace gdjs {
 
           // If we are player number 1, we are the server,
           // so we need to relay the message to others.
-          if (gdjs.multiplayer.playerPositionInLobby === 1) {
+          if (gdjs.multiplayer.isPlayerServer()) {
             // In the case of custom messages, we relay the message to all players, including the sender.
             // This allows the sender to process it the same way others would, when they receive the event.
             const connectedPeerIds = gdjs.evtTools.p2p.getAllPeers();
@@ -1084,9 +1079,6 @@ namespace gdjs {
               otherPeerIds: connectedPeerIds,
             });
             for (const peerId of connectedPeerIds) {
-              logger.info(
-                `Relaying custom message ${messageName} to ${peerId}.`
-              );
               sendDataTo(peerId, messageName, data);
             }
           }
@@ -1124,14 +1116,6 @@ namespace gdjs {
         JSON.stringify(sceneSyncData.var) !==
         JSON.stringify(lastSentSceneSyncData.var);
 
-      if (haveVariableSyncDataChanged) {
-        console.info(
-          'scene data has changed',
-          sceneSyncData,
-          lastSentSceneSyncData
-        );
-      }
-
       return haveVariableSyncDataChanged;
     };
 
@@ -1145,7 +1129,7 @@ namespace gdjs {
       runtimeScene: gdjs.RuntimeScene
     ): void => {
       // Only the server (/player 1) synchronizes the scene state.
-      if (gdjs.multiplayer.playerPositionInLobby !== 1) {
+      if (gdjs.multiplayer.playerNumber !== 1) {
         return;
       }
       const sceneNetworkSyncData = runtimeScene.getNetworkSyncData();
@@ -1193,12 +1177,6 @@ namespace gdjs {
           const data = JSON.parse(gdjs.evtTools.p2p.getEventData(messageName));
           const messageSender = gdjs.evtTools.p2p.getEventSender(messageName);
           if (data && messageSender) {
-            logger.info(
-              `Received message ${messageName} with data ${JSON.stringify(
-                data
-              )}.`
-            );
-
             runtimeScene.updateFromNetworkSyncData(data);
           }
         }
@@ -1232,14 +1210,6 @@ namespace gdjs {
         JSON.stringify(gameSyncData.var) !==
         JSON.stringify(lastSentGameSyncData.var);
 
-      if (haveVariableSyncDataChanged) {
-        console.info(
-          'game data has changed',
-          gameSyncData,
-          lastSentGameSyncData
-        );
-      }
-
       return haveVariableSyncDataChanged;
     };
 
@@ -1251,7 +1221,7 @@ namespace gdjs {
       runtimeScene: gdjs.RuntimeScene
     ): void => {
       // Only the server (/player 1) synchronizes the global state.
-      if (gdjs.multiplayer.playerPositionInLobby !== 1) {
+      if (gdjs.multiplayer.playerNumber !== 1) {
         return;
       }
       const gameNetworkSyncData = runtimeScene.getGame().getNetworkSyncData();
@@ -1296,12 +1266,6 @@ namespace gdjs {
           const data = JSON.parse(gdjs.evtTools.p2p.getEventData(messageName));
           const messageSender = gdjs.evtTools.p2p.getEventSender(messageName);
           if (data && messageSender) {
-            logger.info(
-              `Received message ${messageName} with data ${JSON.stringify(
-                data
-              )}.`
-            );
-
             runtimeScene.getGame().updateFromNetworkSyncData(data);
           }
         }

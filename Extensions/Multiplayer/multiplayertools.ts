@@ -28,7 +28,7 @@ namespace gdjs {
     let _websocket: WebSocket | null = null;
     let _heartbeatInterval: NodeJS.Timeout | null = null;
 
-    export let playerPositionInLobby: number | null = null;
+    export let playerNumber: number | null = null;
     export let isGameRunning = false;
 
     gdjs.registerRuntimeScenePreEventsCallback(
@@ -84,11 +84,8 @@ namespace gdjs {
       if (_connectionId) {
         url.searchParams.set('connectionId', _connectionId);
       }
-      if (playerPositionInLobby) {
-        url.searchParams.set(
-          'positionInLobby',
-          playerPositionInLobby.toString()
-        );
+      if (playerNumber) {
+        url.searchParams.set('positionInLobby', playerNumber.toString());
       }
       const playerId = gdjs.playerAuthentication.getUserId();
       if (playerId) {
@@ -134,19 +131,26 @@ namespace gdjs {
      * Return 0 if the player is not in the lobby.
      * Returns 1, 2, 3, ... if the player is in the lobby.
      */
-    export const getCurrentPlayerPositionInLobby = () => {
-      return playerPositionInLobby || 0;
+    export const getPlayerNumber = () => {
+      return playerNumber || 0;
     };
 
     /**
-     * Returns the player ID of the player at the given position in the lobby.
-     * The position is shifted by one, so that the first player has position 1.
+     * Returns true if the player is the server in the lobby. Here, player 1.
      */
-    export const getPlayerId = (position: number) => {
+    export const isPlayerServer = () => {
+      return playerNumber === 1;
+    };
+
+    /**
+     * Returns the player ID of the player at the given number in the lobby.
+     * The number is shifted by one, so that the first player has number  1.
+     */
+    export const getPlayerId = (number: number) => {
       if (!_lobbyOnGameStart) {
         return '';
       }
-      const index = position - 1;
+      const index = number - 1;
       if (index < 0 || index >= _lobbyOnGameStart.players.length) {
         return '';
       }
@@ -154,11 +158,11 @@ namespace gdjs {
     };
 
     /**
-     * Returns the player ID of the player at the given position in the lobby.
-     * The position is shifted by one, so that the first player has position 1.
+     * Returns the player username at the given number in the lobby.
+     * The number is shifted by one, so that the first player has number 1.
      */
-    export const getPlayerUsername = (position: number) => {
-      const playerId = getPlayerId(position);
+    export const getPlayerUsername = (number: number) => {
+      const playerId = getPlayerId(number);
       if (!playerId) {
         return '';
       }
@@ -169,7 +173,7 @@ namespace gdjs {
 
       return playerPublicProfile
         ? playerPublicProfile.username
-        : `Player ${position}`;
+        : `Player ${number}`;
     };
 
     /**
@@ -275,7 +279,7 @@ namespace gdjs {
         logger.warn('Already connected to a lobby. Closing the previous one.');
         _websocket.close();
         _connectionId = null;
-        playerPositionInLobby = null;
+        playerNumber = null;
         _lobbyId = null;
         _lobby = null;
         _lobbyOnGameStart = null;
@@ -352,7 +356,6 @@ namespace gdjs {
               break;
             }
             case 'lobbyUpdated': {
-              console.log('Lobby updated:', messageContent.data);
               const messageData = messageContent.data;
               const lobby = messageData.lobby;
               const positionInLobby = messageData.positionInLobby;
@@ -372,7 +375,7 @@ namespace gdjs {
               break;
             }
             case 'gameEnded': {
-              handleGameEndedEvent(runtimeScene);
+              handleGameEndedEvent();
               break;
             }
             case 'peerId': {
@@ -422,7 +425,7 @@ namespace gdjs {
           '*' // We could restrict to GDevelop games platform but it's not necessary as the message is not sensitive, and it allows easy debugging.
         );
         _connectionId = null;
-        playerPositionInLobby = null;
+        playerNumber = null;
         _lobbyId = null;
         _lobby = null;
         _lobbyOnGameStart = null;
@@ -459,7 +462,7 @@ namespace gdjs {
       // );
 
       _connectionId = connectionId;
-      playerPositionInLobby = positionInLobby;
+      playerNumber = positionInLobby;
       // We save the lobbyId here as this is the moment when the player is really connected to the lobby.
       _lobbyId = lobbyId;
 
@@ -496,7 +499,7 @@ namespace gdjs {
         _websocket.close();
       }
       _connectionId = null;
-      playerPositionInLobby = null;
+      playerNumber = null;
       _lobbyId = null;
       _lobby = null;
       _lobbyOnGameStart = null;
@@ -511,8 +514,6 @@ namespace gdjs {
       const lobbyBeforeUpdate = _lobby;
       // Update the object representing the lobby in the extension.
       _lobby = updatedLobby;
-
-      console.log('Lobby updated:', updatedLobby, positionInLobby);
 
       // If the lobby is playing, do not update the player position or usernames as it's probably a player leaving,
       // and we want to keep that info.
@@ -569,7 +570,7 @@ namespace gdjs {
         .isUsingGDevelopDevelopmentEnvironment();
       updatePlayerPublicProfiles(isDev);
 
-      playerPositionInLobby = positionInLobby;
+      playerNumber = positionInLobby;
 
       // If the player is in the lobby, tell the lobbies window that the lobby has been updated,
       // as well as the player position.
@@ -595,7 +596,7 @@ namespace gdjs {
       runtimeScene: gdjs.RuntimeScene
     ) {
       // When the countdown starts, if we are player number 1, then send the peerId to others so they can connect via P2P.
-      if (getCurrentPlayerPositionInLobby() === 1) {
+      if (getPlayerNumber() === 1) {
         sendPeerId();
       }
 
@@ -636,9 +637,12 @@ namespace gdjs {
      * When the game receives the information that the game has ended, set the flag to true,
      * so that the game can switch back to the main menu for instance.
      */
-    const handleGameEndedEvent = function (runtimeScene: gdjs.RuntimeScene) {
+    const handleGameEndedEvent = function () {
       _hasGameJustEnded = true;
       isGameRunning = false;
+
+      // Disconnect from any P2P connections.
+      gdjs.evtTools.p2p.disconnectFromAllPeers();
 
       // Clear the expected acknowledgments, as the game is ending.
       multiplayerMessageManager.clearExpectedMessageAcknowledgements();

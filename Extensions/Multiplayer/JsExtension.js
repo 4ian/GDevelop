@@ -89,9 +89,9 @@ module.exports = {
     extension
       .addAction(
         'SendMessage',
-        _('Send message to other players'),
+        _('Send custom message to other players'),
         _(
-          "Send a message to other players in the lobby, with an automatic retry system if it hasn't been received. Use with the condition 'HasMessageBeenReceived' to know when the message has been properly processed by the server."
+          "Send a custom message to other players in the lobby, with an automatic retry system if it hasn't been received. Use with the condition 'Message has been received' to know when the message has been properly processed by the server."
         ),
         _('Send message _PARAM0_ to other players with content _PARAM1_'),
         '',
@@ -215,9 +215,9 @@ module.exports = {
     extension
       .addCondition(
         'HasMessageBeenReceived',
-        _('Message has been received from another player'),
+        _('Custom message has been received from another player'),
         _(
-          'Check if a message has been received from another player. Will be true only for one frame.'
+          'Check if a custom message has been received from another player. Will be true only for one frame.'
         ),
         _('Message _PARAM0_ has been received'),
         '',
@@ -238,6 +238,30 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
       .setFunctionName('gdjs.multiplayerMessageManager.hasMessageBeenReceived');
+
+    extension
+      .addCondition(
+        'isPlayerServer',
+        _('Player is server'),
+        _('Check if the player is the server. (Player 1 is the server)'),
+        _('Player is server'),
+        '',
+        'JsPlatform/Extensions/authentication.svg',
+        'JsPlatform/Extensions/authentication.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
+      .setFunctionName('gdjs.multiplayer.isPlayerServer');
 
     extension
       .addStrExpression(
@@ -288,14 +312,15 @@ module.exports = {
       .setFunctionName('gdjs.multiplayer.getNumberOfPlayersInLobby');
 
     extension
-      .addExpression(
-        'CurrentPlayerPositionInLobby',
-        _('Current player position in lobby'),
-        _('Get the current player position in the lobby. (1, 2, ...)'),
+      .addExpressionAndCondition(
+        'number',
+        'PlayerNumber',
+        _('Player number in lobby'),
+        _('the player number in the lobby. (1, 2, ...)'),
+        _('the player number in the lobby'),
         '',
         'JsPlatform/Extensions/authentication.svg'
       )
-      .getCodeExtraInformation()
       .setIncludeFile('Extensions/P2P/A_peer.js')
       .addIncludeFile('Extensions/P2P/B_p2ptools.js')
       .addIncludeFile(
@@ -307,7 +332,8 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .setFunctionName('gdjs.multiplayer.getCurrentPlayerPositionInLobby');
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .setFunctionName('gdjs.multiplayer.getPlayerNumber');
 
     extension
       .addStrExpression(
@@ -440,7 +466,7 @@ module.exports = {
         'removeObjectOwnership',
         _('Remove object ownership'),
         _(
-          'Remove the ownership of the object. It will no longer be synchronized with other players.'
+          'Remove the ownership of the object from the player. It will still be synchronised to other players, but the server owns it.'
         ),
         _('Remove ownership of _PARAM0_'),
         '',

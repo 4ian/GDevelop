@@ -225,10 +225,8 @@ namespace gdjs {
       const loaderContainer = getLobbiesLoaderContainer(runtimeScene);
       const textsContainer = getLobbiesTextsContainer(runtimeScene);
 
-      console.log(iframeContainer, loaderContainer, textsContainer);
-
       if (!iframeContainer || !loaderContainer || !textsContainer) {
-        console.error('Lobbies containers not found.');
+        logger.error('Lobbies containers not found.');
         return;
       }
 
@@ -270,7 +268,7 @@ namespace gdjs {
     ) => {
       const loaderContainer = getLobbiesLoaderContainer(runtimeScene);
       if (!loaderContainer) {
-        console.error('Loader container not found.');
+        logger.error('Loader container not found.');
         return;
       }
 

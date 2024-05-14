@@ -100,7 +100,7 @@ namespace gdjs {
     }
 
     isOwnerAsPlayerOrServer() {
-      const currentPlayerNumber = gdjs.multiplayer.getCurrentPlayerPositionInLobby();
+      const currentPlayerNumber = gdjs.multiplayer.getPlayerNumber();
 
       const isOwnerOfObject =
         currentPlayerNumber === this._playerNumber || // Player as owner.
@@ -137,7 +137,7 @@ namespace gdjs {
       );
     }
 
-    logToConsole(message: string) {
+    logToConsoleWithThrottle(message: string) {
       if (
         this._getTimeNow() - this._lastLogTimestamp >
         1000 / this._logTickRate
@@ -240,7 +240,7 @@ namespace gdjs {
         return;
       }
 
-      // this.logToConsole(
+      // this.logToConsoleWithThrottle(
       //   `Synchronizing object ${this.owner.getName()} (instance ${
       //     this.owner.networkId
       //   }) with player ${this._playerNumber}`
@@ -346,7 +346,6 @@ namespace gdjs {
         );
       }
       if (shoundSyncEffects) {
-        // console.info('effects have been synced', areEffectsDifferent);
         this._lastEffectsSyncTimestamp = now;
         this._lastSentEffectSyncData = objectNetworkSyncData.eff;
         this._numberOfForcedEffectsUpdates = Math.max(
@@ -377,9 +376,6 @@ namespace gdjs {
         return;
       }
       // Ensure we send a final update before the object is destroyed, if it had a networkId.
-      logger.info(
-        `Sending a final update for object ${objectName} (instance ${instanceNetworkId}) before it is destroyed.`
-      );
       const {
         messageName: updateMessageName,
         messageData: updateMessageData,
@@ -434,7 +430,7 @@ namespace gdjs {
         } to player ${newPlayerNumber}.`
       );
       if (newPlayerNumber < 0) {
-        console.error(
+        logger.error(
           'Invalid player number (' +
             newPlayerNumber +
             ') when setting ownership of an object.'
@@ -445,20 +441,18 @@ namespace gdjs {
       let instanceNetworkId = this.owner.networkId;
 
       if (!instanceNetworkId) {
-        console.info(
+        logger.info(
           'Object has no networkId, we change the ownership locally, but it will not be synchronized yet if we are not the owner.'
         );
         this._playerNumber = newPlayerNumber;
-        if (
-          newPlayerNumber !== gdjs.multiplayer.getCurrentPlayerPositionInLobby()
-        ) {
+        if (newPlayerNumber !== gdjs.multiplayer.getPlayerNumber()) {
           // If we are not the new owner, we should not send a message to the server to change the ownership.
           // Just return and wait to receive an update message to reconcile this object.
           return;
         }
       }
 
-      const currentPlayerNumber = gdjs.multiplayer.getCurrentPlayerPositionInLobby();
+      const currentPlayerNumber = gdjs.multiplayer.getPlayerNumber();
       const objectName = this.owner.getName();
 
       if (instanceNetworkId) {
@@ -499,7 +493,7 @@ namespace gdjs {
           });
         }
 
-        console.info('Sending change owner message', messageName);
+        logger.info('Sending change owner message', messageName);
         this.sendDataToPeersWithIncreasedClock(messageName, messageData);
       }
 
@@ -529,9 +523,6 @@ namespace gdjs {
           instanceNetworkId,
           objectNetworkSyncData,
         });
-        logger.info(
-          `Sending a first update as new owner of object ${objectName} (instance ${instanceNetworkId}).`
-        );
         this.sendDataToPeersWithIncreasedClock(
           updateMessageName,
           updateMessageData

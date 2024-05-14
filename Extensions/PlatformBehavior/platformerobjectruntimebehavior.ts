@@ -326,8 +326,6 @@ namespace gdjs {
     }
 
     doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
-      // console.log(this.owner.getName(), 'preEvent jumpkey', this._jumpKey);
-
       const LEFTKEY = 37;
       const UPKEY = 38;
       const RIGHTKEY = 39;
@@ -610,7 +608,6 @@ namespace gdjs {
               ))
           ) {
             if (this._state === this._jumping) {
-              // console.log('setFalling in moveY');
               this._setFalling();
             }
             if (
@@ -673,7 +670,6 @@ namespace gdjs {
 
     _checkTransitionJumping() {
       if (this._canJump && this._jumpKey) {
-        // console.log('setJumping in transition jump');
         this._setJumping();
       }
     }
@@ -744,7 +740,6 @@ namespace gdjs {
       // don't fall if GrabbingPlatform or OnLadder
       if (this._state === this._onFloor) {
         if (!highestGround) {
-          // console.log('setFalling in checktransitionOnFloorOrFalling');
           this._setFalling();
         } else if (highestGround === this._onFloor.getFloorPlatform()) {
           this._onFloor.updateFloorPosition();
@@ -808,7 +803,6 @@ namespace gdjs {
      */
     _releaseGrabbedPlatform() {
       if (this._state === this._grabbingPlatform) {
-        // console.log('setFalling in releaseGrabbedPlatform');
         this._setFalling();
       }
     }
@@ -818,7 +812,6 @@ namespace gdjs {
      */
     _releaseLadder() {
       if (this._state === this._onLadder) {
-        // console.log('setFalling in releaseLadder');
         this._setFalling();
       }
     }
@@ -1545,7 +1538,6 @@ namespace gdjs {
     abortJump(): void {
       if (this._state === this._jumping) {
         this._currentFallSpeed = 0;
-        // console.log('setFalling in abortJump');
         this._setFalling();
       }
     }
@@ -1871,7 +1863,6 @@ namespace gdjs {
           this._floorPlatform!.owner.id
         )
       ) {
-        // console.log('setFalling in checkTransitionBeforeX first if');
         behavior._setFalling();
       } else if (
         this._behavior._downKey &&
@@ -1880,7 +1871,6 @@ namespace gdjs {
         behavior._canGoDownFromJumpthru
       ) {
         behavior._overlappedJumpThru.push(this._floorPlatform!);
-        // console.log('setFalling in checkTransitionBeforeX second if');
         behavior._setFalling();
       }
 
@@ -2250,9 +2240,7 @@ namespace gdjs {
       }
       this._jumpingFirstDelta = false;
 
-      // console.log('_currentJumpSpeed', this._currentJumpSpeed);
       if (this._currentJumpSpeed < 0) {
-        // console.log('setFalling in beforeMovingY');
         behavior._setFalling();
       }
     }
@@ -2389,7 +2377,6 @@ namespace gdjs {
       const behavior = this._behavior;
       //Coming to an extremity of a ladder
       if (!behavior._isOverlappingLadder()) {
-        // console.log('setFalling in checkTransitionBeforeY onLadder');
         behavior._setFalling();
       }
 

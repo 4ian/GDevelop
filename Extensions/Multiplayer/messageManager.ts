@@ -420,7 +420,7 @@ namespace gdjs {
             // Once the object ownership has changed, we need to acknowledge it to the player who sent this message.
             sendDataTo(messageSender, ownerChangedMessageName, {});
 
-            // If we are player number 1, we are the server,
+            // If we are the server,
             // so we need to relay the ownership change to others,
             // and expect an acknowledgment from them.
             if (gdjs.multiplayer.isPlayerServer()) {
@@ -1061,7 +1061,7 @@ namespace gdjs {
           );
           sendDataTo(messageSender, acknowledgmentMessageName, {});
 
-          // If we are player number 1, we are the server,
+          // If we are the server,
           // so we need to relay the message to others.
           if (gdjs.multiplayer.isPlayerServer()) {
             // In the case of custom messages, we relay the message to all players, including the sender.
@@ -1128,8 +1128,8 @@ namespace gdjs {
     export const handleUpdateSceneMessages = (
       runtimeScene: gdjs.RuntimeScene
     ): void => {
-      // Only the server (/player 1) synchronizes the scene state.
-      if (gdjs.multiplayer.playerNumber !== 1) {
+      // Only the server synchronizes the scene state.
+      if (!gdjs.multiplayer.isPlayerServer()) {
         return;
       }
       const sceneNetworkSyncData = runtimeScene.getNetworkSyncData();
@@ -1220,8 +1220,8 @@ namespace gdjs {
     export const handleUpdateGameMessages = (
       runtimeScene: gdjs.RuntimeScene
     ): void => {
-      // Only the server (/player 1) synchronizes the global state.
-      if (gdjs.multiplayer.playerNumber !== 1) {
+      // Only the server synchronizes the global state.
+      if (!gdjs.multiplayer.isPlayerServer()) {
         return;
       }
       const gameNetworkSyncData = runtimeScene.getGame().getNetworkSyncData();

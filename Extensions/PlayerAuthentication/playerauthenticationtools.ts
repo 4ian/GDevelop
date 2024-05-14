@@ -323,7 +323,8 @@ namespace gdjs {
         _authenticationInAppWindow.close();
         _authenticationInAppWindow = null;
       }
-      // If there were any callbacks
+      // If there were any callbacks, remove them.
+      _loginCallbacks = [];
     };
 
     const saveAuthKeyToStorage = ({

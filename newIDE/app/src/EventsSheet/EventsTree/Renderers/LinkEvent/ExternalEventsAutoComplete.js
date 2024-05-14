@@ -1,8 +1,6 @@
 // @flow
 import * as React from 'react';
-import {
-  enumerateExternalEvents,
-} from '../../../../ProjectManager/EnumerateProjectItems';
+import { enumerateExternalEvents } from '../../../../ProjectManager/EnumerateProjectItems';
 import SemiControlledAutoComplete, {
   type DataSource,
 } from '../../../../UI/SemiControlledAutoComplete';

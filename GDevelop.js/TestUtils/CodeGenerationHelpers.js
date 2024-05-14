@@ -306,15 +306,13 @@ function generateCompiledEventsFromSerializedEvents(
 
     if (parameterTypes) {
       for (const parameterName in parameterTypes) {
-        if (Object.hasOwnProperty.call(parameterTypes, parameterName)) {
-          const parameterType = parameterTypes[parameterName];
+        const parameterType = parameterTypes[parameterName];
 
-          const parameter = new gd.ParameterMetadata();
-          parameter.setType(parameterType);
-          parameter.setName(parameterName);
-          eventsFunction.getParameters().push_back(parameter);
-          parameter.delete();
-        }
+        const parameter = new gd.ParameterMetadata();
+        parameter.setType(parameterType);
+        parameter.setName(parameterName);
+        eventsFunction.getParameters().push_back(parameter);
+        parameter.delete();
       }
     }
   }
@@ -367,15 +365,13 @@ function generateCompiledEventsFunctionFromSerializedEvents(
 
     if (parameterTypes) {
       for (const parameterName in parameterTypes) {
-        if (Object.hasOwnProperty.call(parameterTypes, parameterName)) {
-          const parameterType = parameterTypes[parameterName];
+        const parameterType = parameterTypes[parameterName];
 
-          const parameter = new gd.ParameterMetadata();
-          parameter.setType(parameterType);
-          parameter.setName(parameterName);
-          eventsFunction.getParameters().push_back(parameter);
-          parameter.delete();
-        }
+        const parameter = new gd.ParameterMetadata();
+        parameter.setType(parameterType);
+        parameter.setName(parameterName);
+        eventsFunction.getParameters().push_back(parameter);
+        parameter.delete();
       }
     }
   }

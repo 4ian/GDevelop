@@ -38,7 +38,7 @@ export default function ExtractAsExternalLayoutDialog({
         />,
         <DialogPrimaryButton
           key="apply"
-          label={<Trans>Apply</Trans>}
+          label={<Trans>Move instances</Trans>}
           primary={true}
           onClick={apply}
         />,
@@ -58,7 +58,7 @@ export default function ExtractAsExternalLayoutDialog({
       <ColumnStackLayout noMargin>
         <Text>
           <Trans>
-            Selected objects will be moved to a new external layout.
+            Selected instances will be moved to a new external layout.
           </Trans>
         </Text>
         <TextField

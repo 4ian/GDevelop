@@ -24,6 +24,8 @@ import { shouldActivate } from '../../../../UI/KeyboardShortcuts/InteractionKeys
 import ShareExternal from '../../../../UI/CustomSvgIcons/ShareExternal';
 import Warning from '../../../../UI/CustomSvgIcons/Warning';
 import Tooltip from '@material-ui/core/Tooltip';
+import { Column } from '../../../../UI/Grid';
+import Text from '../../../../UI/Text';
 
 const gd: libGDevelop = global.gd;
 
@@ -37,6 +39,7 @@ const styles = {
   title: {
     fontSize: '1.2em',
     whiteSpace: 'nowrap',
+    overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
   openInNewIcon: {
@@ -183,9 +186,19 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
                       >
                         <Tooltip
                           title={
-                            <Trans>
-                              These external events is owned by another scene.
-                            </Trans>
+                            <Column noMargin>
+                              <Text size="sub-title">
+                                {<Trans>Owned by another scene</Trans>}
+                              </Text>
+                              <Text size="body">
+                                <Trans>
+                                  These external events are owned by another
+                                  scene. Ensure the same variables are declared
+                                  in each scenes, otherwise conditions and
+                                  actions related to them won't work.
+                                </Trans>
+                              </Text>
+                            </Column>
                           }
                         >
                           <Warning

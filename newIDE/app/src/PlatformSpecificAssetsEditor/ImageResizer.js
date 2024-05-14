@@ -1,33 +1,13 @@
 //@flow
-import optionalRequire from '../Utils/OptionalRequire';
-
-const fs = optionalRequire('fs-extra');
-
-export const getImageFromPath = (path: string): Promise<HTMLImageElement> => {
-  const imageElement = document.createElement('img');
-
-  const file = fs.readFileSync(path, { encoding: 'base64' });
-
-  return new Promise<HTMLImageElement>((resolve, reject) => {
-    imageElement.addEventListener('error', (event: Event) => {
-      reject(event);
-    });
-    imageElement.addEventListener('load', () => {
-      resolve(imageElement);
-    });
-    imageElement.src = `data:image/png;base64,${file}`;
-  });
-};
 
 export const resizeImage = (
-  image: HTMLImageElement,
-  outputFile: string,
+  imageAsBlobDataUrl: string,
   {
     width,
     height,
     transparentBorderSize = 0,
   }: {| width: number, height: number, transparentBorderSize?: number |}
-): Promise<boolean> => {
+): Promise<string> => {
   return new Promise((resolve, reject) => {
     const canvasElement = document.createElement('canvas');
     canvasElement.width = width;
@@ -36,20 +16,27 @@ export const resizeImage = (
 
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
+    const image = new Image();
+    image.addEventListener('load', () => {
+      try {
+        ctx.drawImage(
+          image,
+          transparentBorderSize,
+          transparentBorderSize,
+          width - 2 * transparentBorderSize,
+          height - 2 * transparentBorderSize
+        );
 
-    ctx.drawImage(
-      image,
-      transparentBorderSize,
-      transparentBorderSize,
-      width - 2 * transparentBorderSize,
-      height - 2 * transparentBorderSize
-    );
-
-    canvasElement.toBlob(blob => {
-      blob.arrayBuffer().then(buffer => {
-        fs.writeFileSync(outputFile, Buffer.from(buffer));
-        resolve(true);
-      });
-    }, 'image/png');
+        canvasElement.toBlob(blob => {
+          resolve(URL.createObjectURL(blob));
+        }, 'image/png');
+      } catch (error) {
+        reject('An error occurred while generating an icon');
+      }
+    });
+    image.addEventListener('error', (e: Event) => {
+      reject('An error occurred while loading the input image');
+    });
+    image.src = imageAsBlobDataUrl;
   });
 };

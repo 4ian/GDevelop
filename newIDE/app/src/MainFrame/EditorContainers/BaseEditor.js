@@ -106,6 +106,8 @@ export type RenderEditorContainerProps = {|
 
   // Object editing
   openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
+
+  onExtractAsExternalLayout: (name: string) => void,
 |};
 
 export type RenderEditorContainerPropsWithRef = {|

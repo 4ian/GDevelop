@@ -724,6 +724,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
               onFolderSelection={selectFolder}
               onGoBackToFolderIndex={goBackToFolderIndex}
               currentPage={shopNavigationState.getCurrentPage()}
+              hideGameTemplates={hideGameTemplates}
             />
           ) : openedAssetShortHeader ? (
             <AssetDetails

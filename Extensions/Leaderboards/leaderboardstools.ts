@@ -6,6 +6,7 @@ namespace gdjs {
   export namespace evtTools {
     export namespace leaderboards {
       let _hasPlayerJustClosedLeaderboardView = false;
+      let _preferSendConnectedPlayerScore = true;
 
       gdjs.registerRuntimeScenePostEventsCallback(() => {
         // Set it back to false for the next frame.
@@ -22,6 +23,14 @@ namespace gdjs {
         const shaObj = new jsSHA('SHA-256', 'TEXT', { encoding: 'UTF8' });
         shaObj.update(payload);
         return shaObj.getHash('B64');
+      };
+
+      const leaderboardHostBaseUrl = 'https://gd.games';
+      // const leaderboardHostBaseUrl = 'http://localhost:4000';
+
+      type PublicLeaderboardEntry = {
+        id: string;
+        claimSecret?: string;
       };
 
       /**
@@ -45,7 +54,7 @@ namespace gdjs {
         private _lastSavedPlayerId: string | null = null;
 
         /** The id of the entry in the leaderboard, for the last score saved with success. */
-        lastSavedLeaderboardEntryId: string | null = null;
+        lastSavedLeaderboardEntry: PublicLeaderboardEntry | null = null;
 
         /** Last error that happened when saving the score (useful if `hasScoreSavingErrored` is true). */
         lastSaveError: string | null = null;
@@ -114,7 +123,7 @@ namespace gdjs {
           playerId?: string;
           score: number;
         }): {
-          closeSaving: (leaderboardEntryId: string | null) => void;
+          closeSaving: (leaderboardEntry: PublicLeaderboardEntry) => void;
           closeSavingWithError(errorCode: string);
         } {
           if (this._isAlreadySavingThisScore({ playerName, playerId, score })) {
@@ -159,7 +168,7 @@ namespace gdjs {
           if (playerId) this._currentlySavingPlayerId = playerId;
 
           return {
-            closeSaving: (leaderboardEntryId) => {
+            closeSaving: (leaderboardEntry) => {
               if (savingPromise !== this.lastSavingPromise) {
                 logger.info(
                   'Score saving result received, but another save was launched in the meantime - ignoring the result of this one.'
@@ -174,7 +183,7 @@ namespace gdjs {
               this._lastSavedScore = this._currentlySavingScore;
               this._lastSavedPlayerName = this._currentlySavingPlayerName;
               this._lastSavedPlayerId = this._currentlySavingPlayerId;
-              this.lastSavedLeaderboardEntryId = leaderboardEntryId;
+              this.lastSavedLeaderboardEntry = leaderboardEntry;
               this.hasScoreBeenSaved = true;
 
               resolveSavingPromise();
@@ -214,7 +223,7 @@ namespace gdjs {
       let _leaderboardViewIframeLoading: boolean = false;
       let _leaderboardViewIframeLoaded: boolean = false;
       let _errorTimeoutId: NodeJS.Timeout | null = null;
-      let _leaderboardViewClosingCallback:
+      let _leaderboardMessageListener:
         | ((event: MessageEvent) => void)
         | null = null;
 
@@ -288,7 +297,7 @@ namespace gdjs {
         authenticatedPlayerData?: { playerId: string; playerToken: string };
         score: number;
         runtimeScene: gdjs.RuntimeScene;
-      }) {
+      }): Promise<PublicLeaderboardEntry> {
         const rootApi = runtimeScene
           .getGame()
           .isUsingGDevelopDevelopmentEnvironment()
@@ -339,18 +348,18 @@ namespace gdjs {
             throw errorCode;
           }
 
-          let leaderboardEntryId: string | null = null;
           try {
             const leaderboardEntry = await response.json();
-            leaderboardEntryId = leaderboardEntry.id;
+            return leaderboardEntry;
           } catch (error) {
             logger.warn(
               'An error occurred when reading response but score has been saved:',
               error
             );
-          }
 
-          return leaderboardEntryId;
+            const errorCode = 'SAVED_ENTRY_CANT_BE_READ';
+            throw errorCode;
+          }
         } catch (error) {
           logger.error('Error while submitting a leaderboard score:', error);
           const errorCode = 'REQUEST_NOT_SENT';
@@ -359,13 +368,27 @@ namespace gdjs {
         }
       };
 
+      export const setPreferSendConnectedPlayerScore = (
+        runtimeScene: gdjs.RuntimeScene,
+        enable: boolean
+      ) => {
+        _preferSendConnectedPlayerScore = enable;
+      };
+
       export const savePlayerScore = (
         runtimeScene: gdjs.RuntimeScene,
         leaderboardId: string,
         score: float,
         playerName: string
-      ) =>
-        new gdjs.PromiseTask(
+      ) => {
+        if (
+          _preferSendConnectedPlayerScore &&
+          gdjs.playerAuthentication.isAuthenticated()
+        ) {
+          return saveConnectedPlayerScore(runtimeScene, leaderboardId, score);
+        }
+
+        return new gdjs.PromiseTask(
           (async () => {
             const scoreSavingState = (_scoreSavingStateByLeaderboard[
               leaderboardId
@@ -380,13 +403,13 @@ namespace gdjs {
               } = scoreSavingState.startSaving({ playerName, score });
 
               try {
-                const leaderboardEntryId = await saveScore({
+                const leaderboardEntry = await saveScore({
                   leaderboardId,
                   playerName,
                   score,
                   runtimeScene,
                 });
-                closeSaving(leaderboardEntryId);
+                closeSaving(leaderboardEntry);
               } catch (errorCode) {
                 closeSavingWithError(errorCode);
               }
@@ -395,6 +418,7 @@ namespace gdjs {
             }
           })()
         );
+      };
 
       export const saveConnectedPlayerScore = (
         runtimeScene: gdjs.RuntimeScene,
@@ -551,7 +575,64 @@ namespace gdjs {
         displayLoader: boolean,
         event: MessageEvent
       ) {
-        switch (event.data) {
+        const messageId =
+          typeof event.data === 'string' ? event.data : event.data.id;
+        switch (messageId) {
+          case 'playerAuthenticated':
+            gdjs.playerAuthentication.login({
+              runtimeScene,
+              userId: event.data.userId,
+              username: event.data.username,
+              userToken: event.data.userToken,
+            });
+            break;
+          case 'openPlayerAuthentication':
+            gdjs.playerAuthentication
+              .openAuthenticationWindow(runtimeScene)
+              .promise.then(({ status }) => {
+                if (
+                  !_leaderboardViewIframe ||
+                  !_leaderboardViewIframe.contentWindow
+                ) {
+                  logger.warn(
+                    'Unable to transmit the new login status to the leaderboard view.'
+                  );
+                  return;
+                }
+
+                if (status === 'errored') {
+                  _leaderboardViewIframe.contentWindow.postMessage(
+                    {
+                      id: 'onPlayerAuthenticationErrored',
+                    },
+                    leaderboardHostBaseUrl
+                  );
+                  return;
+                }
+
+                const playerId = gdjs.playerAuthentication.getUserId();
+                const playerToken = gdjs.playerAuthentication.getUserToken();
+                if (status === 'dismissed' || !playerId || !playerToken) {
+                  _leaderboardViewIframe.contentWindow.postMessage(
+                    {
+                      id: 'onPlayerAuthenticationDismissed',
+                    },
+                    leaderboardHostBaseUrl
+                  );
+                  return;
+                }
+
+                _leaderboardViewIframe.contentWindow.postMessage(
+                  {
+                    id: 'onPlayerAuthenticated',
+                    playerId,
+                    playerUsername: gdjs.playerAuthentication.getUsername(),
+                    playerToken: playerToken,
+                  },
+                  leaderboardHostBaseUrl
+                );
+              });
+            break;
           case 'closeLeaderboardView':
             _hasPlayerJustClosedLeaderboardView = true;
             closeLeaderboardView(runtimeScene);
@@ -599,7 +680,7 @@ namespace gdjs {
               'Leaderboard page did not send message in time. Closing leaderboard view.'
             );
           }
-        }, 5000);
+        }, 15000);
       };
 
       const displayLoaderInLeaderboardView = function (
@@ -701,15 +782,15 @@ namespace gdjs {
           });
         }
 
-        // If a save is being done for this leaderboard, wait for it to end so that the `lastSavedLeaderboardEntryId`
+        // If a save is being done for this leaderboard, wait for it to end so that the `lastSavedLeaderboardEntry`
         // can be saved and then used to show the player score.
         const scoreSavingState = _scoreSavingStateByLeaderboard[leaderboardId];
         if (scoreSavingState && scoreSavingState.lastSavingPromise) {
           await scoreSavingState.lastSavingPromise;
         }
 
-        const lastSavedLeaderboardEntryId = scoreSavingState
-          ? scoreSavingState.lastSavedLeaderboardEntryId
+        const lastSavedLeaderboardEntry = scoreSavingState
+          ? scoreSavingState.lastSavedLeaderboardEntry
           : null;
 
         const gameId = gdjs.projectData.properties.projectUuid;
@@ -720,13 +801,30 @@ namespace gdjs {
         const searchParams = new URLSearchParams();
         searchParams.set('inGameEmbedded', 'true');
         if (isDev) searchParams.set('dev', 'true');
-        if (lastSavedLeaderboardEntryId)
+        if (lastSavedLeaderboardEntry) {
           searchParams.set(
             'playerLeaderboardEntryId',
-            lastSavedLeaderboardEntryId
+            lastSavedLeaderboardEntry.id
           );
+          if (lastSavedLeaderboardEntry.claimSecret) {
+            searchParams.set(
+              'playerLeaderboardEntryClaimSecret',
+              lastSavedLeaderboardEntry.claimSecret
+            );
+          }
+        }
+        const playerId = gdjs.playerAuthentication.getUserId();
+        const playerToken = gdjs.playerAuthentication.getUserToken();
+        if (playerId && playerToken) {
+          searchParams.set('playerId', playerId);
+          searchParams.set('playerToken', playerToken);
+          searchParams.set(
+            'playerUsername',
+            gdjs.playerAuthentication.getUsername()
+          );
+        }
 
-        const targetUrl = `https://gd.games/games/${gameId}/leaderboard/${leaderboardId}?${searchParams}`;
+        const targetUrl = `${leaderboardHostBaseUrl}/games/${gameId}/leaderboard/${leaderboardId}?${searchParams}`;
 
         try {
           const isAvailable = await checkLeaderboardAvailability(targetUrl);
@@ -772,7 +870,7 @@ namespace gdjs {
               targetUrl
             );
             if (typeof window !== 'undefined') {
-              _leaderboardViewClosingCallback = (event: MessageEvent) => {
+              _leaderboardMessageListener = (event: MessageEvent) => {
                 receiveMessageFromLeaderboardView(
                   runtimeScene,
                   displayLoader,
@@ -781,7 +879,7 @@ namespace gdjs {
               };
               (window as any).addEventListener(
                 'message',
-                _leaderboardViewClosingCallback,
+                _leaderboardMessageListener,
                 true
               );
             }
@@ -836,10 +934,10 @@ namespace gdjs {
           if (typeof window !== 'undefined') {
             (window as any).removeEventListener(
               'message',
-              _leaderboardViewClosingCallback,
+              _leaderboardMessageListener,
               true
             );
-            _leaderboardViewClosingCallback = null;
+            _leaderboardMessageListener = null;
           }
           domElementContainer.removeChild(_leaderboardViewIframe);
           _leaderboardViewIframe = null;

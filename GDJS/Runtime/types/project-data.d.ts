@@ -99,8 +99,9 @@ declare interface EventsFunctionsExtensionData {
   sceneVariables: RootVariableData[];
 }
 
-declare interface LayoutAndExtensionsData extends LayoutData {
-  usedExtensionsWithVariablesData?: ?EventsFunctionsExtensionData[];
+declare interface SceneAndExtensionsData {
+  sceneData: LayoutData;
+  usedExtensionsWithVariablesData: EventsFunctionsExtensionData[];
 }
 
 declare interface EventsBasedObjectData {

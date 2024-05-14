@@ -2,13 +2,13 @@
   const makePlatformerTestRuntimeScene = (timeDelta = 1000 / 60) => {
     const runtimeGame = gdjs.getPixiRuntimeGame();
     const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
-    runtimeScene.loadFromScene({
+    runtimeScene.loadFromScene({sceneData: {
       layers: [{ name: '', visibility: true, effects: [] }],
       variables: [],
       behaviorsSharedData: [],
       objects: [],
       instances: [],
-    });
+    }, usedExtensionsWithVariablesData: []});
     runtimeScene._timeManager.getElapsedTime = function () {
       return timeDelta;
     };

@@ -31,31 +31,34 @@ describe('gdjs.TextInputRuntimeObject (using a PixiJS RuntimeGame with DOM eleme
   /** @param {gdjs.RuntimeScene} runtimeScene */
   const loadScene = (runtimeScene) => {
     runtimeScene.loadFromScene({
-      layers: [
-        {
-          name: '',
-          visibility: true,
-          effects: [],
-          cameras: [],
-          ambientLightColorR: 0,
-          ambientLightColorG: 0,
-          ambientLightColorB: 0,
-          isLightingLayer: false,
-          followBaseLayerCamera: true,
-        },
-      ],
-      r: 0,
-      v: 0,
-      b: 0,
-      mangledName: 'Scene1',
-      name: 'Scene1',
-      stopSoundsOnStartup: false,
-      title: '',
-      behaviorsSharedData: [],
-      objects: [],
-      instances: [],
-      variables: [],
-      usedResources: [],
+      sceneData: {
+        layers: [
+          {
+            name: '',
+            visibility: true,
+            effects: [],
+            cameras: [],
+            ambientLightColorR: 0,
+            ambientLightColorG: 0,
+            ambientLightColorB: 0,
+            isLightingLayer: false,
+            followBaseLayerCamera: true,
+          },
+        ],
+        r: 0,
+        v: 0,
+        b: 0,
+        mangledName: 'Scene1',
+        name: 'Scene1',
+        stopSoundsOnStartup: false,
+        title: '',
+        behaviorsSharedData: [],
+        objects: [],
+        instances: [],
+        variables: [],
+        usedResources: [],
+      },
+      usedExtensionsWithVariablesData: [],
     });
   };
 

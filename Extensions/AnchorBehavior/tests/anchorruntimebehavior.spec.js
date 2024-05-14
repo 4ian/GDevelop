@@ -6,31 +6,34 @@ describe('gdjs.AnchorRuntimeBehavior', function () {
   const anchorBehaviorName = 'Anchor';
   const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
   runtimeScene.loadFromScene({
-    layers: [
-      {
-        name: '',
-        visibility: true,
-        cameras: [],
-        effects: [],
-        ambientLightColorR: 127,
-        ambientLightColorB: 127,
-        ambientLightColorG: 127,
-        isLightingLayer: false,
-        followBaseLayerCamera: false,
-      },
-    ],
-    variables: [],
-    r: 0,
-    v: 0,
-    b: 0,
-    mangledName: 'Scene1',
-    name: 'Scene1',
-    stopSoundsOnStartup: false,
-    title: '',
-    behaviorsSharedData: [],
-    objects: [],
-    instances: [],
-    usedResources: [],
+    sceneData: {
+      layers: [
+        {
+          name: '',
+          visibility: true,
+          cameras: [],
+          effects: [],
+          ambientLightColorR: 127,
+          ambientLightColorB: 127,
+          ambientLightColorG: 127,
+          isLightingLayer: false,
+          followBaseLayerCamera: false,
+        },
+      ],
+      variables: [],
+      r: 0,
+      v: 0,
+      b: 0,
+      mangledName: 'Scene1',
+      name: 'Scene1',
+      stopSoundsOnStartup: false,
+      title: '',
+      behaviorsSharedData: [],
+      objects: [],
+      instances: [],
+      usedResources: [],
+    },
+    usedExtensionsWithVariablesData: [],
   });
 
   function createObject(behaviorProperties) {

@@ -59,11 +59,14 @@ describe('gdjs.LightRuntimeObject', function () {
   const runtimeGame = gdjs.getPixiRuntimeGame();
   const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
   runtimeScene.loadFromScene({
-    layers: [{ name: '', visibility: true, effects: [] }],
-    variables: [],
-    behaviorsSharedData: [],
-    objects: [],
-    instances: [],
+    sceneData: {
+      layers: [{ name: '', visibility: true, effects: [] }],
+      variables: [],
+      behaviorsSharedData: [],
+      objects: [],
+      instances: [],
+    },
+    usedExtensionsWithVariablesData: [],
   });
   const lightObj = addLightObject(runtimeScene, 100);
   lightObj.setPosition(200, 200);
@@ -93,11 +96,14 @@ describe('Light with obstacles around it', function () {
   const runtimeGame = gdjs.getPixiRuntimeGame();
   const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
   runtimeScene.loadFromScene({
-    layers: [{ name: '', visibility: true, effects: [] }],
-    variables: [],
-    behaviorsSharedData: [],
-    objects: [],
-    instances: [],
+    sceneData: {
+      layers: [{ name: '', visibility: true, effects: [] }],
+      variables: [],
+      behaviorsSharedData: [],
+      objects: [],
+      instances: [],
+    },
+    usedExtensionsWithVariablesData: [],
   });
   runtimeScene._timeManager.getElapsedTime = function () {
     return (1 / 60) * 1000;

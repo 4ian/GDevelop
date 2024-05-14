@@ -77,6 +77,7 @@ namespace gdjs {
     _variables: VariablesContainer;
     _variablesByExtensionName: Map<string, gdjs.VariablesContainer>;
     _data: ProjectData;
+    _sceneAndExtensionsData: Array<SceneAndExtensionsData> = [];
     _eventsBasedObjectDatas: Map<String, EventsBasedObjectData>;
     _effectsManager: EffectsManager;
     _maxFPS: integer;
@@ -158,6 +159,7 @@ namespace gdjs {
         }
       }
       this._data = data;
+      this._updateSceneAndExtensionsData();
 
       this._resourcesLoader = new gdjs.ResourceLoader(
         this,
@@ -243,11 +245,22 @@ namespace gdjs {
      */
     setProjectData(projectData: ProjectData): void {
       this._data = projectData;
+      this._updateSceneAndExtensionsData();
       this._resourcesLoader.setResources(
         projectData.resources.resources,
         getGlobalResourceNames(projectData),
         projectData.layouts
       );
+    }
+
+    private _updateSceneAndExtensionsData(): void {
+      const usedExtensionsWithVariablesData = this._data.eventsFunctionsExtensions.filter(
+        (extensionData) => extensionData.sceneVariables.length > 0
+      );
+      this._sceneAndExtensionsData = this._data.layouts.map((sceneData) => ({
+        sceneData,
+        usedExtensionsWithVariablesData,
+      }));
     }
 
     /**
@@ -390,16 +403,14 @@ namespace gdjs {
      * @param sceneName The name of the scene. If not defined, the first scene will be returned.
      * @return The data associated to the scene.
      */
-    getSceneData(sceneName?: string): LayoutAndExtensionsData | null {
+    getSceneData(sceneName?: string): SceneAndExtensionsData | null {
       for (let i = 0, len = this._data.layouts.length; i < len; ++i) {
-        const sceneData = this._data.layouts[i] as LayoutAndExtensionsData;
-        if (sceneName === undefined || sceneData.name === sceneName) {
-          if (!sceneData.usedExtensionsWithVariablesData) {
-            sceneData.usedExtensionsWithVariablesData = this._data.eventsFunctionsExtensions.filter(
-              (extensionData) => extensionData.sceneVariables.length > 0
-            );
-          }
-          return sceneData;
+        const sceneAndExtensionsData = this._sceneAndExtensionsData[i];
+        if (
+          sceneName === undefined ||
+          sceneAndExtensionsData.sceneData.name === sceneName
+        ) {
+          return sceneAndExtensionsData;
         }
       }
       logger.error('The game has no scene called "' + sceneName + '"');

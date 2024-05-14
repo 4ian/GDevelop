@@ -29,7 +29,7 @@ module.exports = {
       .setCategory('Players');
     extension
       .addInstructionOrExpressionGroupMetadata(_('Multiplayer'))
-      .setIcon('JsPlatform/Extensions/authentication.svg');
+      .setIcon('JsPlatform/Extensions/multiplayer.svg');
 
     extension
       .addAction(
@@ -40,8 +40,8 @@ module.exports = {
         ),
         _('Open the game lobbies'),
         '',
-        'JsPlatform/Extensions/authentication.svg',
-        'JsPlatform/Extensions/authentication.svg'
+        'JsPlatform/Extensions/multiplayer.svg',
+        'JsPlatform/Extensions/multiplayer.svg'
       )
       .addCodeOnlyParameter('currentScene', '')
       .setHelpPath('/all-features/multiplayer')
@@ -68,8 +68,8 @@ module.exports = {
         ),
         _('End the lobby game'),
         '',
-        'JsPlatform/Extensions/authentication.svg',
-        'JsPlatform/Extensions/authentication.svg'
+        'JsPlatform/Extensions/multiplayer.svg',
+        'JsPlatform/Extensions/multiplayer.svg'
       )
       .setHelpPath('/all-features/multiplayer')
       .getCodeExtraInformation()
@@ -95,8 +95,8 @@ module.exports = {
         ),
         _('Send message _PARAM0_ to other players with content _PARAM1_'),
         '',
-        'JsPlatform/Extensions/authentication.svg',
-        'JsPlatform/Extensions/authentication.svg'
+        'JsPlatform/Extensions/multiplayer.svg',
+        'JsPlatform/Extensions/multiplayer.svg'
       )
       .setHelpPath('/all-features/multiplayer')
       .addParameter('string', _('Message name'), '', false)
@@ -122,8 +122,8 @@ module.exports = {
         _('Check if the lobbies window is open.'),
         _('Lobbies window is open'),
         '',
-        'JsPlatform/Extensions/authentication.svg',
-        'JsPlatform/Extensions/authentication.svg'
+        'JsPlatform/Extensions/multiplayer.svg',
+        'JsPlatform/Extensions/multiplayer.svg'
       )
       .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
@@ -147,8 +147,8 @@ module.exports = {
         _('Check if the lobby game has just started.'),
         _('Lobby game has started'),
         '',
-        'JsPlatform/Extensions/authentication.svg',
-        'JsPlatform/Extensions/authentication.svg'
+        'JsPlatform/Extensions/multiplayer.svg',
+        'JsPlatform/Extensions/multiplayer.svg'
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/P2P/A_peer.js')
@@ -171,8 +171,8 @@ module.exports = {
         _('Check if the lobby game has just ended.'),
         _('Lobby game has ended'),
         '',
-        'JsPlatform/Extensions/authentication.svg',
-        'JsPlatform/Extensions/authentication.svg'
+        'JsPlatform/Extensions/multiplayer.svg',
+        'JsPlatform/Extensions/multiplayer.svg'
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/P2P/A_peer.js')
@@ -195,8 +195,8 @@ module.exports = {
         _('Check if the player is in a lobby.'),
         _('Player is in a lobby'),
         '',
-        'JsPlatform/Extensions/authentication.svg',
-        'JsPlatform/Extensions/authentication.svg'
+        'JsPlatform/Extensions/multiplayer.svg',
+        'JsPlatform/Extensions/multiplayer.svg'
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/P2P/A_peer.js')
@@ -221,8 +221,8 @@ module.exports = {
         ),
         _('Message _PARAM0_ has been received'),
         '',
-        'JsPlatform/Extensions/authentication.svg',
-        'JsPlatform/Extensions/authentication.svg'
+        'JsPlatform/Extensions/multiplayer.svg',
+        'JsPlatform/Extensions/multiplayer.svg'
       )
       .addParameter('string', _('Message name'), '', false)
       .getCodeExtraInformation()
@@ -246,8 +246,8 @@ module.exports = {
         _('Check if the player is the server. (Player 1 is the server)'),
         _('Player is server'),
         '',
-        'JsPlatform/Extensions/authentication.svg',
-        'JsPlatform/Extensions/authentication.svg'
+        'JsPlatform/Extensions/multiplayer.svg',
+        'JsPlatform/Extensions/multiplayer.svg'
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/P2P/A_peer.js')
@@ -271,8 +271,8 @@ module.exports = {
           'Returns the data received when the specified message was received from another player.'
         ),
         '',
-        'JsPlatform/Extensions/authentication.svg',
-        'JsPlatform/Extensions/authentication.svg'
+        'JsPlatform/Extensions/multiplayer.svg',
+        'JsPlatform/Extensions/multiplayer.svg'
       )
       .addParameter('string', _('Message name'), '', false)
       .getCodeExtraInformation()
@@ -295,7 +295,7 @@ module.exports = {
         _('Number of players in lobby'),
         _('Get the number of players in the lobby.'),
         '',
-        'JsPlatform/Extensions/authentication.svg'
+        'JsPlatform/Extensions/multiplayer.svg'
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/P2P/A_peer.js')
@@ -319,7 +319,7 @@ module.exports = {
         _('the player number in the lobby. (1, 2, ...)'),
         _('the player number in the lobby'),
         '',
-        'JsPlatform/Extensions/authentication.svg'
+        'JsPlatform/Extensions/multiplayer.svg'
       )
       .setIncludeFile('Extensions/P2P/A_peer.js')
       .addIncludeFile('Extensions/P2P/B_p2ptools.js')
@@ -341,7 +341,7 @@ module.exports = {
         _('Player ID in lobby'),
         _('Get the ID of the player in the lobby.'),
         '',
-        'JsPlatform/Extensions/authentication.svg'
+        'JsPlatform/Extensions/multiplayer.svg'
       )
       .addParameter(
         'number',
@@ -369,7 +369,7 @@ module.exports = {
         _('Player username in lobby'),
         _('Get the username of the player in the lobby.'),
         '',
-        'JsPlatform/Extensions/authentication.svg'
+        'JsPlatform/Extensions/multiplayer.svg'
       )
       .addParameter(
         'number',
@@ -420,7 +420,7 @@ module.exports = {
           'Allow the object to be synchronized with other players in the lobby.'
         ),
         '',
-        'JsPlatform/Extensions/authentication.svg',
+        'JsPlatform/Extensions/multiplayer.svg',
         'MultiplayerObjectBehavior',
         // @ts-ignore - TODO: Fix multiplayerBehavior being a BehaviorJsImplementation instead of an Behavior
         multiplayerObjectBehavior,
@@ -447,7 +447,7 @@ module.exports = {
         _('the player owning the object'),
         _('the player owning the object'),
         '',
-        'JsPlatform/Extensions/authentication.svg'
+        'JsPlatform/Extensions/multiplayer.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'MultiplayerObjectBehavior')
@@ -470,8 +470,8 @@ module.exports = {
         ),
         _('Remove ownership of _PARAM0_'),
         '',
-        'JsPlatform/Extensions/authentication.svg',
-        'JsPlatform/Extensions/authentication.svg'
+        'JsPlatform/Extensions/multiplayer.svg',
+        'JsPlatform/Extensions/multiplayer.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter(

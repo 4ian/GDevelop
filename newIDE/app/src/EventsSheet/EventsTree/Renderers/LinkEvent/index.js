@@ -212,8 +212,8 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
                                 <Trans>
                                   These external events are owned by another
                                   scene. Ensure that this scene has the
-                                  variables and objects used in the external
-                                  events.
+                                  variables, objects variables and behaviors
+                                  used in the external events.
                                 </Trans>
                               </Text>
                             </Column>

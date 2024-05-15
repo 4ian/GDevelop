@@ -29,7 +29,7 @@ export default class RenderedSprite3DInstance extends Rendered3DInstance {
     associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,
     threeGroup: THREE.Group,
-    pixiResourcesLoader: Class<PixiResourcesLoader>
+    pixiResourcesLoader: PixiResourcesLoader
   ) {
     super(
       project,

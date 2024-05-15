@@ -24,7 +24,8 @@ import { makeDragSourceAndDropTarget } from '../../UI/DragAndDrop/DragSourceAndD
 import { DragHandleIcon } from '../../UI/DragHandle';
 import DropIndicator from '../../UI/SortableVirtualizedItemList/DropIndicator';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
-import PixiResourcesLoader, {
+import {
+  pixiResourcesLoader,
   type SpineDataOrLoadingError,
 } from '../../ObjectsRendering/PixiResourcesLoader';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
@@ -109,7 +110,7 @@ const SpineEditor = ({
   React.useEffect(
     () => {
       (async () => {
-        const spineData = await PixiResourcesLoader.getSpineData(
+        const spineData = await pixiResourcesLoader.getSpineData(
           project,
           spineResourceName
         );

@@ -5,6 +5,107 @@ type GDNamespace = typeof import('../GDevelop.js/types');
 declare namespace PIXI {}
 
 /**
+ * Expose functions to load PIXI textures or fonts, given the names of
+ * resources and a gd.Project.
+ */
+declare class PixiResourcesLoader {
+  burstCache();
+
+  async reloadResource(project: gd.Project, resourceName: string);
+
+  /**
+   * Reload the given resources.
+   */
+  async reloadResources(
+    project: gd.Project,
+    resourceNames: Array<string>
+  ): Promise<void>;
+
+  /**
+   * Return the PIXI texture represented by the given resource.
+   * If not loaded, it will load it.
+   */
+  getPIXITexture(project: gd.Project, resourceName: string): PIXI.Texture;
+
+  /**
+   * Return the three.js texture associated to the specified resource name.
+   * Returns a placeholder texture if not found.
+   * @param project The project
+   * @param resourceName The name of the resource
+   * @returns The requested texture, or a placeholder if not found.
+   */
+  getThreeTexture(project: gd.Project, resourceName: string): THREE.Texture;
+
+  /**
+   * Return the three.js material associated to the specified resource name.
+   * @param project The project
+   * @param resourceName The name of the resource
+   * @param options Set if the material should be transparent or not.
+   * @returns The requested material.
+   */
+  getThreeMaterial(
+    project: gd.Project,
+    resourceName: string,
+    { useTransparentTexture }: { useTransparentTexture: boolean }
+  ): THREE.Material;
+
+  /**
+   * Return the three.js material associated to the specified resource name.
+   * @param project The project
+   * @param resourceName The name of the resource
+   * @param options
+   * @returns The requested material.
+   */
+  get3DModel(
+    project: gd.Project,
+    resourceName: string
+  ): Promise<THREE.THREE_ADDONS.GLTF>;
+
+  /**
+   * Return the Pixi spine data for the specified resource name.
+   * @param project The project
+   * @param spineName The name of the spine json resource
+   * @returns The requested spine skeleton.
+   */
+  async getSpineData(
+    project: gd.Project,
+    spineName: string
+  ): Promise<SpineDataOrLoadingError>;
+
+  /**
+   * Return the PIXI video texture represented by the given resource.
+   * If not loaded, it will load it.
+   * @returns The PIXI.Texture to be used. It can be loading, so you
+   * should listen to PIXI.Texture `update` event, and refresh your object
+   * if this event is triggered.
+   */
+  getPIXIVideoTexture(project: gd.Project, resourceName: string): PIXI.Texture;
+
+  /**
+   * Load the given font from its url/filename.
+   * @returns a Promise that resolves with the font-family to be used
+   * to render a text with the font.
+   */
+  loadFontFamily(project: gd.Project, resourceName: string): Promise<string>;
+
+  /**
+   * Get the font family name for the given font resource.
+   * The font won't be loaded.
+   * @returns The font-family to be used to render a text with the font.
+   */
+  getFontFamily(project: gd.Project, resourceName: string): string;
+
+  /**
+   * Get the data from a bitmap font file (fnt/xml) resource in the IDE.
+   */
+  getBitmapFontData(project: gd.Project, resourceName: string): Promise<any>;
+
+  getInvalidPIXITexture();
+
+  getResourceJsonData(project: gd.Project, resourceName: string);
+}
+
+/**
  * RenderedInstance is the base class used for creating 2D renderers of instances,
  * which display on the scene editor, using Pixi.js, the instance of an object (see InstancesEditor).
  */
@@ -14,17 +115,17 @@ class RenderedInstance {
   _instance: gd.InitialInstance;
   _associatedObjectConfiguration: gd.ObjectConfiguration;
   _pixiContainer: PIXI.Container;
-  _pixiResourcesLoader: Class<PixiResourcesLoader>;
+  _pixiResourcesLoader: PixiResourcesLoader;
   _pixiObject: PIXI.DisplayObject;
   wasUsed: boolean;
 
   constructor(
-    project: gdProject,
-    layout: gdLayout,
-    instance: gdInitialInstance,
-    associatedObjectConfiguration: gdObjectConfiguration,
+    project: gd.Project,
+    layout: gd.Layout,
+    instance: gd.InitialInstance,
+    associatedObjectConfiguration: gd.ObjectConfiguration,
     pixiContainer: PIXI.Container,
-    pixiResourcesLoader: Class<PixiResourcesLoader>
+    pixiResourcesLoader: PixiResourcesLoader
   );
 
   /**
@@ -85,25 +186,25 @@ class RenderedInstance {
  * It can also display 2D artifacts on Pixi 2D plane (3D object shadow projected on the plane for instance).
  */
 class Rendered3DInstance {
-  _project: gdProject;
-  _layout: gdLayout;
-  _instance: gdInitialInstance;
-  _associatedObjectConfiguration: gdObjectConfiguration;
+  _project: gd.Project;
+  _layout: gd.Layout;
+  _instance: gd.InitialInstance;
+  _associatedObjectConfiguration: gd.ObjectConfiguration;
   _pixiContainer: PIXI.Container;
   _threeGroup: THREE.Group;
-  _pixiResourcesLoader: Class<PixiResourcesLoader>;
+  _pixiResourcesLoader: PixiResourcesLoader;
   _pixiObject: PIXI.DisplayObject;
   _threeObject: THREE.Object3D | null;
   wasUsed: boolean;
 
   constructor(
-    project: gdProject,
-    layout: gdLayout,
-    instance: gdInitialInstance,
-    associatedObjectConfiguration: gdObjectConfiguration,
+    project: gd.Project,
+    layout: gd.Layout,
+    instance: gd.InitialInstance,
+    associatedObjectConfiguration: gd.ObjectConfiguration,
     pixiContainer: PIXI.Container,
     threeGroup: THREE.Group,
-    pixiResourcesLoader: Class<PixiResourcesLoader>
+    pixiResourcesLoader: PixiResourcesLoader
   );
 
   /**

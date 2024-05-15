@@ -28,7 +28,7 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,
-    pixiResourcesLoader: Class<PixiResourcesLoader>
+    pixiResourcesLoader: PixiResourcesLoader
   ) {
     super(
       project,
@@ -86,7 +86,7 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
       this._associatedObjectConfiguration
     );
     this._textureName = panelSprite.getTexture();
-    const texture = PixiResourcesLoader.getPIXITexture(
+    const texture = this._pixiResourcesLoader.getPIXITexture(
       this._project,
       this._textureName
     );
@@ -237,7 +237,7 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
       this._associatedObjectConfiguration
     );
     this._textureName = panelSprite.getTexture();
-    const texture = PixiResourcesLoader.getPIXITexture(
+    const texture = this._pixiResourcesLoader.getPIXITexture(
       this._project,
       this._textureName
     );

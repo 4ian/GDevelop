@@ -24,7 +24,7 @@ export default class RenderedSpriteInstance extends RenderedInstance {
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,
-    pixiResourcesLoader: Class<PixiResourcesLoader>
+    pixiResourcesLoader: PixiResourcesLoader
   ) {
     super(
       project,

@@ -15,7 +15,7 @@ export default class Rendered3DInstance {
   _associatedObjectConfiguration: gdObjectConfiguration;
   _pixiContainer: PIXI.Container;
   _threeGroup: THREE.Group;
-  _pixiResourcesLoader: Class<PixiResourcesLoader>;
+  _pixiResourcesLoader: PixiResourcesLoader;
   _pixiObject: PIXI.DisplayObject;
   _threeObject: THREE.Object3D | null;
   wasUsed: boolean;
@@ -27,7 +27,7 @@ export default class Rendered3DInstance {
     associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,
     threeGroup: THREE.Group,
-    pixiResourcesLoader: Class<PixiResourcesLoader>
+    pixiResourcesLoader: PixiResourcesLoader
   ) {
     this._pixiObject = null;
     this._threeObject = null;

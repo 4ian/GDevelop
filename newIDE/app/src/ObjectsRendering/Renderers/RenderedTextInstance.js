@@ -38,7 +38,7 @@ export default class RenderedTextInstance extends RenderedInstance {
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,
-    pixiResourcesLoader: Class<PixiResourcesLoader>
+    pixiResourcesLoader: PixiResourcesLoader
   ) {
     super(
       project,
@@ -133,10 +133,8 @@ export default class RenderedTextInstance extends RenderedInstance {
     if (this._fontName !== textObjectConfiguration.getFontName()) {
       //Avoid calling loadFontFamily if the font didn't changed.
       this._fontName = textObjectConfiguration.getFontName();
-      PixiResourcesLoader.loadFontFamily(
-        this._project,
-        textObjectConfiguration.getFontName()
-      )
+      this._pixiResourcesLoader
+        .loadFontFamily(this._project, textObjectConfiguration.getFontName())
         .then(fontFamily => {
           // Once the font is loaded, we can use the given fontFamily.
           this._fontFamily = fontFamily;

@@ -12,7 +12,7 @@ export default class RenderedInstance {
   _instance: gdInitialInstance;
   _associatedObjectConfiguration: gdObjectConfiguration;
   _pixiContainer: PIXI.Container;
-  _pixiResourcesLoader: Class<PixiResourcesLoader>;
+  _pixiResourcesLoader: PixiResourcesLoader;
   _pixiObject: PIXI.DisplayObject;
   wasUsed: boolean;
 
@@ -22,7 +22,7 @@ export default class RenderedInstance {
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,
-    pixiResourcesLoader: Class<PixiResourcesLoader>
+    pixiResourcesLoader: PixiResourcesLoader
   ) {
     this._pixiObject = null;
     this._instance = instance;

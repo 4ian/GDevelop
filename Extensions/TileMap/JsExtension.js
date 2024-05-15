@@ -1290,6 +1290,7 @@ module.exports = {
               manager.getOrLoadTextureCache(
                 this._loadTileMapWithCallback.bind(this),
                 (textureName) =>
+                  // @ts-ignore
                   this._pixiResourcesLoader.getPIXITexture(
                     this._project,
                     mapping[textureName] || textureName

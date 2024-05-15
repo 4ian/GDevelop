@@ -175,7 +175,7 @@ import useCreateProject from '../Utils/UseCreateProject';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
 import useEditorTabsStateSaving from './EditorTabs/UseEditorTabsStateSaving';
-import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
+import { pixiResourcesLoader } from '../ObjectsRendering/PixiResourcesLoader';
 import useResourcesWatcher from './ResourcesWatcher';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 import useVersionHistory from '../VersionHistory/UseVersionHistory';
@@ -901,7 +901,7 @@ const MainFrame = (props: Props) => {
       // the URL to a resource with a name in the old project is not re-used
       // for another resource with the same name in the new project.
       ResourcesLoader.burstAllUrlsCache();
-      PixiResourcesLoader.burstCache();
+      pixiResourcesLoader.burstCache();
 
       const state = await setState(state => ({
         ...state,

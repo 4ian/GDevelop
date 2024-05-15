@@ -2,20 +2,17 @@ import { TileTextureCache } from "../TileTextureCache";
 import { LDtkTileMap, LDtkTilesetDef } from "../../load/ldtk/LDtkFormat";
 import { getLDtkTileId } from "../../load/ldtk/LDtkTileMapLoaderHelper";
 
-type Texture = PIXI.BaseTexture<PIXI.Resource>;
-type TextureLoader = (textureName: string) => PIXI.BaseTexture<PIXI.Resource>;
-
 function getAtlasTexture(
-  atlasTextures: Record<number, Texture | null>,
+  atlasTextures: Record<number, PIXI.Texture | null>,
   tilesetCache: Record<number, LDtkTilesetDef>,
-  getTexture: TextureLoader,
+  getTexture: (textureName: string) => PIXI.Texture,
   tilesetId: number
-): Texture | null {
+): PIXI.Texture | null {
   if (atlasTextures[tilesetId]) {
     return atlasTextures[tilesetId];
   }
 
-  let texture: Texture | null = null;
+  let texture: PIXI.Texture | null = null;
 
   const tileset = tilesetCache[tilesetId];
   if (tileset?.relPath) {
@@ -51,8 +48,8 @@ export namespace LDtkPixiHelper {
   export function parseAtlas(
     tileMap: LDtkTileMap,
     levelIndex: number,
-    atlasTexture: Texture | null,
-    getTexture: TextureLoader
+    atlasTexture: PIXI.Texture | null,
+    getTexture: (textureName: string) => PIXI.Texture
   ): TileTextureCache | null {
     const level = tileMap.levels[levelIndex > -1 ? levelIndex : 0];
     if (!level || !level.layerInstances) {
@@ -68,7 +65,7 @@ export namespace LDtkPixiHelper {
     // List the tiles that have been loaded to Pixi by all the layers of the level.
     // The keys are a composition (getLDtkTileId) between the tileset's id and the tile's id.
     const levelTileCache: Record<number, boolean> = {};
-    const atlasTextures: Record<number, Texture | null> = {};
+    const atlasTextures: Record<number, PIXI.Texture | null> = {};
 
     for (let iLayer = level.layerInstances.length - 1; iLayer >= 0; --iLayer) {
       const layer = level.layerInstances[iLayer];
@@ -113,7 +110,7 @@ export namespace LDtkPixiHelper {
           const [x, y] = tile.src;
           const rect = new PIXI.Rectangle(x, y, gridSize, gridSize);
 
-          const texture = new PIXI.Texture(atlasTexture, rect);
+          const texture = new PIXI.Texture(atlasTexture.baseTexture, rect);
 
           textureCache.setTexture(tileId, texture);
         } catch (error) {
@@ -131,7 +128,7 @@ export namespace LDtkPixiHelper {
     if (level.bgRelPath) {
       const atlasTexture = getTexture(level.bgRelPath);
       const rect = new PIXI.Rectangle(0, 0, level.pxWid, level.pxHei);
-      const texture = new PIXI.Texture(atlasTexture!, rect);
+      const texture = new PIXI.Texture(atlasTexture!.baseTexture, rect);
 
       textureCache.setLevelBackgroundTexture(level.bgRelPath, texture);
     }

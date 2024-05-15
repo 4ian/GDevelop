@@ -23,7 +23,7 @@ import { showWarningBox } from '../../../../UI/Messages/MessageBox';
 import { type EventRendererProps } from '../EventRenderer';
 import { shouldActivate } from '../../../../UI/KeyboardShortcuts/InteractionKeys';
 import ShareExternal from '../../../../UI/CustomSvgIcons/ShareExternal';
-import Warning from '../../../../UI/CustomSvgIcons/Warning';
+import InfoIcon from '../../../../UI/CustomSvgIcons/CircledInfo';
 import Tooltip from '@material-ui/core/Tooltip';
 import { Column } from '../../../../UI/Grid';
 import Text from '../../../../UI/Text';
@@ -197,11 +197,7 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
                         {target}
                       </span>
                     ) : this.isLinkedToWrongLayout(target) ? (
-                      <span
-                        className={classNames({
-                          [instructionWarningParameter]: true,
-                        })}
-                      >
+                      <>
                         <Tooltip
                           title={
                             <Column noMargin>
@@ -210,23 +206,22 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
                               </Text>
                               <Text size="body">
                                 <Trans>
-                                  These external events are owned by another
-                                  scene. Ensure that this scene has the
-                                  variables, objects variables and behaviors
-                                  used in the external events.
+                                  Ensure this scene has the same objects,
+                                  behaviors and variables as the ones used in
+                                  these events.
                                 </Trans>
                               </Text>
                             </Column>
                           }
                         >
-                          <Warning
+                          <InfoIcon
                             className={classNames({
                               [icon]: true,
                             })}
                           />
                         </Tooltip>
                         {target}
-                      </span>
+                      </>
                     ) : (
                       target || (
                         <Trans>{`<Enter the name of external events>`}</Trans>

@@ -242,10 +242,6 @@
 .gd-events-sheet-dark-theme .link-container span {
   color: var(--event-sheet-link-container-color);
 }
-.gd-events-sheet .link-container .instruction-warning-parameter {
-  color: var(--event-sheet-instruction-parameter-warning-color);
-  text-decoration:  var(--event-sheet-instruction-parameter-warning-color) underline wavy;
-}
 .gd-events-sheet .link-container .instruction-invalid-parameter {
   color: var(--event-sheet-instruction-parameter-error-color);
   text-decoration:  var(--event-sheet-instruction-parameter-error-color) underline wavy;

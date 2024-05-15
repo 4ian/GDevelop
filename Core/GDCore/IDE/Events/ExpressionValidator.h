@@ -94,14 +94,14 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
 
     if (leftType == Type::Number) {
       if (node.op == ' ') {
-        RaiseError("syntax_error",
+        RaiseError(gd::ExpressionParserError::ErrorType::SyntaxError,
             "No operator found. Did you forget to enter an operator (like +, -, "
             "* or /) between numbers or expressions?", node.rightHandSide->location);
       }
     }
     else if (leftType == Type::String) {
       if (node.op == ' ') {
-        RaiseError("syntax_error",
+        RaiseError(gd::ExpressionParserError::ErrorType::SyntaxError,
             "You must add the operator + between texts or expressions. For "
             "example: \"Your name: \" + VariableString(PlayerName).", node.rightHandSide->location);
       }
@@ -206,7 +206,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       if (!currentParameterExtraInfo || *currentParameterExtraInfo != "AllowUndeclaredVariable") {
         const auto& variablesContainersList = projectScopedContainers.GetVariablesContainersList();
         if (!variablesContainersList.Has(node.name)) {
-          RaiseTypeError(_("No variable with this name found."), node.location);
+          RaiseUndeclaredVariableError(_("No variable with this name found."), node.location, node.name);
         }
       }
 
@@ -284,7 +284,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     ReportAnyError(node);
 
     if (forbidsUsageOfBracketsBecauseParentIsObject) {
-      RaiseError("brackets_not_allowed_for_objects",
+      RaiseError(gd::ExpressionParserError::ErrorType::BracketsNotAllowedForObjects,
                  _("You can't use the brackets to access an object variable. "
                    "Use a dot followed by the variable name, like this: "
                    "`MyObject.MyVariable`."),
@@ -310,7 +310,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       if (!ValidateObjectVariableOrVariableOrProperty(node)) {
         // The identifier is not a variable, so either the variable is not properly declared
         // or it's a text without quotes.
-        RaiseTypeError(_("You must wrap your text inside double quotes "
+        RaiseUnknownIdentifierError(_("You must wrap your text inside double quotes "
                               "(example: \"Hello world\")."),
                             node.location);
       }
@@ -318,15 +318,14 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     else if (parentType == Type::Number) {
       if (!ValidateObjectVariableOrVariableOrProperty(node)) {
         // The identifier is not a variable, so the variable is not properly declared.
-        RaiseTypeError(
-            _("You must enter a number."), node.location);
+        RaiseUnknownIdentifierError(_("You must enter a number."), node.location);
       }
     }
     else if (parentType == Type::NumberOrString) {
       if (!ValidateObjectVariableOrVariableOrProperty(node)) {
         // The identifier is not a variable, so either the variable is not properly declared
         // or it's a text without quotes.
-        RaiseTypeError(
+        RaiseUnknownIdentifierError(
             _("You must enter a number or a text, wrapped inside double quotes (example: \"Hello world\"), or a variable name."),
             node.location);
       }
@@ -335,7 +334,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       if (!currentParameterExtraInfo || *currentParameterExtraInfo != "AllowUndeclaredVariable") {
         const auto& variablesContainersList = projectScopedContainers.GetVariablesContainersList();
         if (!variablesContainersList.Has(node.identifierName)) {
-          RaiseTypeError(_("No variable with this name found."), node.location);
+          RaiseUndeclaredVariableError(_("No variable with this name found."), node.location, node.identifierName);
         }
       }
     }
@@ -392,10 +391,13 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     }
   }
 
-  void RaiseError(const gd::String &type,
-      const gd::String &message, const ExpressionParserLocation &location, bool isFatal = true) {
+  void RaiseError(gd::ExpressionParserError::ErrorType type,
+                  const gd::String &message,
+                  const ExpressionParserLocation &location, bool isFatal = true,
+                  const gd::String &actualValue = "",
+                  const gd::String &objectName = "") {
     auto diagnostic = gd::make_unique<ExpressionParserError>(
-        type, message, location);
+        type, message, location, actualValue, objectName);
     allErrors.push_back(diagnostic.get());
     if (isFatal) {
       fatalErrors.push_back(diagnostic.get());
@@ -406,14 +408,31 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     supplementalErrors.push_back(std::move(diagnostic));
   }
 
-  void RaiseTypeError(
-      const gd::String &message, const ExpressionParserLocation &location, bool isFatal = true) {
-    RaiseError("type_error", message, location, isFatal);
+  void RaiseUnknownIdentifierError(const gd::String &message,
+                                   const ExpressionParserLocation &location) {
+    RaiseError(gd::ExpressionParserError::ErrorType::UnknownIdentifier, message,
+               location);
   }
 
-  void RaiseOperatorError(
-      const gd::String &message, const ExpressionParserLocation &location) {
-    RaiseError("invalid_operator", message, location);
+  void RaiseUndeclaredVariableError(const gd::String &message,
+                                    const ExpressionParserLocation &location,
+                                    const gd::String &variableName,
+                                    const gd::String &objectName = "") {
+    RaiseError(gd::ExpressionParserError::ErrorType::UndeclaredVariable,
+               message, location, true, variableName, objectName);
+  }
+
+  void RaiseTypeError(const gd::String &message,
+                      const ExpressionParserLocation &location,
+                      bool isFatal = true) {
+    RaiseError(gd::ExpressionParserError::ErrorType::MismatchedType, message,
+               location, isFatal);
+  }
+
+  void RaiseOperatorError(const gd::String &message,
+                          const ExpressionParserLocation &location) {
+    RaiseError(gd::ExpressionParserError::ErrorType::InvalidOperator, message,
+               location);
   }
 
   void ReadChildTypeFromVariable(gd::Variable::Type variableType) {

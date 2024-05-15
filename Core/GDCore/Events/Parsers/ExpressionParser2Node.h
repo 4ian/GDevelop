@@ -44,15 +44,33 @@ struct GD_CORE_API ExpressionParserLocation {
  * \brief An error that can be attached to a gd::ExpressionNode.
  */
 struct GD_CORE_API ExpressionParserError {
-  ExpressionParserError(const gd::String &type_,
+  enum ErrorType {
+    SyntaxError,
+    InvalidOperator,
+    MismatchedType,
+    UndeclaredVariable,
+    UnknownIdentifier,
+    BracketsNotAllowedForObjects,
+    TooFewParameters,
+    TooManyParameters,
+    InvalidFunctionName,
+    MalformedVariableParameter,
+    MalformedObjectParameter,
+    UnknownParameterType,
+  };
+
+  ExpressionParserError(ExpressionParserError::ErrorType type_,
                         const gd::String &message_,
-                        const ExpressionParserLocation &location_)
-      : type(type_), message(message_), location(location_){};
-  ExpressionParserError(const gd::String &type_,
+                        const ExpressionParserLocation &location_,
+                        const gd::String &actualValue_ = "",
+                        const gd::String &objectName_ = "")
+      : type(type_), message(message_), location(location_),
+        actualValue(actualValue_), objectName(objectName_){};
+  ExpressionParserError(ExpressionParserError::ErrorType type_,
                         const gd::String &message_,
                         size_t position_)
       : type(type_), message(message_), location(position_){};
-  ExpressionParserError(const gd::String &type_,
+  ExpressionParserError(ExpressionParserError::ErrorType type_,
                         const gd::String &message_,
                         size_t startPosition_,
                         size_t endPosition_)
@@ -61,14 +79,19 @@ struct GD_CORE_API ExpressionParserError {
         location(startPosition_, endPosition_){};
   virtual ~ExpressionParserError(){};
 
+  gd::ExpressionParserError::ErrorType GetType() { return type; }
   const gd::String &GetMessage() { return message; }
+  const gd::String &GetObjectName() { return objectName; }
+  const gd::String &GetActualValue() { return actualValue; }
   size_t GetStartPosition() { return location.GetStartPosition(); }
   size_t GetEndPosition() { return location.GetEndPosition(); }
 
  private:
-  gd::String type;
+  ExpressionParserError::ErrorType type;
   gd::String message;
   ExpressionParserLocation location;
+  gd::String objectName;
+  gd::String actualValue;
 };
 
 /**

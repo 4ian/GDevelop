@@ -61,6 +61,15 @@ gd::String ExpressionCodeGenerator::GenerateExpressionCode(
               << "\" in: \"" << expression.GetPlainString() << "\" ("
               << rootType << ")" << std::endl;
 
+    // TODO Forward the error to the report.
+    for (auto* error : validator.GetFatalErrors()) {
+      if (error->GetType() == gd::ExpressionParserError::ErrorType::UndeclaredVariable) {
+        const auto &variableName = error->GetActualValue();
+        const auto &objectName = error->GetObjectName();
+        const auto &layoutName = codeGenerator.GetLayout().GetName();
+      }
+    }
+
     return generator.GenerateDefaultValue(rootType);
   }
 

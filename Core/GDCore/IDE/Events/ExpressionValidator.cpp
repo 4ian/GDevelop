@@ -106,20 +106,20 @@ bool ExpressionValidator::ValidateObjectVariableOrVariableOrProperty(
       auto variableExistence = objectsContainersList.HasObjectOrGroupWithVariableNamed(identifier.identifierName, identifier.childIdentifierName);
 
       if (variableExistence == gd::ObjectsContainersList::DoesNotExist) {
-        RaiseTypeError(_("This variable does not exist on this object or group."),
-                        identifier.childIdentifierNameLocation);
+        RaiseUndeclaredVariableError(_("This variable does not exist on this object or group."),
+                        identifier.childIdentifierNameLocation, identifier.childIdentifierName, identifier.identifierName);
 
         return true; // We should have found a variable.
       }
       else if (variableExistence == gd::ObjectsContainersList::ExistsOnlyOnSomeObjectsOfTheGroup) {
-        RaiseTypeError(_("This variable only exists on some objects of the group. It must be declared for all objects."),
-                        identifier.childIdentifierNameLocation);
+        RaiseUndeclaredVariableError(_("This variable only exists on some objects of the group. It must be declared for all objects."),
+                        identifier.childIdentifierNameLocation, identifier.childIdentifierName, identifier.identifierName);
 
         return true; // We should have found a variable.
       }
       else if (variableExistence == gd::ObjectsContainersList::GroupIsEmpty) {
-        RaiseTypeError(_("This group is empty. Add an object to this group first."),
-                        identifier.identifierNameLocation);
+        RaiseUndeclaredVariableError(_("This group is empty. Add an object to this group first."),
+                        identifier.identifierNameLocation, identifier.childIdentifierName, identifier.identifierName);
 
         return true; // We should have found a variable.
       }
@@ -263,11 +263,11 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(
 
   if (gd::MetadataProvider::IsBadExpressionMetadata(metadata)) {
     if (function.functionName.empty()) {
-      RaiseError("invalid_function_name",
+      RaiseError(gd::ExpressionParserError::ErrorType::InvalidFunctionName,
                _("Enter the name of the function to call."),
                function.location);
     } else {
-      RaiseError("invalid_function_name",
+      RaiseError(gd::ExpressionParserError::ErrorType::InvalidFunctionName,
                _("Cannot find an expression with this name: ") +
                    function.functionName + "\n" +
                    _("Double check that you've not made any typo in the name."),
@@ -340,13 +340,13 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(
 
     if (function.parameters.size() < minParametersCount) {
       RaiseError(
-          "too_few_parameters",
+          gd::ExpressionParserError::ErrorType::TooFewParameters,
           _("You have not entered enough parameters for the expression.") +
               " " + expectedCountMessage,
           function.location);
     } else {
       RaiseError(
-          "extra_parameter",
+          gd::ExpressionParserError::ErrorType::TooManyParameters,
           _("This parameter was not expected by this expression. Remove it "
             "or verify that you've entered the proper expression name.") +
               " " + expectedCountMessage,
@@ -386,7 +386,7 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(
               ExpressionValidator::variableTypeString, expectedParameterType)) {
         if (dynamic_cast<IdentifierNode*>(parameter.get()) == nullptr &&
             dynamic_cast<VariableNode*>(parameter.get()) == nullptr) {
-          RaiseError("malformed_variable_parameter",
+          RaiseError(gd::ExpressionParserError::ErrorType::MalformedVariableParameter,
                      _("A variable name was expected but something else was "
                        "written. Enter just the name of the variable for this "
                        "parameter."),
@@ -394,7 +394,7 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(
         }
       } else if (gd::ParameterMetadata::IsObject(expectedParameterType)) {
         if (dynamic_cast<IdentifierNode*>(parameter.get()) == nullptr) {
-          RaiseError("malformed_object_parameter",
+          RaiseError(gd::ExpressionParserError::ErrorType::MalformedObjectParameter,
                      _("An object name was expected but something else was "
                        "written. Enter just the name of the object for this "
                        "parameter."),
@@ -408,7 +408,7 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(
                !gd::ParameterMetadata::IsExpression(
                    ExpressionValidator::stringTypeString,
                    expectedParameterType)) {
-        RaiseError("unknown_parameter_type",
+        RaiseError(gd::ExpressionParserError::ErrorType::UnknownParameterType,
                    _("This function is improperly set up. Reach out to the "
                      "extension developer or a GDevelop maintainer to fix "
                      "this issue"),

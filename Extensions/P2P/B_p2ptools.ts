@@ -20,10 +20,15 @@ namespace gdjs {
         typeof event['eventName'] === 'string' &&
         typeof event['data'] === 'string';
 
+      export interface IEventData {
+        readonly data: string;
+        readonly sender: string;
+      }
+
       /**
        * The data bound to an event that got triggered.
        */
-      export class EventData {
+      export class EventData implements IEventData {
         constructor(data: string, sender: string) {
           this.data = data;
           this.sender = sender;
@@ -40,11 +45,21 @@ namespace gdjs {
         public readonly sender: string = '';
       }
 
+      export interface IEvent {
+        dataloss: boolean;
+
+        isTriggered(): boolean;
+        pushData(newData: IEventData): void;
+        popData(): void;
+        getData(): string;
+        getSender(): string;
+      }
+
       /**
        * An event that can be listened to.
        */
-      export class Event {
-        private readonly data: EventData[] = [];
+      export class Event implements IEvent {
+        private readonly data: IEventData[] = [];
         public dataloss = false;
 
         /**
@@ -57,7 +72,7 @@ namespace gdjs {
         /**
          * Add new data, to be called with the event data each time the event is triggered.
          */
-        pushData(newData: EventData) {
+        pushData(newData: IEventData) {
           if (this.dataloss && this.data.length > 0) this.data[0] = newData;
           else this.data.push(newData);
         }
@@ -108,7 +123,7 @@ namespace gdjs {
        * Contains a map of events triggered by other p2p clients.
        * It is keyed by the event name.
        */
-      const events = new Map<string, Event>();
+      const events = new Map<string, IEvent>();
 
       /**
        * True if PeerJS is initialized and ready.
@@ -216,7 +231,7 @@ namespace gdjs {
       /**
        * Get an event, and creates it if it doesn't exist.
        */
-      export const getEvent = (name: string): Event => {
+      export const getEvent = (name: string): IEvent => {
         let event = events.get(name);
         if (!event) events.set(name, (event = new Event()));
         return event;

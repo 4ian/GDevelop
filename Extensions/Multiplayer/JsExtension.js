@@ -271,7 +271,6 @@ module.exports = {
           'Returns the data received when the specified message was received from another player.'
         ),
         '',
-        'JsPlatform/Extensions/multiplayer.svg',
         'JsPlatform/Extensions/multiplayer.svg'
       )
       .addParameter('string', _('Message name'), '', false)

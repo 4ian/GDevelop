@@ -5,6 +5,10 @@ namespace gdjs {
   const multiplayerComponents = gdjs.multiplayerComponents;
   const multiplayerMessageManager = gdjs.multiplayerMessageManager;
   export namespace multiplayer {
+
+    /** Set to true in testing to avoid relying on the multiplayer extension. */
+    export let disableMultiplayerForTesting = false;
+
     let _hasGameJustStarted = false;
     let _hasGameJustEnded = false;
     let _lobbyId: string | null = null;
@@ -33,6 +37,8 @@ namespace gdjs {
 
     gdjs.registerRuntimeScenePreEventsCallback(
       (runtimeScene: gdjs.RuntimeScene) => {
+        if (disableMultiplayerForTesting) return;
+
         multiplayerMessageManager.handleChangeOwnerMessages(runtimeScene);
         multiplayerMessageManager.handleUpdateObjectMessages(runtimeScene);
         multiplayerMessageManager.handleCustomMessages();
@@ -47,6 +53,8 @@ namespace gdjs {
 
     gdjs.registerRuntimeScenePostEventsCallback(
       (runtimeScene: gdjs.RuntimeScene) => {
+        if (disableMultiplayerForTesting) return;
+
         multiplayerMessageManager.handleDestroyObjectMessages(runtimeScene);
         multiplayerMessageManager.handleUpdateSceneMessages(runtimeScene);
         multiplayerMessageManager.handleUpdateGameMessages(runtimeScene);
@@ -55,6 +63,8 @@ namespace gdjs {
 
     // Ensure that the condition "game just started" (or ended) is valid only for one frame.
     gdjs.registerRuntimeScenePostEventsCallback(() => {
+      if (disableMultiplayerForTesting) return;
+
       _hasGameJustStarted = false;
       _hasGameJustEnded = false;
     });
@@ -550,6 +560,7 @@ namespace gdjs {
           }
 
           const playerLeftPublicProfile = _playerPublicProfiles.find(
+            // @ts-ignore - probable TypeScript bug, we guarded against this just before.
             (profile) => profile.id === playerLeft.playerId
           );
 

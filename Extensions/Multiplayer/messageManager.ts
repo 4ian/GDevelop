@@ -1168,6 +1168,7 @@ namespace gdjs {
       runtimeScene: gdjs.RuntimeScene
     ) => {
       const p2pMessagesMap = gdjs.evtTools.p2p.getEvents();
+
       const messageNamesArray = Array.from(p2pMessagesMap.keys());
       const updateSceneMessageNames = messageNamesArray.filter((messageName) =>
         messageName.startsWith(updateSceneMessageNamePrefix)

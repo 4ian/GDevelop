@@ -26,7 +26,22 @@ describe('Multiplayer', () => {
       stopSoundsOnStartup: false,
       title: '',
       behaviorsSharedData: [],
-      objects: [],
+      objects: [
+        {
+          type: 'Sprite',
+          name: 'MySpriteObject',
+          behaviors: [
+            {
+              name: 'MultiplayerObject',
+              type: 'Multiplayer::MultiplayerObjectBehavior',
+            },
+          ],
+          effects: [],
+          // @ts-expect-error ts-migrate(2322) FIXME: Type '{ type: string; name: string; behaviors: nev... Remove this comment to see the full error message
+          animations: [],
+          updateIfNotVisible: false,
+        },
+      ],
       instances: [],
       variables: [],
       usedResources: [],
@@ -228,5 +243,61 @@ describe('Multiplayer', () => {
     expect(
       localRuntimeScene.getVariables().get('MyRemoteVariable').getAsString()
     ).to.be('Hello from remote world');
+  });
+
+  it('properly synchronize objects from the server to other players', () => {
+    let otherPeerIds = [];
+    let currentPeerId = '';
+    const { switchToPeer } = createP2PMock();
+
+    // Create an instance on the server:
+    switchToPeer({
+      peerId: 'player-1',
+      otherPeerIds: ['player-2', 'player-3'],
+      playerNumber: 1,
+    });
+
+    const remoteRuntimeScene = makeTestRuntimeScene();
+    const mySpriteObject1 = remoteRuntimeScene.createObject('MySpriteObject');
+    mySpriteObject1.setX(142);
+    mySpriteObject1.setY(143);
+
+    remoteRuntimeScene.renderAndStep(1000 / 60);
+
+    // Check the object is created on the other peer.
+    switchToPeer({
+      peerId: 'player-2',
+      otherPeerIds: ['player-1', 'player-3'],
+      playerNumber: 2,
+    });
+
+    const localRuntimeScene = makeTestRuntimeScene();
+    expect(localRuntimeScene.getObjects('MySpriteObject').length).to.be(0);
+    localRuntimeScene.renderAndStep(1000 / 60);
+    expect(localRuntimeScene.getObjects('MySpriteObject').length).to.be(1);
+    expect(localRuntimeScene.getObjects('MySpriteObject')[0].getX()).to.be(142);
+    expect(localRuntimeScene.getObjects('MySpriteObject')[0].getY()).to.be(143);
+
+    // Move the object on the server:
+    // switchToPeer({
+    //   peerId: 'player-1',
+    //   otherPeerIds: ['player-2', 'player-3'],
+    //   playerNumber: 1,
+    // });
+
+    // mySpriteObject1.setX(242);
+    // mySpriteObject1.setY(243);
+    // remoteRuntimeScene.renderAndStep(1000 / 60);
+
+    // // Check the object is created on the other peer.
+    // switchToPeer({
+    //   peerId: 'player-2',
+    //   otherPeerIds: ['player-1', 'player-3'],
+    //   playerNumber: 2,
+    // });
+    // localRuntimeScene.renderAndStep(1000 / 60);
+    // expect(localRuntimeScene.getObjects('MySpriteObject').length).to.be(1);
+    // expect(localRuntimeScene.getObjects('MySpriteObject')[0].getX()).to.be(242);
+    // expect(localRuntimeScene.getObjects('MySpriteObject')[0].getY()).to.be(243);
   });
 });

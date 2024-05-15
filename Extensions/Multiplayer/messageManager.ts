@@ -345,6 +345,7 @@ namespace gdjs {
       );
       objectOwnershipChangeMessageNames.forEach((messageName) => {
         if (gdjs.evtTools.p2p.onEvent(messageName, false)) {
+          // TODO: Catch, log error and ignore to avoid to crash the game.
           const data = JSON.parse(gdjs.evtTools.p2p.getEventData(messageName));
           const messageSender = gdjs.evtTools.p2p.getEventSender(messageName);
           logger.info(`Received message ${messageName} with data ${data}.`);
@@ -487,6 +488,7 @@ namespace gdjs {
       );
       objectUpdateMessageNames.forEach((messageName) => {
         if (gdjs.evtTools.p2p.onEvent(messageName, true)) {
+          // TODO: Catch, log error and ignore to avoid to crash the game.
           const data = JSON.parse(gdjs.evtTools.p2p.getEventData(messageName));
           const messageSender = gdjs.evtTools.p2p.getEventSender(messageName);
           if (data) {
@@ -831,6 +833,7 @@ namespace gdjs {
       );
       destroyObjectMessageNames.forEach((messageName) => {
         if (gdjs.evtTools.p2p.onEvent(messageName, false)) {
+          // TODO: Catch, log error and ignore to avoid to crash the game.
           const data = JSON.parse(gdjs.evtTools.p2p.getEventData(messageName));
           const messageSender = gdjs.evtTools.p2p.getEventSender(messageName);
           if (data && messageSender) {
@@ -1000,6 +1003,7 @@ namespace gdjs {
       );
       if (messageHasBeenReceived) {
         const messageData = gdjs.evtTools.p2p.getEventData(messageName);
+        // TODO: Catch, log error and ignore to avoid to crash the game.
         const uniqueMessageId = JSON.parse(messageData).uniqueId;
         const customMessageCacheKey = `${messageName}#${uniqueMessageId}`;
         if (processedCustomMessagesCache.has(customMessageCacheKey)) {
@@ -1028,6 +1032,7 @@ namespace gdjs {
       customMessageNames.forEach((messageName) => {
         if (gdjs.evtTools.p2p.onEvent(messageName, false)) {
           const event = gdjs.evtTools.p2p.getEvent(messageName);
+          // TODO: Catch, log error and ignore to avoid to crash the game.
           const data = JSON.parse(event.getData());
           const uniqueMessageId = data.uniqueId;
           const messageSender = event.getSender();
@@ -1175,6 +1180,7 @@ namespace gdjs {
       );
       updateSceneMessageNames.forEach((messageName) => {
         if (gdjs.evtTools.p2p.onEvent(messageName, true)) {
+          // TODO: Catch, log error and ignore to avoid to crash the game.
           const data = JSON.parse(gdjs.evtTools.p2p.getEventData(messageName));
           const messageSender = gdjs.evtTools.p2p.getEventSender(messageName);
           if (data && messageSender) {
@@ -1264,6 +1270,7 @@ namespace gdjs {
       );
       updateGameMessageNames.forEach((messageName) => {
         if (gdjs.evtTools.p2p.onEvent(messageName, true)) {
+          // TODO: Catch, log error and ignore to avoid to crash the game.
           const data = JSON.parse(gdjs.evtTools.p2p.getEventData(messageName));
           const messageSender = gdjs.evtTools.p2p.getEventSender(messageName);
           if (data && messageSender) {

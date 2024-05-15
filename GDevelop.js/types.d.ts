@@ -1910,24 +1910,24 @@ export class MetadataProvider extends EmscriptenObject {
   static isBadBehaviorMetadata(metadata: BehaviorMetadata): boolean;
 }
 
-export class ExpressionParserDiagnostic extends EmscriptenObject {
+export class ExpressionParserError extends EmscriptenObject {
   isError(): boolean;
   getMessage(): string;
   getStartPosition(): number;
   getEndPosition(): number;
 }
 
-export class VectorExpressionParserDiagnostic extends EmscriptenObject {
+export class VectorExpressionParserError extends EmscriptenObject {
   size(): number;
-  at(index: number): ExpressionParserDiagnostic;
+  at(index: number): ExpressionParserError;
 }
 
 export class ExpressionParser2NodeWorker extends EmscriptenObject {}
 
 export class ExpressionValidator extends EmscriptenObject {
   constructor(platform: Platform, projectScopedContainers: ProjectScopedContainers, rootType: string, extraInfo: string);
-  getAllErrors(): VectorExpressionParserDiagnostic;
-  getFatalErrors(): VectorExpressionParserDiagnostic;
+  getAllErrors(): VectorExpressionParserError;
+  getFatalErrors(): VectorExpressionParserError;
 }
 
 export class ExpressionCompletionDescription extends EmscriptenObject {

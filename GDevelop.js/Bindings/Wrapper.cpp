@@ -452,8 +452,8 @@ typedef EventsFunctionsContainer::FunctionOwner
 typedef std::unique_ptr<gd::Object> UniquePtrObject;
 typedef std::unique_ptr<gd::ObjectConfiguration> UniquePtrObjectConfiguration;
 typedef std::unique_ptr<ExpressionNode> UniquePtrExpressionNode;
-typedef std::vector<gd::ExpressionParserDiagnostic *>
-    VectorExpressionParserDiagnostic;
+typedef std::vector<gd::ExpressionParserError *>
+    VectorExpressionParserError;
 typedef gd::SerializableWithNameList<gd::EventsBasedBehavior>
     EventsBasedBehaviorsList;
 typedef gd::SerializableWithNameList<gd::EventsBasedObject>

@@ -3371,6 +3371,8 @@ const MainFrame = (props: Props) => {
           }}
         />
       )}
+      {// Render example or game template dialogs before NewProjectSetupDialog to make sure it's always displayed on top
+      renderExampleOrGameTemplateDialogs()}
       {newProjectSetupDialogOpen && (
         <NewProjectSetupDialog
           authenticatedUser={authenticatedUser}
@@ -3460,7 +3462,6 @@ const MainFrame = (props: Props) => {
       {renderResourceMoverDialog()}
       {renderResourceFetcherDialog()}
       {renderVersionHistoryPanel()}
-      {renderExampleOrGameTemplateDialogs()}
       <CloseConfirmDialog
         shouldPrompt={!!state.currentProject}
         i18n={props.i18n}

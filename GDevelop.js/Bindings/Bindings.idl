@@ -2519,16 +2519,16 @@ interface MetadataProvider {
     boolean STATIC_IsBadBehaviorMetadata([Const, Ref] BehaviorMetadata metadata);
 };
 
-interface ExpressionParserDiagnostic {
+interface ExpressionParserError {
     boolean IsError();
     [Const, Ref] DOMString GetMessage();
     unsigned long GetStartPosition();
     unsigned long GetEndPosition();
 };
 
-interface VectorExpressionParserDiagnostic {
+interface VectorExpressionParserError {
     unsigned long size();
-    [Const] ExpressionParserDiagnostic at(unsigned long index);
+    [Const] ExpressionParserError at(unsigned long index);
 };
 
 interface ExpressionParser2NodeWorker {
@@ -2541,8 +2541,8 @@ interface ExpressionValidator {
         [Const] DOMString rootType,
         [Const] DOMString extraInfo);
 
-    [Const, Ref] VectorExpressionParserDiagnostic GetAllErrors();
-    [Const, Ref] VectorExpressionParserDiagnostic GetFatalErrors();
+    [Const, Ref] VectorExpressionParserError GetAllErrors();
+    [Const, Ref] VectorExpressionParserError GetFatalErrors();
 
     //Inherited from ExpressionParser2NodeWorker:
 };

@@ -100,10 +100,12 @@ gd::String EventsCodeGenerator::GenerateLayoutCode(
     const gd::Layout& scene,
     const gd::String& codeNamespace,
     std::set<gd::String>& includeFiles,
+    gd::DiagnosticReport& diagnosticReport,
     bool compilationForRuntime) {
   EventsCodeGenerator codeGenerator(project, scene);
   codeGenerator.SetCodeNamespace(codeNamespace);
   codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
+  codeGenerator.SetDiagnosticReport(diagnosticReport);
 
   gd::String output = GenerateEventsListCompleteFunctionCode(
       codeGenerator,

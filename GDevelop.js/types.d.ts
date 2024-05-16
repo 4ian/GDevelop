@@ -45,6 +45,10 @@ export enum ObjectsContainersList_VariableExistence {
   ExistsOnlyOnSomeObjectsOfTheGroup = 3,
 }
 
+export enum ProjectDiagnostic_ErrorType {
+  UndeclaredVariable = 0,
+}
+
 export enum ExpressionCompletionDescription_CompletionKind {
   Object = 0,
   BehaviorWithPrefix = 1,
@@ -558,6 +562,7 @@ export class Project extends EmscriptenObject {
   getResourcesManager(): ResourcesManager;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(element: SerializerElement): void;
+  getWholeProjectDiagnosticReport(): WholeProjectDiagnosticReport;
   static isNameSafe(name: string): boolean;
   static getSafeName(name: string): string;
   getTypeOfBehavior(layout: Layout, name: string, searchInGroups: boolean): string;
@@ -1910,6 +1915,24 @@ export class MetadataProvider extends EmscriptenObject {
   static isBadBehaviorMetadata(metadata: BehaviorMetadata): boolean;
 }
 
+export class ProjectDiagnostic extends EmscriptenObject {
+  getType(): ProjectDiagnostic_ErrorType;
+  getMessage(): string;
+  getActualValue(): string;
+  getObjectName(): string;
+}
+
+export class DiagnosticReport extends EmscriptenObject {
+  get(index: number): ProjectDiagnostic;
+  count(): number;
+  getSceneName(): string;
+}
+
+export class WholeProjectDiagnosticReport extends EmscriptenObject {
+  get(index: number): DiagnosticReport;
+  count(): number;
+}
+
 export class ExpressionParserError extends EmscriptenObject {
   isError(): boolean;
   getMessage(): string;
@@ -2663,7 +2686,7 @@ export class ParticleEmitterObject extends ObjectConfiguration {
 
 export class LayoutCodeGenerator extends EmscriptenObject {
   constructor(project: Project);
-  generateLayoutCompleteCode(layout: Layout, includes: SetString, compilationForRuntime: boolean): string;
+  generateLayoutCompleteCode(layout: Layout, includes: SetString, diagnosticReport: DiagnosticReport, compilationForRuntime: boolean): string;
 }
 
 export class BehaviorCodeGenerator extends EmscriptenObject {

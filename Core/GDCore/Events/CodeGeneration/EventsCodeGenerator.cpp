@@ -1277,7 +1277,8 @@ EventsCodeGenerator::EventsCodeGenerator(const gd::Project& project_,
       compilationForRuntime(false),
       maxCustomConditionsDepth(0),
       maxConditionsListsSize(0),
-      eventsListNextUniqueId(0){};
+      eventsListNextUniqueId(0),
+      diagnosticReport(nullptr){};
 
 EventsCodeGenerator::EventsCodeGenerator(
     const gd::Platform& platform_,
@@ -1291,6 +1292,7 @@ EventsCodeGenerator::EventsCodeGenerator(
       compilationForRuntime(false),
       maxCustomConditionsDepth(0),
       maxConditionsListsSize(0),
-      eventsListNextUniqueId(0){};
+      eventsListNextUniqueId(0),
+      diagnosticReport(nullptr){};
 
 }  // namespace gd

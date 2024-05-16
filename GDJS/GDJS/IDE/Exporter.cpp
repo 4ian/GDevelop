@@ -12,6 +12,7 @@
 #include <string>
 
 #include "GDCore/CommonTools.h"
+#include "GDCore/Events/CodeGeneration/DiagnosticReport.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
 #include "GDCore/IDE/Events/UsedExtensionsFinder.h"
 #include "GDCore/IDE/Project/ProjectResourcesCopier.h"
@@ -64,6 +65,10 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
                         &options,
                         &helper,
                         &usedExtensionsResult](gd::String exportDir) {
+    gd::WholeProjectDiagnosticReport &wholeProjectDiagnosticReport =
+      options.project.GetWholeProjectDiagnosticReport();
+  wholeProjectDiagnosticReport.Clear();
+  
     // Use project properties fallback to set empty properties
     if (exportedProject.GetAuthorIds().empty() &&
         !options.fallbackAuthorId.empty()) {
@@ -115,7 +120,7 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
 
     // Export events
     if (!helper.ExportEventsCode(
-            exportedProject, codeOutputDir, includesFiles, false)) {
+            exportedProject, codeOutputDir, includesFiles, wholeProjectDiagnosticReport, false)) {
       gd::LogError(_("Error during exporting! Unable to export events:\n") +
                    lastError);
       return false;

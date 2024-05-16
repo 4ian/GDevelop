@@ -107,6 +107,7 @@ declare class gdProject extends gdObjectsContainer {
   getResourcesManager(): gdResourcesManager;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(element: gdSerializerElement): void;
+  getWholeProjectDiagnosticReport(): gdWholeProjectDiagnosticReport;
   static isNameSafe(name: string): boolean;
   static getSafeName(name: string): string;
   getTypeOfBehavior(layout: gdLayout, name: string, searchInGroups: boolean): string;

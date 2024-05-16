@@ -594,6 +594,8 @@ interface Project {
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
 
+    [Ref] WholeProjectDiagnosticReport GetWholeProjectDiagnosticReport();
+
     boolean STATIC_IsNameSafe([Const] DOMString name);
     [Const, Value] DOMString STATIC_GetSafeName([Const] DOMString name);
 
@@ -2519,6 +2521,28 @@ interface MetadataProvider {
     boolean STATIC_IsBadBehaviorMetadata([Const, Ref] BehaviorMetadata metadata);
 };
 
+enum ProjectDiagnostic_ErrorType {
+    "ProjectDiagnostic::UndeclaredVariable",
+};
+
+interface ProjectDiagnostic {
+    ProjectDiagnostic_ErrorType GetType();
+    [Const, Ref] DOMString GetMessage();
+    [Const, Ref] DOMString GetActualValue();
+    [Const, Ref] DOMString GetObjectName();
+};
+
+ interface DiagnosticReport {
+    [Const, Ref] ProjectDiagnostic Get(unsigned long index);
+    unsigned long Count();
+    [Const, Ref] DOMString GetSceneName();
+};
+
+interface WholeProjectDiagnosticReport {
+    [Const, Ref] DiagnosticReport Get(unsigned long index);
+    unsigned long Count();
+};
+
 interface ExpressionParserError {
     boolean IsError();
     [Const, Ref] DOMString GetMessage();
@@ -3453,7 +3477,11 @@ ParticleEmitterObject implements ObjectConfiguration;
 [Prefix="gdjs::"]
 interface LayoutCodeGenerator {
     void LayoutCodeGenerator([Ref] Project project);
-    [Const, Value] DOMString GenerateLayoutCompleteCode([Const, Ref] Layout layout, [Ref] SetString includes, boolean compilationForRuntime);
+    [Const, Value] DOMString GenerateLayoutCompleteCode(
+        [Const, Ref] Layout layout,
+        [Ref] SetString includes,
+        [Ref] DiagnosticReport diagnosticReport,
+        boolean compilationForRuntime);
 };
 
 [Prefix="gdjs::"]

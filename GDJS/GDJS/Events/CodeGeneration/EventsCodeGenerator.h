@@ -51,6 +51,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
                                        const gd::Layout& scene,
                                        const gd::String& codeNamespace,
                                        std::set<gd::String>& includeFiles,
+                                       gd::DiagnosticReport& diagnosticReport,
                                        bool compilationForRuntime = false);
 
   /**

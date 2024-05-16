@@ -11,13 +11,14 @@ namespace gdjs {
 gd::String LayoutCodeGenerator::GenerateLayoutCompleteCode(
     const gd::Layout& layout,
     std::set<gd::String>& includeFiles,
+      gd::DiagnosticReport& diagnosticReport,
     bool compilationForRuntime) {
   gd::String sceneMangledName =
       gd::SceneNameMangler::Get()->GetMangledSceneName(layout.GetName());
   gd::String codeNamespace = "gdjs." + sceneMangledName + "Code";
 
   gd::String layoutCode = EventsCodeGenerator::GenerateLayoutCode(
-      project, layout, codeNamespace, includeFiles, compilationForRuntime);
+      project, layout, codeNamespace, includeFiles, diagnosticReport, compilationForRuntime);
 
   // Export the symbols to avoid them being stripped by the Closure Compiler:
   gd::String exportCode =

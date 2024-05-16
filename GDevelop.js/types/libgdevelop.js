@@ -181,6 +181,10 @@ declare class libGDevelop {
   ExtensionAndInstructionMetadata: Class<gdExtensionAndInstructionMetadata>;
   ExtensionAndExpressionMetadata: Class<gdExtensionAndExpressionMetadata>;
   MetadataProvider: Class<gdMetadataProvider>;
+  ProjectDiagnostic_ErrorType: Class<ProjectDiagnostic_ErrorType>;
+  ProjectDiagnostic: Class<gdProjectDiagnostic>;
+  DiagnosticReport: Class<gdDiagnosticReport>;
+  WholeProjectDiagnosticReport: Class<gdWholeProjectDiagnosticReport>;
   ExpressionParserError: Class<gdExpressionParserError>;
   VectorExpressionParserError: Class<gdVectorExpressionParserError>;
   ExpressionParser2NodeWorker: Class<gdExpressionParser2NodeWorker>;

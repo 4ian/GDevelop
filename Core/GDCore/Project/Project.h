@@ -9,6 +9,7 @@
 #include <memory>
 #include <vector>
 
+#include "GDCore/Events/CodeGeneration/DiagnosticReport.h"
 #include "GDCore/Project/ExtensionProperties.h"
 #include "GDCore/Project/LoadingScreen.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
@@ -1050,6 +1051,10 @@ class GD_CORE_API Project : public ObjectsContainer {
                                       std::size_t position = -1);
   ///@}
 
+  gd::WholeProjectDiagnosticReport& GetWholeProjectDiagnosticReport() {
+    return wholeProjectDiagnosticReport;
+  }
+
  private:
   /**
    * Initialize from another game. Used by copy-ctor and assign-op.
@@ -1125,6 +1130,7 @@ class GD_CORE_API Project : public ObjectsContainer {
       externalEvents;  ///< List of all externals events
   ExtensionProperties
       extensionProperties;              ///< The properties of the extensions.
+  gd::WholeProjectDiagnosticReport wholeProjectDiagnosticReport;
   mutable unsigned int gdMajorVersion;  ///< The GD major version used the last
                                         ///< time the project was saved.
   mutable unsigned int gdMinorVersion;  ///< The GD minor version used the last

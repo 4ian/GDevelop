@@ -396,10 +396,12 @@ function generateCompiledEventsFunctionFromSerializedEvents(
 function generateCompiledEventsForLayout(gd, project, layout, logCode = false) {
   const includeFiles = new gd.SetString();
   const layoutCodeGenerator = new gd.LayoutCodeGenerator(project);
+  const diagnosticReport = new gd.DiagnosticReport();
 
   const code = layoutCodeGenerator.generateLayoutCompleteCode(
     layout,
     includeFiles,
+    diagnosticReport,
     true
   );
 

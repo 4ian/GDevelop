@@ -3,8 +3,7 @@
  * Copyright 2008-present Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDCORE_EVENTSCODEGENERATOR_H
-#define GDCORE_EVENTSCODEGENERATOR_H
+#pragma once
 
 #include <set>
 #include <utility>
@@ -12,8 +11,10 @@
 
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Instruction.h"
+#include "GDCore/Events/CodeGeneration/DiagnosticReport.h"
 #include "GDCore/Project/ProjectScopedContainers.h"
 #include "GDCore/String.h"
+
 namespace gd {
 class EventsList;
 class Expression;
@@ -381,6 +382,14 @@ class GD_CORE_API EventsCodeGenerator {
    * \brief Get the maximum size of a list of conditions.
    */
   size_t GetMaxConditionsListsSize() const { return maxConditionsListsSize; }
+
+  void SetDiagnosticReport(gd::DiagnosticReport& diagnosticReport_) {
+    diagnosticReport = &diagnosticReport_;
+  }
+
+  gd::DiagnosticReport* GetDiagnosticReport() {
+    return diagnosticReport;
+  }
 
   /**
    * \brief Generate the full name for accessing to a boolean variable used for
@@ -828,8 +837,9 @@ class GD_CORE_API EventsCodeGenerator {
       instructionUniqueIds;  ///< The unique ids generated for instructions.
   size_t eventsListNextUniqueId;  ///< The next identifier to use for an events
                                   ///< list function name.
+  
+  gd::DiagnosticReport* diagnosticReport;
 };
 
 }  // namespace gd
 
-#endif  // GDCORE_EVENTSCODEGENERATOR_H

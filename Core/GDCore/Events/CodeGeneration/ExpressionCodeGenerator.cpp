@@ -31,6 +31,7 @@
 #include "GDCore/Project/ProjectScopedContainers.h"
 #include "GDCore/IDE/Events/ExpressionTypeFinder.h"
 #include "GDCore/IDE/Events/ExpressionVariableOwnerFinder.h"
+#include "GDCore/Events/CodeGeneration/DiagnosticReport.h"
 
 namespace gd {
 
@@ -61,12 +62,19 @@ gd::String ExpressionCodeGenerator::GenerateExpressionCode(
               << "\" in: \"" << expression.GetPlainString() << "\" ("
               << rootType << ")" << std::endl;
 
-    // TODO Forward the error to the report.
-    for (auto* error : validator.GetFatalErrors()) {
-      if (error->GetType() == gd::ExpressionParserError::ErrorType::UndeclaredVariable) {
-        const auto &variableName = error->GetActualValue();
-        const auto &objectName = error->GetObjectName();
-        const auto &layoutName = codeGenerator.GetLayout().GetName();
+    auto *diagnosticReport = codeGenerator.GetDiagnosticReport();
+    if (diagnosticReport) {
+      for (auto *error : validator.GetFatalErrors()) {
+        if (error->GetType() ==
+                gd::ExpressionParserError::ErrorType::UndeclaredVariable ||
+            error->GetType() ==
+                gd::ExpressionParserError::ErrorType::UnknownIdentifier) {
+          gd::ProjectDiagnostic projectDiagnostic(
+              gd::ProjectDiagnostic::ErrorType::UndeclaredVariable,
+              error->GetMessage(), error->GetActualValue(),
+              codeGenerator.GetLayout().GetName(), error->GetObjectName());
+          diagnosticReport->Add(projectDiagnostic);
+        }
       }
     }
 

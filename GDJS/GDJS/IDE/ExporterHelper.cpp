@@ -18,6 +18,7 @@
 
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/CodeGeneration/EffectsCodeGenerator.h"
+#include "GDCore/Events/CodeGeneration/DiagnosticReport.h"
 #include "GDCore/Extensions/Metadata/DependencyMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Platform.h"
@@ -172,9 +173,15 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   previousTime = LogTimeSpent("Include files export", previousTime);
 
   if (!options.projectDataOnlyExport) {
+    gd::WholeProjectDiagnosticReport &wholeProjectDiagnosticReport =
+        options.project.GetWholeProjectDiagnosticReport();
+    wholeProjectDiagnosticReport.Clear();
+
     // Generate events code
-    if (!ExportEventsCode(immutableProject, codeOutputDir, includesFiles, true))
+    if (!ExportEventsCode(immutableProject, codeOutputDir, includesFiles,
+                          wholeProjectDiagnosticReport, true)) {
       return false;
+    }
 
     // Export source files
     if (!ExportExternalSourceFiles(
@@ -851,18 +858,24 @@ bool ExporterHelper::ExportEffectIncludes(
   return true;
 }
 
-bool ExporterHelper::ExportEventsCode(const gd::Project &project,
-                                      gd::String outputDir,
-                                      std::vector<gd::String> &includesFiles,
-                                      bool exportForPreview) {
+bool ExporterHelper::ExportEventsCode(
+    const gd::Project &project, gd::String outputDir,
+    std::vector<gd::String> &includesFiles,
+    gd::WholeProjectDiagnosticReport &wholeProjectDiagnosticReport,
+    bool exportForPreview) {
   fs.MkDir(outputDir);
 
   for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
     std::set<gd::String> eventsIncludes;
     const gd::Layout &layout = project.GetLayout(i);
+
+    auto &diagnosticReport = wholeProjectDiagnosticReport.AddNewDiagnosticReportForScene(
+            layout.GetName());
     LayoutCodeGenerator layoutCodeGenerator(project);
     gd::String eventsOutput = layoutCodeGenerator.GenerateLayoutCompleteCode(
-        layout, eventsIncludes, !exportForPreview);
+        layout, eventsIncludes,
+        diagnosticReport,
+        !exportForPreview);
     gd::String filename =
         outputDir + "/" + "code" + gd::String::From(i) + ".js";
 

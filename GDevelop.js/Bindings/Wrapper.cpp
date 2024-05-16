@@ -6,6 +6,7 @@
 #include <GDCore/Events/Builtin/RepeatEvent.h>
 #include <GDCore/Events/Builtin/StandardEvent.h>
 #include <GDCore/Events/Builtin/WhileEvent.h>
+#include <GDCore/Events/CodeGeneration/DiagnosticReport.h>
 #include <GDCore/Events/CodeGeneration/ExpressionCodeGenerator.h>
 #include <GDCore/Events/Parsers/ExpressionParser2.h>
 #include <GDCore/Events/Parsers/ExpressionParser2Node.h>
@@ -458,6 +459,8 @@ typedef gd::SerializableWithNameList<gd::EventsBasedBehavior>
     EventsBasedBehaviorsList;
 typedef gd::SerializableWithNameList<gd::EventsBasedObject>
     EventsBasedObjectsList;
+typedef ProjectDiagnostic::ErrorType
+    ProjectDiagnostic_ErrorType;
 typedef ExpressionCompletionDescription::CompletionKind
     ExpressionCompletionDescription_CompletionKind;
 typedef std::vector<gd::ExpressionCompletionDescription>

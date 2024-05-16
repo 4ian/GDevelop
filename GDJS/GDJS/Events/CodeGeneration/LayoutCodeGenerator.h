@@ -3,13 +3,14 @@
  * Copyright 2008-present Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDJS_LAYOUTCODEGENERATOR_H
-#define GDJS_LAYOUTCODEGENERATOR_H
+#pragma once
+
 #include <map>
 #include <set>
 #include <string>
 #include <vector>
 #include "GDCore/Project/Layout.h"
+#include "GDCore/Events/CodeGeneration/DiagnosticReport.h"
 
 namespace gdjs {
 
@@ -31,6 +32,7 @@ class LayoutCodeGenerator {
   gd::String GenerateLayoutCompleteCode(
       const gd::Layout& layout,
       std::set<gd::String>& includeFiles,
+      gd::DiagnosticReport& diagnosticReport,
       bool compilationForRuntime);
 
  private:
@@ -38,4 +40,3 @@ class LayoutCodeGenerator {
 };
 
 }  // namespace gdjs
-#endif  // GDJS_LAYOUTCODEGENERATOR_H

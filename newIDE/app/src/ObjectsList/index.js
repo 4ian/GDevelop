@@ -751,6 +751,19 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         selectObjectFolderOrObjectWithContext,
       ]
     );
+    React.useEffect(
+      () => {
+        if (keyboardShortcutsRef.current) {
+          keyboardShortcutsRef.current.setShortcutCallback(
+            'onDuplicate',
+            () => {
+              duplicateObject(selectedObjectFolderOrObjectsWithContext[0]);
+            }
+          );
+        }
+      },
+      [selectedObjectFolderOrObjectsWithContext, duplicateObject]
+    );
 
     const rename = React.useCallback(
       (item: TreeViewItem, newName: string) => {
@@ -1421,6 +1434,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           {
             label: i18n._(t`Duplicate`),
             click: () => duplicateObject(item),
+            accelerator: 'CTRL+D',
           },
           {
             label: i18n._(t`Rename`),

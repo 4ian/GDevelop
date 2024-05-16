@@ -1931,6 +1931,7 @@ export class DiagnosticReport extends EmscriptenObject {
 export class WholeProjectDiagnosticReport extends EmscriptenObject {
   get(index: number): DiagnosticReport;
   count(): number;
+  hasAnyIssue(): boolean;
 }
 
 export class ExpressionParserError extends EmscriptenObject {

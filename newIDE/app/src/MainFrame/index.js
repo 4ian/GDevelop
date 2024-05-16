@@ -180,6 +180,8 @@ import useResourcesWatcher from './ResourcesWatcher';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 import useVersionHistory from '../VersionHistory/UseVersionHistory';
 import { ProjectManagerDrawer } from '../ProjectManager/ProjectManagerDrawer';
+import DiagnosticReportDialog from '../ExportAndShare/DiagnosticReportDialog';
+
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
 const gd: libGDevelop = global.gd;
@@ -435,6 +437,10 @@ const MainFrame = (props: Props) => {
   const [
     quitInAppTutorialDialogOpen,
     setQuitInAppTutorialDialogOpen,
+  ] = React.useState<boolean>(false);
+  const [
+    diagnosticReportDialogOpen,
+    setDiagnosticReportDialogOpen,
   ] = React.useState<boolean>(false);
   const [
     fileMetadataOpeningProgress,
@@ -1600,6 +1606,10 @@ const MainFrame = (props: Props) => {
           setPreviewLoading(false);
           if (inAppTutorialOrchestratorRef.current) {
             inAppTutorialOrchestratorRef.current.onPreviewLaunch();
+          }
+          const wholeProjectDiagnosticReport = currentProject.getWholeProjectDiagnosticReport();
+          if (wholeProjectDiagnosticReport.hasAnyIssue()) {
+            setDiagnosticReportDialogOpen(true);
           }
         });
     },
@@ -3534,6 +3544,12 @@ const MainFrame = (props: Props) => {
           endTutorial={() => {
             endTutorial(true);
           }}
+        />
+      )}
+      {diagnosticReportDialogOpen && currentProject && (
+        <DiagnosticReportDialog
+          wholeProjectDiagnosticReport={currentProject.getWholeProjectDiagnosticReport()}
+          onClose={() => setDiagnosticReportDialogOpen(false)}
         />
       )}
       <CustomDragLayer />

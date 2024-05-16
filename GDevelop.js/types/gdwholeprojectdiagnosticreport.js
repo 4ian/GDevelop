@@ -2,6 +2,7 @@
 declare class gdWholeProjectDiagnosticReport {
   get(index: number): gdDiagnosticReport;
   count(): number;
+  hasAnyIssue(): boolean;
   delete(): void;
   ptr: number;
 };

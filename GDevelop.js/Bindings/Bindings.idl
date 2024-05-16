@@ -2541,6 +2541,7 @@ interface ProjectDiagnostic {
 interface WholeProjectDiagnosticReport {
     [Const, Ref] DiagnosticReport Get(unsigned long index);
     unsigned long Count();
+    boolean HasAnyIssue();
 };
 
 interface ExpressionParserError {

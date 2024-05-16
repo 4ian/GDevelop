@@ -97,6 +97,15 @@ public:
 
   std::size_t Count() const { return diagnosticReports.size(); };
 
+  bool HasAnyIssue() {
+    for (auto& diagnosticReport : diagnosticReports) {
+      if (diagnosticReport->Count() > 0) {
+        return true;
+      }
+    }
+    return false;
+  }
+
 private:
   std::vector<std::unique_ptr<gd::DiagnosticReport>> diagnosticReports;
 };

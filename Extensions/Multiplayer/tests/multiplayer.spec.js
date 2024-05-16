@@ -110,14 +110,17 @@ describe('Multiplayer', () => {
    * Create a mocked P2P handler.
    * It stores the events sent to/from peers.
    */
-  const createP2PMock = () => {
-    const state = {
+  const createP2PAndMultiplayerMessageManagerMock = () => {
+    const p2pState = {
       currentPeerId: '',
       otherPeerIds: [],
     };
 
     /** @type {Record<string, Map<string, MockedEvent>>} */
     const peerEvents = {};
+
+    /** @type {Record<string, gdjs.MultiplayerMessageManager>} */
+    const peerMultiplayerMessageManager = {};
 
     const getPeerEvents = (peerId) =>
       (peerEvents[peerId] = peerEvents[peerId] || new Map());
@@ -127,7 +130,7 @@ describe('Multiplayer', () => {
      * @returns {gdjs.evtTools.p2p.IEvent}
      */
     const getEvent = (eventName) => {
-      const events = getPeerEvents(state.currentPeerId);
+      const events = getPeerEvents(p2pState.currentPeerId);
       let event = events.get(eventName);
       if (!event) events.set(eventName, (event = new MockedEvent()));
       return event;
@@ -139,6 +142,7 @@ describe('Multiplayer', () => {
      * @param {string} eventData
      */
     const sendDataTo = (peerId, eventName, eventData) => {
+      // console.log(`## SENDING DATA TO ${peerId}:`, eventName, eventData);
       const events = getPeerEvents(peerId);
       let event = events.get(eventName);
       if (!event) events.set(eventName, (event = new MockedEvent()));
@@ -155,8 +159,9 @@ describe('Multiplayer', () => {
       getEventVariable: (eventName, variable) => {
         variable.fromJSON(getEventData(eventName));
       },
-      onEvent: (eventName) => {
+      onEvent: (eventName, dataloss) => {
         const event = getEvent(eventName);
+        event.dataloss = dataloss;
         const isTriggered = event.isTriggered();
         return isTriggered;
       },
@@ -168,13 +173,13 @@ describe('Multiplayer', () => {
       disconnectFromBroker: () => {},
       sendDataTo,
       sendDataToAll: (eventName, eventData) => {
-        state.otherPeerIds.forEach((peerId) => {
+        p2pState.otherPeerIds.forEach((peerId) => {
           sendDataTo(peerId, eventName, eventData);
         });
       },
       getEventData: (eventName) => getEvent(eventName).getData(),
       getEventSender: (eventName) => getEvent(eventName).getSender(),
-      getEvents: () => getPeerEvents(state.currentPeerId),
+      getEvents: () => getPeerEvents(p2pState.currentPeerId),
       useCustomBrokerServer: () => {},
       useDefaultBrokerServer: () => {},
       useCustomICECandidate: () => {},
@@ -188,7 +193,7 @@ describe('Multiplayer', () => {
       getDisconnectedPeer: () => '',
       onConnection: () => false,
       getConnectedPeer: () => '',
-      getAllPeers: () => state.otherPeerIds,
+      getAllPeers: () => p2pState.otherPeerIds,
       getConnectionInstance: () => undefined,
     };
 
@@ -196,13 +201,26 @@ describe('Multiplayer', () => {
 
     return {
       switchToPeer: ({ peerId, otherPeerIds, playerNumber }) => {
-        state.currentPeerId = peerId;
-        state.otherPeerIds = otherPeerIds;
+        // console.log('## SWITCHING TO PEER', peerId);
+
+        // Switch the state of the P2P mock.
+        p2pState.currentPeerId = peerId;
+        p2pState.otherPeerIds = otherPeerIds;
+
+        // Switch the state of the MultiplayerMessageManager.
+        gdjs.multiplayerMessageManager = peerMultiplayerMessageManager[peerId] =
+          peerMultiplayerMessageManager[peerId] ||
+          gdjs.makeMultiplayerMessageManager();
+
+        // Switch the state of the game.
         gdjs.multiplayer.playerNumber = playerNumber;
       },
       logEvents: () => {
         Object.keys(peerEvents).forEach((peerId) => {
-          console.log(peerId, [...peerEvents[peerId].keys()]);
+          console.log(`## PEER ${peerId} events:`);
+          for (const [eventName, event] of peerEvents[peerId]) {
+            console.log(`${eventName}: ${JSON.stringify(event.data)}`);
+          }
         });
       },
       markAllPeerEventsAsProcessed: () => {
@@ -228,11 +246,14 @@ describe('Multiplayer', () => {
     gdjs.multiplayer.isGameRunning = false;
   });
 
-  it('properly synchronize scene variables from the server to other players', () => {
+  it('synchronizes scene variables from the server to other players', () => {
     let otherPeerIds = [];
     let currentPeerId = '';
-    const { switchToPeer, logEvents, markAllPeerEventsAsProcessed } =
-      createP2PMock();
+    const {
+      switchToPeer,
+      logEvents,
+      markAllPeerEventsAsProcessed,
+    } = createP2PAndMultiplayerMessageManagerMock();
 
     switchToPeer({
       peerId: 'player-1',
@@ -263,11 +284,14 @@ describe('Multiplayer', () => {
     ).to.be('Hello from remote world');
   });
 
-  it('properly synchronize objects from the server to other players', () => {
+  it('synchronizes objects from the server to other players', () => {
     let otherPeerIds = [];
     let currentPeerId = '';
-    const { switchToPeer, logEvents, markAllPeerEventsAsProcessed } =
-      createP2PMock();
+    const {
+      switchToPeer,
+      logEvents,
+      markAllPeerEventsAsProcessed,
+    } = createP2PAndMultiplayerMessageManagerMock();
 
     // Create an instance on the server:
     switchToPeer({
@@ -286,7 +310,7 @@ describe('Multiplayer', () => {
     // Check the object is created on the other peer.
     switchToPeer({
       peerId: 'player-2',
-      otherPeerIds: ['player-1', 'player-3'],
+      otherPeerIds: ['player-1'],
       playerNumber: 2,
     });
 
@@ -305,8 +329,9 @@ describe('Multiplayer', () => {
       playerNumber: 1,
     });
 
-    mySpriteObject1.getBehavior('MultiplayerObject')._objectMaxTickRate =
-      Infinity;
+    mySpriteObject1.getBehavior(
+      'MultiplayerObject'
+    )._objectMaxTickRate = Infinity;
     mySpriteObject1.setX(242);
     mySpriteObject1.setY(243);
     remoteRuntimeScene.renderAndStep(1000 / 60);
@@ -314,7 +339,7 @@ describe('Multiplayer', () => {
     // Check the object is moved on the other peer.
     switchToPeer({
       peerId: 'player-2',
-      otherPeerIds: ['player-1', 'player-3'],
+      otherPeerIds: ['player-1'],
       playerNumber: 2,
     });
     localRuntimeScene.renderAndStep(1000 / 60);
@@ -337,12 +362,144 @@ describe('Multiplayer', () => {
     // Check the object is deleted on the other peer.
     switchToPeer({
       peerId: 'player-2',
-      otherPeerIds: ['player-1', 'player-3'],
+      otherPeerIds: ['player-1'],
       playerNumber: 2,
     });
     localRuntimeScene.renderAndStep(1000 / 60);
     markAllPeerEventsAsProcessed();
 
     expect(localRuntimeScene.getObjects('MySpriteObject').length).to.be(0);
+  });
+
+  it('synchronizes objects from a player to the server to other players', () => {
+    let otherPeerIds = [];
+    let currentPeerId = '';
+    const {
+      switchToPeer,
+      logEvents,
+      markAllPeerEventsAsProcessed,
+    } = createP2PAndMultiplayerMessageManagerMock();
+
+    // Create an instance on a player:
+    switchToPeer({
+      peerId: 'player-2',
+      otherPeerIds: ['player-1'],
+      playerNumber: 2,
+    });
+
+    const p2RuntimeScene = makeTestRuntimeScene();
+    const mySpriteObject1 = p2RuntimeScene.createObject('MySpriteObject');
+    mySpriteObject1.setX(142);
+    mySpriteObject1.setY(143);
+    mySpriteObject1
+      .getBehavior('MultiplayerObject')
+      .setPlayerObjectOwnership(2);
+
+    p2RuntimeScene.renderAndStep(1000 / 60);
+
+    // Check the object is created on the other server.
+    switchToPeer({
+      peerId: 'player-1',
+      otherPeerIds: ['player-2', 'player-3'],
+      playerNumber: 1,
+    });
+
+    const p1RuntimeScene = makeTestRuntimeScene();
+    expect(p1RuntimeScene.getObjects('MySpriteObject').length).to.be(0);
+    p1RuntimeScene.renderAndStep(1000 / 60);
+
+    expect(p1RuntimeScene.getObjects('MySpriteObject').length).to.be(1);
+    expect(p1RuntimeScene.getObjects('MySpriteObject')[0].getX()).to.be(142);
+    expect(p1RuntimeScene.getObjects('MySpriteObject')[0].getY()).to.be(143);
+
+    // Check the object is created on the other player.
+    switchToPeer({
+      peerId: 'player-3',
+      otherPeerIds: ['player-1'],
+      playerNumber: 3,
+    });
+
+    const p3RuntimeScene = makeTestRuntimeScene();
+    expect(p3RuntimeScene.getObjects('MySpriteObject').length).to.be(0);
+    p3RuntimeScene.renderAndStep(1000 / 60);
+
+    expect(p3RuntimeScene.getObjects('MySpriteObject').length).to.be(1);
+    expect(p3RuntimeScene.getObjects('MySpriteObject')[0].getX()).to.be(142);
+    expect(p3RuntimeScene.getObjects('MySpriteObject')[0].getY()).to.be(143);
+
+    markAllPeerEventsAsProcessed();
+
+    // Move the object on the player:
+    switchToPeer({
+      peerId: 'player-2',
+      otherPeerIds: ['player-1'],
+      playerNumber: 2,
+    });
+
+    mySpriteObject1.getBehavior(
+      'MultiplayerObject'
+    )._objectMaxTickRate = Infinity;
+    mySpriteObject1.setX(242);
+    mySpriteObject1.setY(243);
+    p2RuntimeScene.renderAndStep(1000 / 60);
+
+    // Check the object is moved on the server.
+    switchToPeer({
+      peerId: 'player-1',
+      otherPeerIds: ['player-2', 'player-3'],
+      playerNumber: 1,
+    });
+    p1RuntimeScene.renderAndStep(1000 / 60);
+
+    expect(p1RuntimeScene.getObjects('MySpriteObject').length).to.be(1);
+    expect(p1RuntimeScene.getObjects('MySpriteObject')[0].getX()).to.be(242);
+    expect(p1RuntimeScene.getObjects('MySpriteObject')[0].getY()).to.be(243);
+
+    // Check the object is moved on the other player.
+    switchToPeer({
+      peerId: 'player-3',
+      otherPeerIds: ['player-1'],
+      playerNumber: 3,
+    });
+    p1RuntimeScene.renderAndStep(1000 / 60);
+    markAllPeerEventsAsProcessed();
+
+    expect(p1RuntimeScene.getObjects('MySpriteObject').length).to.be(1);
+    expect(p1RuntimeScene.getObjects('MySpriteObject')[0].getX()).to.be(242);
+    expect(p1RuntimeScene.getObjects('MySpriteObject')[0].getY()).to.be(243);
+
+    // Destroy the object (on player 2):
+    switchToPeer({
+      peerId: 'player-2',
+      otherPeerIds: ['player-1'],
+      playerNumber: 2,
+    });
+
+    mySpriteObject1.deleteFromScene(p2RuntimeScene);
+    p2RuntimeScene.renderAndStep(1000 / 60);
+
+    // Check the object is deleted on the server.
+    switchToPeer({
+      peerId: 'player-1',
+      otherPeerIds: ['player-2', 'player-3'],
+      playerNumber: 1,
+    });
+
+    expect(p1RuntimeScene.getObjects('MySpriteObject').length).to.be(1);
+    p1RuntimeScene.renderAndStep(1000 / 60);
+    expect(p1RuntimeScene.getObjects('MySpriteObject').length).to.be(0);
+
+    // Check the object is deleted on the other player.
+    switchToPeer({
+      peerId: 'player-3',
+      otherPeerIds: ['player-1'],
+      playerNumber: 3,
+    });
+
+    expect(p3RuntimeScene.getObjects('MySpriteObject').length).to.be(1);
+    p3RuntimeScene.renderAndStep(1000 / 60);
+    expect(p3RuntimeScene.getObjects('MySpriteObject').length).to.be(0);
+
+    markAllPeerEventsAsProcessed();
   });
 });

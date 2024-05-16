@@ -31,7 +31,18 @@ namespace gdjs {
     }
   }
 
-  export namespace multiplayerMessageManager {
+  export type MultiplayerMessageManager = ReturnType<
+    typeof makeMultiplayerMessageManager
+  >;
+
+  /**
+   * Create a new MultiplayerMessageManager.
+   *
+   * In most cases, you should use the default `gdjs.multiplayerMessageManager` instead.
+   *
+   * @returns
+   */
+  export const makeMultiplayerMessageManager = () => {
     // For testing purposes, you can simulate network latency and packet loss.
     // Adds x ms to all network messages, simulating a slow network.
     const SIMULATE_NETWORK_LATENCY_MS = 0; // In ms.
@@ -80,7 +91,7 @@ namespace gdjs {
     let lastSentGameSyncData: GameNetworkSyncData = {};
     let numberOfForcedGameUpdates = 0;
 
-    export const addExpectedMessageAcknowledgement = ({
+    const addExpectedMessageAcknowledgement = ({
       originalMessageName,
       originalData,
       expectedMessageName,
@@ -127,7 +138,7 @@ namespace gdjs {
       });
     };
 
-    export const clearExpectedMessageAcknowledgements = () => {
+    const clearExpectedMessageAcknowledgements = () => {
       expectedMessageAcknowledgements = {};
       _lastClockReceivedByInstance = {};
     };
@@ -136,7 +147,7 @@ namespace gdjs {
      * Main function to send messages to other players, via P2P.
      * Takes into account the simulation of network latency and packet loss.
      */
-    export const sendDataTo = (
+    const sendDataTo = (
       peerId: string,
       messageName: string,
       data: Object
@@ -290,7 +301,7 @@ namespace gdjs {
 
     const changeOwnerMessageNamePrefix = '#changeOwner';
     const changeOwnerMessageNameRegex = /#changeOwner#owner_(\d+)#object_(.+)#instance_(.+)/;
-    export const createChangeOwnerMessage = ({
+    const createChangeOwnerMessage = ({
       objectOwner,
       objectName,
       instanceNetworkId,
@@ -325,7 +336,7 @@ namespace gdjs {
     };
     const objectOwnerChangedMessageNamePrefix = '#ownerChanged';
     const objectOwnerChangedMessageNameRegex = /#ownerChanged#owner_(\d+)#object_(.+)#instance_(.+)/;
-    export const createObjectOwnerChangedMessageNameFromChangeOwnerMessage = (
+    const createObjectOwnerChangedMessageNameFromChangeOwnerMessage = (
       messageName: string
     ): string => {
       return messageName.replace(
@@ -333,9 +344,7 @@ namespace gdjs {
         objectOwnerChangedMessageNamePrefix
       );
     };
-    export const handleChangeOwnerMessages = (
-      runtimeScene: gdjs.RuntimeScene
-    ) => {
+    const handleChangeOwnerMessages = (runtimeScene: gdjs.RuntimeScene) => {
       const p2pMessagesMap = gdjs.evtTools.p2p.getEvents();
       const messageNamesArray = Array.from(p2pMessagesMap.keys());
 
@@ -457,7 +466,7 @@ namespace gdjs {
 
     const updateObjectMessageNamePrefix = '#update';
     const updateObjectMessageNameRegex = /#update#owner_(\d+)#object_(.+)#instance_(.+)/;
-    export const createUpdateObjectMessage = ({
+    const createUpdateObjectMessage = ({
       objectOwner,
       objectName,
       instanceNetworkId,
@@ -476,9 +485,7 @@ namespace gdjs {
         messageData: objectNetworkSyncData,
       };
     };
-    export const handleUpdateObjectMessages = (
-      runtimeScene: gdjs.RuntimeScene
-    ) => {
+    const handleUpdateObjectMessages = (runtimeScene: gdjs.RuntimeScene) => {
       const p2pMessagesMap = gdjs.evtTools.p2p.getEvents();
       const messageNamesArray = Array.from(p2pMessagesMap.keys());
 
@@ -491,6 +498,7 @@ namespace gdjs {
           // TODO: Catch, log error and ignore to avoid to crash the game.
           const data = JSON.parse(gdjs.evtTools.p2p.getEventData(messageName));
           const messageSender = gdjs.evtTools.p2p.getEventSender(messageName);
+
           if (data) {
             const matches = updateObjectMessageNameRegex.exec(messageName);
             if (!matches) {
@@ -508,6 +516,7 @@ namespace gdjs {
             const messageInstanceClock = data['_clock'];
             const lastClock =
               _lastClockReceivedByInstance[instanceNetworkId] || 0;
+
             if (messageInstanceClock <= lastClock) {
               // Ignore old messages, they may be arriving out of order because of lag.
               return;
@@ -563,6 +572,7 @@ namespace gdjs {
             }
 
             instance.updateFromObjectNetworkSyncData(data);
+
             _lastClockReceivedByInstance[
               instanceNetworkId
             ] = messageInstanceClock;
@@ -608,7 +618,7 @@ namespace gdjs {
       );
     };
 
-    export const handleAcknowledgeMessages = () => {
+    const handleAcknowledgeMessages = () => {
       const p2pMessagesMap = gdjs.evtTools.p2p.getEvents();
       const messageNamesArray = Array.from(p2pMessagesMap.keys());
       // When we receive acknowledgement messages, save it in the extension, to avoid sending the message again.
@@ -659,6 +669,7 @@ namespace gdjs {
                 // Ignore old messages.
                 return;
               }
+
               _lastClockReceivedByInstance[instanceId] = messageInstanceClock;
             }
 
@@ -678,7 +689,7 @@ namespace gdjs {
       });
     };
 
-    export const resendClearOrCancelAcknowledgedMessages = (
+    const resendClearOrCancelAcknowledgedMessages = (
       runtimeScene: gdjs.RuntimeScene
     ) => {
       // When all acknowledgments are received for an message, we can clear the message from our
@@ -796,7 +807,7 @@ namespace gdjs {
 
     const destroyObjectMessageNamePrefix = '#destroy';
     const destroyObjectMessageNameRegex = /#destroy#owner_(\d+)#object_(.+)#instance_(.+)/;
-    export const createDestroyObjectMessage = ({
+    const createDestroyObjectMessage = ({
       objectOwner,
       objectName,
       instanceNetworkId,
@@ -815,7 +826,7 @@ namespace gdjs {
     };
     const objectDestroyedMessageNamePrefix = '#destroyed';
     const objectDestroyedMessageNameRegex = /#destroyed#owner_(\d+)#object_(.+)#instance_(.+)/;
-    export const createObjectDestroyedMessageNameFromDestroyMessage = (
+    const createObjectDestroyedMessageNameFromDestroyMessage = (
       messageName: string
     ): string => {
       return messageName.replace(
@@ -823,9 +834,7 @@ namespace gdjs {
         objectDestroyedMessageNamePrefix
       );
     };
-    export const handleDestroyObjectMessages = (
-      runtimeScene: gdjs.RuntimeScene
-    ) => {
+    const handleDestroyObjectMessages = (runtimeScene: gdjs.RuntimeScene) => {
       const p2pMessagesMap = gdjs.evtTools.p2p.getEvents();
       const messageNamesArray = Array.from(p2pMessagesMap.keys());
       const destroyObjectMessageNames = messageNamesArray.filter(
@@ -884,6 +893,7 @@ namespace gdjs {
               `Destroying object ${objectName} with instance network ID ${instanceNetworkId}.`
             );
             instance.deleteFromScene(runtimeScene);
+
             _lastClockReceivedByInstance[
               instanceNetworkId
             ] = messageInstanceClock;
@@ -956,10 +966,7 @@ namespace gdjs {
       );
     };
 
-    export const sendMessage = (
-      userMessageName: string,
-      userMessageData: string
-    ) => {
+    const sendMessage = (userMessageName: string, userMessageData: string) => {
       const connectedPeerIds = gdjs.evtTools.p2p.getAllPeers();
       const { messageName, messageData } = createCustomMessage({
         userMessageName,
@@ -993,7 +1000,7 @@ namespace gdjs {
       }
     };
 
-    export const hasMessageBeenReceived = (userMessageName: string) => {
+    const hasMessageBeenReceived = (userMessageName: string) => {
       const messageName = getCustomMessageNameFromUserMessageName(
         userMessageName
       );
@@ -1018,12 +1025,12 @@ namespace gdjs {
       return false;
     };
 
-    export const getMessageData = (messageName: string) => {
+    const getMessageData = (messageName: string) => {
       const data = gdjs.evtTools.p2p.getEventData(messageName);
       return data;
     };
 
-    export const handleCustomMessages = (): void => {
+    const handleCustomMessages = (): void => {
       const p2pMessagesMap = gdjs.evtTools.p2p.getEvents();
       const messageNamesArray = Array.from(p2pMessagesMap.keys());
       const customMessageNames = messageNamesArray.filter((messageName) =>
@@ -1092,7 +1099,7 @@ namespace gdjs {
     };
 
     const updateSceneMessageNamePrefix = '#updateScene';
-    export const createUpdateSceneMessage = ({
+    const createUpdateSceneMessage = ({
       sceneNetworkSyncData,
     }: {
       sceneNetworkSyncData: LayoutNetworkSyncData;
@@ -1130,7 +1137,7 @@ namespace gdjs {
       );
     };
 
-    export const handleUpdateSceneMessages = (
+    const handleUpdateSceneMessages = (
       runtimeScene: gdjs.RuntimeScene
     ): void => {
       // Only the server synchronizes the scene state.
@@ -1169,9 +1176,7 @@ namespace gdjs {
       }
     };
 
-    export const handleSceneUpdatedMessages = (
-      runtimeScene: gdjs.RuntimeScene
-    ) => {
+    const handleSceneUpdatedMessages = (runtimeScene: gdjs.RuntimeScene) => {
       const p2pMessagesMap = gdjs.evtTools.p2p.getEvents();
 
       const messageNamesArray = Array.from(p2pMessagesMap.keys());
@@ -1191,7 +1196,7 @@ namespace gdjs {
     };
 
     const updateGameMessageNamePrefix = '#updateGame';
-    export const createUpdateGameMessage = ({
+    const createUpdateGameMessage = ({
       gameNetworkSyncData,
     }: {
       gameNetworkSyncData: GameNetworkSyncData;
@@ -1224,7 +1229,7 @@ namespace gdjs {
       return getTimeNow() - lastGameSyncTimestamp < 1000 / gameSyncDataTickRate;
     };
 
-    export const handleUpdateGameMessages = (
+    const handleUpdateGameMessages = (
       runtimeScene: gdjs.RuntimeScene
     ): void => {
       // Only the server synchronizes the global state.
@@ -1260,9 +1265,7 @@ namespace gdjs {
       }
     };
 
-    export const handleGameUpdatedMessages = (
-      runtimeScene: gdjs.RuntimeScene
-    ) => {
+    const handleGameUpdatedMessages = (runtimeScene: gdjs.RuntimeScene) => {
       const p2pMessagesMap = gdjs.evtTools.p2p.getEvents();
       const messageNamesArray = Array.from(p2pMessagesMap.keys());
       const updateGameMessageNames = messageNamesArray.filter((messageName) =>
@@ -1279,5 +1282,36 @@ namespace gdjs {
         }
       });
     };
-  }
+
+    return {
+      addExpectedMessageAcknowledgement,
+      clearExpectedMessageAcknowledgements,
+      sendDataTo,
+      createChangeOwnerMessage,
+      createObjectOwnerChangedMessageNameFromChangeOwnerMessage,
+      handleChangeOwnerMessages,
+      createUpdateObjectMessage,
+      handleUpdateObjectMessages,
+      handleAcknowledgeMessages,
+      resendClearOrCancelAcknowledgedMessages,
+      createDestroyObjectMessage,
+      createObjectDestroyedMessageNameFromDestroyMessage,
+      handleDestroyObjectMessages,
+      sendMessage,
+      hasMessageBeenReceived,
+      getMessageData,
+      handleCustomMessages,
+      createUpdateSceneMessage,
+      handleUpdateSceneMessages,
+      handleSceneUpdatedMessages,
+      createUpdateGameMessage,
+      handleUpdateGameMessages,
+      handleGameUpdatedMessages,
+    };
+  };
+
+  /**
+   * The MultiplayerMessageManager used by the game.
+   */
+  export let multiplayerMessageManager = makeMultiplayerMessageManager();
 }

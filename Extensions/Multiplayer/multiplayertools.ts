@@ -3,9 +3,7 @@ namespace gdjs {
 
   const logger = new gdjs.Logger('Multiplayer');
   const multiplayerComponents = gdjs.multiplayerComponents;
-  const multiplayerMessageManager = gdjs.multiplayerMessageManager;
   export namespace multiplayer {
-
     /** Set to true in testing to avoid relying on the multiplayer extension. */
     export let disableMultiplayerForTesting = false;
 
@@ -39,15 +37,15 @@ namespace gdjs {
       (runtimeScene: gdjs.RuntimeScene) => {
         if (disableMultiplayerForTesting) return;
 
-        multiplayerMessageManager.handleChangeOwnerMessages(runtimeScene);
-        multiplayerMessageManager.handleUpdateObjectMessages(runtimeScene);
-        multiplayerMessageManager.handleCustomMessages();
-        multiplayerMessageManager.handleAcknowledgeMessages();
-        multiplayerMessageManager.resendClearOrCancelAcknowledgedMessages(
+        gdjs.multiplayerMessageManager.handleChangeOwnerMessages(runtimeScene);
+        gdjs.multiplayerMessageManager.handleUpdateObjectMessages(runtimeScene);
+        gdjs.multiplayerMessageManager.handleCustomMessages();
+        gdjs.multiplayerMessageManager.handleAcknowledgeMessages();
+        gdjs.multiplayerMessageManager.resendClearOrCancelAcknowledgedMessages(
           runtimeScene
         );
-        multiplayerMessageManager.handleSceneUpdatedMessages(runtimeScene);
-        multiplayerMessageManager.handleGameUpdatedMessages(runtimeScene);
+        gdjs.multiplayerMessageManager.handleSceneUpdatedMessages(runtimeScene);
+        gdjs.multiplayerMessageManager.handleGameUpdatedMessages(runtimeScene);
       }
     );
 
@@ -55,9 +53,11 @@ namespace gdjs {
       (runtimeScene: gdjs.RuntimeScene) => {
         if (disableMultiplayerForTesting) return;
 
-        multiplayerMessageManager.handleDestroyObjectMessages(runtimeScene);
-        multiplayerMessageManager.handleUpdateSceneMessages(runtimeScene);
-        multiplayerMessageManager.handleUpdateGameMessages(runtimeScene);
+        gdjs.multiplayerMessageManager.handleDestroyObjectMessages(
+          runtimeScene
+        );
+        gdjs.multiplayerMessageManager.handleUpdateSceneMessages(runtimeScene);
+        gdjs.multiplayerMessageManager.handleUpdateGameMessages(runtimeScene);
       }
     );
 
@@ -656,7 +656,7 @@ namespace gdjs {
       gdjs.evtTools.p2p.disconnectFromAllPeers();
 
       // Clear the expected acknowledgments, as the game is ending.
-      multiplayerMessageManager.clearExpectedMessageAcknowledgements();
+      gdjs.multiplayerMessageManager.clearExpectedMessageAcknowledgements();
     };
 
     /**

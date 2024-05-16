@@ -255,7 +255,7 @@ describe('Multiplayer', () => {
     gdjs.multiplayer.isGameRunning = false;
   });
 
-  it('synchronizes scene variables from the server to other players', () => {
+  it('synchronizes scene/global variables from the server to other players', () => {
     let otherPeerIds = [];
     let currentPeerId = '';
     const {
@@ -270,11 +270,12 @@ describe('Multiplayer', () => {
       playerNumber: 1,
     });
 
-    const remoteRuntimeScene = makeTestRuntimeScene();
+    const p1RuntimeScene = makeTestRuntimeScene();
     const remoteVariable = new gdjs.Variable();
     remoteVariable.setString('Hello from remote world');
-    remoteRuntimeScene.getVariables().add('MyRemoteVariable', remoteVariable);
-    remoteRuntimeScene.renderAndStep(1000 / 60);
+    p1RuntimeScene.getVariables().add('MyRemoteVariable', remoteVariable);
+
+    p1RuntimeScene.renderAndStep(1000 / 60);
 
     switchToPeer({
       peerId: 'player-2',
@@ -282,15 +283,48 @@ describe('Multiplayer', () => {
       playerNumber: 2,
     });
 
-    const localRuntimeScene = makeTestRuntimeScene();
-    localRuntimeScene.renderAndStep(1000 / 60);
+    const p2RuntimeScene = makeTestRuntimeScene();
+    p2RuntimeScene.renderAndStep(1000 / 60);
     markAllPeerEventsAsProcessed();
-    expect(localRuntimeScene.getVariables().has('MyRemoteVariable')).to.be(
-      true
-    );
+    expect(p2RuntimeScene.getVariables().has('MyRemoteVariable')).to.be(true);
     expect(
-      localRuntimeScene.getVariables().get('MyRemoteVariable').getAsString()
+      p2RuntimeScene.getVariables().get('MyRemoteVariable').getAsString()
     ).to.be('Hello from remote world');
+
+    // Also check global variables.
+    switchToPeer({
+      peerId: 'player-1',
+      otherPeerIds: ['player-2'],
+      playerNumber: 1,
+    });
+
+    const remoteGlobalVariable = new gdjs.Variable();
+    remoteGlobalVariable.setString('Hello from remote global world');
+    p1RuntimeScene
+      .getGame()
+      .getVariables()
+      .add('MyRemoteGlobalVariable', remoteGlobalVariable);
+
+    p1RuntimeScene.renderAndStep(1000 / 60);
+
+    switchToPeer({
+      peerId: 'player-2',
+      otherPeerIds: ['player-1'],
+      playerNumber: 2,
+    });
+
+    p2RuntimeScene.renderAndStep(1000 / 60);
+    markAllPeerEventsAsProcessed();
+    expect(
+      p2RuntimeScene.getGame().getVariables().has('MyRemoteGlobalVariable')
+    ).to.be(true);
+    expect(
+      p2RuntimeScene
+        .getGame()
+        .getVariables()
+        .get('MyRemoteGlobalVariable')
+        .getAsString()
+    ).to.be('Hello from remote global world');
   });
 
   it('synchronizes objects from the server to other players', () => {

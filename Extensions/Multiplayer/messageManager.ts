@@ -776,7 +776,7 @@ namespace gdjs {
                     }
 
                     const previousOwner = originalData.previousOwner;
-                    if (!previousOwner) {
+                    if (previousOwner === undefined) {
                       // No previous owner, cannot revert ownership.
                       delete expectedMessageAcknowledgements[
                         acknowledgemessageName

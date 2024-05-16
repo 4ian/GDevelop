@@ -232,6 +232,13 @@ describe('Multiplayer', () => {
           }
         }
       },
+      expectNoEventsToBeProcessed: () => {
+        for (const events of Object.values(peerEvents)) {
+          for (const event of events.values()) {
+            expect(event.isTriggered()).to.be(false);
+          }
+        }
+      },
     };
   };
 
@@ -688,5 +695,196 @@ describe('Multiplayer', () => {
 
     p2RuntimeScene.renderAndStep(1000 / 60);
     expect(p2RuntimeScene.getObjects('MySpriteObject').length).to.be(0);
+  });
+
+  it('gives priority to the first ownership change and revert the wrong one', async () => {
+    let otherPeerIds = [];
+    let currentPeerId = '';
+    const {
+      switchToPeer,
+      logEvents,
+      markAllPeerEventsAsProcessed,
+      expectNoEventsToBeProcessed,
+    } = createP2PAndMultiplayerMessageManagerMock();
+
+    // Create an instance on the server:
+    switchToPeer({
+      peerId: 'player-1',
+      otherPeerIds: ['player-2', 'player-3'],
+      playerNumber: 1,
+    });
+
+    const p1RuntimeScene = makeTestRuntimeScene();
+    {
+      const mySpriteObject1 = p1RuntimeScene.createObject('MySpriteObject');
+      mySpriteObject1.setX(142);
+      mySpriteObject1.setY(143);
+      mySpriteObject1.getBehavior('MultiplayerObject');
+    }
+    // No ownership given, it's owned by the server.
+
+    p1RuntimeScene.renderAndStep(1000 / 60);
+
+    // Check the object is created on the other players.
+    switchToPeer({
+      peerId: 'player-2',
+      otherPeerIds: ['player-1'],
+      playerNumber: 2,
+    });
+
+    const p2RuntimeScene = makeTestRuntimeScene();
+    expect(p2RuntimeScene.getObjects('MySpriteObject').length).to.be(0);
+    p2RuntimeScene.renderAndStep(1000 / 60);
+
+    expect(p2RuntimeScene.getObjects('MySpriteObject').length).to.be(1);
+    expect(p2RuntimeScene.getObjects('MySpriteObject')[0].getX()).to.be(142);
+    expect(p2RuntimeScene.getObjects('MySpriteObject')[0].getY()).to.be(143);
+
+    switchToPeer({
+      peerId: 'player-3',
+      otherPeerIds: ['player-1'],
+      playerNumber: 3,
+    });
+
+    const p3RuntimeScene = makeTestRuntimeScene();
+    expect(p3RuntimeScene.getObjects('MySpriteObject').length).to.be(0);
+    p3RuntimeScene.renderAndStep(1000 / 60);
+
+    expect(p3RuntimeScene.getObjects('MySpriteObject').length).to.be(1);
+    expect(p3RuntimeScene.getObjects('MySpriteObject')[0].getX()).to.be(142);
+    expect(p3RuntimeScene.getObjects('MySpriteObject')[0].getY()).to.be(143);
+
+    markAllPeerEventsAsProcessed();
+
+    // Now, try to change ownership to player 2 and 3 at the "same time".
+    switchToPeer({
+      peerId: 'player-2',
+      otherPeerIds: ['player-1'],
+      playerNumber: 2,
+    });
+
+    p2RuntimeScene
+      .getObjects('MySpriteObject')[0]
+      .getBehavior('MultiplayerObject')
+      .setPlayerObjectOwnership(2);
+    p2RuntimeScene.renderAndStep(1000 / 60);
+
+    switchToPeer({
+      peerId: 'player-3',
+      otherPeerIds: ['player-1'],
+      playerNumber: 3,
+    });
+    p3RuntimeScene
+      .getObjects('MySpriteObject')[0]
+      .getBehavior('MultiplayerObject')
+      .setPlayerObjectOwnership(3);
+    p3RuntimeScene.renderAndStep(1000 / 60);
+
+    // Verify the server honors the first one (ownership change from 0 to 2).
+    switchToPeer({
+      peerId: 'player-1',
+      otherPeerIds: ['player-2', 'player-3'],
+      playerNumber: 1,
+    });
+    expect(
+      p1RuntimeScene
+        .getObjects('MySpriteObject')[0]
+        .getBehavior('MultiplayerObject')
+        .getPlayerObjectOwnership()
+    ).to.be(0);
+    p1RuntimeScene.renderAndStep(1000 / 60);
+    expect(
+      p1RuntimeScene
+        .getObjects('MySpriteObject')[0]
+        .getBehavior('MultiplayerObject')
+        .getPlayerObjectOwnership()
+    ).to.be(2);
+
+    markAllPeerEventsAsProcessed();
+
+    // Wait so that player 3 retries.
+    await delay(210);
+
+    // Try 4 times and wait for more than 200ms between each try.
+    for (let i = 0; i < 4; i++) {
+      switchToPeer({
+        peerId: 'player-3',
+        otherPeerIds: ['player-1'],
+        playerNumber: 3,
+      });
+
+      p3RuntimeScene.renderAndStep(1000 / 60);
+      expect(
+        p3RuntimeScene
+          .getObjects('MySpriteObject')[0]
+          .getBehavior('MultiplayerObject')
+          .getPlayerObjectOwnership()
+      ).to.be(3);
+
+      markAllPeerEventsAsProcessed();
+
+      await delay(210);
+    }
+
+    // Check ownership was reverted.
+    p3RuntimeScene.renderAndStep(1000 / 60);
+    expect(
+      p3RuntimeScene
+        .getObjects('MySpriteObject')[0]
+        .getBehavior('MultiplayerObject')
+        .getPlayerObjectOwnership()
+    ).to.be(0);
+    markAllPeerEventsAsProcessed();
+
+    // Move the object on the player 2:
+    switchToPeer({
+      peerId: 'player-2',
+      otherPeerIds: ['player-1'],
+      playerNumber: 2,
+    });
+
+    {
+      const mySpriteObject = p2RuntimeScene.getObjects('MySpriteObject')[0];
+      mySpriteObject.getBehavior(
+        'MultiplayerObject'
+      )._objectMaxTickRate = Infinity;
+      mySpriteObject.setX(242);
+      mySpriteObject.setY(243);
+      p2RuntimeScene.renderAndStep(1000 / 60);
+    }
+
+    // Check the object is moved on the server.
+    switchToPeer({
+      peerId: 'player-1',
+      otherPeerIds: ['player-2', 'player-3'],
+      playerNumber: 1,
+    });
+    p1RuntimeScene.renderAndStep(1000 / 60);
+
+    expect(p1RuntimeScene.getObjects('MySpriteObject').length).to.be(1);
+    expect(p1RuntimeScene.getObjects('MySpriteObject')[0].getX()).to.be(242);
+    expect(p1RuntimeScene.getObjects('MySpriteObject')[0].getY()).to.be(243);
+
+    // Check the object is moved on the other player.
+    switchToPeer({
+      peerId: 'player-3',
+      otherPeerIds: ['player-1'],
+      playerNumber: 3,
+    });
+    p3RuntimeScene.renderAndStep(1000 / 60);
+
+    expect(p3RuntimeScene.getObjects('MySpriteObject').length).to.be(1);
+    expect(p3RuntimeScene.getObjects('MySpriteObject')[0].getX()).to.be(242);
+    expect(p3RuntimeScene.getObjects('MySpriteObject')[0].getY()).to.be(243);
+
+    // Check that ownership is also updated to the latest up-to-date value.
+    expect(
+      p3RuntimeScene
+        .getObjects('MySpriteObject')[0]
+        .getBehavior('MultiplayerObject')
+        .getPlayerObjectOwnership()
+    ).to.be(2);
+
+    markAllPeerEventsAsProcessed();
   });
 });

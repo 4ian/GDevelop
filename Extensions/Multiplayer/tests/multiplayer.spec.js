@@ -1,6 +1,8 @@
 // @ts-check
 
 describe('Multiplayer', () => {
+  const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+
   const makeTestRuntimeScene = (timeDelta = 1000 / 60) => {
     const runtimeGame = gdjs.getPixiRuntimeGame();
     const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
@@ -615,8 +617,6 @@ describe('Multiplayer', () => {
     // Verify the server and player 3 are notified of the new instance, and that they reuse
     // their "ghost" instance for it.
 
-    logEvents();
-
     switchToPeer({
       peerId: 'player-1',
       otherPeerIds: ['player-2', 'player-3'],
@@ -644,5 +644,49 @@ describe('Multiplayer', () => {
     expect(p3RuntimeScene.getObjects('MySpriteObject')[1].getY()).to.be(43);
 
     markAllPeerEventsAsProcessed();
+  });
+
+  it('deletes an instance owned by another player after a bit (if not "reconciled" in the meantime)', async () => {
+    let otherPeerIds = [];
+    let currentPeerId = '';
+    const {
+      switchToPeer,
+      logEvents,
+      markAllPeerEventsAsProcessed,
+    } = createP2PAndMultiplayerMessageManagerMock();
+
+    // Create an instance on a player (2), owned by another player (3).
+    // We can assume it's because there is some common logic running for all players
+    // resulting in the creation of this instance everywhere.
+
+    switchToPeer({
+      peerId: 'player-2',
+      otherPeerIds: ['player-1'],
+      playerNumber: 2,
+    });
+
+    const p2RuntimeScene = makeTestRuntimeScene();
+    const mySpriteObject1 = p2RuntimeScene.createObject('MySpriteObject');
+    mySpriteObject1.setX(142);
+    mySpriteObject1.setY(143);
+    mySpriteObject1
+      .getBehavior('MultiplayerObject')
+      .setPlayerObjectOwnership(3);
+
+    p2RuntimeScene.renderAndStep(1000 / 60);
+    expect(p2RuntimeScene.getObjects('MySpriteObject').length).to.be(1);
+
+    await delay(20);
+
+    p2RuntimeScene.renderAndStep(1000 / 60);
+    expect(p2RuntimeScene.getObjects('MySpriteObject').length).to.be(1);
+
+    // After some time, the instance should be deleted as it is owned by another player
+    // and was never synchronized since then. Player 3 probably created an instance for a logic
+    // that was run too early, or never ran on the other players.
+    await delay(500);
+
+    p2RuntimeScene.renderAndStep(1000 / 60);
+    expect(p2RuntimeScene.getObjects('MySpriteObject').length).to.be(0);
   });
 });

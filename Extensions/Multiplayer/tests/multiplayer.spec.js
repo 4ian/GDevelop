@@ -502,4 +502,147 @@ describe('Multiplayer', () => {
 
     markAllPeerEventsAsProcessed();
   });
+
+  it('reconciles an instance owned by a player with a "ghost" instance created on other peers without a network ID (as not owned by them)', () => {
+    let otherPeerIds = [];
+    let currentPeerId = '';
+    const {
+      switchToPeer,
+      logEvents,
+      markAllPeerEventsAsProcessed,
+    } = createP2PAndMultiplayerMessageManagerMock();
+
+    // Create an instance on a player:
+    switchToPeer({
+      peerId: 'player-2',
+      otherPeerIds: ['player-1'],
+      playerNumber: 2,
+    });
+
+    const p2RuntimeScene = makeTestRuntimeScene();
+    const mySpriteObject1 = p2RuntimeScene.createObject('MySpriteObject');
+    mySpriteObject1.setX(142);
+    mySpriteObject1.setY(143);
+    mySpriteObject1
+      .getBehavior('MultiplayerObject')
+      .setPlayerObjectOwnership(2);
+
+    p2RuntimeScene.renderAndStep(1000 / 60);
+
+    // Check the object is created on the other server.
+    switchToPeer({
+      peerId: 'player-1',
+      otherPeerIds: ['player-2', 'player-3'],
+      playerNumber: 1,
+    });
+
+    const p1RuntimeScene = makeTestRuntimeScene();
+    expect(p1RuntimeScene.getObjects('MySpriteObject').length).to.be(0);
+    p1RuntimeScene.renderAndStep(1000 / 60);
+
+    expect(p1RuntimeScene.getObjects('MySpriteObject').length).to.be(1);
+    expect(p1RuntimeScene.getObjects('MySpriteObject')[0].getX()).to.be(142);
+    expect(p1RuntimeScene.getObjects('MySpriteObject')[0].getY()).to.be(143);
+
+    // Check the object is created on the other player.
+    switchToPeer({
+      peerId: 'player-3',
+      otherPeerIds: ['player-1'],
+      playerNumber: 3,
+    });
+
+    const p3RuntimeScene = makeTestRuntimeScene();
+    expect(p3RuntimeScene.getObjects('MySpriteObject').length).to.be(0);
+    p3RuntimeScene.renderAndStep(1000 / 60);
+
+    expect(p3RuntimeScene.getObjects('MySpriteObject').length).to.be(1);
+    expect(p3RuntimeScene.getObjects('MySpriteObject')[0].getX()).to.be(142);
+    expect(p3RuntimeScene.getObjects('MySpriteObject')[0].getY()).to.be(143);
+
+    markAllPeerEventsAsProcessed();
+
+    // Now, create a new instance on the server and player 3, but owned by player 2.
+    // We call this in this test a "ghost" instance as it would be deleted if not "reconcilied".
+    // We can assume it's because there is some common logic running for all players
+    // resulting in the creation of this instance everywhere.
+
+    switchToPeer({
+      peerId: 'player-1',
+      otherPeerIds: ['player-2', 'player-3'],
+      playerNumber: 1,
+    });
+    const p1GhostInstance = p1RuntimeScene.createObject('MySpriteObject');
+    p1GhostInstance
+      .getBehavior('MultiplayerObject')
+      .setPlayerObjectOwnership(2);
+    p1RuntimeScene.renderAndStep(1000 / 60);
+
+    expect(p1RuntimeScene.getObjects('MySpriteObject').length).to.be(2);
+    expect(p1RuntimeScene.getObjects('MySpriteObject')[0].getX()).to.be(142);
+    expect(p1RuntimeScene.getObjects('MySpriteObject')[0].getY()).to.be(143);
+    expect(p1RuntimeScene.getObjects('MySpriteObject')[1].getX()).to.be(0);
+    expect(p1RuntimeScene.getObjects('MySpriteObject')[1].getY()).to.be(0);
+
+    switchToPeer({
+      peerId: 'player-3',
+      otherPeerIds: ['player-1'],
+      playerNumber: 3,
+    });
+    const p3GhostInstance = p3RuntimeScene.createObject('MySpriteObject');
+    p1GhostInstance
+      .getBehavior('MultiplayerObject')
+      .setPlayerObjectOwnership(2);
+    p3RuntimeScene.renderAndStep(1000 / 60);
+
+    expect(p3RuntimeScene.getObjects('MySpriteObject').length).to.be(2);
+    expect(p3RuntimeScene.getObjects('MySpriteObject')[0].getX()).to.be(142);
+    expect(p3RuntimeScene.getObjects('MySpriteObject')[0].getY()).to.be(143);
+    expect(p3RuntimeScene.getObjects('MySpriteObject')[1].getX()).to.be(0);
+    expect(p3RuntimeScene.getObjects('MySpriteObject')[1].getY()).to.be(0);
+
+    // Create an instance on player 2, owned by player 2.
+    switchToPeer({
+      peerId: 'player-2',
+      otherPeerIds: ['player-1'],
+      playerNumber: 2,
+    });
+    const p2NewInstance = p2RuntimeScene.createObject('MySpriteObject');
+    p2NewInstance.setX(42);
+    p2NewInstance.setY(43);
+    p2NewInstance.getBehavior('MultiplayerObject').setPlayerObjectOwnership(2);
+    p2RuntimeScene.renderAndStep(1000 / 60);
+
+    // Verify the server and player 3 are notified of the new instance, and that they reuse
+    // their "ghost" instance for it.
+
+    logEvents();
+
+    switchToPeer({
+      peerId: 'player-1',
+      otherPeerIds: ['player-2', 'player-3'],
+      playerNumber: 1,
+    });
+
+    p1RuntimeScene.renderAndStep(1000 / 60);
+    expect(p1RuntimeScene.getObjects('MySpriteObject').length).to.be(2);
+    expect(p1RuntimeScene.getObjects('MySpriteObject')[0].getX()).to.be(142);
+    expect(p1RuntimeScene.getObjects('MySpriteObject')[0].getY()).to.be(143);
+    expect(p1RuntimeScene.getObjects('MySpriteObject')[1].getX()).to.be(42);
+    expect(p1RuntimeScene.getObjects('MySpriteObject')[1].getY()).to.be(43);
+
+    switchToPeer({
+      peerId: 'player-3',
+      otherPeerIds: ['player-1'],
+      playerNumber: 3,
+    });
+
+    p3RuntimeScene.renderAndStep(1000 / 60);
+    expect(p3RuntimeScene.getObjects('MySpriteObject').length).to.be(2);
+    expect(p3RuntimeScene.getObjects('MySpriteObject')[0].getX()).to.be(142);
+    expect(p3RuntimeScene.getObjects('MySpriteObject')[0].getY()).to.be(143);
+    expect(p3RuntimeScene.getObjects('MySpriteObject')[1].getX()).to.be(42);
+    expect(p3RuntimeScene.getObjects('MySpriteObject')[1].getY()).to.be(43);
+
+    markAllPeerEventsAsProcessed();
+  });
 });

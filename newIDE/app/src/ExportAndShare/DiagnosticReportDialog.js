@@ -18,7 +18,6 @@ const renderDiagnosticReport = (diagnosticReport: gdDiagnosticReport) => {
     const projectDiagnostic = diagnosticReport.get(index);
 
     const objectName = projectDiagnostic.getObjectName();
-    console.log('objectName: ' + objectName);
     if (objectName.length === 0) {
       missingSceneVariables.add(projectDiagnostic.getActualValue());
     } else {
@@ -34,23 +33,28 @@ const renderDiagnosticReport = (diagnosticReport: gdDiagnosticReport) => {
   });
 
   return (
-    <>
-      <Text>
-        <Trans>
-          Missing scene variables: {[...missingSceneVariables].join(', ')}
-        </Trans>
-      </Text>
+    <ColumnStackLayout noMargin useLargeSpacer>
+      <ColumnStackLayout noMargin>
+        <Text size="sub-title" noMargin>
+          <Trans>Missing scene variables</Trans>
+        </Text>
+        <Text size="body" noMargin>
+          {[...missingSceneVariables].join(', ')}
+        </Text>
+      </ColumnStackLayout>
       {[...missingObjectVariablesByObject.entries()].map(
         ([objectName, missingVariables]) => (
-          <Text>
-            <Trans>
-              Missing variables for object "{objectName}":{' '}
+          <ColumnStackLayout noMargin>
+            <Text size="sub-title" noMargin>
+              <Trans>Missing variables for object "{objectName}"</Trans>
+            </Text>
+            <Text size="body" noMargin>
               {[...missingVariables].join(', ')}
-            </Trans>
-          </Text>
+            </Text>
+          </ColumnStackLayout>
         )
       )}
-    </>
+    </ColumnStackLayout>
   );
 };
 
@@ -74,17 +78,17 @@ export default function DiagnosticReportDialog({
       open
       maxWidth="sm"
     >
-      <ColumnStackLayout noMargin>
+      <ColumnStackLayout noMargin useLargeSpacer>
         {mapFor(0, wholeProjectDiagnosticReport.count(), index => {
           const diagnosticReport = wholeProjectDiagnosticReport.get(index);
           return (
             diagnosticReport.count() > 0 && (
-              <>
-                <Text size="section-title">
+              <ColumnStackLayout noMargin>
+                <Text size="block-title">
                   {diagnosticReport.getSceneName()}
                 </Text>
                 {renderDiagnosticReport(diagnosticReport)}
-              </>
+              </ColumnStackLayout>
             )
           );
         })}

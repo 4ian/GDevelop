@@ -28,7 +28,6 @@ public:
                     const gd::String &expectedValue_, const gd::String &objectName_)
       : type(type_), message(message_), actualValue(actualValue_), expectedValue(expectedValue_),
         objectName(objectName_){};
-  ProjectDiagnostic() : type(ErrorType::UndeclaredVariable) {};
   virtual ~ProjectDiagnostic(){};
 
   ErrorType GetType() const { return type; };

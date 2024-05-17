@@ -1,4 +1,11 @@
 namespace gdjs {
+  interface HslAdjustmentFilterNetworkSyncData {
+    h: number;
+    s: number;
+    l: number;
+    a: number;
+    c: boolean;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'HslAdjustment',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -61,6 +68,29 @@ namespace gdjs {
         if (parameterName === 'colorize') {
           hslAdjustmentFilter.colorize = value;
         }
+      }
+      getNetworkSyncData(
+        filter: PIXI.Filter
+      ): HslAdjustmentFilterNetworkSyncData {
+        const hslAdjustmentFilter = filter as PIXI.filters.HslAdjustmentFilter;
+        return {
+          h: hslAdjustmentFilter.hue,
+          s: hslAdjustmentFilter.saturation,
+          l: hslAdjustmentFilter.lightness,
+          a: hslAdjustmentFilter.alpha,
+          c: hslAdjustmentFilter.colorize,
+        };
+      }
+      updateFromNetworkSyncData(
+        filter: PIXI.Filter,
+        data: HslAdjustmentFilterNetworkSyncData
+      ) {
+        const hslAdjustmentFilter = filter as PIXI.filters.HslAdjustmentFilter;
+        hslAdjustmentFilter.hue = data.h;
+        hslAdjustmentFilter.saturation = data.s;
+        hslAdjustmentFilter.lightness = data.l;
+        hslAdjustmentFilter.alpha = data.a;
+        hslAdjustmentFilter.colorize = data.c;
       }
     })()
   );

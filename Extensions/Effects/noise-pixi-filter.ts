@@ -1,4 +1,7 @@
 namespace gdjs {
+  interface NoiseFilterNetworkSyncData {
+    n: number;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Noise',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -42,6 +45,17 @@ namespace gdjs {
         parameterName: string,
         value: boolean
       ) {}
+      getNetworkSyncData(filter: PIXI.Filter): NoiseFilterNetworkSyncData {
+        const noiseFilter = (filter as unknown) as PIXI.NoiseFilter;
+        return { n: noiseFilter.noise };
+      }
+      updateFromNetworkSyncData(
+        filter: PIXI.Filter,
+        data: NoiseFilterNetworkSyncData
+      ) {
+        const noiseFilter = (filter as unknown) as PIXI.NoiseFilter;
+        noiseFilter.noise = data.n;
+      }
     })()
   );
 }

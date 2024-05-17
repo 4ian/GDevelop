@@ -1,4 +1,9 @@
 namespace gdjs {
+  interface OutlineFilterNetworkSyncData {
+    t: number;
+    p: number;
+    c: number;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Outline',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -63,6 +68,23 @@ namespace gdjs {
         parameterName: string,
         value: boolean
       ) {}
+      getNetworkSyncData(filter: PIXI.Filter): OutlineFilterNetworkSyncData {
+        const outlineFilter = (filter as unknown) as PIXI.filters.OutlineFilter;
+        return {
+          t: outlineFilter.thickness,
+          p: outlineFilter.padding,
+          c: outlineFilter.color,
+        };
+      }
+      updateFromNetworkSyncData(
+        filter: PIXI.Filter,
+        data: OutlineFilterNetworkSyncData
+      ) {
+        const outlineFilter = (filter as unknown) as PIXI.filters.OutlineFilter;
+        outlineFilter.thickness = data.t;
+        outlineFilter.padding = data.p;
+        outlineFilter.color = data.c;
+      }
     })()
   );
 }

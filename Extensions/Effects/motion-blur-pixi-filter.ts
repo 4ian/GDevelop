@@ -3,6 +3,12 @@ namespace gdjs {
     /**Use the private member avoids to instantiate Arrays.*/
     _velocity: PIXI.Point;
   }
+  interface MotionBlurFilterNetworkSyncData {
+    vx: number;
+    vy: number;
+    ks: number;
+    o: number;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'MotionBlur',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -63,6 +69,27 @@ namespace gdjs {
         parameterName: string,
         value: boolean
       ) {}
+      getNetworkSyncData(filter: PIXI.Filter): MotionBlurFilterNetworkSyncData {
+        const motionBlurFilter = filter as PIXI.filters.MotionBlurFilter &
+          MotionBlurFilterExtra;
+        return {
+          vx: motionBlurFilter._velocity.x,
+          vy: motionBlurFilter._velocity.y,
+          ks: motionBlurFilter.kernelSize,
+          o: motionBlurFilter.offset,
+        };
+      }
+      updateFromNetworkSyncData(
+        filter: PIXI.Filter,
+        data: MotionBlurFilterNetworkSyncData
+      ) {
+        const motionBlurFilter = filter as PIXI.filters.MotionBlurFilter &
+          MotionBlurFilterExtra;
+        motionBlurFilter._velocity.x = data.vx;
+        motionBlurFilter._velocity.y = data.vy;
+        motionBlurFilter.kernelSize = data.ks;
+        motionBlurFilter.offset = data.o;
+      }
     })()
   );
 }

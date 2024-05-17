@@ -1,4 +1,7 @@
 namespace gdjs {
+  export interface LightNightFilterExtra {
+    o: number;
+  }
   export class LightNightPixiFilter extends PIXI.Filter {
     constructor() {
       const vertexShader = undefined;
@@ -66,6 +69,17 @@ namespace gdjs {
         parameterName: string,
         value: boolean
       ) {}
+      getNetworkSyncData(filter: PIXI.Filter): LightNightFilterExtra {
+        return {
+          o: filter.uniforms.opacity,
+        };
+      }
+      updateFromNetworkSyncData(
+        filter: PIXI.Filter,
+        data: LightNightFilterExtra
+      ) {
+        filter.uniforms.opacity = data.o;
+      }
     })()
   );
 }

@@ -3,6 +3,18 @@ namespace gdjs {
     _animationTimer: number;
     animationFrequency: number;
   }
+  interface OldFilmFilterNetworkSyncData {
+    se: number;
+    n: number;
+    ns: number;
+    s: number;
+    sd: number;
+    sw: number;
+    v: number;
+    va: number;
+    vb: number;
+    af: number;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'OldFilm',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -109,6 +121,39 @@ namespace gdjs {
         parameterName: string,
         value: boolean
       ) {}
+      getNetworkSyncData(filter: PIXI.Filter): OldFilmFilterNetworkSyncData {
+        const oldFilmFilter = (filter as unknown) as PIXI.filters.OldFilmFilter &
+          OldFilmFilterExtra;
+        return {
+          se: oldFilmFilter.sepia,
+          n: oldFilmFilter.noise,
+          ns: oldFilmFilter.noiseSize,
+          s: oldFilmFilter.scratch,
+          sd: oldFilmFilter.scratchDensity,
+          sw: oldFilmFilter.scratchWidth,
+          v: oldFilmFilter.vignetting,
+          va: oldFilmFilter.vignettingAlpha,
+          vb: oldFilmFilter.vignettingBlur,
+          af: oldFilmFilter.animationFrequency,
+        };
+      }
+      updateFromNetworkSyncData(
+        filter: PIXI.Filter,
+        data: OldFilmFilterNetworkSyncData
+      ) {
+        const oldFilmFilter = (filter as unknown) as PIXI.filters.OldFilmFilter &
+          OldFilmFilterExtra;
+        oldFilmFilter.sepia = data.se;
+        oldFilmFilter.noise = data.n;
+        oldFilmFilter.noiseSize = data.ns;
+        oldFilmFilter.scratch = data.s;
+        oldFilmFilter.scratchDensity = data.sd;
+        oldFilmFilter.scratchWidth = data.sw;
+        oldFilmFilter.vignetting = data.v;
+        oldFilmFilter.vignettingAlpha = data.va;
+        oldFilmFilter.vignettingBlur = data.vb;
+        oldFilmFilter.animationFrequency = data.af;
+      }
     })()
   );
 }

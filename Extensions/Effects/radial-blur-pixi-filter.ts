@@ -4,6 +4,14 @@ namespace gdjs {
     _centerX: number;
     _centerY: number;
   }
+  interface RadialBlurFilterNetworkSyncData {
+    r: number;
+    a: number;
+    ks: number;
+    cx: number;
+    cy: number;
+    p: number;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'RadialBlur',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -87,6 +95,31 @@ namespace gdjs {
         parameterName: string,
         value: boolean
       ) {}
+      getNetworkSyncData(filter: PIXI.Filter): RadialBlurFilterNetworkSyncData {
+        const radialBlurFilter = (filter as unknown) as PIXI.filters.RadialBlurFilter &
+          RadialBlurFilterExtra;
+        return {
+          r: radialBlurFilter.radius,
+          a: radialBlurFilter.angle,
+          ks: radialBlurFilter.kernelSize,
+          cx: radialBlurFilter._centerX,
+          cy: radialBlurFilter._centerY,
+          p: radialBlurFilter.padding,
+        };
+      }
+      updateFromNetworkSyncData(
+        filter: PIXI.Filter,
+        data: RadialBlurFilterNetworkSyncData
+      ) {
+        const radialBlurFilter = (filter as unknown) as PIXI.filters.RadialBlurFilter &
+          RadialBlurFilterExtra;
+        radialBlurFilter.radius = data.r;
+        radialBlurFilter.angle = data.a;
+        radialBlurFilter.kernelSize = data.ks;
+        radialBlurFilter._centerX = data.cx;
+        radialBlurFilter._centerY = data.cy;
+        radialBlurFilter.padding = data.p;
+      }
     })()
   );
 }

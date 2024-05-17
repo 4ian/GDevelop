@@ -3,6 +3,9 @@ namespace gdjs {
     /** It's only set to a number. */
     size: number;
   }
+  interface PixelateFilterNetworkSyncData {
+    s: number;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Pixelate',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -50,6 +53,19 @@ namespace gdjs {
         parameterName: string,
         value: boolean
       ) {}
+      getNetworkSyncData(filter: PIXI.Filter): PixelateFilterNetworkSyncData {
+        const pixelateFilter = (filter as unknown) as PIXI.filters.PixelateFilter &
+          PixelateFilterExtra;
+        return { s: pixelateFilter.size };
+      }
+      updateFromNetworkSyncData(
+        filter: PIXI.Filter,
+        data: PixelateFilterNetworkSyncData
+      ) {
+        const pixelateFilter = (filter as unknown) as PIXI.filters.PixelateFilter &
+          PixelateFilterExtra;
+        pixelateFilter.size = data.s;
+      }
     })()
   );
 }

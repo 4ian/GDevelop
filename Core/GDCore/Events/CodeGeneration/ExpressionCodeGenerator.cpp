@@ -69,11 +69,15 @@ gd::String ExpressionCodeGenerator::GenerateExpressionCode(
                 gd::ExpressionParserError::ErrorType::UndeclaredVariable ||
             error->GetType() ==
                 gd::ExpressionParserError::ErrorType::UnknownIdentifier) {
-          gd::ProjectDiagnostic projectDiagnostic(
-              gd::ProjectDiagnostic::ErrorType::UndeclaredVariable,
-              error->GetMessage(), error->GetActualValue(),
-              "", error->GetObjectName());
-          diagnosticReport->Add(projectDiagnostic);
+                  
+          const auto& variableName = error->GetActualValue();
+          if (!variableName.empty()) {
+            gd::ProjectDiagnostic projectDiagnostic(
+                gd::ProjectDiagnostic::ErrorType::UndeclaredVariable,
+                error->GetMessage(), error->GetActualValue(),
+                "", error->GetObjectName());
+            diagnosticReport->Add(projectDiagnostic);
+          }
         }
       }
     }

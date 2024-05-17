@@ -1925,6 +1925,7 @@ export class ProjectDiagnostic extends EmscriptenObject {
 }
 
 export class DiagnosticReport extends EmscriptenObject {
+  constructor();
   get(index: number): ProjectDiagnostic;
   count(): number;
   getSceneName(): string;

@@ -2535,6 +2535,7 @@ interface ProjectDiagnostic {
 };
 
  interface DiagnosticReport {
+    void DiagnosticReport();
     [Const, Ref] ProjectDiagnostic Get(unsigned long index);
     unsigned long Count();
     [Const, Ref] DOMString GetSceneName();

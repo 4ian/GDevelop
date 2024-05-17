@@ -5,6 +5,17 @@ namespace gdjs {
     x: number;
     y: number;
   }
+  interface GodrayFilterNetworkSyncData {
+    la: number;
+    a: number;
+    g: number;
+    li: number;
+    x: number;
+    y: number;
+    as: number;
+    p: number;
+    pa: boolean;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Godray',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -97,6 +108,37 @@ namespace gdjs {
         if (parameterName === 'parallel') {
           godrayFilter.parallel = value;
         }
+      }
+      getNetworkSyncData(filter: PIXI.Filter): GodrayFilterNetworkSyncData {
+        const godrayFilter = (filter as unknown) as PIXI.filters.GodrayFilter &
+          GodrayFilterExtra;
+        return {
+          la: godrayFilter.lacunarity,
+          a: godrayFilter.angle,
+          g: godrayFilter.gain,
+          li: godrayFilter.light,
+          x: godrayFilter.x,
+          y: godrayFilter.y,
+          as: godrayFilter.animationSpeed,
+          p: godrayFilter.padding,
+          pa: godrayFilter.parallel,
+        };
+      }
+      updateFromNetworkSyncData(
+        filter: PIXI.Filter,
+        data: GodrayFilterNetworkSyncData
+      ) {
+        const godrayFilter = (filter as unknown) as PIXI.filters.GodrayFilter &
+          GodrayFilterExtra;
+        godrayFilter.lacunarity = data.la;
+        godrayFilter.angle = data.a;
+        godrayFilter.gain = data.g;
+        godrayFilter.light = data.li;
+        godrayFilter.x = data.x;
+        godrayFilter.y = data.y;
+        godrayFilter.animationSpeed = data.as;
+        godrayFilter.padding = data.p;
+        godrayFilter.parallel = data.pa;
       }
     })()
   );

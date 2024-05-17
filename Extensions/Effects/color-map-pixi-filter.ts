@@ -1,4 +1,8 @@
 namespace gdjs {
+  interface ColorMapFilterNetworkSyncData {
+    mix: number;
+    near: boolean;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'ColorMap',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -63,6 +67,18 @@ namespace gdjs {
         if (parameterName === 'nearest') {
           colorMapFilter.nearest = value;
         }
+      }
+      getNetworkSyncData(filter: PIXI.Filter): ColorMapFilterNetworkSyncData {
+        const colorMapFilter = (filter as unknown) as PIXI.filters.ColorMapFilter;
+        return { mix: colorMapFilter.mix, near: colorMapFilter.nearest };
+      }
+      updateFromNetworkSyncData(
+        filter: PIXI.Filter,
+        data: ColorMapFilterNetworkSyncData
+      ) {
+        const colorMapFilter = (filter as unknown) as PIXI.filters.ColorMapFilter;
+        colorMapFilter.mix = data.mix;
+        colorMapFilter.nearest = data.near;
       }
     })()
   );

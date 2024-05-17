@@ -1,4 +1,10 @@
 namespace gdjs {
+  interface BlurFilterNetworkSyncData {
+    b: number;
+    q: number;
+    ks: number;
+    res: number | null;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Blur',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -46,6 +52,23 @@ namespace gdjs {
         parameterName: string,
         value: boolean
       ) {}
+      getNetworkSyncData(filter: PIXI.Filter): BlurFilterNetworkSyncData {
+        return {
+          b: filter['blur'],
+          q: filter['quality'],
+          ks: filter['kernelSize'],
+          res: filter['resolution'],
+        };
+      }
+      updateFromNetworkSyncData(
+        filter: PIXI.Filter,
+        data: BlurFilterNetworkSyncData
+      ) {
+        filter['blur'] = data.b;
+        filter['quality'] = data.q;
+        filter['kernelSize'] = data.ks;
+        filter['resolution'] = data.res;
+      }
     })()
   );
 }

@@ -3,6 +3,15 @@ namespace gdjs {
     /** It's defined for the configuration but not for the filter. */
     distance: number;
   }
+  interface BevelFilterNetworkSyncData {
+    r: number;
+    t: number;
+    d: number;
+    la: number;
+    sa: number;
+    lc: number;
+    sc: number;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Bevel',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -97,6 +106,33 @@ namespace gdjs {
         parameterName: string,
         value: boolean
       ) {}
+      getNetworkSyncData(filter: PIXI.Filter): BevelFilterNetworkSyncData {
+        const bevelFilter = (filter as unknown) as PIXI.filters.BevelFilter &
+          BevelFilterExtra;
+        return {
+          r: bevelFilter.rotation,
+          t: bevelFilter.thickness,
+          d: bevelFilter.distance,
+          la: bevelFilter.lightAlpha,
+          sa: bevelFilter.shadowAlpha,
+          lc: bevelFilter.lightColor,
+          sc: bevelFilter.shadowColor,
+        };
+      }
+      updateFromNetworkSyncData(
+        filter: PIXI.Filter,
+        data: BevelFilterNetworkSyncData
+      ) {
+        const bevelFilter = (filter as unknown) as PIXI.filters.BevelFilter &
+          BevelFilterExtra;
+        bevelFilter.rotation = data.r;
+        bevelFilter.thickness = data.t;
+        bevelFilter.distance = data.d;
+        bevelFilter.lightAlpha = data.la;
+        bevelFilter.shadowAlpha = data.sa;
+        bevelFilter.lightColor = data.lc;
+        bevelFilter.shadowColor = data.sc;
+      }
     })()
   );
 }

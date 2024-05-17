@@ -1,4 +1,8 @@
 namespace gdjs {
+  interface DotFilterNetworkSyncData {
+    s: number;
+    a: number;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Dot',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -47,6 +51,18 @@ namespace gdjs {
         parameterName: string,
         value: boolean
       ) {}
+      getNetworkSyncData(filter: PIXI.Filter): DotFilterNetworkSyncData {
+        const dotFilter = (filter as unknown) as PIXI.filters.DotFilter;
+        return { s: dotFilter.scale, a: dotFilter.angle };
+      }
+      updateFromNetworkSyncData(
+        filter: PIXI.Filter,
+        data: DotFilterNetworkSyncData
+      ) {
+        const dotFilter = (filter as unknown) as PIXI.filters.DotFilter;
+        dotFilter.scale = data.s;
+        dotFilter.angle = data.a;
+      }
     })()
   );
 }

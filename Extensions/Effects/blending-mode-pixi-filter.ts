@@ -1,4 +1,8 @@
 namespace gdjs {
+  interface BlendingModeFilterNetworkSyncData {
+    a: number;
+    bm: number;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'BlendingMode',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -47,6 +51,23 @@ namespace gdjs {
         parameterName: string,
         value: boolean
       ) {}
+      getNetworkSyncData(
+        filter: PIXI.Filter
+      ): BlendingModeFilterNetworkSyncData {
+        const blendingModeFilter = (filter as unknown) as PIXI.AlphaFilter;
+        return {
+          a: blendingModeFilter.alpha,
+          bm: blendingModeFilter.blendMode,
+        };
+      }
+      updateFromNetworkSyncData(
+        filter: PIXI.Filter,
+        data: BlendingModeFilterNetworkSyncData
+      ) {
+        const blendingModeFilter = (filter as unknown) as PIXI.AlphaFilter;
+        blendingModeFilter.alpha = data.a;
+        blendingModeFilter.blendMode = data.bm;
+      }
     })()
   );
 }

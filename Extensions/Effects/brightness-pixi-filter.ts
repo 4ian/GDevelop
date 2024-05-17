@@ -3,6 +3,9 @@ namespace gdjs {
     /** It allows to get back the value as the filter uses a matrix.  */
     __brightness: number;
   }
+  interface BrightnessFilterNetworkSyncData {
+    b: number;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Brightness',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -52,6 +55,20 @@ namespace gdjs {
         parameterName: string,
         value: boolean
       ) {}
+      getNetworkSyncData(filter: PIXI.Filter): BrightnessFilterNetworkSyncData {
+        const brightnessFilter = (filter as unknown) as PIXI.ColorMatrixFilter &
+          BrightnessFilterExtra;
+        return { b: brightnessFilter.__brightness };
+      }
+      updateFromNetworkSyncData(
+        filter: PIXI.Filter,
+        data: BrightnessFilterNetworkSyncData
+      ) {
+        const brightnessFilter = (filter as unknown) as PIXI.ColorMatrixFilter &
+          BrightnessFilterExtra;
+        brightnessFilter.__brightness = data.b;
+        brightnessFilter.brightness(data.b, false);
+      }
     })()
   );
 }

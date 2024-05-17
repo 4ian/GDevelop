@@ -3,6 +3,22 @@ namespace gdjs {
     _animationTimer: number;
     animationFrequency: number;
   }
+  interface GlitchFilterNetworkSyncData {
+    s: number;
+    o: number;
+    d: number;
+    fm: number;
+    ms: number;
+    ss: number;
+    rx: number;
+    ry: number;
+    gx: number;
+    gy: number;
+    bx: number;
+    by: number;
+    af: number;
+    a: boolean;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Glitch',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -129,6 +145,47 @@ namespace gdjs {
         if (parameterName === 'average') {
           glitchFilter.average = value;
         }
+      }
+      getNetworkSyncData(filter: PIXI.Filter): GlitchFilterNetworkSyncData {
+        const glitchFilter = (filter as unknown) as PIXI.filters.GlitchFilter &
+          GlitchFilterExtra;
+        return {
+          s: glitchFilter.slices,
+          o: glitchFilter.offset,
+          d: glitchFilter.direction,
+          fm: glitchFilter.fillMode,
+          ms: glitchFilter.minSize,
+          ss: glitchFilter.sampleSize,
+          rx: glitchFilter.red.x,
+          ry: glitchFilter.red.y,
+          gx: glitchFilter.green.x,
+          gy: glitchFilter.green.y,
+          bx: glitchFilter.blue.x,
+          by: glitchFilter.blue.y,
+          af: glitchFilter.animationFrequency,
+          a: glitchFilter.average,
+        };
+      }
+      updateFromNetworkSyncData(
+        filter: PIXI.Filter,
+        data: GlitchFilterNetworkSyncData
+      ) {
+        const glitchFilter = (filter as unknown) as PIXI.filters.GlitchFilter &
+          GlitchFilterExtra;
+        glitchFilter.slices = data.s;
+        glitchFilter.offset = data.o;
+        glitchFilter.direction = data.d;
+        glitchFilter.fillMode = data.fm;
+        glitchFilter.minSize = data.ms;
+        glitchFilter.sampleSize = data.ss;
+        glitchFilter.red.x = data.rx;
+        glitchFilter.red.y = data.ry;
+        glitchFilter.green.x = data.gx;
+        glitchFilter.green.y = data.gy;
+        glitchFilter.blue.x = data.bx;
+        glitchFilter.blue.y = data.by;
+        glitchFilter.animationFrequency = data.af;
+        glitchFilter.average = data.a;
       }
     })()
   );

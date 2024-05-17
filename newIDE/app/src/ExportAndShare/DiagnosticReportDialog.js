@@ -2,6 +2,7 @@
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import Text from '../UI/Text';
+import Toggle from '../UI/Toggle';
 import { ColumnStackLayout } from '../UI/Layout';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import { mapFor } from '../Utils/MapFor';
@@ -14,6 +15,7 @@ import {
   TableHeaderColumn,
 } from '../UI/Table';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
+import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 
 const gd: libGDevelop = global.gd;
 
@@ -36,6 +38,7 @@ export default function DiagnosticReportDialog({
   onClose,
 }: Props) {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const preferences = React.useContext(PreferencesContext);
 
   const renderDiagnosticReport = React.useCallback(
     (diagnosticReport: gdDiagnosticReport) => {
@@ -96,7 +99,7 @@ export default function DiagnosticReportDialog({
                     </Text>
                   </TableRowColumn>
                   <TableRowColumn>
-                    <Text size="body">
+                    <Text size="body" allowSelection>
                       {[...missingSceneVariables].join(', ')}
                     </Text>
                   </TableRowColumn>
@@ -118,7 +121,7 @@ export default function DiagnosticReportDialog({
                       </Text>
                     </TableRowColumn>
                     <TableRowColumn>
-                      <Text size="body">
+                      <Text size="body" allowSelection>
                         {[...missingVariables].join(', ')}
                       </Text>
                     </TableRowColumn>
@@ -172,6 +175,16 @@ export default function DiagnosticReportDialog({
           label={<Trans>Close</Trans>}
           primary={true}
           onClick={onClose}
+        />,
+      ]}
+      secondaryActions={[
+        <Toggle
+          label={<Trans>Open automatically</Trans>}
+          toggled={preferences.values.openDiagnosticReportAutomatically}
+          onToggle={(e, check) =>
+            preferences.setOpenDiagnosticReportAutomatically(check)
+          }
+          labelPosition="right"
         />,
       ]}
       onRequestClose={onClose}

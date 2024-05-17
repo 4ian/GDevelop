@@ -66,6 +66,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setEventsSheetCancelInlineParameter,
     setShowCommunityExtensions,
     setShowEventBasedObjectsEditor,
+    setOpenDiagnosticReportAutomatically,
     setShowDeprecatedInstructionWarning,
     setUse3DEditor,
     setNewProjectsDefaultFolder,
@@ -383,6 +384,14 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               }
             />
           )}
+          <Toggle
+            onToggle={(e, check) => setOpenDiagnosticReportAutomatically(check)}
+            toggled={values.openDiagnosticReportAutomatically}
+            labelPosition="right"
+            label={
+              <Trans>Automatically open the diagnostic report at preview</Trans>
+            }
+          />
           <Toggle
             onToggle={(e, check) => setShowDeprecatedInstructionWarning(check)}
             toggled={values.showDeprecatedInstructionWarning}

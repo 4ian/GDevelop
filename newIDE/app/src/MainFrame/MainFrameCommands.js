@@ -44,6 +44,7 @@ type CommandHandlers = {|
   onLaunchDebugPreview: () => void,
   onLaunchNetworkPreview: () => void,
   onHotReloadPreview: () => void,
+  onLaunchPreviewWithDiagnosticReport: () => void,
   allowNetworkPreview: boolean,
   onOpenHomePage: () => void,
   onCreateBlank: () => void,
@@ -96,6 +97,14 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
     handlers.previewEnabled && handlers.allowNetworkPreview,
     {
       handler: handlers.onLaunchNetworkPreview,
+    }
+  );
+
+  useCommand(
+    'LAUNCH_PREVIEW_WITH_DIAGNOSTIC_REPORT',
+    handlers.previewEnabled && !handlers.hasPreviewsRunning,
+    {
+      handler: handlers.onLaunchPreviewWithDiagnosticReport,
     }
   );
 

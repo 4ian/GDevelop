@@ -2547,7 +2547,6 @@ interface WholeProjectDiagnosticReport {
 };
 
 interface ExpressionParserError {
-    boolean IsError();
     [Const, Ref] DOMString GetMessage();
     unsigned long GetStartPosition();
     unsigned long GetEndPosition();

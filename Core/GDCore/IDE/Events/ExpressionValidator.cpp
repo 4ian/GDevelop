@@ -247,9 +247,10 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(
   if (!function.behaviorName.empty() &&
       !objectsContainersList.HasBehaviorInObjectOrGroup(function.objectName,
                                       function.behaviorName)) {
-    RaiseTypeError(_("This behavior is not attached to this object."),
-                   function.behaviorNameLocation,
-                   /*isFatal=*/false);
+    RaiseError(gd::ExpressionParserError::ErrorType::MissingBehavior,
+               _("This behavior is not attached to this object."),
+               function.behaviorNameLocation,
+               /*isFatal=*/false, function.behaviorName, function.objectName);
     return returnType;
   }
 

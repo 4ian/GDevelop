@@ -47,6 +47,7 @@ export enum ObjectsContainersList_VariableExistence {
 
 export enum ProjectDiagnostic_ErrorType {
   UndeclaredVariable = 0,
+  MissingBehavior = 1,
 }
 
 export enum ExpressionCompletionDescription_CompletionKind {
@@ -1919,6 +1920,7 @@ export class ProjectDiagnostic extends EmscriptenObject {
   getType(): ProjectDiagnostic_ErrorType;
   getMessage(): string;
   getActualValue(): string;
+  getExpectedValue(): string;
   getObjectName(): string;
 }
 

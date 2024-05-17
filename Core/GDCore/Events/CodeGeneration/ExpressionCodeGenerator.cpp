@@ -72,7 +72,7 @@ gd::String ExpressionCodeGenerator::GenerateExpressionCode(
           gd::ProjectDiagnostic projectDiagnostic(
               gd::ProjectDiagnostic::ErrorType::UndeclaredVariable,
               error->GetMessage(), error->GetActualValue(),
-              codeGenerator.GetLayout().GetName(), error->GetObjectName());
+              "", error->GetObjectName());
           diagnosticReport->Add(projectDiagnostic);
         }
       }

@@ -2523,12 +2523,14 @@ interface MetadataProvider {
 
 enum ProjectDiagnostic_ErrorType {
     "ProjectDiagnostic::UndeclaredVariable",
+    "ProjectDiagnostic::MissingBehavior",
 };
 
 interface ProjectDiagnostic {
     ProjectDiagnostic_ErrorType GetType();
     [Const, Ref] DOMString GetMessage();
     [Const, Ref] DOMString GetActualValue();
+    [Const, Ref] DOMString GetExpectedValue();
     [Const, Ref] DOMString GetObjectName();
 };
 

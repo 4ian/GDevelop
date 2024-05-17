@@ -20,12 +20,13 @@ class GD_CORE_API ProjectDiagnostic {
 public:
   enum ErrorType {
     UndeclaredVariable,
+    MissingBehavior
   };
 
   ProjectDiagnostic(ErrorType type_, const gd::String &message_,
                     const gd::String &actualValue_,
-                    const gd::String &sceneName_, const gd::String &objectName_)
-      : type(type_), message(message_), actualValue(actualValue_),
+                    const gd::String &expectedValue_, const gd::String &objectName_)
+      : type(type_), message(message_), actualValue(actualValue_), expectedValue(expectedValue_),
         objectName(objectName_){};
   ProjectDiagnostic() : type(ErrorType::UndeclaredVariable) {};
   virtual ~ProjectDiagnostic(){};
@@ -34,12 +35,14 @@ public:
   const gd::String &GetMessage() const { return message; }
   const gd::String &GetObjectName() const { return objectName; }
   const gd::String &GetActualValue() const { return actualValue; }
+  const gd::String &GetExpectedValue() const { return expectedValue; }
 
 private:
   ErrorType type;
   gd::String message;
   gd::String objectName;
   gd::String actualValue;
+  gd::String expectedValue;
 };
 
 /**

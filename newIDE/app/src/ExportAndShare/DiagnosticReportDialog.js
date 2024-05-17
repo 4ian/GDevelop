@@ -15,10 +15,21 @@ import {
 } from '../UI/Table';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 
+const gd: libGDevelop = global.gd;
+
 type Props = {|
   wholeProjectDiagnosticReport: gdWholeProjectDiagnosticReport,
   onClose: () => void,
 |};
+
+const addFor = (map, key, value) => {
+  let set = map.get(key);
+  if (!set) {
+    set = new Set<string>();
+    map.set(key, set);
+  }
+  set.add(value);
+};
 
 export default function DiagnosticReportDialog({
   wholeProjectDiagnosticReport,
@@ -30,24 +41,35 @@ export default function DiagnosticReportDialog({
     (diagnosticReport: gdDiagnosticReport) => {
       const missingSceneVariables = new Set<string>();
       const missingObjectVariablesByObject = new Map<string, Set<string>>();
+      const missingBehaviorsByObjects = new Map<string, Set<string>>();
       mapFor(0, diagnosticReport.count(), index => {
         const projectDiagnostic = diagnosticReport.get(index);
 
         const objectName = projectDiagnostic.getObjectName();
-        if (objectName.length === 0) {
-          missingSceneVariables.add(projectDiagnostic.getActualValue());
-        } else {
-          let missingObjectVariables = missingObjectVariablesByObject.get(
-            objectName
-          );
-          if (!missingObjectVariables) {
-            missingObjectVariables = new Set<string>();
-            missingObjectVariablesByObject.set(
+        const type = projectDiagnostic.getType();
+        switch (type) {
+          case gd.ProjectDiagnostic.UndeclaredVariable:
+            if (objectName.length === 0) {
+              missingSceneVariables.add(projectDiagnostic.getActualValue());
+            } else {
+              addFor(
+                missingObjectVariablesByObject,
+                objectName,
+                projectDiagnostic.getActualValue()
+              );
+            }
+            break;
+
+          case gd.ProjectDiagnostic.MissingBehavior:
+            addFor(
+              missingBehaviorsByObjects,
               objectName,
-              missingObjectVariables
+              projectDiagnostic.getExpectedValue()
             );
-          }
-          missingObjectVariables.add(projectDiagnostic.getActualValue());
+            break;
+
+          default:
+            break;
         }
       });
 
@@ -98,6 +120,36 @@ export default function DiagnosticReportDialog({
                     <TableRowColumn>
                       <Text size="body">
                         {[...missingVariables].join(', ')}
+                      </Text>
+                    </TableRowColumn>
+                  </TableRow>
+                )
+              )}
+              {[...missingBehaviorsByObjects.entries()].map(
+                ([objectName, missingBehaviors]) => (
+                  <TableRow
+                    key={`missing-object-behaviors-${objectName}`}
+                    style={{
+                      backgroundColor: gdevelopTheme.list.itemsBackgroundColor,
+                    }}
+                  >
+                    <TableRowColumn>
+                      <Text size="body">
+                        <Trans>
+                          Missing behaviors for object "{objectName}"
+                        </Trans>
+                      </Text>
+                    </TableRowColumn>
+                    <TableRowColumn>
+                      <Text size="body">
+                        {[...missingBehaviors]
+                          .map(behaviorType =>
+                            gd.MetadataProvider.getBehaviorMetadata(
+                              gd.JsPlatform.get(),
+                              behaviorType
+                            ).getFullName()
+                          )
+                          .join(', ')}
                       </Text>
                     </TableRowColumn>
                   </TableRow>

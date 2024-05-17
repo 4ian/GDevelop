@@ -807,6 +807,10 @@ class GD_CORE_API EventsCodeGenerator {
   virtual gd::String GenerateGetBehaviorNameCode(
       const gd::String& behaviorName);
 
+  void CheckBehaviorParameters(
+      const gd::Instruction &instruction,
+      const gd::InstructionMetadata &instrInfos);
+
   const gd::Platform& platform;  ///< The platform being used.
 
   gd::ProjectScopedContainers projectScopedContainers;

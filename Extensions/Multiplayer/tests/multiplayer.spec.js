@@ -546,6 +546,202 @@ describe('Multiplayer', () => {
     markAllPeerEventsAsProcessed();
   });
 
+  it('allows ownership to change from server to a player to another player', () => {
+    let otherPeerIds = [];
+    let currentPeerId = '';
+    const {
+      switchToPeer,
+      logEvents,
+      markAllPeerEventsAsProcessed,
+      expectNoEventsToBeProcessed,
+    } = createP2PAndMultiplayerMessageManagerMock();
+
+    // Create an instance on the server:
+    switchToPeer({
+      peerId: 'player-1',
+      otherPeerIds: ['player-2', 'player-3'],
+      playerNumber: 1,
+    });
+
+    const p1RuntimeScene = makeTestRuntimeScene();
+    const p1SpriteObject = p1RuntimeScene.createObject('MySpriteObject');
+    p1SpriteObject.setX(142);
+    p1SpriteObject.setY(143);
+
+    p1RuntimeScene.renderAndStep(1000 / 60);
+
+    // Check the object is created on the players.
+    switchToPeer({
+      peerId: 'player-2',
+      otherPeerIds: ['player-1'],
+      playerNumber: 2,
+    });
+
+    const p2RuntimeScene = makeTestRuntimeScene();
+    p2RuntimeScene.renderAndStep(1000 / 60);
+    expect(p2RuntimeScene.getObjects('MySpriteObject').length).to.be(1);
+    expect(p2RuntimeScene.getObjects('MySpriteObject')[0].getX()).to.be(142);
+    expect(p2RuntimeScene.getObjects('MySpriteObject')[0].getY()).to.be(143);
+
+    switchToPeer({
+      peerId: 'player-3',
+      otherPeerIds: ['player-1'],
+      playerNumber: 3,
+    });
+
+    const p3RuntimeScene = makeTestRuntimeScene();
+    p3RuntimeScene.renderAndStep(1000 / 60);
+    expect(p3RuntimeScene.getObjects('MySpriteObject').length).to.be(1);
+    expect(p3RuntimeScene.getObjects('MySpriteObject')[0].getX()).to.be(142);
+    expect(p3RuntimeScene.getObjects('MySpriteObject')[0].getY()).to.be(143);
+
+    markAllPeerEventsAsProcessed();
+    expectNoEventsToBeProcessed();
+
+    // Check player 3 can get ownership (and can directly move the instance, without waiting for the
+    // server to acknowledge the change).
+    p3RuntimeScene.getObjects('MySpriteObject')[0].setX(342);
+    p3RuntimeScene.getObjects('MySpriteObject')[0].setY(343);
+    p3RuntimeScene
+      .getObjects('MySpriteObject')[0]
+      .getBehavior('MultiplayerObject')
+      .setPlayerObjectOwnership(3);
+
+    p3RuntimeScene.renderAndStep(1000 / 60);
+
+    // Check the server is notified of the new ownership (and the new position).
+    switchToPeer({
+      peerId: 'player-1',
+      otherPeerIds: ['player-2', 'player-3'],
+      playerNumber: 1,
+    });
+
+    p1RuntimeScene.renderAndStep(1000 / 60);
+
+    expect(
+      p1RuntimeScene
+        .getObjects('MySpriteObject')[0]
+        .getBehavior('MultiplayerObject')
+        .getPlayerObjectOwnership()
+    ).to.be(3);
+    expect(p1RuntimeScene.getObjects('MySpriteObject').length).to.be(1);
+    expect(p1RuntimeScene.getObjects('MySpriteObject')[0].getX()).to.be(342);
+    expect(p1RuntimeScene.getObjects('MySpriteObject')[0].getY()).to.be(343);
+
+    // Check the player 2 is notified of the new ownership (and the new position).
+    switchToPeer({
+      peerId: 'player-2',
+      otherPeerIds: ['player-1'],
+      playerNumber: 2,
+    });
+
+    p2RuntimeScene.renderAndStep(1000 / 60);
+    expect(
+      p2RuntimeScene
+        .getObjects('MySpriteObject')[0]
+        .getBehavior('MultiplayerObject')
+        .getPlayerObjectOwnership()
+    ).to.be(3);
+    expect(p2RuntimeScene.getObjects('MySpriteObject').length).to.be(1);
+    expect(p2RuntimeScene.getObjects('MySpriteObject')[0].getX()).to.be(342);
+    expect(p2RuntimeScene.getObjects('MySpriteObject')[0].getY()).to.be(343);
+
+    markAllPeerEventsAsProcessed();
+    markAllPeerEventsAsProcessed();
+    expectNoEventsToBeProcessed();
+
+    // Check player 2 can get ownership.
+    // It will also communicate the new position/changes to the instance.
+    p2RuntimeScene
+      .getObjects('MySpriteObject')[0]
+      .getBehavior('MultiplayerObject')
+      .setPlayerObjectOwnership(2);
+    p2RuntimeScene.getObjects('MySpriteObject')[0].setX(242);
+    p2RuntimeScene.getObjects('MySpriteObject')[0].setY(243);
+
+    p2RuntimeScene.renderAndStep(1000 / 60);
+
+    // Check the server is notified of the new ownership.
+    switchToPeer({
+      peerId: 'player-1',
+      otherPeerIds: ['player-2', 'player-3'],
+      playerNumber: 1,
+    });
+
+    expect(
+      p1RuntimeScene
+        .getObjects('MySpriteObject')[0]
+        .getBehavior('MultiplayerObject')
+        .getPlayerObjectOwnership()
+    ).to.be(3);
+    p1RuntimeScene.renderAndStep(1000 / 60);
+    expect(
+      p1RuntimeScene
+        .getObjects('MySpriteObject')[0]
+        .getBehavior('MultiplayerObject')
+        .getPlayerObjectOwnership()
+    ).to.be(2);
+
+    // Check the player 3 is notified of the new ownership.
+    switchToPeer({
+      peerId: 'player-3',
+      otherPeerIds: ['player-1'],
+      playerNumber: 3,
+    });
+
+    expect(
+      p3RuntimeScene
+        .getObjects('MySpriteObject')[0]
+        .getBehavior('MultiplayerObject')
+        .getPlayerObjectOwnership()
+    ).to.be(3);
+    p3RuntimeScene.renderAndStep(1000 / 60);
+    expect(
+      p3RuntimeScene
+        .getObjects('MySpriteObject')[0]
+        .getBehavior('MultiplayerObject')
+        .getPlayerObjectOwnership()
+    ).to.be(2);
+
+    markAllPeerEventsAsProcessed();
+
+    // Check that the position given by player 2 is updated on the server and player 3.
+    switchToPeer({
+      peerId: 'player-1',
+      otherPeerIds: ['player-2', 'player-3'],
+      playerNumber: 1,
+    });
+
+    expect(
+      p1RuntimeScene
+        .getObjects('MySpriteObject')[0]
+        .getBehavior('MultiplayerObject')
+        .getPlayerObjectOwnership()
+    ).to.be(2);
+    p1RuntimeScene.renderAndStep(1000 / 60);
+    expect(p1RuntimeScene.getObjects('MySpriteObject')[0].getX()).to.be(242);
+    expect(p1RuntimeScene.getObjects('MySpriteObject')[0].getY()).to.be(243);
+
+    switchToPeer({
+      peerId: 'player-3',
+      otherPeerIds: ['player-1'],
+      playerNumber: 3,
+    });
+
+    expect(
+      p3RuntimeScene
+        .getObjects('MySpriteObject')[0]
+        .getBehavior('MultiplayerObject')
+        .getPlayerObjectOwnership()
+    ).to.be(2);
+    p3RuntimeScene.renderAndStep(1000 / 60);
+    expect(p3RuntimeScene.getObjects('MySpriteObject')[0].getX()).to.be(242);
+    expect(p3RuntimeScene.getObjects('MySpriteObject')[0].getY()).to.be(243);
+
+    markAllPeerEventsAsProcessed();
+    expectNoEventsToBeProcessed();
+  });
+
   it('reconciles an instance owned by a player with a "ghost" instance created on other peers without a network ID (as not owned by them)', () => {
     let otherPeerIds = [];
     let currentPeerId = '';

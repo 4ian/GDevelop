@@ -157,6 +157,12 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     getShowEventBasedObjectsEditor: this._getShowEventBasedObjectsEditor.bind(
       this
     ),
+    setOpenDiagnosticReportAutomatically: this._setOpenDiagnosticReportAutomatically.bind(
+      this
+    ),
+    getOpenDiagnosticReportAutomatically: this._getOpenDiagnosticReportAutomatically.bind(
+      this
+    ),
     setShowDeprecatedInstructionWarning: this._setShowDeprecatedInstructionWarning.bind(
       this
     ),
@@ -438,6 +444,24 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _getShowEventBasedObjectsEditor() {
     return this.state.values.showEventBasedObjectsEditor;
+  }
+
+  _setOpenDiagnosticReportAutomatically(
+    openDiagnosticReportAutomatically: boolean
+  ) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          openDiagnosticReportAutomatically,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _getOpenDiagnosticReportAutomatically() {
+    return this.state.values.openDiagnosticReportAutomatically;
   }
 
   _setShowDeprecatedInstructionWarning(

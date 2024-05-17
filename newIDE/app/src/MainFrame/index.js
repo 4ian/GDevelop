@@ -267,6 +267,7 @@ type LaunchPreviewOptions = {
   hotReload?: boolean,
   projectDataOnlyExport?: boolean,
   fullLoadingScreen?: boolean,
+  forceDiagnosticReport?: boolean,
 };
 
 export type Props = {|
@@ -1538,6 +1539,7 @@ const MainFrame = (props: Props) => {
       hotReload,
       projectDataOnlyExport,
       fullLoadingScreen,
+      forceDiagnosticReport,
     }: LaunchPreviewOptions) => {
       if (!currentProject) return;
       if (currentProject.getLayoutsCount() === 0) return;
@@ -1608,20 +1610,29 @@ const MainFrame = (props: Props) => {
             inAppTutorialOrchestratorRef.current.onPreviewLaunch();
           }
           const wholeProjectDiagnosticReport = currentProject.getWholeProjectDiagnosticReport();
-          if (wholeProjectDiagnosticReport.hasAnyIssue()) {
+          if (
+            (forceDiagnosticReport ||
+              preferences.values.openDiagnosticReportAutomatically) &&
+            wholeProjectDiagnosticReport.hasAnyIssue()
+          ) {
             setDiagnosticReportDialogOpen(true);
           }
         });
     },
     [
-      autosaveProjectIfNeeded,
       currentProject,
-      eventsFunctionsExtensionsState,
-      previewState,
       state.editorTabs,
+      previewState.isPreviewOverriden,
+      previewState.overridenPreviewLayoutName,
+      previewState.previewLayoutName,
+      previewState.overridenPreviewExternalLayoutName,
+      previewState.previewExternalLayoutName,
+      autosaveProjectIfNeeded,
+      authenticatedUser.profile,
+      eventsFunctionsExtensionsState,
       preferences.getIsMenuBarHiddenInPreview,
       preferences.getIsAlwaysOnTopInPreview,
-      authenticatedUser.profile,
+      preferences.values.openDiagnosticReportAutomatically,
     ]
   );
 
@@ -1643,6 +1654,11 @@ const MainFrame = (props: Props) => {
 
   const launchNetworkPreview = React.useCallback(
     () => launchPreview({ networkPreview: true, hotReload: false }),
+    [launchPreview]
+  );
+
+  const launchPreviewWithDiagnosticReport = React.useCallback(
+    () => launchPreview({ forceDiagnosticReport: true }),
     [launchPreview]
   );
 
@@ -2969,6 +2985,7 @@ const MainFrame = (props: Props) => {
     onHotReloadPreview: launchHotReloadPreview,
     onLaunchDebugPreview: launchDebuggerAndPreview,
     onLaunchNetworkPreview: launchNetworkPreview,
+    onLaunchPreviewWithDiagnosticReport: launchPreviewWithDiagnosticReport,
     onOpenHomePage: openHomePage,
     onCreateBlank: () => setNewProjectSetupDialogOpen(true),
     onOpenProject: () => openOpenFromStorageProviderDialog(),
@@ -3166,6 +3183,7 @@ const MainFrame = (props: Props) => {
         onPreviewWithoutHotReload={launchNewPreview}
         onNetworkPreview={launchNetworkPreview}
         onHotReloadPreview={launchHotReloadPreview}
+        onLaunchPreviewWithDiagnosticReport={launchPreviewWithDiagnosticReport}
         canDoNetworkPreview={
           !!_previewLauncher.current &&
           _previewLauncher.current.canDoNetworkPreview()

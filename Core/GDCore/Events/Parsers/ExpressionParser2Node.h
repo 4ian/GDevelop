@@ -60,23 +60,20 @@ struct GD_CORE_API ExpressionParserError {
     MissingBehavior,
   };
 
-  ExpressionParserError(ExpressionParserError::ErrorType type_,
+  ExpressionParserError(gd::ExpressionParserError::ErrorType type_,
                         const gd::String &message_,
                         const ExpressionParserLocation &location_,
                         const gd::String &actualValue_ = "",
                         const gd::String &objectName_ = "")
       : type(type_), message(message_), location(location_),
         actualValue(actualValue_), objectName(objectName_){};
-  ExpressionParserError(ExpressionParserError::ErrorType type_,
-                        const gd::String &message_,
-                        size_t position_)
+  ExpressionParserError(gd::ExpressionParserError::ErrorType type_,
+                        const gd::String &message_, size_t position_)
       : type(type_), message(message_), location(position_){};
-  ExpressionParserError(ExpressionParserError::ErrorType type_,
-                        const gd::String &message_,
-                        size_t startPosition_,
+  ExpressionParserError(gd::ExpressionParserError::ErrorType type_,
+                        const gd::String &message_, size_t startPosition_,
                         size_t endPosition_)
-      : type(type_),
-        message(message_),
+      : type(type_), message(message_),
         location(startPosition_, endPosition_){};
   virtual ~ExpressionParserError(){};
 
@@ -87,8 +84,8 @@ struct GD_CORE_API ExpressionParserError {
   size_t GetStartPosition() { return location.GetStartPosition(); }
   size_t GetEndPosition() { return location.GetEndPosition(); }
 
- private:
-  ExpressionParserError::ErrorType type;
+private:
+  gd::ExpressionParserError::ErrorType type;
   gd::String message;
   ExpressionParserLocation location;
   gd::String objectName;

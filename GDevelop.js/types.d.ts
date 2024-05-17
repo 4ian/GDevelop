@@ -1937,7 +1937,6 @@ export class WholeProjectDiagnosticReport extends EmscriptenObject {
 }
 
 export class ExpressionParserError extends EmscriptenObject {
-  isError(): boolean;
   getMessage(): string;
   getStartPosition(): number;
   getEndPosition(): number;

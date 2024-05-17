@@ -1,4 +1,12 @@
 namespace gdjs {
+  interface HemisphereLightFilterNetworkSyncData {
+    i: number;
+    sc: number;
+    gc: number;
+    e: number;
+    r: number;
+    t: string;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Scene3D::HemisphereLight',
     new (class implements gdjs.PixiFiltersTools.FilterCreator {
@@ -128,6 +136,27 @@ namespace gdjs {
               this.rotationObject.rotation.y = gdjs.toRad(this.rotation - 90);
               this.rotationObject.rotation.z = -gdjs.toRad(this.elevation);
             }
+          }
+          getNetworkSyncData(): HemisphereLightFilterNetworkSyncData {
+            return {
+              i: this.light.intensity,
+              sc: this.light.color.getHex(),
+              gc: this.light.groundColor.getHex(),
+              e: this.elevation,
+              r: this.rotation,
+              t: this.top,
+            };
+          }
+          updateFromNetworkSyncData(
+            syncData: HemisphereLightFilterNetworkSyncData
+          ): void {
+            this.light.intensity = syncData.i;
+            this.light.color.setHex(syncData.sc);
+            this.light.groundColor.setHex(syncData.gc);
+            this.elevation = syncData.e;
+            this.rotation = syncData.r;
+            this.top = syncData.t;
+            this.updateRotation();
           }
         })();
       }

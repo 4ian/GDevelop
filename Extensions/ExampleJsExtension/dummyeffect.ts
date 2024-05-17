@@ -105,6 +105,12 @@ namespace gdjs {
         parameterName: string,
         value: boolean
       ) {}
+      getNetworkSyncData(filter: PIXI.Filter): any {
+        return { opacity: filter.uniforms.opacity };
+      }
+      updateFromNetworkSyncData(filter: PIXI.Filter, data: any) {
+        filter.uniforms.opacity = data.opacity;
+      }
     })()
   );
 }

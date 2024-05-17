@@ -1,4 +1,11 @@
 namespace gdjs {
+  interface DirectionalLightFilterNetworkSyncData {
+    i: number;
+    c: number;
+    e: number;
+    r: number;
+    t: string;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Scene3D::DirectionalLight',
     new (class implements gdjs.PixiFiltersTools.FilterCreator {
@@ -117,6 +124,23 @@ namespace gdjs {
               this.rotationObject.rotation.y = gdjs.toRad(this.rotation - 90);
               this.rotationObject.rotation.z = -gdjs.toRad(this.elevation);
             }
+          }
+          getNetworkSyncData(): DirectionalLightFilterNetworkSyncData {
+            return {
+              i: this.light.intensity,
+              c: this.light.color.getHex(),
+              e: this.elevation,
+              r: this.rotation,
+              t: this.top,
+            };
+          }
+          updateFromNetworkSyncData(syncData: any): void {
+            this.light.intensity = syncData.i;
+            this.light.color.setHex(syncData.c);
+            this.elevation = syncData.e;
+            this.rotation = syncData.r;
+            this.top = syncData.t;
+            this.updateRotation();
           }
         })();
       }

@@ -1,4 +1,8 @@
 namespace gdjs {
+  interface ExponentialFogFilterNetworkSyncData {
+    d: number;
+    c: number;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Scene3D::ExponentialFog',
     new (class implements gdjs.PixiFiltersTools.FilterCreator {
@@ -83,6 +87,18 @@ namespace gdjs {
             return 0;
           }
           updateBooleanParameter(parameterName: string, value: boolean): void {}
+          getNetworkSyncData(): ExponentialFogFilterNetworkSyncData {
+            return {
+              d: this.fog.density,
+              c: this.fog.color.getHex(),
+            };
+          }
+          updateFromNetworkSyncData(
+            syncData: ExponentialFogFilterNetworkSyncData
+          ): void {
+            this.fog.density = syncData.d;
+            this.fog.color.setHex(syncData.c);
+          }
         })();
       }
     })()

@@ -1,4 +1,9 @@
 namespace gdjs {
+  interface BloomFilterNetworkSyncData {
+    s: number;
+    r: number;
+    t: number;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Scene3D::Bloom',
     new (class implements gdjs.PixiFiltersTools.FilterCreator {
@@ -82,6 +87,18 @@ namespace gdjs {
             return 0;
           }
           updateBooleanParameter(parameterName: string, value: boolean): void {}
+          getNetworkSyncData(): BloomFilterNetworkSyncData {
+            return {
+              s: this.shaderPass.strength,
+              r: this.shaderPass.radius,
+              t: this.shaderPass.threshold,
+            };
+          }
+          updateFromNetworkSyncData(data: BloomFilterNetworkSyncData) {
+            this.shaderPass.strength = data.s;
+            this.shaderPass.radius = data.r;
+            this.shaderPass.threshold = data.t;
+          }
         })();
       }
     })()

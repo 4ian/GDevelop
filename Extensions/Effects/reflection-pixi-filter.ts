@@ -4,6 +4,17 @@ namespace gdjs {
     animationSpeed: number;
     animationFrequency: number;
   }
+  interface ReflectionFilterNetworkSyncData {
+    b: number;
+    ams: number;
+    ame: number;
+    wls: number;
+    wle: number;
+    als: number;
+    ale: number;
+    as: number;
+    m: boolean;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Reflection',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -120,6 +131,37 @@ namespace gdjs {
         if (parameterName === 'mirror') {
           reflectionFilter.mirror = value;
         }
+      }
+      getNetworkSyncData(filter: PIXI.Filter): ReflectionFilterNetworkSyncData {
+        const reflectionFilter = (filter as unknown) as PIXI.filters.ReflectionFilter &
+          ReflectionFilterExtra;
+        return {
+          b: reflectionFilter.boundary,
+          ams: reflectionFilter.amplitude[0],
+          ame: reflectionFilter.amplitude[1],
+          wls: reflectionFilter.waveLength[0],
+          wle: reflectionFilter.waveLength[1],
+          als: reflectionFilter.alpha[0],
+          ale: reflectionFilter.alpha[1],
+          as: reflectionFilter.animationSpeed,
+          m: reflectionFilter.mirror,
+        };
+      }
+      updateFromNetworkSyncData(
+        filter: PIXI.Filter,
+        data: ReflectionFilterNetworkSyncData
+      ) {
+        const reflectionFilter = (filter as unknown) as PIXI.filters.ReflectionFilter &
+          ReflectionFilterExtra;
+        reflectionFilter.boundary = data.b;
+        reflectionFilter.amplitude[0] = data.ams;
+        reflectionFilter.amplitude[1] = data.ame;
+        reflectionFilter.waveLength[0] = data.wls;
+        reflectionFilter.waveLength[1] = data.wle;
+        reflectionFilter.alpha[0] = data.als;
+        reflectionFilter.alpha[1] = data.ale;
+        reflectionFilter.animationSpeed = data.as;
+        reflectionFilter.mirror = data.m;
       }
     })()
   );

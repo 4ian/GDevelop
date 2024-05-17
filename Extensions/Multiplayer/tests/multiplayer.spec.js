@@ -327,6 +327,92 @@ describe('Multiplayer', () => {
     ).to.be('Hello from remote global world');
   });
 
+  it('overrides a scene/global variable, modified by a player, when synchronized by the server', () => {
+    let otherPeerIds = [];
+    let currentPeerId = '';
+    const {
+      switchToPeer,
+      logEvents,
+      markAllPeerEventsAsProcessed,
+      expectNoEventsToBeProcessed,
+    } = createP2PAndMultiplayerMessageManagerMock();
+
+    switchToPeer({
+      peerId: 'player-1',
+      otherPeerIds: ['player-2'],
+      playerNumber: 1,
+    });
+
+    const p1RuntimeScene = makeTestRuntimeScene();
+    const remoteVariable = new gdjs.Variable();
+    remoteVariable.setString('Hello from remote world');
+    p1RuntimeScene.getVariables().add('MyRemoteVariable', remoteVariable);
+
+    p1RuntimeScene.renderAndStep(1000 / 60);
+
+    switchToPeer({
+      peerId: 'player-2',
+      otherPeerIds: ['player-1'],
+      playerNumber: 2,
+    });
+
+    // Verify player 2 can create variables, but the one from the server will override any value set for it
+    // by player 2.
+    const p2RuntimeScene = makeTestRuntimeScene();
+    {
+      const variable = new gdjs.Variable();
+      variable.setString('This will be overriden');
+      p2RuntimeScene.getVariables().add('MyRemoteVariable', variable);
+    }
+    {
+      const variable = new gdjs.Variable();
+      variable.setString('Something else');
+      p2RuntimeScene.getVariables().add('MyOtherVariable', variable);
+    }
+    p2RuntimeScene.renderAndStep(1000 / 60);
+    markAllPeerEventsAsProcessed();
+    expect(
+      p2RuntimeScene.getVariables().get('MyRemoteVariable').getAsString()
+    ).to.be('Hello from remote world');
+    expect(
+      p2RuntimeScene.getVariables().get('MyOtherVariable').getAsString()
+    ).to.be('Something else');
+
+    expectNoEventsToBeProcessed();
+
+    // Check the server sends again the variable, even if not changed, for reliability
+    // (allows to work around a dropped message, without using a real acknowledgement).
+    switchToPeer({
+      peerId: 'player-1',
+      otherPeerIds: ['player-2'],
+      playerNumber: 1,
+    });
+
+    p1RuntimeScene.renderAndStep(1000 / 60);
+
+    // Check the variable on player 2 is overriden again.
+    switchToPeer({
+      peerId: 'player-2',
+      otherPeerIds: ['player-1'],
+      playerNumber: 2,
+    });
+
+    p2RuntimeScene
+      .getVariables()
+      .get('MyRemoteVariable')
+      .setString('Changed value that will be overriden again');
+    p2RuntimeScene.renderAndStep(1000 / 60);
+    expect(
+      p2RuntimeScene.getVariables().get('MyRemoteVariable').getAsString()
+    ).to.be('Hello from remote world');
+    expect(
+      p2RuntimeScene.getVariables().get('MyOtherVariable').getAsString()
+    ).to.be('Something else');
+
+    markAllPeerEventsAsProcessed();
+    expectNoEventsToBeProcessed();
+  });
+
   it('synchronizes objects from the server to other players', () => {
     let otherPeerIds = [];
     let currentPeerId = '';

@@ -321,6 +321,7 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
     condition.SetParameters(parameters);
   }
 
+  gd::EventsCodeGenerator::CheckBehaviorParameters(condition, instrInfos);
   // Verify that there are no mismatches between object type in parameters.
   for (std::size_t pNb = 0; pNb < instrInfos.parameters.size(); ++pNb) {
     if (ParameterMetadata::IsObject(instrInfos.parameters[pNb].GetType())) {
@@ -367,15 +368,22 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
       }
     }
   } else if (instrInfos.IsBehaviorInstruction()) {
-    gd::String objectName = condition.GetParameter(0).GetPlainString();
-    gd::String behaviorType = GetObjectsContainersList().GetTypeOfBehavior(condition.GetParameter(1).GetPlainString());
     if (instrInfos.parameters.size() >= 2) {
+      const gd::String &objectName = condition.GetParameter(0).GetPlainString();
+      const gd::String &behaviorName =
+          condition.GetParameter(1).GetPlainString();
+      const gd::String &actualBehaviorType =
+          GetObjectsContainersList().GetTypeOfBehavior(behaviorName);
+
       std::vector<gd::String> realObjects =
-          GetObjectsContainersList().ExpandObjectName(objectName, context.GetCurrentObject());
+          GetObjectsContainersList().ExpandObjectName(
+              objectName, context.GetCurrentObject());
+
+      const BehaviorMetadata &autoInfo =
+          MetadataProvider::GetBehaviorMetadata(platform, actualBehaviorType);
+
       for (std::size_t i = 0; i < realObjects.size(); ++i) {
         // Setup context
-        const BehaviorMetadata& autoInfo =
-            MetadataProvider::GetBehaviorMetadata(platform, behaviorType);
         AddIncludeFiles(autoInfo.includeFiles);
         context.SetCurrentObject(realObjects[i]);
         context.ObjectsListNeeded(realObjects[i]);
@@ -385,7 +393,7 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
             condition.GetParameters(), instrInfos.parameters, context);
         conditionCode += GenerateBehaviorCondition(
             realObjects[i],
-            condition.GetParameter(1).GetPlainString(),
+            behaviorName,
             autoInfo,
             arguments,
             instrInfos,
@@ -460,6 +468,32 @@ gd::String EventsCodeGenerator::GenerateConditionsListCode(
   return outputCode;
 }
 
+void EventsCodeGenerator::CheckBehaviorParameters(
+    const gd::Instruction &instruction,
+    const gd::InstructionMetadata &instrInfos) {
+  gd::ParameterMetadataTools::IterateOverParameters(
+      instruction.GetParameters(), instrInfos.parameters,
+      [this](const gd::ParameterMetadata &parameterMetadata,
+             const gd::Expression &parameterValue,
+             const gd::String &lastObjectName) {
+        if (ParameterMetadata::IsBehavior(parameterMetadata.GetType())) {
+          const gd::String &behaviorName = parameterValue.GetPlainString();
+          const gd::String &actualBehaviorType =
+              GetObjectsContainersList().GetTypeOfBehaviorInObjectOrGroup(
+                  lastObjectName, behaviorName);
+          const gd::String &expectedBehaviorType =
+              parameterMetadata.GetExtraInfo();
+
+          if (actualBehaviorType != expectedBehaviorType) {
+            gd::ProjectDiagnostic projectDiagnostic(
+                gd::ProjectDiagnostic::ErrorType::MissingBehavior, "",
+                actualBehaviorType, expectedBehaviorType, lastObjectName);
+            diagnosticReport->Add(projectDiagnostic);
+          }
+        }
+      });
+}
+
 /**
  * Generate code for an action.
  */
@@ -497,6 +531,7 @@ gd::String EventsCodeGenerator::GenerateActionCode(
     action.SetParameters(parameters);
   }
 
+  gd::EventsCodeGenerator::CheckBehaviorParameters(action, instrInfos);
   // Verify that there are no mismatches between object type in parameters.
   for (std::size_t pNb = 0; pNb < instrInfos.parameters.size(); ++pNb) {
     if (ParameterMetadata::IsObject(instrInfos.parameters[pNb].GetType())) {
@@ -543,17 +578,22 @@ gd::String EventsCodeGenerator::GenerateActionCode(
       }
     }
   } else if (instrInfos.IsBehaviorInstruction()) {
-    gd::String objectName = action.GetParameter(0).GetPlainString();
-    gd::String behaviorType = GetObjectsContainersList().GetTypeOfBehavior(action.GetParameter(1).GetPlainString());
-
     if (instrInfos.parameters.size() >= 2) {
+      const gd::String &objectName = action.GetParameter(0).GetPlainString();
+      const gd::String &behaviorName = action.GetParameter(1).GetPlainString();
+      const gd::String &actualBehaviorType =
+          GetObjectsContainersList().GetTypeOfBehavior(behaviorName);
+
       std::vector<gd::String> realObjects =
-          GetObjectsContainersList().ExpandObjectName(objectName, context.GetCurrentObject());
+          GetObjectsContainersList().ExpandObjectName(
+              objectName, context.GetCurrentObject());
+
+      const BehaviorMetadata &autoInfo =
+          MetadataProvider::GetBehaviorMetadata(platform, actualBehaviorType);
+
+      AddIncludeFiles(autoInfo.includeFiles);
       for (std::size_t i = 0; i < realObjects.size(); ++i) {
         // Setup context
-        const BehaviorMetadata& autoInfo =
-            MetadataProvider::GetBehaviorMetadata(platform, behaviorType);
-        AddIncludeFiles(autoInfo.includeFiles);
         context.SetCurrentObject(realObjects[i]);
         context.ObjectsListNeeded(realObjects[i]);
 
@@ -562,7 +602,7 @@ gd::String EventsCodeGenerator::GenerateActionCode(
             action.GetParameters(), instrInfos.parameters, context);
         actionCode +=
             GenerateBehaviorAction(realObjects[i],
-                                   action.GetParameter(1).GetPlainString(),
+                                   behaviorName,
                                    autoInfo,
                                    functionCallName,
                                    arguments,

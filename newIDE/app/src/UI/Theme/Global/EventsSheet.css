@@ -242,10 +242,16 @@
 .gd-events-sheet-dark-theme .link-container span {
   color: var(--event-sheet-link-container-color);
 }
+.gd-events-sheet .link-container .instruction-invalid-parameter {
+  color: var(--event-sheet-instruction-parameter-error-color);
+  text-decoration:  var(--event-sheet-instruction-parameter-error-color) underline wavy;
+}
 
 .gd-events-sheet .link-container .selectable {
   color: var(--event-sheet-link-selectable-link-color);
   font-weight: bold;
+  /* It avoids the warning underlying to get cut. */
+  line-height: 1.6em;
 }
 
 /* Theming icons */
@@ -253,4 +259,10 @@
   padding-right: 2px;
   width: 16px;
   height: 16px;
+}
+
+.gd-events-sheet .link-container .icon {
+  padding-right: 3px;
+  width: 24px;
+  height: 24px;
 }

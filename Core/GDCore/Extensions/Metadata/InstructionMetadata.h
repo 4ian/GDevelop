@@ -456,6 +456,15 @@ class GD_CORE_API InstructionMetadata : public gd::AbstractFunctionMetadata {
     return *this;
   }
 
+/**
+ * \brief Return the type manipulated in a standard way by the instruction.
+ * 
+ * \param type "number" or "string"
+ */
+  const gd::String &GetManipulatedType() const {
+    return codeExtraInformation.type;
+  }
+
   /**
    * If InstructionMetadata::ExtraInformation::SetManipulatedType was called
    * with "number" or "string", this function will tell the code generator the

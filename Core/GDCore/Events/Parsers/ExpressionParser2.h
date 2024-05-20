@@ -38,7 +38,7 @@ using namespace gd::GrammarTerminals;
  * parser by refactoring out the dependency on gd::MetadataProvider (injecting
  * instead functions to be called to query supported functions).
  *
- * \see gd::ExpressionParserDiagnostic
+ * \see gd::ExpressionParserError
  * \see gd::ExpressionNode
  */
 class GD_CORE_API ExpressionParser2 {
@@ -547,28 +547,28 @@ class GD_CORE_API ExpressionParser2 {
   }
   ///@}
 
-  std::unique_ptr<ExpressionParserDiagnostic> ValidateOperator(
+  std::unique_ptr<ExpressionParserError> ValidateOperator(
       gd::String::value_type operatorChar) {
     if (operatorChar == '+' || operatorChar == '-' || operatorChar == '/' ||
         operatorChar == '*') {
-      return gd::make_unique<ExpressionParserDiagnostic>();
+      return std::unique_ptr<ExpressionParserError>(nullptr);
     }
     return gd::make_unique<ExpressionParserError>(
-        "invalid_operator",
+        gd::ExpressionParserError::ErrorType::InvalidOperator,
         _("You've used an operator that is not supported. Operator should be "
           "either +, -, / or *."),
         GetCurrentPosition());
   }
 
-  std::unique_ptr<ExpressionParserDiagnostic> ValidateUnaryOperator(
+  std::unique_ptr<ExpressionParserError> ValidateUnaryOperator(
       gd::String::value_type operatorChar,
       size_t position) {
     if (operatorChar == '+' || operatorChar == '-') {
-      return gd::make_unique<ExpressionParserDiagnostic>();
+      return std::unique_ptr<ExpressionParserError>(nullptr);
     }
 
     return gd::make_unique<ExpressionParserError>(
-        "invalid_operator",
+        gd::ExpressionParserError::ErrorType::InvalidOperator,
         _("You've used an \"unary\" operator that is not supported. Operator "
           "should be "
           "either + or -."),
@@ -719,13 +719,15 @@ class GD_CORE_API ExpressionParser2 {
   std::unique_ptr<ExpressionParserError> RaiseSyntaxError(
       const gd::String &message) {
     return std::move(gd::make_unique<ExpressionParserError>(
-        "syntax_error", message, GetCurrentPosition()));
+        gd::ExpressionParserError::ErrorType::SyntaxError, message,
+        GetCurrentPosition()));
   }
 
   std::unique_ptr<ExpressionParserError> RaiseTypeError(
       const gd::String &message, size_t beginningPosition) {
     return std::move(gd::make_unique<ExpressionParserError>(
-        "type_error", message, beginningPosition, GetCurrentPosition()));
+        gd::ExpressionParserError::ErrorType::MismatchedType, message,
+        beginningPosition, GetCurrentPosition()));
   }
   ///@}
 

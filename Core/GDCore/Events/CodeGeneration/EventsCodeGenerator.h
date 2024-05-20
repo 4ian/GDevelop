@@ -3,8 +3,7 @@
  * Copyright 2008-present Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDCORE_EVENTSCODEGENERATOR_H
-#define GDCORE_EVENTSCODEGENERATOR_H
+#pragma once
 
 #include <set>
 #include <utility>
@@ -12,8 +11,10 @@
 
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Instruction.h"
+#include "GDCore/Events/CodeGeneration/DiagnosticReport.h"
 #include "GDCore/Project/ProjectScopedContainers.h"
 #include "GDCore/String.h"
+
 namespace gd {
 class EventsList;
 class Expression;
@@ -337,6 +338,16 @@ class GD_CORE_API EventsCodeGenerator {
   }
 
   /**
+   * @brief Give access to the project scoped containers as code generation might
+   * push and pop variable containers (for local variables).
+   * This could be passed as a parameter recursively in code generation, but this requires
+   * heavy refactoring. Instead, we use this single instance.
+   */
+  gd::ProjectScopedContainers& GetProjectScopedContainers() {
+    return projectScopedContainers;
+  }
+
+  /**
    * \brief Return true if the code generation is done for a given project and
    * layout. If not, this means that the code is generated for a function.
    */
@@ -371,6 +382,14 @@ class GD_CORE_API EventsCodeGenerator {
    * \brief Get the maximum size of a list of conditions.
    */
   size_t GetMaxConditionsListsSize() const { return maxConditionsListsSize; }
+
+  void SetDiagnosticReport(gd::DiagnosticReport* diagnosticReport_) {
+    diagnosticReport = diagnosticReport_;
+  }
+
+  gd::DiagnosticReport* GetDiagnosticReport() {
+    return diagnosticReport;
+  }
 
   /**
    * \brief Generate the full name for accessing to a boolean variable used for
@@ -448,7 +467,7 @@ class GD_CORE_API EventsCodeGenerator {
    */
   virtual gd::String GetCodeNamespace() { return ""; };
 
-  enum VariableScope { LAYOUT_VARIABLE = 0, PROJECT_VARIABLE, OBJECT_VARIABLE };
+  enum VariableScope { LAYOUT_VARIABLE = 0, PROJECT_VARIABLE, OBJECT_VARIABLE, ANY_VARIABLE };
 
   /**
    * Generate a single unique number for the specified instruction.
@@ -477,6 +496,11 @@ class GD_CORE_API EventsCodeGenerator {
       const gd::String& relationalOperator,
       const gd::String& lhs,
       const gd::String& rhs);
+
+  /**
+   * \brief Generate the code to access the local variables stack.
+   */
+  virtual gd::String GenerateLocalVariablesStackAccessor();
 
  protected:
   virtual const gd::String GenerateRelationalOperatorCodes(
@@ -534,11 +558,15 @@ class GD_CORE_API EventsCodeGenerator {
       const VariableScope& scope,
       gd::EventsCodeGenerationContext& context,
       const gd::String& objectName) {
+    // This code is only used as a mock.
+    // See the real implementation in GDJS.
     if (scope == LAYOUT_VARIABLE) {
       return "getLayoutVariable(" + variableName + ")";
 
     } else if (scope == PROJECT_VARIABLE) {
       return "getProjectVariable(" + variableName + ")";
+    } else if (scope == ANY_VARIABLE) {
+      return "getAnyVariable(" + variableName + ")";
     }
 
     return "getVariableForObject(" + objectName + ", " + variableName + ")";
@@ -779,6 +807,10 @@ class GD_CORE_API EventsCodeGenerator {
   virtual gd::String GenerateGetBehaviorNameCode(
       const gd::String& behaviorName);
 
+  void CheckBehaviorParameters(
+      const gd::Instruction &instruction,
+      const gd::InstructionMetadata &instrInfos);
+
   const gd::Platform& platform;  ///< The platform being used.
 
   gd::ProjectScopedContainers projectScopedContainers;
@@ -809,8 +841,9 @@ class GD_CORE_API EventsCodeGenerator {
       instructionUniqueIds;  ///< The unique ids generated for instructions.
   size_t eventsListNextUniqueId;  ///< The next identifier to use for an events
                                   ///< list function name.
+  
+  gd::DiagnosticReport* diagnosticReport;
 };
 
 }  // namespace gd
 
-#endif  // GDCORE_EVENTSCODEGENERATOR_H

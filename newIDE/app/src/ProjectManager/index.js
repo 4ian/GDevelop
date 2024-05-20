@@ -6,7 +6,7 @@ import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import SearchBar, { type SearchBarInterface } from '../UI/SearchBar';
-import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
+import GlobalVariablesDialog from '../VariablesList/GlobalVariablesDialog';
 import ProjectPropertiesDialog from './ProjectPropertiesDialog';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import ExtensionsSearchDialog from '../AssetStore/ExtensionStore/ExtensionsSearchDialog';
@@ -17,7 +17,6 @@ import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import ProjectManagerCommands from './ProjectManagerCommands';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
-import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import InstalledExtensionDetails from './InstalledExtensionDetails';
 import { useShouldAutofocusInput } from '../UI/Responsive/ScreenTypeMeasurer';
@@ -1334,34 +1333,16 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                   />
                 )}
                 {projectVariablesEditorOpen && (
-                  <VariablesEditorDialog
+                  <GlobalVariablesDialog
                     project={project}
-                    title={<Trans>Global Variables</Trans>}
                     open
-                    variablesContainer={project.getVariables()}
                     onCancel={() => setProjectVariablesEditorOpen(false)}
                     onApply={() => {
                       if (unsavedChanges)
                         unsavedChanges.triggerUnsavedChanges();
                       setProjectVariablesEditorOpen(false);
                     }}
-                    emptyPlaceholderTitle={
-                      <Trans>Add your first global variable</Trans>
-                    }
-                    emptyPlaceholderDescription={
-                      <Trans>
-                        These variables hold additional information on a
-                        project.
-                      </Trans>
-                    }
-                    helpPagePath={'/all-features/variables/global-variables'}
                     hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-                    onComputeAllVariableNames={() =>
-                      EventsRootVariablesFinder.findAllGlobalVariables(
-                        project.getCurrentPlatform(),
-                        project
-                      )
-                    }
                   />
                 )}
                 {openGameDetails && (
@@ -1401,7 +1382,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     open
                     project={project}
                     layout={editedVariablesLayout}
-                    onClose={() => onOpenLayoutVariables(null)}
+                    onCancel={() => onOpenLayoutVariables(null)}
                     onApply={() => {
                       if (unsavedChanges)
                         unsavedChanges.triggerUnsavedChanges();

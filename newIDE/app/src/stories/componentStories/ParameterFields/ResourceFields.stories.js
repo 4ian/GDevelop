@@ -33,6 +33,9 @@ export const AllResourceFields = () => (
             }}
             globalObjectsContainer={testProject.project}
             objectsContainer={testProject.testLayout}
+            projectScopedContainersAccessor={
+              testProject.testSceneProjectScopedContainersAccessor
+            }
             value={value}
             onChange={onChange}
             parameterRenderingService={ParameterRenderingService}
@@ -53,6 +56,9 @@ export const AllResourceFields = () => (
             }}
             globalObjectsContainer={testProject.project}
             objectsContainer={testProject.testLayout}
+            projectScopedContainersAccessor={
+              testProject.testSceneProjectScopedContainersAccessor
+            }
             value={value}
             onChange={onChange}
             parameterRenderingService={ParameterRenderingService}
@@ -73,6 +79,9 @@ export const AllResourceFields = () => (
             }}
             globalObjectsContainer={testProject.project}
             objectsContainer={testProject.testLayout}
+            projectScopedContainersAccessor={
+              testProject.testSceneProjectScopedContainersAccessor
+            }
             value={value}
             onChange={onChange}
             parameterRenderingService={ParameterRenderingService}
@@ -93,6 +102,9 @@ export const AllResourceFields = () => (
             }}
             globalObjectsContainer={testProject.project}
             objectsContainer={testProject.testLayout}
+            projectScopedContainersAccessor={
+              testProject.testSceneProjectScopedContainersAccessor
+            }
             value={value}
             onChange={onChange}
             parameterRenderingService={ParameterRenderingService}
@@ -113,6 +125,9 @@ export const AllResourceFields = () => (
             }}
             globalObjectsContainer={testProject.project}
             objectsContainer={testProject.testLayout}
+            projectScopedContainersAccessor={
+              testProject.testSceneProjectScopedContainersAccessor
+            }
             value={value}
             onChange={onChange}
             parameterRenderingService={ParameterRenderingService}
@@ -133,6 +148,9 @@ export const AllResourceFields = () => (
             }}
             globalObjectsContainer={testProject.project}
             objectsContainer={testProject.testLayout}
+            projectScopedContainersAccessor={
+              testProject.testSceneProjectScopedContainersAccessor
+            }
             value={value}
             onChange={onChange}
             parameterRenderingService={ParameterRenderingService}
@@ -153,6 +171,9 @@ export const AllResourceFields = () => (
             }}
             globalObjectsContainer={testProject.project}
             objectsContainer={testProject.testLayout}
+            projectScopedContainersAccessor={
+              testProject.testSceneProjectScopedContainersAccessor
+            }
             value={value}
             onChange={onChange}
             parameterRenderingService={ParameterRenderingService}
@@ -173,6 +194,9 @@ export const AllResourceFields = () => (
             }}
             globalObjectsContainer={testProject.project}
             objectsContainer={testProject.testLayout}
+            projectScopedContainersAccessor={
+              testProject.testSceneProjectScopedContainersAccessor
+            }
             value={value}
             onChange={onChange}
             parameterRenderingService={ParameterRenderingService}
@@ -193,6 +217,9 @@ export const AllResourceFields = () => (
             }}
             globalObjectsContainer={testProject.project}
             objectsContainer={testProject.testLayout}
+            projectScopedContainersAccessor={
+              testProject.testSceneProjectScopedContainersAccessor
+            }
             value={value}
             onChange={onChange}
             parameterRenderingService={ParameterRenderingService}
@@ -213,6 +240,9 @@ export const AllResourceFields = () => (
             }}
             globalObjectsContainer={testProject.project}
             objectsContainer={testProject.testLayout}
+            projectScopedContainersAccessor={
+              testProject.testSceneProjectScopedContainersAccessor
+            }
             value={value}
             onChange={onChange}
             parameterRenderingService={ParameterRenderingService}

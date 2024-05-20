@@ -4,7 +4,6 @@ import { I18n } from '@lingui/react';
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 import RaisedButton from '../../UI/RaisedButton';
-import { enumerateVariables } from './EnumerateVariables';
 import {
   type ParameterFieldProps,
   type ParameterFieldInterface,
@@ -23,12 +22,31 @@ import SemiControlledAutoComplete, {
 import { TextFieldWithButtonLayout } from '../../UI/Layout';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
-import intersection from 'lodash/intersection';
 import SvgIcon, { type SvgIconProps } from '@material-ui/core/SvgIcon';
+import SelectField from '../../UI/SelectField';
+import SelectOption from '../../UI/SelectOption';
+import { ColumnStackLayout } from '../../UI/Layout';
+import VariableStringIcon from '../../VariablesList/Icons/VariableStringIcon';
+import VariableNumberIcon from '../../VariablesList/Icons/VariableNumberIcon';
+import VariableBooleanIcon from '../../VariablesList/Icons/VariableBooleanIcon';
+import VariableArrayIcon from '../../VariablesList/Icons/VariableArrayIcon';
+import VariableStructureIcon from '../../VariablesList/Icons/VariableStructureIcon';
+import UnknownTypeIcon from '../../UI/CustomSvgIcons/Cross';
+import { type EnumeratedVariable } from './EnumerateVariables';
+import { LineStackLayout } from '../../UI/Layout';
+import GlobalIcon from '../../UI/CustomSvgIcons/Publish';
+import SceneIcon from '../../UI/CustomSvgIcons/Scene';
+import ObjectIcon from '../../UI/CustomSvgIcons/Object';
+import LocalIcon from '../../UI/CustomSvgIcons/ExternalEvents';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
+
+const gd: libGDevelop = global.gd;
 
 type Props = {
   ...ParameterFieldProps,
   variablesContainers: Array<gdVariablesContainer>,
+  enumerateVariables: () => Array<EnumeratedVariable>,
+  forceDeclaration?: boolean,
   onOpenDialog: ?() => void,
 };
 
@@ -45,6 +63,20 @@ export const VariableNameQuickAnalyzeResults = {
   WRONG_SPACE: 2,
   WRONG_EXPRESSION: 3,
   UNDECLARED_VARIABLE: 4,
+};
+
+export const getRootVariableName = (name: string): string => {
+  const dotPosition = name.indexOf('.');
+  const squareBracketPosition = name.indexOf('[');
+  return dotPosition !== -1 || squareBracketPosition !== -1
+    ? name.substring(
+        0,
+        Math.min(
+          dotPosition === -1 ? name.length : dotPosition,
+          squareBracketPosition === -1 ? name.length : squareBracketPosition
+        )
+      )
+    : name;
 };
 
 // TODO: the entire VariableField could be reworked to be a "real" GenericExpressionField
@@ -79,23 +111,10 @@ export const quicklyAnalyzeVariableName = (
   }
 
   // Check at least the name of the root variable, it's the best we can do.
-  const dotPosition = name.indexOf('.');
-  const squareBracketPosition = name.indexOf('[');
-  const nameToCheck =
-    dotPosition !== -1 || squareBracketPosition !== -1
-      ? name.substring(
-          0,
-          Math.min(
-            dotPosition === -1 ? name.length : dotPosition,
-            squareBracketPosition === -1 ? name.length : squareBracketPosition
-          )
-        )
-      : name;
-
   if (
     variablesContainers &&
     !variablesContainers.some(variablesContainer =>
-      variablesContainer.has(nameToCheck)
+      variablesContainer.has(getRootVariableName(name))
     )
   ) {
     return VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE;
@@ -103,10 +122,51 @@ export const quicklyAnalyzeVariableName = (
   return VariableNameQuickAnalyzeResults.OK;
 };
 
+const getVariableSourceIcon = (
+  variableSourceType: VariablesContainer_SourceType
+) => {
+  switch (variableSourceType) {
+    case gd.VariablesContainer.Global:
+    case gd.VariablesContainer.ExtensionGlobal:
+      return GlobalIcon;
+    case gd.VariablesContainer.Scene:
+    case gd.VariablesContainer.ExtensionScene:
+      return SceneIcon;
+    case gd.VariablesContainer.Object:
+      return ObjectIcon;
+    case gd.VariablesContainer.Local:
+      return LocalIcon;
+    default:
+      return UnknownTypeIcon;
+  }
+};
+
+export const getVariableTypeIcon = (variableType: Variable_Type) => {
+  switch (variableType) {
+    case gd.Variable.Number:
+      return VariableNumberIcon;
+    case gd.Variable.String:
+      return VariableStringIcon;
+    case gd.Variable.Boolean:
+      return VariableBooleanIcon;
+    case gd.Variable.Array:
+      return VariableArrayIcon;
+    case gd.Variable.Structure:
+      return VariableStructureIcon;
+    default:
+      return UnknownTypeIcon;
+  }
+};
+
 export default React.forwardRef<Props, VariableFieldInterface>(
   function VariableField(props: Props, ref) {
     const {
+      project,
+      projectScopedContainersAccessor,
       variablesContainers,
+      enumerateVariables,
+      instruction,
+      forceDeclaration,
       value,
       onChange,
       isInline,
@@ -115,6 +175,7 @@ export default React.forwardRef<Props, VariableFieldInterface>(
       onRequestClose,
       onApply,
       id,
+      onInstructionTypeChanged,
     } = props;
 
     const field = React.useRef<?SemiControlledAutoCompleteInterface>(null);
@@ -127,30 +188,35 @@ export default React.forwardRef<Props, VariableFieldInterface>(
      */
     const updateAutocompletions = React.useCallback(
       () => {
-        const definedVariableNames =
-          variablesContainers.length === 0
-            ? []
-            : variablesContainers
-                .map(variablesContainer =>
-                  enumerateVariables(variablesContainer)
-                    .map(({ name, isValidName }) =>
-                      isValidName
-                        ? name
-                        : // Hide invalid variable names - they would not
-                          // be parsed correctly anyway.
-                          null
-                    )
-                    .filter(Boolean)
-                )
-                .reduce((a, b) => intersection(a, b));
         setAutocompletionVariableNames(
-          definedVariableNames.map(name => ({
-            text: name,
-            value: name,
-          }))
+          enumerateVariables()
+            .map(variable =>
+              variable.isValidName
+                ? variable
+                : // Hide invalid variable names - they would not
+                  // be parsed correctly anyway.
+                  null
+            )
+            .filter(Boolean)
+            .map(variable => ({
+              text: variable.name,
+              value: variable.name,
+              renderIcon: () => {
+                const VariableSourceIcon = getVariableSourceIcon(
+                  variable.source
+                );
+                const VariableTypeIcon = getVariableTypeIcon(variable.type);
+                return (
+                  <LineStackLayout>
+                    <VariableSourceIcon fontSize="small" />
+                    <VariableTypeIcon fontSize="small" />
+                  </LineStackLayout>
+                );
+              },
+            }))
         );
       },
-      [variablesContainers]
+      [enumerateVariables]
     );
 
     const focus: FieldFocusFunction = options => {
@@ -196,67 +262,140 @@ export default React.forwardRef<Props, VariableFieldInterface>(
           formula. You can only use this for structure or arrays. For example:
           Score[3].
         </Trans>
+      ) : forceDeclaration &&
+        quicklyAnalysisResult ===
+          VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE ? (
+        <Trans>
+          This variable is not declared. Use the *variables editor* to add it.
+        </Trans>
       ) : null;
     const warningTranslatableText =
+      !forceDeclaration &&
       quicklyAnalysisResult ===
-      VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE
+        VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE
         ? t`This variable is not declared. It's recommended to use the *variables editor* to add it.`
         : null;
+
+    const isSwitchableInstruction =
+      instruction &&
+      gd.VariableInstructionSwitcher.isSwitchableVariableInstruction(
+        instruction.getType()
+      );
+    const variableType =
+      project && instruction && isSwitchableInstruction
+        ? gd.VariableInstructionSwitcher.getVariableTypeFromParameters(
+            project.getCurrentPlatform(),
+            projectScopedContainersAccessor.get(),
+            instruction
+          )
+        : null;
+    const needManualTypeSwitcher =
+      isSwitchableInstruction &&
+      variableType === gd.Variable.Unknown &&
+      !errorText &&
+      value;
 
     return (
       <I18n>
         {({ i18n }) => (
-          <TextFieldWithButtonLayout
-            renderTextField={() => (
-              <SemiControlledAutoComplete
-                margin={isInline ? 'none' : 'dense'}
-                floatingLabelText={description}
-                helperMarkdownText={
-                  warningTranslatableText
-                    ? i18n._(warningTranslatableText)
-                    : parameterMetadata
-                    ? parameterMetadata.getLongDescription()
-                    : undefined
-                }
-                errorText={errorText}
-                fullWidth
-                value={value}
-                onChange={onChange}
-                onRequestClose={onRequestClose}
-                onApply={onApply}
-                dataSource={[
-                  ...autocompletionVariableNames,
-                  onOpenDialog && variablesContainers.length === 1
-                    ? {
-                        translatableValue: t`Add or edit variables...`,
-                        text: '',
-                        value: '',
-                        onClick: onOpenDialog,
-                      }
-                    : null,
-                ].filter(Boolean)}
-                openOnFocus={!isInline}
-                ref={field}
-                id={id}
-              />
-            )}
-            renderButton={style =>
-              onOpenDialog && !isInline ? (
-                <RaisedButton
-                  icon={<ShareExternal />}
-                  disabled={variablesContainers.length !== 1}
-                  primary
-                  style={style}
-                  onClick={onOpenDialog}
+          <ColumnStackLayout noMargin expand>
+            <TextFieldWithButtonLayout
+              renderTextField={() => (
+                <SemiControlledAutoComplete
+                  margin={isInline ? 'none' : 'dense'}
+                  floatingLabelText={description}
+                  helperMarkdownText={
+                    warningTranslatableText
+                      ? i18n._(warningTranslatableText)
+                      : parameterMetadata
+                      ? parameterMetadata.getLongDescription()
+                      : undefined
+                  }
+                  errorText={errorText}
+                  fullWidth
+                  value={value}
+                  onChange={onChange}
+                  onRequestClose={onRequestClose}
+                  onApply={onApply}
+                  dataSource={[
+                    ...autocompletionVariableNames,
+                    onOpenDialog
+                      ? {
+                          translatableValue: t`Add or edit variables...`,
+                          text: '',
+                          value: '',
+                          onClick: onOpenDialog,
+                        }
+                      : null,
+                  ].filter(Boolean)}
+                  openOnFocus={!isInline}
+                  ref={field}
+                  id={id}
                 />
-              ) : null
-            }
-          />
+              )}
+              renderButton={style =>
+                !isInline ? (
+                  <RaisedButton
+                    icon={<ShareExternal />}
+                    disabled={!onOpenDialog}
+                    primary
+                    style={style}
+                    onClick={onOpenDialog}
+                  />
+                ) : null
+              }
+            />
+            {!isInline &&
+              needManualTypeSwitcher &&
+              instruction &&
+              onInstructionTypeChanged && (
+                <SelectField
+                  floatingLabelText={<Trans>Use as...</Trans>}
+                  value={(() => {
+                    const type = gd.VariableInstructionSwitcher.getSwitchableInstructionVariableType(
+                      instruction.getType()
+                    );
+                    return type === gd.Variable.Unknown
+                      ? gd.Variable.Number
+                      : type;
+                  })()}
+                  onChange={(e, i, value: any) => {
+                    gd.VariableInstructionSwitcher.switchVariableInstructionType(
+                      instruction,
+                      value
+                    );
+                    onInstructionTypeChanged();
+                  }}
+                >
+                  <SelectOption value={gd.Variable.Number} label={t`Number`} />
+                  <SelectOption value={gd.Variable.String} label={t`Text`} />
+                  <SelectOption
+                    value={gd.Variable.Boolean}
+                    label={t`Boolean`}
+                  />
+                </SelectField>
+              )}
+          </ColumnStackLayout>
         )}
       </I18n>
     );
   }
 );
+
+const getVariablesContainerSourceType = (
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
+  variableName: string
+) => {
+  const rootVariableName = getRootVariableName(variableName);
+  const variablesContainersList = projectScopedContainersAccessor
+    .get()
+    .getVariablesContainersList();
+  return variablesContainersList.has(rootVariableName)
+    ? variablesContainersList
+        .getVariablesContainerFromVariableName(rootVariableName)
+        .getSourceType()
+    : gd.VariablesContainer.Unknown;
+};
 
 export const renderVariableWithIcon = (
   {
@@ -265,13 +404,19 @@ export const renderVariableWithIcon = (
     expressionIsValid,
     InvalidParameterValue,
     MissingParameterValue,
+    projectScopedContainersAccessor,
   }: ParameterInlineRendererProps,
-  VariableIcon: SvgIconProps => React.Element<typeof SvgIcon>,
-  tooltip: string
+  tooltip: string,
+  ForcedVariableIcon?: SvgIconProps => React.Element<typeof SvgIcon>
 ) => {
   if (!value && !parameterMetadata.isOptional()) {
     return <MissingParameterValue />;
   }
+  const VariableIcon =
+    ForcedVariableIcon ||
+    getVariableSourceIcon(
+      getVariablesContainerSourceType(projectScopedContainersAccessor, value)
+    );
 
   const IconAndNameContainer = expressionIsValid
     ? React.Fragment

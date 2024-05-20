@@ -310,7 +310,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                   //   project.getCurrentPlatform(),
                   //   project,
                   //   eventsBasedObject,
-                  //   editedObjectWithContext.object
+                  //   editedObjectWithContext.object.getName()
                   // );
                 }}
                 onCancel={() => {

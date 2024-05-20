@@ -273,7 +273,7 @@ TEST_CASE("EventsVariablesFinder (FindAllObjectVariables)", "[common]") {
         UseObjectVariable("MyObject", "MyObjectVariable"));
 
     auto variableNames = gd::EventsVariablesFinder::FindAllObjectVariables(
-        platform, project, layout, object);
+        platform, project, layout, "MyObject");
 
     REQUIRE(variableNames.size() == 1);
     REQUIRE(*(variableNames.begin()) == "MyObjectVariable");
@@ -290,7 +290,7 @@ TEST_CASE("EventsVariablesFinder (FindAllObjectVariables)", "[common]") {
         UseObjectVariableInExpression("MyObject", "MyObjectVariable"));
 
     auto variableNames = gd::EventsVariablesFinder::FindAllObjectVariables(
-        platform, project, layout, object);
+        platform, project, layout, "MyObject");
 
     REQUIRE(variableNames.size() == 1);
     REQUIRE(*(variableNames.begin()) == "MyObjectVariable");
@@ -309,7 +309,7 @@ TEST_CASE("EventsVariablesFinder (FindAllObjectVariables)", "[common]") {
     UseExternalEvents(layout, externalEvents);
 
     auto variableNames = gd::EventsVariablesFinder::FindAllObjectVariables(
-        platform, project, layout, object);
+        platform, project, layout, "MyObject");
 
     REQUIRE(variableNames.size() == 1);
     REQUIRE(*(variableNames.begin()) == "MyObjectVariable");
@@ -329,7 +329,7 @@ TEST_CASE("EventsVariablesFinder (FindAllObjectVariables)", "[common]") {
         UseObjectVariable("MyObject2", "MyObjectVariable2"));
 
     auto variableNames = gd::EventsVariablesFinder::FindAllObjectVariables(
-        platform, project, layout, object1);
+        platform, project, layout, "MyObject1");
 
     REQUIRE(variableNames.size() == 1);
     REQUIRE(*(variableNames.begin()) == "MyObjectVariable1");
@@ -352,7 +352,7 @@ TEST_CASE("EventsVariablesFinder (FindAllObjectVariables)", "[common]") {
     UseExternalEvents(layout, externalEvents);
 
     auto variableNames = gd::EventsVariablesFinder::FindAllObjectVariables(
-        platform, project, layout, object1);
+        platform, project, layout, "MyObject1");
 
     REQUIRE(variableNames.size() == 1);
     REQUIRE(*(variableNames.begin()) == "MyObjectVariable1");

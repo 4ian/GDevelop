@@ -2,6 +2,10 @@
 import flatten from 'lodash/flatten';
 import { mapFor } from '../../Utils/MapFor';
 import flatMap from 'lodash/flatMap';
+import uniqBy from 'lodash/uniqBy';
+import sortBy from 'lodash/sortBy';
+import reverse from 'lodash/reverse';
+
 const gd: libGDevelop = global.gd;
 
 // Note that in theory we could have this function inside gd.ExpressionParser2,
@@ -27,7 +31,38 @@ export type EnumeratedVariable = {|
   name: string,
   isValidName: boolean,
   type: Variable_Type,
+  source: VariablesContainer_SourceType,
 |};
+
+const variableSort = [variable => variable.name.toLowerCase()];
+
+export const enumerateVariablesOfContainersList = (
+  variablesContainersList: ?gdVariablesContainersList
+): Array<EnumeratedVariable> => {
+  if (!variablesContainersList) {
+    return [];
+  }
+
+  return sortBy(
+    uniqBy(
+      flatten(
+        reverse(
+          mapFor(
+            0,
+            variablesContainersList.getVariablesContainersCount(),
+            i => {
+              return enumerateVariables(
+                variablesContainersList.getVariablesContainer(i)
+              );
+            }
+          )
+        )
+      ),
+      'name'
+    ),
+    variableSort
+  );
+};
 
 export const enumerateVariables = (
   variablesContainer: ?gdVariablesContainer
@@ -37,6 +72,7 @@ export const enumerateVariables = (
   }
 
   const enumerateVariableAndChildrenNames = (
+    source: VariablesContainer_SourceType,
     fullName: string,
     variable: gdVariable,
     isTopLevel: boolean,
@@ -48,13 +84,14 @@ export const enumerateVariables = (
       ? isValidIdentifier(fullName)
       : isFullNameValid;
     const type = variable.getType();
-    const enumeratedVariable = { name: fullName, isValidName, type };
+    const enumeratedVariable = { name: fullName, isValidName, type, source };
 
     if (type === gd.Variable.Structure) {
       return [
         enumeratedVariable,
         ...flatMap(variable.getAllChildrenNames().toJSArray(), childName =>
           enumerateVariableAndChildrenNames(
+            source,
             isValidIdentifier(childName)
               ? `${fullName}.${childName}`
               : `${fullName}[${convertToStringLiteral(childName)}]`,
@@ -71,6 +108,7 @@ export const enumerateVariables = (
           new Array(variable.getChildrenCount()).fill(''),
           (_, index) =>
             enumerateVariableAndChildrenNames(
+              source,
               `${fullName}[${index}]`,
               variable.getAtIndex(index),
               false,
@@ -87,6 +125,7 @@ export const enumerateVariables = (
   return flatten(
     mapFor(0, variablesContainer.count(), i => {
       return enumerateVariableAndChildrenNames(
+        variablesContainer.getSourceType(),
         variablesContainer.getNameAt(i),
         variablesContainer.getAt(i),
         true,

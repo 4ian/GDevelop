@@ -10,6 +10,8 @@
 #include <unordered_map>
 #include <vector>
 #include "GDCore/String.h"
+#include "GDCore/Project/Variable.h"
+
 namespace gd {
 class Platform;
 class Project;
@@ -41,6 +43,12 @@ namespace gd {
 struct VariablesChangeset {
   std::unordered_set<gd::String> removedVariableNames;
   std::unordered_map<gd::String, gd::String> oldToNewVariableNames;
+  /**
+   * No distinction is done between a change of the variable itself or its
+   * children. Ensuring that a child is actually the one with a type change
+   * would take more time than checking the instruction type is rightly set.
+   */
+  std::unordered_set<gd::String> typeChangedVariableNames;
 
   bool HasRemovedVariables() { return !removedVariableNames.empty(); }
 
@@ -62,7 +70,6 @@ class GD_CORE_API WholeProjectRefactorer {
    * \brief Compute the changes made on the variables of a variable container.
    */
   static VariablesChangeset ComputeChangesetForVariablesContainer(
-    gd::Project &project,
     const gd::SerializerElement &oldSerializedVariablesContainer,
     const gd::VariablesContainer &newVariablesContainer);
 
@@ -554,6 +561,9 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::Object& object,
       const gd::String& behaviorName,
       std::unordered_set<gd::String>& dependentBehaviorNames);
+
+  static bool HasAnyVariableTypeChanged(const gd::Variable &oldVariable,
+                                        const gd::Variable &newVariable);
 
   static const gd::String behaviorObjectParameterName;
   static const gd::String parentObjectParameterName;

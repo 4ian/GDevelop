@@ -34,11 +34,13 @@ class GD_CORE_API EventsVariableReplacer
       const gd::Platform &platform_,
       const gd::VariablesContainer &targetVariablesContainer_,
       const std::unordered_map<gd::String, gd::String> &oldToNewVariableNames_,
-      const std::unordered_set<gd::String> &removedVariableNames_)
+      const std::unordered_set<gd::String> &removedVariableNames_,
+      const std::unordered_set<gd::String> &typeChangedVariableNames_)
       : platform(platform_),
         targetVariablesContainer(targetVariablesContainer_),
         oldToNewVariableNames(oldToNewVariableNames_),
-        removedVariableNames(removedVariableNames_){};
+        removedVariableNames(removedVariableNames_),
+        typeChangedVariableNames(typeChangedVariableNames_){};
   virtual ~EventsVariableReplacer();
 
  private:
@@ -55,6 +57,7 @@ class GD_CORE_API EventsVariableReplacer
   gd::String objectName;
   const std::unordered_map<gd::String, gd::String> &oldToNewVariableNames;
   const std::unordered_set<gd::String> &removedVariableNames;
+  const std::unordered_set<gd::String> &typeChangedVariableNames;
 };
 
 }  // namespace gd

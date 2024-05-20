@@ -42,7 +42,7 @@ class FakeAsyncTasksManager {
   }
 
   /**
-   * @param {gdjs.RuntimeScene} runtimeScene
+   * @param {RuntimeScene} runtimeScene
    */
   processTasks(runtimeScene) {
     for (const task of this.tasks.keys()) {
@@ -113,10 +113,11 @@ class TaskGroup {
 }
 
 class Variable {
-  constructor() {
+  constructor(data) {
     /** @type {string|number} */
-    this._value = 0;
+    this._value = data ? data.value : 0;
     this._children = {};
+    this._childrenArray = [];
   }
 
   add(value) {
@@ -139,6 +140,18 @@ class Variable {
     this.setNumber(value);
   }
 
+  setBoolean(value) {
+    this._value = value;
+  }
+
+  toggle(value) {
+    this._value = !value;
+  }
+
+  getAsBoolean() {
+    return !!this._value;
+  }
+
   /**
    * @param {string} childName
    * @returns {Variable}
@@ -147,8 +160,14 @@ class Variable {
     if (
       this._children[childName] === undefined ||
       this._children[childName] === null
-    )
+    ) {
+      const index = Number.parseInt(childName);
+      const arrayValue = this._childrenArray[index];
+      if (arrayValue !== undefined) {
+        return arrayValue;
+      }
       this._children[childName] = new Variable();
+    }
     return this._children[childName];
   }
 
@@ -160,6 +179,14 @@ class Variable {
     return Object.values(this._children);
   }
 
+  getChildrenCount() {
+    return Object.keys(this._children).length;
+  }
+
+  hasChild(childName) {
+    return !!this._children[childName];
+  }
+
   castTo() {}
 
   isPrimitive() {
@@ -168,6 +195,10 @@ class Variable {
 
   getType() {
     return this.isPrimitive() ? 'number' : 'structure';
+  }
+
+  removeChild(childName) {
+    delete this._children[childName];
   }
 
   clearChildren() {
@@ -184,7 +215,7 @@ class Variable {
   }
 
   getAsString() {
-    return ('' + this._value) || '';
+    return '' + this._value || '';
   }
 
   concatenateString(str) {
@@ -195,10 +226,30 @@ class Variable {
     return this._value;
   }
 
+  /**
+   * @param {string} childName
+   * @param {Variable} childVariable
+   */
   addChild(childName, childVariable) {
-    // Make sure this is a structure
-    this.castTo('structure');
     this._children[childName] = childVariable;
+    return this;
+  }
+
+  /**
+   * @param {string | number | boolean} value
+   */
+  pushValue(value) {
+    this._childrenArray.push(
+      new Variable({ value })
+    );
+    return this;
+  }
+
+  /**
+   * @param {Variable} variable
+   */
+  pushVariableCopy(variable) {
+    this._childrenArray.push(variable.clone());
     return this;
   }
 
@@ -230,6 +281,7 @@ class VariablesContainer {
   constructor(initialVariablesData) {
     this._variables = new Hashtable();
     this._indexedVariables = [];
+    this._isLocal = initialVariablesData === undefined;
 
     if (initialVariablesData !== undefined) {
       const setupVariableFromVariableData = (variable, variableData) => {
@@ -237,6 +289,8 @@ class VariablesContainer {
           variable.setNumber(variableData.value);
         } else if (variableData.type === 'string') {
           variable.setString(variableData.value);
+        } else if (variableData.type === 'boolean') {
+          variable.setBoolean(variableData.value);
         } else if (variableData.type === 'structure') {
           variableData.children.forEach((childVariableData) => {
             const childVariable = variable.getChild(childVariableData.name);
@@ -261,6 +315,11 @@ class VariablesContainer {
     }
   }
 
+  _declare(name, newVariable) {
+    this._variables.put(name, newVariable);
+    this._indexedVariables.push(newVariable);
+  }
+
   /**
    * @param {string} name
    * @returns {Variable}
@@ -280,9 +339,16 @@ class VariablesContainer {
    */
   getFromIndex(index) {
     if (!this._indexedVariables[index]) {
-      throw new Error(
-        'Trying to access to an indexed variable that does not exist.'
-      );
+      if (this._isLocal) {
+        const variable = new Variable();
+        this._indexedVariables[index] = variable;
+        return variable;
+      }
+      else {
+        throw new Error(
+          'Trying to access to an indexed variable that does not exist: ' + index
+        );
+      }
     }
     return this._indexedVariables[index];
   }
@@ -290,12 +356,34 @@ class VariablesContainer {
   has(variableName) {
     return this._variables.containsKey(variableName);
   }
+
+  /**
+   * @param {string} name
+   * @param {Variable} newVariable
+   */
+  add(name, newVariable) {
+    const oldVariable = this._variables.get(name);
+
+    // Variable is either already defined, considered as undefined
+    // in the container or missing in the container.
+    // Whatever the case, replace it by the new.
+    this._variables.put(name, newVariable);
+    if (oldVariable) {
+      // If variable is indexed, ensure that the variable as the index
+      // is replaced too. This can be costly (indexOf) but we assume `add` is not
+      // used in performance sensitive code.
+      const variableIndex = this._variablesArray.indexOf(oldVariable);
+      if (variableIndex !== -1) {
+        this._variablesArray[variableIndex] = newVariable;
+      }
+    }
+  }
 }
 
 class RuntimeObject {
   constructor(runtimeScene, objectData) {
     this.name = objectData.name || '';
-    this._variables = new VariablesContainer();
+    this._variables = new VariablesContainer(objectData.variables);
     this._livingOnScene = true;
     this._behaviors = new Map();
     this._x = 0;
@@ -337,6 +425,30 @@ class RuntimeObject {
 
   getVariableNumber(variable) {
     return variable.getAsNumber();
+  }
+
+  static getVariableBoolean(variable) {
+    return variable.getAsBoolean();
+  }
+
+  getVariableBoolean(variable) {
+    return variable.getAsBoolean();
+  }
+
+  /**
+   * @param {Variable} array
+   * @param {string | float | boolean} value
+   */
+  static valuePush(array, value) {
+    array.pushValue(value);
+  }
+
+  /**
+   * @param {Variable} array
+   * @param {string | float | boolean} value
+   */
+  valuePush(array, value) {
+    array.pushValue(value);
   }
 
   /** @param {RuntimeScene} runtimeScene */
@@ -565,24 +677,84 @@ const getPickedInstancesCount = (objectsLists) => {
   return count;
 };
 
+class RuntimeGame {
+  constructor(gameData) {
+    this._variablesContainer = new VariablesContainer(
+      gameData && gameData.variables
+    );
+    this._variablesByExtensionName = new Map();
+    if (gameData) {
+      for (const extensionData of gameData.eventsFunctionsExtensions) {
+        if (extensionData.globalVariables.length > 0) {
+          this._variablesByExtensionName.set(
+            extensionData.name,
+            new VariablesContainer(extensionData.globalVariables)
+          );
+        }
+      }
+    }
+  }
+
+  getVariables() {
+    return this._variablesContainer;
+  }
+  
+  getVariablesForExtension(extensionName) {
+    return this._variablesByExtensionName.get(extensionName) || null;
+  }
+}
+
 /** A minimal implementation of gdjs.RuntimeScene for testing. */
 class RuntimeScene {
-  constructor(sceneData) {
+  constructor(sceneData, runtimeGame) {
+    this.game = runtimeGame;
     this._variablesContainer = new VariablesContainer(
       sceneData && sceneData.variables
     );
+    this._variablesByExtensionName = new Map();
+    if (sceneData && sceneData.usedExtensionsWithVariablesData) {
+      for (const extensionData of sceneData.usedExtensionsWithVariablesData) {
+        this._variablesByExtensionName.set(
+          extensionData.name,
+          new VariablesContainer(extensionData.sceneVariables)
+        );
+      }
+    }
+
     this._onceTriggers = new OnceTriggers();
     this._asyncTasksManager = new FakeAsyncTasksManager();
 
+    /** @type {Object.<string, any>} */
+    this._objects = {};
     /** @type {Object.<string, RuntimeObject[]>} */
     this._instances = {};
+
+    if (sceneData) {
+      // the scene objects
+      for (let i = 0, len = sceneData.objects.length; i < len; ++i) {
+        this.registerObject(sceneData.objects[i]);
+      }
+      // Create initial instances of objects
+      this.createObjectsFrom(sceneData.instances);
+    }
+  }
+
+  createObjectsFrom(data) {
+    for (const instanceData of data) {
+      const newObject = this.createObject(instanceData.name);
+    }
+  }
+
+  registerObject(objectData) {
+    this._objects[objectData.name] = objectData;
+    this._instances[objectData.name] = [];
   }
 
   createObject(objectName) {
     if (!this._instances[objectName]) this._instances[objectName] = [];
 
-    const fakeObjectData = { name: objectName };
-    const newObject = new RuntimeObject(this, fakeObjectData);
+    const objectData = this._objects[objectName] || { name: objectName };
+    const newObject = new RuntimeObject(this, objectData);
     this._instances[objectName].push(newObject);
 
     return newObject;
@@ -613,6 +785,10 @@ class RuntimeScene {
     return this._variablesContainer;
   }
 
+  getVariablesForExtension(extensionName) {
+    return this._variablesByExtensionName.get(extensionName) || null;
+  }
+
   getOnceTriggers() {
     return this._onceTriggers;
   }
@@ -638,6 +814,10 @@ class RuntimeScene {
   getScene() {
     return this;
   }
+
+  getGame() {
+    return this.game;
+  }
 }
 
 /**
@@ -648,6 +828,8 @@ class LongLivedObjectsList {
   constructor() {
     /** @type {Map<string, Array<RuntimeObject>>} */
     this.objectsLists = new Map();
+    /** @type {Map<string, Array<VariablesContainer>>} */
+    this.localVariablesContainers = [];
     /** @type {Map<RuntimeObject, () => void>} */
     this.callbacks = new Map();
     /** @type {LongLivedObjectsList | null} */
@@ -677,7 +859,7 @@ class LongLivedObjectsList {
 
   /**
    * @param {string} objectName
-   * @param {gdjs.RuntimeObject} runtimeObject
+   * @param {RuntimeObject} runtimeObject
    */
   addObject(objectName, runtimeObject) {
     const list = this.getOrCreateList(objectName);
@@ -692,7 +874,7 @@ class LongLivedObjectsList {
 
   /**
    * @param {string} objectName
-   * @param {gdjs.RuntimeObject} runtimeObject
+   * @param {RuntimeObject} runtimeObject
    */
   removeObject(objectName, runtimeObject) {
     const list = this.getOrCreateList(objectName);
@@ -703,6 +885,20 @@ class LongLivedObjectsList {
     // Properly remove callbacks to not leak the object
     runtimeObject.unregisterDestroyCallback(this.callbacks.get(runtimeObject));
     this.callbacks.delete(runtimeObject);
+  }
+
+  /**
+   * @param {Array<VariablesContainer>} variablesContainers
+   */
+  restoreLocalVariablesContainers(variablesContainers) {
+    copyArray(this.localVariablesContainers, variablesContainers);
+  }
+
+  /**
+   * @param {Array<VariablesContainer>} variablesContainers
+   */
+  backupLocalVariablesContainers(variablesContainers) {
+    copyArray(variablesContainers, this.localVariablesContainers);
   }
 }
 
@@ -716,14 +912,35 @@ function makeMinimalGDJSMock(options) {
   const behaviorCtors = {};
   const customObjectsCtors = {};
   let runtimeScenePreEventsCallbacks = [];
-  const runtimeScene = new RuntimeScene(options && options.sceneData);
+  if (options && options.gameData && options.sceneData) {
+    options.sceneData.usedExtensionsWithVariablesData =
+      options.gameData.eventsFunctionsExtensions;
+  }
+  const runtimeGame = new RuntimeGame(options && options.gameData);
+  const runtimeScene = new RuntimeScene(
+    options && options.sceneData,
+    runtimeGame
+  );
 
   return {
     gdjs: {
       evtTools: {
         variable: {
           getVariableNumber: (variable) => variable.getAsNumber(),
-          getVariableString: (variable) => variable.getAsString()
+          getVariableString: (variable) => variable.getAsString(),
+          getVariableBoolean: (variable) => variable.getAsBoolean(),
+          toggleVariableBoolean: (variable) =>
+            variable.setBoolean(!variable.getAsBoolean()),
+          variablePushCopy: (array, variable) =>
+            array.pushVariableCopy(variable),
+          valuePush: (array, value) => array.pushValue(value),
+          getVariableChildCount: (variable) => variable.getChildrenCount(),
+          variableChildExists: (variable, childName) =>
+            variable.hasChild(childName),
+          variableRemoveChild: (variable, childName) =>
+            variable.removeChild(childName),
+          variableClearChildren: (variable) =>
+            variable.clearChildren(),
         },
         object: {
           createObjectOnScene,
@@ -763,6 +980,7 @@ function makeMinimalGDJSMock(options) {
       CustomRuntimeObject2D,
       ManuallyResolvableTask,
       Variable,
+      VariablesContainer,
     },
     mocks: {
       runRuntimeScenePreEventsCallbacks: () => {

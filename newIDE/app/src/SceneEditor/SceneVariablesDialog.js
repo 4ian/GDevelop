@@ -9,32 +9,63 @@ type Props = {|
   open: boolean,
   project: gdProject,
   layout: gdLayout,
-  onApply: () => void,
-  onClose: () => void,
-  hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
+  onApply: (selectedVariableName: string | null) => void,
+  onCancel: () => void,
+  hotReloadPreviewButtonProps?: ?HotReloadPreviewButtonProps,
+  /**
+   * If set to true, a deleted variable won't trigger a confirmation asking if the
+   * project must be refactored to delete any reference to it.
+   */
+  preventRefactoringToDeleteInstructions?: boolean,
 |};
 
-const SceneVariablesDialog = (props: Props) => {
+const SceneVariablesDialog = ({
+  project,
+  layout,
+  open,
+  onCancel,
+  onApply,
+  hotReloadPreviewButtonProps,
+  preventRefactoringToDeleteInstructions,
+}: Props) => {
+  const onComputeAllVariableNames = React.useCallback(
+    () =>
+      EventsRootVariablesFinder.findAllLayoutVariables(
+        project.getCurrentPlatform(),
+        project,
+        layout
+      ),
+    [layout, project]
+  );
+
+  const tabs = React.useMemo(
+    () => [
+      {
+        id: 'scene-variables',
+        label: <Trans>Scene variables</Trans>,
+        variablesContainer: layout.getVariables(),
+        emptyPlaceholderTitle: <Trans>Add your first scene variable</Trans>,
+        emptyPlaceholderDescription: (
+          <Trans>These variables hold additional information on a scene.</Trans>
+        ),
+        onComputeAllVariableNames,
+      },
+    ],
+    [layout, onComputeAllVariableNames]
+  );
+
   return (
     <VariablesEditorDialog
-      project={props.project}
-      open={props.open}
-      variablesContainer={props.layout.getVariables()}
-      onCancel={props.onClose}
-      onApply={props.onApply}
-      title={<Trans>{props.layout.getName()} variables</Trans>}
-      emptyPlaceholderTitle={<Trans>Add your first scene variable</Trans>}
-      emptyPlaceholderDescription={
-        <Trans>These variables hold additional information on a scene.</Trans>
-      }
+      project={project}
+      open={open}
+      onCancel={onCancel}
+      onApply={onApply}
+      title={<Trans>{layout.getName()} variables</Trans>}
+      tabs={tabs}
       helpPagePath={'/all-features/variables/scene-variables'}
-      hotReloadPreviewButtonProps={props.hotReloadPreviewButtonProps}
-      onComputeAllVariableNames={() =>
-        EventsRootVariablesFinder.findAllLayoutVariables(
-          props.project.getCurrentPlatform(),
-          props.project,
-          props.layout
-        )
+      hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+      preventRefactoringToDeleteInstructions={
+        preventRefactoringToDeleteInstructions
       }
       id="scene-variables-dialog"
     />

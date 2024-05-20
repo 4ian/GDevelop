@@ -3,8 +3,7 @@
  * Copyright 2008-present Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDCORE_EXPRESSIONAUTOCOMPLETIONPROVIDER_H
-#define GDCORE_EXPRESSIONAUTOCOMPLETIONPROVIDER_H
+#pragma once
 
 #include <memory>
 #include <vector>
@@ -20,7 +19,7 @@
 #include "GDCore/IDE/Events/ExpressionNodeLocationFinder.h"
 #include "GDCore/IDE/Events/ExpressionTypeFinder.h"
 #include "GDCore/IDE/Events/ExpressionVariableOwnerFinder.h"
-#include "GDCore/IDE/Events/ExpressionVariableParentFinder.h"
+#include "GDCore/IDE/Events/ExpressionVariablePathFinder.h"
 #include "GDCore/Project/ProjectScopedContainers.h"
 #include "GDCore/Project/Variable.h"
 
@@ -525,7 +524,7 @@ class GD_CORE_API ExpressionCompletionFinder
   }
   void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {
     VariableAndItsParent variableAndItsParent =
-        gd::ExpressionVariableParentFinder::GetLastParentOfNode(
+        gd::ExpressionVariablePathFinder::GetLastParentOfNode(
             platform, projectScopedContainers, node);
 
     // If no child, we're at the end of a variable (like `GrandChild` in
@@ -666,7 +665,7 @@ class GD_CORE_API ExpressionCompletionFinder
             [&]() {
               // This is a variable.
               VariableAndItsParent variableAndItsParent =
-                  gd::ExpressionVariableParentFinder::GetLastParentOfNode(
+                  gd::ExpressionVariablePathFinder::GetLastParentOfNode(
                       platform, projectScopedContainers, node);
 
               AddCompletionsForChildrenVariablesOf(
@@ -1113,5 +1112,3 @@ class GD_CORE_API ExpressionCompletionFinder
 };
 
 }  // namespace gd
-
-#endif  // GDCORE_EXPRESSIONAUTOCOMPLETIONPROVIDER_H

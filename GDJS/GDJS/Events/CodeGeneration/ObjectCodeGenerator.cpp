@@ -6,6 +6,8 @@
 #include "ObjectCodeGenerator.h"
 
 #include "EventsCodeGenerator.h"
+#include "GDCore/Project/EventsBasedObject.h"
+#include "GDCore/Project/EventsFunctionsExtension.h"
 
 namespace gdjs {
 
@@ -16,7 +18,7 @@ gd::String ObjectCodeGenerator::doStepPreEventsFunctionName =
     "doStepPreEvents";
 
 gd::String ObjectCodeGenerator::GenerateRuntimeObjectCompleteCode(
-    const gd::String& extensionName,
+    const gd::EventsFunctionsExtension& eventsFunctionsExtension,
     const gd::EventsBasedObject& eventsBasedObject,
     const gd::String& codeNamespace,
     const std::map<gd::String, gd::String>& objectMethodMangledNames,
@@ -26,7 +28,7 @@ gd::String ObjectCodeGenerator::GenerateRuntimeObjectCompleteCode(
       eventsBasedObject.GetEventsFunctions().GetInternalVector();
 
   return GenerateRuntimeObjectTemplateCode(
-      extensionName,
+      eventsFunctionsExtension.GetName(),
       eventsBasedObject,
       codeNamespace,
       [&]() {
@@ -72,6 +74,7 @@ gd::String ObjectCodeGenerator::GenerateRuntimeObjectCompleteCode(
           runtimeObjectMethodsCode +=
               EventsCodeGenerator::GenerateObjectEventsFunctionCode(
                   project,
+                  eventsFunctionsExtension,
                   eventsBasedObject,
                   *eventsFunction,
                   methodCodeNamespace,

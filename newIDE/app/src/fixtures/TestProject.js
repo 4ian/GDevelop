@@ -1,4 +1,5 @@
 // @flow
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
 
 /*::
 export type TestProject = {|
@@ -19,6 +20,7 @@ export type TestProject = {|
   spriteObjectWithoutBehaviors: gdObject,
   testSpriteObjectInstance: gdInitialInstance,
   testLayout: gdLayout,
+  testSceneProjectScopedContainersAccessor: ProjectScopedContainersAccessor,
   group1: gdObjectGroup,
   group2: gdObjectGroup,
   group4WithLongsNames: gdObjectGroup,
@@ -29,6 +31,7 @@ export type TestProject = {|
   testExternalEvents1: gdExternalEvents,
   testExternalEvents2: gdExternalEvents,
   emptyLayout: gdLayout,
+  emptySceneProjectScopedContainersAccessor: ProjectScopedContainersAccessor,
   emptyEventsList: gdEventsList,
   testEventsFunction: gdEventsFunction,
   testEventsFunctionsExtension: gdEventsFunctionsExtension,
@@ -904,6 +907,20 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     'whatever-this-is-not-recognised'
   );
 
+  const testSceneProjectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+    {
+      project,
+      layout: testLayout,
+    }
+  );
+
+  const emptySceneProjectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+    {
+      project,
+      layout: emptyLayout,
+    }
+  );
+
   return {
     project,
     shapePainterObjectConfiguration: shapePainterObject.getConfiguration(),
@@ -922,6 +939,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     spriteObjectWithBehaviors,
     spriteObjectWithoutBehaviors,
     testLayout,
+    testSceneProjectScopedContainersAccessor,
     group1,
     group2,
     group4WithLongsNames,
@@ -932,6 +950,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     testExternalEvents1,
     testExternalEvents2,
     emptyLayout,
+    emptySceneProjectScopedContainersAccessor,
     emptyEventsList,
     testEventsFunction,
     testEventsFunctionsExtension,

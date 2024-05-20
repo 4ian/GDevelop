@@ -25,6 +25,9 @@ export const Default = () => (
         scope={{ project: testProject.project, layout: testProject.testLayout }}
         globalObjectsContainer={testProject.project}
         objectsContainer={testProject.testLayout}
+        projectScopedContainersAccessor={
+          testProject.testSceneProjectScopedContainersAccessor
+        }
         value={value}
         onChange={onChange}
       />
@@ -41,6 +44,9 @@ export const NonExistingObject = () => (
         scope={{ project: testProject.project, layout: testProject.testLayout }}
         globalObjectsContainer={testProject.project}
         objectsContainer={testProject.testLayout}
+        projectScopedContainersAccessor={
+          testProject.testSceneProjectScopedContainersAccessor
+        }
         value={value}
         onChange={onChange}
       />
@@ -73,6 +79,9 @@ export const WrongObjectType = () => {
           }}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
+          projectScopedContainersAccessor={
+            testProject.testSceneProjectScopedContainersAccessor
+          }
           instructionMetadata={instructionMetadata}
           parameterMetadata={parameterMetadata}
           parameterIndex={0}
@@ -103,6 +112,9 @@ export const WithRequiredBehavior = () => {
           }}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
+          projectScopedContainersAccessor={
+            testProject.testSceneProjectScopedContainersAccessor
+          }
           instructionMetadata={instructionMetadata}
           parameterIndex={0}
           value={value}

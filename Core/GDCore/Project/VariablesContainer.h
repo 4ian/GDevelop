@@ -4,8 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 
-#ifndef GDCORE_VARIABLESCONTAINER_H
-#define GDCORE_VARIABLESCONTAINER_H
+#pragma once
 #include <memory>
 #include <vector>
 #include "GDCore/Project/Variable.h"
@@ -29,11 +28,24 @@ namespace gd {
  */
 class GD_CORE_API VariablesContainer {
  public:
+  enum SourceType {
+      Unknown,
+      Global,
+      Scene,
+      Object,
+      Local,
+      ExtensionGlobal,
+      ExtensionScene
+  };
+
   VariablesContainer();
+  VariablesContainer(const SourceType sourceType);
   VariablesContainer(const VariablesContainer&);
   virtual ~VariablesContainer(){};
 
   VariablesContainer& operator=(const VariablesContainer& rhs);
+
+  SourceType GetSourceType() const { return sourceType; }
 
   /** \name Variables management
    * Members functions related to variables management.
@@ -89,7 +101,6 @@ class GD_CORE_API VariablesContainer {
    */
   const gd::String& GetNameAt(std::size_t index) const;
 
-#if defined(GD_IDE_ONLY)
   /**
    * \brief return the position of the variable called "name" in the variable
    * list
@@ -131,7 +142,6 @@ class GD_CORE_API VariablesContainer {
    * \brief Move the specified variable at a new position in the list.
    */
   void Move(std::size_t oldIndex, std::size_t newIndex);
-#endif
 
   /**
    * \brief Clear all variables of the container.
@@ -178,6 +188,7 @@ class GD_CORE_API VariablesContainer {
   ///@}
 
  private:
+  SourceType sourceType;
   std::vector<std::pair<gd::String, std::shared_ptr<gd::Variable>>> variables;
   mutable gd::String persistentUuid;  ///< A persistent random version 4 UUID,
                                       ///< useful for computing changesets.
@@ -192,5 +203,3 @@ class GD_CORE_API VariablesContainer {
 };
 
 }  // namespace gd
-
-#endif  // GDCORE_VARIABLESCONTAINER_H

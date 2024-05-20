@@ -8,7 +8,7 @@ describe('gdjs.RuntimeScene integration tests', function () {
     it('should properly create and destroy object, including the behaviors', function () {
       const runtimeGame = gdjs.getPixiRuntimeGame();
       const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
-      runtimeScene.loadFromScene({
+      runtimeScene.loadFromScene({sceneData: {
         layers: [
           {
             name: '',
@@ -47,7 +47,7 @@ describe('gdjs.RuntimeScene integration tests', function () {
         ],
         instances: [],
         usedResources: [],
-      });
+      }, usedExtensionsWithVariablesData: []});
 
       const object = runtimeScene.createObject('Object1');
       if (!object) {
@@ -82,7 +82,7 @@ describe('gdjs.RuntimeScene integration tests', function () {
     it('should handle objects on layers', () => {
       const runtimeGame = gdjs.getPixiRuntimeGame();
       const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
-      runtimeScene.loadFromScene({
+      runtimeScene.loadFromScene({sceneData: {
         layers: [
           {
             name: '',
@@ -128,7 +128,7 @@ describe('gdjs.RuntimeScene integration tests', function () {
           },
         ],
         instances: [],
-      });
+      }, usedExtensionsWithVariablesData: []});
 
       expect(runtimeScene.hasLayer('')).to.be(true);
       expect(runtimeScene.hasLayer('MyLayer')).to.be(true);

@@ -53,6 +53,7 @@ import {
   getDirectParentVariable,
   getMovementTypeWithinVariablesContainer,
   getOldestAncestryVariable,
+  getNodeIdFromVariableName,
   getVariableContextFromNodeId,
   inheritedPrefix,
   isAnAncestryOf,
@@ -97,6 +98,7 @@ export type HistoryHandler = {|
 type Props = {|
   variablesContainer: gdVariablesContainer,
   inheritedVariablesContainer?: gdVariablesContainer,
+  initiallySelectedVariableName?: string,
   /** Callback executed at mount to compute suggestions. */
   onComputeAllVariableNames?: () => Array<string>,
   /** To specify if history should be handled by parent. */
@@ -110,6 +112,7 @@ type Props = {|
   size?: 'small',
   onVariablesUpdated?: () => void,
   toolbarIconStyle?: any,
+  onSelectedVariableChange?: (Array<string>) => void,
 |};
 
 const variableRowStyles = {
@@ -524,12 +527,30 @@ const VariablesList = (props: Props) => {
   );
 
   const [searchText, setSearchText] = React.useState<string>('');
-  const { onComputeAllVariableNames } = props;
+  const { onComputeAllVariableNames, onSelectedVariableChange } = props;
   const allVariablesNames = React.useMemo<?Array<string>>(
     () => (onComputeAllVariableNames ? onComputeAllVariableNames() : null),
     [onComputeAllVariableNames]
   );
-  const [selectedNodes, setSelectedNodes] = React.useState<Array<string>>([]);
+  // TODO Scroll to the initially selected variable and focus on the name.
+  const [selectedNodes, doSetSelectedNodes] = React.useState<Array<string>>(
+    props.initiallySelectedVariableName
+      ? [getNodeIdFromVariableName(props.initiallySelectedVariableName)]
+      : []
+  );
+  const setSelectedNodes = React.useCallback(
+    (nodes: Array<string> | ((nodes: Array<string>) => Array<string>)) => {
+      doSetSelectedNodes(selectedNodes => {
+        const newNodes = Array.isArray(nodes) ? nodes : nodes(selectedNodes);
+        if (onSelectedVariableChange) {
+          onSelectedVariableChange(newNodes);
+        }
+        return newNodes;
+      });
+    },
+    [onSelectedVariableChange]
+  );
+
   const [searchMatchingNodes, setSearchMatchingNodes] = React.useState<
     Array<string>
   >([]);
@@ -628,7 +649,7 @@ const VariablesList = (props: Props) => {
         historyRef.current = undo(historyRef.current, props.variablesContainer);
       setSelectedNodes([]);
     },
-    [historyRef, historyHandler, props.variablesContainer]
+    [historyHandler, historyRef, props.variablesContainer, setSelectedNodes]
   );
 
   const _redo = React.useCallback(
@@ -638,7 +659,7 @@ const VariablesList = (props: Props) => {
         historyRef.current = redo(historyRef.current, props.variablesContainer);
       setSelectedNodes([]);
     },
-    [historyRef, historyHandler, props.variablesContainer]
+    [historyHandler, historyRef, props.variablesContainer, setSelectedNodes]
   );
 
   const _canUndo = (): boolean =>
@@ -813,6 +834,7 @@ const VariablesList = (props: Props) => {
       props.inheritedVariablesContainer,
       props.variablesContainer,
       selectedNodes,
+      setSelectedNodes,
     ]
   );
 
@@ -867,7 +889,7 @@ const VariablesList = (props: Props) => {
         setSelectedNodes([]);
       }
     },
-    [_onChange, _deleteNode, selectedNodes]
+    [selectedNodes, _deleteNode, _onChange, setSelectedNodes]
   );
 
   const updateExpandedAndSelectedNodesFollowingNameChange = React.useCallback(
@@ -885,7 +907,7 @@ const VariablesList = (props: Props) => {
         );
       }
     },
-    [searchText]
+    [searchText, setSelectedNodes]
   );
 
   const updateExpandedAndSelectedNodesFollowingNodeMove = React.useCallback(
@@ -897,7 +919,7 @@ const VariablesList = (props: Props) => {
         forceUpdate();
       }
     },
-    [forceUpdate, searchText, triggerSearch]
+    [forceUpdate, searchText, setSelectedNodes, triggerSearch]
   );
 
   const canDrop = React.useCallback(
@@ -1135,8 +1157,10 @@ const VariablesList = (props: Props) => {
         const name = newNameGenerator('ChildVariable', name =>
           variable.hasChild(name)
         );
-        variable.getChild(name).setString('');
-      } else if (type === gd.Variable.Array) variable.pushNew();
+        variable.getChild(name);
+      } else if (type === gd.Variable.Array) {
+        variable.pushNew();
+      }
       _onChange();
       if (variable.isFolded()) variable.setFolded(false);
       forceUpdate();
@@ -1170,7 +1194,12 @@ const VariablesList = (props: Props) => {
       setSelectedNodes([inheritedVariableName]);
       newVariable.delete();
     },
-    [_onChange, props.inheritedVariablesContainer, props.variablesContainer]
+    [
+      _onChange,
+      props.inheritedVariablesContainer,
+      props.variablesContainer,
+      setSelectedNodes,
+    ]
   );
 
   const onAdd = React.useCallback(
@@ -1224,6 +1253,7 @@ const VariablesList = (props: Props) => {
       props.variablesContainer,
       refocusNameField,
       selectedNodes,
+      setSelectedNodes,
     ]
   );
 
@@ -1249,7 +1279,7 @@ const VariablesList = (props: Props) => {
         }
       });
     },
-    []
+    [setSelectedNodes]
   );
 
   const renderVariableAndChildrenRows = (
@@ -1607,6 +1637,7 @@ const VariablesList = (props: Props) => {
       props.inheritedVariablesContainer,
       props.variablesContainer,
       refocusValueField,
+      setSelectedNodes,
     ]
   );
 

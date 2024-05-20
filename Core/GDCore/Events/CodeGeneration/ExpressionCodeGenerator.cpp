@@ -31,6 +31,7 @@
 #include "GDCore/Project/ProjectScopedContainers.h"
 #include "GDCore/IDE/Events/ExpressionTypeFinder.h"
 #include "GDCore/IDE/Events/ExpressionVariableOwnerFinder.h"
+#include "GDCore/Events/CodeGeneration/DiagnosticReport.h"
 
 namespace gd {
 
@@ -39,7 +40,8 @@ gd::String ExpressionCodeGenerator::GenerateExpressionCode(
     EventsCodeGenerationContext& context,
     const gd::String& rootType,
     const gd::Expression& expression,
-    const gd::String& rootObjectName) {
+    const gd::String& rootObjectName,
+    const gd::String& extraInfo) {
   ExpressionCodeGenerator generator(rootType, rootObjectName, codeGenerator, context);
 
   auto node = expression.GetRootNode();
@@ -52,12 +54,33 @@ gd::String ExpressionCodeGenerator::GenerateExpressionCode(
 
   gd::ExpressionValidator validator(codeGenerator.GetPlatform(),
                                     codeGenerator.GetProjectScopedContainers(),
-                                    rootType);
+                                    rootType,
+                                    extraInfo);
   node->Visit(validator);
   if (!validator.GetFatalErrors().empty()) {
     std::cout << "Error: \"" << validator.GetFatalErrors()[0]->GetMessage()
               << "\" in: \"" << expression.GetPlainString() << "\" ("
               << rootType << ")" << std::endl;
+
+    auto *diagnosticReport = codeGenerator.GetDiagnosticReport();
+    if (diagnosticReport) {
+      for (auto *error : validator.GetFatalErrors()) {
+        if (error->GetType() ==
+                gd::ExpressionParserError::ErrorType::UndeclaredVariable ||
+            error->GetType() ==
+                gd::ExpressionParserError::ErrorType::UnknownIdentifier) {
+                  
+          const auto& variableName = error->GetActualValue();
+          if (!variableName.empty()) {
+            gd::ProjectDiagnostic projectDiagnostic(
+                gd::ProjectDiagnostic::ErrorType::UndeclaredVariable,
+                error->GetMessage(), error->GetActualValue(),
+                "", error->GetObjectName());
+            diagnosticReport->Add(projectDiagnostic);
+          }
+        }
+      }
+    }
 
     return generator.GenerateDefaultValue(rootType);
   }
@@ -110,11 +133,13 @@ void ExpressionCodeGenerator::OnVisitVariableNode(VariableNode& node) {
   if (gd::ParameterMetadata::IsExpression("variable", type)) {
     // The node is a variable inside an expression waiting for a *variable* to be returned, not its value.
     EventsCodeGenerator::VariableScope scope =
-        type == "globalvar"
+        type == "variable"
+            ? gd::EventsCodeGenerator::ANY_VARIABLE
+        : type == "globalvar"
             ? gd::EventsCodeGenerator::PROJECT_VARIABLE
-            : ((type == "scenevar")
+            : type == "scenevar"
                   ? gd::EventsCodeGenerator::LAYOUT_VARIABLE
-                  : gd::EventsCodeGenerator::OBJECT_VARIABLE);
+                  : gd::EventsCodeGenerator::OBJECT_VARIABLE;
 
     auto objectName = gd::ExpressionVariableOwnerFinder::GetObjectName(codeGenerator.GetPlatform(),
                                           codeGenerator.GetObjectsContainersList(),
@@ -137,19 +162,8 @@ void ExpressionCodeGenerator::OnVisitVariableNode(VariableNode& node) {
 
       output += codeGenerator.GenerateVariableValueAs(type);
     }, [&]() {
-      if (!codeGenerator.HasProjectAndLayout()) {
-        gd::LogWarning("Tried to generate access to a variable without a project/scene - the code generator only works for global and scene variables for now.");
-        output += GenerateDefaultValue(type);
-        return;
-      }
-
-      // This could be adapted in the future if more scopes are supported.
-      EventsCodeGenerator::VariableScope scope = gd::EventsCodeGenerator::PROJECT_VARIABLE;
-      if (codeGenerator.GetProjectScopedContainers().GetVariablesContainersList().GetBottomMostVariablesContainer()->Has(node.name)) {
-        scope = gd::EventsCodeGenerator::LAYOUT_VARIABLE;
-      }
-
-      output += codeGenerator.GenerateGetVariable(node.name, scope, context, "");
+      output += codeGenerator.GenerateGetVariable(
+          node.name, gd::EventsCodeGenerator::ANY_VARIABLE, context, "");
       if (node.child) node.child->Visit(*this);
       output += codeGenerator.GenerateVariableValueAs(type);
     }, [&]() {
@@ -209,11 +223,13 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
         codeGenerator.GenerateObject(node.identifierName, type, context);
   } else if (gd::ParameterMetadata::IsExpression("variable", type)) {
       EventsCodeGenerator::VariableScope scope =
-          type == "globalvar"
+        type == "variable"
+            ? gd::EventsCodeGenerator::ANY_VARIABLE
+        : type == "globalvar"
               ? gd::EventsCodeGenerator::PROJECT_VARIABLE
-              : ((type == "scenevar")
+              : type == "scenevar"
                     ? gd::EventsCodeGenerator::LAYOUT_VARIABLE
-                    : gd::EventsCodeGenerator::OBJECT_VARIABLE);
+                    : gd::EventsCodeGenerator::OBJECT_VARIABLE;
 
       auto objectName = gd::ExpressionVariableOwnerFinder::GetObjectName(codeGenerator.GetPlatform(),
                                             codeGenerator.GetObjectsContainersList(),
@@ -236,19 +252,9 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
         node.childIdentifierName, gd::EventsCodeGenerator::OBJECT_VARIABLE, context, node.identifierName);
       output += codeGenerator.GenerateVariableValueAs(type);
     }, [&]() {
-      if (!codeGenerator.HasProjectAndLayout()) {
-        gd::LogWarning("Tried to generate access to a variable without a project/scene - the code generator only works for global and scene variables for now.");
-        output += GenerateDefaultValue(type);
-        return;
-      }
-
-      // This could be adapted in the future if more scopes are supported at runtime.
-      EventsCodeGenerator::VariableScope scope = gd::EventsCodeGenerator::PROJECT_VARIABLE;
-      if (variablesContainersList.GetBottomMostVariablesContainer()->Has(node.identifierName)) {
-        scope = gd::EventsCodeGenerator::LAYOUT_VARIABLE;
-      }
-
-      output += codeGenerator.GenerateGetVariable(node.identifierName, scope, context, "");
+      output += codeGenerator.GenerateGetVariable(
+          node.identifierName, gd::EventsCodeGenerator::ANY_VARIABLE, context,
+          "");
       if (!node.childIdentifierName.empty()) {
         output += codeGenerator.GenerateVariableAccessor(node.childIdentifierName);
       }

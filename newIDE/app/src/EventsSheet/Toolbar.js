@@ -22,6 +22,8 @@ type Props = {|
   onAddStandardEvent: () => void,
   onAddSubEvent: () => void,
   canAddSubEvent: boolean,
+  onAddLocalVariable: () => void,
+  canAddLocalVariable: boolean,
   onAddCommentEvent: () => void,
   allEventsMetadata: Array<EventMetadata>,
   onAddEvent: (eventType: string) => Array<gdBaseEvent>,
@@ -46,6 +48,8 @@ const Toolbar = React.memo<Props>(function Toolbar({
   onAddStandardEvent,
   onAddSubEvent,
   canAddSubEvent,
+  onAddLocalVariable,
+  canAddLocalVariable,
   onAddCommentEvent,
   allEventsMetadata,
   onAddEvent,
@@ -73,6 +77,8 @@ const Toolbar = React.memo<Props>(function Toolbar({
         onAddCommentEvent={onAddCommentEvent}
         onAddSubEvent={onAddSubEvent}
         canAddSubEvent={canAddSubEvent}
+        onAddLocalVariable={onAddLocalVariable}
+        canAddLocalVariable={canAddLocalVariable}
         onAddStandardEvent={onAddStandardEvent}
         onAddEvent={onAddEvent}
         allEventsMetadata={allEventsMetadata}

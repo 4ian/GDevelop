@@ -27,6 +27,9 @@ export const OperatorFieldString = () => (
         onChange={onChange}
         globalObjectsContainer={testProject.project}
         objectsContainer={testProject.testLayout}
+        projectScopedContainersAccessor={
+          testProject.testSceneProjectScopedContainersAccessor
+        }
         parameterMetadata={
           testProject.stringRelationalOperatorParameterMetadata
         }
@@ -44,6 +47,9 @@ export const OperatorFieldNumber = () => (
         onChange={onChange}
         globalObjectsContainer={testProject.project}
         objectsContainer={testProject.testLayout}
+        projectScopedContainersAccessor={
+          testProject.testSceneProjectScopedContainersAccessor
+        }
         parameterMetadata={
           testProject.numberRelationalOperatorParameterMetadata
         }
@@ -61,6 +67,9 @@ export const OperatorFieldColor = () => (
         onChange={onChange}
         globalObjectsContainer={testProject.project}
         objectsContainer={testProject.testLayout}
+        projectScopedContainersAccessor={
+          testProject.testSceneProjectScopedContainersAccessor
+        }
         parameterMetadata={testProject.colorRelationalOperatorParameterMetadata}
       />
     )}
@@ -76,6 +85,9 @@ export const OperatorFieldUnknownType = () => (
         onChange={onChange}
         globalObjectsContainer={testProject.project}
         objectsContainer={testProject.testLayout}
+        projectScopedContainersAccessor={
+          testProject.testSceneProjectScopedContainersAccessor
+        }
         parameterMetadata={
           testProject.unknownRelationalOperatorParameterMetadata
         }

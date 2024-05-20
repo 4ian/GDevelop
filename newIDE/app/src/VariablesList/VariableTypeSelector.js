@@ -29,11 +29,7 @@ let variableTypeToString;
 const getOptions = () => {
   if (!options) {
     options = [
-      <SelectOption
-        key="string"
-        label={t`String`}
-        value={gd.Variable.String}
-      />,
+      <SelectOption key="string" label={t`Text`} value={gd.Variable.String} />,
       <SelectOption
         key="number"
         label={t`Number`}

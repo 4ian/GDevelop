@@ -26,7 +26,7 @@ void EventBasedBehaviorBrowser::ExposeEvents(
 void EventBasedBehaviorBrowser::ExposeEvents(
     gd::Project &project, gd::ArbitraryEventsWorkerWithContext &worker) const {
   gd::ProjectBrowserHelper::ExposeEventsBasedBehaviorEvents(
-      project, eventsBasedBehavior, worker);
+      project, eventsFunctionsExtension, eventsBasedBehavior, worker);
 }
 
 void EventBasedBehaviorBrowser::ExposeObjects(

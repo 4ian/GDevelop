@@ -450,6 +450,13 @@ namespace gdjs {
     }
 
     /**
+     * Toggle the value of the variable, considered as a boolean.
+     */
+    toggle() {
+      this.setBoolean(!this.getAsBoolean());
+    }
+
+    /**
      * Sets the primitive value using the setter of the current type.
      * @param newValue The primitive value of the variable.
      */

@@ -13,6 +13,11 @@ class ObjectsContainersList;
 class VariablesContainersList;
 class PropertiesContainersList;
 class NamedPropertyDescriptor;
+class BaseEvent;
+class EventsFunctionsExtension;
+class EventsFunction;
+class EventsBasedBehavior;
+class EventsBasedObject;
 }  // namespace gd
 
 namespace gd {
@@ -51,6 +56,9 @@ class ProjectScopedContainers {
     return projectScopedContainers;
   }
 
+  /**
+   * @deprecated Use another method for an explicit context instead.
+   */
   static ProjectScopedContainers MakeNewProjectScopedContainersFor(
       const gd::ObjectsContainer &globalObjectsContainers,
       const gd::ObjectsContainer &objectsContainers) {
@@ -61,7 +69,35 @@ class ProjectScopedContainers {
         PropertiesContainersList::MakeNewEmptyPropertiesContainersList());
 
     return projectScopedContainers;
-  }
+  };
+
+  static ProjectScopedContainers
+  MakeNewProjectScopedContainersForFreeEventsFunction(
+      const gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      const gd::EventsFunction& eventsFunction,
+      gd::ObjectsContainer& parameterObjectsContainer);
+
+  static ProjectScopedContainers
+  MakeNewProjectScopedContainersForBehaviorEventsFunction(
+      const gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      const gd::EventsBasedBehavior &eventsBasedBehavior,
+      const gd::EventsFunction &eventsFunction,
+      gd::ObjectsContainer &parameterObjectsContainer);
+
+  static ProjectScopedContainers
+  MakeNewProjectScopedContainersForObjectEventsFunction(
+      const gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      const gd::EventsBasedObject &eventsBasedObject,
+      const gd::EventsFunction &eventsFunction,
+      gd::ObjectsContainer &parameterObjectsContainer);
+
+  static ProjectScopedContainers
+  MakeNewProjectScopedContainersWithLocalVariables(
+      const ProjectScopedContainers &projectScopedContainers,
+      const gd::BaseEvent &event);
 
   ProjectScopedContainers &AddPropertiesContainer(
       const gd::PropertiesContainer &container) {
@@ -149,6 +185,14 @@ class ProjectScopedContainers {
   };
 
   const gd::VariablesContainersList &GetVariablesContainersList() const {
+    return variablesContainersList;
+  };
+
+  /**
+   * @brief Allow modification of the variables containers list. This is used
+   * by code generation which does push and pop of local variable containers.
+   */
+  gd::VariablesContainersList &GetVariablesContainersList() {
     return variablesContainersList;
   };
 

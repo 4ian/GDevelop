@@ -31,6 +31,8 @@ declare class gdEventsFunctionsExtension extends gdEventsFunctionsContainer {
   addDependency(): gdDependencyMetadata;
   removeDependencyAt(index: number): void;
   getAllDependencies(): gdVectorDependencyMetadata;
+  getGlobalVariables(): gdVariablesContainer;
+  getSceneVariables(): gdVariablesContainer;
   getEventsBasedBehaviors(): gdEventsBasedBehaviorsList;
   getEventsBasedObjects(): gdEventsBasedObjectsList;
   serializeTo(element: gdSerializerElement): void;

@@ -136,6 +136,9 @@ export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
                 onOpenDebugger={props.onOpenDebugger}
                 onNetworkPreview={props.onNetworkPreview}
                 onHotReloadPreview={props.onHotReloadPreview}
+                onLaunchPreviewWithDiagnosticReport={
+                  props.onLaunchPreviewWithDiagnosticReport
+                }
                 setPreviewOverride={props.setPreviewOverride}
                 canDoNetworkPreview={props.canDoNetworkPreview}
                 isPreviewEnabled={props.isPreviewEnabled}

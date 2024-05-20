@@ -3,8 +3,8 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDCORE_OBJECT_H
-#define GDCORE_OBJECT_H
+#pragma once
+
 #include <map>
 #include <memory>
 #include <vector>
@@ -287,5 +287,3 @@ struct ObjectHasName : public std::binary_function<std::unique_ptr<gd::Object>,
 };
 
 }  // namespace gd
-
-#endif  // GDCORE_OBJECT_H

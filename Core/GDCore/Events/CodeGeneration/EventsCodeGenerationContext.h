@@ -3,8 +3,8 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef EVENTSCODEGENERATIONCONTEXT_H
-#define EVENTSCODEGENERATIONCONTEXT_H
+#pragma once
+
 #include <map>
 #include <memory>
 #include <set>
@@ -325,4 +325,3 @@ class GD_CORE_API EventsCodeGenerationContext {
 };
 
 }  // namespace gd
-#endif  // EVENTSCODEGENERATIONCONTEXT_H

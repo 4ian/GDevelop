@@ -25,6 +25,7 @@ import {
   type InstructionsListContext,
   type InstructionContext,
   type ParameterContext,
+  type VariableDeclarationContext,
 } from '../SelectionHandler';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
 import getObjectByName from '../../Utils/GetObjectByName';
@@ -51,6 +52,8 @@ import { dataObjectToProps } from '../../Utils/HTMLDataset';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { useLongTouch } from '../../Utils/UseLongTouch';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
+
 const gd: libGDevelop = global.gd;
 
 const eventsSheetEventsDnDType = 'events-sheet-events-dnd-type';
@@ -96,6 +99,7 @@ type EventsContainerProps = {|
   scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   selection: SelectionState,
   onAddNewInstruction: InstructionsListContext => void,
   onPasteInstructions: InstructionsListContext => void,
@@ -111,6 +115,9 @@ type EventsContainerProps = {|
     InstructionsListContext
   ) => void,
   onParameterClick: ParameterContext => void,
+
+  onVariableDeclarationClick: VariableDeclarationContext => void,
+  onVariableDeclarationDoubleClick: VariableDeclarationContext => void,
 
   onEventClick: (eventContext: EventContext) => void,
   onEndEditingEvent: () => void,
@@ -145,6 +152,7 @@ const EventContainer = (props: EventsContainerProps) => {
     disabled,
     eventsHeightsCache,
     onEventContextMenu,
+    projectScopedContainersAccessor,
   } = props;
   const forceUpdate = useForceUpdate();
   const containerRef = React.useRef<?HTMLDivElement>(null);
@@ -198,6 +206,7 @@ const EventContainer = (props: EventsContainerProps) => {
               event={event}
               globalObjectsContainer={props.globalObjectsContainer}
               objectsContainer={props.objectsContainer}
+              projectScopedContainersAccessor={projectScopedContainersAccessor}
               selected={isEventSelected(props.selection, event)}
               selection={props.selection}
               leftIndentWidth={props.leftIndentWidth}
@@ -210,6 +219,10 @@ const EventContainer = (props: EventsContainerProps) => {
               onInstructionDoubleClick={props.onInstructionDoubleClick}
               onInstructionContextMenu={props.onInstructionContextMenu}
               onAddInstructionContextMenu={props.onAddInstructionContextMenu}
+              onVariableDeclarationClick={props.onVariableDeclarationClick}
+              onVariableDeclarationDoubleClick={
+                props.onVariableDeclarationDoubleClick
+              }
               onEndEditingEvent={props.onEndEditingEvent}
               onParameterClick={props.onParameterClick}
               onOpenExternalEvents={props.onOpenExternalEvents}
@@ -250,6 +263,7 @@ type EventsTreeProps = {|
   scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   selection: SelectionState,
   onAddNewInstruction: (
     eventContext: EventContext,
@@ -289,6 +303,15 @@ type EventsTreeProps = {|
   onParameterClick: (
     eventContext: EventContext,
     parameterContext: ParameterContext
+  ) => void,
+
+  onVariableDeclarationClick: (
+    eventContext: EventContext,
+    variableDeclarationContext: VariableDeclarationContext
+  ) => void,
+  onVariableDeclarationDoubleClick: (
+    eventContext: EventContext,
+    variableDeclarationContext: VariableDeclarationContext
   ) => void,
 
   onEventClick: (eventContext: EventContext) => void,
@@ -334,6 +357,7 @@ export type SortableTreeNode = {|
   rowIndex: number,
   nodePath: Array<number>,
   relativeNodePath: Array<number>,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   // Key is event pointer or an identification string.
   key: number | string,
 
@@ -377,7 +401,10 @@ export default class ThemableEventsTree extends Component<
     this.temporaryUnfoldedNodes = [];
     this.eventsHeightsCache = new EventHeightsCache(this);
     this.state = {
-      ...this._eventsToTreeData(props.events),
+      ...this._eventsToTreeData(
+        props.projectScopedContainersAccessor,
+        props.events
+      ),
       draggedNode: null,
       isScrolledTop: true,
       isScrolledBottom: false,
@@ -429,12 +456,18 @@ export default class ThemableEventsTree extends Component<
    * from outside this component.
    */
   forceEventsUpdate(cb: ?() => void) {
-    this.setState(this._eventsToTreeData(this.props.events), () => {
-      if (this._list && this._list.wrappedInstance.current) {
-        this._list.wrappedInstance.current.recomputeRowHeights();
+    this.setState(
+      this._eventsToTreeData(
+        this.props.projectScopedContainersAccessor,
+        this.props.events
+      ),
+      () => {
+        if (this._list && this._list.wrappedInstance.current) {
+          this._list.wrappedInstance.current.recomputeRowHeights();
+        }
+        if (cb) cb();
       }
-      if (cb) cb();
-    });
+    );
   }
 
   scrollToRow(row: number) {
@@ -486,14 +519,22 @@ export default class ThemableEventsTree extends Component<
       .map(rowIndex => {
         if (!flatDataTree[rowIndex]) return null;
         const {
-          node: { event, eventsList, indexInList },
+          node: {
+            event,
+            eventsList,
+            indexInList,
+            projectScopedContainersAccessor,
+          },
         } = flatDataTree[rowIndex];
-        return event ? { event, eventsList, indexInList } : null;
+        return event
+          ? { event, eventsList, indexInList, projectScopedContainersAccessor }
+          : null;
       })
       .filter(Boolean);
   }
 
   _eventsToTreeData = (
+    parentProjectScopedContainersAccessor: ProjectScopedContainersAccessor,
     eventsList: gdEventsList,
     flatData: Array<gdBaseEvent> = [],
     depth: number = 0,
@@ -514,6 +555,11 @@ export default class ThemableEventsTree extends Component<
           flatData.length - 1
         );
         const currentRelativePath = [...(parentRelativePath || []), i];
+        const projectScopedContainersAccessor = event.canHaveVariables()
+          ? parentProjectScopedContainersAccessor.makeNewProjectScopedContainersWithLocalVariables(
+              event
+            )
+          : parentProjectScopedContainersAccessor;
 
         return {
           title: this._renderEvent,
@@ -526,6 +572,7 @@ export default class ThemableEventsTree extends Component<
           depth,
           key: event.ptr, //TODO: useless?
           children: this._eventsToTreeData(
+            projectScopedContainersAccessor,
             event.getSubEvents(),
             // flatData is a flat representation of events, one for each line.
             // Hence it should not contain the folded events.
@@ -537,6 +584,7 @@ export default class ThemableEventsTree extends Component<
           ).treeData,
           nodePath: currentAbsolutePath,
           relativeNodePath: currentRelativePath,
+          projectScopedContainersAccessor,
         };
       }
     );
@@ -755,6 +803,8 @@ export default class ThemableEventsTree extends Component<
             eventsList: node.eventsList,
             event: event,
             indexInList: node.indexInList,
+            projectScopedContainersAccessor:
+              node.projectScopedContainersAccessor,
           };
 
           const dropTarget = (
@@ -770,6 +820,9 @@ export default class ThemableEventsTree extends Component<
                 scope={this.props.scope}
                 globalObjectsContainer={this.props.globalObjectsContainer}
                 objectsContainer={this.props.objectsContainer}
+                projectScopedContainersAccessor={
+                  node.projectScopedContainersAccessor
+                }
                 event={event}
                 key={event.ptr}
                 eventsHeightsCache={this.eventsHeightsCache}
@@ -814,11 +867,25 @@ export default class ThemableEventsTree extends Component<
                 onParameterClick={parameterContext =>
                   this.props.onParameterClick(eventContext, parameterContext)
                 }
+                onVariableDeclarationClick={variableDeclarationContext =>
+                  this.props.onVariableDeclarationClick(
+                    eventContext,
+                    variableDeclarationContext
+                  )
+                }
+                onVariableDeclarationDoubleClick={variableDeclarationContext =>
+                  this.props.onVariableDeclarationDoubleClick(
+                    eventContext,
+                    variableDeclarationContext
+                  )
+                }
                 onEventClick={() =>
                   this.props.onEventClick({
                     eventsList: node.eventsList,
                     event: event,
                     indexInList: node.indexInList,
+                    projectScopedContainersAccessor:
+                      node.projectScopedContainersAccessor,
                   })
                 }
                 onEndEditingEvent={() => this.props.onEndEditingEvent(event)}
@@ -827,6 +894,8 @@ export default class ThemableEventsTree extends Component<
                     eventsList: node.eventsList,
                     event: event,
                     indexInList: node.indexInList,
+                    projectScopedContainersAccessor:
+                      node.projectScopedContainersAccessor,
                   })
                 }
                 onInstructionContextMenu={(...args) =>

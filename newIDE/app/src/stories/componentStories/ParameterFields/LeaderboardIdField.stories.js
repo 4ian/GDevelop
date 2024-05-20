@@ -94,6 +94,9 @@ export const Default = () => (
           }}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
+          projectScopedContainersAccessor={
+            testProject.testSceneProjectScopedContainersAccessor
+          }
           value={value}
           onChange={onChange}
         />
@@ -115,6 +118,9 @@ export const InitialValidLeaderboard = () => (
           }}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
+          projectScopedContainersAccessor={
+            testProject.testSceneProjectScopedContainersAccessor
+          }
           value={value}
           onChange={onChange}
         />
@@ -136,6 +142,9 @@ export const InitialInvalidLeaderboard = () => (
           }}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
+          projectScopedContainersAccessor={
+            testProject.testSceneProjectScopedContainersAccessor
+          }
           value={value}
           onChange={onChange}
         />

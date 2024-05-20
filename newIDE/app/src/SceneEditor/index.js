@@ -1830,7 +1830,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                             project.getCurrentPlatform(),
                             project,
                             layout,
-                            editedObjectWithContext.object
+                            editedObjectWithContext.object.getName()
                           );
                         }}
                         onCancel={() => {
@@ -1908,19 +1908,44 @@ export default class SceneEditor extends React.Component<Props, State> {
                   <VariablesEditorDialog
                     project={project}
                     open
-                    variablesContainer={this.state.variablesEditedInstance.getVariables()}
-                    inheritedVariablesContainer={variablesEditedAssociatedObject.getVariables()}
                     onCancel={() => this.editInstanceVariables(null)}
                     onApply={() => this.editInstanceVariables(null)}
-                    emptyPlaceholderTitle={
-                      <Trans>Add your first instance variable</Trans>
-                    }
-                    emptyPlaceholderDescription={
-                      <Trans>
-                        Instance variables overwrite the default values of the
-                        variables of the object.
-                      </Trans>
-                    }
+                    tabs={[
+                      {
+                        id: 'instance-variables',
+                        label: <Trans>Scene variables</Trans>,
+                        variablesContainer: this.state.variablesEditedInstance.getVariables(),
+                        inheritedVariablesContainer: variablesEditedAssociatedObject.getVariables(),
+                        emptyPlaceholderTitle: (
+                          <Trans>Add your first instance variable</Trans>
+                        ),
+                        emptyPlaceholderDescription: (
+                          <Trans>
+                            Instance variables overwrite the default values of
+                            the variables of the object.
+                          </Trans>
+                        ),
+                        onComputeAllVariableNames: () => {
+                          const { variablesEditedInstance } = this.state;
+                          if (!variablesEditedInstance) {
+                            return [];
+                          }
+                          const variablesEditedObject = getObjectByName(
+                            project,
+                            layout,
+                            variablesEditedInstance.getObjectName()
+                          );
+                          return variablesEditedObject
+                            ? EventsRootVariablesFinder.findAllObjectVariables(
+                                project.getCurrentPlatform(),
+                                project,
+                                layout,
+                                variablesEditedObject.getName()
+                              )
+                            : [];
+                        },
+                      },
+                    ]}
                     helpPagePath={'/all-features/variables/instance-variables'}
                     title={<Trans>Instance Variables</Trans>}
                     onEditObjectVariables={
@@ -1937,25 +1962,6 @@ export default class SceneEditor extends React.Component<Props, State> {
                     hotReloadPreviewButtonProps={
                       this.props.hotReloadPreviewButtonProps
                     }
-                    onComputeAllVariableNames={() => {
-                      const { variablesEditedInstance } = this.state;
-                      if (!variablesEditedInstance) {
-                        return [];
-                      }
-                      const variablesEditedObject = getObjectByName(
-                        project,
-                        layout,
-                        variablesEditedInstance.getObjectName()
-                      );
-                      return variablesEditedObject
-                        ? EventsRootVariablesFinder.findAllObjectVariables(
-                            project.getCurrentPlatform(),
-                            project,
-                            layout,
-                            variablesEditedObject
-                          )
-                        : [];
-                    }}
                   />
                 )}
               {!!this.state.layerRemoved &&
@@ -2004,7 +2010,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                   project={project}
                   layout={layout}
                   onApply={() => this.editLayoutVariables(false)}
-                  onClose={() => this.editLayoutVariables(false)}
+                  onCancel={() => this.editLayoutVariables(false)}
                   hotReloadPreviewButtonProps={
                     this.props.hotReloadPreviewButtonProps
                   }

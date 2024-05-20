@@ -383,8 +383,8 @@ class GD_CORE_API EventsCodeGenerator {
    */
   size_t GetMaxConditionsListsSize() const { return maxConditionsListsSize; }
 
-  void SetDiagnosticReport(gd::DiagnosticReport& diagnosticReport_) {
-    diagnosticReport = &diagnosticReport_;
+  void SetDiagnosticReport(gd::DiagnosticReport* diagnosticReport_) {
+    diagnosticReport = diagnosticReport_;
   }
 
   gd::DiagnosticReport* GetDiagnosticReport() {

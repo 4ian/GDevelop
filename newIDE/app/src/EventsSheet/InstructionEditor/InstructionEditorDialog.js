@@ -182,6 +182,9 @@ const InstructionEditorDialog = ({
         behaviorType: type,
         parentEditor: 'instruction-editor-dialog',
       });
+      if (scope.layout) {
+        scope.layout.updateBehaviorsSharedData(project);
+      }
     }
 
     // Re-choose the same object to force recomputation of chosenObjectInstructionsInfoTree

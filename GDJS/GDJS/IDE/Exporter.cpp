@@ -66,9 +66,9 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
                         &helper,
                         &usedExtensionsResult](gd::String exportDir) {
     gd::WholeProjectDiagnosticReport &wholeProjectDiagnosticReport =
-      options.project.GetWholeProjectDiagnosticReport();
-  wholeProjectDiagnosticReport.Clear();
-  
+        options.project.GetWholeProjectDiagnosticReport();
+    wholeProjectDiagnosticReport.Clear();
+
     // Use project properties fallback to set empty properties
     if (exportedProject.GetAuthorIds().empty() &&
         !options.fallbackAuthorId.empty()) {
@@ -119,8 +119,8 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
     helper.ExportEffectIncludes(exportedProject, includesFiles);
 
     // Export events
-    if (!helper.ExportEventsCode(
-            exportedProject, codeOutputDir, includesFiles, wholeProjectDiagnosticReport, false)) {
+    if (!helper.ExportEventsCode(exportedProject, codeOutputDir, includesFiles,
+                                 wholeProjectDiagnosticReport, false)) {
       gd::LogError(_("Error during exporting! Unable to export events:\n") +
                    lastError);
       return false;

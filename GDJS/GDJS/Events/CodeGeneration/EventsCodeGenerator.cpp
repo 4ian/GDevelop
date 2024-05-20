@@ -105,7 +105,7 @@ gd::String EventsCodeGenerator::GenerateLayoutCode(
   EventsCodeGenerator codeGenerator(project, scene);
   codeGenerator.SetCodeNamespace(codeNamespace);
   codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
-  codeGenerator.SetDiagnosticReport(diagnosticReport);
+  codeGenerator.SetDiagnosticReport(&diagnosticReport);
 
   gd::String output = GenerateEventsListCompleteFunctionCode(
       codeGenerator,

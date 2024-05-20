@@ -484,7 +484,8 @@ void EventsCodeGenerator::CheckBehaviorParameters(
           const gd::String &expectedBehaviorType =
               parameterMetadata.GetExtraInfo();
 
-          if (actualBehaviorType != expectedBehaviorType) {
+          if (!expectedBehaviorType.empty() &&
+              actualBehaviorType != expectedBehaviorType) {
             gd::ProjectDiagnostic projectDiagnostic(
                 gd::ProjectDiagnostic::ErrorType::MissingBehavior, "",
                 actualBehaviorType, expectedBehaviorType, lastObjectName);

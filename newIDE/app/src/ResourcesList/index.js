@@ -139,7 +139,7 @@ export default class ResourcesList extends React.Component<Props, State> {
       renamedResource: null,
     });
 
-    if (resource.getName() === newName) return;
+    if (resource.getName() === newName || newName.length === 0) return;
 
     if (project.getResourcesManager().hasResource(newName)) {
       showWarningBox('Another resource with this name already exists', {

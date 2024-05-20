@@ -144,8 +144,11 @@ export const saveBlobUrlsFromExternalEditorBase64Resources = async ({
         // Insert a new resource.
         // Store the blob url, as well as indication
         // about which extension (for a new file) or filename to use (to overwrite existing file).
-        const name = newNameGenerator(baseNameForNewResources, name =>
-          resourcesManager.hasResource(name)
+        const name = newNameGenerator(
+          baseNameForNewResources.length === 0
+            ? 'Untitled'
+            : baseNameForNewResources,
+          name => resourcesManager.hasResource(name)
         );
         console.info('Creating new resource ' + name + '...');
 

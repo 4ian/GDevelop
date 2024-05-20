@@ -531,7 +531,7 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          "runtimeScene.getGame().getVariablesForExtension(" +
          ConvertToStringExplicit(extensionName) + "),\n" +
          "  sceneVariablesForExtension: "
-         "runtimeScene.getVariablesForExtension(" +
+         "runtimeScene.getScene().getVariablesForExtension(" +
          ConvertToStringExplicit(extensionName) + "),\n" +
          // The local variables stack:
          "  localVariables: [],\n"

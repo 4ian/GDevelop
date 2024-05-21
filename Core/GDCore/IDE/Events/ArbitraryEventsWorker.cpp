@@ -14,6 +14,7 @@
 #include "GDCore/Events/Expression.h"
 #include "GDCore/Extensions/Metadata/ParameterMetadata.h"
 #include "GDCore/String.h"
+#include "GDCore/Tools/Log.h"
 
 using namespace std;
 
@@ -28,9 +29,6 @@ void AbstractArbitraryEventsWorker::VisitEventList(gd::EventsList& events) {
     if (events[i].AcceptVisitor(*this))
       events.RemoveEvent(i);
     else {
-      if (events[i].CanHaveSubEvents())
-        VisitEventList(events[i].GetSubEvents());
-
       ++i;
     }
   }
@@ -55,6 +53,9 @@ bool AbstractArbitraryEventsWorker::VisitEvent(gd::BaseEvent& event) {
       *expressionAndMetadata.first, expressionAndMetadata.second);
   }
 
+  if (!shouldDelete && event.CanHaveSubEvents()) {
+    VisitEventList(event.GetSubEvents());
+  }
   return shouldDelete;
 }
 

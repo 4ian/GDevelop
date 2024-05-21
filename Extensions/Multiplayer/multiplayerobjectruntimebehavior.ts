@@ -411,7 +411,9 @@ namespace gdjs {
         originalMessageName: destroyMessageName,
         originalData: {
           ...destroyMessageData,
-          _clock: this._clock + 1, // Will be incremented by the time the message is sent.
+          // As the method `sendDataToPeersWithIncreasedClock` will increment the clock,
+          // we increment it here to ensure we can resend the same message if we don't receive an acknowledgment.
+          _clock: this._clock + 1,
         },
         expectedMessageName: destroyedMessageName,
         otherPeerIds,

@@ -138,7 +138,15 @@ namespace gdjs {
       if (newNetworkSyncData.anim) {
         this._animator.updateFromObjectNetworkSyncData(newNetworkSyncData.anim);
       }
-      this.invalidateHitboxes();
+      if (
+        newNetworkSyncData.ifx !== undefined ||
+        newNetworkSyncData.ify !== undefined ||
+        newNetworkSyncData.sx !== undefined ||
+        newNetworkSyncData.sy !== undefined ||
+        newNetworkSyncData.anim !== undefined
+      ) {
+        this.invalidateHitboxes();
+      }
     }
 
     /**

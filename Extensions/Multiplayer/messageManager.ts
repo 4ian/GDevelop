@@ -1,7 +1,7 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Multiplayer');
 
-  class RecentlySeenCustomMessages {
+  class RecentlySeenKeys {
     maxSize: number;
     cache: Set<string>;
     keys: string[];
@@ -61,7 +61,7 @@ namespace gdjs {
 
     // Make the processed messages an LRU cache, so that we can limit the number of messages we keep in memory,
     // as well as keep them in order.
-    const processedCustomMessagesCache = new RecentlySeenCustomMessages(500);
+    const processedCustomMessagesCache = new RecentlySeenKeys(500);
 
     let expectedMessageAcknowledgements: {
       [messageName: string]: {
@@ -187,6 +187,37 @@ namespace gdjs {
       gdjs.evtTools.p2p.sendDataTo(peerId, messageName, JSON.stringify(data));
     };
 
+    const findClosestInstanceWithoutNetworkId = (
+      instances: gdjs.RuntimeObject[],
+      x: number,
+      y: number
+    ): gdjs.RuntimeObject | null => {
+      if (!instances.length) {
+        // No instances, return null.
+        return null;
+      }
+
+      // Avoid using a reduce function to avoid creating a new object at each iteration.
+      let closestInstance: gdjs.RuntimeObject | null = null;
+      let closestDistance = Infinity;
+      for (let i = 0; i < instances.length; ++i) {
+        if (instances[i].networkId) {
+          // Skip instances that already have a network ID.
+          continue;
+        }
+
+        const instance = instances[i];
+        const distance =
+          Math.pow(instance.getX() - x, 2) + Math.pow(instance.getY() - y, 2);
+        if (distance < closestDistance) {
+          closestInstance = instance;
+          closestDistance = distance;
+        }
+      }
+
+      return closestInstance;
+    };
+
     const getInstanceFromNetworkId = ({
       runtimeScene,
       objectName,
@@ -246,34 +277,16 @@ namespace gdjs {
         //   position of the object created by the other player, and assign it the network ID to start
         //   synchronizing it.
 
-        // Find all instances that have the MultiplayerObjectRuntimeBehavior and no network ID yet.
-        const instancesWithoutNetworkId = instances.filter(
-          (instance) =>
-            instance.hasBehavior('MultiplayerObject') && !instance.networkId
+        // Try to assign the network ID to the instance that is the closest to the position of the object created by the other player.
+        const closestInstance = findClosestInstanceWithoutNetworkId(
+          instances,
+          instanceX,
+          instanceY
         );
-        logger.info(
-          `Found ${instancesWithoutNetworkId.length} instances for object ${objectName} ${instanceNetworkId} with behavior MultiplayerObject and no network ID.`
-        );
-        if (instancesWithoutNetworkId.length > 0) {
-          // Find the instance that is the closest to the position of the object created by the other player.
-          const closestInstance = instancesWithoutNetworkId.reduce(
-            (closestInstance, instance) => {
-              const dx = instance.getX() - instanceX;
-              const dy = instance.getY() - instanceY;
-              const distance = dx * dx + dy * dy;
-              if (distance < closestInstance.distance) {
-                return { instance, distance };
-              }
-              return closestInstance;
-            },
-            {
-              instance: instancesWithoutNetworkId[0],
-              distance: Infinity,
-            }
-          ).instance;
 
+        if (closestInstance) {
           logger.info(
-            `Found closest instance for object ${objectName} ${instanceNetworkId} with behavior MultiplayerObject and no network ID.`
+            `Found closest instance for object ${objectName} ${instanceNetworkId} with no network ID.`
           );
 
           instance = closestInstance;
@@ -355,7 +368,15 @@ namespace gdjs {
       objectOwnershipChangeMessageNames.forEach((messageName) => {
         if (gdjs.evtTools.p2p.onEvent(messageName, false)) {
           // TODO: Catch, log error and ignore to avoid to crash the game.
-          const data = JSON.parse(gdjs.evtTools.p2p.getEventData(messageName));
+          let data;
+          try {
+            data = JSON.parse(gdjs.evtTools.p2p.getEventData(messageName));
+          } catch (e) {
+            logger.error(
+              `Error while parsing message ${messageName}: ${e.toString()}`
+            );
+            return;
+          }
           const messageSender = gdjs.evtTools.p2p.getEventSender(messageName);
           logger.info(`Received message ${messageName} with data ${data}.`);
           if (data) {
@@ -495,8 +516,15 @@ namespace gdjs {
       );
       objectUpdateMessageNames.forEach((messageName) => {
         if (gdjs.evtTools.p2p.onEvent(messageName, true)) {
-          // TODO: Catch, log error and ignore to avoid to crash the game.
-          const data = JSON.parse(gdjs.evtTools.p2p.getEventData(messageName));
+          let data;
+          try {
+            data = JSON.parse(gdjs.evtTools.p2p.getEventData(messageName));
+          } catch (e) {
+            logger.error(
+              `Error while parsing message ${messageName}: ${e.toString()}`
+            );
+            return;
+          }
           const messageSender = gdjs.evtTools.p2p.getEventSender(messageName);
 
           if (data) {
@@ -582,15 +610,11 @@ namespace gdjs {
             if (gdjs.multiplayer.isPlayerServer()) {
               const connectedPeerIds = gdjs.evtTools.p2p.getAllPeers();
               // We don't need to send the message to the player who sent the update message.
-              const otherPeerIds = connectedPeerIds.filter(
-                (peerId) => peerId !== messageSender
-              );
-              if (!otherPeerIds.length) {
-                // No one else to relay the message to.
-                return;
-              }
+              for (const peerId of connectedPeerIds) {
+                if (peerId === messageSender) {
+                  continue;
+                }
 
-              for (const peerId of otherPeerIds) {
                 sendDataTo(peerId, messageName, data);
               }
             }
@@ -842,8 +866,15 @@ namespace gdjs {
       );
       destroyObjectMessageNames.forEach((messageName) => {
         if (gdjs.evtTools.p2p.onEvent(messageName, false)) {
-          // TODO: Catch, log error and ignore to avoid to crash the game.
-          const data = JSON.parse(gdjs.evtTools.p2p.getEventData(messageName));
+          let data;
+          try {
+            data = JSON.parse(gdjs.evtTools.p2p.getEventData(messageName));
+          } catch (e) {
+            logger.error(
+              `Error while parsing message ${messageName}: ${e.toString()}`
+            );
+            return;
+          }
           const messageSender = gdjs.evtTools.p2p.getEventSender(messageName);
           if (data && messageSender) {
             logger.info(`Received message ${messageName} with data ${data}.`);
@@ -1010,8 +1041,16 @@ namespace gdjs {
       );
       if (messageHasBeenReceived) {
         const messageData = gdjs.evtTools.p2p.getEventData(messageName);
-        // TODO: Catch, log error and ignore to avoid to crash the game.
-        const uniqueMessageId = JSON.parse(messageData).uniqueId;
+        let data;
+        try {
+          data = JSON.parse(messageData);
+        } catch (e) {
+          logger.error(
+            `Error while parsing message ${messageName}: ${e.toString()}`
+          );
+          return false;
+        }
+        const uniqueMessageId = data.uniqueId;
         const customMessageCacheKey = `${messageName}#${uniqueMessageId}`;
         if (processedCustomMessagesCache.has(customMessageCacheKey)) {
           // Message has already been processed recently. This can happen if the message is sent multiple times,
@@ -1039,8 +1078,15 @@ namespace gdjs {
       customMessageNames.forEach((messageName) => {
         if (gdjs.evtTools.p2p.onEvent(messageName, false)) {
           const event = gdjs.evtTools.p2p.getEvent(messageName);
-          // TODO: Catch, log error and ignore to avoid to crash the game.
-          const data = JSON.parse(event.getData());
+          let data;
+          try {
+            data = JSON.parse(event.getData());
+          } catch (e) {
+            logger.error(
+              `Error while parsing message ${messageName}: ${e.toString()}`
+            );
+            return;
+          }
           const uniqueMessageId = data.uniqueId;
           const messageSender = event.getSender();
           logger.info(`Received message ${messageName} with data ${data}.`);
@@ -1185,8 +1231,15 @@ namespace gdjs {
       );
       updateSceneMessageNames.forEach((messageName) => {
         if (gdjs.evtTools.p2p.onEvent(messageName, true)) {
-          // TODO: Catch, log error and ignore to avoid to crash the game.
-          const data = JSON.parse(gdjs.evtTools.p2p.getEventData(messageName));
+          let data;
+          try {
+            data = JSON.parse(gdjs.evtTools.p2p.getEventData(messageName));
+          } catch (e) {
+            logger.error(
+              `Error while parsing message ${messageName}: ${e.toString()}`
+            );
+            return;
+          }
           const messageSender = gdjs.evtTools.p2p.getEventSender(messageName);
           if (data && messageSender) {
             runtimeScene.updateFromNetworkSyncData(data);
@@ -1273,8 +1326,15 @@ namespace gdjs {
       );
       updateGameMessageNames.forEach((messageName) => {
         if (gdjs.evtTools.p2p.onEvent(messageName, true)) {
-          // TODO: Catch, log error and ignore to avoid to crash the game.
-          const data = JSON.parse(gdjs.evtTools.p2p.getEventData(messageName));
+          let data;
+          try {
+            data = JSON.parse(gdjs.evtTools.p2p.getEventData(messageName));
+          } catch (e) {
+            logger.error(
+              `Error while parsing message ${messageName}: ${e.toString()}`
+            );
+            return;
+          }
           const messageSender = gdjs.evtTools.p2p.getEventSender(messageName);
           if (data && messageSender) {
             runtimeScene.getGame().updateFromNetworkSyncData(data);

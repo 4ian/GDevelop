@@ -358,6 +358,9 @@ namespace gdjs {
       }
 
       closeContainer.style.display = 'none';
+      // There is a risk a player leaves the lobby before the end of the countdown,
+      // so we show the close container again after 5 seconds in case this happens,
+      // to allow the player to leave the lobby.
       setTimeout(() => {
         closeContainer.style.display = 'flex';
       }, 5000);

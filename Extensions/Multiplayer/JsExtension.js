@@ -64,7 +64,7 @@ module.exports = {
         'EndLobbyGame',
         _('End Lobby Game'),
         _(
-          'End the lobby game. This will trigger the "HasGameJustEnded" condition.'
+          'End the lobby game. This will trigger the "Lobby game has just ended" condition.'
         ),
         _('End the lobby game'),
         '',
@@ -265,8 +265,8 @@ module.exports = {
 
     extension
       .addStrExpression(
-        'GetMessageData',
-        _('Get message data'),
+        'MessageData',
+        _('Message data'),
         _(
           'Returns the data received when the specified message was received from another player.'
         ),
@@ -315,7 +315,7 @@ module.exports = {
         'number',
         'PlayerNumber',
         _('Player number in lobby'),
-        _('the player number in the lobby. (1, 2, ...)'),
+        _('the player number in the lobby (1, 2, ...)'),
         _('the player number in the lobby'),
         '',
         'JsPlatform/Extensions/multiplayer.svg'
@@ -441,7 +441,7 @@ module.exports = {
     behavior
       .addExpressionAndConditionAndAction(
         'number',
-        'playerObjectOwnership',
+        'PlayerObjectOwnership',
         _('Player object ownership'),
         _('the player owning the object'),
         _('the player owning the object'),
@@ -462,10 +462,10 @@ module.exports = {
 
     behavior
       .addScopedAction(
-        'removeObjectOwnership',
+        'RemoveObjectOwnership',
         _('Remove object ownership'),
         _(
-          'Remove the ownership of the object from the player. It will still be synchronised to other players, but the server owns it.'
+          'Remove the ownership of the object from the player. It will still be synchronized to other players, but the server owns it.'
         ),
         _('Remove ownership of _PARAM0_'),
         '',

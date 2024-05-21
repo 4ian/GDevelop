@@ -770,6 +770,98 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     REQUIRE(event.GetActions()[0].GetType() == "SetStringVariable");
   }
 
+  SECTION("Can rename a local variable") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &scene = project.InsertNewLayout("Scene", 0);
+
+    gd::StandardEvent &event =
+        dynamic_cast<gd::StandardEvent &>(scene.GetEvents().InsertNewEvent(
+            project, "BuiltinCommonInstructions::Standard"));
+    event.GetVariables().InsertNew("MyLocalVariable").SetValue(123);
+
+    {
+      gd::Instruction action;
+      action.SetType("SetNumberVariable");
+      action.SetParametersCount(3);
+      action.SetParameter(0, gd::Expression("MyLocalVariable"));
+      action.SetParameter(1, gd::Expression("="));
+      action.SetParameter(2, gd::Expression("123"));
+      event.GetActions().Insert(action);
+    }
+
+    // Do the changes and launch the refactoring.
+    event.GetVariables().ResetPersistentUuid();
+    gd::SerializerElement originalSerializedVariables;
+    event.GetVariables().SerializeTo(originalSerializedVariables);
+
+    event.GetVariables().Rename("MyLocalVariable", "MyRenamedLocalVariable");
+    auto changeset =
+        gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
+            originalSerializedVariables, event.GetVariables());
+
+    REQUIRE(changeset.oldToNewVariableNames.find("MyLocalVariable")->second ==
+            "MyRenamedLocalVariable");
+
+    gd::LogMessage("OTHER TEST START");
+
+    gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
+        project, event.GetVariables(), changeset);
+
+    REQUIRE(event.GetActions()[0].GetParameter(0).GetPlainString() == "MyRenamedLocalVariable");
+  }
+
+  SECTION("Can rename a local variable in sub-events") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &scene = project.InsertNewLayout("Scene", 0);
+
+    gd::StandardEvent &event =
+        dynamic_cast<gd::StandardEvent &>(scene.GetEvents().InsertNewEvent(
+            project, "BuiltinCommonInstructions::Standard"));
+    event.GetVariables().InsertNew("MyLocalVariable").SetValue(123);
+
+    gd::StandardEvent &subEvent =
+        dynamic_cast<gd::StandardEvent &>(event.GetSubEvents().InsertNewEvent(
+            project, "BuiltinCommonInstructions::Standard"));
+
+    {
+      gd::Instruction action;
+      action.SetType("SetNumberVariable");
+      action.SetParametersCount(3);
+      action.SetParameter(0, gd::Expression("MyLocalVariable"));
+      action.SetParameter(1, gd::Expression("="));
+      action.SetParameter(2, gd::Expression("123"));
+      subEvent.GetActions().Insert(action);
+    }
+
+    // Do the changes and launch the refactoring.
+    event.GetVariables().ResetPersistentUuid();
+    gd::SerializerElement originalSerializedVariables;
+    event.GetVariables().SerializeTo(originalSerializedVariables);
+
+    event.GetVariables().Rename("MyLocalVariable", "MyRenamedLocalVariable");
+    auto changeset =
+        gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
+            originalSerializedVariables, event.GetVariables());
+
+    REQUIRE(changeset.oldToNewVariableNames.find("MyLocalVariable")->second ==
+            "MyRenamedLocalVariable");
+
+    gd::LogMessage("TEST START");
+
+    gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
+        project, event.GetVariables(), changeset);
+
+    gd::LogMessage("TEST END");
+
+    REQUIRE(subEvent.GetActions()[0].GetParameter(0).GetPlainString() == "MyRenamedLocalVariable");
+  }
+
   SECTION("Can change the instruction type of variable occurrences (function)") {
     gd::Project project;
     gd::Platform platform;

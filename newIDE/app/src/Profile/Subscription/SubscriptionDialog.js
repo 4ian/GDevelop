@@ -118,14 +118,14 @@ const seamlesslyChangeConfirmationTexts = {
 };
 const cancelAndChangeConfirmationTexts = {
   title: t`Update your subscription`,
-  message: t`To get this new subscription, we need to cancel your existing one before you can pay for the new one. The change will be immediate but your payment will NOT be pro-rated (you will have to pay as for a new subscription).`,
-  confirmButtonLabel: t`Cancel my subscription`,
+  message: t`To get this new subscription, we need to stop your existing one before you can pay for the new one. This is immediate but your payment will NOT be pro-rated (you will pay the full price for the new subscription). You won't lose any project, game or other data.`,
+  confirmButtonLabel: t`Cancel and upgrade my subscription`,
   dismissButtonLabel: t`Go back`,
   maxWidth: 'sm',
 };
 const cancelAndChangeWithValidRedeemedCodeConfirmationTexts = {
   title: t`Update your subscription`,
-  message: t`To get this new subscription, we need to cancel your existing one before you can pay for the new one. The change will be immediate. You will also lose your redeemed code.`,
+  message: t`To get this new subscription, we need to stop your existing one before you can pay for the new one. The change will be immediate. You will also lose your redeemed code.`,
   confirmButtonLabel: t`Update my subscription`,
   dismissButtonLabel: t`Go back`,
   maxWidth: 'sm',

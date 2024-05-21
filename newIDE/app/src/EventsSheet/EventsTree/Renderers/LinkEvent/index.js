@@ -14,7 +14,6 @@ import {
   linkContainer,
   disabledText,
   icon,
-  instructionWarningParameter,
   instructionInvalidParameter,
 } from '../../ClassNames';
 import InlinePopover from '../../../InlinePopover';

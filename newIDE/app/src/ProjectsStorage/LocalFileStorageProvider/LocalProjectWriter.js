@@ -28,28 +28,26 @@ const deleteExistingFilesFromDirs = (
   project: gdProject,
   projectPath: string
 ) => {
-  const entries = fs.readdirSync(projectPath);
+  //If multiFile is not enabled in settings and directories do not exist.
+  if (!project.isFolderProject()) return;
 
-  if (project.isFolderProject()) {
-    //If multiFile enabled in settings and directories exist!
-    entries.forEach(entry => {
-      let dirPath = projectPath.concat('\\', entry);
-      if (
-        fs.statSync(dirPath).isDirectory() &&
-        splittedProjectFolderNames.includes(entry)
-      ) {
-        const filenames = fs.readdirSync(dirPath);
-        filenames.forEach(file => {
-          let result = dirPath.concat('\\', file);
-          try {
-            fs.unlinkSync(result);
-          } catch (e) {
-            throw new Error(`Unable to remove file ${file}: ${e.message}`);
-          }
-        });
-      }
-    });
-  }
+  const entries = fs.readdirSync(projectPath);
+  entries.forEach(entry => {
+    if (!splittedProjectFolderNames.includes(entry)) return;
+
+    const dirPath = path.join(projectPath, entry);
+    if (fs.statSync(dirPath).isDirectory()) {
+      const filenames = fs.readdirSync(dirPath);
+      filenames.forEach(file => {
+        const fileToRemovePath = path.join(dirPath, file);
+        try {
+          fs.unlinkSync(fileToRemovePath);
+        } catch (e) {
+          throw new Error(`Unable to remove file ${file}: ${e.message}`);
+        }
+      });
+    }
+  });
 };
 
 const checkFileContent = (filePath: string, expectedContent: string) => {

@@ -11,7 +11,7 @@ namespace gdjs {
    */
   export class MultiplayerObjectRuntimeBehavior extends gdjs.RuntimeBehavior {
     // Which player is the owner of the object.
-    // If 0, then the object is not owned by any player, so the server is the owner.
+    // If 0, then the object is not owned by any player, so the host is the owner.
     _playerNumber: number = 0;
     // The last time the object has been synchronized.
     // This is to avoid synchronizing the object too often, see _objectMaxTickRate.
@@ -61,6 +61,7 @@ namespace gdjs {
     // and old messages are ignored.
     _clock: number = 0;
     _destroyInstanceTimeoutId: NodeJS.Timeout | null = null;
+    _timeBeforeDestroyingObjectWithoutNetworkIdInMs = 500;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -75,8 +76,8 @@ namespace gdjs {
       // When a synchronized object is created, we assume it will be assigned a networkId quickly if:
       // - It is a new object created by the current player. -> will be assigned a networkId when sending the update message.
       // - It is an object created by another player. -> will be assigned a networkId when receiving the update message.
-      // There is a small risk that the object is created by us after we receive an update message from the server,
-      // ending up with 2 objects created, one with a networkId (from the server) and one without (from us).
+      // There is a small risk that the object is created by us after we receive an update message from the host,
+      // ending up with 2 objects created, one with a networkId (from the host) and one without (from us).
       // To handle this case and avoid having an object not synchronized, we set a timeout to destroy the object
       // if it has not been assigned a networkId after a short delay.
 
@@ -87,7 +88,7 @@ namespace gdjs {
           );
           owner.deleteFromScene(instanceContainer);
         }
-      }, 500);
+      }, this._timeBeforeDestroyingObjectWithoutNetworkIdInMs);
     }
 
     sendDataToPeersWithIncreasedClock(messageName: string, data: Object) {
@@ -99,12 +100,12 @@ namespace gdjs {
       }
     }
 
-    isOwnerAsPlayerOrServer() {
+    isOwnerAsPlayerOrHost() {
       const currentPlayerNumber = gdjs.multiplayer.getPlayerNumber();
 
       const isOwnerOfObject =
         currentPlayerNumber === this._playerNumber || // Player as owner.
-        (currentPlayerNumber === 1 && this._playerNumber === 0); // Server as owner.
+        (currentPlayerNumber === 1 && this._playerNumber === 0); // Host as owner.
 
       return isOwnerOfObject;
     }
@@ -230,7 +231,7 @@ namespace gdjs {
     }
 
     doStepPostEvents() {
-      if (!this.isOwnerAsPlayerOrServer()) {
+      if (!this.isOwnerAsPlayerOrHost()) {
         return;
       }
 
@@ -361,7 +362,7 @@ namespace gdjs {
         this._destroyInstanceTimeoutId = null;
       }
 
-      if (!this.isOwnerAsPlayerOrServer()) {
+      if (!this.isOwnerAsPlayerOrHost()) {
         return;
       }
 
@@ -448,7 +449,7 @@ namespace gdjs {
         );
         this._playerNumber = newPlayerNumber;
         if (newPlayerNumber !== gdjs.multiplayer.getPlayerNumber()) {
-          // If we are not the new owner, we should not send a message to the server to change the ownership.
+          // If we are not the new owner, we should not send a message to the host to change the ownership.
           // Just return and wait to receive an update message to reconcile this object.
           return;
         }
@@ -458,9 +459,9 @@ namespace gdjs {
       const objectName = this.owner.getName();
 
       if (instanceNetworkId) {
-        // When changing the ownership of an object with a networkId, we send a message to the server to ensure it is aware of the change,
+        // When changing the ownership of an object with a networkId, we send a message to the host to ensure it is aware of the change,
         // and can either accept it and broadcast it to other players, or reject it and do nothing with it.
-        // We expect an acknowledgment from the server, if not, we will retry and eventually revert the ownership.
+        // We expect an acknowledgment from the host, if not, we will retry and eventually revert the ownership.
         const {
           messageName,
           messageData,
@@ -490,7 +491,7 @@ namespace gdjs {
             },
             expectedMessageName: changeOwnerAcknowledgedMessageName,
             otherPeerIds,
-            // If we are not the server, we should revert the ownership if the server does not acknowledge the change.
+            // If we are not the host, we should revert the ownership if the host does not acknowledge the change.
             shouldCancelMessageIfTimesOut: currentPlayerNumber !== 1,
           });
         }
@@ -501,9 +502,9 @@ namespace gdjs {
 
       // We also update the ownership locally, so the object can be used immediately.
       // This is a prediction to allow snappy interactions.
-      // If we are player 1 or server, we will have the ownership immediately anyway.
-      // If we are another player, we will have the ownership as soon as the server acknowledges the change.
-      // If the server does not send an acknowledgment, we will revert the ownership.
+      // If we are player 1 or host, we will have the ownership immediately anyway.
+      // If we are another player, we will have the ownership as soon as the host acknowledges the change.
+      // If the host does not send an acknowledgment, we will revert the ownership.
       this._playerNumber = newPlayerNumber;
 
       // If we are the new owner, also send directly an update of the position,
@@ -536,9 +537,17 @@ namespace gdjs {
       return this._playerNumber;
     }
 
+    isObjectOwnedByCurrentPlayer(): boolean {
+      return this.isOwnerAsPlayerOrHost();
+    }
+
     removeObjectOwnership() {
-      // 0 means the server is the owner.
+      // 0 means the host is the owner.
       this.setPlayerObjectOwnership(0);
+    }
+
+    takeObjectOwnership() {
+      this.setPlayerObjectOwnership(gdjs.multiplayer.getPlayerNumber());
     }
   }
   gdjs.registerBehavior(

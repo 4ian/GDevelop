@@ -108,7 +108,7 @@ namespace gdjs {
       maxNumberOfRetries?: number;
       messageRetryTime?: number;
     }) => {
-      if (!gdjs.multiplayer.isGameRunning) {
+      if (!gdjs.multiplayer.isGameRunning()) {
         // This can happen if objects are destroyed at the end of the scene.
         // We should not add expected messages in this case.
         return;
@@ -418,17 +418,14 @@ namespace gdjs {
             const currentPlayerObjectOwnership = behavior.getPlayerObjectOwnership();
             // Change is coherent if:
             const ownershipChangeIsCoherent =
-              // the object is changing ownership from the same owner the server knew about,
+              // the object is changing ownership from the same owner the host knew about,
               currentPlayerObjectOwnership === previousOwner ||
               // the object is already owned by the new owner. (may have been changed by another player faster)
               currentPlayerObjectOwnership === newOwner;
-            if (
-              gdjs.multiplayer.isPlayerServer() &&
-              !ownershipChangeIsCoherent
-            ) {
+            if (gdjs.multiplayer.isPlayerHost() && !ownershipChangeIsCoherent) {
               // We received an ownership change message for an object which is in an unexpected state.
               // There may be some lag, and multiple ownership changes may have been sent by the other players.
-              // As the server, let's not change the ownership and let the player revert it.
+              // As the host, let's not change the ownership and let the player revert it.
               logger.warn(
                 `Object ${objectName} with instance network ID ${instanceNetworkId} does not have the expected owner. Wanted to change from ${previousOwner} to ${newOwner}, but object has owner ${currentPlayerObjectOwnership}.`
               );
@@ -451,10 +448,10 @@ namespace gdjs {
             // Once the object ownership has changed, we need to acknowledge it to the player who sent this message.
             sendDataTo(messageSender, ownerChangedMessageName, {});
 
-            // If we are the server,
+            // If we are the host,
             // so we need to relay the ownership change to others,
             // and expect an acknowledgment from them.
-            if (gdjs.multiplayer.isPlayerServer()) {
+            if (gdjs.multiplayer.isPlayerHost()) {
               const connectedPeerIds = gdjs.evtTools.p2p.getAllPeers();
               // We don't need to send the message to the player who sent the ownership change message.
               const otherPeerIds = connectedPeerIds.filter(
@@ -470,7 +467,7 @@ namespace gdjs {
                 originalData: data,
                 expectedMessageName: ownerChangedMessageName,
                 otherPeerIds,
-                // As we are the server, we do not cancel the message if it times out.
+                // As we are the host, we do not cancel the message if it times out.
                 shouldCancelMessageIfTimesOut: false,
               });
               for (const peerId of otherPeerIds) {
@@ -605,9 +602,9 @@ namespace gdjs {
               instanceNetworkId
             ] = messageInstanceClock;
 
-            // If we are are the server,
+            // If we are are the host,
             // we need to relay the position to others except the player who sent the update message.
-            if (gdjs.multiplayer.isPlayerServer()) {
+            if (gdjs.multiplayer.isPlayerHost()) {
               const connectedPeerIds = gdjs.evtTools.p2p.getAllPeers();
               // We don't need to send the message to the player who sent the update message.
               for (const peerId of connectedPeerIds) {
@@ -935,9 +932,9 @@ namespace gdjs {
             // Once the object is destroyed, we need to acknowledge it to the player who sent the destroy message.
             sendDataTo(messageSender, destroyedMessageName, {});
 
-            // If we are the server, we need to relay the destruction to others.
+            // If we are the host, we need to relay the destruction to others.
             // And expect an acknowledgment from everyone else as well.
-            if (gdjs.multiplayer.isPlayerServer()) {
+            if (gdjs.multiplayer.isPlayerHost()) {
               const connectedPeerIds = gdjs.evtTools.p2p.getAllPeers();
               // We don't need to send the message to the player who sent the destroy message.
               const otherPeerIds = connectedPeerIds.filter(
@@ -1016,9 +1013,9 @@ namespace gdjs {
         sendDataTo(peerId, messageName, messageData);
       }
 
-      // If we are the server, we can consider this messaged as received
+      // If we are the host, we can consider this messaged as received
       // and add it to the list of custom messages to process on top of the messages received.
-      if (gdjs.multiplayer.isPlayerServer()) {
+      if (gdjs.multiplayer.isPlayerHost()) {
         const message = gdjs.evtTools.p2p.getEvent(messageName);
         message.pushData(
           new gdjs.evtTools.p2p.EventData(
@@ -1119,9 +1116,9 @@ namespace gdjs {
           );
           sendDataTo(messageSender, acknowledgmentMessageName, {});
 
-          // If we are the server,
+          // If we are the host,
           // so we need to relay the message to others.
-          if (gdjs.multiplayer.isPlayerServer()) {
+          if (gdjs.multiplayer.isPlayerHost()) {
             // In the case of custom messages, we relay the message to all players, including the sender.
             // This allows the sender to process it the same way others would, when they receive the event.
             const connectedPeerIds = gdjs.evtTools.p2p.getAllPeers();
@@ -1186,8 +1183,8 @@ namespace gdjs {
     const handleUpdateSceneMessages = (
       runtimeScene: gdjs.RuntimeScene
     ): void => {
-      // Only the server synchronizes the scene state.
-      if (!gdjs.multiplayer.isPlayerServer()) {
+      // Only the host synchronizes the scene state.
+      if (!gdjs.multiplayer.isPlayerHost()) {
         return;
       }
       const sceneNetworkSyncData = runtimeScene.getNetworkSyncData();
@@ -1285,8 +1282,8 @@ namespace gdjs {
     const handleUpdateGameMessages = (
       runtimeScene: gdjs.RuntimeScene
     ): void => {
-      // Only the server synchronizes the global state.
-      if (!gdjs.multiplayer.isPlayerServer()) {
+      // Only the host synchronizes the global state.
+      if (!gdjs.multiplayer.isPlayerHost()) {
         return;
       }
       const gameNetworkSyncData = runtimeScene.getGame().getNetworkSyncData();

@@ -7,7 +7,12 @@ namespace gdjs {
     /** Set to true in testing to avoid relying on the multiplayer extension. */
     export let disableMultiplayerForTesting = false;
 
+    let _isGameRegistered: boolean | null = null;
+    let _isCheckingIfGameIsRegistered = false;
+    let _isWaitingForLoginCallback = false;
+
     let _hasGameJustStarted = false;
+    export let _isGameRunning = false;
     let _hasGameJustEnded = false;
     let _lobbyId: string | null = null;
     let _connectionId: string | null = null;
@@ -31,7 +36,6 @@ namespace gdjs {
     let _heartbeatInterval: NodeJS.Timeout | null = null;
 
     export let playerNumber: number | null = null;
-    export let isGameRunning = false;
 
     gdjs.registerRuntimeScenePreEventsCallback(
       (runtimeScene: gdjs.RuntimeScene) => {
@@ -115,6 +119,8 @@ namespace gdjs {
      */
     export const hasGameJustStarted = () => _hasGameJustStarted;
 
+    export const isGameRunning = () => _isGameRunning;
+
     /**
      * Returns true if the game has just ended,
      * useful to switch back to to the main menu.
@@ -146,9 +152,9 @@ namespace gdjs {
     };
 
     /**
-     * Returns true if the player is the server in the lobby. Here, player 1.
+     * Returns true if the player is the host in the lobby. Here, player 1.
      */
-    export const isPlayerServer = () => {
+    export const isPlayerHost = () => {
       return playerNumber === 1;
     };
 
@@ -629,7 +635,7 @@ namespace gdjs {
       );
 
       // Prevent the player from leaving the lobby while the game is starting.
-      multiplayerComponents.hideLobbiesCloseArrow(runtimeScene);
+      multiplayerComponents.hideLobbiesCloseButtonTemporarily(runtimeScene);
     };
 
     /**
@@ -638,7 +644,7 @@ namespace gdjs {
      */
     const handleGameStartedEvent = function (runtimeScene: gdjs.RuntimeScene) {
       _hasGameJustStarted = true;
-      isGameRunning = true;
+      _isGameRunning = true;
       _lobbyOnGameStart = _lobby;
       removeLobbiesContainer(runtimeScene);
       focusOnGame(runtimeScene);
@@ -650,7 +656,7 @@ namespace gdjs {
      */
     const handleGameEndedEvent = function () {
       _hasGameJustEnded = true;
-      isGameRunning = false;
+      _isGameRunning = false;
 
       // Disconnect from any P2P connections.
       gdjs.evtTools.p2p.disconnectFromAllPeers();
@@ -860,11 +866,54 @@ namespace gdjs {
     /**
      * Action to display the lobbies window to the user.
      */
-    export const openLobbiesWindow = function (
+    export const openLobbiesWindow = async (
       runtimeScene: gdjs.RuntimeScene
-    ) {
+    ) => {
       if (isLobbiesWindowOpen(runtimeScene)) {
         return;
+      }
+
+      const _gameId = gdjs.projectData.properties.projectUuid;
+      if (!_gameId) {
+        handleLobbiesError(
+          runtimeScene,
+          'The game ID is missing, the lobbies window cannot be opened.'
+        );
+        return;
+      }
+
+      logger.info(_isCheckingIfGameIsRegistered, _isWaitingForLoginCallback);
+
+      if (_isCheckingIfGameIsRegistered || _isWaitingForLoginCallback) {
+        // The action is called multiple times, let's prevent that.
+        return;
+      }
+
+      if (_isGameRegistered === null) {
+        logger.info('Checking if the game is registered.');
+        _isCheckingIfGameIsRegistered = true;
+        try {
+          const isGameRegistered = await checkIfGameIsRegistered(
+            runtimeScene.getGame(),
+            _gameId
+          );
+          logger.info('Game registration:', isGameRegistered);
+          _isGameRegistered = isGameRegistered;
+        } catch (error) {
+          _isGameRegistered = false;
+          logger.error(
+            'Error while checking if the game is registered:',
+            error
+          );
+          handleLobbiesError(
+            runtimeScene,
+            'Error while checking if the game is registered.'
+          );
+          logger.error(error);
+          return;
+        } finally {
+          _isCheckingIfGameIsRegistered = false;
+        }
       }
 
       // Create the lobbies container for the player to wait.
@@ -884,21 +933,14 @@ namespace gdjs {
         removeLobbiesContainer(runtimeScene);
       };
 
-      const _gameId = gdjs.projectData.properties.projectUuid;
-      if (!_gameId) {
-        handleLobbiesError(
-          runtimeScene,
-          'The game ID is missing, the lobbies window cannot be opened.'
-        );
-        return;
-      }
-
       const playerId = gdjs.playerAuthentication.getUserId();
       const playerToken = gdjs.playerAuthentication.getUserToken();
-      if (!playerId || !playerToken) {
+      if (_isGameRegistered && (!playerId || !playerToken)) {
+        _isWaitingForLoginCallback = true;
         gdjs.playerAuthentication.openAuthenticationWindow(runtimeScene);
         // Create a callback to open the lobbies window once the player is connected.
         gdjs.playerAuthentication.setLoginCallback(() => {
+          _isWaitingForLoginCallback = false;
           openLobbiesWindow(runtimeScene);
         });
         return;
@@ -911,37 +953,27 @@ namespace gdjs {
 
       // If the game is registered, open the lobbies window.
       // Otherwise, open the window indicating that the game is not registered.
-      checkIfGameIsRegistered(runtimeScene.getGame(), _gameId)
-        .then((isGameRegistered) => {
-          const electron = runtimeScene.getGame().getRenderer().getElectron();
-          const wikiOpenAction = electron
-            ? () =>
-                electron.shell.openExternal(
-                  'https://wiki.gdevelop.io/gdevelop5/publishing/web'
-                )
-            : () =>
-                window.open(
-                  'https://wiki.gdevelop.io/gdevelop5/publishing/web',
-                  '_blank'
-                );
+      const electron = runtimeScene.getGame().getRenderer().getElectron();
+      const wikiOpenAction = electron
+        ? () =>
+            electron.shell.openExternal(
+              'https://wiki.gdevelop.io/gdevelop5/publishing/web'
+            )
+        : () =>
+            window.open(
+              'https://wiki.gdevelop.io/gdevelop5/publishing/web',
+              '_blank'
+            );
 
-          multiplayerComponents.addTextsToLoadingContainer(
-            runtimeScene,
-            isGameRegistered,
-            wikiOpenAction
-          );
+      multiplayerComponents.addTextsToLoadingContainer(
+        runtimeScene,
+        _isGameRegistered,
+        wikiOpenAction
+      );
 
-          if (isGameRegistered) {
-            openLobbiesIframe(runtimeScene, _gameId);
-          }
-        })
-        .catch((error) => {
-          handleLobbiesError(
-            runtimeScene,
-            'Error while checking if the game is registered.'
-          );
-          logger.error(error);
-        });
+      if (_isGameRegistered) {
+        openLobbiesIframe(runtimeScene, _gameId);
+      }
     };
 
     /**
@@ -954,6 +986,16 @@ namespace gdjs {
         runtimeScene
       );
       return !!lobbiesRootContainer;
+    };
+
+    export const showLobbiesCloseButton = function (
+      runtimeScene: gdjs.RuntimeScene,
+      visible: boolean
+    ) {
+      multiplayerComponents.changeLobbiesWindowCloseActionVisibility(
+        runtimeScene,
+        visible
+      );
     };
 
     /**

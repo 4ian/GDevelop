@@ -247,12 +247,12 @@ describe('Multiplayer', () => {
   beforeEach(() => {
     _originalP2pIfAny = gdjs.evtTools.p2p;
     gdjs.multiplayer.disableMultiplayerForTesting = false;
-    gdjs.multiplayer.isGameRunning = true;
+    gdjs.multiplayer._isGameRunning = true;
   });
   afterEach(() => {
     gdjs.evtTools.p2p = _originalP2pIfAny;
     gdjs.multiplayer.disableMultiplayerForTesting = true;
-    gdjs.multiplayer.isGameRunning = false;
+    gdjs.multiplayer._isGameRunning = false;
   });
 
   it('synchronizes scene/global variables from the server to other players', () => {

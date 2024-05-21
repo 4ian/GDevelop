@@ -61,6 +61,35 @@ module.exports = {
 
     extension
       .addAction(
+        'ShowLobbiesWindowCloseAction',
+        _('Show (or hide) lobbies window close action'),
+        _(
+          'Show or hide the close button in the lobbies window. The cross is shown by default.'
+        ),
+        _('Show lobbies window close action: _PARAM1_'),
+        '',
+        'JsPlatform/Extensions/multiplayer.svg',
+        'JsPlatform/Extensions/multiplayer.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('yesorno', _('Show close button'), '', false)
+      .setHelpPath('/all-features/multiplayer')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
+      .setFunctionName('gdjs.multiplayer.showLobbiesCloseButton');
+
+    extension
+      .addAction(
         'EndLobbyGame',
         _('End Lobby Game'),
         _(
@@ -91,7 +120,7 @@ module.exports = {
         'SendMessage',
         _('Send custom message to other players'),
         _(
-          "Send a custom message to other players in the lobby, with an automatic retry system if it hasn't been received. Use with the condition 'Message has been received' to know when the message has been properly processed by the server."
+          "Send a custom message to other players in the lobby, with an automatic retry system if it hasn't been received. Use with the condition 'Message has been received' to know when the message has been properly processed by the host."
         ),
         _('Send message _PARAM0_ to other players with content _PARAM1_'),
         '',
@@ -163,6 +192,30 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
       .setFunctionName('gdjs.multiplayer.hasGameJustStarted');
+
+    extension
+      .addCondition(
+        'IsGameRunning',
+        _('Lobby game is running'),
+        _('Check if the lobby game is running.'),
+        _('Lobby game is running'),
+        '',
+        'JsPlatform/Extensions/multiplayer.svg',
+        'JsPlatform/Extensions/multiplayer.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
+      .setFunctionName('gdjs.multiplayer.isGameRunning');
 
     extension
       .addCondition(
@@ -241,10 +294,10 @@ module.exports = {
 
     extension
       .addCondition(
-        'isPlayerServer',
-        _('Player is server'),
-        _('Check if the player is the server. (Player 1 is the server)'),
-        _('Player is server'),
+        'isPlayerHost',
+        _('Player is host'),
+        _('Check if the player is the host. (Player 1 is the host)'),
+        _('Player is host'),
         '',
         'JsPlatform/Extensions/multiplayer.svg',
         'JsPlatform/Extensions/multiplayer.svg'
@@ -261,7 +314,7 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .setFunctionName('gdjs.multiplayer.isPlayerServer');
+      .setFunctionName('gdjs.multiplayer.isPlayerHost');
 
     extension
       .addStrExpression(
@@ -461,11 +514,55 @@ module.exports = {
       .setGetter('getPlayerObjectOwnership');
 
     behavior
+      .addScopedCondition(
+        'IsObjectOwnedByCurrentPlayer',
+        _('Is object owned by current player'),
+        _(
+          'Check if the object is owned by the current player, as a player or the host.'
+        ),
+        _('Object _PARAM0_ is owned by current player'),
+        '',
+        'JsPlatform/Extensions/multiplayer.svg',
+        'JsPlatform/Extensions/multiplayer.svg'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter(
+        'behavior',
+        _('Behavior'),
+        'MultiplayerObjectBehavior',
+        false
+      )
+      .markAsAdvanced()
+      .setFunctionName('isObjectOwnedByCurrentPlayer');
+
+    behavior
+      .addScopedAction(
+        'TakeObjectOwnership',
+        _('Take ownership of object'),
+        _(
+          'Take the ownership of the object. It will then be synchronized to other players, with the current player as the owner.'
+        ),
+        _('Take ownership of _PARAM0_'),
+        '',
+        'JsPlatform/Extensions/multiplayer.svg',
+        'JsPlatform/Extensions/multiplayer.svg'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter(
+        'behavior',
+        _('Behavior'),
+        'MultiplayerObjectBehavior',
+        false
+      )
+      .markAsAdvanced()
+      .setFunctionName('takeObjectOwnership');
+
+    behavior
       .addScopedAction(
         'RemoveObjectOwnership',
         _('Remove object ownership'),
         _(
-          'Remove the ownership of the object from the player. It will still be synchronized to other players, but the server owns it.'
+          'Remove the ownership of the object from the player. It will still be synchronized to other players, but the host owns it.'
         ),
         _('Remove ownership of _PARAM0_'),
         '',

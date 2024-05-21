@@ -9,6 +9,8 @@ namespace gdjs {
     const lobbiesIframeContainerId = 'lobbies-iframe-container';
     const lobbiesIframeId = 'lobbies-iframe';
 
+    let canLobbyBeClosed = true;
+
     export const getDomElementContainer = (
       runtimeScene: gdjs.RuntimeScene
     ): HTMLDivElement | null => {
@@ -166,6 +168,10 @@ namespace gdjs {
         'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOCIgaGVpZ2h0PSI4IiB2aWV3Qm94PSIwIDAgOCA4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTcuODUzNTUgMC4xNDY0NDdDOC4wNDg4MiAwLjM0MTcwOSA4LjA0ODgyIDAuNjU4MjkxIDcuODUzNTUgMC44NTM1NTNMMC44NTM1NTMgNy44NTM1NUMwLjY1ODI5MSA4LjA0ODgyIDAuMzQxNzA5IDguMDQ4ODIgMC4xNDY0NDcgNy44NTM1NUMtMC4wNDg4MTU1IDcuNjU4MjkgLTAuMDQ4ODE1NSA3LjM0MTcxIDAuMTQ2NDQ3IDcuMTQ2NDVMNy4xNDY0NSAwLjE0NjQ0N0M3LjM0MTcxIC0wLjA0ODgxNTUgNy42NTgyOSAtMC4wNDg4MTU1IDcuODUzNTUgMC4xNDY0NDdaIiBmaWxsPSIjMUQxRDI2Ii8+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMC4xNDY0NDcgMC4xNDY0NDdDMC4zNDE3MDkgLTAuMDQ4ODE1NSAwLjY1ODI5MSAtMC4wNDg4MTU1IDAuODUzNTUzIDAuMTQ2NDQ3TDcuODUzNTUgNy4xNDY0NUM4LjA0ODgyIDcuMzQxNzEgOC4wNDg4MiA3LjY1ODI5IDcuODUzNTUgNy44NTM1NUM3LjY1ODI5IDguMDQ4ODIgNy4zNDE3MSA4LjA0ODgyIDcuMTQ2NDUgNy44NTM1NUwwLjE0NjQ0NyAwLjg1MzU1M0MtMC4wNDg4MTU1IDAuNjU4MjkxIC0wLjA0ODgxNTUgMC4zNDE3MDkgMC4xNDY0NDcgMC4xNDY0NDdaIiBmaWxsPSIjMUQxRDI2Ii8+Cjwvc3ZnPgo='
       );
       _closeContainer.appendChild(_close);
+
+      if (!canLobbyBeClosed) {
+        _closeContainer.style.visibility = 'hidden';
+      }
 
       const loaderContainer: HTMLDivElement = document.createElement('div');
       loaderContainer.id = lobbiesLoaderContainerId;
@@ -349,20 +355,37 @@ namespace gdjs {
       rootContainer.remove();
     };
 
-    export const hideLobbiesCloseArrow = function (
-      runtimeScene: gdjs.RuntimeScene
+    export const changeLobbiesWindowCloseActionVisibility = function (
+      runtimeScene: gdjs.RuntimeScene,
+      canClose: boolean
     ) {
+      canLobbyBeClosed = canClose;
+
       const closeContainer = getLobbiesCloseContainer(runtimeScene);
       if (!closeContainer) {
         return;
       }
 
-      closeContainer.style.display = 'none';
+      closeContainer.style.visibility = canClose ? 'inherit' : 'hidden';
+    };
+
+    export const hideLobbiesCloseButtonTemporarily = function (
+      runtimeScene: gdjs.RuntimeScene
+    ) {
+      if (!canLobbyBeClosed) return;
+
+      const closeContainer = getLobbiesCloseContainer(runtimeScene);
+      if (!closeContainer) {
+        return;
+      }
+
+      closeContainer.style.visibility = 'hidden';
+
       // There is a risk a player leaves the lobby before the end of the countdown,
       // so we show the close container again after 5 seconds in case this happens,
       // to allow the player to leave the lobby.
       setTimeout(() => {
-        closeContainer.style.display = 'flex';
+        closeContainer.style.visibility = 'inherit';
       }, 5000);
     };
 

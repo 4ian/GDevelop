@@ -378,6 +378,7 @@ namespace gdjs {
       userToken: string;
     }) => {
       saveAuthKeyToStorage({ userId, username, userToken });
+      _loginCallbacks.forEach((callback) => callback());
       cleanUpAuthWindowAndCallbacks(runtimeScene);
       removeAuthenticationBanner(runtimeScene);
 
@@ -396,10 +397,6 @@ namespace gdjs {
         domElementContainer,
         _username || 'Anonymous'
       );
-
-      _loginCallbacks.forEach((callback) => callback());
-      // Clear the callbacks, as they are only called once.
-      _loginCallbacks = [];
     };
 
     /**

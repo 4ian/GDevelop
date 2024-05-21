@@ -38,12 +38,41 @@ namespace gdjs {
 
   export type TextObjectData = ObjectData & TextObjectDataType;
 
+  export type TextObjectNetworkSyncDataType = {
+    str: string;
+    o: float;
+    cs: number;
+    fn: string;
+    b: boolean;
+    i: boolean;
+    u: boolean;
+    c: number[];
+    scale: number;
+    ta: string;
+    wrap: boolean;
+    wrapw: float;
+    oena: boolean;
+    ot: float;
+    oc: number[];
+    sh: boolean;
+    shc: number[];
+    sho: float;
+    shd: float;
+    sha: float;
+    shb: float;
+    pad: integer;
+  };
+
+  export type TextObjectNetworkSyncData = ObjectNetworkSyncData &
+    TextObjectNetworkSyncDataType;
+
   /**
    * Displays a text.
    */
   export class TextRuntimeObject
     extends gdjs.RuntimeObject
-    implements gdjs.TextContainer, gdjs.OpacityHandler {
+    implements gdjs.TextContainer, gdjs.OpacityHandler
+  {
     _characterSize: number;
     _fontName: string;
     _bold: boolean;
@@ -175,6 +204,117 @@ namespace gdjs {
         this.setShadowBlurRadius(newContent.shadowBlurRadius);
       }
       return true;
+    }
+
+    getObjectNetworkSyncData(): TextObjectNetworkSyncData {
+      return {
+        ...super.getObjectNetworkSyncData(),
+        str: this._str,
+        o: this.opacity,
+        cs: this._characterSize,
+        fn: this._fontName,
+        b: this._bold,
+        i: this._italic,
+        u: this._underlined,
+        c: this._color,
+        scale: this.getScale(),
+        ta: this._textAlign,
+        wrap: this._wrapping,
+        wrapw: this._wrappingWidth,
+        oena: this._isOutlineEnabled,
+        ot: this._outlineThickness,
+        oc: this._outlineColor,
+        sh: this._shadow,
+        shc: this._shadowColor,
+        sho: this._shadowOpacity,
+        shd: this._shadowDistance,
+        sha: this._shadowAngle,
+        shb: this._shadowBlur,
+        pad: this._padding,
+      };
+    }
+
+    updateFromObjectNetworkSyncData(
+      networkSyncData: TextObjectNetworkSyncData
+    ): void {
+      super.updateFromObjectNetworkSyncData(networkSyncData);
+      if (networkSyncData.str !== undefined) {
+        this.setText(networkSyncData.str);
+      }
+      if (networkSyncData.x !== undefined) {
+        // It's important to call this function if x changes as it will update the renderer.
+        this.setX(networkSyncData.x);
+      }
+      if (networkSyncData.y !== undefined) {
+        // It's important to call this function if y changes as it will update the renderer.
+        this.setY(networkSyncData.y);
+      }
+      if (networkSyncData.a !== undefined) {
+        this.setAngle(networkSyncData.a);
+      }
+      if (networkSyncData.o !== undefined) {
+        this.setOpacity(networkSyncData.o);
+      }
+      if (networkSyncData.cs !== undefined) {
+        this.setCharacterSize(networkSyncData.cs);
+      }
+      if (networkSyncData.fn !== undefined) {
+        this.setFontName(networkSyncData.fn);
+      }
+      if (networkSyncData.b !== undefined) {
+        this.setBold(networkSyncData.b);
+      }
+      if (networkSyncData.i !== undefined) {
+        this.setItalic(networkSyncData.i);
+      }
+      if (networkSyncData.u !== undefined) {
+        this._underlined = networkSyncData.u;
+      }
+      if (networkSyncData.c !== undefined) {
+        this._color = networkSyncData.c;
+      }
+      if (networkSyncData.scale !== undefined) {
+        this.setScale(networkSyncData.scale);
+      }
+      if (networkSyncData.ta !== undefined) {
+        this.setTextAlignment(networkSyncData.ta);
+      }
+      if (networkSyncData.wrap !== undefined) {
+        this.setWrapping(networkSyncData.wrap);
+      }
+      if (networkSyncData.wrapw !== undefined) {
+        this.setWrappingWidth(networkSyncData.wrapw);
+      }
+      if (networkSyncData.oena !== undefined) {
+        this.setOutlineEnabled(networkSyncData.oena);
+      }
+      if (networkSyncData.ot !== undefined) {
+        this.setOutlineThickness(networkSyncData.ot);
+      }
+      if (networkSyncData.oc !== undefined) {
+        this._outlineColor = networkSyncData.oc;
+      }
+      if (networkSyncData.sh !== undefined) {
+        this.showShadow(networkSyncData.sh);
+      }
+      if (networkSyncData.shc !== undefined) {
+        this._shadowColor = networkSyncData.shc;
+      }
+      if (networkSyncData.sho !== undefined) {
+        this.setShadowOpacity(networkSyncData.sho);
+      }
+      if (networkSyncData.shd !== undefined) {
+        this.setShadowDistance(networkSyncData.shd);
+      }
+      if (networkSyncData.sha !== undefined) {
+        this.setShadowAngle(networkSyncData.sha);
+      }
+      if (networkSyncData.shb !== undefined) {
+        this.setShadowBlurRadius(networkSyncData.shb);
+      }
+      if (networkSyncData.pad !== undefined) {
+        this.setPadding(networkSyncData.pad);
+      }
     }
 
     getRendererObject() {

@@ -805,8 +805,6 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     REQUIRE(changeset.oldToNewVariableNames.find("MyLocalVariable")->second ==
             "MyRenamedLocalVariable");
 
-    gd::LogMessage("OTHER TEST START");
-
     gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
         project, event.GetVariables(), changeset);
 
@@ -852,12 +850,8 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     REQUIRE(changeset.oldToNewVariableNames.find("MyLocalVariable")->second ==
             "MyRenamedLocalVariable");
 
-    gd::LogMessage("TEST START");
-
     gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
         project, event.GetVariables(), changeset);
-
-    gd::LogMessage("TEST END");
 
     REQUIRE(subEvent.GetActions()[0].GetParameter(0).GetPlainString() == "MyRenamedLocalVariable");
   }

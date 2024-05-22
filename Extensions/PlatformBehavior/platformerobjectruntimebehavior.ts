@@ -162,6 +162,10 @@ namespace gdjs {
     }
 
     getNetworkSyncData() {
+      // This method is called, so we are synchronizing this object.
+      // Let's clear the inputs between frames as we control it.
+      this._dontClearInputsBetweenFrames = false;
+
       return {
         ...super.getNetworkSyncData(),
         props: {

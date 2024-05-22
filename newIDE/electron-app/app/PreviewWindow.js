@@ -2,6 +2,7 @@ const {
   BrowserWindow, // Module to create native browser window.
   ipcMain,
   shell,
+  screen,
 } = require('electron');
 const isDev = require('electron-is').dev();
 const { load } = require('./Utils/UrlLoader');
@@ -24,32 +25,18 @@ const openPreviewWindow = ({
   numberOfWindows,
 }) => {
   // If opening multiple windows at once, place them across the screen.
-  const parentWindowPosition = parentWindow.getPosition();
-  const screenWidth = parentWindow.getSize()[0];
-  const screenHeight = parentWindow.getSize()[1];
-  console.log('parentWindowPosition', parentWindowPosition);
-  console.log('screenWidth', screenWidth);
+  const screenSize = screen.getPrimaryDisplay().workAreaSize;
+  const screenWidth = screenSize.width;
+  const screenHeight = screenSize.height;
   const positions = {
     // top-left
-    1: {
-      x: parentWindowPosition[0],
-      y: parentWindowPosition[1],
-    },
+    1: { x: 0, y: 0 },
     // top-right
-    2: {
-      x: parentWindowPosition[0] + screenWidth / 2,
-      y: parentWindowPosition[1],
-    },
+    2: { x: screenWidth / 2, y: 0 },
     // bottom-left
-    3: {
-      x: parentWindowPosition[0],
-      y: parentWindowPosition[1] + screenHeight / 2,
-    },
+    3: { x: 0, y: screenHeight / 2 },
     // bottom-right
-    4: {
-      x: parentWindowPosition[0] + screenWidth / 2,
-      y: parentWindowPosition[1] + screenHeight / 2,
-    },
+    4: { x: screenWidth / 2, y: screenHeight / 2 },
   };
   for (let i = 0; i < numberOfWindows; i++) {
     const browserWindowOptions = {

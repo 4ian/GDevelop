@@ -21,6 +21,7 @@ namespace gdjs {
     sx: float;
     sy: float;
     op: float;
+    color: string;
   };
 
   export type SpriteNetworkSyncData = ObjectNetworkSyncData &
@@ -115,6 +116,7 @@ namespace gdjs {
         sx: this._scaleX,
         sy: this._scaleY,
         op: this.opacity,
+        color: this.getColor(),
       };
     }
 
@@ -146,6 +148,9 @@ namespace gdjs {
         newNetworkSyncData.anim !== undefined
       ) {
         this.invalidateHitboxes();
+      }
+      if (newNetworkSyncData.color !== undefined) {
+        this.setColor(newNetworkSyncData.color);
       }
     }
 

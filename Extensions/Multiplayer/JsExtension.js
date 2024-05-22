@@ -62,11 +62,9 @@ module.exports = {
     extension
       .addAction(
         'ShowLobbiesWindowCloseAction',
-        _('Show (or hide) lobbies window close action'),
-        _(
-          'Show or hide the close button in the lobbies window. The cross is shown by default.'
-        ),
-        _('Show lobbies window close action: _PARAM1_'),
+        _('Allow players to close the lobbies window'),
+        _('Allow players to close the lobbies window. Allowed by default.'),
+        _('Allow players to close the lobbies window: _PARAM1_'),
         '',
         'JsPlatform/Extensions/multiplayer.svg',
         'JsPlatform/Extensions/multiplayer.svg'

@@ -84,6 +84,10 @@ namespace gdjs {
     }
 
     getNetworkSyncData() {
+      // This method is called, so we are synchronizing this object.
+      // Let's clear the inputs between frames as we control it.
+      this._dontClearInputsBetweenFrames = false;
+
       return {
         ...super.getNetworkSyncData(),
         props: {
@@ -142,8 +146,6 @@ namespace gdjs {
 
       // When the object is synchronized from the network, the inputs must not be cleared.
       this._dontClearInputsBetweenFrames = true;
-      // And we are not using the default controls.
-      this._ignoreDefaultControls = true;
     }
 
     updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {

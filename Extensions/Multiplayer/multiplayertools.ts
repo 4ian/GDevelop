@@ -869,7 +869,10 @@ namespace gdjs {
     export const openLobbiesWindow = async (
       runtimeScene: gdjs.RuntimeScene
     ) => {
-      if (isLobbiesWindowOpen(runtimeScene)) {
+      if (
+        isLobbiesWindowOpen(runtimeScene) ||
+        gdjs.playerAuthentication.isAuthenticationWindowOpen()
+      ) {
         return;
       }
 
@@ -882,15 +885,49 @@ namespace gdjs {
         return;
       }
 
-      logger.info(_isCheckingIfGameIsRegistered, _isWaitingForLoginCallback);
-
       if (_isCheckingIfGameIsRegistered || _isWaitingForLoginCallback) {
         // The action is called multiple times, let's prevent that.
         return;
       }
 
+      // Create the lobbies container for the player to wait.
+      const domElementContainer = runtimeScene
+        .getGame()
+        .getRenderer()
+        .getDomElementContainer();
+      if (!domElementContainer) {
+        handleLobbiesError(
+          runtimeScene,
+          "The div element covering the game couldn't be found, the lobbies window cannot be displayed."
+        );
+        return;
+      }
+
+      const onLobbiesContainerDismissed = () => {
+        removeLobbiesContainer(runtimeScene);
+      };
+
+      const playerId = gdjs.playerAuthentication.getUserId();
+      const playerToken = gdjs.playerAuthentication.getUserToken();
+      if (!playerId || !playerToken) {
+        _isWaitingForLoginCallback = true;
+        gdjs.playerAuthentication.openAuthenticationWindow(runtimeScene);
+        // Create a callback to open the lobbies window once the player is connected.
+        gdjs.playerAuthentication.setLoginCallback(() => {
+          _isWaitingForLoginCallback = false;
+          openLobbiesWindow(runtimeScene);
+        });
+        return;
+      }
+
+      multiplayerComponents.displayLobbies(
+        runtimeScene,
+        onLobbiesContainerDismissed
+      );
+
+      // If the game is registered, open the lobbies window.
+      // Otherwise, open the window indicating that the game is not registered.
       if (_isGameRegistered === null) {
-        logger.info('Checking if the game is registered.');
         _isCheckingIfGameIsRegistered = true;
         try {
           const isGameRegistered = await checkIfGameIsRegistered(
@@ -915,44 +952,6 @@ namespace gdjs {
           _isCheckingIfGameIsRegistered = false;
         }
       }
-
-      // Create the lobbies container for the player to wait.
-      const domElementContainer = runtimeScene
-        .getGame()
-        .getRenderer()
-        .getDomElementContainer();
-      if (!domElementContainer) {
-        handleLobbiesError(
-          runtimeScene,
-          "The div element covering the game couldn't be found, the lobbies window cannot be displayed."
-        );
-        return;
-      }
-
-      const onLobbiesContainerDismissed = () => {
-        removeLobbiesContainer(runtimeScene);
-      };
-
-      const playerId = gdjs.playerAuthentication.getUserId();
-      const playerToken = gdjs.playerAuthentication.getUserToken();
-      if (_isGameRegistered && (!playerId || !playerToken)) {
-        _isWaitingForLoginCallback = true;
-        gdjs.playerAuthentication.openAuthenticationWindow(runtimeScene);
-        // Create a callback to open the lobbies window once the player is connected.
-        gdjs.playerAuthentication.setLoginCallback(() => {
-          _isWaitingForLoginCallback = false;
-          openLobbiesWindow(runtimeScene);
-        });
-        return;
-      }
-
-      multiplayerComponents.displayLobbies(
-        runtimeScene,
-        onLobbiesContainerDismissed
-      );
-
-      // If the game is registered, open the lobbies window.
-      // Otherwise, open the window indicating that the game is not registered.
       const electron = runtimeScene.getGame().getRenderer().getElectron();
       const wikiOpenAction = electron
         ? () =>

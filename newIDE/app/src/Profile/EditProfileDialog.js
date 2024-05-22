@@ -4,6 +4,7 @@ import { Trans, t } from '@lingui/macro';
 import * as React from 'react';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import FlatButton from '../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import {
@@ -11,14 +12,15 @@ import {
   type AuthError,
   type Profile,
   type UpdateGitHubStarResponse,
+  type UpdateTiktokFollowResponse,
 } from '../Utils/GDevelopServices/Authentication';
 import {
   communityLinksConfig,
   donateLinkConfig,
   discordUsernameConfig,
-  githubUsernameConfig,
   type UsernameAvailability,
   type CommunityLinkType,
+  type CommunityLinks,
 } from '../Utils/GDevelopServices/User';
 import { type Badge, type Achievement } from '../Utils/GDevelopServices/Badge';
 import {
@@ -45,7 +47,8 @@ import useAlertDialog from '../UI/Alert/useAlertDialog';
 import Form from '../UI/Form';
 import RaisedButton from '../UI/RaisedButton';
 import Coin from '../Credits/Icons/Coin';
-import { sendGitHubStarUpdated } from '../Utils/Analytics/EventSender';
+import { sendSocialFollowUpdated } from '../Utils/Analytics/EventSender';
+import { Line } from '../UI/Grid';
 
 export type EditProfileDialogProps = {|
   profile: Profile,
@@ -57,6 +60,9 @@ export type EditProfileDialogProps = {|
   onUpdateGitHubStar: (
     githubUsername: string
   ) => Promise<UpdateGitHubStarResponse>,
+  onUpdateTiktokFollow: (
+    communityLinks: CommunityLinks
+  ) => Promise<UpdateTiktokFollowResponse>,
   onDelete: () => Promise<void>,
   actionInProgress: boolean,
   error: ?AuthError,
@@ -72,113 +78,120 @@ export const getUsernameErrorText = (error: ?AuthError) => {
   return undefined;
 };
 
-const GitHubUsernameField = ({
+const CommunityLinkWithFollow = <UpdateResponse: { +code: string }>({
   badges,
   achievements,
-  githubUsername,
-  onSetGithubUsername,
-  onUpdateGitHubStar,
+  achievementId,
+  value,
+  onChange,
+  onUpdateFollow,
+  getMessageFromUpdate,
   disabled,
+  maxLength,
+  prefix,
+  getRewardMessage,
+  translatableHintText,
+  icon,
 }: {
   badges: ?Array<Badge>,
   achievements: ?Array<Achievement>,
-  githubUsername: string,
-  onSetGithubUsername: (username: string) => void,
-  onUpdateGitHubStar: (
-    githubUsername: string
-  ) => Promise<UpdateGitHubStarResponse>,
+  achievementId: string,
+  value: string,
+  onChange: (value: string) => void,
+  onUpdateFollow: () => Promise<UpdateResponse>,
+  getMessageFromUpdate: (
+    responseCode: string
+  ) => null | {|
+    title: MessageDescriptor,
+    message: MessageDescriptor,
+  |},
+  getRewardMessage: (
+    hasBadge: boolean,
+    rewardValueInCredits: string
+  ) => MessageDescriptor,
   disabled: boolean,
+  maxLength: number,
+  prefix: string,
+  translatableHintText?: string,
+  icon: React.Node,
 }) => {
   const { showAlert } = useAlertDialog();
 
-  const hasGithubStarBadge =
-    !!badges && badges.some(badge => badge.achievementId === 'github-star');
-  const githubStarAchievement =
+  const hasBadge =
+    !!badges && badges.some(badge => badge.achievementId === achievementId);
+  const achievement =
     (achievements &&
-      achievements.find(achievement => achievement.id === 'github-star')) ||
+      achievements.find(achievement => achievement.id === achievementId)) ||
     null;
 
   const onClaim = React.useCallback(
     async () => {
       try {
-        const response = await onUpdateGitHubStar(githubUsername);
-        sendGitHubStarUpdated({ code: response.code });
+        const response = await onUpdateFollow();
+        sendSocialFollowUpdated(achievementId, { code: response.code });
 
-        if (
-          response.code === 'github-star/badge-given' ||
-          response.code === 'github-star/badge-already-given'
-        ) {
-          showAlert({
-            title: t`You're awesome!`,
-            message: t`Thanks for starring GDevelop repository. We added credits to your account as a thank you gift.`,
-          });
-        } else if (response.code === 'github-star/repository-not-starred') {
-          showAlert({
-            title: t`We could not find your GitHub star`,
-            message: t`Make sure you star the repository called 4ian/GDevelop with your GitHub user and try again.`,
-          });
-        } else if (response.code === 'github-star/user-not-found') {
-          showAlert({
-            title: t`We could not find your GitHub user and star`,
-            message: t`Make sure you create your GitHub account, star the repository called 4ian/GDevelop, enter your username here and try again.`,
-          });
+        const messageAndTitle = getMessageFromUpdate(response.code);
+        if (messageAndTitle) {
+          showAlert({ ...messageAndTitle });
         } else {
           throw new Error(
-            `Error while updating the GitHub star: ${response.code}.`
+            `Error while updating the social follow: ${response.code}.`
           );
         }
       } catch (error) {
-        console.error('Error while updating GitHub star:', error);
+        console.error('Error while updating social follow:', error);
         showAlert({
           title: t`Something went wrong`,
           message: t`Make sure you have a proper internet connection or try again later.`,
         });
       }
     },
-    [githubUsername, onUpdateGitHubStar, showAlert]
+    [onUpdateFollow, achievementId, getMessageFromUpdate, showAlert]
   );
 
   return (
     <I18n>
       {({ i18n }) => (
-        <TextFieldWithButtonLayout
-          renderButton={style => (
-            <RaisedButton
-              onClick={onClaim}
-              icon={<Coin fontSize="small" />}
-              label={
-                hasGithubStarBadge ? (
-                  <Trans>Credits given</Trans>
-                ) : (
-                  <Trans>Claim</Trans>
-                )
-              }
-              disabled={hasGithubStarBadge || disabled}
-              primary
-              style={style}
-            />
-          )}
-          renderTextField={() => (
-            <TextField
-              value={githubUsername}
-              floatingLabelText={<Trans>GitHub username</Trans>}
-              fullWidth
-              translatableHintText={t`Your GitHub username`}
-              onChange={(e, value) => {
-                onSetGithubUsername(value);
-              }}
-              disabled={disabled}
-              maxLength={githubUsernameConfig.maxLength}
-              helperMarkdownText={i18n._(
-                !hasGithubStarBadge
-                  ? t`[Star the GDevelop repository](https://github.com/4ian/GDevelop) and add your GitHub username here to get ${(githubStarAchievement &&
-                      githubStarAchievement.rewardValueInCredits) ||
-                      '-'} free credits as a thank you!`
-                  : t`Thank you for supporting the GDevelop open-source community. Credits were added to your account as a thank you.`
-              )}
-            />
-          )}
-        />
+        <LineStackLayout noMargin alignItems="flex-start">
+          <Line>{icon}</Line>
+          <TextFieldWithButtonLayout
+            renderButton={style => (
+              <RaisedButton
+                onClick={onClaim}
+                icon={<Coin fontSize="small" />}
+                label={
+                  hasBadge ? <Trans>Credits given</Trans> : <Trans>Claim</Trans>
+                }
+                disabled={hasBadge || disabled}
+                primary
+                style={style}
+              />
+            )}
+            renderTextField={() => (
+              <TextField
+                value={value}
+                fullWidth
+                translatableHintText={translatableHintText}
+                onChange={(e, value) => {
+                  onChange(value);
+                }}
+                startAdornment={
+                  prefix ? <Text noMargin>{prefix}</Text> : undefined
+                }
+                disabled={disabled}
+                maxLength={maxLength}
+                helperMarkdownText={i18n._(
+                  getRewardMessage(
+                    hasBadge,
+                    achievement && achievement.rewardValueInCredits
+                      ? achievement.rewardValueInCredits.toString()
+                      : '-'
+                  )
+                )}
+              />
+            )}
+          />
+        </LineStackLayout>
       )}
     </I18n>
   );
@@ -230,6 +243,7 @@ const EditProfileDialog = ({
   onClose,
   onEdit,
   onUpdateGitHubStar,
+  onUpdateTiktokFollow,
   onDelete,
   actionInProgress,
   error,
@@ -321,6 +335,19 @@ const EditProfileDialog = ({
     (!usernameAvailability || usernameAvailability.isAvailable) &&
     !hasFormattingError;
 
+  const updatedCommunityLinks = {
+    personalWebsiteLink,
+    personalWebsite2Link,
+    twitterUsername,
+    facebookUsername,
+    youtubeUsername,
+    tiktokUsername,
+    instagramUsername,
+    redditUsername,
+    snapchatUsername,
+    discordServerLink,
+  };
+
   const edit = async () => {
     if (!canEdit) return;
     await onEdit({
@@ -331,18 +358,7 @@ const EditProfileDialog = ({
       donateLink,
       discordUsername,
       githubUsername,
-      communityLinks: {
-        personalWebsiteLink,
-        personalWebsite2Link,
-        twitterUsername,
-        facebookUsername,
-        youtubeUsername,
-        tiktokUsername,
-        instagramUsername,
-        redditUsername,
-        snapchatUsername,
-        discordServerLink,
-      },
+      communityLinks: updatedCommunityLinks,
     });
   };
 
@@ -452,14 +468,6 @@ const EditProfileDialog = ({
                   t`Add your Discord username to get access to a dedicated channel if you have a Gold or Pro subscription! Join the [GDevelop Discord](https://discord.gg/gdevelop).`
                 )}
               />
-              <GitHubUsernameField
-                achievements={achievements}
-                badges={badges}
-                githubUsername={githubUsername}
-                onSetGithubUsername={setGithubUsername}
-                onUpdateGitHubStar={onUpdateGitHubStar}
-                disabled={actionInProgress}
-              />
               <TextField
                 value={description}
                 floatingLabelText={<Trans>Bio</Trans>}
@@ -478,6 +486,46 @@ const EditProfileDialog = ({
               <Text size="sub-title" noMargin>
                 <Trans>Socials</Trans>
               </Text>
+              <CommunityLinkWithFollow
+                badges={badges}
+                achievements={achievements}
+                achievementId="github-star"
+                value={githubUsername}
+                onChange={setGithubUsername}
+                onUpdateFollow={() => onUpdateGitHubStar(githubUsername)}
+                getMessageFromUpdate={
+                  communityLinksConfig.githubUsername.getMessageFromUpdate
+                }
+                disabled={actionInProgress}
+                maxLength={communityLinksConfig.githubUsername.maxLength}
+                prefix={communityLinksConfig.githubUsername.prefix}
+                getRewardMessage={
+                  communityLinksConfig.githubUsername.getRewardMessage
+                }
+                translatableHintText={t`username`}
+                icon={communityLinksConfig.githubUsername.icon}
+              />
+              <CommunityLinkWithFollow
+                badges={badges}
+                achievements={achievements}
+                achievementId="tiktok-follow"
+                value={tiktokUsername}
+                onChange={setTiktokUsername}
+                onUpdateFollow={() =>
+                  onUpdateTiktokFollow(updatedCommunityLinks)
+                }
+                getMessageFromUpdate={
+                  communityLinksConfig.tiktokUsername.getMessageFromUpdate
+                }
+                disabled={actionInProgress}
+                maxLength={communityLinksConfig.tiktokUsername.maxLength}
+                prefix={communityLinksConfig.tiktokUsername.prefix}
+                getRewardMessage={
+                  communityLinksConfig.tiktokUsername.getRewardMessage
+                }
+                translatableHintText={t`username`}
+                icon={communityLinksConfig.tiktokUsername.icon}
+              />
               <CommunityLinkLine
                 id="personalWebsiteLink"
                 value={personalWebsiteLink}
@@ -520,15 +568,6 @@ const EditProfileDialog = ({
                 translatableHintText={t`username`}
                 onChange={(e, value) => {
                   setYoutubeUsername(value);
-                }}
-                disabled={actionInProgress}
-              />
-              <CommunityLinkLine
-                id="tiktokUsername"
-                value={tiktokUsername}
-                translatableHintText={t`username`}
-                onChange={(e, value) => {
-                  setTiktokUsername(value);
                 }}
                 disabled={actionInProgress}
               />

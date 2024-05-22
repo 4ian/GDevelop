@@ -157,8 +157,9 @@ namespace gdjs {
       _closeContainer.style.justifyContent = 'right';
       _closeContainer.style.alignItems = 'center';
       _closeContainer.style.zIndex = '3';
-      _closeContainer.style.paddingTop = '32px';
-      _closeContainer.style.paddingRight = '32px';
+      _closeContainer.style.position = 'absolute';
+      _closeContainer.style.top = '32px';
+      _closeContainer.style.right = '32px';
       addTouchAndClickEventListeners(_closeContainer, onCloseLobbiesContainer);
 
       const _close = document.createElement('img');

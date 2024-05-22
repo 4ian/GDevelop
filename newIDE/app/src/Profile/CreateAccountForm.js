@@ -29,6 +29,10 @@ const styles = {
     alignItems: 'stretch',
     marginTop: 30,
   },
+  icon: {
+    width: 16,
+    height: 16,
+  },
 };
 
 type Props = {|
@@ -139,7 +143,7 @@ const CreateAccountForm = ({
                   primary
                   fullWidth
                   label="Google"
-                  leftIcon={<Google />}
+                  leftIcon={<Google style={styles.icon} />}
                   onClick={() => {
                     onLoginWithProvider('google');
                   }}
@@ -149,7 +153,7 @@ const CreateAccountForm = ({
                   primary
                   fullWidth
                   label="GitHub"
-                  leftIcon={<GitHub />}
+                  leftIcon={<GitHub style={styles.icon} />}
                   onClick={() => {
                     onLoginWithProvider('github');
                   }}
@@ -159,7 +163,7 @@ const CreateAccountForm = ({
                   primary
                   fullWidth
                   label="Apple"
-                  leftIcon={<Apple />}
+                  leftIcon={<Apple style={styles.icon} />}
                   onClick={() => {
                     onLoginWithProvider('apple');
                   }}

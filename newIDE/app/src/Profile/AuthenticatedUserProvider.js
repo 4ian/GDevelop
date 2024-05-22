@@ -10,6 +10,7 @@ import {
   getUserBadges,
   listDefaultRecommendations,
   listRecommendations,
+  type CommunityLinks,
 } from '../Utils/GDevelopServices/User';
 import { getAchievements } from '../Utils/GDevelopServices/Badge';
 import Authentication, {
@@ -1299,6 +1300,36 @@ export default class AuthenticatedUserProvider extends React.Component<
     }
   };
 
+  _onUpdateTiktokFollow = async (
+    communityLinks: CommunityLinks,
+    preferences: PreferencesValues
+  ) => {
+    const { authentication } = this.props;
+
+    await this._doEdit(
+      {
+        communityLinks,
+      },
+      preferences
+    );
+
+    this.setState({
+      editInProgress: true,
+    });
+    try {
+      const response = await authentication.updateTiktokFollow(
+        authentication.getAuthorizationHeader
+      );
+      this._fetchUserBadges();
+
+      return response;
+    } finally {
+      this.setState({
+        editInProgress: false,
+      });
+    }
+  };
+
   render() {
     return (
       <PreferencesContext.Consumer>
@@ -1342,6 +1373,9 @@ export default class AuthenticatedUserProvider extends React.Component<
                   }}
                   onUpdateGitHubStar={githubUsername =>
                     this._onUpdateGithubStar(githubUsername, preferences)
+                  }
+                  onUpdateTiktokFollow={communityLinks =>
+                    this._onUpdateTiktokFollow(communityLinks, preferences)
                   }
                   onDelete={this._doDeleteAccount}
                   actionInProgress={

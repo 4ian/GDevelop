@@ -40,14 +40,20 @@ import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/
 const CommunityLinksLines = ({
   communityLinks,
 }: {|
-  communityLinks: Array<{ url: ?string, icon: React.Node }>,
+  communityLinks: Array<{
+    text: ?React.Node,
+    isNotFilled?: boolean,
+    icon: React.Node,
+  }>,
 |}) => (
   <ColumnStackLayout expand noMargin>
-    {communityLinks.map(({ url, icon }, index) =>
-      url ? (
+    {communityLinks.map(({ text, isNotFilled, icon }, index) =>
+      text ? (
         <LineStackLayout noMargin alignItems="center" key={index}>
           {icon}
-          <Text noMargin>{url}</Text>
+          <Text noMargin color={isNotFilled ? 'secondary' : 'primary'}>
+            {text}
+          </Text>
         </LineStackLayout>
       ) : null
     )}
@@ -109,6 +115,10 @@ const ProfileDetails = ({
   const githubStarAchievement =
     (achievements &&
       achievements.find(achievement => achievement.id === 'github-star')) ||
+    null;
+  const tiktokFollowAchievement =
+    (achievements &&
+      achievements.find(achievement => achievement.id === 'tiktok-follow')) ||
     null;
 
   const [
@@ -214,7 +224,7 @@ const ProfileDetails = ({
                   </IconButton>
                 )}
               </LineStackLayout>
-              <Text>
+              <Text color={!discordUsername ? 'secondary' : 'primary'}>
                 {!discordUsername ? (
                   !canUserBenefitFromDiscordRole ? (
                     <MarkdownText
@@ -240,103 +250,100 @@ const ProfileDetails = ({
                 )}
               </Text>
             </Column>
-            {
-              <Column noMargin>
-                <Text noMargin size="body-small">
-                  <Trans>GitHub username</Trans>
-                </Text>
-                <Text>
-                  {!githubUsername ? (
-                    <MarkdownText
-                      translatableSource={t`[Star the GDevelop repository](https://github.com/4ian/GDevelop) and add your GitHub username here to get ${(githubStarAchievement &&
-                        githubStarAchievement.rewardValueInCredits) ||
-                        '-'} free credits as a thank you!.`}
-                    />
-                  ) : (
-                    githubUsername
-                  )}
-                </Text>
-              </Column>
-            }
             <Column noMargin>
               <Text noMargin size="body-small">
                 <Trans>Bio</Trans>
               </Text>
-              <Text>
+              <Text color={!profile.description ? 'secondary' : 'primary'}>
                 {profile.description || <Trans>No bio defined.</Trans>}
               </Text>
             </Column>
-            <CommunityLinksLines
-              communityLinks={[
-                {
-                  url: personalWebsiteLink,
-                  icon: communityLinksConfig.personalWebsiteLink.icon,
-                },
-                {
-                  url: personalWebsite2Link,
-                  icon: communityLinksConfig.personalWebsite2Link.icon,
-                },
-                {
-                  url: twitterUsername
-                    ? communityLinksConfig.twitterUsername.prefix +
-                      twitterUsername
-                    : undefined,
-                  icon: communityLinksConfig.twitterUsername.icon,
-                },
-                {
-                  url: facebookUsername
-                    ? communityLinksConfig.facebookUsername.prefix +
-                      facebookUsername
-                    : undefined,
-                  icon: communityLinksConfig.facebookUsername.icon,
-                },
-                {
-                  url: youtubeUsername
-                    ? communityLinksConfig.youtubeUsername.prefix +
-                      youtubeUsername
-                    : undefined,
-                  icon: communityLinksConfig.youtubeUsername.icon,
-                },
-                {
-                  url: tiktokUsername
-                    ? communityLinksConfig.tiktokUsername.prefix +
+            <ColumnStackLayout noMargin>
+              <Text noMargin size="body-small">
+                <Trans>Socials</Trans>
+              </Text>
+              <CommunityLinksLines
+                communityLinks={[
+                  {
+                    text: !githubUsername ? (
+                      <MarkdownText
+                        translatableSource={communityLinksConfig.githubUsername.getRewardMessage(
+                          false,
+                          githubStarAchievement &&
+                            githubStarAchievement.rewardValueInCredits
+                            ? githubStarAchievement.rewardValueInCredits.toString()
+                            : '-'
+                        )}
+                      />
+                    ) : (
+                      githubUsername
+                    ),
+                    isNotFilled: !githubUsername,
+                    icon: communityLinksConfig.githubUsername.icon,
+                  },
+                  {
+                    text: !tiktokUsername ? (
+                      <MarkdownText
+                        translatableSource={communityLinksConfig.tiktokUsername.getRewardMessage(
+                          false,
+                          tiktokFollowAchievement &&
+                            tiktokFollowAchievement.rewardValueInCredits
+                            ? tiktokFollowAchievement.rewardValueInCredits.toString()
+                            : '-'
+                        )}
+                      />
+                    ) : (
                       tiktokUsername
-                    : undefined,
-                  icon: communityLinksConfig.tiktokUsername.icon,
-                },
-                {
-                  url: instagramUsername
-                    ? communityLinksConfig.instagramUsername.prefix +
-                      instagramUsername
-                    : undefined,
-                  icon: communityLinksConfig.instagramUsername.icon,
-                },
-                {
-                  url: redditUsername
-                    ? communityLinksConfig.redditUsername.prefix +
-                      redditUsername
-                    : undefined,
-                  icon: communityLinksConfig.redditUsername.icon,
-                },
-                {
-                  url: snapchatUsername
-                    ? communityLinksConfig.snapchatUsername.prefix +
-                      snapchatUsername
-                    : undefined,
-                  icon: communityLinksConfig.snapchatUsername.icon,
-                },
-                {
-                  url: discordServerLink,
-                  icon: communityLinksConfig.discordServerLink.icon,
-                },
-              ]}
-            />
-
+                    ),
+                    isNotFilled: !tiktokUsername,
+                    icon: communityLinksConfig.tiktokUsername.icon,
+                  },
+                  {
+                    text: personalWebsiteLink,
+                    icon: communityLinksConfig.personalWebsiteLink.icon,
+                  },
+                  {
+                    text: personalWebsite2Link,
+                    icon: communityLinksConfig.personalWebsite2Link.icon,
+                  },
+                  {
+                    text: twitterUsername,
+                    icon: communityLinksConfig.twitterUsername.icon,
+                  },
+                  {
+                    text: facebookUsername,
+                    icon: communityLinksConfig.facebookUsername.icon,
+                  },
+                  {
+                    text: youtubeUsername,
+                    icon: communityLinksConfig.youtubeUsername.icon,
+                  },
+                  {
+                    text: instagramUsername,
+                    icon: communityLinksConfig.instagramUsername.icon,
+                  },
+                  {
+                    text: redditUsername,
+                    icon: communityLinksConfig.redditUsername.icon,
+                  },
+                  {
+                    text: snapchatUsername,
+                    icon: communityLinksConfig.snapchatUsername.icon,
+                  },
+                  {
+                    text: discordServerLink,
+                    icon: communityLinksConfig.discordServerLink.icon,
+                  },
+                ]}
+              />
+            </ColumnStackLayout>
             <Column noMargin>
               <Text noMargin size="body-small">
                 <Trans>Donate link</Trans>
               </Text>
-              <Text>{donateLink || <Trans>No link defined.</Trans>}</Text>
+              <Text color={!donateLink ? 'secondary' : 'primary'}>
+                {donateLink || <Trans>No link defined.</Trans>}
+              </Text>
             </Column>
 
             <ResponsiveLineStackLayout justifyContent="flex-start" noMargin>

@@ -21,6 +21,9 @@ const defaultProps: EditProfileDialogProps = {
   onUpdateGitHubStar: async () => ({
     code: 'github-star/badge-already-given',
   }),
+  onUpdateTiktokFollow: async () => ({
+    code: 'tiktok-follow/badge-already-given',
+  }),
   achievements: fakeAchievements,
   badges: [
     {
@@ -113,6 +116,39 @@ export const WithGithubUsernameButUserNotFoundWhenGivingGithubStarBadge = () => 
     badges={[]}
     onUpdateGitHubStar={async () => ({
       code: 'github-star/user-not-found',
+    })}
+  />
+);
+
+export const WithNoTiktokBadge = () => (
+  <EditProfileDialog
+    {...defaultProps}
+    subscription={null}
+    badges={[]}
+    onUpdateTiktokFollow={async () => ({
+      code: 'tiktok-follow/badge-given',
+    })}
+  />
+);
+
+export const WithErrorWhenGivingTiktokBadge = () => (
+  <EditProfileDialog
+    {...defaultProps}
+    subscription={null}
+    badges={[]}
+    onUpdateTiktokFollow={async () => ({
+      code: 'tiktok-follow/account-not-followed',
+    })}
+  />
+);
+
+export const WithUserNotFoundWhenGivingTiktokBadge = () => (
+  <EditProfileDialog
+    {...defaultProps}
+    subscription={null}
+    badges={[]}
+    onUpdateTiktokFollow={async () => ({
+      code: 'tiktok-follow/user-not-found',
     })}
   />
 );

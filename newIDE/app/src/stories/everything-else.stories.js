@@ -2636,15 +2636,15 @@ storiesOf('HotReloadPreviewButton', module)
   .add('default', () => (
     <HotReloadPreviewButton
       hasPreviewsRunning={false}
-      launchProjectDataOnlyPreview={() => {}}
-      launchProjectWithLoadingScreenPreview={() => {}}
+      launchProjectDataOnlyPreview={async () => {}}
+      launchProjectWithLoadingScreenPreview={async () => {}}
     />
   ))
   .add('with preview(s) running', () => (
     <HotReloadPreviewButton
       hasPreviewsRunning={true}
-      launchProjectDataOnlyPreview={() => {}}
-      launchProjectWithLoadingScreenPreview={() => {}}
+      launchProjectDataOnlyPreview={async () => {}}
+      launchProjectWithLoadingScreenPreview={async () => {}}
     />
   ));
 

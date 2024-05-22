@@ -13,7 +13,7 @@ let previewWindows = [];
 let openDevToolsByDefault = false;
 
 /**
- * Open a window running a preview of an exported game.
+ * Open 1 or multiple windows running a preview of an exported game.
  */
 const openPreviewWindow = ({
   parentWindow,
@@ -21,43 +21,76 @@ const openPreviewWindow = ({
   previewGameIndexHtmlPath,
   alwaysOnTop,
   hideMenuBar,
+  numberOfWindows,
 }) => {
-  const browserWindowOptions = {
-    ...previewBrowserWindowOptions,
-    parent: alwaysOnTop ? parentWindow : null,
+  // If opening multiple windows at once, place them across the screen.
+  const parentWindowPosition = parentWindow.getPosition();
+  const screenWidth = parentWindow.getSize()[0];
+  const screenHeight = parentWindow.getSize()[1];
+  console.log('parentWindowPosition', parentWindowPosition);
+  console.log('screenWidth', screenWidth);
+  const positions = {
+    // top-left
+    1: {
+      x: parentWindowPosition[0],
+      y: parentWindowPosition[1],
+    },
+    // top-right
+    2: {
+      x: parentWindowPosition[0] + screenWidth / 2,
+      y: parentWindowPosition[1],
+    },
+    // bottom-left
+    3: {
+      x: parentWindowPosition[0],
+      y: parentWindowPosition[1] + screenHeight / 2,
+    },
+    // bottom-right
+    4: {
+      x: parentWindowPosition[0] + screenWidth / 2,
+      y: parentWindowPosition[1] + screenHeight / 2,
+    },
   };
+  for (let i = 0; i < numberOfWindows; i++) {
+    const browserWindowOptions = {
+      ...previewBrowserWindowOptions,
+      parent: alwaysOnTop ? parentWindow : null,
+      x: numberOfWindows > 1 ? positions[i + 1].x : undefined,
+      y: numberOfWindows > 1 ? positions[i + 1].y : undefined,
+    };
 
-  let previewWindow = new BrowserWindow(browserWindowOptions);
+    let previewWindow = new BrowserWindow(browserWindowOptions);
 
-  previewWindow.setMenuBarVisibility(hideMenuBar);
-  previewWindow.webContents.on('devtools-opened', () => {
-    openDevToolsByDefault = true;
-  });
-  previewWindow.webContents.on('devtools-closed', () => {
-    openDevToolsByDefault = false;
-  });
+    previewWindow.setMenuBarVisibility(hideMenuBar);
+    previewWindow.webContents.on('devtools-opened', () => {
+      openDevToolsByDefault = true;
+    });
+    previewWindow.webContents.on('devtools-closed', () => {
+      openDevToolsByDefault = false;
+    });
 
-  if (openDevToolsByDefault) previewWindow.openDevTools();
+    if (openDevToolsByDefault) previewWindow.openDevTools();
 
-  // Enable `@electron/remote` module for renderer process
-  require('@electron/remote/main').enable(previewWindow.webContents);
+    // Enable `@electron/remote` module for renderer process
+    require('@electron/remote/main').enable(previewWindow.webContents);
 
-  // Open external link in the OS default browser
-  previewWindow.webContents.setWindowOpenHandler(details => {
-    shell.openExternal(details.url);
-    return { action: 'deny' };
-  });
+    // Open external link in the OS default browser
+    previewWindow.webContents.setWindowOpenHandler(details => {
+      shell.openExternal(details.url);
+      return { action: 'deny' };
+    });
 
-  previewWindow.loadURL(previewGameIndexHtmlPath);
+    previewWindow.loadURL(previewGameIndexHtmlPath);
 
-  previewWindows.push(previewWindow);
+    previewWindows.push(previewWindow);
 
-  previewWindow.on('closed', event => {
-    previewWindows = previewWindows.filter(
-      otherPreviewBrowserWindow => otherPreviewBrowserWindow !== previewWindow
-    );
-    previewWindow = null;
-  });
+    previewWindow.on('closed', event => {
+      previewWindows = previewWindows.filter(
+        otherPreviewBrowserWindow => otherPreviewBrowserWindow !== previewWindow
+      );
+      previewWindow = null;
+    });
+  }
 };
 
 const closePreviewWindow = windowId => {

@@ -9,8 +9,8 @@ import IconButton from '../UI/IconButton';
 
 export type HotReloadPreviewButtonProps = {|
   hasPreviewsRunning: boolean,
-  launchProjectDataOnlyPreview: () => void,
-  launchProjectWithLoadingScreenPreview: () => void,
+  launchProjectDataOnlyPreview: () => Promise<void>,
+  launchProjectWithLoadingScreenPreview: () => Promise<void>,
 |};
 
 export default function HotReloadPreviewButton({

@@ -389,34 +389,6 @@ module.exports = {
 
     extension
       .addStrExpression(
-        'PlayerId',
-        _('Player ID in lobby'),
-        _('Get the ID of the player in the lobby.'),
-        '',
-        'JsPlatform/Extensions/multiplayer.svg'
-      )
-      .addParameter(
-        'number',
-        _('The position of the player in the lobby (1, 2, ...)'),
-        '',
-        false
-      )
-      .getCodeExtraInformation()
-      .setIncludeFile('Extensions/P2P/A_peer.js')
-      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
-      .addIncludeFile(
-        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
-      )
-      .addIncludeFile(
-        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
-      )
-      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
-      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
-      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .setFunctionName('gdjs.multiplayer.getPlayerId');
-
-    extension
-      .addStrExpression(
         'PlayerUsername',
         _('Player username in lobby'),
         _('Get the username of the player in the lobby.'),

@@ -133,10 +133,6 @@ export const getTabsToDisplay = ({
 }: {|
   limits: ?Limits,
 |}): HomePageMenuTab[] => {
-  const displayTeamViewTab =
-    limits &&
-    limits.capabilities.classrooms &&
-    limits.capabilities.classrooms.showClassroomTab;
   const displayPlayTab =
     !limits ||
     !(
@@ -146,7 +142,7 @@ export const getTabsToDisplay = ({
   const tabs = [
     'get-started',
     'build',
-    displayTeamViewTab ? 'team-view' : null,
+    'team-view',
     'manage',
     'shop',
     'learn',

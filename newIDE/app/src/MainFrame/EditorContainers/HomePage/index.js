@@ -46,6 +46,10 @@ import Text from '../../../UI/Text';
 import Link from '../../../UI/Link';
 import Window from '../../../Utils/Window';
 import { getHelpLink } from '../../../Utils/HelpLink';
+import { canUseClassroomFeature } from '../../../Utils/GDevelopServices/Usage';
+import EducationMarketingSection, {
+  type EducationForm,
+} from './EducationMarketingSection';
 
 const gamesDashboardWikiArticle = getHelpLink('/interface/games-dashboard/');
 const isShopRequested = (routeArguments: RouteArguments): boolean =>
@@ -161,9 +165,17 @@ export const HomePage = React.memo<Props>(
       }: Props,
       ref
     ) => {
-      const { authenticated, onCloudProjectsChanged } = React.useContext(
-        AuthenticatedUserContext
-      );
+      const {
+        authenticated,
+        onCloudProjectsChanged,
+        limits,
+      } = React.useContext(AuthenticatedUserContext);
+      const [educationForm, setEducationForm] = React.useState<EducationForm>({
+        firstName: '',
+        lastName: '',
+        email: '',
+        schoolName: '',
+      });
       const userSurveyStartedRef = React.useRef<boolean>(false);
       const userSurveyHiddenRef = React.useRef<boolean>(false);
       const { fetchTutorials } = React.useContext(TutorialContext);
@@ -376,16 +388,6 @@ export const HomePage = React.memo<Props>(
         forceUpdateEditor,
       }));
 
-      // If the user logs out and is on the team view section, go back to the build section.
-      React.useEffect(
-        () => {
-          if (activeTab === 'team-view' && !authenticated) {
-            setActiveTab('build');
-          }
-        },
-        [authenticated, activeTab]
-      );
-
       const onUserSurveyStarted = React.useCallback(() => {
         if (userSurveyStartedRef.current) return;
         sendUserSurveyStarted();
@@ -497,18 +499,24 @@ export const HomePage = React.memo<Props>(
                       onOpenProfile={onOpenProfile}
                     />
                   )}
-                  {activeTab === 'team-view' && (
-                    <TeamSection
-                      project={project}
-                      onOpenRecentFile={onOpenRecentFile}
-                      storageProviders={storageProviders}
-                      currentFileMetadata={fileMetadata}
-                      onOpenTeachingResources={() => {
-                        setLearnInitialCategory('education-curriculum');
-                        setActiveTab('learn');
-                      }}
-                    />
-                  )}
+                  {activeTab === 'team-view' &&
+                    (canUseClassroomFeature(limits) ? (
+                      <TeamSection
+                        project={project}
+                        onOpenRecentFile={onOpenRecentFile}
+                        storageProviders={storageProviders}
+                        currentFileMetadata={fileMetadata}
+                        onOpenTeachingResources={() => {
+                          setLearnInitialCategory('education-curriculum');
+                          setActiveTab('learn');
+                        }}
+                      />
+                    ) : (
+                      <EducationMarketingSection
+                        form={educationForm}
+                        onChangeForm={setEducationForm}
+                      />
+                    ))}
                 </div>
                 <HomePageMenu
                   activeTab={activeTab}

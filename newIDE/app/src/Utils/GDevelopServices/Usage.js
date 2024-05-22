@@ -481,3 +481,8 @@ export const canUpgradeSubscription = (subscription: ?Subscription) => {
     !subscription.benefitsFromEducationPlan
   );
 };
+
+export const canUseClassroomFeature = (limits: ?Limits) =>
+  limits &&
+  limits.capabilities.classrooms &&
+  limits.capabilities.classrooms.showClassroomTab;

@@ -383,13 +383,12 @@ export const registerUserInterest = async (
     email: string,
     interestKind: 'education',
   |}
-): Promise<TeamGroup> => {
+): Promise<void> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await client.post(`/action/register-user-interest`, data, {
+  await client.post(`/action/register-user-interest`, data, {
     headers: { Authorization: authorizationHeader },
     params: { userId },
   });
-  return response.data;
 };
 
 const simpleUrlRegex = /^https:\/\/[^ ]+$/;

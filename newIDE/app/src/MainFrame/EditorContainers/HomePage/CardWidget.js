@@ -23,19 +23,16 @@ const styles = {
 // Styles to give the impression of pressing an element.
 const useStylesForWidget = ({
   useDefaultDisabledStyle,
-  disableHoverEffects,
+  disableHoverAndFocusEffects,
 }: {|
   useDefaultDisabledStyle?: boolean,
-  disableHoverEffects?: boolean,
+  disableHoverAndFocusEffects?: boolean,
 |}) =>
   makeStyles(theme => {
     const rootStyles = {
       border: `1px solid ${theme.palette.text.primary}`,
       borderBottom: `6px solid ${theme.palette.text.primary}`,
       transition: 'background-color 100ms ease',
-      '&:focus': {
-        backgroundColor: theme.palette.action.hover,
-      },
       '&:disabled': useDefaultDisabledStyle
         ? {
             opacity: theme.palette.action.disabledOpacity,
@@ -44,9 +41,13 @@ const useStylesForWidget = ({
           }
         : undefined,
     };
-    if (!disableHoverEffects) {
+    if (!disableHoverAndFocusEffects) {
       // $FlowIgnore
       rootStyles['&:hover'] = {
+        backgroundColor: theme.palette.action.hover,
+      };
+      // $FlowIgnore
+      rootStyles['&:focus'] = {
         backgroundColor: theme.palette.action.hover,
       };
     }
@@ -75,7 +76,7 @@ export const CardWidget = ({
 }: Props) => {
   const classes = useStylesForWidget({
     useDefaultDisabledStyle,
-    disableHoverEffects: !onClick,
+    disableHoverAndFocusEffects: !onClick,
   });
   const { isMobile } = useResponsiveWindowSize();
 

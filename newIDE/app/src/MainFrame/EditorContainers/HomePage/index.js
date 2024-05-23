@@ -46,6 +46,9 @@ import Text from '../../../UI/Text';
 import Link from '../../../UI/Link';
 import Window from '../../../Utils/Window';
 import { getHelpLink } from '../../../Utils/HelpLink';
+import { canUseClassroomFeature } from '../../../Utils/GDevelopServices/Usage';
+import EducationMarketingSection from './EducationMarketingSection';
+import useEducationForm from './UseEducationForm';
 
 const gamesDashboardWikiArticle = getHelpLink('/interface/games-dashboard/');
 const isShopRequested = (routeArguments: RouteArguments): boolean =>
@@ -161,9 +164,13 @@ export const HomePage = React.memo<Props>(
       }: Props,
       ref
     ) => {
-      const { authenticated, onCloudProjectsChanged } = React.useContext(
-        AuthenticatedUserContext
-      );
+      const authenticatedUser = React.useContext(AuthenticatedUserContext);
+      const {
+        authenticated,
+        onCloudProjectsChanged,
+        onOpenLoginDialog,
+        limits,
+      } = authenticatedUser;
       const userSurveyStartedRef = React.useRef<boolean>(false);
       const userSurveyHiddenRef = React.useRef<boolean>(false);
       const { fetchTutorials } = React.useContext(TutorialContext);
@@ -180,7 +187,14 @@ export const HomePage = React.memo<Props>(
       const { routeArguments, removeRouteArguments } = React.useContext(
         RouterContext
       );
-
+      const {
+        educationForm,
+        onChangeEducationForm,
+        onSendEducationForm,
+        educationFormError,
+        educationFormStatus,
+        onResetEducationForm,
+      } = useEducationForm({ authenticatedUser });
       const { isMobile } = useResponsiveWindowSize();
       const {
         values: { showGetStartedSectionByDefault },
@@ -376,16 +390,6 @@ export const HomePage = React.memo<Props>(
         forceUpdateEditor,
       }));
 
-      // If the user logs out and is on the team view section, go back to the build section.
-      React.useEffect(
-        () => {
-          if (activeTab === 'team-view' && !authenticated) {
-            setActiveTab('build');
-          }
-        },
-        [authenticated, activeTab]
-      );
-
       const onUserSurveyStarted = React.useCallback(() => {
         if (userSurveyStartedRef.current) return;
         sendUserSurveyStarted();
@@ -497,18 +501,29 @@ export const HomePage = React.memo<Props>(
                       onOpenProfile={onOpenProfile}
                     />
                   )}
-                  {activeTab === 'team-view' && (
-                    <TeamSection
-                      project={project}
-                      onOpenRecentFile={onOpenRecentFile}
-                      storageProviders={storageProviders}
-                      currentFileMetadata={fileMetadata}
-                      onOpenTeachingResources={() => {
-                        setLearnInitialCategory('education-curriculum');
-                        setActiveTab('learn');
-                      }}
-                    />
-                  )}
+                  {activeTab === 'team-view' &&
+                    (canUseClassroomFeature(limits) ? (
+                      <TeamSection
+                        project={project}
+                        onOpenRecentFile={onOpenRecentFile}
+                        storageProviders={storageProviders}
+                        currentFileMetadata={fileMetadata}
+                        onOpenTeachingResources={() => {
+                          setLearnInitialCategory('education-curriculum');
+                          setActiveTab('learn');
+                        }}
+                      />
+                    ) : (
+                      <EducationMarketingSection
+                        form={educationForm}
+                        onChangeForm={onChangeEducationForm}
+                        onSendForm={onSendEducationForm}
+                        formError={educationFormError}
+                        formStatus={educationFormStatus}
+                        onResetForm={onResetEducationForm}
+                        onLogin={onOpenLoginDialog}
+                      />
+                    ))}
                 </div>
                 <HomePageMenu
                   activeTab={activeTab}

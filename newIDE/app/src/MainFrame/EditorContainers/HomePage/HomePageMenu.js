@@ -17,9 +17,13 @@ import Preferences from '../../../UI/CustomSvgIcons/Preferences';
 import GDevelopGLogo from '../../../UI/CustomSvgIcons/GDevelopGLogo';
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
 import HomePageMenuBar from './HomePageMenuBar';
-import type { Limits } from '../../../Utils/GDevelopServices/Usage';
+import {
+  canUseClassroomFeature,
+  type Limits,
+} from '../../../Utils/GDevelopServices/Usage';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import GraphsIcon from '../../../UI/CustomSvgIcons/Graphs';
+import { isNativeMobileApp } from '../../../Utils/Platform';
 
 export const styles = {
   drawerContent: {
@@ -133,10 +137,6 @@ export const getTabsToDisplay = ({
 }: {|
   limits: ?Limits,
 |}): HomePageMenuTab[] => {
-  const displayTeamViewTab =
-    limits &&
-    limits.capabilities.classrooms &&
-    limits.capabilities.classrooms.showClassroomTab;
   const displayPlayTab =
     !limits ||
     !(
@@ -146,7 +146,11 @@ export const getTabsToDisplay = ({
   const tabs = [
     'get-started',
     'build',
-    displayTeamViewTab ? 'team-view' : null,
+    canUseClassroomFeature(limits)
+      ? 'team-view'
+      : isNativeMobileApp()
+      ? null
+      : 'team-view',
     'manage',
     'shop',
     'learn',

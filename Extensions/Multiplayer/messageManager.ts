@@ -91,6 +91,13 @@ namespace gdjs {
     let lastSentGameSyncData: GameNetworkSyncData = {};
     let numberOfForcedGameUpdates = 0;
 
+    // Send heartbeat messages to host to ensure the connection is still alive.
+    let heartbeatTickRate = 1;
+    let lastHeartbeatTimestamp = 0;
+    let _playersLastHeartbeatTimes: { [playerNumber: number]: number[] } = {};
+    let _peerIdToPlayerNumber: { [peerId: string]: number } = {};
+    let _playersPings: { [playerNumber: number]: number } = {};
+
     const addExpectedMessageAcknowledgement = ({
       originalMessageName,
       originalData,
@@ -1200,28 +1207,30 @@ namespace gdjs {
         numberOfForcedSceneUpdates = 3;
       }
 
-      if (shouldSyncScene) {
-        const connectedPeerIds = gdjs.evtTools.p2p.getAllPeers();
-        const { messageName, messageData } = createUpdateSceneMessage({
-          sceneNetworkSyncData,
-        });
-
-        for (const peerId of connectedPeerIds) {
-          sendDataTo(peerId, messageName, messageData);
-        }
-
-        lastSceneSyncTimestamp = getTimeNow();
-        lastSentSceneSyncData = sceneNetworkSyncData;
-        numberOfForcedSceneUpdates = Math.max(
-          numberOfForcedSceneUpdates - 1,
-          0
-        );
+      if (!shouldSyncScene) {
+        return;
       }
+
+      const connectedPeerIds = gdjs.evtTools.p2p.getAllPeers();
+      const { messageName, messageData } = createUpdateSceneMessage({
+        sceneNetworkSyncData,
+      });
+
+      for (const peerId of connectedPeerIds) {
+        sendDataTo(peerId, messageName, messageData);
+      }
+
+      lastSceneSyncTimestamp = getTimeNow();
+      lastSentSceneSyncData = sceneNetworkSyncData;
+      numberOfForcedSceneUpdates = Math.max(numberOfForcedSceneUpdates - 1, 0);
     };
 
     const handleSceneUpdatedMessages = (runtimeScene: gdjs.RuntimeScene) => {
-      const p2pMessagesMap = gdjs.evtTools.p2p.getEvents();
+      if (gdjs.multiplayer.isPlayerHost()) {
+        return;
+      }
 
+      const p2pMessagesMap = gdjs.evtTools.p2p.getEvents();
       const messageNamesArray = Array.from(p2pMessagesMap.keys());
       const updateSceneMessageNames = messageNamesArray.filter((messageName) =>
         messageName.startsWith(updateSceneMessageNamePrefix)
@@ -1299,23 +1308,29 @@ namespace gdjs {
         numberOfForcedGameUpdates = 3;
       }
 
-      if (shouldSyncGame) {
-        const connectedPeerIds = gdjs.evtTools.p2p.getAllPeers();
-        const { messageName, messageData } = createUpdateGameMessage({
-          gameNetworkSyncData,
-        });
-
-        for (const peerId of connectedPeerIds) {
-          sendDataTo(peerId, messageName, messageData);
-        }
-
-        lastGameSyncTimestamp = getTimeNow();
-        lastSentGameSyncData = gameNetworkSyncData;
-        numberOfForcedGameUpdates = Math.max(numberOfForcedGameUpdates - 1, 0);
+      if (!shouldSyncGame) {
+        return;
       }
+
+      const connectedPeerIds = gdjs.evtTools.p2p.getAllPeers();
+      const { messageName, messageData } = createUpdateGameMessage({
+        gameNetworkSyncData,
+      });
+
+      for (const peerId of connectedPeerIds) {
+        sendDataTo(peerId, messageName, messageData);
+      }
+
+      lastGameSyncTimestamp = getTimeNow();
+      lastSentGameSyncData = gameNetworkSyncData;
+      numberOfForcedGameUpdates = Math.max(numberOfForcedGameUpdates - 1, 0);
     };
 
     const handleGameUpdatedMessages = (runtimeScene: gdjs.RuntimeScene) => {
+      if (gdjs.multiplayer.isPlayerHost()) {
+        return;
+      }
+
       const p2pMessagesMap = gdjs.evtTools.p2p.getEvents();
       const messageNamesArray = Array.from(p2pMessagesMap.keys());
       const updateGameMessageNames = messageNamesArray.filter((messageName) =>
@@ -1338,6 +1353,123 @@ namespace gdjs {
           }
         }
       });
+    };
+
+    const heartbeatMessageNamePrefix = '#heartbeat';
+    const heartbeastMessageRegex = /#heartbeat#(.+)/;
+    const createHeartbeatMessage = (): {
+      messageName: string;
+      messageData: any;
+    } => {
+      const playersPings = {};
+      for (const playerNumber in _playersLastHeartbeatTimes) {
+        playersPings[playerNumber] = getPlayerPing(parseInt(playerNumber, 10));
+      }
+      logger.info(
+        'Sending heartbeat message with pings ' + JSON.stringify(playersPings)
+      );
+      return {
+        messageName: `${heartbeatMessageNamePrefix}#${gdjs.multiplayer.getPlayerNumber()}`,
+        messageData: {
+          now: Date.now(),
+          playersPings,
+        },
+      };
+    };
+    const hasSentHeartbeatRecently = () => {
+      return getTimeNow() - lastHeartbeatTimestamp < 1000 / heartbeatTickRate;
+    };
+    const handleHeartbeats = () => {
+      const shouldSendHeartbeat = !hasSentHeartbeatRecently();
+      if (!shouldSendHeartbeat) {
+        return;
+      }
+
+      // Players > 1 send heartbeats to the host.
+      // Host sends heartbeats to all players, allowing to pass along the pings of all players.
+      const connectedPeerIds = gdjs.evtTools.p2p.getAllPeers();
+      const { messageName, messageData } = createHeartbeatMessage();
+      for (const peerId of connectedPeerIds) {
+        sendDataTo(peerId, messageName, messageData);
+      }
+
+      lastHeartbeatTimestamp = getTimeNow();
+    };
+
+    const handleHeartbeatsReceived = () => {
+      const p2pMessagesMap = gdjs.evtTools.p2p.getEvents();
+      const messageNamesArray = Array.from(p2pMessagesMap.keys());
+      const heartbeatMessageNames = messageNamesArray.filter((messageName) =>
+        messageName.startsWith(heartbeatMessageNamePrefix)
+      );
+      heartbeatMessageNames.forEach((messageName) => {
+        if (gdjs.evtTools.p2p.onEvent(messageName, false)) {
+          let data;
+          try {
+            data = JSON.parse(gdjs.evtTools.p2p.getEventData(messageName));
+          } catch (e) {
+            logger.error(
+              `Error while parsing message ${messageName}: ${e.toString()}`
+            );
+            return;
+          }
+          const messageSender = gdjs.evtTools.p2p.getEventSender(messageName);
+          if (data && messageSender) {
+            const matches = heartbeastMessageRegex.exec(messageName);
+            if (!matches) {
+              return;
+            }
+            const playerNumber = parseInt(matches[1], 10);
+            // Ensure we know who is who.
+            _peerIdToPlayerNumber[messageSender] = playerNumber;
+
+            // If we are not the host, save what the host told us about the pings.
+            if (!gdjs.multiplayer.isPlayerHost()) {
+              logger.info(
+                `Received heartbeat from player ${playerNumber} with pings ${JSON.stringify(
+                  data.playersPings
+                )}.`
+              );
+              _playersPings = data.playersPings;
+              return;
+            }
+
+            // If we are the host, compute the pings.
+            const now = data.now;
+            const timeDifference = Math.round(Date.now() - now);
+            logger.info(
+              `Received heartbeat from player ${playerNumber} with time difference of ${timeDifference}ms.`
+            );
+            const playerLastHeartbeatTimes =
+              _playersLastHeartbeatTimes[playerNumber] || [];
+            playerLastHeartbeatTimes.push(timeDifference);
+            if (playerLastHeartbeatTimes.length > 5) {
+              // Keep only the last 5 heartbeats to compute the average.
+              playerLastHeartbeatTimes.shift();
+            }
+            _playersLastHeartbeatTimes[playerNumber] = playerLastHeartbeatTimes;
+
+            let sum = 0;
+            for (const time of playerLastHeartbeatTimes) {
+              sum += time;
+            }
+            const averagePing = Math.round(
+              sum / playerLastHeartbeatTimes.length
+            );
+            _playersPings[playerNumber] = averagePing;
+          }
+        }
+      });
+    };
+
+    const getPlayerPing = (playerNumber: number) => {
+      if (playerNumber < 1) {
+        // Player 1 is the host, so we don't need to compute the ping.
+        // Any negative number is invalid.
+        return 0;
+      }
+
+      return _playersPings[playerNumber] || 0;
     };
 
     return {
@@ -1364,6 +1496,9 @@ namespace gdjs {
       createUpdateGameMessage,
       handleUpdateGameMessages,
       handleGameUpdatedMessages,
+      handleHeartbeats,
+      handleHeartbeatsReceived,
+      getPlayerPing,
     };
   };
 

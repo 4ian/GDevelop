@@ -50,6 +50,7 @@ namespace gdjs {
         );
         gdjs.multiplayerMessageManager.handleSceneUpdatedMessages(runtimeScene);
         gdjs.multiplayerMessageManager.handleGameUpdatedMessages(runtimeScene);
+        gdjs.multiplayerMessageManager.handleHeartbeats();
       }
     );
 
@@ -62,6 +63,7 @@ namespace gdjs {
         );
         gdjs.multiplayerMessageManager.handleUpdateSceneMessages(runtimeScene);
         gdjs.multiplayerMessageManager.handleUpdateGameMessages(runtimeScene);
+        gdjs.multiplayerMessageManager.handleHeartbeatsReceived();
       }
     );
 
@@ -158,15 +160,23 @@ namespace gdjs {
       return playerNumber === 1;
     };
 
+    export const getPlayerPing = (playerNumber: number) => {
+      if (playerNumber === 1) {
+        return 0;
+      }
+
+      return gdjs.multiplayerMessageManager.getPlayerPing(playerNumber);
+    };
+
     /**
      * Returns the player ID of the player at the given number in the lobby.
      * The number is shifted by one, so that the first player has number  1.
      */
-    export const getPlayerId = (number: number) => {
+    const getPlayerId = (playerNumber: number) => {
       if (!_lobbyOnGameStart) {
         return '';
       }
-      const index = number - 1;
+      const index = playerNumber - 1;
       if (index < 0 || index >= _lobbyOnGameStart.players.length) {
         return '';
       }
@@ -177,8 +187,8 @@ namespace gdjs {
      * Returns the player username at the given number in the lobby.
      * The number is shifted by one, so that the first player has number 1.
      */
-    export const getPlayerUsername = (number: number) => {
-      const playerId = getPlayerId(number);
+    export const getPlayerUsername = (playerNumber: number) => {
+      const playerId = getPlayerId(playerNumber);
       if (!playerId) {
         return '';
       }
@@ -189,7 +199,7 @@ namespace gdjs {
 
       return playerPublicProfile
         ? playerPublicProfile.username
-        : `Player ${number}`;
+        : `Player ${playerNumber}`;
     };
 
     /**

@@ -413,6 +413,34 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
       .setFunctionName('gdjs.multiplayer.getPlayerUsername');
 
+    extension
+      .addExpression(
+        'PlayerPing',
+        _('Player ping in lobby'),
+        _('Get the ping of the player in the lobby.'),
+        '',
+        'JsPlatform/Extensions/multiplayer.svg'
+      )
+      .addParameter(
+        'number',
+        _('The position of the player in the lobby (1, 2, ...)'),
+        '',
+        false
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
+      .setFunctionName('gdjs.multiplayer.getPlayerPing');
+
     // Multiplayer object behavior
     const multiplayerObjectBehavior = new gd.BehaviorJsImplementation();
 
@@ -421,15 +449,38 @@ module.exports = {
       propertyName,
       newValue
     ) {
+      if (propertyName === 'actionOnPlayerDisconnect') {
+        behaviorContent
+          .getChild('actionOnPlayerDisconnect')
+          .setStringValue(newValue);
+        return true;
+      }
+
       return false;
     };
 
     multiplayerObjectBehavior.getProperties = function (behaviorContent) {
       const behaviorProperties = new gd.MapStringPropertyDescriptor();
+
+      behaviorProperties
+        .getOrCreate('actionOnPlayerDisconnect')
+        .setValue(
+          behaviorContent.getChild('actionOnPlayerDisconnect').getStringValue()
+        )
+        .setType('Choice')
+        .setLabel(_('Action when player disconnects'))
+        .addExtraInfo('DestroyObject')
+        .addExtraInfo('GiveOwnershipToHost')
+        .addExtraInfo('DoNothing');
+
       return behaviorProperties;
     };
 
-    multiplayerObjectBehavior.initializeContent = function (behaviorContent) {};
+    multiplayerObjectBehavior.initializeContent = function (behaviorContent) {
+      behaviorContent
+        .addChild('actionOnPlayerDisconnect')
+        .setStringValue('DestroyObject');
+    };
 
     const sharedData = new gd.BehaviorsSharedData();
 

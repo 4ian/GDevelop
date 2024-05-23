@@ -47,9 +47,8 @@ import Link from '../../../UI/Link';
 import Window from '../../../Utils/Window';
 import { getHelpLink } from '../../../Utils/HelpLink';
 import { canUseClassroomFeature } from '../../../Utils/GDevelopServices/Usage';
-import EducationMarketingSection, {
-  type EducationForm,
-} from './EducationMarketingSection';
+import EducationMarketingSection from './EducationMarketingSection';
+import useEducationForm from './UseEducationForm';
 
 const gamesDashboardWikiArticle = getHelpLink('/interface/games-dashboard/');
 const isShopRequested = (routeArguments: RouteArguments): boolean =>
@@ -165,17 +164,13 @@ export const HomePage = React.memo<Props>(
       }: Props,
       ref
     ) => {
+      const authenticatedUser = React.useContext(AuthenticatedUserContext);
       const {
         authenticated,
         onCloudProjectsChanged,
+        onOpenLoginDialog,
         limits,
-      } = React.useContext(AuthenticatedUserContext);
-      const [educationForm, setEducationForm] = React.useState<EducationForm>({
-        firstName: '',
-        lastName: '',
-        email: '',
-        schoolName: '',
-      });
+      } = authenticatedUser;
       const userSurveyStartedRef = React.useRef<boolean>(false);
       const userSurveyHiddenRef = React.useRef<boolean>(false);
       const { fetchTutorials } = React.useContext(TutorialContext);
@@ -192,7 +187,14 @@ export const HomePage = React.memo<Props>(
       const { routeArguments, removeRouteArguments } = React.useContext(
         RouterContext
       );
-
+      const {
+        educationForm,
+        onChangeEducationForm,
+        onSendEducationForm,
+        educationFormError,
+        educationFormStatus,
+        onResetEducationForm,
+      } = useEducationForm({ authenticatedUser });
       const { isMobile } = useResponsiveWindowSize();
       const {
         values: { showGetStartedSectionByDefault },
@@ -514,7 +516,12 @@ export const HomePage = React.memo<Props>(
                     ) : (
                       <EducationMarketingSection
                         form={educationForm}
-                        onChangeForm={setEducationForm}
+                        onChangeForm={onChangeEducationForm}
+                        onSendForm={onSendEducationForm}
+                        formError={educationFormError}
+                        formStatus={educationFormStatus}
+                        onResetForm={onResetEducationForm}
+                        onLogin={onOpenLoginDialog}
                       />
                     ))}
                 </div>

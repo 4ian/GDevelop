@@ -190,22 +190,6 @@ const EducationMarketingSection = ({
             setIsEmailValid(emailRegex.test(trimmedEmail));
           }}
         />
-        <TextField
-          value={form.schoolName}
-          floatingLabelText={<Trans>School name</Trans>}
-          fullWidth
-          type="text"
-          required
-          onChange={(e, value) => {
-            onChangeForm({ ...form, schoolName: value });
-          }}
-          onBlur={event => {
-            onChangeForm({
-              ...form,
-              schoolName: event.currentTarget.value.trim(),
-            });
-          }}
-        />
         <Line noMargin justifyContent="space-between" alignItems="center">
           {formError ? (
             <Text noMargin color="error">

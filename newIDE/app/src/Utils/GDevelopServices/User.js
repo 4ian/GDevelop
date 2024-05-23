@@ -374,6 +374,24 @@ export const getUserCommentQualityRatingsLeaderboards = async (): Promise<
   return response.data;
 };
 
+export const registerUserInterest = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  data: {|
+    firstName: string,
+    lastName: string,
+    email: string,
+    interestKind: 'education',
+  |}
+): Promise<TeamGroup> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await client.post(`/action/register-user-interest`, data, {
+    headers: { Authorization: authorizationHeader },
+    params: { userId },
+  });
+  return response.data;
+};
+
 const simpleUrlRegex = /^https:\/\/[^ ]+$/;
 const profileLinkFormattingErrorMessage = (
   <Trans>Please enter a valid URL, starting with https://</Trans>

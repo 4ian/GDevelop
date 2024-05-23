@@ -3,13 +3,12 @@
 import * as React from 'react';
 import type { AuthenticatedUser } from '../../../Profile/AuthenticatedUserContext';
 import { Trans } from '@lingui/macro';
-import { delay } from '../../../Utils/Delay';
+import { registerUserInterest } from '../../../Utils/GDevelopServices/User';
 
 export type EducationForm = {|
   firstName: string,
   lastName: string,
   email: string,
-  schoolName: string,
 |};
 
 export type EducationFormStatus =
@@ -23,32 +22,40 @@ const emptyForm = {
   firstName: '',
   lastName: '',
   email: '',
-  schoolName: '',
 };
 
 type Props = {| authenticatedUser: AuthenticatedUser |};
 
-const useEducationForm = ({ authenticatedUser: { authenticated } }: Props) => {
-  const [educationForm, setEducationForm] = React.useState<EducationForm>(
-    emptyForm
-  );
+const useEducationForm = ({
+  authenticatedUser: { authenticated, profile, getAuthorizationHeader },
+}: Props) => {
+  const [educationForm, setEducationForm] = React.useState<EducationForm>({
+    ...emptyForm,
+    email: profile ? profile.email : '',
+  });
   const [
     educationFormError,
     setEducationFormError,
   ] = React.useState<?React.Node>(null);
-  const [status, setStatus] = React.useState<EducationFormStatus>('error');
+  const [status, setStatus] = React.useState<EducationFormStatus>(
+    authenticated ? 'fill' : 'login'
+  );
 
   const onSendEducationForm = async () => {
     if (Object.values(educationForm).some(value => !value)) {
       setEducationFormError(<Trans>Please fill out every field.</Trans>);
       return;
     }
+    if (!profile) return;
     setStatus('sending');
     try {
-      // TODO: Send data
-      await delay(2000)
+      await registerUserInterest(getAuthorizationHeader, profile.id, {
+        ...educationForm,
+        interestKind: 'education',
+      });
       setStatus('success');
     } catch (error) {
+      console.error('Error while sending education form data:', error);
       setStatus('error');
     }
   };
@@ -66,13 +73,13 @@ const useEducationForm = ({ authenticatedUser: { authenticated } }: Props) => {
     [educationFormError]
   );
 
-  // React.useEffect(
-  //   () => {
-  //     if (!authenticated) setStatus('login');
-  //     else setStatus('fill');
-  //   },
-  //   [authenticated]
-  // );
+  React.useEffect(
+    () => {
+      if (!authenticated) setStatus('login');
+      else setStatus('fill');
+    },
+    [authenticated]
+  );
 
   return {
     educationForm,

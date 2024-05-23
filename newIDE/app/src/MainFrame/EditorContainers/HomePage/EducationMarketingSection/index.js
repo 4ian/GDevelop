@@ -43,6 +43,12 @@ const styles = {
   },
 };
 
+const blockTitle = (
+  <Text size="block-title" noMargin>
+    <Trans>Get a free sample in your email</Trans>
+  </Text>
+);
+
 type Props = {|
   form: EducationForm,
   formError: ?React.Node,
@@ -70,9 +76,7 @@ const EducationMarketingSection = ({
 
   const renderLogin = () => (
     <ColumnStackLayout noMargin expand>
-      <Text size="block-title" noMargin>
-        <Trans>Get a free sample in your email</Trans>
-      </Text>
+      {blockTitle}
       <Text noMargin>
         <Trans>
           Please login to access free samples of the Education plan resources.
@@ -86,17 +90,13 @@ const EducationMarketingSection = ({
 
   const renderLoader = () => (
     <ColumnStackLayout noMargin expand>
-      <Text size="block-title" noMargin>
-        <Trans>Get a free sample in your email</Trans>
-      </Text>
+      {blockTitle}
       <PlaceholderLoader />
     </ColumnStackLayout>
   );
   const renderError = () => (
     <ColumnStackLayout noMargin expand>
-      <Text size="block-title" noMargin>
-        <Trans>Get a free sample in your email</Trans>
-      </Text>
+      {blockTitle}
       <PlaceholderError onRetry={onResetForm}>
         <Trans>
           An error occurred when sending the form, please verify your internet
@@ -108,9 +108,7 @@ const EducationMarketingSection = ({
 
   const renderSuccess = () => (
     <ColumnStackLayout noMargin expand>
-      <Text size="block-title" noMargin>
-        <Trans>Get a free sample in your email</Trans>
-      </Text>
+      {blockTitle}
       <Text noMargin>
         <Trans>
           Form sent with success. You should receive an email in the next
@@ -134,9 +132,7 @@ const EducationMarketingSection = ({
       fullWidth
     >
       <ColumnStackLayout noMargin expand>
-        <Text size="block-title" noMargin>
-          <Trans>Get a free sample in your email</Trans>
-        </Text>
+        {blockTitle}
         <LineStackLayout noMargin>
           <TextField
             value={form.firstName}
@@ -144,8 +140,8 @@ const EducationMarketingSection = ({
             fullWidth
             type="text"
             required
-            onChange={(e, value) => {
-              onChangeForm({ ...form, firstName: value });
+            onChange={(e, value: string) => {
+              onChangeForm({ ...form, firstName: value.slice(0, 100) });
             }}
             onBlur={event => {
               onChangeForm({
@@ -160,8 +156,8 @@ const EducationMarketingSection = ({
             fullWidth
             type="text"
             required
-            onChange={(e, value) => {
-              onChangeForm({ ...form, lastName: value });
+            onChange={(e, value: string) => {
+              onChangeForm({ ...form, lastName: value.slice(0, 100) });
             }}
             onBlur={event => {
               onChangeForm({

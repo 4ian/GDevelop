@@ -40,6 +40,10 @@ const useEducationForm = ({
   const [status, setStatus] = React.useState<EducationFormStatus>(
     authenticated ? 'fill' : 'login'
   );
+  const isFormEmpty = React.useMemo(
+    () => Object.values(educationForm).every(value => !value),
+    [educationForm]
+  );
 
   const onSendEducationForm = async () => {
     if (Object.values(educationForm).some(value => !value)) {
@@ -75,10 +79,17 @@ const useEducationForm = ({
 
   React.useEffect(
     () => {
-      if (!authenticated) setStatus('login');
-      else setStatus('fill');
+      if (!authenticated) {
+        setStatus('login');
+        setEducationForm(emptyForm);
+      } else {
+        setStatus('fill');
+        if (isFormEmpty && profile) {
+          setEducationForm(form => ({ ...form, email: profile.email }));
+        }
+      }
     },
-    [authenticated]
+    [authenticated, profile, isFormEmpty]
   );
 
   return {

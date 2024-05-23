@@ -502,7 +502,15 @@ class GD_CORE_API EventsCodeGenerator {
    */
   virtual gd::String GenerateLocalVariablesStackAccessor();
 
- protected:
+  /**
+   * \brief Generate an any variable getter that fallbacks on scene variable for
+   * compatibility reason.
+   */
+  gd::String
+  GenerateAnyOrSceneVariableGetter(const gd::Expression &variableExpression,
+                                   EventsCodeGenerationContext &context);
+
+protected:
   virtual const gd::String GenerateRelationalOperatorCodes(
       const gd::String& operatorString);
 

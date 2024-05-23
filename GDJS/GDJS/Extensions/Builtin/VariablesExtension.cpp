@@ -40,27 +40,14 @@ VariablesExtension::VariablesExtension() {
       "gdjs.evtTools.variable.getLastVariableNumber");
 
   GetAllExpressions()["VariableChildCount"].SetCustomCodeGenerator(
-      [](const std::vector<gd::Expression> &parameters, gd::EventsCodeGenerator &codeGenerator,
+      [](const std::vector<gd::Expression> &parameters,
+         gd::EventsCodeGenerator &codeGenerator,
          gd::EventsCodeGenerationContext &context) {
-        auto &variableExpression = parameters[0];
-        const auto variableName =
-            gd::ExpressionVariableNameFinder::GetVariableName(
-                *variableExpression.GetRootNode());
-
         // This expression used to be declared with a scenevar parameter.
-        gd::String variableParameterType =
-            codeGenerator.GetProjectScopedContainers()
-                    .GetVariablesContainersList()
-                    .Has(variableName)
-                ? "variable"
-                : "scenevar";
-
-        gd::String varGetter =
-            gd::ExpressionCodeGenerator::GenerateExpressionCode(
-                codeGenerator, context, variableParameterType,
-                variableExpression.GetPlainString(), "", "AllowUndeclaredVariable");
-
-        return "gdjs.evtTools.variable.getVariableChildCount(" + varGetter + ")";
+        return "gdjs.evtTools.variable.getVariableChildCount(" +
+               codeGenerator.GenerateAnyOrSceneVariableGetter(parameters[0],
+                                                              context) +
+               ")";
       });
   GetAllConditions()["VariableChildCount"].SetFunctionName(
       "gdjs.evtTools.variable.getVariableChildCount");

@@ -539,9 +539,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
               outputCode
                   .FindAndReplace(
                       "$VALUE_ITERATOR_VARIABLE_ACCESSOR",
-                      gd::ExpressionCodeGenerator::GenerateExpressionCode(
-                          codeGenerator, context, "scenevar",
-                          event.GetValueIteratorVariableName()))
+                      codeGenerator.GenerateAnyOrSceneVariableGetter(
+                                event.GetValueIteratorVariableName(), context))
                   .FindAndReplace("$VALUE_ITERATOR_REFERENCE",
                                   iteratorReferenceVariableName);
         }
@@ -554,12 +553,12 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
               outputCode
                   .FindAndReplace(
                       "$KEY_ITERATOR_VARIABLE_ACCESSOR",
-                      gd::ExpressionCodeGenerator::GenerateExpressionCode(
-                          codeGenerator, context, "scenevar",
-                          event.GetKeyIteratorVariableName()))
+                      codeGenerator.GenerateAnyOrSceneVariableGetter(
+                                event.GetKeyIteratorVariableName(), context))
                   .FindAndReplace("$KEY_ITERATOR_REFERENCE",
                                   iteratorReferenceVariableName);
         }
+
         return outputCode
             .FindAndReplace("$ITERATOR_KEY", iteratorKeyVariableName)
             .FindAndReplace("$STRUCTURE_CHILD_VARIABLE",
@@ -567,9 +566,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             .FindAndReplace("$ITERABLE_REFERENCE",
                             iterableReferenceVariableName)
             .FindAndReplace("$ITERABLE_VARIABLE_ACCESSOR",
-                            gd::ExpressionCodeGenerator::GenerateExpressionCode(
-                                codeGenerator, context, "scenevar",
-                                event.GetIterableVariableName()));
+                            codeGenerator.GenerateAnyOrSceneVariableGetter(
+                                event.GetIterableVariableName(), context));
       });
 
   GetAllEvents()["BuiltinCommonInstructions::Repeat"].SetCodeGenerator(

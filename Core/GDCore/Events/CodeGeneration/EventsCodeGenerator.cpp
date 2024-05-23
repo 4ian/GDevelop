@@ -14,6 +14,7 @@
 #include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/IDE/Events/ExpressionVariableNameFinder.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/ObjectsContainersList.h"
@@ -631,6 +632,23 @@ gd::String EventsCodeGenerator::GenerateLocalVariablesStackAccessor() {
   return (HasProjectAndLayout() ? GetCodeNamespace()
                                 : "eventsFunctionContext") +
          ".localVariables";
+}
+
+gd::String EventsCodeGenerator::GenerateAnyOrSceneVariableGetter(
+    const gd::Expression &variableExpression,
+    EventsCodeGenerationContext &context) {
+  const auto variableName = gd::ExpressionVariableNameFinder::GetVariableName(
+      *variableExpression.GetRootNode());
+
+  gd::String variableParameterType =
+      GetProjectScopedContainers().GetVariablesContainersList().Has(
+          variableName)
+          ? "variable"
+          : "scenevar";
+
+  return gd::ExpressionCodeGenerator::GenerateExpressionCode(
+      *this, context, variableParameterType,
+      variableExpression.GetPlainString(), "", "AllowUndeclaredVariable");
 }
 
 const EventsCodeGenerator::CallbackDescriptor

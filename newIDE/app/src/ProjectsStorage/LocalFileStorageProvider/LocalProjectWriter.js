@@ -36,17 +36,17 @@ const deleteExistingFilesFromDirs = (
     if (!splittedProjectFolderNames.includes(entry)) return;
 
     const dirPath = path.join(projectPath, entry);
-    if (fs.statSync(dirPath).isDirectory()) {
-      const filenames = fs.readdirSync(dirPath);
-      filenames.forEach(file => {
-        const fileToRemovePath = path.join(dirPath, file);
-        try {
-          fs.unlinkSync(fileToRemovePath);
-        } catch (e) {
-          throw new Error(`Unable to remove file ${file}: ${e.message}`);
-        }
-      });
-    }
+    if (!fs.statSync(dirPath).isDirectory()) return;
+
+    const filenames = fs.readdirSync(dirPath);
+    filenames.forEach(file => {
+      const fileToRemovePath = path.join(dirPath, file);
+      try {
+        fs.unlinkSync(fileToRemovePath);
+      } catch (e) {
+        throw new Error(`Unable to remove file ${file}: ${e.message}`);
+      }
+    });
   });
 };
 
@@ -155,9 +155,7 @@ export const onSaveProject = async (
   const filePath = fileMetadata.fileIdentifier;
   const now = Date.now();
   if (!filePath) {
-    return Promise.reject(
-      'Project file is empty, "Save as" should have been called?'
-    );
+    throw new Error('Unable to find file path before saving.');
   }
   // Ensure we always pick the latest name and gameId.
   const newFileMetadata = {
@@ -172,9 +170,7 @@ export const onSaveProject = async (
   try {
     deleteExistingFilesFromDirs(project, projectPath);
   } catch (e) {
-    return Promise.reject(
-      'Unable to clean project folder before saving project'
-    );
+    console.warn('Unable to clean project folder before saving project: ', e);
   }
 
   await writeProjectFiles(project, filePath, projectPath);

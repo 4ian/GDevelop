@@ -139,7 +139,8 @@ export default class InstancesResizer {
     deltaY: number,
     grabbingLocation: ResizeGrabbingLocation,
     proportional: boolean,
-    noGridSnap: boolean
+    noGridSnap: boolean,
+    centeredResize: boolean
   ) {
     this.totalDeltaX += deltaX;
     this.totalDeltaY += deltaY;
@@ -210,14 +211,17 @@ export default class InstancesResizer {
       : roundedTotalDeltaX;
     const flippedTotalDeltaY = isTop ? -roundedTotalDeltaY : roundedTotalDeltaY;
 
+    // While rezising both sides, TotalDelta must be doubled
+    const altOffset = centeredResize ? 2 : 1;
+
     let scaleX =
       initialSelectionAABB.width() !== 0
-        ? (initialSelectionAABB.width() + flippedTotalDeltaX) /
+        ? (initialSelectionAABB.width() + flippedTotalDeltaX * altOffset) /
           initialSelectionAABB.width()
         : flippedTotalDeltaX;
     let scaleY =
       initialSelectionAABB.height() !== 0
-        ? (initialSelectionAABB.height() + flippedTotalDeltaY) /
+        ? (initialSelectionAABB.height() + flippedTotalDeltaY * altOffset) /
           initialSelectionAABB.height()
         : flippedTotalDeltaY;
     let scaleZ = 1;
@@ -348,12 +352,21 @@ export default class InstancesResizer {
         newWidth = scaleX * initialWidth;
         newHeight = scaleY * initialHeight;
         newDepth = scaleZ * initialDepth;
-        newX =
-          (initialInstanceOriginPosition.x - fixedPointX) * scaleX +
-          fixedPointX;
-        newY =
-          (initialInstanceOriginPosition.y - fixedPointY) * scaleY +
-          fixedPointY;
+
+        if (centeredResize) {
+          // fixedPoint will not be needed since resize will be done in both sides
+          newX =
+            initialInstanceOriginPosition.x + (initialWidth - newWidth) / 2;
+          newY =
+            initialInstanceOriginPosition.y + (initialHeight - newHeight) / 2;
+        } else {
+          newX =
+            (initialInstanceOriginPosition.x - fixedPointX) * scaleX +
+            fixedPointX;
+          newY =
+            (initialInstanceOriginPosition.y - fixedPointY) * scaleY +
+            fixedPointY;
+        }
       }
 
       // After resizing, we round the new positions and dimensions to the nearest pixel.

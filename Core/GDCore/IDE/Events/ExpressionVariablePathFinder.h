@@ -81,6 +81,9 @@ class GD_CORE_API ExpressionVariablePathFinder
     auto *variable = typeFinder.WalkUntilLastChild(
         typeFinder.variablesContainer->Get(typeFinder.variableName),
         typeFinder.childVariableNames);
+    if (variable && variable->GetType() != gd::Variable::Array) {
+      return gd::Variable::Unknown;
+    }
     return variable && variable->GetChildrenCount() > 0
                ? variable->GetAtIndex(0).GetType()
                : gd::Variable::Unknown;

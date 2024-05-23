@@ -122,7 +122,7 @@ export const quicklyAnalyzeVariableName = (
   return VariableNameQuickAnalyzeResults.OK;
 };
 
-const getVariableSourceIcon = (
+export const getVariableSourceIcon = (
   variableSourceType: VariablesContainer_SourceType
 ) => {
   switch (variableSourceType) {
@@ -382,7 +382,7 @@ export default React.forwardRef<Props, VariableFieldInterface>(
   }
 );
 
-const getVariablesContainerSourceType = (
+export const getVariablesContainerSourceType = (
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   variableName: string
 ) => {

@@ -283,6 +283,7 @@ BaseObjectExtension::BaseObjectExtension() {
       "toggleVariableBoolean");
 
   objectActions["ObjectVariablePush"].SetFunctionName("variablePushCopy");
+  objectActions["ObjectVariablePush2"].SetFunctionName("variablePushCopy");
   objectActions["ObjectVariablePushString"].SetFunctionName("valuePush");
   objectActions["ObjectVariablePushNumber"].SetFunctionName("valuePush");
   objectActions["ObjectVariablePushBool"].SetFunctionName("valuePush");

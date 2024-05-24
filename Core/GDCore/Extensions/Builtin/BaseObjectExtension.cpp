@@ -832,6 +832,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced()
       .SetRelevantForLayoutEventsOnly();
 
+  // Deprecated
   obj.AddAction(
          "ObjectVariablePush",
          _("Add existing variable"),
@@ -843,6 +844,23 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Array variable"))
       .AddParameter("scenevar", _("Scene variable with the content to add"))
+      .SetParameterLongDescription(_("The content of the object variable will "
+                                     "*be copied* and added at the "
+                                     "end of the array."))
+      .MarkAsAdvanced()
+      .SetHidden();
+
+  obj.AddAction(
+         "ObjectVariablePush2",
+         _("Add existing variable"),
+         _("Adds an existing variable to the end of an object array variable."),
+         _("Add variable _PARAM2_ to array variable _PARAM1_ of _PARAM0_"),
+         _("Variables/Arrays and structures"),
+         "res/actions/var24.png",
+         "res/actions/var.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("objectvar", _("Array variable"))
+      .AddParameter("variable", _("Scene variable with the content to add"))
       .SetParameterLongDescription(_("The content of the object variable will "
                                      "*be copied* and added at the "
                                      "end of the array."))

@@ -68,19 +68,22 @@ BuiltinExtensionsImplementer::ImplementsCommonConversionsExtension(
 
   extension
       .AddStrExpression("ToJSON",
-                        _("Convert scene variable to JSON"),
-                        _("Convert a scene variable to JSON"),
+                        _("Convert variable to JSON"),
+                        _("Convert a variable to JSON"),
                         _("JSON"),
                         "res/conditions/toujours24_black.png")
-      .AddParameter("scenevar", _("Scene variable to be stringified"));
+      .AddParameter("variable", _("The variable to be stringified"),
+                    "AllowUndeclaredVariable");
 
+  // Deprecated
   extension
       .AddStrExpression("GlobalVarToJSON",
                         _("Convert global variable to JSON"),
                         _("Convert a global variable to JSON"),
                         _("JSON"),
                         "res/conditions/toujours24_black.png")
-      .AddParameter("globalvar", _("The global variable to be stringified"));
+      .AddParameter("globalvar", _("The global variable to be stringified"))
+      .SetHidden();
 
   extension
       .AddStrExpression("ObjectVarToJSON",
@@ -91,6 +94,7 @@ BuiltinExtensionsImplementer::ImplementsCommonConversionsExtension(
       .AddParameter("objectPtr", _("The object with the variable"))
       .AddParameter("objectvar", _("The object variable to be stringified"));
 
+  // Deprecated
   extension
       .AddAction(
           "JSONToVariableStructure",
@@ -102,8 +106,10 @@ BuiltinExtensionsImplementer::ImplementsCommonConversionsExtension(
           "res/actions/net.png")
       .AddParameter("string", _("JSON string"))
       .AddParameter("scenevar", _("Variable where store the JSON object"))
-      .MarkAsAdvanced();
+      .MarkAsAdvanced()
+      .SetHidden();
 
+  // Deprecated
   extension
       .AddAction("JSONToGlobalVariableStructure",
                  _("Convert JSON to global variable"),
@@ -116,6 +122,20 @@ BuiltinExtensionsImplementer::ImplementsCommonConversionsExtension(
       .AddParameter("string", _("JSON string"))
       .AddParameter("globalvar",
                     _("Global variable where store the JSON object"))
+      .MarkAsAdvanced()
+      .SetHidden();
+
+  extension
+      .AddAction(
+          "JSONToVariableStructure2",
+          _("Convert JSON to a variable"),
+          _("Parse a JSON object and store it into a variable"),
+          _("Convert JSON string _PARAM0_ and store it into variable _PARAM1_"),
+          "",
+          "res/actions/net24.png",
+          "res/actions/net.png")
+      .AddParameter("string", _("JSON string"))
+      .AddParameter("variable", _("Variable where to store the JSON object"))
       .MarkAsAdvanced();
 
   extension

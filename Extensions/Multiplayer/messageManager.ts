@@ -80,23 +80,30 @@ namespace gdjs {
     let _lastClockReceivedByInstance: { [instanceId: string]: number } = {};
 
     // The number of times per second the scene data should be synchronized.
-    let sceneSyncDataTickRate = 1;
+    const sceneSyncDataTickRate = 1;
     let lastSceneSyncTimestamp = 0;
     let lastSentSceneSyncData: LayoutNetworkSyncData = {};
     let numberOfForcedSceneUpdates = 0;
 
     // The number of times per second the game data should be synchronized.
-    let gameSyncDataTickRate = 1;
+    const gameSyncDataTickRate = 1;
     let lastGameSyncTimestamp = 0;
     let lastSentGameSyncData: GameNetworkSyncData = {};
     let numberOfForcedGameUpdates = 0;
 
     // Send heartbeat messages to host to ensure the connection is still alive.
-    let heartbeatTickRate = 1;
+    const heartbeatTickRate = 1;
+    const timeBeforeHeartbeatTimeoutInMs = 10000; // 10 seconds
     let lastHeartbeatTimestamp = 0;
-    let _playersLastHeartbeatTimes: { [playerNumber: number]: number[] } = {};
+    let _playersLastHeartbeatInfo: {
+      [playerNumber: number]: {
+        lastDurations: number[];
+        lastHeartbeatAt: number;
+      };
+    } = {};
     let _peerIdToPlayerNumber: { [peerId: string]: number } = {};
     let _playersPings: { [playerNumber: number]: number } = {};
+    let _playerNumbersWhoJustLeft: number[] = [];
 
     const addExpectedMessageAcknowledgement = ({
       originalMessageName,
@@ -895,15 +902,6 @@ namespace gdjs {
             const objectName = matches[2];
             const instanceNetworkId = matches[3];
 
-            const messageInstanceClock = data['_clock'];
-            const lastClock =
-              _lastClockReceivedByInstance[instanceNetworkId] || 0;
-            if (messageInstanceClock <= lastClock) {
-              // Ignore old messages.
-              logger.info('Ignoring old message.');
-              return;
-            }
-
             const instance = getInstanceFromNetworkId({
               runtimeScene,
               objectName,
@@ -928,10 +926,6 @@ namespace gdjs {
               `Destroying object ${objectName} with instance network ID ${instanceNetworkId}.`
             );
             instance.deleteFromScene(runtimeScene);
-
-            _lastClockReceivedByInstance[
-              instanceNetworkId
-            ] = messageInstanceClock;
 
             logger.info(
               `Sending acknowledgment of destruction of object ${objectName} with instance network ID ${instanceNetworkId} to ${messageSender}.`
@@ -1361,8 +1355,10 @@ namespace gdjs {
       messageName: string;
       messageData: any;
     } => {
-      const playersPings = {};
-      for (const playerNumber in _playersLastHeartbeatTimes) {
+      const playersPings = {
+        1: 0, // Player 1 is the host, so we don't need to compute the ping.
+      };
+      for (const playerNumber in _playersLastHeartbeatInfo) {
         playersPings[playerNumber] = getPlayerPing(parseInt(playerNumber, 10));
       }
       logger.info(
@@ -1430,6 +1426,17 @@ namespace gdjs {
                   data.playersPings
                 )}.`
               );
+              // If one player is missing from the heartbeat, it means they have disconnected.
+              const missingPlayerNumbers = Object.keys(_playersPings).filter(
+                (playerNumber) => data.playersPings[playerNumber] === undefined
+              );
+              for (const missingPlayerNumber of missingPlayerNumbers) {
+                logger.info(
+                  `Player ${missingPlayerNumber} is missing from the heartbeat, assuming they have disconnected.`
+                );
+                delete _playersPings[missingPlayerNumber];
+                markPlayerAsDisconnected(parseInt(missingPlayerNumber, 10));
+              }
               _playersPings = data.playersPings;
               return;
             }
@@ -1440,21 +1447,26 @@ namespace gdjs {
             logger.info(
               `Received heartbeat from player ${playerNumber} with time difference of ${timeDifference}ms.`
             );
-            const playerLastHeartbeatTimes =
-              _playersLastHeartbeatTimes[playerNumber] || [];
-            playerLastHeartbeatTimes.push(timeDifference);
-            if (playerLastHeartbeatTimes.length > 5) {
+            const playerLastHeartbeatInfo =
+              _playersLastHeartbeatInfo[playerNumber] || {};
+            const playerLastHeartbeatDurations =
+              playerLastHeartbeatInfo.lastDurations || [];
+            playerLastHeartbeatDurations.push(timeDifference);
+            if (playerLastHeartbeatDurations.length > 5) {
               // Keep only the last 5 heartbeats to compute the average.
-              playerLastHeartbeatTimes.shift();
+              playerLastHeartbeatDurations.shift();
             }
-            _playersLastHeartbeatTimes[playerNumber] = playerLastHeartbeatTimes;
+            _playersLastHeartbeatInfo[playerNumber] = {
+              lastDurations: playerLastHeartbeatDurations,
+              lastHeartbeatAt: getTimeNow(),
+            };
 
             let sum = 0;
-            for (const time of playerLastHeartbeatTimes) {
-              sum += time;
+            for (const duration of playerLastHeartbeatDurations) {
+              sum += duration;
             }
             const averagePing = Math.round(
-              sum / playerLastHeartbeatTimes.length
+              sum / playerLastHeartbeatDurations.length
             );
             _playersPings[playerNumber] = averagePing;
           }
@@ -1470,6 +1482,101 @@ namespace gdjs {
       }
 
       return _playersPings[playerNumber] || 0;
+    };
+
+    const markPlayerAsDisconnected = (playerNumber: number) => {
+      logger.info(`Marking player ${playerNumber} as disconnected.`);
+      _playerNumbersWhoJustLeft.push(playerNumber);
+
+      // If Player 1 has disconnected, just end the game.
+      if (playerNumber === 1) {
+        logger.info('Host has disconnected, ending the game.');
+        _playersLastHeartbeatInfo = {};
+        _playersPings = {};
+        gdjs.multiplayer.endLobbyGame();
+        return;
+      }
+
+      // Remove the player from the list of players.
+      // This will cause the next hearbeat to not include this player
+      // and the others will consider them as disconnected.
+      delete _playersLastHeartbeatInfo[playerNumber];
+      delete _playersPings[playerNumber];
+    };
+
+    const handleDisconnectedPeers = (runtimeScene: RuntimeScene) => {
+      // Players can disconnect if the P2P connection disconnects
+      // or if we don't receive heartbeats for a while.
+      const disconnectedPlayerNumbers: number[] = [];
+
+      const disconnectedPeer = gdjs.evtTools.p2p.getDisconnectedPeer();
+      if (disconnectedPeer) {
+        logger.info(`Disconnected peer: ${disconnectedPeer}`);
+        const disconnectedPlayerNumber =
+          _peerIdToPlayerNumber[disconnectedPeer];
+        if (!disconnectedPlayerNumber) {
+          // This should not happen.
+          return;
+        }
+        logger.info(`Player ${disconnectedPlayerNumber} has disconnected.`);
+        disconnectedPlayerNumbers.push(disconnectedPlayerNumber);
+      }
+
+      // Check for players who have not sent heartbeats for a while.
+      const now = getTimeNow();
+      for (const playerNumber in _playersLastHeartbeatInfo) {
+        const playerLastHeartbeatInfo = _playersLastHeartbeatInfo[playerNumber];
+        const lastHeartbeatAt = playerLastHeartbeatInfo.lastHeartbeatAt;
+        if (now - lastHeartbeatAt > timeBeforeHeartbeatTimeoutInMs) {
+          logger.info(
+            `Player ${playerNumber} has not sent a heartbeat for a while, assuming they are disconnected.`
+          );
+          disconnectedPlayerNumbers.push(parseInt(playerNumber, 10));
+        }
+      }
+
+      for (const playerNumber of disconnectedPlayerNumbers) {
+        // When a player disconnects, as the host, we look at all the instances
+        // they own and decide what to do with them.
+        if (gdjs.multiplayer.isPlayerHost()) {
+          const instances = runtimeScene.getAdhocListOfAllInstances();
+          for (const instance of instances) {
+            logger.info('Found instances ' + instance.getName());
+            const behavior = instance.getBehavior(
+              'MultiplayerObject'
+            ) as MultiplayerObjectRuntimeBehavior | null;
+            if (
+              behavior &&
+              behavior.getPlayerObjectOwnership() === playerNumber
+            ) {
+              const actionOnPlayerDisconnect = behavior.getActionOnPlayerDisconnect();
+              if (actionOnPlayerDisconnect === 'DestroyObject') {
+                // No need to remove the ownership, as the destroy message will be sent to all players.
+                instance.deleteFromScene(runtimeScene);
+              } else if (actionOnPlayerDisconnect === 'GiveOwnershipToHost') {
+                // Removing the ownership will send a message to all players.
+                behavior.removeObjectOwnership();
+              } else if (actionOnPlayerDisconnect === 'DoNothing') {
+                // Do nothing.
+              }
+            }
+          }
+        }
+
+        markPlayerAsDisconnected(playerNumber);
+      }
+    };
+
+    const clearDisconnectedPeers = () => {
+      _playerNumbersWhoJustLeft = [];
+    };
+
+    const hasPlayerLeft = (playerNumber: number) => {
+      return _playerNumbersWhoJustLeft.includes(playerNumber);
+    };
+
+    const getDisconnectedPlayers = () => {
+      return _playerNumbersWhoJustLeft;
     };
 
     return {
@@ -1499,6 +1606,10 @@ namespace gdjs {
       handleHeartbeats,
       handleHeartbeatsReceived,
       getPlayerPing,
+      handleDisconnectedPeers,
+      clearDisconnectedPeers,
+      hasPlayerLeft,
+      getDisconnectedPlayers,
     };
   };
 

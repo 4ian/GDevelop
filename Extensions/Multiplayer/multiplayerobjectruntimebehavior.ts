@@ -13,6 +13,10 @@ namespace gdjs {
     // Which player is the owner of the object.
     // If 0, then the object is not owned by any player, so the host is the owner.
     _playerNumber: number = 0;
+
+    // The action to be executed when the player disconnects.
+    actionOnPlayerDisconnect: string;
+
     // The last time the object has been synchronized.
     // This is to avoid synchronizing the object too often, see _objectMaxTickRate.
     _lastObjectSyncTimestamp: number = 0;
@@ -69,6 +73,7 @@ namespace gdjs {
       owner: RuntimeObject
     ) {
       super(instanceContainer, behaviorData, owner);
+      this.actionOnPlayerDisconnect = behaviorData.actionOnPlayerDisconnect;
       this._getTimeNow =
         window.performance && typeof window.performance.now === 'function'
           ? window.performance.now.bind(window.performance)
@@ -362,7 +367,9 @@ namespace gdjs {
         this._destroyInstanceTimeoutId = null;
       }
 
-      if (!this.isOwnerAsPlayerOrHost()) {
+      // For desruction of objects, we allow the host to destroy the object even if it is not the owner.
+      // This is particularly helpful when a player disconnects, so the host can destroy the object they were owning.
+      if (!this.isOwnerAsPlayerOrHost() && !gdjs.multiplayer.isPlayerHost()) {
         return;
       }
 
@@ -548,6 +555,10 @@ namespace gdjs {
 
     takeObjectOwnership() {
       this.setPlayerObjectOwnership(gdjs.multiplayer.getPlayerNumber());
+    }
+
+    getActionOnPlayerDisconnect() {
+      return this.actionOnPlayerDisconnect;
     }
   }
   gdjs.registerBehavior(

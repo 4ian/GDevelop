@@ -51,6 +51,7 @@ namespace gdjs {
         gdjs.multiplayerMessageManager.handleSceneUpdatedMessages(runtimeScene);
         gdjs.multiplayerMessageManager.handleGameUpdatedMessages(runtimeScene);
         gdjs.multiplayerMessageManager.handleHeartbeats();
+        gdjs.multiplayerMessageManager.handleDisconnectedPeers(runtimeScene);
       }
     );
 
@@ -64,6 +65,8 @@ namespace gdjs {
         gdjs.multiplayerMessageManager.handleUpdateSceneMessages(runtimeScene);
         gdjs.multiplayerMessageManager.handleUpdateGameMessages(runtimeScene);
         gdjs.multiplayerMessageManager.handleHeartbeatsReceived();
+        handleLeavingPlayer(runtimeScene);
+        gdjs.multiplayerMessageManager.clearDisconnectedPeers();
       }
     );
 
@@ -200,6 +203,34 @@ namespace gdjs {
       return playerPublicProfile
         ? playerPublicProfile.username
         : `Player ${playerNumber}`;
+    };
+
+    export const hasPlayerLeft = (playerNumber: number) =>
+      gdjs.multiplayerMessageManager.hasPlayerLeft(playerNumber);
+
+    const handleLeavingPlayer = (runtimeScene: gdjs.RuntimeScene) => {
+      const disconnectedPlayers = gdjs.multiplayerMessageManager.getDisconnectedPlayers();
+      if (disconnectedPlayers.length > 0) {
+        for (const playerNumber of disconnectedPlayers) {
+          const playerLeftId = getPlayerId(playerNumber);
+
+          if (!playerLeftId) {
+            return;
+          }
+
+          const playerLeftPublicProfile = _playerPublicProfiles.find(
+            (profile) => profile.id === playerLeftId
+          );
+
+          if (playerLeftPublicProfile) {
+            multiplayerComponents.displayPlayerLeftNotification(
+              runtimeScene,
+              (playerLeftPublicProfile && playerLeftPublicProfile.username) ||
+                'Player'
+            );
+          }
+        }
+      }
     };
 
     /**
@@ -537,57 +568,11 @@ namespace gdjs {
       updatedLobby,
       positionInLobby: number
     ) {
-      const lobbyBeforeUpdate = _lobby;
       // Update the object representing the lobby in the extension.
       _lobby = updatedLobby;
 
-      // If the lobby is playing, do not update the player position or usernames as it's probably a player leaving,
-      // and we want to keep that info.
+      // If the lobby is playing, do not update anything.
       if (updatedLobby.status === 'playing') {
-        // But we do want to let the player know if another player has left the lobby.
-        if (
-          _lobbyOnGameStart &&
-          lobbyBeforeUpdate &&
-          lobbyBeforeUpdate.players.length > updatedLobby.players.length
-        ) {
-          // Find the missing player. Note: we can have multiple players with the same playerId, when testing.
-          // So, we loop through the players one by one until one is not the same (as they are in order).
-          let playerLeft: { playerId: string; status: string } | null = null;
-          for (let i = 0; i < lobbyBeforeUpdate.players.length; i++) {
-            // If the last player is missing, then it's the last one.
-            if (!updatedLobby.players[i]) {
-              playerLeft = lobbyBeforeUpdate.players[i];
-              break;
-            }
-
-            // If the player is not the same, then it's the missing one, we can break.
-            if (
-              updatedLobby.players[i] &&
-              updatedLobby.players[i].playerId !==
-                lobbyBeforeUpdate.players[i].playerId
-            ) {
-              playerLeft = lobbyBeforeUpdate.players[i];
-              break;
-            }
-          }
-
-          if (!playerLeft) {
-            return;
-          }
-
-          const playerLeftPublicProfile = _playerPublicProfiles.find(
-            // @ts-ignore - probable TypeScript bug, we guarded against this just before.
-            (profile) => profile.id === playerLeft.playerId
-          );
-
-          if (playerLeftPublicProfile) {
-            multiplayerComponents.displayPlayerLeftNotification(
-              runtimeScene,
-              (playerLeftPublicProfile && playerLeftPublicProfile.username) ||
-                'Player'
-            );
-          }
-        }
         return;
       }
 
@@ -748,6 +733,10 @@ namespace gdjs {
         logger.error(
           'No connection to send the end game message. Are you connected to a lobby?'
         );
+        return;
+      }
+
+      if (!isConnectedToLobby() || !isGameRunning()) {
         return;
       }
 

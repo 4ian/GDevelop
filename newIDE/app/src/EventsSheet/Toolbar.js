@@ -17,6 +17,7 @@ import RedoIcon from '../UI/CustomSvgIcons/Redo';
 import ToolbarSearchIcon from '../UI/CustomSvgIcons/ToolbarSearch';
 import EditSceneIcon from '../UI/CustomSvgIcons/EditScene';
 import { getShortcutDisplayName, useShortcutMap } from '../KeyboardShortcuts';
+import AddLocalVariableIcon from '../UI/CustomSvgIcons/ExternalEvents';
 
 type Props = {|
   onAddStandardEvent: () => void,
@@ -123,6 +124,20 @@ const Toolbar = React.memo<Props>(function Toolbar({
           )}
         >
           <AddSubEventIcon />
+        </IconButton>
+
+        <IconButton
+          size="small"
+          color="default"
+          onClick={onAddLocalVariable}
+          disabled={!canAddLocalVariable}
+          id="toolbar-add-local-variable-button"
+          tooltip={t`Add a local variable`}
+          acceleratorString={getShortcutDisplayName(
+            shortcutMap['ADD_LOCAL_VARIABLE']
+          )}
+        >
+          <AddLocalVariableIcon />
         </IconButton>
 
         <IconButton

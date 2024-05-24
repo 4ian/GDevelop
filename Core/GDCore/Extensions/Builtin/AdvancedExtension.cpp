@@ -97,6 +97,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
       .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
+  // Deprecated
   extension
       .AddAction("CopyVariableToArgument",
                  _("Copy variable to function parameter"),

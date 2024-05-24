@@ -17,5 +17,6 @@ export default {
 export const Default = () => (
   <EventsBasedObjectEditor
     eventsBasedObject={testProject.testEventsBasedObject}
+    onOpenCustomObjectEditor={() => {}}
   />
 );

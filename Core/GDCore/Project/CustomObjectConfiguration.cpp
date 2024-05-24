@@ -35,19 +35,26 @@ std::unique_ptr<gd::ObjectConfiguration> CustomObjectConfiguration::Clone() cons
   return gd::make_unique<gd::CustomObjectConfiguration>(*this);
 }
 
-gd::ObjectConfiguration &CustomObjectConfiguration::GetChildObjectConfiguration(const gd::String &objectName) {
+const gd::EventsBasedObject* CustomObjectConfiguration::GetEventsBasedObject() const {
   if (!project->HasEventsBasedObject(GetType())) {
+    return nullptr;
+  }
+  return &project->GetEventsBasedObject(GetType());
+}
+
+gd::ObjectConfiguration &CustomObjectConfiguration::GetChildObjectConfiguration(const gd::String &objectName) {
+  const auto *eventsBasedObject = GetEventsBasedObject();
+  if (!eventsBasedObject) {
     return badObjectConfiguration;
   }
-  const auto &eventsBasedObject = project->GetEventsBasedObject(GetType());
 
-  if (!eventsBasedObject.HasObjectNamed(objectName)) {
+  if (!eventsBasedObject->HasObjectNamed(objectName)) {
     gd::LogError("Tried to get the configuration of a child-object:" + objectName
                 + " that doesn't exist in the event-based object: " + GetType());
     return badObjectConfiguration;
   }
 
-  auto &childObject = eventsBasedObject.GetObject(objectName);
+  auto &childObject = eventsBasedObject->GetObject(objectName);
   auto configurationPosition = childObjectConfigurations.find(objectName);
   if (configurationPosition == childObjectConfigurations.end()) {
     childObjectConfigurations.insert(std::make_pair(
@@ -128,6 +135,14 @@ void CustomObjectConfiguration::DoSerializeTo(SerializerElement& element) const 
     auto &childConfiguration = pair.second;
     auto &childElement = childrenContentElement.AddChild(childName);
     childConfiguration->SerializeTo(childElement);
+  }
+
+  const auto *eventsBasedObject = GetEventsBasedObject();
+  if (eventsBasedObject) {
+    eventsBasedObject->GetInitialInstances().SerializeTo(
+        element.AddChild("instances"));
+    eventsBasedObject->GetLayers().SerializeLayersTo(
+        element.AddChild("layers"));
   }
 }
 void CustomObjectConfiguration::DoUnserializeFrom(Project& project,

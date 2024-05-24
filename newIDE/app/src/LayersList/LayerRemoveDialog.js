@@ -13,7 +13,7 @@ const gd: libGDevelop = global.gd;
 type Props = {|
   open: boolean,
   project: gdProject,
-  layersContainer: gdLayout,
+  layersContainer: gdLayersContainer,
   layerRemoved: string,
   onClose: (doRemove: boolean, newLayer: string | null) => void,
 |};
@@ -43,6 +43,7 @@ export default class LayerRemoveDialog extends Component<Props, State> {
   render() {
     if (!this.props.layersContainer || !this.props.open) return null;
 
+    // TODO: adapt for layouts.
     const instancesCountInLayout = gd.WholeProjectRefactorer.getLayoutAndExternalLayoutLayerInstancesCount(
       this.props.project,
       this.props.layersContainer,

@@ -30,7 +30,7 @@ const gd: libGDevelop = global.gd;
 type Props = {|
   project: gdProject,
   resourceManagementProps: ResourceManagementProps,
-  layout: gdLayout,
+  layout: ?gdLayout,
   layer: gdLayer,
   initialInstances: gdInitialInstancesContainer,
 
@@ -418,15 +418,19 @@ const LayerEditorDialog = (props: Props) => {
           project={props.project}
           resourceManagementProps={props.resourceManagementProps}
           effectsContainer={layer.getEffects()}
-          onEffectsRenamed={(oldName, newName) =>
-            gd.WholeProjectRefactorer.renameLayerEffect(
-              props.project,
-              props.layout,
-              props.layer,
-              oldName,
-              newName
-            )
-          }
+          onEffectsRenamed={(oldName, newName) => {
+            if (props.layout) {
+              gd.WholeProjectRefactorer.renameLayerEffect(
+                props.project,
+                props.layout,
+                props.layer,
+                oldName,
+                newName
+              )
+            } else {
+              // TODO: refactoring for custom objects.
+            }
+          }}
           onEffectsUpdated={() => {
             forceUpdate(); /*Force update to ensure dialog is properly positioned*/
             notifyOfChange();

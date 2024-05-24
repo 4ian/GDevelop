@@ -68,7 +68,10 @@ export type InstancesEditorShortcutsCallbacks = {|
 
 export type InstancesEditorPropsWithoutSizeAndScroll = {|
   project: gdProject,
-  layout: gdLayout,
+  layout: gdLayout | null,
+  layersContainer: gdLayersContainer,
+  globalObjectsContainer: gdObjectsContainer,
+  objectsContainer: gdObjectsContainer,
   selectedLayer: string,
   initialInstances: gdInitialInstancesContainer,
   instancesEditorSettings: InstancesEditorSettings,
@@ -422,7 +425,10 @@ export default class InstancesEditor extends Component<Props> {
 
     this.instancesRenderer = new InstancesRenderer({
       project: props.project,
-      layout: props.layout,
+      layout: props.layout || null,
+      layersContainer: props.layersContainer,
+      globalObjectsContainer: props.globalObjectsContainer,
+      objectsContainer: props.objectsContainer,
       instances: props.initialInstances,
       viewPosition: this.viewPosition,
       onOverInstance: this._onOverInstance,
@@ -472,7 +478,7 @@ export default class InstancesEditor extends Component<Props> {
     });
     this.windowBorder = new WindowBorder({
       project: props.project,
-      layout: props.layout,
+      layout: props.layout || null,
       toCanvasCoordinates: this.viewPosition.toCanvasCoordinates,
     });
     this.windowMask = new WindowMask({
@@ -578,6 +584,8 @@ export default class InstancesEditor extends Component<Props> {
 
     if (
       this.props.layout !== nextProps.layout ||
+      this.props.layersContainer !== nextProps.layersContainer ||
+      this.props.objectsContainer !== nextProps.objectsContainer ||
       this.props.initialInstances !== nextProps.initialInstances ||
       this.props.project !== nextProps.project
     ) {
@@ -717,11 +725,11 @@ export default class InstancesEditor extends Component<Props> {
   };
 
   _getLayersLocks = () => {
-    const { layout } = this.props;
+    const { layersContainer } = this.props;
     const layersLocks = {};
-    for (let i = 0; i < layout.getLayersCount(); i++) {
-      const layer = layout.getLayerAt(i);
-      layersLocks[layout.getLayerAt(i).getName()] =
+    for (let i = 0; i < layersContainer.getLayersCount(); i++) {
+      const layer = layersContainer.getLayerAt(i);
+      layersLocks[layersContainer.getLayerAt(i).getName()] =
         !layer.getVisibility() || layer.isLocked();
     }
     return layersLocks;

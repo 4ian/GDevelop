@@ -558,7 +558,6 @@ module.exports = {
     class RenderedVideoObjectInstance extends RenderedInstance {
       constructor(
         project,
-        layout,
         instance,
         associatedObjectConfiguration,
         pixiContainer,
@@ -566,7 +565,6 @@ module.exports = {
       ) {
         super(
           project,
-          layout,
           instance,
           associatedObjectConfiguration,
           pixiContainer,

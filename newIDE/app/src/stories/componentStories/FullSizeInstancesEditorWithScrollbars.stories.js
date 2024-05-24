@@ -38,6 +38,9 @@ export const Default = () => (
       <FullSizeInstancesEditorWithScrollbars
         project={testProject.project}
         layout={testProject.testLayout}
+        layersContainer={testProject.testLayout.getLayers()}
+        globalObjectsContainer={testProject.project}
+        objectsContainer={testProject.testLayout}
         selectedLayer={''}
         initialInstances={testProject.testLayout.getInitialInstances()}
         instancesEditorSettings={instancesEditorSettings}

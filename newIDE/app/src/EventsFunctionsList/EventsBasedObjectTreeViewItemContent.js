@@ -31,6 +31,7 @@ export type EventsBasedObjectCallbacks = {|
     cb: (boolean) => void
   ) => void,
   onEventsBasedObjectRenamed: (eventsBasedObject: gdEventsBasedObject) => void,
+  onOpenCustomObjectEditor: (eventsBasedObject: gdEventsBasedObject) => void,
 |};
 
 export type EventsBasedObjectProps = {|
@@ -133,6 +134,10 @@ export class EventsBasedObjectTreeViewItemContent
 
   buildMenuTemplate(i18n: I18nType, index: number) {
     return [
+      {
+        label: i18n._(t`Open visual editor`),
+        click: () => this.props.onOpenCustomObjectEditor(this.eventsBasedObject),
+      },
       {
         label: i18n._(t`Add a function`),
         click: () => this.addFunctionAtSelection(),

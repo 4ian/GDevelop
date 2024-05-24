@@ -34,7 +34,6 @@ export default class RenderedTextInstance extends RenderedInstance {
 
   constructor(
     project: gdProject,
-    layout: gdLayout,
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,
@@ -42,7 +41,6 @@ export default class RenderedTextInstance extends RenderedInstance {
   ) {
     super(
       project,
-      layout,
       instance,
       associatedObjectConfiguration,
       pixiContainer,

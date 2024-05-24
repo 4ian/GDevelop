@@ -71,6 +71,7 @@ type Props = {|
   initiallyFocusedFunctionName: ?string,
   initiallyFocusedBehaviorName: ?string,
   unsavedChanges?: ?UnsavedChanges,
+  onOpenCustomObjectEditor: gdEventsBasedObject => void,
 |};
 
 type State = {|
@@ -1317,6 +1318,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   this.eventsFunctionList.forceUpdateList();
                 }
               }}
+              onOpenCustomObjectEditor={() =>
+                this.props.onOpenCustomObjectEditor(selectedEventsBasedObject)
+              }
             />
           ) : (
             <Background>
@@ -1385,6 +1389,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   this._editVariables({ isGlobalTabInitiallyOpen: true })
                 }
                 onSelectExtensionSceneVariables={() => this._editVariables()}
+                onOpenCustomObjectEditor={this.props.onOpenCustomObjectEditor}
               />
             )}
           </I18n>

@@ -15,6 +15,8 @@ declare class gdEventsBasedObject extends gdAbstractEventsBasedEntity {
   isAnimatable(): boolean;
   markAsTextContainer(isTextContainer: boolean): gdEventsBasedObject;
   isTextContainer(): boolean;
+  getInitialInstances(): gdInitialInstancesContainer;
+  getLayers(): gdLayersContainer;
   static getPropertyActionName(propertyName: string): string;
   static getPropertyConditionName(propertyName: string): string;
   static getPropertyExpressionName(propertyName: string): string;
@@ -31,6 +33,7 @@ declare class gdEventsBasedObject extends gdAbstractEventsBasedEntity {
   moveObjectFolderOrObjectToAnotherContainerInFolder(objectFolderOrObject: gdObjectFolderOrObject, newObjectsContainer: gdObjectsContainer, parentObjectFolderOrObject: gdObjectFolderOrObject, newPosition: number): void;
   getObjectsCount(): number;
   getRootFolder(): gdObjectFolderOrObject;
+  getAllObjectFolderOrObjects(): gdVectorObjectFolderOrObject;
   getObjectGroups(): gdObjectGroupsContainer;
   delete(): void;
   ptr: number;

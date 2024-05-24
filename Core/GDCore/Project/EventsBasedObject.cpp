@@ -43,6 +43,9 @@ void EventsBasedObject::SerializeTo(SerializerElement& element) const {
   AbstractEventsBasedEntity::SerializeTo(element);
   SerializeObjectsTo(element.AddChild("objects"));
   SerializeFoldersTo(element.AddChild("objectsFolderStructure"));
+
+  layers.SerializeLayersTo(element.AddChild("layers"));
+  initialInstances.SerializeTo(element.AddChild("instances"));
 }
 
 void EventsBasedObject::UnserializeFrom(gd::Project& project,
@@ -58,6 +61,14 @@ void EventsBasedObject::UnserializeFrom(gd::Project& project,
     UnserializeFoldersFrom(project, element.GetChild("objectsFolderStructure", 0));
   }
   AddMissingObjectsInRootFolder();
+
+  if (element.HasChild("layers")) {
+    layers.UnserializeLayersFrom(element.GetChild("layers"));
+  } else {
+    layers.Reset();
+  }
+
+  initialInstances.UnserializeFrom(element.GetChild("instances"));
 }
 
 }  // namespace gd

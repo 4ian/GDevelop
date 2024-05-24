@@ -195,6 +195,7 @@ type Props = {|
   project: gdProject,
   layout: ?gdLayout,
   initialInstances?: gdInitialInstancesContainer,
+  // TODO: add globalObjectsContainer
   objectsContainer: gdObjectsContainer,
   onSelectAllInstancesOfObjectInLayout?: string => void,
   resourceManagementProps: ResourceManagementProps,

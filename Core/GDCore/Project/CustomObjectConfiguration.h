@@ -86,6 +86,8 @@ protected:
   void DoUnserializeFrom(Project& project, const SerializerElement& element) override;
 
  private:
+  const gd::EventsBasedObject* GetEventsBasedObject() const;
+
   const Project* project; ///< The project is used to get the
                           ///< EventBasedObject from the fullType.
   gd::SerializerElement objectContent;

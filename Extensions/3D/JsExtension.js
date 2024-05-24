@@ -2115,7 +2115,6 @@ module.exports = {
 
       constructor(
         project,
-        layout,
         instance,
         associatedObjectConfiguration,
         pixiContainer,
@@ -2123,7 +2122,6 @@ module.exports = {
       ) {
         super(
           project,
-          layout,
           instance,
           associatedObjectConfiguration,
           pixiContainer,
@@ -2300,7 +2298,6 @@ module.exports = {
     class RenderedCube3DObject3DInstance extends Rendered3DInstance {
       constructor(
         project,
-        layout,
         instance,
         associatedObjectConfiguration,
         pixiContainer,
@@ -2309,7 +2306,6 @@ module.exports = {
       ) {
         super(
           project,
-          layout,
           instance,
           associatedObjectConfiguration,
           pixiContainer,
@@ -2682,7 +2678,6 @@ module.exports = {
 
       constructor(
         project,
-        layout,
         instance,
         associatedObjectConfiguration,
         pixiContainer,
@@ -2690,7 +2685,6 @@ module.exports = {
       ) {
         super(
           project,
-          layout,
           instance,
           associatedObjectConfiguration,
           pixiContainer,
@@ -2945,7 +2939,6 @@ module.exports = {
 
       constructor(
         project,
-        layout,
         instance,
         associatedObjectConfiguration,
         pixiContainer,
@@ -2954,7 +2947,6 @@ module.exports = {
       ) {
         super(
           project,
-          layout,
           instance,
           associatedObjectConfiguration,
           pixiContainer,

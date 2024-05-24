@@ -23,6 +23,7 @@ export const Default = () => (
       eventsBasedObject={testProject.testEventsBasedObject}
       onRenameProperty={action('property rename')}
       onEventsFunctionsAdded={action('functions added')}
+      onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
     />
   </DragAndDropContextProvider>
 );

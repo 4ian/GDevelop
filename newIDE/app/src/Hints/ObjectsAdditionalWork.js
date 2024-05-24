@@ -3,6 +3,7 @@ import { t } from '@lingui/macro';
 import { type AlertMessageIdentifier } from '../MainFrame/Preferences/PreferencesContext';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import getObjectByName from '../Utils/GetObjectByName';
 
 /*
  * Define additional logic which executes after an object/instance has been created.
@@ -19,14 +20,24 @@ export type InfoBarDetails = {|
 
 type InfoBarEvent = 'onObjectAdded' | 'onInstanceAdded';
 
-export const onObjectAdded = (
+type ObjectAddedOptions = {|
   object: gdObject,
-  layout: gdLayout,
-  project: gdProject
-): ?InfoBarDetails => {
-  const additionalWork = objectType[object.getType()];
+  layersContainer: gdLayersContainer,
+  globalObjectsContainer: gdObjectsContainer,
+  objectsContainer: gdObjectsContainer,
+|};
+
+type InstanceAddedOptions = {|
+  instance: gdInitialInstance,
+  layersContainer: gdLayersContainer,
+  globalObjectsContainer: gdObjectsContainer,
+  objectsContainer: gdObjectsContainer,
+|};
+
+export const onObjectAdded = (options: ObjectAddedOptions): ?InfoBarDetails => {
+  const additionalWork = objectType[options.object.getType()];
   if (additionalWork) {
-    additionalWork.onObjectAdded(object, layout, project);
+    additionalWork.onObjectAdded(options);
     return additionalWork.getInfoBarDetails('onObjectAdded');
   }
 
@@ -34,28 +45,28 @@ export const onObjectAdded = (
 };
 
 export const onInstanceAdded = (
-  instance: gdInitialInstance,
-  layout: gdLayout,
-  project: gdProject
+  options: InstanceAddedOptions
 ): ?InfoBarDetails => {
+  const { instance, globalObjectsContainer, objectsContainer } = options;
   const objectName = instance.getObjectName();
-  let object: ?gdObject = null;
-  if (layout.hasObjectNamed(objectName)) object = layout.getObject(objectName);
-  else if (project.hasObjectNamed(objectName))
-    object = project.getObject(objectName);
+  const object = getObjectByName(
+    globalObjectsContainer,
+    objectsContainer,
+    objectName
+  );
 
   const additionalWork = object ? objectType[object.getType()] : null;
   if (additionalWork) {
-    additionalWork.onInstanceAdded(instance, layout, project);
+    additionalWork.onInstanceAdded(options);
     return additionalWork.getInfoBarDetails('onInstanceAdded');
   }
 
   return null;
 };
 
-const getLightingLayer = (layout: gdLayout): ?gdLayer => {
-  for (let i = 0; i < layout.getLayersCount(); i++) {
-    const layer = layout.getLayerAt(i);
+const getLightingLayer = (layersContainer: gdLayersContainer): ?gdLayer => {
+  for (let i = 0; i < layersContainer.getLayersCount(); i++) {
+    const layer = layersContainer.getLayerAt(i);
     if (layer.isLightingLayer()) return layer;
   }
 
@@ -64,26 +75,22 @@ const getLightingLayer = (layout: gdLayout): ?gdLayer => {
 
 const objectType = {
   'Lighting::LightObject': {
-    onObjectAdded: (object: gdObject, layout: gdLayout, project: gdProject) => {
-      const lightingLayer = getLightingLayer(layout);
+    onObjectAdded: ({ object, layersContainer }: ObjectAddedOptions) => {
+      const lightingLayer = getLightingLayer(layersContainer);
       if (lightingLayer === null) {
         const name = newNameGenerator('Lighting', name =>
-          layout.hasLayerNamed(name)
+          layersContainer.hasLayerNamed(name)
         );
-        layout.insertNewLayer(name, layout.getLayersCount());
-        const layer: gdLayer = layout.getLayer('Lighting');
+        layersContainer.insertNewLayer(name, layersContainer.getLayersCount());
+        const layer: gdLayer = layersContainer.getLayer('Lighting');
         layer.setLightingLayer(true);
         layer.setFollowBaseLayerCamera(true);
         layer.setAmbientLightColor(128, 128, 128);
       }
     },
 
-    onInstanceAdded: (
-      instance: gdInitialInstance,
-      layout: gdLayout,
-      project: gdProject
-    ) => {
-      const lightingLayer = getLightingLayer(layout);
+    onInstanceAdded: ({ instance, layersContainer }: InstanceAddedOptions) => {
+      const lightingLayer = getLightingLayer(layersContainer);
       if (lightingLayer) {
         instance.setLayer(lightingLayer.getName());
       }

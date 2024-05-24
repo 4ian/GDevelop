@@ -7,11 +7,15 @@ import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService
 
 const generateLayoutObjectsOptions = (
   project: gdProject,
-  layout: gdLayout,
+  globalObjectsContainer: gdObjectsContainer,
+  objectsContainer: gdObjectsContainer,
   onChoose: (object: gdObject, arg: ?string) => void,
   onChooseArg: ?string
 ): Array<CommandOption> => {
-  return enumerateObjects(project, layout).containerObjectsList.map(item => ({
+  return enumerateObjects(
+    globalObjectsContainer,
+    objectsContainer
+  ).containerObjectsList.map(item => ({
     text: item.object.getName(),
     handler: () => onChoose(item.object, onChooseArg),
     iconSrc: ObjectsRenderingService.getThumbnail.bind(ObjectsRenderingService)(
@@ -23,17 +27,30 @@ const generateLayoutObjectsOptions = (
 
 type Props = {|
   project: gdProject,
-  layout: gdLayout,
+  globalObjectsContainer: gdObjectsContainer,
+  objectsContainer: gdObjectsContainer,
   onEditObject: (object: gdObject, initialTab: ?string) => void,
   onEditObjectVariables: (object: gdObject) => void,
 |};
 
 const useObjectsListCommands = (props: Props) => {
-  const { project, layout, onEditObject, onEditObjectVariables } = props;
+  const {
+    project,
+    globalObjectsContainer,
+    objectsContainer,
+    onEditObject,
+    onEditObjectVariables,
+  } = props;
   useCommandWithOptions('EDIT_OBJECT', true, {
     generateOptions: React.useCallback(
-      () => generateLayoutObjectsOptions(project, layout, onEditObject),
-      [project, layout, onEditObject]
+      () =>
+        generateLayoutObjectsOptions(
+          project,
+          globalObjectsContainer,
+          objectsContainer,
+          onEditObject
+        ),
+      [project, globalObjectsContainer, objectsContainer, onEditObject]
     ),
   });
 
@@ -42,27 +59,39 @@ const useObjectsListCommands = (props: Props) => {
       () =>
         generateLayoutObjectsOptions(
           project,
-          layout,
+          globalObjectsContainer,
+          objectsContainer,
           onEditObject,
           'behaviors'
         ),
-      [project, layout, onEditObject]
+      [project, globalObjectsContainer, objectsContainer, onEditObject]
     ),
   });
 
   useCommandWithOptions('EDIT_OBJECT_EFFECTS', true, {
     generateOptions: React.useCallback(
       () =>
-        generateLayoutObjectsOptions(project, layout, onEditObject, 'effects'),
-      [project, layout, onEditObject]
+        generateLayoutObjectsOptions(
+          project,
+          globalObjectsContainer,
+          objectsContainer,
+          onEditObject,
+          'effects'
+        ),
+      [project, globalObjectsContainer, objectsContainer, onEditObject]
     ),
   });
 
   useCommandWithOptions('EDIT_OBJECT_VARIABLES', true, {
     generateOptions: React.useCallback(
       () =>
-        generateLayoutObjectsOptions(project, layout, onEditObjectVariables),
-      [project, layout, onEditObjectVariables]
+        generateLayoutObjectsOptions(
+          project,
+          globalObjectsContainer,
+          objectsContainer,
+          onEditObjectVariables
+        ),
+      [project, globalObjectsContainer, objectsContainer, onEditObjectVariables]
     ),
   });
 };

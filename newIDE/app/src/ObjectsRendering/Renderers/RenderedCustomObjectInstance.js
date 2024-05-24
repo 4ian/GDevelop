@@ -18,6 +18,7 @@ import {
 } from './CustomObjectLayoutingModel';
 import * as PIXI from 'pixi.js-legacy';
 import * as THREE from 'three';
+import getObjectByName from '../../Utils/GetObjectByName';
 
 const gd: libGDevelop = global.gd;
 
@@ -39,9 +40,15 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
   _threeObjectPivot: THREE.Group | null;
   _isRenderedIn3D = false;
 
+  /** Functor used to render an instance */
+  instancesRenderer: gdInitialInstanceJSFunctor;
+
+  renderedInstances: { [number]: RenderedInstance | Rendered3DInstance } = {};
+
+  eventBasedObject: gdEventsBasedObject | null;
+
   constructor(
     project: gdProject,
-    layout: gdLayout,
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,
@@ -50,7 +57,6 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
   ) {
     super(
       project,
-      layout,
       instance,
       associatedObjectConfiguration,
       pixiContainer,
@@ -110,7 +116,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
         getProportionalPositionZ(parentOriginZPositionName)) ||
       0;
 
-    const eventBasedObject = project.hasEventsBasedObject(
+    this.eventBasedObject = project.hasEventsBasedObject(
       customObjectConfiguration.getType()
     )
       ? project.getEventsBasedObject(customObjectConfiguration.getType())
@@ -124,62 +130,177 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
       RenderedInstance | Rendered3DInstance
     >();
 
-    if (!eventBasedObject) {
+    if (!this.eventBasedObject) {
       return;
     }
     this._isRenderedIn3D = eventBasedObject.isRenderedIn3D();
 
-    const childLayouts = getLayouts(
-      eventBasedObject,
-      customObjectConfiguration
-    );
+    const eventBasedObject = this.eventBasedObject;
 
-    mapReverseFor(0, eventBasedObject.getObjectsCount(), i => {
-      const childObject = eventBasedObject.getObjectAt(i);
+    // TODO: do the proper rendering according to instances
+    if (true) {
+      // Functor used to render an instance
+      this.instancesRenderer = new gd.InitialInstanceJSFunctor();
+      // $FlowFixMe - invoke is not writable
+      this.instancesRenderer.invoke = instancePtr => {
+        // $FlowFixMe - wrapPointer is not exposed
+        const instance: gdInitialInstance = gd.wrapPointer(
+          instancePtr,
+          gd.InitialInstance
+        );
 
-      const childLayout = childLayouts.get(childObject.getName()) || {
-        isShown: true,
-        horizontalLayout: {},
-        verticalLayout: {},
-        depthLayout: {},
+        //Get the "RenderedInstance" object associated to the instance and tell it to update.
+        const renderedInstance:
+          | RenderedInstance
+          | Rendered3DInstance
+          | null = this.getRendererOfInstance(instance);
+        if (!renderedInstance) return;
+
+        const pixiObject: PIXI.DisplayObject | null = renderedInstance.getPixiObject();
+        if (pixiObject) {
+          if (renderedInstance instanceof Rendered3DInstance) {
+            pixiObject.zOrder = instance.getZ() + renderedInstance.getDepth();
+          } else {
+            pixiObject.zOrder = instance.getZOrder();
+          }
+        }
+
+        try {
+          // TODO: should we do culling here?
+          // "Culling" improves rendering performance of large levels
+          const isVisible = true; // this._isInstanceVisible(instance);
+          if (pixiObject) {
+            pixiObject.visible = isVisible;
+            pixiObject.eventMode = 'auto';
+          }
+          if (isVisible) renderedInstance.update();
+
+          if (renderedInstance instanceof Rendered3DInstance) {
+            const threeObject = renderedInstance.getThreeObject();
+            if (threeObject) {
+              threeObject.visible = isVisible;
+            }
+          }
+        } catch (error) {
+          if (error instanceof TypeError) {
+            // When reloading a texture when a resource changed externally, rendering
+            // an instance could crash when trying to access a non-existent PIXI base texture.
+            // The error is not propagated in order to avoid a crash at the SceneEditor level.
+            // See https://github.com/4ian/GDevelop/issues/5802.
+            console.error(
+              `An error occurred when rendering instance for object ${instance.getObjectName()}:`,
+              error
+            );
+            return;
+          }
+          throw error;
+        } finally {
+          renderedInstance.wasUsed = true;
+        }
       };
+    }
 
-      const childObjectConfiguration = customObjectConfiguration.getChildObjectConfiguration(
-        childObject.getName()
+    if (false) {
+      const childLayouts = getLayouts(
+        eventBasedObject,
+        customObjectConfiguration
       );
-      const childInstance = new ChildInstance();
-      const renderer = ObjectsRenderingService.createNewInstanceRenderer(
-        project,
-        layout,
-        // $FlowFixMe Use real object instances.
-        childInstance,
-        childObjectConfiguration,
+
+      mapReverseFor(0, eventBasedObject.getObjectsCount(), i => {
+        const childObject = eventBasedObject.getObjectAt(i);
+
+        const childLayout = childLayouts.get(childObject.getName()) || {
+          isShown: true,
+          horizontalLayout: {},
+          verticalLayout: {},
+          depthLayout: {},
+        };
+
+        const childObjectConfiguration = customObjectConfiguration.getChildObjectConfiguration(
+          childObject.getName()
+        );
+        const childInstance = new ChildInstance();
+        const renderer = ObjectsRenderingService.createNewInstanceRenderer(
+          project,
+          // $FlowFixMe Use real object instances.
+          childInstance,
+          childObjectConfiguration,
+          this._pixiObject,
+          this._threeObjectPivot
+        );
+        if (!childLayout.isShown) {
+          this._pixiObject.removeChild(renderer._pixiObject);
+          if (
+            this._threeObjectPivot &&
+            renderer instanceof Rendered3DInstance
+          ) {
+            this._threeObjectPivot.remove(renderer._threeObject);
+          }
+        }
+
+        if (renderer instanceof RenderedTextInstance) {
+          // TODO EBO Remove this line when an alignment property is added to the text object.
+          renderer._pixiObject.style.align = 'center';
+        }
+        this.childrenInstances.push(childInstance);
+        this.childrenLayouts.push(childLayout);
+        this.childrenRenderedInstances.push(renderer);
+        this.childrenRenderedInstanceByNames.set(
+          childObject.getName(),
+          renderer
+        );
+      });
+
+      if (this.childrenRenderedInstances.length === 0) {
+        // Show a placeholder.
+        this._pixiObject = new PIXI.Sprite(
+          PixiResourcesLoader.getInvalidPIXITexture()
+        );
+        this._pixiContainer.addChild(this._pixiObject);
+      }
+    }
+  }
+
+  getRendererOfInstance = (instance: gdInitialInstance) => {
+    var renderedInstance = this.renderedInstances[instance.ptr];
+    if (renderedInstance === undefined) {
+      //No renderer associated yet, the instance must have been just created!...
+      const associatedObjectName = instance.getObjectName();
+      const associatedObject = getObjectByName(
+        this.eventBasedObject,
+        null,
+        associatedObjectName
+      );
+      if (!associatedObject) return null;
+
+      //...so let's create a renderer.
+      renderedInstance = this.renderedInstances[
+        instance.ptr
+      ] = ObjectsRenderingService.createNewInstanceRenderer(
+        this._project,
+        instance,
+        associatedObject.getConfiguration(),
         this._pixiObject,
         this._threeObjectPivot
       );
-      if (!childLayout.isShown) {
-        this._pixiObject.removeChild(renderer._pixiObject);
-        if (this._threeObjectPivot && renderer instanceof Rendered3DInstance) {
-          this._threeObjectPivot.remove(renderer._threeObject);
-        }
-      }
+    }
 
-      if (renderer instanceof RenderedTextInstance) {
-        // TODO EBO Remove this line when an alignment property is added to the text object.
-        renderer._pixiObject.style.align = 'center';
-      }
-      this.childrenInstances.push(childInstance);
-      this.childrenLayouts.push(childLayout);
-      this.childrenRenderedInstances.push(renderer);
-      this.childrenRenderedInstanceByNames.set(childObject.getName(), renderer);
-    });
+    return renderedInstance;
+  };
 
-    if (this.childrenRenderedInstances.length === 0) {
-      // Show a placeholder.
-      this._pixiObject = new PIXI.Sprite(
-        PixiResourcesLoader.getInvalidPIXITexture()
-      );
-      this._pixiContainer.addChild(this._pixiObject);
+  /**
+   * Remove rendered instances that are not associated to any instance anymore
+   * (this can happen after an instance has been deleted).
+   */
+  _destroyUnusedInstanceRenderers() {
+    for (const i in this.renderedInstances) {
+      // $FlowFixMe - useless to cast to number
+      const renderedInstance = this.renderedInstances[i];
+      if (!renderedInstance.wasUsed) {
+        renderedInstance.onRemovedFromScene();
+        // $FlowFixMe - useless to cast to number
+        delete this.renderedInstances[i];
+      } else renderedInstance.wasUsed = false;
     }
   }
 
@@ -189,9 +310,22 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
 
   onRemovedFromScene(): void {
     super.onRemovedFromScene();
+
+    // Destroy all instances
+    for (const i in this.renderedInstances) {
+      // $FlowFixMe - useless to cast to number
+      this.renderedInstances[i].onRemovedFromScene();
+      // $FlowFixMe - useless to cast to number
+      delete this.renderedInstances[i];
+    }
     for (const childrenInstance of this.childrenRenderedInstances) {
       childrenInstance.onRemovedFromScene();
     }
+
+    // Destroy the object iterating on instances
+    this.instancesRenderer.delete();
+
+    // Destroy the container.
     this._pixiObject.destroy(false);
   }
 
@@ -258,11 +392,32 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     return 'res/unknown32.png';
   }
 
+  _updatePixiObjectsZOrder() {
+    this._pixiContainer.children.sort((a, b) => {
+      a.zOrder = a.zOrder || 0;
+      b.zOrder = b.zOrder || 0;
+      return a.zOrder - b.zOrder;
+    });
+  }
+
   update() {
     // TODO For animatable custom objects, change the texture used by the child
     // according to the current animation.
+    const { eventBasedObject } = this;
 
-    applyChildLayouts(this);
+    if (true && eventBasedObject) {
+      eventBasedObject.getInitialInstances().iterateOverInstancesWithZOrdering(
+        // $FlowFixMe - gd.castObject is not supporting typings.
+        this.instancesRenderer,
+        '' // TODO: handle all layer
+      );
+      this._updatePixiObjectsZOrder();
+      this._destroyUnusedInstanceRenderers();
+    }
+
+    if (false) {
+      applyChildLayouts(this);
+    }
 
     const originX = this.getOriginX();
     const originY = this.getOriginY();
@@ -272,7 +427,16 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     const centerZ = this.getCenterZ();
 
     const firstInstance = this.childrenRenderedInstances[0];
-    const is3D = firstInstance && firstInstance instanceof Rendered3DInstance;
+    let is3D = !!firstInstance && firstInstance instanceof Rendered3DInstance;
+
+    for (const i in this.renderedInstances) {
+      // $FlowFixMe - useless to cast to number
+      const renderedInstance = this.renderedInstances[i];
+      if (renderedInstance instanceof Rendered3DInstance) {
+        is3D = true;
+        break;
+      }
+    }
 
     const threeObject = this._threeObject;
     const threeObjectPivot = this._threeObjectPivot;

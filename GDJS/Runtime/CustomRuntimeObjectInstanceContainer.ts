@@ -105,6 +105,15 @@ namespace gdjs {
         followBaseLayerCamera: false,
       });
 
+      this.createObjectsFrom(
+        customObjectData.instances,
+        0,
+        0,
+        0,
+        // TODO: verify this.
+        true
+      );
+
       // Set up the default z order (for objects created from events)
       this._setLayerDefaultZOrders();
 

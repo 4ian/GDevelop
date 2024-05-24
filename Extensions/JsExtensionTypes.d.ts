@@ -10,7 +10,6 @@ declare namespace PIXI {}
  */
 class RenderedInstance {
   _project: gd.Project;
-  _layout: gd.Layout;
   _instance: gd.InitialInstance;
   _associatedObjectConfiguration: gd.ObjectConfiguration;
   _pixiContainer: PIXI.Container;
@@ -86,7 +85,6 @@ class RenderedInstance {
  */
 class Rendered3DInstance {
   _project: gdProject;
-  _layout: gdLayout;
   _instance: gdInitialInstance;
   _associatedObjectConfiguration: gdObjectConfiguration;
   _pixiContainer: PIXI.Container;

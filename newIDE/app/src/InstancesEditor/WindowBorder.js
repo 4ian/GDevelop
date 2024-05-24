@@ -6,13 +6,13 @@ import Rectangle from '../Utils/Rectangle';
 
 type Props = {|
   project: gdProject,
-  layout: gdLayout,
+  layout: gdLayout | null,
   toCanvasCoordinates: (x: number, y: number) => [number, number],
 |};
 
 export default class WindowBorder {
   project: gdProject;
-  layout: gdLayout;
+  layout: gdLayout | null;
   toCanvasCoordinates: (x: number, y: number) => [number, number];
   pixiRectangle = new PIXI.Graphics();
   windowRectangle: Rectangle = new Rectangle();
@@ -30,6 +30,9 @@ export default class WindowBorder {
   }
 
   render() {
+    const { layout } = this;
+    if (!layout) return;
+
     this.windowRectangle.set({
       left: 0,
       top: 0,
@@ -43,9 +46,9 @@ export default class WindowBorder {
 
     this.pixiRectangle.clear();
     this.pixiRectangle.beginFill(0x000000);
-    const backgroundRed = this.layout.getBackgroundColorRed();
-    const backgroundBlue = this.layout.getBackgroundColorBlue();
-    const backgroundGreen = this.layout.getBackgroundColorGreen();
+    const backgroundRed = layout.getBackgroundColorRed();
+    const backgroundBlue = layout.getBackgroundColorBlue();
+    const backgroundGreen = layout.getBackgroundColorGreen();
     const isDark =
       Math.max(backgroundRed, backgroundBlue, backgroundGreen) < 128;
     this.pixiRectangle.lineStyle(

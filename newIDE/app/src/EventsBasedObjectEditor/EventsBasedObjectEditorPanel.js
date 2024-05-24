@@ -19,6 +19,7 @@ type Props = {|
   eventsBasedObject: gdEventsBasedObject,
   onRenameProperty: (oldName: string, newName: string) => void,
   onEventsFunctionsAdded: () => void,
+  onOpenCustomObjectEditor: () => void,
   unsavedChanges?: ?UnsavedChanges,
 |};
 
@@ -29,6 +30,7 @@ export default function EventsBasedObjectEditorPanel({
   eventsBasedObject,
   onRenameProperty,
   onEventsFunctionsAdded,
+  onOpenCustomObjectEditor,
   unsavedChanges,
 }: Props) {
   const [currentTab, setCurrentTab] = React.useState<TabName>('configuration');
@@ -81,6 +83,7 @@ export default function EventsBasedObjectEditorPanel({
           <EventsBasedObjectEditor
             eventsBasedObject={eventsBasedObject}
             unsavedChanges={unsavedChanges}
+            onOpenCustomObjectEditor={onOpenCustomObjectEditor}
           />
         )}
         {currentTab === 'properties' && (

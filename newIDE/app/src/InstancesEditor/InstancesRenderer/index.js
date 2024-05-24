@@ -15,7 +15,10 @@ export type InstanceMeasurer = {|
 export default class InstancesRenderer {
   project: gdProject;
   instances: gdInitialInstancesContainer;
-  layout: gdLayout;
+  layout: gdLayout | null;
+  layersContainer: gdLayersContainer;
+  globalObjectsContainer: gdObjectsContainer;
+  objectsContainer: gdObjectsContainer | null;
   viewPosition: ViewPosition;
   onInstanceClicked: gdInitialInstance => void;
   onInstanceRightClicked: ({|
@@ -48,6 +51,8 @@ export default class InstancesRenderer {
 
   constructor({
     project,
+    layersContainer,
+    objectsContainer,
     layout,
     instances,
     viewPosition,
@@ -64,7 +69,9 @@ export default class InstancesRenderer {
   }: {
     project: gdProject,
     instances: gdInitialInstancesContainer,
-    layout: gdLayout,
+    layersContainer: gdLayersContainer,
+    objectsContainer: gdObjectsContainer,
+    layout: gdLayout | null,
     viewPosition: ViewPosition,
     onInstanceClicked: gdInitialInstance => void,
     onInstanceRightClicked: ({|
@@ -85,6 +92,8 @@ export default class InstancesRenderer {
     this.project = project;
     this.instances = instances;
     this.layout = layout;
+    this.layersContainer = layersContainer;
+    this.objectsContainer = objectsContainer;
     this.viewPosition = viewPosition;
     this.onInstanceClicked = onInstanceClicked;
     this.onInstanceRightClicked = onInstanceRightClicked;
@@ -178,21 +187,25 @@ export default class InstancesRenderer {
     // And, out of caution, keep doing it for every frame.
     if (threeRenderer) threeRenderer.resetState();
 
-    const backgroundColor = rgbToHexNumber(
-      this.layout.getBackgroundColorRed(),
-      this.layout.getBackgroundColorGreen(),
-      this.layout.getBackgroundColorBlue()
-    );
+    const { layout } = this;
 
-    for (let i = 0; i < this.layout.getLayersCount(); i++) {
-      const layer = this.layout.getLayerAt(i);
+    const backgroundColor = layout ? rgbToHexNumber(
+      layout.getBackgroundColorRed(),
+      layout.getBackgroundColorGreen(),
+      layout.getBackgroundColorBlue()
+    ) : 0x888888;
+
+    // TODO (custom object editor): handle a custom object here
+    for (let i = 0; i < this.layersContainer.getLayersCount(); i++) {
+      const layer = this.layersContainer.getLayerAt(i);
       const layerName = layer.getName();
 
       let layerRenderer = this.layersRenderers[layerName];
       if (!layerRenderer) {
         this.layersRenderers[layerName] = layerRenderer = new LayerRenderer({
           project: this.project,
-          layout: this.layout,
+          globalObjectsContainer: this.globalObjectsContainer,
+          objectsContainer: this.objectsContainer,
           instances: this.instances,
           viewPosition: this.viewPosition,
           layer: layer,

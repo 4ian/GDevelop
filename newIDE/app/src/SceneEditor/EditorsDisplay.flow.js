@@ -21,7 +21,10 @@ import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/Even
 
 export type SceneEditorsDisplayProps = {|
   project: gdProject,
-  layout: gdLayout,
+  layout: gdLayout | null,
+  layersContainer: gdLayersContainer,
+  globalObjectsContainer: gdObjectsContainer,
+  objectsContainer: gdObjectsContainer,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   initialInstances: gdInitialInstancesContainer,
   instancesSelection: InstancesSelection,

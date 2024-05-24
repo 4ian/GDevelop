@@ -12,6 +12,7 @@ declare class gdLayout extends gdObjectsContainer {
   getInitialInstances(): gdInitialInstancesContainer;
   getVariables(): gdVariablesContainer;
   getEvents(): gdEventsList;
+  getLayers(): gdLayersContainer;
   updateBehaviorsSharedData(project: gdProject): void;
   getAllBehaviorSharedDataNames(): gdVectorString;
   hasBehaviorSharedData(behaviorName: string): boolean;
@@ -25,8 +26,6 @@ declare class gdLayout extends gdObjectsContainer {
   getLayersCount(): number;
   swapLayers(firstLayerIndex: number, secondLayerIndex: number): void;
   moveLayer(oldIndex: number, newIndex: number): void;
-  serializeLayersTo(element: gdSerializerElement): void;
-  unserializeLayersFrom(element: gdSerializerElement): void;
   getAssociatedEditorSettings(): gdEditorSettings;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(project: gdProject, element: gdSerializerElement): void;

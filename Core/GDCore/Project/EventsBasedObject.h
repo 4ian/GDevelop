@@ -9,6 +9,8 @@
 #include <vector>
 #include "GDCore/Project/AbstractEventsBasedEntity.h"
 #include "GDCore/Project/ObjectsContainer.h"
+#include "GDCore/Project/InitialInstancesContainer.h"
+#include "GDCore/Project/LayersContainer.h"
 #include "GDCore/String.h"
 namespace gd {
 class SerializerElement;
@@ -111,6 +113,42 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity, public Ob
    */
   bool IsTextContainer() const { return isTextContainer; }
 
+  /** \name Layers
+   */
+  ///@{
+
+  /**
+   * \brief Get the layers of the custom object.
+   */
+  const gd::LayersContainer& GetLayers() const { return layers; }
+
+  /**
+   * \brief Get the layers of the custom object.
+   */
+  gd::LayersContainer& GetLayers() { return layers; }
+
+  ///@}
+
+  /** \name Instances
+   */
+  ///@{
+
+  /**
+   * \brief Get the instances of the custom object.
+   */
+  gd::InitialInstancesContainer& GetInitialInstances() {
+    return initialInstances;
+  }
+
+  /**
+   * \brief Get the instances of the custom object.
+   */
+  const gd::InitialInstancesContainer& GetInitialInstances() const {
+    return initialInstances;
+  }
+
+  ///@}
+
   void SerializeTo(SerializerElement& element) const override;
 
   void UnserializeFrom(gd::Project& project,
@@ -121,6 +159,8 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity, public Ob
   bool isRenderedIn3D;
   bool isAnimatable;
   bool isTextContainer;
+  gd::InitialInstancesContainer initialInstances;
+  gd::LayersContainer layers;
 };
 
 }  // namespace gd

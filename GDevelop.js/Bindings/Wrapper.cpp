@@ -72,6 +72,7 @@
 #include <GDCore/Project/InitialInstance.h>
 #include <GDCore/Project/InitialInstancesContainer.h>
 #include <GDCore/Project/Layout.h>
+#include <GDCore/Project/LayersContainer.h>
 #include <GDCore/Project/MeasurementBaseUnit.h>
 #include <GDCore/Project/MeasurementUnitElement.h>
 #include <GDCore/Project/NamedPropertyDescriptor.h>

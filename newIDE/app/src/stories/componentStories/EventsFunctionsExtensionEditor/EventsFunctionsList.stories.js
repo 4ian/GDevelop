@@ -33,6 +33,7 @@ export const Default = () => (
         onDeleteEventsBasedObject={action('object deleted')}
         onRenameEventsBasedObject={action('rename object')}
         onEventsBasedObjectRenamed={action('object renamed')}
+        onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
         // Behaviors
         onSelectEventsBasedBehavior={action('behavior selected')}
         onDeleteEventsBasedBehavior={action('behavior deleted')}

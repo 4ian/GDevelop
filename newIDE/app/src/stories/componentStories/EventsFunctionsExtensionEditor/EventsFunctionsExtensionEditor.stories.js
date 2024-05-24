@@ -32,6 +32,7 @@ export const Default = () => (
         initiallyFocusedFunctionName={null}
         initiallyFocusedBehaviorName={null}
         onCreateEventsFunction={action('on create events function')}
+        onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
       />
     </FixedHeightFlexContainer>
   </DragAndDropContextProvider>
@@ -58,6 +59,7 @@ export const WithObjectEditor = () => {
             initiallyFocusedFunctionName={null}
             initiallyFocusedBehaviorName={null}
             onCreateEventsFunction={action('on create events function')}
+            onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
           />
         </FixedHeightFlexContainer>
       </DragAndDropContextProvider>

@@ -53,6 +53,10 @@ export type RenderEditorContainerProps = {|
     extension: gdPlatformExtension,
     type: string
   ) => void,
+  onOpenCustomObjectEditor: (
+    gdEventsFunctionsExtension,
+    gdEventsBasedObject
+  ) => void,
 
   // Events function management:
   onLoadEventsFunctionsExtensions: () => Promise<void>,

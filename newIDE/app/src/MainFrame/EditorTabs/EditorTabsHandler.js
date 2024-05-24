@@ -13,6 +13,7 @@ import {
   type EditorContainerExtraProps,
 } from '../EditorContainers/BaseEditor';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
+import { CustomObjectEditorContainer } from '../EditorContainers/CustomObjectEditorContainer';
 
 // Supported editors
 type EditorRef =
@@ -57,6 +58,7 @@ export type EditorKind =
   | 'external layout'
   | 'external events'
   | 'events functions extension'
+  | 'custom object'
   | 'debugger'
   | 'resources'
   | 'start page';
@@ -351,6 +353,25 @@ export const getEventsFunctionsExtensionEditor = (
     if (
       editor instanceof EventsFunctionsExtensionEditorContainer &&
       editor.getEventsFunctionsExtension() === eventsFunctionsExtension
+    ) {
+      return { editor, tabIndex };
+    }
+  }
+
+  return null;
+};
+
+export const getCustomObjectEditor = (
+  state: EditorTabsState,
+  eventsFunctionsExtension: gdEventsFunctionsExtension,
+  eventsBasedObject: gdEventsBasedObject
+): ?{| editor: CustomObjectEditorContainer, tabIndex: number |} => {
+  for (let tabIndex = 0; tabIndex < state.editors.length; ++tabIndex) {
+    const editor = state.editors[tabIndex].editorRef;
+    if (
+      editor instanceof CustomObjectEditorContainer &&
+      editor.getEventsFunctionsExtension() === eventsFunctionsExtension &&
+      editor.getEventsBasedObject() === eventsBasedObject
     ) {
       return { editor, tabIndex };
     }

@@ -87,7 +87,7 @@ type AnimationListProps = {|
    * The layout is used to adapt events when an identifier is renamed
    * (for instance, an object animation or a layer name).
    */
-  layout?: gdLayout,
+  layout: gdLayout | null,
   /**
    * The edited object. It can be undefined for sub-ObjectConfiguration of
    * custom object. There is no event to refactor in this case.

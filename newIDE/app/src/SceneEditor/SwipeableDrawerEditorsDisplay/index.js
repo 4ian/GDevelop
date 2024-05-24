@@ -58,6 +58,9 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
   const {
     project,
     layout,
+    layersContainer,
+    globalObjectsContainer,
+    objectsContainer,
     projectScopedContainersAccessor,
     initialInstances,
     selectedLayer,
@@ -239,6 +242,9 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
               width={width}
               project={project}
               layout={layout}
+              globalObjectsContainer={globalObjectsContainer}
+              objectsContainer={objectsContainer}
+              layersContainer={layersContainer}
               selectedLayer={selectedLayer}
               screenType={screenType}
               initialInstances={initialInstances}
@@ -280,7 +286,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                         ObjectsRenderingService
                       )}
                       project={project}
-                      objectsContainer={layout}
+                      objectsContainer={objectsContainer}
                       layout={layout}
                       initialInstances={initialInstances}
                       onSelectAllInstancesOfObjectInLayout={
@@ -332,7 +338,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                     <CompactInstancePropertiesEditorContainer
                       i18n={i18n}
                       project={project}
-                      layout={layout}
+                      layout={layout /* TODO: remove or make optional */}
                       projectScopedContainersAccessor={
                         projectScopedContainersAccessor
                       }
@@ -353,8 +359,8 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                   {({ i18n }) => (
                     <ObjectGroupsList
                       ref={objectGroupsListRef}
-                      globalObjectGroups={project.getObjectGroups()}
-                      objectGroups={layout.getObjectGroups()}
+                      globalObjectGroups={globalObjectsContainer.getObjectGroups()}
+                      objectGroups={objectsContainer.getObjectGroups()}
                       onEditGroup={props.onEditObjectGroup}
                       onDeleteGroup={props.onDeleteObjectGroup}
                       onRenameGroup={props.onRenameObjectGroup}
@@ -390,6 +396,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
               {selectedEditorId === 'layers-list' && (
                 <LayersList
                   project={project}
+                  layout={layout}
                   selectedLayer={selectedLayer}
                   onSelectLayer={props.onSelectLayer}
                   onEditLayerEffects={props.editLayerEffects}
@@ -397,7 +404,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                   onRemoveLayer={props.onRemoveLayer}
                   onLayerRenamed={props.onLayerRenamed}
                   onCreateLayer={forceUpdateInstancesPropertiesEditor}
-                  layersContainer={layout}
+                  layersContainer={layersContainer}
                   unsavedChanges={props.unsavedChanges}
                   ref={layersListRef}
                   hotReloadPreviewButtonProps={

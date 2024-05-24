@@ -747,6 +747,7 @@ export class Layout extends EmscriptenObject {
   getInitialInstances(): InitialInstancesContainer;
   getVariables(): VariablesContainer;
   getEvents(): EventsList;
+  getLayers(): LayersContainer;
   updateBehaviorsSharedData(project: Project): void;
   getAllBehaviorSharedDataNames(): VectorString;
   hasBehaviorSharedData(behaviorName: string): boolean;
@@ -760,8 +761,6 @@ export class Layout extends EmscriptenObject {
   getLayersCount(): number;
   swapLayers(firstLayerIndex: number, secondLayerIndex: number): void;
   moveLayer(oldIndex: number, newIndex: number): void;
-  serializeLayersTo(element: SerializerElement): void;
-  unserializeLayersFrom(element: SerializerElement): void;
   getAssociatedEditorSettings(): EditorSettings;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
@@ -874,6 +873,20 @@ export class Layer extends EmscriptenObject {
   setCameraCount(cameraCount: number): void;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(element: SerializerElement): void;
+}
+
+export class LayersContainer extends EmscriptenObject {
+  insertNewLayer(name: string, position: number): void;
+  insertLayer(layer: Layer, position: number): void;
+  getLayer(name: string): Layer;
+  getLayerAt(pos: number): Layer;
+  hasLayerNamed(name: string): boolean;
+  removeLayer(name: string): void;
+  getLayersCount(): number;
+  swapLayers(firstLayerIndex: number, secondLayerIndex: number): void;
+  moveLayer(oldIndex: number, newIndex: number): void;
+  serializeLayersTo(element: SerializerElement): void;
+  unserializeLayersFrom(element: SerializerElement): void;
 }
 
 export class PropertyDescriptor extends EmscriptenObject {
@@ -2118,6 +2131,8 @@ export class EventsBasedObject extends AbstractEventsBasedEntity {
   isAnimatable(): boolean;
   markAsTextContainer(isTextContainer: boolean): EventsBasedObject;
   isTextContainer(): boolean;
+  getInitialInstances(): InitialInstancesContainer;
+  getLayers(): LayersContainer;
   static getPropertyActionName(propertyName: string): string;
   static getPropertyConditionName(propertyName: string): string;
   static getPropertyExpressionName(propertyName: string): string;
@@ -2134,6 +2149,7 @@ export class EventsBasedObject extends AbstractEventsBasedEntity {
   moveObjectFolderOrObjectToAnotherContainerInFolder(objectFolderOrObject: ObjectFolderOrObject, newObjectsContainer: ObjectsContainer, parentObjectFolderOrObject: ObjectFolderOrObject, newPosition: number): void;
   getObjectsCount(): number;
   getRootFolder(): ObjectFolderOrObject;
+  getAllObjectFolderOrObjects(): VectorObjectFolderOrObject;
   getObjectGroups(): ObjectGroupsContainer;
 }
 

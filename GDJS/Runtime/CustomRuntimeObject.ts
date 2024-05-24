@@ -11,6 +11,8 @@ namespace gdjs {
   export type CustomObjectConfiguration = ObjectConfiguration & {
     animatable?: SpriteAnimationData[];
     childrenContent: { [objectName: string]: ObjectConfiguration & any };
+    instances: InstanceData[];
+    layers: LayerData[];
   };
 
   /**

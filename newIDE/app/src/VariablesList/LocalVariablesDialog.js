@@ -29,7 +29,7 @@ const LocalVariablesDialog = ({
         onComputeAllVariableNames: () => [],
       },
     ],
-    [project]
+    [variablesContainer]
   );
 
   return (

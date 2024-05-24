@@ -38,7 +38,7 @@ const LocalVariablesDialog = ({
       open={open}
       onCancel={onCancel}
       onApply={onApply}
-      title={<Trans>Global variables</Trans>}
+      title={<Trans>Local variables</Trans>}
       tabs={tabs}
       helpPagePath={'/all-features/variables/local-variables'}
       preventRefactoringToDeleteInstructions

@@ -123,7 +123,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
                  "res/function32.png")
       .SetHelpPath("/events/functions/return")
       .AddParameter("functionParameterName", _("Parameter name"), "variable")
-      .AddParameter("variable", _("Scene variable"))
+      .AddParameter("variable", _("Variable"))
       .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 

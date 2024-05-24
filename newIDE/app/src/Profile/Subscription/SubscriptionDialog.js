@@ -10,7 +10,6 @@ import {
   changeUserSubscription,
   getRedirectToCheckoutUrl,
   canSeamlesslyChangeSubscription,
-  canCancelAtEndOfPeriod,
   hasValidSubscriptionPlan,
   EDUCATION_PLAN_MAX_SEATS,
   EDUCATION_PLAN_MIN_SEATS,
@@ -99,13 +98,6 @@ const cancelConfirmationTexts = {
   title: t`Cancel your subscription?`,
   message: t`By canceling your subscription, you will lose all your premium features at the end of the period you already paid for. Continue?`,
   confirmButtonLabel: t`Continue`,
-  dismissButtonLabel: t`Keep subscription`,
-  maxWidth: 'sm',
-};
-const cancelImmediatelyConfirmationTexts = {
-  title: t`Cancel your subscription?`,
-  message: t`By canceling your subscription you will lose all your premium features IMMEDIATELY. Continue?`,
-  confirmButtonLabel: t`Cancel my subscription now`,
   dismissButtonLabel: t`Keep subscription`,
   maxWidth: 'sm',
 };
@@ -291,11 +283,7 @@ export default function SubscriptionDialog({
 
     if (!subscriptionPlanPricingSystem) {
       // Cancelling the existing subscription.
-      const answer = await showConfirmation(
-        canCancelAtEndOfPeriod(subscription)
-          ? cancelConfirmationTexts
-          : cancelImmediatelyConfirmationTexts
-      );
+      const answer = await showConfirmation(cancelConfirmationTexts);
       if (!answer) return;
 
       setCancelReasonDialogOpen(true);

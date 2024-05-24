@@ -38,7 +38,7 @@ namespace gdjs {
     // The number of times per second the variables should be synchronized.
     _variablesTickRate: number = 1;
     // The last data sent to synchronize the variables.
-    _lastSentVariableSyncData: VariableSyncData[] | undefined;
+    _lastSentVariableSyncData: VariableNetworkSyncData[] | undefined;
     // When we know that the variables have been updated, we can force sending them
     // on the same tickrate as the object update for a number of times
     // to ensure they are received, without the need of an acknowledgment.
@@ -50,7 +50,7 @@ namespace gdjs {
     _effectsTickRate: number = 1;
     // The last data sent to synchronize the effects.
     _lastSentEffectSyncData:
-      | { [effectName: string]: EffectSyncData }
+      | { [effectName: string]: EffectNetworkSyncData }
       | undefined;
     // When we know that the effects have been updated, we can force sending them
     // on the same tickrate as the object update for a number of times
@@ -183,7 +183,9 @@ namespace gdjs {
       return haveBasicObjectNetworkSyncDataChanged;
     }
 
-    areVariablesDifferentFromLastSync(variablesSyncData: VariableSyncData[]) {
+    areVariablesDifferentFromLastSync(
+      variablesSyncData: VariableNetworkSyncData[]
+    ) {
       if (!this._lastSentVariableSyncData) {
         return true;
       }
@@ -198,7 +200,7 @@ namespace gdjs {
     }
 
     areEffectsDifferentFromLastSync(effectsSyncData: {
-      [effectName: string]: EffectSyncData;
+      [effectName: string]: EffectNetworkSyncData;
     }) {
       if (!this._lastSentEffectSyncData) {
         return true;

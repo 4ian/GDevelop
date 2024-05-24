@@ -106,7 +106,7 @@ namespace gdjs {
       };
     }
 
-    updateFromNetworkSyncData(networkSyncData: BehaviorSyncData): void {
+    updateFromNetworkSyncData(networkSyncData: BehaviorNetworkSyncData): void {
       super.updateFromNetworkSyncData(networkSyncData);
 
       const behaviorSpecificProps = networkSyncData.props;

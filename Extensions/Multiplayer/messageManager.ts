@@ -381,7 +381,6 @@ namespace gdjs {
       );
       objectOwnershipChangeMessageNames.forEach((messageName) => {
         if (gdjs.evtTools.p2p.onEvent(messageName, false)) {
-          // TODO: Catch, log error and ignore to avoid to crash the game.
           let data;
           try {
             data = JSON.parse(gdjs.evtTools.p2p.getEventData(messageName));
@@ -392,7 +391,6 @@ namespace gdjs {
             return;
           }
           const messageSender = gdjs.evtTools.p2p.getEventSender(messageName);
-          logger.info(`Received message ${messageName} with data ${data}.`);
           if (data) {
             const matches = changeOwnerMessageNameRegex.exec(messageName);
             if (!matches) {
@@ -1221,6 +1219,7 @@ namespace gdjs {
 
     const handleSceneUpdatedMessages = (runtimeScene: gdjs.RuntimeScene) => {
       if (gdjs.multiplayer.isPlayerHost()) {
+        // Only other players need to update their scene.
         return;
       }
 
@@ -1361,9 +1360,6 @@ namespace gdjs {
       for (const playerNumber in _playersLastHeartbeatInfo) {
         playersPings[playerNumber] = getPlayerPing(parseInt(playerNumber, 10));
       }
-      logger.info(
-        'Sending heartbeat message with pings ' + JSON.stringify(playersPings)
-      );
       return {
         messageName: `${heartbeatMessageNamePrefix}#${gdjs.multiplayer.getPlayerNumber()}`,
         messageData: {
@@ -1421,11 +1417,6 @@ namespace gdjs {
 
             // If we are not the host, save what the host told us about the pings.
             if (!gdjs.multiplayer.isPlayerHost()) {
-              logger.info(
-                `Received heartbeat from player ${playerNumber} with pings ${JSON.stringify(
-                  data.playersPings
-                )}.`
-              );
               // If one player is missing from the heartbeat, it means they have disconnected.
               const missingPlayerNumbers = Object.keys(_playersPings).filter(
                 (playerNumber) => data.playersPings[playerNumber] === undefined
@@ -1444,9 +1435,6 @@ namespace gdjs {
             // If we are the host, compute the pings.
             const now = data.now;
             const timeDifference = Math.round(Date.now() - now);
-            logger.info(
-              `Received heartbeat from player ${playerNumber} with time difference of ${timeDifference}ms.`
-            );
             const playerLastHeartbeatInfo =
               _playersLastHeartbeatInfo[playerNumber] || {};
             const playerLastHeartbeatDurations =

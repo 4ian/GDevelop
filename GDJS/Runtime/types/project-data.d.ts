@@ -69,10 +69,10 @@ declare interface ObjectNetworkSyncData extends BasicObjectNetworkSyncData {
     [behaviorName: string]: any;
   };
   /** The variables of the object */
-  var?: VariableSyncData[];
+  var?: VariableNetworkSyncData[];
   /** The effects of the object */
   eff?: {
-    [effectName: string]: EffectSyncData;
+    [effectName: string]: EffectNetworkSyncData;
   };
   /** The timers of the object */
   tim?: {
@@ -115,10 +115,10 @@ declare type VariableData = Readonly<{
 /** A variable child of a container. Those always have a name. */
 declare type RootVariableData = Omit<VariableData, 'name'> & { name: string };
 
-declare type VariableSyncData = {
+declare type VariableNetworkSyncData = {
   name: string;
   value: string | float | boolean;
-  children?: VariableSyncData[];
+  children?: VariableNetworkSyncData[];
   type: VariableType;
 };
 
@@ -130,7 +130,7 @@ declare type BehaviorData = {
   type: string;
 };
 
-declare type BehaviorSyncData = {
+declare type BehaviorNetworkSyncData = {
   act: boolean;
   props: any;
 };
@@ -159,11 +159,11 @@ declare interface LayoutData {
 }
 
 declare interface LayoutNetworkSyncData {
-  var?: VariableSyncData[];
+  var?: VariableNetworkSyncData[];
 }
 
 declare interface GameNetworkSyncData {
-  var?: VariableSyncData[];
+  var?: VariableNetworkSyncData[];
 }
 
 declare interface EventsFunctionsExtensionData {
@@ -271,7 +271,7 @@ declare interface EffectData {
   };
 }
 
-declare interface EffectSyncData {
+declare interface EffectNetworkSyncData {
   ena: boolean;
   fc: {
     [name: string]: any;

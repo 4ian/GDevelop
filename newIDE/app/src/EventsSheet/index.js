@@ -114,7 +114,7 @@ import {
 } from '../MainFrame/ResourcesWatcher';
 import { insertInVariablesContainer } from '../Utils/VariablesUtils';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
-import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
+import LocalVariablesDialog from '../VariablesList/LocalVariablesDialog';
 
 const gd: libGDevelop = global.gd;
 
@@ -2102,9 +2102,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                   />
                 )}
                 {this.state.editedVariable && (
-                  <VariablesEditorDialog
+                  <LocalVariablesDialog
                     project={project}
-                    title={<Trans>Local variables</Trans>}
                     open
                     onCancel={() =>
                       this.setState({
@@ -2112,23 +2111,27 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                       })
                     }
                     onApply={() => {
+                      const eventContext = this.state.editedVariable
+                        ? this.state.editedVariable.eventContext
+                        : null;
                       this.setState({
                         editedVariable: null,
                       });
-                      if (this._eventsTree)
-                        this._eventsTree.forceEventsUpdate();
+                      if (this._eventsTree && eventContext) {
+                        this._eventsTree.forceEventsUpdate(() => {
+                          const positions = this._getChangedEventRows([
+                            eventContext.event,
+                          ]);
+                          this._saveChangesToHistory('ADD', {
+                            positionsBeforeAction: positions,
+                            positionAfterAction: positions,
+                          });
+                        });
+                      }
                     }}
-                    tabs={[
-                      {
-                        id: 'local-variables',
-                        label: '',
-                        variablesContainer: this.state.editedVariable
-                          .variablesContainer,
-                        onComputeAllVariableNames: () => [],
-                      },
-                    ]}
-                    helpPagePath={'/all-features/variables/local-variables'}
-                    preventRefactoringToDeleteInstructions
+                    variablesContainer={
+                      this.state.editedVariable.variablesContainer
+                    }
                     initiallySelectedVariableName={
                       this.state.editedVariable.variableName
                     }

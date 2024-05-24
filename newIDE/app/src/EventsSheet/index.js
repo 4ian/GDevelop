@@ -2112,11 +2112,23 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                       })
                     }
                     onApply={() => {
+                      const eventContext = this.state.editedVariable
+                        ? this.state.editedVariable.eventContext
+                        : null;
                       this.setState({
                         editedVariable: null,
                       });
-                      if (this._eventsTree)
-                        this._eventsTree.forceEventsUpdate();
+                      if (this._eventsTree && eventContext) {
+                        this._eventsTree.forceEventsUpdate(() => {
+                          const positions = this._getChangedEventRows([
+                            eventContext.event,
+                          ]);
+                          this._saveChangesToHistory('ADD', {
+                            positionsBeforeAction: positions,
+                            positionAfterAction: positions,
+                          });
+                        });
+                      }
                     }}
                     tabs={[
                       {

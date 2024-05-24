@@ -81,6 +81,24 @@ AdvancedExtension::AdvancedExtension() {
                "}\n";
       });
 
+  GetAllActions()["CopyArgumentToVariable2"]
+      .SetCustomCodeGenerator([](gd::Instruction &instruction,
+                                 gd::EventsCodeGenerator &codeGenerator,
+                                 gd::EventsCodeGenerationContext &context) {
+        // This is duplicated from EventsCodeGenerator::GenerateParameterCodes
+        gd::String parameter = instruction.GetParameter(0).GetPlainString();
+        gd::String variable =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator, context, "variable", instruction.GetParameter(1),
+                "");
+
+        return "if (typeof eventsFunctionContext !== 'undefined') {\n"
+               "gdjs.Variable.copy(eventsFunctionContext.getArgument(" +
+               parameter + "), " + variable +
+               ", false);\n"
+               "}\n";
+      });
+
   GetAllActions()["CopyVariableToArgument"]
       .SetCustomCodeGenerator([](gd::Instruction &instruction,
                                  gd::EventsCodeGenerator &codeGenerator,
@@ -90,6 +108,24 @@ AdvancedExtension::AdvancedExtension() {
         gd::String variable =
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
                 codeGenerator, context, "scenevar", instruction.GetParameter(1),
+                "");
+
+        return "if (typeof eventsFunctionContext !== 'undefined') {\n"
+               "gdjs.Variable.copy(" +
+               variable + ", eventsFunctionContext.getArgument(" + parameter +
+               "), false);\n"
+               "}\n";
+      });
+
+  GetAllActions()["CopyVariableToArgument2"]
+      .SetCustomCodeGenerator([](gd::Instruction &instruction,
+                                 gd::EventsCodeGenerator &codeGenerator,
+                                 gd::EventsCodeGenerationContext &context) {
+        // This is duplicated from EventsCodeGenerator::GenerateParameterCodes
+        gd::String parameter = instruction.GetParameter(0).GetPlainString();
+        gd::String variable =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator, context, "variable", instruction.GetParameter(1),
                 "");
 
         return "if (typeof eventsFunctionContext !== 'undefined') {\n"

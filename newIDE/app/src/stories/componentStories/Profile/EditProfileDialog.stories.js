@@ -24,6 +24,9 @@ const defaultProps: EditProfileDialogProps = {
   onUpdateTiktokFollow: async () => ({
     code: 'tiktok-follow/badge-already-given',
   }),
+  onUpdateTwitterFollow: async () => ({
+    code: 'twitter-follow/badge-already-given',
+  }),
   achievements: fakeAchievements,
   badges: [
     {

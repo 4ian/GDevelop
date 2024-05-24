@@ -1330,6 +1330,36 @@ export default class AuthenticatedUserProvider extends React.Component<
     }
   };
 
+  _onUpdateTwitterFollow = async (
+    communityLinks: CommunityLinks,
+    preferences: PreferencesValues
+  ) => {
+    const { authentication } = this.props;
+
+    await this._doEdit(
+      {
+        communityLinks,
+      },
+      preferences
+    );
+
+    this.setState({
+      editInProgress: true,
+    });
+    try {
+      const response = await authentication.updateTwitterFollow(
+        authentication.getAuthorizationHeader
+      );
+      this._fetchUserBadges();
+
+      return response;
+    } finally {
+      this.setState({
+        editInProgress: false,
+      });
+    }
+  };
+
   render() {
     return (
       <PreferencesContext.Consumer>
@@ -1376,6 +1406,9 @@ export default class AuthenticatedUserProvider extends React.Component<
                   }
                   onUpdateTiktokFollow={communityLinks =>
                     this._onUpdateTiktokFollow(communityLinks, preferences)
+                  }
+                  onUpdateTwitterFollow={communityLinks =>
+                    this._onUpdateTwitterFollow(communityLinks, preferences)
                   }
                   onDelete={this._doDeleteAccount}
                   actionInProgress={

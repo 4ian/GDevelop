@@ -469,6 +469,33 @@ export const communityLinksConfig = {
     icon: <Twitter />,
     prefix: 'https://twitter.com/',
     maxLength: 15,
+    getMessageFromUpdate: (responseCode: string) => {
+      if (
+        responseCode === 'twitter-follow/badge-given' ||
+        responseCode === 'twitter-follow/badge-already-given'
+      ) {
+        return {
+          title: t`You're awesome!`,
+          message: t`Thanks for following GDevelop. We added credits to your account as a thank you gift.`,
+        };
+      } else if (responseCode === 'twitter-follow/account-not-followed') {
+        return {
+          title: t`We could not check your follow`,
+          message: t`Make sure you follow the GDevelop account and try again.`,
+        };
+      } else if (responseCode === 'twitter-follow/user-not-found') {
+        return {
+          title: t`We could not find your user`,
+          message: t`Make sure your username is correct, follow the GDevelop account and try again.`,
+        };
+      }
+
+      return null;
+    },
+    getRewardMessage: (hasBadge: boolean, rewardValueInCredits: string) =>
+      !hasBadge
+        ? t`[Follow GDevelop](https://twitter.com/GDevelopApp) and enter your Twitter username here to get ${rewardValueInCredits} free credits as a thank you!`
+        : t`Thank you for supporting GDevelop. Credits were added to your account as a thank you.`,
   },
   facebookUsername: {
     icon: <Facebook />,

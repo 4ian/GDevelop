@@ -124,6 +124,14 @@ export type UpdateTiktokFollowResponse = {|
     | 'tiktok-follow/user-not-found',
 |};
 
+export type UpdateTwitterFollowResponse = {|
+  +code:
+    | 'twitter-follow/badge-already-given'
+    | 'twitter-follow/badge-given'
+    | 'twitter-follow/account-not-followed'
+    | 'twitter-follow/user-not-found',
+|};
+
 export type IdentityProvider = 'google' | 'apple' | 'github';
 
 export default class Authentication {
@@ -454,6 +462,29 @@ export default class Authentication {
     const authorizationHeader = await getAuthorizationHeader();
     const response = await axios.post(
       `${GDevelopUserApi.baseUrl}/user/${uid}/action/update-tiktok-follow`,
+      {},
+      {
+        params: { userId: uid },
+        headers: { Authorization: authorizationHeader },
+      }
+    );
+
+    return response.data;
+  };
+
+  updateTwitterFollow = async (
+    getAuthorizationHeader: () => Promise<string>
+  ): Promise<UpdateTwitterFollowResponse> => {
+    const { currentUser } = this.auth;
+    if (!currentUser)
+      throw new Error(
+        'Tried to update twitter follow while not authenticated.'
+      );
+    const { uid } = currentUser;
+
+    const authorizationHeader = await getAuthorizationHeader();
+    const response = await axios.post(
+      `${GDevelopUserApi.baseUrl}/user/${uid}/action/update-twitter-follow`,
       {},
       {
         params: { userId: uid },

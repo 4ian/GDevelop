@@ -66,6 +66,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
       .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
+  // Deprecated
   extension
       .AddAction("CopyArgumentToVariable",
                  _("Copy function parameter to variable"),
@@ -78,6 +79,21 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
       .SetHelpPath("/events/functions/return")
       .AddParameter("functionParameterName", _("Parameter name"), "variable")
       .AddParameter("scenevar", _("Scene variable"))
+      .SetHidden()
+      .MarkAsAdvanced();
+
+  extension
+      .AddAction("CopyArgumentToVariable2",
+                 _("Copy function parameter to variable"),
+                 _("Copy a function parameter (also called \"argument\") to a variable. "
+                 "The parameter type must be a variable."),
+                 _("Copy the parameter _PARAM0_ into the variable _PARAM1_"),
+                 "",
+                 "res/function32.png",
+                 "res/function32.png")
+      .SetHelpPath("/events/functions/return")
+      .AddParameter("functionParameterName", _("Parameter name"), "variable")
+      .AddParameter("variable", _("Variable"))
       .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
@@ -93,6 +109,21 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
       .SetHelpPath("/events/functions/return")
       .AddParameter("functionParameterName", _("Parameter name"), "variable")
       .AddParameter("scenevar", _("Scene variable"))
+      .SetHidden()
+      .MarkAsAdvanced();
+
+  extension
+      .AddAction("CopyVariableToArgument2",
+                 _("Copy variable to function parameter"),
+                 _("Copy a variable to function parameter (also called \"argument\"). "
+                 "The parameter type must be a variable."),
+                 _("Copy the variable _PARAM1_ into the parameter _PARAM0_"),
+                 "",
+                 "res/function32.png",
+                 "res/function32.png")
+      .SetHelpPath("/events/functions/return")
+      .AddParameter("functionParameterName", _("Parameter name"), "variable")
+      .AddParameter("variable", _("Scene variable"))
       .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 

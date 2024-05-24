@@ -133,7 +133,11 @@ export default function ValueTypeEditor({
                   label={t`Leaderboard (text)`}
                 />
                 <SelectOption value="identifier" label={t`Identifier (text)`} />
-                <SelectOption value="scenevar" label={t`Scene variable`} />
+                <SelectOption value="variable" label={t`Variable`} />
+                <SelectOption
+                  value="scenevar"
+                  label={t`Scene variable (deprecated)`}
+                />
                 {!isExpressionType && (
                   <SelectOption
                     value="objectListOrEmptyIfJustDeclared"

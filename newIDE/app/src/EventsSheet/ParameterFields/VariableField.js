@@ -291,7 +291,9 @@ export default React.forwardRef<Props, VariableFieldInterface>(
         : null;
     const needManualTypeSwitcher =
       isSwitchableInstruction &&
-      variableType === gd.Variable.Unknown &&
+      variableType !== gd.Variable.Number &&
+      variableType !== gd.Variable.String &&
+      variableType !== gd.Variable.Boolean &&
       !errorText &&
       value;
 

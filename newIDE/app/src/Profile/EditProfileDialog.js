@@ -13,6 +13,7 @@ import {
   type Profile,
   type UpdateGitHubStarResponse,
   type UpdateTiktokFollowResponse,
+  type UpdateTwitterFollowResponse,
 } from '../Utils/GDevelopServices/Authentication';
 import {
   communityLinksConfig,
@@ -63,6 +64,9 @@ export type EditProfileDialogProps = {|
   onUpdateTiktokFollow: (
     communityLinks: CommunityLinks
   ) => Promise<UpdateTiktokFollowResponse>,
+  onUpdateTwitterFollow: (
+    communityLinks: CommunityLinks
+  ) => Promise<UpdateTwitterFollowResponse>,
   onDelete: () => Promise<void>,
   actionInProgress: boolean,
   error: ?AuthError,
@@ -244,6 +248,7 @@ const EditProfileDialog = ({
   onEdit,
   onUpdateGitHubStar,
   onUpdateTiktokFollow,
+  onUpdateTwitterFollow,
   onDelete,
   actionInProgress,
   error,
@@ -508,6 +513,27 @@ const EditProfileDialog = ({
               <CommunityLinkWithFollow
                 badges={badges}
                 achievements={achievements}
+                achievementId="twitter-follow"
+                value={twitterUsername}
+                onChange={setTwitterUsername}
+                onUpdateFollow={() =>
+                  onUpdateTwitterFollow(updatedCommunityLinks)
+                }
+                getMessageFromUpdate={
+                  communityLinksConfig.twitterUsername.getMessageFromUpdate
+                }
+                disabled={actionInProgress}
+                maxLength={communityLinksConfig.twitterUsername.maxLength}
+                prefix={communityLinksConfig.twitterUsername.prefix}
+                getRewardMessage={
+                  communityLinksConfig.twitterUsername.getRewardMessage
+                }
+                translatableHintText={t`username`}
+                icon={communityLinksConfig.twitterUsername.icon}
+              />
+              <CommunityLinkWithFollow
+                badges={badges}
+                achievements={achievements}
                 achievementId="tiktok-follow"
                 value={tiktokUsername}
                 onChange={setTiktokUsername}
@@ -541,15 +567,6 @@ const EditProfileDialog = ({
                 translatableHintText={t`Another personal website, newgrounds.com page, etc.`}
                 onChange={(e, value) => {
                   setPersonalWebsite2Link(value);
-                }}
-                disabled={actionInProgress}
-              />
-              <CommunityLinkLine
-                id="twitterUsername"
-                value={twitterUsername}
-                translatableHintText={t`username`}
-                onChange={(e, value) => {
-                  setTwitterUsername(value);
                 }}
                 disabled={actionInProgress}
               />

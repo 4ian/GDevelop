@@ -120,6 +120,10 @@ const ProfileDetails = ({
     (achievements &&
       achievements.find(achievement => achievement.id === 'tiktok-follow')) ||
     null;
+  const twitterFollowAchievement =
+    (achievements &&
+      achievements.find(achievement => achievement.id === 'twitter-follow')) ||
+    null;
 
   const [
     discordUsernameSyncStatus,
@@ -282,6 +286,23 @@ const ProfileDetails = ({
                     icon: communityLinksConfig.githubUsername.icon,
                   },
                   {
+                    text: !twitterUsername ? (
+                      <MarkdownText
+                        translatableSource={communityLinksConfig.twitterUsername.getRewardMessage(
+                          false,
+                          twitterFollowAchievement &&
+                            twitterFollowAchievement.rewardValueInCredits
+                            ? twitterFollowAchievement.rewardValueInCredits.toString()
+                            : '-'
+                        )}
+                      />
+                    ) : (
+                      twitterUsername
+                    ),
+                    isNotFilled: !twitterUsername,
+                    icon: communityLinksConfig.twitterUsername.icon,
+                  },
+                  {
                     text: !tiktokUsername ? (
                       <MarkdownText
                         translatableSource={communityLinksConfig.tiktokUsername.getRewardMessage(
@@ -305,10 +326,6 @@ const ProfileDetails = ({
                   {
                     text: personalWebsite2Link,
                     icon: communityLinksConfig.personalWebsite2Link.icon,
-                  },
-                  {
-                    text: twitterUsername,
-                    icon: communityLinksConfig.twitterUsername.icon,
                   },
                   {
                     text: facebookUsername,

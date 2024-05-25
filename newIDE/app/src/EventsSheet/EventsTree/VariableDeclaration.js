@@ -70,6 +70,10 @@ const getVariableValueAsString = (variable: gdVariable, i18n: I18nType) => {
     ? variable.getString()
     : type === gd.Variable.Number
     ? variable.getValue().toString()
+    : type === gd.Variable.Boolean
+    ? variable.getBool()
+      ? i18n._(t`True`)
+      : i18n._(t`False`)
     : null;
 };
 

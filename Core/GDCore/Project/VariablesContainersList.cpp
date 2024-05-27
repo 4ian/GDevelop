@@ -23,6 +23,15 @@ VariablesContainersList::MakeNewVariablesContainersListForProjectAndLayout(
 }
 
 VariablesContainersList
+VariablesContainersList::MakeNewVariablesContainersListForProject(
+    const gd::Project& project) {
+  VariablesContainersList variablesContainersList;
+  variablesContainersList.Push(project.GetVariables());
+  variablesContainersList.firstLocalVariableContainerIndex = 1;
+  return variablesContainersList;
+}
+
+VariablesContainersList
 VariablesContainersList::MakeNewVariablesContainersListForEventsFunctionsExtension(
     const gd::EventsFunctionsExtension &extension) {
   VariablesContainersList variablesContainersList;

@@ -2,10 +2,12 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import VariablesEditorDialog from './VariablesEditorDialog';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
 
 type Props = {|
   open: boolean,
   project: gdProject,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   variablesContainer: gdVariablesContainer,
   onApply: (selectedVariableName: string | null) => void,
   onCancel: () => void,
@@ -14,6 +16,7 @@ type Props = {|
 
 const LocalVariablesDialog = ({
   project,
+  projectScopedContainersAccessor,
   variablesContainer,
   open,
   onCancel,
@@ -35,6 +38,7 @@ const LocalVariablesDialog = ({
   return (
     <VariablesEditorDialog
       project={project}
+      projectScopedContainersAccessor={projectScopedContainersAccessor}
       open={open}
       onCancel={onCancel}
       onApply={onApply}

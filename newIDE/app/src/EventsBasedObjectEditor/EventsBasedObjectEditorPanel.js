@@ -8,6 +8,7 @@ import EventBasedObjectChildrenEditor from './EventBasedObjectChildrenEditor';
 import Background from '../UI/Background';
 import { Column, Line } from '../UI/Grid';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
 
 type TabName = 'configuration' | 'properties' | 'children';
 
@@ -88,6 +89,13 @@ export default function EventsBasedObjectEditorPanel({
             globalObjectsContainer={globalObjectsContainer}
             eventsFunctionsExtension={eventsFunctionsExtension}
             eventsBasedObject={eventsBasedObject}
+            projectScopedContainersAccessor={
+              new ProjectScopedContainersAccessor({
+                project,
+                eventsFunctionsExtension,
+                eventsBasedObject,
+              })
+            }
           />
         )}
       </Column>

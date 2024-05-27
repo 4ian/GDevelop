@@ -595,11 +595,14 @@ export class ObjectsContainersList extends EmscriptenObject {
   getTypeOfBehavior(name: string, searchInGroups: boolean): string;
   getBehaviorsOfObject(name: string, searchInGroups: boolean): VectorString;
   getTypeOfBehaviorInObjectOrGroup(objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): string;
+  hasObjectOrGroupNamed(name: string): boolean;
   hasObjectOrGroupWithVariableNamed(objectName: string, variableName: string): ObjectsContainersList_VariableExistence;
 }
 
 export class ProjectScopedContainers extends EmscriptenObject {
   static makeNewProjectScopedContainersForProjectAndLayout(project: Project, layout: Layout): ProjectScopedContainers;
+  static makeNewProjectScopedContainersForProject(project: Project): ProjectScopedContainers;
+  static makeNewProjectScopedContainersForEventsFunctionsExtension(project: Project, eventsFunctionsExtension: EventsFunctionsExtension): ProjectScopedContainers;
   static makeNewProjectScopedContainersForFreeEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer): ProjectScopedContainers;
   static makeNewProjectScopedContainersForBehaviorEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer): ProjectScopedContainers;
   static makeNewProjectScopedContainersForObjectEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer): ProjectScopedContainers;

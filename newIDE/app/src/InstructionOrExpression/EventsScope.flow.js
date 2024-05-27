@@ -45,38 +45,41 @@ export class ProjectScopedContainersAccessor {
         project,
         layout
       );
-    } else if (
-      eventsFunctionsExtension &&
-      eventsFunction &&
-      this._parameterObjectsContainer
-    ) {
-      if (eventsBasedBehavior) {
-        projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForBehaviorEventsFunction(
-          project,
-          eventsFunctionsExtension,
-          eventsBasedBehavior,
-          eventsFunction,
-          this._parameterObjectsContainer
-        );
-      } else if (eventsBasedObject) {
-        projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForObjectEventsFunction(
-          project,
-          eventsFunctionsExtension,
-          eventsBasedObject,
-          eventsFunction,
-          this._parameterObjectsContainer
-        );
+    } else if (eventsFunctionsExtension) {
+      if (eventsFunction && this._parameterObjectsContainer) {
+        if (eventsBasedBehavior) {
+          projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForBehaviorEventsFunction(
+            project,
+            eventsFunctionsExtension,
+            eventsBasedBehavior,
+            eventsFunction,
+            this._parameterObjectsContainer
+          );
+        } else if (eventsBasedObject) {
+          projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForObjectEventsFunction(
+            project,
+            eventsFunctionsExtension,
+            eventsBasedObject,
+            eventsFunction,
+            this._parameterObjectsContainer
+          );
+        } else {
+          projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForFreeEventsFunction(
+            project,
+            eventsFunctionsExtension,
+            eventsFunction,
+            this._parameterObjectsContainer
+          );
+        }
       } else {
-        projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForFreeEventsFunction(
+        projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForEventsFunctionsExtension(
           project,
-          eventsFunctionsExtension,
-          eventsFunction,
-          this._parameterObjectsContainer
+          eventsFunctionsExtension
         );
       }
     } else {
-      throw new Error(
-        'Called `ProjectScopedContainers.get` without a layout or an eventsFunction and eventsFunctionsExtension'
+      projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForProject(
+        project
       );
     }
     for (const event of this._eventPath) {

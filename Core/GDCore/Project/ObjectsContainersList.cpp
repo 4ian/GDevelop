@@ -13,11 +13,25 @@
 namespace gd {
 
 ObjectsContainersList
+ObjectsContainersList::MakeNewEmptyObjectsContainersList() {
+  ObjectsContainersList objectsContainersList;
+  return objectsContainersList;
+}
+
+ObjectsContainersList
 ObjectsContainersList::MakeNewObjectsContainersListForProjectAndLayout(
     const gd::Project& project, const gd::Layout& layout) {
   ObjectsContainersList objectsContainersList;
   objectsContainersList.Add(project);
   objectsContainersList.Add(layout);
+  return objectsContainersList;
+}
+
+ObjectsContainersList
+ObjectsContainersList::MakeNewObjectsContainersListForProject(
+    const gd::Project& project) {
+  ObjectsContainersList objectsContainersList;
+  objectsContainersList.Add(project);
   return objectsContainersList;
 }
 

@@ -18,6 +18,7 @@ import {
   type ObjectFolderOrObjectWithContext,
 } from '../ObjectsList/EnumerateObjectFolderOrObject';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
 
 const gd: libGDevelop = global.gd;
 
@@ -26,6 +27,7 @@ type Props = {|
   globalObjectsContainer: gdObjectsContainer,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsBasedObject: gdEventsBasedObject,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   unsavedChanges?: ?UnsavedChanges,
 |};
 
@@ -292,6 +294,9 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 initialTab={this.state.editedObjectInitialTab}
                 project={project}
                 eventsFunctionsExtension={eventsFunctionsExtension}
+                projectScopedContainersAccessor={
+                  this.props.projectScopedContainersAccessor
+                }
                 resourceManagementProps={{
                   resourceSources: [],
                   resourceExternalEditors: [],

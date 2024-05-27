@@ -27,6 +27,7 @@ import {
   makeSchema,
   reorderInstanceSchemaForCustomProperties,
 } from './CompactPropertiesSchema';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
 
 export const styles = {
   paper: {
@@ -46,6 +47,7 @@ const gd: libGDevelop = global.gd;
 type Props = {|
   project: gdProject,
   layout: gdLayout,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   instances: Array<gdInitialInstance>,
   onEditObjectByName: string => void,
   onInstancesModified?: (Array<gdInitialInstance>) => void,
@@ -71,6 +73,7 @@ const CompactInstancePropertiesEditor = ({
   onGetInstanceSize,
   editInstanceVariables,
   onInstancesModified,
+  projectScopedContainersAccessor,
 }: Props) => {
   const forceUpdate = useForceUpdate();
 
@@ -181,6 +184,7 @@ const CompactInstancePropertiesEditor = ({
           </Column>
           {object ? (
             <VariablesList
+              projectScopedContainersAccessor={projectScopedContainersAccessor}
               directlyStoreValueChangesWhileEditing
               inheritedVariablesContainer={object.getVariables()}
               variablesContainer={instance.getVariables()}

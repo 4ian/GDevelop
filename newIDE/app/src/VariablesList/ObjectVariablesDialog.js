@@ -4,11 +4,13 @@ import { Trans } from '@lingui/macro';
 import VariablesEditorDialog from './VariablesEditorDialog';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
 
 type Props = {|
   open: boolean,
   project: gdProject,
   layout?: ?gdLayout,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   objectName?: ?string,
   variablesContainer: gdVariablesContainer,
   onApply: (selectedVariableName: string | null) => void,
@@ -35,6 +37,7 @@ const ObjectVariablesDialog = ({
   preventRefactoringToDeleteInstructions,
   isGlobalTabInitiallyOpen,
   initiallySelectedVariableName,
+  projectScopedContainersAccessor,
 }: Props) => {
   const onComputeAllVariableNames = React.useCallback(
     () =>
@@ -71,6 +74,7 @@ const ObjectVariablesDialog = ({
   return (
     <VariablesEditorDialog
       project={project}
+      projectScopedContainersAccessor={projectScopedContainersAccessor}
       open={open}
       onCancel={onCancel}
       onApply={onApply}

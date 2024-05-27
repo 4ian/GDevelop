@@ -78,6 +78,8 @@ import Text from '../UI/Text';
 import { MultilineVariableEditorDialog } from './MultilineVariableEditorDialog';
 import { MarkdownText } from '../UI/MarkdownText';
 import Paper from '../UI/Paper';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
+
 const gd: libGDevelop = global.gd;
 
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget('variable-editor');
@@ -96,6 +98,7 @@ export type HistoryHandler = {|
 |};
 
 type Props = {|
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   variablesContainer: gdVariablesContainer,
   inheritedVariablesContainer?: gdVariablesContainer,
   initiallySelectedVariableName?: string,
@@ -1480,16 +1483,14 @@ const VariablesList = (props: Props) => {
             gd.Project.getSafeName(cleanedName)
           : // Child variables of structures must "just" be not empty.
             cleanedName || 'Unnamed',
-        tentativeNewName => {
-          if (
-            (parentVariable && parentVariable.hasChild(tentativeNewName)) ||
-            (!parentVariable && props.variablesContainer.has(tentativeNewName))
-          ) {
-            return true;
-          }
-
-          return false;
-        }
+        tentativeNewName =>
+          (parentVariable && parentVariable.hasChild(tentativeNewName)) ||
+          (!parentVariable &&
+            (props.variablesContainer.has(tentativeNewName) ||
+              props.projectScopedContainersAccessor
+                .get()
+                .getObjectsContainersList()
+                .hasObjectOrGroupNamed(tentativeNewName)))
       );
 
       if (!parentVariable) {
@@ -1506,8 +1507,9 @@ const VariablesList = (props: Props) => {
       refocusNameField({ identifier: variable.ptr });
     },
     [
-      _onChange,
       props.variablesContainer,
+      props.projectScopedContainersAccessor,
+      _onChange,
       updateExpandedAndSelectedNodesFollowingNameChange,
       refocusNameField,
     ]

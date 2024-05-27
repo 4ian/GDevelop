@@ -10,6 +10,19 @@
 namespace gd {
 
 ProjectScopedContainers
+ProjectScopedContainers::MakeNewProjectScopedContainersForEventsFunctionsExtension(
+    const gd::Project &project, const gd::EventsFunctionsExtension &eventsFunctionsExtension) {
+
+  ProjectScopedContainers projectScopedContainers(
+      ObjectsContainersList::MakeNewEmptyObjectsContainersList(),
+      VariablesContainersList::
+          MakeNewVariablesContainersListForEventsFunctionsExtension(eventsFunctionsExtension),
+      PropertiesContainersList::MakeNewEmptyPropertiesContainersList());
+
+  return projectScopedContainers;
+};
+
+ProjectScopedContainers
 ProjectScopedContainers::MakeNewProjectScopedContainersForFreeEventsFunction(
     const gd::Project &project, const gd::EventsFunctionsExtension &eventsFunctionsExtension,
     const gd::EventsFunction &eventsFunction,

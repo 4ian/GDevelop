@@ -120,7 +120,8 @@ const InnerDialog = (props: InnerDialogProps) => {
     gd.WholeProjectRefactorer.applyRefactoringForVariablesContainer(
       props.project,
       props.object.getVariables(),
-      changeset
+      changeset,
+      getOriginalContentSerializedElement().getChild('variables')
     );
     props.object.clearPersistentUuid();
 

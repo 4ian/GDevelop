@@ -78,9 +78,9 @@ class GD_CORE_API WholeProjectRefactorer {
    * made to variables.
    */
   static void ApplyRefactoringForVariablesContainer(
-    gd::Project &project,
-    const gd::VariablesContainer &newVariablesContainer,
-    const gd::VariablesChangeset& changeset);
+      gd::Project &project, gd::VariablesContainer &variablesContainer,
+      const gd::VariablesChangeset &changeset,
+      const gd::SerializerElement &originalSerializedVariables);
 
   /**
    * \brief Refactor the project **before** an events function extension is

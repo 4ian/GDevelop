@@ -139,6 +139,7 @@ const VariablesEditorDialog = ({
             originalContentSerializedElement,
             variablesContainer
           );
+
           if (
             preventRefactoringToDeleteInstructions ||
             // While we support refactoring that would remove all references (actions, conditions...)
@@ -154,7 +155,8 @@ const VariablesEditorDialog = ({
           gd.WholeProjectRefactorer.applyRefactoringForVariablesContainer(
             project,
             variablesContainer,
-            changeset
+            changeset,
+            originalContentSerializedElement
           );
         }
         variablesContainer.clearPersistentUuid();

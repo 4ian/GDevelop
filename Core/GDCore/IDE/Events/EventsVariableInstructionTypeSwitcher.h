@@ -15,9 +15,7 @@
 #include "GDCore/String.h"
 
 namespace gd {
-class BaseEvent;
 class VariablesContainer;
-class EventsList;
 class Platform;
 }  // namespace gd
 
@@ -29,34 +27,26 @@ namespace gd {
  *
  * \ingroup IDE
  */
-class GD_CORE_API EventsVariableReplacer
+class GD_CORE_API EventsVariableInstructionTypeSwitcher
     : public ArbitraryEventsWorkerWithContext {
  public:
-  EventsVariableReplacer(
+  EventsVariableInstructionTypeSwitcher(
       const gd::Platform &platform_,
       const gd::VariablesContainer &targetVariablesContainer_,
-      const std::unordered_map<gd::String, gd::String> &oldToNewVariableNames_,
-      const std::unordered_set<gd::String> &removedVariableNames_)
+      const std::unordered_set<gd::String> &typeChangedVariableNames_)
       : platform(platform_),
         targetVariablesContainer(targetVariablesContainer_),
-        oldToNewVariableNames(oldToNewVariableNames_),
-        removedVariableNames(removedVariableNames_) {};
-  virtual ~EventsVariableReplacer();
+        typeChangedVariableNames(typeChangedVariableNames_){};
+  virtual ~EventsVariableInstructionTypeSwitcher();
 
  private:
   bool DoVisitInstruction(gd::Instruction &instruction,
                           bool isCondition) override;
-  bool DoVisitEventExpression(gd::Expression &expression,
-                              const gd::ParameterMetadata &metadata) override;
-
-  const gd::VariablesContainer *FindForcedVariablesContainerIfAny(
-      const gd::String &type, const gd::String &lastObjectName);
 
   const gd::Platform &platform;
   const gd::VariablesContainer &targetVariablesContainer;
   gd::String objectName;
-  const std::unordered_map<gd::String, gd::String> &oldToNewVariableNames;
-  const std::unordered_set<gd::String> &removedVariableNames;
+  const std::unordered_set<gd::String> &typeChangedVariableNames;
 };
 
 }  // namespace gd

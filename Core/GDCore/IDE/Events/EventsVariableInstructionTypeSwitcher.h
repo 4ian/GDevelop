@@ -20,16 +20,17 @@ class Platform;
 }  // namespace gd
 
 namespace gd {
-
 /**
- * \brief Replace in expressions and in parameters of actions or conditions,
- * references to the name of a variable by another.
+ * \brief Switch the types of variable instructions for a given set of
+ * variables.
+ *
+ * \see gd::VariableInstructionSwitcher
  *
  * \ingroup IDE
  */
 class GD_CORE_API EventsVariableInstructionTypeSwitcher
     : public ArbitraryEventsWorkerWithContext {
- public:
+public:
   EventsVariableInstructionTypeSwitcher(
       const gd::Platform &platform_,
       const gd::VariablesContainer &targetVariablesContainer_,
@@ -49,4 +50,4 @@ class GD_CORE_API EventsVariableInstructionTypeSwitcher
   const std::unordered_set<gd::String> &typeChangedVariableNames;
 };
 
-}  // namespace gd
+} // namespace gd

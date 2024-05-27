@@ -311,6 +311,12 @@ namespace gdjs {
         delete objectNetworkSyncData.eff;
       }
 
+      const sceneNetworkId = this.owner.getRuntimeScene().networkId;
+      if (!sceneNetworkId) {
+        // No networkId for the scene yet, it will be set soon, let's not sync the object yet.
+        return;
+      }
+
       const {
         messageName: updateMessageName,
         messageData: updateMessageData,
@@ -319,6 +325,7 @@ namespace gdjs {
         objectName,
         instanceNetworkId,
         objectNetworkSyncData,
+        sceneNetworkId,
       });
       this.sendDataToPeersWithIncreasedClock(
         updateMessageName,
@@ -385,6 +392,13 @@ namespace gdjs {
         );
         return;
       }
+
+      const sceneNetworkId = this.owner.getRuntimeScene().networkId;
+      if (!sceneNetworkId) {
+        // No networkId for the scene yet, it will be set soon, let's not sync the object yet.
+        return;
+      }
+
       // Ensure we send a final update before the object is destroyed, if it had a networkId.
       const {
         messageName: updateMessageName,
@@ -394,6 +408,7 @@ namespace gdjs {
         objectName,
         instanceNetworkId,
         objectNetworkSyncData: this.owner.getObjectNetworkSyncData(),
+        sceneNetworkId,
       });
       this.sendDataToPeersWithIncreasedClock(
         updateMessageName,
@@ -413,6 +428,7 @@ namespace gdjs {
         objectOwner: this._playerNumber,
         objectName,
         instanceNetworkId,
+        sceneNetworkId,
       });
       const destroyedMessageName = gdjs.multiplayerMessageManager.createObjectDestroyedMessageNameFromDestroyMessage(
         destroyMessageName
@@ -464,6 +480,12 @@ namespace gdjs {
         }
       }
 
+      const sceneNetworkId = this.owner.getRuntimeScene().networkId;
+      if (!sceneNetworkId) {
+        // No networkId for the scene yet, it will be set soon, let's not sync the object yet.
+        return;
+      }
+
       const currentPlayerNumber = gdjs.multiplayer.getPlayerNumber();
       const objectName = this.owner.getName();
 
@@ -481,6 +503,7 @@ namespace gdjs {
           newObjectOwner: newPlayerNumber,
           instanceX: this.owner.getX(),
           instanceY: this.owner.getY(),
+          sceneNetworkId,
         });
         // Before sending the changeOwner message, if we are becoming the new owner,
         // we want to ensure this message is acknowledged, by everyone we're connected to.
@@ -534,6 +557,7 @@ namespace gdjs {
           objectName,
           instanceNetworkId,
           objectNetworkSyncData,
+          sceneNetworkId,
         });
         this.sendDataToPeersWithIncreasedClock(
           updateMessageName,

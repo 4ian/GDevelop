@@ -1216,15 +1216,18 @@ namespace gdjs {
     }
 
     getNetworkSyncData(): GameNetworkSyncData {
-      const variablesNetworkSyncData = this._variables.getNetworkSyncData();
       return {
-        var: variablesNetworkSyncData,
+        var: this._variables.getNetworkSyncData(),
+        ss: this._sceneStack.getNetworkSyncData(),
       };
     }
 
     updateFromNetworkSyncData(syncData: GameNetworkSyncData) {
       if (syncData.var) {
         this._variables.updateFromNetworkSyncData(syncData.var);
+      }
+      if (syncData.ss) {
+        this._sceneStack.updateFromNetworkSyncData(syncData.ss);
       }
     }
   }

@@ -186,5 +186,107 @@ namespace gdjs {
     wasFirstSceneLoaded(): boolean {
       return this._wasFirstSceneLoaded;
     }
+
+    getNetworkSyncData(): SceneStackNetworkSyncData {
+      // If this method is called, we are the host, so we can take charge of
+      // generating a networkId for each scene if they don't have one.
+      // They will be reconciled on the other players' games.
+      const sceneStackSyncData: SceneStackSceneNetworkSyncData[] = [];
+      for (let i = 0; i < this._stack.length; ++i) {
+        const scene = this._stack[i];
+        sceneStackSyncData.push({
+          name: scene.getName(),
+          networkId: scene.getOrCreateNetworkId(),
+        });
+      }
+      return sceneStackSyncData;
+    }
+
+    updateFromNetworkSyncData(
+      sceneStackSyncData: SceneStackNetworkSyncData
+    ): void {
+      // If this method is called, we are a client.
+      // We trust the host to be the source of truth for the scene stack.
+      // So we loop through the scenes in the stack given by the host and either:
+      // - Set the networkId of the scene if it's already in the stack at the right place
+      // - Add the scene to the stack if it's not there, and set its networkId
+      // - Remove any scenes that are in the stack but not in the data given by the host
+      for (let i = 0; i < sceneStackSyncData.length; ++i) {
+        const sceneSyncData = sceneStackSyncData[i];
+        const sceneAtThisPositionInOurStack = this._stack[i];
+        if (!sceneAtThisPositionInOurStack) {
+          logger.info(
+            `Scene at position ${i} with name ${sceneSyncData.name} is missing from the stack, adding it.`
+          );
+          // We have less scenes in the stack than the host, let's add the scene.
+          const newScene = this.push(sceneSyncData.name);
+          if (newScene) {
+            newScene.networkId = sceneSyncData.networkId;
+          }
+          // Continue to the next scene in the stack received from the host.
+          continue;
+        }
+
+        if (sceneAtThisPositionInOurStack.getName() !== sceneSyncData.name) {
+          logger.info(
+            `Scene at position ${i} and name ${sceneAtThisPositionInOurStack.getName()} is not the same as the expected ${
+              sceneSyncData.name
+            }, replacing.`
+          );
+          // The scene does not correspond to the scene at this position in our stack
+          // Let's unload everything after this position to recreate the stack.
+          const newScene = this.replace(
+            sceneSyncData.name,
+            true // Clear the stack
+          );
+          if (newScene) {
+            newScene.networkId = sceneSyncData.networkId;
+          }
+          // Continue to the next scene in the stack received from the host.
+          continue;
+        }
+
+        if (!sceneAtThisPositionInOurStack.networkId) {
+          logger.info(
+            `Scene at position ${i} and name ${sceneAtThisPositionInOurStack.getName()} has no networkId, let's assume it's the right one and reconcile it with the id ${
+              sceneSyncData.networkId
+            }.`
+          );
+          // The scene is in the stack but has no networkId,
+          // this can happen at the start of the game on a player that is not the host,
+          // or if a player switch to another scene before the host has sent the scene stack.
+          // Let's set the networkId of the scene.
+          sceneAtThisPositionInOurStack.networkId = sceneSyncData.networkId;
+          // Continue to the next scene in the stack received from the host.
+          continue;
+        }
+
+        if (
+          sceneAtThisPositionInOurStack.networkId !== sceneSyncData.networkId
+        ) {
+          logger.info(
+            `Scene at position ${i} and name ${sceneAtThisPositionInOurStack.getName()} has a different networkId ${
+              sceneAtThisPositionInOurStack.networkId
+            } than the expected ${sceneSyncData.networkId}, replacing.`
+          );
+          // The scene is in the stack but has a different networkId
+          // This can happen if the host has restarted the scene
+          // We can't just update the networkId of the scene in the stack
+          // We need to replace it with a new scene
+          const newScene = this.replace(
+            sceneSyncData.name,
+            false // Don't clear the stack
+          );
+          if (newScene) {
+            newScene.networkId = sceneSyncData.networkId;
+          }
+          // Continue to the next scene in the stack received from the host.
+          continue;
+        }
+
+        // The scene is in the stack and has the right networkId.
+        // Nothing to do, just continue to the next scene in the stack received from the host.
+      }
+    }
   }
 }

@@ -159,11 +159,20 @@ declare interface LayoutData {
 }
 
 declare interface LayoutNetworkSyncData {
+  id: string;
   var?: VariableNetworkSyncData[];
 }
 
+declare interface SceneStackSceneNetworkSyncData {
+  name: string;
+  networkId: string;
+}
+
+declare type SceneStackNetworkSyncData = SceneStackSceneNetworkSyncData[];
+
 declare interface GameNetworkSyncData {
   var?: VariableNetworkSyncData[];
+  ss?: SceneStackNetworkSyncData;
 }
 
 declare interface EventsFunctionsExtensionData {

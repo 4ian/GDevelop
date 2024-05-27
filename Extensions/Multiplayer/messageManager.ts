@@ -77,18 +77,20 @@ namespace gdjs {
         };
       };
     } = {};
-    let _lastClockReceivedByInstance: { [instanceId: string]: number } = {};
+    let _lastClockReceivedByInstanceByScene: {
+      [sceneId: string]: { [instanceId: string]: number };
+    } = {};
 
     // The number of times per second the scene data should be synchronized.
     const sceneSyncDataTickRate = 1;
     let lastSceneSyncTimestamp = 0;
-    let lastSentSceneSyncData: LayoutNetworkSyncData = {};
+    let lastSentSceneSyncData: LayoutNetworkSyncData | null = null;
     let numberOfForcedSceneUpdates = 0;
 
     // The number of times per second the game data should be synchronized.
     const gameSyncDataTickRate = 1;
     let lastGameSyncTimestamp = 0;
-    let lastSentGameSyncData: GameNetworkSyncData = {};
+    let lastSentGameSyncData: GameNetworkSyncData | null = null;
     let numberOfForcedGameUpdates = 0;
 
     // Send heartbeat messages to host to ensure the connection is still alive.
@@ -154,7 +156,43 @@ namespace gdjs {
 
     const clearExpectedMessageAcknowledgements = () => {
       expectedMessageAcknowledgements = {};
-      _lastClockReceivedByInstance = {};
+      _lastClockReceivedByInstanceByScene = {};
+    };
+
+    const getLastClockReceivedForInstanceOnScene = ({
+      sceneNetworkId,
+      instanceNetworkId,
+    }: {
+      sceneNetworkId: string;
+      instanceNetworkId: string;
+    }) => {
+      if (!_lastClockReceivedByInstanceByScene[sceneNetworkId]) {
+        _lastClockReceivedByInstanceByScene[sceneNetworkId] = {};
+      }
+
+      return (
+        _lastClockReceivedByInstanceByScene[sceneNetworkId][
+          instanceNetworkId
+        ] || 0
+      );
+    };
+
+    const setLastClockReceivedForInstanceOnScene = ({
+      sceneNetworkId,
+      instanceNetworkId,
+      clock,
+    }: {
+      sceneNetworkId: string;
+      instanceNetworkId: string;
+      clock: number;
+    }) => {
+      if (!_lastClockReceivedByInstanceByScene[sceneNetworkId]) {
+        _lastClockReceivedByInstanceByScene[sceneNetworkId] = {};
+      }
+
+      _lastClockReceivedByInstanceByScene[sceneNetworkId][
+        instanceNetworkId
+      ] = clock;
     };
 
     /**
@@ -335,6 +373,7 @@ namespace gdjs {
       newObjectOwner,
       instanceX,
       instanceY,
+      sceneNetworkId,
     }: {
       objectOwner: number;
       objectName: string;
@@ -342,6 +381,7 @@ namespace gdjs {
       newObjectOwner: number;
       instanceX: number;
       instanceY: number;
+      sceneNetworkId: string;
     }): {
       messageName: string;
       messageData: {
@@ -349,6 +389,7 @@ namespace gdjs {
         newOwner: number;
         instanceX: number;
         instanceY: number;
+        sceneNetworkId: string;
       };
     } => {
       return {
@@ -358,6 +399,7 @@ namespace gdjs {
           newOwner: newObjectOwner,
           instanceX,
           instanceY,
+          sceneNetworkId,
         },
       };
     };
@@ -400,6 +442,15 @@ namespace gdjs {
             const instanceNetworkId = matches[3];
             const previousOwner = data.previousOwner;
             const newOwner = data.newOwner;
+            const sceneNetworkId = data.sceneNetworkId;
+
+            if (sceneNetworkId !== runtimeScene.networkId) {
+              logger.info(
+                `Object ${objectName} is in scene ${sceneNetworkId}, but we are on ${runtimeScene.networkId}. Skipping.`
+              );
+              // The object is not in the current scene.
+              return;
+            }
 
             const instance = getInstanceFromNetworkId({
               runtimeScene,
@@ -495,23 +546,25 @@ namespace gdjs {
     };
 
     const updateObjectMessageNamePrefix = '#update';
-    const updateObjectMessageNameRegex = /#update#owner_(\d+)#object_(.+)#instance_(.+)/;
+    const updateObjectMessageNameRegex = /#update#owner_(\d+)#object_(.+)#instance_(.+)#scene_(.+)/;
     const createUpdateObjectMessage = ({
       objectOwner,
       objectName,
       instanceNetworkId,
       objectNetworkSyncData,
+      sceneNetworkId,
     }: {
       objectOwner: number;
       objectName: string;
       instanceNetworkId: string;
       objectNetworkSyncData: ObjectNetworkSyncData;
+      sceneNetworkId: string;
     }): {
       messageName: string;
       messageData: any;
     } => {
       return {
-        messageName: `${updateObjectMessageNamePrefix}#owner_${objectOwner}#object_${objectName}#instance_${instanceNetworkId}`,
+        messageName: `${updateObjectMessageNamePrefix}#owner_${objectOwner}#object_${objectName}#instance_${instanceNetworkId}#scene_${sceneNetworkId}`,
         messageData: objectNetworkSyncData,
       };
     };
@@ -549,10 +602,21 @@ namespace gdjs {
             }
             const objectName = matches[2];
             const instanceNetworkId = matches[3];
+            const sceneNetworkId = matches[4];
+
+            if (sceneNetworkId !== runtimeScene.networkId) {
+              logger.info(
+                `Object ${objectName} is in scene ${sceneNetworkId}, but we are on ${runtimeScene.networkId}. Skipping.`
+              );
+              // The object is not in the current scene.
+              return;
+            }
 
             const messageInstanceClock = data['_clock'];
-            const lastClock =
-              _lastClockReceivedByInstance[instanceNetworkId] || 0;
+            const lastClock = getLastClockReceivedForInstanceOnScene({
+              sceneNetworkId,
+              instanceNetworkId,
+            });
 
             if (messageInstanceClock <= lastClock) {
               // Ignore old messages, they may be arriving out of order because of lag.
@@ -610,9 +674,11 @@ namespace gdjs {
 
             instance.updateFromObjectNetworkSyncData(data);
 
-            _lastClockReceivedByInstance[
-              instanceNetworkId
-            ] = messageInstanceClock;
+            setLastClockReceivedForInstanceOnScene({
+              sceneNetworkId,
+              instanceNetworkId,
+              clock: messageInstanceClock,
+            });
 
             // If we are are the host,
             // we need to relay the position to others except the player who sent the update message.
@@ -696,14 +762,22 @@ namespace gdjs {
             // If a clock is provided in the message, ensure that we only process the message if the clock is newer than the last one received.
             const messageInstanceClock = data['_clock'];
             if (messageInstanceClock !== undefined) {
-              const instanceId = matches[3];
-              const lastClock = _lastClockReceivedByInstance[instanceId] || 0;
+              const instanceNetworkId = matches[3];
+              const sceneNetworkId = matches[4];
+              const lastClock = getLastClockReceivedForInstanceOnScene({
+                sceneNetworkId,
+                instanceNetworkId,
+              });
               if (messageInstanceClock <= lastClock) {
                 // Ignore old messages.
                 return;
               }
 
-              _lastClockReceivedByInstance[instanceId] = messageInstanceClock;
+              setLastClockReceivedForInstanceOnScene({
+                sceneNetworkId,
+                instanceNetworkId,
+                clock: messageInstanceClock,
+              });
             }
 
             logger.info(
@@ -839,21 +913,23 @@ namespace gdjs {
     };
 
     const destroyObjectMessageNamePrefix = '#destroy';
-    const destroyObjectMessageNameRegex = /#destroy#owner_(\d+)#object_(.+)#instance_(.+)/;
+    const destroyObjectMessageNameRegex = /#destroy#owner_(\d+)#object_(.+)#instance_(.+)#scene_(.+)/;
     const createDestroyObjectMessage = ({
       objectOwner,
       objectName,
       instanceNetworkId,
+      sceneNetworkId,
     }: {
       objectOwner: number;
       objectName: string;
       instanceNetworkId: string;
+      sceneNetworkId: string;
     }): {
       messageName: string;
       messageData: any;
     } => {
       return {
-        messageName: `${destroyObjectMessageNamePrefix}#owner_${objectOwner}#object_${objectName}#instance_${instanceNetworkId}`,
+        messageName: `${destroyObjectMessageNamePrefix}#owner_${objectOwner}#object_${objectName}#instance_${instanceNetworkId}#scene_${sceneNetworkId}`,
         messageData: {},
       };
     };
@@ -899,6 +975,15 @@ namespace gdjs {
             }
             const objectName = matches[2];
             const instanceNetworkId = matches[3];
+            const sceneNetworkId = matches[4];
+
+            if (sceneNetworkId !== runtimeScene.networkId) {
+              // The object is not in the current scene.
+              logger.info(
+                `Object ${objectName} is in scene ${sceneNetworkId}, but we are on ${runtimeScene.networkId}. Skipping.`
+              );
+              return;
+            }
 
             const instance = getInstanceFromNetworkId({
               runtimeScene,
@@ -1147,7 +1232,7 @@ namespace gdjs {
       sceneNetworkSyncData: LayoutNetworkSyncData;
     }): {
       messageName: string;
-      messageData: any;
+      messageData: LayoutNetworkSyncData;
     } => {
       return {
         messageName: `${updateSceneMessageNamePrefix}`,
@@ -1161,7 +1246,7 @@ namespace gdjs {
       if (!sceneSyncData.var) {
         return false;
       }
-      if (!lastSentSceneSyncData.var) {
+      if (!lastSentSceneSyncData) {
         return true;
       }
       // Compare the json of the scene sync data to know if it has changed.
@@ -1241,6 +1326,16 @@ namespace gdjs {
           }
           const messageSender = gdjs.evtTools.p2p.getEventSender(messageName);
           if (data && messageSender) {
+            const sceneNetworkId = data.id;
+
+            if (sceneNetworkId !== runtimeScene.networkId) {
+              logger.info(
+                `Received update of scene ${sceneNetworkId}, but we are on ${runtimeScene.networkId}. Skipping.`
+              );
+              // The scene is not the current scene.
+              return;
+            }
+
             runtimeScene.updateFromNetworkSyncData(data);
           }
         }
@@ -1262,19 +1357,52 @@ namespace gdjs {
       };
     };
     const isGameDifferentFromLastSync = (gameSyncData: GameNetworkSyncData) => {
-      if (!gameSyncData.var) {
+      const variablesToSync = gameSyncData.var;
+      const sceneStackToSync = gameSyncData.ss;
+      if (!variablesToSync && !sceneStackToSync) {
+        // Nothing to sync.
         return false;
       }
-      if (!lastSentGameSyncData.var) {
+
+      if (
+        !lastSentGameSyncData ||
+        !lastSentGameSyncData.var ||
+        !lastSentGameSyncData.ss
+      ) {
+        // We have not sent any game sync data yet, probably start of the game, let's do it.
         return true;
       }
-      // Compare the json of the game sync data to know if it has changed.
-      // Not the most efficient way, but it's good enough for now.
-      const haveVariableSyncDataChanged =
-        JSON.stringify(gameSyncData.var) !==
-        JSON.stringify(lastSentGameSyncData.var);
 
-      return haveVariableSyncDataChanged;
+      // Compare the json of the game variables sync data to know if it has changed.
+      // Not the most efficient way, but it's good enough for now.
+      if (
+        variablesToSync &&
+        JSON.stringify(variablesToSync) !==
+          JSON.stringify(lastSentGameSyncData.var)
+      ) {
+        return true;
+      }
+
+      // For the sceneStack, loop through them one by one as it's more efficient.
+      if (sceneStackToSync) {
+        // If the length has changed, we're sure it's different.
+        if (sceneStackToSync.length !== lastSentGameSyncData.ss.length) {
+          return true;
+        }
+
+        for (let i = 0; i < sceneStackToSync.length; ++i) {
+          const sceneToSync = sceneStackToSync[i];
+          const lastSceneSent = lastSentGameSyncData.ss[i];
+          if (
+            sceneToSync.name !== lastSceneSent.name ||
+            sceneToSync.networkId !== lastSceneSent.networkId
+          ) {
+            return true;
+          }
+        }
+      }
+
+      return false;
     };
 
     const hasGameBeenSyncedRecently = () => {

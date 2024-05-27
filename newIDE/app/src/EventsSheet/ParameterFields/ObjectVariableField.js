@@ -15,8 +15,8 @@ import { getLastObjectParameterValue } from './ParameterMetadataTools';
 import getObjectByName from '../../Utils/GetObjectByName';
 import getObjectGroupByName from '../../Utils/GetObjectGroupByName';
 import ObjectIcon from '../../UI/CustomSvgIcons/Object';
-import intersection from 'lodash/intersection';
 import { enumerateVariables } from './EnumerateVariables';
+import { intersectionBy } from 'lodash';
 
 const gd: libGDevelop = global.gd;
 
@@ -107,7 +107,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         variablesContainers.length > 0
           ? variablesContainers
               .map(variablesContainer => enumerateVariables(variablesContainer))
-              .reduce((a, b) => intersection(a, b))
+              .reduce((a, b) => intersectionBy(a, b, 'name'))
           : [],
       [variablesContainers]
     );

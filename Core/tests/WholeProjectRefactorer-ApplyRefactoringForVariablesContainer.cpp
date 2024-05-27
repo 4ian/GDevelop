@@ -911,12 +911,60 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     REQUIRE(changeset.typeChangedVariableNames.find("MySceneVariable") !=
             changeset.typeChangedVariableNames.end());
 
-          gd::LogMessage("TEST");
     gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
         project, scene.GetVariables(), changeset, originalSerializedVariables);
 
     // Check the the action has changed to follow the variable type.
     REQUIRE(event.GetActions()[0].GetType() == "SetStringVariable");
+  }
+
+  SECTION("Can rename and change the type of a scene variable at the same time") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &scene = project.InsertNewLayout("Scene", 0);
+    scene.GetVariables().InsertNew("MyVariable").SetValue(123);
+    gd::StandardEvent &sceneEvent =
+        dynamic_cast<gd::StandardEvent &>(scene.GetEvents().InsertNewEvent(
+            project, "BuiltinCommonInstructions::Standard"));
+    {
+      gd::Instruction action;
+      action.SetType("SetNumberVariable");
+      action.SetParametersCount(3);
+      action.SetParameter(0, gd::Expression("MyVariable"));
+      action.SetParameter(1, gd::Expression("="));
+      action.SetParameter(2, gd::Expression("123"));
+      sceneEvent.GetActions().Insert(action);
+    }
+
+  auto projectScopedContainers =
+    gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
+    REQUIRE(&projectScopedContainers.GetVariablesContainersList()
+                   .GetVariablesContainerFromVariableName("MyVariable") == &scene.GetVariables());
+
+    // Do the changes and launch the refactoring.
+    scene.GetVariables().ResetPersistentUuid();
+    gd::SerializerElement originalSerializedVariables;
+    scene.GetVariables().SerializeTo(originalSerializedVariables);
+
+    scene.GetVariables().Get("MyVariable").SetString("Hello");
+    scene.GetVariables().Rename("MyVariable", "MyRenamedVariable");
+    auto changeset =
+        gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
+            originalSerializedVariables, scene.GetVariables());
+
+    REQUIRE(changeset.oldToNewVariableNames.find("MyVariable")->second ==
+            "MyRenamedVariable");
+    REQUIRE(changeset.typeChangedVariableNames.find("MyRenamedVariable") !=
+            changeset.typeChangedVariableNames.end());
+
+    gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
+        project, scene.GetVariables(), changeset, originalSerializedVariables);
+
+    REQUIRE(sceneEvent.GetActions()[0].GetParameter(0).GetPlainString() == "MyRenamedVariable");
+    // Check the the action has changed to follow the variable type.
+    REQUIRE(sceneEvent.GetActions()[0].GetType() == "SetStringVariable");
   }
 
   SECTION("Can rename a local variable") {

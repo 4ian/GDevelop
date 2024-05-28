@@ -42,6 +42,16 @@ export default function EventsBasedObjectEditorPanel({
     [unsavedChanges]
   );
 
+  const projectScopedContainersAccessor = React.useMemo(
+    () =>
+      new ProjectScopedContainersAccessor({
+        project,
+        eventsFunctionsExtension,
+        eventsBasedObject,
+      }),
+    [eventsBasedObject, eventsFunctionsExtension, project]
+  );
+
   return (
     <Background>
       <Column expand useFullHeight noOverflowParent>
@@ -89,13 +99,7 @@ export default function EventsBasedObjectEditorPanel({
             globalObjectsContainer={globalObjectsContainer}
             eventsFunctionsExtension={eventsFunctionsExtension}
             eventsBasedObject={eventsBasedObject}
-            projectScopedContainersAccessor={
-              new ProjectScopedContainersAccessor({
-                project,
-                eventsFunctionsExtension,
-                eventsBasedObject,
-              })
-            }
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
           />
         )}
       </Column>

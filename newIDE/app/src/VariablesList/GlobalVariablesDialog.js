@@ -54,9 +54,13 @@ const GlobalVariablesDialog = ({
     [project, onComputeAllVariableNames]
   );
 
-  const projectScopedContainersAccessor = new ProjectScopedContainersAccessor({
-    project,
-  });
+  const projectScopedContainersAccessor = React.useMemo(
+    () =>
+      new ProjectScopedContainersAccessor({
+        project,
+      }),
+    [project]
+  );
 
   return (
     <VariablesEditorDialog

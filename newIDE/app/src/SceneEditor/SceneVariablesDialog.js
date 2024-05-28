@@ -55,10 +55,14 @@ const SceneVariablesDialog = ({
     [layout, onComputeAllVariableNames]
   );
 
-  const projectScopedContainersAccessor = new ProjectScopedContainersAccessor({
-    project,
-    layout,
-  });
+  const projectScopedContainersAccessor = React.useMemo(
+    () =>
+      new ProjectScopedContainersAccessor({
+        project,
+        layout,
+      }),
+    [layout, project]
+  );
 
   return (
     <VariablesEditorDialog

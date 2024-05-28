@@ -40,6 +40,15 @@ export default function OptionsEditorDialog({
   );
   const eventsFunctionsExtensionWriter = eventsFunctionsExtensionsState.getEventsFunctionsExtensionWriter();
 
+  const projectScopedContainersAccessor = React.useMemo(
+    () =>
+      new ProjectScopedContainersAccessor({
+        project,
+        eventsFunctionsExtension,
+      }),
+    [eventsFunctionsExtension, project]
+  );
+
   return (
     <Dialog
       title={<Trans>{eventsFunctionsExtension.getName()} options</Trans>}
@@ -120,12 +129,7 @@ export default function OptionsEditorDialog({
           globalVariables={eventsFunctionsExtension.getGlobalVariables()}
           sceneVariables={eventsFunctionsExtension.getSceneVariables()}
           project={project}
-          projectScopedContainersAccessor={
-            new ProjectScopedContainersAccessor({
-              project,
-              eventsFunctionsExtension,
-            })
-          }
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
           open
           onCancel={() => setVariableEditorOpen(false)}
           onApply={(selectedVariableName: string | null) => {

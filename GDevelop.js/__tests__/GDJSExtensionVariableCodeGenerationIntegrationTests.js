@@ -420,6 +420,41 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     ).toBe(1);
   });
 
+  it('can generate a local child-variable condition', function () {
+    extension.getSceneVariables().insertNew('SuccessVariable', 0).setValue(0);
+    const runtimeScene = generateAndRunEventsForFunction([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        variables: [
+          {
+            name: 'MyLocalVariable',
+            type: 'structure',
+            children: [{ name: 'MyChild', type: 'number', value: 123 }],
+          },
+        ],
+        conditions: [
+          {
+            type: { inverted: false, value: 'NumberVariable' },
+            parameters: ['MyLocalVariable.MyChild', '=', '123'],
+          },
+        ],
+        actions: [
+          {
+            type: { value: 'SetNumberVariable' },
+            parameters: ['SuccessVariable', '=', '1'],
+          },
+        ],
+        events: [],
+      },
+    ]);
+    expect(
+      runtimeScene
+        .getVariablesForExtension('Extension')
+        .get('SuccessVariable')
+        .getAsNumber()
+    ).toBe(1);
+  });
+
   it('can generate a local variable condition giving precedence to the closest local variable', function () {
     extension.getSceneVariables().insertNew('SuccessVariable', 0).setValue(0);
 

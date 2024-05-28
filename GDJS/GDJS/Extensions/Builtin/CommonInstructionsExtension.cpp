@@ -895,14 +895,14 @@ void CommonInstructionsExtension::GenerateLocalVariableInitializationCode(
   } else if (variable.GetType() == gd::Variable::Structure ||
              variable.GetType() == gd::Variable::Array) {
     const auto &childrenNames = variable.GetAllChildrenNames();
-    for (std::size_t i = 0; i < variable.GetChildrenCount(); i++) {
-      auto &child = variable.GetAtIndex(i);
+    for (const auto& childName : variable.GetAllChildrenNames()) {
+      auto &child = variable.GetChild(childName);
 
       code += "{\n";
       GenerateLocalVariableInitializationCode(child, code, depth + 1);
       auto childCodeName = "variable" + gd::String::From(depth + 1);
       code += variableCodeName + ".addChild(" +
-              EventsCodeGenerator::ConvertToStringExplicit(childrenNames[i]) +
+              EventsCodeGenerator::ConvertToStringExplicit(childName) +
               ", " + childCodeName + ");\n";
       code += "}\n";
     }

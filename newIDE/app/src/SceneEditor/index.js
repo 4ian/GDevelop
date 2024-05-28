@@ -1681,12 +1681,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     const variablesEditedAssociatedObject = variablesEditedAssociatedObjectName
       ? getObjectByName(project, layout, variablesEditedAssociatedObjectName)
       : null;
-    const scope = {
-      project,
-      layout,
-    };
     const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
-      scope
+      {
+        project,
+        layout,
+      }
     );
 
     // Deactivate prettier on this variable to prevent spaces to be added by

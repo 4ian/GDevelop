@@ -19,6 +19,7 @@
 #include "GDCore/IDE/Events/EventsPropertyReplacer.h"
 #include "GDCore/IDE/Events/EventsRefactorer.h"
 #include "GDCore/IDE/Events/EventsVariableReplacer.h"
+#include "GDCore/IDE/Events/EventsVariableInstructionTypeSwitcher.h"
 #include "GDCore/IDE/Events/ExpressionsParameterMover.h"
 #include "GDCore/IDE/Events/ExpressionsRenamer.h"
 #include "GDCore/IDE/Events/InstructionsParameterMover.h"
@@ -238,14 +239,31 @@ bool WholeProjectRefactorer::HasAnyVariableTypeChanged(
 }
 
 void WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
-    gd::Project &project, const gd::VariablesContainer &newVariablesContainer,
-    const gd::VariablesChangeset &changeset) {
+    gd::Project &project, gd::VariablesContainer &variablesContainer,
+    const gd::VariablesChangeset &changeset,
+    const gd::SerializerElement &originalSerializedVariables) {
+  // Revert changes
+  gd::SerializerElement editedSerializedVariables;
+  variablesContainer.SerializeTo(editedSerializedVariables);
+  variablesContainer.UnserializeFrom(originalSerializedVariables);
+
+  // Rename and remove variables
   gd::EventsVariableReplacer eventsVariableReplacer(
-      project.GetCurrentPlatform(), newVariablesContainer,
-      changeset.oldToNewVariableNames, changeset.removedVariableNames,
-      changeset.typeChangedVariableNames);
+      project.GetCurrentPlatform(), variablesContainer,
+      changeset.oldToNewVariableNames, changeset.removedVariableNames);
   gd::ProjectBrowserHelper::ExposeProjectEvents(project,
                                                 eventsVariableReplacer);
+
+  // Apply back changes
+  variablesContainer.UnserializeFrom(editedSerializedVariables);
+
+  // Switch types of instructions
+  gd::EventsVariableInstructionTypeSwitcher
+      eventsVariableInstructionTypeSwitcher(project.GetCurrentPlatform(),
+                                            variablesContainer,
+                                            changeset.typeChangedVariableNames);
+  gd::ProjectBrowserHelper::ExposeProjectEvents(
+      project, eventsVariableInstructionTypeSwitcher);
 }
 
 void WholeProjectRefactorer::UpdateExtensionNameInEventsBasedBehavior(

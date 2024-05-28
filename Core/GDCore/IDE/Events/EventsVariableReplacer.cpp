@@ -95,7 +95,7 @@ class GD_CORE_API ExpressionVariableReplacer
     // Match the potential *new* name of the variable, because refactorings are
     // done after changes in the variables container.
     projectScopedContainers.MatchIdentifierWithName<void>(
-        GetPotentialNewName(node.name),
+        node.name,
         [&]() {
           // This represents an object.
           // Remember the object name.
@@ -105,8 +105,9 @@ class GD_CORE_API ExpressionVariableReplacer
         },
         [&]() {
           // This is a variable.
-          if (projectScopedContainers.GetVariablesContainersList()
-                   .HasVariablesContainer(targetVariablesContainer)) {
+          if (&projectScopedContainers.GetVariablesContainersList()
+                   .GetVariablesContainerFromVariableName(node.name) ==
+              &targetVariablesContainer) {
             // The node represents a variable, that can come from the target
             // (because the target is in the scope), replace or remove it:
             RenameOrRemoveVariableOfTargetVariableContainer(node.name);
@@ -123,14 +124,7 @@ class GD_CORE_API ExpressionVariableReplacer
           if (node.child) node.child->Visit(*this);
         },
         [&]() {
-          // This is something else - potentially a deleted variable.
-          if (projectScopedContainers.GetVariablesContainersList()
-                   .HasVariablesContainer(targetVariablesContainer)) {
-            // The node represents a variable, that can come from the target
-            // (because the target is in the scope), replace or remove it:
-            RenameOrRemoveVariableOfTargetVariableContainer(node.name);
-          }
-
+          // This is something else.
           if (node.child) node.child->Visit(*this);
         });
   }
@@ -176,7 +170,7 @@ class GD_CORE_API ExpressionVariableReplacer
     // Match the potential *new* name of the variable, because refactorings are
     // done after changes in the variables container.
     projectScopedContainers.MatchIdentifierWithName<void>(
-        GetPotentialNewName(node.identifierName),
+        node.identifierName,
         [&]() {
           // This represents an object.
           if (objectsContainersList.HasObjectOrGroupVariablesContainer(
@@ -189,8 +183,9 @@ class GD_CORE_API ExpressionVariableReplacer
         },
         [&]() {
           // This is a variable.
-          if (projectScopedContainers.GetVariablesContainersList()
-                   .HasVariablesContainer(targetVariablesContainer)) {
+          if (&projectScopedContainers.GetVariablesContainersList()
+                   .GetVariablesContainerFromVariableName(
+                       node.identifierName) == &targetVariablesContainer) {
             // The node represents a variable, that can come from the target
             // (because the target is in the scope), replace or remove it:
             RenameOrRemoveVariableOfTargetVariableContainer(
@@ -204,14 +199,7 @@ class GD_CORE_API ExpressionVariableReplacer
           // This is a parameter.
         },
         [&]() {
-          // This is something else - potentially a deleted variable.
-          if (projectScopedContainers.GetVariablesContainersList()
-                   .HasVariablesContainer(targetVariablesContainer)) {
-            // The node represents a variable, that can come from the target
-            // (because the target is in the scope), replace or remove it:
-            RenameOrRemoveVariableOfTargetVariableContainer(
-                node.identifierName);
-          }
+          // This is something else.
         });
   }
   void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {}
@@ -269,12 +257,6 @@ class GD_CORE_API ExpressionVariableReplacer
  private:
   bool hasDoneRenaming;
   bool removedVariableUsed;
-
-  const gd::String& GetPotentialNewName(const gd::String& oldName) {
-    return oldToNewVariableNames.count(oldName) >= 1
-            ? oldToNewVariableNames.find(oldName)->second
-            : oldName;
-  }
 
   bool RenameOrRemoveVariableOfTargetVariableContainer(
       gd::String& variableName) {
@@ -364,50 +346,6 @@ bool EventsVariableReplacer::DoVisitInstruction(gd::Instruction& instruction,
           } else if (renamer.HasDoneRenaming()) {
             instruction.SetParameter(
                 parameterIndex, ExpressionParser2NodePrinter::PrintNode(*node));
-          }
-        }
-
-        if (gd::ParameterMetadata::IsExpression("variable", type) &&
-            gd::VariableInstructionSwitcher::IsSwitchableVariableInstruction(
-                instruction.GetType())) {
-          const auto &newParameterValue =
-              instruction.GetParameter(parameterIndex);
-          const auto variableName =
-              gd::ExpressionVariableNameFinder::GetVariableName(
-                  *newParameterValue.GetRootNode());
-
-          const gd::VariablesContainer *variablesContainer = nullptr;
-          if (type == "objectvar") {
-            const auto &objectsContainersList =
-                GetProjectScopedContainers().GetObjectsContainersList();
-            if (objectsContainersList.HasObjectOrGroupWithVariableNamed(
-                    lastObjectName, variableName) !=
-                gd::ObjectsContainersList::VariableExistence::DoesNotExist) {
-              variablesContainer =
-                  GetProjectScopedContainers()
-                      .GetObjectsContainersList()
-                      .GetObjectOrGroupVariablesContainer(lastObjectName);
-            }
-          } else {
-            if (GetProjectScopedContainers().GetVariablesContainersList().Has(
-                    variableName)) {
-              variablesContainer =
-                  &GetProjectScopedContainers()
-                       .GetVariablesContainersList()
-                       .GetVariablesContainerFromVariableName(variableName);
-            }
-          }
-
-          // Every occurrence of the variable or its children are checked.
-          // Ensuring that a child is actually the one with a type change would
-          // take more time.
-          if (variablesContainer == &targetVariablesContainer) {
-            if (typeChangedVariableNames.find(variableName) !=
-                typeChangedVariableNames.end()) {
-              gd::VariableInstructionSwitcher::
-                  SwitchBetweenUnifiedInstructionIfNeeded(
-                      platform, GetProjectScopedContainers(), instruction);
-            }
           }
         }
       });

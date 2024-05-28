@@ -4,6 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 #pragma once
+
 #include <map>
 #include <memory>
 #include <unordered_map>
@@ -12,6 +13,7 @@
 
 #include "GDCore/IDE/Events/ArbitraryEventsWorker.h"
 #include "GDCore/String.h"
+
 namespace gd {
 class BaseEvent;
 class VariablesContainer;
@@ -34,13 +36,11 @@ class GD_CORE_API EventsVariableReplacer
       const gd::Platform &platform_,
       const gd::VariablesContainer &targetVariablesContainer_,
       const std::unordered_map<gd::String, gd::String> &oldToNewVariableNames_,
-      const std::unordered_set<gd::String> &removedVariableNames_,
-      const std::unordered_set<gd::String> &typeChangedVariableNames_)
+      const std::unordered_set<gd::String> &removedVariableNames_)
       : platform(platform_),
         targetVariablesContainer(targetVariablesContainer_),
         oldToNewVariableNames(oldToNewVariableNames_),
-        removedVariableNames(removedVariableNames_),
-        typeChangedVariableNames(typeChangedVariableNames_){};
+        removedVariableNames(removedVariableNames_) {};
   virtual ~EventsVariableReplacer();
 
  private:
@@ -57,7 +57,6 @@ class GD_CORE_API EventsVariableReplacer
   gd::String objectName;
   const std::unordered_map<gd::String, gd::String> &oldToNewVariableNames;
   const std::unordered_set<gd::String> &removedVariableNames;
-  const std::unordered_set<gd::String> &typeChangedVariableNames;
 };
 
 }  // namespace gd

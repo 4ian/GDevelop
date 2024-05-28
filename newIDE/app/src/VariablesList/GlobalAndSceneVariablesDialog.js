@@ -4,6 +4,7 @@ import { Trans } from '@lingui/macro';
 import VariablesEditorDialog from './VariablesEditorDialog';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
 
 type Props = {|
   open: boolean,
@@ -11,6 +12,7 @@ type Props = {|
   sceneVariables: gdVariablesContainer,
   project: gdProject,
   layout?: ?gdLayout,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   onApply: (selectedVariableName: string | null) => void,
   onCancel: () => void,
   hotReloadPreviewButtonProps?: ?HotReloadPreviewButtonProps,
@@ -28,6 +30,7 @@ const GlobalAndSceneVariablesDialog = ({
   sceneVariables,
   project,
   layout,
+  projectScopedContainersAccessor,
   open,
   onCancel,
   onApply,
@@ -97,6 +100,7 @@ const GlobalAndSceneVariablesDialog = ({
 
   return (
     <VariablesEditorDialog
+      projectScopedContainersAccessor={projectScopedContainersAccessor}
       project={project}
       open={open}
       onCancel={onCancel}

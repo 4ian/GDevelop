@@ -56,6 +56,18 @@ class ProjectScopedContainers {
     return projectScopedContainers;
   }
 
+  static ProjectScopedContainers
+  MakeNewProjectScopedContainersForProject(const gd::Project &project) {
+    ProjectScopedContainers projectScopedContainers(
+        ObjectsContainersList::MakeNewObjectsContainersListForProject(
+            project),
+        VariablesContainersList::
+            MakeNewVariablesContainersListForProject(project),
+        PropertiesContainersList::MakeNewEmptyPropertiesContainersList());
+
+    return projectScopedContainers;
+  }
+
   /**
    * @deprecated Use another method for an explicit context instead.
    */
@@ -70,6 +82,11 @@ class ProjectScopedContainers {
 
     return projectScopedContainers;
   };
+
+  static ProjectScopedContainers
+  MakeNewProjectScopedContainersForEventsFunctionsExtension(
+      const gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension);
 
   static ProjectScopedContainers
   MakeNewProjectScopedContainersForFreeEventsFunction(

@@ -32,6 +32,9 @@ class GD_CORE_API VariablesContainersList {
                                                     const gd::Layout& layout);
 
   static VariablesContainersList
+  MakeNewVariablesContainersListForProject(const gd::Project& project);
+
+  static VariablesContainersList
   MakeNewVariablesContainersListForEventsFunctionsExtension(
       const gd::EventsFunctionsExtension &extension);
 

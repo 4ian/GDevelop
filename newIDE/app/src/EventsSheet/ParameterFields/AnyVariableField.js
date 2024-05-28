@@ -115,6 +115,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             sceneVariables={layout.getVariables()}
             project={project}
             layout={layout}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
             open
             onCancel={() => setEditorOpen(false)}
             onApply={onVariableEditorApply}
@@ -128,6 +129,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             globalVariables={eventsFunctionsExtension.getGlobalVariables()}
             sceneVariables={eventsFunctionsExtension.getSceneVariables()}
             project={project}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
             open
             onCancel={() => setEditorOpen(false)}
             onApply={onVariableEditorApply}

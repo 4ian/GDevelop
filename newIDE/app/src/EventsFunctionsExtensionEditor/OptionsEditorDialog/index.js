@@ -13,6 +13,7 @@ import ExtensionExporterDialog from './ExtensionExporterDialog';
 import { Line } from '../../UI/Grid';
 import Upload from '../../UI/CustomSvgIcons/Upload';
 import GlobalAndSceneVariablesDialog from '../../VariablesList/GlobalAndSceneVariablesDialog';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
 
 type TabName = 'options' | 'dependencies';
 
@@ -38,6 +39,15 @@ export default function OptionsEditorDialog({
     EventsFunctionsExtensionsContext
   );
   const eventsFunctionsExtensionWriter = eventsFunctionsExtensionsState.getEventsFunctionsExtensionWriter();
+
+  const projectScopedContainersAccessor = React.useMemo(
+    () =>
+      new ProjectScopedContainersAccessor({
+        project,
+        eventsFunctionsExtension,
+      }),
+    [eventsFunctionsExtension, project]
+  );
 
   return (
     <Dialog
@@ -119,6 +129,7 @@ export default function OptionsEditorDialog({
           globalVariables={eventsFunctionsExtension.getGlobalVariables()}
           sceneVariables={eventsFunctionsExtension.getSceneVariables()}
           project={project}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
           open
           onCancel={() => setVariableEditorOpen(false)}
           onApply={(selectedVariableName: string | null) => {

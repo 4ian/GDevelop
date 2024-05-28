@@ -4,6 +4,7 @@ import { Trans } from '@lingui/macro';
 import VariablesEditorDialog from './VariablesEditorDialog';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
 
 type Props = {|
   open: boolean,
@@ -53,9 +54,18 @@ const GlobalVariablesDialog = ({
     [project, onComputeAllVariableNames]
   );
 
+  const projectScopedContainersAccessor = React.useMemo(
+    () =>
+      new ProjectScopedContainersAccessor({
+        project,
+      }),
+    [project]
+  );
+
   return (
     <VariablesEditorDialog
       project={project}
+      projectScopedContainersAccessor={projectScopedContainersAccessor}
       open={open}
       onCancel={onCancel}
       onApply={onApply}

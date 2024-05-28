@@ -4,6 +4,7 @@ import { Trans } from '@lingui/macro';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
 
 type Props = {|
   open: boolean,
@@ -54,9 +55,19 @@ const SceneVariablesDialog = ({
     [layout, onComputeAllVariableNames]
   );
 
+  const projectScopedContainersAccessor = React.useMemo(
+    () =>
+      new ProjectScopedContainersAccessor({
+        project,
+        layout,
+      }),
+    [layout, project]
+  );
+
   return (
     <VariablesEditorDialog
       project={project}
+      projectScopedContainersAccessor={projectScopedContainersAccessor}
       open={open}
       onCancel={onCancel}
       onApply={onApply}

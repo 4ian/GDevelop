@@ -642,6 +642,7 @@ interface ObjectsContainersList {
   [Const, Value] DOMString GetTypeOfBehavior([Const] DOMString name, boolean searchInGroups);
   [Value] VectorString GetBehaviorsOfObject([Const] DOMString name, boolean searchInGroups);
   [Const, Value] DOMString GetTypeOfBehaviorInObjectOrGroup([Const] DOMString objectOrGroupName, [Const] DOMString behaviorName, boolean searchInGroups);
+  boolean HasObjectOrGroupNamed([Const] DOMString name);
 
   ObjectsContainersList_VariableExistence HasObjectOrGroupWithVariableNamed([Const] DOMString objectName, [Const] DOMString variableName);
 };
@@ -650,6 +651,13 @@ interface ProjectScopedContainers {
   [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersForProjectAndLayout(
         [Const, Ref] Project project,
         [Const, Ref] Layout layout);
+
+  [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersForProject(
+        [Const, Ref] Project project);
+
+  [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersForEventsFunctionsExtension(
+        [Const, Ref] Project project,
+        [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension);
 
   [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersForFreeEventsFunction(
         [Const, Ref] Project project,

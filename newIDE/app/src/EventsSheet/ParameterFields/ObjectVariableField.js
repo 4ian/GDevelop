@@ -151,6 +151,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           <ObjectVariablesDialog
             project={project}
             layout={layout}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
             objectName={objectName}
             variablesContainer={variablesContainers[0]}
             open={editorOpen}

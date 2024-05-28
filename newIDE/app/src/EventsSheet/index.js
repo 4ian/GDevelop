@@ -2104,6 +2104,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                 {this.state.editedVariable && (
                   <LocalVariablesDialog
                     project={project}
+                    projectScopedContainersAccessor={
+                      editedParameterProjectScopedContainersAccessor
+                    }
                     open
                     onCancel={() =>
                       this.setState({

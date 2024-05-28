@@ -23,12 +23,14 @@ import VariablesList, {
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import ErrorBoundary from '../../UI/ErrorBoundary';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
 
 const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
   layout: gdLayout,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   instances: Array<gdInitialInstance>,
   onEditObjectByName: string => void,
   onInstancesModified?: (Array<gdInitialInstance>) => void,
@@ -281,6 +283,7 @@ const InstancePropertiesEditor = ({
   i18n,
   project,
   layout,
+  projectScopedContainersAccessor,
   unsavedChanges,
   historyHandler,
   onEditObjectByName,
@@ -386,6 +389,7 @@ const InstancePropertiesEditor = ({
           </Column>
           {object ? (
             <VariablesList
+              projectScopedContainersAccessor={projectScopedContainersAccessor}
               directlyStoreValueChangesWhileEditing
               inheritedVariablesContainer={object.getVariables()}
               variablesContainer={instance.getVariables()}

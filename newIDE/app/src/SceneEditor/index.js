@@ -72,6 +72,7 @@ import {
   unregisterOnResourceExternallyChangedCallback,
 } from '../MainFrame/ResourcesWatcher';
 import { unserializeFromJSObject } from '../Utils/Serializer';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
 
 const gd: libGDevelop = global.gd;
 
@@ -1680,6 +1681,12 @@ export default class SceneEditor extends React.Component<Props, State> {
     const variablesEditedAssociatedObject = variablesEditedAssociatedObjectName
       ? getObjectByName(project, layout, variablesEditedAssociatedObjectName)
       : null;
+    const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+      {
+        project,
+        layout,
+      }
+    );
 
     // Deactivate prettier on this variable to prevent spaces to be added by
     // line breaks.
@@ -1723,6 +1730,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                 ref={ref => (this.editorDisplay = ref)}
                 project={project}
                 layout={layout}
+                projectScopedContainersAccessor={
+                  projectScopedContainersAccessor
+                }
                 initialInstances={initialInstances}
                 instancesSelection={this.instancesSelection}
                 onSelectInstances={this._onSelectInstances}
@@ -1821,6 +1831,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                         initialTab={this.state.editedObjectInitialTab}
                         project={project}
                         layout={layout}
+                        projectScopedContainersAccessor={
+                          projectScopedContainersAccessor
+                        }
                         resourceManagementProps={resourceManagementProps}
                         onComputeAllVariableNames={() => {
                           const { editedObjectWithContext } = this.state;
@@ -1907,6 +1920,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                 !!variablesEditedAssociatedObject && (
                   <VariablesEditorDialog
                     project={project}
+                    projectScopedContainersAccessor={
+                      projectScopedContainersAccessor
+                    }
                     open
                     onCancel={() => this.editInstanceVariables(null)}
                     onApply={() => this.editInstanceVariables(null)}

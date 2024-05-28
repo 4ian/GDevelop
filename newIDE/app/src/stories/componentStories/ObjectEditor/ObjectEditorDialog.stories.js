@@ -19,6 +19,9 @@ export const CustomObject = () => (
   <DragAndDropContextProvider>
     <ObjectEditorDialog
       open={true}
+      projectScopedContainersAccessor={
+        testProject.testSceneProjectScopedContainersAccessor
+      }
       object={testProject.customObject}
       onApply={() => action('Apply changes')}
       onCancel={() => action('Cancel changes')}
@@ -44,6 +47,9 @@ export const StandardObject = () => (
   <DragAndDropContextProvider>
     <ObjectEditorDialog
       open={true}
+      projectScopedContainersAccessor={
+        testProject.testSceneProjectScopedContainersAccessor
+      }
       object={testProject.panelSpriteObject}
       onApply={() => action('Apply changes')}
       onCancel={() => action('Cancel changes')}

@@ -14,6 +14,7 @@ import HelpButton from '../UI/HelpButton';
 import { getVariableContextFromNodeId } from './VariableToTreeNodeHandling';
 import { Tabs } from '../UI/Tabs';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
 
 const gd: libGDevelop = global.gd;
 
@@ -45,6 +46,7 @@ type TabProps = {
 };
 
 type Props = {|
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   onCancel: () => void,
   onApply: (selectedVariableName: string | null) => void,
   open: boolean,
@@ -81,6 +83,7 @@ const VariablesEditorDialog = ({
   tabs,
   initiallyOpenTabId,
   initiallySelectedVariableName,
+  projectScopedContainersAccessor,
 }: Props) => {
   const serializableObjects = React.useMemo(
     () =>
@@ -253,6 +256,9 @@ const VariablesEditorDialog = ({
                   </Line>
                 )}
                 <VariablesList
+                  projectScopedContainersAccessor={
+                    projectScopedContainersAccessor
+                  }
                   variablesContainer={variablesContainer}
                   initiallySelectedVariableName={initiallySelectedVariableName}
                   inheritedVariablesContainer={inheritedVariablesContainer}

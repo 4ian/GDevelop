@@ -9,6 +9,7 @@ namespace gdjs {
     _stack: gdjs.RuntimeScene[] = [];
     _wasFirstSceneLoaded: boolean = false;
     _isNextLayoutLoading: boolean = false;
+    _sceneStackSyncDataToApply: SceneStackNetworkSyncData | null = null;
 
     /**
      * @param runtimeGame The runtime game that is using the scene stack
@@ -39,7 +40,7 @@ namespace gdjs {
       if (currentScene.renderAndStep(elapsedTime)) {
         const request = currentScene.getRequestedChange();
 
-        //Something special was requested by the current scene.
+        // A scene change was requested by the current scene.
         if (request === gdjs.SceneChangeRequest.STOP_GAME) {
           this._runtimeGame.getRenderer().stopGame();
           return true;
@@ -53,9 +54,11 @@ namespace gdjs {
           this.replace(currentScene.getRequestedScene(), true);
         } else {
           logger.error('Unrecognized change in scene stack: ' + request);
-          return false;
         }
       }
+
+      this.applyUpdateFromNetworkSyncDataIfAny();
+
       return true;
     }
 
@@ -68,24 +71,29 @@ namespace gdjs {
       return true;
     }
 
-    pop(): gdjs.RuntimeScene | null {
-      if (this._stack.length <= 1) {
-        return null;
-      }
+    pop(popCount = 1): void {
+      let hasDoneAnyChanges = false;
+      for (let i = 0; i < popCount; ++i) {
+        if (this._stack.length <= 1) {
+          break;
+        }
 
-      // Unload the current scene
-      const scene = this._stack.pop();
-      if (!scene) {
-        return null;
+        // Unload the current scene
+        hasDoneAnyChanges = true;
+        const scene = this._stack.pop();
+        if (!scene) {
+          return;
+        }
+        scene.unloadScene();
       }
-      scene.unloadScene();
 
       // Tell the new current scene it's being resumed
-      const currentScene = this._stack[this._stack.length - 1];
-      if (currentScene) {
-        currentScene.onResume();
+      if (hasDoneAnyChanges) {
+        const currentScene = this._stack[this._stack.length - 1];
+        if (currentScene) {
+          currentScene.onResume();
+        }
       }
-      return scene;
     }
 
     /**
@@ -205,6 +213,19 @@ namespace gdjs {
     updateFromNetworkSyncData(
       sceneStackSyncData: SceneStackNetworkSyncData
     ): void {
+      // Don't directly apply changes to the scene stack. Store them and they will be applied
+      // in `step` (i.e: at the end of a frame). Otherwise, we would risk doing operations on the scene
+      // stack, like creating a new scene or unloading a scene, while being inside the `renderAndStep` method
+      // of the current scene.
+      this._sceneStackSyncDataToApply = sceneStackSyncData;
+    }
+
+    applyUpdateFromNetworkSyncDataIfAny(): void {
+      const sceneStackSyncData = this._sceneStackSyncDataToApply;
+      if (!sceneStackSyncData) return;
+
+      this._sceneStackSyncDataToApply = null;
+
       // If this method is called, we are a client.
       // We trust the host to be the source of truth for the scene stack.
       // So we loop through the scenes in the stack given by the host and either:
@@ -246,7 +267,11 @@ namespace gdjs {
           continue;
         }
 
-        if (!sceneAtThisPositionInOurStack.networkId) {
+        if (
+          !sceneAtThisPositionInOurStack.networkId &&
+          sceneSyncData.networkId &&
+          sceneSyncData.name === sceneAtThisPositionInOurStack.getName()
+        ) {
           logger.info(
             `Scene at position ${i} and name ${sceneAtThisPositionInOurStack.getName()} has no networkId, let's assume it's the right one and reconcile it with the id ${
               sceneSyncData.networkId
@@ -286,6 +311,13 @@ namespace gdjs {
 
         // The scene is in the stack and has the right networkId.
         // Nothing to do, just continue to the next scene in the stack received from the host.
+      }
+
+      // Pop any scene not on the host.
+      // In the future, we could avoid to pop scenes if they are not set to be synchronized.
+      if (this._stack.length > sceneStackSyncData.length) {
+        const popCount = this._stack.length - sceneStackSyncData.length;
+        this.pop(popCount);
       }
     }
   }

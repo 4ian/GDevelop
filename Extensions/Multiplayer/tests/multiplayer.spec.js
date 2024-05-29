@@ -1,53 +1,59 @@
 // @ts-check
 
-describe('Multiplayer', () => {
+describe.only('Multiplayer', () => {
   const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+
+  /**
+   * @param {{name: string}} settings
+   * @returns {LayoutData}
+   */
+  const getFakeLayoutData = ({ name }) => ({
+    layers: [
+      {
+        name: '',
+        visibility: true,
+        effects: [],
+        cameras: [],
+        ambientLightColorR: 0,
+        ambientLightColorG: 0,
+        ambientLightColorB: 0,
+        isLightingLayer: false,
+        followBaseLayerCamera: true,
+      },
+    ],
+    r: 0,
+    v: 0,
+    b: 0,
+    mangledName: name,
+    name: name,
+    stopSoundsOnStartup: false,
+    title: '',
+    behaviorsSharedData: [],
+    objects: [
+      {
+        type: 'Sprite',
+        name: 'MySpriteObject',
+        behaviors: [
+          {
+            name: 'MultiplayerObject',
+            type: 'Multiplayer::MultiplayerObjectBehavior',
+          },
+        ],
+        effects: [],
+        // @ts-expect-error ts-migrate(2322) FIXME: Type '{ type: string; name: string; behaviors: nev... Remove this comment to see the full error message
+        animations: [],
+        updateIfNotVisible: false,
+      },
+    ],
+    instances: [],
+    variables: [],
+    usedResources: [],
+  });
 
   const makeTestRuntimeSceneWithNetworkId = (timeDelta = 1000 / 60) => {
     const runtimeGame = gdjs.getPixiRuntimeGame();
     const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
-    runtimeScene.loadFromScene({
-      layers: [
-        {
-          name: '',
-          visibility: true,
-          effects: [],
-          cameras: [],
-          ambientLightColorR: 0,
-          ambientLightColorG: 0,
-          ambientLightColorB: 0,
-          isLightingLayer: false,
-          followBaseLayerCamera: true,
-        },
-      ],
-      r: 0,
-      v: 0,
-      b: 0,
-      mangledName: 'Scene1',
-      name: 'Scene1',
-      stopSoundsOnStartup: false,
-      title: '',
-      behaviorsSharedData: [],
-      objects: [
-        {
-          type: 'Sprite',
-          name: 'MySpriteObject',
-          behaviors: [
-            {
-              name: 'MultiplayerObject',
-              type: 'Multiplayer::MultiplayerObjectBehavior',
-            },
-          ],
-          effects: [],
-          // @ts-expect-error ts-migrate(2322) FIXME: Type '{ type: string; name: string; behaviors: nev... Remove this comment to see the full error message
-          animations: [],
-          updateIfNotVisible: false,
-        },
-      ],
-      instances: [],
-      variables: [],
-      usedResources: [],
-    });
+    runtimeScene.loadFromScene(getFakeLayoutData({ name: 'Scene1' }));
     runtimeScene._timeManager.getElapsedTime = function () {
       return timeDelta;
     };
@@ -1198,6 +1204,241 @@ describe('Multiplayer', () => {
       ).to.be(2);
 
       markAllPeerEventsAsProcessed();
+    });
+  });
+
+  describe.only('Multiple scene tests', () => {
+    /**
+     * @param {gdjs.RuntimeGame} runtimeGame
+     * @param {string} expectedSceneName
+     * @returns {{currentScene: gdjs.RuntimeScene}}
+     */
+    const checkCurrentSceneIs = (runtimeGame, expectedSceneName) => {
+      const currentScene = runtimeGame.getSceneStack().getCurrentScene();
+      if (!currentScene) throw new Error('No current scene found.');
+      expect(currentScene.getName()).to.be(expectedSceneName);
+
+      return { currentScene };
+    };
+
+    it('synchronizes scenes from the server to other players', async () => {
+      const {
+        switchToPeer,
+        logEvents,
+        markAllPeerEventsAsProcessed,
+        expectNoEventsToBeProcessed,
+      } = createP2PAndMultiplayerMessageManagerMock();
+
+      const gameLayoutData = [
+        getFakeLayoutData({ name: 'Scene1' }),
+        getFakeLayoutData({ name: 'Scene2' }),
+        getFakeLayoutData({ name: 'Scene3' }),
+      ];
+
+      // Launch two games.
+      const p1RuntimeGame = gdjs.getPixiRuntimeGame({
+        layouts: gameLayoutData,
+      });
+
+      await p1RuntimeGame._resourcesLoader.loadAllResources();
+
+      const p2RuntimeGame = gdjs.getPixiRuntimeGame({
+        layouts: gameLayoutData,
+      });
+
+      await p2RuntimeGame._resourcesLoader.loadAllResources();
+
+      // Launch two scenes on the server:
+      switchToPeer({
+        peerId: 'player-1',
+        otherPeerIds: ['player-2', 'player-3'],
+        playerNumber: 1,
+      });
+
+      p1RuntimeGame.getSceneStack().push('Scene1');
+      p1RuntimeGame.getSceneStack().push('Scene3');
+
+      checkCurrentSceneIs(p1RuntimeGame, 'Scene3');
+      p1RuntimeGame.getSceneStack().step(1000 / 60);
+
+      // Launch the game on a client, with just the first scene.
+      switchToPeer({
+        peerId: 'player-2',
+        otherPeerIds: ['player-1'],
+        playerNumber: 2,
+      });
+
+      p2RuntimeGame.getSceneStack().push('Scene1');
+
+      // Ensure the second scene (Scene3) is started.
+      checkCurrentSceneIs(p2RuntimeGame, 'Scene1');
+      p2RuntimeGame.getSceneStack().step(1000 / 60);
+      checkCurrentSceneIs(p2RuntimeGame, 'Scene3');
+      p2RuntimeGame.getSceneStack().step(1000 / 60);
+
+      // Start again the same scene (Scene3) on the server
+      switchToPeer({
+        peerId: 'player-1',
+        otherPeerIds: ['player-2'],
+        playerNumber: 1,
+      });
+
+      let p1FirstScene3NetworkId;
+      checkCurrentSceneIs(p1RuntimeGame, 'Scene3');
+      {
+        const { currentScene } = checkCurrentSceneIs(p1RuntimeGame, 'Scene3');
+        p1RuntimeGame.getSceneStack().step(1000 / 60);
+        p1FirstScene3NetworkId = currentScene.networkId;
+      }
+
+      p1RuntimeGame.getSceneStack().push('Scene3');
+      let p1SecondScene3NetworkId;
+      {
+        const { currentScene } = checkCurrentSceneIs(p1RuntimeGame, 'Scene3');
+        p1RuntimeGame.getSceneStack().step(1000 / 60);
+        p1SecondScene3NetworkId = currentScene.networkId;
+      }
+
+      expect(p1FirstScene3NetworkId).not.to.be(null);
+      expect(p1SecondScene3NetworkId).not.to.be(null);
+      expect(p1FirstScene3NetworkId).not.to.be(p1SecondScene3NetworkId);
+
+      // Ensure the second Scene3 is also started on the player.
+      switchToPeer({
+        peerId: 'player-2',
+        otherPeerIds: ['player-1'],
+        playerNumber: 2,
+      });
+      {
+        const { currentScene } = checkCurrentSceneIs(p2RuntimeGame, 'Scene3');
+        p2RuntimeGame.getSceneStack().step(1000 / 60);
+        expect(currentScene.networkId).to.be(p1FirstScene3NetworkId);
+      }
+      {
+        const { currentScene } = checkCurrentSceneIs(p2RuntimeGame, 'Scene3');
+        p2RuntimeGame.getSceneStack().step(1000 / 60);
+        expect(currentScene.networkId).to.be(p1SecondScene3NetworkId);
+      }
+
+      // Remove the two Scene3 on the server.
+      switchToPeer({
+        peerId: 'player-1',
+        otherPeerIds: ['player-2'],
+        playerNumber: 1,
+      });
+      p1RuntimeGame.getSceneStack().pop();
+      p1RuntimeGame.getSceneStack().pop();
+
+      let p1Scene1NetworkId;
+      {
+        const { currentScene } = checkCurrentSceneIs(p1RuntimeGame, 'Scene1');
+        p1RuntimeGame.getSceneStack().step(1000 / 60);
+        p1Scene1NetworkId = currentScene.networkId;
+      }
+
+      // Check that the player also goes back to Scene1:
+      switchToPeer({
+        peerId: 'player-2',
+        otherPeerIds: ['player-1'],
+        playerNumber: 2,
+      });
+
+      checkCurrentSceneIs(p2RuntimeGame, 'Scene3');
+      p2RuntimeGame.getSceneStack().step(1000 / 60);
+      {
+        const { currentScene } = checkCurrentSceneIs(p2RuntimeGame, 'Scene1');
+        expect(currentScene.networkId).to.be(p1Scene1NetworkId);
+      }
+    });
+
+    it('reconciles a scene launched both on the server and by a player', async () => {
+      const {
+        switchToPeer,
+        logEvents,
+        markAllPeerEventsAsProcessed,
+        expectNoEventsToBeProcessed,
+      } = createP2PAndMultiplayerMessageManagerMock();
+
+      const gameLayoutData = [
+        getFakeLayoutData({ name: 'Scene1' }),
+        getFakeLayoutData({ name: 'Scene2' }),
+        getFakeLayoutData({ name: 'Scene3' }),
+      ];
+
+      // Launch two games.
+      const p1RuntimeGame = gdjs.getPixiRuntimeGame({
+        layouts: gameLayoutData,
+      });
+
+      await p1RuntimeGame._resourcesLoader.loadAllResources();
+
+      const p2RuntimeGame = gdjs.getPixiRuntimeGame({
+        layouts: gameLayoutData,
+      });
+
+      await p2RuntimeGame._resourcesLoader.loadAllResources();
+
+      // Launch two scenes on the server:
+      switchToPeer({
+        peerId: 'player-1',
+        otherPeerIds: ['player-2', 'player-3'],
+        playerNumber: 1,
+      });
+
+      p1RuntimeGame.getSceneStack().push('Scene1');
+      p1RuntimeGame.getSceneStack().step(1000 / 60);
+
+      checkCurrentSceneIs(p1RuntimeGame, 'Scene1');
+
+      // Launch the game on a client, with just the first scene.
+      switchToPeer({
+        peerId: 'player-2',
+        otherPeerIds: ['player-1'],
+        playerNumber: 2,
+      });
+
+      p2RuntimeGame.getSceneStack().push('Scene1');
+      p2RuntimeGame.getSceneStack().step(1000 / 60);
+
+      checkCurrentSceneIs(p2RuntimeGame, 'Scene1');
+      markAllPeerEventsAsProcessed();
+
+      // Launch a second scene, first on the player:
+      p2RuntimeGame.getSceneStack().push('Scene2');
+      p2RuntimeGame.getSceneStack().step(1000 / 60);
+
+      expect(
+        checkCurrentSceneIs(p2RuntimeGame, 'Scene2').currentScene.networkId
+      ).to.be(null);
+
+      // Launch a second scene, this time on the server:
+      switchToPeer({
+        peerId: 'player-1',
+        otherPeerIds: ['player-2', 'player-3'],
+        playerNumber: 1,
+      });
+
+      p1RuntimeGame.getSceneStack().push('Scene2');
+      p1RuntimeGame.getSceneStack().step(1000 / 60);
+
+      const p1Scene2NetworkId = checkCurrentSceneIs(p1RuntimeGame, 'Scene2')
+        .currentScene.networkId;
+
+      // Check the network id of the scene on the player is reconciled with the server.
+      switchToPeer({
+        peerId: 'player-2',
+        otherPeerIds: ['player-1'],
+        playerNumber: 2,
+      });
+
+      expect(
+        checkCurrentSceneIs(p2RuntimeGame, 'Scene2').currentScene.networkId
+      ).to.be(null);
+      p2RuntimeGame.getSceneStack().step(1000 / 60);
+
+      expect(
+        checkCurrentSceneIs(p2RuntimeGame, 'Scene2').currentScene.networkId
+      ).to.be(p1Scene2NetworkId);
     });
   });
 });

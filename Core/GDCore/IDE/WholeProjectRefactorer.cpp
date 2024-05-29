@@ -185,6 +185,15 @@ WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
         changeset.typeChangedVariableNames.insert(variableName);
       }
 
+      const auto &variablesRenamingChangesetNode =
+          gd::WholeProjectRefactorer::ComputeChangesetForVariable(oldVariable,
+                                                                  variable);
+
+      if (variablesRenamingChangesetNode) {
+        changeset.modifiedVariables[oldName] =
+            std::move(variablesRenamingChangesetNode);
+      }
+
       // Renamed or not, this is not a removed variable.
       removedUuidAndNames.erase(variable.GetPersistentUuid());
     }
@@ -196,6 +205,52 @@ WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
 
   return changeset;
 }
+
+std::shared_ptr<VariablesRenamingChangesetNode>
+WholeProjectRefactorer::ComputeChangesetForVariable(
+    const gd::Variable &oldVariable, const gd::Variable &newVariable) {
+
+  if (newVariable.GetChildrenCount() == 0 ||
+      oldVariable.GetChildrenCount() == 0) {
+    return std::shared_ptr<VariablesRenamingChangesetNode>(nullptr);
+  }
+
+  std::unordered_map<gd::String, gd::String> removedUuidAndNames;
+  for (const auto &pair : oldVariable.GetAllChildren()) {
+    const auto &oldName = pair.first;
+    const auto oldChild = pair.second;
+
+    // All variables are candidate to be removed.
+    removedUuidAndNames[oldChild->GetPersistentUuid()] = oldName;
+  }
+
+  auto changeset = std::make_shared<VariablesRenamingChangesetNode>();
+  for (const auto &pair : newVariable.GetAllChildren()) {
+    const auto &newName = pair.first;
+    const auto newChild = pair.second;
+
+    auto existingOldVariableUuidAndName =
+        removedUuidAndNames.find(newChild->GetPersistentUuid());
+    if (existingOldVariableUuidAndName == removedUuidAndNames.end()) {
+      // This is a new variable.
+      continue;
+    }
+    const gd::String &oldName = existingOldVariableUuidAndName->second;
+    const auto &oldChild = oldVariable.GetChild(oldName);
+
+    const auto &childChangeset =
+        gd::WholeProjectRefactorer::ComputeChangesetForVariable(oldChild,
+                                                                *newChild);
+    if (childChangeset) {
+      changeset->modifiedVariables[oldName] = std::move(childChangeset);
+    }
+  }
+  if (changeset->modifiedVariables.size() == 0 &&
+      changeset->oldToNewVariableNames.size() == 0) {
+    return std::shared_ptr<VariablesRenamingChangesetNode>(nullptr);
+  }
+  return std::move(changeset);
+};
 
 bool WholeProjectRefactorer::HasAnyVariableTypeChanged(
     const gd::Variable &oldVariable, const gd::Variable &newVariable) {
@@ -250,7 +305,7 @@ void WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
   // Rename and remove variables
   gd::EventsVariableReplacer eventsVariableReplacer(
       project.GetCurrentPlatform(), variablesContainer,
-      changeset.oldToNewVariableNames, changeset.removedVariableNames);
+      changeset, changeset.removedVariableNames);
   gd::ProjectBrowserHelper::ExposeProjectEvents(project,
                                                 eventsVariableReplacer);
 

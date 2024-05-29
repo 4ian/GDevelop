@@ -9,6 +9,7 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <vector>
+#include <memory>
 #include "GDCore/String.h"
 #include "GDCore/Project/Variable.h"
 
@@ -36,13 +37,20 @@ class BehaviorMetadata;
 class UnfilledRequiredBehaviorPropertyProblem;
 class ProjectBrowser;
 class SerializerElement;
+struct VariablesRenamingChangesetNode;
 }  // namespace gd
 
 namespace gd {
 
-struct VariablesChangeset {
-  std::unordered_set<gd::String> removedVariableNames;
+struct VariablesRenamingChangesetNode {
   std::unordered_map<gd::String, gd::String> oldToNewVariableNames;
+  std::unordered_map<gd::String, std::shared_ptr<gd::VariablesRenamingChangesetNode>>
+      modifiedVariables;
+};
+
+struct VariablesChangeset : VariablesRenamingChangesetNode {
+  std::unordered_set<gd::String> removedVariableNames;
+
   /**
    * No distinction is done between a change of the variable itself or its
    * children. Ensuring that a child is actually the one with a type change
@@ -561,6 +569,10 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::Object& object,
       const gd::String& behaviorName,
       std::unordered_set<gd::String>& dependentBehaviorNames);
+
+  static std::shared_ptr<VariablesRenamingChangesetNode>
+  ComputeChangesetForVariable(const gd::Variable &oldVariable,
+                              const gd::Variable &newVariable);
 
   static bool HasAnyVariableTypeChanged(const gd::Variable &oldVariable,
                                         const gd::Variable &newVariable);

@@ -764,6 +764,8 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
         gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
             originalSerializedVariables, project.GetVariables());
 
+    REQUIRE(changeset.oldToNewVariableNames.find("MyVariable") !=
+            changeset.oldToNewVariableNames.end());
     REQUIRE(changeset.oldToNewVariableNames.find("MyVariable")->second ==
             "MyRenamedVariable");
 
@@ -793,11 +795,6 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
       sceneEvent.GetActions().Insert(action);
     }
 
-  auto projectScopedContainers =
-    gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
-    REQUIRE(&projectScopedContainers.GetVariablesContainersList()
-                   .GetVariablesContainerFromVariableName("MyVariable") == &scene.GetVariables());
-
     // Do the changes and launch the refactoring.
     scene.GetVariables().ResetPersistentUuid();
     gd::SerializerElement originalSerializedVariables;
@@ -808,6 +805,8 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
         gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
             originalSerializedVariables, scene.GetVariables());
 
+    REQUIRE(changeset.oldToNewVariableNames.find("MyVariable") !=
+            changeset.oldToNewVariableNames.end());
     REQUIRE(changeset.oldToNewVariableNames.find("MyVariable")->second ==
             "MyRenamedVariable");
 
@@ -815,6 +814,58 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
         project, scene.GetVariables(), changeset, originalSerializedVariables);
 
     REQUIRE(sceneEvent.GetActions()[0].GetParameter(0).GetPlainString() == "MyRenamedVariable");
+  }
+
+  SECTION("Can rename a scene child variable") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &scene = project.InsertNewLayout("Scene", 0);
+    scene.GetVariables()
+        .InsertNew("MyVariable")
+        .GetChild("MyChild")
+        .SetValue(123);
+    gd::StandardEvent &sceneEvent =
+        dynamic_cast<gd::StandardEvent &>(scene.GetEvents().InsertNewEvent(
+            project, "BuiltinCommonInstructions::Standard"));
+    {
+      gd::Instruction action;
+      action.SetType("SetNumberVariable");
+      action.SetParametersCount(3);
+      action.SetParameter(0, gd::Expression("MyVariable.MyChild"));
+      action.SetParameter(1, gd::Expression("="));
+      action.SetParameter(2, gd::Expression("123"));
+      sceneEvent.GetActions().Insert(action);
+    }
+
+    // Do the changes and launch the refactoring.
+    scene.GetVariables().ResetPersistentUuid();
+    gd::SerializerElement originalSerializedVariables;
+    scene.GetVariables().SerializeTo(originalSerializedVariables);
+
+    scene.GetVariables()
+        .Get("MyVariable")
+        .RenameChild("MyChild", "MyRenamedChild");
+    auto changeset =
+        gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
+            originalSerializedVariables, scene.GetVariables());
+
+    REQUIRE(changeset.modifiedVariables.find("MyVariable") !=
+            changeset.modifiedVariables.end());
+    auto oldToNewChildVariableNames =
+        changeset.modifiedVariables.find("MyVariable")
+            ->second->oldToNewVariableNames;
+    REQUIRE(oldToNewChildVariableNames.find("MyChild") !=
+            oldToNewChildVariableNames.end());
+    REQUIRE(oldToNewChildVariableNames.find("MyChild")->second ==
+            "MyRenamedChild");
+
+    gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
+        project, scene.GetVariables(), changeset, originalSerializedVariables);
+
+    REQUIRE(sceneEvent.GetActions()[0].GetParameter(0).GetPlainString() ==
+            "MyVariable.MyRenamedChild");
   }
 
   SECTION("Can rename a global variable without replacing occurrences of scene variables") {
@@ -866,6 +917,8 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
         gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
             originalSerializedVariables, project.GetVariables());
 
+    REQUIRE(changeset.oldToNewVariableNames.find("MyVariable") !=
+            changeset.oldToNewVariableNames.end());
     REQUIRE(changeset.oldToNewVariableNames.find("MyVariable")->second ==
             "MyRenamedVariable");
 
@@ -954,6 +1007,8 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
         gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
             originalSerializedVariables, scene.GetVariables());
 
+    REQUIRE(changeset.oldToNewVariableNames.find("MyVariable") !=
+            changeset.oldToNewVariableNames.end());
     REQUIRE(changeset.oldToNewVariableNames.find("MyVariable")->second ==
             "MyRenamedVariable");
     REQUIRE(changeset.typeChangedVariableNames.find("MyRenamedVariable") !=
@@ -999,6 +1054,8 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
         gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
             originalSerializedVariables, event.GetVariables());
 
+    REQUIRE(changeset.oldToNewVariableNames.find("MyLocalVariable") !=
+            changeset.oldToNewVariableNames.end());
     REQUIRE(changeset.oldToNewVariableNames.find("MyLocalVariable")->second ==
             "MyRenamedLocalVariable");
 
@@ -1099,6 +1156,8 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
         gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
             originalSerializedVariables, event.GetVariables());
 
+    REQUIRE(changeset.oldToNewVariableNames.find("MyLocalVariable") !=
+            changeset.oldToNewVariableNames.end());
     REQUIRE(changeset.oldToNewVariableNames.find("MyLocalVariable")->second ==
             "MyRenamedLocalVariable");
 

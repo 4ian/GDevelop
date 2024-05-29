@@ -96,7 +96,10 @@ namespace gdjs {
       const url = new URL(
         `${baseUrl}/games/${gameId}/lobbies${_lobbyId ? `/${_lobbyId}` : ''}`
       );
-
+      url.searchParams.set(
+        'gameVersion',
+        runtimeGame.getGameData().properties.version
+      );
       if (isDev) {
         url.searchParams.set('dev', 'true');
       }

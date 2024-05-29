@@ -868,6 +868,50 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
             "MyVariable.MyRenamedChild");
   }
 
+  SECTION("Can rename a scene child child variable") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &scene = project.InsertNewLayout("Scene", 0);
+    scene.GetVariables()
+        .InsertNew("MyVariable")
+        .GetChild("MyChild")
+        .GetChild("MyGranChild")
+        .SetValue(123);
+    gd::StandardEvent &sceneEvent =
+        dynamic_cast<gd::StandardEvent &>(scene.GetEvents().InsertNewEvent(
+            project, "BuiltinCommonInstructions::Standard"));
+    {
+      gd::Instruction action;
+      action.SetType("SetNumberVariable");
+      action.SetParametersCount(3);
+      action.SetParameter(0, gd::Expression("MyVariable.MyChild.MyGranChild"));
+      action.SetParameter(1, gd::Expression("="));
+      action.SetParameter(2, gd::Expression("123"));
+      sceneEvent.GetActions().Insert(action);
+    }
+
+    // Do the changes and launch the refactoring.
+    scene.GetVariables().ResetPersistentUuid();
+    gd::SerializerElement originalSerializedVariables;
+    scene.GetVariables().SerializeTo(originalSerializedVariables);
+
+    scene.GetVariables()
+        .Get("MyVariable")
+        .GetChild("MyChild")
+        .RenameChild("MyGranChild", "MyRenamedChild");
+    auto changeset =
+        gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
+            originalSerializedVariables, scene.GetVariables());
+
+    gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
+        project, scene.GetVariables(), changeset, originalSerializedVariables);
+
+    REQUIRE(sceneEvent.GetActions()[0].GetParameter(0).GetPlainString() ==
+            "MyVariable.MyChild.MyRenamedChild");
+  }
+
   SECTION("Can rename a global variable without replacing occurrences of scene variables") {
     gd::Project project;
     gd::Platform platform;

@@ -190,7 +190,7 @@ namespace gdjs {
      */
     has(name: string): boolean {
       const variable = this._variables.get(name);
-      return variable && !variable.isUndefinedInContainer();
+      return !!variable && !variable.isUndefinedInContainer();
     }
     static _deletedVars: Array<string | undefined> = [];
 

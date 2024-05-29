@@ -111,16 +111,20 @@ class GD_CORE_API ExpressionVariableReplacer
               &targetVariablesContainer) {
             // The node represents a variable, that can come from the target
             // (because the target is in the scope), replace or remove it:
-            bool hasBeenPushed = PushVariablesRenamingChangesetNodeForNewVariable(node.name);
+            PushVariablesRenamingChangesetRoot();
             RenameOrRemoveVariableOfTargetVariableContainer(node.name);
-            if (node.child) node.child->Visit(*this);
-            PopVariablesRenamingChangesetNode(hasBeenPushed);
-          }
-          else {
             if (node.child) {
-              bool hasBeenPushed = PushVariablesRenamingChangesetNodeForIgnoredVariables();
+              bool hasBeenPushed =
+                  PushVariablesRenamingChangesetNodeForVariable(node.name);
               node.child->Visit(*this);
               PopVariablesRenamingChangesetNode(hasBeenPushed);
+            }
+            PopVariablesRenamingChangesetNode(true);
+          } else {
+            if (node.child) {
+              PushVariablesRenamingChangesetNodeForIgnoredVariables();
+              node.child->Visit(*this);
+              PopVariablesRenamingChangesetNode(true);
             }
           }
         },
@@ -147,21 +151,25 @@ class GD_CORE_API ExpressionVariableReplacer
               objectNameToUseForVariableAccessor, targetVariablesContainer)) {
         // The node represents an object variable, and this object variables are
         // the target. Do the replacement or removals:
-        bool hasBeenPushed = PushVariablesRenamingChangesetNodeForNewVariable(node.name);
+        PushVariablesRenamingChangesetRoot();
         RenameOrRemoveVariableOfTargetVariableContainer(node.name);
         if (node.child) {
+          bool hasBeenPushed =
+              PushVariablesRenamingChangesetNodeForVariable(node.name);
           node.child->Visit(*this);
+          PopVariablesRenamingChangesetNode(hasBeenPushed);
         }
-        PopVariablesRenamingChangesetNode(hasBeenPushed);
+        PopVariablesRenamingChangesetNode(true);
       }
       objectNameToUseForVariableAccessor = "";
     } else {
-      bool hasBeenPushed = PushVariablesRenamingChangesetNodeForChild(node.name);
       RenameOrRemoveVariableOfTargetVariableContainer(node.name);
       if (node.child) {
+        bool hasBeenPushed =
+            PushVariablesRenamingChangesetNodeForVariable(node.name);
         node.child->Visit(*this);
+        PopVariablesRenamingChangesetNode(hasBeenPushed);
       }
-      PopVariablesRenamingChangesetNode(hasBeenPushed);
     }
   }
   void OnVisitVariableBracketAccessorNode(
@@ -172,9 +180,9 @@ class GD_CORE_API ExpressionVariableReplacer
     // `expression` and in `child`.
     node.expression->Visit(*this);
     if (node.child) {
-      bool hasBeenPushed = PushVariablesRenamingChangesetNodeForIgnoredVariables();
+      PushVariablesRenamingChangesetNodeForIgnoredVariables();
       node.child->Visit(*this);
-      PopVariablesRenamingChangesetNode(hasBeenPushed);
+      PopVariablesRenamingChangesetNode(true);
     }
   }
   void OnVisitIdentifierNode(IdentifierNode& node) override {
@@ -204,10 +212,10 @@ class GD_CORE_API ExpressionVariableReplacer
                   node.identifierName, targetVariablesContainer)) {
             // The node represents an object variable, and this object variables
             // are the target. Do the replacement or removals:
-            bool hasBeenPushed = PushVariablesRenamingChangesetNodeForNewVariable(node.childIdentifierName);
+            PushVariablesRenamingChangesetRoot();
             RenameOrRemoveVariableOfTargetVariableContainer(
                 node.childIdentifierName);
-            PopVariablesRenamingChangesetNode(hasBeenPushed);
+            PopVariablesRenamingChangesetNode(true);
           }
         },
         [&]() {
@@ -217,17 +225,19 @@ class GD_CORE_API ExpressionVariableReplacer
                        node.identifierName) == &targetVariablesContainer) {
             // The node represents a variable, that can come from the target
             // (because the target is in the scope), replace or remove it:
-            
-          bool hasBeenPushed = PushVariablesRenamingChangesetNodeForNewVariable(node.identifierName);
-          RenameOrRemoveVariableOfTargetVariableContainer(
-              node.identifierName);
-          if (hasBeenPushed) {
-            bool hasBeenPushed = PushVariablesRenamingChangesetNodeForNewVariable(node.childIdentifierName);
+
+            PushVariablesRenamingChangesetRoot();
             RenameOrRemoveVariableOfTargetVariableContainer(
-                node.childIdentifierName);
-            PopVariablesRenamingChangesetNode(hasBeenPushed);
-          }
-          PopVariablesRenamingChangesetNode(hasBeenPushed);
+                node.identifierName);
+            if (!node.childIdentifierName.empty()) {
+              bool hasBeenPushed =
+                  PushVariablesRenamingChangesetNodeForVariable(
+                      node.identifierName);
+              RenameOrRemoveVariableOfTargetVariableContainer(
+                  node.childIdentifierName);
+              PopVariablesRenamingChangesetNode(hasBeenPushed);
+            }
+            PopVariablesRenamingChangesetNode(true);
           }
         },
         [&]() {
@@ -321,14 +331,12 @@ class GD_CORE_API ExpressionVariableReplacer
     return false;  // Nothing was changed or done.
   }
 
-  bool PushVariablesRenamingChangesetNodeForNewVariable(const gd::String& variableName) {
-      variablesRenamingChangesetNodeStack.push_back(&variablesRenamingChangesetRoot);
-    return true;
+  void PushVariablesRenamingChangesetRoot() {
+    variablesRenamingChangesetNodeStack.push_back(&variablesRenamingChangesetRoot);
   }
 
-  bool PushVariablesRenamingChangesetNodeForIgnoredVariables() {
-      variablesRenamingChangesetNodeStack.push_back(nullptr);
-    return true;
+  void PushVariablesRenamingChangesetNodeForIgnoredVariables() {
+    variablesRenamingChangesetNodeStack.push_back(nullptr);
   }
 
   const gd::VariablesRenamingChangesetNode *GetCurrentVariablesRenamingChangesetNode() {
@@ -338,7 +346,7 @@ class GD_CORE_API ExpressionVariableReplacer
             [variablesRenamingChangesetNodeStack.size() - 1];
   }
 
-  bool PushVariablesRenamingChangesetNodeForChild(const gd::String& childVariableName) {
+  bool PushVariablesRenamingChangesetNodeForVariable(const gd::String& variableName) {
     const auto *currentVariablesRenamingChangesetNode = GetCurrentVariablesRenamingChangesetNode();
     if (!currentVariablesRenamingChangesetNode) {
       // There were already no more change on a parent.
@@ -346,7 +354,7 @@ class GD_CORE_API ExpressionVariableReplacer
     }
     const auto &childVariablesRenamingChangesetNodeItr =
         currentVariablesRenamingChangesetNode->modifiedVariables.find(
-            childVariableName);
+            variableName);
     if (childVariablesRenamingChangesetNodeItr ==
         currentVariablesRenamingChangesetNode->modifiedVariables.end()) {
       // There is no more change on the current variable child.

@@ -238,6 +238,11 @@ WholeProjectRefactorer::ComputeChangesetForVariable(
     const gd::String &oldName = existingOldVariableUuidAndName->second;
     const auto &oldChild = oldVariable.GetChild(oldName);
 
+    if (oldName != newName) {
+      // This is a renamed child.
+      changeset->oldToNewVariableNames[oldName] = newName;
+    }
+
     const auto &childChangeset =
         gd::WholeProjectRefactorer::ComputeChangesetForVariable(oldChild,
                                                                 *newChild);

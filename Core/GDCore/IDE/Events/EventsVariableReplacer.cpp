@@ -22,6 +22,7 @@
 #include "GDCore/IDE/Events/ExpressionVariableOwnerFinder.h"
 #include "GDCore/IDE/Events/ExpressionVariableNameFinder.h"
 #include "GDCore/IDE/VariableInstructionSwitcher.h"
+#include "GDCore/IDE/WholeProjectRefactorer.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/ProjectScopedContainers.h"
@@ -44,7 +45,7 @@ class GD_CORE_API ExpressionVariableReplacer
       const gd::Platform& platform_,
       const gd::ProjectScopedContainers& projectScopedContainers_,
       const gd::VariablesContainer& targetVariablesContainer_,
-      const std::unordered_map<gd::String, gd::String>& oldToNewVariableNames_,
+      const VariablesRenamingChangesetNode& variablesRenamingChangesetRoot_,
       const std::unordered_set<gd::String>& removedVariableNames_)
       : hasDoneRenaming(false),
         removedVariableUsed(false),
@@ -52,7 +53,7 @@ class GD_CORE_API ExpressionVariableReplacer
         projectScopedContainers(projectScopedContainers_),
         forcedInitialVariablesContainer(nullptr),
         targetVariablesContainer(targetVariablesContainer_),
-        oldToNewVariableNames(oldToNewVariableNames_),
+        variablesRenamingChangesetRoot(variablesRenamingChangesetRoot_),
         removedVariableNames(removedVariableNames_){};
   virtual ~ExpressionVariableReplacer(){};
 
@@ -110,10 +111,18 @@ class GD_CORE_API ExpressionVariableReplacer
               &targetVariablesContainer) {
             // The node represents a variable, that can come from the target
             // (because the target is in the scope), replace or remove it:
+            bool hasBeenPushed = PushVariablesRenamingChangesetNodeForNewVariable(node.name);
             RenameOrRemoveVariableOfTargetVariableContainer(node.name);
+            if (node.child) node.child->Visit(*this);
+            PopVariablesRenamingChangesetNode(hasBeenPushed);
           }
-
-          if (node.child) node.child->Visit(*this);
+          else {
+            if (node.child) {
+              bool hasBeenPushed = PushVariablesRenamingChangesetNodeForIgnoredVariables();
+              node.child->Visit(*this);
+              PopVariablesRenamingChangesetNode(hasBeenPushed);
+            }
+          }
         },
         [&]() {
           // This is a property.
@@ -132,23 +141,41 @@ class GD_CORE_API ExpressionVariableReplacer
     auto& objectsContainersList =
         projectScopedContainers.GetObjectsContainersList();
     if (!objectNameToUseForVariableAccessor.empty()) {
+      // This is always true because MatchIdentifierWithName is used to get
+      // objectNameToUseForVariableAccessor.
       if (objectsContainersList.HasObjectOrGroupVariablesContainer(
               objectNameToUseForVariableAccessor, targetVariablesContainer)) {
         // The node represents an object variable, and this object variables are
         // the target. Do the replacement or removals:
+        bool hasBeenPushed = PushVariablesRenamingChangesetNodeForNewVariable(node.name);
         RenameOrRemoveVariableOfTargetVariableContainer(node.name);
+        if (node.child) {
+          node.child->Visit(*this);
+        }
+        PopVariablesRenamingChangesetNode(hasBeenPushed);
       }
+      objectNameToUseForVariableAccessor = "";
+    } else {
+      bool hasBeenPushed = PushVariablesRenamingChangesetNodeForChild(node.name);
+      RenameOrRemoveVariableOfTargetVariableContainer(node.name);
+      if (node.child) {
+        node.child->Visit(*this);
+      }
+      PopVariablesRenamingChangesetNode(hasBeenPushed);
     }
-    objectNameToUseForVariableAccessor = "";
-
-    if (node.child) node.child->Visit(*this);
   }
   void OnVisitVariableBracketAccessorNode(
       VariableBracketAccessorNode& node) override {
     objectNameToUseForVariableAccessor = "";
 
+    // TODO Literal expressions could be checked to handle renaming in
+    // `expression` and in `child`.
     node.expression->Visit(*this);
-    if (node.child) node.child->Visit(*this);
+    if (node.child) {
+      bool hasBeenPushed = PushVariablesRenamingChangesetNodeForIgnoredVariables();
+      node.child->Visit(*this);
+      PopVariablesRenamingChangesetNode(hasBeenPushed);
+    }
   }
   void OnVisitIdentifierNode(IdentifierNode& node) override {
     auto& objectsContainersList =
@@ -177,8 +204,10 @@ class GD_CORE_API ExpressionVariableReplacer
                   node.identifierName, targetVariablesContainer)) {
             // The node represents an object variable, and this object variables
             // are the target. Do the replacement or removals:
+            bool hasBeenPushed = PushVariablesRenamingChangesetNodeForNewVariable(node.childIdentifierName);
             RenameOrRemoveVariableOfTargetVariableContainer(
                 node.childIdentifierName);
+            PopVariablesRenamingChangesetNode(hasBeenPushed);
           }
         },
         [&]() {
@@ -188,8 +217,17 @@ class GD_CORE_API ExpressionVariableReplacer
                        node.identifierName) == &targetVariablesContainer) {
             // The node represents a variable, that can come from the target
             // (because the target is in the scope), replace or remove it:
+            
+          bool hasBeenPushed = PushVariablesRenamingChangesetNodeForNewVariable(node.identifierName);
+          RenameOrRemoveVariableOfTargetVariableContainer(
+              node.identifierName);
+          if (hasBeenPushed) {
+            bool hasBeenPushed = PushVariablesRenamingChangesetNodeForNewVariable(node.childIdentifierName);
             RenameOrRemoveVariableOfTargetVariableContainer(
-                node.identifierName);
+                node.childIdentifierName);
+            PopVariablesRenamingChangesetNode(hasBeenPushed);
+          }
+          PopVariablesRenamingChangesetNode(hasBeenPushed);
           }
         },
         [&]() {
@@ -260,16 +298,71 @@ class GD_CORE_API ExpressionVariableReplacer
 
   bool RenameOrRemoveVariableOfTargetVariableContainer(
       gd::String& variableName) {
+    const auto *currentVariablesRenamingChangesetNode =
+        GetCurrentVariablesRenamingChangesetNode();
+    if (!currentVariablesRenamingChangesetNode) {
+      return false;
+    }
+    const auto &oldToNewVariableNames =
+        currentVariablesRenamingChangesetNode->oldToNewVariableNames;
     if (oldToNewVariableNames.count(variableName) >= 1) {
       variableName = oldToNewVariableNames.find(variableName)->second;
       hasDoneRenaming = true;
       return true;
-    } else if (removedVariableNames.count(variableName) >= 1) {
+    } else if (
+      // Only the root variable is checked for removing.
+      currentVariablesRenamingChangesetNode ==
+                   &variablesRenamingChangesetRoot &&
+               removedVariableNames.count(variableName) >= 1) {
       removedVariableUsed = true;
       return true;
     }
 
     return false;  // Nothing was changed or done.
+  }
+
+  bool PushVariablesRenamingChangesetNodeForNewVariable(const gd::String& variableName) {
+      variablesRenamingChangesetNodeStack.push_back(&variablesRenamingChangesetRoot);
+    return true;
+  }
+
+  bool PushVariablesRenamingChangesetNodeForIgnoredVariables() {
+      variablesRenamingChangesetNodeStack.push_back(nullptr);
+    return true;
+  }
+
+  const gd::VariablesRenamingChangesetNode *GetCurrentVariablesRenamingChangesetNode() {
+    return variablesRenamingChangesetNodeStack.size() == 0 ?
+    &variablesRenamingChangesetRoot :
+        variablesRenamingChangesetNodeStack
+            [variablesRenamingChangesetNodeStack.size() - 1];
+  }
+
+  bool PushVariablesRenamingChangesetNodeForChild(const gd::String& childVariableName) {
+    const auto *currentVariablesRenamingChangesetNode = GetCurrentVariablesRenamingChangesetNode();
+    if (!currentVariablesRenamingChangesetNode) {
+      // There were already no more change on a parent.
+      return false;
+    }
+    const auto &childVariablesRenamingChangesetNodeItr =
+        currentVariablesRenamingChangesetNode->modifiedVariables.find(
+            childVariableName);
+    if (childVariablesRenamingChangesetNodeItr ==
+        currentVariablesRenamingChangesetNode->modifiedVariables.end()) {
+      // There is no more change on the current variable child.
+      variablesRenamingChangesetNodeStack.push_back(nullptr);
+    }
+    else {
+      variablesRenamingChangesetNodeStack.push_back(
+          childVariablesRenamingChangesetNodeItr->second.get());
+    }
+    return true;
+  }
+
+  void PopVariablesRenamingChangesetNode(bool hasBeenPushed) {
+    if (hasBeenPushed) {
+      variablesRenamingChangesetNodeStack.push_back(&variablesRenamingChangesetRoot);
+    }
   }
 
   // Scope:
@@ -279,10 +372,11 @@ class GD_CORE_API ExpressionVariableReplacer
 
   // Renaming or removing to do:
   const gd::VariablesContainer& targetVariablesContainer;
-  const std::unordered_map<gd::String, gd::String>& oldToNewVariableNames;
+  const VariablesRenamingChangesetNode &variablesRenamingChangesetRoot;
   const std::unordered_set<gd::String>& removedVariableNames;
 
   gd::String objectNameToUseForVariableAccessor;
+  std::vector<const VariablesRenamingChangesetNode*> variablesRenamingChangesetNodeStack;
 };
 
 const gd::VariablesContainer*
@@ -335,7 +429,7 @@ bool EventsVariableReplacer::DoVisitInstruction(gd::Instruction& instruction,
           ExpressionVariableReplacer renamer(platform,
                                              GetProjectScopedContainers(),
                                              targetVariablesContainer,
-                                             oldToNewVariableNames,
+                                             variablesRenamingChangesetRoot,
                                              removedVariableNames);
           renamer.SetForcedInitialVariablesContainer(
               FindForcedVariablesContainerIfAny(type, lastObjectName));
@@ -367,7 +461,7 @@ bool EventsVariableReplacer::DoVisitEventExpression(
     ExpressionVariableReplacer renamer(platform,
                                        GetProjectScopedContainers(),
                                        targetVariablesContainer,
-                                       oldToNewVariableNames,
+                                       variablesRenamingChangesetRoot,
                                        removedVariableNames);
     renamer.SetForcedInitialVariablesContainer(
         FindForcedVariablesContainerIfAny(type, ""));

@@ -256,10 +256,8 @@ describe('Multiplayer', () => {
     gdjs.multiplayer._isGameRunning = false;
   });
 
-  describe('Single scene test', () => {
+  describe('Single scene tests', () => {
     it('synchronizes scene/global variables from the server to other players', () => {
-      let otherPeerIds = [];
-      let currentPeerId = '';
       const {
         switchToPeer,
         logEvents,
@@ -330,8 +328,6 @@ describe('Multiplayer', () => {
     });
 
     it('overrides a scene/global variable, modified by a player, when synchronized by the server', () => {
-      let otherPeerIds = [];
-      let currentPeerId = '';
       const {
         switchToPeer,
         logEvents,
@@ -416,8 +412,6 @@ describe('Multiplayer', () => {
     });
 
     it('synchronizes objects from the server to other players', () => {
-      let otherPeerIds = [];
-      let currentPeerId = '';
       const {
         switchToPeer,
         logEvents,
@@ -511,8 +505,6 @@ describe('Multiplayer', () => {
     });
 
     it('synchronizes objects from a player to the server to other players', () => {
-      let otherPeerIds = [];
-      let currentPeerId = '';
       const {
         switchToPeer,
         logEvents,
@@ -643,8 +635,6 @@ describe('Multiplayer', () => {
     });
 
     it('allows ownership to change from server to a player to another player', () => {
-      let otherPeerIds = [];
-      let currentPeerId = '';
       const {
         switchToPeer,
         logEvents,
@@ -839,8 +829,6 @@ describe('Multiplayer', () => {
     });
 
     it('reconciles an instance owned by a player with a "ghost" instance created on other peers without a network ID (as not owned by them)', () => {
-      let otherPeerIds = [];
-      let currentPeerId = '';
       const {
         switchToPeer,
         logEvents,
@@ -982,8 +970,6 @@ describe('Multiplayer', () => {
     });
 
     it('deletes an instance owned by another player after a bit (if not "reconciled" in the meantime)', async () => {
-      let otherPeerIds = [];
-      let currentPeerId = '';
       const {
         switchToPeer,
         logEvents,
@@ -1026,8 +1012,6 @@ describe('Multiplayer', () => {
     });
 
     it('gives priority to the first ownership change and revert the wrong one', async () => {
-      let otherPeerIds = [];
-      let currentPeerId = '';
       const {
         switchToPeer,
         logEvents,

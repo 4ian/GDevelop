@@ -1,6 +1,6 @@
 // @ts-check
 
-describe('Multiplayer', () => {
+describe.only('Multiplayer', () => {
   const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
   /**
@@ -264,11 +264,8 @@ describe('Multiplayer', () => {
 
   describe('Single scene tests', () => {
     it('synchronizes scene/global variables from the server to other players', () => {
-      const {
-        switchToPeer,
-        logEvents,
-        markAllPeerEventsAsProcessed,
-      } = createP2PAndMultiplayerMessageManagerMock();
+      const { switchToPeer, logEvents, markAllPeerEventsAsProcessed } =
+        createP2PAndMultiplayerMessageManagerMock();
 
       switchToPeer({
         peerId: 'player-1',
@@ -418,11 +415,8 @@ describe('Multiplayer', () => {
     });
 
     it('synchronizes objects from the server to other players', () => {
-      const {
-        switchToPeer,
-        logEvents,
-        markAllPeerEventsAsProcessed,
-      } = createP2PAndMultiplayerMessageManagerMock();
+      const { switchToPeer, logEvents, markAllPeerEventsAsProcessed } =
+        createP2PAndMultiplayerMessageManagerMock();
 
       // Create an instance on the server:
       switchToPeer({
@@ -464,9 +458,8 @@ describe('Multiplayer', () => {
         playerNumber: 1,
       });
 
-      mySpriteObject1.getBehavior(
-        'MultiplayerObject'
-      )._objectMaxTickRate = Infinity;
+      mySpriteObject1.getBehavior('MultiplayerObject')._objectMaxTickRate =
+        Infinity;
       mySpriteObject1.setX(242);
       mySpriteObject1.setY(243);
       remoteRuntimeScene.renderAndStep(1000 / 60);
@@ -511,11 +504,8 @@ describe('Multiplayer', () => {
     });
 
     it('synchronizes objects from a player to the server to other players', () => {
-      const {
-        switchToPeer,
-        logEvents,
-        markAllPeerEventsAsProcessed,
-      } = createP2PAndMultiplayerMessageManagerMock();
+      const { switchToPeer, logEvents, markAllPeerEventsAsProcessed } =
+        createP2PAndMultiplayerMessageManagerMock();
 
       // Create an instance on a player:
       switchToPeer({
@@ -573,9 +563,8 @@ describe('Multiplayer', () => {
         playerNumber: 2,
       });
 
-      mySpriteObject1.getBehavior(
-        'MultiplayerObject'
-      )._objectMaxTickRate = Infinity;
+      mySpriteObject1.getBehavior('MultiplayerObject')._objectMaxTickRate =
+        Infinity;
       mySpriteObject1.setX(242);
       mySpriteObject1.setY(243);
       p2RuntimeScene.renderAndStep(1000 / 60);
@@ -835,11 +824,8 @@ describe('Multiplayer', () => {
     });
 
     it('reconciles an instance owned by a player with a "ghost" instance created on other peers without a network ID (as not owned by them)', () => {
-      const {
-        switchToPeer,
-        logEvents,
-        markAllPeerEventsAsProcessed,
-      } = createP2PAndMultiplayerMessageManagerMock();
+      const { switchToPeer, logEvents, markAllPeerEventsAsProcessed } =
+        createP2PAndMultiplayerMessageManagerMock();
 
       // Create an instance on a player:
       switchToPeer({
@@ -976,11 +962,8 @@ describe('Multiplayer', () => {
     });
 
     it('deletes an instance owned by another player after a bit (if not "reconciled" in the meantime)', async () => {
-      const {
-        switchToPeer,
-        logEvents,
-        markAllPeerEventsAsProcessed,
-      } = createP2PAndMultiplayerMessageManagerMock();
+      const { switchToPeer, logEvents, markAllPeerEventsAsProcessed } =
+        createP2PAndMultiplayerMessageManagerMock();
 
       // Create an instance on a player (2), owned by another player (3).
       // We can assume it's because there is some common logic running for all players
@@ -1163,9 +1146,8 @@ describe('Multiplayer', () => {
 
       {
         const mySpriteObject = p2RuntimeScene.getObjects('MySpriteObject')[0];
-        mySpriteObject.getBehavior(
-          'MultiplayerObject'
-        )._objectMaxTickRate = Infinity;
+        mySpriteObject.getBehavior('MultiplayerObject')._objectMaxTickRate =
+          Infinity;
         mySpriteObject.setX(242);
         mySpriteObject.setY(243);
         p2RuntimeScene.renderAndStep(1000 / 60);

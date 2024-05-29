@@ -153,7 +153,7 @@ const MultiplayerAdmin = ({ gameId }: Props) => {
           .
         </AlertMessage>
         <Text size="block-title">
-          <Trans>Game configuration</Trans>
+          <Trans>Lobby configuration</Trans>
         </Text>
         <Line noMargin>
           <TextField
@@ -162,7 +162,7 @@ const MultiplayerAdmin = ({ gameId }: Props) => {
             max={maximumNumberOfPlayers}
             fullWidth
             floatingLabelText={
-              <Trans>Maximum number of players per game</Trans>
+              <Trans>Maximum number of players per lobby</Trans>
             }
             value={maxPlayersValue}
             onChange={(e, newValueAsString) => {

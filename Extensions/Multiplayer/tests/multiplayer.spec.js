@@ -1,6 +1,6 @@
 // @ts-check
 
-describe.only('Multiplayer', () => {
+describe('Multiplayer', () => {
   const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
   /**
@@ -1207,7 +1207,7 @@ describe.only('Multiplayer', () => {
     });
   });
 
-  describe.only('Multiple scene tests', () => {
+  describe('Multiple scene tests', () => {
     /**
      * @param {gdjs.RuntimeGame} runtimeGame
      * @param {string} expectedSceneName

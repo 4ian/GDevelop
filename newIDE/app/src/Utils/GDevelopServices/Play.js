@@ -91,6 +91,11 @@ export type LeaderboardEntry = {|
   score: number,
 |};
 
+export type LobbyConfiguration = {|
+  gameId: string,
+  maxPlayers: number,
+|};
+
 export const shortenUuidForDisplay = (uuid: string): string =>
   `${uuid.split('-')[0]}-...`;
 
@@ -446,4 +451,51 @@ export const getRGBLeaderboardTheme = (
       hexLeaderboardTheme.highlightTextColor
     ),
   };
+};
+
+export const getLobbyConfiguration = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  {
+    gameId,
+  }: {|
+    gameId: string,
+  |}
+): Promise<LobbyConfiguration> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.get(
+    `${GDevelopPlayApi.baseUrl}/game/${gameId}/lobby-configuration`,
+    {
+      params: { userId },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const updateLobbyConfiguration = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  {
+    gameId,
+    maxPlayers,
+  }: {|
+    gameId: string,
+    maxPlayers: number,
+  |}
+): Promise<LobbyConfiguration> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.patch(
+    `${GDevelopPlayApi.baseUrl}/game/${gameId}/lobby-configuration`,
+    { maxPlayers },
+    {
+      params: { userId },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
+  return response.data;
 };

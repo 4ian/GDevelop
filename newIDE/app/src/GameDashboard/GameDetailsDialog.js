@@ -77,7 +77,13 @@ export const GameDetailsDialog = ({
               key="help"
               helpPagePath={
                 currentTab === 'leaderboards'
-                  ? '/interface/games-dashboard/leaderboard-administration'
+                  ? '/interface/games-dashboard/leaderboard-administration/'
+                  : currentTab === 'multiplayer'
+                  ? '/all-features/multiplayer/'
+                  : currentTab === 'marketing'
+                  ? '/interface/games-dashboard/marketing/'
+                  : currentTab === 'feedback'
+                  ? '/interface/games-dashboard/player-feedback/'
                   : '/interface/games-dashboard'
               }
             />,

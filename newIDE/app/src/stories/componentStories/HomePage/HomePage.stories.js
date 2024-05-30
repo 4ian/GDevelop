@@ -107,6 +107,9 @@ const WrappedHomePage = ({
           fetchInAppTutorials: async () => {
             action('fetch tutorials')();
           },
+          onLoadInAppTutorialFromLocalFile: async () => {
+            action('load in app tutorial from local file')();
+          },
         }}
       >
         <AuthenticatedUserContext.Provider value={user}>

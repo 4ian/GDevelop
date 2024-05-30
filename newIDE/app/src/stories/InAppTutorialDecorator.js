@@ -33,6 +33,9 @@ const inAppTutorialDecorator: StoryDecorator = (Story, context) => {
         fetchInAppTutorials: async () => {
           action('Fetch in app tutorials')();
         },
+        onLoadInAppTutorialFromLocalFile: async () => {
+          action('load in app tutorial from local file')();
+        },
       }}
     >
       <Story />

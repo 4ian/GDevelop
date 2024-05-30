@@ -912,6 +912,67 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
             "MyVariable.MyChild.MyRenamedChild");
   }
 
+  SECTION("Can rename all the children of a structure variable") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &scene = project.InsertNewLayout("Scene", 0);
+    auto& variable = scene.GetVariables().InsertNew("MyVariable");
+    variable.GetChild("MyChildA").GetChild("MyGranChildA1").SetValue(123);
+    variable.GetChild("MyChildA").GetChild("MyGranChildA2").SetValue(123);
+    variable.GetChild("MyChildB").GetChild("MyGranChildB1").SetValue(123);
+    variable.GetChild("MyChildB").GetChild("MyGranChildB2").SetValue(123);
+    gd::StandardEvent &sceneEvent =
+        dynamic_cast<gd::StandardEvent &>(scene.GetEvents().InsertNewEvent(
+            project, "BuiltinCommonInstructions::Standard"));
+    {
+      gd::Instruction action;
+      action.SetType("SetNumberVariable");
+      action.SetParametersCount(3);
+      action.SetParameter(0,
+                          gd::Expression("MyVariable.MyChildA.MyGranChildA1 + "
+                                         "MyVariable.MyChildA.MyGranChildA2 + "
+                                         "MyVariable.MyChildB.MyGranChildB1 + "
+                                         "MyVariable.MyChildB.MyGranChildB2"));
+      action.SetParameter(1, gd::Expression("="));
+      action.SetParameter(2, gd::Expression("123"));
+      sceneEvent.GetActions().Insert(action);
+    }
+
+    // Do the changes and launch the refactoring.
+    scene.GetVariables().ResetPersistentUuid();
+    gd::SerializerElement originalSerializedVariables;
+    scene.GetVariables().SerializeTo(originalSerializedVariables);
+
+    variable.GetChild("MyChildA").RenameChild("MyGranChildA1", "MyRenamedGranChildA1");
+    variable.GetChild("MyChildA").RenameChild("MyGranChildA2", "MyRenamedGranChildA2");
+    variable.GetChild("MyChildB").RenameChild("MyGranChildB1", "MyRenamedGranChildB1");
+    variable.GetChild("MyChildB").RenameChild("MyGranChildB2", "MyRenamedGranChildB2");
+    variable.RenameChild("MyChildA", "MyRenamedChildA");
+    variable.RenameChild("MyChildB", "MyRenamedChildB");
+    scene.GetVariables().Rename("MyVariable", "MyRenamedVariable");
+    auto changeset =
+        gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
+            originalSerializedVariables, scene.GetVariables());
+
+    REQUIRE(changeset.modifiedVariables.find("MyVariable") !=
+            changeset.modifiedVariables.end());
+    REQUIRE(changeset.modifiedVariables.find("MyVariable")
+            ->second->oldToNewVariableNames.size() == 2);
+    REQUIRE(changeset.modifiedVariables.find("MyVariable")
+            ->second->modifiedVariables.size() == 2);
+
+    gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
+        project, scene.GetVariables(), changeset, originalSerializedVariables);
+
+    REQUIRE(sceneEvent.GetActions()[0].GetParameter(0).GetPlainString() ==
+            "MyRenamedVariable.MyRenamedChildA.MyRenamedGranChildA1 + "
+            "MyRenamedVariable.MyRenamedChildA.MyRenamedGranChildA2 + "
+            "MyRenamedVariable.MyRenamedChildB.MyRenamedGranChildB1 + "
+            "MyRenamedVariable.MyRenamedChildB.MyRenamedGranChildB2");
+  }
+
   SECTION("Can rename a global variable without replacing occurrences of scene variables") {
     gd::Project project;
     gd::Platform platform;

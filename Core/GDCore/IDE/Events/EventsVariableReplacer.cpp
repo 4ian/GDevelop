@@ -112,10 +112,11 @@ class GD_CORE_API ExpressionVariableReplacer
             // The node represents a variable, that can come from the target
             // (because the target is in the scope), replace or remove it:
             PushVariablesRenamingChangesetRoot();
+           const gd::String oldVariableName = node.name;
             RenameOrRemoveVariableOfTargetVariableContainer(node.name);
             if (node.child) {
               bool hasBeenPushed =
-                  PushVariablesRenamingChangesetNodeForVariable(node.name);
+                  PushVariablesRenamingChangesetNodeForVariable(oldVariableName);
               node.child->Visit(*this);
               PopVariablesRenamingChangesetNode(hasBeenPushed);
             }
@@ -152,10 +153,11 @@ class GD_CORE_API ExpressionVariableReplacer
         // The node represents an object variable, and this object variables are
         // the target. Do the replacement or removals:
         PushVariablesRenamingChangesetRoot();
+        const gd::String oldVariableName = node.name;
         RenameOrRemoveVariableOfTargetVariableContainer(node.name);
         if (node.child) {
           bool hasBeenPushed =
-              PushVariablesRenamingChangesetNodeForVariable(node.name);
+              PushVariablesRenamingChangesetNodeForVariable(oldVariableName);
           node.child->Visit(*this);
           PopVariablesRenamingChangesetNode(hasBeenPushed);
         }
@@ -163,10 +165,11 @@ class GD_CORE_API ExpressionVariableReplacer
       }
       objectNameToUseForVariableAccessor = "";
     } else {
+      const gd::String oldVariableName = node.name;
       RenameOrRemoveVariableOfTargetVariableContainer(node.name);
       if (node.child) {
         bool hasBeenPushed =
-            PushVariablesRenamingChangesetNodeForVariable(node.name);
+            PushVariablesRenamingChangesetNodeForVariable(oldVariableName);
         node.child->Visit(*this);
         PopVariablesRenamingChangesetNode(hasBeenPushed);
       }
@@ -227,12 +230,13 @@ class GD_CORE_API ExpressionVariableReplacer
             // (because the target is in the scope), replace or remove it:
 
             PushVariablesRenamingChangesetRoot();
+            const gd::String oldVariableName = node.identifierName;
             RenameOrRemoveVariableOfTargetVariableContainer(
                 node.identifierName);
             if (!node.childIdentifierName.empty()) {
               bool hasBeenPushed =
                   PushVariablesRenamingChangesetNodeForVariable(
-                      node.identifierName);
+                      oldVariableName);
               RenameOrRemoveVariableOfTargetVariableContainer(
                   node.childIdentifierName);
               PopVariablesRenamingChangesetNode(hasBeenPushed);

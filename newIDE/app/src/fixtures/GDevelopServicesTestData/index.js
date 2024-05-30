@@ -2363,6 +2363,11 @@ export const limitsForNoSubscriptionUser: Limits = {
       canUseCustomCss: false,
       canDisableLoginInLeaderboard: false,
     },
+    multiplayer: {
+      lobbiesCount: 1,
+      maxPlayersPerLobby: 4,
+      themeCustomizationCapabilities: 'NONE',
+    },
   },
   quotas: {
     'cordova-build': {
@@ -2407,6 +2412,11 @@ export const limitsForSilverUser: Limits = {
       canUseCustomCss: false,
       canDisableLoginInLeaderboard: false,
     },
+    multiplayer: {
+      lobbiesCount: -1,
+      maxPlayersPerLobby: 8,
+      themeCustomizationCapabilities: 'BASIC',
+    },
   },
   quotas: {
     'cordova-build': {
@@ -2450,6 +2460,11 @@ export const limitsForGoldUser: Limits = {
       themeCustomizationCapabilities: 'FULL',
       canUseCustomCss: false,
       canDisableLoginInLeaderboard: false,
+    },
+    multiplayer: {
+      lobbiesCount: -1,
+      maxPlayersPerLobby: 8,
+      themeCustomizationCapabilities: 'BASIC',
     },
   },
   quotas: {
@@ -2503,6 +2518,11 @@ export const limitsForTeacherUser: Limits = {
       hideUpgradeNotice: false,
       showClassroomTab: true,
     },
+    multiplayer: {
+      lobbiesCount: -1,
+      maxPlayersPerLobby: 8,
+      themeCustomizationCapabilities: 'BASIC',
+    },
   },
   quotas: {
     'cordova-build': {
@@ -2552,6 +2572,11 @@ export const limitsForStudentUser: Limits = {
       hideUpgradeNotice: true,
       showClassroomTab: false,
     },
+    multiplayer: {
+      lobbiesCount: -1,
+      maxPlayersPerLobby: 8,
+      themeCustomizationCapabilities: 'BASIC',
+    },
   },
   quotas: {
     'cordova-build': {
@@ -2596,49 +2621,10 @@ export const limitsForStartupUser: Limits = {
       canUseCustomCss: true,
       canDisableLoginInLeaderboard: true,
     },
-  },
-  quotas: {
-    'cordova-build': {
-      current: 2,
-      max: 1000,
-      limitReached: false,
-    },
-    'ai-project-generation': {
-      current: 3,
-      max: 1000,
-      limitReached: false,
-    },
-  },
-  credits: {
-    userBalance: {
-      amount: 0,
-    },
-    prices,
-    purchasableQuantities: {},
-  },
-  message: undefined,
-};
-
-export const limitsForBusinessUser: Limits = {
-  capabilities: {
-    analytics: {
-      sessions: true,
-      players: true,
-      retention: true,
-      sessionsTimeStats: true,
-      platforms: true,
-    },
-    cloudProjects: {
-      maximumCount: 500,
-      canMaximumCountBeIncreased: false,
-      maximumGuestCollaboratorsPerProject: 1,
-    },
-    leaderboards: {
-      maximumCountPerGame: -1,
-      canMaximumCountPerGameBeIncreased: false,
+    multiplayer: {
+      lobbiesCount: -1,
+      maxPlayersPerLobby: 8,
       themeCustomizationCapabilities: 'FULL',
-      canUseCustomCss: true,
-      canDisableLoginInLeaderboard: true,
     },
   },
   quotas: {
@@ -2684,6 +2670,11 @@ export const limitsReached: Limits = {
       canUseCustomCss: false,
       canDisableLoginInLeaderboard: false,
     },
+    multiplayer: {
+      lobbiesCount: -1,
+      maxPlayersPerLobby: 8,
+      themeCustomizationCapabilities: 'BASIC',
+    },
   },
   quotas: {
     'cordova-build': {
@@ -2727,6 +2718,11 @@ export const limitsForNoSubscriptionUserWithCredits: Limits = {
       themeCustomizationCapabilities: 'NONE',
       canUseCustomCss: false,
       canDisableLoginInLeaderboard: false,
+    },
+    multiplayer: {
+      lobbiesCount: 1,
+      maxPlayersPerLobby: 4,
+      themeCustomizationCapabilities: 'NONE',
     },
   },
   quotas: {

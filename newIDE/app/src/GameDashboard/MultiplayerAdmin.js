@@ -1,7 +1,7 @@
 // @flow
 
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import { ColumnStackLayout } from '../UI/Layout';
 import {
   getLobbyConfiguration,
@@ -10,7 +10,6 @@ import {
 } from '../Utils/GDevelopServices/Play';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
-import TextField from '../UI/TextField';
 import Text from '../UI/Text';
 import { Line } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
@@ -21,8 +20,10 @@ import AlertMessage from '../UI/AlertMessage';
 import Link from '../UI/Link';
 import { getHelpLink } from '../Utils/HelpLink';
 import Window from '../Utils/Window';
+import SelectField from '../UI/SelectField';
+import SelectOption from '../UI/SelectOption';
 
-const maximumNumberOfPlayers = 8;
+const defaultMaximumNumberOfPlayers = 4;
 const minimumNumberOfPlayers = 2;
 
 type Props = {|
@@ -33,23 +34,63 @@ const MultiplayerAdmin = ({ gameId }: Props) => {
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const [fetchingError, setFetchingError] = React.useState<React.Node>(null);
   const [isSaving, setIsSaving] = React.useState<boolean>(false);
-  const [maxPlayersValue, setMaxPlayersValue] = React.useState<number | ''>(2);
-  const { getAuthorizationHeader, profile } = React.useContext(
-    AuthenticatedUserContext
-  );
+  const [maxPlayersValue, setMaxPlayersValue] = React.useState<number>(2);
+  const {
+    getAuthorizationHeader,
+    profile,
+    limits,
+    subscription,
+  } = React.useContext(AuthenticatedUserContext);
   const [
     lobbyConfiguration,
     setLobbyConfiguration,
   ] = React.useState<?LobbyConfiguration>(null);
   const [infoBarMessage, setInfoBarMessage] = React.useState<React.Node>(null);
   const userId = profile ? profile.id : null;
+  const maximumNumberOfPlayers = limits
+    ? limits.capabilities.multiplayer.maxPlayersPerLobby
+    : defaultMaximumNumberOfPlayers;
+  const isUserOnFreePlan = !subscription || !subscription.planId;
 
   React.useEffect(
     () => {
-      if (!lobbyConfiguration) return;
-      setMaxPlayersValue(lobbyConfiguration.maxPlayers);
+      if (lobbyConfiguration) {
+        setMaxPlayersValue(lobbyConfiguration.maxPlayers);
+        return;
+      }
+      if (limits) {
+        setMaxPlayersValue(limits.capabilities.multiplayer.maxPlayersPerLobby);
+        return;
+      }
     },
-    [lobbyConfiguration]
+    [lobbyConfiguration, limits]
+  );
+
+  const maxPlayersSelectOptions = React.useMemo(
+    () => {
+      const options = new Array(maximumNumberOfPlayers - 1)
+        .fill(0)
+        .map((_, index) => (
+          <SelectOption
+            value={index + 2}
+            label={(index + 2).toString()}
+            shouldNotTranslate
+          />
+        ));
+      if (isUserOnFreePlan) {
+        options.push(
+          <SelectOption
+            value={maximumNumberOfPlayers + 1}
+            label={t`${(
+              maximumNumberOfPlayers + 1
+            ).toString()}+ (Available with a subscription)`}
+            disabled
+          />
+        );
+      }
+      return options;
+    },
+    [maximumNumberOfPlayers, isUserOnFreePlan]
   );
 
   const fetchGameConfiguration = React.useCallback(
@@ -156,17 +197,9 @@ const MultiplayerAdmin = ({ gameId }: Props) => {
           <Trans>Lobby configuration</Trans>
         </Text>
         <Line noMargin>
-          <TextField
-            type="number"
-            min={minimumNumberOfPlayers}
-            max={maximumNumberOfPlayers}
-            fullWidth
-            floatingLabelText={
-              <Trans>Maximum number of players per lobby</Trans>
-            }
+          <SelectField
             value={maxPlayersValue}
-            onChange={(e, newValueAsString) => {
-              if (newValueAsString === '') setMaxPlayersValue('');
+            onChange={(e, i, newValueAsString) => {
               const newValue = parseInt(newValueAsString, 10);
               if (Number.isNaN(newValue)) return;
               setMaxPlayersValue(
@@ -176,13 +209,13 @@ const MultiplayerAdmin = ({ gameId }: Props) => {
                 )
               );
             }}
-            onBlur={e => {
-              const valueAsString = e.currentTarget.value;
-              if (!valueAsString && lobbyConfiguration) {
-                setMaxPlayersValue(lobbyConfiguration.maxPlayers);
-              }
-            }}
-          />
+            fullWidth
+            floatingLabelText={
+              <Trans>Maximum number of players per lobby</Trans>
+            }
+          >
+            {maxPlayersSelectOptions}
+          </SelectField>
         </Line>
         <Line noMargin justifyContent="flex-end">
           <LeftLoader isLoading={isSaving}>

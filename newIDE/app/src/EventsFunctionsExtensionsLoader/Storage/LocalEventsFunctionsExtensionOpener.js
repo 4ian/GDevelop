@@ -1,25 +1,8 @@
 // @flow
+import { readJSONFile } from '../../Utils/FileSystem';
 import optionalRequire from '../../Utils/OptionalRequire';
-const fs = optionalRequire('fs');
 const remote = optionalRequire('@electron/remote');
 const dialog = remote ? remote.dialog : null;
-
-const readJSONFile = (filepath: string): Promise<Object> => {
-  if (!fs) return Promise.reject('Filesystem is not supported.');
-
-  return new Promise((resolve, reject) => {
-    fs.readFile(filepath, { encoding: 'utf8' }, (err, data) => {
-      if (err) return reject(err);
-
-      try {
-        const dataObject = JSON.parse(data);
-        return resolve(dataObject);
-      } catch (ex) {
-        return reject(filepath + ' is a corrupted/malformed file.');
-      }
-    });
-  });
-};
 
 export default class LocalEventsFunctionsExtensionOpener {
   static chooseEventsFunctionExtensionFile = (): Promise<?string> => {

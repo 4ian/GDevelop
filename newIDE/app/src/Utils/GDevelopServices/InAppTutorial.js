@@ -6,8 +6,7 @@ import optionalRequire from '../OptionalRequire';
 import { type MessageDescriptor } from '../i18n/MessageDescriptor.flow';
 import { type MessageByLocale } from '../i18n/MessageByLocale';
 import Window from '../Window';
-const fs = optionalRequire('fs');
-const fsPromises = fs ? fs.promises : null;
+import { readJSONFile } from '../FileSystem';
 const path = optionalRequire('path');
 const remote = optionalRequire('@electron/remote');
 const app = remote ? remote.app : null;
@@ -140,18 +139,6 @@ export type InAppTutorial = {|
   availableLocales?: Array<string>,
 |};
 
-const readJSONFile = async (filepath: string): Promise<Object> => {
-  if (!fsPromises) throw new Error('Filesystem is not supported.');
-
-  try {
-    const data = await fsPromises.readFile(filepath, { encoding: 'utf8' });
-    const dataObject = JSON.parse(data);
-    return dataObject;
-  } catch (ex) {
-    throw new Error(filepath + ' is a corrupted/malformed file.');
-  }
-};
-
 const fetchLocalFileIfDesktop = async (filename: string): Promise<?Object> => {
   const shouldRetrieveTutorialsLocally = !!remote && !Window.isDev();
   if (!shouldRetrieveTutorialsLocally) return null;
@@ -163,7 +150,8 @@ const fetchLocalFileIfDesktop = async (filename: string): Promise<?Object> => {
   const filePath = path.join(
     appPath,
     '..', // If on dev env, replace with '../../app/resources' to test.
-    `inAppTutorials/${filename}.json`
+    'inAppTutorials',
+    `${filename}.json`
   );
   const data = await readJSONFile(filePath);
   return data;

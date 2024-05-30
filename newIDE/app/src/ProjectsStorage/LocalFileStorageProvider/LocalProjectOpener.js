@@ -2,27 +2,11 @@
 import optionalRequire from '../../Utils/OptionalRequire';
 import { type FileMetadata } from '../index';
 import { unsplit } from '../../Utils/ObjectSplitter';
+import { readJSONFile } from '../../Utils/FileSystem';
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
 const remote = optionalRequire('@electron/remote');
 const dialog = remote ? remote.dialog : null;
-
-const readJSONFile = (filepath: string): Promise<Object> => {
-  if (!fs) return Promise.reject('Filesystem is not supported.');
-
-  return new Promise((resolve, reject) => {
-    fs.readFile(filepath, { encoding: 'utf8' }, (err, data) => {
-      if (err) return reject(err);
-
-      try {
-        const dataObject = JSON.parse(data);
-        return resolve(dataObject);
-      } catch (ex) {
-        return reject(filepath + ' is a corrupted/malformed file.');
-      }
-    });
-  });
-};
 
 export const onOpenWithPicker = (): Promise<?FileMetadata> => {
   if (!dialog) return Promise.reject('Not supported');

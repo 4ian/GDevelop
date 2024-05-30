@@ -1023,9 +1023,9 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
       // This expression looks similar to `MyVariable.MyChild.MyGranChild`
       // The visitor could take `MyGranChild` as the child if it doesn't reset
       // its context correctly.
-      action.SetParameter(0, gd::Expression("MyVariable.MyChild + MyGranChild"));
+      action.SetParameter(0, gd::Expression("MyVariable"));
       action.SetParameter(1, gd::Expression("="));
-      action.SetParameter(2, gd::Expression("123"));
+      action.SetParameter(2, gd::Expression("MyVariable.MyChild + MyGranChild"));
       sceneEvent.GetActions().Insert(action);
     }
 
@@ -1046,7 +1046,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
         project, scene.GetVariables(), changeset, originalSerializedVariables);
 
     // No change
-    REQUIRE(sceneEvent.GetActions()[0].GetParameter(0).GetPlainString() ==
+    REQUIRE(sceneEvent.GetActions()[0].GetParameter(2).GetPlainString() ==
             "MyVariable.MyChild + MyGranChild");
   }
 
@@ -1069,12 +1069,12 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
       action.SetType("SetNumberVariable");
       action.SetParametersCount(3);
       action.SetParameter(0,
-                          gd::Expression("MyVariable.MyChildA.MyGranChildA1 + "
+                          gd::Expression("MyVariable"));
+      action.SetParameter(1, gd::Expression("="));
+      action.SetParameter(2, gd::Expression("MyVariable.MyChildA.MyGranChildA1 + "
                                          "MyVariable.MyChildA.MyGranChildA2 + "
                                          "MyVariable.MyChildB.MyGranChildB1 + "
                                          "MyVariable.MyChildB.MyGranChildB2"));
-      action.SetParameter(1, gd::Expression("="));
-      action.SetParameter(2, gd::Expression("123"));
       sceneEvent.GetActions().Insert(action);
     }
 
@@ -1104,7 +1104,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
         project, scene.GetVariables(), changeset, originalSerializedVariables);
 
-    REQUIRE(sceneEvent.GetActions()[0].GetParameter(0).GetPlainString() ==
+    REQUIRE(sceneEvent.GetActions()[0].GetParameter(2).GetPlainString() ==
             "MyRenamedVariable.MyRenamedChildA.MyRenamedGranChildA1 + "
             "MyRenamedVariable.MyRenamedChildA.MyRenamedGranChildA2 + "
             "MyRenamedVariable.MyRenamedChildB.MyRenamedGranChildB1 + "

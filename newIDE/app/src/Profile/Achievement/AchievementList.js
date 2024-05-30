@@ -14,6 +14,7 @@ import {
   type AchievementWithBadgeData,
 } from '../../Utils/GDevelopServices/Badge';
 import ScrollView from '../../UI/ScrollView';
+import { selectMessageByLocale } from '../../Utils/i18n/MessageByLocale';
 
 type Props = {|
   badges: Array<BadgeType>,
@@ -102,7 +103,10 @@ const AchievementList = ({
                           : styles.lockedAchievement
                       }
                     >
-                      {achievementWithBadgeData.name}
+                      {selectMessageByLocale(
+                        i18n,
+                        achievementWithBadgeData.nameByLocale
+                      )}
                     </Text>
                   </DotBadge>
                   {displayUnclaimedAchievements && (
@@ -115,7 +119,10 @@ const AchievementList = ({
                       }
                       size="body2"
                     >
-                      {achievementWithBadgeData.description}
+                      {selectMessageByLocale(
+                        i18n,
+                        achievementWithBadgeData.descriptionByLocale
+                      )}
                     </Text>
                   )}
                 </Column>

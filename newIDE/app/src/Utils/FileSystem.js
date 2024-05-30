@@ -18,7 +18,10 @@ export const readJSONFile = async (filepath: string): Promise<Object> => {
 };
 
 export const openFilePicker = ({
-  title, properties, message, filters
+  title,
+  properties,
+  message,
+  filters,
 }: {|
   title: string,
   properties: string[],

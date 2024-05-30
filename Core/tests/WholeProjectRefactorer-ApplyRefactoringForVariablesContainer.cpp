@@ -910,6 +910,56 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
             "MyVariable.MyRenamedChild");
   }
 
+  SECTION("Can rename an object child variable") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &scene = project.InsertNewLayout("Scene", 0);
+    auto &object =
+        scene.InsertNewObject(project, "MyExtension::Sprite", "Object", 0);
+    object.GetVariables()
+        .InsertNew("MyVariable")
+        .GetChild("MyChild")
+        .SetValue(123);
+
+    gd::StandardEvent &event =
+        dynamic_cast<gd::StandardEvent &>(scene.GetEvents().InsertNewEvent(
+            project, "BuiltinCommonInstructions::Standard"));
+
+    {
+      gd::Instruction action;
+      action.SetType("SetNumberObjectVariable");
+      action.SetParametersCount(4);
+      action.SetParameter(0, gd::Expression("Object"));
+      action.SetParameter(1, gd::Expression("MyVariable.MyChild"));
+      action.SetParameter(2, gd::Expression("="));
+      action.SetParameter(3, gd::Expression("Object.MyVariable.MyChild"));
+      event.GetActions().Insert(action);
+    }
+
+    // Do the changes and launch the refactoring.
+    object.GetVariables().ResetPersistentUuid();
+    gd::SerializerElement originalSerializedVariables;
+    object.GetVariables().SerializeTo(originalSerializedVariables);
+
+    object.GetVariables().Get("MyVariable")
+        .RenameChild("MyChild", "MyRenamedChild");
+    auto changeset =
+        gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
+            originalSerializedVariables, object.GetVariables());
+
+    REQUIRE(changeset.modifiedVariables.size() == 1);
+
+    gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
+        project, object.GetVariables(), changeset, originalSerializedVariables);
+
+    REQUIRE(event.GetActions()[0].GetParameter(1).GetPlainString() ==
+            "MyVariable.MyRenamedChild");
+    REQUIRE(event.GetActions()[0].GetParameter(3).GetPlainString() ==
+            "Object.MyVariable.MyRenamedChild");
+  }
+
   SECTION("Can rename a scene child child variable") {
     gd::Project project;
     gd::Platform platform;

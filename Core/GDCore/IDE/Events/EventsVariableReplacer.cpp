@@ -83,13 +83,21 @@ class GD_CORE_API ExpressionVariableReplacer
     // will be accessed.
 
     if (forcedInitialVariablesContainer) {
+      const gd::String oldVariableName = node.name;
+      PushVariablesRenamingChangesetRoot();
       // A scope was forced. Honor it: it means this node represents a variable
       // of the forced variables container.
       if (forcedInitialVariablesContainer == &targetVariablesContainer) {
         RenameOrRemoveVariableOfTargetVariableContainer(node.name);
       }
 
-      if (node.child) node.child->Visit(*this);
+      if (node.child) {
+        bool hasBeenPushed =
+            PushVariablesRenamingChangesetNodeForVariable(oldVariableName);
+        node.child->Visit(*this);
+        PopVariablesRenamingChangesetNode(hasBeenPushed);
+      }
+      PopVariablesRenamingChangesetNode(true);
       return;
     }
 
@@ -150,6 +158,7 @@ class GD_CORE_API ExpressionVariableReplacer
       // objectNameToUseForVariableAccessor.
       if (objectsContainersList.HasObjectOrGroupVariablesContainer(
               objectNameToUseForVariableAccessor, targetVariablesContainer)) {
+        objectNameToUseForVariableAccessor = "";
         // The node represents an object variable, and this object variables are
         // the target. Do the replacement or removals:
         PushVariablesRenamingChangesetRoot();
@@ -163,7 +172,6 @@ class GD_CORE_API ExpressionVariableReplacer
         }
         PopVariablesRenamingChangesetNode(true);
       }
-      objectNameToUseForVariableAccessor = "";
     } else {
       const gd::String oldVariableName = node.name;
       RenameOrRemoveVariableOfTargetVariableContainer(node.name);
@@ -200,7 +208,17 @@ class GD_CORE_API ExpressionVariableReplacer
       // A scope was forced. Honor it: it means this node represents a variable
       // of the forced variables container.
       if (forcedInitialVariablesContainer == &targetVariablesContainer) {
+        PushVariablesRenamingChangesetRoot();
+        const gd::String oldVariableName = node.identifierName;
         RenameOrRemoveVariableOfTargetVariableContainer(node.identifierName);
+        if (!node.childIdentifierName.empty()) {
+          bool hasBeenPushed =
+              PushVariablesRenamingChangesetNodeForVariable(oldVariableName);
+          RenameOrRemoveVariableOfTargetVariableContainer(
+              node.childIdentifierName);
+          PopVariablesRenamingChangesetNode(hasBeenPushed);
+        }
+        PopVariablesRenamingChangesetNode(true);
       }
       return;
     }

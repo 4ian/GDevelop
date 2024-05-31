@@ -251,7 +251,8 @@ namespace gdjs {
         return;
       }
       window.localStorage.removeItem(getLocalStorageKey(gameId));
-      cleanUpAuthWindowAndCallbacks(runtimeScene);
+      cleanUpAuthWindowAndTimeouts(runtimeScene);
+      cleanUpLoginCallbacks();
       removeAuthenticationBanner(runtimeScene);
       const domElementContainer = runtimeScene
         .getGame()
@@ -301,9 +302,9 @@ namespace gdjs {
 
     /**
      * Helper to be called on login or error.
-     * Removes all the UI and callbacks.
+     * Removes all the UI and timeouts.
      */
-    const cleanUpAuthWindowAndCallbacks = (runtimeScene: RuntimeScene) => {
+    const cleanUpAuthWindowAndTimeouts = (runtimeScene: RuntimeScene) => {
       removeAuthenticationContainer(runtimeScene);
       clearAuthenticationWindowTimeout();
 
@@ -323,7 +324,9 @@ namespace gdjs {
         _authenticationInAppWindow.close();
         _authenticationInAppWindow = null;
       }
-      // If there were any callbacks, remove them.
+    };
+
+    const cleanUpLoginCallbacks = () => {
       _loginCallbacks = [];
     };
 
@@ -378,9 +381,11 @@ namespace gdjs {
       userToken: string;
     }) => {
       saveAuthKeyToStorage({ userId, username, userToken });
-      _loginCallbacks.forEach((callback) => callback());
-      cleanUpAuthWindowAndCallbacks(runtimeScene);
+      cleanUpAuthWindowAndTimeouts(runtimeScene);
       removeAuthenticationBanner(runtimeScene);
+      _loginCallbacks.forEach((callback) => callback());
+      // Clear the login callbacks after they have been called.
+      cleanUpLoginCallbacks();
 
       const domElementContainer = runtimeScene
         .getGame()
@@ -468,7 +473,8 @@ namespace gdjs {
       message: string
     ) {
       logger.error(message);
-      cleanUpAuthWindowAndCallbacks(runtimeScene);
+      cleanUpAuthWindowAndTimeouts(runtimeScene);
+      cleanUpLoginCallbacks();
 
       const domElementContainer = runtimeScene
         .getGame()
@@ -498,7 +504,8 @@ namespace gdjs {
         logger.info(
           'Authentication window did not send message in time. Closing it.'
         );
-        cleanUpAuthWindowAndCallbacks(runtimeScene);
+        cleanUpAuthWindowAndTimeouts(runtimeScene);
+        cleanUpLoginCallbacks();
         focusOnGame(runtimeScene);
       }, time);
     };
@@ -945,12 +952,11 @@ namespace gdjs {
 
           let isDimissedAlready = false;
           const onAuthenticationContainerDismissed = () => {
-            cleanUpAuthWindowAndCallbacks(runtimeScene);
+            cleanUpAuthWindowAndTimeouts(runtimeScene);
+            cleanUpLoginCallbacks();
             displayAuthenticationBanner(runtimeScene);
 
             isDimissedAlready = true;
-            // Clear login callbacks, as they are either already called if logged in, or not called if the window is closed.
-            _loginCallbacks = [];
             resolve({ status: 'dismissed' });
           };
 

@@ -885,15 +885,6 @@ export default class SceneEditor extends React.Component<Props, State> {
     objectsWithContext: ObjectWithContext[],
     done: boolean => void
   ) => {
-    const message =
-      objectsWithContext.length === 1
-        ? t`Do you want to remove all references to this object in groups and events (actions and conditions using the object)?`
-        : t`Do you want to remove all references to these objects in groups and events (actions and conditions using the objects)?`;
-
-    const answer = Window.showYesNoCancelDialog(i18n._(message));
-
-    if (answer === 'cancel') return;
-    const shouldRemoveReferences = answer === 'yes';
     const { project, layout } = this.props;
 
     objectsWithContext.forEach(objectWithContext => {
@@ -905,19 +896,15 @@ export default class SceneEditor extends React.Component<Props, State> {
       this.instancesSelection.unselectInstancesOfObject(object.getName());
 
       if (global) {
-        gd.WholeProjectRefactorer.globalObjectOrGroupRemoved(
+        gd.WholeProjectRefactorer.globalObjectRemoved(
           project,
-          object.getName(),
-          /* isObjectGroup=*/ false,
-          shouldRemoveReferences
+          object.getName()
         );
       } else {
-        gd.WholeProjectRefactorer.objectOrGroupRemovedInLayout(
+        gd.WholeProjectRefactorer.objectRemovedInLayout(
           project,
           layout,
-          object.getName(),
-          /* isObjectGroup=*/ false,
-          shouldRemoveReferences
+          object.getName()
         );
       }
     });
@@ -1100,30 +1087,6 @@ export default class SceneEditor extends React.Component<Props, State> {
     groupWithContext: GroupWithContext,
     done: boolean => void
   ) => {
-    const { group, global } = groupWithContext;
-    const { project, layout } = this.props;
-
-    const answer = Window.showConfirmDialog(
-      'Do you want to remove all references to this group in events (actions and conditions using the group)?'
-    );
-
-    if (global) {
-      gd.WholeProjectRefactorer.globalObjectOrGroupRemoved(
-        project,
-        group.getName(),
-        /* isObjectGroup=*/ true,
-        !!answer
-      );
-    } else {
-      gd.WholeProjectRefactorer.objectOrGroupRemovedInLayout(
-        project,
-        layout,
-        group.getName(),
-        /* isObjectGroup=*/ true,
-        !!answer
-      );
-    }
-
     done(true);
   };
 

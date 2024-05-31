@@ -1214,10 +1214,10 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       layout1.InsertNewObject(project, "MyExtension::Sprite", "Object1", 0);
       layout1.InsertNewObject(project, "MyExtension::Sprite", "Object2", 0);
 
-      gd::WholeProjectRefactorer::ObjectOrGroupRemovedInLayout(
-          project, layout1, "Object1", /* isObjectGroup =*/false);
-      gd::WholeProjectRefactorer::GlobalObjectOrGroupRemoved(
-          project, "GlobalObject1", /* isObjectGroup =*/false);
+      gd::WholeProjectRefactorer::ObjectRemovedInLayout(
+          project, layout1, "Object1");
+      gd::WholeProjectRefactorer::GlobalObjectRemoved(
+          project, "GlobalObject1");
       REQUIRE(layout1.GetObjectGroups()[0].Find("Object1") == false);
       REQUIRE(layout1.GetObjectGroups()[0].Find("Object2") == true);
       REQUIRE(layout1.GetObjectGroups()[0].Find("NotExistingObject") == true);
@@ -1243,10 +1243,10 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       layout1.GetInitialInstances().InsertInitialInstance(instance2);
       layout1.GetInitialInstances().InsertInitialInstance(instance3);
 
-      gd::WholeProjectRefactorer::ObjectOrGroupRemovedInLayout(
-          project, layout1, "Object1", /* isObjectGroup =*/false);
-      gd::WholeProjectRefactorer::GlobalObjectOrGroupRemoved(
-          project, "GlobalObject1", /* isObjectGroup =*/false);
+      gd::WholeProjectRefactorer::ObjectRemovedInLayout(
+          project, layout1, "Object1");
+      gd::WholeProjectRefactorer::GlobalObjectRemoved(
+          project, "GlobalObject1");
       REQUIRE(layout1.GetInitialInstances().HasInstancesOfObject("Object1") ==
               false);
       REQUIRE(layout1.GetInitialInstances().HasInstancesOfObject("Object2") ==
@@ -1285,10 +1285,10 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       externalLayout2.GetInitialInstances().InsertInitialInstance(instance2);
       externalLayout2.GetInitialInstances().InsertInitialInstance(instance3);
 
-      gd::WholeProjectRefactorer::ObjectOrGroupRemovedInLayout(
-          project, layout1, "Object1", /* isObjectGroup =*/false);
-      gd::WholeProjectRefactorer::GlobalObjectOrGroupRemoved(
-          project, "GlobalObject1", /* isObjectGroup =*/false);
+      gd::WholeProjectRefactorer::ObjectRemovedInLayout(
+          project, layout1, "Object1");
+      gd::WholeProjectRefactorer::GlobalObjectRemoved(
+          project, "GlobalObject1");
       REQUIRE(externalLayout1.GetInitialInstances().HasInstancesOfObject(
                   "Object1") == false);
       REQUIRE(externalLayout1.GetInitialInstances().HasInstancesOfObject(
@@ -1301,29 +1301,6 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                   "Object2") == true);
       REQUIRE(externalLayout2.GetInitialInstances().HasInstancesOfObject(
                   "GlobalObject1") == false);
-    }
-
-    SECTION("Events") {
-      gd::Project project;
-      gd::Platform platform;
-      SetupProjectWithDummyPlatform(project, platform);
-      auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
-
-      auto &layout = project.GetLayout("Scene");
-
-      // Trigger the refactoring after removing an object
-      gd::WholeProjectRefactorer::ObjectOrGroupRemovedInLayout(
-          project, layout, "ObjectWithMyBehavior", /* isObjectGroup=*/false);
-
-      for (auto *eventsList : GetEventsListsAssociatedToScene(project)) {
-      // Check actions with the object in parameters have been removed.
-      REQUIRE(
-          AreActionsEmpty(eventsList->GetEvent(FreeFunctionWithObjects)));
-
-      // Check actions with the object in expressions have been removed.
-      REQUIRE(AreActionsEmpty(
-          eventsList->GetEvent(FreeFunctionWithObjectExpression)));
-      }
     }
   }
 
@@ -1467,30 +1444,6 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
         REQUIRE(GetEventFirstActionFirstParameterString(
                     eventsList->GetEvent(FreeFunctionWithObjectExpression)) ==
                 "RenamedObjectWithMyBehavior.GetObjectNumber() + RenamedObjectWithMyBehavior.MyVariable + RenamedObjectWithMyBehavior.MyStructureVariable.Child");
-      }
-    }
-  }
-
-  SECTION("Group deleted (in layout)") {
-    SECTION("Events") {
-      gd::Project project;
-      gd::Platform platform;
-      SetupProjectWithDummyPlatform(project, platform);
-      auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
-
-      auto &layout = project.GetLayout("Scene");
-
-      // Trigger the refactoring after removing a group
-      gd::WholeProjectRefactorer::ObjectOrGroupRemovedInLayout(
-          project, layout, "GroupWithMyBehavior", /* isObjectGroup=*/true);
-
-      for (auto *eventsList : GetEventsListsAssociatedToScene(project)) {
-        // Check actions with the group in parameters have been removed.
-        REQUIRE(AreActionsEmpty(eventsList->GetEvent(FreeFunctionWithGroup)));
-
-        // Check actions with the group in expressions have been removed.
-        REQUIRE(AreActionsEmpty(
-            eventsList->GetEvent(FreeFunctionWithObjectExpressionOnGroup)));
       }
     }
   }
@@ -1664,10 +1617,9 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     // test)
 
     // Trigger the refactoring after the renaming of an object
-    gd::WholeProjectRefactorer::ObjectOrGroupRemovedInEventsFunction(
+    gd::WholeProjectRefactorer::ObjectRemovedInEventsFunction(
         project, eventsFunction, globalObjectsContainer, objectsContainer,
-        "Object1",
-        /* isObjectGroup=*/false);
+        "Object1");
 
     REQUIRE(objectGroup.Find("Object1") == false);
     REQUIRE(objectGroup.Find("Object2") == true);

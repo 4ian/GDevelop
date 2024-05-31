@@ -67,8 +67,8 @@ struct VariablesChangeset : VariablesRenamingChangesetNode {
  * \brief Tool functions to do refactoring on the whole project after
  * changes like deletion or renaming of an object.
  *
- * \TODO Ideally ObjectOrGroupRenamedInLayout, ObjectOrGroupRemovedInLayout,
- * GlobalObjectOrGroupRenamed, GlobalObjectOrGroupRemoved would be implemented
+ * \TODO Ideally ObjectOrGroupRenamedInLayout, ObjectRemovedInLayout,
+ * GlobalObjectOrGroupRenamed, GlobalObjectRemoved would be implemented
  * using ExposeProjectEvents.
  */
 class GD_CORE_API WholeProjectRefactorer {
@@ -391,11 +391,9 @@ class GD_CORE_API WholeProjectRefactorer {
    * This will update the layout, all external layouts associated with it
    * and all external events associated with it.
    */
-  static void ObjectOrGroupRemovedInLayout(gd::Project& project,
+  static void ObjectRemovedInLayout(gd::Project& project,
                                            gd::Layout& layout,
-                                           const gd::String& objectName,
-                                           bool isObjectGroup,
-                                           bool removeEventsAndGroups = true);
+                                           const gd::String& objectName);
 
   /**
    * \brief Refactor the project after an object is removed in an events-based
@@ -403,14 +401,12 @@ class GD_CORE_API WholeProjectRefactorer {
    *
    * This will update the events of the function and groups.
    */
-  static void ObjectOrGroupRemovedInEventsBasedObject(
+  static void ObjectRemovedInEventsBasedObject(
       gd::Project& project,
       gd::EventsBasedObject& eventsBasedObject,
       gd::ObjectsContainer& globalObjectsContainer,
       gd::ObjectsContainer& objectsContainer,
-      const gd::String& objectName,
-      bool isObjectGroup,
-      bool removeEventsAndGroups);
+      const gd::String& objectName);
 
   /**
    * \brief Refactor the events function after an object or group is renamed
@@ -444,14 +440,12 @@ class GD_CORE_API WholeProjectRefactorer {
    *
    * This will update the events of the function and groups.
    */
-  static void ObjectOrGroupRemovedInEventsFunction(
+  static void ObjectRemovedInEventsFunction(
       gd::Project& project,
       gd::EventsFunction& eventsFunction,
       gd::ObjectsContainer& globalObjectsContainer,
       gd::ObjectsContainer& objectsContainer,
-      const gd::String& objectName,
-      bool isObjectGroup,
-      bool removeEventsAndGroups = true);
+      const gd::String& objectName);
 
   /**
    * \brief Refactor the project after a global object is renamed.
@@ -470,10 +464,8 @@ class GD_CORE_API WholeProjectRefactorer {
    * This will update all the layouts, all external layouts associated with them
    * and all external events used by the layouts.
    */
-  static void GlobalObjectOrGroupRemoved(gd::Project& project,
-                                         const gd::String& objectName,
-                                         bool isObjectGroup,
-                                         bool removeEventsAndGroups = true);
+  static void GlobalObjectRemoved(gd::Project& project,
+                                         const gd::String& objectName);
 
   /**
    * \brief Return the set of all the types of the objects that are using the

@@ -94,27 +94,6 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
     groupWithContext: GroupWithContext,
     done: boolean => void
   ) => {
-    const { group } = groupWithContext;
-    const {
-      project,
-      eventsFunction,
-      globalObjectsContainer,
-      objectsContainer,
-    } = this.props;
-
-    const answer = Window.showConfirmDialog(
-      'Do you want to remove all references to this group in events (actions and conditions using the group)?'
-    );
-
-    gd.WholeProjectRefactorer.objectOrGroupRemovedInEventsFunction(
-      project,
-      eventsFunction,
-      globalObjectsContainer,
-      objectsContainer,
-      group.getName(),
-      /* isObjectGroup=*/ true,
-      !!answer
-    );
     done(true);
   };
 

@@ -95,7 +95,6 @@ namespace gdjs {
 
     // Send heartbeat messages to host to ensure the connection is still alive.
     const heartbeatTickRate = 1;
-    const timeBeforeHeartbeatTimeoutInMs = 10000; // 10 seconds
     let lastHeartbeatTimestamp = 0;
     let _playersLastHeartbeatInfo: {
       [playerNumber: number]: {
@@ -1545,17 +1544,6 @@ namespace gdjs {
 
             // If we are not the host, save what the host told us about the pings.
             if (!gdjs.multiplayer.isPlayerHost()) {
-              // If one player is missing from the heartbeat, it means they have disconnected.
-              const missingPlayerNumbers = Object.keys(_playersPings).filter(
-                (playerNumber) => data.playersPings[playerNumber] === undefined
-              );
-              for (const missingPlayerNumber of missingPlayerNumbers) {
-                logger.info(
-                  `Player ${missingPlayerNumber} is missing from the heartbeat, assuming they have disconnected.`
-                );
-                delete _playersPings[missingPlayerNumber];
-                markPlayerAsDisconnected(parseInt(missingPlayerNumber, 10));
-              }
               _playersPings = data.playersPings;
               return;
             }
@@ -1636,19 +1624,6 @@ namespace gdjs {
         }
         logger.info(`Player ${disconnectedPlayerNumber} has disconnected.`);
         disconnectedPlayerNumbers.push(disconnectedPlayerNumber);
-      }
-
-      // Check for players who have not sent heartbeats for a while.
-      const now = getTimeNow();
-      for (const playerNumber in _playersLastHeartbeatInfo) {
-        const playerLastHeartbeatInfo = _playersLastHeartbeatInfo[playerNumber];
-        const lastHeartbeatAt = playerLastHeartbeatInfo.lastHeartbeatAt;
-        if (now - lastHeartbeatAt > timeBeforeHeartbeatTimeoutInMs) {
-          logger.info(
-            `Player ${playerNumber} has not sent a heartbeat for a while, assuming they are disconnected.`
-          );
-          disconnectedPlayerNumbers.push(parseInt(playerNumber, 10));
-        }
       }
 
       for (const playerNumber of disconnectedPlayerNumbers) {

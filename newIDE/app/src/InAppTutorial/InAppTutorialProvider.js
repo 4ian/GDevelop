@@ -95,6 +95,7 @@ const InAppTutorialProvider = (props: Props) => {
         message: 'Choose a guided lesson (.json file)',
         filters: [{ name: 'GDevelop 5 in-app tutorial', extensions: ['json'] }],
       });
+      if (!filePath) return;
       const guidedLesson = await readJSONFile(filePath);
       const errors = checkInAppTutorialFileJsonSchema(guidedLesson);
       if (errors.length) {

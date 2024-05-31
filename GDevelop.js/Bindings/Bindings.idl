@@ -2533,6 +2533,8 @@ interface MetadataProvider {
 enum ProjectDiagnostic_ErrorType {
     "ProjectDiagnostic::UndeclaredVariable",
     "ProjectDiagnostic::MissingBehavior",
+    "ProjectDiagnostic::UnknownObject",
+    "ProjectDiagnostic::MismatchedObjectType",
 };
 
 interface ProjectDiagnostic {

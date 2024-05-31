@@ -42,7 +42,10 @@ export default function DiagnosticReportDialog({
 
   const renderDiagnosticReport = React.useCallback(
     (diagnosticReport: gdDiagnosticReport) => {
+      // TODO Generalize error aggregation when enough errors are handled to have a clearer view.
       const missingSceneVariables = new Set<string>();
+      const unknownObjects = new Set<string>();
+      const mismatchedTypeObjects = new Set<string>();
       const missingObjectVariablesByObject = new Map<string, Set<string>>();
       const missingBehaviorsByObjects = new Map<string, Set<string>>();
       mapFor(0, diagnosticReport.count(), index => {
@@ -64,17 +67,33 @@ export default function DiagnosticReportDialog({
             break;
 
           case gd.ProjectDiagnostic.MissingBehavior:
-            addFor(
-              missingBehaviorsByObjects,
-              objectName,
-              projectDiagnostic.getExpectedValue()
-            );
+            const behaviorType = projectDiagnostic.getExpectedValue();
+            const isCapability = gd.MetadataProvider.getBehaviorMetadata(
+              gd.JsPlatform.get(),
+              behaviorType
+            ).isHidden();
+            if (isCapability) {
+              mismatchedTypeObjects.add(objectName);
+            } else {
+              addFor(missingBehaviorsByObjects, objectName, behaviorType);
+            }
+            break;
+
+          case gd.ProjectDiagnostic.UnknownObject:
+            unknownObjects.add(projectDiagnostic.getActualValue());
+            break;
+
+          case gd.ProjectDiagnostic.MismatchedObjectType:
+            mismatchedTypeObjects.add(objectName);
             break;
 
           default:
             break;
         }
       });
+      for (const unknownObjectName of unknownObjects) {
+        mismatchedTypeObjects.delete(unknownObjectName);
+      }
 
       return (
         <ColumnStackLayout noMargin useLargeSpacer>
@@ -86,6 +105,46 @@ export default function DiagnosticReportDialog({
               </TableRow>
             </TableHeader>
             <TableBody>
+              {unknownObjects.size > 0 && (
+                <TableRow
+                  key={`missing-objects`}
+                  style={{
+                    backgroundColor: gdevelopTheme.list.itemsBackgroundColor,
+                  }}
+                >
+                  <TableRowColumn>
+                    <Text size="body">
+                      <Trans>Missing objects</Trans>
+                    </Text>
+                  </TableRowColumn>
+                  <TableRowColumn>
+                    <Text size="body" allowSelection>
+                      {[...unknownObjects].join(', ')}
+                    </Text>
+                  </TableRowColumn>
+                </TableRow>
+              )}
+              {mismatchedTypeObjects.size > 0 && (
+                <TableRow
+                  key={`missing-objects`}
+                  style={{
+                    backgroundColor: gdevelopTheme.list.itemsBackgroundColor,
+                  }}
+                >
+                  <TableRowColumn>
+                    <Text size="body">
+                      <Trans>
+                        Objects used with wrong actions or conditions
+                      </Trans>
+                    </Text>
+                  </TableRowColumn>
+                  <TableRowColumn>
+                    <Text size="body" allowSelection>
+                      {[...mismatchedTypeObjects].join(', ')}
+                    </Text>
+                  </TableRowColumn>
+                </TableRow>
+              )}
               {missingSceneVariables.size > 0 && (
                 <TableRow
                   key={`missing-scene-variables`}

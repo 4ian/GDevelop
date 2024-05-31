@@ -1609,13 +1609,15 @@ const MainFrame = (props: Props) => {
           if (inAppTutorialOrchestratorRef.current) {
             inAppTutorialOrchestratorRef.current.onPreviewLaunch();
           }
-          const wholeProjectDiagnosticReport = currentProject.getWholeProjectDiagnosticReport();
-          if (
-            (forceDiagnosticReport ||
-              preferences.values.openDiagnosticReportAutomatically) &&
-            wholeProjectDiagnosticReport.hasAnyIssue()
-          ) {
-            setDiagnosticReportDialogOpen(true);
+          if (!currentlyRunningInAppTutorial) {
+            const wholeProjectDiagnosticReport = currentProject.getWholeProjectDiagnosticReport();
+            if (
+              (forceDiagnosticReport ||
+                preferences.values.openDiagnosticReportAutomatically) &&
+              wholeProjectDiagnosticReport.hasAnyIssue()
+            ) {
+              setDiagnosticReportDialogOpen(true);
+            }
           }
         });
     },
@@ -1633,6 +1635,7 @@ const MainFrame = (props: Props) => {
       preferences.getIsMenuBarHiddenInPreview,
       preferences.getIsAlwaysOnTopInPreview,
       preferences.values.openDiagnosticReportAutomatically,
+      currentlyRunningInAppTutorial,
     ]
   );
 

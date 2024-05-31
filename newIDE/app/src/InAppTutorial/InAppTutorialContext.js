@@ -11,6 +11,7 @@ export type InAppTutorialState = {|
     tutorialId: string,
     initialStepIndex: number,
     initialProjectData: { [key: string]: string },
+    inAppTutorial?: InAppTutorial,
   |}) => Promise<void>,
   endTutorial: () => void,
   inAppTutorialShortHeaders: ?Array<InAppTutorialShortHeader>,

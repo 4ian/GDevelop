@@ -45,21 +45,30 @@ const InAppTutorialProvider = (props: Props) => {
       tutorialId,
       initialStepIndex,
       initialProjectData,
+      inAppTutorial,
     }: {|
       tutorialId: string,
       initialStepIndex: number,
       initialProjectData: { [key: string]: string },
+      inAppTutorial?: InAppTutorial,
     |}) => {
-      if (!inAppTutorialShortHeaders) return;
+      let inAppTutorialToLoad = inAppTutorial;
+      if (!inAppTutorialToLoad) {
+        if (!inAppTutorialShortHeaders) return;
 
-      const inAppTutorialShortHeader = getInAppTutorialShortHeader(tutorialId);
+        const inAppTutorialShortHeader = getInAppTutorialShortHeader(
+          tutorialId
+        );
 
-      if (!inAppTutorialShortHeader) return;
+        if (!inAppTutorialShortHeader) return;
 
-      const inAppTutorial = await fetchInAppTutorial(inAppTutorialShortHeader);
+        inAppTutorialToLoad = await fetchInAppTutorial(
+          inAppTutorialShortHeader
+        );
+      }
       setStartStepIndex(initialStepIndex);
       setStartProjectData(initialProjectData);
-      setTutorial(inAppTutorial);
+      setTutorial(inAppTutorialToLoad);
       setCurrentlyRunningInAppTutorial(tutorialId);
     },
     [getInAppTutorialShortHeader, inAppTutorialShortHeaders]
@@ -95,8 +104,9 @@ const InAppTutorialProvider = (props: Props) => {
         message: 'Choose a guided lesson (.json file)',
         filters: [{ name: 'GDevelop 5 in-app tutorial', extensions: ['json'] }],
       });
-      const guidedLesson = await readJSONFile(filePath);
-      const errors = checkInAppTutorialFileJsonSchema(guidedLesson);
+      if (!filePath) return;
+      const inAppTutorial = await readJSONFile(filePath);
+      const errors = checkInAppTutorialFileJsonSchema(inAppTutorial);
       if (errors.length) {
         console.error(
           "Guided lesson file doesn't respect the format. See errors:",
@@ -107,15 +117,16 @@ const InAppTutorialProvider = (props: Props) => {
         );
         return;
       }
-      if (guidedLesson.initialTemplateUrl) {
+      if (inAppTutorial.initialTemplateUrl) {
         console.warn(
           'Starting tutorial from file. The tutorial has the field initialTemplateUrl set so make sure the project is already open in the editor.'
         );
       }
       startTutorial({
-        tutorialId: guidedLesson.id,
-        initialProjectData: guidedLesson.initialProjectData || {},
+        tutorialId: inAppTutorial.id,
+        initialProjectData: inAppTutorial.initialProjectData || {},
         initialStepIndex: 0,
+        inAppTutorial,
       });
     },
     [startTutorial]

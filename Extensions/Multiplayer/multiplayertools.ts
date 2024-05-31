@@ -936,7 +936,6 @@ namespace gdjs {
             runtimeScene.getGame(),
             _gameId
           );
-          logger.info('Game registration:', isGameRegistered);
           _isGameRegistered = isGameRegistered;
         } catch (error) {
           _isGameRegistered = false;

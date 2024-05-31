@@ -465,6 +465,18 @@ namespace gdjs {
         );
         return;
       }
+      const numberOfPlayersInLobby = gdjs.multiplayer.getNumberOfPlayersInLobby();
+      if (newPlayerNumber > numberOfPlayersInLobby) {
+        logger.info(
+          `Player number ${newPlayerNumber} does not exist, as there are only ${numberOfPlayersInLobby} players in the lobby. Destroying the object as it will not be synchronized.`
+        );
+        if (this._destroyInstanceTimeoutId) {
+          clearTimeout(this._destroyInstanceTimeoutId);
+          this._destroyInstanceTimeoutId = null;
+        }
+        this.owner.deleteFromScene(this.owner.getInstanceContainer());
+        return;
+      }
 
       let instanceNetworkId = this.owner.networkId;
 

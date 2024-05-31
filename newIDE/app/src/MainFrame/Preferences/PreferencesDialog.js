@@ -66,6 +66,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setEventsSheetCancelInlineParameter,
     setShowCommunityExtensions,
     setShowEventBasedObjectsEditor,
+    setShowInAppTutorialDeveloperMode,
     setOpenDiagnosticReportAutomatically,
     setShowDeprecatedInstructionWarning,
     setUse3DEditor,
@@ -358,16 +359,6 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               </Trans>
             }
           />
-          <Toggle
-            onToggle={(e, check) => setShowEventBasedObjectsEditor(check)}
-            toggled={values.showEventBasedObjectsEditor}
-            labelPosition="right"
-            label={
-              <Trans>
-                Show custom objects in the extension editor (experimental)
-              </Trans>
-            }
-          />
           {!!electron && (
             <Toggle
               onToggle={(e, check) =>
@@ -455,18 +446,46 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               </ColumnStackLayout>
             </>
           )}
+          <Text size="block-title">
+            <Trans>Contributor options</Trans>
+          </Text>
+          <Toggle
+            onToggle={(e, check) => setShowEventBasedObjectsEditor(check)}
+            toggled={values.showEventBasedObjectsEditor}
+            labelPosition="right"
+            label={
+              <Trans>
+                Show custom objects in the extension editor (experimental)
+              </Trans>
+            }
+          />
+          <Toggle
+            onToggle={(e, check) => setShowInAppTutorialDeveloperMode(check)}
+            toggled={values.showInAppTutorialDeveloperMode}
+            labelPosition="right"
+            label={
+              <Trans>
+                Show button to load guided lesson from file and test it.
+              </Trans>
+            }
+          />
           {Window.isDev() && (
-            <Toggle
-              onToggle={(e, check) => setUseGDJSDevelopmentWatcher(check)}
-              toggled={values.useGDJSDevelopmentWatcher}
-              labelPosition="right"
-              label={
-                <Trans>
-                  Watch changes in game engine (GDJS) sources and auto import
-                  them (dev only)
-                </Trans>
-              }
-            />
+            <>
+              <Text size="block-title">
+                <Trans>Developer options</Trans>
+              </Text>
+              <Toggle
+                onToggle={(e, check) => setUseGDJSDevelopmentWatcher(check)}
+                toggled={values.useGDJSDevelopmentWatcher}
+                labelPosition="right"
+                label={
+                  <Trans>
+                    Watch changes in game engine (GDJS) sources and auto import
+                    them (dev only)
+                  </Trans>
+                }
+              />
+            </>
           )}
         </ColumnStackLayout>
       )}

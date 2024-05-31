@@ -33,6 +33,8 @@ import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserConte
 import { type Limits } from '../../../../Utils/GDevelopServices/Usage';
 import { PrivateTutorialViewDialog } from '../../../../AssetStore/PrivateTutorials/PrivateTutorialViewDialog';
 import { EducationCard } from './EducationCard';
+import InAppTutorialContext from '../../../../InAppTutorial/InAppTutorialContext';
+import PreferencesContext from '../../../Preferences/PreferencesContext';
 
 const useStyles = makeStyles({
   tile: {
@@ -144,6 +146,12 @@ const MainPage = ({
   selectInAppTutorial,
 }: Props) => {
   const { limits } = React.useContext(AuthenticatedUserContext);
+  const { onLoadInAppTutorialFromLocalFile } = React.useContext(
+    InAppTutorialContext
+  );
+  const {
+    values: { showInAppTutorialDeveloperMode },
+  } = React.useContext(PreferencesContext);
   const classes = useStyles();
   const {
     windowSize,
@@ -223,9 +231,17 @@ const MainPage = ({
         </Line>
       </SectionRow>
       <SectionRow>
-        <Text noMargin size="section-title">
-          <Trans>Guided lessons</Trans>
-        </Text>
+        <Line justifyContent="space-between" noMargin>
+          <Text noMargin size="section-title">
+            <Trans>Guided lessons</Trans>
+          </Text>
+          {showInAppTutorialDeveloperMode && (
+            <FlatButton
+              label={<Trans>Load local lesson</Trans>}
+              onClick={onLoadInAppTutorialFromLocalFile}
+            />
+          )}
+        </Line>
         <GuidedLessons selectInAppTutorial={selectInAppTutorial} />
       </SectionRow>
       <>

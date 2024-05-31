@@ -157,6 +157,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     getShowEventBasedObjectsEditor: this._getShowEventBasedObjectsEditor.bind(
       this
     ),
+    setShowInAppTutorialDeveloperMode: this._setShowInAppTutorialDeveloperMode.bind(
+      this
+    ),
     setOpenDiagnosticReportAutomatically: this._setOpenDiagnosticReportAutomatically.bind(
       this
     ),
@@ -444,6 +447,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _getShowEventBasedObjectsEditor() {
     return this.state.values.showEventBasedObjectsEditor;
+  }
+
+  _setShowInAppTutorialDeveloperMode(showInAppTutorialDeveloperMode: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          showInAppTutorialDeveloperMode,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
   }
 
   _setOpenDiagnosticReportAutomatically(

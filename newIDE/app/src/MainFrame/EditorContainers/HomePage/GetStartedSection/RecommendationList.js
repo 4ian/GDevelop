@@ -18,7 +18,7 @@ import {
   type WindowSizeType,
 } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import Text from '../../../../UI/Text';
-import { Column, Spacer } from '../../../../UI/Grid';
+import { Column, Line, Spacer } from '../../../../UI/Grid';
 import { type Tutorial } from '../../../../Utils/GDevelopServices/Tutorial';
 import { type SubscriptionPlanWithPricingSystems } from '../../../../Utils/GDevelopServices/Usage';
 import { CardWidget } from '../CardWidget';
@@ -35,6 +35,8 @@ import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
 import PromotionsSlideshow from '../../../../Promotions/PromotionsSlideshow';
 import { PrivateTutorialViewDialog } from '../../../../AssetStore/PrivateTutorials/PrivateTutorialViewDialog';
 import { EarnBadges } from './EarnBadges';
+import FlatButton from '../../../../UI/FlatButton';
+import InAppTutorialContext from '../../../../InAppTutorial/InAppTutorialContext';
 
 const styles = {
   textTutorialContent: {
@@ -198,7 +200,13 @@ const RecommendationList = ({
     achievements,
   } = authenticatedUser;
   const { tutorials } = React.useContext(TutorialContext);
-  const { getTutorialProgress } = React.useContext(PreferencesContext);
+  const {
+    getTutorialProgress,
+    values: { showInAppTutorialDeveloperMode },
+  } = React.useContext(PreferencesContext);
+  const { onLoadInAppTutorialFromLocalFile } = React.useContext(
+    InAppTutorialContext
+  );
 
   const [
     selectedTutorial,
@@ -276,9 +284,17 @@ const RecommendationList = ({
 
           items.push(
             <SectionRow key="guided-lessons">
-              <Text size="section-title" noMargin>
-                <Trans>Build game mechanics</Trans>
-              </Text>
+              <Line justifyContent="space-between" noMargin>
+                <Text size="section-title" noMargin>
+                  <Trans>Build game mechanics</Trans>
+                </Text>
+                {showInAppTutorialDeveloperMode && (
+                  <FlatButton
+                    label={<Trans>Load local lesson</Trans>}
+                    onClick={onLoadInAppTutorialFromLocalFile}
+                  />
+                )}
+              </Line>
               <GuidedLessons
                 selectInAppTutorial={selectInAppTutorial}
                 lessonsIds={guidedLessonsIds}

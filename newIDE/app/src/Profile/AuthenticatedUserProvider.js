@@ -193,6 +193,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 
   // This should be called only on the first mount of the provider.
   _initializeAuthenticatedUser() {
+    this._fetchAchievements();
     this.setState(({ authenticatedUser }) => ({
       authenticatedUser: {
         ...initialAuthenticatedUser,
@@ -517,6 +518,7 @@ export default class AuthenticatedUserProvider extends React.Component<
       }
     );
     this._fetchUserBadges();
+    this._fetchAchievements();
     this._fetchUserNotifications();
 
     // Load and wait for the user profile to be fetched.
@@ -842,19 +844,25 @@ export default class AuthenticatedUserProvider extends React.Component<
           badges,
         },
       }));
-
-      // Load achievements only once, as they are the same across all users.
-      if (!this.state.authenticatedUser.achievements) {
-        const achievements = await getAchievements();
-        this.setState(({ authenticatedUser }) => ({
-          authenticatedUser: {
-            ...authenticatedUser,
-            achievements,
-          },
-        }));
-      }
     } catch (error) {
       console.error('Error while loading user badges:', error);
+    }
+  };
+
+  _fetchAchievements = async () => {
+    // Load achievements only once, as they are the same across all users.
+    if (this.state.authenticatedUser.achievements) return;
+
+    try {
+      const achievements = await getAchievements();
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          achievements,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading achievements:', error);
     }
   };
 

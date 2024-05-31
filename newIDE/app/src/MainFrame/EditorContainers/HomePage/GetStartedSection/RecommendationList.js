@@ -34,10 +34,7 @@ import { SurveyCard } from './SurveyCard';
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
 import PromotionsSlideshow from '../../../../Promotions/PromotionsSlideshow';
 import { PrivateTutorialViewDialog } from '../../../../AssetStore/PrivateTutorials/PrivateTutorialViewDialog';
-import {
-  GithubStarCard,
-  shouldDisplayGithubStarCard,
-} from '../../../../Profile/GithubStarCard';
+import { EarnBadges } from './EarnBadges';
 
 const styles = {
   textTutorialContent: {
@@ -297,6 +294,27 @@ const RecommendationList = ({
             </SectionRow>
           );
         }
+
+        if (
+          !limits ||
+          !limits.capabilities.classrooms ||
+          !limits.capabilities.classrooms.hidePlayTab
+        ) {
+          items.push(
+            <SectionRow key="earn-badges">
+              <Text size="section-title" noMargin>
+                <Trans>Earn badges and credits</Trans>
+              </Text>
+              <Spacer />
+              <EarnBadges
+                achievements={achievements}
+                badges={badges}
+                onOpenProfile={onOpenProfile}
+              />
+            </SectionRow>
+          );
+        }
+
         if (recommendedVideoTutorials.length) {
           items.push(
             <SectionRow key="videos">
@@ -335,13 +353,6 @@ const RecommendationList = ({
             </Text>
             <Spacer />
             <PromotionsSlideshow />
-            <Spacer />
-            {shouldDisplayGithubStarCard({ badges }) && (
-              <GithubStarCard
-                achievements={achievements}
-                onOpenProfile={onOpenProfile}
-              />
-            )}
           </SectionRow>
         );
 

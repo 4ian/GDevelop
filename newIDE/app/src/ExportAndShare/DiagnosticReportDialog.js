@@ -88,7 +88,6 @@ export default function DiagnosticReportDialog({
             <TableBody>
               {missingSceneVariables.size > 0 && (
                 <TableRow
-                  key={`missing-scene-variables`}
                   style={{
                     backgroundColor: gdevelopTheme.list.itemsBackgroundColor,
                   }}
@@ -168,9 +167,11 @@ export default function DiagnosticReportDialog({
 
   return (
     <Dialog
+      id="diagnostic-report-dialog"
       title={<Trans>Diagnostic report</Trans>}
       actions={[
         <DialogPrimaryButton
+          id="close-button"
           key="close"
           label={<Trans>Close</Trans>}
           primary={true}
@@ -179,7 +180,8 @@ export default function DiagnosticReportDialog({
       ]}
       secondaryActions={[
         <Toggle
-          label={<Trans>Open automatically</Trans>}
+          key="report-automatically"
+          label={<Trans>Generate report at each preview</Trans>}
           toggled={preferences.values.openDiagnosticReportAutomatically}
           onToggle={(e, check) =>
             preferences.setOpenDiagnosticReportAutomatically(check)

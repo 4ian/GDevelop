@@ -10,6 +10,7 @@ declare class gdExpressionCompletionDescription {
   getCompletionKind(): ExpressionCompletionDescription_CompletionKind;
   getType(): string;
   getVariableType(): Variable_Type;
+  getVariableScope(): VariablesContainer_SourceType;
   getPrefix(): string;
   getCompletion(): string;
   getObjectName(): string;

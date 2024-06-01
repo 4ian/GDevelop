@@ -50,6 +50,7 @@ export type ExpressionAutocompletion =
       ...BaseExpressionAutocompletion,
       kind: 'Variable',
       variableType: Variable_Type,
+      variableScope: VariablesContainer_SourceType,
     |}
   | {|
       ...BaseExpressionAutocompletion,
@@ -467,6 +468,7 @@ export const getAutocompletionsFromDescriptions = (
             replacementStartPosition: completionDescription.getReplacementStartPosition(),
             replacementEndPosition: completionDescription.getReplacementEndPosition(),
             variableType: completionDescription.getVariableType(),
+            variableScope: completionDescription.getVariableScope(),
           },
         ];
       } else if (

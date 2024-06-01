@@ -2597,6 +2597,7 @@ interface ExpressionCompletionDescription {
   ExpressionCompletionDescription_CompletionKind GetCompletionKind();
   [Const, Ref] DOMString GetType();
   Variable_Type GetVariableType();
+  VariablesContainer_SourceType GetVariableScope();
   [Const, Ref] DOMString GetPrefix();
   [Const, Ref] DOMString GetCompletion();
   [Const, Ref] DOMString GetObjectName();

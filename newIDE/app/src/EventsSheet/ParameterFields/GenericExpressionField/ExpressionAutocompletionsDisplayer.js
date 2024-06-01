@@ -11,7 +11,7 @@ import ScrollView, { type ScrollViewInterface } from '../../../UI/ScrollView';
 import { getVisibleParameterTypes } from './FormatExpressionCall';
 import { type ParameterRenderingServiceType } from '../ParameterFieldCommons';
 import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
-import { Column, Line, Spacer } from '../../../UI/Grid';
+import { Column, Line } from '../../../UI/Grid';
 import ObjectsRenderingService from '../../../ObjectsRendering/ObjectsRenderingService';
 import Paper from '../../../UI/Paper';
 import { mapVector } from '../../../Utils/MapFor';
@@ -21,6 +21,7 @@ import { getVariableTypeToIcon } from '../../../VariablesList/VariableTypeSelect
 import { getVariableSourceIcon } from '../../ParameterFields/VariableField';
 import PropertyIcon from '../../../UI/CustomSvgIcons/Settings';
 import ParameterIcon from '../../../UI/CustomSvgIcons/Parameter';
+import { LineStackLayout } from '../../../UI/Layout';
 
 const gd: libGDevelop = global.gd;
 
@@ -116,18 +117,18 @@ const AutocompletionRow = React.forwardRef(
         onClick={onClick}
         ref={ref}
       >
-        {icon || (iconSrc ? <AutocompletionIcon src={iconSrc} /> : null)}
-        <Spacer />
-        {secondaryIcon}
-        <Spacer />
-        <Text style={defaultTextStyle} noMargin align="left">
-          {isSelected ? <b>{trimmedLabel}</b> : trimmedLabel}
-          {parametersLabel && (
-            <>
-              (<i>{parametersLabel}</i>)
-            </>
-          )}
-        </Text>
+        <LineStackLayout noMargin>
+          {icon || (iconSrc ? <AutocompletionIcon src={iconSrc} /> : null)}
+          {secondaryIcon}
+          <Text style={defaultTextStyle} noMargin align="left">
+            {isSelected ? <b>{trimmedLabel}</b> : trimmedLabel}
+            {parametersLabel && (
+              <>
+                (<i>{parametersLabel}</i>)
+              </>
+            )}
+          </Text>
+        </LineStackLayout>
       </ButtonBase>
     );
   }

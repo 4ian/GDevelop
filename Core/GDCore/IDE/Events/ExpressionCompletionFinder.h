@@ -147,6 +147,19 @@ struct GD_CORE_API ExpressionCompletionDescription {
   }
 
   /**
+   * \brief Return the scope of the variable, for a variable completion.
+   */
+  gd::VariablesContainer::SourceType GetVariableScope() const {
+    return variableScope;
+  }
+
+  ExpressionCompletionDescription &
+  SetVariableScope(gd::VariablesContainer::SourceType variableScope_) {
+    variableScope = variableScope_;
+    return *this;
+  }
+
+  /**
    * \brief Return the prefix that must be completed.
    */
   const gd::String& GetPrefix() const { return prefix; }
@@ -324,6 +337,7 @@ struct GD_CORE_API ExpressionCompletionDescription {
  private:
   CompletionKind completionKind;
   gd::Variable::Type variableType;
+  gd::VariablesContainer::SourceType variableScope;
   gd::String type;
   gd::String prefix;
   gd::String completion;
@@ -1059,6 +1073,7 @@ class GD_CORE_API ExpressionCompletionFinder
               location.GetEndPosition());
           description.SetCompletion(variableName);
           description.SetVariableType(variable.GetType());
+          description.SetVariableScope(projectScopedContainers.GetVariablesContainersList().GetVariablesContainerFromVariableName(variableName).GetSourceType());
           completions.push_back(description);
 
           if (eagerlyCompleteIfExactMatch && variableName == search) {

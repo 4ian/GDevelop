@@ -1963,6 +1963,7 @@ export class ExpressionCompletionDescription extends EmscriptenObject {
   getCompletionKind(): ExpressionCompletionDescription_CompletionKind;
   getType(): string;
   getVariableType(): Variable_Type;
+  getVariableScope(): VariablesContainer_SourceType;
   getPrefix(): string;
   getCompletion(): string;
   getObjectName(): string;

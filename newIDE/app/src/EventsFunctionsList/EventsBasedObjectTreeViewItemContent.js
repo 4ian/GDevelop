@@ -110,6 +110,8 @@ export class EventsBasedObjectTreeViewItemContent
     this.props.onSelectEventsBasedObject(this.eventsBasedObject);
   }
 
+  onClick(): void {}
+
   rename(newName: string): void {
     if (this.eventsBasedObject.getName() === newName) return;
 

@@ -202,6 +202,8 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
     );
   }
 
+  onClick(): void {}
+
   rename(newName: string): void {
     if (this.eventsFunction.getName() === newName) return;
 

@@ -74,6 +74,10 @@ const styles = {
 
 const extensionItemReactDndType = 'GD_EXTENSION_ITEM';
 
+const extensionPropertiesItemId = 'extension-properties';
+const extensionGlobalVariablesItemId = 'extension-global-variables';
+const extensionSceneVariablesItemId = 'extension-scene-variables';
+
 export interface TreeViewItemContent {
   getName(): string | React.Node;
   getId(): string;
@@ -81,6 +85,7 @@ export interface TreeViewItemContent {
   getThumbnail(): ?string;
   getDataset(): ?HTMLDataset;
   onSelect(): void;
+  onClick(): void;
   buildMenuTemplate(i18n: I18nType, index: number): Array<MenuItemTemplate>;
   getRightButton(i18n: I18nType): ?MenuButton;
   renderRightComponent(i18n: I18nType): ?React.Node;
@@ -310,6 +315,114 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
 
   onSelect(): void {}
 
+  onClick(): void {}
+
+  buildMenuTemplate(i18n: I18nType, index: number) {
+    return this.buildMenuTemplateFunction(i18n, index);
+  }
+
+  renderRightComponent(i18n: I18nType): ?React.Node {
+    return null;
+  }
+
+  rename(newName: string): void {}
+
+  edit(): void {}
+
+  delete(): void {}
+
+  copy(): void {}
+
+  paste(): void {}
+
+  cut(): void {}
+
+  getIndex(): number {
+    return 0;
+  }
+
+  moveAt(destinationIndex: number): void {}
+
+  isDescendantOf(itemContent: TreeViewItemContent): boolean {
+    return false;
+  }
+
+  addFunctionAtSelection(
+    selectedEventsBasedBehavior: ?gdEventsBasedBehavior,
+    selectedEventsBasedObject: ?gdEventsBasedObject,
+    selectedEventsFunction: ?gdEventsFunction
+  ): void {}
+}
+
+class ActionTreeViewItemContent implements TreeViewItemContent {
+  id: string;
+  label: string | React.Node;
+  buildMenuTemplateFunction: (
+    i18n: I18nType,
+    index: number
+  ) => Array<MenuItemTemplate>;
+  thumbnail: ?string;
+  onClickCallback: () => void;
+
+  constructor(
+    id: string,
+    label: string | React.Node,
+    onClickCallback: () => void,
+    thumbnail?: string
+  ) {
+    this.id = id;
+    this.label = label;
+    this.onClickCallback = onClickCallback;
+    this.thumbnail = thumbnail;
+    this.buildMenuTemplateFunction = (i18n: I18nType, index: number) => [];
+  }
+
+  getName(): string | React.Node {
+    return this.label;
+  }
+
+  getId(): string {
+    return this.id;
+  }
+
+  getRightButton(i18n: I18nType): ?MenuButton {
+    return null;
+  }
+
+  getEventsFunctionsContainer(): ?gdEventsFunctionsContainer {
+    return null;
+  }
+
+  getEventsFunction(): ?gdEventsFunction {
+    return null;
+  }
+
+  getEventsBasedBehavior(): ?gdEventsBasedBehavior {
+    return null;
+  }
+
+  getEventsBasedObject(): ?gdEventsBasedObject {
+    return null;
+  }
+
+  getHtmlId(index: number): ?string {
+    return this.id;
+  }
+
+  getDataset(): ?HTMLDataset {
+    return {};
+  }
+
+  onSelect(): void {}
+
+  getThumbnail(): ?string {
+    return this.thumbnail;
+  }
+
+  onClick(): void {
+    this.onClickCallback();
+  }
+
   buildMenuTemplate(i18n: I18nType, index: number) {
     return this.buildMenuTemplateFunction(i18n, index);
   }
@@ -366,6 +479,9 @@ const renderTreeViewItemRightComponent = (i18n: I18nType) => (
 const renameItem = (item: TreeViewItem, newName: string) => {
   item.content.rename(newName);
 };
+const onClickItem = (item: TreeViewItem) => {
+  item.content.onClick();
+};
 const editItem = (item: TreeViewItem) => {
   item.content.edit();
 };
@@ -393,6 +509,9 @@ type Props = {|
   // Free functions
   selectedEventsFunction: ?gdEventsFunction,
   ...EventsFunctionCallbacks,
+  onSelectExtensionProperties: () => void,
+  onSelectExtensionGlobalVariables: () => void,
+  onSelectExtensionSceneVariables: () => void,
 |};
 
 const EventsFunctionsList = React.forwardRef<
@@ -422,6 +541,9 @@ const EventsFunctionsList = React.forwardRef<
       selectedEventsBasedBehavior,
       selectedEventsBasedObject,
       forceUpdateEditor,
+      onSelectExtensionProperties,
+      onSelectExtensionGlobalVariables,
+      onSelectExtensionSceneVariables,
     }: Props,
     ref
   ) => {
@@ -910,6 +1032,41 @@ const EventsFunctionsList = React.forwardRef<
     const getTreeViewData = React.useCallback(
       (i18n: I18nType): Array<TreeViewItem> => {
         return [
+          {
+            isRoot: true,
+            content: new LabelTreeViewItemContent(
+              extensionBehaviorsRootFolderId,
+              i18n._(t`Extension`)
+            ),
+            getChildren(i18n: I18nType): ?Array<TreeViewItem> {
+              return [
+                new LeafTreeViewItem(
+                  new ActionTreeViewItemContent(
+                    extensionPropertiesItemId,
+                    i18n._(t`Properties`),
+                    onSelectExtensionProperties,
+                    'res/icons_default/properties_black.svg'
+                  )
+                ),
+                new LeafTreeViewItem(
+                  new ActionTreeViewItemContent(
+                    extensionGlobalVariablesItemId,
+                    i18n._(t`Global variables`),
+                    onSelectExtensionGlobalVariables,
+                    'res/icons_default/publish_black.svg'
+                  )
+                ),
+                new LeafTreeViewItem(
+                  new ActionTreeViewItemContent(
+                    extensionSceneVariablesItemId,
+                    i18n._(t`Scene variables`),
+                    onSelectExtensionSceneVariables,
+                    'res/icons_default/scene_black.svg'
+                  )
+                ),
+              ];
+            },
+          },
           getShowEventBasedObjectsEditor()
             ? {
                 isRoot: true,
@@ -1014,6 +1171,9 @@ const EventsFunctionsList = React.forwardRef<
         getShowEventBasedObjectsEditor,
         addNewEventsBasedObject,
         addNewEventsBehavior,
+        onSelectExtensionProperties,
+        onSelectExtensionGlobalVariables,
+        onSelectExtensionSceneVariables,
         objectTreeViewItems,
         behaviorTreeViewItems,
         selectedEventsBasedBehavior,
@@ -1199,6 +1359,7 @@ const EventsFunctionsList = React.forwardRef<
                         itemToSelect.content.onSelect();
                         setSelectedItems(items);
                       }}
+                      onClickItem={onClickItem}
                       onRenameItem={renameItem}
                       buildMenuTemplate={buildMenuTemplate(i18n)}
                       getItemRightButton={getTreeViewItemRightButton(i18n)}

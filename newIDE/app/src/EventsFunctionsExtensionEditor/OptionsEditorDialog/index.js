@@ -3,7 +3,6 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import Dialog from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
-import RaisedButton from '../../UI/RaisedButton';
 import HelpButton from '../../UI/HelpButton';
 import EventsFunctionsExtensionsContext from '../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { ExtensionOptionsEditor } from './ExtensionOptionsEditor';
@@ -12,8 +11,6 @@ import { ExtensionDependenciesEditor } from './ExtensionDependenciesEditor';
 import ExtensionExporterDialog from './ExtensionExporterDialog';
 import { Line } from '../../UI/Grid';
 import Upload from '../../UI/CustomSvgIcons/Upload';
-import GlobalAndSceneVariablesDialog from '../../VariablesList/GlobalAndSceneVariablesDialog';
-import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
 
 type TabName = 'options' | 'dependencies';
 
@@ -33,33 +30,17 @@ export default function OptionsEditorDialog({
   const [currentTab, setCurrentTab] = React.useState<TabName>('options');
   const [isLoading, setIsLoading] = React.useState(false);
   const [exportDialogOpen, setExportDialogOpen] = React.useState(false);
-  const [variableEditorOpen, setVariableEditorOpen] = React.useState(false);
 
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
   );
   const eventsFunctionsExtensionWriter = eventsFunctionsExtensionsState.getEventsFunctionsExtensionWriter();
 
-  const projectScopedContainersAccessor = React.useMemo(
-    () =>
-      new ProjectScopedContainersAccessor({
-        project,
-        eventsFunctionsExtension,
-      }),
-    [eventsFunctionsExtension, project]
-  );
-
   return (
     <Dialog
       title={<Trans>{eventsFunctionsExtension.getName()} options</Trans>}
       secondaryActions={[
         <HelpButton key="help" helpPagePath="/extensions/create" />,
-        <RaisedButton
-          key="edit-extension-variables"
-          label={<Trans>Edit variables</Trans>}
-          onClick={() => setVariableEditorOpen(true)}
-          disabled={isLoading}
-        />,
         eventsFunctionsExtensionWriter ? (
           <FlatButton
             leftIcon={<Upload />}
@@ -122,20 +103,6 @@ export default function OptionsEditorDialog({
         <ExtensionExporterDialog
           eventsFunctionsExtension={eventsFunctionsExtension}
           onClose={() => setExportDialogOpen(false)}
-        />
-      )}
-      {variableEditorOpen && project && (
-        <GlobalAndSceneVariablesDialog
-          globalVariables={eventsFunctionsExtension.getGlobalVariables()}
-          sceneVariables={eventsFunctionsExtension.getSceneVariables()}
-          project={project}
-          projectScopedContainersAccessor={projectScopedContainersAccessor}
-          open
-          onCancel={() => setVariableEditorOpen(false)}
-          onApply={(selectedVariableName: string | null) => {
-            setVariableEditorOpen(false);
-          }}
-          preventRefactoringToDeleteInstructions
         />
       )}
     </Dialog>

@@ -48,6 +48,8 @@ export enum ObjectsContainersList_VariableExistence {
 export enum ProjectDiagnostic_ErrorType {
   UndeclaredVariable = 0,
   MissingBehavior = 1,
+  UnknownObject = 2,
+  MismatchedObjectType = 3,
 }
 
 export enum ExpressionCompletionDescription_CompletionKind {

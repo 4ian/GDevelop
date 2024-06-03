@@ -2,6 +2,8 @@
 declare class gdProjectDiagnostic {
   static UndeclaredVariable: 0;
   static MissingBehavior: 1;
+  static UnknownObject: 2;
+  static MismatchedObjectType: 3;
   getType(): ProjectDiagnostic_ErrorType;
   getMessage(): string;
   getActualValue(): string;

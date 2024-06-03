@@ -38,6 +38,14 @@ void GD_CORE_API ProjectStripper::StripProjectForExport(gd::Project &project) {
        extensionIndex < project.GetEventsFunctionsExtensionsCount();
        ++extensionIndex) {
     auto &extension = project.GetEventsFunctionsExtension(extensionIndex);
+    extension.SetFullName("");
+    extension.SetShortDescription("");
+    extension.SetDescription("");
+    extension.SetHelpPath("");
+    extension.SetIconUrl("");
+    extension.SetPreviewIconUrl("");
+    extension.SetOrigin("", "");
+    extension.SetVersion("");
     auto &eventsBasedObjects = extension.GetEventsBasedObjects();
     if (eventsBasedObjects.size() == 0 &&
         extension.GetGlobalVariables().Count() == 0 &&

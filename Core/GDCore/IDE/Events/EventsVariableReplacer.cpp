@@ -375,7 +375,7 @@ class GD_CORE_API ExpressionVariableReplacer
 
   void PopVariablesRenamingChangesetNode(bool hasBeenPushed) {
     if (hasBeenPushed) {
-      variablesRenamingChangesetNodeStack.push_back(&variablesRenamingChangesetRoot);
+      variablesRenamingChangesetNodeStack.pop_back();
     }
   }
 

@@ -215,13 +215,13 @@ WholeProjectRefactorer::ComputeChangesetForVariable(
     return std::shared_ptr<VariablesRenamingChangesetNode>(nullptr);
   }
 
-  std::unordered_map<gd::String, gd::String> removedUuidAndNames;
+  std::unordered_map<gd::String, gd::String> oldVariableNamesByUuid;
   for (const auto &pair : oldVariable.GetAllChildren()) {
     const auto &oldName = pair.first;
     const auto oldChild = pair.second;
 
     // All variables are candidate to be removed.
-    removedUuidAndNames[oldChild->GetPersistentUuid()] = oldName;
+    oldVariableNamesByUuid[oldChild->GetPersistentUuid()] = oldName;
   }
 
   auto changeset = std::make_shared<VariablesRenamingChangesetNode>();
@@ -230,8 +230,8 @@ WholeProjectRefactorer::ComputeChangesetForVariable(
     const auto newChild = pair.second;
 
     auto existingOldVariableUuidAndName =
-        removedUuidAndNames.find(newChild->GetPersistentUuid());
-    if (existingOldVariableUuidAndName == removedUuidAndNames.end()) {
+        oldVariableNamesByUuid.find(newChild->GetPersistentUuid());
+    if (existingOldVariableUuidAndName == oldVariableNamesByUuid.end()) {
       // This is a new variable.
       continue;
     }
@@ -268,13 +268,13 @@ bool WholeProjectRefactorer::HasAnyVariableTypeChanged(
     return false;
   }
 
-  std::unordered_map<gd::String, gd::String> removedUuidAndNames;
+  std::unordered_map<gd::String, gd::String> oldVariableNamesByUuid;
   for (const auto &pair : oldVariable.GetAllChildren()) {
     const auto &oldName = pair.first;
     const auto oldChild = pair.second;
 
     // All variables are candidate to be removed.
-    removedUuidAndNames[oldChild->GetPersistentUuid()] = oldName;
+    oldVariableNamesByUuid[oldChild->GetPersistentUuid()] = oldName;
   }
 
   for (const auto &pair : newVariable.GetAllChildren()) {
@@ -282,8 +282,8 @@ bool WholeProjectRefactorer::HasAnyVariableTypeChanged(
     const auto newChild = pair.second;
 
     auto existingOldVariableUuidAndName =
-        removedUuidAndNames.find(newChild->GetPersistentUuid());
-    if (existingOldVariableUuidAndName == removedUuidAndNames.end()) {
+        oldVariableNamesByUuid.find(newChild->GetPersistentUuid());
+    if (existingOldVariableUuidAndName == oldVariableNamesByUuid.end()) {
       // This is a new variable.
       continue;
     }

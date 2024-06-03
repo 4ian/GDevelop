@@ -48,8 +48,8 @@ namespace gdjs {
         gdjs.multiplayerMessageManager.resendClearOrCancelAcknowledgedMessages(
           runtimeScene
         );
-        gdjs.multiplayerMessageManager.handleSceneUpdatedMessages(runtimeScene);
         gdjs.multiplayerMessageManager.handleGameUpdatedMessages(runtimeScene);
+        gdjs.multiplayerMessageManager.handleSceneUpdatedMessages(runtimeScene);
         gdjs.multiplayerMessageManager.handleHeartbeats();
         gdjs.multiplayerMessageManager.handleDisconnectedPeers(runtimeScene);
       }
@@ -62,8 +62,8 @@ namespace gdjs {
         gdjs.multiplayerMessageManager.handleDestroyObjectMessages(
           runtimeScene
         );
-        gdjs.multiplayerMessageManager.handleUpdateSceneMessages(runtimeScene);
         gdjs.multiplayerMessageManager.handleUpdateGameMessages(runtimeScene);
+        gdjs.multiplayerMessageManager.handleUpdateSceneMessages(runtimeScene);
         gdjs.multiplayerMessageManager.handleHeartbeatsReceived();
         handleLeavingPlayer(runtimeScene);
         gdjs.multiplayerMessageManager.clearDisconnectedPeers();

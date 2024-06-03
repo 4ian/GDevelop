@@ -505,6 +505,11 @@ module.exports = {
         .setValue(playerNumberStringValue)
         .setType('Choice')
         .setLabel(_('Player owning the object'))
+        .setDescription(
+          _(
+            'Who is synchronizing the object to the players. If this is an object controlled by a player, then assign the player number. Otherwise just leave "Host" and the host of the game will synchronize the object to the players. (Note: you can change the ownership of the object during the game with corresponding actions).'
+          )
+        )
         .addExtraInfo('Host')
         .addExtraInfo('1')
         .addExtraInfo('2')

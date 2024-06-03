@@ -277,7 +277,7 @@ namespace gdjs {
       // this.logToConsoleWithThrottle(
       //   `Synchronizing object ${this.owner.getName()} (instance ${
       //     this.owner.networkId
-      //   }) with player ${this._playerNumber}`
+      //   }) with player ${this.playerNumber}`
       // );
 
       const instanceNetworkId = this.getOrCreateInstanceNetworkId();

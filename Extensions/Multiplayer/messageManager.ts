@@ -498,7 +498,7 @@ namespace gdjs {
             logger.info(
               `Changing ownership of object ${objectName} to ${newOwner}.`
             );
-            behavior._playerNumber = newOwner;
+            behavior.playerNumber = newOwner;
 
             const ownerChangedMessageName = createObjectOwnerChangedMessageNameFromChangeOwnerMessage(
               messageName
@@ -668,7 +668,7 @@ namespace gdjs {
               logger.info(
                 `Object ${objectName} with instance network ID ${instanceNetworkId} is owned by ${behavior.getPlayerObjectOwnership()} on our game, changing ownership to ${ownerPlayerNumber} as part of the update event.`
               );
-              behavior._playerNumber = ownerPlayerNumber;
+              behavior.playerNumber = ownerPlayerNumber;
             }
 
             instance.updateFromObjectNetworkSyncData(data);
@@ -891,7 +891,7 @@ namespace gdjs {
                     }
 
                     // Force the ownership change.
-                    behavior._playerNumber = previousOwner || 0;
+                    behavior.playerNumber = previousOwner || 0;
                   }
                 }
                 delete expectedMessageAcknowledgements[acknowledgemessageName];

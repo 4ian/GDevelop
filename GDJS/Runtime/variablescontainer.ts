@@ -194,8 +194,8 @@ namespace gdjs {
     }
     static _deletedVars: Array<string | undefined> = [];
 
-    getNetworkSyncData(): VariableSyncData[] {
-      const networkSyncData: VariableSyncData[] = [];
+    getNetworkSyncData(): VariableNetworkSyncData[] {
+      const networkSyncData: VariableNetworkSyncData[] = [];
       const variableNames = [];
       this._variables.keys(variableNames);
       variableNames.forEach((variableName) => {
@@ -219,7 +219,7 @@ namespace gdjs {
     // get the sync data for each child variable.
     getStructureNetworkSyncData(
       variable: gdjs.Variable
-    ): VariableSyncData[] | undefined {
+    ): VariableNetworkSyncData[] | undefined {
       const variableChildren =
         variable.getType() === 'structure' ? variable.getAllChildren() : null;
 
@@ -239,7 +239,7 @@ namespace gdjs {
       return childrenSyncData;
     }
 
-    updateFromNetworkSyncData(networkSyncData: VariableSyncData[]) {
+    updateFromNetworkSyncData(networkSyncData: VariableNetworkSyncData[]) {
       const that = this;
       for (let j = 0; j < networkSyncData.length; ++j) {
         const variableSyncData = networkSyncData[j];

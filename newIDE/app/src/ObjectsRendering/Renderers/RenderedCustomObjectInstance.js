@@ -37,6 +37,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
   _proportionalOriginY: number;
   _proportionalOriginZ: number;
   _threeObjectPivot: THREE.Group | null;
+  _isRenderedIn3D = false;
 
   constructor(
     project: gdProject,
@@ -126,6 +127,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     if (!eventBasedObject) {
       return;
     }
+    this._isRenderedIn3D = eventBasedObject.isRenderedIn3D();
 
     const childLayouts = getLayouts(
       eventBasedObject,
@@ -179,6 +181,10 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
       );
       this._pixiContainer.addChild(this._pixiObject);
     }
+  }
+
+  isRenderedIn3D(): boolean {
+    return this._isRenderedIn3D;
   }
 
   onRemovedFromScene(): void {

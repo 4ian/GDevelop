@@ -37,6 +37,7 @@ import PromisePool from '@supercharge/promise-pool';
 import NewObjectFromScratch from './NewObjectFromScratch';
 import { getAssetShortHeadersToDisplay } from './AssetsList';
 import ErrorBoundary from '../UI/ErrorBoundary';
+import type { ObjectFolderOrObjectWithContext } from '../ObjectsList/EnumerateObjectFolderOrObject';
 
 const isDev = Window.isDev();
 
@@ -103,6 +104,7 @@ type Props = {|
   onCreateNewObject: (type: string) => void,
   onObjectsAddedFromAssets: (Array<gdObject>) => void,
   canInstallPrivateAsset: () => boolean,
+  targetObjectFolderOrObjectWithContext?: ?ObjectFolderOrObjectWithContext,
 |};
 
 function NewObjectDialog({
@@ -114,6 +116,7 @@ function NewObjectDialog({
   onCreateNewObject,
   onObjectsAddedFromAssets,
   canInstallPrivateAsset,
+  targetObjectFolderOrObjectWithContext,
 }: Props) {
   const { isMobile } = useResponsiveWindowSize();
   const {
@@ -214,11 +217,21 @@ function NewObjectDialog({
               asset,
               project,
               objectsContainer,
+              targetObjectFolderOrObject:
+                targetObjectFolderOrObjectWithContext &&
+                !targetObjectFolderOrObjectWithContext.global
+                  ? targetObjectFolderOrObjectWithContext.objectFolderOrObject
+                  : null,
             })
           : await installPublicAsset({
               asset,
               project,
               objectsContainer,
+              targetObjectFolderOrObject:
+                targetObjectFolderOrObjectWithContext &&
+                !targetObjectFolderOrObjectWithContext.global
+                  ? targetObjectFolderOrObjectWithContext.objectFolderOrObject
+                  : null,
             });
         if (!installOutput) {
           throw new Error('Unable to install private Asset.');
@@ -262,6 +275,7 @@ function NewObjectDialog({
       canInstallPrivateAsset,
       showAlert,
       onObjectsAddedFromAssets,
+      targetObjectFolderOrObjectWithContext,
     ]
   );
 

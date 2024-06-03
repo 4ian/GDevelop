@@ -87,14 +87,6 @@ class GD_CORE_API EventsRefactorer {
                                    gd::String newName);
 
   /**
-   * Remove all actions or conditions using an object
-   */
-  static void RemoveObjectInEvents(const gd::Platform& platform,
-                                   gd::ProjectScopedContainers& projectScopedContainers,
-                                   gd::EventsList& events,
-                                   gd::String name);
-
-  /**
    * Search for a gd::String in events
    *
    * \return A vector containing EventsSearchResult objects filled with events

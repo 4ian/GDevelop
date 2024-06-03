@@ -1772,7 +1772,6 @@ export class VectorEventsSearchResult extends EmscriptenObject {
 
 export class EventsRefactorer extends EmscriptenObject {
   static renameObjectInEvents(platform: Platform, projectScopedContainers: ProjectScopedContainers, events: EventsList, oldName: string, newName: string): void;
-  static removeObjectInEvents(platform: Platform, projectScopedContainers: ProjectScopedContainers, events: EventsList, name: string): void;
   static replaceStringInEvents(project: ObjectsContainer, layout: ObjectsContainer, events: EventsList, toReplace: string, newString: string, matchCase: boolean, inConditions: boolean, inActions: boolean, inEventStrings: boolean): VectorEventsSearchResult;
   static searchInEvents(platform: Platform, events: EventsList, search: string, matchCase: boolean, inConditions: boolean, inActions: boolean, inEventStrings: boolean, inEventSentences: boolean): VectorEventsSearchResult;
 }
@@ -1829,13 +1828,13 @@ export class WholeProjectRefactorer extends EmscriptenObject {
   static renameObjectPoint(project: Project, layout: Layout, gdObject: gdObject, oldName: string, newName: string): void;
   static renameObjectEffect(project: Project, layout: Layout, gdObject: gdObject, oldName: string, newName: string): void;
   static objectOrGroupRenamedInLayout(project: Project, layout: Layout, oldName: string, newName: string, isObjectGroup: boolean): void;
-  static objectOrGroupRemovedInLayout(project: Project, layout: Layout, objectName: string, isObjectGroup: boolean, removeEventsAndGroups: boolean): void;
+  static objectRemovedInLayout(project: Project, layout: Layout, objectName: string): void;
   static objectOrGroupRenamedInEventsFunction(project: Project, eventsFunction: EventsFunction, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, oldName: string, newName: string, isObjectGroup: boolean): void;
-  static objectOrGroupRemovedInEventsFunction(project: Project, eventsFunction: EventsFunction, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, objectName: string, isObjectGroup: boolean, removeEventsAndGroups: boolean): void;
+  static objectRemovedInEventsFunction(project: Project, eventsFunction: EventsFunction, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, objectName: string): void;
   static objectOrGroupRenamedInEventsBasedObject(project: Project, globalObjectsContainer: ObjectsContainer, eventsBasedObject: EventsBasedObject, oldName: string, newName: string, isObjectGroup: boolean): void;
-  static objectOrGroupRemovedInEventsBasedObject(project: Project, eventsBasedObject: EventsBasedObject, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, objectName: string, isObjectGroup: boolean, removeEventsAndGroups: boolean): void;
+  static objectRemovedInEventsBasedObject(project: Project, eventsBasedObject: EventsBasedObject, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, objectName: string): void;
   static globalObjectOrGroupRenamed(project: Project, oldName: string, newName: string, isObjectGroup: boolean): void;
-  static globalObjectOrGroupRemoved(project: Project, objectName: string, isObjectGroup: boolean, removeEventsAndGroups: boolean): void;
+  static globalObjectRemoved(project: Project, objectName: string): void;
   static getAllObjectTypesUsingEventsBasedBehavior(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior): SetString;
   static ensureBehaviorEventsFunctionsProperParameters(eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior): void;
   static ensureObjectEventsFunctionsProperParameters(eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject): void;

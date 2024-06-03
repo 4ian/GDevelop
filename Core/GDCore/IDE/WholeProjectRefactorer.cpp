@@ -1515,50 +1515,25 @@ void WholeProjectRefactorer::DoRenameObject(
   projectBrowser.ExposeFunctions(project, objectParameterRenamer);
 }
 
-void WholeProjectRefactorer::ObjectOrGroupRemovedInLayout(
-    gd::Project &project, gd::Layout &layout, const gd::String &objectName,
-    bool isObjectGroup, bool removeEventsAndGroups) {
+void WholeProjectRefactorer::ObjectRemovedInLayout(
+    gd::Project &project, gd::Layout &layout, const gd::String &objectName) {
   auto projectScopedContainers = gd::ProjectScopedContainers::
       MakeNewProjectScopedContainersForProjectAndLayout(project, layout);
 
-  // Remove object in the current layout
-  if (removeEventsAndGroups) {
-    gd::EventsRefactorer::RemoveObjectInEvents(project.GetCurrentPlatform(),
-                                               projectScopedContainers,
-                                               layout.GetEvents(), objectName);
+  // Object groups can't have instances or be in other groups
+  for (std::size_t g = 0; g < layout.GetObjectGroups().size(); ++g) {
+    if (layout.GetObjectGroups()[g].Find(objectName))
+      layout.GetObjectGroups()[g].RemoveObject(objectName);
   }
-  if (!isObjectGroup) { // Object groups can't have instances or be in other
-                        // groups
-    if (removeEventsAndGroups) {
-      for (std::size_t g = 0; g < layout.GetObjectGroups().size(); ++g) {
-        if (layout.GetObjectGroups()[g].Find(objectName))
-          layout.GetObjectGroups()[g].RemoveObject(objectName);
-      }
-    }
-    layout.GetInitialInstances().RemoveInitialInstancesOfObject(objectName);
-  }
-
-  // Remove object in external events
-  if (removeEventsAndGroups) {
-    for (auto &externalEventsName :
-         GetAssociatedExternalEvents(project, layout.GetName())) {
-      auto &externalEvents = project.GetExternalEvents(externalEventsName);
-
-      gd::EventsRefactorer::RemoveObjectInEvents(
-          project.GetCurrentPlatform(), projectScopedContainers,
-          externalEvents.GetEvents(), objectName);
-    }
-  }
+  layout.GetInitialInstances().RemoveInitialInstancesOfObject(objectName);
 
   // Remove object in external layouts
-  if (!isObjectGroup) { // Object groups can't have instances
-    std::vector<gd::String> externalLayoutsNames =
-        GetAssociatedExternalLayouts(project, layout);
-    for (gd::String name : externalLayoutsNames) {
-      auto &externalLayout = project.GetExternalLayout(name);
-      externalLayout.GetInitialInstances().RemoveInitialInstancesOfObject(
-          objectName);
-    }
+  std::vector<gd::String> externalLayoutsNames =
+      GetAssociatedExternalLayouts(project, layout);
+  for (gd::String name : externalLayoutsNames) {
+    auto &externalLayout = project.GetExternalLayout(name);
+    externalLayout.GetInitialInstances().RemoveInitialInstancesOfObject(
+        objectName);
   }
 }
 
@@ -1729,45 +1704,28 @@ void WholeProjectRefactorer::RenameObjectEffect(gd::Project &project,
       project, layout, projectElementRenamer);
 }
 
-void WholeProjectRefactorer::ObjectOrGroupRemovedInEventsBasedObject(
+void WholeProjectRefactorer::ObjectRemovedInEventsBasedObject(
     gd::Project &project, gd::EventsBasedObject &eventsBasedObject,
     gd::ObjectsContainer &globalObjectsContainer,
-    gd::ObjectsContainer &objectsContainer, const gd::String &objectName,
-    bool isObjectGroup, bool removeEventsAndGroups) {
+    gd::ObjectsContainer &objectsContainer, const gd::String &objectName) {
   for (auto &functionUniquePtr :
        eventsBasedObject.GetEventsFunctions().GetInternalVector()) {
     auto function = functionUniquePtr.get();
-    WholeProjectRefactorer::ObjectOrGroupRemovedInEventsFunction(
+    WholeProjectRefactorer::ObjectRemovedInEventsFunction(
         project, *function, globalObjectsContainer, objectsContainer,
-        objectName, isObjectGroup, isObjectGroup);
+        objectName);
   }
 }
 
-void WholeProjectRefactorer::ObjectOrGroupRemovedInEventsFunction(
+void WholeProjectRefactorer::ObjectRemovedInEventsFunction(
     gd::Project &project, gd::EventsFunction &eventsFunction,
     gd::ObjectsContainer &globalObjectsContainer,
-    gd::ObjectsContainer &objectsContainer, const gd::String &objectName,
-    bool isObjectGroup, bool removeEventsAndGroups) {
-  // In theory we should pass a ProjectScopedContainers to this function so it
-  // does not have to construct one. In practice, this is ok because we only
-  // deal with objects.
-  auto projectScopedContainers =
-      gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(
-          globalObjectsContainer, objectsContainer);
+    gd::ObjectsContainer &objectsContainer, const gd::String &objectName) {
 
-  if (removeEventsAndGroups) {
-    gd::EventsRefactorer::RemoveObjectInEvents(
-        project.GetCurrentPlatform(), projectScopedContainers,
-        eventsFunction.GetEvents(), objectName);
-  }
-  if (!isObjectGroup) { // Object groups can't be in other groups
-    if (removeEventsAndGroups) {
-      for (std::size_t g = 0; g < eventsFunction.GetObjectGroups().size();
-           ++g) {
-        if (eventsFunction.GetObjectGroups()[g].Find(objectName))
-          eventsFunction.GetObjectGroups()[g].RemoveObject(objectName);
-      }
-    }
+  for (std::size_t g = 0; g < eventsFunction.GetObjectGroups().size();
+        ++g) {
+    if (eventsFunction.GetObjectGroups()[g].Find(objectName))
+      eventsFunction.GetObjectGroups()[g].RemoveObject(objectName);
   }
 }
 
@@ -1800,7 +1758,8 @@ void WholeProjectRefactorer::ObjectOrGroupRenamedInEventsFunction(
       project.GetCurrentPlatform(), projectScopedContainers,
       eventsFunction.GetEvents(), oldName, newName);
 
-  if (!isObjectGroup) { // Object groups can't be in other groups
+  // Object groups can't be in other groups
+  if (!isObjectGroup) {
     for (std::size_t g = 0; g < eventsFunction.GetObjectGroups().size(); ++g) {
       eventsFunction.GetObjectGroups()[g].RenameObject(oldName, newName);
     }
@@ -1810,7 +1769,8 @@ void WholeProjectRefactorer::ObjectOrGroupRenamedInEventsFunction(
 void WholeProjectRefactorer::GlobalObjectOrGroupRenamed(
     gd::Project &project, const gd::String &oldName, const gd::String &newName,
     bool isObjectGroup) {
-  if (!isObjectGroup) { // Object groups can't be in other groups
+  // Object groups can't be in other groups
+  if (!isObjectGroup) {
     for (std::size_t g = 0; g < project.GetObjectGroups().size(); ++g) {
       project.GetObjectGroups()[g].RenameObject(oldName, newName);
     }
@@ -1826,15 +1786,10 @@ void WholeProjectRefactorer::GlobalObjectOrGroupRenamed(
   }
 }
 
-void WholeProjectRefactorer::GlobalObjectOrGroupRemoved(
-    gd::Project &project, const gd::String &objectName, bool isObjectGroup,
-    bool removeEventsAndGroups) {
-  if (!isObjectGroup) { // Object groups can't be in other groups
-    if (removeEventsAndGroups) {
-      for (std::size_t g = 0; g < project.GetObjectGroups().size(); ++g) {
-        project.GetObjectGroups()[g].RemoveObject(objectName);
-      }
-    }
+void WholeProjectRefactorer::GlobalObjectRemoved(
+    gd::Project &project, const gd::String &objectName) {
+  for (std::size_t g = 0; g < project.GetObjectGroups().size(); ++g) {
+    project.GetObjectGroups()[g].RemoveObject(objectName);
   }
 
   for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
@@ -1842,8 +1797,7 @@ void WholeProjectRefactorer::GlobalObjectOrGroupRemoved(
     if (layout.HasObjectNamed(objectName))
       continue;
 
-    ObjectOrGroupRemovedInLayout(project, layout, objectName, isObjectGroup,
-                                 removeEventsAndGroups);
+    ObjectRemovedInLayout(project, layout, objectName);
   }
 }
 

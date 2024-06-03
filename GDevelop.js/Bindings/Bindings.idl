@@ -2278,7 +2278,6 @@ interface VectorEventsSearchResult {
 
 interface EventsRefactorer {
     void STATIC_RenameObjectInEvents([Const, Ref] Platform platform, [Ref] ProjectScopedContainers projectScopedContainers, [Ref] EventsList events, [Const] DOMString oldName, [Const] DOMString newName);
-    void STATIC_RemoveObjectInEvents([Const, Ref] Platform platform, [Ref] ProjectScopedContainers projectScopedContainers, [Ref] EventsList events, [Const] DOMString name);
     [Value] VectorEventsSearchResult STATIC_ReplaceStringInEvents([Ref] ObjectsContainer project, [Ref] ObjectsContainer layout, [Ref] EventsList events, [Const] DOMString toReplace, [Const] DOMString newString, boolean matchCase, boolean inConditions, boolean inActions,  boolean inEventStrings);
     [Value] VectorEventsSearchResult STATIC_SearchInEvents([Const, Ref] Platform platform, [Ref] EventsList events, [Const] DOMString search, boolean matchCase, boolean inConditions, boolean inActions, boolean inEventStrings, boolean inEventSentences);
 };
@@ -2435,13 +2434,28 @@ interface WholeProjectRefactorer {
       [Const] DOMString oldName,
       [Const] DOMString newName);
     void STATIC_ObjectOrGroupRenamedInLayout([Ref] Project project, [Ref] Layout layout, [Const] DOMString oldName, [Const] DOMString newName, boolean isObjectGroup);
-    void STATIC_ObjectOrGroupRemovedInLayout([Ref] Project project, [Ref] Layout layout, [Const] DOMString objectName, boolean isObjectGroup, boolean removeEventsAndGroups);
+    void STATIC_ObjectRemovedInLayout(
+        [Ref] Project project,
+        [Ref] Layout layout,
+        [Const] DOMString objectName);
     void STATIC_ObjectOrGroupRenamedInEventsFunction([Ref] Project project, [Ref] EventsFunction eventsFunction, [Ref] ObjectsContainer globalObjectsContainer, [Ref] ObjectsContainer objectsContainer, [Const] DOMString oldName, [Const] DOMString newName, boolean isObjectGroup);
-    void STATIC_ObjectOrGroupRemovedInEventsFunction([Ref] Project project, [Ref] EventsFunction eventsFunction, [Ref] ObjectsContainer globalObjectsContainer, [Ref] ObjectsContainer objectsContainer, [Const] DOMString objectName, boolean isObjectGroup, boolean removeEventsAndGroups);
+    void STATIC_ObjectRemovedInEventsFunction(
+        [Ref] Project project,
+        [Ref] EventsFunction eventsFunction,
+        [Ref] ObjectsContainer globalObjectsContainer,
+        [Ref] ObjectsContainer objectsContainer,
+        [Const] DOMString objectName);
     void STATIC_ObjectOrGroupRenamedInEventsBasedObject([Ref] Project project, [Ref] ObjectsContainer globalObjectsContainer, [Ref] EventsBasedObject eventsBasedObject, [Const] DOMString oldName, [Const] DOMString newName, boolean isObjectGroup);
-    void STATIC_ObjectOrGroupRemovedInEventsBasedObject([Ref] Project project, [Ref] EventsBasedObject eventsBasedObject, [Ref] ObjectsContainer globalObjectsContainer, [Ref] ObjectsContainer objectsContainer, [Const] DOMString objectName, boolean isObjectGroup, boolean removeEventsAndGroups);
+    void STATIC_ObjectRemovedInEventsBasedObject(
+        [Ref] Project project,
+        [Ref] EventsBasedObject eventsBasedObject,
+        [Ref] ObjectsContainer globalObjectsContainer,
+        [Ref] ObjectsContainer objectsContainer,
+        [Const] DOMString objectName);
     void STATIC_GlobalObjectOrGroupRenamed([Ref] Project project, [Const] DOMString oldName, [Const] DOMString newName, boolean isObjectGroup);
-    void STATIC_GlobalObjectOrGroupRemoved([Ref] Project project, [Const] DOMString objectName, boolean isObjectGroup, boolean removeEventsAndGroups);
+    void STATIC_GlobalObjectRemoved(
+        [Ref] Project project,
+        [Const] DOMString objectName);
     [Value] SetString STATIC_GetAllObjectTypesUsingEventsBasedBehavior([Const, Ref] Project project, [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension, [Const, Ref] EventsBasedBehavior eventsBasedBehavior);
     void STATIC_EnsureBehaviorEventsFunctionsProperParameters([Const, Ref] EventsFunctionsExtension eventsFunctionsExtension, [Const, Ref] EventsBasedBehavior eventsBasedBehavior);
     void STATIC_EnsureObjectEventsFunctionsProperParameters([Const, Ref] EventsFunctionsExtension eventsFunctionsExtension, [Const, Ref] EventsBasedObject eventsBasedObject);

@@ -8,7 +8,6 @@ import { EventsFunctionParametersEditor } from './EventsFunctionParametersEditor
 import { EventsFunctionPropertiesEditor } from './EventsFunctionPropertiesEditor';
 import ScrollView from '../../UI/ScrollView';
 import { Column, Line } from '../../UI/Grid';
-import Window from '../../Utils/Window';
 import { type GroupWithContext } from '../../ObjectsList/EnumerateObjects';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
 import newNameGenerator from '../../Utils/NewNameGenerator';

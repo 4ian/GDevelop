@@ -24,6 +24,16 @@ namespace gdjs {
 
   export type PanelSpriteObjectData = ObjectData & PanelSpriteObjectDataType;
 
+  export type PanelSpriteNetworkSyncDataType = {
+    wid: number;
+    hei: number;
+    op: number;
+    color: string;
+  };
+
+  export type PanelSpriteNetworkSyncData = ObjectNetworkSyncData &
+    PanelSpriteNetworkSyncDataType;
+
   /**
    * The PanelSpriteRuntimeObject displays a tiled texture.
    */
@@ -108,6 +118,46 @@ namespace gdjs {
         return false;
       }
       return true;
+    }
+
+    getObjectNetworkSyncData(): PanelSpriteNetworkSyncData {
+      return {
+        ...super.getObjectNetworkSyncData(),
+        wid: this.getWidth(),
+        hei: this.getHeight(),
+        op: this.getOpacity(),
+        color: this.getColor(),
+      };
+    }
+
+    updateFromObjectNetworkSyncData(
+      networkSyncData: PanelSpriteNetworkSyncData
+    ): void {
+      super.updateFromObjectNetworkSyncData(networkSyncData);
+
+      // Texture is not synchronized, see if this is asked or not.
+
+      if (networkSyncData.x !== undefined) {
+        this.setX(networkSyncData.x);
+      }
+      if (networkSyncData.y !== undefined) {
+        this.setY(networkSyncData.y);
+      }
+      if (networkSyncData.a !== undefined) {
+        this.setAngle(networkSyncData.a);
+      }
+      if (networkSyncData.wid !== undefined) {
+        this.setWidth(networkSyncData.wid);
+      }
+      if (networkSyncData.hei !== undefined) {
+        this.setHeight(networkSyncData.hei);
+      }
+      if (networkSyncData.op !== undefined) {
+        this.setOpacity(networkSyncData.op);
+      }
+      if (networkSyncData.color !== undefined) {
+        this.setColor(networkSyncData.color);
+      }
     }
 
     getRendererObject() {

@@ -112,6 +112,11 @@ namespace gdjs {
           owner.deleteFromScene(instanceContainer);
         }
       }, this._timeBeforeDestroyingObjectWithoutNetworkIdInMs);
+
+      logger.info(
+        'Created MultiplayerObjectRuntimeBehavior object with name ' +
+          owner.getName()
+      );
     }
 
     sendDataToPeersWithIncreasedClock(messageName: string, data: Object) {

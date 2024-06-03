@@ -16,7 +16,7 @@ namespace gdjs {
     let _hasGameJustEnded = false;
     let _lobbyId: string | null = null;
     let _connectionId: string | null = null;
-    let _lobby: {
+    export let _lobby: {
       id: string;
       name: string;
       status: string;

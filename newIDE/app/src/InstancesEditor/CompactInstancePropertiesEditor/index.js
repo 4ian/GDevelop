@@ -103,8 +103,14 @@ const CompactInstancePropertiesEditor = ({
     [i18n, onGetInstanceSize, onEditObjectByName, layout, forceUpdate]
   );
 
-  // TODO: multiple instances support.
   const instance = instances[0];
+  /**
+   * TODO: multiple instances support for variables list. Expected behavior should be:
+   * - if instances of different objects, do not show
+   * - if instances of same object, show only variables in common (inherited variables
+   * obviously plus instance-wise variables with same name).
+   */
+  const shouldDisplayVariablesList = instances.length === 1;
 
   const { object, instanceSchema } = React.useMemo<{|
     object?: gdObject,
@@ -166,42 +172,48 @@ const CompactInstancePropertiesEditor = ({
               instances={instances}
               onInstancesModified={onInstancesModified}
             />
-            <Spacer />
-            <Separator />
-            <Line alignItems="center" justifyContent="space-between">
-              <Text size="sub-title" noMargin>
-                <Trans>Instance Variables</Trans>
-              </Text>
-              <IconButton
-                size="small"
-                onClick={() => {
-                  editInstanceVariables(instance);
-                }}
-              >
-                <ShareExternal style={styles.icon} />
-              </IconButton>
-            </Line>
           </Column>
-          {object ? (
-            <VariablesList
-              projectScopedContainersAccessor={projectScopedContainersAccessor}
-              directlyStoreValueChangesWhileEditing
-              inheritedVariablesContainer={object.getVariables()}
-              variablesContainer={instance.getVariables()}
-              size="small"
-              onComputeAllVariableNames={() =>
-                object
-                  ? EventsRootVariablesFinder.findAllObjectVariables(
-                      project.getCurrentPlatform(),
-                      project,
-                      layout,
-                      object.getName()
-                    )
-                  : []
-              }
-              historyHandler={historyHandler}
-              toolbarIconStyle={styles.icon}
-            />
+          {object && shouldDisplayVariablesList ? (
+            <>
+              <Column>
+                <Spacer />
+                <Separator />
+                <Line alignItems="center" justifyContent="space-between">
+                  <Text size="sub-title" noMargin>
+                    <Trans>Instance Variables</Trans>
+                  </Text>
+                  <IconButton
+                    size="small"
+                    onClick={() => {
+                      editInstanceVariables(instance);
+                    }}
+                  >
+                    <ShareExternal style={styles.icon} />
+                  </IconButton>
+                </Line>
+              </Column>
+              <VariablesList
+                projectScopedContainersAccessor={
+                  projectScopedContainersAccessor
+                }
+                directlyStoreValueChangesWhileEditing
+                inheritedVariablesContainer={object.getVariables()}
+                variablesContainer={instance.getVariables()}
+                size="small"
+                onComputeAllVariableNames={() =>
+                  object
+                    ? EventsRootVariablesFinder.findAllObjectVariables(
+                        project.getCurrentPlatform(),
+                        project,
+                        layout,
+                        object.getName()
+                      )
+                    : []
+                }
+                historyHandler={historyHandler}
+                toolbarIconStyle={styles.icon}
+              />
+            </>
           ) : null}
         </Column>
       </ScrollView>

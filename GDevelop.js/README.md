@@ -20,6 +20,9 @@ These are the bindings of GDevelop core classes to WebAssembly+JavaScript. This 
   git pull
   ./emsdk install 3.1.21
   ./emsdk activate 3.1.21
+
+  # On Windows, also install an additional Python package:
+  pip install setuptools
   ```
 
 - Whenever you try to build GDevelop.js in the future, you will have to load the emsdk environement into your terminal window again by running:

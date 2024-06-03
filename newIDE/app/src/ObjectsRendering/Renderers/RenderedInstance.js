@@ -34,6 +34,10 @@ export default class RenderedInstance {
     this.wasUsed = true; //Used by InstancesRenderer to track rendered instance that are not used anymore.
   }
 
+  isRenderedIn3D(): boolean {
+    return false;
+  }
+
   /**
    * Convert an angle from degrees to radians.
    */

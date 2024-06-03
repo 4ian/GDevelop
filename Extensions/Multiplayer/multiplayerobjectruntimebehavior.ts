@@ -12,7 +12,7 @@ namespace gdjs {
   export class MultiplayerObjectRuntimeBehavior extends gdjs.RuntimeBehavior {
     // Which player is the owner of the object.
     // If 0, then the object is not owned by any player, so the host is the owner.
-    _playerNumber: number = 0;
+    playerNumber: number = 0;
 
     // The action to be executed when the player disconnects.
     actionOnPlayerDisconnect: string;
@@ -67,17 +67,36 @@ namespace gdjs {
     _destroyInstanceTimeoutId: NodeJS.Timeout | null = null;
     _timeBeforeDestroyingObjectWithoutNetworkIdInMs = 500;
 
+    // Boolean to help with the destruction of the object.
+    _shouldDeleteObject = false;
+
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
       behaviorData,
       owner: RuntimeObject
     ) {
       super(instanceContainer, behaviorData, owner);
+      this.playerNumber =
+        behaviorData.playerNumber === 'Host'
+          ? 0
+          : parseInt(behaviorData.playerNumber, 10);
       this.actionOnPlayerDisconnect = behaviorData.actionOnPlayerDisconnect;
       this._getTimeNow =
         window.performance && typeof window.performance.now === 'function'
           ? window.performance.now.bind(window.performance)
           : Date.now;
+
+      // If the object is assigned to a player that does not exist, mark it for destruction before the next tick.
+      // We cannot destroy it immediately as the object is being created.
+      const numberOfPlayersInLobby = gdjs.multiplayer.getNumberOfPlayersInLobby();
+      if (this.playerNumber > numberOfPlayersInLobby) {
+        logger.info(
+          `Player number ${this.playerNumber} does not exist, as there are only ${numberOfPlayersInLobby} players in the lobby. Marking the object for destruction.`
+        );
+        this._shouldDeleteObject = true;
+        return;
+      }
+
       // When a synchronized object is created, we assume it will be assigned a networkId quickly if:
       // - It is a new object created by the current player. -> will be assigned a networkId when sending the update message.
       // - It is an object created by another player. -> will be assigned a networkId when receiving the update message.
@@ -85,7 +104,6 @@ namespace gdjs {
       // ending up with 2 objects created, one with a networkId (from the host) and one without (from us).
       // To handle this case and avoid having an object not synchronized, we set a timeout to destroy the object
       // if it has not been assigned a networkId after a short delay.
-
       this._destroyInstanceTimeoutId = setTimeout(() => {
         if (!owner.networkId) {
           logger.info(
@@ -109,8 +127,8 @@ namespace gdjs {
       const currentPlayerNumber = gdjs.multiplayer.getPlayerNumber();
 
       const isOwnerOfObject =
-        currentPlayerNumber === this._playerNumber || // Player as owner.
-        (currentPlayerNumber === 1 && this._playerNumber === 0); // Host as owner.
+        currentPlayerNumber === this.playerNumber || // Player as owner.
+        (currentPlayerNumber === 1 && this.playerNumber === 0); // Host as owner.
 
       return isOwnerOfObject;
     }
@@ -237,6 +255,14 @@ namespace gdjs {
       return false;
     }
 
+    doStepPreEvents() {
+      // Before doing anything, check if the object is marked for destruction.
+      if (this._shouldDeleteObject) {
+        this.owner.deleteFromScene(this.owner.getInstanceContainer());
+        return;
+      }
+    }
+
     doStepPostEvents() {
       if (!this.isOwnerAsPlayerOrHost()) {
         return;
@@ -321,7 +347,7 @@ namespace gdjs {
         messageName: updateMessageName,
         messageData: updateMessageData,
       } = gdjs.multiplayerMessageManager.createUpdateObjectMessage({
-        objectOwner: this._playerNumber,
+        objectOwner: this.playerNumber,
         objectName,
         instanceNetworkId,
         objectNetworkSyncData,
@@ -404,7 +430,7 @@ namespace gdjs {
         messageName: updateMessageName,
         messageData: updateMessageData,
       } = gdjs.multiplayerMessageManager.createUpdateObjectMessage({
-        objectOwner: this._playerNumber,
+        objectOwner: this.playerNumber,
         objectName,
         instanceNetworkId,
         objectNetworkSyncData: this.owner.getObjectNetworkSyncData(),
@@ -425,7 +451,7 @@ namespace gdjs {
         messageName: destroyMessageName,
         messageData: destroyMessageData,
       } = gdjs.multiplayerMessageManager.createDestroyObjectMessage({
-        objectOwner: this._playerNumber,
+        objectOwner: this.playerNumber,
         objectName,
         instanceNetworkId,
         sceneNetworkId,
@@ -484,7 +510,7 @@ namespace gdjs {
         logger.info(
           'Object has no networkId, we change the ownership locally, but it will not be synchronized yet if we are not the owner.'
         );
-        this._playerNumber = newPlayerNumber;
+        this.playerNumber = newPlayerNumber;
         if (newPlayerNumber !== gdjs.multiplayer.getPlayerNumber()) {
           // If we are not the new owner, we should not send a message to the host to change the ownership.
           // Just return and wait to receive an update message to reconcile this object.
@@ -509,7 +535,7 @@ namespace gdjs {
           messageName,
           messageData,
         } = gdjs.multiplayerMessageManager.createChangeOwnerMessage({
-          objectOwner: this._playerNumber,
+          objectOwner: this.playerNumber,
           objectName,
           instanceNetworkId,
           newObjectOwner: newPlayerNumber,
@@ -549,7 +575,7 @@ namespace gdjs {
       // If we are player 1 or host, we will have the ownership immediately anyway.
       // If we are another player, we will have the ownership as soon as the host acknowledges the change.
       // If the host does not send an acknowledgment, we will revert the ownership.
-      this._playerNumber = newPlayerNumber;
+      this.playerNumber = newPlayerNumber;
 
       // If we are the new owner, also send directly an update of the position,
       // so that the object is immediately moved on the screen and we don't wait for the next tick.
@@ -565,7 +591,7 @@ namespace gdjs {
           messageName: updateMessageName,
           messageData: updateMessageData,
         } = gdjs.multiplayerMessageManager.createUpdateObjectMessage({
-          objectOwner: this._playerNumber,
+          objectOwner: this.playerNumber,
           objectName,
           instanceNetworkId,
           objectNetworkSyncData,
@@ -579,7 +605,7 @@ namespace gdjs {
     }
 
     getPlayerObjectOwnership(): number {
-      return this._playerNumber;
+      return this.playerNumber;
     }
 
     isObjectOwnedByCurrentPlayer(): boolean {

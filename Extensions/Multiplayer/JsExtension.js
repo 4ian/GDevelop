@@ -482,12 +482,38 @@ module.exports = {
           .setStringValue(newValue);
         return true;
       }
+      if (propertyName === 'playerNumber') {
+        const numberValue = newValue === 'Host' ? 0 : parseInt(newValue, 10);
+        behaviorContent.getChild('playerNumber').setIntValue(newValue);
+        return true;
+      }
 
       return false;
     };
 
     multiplayerObjectBehavior.getProperties = function (behaviorContent) {
       const behaviorProperties = new gd.MapStringPropertyDescriptor();
+
+      const playerNumberNumberValue = behaviorContent
+        .getChild('playerNumber')
+        .getIntValue();
+      const playerNumberStringValue =
+        playerNumberNumberValue === 0 ? 'Host' : `${playerNumberNumberValue}`;
+
+      behaviorProperties
+        .getOrCreate('playerNumber')
+        .setValue(playerNumberStringValue)
+        .setType('Choice')
+        .setLabel(_('Player owning the object'))
+        .addExtraInfo('Host')
+        .addExtraInfo('1')
+        .addExtraInfo('2')
+        .addExtraInfo('3')
+        .addExtraInfo('4')
+        .addExtraInfo('5')
+        .addExtraInfo('6')
+        .addExtraInfo('7')
+        .addExtraInfo('8');
 
       behaviorProperties
         .getOrCreate('actionOnPlayerDisconnect')
@@ -496,6 +522,7 @@ module.exports = {
         )
         .setType('Choice')
         .setLabel(_('Action when player disconnects'))
+        .setAdvanced(true)
         .addExtraInfo('DestroyObject')
         .addExtraInfo('GiveOwnershipToHost')
         .addExtraInfo('DoNothing');
@@ -504,6 +531,7 @@ module.exports = {
     };
 
     multiplayerObjectBehavior.initializeContent = function (behaviorContent) {
+      behaviorContent.addChild('playerNumber').setIntValue(0);
       behaviorContent
         .addChild('actionOnPlayerDisconnect')
         .setStringValue('DestroyObject');
@@ -553,9 +581,7 @@ module.exports = {
       .addParameter('behavior', _('Behavior'), 'MultiplayerObjectBehavior')
       .useStandardParameters(
         'number',
-        gd.ParameterOptions.makeNewOptions().setDescription(
-          _('Player number (1 by default)')
-        )
+        gd.ParameterOptions.makeNewOptions().setDescription(_('Player number'))
       )
       .markAsAdvanced()
       .setFunctionName('setPlayerObjectOwnership')

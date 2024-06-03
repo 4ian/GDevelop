@@ -317,6 +317,23 @@ void Variable::UnserializeFrom(const SerializerElement& element) {
 
 Variable& Variable::ResetPersistentUuid() {
   persistentUuid = UUID::MakeUuid4();
+  for (auto& it : children) {
+    it.second->ResetPersistentUuid();
+  }
+  for (auto& it : childrenArray) {
+    it->ResetPersistentUuid();
+  }
+  return *this;
+}
+
+Variable& Variable::ClearPersistentUuid() {
+  persistentUuid = "";
+  for (auto& it : children) {
+    it.second->ClearPersistentUuid();
+  }
+  for (auto& it : childrenArray) {
+    it->ClearPersistentUuid();
+  }
   return *this;
 }
 

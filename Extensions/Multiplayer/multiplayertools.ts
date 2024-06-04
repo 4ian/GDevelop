@@ -211,6 +211,9 @@ namespace gdjs {
     export const hasPlayerLeft = (playerNumber: number) =>
       gdjs.multiplayerMessageManager.hasPlayerLeft(playerNumber);
 
+    export const hasAnyPlayerLeft = () =>
+      gdjs.multiplayerMessageManager.hasAnyPlayerLeft();
+
     const handleLeavingPlayer = (runtimeScene: gdjs.RuntimeScene) => {
       const disconnectedPlayers = gdjs.multiplayerMessageManager.getDisconnectedPlayers();
       if (disconnectedPlayers.length > 0) {

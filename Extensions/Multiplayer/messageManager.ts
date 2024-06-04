@@ -1662,6 +1662,10 @@ namespace gdjs {
       _playerNumbersWhoJustLeft = [];
     };
 
+    const hasAnyPlayerLeft = () => {
+      return _playerNumbersWhoJustLeft.length > 0;
+    };
+
     const hasPlayerLeft = (playerNumber: number) => {
       return _playerNumbersWhoJustLeft.includes(playerNumber);
     };
@@ -1699,6 +1703,7 @@ namespace gdjs {
       getPlayerPing,
       handleDisconnectedPeers,
       clearDisconnectedPeers,
+      hasAnyPlayerLeft,
       hasPlayerLeft,
       getDisconnectedPlayers,
     };

@@ -51,7 +51,7 @@ const ObjectInstanceVariablesDialog = ({
         ? [
             {
               id: 'instance-variables',
-              label: <Trans>Scene variables</Trans>,
+              label: <Trans>Instance variables</Trans>,
               variablesContainer: objectInstance.getVariables(),
               inheritedVariablesContainer: variablesEditedAssociatedObject.getVariables(),
               emptyPlaceholderTitle: (

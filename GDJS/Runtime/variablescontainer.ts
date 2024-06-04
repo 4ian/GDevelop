@@ -206,7 +206,7 @@ namespace gdjs {
 
         networkSyncData.push({
           name: variableName,
-          value: variable.getAsNumberOrString(),
+          value: variable.getValue(),
           type: variable.getType(),
           children: this.getStructureNetworkSyncData(variable),
         });
@@ -220,15 +220,29 @@ namespace gdjs {
     getStructureNetworkSyncData(
       variable: gdjs.Variable
     ): VariableNetworkSyncData[] | undefined {
-      const variableChildren =
-        variable.getType() === 'structure' ? variable.getAllChildren() : null;
+      if (variable.getType() === 'array') {
+        return variable.getAllChildrenArray().map((childVariable) => {
+          return {
+            name: '',
+            value: childVariable.getValue(),
+            type: childVariable.getType(),
+            children: this.getStructureNetworkSyncData(childVariable),
+          };
+        });
+      }
+
+      if (variable.getType() !== 'structure') {
+        return undefined;
+      }
+
+      const variableChildren = variable.getAllChildren();
 
       const childrenSyncData = variableChildren
         ? Object.entries(variableChildren).map(
             ([childVariableName, childVariable]) => {
               return {
                 name: childVariableName,
-                value: childVariable.getAsNumberOrString(),
+                value: childVariable.getValue(),
                 type: childVariable.getType(),
                 children: this.getStructureNetworkSyncData(childVariable),
               };

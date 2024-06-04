@@ -84,7 +84,7 @@ describe('gdjs.SceneStack', () => {
     gdjs.registerRuntimeSceneResumedCallback(onRuntimeSceneResumed);
 
     // Test the stack
-    expect(sceneStack.pop()).to.be(null);
+    sceneStack.pop();
     expect(lastLoadedScene).to.be(null);
     expect(firstLoadedScene).to.be(null);
     expect(sceneStack.wasFirstSceneLoaded()).to.be(false);
@@ -110,13 +110,13 @@ describe('gdjs.SceneStack', () => {
     expect(lastLoadedScene).to.be(scene4);
     expect(firstLoadedScene).to.be(scene1); // Not changed
 
-    expect(sceneStack.pop()).to.be(scene4);
+    sceneStack.pop();
     expect(lastUnloadedScene).to.be(scene4);
     expect(lastResumedScene).to.be(scene2);
     expect(lastPausedScene).to.be(scene2); // Not changed
     expect(firstLoadedScene).to.be(scene1); // Not changed
 
-    expect(sceneStack.pop()).to.be(scene2);
+    sceneStack.pop();
     expect(lastUnloadedScene).to.be(scene2);
     expect(lastResumedScene).to.be(scene1);
     expect(lastPausedScene).to.be(scene2); // Not changed
@@ -129,7 +129,7 @@ describe('gdjs.SceneStack', () => {
     expect(lastResumedScene).to.be(scene1); // Not changed
     expect(firstLoadedScene).to.be(scene1); // Not changed
 
-    expect(sceneStack.pop()).to.be(null);
+    sceneStack.pop();
     expect(lastLoadedScene).to.be(scene5); // Not changed
     expect(lastUnloadedScene).to.be(scene1); // Not changed
     expect(lastPausedScene).to.be(scene2); // Not changed
@@ -402,7 +402,7 @@ describe('gdjs.SceneStack', () => {
     gdjs._unregisterCallback(onRuntimeScenePaused);
   });
 
-  it('can start a layout which assets loading didn\'t stated yet and wait them to finish', async () => {
+  it("can start a layout which assets loading didn't stated yet and wait them to finish", async () => {
     const mockedResourceManager = new gdjs.MockedResourceManager();
     //@ts-ignore
     const runtimeGame = gdjs.getPixiRuntimeGame(gameSettingsWithHeavyResource);

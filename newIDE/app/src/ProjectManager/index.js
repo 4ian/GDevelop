@@ -1265,16 +1265,15 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
             </Column>
           </LineStackLayout>
         </Column>
-        <div
-          style={styles.listContainer}
-          onKeyDown={keyboardShortcutsRef.current.onKeyDown}
-          onKeyUp={keyboardShortcutsRef.current.onKeyUp}
-          id="project-manager"
-        >
+        <div style={styles.listContainer} id="project-manager">
           <I18n>
             {({ i18n }) => (
               <>
-                <div style={styles.autoSizerContainer}>
+                <div
+                  style={styles.autoSizerContainer}
+                  onKeyDown={keyboardShortcutsRef.current.onKeyDown}
+                  onKeyUp={keyboardShortcutsRef.current.onKeyUp}
+                >
                   <AutoSizer style={styles.autoSizer} disableWidth>
                     {({ height }) => (
                       <TreeView

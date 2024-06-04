@@ -53,6 +53,7 @@ type Props = {|
   onEditObjectVariables?: () => void,
   title: React.Node,
   tabs: Array<TabProps>,
+  areObjectVariables?: boolean,
   initiallyOpenTabId?: string,
   initiallySelectedVariableName?: string,
 
@@ -84,6 +85,7 @@ const VariablesEditorDialog = ({
   initiallyOpenTabId,
   initiallySelectedVariableName,
   projectScopedContainersAccessor,
+  areObjectVariables,
 }: Props) => {
   const serializableObjects = React.useMemo(
     () =>
@@ -262,6 +264,7 @@ const VariablesEditorDialog = ({
                     projectScopedContainersAccessor
                   }
                   variablesContainer={variablesContainer}
+                  areObjectVariables={areObjectVariables}
                   initiallySelectedVariableName={initiallySelectedVariableName}
                   inheritedVariablesContainer={inheritedVariablesContainer}
                   emptyPlaceholderTitle={emptyPlaceholderTitle}

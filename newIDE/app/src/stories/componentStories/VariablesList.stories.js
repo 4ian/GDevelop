@@ -37,6 +37,7 @@ export const InstanceWithObjectVariables = () => (
           testProject.testSceneProjectScopedContainersAccessor
         }
         variablesContainer={testProject.testSpriteObjectInstance.getVariables()}
+        areObjectVariables
         emptyPlaceholderDescription="Variables help you store data"
         emptyPlaceholderTitle="Variables"
         helpPagePath="/variables"

@@ -100,6 +100,7 @@ export type HistoryHandler = {|
 type Props = {|
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   variablesContainer: gdVariablesContainer,
+  areObjectVariables?: boolean,
   inheritedVariablesContainer?: gdVariablesContainer,
   initiallySelectedVariableName?: string,
   /** Callback executed at mount to compute suggestions. */
@@ -1487,10 +1488,11 @@ const VariablesList = (props: Props) => {
           (parentVariable && parentVariable.hasChild(tentativeNewName)) ||
           (!parentVariable &&
             (props.variablesContainer.has(tentativeNewName) ||
-              props.projectScopedContainersAccessor
-                .get()
-                .getObjectsContainersList()
-                .hasObjectOrGroupNamed(tentativeNewName)))
+              (!props.areObjectVariables &&
+                props.projectScopedContainersAccessor
+                  .get()
+                  .getObjectsContainersList()
+                  .hasObjectOrGroupNamed(tentativeNewName))))
       );
 
       if (!parentVariable) {
@@ -1508,6 +1510,7 @@ const VariablesList = (props: Props) => {
     },
     [
       props.variablesContainer,
+      props.areObjectVariables,
       props.projectScopedContainersAccessor,
       _onChange,
       updateExpandedAndSelectedNodesFollowingNameChange,

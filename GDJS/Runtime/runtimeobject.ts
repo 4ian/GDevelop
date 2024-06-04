@@ -503,10 +503,12 @@ namespace gdjs {
      * @returns true if the object was updated, false if it could not (i.e: network sync is not supported).
      */
     updateFromObjectNetworkSyncData(networkSyncData: ObjectNetworkSyncData) {
-      if (networkSyncData.x !== undefined || networkSyncData.y !== undefined) {
-        this.setPosition(networkSyncData.x, networkSyncData.y);
+      if (networkSyncData.x !== undefined) {
+        this.setX(networkSyncData.x);
       }
-
+      if (networkSyncData.y !== undefined) {
+        this.setY(networkSyncData.y);
+      }
       if (networkSyncData.z !== undefined) {
         this.setZOrder(networkSyncData.z);
       }

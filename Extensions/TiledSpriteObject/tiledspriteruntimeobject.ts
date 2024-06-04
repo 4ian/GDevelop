@@ -98,15 +98,6 @@ namespace gdjs {
 
       // Texture is not synchronized, see if this is asked or not.
 
-      if (networkSyncData.x !== undefined) {
-        this.setX(networkSyncData.x);
-      }
-      if (networkSyncData.y !== undefined) {
-        this.setY(networkSyncData.y);
-      }
-      if (networkSyncData.a !== undefined) {
-        this.setAngle(networkSyncData.a);
-      }
       if (networkSyncData.wid !== undefined) {
         this.setWidth(networkSyncData.wid);
       }

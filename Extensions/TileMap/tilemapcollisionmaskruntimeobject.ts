@@ -202,15 +202,6 @@ namespace gdjs {
     ): void {
       super.updateFromObjectNetworkSyncData(networkSyncData);
 
-      if (networkSyncData.x !== undefined) {
-        this.setX(networkSyncData.x);
-      }
-      if (networkSyncData.y !== undefined) {
-        this.setY(networkSyncData.y);
-      }
-      if (networkSyncData.a !== undefined) {
-        this.setAngle(networkSyncData.a);
-      }
       if (networkSyncData.tmjf !== undefined) {
         this.setTilemapJsonFile(networkSyncData.tmjf);
       }

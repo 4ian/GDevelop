@@ -240,17 +240,6 @@ namespace gdjs {
       if (networkSyncData.str !== undefined) {
         this.setText(networkSyncData.str);
       }
-      if (networkSyncData.x !== undefined) {
-        // It's important to call this function if x changes as it will update the renderer.
-        this.setX(networkSyncData.x);
-      }
-      if (networkSyncData.y !== undefined) {
-        // It's important to call this function if y changes as it will update the renderer.
-        this.setY(networkSyncData.y);
-      }
-      if (networkSyncData.a !== undefined) {
-        this.setAngle(networkSyncData.a);
-      }
       if (networkSyncData.o !== undefined) {
         this.setOpacity(networkSyncData.o);
       }

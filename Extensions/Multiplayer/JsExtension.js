@@ -292,7 +292,7 @@ module.exports = {
 
     extension
       .addCondition(
-        'isPlayerHost',
+        'IsPlayerHost',
         _('Player is host'),
         _('Check if the player is the host. (Player 1 is the host)'),
         _('Player is host'),
@@ -316,7 +316,7 @@ module.exports = {
 
     extension
       .addCondition(
-        'hasAnyPlayerLeft',
+        'HasAnyPlayerLeft',
         _('Any player has left'),
         _('Check if any player has left the lobby.'),
         _('Any player has left'),
@@ -340,7 +340,7 @@ module.exports = {
 
     extension
       .addCondition(
-        'hasPlayerLeft',
+        'HasPlayerLeft',
         _('Player has left'),
         _('Check if the player has left the lobby.'),
         _('Player _PARAM0_ has left'),

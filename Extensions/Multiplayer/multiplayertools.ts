@@ -399,7 +399,7 @@ namespace gdjs {
               const messageData = messageContent.data;
               const connectionId = messageData.connectionId;
               const positionInLobby = messageData.positionInLobby;
-              const validStunServers = messageData.validStunServers || [];
+              const validIceServers = messageData.validIceServers || [];
 
               if (!connectionId || !positionInLobby) {
                 logger.error('No connectionId or position received');
@@ -413,7 +413,7 @@ namespace gdjs {
                 lobbyId,
                 playerId,
                 playerToken,
-                validStunServers,
+                validIceServers,
               });
               break;
             }
@@ -505,7 +505,7 @@ namespace gdjs {
       lobbyId,
       playerId,
       playerToken,
-      validStunServers,
+      validIceServers,
     }: {
       runtimeScene: gdjs.RuntimeScene;
       connectionId: string;
@@ -513,12 +513,12 @@ namespace gdjs {
       lobbyId: string;
       playerId: string;
       playerToken: string;
-      validStunServers: string[];
+      validIceServers: string[];
     }) {
       // When the connectionId is received, initialise PeerJS so players can connect to each others afterwards.
-      if (validStunServers.length) {
-        console.info('Using custom STUN servers:', validStunServers);
-        for (const server of validStunServers) {
+      if (validIceServers.length) {
+        console.info('Using custom servers:', validIceServers);
+        for (const server of validIceServers) {
           gdjs.evtTools.p2p.useCustomICECandidate(server);
         }
       }

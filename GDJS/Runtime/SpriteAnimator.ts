@@ -65,7 +65,7 @@ namespace gdjs {
     directions: Array<SpriteDirectionData>;
   };
 
-  /** Represents all the information needed to synchronize the animations of a SpriteRuntimeObject. */
+  /** Represents all the information needed to synchronize the animations of an object. */
   export type SpriteAnimatorNetworkSyncData = {
     an: integer;
     di: integer;

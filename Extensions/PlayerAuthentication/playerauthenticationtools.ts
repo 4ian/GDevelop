@@ -13,9 +13,6 @@ namespace gdjs {
 
     let _checkedLocalStorage: boolean = false;
 
-    // Callbacks that can be used by other extensions.
-    let _loginCallbacks: Array<() => void> = [];
-
     // Authentication display
     let _authenticationWindow: Window | null = null; // For Web.
     let _authenticationInAppWindow: any | null = null; // For Cordova.
@@ -252,7 +249,6 @@ namespace gdjs {
       }
       window.localStorage.removeItem(getLocalStorageKey(gameId));
       cleanUpAuthWindowAndTimeouts(runtimeScene);
-      cleanUpLoginCallbacks();
       removeAuthenticationBanner(runtimeScene);
       const domElementContainer = runtimeScene
         .getGame()
@@ -326,10 +322,6 @@ namespace gdjs {
       }
     };
 
-    const cleanUpLoginCallbacks = () => {
-      _loginCallbacks = [];
-    };
-
     const saveAuthKeyToStorage = ({
       username,
       userId,
@@ -383,9 +375,6 @@ namespace gdjs {
       saveAuthKeyToStorage({ userId, username, userToken });
       cleanUpAuthWindowAndTimeouts(runtimeScene);
       removeAuthenticationBanner(runtimeScene);
-      _loginCallbacks.forEach((callback) => callback());
-      // Clear the login callbacks after they have been called.
-      cleanUpLoginCallbacks();
 
       const domElementContainer = runtimeScene
         .getGame()
@@ -474,7 +463,6 @@ namespace gdjs {
     ) {
       logger.error(message);
       cleanUpAuthWindowAndTimeouts(runtimeScene);
-      cleanUpLoginCallbacks();
 
       const domElementContainer = runtimeScene
         .getGame()
@@ -505,7 +493,6 @@ namespace gdjs {
           'Authentication window did not send message in time. Closing it.'
         );
         cleanUpAuthWindowAndTimeouts(runtimeScene);
-        cleanUpLoginCallbacks();
         focusOnGame(runtimeScene);
       }, time);
     };
@@ -953,7 +940,6 @@ namespace gdjs {
           let isDimissedAlready = false;
           const onAuthenticationContainerDismissed = () => {
             cleanUpAuthWindowAndTimeouts(runtimeScene);
-            cleanUpLoginCallbacks();
             displayAuthenticationBanner(runtimeScene);
 
             isDimissedAlready = true;
@@ -1153,10 +1139,6 @@ namespace gdjs {
     const focusOnGame = function (runtimeScene: gdjs.RuntimeScene) {
       const gameCanvas = runtimeScene.getGame().getRenderer().getCanvas();
       if (gameCanvas) gameCanvas.focus();
-    };
-
-    export const setLoginCallback = (callback: () => void) => {
-      _loginCallbacks.push(callback);
     };
   }
 }

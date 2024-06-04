@@ -926,12 +926,17 @@ namespace gdjs {
       const playerToken = gdjs.playerAuthentication.getUserToken();
       if (!playerId || !playerToken) {
         _isWaitingForLoginCallback = true;
-        gdjs.playerAuthentication.openAuthenticationWindow(runtimeScene);
-        // Create a callback to open the lobbies window once the player is connected.
-        gdjs.playerAuthentication.setLoginCallback(() => {
-          _isWaitingForLoginCallback = false;
+        const {
+          status,
+        } = await gdjs.playerAuthentication.openAuthenticationWindow(
+          runtimeScene
+        ).promise;
+        _isWaitingForLoginCallback = false;
+
+        if (status === 'logged') {
           openLobbiesWindow(runtimeScene);
-        });
+        }
+
         return;
       }
 

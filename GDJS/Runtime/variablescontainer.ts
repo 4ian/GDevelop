@@ -204,10 +204,16 @@ namespace gdjs {
           return;
         }
 
+        const variableType = variable.getType();
+        const variableValue =
+          variableType === 'structure' || variableType === 'array'
+            ? ''
+            : variable.getValue();
+
         networkSyncData.push({
           name: variableName,
-          value: variable.getValue(),
-          type: variable.getType(),
+          value: variableValue,
+          type: variableType,
           children: this.getStructureNetworkSyncData(variable),
         });
       });
@@ -222,35 +228,48 @@ namespace gdjs {
     ): VariableNetworkSyncData[] | undefined {
       if (variable.getType() === 'array') {
         return variable.getAllChildrenArray().map((childVariable) => {
+          const childVariableType = childVariable.getType();
+          const childVariableValue =
+            childVariableType === 'structure' || childVariableType === 'array'
+              ? ''
+              : childVariable.getValue();
+
           return {
             name: '',
-            value: childVariable.getValue(),
-            type: childVariable.getType(),
+            value: childVariableValue,
+            type: childVariableType,
             children: this.getStructureNetworkSyncData(childVariable),
           };
         });
       }
 
-      if (variable.getType() !== 'structure') {
-        return undefined;
+      if (variable.getType() === 'structure') {
+        const variableChildren = variable.getAllChildren();
+
+        const childrenSyncData = variableChildren
+          ? Object.entries(variableChildren).map(
+              ([childVariableName, childVariable]) => {
+                const childVariableType = childVariable.getType();
+                const childVariableValue =
+                  childVariableType === 'structure' ||
+                  childVariableType === 'array'
+                    ? ''
+                    : childVariable.getValue();
+
+                return {
+                  name: childVariableName,
+                  value: childVariableValue,
+                  type: childVariableType,
+                  children: this.getStructureNetworkSyncData(childVariable),
+                };
+              }
+            )
+          : undefined;
+
+        return childrenSyncData;
       }
 
-      const variableChildren = variable.getAllChildren();
-
-      const childrenSyncData = variableChildren
-        ? Object.entries(variableChildren).map(
-            ([childVariableName, childVariable]) => {
-              return {
-                name: childVariableName,
-                value: childVariable.getValue(),
-                type: childVariable.getType(),
-                children: this.getStructureNetworkSyncData(childVariable),
-              };
-            }
-          )
-        : undefined;
-
-      return childrenSyncData;
+      return undefined;
     }
 
     updateFromNetworkSyncData(networkSyncData: VariableNetworkSyncData[]) {

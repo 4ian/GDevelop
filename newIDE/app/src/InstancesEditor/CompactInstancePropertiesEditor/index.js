@@ -199,6 +199,7 @@ const CompactInstancePropertiesEditor = ({
                 directlyStoreValueChangesWhileEditing
                 inheritedVariablesContainer={object.getVariables()}
                 variablesContainer={instance.getVariables()}
+                areObjectVariables
                 size="small"
                 onComputeAllVariableNames={() =>
                   object

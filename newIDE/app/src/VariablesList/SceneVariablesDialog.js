@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
-import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
+import VariablesEditorDialog from './VariablesEditorDialog';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';

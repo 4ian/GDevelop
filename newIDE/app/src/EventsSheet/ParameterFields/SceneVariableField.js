@@ -5,7 +5,7 @@ import VariableField, {
   renderVariableWithIcon,
   type VariableFieldInterface,
 } from './VariableField';
-import SceneVariablesDialog from '../../SceneEditor/SceneVariablesDialog';
+import SceneVariablesDialog from '../../VariablesList/SceneVariablesDialog';
 import {
   type ParameterFieldProps,
   type ParameterFieldInterface,

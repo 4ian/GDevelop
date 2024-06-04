@@ -7,7 +7,7 @@ import { t } from '@lingui/macro';
 import * as React from 'react';
 import LayerRemoveDialog from '../LayersList/LayerRemoveDialog';
 import LayerEditorDialog from '../LayersList/LayerEditorDialog';
-import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
+import ObjectInstanceVariablesDialog from '../VariablesList/ObjectInstanceVariablesDialog';
 import ObjectEditorDialog from '../ObjectEditor/ObjectEditorDialog';
 import ObjectExporterDialog from '../ObjectEditor/ObjectExporterDialog';
 import ObjectGroupEditorDialog from '../ObjectGroupEditor/ObjectGroupEditorDialog';
@@ -46,7 +46,7 @@ import {
 } from '../ObjectsList/EnumerateObjects';
 import InfoBar from '../UI/Messages/InfoBar';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
-import SceneVariablesDialog from './SceneVariablesDialog';
+import SceneVariablesDialog from '../VariablesList/SceneVariablesDialog';
 import { onObjectAdded, onInstanceAdded } from '../Hints/ObjectsAdditionalWork';
 import { type InfoBarDetails } from '../Hints/ObjectsAdditionalWork';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
@@ -1881,63 +1881,23 @@ export default class SceneEditor extends React.Component<Props, State> {
               )}
               {!!this.state.variablesEditedInstance &&
                 !!variablesEditedAssociatedObject && (
-                  <VariablesEditorDialog
+                  <ObjectInstanceVariablesDialog
                     project={project}
+                    layout={layout}
                     projectScopedContainersAccessor={
                       projectScopedContainersAccessor
                     }
+                    objectInstance={this.state.variablesEditedInstance}
                     open
                     onCancel={() => this.editInstanceVariables(null)}
                     onApply={() => this.editInstanceVariables(null)}
-                    tabs={[
-                      {
-                        id: 'instance-variables',
-                        label: <Trans>Scene variables</Trans>,
-                        variablesContainer: this.state.variablesEditedInstance.getVariables(),
-                        inheritedVariablesContainer: variablesEditedAssociatedObject.getVariables(),
-                        emptyPlaceholderTitle: (
-                          <Trans>Add your first instance variable</Trans>
-                        ),
-                        emptyPlaceholderDescription: (
-                          <Trans>
-                            Instance variables overwrite the default values of
-                            the variables of the object.
-                          </Trans>
-                        ),
-                        onComputeAllVariableNames: () => {
-                          const { variablesEditedInstance } = this.state;
-                          if (!variablesEditedInstance) {
-                            return [];
-                          }
-                          const variablesEditedObject = getObjectByName(
-                            project,
-                            layout,
-                            variablesEditedInstance.getObjectName()
-                          );
-                          return variablesEditedObject
-                            ? EventsRootVariablesFinder.findAllObjectVariables(
-                                project.getCurrentPlatform(),
-                                project,
-                                layout,
-                                variablesEditedObject.getName()
-                              )
-                            : [];
-                        },
-                      },
-                    ]}
-                    helpPagePath={'/all-features/variables/instance-variables'}
-                    title={<Trans>Instance Variables</Trans>}
-                    onEditObjectVariables={
-                      variablesEditedAssociatedObject
-                        ? () => {
-                            this.editObject(
-                              variablesEditedAssociatedObject,
-                              'variables'
-                            );
-                            this.editInstanceVariables(null);
-                          }
-                        : undefined
-                    }
+                    onEditObjectVariables={() => {
+                      this.editObject(
+                        variablesEditedAssociatedObject,
+                        'variables'
+                      );
+                      this.editInstanceVariables(null);
+                    }}
                     hotReloadPreviewButtonProps={
                       this.props.hotReloadPreviewButtonProps
                     }

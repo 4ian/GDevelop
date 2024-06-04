@@ -299,6 +299,7 @@ const InnerDialog = (props: InnerDialogProps) => {
               props.projectScopedContainersAccessor
             }
             variablesContainer={props.object.getVariables()}
+            areObjectVariables
             emptyPlaceholderTitle={
               <Trans>Add your first object variable</Trans>
             }

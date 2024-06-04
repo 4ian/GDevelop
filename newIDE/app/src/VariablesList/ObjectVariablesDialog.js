@@ -21,7 +21,6 @@ type Props = {|
    * project must be refactored to delete any reference to it.
    */
   preventRefactoringToDeleteInstructions?: boolean,
-  isGlobalTabInitiallyOpen?: boolean,
   initiallySelectedVariableName?: string,
 |};
 
@@ -35,7 +34,6 @@ const ObjectVariablesDialog = ({
   onApply,
   hotReloadPreviewButtonProps,
   preventRefactoringToDeleteInstructions,
-  isGlobalTabInitiallyOpen,
   initiallySelectedVariableName,
   projectScopedContainersAccessor,
 }: Props) => {
@@ -53,21 +51,20 @@ const ObjectVariablesDialog = ({
   );
 
   const tabs = React.useMemo(
-    () =>
-      [
-        {
-          id: 'object-variables',
-          label: <Trans>Object variables</Trans>,
-          variablesContainer: variablesContainer,
-          emptyPlaceholderTitle: <Trans>Add your first object variable</Trans>,
-          emptyPlaceholderDescription: (
-            <Trans>
-              These variables hold additional information on an object.
-            </Trans>
-          ),
-          onComputeAllVariableNames,
-        },
-      ].filter(Boolean),
+    () => [
+      {
+        id: 'object-variables',
+        label: <Trans>Object variables</Trans>,
+        variablesContainer: variablesContainer,
+        emptyPlaceholderTitle: <Trans>Add your first object variable</Trans>,
+        emptyPlaceholderDescription: (
+          <Trans>
+            These variables hold additional information on an object.
+          </Trans>
+        ),
+        onComputeAllVariableNames,
+      },
+    ],
     [onComputeAllVariableNames, variablesContainer]
   );
 
@@ -75,6 +72,7 @@ const ObjectVariablesDialog = ({
     <VariablesEditorDialog
       project={project}
       projectScopedContainersAccessor={projectScopedContainersAccessor}
+      areObjectVariables
       open={open}
       onCancel={onCancel}
       onApply={onApply}

@@ -11,7 +11,7 @@ import ProjectPropertiesDialog from './ProjectPropertiesDialog';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import ExtensionsSearchDialog from '../AssetStore/ExtensionStore/ExtensionsSearchDialog';
 import ScenePropertiesDialog from '../SceneEditor/ScenePropertiesDialog';
-import SceneVariablesDialog from '../SceneEditor/SceneVariablesDialog';
+import SceneVariablesDialog from '../VariablesList/SceneVariablesDialog';
 import { isExtensionNameTaken } from './EventFunctionExtensionNameVerifier';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import ProjectManagerCommands from './ProjectManagerCommands';

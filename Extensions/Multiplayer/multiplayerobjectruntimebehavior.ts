@@ -260,15 +260,13 @@ namespace gdjs {
       return false;
     }
 
-    doStepPreEvents() {
+    doStepPostEvents() {
       // Before doing anything, check if the object is marked for destruction.
       if (this._shouldDeleteObject) {
         this.owner.deleteFromScene(this.owner.getInstanceContainer());
         return;
       }
-    }
 
-    doStepPostEvents() {
       if (!this.isOwnerAsPlayerOrHost()) {
         return;
       }

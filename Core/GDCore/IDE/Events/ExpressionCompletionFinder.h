@@ -327,6 +327,7 @@ struct GD_CORE_API ExpressionCompletionDescription {
                                   size_t replacementEndPosition_)
       : completionKind(completionKind_),
         variableType(gd::Variable::Number),
+        variableScope(gd::VariablesContainer::Unknown),
         replacementStartPosition(replacementStartPosition_),
         replacementEndPosition(replacementEndPosition_),
         isExact(false),
@@ -946,6 +947,7 @@ class GD_CORE_API ExpressionCompletionFinder
               location.GetEndPosition());
           description.SetCompletion(variableName);
           description.SetVariableType(variable.GetType());
+          description.SetVariableScope(variablesContainer.GetSourceType());
           completions.push_back(description);
 
           if (eagerlyCompleteIfExactMatch && variableName == search) {
@@ -971,6 +973,7 @@ class GD_CORE_API ExpressionCompletionFinder
               location.GetEndPosition());
           description.SetCompletion(variableName);
           description.SetVariableType(variable.GetType());
+          description.SetVariableScope(gd::VariablesContainer::Object);
           completions.push_back(description);
 
           if (eagerlyCompleteIfExactMatch && variableName == search) {
@@ -1025,6 +1028,10 @@ class GD_CORE_API ExpressionCompletionFinder
               location.GetEndPosition());
           description.SetCompletion(variableName);
           description.SetVariableType(variable.GetType());
+          description.SetVariableScope(
+              projectScopedContainers.GetVariablesContainersList()
+                  .GetVariablesContainerFromVariableName(variableName)
+                  .GetSourceType());
           completions.push_back(description);
 
           if (eagerlyCompleteIfExactMatch && variableName == search) {
@@ -1073,7 +1080,10 @@ class GD_CORE_API ExpressionCompletionFinder
               location.GetEndPosition());
           description.SetCompletion(variableName);
           description.SetVariableType(variable.GetType());
-          description.SetVariableScope(projectScopedContainers.GetVariablesContainersList().GetVariablesContainerFromVariableName(variableName).GetSourceType());
+          description.SetVariableScope(
+              projectScopedContainers.GetVariablesContainersList()
+                  .GetVariablesContainerFromVariableName(variableName)
+                  .GetSourceType());
           completions.push_back(description);
 
           if (eagerlyCompleteIfExactMatch && variableName == search) {

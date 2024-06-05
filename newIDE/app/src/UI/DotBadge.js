@@ -14,9 +14,7 @@ const useStyles = (color: BadgeColor) =>
               backgroundColor:
                 color === 'success'
                   ? theme.palette.success.main
-                  : theme.palette.type === 'dark'
-                  ? 'white'
-                  : 'black',
+                  : theme.palette.text.primary,
             },
           }
         : {};

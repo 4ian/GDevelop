@@ -576,7 +576,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         gd::String outputCode;
         gd::RepeatEvent &event = dynamic_cast<gd::RepeatEvent &>(event_);
 
-        gd::String repeatNumberExpression = event.GetRepeatExpression();
+        const gd::Expression &repeatNumberExpression = event.GetRepeatExpression();
 
         // Prepare expression containing how many times event must be repeated
         gd::String repeatCountCode =

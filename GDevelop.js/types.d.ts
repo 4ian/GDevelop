@@ -1665,8 +1665,8 @@ export class RepeatEvent extends BaseEvent {
   constructor();
   getConditions(): InstructionsList;
   getActions(): InstructionsList;
-  setRepeatExpression(expr: string): void;
-  getRepeatExpression(): string;
+  setRepeatExpressionPlainString(expr: string): void;
+  getRepeatExpression(): Expression;
 }
 
 export class WhileEvent extends BaseEvent {

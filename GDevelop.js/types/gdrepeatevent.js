@@ -3,8 +3,8 @@ declare class gdRepeatEvent extends gdBaseEvent {
   constructor(): void;
   getConditions(): gdInstructionsList;
   getActions(): gdInstructionsList;
-  setRepeatExpression(expr: string): void;
-  getRepeatExpression(): string;
+  setRepeatExpressionPlainString(expr: string): void;
+  getRepeatExpression(): gdExpression;
   delete(): void;
   ptr: number;
 };

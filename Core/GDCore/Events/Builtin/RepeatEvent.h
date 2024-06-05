@@ -4,8 +4,8 @@
  * reserved. This project is released under the MIT License.
  */
 
-#ifndef GDCORE_REPEATEVENT_H
-#define GDCORE_REPEATEVENT_H
+#pragma once
+
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/EventsList.h"
 namespace gd {
@@ -36,10 +36,10 @@ class GD_CORE_API RepeatEvent : public gd::BaseEvent {
   const gd::InstructionsList& GetActions() const { return actions; };
   gd::InstructionsList& GetActions() { return actions; };
 
-  const gd::String& GetRepeatExpression() const {
-    return repeatNumberExpression.GetPlainString();
+  const gd::Expression& GetRepeatExpression() const {
+    return repeatNumberExpression;
   };
-  void SetRepeatExpression(gd::String repeatNumberExpression_) {
+  void SetRepeatExpressionPlainString(gd::String repeatNumberExpression_) {
     repeatNumberExpression = gd::Expression(repeatNumberExpression_);
   };
 
@@ -68,5 +68,3 @@ class GD_CORE_API RepeatEvent : public gd::BaseEvent {
 };
 
 }  // namespace gd
-
-#endif  // GDCORE_REPEATEVENT_H

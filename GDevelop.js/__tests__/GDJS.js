@@ -210,7 +210,7 @@ describe('libGD.js - GDJS related tests', function () {
       const evt = layout
         .getEvents()
         .insertNewEvent(project, 'BuiltinCommonInstructions::Repeat', 0);
-      gd.asRepeatEvent(evt).setRepeatExpression('5+4+3+2+1');
+      gd.asRepeatEvent(evt).setRepeatExpressionPlainString('5+4+3+2+1');
       const condition = new gd.Instruction();
       condition.setType('BuiltinCommonInstructions::Once');
       gd.asRepeatEvent(evt).getConditions().insert(condition, 0);
@@ -427,7 +427,7 @@ describe('libGD.js - GDJS related tests', function () {
         'BuiltinCommonInstructions::Repeat',
         0
       );
-      gd.asRepeatEvent(evt).setRepeatExpression('5+4+3+2+1');
+      gd.asRepeatEvent(evt).setRepeatExpressionPlainString('5+4+3+2+1');
 
       // ...a trigger once condition...
       const condition = new gd.Instruction();
@@ -551,7 +551,7 @@ describe('libGD.js - GDJS related tests', function () {
         'BuiltinCommonInstructions::Repeat',
         0
       );
-      gd.asRepeatEvent(evt).setRepeatExpression('5+4+3+2+1');
+      gd.asRepeatEvent(evt).setRepeatExpressionPlainString('5+4+3+2+1');
 
       // ...an action to update a variable of the group of objects
       const action = new gd.Instruction();

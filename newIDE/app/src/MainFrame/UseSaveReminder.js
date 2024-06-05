@@ -56,13 +56,10 @@ const useSaveReminder = ({ onSave, project }: Props) => {
     number | null
   >(null);
 
-  const unsavedChangesAmount = getUnsavedChangesAmount(unsavedChanges);
-
-  const [temp, setTemp] = React.useState<Object>({});
-  useInterval(() => setTemp({}), project ? CHECK_FREQUENCY : null);
-
-  React.useEffect(
+  useInterval(
     () => {
+      const unsavedChangesAmount = getUnsavedChangesAmount(unsavedChanges);
+
       if (
         !displaySaveReminderPreference.activated ||
         currentlyRunningInAppTutorial ||
@@ -80,37 +77,31 @@ const useSaveReminder = ({ onSave, project }: Props) => {
         setDisplayReminder(newDisplayReminder);
       }
     },
-    [
-      // Necessary dependencies
-      displaySaveReminderPreference,
-      unsavedChangesAmount,
-      lastAcknowledgement,
-      currentlyRunningInAppTutorial,
-      displayReminder,
-      project,
-      // Added dependency to have the possibility to show the reminder regularly.
-      temp,
-    ]
+    project ? CHECK_FREQUENCY : null
   );
 
   const onHideReminder = React.useCallback(() => {
     setLastAcknowledgement(Date.now());
+    setDisplayReminder(false);
   }, []);
 
-  const renderSaveReminder = () => {
-    return (
-      <InfoBar
-        duration={-1}
-        visible={displayReminder}
-        message={<Trans>Think about saving your progress!</Trans>}
-        hide={onHideReminder}
-        actionLabel={<Trans>Save</Trans>}
-        onActionClick={onSave}
-        closable
-      />
-    );
-  };
-  return { renderSaveReminder };
+  const renderSaveReminder = React.useCallback(
+    () => {
+      return (
+        <InfoBar
+          duration={-1}
+          visible={displayReminder}
+          message={<Trans>Think about saving your progress!</Trans>}
+          hide={onHideReminder}
+          actionLabel={<Trans>Save</Trans>}
+          onActionClick={onSave}
+          closable
+        />
+      );
+    },
+    [displayReminder, onHideReminder, onSave]
+  );
+  return renderSaveReminder;
 };
 
 export default useSaveReminder;

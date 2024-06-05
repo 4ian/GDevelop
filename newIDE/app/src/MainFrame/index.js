@@ -2636,7 +2636,7 @@ const MainFrame = (props: Props) => {
     ]
   );
 
-  const { renderSaveReminder } = useSaveReminder({
+  const renderSaveReminder = useSaveReminder({
     onSave: saveProject,
     project: currentProject,
   });

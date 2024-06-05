@@ -83,7 +83,7 @@ type State = {|
   behaviorMethodSelectorDialogOpen: boolean,
   objectMethodSelectorDialogOpen: boolean,
   extensionFunctionSelectorDialogOpen: boolean,
-  variablesEditorOpen: { global: boolean } | null,
+  variablesEditorOpen: { isGlobalTabInitiallyOpen: boolean } | null,
   onAddEventsFunctionCb: ?(
     parameters: ?EventsFunctionCreationParameters
   ) => void,
@@ -901,7 +901,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   };
 
   _editVariables = (
-    options: { global: boolean } | null = { global: false }
+    options: { isGlobalTabInitiallyOpen: boolean } | null = {
+      isGlobalTabInitiallyOpen: false,
+    }
   ) => {
     this.setState({
       variablesEditorOpen: options,
@@ -1361,7 +1363,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 onEventsBasedObjectRenamed={this._onEventsBasedObjectRenamed}
                 onSelectExtensionProperties={() => this._editOptions(true)}
                 onSelectExtensionGlobalVariables={() =>
-                  this._editVariables({ global })
+                  this._editVariables({ isGlobalTabInitiallyOpen: true })
                 }
                 onSelectExtensionSceneVariables={() => this._editVariables()}
               />
@@ -1449,7 +1451,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         )}
         {variablesEditorOpen && project && (
           <GlobalAndSceneVariablesDialog
-            isGlobalTabInitiallyOpen={variablesEditorOpen.global}
+            isGlobalTabInitiallyOpen={
+              variablesEditorOpen.isGlobalTabInitiallyOpen
+            }
             globalVariables={eventsFunctionsExtension.getGlobalVariables()}
             sceneVariables={eventsFunctionsExtension.getSceneVariables()}
             project={project}

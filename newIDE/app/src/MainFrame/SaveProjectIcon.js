@@ -19,10 +19,7 @@ const CHECK_FREQUENCY = 5000;
 
 const SaveProjectIcon = (props: Props) => {
   const unsavedChanges = React.useContext(UnsavedChangesContext);
-  const unsavedChangesAmount = React.useMemo(
-    () => getUnsavedChangesAmount(unsavedChanges),
-    [unsavedChanges]
-  );
+  const unsavedChangesAmount = getUnsavedChangesAmount(unsavedChanges);
   const displayDotBadge = unsavedChangesAmount !== 'none';
   const dotBadgeColor = unsavedChangesAmount === 'small' ? 'neutral' : 'error';
 

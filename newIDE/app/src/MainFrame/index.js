@@ -1111,6 +1111,7 @@ const MainFrame = (props: Props) => {
           );
           return state;
         } finally {
+          unsavedChanges.sealUnsavedChanges();
           serializedProject.delete();
         }
       } catch (error) {
@@ -1135,6 +1136,7 @@ const MainFrame = (props: Props) => {
       loadFromSerializedProject,
       showConfirmation,
       showAlert,
+      unsavedChanges,
     ]
   );
 
@@ -2140,7 +2142,6 @@ const MainFrame = (props: Props) => {
           )
         );
         if (!answer) return;
-        unsavedChanges.sealUnsavedChanges();
       }
 
       const { fileMetadata } = fileMetadataAndStorageProviderName;

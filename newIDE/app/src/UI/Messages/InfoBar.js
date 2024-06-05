@@ -33,6 +33,7 @@ const InfoBar = ({
 
   React.useEffect(
     () => {
+      if (duration <= 0) return;
       if (visible) {
         const timeout = setTimeout(() => {
           hide();

@@ -5,16 +5,16 @@ export type UnsavedChanges = {|
   hasUnsavedChanges: boolean,
   sealUnsavedChanges: () => void,
   triggerUnsavedChanges: () => void,
-  changesCount: number,
-  lastSaveTime: number | null,
+  getChangesCount: () => number,
+  getLastSaveTime: () => number | null,
 |};
 
 const initialState: UnsavedChanges = {
   hasUnsavedChanges: false,
   sealUnsavedChanges: () => {},
   triggerUnsavedChanges: () => {},
-  changesCount: 0,
-  lastSaveTime: null,
+  getChangesCount: () => 0,
+  getLastSaveTime: () => null,
 };
 
 const UnsavedChangesContext = React.createContext<UnsavedChanges>(initialState);
@@ -29,19 +29,22 @@ export const UnsavedChangesContextProvider = (props: Props) => {
   const [hasUnsavedChanges, setHasUnsavedChanges] = React.useState<boolean>(
     false
   );
-  const [changesCount, setChangesCount] = React.useState<number>(0);
-  const [lastSaveTime, setLastSaveTime] = React.useState<number | null>(null);
+  const changesCount = React.useRef<number>(0);
+  const lastSaveTime = React.useRef<number | null>(null);
 
   const triggerUnsavedChanges = React.useCallback((): void => {
-    setChangesCount(changesCount_ => changesCount_ + 1);
+    changesCount.current = changesCount.current + 1;
     setHasUnsavedChanges(true);
   }, []);
 
   const sealUnsavedChanges = React.useCallback((): void => {
-    setChangesCount(0);
-    setLastSaveTime(Date.now());
+    changesCount.current = 0;
+    lastSaveTime.current = Date.now();
     setHasUnsavedChanges(false);
   }, []);
+
+  const getChangesCount = () => changesCount.current;
+  const getLastSaveTime = () => lastSaveTime.current;
 
   return (
     <UnsavedChangesContext.Provider
@@ -49,8 +52,8 @@ export const UnsavedChangesContextProvider = (props: Props) => {
         hasUnsavedChanges,
         triggerUnsavedChanges: triggerUnsavedChanges,
         sealUnsavedChanges: sealUnsavedChanges,
-        changesCount,
-        lastSaveTime,
+        getChangesCount,
+        getLastSaveTime,
       }}
     >
       {props.children}

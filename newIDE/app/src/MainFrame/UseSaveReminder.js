@@ -7,6 +7,7 @@ import { Trans } from '@lingui/macro';
 import InfoBar from '../UI/Messages/InfoBar';
 import type { UnsavedChanges } from './UnsavedChangesContext';
 import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
+import { useInterval } from '../Utils/UseInterval';
 
 export type UnsavedChangesAmount = 'none' | 'small' | 'significant' | 'risky';
 
@@ -18,11 +19,14 @@ const MINIMUM_CHANGES_FOR_RISKY_STATUS = 200;
 const MAXIMUM_DURATION_FOR_SMALL_STATUS = 5 * ONE_MINUTE;
 const MINIMUM_DURATION_FOR_RISKY_STATUS = 20 * ONE_MINUTE;
 const DURATION_BETWEEN_TWO_DISPLAYS = 5 * ONE_MINUTE;
+const CHECK_FREQUENCY = 5000;
 
 const getUnsavedChangesAmount = (
   unsavedChanges: UnsavedChanges
 ): UnsavedChangesAmount => {
-  const { changesCount, lastSaveTime } = unsavedChanges;
+  const { getChangesCount, getLastSaveTime } = unsavedChanges;
+  const changesCount = getChangesCount();
+  const lastSaveTime = getLastSaveTime();
   if (changesCount === 0 || !lastSaveTime) return 'none';
   const now = Date.now();
   if (changesCount > MINIMUM_CHANGES_FOR_RISKY_STATUS) return 'risky';
@@ -52,6 +56,9 @@ const useSaveReminder = ({ onSave }: Props) => {
 
   const unsavedChangesAmount = getUnsavedChangesAmount(unsavedChanges);
 
+  const [temp, setTemp] = React.useState<Object>({});
+  useInterval(() => setTemp({}), CHECK_FREQUENCY);
+
   React.useEffect(
     () => {
       if (
@@ -74,8 +81,8 @@ const useSaveReminder = ({ onSave }: Props) => {
       unsavedChangesAmount,
       lastAcknowledgement,
       currentlyRunningInAppTutorial,
-      // Added dependency to have the possibility to show the reminder on each change.
-      unsavedChanges.changesCount,
+      // Added dependency to have the possibility to show the reminder regularly.
+      temp,
     ]
   );
 

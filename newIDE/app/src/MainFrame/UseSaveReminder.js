@@ -21,7 +21,7 @@ const MINIMUM_DURATION_FOR_RISKY_STATUS = 20 * ONE_MINUTE;
 const DURATION_BETWEEN_TWO_DISPLAYS = 5 * ONE_MINUTE;
 const CHECK_FREQUENCY = 5000;
 
-const getUnsavedChangesAmount = (
+export const getUnsavedChangesAmount = (
   unsavedChanges: UnsavedChanges
 ): UnsavedChangesAmount => {
   const { getChangesCount, getLastSaveTime } = unsavedChanges;

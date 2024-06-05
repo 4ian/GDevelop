@@ -31,7 +31,8 @@ export const getUnsavedChangesAmount = (
   if (changesCount === 0 || !lastCheckpointTime) return 'none';
   const now = Date.now();
   if (changesCount > MINIMUM_CHANGES_FOR_RISKY_STATUS) return 'risky';
-  if (now - lastCheckpointTime > MINIMUM_DURATION_FOR_RISKY_STATUS) return 'risky';
+  if (now - lastCheckpointTime > MINIMUM_DURATION_FOR_RISKY_STATUS)
+    return 'risky';
   else if (now - lastCheckpointTime < MAXIMUM_DURATION_FOR_SMALL_STATUS)
     return 'small';
   else {

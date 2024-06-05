@@ -88,10 +88,12 @@ namespace gdjs {
 
       // If the object is assigned to a player that does not exist, mark it for destruction before the next tick.
       // We cannot destroy it immediately as the object is being created.
-      const numberOfPlayersInLobby = gdjs.multiplayer.getNumberOfPlayersInLobby();
-      if (this.playerNumber > numberOfPlayersInLobby) {
+      if (
+        this.playerNumber !== 0 && // Host is always connected.
+        !gdjs.multiplayerMessageManager.isPlayerConnected(this.playerNumber)
+      ) {
         logger.info(
-          `Player number ${this.playerNumber} does not exist, as there are only ${numberOfPlayersInLobby} players in the lobby. Marking the object for destruction.`
+          `Player number ${this.playerNumber} does not exist in the lobby at the moment. Marking the object for destruction.`
         );
         this._shouldDeleteObject = true;
         return;
@@ -494,10 +496,12 @@ namespace gdjs {
         );
         return;
       }
-      const numberOfPlayersInLobby = gdjs.multiplayer.getNumberOfPlayersInLobby();
-      if (newPlayerNumber > numberOfPlayersInLobby) {
+      if (
+        newPlayerNumber !== 0 && // Host is always connected.
+        !gdjs.multiplayerMessageManager.isPlayerConnected(newPlayerNumber)
+      ) {
         logger.info(
-          `Player number ${newPlayerNumber} does not exist, as there are only ${numberOfPlayersInLobby} players in the lobby. Destroying the object as it will not be synchronized.`
+          `Player number ${newPlayerNumber} does not exist in the lobby at the moment. Destroying the object as it will not be synchronized.`
         );
         if (this._destroyInstanceTimeoutId) {
           clearTimeout(this._destroyInstanceTimeoutId);

@@ -336,7 +336,7 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .setFunctionName('gdjs.multiplayer.hasAnyPlayerLeft');
+      .setFunctionName('gdjs.multiplayerMessageManager.hasAnyPlayerLeft');
 
     extension
       .addCondition(
@@ -361,7 +361,7 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .setFunctionName('gdjs.multiplayer.hasPlayerLeft');
+      .setFunctionName('gdjs.multiplayerMessageManager.hasPlayerLeft');
 
     extension
       .addStrExpression(
@@ -490,7 +490,7 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .setFunctionName('gdjs.multiplayer.getPlayerPing');
+      .setFunctionName('gdjs.multiplayerMessageManager.getPlayerPing');
 
     // Multiplayer object behavior
     const multiplayerObjectBehavior = new gd.BehaviorJsImplementation();

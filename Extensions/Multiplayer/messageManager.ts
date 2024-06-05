@@ -1549,6 +1549,8 @@ namespace gdjs {
             }
 
             // If we are the host, compute the pings.
+            // Ensure player 1 is always considered as having a 0 ping.
+            _playersPings[1] = 0;
             const now = data.now;
             const timeDifference = Math.round(Date.now() - now);
             const playerLastHeartbeatInfo =
@@ -1674,6 +1676,15 @@ namespace gdjs {
       return _playerNumbersWhoJustLeft;
     };
 
+    const getNumberOfConnectedPlayers = () => {
+      // Look at the player pings as a way to know how many players are in the lobby.
+      return Object.keys(_playersPings).length;
+    };
+
+    const isPlayerConnected = (playerNumber: number) => {
+      return _playersPings[playerNumber] !== undefined;
+    };
+
     return {
       addExpectedMessageAcknowledgement,
       clearExpectedMessageAcknowledgements,
@@ -1706,6 +1717,8 @@ namespace gdjs {
       hasAnyPlayerLeft,
       hasPlayerLeft,
       getDisconnectedPlayers,
+      getNumberOfConnectedPlayers,
+      isPlayerConnected,
     };
   };
 

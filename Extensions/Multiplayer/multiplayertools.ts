@@ -144,10 +144,17 @@ namespace gdjs {
      * Returns the number of players in the lobby.
      */
     export const getNumberOfPlayersInLobby = () => {
-      if (!_lobby) {
-        return 0;
+      // If the game has not started yet, look at the lobby.
+      if (!_isGameRunning && _lobby) {
+        return _lobby.players.length;
       }
-      return _lobby.players.length;
+
+      // If the game has started, look at the pings received from the players.
+      if (_isGameRunning) {
+        return gdjs.multiplayerMessageManager.getNumberOfConnectedPlayers();
+      }
+
+      return 0;
     };
 
     /**
@@ -164,14 +171,6 @@ namespace gdjs {
      */
     export const isPlayerHost = () => {
       return playerNumber === 1;
-    };
-
-    export const getPlayerPing = (playerNumber: number) => {
-      if (playerNumber === 1) {
-        return 0;
-      }
-
-      return gdjs.multiplayerMessageManager.getPlayerPing(playerNumber);
     };
 
     /**
@@ -207,12 +206,6 @@ namespace gdjs {
         ? playerPublicProfile.username
         : `Player ${playerNumber}`;
     };
-
-    export const hasPlayerLeft = (playerNumber: number) =>
-      gdjs.multiplayerMessageManager.hasPlayerLeft(playerNumber);
-
-    export const hasAnyPlayerLeft = () =>
-      gdjs.multiplayerMessageManager.hasAnyPlayerLeft();
 
     const handleLeavingPlayer = (runtimeScene: gdjs.RuntimeScene) => {
       const disconnectedPlayers = gdjs.multiplayerMessageManager.getDisconnectedPlayers();

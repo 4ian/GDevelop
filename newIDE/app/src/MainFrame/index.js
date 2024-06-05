@@ -181,6 +181,7 @@ import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/
 import useVersionHistory from '../VersionHistory/UseVersionHistory';
 import { ProjectManagerDrawer } from '../ProjectManager/ProjectManagerDrawer';
 import DiagnosticReportDialog from '../ExportAndShare/DiagnosticReportDialog';
+import useSaveReminder from './UseSaveReminder';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -2635,6 +2636,8 @@ const MainFrame = (props: Props) => {
     ]
   );
 
+  const { renderSaveReminder } = useSaveReminder({ onSave: saveProject });
+
   /**
    * Returns true if the project has been closed and false if the user refused to close it.
    */
@@ -3494,6 +3497,7 @@ const MainFrame = (props: Props) => {
       {renderResourceMoverDialog()}
       {renderResourceFetcherDialog()}
       {renderVersionHistoryPanel()}
+      {renderSaveReminder()}
       <CloseConfirmDialog
         shouldPrompt={!!state.currentProject}
         i18n={props.i18n}

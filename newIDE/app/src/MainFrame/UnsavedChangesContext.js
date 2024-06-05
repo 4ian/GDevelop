@@ -29,8 +29,8 @@ export const UnsavedChangesContextProvider = (props: Props) => {
   const [hasUnsavedChanges, setHasUnsavedChanges] = React.useState<boolean>(
     false
   );
-  const changesCount = React.useRef<number>(0);
-  const lastCheckpointTime = React.useRef<number | null>(null);
+  const changesCount = React.useRef<number>(0); // Cannot be stored in a state variable, otherwise it re-renders children at each change.
+  const lastCheckpointTime = React.useRef<number | null>(null); // Cannot be stored in a state variable, otherwise it re-renders children at each change.
 
   const triggerUnsavedChanges = React.useCallback((): void => {
     changesCount.current = changesCount.current + 1;

@@ -309,9 +309,13 @@ export default function ExpressionAutocompletionsDisplayer({
 
                   const IconComponent =
                     expressionAutocompletion.kind === 'Variable'
-                      ? getVariableSourceIcon(
-                          expressionAutocompletion.variableScope
-                        )
+                      ? expressionAutocompletion.variableScope ===
+                        gd.VariablesContainer.Unknown
+                        ? // No icon is displayed for child-variables
+                          null
+                        : getVariableSourceIcon(
+                            expressionAutocompletion.variableScope
+                          )
                       : expressionAutocompletion.kind === 'Property'
                       ? PropertyIcon
                       : expressionAutocompletion.kind === 'Parameter'

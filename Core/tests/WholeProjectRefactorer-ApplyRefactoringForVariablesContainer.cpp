@@ -176,7 +176,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     }
 
     forEachChildVariableEvent.SetIterableVariableName("MySceneStructureVariable");
-    repeatEvent.SetRepeatExpression("1 + MySceneVariable + Object1.MyObjectVariable + Object2.MyObjectVariable");
+    repeatEvent.SetRepeatExpressionPlainString("1 + MySceneVariable + Object1.MyObjectVariable + Object2.MyObjectVariable");
     // clang-format on
 
     // Do a copy of layout1 to ensure other scene is unchanged after the
@@ -314,7 +314,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     }
 
     REQUIRE(forEachChildVariableEvent.GetIterableVariableName() == "MyRenamedSceneStructureVariable");
-    REQUIRE(repeatEvent.GetRepeatExpression() == "1 + MyRenamedSceneVariable + Object1.MyRenamedObjectVariable + Object2.MyObjectVariable");
+    REQUIRE(repeatEvent.GetRepeatExpression().GetPlainString() == "1 + MyRenamedSceneVariable + Object1.MyRenamedObjectVariable + Object2.MyObjectVariable");
     // clang-format on
 
     // Check the other layout is untouched.
@@ -413,7 +413,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
       event.GetActions().Insert(action);
     }
 
-    repeatEvent.SetRepeatExpression("1 + Object1.MyObjectVariable + Object2.MyObjectVariable + MyObjectGroup.MyObjectVariable");
+    repeatEvent.SetRepeatExpressionPlainString("1 + Object1.MyObjectVariable + Object2.MyObjectVariable + MyObjectGroup.MyObjectVariable");
     // clang-format on
 
     // Do a copy of layout1 to ensure other scene is unchanged after the
@@ -488,7 +488,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
               "MyRenamedObjectVariable");
     }
 
-    REQUIRE(repeatEvent.GetRepeatExpression() == "1 + Object1.MyRenamedObjectVariable + Object2.MyObjectVariable + MyObjectGroup.MyRenamedObjectVariable");
+    REQUIRE(repeatEvent.GetRepeatExpression().GetPlainString() == "1 + Object1.MyRenamedObjectVariable + Object2.MyObjectVariable + MyObjectGroup.MyRenamedObjectVariable");
     // clang-format on
 
     // Check the other layout is untouched.

@@ -2152,8 +2152,8 @@ interface RepeatEvent {
 
     [Ref] InstructionsList GetConditions();
     [Ref] InstructionsList GetActions();
-    void SetRepeatExpression([Const] DOMString expr);
-    [Const, Ref] DOMString GetRepeatExpression();
+    void SetRepeatExpressionPlainString([Const] DOMString expr);
+    [Const, Ref] Expression GetRepeatExpression();
 };
 RepeatEvent implements BaseEvent;
 

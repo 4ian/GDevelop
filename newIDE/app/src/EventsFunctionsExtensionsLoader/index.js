@@ -435,7 +435,7 @@ function generateBehavior(
       const includeFiles = new gd.SetString();
       const behaviorCodeGenerator = new gd.BehaviorCodeGenerator(project);
       const code = behaviorCodeGenerator.generateRuntimeBehaviorCompleteCode(
-        eventsFunctionsExtension.getName(),
+        eventsFunctionsExtension,
         eventsBasedBehavior,
         codeNamespace,
         behaviorMethodMangledNames,
@@ -537,7 +537,7 @@ function generateObject(
       const includeFiles = new gd.SetString();
       const objectCodeGenerator = new gd.ObjectCodeGenerator(project);
       const code = objectCodeGenerator.generateRuntimeObjectCompleteCode(
-        eventsFunctionsExtension.getName(),
+        eventsFunctionsExtension,
         eventsBasedObject,
         codeNamespace,
         objectMethodMangledNames,

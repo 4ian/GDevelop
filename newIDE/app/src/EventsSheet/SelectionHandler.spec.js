@@ -17,7 +17,15 @@ import {
   getLastSelectedEventContextWhichCanHaveSubEvents,
   getLastSelectedInstructionContext,
 } from './SelectionHandler';
+import { makeTestProject } from '../fixtures/TestProject';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
+
 const gd: libGDevelop = global.gd;
+
+const expectProjectScopedContainersAccessor = (): ProjectScopedContainersAccessor => {
+  // $FlowFixMe
+  return expect.any(ProjectScopedContainersAccessor);
+};
 
 describe('SelectionHandler', () => {
   it('handles the selected events', () => {
@@ -48,11 +56,14 @@ describe('SelectionHandler', () => {
       null
     );
 
+    const { emptySceneProjectScopedContainersAccessor } = makeTestProject(gd);
+
     // Select a top-level event.
     currentSelection = selectEvent(currentSelection, {
       eventsList: topEventsList,
       event: standardEvent1,
       indexInList: 0,
+      projectScopedContainersAccessor: emptySceneProjectScopedContainersAccessor,
     });
     expect(isEventSelected(currentSelection, standardEvent1)).toBe(true);
     expect(isEventSelected(currentSelection, standardEvent1_1)).toBe(false);
@@ -63,6 +74,7 @@ describe('SelectionHandler', () => {
       eventsList: topEventsList,
       event: standardEvent1,
       indexInList: 0,
+      projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
     });
     expect(
       getLastSelectedEventContextWhichCanHaveSubEvents(currentSelection)
@@ -70,12 +82,14 @@ describe('SelectionHandler', () => {
       eventsList: topEventsList,
       event: standardEvent1,
       indexInList: 0,
+      projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
     });
     expect(getSelectedEventContexts(currentSelection)).toEqual([
       {
         eventsList: topEventsList,
         event: standardEvent1,
         indexInList: 0,
+        projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
       },
     ]);
     expect(getSelectedTopMostOnlyEventContexts(currentSelection)).toEqual([
@@ -83,12 +97,14 @@ describe('SelectionHandler', () => {
         eventsList: topEventsList,
         event: standardEvent1,
         indexInList: 0,
+        projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
       },
     ]);
     expect(getLastSelectedTopMostOnlyEventContext(currentSelection)).toEqual({
       eventsList: topEventsList,
       event: standardEvent1,
       indexInList: 0,
+      projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
     });
 
     // Select a child event, but without multiselection (so the parent is removed).
@@ -96,6 +112,7 @@ describe('SelectionHandler', () => {
       eventsList: standardEvent1.getSubEvents(),
       event: standardEvent1_1,
       indexInList: 0,
+      projectScopedContainersAccessor: emptySceneProjectScopedContainersAccessor,
     });
     expect(isEventSelected(currentSelection, standardEvent1)).toBe(false);
     expect(isEventSelected(currentSelection, standardEvent1_1)).toBe(true);
@@ -106,6 +123,7 @@ describe('SelectionHandler', () => {
       eventsList: standardEvent1.getSubEvents(),
       event: standardEvent1_1,
       indexInList: 0,
+      projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
     });
     expect(
       getLastSelectedEventContextWhichCanHaveSubEvents(currentSelection)
@@ -113,12 +131,14 @@ describe('SelectionHandler', () => {
       eventsList: standardEvent1.getSubEvents(),
       event: standardEvent1_1,
       indexInList: 0,
+      projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
     });
     expect(getSelectedEventContexts(currentSelection)).toEqual([
       {
         eventsList: standardEvent1.getSubEvents(),
         event: standardEvent1_1,
         indexInList: 0,
+        projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
       },
     ]);
     expect(getSelectedTopMostOnlyEventContexts(currentSelection)).toEqual([
@@ -126,12 +146,14 @@ describe('SelectionHandler', () => {
         eventsList: standardEvent1.getSubEvents(),
         event: standardEvent1_1,
         indexInList: 0,
+        projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
       },
     ]);
     expect(getLastSelectedTopMostOnlyEventContext(currentSelection)).toEqual({
       eventsList: standardEvent1.getSubEvents(),
       event: standardEvent1_1,
       indexInList: 0,
+      projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
     });
 
     // Add an unrelated grand-child event to the selection, with multiselection (so the previous child
@@ -142,6 +164,7 @@ describe('SelectionHandler', () => {
         eventsList: standardEvent1_2.getSubEvents(),
         event: standardEvent1_2_1,
         indexInList: 0,
+        projectScopedContainersAccessor: emptySceneProjectScopedContainersAccessor,
       },
       /*multiSelection=*/ true
     );
@@ -154,6 +177,7 @@ describe('SelectionHandler', () => {
       eventsList: standardEvent1_2.getSubEvents(),
       event: standardEvent1_2_1,
       indexInList: 0,
+      projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
     });
     expect(
       getLastSelectedEventContextWhichCanHaveSubEvents(currentSelection)
@@ -161,17 +185,20 @@ describe('SelectionHandler', () => {
       eventsList: standardEvent1_2.getSubEvents(),
       event: standardEvent1_2_1,
       indexInList: 0,
+      projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
     });
     expect(getSelectedEventContexts(currentSelection)).toEqual([
       {
         eventsList: standardEvent1.getSubEvents(),
         event: standardEvent1_1,
         indexInList: 0,
+        projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
       },
       {
         eventsList: standardEvent1_2.getSubEvents(),
         event: standardEvent1_2_1,
         indexInList: 0,
+        projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
       },
     ]);
     expect(getSelectedTopMostOnlyEventContexts(currentSelection)).toEqual([
@@ -180,17 +207,20 @@ describe('SelectionHandler', () => {
         eventsList: standardEvent1.getSubEvents(),
         event: standardEvent1_1,
         indexInList: 0,
+        projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
       },
       {
         eventsList: standardEvent1_2.getSubEvents(),
         event: standardEvent1_2_1,
         indexInList: 0,
+        projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
       },
     ]);
     expect(getLastSelectedTopMostOnlyEventContext(currentSelection)).toEqual({
       eventsList: standardEvent1_2.getSubEvents(),
       event: standardEvent1_2_1,
       indexInList: 0,
+      projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
     });
 
     // Restart from a empty selection, and select a parent and its child.
@@ -200,6 +230,7 @@ describe('SelectionHandler', () => {
         eventsList: standardEvent1_2.getSubEvents(),
         event: standardEvent1_2_1,
         indexInList: 0,
+        projectScopedContainersAccessor: emptySceneProjectScopedContainersAccessor,
       },
       /*multiSelection=*/ true
     );
@@ -209,6 +240,7 @@ describe('SelectionHandler', () => {
         eventsList: standardEvent1.getSubEvents(),
         event: standardEvent1_2,
         indexInList: 1,
+        projectScopedContainersAccessor: emptySceneProjectScopedContainersAccessor,
       },
       /*multiSelection=*/ true
     );
@@ -221,6 +253,7 @@ describe('SelectionHandler', () => {
       eventsList: standardEvent1.getSubEvents(),
       event: standardEvent1_2,
       indexInList: 1,
+      projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
     });
     expect(
       getLastSelectedEventContextWhichCanHaveSubEvents(currentSelection)
@@ -228,17 +261,20 @@ describe('SelectionHandler', () => {
       eventsList: standardEvent1.getSubEvents(),
       event: standardEvent1_2,
       indexInList: 1,
+      projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
     });
     expect(getSelectedEventContexts(currentSelection)).toEqual([
       {
         eventsList: standardEvent1_2.getSubEvents(),
         event: standardEvent1_2_1,
         indexInList: 0,
+        projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
       },
       {
         eventsList: standardEvent1.getSubEvents(),
         event: standardEvent1_2,
         indexInList: 1,
+        projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
       },
     ]);
     expect(getSelectedTopMostOnlyEventContexts(currentSelection)).toEqual([
@@ -247,12 +283,14 @@ describe('SelectionHandler', () => {
         eventsList: standardEvent1.getSubEvents(),
         event: standardEvent1_2,
         indexInList: 1,
+        projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
       },
     ]);
     expect(getLastSelectedTopMostOnlyEventContext(currentSelection)).toEqual({
       eventsList: standardEvent1.getSubEvents(),
       event: standardEvent1_2,
       indexInList: 1,
+      projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
     });
 
     // Restart from a empty selection, and select a grand-parent and its grand-child.
@@ -262,6 +300,7 @@ describe('SelectionHandler', () => {
         eventsList: standardEvent1_2.getSubEvents(),
         event: standardEvent1_2_1,
         indexInList: 0,
+        projectScopedContainersAccessor: emptySceneProjectScopedContainersAccessor,
       },
       /*multiSelection=*/ true
     );
@@ -271,6 +310,7 @@ describe('SelectionHandler', () => {
         eventsList: topEventsList,
         event: standardEvent1,
         indexInList: 0,
+        projectScopedContainersAccessor: emptySceneProjectScopedContainersAccessor,
       },
       /*multiSelection=*/ true
     );
@@ -283,6 +323,7 @@ describe('SelectionHandler', () => {
       eventsList: topEventsList,
       event: standardEvent1,
       indexInList: 0,
+      projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
     });
     expect(
       getLastSelectedEventContextWhichCanHaveSubEvents(currentSelection)
@@ -290,17 +331,20 @@ describe('SelectionHandler', () => {
       eventsList: topEventsList,
       event: standardEvent1,
       indexInList: 0,
+      projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
     });
     expect(getSelectedEventContexts(currentSelection)).toEqual([
       {
         eventsList: standardEvent1_2.getSubEvents(),
         event: standardEvent1_2_1,
         indexInList: 0,
+        projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
       },
       {
         eventsList: topEventsList,
         event: standardEvent1,
         indexInList: 0,
+        projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
       },
     ]);
     expect(getSelectedTopMostOnlyEventContexts(currentSelection)).toEqual([
@@ -309,12 +353,14 @@ describe('SelectionHandler', () => {
         eventsList: topEventsList,
         event: standardEvent1,
         indexInList: 0,
+        projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
       },
     ]);
     expect(getLastSelectedTopMostOnlyEventContext(currentSelection)).toEqual({
       eventsList: topEventsList,
       event: standardEvent1,
       indexInList: 0,
+      projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
     });
 
     // Restart from a empty selection, and select an event and a unrelated grand-child.
@@ -324,6 +370,7 @@ describe('SelectionHandler', () => {
         eventsList: standardEvent1_2.getSubEvents(),
         event: standardEvent1_2_1,
         indexInList: 0,
+        projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
       },
       /*multiSelection=*/ true
     );
@@ -333,6 +380,7 @@ describe('SelectionHandler', () => {
         eventsList: topEventsList,
         event: standardEvent2,
         indexInList: 1,
+        projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
       },
       /*multiSelection=*/ true
     );
@@ -345,6 +393,7 @@ describe('SelectionHandler', () => {
       eventsList: topEventsList,
       event: standardEvent2,
       indexInList: 1,
+      projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
     });
     expect(
       getLastSelectedEventContextWhichCanHaveSubEvents(currentSelection)
@@ -352,17 +401,20 @@ describe('SelectionHandler', () => {
       eventsList: topEventsList,
       event: standardEvent2,
       indexInList: 1,
+      projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
     });
     expect(getSelectedEventContexts(currentSelection)).toEqual([
       {
         eventsList: standardEvent1_2.getSubEvents(),
         event: standardEvent1_2_1,
         indexInList: 0,
+        projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
       },
       {
         eventsList: topEventsList,
         event: standardEvent2,
         indexInList: 1,
+        projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
       },
     ]);
     expect(getSelectedTopMostOnlyEventContexts(currentSelection)).toEqual([
@@ -371,17 +423,20 @@ describe('SelectionHandler', () => {
         eventsList: standardEvent1_2.getSubEvents(),
         event: standardEvent1_2_1,
         indexInList: 0,
+        projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
       },
       {
         eventsList: topEventsList,
         event: standardEvent2,
         indexInList: 1,
+        projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
       },
     ]);
     expect(getLastSelectedTopMostOnlyEventContext(currentSelection)).toEqual({
       eventsList: topEventsList,
       event: standardEvent2,
       indexInList: 1,
+      projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
     });
 
     topEventsList.delete();
@@ -420,11 +475,14 @@ describe('SelectionHandler', () => {
       null
     );
 
+    const { emptySceneProjectScopedContainersAccessor } = makeTestProject(gd);
+
     // Select a top-level event.
     currentSelection = selectEvent(currentSelection, {
       eventsList: topEventsList,
       event: standardEvent1,
       indexInList: 0,
+      projectScopedContainersAccessor: emptySceneProjectScopedContainersAccessor,
     });
     expect(isEventSelected(currentSelection, standardEvent1)).toBe(true);
     expect(isEventSelected(currentSelection, standardEvent1_1)).toBe(false);
@@ -439,6 +497,7 @@ describe('SelectionHandler', () => {
         eventsList: topEventsList,
         event: standardEvent1,
         indexInList: 0,
+        projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
       },
     ]);
     expect(getSelectedTopMostOnlyEventContexts(currentSelection)).toEqual([
@@ -446,12 +505,14 @@ describe('SelectionHandler', () => {
         eventsList: topEventsList,
         event: standardEvent1,
         indexInList: 0,
+        projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
       },
     ]);
     expect(getLastSelectedTopMostOnlyEventContext(currentSelection)).toEqual({
       eventsList: topEventsList,
       event: standardEvent1,
       indexInList: 0,
+      projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
     });
 
     // Select a condition of a child event.
@@ -460,6 +521,7 @@ describe('SelectionHandler', () => {
         event: standardEvent1_2,
         eventsList: standardEvent1.getSubEvents(),
         indexInList: 1,
+        projectScopedContainersAccessor: emptySceneProjectScopedContainersAccessor,
       },
       currentSelection,
       {
@@ -484,6 +546,7 @@ describe('SelectionHandler', () => {
         eventsList: topEventsList,
         event: standardEvent1,
         indexInList: 0,
+        projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
       },
     ]);
     expect(getSelectedTopMostOnlyEventContexts(currentSelection)).toEqual([
@@ -491,12 +554,14 @@ describe('SelectionHandler', () => {
         eventsList: topEventsList,
         event: standardEvent1,
         indexInList: 0,
+        projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
       },
     ]);
     expect(getLastSelectedTopMostOnlyEventContext(currentSelection)).toEqual({
       eventsList: topEventsList,
       event: standardEvent1,
       indexInList: 0,
+      projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
     });
     // Ensure the condition was selected:
     expect(hasSelectedAtLeastOneCondition(currentSelection)).toBe(true);
@@ -541,6 +606,7 @@ describe('SelectionHandler', () => {
         event: standardEvent1_2,
         eventsList: standardEvent1.getSubEvents(),
         indexInList: 1,
+        projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
       },
     });
 
@@ -550,6 +616,7 @@ describe('SelectionHandler', () => {
         event: standardEvent1_2_1,
         eventsList: standardEvent1_2.getSubEvents(),
         indexInList: 0,
+        projectScopedContainersAccessor: emptySceneProjectScopedContainersAccessor,
       },
       currentSelection,
       {
@@ -574,6 +641,7 @@ describe('SelectionHandler', () => {
         eventsList: topEventsList,
         event: standardEvent1,
         indexInList: 0,
+        projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
       },
     ]);
     expect(getSelectedTopMostOnlyEventContexts(currentSelection)).toEqual([
@@ -581,12 +649,14 @@ describe('SelectionHandler', () => {
         eventsList: topEventsList,
         event: standardEvent1,
         indexInList: 0,
+        projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
       },
     ]);
     expect(getLastSelectedTopMostOnlyEventContext(currentSelection)).toEqual({
       eventsList: topEventsList,
       event: standardEvent1,
       indexInList: 0,
+      projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
     });
     // Ensure the new action is selected:
     expect(hasSelectedAtLeastOneCondition(currentSelection)).toBe(true);
@@ -654,6 +724,7 @@ describe('SelectionHandler', () => {
         event: standardEvent1_2_1,
         eventsList: standardEvent1_2.getSubEvents(),
         indexInList: 0,
+        projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
       },
     });
 

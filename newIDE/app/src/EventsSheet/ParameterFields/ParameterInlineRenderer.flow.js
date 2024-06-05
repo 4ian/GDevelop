@@ -1,5 +1,7 @@
 // @flow
 import * as React from 'react';
+import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
 
 export type InvalidParameterValueProps = {|
   children: React.Node,
@@ -10,6 +12,8 @@ export type InvalidParameterValueProps = {|
  * The props expected by a function that renders a parameter in the events sheet
  */
 export type ParameterInlineRendererProps = {|
+  scope: EventsScope,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   parameterMetadata: gdParameterMetadata,
   value: string,
   expressionIsValid: boolean,

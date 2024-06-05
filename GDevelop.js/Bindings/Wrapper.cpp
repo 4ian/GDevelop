@@ -6,6 +6,7 @@
 #include <GDCore/Events/Builtin/RepeatEvent.h>
 #include <GDCore/Events/Builtin/StandardEvent.h>
 #include <GDCore/Events/Builtin/WhileEvent.h>
+#include <GDCore/Events/CodeGeneration/DiagnosticReport.h>
 #include <GDCore/Events/CodeGeneration/ExpressionCodeGenerator.h>
 #include <GDCore/Events/Parsers/ExpressionParser2.h>
 #include <GDCore/Events/Parsers/ExpressionParser2Node.h>
@@ -57,6 +58,7 @@
 #include <GDCore/IDE/ProjectBrowserHelper.h>
 #include <GDCore/IDE/PropertyFunctionGenerator.h>
 #include <GDCore/IDE/UnfilledRequiredBehaviorPropertyProblem.h>
+#include <GDCore/IDE/VariableInstructionSwitcher.h>
 #include <GDCore/IDE/WholeProjectRefactorer.h>
 #include <GDCore/Project/Behavior.h>
 #include <GDCore/Project/CustomObjectConfiguration.h>
@@ -445,17 +447,20 @@ typedef std::vector<gd::EventsFunction> VectorEventsFunction;
 typedef gd::Object gdObject;  // To avoid clashing javascript Object in glue.js
 typedef ParticleEmitterObject::RendererType ParticleEmitterObject_RendererType;
 typedef EventsFunction::FunctionType EventsFunction_FunctionType;
+typedef ObjectsContainersList::VariableExistence ObjectsContainersList_VariableExistence;
 typedef EventsFunctionsContainer::FunctionOwner
     EventsFunctionsContainer_FunctionOwner;
 typedef std::unique_ptr<gd::Object> UniquePtrObject;
 typedef std::unique_ptr<gd::ObjectConfiguration> UniquePtrObjectConfiguration;
 typedef std::unique_ptr<ExpressionNode> UniquePtrExpressionNode;
-typedef std::vector<gd::ExpressionParserDiagnostic *>
-    VectorExpressionParserDiagnostic;
+typedef std::vector<gd::ExpressionParserError *>
+    VectorExpressionParserError;
 typedef gd::SerializableWithNameList<gd::EventsBasedBehavior>
     EventsBasedBehaviorsList;
 typedef gd::SerializableWithNameList<gd::EventsBasedObject>
     EventsBasedObjectsList;
+typedef ProjectDiagnostic::ErrorType
+    ProjectDiagnostic_ErrorType;
 typedef ExpressionCompletionDescription::CompletionKind
     ExpressionCompletionDescription_CompletionKind;
 typedef std::vector<gd::ExpressionCompletionDescription>
@@ -463,6 +468,7 @@ typedef std::vector<gd::ExpressionCompletionDescription>
 typedef std::map<gd::String, std::map<gd::String, gd::PropertyDescriptor>>
     MapExtensionProperties;
 typedef gd::Variable::Type Variable_Type;
+typedef gd::VariablesContainer::SourceType VariablesContainer_SourceType;
 typedef std::map<gd::String, gd::SerializerValue> MapStringSerializerValue;
 typedef std::vector<std::pair<gd::String, std::shared_ptr<SerializerElement>>>
     VectorPairStringSharedPtrSerializerElement;
@@ -556,18 +562,34 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_Get Get
 #define STATIC_GetAllUseless GetAllUseless
 #define STATIC_RemoveAllUseless RemoveAllUseless
-#define STATIC_MakeNewVariablesContainersListForProjectAndLayout \
-  MakeNewVariablesContainersListForProjectAndLayout
-#define STATIC_MakeNewEmptyVariablesContainersList \
-  MakeNewEmptyVariablesContainersList
 #define STATIC_MakeNewObjectsContainersListForProjectAndLayout \
   MakeNewObjectsContainersListForProjectAndLayout
 #define STATIC_MakeNewObjectsContainersListForContainers \
   MakeNewObjectsContainersListForContainers
+#define STATIC_MakeNewEmptyProjectScopedContainers \
+  MakeNewEmptyProjectScopedContainers
 #define STATIC_MakeNewProjectScopedContainersForProjectAndLayout \
   MakeNewProjectScopedContainersForProjectAndLayout
+#define STATIC_MakeNewProjectScopedContainersForProject \
+  MakeNewProjectScopedContainersForProject
 #define STATIC_MakeNewProjectScopedContainersFor \
   MakeNewProjectScopedContainersFor
+#define STATIC_MakeNewProjectScopedContainersForEventsFunctionsExtension \
+  MakeNewProjectScopedContainersForEventsFunctionsExtension
+#define STATIC_MakeNewProjectScopedContainersForFreeEventsFunction \
+  MakeNewProjectScopedContainersForFreeEventsFunction
+#define STATIC_MakeNewProjectScopedContainersForBehaviorEventsFunction \
+  MakeNewProjectScopedContainersForBehaviorEventsFunction
+#define STATIC_MakeNewProjectScopedContainersForObjectEventsFunction \
+  MakeNewProjectScopedContainersForObjectEventsFunction
+#define STATIC_MakeNewProjectScopedContainersWithLocalVariables \
+  MakeNewProjectScopedContainersWithLocalVariables
+#define STATIC_MakeNewProjectScopedContainersForFreeEventsFunction \
+  MakeNewProjectScopedContainersForFreeEventsFunction
+#define STATIC_MakeNewProjectScopedContainersForBehaviorEventsFunction \
+  MakeNewProjectScopedContainersForBehaviorEventsFunction
+#define STATIC_MakeNewProjectScopedContainersForObjectEventsFunction \
+  MakeNewProjectScopedContainersForObjectEventsFunction
 
 #define STATIC_GetExtensionAndBehaviorMetadata GetExtensionAndBehaviorMetadata
 #define STATIC_GetExtensionAndObjectMetadata GetExtensionAndObjectMetadata
@@ -621,17 +643,17 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_Month Month
 #define STATIC_Date Date
 #define STATIC_ObjectOrGroupRenamedInLayout ObjectOrGroupRenamedInLayout
-#define STATIC_ObjectOrGroupRemovedInLayout ObjectOrGroupRemovedInLayout
-#define STATIC_ObjectOrGroupRemovedInEventsFunction \
-  ObjectOrGroupRemovedInEventsFunction
+#define STATIC_ObjectRemovedInLayout ObjectRemovedInLayout
+#define STATIC_ObjectRemovedInEventsFunction \
+  ObjectRemovedInEventsFunction
 #define STATIC_ObjectOrGroupRenamedInEventsFunction \
   ObjectOrGroupRenamedInEventsFunction
-#define STATIC_ObjectOrGroupRemovedInEventsBasedObject \
-  ObjectOrGroupRemovedInEventsBasedObject
+#define STATIC_ObjectRemovedInEventsBasedObject \
+  ObjectRemovedInEventsBasedObject
 #define STATIC_ObjectOrGroupRenamedInEventsBasedObject \
   ObjectOrGroupRenamedInEventsBasedObject
 #define STATIC_GlobalObjectOrGroupRenamed GlobalObjectOrGroupRenamed
-#define STATIC_GlobalObjectOrGroupRemoved GlobalObjectOrGroupRemoved
+#define STATIC_GlobalObjectRemoved GlobalObjectRemoved
 #define STATIC_GetAllObjectTypesUsingEventsBasedBehavior \
   GetAllObjectTypesUsingEventsBasedBehavior
 #define STATIC_EnsureBehaviorEventsFunctionsProperParameters \
@@ -666,6 +688,13 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_FindAllLayoutVariables FindAllLayoutVariables
 #define STATIC_FindAllObjectVariables FindAllObjectVariables
 #define STATIC_FindAllIdentifierExpressions FindAllIdentifierExpressions
+#define STATIC_SwitchVariableInstructionType SwitchVariableInstructionType
+#define STATIC_GetVariableTypeFromParameters GetVariableTypeFromParameters
+#define STATIC_SwitchBetweenUnifiedInstructionIfNeeded SwitchBetweenUnifiedInstructionIfNeeded
+#define STATIC_IsSwitchableVariableInstruction IsSwitchableVariableInstruction
+#define STATIC_IsSwitchableObjectVariableInstruction IsSwitchableObjectVariableInstruction
+#define STATIC_GetSwitchableVariableInstructionIdentifier GetSwitchableVariableInstructionIdentifier
+#define STATIC_GetSwitchableInstructionVariableType GetSwitchableInstructionVariableType
 
 #define STATIC_IsFreeFunctionOnlyCallingItself IsFreeFunctionOnlyCallingItself
 #define STATIC_IsBehaviorFunctionOnlyCallingItself \
@@ -678,12 +707,6 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_FoldAll FoldAll
 #define STATIC_UnfoldToLevel UnfoldToLevel
 
-#define STATIC_FreeEventsFunctionToObjectsContainer \
-  FreeEventsFunctionToObjectsContainer
-#define STATIC_BehaviorEventsFunctionToObjectsContainer \
-  BehaviorEventsFunctionToObjectsContainer
-#define STATIC_ObjectEventsFunctionToObjectsContainer \
-  ObjectEventsFunctionToObjectsContainer
 #define STATIC_ParametersToObjectsContainer ParametersToObjectsContainer
 #define STATIC_GetObjectParameterIndexFor GetObjectParameterIndexFor
 

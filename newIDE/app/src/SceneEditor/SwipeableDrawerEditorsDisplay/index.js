@@ -58,6 +58,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
   const {
     project,
     layout,
+    projectScopedContainersAccessor,
     initialInstances,
     selectedLayer,
     onSelectInstances,
@@ -332,6 +333,9 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                       i18n={i18n}
                       project={project}
                       layout={layout}
+                      projectScopedContainersAccessor={
+                        projectScopedContainersAccessor
+                      }
                       instances={selectedInstances}
                       editInstanceVariables={props.editInstanceVariables}
                       onEditObjectByName={props.editObjectByName}

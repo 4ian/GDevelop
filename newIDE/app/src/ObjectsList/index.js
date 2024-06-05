@@ -52,6 +52,7 @@ import { getHelpLink } from '../Utils/HelpLink';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import ErrorBoundary from '../UI/ErrorBoundary';
+import { getInsertionParentAndPositionFromSelection } from '../Utils/ObjectFolders';
 
 const gd: libGDevelop = global.gd;
 const sceneObjectsRootFolderId = 'scene-objects';
@@ -318,23 +319,21 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         if (
           newObjectDialogOpen &&
           newObjectDialogOpen.from &&
+          // If a scene objectFolderOrObject is selected, insert new object next to or inside it.
           !newObjectDialogOpen.from.global
         ) {
           const selectedItem = newObjectDialogOpen.from.objectFolderOrObject;
-          const parentFolder = selectedItem.isFolder()
-            ? selectedItem
-            : selectedItem.getParent();
-          const insertionIndex = selectedItem.isFolder()
-            ? parentFolder.getChildrenCount()
-            : parentFolder.getChildPosition(selectedItem) + 1;
+          const {
+            folder: parentFolder,
+            position,
+          } = getInsertionParentAndPositionFromSelection(selectedItem);
 
-          // If a scene folder is selected, insert object in the folder.
           object = objectsContainer.insertNewObjectInFolder(
             project,
             objectType,
             name,
             parentFolder,
-            insertionIndex
+            position
           );
           objectFolderOrObjectWithContext = {
             objectFolderOrObject: parentFolder.getObjectChild(name),
@@ -1674,6 +1673,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             objectsContainer={objectsContainer}
             resourceManagementProps={resourceManagementProps}
             canInstallPrivateAsset={canInstallPrivateAsset}
+            targetObjectFolderOrObjectWithContext={newObjectDialogOpen.from}
           />
         )}
       </Background>

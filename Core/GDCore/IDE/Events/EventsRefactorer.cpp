@@ -588,31 +588,6 @@ bool EventsRefactorer::RemoveObjectInConditions(
   return somethingModified;
 }
 
-void EventsRefactorer::RemoveObjectInEvents(const gd::Platform& platform,
-                                            gd::ProjectScopedContainers& projectScopedContainers,
-                                            gd::EventsList& events,
-                                            gd::String name) {
-  for (std::size_t i = 0; i < events.size(); ++i) {
-    vector<gd::InstructionsList*> conditionsVectors =
-        events[i].GetAllConditionsVectors();
-    for (std::size_t j = 0; j < conditionsVectors.size(); ++j) {
-      bool conditionsModified = RemoveObjectInConditions(
-          platform, projectScopedContainers, *conditionsVectors[j], name);
-    }
-
-    vector<gd::InstructionsList*> actionsVectors =
-        events[i].GetAllActionsVectors();
-    for (std::size_t j = 0; j < actionsVectors.size(); ++j) {
-      bool actionsModified = RemoveObjectInActions(
-          platform, projectScopedContainers, *actionsVectors[j], name);
-    }
-
-    if (events[i].CanHaveSubEvents())
-      RemoveObjectInEvents(
-          platform, projectScopedContainers, events[i].GetSubEvents(), name);
-  }
-}
-
 gd::String ReplaceAllOccurrencesCaseInsensitive(gd::String context,
                                                 const gd::String& from,
                                                 const gd::String& to) {

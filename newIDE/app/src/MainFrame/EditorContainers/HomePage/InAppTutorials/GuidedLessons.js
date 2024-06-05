@@ -19,6 +19,7 @@ import {
   HEALTH_BAR_IN_APP_TUTORIAL_ID,
   JOYSTICK_IN_APP_TUTORIAL_ID,
   OBJECT_3D_IN_APP_TUTORIAL_ID,
+  KNIGHT_PLATFORMER_IN_APP_TUTORIAL_ID,
   guidedLessonsIds,
 } from '../../../../Utils/GDevelopServices/InAppTutorial';
 import MultiplierScore from './Icons/MultiplierScore';
@@ -34,6 +35,7 @@ import Text from '../../../../UI/Text';
 import ColoredLinearProgress from '../../../../UI/ColoredLinearProgress';
 import Trophy from '../../../../UI/CustomSvgIcons/Trophy';
 import Object3D from './Icons/Object3D';
+import Platformer from './Icons/Platformer';
 
 const getColumnsFromWindowSize = (
   windowSize: WindowSizeType,
@@ -154,6 +156,13 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
       description: t`Learn how to manipulate a score by adding collectibles.`,
       durationInMinutes: 3,
       renderImage: props => <MultiplierScore {...props} />,
+    },
+    {
+      id: KNIGHT_PLATFORMER_IN_APP_TUTORIAL_ID,
+      title: t`Platformer`,
+      description: t`Learn how to use the behaviors to make a basic 2D platformer.`,
+      durationInMinutes: 1,
+      renderImage: props => <Platformer {...props} />,
     },
   ].filter(item => displayedGuidedLessonsIds.includes(item.id));
 

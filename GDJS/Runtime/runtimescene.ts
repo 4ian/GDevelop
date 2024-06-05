@@ -16,6 +16,7 @@ namespace gdjs {
     _renderer: RuntimeSceneRenderer;
     _debuggerRenderer: gdjs.DebuggerRenderer;
     _variables: gdjs.VariablesContainer;
+    _variablesByExtensionName: Map<string, gdjs.VariablesContainer>;
     _runtimeGame: gdjs.RuntimeGame;
     _lastId: integer = 0;
     _name: string = '';
@@ -52,6 +53,10 @@ namespace gdjs {
       super();
       this._runtimeGame = runtimeGame;
       this._variables = new gdjs.VariablesContainer();
+      this._variablesByExtensionName = new Map<
+        string,
+        gdjs.VariablesContainer
+      >();
       this._timeManager = new gdjs.TimeManager();
       this._onceTriggers = new gdjs.OnceTriggers();
       this._requestedChange = SceneChangeRequest.CONTINUE;
@@ -111,11 +116,15 @@ namespace gdjs {
      * @param sceneData An object containing the scene data.
      * @see gdjs.RuntimeGame#getSceneData
      */
-    loadFromScene(sceneData: LayoutData | null) {
-      if (!sceneData) {
+    loadFromScene(sceneAndExtensionsData: SceneAndExtensionsData | null) {
+      if (!sceneAndExtensionsData) {
         logger.error('loadFromScene was called without a scene');
         return;
       }
+      const {
+        sceneData,
+        usedExtensionsWithVariablesData,
+      } = sceneAndExtensionsData;
 
       if (this._isLoaded) {
         this.unloadScene();
@@ -133,8 +142,14 @@ namespace gdjs {
         this.addLayer(sceneData.layers[i]);
       }
 
-      //Load variables
+      // Load variables
       this._variables = new gdjs.VariablesContainer(sceneData.variables);
+      for (const extensionData of usedExtensionsWithVariablesData) {
+        this._variablesByExtensionName.set(
+          extensionData.name,
+          new gdjs.VariablesContainer(extensionData.sceneVariables)
+        );
+      }
 
       //Cache the initial shared data of the behaviors
       for (
@@ -290,6 +305,10 @@ namespace gdjs {
       // ensuring that all memory related to the RuntimeScene is released immediately.
       super._destroy();
       this._variables = new gdjs.VariablesContainer();
+      this._variablesByExtensionName = new Map<
+        string,
+        gdjs.VariablesContainer
+      >();
       this._initialBehaviorSharedData = new Hashtable();
       this._eventsFunction = null;
       this._lastId = 0;
@@ -622,6 +641,15 @@ namespace gdjs {
      */
     getVariables() {
       return this._variables;
+    }
+
+    /**
+     * Get the extension's variables for this scene.
+     * @param extensionName The extension name.
+     * @returns The extension's variables for this scene.
+     */
+    getVariablesForExtension(extensionName: string) {
+      return this._variablesByExtensionName.get(extensionName) || null;
     }
 
     /**

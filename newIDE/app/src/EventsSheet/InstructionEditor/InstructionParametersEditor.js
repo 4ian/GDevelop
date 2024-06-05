@@ -34,6 +34,7 @@ import {
   type FieldFocusFunction,
 } from '../ParameterFields/ParameterFieldCommons';
 import Edit from '../../UI/CustomSvgIcons/Edit';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
 
 const gd: libGDevelop = global.gd;
 
@@ -71,6 +72,7 @@ type Props = {|
   scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   objectName?: ?string,
   instruction: gdInstruction,
   isCondition: boolean,
@@ -108,6 +110,7 @@ const InstructionParametersEditor = React.forwardRef<
       project,
       globalObjectsContainer,
       objectsContainer,
+      projectScopedContainersAccessor,
       noHelpButton,
       objectName,
       isCondition,
@@ -212,7 +215,14 @@ const InstructionParametersEditor = React.forwardRef<
       [focus, focusOnMount]
     );
 
+    gd.VariableInstructionSwitcher.switchBetweenUnifiedInstructionIfNeeded(
+      project.getCurrentPlatform(),
+      projectScopedContainersAccessor.get(),
+      instruction
+    );
+
     const instructionType = instruction.getType();
+
     const instructionMetadata = getInstructionMetadata({
       instructionType,
       isCondition,
@@ -343,10 +353,14 @@ const InstructionParametersEditor = React.forwardRef<
                             forceUpdate();
                           }
                         }}
+                        onInstructionTypeChanged={forceUpdate}
                         project={project}
                         scope={scope}
                         globalObjectsContainer={globalObjectsContainer}
                         objectsContainer={objectsContainer}
+                        projectScopedContainersAccessor={
+                          projectScopedContainersAccessor
+                        }
                         key={i}
                         parameterRenderingService={ParameterRenderingService}
                         resourceManagementProps={resourceManagementProps}

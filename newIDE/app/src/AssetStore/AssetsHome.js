@@ -28,10 +28,7 @@ import {
 import { useDebounce } from '../Utils/UseDebounce';
 import PromotionsSlideshow from '../Promotions/PromotionsSlideshow';
 import { ColumnStackLayout } from '../UI/Layout';
-import {
-  GithubStarCard,
-  shouldDisplayGithubStarCard,
-} from '../Profile/GithubStarCard';
+import { EarnBadges } from '../MainFrame/EditorContainers/HomePage/GetStartedSection/EarnBadges';
 
 const cellSpacing = 2;
 
@@ -399,13 +396,14 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
         {displayPromotions ? (
           <ColumnStackLayout>
             <Text size="block-title">
-              <Trans>Promotions</Trans>
+              <Trans>Promotions + Earn credits</Trans>
             </Text>
 
             <PromotionsSlideshow />
-            {onOpenProfile && shouldDisplayGithubStarCard({ badges }) && (
-              <GithubStarCard
+            {onOpenProfile && (
+              <EarnBadges
                 achievements={achievements}
+                badges={badges}
                 onOpenProfile={onOpenProfile}
               />
             )}

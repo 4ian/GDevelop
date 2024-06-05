@@ -9,6 +9,11 @@ import {
   type InAppTutorial,
 } from '../Utils/GDevelopServices/InAppTutorial';
 import { IN_APP_TUTORIALS_FETCH_TIMEOUT } from '../Utils/GlobalFetchTimeouts';
+import optionalRequire from '../Utils/OptionalRequire';
+import Window from '../Utils/Window';
+import { openFilePicker, readJSONFile } from '../Utils/FileSystem';
+import { checkInAppTutorialFileJsonSchema } from './SchemaChecker';
+const electron = optionalRequire('electron');
 
 type Props = {| children: React.Node |};
 
@@ -35,27 +40,39 @@ const InAppTutorialProvider = (props: Props) => {
     [inAppTutorialShortHeaders]
   );
 
-  const startTutorial = async ({
-    tutorialId,
-    initialStepIndex,
-    initialProjectData,
-  }: {|
-    tutorialId: string,
-    initialStepIndex: number,
-    initialProjectData: { [key: string]: string },
-  |}) => {
-    if (!inAppTutorialShortHeaders) return;
+  const startTutorial = React.useCallback(
+    async ({
+      tutorialId,
+      initialStepIndex,
+      initialProjectData,
+      inAppTutorial,
+    }: {|
+      tutorialId: string,
+      initialStepIndex: number,
+      initialProjectData: { [key: string]: string },
+      inAppTutorial?: InAppTutorial,
+    |}) => {
+      let inAppTutorialToLoad = inAppTutorial;
+      if (!inAppTutorialToLoad) {
+        if (!inAppTutorialShortHeaders) return;
 
-    const inAppTutorialShortHeader = getInAppTutorialShortHeader(tutorialId);
+        const inAppTutorialShortHeader = getInAppTutorialShortHeader(
+          tutorialId
+        );
 
-    if (!inAppTutorialShortHeader) return;
+        if (!inAppTutorialShortHeader) return;
 
-    const inAppTutorial = await fetchInAppTutorial(inAppTutorialShortHeader);
-    setStartStepIndex(initialStepIndex);
-    setStartProjectData(initialProjectData);
-    setTutorial(inAppTutorial);
-    setCurrentlyRunningInAppTutorial(tutorialId);
-  };
+        inAppTutorialToLoad = await fetchInAppTutorial(
+          inAppTutorialShortHeader
+        );
+      }
+      setStartStepIndex(initialStepIndex);
+      setStartProjectData(initialProjectData);
+      setTutorial(inAppTutorialToLoad);
+      setCurrentlyRunningInAppTutorial(tutorialId);
+    },
+    [getInAppTutorialShortHeader, inAppTutorialShortHeaders]
+  );
 
   const endTutorial = () => {
     setTutorial(null);
@@ -72,6 +89,48 @@ const InAppTutorialProvider = (props: Props) => {
       setFetchingError('fetching-error');
     }
   }, []);
+
+  const onLoadInAppTutorialFromLocalFile = React.useCallback(
+    async () => {
+      if (!electron) {
+        Window.showMessageBox(
+          'This option is available on the desktop app only.'
+        );
+        return;
+      }
+      const filePath = await openFilePicker({
+        title: 'Open a guided lesson',
+        properties: ['openFile'],
+        message: 'Choose a guided lesson (.json file)',
+        filters: [{ name: 'GDevelop 5 in-app tutorial', extensions: ['json'] }],
+      });
+      if (!filePath) return;
+      const inAppTutorial = await readJSONFile(filePath);
+      const errors = checkInAppTutorialFileJsonSchema(inAppTutorial);
+      if (errors.length) {
+        console.error(
+          "Guided lesson file doesn't respect the format. See errors:",
+          errors
+        );
+        Window.showMessageBox(
+          "Guided lesson file doesn't respect the format. Check developer console for details."
+        );
+        return;
+      }
+      if (inAppTutorial.initialTemplateUrl) {
+        console.warn(
+          'Starting tutorial from file. The tutorial has the field initialTemplateUrl set so make sure the project is already open in the editor.'
+        );
+      }
+      startTutorial({
+        tutorialId: inAppTutorial.id,
+        initialProjectData: inAppTutorial.initialProjectData || {},
+        initialStepIndex: 0,
+        inAppTutorial,
+      });
+    },
+    [startTutorial]
+  );
 
   // Preload the in-app tutorial short headers when the app loads.
   React.useEffect(
@@ -97,6 +156,7 @@ const InAppTutorialProvider = (props: Props) => {
         startStepIndex,
         inAppTutorialsFetchingError: fetchingError,
         fetchInAppTutorials: loadInAppTutorials,
+        onLoadInAppTutorialFromLocalFile,
       }}
     >
       {props.children}

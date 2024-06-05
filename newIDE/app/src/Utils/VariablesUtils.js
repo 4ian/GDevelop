@@ -63,8 +63,6 @@ export const insertInVariablesContainer = (
   if (serializedVariable) {
     unserializeFromJSObject(newVariable, serializedVariable);
     newVariable.resetPersistentUuid();
-  } else {
-    newVariable.setString('');
   }
   const variable = variablesContainer.insert(newName, newVariable, index);
   newVariable.delete();

@@ -14,29 +14,27 @@
 #include "GDCore/Events/Expression.h"
 #include "GDCore/Extensions/Metadata/ParameterMetadata.h"
 #include "GDCore/String.h"
+#include "GDCore/Tools/Log.h"
 
 using namespace std;
 
 namespace gd {
 
-ArbitraryEventsWorker::~ArbitraryEventsWorker() {}
+AbstractArbitraryEventsWorker::~AbstractArbitraryEventsWorker() {}
 
-void ArbitraryEventsWorker::VisitEventList(gd::EventsList& events) {
+void AbstractArbitraryEventsWorker::VisitEventList(gd::EventsList& events) {
   DoVisitEventList(events);
 
   for (std::size_t i = 0; i < events.size();) {
     if (events[i].AcceptVisitor(*this))
       events.RemoveEvent(i);
     else {
-      if (events[i].CanHaveSubEvents())
-        VisitEventList(events[i].GetSubEvents());
-
       ++i;
     }
   }
 }
 
-bool ArbitraryEventsWorker::VisitEvent(gd::BaseEvent& event) {
+bool AbstractArbitraryEventsWorker::VisitEvent(gd::BaseEvent& event) {
   bool shouldDelete = DoVisitEvent(event);
   if (shouldDelete) return true;
 
@@ -55,15 +53,17 @@ bool ArbitraryEventsWorker::VisitEvent(gd::BaseEvent& event) {
       *expressionAndMetadata.first, expressionAndMetadata.second);
   }
 
-
+  if (!shouldDelete && event.CanHaveSubEvents()) {
+    VisitEventList(event.GetSubEvents());
+  }
   return shouldDelete;
 }
 
-bool ArbitraryEventsWorker::VisitLinkEvent(gd::LinkEvent& linkEvent) {
+bool AbstractArbitraryEventsWorker::VisitLinkEvent(gd::LinkEvent& linkEvent) {
   return DoVisitLinkEvent(linkEvent);
 }
 
-void ArbitraryEventsWorker::VisitInstructionList(
+void AbstractArbitraryEventsWorker::VisitInstructionList(
     gd::InstructionsList& instructions, bool areConditions) {
   DoVisitInstructionList(instructions, areConditions);
 
@@ -79,22 +79,19 @@ void ArbitraryEventsWorker::VisitInstructionList(
   }
 }
 
-bool ArbitraryEventsWorker::VisitInstruction(gd::Instruction& instruction,
+bool AbstractArbitraryEventsWorker::VisitInstruction(gd::Instruction& instruction,
                                              bool isCondition) {
   return DoVisitInstruction(instruction, isCondition);
 }
 
-bool ArbitraryEventsWorker::VisitEventExpression(gd::Expression& expression,
+bool AbstractArbitraryEventsWorker::VisitEventExpression(gd::Expression& expression,
                                                  const gd::ParameterMetadata& metadata) {
   return DoVisitEventExpression(expression, metadata);
 }
 
-ArbitraryEventsWorkerWithContext::~ArbitraryEventsWorkerWithContext() {}
+AbstractReadOnlyArbitraryEventsWorker::~AbstractReadOnlyArbitraryEventsWorker() {}
 
-
-ReadOnlyArbitraryEventsWorker::~ReadOnlyArbitraryEventsWorker() {}
-
-void ReadOnlyArbitraryEventsWorker::VisitEventList(const gd::EventsList& events) {
+void AbstractReadOnlyArbitraryEventsWorker::VisitEventList(const gd::EventsList& events) {
   DoVisitEventList(events);
 
   for (std::size_t i = 0; i < events.size(); ++i) {
@@ -109,7 +106,7 @@ void ReadOnlyArbitraryEventsWorker::VisitEventList(const gd::EventsList& events)
   }
 }
 
-void ReadOnlyArbitraryEventsWorker::VisitEvent(const gd::BaseEvent& event) {
+void AbstractReadOnlyArbitraryEventsWorker::VisitEvent(const gd::BaseEvent& event) {
   DoVisitEvent(event);
 
   const vector<const gd::InstructionsList*> conditionsVectors =
@@ -130,11 +127,11 @@ void ReadOnlyArbitraryEventsWorker::VisitEvent(const gd::BaseEvent& event) {
   }
 }
 
-void ReadOnlyArbitraryEventsWorker::VisitLinkEvent(const gd::LinkEvent& linkEvent) {
+void AbstractReadOnlyArbitraryEventsWorker::VisitLinkEvent(const gd::LinkEvent& linkEvent) {
   DoVisitLinkEvent(linkEvent);
 }
 
-void ReadOnlyArbitraryEventsWorker::VisitInstructionList(
+void AbstractReadOnlyArbitraryEventsWorker::VisitInstructionList(
     const gd::InstructionsList& instructions, bool areConditions) {
   DoVisitInstructionList(instructions, areConditions);
 
@@ -150,21 +147,73 @@ void ReadOnlyArbitraryEventsWorker::VisitInstructionList(
   }
 }
 
-void ReadOnlyArbitraryEventsWorker::VisitInstruction(const gd::Instruction& instruction,
+void AbstractReadOnlyArbitraryEventsWorker::VisitInstruction(const gd::Instruction& instruction,
                                              bool isCondition) {
   DoVisitInstruction(instruction, isCondition);
 }
 
 
-void ReadOnlyArbitraryEventsWorker::VisitEventExpression(const gd::Expression& expression,
+void AbstractReadOnlyArbitraryEventsWorker::VisitEventExpression(const gd::Expression& expression,
                                                  const gd::ParameterMetadata& metadata) {
   DoVisitEventExpression(expression, metadata);
 }
 
-void ReadOnlyArbitraryEventsWorker::StopAnyEventIteration() {
+void AbstractReadOnlyArbitraryEventsWorker::StopAnyEventIteration() {
   shouldStopIteration = true;
 }
 
+ArbitraryEventsWorker::~ArbitraryEventsWorker() {}
+
+bool ArbitraryEventsWorker::VisitEvent(gd::BaseEvent &event) {
+  return AbstractArbitraryEventsWorker::VisitEvent(event);
+}
+
+ArbitraryEventsWorkerWithContext::~ArbitraryEventsWorkerWithContext() {}
+
+bool ArbitraryEventsWorkerWithContext::VisitEvent(gd::BaseEvent &event) {
+  if (!event.HasVariables()) {
+    return AbstractArbitraryEventsWorker::VisitEvent(event);
+  }
+  // Push local variables
+  auto newProjectScopedContainers =
+      ProjectScopedContainers::MakeNewProjectScopedContainersWithLocalVariables(
+          *currentProjectScopedContainers, event);
+  auto *parentProjectScopedContainers = currentProjectScopedContainers;
+  currentProjectScopedContainers = &newProjectScopedContainers;
+
+  bool shouldDelete = AbstractArbitraryEventsWorker::VisitEvent(event);
+
+  // Pop local variables
+  currentProjectScopedContainers = parentProjectScopedContainers;
+  return shouldDelete;
+}
+
+ReadOnlyArbitraryEventsWorker::~ReadOnlyArbitraryEventsWorker() {}
+
+void ReadOnlyArbitraryEventsWorker::VisitEvent(
+    const gd::BaseEvent &event) {
+  AbstractReadOnlyArbitraryEventsWorker::VisitEvent(event);
+}
+
 ReadOnlyArbitraryEventsWorkerWithContext::~ReadOnlyArbitraryEventsWorkerWithContext() {}
+
+void ReadOnlyArbitraryEventsWorkerWithContext::VisitEvent(
+    const gd::BaseEvent &event) {
+  if (!event.HasVariables()) {
+    AbstractReadOnlyArbitraryEventsWorker::VisitEvent(event);
+    return;
+  }
+  // Push local variables
+  auto newProjectScopedContainers =
+      ProjectScopedContainers::MakeNewProjectScopedContainersWithLocalVariables(
+          *currentProjectScopedContainers, event);
+  auto *parentProjectScopedContainers = currentProjectScopedContainers;
+  currentProjectScopedContainers = &newProjectScopedContainers;
+
+  AbstractReadOnlyArbitraryEventsWorker::VisitEvent(event);
+
+  // Pop local variables
+  currentProjectScopedContainers = parentProjectScopedContainers;
+}
 
 }  // namespace gd

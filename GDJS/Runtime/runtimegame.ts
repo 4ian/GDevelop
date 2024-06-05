@@ -75,7 +75,9 @@ namespace gdjs {
   export class RuntimeGame {
     _resourcesLoader: gdjs.ResourceLoader;
     _variables: VariablesContainer;
+    _variablesByExtensionName: Map<string, gdjs.VariablesContainer>;
     _data: ProjectData;
+    _sceneAndExtensionsData: Array<SceneAndExtensionsData> = [];
     _eventsBasedObjectDatas: Map<String, EventsBasedObjectData>;
     _effectsManager: EffectsManager;
     _maxFPS: integer;
@@ -144,7 +146,20 @@ namespace gdjs {
     constructor(data: ProjectData, options?: RuntimeGameOptions) {
       this._options = options || {};
       this._variables = new gdjs.VariablesContainer(data.variables);
+      this._variablesByExtensionName = new Map<
+        string,
+        gdjs.VariablesContainer
+      >();
+      for (const extensionData of data.eventsFunctionsExtensions) {
+        if (extensionData.globalVariables.length > 0) {
+          this._variablesByExtensionName.set(
+            extensionData.name,
+            new gdjs.VariablesContainer(extensionData.globalVariables)
+          );
+        }
+      }
       this._data = data;
+      this._updateSceneAndExtensionsData();
 
       this._resourcesLoader = new gdjs.ResourceLoader(
         this,
@@ -230,11 +245,22 @@ namespace gdjs {
      */
     setProjectData(projectData: ProjectData): void {
       this._data = projectData;
+      this._updateSceneAndExtensionsData();
       this._resourcesLoader.setResources(
         projectData.resources.resources,
         getGlobalResourceNames(projectData),
         projectData.layouts
       );
+    }
+
+    private _updateSceneAndExtensionsData(): void {
+      const usedExtensionsWithVariablesData = this._data.eventsFunctionsExtensions.filter(
+        (extensionData) => extensionData.sceneVariables.length > 0
+      );
+      this._sceneAndExtensionsData = this._data.layouts.map((sceneData) => ({
+        sceneData,
+        usedExtensionsWithVariablesData,
+      }));
     }
 
     /**
@@ -255,6 +281,15 @@ namespace gdjs {
      */
     getVariables(): gdjs.VariablesContainer {
       return this._variables;
+    }
+
+    /**
+     * Get the extension's global variables.
+     * @param extensionName The extension name.
+     * @returns The extension's global variables.
+     */
+    getVariablesForExtension(extensionName: string) {
+      return this._variablesByExtensionName.get(extensionName) || null;
     }
 
     /**
@@ -368,19 +403,18 @@ namespace gdjs {
      * @param sceneName The name of the scene. If not defined, the first scene will be returned.
      * @return The data associated to the scene.
      */
-    getSceneData(sceneName?: string): LayoutData | null {
-      let scene: LayoutData | null = null;
+    getSceneData(sceneName?: string): SceneAndExtensionsData | null {
       for (let i = 0, len = this._data.layouts.length; i < len; ++i) {
-        const sceneData = this._data.layouts[i];
-        if (sceneName === undefined || sceneData.name === sceneName) {
-          scene = sceneData;
-          break;
+        const sceneAndExtensionsData = this._sceneAndExtensionsData[i];
+        if (
+          sceneName === undefined ||
+          sceneAndExtensionsData.sceneData.name === sceneName
+        ) {
+          return sceneAndExtensionsData;
         }
       }
-      if (scene === null) {
-        logger.error('The game has no scene called "' + sceneName + '"');
-      }
-      return scene;
+      logger.error('The game has no scene called "' + sceneName + '"');
+      return null;
     }
 
     /**
@@ -390,15 +424,13 @@ namespace gdjs {
      * @return true if the scene exists. If sceneName is undefined, true if the game has a scene.
      */
     hasScene(sceneName?: string): boolean {
-      let isTrue = false;
       for (let i = 0, len = this._data.layouts.length; i < len; ++i) {
         const sceneData = this._data.layouts[i];
         if (sceneName === undefined || sceneData.name == sceneName) {
-          isTrue = true;
-          break;
+          return true;
         }
       }
-      return isTrue;
+      return false;
     }
 
     /**

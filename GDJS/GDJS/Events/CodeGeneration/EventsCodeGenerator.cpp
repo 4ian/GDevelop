@@ -27,6 +27,7 @@
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/PropertiesContainer.h"
+#include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDJS/Events/CodeGeneration/BehaviorCodeGenerator.h"
 #include "GDJS/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDJS/Extensions/JsPlatform.h"
@@ -67,9 +68,16 @@ gd::String EventsCodeGenerator::GenerateEventsListCompleteFunctionCode(
   gd::String globalObjectLists = allObjectsDeclarationsAndResets.first;
   gd::String globalObjectListsReset = allObjectsDeclarationsAndResets.second;
 
+  gd::String localVariablesInitializationCode;
+  if (codeGenerator.HasProjectAndLayout()) {
+    localVariablesInitializationCode +=
+        codeGenerator.GetCodeNamespace() + ".localVariables = [];\n";
+  }
+
   gd::String output =
       // clang-format off
       codeGenerator.GetCodeNamespace() + " = {};\n" +
+      localVariablesInitializationCode +
       globalDeclarations +
       globalObjectLists + "\n\n" +
       codeGenerator.GetCustomCodeOutsideMain() + "\n\n" +
@@ -92,10 +100,12 @@ gd::String EventsCodeGenerator::GenerateLayoutCode(
     const gd::Layout& scene,
     const gd::String& codeNamespace,
     std::set<gd::String>& includeFiles,
+    gd::DiagnosticReport& diagnosticReport,
     bool compilationForRuntime) {
   EventsCodeGenerator codeGenerator(project, scene);
   codeGenerator.SetCodeNamespace(codeNamespace);
   codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
+  codeGenerator.SetDiagnosticReport(&diagnosticReport);
 
   gd::String output = GenerateEventsListCompleteFunctionCode(
       codeGenerator,
@@ -113,25 +123,15 @@ gd::String EventsCodeGenerator::GenerateLayoutCode(
 
 gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
     gd::Project& project,
-    const gd::EventsFunctionsContainer& functionsContainer,
+    const gd::EventsFunctionsExtension& eventsFunctionsExtension,
     const gd::EventsFunction& eventsFunction,
     const gd::String& codeNamespace,
     std::set<gd::String>& includeFiles,
     bool compilationForRuntime) {
-  gd::ObjectsContainer globalObjectsAndGroups;
-  gd::ObjectsContainer objectsAndGroups;
-  gd::EventsFunctionTools::FreeEventsFunctionToObjectsContainer(
-      project,
-      functionsContainer,
-      eventsFunction,
-      globalObjectsAndGroups,
-      objectsAndGroups);
-
-  gd::ProjectScopedContainers projectScopedContainers =
-      gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(
-          globalObjectsAndGroups, objectsAndGroups);
-  projectScopedContainers.AddParameters(
-      eventsFunction.GetParametersForEvents(functionsContainer));
+  gd::ObjectsContainer parameterObjectsAndGroups;
+  auto projectScopedContainers =
+      gd::ProjectScopedContainers::MakeNewProjectScopedContainersForFreeEventsFunction(
+              project, eventsFunctionsExtension, eventsFunction, parameterObjectsAndGroups);
 
   EventsCodeGenerator codeGenerator(projectScopedContainers);
   codeGenerator.SetCodeNamespace(codeNamespace);
@@ -141,11 +141,11 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
       codeGenerator,
       codeGenerator.GetCodeNamespaceAccessor() + "func",
       codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
-          eventsFunction.GetParametersForEvents(functionsContainer), 0, true),
+          eventsFunction.GetParametersForEvents(eventsFunctionsExtension), 0, true),
       codeGenerator.GenerateFreeEventsFunctionContext(
-          eventsFunction.GetParametersForEvents(functionsContainer),
-          "runtimeScene.getOnceTriggers()",
-          eventsFunction.IsAsync()),
+          eventsFunctionsExtension,
+          eventsFunction,
+          "runtimeScene.getOnceTriggers()"),
       eventsFunction.GetEvents(),
       "",
       codeGenerator.GenerateEventsFunctionReturn(eventsFunction));
@@ -157,6 +157,7 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
 
 gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
     gd::Project& project,
+    const gd::EventsFunctionsExtension& eventsFunctionsExtension,
     const gd::EventsBasedBehavior& eventsBasedBehavior,
     const gd::EventsFunction& eventsFunction,
     const gd::String& codeNamespace,
@@ -165,24 +166,12 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
     const gd::String& preludeCode,
     std::set<gd::String>& includeFiles,
     bool compilationForRuntime) {
-  gd::ObjectsContainer globalObjectsAndGroups;
-  gd::ObjectsContainer objectsAndGroups;
-  gd::EventsFunctionTools::BehaviorEventsFunctionToObjectsContainer(
-      project,
-      eventsBasedBehavior,
-      eventsFunction,
-      globalObjectsAndGroups,
-      objectsAndGroups);
 
-  gd::ProjectScopedContainers projectScopedContainers =
-      gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(
-          globalObjectsAndGroups, objectsAndGroups);
-  projectScopedContainers.AddPropertiesContainer(
-      eventsBasedBehavior.GetSharedPropertyDescriptors());
-  projectScopedContainers.AddPropertiesContainer(
-      eventsBasedBehavior.GetPropertyDescriptors());
-  projectScopedContainers.AddParameters(eventsFunction.GetParametersForEvents(
-      eventsBasedBehavior.GetEventsFunctions()));
+  gd::ObjectsContainer parameterObjectsContainers;
+  auto projectScopedContainers = gd::ProjectScopedContainers::
+      MakeNewProjectScopedContainersForBehaviorEventsFunction(
+          project, eventsFunctionsExtension, eventsBasedBehavior,
+          eventsFunction, parameterObjectsContainers);
 
   EventsCodeGenerator codeGenerator(projectScopedContainers);
   codeGenerator.SetCodeNamespace(codeNamespace);
@@ -204,11 +193,10 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
       // as a parameter called "Behavior".
       "var Behavior = this.name;\n" +
       codeGenerator.GenerateBehaviorEventsFunctionContext(
+          eventsFunctionsExtension,
           eventsBasedBehavior,
-          eventsFunction.GetParametersForEvents(
-              eventsBasedBehavior.GetEventsFunctions()),
+          eventsFunction,
           onceTriggersVariable,
-          eventsFunction.IsAsync(),
           // Pass the names of the parameters considered as the current
           // object and behavior parameters:
           "Object",
@@ -234,6 +222,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
 
 gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
     gd::Project& project,
+    const gd::EventsFunctionsExtension& eventsFunctionsExtension,
     const gd::EventsBasedObject& eventsBasedObject,
     const gd::EventsFunction& eventsFunction,
     const gd::String& codeNamespace,
@@ -243,22 +232,12 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
     const gd::String& endingCode,
     std::set<gd::String>& includeFiles,
     bool compilationForRuntime) {
-  gd::ObjectsContainer globalObjectsAndGroups;
-  gd::ObjectsContainer objectsAndGroups;
-  gd::EventsFunctionTools::ObjectEventsFunctionToObjectsContainer(
-      project,
-      eventsBasedObject,
-      eventsFunction,
-      globalObjectsAndGroups,
-      objectsAndGroups);
 
-  gd::ProjectScopedContainers projectScopedContainers =
-      gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(
-          globalObjectsAndGroups, objectsAndGroups);
-  projectScopedContainers.AddPropertiesContainer(
-      eventsBasedObject.GetPropertyDescriptors());
-  projectScopedContainers.AddParameters(eventsFunction.GetParametersForEvents(
-      eventsBasedObject.GetEventsFunctions()));
+  gd::ObjectsContainer parameterObjectsContainers;
+  auto projectScopedContainers = gd::ProjectScopedContainers::
+      MakeNewProjectScopedContainersForObjectEventsFunction(
+          project, eventsFunctionsExtension, eventsBasedObject,
+          eventsFunction, parameterObjectsContainers);
 
   EventsCodeGenerator codeGenerator(projectScopedContainers);
   codeGenerator.SetCodeNamespace(codeNamespace);
@@ -290,11 +269,10 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
   }
 
   fullPreludeCode += codeGenerator.GenerateObjectEventsFunctionContext(
+      eventsFunctionsExtension,
       eventsBasedObject,
-      eventsFunction.GetParametersForEvents(
-          eventsBasedObject.GetEventsFunctions()),
+      eventsFunction,
       onceTriggersVariable,
-      eventsFunction.IsAsync(),
       // Pass the names of the parameters considered as the current
       // object and behavior parameters:
       "Object");
@@ -345,25 +323,26 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionParameterDeclarationsList(
 }
 
 gd::String EventsCodeGenerator::GenerateFreeEventsFunctionContext(
-    const vector<gd::ParameterMetadata>& parameters,
-    const gd::String& onceTriggersVariable,
-    bool isAsync) {
+    const gd::EventsFunctionsExtension& eventsFunctionsExtension,
+    const gd::EventsFunction& eventsFunction,
+    const gd::String& onceTriggersVariable) {
   gd::String objectsGettersMap;
   gd::String objectArraysMap;
   gd::String behaviorNamesMap;
-  return GenerateEventsFunctionContext(parameters,
+  return GenerateEventsFunctionContext(eventsFunctionsExtension,
+                                       eventsFunctionsExtension,
+                                       eventsFunction,
                                        onceTriggersVariable,
                                        objectsGettersMap,
                                        objectArraysMap,
-                                       behaviorNamesMap,
-                                       isAsync);
+                                       behaviorNamesMap);
 }
 
 gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionContext(
+    const gd::EventsFunctionsExtension& eventsFunctionsExtension,
     const gd::EventsBasedBehavior& eventsBasedBehavior,
-    const vector<gd::ParameterMetadata>& parameters,
+    const gd::EventsFunction& eventsFunction,
     const gd::String& onceTriggersVariable,
-    bool isAsync,
     const gd::String& thisObjectName,
     const gd::String& thisBehaviorName) {
   // See the comment at the start of the GenerateEventsFunctionContext function
@@ -409,21 +388,22 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionContext(
     }
   }
 
-  return GenerateEventsFunctionContext(parameters,
+  return GenerateEventsFunctionContext(eventsFunctionsExtension,
+                                       eventsBasedBehavior.GetEventsFunctions(),
+                                       eventsFunction,
                                        onceTriggersVariable,
                                        objectsGettersMap,
                                        objectArraysMap,
                                        behaviorNamesMap,
-                                       isAsync,
                                        thisObjectName,
                                        thisBehaviorName);
 }
 
 gd::String EventsCodeGenerator::GenerateObjectEventsFunctionContext(
+    const gd::EventsFunctionsExtension& eventsFunctionsExtension,
     const gd::EventsBasedObject& eventsBasedObject,
-    const vector<gd::ParameterMetadata>& parameters,
+    const gd::EventsFunction& eventsFunction,
     const gd::String& onceTriggersVariable,
-    bool isAsync,
     const gd::String& thisObjectName) {
   // See the comment at the start of the GenerateEventsFunctionContext function
 
@@ -454,24 +434,30 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionContext(
     }
   }
 
-  return GenerateEventsFunctionContext(parameters,
+  return GenerateEventsFunctionContext(eventsFunctionsExtension,
+                                       eventsBasedObject.GetEventsFunctions(),
+                                       eventsFunction,
                                        onceTriggersVariable,
                                        objectsGettersMap,
                                        objectArraysMap,
                                        behaviorNamesMap,
-                                       isAsync,
                                        thisObjectName);
 }
 
 gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
-    const vector<gd::ParameterMetadata>& parameters,
+    const gd::EventsFunctionsExtension& eventsFunctionsExtension,
+    const gd::EventsFunctionsContainer& eventsFunctionsContainer,
+    const gd::EventsFunction& eventsFunction,
     const gd::String& onceTriggersVariable,
     gd::String& objectsGettersMap,
     gd::String& objectArraysMap,
     gd::String& behaviorNamesMap,
-    bool isAsync,
     const gd::String& thisObjectName,
     const gd::String& thisBehaviorName) {
+  const auto& extensionName = eventsFunctionsExtension.GetName();
+  const auto &parameters = eventsFunction.GetParametersForEvents(
+      eventsFunctionsContainer);
+
   // When running in the context of a function generated from events, we
   // need some indirection to deal with objects, behaviors and parameters in
   // general:
@@ -525,7 +511,7 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
   }
 
   const gd::String async =
-      isAsync ? "  task: new gdjs.ManuallyResolvableTask(),\n" : "";
+      eventsFunction.IsAsync() ? "  task: new gdjs.ManuallyResolvableTask(),\n" : "";
 
   return gd::String("var eventsFunctionContext = {\n") +
          // The async task, if there is one
@@ -541,6 +527,14 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          "  _behaviorNamesMap: {\n" +
          behaviorNamesMap +
          "},\n"
+         "  globalVariablesForExtension: "
+         "runtimeScene.getGame().getVariablesForExtension(" +
+         ConvertToStringExplicit(extensionName) + "),\n" +
+         "  sceneVariablesForExtension: "
+         "runtimeScene.getScene().getVariablesForExtension(" +
+         ConvertToStringExplicit(extensionName) + "),\n" +
+         // The local variables stack:
+         "  localVariables: [],\n"
          // Function that will be used to query objects, when a new object list
          // is needed by events. We assume it's used a lot by the events
          // generated code, so we cache the arrays in a map.
@@ -875,7 +869,8 @@ gd::String EventsCodeGenerator::GenerateObjectAction(
   // Create call
   gd::String call;
   if (instrInfos.codeExtraInformation.type == "number" ||
-      instrInfos.codeExtraInformation.type == "string") {
+      instrInfos.codeExtraInformation.type == "string" || 
+      instrInfos.codeExtraInformation.type == "boolean") {
     if (instrInfos.codeExtraInformation.accessType ==
         gd::InstructionMetadata::ExtraInformation::MutatorAndOrAccessor)
       call = GenerateOperatorCall(
@@ -936,7 +931,8 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
   // Create call
   gd::String call;
   if ((instrInfos.codeExtraInformation.type == "number" ||
-       instrInfos.codeExtraInformation.type == "string")) {
+       instrInfos.codeExtraInformation.type == "string" || 
+      instrInfos.codeExtraInformation.type == "boolean")) {
     if (instrInfos.codeExtraInformation.accessType ==
         gd::InstructionMetadata::ExtraInformation::MutatorAndOrAccessor)
       call = GenerateOperatorCall(
@@ -1298,7 +1294,35 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
     const gd::String& objectName) {
   gd::String output;
   const gd::VariablesContainer* variables = NULL;
-  if (scope == LAYOUT_VARIABLE) {
+  if (scope == ANY_VARIABLE) {
+    const auto variablesContainersList =
+        GetProjectScopedContainers().GetVariablesContainersList();
+    const auto &variablesContainer =
+        variablesContainersList.GetVariablesContainerFromVariableName(
+            variableName);
+    const auto sourceType = variablesContainer.GetSourceType();
+    if (sourceType == gd::VariablesContainer::SourceType::Scene) {
+      variables = &variablesContainer;
+      output = "runtimeScene.getScene().getVariables()";
+    } else if (sourceType == gd::VariablesContainer::SourceType::Global) {
+      variables = &variablesContainer;
+      output = "runtimeScene.getGame().getVariables()";
+    } else if (sourceType == gd::VariablesContainer::SourceType::Local) {
+      variables = &variablesContainer;
+      std::size_t localVariablesIndex =
+          variablesContainersList.GetLocalVariablesContainerPosition(
+              variablesContainer);
+      output = GenerateLocalVariablesStackAccessor() + "[" +
+                gd::String::From(localVariablesIndex) + "]";
+    } else if (sourceType ==
+                gd::VariablesContainer::SourceType::ExtensionGlobal) {
+      variables = &variablesContainer;
+      output = "eventsFunctionContext.globalVariablesForExtension";
+    } else if (sourceType == gd::VariablesContainer::SourceType::ExtensionScene) {
+      variables = &variablesContainer;
+      output = "eventsFunctionContext.sceneVariablesForExtension";
+    }
+  } else if (scope == LAYOUT_VARIABLE) {
     output = "runtimeScene.getScene().getVariables()";
 
     if (HasProjectAndLayout()) {

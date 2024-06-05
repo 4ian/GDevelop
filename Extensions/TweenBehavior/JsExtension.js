@@ -1671,7 +1671,7 @@ module.exports = {
           'Tweens the object opacity from its current value to a new one (note: the value shall stay between 0 and 255).'
         ),
         _(
-          'Tween the opacity of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ seconds as _PARAM2_'
+          'Tween the opacity of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ seconds as _PARAM2_ and destroy: _PARAM6_'
         ),
         _('Visibility'),
         'JsPlatform/Extensions/tween_behavior24.png',

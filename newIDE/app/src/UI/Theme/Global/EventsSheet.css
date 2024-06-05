@@ -87,6 +87,16 @@
   border-bottom-color: var(--event-sheet-conditions-border-color);
 }
 
+.gd-events-sheet .local-variables-container {
+  background: var(--event-sheet-actions-background-color);
+  color: var(--event-sheet-actions-color);
+  padding-left: 5px;
+  padding-right: 5px;
+  /* Prevent container to growing outside its parent. We don't have a way to prevent an infinitely
+     * small variables column, but responsive design should avoid the problem on small screens. */
+  min-width: 0;
+}
+
 .gd-events-sheet .actions-container {
   background: var(--event-sheet-actions-background-color);
   color: var(--event-sheet-actions-color);
@@ -169,6 +179,10 @@
   color: var(--event-sheet-instruction-parameter-var-color);
 }
 
+.gd-events-sheet .instruction-parameter.variable {
+  color: var(--event-sheet-instruction-parameter-var-color);
+}
+
 .gd-events-sheet .instruction-parameter .instruction-invalid-parameter {
   color: var(--event-sheet-instruction-parameter-error-color);
   text-decoration:  var(--event-sheet-instruction-parameter-error-color) underline wavy;
@@ -207,6 +221,10 @@
   outline: none;
   background-color: var(--event-sheet-events-highlighted-background-color);
 }
+.gd-events-sheet .with-search-results .rst__rowSearchMatch .local-variables-container {
+  outline: none;
+  background-color: var(--event-sheet-events-highlighted-background-color);
+}
 
 .gd-events-sheet .with-search-results .rst__rowSearchFocus .move-handle {
   width: 15px;
@@ -242,10 +260,16 @@
 .gd-events-sheet-dark-theme .link-container span {
   color: var(--event-sheet-link-container-color);
 }
+.gd-events-sheet .link-container .instruction-invalid-parameter {
+  color: var(--event-sheet-instruction-parameter-error-color);
+  text-decoration:  var(--event-sheet-instruction-parameter-error-color) underline wavy;
+}
 
 .gd-events-sheet .link-container .selectable {
   color: var(--event-sheet-link-selectable-link-color);
   font-weight: bold;
+  /* It avoids the warning underlying to get cut. */
+  line-height: 1.6em;
 }
 
 /* Theming icons */
@@ -253,4 +277,10 @@
   padding-right: 2px;
   width: 16px;
   height: 16px;
+}
+
+.gd-events-sheet .link-container .icon {
+  padding-right: 3px;
+  width: 24px;
+  height: 24px;
 }

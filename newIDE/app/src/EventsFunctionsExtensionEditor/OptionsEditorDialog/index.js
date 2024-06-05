@@ -15,12 +15,14 @@ import Upload from '../../UI/CustomSvgIcons/Upload';
 type TabName = 'options' | 'dependencies';
 
 type Props = {|
+  project: gdProject,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   onClose: () => void,
   open: boolean,
 |};
 
 export default function OptionsEditorDialog({
+  project,
   eventsFunctionsExtension,
   onClose,
   open,

@@ -9,7 +9,10 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <vector>
+#include <memory>
 #include "GDCore/String.h"
+#include "GDCore/Project/Variable.h"
+
 namespace gd {
 class Platform;
 class Project;
@@ -34,13 +37,26 @@ class BehaviorMetadata;
 class UnfilledRequiredBehaviorPropertyProblem;
 class ProjectBrowser;
 class SerializerElement;
+struct VariablesRenamingChangesetNode;
 }  // namespace gd
 
 namespace gd {
 
-struct VariablesChangeset {
-  std::unordered_set<gd::String> removedVariableNames;
+struct VariablesRenamingChangesetNode {
   std::unordered_map<gd::String, gd::String> oldToNewVariableNames;
+  std::unordered_map<gd::String, std::shared_ptr<gd::VariablesRenamingChangesetNode>>
+      modifiedVariables;
+};
+
+struct VariablesChangeset : VariablesRenamingChangesetNode {
+  std::unordered_set<gd::String> removedVariableNames;
+
+  /**
+   * No distinction is done between a change of the variable itself or its
+   * children. Ensuring that a child is actually the one with a type change
+   * would take more time than checking the instruction type is rightly set.
+   */
+  std::unordered_set<gd::String> typeChangedVariableNames;
 
   bool HasRemovedVariables() { return !removedVariableNames.empty(); }
 
@@ -51,8 +67,8 @@ struct VariablesChangeset {
  * \brief Tool functions to do refactoring on the whole project after
  * changes like deletion or renaming of an object.
  *
- * \TODO Ideally ObjectOrGroupRenamedInLayout, ObjectOrGroupRemovedInLayout,
- * GlobalObjectOrGroupRenamed, GlobalObjectOrGroupRemoved would be implemented
+ * \TODO Ideally ObjectOrGroupRenamedInLayout, ObjectRemovedInLayout,
+ * GlobalObjectOrGroupRenamed, GlobalObjectRemoved would be implemented
  * using ExposeProjectEvents.
  */
 class GD_CORE_API WholeProjectRefactorer {
@@ -62,7 +78,6 @@ class GD_CORE_API WholeProjectRefactorer {
    * \brief Compute the changes made on the variables of a variable container.
    */
   static VariablesChangeset ComputeChangesetForVariablesContainer(
-    gd::Project &project,
     const gd::SerializerElement &oldSerializedVariablesContainer,
     const gd::VariablesContainer &newVariablesContainer);
 
@@ -71,9 +86,9 @@ class GD_CORE_API WholeProjectRefactorer {
    * made to variables.
    */
   static void ApplyRefactoringForVariablesContainer(
-    gd::Project &project,
-    const gd::VariablesContainer &newVariablesContainer,
-    const gd::VariablesChangeset& changeset);
+      gd::Project &project, gd::VariablesContainer &variablesContainer,
+      const gd::VariablesChangeset &changeset,
+      const gd::SerializerElement &originalSerializedVariables);
 
   /**
    * \brief Refactor the project **before** an events function extension is
@@ -376,11 +391,9 @@ class GD_CORE_API WholeProjectRefactorer {
    * This will update the layout, all external layouts associated with it
    * and all external events associated with it.
    */
-  static void ObjectOrGroupRemovedInLayout(gd::Project& project,
+  static void ObjectRemovedInLayout(gd::Project& project,
                                            gd::Layout& layout,
-                                           const gd::String& objectName,
-                                           bool isObjectGroup,
-                                           bool removeEventsAndGroups = true);
+                                           const gd::String& objectName);
 
   /**
    * \brief Refactor the project after an object is removed in an events-based
@@ -388,14 +401,12 @@ class GD_CORE_API WholeProjectRefactorer {
    *
    * This will update the events of the function and groups.
    */
-  static void ObjectOrGroupRemovedInEventsBasedObject(
+  static void ObjectRemovedInEventsBasedObject(
       gd::Project& project,
       gd::EventsBasedObject& eventsBasedObject,
       gd::ObjectsContainer& globalObjectsContainer,
       gd::ObjectsContainer& objectsContainer,
-      const gd::String& objectName,
-      bool isObjectGroup,
-      bool removeEventsAndGroups);
+      const gd::String& objectName);
 
   /**
    * \brief Refactor the events function after an object or group is renamed
@@ -429,14 +440,12 @@ class GD_CORE_API WholeProjectRefactorer {
    *
    * This will update the events of the function and groups.
    */
-  static void ObjectOrGroupRemovedInEventsFunction(
+  static void ObjectRemovedInEventsFunction(
       gd::Project& project,
       gd::EventsFunction& eventsFunction,
       gd::ObjectsContainer& globalObjectsContainer,
       gd::ObjectsContainer& objectsContainer,
-      const gd::String& objectName,
-      bool isObjectGroup,
-      bool removeEventsAndGroups = true);
+      const gd::String& objectName);
 
   /**
    * \brief Refactor the project after a global object is renamed.
@@ -455,10 +464,8 @@ class GD_CORE_API WholeProjectRefactorer {
    * This will update all the layouts, all external layouts associated with them
    * and all external events used by the layouts.
    */
-  static void GlobalObjectOrGroupRemoved(gd::Project& project,
-                                         const gd::String& objectName,
-                                         bool isObjectGroup,
-                                         bool removeEventsAndGroups = true);
+  static void GlobalObjectRemoved(gd::Project& project,
+                                         const gd::String& objectName);
 
   /**
    * \brief Return the set of all the types of the objects that are using the
@@ -554,6 +561,13 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::Object& object,
       const gd::String& behaviorName,
       std::unordered_set<gd::String>& dependentBehaviorNames);
+
+  static std::shared_ptr<VariablesRenamingChangesetNode>
+  ComputeChangesetForVariable(const gd::Variable &oldVariable,
+                              const gd::Variable &newVariable);
+
+  static bool HasAnyVariableTypeChanged(const gd::Variable &oldVariable,
+                                        const gd::Variable &newVariable);
 
   static const gd::String behaviorObjectParameterName;
   static const gd::String parentObjectParameterName;

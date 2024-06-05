@@ -87,6 +87,18 @@ namespace gdjs {
     }
 
     /**
+     * Declare a new variable.
+     * This should only be used by generated code.
+     *
+     * @param name Variable name
+     * @param newVariable The variable to be declared
+     */
+    _declare(name: string, newVariable: gdjs.Variable): void {
+      this._variables.put(name, newVariable);
+      this._variablesArray.push(newVariable);
+    }
+
+    /**
      * Add a new variable.
      * This can be costly, don't use in performance sensitive paths.
      *
@@ -205,6 +217,9 @@ namespace gdjs {
       add: function () {
         return;
       },
+      _declare: function () {
+        return;
+      },
       initFrom: function () {
         return;
       },
@@ -241,6 +256,7 @@ namespace gdjs {
         return true;
       },
       setValue: () => {},
+      toggle: () => {},
       getValue: () => 0,
       getChild: () => gdjs.VariablesContainer.badVariable,
       getChildAt: () => gdjs.VariablesContainer.badVariable,

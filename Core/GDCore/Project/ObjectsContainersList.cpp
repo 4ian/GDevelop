@@ -13,6 +13,12 @@
 namespace gd {
 
 ObjectsContainersList
+ObjectsContainersList::MakeNewEmptyObjectsContainersList() {
+  ObjectsContainersList objectsContainersList;
+  return objectsContainersList;
+}
+
+ObjectsContainersList
 ObjectsContainersList::MakeNewObjectsContainersListForProjectAndLayout(
     const gd::Project& project, const gd::Layout& layout) {
   ObjectsContainersList objectsContainersList;
@@ -22,11 +28,27 @@ ObjectsContainersList::MakeNewObjectsContainersListForProjectAndLayout(
 }
 
 ObjectsContainersList
+ObjectsContainersList::MakeNewObjectsContainersListForProject(
+    const gd::Project& project) {
+  ObjectsContainersList objectsContainersList;
+  objectsContainersList.Add(project);
+  return objectsContainersList;
+}
+
+ObjectsContainersList
 ObjectsContainersList::MakeNewObjectsContainersListForContainers(
     const gd::ObjectsContainer& globalObjectsContainer,
     const gd::ObjectsContainer& objectsContainer) {
   ObjectsContainersList objectsContainersList;
   objectsContainersList.Add(globalObjectsContainer);
+  objectsContainersList.Add(objectsContainer);
+  return objectsContainersList;
+}
+
+ObjectsContainersList
+ObjectsContainersList::MakeNewObjectsContainersListForContainer(
+    const gd::ObjectsContainer& objectsContainer) {
+  ObjectsContainersList objectsContainersList;
   objectsContainersList.Add(objectsContainer);
   return objectsContainersList;
 }
@@ -370,7 +392,7 @@ void ObjectsContainersList::ForEachObject(
 
 gd::String ObjectsContainersList::GetTypeOfObject(
     const gd::String& objectName) const {
-  if (objectsContainers.size() != 2) {
+  if (objectsContainers.size() > 2) {
     std::cout << this << std::endl;
     std::cout << objectsContainers.size() << std::endl;
     // TODO: rework forwarded methods so they can work with any number of
@@ -379,18 +401,39 @@ gd::String ObjectsContainersList::GetTypeOfObject(
         "ObjectsContainersList::GetTypeOfObject called with objectsContainers "
         "not being exactly 2. This is a logical error and will crash.");
   }
+  if (objectsContainers.size() == 0) {
+    gd::LogWarning("ObjectsContainersList::GetTypeOfObject called without any "
+                   "objectsContainer");
+    return "";
+  }
+  if (objectsContainers.size() == 1) {
+    gd::ObjectsContainer emptyObjectsContainer;
+    return gd::GetTypeOfObject(emptyObjectsContainer, *objectsContainers[0],
+                               objectName, true);
+  }
   return gd::GetTypeOfObject(
       *objectsContainers[0], *objectsContainers[1], objectName, true);
 }
 
 bool ObjectsContainersList::HasBehaviorInObjectOrGroup(
     const gd::String& objectOrGroupName, const gd::String& behaviorName) const {
-  if (objectsContainers.size() != 2) {
+  if (objectsContainers.size() > 2) {
     // TODO: rework forwarded methods so they can work with any number of
     // containers.
     gd::LogFatalError(
-        "ObjectsContainersList::GetTypeOfObject called with objectsContainers "
+        "ObjectsContainersList::HasBehaviorInObjectOrGroup called with objectsContainers "
         "not being exactly 2. This is a logical error and will crash.");
+  }
+  if (objectsContainers.size() == 0) {
+    gd::LogWarning("ObjectsContainersList::HasBehaviorInObjectOrGroup called without any "
+                   "objectsContainer");
+    return false;
+  }
+  if (objectsContainers.size() == 1) {
+    gd::ObjectsContainer emptyObjectsContainer;
+    return gd::HasBehaviorInObjectOrGroup(
+        emptyObjectsContainer, *objectsContainers[0], objectOrGroupName,
+        behaviorName, true);
   }
   return gd::HasBehaviorInObjectOrGroup(*objectsContainers[0],
                                         *objectsContainers[1],
@@ -403,12 +446,23 @@ gd::String ObjectsContainersList::GetTypeOfBehaviorInObjectOrGroup(
     const gd::String& objectOrGroupName,
     const gd::String& behaviorName,
     bool searchInGroups) const {
-  if (objectsContainers.size() != 2) {
+  if (objectsContainers.size() > 2) {
     // TODO: rework forwarded methods so they can work with any number of
     // containers.
     gd::LogFatalError(
-        "ObjectsContainersList::GetTypeOfObject called with objectsContainers "
+        "ObjectsContainersList::GetTypeOfBehaviorInObjectOrGroup called with objectsContainers "
         "not being exactly 2. This is a logical error and will crash.");
+  }
+  if (objectsContainers.size() == 0) {
+    gd::LogWarning("ObjectsContainersList::GetTypeOfBehaviorInObjectOrGroup called without any "
+                   "objectsContainer");
+    return "";
+  }
+  if (objectsContainers.size() == 1) {
+    gd::ObjectsContainer emptyObjectsContainer;
+    return gd::GetTypeOfBehaviorInObjectOrGroup(
+        emptyObjectsContainer, *objectsContainers[0], objectOrGroupName,
+        behaviorName, searchInGroups);
   }
   return gd::GetTypeOfBehaviorInObjectOrGroup(*objectsContainers[0],
                                               *objectsContainers[1],
@@ -419,12 +473,22 @@ gd::String ObjectsContainersList::GetTypeOfBehaviorInObjectOrGroup(
 
 gd::String ObjectsContainersList::GetTypeOfBehavior(
     const gd::String& behaviorName, bool searchInGroups) const {
-  if (objectsContainers.size() != 2) {
+  if (objectsContainers.size() > 2) {
     // TODO: rework forwarded methods so they can work with any number of
     // containers.
     gd::LogFatalError(
-        "ObjectsContainersList::GetTypeOfObject called with objectsContainers "
+        "ObjectsContainersList::GetTypeOfBehavior called with objectsContainers "
         "not being exactly 2. This is a logical error and will crash.");
+  }
+  if (objectsContainers.size() == 0) {
+    gd::LogWarning("ObjectsContainersList::GetTypeOfBehavior called without any "
+                   "objectsContainer");
+    return "";
+  }
+  if (objectsContainers.size() == 1) {
+    gd::ObjectsContainer emptyObjectsContainer;
+    return gd::GetTypeOfBehavior(emptyObjectsContainer, *objectsContainers[0],
+                                 behaviorName, searchInGroups);
   }
   return gd::GetTypeOfBehavior(*objectsContainers[0],
                                *objectsContainers[1],
@@ -434,14 +498,25 @@ gd::String ObjectsContainersList::GetTypeOfBehavior(
 
 std::vector<gd::String> ObjectsContainersList::GetBehaviorsOfObject(
     const gd::String& objectName, bool searchInGroups) const {
-  if (objectsContainers.size() != 2) {
+  if (objectsContainers.size() > 2) {
     // TODO: rework forwarded methods so they can work with any number of
     // containers.
     gd::LogFatalError(
-        "ObjectsContainersList::GetTypeOfObject called with objectsContainers "
+        "ObjectsContainersList::GetBehaviorsOfObject called with objectsContainers "
         "not being exactly 2. This is a logical error and will crash.");
   }
-
+  if (objectsContainers.size() == 0) {
+    gd::LogWarning("ObjectsContainersList::GetBehaviorsOfObject called without any "
+                   "objectsContainer");
+    std::vector<gd::String> behaviors;
+    return behaviors;
+  }
+  if (objectsContainers.size() == 1) {
+    gd::ObjectsContainer emptyObjectsContainer;
+    return gd::GetBehaviorsOfObject(emptyObjectsContainer,
+                                    *objectsContainers[0], objectName,
+                                    searchInGroups);
+  }
   return gd::GetBehaviorsOfObject(
       *objectsContainers[0], *objectsContainers[1], objectName, searchInGroups);
 }

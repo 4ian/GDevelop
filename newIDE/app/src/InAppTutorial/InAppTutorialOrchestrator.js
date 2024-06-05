@@ -121,9 +121,24 @@ const interpolateExpectedEditor = (
   data: { [key: string]: string }
 ): {| editor: EditorIdentifier, scene?: string |} | null => {
   if (!expectedEditor) return null;
+  let scene = undefined;
+  if (expectedEditor.scene) {
+    const sceneName = data[expectedEditor.scene];
+    if (!sceneName) {
+      console.warn(
+        `The user should now be focused on editor ${
+          expectedEditor.editor
+        } for scene with key ${
+          expectedEditor.scene
+        } but the scene name couldn't be found in project data:`,
+        data
+      );
+    }
+    scene = sceneName;
+  }
   return {
     ...expectedEditor,
-    scene: expectedEditor.scene ? data[expectedEditor.scene] : undefined,
+    scene,
   };
 };
 

@@ -10,6 +10,8 @@ type Props = {|
   onAddStandardEvent: () => void,
   onAddSubEvent: () => void,
   canAddSubEvent: boolean,
+  onAddLocalVariable: () => void,
+  canAddLocalVariable: boolean,
   onAddCommentEvent: () => void,
   allEventsMetadata: Array<EventMetadata>,
   onAddEvent: (eventType: string) => Array<gdBaseEvent>,
@@ -38,6 +40,10 @@ const ToolbarCommands = (props: Props) => {
 
   useCommand('ADD_SUBEVENT', props.canAddSubEvent, {
     handler: props.onAddSubEvent,
+  });
+
+  useCommand('ADD_LOCAL_VARIABLE', props.canAddLocalVariable, {
+    handler: props.onAddLocalVariable,
   });
 
   useCommand('ADD_COMMENT_EVENT', true, {

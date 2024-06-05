@@ -65,7 +65,9 @@ declare class libGDevelop {
   JsPlatform: Class<gdJsPlatform>;
   PairStringVariable: Class<gdPairStringVariable>;
   Variable_Type: Class<Variable_Type>;
+  VariableInstructionSwitcher: Class<gdVariableInstructionSwitcher>;
   Variable: Class<gdVariable>;
+  VariablesContainer_SourceType: Class<VariablesContainer_SourceType>;
   VariablesContainer: Class<gdVariablesContainer>;
   VariablesContainersList: Class<gdVariablesContainersList>;
   ObjectGroup: Class<gdObjectGroup>;
@@ -76,6 +78,7 @@ declare class libGDevelop {
   ObjectFolderOrObject: Class<gdObjectFolderOrObject>;
   ObjectsContainer: Class<gdObjectsContainer>;
   Project: Class<gdProject>;
+  ObjectsContainersList_VariableExistence: Class<ObjectsContainersList_VariableExistence>;
   ObjectsContainersList: Class<gdObjectsContainersList>;
   ProjectScopedContainers: Class<gdProjectScopedContainers>;
   ExtensionProperties: Class<gdExtensionProperties>;
@@ -142,7 +145,6 @@ declare class libGDevelop {
   ValueTypeMetadata: Class<gdValueTypeMetadata>;
   VectorParameterMetadata: Class<gdVectorParameterMetadata>;
   ParameterMetadataTools: Class<gdParameterMetadataTools>;
-  EventsFunctionTools: Class<gdEventsFunctionTools>;
   ObjectMetadata: Class<gdObjectMetadata>;
   BehaviorMetadata: Class<gdBehaviorMetadata>;
   EffectMetadata: Class<gdEffectMetadata>;
@@ -179,8 +181,12 @@ declare class libGDevelop {
   ExtensionAndInstructionMetadata: Class<gdExtensionAndInstructionMetadata>;
   ExtensionAndExpressionMetadata: Class<gdExtensionAndExpressionMetadata>;
   MetadataProvider: Class<gdMetadataProvider>;
-  ExpressionParserDiagnostic: Class<gdExpressionParserDiagnostic>;
-  VectorExpressionParserDiagnostic: Class<gdVectorExpressionParserDiagnostic>;
+  ProjectDiagnostic_ErrorType: Class<ProjectDiagnostic_ErrorType>;
+  ProjectDiagnostic: Class<gdProjectDiagnostic>;
+  DiagnosticReport: Class<gdDiagnosticReport>;
+  WholeProjectDiagnosticReport: Class<gdWholeProjectDiagnosticReport>;
+  ExpressionParserError: Class<gdExpressionParserError>;
+  VectorExpressionParserError: Class<gdVectorExpressionParserError>;
   ExpressionParser2NodeWorker: Class<gdExpressionParser2NodeWorker>;
   ExpressionValidator: Class<gdExpressionValidator>;
   ExpressionCompletionDescription_CompletionKind: Class<ExpressionCompletionDescription_CompletionKind>;

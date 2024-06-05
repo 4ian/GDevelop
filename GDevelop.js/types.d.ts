@@ -20,11 +20,36 @@ declare class EmscriptenObject {
 }
 
 export enum Variable_Type {
-  String = 0,
-  Number = 1,
-  Boolean = 2,
-  Structure = 3,
-  Array = 4,
+  Unknown = 0,
+  String = 1,
+  Number = 2,
+  Boolean = 3,
+  Structure = 4,
+  Array = 5,
+}
+
+export enum VariablesContainer_SourceType {
+  Unknown = 0,
+  Global = 1,
+  Scene = 2,
+  Object = 3,
+  Local = 4,
+  ExtensionGlobal = 5,
+  ExtensionScene = 6,
+}
+
+export enum ObjectsContainersList_VariableExistence {
+  DoesNotExist = 0,
+  Exists = 1,
+  GroupIsEmpty = 2,
+  ExistsOnlyOnSomeObjectsOfTheGroup = 3,
+}
+
+export enum ProjectDiagnostic_ErrorType {
+  UndeclaredVariable = 0,
+  MissingBehavior = 1,
+  UnknownObject = 2,
+  MismatchedObjectType = 3,
 }
 
 export enum ExpressionCompletionDescription_CompletionKind {
@@ -169,7 +194,7 @@ export class EventsVariablesFinder extends EmscriptenObject {
   constructor();
   static findAllGlobalVariables(platform: Platform, project: Project): SetString;
   static findAllLayoutVariables(platform: Platform, project: Project, layout: Layout): SetString;
-  static findAllObjectVariables(platform: Platform, project: Project, layout: Layout, obj: gdObject): SetString;
+  static findAllObjectVariables(platform: Platform, project: Project, layout: Layout, objectName: string): SetString;
 }
 
 export class EventsIdentifiersFinder extends EmscriptenObject {
@@ -233,6 +258,16 @@ export class PairStringVariable extends EmscriptenObject {
   getVariable(): Variable;
 }
 
+export class VariableInstructionSwitcher extends EmscriptenObject {
+  static isSwitchableVariableInstruction(instructionType: string): boolean;
+  static isSwitchableObjectVariableInstruction(instructionType: string): boolean;
+  static getSwitchableVariableInstructionIdentifier(instructionType: string): string;
+  static getSwitchableInstructionVariableType(instructionType: string): Variable_Type;
+  static switchVariableInstructionType(instruction: Instruction, variableType: Variable_Type): void;
+  static getVariableTypeFromParameters(platform: Platform, projectScopedContainers: ProjectScopedContainers, instruction: Instruction): Variable_Type;
+  static switchBetweenUnifiedInstructionIfNeeded(platform: Platform, projectScopedContainers: ProjectScopedContainers, instruction: Instruction): void;
+}
+
 export class Variable extends EmscriptenObject {
   constructor();
   static isPrimitive(type: Variable_Type): boolean;
@@ -269,6 +304,8 @@ export class Variable extends EmscriptenObject {
 
 export class VariablesContainer extends EmscriptenObject {
   constructor();
+  constructor(sourceType: VariablesContainer_SourceType);
+  getSourceType(): VariablesContainer_SourceType;
   has(name: string): boolean;
   get(name: string): Variable;
   getAt(index: number): Variable;
@@ -290,8 +327,11 @@ export class VariablesContainer extends EmscriptenObject {
 }
 
 export class VariablesContainersList extends EmscriptenObject {
-  static makeNewVariablesContainersListForProjectAndLayout(project: Project, layout: Layout): VariablesContainersList;
-  static makeNewEmptyVariablesContainersList(): VariablesContainersList;
+  has(name: string): boolean;
+  get(name: string): Variable;
+  getVariablesContainerFromVariableName(variableName: string): VariablesContainer;
+  getVariablesContainer(index: number): VariablesContainer;
+  getVariablesContainersCount(): number;
 }
 
 export class ObjectGroup extends EmscriptenObject {
@@ -525,6 +565,7 @@ export class Project extends EmscriptenObject {
   getResourcesManager(): ResourcesManager;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(element: SerializerElement): void;
+  getWholeProjectDiagnosticReport(): WholeProjectDiagnosticReport;
   static isNameSafe(name: string): boolean;
   static getSafeName(name: string): string;
   getTypeOfBehavior(layout: Layout, name: string, searchInGroups: boolean): string;
@@ -556,11 +597,18 @@ export class ObjectsContainersList extends EmscriptenObject {
   getTypeOfBehavior(name: string, searchInGroups: boolean): string;
   getBehaviorsOfObject(name: string, searchInGroups: boolean): VectorString;
   getTypeOfBehaviorInObjectOrGroup(objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): string;
+  hasObjectOrGroupNamed(name: string): boolean;
+  hasObjectOrGroupWithVariableNamed(objectName: string, variableName: string): ObjectsContainersList_VariableExistence;
 }
 
 export class ProjectScopedContainers extends EmscriptenObject {
   static makeNewProjectScopedContainersForProjectAndLayout(project: Project, layout: Layout): ProjectScopedContainers;
-  static makeNewProjectScopedContainersFor(globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer): ProjectScopedContainers;
+  static makeNewProjectScopedContainersForProject(project: Project): ProjectScopedContainers;
+  static makeNewProjectScopedContainersForEventsFunctionsExtension(project: Project, eventsFunctionsExtension: EventsFunctionsExtension): ProjectScopedContainers;
+  static makeNewProjectScopedContainersForFreeEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer): ProjectScopedContainers;
+  static makeNewProjectScopedContainersForBehaviorEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer): ProjectScopedContainers;
+  static makeNewProjectScopedContainersForObjectEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer): ProjectScopedContainers;
+  static makeNewProjectScopedContainersWithLocalVariables(projectScopedContainers: ProjectScopedContainers, event: BaseEvent): ProjectScopedContainers;
   addPropertiesContainer(propertiesContainer: PropertiesContainer): ProjectScopedContainers;
   addParameters(parameters: VectorParameterMetadata): ProjectScopedContainers;
   getObjectsContainersList(): ObjectsContainersList;
@@ -1412,12 +1460,6 @@ export class ParameterMetadataTools extends EmscriptenObject {
   static getObjectParameterIndexFor(parameters: VectorParameterMetadata, parameterIndex: number): number;
 }
 
-export class EventsFunctionTools extends EmscriptenObject {
-  static freeEventsFunctionToObjectsContainer(project: Project, functionsContainer: EventsFunctionsContainer, eventsFunction: EventsFunction, outputGlobalObjectsContainer: ObjectsContainer, outputObjectsContainer: ObjectsContainer): void;
-  static behaviorEventsFunctionToObjectsContainer(project: Project, eventsBasedBehavior: EventsBasedBehavior, eventsFunction: EventsFunction, outputGlobalObjectsContainer: ObjectsContainer, outputObjectsContainer: ObjectsContainer): void;
-  static objectEventsFunctionToObjectsContainer(project: Project, eventsBasedObject: EventsBasedObject, eventsFunction: EventsFunction, outputGlobalObjectsContainer: ObjectsContainer, outputObjectsContainer: ObjectsContainer): void;
-}
-
 export class ObjectMetadata extends EmscriptenObject {
   getName(): string;
   getFullName(): string;
@@ -1602,6 +1644,9 @@ export class BaseEvent extends EmscriptenObject {
   canHaveSubEvents(): boolean;
   hasSubEvents(): boolean;
   getSubEvents(): EventsList;
+  canHaveVariables(): boolean;
+  hasVariables(): boolean;
+  getVariables(): VariablesContainer;
   isDisabled(): boolean;
   setDisabled(disable: boolean): void;
   isFolded(): boolean;
@@ -1610,88 +1655,36 @@ export class BaseEvent extends EmscriptenObject {
   unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
-export class StandardEvent extends EmscriptenObject {
+export class StandardEvent extends BaseEvent {
   constructor();
   getConditions(): InstructionsList;
   getActions(): InstructionsList;
-  clone(): StandardEvent;
-  getType(): string;
-  setType(type: string): void;
-  isExecutable(): boolean;
-  canHaveSubEvents(): boolean;
-  hasSubEvents(): boolean;
-  getSubEvents(): EventsList;
-  isDisabled(): boolean;
-  setDisabled(disable: boolean): void;
-  isFolded(): boolean;
-  setFolded(folded: boolean): void;
-  serializeTo(element: SerializerElement): void;
-  unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
-export class RepeatEvent extends EmscriptenObject {
+export class RepeatEvent extends BaseEvent {
   constructor();
   getConditions(): InstructionsList;
   getActions(): InstructionsList;
-  setRepeatExpression(expr: string): void;
-  getRepeatExpression(): string;
-  clone(): RepeatEvent;
-  getType(): string;
-  setType(type: string): void;
-  isExecutable(): boolean;
-  canHaveSubEvents(): boolean;
-  hasSubEvents(): boolean;
-  getSubEvents(): EventsList;
-  isDisabled(): boolean;
-  setDisabled(disable: boolean): void;
-  isFolded(): boolean;
-  setFolded(folded: boolean): void;
-  serializeTo(element: SerializerElement): void;
-  unserializeFrom(project: Project, element: SerializerElement): void;
+  setRepeatExpressionPlainString(expr: string): void;
+  getRepeatExpression(): Expression;
 }
 
-export class WhileEvent extends EmscriptenObject {
+export class WhileEvent extends BaseEvent {
   constructor();
   getConditions(): InstructionsList;
   getWhileConditions(): InstructionsList;
   getActions(): InstructionsList;
-  clone(): WhileEvent;
-  getType(): string;
-  setType(type: string): void;
-  isExecutable(): boolean;
-  canHaveSubEvents(): boolean;
-  hasSubEvents(): boolean;
-  getSubEvents(): EventsList;
-  isDisabled(): boolean;
-  setDisabled(disable: boolean): void;
-  isFolded(): boolean;
-  setFolded(folded: boolean): void;
-  serializeTo(element: SerializerElement): void;
-  unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
-export class ForEachEvent extends EmscriptenObject {
+export class ForEachEvent extends BaseEvent {
   constructor();
   setObjectToPick(objects: string): void;
   getObjectToPick(): string;
   getConditions(): InstructionsList;
   getActions(): InstructionsList;
-  clone(): ForEachEvent;
-  getType(): string;
-  setType(type: string): void;
-  isExecutable(): boolean;
-  canHaveSubEvents(): boolean;
-  hasSubEvents(): boolean;
-  getSubEvents(): EventsList;
-  isDisabled(): boolean;
-  setDisabled(disable: boolean): void;
-  isFolded(): boolean;
-  setFolded(folded: boolean): void;
-  serializeTo(element: SerializerElement): void;
-  unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
-export class ForEachChildVariableEvent extends EmscriptenObject {
+export class ForEachChildVariableEvent extends BaseEvent {
   constructor();
   getConditions(): InstructionsList;
   getActions(): InstructionsList;
@@ -1701,22 +1694,9 @@ export class ForEachChildVariableEvent extends EmscriptenObject {
   setIterableVariableName(newName: string): void;
   setKeyIteratorVariableName(newName: string): void;
   setValueIteratorVariableName(newName: string): void;
-  clone(): ForEachChildVariableEvent;
-  getType(): string;
-  setType(type: string): void;
-  isExecutable(): boolean;
-  canHaveSubEvents(): boolean;
-  hasSubEvents(): boolean;
-  getSubEvents(): EventsList;
-  isDisabled(): boolean;
-  setDisabled(disable: boolean): void;
-  isFolded(): boolean;
-  setFolded(folded: boolean): void;
-  serializeTo(element: SerializerElement): void;
-  unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
-export class CommentEvent extends EmscriptenObject {
+export class CommentEvent extends BaseEvent {
   constructor();
   getComment(): string;
   setComment(type: string): void;
@@ -1728,22 +1708,9 @@ export class CommentEvent extends EmscriptenObject {
   getTextColorRed(): number;
   getTextColorGreen(): number;
   getTextColorBlue(): number;
-  clone(): CommentEvent;
-  getType(): string;
-  setType(type: string): void;
-  isExecutable(): boolean;
-  canHaveSubEvents(): boolean;
-  hasSubEvents(): boolean;
-  getSubEvents(): EventsList;
-  isDisabled(): boolean;
-  setDisabled(disable: boolean): void;
-  isFolded(): boolean;
-  setFolded(folded: boolean): void;
-  serializeTo(element: SerializerElement): void;
-  unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
-export class GroupEvent extends EmscriptenObject {
+export class GroupEvent extends BaseEvent {
   constructor();
   setName(name: string): void;
   getName(): string;
@@ -1756,22 +1723,9 @@ export class GroupEvent extends EmscriptenObject {
   getCreationParameters(): VectorString;
   getCreationTimestamp(): number;
   setCreationTimestamp(ts: number): void;
-  clone(): GroupEvent;
-  getType(): string;
-  setType(type: string): void;
-  isExecutable(): boolean;
-  canHaveSubEvents(): boolean;
-  hasSubEvents(): boolean;
-  getSubEvents(): EventsList;
-  isDisabled(): boolean;
-  setDisabled(disable: boolean): void;
-  isFolded(): boolean;
-  setFolded(folded: boolean): void;
-  serializeTo(element: SerializerElement): void;
-  unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
-export class LinkEvent extends EmscriptenObject {
+export class LinkEvent extends BaseEvent {
   constructor();
   setTarget(name: string): void;
   getTarget(): string;
@@ -1782,19 +1736,6 @@ export class LinkEvent extends EmscriptenObject {
   setIncludeStartAndEnd(start: number, end: number): void;
   getIncludeStart(): number;
   getIncludeEnd(): number;
-  clone(): LinkEvent;
-  getType(): string;
-  setType(type: string): void;
-  isExecutable(): boolean;
-  canHaveSubEvents(): boolean;
-  hasSubEvents(): boolean;
-  getSubEvents(): EventsList;
-  isDisabled(): boolean;
-  setDisabled(disable: boolean): void;
-  isFolded(): boolean;
-  setFolded(folded: boolean): void;
-  serializeTo(element: SerializerElement): void;
-  unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
 export class EventsRemover extends EmscriptenObject {
@@ -1831,7 +1772,6 @@ export class VectorEventsSearchResult extends EmscriptenObject {
 
 export class EventsRefactorer extends EmscriptenObject {
   static renameObjectInEvents(platform: Platform, projectScopedContainers: ProjectScopedContainers, events: EventsList, oldName: string, newName: string): void;
-  static removeObjectInEvents(platform: Platform, projectScopedContainers: ProjectScopedContainers, events: EventsList, name: string): void;
   static replaceStringInEvents(project: ObjectsContainer, layout: ObjectsContainer, events: EventsList, toReplace: string, newString: string, matchCase: boolean, inConditions: boolean, inActions: boolean, inEventStrings: boolean): VectorEventsSearchResult;
   static searchInEvents(platform: Platform, events: EventsList, search: string, matchCase: boolean, inConditions: boolean, inActions: boolean, inEventStrings: boolean, inEventSentences: boolean): VectorEventsSearchResult;
 }
@@ -1864,8 +1804,8 @@ export class VariablesChangeset extends EmscriptenObject {
 }
 
 export class WholeProjectRefactorer extends EmscriptenObject {
-  static computeChangesetForVariablesContainer(project: Project, oldSerializedVariablesContainer: SerializerElement, newVariablesContainer: VariablesContainer): VariablesChangeset;
-  static applyRefactoringForVariablesContainer(project: Project, newVariablesContainer: VariablesContainer, changeset: VariablesChangeset): void;
+  static computeChangesetForVariablesContainer(oldSerializedVariablesContainer: SerializerElement, newVariablesContainer: VariablesContainer): VariablesChangeset;
+  static applyRefactoringForVariablesContainer(project: Project, newVariablesContainer: VariablesContainer, changeset: VariablesChangeset, originalSerializedVariables: SerializerElement): void;
   static renameEventsFunctionsExtension(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, oldName: string, newName: string): void;
   static updateExtensionNameInEventsBasedBehavior(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, sourceExtensionName: string): void;
   static renameEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, oldName: string, newName: string): void;
@@ -1888,13 +1828,13 @@ export class WholeProjectRefactorer extends EmscriptenObject {
   static renameObjectPoint(project: Project, layout: Layout, gdObject: gdObject, oldName: string, newName: string): void;
   static renameObjectEffect(project: Project, layout: Layout, gdObject: gdObject, oldName: string, newName: string): void;
   static objectOrGroupRenamedInLayout(project: Project, layout: Layout, oldName: string, newName: string, isObjectGroup: boolean): void;
-  static objectOrGroupRemovedInLayout(project: Project, layout: Layout, objectName: string, isObjectGroup: boolean, removeEventsAndGroups: boolean): void;
+  static objectRemovedInLayout(project: Project, layout: Layout, objectName: string): void;
   static objectOrGroupRenamedInEventsFunction(project: Project, eventsFunction: EventsFunction, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, oldName: string, newName: string, isObjectGroup: boolean): void;
-  static objectOrGroupRemovedInEventsFunction(project: Project, eventsFunction: EventsFunction, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, objectName: string, isObjectGroup: boolean, removeEventsAndGroups: boolean): void;
+  static objectRemovedInEventsFunction(project: Project, eventsFunction: EventsFunction, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, objectName: string): void;
   static objectOrGroupRenamedInEventsBasedObject(project: Project, globalObjectsContainer: ObjectsContainer, eventsBasedObject: EventsBasedObject, oldName: string, newName: string, isObjectGroup: boolean): void;
-  static objectOrGroupRemovedInEventsBasedObject(project: Project, eventsBasedObject: EventsBasedObject, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, objectName: string, isObjectGroup: boolean, removeEventsAndGroups: boolean): void;
+  static objectRemovedInEventsBasedObject(project: Project, eventsBasedObject: EventsBasedObject, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, objectName: string): void;
   static globalObjectOrGroupRenamed(project: Project, oldName: string, newName: string, isObjectGroup: boolean): void;
-  static globalObjectOrGroupRemoved(project: Project, objectName: string, isObjectGroup: boolean, removeEventsAndGroups: boolean): void;
+  static globalObjectRemoved(project: Project, objectName: string): void;
   static getAllObjectTypesUsingEventsBasedBehavior(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior): SetString;
   static ensureBehaviorEventsFunctionsProperParameters(eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior): void;
   static ensureObjectEventsFunctionsProperParameters(eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject): void;
@@ -1980,30 +1920,51 @@ export class MetadataProvider extends EmscriptenObject {
   static isBadBehaviorMetadata(metadata: BehaviorMetadata): boolean;
 }
 
-export class ExpressionParserDiagnostic extends EmscriptenObject {
-  isError(): boolean;
+export class ProjectDiagnostic extends EmscriptenObject {
+  getType(): ProjectDiagnostic_ErrorType;
+  getMessage(): string;
+  getActualValue(): string;
+  getExpectedValue(): string;
+  getObjectName(): string;
+}
+
+export class DiagnosticReport extends EmscriptenObject {
+  constructor();
+  get(index: number): ProjectDiagnostic;
+  count(): number;
+  getSceneName(): string;
+}
+
+export class WholeProjectDiagnosticReport extends EmscriptenObject {
+  get(index: number): DiagnosticReport;
+  count(): number;
+  hasAnyIssue(): boolean;
+}
+
+export class ExpressionParserError extends EmscriptenObject {
   getMessage(): string;
   getStartPosition(): number;
   getEndPosition(): number;
 }
 
-export class VectorExpressionParserDiagnostic extends EmscriptenObject {
+export class VectorExpressionParserError extends EmscriptenObject {
   size(): number;
-  at(index: number): ExpressionParserDiagnostic;
+  at(index: number): ExpressionParserError;
 }
 
 export class ExpressionParser2NodeWorker extends EmscriptenObject {}
 
 export class ExpressionValidator extends EmscriptenObject {
-  constructor(platform: Platform, projectScopedContainers: ProjectScopedContainers, rootType: string);
-  getAllErrors(): VectorExpressionParserDiagnostic;
-  getFatalErrors(): VectorExpressionParserDiagnostic;
+  constructor(platform: Platform, projectScopedContainers: ProjectScopedContainers, rootType: string, extraInfo: string);
+  getAllErrors(): VectorExpressionParserError;
+  getFatalErrors(): VectorExpressionParserError;
 }
 
 export class ExpressionCompletionDescription extends EmscriptenObject {
   getCompletionKind(): ExpressionCompletionDescription_CompletionKind;
   getType(): string;
   getVariableType(): Variable_Type;
+  getVariableScope(): VariablesContainer_SourceType;
   getPrefix(): string;
   getCompletion(): string;
   getObjectName(): string;
@@ -2235,6 +2196,8 @@ export class EventsFunctionsExtension extends EmscriptenObject {
   addDependency(): DependencyMetadata;
   removeDependencyAt(index: number): void;
   getAllDependencies(): VectorDependencyMetadata;
+  getGlobalVariables(): VariablesContainer;
+  getSceneVariables(): VariablesContainer;
   getEventsBasedBehaviors(): EventsBasedBehaviorsList;
   getEventsBasedObjects(): EventsBasedObjectsList;
   serializeTo(element: SerializerElement): void;
@@ -2731,12 +2694,12 @@ export class ParticleEmitterObject extends ObjectConfiguration {
 
 export class LayoutCodeGenerator extends EmscriptenObject {
   constructor(project: Project);
-  generateLayoutCompleteCode(layout: Layout, includes: SetString, compilationForRuntime: boolean): string;
+  generateLayoutCompleteCode(layout: Layout, includes: SetString, diagnosticReport: DiagnosticReport, compilationForRuntime: boolean): string;
 }
 
 export class BehaviorCodeGenerator extends EmscriptenObject {
   constructor(project: Project);
-  generateRuntimeBehaviorCompleteCode(extensionName: string, eventsBasedBehavior: EventsBasedBehavior, codeNamespace: string, behaviorMethodMangledNames: MapStringString, includes: SetString, compilationForRuntime: boolean): string;
+  generateRuntimeBehaviorCompleteCode(eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, codeNamespace: string, behaviorMethodMangledNames: MapStringString, includes: SetString, compilationForRuntime: boolean): string;
   static getBehaviorPropertyGetterName(propertyName: string): string;
   static getBehaviorPropertySetterName(propertyName: string): string;
   static getBehaviorPropertyToggleFunctionName(propertyName: string): string;
@@ -2747,7 +2710,7 @@ export class BehaviorCodeGenerator extends EmscriptenObject {
 
 export class ObjectCodeGenerator extends EmscriptenObject {
   constructor(project: Project);
-  generateRuntimeObjectCompleteCode(extensionName: string, eventsBasedObject: EventsBasedObject, codeNamespace: string, objectMethodMangledNames: MapStringString, includes: SetString, compilationForRuntime: boolean): string;
+  generateRuntimeObjectCompleteCode(eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, codeNamespace: string, objectMethodMangledNames: MapStringString, includes: SetString, compilationForRuntime: boolean): string;
   static getObjectPropertyGetterName(propertyName: string): string;
   static getObjectPropertySetterName(propertyName: string): string;
   static getObjectPropertyToggleFunctionName(propertyName: string): string;

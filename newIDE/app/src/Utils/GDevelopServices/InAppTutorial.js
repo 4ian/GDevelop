@@ -6,8 +6,7 @@ import optionalRequire from '../OptionalRequire';
 import { type MessageDescriptor } from '../i18n/MessageDescriptor.flow';
 import { type MessageByLocale } from '../i18n/MessageByLocale';
 import Window from '../Window';
-const fs = optionalRequire('fs');
-const fsPromises = fs ? fs.promises : null;
+import { readJSONFile } from '../FileSystem';
 const path = optionalRequire('path');
 const remote = optionalRequire('@electron/remote');
 const app = remote ? remote.app : null;
@@ -19,6 +18,7 @@ export const HEALTH_BAR_IN_APP_TUTORIAL_ID = 'healthBar';
 export const JOYSTICK_IN_APP_TUTORIAL_ID = 'joystick';
 export const TIMER_IN_APP_TUTORIAL_ID = 'timer';
 export const OBJECT_3D_IN_APP_TUTORIAL_ID = 'object3d';
+export const KNIGHT_PLATFORMER_IN_APP_TUTORIAL_ID = 'knightPlatformer';
 
 export const guidedLessonsIds = [
   PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
@@ -27,6 +27,7 @@ export const guidedLessonsIds = [
   HEALTH_BAR_IN_APP_TUTORIAL_ID,
   JOYSTICK_IN_APP_TUTORIAL_ID,
   OBJECT_3D_IN_APP_TUTORIAL_ID,
+  KNIGHT_PLATFORMER_IN_APP_TUTORIAL_ID,
 ];
 
 const fullTutorialIds = [FLING_GAME_IN_APP_TUTORIAL_ID];
@@ -140,18 +141,6 @@ export type InAppTutorial = {|
   availableLocales?: Array<string>,
 |};
 
-const readJSONFile = async (filepath: string): Promise<Object> => {
-  if (!fsPromises) throw new Error('Filesystem is not supported.');
-
-  try {
-    const data = await fsPromises.readFile(filepath, { encoding: 'utf8' });
-    const dataObject = JSON.parse(data);
-    return dataObject;
-  } catch (ex) {
-    throw new Error(filepath + ' is a corrupted/malformed file.');
-  }
-};
-
 const fetchLocalFileIfDesktop = async (filename: string): Promise<?Object> => {
   const shouldRetrieveTutorialsLocally = !!remote && !Window.isDev();
   if (!shouldRetrieveTutorialsLocally) return null;
@@ -163,7 +152,8 @@ const fetchLocalFileIfDesktop = async (filename: string): Promise<?Object> => {
   const filePath = path.join(
     appPath,
     '..', // If on dev env, replace with '../../app/resources' to test.
-    `inAppTutorials/${filename}.json`
+    'inAppTutorials',
+    `${filename}.json`
   );
   const data = await readJSONFile(filePath);
   return data;
@@ -216,4 +206,5 @@ export const isMiniTutorial = (tutorialId: string) =>
     HEALTH_BAR_IN_APP_TUTORIAL_ID,
     JOYSTICK_IN_APP_TUTORIAL_ID,
     OBJECT_3D_IN_APP_TUTORIAL_ID,
+    KNIGHT_PLATFORMER_IN_APP_TUTORIAL_ID,
   ].includes(tutorialId);

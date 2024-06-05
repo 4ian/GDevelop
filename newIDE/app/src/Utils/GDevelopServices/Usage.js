@@ -334,14 +334,6 @@ export const canSeamlesslyChangeSubscription = (
   return false;
 };
 
-export const canCancelAtEndOfPeriod = (subscription: Subscription) => {
-  // If the subscription is on Stripe, it can be set as cancelled and only removed at the
-  // end of the period already paid.
-  // Otherwise (Paypal), it will be cancelled immediately.
-  // TODO: When the backend allows it, remove this payment provider condition.
-  return !!subscription.stripeSubscriptionId;
-};
-
 export const hasMobileAppStoreSubscriptionPlan = (
   subscription: ?Subscription
 ): boolean => {
@@ -481,3 +473,8 @@ export const canUpgradeSubscription = (subscription: ?Subscription) => {
     !subscription.benefitsFromEducationPlan
   );
 };
+
+export const canUseClassroomFeature = (limits: ?Limits) =>
+  limits &&
+  limits.capabilities.classrooms &&
+  limits.capabilities.classrooms.showClassroomTab;

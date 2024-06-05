@@ -62,30 +62,33 @@ describe('Physics2RuntimeBehavior', () => {
     const runtimeGame = gdjs.getPixiRuntimeGame();
     const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
     runtimeScene.loadFromScene({
-      layers: [
-        {
-          name: '',
-          visibility: true,
-          cameras: [],
-          effects: [],
-          ambientLightColorR: 127,
-          ambientLightColorB: 127,
-          ambientLightColorG: 127,
-          isLightingLayer: false,
-          followBaseLayerCamera: false,
-        },
-      ],
-      variables: [],
-      r: 0,
-      v: 0,
-      b: 0,
-      mangledName: 'Scene1',
-      name: 'Scene1',
-      stopSoundsOnStartup: false,
-      title: '',
-      behaviorsSharedData: [],
-      objects: [],
-      instances: [],
+      sceneData: {
+        layers: [
+          {
+            name: '',
+            visibility: true,
+            cameras: [],
+            effects: [],
+            ambientLightColorR: 127,
+            ambientLightColorB: 127,
+            ambientLightColorG: 127,
+            isLightingLayer: false,
+            followBaseLayerCamera: false,
+          },
+        ],
+        variables: [],
+        r: 0,
+        v: 0,
+        b: 0,
+        mangledName: 'Scene1',
+        name: 'Scene1',
+        stopSoundsOnStartup: false,
+        title: '',
+        behaviorsSharedData: [],
+        objects: [],
+        instances: [],
+      },
+      usedExtensionsWithVariablesData: [],
     });
 
     runtimeScene.setInitialSharedDataForBehavior('Physics2', {

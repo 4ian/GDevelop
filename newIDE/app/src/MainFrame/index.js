@@ -180,6 +180,8 @@ import useResourcesWatcher from './ResourcesWatcher';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 import useVersionHistory from '../VersionHistory/UseVersionHistory';
 import { ProjectManagerDrawer } from '../ProjectManager/ProjectManagerDrawer';
+import DiagnosticReportDialog from '../ExportAndShare/DiagnosticReportDialog';
+
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
 const gd: libGDevelop = global.gd;
@@ -265,6 +267,7 @@ type LaunchPreviewOptions = {
   hotReload?: boolean,
   projectDataOnlyExport?: boolean,
   fullLoadingScreen?: boolean,
+  forceDiagnosticReport?: boolean,
 };
 
 export type Props = {|
@@ -435,6 +438,10 @@ const MainFrame = (props: Props) => {
   const [
     quitInAppTutorialDialogOpen,
     setQuitInAppTutorialDialogOpen,
+  ] = React.useState<boolean>(false);
+  const [
+    diagnosticReportDialogOpen,
+    setDiagnosticReportDialogOpen,
   ] = React.useState<boolean>(false);
   const [
     fileMetadataOpeningProgress,
@@ -1532,6 +1539,7 @@ const MainFrame = (props: Props) => {
       hotReload,
       projectDataOnlyExport,
       fullLoadingScreen,
+      forceDiagnosticReport,
     }: LaunchPreviewOptions) => {
       if (!currentProject) return;
       if (currentProject.getLayoutsCount() === 0) return;
@@ -1601,17 +1609,33 @@ const MainFrame = (props: Props) => {
           if (inAppTutorialOrchestratorRef.current) {
             inAppTutorialOrchestratorRef.current.onPreviewLaunch();
           }
+          if (!currentlyRunningInAppTutorial) {
+            const wholeProjectDiagnosticReport = currentProject.getWholeProjectDiagnosticReport();
+            if (
+              (forceDiagnosticReport ||
+                preferences.values.openDiagnosticReportAutomatically) &&
+              wholeProjectDiagnosticReport.hasAnyIssue()
+            ) {
+              setDiagnosticReportDialogOpen(true);
+            }
+          }
         });
     },
     [
-      autosaveProjectIfNeeded,
       currentProject,
-      eventsFunctionsExtensionsState,
-      previewState,
       state.editorTabs,
+      previewState.isPreviewOverriden,
+      previewState.overridenPreviewLayoutName,
+      previewState.previewLayoutName,
+      previewState.overridenPreviewExternalLayoutName,
+      previewState.previewExternalLayoutName,
+      autosaveProjectIfNeeded,
+      authenticatedUser.profile,
+      eventsFunctionsExtensionsState,
       preferences.getIsMenuBarHiddenInPreview,
       preferences.getIsAlwaysOnTopInPreview,
-      authenticatedUser.profile,
+      preferences.values.openDiagnosticReportAutomatically,
+      currentlyRunningInAppTutorial,
     ]
   );
 
@@ -1633,6 +1657,11 @@ const MainFrame = (props: Props) => {
 
   const launchNetworkPreview = React.useCallback(
     () => launchPreview({ networkPreview: true, hotReload: false }),
+    [launchPreview]
+  );
+
+  const launchPreviewWithDiagnosticReport = React.useCallback(
+    () => launchPreview({ forceDiagnosticReport: true }),
     [launchPreview]
   );
 
@@ -2963,6 +2992,7 @@ const MainFrame = (props: Props) => {
     onHotReloadPreview: launchHotReloadPreview,
     onLaunchDebugPreview: launchDebuggerAndPreview,
     onLaunchNetworkPreview: launchNetworkPreview,
+    onLaunchPreviewWithDiagnosticReport: launchPreviewWithDiagnosticReport,
     onOpenHomePage: openHomePage,
     onCreateBlank: () => setNewProjectSetupDialogOpen(true),
     onOpenProject: () => openOpenFromStorageProviderDialog(),
@@ -3160,6 +3190,7 @@ const MainFrame = (props: Props) => {
         onPreviewWithoutHotReload={launchNewPreview}
         onNetworkPreview={launchNetworkPreview}
         onHotReloadPreview={launchHotReloadPreview}
+        onLaunchPreviewWithDiagnosticReport={launchPreviewWithDiagnosticReport}
         canDoNetworkPreview={
           !!_previewLauncher.current &&
           _previewLauncher.current.canDoNetworkPreview()
@@ -3540,6 +3571,12 @@ const MainFrame = (props: Props) => {
           endTutorial={() => {
             endTutorial(true);
           }}
+        />
+      )}
+      {diagnosticReportDialogOpen && currentProject && (
+        <DiagnosticReportDialog
+          wholeProjectDiagnosticReport={currentProject.getWholeProjectDiagnosticReport()}
+          onClose={() => setDiagnosticReportDialogOpen(false)}
         />
       )}
       <CustomDragLayer />

@@ -5,18 +5,48 @@
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/Variable.h"
+#include "GDCore/Project/EventsFunctionsExtension.h"
 
 namespace gd {
 
 Variable VariablesContainersList::badVariable;
+VariablesContainer VariablesContainersList::badVariablesContainer;
 
 VariablesContainersList
 VariablesContainersList::MakeNewVariablesContainersListForProjectAndLayout(
     const gd::Project& project, const gd::Layout& layout) {
   VariablesContainersList variablesContainersList;
-  variablesContainersList.Add(project.GetVariables());
-  variablesContainersList.Add(layout.GetVariables());
+  variablesContainersList.Push(project.GetVariables());
+  variablesContainersList.Push(layout.GetVariables());
+  variablesContainersList.firstLocalVariableContainerIndex = 2;
   return variablesContainersList;
+}
+
+VariablesContainersList
+VariablesContainersList::MakeNewVariablesContainersListForProject(
+    const gd::Project& project) {
+  VariablesContainersList variablesContainersList;
+  variablesContainersList.Push(project.GetVariables());
+  variablesContainersList.firstLocalVariableContainerIndex = 1;
+  return variablesContainersList;
+}
+
+VariablesContainersList
+VariablesContainersList::MakeNewVariablesContainersListForEventsFunctionsExtension(
+    const gd::EventsFunctionsExtension &extension) {
+  VariablesContainersList variablesContainersList;
+  variablesContainersList.Push(extension.GetGlobalVariables());
+  variablesContainersList.Push(extension.GetSceneVariables());
+  variablesContainersList.firstLocalVariableContainerIndex = 2;
+  return variablesContainersList;
+}
+
+VariablesContainersList
+VariablesContainersList::MakeNewVariablesContainersListPushing(
+    const VariablesContainersList& variablesContainersList, const gd::VariablesContainer& variablesContainer) {
+  VariablesContainersList newVariablesContainersList(variablesContainersList);
+  newVariablesContainersList.Push(variablesContainer);
+  return newVariablesContainersList;
 }
 
 VariablesContainersList
@@ -41,6 +71,37 @@ const Variable& VariablesContainersList::Get(const gd::String& name) const {
   }
 
   return badVariable;
+}
+
+const VariablesContainer &
+VariablesContainersList::GetVariablesContainerFromVariableName(
+    const gd::String &variableName) const {
+  for (auto it = variablesContainers.rbegin(); it != variablesContainers.rend();
+       ++it) {
+    if ((*it)->Has(variableName))
+      return **it;
+  }
+  return badVariablesContainer;
+}
+
+std::size_t
+VariablesContainersList::GetVariablesContainerPositionFromVariableName(
+    const gd::String &variableName) const {
+  for (std::size_t i = variablesContainers.size() - 1; i >= 0 ; --i) {
+    if (variablesContainers[i]->Has(variableName))
+      return i;
+  }
+  return gd::String::npos;
+}
+
+std::size_t VariablesContainersList::GetLocalVariablesContainerPosition(
+    const gd::VariablesContainer &localVariableContainer) const {
+  for (std::size_t i = firstLocalVariableContainerIndex;
+       i < variablesContainers.size(); ++i) {
+    if (variablesContainers[i] == &localVariableContainer)
+      return i - firstLocalVariableContainerIndex;
+  }
+  return gd::String::npos;
 }
 
 bool VariablesContainersList::HasVariablesContainer(const gd::VariablesContainer& variablesContainer) const {

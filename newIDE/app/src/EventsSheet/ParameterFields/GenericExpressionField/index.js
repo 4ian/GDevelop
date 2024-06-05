@@ -48,7 +48,8 @@ import {
   shouldValidate,
 } from '../../../UI/KeyboardShortcuts/InteractionKeys';
 import Paper from '../../../UI/Paper';
-import { getProjectScopedContainersFromScope } from '../../../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../../../InstructionOrExpression/EventsScope.flow';
+
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -126,8 +127,9 @@ const MAX_ERRORS_COUNT = 10;
 const extractErrors = (
   platform: gdPlatform,
   project: gdProject,
-  projectScopedContainers: gdProjectScopedContainers,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   expressionType: string,
+  parameterMetadata: ?gdParameterMetadata,
   expressionNode: gdExpressionNode
 ): {|
   errorText: ?string,
@@ -135,8 +137,9 @@ const extractErrors = (
 |} => {
   const expressionValidator = new gd.ExpressionValidator(
     gd.JsPlatform.get(),
-    projectScopedContainers,
-    expressionType
+    projectScopedContainersAccessor.get(),
+    expressionType,
+    parameterMetadata ? parameterMetadata.getExtraInfo() : ''
   );
   expressionNode.visit(expressionValidator);
   const errors = expressionValidator.getAllErrors();
@@ -280,9 +283,7 @@ export default class ExpressionField extends React.Component<Props, State> {
   ) => {
     if (!this._inputElement) return;
     const {
-      globalObjectsContainer,
-      objectsContainer,
-      scope,
+      projectScopedContainersAccessor,
       expressionType,
       value,
     } = this.props;
@@ -306,14 +307,9 @@ export default class ExpressionField extends React.Component<Props, State> {
       expressionNode,
       cursorPosition + 'fakeIdentifier'.length - 1
     );
-    const projectScopedContainers = getProjectScopedContainersFromScope(
-      scope,
-      globalObjectsContainer,
-      objectsContainer
-    );
     const type = gd.ExpressionTypeFinder.getType(
       gd.JsPlatform.get(),
-      projectScopedContainers,
+      projectScopedContainersAccessor.get(),
       expressionType,
       currentNode
     );
@@ -430,9 +426,9 @@ export default class ExpressionField extends React.Component<Props, State> {
   _doValidation = () => {
     const {
       project,
-      globalObjectsContainer,
-      objectsContainer,
+      projectScopedContainersAccessor,
       expressionType,
+      parameterMetadata,
       scope,
       onGetAdditionalAutocompletions,
       onExtractAdditionalErrors,
@@ -447,17 +443,12 @@ export default class ExpressionField extends React.Component<Props, State> {
     const parser = new gd.ExpressionParser2();
     const expressionNode = parser.parseExpression(expression).get();
 
-    const projectScopedContainers = getProjectScopedContainersFromScope(
-      scope,
-      globalObjectsContainer,
-      objectsContainer
-    );
-
     const { errorText, errorHighlights } = extractErrors(
       gd.JsPlatform.get(),
       project,
-      projectScopedContainers,
+      projectScopedContainersAccessor,
       expressionType,
+      parameterMetadata,
       expressionNode
     );
     const extraErrorText = onExtractAdditionalErrors
@@ -486,7 +477,7 @@ export default class ExpressionField extends React.Component<Props, State> {
       : 0;
     const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
       gd.JsPlatform.get(),
-      projectScopedContainers,
+      projectScopedContainersAccessor.get(),
       expressionType,
       expressionNode,
       cursorPosition - 1
@@ -496,7 +487,7 @@ export default class ExpressionField extends React.Component<Props, State> {
       {
         gd,
         project,
-        projectScopedContainers,
+        projectScopedContainersAccessor,
         scope,
       },
       completionDescriptions,
@@ -529,6 +520,7 @@ export default class ExpressionField extends React.Component<Props, State> {
       scope,
       globalObjectsContainer,
       objectsContainer,
+      projectScopedContainersAccessor,
       parameterRenderingService,
     } = this.props;
     const description = parameterMetadata
@@ -724,6 +716,9 @@ export default class ExpressionField extends React.Component<Props, State> {
                   scope={scope}
                   globalObjectsContainer={globalObjectsContainer}
                   objectsContainer={objectsContainer}
+                  projectScopedContainersAccessor={
+                    projectScopedContainersAccessor
+                  }
                   expressionMetadata={
                     this.state.selectedExpressionInfo.metadata
                   }

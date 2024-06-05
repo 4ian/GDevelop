@@ -49,7 +49,8 @@ vector<pair<gd::Expression*, gd::ParameterMetadata> >
     ForEachChildVariableEvent::GetAllExpressionsWithMetadata() {
   vector<pair<gd::Expression*, gd::ParameterMetadata> >
       allExpressionsWithMetadata;
-  auto metadata = gd::ParameterMetadata().SetType("scenevar");
+  auto metadata = gd::ParameterMetadata().SetType("variable");
+  metadata.SetExtraInfo("AllowUndeclaredVariable");
   allExpressionsWithMetadata.push_back(
       std::make_pair(&iterableVariableName, metadata));
   allExpressionsWithMetadata.push_back(
@@ -63,7 +64,8 @@ vector<pair<const gd::Expression*, const gd::ParameterMetadata> >
     ForEachChildVariableEvent::GetAllExpressionsWithMetadata() const {
   vector<pair<const gd::Expression*, const gd::ParameterMetadata> >
       allExpressionsWithMetadata;
-  auto metadata = gd::ParameterMetadata().SetType("scenevar");
+  auto metadata = gd::ParameterMetadata().SetType("variable");
+  metadata.SetExtraInfo("AllowUndeclaredVariable");
   allExpressionsWithMetadata.push_back(
       std::make_pair(&iterableVariableName, metadata));
   allExpressionsWithMetadata.push_back(

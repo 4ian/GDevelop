@@ -3,8 +3,8 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef EVENTSCODEGENERATOR_H
-#define EVENTSCODEGENERATOR_H
+#pragma once
+
 #include <set>
 #include <string>
 #include <vector>
@@ -51,13 +51,14 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
                                        const gd::Layout& scene,
                                        const gd::String& codeNamespace,
                                        std::set<gd::String>& includeFiles,
+                                       gd::DiagnosticReport& diagnosticReport,
                                        bool compilationForRuntime = false);
 
   /**
    * Generate JavaScript for executing events of an events based function.
    *
    * \param project Project used.
-   * \param functionsContainer The container of the compiled event function.
+   * \param eventsFunctionsExtension The container of the compiled event function.
    * \param eventsFunction The events function to be compiled.
    * \param codeNamespace Where to store the context used by the function.
    * \param includeFiles Will be filled with the necessary include files.
@@ -68,7 +69,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    */
   static gd::String GenerateEventsFunctionCode(
       gd::Project& project,
-      const gd::EventsFunctionsContainer& functionsContainer,
+      const gd::EventsFunctionsExtension& eventsFunctionsExtension,
       const gd::EventsFunction& eventsFunction,
       const gd::String& codeNamespace,
       std::set<gd::String>& includeFiles,
@@ -94,6 +95,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    */
   static gd::String GenerateBehaviorEventsFunctionCode(
       gd::Project& project,
+    const gd::EventsFunctionsExtension& eventsFunctionsExtension,
       const gd::EventsBasedBehavior& eventsBasedBehavior,
       const gd::EventsFunction& eventsFunction,
       const gd::String& codeNamespace,
@@ -126,6 +128,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    */
   static gd::String GenerateObjectEventsFunctionCode(
       gd::Project& project,
+    const gd::EventsFunctionsExtension& eventsFunctionsExtension,
       const gd::EventsBasedObject& eventsBasedObject,
       const gd::EventsFunction& eventsFunction,
       const gd::String& codeNamespace,
@@ -398,9 +401,9 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    * arguments from the rest of the events.
    */
   gd::String GenerateFreeEventsFunctionContext(
-      const std::vector<gd::ParameterMetadata>& parameters,
-      const gd::String& onceTriggersVariable,
-      bool isAsync);
+       const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+       const gd::EventsFunction &eventsFunction,
+      const gd::String& onceTriggersVariable);
 
   /**
    * \brief Generate the "eventsFunctionContext" object that allow a behavior
@@ -408,10 +411,10 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    * arguments from the rest of the events.
    */
   gd::String GenerateBehaviorEventsFunctionContext(
+       const gd::EventsFunctionsExtension &eventsFunctionsExtension,
       const gd::EventsBasedBehavior& eventsBasedBehavior,
-      const std::vector<gd::ParameterMetadata>& parameters,
+       const gd::EventsFunction &eventsFunction,
       const gd::String& onceTriggersVariable,
-      bool isAsync,
       const gd::String& thisObjectName,
       const gd::String& thisBehaviorName);
 
@@ -421,10 +424,10 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    * arguments from the rest of the events.
    */
   gd::String GenerateObjectEventsFunctionContext(
+       const gd::EventsFunctionsExtension &eventsFunctionsExtension,
       const gd::EventsBasedObject& eventsBasedObject,
-      const std::vector<gd::ParameterMetadata>& parameters,
+       const gd::EventsFunction &eventsFunction,
       const gd::String& onceTriggersVariable,
-      bool isAsync,
       const gd::String& thisObjectName);
 
   gd::String GenerateEventsFunctionReturn(
@@ -443,22 +446,23 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
 
   gd::String codeNamespace;  ///< Optional namespace for the generated code,
                              ///< used when generating events function.
+
  private:
   /**
    * \brief Generate the "eventsFunctionContext" object that allow a function
    * to provides access objects, object creation and access to arguments from
    * the rest of the events.
    */
-  gd::String GenerateEventsFunctionContext(
-      const std::vector<gd::ParameterMetadata>& parameters,
-      const gd::String& onceTriggersVariable,
-      gd::String& objectsGettersMap,
-      gd::String& objectArraysMap,
-      gd::String& behaviorNamesMap,
-      bool isAsync,
-      const gd::String& thisObjectName = "",
-      const gd::String& thisBehaviorName = "");
+   gd::String GenerateEventsFunctionContext(
+       const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+       const gd::EventsFunctionsContainer &eventsFunctionsContainer,
+       const gd::EventsFunction &eventsFunction,
+       const gd::String &onceTriggersVariable,
+       gd::String &objectsGettersMap,
+       gd::String &objectArraysMap,
+       gd::String &behaviorNamesMap,
+       const gd::String &thisObjectName = "",
+       const gd::String &thisBehaviorName = "");
 };
 
 }  // namespace gdjs
-#endif  // EVENTSCODEGENERATOR_H

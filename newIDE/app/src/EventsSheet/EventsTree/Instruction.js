@@ -40,7 +40,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import {
   type EventsScope,
-  getProjectScopedContainersFromScope,
+  ProjectScopedContainersAccessor,
 } from '../../InstructionOrExpression/EventsScope.flow';
 import { enumerateParametersUsableInExpressions } from '../ParameterFields/EnumerateFunctionParameters';
 import { getFunctionNameFromType } from '../../EventsFunctionsExtensionsLoader';
@@ -48,6 +48,7 @@ import { ExtensionStoreContext } from '../../AssetStore/ExtensionStore/Extension
 import { getRequiredBehaviorTypes } from '../ParameterFields/ObjectField';
 import { checkHasRequiredCapability } from '../../ObjectsList/ObjectSelector';
 import Warning from '../../UI/CustomSvgIcons/Warning';
+import { getRootVariableName } from '../../EventsSheet/ParameterFields/VariableField';
 
 const gd: libGDevelop = global.gd;
 
@@ -107,6 +108,7 @@ type Props = {|
   resourcesManager: gdResourcesManager,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
 
   id: string,
 |};
@@ -131,6 +133,16 @@ const formatValue = ({
   (value === '' || value === '""') && parameterType === 'layer'
     ? i18n._(t`Base layer`)
     : value;
+
+const isInstructionVisible = (scope, instructionMetadata) =>
+  (instructionMetadata.isRelevantForLayoutEvents() &&
+    (scope.layout || scope.externalEvents)) ||
+  (instructionMetadata.isRelevantForFunctionEvents() && scope.eventsFunction) ||
+  (instructionMetadata.isRelevantForAsynchronousFunctionEvents() &&
+    scope.eventsFunction &&
+    scope.eventsFunction.isAsync()) ||
+  (instructionMetadata.isRelevantForCustomObjectEvents() &&
+    scope.eventsBasedObject);
 
 const InstructionMissing = (props: {|
   instructionType: string,
@@ -209,6 +221,7 @@ const Instruction = (props: Props) => {
     resourcesManager,
     scope,
   } = props;
+  const projectScopedContainers = props.projectScopedContainersAccessor.get();
 
   const instrFormatter = React.useMemo(
     () => gd.InstructionSentenceFormatter.get(),
@@ -289,17 +302,39 @@ const Instruction = (props: Props) => {
                 .getRootNode();
               const expressionValidator = new gd.ExpressionValidator(
                 gd.JsPlatform.get(),
-                getProjectScopedContainersFromScope(
-                  scope,
-                  globalObjectsContainer,
-                  objectsContainer
-                ),
-                parameterType
+                projectScopedContainers,
+                parameterType,
+                parameterMetadata.getExtraInfo()
               );
               expressionNode.visit(expressionValidator);
               expressionIsValid =
                 expressionValidator.getAllErrors().size() === 0;
               expressionValidator.delete();
+
+              // New object variable instructions require the variable to be
+              // declared while legacy ones don't.
+              // This is why it's done here instead of in the parser directly.
+              if (
+                parameterType === 'objectvar' &&
+                gd.VariableInstructionSwitcher.isSwitchableVariableInstruction(
+                  instruction.getType()
+                )
+              ) {
+                // Check at least the name of the root variable, it's the best we can do.
+                const objectsContainersList = projectScopedContainers.getObjectsContainersList();
+                const objectName = instruction.getParameter(0).getPlainString();
+                const variableName = instruction
+                  .getParameter(parameterIndex)
+                  .getPlainString();
+                if (
+                  objectsContainersList.hasObjectOrGroupWithVariableNamed(
+                    objectName,
+                    getRootVariableName(variableName)
+                  ) === gd.ObjectsContainersList.DoesNotExist
+                ) {
+                  expressionIsValid = false;
+                }
+              }
             } else if (gd.ParameterMetadata.isObject(parameterType)) {
               const objectOrGroupName = instruction
                 .getParameter(parameterIndex)
@@ -410,6 +445,7 @@ const Instruction = (props: Props) => {
               tabIndex={0}
             >
               {ParameterRenderingService.renderInlineParameter({
+                scope,
                 value: formattedValue,
                 expressionIsValid,
                 parameterMetadata,
@@ -417,6 +453,8 @@ const Instruction = (props: Props) => {
                 InvalidParameterValue,
                 MissingParameterValue,
                 useAssignmentOperators,
+                projectScopedContainersAccessor:
+                  props.projectScopedContainersAccessor,
               })}
             </span>
           );
@@ -493,7 +531,8 @@ const Instruction = (props: Props) => {
                   [selectableArea]: true,
                   [selectedArea]: props.selected,
                   [warningInstruction]:
-                    showDeprecatedInstructionWarning && metadata.isHidden(),
+                    showDeprecatedInstructionWarning &&
+                    !isInstructionVisible(scope, metadata),
                 })}
                 onClick={e => {
                   e.stopPropagation();
@@ -631,6 +670,9 @@ const Instruction = (props: Props) => {
                     resourcesManager={props.resourcesManager}
                     globalObjectsContainer={props.globalObjectsContainer}
                     objectsContainer={props.objectsContainer}
+                    projectScopedContainersAccessor={
+                      props.projectScopedContainersAccessor
+                    }
                     idPrefix={props.id}
                   />
                 )}

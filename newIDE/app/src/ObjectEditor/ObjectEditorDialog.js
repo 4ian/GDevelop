@@ -24,6 +24,7 @@ import { sendBehaviorsEditorShown } from '../Utils/Analytics/EventSender';
 import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessage';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import ErrorBoundary from '../UI/ErrorBoundary';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
 
 const gd: libGDevelop = global.gd;
 
@@ -47,6 +48,7 @@ type Props = {|
   // Passed down to object editors:
   project: gdProject,
   layout?: gdLayout,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   onComputeAllVariableNames: () => Array<string>,
   resourceManagementProps: ResourceManagementProps,
   unsavedChanges?: UnsavedChanges,
@@ -103,9 +105,11 @@ const InnerDialog = (props: InnerDialogProps) => {
   const onApply = async () => {
     props.onApply();
 
+    const originalSerializedVariables = getOriginalContentSerializedElement().getChild(
+      'variables'
+    );
     const changeset = gd.WholeProjectRefactorer.computeChangesetForVariablesContainer(
-      props.project,
-      getOriginalContentSerializedElement().getChild('variables'),
+      originalSerializedVariables,
       props.object.getVariables()
     );
     if (changeset.hasRemovedVariables()) {
@@ -119,7 +123,8 @@ const InnerDialog = (props: InnerDialogProps) => {
     gd.WholeProjectRefactorer.applyRefactoringForVariablesContainer(
       props.project,
       props.object.getVariables(),
-      changeset
+      changeset,
+      originalSerializedVariables
     );
     props.object.clearPersistentUuid();
 
@@ -290,7 +295,11 @@ const InnerDialog = (props: InnerDialogProps) => {
               </Line>
             )}
           <VariablesList
+            projectScopedContainersAccessor={
+              props.projectScopedContainersAccessor
+            }
             variablesContainer={props.object.getVariables()}
+            areObjectVariables
             emptyPlaceholderTitle={
               <Trans>Add your first object variable</Trans>
             }

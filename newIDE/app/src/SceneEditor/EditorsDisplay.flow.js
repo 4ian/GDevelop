@@ -17,10 +17,12 @@ import { type EditorId } from '.';
 import Rectangle from '../Utils/Rectangle';
 import ViewPosition from '../InstancesEditor/ViewPosition';
 import { type ObjectFolderOrObjectWithContext } from '../ObjectsList/EnumerateObjectFolderOrObject';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
 
 export type SceneEditorsDisplayProps = {|
   project: gdProject,
   layout: gdLayout,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   initialInstances: gdInitialInstancesContainer,
   instancesSelection: InstancesSelection,
   selectedLayer: string,

@@ -198,7 +198,24 @@ void Variable::MoveChildInArray(const size_t oldIndex, const size_t newIndex) {
   childrenArray.insert(childrenArray.begin() + newIndex, std::move(object));
 }
 
-Variable& Variable::PushNew() { return GetAtIndex(GetChildrenCount()); };
+Variable& Variable::PushNew() {
+  const size_t count = GetChildrenCount();
+  auto& variable = GetAtIndex(count);
+  if (type == Type::Array && count > 0) {
+    const auto childType = GetAtIndex(count - 1).type;
+    variable.type = childType;
+    if (childType == Type::Number) {
+      variable.SetValue(0);
+    }
+    else if (childType == Type::String) {
+      variable.SetString("");
+    }
+    else if (childType == Type::Boolean) {
+      variable.SetBool(false);
+    }
+  }
+  return variable;
+};
 
 void Variable::RemoveAtIndex(const size_t index) {
   if (index >= childrenArray.size()) return;
@@ -300,6 +317,23 @@ void Variable::UnserializeFrom(const SerializerElement& element) {
 
 Variable& Variable::ResetPersistentUuid() {
   persistentUuid = UUID::MakeUuid4();
+  for (auto& it : children) {
+    it.second->ResetPersistentUuid();
+  }
+  for (auto& it : childrenArray) {
+    it->ResetPersistentUuid();
+  }
+  return *this;
+}
+
+Variable& Variable::ClearPersistentUuid() {
+  persistentUuid = "";
+  for (auto& it : children) {
+    it.second->ClearPersistentUuid();
+  }
+  for (auto& it : childrenArray) {
+    it->ClearPersistentUuid();
+  }
   return *this;
 }
 

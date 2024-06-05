@@ -35,6 +35,7 @@ import {
   type InstructionContext,
   type ParameterContext,
   type InstructionContextWithEventContext,
+  type VariableDeclarationContext,
   getInitialSelection,
   selectEvent,
   selectInstruction,
@@ -55,6 +56,8 @@ import {
   getLastSelectedEventContextWhichCanHaveSubEvents,
   getLastSelectedInstructionContext,
   getLastSelectedInstructionEventContextWhichCanHaveSubEvents,
+  getLastSelectedEventContextWhichCanHaveVariables,
+  getLastSelectedInstructionEventContextWhichCanHaveVariables,
 } from './SelectionHandler';
 import { ensureSingleOnceInstructions } from './OnceInstructionSanitizer';
 import EventsContextAnalyzerDialog, {
@@ -77,10 +80,7 @@ import PreferencesContext, {
 } from '../MainFrame/Preferences/PreferencesContext';
 import EventsFunctionExtractorDialog from './EventsFunctionExtractor/EventsFunctionExtractorDialog';
 import { createNewInstructionForEventsFunction } from './EventsFunctionExtractor';
-import {
-  getProjectScopedContainersFromScope,
-  type EventsScope,
-} from '../InstructionOrExpression/EventsScope.flow';
+import { type EventsScope } from '../InstructionOrExpression/EventsScope.flow';
 import {
   pasteEventsFromClipboardInSelection,
   copySelectionToClipboard,
@@ -112,6 +112,9 @@ import {
   registerOnResourceExternallyChangedCallback,
   unregisterOnResourceExternallyChangedCallback,
 } from '../MainFrame/ResourcesWatcher';
+import { insertInVariablesContainer } from '../Utils/VariablesUtils';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
+import LocalVariablesDialog from '../VariablesList/LocalVariablesDialog';
 
 const gd: libGDevelop = global.gd;
 
@@ -127,6 +130,7 @@ type Props = {|
   scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   events: gdEventsList,
   setToolbar: (?React.Node) => void,
   onOpenSettings?: ?() => void,
@@ -175,6 +179,11 @@ type State = {|
     parameterIndex: number,
     eventContext: ?EventContext,
   },
+  editedVariable: {
+    variablesContainer: gdVariablesContainer,
+    variableName: string,
+    eventContext: ?EventContext,
+  } | null,
 
   selection: SelectionState,
 
@@ -268,6 +277,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       parameterIndex: 0,
       eventContext: null,
     },
+    editedVariable: null,
 
     selection: getInitialSelection(),
 
@@ -345,6 +355,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         onAddStandardEvent={this._addStandardEvent}
         onAddSubEvent={this.addSubEvent}
         canAddSubEvent={canAddSubEvent}
+        onAddLocalVariable={this.addLocalVariable}
+        canAddLocalVariable={this._selectionCanHaveLocalVariables()}
         canToggleEventDisabled={
           hasEventSelected(this.state.selection) &&
           this._selectionCanToggleDisabled()
@@ -444,6 +456,47 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     const eventContext =
       getLastSelectedEventContextWhichCanHaveSubEvents(this.state.selection) ||
       getLastSelectedInstructionEventContextWhichCanHaveSubEvents(
+        this.state.selection
+      );
+    return !!eventContext;
+  };
+
+  addLocalVariable = () => {
+    const eventContext =
+      getLastSelectedEventContextWhichCanHaveVariables(this.state.selection) ||
+      getLastSelectedInstructionEventContextWhichCanHaveVariables(
+        this.state.selection
+      );
+    if (!eventContext) return;
+
+    const variablesContainer = eventContext.event.getVariables();
+    const { name: newName } = insertInVariablesContainer(
+      variablesContainer,
+      'Variable',
+      null,
+      variablesContainer.count(),
+      null
+    );
+
+    this._eventsTree &&
+      this._eventsTree.forceEventsUpdate(() => {
+        const positions = this._getChangedEventRows([eventContext.event]);
+        this._saveChangesToHistory('ADD', {
+          positionsBeforeAction: positions,
+          positionAfterAction: positions,
+        });
+      });
+
+    this.openVariablesEditor(eventContext, {
+      variablesContainer,
+      variableName: newName,
+    });
+  };
+
+  _selectionCanHaveLocalVariables = () => {
+    const eventContext =
+      getLastSelectedEventContextWhichCanHaveVariables(this.state.selection) ||
+      getLastSelectedInstructionEventContextWhichCanHaveVariables(
         this.state.selection
       );
     return !!eventContext;
@@ -646,6 +699,19 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     });
   };
 
+  openVariablesEditor = (
+    eventContext: EventContext,
+    variableDeclarationContext: VariableDeclarationContext
+  ) => {
+    this.setState({
+      editedVariable: {
+        variablesContainer: variableDeclarationContext.variablesContainer,
+        variableName: variableDeclarationContext.variableName,
+        eventContext,
+      },
+    });
+  };
+
   closeInstructionEditor(saveChanges: boolean = false) {
     const { instruction, eventContext } = this.state.editedInstruction;
 
@@ -812,6 +878,14 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           enabled: this._selectionCanHaveSubEvents(),
           accelerator: getShortcutDisplayName(
             this.props.shortcutMap['ADD_SUBEVENT']
+          ),
+        },
+        {
+          label: i18n._(t`Add Local Variable`),
+          click: () => this.addLocalVariable(),
+          enabled: this._selectionCanHaveLocalVariables(),
+          accelerator: getShortcutDisplayName(
+            this.props.shortcutMap['ADD_LOCAL_VARIABLE']
           ),
         },
         {
@@ -1470,13 +1544,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   _openEventsContextAnalyzer = () => {
-    const { scope, globalObjectsContainer, objectsContainer } = this.props;
+    const projectScopedContainers = this.props.projectScopedContainersAccessor.get();
 
-    const projectScopedContainers = getProjectScopedContainersFromScope(
-      scope,
-      globalObjectsContainer,
-      objectsContainer
-    );
     const eventsContextAnalyzer = new gd.EventsContextAnalyzer(
       gd.JsPlatform.get()
     );
@@ -1638,6 +1707,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       scope,
       globalObjectsContainer,
       objectsContainer,
+      projectScopedContainersAccessor,
     } = this.props;
 
     // Choose the dialog to use
@@ -1655,6 +1725,12 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             scope={scope}
             globalObjectsContainer={globalObjectsContainer}
             objectsContainer={objectsContainer}
+            projectScopedContainersAccessor={
+              this.state.editedInstruction.eventContext
+                ? this.state.editedInstruction.eventContext
+                    .projectScopedContainersAccessor
+                : projectScopedContainersAccessor
+            }
             instruction={instruction}
             isCondition={this.state.editedInstruction.isCondition}
             isNewInstruction={
@@ -1753,6 +1829,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       onOpenLayout,
       globalObjectsContainer,
       objectsContainer,
+      projectScopedContainersAccessor,
       preferences,
       resourceManagementProps,
       onCreateEventsFunction,
@@ -1787,6 +1864,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             scope.eventsBasedObject,
             scope.eventsFunction
           )));
+
+    const editedParameterProjectScopedContainersAccessor = this.state
+      .editedParameter.eventContext
+      ? this.state.editedParameter.eventContext.projectScopedContainersAccessor
+      : projectScopedContainersAccessor;
 
     return (
       <ResponsiveWindowMeasurer>
@@ -1841,6 +1923,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                   scope={scope}
                   globalObjectsContainer={globalObjectsContainer}
                   objectsContainer={objectsContainer}
+                  projectScopedContainersAccessor={
+                    projectScopedContainersAccessor
+                  }
                   selection={this.state.selection}
                   onInstructionClick={this.selectInstruction}
                   onInstructionDoubleClick={this.openInstructionEditor}
@@ -1855,6 +1940,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                     this.moveSelectionToInstructionsList
                   }
                   onParameterClick={this.openParameterEditor}
+                  onVariableDeclarationClick={() => {
+                    // Nothing to do.
+                  }}
+                  onVariableDeclarationDoubleClick={this.openVariablesEditor}
                   onEventClick={this.selectEvent}
                   onEventContextMenu={this.openEventContextMenu}
                   onAddNewEvent={(
@@ -1935,6 +2024,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                   scope={scope}
                   globalObjectsContainer={globalObjectsContainer}
                   objectsContainer={objectsContainer}
+                  projectScopedContainersAccessor={
+                    editedParameterProjectScopedContainersAccessor
+                  }
                   isCondition={this.state.editedParameter.isCondition}
                   instruction={this.state.editedParameter.instruction}
                   parameterIndex={this.state.editedParameter.parameterIndex}
@@ -1950,6 +2042,13 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                       return;
                     }
                     instruction.setParameter(parameterIndex, value);
+
+                    gd.VariableInstructionSwitcher.switchBetweenUnifiedInstructionIfNeeded(
+                      project.getCurrentPlatform(),
+                      editedParameterProjectScopedContainersAccessor.get(),
+                      instruction
+                    );
+
                     // Ask the component to re-render, so that the new parameter
                     // set for the instruction in the state
                     // is taken into account for the InlineParameterEditor.
@@ -2000,6 +2099,45 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                         serializedEventsToExtract: null,
                       });
                     }}
+                  />
+                )}
+                {this.state.editedVariable && (
+                  <LocalVariablesDialog
+                    project={project}
+                    projectScopedContainersAccessor={
+                      editedParameterProjectScopedContainersAccessor
+                    }
+                    open
+                    onCancel={() =>
+                      this.setState({
+                        editedVariable: null,
+                      })
+                    }
+                    onApply={() => {
+                      const eventContext = this.state.editedVariable
+                        ? this.state.editedVariable.eventContext
+                        : null;
+                      this.setState({
+                        editedVariable: null,
+                      });
+                      if (this._eventsTree && eventContext) {
+                        this._eventsTree.forceEventsUpdate(() => {
+                          const positions = this._getChangedEventRows([
+                            eventContext.event,
+                          ]);
+                          this._saveChangesToHistory('ADD', {
+                            positionsBeforeAction: positions,
+                            positionAfterAction: positions,
+                          });
+                        });
+                      }
+                    }}
+                    variablesContainer={
+                      this.state.editedVariable.variablesContainer
+                    }
+                    initiallySelectedVariableName={
+                      this.state.editedVariable.variableName
+                    }
                   />
                 )}
                 {this.state.textEditedEvent && (

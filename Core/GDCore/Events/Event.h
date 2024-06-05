@@ -3,9 +3,7 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#if defined(GD_IDE_ONLY)
-#ifndef GDCORE_EVENT_H
-#define GDCORE_EVENT_H
+#pragma once
 
 #include <iostream>
 #include <memory>
@@ -26,6 +24,7 @@ class SerializerElement;
 class Instruction;
 class EventVisitor;
 class ReadOnlyEventVisitor;
+class VariablesContainer;
 }  // namespace gd
 
 namespace gd {
@@ -91,6 +90,32 @@ class GD_CORE_API BaseEvent {
    * \warning This is only applicable when CanHaveSubEvents() return true.
    */
   bool HasSubEvents() const;
+
+  /**
+   * Derived class have to redefine this function, so as to return true, if they
+   * can have local variables.
+   */
+  virtual bool CanHaveVariables() const { return false; }
+
+  /**
+   * Return the local variables, if applicable.
+   */
+  virtual const gd::VariablesContainer& GetVariables() const {
+    return badLocalVariables;
+  };
+
+  /**
+   * Return the local variables, if applicable.
+   */
+  virtual gd::VariablesContainer& GetVariables() {
+    return badLocalVariables;
+  };
+
+  /**
+   * \brief Return true if the events has local variables.
+   * \warning This is only applicable when CanHaveVariables() return true.
+   */
+  bool HasVariables() const;
 
   /**
    * \brief Return a list of all conditions of the event.
@@ -301,6 +326,7 @@ class GD_CORE_API BaseEvent {
                     ///< Used for saving the event for instance.
 
   static gd::EventsList badSubEvents;
+  static gd::VariablesContainer badLocalVariables;
   static std::vector<gd::String> emptyDependencies;
   static gd::String emptySourceFile;
 };
@@ -325,6 +351,3 @@ class EmptyEvent : public BaseEvent {
 };
 
 }  // namespace gd
-
-#endif  // GDCORE_EVENT_H
-#endif

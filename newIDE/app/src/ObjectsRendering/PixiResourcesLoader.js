@@ -89,7 +89,10 @@ const load3DModel = (
   project: gdProject,
   resourceName: string
 ): Promise<THREE.THREE_ADDONS.GLTF> => {
-  if (!project.getResourcesManager().hasResource(resourceName))
+  if (
+    resourceName.length === 0 ||
+    !project.getResourcesManager().hasResource(resourceName)
+  )
     return Promise.resolve(invalidModel);
 
   const resource = project.getResourcesManager().getResource(resourceName);
@@ -458,7 +461,10 @@ export default class PixiResourcesLoader {
       return loadedTextures[resourceName];
     }
 
-    if (!project.getResourcesManager().hasResource(resourceName))
+    if (
+      resourceName.length === 0 ||
+      !project.getResourcesManager().hasResource(resourceName)
+    )
       return invalidTexture;
 
     const resource = project.getResourcesManager().getResource(resourceName);
@@ -600,7 +606,10 @@ export default class PixiResourcesLoader {
     }
 
     const resourceManager = project.getResourcesManager();
-    if (!resourceManager.hasResource(spineTextureAtlasName)) {
+    if (
+      spineTextureAtlasName.length === 0 ||
+      !resourceManager.hasResource(spineTextureAtlasName)
+    ) {
       return {
         textureAtlas: null,
         loadingError: null,
@@ -724,7 +733,7 @@ export default class PixiResourcesLoader {
     }
 
     const resourceManager = project.getResourcesManager();
-    if (!resourceManager.hasResource(spineName)) {
+    if (spineName.length === 0 || !resourceManager.hasResource(spineName)) {
       return {
         skeleton: null,
         loadingError: null,
@@ -820,7 +829,10 @@ export default class PixiResourcesLoader {
       return loadedTextures[resourceName];
     }
 
-    if (!project.getResourcesManager().hasResource(resourceName))
+    if (
+      resourceName.length === 0 ||
+      !project.getResourcesManager().hasResource(resourceName)
+    )
       return invalidTexture;
 
     const resource = project.getResourcesManager().getResource(resourceName);
@@ -871,7 +883,10 @@ export default class PixiResourcesLoader {
 
     const fontFamily = slugs(resourceName);
     let fullFilename = null;
-    if (project.getResourcesManager().hasResource(resourceName)) {
+    if (
+      resourceName.length > 0 &&
+      project.getResourcesManager().hasResource(resourceName)
+    ) {
       const resource = project.getResourcesManager().getResource(resourceName);
       if (resource.getKind() === 'font') {
         fullFilename = ResourcesLoader.getResourceFullUrl(
@@ -929,7 +944,10 @@ export default class PixiResourcesLoader {
       return Promise.resolve(loadedBitmapFonts[resourceName].data);
     }
 
-    if (!project.getResourcesManager().hasResource(resourceName))
+    if (
+      resourceName.length === 0 ||
+      !project.getResourcesManager().hasResource(resourceName)
+    )
       return Promise.reject(
         new Error(`Can't find resource called ${resourceName}.`)
       );
@@ -974,7 +992,10 @@ export default class PixiResourcesLoader {
     project: gdProject,
     resourceName: string
   ): Promise<any> {
-    if (!project.getResourcesManager().hasResource(resourceName))
+    if (
+      resourceName.length === 0 ||
+      !project.getResourcesManager().hasResource(resourceName)
+    )
       return Promise.reject(
         new Error(`Can't find resource called ${resourceName}.`)
       );

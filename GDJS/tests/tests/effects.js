@@ -67,7 +67,7 @@ describe('gdjs.EffectsManager', () => {
 
   it('can add effects on a runtime layer', () => {
     const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
-    runtimeScene.loadFromScene({
+    runtimeScene.loadFromScene({sceneData: {
       layers: [
         {
           name: '',
@@ -107,7 +107,7 @@ describe('gdjs.EffectsManager', () => {
       objects: [],
       instances: [],
       usedResources: [],
-    });
+    }, usedExtensionsWithVariablesData: []});
 
     const runtimeLayer = runtimeScene.getLayer('');
 

@@ -63,14 +63,14 @@ class EventsVariablesFinder {
    *
    * \param project The project
    * \param layout The layout to use.
-   * \param  object The object to be scanned
+   * \param  objectName The name of the object to be scanned
    * \return A std::set containing the names of all object variables used.
    */
   static std::set<gd::String> FindAllObjectVariables(
       const gd::Platform& platform,
       const gd::Project& project,
       const gd::Layout& layout,
-      const gd::Object& object);
+      const gd::String& objectName);
 
  private:
 

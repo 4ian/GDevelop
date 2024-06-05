@@ -5,6 +5,8 @@ import type {
 } from '../../../ObjectsList/EnumerateObjects';
 import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 
+const gd: libGDevelop = global.gd;
+
 // ListItem created must have consistent keys that include their type
 // (object, group, instruction) to allow them to be living
 // in the same list (in search results) and be selected.
@@ -31,7 +33,16 @@ export const getInstructionListItemKey = (
   }-${instruction.type}`;
 
 export const getInstructionListItemValue = (instructionType: string) =>
-  `instruction-value-${instructionType}`;
+  `instruction-value-${getInstructionType(instructionType)}`;
+
+export const getInstructionType = (instructionType: string) => {
+  const switchableVariableInstructionIdentifier = gd.VariableInstructionSwitcher.getSwitchableVariableInstructionIdentifier(
+    instructionType
+  );
+  return switchableVariableInstructionIdentifier.length > 0
+    ? switchableVariableInstructionIdentifier
+    : instructionType;
+};
 
 export const getSubheaderListItemKey = (subheader: string) =>
   `subheader-key-${subheader}`;

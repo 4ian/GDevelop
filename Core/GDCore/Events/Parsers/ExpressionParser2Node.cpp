@@ -6,5 +6,5 @@
 #include "ExpressionParser2Node.h"
 
 namespace gd {
-gd::String ExpressionParserDiagnostic::noMessage = "";
+
 }

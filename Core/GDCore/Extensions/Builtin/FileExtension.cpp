@@ -98,6 +98,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(
       .AddParameter("string", _("Group"))
       .AddParameter("string", _("Text"));
 
+  // Deprecated
   extension
       .AddAction(
           "LireFichierExp",
@@ -114,8 +115,27 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(
       .AddParameter("string", _("Storage name"))
       .AddParameter("string", _("Group"))
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("scenevar", _("Scene variables"));
+      .AddParameter("scenevar", _("Scene variable"))
+      .SetHidden();
 
+  extension
+      .AddAction(
+          "ReadNumberFromStorage",
+          _("Load a value"),
+          _("Load the value saved in the specified element and store it in a "
+            "variable.\nSpecify the structure leading to the element using / "
+            "(example : Root/Level/Current)\nSpaces are forbidden in element "
+            "names."),
+          _("Load _PARAM1_ from storage _PARAM0_ and store value in _PARAM3_"),
+          "",
+          "res/actions/fichier24.png",
+          "res/actions/fichier.png")
+      .AddParameter("string", _("Storage name"))
+      .AddParameter("string", _("Group"))
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("variable", _("Variable"));
+
+  // Deprecated
   extension
       .AddAction(
           "LireFichierTxt",
@@ -133,7 +153,26 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(
       .AddParameter("string", _("Storage name"))
       .AddParameter("string", _("Group"))
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("scenevar", _("Scene variables"));
+      .AddParameter("scenevar", _("Scene variable"))
+      .SetHidden();
+
+  extension
+      .AddAction(
+          "ReadStringFromStorage",
+          _("Load a text"),
+          _("Load the text saved in the specified element and store it in a "
+            "variable.\nSpecify the structure leading to the element using / "
+            "(example : Root/Level/Current)\nSpaces are forbidden in element "
+            "names."),
+          _("Load _PARAM1_ from storage _PARAM0_ and store as text in "
+            "_PARAM3_"),
+          "",
+          "res/actions/fichier24.png",
+          "res/actions/fichier.png")
+      .AddParameter("string", _("Storage name"))
+      .AddParameter("string", _("Group"))
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("variable", _("Variable"));
 
   extension
       .AddAction("DeleteGroupFichier",

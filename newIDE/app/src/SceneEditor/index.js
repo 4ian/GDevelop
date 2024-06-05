@@ -7,7 +7,7 @@ import { t } from '@lingui/macro';
 import * as React from 'react';
 import LayerRemoveDialog from '../LayersList/LayerRemoveDialog';
 import LayerEditorDialog from '../LayersList/LayerEditorDialog';
-import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
+import ObjectInstanceVariablesDialog from '../VariablesList/ObjectInstanceVariablesDialog';
 import ObjectEditorDialog from '../ObjectEditor/ObjectEditorDialog';
 import ObjectExporterDialog from '../ObjectEditor/ObjectExporterDialog';
 import ObjectGroupEditorDialog from '../ObjectGroupEditor/ObjectGroupEditorDialog';
@@ -46,7 +46,7 @@ import {
 } from '../ObjectsList/EnumerateObjects';
 import InfoBar from '../UI/Messages/InfoBar';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
-import SceneVariablesDialog from './SceneVariablesDialog';
+import SceneVariablesDialog from '../VariablesList/SceneVariablesDialog';
 import { onObjectAdded, onInstanceAdded } from '../Hints/ObjectsAdditionalWork';
 import { type InfoBarDetails } from '../Hints/ObjectsAdditionalWork';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
@@ -72,6 +72,7 @@ import {
   unregisterOnResourceExternallyChangedCallback,
 } from '../MainFrame/ResourcesWatcher';
 import { unserializeFromJSObject } from '../Utils/Serializer';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
 
 const gd: libGDevelop = global.gd;
 
@@ -884,15 +885,6 @@ export default class SceneEditor extends React.Component<Props, State> {
     objectsWithContext: ObjectWithContext[],
     done: boolean => void
   ) => {
-    const message =
-      objectsWithContext.length === 1
-        ? t`Do you want to remove all references to this object in groups and events (actions and conditions using the object)?`
-        : t`Do you want to remove all references to these objects in groups and events (actions and conditions using the objects)?`;
-
-    const answer = Window.showYesNoCancelDialog(i18n._(message));
-
-    if (answer === 'cancel') return;
-    const shouldRemoveReferences = answer === 'yes';
     const { project, layout } = this.props;
 
     objectsWithContext.forEach(objectWithContext => {
@@ -904,19 +896,15 @@ export default class SceneEditor extends React.Component<Props, State> {
       this.instancesSelection.unselectInstancesOfObject(object.getName());
 
       if (global) {
-        gd.WholeProjectRefactorer.globalObjectOrGroupRemoved(
+        gd.WholeProjectRefactorer.globalObjectRemoved(
           project,
-          object.getName(),
-          /* isObjectGroup=*/ false,
-          shouldRemoveReferences
+          object.getName()
         );
       } else {
-        gd.WholeProjectRefactorer.objectOrGroupRemovedInLayout(
+        gd.WholeProjectRefactorer.objectRemovedInLayout(
           project,
           layout,
-          object.getName(),
-          /* isObjectGroup=*/ false,
-          shouldRemoveReferences
+          object.getName()
         );
       }
     });
@@ -1099,30 +1087,6 @@ export default class SceneEditor extends React.Component<Props, State> {
     groupWithContext: GroupWithContext,
     done: boolean => void
   ) => {
-    const { group, global } = groupWithContext;
-    const { project, layout } = this.props;
-
-    const answer = Window.showConfirmDialog(
-      'Do you want to remove all references to this group in events (actions and conditions using the group)?'
-    );
-
-    if (global) {
-      gd.WholeProjectRefactorer.globalObjectOrGroupRemoved(
-        project,
-        group.getName(),
-        /* isObjectGroup=*/ true,
-        !!answer
-      );
-    } else {
-      gd.WholeProjectRefactorer.objectOrGroupRemovedInLayout(
-        project,
-        layout,
-        group.getName(),
-        /* isObjectGroup=*/ true,
-        !!answer
-      );
-    }
-
     done(true);
   };
 
@@ -1680,6 +1644,12 @@ export default class SceneEditor extends React.Component<Props, State> {
     const variablesEditedAssociatedObject = variablesEditedAssociatedObjectName
       ? getObjectByName(project, layout, variablesEditedAssociatedObjectName)
       : null;
+    const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+      {
+        project,
+        layout,
+      }
+    );
 
     // Deactivate prettier on this variable to prevent spaces to be added by
     // line breaks.
@@ -1723,6 +1693,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                 ref={ref => (this.editorDisplay = ref)}
                 project={project}
                 layout={layout}
+                projectScopedContainersAccessor={
+                  projectScopedContainersAccessor
+                }
                 initialInstances={initialInstances}
                 instancesSelection={this.instancesSelection}
                 onSelectInstances={this._onSelectInstances}
@@ -1821,6 +1794,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                         initialTab={this.state.editedObjectInitialTab}
                         project={project}
                         layout={layout}
+                        projectScopedContainersAccessor={
+                          projectScopedContainersAccessor
+                        }
                         resourceManagementProps={resourceManagementProps}
                         onComputeAllVariableNames={() => {
                           const { editedObjectWithContext } = this.state;
@@ -1830,7 +1806,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                             project.getCurrentPlatform(),
                             project,
                             layout,
-                            editedObjectWithContext.object
+                            editedObjectWithContext.object.getName()
                           );
                         }}
                         onCancel={() => {
@@ -1905,57 +1881,26 @@ export default class SceneEditor extends React.Component<Props, State> {
               )}
               {!!this.state.variablesEditedInstance &&
                 !!variablesEditedAssociatedObject && (
-                  <VariablesEditorDialog
+                  <ObjectInstanceVariablesDialog
                     project={project}
+                    layout={layout}
+                    projectScopedContainersAccessor={
+                      projectScopedContainersAccessor
+                    }
+                    objectInstance={this.state.variablesEditedInstance}
                     open
-                    variablesContainer={this.state.variablesEditedInstance.getVariables()}
-                    inheritedVariablesContainer={variablesEditedAssociatedObject.getVariables()}
                     onCancel={() => this.editInstanceVariables(null)}
                     onApply={() => this.editInstanceVariables(null)}
-                    emptyPlaceholderTitle={
-                      <Trans>Add your first instance variable</Trans>
-                    }
-                    emptyPlaceholderDescription={
-                      <Trans>
-                        Instance variables overwrite the default values of the
-                        variables of the object.
-                      </Trans>
-                    }
-                    helpPagePath={'/all-features/variables/instance-variables'}
-                    title={<Trans>Instance Variables</Trans>}
-                    onEditObjectVariables={
-                      variablesEditedAssociatedObject
-                        ? () => {
-                            this.editObject(
-                              variablesEditedAssociatedObject,
-                              'variables'
-                            );
-                            this.editInstanceVariables(null);
-                          }
-                        : undefined
-                    }
+                    onEditObjectVariables={() => {
+                      this.editObject(
+                        variablesEditedAssociatedObject,
+                        'variables'
+                      );
+                      this.editInstanceVariables(null);
+                    }}
                     hotReloadPreviewButtonProps={
                       this.props.hotReloadPreviewButtonProps
                     }
-                    onComputeAllVariableNames={() => {
-                      const { variablesEditedInstance } = this.state;
-                      if (!variablesEditedInstance) {
-                        return [];
-                      }
-                      const variablesEditedObject = getObjectByName(
-                        project,
-                        layout,
-                        variablesEditedInstance.getObjectName()
-                      );
-                      return variablesEditedObject
-                        ? EventsRootVariablesFinder.findAllObjectVariables(
-                            project.getCurrentPlatform(),
-                            project,
-                            layout,
-                            variablesEditedObject
-                          )
-                        : [];
-                    }}
                   />
                 )}
               {!!this.state.layerRemoved &&
@@ -2004,7 +1949,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                   project={project}
                   layout={layout}
                   onApply={() => this.editLayoutVariables(false)}
-                  onClose={() => this.editLayoutVariables(false)}
+                  onCancel={() => this.editLayoutVariables(false)}
                   hotReloadPreviewButtonProps={
                     this.props.hotReloadPreviewButtonProps
                   }

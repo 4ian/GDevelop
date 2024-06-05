@@ -1,6 +1,7 @@
 // @flow
 
 import values from 'lodash/values';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
 
 export type InstructionsListContext = {|
   isCondition: boolean,
@@ -23,10 +24,16 @@ export type ParameterContext = {|
   domEvent?: any,
 |};
 
+export type VariableDeclarationContext = {|
+  variablesContainer: gdVariablesContainer,
+  variableName: string,
+|};
+
 export type EventContext = {|
   eventsList: gdEventsList,
   event: gdBaseEvent,
   indexInList: number,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
 |};
 
 export type InstructionContextWithEventContext = {
@@ -84,6 +91,17 @@ export const getLastSelectedEventContextWhichCanHaveSubEvents = (
 ): EventContext | null => {
   const candidates = selection.selectedEvents.filter(({ event }) =>
     event.canHaveSubEvents()
+  );
+  if (!candidates.length) return null;
+
+  return candidates[candidates.length - 1];
+};
+
+export const getLastSelectedEventContextWhichCanHaveVariables = (
+  selection: SelectionState
+): EventContext | null => {
+  const candidates = selection.selectedEvents.filter(({ event }) =>
+    event.canHaveVariables()
   );
   if (!candidates.length) return null;
 
@@ -174,6 +192,17 @@ export const getLastSelectedInstructionEventContextWhichCanHaveSubEvents = (
 ): EventContext | null => {
   const candidates = selection.selectedInstructions.filter(({ eventContext }) =>
     eventContext.event.canHaveSubEvents()
+  );
+  if (!candidates.length) return null;
+
+  return candidates[candidates.length - 1].eventContext;
+};
+
+export const getLastSelectedInstructionEventContextWhichCanHaveVariables = (
+  selection: SelectionState
+): EventContext | null => {
+  const candidates = selection.selectedInstructions.filter(({ eventContext }) =>
+    eventContext.event.canHaveVariables()
   );
   if (!candidates.length) return null;
 

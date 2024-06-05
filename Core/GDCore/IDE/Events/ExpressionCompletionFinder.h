@@ -3,8 +3,7 @@
  * Copyright 2008-present Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDCORE_EXPRESSIONAUTOCOMPLETIONPROVIDER_H
-#define GDCORE_EXPRESSIONAUTOCOMPLETIONPROVIDER_H
+#pragma once
 
 #include <memory>
 #include <vector>
@@ -20,7 +19,7 @@
 #include "GDCore/IDE/Events/ExpressionNodeLocationFinder.h"
 #include "GDCore/IDE/Events/ExpressionTypeFinder.h"
 #include "GDCore/IDE/Events/ExpressionVariableOwnerFinder.h"
-#include "GDCore/IDE/Events/ExpressionVariableParentFinder.h"
+#include "GDCore/IDE/Events/ExpressionVariablePathFinder.h"
 #include "GDCore/Project/ProjectScopedContainers.h"
 #include "GDCore/Project/Variable.h"
 
@@ -144,6 +143,19 @@ struct GD_CORE_API ExpressionCompletionDescription {
   ExpressionCompletionDescription& SetVariableType(
       gd::Variable::Type variableType_) {
     variableType = variableType_;
+    return *this;
+  }
+
+  /**
+   * \brief Return the scope of the variable, for a variable completion.
+   */
+  gd::VariablesContainer::SourceType GetVariableScope() const {
+    return variableScope;
+  }
+
+  ExpressionCompletionDescription &
+  SetVariableScope(gd::VariablesContainer::SourceType variableScope_) {
+    variableScope = variableScope_;
     return *this;
   }
 
@@ -325,6 +337,7 @@ struct GD_CORE_API ExpressionCompletionDescription {
  private:
   CompletionKind completionKind;
   gd::Variable::Type variableType;
+  gd::VariablesContainer::SourceType variableScope;
   gd::String type;
   gd::String prefix;
   gd::String completion;
@@ -525,7 +538,7 @@ class GD_CORE_API ExpressionCompletionFinder
   }
   void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {
     VariableAndItsParent variableAndItsParent =
-        gd::ExpressionVariableParentFinder::GetLastParentOfNode(
+        gd::ExpressionVariablePathFinder::GetLastParentOfNode(
             platform, projectScopedContainers, node);
 
     // If no child, we're at the end of a variable (like `GrandChild` in
@@ -666,7 +679,7 @@ class GD_CORE_API ExpressionCompletionFinder
             [&]() {
               // This is a variable.
               VariableAndItsParent variableAndItsParent =
-                  gd::ExpressionVariableParentFinder::GetLastParentOfNode(
+                  gd::ExpressionVariablePathFinder::GetLastParentOfNode(
                       platform, projectScopedContainers, node);
 
               AddCompletionsForChildrenVariablesOf(
@@ -1060,6 +1073,7 @@ class GD_CORE_API ExpressionCompletionFinder
               location.GetEndPosition());
           description.SetCompletion(variableName);
           description.SetVariableType(variable.GetType());
+          description.SetVariableScope(projectScopedContainers.GetVariablesContainersList().GetVariablesContainerFromVariableName(variableName).GetSourceType());
           completions.push_back(description);
 
           if (eagerlyCompleteIfExactMatch && variableName == search) {
@@ -1113,5 +1127,3 @@ class GD_CORE_API ExpressionCompletionFinder
 };
 
 }  // namespace gd
-
-#endif  // GDCORE_EXPRESSIONAUTOCOMPLETIONPROVIDER_H

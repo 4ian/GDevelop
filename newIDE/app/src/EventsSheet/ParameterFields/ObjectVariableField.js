@@ -1,25 +1,27 @@
 // @flow
-import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import VariableField, {
   renderVariableWithIcon,
   type VariableFieldInterface,
 } from './VariableField';
-import VariablesEditorDialog from '../../VariablesList/VariablesEditorDialog';
+import ObjectVariablesDialog from '../../VariablesList/ObjectVariablesDialog';
 import {
   type ParameterFieldProps,
   type ParameterFieldInterface,
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
 import { getLastObjectParameterValue } from './ParameterMetadataTools';
-import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
 import getObjectByName from '../../Utils/GetObjectByName';
 import getObjectGroupByName from '../../Utils/GetObjectGroupByName';
 import ObjectIcon from '../../UI/CustomSvgIcons/Object';
+import { enumerateVariables } from './EnumerateVariables';
+import { intersectionBy } from 'lodash';
+
+const gd: libGDevelop = global.gd;
 
 // TODO Move this function to the ObjectsContainersList class.
-const getObjectOrGroupVariablesContainers = (
+export const getObjectOrGroupVariablesContainers = (
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   objectName: string
@@ -69,12 +71,14 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       project,
       globalObjectsContainer,
       objectsContainer,
+      projectScopedContainersAccessor,
       scope,
       instructionMetadata,
       instruction,
       expressionMetadata,
       expression,
       parameterIndex,
+      onInstructionTypeChanged,
     } = props;
 
     const objectName = getLastObjectParameterValue({
@@ -86,9 +90,6 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     });
 
     const { layout } = scope;
-    const object = objectName
-      ? getObjectByName(globalObjectsContainer, objectsContainer, objectName)
-      : null;
     const variablesContainers = React.useMemo<Array<gdVariablesContainer>>(
       () =>
         objectName
@@ -101,20 +102,29 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       [objectName, globalObjectsContainer, objectsContainer]
     );
 
-    const onComputeAllVariableNames = () =>
-      project && layout && object
-        ? EventsRootVariablesFinder.findAllObjectVariables(
-            project.getCurrentPlatform(),
-            project,
-            layout,
-            object
-          )
-        : [];
+    const enumerateObjectVariables = React.useCallback(
+      () =>
+        variablesContainers.length > 0
+          ? variablesContainers
+              .map(variablesContainer => enumerateVariables(variablesContainer))
+              .reduce((a, b) => intersectionBy(a, b, 'name'))
+          : [],
+      [variablesContainers]
+    );
 
     return (
       <React.Fragment>
         <VariableField
+          forceDeclaration={
+            instruction &&
+            gd.VariableInstructionSwitcher.isSwitchableVariableInstruction(
+              instruction.getType()
+            )
+          }
+          project={project}
+          instruction={instruction}
           variablesContainers={variablesContainers}
+          enumerateVariables={enumerateObjectVariables}
           parameterMetadata={props.parameterMetadata}
           value={props.value}
           onChange={props.onChange}
@@ -122,43 +132,45 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           onRequestClose={props.onRequestClose}
           onApply={props.onApply}
           ref={field}
-          onOpenDialog={() => setEditorOpen(true)}
+          // There is no variable editor for groups.
+          onOpenDialog={
+            variablesContainers.length === 1 ? () => setEditorOpen(true) : null
+          }
           globalObjectsContainer={props.globalObjectsContainer}
           objectsContainer={props.objectsContainer}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
           scope={scope}
           id={
             props.parameterIndex !== undefined
               ? `parameter-${props.parameterIndex}-object-variable-field`
               : undefined
           }
+          onInstructionTypeChanged={onInstructionTypeChanged}
         />
-        {editorOpen &&
-          // There is no variable editor for groups.
-          variablesContainers.length === 1 &&
-          project && (
-            <VariablesEditorDialog
-              project={project}
-              title={<Trans>Object Variables</Trans>}
-              open={editorOpen}
-              variablesContainer={variablesContainers[0]}
-              emptyPlaceholderTitle={
-                <Trans>Add your first object variable</Trans>
+        {editorOpen && project && (
+          <ObjectVariablesDialog
+            project={project}
+            layout={layout}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
+            objectName={objectName}
+            variablesContainer={variablesContainers[0]}
+            open={editorOpen}
+            onCancel={() => setEditorOpen(false)}
+            onApply={(selectedVariableName: string | null) => {
+              if (
+                selectedVariableName &&
+                selectedVariableName.startsWith(props.value)
+              ) {
+                props.onChange(selectedVariableName);
               }
-              emptyPlaceholderDescription={
-                <Trans>
-                  These variables hold additional information on an object.
-                </Trans>
-              }
-              helpPagePath={'/all-features/variables/object-variables'}
-              onComputeAllVariableNames={onComputeAllVariableNames}
-              onCancel={() => setEditorOpen(false)}
-              onApply={() => {
-                setEditorOpen(false);
-                if (field.current) field.current.updateAutocompletions();
-              }}
-              preventRefactoringToDeleteInstructions
-            />
-          )}
+              setEditorOpen(false);
+              if (onInstructionTypeChanged) onInstructionTypeChanged();
+              if (field.current) field.current.updateAutocompletions();
+            }}
+            preventRefactoringToDeleteInstructions
+            initiallySelectedVariableName={props.value}
+          />
+        )}
       </React.Fragment>
     );
   }
@@ -166,4 +178,4 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
 export const renderInlineObjectVariable = (
   props: ParameterInlineRendererProps
-) => renderVariableWithIcon(props, ObjectIcon, 'object variable');
+) => renderVariableWithIcon(props, 'object variable', ObjectIcon);

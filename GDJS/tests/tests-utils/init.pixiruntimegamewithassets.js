@@ -113,6 +113,8 @@ gdjs.getPixiRuntimeGameWithAssets = () => {
             ],
           },
         ],
+        sceneVariables: [],
+        globalVariables: [],
       },
     ],
   });

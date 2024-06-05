@@ -122,7 +122,9 @@ public:
    * event-based behavior.
    */
   static void ExposeEventsBasedBehaviorEvents(
-      gd::Project &project, const gd::EventsBasedBehavior &eventsBasedBehavior,
+      gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      const gd::EventsBasedBehavior &eventsBasedBehavior,
       gd::ArbitraryEventsWorkerWithContext &worker);
 
   /**
@@ -144,10 +146,11 @@ public:
    * This should be the preferred way to traverse all the events of an
    * event-based object.
    */
-  static void
-  ExposeEventsBasedObjectEvents(gd::Project &project,
-                                const gd::EventsBasedObject &eventsBasedObject,
-                                gd::ArbitraryEventsWorkerWithContext &worker);
+  static void ExposeEventsBasedObjectEvents(
+      gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      const gd::EventsBasedObject &eventsBasedObject,
+      gd::ArbitraryEventsWorkerWithContext &worker);
 
   /**
    * \brief Call the specified worker on all ObjectContainers of the project

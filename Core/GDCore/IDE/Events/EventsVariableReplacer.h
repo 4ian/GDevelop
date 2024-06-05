@@ -4,6 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 #pragma once
+
 #include <map>
 #include <memory>
 #include <unordered_map>
@@ -12,11 +13,13 @@
 
 #include "GDCore/IDE/Events/ArbitraryEventsWorker.h"
 #include "GDCore/String.h"
+
 namespace gd {
 class BaseEvent;
 class VariablesContainer;
 class EventsList;
 class Platform;
+struct VariablesRenamingChangesetNode;
 }  // namespace gd
 
 namespace gd {
@@ -33,12 +36,12 @@ class GD_CORE_API EventsVariableReplacer
   EventsVariableReplacer(
       const gd::Platform &platform_,
       const gd::VariablesContainer &targetVariablesContainer_,
-      const std::unordered_map<gd::String, gd::String> &oldToNewVariableNames_,
+      const VariablesRenamingChangesetNode &variablesRenamingChangesetRoot_,
       const std::unordered_set<gd::String> &removedVariableNames_)
       : platform(platform_),
         targetVariablesContainer(targetVariablesContainer_),
-        oldToNewVariableNames(oldToNewVariableNames_),
-        removedVariableNames(removedVariableNames_){};
+        variablesRenamingChangesetRoot(variablesRenamingChangesetRoot_),
+        removedVariableNames(removedVariableNames_) {};
   virtual ~EventsVariableReplacer();
 
  private:
@@ -53,7 +56,7 @@ class GD_CORE_API EventsVariableReplacer
   const gd::Platform &platform;
   const gd::VariablesContainer &targetVariablesContainer;
   gd::String objectName;
-  const std::unordered_map<gd::String, gd::String> &oldToNewVariableNames;
+  const VariablesRenamingChangesetNode &variablesRenamingChangesetRoot;
   const std::unordered_set<gd::String> &removedVariableNames;
 };
 

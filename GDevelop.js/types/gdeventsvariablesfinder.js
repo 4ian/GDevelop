@@ -3,7 +3,7 @@ declare class gdEventsVariablesFinder {
   constructor(): void;
   static findAllGlobalVariables(platform: gdPlatform, project: gdProject): gdSetString;
   static findAllLayoutVariables(platform: gdPlatform, project: gdProject, layout: gdLayout): gdSetString;
-  static findAllObjectVariables(platform: gdPlatform, project: gdProject, layout: gdLayout, obj: gdObject): gdSetString;
+  static findAllObjectVariables(platform: gdPlatform, project: gdProject, layout: gdLayout, objectName: string): gdSetString;
   delete(): void;
   ptr: number;
 };

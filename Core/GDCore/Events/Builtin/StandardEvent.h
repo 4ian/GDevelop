@@ -4,13 +4,13 @@
  * reserved. This project is released under the MIT License.
  */
 
-#if defined(GD_IDE_ONLY)
-#ifndef GDCORE_STANDARDEVENT_H
-#define GDCORE_STANDARDEVENT_H
+#pragma once
+
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/Events/InstructionsList.h"
+#include "GDCore/Project/VariablesContainer.h"
 namespace gd {
 class Instruction;
 class Project;
@@ -33,6 +33,10 @@ class GD_CORE_API StandardEvent : public gd::BaseEvent {
   virtual const gd::EventsList& GetSubEvents() const { return events; };
   virtual gd::EventsList& GetSubEvents() { return events; };
 
+  virtual bool CanHaveVariables() const { return true; }
+  virtual const gd::VariablesContainer& GetVariables() const { return variables; };
+  virtual gd::VariablesContainer& GetVariables() { return variables; };
+
   const gd::InstructionsList& GetConditions() const { return conditions; };
   gd::InstructionsList& GetConditions() { return conditions; };
 
@@ -53,9 +57,7 @@ class GD_CORE_API StandardEvent : public gd::BaseEvent {
   gd::InstructionsList conditions;
   gd::InstructionsList actions;
   EventsList events;
+  VariablesContainer variables;
 };
 
 }  // namespace gd
-
-#endif  // GDCORE_STANDARDEVENT_H
-#endif

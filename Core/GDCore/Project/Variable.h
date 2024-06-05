@@ -30,6 +30,8 @@ class GD_CORE_API Variable {
  public:
   static gd::Variable badVariable;
   enum Type {
+    Unknown,
+    
     // Primitive types
     String,
     Number,
@@ -349,7 +351,7 @@ class GD_CORE_API Variable {
    * \brief Remove the persistent UUID - when the variable no
    * longer needs to be recognized between serializations.
    */
-  Variable& ClearPersistentUuid() { persistentUuid = ""; return *this; };
+  Variable& ClearPersistentUuid();
 
   /**
    * \brief Get the persistent UUID used to recognize

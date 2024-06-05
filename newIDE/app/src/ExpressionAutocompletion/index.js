@@ -19,6 +19,7 @@ import getObjectByName from '../Utils/GetObjectByName';
 import { getAllPointNames } from '../ObjectEditor/Editors/SpriteEditor/Utils/SpriteObjectHelper';
 import { enumerateParametersUsableInExpressions } from '../EventsSheet/ParameterFields/EnumerateFunctionParameters';
 import { filterStringListWithPrefix } from '../Utils/ListFiltering';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
 
 const gd: libGDevelop = global.gd;
 
@@ -49,6 +50,7 @@ export type ExpressionAutocompletion =
       ...BaseExpressionAutocompletion,
       kind: 'Variable',
       variableType: Variable_Type,
+      variableScope: VariablesContainer_SourceType,
     |}
   | {|
       ...BaseExpressionAutocompletion,
@@ -78,7 +80,7 @@ export type ExpressionAutocompletion =
 type ExpressionAutocompletionContext = {|
   gd: libGDevelop,
   project: gdProject,
-  projectScopedContainers: gdProjectScopedContainers,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   scope: EventsScope, // TODO: Should be replaced by usage of projectScopedContainers everywhere.
 |};
 
@@ -154,7 +156,8 @@ const getAutocompletionsForObjectExpressions = function(
   const type: string = completionDescription.getType();
   const objectName: string = completionDescription.getObjectName();
   const isExact: boolean = completionDescription.isExact();
-  const { gd, projectScopedContainers } = expressionAutocompletionContext;
+  const projectScopedContainers = expressionAutocompletionContext.projectScopedContainersAccessor.get();
+  const { gd } = expressionAutocompletionContext;
 
   const objectType = projectScopedContainers
     .getObjectsContainersList()
@@ -222,7 +225,7 @@ const getAutocompletionsForBehaviorExpressions = function(
   const type: string = completionDescription.getType();
   const behaviorName: string = completionDescription.getBehaviorName();
   const isExact: boolean = completionDescription.isExact();
-  const { projectScopedContainers } = expressionAutocompletionContext;
+  const projectScopedContainers = expressionAutocompletionContext.projectScopedContainersAccessor.get();
 
   // TODO: could be made more precise with the object name
   const behaviorType = projectScopedContainers
@@ -368,8 +371,8 @@ const getAutocompletionsForBehavior = function(
   const prefix: string = completionDescription.getPrefix();
   const isExact: boolean = completionDescription.isExact();
   const objectName: string = completionDescription.getObjectName();
+  const projectScopedContainers = expressionAutocompletionContext.projectScopedContainersAccessor.get();
 
-  const { projectScopedContainers } = expressionAutocompletionContext;
   return projectScopedContainers
     .getObjectsContainersList()
     .getBehaviorsOfObject(objectName, true)
@@ -465,6 +468,7 @@ export const getAutocompletionsFromDescriptions = (
             replacementStartPosition: completionDescription.getReplacementStartPosition(),
             replacementEndPosition: completionDescription.getReplacementEndPosition(),
             variableType: completionDescription.getVariableType(),
+            variableScope: completionDescription.getVariableScope(),
           },
         ];
       } else if (

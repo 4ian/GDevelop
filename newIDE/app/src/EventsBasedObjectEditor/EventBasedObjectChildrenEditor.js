@@ -1,5 +1,4 @@
 // @flow
-import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
@@ -8,7 +7,6 @@ import { Line } from '../UI/Grid';
 import ObjectsList, { type ObjectsListInterface } from '../ObjectsList';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
 import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
-import Window from '../Utils/Window';
 import ObjectEditorDialog from '../ObjectEditor/ObjectEditorDialog';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import { emptyStorageProvider } from '../ProjectsStorage/ProjectStorageProviders';
@@ -18,6 +16,7 @@ import {
   type ObjectFolderOrObjectWithContext,
 } from '../ObjectsList/EnumerateObjectFolderOrObject';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
 
 const gd: libGDevelop = global.gd;
 
@@ -26,6 +25,7 @@ type Props = {|
   globalObjectsContainer: gdObjectsContainer,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsBasedObject: gdEventsBasedObject,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   unsavedChanges?: ?UnsavedChanges,
 |};
 
@@ -51,29 +51,17 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
     objectsWithContext: ObjectWithContext[],
     done: boolean => void
   ) => {
-    const message =
-      objectsWithContext.length === 1
-        ? t`Do you want to remove all references to this object in groups and events (actions and conditions using the object)?`
-        : t`Do you want to remove all references to these objects in groups and events (actions and conditions using the objects)?`;
-
-    const answer = Window.showYesNoCancelDialog(i18n._(message));
-
-    if (answer === 'cancel') return;
-    const shouldRemoveReferences = answer === 'yes';
-
     const { project, globalObjectsContainer, eventsBasedObject } = this.props;
 
     objectsWithContext.forEach(objectWithContext => {
       const { object } = objectWithContext;
-      gd.WholeProjectRefactorer.objectOrGroupRemovedInEventsBasedObject(
+      gd.WholeProjectRefactorer.objectRemovedInEventsBasedObject(
         project,
         eventsBasedObject,
         globalObjectsContainer,
         // $FlowFixMe gdObjectsContainer should be a member of gdEventsBasedObject instead of a base class.
         eventsBasedObject,
-        object.getName(),
-        /* isObjectGroup=*/ false,
-        shouldRemoveReferences
+        object.getName()
       );
     });
     done(true);
@@ -292,6 +280,9 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 initialTab={this.state.editedObjectInitialTab}
                 project={project}
                 eventsFunctionsExtension={eventsFunctionsExtension}
+                projectScopedContainersAccessor={
+                  this.props.projectScopedContainersAccessor
+                }
                 resourceManagementProps={{
                   resourceSources: [],
                   resourceExternalEditors: [],
@@ -310,7 +301,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                   //   project.getCurrentPlatform(),
                   //   project,
                   //   eventsBasedObject,
-                  //   editedObjectWithContext.object
+                  //   editedObjectWithContext.object.getName()
                   // );
                 }}
                 onCancel={() => {

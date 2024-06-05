@@ -10,189 +10,31 @@ describe('libGD.js - GDJS Scene Code Generation integration tests', function () 
     gd = await initializeGDevelopJs();
   });
 
-  it('generates code for a link to an external events', function () {
-    const project = new gd.ProjectHelper.createNewGDJSProject();
-    const layout = project.insertNewLayout('Scene', 0);
-    const serializedLayoutEvents = gd.Serializer.fromJSObject([
-      {
-        type: 'BuiltinCommonInstructions::Standard',
-        conditions: [],
-        actions: [
-          {
-            type: { value: 'ModVarScene' },
-            parameters: ['Counter', '+', '1'],
-          },
-        ],
-        events: [],
-      },
-      {
-        type: 'BuiltinCommonInstructions::Standard',
-        conditions: [],
-        actions: [
-          {
-            type: { value: 'ModVarScene' },
-            parameters: ['Counter', '+', '2'],
-          },
-        ],
-        events: [
-          {
-            type: 'BuiltinCommonInstructions::Link',
-            target: 'External events 1',
-          },
-        ],
-      },
-    ]);
-    layout.getEvents().unserializeFrom(project, serializedLayoutEvents);
-
-    const externalEvents = project.insertNewExternalEvents(
-      'External events 1',
-      0
-    );
-    const serializedExternalEventsEvents = gd.Serializer.fromJSObject([
-      {
-        type: 'BuiltinCommonInstructions::Standard',
-        conditions: [],
-        actions: [
-          {
-            type: { value: 'ModVarScene' },
-            parameters: ['Counter', '+', '4'],
-          },
-        ],
-        events: [],
-      },
-      // The new event is disabled, so not executed. And the link
-      // should not be inserted (so no infinite loop), because it's not
-      // even processed (as it's inside a disabled event).
-      {
-        type: 'BuiltinCommonInstructions::Standard',
-        disabled: true,
-        conditions: [],
-        actions: [
-          {
-            type: { value: 'ModVarScene' },
-            parameters: ['Counter', '+', '8'],
-          },
-        ],
-        events: [
-          {
-            type: 'BuiltinCommonInstructions::Link',
-            target: 'External events 1',
-          },
-        ],
-      },
-    ]);
-
-    externalEvents
-      .getEvents()
-      .unserializeFrom(project, serializedExternalEventsEvents);
-
-    const runCompiledEvents = generateCompiledEventsForLayout(
-      gd,
-      project,
-      layout
-    );
-
-    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
-    runCompiledEvents(gdjs, runtimeScene);
-
-    expect(runtimeScene.getVariables().has('Counter')).toBe(true);
-    expect(runtimeScene.getVariables().get('Counter').getAsNumber()).toBe(7);
-
-    project.delete();
-  });
-
-  it('generates code for nested links to external events', function () {
-    const project = new gd.ProjectHelper.createNewGDJSProject();
-    const layout = project.insertNewLayout('Scene', 0);
-    const serializedLayoutEvents = gd.Serializer.fromJSObject([
-      {
-        type: 'BuiltinCommonInstructions::Link',
-        target: 'External events 1',
-      },
-    ]);
-    layout.getEvents().unserializeFrom(project, serializedLayoutEvents);
-
-    const externalEvents1 = project.insertNewExternalEvents(
-      'External events 1',
-      0
-    );
-    const serializedExternalEvents1Events = gd.Serializer.fromJSObject([
-      {
-        type: 'BuiltinCommonInstructions::Link',
-        target: 'External events 2',
-      },
-      {
-        type: 'BuiltinCommonInstructions::Link',
-        target: 'External events 2',
-      },
-    ]);
-
-    externalEvents1
-      .getEvents()
-      .unserializeFrom(project, serializedExternalEvents1Events);
-
-    const externalEvents2 = project.insertNewExternalEvents(
-      'External events 2',
-      0
-    );
-    const serializedExternalEvents2Events = gd.Serializer.fromJSObject([
-      {
-        type: 'BuiltinCommonInstructions::Standard',
-        conditions: [],
-        actions: [
-          {
-            type: { value: 'ModVarScene' },
-            parameters: ['Counter', '+', '1'],
-          },
-        ],
-        events: [],
-      },
-    ]);
-
-    externalEvents2
-      .getEvents()
-      .unserializeFrom(project, serializedExternalEvents2Events);
-
-    const runCompiledEvents = generateCompiledEventsForLayout(
-      gd,
-      project,
-      layout
-    );
-
-    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
-    runCompiledEvents(gdjs, runtimeScene);
-
-    expect(runtimeScene.getVariables().has('Counter')).toBe(true);
-    expect(runtimeScene.getVariables().get('Counter').getAsNumber()).toBe(2);
-
-    project.delete();
-  });
-
   describe('(Scene) variable code generation', () => {
     let project = null;
-    let layout = null;
+    let scene = null;
     beforeEach(() => {
       project = new gd.ProjectHelper.createNewGDJSProject();
-      layout = project.insertNewLayout('Scene', 0);
-      layout.insertNewObject(project, '', 'MyObject', 0);
+      scene = project.insertNewLayout('Scene', 0);
+      scene.insertNewObject(project, '', 'MyObject', 0);
 
       // These variables are "simple" and their type will be known at code generation.
-      layout.getVariables().insertNew('MyNumberVariable', 0).setValue(123);
-      layout.getVariables().insertNew('MyStringVariable', 1).setString('Test');
-      layout
+      scene.getVariables().insertNew('MyNumberVariable', 0).setValue(123);
+      scene.getVariables().insertNew('MyStringVariable', 1).setString('Test');
+      scene
         .getVariables()
         .insertNew('MyOtherStringVariable', 1)
         .setString('SomeChild');
 
       // Use a variable that has a value deep inside a structure - so code generation
       // does not know its type and will issue a `getAsNumberOrString`.
-      layout
+      scene
         .getVariables()
         .insertNew('MyOtherStructureVariable', 1)
         .getChild('Child')
         .getChild('SubChild')
         .setString('SomeOtherChild');
-      const structureVariable = layout
+      const structureVariable = scene
         .getVariables()
         .insertNew('MyStructureVariable', 2);
 
@@ -251,16 +93,16 @@ describe('libGD.js - GDJS Scene Code Generation integration tests', function () 
           events: [],
         },
       ]);
-      layout.getEvents().unserializeFrom(project, serializedLayoutEvents);
+      scene.getEvents().unserializeFrom(project, serializedLayoutEvents);
 
       const runCompiledEvents = generateCompiledEventsForLayout(
         gd,
         project,
-        layout
+        scene
       );
 
       const serializedSceneElement = new gd.SerializerElement();
-      layout.serializeTo(serializedSceneElement);
+      scene.serializeTo(serializedSceneElement);
 
       const { gdjs, runtimeScene } = makeMinimalGDJSMock({
         sceneData: JSON.parse(gd.Serializer.toJSON(serializedSceneElement)),
@@ -294,16 +136,16 @@ describe('libGD.js - GDJS Scene Code Generation integration tests', function () 
           events: [],
         },
       ]);
-      layout.getEvents().unserializeFrom(project, serializedLayoutEvents);
+      scene.getEvents().unserializeFrom(project, serializedLayoutEvents);
 
       const runCompiledEvents = generateCompiledEventsForLayout(
         gd,
         project,
-        layout
+        scene
       );
 
       const serializedSceneElement = new gd.SerializerElement();
-      layout.serializeTo(serializedSceneElement);
+      scene.serializeTo(serializedSceneElement);
 
       const { gdjs, runtimeScene } = makeMinimalGDJSMock({
         sceneData: JSON.parse(gd.Serializer.toJSON(serializedSceneElement)),
@@ -337,16 +179,16 @@ describe('libGD.js - GDJS Scene Code Generation integration tests', function () 
           events: [],
         },
       ]);
-      layout.getEvents().unserializeFrom(project, serializedLayoutEvents);
+      scene.getEvents().unserializeFrom(project, serializedLayoutEvents);
 
       const runCompiledEvents = generateCompiledEventsForLayout(
         gd,
         project,
-        layout
+        scene
       );
 
       const serializedSceneElement = new gd.SerializerElement();
-      layout.serializeTo(serializedSceneElement);
+      scene.serializeTo(serializedSceneElement);
 
       const { gdjs, runtimeScene } = makeMinimalGDJSMock({
         sceneData: JSON.parse(gd.Serializer.toJSON(serializedSceneElement)),

@@ -1,7 +1,6 @@
 const initializeGDevelopJs = require('../../Binaries/embuild/GDevelop.js/libGD.js');
 const { makeMinimalGDJSMock } = require('../TestUtils/GDJSMocks.js');
 const {
-  generateCompiledEventsForEventsFunction,
   generateCompiledEventsFromSerializedEvents,
 } = require('../TestUtils/CodeGenerationHelpers.js');
 

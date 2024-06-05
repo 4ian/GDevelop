@@ -11,6 +11,7 @@
 #include "GDCore/Events/CodeGeneration/ExpressionCodeGenerator.h"
 #include "GDCore/Extensions/Builtin/AllBuiltinExtensions.h"
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
+#include "GDCore/IDE/Events/ExpressionVariableNameFinder.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Tools/Localization.h"
@@ -21,6 +22,134 @@ namespace gdjs {
 
 VariablesExtension::VariablesExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsVariablesExtension(*this);
+
+  GetAllConditions()["NumberVariable"].SetFunctionName(
+      "gdjs.evtTools.variable.getVariableNumber");
+  GetAllConditions()["StringVariable"].SetFunctionName(
+      "gdjs.evtTools.variable.getVariableString");
+  GetAllConditions()["BooleanVariable"].SetFunctionName(
+      "gdjs.evtTools.variable.getVariableBoolean");
+
+  GetAllStrExpressions()["VariableFirstString"].SetFunctionName(
+      "gdjs.evtTools.variable.getFirstVariableString");
+  GetAllExpressions()["VariableFirstNumber"].SetFunctionName(
+      "gdjs.evtTools.variable.getFirstVariableNumber");
+  GetAllStrExpressions()["VariableLastString"].SetFunctionName(
+      "gdjs.evtTools.variable.getLastVariableString");
+  GetAllExpressions()["VariableLastNumber"].SetFunctionName(
+      "gdjs.evtTools.variable.getLastVariableNumber");
+
+  GetAllExpressions()["VariableChildCount"].SetCustomCodeGenerator(
+      [](const std::vector<gd::Expression> &parameters,
+         gd::EventsCodeGenerator &codeGenerator,
+         gd::EventsCodeGenerationContext &context) {
+        // This expression used to be declared with a scenevar parameter.
+        return "gdjs.evtTools.variable.getVariableChildCount(" +
+               codeGenerator.GenerateAnyOrSceneVariableGetter(parameters[0],
+                                                              context) +
+               ")";
+      });
+  GetAllConditions()["VariableChildCount"].SetFunctionName(
+      "gdjs.evtTools.variable.getVariableChildCount");
+  GetAllConditions()["VariableChildExists2"].SetFunctionName(
+      "gdjs.evtTools.variable.variableChildExists");
+  GetAllActions()["RemoveVariableChild"].SetFunctionName(
+      "gdjs.evtTools.variable.variableRemoveChild");
+  GetAllActions()["ClearVariableChildren"].SetFunctionName(
+      "gdjs.evtTools.variable.variableClearChildren");
+
+  GetAllActions()["PushVariable"].SetFunctionName(
+      "gdjs.evtTools.variable.variablePushCopy");
+  GetAllActions()["PushString"].SetFunctionName(
+      "gdjs.evtTools.variable.valuePush");
+  GetAllActions()["PushNumber"].SetFunctionName(
+      "gdjs.evtTools.variable.valuePush");
+  GetAllActions()["PushBoolean"].SetFunctionName(
+      "gdjs.evtTools.variable.valuePush");
+  GetAllActions()["RemoveVariableAt"].SetFunctionName(
+      "gdjs.evtTools.variable.variableRemoveAt");
+
+  GetAllActions()["SetBooleanVariable"].SetCustomCodeGenerator(
+      [](gd::Instruction& instruction,
+         gd::EventsCodeGenerator& codeGenerator,
+         gd::EventsCodeGenerationContext& context) {
+        gd::String varGetter =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator,
+                context,
+                "variable",
+                instruction.GetParameters()[0].GetPlainString());
+
+        gd::String op = instruction.GetParameters()[1].GetPlainString();
+        if (op == "True")
+          return varGetter + ".setBoolean(true);\n";
+        else if (op == "False")
+          return varGetter + ".setBoolean(false);\n";
+        else if (op == "Toggle")
+          return "gdjs.evtTools.variable.toggleVariableBoolean(" + varGetter + ");\n";
+
+        return gd::String("");
+      });
+
+  GetAllActions()["SetNumberVariable"].SetCustomCodeGenerator(
+      [](gd::Instruction& instruction,
+         gd::EventsCodeGenerator& codeGenerator,
+         gd::EventsCodeGenerationContext& context) {
+        gd::String expressionCode =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator,
+                context,
+                "number",
+                instruction.GetParameters()[2].GetPlainString());
+        gd::String varGetter =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator,
+                context,
+                "variable",
+                instruction.GetParameters()[0].GetPlainString());
+
+        gd::String op = instruction.GetParameters()[1].GetPlainString();
+        if (op == "=")
+          return varGetter + ".setNumber(" + expressionCode + ");\n";
+        else if (op == "+")
+          return varGetter + ".add(" + expressionCode + ");\n";
+        else if (op == "-")
+          return varGetter + ".sub(" + expressionCode + ");\n";
+        else if (op == "*")
+          return varGetter + ".mul(" + expressionCode + ");\n";
+        else if (op == "/")
+          return varGetter + ".div(" + expressionCode + ");\n";
+
+        return gd::String("");
+      });
+
+  GetAllActions()["SetStringVariable"].SetCustomCodeGenerator(
+      [](gd::Instruction& instruction,
+         gd::EventsCodeGenerator& codeGenerator,
+         gd::EventsCodeGenerationContext& context) {
+        gd::String expressionCode =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator,
+                context,
+                "string",
+                instruction.GetParameters()[2].GetPlainString());
+        gd::String varGetter =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator,
+                context,
+                "variable",
+                instruction.GetParameters()[0].GetPlainString());
+
+        gd::String op = instruction.GetParameters()[1].GetPlainString();
+        if (op == "=")
+          return varGetter + ".setString(" + expressionCode + ");\n";
+        else if (op == "+")
+          return varGetter + ".concatenateString(" + expressionCode + ");\n";
+
+        return gd::String("");
+      });
+
+  // Legacy instructions
 
   GetAllConditions()["VarScene"].SetFunctionName(
       "gdjs.evtTools.variable.getVariableNumber");
@@ -35,8 +164,6 @@ VariablesExtension::VariablesExtension() {
   GetAllConditions()["GlobalVariableAsBoolean"].SetFunctionName(
       "gdjs.evtTools.variable.getVariableBoolean");
 
-  GetAllExpressions()["VariableChildCount"].SetFunctionName(
-      "gdjs.evtTools.variable.getVariableChildCount");
   GetAllExpressions()["GlobalVariableChildCount"].SetFunctionName(
       "gdjs.evtTools.variable.getVariableChildCount");
 

@@ -33,6 +33,7 @@ import ExtensionsSearchDialog from '../../AssetStore/ExtensionStore/ExtensionsSe
 import { sendBehaviorAdded } from '../../Utils/Analytics/EventSender';
 import { useShouldAutofocusInput } from '../../UI/Responsive/ScreenTypeMeasurer';
 import ErrorBoundary from '../../UI/ErrorBoundary';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
 
 const styles = {
   fullHeightSelector: {
@@ -52,6 +53,7 @@ type Props = {|
   scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   instruction: gdInstruction,
   isCondition: boolean,
   resourceManagementProps: ResourceManagementProps,
@@ -91,6 +93,7 @@ const InstructionEditorDialog = ({
   project,
   globalObjectsContainer,
   objectsContainer,
+  projectScopedContainersAccessor,
   onCancel,
   open,
   instruction,
@@ -182,6 +185,9 @@ const InstructionEditorDialog = ({
         behaviorType: type,
         parentEditor: 'instruction-editor-dialog',
       });
+      if (scope.layout) {
+        scope.layout.updateBehaviorsSharedData(project);
+      }
     }
 
     // Re-choose the same object to force recomputation of chosenObjectInstructionsInfoTree
@@ -262,6 +268,7 @@ const InstructionEditorDialog = ({
       scope={scope}
       globalObjectsContainer={globalObjectsContainer}
       objectsContainer={objectsContainer}
+      projectScopedContainersAccessor={projectScopedContainersAccessor}
       objectName={chosenObjectName}
       isCondition={isCondition}
       instruction={instruction}

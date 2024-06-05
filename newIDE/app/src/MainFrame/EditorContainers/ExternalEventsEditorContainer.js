@@ -21,6 +21,7 @@ import {
   registerOnResourceExternallyChangedCallback,
   unregisterOnResourceExternallyChangedCallback,
 } from '../ResourcesWatcher';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
 
 const styles = {
   container: {
@@ -159,6 +160,12 @@ export class ExternalEventsEditorContainer extends React.Component<
       return <div>No external events called {projectItemName} found!</div>;
     }
 
+    const scope = {
+      project,
+      layout,
+      externalEvents,
+    };
+
     return (
       <div style={styles.container}>
         {layout && (
@@ -172,13 +179,12 @@ export class ExternalEventsEditorContainer extends React.Component<
             onBeginCreateEventsFunction={this.onBeginCreateEventsFunction}
             unsavedChanges={this.props.unsavedChanges}
             project={project}
-            scope={{
-              project,
-              layout,
-              externalEvents,
-            }}
+            scope={scope}
             globalObjectsContainer={project}
             objectsContainer={layout}
+            projectScopedContainersAccessor={
+              new ProjectScopedContainersAccessor(scope)
+            }
             events={externalEvents.getEvents()}
             onOpenSettings={this.openExternalPropertiesDialog}
             settingsIcon={editSceneIconReactNode}

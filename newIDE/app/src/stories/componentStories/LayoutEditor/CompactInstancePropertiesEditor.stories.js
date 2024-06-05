@@ -27,6 +27,9 @@ export const InstanceSprite2d = () => (
             i18n={i18n}
             project={testProject.project}
             layout={testProject.testLayout}
+            projectScopedContainersAccessor={
+              testProject.testSceneProjectScopedContainersAccessor
+            }
             instances={[testProject.testSpriteObjectInstance]}
             editInstanceVariables={action('edit instance variables')}
             onGetInstanceSize={() => [100, 101, 102]}
@@ -47,6 +50,9 @@ export const InstanceCube3d = () => (
             i18n={i18n}
             project={testProject.project}
             layout={testProject.testLayout}
+            projectScopedContainersAccessor={
+              testProject.testSceneProjectScopedContainersAccessor
+            }
             instances={[testProject.testLayoutInstance2]}
             editInstanceVariables={action('edit instance variables')}
             onGetInstanceSize={() => [100, 101, 102]}
@@ -67,6 +73,9 @@ export const InstanceTextInput = () => (
             i18n={i18n}
             project={testProject.project}
             layout={testProject.testLayout}
+            projectScopedContainersAccessor={
+              testProject.testSceneProjectScopedContainersAccessor
+            }
             instances={[testProject.testLayoutInstance3]}
             editInstanceVariables={action('edit instance variables')}
             onGetInstanceSize={() => [120, 40, 0]}

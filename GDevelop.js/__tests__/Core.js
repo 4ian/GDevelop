@@ -3658,7 +3658,7 @@ describe('libGD.js', function () {
         true
       );
 
-      gd.WholeProjectRefactorer.objectOrGroupRemovedInLayout(
+      gd.WholeProjectRefactorer.objectRemovedInLayout(
         project,
         layout,
         'Object3',

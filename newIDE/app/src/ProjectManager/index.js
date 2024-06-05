@@ -6,18 +6,17 @@ import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import SearchBar, { type SearchBarInterface } from '../UI/SearchBar';
-import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
+import GlobalVariablesDialog from '../VariablesList/GlobalVariablesDialog';
 import ProjectPropertiesDialog from './ProjectPropertiesDialog';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import ExtensionsSearchDialog from '../AssetStore/ExtensionStore/ExtensionsSearchDialog';
 import ScenePropertiesDialog from '../SceneEditor/ScenePropertiesDialog';
-import SceneVariablesDialog from '../SceneEditor/SceneVariablesDialog';
+import SceneVariablesDialog from '../VariablesList/SceneVariablesDialog';
 import { isExtensionNameTaken } from './EventFunctionExtensionNameVerifier';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import ProjectManagerCommands from './ProjectManagerCommands';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
-import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import InstalledExtensionDetails from './InstalledExtensionDetails';
 import { useShouldAutofocusInput } from '../UI/Responsive/ScreenTypeMeasurer';
@@ -1266,179 +1265,159 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
             </Column>
           </LineStackLayout>
         </Column>
-        <div
-          style={styles.listContainer}
-          onKeyDown={keyboardShortcutsRef.current.onKeyDown}
-          onKeyUp={keyboardShortcutsRef.current.onKeyUp}
-          id="project-manager"
-        >
-          <I18n>
-            {({ i18n }) => (
-              <>
-                <div style={styles.autoSizerContainer}>
-                  <AutoSizer style={styles.autoSizer} disableWidth>
-                    {({ height }) => (
-                      <TreeView
-                        key={listKey}
-                        ref={treeViewRef}
-                        items={getTreeViewData(i18n)}
-                        height={height}
-                        forceAllOpened={!!currentlyRunningInAppTutorial}
-                        searchText={searchText}
-                        getItemName={getTreeViewItemName}
-                        getItemThumbnail={getTreeViewItemThumbnail}
-                        getItemChildren={getTreeViewItemChildren(i18n)}
-                        multiSelect={false}
-                        getItemId={getTreeViewItemId}
-                        getItemHtmlId={getTreeViewItemHtmlId}
-                        getItemDataset={getTreeViewItemDataSet}
-                        onEditItem={editItem}
-                        onCollapseItem={onCollapseItem}
-                        selectedItems={selectedItems}
-                        onSelectItems={items => {
-                          const itemToSelect = items[0];
-                          if (!itemToSelect) return;
-                          if (itemToSelect.isRoot) return;
-                          setSelectedItems(items);
-                        }}
-                        onClickItem={onClickItem}
-                        onRenameItem={renameItem}
-                        buildMenuTemplate={buildMenuTemplate(i18n)}
-                        getItemRightButton={getTreeViewItemRightButton(i18n)}
-                        renderRightComponent={renderTreeViewItemRightComponent(
-                          i18n
-                        )}
-                        onMoveSelectionToItem={(destinationItem, where) =>
-                          moveSelectionTo(i18n, destinationItem, where)
-                        }
-                        canMoveSelectionToItem={canMoveSelectionTo}
-                        reactDndType={extensionItemReactDndType}
-                        initiallyOpenedNodeIds={initiallyOpenedNodeIds}
-                        forceDefaultDraggingPreview
-                        shouldHideMenuIcon={item => !item.content.getRootId()}
-                      />
-                    )}
-                  </AutoSizer>
-                </div>
-                {projectPropertiesDialogOpen && (
-                  <ProjectPropertiesDialog
-                    open
-                    initialTab={projectPropertiesDialogInitialTab}
-                    project={project}
-                    onClose={() => setProjectPropertiesDialogOpen(false)}
-                    onApply={onSaveProjectProperties}
-                    onPropertiesApplied={onProjectPropertiesApplied}
-                    resourceManagementProps={resourceManagementProps}
-                    hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-                    i18n={i18n}
-                  />
-                )}
-                {projectVariablesEditorOpen && (
-                  <VariablesEditorDialog
-                    project={project}
-                    title={<Trans>Global Variables</Trans>}
-                    open
-                    variablesContainer={project.getVariables()}
-                    onCancel={() => setProjectVariablesEditorOpen(false)}
-                    onApply={() => {
-                      if (unsavedChanges)
-                        unsavedChanges.triggerUnsavedChanges();
-                      setProjectVariablesEditorOpen(false);
-                    }}
-                    emptyPlaceholderTitle={
-                      <Trans>Add your first global variable</Trans>
-                    }
-                    emptyPlaceholderDescription={
-                      <Trans>
-                        These variables hold additional information on a
-                        project.
-                      </Trans>
-                    }
-                    helpPagePath={'/all-features/variables/global-variables'}
-                    hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-                    onComputeAllVariableNames={() =>
-                      EventsRootVariablesFinder.findAllGlobalVariables(
-                        project.getCurrentPlatform(),
-                        project
-                      )
-                    }
-                  />
-                )}
-                {openGameDetails && (
-                  <GameDetailsDialog
-                    project={project}
-                    analyticsSource="projectManager"
-                    game={gameMatchingProjectUuid}
-                    onClose={() => setOpenGameDetails(false)}
-                    onGameDeleted={() => {
-                      setOpenGameDetails(false);
-                      fetchGames();
-                    }}
-                    onGameUpdated={fetchGames}
-                    onShareProject={onShareProject}
-                  />
-                )}
-                {!!editedPropertiesLayout && (
-                  <ScenePropertiesDialog
-                    open
-                    layout={editedPropertiesLayout}
-                    project={project}
-                    onApply={() => {
-                      if (unsavedChanges)
-                        unsavedChanges.triggerUnsavedChanges();
-                      onOpenLayoutProperties(null);
-                    }}
-                    onClose={() => onOpenLayoutProperties(null)}
-                    onEditVariables={() => {
-                      onOpenLayoutVariables(editedPropertiesLayout);
-                      onOpenLayoutProperties(null);
-                    }}
-                    resourceManagementProps={resourceManagementProps}
-                  />
-                )}
-                {!!editedVariablesLayout && (
-                  <SceneVariablesDialog
-                    open
-                    project={project}
-                    layout={editedVariablesLayout}
-                    onClose={() => onOpenLayoutVariables(null)}
-                    onApply={() => {
-                      if (unsavedChanges)
-                        unsavedChanges.triggerUnsavedChanges();
-                      onOpenLayoutVariables(null);
-                    }}
-                    hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-                  />
-                )}
-                {extensionsSearchDialogOpen && (
-                  <ExtensionsSearchDialog
-                    project={project}
-                    onClose={() => setExtensionsSearchDialogOpen(false)}
-                    onInstallExtension={onInstallExtension}
-                    onCreateNew={() => {
-                      onCreateNewExtension(project, i18n);
-                    }}
-                  />
-                )}
-                {openedExtensionShortHeader && openedExtensionName && (
-                  <InstalledExtensionDetails
-                    project={project}
-                    onClose={() => {
-                      setOpenedExtensionShortHeader(null);
-                      setOpenedExtensionName(null);
-                    }}
-                    onOpenEventsFunctionsExtension={
-                      onOpenEventsFunctionsExtension
-                    }
-                    extensionShortHeader={openedExtensionShortHeader}
-                    extensionName={openedExtensionName}
-                    onInstallExtension={onInstallExtension}
-                  />
-                )}
-              </>
-            )}
-          </I18n>
-        </div>
+        <I18n>
+          {({ i18n }) => (
+            <>
+              <div
+                id="project-manager"
+                style={{
+                  ...styles.listContainer,
+                  ...styles.autoSizerContainer,
+                }}
+                onKeyDown={keyboardShortcutsRef.current.onKeyDown}
+                onKeyUp={keyboardShortcutsRef.current.onKeyUp}
+              >
+                <AutoSizer style={styles.autoSizer} disableWidth>
+                  {({ height }) => (
+                    <TreeView
+                      key={listKey}
+                      ref={treeViewRef}
+                      items={getTreeViewData(i18n)}
+                      height={height}
+                      forceAllOpened={!!currentlyRunningInAppTutorial}
+                      searchText={searchText}
+                      getItemName={getTreeViewItemName}
+                      getItemThumbnail={getTreeViewItemThumbnail}
+                      getItemChildren={getTreeViewItemChildren(i18n)}
+                      multiSelect={false}
+                      getItemId={getTreeViewItemId}
+                      getItemHtmlId={getTreeViewItemHtmlId}
+                      getItemDataset={getTreeViewItemDataSet}
+                      onEditItem={editItem}
+                      onCollapseItem={onCollapseItem}
+                      selectedItems={selectedItems}
+                      onSelectItems={items => {
+                        const itemToSelect = items[0];
+                        if (!itemToSelect) return;
+                        if (itemToSelect.isRoot) return;
+                        setSelectedItems(items);
+                      }}
+                      onClickItem={onClickItem}
+                      onRenameItem={renameItem}
+                      buildMenuTemplate={buildMenuTemplate(i18n)}
+                      getItemRightButton={getTreeViewItemRightButton(i18n)}
+                      renderRightComponent={renderTreeViewItemRightComponent(
+                        i18n
+                      )}
+                      onMoveSelectionToItem={(destinationItem, where) =>
+                        moveSelectionTo(i18n, destinationItem, where)
+                      }
+                      canMoveSelectionToItem={canMoveSelectionTo}
+                      reactDndType={extensionItemReactDndType}
+                      initiallyOpenedNodeIds={initiallyOpenedNodeIds}
+                      forceDefaultDraggingPreview
+                      shouldHideMenuIcon={item => !item.content.getRootId()}
+                    />
+                  )}
+                </AutoSizer>
+              </div>
+              {projectPropertiesDialogOpen && (
+                <ProjectPropertiesDialog
+                  open
+                  initialTab={projectPropertiesDialogInitialTab}
+                  project={project}
+                  onClose={() => setProjectPropertiesDialogOpen(false)}
+                  onApply={onSaveProjectProperties}
+                  onPropertiesApplied={onProjectPropertiesApplied}
+                  resourceManagementProps={resourceManagementProps}
+                  hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+                  i18n={i18n}
+                />
+              )}
+              {projectVariablesEditorOpen && (
+                <GlobalVariablesDialog
+                  project={project}
+                  open
+                  onCancel={() => setProjectVariablesEditorOpen(false)}
+                  onApply={() => {
+                    if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
+                    setProjectVariablesEditorOpen(false);
+                  }}
+                  hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+                />
+              )}
+              {openGameDetails && (
+                <GameDetailsDialog
+                  project={project}
+                  analyticsSource="projectManager"
+                  game={gameMatchingProjectUuid}
+                  onClose={() => setOpenGameDetails(false)}
+                  onGameDeleted={() => {
+                    setOpenGameDetails(false);
+                    fetchGames();
+                  }}
+                  onGameUpdated={fetchGames}
+                  onShareProject={onShareProject}
+                />
+              )}
+              {!!editedPropertiesLayout && (
+                <ScenePropertiesDialog
+                  open
+                  layout={editedPropertiesLayout}
+                  project={project}
+                  onApply={() => {
+                    if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
+                    onOpenLayoutProperties(null);
+                  }}
+                  onClose={() => onOpenLayoutProperties(null)}
+                  onEditVariables={() => {
+                    onOpenLayoutVariables(editedPropertiesLayout);
+                    onOpenLayoutProperties(null);
+                  }}
+                  resourceManagementProps={resourceManagementProps}
+                />
+              )}
+              {!!editedVariablesLayout && (
+                <SceneVariablesDialog
+                  open
+                  project={project}
+                  layout={editedVariablesLayout}
+                  onCancel={() => onOpenLayoutVariables(null)}
+                  onApply={() => {
+                    if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
+                    onOpenLayoutVariables(null);
+                  }}
+                  hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+                />
+              )}
+              {extensionsSearchDialogOpen && (
+                <ExtensionsSearchDialog
+                  project={project}
+                  onClose={() => setExtensionsSearchDialogOpen(false)}
+                  onInstallExtension={onInstallExtension}
+                  onCreateNew={() => {
+                    onCreateNewExtension(project, i18n);
+                  }}
+                />
+              )}
+              {openedExtensionShortHeader && openedExtensionName && (
+                <InstalledExtensionDetails
+                  project={project}
+                  onClose={() => {
+                    setOpenedExtensionShortHeader(null);
+                    setOpenedExtensionName(null);
+                  }}
+                  onOpenEventsFunctionsExtension={
+                    onOpenEventsFunctionsExtension
+                  }
+                  extensionShortHeader={openedExtensionShortHeader}
+                  extensionName={openedExtensionName}
+                  onInstallExtension={onInstallExtension}
+                />
+              )}
+            </>
+          )}
+        </I18n>
       </Background>
     );
   }

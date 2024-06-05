@@ -14,6 +14,7 @@
 #include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/IDE/Events/ExpressionVariableNameFinder.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/ObjectsContainersList.h"
@@ -254,12 +255,12 @@ gd::String EventsCodeGenerator::GenerateMutatorCall(
   }
 
   gd::String operatorStr = arguments[operatorIndex];
-  if (operatorStr.size() > 2)
+  if (operatorStr.size() > 2 && operatorStr[0] == '\"') {
     operatorStr = operatorStr.substr(
         1,
         operatorStr.length() - 1 -
             1);  // Operator contains quote which must be removed.
-
+  }
   auto mutators = instrInfos.codeExtraInformation.optionalMutators;
   auto mutator = mutators.find(operatorStr);
   if (mutator == mutators.end()) {
@@ -278,6 +279,9 @@ gd::String EventsCodeGenerator::GenerateMutatorCall(
       if (!argumentsStr.empty()) argumentsStr += ", ";
       argumentsStr += arguments[i];
     }
+  }
+  if (instrInfos.GetManipulatedType() == "boolean") {
+    return callStartString + "(" + argumentsStr + ")." + mutator->second;
   }
 
   return callStartString + "(" + argumentsStr + ")." + mutator->second + "(" +
@@ -318,17 +322,30 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
     condition.SetParameters(parameters);
   }
 
+  gd::EventsCodeGenerator::CheckBehaviorParameters(condition, instrInfos);
   // Verify that there are no mismatches between object type in parameters.
   for (std::size_t pNb = 0; pNb < instrInfos.parameters.size(); ++pNb) {
     if (ParameterMetadata::IsObject(instrInfos.parameters[pNb].GetType())) {
       gd::String objectInParameter =
           condition.GetParameter(pNb).GetPlainString();
 
-      if (!GetObjectsContainersList().HasObjectOrGroupNamed(objectInParameter)) {
+      const auto &expectedObjectType =
+          instrInfos.parameters[pNb].GetExtraInfo();
+      const auto &actualObjectType =
+          GetObjectsContainersList().GetTypeOfObject(objectInParameter);
+      if (!GetObjectsContainersList().HasObjectOrGroupNamed(
+              objectInParameter)) {
+        gd::ProjectDiagnostic projectDiagnostic(
+            gd::ProjectDiagnostic::ErrorType::UnknownObject, "",
+            objectInParameter, "");
+        diagnosticReport->Add(projectDiagnostic);
         return "/* Unknown object - skipped. */";
-      } else if (!instrInfos.parameters[pNb].GetExtraInfo().empty() &&
-                GetObjectsContainersList().GetTypeOfObject(objectInParameter) !=
-                     instrInfos.parameters[pNb].GetExtraInfo()) {
+      } else if (!expectedObjectType.empty() &&
+                 actualObjectType != expectedObjectType) {
+        gd::ProjectDiagnostic projectDiagnostic(
+            gd::ProjectDiagnostic::ErrorType::MismatchedObjectType, "",
+            actualObjectType, expectedObjectType, objectInParameter);
+        diagnosticReport->Add(projectDiagnostic);
         return "/* Mismatched object type - skipped. */";
       }
     }
@@ -364,15 +381,22 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
       }
     }
   } else if (instrInfos.IsBehaviorInstruction()) {
-    gd::String objectName = condition.GetParameter(0).GetPlainString();
-    gd::String behaviorType = GetObjectsContainersList().GetTypeOfBehavior(condition.GetParameter(1).GetPlainString());
     if (instrInfos.parameters.size() >= 2) {
+      const gd::String &objectName = condition.GetParameter(0).GetPlainString();
+      const gd::String &behaviorName =
+          condition.GetParameter(1).GetPlainString();
+      const gd::String &actualBehaviorType =
+          GetObjectsContainersList().GetTypeOfBehavior(behaviorName);
+
       std::vector<gd::String> realObjects =
-          GetObjectsContainersList().ExpandObjectName(objectName, context.GetCurrentObject());
+          GetObjectsContainersList().ExpandObjectName(
+              objectName, context.GetCurrentObject());
+
+      const BehaviorMetadata &autoInfo =
+          MetadataProvider::GetBehaviorMetadata(platform, actualBehaviorType);
+
       for (std::size_t i = 0; i < realObjects.size(); ++i) {
         // Setup context
-        const BehaviorMetadata& autoInfo =
-            MetadataProvider::GetBehaviorMetadata(platform, behaviorType);
         AddIncludeFiles(autoInfo.includeFiles);
         context.SetCurrentObject(realObjects[i]);
         context.ObjectsListNeeded(realObjects[i]);
@@ -382,7 +406,7 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
             condition.GetParameters(), instrInfos.parameters, context);
         conditionCode += GenerateBehaviorCondition(
             realObjects[i],
-            condition.GetParameter(1).GetPlainString(),
+            behaviorName,
             autoInfo,
             arguments,
             instrInfos,
@@ -457,6 +481,33 @@ gd::String EventsCodeGenerator::GenerateConditionsListCode(
   return outputCode;
 }
 
+void EventsCodeGenerator::CheckBehaviorParameters(
+    const gd::Instruction &instruction,
+    const gd::InstructionMetadata &instrInfos) {
+  gd::ParameterMetadataTools::IterateOverParameters(
+      instruction.GetParameters(), instrInfos.parameters,
+      [this](const gd::ParameterMetadata &parameterMetadata,
+             const gd::Expression &parameterValue,
+             const gd::String &lastObjectName) {
+        if (ParameterMetadata::IsBehavior(parameterMetadata.GetType())) {
+          const gd::String &behaviorName = parameterValue.GetPlainString();
+          const gd::String &actualBehaviorType =
+              GetObjectsContainersList().GetTypeOfBehaviorInObjectOrGroup(
+                  lastObjectName, behaviorName);
+          const gd::String &expectedBehaviorType =
+              parameterMetadata.GetExtraInfo();
+
+          if (!expectedBehaviorType.empty() &&
+              actualBehaviorType != expectedBehaviorType) {
+            gd::ProjectDiagnostic projectDiagnostic(
+                gd::ProjectDiagnostic::ErrorType::MissingBehavior, "",
+                actualBehaviorType, expectedBehaviorType, lastObjectName);
+            diagnosticReport->Add(projectDiagnostic);
+          }
+        }
+      });
+}
+
 /**
  * Generate code for an action.
  */
@@ -494,15 +545,29 @@ gd::String EventsCodeGenerator::GenerateActionCode(
     action.SetParameters(parameters);
   }
 
+  gd::EventsCodeGenerator::CheckBehaviorParameters(action, instrInfos);
   // Verify that there are no mismatches between object type in parameters.
   for (std::size_t pNb = 0; pNb < instrInfos.parameters.size(); ++pNb) {
     if (ParameterMetadata::IsObject(instrInfos.parameters[pNb].GetType())) {
       gd::String objectInParameter = action.GetParameter(pNb).GetPlainString();
-      if (!GetObjectsContainersList().HasObjectOrGroupNamed(objectInParameter)) {
+
+      const auto &expectedObjectType =
+          instrInfos.parameters[pNb].GetExtraInfo();
+      const auto &actualObjectType =
+          GetObjectsContainersList().GetTypeOfObject(objectInParameter);
+      if (!GetObjectsContainersList().HasObjectOrGroupNamed(
+              objectInParameter)) {
+        gd::ProjectDiagnostic projectDiagnostic(
+            gd::ProjectDiagnostic::ErrorType::UnknownObject, "",
+            objectInParameter, "");
+        diagnosticReport->Add(projectDiagnostic);
         return "/* Unknown object - skipped. */";
-      } else if (!instrInfos.parameters[pNb].GetExtraInfo().empty() &&
-                 GetObjectsContainersList().GetTypeOfObject(objectInParameter) !=
-                     instrInfos.parameters[pNb].GetExtraInfo()) {
+      } else if (!expectedObjectType.empty() &&
+                 actualObjectType != expectedObjectType) {
+        gd::ProjectDiagnostic projectDiagnostic(
+            gd::ProjectDiagnostic::ErrorType::MismatchedObjectType, "",
+            actualObjectType, expectedObjectType, objectInParameter);
+        diagnosticReport->Add(projectDiagnostic);
         return "/* Mismatched object type - skipped. */";
       }
     }
@@ -540,17 +605,22 @@ gd::String EventsCodeGenerator::GenerateActionCode(
       }
     }
   } else if (instrInfos.IsBehaviorInstruction()) {
-    gd::String objectName = action.GetParameter(0).GetPlainString();
-    gd::String behaviorType = GetObjectsContainersList().GetTypeOfBehavior(action.GetParameter(1).GetPlainString());
-
     if (instrInfos.parameters.size() >= 2) {
+      const gd::String &objectName = action.GetParameter(0).GetPlainString();
+      const gd::String &behaviorName = action.GetParameter(1).GetPlainString();
+      const gd::String &actualBehaviorType =
+          GetObjectsContainersList().GetTypeOfBehavior(behaviorName);
+
       std::vector<gd::String> realObjects =
-          GetObjectsContainersList().ExpandObjectName(objectName, context.GetCurrentObject());
+          GetObjectsContainersList().ExpandObjectName(
+              objectName, context.GetCurrentObject());
+
+      const BehaviorMetadata &autoInfo =
+          MetadataProvider::GetBehaviorMetadata(platform, actualBehaviorType);
+
+      AddIncludeFiles(autoInfo.includeFiles);
       for (std::size_t i = 0; i < realObjects.size(); ++i) {
         // Setup context
-        const BehaviorMetadata& autoInfo =
-            MetadataProvider::GetBehaviorMetadata(platform, behaviorType);
-        AddIncludeFiles(autoInfo.includeFiles);
         context.SetCurrentObject(realObjects[i]);
         context.ObjectsListNeeded(realObjects[i]);
 
@@ -559,7 +629,7 @@ gd::String EventsCodeGenerator::GenerateActionCode(
             action.GetParameters(), instrInfos.parameters, context);
         actionCode +=
             GenerateBehaviorAction(realObjects[i],
-                                   action.GetParameter(1).GetPlainString(),
+                                   behaviorName,
                                    autoInfo,
                                    functionCallName,
                                    arguments,
@@ -581,6 +651,29 @@ gd::String EventsCodeGenerator::GenerateActionCode(
   }
 
   return actionCode;
+}
+
+gd::String EventsCodeGenerator::GenerateLocalVariablesStackAccessor() {
+  return (HasProjectAndLayout() ? GetCodeNamespace()
+                                : "eventsFunctionContext") +
+         ".localVariables";
+}
+
+gd::String EventsCodeGenerator::GenerateAnyOrSceneVariableGetter(
+    const gd::Expression &variableExpression,
+    EventsCodeGenerationContext &context) {
+  const auto variableName = gd::ExpressionVariableNameFinder::GetVariableName(
+      *variableExpression.GetRootNode());
+
+  gd::String variableParameterType =
+      GetProjectScopedContainers().GetVariablesContainersList().Has(
+          variableName)
+          ? "variable"
+          : "scenevar";
+
+  return gd::ExpressionCodeGenerator::GenerateExpressionCode(
+      *this, context, variableParameterType,
+      variableExpression.GetPlainString(), "", "AllowUndeclaredVariable");
 }
 
 const EventsCodeGenerator::CallbackDescriptor
@@ -607,14 +700,20 @@ EventsCodeGenerator::GenerateCallback(
     actionsCode += "} //End of subevents\n";
   }
 
+  gd::String restoreLocalVariablesCode;
+  restoreLocalVariablesCode +=
+      "asyncObjectsList.restoreLocalVariablesContainers(" +
+      GenerateLocalVariablesStackAccessor() + ");\n";
+
   // Compose the callback function and add outside main
   const gd::String actionsDeclarationsCode =
       GenerateObjectsDeclarationCode(callbackContext);
 
-  const gd::String callbackCode = callbackFunctionName + " = function (" +
-                                  GenerateEventsParameters(callbackContext) +
-                                  ") {\n" + actionsDeclarationsCode +
-                                  actionsCode + "}\n";
+  const gd::String callbackCode =
+      callbackFunctionName + " = function (" +
+      GenerateEventsParameters(callbackContext) + ") {\n" +
+      restoreLocalVariablesCode +
+      actionsDeclarationsCode + actionsCode + "}\n";
 
   AddCustomCodeOutsideMain(callbackCode);
 
@@ -677,13 +776,13 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
 
   if (ParameterMetadata::IsExpression("number", metadata.GetType())) {
     argOutput = gd::ExpressionCodeGenerator::GenerateExpressionCode(
-        *this, context, "number", parameter, lastObjectName);
+        *this, context, "number", parameter, lastObjectName, metadata.GetExtraInfo());
   } else if (ParameterMetadata::IsExpression("string", metadata.GetType())) {
     argOutput = gd::ExpressionCodeGenerator::GenerateExpressionCode(
-        *this, context, "string", parameter, lastObjectName);
+        *this, context, "string", parameter, lastObjectName, metadata.GetExtraInfo());
   } else if (ParameterMetadata::IsExpression("variable", metadata.GetType())) {
     argOutput = gd::ExpressionCodeGenerator::GenerateExpressionCode(
-        *this, context, metadata.GetType(), parameter, lastObjectName);
+        *this, context, metadata.GetType(), parameter, lastObjectName, metadata.GetExtraInfo());
   } else if (ParameterMetadata::IsObject(metadata.GetType())) {
     // It would be possible to run a gd::ExpressionCodeGenerator if later
     // objects can have nested objects, or function returning objects.
@@ -695,7 +794,8 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
   } else if (metadata.GetType() == "operator") {
     argOutput += parameter.GetPlainString();
     if (argOutput != "=" && argOutput != "+" && argOutput != "-" &&
-        argOutput != "/" && argOutput != "*") {
+        argOutput != "/" && argOutput != "*" && argOutput != "True" &&
+        argOutput != "False" && argOutput != "Toggle") {
       cout << "Warning: Bad operator: Set to = by default." << endl;
       argOutput = "=";
     }
@@ -865,6 +965,11 @@ gd::String EventsCodeGenerator::GenerateEventsListCode(
     gd::EventsList& events, EventsCodeGenerationContext& parentContext) {
   gd::String output;
   for (std::size_t eId = 0; eId < events.size(); ++eId) {
+    auto& event = events[eId];
+    if (event.HasVariables()) {
+      GetProjectScopedContainers().GetVariablesContainersList().Push(event.GetVariables());
+    }
+
     // Each event has its own context : Objects picked in an event are totally
     // different than the one picked in another.
     gd::EventsCodeGenerationContext newContext;
@@ -885,13 +990,17 @@ gd::String EventsCodeGenerator::GenerateEventsListCode(
 
     auto& context = reuseParentContext ? reusedContext : newContext;
 
-    gd::String eventCoreCode = events[eId].GenerateEventCode(*this, context);
+    gd::String eventCoreCode = event.GenerateEventCode(*this, context);
     gd::String scopeBegin = GenerateScopeBegin(context);
     gd::String scopeEnd = GenerateScopeEnd(context);
     gd::String declarationsCode = GenerateObjectsDeclarationCode(context);
 
     output += "\n" + scopeBegin + "\n" + declarationsCode + "\n" +
               eventCoreCode + "\n" + scopeEnd + "\n";
+    
+    if (event.HasVariables()) {
+      GetProjectScopedContainers().GetVariablesContainersList().Pop();
+    }
   }
 
   return output;
@@ -1067,7 +1176,8 @@ gd::String EventsCodeGenerator::GenerateFreeAction(
   // Generate call
   gd::String call;
   if (instrInfos.codeExtraInformation.type == "number" ||
-      instrInfos.codeExtraInformation.type == "string") {
+      instrInfos.codeExtraInformation.type == "string" || 
+      instrInfos.codeExtraInformation.type == "boolean") {
     if (instrInfos.codeExtraInformation.accessType ==
         gd::InstructionMetadata::ExtraInformation::MutatorAndOrAccessor)
       call = GenerateOperatorCall(
@@ -1251,7 +1361,8 @@ EventsCodeGenerator::EventsCodeGenerator(const gd::Project& project_,
       compilationForRuntime(false),
       maxCustomConditionsDepth(0),
       maxConditionsListsSize(0),
-      eventsListNextUniqueId(0){};
+      eventsListNextUniqueId(0),
+      diagnosticReport(nullptr){};
 
 EventsCodeGenerator::EventsCodeGenerator(
     const gd::Platform& platform_,
@@ -1265,6 +1376,7 @@ EventsCodeGenerator::EventsCodeGenerator(
       compilationForRuntime(false),
       maxCustomConditionsDepth(0),
       maxConditionsListsSize(0),
-      eventsListNextUniqueId(0){};
+      eventsListNextUniqueId(0),
+      diagnosticReport(nullptr){};
 
 }  // namespace gd

@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import axios from 'axios';
 import Discord from '../../UI/CustomSvgIcons/Discord';
 import Facebook from '../../UI/CustomSvgIcons/Facebook';
@@ -11,6 +11,7 @@ import Snapchat from '../../UI/CustomSvgIcons/Snapchat';
 import TikTok from '../../UI/CustomSvgIcons/TikTok';
 import Twitter from '../../UI/CustomSvgIcons/Twitter';
 import YouTube from '../../UI/CustomSvgIcons/YouTube';
+import GitHub from '../../UI/CustomSvgIcons/GitHub';
 import { GDevelopUserApi } from './ApiConfigs';
 import { type MessageByLocale } from '../i18n/MessageByLocale';
 
@@ -374,6 +375,23 @@ export const getUserCommentQualityRatingsLeaderboards = async (): Promise<
   return response.data;
 };
 
+export const registerUserInterest = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  data: {|
+    firstName: string,
+    lastName: string,
+    email: string,
+    interestKind: 'education',
+  |}
+): Promise<void> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  await client.post(`/action/register-user-interest`, data, {
+    headers: { Authorization: authorizationHeader },
+    params: { userId },
+  });
+};
+
 const simpleUrlRegex = /^https:\/\/[^ ]+$/;
 const profileLinkFormattingErrorMessage = (
   <Trans>Please enter a valid URL, starting with https://</Trans>
@@ -399,10 +417,6 @@ export const discordUsernameConfig = {
   maxLength: 32,
 };
 
-export const githubUsernameConfig = {
-  maxLength: 39,
-};
-
 export const communityLinksConfig = {
   personalWebsiteLink: {
     icon: <Planet />,
@@ -420,10 +434,68 @@ export const communityLinksConfig = {
         : undefined,
     maxLength: 150,
   },
+  githubUsername: {
+    icon: <GitHub style={{ width: 24, height: 24 }} />,
+    prefix: 'https://github.com/',
+    maxLength: 39,
+    getMessageFromUpdate: (responseCode: string) => {
+      if (
+        responseCode === 'github-star/badge-given' ||
+        responseCode === 'github-star/badge-already-given'
+      ) {
+        return {
+          title: t`You're awesome!`,
+          message: t`Thanks for starring GDevelop repository. We added credits to your account as a thank you gift.`,
+        };
+      } else if (responseCode === 'github-star/repository-not-starred') {
+        return {
+          title: t`We could not find your GitHub star`,
+          message: t`Make sure you star the repository called 4ian/GDevelop with your GitHub user and try again.`,
+        };
+      } else if (responseCode === 'github-star/user-not-found') {
+        return {
+          title: t`We could not find your GitHub user and star`,
+          message: t`Make sure you create your GitHub account, star the repository called 4ian/GDevelop, enter your username here and try again.`,
+        };
+      }
+      return null;
+    },
+    getRewardMessage: (hasBadge: boolean, rewardValueInCredits: string) =>
+      !hasBadge
+        ? t`[Star the GDevelop repository](https://github.com/4ian/GDevelop) and add your GitHub username here to get ${rewardValueInCredits} free credits as a thank you!`
+        : t`Thank you for supporting the GDevelop open-source community. Credits were added to your account as a thank you.`,
+  },
   twitterUsername: {
     icon: <Twitter />,
     prefix: 'https://twitter.com/',
     maxLength: 15,
+    getMessageFromUpdate: (responseCode: string) => {
+      if (
+        responseCode === 'twitter-follow/badge-given' ||
+        responseCode === 'twitter-follow/badge-already-given'
+      ) {
+        return {
+          title: t`You're awesome!`,
+          message: t`Thanks for following GDevelop. We added credits to your account as a thank you gift.`,
+        };
+      } else if (responseCode === 'twitter-follow/account-not-followed') {
+        return {
+          title: t`We could not check your follow`,
+          message: t`Make sure you follow the GDevelop account and try again.`,
+        };
+      } else if (responseCode === 'twitter-follow/user-not-found') {
+        return {
+          title: t`We could not find your user`,
+          message: t`Make sure your username is correct, follow the GDevelop account and try again.`,
+        };
+      }
+
+      return null;
+    },
+    getRewardMessage: (hasBadge: boolean, rewardValueInCredits: string) =>
+      !hasBadge
+        ? t`[Follow GDevelop](https://twitter.com/GDevelopApp) and enter your Twitter username here to get ${rewardValueInCredits} free credits as a thank you!`
+        : t`Thank you for supporting GDevelop. Credits were added to your account as a thank you.`,
   },
   facebookUsername: {
     icon: <Facebook />,
@@ -443,6 +515,33 @@ export const communityLinksConfig = {
         ? tiktokUsernameFormattingErrorMessage
         : undefined,
     maxLength: 30,
+    getMessageFromUpdate: (responseCode: string) => {
+      if (
+        responseCode === 'tiktok-follow/badge-given' ||
+        responseCode === 'tiktok-follow/badge-already-given'
+      ) {
+        return {
+          title: t`You're awesome!`,
+          message: t`Thanks for following GDevelop. We added credits to your account as a thank you gift.`,
+        };
+      } else if (responseCode === 'tiktok-follow/account-not-followed') {
+        return {
+          title: t`We could not check your follow`,
+          message: t`Make sure you follow the GDevelop account and try again.`,
+        };
+      } else if (responseCode === 'tiktok-follow/user-not-found') {
+        return {
+          title: t`We could not find your user`,
+          message: t`Make sure your username is correct, follow the GDevelop account and try again.`,
+        };
+      }
+
+      return null;
+    },
+    getRewardMessage: (hasBadge: boolean, rewardValueInCredits: string) =>
+      !hasBadge
+        ? t`[Follow GDevelop](https://tiktok.com/@gdevelop) and enter your TikTok username here to get ${rewardValueInCredits} free credits as a thank you!`
+        : t`Thank you for supporting GDevelop. Credits were added to your account as a thank you.`,
   },
   instagramUsername: {
     icon: <Instagram />,

@@ -3,8 +3,8 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDCORE_ARBITRARYEVENTSWORKER_H
-#define GDCORE_ARBITRARYEVENTSWORKER_H
+#pragma once
+
 #include <map>
 #include <memory>
 #include <vector>
@@ -12,6 +12,7 @@
 #include "GDCore/Events/EventVisitor.h"
 #include "GDCore/Project/ProjectScopedContainers.h"
 #include "GDCore/String.h"
+
 namespace gd {
 class Instruction;
 class BaseEvent;
@@ -25,27 +26,24 @@ class ParameterMetadata;
 namespace gd {
 
 /**
- * \brief ArbitraryEventsWorker is an abstract class used to browse events (and
- * instructions) and do some work on them. Can be used to implement refactoring
- * for example.
+ * \brief AbstractArbitraryEventsWorker is a base abstract class used to browse events (and
+ * instructions) and do some work on them. It must not be inherited directly.
  *
+ * \see gd::ArbitraryEventsWorker
  * \see gd::ArbitraryEventsWorkerWithContext
  *
  * \ingroup IDE
  */
-class GD_CORE_API ArbitraryEventsWorker : private EventVisitor {
+class GD_CORE_API AbstractArbitraryEventsWorker : private EventVisitor {
  public:
-  ArbitraryEventsWorker(){};
-  virtual ~ArbitraryEventsWorker();
+  AbstractArbitraryEventsWorker(){};
+  virtual ~AbstractArbitraryEventsWorker();
 
-  /**
-   * \brief Launch the worker on the specified events list.
-   */
-  void Launch(gd::EventsList& events) { VisitEventList(events); };
+protected:
+  virtual bool VisitEvent(gd::BaseEvent& event) override;
+  void VisitEventList(gd::EventsList& events);
 
  private:
-  void VisitEventList(gd::EventsList& events);
-  bool VisitEvent(gd::BaseEvent& event) override;
   bool VisitLinkEvent(gd::LinkEvent& linkEvent) override;
   void VisitInstructionList(gd::InstructionsList& instructions,
                             bool areConditions);
@@ -102,6 +100,31 @@ class GD_CORE_API ArbitraryEventsWorker : private EventVisitor {
 };
 
 /**
+ * \brief ArbitraryEventsWorker is an abstract class used to browse events (and
+ * instructions) and do some work on them. Can be used to implement refactoring
+ * for example.
+ *
+ * \see gd::ArbitraryEventsWorkerWithContext
+ *
+ * \ingroup IDE
+ */
+class GD_CORE_API ArbitraryEventsWorker : public AbstractArbitraryEventsWorker {
+public:
+  ArbitraryEventsWorker(){};
+  virtual ~ArbitraryEventsWorker();
+
+  /**
+   * \brief Launch the worker on the specified events list.
+   */
+  void Launch(gd::EventsList &events) {
+    AbstractArbitraryEventsWorker::VisitEventList(events);
+  };
+
+private:
+  bool VisitEvent(gd::BaseEvent &event) override;
+};
+
+/**
  * \brief An events worker that will know about the context (the objects
  * container). Useful for workers working on expressions notably.
  *
@@ -110,10 +133,10 @@ class GD_CORE_API ArbitraryEventsWorker : private EventVisitor {
  * \ingroup IDE
  */
 class GD_CORE_API ArbitraryEventsWorkerWithContext
-    : public ArbitraryEventsWorker {
+    : public AbstractArbitraryEventsWorker {
  public:
   ArbitraryEventsWorkerWithContext()
-      : projectScopedContainers(nullptr){};
+      : currentProjectScopedContainers(nullptr){};
   virtual ~ArbitraryEventsWorkerWithContext();
 
   /**
@@ -121,53 +144,50 @@ class GD_CORE_API ArbitraryEventsWorkerWithContext
    * giving the objects container on which the events are applying to.
    */
   void Launch(gd::EventsList& events,
-              const gd::ProjectScopedContainers& projectScopedContainers_) {
-    projectScopedContainers = &projectScopedContainers_;
-    ArbitraryEventsWorker::Launch(events);
+              const gd::ProjectScopedContainers& projectScopedContainers) {
+    currentProjectScopedContainers = &projectScopedContainers;
+    AbstractArbitraryEventsWorker::VisitEventList(events);
   };
 
-  void Launch(gd::EventsList& events) = delete;
-
- protected:
+protected:
   const gd::ProjectScopedContainers& GetProjectScopedContainers() {
     // Pointers are guaranteed to be not nullptr after
     // Launch was called.
-    return *projectScopedContainers;
+    return *currentProjectScopedContainers;
   };
   const gd::ObjectsContainersList& GetObjectsContainersList() {
     // Pointers are guaranteed to be not nullptr after
     // Launch was called.
-    return projectScopedContainers->GetObjectsContainersList();
+    return currentProjectScopedContainers->GetObjectsContainersList();
   };
 
  private:
-  const gd::ProjectScopedContainers* projectScopedContainers;
+  bool VisitEvent(gd::BaseEvent& event) override;
+
+  const gd::ProjectScopedContainers* currentProjectScopedContainers;
 };
 
 /**
  * \brief ReadOnlyArbitraryEventsWorker is an abstract class used to browse events (and
- * instructions). It can be used to implement autocompletion for example.
+ * instructions). It must not be inherited directly.
  *
+ * \see gd::ReadOnlyArbitraryEventsWorker
  * \see gd::ReadOnlyArbitraryEventsWorkerWithContext
  *
  * \ingroup IDE
  */
-class GD_CORE_API ReadOnlyArbitraryEventsWorker : private ReadOnlyEventVisitor {
+class GD_CORE_API AbstractReadOnlyArbitraryEventsWorker : private ReadOnlyEventVisitor {
  public:
-  ReadOnlyArbitraryEventsWorker() : shouldStopIteration(false) {};
-  virtual ~ReadOnlyArbitraryEventsWorker();
-
-  /**
-   * \brief Launch the worker on the specified events list.
-   */
-  void Launch(const gd::EventsList& events) { VisitEventList(events); };
+  AbstractReadOnlyArbitraryEventsWorker() : shouldStopIteration(false) {};
+  virtual ~AbstractReadOnlyArbitraryEventsWorker();
 
 protected:
   void StopAnyEventIteration() override;
+  virtual void VisitEvent(const gd::BaseEvent& event) override;
+
+  void VisitEventList(const gd::EventsList& events);
 
  private:
-  void VisitEventList(const gd::EventsList& events);
-  void VisitEvent(const gd::BaseEvent& event) override;
   void VisitLinkEvent(const gd::LinkEvent& linkEvent) override;
   void VisitInstructionList(const gd::InstructionsList& instructions,
                             bool areConditions);
@@ -214,6 +234,31 @@ protected:
 };
 
 /**
+ * \brief ReadOnlyArbitraryEventsWorker is an abstract class used to browse events (and
+ * instructions). It can be used to implement autocompletion for example.
+ *
+ * \see gd::ReadOnlyArbitraryEventsWorkerWithContext
+ *
+ * \ingroup IDE
+ */
+class GD_CORE_API ReadOnlyArbitraryEventsWorker
+    : public AbstractReadOnlyArbitraryEventsWorker {
+public:
+  ReadOnlyArbitraryEventsWorker(){};
+  virtual ~ReadOnlyArbitraryEventsWorker();
+
+  /**
+   * \brief Launch the worker on the specified events list.
+   */
+  void Launch(const gd::EventsList &events) {
+    AbstractReadOnlyArbitraryEventsWorker::VisitEventList(events);
+  };
+
+private:
+  void VisitEvent(const gd::BaseEvent &event) override;
+};
+
+/**
  * \brief An events worker that will know about the context (the objects
  * container). Useful for workers working on expressions notably.
  *
@@ -222,10 +267,10 @@ protected:
  * \ingroup IDE
  */
 class GD_CORE_API ReadOnlyArbitraryEventsWorkerWithContext
-    : public ReadOnlyArbitraryEventsWorker {
+    : public AbstractReadOnlyArbitraryEventsWorker {
  public:
   ReadOnlyArbitraryEventsWorkerWithContext()
-      : projectScopedContainers(nullptr){};
+      : currentProjectScopedContainers(nullptr){};
   virtual ~ReadOnlyArbitraryEventsWorkerWithContext();
 
   /**
@@ -233,24 +278,22 @@ class GD_CORE_API ReadOnlyArbitraryEventsWorkerWithContext
    * giving the objects container on which the events are applying to.
    */
   void Launch(const gd::EventsList& events,
-              const gd::ProjectScopedContainers& projectScopedContainers_) {
-    projectScopedContainers = &projectScopedContainers_;
-    ReadOnlyArbitraryEventsWorker::Launch(events);
+              const gd::ProjectScopedContainers& projectScopedContainers) {
+    currentProjectScopedContainers = &projectScopedContainers;
+    AbstractReadOnlyArbitraryEventsWorker::VisitEventList(events);
   };
 
-  void Launch(gd::EventsList& events) = delete;
-
- protected:
+protected:
   const gd::ProjectScopedContainers& GetProjectScopedContainers() {
     // Pointers are guaranteed to be not nullptr after
     // Launch was called.
-    return *projectScopedContainers;
+    return *currentProjectScopedContainers;
   };
 
  private:
-  const gd::ProjectScopedContainers* projectScopedContainers;
+  void VisitEvent(const gd::BaseEvent& event) override;
+
+  const gd::ProjectScopedContainers* currentProjectScopedContainers;
 };
 
 }  // namespace gd
-
-#endif  // GDCORE_ARBITRARYEVENTSWORKER_H

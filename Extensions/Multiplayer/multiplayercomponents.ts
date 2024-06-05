@@ -420,6 +420,20 @@ namespace gdjs {
     };
 
     /**
+     * Create, display, and hide a notification when a player leaves the game.
+     */
+    export const displayConnectionErrorNotification = function (
+      runtimeScene: gdjs.RuntimeScene
+    ) {
+      showNotification(
+        runtimeScene,
+        'connection-error-notification',
+        'Could not connect to other players.',
+        'error'
+      );
+    };
+
+    /**
      * Helper to show a notification to the user, that disappears automatically.
      */
     export const showNotification = function (

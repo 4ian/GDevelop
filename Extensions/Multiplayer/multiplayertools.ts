@@ -647,6 +647,23 @@ namespace gdjs {
      * lobbies window, focus on the game, and set the flag to true.
      */
     const handleGameStartedEvent = function (runtimeScene: gdjs.RuntimeScene) {
+      // It is possible the connection to other players didn't work.
+      // If that's the case, show an error message and leave the lobby.
+      const allConnectedPeers = gdjs.evtTools.p2p.getAllPeers();
+      if (allConnectedPeers.length === 0) {
+        multiplayerComponents.displayConnectionErrorNotification(runtimeScene);
+        // If we are player number 1, end the game to release the lobby.
+        if (isPlayerHost()) {
+          endLobbyGame();
+        }
+        // Do as if the player left the lobby.
+        handleLobbyLeaveEvent();
+        removeLobbiesContainer(runtimeScene);
+        focusOnGame(runtimeScene);
+        return;
+      }
+
+      // If we are connected to players, then the game can start.
       _hasGameJustStarted = true;
       _isGameRunning = true;
       _lobbyOnGameStart = _lobby;

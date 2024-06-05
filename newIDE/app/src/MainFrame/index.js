@@ -418,6 +418,11 @@ const MainFrame = (props: Props) => {
   );
   const unsavedChanges = React.useContext(UnsavedChangesContext);
   const {
+    hasUnsavedChanges,
+    sealUnsavedChanges,
+    triggerUnsavedChanges,
+  } = unsavedChanges;
+  const {
     currentlyRunningInAppTutorial,
     getInAppTutorialShortHeader,
     endTutorial: doEndTutorial,
@@ -864,8 +869,8 @@ const MainFrame = (props: Props) => {
       );
       await eventsFunctionsExtensionsState.ensureLoadFinished();
       currentProject.delete();
-      if (unsavedChanges.hasUnsavedChanges) {
-        unsavedChanges.sealUnsavedChanges();
+      if (hasUnsavedChanges) {
+        sealUnsavedChanges();
       }
       console.info('Project closed.');
     },
@@ -874,7 +879,8 @@ const MainFrame = (props: Props) => {
       eventsFunctionsExtensionsState,
       setHasProjectOpened,
       setState,
-      unsavedChanges,
+      hasUnsavedChanges,
+      sealUnsavedChanges,
     ]
   );
 
@@ -1112,7 +1118,7 @@ const MainFrame = (props: Props) => {
           );
           return state;
         } finally {
-          unsavedChanges.sealUnsavedChanges();
+          sealUnsavedChanges();
           serializedProject.delete();
         }
       } catch (error) {
@@ -1137,7 +1143,7 @@ const MainFrame = (props: Props) => {
       loadFromSerializedProject,
       showConfirmation,
       showAlert,
-      unsavedChanges,
+      sealUnsavedChanges,
     ]
   );
 
@@ -1503,7 +1509,6 @@ const MainFrame = (props: Props) => {
       if (!currentProject) return;
 
       const storageProviderOperations = getStorageProviderOperations();
-      const hasUnsavedChanges = unsavedChanges.hasUnsavedChanges;
       if (
         hasUnsavedChanges && // Only create an autosave if there are unsaved changes.
         preferences.values.autosaveOnPreview &&
@@ -1532,7 +1537,7 @@ const MainFrame = (props: Props) => {
       currentFileMetadata,
       getStorageProviderOperations,
       preferences.values.autosaveOnPreview,
-      unsavedChanges.hasUnsavedChanges,
+      hasUnsavedChanges,
     ]
   );
 
@@ -1917,7 +1922,7 @@ const MainFrame = (props: Props) => {
   };
 
   const _onProjectItemModified = () => {
-    if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
+    triggerUnsavedChanges();
     forceUpdate();
   };
 
@@ -2133,10 +2138,7 @@ const MainFrame = (props: Props) => {
         openingMessage?: ?MessageDescriptor,
       |}
     ): Promise<void> => {
-      if (
-        unsavedChanges.hasUnsavedChanges &&
-        !(options && options.ignoreUnsavedChanges)
-      ) {
+      if (hasUnsavedChanges && !(options && options.ignoreUnsavedChanges)) {
         const answer = Window.showConfirmDialog(
           i18n._(
             t`Open a new project? Any changes that have not been saved will be lost.`
@@ -2205,7 +2207,8 @@ const MainFrame = (props: Props) => {
       openSceneOrProjectManager,
       props.storageProviders,
       getStorageProviderOperations,
-      unsavedChanges,
+      hasUnsavedChanges,
+
       getStorageProvider,
       setHasProjectOpened,
       openAllScenes,
@@ -2356,7 +2359,7 @@ const MainFrame = (props: Props) => {
 
         if (!wasSaved) return; // Save was cancelled, don't do anything.
 
-        unsavedChanges.sealUnsavedChanges();
+        sealUnsavedChanges();
         _replaceSnackMessage(i18n._(t`Project properly saved`));
         setCloudProjectSaveChoiceOpen(false);
         setCloudProjectRecoveryOpenedVersionId(null);
@@ -2426,7 +2429,7 @@ const MainFrame = (props: Props) => {
       currentProjectRef,
       currentFileMetadata,
       getStorageProviderOperations,
-      unsavedChanges,
+      sealUnsavedChanges,
       setState,
       state.editorTabs,
       _replaceSnackMessage,
@@ -2590,7 +2593,7 @@ const MainFrame = (props: Props) => {
             }));
           }
 
-          unsavedChanges.sealUnsavedChanges();
+          sealUnsavedChanges();
           _replaceSnackMessage(i18n._(t`Project properly saved`));
         }
       } catch (error) {
@@ -2620,7 +2623,7 @@ const MainFrame = (props: Props) => {
       _closeSnackMessage,
       _replaceSnackMessage,
       i18n,
-      unsavedChanges,
+      sealUnsavedChanges,
       saveProjectAs,
       state.editorTabs,
       getStorageProvider,
@@ -2645,7 +2648,7 @@ const MainFrame = (props: Props) => {
     async (): Promise<boolean> => {
       if (!currentProject) return true;
 
-      if (unsavedChanges.hasUnsavedChanges) {
+      if (hasUnsavedChanges) {
         const answer = Window.showConfirmDialog(
           i18n._(
             t`Close the project? Any changes that have not been saved will be lost.`
@@ -2656,7 +2659,7 @@ const MainFrame = (props: Props) => {
       await closeProject();
       return true;
     },
-    [currentProject, unsavedChanges, i18n, closeProject]
+    [currentProject, hasUnsavedChanges, i18n, closeProject]
   );
 
   const _onChangeEditorTab = (value: number) => {
@@ -2753,7 +2756,7 @@ const MainFrame = (props: Props) => {
         { name: newName }
       );
       if (fileMetadataNewAttributes) {
-        unsavedChanges.sealUnsavedChanges();
+        sealUnsavedChanges();
         newFileMetadata = { ...newFileMetadata, ...fileMetadataNewAttributes };
       }
     }
@@ -3142,7 +3145,6 @@ const MainFrame = (props: Props) => {
             }}
             onShareProject={() => openShareDialog()}
             freezeUpdate={!projectManagerOpen}
-            unsavedChanges={unsavedChanges}
             hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
             resourceManagementProps={resourceManagementProps}
           />
@@ -3502,7 +3504,7 @@ const MainFrame = (props: Props) => {
         shouldPrompt={!!state.currentProject}
         i18n={props.i18n}
         language={props.i18n.language}
-        hasUnsavedChanges={unsavedChanges.hasUnsavedChanges}
+        hasUnsavedChanges={hasUnsavedChanges}
       />
       <ChangelogDialogContainer />
       {selectedInAppTutorialInfo && (
@@ -3555,7 +3557,7 @@ const MainFrame = (props: Props) => {
             if (
               shouldWarnAboutUnsavedChanges &&
               currentProject &&
-              (!currentFileMetadata || unsavedChanges.hasUnsavedChanges)
+              (!currentFileMetadata || hasUnsavedChanges)
             ) {
               setQuitInAppTutorialDialogOpen(true);
             } else {
@@ -3570,9 +3572,7 @@ const MainFrame = (props: Props) => {
           onSaveProject={saveProject}
           onClose={() => setQuitInAppTutorialDialogOpen(false)}
           isSavingProject={isSavingProject}
-          canEndTutorial={
-            !!currentFileMetadata && !unsavedChanges.hasUnsavedChanges
-          }
+          canEndTutorial={!!currentFileMetadata && !hasUnsavedChanges}
           endTutorial={() => {
             endTutorial(true);
           }}

@@ -32,16 +32,16 @@ export const UnsavedChangesContextProvider = (props: Props) => {
   const [changesCount, setChangesCount] = React.useState<number>(0);
   const [lastSaveTime, setLastSaveTime] = React.useState<number | null>(null);
 
-  const triggerUnsavedChanges = (): void => {
+  const triggerUnsavedChanges = React.useCallback((): void => {
     setChangesCount(changesCount_ => changesCount_ + 1);
-    if (!hasUnsavedChanges) setHasUnsavedChanges(true);
-  };
+    setHasUnsavedChanges(true);
+  }, []);
 
-  const sealUnsavedChanges = (): void => {
+  const sealUnsavedChanges = React.useCallback((): void => {
     setChangesCount(0);
     setLastSaveTime(Date.now());
-    if (hasUnsavedChanges) setHasUnsavedChanges(false);
-  };
+    setHasUnsavedChanges(false);
+  }, []);
 
   return (
     <UnsavedChangesContext.Provider

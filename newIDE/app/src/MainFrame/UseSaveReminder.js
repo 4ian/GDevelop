@@ -24,14 +24,15 @@ const CHECK_FREQUENCY = 5000;
 export const getUnsavedChangesAmount = (
   unsavedChanges: UnsavedChanges
 ): UnsavedChangesAmount => {
-  const { getChangesCount, getLastSaveTime } = unsavedChanges;
+  const { getChangesCount, getLastCheckpointTime } = unsavedChanges;
   const changesCount = getChangesCount();
-  const lastSaveTime = getLastSaveTime();
-  if (changesCount === 0 || !lastSaveTime) return 'none';
+  const lastCheckpointTime = getLastCheckpointTime();
+
+  if (changesCount === 0 || !lastCheckpointTime) return 'none';
   const now = Date.now();
   if (changesCount > MINIMUM_CHANGES_FOR_RISKY_STATUS) return 'risky';
-  if (now - lastSaveTime > MINIMUM_DURATION_FOR_RISKY_STATUS) return 'risky';
-  else if (now - lastSaveTime < MAXIMUM_DURATION_FOR_SMALL_STATUS)
+  if (now - lastCheckpointTime > MINIMUM_DURATION_FOR_RISKY_STATUS) return 'risky';
+  else if (now - lastCheckpointTime < MAXIMUM_DURATION_FOR_SMALL_STATUS)
     return 'small';
   else {
     // Between MAXIMUM_DURATION_FOR_SMALL_STATUS and MINIMUM_DURATION_FOR_RISKY_STATUS without saving.

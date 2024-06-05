@@ -1115,6 +1115,7 @@ const MainFrame = (props: Props) => {
           );
           return state;
         } finally {
+          sealUnsavedChanges({ setCheckpointTime: true });
           serializedProject.delete();
         }
       } catch (error) {
@@ -1139,6 +1140,7 @@ const MainFrame = (props: Props) => {
       loadFromSerializedProject,
       showConfirmation,
       showAlert,
+      sealUnsavedChanges,
     ]
   );
 
@@ -2354,7 +2356,7 @@ const MainFrame = (props: Props) => {
 
         if (!wasSaved) return; // Save was cancelled, don't do anything.
 
-        sealUnsavedChanges({ setSaveTime: true });
+        sealUnsavedChanges({ setCheckpointTime: true });
         _replaceSnackMessage(i18n._(t`Project properly saved`));
         setCloudProjectSaveChoiceOpen(false);
         setCloudProjectRecoveryOpenedVersionId(null);
@@ -2588,7 +2590,7 @@ const MainFrame = (props: Props) => {
             }));
           }
 
-          sealUnsavedChanges({ setSaveTime: true });
+          sealUnsavedChanges({ setCheckpointTime: true });
           _replaceSnackMessage(i18n._(t`Project properly saved`));
         }
       } catch (error) {
@@ -2754,7 +2756,7 @@ const MainFrame = (props: Props) => {
         { name: newName }
       );
       if (fileMetadataNewAttributes) {
-        sealUnsavedChanges({ setSaveTime: true });
+        sealUnsavedChanges({ setCheckpointTime: true });
         newFileMetadata = { ...newFileMetadata, ...fileMetadataNewAttributes };
       }
     }

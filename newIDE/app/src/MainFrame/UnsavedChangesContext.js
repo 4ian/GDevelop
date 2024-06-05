@@ -3,10 +3,10 @@ import * as React from 'react';
 
 export type UnsavedChanges = {|
   hasUnsavedChanges: boolean,
-  sealUnsavedChanges: (options?: {| setSaveTime: boolean |}) => void,
+  sealUnsavedChanges: (options?: {| setCheckpointTime: boolean |}) => void,
   triggerUnsavedChanges: () => void,
   getChangesCount: () => number,
-  getLastSaveTime: () => number | null,
+  getLastCheckpointTime: () => number | null,
 |};
 
 const initialState: UnsavedChanges = {
@@ -14,7 +14,7 @@ const initialState: UnsavedChanges = {
   sealUnsavedChanges: () => {},
   triggerUnsavedChanges: () => {},
   getChangesCount: () => 0,
-  getLastSaveTime: () => null,
+  getLastCheckpointTime: () => null,
 };
 
 const UnsavedChangesContext = React.createContext<UnsavedChanges>(initialState);
@@ -30,7 +30,7 @@ export const UnsavedChangesContextProvider = (props: Props) => {
     false
   );
   const changesCount = React.useRef<number>(0);
-  const lastSaveTime = React.useRef<number | null>(null);
+  const lastCheckpointTime = React.useRef<number | null>(null);
 
   const triggerUnsavedChanges = React.useCallback((): void => {
     changesCount.current = changesCount.current + 1;
@@ -38,16 +38,20 @@ export const UnsavedChangesContextProvider = (props: Props) => {
   }, []);
 
   const sealUnsavedChanges = React.useCallback(
-    (options?: {| setSaveTime: boolean |}): void => {
+    (options?: {| setCheckpointTime: boolean |}): void => {
       changesCount.current = 0;
-      lastSaveTime.current = options && options.setSaveTime ? Date.now() : null;
+      lastCheckpointTime.current =
+        options && options.setCheckpointTime ? Date.now() : null;
       setHasUnsavedChanges(false);
     },
     []
   );
 
   const getChangesCount = React.useCallback(() => changesCount.current, []);
-  const getLastSaveTime = React.useCallback(() => lastSaveTime.current, []);
+  const getLastCheckpointTime = React.useCallback(
+    () => lastCheckpointTime.current,
+    []
+  );
 
   return (
     <UnsavedChangesContext.Provider
@@ -56,7 +60,7 @@ export const UnsavedChangesContextProvider = (props: Props) => {
         triggerUnsavedChanges,
         sealUnsavedChanges,
         getChangesCount,
-        getLastSaveTime,
+        getLastCheckpointTime,
       }}
     >
       {props.children}

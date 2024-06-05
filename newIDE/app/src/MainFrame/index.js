@@ -869,9 +869,7 @@ const MainFrame = (props: Props) => {
       );
       await eventsFunctionsExtensionsState.ensureLoadFinished();
       currentProject.delete();
-      if (hasUnsavedChanges) {
-        sealUnsavedChanges();
-      }
+      sealUnsavedChanges();
       console.info('Project closed.');
     },
     [
@@ -879,7 +877,6 @@ const MainFrame = (props: Props) => {
       eventsFunctionsExtensionsState,
       setHasProjectOpened,
       setState,
-      hasUnsavedChanges,
       sealUnsavedChanges,
     ]
   );
@@ -1118,7 +1115,6 @@ const MainFrame = (props: Props) => {
           );
           return state;
         } finally {
-          sealUnsavedChanges();
           serializedProject.delete();
         }
       } catch (error) {
@@ -1143,7 +1139,6 @@ const MainFrame = (props: Props) => {
       loadFromSerializedProject,
       showConfirmation,
       showAlert,
-      sealUnsavedChanges,
     ]
   );
 
@@ -2359,7 +2354,7 @@ const MainFrame = (props: Props) => {
 
         if (!wasSaved) return; // Save was cancelled, don't do anything.
 
-        sealUnsavedChanges();
+        sealUnsavedChanges({ setSaveTime: true });
         _replaceSnackMessage(i18n._(t`Project properly saved`));
         setCloudProjectSaveChoiceOpen(false);
         setCloudProjectRecoveryOpenedVersionId(null);
@@ -2593,7 +2588,7 @@ const MainFrame = (props: Props) => {
             }));
           }
 
-          sealUnsavedChanges();
+          sealUnsavedChanges({ setSaveTime: true });
           _replaceSnackMessage(i18n._(t`Project properly saved`));
         }
       } catch (error) {
@@ -2639,7 +2634,10 @@ const MainFrame = (props: Props) => {
     ]
   );
 
-  const { renderSaveReminder } = useSaveReminder({ onSave: saveProject });
+  const { renderSaveReminder } = useSaveReminder({
+    onSave: saveProject,
+    project: currentProject,
+  });
 
   /**
    * Returns true if the project has been closed and false if the user refused to close it.
@@ -2756,7 +2754,7 @@ const MainFrame = (props: Props) => {
         { name: newName }
       );
       if (fileMetadataNewAttributes) {
-        sealUnsavedChanges();
+        sealUnsavedChanges({ setSaveTime: true });
         newFileMetadata = { ...newFileMetadata, ...fileMetadataNewAttributes };
       }
     }

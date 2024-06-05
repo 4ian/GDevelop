@@ -11,7 +11,7 @@ import { useInterval } from '../Utils/UseInterval';
 
 export type UnsavedChangesAmount = 'none' | 'small' | 'significant' | 'risky';
 
-type Props = {| onSave: () => Promise<void> |};
+type Props = {| onSave: () => Promise<void>, project: ?gdProject |};
 
 const ONE_MINUTE = 60 * 1000;
 const MINIMUM_CHANGES_FOR_SIGNIFICANT_STATUS = 12;
@@ -41,7 +41,7 @@ const getUnsavedChangesAmount = (
   }
 };
 
-const useSaveReminder = ({ onSave }: Props) => {
+const useSaveReminder = ({ onSave, project }: Props) => {
   const unsavedChanges = React.useContext(UnsavedChangesContext);
   const { currentlyRunningInAppTutorial } = React.useContext(
     InAppTutorialContext
@@ -57,23 +57,26 @@ const useSaveReminder = ({ onSave }: Props) => {
   const unsavedChangesAmount = getUnsavedChangesAmount(unsavedChanges);
 
   const [temp, setTemp] = React.useState<Object>({});
-  useInterval(() => setTemp({}), CHECK_FREQUENCY);
+  useInterval(() => setTemp({}), project ? CHECK_FREQUENCY : null);
 
   React.useEffect(
     () => {
       if (
         !displaySaveReminderPreference.activated ||
-        currentlyRunningInAppTutorial
+        currentlyRunningInAppTutorial ||
+        !project
       ) {
         setDisplayReminder(false);
         return;
       }
       const now = Date.now();
-      setDisplayReminder(
+      const newDisplayReminder =
         unsavedChangesAmount === 'risky' &&
-          (!lastAcknowledgement ||
-            now - lastAcknowledgement > DURATION_BETWEEN_TWO_DISPLAYS)
-      );
+        (!lastAcknowledgement ||
+          now - lastAcknowledgement > DURATION_BETWEEN_TWO_DISPLAYS);
+      if (newDisplayReminder !== displayReminder) {
+        setDisplayReminder(newDisplayReminder);
+      }
     },
     [
       // Necessary dependencies
@@ -81,6 +84,8 @@ const useSaveReminder = ({ onSave }: Props) => {
       unsavedChangesAmount,
       lastAcknowledgement,
       currentlyRunningInAppTutorial,
+      displayReminder,
+      project,
       // Added dependency to have the possibility to show the reminder regularly.
       temp,
     ]

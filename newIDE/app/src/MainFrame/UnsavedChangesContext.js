@@ -3,7 +3,7 @@ import * as React from 'react';
 
 export type UnsavedChanges = {|
   hasUnsavedChanges: boolean,
-  sealUnsavedChanges: () => void,
+  sealUnsavedChanges: (options?: {| setSaveTime: boolean |}) => void,
   triggerUnsavedChanges: () => void,
   getChangesCount: () => number,
   getLastSaveTime: () => number | null,
@@ -37,21 +37,24 @@ export const UnsavedChangesContextProvider = (props: Props) => {
     setHasUnsavedChanges(true);
   }, []);
 
-  const sealUnsavedChanges = React.useCallback((): void => {
-    changesCount.current = 0;
-    lastSaveTime.current = Date.now();
-    setHasUnsavedChanges(false);
-  }, []);
+  const sealUnsavedChanges = React.useCallback(
+    (options?: {| setSaveTime: boolean |}): void => {
+      changesCount.current = 0;
+      lastSaveTime.current = options && options.setSaveTime ? Date.now() : null;
+      setHasUnsavedChanges(false);
+    },
+    []
+  );
 
-  const getChangesCount = () => changesCount.current;
-  const getLastSaveTime = () => lastSaveTime.current;
+  const getChangesCount = React.useCallback(() => changesCount.current, []);
+  const getLastSaveTime = React.useCallback(() => lastSaveTime.current, []);
 
   return (
     <UnsavedChangesContext.Provider
       value={{
         hasUnsavedChanges,
-        triggerUnsavedChanges: triggerUnsavedChanges,
-        sealUnsavedChanges: sealUnsavedChanges,
+        triggerUnsavedChanges,
+        sealUnsavedChanges,
         getChangesCount,
         getLastSaveTime,
       }}

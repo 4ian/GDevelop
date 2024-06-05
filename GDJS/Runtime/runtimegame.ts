@@ -1164,7 +1164,7 @@ namespace gdjs {
      * Unless you are contributing to GDevelop, avoid using this.
      */
     isUsingGDevelopDevelopmentEnvironment(): boolean {
-      return this._options.environment === 'dev';
+      return true;
     }
 
     /**

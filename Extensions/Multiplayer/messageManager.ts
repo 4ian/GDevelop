@@ -103,7 +103,7 @@ namespace gdjs {
       };
     } = {};
     let _peerIdToPlayerNumber: { [peerId: string]: number } = {};
-    let _playersPings: { [playerNumber: number]: number } = {};
+    let _playersPings: { [playerNumber: number]: number } = { 1: 0 };
     let _playerNumbersWhoJustLeft: number[] = [];
 
     const addExpectedMessageAcknowledgement = ({
@@ -1549,8 +1549,6 @@ namespace gdjs {
             }
 
             // If we are the host, compute the pings.
-            // Ensure player 1 is always considered as having a 0 ping.
-            _playersPings[1] = 0;
             const now = data.now;
             const timeDifference = Math.round(Date.now() - now);
             const playerLastHeartbeatInfo =

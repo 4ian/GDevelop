@@ -457,21 +457,21 @@ namespace gdjs {
       _websocket.onclose = () => {
         logger.info('Disconnected from the lobby.');
 
+        _connectionId = null;
+        playerNumber = null;
+        _lobbyId = null;
+        _lobby = null;
+        _lobbyOnGameStart = null;
+        _websocket = null;
+        if (_heartbeatInterval) {
+          clearInterval(_heartbeatInterval);
+        }
+
         const lobbiesIframe = multiplayerComponents.getLobbiesIframe(
           runtimeScene
         );
 
         if (!lobbiesIframe || !lobbiesIframe.contentWindow) {
-          logger.error(
-            'The lobbies iframe is not opened, cannot send the join message.'
-          );
-          return;
-        }
-
-        if (!lobbiesIframe || !lobbiesIframe.contentWindow) {
-          logger.error(
-            'The lobbies iframe is not opened, cannot send the join message.'
-          );
           return;
         }
 
@@ -482,15 +482,6 @@ namespace gdjs {
           },
           '*' // We could restrict to GDevelop games platform but it's not necessary as the message is not sensitive, and it allows easy debugging.
         );
-        _connectionId = null;
-        playerNumber = null;
-        _lobbyId = null;
-        _lobby = null;
-        _lobbyOnGameStart = null;
-        _websocket = null;
-        if (_heartbeatInterval) {
-          clearInterval(_heartbeatInterval);
-        }
       };
     };
 
@@ -509,13 +500,21 @@ namespace gdjs {
       lobbyId: string;
       playerId: string;
       playerToken: string;
-      validIceServers: string[];
+      validIceServers: {
+        urls: string;
+        username?: string;
+        credential?: string;
+      }[];
     }) {
       // When the connectionId is received, initialise PeerJS so players can connect to each others afterwards.
       if (validIceServers.length) {
         console.info('Using custom servers:', validIceServers);
         for (const server of validIceServers) {
-          gdjs.evtTools.p2p.useCustomICECandidate(server);
+          gdjs.evtTools.p2p.useCustomICECandidate(
+            server.urls,
+            server.username,
+            server.credential
+          );
         }
       }
       gdjs.evtTools.p2p.useDefaultBrokerServer();
@@ -649,13 +648,10 @@ namespace gdjs {
     const handleGameStartedEvent = function (runtimeScene: gdjs.RuntimeScene) {
       // It is possible the connection to other players didn't work.
       // If that's the case, show an error message and leave the lobby.
+      // If we are the host, still start the game, as this allows a player to test the game alone.
       const allConnectedPeers = gdjs.evtTools.p2p.getAllPeers();
-      if (allConnectedPeers.length === 0) {
+      if (!isPlayerHost() && allConnectedPeers.length === 0) {
         multiplayerComponents.displayConnectionErrorNotification(runtimeScene);
-        // If we are player number 1, end the game to release the lobby.
-        if (isPlayerHost()) {
-          endLobbyGame();
-        }
         // Do as if the player left the lobby.
         handleLobbyLeaveEvent();
         removeLobbiesContainer(runtimeScene);

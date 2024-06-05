@@ -318,7 +318,7 @@ describe('Multiplayer', () => {
   });
 
   describe('Single scene tests', () => {
-    it.only('synchronizes scene/global variables from the host to other players', () => {
+    it('synchronizes scene/global variables from the host to other players', () => {
       const {
         switchToPeer,
         markAllPeerEventsAsProcessed,

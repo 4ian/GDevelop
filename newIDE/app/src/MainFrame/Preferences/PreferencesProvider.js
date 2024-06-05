@@ -189,6 +189,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setNewFeaturesAcknowledgements: this._setNewFeaturesAcknowledgements.bind(
       this
     ),
+    setDisplaySaveReminder: this._setDisplaySaveReminder.bind(this),
     getEditorStateForProject: this._getEditorStateForProject.bind(this),
     setEditorStateForProject: this._setEditorStateForProject.bind(this),
   };
@@ -929,6 +930,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           newFeaturesAcknowledgements,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setDisplaySaveReminder(newValue: {| activated: boolean |}) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          displaySaveReminder: newValue,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

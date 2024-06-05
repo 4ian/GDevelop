@@ -73,6 +73,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setNewProjectsDefaultFolder,
     setUseShortcutToClosePreviewWindow,
     setWatchProjectFolderFilesForLocalProjects,
+    setDisplaySaveReminder,
   } = React.useContext(PreferencesContext);
 
   const initialUse3DEditor = React.useRef<boolean>(values.use3DEditor);
@@ -337,6 +338,18 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
             toggled={values.autosaveOnPreview}
             labelPosition="right"
             label={<Trans>Auto-save project on Preview</Trans>}
+          />
+          <Toggle
+            onToggle={(e, check) =>
+              setDisplaySaveReminder({ activated: check })
+            }
+            toggled={values.displaySaveReminder.activated}
+            labelPosition="right"
+            label={
+              <Trans>
+                Display save reminder after significant changes in project
+              </Trans>
+            }
           />
           <Toggle
             onToggle={(e, check) => setAutoOpenMostRecentProject(check)}

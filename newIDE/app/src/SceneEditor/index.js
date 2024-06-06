@@ -1832,6 +1832,18 @@ export default class SceneEditor extends React.Component<Props, State> {
                             this.reloadResourcesFor(
                               editedObjectWithContext.object
                             );
+                            if (editedObjectWithContext.global) {
+                              gd.WholeProjectRefactorer.behaviorsAddedToGlobalObject(
+                                project,
+                                editedObjectWithContext.object.getName()
+                              );
+                            } else {
+                              gd.WholeProjectRefactorer.behaviorsAddedToObjectInLayout(
+                                project,
+                                layout,
+                                editedObjectWithContext.object.getName()
+                              );
+                            }
                           }
                           this.editObject(null);
                           this.updateBehaviorsSharedData();

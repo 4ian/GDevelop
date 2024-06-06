@@ -1829,12 +1829,14 @@ export class WholeProjectRefactorer extends EmscriptenObject {
   static renameObjectEffect(project: Project, layout: Layout, gdObject: gdObject, oldName: string, newName: string): void;
   static objectOrGroupRenamedInLayout(project: Project, layout: Layout, oldName: string, newName: string, isObjectGroup: boolean): void;
   static objectRemovedInLayout(project: Project, layout: Layout, objectName: string): void;
+  static behaviorsAddedToObjectInLayout(project: Project, layout: Layout, objectName: string): void;
   static objectOrGroupRenamedInEventsFunction(project: Project, eventsFunction: EventsFunction, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, oldName: string, newName: string, isObjectGroup: boolean): void;
   static objectRemovedInEventsFunction(project: Project, eventsFunction: EventsFunction, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, objectName: string): void;
   static objectOrGroupRenamedInEventsBasedObject(project: Project, globalObjectsContainer: ObjectsContainer, eventsBasedObject: EventsBasedObject, oldName: string, newName: string, isObjectGroup: boolean): void;
   static objectRemovedInEventsBasedObject(project: Project, eventsBasedObject: EventsBasedObject, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, objectName: string): void;
   static globalObjectOrGroupRenamed(project: Project, oldName: string, newName: string, isObjectGroup: boolean): void;
   static globalObjectRemoved(project: Project, objectName: string): void;
+  static behaviorsAddedToGlobalObject(project: Project, objectName: string): void;
   static getAllObjectTypesUsingEventsBasedBehavior(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior): SetString;
   static ensureBehaviorEventsFunctionsProperParameters(eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior): void;
   static ensureObjectEventsFunctionsProperParameters(eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject): void;

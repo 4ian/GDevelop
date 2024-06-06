@@ -644,6 +644,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_Date Date
 #define STATIC_ObjectOrGroupRenamedInLayout ObjectOrGroupRenamedInLayout
 #define STATIC_ObjectRemovedInLayout ObjectRemovedInLayout
+#define STATIC_BehaviorsAddedToObjectInLayout BehaviorsAddedToObjectInLayout
 #define STATIC_ObjectRemovedInEventsFunction \
   ObjectRemovedInEventsFunction
 #define STATIC_ObjectOrGroupRenamedInEventsFunction \
@@ -654,6 +655,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
   ObjectOrGroupRenamedInEventsBasedObject
 #define STATIC_GlobalObjectOrGroupRenamed GlobalObjectOrGroupRenamed
 #define STATIC_GlobalObjectRemoved GlobalObjectRemoved
+#define STATIC_BehaviorsAddedToGlobalObject BehaviorsAddedToGlobalObject
 #define STATIC_GetAllObjectTypesUsingEventsBasedBehavior \
   GetAllObjectTypesUsingEventsBasedBehavior
 #define STATIC_EnsureBehaviorEventsFunctionsProperParameters \

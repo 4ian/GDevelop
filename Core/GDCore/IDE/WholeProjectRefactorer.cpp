@@ -26,6 +26,7 @@
 #include "GDCore/IDE/Events/InstructionsTypeRenamer.h"
 #include "GDCore/IDE/Events/LinkEventTargetRenamer.h"
 #include "GDCore/IDE/Events/ProjectElementRenamer.h"
+#include "GDCore/IDE/Events/BehaviorParametersFiller.h"
 #include "GDCore/IDE/EventsFunctionTools.h"
 #include "GDCore/IDE/Project/ArbitraryBehaviorSharedDataWorker.h"
 #include "GDCore/IDE/Project/ArbitraryEventBasedBehaviorsWorker.h"
@@ -1537,6 +1538,16 @@ void WholeProjectRefactorer::ObjectRemovedInLayout(
   }
 }
 
+void WholeProjectRefactorer::BehaviorsAddedToObjectInLayout(
+    gd::Project &project, gd::Layout &layout, const gd::String &objectName) {
+  auto projectScopedContainers = gd::ProjectScopedContainers::
+      MakeNewProjectScopedContainersForProjectAndLayout(project, layout);
+  gd::BehaviorParametersFiller behaviorParameterFiller(
+      project.GetCurrentPlatform(), projectScopedContainers);
+  gd::ProjectBrowserHelper::ExposeLayoutEventsAndExternalEvents(
+      project, layout, behaviorParameterFiller);
+}
+
 void WholeProjectRefactorer::ObjectOrGroupRenamedInLayout(
     gd::Project &project, gd::Layout &layout, const gd::String &oldName,
     const gd::String &newName, bool isObjectGroup) {
@@ -1798,6 +1809,17 @@ void WholeProjectRefactorer::GlobalObjectRemoved(
       continue;
 
     ObjectRemovedInLayout(project, layout, objectName);
+  }
+}
+
+void WholeProjectRefactorer::BehaviorsAddedToGlobalObject(
+    gd::Project &project, const gd::String &objectName) {
+  for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
+    gd::Layout &layout = project.GetLayout(i);
+    if (layout.HasObjectNamed(objectName))
+      continue;
+
+    BehaviorsAddedToObjectInLayout(project, layout, objectName);
   }
 }
 

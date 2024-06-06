@@ -396,6 +396,18 @@ class GD_CORE_API WholeProjectRefactorer {
                                            const gd::String& objectName);
 
   /**
+   * \brief Refactor the project after behaviors are added to an object in a
+   * layout.
+   *
+   * This will update the layout, all external events associated with it.
+   * The refactor is actually applied to all objects because it allow to handle
+   * groups.
+   */
+  static void BehaviorsAddedToObjectInLayout(gd::Project &project,
+                                             gd::Layout &layout,
+                                             const gd::String &objectName);
+
+  /**
    * \brief Refactor the project after an object is removed in an events-based
    * object.
    *
@@ -466,6 +478,16 @@ class GD_CORE_API WholeProjectRefactorer {
    */
   static void GlobalObjectRemoved(gd::Project& project,
                                          const gd::String& objectName);
+
+  /**
+   * \brief Refactor the project after behaviors are added a global object.
+   *
+   * This will update all the layouts, all external events associated with them.
+   * The refactor is actually applied to all objects because it allow to handle
+   * groups.
+   */
+  void BehaviorsAddedToGlobalObject(gd::Project &project,
+                                    const gd::String &objectName);
 
   /**
    * \brief Return the set of all the types of the objects that are using the

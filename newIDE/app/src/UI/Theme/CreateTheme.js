@@ -304,6 +304,7 @@ export function getMuiOverrides({
     MuiSnackbarContent: {
       root: {
         boxShadow: 'none',
+        flexWrap: 'none', // To prevent action to be put under the text when it's long.
         backgroundColor: snackbarBackgroundColor,
         border: `1px solid ${snackbarBorderColor}`,
       },

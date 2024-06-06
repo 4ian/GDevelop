@@ -240,7 +240,7 @@ namespace gdjs {
         newSceneName: string,
         clearOthers: boolean
       ) {
-        if (!runtimeScene.getGame().getSceneData(newSceneName)) {
+        if (!runtimeScene.getGame().getSceneAndExtensionsData(newSceneName)) {
           return;
         }
         runtimeScene
@@ -257,7 +257,7 @@ namespace gdjs {
         runtimeScene: gdjs.RuntimeScene,
         newSceneName: string
       ) {
-        if (!runtimeScene.getGame().getSceneData(newSceneName)) {
+        if (!runtimeScene.getGame().getSceneAndExtensionsData(newSceneName)) {
           return;
         }
         runtimeScene

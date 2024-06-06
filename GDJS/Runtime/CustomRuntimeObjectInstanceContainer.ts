@@ -52,7 +52,7 @@ namespace gdjs {
     /**
      * Load the container from the given initial configuration.
      * @param customObjectData An object containing the container data.
-     * @see gdjs.RuntimeGame#getSceneData
+     * @see gdjs.RuntimeGame#getSceneAndExtensionsData
      */
     loadFrom(customObjectData: ObjectData & CustomObjectConfiguration) {
       if (this._isLoaded) {

@@ -147,6 +147,8 @@ namespace gdjs {
     return true;
   };
 
+  type RuntimeObjectCallback = (object: gdjs.RuntimeObject) => void;
+
   /**
    * RuntimeObject represents an object being used on a RuntimeScene.
    *
@@ -164,9 +166,12 @@ namespace gdjs {
     layer: string = '';
     protected _nameId: integer;
     protected _livingOnScene: boolean = true;
+    protected _spatialSearchSleepState: ObjectSleepState;
 
     readonly id: integer;
     private destroyCallbacks = new Set<() => void>();
+    // HitboxChanges happen a lot, an Array is faster to iterate.
+    private hitBoxChangedCallbacks: Array<RuntimeObjectCallback> = [];
     _runtimeScene: gdjs.RuntimeInstanceContainer;
 
     /**
@@ -181,12 +186,16 @@ namespace gdjs {
      * not "thread safe" or "re-entrant algorithm" safe.
      */
     pick: boolean = false;
+    pickingId: integer = 0;
 
     //Hit boxes:
     protected _defaultHitBoxes: gdjs.Polygon[] = [];
     protected hitBoxes: gdjs.Polygon[];
     protected hitBoxesDirty: boolean = true;
+    // TODO use a different AABB for collision mask and rendered image.
     protected aabb: AABB = { min: [0, 0], max: [0, 0] };
+    _rtreeAABB: SearchedItem<RuntimeObject>;
+
     protected _isIncludedInParentCollisionMask = true;
 
     //Variables:
@@ -229,10 +238,11 @@ namespace gdjs {
       instanceContainer: gdjs.RuntimeInstanceContainer,
       objectData: ObjectData & any
     ) {
+      const scene = instanceContainer.getScene();
       this.name = objectData.name || '';
       this.type = objectData.type || '';
       this._nameId = RuntimeObject.getNameIdentifier(this.name);
-      this.id = instanceContainer.getScene().createNewUniqueId();
+      this.id = scene.createNewUniqueId();
       this._runtimeScene = instanceContainer;
       this._defaultHitBoxes.push(gdjs.Polygon.createRectangle(0, 0));
       this.hitBoxes = this._defaultHitBoxes;
@@ -241,8 +251,20 @@ namespace gdjs {
       );
       this._totalForce = new gdjs.Force(0, 0, 0);
       this._behaviorsTable = new Hashtable();
+      this._rtreeAABB = {
+        source: this,
+        minX: 0,
+        minY: 0,
+        maxX: 0,
+        maxY: 0,
+      };
+      this._spatialSearchSleepState = new gdjs.ObjectSleepState(
+        this,
+        () => !this.getVisibilityAABB(),
+        gdjs.ObjectSleepState.State.CanSleepThisFrame
+      );
       for (let i = 0; i < objectData.effects.length; ++i) {
-        this._runtimeScene
+        scene
           .getGame()
           .getEffectsManager()
           .initializeEffect(objectData.effects[i], this._rendererEffects, this);
@@ -439,6 +461,14 @@ namespace gdjs {
       return false;
     }
 
+    getSpatialSearchSleepState(): ObjectSleepState {
+      return this._spatialSearchSleepState;
+    }
+
+    isAlive(): boolean {
+      return this._livingOnScene;
+    }
+
     /**
      * Remove an object from a scene.
      *
@@ -485,6 +515,31 @@ namespace gdjs {
     }
 
     onDestroyed(): void {}
+
+    registerHitboxChangedCallback(callback: RuntimeObjectCallback) {
+      if (this.hitBoxChangedCallbacks.includes(callback)) {
+        return;
+      }
+      this.hitBoxChangedCallbacks.push(callback);
+    }
+
+    /**
+     * Send a signal that the object hitboxes are no longer up to date.
+     *
+     * The signal is propagated to parents so
+     * {@link gdjs.RuntimeObject.hitBoxesDirty} should never be modified
+     * directly.
+     */
+    invalidateHitboxes(): void {
+      // TODO EBO Check that no community extension set hitBoxesDirty to true
+      // directly.
+      this.hitBoxesDirty = true;
+      this._spatialSearchSleepState.wakeUp();
+      this._runtimeScene.onChildrenLocationChanged();
+      for (const callback of this.hitBoxChangedCallbacks) {
+        callback(this);
+      }
+    }
 
     /**
      * Called whenever the scene owning the object is paused.
@@ -568,20 +623,6 @@ namespace gdjs {
       }
       this.x = x;
       this.invalidateHitboxes();
-    }
-
-    /**
-     * Send a signal that the object hitboxes are no longer up to date.
-     *
-     * The signal is propagated to parents so
-     * {@link gdjs.RuntimeObject.hitBoxesDirty} should never be modified
-     * directly.
-     */
-    invalidateHitboxes(): void {
-      // TODO EBO Check that no community extension set hitBoxesDirty to true
-      // directly.
-      this.hitBoxesDirty = true;
-      this._runtimeScene.onChildrenLocationChanged();
     }
 
     /**
@@ -758,6 +799,7 @@ namespace gdjs {
         oldLayer.getRenderer().remove3DRendererObject(rendererObject3D);
         newLayer.getRenderer().add3DRendererObject(rendererObject3D);
       }
+      this._runtimeScene.onObjectChangedOfLayer(this, oldLayer);
     }
 
     /**

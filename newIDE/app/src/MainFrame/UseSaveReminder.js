@@ -99,7 +99,7 @@ const useSaveReminder = ({ onSave, project }: Props) => {
         <InfoBar
           duration={-1}
           visible={displayReminder}
-          message={<Trans>Think about saving your progress!</Trans>}
+          message={<Trans>You have unsaved changes in your project.</Trans>}
           hide={onHideReminder}
           actionLabel={<Trans>Save</Trans>}
           onActionClick={onSaveProject}

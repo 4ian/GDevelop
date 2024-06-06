@@ -85,6 +85,14 @@ const useSaveReminder = ({ onSave, project }: Props) => {
     setDisplayReminder(false);
   }, []);
 
+  const onSaveProject = React.useCallback(
+    () => {
+      setLastAcknowledgement(null);
+      onSave();
+    },
+    [onSave]
+  );
+
   const renderSaveReminder = React.useCallback(
     () => {
       return (
@@ -94,12 +102,12 @@ const useSaveReminder = ({ onSave, project }: Props) => {
           message={<Trans>Think about saving your progress!</Trans>}
           hide={onHideReminder}
           actionLabel={<Trans>Save</Trans>}
-          onActionClick={onSave}
+          onActionClick={onSaveProject}
           closable
         />
       );
     },
-    [displayReminder, onHideReminder, onSave]
+    [displayReminder, onHideReminder, onSaveProject]
   );
   return renderSaveReminder;
 };

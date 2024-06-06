@@ -427,9 +427,21 @@
         }
       }
     },
+    "snackbar": {
+      "border": {
+        "color": {
+          "value": "#C5C5C9"
+        }
+      },
+      "background": {
+        "color": {
+          "value": "#1F1D2A"
+        }
+      }
+    },
     "notification": {
       "badge-color": {
-        "value": "#6BAFFF"
+        "value": "#FF5E3B"
       }
     },
     "text-field": {

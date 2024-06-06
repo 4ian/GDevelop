@@ -7,7 +7,6 @@ import PreferencesContext, {
   type AlertMessageIdentifier,
 } from '../../MainFrame/Preferences/PreferencesContext';
 import { useScreenType } from '../Responsive/ScreenTypeMeasurer';
-import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
 import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
 
 type Props = {|
@@ -27,7 +26,6 @@ const DismissableInfoBar = ({
     InAppTutorialContext
   );
   const preferences = React.useContext(PreferencesContext);
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const screenType = useScreenType();
 
   return !!currentlyRunningInAppTutorial ? null : (
@@ -40,9 +38,7 @@ const DismissableInfoBar = ({
       }
       action={
         <Button
-          color={
-            gdevelopTheme.palette.type === 'light' ? 'secondary' : 'primary'
-          }
+          color="secondary"
           size="small"
           onClick={() => {
             preferences.showAlertMessage(identifier, false);

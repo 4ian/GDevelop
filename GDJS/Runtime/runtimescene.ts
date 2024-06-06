@@ -114,7 +114,7 @@ namespace gdjs {
     /**
      * Load the runtime scene from the given scene.
      * @param sceneData An object containing the scene data.
-     * @see gdjs.RuntimeGame#getSceneData
+     * @see gdjs.RuntimeGame#getSceneAndExtensionsData
      */
     loadFromScene(sceneAndExtensionsData: SceneAndExtensionsData | null) {
       if (!sceneAndExtensionsData) {

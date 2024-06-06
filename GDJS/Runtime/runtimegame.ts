@@ -403,8 +403,10 @@ namespace gdjs {
      * @param sceneName The name of the scene. If not defined, the first scene will be returned.
      * @return The data associated to the scene.
      */
-    getSceneData(sceneName?: string): SceneAndExtensionsData | null {
-      for (let i = 0, len = this._data.layouts.length; i < len; ++i) {
+    getSceneAndExtensionsData(
+      sceneName?: string
+    ): SceneAndExtensionsData | null {
+      for (let i = 0, len = this._sceneAndExtensionsData.length; i < len; ++i) {
         const sceneAndExtensionsData = this._sceneAndExtensionsData[i];
         if (
           sceneName === undefined ||
@@ -798,8 +800,8 @@ namespace gdjs {
       const firstSceneName = this._data.firstLayout;
       return this.hasScene(firstSceneName)
         ? firstSceneName
-        : // @ts-ignore - no risk of null object.
-          this.getSceneData().name;
+        : // There is always at least a scene
+          this.getSceneAndExtensionsData()!.sceneData.name;
     }
 
     /**

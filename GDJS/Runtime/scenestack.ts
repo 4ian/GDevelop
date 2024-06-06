@@ -122,7 +122,9 @@ namespace gdjs {
     ): gdjs.RuntimeScene {
       // Load the new one
       const newScene = new gdjs.RuntimeScene(this._runtimeGame);
-      newScene.loadFromScene(this._runtimeGame.getSceneData(newSceneName));
+      newScene.loadFromScene(
+        this._runtimeGame.getSceneAndExtensionsData(newSceneName)
+      );
       this._wasFirstSceneLoaded = true;
 
       // Optionally create the objects from an external layout.

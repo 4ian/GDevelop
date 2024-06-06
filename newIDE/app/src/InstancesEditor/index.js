@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import debounce from 'lodash/debounce';
 import panable, { type PanMoveEvent } from '../Utils/PixiSimpleGesture/pan';
 import KeyboardShortcuts, { MID_MOUSE_BUTTON } from '../UI/KeyboardShortcuts';
 import InstancesRenderer from './InstancesRenderer';
@@ -1013,6 +1014,12 @@ export default class InstancesEditor extends Component<Props> {
     this.highlightedInstance.setInstance(null);
   };
 
+  // Debounce function to avoid storing history for each pixel move when user
+  // keeps pressing an arrow key.
+  onInstancesMovedDebounced = debounce(this.props.onInstancesMoved, 50, {
+    trailing: true,
+  });
+
   moveSelection = (x: number, y: number) => {
     this.fpsLimiter.notifyInteractionHappened();
     const selectedInstances = this.props.instancesSelection.getSelectedInstances();
@@ -1023,7 +1030,7 @@ export default class InstancesEditor extends Component<Props> {
       instance.setX(instance.getX() + x);
       instance.setY(instance.getY() + y);
     });
-    this.props.onInstancesMoved(unlockedSelectedInstances);
+    this.onInstancesMovedDebounced(unlockedSelectedInstances);
   };
 
   scrollBy(x: number, y: number) {

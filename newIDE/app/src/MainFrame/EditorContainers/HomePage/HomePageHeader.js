@@ -8,7 +8,6 @@ import { Column, Line } from '../../../UI/Grid';
 import { LineStackLayout } from '../../../UI/Layout';
 import UserChip from '../../../UI/User/UserChip';
 import ProjectManagerIcon from '../../../UI/CustomSvgIcons/ProjectManager';
-import FloppyIcon from '../../../UI/CustomSvgIcons/Floppy';
 import Window from '../../../Utils/Window';
 import optionalRequire from '../../../Utils/OptionalRequire';
 import TextButton from '../../../UI/TextButton';
@@ -16,6 +15,7 @@ import IconButton from '../../../UI/IconButton';
 import { isNativeMobileApp } from '../../../Utils/Platform';
 import NotificationChip from '../../../UI/User/NotificationChip';
 import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
+import SaveProjectIcon from '../../SaveProjectIcon';
 const electron = optionalRequire('electron');
 
 type Props = {|
@@ -59,16 +59,11 @@ export const HomePageHeader = ({
                 <ProjectManagerIcon />
               </IconButton>
               {!!hasProject && (
-                <IconButton
-                  size="small"
+                <SaveProjectIcon
                   id="main-toolbar-save-button"
-                  onClick={onSave}
-                  tooltip={t`Save project`}
-                  color="default"
-                  disabled={!canSave}
-                >
-                  <FloppyIcon />
-                </IconButton>
+                  onSave={onSave}
+                  canSave={canSave}
+                />
               )}
             </Line>
           </Column>

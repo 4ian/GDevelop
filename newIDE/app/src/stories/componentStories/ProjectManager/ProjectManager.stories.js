@@ -10,6 +10,7 @@ import GDevelopJsInitializerDecorator, {
 import fakeHotReloadPreviewButtonProps from '../../FakeHotReloadPreviewButtonProps';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
+import { UnsavedChangesContextProvider } from '../../../MainFrame/UnsavedChangesContext';
 
 export default {
   title: 'Project Creation/ProjectManager',
@@ -17,85 +18,89 @@ export default {
   decorators: [paperDecorator, GDevelopJsInitializerDecorator],
 };
 export const Default = () => (
-  <DragAndDropContextProvider>
-    <FixedHeightFlexContainer height={500}>
-      <ProjectManager
-        project={testProject.project}
-        onSaveProjectProperties={async () => true}
-        onChangeProjectName={action('onChangeProjectName')}
-        onOpenExternalEvents={action('onOpenExternalEvents')}
-        onOpenLayout={action('onOpenLayout')}
-        onOpenExternalLayout={action('onOpenExternalLayout')}
-        onOpenEventsFunctionsExtension={action(
-          'onOpenEventsFunctionsExtension'
-        )}
-        onInstallExtension={action('onInstallExtension')}
-        onDeleteLayout={action('onDeleteLayout')}
-        onDeleteExternalLayout={action('onDeleteExternalLayout')}
-        onDeleteEventsFunctionsExtension={action(
-          'onDeleteEventsFunctionsExtension'
-        )}
-        onDeleteExternalEvents={action('onDeleteExternalEvents')}
-        onRenameLayout={action('onRenameLayout')}
-        onRenameExternalLayout={action('onRenameExternalLayout')}
-        onRenameEventsFunctionsExtension={action(
-          'onRenameEventsFunctionsExtension'
-        )}
-        onRenameExternalEvents={action('onRenameExternalEvents')}
-        onOpenResources={action('onOpenResources')}
-        onOpenPlatformSpecificAssets={action('onOpenPlatformSpecificAssets')}
-        eventsFunctionsExtensionsError={null}
-        onReloadEventsFunctionsExtensions={action(
-          'onReloadEventsFunctionsExtensions'
-        )}
-        onShareProject={action('onShareProject')}
-        freezeUpdate={false}
-        hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
-        resourceManagementProps={fakeResourceManagementProps}
-      />
-    </FixedHeightFlexContainer>
-  </DragAndDropContextProvider>
+  <UnsavedChangesContextProvider>
+    <DragAndDropContextProvider>
+      <FixedHeightFlexContainer height={500}>
+        <ProjectManager
+          project={testProject.project}
+          onSaveProjectProperties={async () => true}
+          onChangeProjectName={action('onChangeProjectName')}
+          onOpenExternalEvents={action('onOpenExternalEvents')}
+          onOpenLayout={action('onOpenLayout')}
+          onOpenExternalLayout={action('onOpenExternalLayout')}
+          onOpenEventsFunctionsExtension={action(
+            'onOpenEventsFunctionsExtension'
+          )}
+          onInstallExtension={action('onInstallExtension')}
+          onDeleteLayout={action('onDeleteLayout')}
+          onDeleteExternalLayout={action('onDeleteExternalLayout')}
+          onDeleteEventsFunctionsExtension={action(
+            'onDeleteEventsFunctionsExtension'
+          )}
+          onDeleteExternalEvents={action('onDeleteExternalEvents')}
+          onRenameLayout={action('onRenameLayout')}
+          onRenameExternalLayout={action('onRenameExternalLayout')}
+          onRenameEventsFunctionsExtension={action(
+            'onRenameEventsFunctionsExtension'
+          )}
+          onRenameExternalEvents={action('onRenameExternalEvents')}
+          onOpenResources={action('onOpenResources')}
+          onOpenPlatformSpecificAssets={action('onOpenPlatformSpecificAssets')}
+          eventsFunctionsExtensionsError={null}
+          onReloadEventsFunctionsExtensions={action(
+            'onReloadEventsFunctionsExtensions'
+          )}
+          onShareProject={action('onShareProject')}
+          freezeUpdate={false}
+          hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
+          resourceManagementProps={fakeResourceManagementProps}
+        />
+      </FixedHeightFlexContainer>
+    </DragAndDropContextProvider>
+  </UnsavedChangesContextProvider>
 );
 
 export const ErrorsInFunctions = () => (
-  <DragAndDropContextProvider>
-    <FixedHeightFlexContainer height={500}>
-      <ProjectManager
-        project={testProject.project}
-        onSaveProjectProperties={async () => true}
-        onChangeProjectName={action('onChangeProjectName')}
-        onOpenExternalEvents={action('onOpenExternalEvents')}
-        onOpenLayout={action('onOpenLayout')}
-        onOpenExternalLayout={action('onOpenExternalLayout')}
-        onOpenEventsFunctionsExtension={action(
-          'onOpenEventsFunctionsExtension'
-        )}
-        onInstallExtension={action('onInstallExtension')}
-        onDeleteLayout={action('onDeleteLayout')}
-        onDeleteExternalLayout={action('onDeleteExternalLayout')}
-        onDeleteEventsFunctionsExtension={action(
-          'onDeleteEventsFunctionsExtension'
-        )}
-        onDeleteExternalEvents={action('onDeleteExternalEvents')}
-        onRenameLayout={action('onRenameLayout')}
-        onRenameExternalLayout={action('onRenameExternalLayout')}
-        onRenameEventsFunctionsExtension={action(
-          'onRenameEventsFunctionsExtension'
-        )}
-        onRenameExternalEvents={action('onRenameExternalEvents')}
-        onOpenResources={action('onOpenResources')}
-        onOpenPlatformSpecificAssets={action('onOpenPlatformSpecificAssets')}
-        eventsFunctionsExtensionsError={
-          new Error('Fake error during code generation')
-        }
-        onReloadEventsFunctionsExtensions={action(
-          'onReloadEventsFunctionsExtensions'
-        )}
-        onShareProject={action('onShareProject')}
-        freezeUpdate={false}
-        hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
-        resourceManagementProps={fakeResourceManagementProps}
-      />
-    </FixedHeightFlexContainer>
-  </DragAndDropContextProvider>
+  <UnsavedChangesContextProvider>
+    <DragAndDropContextProvider>
+      <FixedHeightFlexContainer height={500}>
+        <ProjectManager
+          project={testProject.project}
+          onSaveProjectProperties={async () => true}
+          onChangeProjectName={action('onChangeProjectName')}
+          onOpenExternalEvents={action('onOpenExternalEvents')}
+          onOpenLayout={action('onOpenLayout')}
+          onOpenExternalLayout={action('onOpenExternalLayout')}
+          onOpenEventsFunctionsExtension={action(
+            'onOpenEventsFunctionsExtension'
+          )}
+          onInstallExtension={action('onInstallExtension')}
+          onDeleteLayout={action('onDeleteLayout')}
+          onDeleteExternalLayout={action('onDeleteExternalLayout')}
+          onDeleteEventsFunctionsExtension={action(
+            'onDeleteEventsFunctionsExtension'
+          )}
+          onDeleteExternalEvents={action('onDeleteExternalEvents')}
+          onRenameLayout={action('onRenameLayout')}
+          onRenameExternalLayout={action('onRenameExternalLayout')}
+          onRenameEventsFunctionsExtension={action(
+            'onRenameEventsFunctionsExtension'
+          )}
+          onRenameExternalEvents={action('onRenameExternalEvents')}
+          onOpenResources={action('onOpenResources')}
+          onOpenPlatformSpecificAssets={action('onOpenPlatformSpecificAssets')}
+          eventsFunctionsExtensionsError={
+            new Error('Fake error during code generation')
+          }
+          onReloadEventsFunctionsExtensions={action(
+            'onReloadEventsFunctionsExtensions'
+          )}
+          onShareProject={action('onShareProject')}
+          freezeUpdate={false}
+          hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
+          resourceManagementProps={fakeResourceManagementProps}
+        />
+      </FixedHeightFlexContainer>
+    </DragAndDropContextProvider>
+  </UnsavedChangesContextProvider>
 );

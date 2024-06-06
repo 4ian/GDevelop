@@ -208,7 +208,7 @@ const useCreateProject = ({
 
           if (wasSaved) {
             onProjectSaved(fileMetadata);
-            unsavedChanges.sealUnsavedChanges();
+            unsavedChanges.sealUnsavedChanges({ setCheckpointTime: true });
             if (newProjectSetup.storageProvider.internalName === 'LocalFile') {
               preferences.setHasProjectOpened(true);
             }

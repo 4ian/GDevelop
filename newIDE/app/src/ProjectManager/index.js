@@ -13,7 +13,9 @@ import ExtensionsSearchDialog from '../AssetStore/ExtensionStore/ExtensionsSearc
 import ScenePropertiesDialog from '../SceneEditor/ScenePropertiesDialog';
 import SceneVariablesDialog from '../VariablesList/SceneVariablesDialog';
 import { isExtensionNameTaken } from './EventFunctionExtensionNameVerifier';
-import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import UnsavedChangesContext, {
+  type UnsavedChanges,
+} from '../MainFrame/UnsavedChangesContext';
 import ProjectManagerCommands from './ProjectManagerCommands';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
@@ -410,7 +412,6 @@ type Props = {|
   eventsFunctionsExtensionsError: ?Error,
   onReloadEventsFunctionsExtensions: () => void,
   freezeUpdate: boolean,
-  unsavedChanges?: UnsavedChanges,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
   onInstallExtension: ExtensionShortHeader => void,
   onShareProject: () => void,
@@ -442,7 +443,6 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       eventsFunctionsExtensionsError,
       onReloadEventsFunctionsExtensions,
       freezeUpdate,
-      unsavedChanges,
       hotReloadPreviewButtonProps,
       onInstallExtension,
       onShareProject,
@@ -453,7 +453,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     const [selectedItems, setSelectedItems] = React.useState<
       Array<TreeViewItem>
     >([]);
-
+    const unsavedChanges = React.useContext(UnsavedChangesContext);
+    const { triggerUnsavedChanges } = unsavedChanges;
     const preferences = React.useContext(PreferencesContext);
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const { currentlyRunningInAppTutorial } = React.useContext(
@@ -498,16 +499,14 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     }, []);
     const onProjectPropertiesApplied = React.useCallback(
       (options: { newName?: string }) => {
-        if (unsavedChanges) {
-          unsavedChanges.triggerUnsavedChanges();
-        }
+        triggerUnsavedChanges();
 
         if (options.newName) {
           onChangeProjectName(options.newName);
         }
         setProjectPropertiesDialogOpen(false);
       },
-      [unsavedChanges, onChangeProjectName]
+      [triggerUnsavedChanges, onChangeProjectName]
     );
 
     const [openGameDetails, setOpenGameDetails] = React.useState<boolean>(
@@ -580,9 +579,9 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     const onProjectItemModified = React.useCallback(
       () => {
         forceUpdate();
-        if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
+        triggerUnsavedChanges();
       },
-      [forceUpdate, unsavedChanges]
+      [forceUpdate, triggerUnsavedChanges]
     );
 
     const editName = React.useCallback(
@@ -767,12 +766,12 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
 
     const onTreeModified = React.useCallback(
       (shouldForceUpdateList: boolean) => {
-        if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
+        triggerUnsavedChanges();
 
         if (shouldForceUpdateList) forceUpdateList();
         else forceUpdate();
       },
-      [forceUpdate, forceUpdateList, unsavedChanges]
+      [forceUpdate, forceUpdateList, triggerUnsavedChanges]
     );
 
     // Initialize keyboard shortcuts as empty.
@@ -1340,7 +1339,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                   open
                   onCancel={() => setProjectVariablesEditorOpen(false)}
                   onApply={() => {
-                    if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
+                    triggerUnsavedChanges();
                     setProjectVariablesEditorOpen(false);
                   }}
                   hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
@@ -1366,7 +1365,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                   layout={editedPropertiesLayout}
                   project={project}
                   onApply={() => {
-                    if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
+                    triggerUnsavedChanges();
                     onOpenLayoutProperties(null);
                   }}
                   onClose={() => onOpenLayoutProperties(null)}
@@ -1384,7 +1383,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                   layout={editedVariablesLayout}
                   onCancel={() => onOpenLayoutVariables(null)}
                   onApply={() => {
-                    if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
+                    triggerUnsavedChanges();
                     onOpenLayoutVariables(null);
                   }}
                   hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}

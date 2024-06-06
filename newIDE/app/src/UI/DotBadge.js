@@ -3,21 +3,30 @@ import * as React from 'react';
 import MuiBadge from '@material-ui/core/Badge';
 import { createStyles, makeStyles } from '@material-ui/core';
 
-type BadgeColor = 'secondary' | 'primary' | 'error' | 'success';
+type BadgeColor = 'secondary' | 'primary' | 'error' | 'success' | 'neutral';
 
 const useStyles = (color: BadgeColor) =>
-  makeStyles(theme =>
-    createStyles({
+  makeStyles(theme => {
+    const dotStyle =
+      color === 'success' || color === 'neutral'
+        ? {
+            dot: {
+              backgroundColor:
+                color === 'success'
+                  ? theme.palette.success.main
+                  : theme.palette.text.primary,
+            },
+          }
+        : {};
+    return createStyles({
       root: { flexDirection: 'column' },
       anchorOriginTopRightCircle: {
         top: '8%',
         right: '8%',
       },
-      ...(color === 'success'
-        ? { dot: { backgroundColor: theme.palette.success.main } }
-        : {}),
-    })
-  )();
+      ...dotStyle,
+    });
+  })();
 
 type Props = {|
   children: React.Node,
@@ -29,7 +38,7 @@ type Props = {|
    * override the dot style to use the success color.
    * If you need to use another color, you can do the same.
    */
-  color?: 'secondary' | 'primary' | 'error' | 'success',
+  color?: BadgeColor,
 |};
 
 const DotBadge = ({
@@ -39,7 +48,8 @@ const DotBadge = ({
   color = 'secondary',
 }: Props) => {
   const classes = useStyles(color);
-  const colorForBadge = color === 'success' ? undefined : color;
+  const colorForBadge =
+    color === 'success' || color === 'neutral' ? undefined : color;
   return (
     <MuiBadge
       color={colorForBadge}

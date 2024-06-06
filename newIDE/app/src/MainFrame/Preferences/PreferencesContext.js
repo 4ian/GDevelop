@@ -224,6 +224,7 @@ export type PreferencesValues = {|
   newFeaturesAcknowledgements: {
     [featureId: string]: {| dates: [number] |},
   },
+  displaySaveReminder: {| activated: boolean |}, // Store as object in case we need to add options.
   editorStateByProject: { [string]: { editorTabs: EditorTabsPersistedState } },
 |};
 
@@ -313,6 +314,7 @@ export type Preferences = {|
   setNewFeaturesAcknowledgements: ({
     [featureId: string]: {| dates: [number] |},
   }) => void,
+  setDisplaySaveReminder: ({| activated: boolean |}) => void,
   getEditorStateForProject: (
     projectId: string
   ) => ?{| editorTabs: EditorTabsPersistedState |},
@@ -370,6 +372,7 @@ export const initialPreferences = {
     useShortcutToClosePreviewWindow: true,
     watchProjectFolderFilesForLocalProjects: true,
     newFeaturesAcknowledgements: {},
+    displaySaveReminder: { activated: true },
     editorStateByProject: {},
   },
   setLanguage: () => {},
@@ -436,6 +439,7 @@ export const initialPreferences = {
   setUseShortcutToClosePreviewWindow: () => {},
   setWatchProjectFolderFilesForLocalProjects: () => {},
   setNewFeaturesAcknowledgements: () => {},
+  setDisplaySaveReminder: () => {},
   getEditorStateForProject: projectId => {},
   setEditorStateForProject: (projectId, editorState) => {},
 };

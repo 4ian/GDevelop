@@ -6,7 +6,6 @@ import PreviewAndShareButtons, {
   type PreviewAndShareButtonsProps,
 } from './PreviewAndShareButtons';
 import ProjectManagerIcon from '../../UI/CustomSvgIcons/ProjectManager';
-import FloppyIcon from '../../UI/CustomSvgIcons/Floppy';
 import IconButton from '../../UI/IconButton';
 import { Spacer } from '../../UI/Grid';
 import HistoryIcon from '../../UI/CustomSvgIcons/History';
@@ -14,6 +13,7 @@ import OpenedVersionStatusChip from '../../VersionHistory/OpenedVersionStatusChi
 import type { OpenedVersionStatus } from '../../VersionHistory';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { getStatusColor } from '../../VersionHistory/Utils';
+import SaveProjectIcon from '../SaveProjectIcon';
 
 export type MainFrameToolbarProps = {|
   showProjectButtons: boolean,
@@ -66,16 +66,11 @@ const LeftButtonsToolbarGroup = React.memo<LeftButtonsToolbarGroupProps>(
         >
           <HistoryIcon />
         </IconButton>
-        <IconButton
-          size="small"
+        <SaveProjectIcon
           id="toolbar-save-button"
-          onClick={props.onSave}
-          tooltip={t`Save project`}
-          color="default"
-          disabled={!props.canSave}
-        >
-          <FloppyIcon />
-        </IconButton>
+          onSave={props.onSave}
+          canSave={props.canSave}
+        />
         {props.checkedOutVersionStatus && (
           <div
             style={{

@@ -524,6 +524,7 @@ void GD_CORE_API FilterBehaviorNamesFromObject(
     if (!object.HasBehaviorNamed(behaviorName) ||
         object.GetBehavior(behaviorName).GetTypeName() != behaviorType) {
       behaviorNames.erase(behaviorNames.begin() + i);
+      --i;
     }
   }
 }

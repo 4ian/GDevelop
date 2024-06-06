@@ -16,10 +16,11 @@ import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
 
 const gd: libGDevelop = global.gd;
 
-export const getRequiredBehaviorTypes = (
+const getRequiredBehaviorTypes = (
   platform: gdPlatform,
   functionMetadata: gdInstructionMetadata | gdExpressionMetadata,
-  parameterIndex: number
+  parameterIndex: number,
+  shouldBeHidden: boolean | null
 ) => {
   const requiredBehaviorTypes: Array<string> = [];
   for (
@@ -36,12 +37,34 @@ export const getRequiredBehaviorTypes = (
       platform,
       behaviorType
     );
-    if (behaviorMetadata.isHidden()) {
+    if (
+      shouldBeHidden === null ||
+      behaviorMetadata.isHidden() === shouldBeHidden
+    ) {
       requiredBehaviorTypes.push(behaviorType);
     }
   }
   return requiredBehaviorTypes;
 };
+
+const getRequiredCapabilitiesBehaviorTypes = (
+  platform: gdPlatform,
+  functionMetadata: gdInstructionMetadata | gdExpressionMetadata,
+  parameterIndex: number
+) => getRequiredBehaviorTypes(platform, functionMetadata, parameterIndex, true);
+
+const getRequiredVisibleBehaviorTypes = (
+  platform: gdPlatform,
+  functionMetadata: gdInstructionMetadata | gdExpressionMetadata,
+  parameterIndex: number
+) =>
+  getRequiredBehaviorTypes(platform, functionMetadata, parameterIndex, false);
+
+export const getAllRequiredBehaviorTypes = (
+  platform: gdPlatform,
+  functionMetadata: gdInstructionMetadata | gdExpressionMetadata,
+  parameterIndex: number
+) => getRequiredBehaviorTypes(platform, functionMetadata, parameterIndex, null);
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ObjectField(props: ParameterFieldProps, ref) {
@@ -80,13 +103,28 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       ? parameterMetadata.getExtraInfo()
       : undefined;
 
-    const requiredBehaviorTypes = React.useMemo(
+    const requiredCapabilitiesBehaviorTypes = React.useMemo(
       () => {
         const functionMetadata = instructionMetadata || expressionMetadata;
         if (!project || !functionMetadata || parameterIndex === undefined) {
           return [];
         }
-        return getRequiredBehaviorTypes(
+        return getRequiredCapabilitiesBehaviorTypes(
+          project.getCurrentPlatform(),
+          functionMetadata,
+          parameterIndex
+        );
+      },
+      [expressionMetadata, instructionMetadata, parameterIndex, project]
+    );
+
+    const requiredVisibleBehaviorTypes = React.useMemo(
+      () => {
+        const functionMetadata = instructionMetadata || expressionMetadata;
+        if (!project || !functionMetadata || parameterIndex === undefined) {
+          return [];
+        }
+        return getRequiredVisibleBehaviorTypes(
           project.getCurrentPlatform(),
           functionMetadata,
           parameterIndex
@@ -106,7 +144,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         // Some instructions apply to all objects BUT not some objects
         // lacking a specific capability offered by a default behavior.
         allowedObjectType={allowedObjectType}
-        requiredBehaviorTypes={requiredBehaviorTypes}
+        requiredCapabilitiesBehaviorTypes={requiredCapabilitiesBehaviorTypes}
+        requiredVisibleBehaviorTypes={requiredVisibleBehaviorTypes}
         globalObjectsContainer={props.globalObjectsContainer}
         objectsContainer={props.objectsContainer}
         floatingLabelText={description}
@@ -118,7 +157,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         }
         fullWidth
         errorTextIfInvalid={
-          allowedObjectType || requiredBehaviorTypes.length > 0 ? (
+          allowedObjectType || requiredCapabilitiesBehaviorTypes.length > 0 ? (
             <Trans>The object does not exist or can't be used here.</Trans>
           ) : (
             <Trans>Enter the name of an object.</Trans>

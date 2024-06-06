@@ -519,12 +519,13 @@ gd::String GD_CORE_API GetTypeOfObject(const gd::ObjectsContainer& project,
 void GD_CORE_API FilterBehaviorNamesFromObject(
     const gd::Object &object, const gd::String &behaviorType,
     std::vector<gd::String> &behaviorNames) {
-  for (size_t i = 0; i < behaviorNames.size(); i++) {
+  for (size_t i = 0; i < behaviorNames.size();) {
     auto &behaviorName = behaviorNames[i];
     if (!object.HasBehaviorNamed(behaviorName) ||
         object.GetBehavior(behaviorName).GetTypeName() != behaviorType) {
       behaviorNames.erase(behaviorNames.begin() + i);
-      --i;
+    } else {
+      ++i;
     }
   }
 }

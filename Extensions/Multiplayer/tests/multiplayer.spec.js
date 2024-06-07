@@ -254,6 +254,13 @@ describe('Multiplayer', () => {
           peerMultiplayerMessageManager[peerId] ||
           gdjs.makeMultiplayerMessageManager();
 
+        // Ensure the messageManager is aware of the other players.
+        gdjs.multiplayerMessageManager.updatePlayersPingsForTests({
+          1: 0,
+          2: 20,
+          3: 40,
+        });
+
         // Switch the state of the game.
         gdjs.multiplayer.playerNumber = playerNumber;
       },
@@ -986,6 +993,12 @@ describe('Multiplayer', () => {
       // Check player 3 can get ownership (and can directly move the instance, without waiting for the
       // host to acknowledge the change).
       {
+        switchToPeer({
+          peerId: 'player-3',
+          otherPeerIds: ['player-1'],
+          playerNumber: 3,
+        });
+
         const {
           object: p3SpriteObject,
           behavior: p3MultiplayerObjectBehavior,
@@ -1053,6 +1066,12 @@ describe('Multiplayer', () => {
       // Check player 2 can get ownership.
       // It will also communicate the new position/changes to the instance.
       {
+        switchToPeer({
+          peerId: 'player-2',
+          otherPeerIds: ['player-1'],
+          playerNumber: 2,
+        });
+
         const {
           object: p2SpriteObject,
           behavior: p2MultiplayerObjectBehavior,
@@ -1621,6 +1640,12 @@ describe('Multiplayer', () => {
 
       // Check ownership was reverted.
       {
+        switchToPeer({
+          peerId: 'player-3',
+          otherPeerIds: ['player-1'],
+          playerNumber: 3,
+        });
+
         p3RuntimeScene.renderAndStep(1000 / 60);
 
         const {

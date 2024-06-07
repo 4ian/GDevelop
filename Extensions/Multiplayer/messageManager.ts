@@ -1731,6 +1731,10 @@ namespace gdjs {
       });
     };
 
+    const updatePlayersPingsForTests = (playersPings) => {
+      _playersPings = playersPings;
+    };
+
     return {
       addExpectedMessageAcknowledgement,
       clearExpectedMessageAcknowledgements,
@@ -1767,6 +1771,7 @@ namespace gdjs {
       isPlayerConnected,
       sendEndGameMessage,
       handleEndGameMessages,
+      updatePlayersPingsForTests,
     };
   };
 

@@ -25,7 +25,6 @@ bool BehaviorParametersFiller::DoVisitInstruction(gd::Instruction &instruction,
                              : gd::MetadataProvider::GetActionMetadata(
                                    platform, instruction.GetType());
 
-  gd::String lastLayerName;
   gd::ParameterMetadataTools::IterateOverParametersWithIndex(
       instruction.GetParameters(), metadata.GetParameters(),
       [&](const gd::ParameterMetadata &parameterMetadata,
@@ -42,18 +41,18 @@ bool BehaviorParametersFiller::DoVisitInstruction(gd::Instruction &instruction,
           auto behaviorNames =
               objectsContainersList.GetBehaviorsOfObject(lastObjectName, true);
 
-          gd::String *foundBehaviorName = nullptr;
+          gd::String foundBehaviorName = "";
           for (auto &behaviorName : behaviorNames) {
             auto behaviorTypeName =
                 objectsContainersList.GetTypeOfBehavior(behaviorName, false);
             if (behaviorTypeName == expectedBehaviorTypeName) {
-              foundBehaviorName = &behaviorName;
+              foundBehaviorName = behaviorName;
               break;
             }
           }
-          if (foundBehaviorName) {
+          if (!foundBehaviorName.empty()) {
             instruction.SetParameter(parameterIndex,
-                                     gd::Expression(*foundBehaviorName));
+                                     gd::Expression(foundBehaviorName));
           }
         }
       });

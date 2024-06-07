@@ -4,6 +4,13 @@ namespace gdjs {
     _offsetX: number;
     _offsetY: number;
   }
+  interface TwistFilterNetworkSyncData {
+    r: number;
+    a: number;
+    p: number;
+    ox: number;
+    oy: number;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Twist',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -79,6 +86,29 @@ namespace gdjs {
         parameterName: string,
         value: boolean
       ) {}
+      getNetworkSyncData(filter: PIXI.Filter): TwistFilterNetworkSyncData {
+        const twistFilter = (filter as unknown) as PIXI.filters.TwistFilter &
+          TwistFilterExtra;
+        return {
+          r: twistFilter.radius,
+          a: twistFilter.angle,
+          p: twistFilter.padding,
+          ox: twistFilter._offsetX,
+          oy: twistFilter._offsetY,
+        };
+      }
+      updateFromNetworkSyncData(
+        filter: PIXI.Filter,
+        data: TwistFilterNetworkSyncData
+      ) {
+        const twistFilter = (filter as unknown) as PIXI.filters.TwistFilter &
+          TwistFilterExtra;
+        twistFilter.radius = data.r;
+        twistFilter.angle = data.a;
+        twistFilter.padding = data.p;
+        twistFilter._offsetX = data.ox;
+        twistFilter._offsetY = data.oy;
+      }
     })()
   );
 }

@@ -1,4 +1,8 @@
 namespace gdjs {
+  interface DisplacementFilterNetworkSyncData {
+    sx: number;
+    sy: number;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Displacement',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -57,6 +61,23 @@ namespace gdjs {
         parameterName: string,
         value: boolean
       ) {}
+      getNetworkSyncData(
+        filter: PIXI.Filter
+      ): DisplacementFilterNetworkSyncData {
+        const displacementFilter = (filter as unknown) as PIXI.DisplacementFilter;
+        return {
+          sx: displacementFilter.scale.x,
+          sy: displacementFilter.scale.y,
+        };
+      }
+      updateFromNetworkSyncData(
+        filter: PIXI.Filter,
+        data: DisplacementFilterNetworkSyncData
+      ) {
+        const displacementFilter = (filter as unknown) as PIXI.DisplacementFilter;
+        displacementFilter.scale.x = data.sx;
+        displacementFilter.scale.y = data.sy;
+      }
     })()
   );
 }

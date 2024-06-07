@@ -1,5 +1,37 @@
 /// <reference path="helper/TileMapHelper.d.ts" />
 namespace gdjs {
+  export type TilemapObjectDataType = {
+    content: {
+      opacity: number;
+      tilemapJsonFile: string;
+      tilesetJsonFile: string;
+      tilemapAtlasImage: string;
+      displayMode: string;
+      layerIndex: integer;
+      levelIndex: integer;
+      animationSpeedScale: number;
+      animationFps: number;
+    };
+  };
+
+  export type TilemapObjectData = ObjectData & TilemapObjectDataType;
+
+  export type TilemapNetworkSyncDataType = {
+    op: number;
+    tmjf: string;
+    tsjf: string;
+    tmai: string;
+    dm: string;
+    lai: number;
+    lei: number;
+    asps: number;
+    wid: number;
+    hei: number;
+  };
+
+  export type TilemapNetworkSyncData = ObjectNetworkSyncData &
+    TilemapNetworkSyncDataType;
+
   /**
    * Displays a Tilemap object (mapeditor.org supported).
    */
@@ -59,7 +91,10 @@ namespace gdjs {
       }
     }
 
-    updateFromObjectData(oldObjectData: any, newObjectData: any): boolean {
+    updateFromObjectData(
+      oldObjectData: TilemapObjectData,
+      newObjectData: TilemapObjectData
+    ): boolean {
       if (oldObjectData.content.opacity !== newObjectData.content.opacity) {
         this.setOpacity(newObjectData.content.opacity);
       }
@@ -110,6 +145,59 @@ namespace gdjs {
         return false;
       }
       return true;
+    }
+
+    getObjectNetworkSyncData(): TilemapNetworkSyncData {
+      return {
+        ...super.getObjectNetworkSyncData(),
+        op: this._opacity,
+        tmjf: this._tilemapJsonFile,
+        tsjf: this._tilesetJsonFile,
+        tmai: this._tilemapAtlasImage,
+        dm: this._displayMode,
+        lai: this._layerIndex,
+        lei: this._levelIndex,
+        asps: this._animationSpeedScale,
+        wid: this.getWidth(),
+        hei: this.getHeight(),
+      };
+    }
+
+    updateFromObjectNetworkSyncData(
+      networkSyncData: TilemapNetworkSyncData
+    ): void {
+      super.updateFromObjectNetworkSyncData(networkSyncData);
+
+      if (networkSyncData.op !== undefined) {
+        this.setOpacity(networkSyncData.op);
+      }
+      if (networkSyncData.tmjf !== undefined) {
+        this.setTilemapJsonFile(networkSyncData.tmjf);
+      }
+      if (networkSyncData.tsjf !== undefined) {
+        this.setTilesetJsonFile(networkSyncData.tsjf);
+      }
+      if (networkSyncData.tmai !== undefined) {
+        this._tilemapAtlasImage = networkSyncData.tmai;
+      }
+      if (networkSyncData.dm !== undefined) {
+        this.setDisplayMode(networkSyncData.dm);
+      }
+      if (networkSyncData.lai !== undefined) {
+        this.setLayerIndex(networkSyncData.lai);
+      }
+      if (networkSyncData.lei !== undefined) {
+        this.setLevelIndex(networkSyncData.lei);
+      }
+      if (networkSyncData.asps !== undefined) {
+        this.setAnimationSpeedScale(networkSyncData.asps);
+      }
+      if (networkSyncData.wid !== undefined) {
+        this.setWidth(networkSyncData.wid);
+      }
+      if (networkSyncData.hei !== undefined) {
+        this.setHeight(networkSyncData.hei);
+      }
     }
 
     extraInitializationFromInitialInstance(initialInstanceData): void {

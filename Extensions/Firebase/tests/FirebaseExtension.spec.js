@@ -18,6 +18,7 @@ const promisifyCallbackVariables = (executor) =>
   });
 
 /** A complex variable using all variables types. */
+// TODO: this is a global, should be moved in a scope.
 const variable = new gdjs.Variable().fromJSObject({
   my: 'test',
   object: { with: 'all', types: 2 },

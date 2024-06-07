@@ -23,6 +23,21 @@ namespace gdjs {
   };
   export type BBTextObjectData = ObjectData & BBTextObjectDataType;
 
+  export type BBTextObjectNetworkSyncDataType = {
+    text: string;
+    o: float;
+    c: number[];
+    ff: string;
+    fs: number;
+    wwrap: boolean;
+    wwidth: float;
+    align: string;
+    hidden: boolean;
+  };
+
+  export type BBTextObjectNetworkSyncData = ObjectNetworkSyncData &
+    BBTextObjectNetworkSyncDataType;
+
   /**
    * Displays a rich text using BBCode markup (allowing to set parts of the text as bold, italic, use different colors and shadows).
    */
@@ -114,6 +129,55 @@ namespace gdjs {
         this.setAlignment(newObjectData.content.align);
       }
       return true;
+    }
+
+    getObjectNetworkSyncData(): BBTextObjectNetworkSyncData {
+      return {
+        ...super.getObjectNetworkSyncData(),
+        text: this._text,
+        o: this._opacity,
+        c: this._color,
+        ff: this._fontFamily,
+        fs: this._fontSize,
+        wwrap: this._wordWrap,
+        wwidth: this._wrappingWidth,
+        align: this._align,
+        hidden: this.hidden,
+      };
+    }
+
+    updateFromObjectNetworkSyncData(
+      networkSyncData: BBTextObjectNetworkSyncData
+    ): void {
+      super.updateFromObjectNetworkSyncData(networkSyncData);
+      if (this._text !== undefined) {
+        this.setBBText(networkSyncData.text);
+      }
+      if (this._opacity !== undefined) {
+        this.setOpacity(networkSyncData.o);
+      }
+      if (this._color !== undefined) {
+        this._color = networkSyncData.c;
+        this._renderer.updateColor();
+      }
+      if (this._fontFamily !== undefined) {
+        this.setFontFamily(networkSyncData.ff);
+      }
+      if (this._fontSize !== undefined) {
+        this.setFontSize(networkSyncData.fs);
+      }
+      if (this._wordWrap !== undefined) {
+        this.setWordWrap(networkSyncData.wwrap);
+      }
+      if (this._wrappingWidth !== undefined) {
+        this.setWrappingWidth(networkSyncData.wwidth);
+      }
+      if (this._align !== undefined) {
+        this.setAlignment(networkSyncData.align);
+      }
+      if (this.hidden !== undefined) {
+        this.hide(networkSyncData.hidden);
+      }
     }
 
     /**

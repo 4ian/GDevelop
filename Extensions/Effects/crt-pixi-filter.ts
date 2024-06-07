@@ -4,6 +4,20 @@ namespace gdjs {
     animationSpeed: number;
     animationFrequency: number;
   }
+  interface CRTFilterNetworkSyncData {
+    lw: number;
+    lc: number;
+    n: number;
+    c: number;
+    ns: number;
+    v: number;
+    va: number;
+    vb: number;
+    as: number;
+    af: number;
+    p: number;
+    vl: boolean;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'CRT',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -121,6 +135,43 @@ namespace gdjs {
         if (parameterName === 'verticalLine') {
           crtFilter.verticalLine = value;
         }
+      }
+      getNetworkSyncData(filter: PIXI.Filter): CRTFilterNetworkSyncData {
+        const crtFilter = (filter as unknown) as PIXI.filters.CRTFilter &
+          CRTFilterExtra;
+        return {
+          lw: crtFilter.lineWidth,
+          lc: crtFilter.lineContrast,
+          n: crtFilter.noise,
+          c: crtFilter.curvature,
+          ns: crtFilter.noiseSize,
+          v: crtFilter.vignetting,
+          va: crtFilter.vignettingAlpha,
+          vb: crtFilter.vignettingBlur,
+          as: crtFilter.animationSpeed,
+          af: crtFilter.animationFrequency,
+          p: crtFilter.padding,
+          vl: crtFilter.verticalLine,
+        };
+      }
+      updateFromNetworkSyncData(
+        filter: PIXI.Filter,
+        data: CRTFilterNetworkSyncData
+      ) {
+        const crtFilter = (filter as unknown) as PIXI.filters.CRTFilter &
+          CRTFilterExtra;
+        crtFilter.lineWidth = data.lw;
+        crtFilter.lineContrast = data.lc;
+        crtFilter.noise = data.n;
+        crtFilter.curvature = data.c;
+        crtFilter.noiseSize = data.ns;
+        crtFilter.vignetting = data.v;
+        crtFilter.vignettingAlpha = data.va;
+        crtFilter.vignettingBlur = data.vb;
+        crtFilter.animationSpeed = data.as;
+        crtFilter.animationFrequency = data.af;
+        crtFilter.padding = data.p;
+        crtFilter.verticalLine = data.vl;
       }
     })()
   );

@@ -1,4 +1,14 @@
 namespace gdjs {
+  interface AdjustmentFilterNetworkSyncData {
+    ga: number;
+    sa: number;
+    co: number;
+    br: number;
+    r: number;
+    g: number;
+    b: number;
+    a: number;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Adjustment',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -77,6 +87,33 @@ namespace gdjs {
         parameterName: string,
         value: boolean
       ) {}
+      getNetworkSyncData(filter: PIXI.Filter): AdjustmentFilterNetworkSyncData {
+        const adjustmentFilter = (filter as unknown) as PIXI.filters.AdjustmentFilter;
+        return {
+          ga: adjustmentFilter.gamma,
+          sa: adjustmentFilter.saturation,
+          co: adjustmentFilter.contrast,
+          br: adjustmentFilter.brightness,
+          r: adjustmentFilter.red,
+          g: adjustmentFilter.green,
+          b: adjustmentFilter.blue,
+          a: adjustmentFilter.alpha,
+        };
+      }
+      updateFromNetworkSyncData(
+        filter: PIXI.Filter,
+        data: AdjustmentFilterNetworkSyncData
+      ): void {
+        const adjustmentFilter = (filter as unknown) as PIXI.filters.AdjustmentFilter;
+        adjustmentFilter.gamma = data.ga;
+        adjustmentFilter.saturation = data.sa;
+        adjustmentFilter.contrast = data.co;
+        adjustmentFilter.brightness = data.br;
+        adjustmentFilter.red = data.r;
+        adjustmentFilter.green = data.g;
+        adjustmentFilter.blue = data.b;
+        adjustmentFilter.alpha = data.a;
+      }
     })()
   );
 }

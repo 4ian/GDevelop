@@ -68,9 +68,19 @@ const ManageSection = ({
     () => {
       onRefreshGames();
     },
-    // Refresh the games when the section is opened, useful when a game gets registered.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    // Refresh the games when the callback changes (defined in useGamesList), that's
+    // to say when the user profile changes.
+    [onRefreshGames]
+  );
+
+  React.useEffect(
+    () => {
+      if (openedGame && !profile) {
+        setOpenedGame(null);
+      }
+    },
+    // Close game view is user logs out.
+    [profile, openedGame, setOpenedGame]
   );
 
   const onBack = React.useCallback(

@@ -1216,5 +1216,21 @@ namespace gdjs {
         ? Object.keys(this._embeddedResourcesMappings.get(resourceName)!)
         : [];
     }
+
+    getNetworkSyncData(): GameNetworkSyncData {
+      return {
+        var: this._variables.getNetworkSyncData(),
+        ss: this._sceneStack.getNetworkSyncData(),
+      };
+    }
+
+    updateFromNetworkSyncData(syncData: GameNetworkSyncData) {
+      if (syncData.var) {
+        this._variables.updateFromNetworkSyncData(syncData.var);
+      }
+      if (syncData.ss) {
+        this._sceneStack.updateFromNetworkSyncData(syncData.ss);
+      }
+    }
   }
 }

@@ -180,6 +180,7 @@ app.on('ready', function() {
       previewGameIndexHtmlPath: options.previewGameIndexHtmlPath,
       alwaysOnTop: options.alwaysOnTop,
       hideMenuBar: options.hideMenuBar,
+      numberOfWindows: options.numberOfWindows,
     });
   });
   ipcMain.handle('preview-close', async (event, options) => {

@@ -1,4 +1,12 @@
 namespace gdjs {
+  interface AdvancedBloomFilterNetworkSyncData {
+    th: number;
+    bs: number;
+    bn: number;
+    b: number;
+    q: number;
+    p: number;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'AdvancedBloom',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -67,6 +75,31 @@ namespace gdjs {
         parameterName: string,
         value: boolean
       ) {}
+      getNetworkSyncData(
+        filter: PIXI.Filter
+      ): AdvancedBloomFilterNetworkSyncData {
+        const advancedBloomFilter = (filter as unknown) as PIXI.filters.AdvancedBloomFilter;
+        return {
+          th: advancedBloomFilter.threshold,
+          bs: advancedBloomFilter.bloomScale,
+          bn: advancedBloomFilter.brightness,
+          b: advancedBloomFilter.blur,
+          q: advancedBloomFilter.quality,
+          p: advancedBloomFilter.padding,
+        };
+      }
+      updateFromNetworkSyncData(
+        filter: PIXI.Filter,
+        syncData: AdvancedBloomFilterNetworkSyncData
+      ) {
+        const advancedBloomFilter = (filter as unknown) as PIXI.filters.AdvancedBloomFilter;
+        advancedBloomFilter.threshold = syncData.th;
+        advancedBloomFilter.bloomScale = syncData.bs;
+        advancedBloomFilter.brightness = syncData.bn;
+        advancedBloomFilter.blur = syncData.b;
+        advancedBloomFilter.quality = syncData.q;
+        advancedBloomFilter.padding = syncData.p;
+      }
     })()
   );
 }

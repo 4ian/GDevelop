@@ -147,5 +147,23 @@ namespace gdjs {
     setMultiplier(multiplier: integer): void {
       this._multiplier = multiplier;
     }
+
+    getNetworkSyncData(): ForceNetworkSyncData {
+      return {
+        x: this._x,
+        y: this._y,
+        a: this._angle,
+        l: this._length,
+        m: this._multiplier,
+      };
+    }
+
+    updateFromNetworkSyncData(syncData: ForceNetworkSyncData) {
+      this._x = syncData.x;
+      this._y = syncData.y;
+      this._angle = syncData.a;
+      this._length = syncData.l;
+      this._multiplier = syncData.m;
+    }
   }
 }

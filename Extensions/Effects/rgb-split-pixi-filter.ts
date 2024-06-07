@@ -1,4 +1,12 @@
 namespace gdjs {
+  interface RGBSplitFilterNetworkSyncData {
+    rX: number;
+    rY: number;
+    gX: number;
+    gY: number;
+    bX: number;
+    bY: number;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'RGBSplit',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -67,6 +75,29 @@ namespace gdjs {
         parameterName: string,
         value: boolean
       ) {}
+      getNetworkSyncData(filter: PIXI.Filter): RGBSplitFilterNetworkSyncData {
+        const rgbSplitFilter = (filter as unknown) as PIXI.filters.RGBSplitFilter;
+        return {
+          rX: rgbSplitFilter.red.x,
+          rY: rgbSplitFilter.red.y,
+          gX: rgbSplitFilter.green.x,
+          gY: rgbSplitFilter.green.y,
+          bX: rgbSplitFilter.blue.x,
+          bY: rgbSplitFilter.blue.y,
+        };
+      }
+      updateFromNetworkSyncData(
+        filter: PIXI.Filter,
+        data: RGBSplitFilterNetworkSyncData
+      ) {
+        const rgbSplitFilter = (filter as unknown) as PIXI.filters.RGBSplitFilter;
+        rgbSplitFilter.red.x = data.rX;
+        rgbSplitFilter.red.y = data.rY;
+        rgbSplitFilter.green.x = data.gX;
+        rgbSplitFilter.green.y = data.gY;
+        rgbSplitFilter.blue.x = data.bX;
+        rgbSplitFilter.blue.y = data.bY;
+      }
     })()
   );
 }

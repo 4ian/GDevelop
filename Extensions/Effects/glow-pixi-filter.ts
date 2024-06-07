@@ -2,6 +2,12 @@ namespace gdjs {
   interface GlowFilterExtra {
     distance: number;
   }
+  interface GlowFilterNetworkSyncData {
+    is: number;
+    os: number;
+    d: number;
+    c: number;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Glow',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -74,6 +80,27 @@ namespace gdjs {
         parameterName: string,
         value: boolean
       ) {}
+      getNetworkSyncData(filter: PIXI.Filter): GlowFilterNetworkSyncData {
+        const glowFilter = (filter as unknown) as PIXI.filters.GlowFilter &
+          GlowFilterExtra;
+        return {
+          is: glowFilter.innerStrength,
+          os: glowFilter.outerStrength,
+          d: glowFilter.distance,
+          c: glowFilter.color,
+        };
+      }
+      updateFromNetworkSyncData(
+        filter: PIXI.Filter,
+        data: GlowFilterNetworkSyncData
+      ): void {
+        const glowFilter = (filter as unknown) as PIXI.filters.GlowFilter &
+          GlowFilterExtra;
+        glowFilter.innerStrength = data.is;
+        glowFilter.outerStrength = data.os;
+        glowFilter.distance = data.d;
+        glowFilter.color = data.c;
+      }
     })()
   );
 }

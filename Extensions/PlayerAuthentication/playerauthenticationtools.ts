@@ -248,7 +248,7 @@ namespace gdjs {
         return;
       }
       window.localStorage.removeItem(getLocalStorageKey(gameId));
-      cleanUpAuthWindowAndCallbacks(runtimeScene);
+      cleanUpAuthWindowAndTimeouts(runtimeScene);
       removeAuthenticationBanner(runtimeScene);
       const domElementContainer = runtimeScene
         .getGame()
@@ -298,9 +298,9 @@ namespace gdjs {
 
     /**
      * Helper to be called on login or error.
-     * Removes all the UI and callbacks.
+     * Removes all the UI and timeouts.
      */
-    const cleanUpAuthWindowAndCallbacks = (runtimeScene: RuntimeScene) => {
+    const cleanUpAuthWindowAndTimeouts = (runtimeScene: RuntimeScene) => {
       removeAuthenticationContainer(runtimeScene);
       clearAuthenticationWindowTimeout();
 
@@ -373,7 +373,7 @@ namespace gdjs {
       userToken: string;
     }) => {
       saveAuthKeyToStorage({ userId, username, userToken });
-      cleanUpAuthWindowAndCallbacks(runtimeScene);
+      cleanUpAuthWindowAndTimeouts(runtimeScene);
       removeAuthenticationBanner(runtimeScene);
 
       const domElementContainer = runtimeScene
@@ -462,7 +462,7 @@ namespace gdjs {
       message: string
     ) {
       logger.error(message);
-      cleanUpAuthWindowAndCallbacks(runtimeScene);
+      cleanUpAuthWindowAndTimeouts(runtimeScene);
 
       const domElementContainer = runtimeScene
         .getGame()
@@ -492,7 +492,7 @@ namespace gdjs {
         logger.info(
           'Authentication window did not send message in time. Closing it.'
         );
-        cleanUpAuthWindowAndCallbacks(runtimeScene);
+        cleanUpAuthWindowAndTimeouts(runtimeScene);
         focusOnGame(runtimeScene);
       }, time);
     };
@@ -596,6 +596,7 @@ namespace gdjs {
 
     const setupWebsocketForAuthenticationWindow = (
       runtimeScene: gdjs.RuntimeScene,
+      gameId: string,
       onOpenAuthenticationWindow: (options: {
         connectionId: string;
         resolve: (AuthenticationWindowStatus) => void;
@@ -606,8 +607,8 @@ namespace gdjs {
         const wsPlayApi = runtimeScene
           .getGame()
           .isUsingGDevelopDevelopmentEnvironment()
-          ? 'wss://api-ws-dev.gdevelop.io/play'
-          : 'wss://api-ws.gdevelop.io/play';
+          ? `wss://api-ws-dev.gdevelop.io/play?gameId=${gameId}&connectionType=login`
+          : `wss://api-ws.gdevelop.io/play?gameId=${gameId}&connectionType=login`;
         _websocket = new WebSocket(wsPlayApi);
         _websocket.onopen = () => {
           logger.info('Opened authentication websocket connection.');
@@ -682,6 +683,7 @@ namespace gdjs {
     ) =>
       setupWebsocketForAuthenticationWindow(
         runtimeScene,
+        gameId,
         ({ connectionId }) => {
           const targetUrl = getAuthWindowUrl({
             runtimeGame: runtimeScene.getGame(),
@@ -714,6 +716,7 @@ namespace gdjs {
     ) =>
       setupWebsocketForAuthenticationWindow(
         runtimeScene,
+        gameId,
         ({ connectionId, resolve }) => {
           const targetUrl = getAuthWindowUrl({
             runtimeGame: runtimeScene.getGame(),
@@ -936,7 +939,7 @@ namespace gdjs {
 
           let isDimissedAlready = false;
           const onAuthenticationContainerDismissed = () => {
-            cleanUpAuthWindowAndCallbacks(runtimeScene);
+            cleanUpAuthWindowAndTimeouts(runtimeScene);
             displayAuthenticationBanner(runtimeScene);
 
             isDimissedAlready = true;

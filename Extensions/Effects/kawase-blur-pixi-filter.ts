@@ -1,4 +1,10 @@
 namespace gdjs {
+  interface KawaseBlurFilterNetworkSyncData {
+    px: number;
+    py: number;
+    b: number;
+    q: number;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'KawaseBlur',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -57,6 +63,25 @@ namespace gdjs {
         parameterName: string,
         value: boolean
       ) {}
+      getNetworkSyncData(filter: PIXI.Filter): KawaseBlurFilterNetworkSyncData {
+        const kawaseBlurFilter = (filter as unknown) as PIXI.filters.KawaseBlurFilter;
+        return {
+          px: kawaseBlurFilter.pixelSize[0],
+          py: kawaseBlurFilter.pixelSize[1],
+          b: kawaseBlurFilter.blur,
+          q: kawaseBlurFilter.quality,
+        };
+      }
+      updateFromNetworkSyncData(
+        filter: PIXI.Filter,
+        data: KawaseBlurFilterNetworkSyncData
+      ) {
+        const kawaseBlurFilter = (filter as unknown) as PIXI.filters.KawaseBlurFilter;
+        kawaseBlurFilter.pixelSize[0] = data.px;
+        kawaseBlurFilter.pixelSize[1] = data.py;
+        kawaseBlurFilter.blur = data.b;
+        kawaseBlurFilter.quality = data.q;
+      }
     })()
   );
 }

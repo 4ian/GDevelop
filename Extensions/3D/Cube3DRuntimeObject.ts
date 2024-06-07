@@ -38,6 +38,24 @@ namespace gdjs {
     bottom: 5,
   };
 
+  type Cube3DObjectNetworkSyncDataType = {
+    w: number;
+    h: number;
+    d: number;
+    rx: number;
+    ry: number;
+    rz: number;
+    fo: 'Y' | 'Z';
+    bfu: 'X' | 'Y';
+    vfb: integer;
+    trfb: integer;
+    frn: [string, string, string, string, string, string];
+    mt: number;
+  };
+
+  type Cube3DObjectNetworkSyncData = ObjectNetworkSyncData &
+    Cube3DObjectNetworkSyncDataType;
+
   /**
    * Shows a 3D box object.
    */
@@ -400,6 +418,94 @@ namespace gdjs {
       }
 
       return true;
+    }
+
+    getObjectNetworkSyncData(): Cube3DObjectNetworkSyncData {
+      return {
+        ...super.getObjectNetworkSyncData(),
+        w: this.getWidth(),
+        h: this.getHeight(),
+        d: this.getDepth(),
+        rx: this.getRotationX(),
+        ry: this.getRotationY(),
+        rz: this.getAngle(),
+        mt: this._materialType,
+        fo: this._facesOrientation,
+        bfu: this._backFaceUpThroughWhichAxisRotation,
+        vfb: this._visibleFacesBitmask,
+        trfb: this._textureRepeatFacesBitmask,
+        frn: this._faceResourceNames,
+      };
+    }
+
+    updateFromObjectNetworkSyncData(
+      networkSyncData: Cube3DObjectNetworkSyncData
+    ): void {
+      super.updateFromObjectNetworkSyncData(networkSyncData);
+
+      if (networkSyncData.w !== undefined) {
+        this.setWidth(networkSyncData.w);
+      }
+      if (networkSyncData.h !== undefined) {
+        this.setHeight(networkSyncData.h);
+      }
+      if (networkSyncData.d !== undefined) {
+        this.setDepth(networkSyncData.d);
+      }
+      if (networkSyncData.rx !== undefined) {
+        this.setRotationX(networkSyncData.rx);
+      }
+      if (networkSyncData.ry !== undefined) {
+        this.setRotationY(networkSyncData.ry);
+      }
+      if (networkSyncData.rz !== undefined) {
+        this.setAngle(networkSyncData.rz);
+      }
+      if (networkSyncData.mt !== undefined) {
+        this._materialType = networkSyncData.mt;
+      }
+      if (networkSyncData.fo !== undefined) {
+        if (this._facesOrientation !== networkSyncData.fo) {
+          this.setFacesOrientation(networkSyncData.fo);
+        }
+      }
+      if (networkSyncData.bfu !== undefined) {
+        if (this._backFaceUpThroughWhichAxisRotation !== networkSyncData.bfu) {
+          this.setBackFaceUpThroughWhichAxisRotation(networkSyncData.bfu);
+        }
+      }
+      if (networkSyncData.vfb !== undefined) {
+        // If it is different, update all the faces.
+        if (this._visibleFacesBitmask !== networkSyncData.vfb) {
+          this._visibleFacesBitmask = networkSyncData.vfb;
+          for (let i = 0; i < this._faceResourceNames.length; i++) {
+            this._renderer.updateFace(i);
+          }
+        }
+      }
+      if (networkSyncData.trfb !== undefined) {
+        // If it is different, update all the faces.
+        if (this._textureRepeatFacesBitmask !== networkSyncData.trfb) {
+          this._textureRepeatFacesBitmask = networkSyncData.trfb;
+          for (let i = 0; i < this._faceResourceNames.length; i++) {
+            this._renderer.updateFace(i);
+          }
+        }
+      }
+      if (networkSyncData.frn !== undefined) {
+        // If one element is different, update all the faces.
+        if (
+          !this._faceResourceNames.every(
+            (value, index) => value === networkSyncData.frn[index]
+          )
+        ) {
+          this._faceResourceNames = networkSyncData.frn;
+          // Update all faces. (Could optimize to only update the changed ones)
+          for (let i = 0; i < this._faceResourceNames.length; i++) {
+            this._renderer.updateFace(i);
+          }
+        }
+      }
     }
 
     /**

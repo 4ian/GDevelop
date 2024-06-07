@@ -1,4 +1,8 @@
 namespace gdjs {
+  interface TiltShiftFilterNetworkSyncData {
+    b: number;
+    gb: number;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'TiltShift',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -47,6 +51,18 @@ namespace gdjs {
         parameterName: string,
         value: boolean
       ) {}
+      getNetworkSyncData(filter: PIXI.Filter): TiltShiftFilterNetworkSyncData {
+        const tiltShiftFilter = (filter as unknown) as PIXI.filters.TiltShiftFilter;
+        return { b: tiltShiftFilter.blur, gb: tiltShiftFilter.gradientBlur };
+      }
+      updateFromNetworkSyncData(
+        filter: PIXI.Filter,
+        data: TiltShiftFilterNetworkSyncData
+      ) {
+        const tiltShiftFilter = (filter as unknown) as PIXI.filters.TiltShiftFilter;
+        tiltShiftFilter.blur = data.b;
+        tiltShiftFilter.gradientBlur = data.gb;
+      }
     })()
   );
 }

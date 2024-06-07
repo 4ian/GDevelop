@@ -190,9 +190,104 @@ namespace gdjs {
      */
     has(name: string): boolean {
       const variable = this._variables.get(name);
-      return variable && !variable.isUndefinedInContainer();
+      return !!variable && !variable.isUndefinedInContainer();
     }
     static _deletedVars: Array<string | undefined> = [];
+
+    getNetworkSyncData(): VariableNetworkSyncData[] {
+      const networkSyncData: VariableNetworkSyncData[] = [];
+      const variableNames = [];
+      this._variables.keys(variableNames);
+      variableNames.forEach((variableName) => {
+        const variable = this._variables.get(variableName);
+        if (variable.isUndefinedInContainer()) {
+          return;
+        }
+
+        const variableType = variable.getType();
+        const variableValue =
+          variableType === 'structure' || variableType === 'array'
+            ? ''
+            : variable.getValue();
+
+        networkSyncData.push({
+          name: variableName,
+          value: variableValue,
+          type: variableType,
+          children: this.getStructureNetworkSyncData(variable),
+        });
+      });
+
+      return networkSyncData;
+    }
+
+    // Structure variables can contain other variables, so we need to recursively
+    // get the sync data for each child variable.
+    getStructureNetworkSyncData(
+      variable: gdjs.Variable
+    ): VariableNetworkSyncData[] | undefined {
+      if (variable.getType() === 'array') {
+        return variable.getAllChildrenArray().map((childVariable) => {
+          const childVariableType = childVariable.getType();
+          const childVariableValue =
+            childVariableType === 'structure' || childVariableType === 'array'
+              ? ''
+              : childVariable.getValue();
+
+          return {
+            name: '',
+            value: childVariableValue,
+            type: childVariableType,
+            children: this.getStructureNetworkSyncData(childVariable),
+          };
+        });
+      }
+
+      if (variable.getType() === 'structure') {
+        const variableChildren = variable.getAllChildren();
+
+        const childrenSyncData = variableChildren
+          ? Object.entries(variableChildren).map(
+              ([childVariableName, childVariable]) => {
+                const childVariableType = childVariable.getType();
+                const childVariableValue =
+                  childVariableType === 'structure' ||
+                  childVariableType === 'array'
+                    ? ''
+                    : childVariable.getValue();
+
+                return {
+                  name: childVariableName,
+                  value: childVariableValue,
+                  type: childVariableType,
+                  children: this.getStructureNetworkSyncData(childVariable),
+                };
+              }
+            )
+          : undefined;
+
+        return childrenSyncData;
+      }
+
+      return undefined;
+    }
+
+    updateFromNetworkSyncData(networkSyncData: VariableNetworkSyncData[]) {
+      const that = this;
+      for (let j = 0; j < networkSyncData.length; ++j) {
+        const variableSyncData = networkSyncData[j];
+        const variableName = variableSyncData.name;
+        if (!variableName) continue;
+
+        const variable = that.get(variableName);
+        variable.reinitialize({
+          name: variableName,
+          value: variableSyncData.value,
+          type: variableSyncData.type,
+          children: variableSyncData.children,
+        });
+      }
+    }
 
     /**
      * "Bad" variable container, used by events when no other valid container can be found.
@@ -222,6 +317,15 @@ namespace gdjs {
       },
       initFrom: function () {
         return;
+      },
+      getNetworkSyncData: function () {
+        return [];
+      },
+      updateFromNetworkSyncData: function () {
+        return;
+      },
+      getStructureNetworkSyncData: function () {
+        return undefined;
       },
     };
 

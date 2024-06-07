@@ -176,6 +176,14 @@ namespace gdjs {
     persistentUuid: string | null = null;
 
     /**
+     * A network ID associated to the object to be used
+     * for multiplayer, to identify the object across peers.
+     * We don't use persistentUuid as it's only used for hot-reload.
+     * We don't use the object ID either as it's not unique across peers.
+     */
+    networkId: string | null = null;
+
+    /**
      * A property to be used by external algorithms to indicate if the
      * object is picked or not in an object selection. By construction, this is
      * not "thread safe" or "re-entrant algorithm" safe.
@@ -312,6 +320,7 @@ namespace gdjs {
       //@ts-ignore Reinitialize is like a constructor, it can overwrite the readonly property.
       this.id = runtimeScene.createNewUniqueId();
       this.persistentUuid = null;
+      this.networkId = null;
       this.pick = false;
       this.hitBoxesDirty = true;
       this._defaultHitBoxes.length = 0;
@@ -437,6 +446,137 @@ namespace gdjs {
     ): boolean {
       // If not redefined, mark by default the hot-reload as failed.
       return false;
+    }
+
+    /**
+     * Called when trying to send all information about the state of an object to other peers.
+     * This can be redefined by objects to send more information.
+     * @returns The full network sync data.
+     */
+    getObjectNetworkSyncData(): ObjectNetworkSyncData {
+      const behaviorNetworkSyncData = {};
+      for (let i = 0, len = this._behaviors.length; i < len; ++i) {
+        const behavior = this._behaviors[i];
+        const networkSyncData = behavior.getNetworkSyncData();
+        if (networkSyncData) {
+          behaviorNetworkSyncData[behavior.getName()] = networkSyncData;
+        }
+      }
+
+      const variablesNetworkSyncData = this._variables.getNetworkSyncData();
+
+      const effectsNetworkSyncData = {};
+      for (const effectName in this._rendererEffects) {
+        effectsNetworkSyncData[effectName] = this._rendererEffects[
+          effectName
+        ].getNetworkSyncData();
+      }
+
+      const timersNetworkSyncData = {};
+      for (const timerName in this._timers.items) {
+        timersNetworkSyncData[timerName] = this._timers.items[
+          timerName
+        ].getNetworkSyncData();
+      }
+
+      return {
+        x: this.x,
+        y: this.y,
+        z: this.zOrder,
+        a: this.angle,
+        hid: this.hidden,
+        if: this._instantForces.map((force) => force.getNetworkSyncData()),
+        pfx: this._permanentForceX,
+        pfy: this._permanentForceY,
+        beh: behaviorNetworkSyncData,
+        var: variablesNetworkSyncData,
+        eff: effectsNetworkSyncData,
+        tim: timersNetworkSyncData,
+      };
+    }
+
+    /**
+     * Called when the object must be updated using the specified networkSyncData. This is the
+     * case during an update of the object from the network.
+     *
+     * @param networkSyncData The new data for the object.
+     * @returns true if the object was updated, false if it could not (i.e: network sync is not supported).
+     */
+    updateFromObjectNetworkSyncData(networkSyncData: ObjectNetworkSyncData) {
+      if (networkSyncData.x !== undefined) {
+        this.setX(networkSyncData.x);
+      }
+      if (networkSyncData.y !== undefined) {
+        this.setY(networkSyncData.y);
+      }
+      if (networkSyncData.z !== undefined) {
+        this.setZOrder(networkSyncData.z);
+      }
+      if (networkSyncData.a !== undefined) {
+        this.setAngle(networkSyncData.a);
+      }
+      if (
+        networkSyncData.hid !== undefined &&
+        this.hidden !== networkSyncData.hid
+      ) {
+        this.hide(networkSyncData.hid);
+      }
+
+      if (networkSyncData.if) {
+        // Force clear all forces and reapply them, using the garbage collector to recycle forces.
+        // Is that efficient?
+        this.clearForces();
+        for (let i = 0, len = networkSyncData.if.length; i < len; ++i) {
+          const forceData = networkSyncData.if[i];
+          const recycledOrNewForce = RuntimeObject.forcesGarbage.pop() as gdjs.Force;
+          recycledOrNewForce.updateFromNetworkSyncData(forceData);
+          this._instantForces.push(recycledOrNewForce);
+        }
+      }
+      if (networkSyncData.pfx !== undefined) {
+        this._permanentForceX = networkSyncData.pfx;
+      }
+      if (networkSyncData.pfy !== undefined) {
+        this._permanentForceY = networkSyncData.pfy;
+      }
+
+      // Loop through all behaviors and update them.
+      for (const behaviorName in networkSyncData.beh) {
+        const behaviorNetworkSyncData = networkSyncData.beh[behaviorName];
+        const behavior = this.getBehavior(behaviorName);
+        if (behavior) {
+          behavior.updateFromNetworkSyncData(behaviorNetworkSyncData);
+        }
+      }
+
+      // If variables are synchronized, update them.
+      if (networkSyncData.var) {
+        this._variables.updateFromNetworkSyncData(networkSyncData.var);
+      }
+
+      // If effects are synchronized, update them.
+      if (networkSyncData.eff) {
+        // Loop through all effects and update them.
+        for (const effectName in networkSyncData.eff) {
+          const effectNetworkSyncData = networkSyncData.eff[effectName];
+          const effect = this._rendererEffects[effectName];
+          if (effect) {
+            effect.updateFromNetworkSyncData(effectNetworkSyncData);
+          }
+        }
+      }
+
+      // If timers are synchronized, update them.
+      // TODO: If a timer is removed, also remove it from the object?
+      if (networkSyncData.tim) {
+        for (const timerName in networkSyncData.tim) {
+          const timerNetworkSyncData = networkSyncData.tim[timerName];
+          const timer = this._timers.get(timerName);
+          if (timer) {
+            timer.updateFromNetworkSyncData(timerNetworkSyncData);
+          }
+        }
+      }
     }
 
     /**

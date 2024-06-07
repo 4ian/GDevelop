@@ -1,5 +1,38 @@
 /// <reference path="helper/TileMapHelper.d.ts" />
 namespace gdjs {
+  export type TilemapCollisionMaskObjectDataType = {
+    content: {
+      tilemapJsonFile: string;
+      tilesetJsonFile: string;
+      collisionMaskTag: string;
+      debugMode: boolean;
+      fillColor: string;
+      outlineColor: string;
+    };
+    fillOpacity: float;
+    outlineOpacity: float;
+    outlineSize: float;
+  };
+
+  export type TilemapCollisionMaskObjectData = ObjectData &
+    TilemapCollisionMaskObjectDataType;
+
+  export type TilemapCollisionMaskNetworkSyncDataType = {
+    tmjf: string;
+    tsjf: string;
+    dm: boolean;
+    oc: integer;
+    fc: integer;
+    os: float;
+    fo: float;
+    oo: float;
+    wid: float;
+    hei: float;
+  };
+
+  export type TilemapCollisionMaskNetworkSyncData = ObjectNetworkSyncData &
+    TilemapCollisionMaskNetworkSyncDataType;
+
   /**
    * An object that handle hitboxes for a tile map.
    * @extends gdjs.RuntimeObject
@@ -104,7 +137,10 @@ namespace gdjs {
       return null;
     }
 
-    updateFromObjectData(oldObjectData: any, newObjectData: any): boolean {
+    updateFromObjectData(
+      oldObjectData: TilemapCollisionMaskObjectData,
+      newObjectData: TilemapCollisionMaskObjectData
+    ): boolean {
       if (
         oldObjectData.content.tilemapJsonFile !==
         newObjectData.content.tilemapJsonFile
@@ -143,6 +179,59 @@ namespace gdjs {
         this.setOutlineSize(newObjectData.outlineSize);
       }
       return true;
+    }
+
+    getObjectNetworkSyncData(): TilemapCollisionMaskNetworkSyncData {
+      return {
+        ...super.getObjectNetworkSyncData(),
+        tmjf: this.getTilemapJsonFile(),
+        tsjf: this.getTilesetJsonFile(),
+        dm: this.getDebugMode(),
+        oc: this.getOutlineColor(),
+        fc: this.getFillColor(),
+        os: this.getOutlineSize(),
+        fo: this.getFillOpacity(),
+        oo: this.getOutlineOpacity(),
+        wid: this.getWidth(),
+        hei: this.getHeight(),
+      };
+    }
+
+    updateFromObjectNetworkSyncData(
+      networkSyncData: TilemapCollisionMaskNetworkSyncData
+    ): void {
+      super.updateFromObjectNetworkSyncData(networkSyncData);
+
+      if (networkSyncData.tmjf !== undefined) {
+        this.setTilemapJsonFile(networkSyncData.tmjf);
+      }
+      if (networkSyncData.tsjf !== undefined) {
+        this.setTilesetJsonFile(networkSyncData.tsjf);
+      }
+      if (networkSyncData.dm !== undefined) {
+        this.setDebugMode(networkSyncData.dm);
+      }
+      if (networkSyncData.oc !== undefined) {
+        this.setOutlineColor(networkSyncData.oc);
+      }
+      if (networkSyncData.fc !== undefined) {
+        this.setFillColor(networkSyncData.fc);
+      }
+      if (networkSyncData.os !== undefined) {
+        this.setOutlineSize(networkSyncData.os);
+      }
+      if (networkSyncData.fo !== undefined) {
+        this.setFillOpacity(networkSyncData.fo);
+      }
+      if (networkSyncData.oo !== undefined) {
+        this.setOutlineOpacity(networkSyncData.oo);
+      }
+      if (networkSyncData.wid !== undefined) {
+        this.setWidth(networkSyncData.wid);
+      }
+      if (networkSyncData.hei !== undefined) {
+        this.setHeight(networkSyncData.hei);
+      }
     }
 
     extraInitializationFromInitialInstance(initialInstanceData): void {

@@ -11,6 +11,8 @@
     "test-benchmark:watch": "karma start --browsers ChromeHeadless --enableBenchmarks",
     "test:firefox": "karma start --browsers Firefox --single-run",
     "test:firefox:watch": "karma start --browsers Firefox",
+    "test:chrome": "karma start --browsers Chrome --single-run",
+    "test:chrome:watch": "karma start --browsers Chrome",
     "test:edge": "karma start --browsers EdgeHeadless --single-run",
     "test:edge:watch": "karma start --browsers EdgeHeadless"
   },

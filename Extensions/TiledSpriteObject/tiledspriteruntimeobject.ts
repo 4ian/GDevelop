@@ -14,6 +14,18 @@ namespace gdjs {
 
   export type TiledSpriteObjectData = ObjectData & TiledSpriteObjectDataType;
 
+  export type TiledSpriteNetworkSyncDataType = {
+    wid: number;
+    hei: number;
+    xo: number;
+    yo: number;
+    op: number;
+    color: string;
+  };
+
+  export type TiledSpriteNetworkSyncData = ObjectNetworkSyncData &
+    TiledSpriteNetworkSyncDataType;
+
   /**
    * The TiledSpriteRuntimeObject displays a tiled texture.
    */
@@ -65,6 +77,45 @@ namespace gdjs {
         this.setHeight(newObjectData.height);
       }
       return true;
+    }
+
+    getObjectNetworkSyncData(): TiledSpriteNetworkSyncData {
+      return {
+        ...super.getObjectNetworkSyncData(),
+        wid: this.getWidth(),
+        hei: this.getHeight(),
+        xo: this.getXOffset(),
+        yo: this.getYOffset(),
+        op: this.getOpacity(),
+        color: this.getColor(),
+      };
+    }
+
+    updateFromObjectNetworkSyncData(
+      networkSyncData: TiledSpriteNetworkSyncData
+    ): void {
+      super.updateFromObjectNetworkSyncData(networkSyncData);
+
+      // Texture is not synchronized, see if this is asked or not.
+
+      if (networkSyncData.wid !== undefined) {
+        this.setWidth(networkSyncData.wid);
+      }
+      if (networkSyncData.hei !== undefined) {
+        this.setHeight(networkSyncData.hei);
+      }
+      if (networkSyncData.xo !== undefined) {
+        this.setXOffset(networkSyncData.xo);
+      }
+      if (networkSyncData.yo !== undefined) {
+        this.setYOffset(networkSyncData.yo);
+      }
+      if (networkSyncData.op !== undefined) {
+        this.setOpacity(networkSyncData.op);
+      }
+      if (networkSyncData.color !== undefined) {
+        this.setColor(networkSyncData.color);
+      }
     }
 
     getRendererObject() {

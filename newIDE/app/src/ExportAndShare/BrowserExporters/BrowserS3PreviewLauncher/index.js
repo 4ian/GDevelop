@@ -96,7 +96,7 @@ export default class BrowserS3PreviewLauncher extends React.Component<
   };
 
   launchPreview = async (previewOptions: PreviewOptions): Promise<any> => {
-    const { project, layout, externalLayout } = previewOptions;
+    const { project, layout, externalLayout, numberOfWindows } = previewOptions;
     this.setState({
       error: null,
     });
@@ -115,8 +115,11 @@ export default class BrowserS3PreviewLauncher extends React.Component<
       ? getExistingPreviewWindowForDebuggerId(lastDebuggerId)
       : null;
 
-    const previewWindow =
-      existingPreviewWindow || immediatelyOpenNewPreviewWindow(project);
+    const previewWindows = existingPreviewWindow
+      ? [existingPreviewWindow]
+      : Array.from({ length: numberOfWindows }, () =>
+          immediatelyOpenNewPreviewWindow(project)
+        );
 
     try {
       await this.getPreviewDebuggerServer().startServer();
@@ -177,12 +180,17 @@ export default class BrowserS3PreviewLauncher extends React.Component<
 
       // Change the HTML file displayed by the preview window so that it starts loading
       // the game.
-      previewWindow.location = outputDir + '/index.html';
+      previewWindows.forEach(
+        (previewWindow: WindowProxy) =>
+          (previewWindow.location = outputDir + '/index.html')
+      );
 
-      // If the preview window is a new one, register it so that it can be accessed
+      // If the preview windows are new, register them so that they can be accessed
       // by the debugger.
       if (!existingPreviewWindow) {
-        registerNewPreviewWindow(previewWindow);
+        previewWindows.forEach((previewWindow: WindowProxy) => {
+          registerNewPreviewWindow(previewWindow);
+        });
       }
     } catch (error) {
       this.setState({

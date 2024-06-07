@@ -47,6 +47,14 @@ namespace gdjs {
     _cachedGameResolutionHeight: integer;
 
     /**
+     * A network ID associated to the scene to be used
+     * for multiplayer, to identify the scene across peers.
+     * A scene can have its networkId re-generated during the game, meaning
+     * that the scene is re-created on every peer.
+     */
+    networkId: string | null = null;
+
+    /**
      * @param runtimeGame The game associated to this scene.
      */
     constructor(runtimeGame: gdjs.RuntimeGame) {
@@ -312,6 +320,7 @@ namespace gdjs {
       this._initialBehaviorSharedData = new Hashtable();
       this._eventsFunction = null;
       this._lastId = 0;
+      this.networkId = null;
       // @ts-ignore We are deleting the object
       this._onceTriggers = null;
     }
@@ -761,6 +770,28 @@ namespace gdjs {
      */
     sceneJustResumed(): boolean {
       return this._isJustResumed;
+    }
+
+    getNetworkSyncData(): LayoutNetworkSyncData {
+      const variablesNetworkSyncData = this._variables.getNetworkSyncData();
+      return {
+        var: variablesNetworkSyncData,
+        id: this.getOrCreateNetworkId(),
+      };
+    }
+
+    updateFromNetworkSyncData(syncData: LayoutNetworkSyncData) {
+      if (syncData.var) {
+        this._variables.updateFromNetworkSyncData(syncData.var);
+      }
+    }
+
+    getOrCreateNetworkId(): string {
+      if (!this.networkId) {
+        const newNetworkId = gdjs.makeUuid().substring(0, 8);
+        this.networkId = newNetworkId;
+      }
+      return this.networkId;
     }
   }
 

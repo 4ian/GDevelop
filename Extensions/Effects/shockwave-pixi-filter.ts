@@ -4,6 +4,16 @@ namespace gdjs {
     _centerX: number;
     _centerY: number;
   }
+  interface ShockwaveFilterNetworkSyncData {
+    cx: number;
+    cy: number;
+    t: number;
+    s: number;
+    a: number;
+    w: number;
+    b: number;
+    r: number;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Shockwave',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -96,6 +106,35 @@ namespace gdjs {
         parameterName: string,
         value: boolean
       ) {}
+      getNetworkSyncData(filter: PIXI.Filter): ShockwaveFilterNetworkSyncData {
+        const shockwaveFilter = filter as PIXI.filters.ShockwaveFilter &
+          ShockwaveFilterExtra;
+        return {
+          cx: shockwaveFilter._centerX,
+          cy: shockwaveFilter._centerY,
+          t: shockwaveFilter.time,
+          s: shockwaveFilter.speed,
+          a: shockwaveFilter.amplitude,
+          w: shockwaveFilter.wavelength,
+          b: shockwaveFilter.brightness,
+          r: shockwaveFilter.radius,
+        };
+      }
+      updateFromNetworkSyncData(
+        filter: PIXI.Filter,
+        data: ShockwaveFilterNetworkSyncData
+      ) {
+        const shockwaveFilter = filter as PIXI.filters.ShockwaveFilter &
+          ShockwaveFilterExtra;
+        shockwaveFilter._centerX = data.cx;
+        shockwaveFilter._centerY = data.cy;
+        shockwaveFilter.time = data.t;
+        shockwaveFilter.speed = data.s;
+        shockwaveFilter.amplitude = data.a;
+        shockwaveFilter.wavelength = data.w;
+        shockwaveFilter.brightness = data.b;
+        shockwaveFilter.radius = data.r;
+      }
     })()
   );
 }

@@ -65,20 +65,20 @@ class BehaviorCodeGenerator {
    * property of a behavior.
    */
   static gd::String GetBehaviorPropertyToggleFunctionName(
-      const gd::String &propertyName) {
+      const gd::String& propertyName) {
     return "_toggle" + propertyName;
   }
 
   /**
-   * \brief Generate the name of the method to get the value of the shared property
-   * of a behavior.
+   * \brief Generate the name of the method to get the value of the shared
+   * property of a behavior.
    */
   static gd::String GetBehaviorSharedPropertyGetterName(
       const gd::String& propertyName);
 
   /**
-   * \brief Generate the name of the method to set the value of the shared property
-   * of a behavior.
+   * \brief Generate the name of the method to set the value of the shared
+   * property of a behavior.
    */
   static gd::String GetBehaviorSharedPropertySetterName(
       const gd::String& propertyName);
@@ -92,15 +92,15 @@ class BehaviorCodeGenerator {
 
  private:
   /**
-   * \brief Generate the name of the method to get the value of the shared property
-   * of a behavior form within the shared data class.
+   * \brief Generate the name of the method to get the value of the shared
+   * property of a behavior form within the shared data class.
    */
   static gd::String GetBehaviorSharedPropertyGetterInternalName(
       const gd::String& propertyName);
 
   /**
-   * \brief Generate the name of the method to set the value of the shared property
-   * of a behavior form within the shared data class.
+   * \brief Generate the name of the method to set the value of the shared
+   * property of a behavior form within the shared data class.
    */
   static gd::String GetBehaviorSharedPropertySetterInternalName(
       const gd::String& propertyName);
@@ -121,15 +121,18 @@ class BehaviorCodeGenerator {
       std::function<gd::String()> generateInitializeSharedPropertiesCode,
       std::function<gd::String()> generateSharedPropertiesCode,
       std::function<gd::String()> generateMethodsCode,
-      std::function<gd::String()> generateUpdateFromBehaviorDataCode);
+      std::function<gd::String()> generateUpdateFromBehaviorDataCode,
+      std::function<gd::String()> generateGetNetworkSyncDataCode,
+      std::function<gd::String()> generateUpdateFromNetworkSyncDataCode);
 
   gd::String GenerateRuntimeBehaviorPropertyTemplateCode(
       const gd::EventsBasedBehavior& eventsBasedBehavior,
       const gd::NamedPropertyDescriptor& property);
 
   gd::String GenerateToggleBooleanPropertyTemplateCode(
-    const gd::String &toggleName, const gd::String &getterName,
-    const gd::String &setterName);
+      const gd::String& toggleName,
+      const gd::String& getterName,
+      const gd::String& setterName);
 
   gd::String GenerateInitializePropertyFromDataCode(
       const gd::NamedPropertyDescriptor& property);
@@ -150,6 +153,14 @@ class BehaviorCodeGenerator {
   gd::String GeneratePropertyValueCode(const gd::PropertyDescriptor& property);
 
   gd::String GenerateUpdatePropertyFromBehaviorDataCode(
+      const gd::EventsBasedBehavior& eventsBasedBehavior,
+      const gd::NamedPropertyDescriptor& property);
+
+  gd::String GenerateGetPropertyNetworkSyncDataCode(
+      const gd::EventsBasedBehavior& eventsBasedBehavior,
+      const gd::NamedPropertyDescriptor& property);
+
+  gd::String GenerateUpdatePropertyFromNetworkSyncDataCode(
       const gd::EventsBasedBehavior& eventsBasedBehavior,
       const gd::NamedPropertyDescriptor& property);
 

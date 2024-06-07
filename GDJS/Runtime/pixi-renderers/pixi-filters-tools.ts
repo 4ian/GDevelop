@@ -109,6 +109,8 @@ namespace gdjs {
       updateColorParameter(parameterName: string, value: number): void;
       getDoubleParameter(parameterName: string): number;
       getColorParameter(parameterName: string): number;
+      getNetworkSyncData(): any;
+      updateFromNetworkSyncData(syncData: any): void;
     }
 
     /** A wrapper allowing to create a PIXI filter and update it using a common interface */
@@ -162,6 +164,11 @@ namespace gdjs {
         filter: PIXI.Filter,
         parameterName: string
       ): number;
+      abstract getNetworkSyncData(filter: PIXI.Filter): any;
+      abstract updateFromNetworkSyncData(
+        filter: PIXI.Filter,
+        syncData: any
+      ): void;
     }
 
     /**An effect used to manipulate a Pixi filter. */
@@ -263,6 +270,21 @@ namespace gdjs {
           parameterName
         );
       }
+
+      getNetworkSyncData(): any {
+        return {
+          ena: this.pixiFilter.enabled,
+          fc: this.filterCreator.getNetworkSyncData(this.pixiFilter),
+        };
+      }
+
+      updateFromNetworkSyncData(syncData: any): void {
+        this.pixiFilter.enabled = syncData.ena;
+        this.filterCreator.updateFromNetworkSyncData(
+          this.pixiFilter,
+          syncData.fc
+        );
+      }
     }
 
     export class EmptyFilter implements Filter {
@@ -289,6 +311,10 @@ namespace gdjs {
       getColorParameter(parameterName: string): number {
         return 0;
       }
+      getNetworkSyncData(): any {
+        return {};
+      }
+      updateFromNetworkSyncData(syncData: any): void {}
     }
   }
 }

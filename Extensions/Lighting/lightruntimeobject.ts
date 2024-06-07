@@ -15,6 +15,14 @@ namespace gdjs {
 
   export type LightObjectData = ObjectData & LightObjectDataType;
 
+  export type LightNetworkSyncDataType = {
+    rad: number;
+    col: string;
+  };
+
+  export type LightNetworkSyncData = ObjectNetworkSyncData &
+    LightNetworkSyncDataType;
+
   /**
    * Displays a Light object.
    */
@@ -78,6 +86,27 @@ namespace gdjs {
         this._renderer.updateDebugMode();
       }
       return true;
+    }
+
+    getObjectNetworkSyncData(): LightNetworkSyncData {
+      return {
+        ...super.getObjectNetworkSyncData(),
+        rad: this.getRadius(),
+        col: this.getColor(),
+      };
+    }
+
+    updateFromObjectNetworkSyncData(
+      networkSyncData: LightNetworkSyncData
+    ): void {
+      super.updateFromObjectNetworkSyncData(networkSyncData);
+
+      if (networkSyncData.rad !== undefined) {
+        this.setRadius(networkSyncData.rad);
+      }
+      if (networkSyncData.col !== undefined) {
+        this.setColor(networkSyncData.col);
+      }
     }
 
     updatePreRender(): void {

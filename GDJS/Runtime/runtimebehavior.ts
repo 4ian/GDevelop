@@ -73,6 +73,27 @@ namespace gdjs {
       return false;
     }
 
+    getNetworkSyncData(): BehaviorNetworkSyncData {
+      // To be redefined by behaviors that need to synchronize properties
+      // while calling super() to get the common properties.
+      return {
+        act: this._activated,
+        props: {},
+      };
+    }
+
+    /**
+     * Update the behavior properties using the provided data.
+     * @param networkSyncData The new properties of the behavior.
+     */
+    updateFromNetworkSyncData(networkSyncData: BehaviorNetworkSyncData): void {
+      // Must be redefined by behaviors that need to synchronize properties
+      // while calling super() to get the common properties.
+      if (networkSyncData.act !== this._activated) {
+        this.activate(networkSyncData.act);
+      }
+    }
+
     /**
      * Get the name of the behavior.
      * @return The behavior's name.

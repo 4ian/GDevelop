@@ -1,4 +1,10 @@
 namespace gdjs {
+  interface BulgePinchFilterNetworkSyncData {
+    cx: number;
+    cy: number;
+    r: number;
+    s: number;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'BulgePinch',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -61,6 +67,25 @@ namespace gdjs {
         parameterName: string,
         value: boolean
       ) {}
+      getNetworkSyncData(filter: PIXI.Filter): BulgePinchFilterNetworkSyncData {
+        const bulgePinchFilter = (filter as unknown) as PIXI.filters.BulgePinchFilter;
+        return {
+          cx: bulgePinchFilter.center[0],
+          cy: bulgePinchFilter.center[1],
+          r: bulgePinchFilter.radius,
+          s: bulgePinchFilter.strength,
+        };
+      }
+      updateFromNetworkSyncData(
+        filter: PIXI.Filter,
+        data: BulgePinchFilterNetworkSyncData
+      ) {
+        const bulgePinchFilter = (filter as unknown) as PIXI.filters.BulgePinchFilter;
+        bulgePinchFilter.center[0] = data.cx;
+        bulgePinchFilter.center[1] = data.cy;
+        bulgePinchFilter.radius = data.r;
+        bulgePinchFilter.strength = data.s;
+      }
     })()
   );
 }

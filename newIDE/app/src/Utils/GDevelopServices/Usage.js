@@ -79,6 +79,11 @@ export type Capabilities = {|
     hideUpgradeNotice: boolean,
     showClassroomTab: boolean,
   },
+  multiplayer: {|
+    lobbiesCount: number,
+    maxPlayersPerLobby: number,
+    themeCustomizationCapabilities: 'NONE' | 'BASIC' | 'FULL',
+  |},
 |};
 
 export type UsagePrice = {|

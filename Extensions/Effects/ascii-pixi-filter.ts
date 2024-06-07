@@ -1,4 +1,7 @@
 namespace gdjs {
+  interface AsciiFilterNetworkSyncData {
+    size: number;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Ascii',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -42,6 +45,17 @@ namespace gdjs {
         parameterName: string,
         value: boolean
       ) {}
+      getNetworkSyncData(filter: PIXI.Filter): AsciiFilterNetworkSyncData {
+        const asciiFilter = (filter as unknown) as PIXI.filters.AsciiFilter;
+        return { size: asciiFilter.size };
+      }
+      updateFromNetworkSyncData(
+        filter: PIXI.Filter,
+        data: AsciiFilterNetworkSyncData
+      ) {
+        const asciiFilter = (filter as unknown) as PIXI.filters.AsciiFilter;
+        asciiFilter.size = data.size;
+      }
     })()
   );
 }

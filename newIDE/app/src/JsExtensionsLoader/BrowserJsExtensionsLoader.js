@@ -96,6 +96,12 @@ const jsExtensions = [
     objectsRenderingServiceModules: {},
   },
   {
+    name: 'Multiplayer',
+    // $FlowExpectedError - this path is ignored for Flow.
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Multiplayer/JsExtension.js'),
+    objectsRenderingServiceModules: {},
+  },
+  {
     name: 'DialogueTree',
     // $FlowExpectedError - this path is ignored for Flow.
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/DialogueTree/JsExtension.js'),

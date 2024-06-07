@@ -39,6 +39,60 @@ declare type ObjectData = {
   effects: Array<EffectData>;
 };
 
+/** Object containing basic properties for all objects synchronizing over the network. */
+declare type BasicObjectNetworkSyncData = {
+  /** The position of the object on the X axis. */
+  x: number;
+  /** The position of the object on the Y axis. */
+  y: number;
+  /** The position of the object on the Z axis. */
+  z: number;
+  /** The angle of the object. */
+  a: number;
+  /** If the object is hidden */
+  hid: boolean;
+  /** All the instant forces */
+  if: Array<ForceNetworkSyncData>;
+  /** Permanent force on X */
+  pfx: number;
+  /** Permanent force on Y */
+  pfy: number;
+};
+
+/**
+ * Object containing properties, behaviors, variables, effects and timers
+ * for all objects synchronizing over the network.
+ **/
+declare interface ObjectNetworkSyncData extends BasicObjectNetworkSyncData {
+  /** The behaviors of the object */
+  beh: {
+    [behaviorName: string]: any;
+  };
+  /** The variables of the object */
+  var?: VariableNetworkSyncData[];
+  /** The effects of the object */
+  eff?: {
+    [effectName: string]: EffectNetworkSyncData;
+  };
+  /** The timers of the object */
+  tim?: {
+    [timerName: string]: TimerNetworkSyncData;
+  };
+}
+
+declare type ForceNetworkSyncData = {
+  x: float;
+  y: float;
+  a: float;
+  l: float;
+  m: number;
+};
+
+declare type TimerNetworkSyncData = {
+  time: float;
+  paused: boolean;
+};
+
 declare type VariableType =
   | 'string'
   | 'number'
@@ -61,12 +115,24 @@ declare type VariableData = Readonly<{
 /** A variable child of a container. Those always have a name. */
 declare type RootVariableData = Omit<VariableData, 'name'> & { name: string };
 
+declare type VariableNetworkSyncData = {
+  name: string;
+  value: string | float | boolean;
+  children?: VariableNetworkSyncData[];
+  type: VariableType;
+};
+
 /** Properties to set up a behavior. */
 declare type BehaviorData = {
   /** The name of the behavior (for getting from an object (object.getBehavior) for example) */
   name: string;
   /** The behavior type. Used by GDJS to find the proper behavior to construct. */
   type: string;
+};
+
+declare type BehaviorNetworkSyncData = {
+  act: boolean;
+  props: any;
 };
 
 declare interface GdVersionData {
@@ -90,6 +156,23 @@ declare interface LayoutData {
   layers: LayerData[];
   behaviorsSharedData: BehaviorSharedData[];
   usedResources: ResourceReference[];
+}
+
+declare interface LayoutNetworkSyncData {
+  id: string;
+  var?: VariableNetworkSyncData[];
+}
+
+declare interface SceneStackSceneNetworkSyncData {
+  name: string;
+  networkId: string;
+}
+
+declare type SceneStackNetworkSyncData = SceneStackSceneNetworkSyncData[];
+
+declare interface GameNetworkSyncData {
+  var?: VariableNetworkSyncData[];
+  ss?: SceneStackNetworkSyncData;
 }
 
 declare interface EventsFunctionsExtensionData {
@@ -194,6 +277,13 @@ declare interface EffectData {
   };
   booleanParameters: {
     [name: string]: boolean;
+  };
+}
+
+declare interface EffectNetworkSyncData {
+  ena: boolean;
+  fc: {
+    [name: string]: any;
   };
 }
 

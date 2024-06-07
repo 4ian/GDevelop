@@ -20,10 +20,15 @@ namespace gdjs {
         typeof event['eventName'] === 'string' &&
         typeof event['data'] === 'string';
 
+      export interface IEventData {
+        readonly data: string;
+        readonly sender: string;
+      }
+
       /**
        * The data bound to an event that got triggered.
        */
-      class EventData {
+      export class EventData implements IEventData {
         constructor(data: string, sender: string) {
           this.data = data;
           this.sender = sender;
@@ -40,11 +45,21 @@ namespace gdjs {
         public readonly sender: string = '';
       }
 
+      export interface IEvent {
+        dataloss: boolean;
+
+        isTriggered(): boolean;
+        pushData(newData: IEventData): void;
+        popData(): void;
+        getData(): string;
+        getSender(): string;
+      }
+
       /**
        * An event that can be listened to.
        */
-      class Event {
-        private readonly data: EventData[] = [];
+      export class Event implements IEvent {
+        private readonly data: IEventData[] = [];
         public dataloss = false;
 
         /**
@@ -57,13 +72,13 @@ namespace gdjs {
         /**
          * Add new data, to be called with the event data each time the event is triggered.
          */
-        pushData(newData: EventData) {
+        pushData(newData: IEventData) {
           if (this.dataloss && this.data.length > 0) this.data[0] = newData;
           else this.data.push(newData);
         }
 
         /**
-         * Deleted the last event data, to be called when it is sure the event was processed thoroughly.
+         * Delete the last event data, to be called when it is sure the event was processed thoroughly.
          */
         popData() {
           this.data.shift();
@@ -108,7 +123,7 @@ namespace gdjs {
        * Contains a map of events triggered by other p2p clients.
        * It is keyed by the event name.
        */
-      const events = new Map<string, Event>();
+      const events = new Map<string, IEvent>();
 
       /**
        * True if PeerJS is initialized and ready.
@@ -192,9 +207,10 @@ namespace gdjs {
         // Regularly check for disconnection as the built in way is not reliable.
         (function disconnectChecker() {
           if (
-            connection.peerConnection.connectionState === 'failed' ||
-            connection.peerConnection.connectionState === 'disconnected' ||
-            connection.peerConnection.connectionState === 'closed'
+            connection.peerConnection &&
+            (connection.peerConnection.connectionState === 'failed' ||
+              connection.peerConnection.connectionState === 'disconnected' ||
+              connection.peerConnection.connectionState === 'closed')
           ) {
             _onDisconnect(connection.peer);
           } else {
@@ -216,7 +232,7 @@ namespace gdjs {
       /**
        * Get an event, and creates it if it doesn't exist.
        */
-      export const getEvent = (name: string): Event => {
+      export const getEvent = (name: string): IEvent => {
         let event = events.get(name);
         if (!event) events.set(name, (event = new Event()));
         return event;
@@ -280,7 +296,8 @@ namespace gdjs {
       ): boolean => {
         const event = getEvent(eventName);
         event.dataloss = defaultDataLoss;
-        return event.isTriggered();
+        const isTriggered = event.isTriggered();
+        return isTriggered;
       };
 
       /**
@@ -347,8 +364,10 @@ namespace gdjs {
        * @param eventName - The event to get data from.
        * @returns - The data as JSON.
        */
-      export const getEventData = (eventName: string) =>
-        getEvent(eventName).getData();
+      export const getEventData = (eventName: string) => {
+        const data = getEvent(eventName).getData();
+        return data;
+      };
 
       /**
        * Get the id of peer that caused the last trigger of an event.
@@ -368,6 +387,8 @@ namespace gdjs {
       ) => {
         variable.fromJSON(getEventData(eventName));
       };
+
+      export const getEvents = () => events;
 
       /**
        * Connects to a custom broker server.
@@ -491,6 +512,11 @@ namespace gdjs {
        * Get the ID of the peer that triggered onConnection.
        */
       export const getConnectedPeer = (): string => connectedPeers[0] || '';
+
+      /**
+       * Returns the list of all currently connected peers.
+       */
+      export const getAllPeers = () => Array.from(connections.keys());
 
       /**
        * A JavaScript-only function to get the raw P2P DataConnection.

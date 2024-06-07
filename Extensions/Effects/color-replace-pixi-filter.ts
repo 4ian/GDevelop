@@ -5,6 +5,11 @@ namespace gdjs {
     /** It's only set to a number. */
     newColor: number;
   }
+  interface ColorReplaceFilterNetworkSyncData {
+    e: number;
+    oc: number;
+    nc: number;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'ColorReplace',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -77,6 +82,27 @@ namespace gdjs {
         parameterName: string,
         value: boolean
       ) {}
+      getNetworkSyncData(
+        filter: PIXI.Filter
+      ): ColorReplaceFilterNetworkSyncData {
+        const colorReplaceFilter = (filter as unknown) as PIXI.filters.ColorReplaceFilter &
+          ColorReplaceFilterExtra;
+        return {
+          e: colorReplaceFilter.epsilon,
+          oc: colorReplaceFilter.originalColor,
+          nc: colorReplaceFilter.newColor,
+        };
+      }
+      updateFromNetworkSyncData(
+        filter: PIXI.Filter,
+        data: ColorReplaceFilterNetworkSyncData
+      ) {
+        const colorReplaceFilter = (filter as unknown) as PIXI.filters.ColorReplaceFilter &
+          ColorReplaceFilterExtra;
+        colorReplaceFilter.epsilon = data.e;
+        colorReplaceFilter.originalColor = data.oc;
+        colorReplaceFilter.newColor = data.nc;
+      }
     })()
   );
 }

@@ -1,4 +1,7 @@
 namespace gdjs {
+  interface SepiaFilterNetworkSyncData {
+    a: number;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Sepia',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -47,6 +50,17 @@ namespace gdjs {
         parameterName: string,
         value: boolean
       ) {}
+      getNetworkSyncData(filter: PIXI.Filter): SepiaFilterNetworkSyncData {
+        const colorMatrixFilter = (filter as unknown) as PIXI.ColorMatrixFilter;
+        return { a: colorMatrixFilter.alpha };
+      }
+      updateFromNetworkSyncData(
+        filter: PIXI.Filter,
+        data: SepiaFilterNetworkSyncData
+      ) {
+        const colorMatrixFilter = (filter as unknown) as PIXI.ColorMatrixFilter;
+        colorMatrixFilter.alpha = data.a;
+      }
     })()
   );
 }

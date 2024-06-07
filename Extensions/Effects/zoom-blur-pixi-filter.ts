@@ -1,4 +1,11 @@
 namespace gdjs {
+  interface ZoomBlurFilterNetworkSyncData {
+    cx: number;
+    cy: number;
+    ir: number;
+    s: number;
+    p: number;
+  }
   interface ZoomBlurFilterExtra {
     // extra properties are stored on the filter.
     _centerX: number;
@@ -82,6 +89,29 @@ namespace gdjs {
         parameterName: string,
         value: boolean
       ) {}
+      getNetworkSyncData(filter: PIXI.Filter): ZoomBlurFilterNetworkSyncData {
+        const zoomBlurFilter = (filter as unknown) as PIXI.filters.ZoomBlurFilter &
+          ZoomBlurFilterExtra;
+        return {
+          cx: zoomBlurFilter._centerX,
+          cy: zoomBlurFilter._centerY,
+          ir: zoomBlurFilter.innerRadius,
+          s: zoomBlurFilter.strength,
+          p: zoomBlurFilter.padding,
+        };
+      }
+      updateFromNetworkSyncData(
+        filter: PIXI.Filter,
+        data: ZoomBlurFilterNetworkSyncData
+      ) {
+        const zoomBlurFilter = (filter as unknown) as PIXI.filters.ZoomBlurFilter &
+          ZoomBlurFilterExtra;
+        zoomBlurFilter._centerX = data.cx;
+        zoomBlurFilter._centerY = data.cy;
+        zoomBlurFilter.innerRadius = data.ir;
+        zoomBlurFilter.strength = data.s;
+        zoomBlurFilter.padding = data.p;
+      }
     })()
   );
 }

@@ -1,4 +1,14 @@
 namespace gdjs {
+  interface DropShadowFilterNetworkSyncData {
+    b: number;
+    q: number;
+    a: number;
+    d: number;
+    r: number;
+    p: number;
+    c: number;
+    so: boolean;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'DropShadow',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -87,6 +97,33 @@ namespace gdjs {
         if (parameterName === 'shadowOnly') {
           dropShadowFilter.shadowOnly = value;
         }
+      }
+      getNetworkSyncData(filter: PIXI.Filter): DropShadowFilterNetworkSyncData {
+        const dropShadowFilter = (filter as unknown) as PIXI.filters.DropShadowFilter;
+        return {
+          b: dropShadowFilter.blur,
+          q: dropShadowFilter.quality,
+          a: dropShadowFilter.alpha,
+          d: dropShadowFilter.distance,
+          r: dropShadowFilter.rotation,
+          p: dropShadowFilter.padding,
+          c: dropShadowFilter.color,
+          so: dropShadowFilter.shadowOnly,
+        };
+      }
+      updateFromNetworkSyncData(
+        filter: PIXI.Filter,
+        data: DropShadowFilterNetworkSyncData
+      ) {
+        const dropShadowFilter = (filter as unknown) as PIXI.filters.DropShadowFilter;
+        dropShadowFilter.blur = data.b;
+        dropShadowFilter.quality = data.q;
+        dropShadowFilter.alpha = data.a;
+        dropShadowFilter.distance = data.d;
+        dropShadowFilter.rotation = data.r;
+        dropShadowFilter.padding = data.p;
+        dropShadowFilter.color = data.c;
+        dropShadowFilter.shadowOnly = data.so;
       }
     })()
   );

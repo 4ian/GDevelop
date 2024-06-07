@@ -25,6 +25,21 @@ namespace gdjs {
   };
   export type BitmapTextObjectData = ObjectData & BitmapTextObjectDataType;
 
+  export type BitmapTextObjectNetworkSyncDataType = {
+    text: string;
+    opa: float;
+    tint: number[];
+    bfrn: string;
+    tarn: string;
+    scale: number;
+    wwrap: boolean;
+    wwidth: float;
+    align: string;
+  };
+
+  export type BitmapTextObjectNetworkSyncData = ObjectNetworkSyncData &
+    BitmapTextObjectNetworkSyncDataType;
+
   /**
    * Displays a text using a "Bitmap Font", generated in a external editor like bmFont.
    * This is more efficient/faster to render than a traditional text (which needs
@@ -130,6 +145,55 @@ namespace gdjs {
       }
 
       return true;
+    }
+
+    getObjectNetworkSyncData(): BitmapTextObjectNetworkSyncData {
+      return {
+        ...super.getObjectNetworkSyncData(),
+        text: this._text,
+        opa: this._opacity,
+        tint: this._tint,
+        bfrn: this._bitmapFontResourceName,
+        tarn: this._textureAtlasResourceName,
+        scale: this.getScale(),
+        wwrap: this._wordWrap,
+        wwidth: this._wrappingWidth,
+        align: this._align,
+      };
+    }
+
+    updateFromObjectNetworkSyncData(
+      networkSyncData: BitmapTextObjectNetworkSyncData
+    ): void {
+      super.updateFromObjectNetworkSyncData(networkSyncData);
+      if (this._text !== undefined) {
+        this.setText(networkSyncData.text);
+      }
+      if (this._opacity !== undefined) {
+        this.setOpacity(networkSyncData.opa);
+      }
+      if (this._tint !== undefined) {
+        this._tint = networkSyncData.tint;
+        this._renderer.updateTint();
+      }
+      if (this._bitmapFontResourceName !== undefined) {
+        this.setBitmapFontResourceName(networkSyncData.bfrn);
+      }
+      if (this._textureAtlasResourceName !== undefined) {
+        this.setTextureAtlasResourceName(networkSyncData.tarn);
+      }
+      if (this._scaleX !== undefined) {
+        this.setScale(networkSyncData.scale);
+      }
+      if (this._wordWrap !== undefined) {
+        this.setWordWrap(networkSyncData.wwrap);
+      }
+      if (this._wrappingWidth !== undefined) {
+        this.setWrappingWidth(networkSyncData.wwidth);
+      }
+      if (this._align !== undefined) {
+        this.setAlignment(networkSyncData.align);
+      }
     }
 
     /**

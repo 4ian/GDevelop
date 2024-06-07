@@ -1,4 +1,7 @@
 namespace gdjs {
+  interface BlackAndWhiteFilterNetworkSyncData {
+    a: number;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'BlackAndWhite',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -44,6 +47,19 @@ namespace gdjs {
         parameterName: string,
         value: boolean
       ) {}
+      getNetworkSyncData(
+        filter: PIXI.Filter
+      ): BlackAndWhiteFilterNetworkSyncData {
+        const colorMatrix = (filter as unknown) as PIXI.ColorMatrixFilter;
+        return { a: colorMatrix.alpha };
+      }
+      updateFromNetworkSyncData(
+        filter: PIXI.Filter,
+        data: BlackAndWhiteFilterNetworkSyncData
+      ) {
+        const colorMatrix = (filter as unknown) as PIXI.ColorMatrixFilter;
+        colorMatrix.alpha = data.a;
+      }
     })()
   );
 }

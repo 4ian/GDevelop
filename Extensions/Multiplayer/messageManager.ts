@@ -123,7 +123,7 @@ namespace gdjs {
       maxNumberOfRetries?: number;
       messageRetryTime?: number;
     }) => {
-      if (!gdjs.multiplayer.isGameRunning()) {
+      if (!gdjs.multiplayer.isLobbyGameRunning()) {
         // This can happen if objects are destroyed at the end of the scene.
         // We should not add expected messages in this case.
         return;
@@ -1597,7 +1597,7 @@ namespace gdjs {
         logger.info('Host has disconnected, ending the game.');
         _playersLastHeartbeatInfo = {};
         _playersPings = {};
-        gdjs.multiplayer.endLobbyGame();
+        gdjs.multiplayer.handleLobbyGameEnded();
         return;
       }
 
@@ -1609,6 +1609,11 @@ namespace gdjs {
     };
 
     const handleDisconnectedPeers = (runtimeScene: RuntimeScene) => {
+      // If the game is not running, we don't need to handle disconnected peers.
+      if (!gdjs.multiplayer.isLobbyGameRunning()) {
+        return;
+      }
+
       // Players can disconnect if the P2P connection disconnects
       // or if we don't receive heartbeats for a while.
       const disconnectedPlayerNumbers: number[] = [];
@@ -1683,6 +1688,49 @@ namespace gdjs {
       return _playersPings[playerNumber] !== undefined;
     };
 
+    const endGameMessageName = '#endGame';
+    const createEndGameMessage = (): {
+      messageName: string;
+      messageData: any;
+    } => {
+      return {
+        messageName: endGameMessageName,
+        messageData: {},
+      };
+    };
+    const sendEndGameMessage = () => {
+      // Only the host can end the game.
+      if (!gdjs.multiplayer.isPlayerHost()) {
+        return;
+      }
+
+      const connectedPeerIds = gdjs.evtTools.p2p.getAllPeers();
+      const { messageName, messageData } = createEndGameMessage();
+      // Note: we don't wait for an acknowledgment here, as the game will end anyway.
+      for (const peerId of connectedPeerIds) {
+        sendDataTo(peerId, messageName, messageData);
+      }
+    };
+    const handleEndGameMessages = () => {
+      if (gdjs.multiplayer.isPlayerHost()) {
+        // Only other players need to react to the end game message.
+        return;
+      }
+      const p2pMessagesMap = gdjs.evtTools.p2p.getEvents();
+      const messageNamesArray = Array.from(p2pMessagesMap.keys());
+      const endGameMessageNames = messageNamesArray.filter(
+        (messageName) => messageName === endGameMessageName
+      );
+      endGameMessageNames.forEach((messageName) => {
+        logger.info(`Received endgame message ${messageName}.`);
+        if (gdjs.evtTools.p2p.onEvent(messageName, false)) {
+          _playersLastHeartbeatInfo = {};
+          _playersPings = {};
+          gdjs.multiplayer.handleLobbyGameEnded();
+        }
+      });
+    };
+
     return {
       addExpectedMessageAcknowledgement,
       clearExpectedMessageAcknowledgements,
@@ -1717,6 +1765,8 @@ namespace gdjs {
       getDisconnectedPlayers,
       getNumberOfConnectedPlayers,
       isPlayerConnected,
+      sendEndGameMessage,
+      handleEndGameMessages,
     };
   };
 

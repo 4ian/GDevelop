@@ -307,13 +307,13 @@ describe('Multiplayer', () => {
   beforeEach(() => {
     _originalP2pIfAny = gdjs.evtTools.p2p;
     gdjs.multiplayer.disableMultiplayerForTesting = false;
-    gdjs.multiplayer._isGameRunning = true;
+    gdjs.multiplayer._isLobbyGameRunning = true;
     gdjs.multiplayer._lobby = fakeLobby;
   });
   afterEach(() => {
     gdjs.evtTools.p2p = _originalP2pIfAny;
     gdjs.multiplayer.disableMultiplayerForTesting = true;
-    gdjs.multiplayer._isGameRunning = false;
+    gdjs.multiplayer._isLobbyGameRunning = false;
     gdjs.multiplayer._lobby = null;
   });
 

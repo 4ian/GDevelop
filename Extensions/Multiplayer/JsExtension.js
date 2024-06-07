@@ -169,7 +169,7 @@ module.exports = {
 
     extension
       .addCondition(
-        'HasGameJustStarted',
+        'hasLobbyGameJustStarted',
         _('Lobby game has just started'),
         _('Check if the lobby game has just started.'),
         _('Lobby game has started'),
@@ -189,11 +189,11 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .setFunctionName('gdjs.multiplayer.hasGameJustStarted');
+      .setFunctionName('gdjs.multiplayer.hasLobbyGameJustStarted');
 
     extension
       .addCondition(
-        'IsGameRunning',
+        'isLobbyGameRunning',
         _('Lobby game is running'),
         _('Check if the lobby game is running.'),
         _('Lobby game is running'),
@@ -213,11 +213,11 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .setFunctionName('gdjs.multiplayer.isGameRunning');
+      .setFunctionName('gdjs.multiplayer.isLobbyGameRunning');
 
     extension
       .addCondition(
-        'HasGameJustEnded',
+        'hasLobbyGameJustEnded',
         _('Lobby game has just ended'),
         _('Check if the lobby game has just ended.'),
         _('Lobby game has ended'),
@@ -237,31 +237,7 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .setFunctionName('gdjs.multiplayer.hasGameJustEnded');
-
-    extension
-      .addCondition(
-        'IsPlayerInLobby',
-        _('Player is in a lobby'),
-        _('Check if the player is in a lobby.'),
-        _('Player is in a lobby'),
-        '',
-        'JsPlatform/Extensions/multiplayer.svg',
-        'JsPlatform/Extensions/multiplayer.svg'
-      )
-      .getCodeExtraInformation()
-      .setIncludeFile('Extensions/P2P/A_peer.js')
-      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
-      .addIncludeFile(
-        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
-      )
-      .addIncludeFile(
-        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
-      )
-      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
-      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
-      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .setFunctionName('gdjs.multiplayer.isConnectedToLobby');
+      .setFunctionName('gdjs.multiplayer.hasLobbyGameJustEnded');
 
     extension
       .addCondition(

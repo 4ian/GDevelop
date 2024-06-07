@@ -207,9 +207,10 @@ namespace gdjs {
         // Regularly check for disconnection as the built in way is not reliable.
         (function disconnectChecker() {
           if (
-            connection.peerConnection.connectionState === 'failed' ||
-            connection.peerConnection.connectionState === 'disconnected' ||
-            connection.peerConnection.connectionState === 'closed'
+            connection.peerConnection &&
+            (connection.peerConnection.connectionState === 'failed' ||
+              connection.peerConnection.connectionState === 'disconnected' ||
+              connection.peerConnection.connectionState === 'closed')
           ) {
             _onDisconnect(connection.peer);
           } else {

@@ -94,6 +94,7 @@ export type LeaderboardEntry = {|
 export type LobbyConfiguration = {|
   gameId: string,
   maxPlayers: number,
+  minPlayers: number,
 |};
 
 export const shortenUuidForDisplay = (uuid: string): string =>
@@ -481,15 +482,17 @@ export const updateLobbyConfiguration = async (
   {
     gameId,
     maxPlayers,
+    minPlayers,
   }: {|
     gameId: string,
     maxPlayers: number,
+    minPlayers: number,
   |}
 ): Promise<LobbyConfiguration> => {
   const authorizationHeader = await getAuthorizationHeader();
   const response = await axios.patch(
     `${GDevelopPlayApi.baseUrl}/game/${gameId}/lobby-configuration`,
-    { maxPlayers },
+    { maxPlayers, minPlayers },
     {
       params: { userId },
       headers: {

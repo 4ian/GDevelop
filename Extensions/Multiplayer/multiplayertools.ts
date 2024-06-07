@@ -11,18 +11,12 @@ namespace gdjs {
     let _isCheckingIfGameIsRegistered = false;
     let _isWaitingForLoginCallback = false;
 
-    let _hasGameJustStarted = false;
-    export let _isGameRunning = false;
-    let _hasGameJustEnded = false;
+    let _hasLobbyGameJustStarted = false;
+    export let _isLobbyGameRunning = false;
+    let _hasLobbyGameJustEnded = false;
     let _lobbyId: string | null = null;
     let _connectionId: string | null = null;
     export let _lobby: {
-      id: string;
-      name: string;
-      status: string;
-      players: { playerId: string; status: string }[];
-    } | null = null;
-    let _lobbyOnGameStart: {
       id: string;
       name: string;
       status: string;
@@ -33,12 +27,23 @@ namespace gdjs {
     // Communication methods.
     let _lobbiesMessageCallback: ((event: MessageEvent) => void) | null = null;
     let _websocket: WebSocket | null = null;
-    let _heartbeatInterval: NodeJS.Timeout | null = null;
+    let _websocketHeartbeatInterval: NodeJS.Timeout | null = null;
+    let _lobbyHeartbeatInterval: NodeJS.Timeout | null = null;
+
+    const DEFAULT_WEBSOCKET_HEARTBEAT_INTERVAL = 10000;
+    const DEFAULT_LOBBY_HEARTBEAT_INTERVAL = 30000;
+
+    // Save if we are on dev environment so we don't need to use the runtimeGame every time.
+    let isUsingGDevelopDevelopmentEnvironment = false;
 
     export let playerNumber: number | null = null;
 
     gdjs.registerRuntimeScenePreEventsCallback(
       (runtimeScene: gdjs.RuntimeScene) => {
+        isUsingGDevelopDevelopmentEnvironment = runtimeScene
+          .getGame()
+          .isUsingGDevelopDevelopmentEnvironment();
+
         if (disableMultiplayerForTesting) return;
 
         gdjs.multiplayerMessageManager.handleChangeOwnerMessages(runtimeScene);
@@ -74,8 +79,8 @@ namespace gdjs {
     gdjs.registerRuntimeScenePostEventsCallback(() => {
       if (disableMultiplayerForTesting) return;
 
-      _hasGameJustStarted = false;
-      _hasGameJustEnded = false;
+      _hasLobbyGameJustStarted = false;
+      _hasLobbyGameJustEnded = false;
     });
 
     const getLobbiesWindowUrl = ({
@@ -88,7 +93,6 @@ namespace gdjs {
       // Uncomment to test the case of a failing loading:
       // return 'https://gd.games.wronglink';
 
-      const isDev = runtimeGame.isUsingGDevelopDevelopmentEnvironment();
       const baseUrl = 'https://gd.games';
       // Uncomment to test locally:
       // const baseUrl = 'http://localhost:4000';
@@ -100,7 +104,7 @@ namespace gdjs {
         'gameVersion',
         runtimeGame.getGameData().properties.version
       );
-      if (isDev) {
+      if (isUsingGDevelopDevelopmentEnvironment) {
         url.searchParams.set('dev', 'true');
       }
       if (_connectionId) {
@@ -125,32 +129,27 @@ namespace gdjs {
      * Returns true if the game has just started,
      * useful to switch to the game scene.
      */
-    export const hasGameJustStarted = () => _hasGameJustStarted;
+    export const hasLobbyGameJustStarted = () => _hasLobbyGameJustStarted;
 
-    export const isGameRunning = () => _isGameRunning;
+    export const isLobbyGameRunning = () => _isLobbyGameRunning;
 
     /**
      * Returns true if the game has just ended,
      * useful to switch back to to the main menu.
      */
-    export const hasGameJustEnded = () => _hasGameJustEnded;
-
-    /**
-     * Returns true if the player is connected to a lobby, false otherwise.
-     */
-    export const isConnectedToLobby = () => !!_connectionId;
+    export const hasLobbyGameJustEnded = () => _hasLobbyGameJustEnded;
 
     /**
      * Returns the number of players in the lobby.
      */
     export const getNumberOfPlayersInLobby = () => {
       // If the game has not started yet, look at the lobby.
-      if (!_isGameRunning && _lobby) {
+      if (!_isLobbyGameRunning && _lobby) {
         return _lobby.players.length;
       }
 
       // If the game has started, look at the pings received from the players.
-      if (_isGameRunning) {
+      if (_isLobbyGameRunning) {
         return gdjs.multiplayerMessageManager.getNumberOfConnectedPlayers();
       }
 
@@ -178,14 +177,14 @@ namespace gdjs {
      * The number is shifted by one, so that the first player has number  1.
      */
     const getPlayerId = (playerNumber: number) => {
-      if (!_lobbyOnGameStart) {
+      if (!_lobby) {
         return '';
       }
       const index = playerNumber - 1;
-      if (index < 0 || index >= _lobbyOnGameStart.players.length) {
+      if (index < 0 || index >= _lobby.players.length) {
         return '';
       }
-      return _lobbyOnGameStart.players[index].playerId;
+      return _lobby.players[index].playerId;
     };
 
     /**
@@ -241,7 +240,7 @@ namespace gdjs {
       gameId: string,
       tries: number = 0
     ): Promise<boolean> => {
-      const rootApi = runtimeGame.isUsingGDevelopDevelopmentEnvironment()
+      const rootApi = isUsingGDevelopDevelopmentEnvironment
         ? 'https://api-dev.gdevelop.io'
         : 'https://api.gdevelop.io';
       const url = `${rootApi}/game/public-game/${gameId}`;
@@ -338,7 +337,6 @@ namespace gdjs {
         playerNumber = null;
         _lobbyId = null;
         _lobby = null;
-        _lobbyOnGameStart = null;
         _websocket = null;
       }
 
@@ -353,9 +351,7 @@ namespace gdjs {
         logger.warn('Cannot open lobbies if the player is not connected.');
         return;
       }
-      const wsPlayApi = runtimeScene
-        .getGame()
-        .isUsingGDevelopDevelopmentEnvironment()
+      const wsPlayApi = isUsingGDevelopDevelopmentEnvironment
         ? 'wss://api-ws-dev.gdevelop.io/play'
         : 'wss://api-ws.gdevelop.io/play';
 
@@ -369,7 +365,7 @@ namespace gdjs {
       _websocket.onopen = () => {
         logger.info('Connected to the lobby.');
         // Register a heartbeat to keep the connection alive.
-        _heartbeatInterval = setInterval(() => {
+        _websocketHeartbeatInterval = setInterval(() => {
           if (_websocket) {
             logger.info('Heartbeat sent to keep connection alive.');
             _websocket.send(
@@ -379,7 +375,7 @@ namespace gdjs {
               })
             );
           }
-        }, 10000);
+        }, DEFAULT_WEBSOCKET_HEARTBEAT_INTERVAL);
 
         // When socket is open, ask for the connectionId, so that we can inform the lobbies window.
         if (_websocket) {
@@ -387,7 +383,6 @@ namespace gdjs {
         }
       };
       _websocket.onmessage = (event) => {
-        logger.info('Message from the lobby:', event.data);
         if (event.data) {
           const messageContent = JSON.parse(event.data);
           switch (messageContent.type) {
@@ -396,6 +391,7 @@ namespace gdjs {
               const connectionId = messageData.connectionId;
               const positionInLobby = messageData.positionInLobby;
               const validIceServers = messageData.validIceServers || [];
+              const brokerServerConfig = messageData.brokerServerConfig;
 
               if (!connectionId || !positionInLobby) {
                 logger.error('No connectionId or position received');
@@ -410,6 +406,7 @@ namespace gdjs {
                 playerId,
                 playerToken,
                 validIceServers,
+                brokerServerConfig,
               });
               break;
             }
@@ -429,11 +426,12 @@ namespace gdjs {
               break;
             }
             case 'gameStarted': {
-              handleGameStartedEvent(runtimeScene);
-              break;
-            }
-            case 'gameEnded': {
-              handleGameEndedEvent();
+              const messageData = messageContent.data;
+              const heartbeatInterval =
+                messageData.heartbeatInterval ||
+                DEFAULT_LOBBY_HEARTBEAT_INTERVAL;
+
+              handleGameStartedEvent(runtimeScene, heartbeatInterval);
               break;
             }
             case 'peerId': {
@@ -455,16 +453,20 @@ namespace gdjs {
         }
       };
       _websocket.onclose = () => {
-        logger.info('Disconnected from the lobby.');
+        logger.info(
+          'Disconnected from the lobby. Either manually or game started.'
+        );
 
         _connectionId = null;
-        playerNumber = null;
-        _lobbyId = null;
-        _lobby = null;
-        _lobbyOnGameStart = null;
         _websocket = null;
-        if (_heartbeatInterval) {
-          clearInterval(_heartbeatInterval);
+        if (_websocketHeartbeatInterval) {
+          clearInterval(_websocketHeartbeatInterval);
+        }
+
+        // If the game is running, then all good.
+        // Otherwise, the player left the lobby.
+        if (_isLobbyGameRunning) {
+          return;
         }
 
         const lobbiesIframe = multiplayerComponents.getLobbiesIframe(
@@ -493,6 +495,7 @@ namespace gdjs {
       playerId,
       playerToken,
       validIceServers,
+      brokerServerConfig,
     }: {
       runtimeScene: gdjs.RuntimeScene;
       connectionId: string;
@@ -505,10 +508,16 @@ namespace gdjs {
         username?: string;
         credential?: string;
       }[];
+      brokerServerConfig?: {
+        hostname: string;
+        port: number;
+        path: string;
+        key: string;
+        secure: boolean;
+      };
     }) {
       // When the connectionId is received, initialise PeerJS so players can connect to each others afterwards.
       if (validIceServers.length) {
-        console.info('Using custom servers:', validIceServers);
         for (const server of validIceServers) {
           gdjs.evtTools.p2p.useCustomICECandidate(
             server.urls,
@@ -517,14 +526,17 @@ namespace gdjs {
           );
         }
       }
-      gdjs.evtTools.p2p.useDefaultBrokerServer();
-      // gdjs.evtTools.p2p.useCustomBrokerServer(
-      //   'gdevelop-services.uc.r.appspot.com',
-      //   80,
-      //   '/',
-      //   '',
-      //   false
-      // );
+      if (brokerServerConfig) {
+        gdjs.evtTools.p2p.useCustomBrokerServer(
+          brokerServerConfig.hostname,
+          brokerServerConfig.port,
+          brokerServerConfig.path,
+          brokerServerConfig.key,
+          brokerServerConfig.secure
+        );
+      } else {
+        gdjs.evtTools.p2p.useDefaultBrokerServer();
+      }
 
       _connectionId = connectionId;
       playerNumber = positionInLobby;
@@ -567,7 +579,6 @@ namespace gdjs {
       playerNumber = null;
       _lobbyId = null;
       _lobby = null;
-      _lobbyOnGameStart = null;
       _websocket = null;
     };
 
@@ -585,10 +596,7 @@ namespace gdjs {
       }
 
       // Update the profiles so we can use the usernames of the players.
-      const isDev = runtimeScene
-        .getGame()
-        .isUsingGDevelopDevelopmentEnvironment();
-      updatePlayerPublicProfiles(isDev);
+      updatePlayerPublicProfiles(isUsingGDevelopDevelopmentEnvironment);
 
       playerNumber = positionInLobby;
 
@@ -645,7 +653,10 @@ namespace gdjs {
      * When the game receives the information that the game has started, close the
      * lobbies window, focus on the game, and set the flag to true.
      */
-    const handleGameStartedEvent = function (runtimeScene: gdjs.RuntimeScene) {
+    const handleGameStartedEvent = function (
+      runtimeScene: gdjs.RuntimeScene,
+      heartbeatInterval: number
+    ) {
       // It is possible the connection to other players didn't work.
       // If that's the case, show an error message and leave the lobby.
       // If we are the host, still start the game, as this allows a player to test the game alone.
@@ -659,11 +670,45 @@ namespace gdjs {
         return;
       }
 
+      // If we are the host, start pinging the backend to let it know the lobby is running.
+      if (isPlayerHost()) {
+        const gameId = gdjs.projectData.properties.projectUuid;
+        const playerId = gdjs.playerAuthentication.getUserId();
+        const playerToken = gdjs.playerAuthentication.getUserToken();
+
+        if (!gameId || !playerId || !playerToken || !_lobbyId) {
+          logger.error(
+            'Cannot keep the lobby playing without the game ID or player ID.'
+          );
+          return;
+        }
+
+        _lobbyHeartbeatInterval = setInterval(async () => {
+          const rootApi = isUsingGDevelopDevelopmentEnvironment
+            ? 'https://api-dev.gdevelop.io'
+            : 'https://api.gdevelop.io';
+          const headers = {
+            'Content-Type': 'application/json',
+          };
+          let heartbeatUrl = `${rootApi}/play/game/${gameId}/public-lobby/${_lobbyId}/action/heartbeat`;
+          headers['Authorization'] = `player-game-token ${playerToken}`;
+          heartbeatUrl += `?playerId=${playerId}`;
+          await fetch(heartbeatUrl, {
+            method: 'POST',
+            headers,
+          });
+        }, heartbeatInterval);
+      }
+
       // If we are connected to players, then the game can start.
-      _hasGameJustStarted = true;
-      _isGameRunning = true;
-      _lobbyOnGameStart = _lobby;
+      logger.info('Lobby game has started.');
+      _hasLobbyGameJustStarted = true;
+      _isLobbyGameRunning = true;
       removeLobbiesContainer(runtimeScene);
+      // Close the websocket, as we don't need it anymore.
+      if (_websocket) {
+        _websocket.close();
+      }
       focusOnGame(runtimeScene);
     };
 
@@ -671,9 +716,16 @@ namespace gdjs {
      * When the game receives the information that the game has ended, set the flag to true,
      * so that the game can switch back to the main menu for instance.
      */
-    const handleGameEndedEvent = function () {
-      _hasGameJustEnded = true;
-      _isGameRunning = false;
+    export const handleLobbyGameEnded = function () {
+      logger.info('Lobby game has ended.');
+      _hasLobbyGameJustEnded = true;
+      _isLobbyGameRunning = false;
+      _lobbyId = null;
+      _lobby = null;
+      playerNumber = null;
+      if (_lobbyHeartbeatInterval) {
+        clearInterval(_lobbyHeartbeatInterval);
+      }
 
       // Disconnect from any P2P connections.
       gdjs.evtTools.p2p.disconnectFromAllPeers();
@@ -750,24 +802,56 @@ namespace gdjs {
      * Action to end the lobby game.
      * This will update the lobby status and inform everyone in the lobby that the game has ended.
      */
-    export const endLobbyGame = function () {
-      if (!_websocket) {
-        logger.error(
-          'No connection to send the end game message. Are you connected to a lobby?'
-        );
+    export const endLobbyGame = async function () {
+      if (!isLobbyGameRunning()) {
         return;
       }
 
-      if (!isConnectedToLobby() || !isGameRunning()) {
+      if (!isPlayerHost()) {
+        logger.error('Only the host can end the game.');
         return;
       }
 
-      _websocket.send(
-        JSON.stringify({
-          action: 'endGame',
-          connectionType: 'lobby',
-        })
-      );
+      // Consider the game is ended, so that we don't listen to other players disconnecting.
+      _isLobbyGameRunning = false;
+
+      // Inform the players that the game has ended.
+      gdjs.multiplayerMessageManager.sendEndGameMessage();
+
+      // Also call backend to end the game.
+      const gameId = gdjs.projectData.properties.projectUuid;
+      const playerId = gdjs.playerAuthentication.getUserId();
+      const playerToken = gdjs.playerAuthentication.getUserToken();
+
+      if (!gameId || !playerId || !playerToken || !_lobbyId) {
+        logger.error('Cannot end the lobby without the game ID or player ID.');
+        return;
+      }
+
+      const rootApi = isUsingGDevelopDevelopmentEnvironment
+        ? 'https://api-dev.gdevelop.io'
+        : 'https://api.gdevelop.io';
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+      let endGameUrl = `${rootApi}/play/game/${gameId}/public-lobby/${_lobbyId}/action/end`;
+      headers['Authorization'] = `player-game-token ${playerToken}`;
+      endGameUrl += `?playerId=${playerId}`;
+      try {
+        await fetch(endGameUrl, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            gameId,
+            lobbyId: _lobbyId,
+          }),
+        });
+      } catch (error) {
+        logger.error('Error while ending the game:', error);
+      }
+
+      // Do as if everyone left the lobby.
+      handleLobbyGameEnded();
     };
 
     /**

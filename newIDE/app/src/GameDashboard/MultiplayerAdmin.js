@@ -24,7 +24,7 @@ import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 
 const defaultMaximumNumberOfPlayers = 4;
-const minimumNumberOfPlayers = 2;
+const minimumValueForMaximumNumberOfPlayers = 2;
 
 type Props = {|
   gameId: string,
@@ -35,6 +35,7 @@ const MultiplayerAdmin = ({ gameId }: Props) => {
   const [fetchingError, setFetchingError] = React.useState<React.Node>(null);
   const [isSaving, setIsSaving] = React.useState<boolean>(false);
   const [maxPlayersValue, setMaxPlayersValue] = React.useState<number>(2);
+  const [minPlayersValue, setMinPlayersValue] = React.useState<number>(1);
   const {
     getAuthorizationHeader,
     profile,
@@ -47,7 +48,7 @@ const MultiplayerAdmin = ({ gameId }: Props) => {
   ] = React.useState<?LobbyConfiguration>(null);
   const [infoBarMessage, setInfoBarMessage] = React.useState<React.Node>(null);
   const userId = profile ? profile.id : null;
-  const maximumNumberOfPlayers = limits
+  const maximumNumberOfPlayersAllowed = limits
     ? limits.capabilities.multiplayer.maxPlayersPerLobby
     : defaultMaximumNumberOfPlayers;
   const isUserOnFreePlan = !subscription || !subscription.planId;
@@ -56,8 +57,10 @@ const MultiplayerAdmin = ({ gameId }: Props) => {
     () => {
       if (lobbyConfiguration) {
         setMaxPlayersValue(lobbyConfiguration.maxPlayers);
+        setMinPlayersValue(lobbyConfiguration.minPlayers);
         return;
       }
+
       if (limits) {
         setMaxPlayersValue(limits.capabilities.multiplayer.maxPlayersPerLobby);
         return;
@@ -68,7 +71,7 @@ const MultiplayerAdmin = ({ gameId }: Props) => {
 
   const maxPlayersSelectOptions = React.useMemo(
     () => {
-      const options = new Array(maximumNumberOfPlayers - 1)
+      const options = new Array(maximumNumberOfPlayersAllowed - 1)
         .fill(0)
         .map((_, index) => (
           <SelectOption
@@ -80,9 +83,9 @@ const MultiplayerAdmin = ({ gameId }: Props) => {
       if (isUserOnFreePlan) {
         options.push(
           <SelectOption
-            value={maximumNumberOfPlayers + 1}
+            value={maximumNumberOfPlayersAllowed + 1}
             label={t`${(
-              maximumNumberOfPlayers + 1
+              maximumNumberOfPlayersAllowed + 1
             ).toString()}+ (Available with a subscription)`}
             disabled
           />
@@ -90,7 +93,23 @@ const MultiplayerAdmin = ({ gameId }: Props) => {
       }
       return options;
     },
-    [maximumNumberOfPlayers, isUserOnFreePlan]
+    [maximumNumberOfPlayersAllowed, isUserOnFreePlan]
+  );
+
+  const minPlayersSelectOptions = React.useMemo(
+    () => {
+      const options = new Array(maxPlayersValue)
+        .fill(0)
+        .map((_, index) => (
+          <SelectOption
+            value={index + 1}
+            label={(index + 1).toString()}
+            shouldNotTranslate
+          />
+        ));
+      return options;
+    },
+    [maxPlayersValue]
   );
 
   const fetchGameConfiguration = React.useCallback(
@@ -146,10 +165,11 @@ const MultiplayerAdmin = ({ gameId }: Props) => {
           {
             gameId,
             maxPlayers: maxPlayersValue,
+            minPlayers: minPlayersValue,
           }
         );
         setLobbyConfiguration(updatedLobbyConfiguration);
-        setInfoBarMessage(<Trans>✅ Game configuration has been saved</Trans>);
+        setInfoBarMessage(<Trans>Game configuration has been saved</Trans>);
       } catch (error) {
         console.error(
           'An error occurred while updating lobby configuration: ',
@@ -164,12 +184,14 @@ const MultiplayerAdmin = ({ gameId }: Props) => {
         setIsSaving(false);
       }
     },
-    [getAuthorizationHeader, gameId, userId, maxPlayersValue]
+    [getAuthorizationHeader, gameId, userId, maxPlayersValue, minPlayersValue]
   );
 
   const hasUnsavedModifications =
-    lobbyConfiguration && lobbyConfiguration.maxPlayers !== maxPlayersValue;
-  const canSave = hasUnsavedModifications && maxPlayersValue !== '';
+    lobbyConfiguration &&
+    (lobbyConfiguration.maxPlayers !== maxPlayersValue ||
+      lobbyConfiguration.minPlayers !== minPlayersValue);
+  const canSave = hasUnsavedModifications;
 
   const helpLink = getHelpLink('/all-features/multiplayer/');
   if (isLoading) return <PlaceholderLoader />;
@@ -198,16 +220,34 @@ const MultiplayerAdmin = ({ gameId }: Props) => {
         </Text>
         <Line noMargin>
           <SelectField
+            value={minPlayersValue}
+            onChange={(e, i, newValueAsString) => {
+              const newValue = parseInt(newValueAsString, 10);
+              if (Number.isNaN(newValue)) return;
+              setMinPlayersValue(newValue);
+            }}
+            fullWidth
+            floatingLabelText={
+              <Trans>Minimum number of players to start the lobby</Trans>
+            }
+          >
+            {minPlayersSelectOptions}
+          </SelectField>
+        </Line>
+        <Line noMargin>
+          <SelectField
             value={maxPlayersValue}
             onChange={(e, i, newValueAsString) => {
               const newValue = parseInt(newValueAsString, 10);
               if (Number.isNaN(newValue)) return;
-              setMaxPlayersValue(
-                Math.min(
-                  maximumNumberOfPlayers,
-                  Math.max(minimumNumberOfPlayers, newValue)
-                )
+              const newRealValue = Math.min(
+                maximumNumberOfPlayersAllowed,
+                Math.max(minimumValueForMaximumNumberOfPlayers, newValue)
               );
+              setMaxPlayersValue(newRealValue);
+              if (newRealValue < minPlayersValue) {
+                setMinPlayersValue(newRealValue);
+              }
             }}
             fullWidth
             floatingLabelText={

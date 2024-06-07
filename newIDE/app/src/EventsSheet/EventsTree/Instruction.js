@@ -45,8 +45,8 @@ import {
 import { enumerateParametersUsableInExpressions } from '../ParameterFields/EnumerateFunctionParameters';
 import { getFunctionNameFromType } from '../../EventsFunctionsExtensionsLoader';
 import { ExtensionStoreContext } from '../../AssetStore/ExtensionStore/ExtensionStoreContext';
-import { getRequiredBehaviorTypes } from '../ParameterFields/ObjectField';
-import { checkHasRequiredCapability } from '../../ObjectsList/ObjectSelector';
+import { getAllRequiredBehaviorTypes } from '../ParameterFields/ObjectField';
+import { checkHasRequiredBehaviors } from '../../ObjectsList/ObjectSelector';
 import Warning from '../../UI/CustomSvgIcons/Warning';
 import { getRootVariableName } from '../../EventsSheet/ParameterFields/VariableField';
 
@@ -339,25 +339,19 @@ const Instruction = (props: Props) => {
               const objectOrGroupName = instruction
                 .getParameter(parameterIndex)
                 .getPlainString();
+              const objectsContainersList = projectScopedContainers.getObjectsContainersList();
               expressionIsValid =
-                (globalObjectsContainer.hasObjectNamed(objectOrGroupName) ||
-                  objectsContainer.hasObjectNamed(objectOrGroupName) ||
-                  globalObjectsContainer
-                    .getObjectGroups()
-                    .has(objectOrGroupName) ||
-                  objectsContainer.getObjectGroups().has(objectOrGroupName)) &&
+                objectsContainersList.hasObjectOrGroupNamed(
+                  objectOrGroupName
+                ) &&
                 (!parameterMetadata.getExtraInfo() ||
-                  gd.getTypeOfObject(
-                    globalObjectsContainer,
-                    objectsContainer,
-                    objectOrGroupName,
-                    /*searchInGroups=*/ true
-                  ) === parameterMetadata.getExtraInfo()) &&
-                checkHasRequiredCapability({
+                  objectsContainersList.getTypeOfObject(objectOrGroupName) ===
+                    parameterMetadata.getExtraInfo()) &&
+                checkHasRequiredBehaviors({
                   globalObjectsContainer,
                   objectsContainer,
                   objectName: objectOrGroupName,
-                  requiredBehaviorTypes: getRequiredBehaviorTypes(
+                  requiredBehaviorTypes: getAllRequiredBehaviorTypes(
                     platform,
                     metadata,
                     parameterIndex

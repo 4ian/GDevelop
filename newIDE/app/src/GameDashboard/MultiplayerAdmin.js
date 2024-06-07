@@ -25,6 +25,7 @@ import SelectOption from '../UI/SelectOption';
 
 const defaultMaximumNumberOfPlayers = 4;
 const minimumValueForMaximumNumberOfPlayers = 2;
+const maximumValueForMaximumNumberOfPlayers = 8;
 
 type Props = {|
   gameId: string,
@@ -36,12 +37,9 @@ const MultiplayerAdmin = ({ gameId }: Props) => {
   const [isSaving, setIsSaving] = React.useState<boolean>(false);
   const [maxPlayersValue, setMaxPlayersValue] = React.useState<number>(2);
   const [minPlayersValue, setMinPlayersValue] = React.useState<number>(1);
-  const {
-    getAuthorizationHeader,
-    profile,
-    limits,
-    subscription,
-  } = React.useContext(AuthenticatedUserContext);
+  const { getAuthorizationHeader, profile, limits } = React.useContext(
+    AuthenticatedUserContext
+  );
   const [
     lobbyConfiguration,
     setLobbyConfiguration,
@@ -51,7 +49,6 @@ const MultiplayerAdmin = ({ gameId }: Props) => {
   const maximumNumberOfPlayersAllowed = limits
     ? limits.capabilities.multiplayer.maxPlayersPerLobby
     : defaultMaximumNumberOfPlayers;
-  const isUserOnFreePlan = !subscription || !subscription.planId;
 
   React.useEffect(
     () => {
@@ -80,7 +77,9 @@ const MultiplayerAdmin = ({ gameId }: Props) => {
             shouldNotTranslate
           />
         ));
-      if (isUserOnFreePlan) {
+      if (
+        maximumNumberOfPlayersAllowed < maximumValueForMaximumNumberOfPlayers
+      ) {
         options.push(
           <SelectOption
             value={maximumNumberOfPlayersAllowed + 1}
@@ -93,7 +92,7 @@ const MultiplayerAdmin = ({ gameId }: Props) => {
       }
       return options;
     },
-    [maximumNumberOfPlayersAllowed, isUserOnFreePlan]
+    [maximumNumberOfPlayersAllowed]
   );
 
   const minPlayersSelectOptions = React.useMemo(

@@ -104,6 +104,10 @@ namespace gdjs {
         'gameVersion',
         runtimeGame.getGameData().properties.version
       );
+      url.searchParams.set(
+        'isPreview',
+        runtimeGame.isPreview() ? 'true' : 'false'
+      );
       if (isUsingGDevelopDevelopmentEnvironment) {
         url.searchParams.set('dev', 'true');
       }
@@ -1055,7 +1059,6 @@ namespace gdjs {
             runtimeScene,
             'Error while checking if the game is registered.'
           );
-          logger.error(error);
           return;
         } finally {
           _isCheckingIfGameIsRegistered = false;

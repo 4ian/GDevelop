@@ -5,6 +5,11 @@
 
 namespace gdjs {
   const logger = new gdjs.Logger('Multiplayer');
+  const getTimeNow =
+    window.performance && typeof window.performance.now === 'function'
+      ? window.performance.now.bind(window.performance)
+      : Date.now;
+
   /**
    * The MultiplayerObjectRuntimeBehavior represents a behavior that can be added to objects
    * to make them synchronized over the network.
@@ -60,7 +65,6 @@ namespace gdjs {
     // To avoid seeing too many logs.
     _lastLogTimestamp: number = 0;
     _logTickRate: number = 1;
-    _getTimeNow: () => number;
     // Clock to be incremented every time we send a message, to ensure they are ordered
     // and old messages are ignored.
     _clock: number = 0;
@@ -78,10 +82,6 @@ namespace gdjs {
           ? 0
           : parseInt(behaviorData.playerNumber, 10);
       this.actionOnPlayerDisconnect = behaviorData.actionOnPlayerDisconnect;
-      this._getTimeNow =
-        window.performance && typeof window.performance.now === 'function'
-          ? window.performance.now.bind(window.performance)
-          : Date.now;
 
       // When a synchronized object is created, we assume it will be assigned a networkId quickly if:
       // - It is a new object created by the current player. -> will be assigned a networkId when sending the update message.
@@ -100,7 +100,10 @@ namespace gdjs {
       }, this._timeBeforeDestroyingObjectWithoutNetworkIdInMs);
     }
 
-    sendDataToPeersWithIncreasedClock(messageName: string, data: Object) {
+    private _sendDataToPeersWithIncreasedClock(
+      messageName: string,
+      data: Object
+    ) {
       this._clock++;
       data['_clock'] = this._clock;
       const connectedPeerIds = gdjs.evtTools.p2p.getAllPeers();
@@ -109,7 +112,7 @@ namespace gdjs {
       }
     }
 
-    isOwnerAsPlayerOrHost() {
+    private _isOwnerAsPlayerOrHost() {
       const currentPlayerNumber = gdjs.multiplayer.getPlayerNumber();
 
       const isOwnerOfObject =
@@ -119,45 +122,45 @@ namespace gdjs {
       return isOwnerOfObject;
     }
 
-    hasObjectBeenSyncedWithinMaxRate() {
+    private _hasObjectBeenSyncedWithinMaxRate() {
       return (
-        this._getTimeNow() - this._lastObjectSyncTimestamp <
+        getTimeNow() - this._lastObjectSyncTimestamp <
         1000 / this._objectMaxTickRate
       );
     }
 
-    hasObjectBasicInfoBeenSyncedRecently() {
+    private _hasObjectBasicInfoBeenSyncedRecently() {
       return (
-        this._getTimeNow() - this._lastBasicObjectSyncTimestamp <
+        getTimeNow() - this._lastBasicObjectSyncTimestamp <
         1000 / this._objectBasicInfoTickRate
       );
     }
 
-    haveVariablesBeenSyncedRecently() {
+    private _haveVariablesBeenSyncedRecently() {
       return (
-        this._getTimeNow() - this._lastVariablesSyncTimestamp <
+        getTimeNow() - this._lastVariablesSyncTimestamp <
         1000 / this._variablesTickRate
       );
     }
 
-    haveEffectsBeenSyncedRecently() {
+    private _haveEffectsBeenSyncedRecently() {
       return (
-        this._getTimeNow() - this._lastEffectsSyncTimestamp <
+        getTimeNow() - this._lastEffectsSyncTimestamp <
         1000 / this._effectsTickRate
       );
     }
 
-    logToConsoleWithThrottle(message: string) {
-      if (
-        this._getTimeNow() - this._lastLogTimestamp >
-        1000 / this._logTickRate
-      ) {
-        logger.info(message);
-        this._lastLogTimestamp = this._getTimeNow();
-      }
-    }
+    // private _logToConsoleWithThrottle(message: string) {
+    //   if (
+    //     getTimeNow() - this._lastLogTimestamp >
+    //     1000 / this._logTickRate
+    //   ) {
+    //     logger.info(message);
+    //     this._lastLogTimestamp = getTimeNow();
+    //   }
+    // }
 
-    getOrCreateInstanceNetworkId() {
+    private _getOrCreateInstanceNetworkId() {
       if (!this.owner.networkId) {
         // no ID for this object, let's generate one so it can be identified by other players.
         // Either use the persistentUuid if it exists, or generate a new one.
@@ -171,7 +174,7 @@ namespace gdjs {
       return this.owner.networkId;
     }
 
-    isBasicObjectNetworkSyncDataDifferentFromLastSync(
+    private _isBasicObjectNetworkSyncDataDifferentFromLastSync(
       basicObjectNetworkSyncData: BasicObjectNetworkSyncData
     ) {
       if (!this._lastSentBasicObjectSyncData) {
@@ -187,7 +190,7 @@ namespace gdjs {
       return haveBasicObjectNetworkSyncDataChanged;
     }
 
-    areVariablesDifferentFromLastSync(
+    private _areVariablesDifferentFromLastSync(
       variablesSyncData: VariableNetworkSyncData[]
     ) {
       if (!this._lastSentVariableSyncData) {
@@ -203,7 +206,7 @@ namespace gdjs {
       return haveVariableSyncDataChanged;
     }
 
-    areEffectsDifferentFromLastSync(effectsSyncData: {
+    private _areEffectsDifferentFromLastSync(effectsSyncData: {
       [effectName: string]: EffectNetworkSyncData;
     }) {
       if (!this._lastSentEffectSyncData) {
@@ -259,27 +262,27 @@ namespace gdjs {
         return;
       }
 
-      if (!this.isOwnerAsPlayerOrHost()) {
+      if (!this._isOwnerAsPlayerOrHost()) {
         return;
       }
 
       // If the object has been synchronized recently at the max rate, then return.
       // This is to avoid sending data on every frame, which would be too much.
-      if (this.hasObjectBeenSyncedWithinMaxRate()) {
+      if (this._hasObjectBeenSyncedWithinMaxRate()) {
         return;
       }
 
-      // this.logToConsoleWithThrottle(
+      // this._logToConsoleWithThrottle(
       //   `Synchronizing object ${this.owner.getName()} (instance ${
       //     this.owner.networkId
       //   }) with player ${this.playerNumber}`
       // );
 
-      const instanceNetworkId = this.getOrCreateInstanceNetworkId();
+      const instanceNetworkId = this._getOrCreateInstanceNetworkId();
       const objectName = this.owner.getName();
       const objectNetworkSyncData = this.owner.getObjectNetworkSyncData();
 
-      const areBasicObjectNetworkSyncDataDifferent = this.isBasicObjectNetworkSyncDataDifferentFromLastSync(
+      const areBasicObjectNetworkSyncDataDifferent = this._isBasicObjectNetworkSyncDataDifferentFromLastSync(
         {
           x: objectNetworkSyncData.x,
           y: objectNetworkSyncData.y,
@@ -292,7 +295,7 @@ namespace gdjs {
         }
       );
       const shouldSyncObjectBasicInfo =
-        !this.hasObjectBasicInfoBeenSyncedRecently() ||
+        !this._hasObjectBasicInfoBeenSyncedRecently() ||
         areBasicObjectNetworkSyncDataDifferent ||
         this._numberOfForcedBasicObjectUpdates > 0;
       if (areBasicObjectNetworkSyncDataDifferent) {
@@ -306,9 +309,9 @@ namespace gdjs {
 
       const areVariablesDifferent =
         objectNetworkSyncData.var &&
-        this.areVariablesDifferentFromLastSync(objectNetworkSyncData.var);
+        this._areVariablesDifferentFromLastSync(objectNetworkSyncData.var);
       const shouldSyncVariables =
-        !this.haveVariablesBeenSyncedRecently() ||
+        !this._haveVariablesBeenSyncedRecently() ||
         areVariablesDifferent ||
         this._numberOfForcedVariablesUpdates > 0;
       if (areVariablesDifferent) {
@@ -320,9 +323,9 @@ namespace gdjs {
 
       const areEffectsDifferent =
         objectNetworkSyncData.eff &&
-        this.areEffectsDifferentFromLastSync(objectNetworkSyncData.eff);
+        this._areEffectsDifferentFromLastSync(objectNetworkSyncData.eff);
       const shoundSyncEffects =
-        !this.haveEffectsBeenSyncedRecently() ||
+        !this._haveEffectsBeenSyncedRecently() ||
         areEffectsDifferent ||
         this._numberOfForcedEffectsUpdates > 0;
       if (areEffectsDifferent) {
@@ -348,12 +351,12 @@ namespace gdjs {
         objectNetworkSyncData,
         sceneNetworkId,
       });
-      this.sendDataToPeersWithIncreasedClock(
+      this._sendDataToPeersWithIncreasedClock(
         updateMessageName,
         updateMessageData
       );
 
-      const now = this._getTimeNow();
+      const now = getTimeNow();
 
       this._lastObjectSyncTimestamp = now;
       if (shouldSyncObjectBasicInfo) {
@@ -404,7 +407,7 @@ namespace gdjs {
 
       // For desruction of objects, we allow the host to destroy the object even if it is not the owner.
       // This is particularly helpful when a player disconnects, so the host can destroy the object they were owning.
-      if (!this.isOwnerAsPlayerOrHost() && !gdjs.multiplayer.isPlayerHost()) {
+      if (!this._isOwnerAsPlayerOrHost() && !gdjs.multiplayer.isPlayerHost()) {
         return;
       }
 
@@ -436,7 +439,7 @@ namespace gdjs {
         objectNetworkSyncData: this.owner.getObjectNetworkSyncData(),
         sceneNetworkId,
       });
-      this.sendDataToPeersWithIncreasedClock(
+      this._sendDataToPeersWithIncreasedClock(
         updateMessageName,
         updateMessageData
       );
@@ -471,7 +474,7 @@ namespace gdjs {
         otherPeerIds,
       });
 
-      this.sendDataToPeersWithIncreasedClock(
+      this._sendDataToPeersWithIncreasedClock(
         destroyMessageName,
         destroyMessageData
       );
@@ -565,7 +568,7 @@ namespace gdjs {
         }
 
         logger.info('Sending change owner message', messageName);
-        this.sendDataToPeersWithIncreasedClock(messageName, messageData);
+        this._sendDataToPeersWithIncreasedClock(messageName, messageData);
       }
 
       // If we are the new owner, also send directly an update of the position,
@@ -574,7 +577,7 @@ namespace gdjs {
         if (!instanceNetworkId) {
           // If we don't have a networkId, we need to create one now that we are the owner.
           // We are probably in a case where we created the object and then changed the ownership.
-          instanceNetworkId = this.getOrCreateInstanceNetworkId();
+          instanceNetworkId = this._getOrCreateInstanceNetworkId();
         }
 
         const objectNetworkSyncData = this.owner.getObjectNetworkSyncData();
@@ -588,7 +591,7 @@ namespace gdjs {
           objectNetworkSyncData,
           sceneNetworkId,
         });
-        this.sendDataToPeersWithIncreasedClock(
+        this._sendDataToPeersWithIncreasedClock(
           updateMessageName,
           updateMessageData
         );
@@ -600,7 +603,7 @@ namespace gdjs {
     }
 
     isObjectOwnedByCurrentPlayer(): boolean {
-      return this.isOwnerAsPlayerOrHost();
+      return this._isOwnerAsPlayerOrHost();
     }
 
     removeObjectOwnership() {

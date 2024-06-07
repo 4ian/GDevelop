@@ -400,7 +400,8 @@ namespace gdjs {
         this._destroyInstanceTimeoutId = null;
       }
 
-      // If the lobby game is not running, just return here.
+      // If the lobby game is not running, do not try to destroy the object,
+      // as the game may create objects before the lobby game starts, and we don't want to destroy them.
       if (!gdjs.multiplayer.isLobbyGameRunning()) {
         return;
       }
@@ -504,7 +505,8 @@ namespace gdjs {
       this.playerNumber = newObjectPlayerNumber;
       const currentPlayerNumber = gdjs.multiplayer.getPlayerNumber();
 
-      // If the lobby game is not running, just return here.
+      // If the lobby game is not running, do not try to update the ownership over the network,
+      // as the game may create & update objects before the lobby game starts.
       if (!gdjs.multiplayer.isLobbyGameRunning()) {
         return;
       }

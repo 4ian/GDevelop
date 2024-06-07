@@ -52,6 +52,7 @@ namespace gdjs {
         pushData(newData: IEventData): void;
         popData(): void;
         getData(): string;
+        getAllData(): IEventData[];
         getSender(): string;
       }
 
@@ -96,6 +97,13 @@ namespace gdjs {
          */
         getSender() {
           return this.data.length === 0 ? '' : this.data[0].sender;
+        }
+
+        /**
+         * Get all data sent for this event.
+         */
+        getAllData() {
+          return this.data;
         }
       }
 

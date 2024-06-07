@@ -2438,6 +2438,10 @@ interface WholeProjectRefactorer {
         [Ref] Project project,
         [Ref] Layout layout,
         [Const] DOMString objectName);
+    void STATIC_BehaviorsAddedToObjectInLayout(
+        [Ref] Project project,
+        [Ref] Layout layout,
+        [Const] DOMString objectName);
     void STATIC_ObjectOrGroupRenamedInEventsFunction([Ref] Project project, [Ref] EventsFunction eventsFunction, [Ref] ObjectsContainer globalObjectsContainer, [Ref] ObjectsContainer objectsContainer, [Const] DOMString oldName, [Const] DOMString newName, boolean isObjectGroup);
     void STATIC_ObjectRemovedInEventsFunction(
         [Ref] Project project,
@@ -2454,6 +2458,9 @@ interface WholeProjectRefactorer {
         [Const] DOMString objectName);
     void STATIC_GlobalObjectOrGroupRenamed([Ref] Project project, [Const] DOMString oldName, [Const] DOMString newName, boolean isObjectGroup);
     void STATIC_GlobalObjectRemoved(
+        [Ref] Project project,
+        [Const] DOMString objectName);
+    void STATIC_BehaviorsAddedToGlobalObject(
         [Ref] Project project,
         [Const] DOMString objectName);
     [Value] SetString STATIC_GetAllObjectTypesUsingEventsBasedBehavior([Const, Ref] Project project, [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension, [Const, Ref] EventsBasedBehavior eventsBasedBehavior);

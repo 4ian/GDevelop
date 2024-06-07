@@ -1475,6 +1475,41 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     }
   }
 
+  SECTION("Behaviors added to an object (in layout)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &scene = project.InsertNewLayout("Scene", 0);
+    auto &object =
+        scene.InsertNewObject(project, "MyExtension::Sprite", "Object", 0);
+
+    gd::StandardEvent &event =
+        dynamic_cast<gd::StandardEvent &>(scene.GetEvents().InsertNewEvent(
+            project, "BuiltinCommonInstructions::Standard"));
+    // Add a behavior instruction using an object that doesn't have the
+    // behavior.
+    {
+      gd::Instruction action;
+      action.SetType("MyExtension::BehaviorDoSomething");
+      action.SetParametersCount(3);
+      action.SetParameter(0, gd::Expression("Object"));
+      // The behavior parameter is left empty.
+      action.SetParameter(1, gd::Expression(""));
+      action.SetParameter(2, gd::Expression("0"));
+      event.GetActions().Insert(action);
+    }
+
+    // Attach the behavior to the object.
+    object.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
+    gd::WholeProjectRefactorer::BehaviorsAddedToObjectInLayout(project, scene,
+                                                               "Object");
+
+    // The behavior parameter is now filled.
+    REQUIRE(event.GetActions()[0].GetParameter(1).GetPlainString() ==
+            "MyBehavior");
+  }
+
   SECTION("Object renamed (in events function)") {
     SECTION("Group") {
       gd::Project project;

@@ -169,7 +169,7 @@ module.exports = {
 
     extension
       .addCondition(
-        'hasLobbyGameJustStarted',
+        'HasLobbyGameJustStarted',
         _('Lobby game has just started'),
         _('Check if the lobby game has just started.'),
         _('Lobby game has started'),
@@ -193,7 +193,7 @@ module.exports = {
 
     extension
       .addCondition(
-        'isLobbyGameRunning',
+        'IsLobbyGameRunning',
         _('Lobby game is running'),
         _('Check if the lobby game is running.'),
         _('Lobby game is running'),
@@ -217,7 +217,7 @@ module.exports = {
 
     extension
       .addCondition(
-        'hasLobbyGameJustEnded',
+        'HasLobbyGameJustEnded',
         _('Lobby game has just ended'),
         _('Check if the lobby game has just ended.'),
         _('Lobby game has ended'),

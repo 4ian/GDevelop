@@ -480,16 +480,16 @@ namespace gdjs {
       );
     }
 
-    setPlayerObjectOwnership(newPlayerNumber: number) {
+    setPlayerObjectOwnership(newObjectPlayerNumber: number) {
       logger.info(
         `Setting ownership of object ${this.owner.getName()} (networkId: ${
           this.owner.networkId
-        } to player ${newPlayerNumber}.`
+        } to player ${newObjectPlayerNumber}.`
       );
-      if (newPlayerNumber < 0) {
+      if (newObjectPlayerNumber < 0) {
         logger.error(
           'Invalid player number (' +
-            newPlayerNumber +
+            newObjectPlayerNumber +
             ') when setting ownership of an object.'
         );
         return;
@@ -500,7 +500,9 @@ namespace gdjs {
       // If we are player 1 or host, we will have the ownership immediately anyway.
       // If we are another player, we will have the ownership as soon as the host acknowledges the change.
       // If the host does not send an acknowledgment, we will revert the ownership.
-      this.playerNumber = newPlayerNumber;
+      const previousObjectPlayerNumber = this.playerNumber;
+      this.playerNumber = newObjectPlayerNumber;
+      const currentPlayerNumber = gdjs.multiplayer.getPlayerNumber();
 
       // If the lobby game is not running, just return here.
       if (!gdjs.multiplayer.isLobbyGameRunning()) {
@@ -512,7 +514,7 @@ namespace gdjs {
         logger.info(
           'Object has no networkId, we change the ownership locally, but it will not be synchronized yet if we are not the owner.'
         );
-        if (newPlayerNumber !== gdjs.multiplayer.getPlayerNumber()) {
+        if (newObjectPlayerNumber !== gdjs.multiplayer.getPlayerNumber()) {
           // If we are not the new owner, we should not send a message to the host to change the ownership.
           // Just return and wait to receive an update message to reconcile this object.
           return;
@@ -525,7 +527,6 @@ namespace gdjs {
         return;
       }
 
-      const currentPlayerNumber = gdjs.multiplayer.getPlayerNumber();
       const objectName = this.owner.getName();
 
       if (instanceNetworkId) {
@@ -536,10 +537,10 @@ namespace gdjs {
           messageName,
           messageData,
         } = gdjs.multiplayerMessageManager.createChangeOwnerMessage({
-          objectOwner: this.playerNumber,
+          objectOwner: previousObjectPlayerNumber,
           objectName,
           instanceNetworkId,
-          newObjectOwner: newPlayerNumber,
+          newObjectOwner: newObjectPlayerNumber,
           instanceX: this.owner.getX(),
           instanceY: this.owner.getY(),
           sceneNetworkId,
@@ -549,7 +550,7 @@ namespace gdjs {
         // If we are player 1, we are connected to everyone, so we expect an acknowledgment from everyone.
         // If we are another player, we are only connected to player 1, so we expect an acknowledgment from player 1.
         // In both cases, this represents the list of peers the current user is connected to.
-        if (newPlayerNumber === currentPlayerNumber) {
+        if (newObjectPlayerNumber === currentPlayerNumber) {
           const otherPeerIds = gdjs.evtTools.p2p.getAllPeers();
           const changeOwnerAcknowledgedMessageName = gdjs.multiplayerMessageManager.createObjectOwnerChangedMessageNameFromChangeOwnerMessage(
             messageName
@@ -573,7 +574,7 @@ namespace gdjs {
 
       // If we are the new owner, also send directly an update of the position,
       // so that the object is immediately moved on the screen and we don't wait for the next tick.
-      if (newPlayerNumber === currentPlayerNumber) {
+      if (newObjectPlayerNumber === currentPlayerNumber) {
         if (!instanceNetworkId) {
           // If we don't have a networkId, we need to create one now that we are the owner.
           // We are probably in a case where we created the object and then changed the ownership.

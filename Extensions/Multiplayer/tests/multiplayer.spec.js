@@ -254,6 +254,13 @@ describe('Multiplayer', () => {
           peerMultiplayerMessageManager[peerId] ||
           gdjs.makeMultiplayerMessageManager();
 
+        // Ensure the messageManager is aware of the other players.
+        gdjs.multiplayerMessageManager.updatePlayersPingsForTests({
+          1: 0,
+          2: 20,
+          3: 40,
+        });
+
         // Switch the state of the game.
         gdjs.multiplayer.playerNumber = playerNumber;
       },

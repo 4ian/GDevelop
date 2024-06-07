@@ -184,46 +184,6 @@ describe('MetadataDeclarationHelper', () => {
     project.delete();
   });
 
-  it('can create metadata for free ExpressionAndConditions without description', () => {
-    const extension = new gd.PlatformExtension();
-    const project = new gd.Project();
-
-    const eventExtension = project.insertNewEventsFunctionsExtension(
-      'MyExtension',
-      0
-    );
-    const eventFunction = eventExtension.insertNewEventsFunction('Value', 0);
-    eventFunction.setFunctionType(gd.EventsFunction.ExpressionAndCondition);
-    eventFunction.setFullName('');
-    eventFunction.setDescription('');
-    eventFunction.setSentence('');
-
-    const metadataDeclarationHelper = new gd.MetadataDeclarationHelper();
-    metadataDeclarationHelper.generateFreeFunctionMetadata(
-      project,
-      extension,
-      eventExtension,
-      eventFunction
-    );
-    metadataDeclarationHelper.delete();
-
-    expect(extension.getAllExpressions().has('Value')).toBe(true);
-    const expression = extension.getAllExpressions().get('Value');
-    expect(expression.getFullName()).toBe('Value');
-    expect(expression.getDescription()).toBe('Return .');
-
-    expect(extension.getAllConditions().has('Value')).toBe(true);
-    const condition = extension.getAllConditions().get('Value');
-    expect(condition.getFullName()).toBe('Value');
-    // TODO The full name could be used when the description is not set.
-    expect(condition.getDescription()).toBe('Compare .');
-    // TODO The full name could be used when the sentence is not set.
-    expect(condition.getSentence()).toBe(' _PARAM1_ _PARAM2_');
-
-    extension.delete();
-    project.delete();
-  });
-
   it('can create metadata for free ActionWithOperator', () => {
     const extension = new gd.PlatformExtension();
     const project = new gd.Project();
@@ -1712,5 +1672,651 @@ describe('MetadataDeclarationHelper', () => {
         );
       });
     });
+  });
+
+  it('can create metadata for free actions without full name', () => {
+    const extension = new gd.PlatformExtension();
+    const project = new gd.Project();
+
+    const eventExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const eventFunction = eventExtension.insertNewEventsFunction(
+      'MyFunction',
+      0
+    );
+    eventFunction.setFunctionType(gd.EventsFunction.Action);
+    eventFunction.setFullName('');
+    eventFunction.setDescription('');
+    eventFunction.setSentence('');
+
+    const parameter = new gd.ParameterMetadata();
+    parameter.setType('number');
+    parameter.setName("Parameter");
+    eventFunction.getParameters().push_back(parameter);
+
+    const metadataDeclarationHelper = new gd.MetadataDeclarationHelper();
+    metadataDeclarationHelper.generateFreeFunctionMetadata(
+      project,
+      extension,
+      eventExtension,
+      eventFunction
+    );
+    metadataDeclarationHelper.delete();
+
+    expect(extension.getAllActions().has('MyFunction')).toBe(true);
+    const action = extension.getAllActions().get('MyFunction');
+    expect(action.getFullName()).toBe('MyFunction');
+    expect(action.getDescription()).toBe('MyFunction');
+    expect(action.getSentence()).toBe('MyFunction (Parameter: _PARAM1_)');
+
+    extension.delete();
+    project.delete();
+  });
+
+  it('can create metadata for free conditions without full name', () => {
+    const extension = new gd.PlatformExtension();
+    const project = new gd.Project();
+
+    const eventExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const eventFunction = eventExtension.insertNewEventsFunction(
+      'MyFunction',
+      0
+    );
+    eventFunction.setFunctionType(gd.EventsFunction.Condition);
+    eventFunction.setFullName('');
+    eventFunction.setDescription('');
+    eventFunction.setSentence('');
+
+    const parameter = new gd.ParameterMetadata();
+    parameter.setType('number');
+    parameter.setName("Parameter");
+    eventFunction.getParameters().push_back(parameter);
+
+    const metadataDeclarationHelper = new gd.MetadataDeclarationHelper();
+    metadataDeclarationHelper.generateFreeFunctionMetadata(
+      project,
+      extension,
+      eventExtension,
+      eventFunction
+    );
+    metadataDeclarationHelper.delete();
+
+    expect(extension.getAllConditions().has('MyFunction')).toBe(true);
+    const condition = extension.getAllConditions().get('MyFunction');
+    expect(condition.getFullName()).toBe('MyFunction');
+    expect(condition.getDescription()).toBe('MyFunction');
+    expect(condition.getSentence()).toBe('MyFunction (Parameter: _PARAM1_)');
+
+    extension.delete();
+    project.delete();
+  });
+
+  it('can create metadata for free ExpressionAndConditions without full name', () => {
+    const extension = new gd.PlatformExtension();
+    const project = new gd.Project();
+
+    const eventExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const eventFunction = eventExtension.insertNewEventsFunction('Value', 0);
+    eventFunction.setFunctionType(gd.EventsFunction.ExpressionAndCondition);
+    eventFunction.setFullName('');
+    eventFunction.setDescription('');
+    eventFunction.setSentence('');
+    
+    const parameter = new gd.ParameterMetadata();
+    parameter.setType('number');
+    parameter.setName("Parameter");
+    eventFunction.getParameters().push_back(parameter);
+
+    const metadataDeclarationHelper = new gd.MetadataDeclarationHelper();
+    metadataDeclarationHelper.generateFreeFunctionMetadata(
+      project,
+      extension,
+      eventExtension,
+      eventFunction
+    );
+    metadataDeclarationHelper.delete();
+
+    expect(extension.getAllExpressions().has('Value')).toBe(true);
+    const expression = extension.getAllExpressions().get('Value');
+    expect(expression.getFullName()).toBe('Value');
+    expect(expression.getDescription()).toBe('Return Value.');
+
+    expect(extension.getAllConditions().has('Value')).toBe(true);
+    const condition = extension.getAllConditions().get('Value');
+    expect(condition.getFullName()).toBe('Value');
+    expect(condition.getDescription()).toBe('Compare Value.');
+    expect(condition.getSentence()).toBe('Value (Parameter: _PARAM3_) _PARAM1_ _PARAM2_');
+
+    extension.delete();
+    project.delete();
+  });
+
+  it('can create metadata for free ActionWithOperator without full name', () => {
+    const extension = new gd.PlatformExtension();
+    const project = new gd.Project();
+
+    const eventExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+
+    const getter = eventExtension.insertNewEventsFunction('Value', 0);
+    getter.setFunctionType(gd.EventsFunction.ExpressionAndConditions);
+    getter.setFullName('');
+    getter.setDescription('');
+    getter.setSentence('');
+    
+    const parameter = new gd.ParameterMetadata();
+    parameter.setType('number');
+    parameter.setName("Parameter");
+    getter.getParameters().push_back(parameter);
+
+    const eventFunction = eventExtension.insertNewEventsFunction('SetValue', 0);
+    eventFunction.setFunctionType(gd.EventsFunction.ActionWithOperator);
+    eventFunction.setGetterName('Value');
+
+    const metadataDeclarationHelper = new gd.MetadataDeclarationHelper();
+    metadataDeclarationHelper.generateFreeFunctionMetadata(
+      project,
+      extension,
+      eventExtension,
+      eventFunction
+    );
+    metadataDeclarationHelper.delete();
+
+    expect(extension.getAllActions().has('SetValue')).toBe(true);
+    const action = extension.getAllActions().get('SetValue');
+    expect(action.getFullName()).toBe('Value');
+    expect(action.getDescription()).toBe('Change Value');
+    expect(action.getSentence()).toBe('Change Value (Parameter: _PARAM3_): _PARAM1_ _PARAM2_');
+
+    extension.delete();
+    project.delete();
+  });
+
+  it('can create metadata for behavior actions without full name', () => {
+    const extension = new gd.PlatformExtension();
+    const project = new gd.Project();
+
+    const eventExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const eventBehavior = eventExtension
+      .getEventsBasedBehaviors()
+      .insertNew('MyBehavior', 0);
+    const eventFunction = eventBehavior
+      .getEventsFunctions()
+      .insertNewEventsFunction('MyFunction', 0);
+    eventFunction.setFunctionType(gd.EventsFunction.Action);
+    eventFunction.setFullName('');
+    eventFunction.setDescription('');
+    eventFunction.setSentence('');
+
+    gd.WholeProjectRefactorer.ensureBehaviorEventsFunctionsProperParameters(
+      eventExtension,
+      eventBehavior
+    );
+    const parameter = new gd.ParameterMetadata();
+    parameter.setType('number');
+    parameter.setName("Parameter");
+    eventFunction.getParameters().push_back(parameter);
+
+    const behaviorMethodMangledNames = new gd.MapStringString();
+    gd.MetadataDeclarationHelper.generateBehaviorMetadata(
+      project,
+      extension,
+      eventExtension,
+      eventBehavior,
+      behaviorMethodMangledNames
+    );
+    behaviorMethodMangledNames.delete();
+
+    expect(extension.getBehaviorsTypes().size()).toBe(1);
+    expect(extension.getBehaviorsTypes().at(0)).toBe('MyBehavior');
+    const behaviorMetadata = extension.getBehaviorMetadata('MyBehavior');
+
+    expect(behaviorMetadata.getAllActions().has('MyBehavior::MyFunction')).toBe(
+      true
+    );
+    const action = behaviorMetadata
+      .getAllActions()
+      .get('MyBehavior::MyFunction');
+    expect(action.getFullName()).toBe('MyFunction');
+    expect(action.getDescription()).toBe('MyFunction');
+    expect(action.getSentence()).toBe('MyFunction (Object: _PARAM0_, Behavior: _PARAM1_, Parameter: _PARAM2_)');
+
+    expect(action.getParametersCount()).toBe(4);
+    checkBehaviorDefaultParameters(action);
+
+    extension.delete();
+    project.delete();
+  });
+
+  it('can create metadata for behavior conditions without full name', () => {
+    const extension = new gd.PlatformExtension();
+    const project = new gd.Project();
+
+    const eventExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const eventBehavior = eventExtension
+      .getEventsBasedBehaviors()
+      .insertNew('MyBehavior', 0);
+    const eventFunction = eventBehavior
+      .getEventsFunctions()
+      .insertNewEventsFunction('MyFunction', 0);
+    eventFunction.setFunctionType(gd.EventsFunction.Condition);
+    eventFunction.setFullName('');
+    eventFunction.setDescription('');
+    eventFunction.setSentence('');
+
+    gd.WholeProjectRefactorer.ensureBehaviorEventsFunctionsProperParameters(
+      eventExtension,
+      eventBehavior
+    );
+    const parameter = new gd.ParameterMetadata();
+    parameter.setType('number');
+    parameter.setName("Parameter");
+    eventFunction.getParameters().push_back(parameter);
+
+    const behaviorMethodMangledNames = new gd.MapStringString();
+    gd.MetadataDeclarationHelper.generateBehaviorMetadata(
+      project,
+      extension,
+      eventExtension,
+      eventBehavior,
+      behaviorMethodMangledNames
+    );
+    behaviorMethodMangledNames.delete();
+
+    expect(extension.getBehaviorsTypes().size()).toBe(1);
+    expect(extension.getBehaviorsTypes().at(0)).toBe('MyBehavior');
+    const behaviorMetadata = extension.getBehaviorMetadata('MyBehavior');
+
+    expect(
+      behaviorMetadata.getAllConditions().has('MyBehavior::MyFunction')
+    ).toBe(true);
+    const condition = behaviorMetadata
+      .getAllConditions()
+      .get('MyBehavior::MyFunction');
+    expect(condition.getFullName()).toBe('MyFunction');
+    expect(condition.getDescription()).toBe('MyFunction');
+    expect(condition.getSentence()).toBe('MyFunction (Object: _PARAM0_, Behavior: _PARAM1_, Parameter: _PARAM2_)');
+
+    expect(condition.getParametersCount()).toBe(4);
+    checkBehaviorDefaultParameters(condition);
+
+    extension.delete();
+    project.delete();
+  });
+
+  it('can create metadata for behavior ExpressionAndConditions without full name', () => {
+    const extension = new gd.PlatformExtension();
+    const project = new gd.Project();
+
+    const eventExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const eventBehavior = eventExtension
+      .getEventsBasedBehaviors()
+      .insertNew('MyBehavior', 0);
+    const eventFunction = eventBehavior
+      .getEventsFunctions()
+      .insertNewEventsFunction('Value', 0);
+    eventFunction.setFunctionType(gd.EventsFunction.ExpressionAndCondition);
+    eventFunction.setFullName('');
+    eventFunction.setDescription('');
+    eventFunction.setSentence('');
+    
+    gd.WholeProjectRefactorer.ensureBehaviorEventsFunctionsProperParameters(
+      eventExtension,
+      eventBehavior
+    );
+    const parameter = new gd.ParameterMetadata();
+    parameter.setType('number');
+    parameter.setName("Parameter");
+    eventFunction.getParameters().push_back(parameter);
+
+    const behaviorMethodMangledNames = new gd.MapStringString();
+    gd.MetadataDeclarationHelper.generateBehaviorMetadata(
+      project,
+      extension,
+      eventExtension,
+      eventBehavior,
+      behaviorMethodMangledNames
+    );
+    behaviorMethodMangledNames.delete();
+
+    expect(extension.getBehaviorsTypes().size()).toBe(1);
+    expect(extension.getBehaviorsTypes().at(0)).toBe('MyBehavior');
+    const behaviorMetadata = extension.getBehaviorMetadata('MyBehavior');
+
+    expect(behaviorMetadata.getAllExpressions().has('Value')).toBe(true);
+    const expression = behaviorMetadata.getAllExpressions().get('Value');
+    expect(expression.getFullName()).toBe('Value');
+    expect(expression.getDescription()).toBe('Return Value.');
+
+    expect(behaviorMetadata.getAllConditions().has('MyBehavior::Value')).toBe(
+      true
+    );
+    const condition = behaviorMetadata
+      .getAllConditions()
+      .get('MyBehavior::Value');
+    expect(condition.getFullName()).toBe('Value');
+    expect(condition.getDescription()).toBe('Compare Value.');
+    // The IDE fixes the first letter case.
+    expect(condition.getSentence()).toBe(
+      'Value (Parameter: _PARAM4_) of _PARAM0_ _PARAM2_ _PARAM3_'
+    );
+
+    extension.delete();
+    project.delete();
+  });
+
+  it('can create metadata for behavior ActionWithOperator without full name', () => {
+    const extension = new gd.PlatformExtension();
+    const project = new gd.Project();
+
+    const eventExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const eventBehavior = eventExtension
+      .getEventsBasedBehaviors()
+      .insertNew('MyBehavior', 0);
+
+    const getter = eventBehavior
+      .getEventsFunctions()
+      .insertNewEventsFunction('Value', 0);
+    getter.setFunctionType(gd.EventsFunction.ExpressionAndCondition);
+    getter.setFullName('');
+    getter.setDescription('');
+    getter.setSentence('');
+
+    const eventFunction = eventBehavior
+      .getEventsFunctions()
+      .insertNewEventsFunction('SetValue', 0);
+    eventFunction.setFunctionType(gd.EventsFunction.ActionWithOperator);
+    eventFunction.setGetterName('Value');
+
+    gd.WholeProjectRefactorer.ensureBehaviorEventsFunctionsProperParameters(
+      eventExtension,
+      eventBehavior
+    );
+    const parameter = new gd.ParameterMetadata();
+    parameter.setType('number');
+    parameter.setName("Parameter");
+    getter.getParameters().push_back(parameter);
+
+    const behaviorMethodMangledNames = new gd.MapStringString();
+    gd.MetadataDeclarationHelper.generateBehaviorMetadata(
+      project,
+      extension,
+      eventExtension,
+      eventBehavior,
+      behaviorMethodMangledNames
+    );
+    behaviorMethodMangledNames.delete();
+
+    expect(extension.getBehaviorsTypes().size()).toBe(1);
+    expect(extension.getBehaviorsTypes().at(0)).toBe('MyBehavior');
+    const behaviorMetadata = extension.getBehaviorMetadata('MyBehavior');
+
+    expect(behaviorMetadata.getAllActions().has('MyBehavior::SetValue')).toBe(
+      true
+    );
+    const action = behaviorMetadata.getAllActions().get('MyBehavior::SetValue');
+    expect(action.getFullName()).toBe('Value');
+    expect(action.getDescription()).toBe('Change Value');
+    expect(action.getSentence()).toBe(
+      'Change Value (Parameter: _PARAM4_) of _PARAM0_: _PARAM2_ _PARAM3_'
+    );
+
+    extension.delete();
+    project.delete();
+  });
+
+
+  it('can create metadata for object actions without full name', () => {
+    const extension = new gd.PlatformExtension();
+    const project = new gd.Project();
+
+    const eventExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const eventObject = eventExtension
+      .getEventsBasedObjects()
+      .insertNew('MyObject', 0);
+    const eventFunction = eventObject
+      .getEventsFunctions()
+      .insertNewEventsFunction('MyFunction', 0);
+    eventFunction.setFunctionType(gd.EventsFunction.Action);
+    eventFunction.setFullName('');
+    eventFunction.setDescription('');
+    eventFunction.setSentence('');
+
+    gd.WholeProjectRefactorer.ensureObjectEventsFunctionsProperParameters(
+      eventExtension,
+      eventObject
+    );
+    const parameter = new gd.ParameterMetadata();
+    parameter.setType('number');
+    parameter.setName("Parameter");
+    eventFunction.getParameters().push_back(parameter);
+
+    const objectMethodMangledNames = new gd.MapStringString();
+    gd.MetadataDeclarationHelper.generateObjectMetadata(
+      project,
+      extension,
+      eventExtension,
+      eventObject,
+      objectMethodMangledNames
+    );
+    objectMethodMangledNames.delete();
+
+    expect(extension.getExtensionObjectsTypes().size()).toBe(1);
+    expect(extension.getExtensionObjectsTypes().at(0)).toBe('MyObject');
+    const objectMetadata = extension.getObjectMetadata('MyObject');
+
+    expect(objectMetadata.getAllActions().has('MyObject::MyFunction')).toBe(
+      true
+    );
+    const action = objectMetadata.getAllActions().get('MyObject::MyFunction');
+    expect(action.getFullName()).toBe('MyFunction');
+    expect(action.getDescription()).toBe('MyFunction');
+    expect(action.getSentence()).toBe('MyFunction (Object: _PARAM0_, Parameter: _PARAM1_)');
+
+    extension.delete();
+    project.delete();
+  });
+
+  it('can create metadata for object conditions without full name', () => {
+    const extension = new gd.PlatformExtension();
+    const project = new gd.Project();
+
+    const eventExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const eventObject = eventExtension
+      .getEventsBasedObjects()
+      .insertNew('MyObject', 0);
+    const eventFunction = eventObject
+      .getEventsFunctions()
+      .insertNewEventsFunction('MyFunction', 0);
+    eventFunction.setFunctionType(gd.EventsFunction.Condition);
+    eventFunction.setFullName('');
+    eventFunction.setDescription('');
+    eventFunction.setSentence('');
+
+    gd.WholeProjectRefactorer.ensureObjectEventsFunctionsProperParameters(
+      eventExtension,
+      eventObject
+    );
+    const parameter = new gd.ParameterMetadata();
+    parameter.setType('number');
+    parameter.setName("Parameter");
+    eventFunction.getParameters().push_back(parameter);
+
+    const objectMethodMangledNames = new gd.MapStringString();
+    gd.MetadataDeclarationHelper.generateObjectMetadata(
+      project,
+      extension,
+      eventExtension,
+      eventObject,
+      objectMethodMangledNames
+    );
+    objectMethodMangledNames.delete();
+
+    expect(extension.getExtensionObjectsTypes().size()).toBe(1);
+    expect(extension.getExtensionObjectsTypes().at(0)).toBe('MyObject');
+    const objectMetadata = extension.getObjectMetadata('MyObject');
+
+    expect(objectMetadata.getAllConditions().has('MyObject::MyFunction')).toBe(
+      true
+    );
+    const condition = objectMetadata
+      .getAllConditions()
+      .get('MyObject::MyFunction');
+    expect(condition.getFullName()).toBe('MyFunction');
+    expect(condition.getDescription()).toBe('MyFunction');
+    expect(condition.getSentence()).toBe('MyFunction (Object: _PARAM0_, Parameter: _PARAM1_)');
+
+    extension.delete();
+    project.delete();
+  });
+
+
+  it('can create metadata for object ExpressionAndConditions without full name', () => {
+    const extension = new gd.PlatformExtension();
+    const project = new gd.Project();
+
+    const eventExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const eventObject = eventExtension
+      .getEventsBasedObjects()
+      .insertNew('MyObject', 0);
+    const eventFunction = eventObject
+      .getEventsFunctions()
+      .insertNewEventsFunction('Value', 0);
+    eventFunction.setFunctionType(gd.EventsFunction.ExpressionAndCondition);
+    eventFunction.setFullName('');
+    eventFunction.setDescription('');
+    eventFunction.setSentence('');
+
+    gd.WholeProjectRefactorer.ensureObjectEventsFunctionsProperParameters(
+      eventExtension,
+      eventObject
+    );
+    const parameter = new gd.ParameterMetadata();
+    parameter.setType('number');
+    parameter.setName("Parameter");
+    eventFunction.getParameters().push_back(parameter);
+
+    const objectMethodMangledNames = new gd.MapStringString();
+    gd.MetadataDeclarationHelper.generateObjectMetadata(
+      project,
+      extension,
+      eventExtension,
+      eventObject,
+      objectMethodMangledNames
+    );
+    objectMethodMangledNames.delete();
+
+    expect(extension.getExtensionObjectsTypes().size()).toBe(1);
+    expect(extension.getExtensionObjectsTypes().at(0)).toBe('MyObject');
+    const objectMetadata = extension.getObjectMetadata('MyObject');
+
+    expect(objectMetadata.getAllExpressions().has('Value')).toBe(true);
+    const expression = objectMetadata.getAllExpressions().get('Value');
+    expect(expression.getFullName()).toBe('Value');
+    expect(expression.getDescription()).toBe('Return Value.');
+
+    expect(objectMetadata.getAllConditions().has('MyObject::Value')).toBe(true);
+    const condition = objectMetadata.getAllConditions().get('MyObject::Value');
+    expect(condition.getFullName()).toBe('Value');
+    expect(condition.getDescription()).toBe('Compare Value.');
+    // The IDE fixes the first letter case.
+    expect(condition.getSentence()).toBe(
+      'Value (Parameter: _PARAM3_) of _PARAM0_ _PARAM1_ _PARAM2_'
+    );
+
+    extension.delete();
+    project.delete();
+  });
+
+  it('can create metadata for object ActionWithOperator without full name', () => {
+    const extension = new gd.PlatformExtension();
+    const project = new gd.Project();
+
+    const eventExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const eventObject = eventExtension
+      .getEventsBasedObjects()
+      .insertNew('MyObject', 0);
+
+    const getter = eventObject
+      .getEventsFunctions()
+      .insertNewEventsFunction('Value', 0);
+    getter.setFunctionType(gd.EventsFunction.ExpressionAndCondition);
+    getter.setFullName('');
+    getter.setDescription('');
+    getter.setSentence('');
+
+    const eventFunction = eventObject
+      .getEventsFunctions()
+      .insertNewEventsFunction('SetValue', 0);
+    eventFunction.setFunctionType(gd.EventsFunction.ActionWithOperator);
+    eventFunction.setGetterName('Value');
+
+    gd.WholeProjectRefactorer.ensureObjectEventsFunctionsProperParameters(
+      eventExtension,
+      eventObject
+    );
+    const parameter = new gd.ParameterMetadata();
+    parameter.setType('number');
+    parameter.setName("Parameter");
+    getter.getParameters().push_back(parameter);
+
+    const objectMethodMangledNames = new gd.MapStringString();
+    gd.MetadataDeclarationHelper.generateObjectMetadata(
+      project,
+      extension,
+      eventExtension,
+      eventObject,
+      objectMethodMangledNames
+    );
+    objectMethodMangledNames.delete();
+
+    expect(extension.getExtensionObjectsTypes().size()).toBe(1);
+    expect(extension.getExtensionObjectsTypes().at(0)).toBe('MyObject');
+    const objectMetadata = extension.getObjectMetadata('MyObject');
+
+    expect(objectMetadata.getAllActions().has('MyObject::SetValue')).toBe(true);
+    const action = objectMetadata.getAllActions().get('MyObject::SetValue');
+    expect(action.getFullName()).toBe('Value');
+    expect(action.getDescription()).toBe('Change Value');
+    expect(action.getSentence()).toBe(
+      'Change Value (Parameter: _PARAM3_) of _PARAM0_: _PARAM1_ _PARAM2_'
+    );
+
+    extension.delete();
+    project.delete();
   });
 });

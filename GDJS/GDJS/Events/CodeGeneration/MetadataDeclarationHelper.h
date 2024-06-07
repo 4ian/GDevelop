@@ -324,6 +324,20 @@ private:
 
   static gd::String UncapitalizeFirstLetter(const gd::String &string);
 
+  static const gd::String &
+  GetFullName(const gd::EventsFunction &eventsFunction);
+  static gd::String GetDefaultSentence(const gd::EventsFunction &eventsFunction,
+                                       const int firstParameterIndex,
+                                       const int parameterIndexOffset);
+  static gd::String
+  GetFreeFunctionSentence(const gd::EventsFunction &eventsFunction);
+  static gd::String
+  GetBehaviorFunctionSentence(const gd::EventsFunction &eventsFunction,
+                              const bool excludeObjectParameter = false);
+  static gd::String
+  GetObjectFunctionSentence(const gd::EventsFunction &eventsFunction,
+                            const bool excludeObjectParameter = false);
+
   std::vector<gd::MultipleInstructionMetadata> expressionAndConditions;
 };
 

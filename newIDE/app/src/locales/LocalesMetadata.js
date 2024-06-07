@@ -11,7 +11,7 @@ module.exports = [
     "languageCode": "ar_SA",
     "languageName": "Arabic",
     "languageNativeName": "اللغة العربية",
-    "translationRatio": 0.978527235229892
+    "translationRatio": 0.9786485502850903
   },
   {
     "languageCode": "az_AZ",
@@ -71,7 +71,7 @@ module.exports = [
     "languageCode": "en",
     "languageName": "English",
     "languageNativeName": "English",
-    "translationRatio": 0.06866537717601551
+    "translationRatio": 0.06869983948635638
   },
   {
     "languageCode": "eo_UY",
@@ -197,7 +197,7 @@ module.exports = [
     "languageCode": "ms_MY",
     "languageName": "Malay",
     "languageNativeName": "Bahasa Malaysia",
-    "translationRatio": 0.05168021351449714
+    "translationRatio": 0.05786728132961305
   },
   {
     "languageCode": "my_MM",
@@ -209,7 +209,7 @@ module.exports = [
     "languageCode": "nl_NL",
     "languageName": "Dutch",
     "languageNativeName": "Nederlands",
-    "translationRatio": 0.48671600145578064
+    "translationRatio": 0.48683731651097906
   },
   {
     "languageCode": "no_NO",
@@ -227,13 +227,13 @@ module.exports = [
     "languageCode": "pseudo_LOCALE",
     "languageName": "for development only",
     "languageNativeName": "Pseudolocalization",
-    "translationRatio": 0.9977433913604127
+    "translationRatio": 0.9977528089887641
   },
   {
     "languageCode": "pt_BR",
     "languageName": "Brazilian Portuguese",
     "languageNativeName": "Português brasileiro",
-    "translationRatio": 0.8917869707630717
+    "translationRatio": 0.8919082858182701
   },
   {
     "languageCode": "pt_PT",
@@ -251,7 +251,7 @@ module.exports = [
     "languageCode": "ru_RU",
     "languageName": "Russian",
     "languageNativeName": "Русский",
-    "translationRatio": 0.9842290428242145
+    "translationRatio": 0.987868494480165
   },
   {
     "languageCode": "si_LK",
@@ -347,7 +347,7 @@ module.exports = [
     "languageCode": "zh_CN",
     "languageName": "Chinese Simplified",
     "languageNativeName": "简化字",
-    "translationRatio": 0.9919932063569089
+    "translationRatio": 0.9922358364673056
   },
   {
     "languageCode": "zh_TW",

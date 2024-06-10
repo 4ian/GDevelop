@@ -2160,7 +2160,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                     onApply={() => this.editLayoutVariables(false)}
                   />
                 )}
-                )}
                 {this.state.textEditedEvent && (
                   <EventTextDialog
                     event={this.state.textEditedEvent}

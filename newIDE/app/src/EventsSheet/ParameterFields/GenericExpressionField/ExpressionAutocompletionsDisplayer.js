@@ -117,7 +117,7 @@ const AutocompletionRow = React.forwardRef(
         onClick={onClick}
         ref={ref}
       >
-        <LineStackLayout noMargin>
+        <LineStackLayout noMargin expand>
           {icon || (iconSrc ? <AutocompletionIcon src={iconSrc} /> : null)}
           {secondaryIcon}
           <Text style={defaultTextStyle} noMargin align="left">

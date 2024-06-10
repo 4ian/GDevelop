@@ -38,6 +38,7 @@ type Props = {|
   settingsIcon: React.Node,
   canRenameObject: boolean,
   onRenameObject: () => void,
+  onOpenSceneVariables: () => void,
 |};
 
 const Toolbar = React.memo<Props>(function(props) {
@@ -60,6 +61,7 @@ const Toolbar = React.memo<Props>(function(props) {
         canDeleteSelection={props.selectedInstancesCount !== 0}
         canRenameObject={props.canRenameObject}
         onRenameObject={props.onRenameObject}
+        onOpenSceneVariables={props.onOpenSceneVariables}
       />
       <IconButton
         size="small"

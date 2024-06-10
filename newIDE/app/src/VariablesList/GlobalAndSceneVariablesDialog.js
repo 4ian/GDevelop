@@ -8,37 +8,39 @@ import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/Even
 
 type Props = {|
   open: boolean,
-  globalVariables: gdVariablesContainer,
-  sceneVariables: gdVariablesContainer,
-  project: gdProject,
-  layout?: ?gdLayout,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   onApply: (selectedVariableName: string | null) => void,
   onCancel: () => void,
   hotReloadPreviewButtonProps?: ?HotReloadPreviewButtonProps,
-  /**
-   * If set to true, a deleted variable won't trigger a confirmation asking if the
-   * project must be refactored to delete any reference to it.
-   */
-  preventRefactoringToDeleteInstructions?: boolean,
   isGlobalTabInitiallyOpen?: boolean,
   initiallySelectedVariableName?: string,
 |};
 
 const GlobalAndSceneVariablesDialog = ({
-  globalVariables,
-  sceneVariables,
-  project,
-  layout,
   projectScopedContainersAccessor,
   open,
   onCancel,
   onApply,
   hotReloadPreviewButtonProps,
-  preventRefactoringToDeleteInstructions,
   isGlobalTabInitiallyOpen,
   initiallySelectedVariableName,
 }: Props) => {
+  const {
+    project,
+    layout,
+    eventsFunctionsExtension,
+  } = projectScopedContainersAccessor.getScope();
+
+  let globalVariables = null;
+  let sceneVariables = null;
+  if (layout) {
+    globalVariables = project.getVariables();
+    sceneVariables = layout.getVariables();
+  } else if (eventsFunctionsExtension) {
+    globalVariables = eventsFunctionsExtension.getGlobalVariables();
+    sceneVariables = eventsFunctionsExtension.getSceneVariables();
+  }
+
   const onComputeAllSceneVariableNames = React.useCallback(
     () =>
       layout
@@ -65,7 +67,7 @@ const GlobalAndSceneVariablesDialog = ({
   const tabs = React.useMemo(
     () =>
       [
-        {
+        sceneVariables && {
           id: 'scene-variables',
           label: <Trans>Scene variables</Trans>,
           variablesContainer: sceneVariables,
@@ -77,7 +79,7 @@ const GlobalAndSceneVariablesDialog = ({
           ),
           onComputeAllVariableNames: onComputeAllSceneVariableNames,
         },
-        {
+        globalVariables && {
           id: 'global-variables',
           label: <Trans>Global variables</Trans>,
           variablesContainer: globalVariables,
@@ -119,9 +121,7 @@ const GlobalAndSceneVariablesDialog = ({
       initiallySelectedVariableName={initiallySelectedVariableName}
       helpPagePath={'/all-features/variables/scene-variables'}
       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-      preventRefactoringToDeleteInstructions={
-        preventRefactoringToDeleteInstructions
-      }
+      preventRefactoringToDeleteInstructions={true}
       id="global-and-scene-variables-dialog"
     />
   );

@@ -18,6 +18,7 @@ type Props = {|
   setupGrid: () => void,
   canRenameObject: boolean,
   onRenameObject: () => void,
+  onOpenSceneVariables: () => void,
 |};
 
 const ToolbarCommands = (props: Props) => {
@@ -67,6 +68,10 @@ const ToolbarCommands = (props: Props) => {
 
   useCommand('RENAME_SCENE_OBJECT', props.canRenameObject, {
     handler: props.onRenameObject,
+  });
+
+  useCommand('OPEN_SCENE_VARIABLES', true, {
+    handler: props.onOpenSceneVariables,
   });
 
   return null;

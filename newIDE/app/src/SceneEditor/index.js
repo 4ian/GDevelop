@@ -306,6 +306,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             this.state.selectedObjectFolderOrObjectsWithContext.length === 1
           }
           onRenameObject={this._startRenamingSelectedObject}
+          onOpenSceneVariables={this.editLayoutVariables}
         />
       );
     } else {
@@ -337,6 +338,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             this.state.selectedObjectFolderOrObjectsWithContext.length === 1
           }
           onRenameObject={this._startRenamingSelectedObject}
+          onOpenSceneVariables={this.editLayoutVariables}
         />
       );
     }
@@ -1684,7 +1686,6 @@ export default class SceneEditor extends React.Component<Props, State> {
                   this.editObject(object, 'variables');
                 }}
                 onOpenSceneProperties={this.openSceneProperties}
-                onOpenSceneVariables={this.editLayoutVariables}
                 onEditObjectGroup={this.editGroup}
                 onEditLayerEffects={this.editLayerEffects}
                 onEditLayer={this.editLayer}

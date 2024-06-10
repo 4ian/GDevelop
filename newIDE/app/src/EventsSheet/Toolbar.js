@@ -43,6 +43,7 @@ type Props = {|
   settingsIcon?: React.Node,
   moveEventsIntoNewGroup: () => void,
   canMoveEventsIntoNewGroup: boolean,
+  onOpenSceneVariables: () => void,
 |};
 
 const Toolbar = React.memo<Props>(function Toolbar({
@@ -69,6 +70,7 @@ const Toolbar = React.memo<Props>(function Toolbar({
   settingsIcon,
   moveEventsIntoNewGroup,
   canMoveEventsIntoNewGroup,
+  onOpenSceneVariables,
 }: Props) {
   const shortcutMap = useShortcutMap();
 
@@ -97,6 +99,7 @@ const Toolbar = React.memo<Props>(function Toolbar({
         onOpenSettings={onOpenSettings}
         moveEventsIntoNewGroup={moveEventsIntoNewGroup}
         canMoveEventsIntoNewGroup={canMoveEventsIntoNewGroup}
+        onOpenSceneVariables={onOpenSceneVariables}
       />
       <ToolbarGroup lastChild>
         <IconButton

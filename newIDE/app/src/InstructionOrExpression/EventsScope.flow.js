@@ -30,6 +30,10 @@ export class ProjectScopedContainersAccessor {
     this._eventPath = eventPath;
   }
 
+  getScope(): EventsScope {
+    return this._scope;
+  }
+
   get(): gdProjectScopedContainers {
     let projectScopedContainers;
     const {

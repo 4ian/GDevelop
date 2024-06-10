@@ -109,33 +109,14 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           }
           onInstructionTypeChanged={onInstructionTypeChanged}
         />
-        {editorOpen && project && layout && (
+        {editorOpen && (
           <GlobalAndSceneVariablesDialog
-            globalVariables={project.getVariables()}
-            sceneVariables={layout.getVariables()}
-            project={project}
-            layout={layout}
             projectScopedContainersAccessor={projectScopedContainersAccessor}
             open
             onCancel={() => setEditorOpen(false)}
             onApply={onVariableEditorApply}
             isGlobalTabInitiallyOpen={isGlobal}
             initiallySelectedVariableName={props.value}
-            preventRefactoringToDeleteInstructions
-          />
-        )}
-        {editorOpen && project && eventsFunctionsExtension && (
-          <GlobalAndSceneVariablesDialog
-            globalVariables={eventsFunctionsExtension.getGlobalVariables()}
-            sceneVariables={eventsFunctionsExtension.getSceneVariables()}
-            project={project}
-            projectScopedContainersAccessor={projectScopedContainersAccessor}
-            open
-            onCancel={() => setEditorOpen(false)}
-            onApply={onVariableEditorApply}
-            isGlobalTabInitiallyOpen={isGlobal}
-            initiallySelectedVariableName={props.value}
-            preventRefactoringToDeleteInstructions
           />
         )}
       </React.Fragment>

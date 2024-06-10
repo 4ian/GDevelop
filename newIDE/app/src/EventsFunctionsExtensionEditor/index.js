@@ -1454,9 +1454,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             isGlobalTabInitiallyOpen={
               variablesEditorOpen.isGlobalTabInitiallyOpen
             }
-            globalVariables={eventsFunctionsExtension.getGlobalVariables()}
-            sceneVariables={eventsFunctionsExtension.getSceneVariables()}
-            project={project}
             projectScopedContainersAccessor={
               new ProjectScopedContainersAccessor({
                 project,
@@ -1466,7 +1463,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             open
             onCancel={() => this._editVariables(null)}
             onApply={() => this._editVariables(null)}
-            preventRefactoringToDeleteInstructions
           />
         )}
         {objectMethodSelectorDialogOpen && selectedEventsBasedObject && (

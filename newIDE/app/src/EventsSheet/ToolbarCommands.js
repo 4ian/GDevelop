@@ -29,6 +29,7 @@ type Props = {|
   onOpenSettings?: ?() => void,
   moveEventsIntoNewGroup: () => void,
   canMoveEventsIntoNewGroup: boolean,
+  onOpenSceneVariables: () => void,
 |};
 
 const ToolbarCommands = (props: Props) => {
@@ -93,6 +94,10 @@ const ToolbarCommands = (props: Props) => {
 
   useCommand('OPEN_EXTENSION_SETTINGS', !!props.onOpenSettings, {
     handler: props.onOpenSettings || (() => {}),
+  });
+
+  useCommand('OPEN_SCENE_VARIABLES', true, {
+    handler: props.onOpenSceneVariables,
   });
 
   return null;

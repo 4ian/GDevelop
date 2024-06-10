@@ -42,6 +42,7 @@ function InAppTutorialDialog({
   const actions = isLastStep
     ? [
         <DialogPrimaryButton
+          primary
           key="close"
           onClick={onApply}
           label={<Trans>Close</Trans>}

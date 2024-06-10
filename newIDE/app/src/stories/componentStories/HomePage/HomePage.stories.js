@@ -24,8 +24,8 @@ import {
   indieUserProfile,
 } from '../../../fixtures/GDevelopServicesTestData';
 import { GDevelopAssetApi } from '../../../Utils/GDevelopServices/ApiConfigs';
-import InAppTutorialContext from '../../../InAppTutorial/InAppTutorialContext';
 import fakeResourceManagementProps from '../../FakeResourceManagement';
+import inAppTutorialDecorator from '../../InAppTutorialDecorator';
 
 const apiDataServerSideError = {
   mockData: [
@@ -80,79 +80,46 @@ const WrappedHomePage = ({
         getTutorialProgress: () => tutorialProgress,
       }}
     >
-      <InAppTutorialContext.Provider
-        value={{
-          inAppTutorialShortHeaders: [
-            {
-              id: 'flingGame',
-              contentUrl: 'fakeUrl',
-              availableLocales: ['en', 'fr-FR'],
-            },
-          ],
-          getInAppTutorialShortHeader: (tutorialId: string) => ({
-            id: 'flingGame',
-            contentUrl: 'fakeUrl',
-            availableLocales: ['en', 'fr-FR'],
-          }),
-          currentlyRunningInAppTutorial: null,
-          startTutorial: async () => {
-            action('start tutorial');
-          },
-          startProjectData: {},
-          endTutorial: () => {
-            action('end tutorial');
-          },
-          startStepIndex: 0,
-          inAppTutorialsFetchingError,
-          fetchInAppTutorials: async () => {
-            action('fetch tutorials')();
-          },
-          onLoadInAppTutorialFromLocalFile: async () => {
-            action('load in app tutorial from local file')();
-          },
-        }}
-      >
-        <AuthenticatedUserContext.Provider value={user}>
-          <ExampleStoreStateProvider>
-            <TutorialStateProvider>
-              <HomePage
-                project={project}
-                fileMetadata={null}
-                isActive={true}
-                projectItemName={null}
-                setToolbar={() => {}}
-                canOpen={true}
-                storageProviders={[CloudStorageProvider]}
-                onChooseProject={() => action('onChooseProject')()}
-                onOpenRecentFile={() => action('onOpenRecentFile')()}
-                onOpenExampleStore={() => action('onOpenExampleStore')()}
-                onSelectExampleShortHeader={() =>
-                  action('onSelectExampleShortHeader')()
-                }
-                onPreviewPrivateGameTemplateListingData={() =>
-                  action('onPreviewPrivateGameTemplateListingData')()
-                }
-                onOpenPrivateGameTemplateListingData={() =>
-                  action('onOpenPrivateGameTemplateListingData')()
-                }
-                onOpenProjectManager={() => action('onOpenProjectManager')()}
-                onOpenLanguageDialog={() => action('open language dialog')()}
-                onOpenNewProjectSetupDialog={() =>
-                  action('onOpenNewProjectSetupDialog')()
-                }
-                canSave={true}
-                onSave={() => action('onSave')()}
-                selectInAppTutorial={() => action('select in app tutorial')()}
-                onOpenProfile={() => action('open profile')()}
-                onOpenPreferences={() => action('open preferences')()}
-                onOpenAbout={() => action('open about')()}
-                resourceManagementProps={fakeResourceManagementProps}
-                canInstallPrivateAsset={() => true}
-              />
-            </TutorialStateProvider>
-          </ExampleStoreStateProvider>
-        </AuthenticatedUserContext.Provider>
-      </InAppTutorialContext.Provider>
+      <AuthenticatedUserContext.Provider value={user}>
+        <ExampleStoreStateProvider>
+          <TutorialStateProvider>
+            <HomePage
+              project={project}
+              fileMetadata={null}
+              isActive={true}
+              projectItemName={null}
+              setToolbar={() => {}}
+              canOpen={true}
+              storageProviders={[CloudStorageProvider]}
+              onChooseProject={() => action('onChooseProject')()}
+              onOpenRecentFile={() => action('onOpenRecentFile')()}
+              onOpenExampleStore={() => action('onOpenExampleStore')()}
+              onSelectExampleShortHeader={() =>
+                action('onSelectExampleShortHeader')()
+              }
+              onPreviewPrivateGameTemplateListingData={() =>
+                action('onPreviewPrivateGameTemplateListingData')()
+              }
+              onOpenPrivateGameTemplateListingData={() =>
+                action('onOpenPrivateGameTemplateListingData')()
+              }
+              onOpenProjectManager={() => action('onOpenProjectManager')()}
+              onOpenLanguageDialog={() => action('open language dialog')()}
+              onOpenNewProjectSetupDialog={() =>
+                action('onOpenNewProjectSetupDialog')()
+              }
+              canSave={true}
+              onSave={() => action('onSave')()}
+              selectInAppTutorial={() => action('select in app tutorial')()}
+              onOpenProfile={() => action('open profile')()}
+              onOpenPreferences={() => action('open preferences')()}
+              onOpenAbout={() => action('open about')()}
+              resourceManagementProps={fakeResourceManagementProps}
+              canInstallPrivateAsset={() => true}
+            />
+          </TutorialStateProvider>
+        </ExampleStoreStateProvider>
+      </AuthenticatedUserContext.Provider>
     </PreferencesContext.Provider>
   </FixedHeightFlexContainer>
 );
@@ -160,7 +127,7 @@ const WrappedHomePage = ({
 export default {
   title: 'HomePage',
   component: WrappedHomePage,
-  decorators: [GDevelopJsInitializerDecorator],
+  decorators: [GDevelopJsInitializerDecorator, inAppTutorialDecorator],
 };
 
 export const BuildSectionLoading = () => (

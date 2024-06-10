@@ -1850,8 +1850,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const screenType = useScreenType();
 
-    const { layout, eventsFunctionsExtension } = scope;
-
     const isFunctionOnlyCallingItself =
       scope.eventsFunctionsExtension &&
       scope.eventsFunction &&

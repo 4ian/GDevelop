@@ -35,7 +35,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       onChange,
       value,
     } = props;
-    const { layout, eventsFunctionsExtension } = scope;
+    const { layout } = scope;
 
     const enumerateGlobalAndSceneVariables = React.useCallback(
       () =>

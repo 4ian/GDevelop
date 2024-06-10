@@ -11,7 +11,6 @@ import {
   type InAppTutorialFlowStepTrigger,
   type TranslatedText,
   type EditorIdentifier,
-  isMiniTutorial,
 } from '../Utils/GDevelopServices/InAppTutorial';
 import {
   createOrEnsureBadgeForUser,
@@ -1018,10 +1017,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
       currentStep && currentStep.isTriggerFlickering ? 500 : null
     );
 
-    const isRunningMiniTutorial = React.useMemo(
-      () => isMiniTutorial(tutorial.id),
-      [tutorial.id]
-    );
+    const isRunningMiniTutorial = tutorial.isMiniTutorial;
 
     const isTouchScreen = useScreenType() === 'touch';
 

@@ -30,16 +30,15 @@ export const guidedLessonsIds = [
   KNIGHT_PLATFORMER_IN_APP_TUTORIAL_ID,
 ];
 
-const fullTutorialIds = [FLING_GAME_IN_APP_TUTORIAL_ID];
-
-export const allInAppTutorialIds = [...guidedLessonsIds, ...fullTutorialIds];
-
 export type InAppTutorialShortHeader = {|
   id: string,
+  titleByLocale: MessageByLocale,
+  bulletPointsByLocale: Array<MessageByLocale>,
   contentUrl: string,
   availableLocales: Array<string>,
   initialTemplateUrl?: string,
   initialProjectData?: { [key: string]: string },
+  isMiniTutorial?: boolean,
 |};
 
 export type EditorIdentifier =
@@ -139,6 +138,7 @@ export type InAppTutorial = {|
   },
   endDialog: InAppTutorialDialog,
   availableLocales?: Array<string>,
+  isMiniTutorial?: boolean,
 |};
 
 const fetchLocalFileIfDesktop = async (filename: string): Promise<?Object> => {
@@ -197,14 +197,3 @@ export const fetchInAppTutorial = async (
   const response = await axios.get(shortHeader.contentUrl);
   return response.data;
 };
-
-export const isMiniTutorial = (tutorialId: string) =>
-  [
-    PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
-    TIMER_IN_APP_TUTORIAL_ID,
-    CAMERA_PARALLAX_IN_APP_TUTORIAL_ID,
-    HEALTH_BAR_IN_APP_TUTORIAL_ID,
-    JOYSTICK_IN_APP_TUTORIAL_ID,
-    OBJECT_3D_IN_APP_TUTORIAL_ID,
-    KNIGHT_PLATFORMER_IN_APP_TUTORIAL_ID,
-  ].includes(tutorialId);

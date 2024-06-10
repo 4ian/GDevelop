@@ -1,6 +1,12 @@
 [
   {
     "id": "cameraParallax",
+    "titleByLocale": { "en": "Let's improve the camera and the background" },
+    "bulletPointsByLocale": [
+      { "en": "Add a background with parallax effect" },
+      { "en": "Add an extension" },
+      { "en": "Use basic camera movements to follow the player" }
+    ],
     "contentUrl": "https://resources.gdevelop-app.com/in-app-tutorials/cameraParallax.json",
     "availableLocales": [
       "en",
@@ -26,15 +32,29 @@
       "player": "PlayerObject",
       "farBackground": "FarBackground",
       "midBackground": "MidBackground"
-    }
+    },
+    "isMiniTutorial": true
   },
   {
     "id": "flingGame",
+    "titleByLocale": { "en": "Let's make a Fling Game" },
+    "bulletPointsByLocale": [
+      { "en": "Learn to create a game from zero." },
+      { "en": "Add a leaderboard to your game." }
+    ],
     "contentUrl": "https://resources.gdevelop-app.com/in-app-tutorials/flingGame.json",
-    "availableLocales": ["en", "fr", "es", "pt", "th", "ar"]
+    "availableLocales": ["en", "fr", "es", "pt", "th", "ar"],
+    "isMiniTutorial": false
   },
   {
     "id": "healthBar",
+    "titleByLocale": {
+      "en": "Let's communicate to the player the remaining health points"
+    },
+    "bulletPointsByLocale": [
+      { "en": "Use a prefab for a health bar" },
+      { "en": "Update the health bar based on the player's health" }
+    ],
     "contentUrl": "https://resources.gdevelop-app.com/in-app-tutorials/healthBar.json",
     "availableLocales": [
       "en",
@@ -55,10 +75,16 @@
       "zh"
     ],
     "initialTemplateUrl": "https://resources.gdevelop-app.com/in-app-tutorials/templates/healthBar/game.json",
-    "initialProjectData": { "level": "Level", "player": "Player" }
+    "initialProjectData": { "level": "Level", "player": "Player" },
+    "isMiniTutorial": true
   },
   {
     "id": "joystick",
+    "titleByLocale": { "en": "Let's add mobile controls to our game" },
+    "bulletPointsByLocale": [
+      { "en": "Add a joystick prefab" },
+      { "en": "Add a behavior" }
+    ],
     "contentUrl": "https://resources.gdevelop-app.com/in-app-tutorials/joystick.json",
     "availableLocales": [
       "en",
@@ -82,10 +108,32 @@
     "initialProjectData": {
       "gameScene": "GameScene",
       "ship": "OrangePlayerShip3"
-    }
+    },
+    "isMiniTutorial": true
+  },
+  {
+    "id": "knightPlatformer",
+    "titleByLocale": { "en": "Let's make a platformer game" },
+    "bulletPointsByLocale": [
+      { "en": "Use a behavior to mark an object as a platform." },
+      { "en": "Use another behavior to control the player." }
+    ],
+    "contentUrl": "https://resources.gdevelop-app.com/in-app-tutorials/knightPlatformer.json",
+    "availableLocales": ["en"],
+    "initialProjectData": {
+      "playerHitBox": "KnightHitBox",
+      "tiles": "Tiles",
+      "level1": "Level 1"
+    },
+    "isMiniTutorial": true
   },
   {
     "id": "object3d",
+    "titleByLocale": { "en": "Let's add a 3D object to our game" },
+    "bulletPointsByLocale": [
+      { "en": "Add a 3D Box" },
+      { "en": "Add a behavior" }
+    ],
     "contentUrl": "https://resources.gdevelop-app.com/in-app-tutorials/object3d.json",
     "availableLocales": [
       "en",
@@ -106,10 +154,17 @@
       "zh"
     ],
     "initialTemplateUrl": "https://resources.gdevelop-app.com/in-app-tutorials/templates/object3d/game.json",
-    "initialProjectData": { "gameScene": "GameScene", "platform": "Platform" }
+    "initialProjectData": { "gameScene": "GameScene", "platform": "Platform" },
+    "isMiniTutorial": true
   },
   {
     "id": "plinkoMultiplier",
+    "titleByLocale": { "en": "Let's improve a scoring system" },
+    "bulletPointsByLocale": [
+      { "en": "Making objects disappear or appear when colliding" },
+      { "en": "Creating, modifying and accessing a scene variable" },
+      { "en": "Updating a score accordingly" }
+    ],
     "contentUrl": "https://resources.gdevelop-app.com/in-app-tutorials/plinkoMultiplier.json",
     "availableLocales": [
       "en",
@@ -136,10 +191,17 @@
       "scoreMultiplier": "ScoreMultiplier",
       "ball": "Ball",
       "particles": "PegStar_Particle"
-    }
+    },
+    "isMiniTutorial": true
   },
   {
     "id": "timer",
+    "titleByLocale": { "en": "Let's use time to measure a score" },
+    "bulletPointsByLocale": [
+      { "en": "Create and modify a text" },
+      { "en": "Start a timer" },
+      { "en": "Use the timer to display a score" }
+    ],
     "contentUrl": "https://resources.gdevelop-app.com/in-app-tutorials/timer.json",
     "availableLocales": [
       "en",
@@ -160,6 +222,7 @@
       "zh"
     ],
     "initialTemplateUrl": "https://resources.gdevelop-app.com/in-app-tutorials/templates/timer/game.json",
-    "initialProjectData": { "gameScene": "GameScene" }
+    "initialProjectData": { "gameScene": "GameScene" },
+    "isMiniTutorial": true
   }
 ]

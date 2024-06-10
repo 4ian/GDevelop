@@ -164,10 +164,6 @@ import {
   useStableUpToDateRef,
 } from '../Utils/UseStableUpToDateCallback';
 import { emptyStorageProvider } from '../ProjectsStorage/ProjectStorageProviders';
-import {
-  isMiniTutorial,
-  allInAppTutorialIds,
-} from '../Utils/GDevelopServices/InAppTutorial';
 import CustomDragLayer from '../UI/DragAndDrop/CustomDragLayer';
 import CloudProjectRecoveryDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectRecoveryDialog';
 import CloudProjectSaveChoiceDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectSaveChoiceDialog';
@@ -681,15 +677,6 @@ const MainFrame = (props: Props) => {
     editorTabs: state.editorTabs,
     setEditorTabs: setEditorTabs,
     getEditorOpeningOptions,
-  });
-
-  useOpenInitialDialog({
-    openInAppTutorialDialog: (tutorialId: string) => {
-      if (allInAppTutorialIds.includes(tutorialId)) {
-        selectInAppTutorial(tutorialId);
-      }
-    },
-    openProfileDialog,
   });
 
   const _closeSnackMessage = React.useCallback(
@@ -2378,7 +2365,7 @@ const MainFrame = (props: Props) => {
         preferences.insertRecentProjectFile(fileMetadataAndStorageProviderName);
         if (
           currentlyRunningInAppTutorial &&
-          !isMiniTutorial(currentlyRunningInAppTutorial.id) && // Don't save the progress of mini-tutorials
+          !currentlyRunningInAppTutorial.isMiniTutorial && // Don't save the progress of mini-tutorials
           inAppTutorialOrchestratorRef.current
         ) {
           preferences.saveTutorialProgress({
@@ -2570,7 +2557,7 @@ const MainFrame = (props: Props) => {
           );
           if (
             currentlyRunningInAppTutorial &&
-            !isMiniTutorial(currentlyRunningInAppTutorial.id) && // Don't save the progress of mini-tutorials
+            !currentlyRunningInAppTutorial.isMiniTutorial && // Don't save the progress of mini-tutorials
             inAppTutorialOrchestratorRef.current
           ) {
             preferences.saveTutorialProgress({
@@ -2746,6 +2733,11 @@ const MainFrame = (props: Props) => {
     },
     [preferences, authenticatedUser.profile]
   );
+
+  useOpenInitialDialog({
+    openInAppTutorialDialog: selectInAppTutorial,
+    openProfileDialog,
+  });
 
   const onChangeProjectName = async (newName: string): Promise<void> => {
     if (!currentProject || !currentFileMetadata) return;

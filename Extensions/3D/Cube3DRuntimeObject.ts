@@ -39,12 +39,6 @@ namespace gdjs {
   };
 
   type Cube3DObjectNetworkSyncDataType = {
-    w: number;
-    h: number;
-    d: number;
-    rx: number;
-    ry: number;
-    rz: number;
     fo: 'Y' | 'Z';
     bfu: 'X' | 'Y';
     vfb: integer;
@@ -53,7 +47,7 @@ namespace gdjs {
     mt: number;
   };
 
-  type Cube3DObjectNetworkSyncData = ObjectNetworkSyncData &
+  type Cube3DObjectNetworkSyncData = Object3DNetworkSyncData &
     Cube3DObjectNetworkSyncDataType;
 
   /**
@@ -423,12 +417,6 @@ namespace gdjs {
     getObjectNetworkSyncData(): Cube3DObjectNetworkSyncData {
       return {
         ...super.getObjectNetworkSyncData(),
-        w: this.getWidth(),
-        h: this.getHeight(),
-        d: this.getDepth(),
-        rx: this.getRotationX(),
-        ry: this.getRotationY(),
-        rz: this.getAngle(),
         mt: this._materialType,
         fo: this._facesOrientation,
         bfu: this._backFaceUpThroughWhichAxisRotation,
@@ -443,24 +431,6 @@ namespace gdjs {
     ): void {
       super.updateFromObjectNetworkSyncData(networkSyncData);
 
-      if (networkSyncData.w !== undefined) {
-        this.setWidth(networkSyncData.w);
-      }
-      if (networkSyncData.h !== undefined) {
-        this.setHeight(networkSyncData.h);
-      }
-      if (networkSyncData.d !== undefined) {
-        this.setDepth(networkSyncData.d);
-      }
-      if (networkSyncData.rx !== undefined) {
-        this.setRotationX(networkSyncData.rx);
-      }
-      if (networkSyncData.ry !== undefined) {
-        this.setRotationY(networkSyncData.ry);
-      }
-      if (networkSyncData.rz !== undefined) {
-        this.setAngle(networkSyncData.rz);
-      }
       if (networkSyncData.mt !== undefined) {
         this._materialType = networkSyncData.mt;
       }

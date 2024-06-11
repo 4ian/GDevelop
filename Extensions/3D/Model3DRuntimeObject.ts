@@ -2,12 +2,6 @@ namespace gdjs {
   type Model3DAnimation = { name: string; source: string; loop: boolean };
 
   type Model3DObjectNetworkSyncDataType = {
-    w: float;
-    h: float;
-    d: float;
-    rx: number;
-    ry: number;
-    rz: number;
     mt: number;
     op: FloatPoint3D | null;
     cp: FloatPoint3D | null;
@@ -17,7 +11,7 @@ namespace gdjs {
     ap: boolean;
   };
 
-  type Model3DObjectNetworkSyncData = ObjectNetworkSyncData &
+  type Model3DObjectNetworkSyncData = Object3DNetworkSyncData &
     Model3DObjectNetworkSyncDataType;
 
   /** Base parameters for {@link gdjs.Cube3DRuntimeObject} */
@@ -184,12 +178,6 @@ namespace gdjs {
     getObjectNetworkSyncData(): Model3DObjectNetworkSyncData {
       return {
         ...super.getObjectNetworkSyncData(),
-        w: this.getWidth(),
-        h: this.getHeight(),
-        d: this.getDepth(),
-        rx: this.getRotationX(),
-        ry: this.getRotationY(),
-        rz: this.getAngle(),
         mt: this._materialType,
         op: this._originPoint,
         cp: this._centerPoint,
@@ -205,24 +193,6 @@ namespace gdjs {
     ): void {
       super.updateFromObjectNetworkSyncData(networkSyncData);
 
-      if (networkSyncData.w !== undefined) {
-        this.setWidth(networkSyncData.w);
-      }
-      if (networkSyncData.h !== undefined) {
-        this.setHeight(networkSyncData.h);
-      }
-      if (networkSyncData.d !== undefined) {
-        this.setDepth(networkSyncData.d);
-      }
-      if (networkSyncData.rx !== undefined) {
-        this.setRotationX(networkSyncData.rx);
-      }
-      if (networkSyncData.ry !== undefined) {
-        this.setRotationY(networkSyncData.ry);
-      }
-      if (networkSyncData.rz !== undefined) {
-        this.setAngle(networkSyncData.rz);
-      }
       if (networkSyncData.mt !== undefined) {
         this._materialType = networkSyncData.mt;
       }

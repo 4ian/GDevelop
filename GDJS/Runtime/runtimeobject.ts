@@ -482,7 +482,7 @@ namespace gdjs {
       return {
         x: this.x,
         y: this.y,
-        z: this.zOrder,
+        zo: this.zOrder,
         a: this.angle,
         hid: this.hidden,
         if: this._instantForces.map((force) => force.getNetworkSyncData()),
@@ -509,8 +509,8 @@ namespace gdjs {
       if (networkSyncData.y !== undefined) {
         this.setY(networkSyncData.y);
       }
-      if (networkSyncData.z !== undefined) {
-        this.setZOrder(networkSyncData.z);
+      if (networkSyncData.zo !== undefined) {
+        this.setZOrder(networkSyncData.zo);
       }
       if (networkSyncData.a !== undefined) {
         this.setAngle(networkSyncData.a);

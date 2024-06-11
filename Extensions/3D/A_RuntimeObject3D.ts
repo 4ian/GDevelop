@@ -13,6 +13,23 @@ namespace gdjs {
   const getValidDimensionValue = (value: float | undefined) =>
     value === undefined ? 100 : value <= 0 ? 1 : value;
 
+  type Object3DNetworkSyncDataType = {
+    // z is position on the Z axis, different from zo, which is Z order
+    z: number;
+    w: number;
+    h: number;
+    d: number;
+    rx: number;
+    ry: number;
+    // no need for rz, as it is the angle from gdjs.RuntimeObject
+    flipX: boolean;
+    flipY: boolean;
+    flipZ: boolean;
+  };
+
+  export type Object3DNetworkSyncData = ObjectNetworkSyncData &
+    Object3DNetworkSyncDataType;
+
   /**
    * Base class for 3D objects.
    */
@@ -107,6 +124,39 @@ namespace gdjs {
         getValidDimensionValue(newObjectData.content.depth)
       );
       return true;
+    }
+
+    getObjectNetworkSyncData(): Object3DNetworkSyncData {
+      return {
+        ...super.getObjectNetworkSyncData(),
+        z: this.getZ(),
+        w: this.getWidth(),
+        h: this.getHeight(),
+        d: this.getDepth(),
+        rx: this.getRotationX(),
+        ry: this.getRotationY(),
+        flipX: this.isFlippedX(),
+        flipY: this.isFlippedY(),
+        flipZ: this.isFlippedZ(),
+      };
+    }
+
+    updateFromObjectNetworkSyncData(networkSyncData: Object3DNetworkSyncData) {
+      super.updateFromObjectNetworkSyncData(networkSyncData);
+      if (networkSyncData.z !== undefined) this.setZ(networkSyncData.z);
+      if (networkSyncData.w !== undefined) this.setWidth(networkSyncData.w);
+      if (networkSyncData.h !== undefined) this.setHeight(networkSyncData.h);
+      if (networkSyncData.d !== undefined) this.setDepth(networkSyncData.d);
+      if (networkSyncData.rx !== undefined)
+        this.setRotationX(networkSyncData.rx);
+      if (networkSyncData.ry !== undefined)
+        this.setRotationY(networkSyncData.ry);
+      if (networkSyncData.flipX !== undefined)
+        this.flipX(networkSyncData.flipX);
+      if (networkSyncData.flipY !== undefined)
+        this.flipY(networkSyncData.flipY);
+      if (networkSyncData.flipZ !== undefined)
+        this.flipZ(networkSyncData.flipZ);
     }
 
     extraInitializationFromInitialInstance(initialInstanceData: InstanceData) {

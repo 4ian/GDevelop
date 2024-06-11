@@ -147,8 +147,11 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
           onFunctionEdited={this._reloadExtensionMetadata}
           ref={editor => (this.editor = editor)}
           unsavedChanges={this.props.unsavedChanges}
-          onOpenCustomObjectEditor={(eventsBasedObject) => {
-            this.props.onOpenCustomObjectEditor(eventsFunctionsExtension, eventsBasedObject);
+          onOpenCustomObjectEditor={eventsBasedObject => {
+            this.props.onOpenCustomObjectEditor(
+              eventsFunctionsExtension,
+              eventsBasedObject
+            );
           }}
         />
       </div>

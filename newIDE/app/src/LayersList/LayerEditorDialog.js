@@ -426,7 +426,7 @@ const LayerEditorDialog = (props: Props) => {
                 props.layer,
                 oldName,
                 newName
-              )
+              );
             } else {
               // TODO: refactoring for custom objects.
             }

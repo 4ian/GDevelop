@@ -136,7 +136,8 @@ export class EventsBasedObjectTreeViewItemContent
     return [
       {
         label: i18n._(t`Open visual editor`),
-        click: () => this.props.onOpenCustomObjectEditor(this.eventsBasedObject),
+        click: () =>
+          this.props.onOpenCustomObjectEditor(this.eventsBasedObject),
       },
       {
         label: i18n._(t`Add a function`),

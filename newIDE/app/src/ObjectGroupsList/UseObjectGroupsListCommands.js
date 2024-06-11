@@ -16,7 +16,9 @@ const useObjectGroupsListCommands = (props: Props) => {
     generateOptions: React.useCallback(
       () =>
         [
-          ...objectsContainer ? enumerateGroups(objectsContainer.getObjectGroups()) : [],
+          ...(objectsContainer
+            ? enumerateGroups(objectsContainer.getObjectGroups())
+            : []),
           ...enumerateGroups(globalObjectsContainer.getObjectGroups()),
         ].map(group => ({
           text: group.getName(),

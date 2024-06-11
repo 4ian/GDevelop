@@ -189,11 +189,13 @@ export default class InstancesRenderer {
 
     const { layout } = this;
 
-    const backgroundColor = layout ? rgbToHexNumber(
-      layout.getBackgroundColorRed(),
-      layout.getBackgroundColorGreen(),
-      layout.getBackgroundColorBlue()
-    ) : 0x888888;
+    const backgroundColor = layout
+      ? rgbToHexNumber(
+          layout.getBackgroundColorRed(),
+          layout.getBackgroundColorGreen(),
+          layout.getBackgroundColorBlue()
+        )
+      : 0x888888;
 
     // TODO (custom object editor): handle a custom object here
     for (let i = 0; i < this.layersContainer.getLayersCount(); i++) {

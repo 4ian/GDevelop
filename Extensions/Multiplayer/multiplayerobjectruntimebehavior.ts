@@ -286,6 +286,7 @@ namespace gdjs {
         {
           x: objectNetworkSyncData.x,
           y: objectNetworkSyncData.y,
+          z: objectNetworkSyncData.z,
           zo: objectNetworkSyncData.zo,
           a: objectNetworkSyncData.a,
           hid: objectNetworkSyncData.hid,

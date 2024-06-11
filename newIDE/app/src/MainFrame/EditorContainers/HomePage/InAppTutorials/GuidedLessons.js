@@ -20,6 +20,7 @@ import {
   JOYSTICK_IN_APP_TUTORIAL_ID,
   OBJECT_3D_IN_APP_TUTORIAL_ID,
   KNIGHT_PLATFORMER_IN_APP_TUTORIAL_ID,
+  TOP_DOWN_RPG_PIXEL_PERFECT_ID,
   guidedLessonsIds,
 } from '../../../../Utils/GDevelopServices/InAppTutorial';
 import MultiplierScore from './Icons/MultiplierScore';
@@ -162,6 +163,13 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
       title: t`Platformer`,
       description: t`Learn how to use the behaviors to make a basic 2D platformer.`,
       durationInMinutes: 1,
+      renderImage: props => <Platformer {...props} />,
+    },
+    {
+      id: TOP_DOWN_RPG_PIXEL_PERFECT_ID,
+      title: t`Top-Down RPG Pixel Perfect`,
+      description: t`Learn how to make a player move like in old-school Pokemon.`,
+      durationInMinutes: 2,
       renderImage: props => <Platformer {...props} />,
     },
   ].filter(item => displayedGuidedLessonsIds.includes(item.id));

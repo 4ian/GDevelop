@@ -42,6 +42,8 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
 
   /** Functor used to render an instance */
   instancesRenderer: gdInitialInstanceJSFunctor;
+  _defaultWidth = 48;
+  _defaultHeight = 48;
 
   renderedInstances: { [number]: RenderedInstance | Rendered3DInstance } = {};
 
@@ -133,12 +135,12 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     if (!this.eventBasedObject) {
       return;
     }
-    this._isRenderedIn3D = eventBasedObject.isRenderedIn3D();
 
     const eventBasedObject = this.eventBasedObject;
+    this._isRenderedIn3D = eventBasedObject.isRenderedIn3D();
 
     // TODO: do the proper rendering according to instances
-    if (true) {
+    if (this.eventBasedObject.getInitialInstances().getInstancesCount() > 0) {
       // Functor used to render an instance
       this.instancesRenderer = new gd.InitialInstanceJSFunctor();
       // $FlowFixMe - invoke is not writable
@@ -198,9 +200,8 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
           renderedInstance.wasUsed = true;
         }
       };
-    }
-
-    if (false) {
+      this._updateDimensions();
+    } else {
       const childLayouts = getLayouts(
         eventBasedObject,
         customObjectConfiguration
@@ -287,6 +288,69 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
 
     return renderedInstance;
   };
+
+  _isRenderedFromInitialInstances(): boolean {
+    return !!this.instancesRenderer;
+  }
+
+  _updateDimensions() {
+    if (!this._isRenderedFromInitialInstances()) {
+      return;
+    }
+
+    let minX = Number.MAX_VALUE;
+    let minY = Number.MAX_VALUE;
+    let minZ = Number.MAX_VALUE;
+    let maxX = -Number.MAX_VALUE;
+    let maxY = -Number.MAX_VALUE;
+    let maxZ = -Number.MAX_VALUE;
+
+    // Functor used to render an instance
+    let instancesMeasurer = new gd.InitialInstanceJSFunctor();
+    // $FlowFixMe - invoke is not writable
+    instancesMeasurer.invoke = instancePtr => {
+      // $FlowFixMe - wrapPointer is not exposed
+      const instance: gdInitialInstance = gd.wrapPointer(
+        instancePtr,
+        gd.InitialInstance
+      );
+
+      //Get the "RenderedInstance" object associated to the instance and tell it to update.
+      const renderedInstance:
+        | RenderedInstance
+        | Rendered3DInstance
+        | null = this.getRendererOfInstance(instance);
+      if (!renderedInstance) return;
+
+      const x = renderedInstance._instance.getX();
+      const y = renderedInstance._instance.getY();
+      const z = renderedInstance._instance.getZ();
+      const width = renderedInstance.getWidth();
+      const height = renderedInstance.getHeight();
+      const depth = renderedInstance.getDepth();
+      const originX = renderedInstance.getOriginX();
+      const originY = renderedInstance.getOriginY();
+      const originZ = renderedInstance.getOriginZ();
+
+      minX = Math.min(minX, x - originX);
+      minY = Math.min(minY, y - originY);
+      minZ = Math.min(minZ, z - originZ);
+      maxX = Math.max(maxX, x - originX + width);
+      maxY = Math.max(maxY, y - originY + height);
+      maxZ = Math.max(maxZ, z - originZ + depth);
+    };
+    this.eventBasedObject
+      .getInitialInstances()
+      .iterateOverInstances(instancesMeasurer);
+    instancesMeasurer.delete();
+
+    this._defaultWidth = maxX - minX;
+    this._defaultHeight = maxY - minY;
+    this._defaultDepth = maxZ - minZ;
+    this._proportionalOriginX = -minX / this._defaultWidth;
+    this._proportionalOriginY = -minY / this._defaultHeight;
+    this._proportionalOriginZ = -minZ / this._defaultDepth;
+  }
 
   /**
    * Remove rendered instances that are not associated to any instance anymore
@@ -405,7 +469,8 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     // according to the current animation.
     const { eventBasedObject } = this;
 
-    if (true && eventBasedObject) {
+    if (this._isRenderedFromInitialInstances()) {
+      this._updateDimensions();
       eventBasedObject.getInitialInstances().iterateOverInstancesWithZOrdering(
         // $FlowFixMe - gd.castObject is not supporting typings.
         this.instancesRenderer,
@@ -413,18 +478,9 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
       );
       this._updatePixiObjectsZOrder();
       this._destroyUnusedInstanceRenderers();
-    }
-
-    if (false) {
+    } else {
       applyChildLayouts(this);
     }
-
-    const originX = this.getOriginX();
-    const originY = this.getOriginY();
-    const originZ = this.getOriginZ();
-    const centerX = this.getCenterX();
-    const centerY = this.getCenterY();
-    const centerZ = this.getCenterZ();
 
     const firstInstance = this.childrenRenderedInstances[0];
     let is3D = !!firstInstance && firstInstance instanceof Rendered3DInstance;
@@ -438,54 +494,116 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
       }
     }
 
-    const threeObject = this._threeObject;
-    const threeObjectPivot = this._threeObjectPivot;
-    if (threeObject && threeObjectPivot && is3D) {
-      threeObject.position.set(
-        this._instance.getX() + centerX - originX,
-        this._instance.getY() + centerY - originY,
-        this._instance.getZ() + centerZ - originZ
-      );
-      threeObjectPivot.position.set(
-        -centerX + originX,
-        -centerY + originY,
-        -centerZ + originZ
-      );
-      threeObject.rotation.set(
-        RenderedInstance.toRad(this._instance.getRotationX()),
-        RenderedInstance.toRad(this._instance.getRotationY()),
-        RenderedInstance.toRad(this._instance.getAngle())
-      );
+    if (this._isRenderedFromInitialInstances()) {
+      // The children are rendered for the default size and the render image is
+      // stretched.
+      const scaleX = this.getWidth() / this.getDefaultWidth();
+      const scaleY = this.getHeight() / this.getDefaultHeight();
+      const scaleZ = this.getDepth() / this.getDefaultDepth();
 
+      const threeObject = this._threeObject;
+      const threeObjectPivot = this._threeObjectPivot;
+      if (threeObject && threeObjectPivot && is3D) {
+        const pivotX = this.getCenterX() - this.getOriginX();
+        const pivotY = this.getCenterY() - this.getOriginY();
+        const pivotZ = this.getCenterZ() - this.getOriginZ();
+
+        threeObject.rotation.set(
+          RenderedInstance.toRad(this._instance.getRotationX()),
+          RenderedInstance.toRad(this._instance.getRotationY()),
+          RenderedInstance.toRad(this._instance.getAngle())
+        );
+
+        threeObject.position.set(-pivotX, -pivotY, -pivotZ);
+        threeObject.position.applyEuler(threeObject.rotation);
+        threeObject.position.x += this._instance.getX() + pivotX;
+        threeObject.position.y += this._instance.getY() + pivotY;
+        threeObject.position.z += this._instance.getZ() + pivotZ;
+
+        threeObject.scale.set(scaleX, scaleY, scaleZ);
+      }
+
+      const unscaledCenterX =
+        this.getDefaultWidth() * (0.5 - this._proportionalOriginX);
+      const unscaledCenterY =
+        this.getDefaultHeight() * (0.5 - this._proportionalOriginY);
+
+      this._pixiObject.pivot.x = unscaledCenterX;
+      this._pixiObject.pivot.y = unscaledCenterY;
+      this._pixiObject.position.x =
+        this._instance.getX() + unscaledCenterX * Math.abs(scaleX);
+      this._pixiObject.position.y =
+        this._instance.getY() + unscaledCenterY * Math.abs(scaleY);
+
+      this._pixiObject.rotation = RenderedInstance.toRad(
+        this._instance.getAngle()
+      );
+      this._pixiObject.scale.x = scaleX;
+      this._pixiObject.scale.y = scaleY;
+    } else {
+      // The children dimension and position are evaluated according to the
+      // layout. The object pixels are not stretched. The object is rendered in
+      // its current dimension. This is why the scale is always set to 1.
+      const originX = this.getOriginX();
+      const originY = this.getOriginY();
+      const originZ = this.getOriginZ();
+      const centerX = this.getCenterX();
+      const centerY = this.getCenterY();
+      const centerZ = this.getCenterZ();
+
+      const threeObject = this._threeObject;
+      const threeObjectPivot = this._threeObjectPivot;
+      if (threeObject && threeObjectPivot && is3D) {
+        threeObject.position.set(
+          this._instance.getX() + centerX - originX,
+          this._instance.getY() + centerY - originY,
+          this._instance.getZ() + centerZ - originZ
+        );
+        threeObjectPivot.position.set(
+          -centerX + originX,
+          -centerY + originY,
+          -centerZ + originZ
+        );
+        threeObject.rotation.set(
+          RenderedInstance.toRad(this._instance.getRotationX()),
+          RenderedInstance.toRad(this._instance.getRotationY()),
+          RenderedInstance.toRad(this._instance.getAngle())
+        );
+      }
       this._pixiObject.pivot.x = centerX - originX;
       this._pixiObject.pivot.y = centerY - originY;
-    } else {
-      this._pixiObject.pivot.x = centerX;
-      this._pixiObject.pivot.y = centerY;
-    }
-    this._pixiObject.position.x = this._instance.getX() + centerX - originX;
-    this._pixiObject.position.y = this._instance.getY() + centerY - originY;
+      this._pixiObject.position.x = this._instance.getX() + centerX - originX;
+      this._pixiObject.position.y = this._instance.getY() + centerY - originY;
 
-    this._pixiObject.rotation = RenderedInstance.toRad(
-      this._instance.getAngle()
-    );
-    this._pixiObject.scale.x = 1;
-    this._pixiObject.scale.y = 1;
+      this._pixiObject.rotation = RenderedInstance.toRad(
+        this._instance.getAngle()
+      );
+
+      this._pixiObject.scale.x = 1;
+      this._pixiObject.scale.y = 1;
+    }
   }
 
   getDefaultWidth() {
-    return this.childrenRenderedInstances.length > 0
+    return this._isRenderedFromInitialInstances()
+      ? this._defaultWidth
+      : this.childrenRenderedInstances.length > 0
       ? this.childrenRenderedInstances[0].getDefaultWidth()
       : 48;
   }
 
   getDefaultHeight() {
-    return this.childrenRenderedInstances.length > 0
+    return this._isRenderedFromInitialInstances()
+      ? this._defaultHeight
+      : this.childrenRenderedInstances.length > 0
       ? this.childrenRenderedInstances[0].getDefaultHeight()
       : 48;
   }
 
   getDefaultDepth() {
+    if (this._isRenderedFromInitialInstances()) {
+      return this._defaultDepth;
+    }
     const firstInstance = this.childrenRenderedInstances[0];
     return firstInstance && firstInstance instanceof Rendered3DInstance
       ? firstInstance.getDefaultDepth()

@@ -75,6 +75,10 @@ export default class RenderedInstance {
     return 0;
   }
 
+  getOriginZ(): number {
+    return 0;
+  }
+
   getCenterX(): number {
     return this.getWidth() / 2;
   }

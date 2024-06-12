@@ -37,6 +37,7 @@ import ColoredLinearProgress from '../../../../UI/ColoredLinearProgress';
 import Trophy from '../../../../UI/CustomSvgIcons/Trophy';
 import Object3D from './Icons/Object3D';
 import Platformer from './Icons/Platformer';
+import TopDownRPGMovement from './Icons/TopDownRPGMovement';
 
 const getColumnsFromWindowSize = (
   windowSize: WindowSizeType,
@@ -170,7 +171,7 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
       title: t`Top-Down RPG Pixel Perfect`,
       description: t`Learn how to make a character move like in the old Pokemon games.`,
       durationInMinutes: 2,
-      renderImage: props => <Platformer {...props} />,
+      renderImage: props => <TopDownRPGMovement {...props} />,
     },
   ].filter(item => displayedGuidedLessonsIds.includes(item.id));
 

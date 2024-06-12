@@ -46,16 +46,27 @@ namespace gdjs {
 
         if (disableMultiplayerForTesting) return;
 
-        gdjs.multiplayerMessageManager.handleChangeOwnerMessages(runtimeScene);
-        gdjs.multiplayerMessageManager.handleUpdateObjectMessages(runtimeScene);
-        gdjs.multiplayerMessageManager.handleCustomMessages();
-        gdjs.multiplayerMessageManager.handleAcknowledgeMessages();
+        gdjs.multiplayerMessageManager.handleChangeInstanceOwnerMessagesReceived(
+          runtimeScene
+        );
+        gdjs.multiplayerMessageManager.handleUpdateInstanceMessagesReceived(
+          runtimeScene
+        );
+        gdjs.multiplayerMessageManager.handleCustomMessagesReceived();
+        gdjs.multiplayerMessageManager.handleAcknowledgeMessagesReceived();
         gdjs.multiplayerMessageManager.resendClearOrCancelAcknowledgedMessages(
           runtimeScene
         );
-        gdjs.multiplayerMessageManager.handleGameUpdatedMessages(runtimeScene);
-        gdjs.multiplayerMessageManager.handleSceneUpdatedMessages(runtimeScene);
-        gdjs.multiplayerMessageManager.handleHeartbeats();
+        gdjs.multiplayerMessageManager.handleChangeVariableOwnerMessagesReceived(
+          runtimeScene
+        );
+        gdjs.multiplayerMessageManager.handleUpdateGameMessagesReceived(
+          runtimeScene
+        );
+        gdjs.multiplayerMessageManager.handleUpdateSceneMessagesReceived(
+          runtimeScene
+        );
+        gdjs.multiplayerMessageManager.handleHeartbeatsToSend();
         gdjs.multiplayerMessageManager.handleDisconnectedPeers(runtimeScene);
       }
     );
@@ -64,11 +75,16 @@ namespace gdjs {
       (runtimeScene: gdjs.RuntimeScene) => {
         if (disableMultiplayerForTesting) return;
 
-        gdjs.multiplayerMessageManager.handleDestroyObjectMessages(
+        gdjs.multiplayerMessageManager.handleDestroyInstanceMessagesReceived(
           runtimeScene
         );
-        gdjs.multiplayerMessageManager.handleUpdateGameMessages(runtimeScene);
-        gdjs.multiplayerMessageManager.handleUpdateSceneMessages(runtimeScene);
+        gdjs.multiplayerVariables.handleChangeVariableOwnerMessagesToSend();
+        gdjs.multiplayerMessageManager.handleUpdateGameMessagesToSend(
+          runtimeScene
+        );
+        gdjs.multiplayerMessageManager.handleUpdateSceneMessagesToSend(
+          runtimeScene
+        );
         gdjs.multiplayerMessageManager.handleHeartbeatsReceived();
         handleLeavingPlayer(runtimeScene);
         gdjs.multiplayerMessageManager.clearDisconnectedPeers();

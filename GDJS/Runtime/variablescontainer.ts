@@ -192,15 +192,46 @@ namespace gdjs {
       const variable = this._variables.get(name);
       return !!variable && !variable.isUndefinedInContainer();
     }
+
+    /**
+     * Check if a variable exists in the container.
+     * @param variable The variable
+     * @return true if the variable exists.
+     */
+    hasVariable(variable: gdjs.Variable): boolean {
+      const foundVariable = this._variablesArray.find((v) => v === variable);
+      return !!foundVariable && !foundVariable.isUndefinedInContainer();
+    }
+
+    getVariableNameInContainer(variable: gdjs.Variable): string | undefined {
+      const index = this._variablesArray.indexOf(variable);
+      if (index === -1) {
+        return undefined;
+      }
+
+      const variableNames: string[] = [];
+      this._variables.keys(variableNames);
+      return variableNames[index];
+    }
+
     static _deletedVars: Array<string | undefined> = [];
 
-    getNetworkSyncData(): VariableNetworkSyncData[] {
+    getNetworkSyncData({
+      playerNumber,
+    }: {
+      playerNumber: number;
+    }): VariableNetworkSyncData[] {
       const networkSyncData: VariableNetworkSyncData[] = [];
       const variableNames = [];
       this._variables.keys(variableNames);
       variableNames.forEach((variableName) => {
         const variable = this._variables.get(variableName);
-        if (variable.isUndefinedInContainer()) {
+        if (
+          variable.isUndefinedInContainer() ||
+          (variable.getPlayerOwnership() === 0 && playerNumber !== 1) ||
+          (variable.getPlayerOwnership() !== 0 &&
+            playerNumber !== variable.getPlayerOwnership())
+        ) {
           return;
         }
 
@@ -276,17 +307,30 @@ namespace gdjs {
       const that = this;
       for (let j = 0; j < networkSyncData.length; ++j) {
         const variableSyncData = networkSyncData[j];
-        const variableName = variableSyncData.name;
+        const variableData = that._getVariableDataFromNetworkSyncData(
+          variableSyncData
+        );
+        const variableName = variableData.name;
         if (!variableName) continue;
 
         const variable = that.get(variableName);
-        variable.reinitialize({
-          name: variableName,
-          value: variableSyncData.value,
-          type: variableSyncData.type,
-          children: variableSyncData.children,
-        });
+        variable.reinitialize(variableData);
       }
+    }
+
+    _getVariableDataFromNetworkSyncData(
+      syncData: VariableNetworkSyncData
+    ): VariableData {
+      return {
+        name: syncData.name,
+        value: syncData.value,
+        type: syncData.type,
+        children: syncData.children
+          ? syncData.children.map((childSyncData) =>
+              this._getVariableDataFromNetworkSyncData(childSyncData)
+            )
+          : undefined,
+      };
     }
 
     /**
@@ -327,6 +371,15 @@ namespace gdjs {
       getStructureNetworkSyncData: function () {
         return undefined;
       },
+      _getVariableDataFromNetworkSyncData: function () {
+        return {};
+      },
+      hasVariable: function () {
+        return false;
+      },
+      getVariableNameInContainer: function () {
+        return '';
+      },
     };
 
     /**
@@ -342,6 +395,7 @@ namespace gdjs {
       _str: '',
       _undefinedInContainer: true,
       _value: 0,
+      _playerNumber: 0,
       fromJSON: () => gdjs.VariablesContainer.badVariable,
       toJSObject: () => 0,
       fromJSObject: () => gdjs.VariablesContainer.badVariable,
@@ -432,6 +486,12 @@ namespace gdjs {
       },
       isUndefinedInContainer: function () {
         return true;
+      },
+      getPlayerOwnership: function () {
+        return 0;
+      },
+      setPlayerOwnership: function () {
+        return;
       },
     };
   }

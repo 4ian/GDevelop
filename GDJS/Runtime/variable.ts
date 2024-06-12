@@ -24,6 +24,10 @@ namespace gdjs {
     _childrenArray: gdjs.Variable[] = [];
     _undefinedInContainer: boolean = false;
 
+    // When synchronised over the network, this defines which player is the owner of the variable.
+    // If 0, then the variable is not owned by any player, so the host is the owner.
+    _playerNumber = 0;
+
     /**
      * @param [varData] The optional initial content of the variable.
      */
@@ -627,6 +631,14 @@ namespace gdjs {
           value,
         })
       );
+    }
+
+    getPlayerOwnership(): number {
+      return this._playerNumber;
+    }
+
+    setPlayerOwnership(playerNumber: number) {
+      this._playerNumber = playerNumber;
     }
   }
 }

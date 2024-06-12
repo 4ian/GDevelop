@@ -772,8 +772,25 @@ namespace gdjs {
       return this._isJustResumed;
     }
 
-    getNetworkSyncData(): LayoutNetworkSyncData {
-      const variablesNetworkSyncData = this._variables.getNetworkSyncData();
+    getNetworkSyncData({
+      playerNumber,
+    }: {
+      playerNumber: number;
+    }): LayoutNetworkSyncData | null {
+      const variablesNetworkSyncData = this._variables.getNetworkSyncData({
+        playerNumber,
+      });
+
+      if (
+        playerNumber !== 1 &&
+        (!this.networkId || variablesNetworkSyncData.length === 0)
+      ) {
+        // If we are not the host, there is no sync data to send if:
+        // - The scene has no networkId (it's either not a multiplayer scene or the scene is not yet networked).
+        // - There are no variables to sync.
+        return null;
+      }
+
       return {
         var: variablesNetworkSyncData,
         id: this.getOrCreateNetworkId(),

@@ -501,7 +501,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
       elementWithValueToWatchIfEquals,
       setElementWithValueToWatchIfEquals,
     ] = React.useState<?string>(null);
-    const inputExpectedValueRef = React.useRef<?string>(null);
+    const inputExpectedValueRef = React.useRef<?string | boolean>(null);
     const [
       objectSceneInstancesToWatch,
       setObjectSceneInstancesToWatch,
@@ -937,17 +937,29 @@ const InAppTutorialOrchestrator = React.forwardRef<
         const elementToWatch = document.querySelector(
           elementWithValueToWatchIfEquals
         );
+        if (!elementToWatch) return;
         const inputExpectedValue = inputExpectedValueRef.current;
-        if (!inputExpectedValue) return;
+        if (inputExpectedValue === null) return;
 
-        // We trim all spaces to not be picky about the user input inside expressions.
-        // Ex: "1 + 1" === "1+1"
+        const inputValue = getInputValue(elementToWatch);
         if (
-          elementToWatch &&
-          getInputValue(elementToWatch).replace(/\s/g, '') ===
+          typeof inputExpectedValue === 'boolean' &&
+          inputExpectedValue === inputValue
+        ) {
+          goToNextStep();
+          return;
+        }
+
+        if (
+          typeof inputExpectedValue === 'string' &&
+          typeof inputValue === 'string' &&
+          // We trim all spaces to not be picky about the user input inside expressions.
+          // Ex: "1 + 1" === "1+1"
+          inputValue.replace(/\s/g, '') ===
             inputExpectedValue.replace(/\s/g, '')
         ) {
           goToNextStep();
+          return;
         }
       },
       [goToNextStep, elementWithValueToWatchIfEquals]

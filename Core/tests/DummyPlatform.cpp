@@ -293,6 +293,14 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       .AddCodeOnlyParameter("trueorfalse", "")
       .SetFunctionName("setBooleanVariable");
 
+  extension->AddStrExpression("ToString",
+                      "",
+                      "",
+                      "",
+                      "")
+      .AddParameter("number", "")
+      .SetFunctionName("toString");
+
   platform.AddExtension(extension);
 }
 

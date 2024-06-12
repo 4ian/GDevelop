@@ -44,6 +44,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
   instancesRenderer: gdInitialInstanceJSFunctor;
   _defaultWidth = 48;
   _defaultHeight = 48;
+  _defaultDepth = 48;
 
   renderedInstances: { [number]: RenderedInstance | Rendered3DInstance } = {};
 
@@ -132,15 +133,14 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
       RenderedInstance | Rendered3DInstance
     >();
 
-    if (!this.eventBasedObject) {
+    const { eventBasedObject } = this;
+    if (!eventBasedObject) {
       return;
     }
-
-    const eventBasedObject = this.eventBasedObject;
     this._isRenderedIn3D = eventBasedObject.isRenderedIn3D();
 
     // TODO: do the proper rendering according to instances
-    if (this.eventBasedObject.getInitialInstances().getInstancesCount() > 0) {
+    if (eventBasedObject.getInitialInstances().getInstancesCount() > 0) {
       // Functor used to render an instance
       this.instancesRenderer = new gd.InitialInstanceJSFunctor();
       // $FlowFixMe - invoke is not writable
@@ -267,8 +267,12 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     if (renderedInstance === undefined) {
       //No renderer associated yet, the instance must have been just created!...
       const associatedObjectName = instance.getObjectName();
+      const { eventBasedObject } = this;
+      if (!eventBasedObject) {
+        return null;
+      }
       const associatedObject = getObjectByName(
-        this.eventBasedObject,
+        eventBasedObject,
         null,
         associatedObjectName
       );
@@ -295,6 +299,10 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
 
   _updateDimensions() {
     if (!this._isRenderedFromInitialInstances()) {
+      return;
+    }
+    const { eventBasedObject } = this;
+    if (!eventBasedObject) {
       return;
     }
 
@@ -339,9 +347,10 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
       maxY = Math.max(maxY, y - originY + height);
       maxZ = Math.max(maxZ, z - originZ + depth);
     };
-    this.eventBasedObject
-      .getInitialInstances()
-      .iterateOverInstances(instancesMeasurer);
+    eventBasedObject.getInitialInstances().iterateOverInstances(
+      // $FlowFixMe - gd.castObject is not supporting typings.
+      instancesMeasurer
+    );
     instancesMeasurer.delete();
 
     this._defaultWidth = maxX - minX;
@@ -467,17 +476,21 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
   update() {
     // TODO For animatable custom objects, change the texture used by the child
     // according to the current animation.
-    const { eventBasedObject } = this;
 
     if (this._isRenderedFromInitialInstances()) {
-      this._updateDimensions();
-      eventBasedObject.getInitialInstances().iterateOverInstancesWithZOrdering(
-        // $FlowFixMe - gd.castObject is not supporting typings.
-        this.instancesRenderer,
-        '' // TODO: handle all layer
-      );
-      this._updatePixiObjectsZOrder();
-      this._destroyUnusedInstanceRenderers();
+      const { eventBasedObject } = this;
+      if (eventBasedObject) {
+        this._updateDimensions();
+        eventBasedObject
+          .getInitialInstances()
+          .iterateOverInstancesWithZOrdering(
+            // $FlowFixMe - gd.castObject is not supporting typings.
+            this.instancesRenderer,
+            '' // TODO: handle all layer
+          );
+        this._updatePixiObjectsZOrder();
+        this._destroyUnusedInstanceRenderers();
+      }
     } else {
       applyChildLayouts(this);
     }

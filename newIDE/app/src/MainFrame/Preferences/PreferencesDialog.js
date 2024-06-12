@@ -28,6 +28,8 @@ import { getElectronAccelerator } from '../../KeyboardShortcuts';
 import defaultShortcuts from '../../KeyboardShortcuts/DefaultShortcuts';
 import AlertMessage from '../../UI/AlertMessage';
 import ErrorBoundary from '../../UI/ErrorBoundary';
+import Slider from '../../UI/Slider';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 const electron = optionalRequire('electron');
 
 type Props = {|
@@ -54,6 +56,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setAutosaveOnPreview,
     setUseGDJSDevelopmentWatcher,
     setEventsSheetUseAssignmentOperators,
+    setEventsSheetIndentScale,
     getDefaultEditorMosaicNode,
     setDefaultEditorMosaicNode,
     setAutoOpenMostRecentProject,
@@ -288,6 +291,32 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
             toggled={values.eventsSheetUseAssignmentOperators}
             labelPosition="right"
             label={<Trans>Display assignment operators in Events Sheets</Trans>}
+          />
+          <FormControlLabel
+            control={
+              <Slider
+                min={1}
+                step={1}
+                max={8}
+                marks={[
+                  {
+                    value: 1,
+                    label: "1x",
+                  },
+                  {
+                    value: 8,
+                    label: "8x",
+                  },
+                ]}
+                valueLabelDisplay="auto"
+                value={values.eventsSheetIndentScale}
+                onChange={(value: number) => {
+                  setEventsSheetIndentScale(value);
+                }}
+              />
+            }
+            labelPlacement="top"
+            label={<Trans>Indent Scale</Trans>}
           />
           <SelectField
             floatingLabelText={

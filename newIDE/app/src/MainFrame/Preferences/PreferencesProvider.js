@@ -115,6 +115,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setEventsSheetUseAssignmentOperators: this._setEventsSheetUseAssignmentOperators.bind(
       this
     ),
+    setEventsSheetIndentScale: this._setEventsSheetIndentScale.bind(this),
     setEventsSheetZoomLevel: this._setEventsSheetZoomLevel.bind(this),
     setShowEffectParameterNames: this._setShowEffectParameterNames.bind(this),
     getLastUsedPath: this._getLastUsedPath.bind(this),
@@ -304,6 +305,20 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           eventsSheetUseAssignmentOperators,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setEventsSheetIndentScale(
+    eventsSheetIndentScale: boolean
+  ) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          eventsSheetIndentScale,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

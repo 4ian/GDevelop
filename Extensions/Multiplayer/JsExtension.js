@@ -367,7 +367,7 @@ module.exports = {
     extension
       .addExpressionAndCondition(
         'number',
-        'NumberOfPlayersInLobby',
+        'PlayersInLobbyCount',
         _('Number of players in lobby'),
         _('the number of players in the lobby'),
         _('the number of players in the lobby'),
@@ -386,15 +386,15 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
-      .setFunctionName('gdjs.multiplayer.getNumberOfPlayersInLobby');
+      .setFunctionName('gdjs.multiplayer.getPlayersInLobbyCount');
 
     extension
       .addExpressionAndCondition(
         'number',
-        'PlayerNumber',
-        _('Player number in lobby'),
-        _('the player number in the lobby (1, 2, ...)'),
-        _('the player number in the lobby'),
+        'CurrentPlayerNumber',
+        _('Current player number in lobby'),
+        _('the current player number in the lobby (1, 2, ...)'),
+        _('the current player number in the lobby'),
         '',
         'JsPlatform/Extensions/multiplayer.svg'
       )
@@ -410,7 +410,7 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
-      .setFunctionName('gdjs.multiplayer.getPlayerNumber');
+      .setFunctionName('gdjs.multiplayer.getCurrentPlayerNumber');
 
     extension
       .addStrExpression(

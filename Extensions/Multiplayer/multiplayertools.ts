@@ -146,7 +146,7 @@ namespace gdjs {
     /**
      * Returns the number of players in the lobby.
      */
-    export const getNumberOfPlayersInLobby = () => {
+    export const getPlayersInLobbyCount = () => {
       // If the game has not started yet, look at the lobby.
       if (!_isLobbyGameRunning && _lobby) {
         return _lobby.players.length;
@@ -165,7 +165,7 @@ namespace gdjs {
      * Return 0 if the player is not in the lobby.
      * Returns 1, 2, 3, ... if the player is in the lobby.
      */
-    export const getPlayerNumber = () => {
+    export const getCurrentPlayerNumber = () => {
       return playerNumber || 0;
     };
 
@@ -628,7 +628,7 @@ namespace gdjs {
       runtimeScene: gdjs.RuntimeScene
     ) {
       // When the countdown starts, if we are player number 1, then send the peerId to others so they can connect via P2P.
-      if (getPlayerNumber() === 1) {
+      if (getCurrentPlayerNumber() === 1) {
         sendPeerId();
       }
 

@@ -1488,7 +1488,7 @@ namespace gdjs {
         playersPings[playerNumber] = getPlayerPing(parseInt(playerNumber, 10));
       }
       return {
-        messageName: `${heartbeatMessageNamePrefix}#${gdjs.multiplayer.getPlayerNumber()}`,
+        messageName: `${heartbeatMessageNamePrefix}#${gdjs.multiplayer.getCurrentPlayerNumber()}`,
         messageData: {
           now: Date.now(),
           playersPings,

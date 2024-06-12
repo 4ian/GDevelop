@@ -81,9 +81,7 @@ bool ObjectJsImplementation::UpdateProperty(const gd::String& arg0,
 
 std::map<gd::String, gd::PropertyDescriptor>
 ObjectJsImplementation::GetInitialInstanceProperties(
-    const gd::InitialInstance& instance,
-    gd::Project& project,
-    gd::Layout& scene) {
+    const gd::InitialInstance& instance) {
   std::map<gd::String, gd::PropertyDescriptor>* jsCreatedProperties = nullptr;
   std::map<gd::String, gd::PropertyDescriptor> copiedProperties;
 
@@ -96,9 +94,7 @@ ObjectJsImplementation::GetInitialInstanceProperties(
         var objectContent = JSON.parse(UTF8ToString($1));
         var newProperties = self['getInitialInstanceProperties'](
             objectContent,
-            wrapPointer($2, Module['InitialInstance']),
-            wrapPointer($3, Module['Project']),
-            wrapPointer($4, Module['Layout']));
+            wrapPointer($2, Module['InitialInstance']));
         if (!newProperties)
           throw 'getInitialInstanceProperties returned nothing in a gd::ObjectJsImplementation.';
 
@@ -106,9 +102,7 @@ ObjectJsImplementation::GetInitialInstanceProperties(
       },
       (int)this,
       jsonContent.c_str(),
-      (int)&instance,
-      (int)&project,
-      (int)&scene);
+      (int)&instance);
 
   copiedProperties = *jsCreatedProperties;
   delete jsCreatedProperties;
@@ -118,9 +112,7 @@ ObjectJsImplementation::GetInitialInstanceProperties(
 bool ObjectJsImplementation::UpdateInitialInstanceProperty(
     gd::InitialInstance& instance,
     const gd::String& name,
-    const gd::String& value,
-    gd::Project& project,
-    gd::Layout& scene) {
+    const gd::String& value) {
   return EM_ASM_INT(
       {
         var self = Module['getCache'](Module['ObjectJsImplementation'])[$0];
@@ -131,17 +123,13 @@ bool ObjectJsImplementation::UpdateInitialInstanceProperty(
             objectContent,
             wrapPointer($2, Module['InitialInstance']),
             UTF8ToString($3),
-            UTF8ToString($4),
-            wrapPointer($5, Module['Project']),
-            wrapPointer($6, Module['Layout']));
+            UTF8ToString($4));
       },
       (int)this,
       jsonContent.c_str(),
       (int)&instance,
       name.c_str(),
-      value.c_str(),
-      (int)&project,
-      (int)&scene);
+      value.c_str());
 }
 
 void ObjectJsImplementation::DoSerializeTo(SerializerElement& element) const {

@@ -2135,9 +2135,7 @@ describe('libGD.js', function () {
         content,
         instance,
         propertyName,
-        newValue,
-        project,
-        layout
+        newValue
       ) {
         if (propertyName === 'My instance property') {
           instance.setRawStringProperty('instanceprop1', newValue);
@@ -2152,9 +2150,7 @@ describe('libGD.js', function () {
       };
       myObject.getInitialInstanceProperties = function (
         content,
-        instance,
-        project,
-        layout
+        instance
       ) {
         let properties = new gd.MapStringPropertyDescriptor();
 

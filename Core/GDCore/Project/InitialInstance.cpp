@@ -8,6 +8,7 @@
 
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
+#include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/Serialization/SerializerElement.h"
@@ -153,33 +154,35 @@ InitialInstance& InitialInstance::ResetPersistentUuid() {
 }
 
 std::map<gd::String, gd::PropertyDescriptor>
-InitialInstance::GetCustomProperties(gd::Project& project, gd::Layout& layout) {
+InitialInstance::GetCustomProperties(
+    gd::ObjectsContainer &globalObjectsContainer,
+    gd::ObjectsContainer &objectsContainer) {
   // Find an object
-  if (layout.HasObjectNamed(GetObjectName()))
-    return layout.GetObject(GetObjectName())
+  if (objectsContainer.HasObjectNamed(GetObjectName()))
+    return objectsContainer.GetObject(GetObjectName())
         .GetConfiguration()
-        .GetInitialInstanceProperties(*this, project, layout);
-  else if (project.HasObjectNamed(GetObjectName()))
-    return project.GetObject(GetObjectName())
+        .GetInitialInstanceProperties(*this);
+  else if (globalObjectsContainer.HasObjectNamed(GetObjectName()))
+    return globalObjectsContainer.GetObject(GetObjectName())
         .GetConfiguration()
-        .GetInitialInstanceProperties(*this, project, layout);
+        .GetInitialInstanceProperties(*this);
 
   std::map<gd::String, gd::PropertyDescriptor> nothing;
   return nothing;
 }
 
-bool InitialInstance::UpdateCustomProperty(const gd::String& name,
-                                           const gd::String& value,
-                                           gd::Project& project,
-                                           gd::Layout& layout) {
-  if (layout.HasObjectNamed(GetObjectName()))
-    return layout.GetObject(GetObjectName())
+bool InitialInstance::UpdateCustomProperty(
+    const gd::String &name, const gd::String &value,
+    gd::ObjectsContainer &globalObjectsContainer,
+    gd::ObjectsContainer &objectsContainer) {
+  if (objectsContainer.HasObjectNamed(GetObjectName()))
+    return objectsContainer.GetObject(GetObjectName())
         .GetConfiguration()
-        .UpdateInitialInstanceProperty(*this, name, value, project, layout);
-  else if (project.HasObjectNamed(GetObjectName()))
-    return project.GetObject(GetObjectName())
+        .UpdateInitialInstanceProperty(*this, name, value);
+  else if (globalObjectsContainer.HasObjectNamed(GetObjectName()))
+    return globalObjectsContainer.GetObject(GetObjectName())
         .GetConfiguration()
-        .UpdateInitialInstanceProperty(*this, name, value, project, layout);
+        .UpdateInitialInstanceProperty(*this, name, value);
 
   return false;
 }

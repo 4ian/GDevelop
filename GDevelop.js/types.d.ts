@@ -670,8 +670,8 @@ export class ObjectConfiguration extends EmscriptenObject {
   getType(): string;
   getProperties(): MapStringPropertyDescriptor;
   updateProperty(name: string, value: string): boolean;
-  getInitialInstanceProperties(instance: InitialInstance, project: Project, scene: Layout): MapStringPropertyDescriptor;
-  updateInitialInstanceProperty(instance: InitialInstance, name: string, value: string, project: Project, scene: Layout): boolean;
+  getInitialInstanceProperties(instance: InitialInstance): MapStringPropertyDescriptor;
+  updateInitialInstanceProperty(instance: InitialInstance, name: string, value: string): boolean;
   exposeResources(worker: ArbitraryResourceWorker): void;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
@@ -716,8 +716,8 @@ export class ObjectJsImplementation extends ObjectConfiguration {
   clone(): UniquePtrObjectConfiguration;
   getProperties(): MapStringPropertyDescriptor;
   updateProperty(name: string, value: string): boolean;
-  getInitialInstanceProperties(instance: InitialInstance, project: Project, scene: Layout): MapStringPropertyDescriptor;
-  updateInitialInstanceProperty(instance: InitialInstance, name: string, value: string, project: Project, scene: Layout): boolean;
+  getInitialInstanceProperties(instance: InitialInstance): MapStringPropertyDescriptor;
+  updateInitialInstanceProperty(instance: InitialInstance, name: string, value: string): boolean;
   getRawJSONContent(): string;
   setRawJSONContent(newContent: string): ObjectJsImplementation;
   serializeTo(element: SerializerElement): void;
@@ -729,8 +729,8 @@ export class CustomObjectConfiguration extends ObjectConfiguration {
   getChildObjectConfiguration(objectName: string): ObjectConfiguration;
   getProperties(): MapStringPropertyDescriptor;
   updateProperty(name: string, value: string): boolean;
-  getInitialInstanceProperties(instance: InitialInstance, project: Project, scene: Layout): MapStringPropertyDescriptor;
-  updateInitialInstanceProperty(instance: InitialInstance, name: string, value: string, project: Project, scene: Layout): boolean;
+  getInitialInstanceProperties(instance: InitialInstance): MapStringPropertyDescriptor;
+  updateInitialInstanceProperty(instance: InitialInstance, name: string, value: string): boolean;
   getAnimations(): SpriteAnimationList;
 }
 
@@ -1103,8 +1103,8 @@ export class InitialInstance extends EmscriptenObject {
   setCustomDepth(depth: number): void;
   getCustomDepth(): number;
   resetPersistentUuid(): InitialInstance;
-  updateCustomProperty(name: string, value: string, project: Project, layout: Layout): void;
-  getCustomProperties(project: Project, layout: Layout): MapStringPropertyDescriptor;
+  updateCustomProperty(name: string, value: string, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer): void;
+  getCustomProperties(globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer): MapStringPropertyDescriptor;
   getRawDoubleProperty(name: string): number;
   getRawStringProperty(name: string): string;
   setRawDoubleProperty(name: string, value: number): void;

@@ -97,8 +97,7 @@ bool CustomObjectConfiguration::UpdateProperty(const gd::String& propertyName,
 
 std::map<gd::String, gd::PropertyDescriptor>
 CustomObjectConfiguration::GetInitialInstanceProperties(
-    const gd::InitialInstance &initialInstance, gd::Project &project,
-    gd::Layout &scene) {
+    const gd::InitialInstance &initialInstance) {
   std::map<gd::String, gd::PropertyDescriptor> properties;
   if (!animations.HasNoAnimations()) {
     properties["animation"] =
@@ -112,7 +111,7 @@ CustomObjectConfiguration::GetInitialInstanceProperties(
 
 bool CustomObjectConfiguration::UpdateInitialInstanceProperty(
     gd::InitialInstance &initialInstance, const gd::String &name,
-    const gd::String &value, gd::Project &project, gd::Layout &scene) {
+    const gd::String &value) {
   if (name == "animation") {
     initialInstance.SetRawDoubleProperty(
         "animation", std::max(0, value.empty() ? 0 : value.To<int>()));

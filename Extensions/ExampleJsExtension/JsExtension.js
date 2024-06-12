@@ -349,9 +349,7 @@ module.exports = {
       objectContent,
       instance,
       propertyName,
-      newValue,
-      project,
-      layout
+      newValue
     ) {
       if (propertyName === 'My instance property') {
         instance.setRawStringProperty('instanceprop1', newValue);
@@ -366,9 +364,7 @@ module.exports = {
     };
     dummyObject.getInitialInstanceProperties = function (
       content,
-      instance,
-      project,
-      layout
+      instance
     ) {
       var instanceProperties = new gd.MapStringPropertyDescriptor();
 

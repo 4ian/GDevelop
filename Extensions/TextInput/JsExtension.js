@@ -226,9 +226,7 @@ module.exports = {
       objectContent,
       instance,
       propertyName,
-      newValue,
-      project,
-      layout
+      newValue
     ) {
       if (propertyName === 'initialValue') {
         instance.setRawStringProperty('initialValue', newValue);
@@ -242,9 +240,7 @@ module.exports = {
     };
     textInputObject.getInitialInstanceProperties = function (
       content,
-      instance,
-      project,
-      layout
+      instance
     ) {
       const instanceProperties = new gd.MapStringPropertyDescriptor();
 

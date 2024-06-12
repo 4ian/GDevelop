@@ -4,8 +4,8 @@ declare class gdCustomObjectConfiguration extends gdObjectConfiguration {
   getChildObjectConfiguration(objectName: string): gdObjectConfiguration;
   getProperties(): gdMapStringPropertyDescriptor;
   updateProperty(name: string, value: string): boolean;
-  getInitialInstanceProperties(instance: gdInitialInstance, project: gdProject, scene: gdLayout): gdMapStringPropertyDescriptor;
-  updateInitialInstanceProperty(instance: gdInitialInstance, name: string, value: string, project: gdProject, scene: gdLayout): boolean;
+  getInitialInstanceProperties(instance: gdInitialInstance): gdMapStringPropertyDescriptor;
+  updateInitialInstanceProperty(instance: gdInitialInstance, name: string, value: string): boolean;
   getAnimations(): gdSpriteAnimationList;
   delete(): void;
   ptr: number;

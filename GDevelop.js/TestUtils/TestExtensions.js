@@ -112,18 +112,14 @@ module.exports = {
         objectContent,
         instance,
         propertyName,
-        newValue,
-        project,
-        layout
+        newValue
       ) {
         return false;
       };
 
       fakeObject.getInitialInstanceProperties = function (
         content,
-        instance,
-        project,
-        layout
+        instance
       ) {
         var instanceProperties = new gd.MapStringPropertyDescriptor();
         return instanceProperties;
@@ -163,18 +159,14 @@ module.exports = {
         objectContent,
         instance,
         propertyName,
-        newValue,
-        project,
-        layout
+        newValue
       ) {
         return false;
       };
 
       fakeObject.getInitialInstanceProperties = function (
         content,
-        instance,
-        project,
-        layout
+        instance
       ) {
         var instanceProperties = new gd.MapStringPropertyDescriptor();
         return instanceProperties;

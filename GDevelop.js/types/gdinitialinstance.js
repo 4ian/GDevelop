@@ -36,8 +36,8 @@ declare class gdInitialInstance {
   setCustomDepth(depth: number): void;
   getCustomDepth(): number;
   resetPersistentUuid(): gdInitialInstance;
-  updateCustomProperty(name: string, value: string, project: gdProject, layout: gdLayout): void;
-  getCustomProperties(project: gdProject, layout: gdLayout): gdMapStringPropertyDescriptor;
+  updateCustomProperty(name: string, value: string, globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer): void;
+  getCustomProperties(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer): gdMapStringPropertyDescriptor;
   getRawDoubleProperty(name: string): number;
   getRawStringProperty(name: string): string;
   setRawDoubleProperty(name: string, value: number): void;

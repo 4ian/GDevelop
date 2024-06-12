@@ -132,17 +132,13 @@ module.exports = {
       objectContent,
       instance,
       propertyName,
-      newValue,
-      project,
-      layout
+      newValue
     ) {
       return false;
     };
     objectBBText.getInitialInstanceProperties = function (
       content,
-      instance,
-      project,
-      layout
+      instance
     ) {
       var instanceProperties = new gd.MapStringPropertyDescriptor();
       return instanceProperties;

@@ -24,14 +24,10 @@ class ObjectJsImplementation : public gd::ObjectConfiguration {
   bool UpdateProperty(const gd::String& name, const gd::String& value) override;
 
   std::map<gd::String, gd::PropertyDescriptor> GetInitialInstanceProperties(
-      const gd::InitialInstance& instance,
-      gd::Project& project,
-      gd::Layout& scene) override;
+      const gd::InitialInstance& instance) override;
   bool UpdateInitialInstanceProperty(gd::InitialInstance& instance,
                                      const gd::String& name,
-                                     const gd::String& value,
-                                     gd::Project& project,
-                                     gd::Layout& scene) override;
+                                     const gd::String& value) override;
 
   void __destroy__();
 

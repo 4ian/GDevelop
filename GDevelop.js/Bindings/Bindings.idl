@@ -764,8 +764,12 @@ interface ObjectConfiguration {
     [Value] MapStringPropertyDescriptor GetProperties();
     boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
 
-    [Value] MapStringPropertyDescriptor GetInitialInstanceProperties([Const, Ref] InitialInstance instance, [Ref] Project project, [Ref] Layout scene);
-    boolean UpdateInitialInstanceProperty([Ref] InitialInstance instance, [Const] DOMString name, [Const] DOMString value, [Ref] Project project, [Ref] Layout scene);
+    [Value] MapStringPropertyDescriptor GetInitialInstanceProperties(
+        [Const, Ref] InitialInstance instance);
+    boolean UpdateInitialInstanceProperty(
+        [Ref] InitialInstance instance,
+        [Const] DOMString name,
+        [Const] DOMString value);
 
     void ExposeResources([Ref] ArbitraryResourceWorker worker);
 
@@ -821,8 +825,12 @@ interface ObjectJsImplementation {
     [Value] MapStringPropertyDescriptor GetProperties();
     boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
 
-    [Value] MapStringPropertyDescriptor GetInitialInstanceProperties([Const, Ref] InitialInstance instance, [Ref] Project project, [Ref] Layout scene);
-    boolean UpdateInitialInstanceProperty([Ref] InitialInstance instance, [Const] DOMString name, [Const] DOMString value, [Ref] Project project, [Ref] Layout scene);
+    [Value] MapStringPropertyDescriptor GetInitialInstanceProperties(
+        [Const, Ref] InitialInstance instance);
+    boolean UpdateInitialInstanceProperty(
+        [Ref] InitialInstance instance,
+        [Const] DOMString name,
+        [Const] DOMString value);
 
     [Const, Ref] DOMString GetRawJSONContent();
     [Ref] ObjectJsImplementation SetRawJSONContent([Const] DOMString newContent);
@@ -843,8 +851,12 @@ interface CustomObjectConfiguration {
     [Value] MapStringPropertyDescriptor GetProperties();
     boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
 
-    [Value] MapStringPropertyDescriptor GetInitialInstanceProperties([Const, Ref] InitialInstance instance, [Ref] Project project, [Ref] Layout scene);
-    boolean UpdateInitialInstanceProperty([Ref] InitialInstance instance, [Const] DOMString name, [Const] DOMString value, [Ref] Project project, [Ref] Layout scene);
+    [Value] MapStringPropertyDescriptor GetInitialInstanceProperties(
+        [Const, Ref] InitialInstance instance);
+    boolean UpdateInitialInstanceProperty(
+        [Ref] InitialInstance instance,
+        [Const] DOMString name, [Const]
+        DOMString value);
 
     [Ref] SpriteAnimationList GetAnimations();
 };
@@ -1283,8 +1295,14 @@ interface InitialInstance {
 
     [Ref] InitialInstance ResetPersistentUuid();
 
-    void UpdateCustomProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project, [Ref] Layout layout);
-    [Value] MapStringPropertyDescriptor GetCustomProperties([Ref] Project project, [Ref] Layout layout);
+    void UpdateCustomProperty(
+        [Const] DOMString name,
+        [Const] DOMString value,
+        [Ref] ObjectsContainer globalObjectsContainer,
+        [Ref] ObjectsContainer objectsContainer);
+    [Value] MapStringPropertyDescriptor GetCustomProperties(
+        [Ref] ObjectsContainer globalObjectsContainer,
+        [Ref] ObjectsContainer objectsContainer);
     double GetRawDoubleProperty([Const] DOMString name);
     [Const, Ref] DOMString GetRawStringProperty([Const] DOMString name);
     void SetRawDoubleProperty([Const] DOMString name, double value);

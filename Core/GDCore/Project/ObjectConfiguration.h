@@ -114,9 +114,7 @@ class GD_CORE_API ObjectConfiguration {
    * \see gd::InitialInstance
    */
   virtual std::map<gd::String, gd::PropertyDescriptor>
-  GetInitialInstanceProperties(const gd::InitialInstance& instance,
-                               gd::Project& project,
-                               gd::Layout& layout);
+  GetInitialInstanceProperties(const gd::InitialInstance& instance);
 
   /**
    * \brief Called when the IDE wants to update a custom property of an initial
@@ -127,9 +125,7 @@ class GD_CORE_API ObjectConfiguration {
    */
   virtual bool UpdateInitialInstanceProperty(gd::InitialInstance& instance,
                                              const gd::String& name,
-                                             const gd::String& value,
-                                             gd::Project& project,
-                                             gd::Layout& layout) {
+                                             const gd::String& value) {
     return false;
   };
     ///@}

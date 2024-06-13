@@ -119,7 +119,7 @@ namespace gdjs {
       originalData: any;
       expectedMessageName: string;
       otherPeerIds: string[];
-      shouldCancelMessageIfTimesOut?: boolean;
+      shouldCancelMessageIfTimesOut: boolean;
       maxNumberOfRetries?: number;
       messageRetryTime?: number;
     }) => {
@@ -1301,6 +1301,8 @@ namespace gdjs {
                 originalData: data,
                 expectedMessageName: instanceDestroyedMessageName,
                 otherPeerIds,
+                // As we are the host, we do not cancel the message if it times out.
+                shouldCancelMessageIfTimesOut: false,
               });
               for (const peerId of otherPeerIds) {
                 sendDataTo(peerId, messageName, data);
@@ -1359,6 +1361,8 @@ namespace gdjs {
         originalData: messageData,
         expectedMessageName: acknowledgmentMessageName,
         otherPeerIds: connectedPeerIds, // Expect acknowledgment from all peers.
+        // custom messages cannot be reverted.
+        shouldCancelMessageIfTimesOut: false,
       });
       for (const peerId of connectedPeerIds) {
         sendDataTo(peerId, messageName, messageData);
@@ -1482,6 +1486,8 @@ namespace gdjs {
               originalData: data,
               expectedMessageName: acknowledgmentMessageName,
               otherPeerIds: connectedPeerIds,
+              // As we are the host, we do not cancel the message if it times out.
+              shouldCancelMessageIfTimesOut: false,
             });
             for (const peerId of connectedPeerIds) {
               sendDataTo(peerId, messageName, data);
@@ -1579,43 +1585,49 @@ namespace gdjs {
         messageName.startsWith(updateSceneMessageNamePrefix)
       );
       updateSceneMessageNames.forEach((messageName) => {
-        if (gdjs.evtTools.p2p.onEvent(messageName, true)) {
-          const messageData = gdjs.evtTools.p2p.getEventData(messageName);
-          let data;
-          try {
-            data = JSON.parse(messageData);
-          } catch (e) {
-            logger.error(
-              `Error while parsing message ${messageName}: ${e.toString()}`
-            );
-            return;
-          }
-          const messageSender = gdjs.evtTools.p2p.getEventSender(messageName);
-          if (data && messageSender) {
-            const sceneNetworkId = data.id;
-
-            if (sceneNetworkId !== runtimeScene.networkId) {
-              logger.info(
-                `Received update of scene ${sceneNetworkId}, but we are on ${runtimeScene.networkId}. Skipping.`
+        if (gdjs.evtTools.p2p.onEvent(messageName, false)) {
+          const message = gdjs.evtTools.p2p.getEvent(messageName);
+          let messageData;
+          while ((messageData = message.getData())) {
+            let data;
+            try {
+              data = JSON.parse(messageData);
+            } catch (e) {
+              logger.error(
+                `Error while parsing message ${messageName}: ${e.toString()}`
               );
-              // The scene is not the current scene.
+              message.popData();
               return;
             }
+            const messageSender = gdjs.evtTools.p2p.getEventSender(messageName);
+            if (data && messageSender) {
+              const sceneNetworkId = data.id;
 
-            runtimeScene.updateFromNetworkSyncData(data);
+              if (sceneNetworkId !== runtimeScene.networkId) {
+                logger.info(
+                  `Received update of scene ${sceneNetworkId}, but we are on ${runtimeScene.networkId}. Skipping.`
+                );
+                message.popData();
+                // The scene is not the current scene.
+                return;
+              }
 
-            // If we are are the host,
-            // we need to relay the scene update to others except the player who sent the update message.
-            if (gdjs.multiplayer.isPlayerHost()) {
-              const connectedPeerIds = gdjs.evtTools.p2p.getAllPeers();
-              for (const peerId of connectedPeerIds) {
-                if (peerId === messageSender) {
-                  continue;
+              runtimeScene.updateFromNetworkSyncData(data);
+
+              // If we are are the host,
+              // we need to relay the scene update to others except the player who sent the update message.
+              if (gdjs.multiplayer.isPlayerHost()) {
+                const connectedPeerIds = gdjs.evtTools.p2p.getAllPeers();
+                for (const peerId of connectedPeerIds) {
+                  if (peerId === messageSender) {
+                    continue;
+                  }
+                  sendDataTo(peerId, messageName, data);
                 }
-
-                sendDataTo(peerId, messageName, data);
               }
             }
+
+            message.popData();
           }
         }
       });
@@ -1737,33 +1749,39 @@ namespace gdjs {
         messageName.startsWith(updateGameMessageNamePrefix)
       );
       updateGameMessageNames.forEach((messageName) => {
-        if (gdjs.evtTools.p2p.onEvent(messageName, true)) {
-          const messageData = gdjs.evtTools.p2p.getEventData(messageName);
-          let data;
-          try {
-            data = JSON.parse(messageData);
-          } catch (e) {
-            logger.error(
-              `Error while parsing message ${messageName}: ${e.toString()}`
-            );
-            return;
-          }
-          const messageSender = gdjs.evtTools.p2p.getEventSender(messageName);
-          if (data && messageSender) {
-            runtimeScene.getGame().updateFromNetworkSyncData(data);
+        if (gdjs.evtTools.p2p.onEvent(messageName, false)) {
+          const message = gdjs.evtTools.p2p.getEvent(messageName);
+          let messageData;
+          while ((messageData = message.getData())) {
+            let data;
+            try {
+              data = JSON.parse(messageData);
+            } catch (e) {
+              logger.error(
+                `Error while parsing message ${messageName}: ${e.toString()}`
+              );
+              message.popData();
+              return;
+            }
+            const messageSender = message.getSender();
+            if (data && messageSender) {
+              runtimeScene.getGame().updateFromNetworkSyncData(data);
 
-            // If we are are the host,
-            // we need to relay the game update to others except the player who sent the update message.
-            if (gdjs.multiplayer.isPlayerHost()) {
-              const connectedPeerIds = gdjs.evtTools.p2p.getAllPeers();
-              for (const peerId of connectedPeerIds) {
-                if (peerId === messageSender) {
-                  continue;
+              // If we are are the host,
+              // we need to relay the game update to others except the player who sent the update message.
+              if (gdjs.multiplayer.isPlayerHost()) {
+                const connectedPeerIds = gdjs.evtTools.p2p.getAllPeers();
+                for (const peerId of connectedPeerIds) {
+                  if (peerId === messageSender) {
+                    continue;
+                  }
+
+                  sendDataTo(peerId, messageName, data);
                 }
-
-                sendDataTo(peerId, messageName, data);
               }
             }
+
+            message.popData();
           }
         }
       });

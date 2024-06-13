@@ -474,6 +474,8 @@ namespace gdjs {
         },
         expectedMessageName: destroyedMessageName,
         otherPeerIds,
+        // Destruction of objects are not reverted, as they will eventually be recreated by an update message.
+        shouldCancelMessageIfTimesOut: false,
       });
 
       this._sendDataToPeersWithIncreasedClock(

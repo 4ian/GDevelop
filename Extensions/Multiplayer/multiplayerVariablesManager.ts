@@ -236,8 +236,8 @@ namespace gdjs {
             originalData: messageData,
             expectedMessageName: variableOwnerChangedMessageName,
             otherPeerIds,
-            // If we don't receive an acknowledgement from the host, we should cancel the ownership change.
-            shouldCancelMessageIfTimesOut: true,
+            // If we are not the host and don't receive an acknowledgement from the host, we should cancel the ownership change.
+            shouldCancelMessageIfTimesOut: currentPlayerNumber !== 1,
           });
         }
 

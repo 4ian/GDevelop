@@ -6,7 +6,7 @@ namespace gdjs {
   >;
 
   export const makeMultiplayerVariablesManager = () => {
-    const _variableOwnershipChangesToSyncAtEndOfFrame: {
+    const variableOwnershipChangesToSyncAtEndOfFrame: {
       [variableNetworkId: string]: {
         variableName: string;
         sceneNetworkId?: string; // If not defined, the variable is global.
@@ -25,14 +25,14 @@ namespace gdjs {
       newVariableOwner: number;
     }) {
       // If the variable is already planned to be synchronized, update it with the new owner.
-      if (_variableOwnershipChangesToSyncAtEndOfFrame[variableNetworkId]) {
-        _variableOwnershipChangesToSyncAtEndOfFrame[
+      if (variableOwnershipChangesToSyncAtEndOfFrame[variableNetworkId]) {
+        variableOwnershipChangesToSyncAtEndOfFrame[
           variableNetworkId
         ].newVariableOwner = newVariableOwner;
         return;
       }
 
-      _variableOwnershipChangesToSyncAtEndOfFrame[variableNetworkId] = {
+      variableOwnershipChangesToSyncAtEndOfFrame[variableNetworkId] = {
         variableName: variableNetworkId,
         previousVariableOwner: previousVariableOwner,
         newVariableOwner: newVariableOwner,
@@ -213,9 +213,9 @@ namespace gdjs {
 
       const currentPlayerNumber = gdjs.multiplayer.getCurrentPlayerNumber();
 
-      for (const variableNetworkId in _variableOwnershipChangesToSyncAtEndOfFrame) {
+      for (const variableNetworkId in variableOwnershipChangesToSyncAtEndOfFrame) {
         const variableData =
-          _variableOwnershipChangesToSyncAtEndOfFrame[variableNetworkId];
+          variableOwnershipChangesToSyncAtEndOfFrame[variableNetworkId];
         const {
           messageName,
           messageData,
@@ -252,7 +252,7 @@ namespace gdjs {
         }
 
         // Remove the variable from the list of variables ownership changes to sync.
-        delete _variableOwnershipChangesToSyncAtEndOfFrame[variableNetworkId];
+        delete variableOwnershipChangesToSyncAtEndOfFrame[variableNetworkId];
       }
     };
 

@@ -1222,7 +1222,7 @@ namespace gdjs {
     ): GameNetworkSyncData | null {
       const syncData = {
         var: this._variables.getNetworkSyncData(syncOptions),
-        ss: this._sceneStack.getNetworkSyncData(syncOptions),
+        ss: this._sceneStack.getNetworkSyncData(syncOptions) || undefined,
       };
 
       if (syncData.var.length === 0 && !syncData.ss) {

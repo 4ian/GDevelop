@@ -203,35 +203,47 @@ namespace gdjs {
       return !!foundVariable && !foundVariable.isUndefinedInContainer();
     }
 
-    getVariableNameInContainer(variable: gdjs.Variable): string | undefined {
-      const index = this._variablesArray.indexOf(variable);
-      if (index === -1) {
-        return undefined;
+    getVariableNameInContainerByLoopingThroughAllVariables(
+      variable: gdjs.Variable
+    ): string | null {
+      const variableItems = this._variables.items;
+      for (const variableName in variableItems) {
+        if (variableItems.hasOwnProperty(variableName)) {
+          if (variableItems[variableName] === variable) {
+            return variableName;
+          }
+        }
       }
 
-      const variableNames: string[] = [];
-      this._variables.keys(variableNames);
-      return variableNames[index];
+      return null;
     }
 
     static _deletedVars: Array<string | undefined> = [];
 
-    getNetworkSyncData({
-      playerNumber,
-    }: {
-      playerNumber: number;
-    }): VariableNetworkSyncData[] {
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): VariableNetworkSyncData[] {
+      const syncedPlayerNumber = syncOptions.playerNumber;
       const networkSyncData: VariableNetworkSyncData[] = [];
       const variableNames = [];
       this._variables.keys(variableNames);
       variableNames.forEach((variableName) => {
         const variable = this._variables.get(variableName);
+        const variableOwner = variable.getPlayerOwnership();
         if (
+          // Variable undefined.
           variable.isUndefinedInContainer() ||
-          (variable.getPlayerOwnership() === 0 && playerNumber !== 1) ||
-          (variable.getPlayerOwnership() !== 0 &&
-            playerNumber !== variable.getPlayerOwnership())
+          // Variable marked as not to be synchronized.
+          variableOwner === null ||
+          // Getting sync data for a specific player:
+          (syncedPlayerNumber !== undefined &&
+            // Owned by host but we are not player 1.
+            variableOwner === 0 &&
+            syncedPlayerNumber !== 1) ||
+          // Owned by a player but we are not this player.
+          (variableOwner !== 0 && syncedPlayerNumber !== variableOwner)
         ) {
+          // In those cases, the variable should not be synchronized.
           return;
         }
 
@@ -246,6 +258,7 @@ namespace gdjs {
           value: variableValue,
           type: variableType,
           children: this.getStructureNetworkSyncData(variable),
+          owner: variableOwner,
         });
       });
 
@@ -258,46 +271,71 @@ namespace gdjs {
       variable: gdjs.Variable
     ): VariableNetworkSyncData[] | undefined {
       if (variable.getType() === 'array') {
-        return variable.getAllChildrenArray().map((childVariable) => {
+        const allVariableNetworkSyncData: VariableNetworkSyncData[] = [];
+        variable.getAllChildrenArray().forEach((childVariable) => {
           const childVariableType = childVariable.getType();
           const childVariableValue =
             childVariableType === 'structure' || childVariableType === 'array'
               ? ''
               : childVariable.getValue();
 
-          return {
+          const childVariableOwner = childVariable.getPlayerOwnership();
+          if (
+            // Variable undefined.
+            childVariable.isUndefinedInContainer() ||
+            // Variable marked as not to be synchronized.
+            childVariableOwner === null
+          ) {
+            // In those cases, the variable should not be synchronized.
+            return;
+          }
+
+          allVariableNetworkSyncData.push({
             name: '',
             value: childVariableValue,
             type: childVariableType,
             children: this.getStructureNetworkSyncData(childVariable),
-          };
+            owner: childVariableOwner,
+          });
         });
+
+        return allVariableNetworkSyncData;
       }
 
       if (variable.getType() === 'structure') {
         const variableChildren = variable.getAllChildren();
+        if (!variableChildren) return undefined;
+        const allVariableNetworkSyncData: VariableNetworkSyncData[] = [];
 
-        const childrenSyncData = variableChildren
-          ? Object.entries(variableChildren).map(
-              ([childVariableName, childVariable]) => {
-                const childVariableType = childVariable.getType();
-                const childVariableValue =
-                  childVariableType === 'structure' ||
-                  childVariableType === 'array'
-                    ? ''
-                    : childVariable.getValue();
+        Object.entries(variableChildren).forEach(
+          ([childVariableName, childVariable]) => {
+            const childVariableType = childVariable.getType();
+            const childVariableValue =
+              childVariableType === 'structure' || childVariableType === 'array'
+                ? ''
+                : childVariable.getValue();
+            const childVariableOwner = childVariable.getPlayerOwnership();
+            if (
+              // Variable undefined.
+              childVariable.isUndefinedInContainer() ||
+              // Variable marked as not to be synchronized.
+              childVariableOwner === null
+            ) {
+              // In those cases, the variable should not be synchronized.
+              return;
+            }
 
-                return {
-                  name: childVariableName,
-                  value: childVariableValue,
-                  type: childVariableType,
-                  children: this.getStructureNetworkSyncData(childVariable),
-                };
-              }
-            )
-          : undefined;
+            allVariableNetworkSyncData.push({
+              name: childVariableName,
+              value: childVariableValue,
+              type: childVariableType,
+              children: this.getStructureNetworkSyncData(childVariable),
+              owner: childVariableOwner,
+            });
+          }
+        );
 
-        return childrenSyncData;
+        return allVariableNetworkSyncData;
       }
 
       return undefined;
@@ -314,6 +352,30 @@ namespace gdjs {
         if (!variableName) continue;
 
         const variable = that.get(variableName);
+
+        // // If we receive an update for this variable for a different owner than the one we know about,
+        // then 2 cases:
+        // - If we are the owner of the variable, then ignore the message, we assume it's a late update message or a wrong one,
+        //   we are confident that we own this variable. (it may be reverted if we don't receive an acknowledgment in time)
+        // - If we are not the owner of the variable, then assume that we missed the ownership change message, so update the variable's
+        //   ownership and then update the variable.
+        const syncedVariableOwner = variableSyncData.owner;
+        const currentPlayerNumber = gdjs.multiplayer.getCurrentPlayerNumber();
+        const currentVariableOwner = variable.getPlayerOwnership();
+        if (currentPlayerNumber === currentVariableOwner) {
+          console.info(
+            `Variable ${variableName} is owned by us ${gdjs.multiplayer.playerNumber}, ignoring update message from ${syncedVariableOwner}.`
+          );
+          return;
+        }
+
+        if (syncedVariableOwner !== currentVariableOwner) {
+          console.info(
+            `Variable ${variableName} is owned by ${currentVariableOwner} on our game, changing ownership to ${syncedVariableOwner} as part of the update event.`
+          );
+          variable.setPlayerOwnership(syncedVariableOwner);
+        }
+
         variable.reinitialize(variableData);
       }
     }
@@ -377,7 +439,7 @@ namespace gdjs {
       hasVariable: function () {
         return false;
       },
-      getVariableNameInContainer: function () {
+      getVariableNameInContainerByLoopingThroughAllVariables: function () {
         return '';
       },
     };
@@ -491,6 +553,9 @@ namespace gdjs {
         return 0;
       },
       setPlayerOwnership: function () {
+        return;
+      },
+      disableSynchronization: function () {
         return;
       },
     };

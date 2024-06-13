@@ -197,12 +197,13 @@ namespace gdjs {
       return this._wasFirstSceneLoaded;
     }
 
-    getNetworkSyncData({
-      playerNumber,
-    }: {
-      playerNumber: number;
-    }): SceneStackNetworkSyncData | undefined {
-      if (playerNumber !== 1) {
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): SceneStackNetworkSyncData | undefined {
+      const syncedPlayerNumber = syncOptions.playerNumber;
+      if (syncedPlayerNumber !== undefined && syncedPlayerNumber !== 1) {
+        // If we are getting sync data of a specific player,
+        // and they are not the host, we don't sync the scene stack.
         return undefined;
       }
 

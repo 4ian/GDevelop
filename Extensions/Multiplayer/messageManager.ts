@@ -1017,6 +1017,7 @@ namespace gdjs {
                 );
                 if (acknowledgements[peerId].shouldCancelMessageIfTimesOut) {
                   // If we should cancel the message if it times out, then revert it based on the original message.
+                  // INSTANCE OWNER CHANGE:
                   if (
                     originalMessageName.startsWith(
                       changeInstanceOwnerMessageNamePrefix
@@ -1079,6 +1080,77 @@ namespace gdjs {
 
                     // Force the ownership change.
                     behavior.playerNumber = previousOwner || 0;
+                  }
+
+                  // VARIABLE OWNER CHANGE:
+                  if (
+                    originalMessageName.startsWith(
+                      changeVariableOwnerMessageNamePrefix
+                    )
+                  ) {
+                    const matches = changeVariableOwnerMessageNameRegex.exec(
+                      originalMessageName
+                    );
+                    if (!matches) {
+                      // This should not happen, if it does, remove the acknowledgment and return.
+                      delete expectedMessageAcknowledgements[
+                        acknowledgemessageName
+                      ];
+                      return;
+                    }
+                    const variableNetworkId = matches[2];
+                    const previousOwner = originalData.previousOwner;
+
+                    const {
+                      type: variableType,
+                      name: variableName,
+                      containerId,
+                    } = gdjs.multiplayerVariables.getVariableTypeAndNameFromNetworkId(
+                      variableNetworkId
+                    );
+
+                    // If this is a scene variable and we are not on the right scene, ignore it.
+                    if (
+                      variableType === 'scene' &&
+                      containerId !== runtimeScene.networkId
+                    ) {
+                      logger.info(
+                        `Variable ${variableName} is in scene ${containerId}, but we are on ${runtimeScene.networkId}. Skipping ownership revert.`
+                      );
+                      delete expectedMessageAcknowledgements[
+                        acknowledgemessageName
+                      ];
+                      return;
+                    }
+
+                    const variablesContainer =
+                      containerId === 'game'
+                        ? runtimeScene.getGame().getVariables()
+                        : runtimeScene.getVariables();
+
+                    if (!variablesContainer.has(variableName)) {
+                      // Variable not found, this should not happen.
+                      logger.error(
+                        `Variable with ID ${variableNetworkId} not found while reverting ownership. This should not happen.`
+                      );
+                      delete expectedMessageAcknowledgements[
+                        acknowledgemessageName
+                      ];
+                      return;
+                    }
+
+                    const variable = variablesContainer.get(variableName);
+
+                    if (previousOwner === undefined) {
+                      // No previous owner, cannot revert ownership.
+                      delete expectedMessageAcknowledgements[
+                        acknowledgemessageName
+                      ];
+                      return;
+                    }
+
+                    // Force the ownership change.
+                    variable.setPlayerOwnership(previousOwner || 0);
                   }
                 }
                 delete expectedMessageAcknowledgements[acknowledgemessageName];

@@ -551,7 +551,7 @@ module.exports = {
         _(
           'Remove the ownership of the variable. It will still be synchronized to other players, but the host owns it.'
         ),
-        _('Remove ownership of _PARAM0_'),
+        _('Remove ownership of _PARAM1_'),
         '',
         'JsPlatform/Extensions/multiplayer.svg',
         'JsPlatform/Extensions/multiplayer.svg'
@@ -572,6 +572,37 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayervariables.js')
       .setFunctionName('gdjs.multiplayerVariables.removeVariableOwnership');
+
+    extension
+      .addAction(
+        'DisableVariableSynchronization',
+        _('Disable variable synchronization'),
+        _(
+          'Disable synchronization of the variable over the network. It will not be sent to other players anymore.'
+        ),
+        _('Disable synchronization of _PARAM1_'),
+        '',
+        'JsPlatform/Extensions/multiplayer.svg',
+        'JsPlatform/Extensions/multiplayer.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('variable', _('Variable'), '', false)
+      .setHelpPath('/all-features/multiplayer')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayervariables.js')
+      .setFunctionName(
+        'gdjs.multiplayerVariables.disableVariableSynchronization'
+      );
 
     // Multiplayer object behavior
     const multiplayerObjectBehavior = new gd.BehaviorJsImplementation();

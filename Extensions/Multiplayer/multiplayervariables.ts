@@ -1,7 +1,7 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Multiplayer');
   export namespace multiplayerVariables {
-    let _variablesToSync: {
+    const _variableOwnershipChangesToSyncAtEndOfFrame: {
       [variableNetworkId: string]: {
         variableName: string;
         sceneNetworkId?: string; // If not defined, the variable is global.
@@ -10,7 +10,7 @@ namespace gdjs {
       };
     } = {};
 
-    const addVariableToSync = function ({
+    const addVariableOwnershipChangeToSync = function ({
       variableNetworkId,
       previousVariableOwner,
       newVariableOwner,
@@ -20,12 +20,14 @@ namespace gdjs {
       newVariableOwner: number;
     }) {
       // If the variable is already planned to be synchronized, update it with the new owner.
-      if (_variablesToSync[variableNetworkId]) {
-        _variablesToSync[variableNetworkId].newVariableOwner = newVariableOwner;
+      if (_variableOwnershipChangesToSyncAtEndOfFrame[variableNetworkId]) {
+        _variableOwnershipChangesToSyncAtEndOfFrame[
+          variableNetworkId
+        ].newVariableOwner = newVariableOwner;
         return;
       }
 
-      _variablesToSync[variableNetworkId] = {
+      _variableOwnershipChangesToSyncAtEndOfFrame[variableNetworkId] = {
         variableName: variableNetworkId,
         previousVariableOwner: previousVariableOwner,
         newVariableOwner: newVariableOwner,
@@ -51,7 +53,7 @@ namespace gdjs {
 
     // A variable network id is a combination of the scene network id if it's a scene variable,
     // and the variable name, or "game" and the variable name if it's a global variable.
-    const _getVariableNetworkId = function (
+    const _guessVariableNetworkIdFromSceneAndGame = function (
       variable: gdjs.Variable,
       currentScene: gdjs.RuntimeScene
     ): string | undefined {
@@ -70,9 +72,7 @@ namespace gdjs {
           return;
         }
 
-        // TODO: prevent returning a networkID if this is not a root variable.
-
-        const variableName = currentSceneVariables.getVariableNameInContainer(
+        const variableName = currentSceneVariables.getVariableNameInContainerByLoopingThroughAllVariables(
           variable
         );
 
@@ -92,7 +92,7 @@ namespace gdjs {
 
         // TODO: prevent returning a networkID if this is not a root variable.
 
-        const variableName = runtimeGameVariables.getVariableNameInContainer(
+        const variableName = runtimeGameVariables.getVariableNameInContainerByLoopingThroughAllVariables(
           variable
         );
         if (!variableName) {
@@ -104,7 +104,7 @@ namespace gdjs {
       }
 
       logger.error(
-        'Trying to synchronize a variable that is not a scene or global variable.'
+        'Trying to modify synchronization of a variable that is not a scene or global variable.'
       );
       return;
     };
@@ -133,6 +133,13 @@ namespace gdjs {
         return;
       }
       const previousVariablePlayerNumber = variable.getPlayerOwnership();
+      if (previousVariablePlayerNumber === null) {
+        logger.error(
+          'Cannot change ownership of a variable that is not synchronized.'
+        );
+        return;
+      }
+
       variable.setPlayerOwnership(newVariablePlayerNumber);
       const currentPlayerNumber = gdjs.multiplayer.getCurrentPlayerNumber();
 
@@ -148,7 +155,10 @@ namespace gdjs {
         return;
       }
 
-      const variableNetworkId = _getVariableNetworkId(variable, runtimeScene);
+      const variableNetworkId = _guessVariableNetworkIdFromSceneAndGame(
+        variable,
+        runtimeScene
+      );
       const sceneNetworkId = runtimeScene.networkId;
       if (!variableNetworkId || !sceneNetworkId) {
         // An error was already logged.
@@ -162,7 +172,7 @@ namespace gdjs {
       logger.info(
         `Adding variable to be synchronized: ${variableNetworkId} (type: ${variableType}) from owner ${previousVariablePlayerNumber} to ${newVariablePlayerNumber}.`
       );
-      addVariableToSync({
+      addVariableOwnershipChangeToSync({
         variableNetworkId,
         previousVariableOwner: previousVariablePlayerNumber,
         newVariableOwner: newVariablePlayerNumber,
@@ -184,6 +194,13 @@ namespace gdjs {
       setPlayerVariableOwnership(runtimeScene, variable, 0);
     };
 
+    export const disableVariableSynchronization = function (
+      runtimeScene: gdjs.RuntimeScene,
+      variable: gdjs.Variable
+    ) {
+      variable.disableSynchronization();
+    };
+
     export const handleChangeVariableOwnerMessagesToSend = function () {
       if (!gdjs.multiplayer.isLobbyGameRunning()) {
         return;
@@ -191,8 +208,9 @@ namespace gdjs {
 
       const currentPlayerNumber = gdjs.multiplayer.getCurrentPlayerNumber();
 
-      for (const variableNetworkId in _variablesToSync) {
-        const variableData = _variablesToSync[variableNetworkId];
+      for (const variableNetworkId in _variableOwnershipChangesToSyncAtEndOfFrame) {
+        const variableData =
+          _variableOwnershipChangesToSyncAtEndOfFrame[variableNetworkId];
         const {
           messageName,
           messageData,
@@ -213,9 +231,8 @@ namespace gdjs {
             originalData: messageData,
             expectedMessageName: variableOwnerChangedMessageName,
             otherPeerIds,
-            // Let's assume we don't need to cancel the message if it times out.
-            // TODO: check if this is a good assumption.
-            shouldCancelMessageIfTimesOut: false,
+            // If we don't receive an acknowledgement from the host, we should cancel the ownership change.
+            shouldCancelMessageIfTimesOut: true,
           });
         }
 
@@ -229,8 +246,8 @@ namespace gdjs {
           );
         }
 
-        // Remove the variable from the list of variables to sync.
-        delete _variablesToSync[variableNetworkId];
+        // Remove the variable from the list of variables ownership changes to sync.
+        delete _variableOwnershipChangesToSyncAtEndOfFrame[variableNetworkId];
       }
     };
   }

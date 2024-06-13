@@ -1217,18 +1217,12 @@ namespace gdjs {
         : [];
     }
 
-    getNetworkSyncData({
-      playerNumber,
-    }: {
-      playerNumber: number;
-    }): GameNetworkSyncData | null {
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): GameNetworkSyncData | null {
       const syncData = {
-        var: this._variables.getNetworkSyncData({
-          playerNumber,
-        }),
-        ss: this._sceneStack.getNetworkSyncData({
-          playerNumber,
-        }),
+        var: this._variables.getNetworkSyncData(syncOptions),
+        ss: this._sceneStack.getNetworkSyncData(syncOptions),
       };
 
       if (syncData.var.length === 0 && !syncData.ss) {

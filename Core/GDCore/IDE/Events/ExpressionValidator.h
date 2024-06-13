@@ -293,12 +293,14 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     forbidsUsageOfBracketsBecauseParentIsObject = false;
 
     Type currentParentType = parentType;
+    Type currentChildType = childType;
     parentType = Type::NumberOrString;
     auto parentParameterExtraInfo = currentParameterExtraInfo;
     currentParameterExtraInfo = nullptr;
     node.expression->Visit(*this);
     currentParameterExtraInfo = parentParameterExtraInfo;
     parentType = currentParentType;
+    childType = currentChildType;
 
     if (node.child) {
       node.child->Visit(*this);

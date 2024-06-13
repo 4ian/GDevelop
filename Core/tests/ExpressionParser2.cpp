@@ -1521,6 +1521,54 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     }
   }
 
+  SECTION("Variable with bracket accessor and operators") {
+    {
+      auto node =
+          parser.ParseExpression("MySceneStructureVariable[\"MyUndeclaredChild\"] * 2");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    {
+      auto node =
+          parser.ParseExpression("MySceneStructureVariable[\"MyUndeclaredChild\"] / 2");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    {
+      auto node =
+          parser.ParseExpression("MySceneStructureVariable[\"MyUndeclaredChild\"] - 2");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    {
+      auto node = parser.ParseExpression(
+          "MySceneStructureVariable["
+          "MySceneStructureVariable2[\"MyUndeclaredChild\"]] * 2");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                        "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    {
+      // TODO `ToString` should not be required here.
+      auto node = parser.ParseExpression(
+          "MySceneStructureVariable[\"Child\" + "
+          "ToString(MySceneStructureVariable2[\"MyUndeclaredChild\"] * 2)] * 2");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                        "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+  }
+
   SECTION("Invalid scene variables (1 level, variable does not exist)") {
     {
       auto node =

@@ -846,6 +846,73 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       REQUIRE(expressionCodeGenerator.GetOutput() == "getAnyVariable(MySceneStructureVariable).getChild(\"\" + getAnyVariable(MySceneVariable).getAsString()).getAsNumber() + 1");
     }
   }
+  SECTION("Variable with bracket accessor and operators") {
+    {
+      auto node = parser.ParseExpression(
+          "MySceneStructureVariable[\"MyUndeclaredChild\"] * 2");
+      gd::ExpressionCodeGenerator expressionCodeGenerator(
+          "number", "", codeGenerator, context);
+
+      REQUIRE(node);
+      node->Visit(expressionCodeGenerator);
+      REQUIRE(expressionCodeGenerator.GetOutput() ==
+              "getAnyVariable(MySceneStructureVariable).getChild("
+              "\"MyUndeclaredChild\").getAsNumber() * 2");
+    }
+    {
+      auto node =
+          parser.ParseExpression("MySceneStructureVariable[\"MyUndeclaredChild\"] / 2");
+      gd::ExpressionCodeGenerator expressionCodeGenerator(
+          "number", "", codeGenerator, context);
+
+      REQUIRE(node);
+      node->Visit(expressionCodeGenerator);
+      REQUIRE(expressionCodeGenerator.GetOutput() ==
+              "getAnyVariable(MySceneStructureVariable).getChild("
+              "\"MyUndeclaredChild\").getAsNumber() / 2");
+    }
+    {
+      auto node =
+          parser.ParseExpression("MySceneStructureVariable[\"MyUndeclaredChild\"] - 2");
+      gd::ExpressionCodeGenerator expressionCodeGenerator(
+          "number", "", codeGenerator, context);
+
+      REQUIRE(node);
+      node->Visit(expressionCodeGenerator);
+      REQUIRE(expressionCodeGenerator.GetOutput() ==
+              "getAnyVariable(MySceneStructureVariable).getChild("
+              "\"MyUndeclaredChild\").getAsNumber() - 2");
+    }
+    {
+      auto node = parser.ParseExpression(
+          "MySceneStructureVariable["
+          "MySceneStructureVariable2[\"MyUndeclaredChild\"]] * 2");
+      gd::ExpressionCodeGenerator expressionCodeGenerator(
+          "number", "", codeGenerator, context);
+
+      REQUIRE(node);
+      node->Visit(expressionCodeGenerator);
+      REQUIRE(expressionCodeGenerator.GetOutput() ==
+              "getAnyVariable(MySceneStructureVariable).getChild("
+              "getAnyVariable(MySceneStructureVariable2).getChild("
+              "\"MyUndeclaredChild\").getAsNumberOrString()).getAsNumber() * 2");
+    }
+    {
+      auto node = parser.ParseExpression(
+          "MySceneStructureVariable[\"Child\" + "
+          "ToString(MySceneStructureVariable2[\"MyUndeclaredChild\"] * 2)] * 2");
+      gd::ExpressionCodeGenerator expressionCodeGenerator(
+          "number", "", codeGenerator, context);
+
+      REQUIRE(node);
+      node->Visit(expressionCodeGenerator);
+      REQUIRE(expressionCodeGenerator.GetOutput() ==
+              "getAnyVariable(MySceneStructureVariable).getChild("
+              "\"Child\" + "
+              "toString(getAnyVariable(MySceneStructureVariable2).getChild("
+              "\"MyUndeclaredChild\").getAsNumber() * 2)).getAsNumber() * 2");
+    }
+  }
   SECTION("Object variable with non existing object (invalid)") {
     auto node =
         parser.ParseExpression("MyNonExistingSpriteObject.MyVariable");

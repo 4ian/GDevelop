@@ -154,13 +154,15 @@ describe('EnumerateInstructions', () => {
     makeTestExtensions(gd);
     const project = new gd.ProjectHelper.createNewGDJSProject();
     const layout = project.insertNewLayout('Scene', 0);
-    layout.insertNewObject(project, 'Sprite', 'MySpriteObject', 0);
+    layout
+      .getObjectsContainer()
+      .insertNewObject(project, 'Sprite', 'MySpriteObject', 0);
 
     // Test for the proper presence of a few conditions.
     const spriteInstructions = enumerateObjectAndBehaviorsInstructions(
       true,
-      project,
-      layout,
+      project.getObjectsContainer(),
+      layout.getObjectsContainer(),
       'MySpriteObject',
       makeFakeI18n()
     );

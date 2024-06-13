@@ -26,7 +26,7 @@ export const Default = () => (
       <ObjectsList
         getThumbnail={() => 'res/unknown32.png'}
         project={testProject.project}
-        objectsContainer={testProject.testLayout}
+        objectsContainer={testProject.testLayout.getObjectsContainer()}
         layout={testProject.testLayout}
         resourceManagementProps={fakeResourceManagementProps}
         onEditObject={action('On edit object')}
@@ -56,7 +56,7 @@ export const WithSerializedObjectView = () => (
         <ObjectsList
           getThumbnail={() => 'res/unknown32.png'}
           project={testProject.project}
-          objectsContainer={testProject.testLayout}
+          objectsContainer={testProject.testLayout.getObjectsContainer()}
           layout={testProject.testLayout}
           resourceManagementProps={fakeResourceManagementProps}
           onEditObject={action('On edit object')}

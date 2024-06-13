@@ -257,7 +257,8 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
       "var Object = Hashtable.newFrom({Object: thisObjectList});\n";
 
   // Add child-objects
-  for (auto& childObject : eventsBasedObject.GetObjects()) {
+  for (auto &childObject :
+       eventsBasedObject.GetObjectsContainer().GetObjects()) {
     // child-object are never picked because they are not parameters.
     const auto& childName = ManObjListName(childObject->GetName());
     fullPreludeCode += "var this" + childName +
@@ -422,7 +423,8 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionContext(
         ConvertToStringExplicit(thisObjectName) + ": thisObjectList\n";
 
     // Add child-objects
-    for (auto& childObject : eventsBasedObject.GetObjects()) {
+    for (auto &childObject :
+         eventsBasedObject.GetObjectsContainer().GetObjects()) {
       const auto& childName = ManObjListName(childObject->GetName());
       // child-object are never picked because they are not parameters.
       objectsGettersMap += ", " +
@@ -1356,12 +1358,18 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
     }
 
     if (HasProjectAndLayout()) {
-      if (GetLayout().HasObjectNamed(
-              objectName))  // We check first layout's objects' list.
-        variables = &GetLayout().GetObject(objectName).GetVariables();
-      else if (GetProject().HasObjectNamed(
-                   objectName))  // Then the global objects list.
-        variables = &GetProject().GetObject(objectName).GetVariables();
+      if (GetLayout().GetObjectsContainer().HasObjectNamed(
+              objectName)) // We check first layout's objects' list.
+        variables = &GetLayout()
+                         .GetObjectsContainer()
+                         .GetObject(objectName)
+                         .GetVariables();
+      else if (GetProject().GetObjectsContainer().HasObjectNamed(
+                   objectName)) // Then the global objects list.
+        variables = &GetProject()
+                         .GetObjectsContainer()
+                         .GetObject(objectName)
+                         .GetVariables();
     }
   }
 

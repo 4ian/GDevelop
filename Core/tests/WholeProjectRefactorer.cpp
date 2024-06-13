@@ -1069,15 +1069,20 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
 
     // Add a child-object with the same names the one from the scene
     // to be able to use the same events list.
-    auto &childObject = eventsBasedObject.InsertNewObject(
+    auto &childObject = eventsBasedObject.GetObjectsContainer().InsertNewObject(
         project, "MyExtension::Sprite", "ObjectWithMyBehavior", 0);
-    childObject.AddNewBehavior(project, "MyEventsExtension::MyEventsBasedBehavior", "MyBehavior");
+    childObject.AddNewBehavior(
+        project, "MyEventsExtension::MyEventsBasedBehavior", "MyBehavior");
     childObject.GetVariables().InsertNew("MyVariable");
-    childObject.GetVariables().InsertNew("MyStructureVariable").CastTo(gd::Variable::Structure);
-    auto &group = eventsBasedObject.GetObjectGroups().InsertNew("GroupWithMyBehavior");
+    childObject.GetVariables()
+        .InsertNew("MyStructureVariable")
+        .CastTo(gd::Variable::Structure);
+    auto &group =
+        eventsBasedObject.GetObjectsContainer().GetObjectGroups().InsertNew(
+            "GroupWithMyBehavior");
     group.AddObject(childObject.GetName());
 
-    eventsBasedObject.InsertNewObject(
+    eventsBasedObject.GetObjectsContainer().InsertNewObject(
         project, "MyEventsExtension::MyEventsBasedObject", "MyCustomObject", 1);
   }
 
@@ -1157,24 +1162,30 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
     externalEvents.SetAssociatedLayout("Scene");
 
     // Objects with event based behaviors
-    auto &object = layout.InsertNewObject(project, "MyExtension::Sprite",
-                                          "ObjectWithMyBehavior", 0);
-    object.AddNewBehavior(project, "MyEventsExtension::MyEventsBasedBehavior", "MyBehavior");
+    auto &object = layout.GetObjectsContainer().InsertNewObject(
+        project, "MyExtension::Sprite", "ObjectWithMyBehavior", 0);
+    object.AddNewBehavior(project, "MyEventsExtension::MyEventsBasedBehavior",
+                          "MyBehavior");
     object.GetVariables().InsertNew("MyVariable");
-    object.GetVariables().InsertNew("MyStructureVariable").CastTo(gd::Variable::Structure);
-    auto &group = layout.GetObjectGroups().InsertNew("GroupWithMyBehavior", 0);
+    object.GetVariables()
+        .InsertNew("MyStructureVariable")
+        .CastTo(gd::Variable::Structure);
+    auto &group = layout.GetObjectsContainer().GetObjectGroups().InsertNew(
+        "GroupWithMyBehavior", 0);
     group.AddObject("ObjectWithMyBehavior");
 
-    auto &globalObject = project.InsertNewObject(
+    auto &globalObject = project.GetObjectsContainer().InsertNewObject(
         project, "MyExtension::Sprite", "GlobalObjectWithMyBehavior", 0);
-    globalObject.AddNewBehavior(project, "MyEventsExtension::MyEventsBasedBehavior", "MyBehavior");
+    globalObject.AddNewBehavior(
+        project, "MyEventsExtension::MyEventsBasedBehavior", "MyBehavior");
 
     // Custom objects
-    layout.InsertNewObject(project, "MyEventsExtension::MyEventsBasedObject",
-                           "MyCustomObject", 1);
+    layout.GetObjectsContainer().InsertNewObject(
+        project, "MyEventsExtension::MyEventsBasedObject", "MyCustomObject", 1);
 
-    project.InsertNewObject(project, "MyEventsExtension::MyEventsBasedObject",
-                            "MyGlobalCustomObject", 1);
+    project.GetObjectsContainer().InsertNewObject(
+        project, "MyEventsExtension::MyEventsBasedObject",
+        "MyGlobalCustomObject", 1);
 
     SetupEvents(layout.GetEvents());
     SetupEvents(externalEvents.GetEvents());
@@ -1209,19 +1220,24 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       group1.AddObject("Object2");
       group1.AddObject("NotExistingObject");
       group1.AddObject("GlobalObject1");
-      layout1.GetObjectGroups().Insert(group1);
+      layout1.GetObjectsContainer().GetObjectGroups().Insert(group1);
 
-      layout1.InsertNewObject(project, "MyExtension::Sprite", "Object1", 0);
-      layout1.InsertNewObject(project, "MyExtension::Sprite", "Object2", 0);
+      layout1.GetObjectsContainer().InsertNewObject(
+          project, "MyExtension::Sprite", "Object1", 0);
+      layout1.GetObjectsContainer().InsertNewObject(
+          project, "MyExtension::Sprite", "Object2", 0);
 
-      gd::WholeProjectRefactorer::ObjectRemovedInLayout(
-          project, layout1, "Object1");
-      gd::WholeProjectRefactorer::GlobalObjectRemoved(
-          project, "GlobalObject1");
-      REQUIRE(layout1.GetObjectGroups()[0].Find("Object1") == false);
-      REQUIRE(layout1.GetObjectGroups()[0].Find("Object2") == true);
-      REQUIRE(layout1.GetObjectGroups()[0].Find("NotExistingObject") == true);
-      REQUIRE(layout1.GetObjectGroups()[0].Find("GlobalObject1") == false);
+      gd::WholeProjectRefactorer::ObjectRemovedInLayout(project, layout1,
+                                                        "Object1");
+      gd::WholeProjectRefactorer::GlobalObjectRemoved(project, "GlobalObject1");
+      REQUIRE(layout1.GetObjectsContainer().GetObjectGroups()[0].Find(
+                  "Object1") == false);
+      REQUIRE(layout1.GetObjectsContainer().GetObjectGroups()[0].Find(
+                  "Object2") == true);
+      REQUIRE(layout1.GetObjectsContainer().GetObjectGroups()[0].Find(
+                  "NotExistingObject") == true);
+      REQUIRE(layout1.GetObjectsContainer().GetObjectGroups()[0].Find(
+                  "GlobalObject1") == false);
     }
 
     SECTION("Initial instances") {
@@ -1230,8 +1246,10 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       SetupProjectWithDummyPlatform(project, platform);
       auto &layout1 = project.InsertNewLayout("Layout1", 0);
 
-      layout1.InsertNewObject(project, "MyExtension::Sprite", "Object1", 0);
-      layout1.InsertNewObject(project, "MyExtension::Sprite", "Object2", 0);
+      layout1.GetObjectsContainer().InsertNewObject(
+          project, "MyExtension::Sprite", "Object1", 0);
+      layout1.GetObjectsContainer().InsertNewObject(
+          project, "MyExtension::Sprite", "Object2", 0);
 
       gd::InitialInstance instance1;
       instance1.SetObjectName("Object1");
@@ -1269,8 +1287,10 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       externalLayout1.SetAssociatedLayout("Layout1");
       externalLayout2.SetAssociatedLayout("Layout2");
 
-      layout1.InsertNewObject(project, "MyExtension::Sprite", "Object1", 0);
-      layout1.InsertNewObject(project, "MyExtension::Sprite", "Object2", 0);
+      layout1.GetObjectsContainer().InsertNewObject(
+          project, "MyExtension::Sprite", "Object1", 0);
+      layout1.GetObjectsContainer().InsertNewObject(
+          project, "MyExtension::Sprite", "Object2", 0);
 
       gd::InitialInstance instance1;
       instance1.SetObjectName("Object1");
@@ -1316,20 +1336,27 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       group1.AddObject("Object2");
       group1.AddObject("NotExistingObject");
       group1.AddObject("GlobalObject1");
-      layout1.GetObjectGroups().Insert(group1);
+      layout1.GetObjectsContainer().GetObjectGroups().Insert(group1);
 
-      layout1.InsertNewObject(project, "MyExtension::Sprite", "Object1", 0);
-      layout1.InsertNewObject(project, "MyExtension::Sprite", "Object2", 0);
+      layout1.GetObjectsContainer().InsertNewObject(
+          project, "MyExtension::Sprite", "Object1", 0);
+      layout1.GetObjectsContainer().InsertNewObject(
+          project, "MyExtension::Sprite", "Object2", 0);
 
       gd::WholeProjectRefactorer::ObjectOrGroupRenamedInLayout(
           project, layout1, "Object1", "Object3", /* isObjectGroup =*/false);
       gd::WholeProjectRefactorer::GlobalObjectOrGroupRenamed(
           project, "GlobalObject1", "GlobalObject3", /* isObjectGroup =*/false);
-      REQUIRE(layout1.GetObjectGroups()[0].Find("Object1") == false);
-      REQUIRE(layout1.GetObjectGroups()[0].Find("Object2") == true);
-      REQUIRE(layout1.GetObjectGroups()[0].Find("Object3") == true);
-      REQUIRE(layout1.GetObjectGroups()[0].Find("GlobalObject1") == false);
-      REQUIRE(layout1.GetObjectGroups()[0].Find("GlobalObject3") == true);
+      REQUIRE(layout1.GetObjectsContainer().GetObjectGroups()[0].Find(
+                  "Object1") == false);
+      REQUIRE(layout1.GetObjectsContainer().GetObjectGroups()[0].Find(
+                  "Object2") == true);
+      REQUIRE(layout1.GetObjectsContainer().GetObjectGroups()[0].Find(
+                  "Object3") == true);
+      REQUIRE(layout1.GetObjectsContainer().GetObjectGroups()[0].Find(
+                  "GlobalObject1") == false);
+      REQUIRE(layout1.GetObjectsContainer().GetObjectGroups()[0].Find(
+                  "GlobalObject3") == true);
     }
 
     SECTION("Initial instances") {
@@ -1338,8 +1365,10 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       SetupProjectWithDummyPlatform(project, platform);
       auto &layout1 = project.InsertNewLayout("Layout1", 0);
 
-      layout1.InsertNewObject(project, "MyExtension::Sprite", "Object1", 0);
-      layout1.InsertNewObject(project, "MyExtension::Sprite", "Object2", 0);
+      layout1.GetObjectsContainer().InsertNewObject(
+          project, "MyExtension::Sprite", "Object1", 0);
+      layout1.GetObjectsContainer().InsertNewObject(
+          project, "MyExtension::Sprite", "Object2", 0);
 
       gd::InitialInstance instance1;
       instance1.SetObjectName("Object1");
@@ -1379,8 +1408,10 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       externalLayout1.SetAssociatedLayout("Layout1");
       externalLayout2.SetAssociatedLayout("Layout2");
 
-      layout1.InsertNewObject(project, "MyExtension::Sprite", "Object1", 0);
-      layout1.InsertNewObject(project, "MyExtension::Sprite", "Object2", 0);
+      layout1.GetObjectsContainer().InsertNewObject(
+          project, "MyExtension::Sprite", "Object1", 0);
+      layout1.GetObjectsContainer().InsertNewObject(
+          project, "MyExtension::Sprite", "Object2", 0);
 
       gd::InitialInstance instance1;
       instance1.SetObjectName("Object1");
@@ -1481,8 +1512,8 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     SetupProjectWithDummyPlatform(project, platform);
 
     auto &scene = project.InsertNewLayout("Scene", 0);
-    auto &object =
-        scene.InsertNewObject(project, "MyExtension::Sprite", "Object", 0);
+    auto &object = scene.GetObjectsContainer().InsertNewObject(
+        project, "MyExtension::Sprite", "Object", 0);
 
     gd::StandardEvent &event =
         dynamic_cast<gd::StandardEvent &>(scene.GetEvents().InsertNewEvent(
@@ -1700,31 +1731,37 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       // Check that the type of the behavior was changed in the behaviors of
       // objects. Name is *not* changed.
       REQUIRE(project.GetLayout("Scene")
+                  .GetObjectsContainer()
                   .GetObject("ObjectWithMyBehavior")
                   .GetBehavior("MyBehavior")
                   .GetTypeName() ==
               "MyRenamedExtension::MyEventsBasedBehavior");
-      REQUIRE(project.GetObject("GlobalObjectWithMyBehavior")
+      REQUIRE(project.GetObjectsContainer()
+                  .GetObject("GlobalObjectWithMyBehavior")
                   .GetBehavior("MyBehavior")
                   .GetTypeName() ==
               "MyRenamedExtension::MyEventsBasedBehavior");
       REQUIRE(project.GetEventsFunctionsExtension("MyEventsExtension")
                   .GetEventsBasedObjects()
                   .Get("MyOtherEventsBasedObject")
+                  .GetObjectsContainer()
                   .GetObject("ObjectWithMyBehavior")
                   .GetBehavior("MyBehavior")
                   .GetTypeName() ==
               "MyRenamedExtension::MyEventsBasedBehavior");
 
       // Check that the type of the object was changed. Name is *not* changed.
-      REQUIRE(
-          project.GetLayout("Scene").GetObject("MyCustomObject").GetType() ==
-          "MyRenamedExtension::MyEventsBasedObject");
-      REQUIRE(project.GetObject("MyGlobalCustomObject").GetType() ==
-              "MyRenamedExtension::MyEventsBasedObject");
+      REQUIRE(project.GetLayout("Scene")
+                  .GetObjectsContainer()
+                  .GetObject("MyCustomObject")
+                  .GetType() == "MyRenamedExtension::MyEventsBasedObject");
+      REQUIRE(project.GetObjectsContainer()
+                  .GetObject("MyGlobalCustomObject")
+                  .GetType() == "MyRenamedExtension::MyEventsBasedObject");
       REQUIRE(project.GetEventsFunctionsExtension("MyEventsExtension")
                   .GetEventsBasedObjects()
                   .Get("MyOtherEventsBasedObject")
+                  .GetObjectsContainer()
                   .GetObject("MyCustomObject")
                   .GetType() == "MyRenamedExtension::MyEventsBasedObject");
 
@@ -1774,11 +1811,13 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
 
       // Check that the type of the object was changed in the custom
       // objects. Name is *not* changed.
-      REQUIRE(
-          project.GetLayout("Scene").GetObject("MyCustomObject").GetType() ==
-          "MyRenamedExtension::MyEventsBasedObject");
-      REQUIRE(project.GetObject("MyGlobalCustomObject").GetType() ==
-              "MyRenamedExtension::MyEventsBasedObject");
+      REQUIRE(project.GetLayout("Scene")
+                  .GetObjectsContainer()
+                  .GetObject("MyCustomObject")
+                  .GetType() == "MyRenamedExtension::MyEventsBasedObject");
+      REQUIRE(project.GetObjectsContainer()
+                  .GetObject("MyGlobalCustomObject")
+                  .GetType() == "MyRenamedExtension::MyEventsBasedObject");
 
       // Check if events-based object methods have been renamed in
       // instructions
@@ -2075,17 +2114,20 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     // Check that the type of the behavior was changed in the behaviors of
     // objects. Name is *not* changed.
     REQUIRE(project.GetLayout("Scene")
+                .GetObjectsContainer()
                 .GetObject("ObjectWithMyBehavior")
                 .GetBehavior("MyBehavior")
                 .GetTypeName() ==
             "MyEventsExtension::MyRenamedEventsBasedBehavior");
-    REQUIRE(project.GetObject("GlobalObjectWithMyBehavior")
+    REQUIRE(project.GetObjectsContainer()
+                .GetObject("GlobalObjectWithMyBehavior")
                 .GetBehavior("MyBehavior")
                 .GetTypeName() ==
             "MyEventsExtension::MyRenamedEventsBasedBehavior");
     REQUIRE(project.GetEventsFunctionsExtension("MyEventsExtension")
                 .GetEventsBasedObjects()
                 .Get("MyOtherEventsBasedObject")
+                .GetObjectsContainer()
                 .GetObject("ObjectWithMyBehavior")
                 .GetBehavior("MyBehavior")
                 .GetTypeName() ==
@@ -2187,13 +2229,17 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
         "MyRenamedEventsBasedObject");
 
     // Check that the type of the object was changed. Name is *not* changed.
-    REQUIRE(project.GetLayout("Scene").GetObject("MyCustomObject").GetType() ==
-            "MyEventsExtension::MyRenamedEventsBasedObject");
-    REQUIRE(project.GetObject("MyGlobalCustomObject").GetType() ==
-            "MyEventsExtension::MyRenamedEventsBasedObject");
+    REQUIRE(project.GetLayout("Scene")
+                .GetObjectsContainer()
+                .GetObject("MyCustomObject")
+                .GetType() == "MyEventsExtension::MyRenamedEventsBasedObject");
+    REQUIRE(project.GetObjectsContainer()
+                .GetObject("MyGlobalCustomObject")
+                .GetType() == "MyEventsExtension::MyRenamedEventsBasedObject");
     REQUIRE(project.GetEventsFunctionsExtension("MyEventsExtension")
                 .GetEventsBasedObjects()
                 .Get("MyOtherEventsBasedObject")
+                .GetObjectsContainer()
                 .GetObject("MyCustomObject")
                 .GetType() == "MyEventsExtension::MyRenamedEventsBasedObject");
 
@@ -2844,8 +2890,8 @@ TEST_CASE("WholeProjectRefactorer (FindInvalidRequiredBehaviorProperties)",
 
     // Insert an object using a behavior requiring another behavior.
     // But don't fill the property, which is a problem.
-    auto &object =
-        project.InsertNewObject(project, "MyExtension::Sprite", "MyObject", 0);
+    auto &object = project.GetObjectsContainer().InsertNewObject(
+        project, "MyExtension::Sprite", "MyObject", 0);
     object.AddNewBehavior(project,
                           "MyExtension::BehaviorWithRequiredBehaviorProperty",
                           "MyBehaviorWithRequiredBehaviorProperty");
@@ -2867,8 +2913,8 @@ TEST_CASE("WholeProjectRefactorer (FindInvalidRequiredBehaviorProperties)",
     SetupProjectWithDummyPlatform(project, platform);
 
     // Insert an object using a behavior requiring another behavior.
-    auto &object =
-        project.InsertNewObject(project, "MyExtension::Sprite", "MyObject", 0);
+    auto &object = project.GetObjectsContainer().InsertNewObject(
+        project, "MyExtension::Sprite", "MyObject", 0);
     object.AddNewBehavior(project,
                           "MyExtension::BehaviorWithRequiredBehaviorProperty",
                           "MyBehaviorWithRequiredBehaviorProperty");
@@ -2891,8 +2937,8 @@ TEST_CASE("WholeProjectRefactorer (FindInvalidRequiredBehaviorProperties)",
     SetupProjectWithDummyPlatform(project, platform);
 
     // Insert an object using a behavior requiring another behavior.
-    auto &object =
-        project.InsertNewObject(project, "MyExtension::Sprite", "MyObject", 0);
+    auto &object = project.GetObjectsContainer().InsertNewObject(
+        project, "MyExtension::Sprite", "MyObject", 0);
     object.AddNewBehavior(project,
                           "MyExtension::BehaviorWithRequiredBehaviorProperty",
                           "MyBehaviorWithRequiredBehaviorProperty");
@@ -2923,8 +2969,8 @@ TEST_CASE("WholeProjectRefactorer (FindInvalidRequiredBehaviorProperties)",
     SetupProjectWithDummyPlatform(project, platform);
 
     // Insert an object using a behavior requiring another behavior.
-    auto &object =
-        project.InsertNewObject(project, "MyExtension::Sprite", "MyObject", 0);
+    auto &object = project.GetObjectsContainer().InsertNewObject(
+        project, "MyExtension::Sprite", "MyObject", 0);
     object.AddNewBehavior(project,
                           "MyExtension::BehaviorWithRequiredBehaviorProperty",
                           "MyBehaviorWithRequiredBehaviorProperty");
@@ -2974,8 +3020,8 @@ TEST_CASE("WholeProjectRefactorer (FixInvalidRequiredBehaviorProperties)",
 
     // Insert an object using a behavior requiring another behavior.
     // But don't fill the property, which is a problem.
-    auto &object =
-        project.InsertNewObject(project, "MyExtension::Sprite", "MyObject", 0);
+    auto &object = project.GetObjectsContainer().InsertNewObject(
+        project, "MyExtension::Sprite", "MyObject", 0);
     object.AddNewBehavior(project,
                           "MyExtension::BehaviorWithRequiredBehaviorProperty",
                           "MyBehaviorWithRequiredBehaviorProperty");
@@ -3014,8 +3060,8 @@ TEST_CASE("WholeProjectRefactorer (FixInvalidRequiredBehaviorProperties)",
     SetupProjectWithDummyPlatform(project, platform);
 
     // Insert an object using a behavior requiring another behavior.
-    auto &object =
-        project.InsertNewObject(project, "MyExtension::Sprite", "MyObject", 0);
+    auto &object = project.GetObjectsContainer().InsertNewObject(
+        project, "MyExtension::Sprite", "MyObject", 0);
     object.AddNewBehavior(project,
                           "MyExtension::BehaviorWithRequiredBehaviorProperty",
                           "MyBehaviorWithRequiredBehaviorProperty");
@@ -3057,8 +3103,8 @@ TEST_CASE("WholeProjectRefactorer (AddBehaviorAndRequiredBehaviors)",
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
-    auto &object =
-        project.InsertNewObject(project, "MyExtension::Sprite", "MyObject", 0);
+    auto &object = project.GetObjectsContainer().InsertNewObject(
+        project, "MyExtension::Sprite", "MyObject", 0);
 
     // Add a simple behavior.
     gd::WholeProjectRefactorer::AddBehaviorAndRequiredBehaviors(
@@ -3072,8 +3118,8 @@ TEST_CASE("WholeProjectRefactorer (AddBehaviorAndRequiredBehaviors)",
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
-    auto &object =
-        project.InsertNewObject(project, "MyExtension::Sprite", "MyObject", 0);
+    auto &object = project.GetObjectsContainer().InsertNewObject(
+        project, "MyExtension::Sprite", "MyObject", 0);
 
     // Add an unknown behavior.
     gd::WholeProjectRefactorer::AddBehaviorAndRequiredBehaviors(
@@ -3088,8 +3134,8 @@ TEST_CASE("WholeProjectRefactorer (AddBehaviorAndRequiredBehaviors)",
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
-    auto &object =
-        project.InsertNewObject(project, "MyExtension::Sprite", "MyObject", 0);
+    auto &object = project.GetObjectsContainer().InsertNewObject(
+        project, "MyExtension::Sprite", "MyObject", 0);
 
     // Add the behavior that requires a behavior.
     gd::WholeProjectRefactorer::AddBehaviorAndRequiredBehaviors(
@@ -3118,8 +3164,8 @@ TEST_CASE("WholeProjectRefactorer (AddBehaviorAndRequiredBehaviors)",
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
-    auto &object =
-        project.InsertNewObject(project, "MyExtension::Sprite", "MyObject", 0);
+    auto &object = project.GetObjectsContainer().InsertNewObject(
+        project, "MyExtension::Sprite", "MyObject", 0);
 
     // Add the behavior that requires a behavior that requires another.
     gd::WholeProjectRefactorer::AddBehaviorAndRequiredBehaviors(
@@ -3161,8 +3207,8 @@ TEST_CASE("WholeProjectRefactorer (FindDependentBehaviorNames)", "[common]") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
-    auto &object =
-        project.InsertNewObject(project, "MyExtension::Sprite", "MyObject", 0);
+    auto &object = project.GetObjectsContainer().InsertNewObject(
+        project, "MyExtension::Sprite", "MyObject", 0);
 
     // Add the behavior that requires a behavior that requires another.
     gd::WholeProjectRefactorer::AddBehaviorAndRequiredBehaviors(
@@ -3213,8 +3259,8 @@ TEST_CASE("WholeProjectRefactorer (FindDependentBehaviorNames failing cases)",
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
-    auto &object =
-        project.InsertNewObject(project, "MyExtension::Sprite", "MyObject", 0);
+    auto &object = project.GetObjectsContainer().InsertNewObject(
+        project, "MyExtension::Sprite", "MyObject", 0);
 
     // Add the behavior that requires a behavior that requires another.
     gd::WholeProjectRefactorer::AddBehaviorAndRequiredBehaviors(
@@ -3625,9 +3671,12 @@ TEST_CASE("RenameObjectAnimation", "[common]") {
     auto &otherExternalEvents =
         project.InsertNewExternalEvents("My external events", 0);
     otherExternalEvents.SetAssociatedLayout("My other layout");
-    auto &object = layout.InsertNewObject(project, "MyExtension::Sprite", "MySprite", 0);
-    layout.InsertNewObject(project, "MyExtension::Sprite", "MySprite2", 1);
-    otherLayout.InsertNewObject(project, "MyExtension::Sprite", "MySprite", 0);
+    auto &object = layout.GetObjectsContainer().InsertNewObject(
+        project, "MyExtension::Sprite", "MySprite", 0);
+    layout.GetObjectsContainer().InsertNewObject(project, "MyExtension::Sprite",
+                                                 "MySprite2", 1);
+    otherLayout.GetObjectsContainer().InsertNewObject(
+        project, "MyExtension::Sprite", "MySprite", 0);
 
     auto &layoutAction =
         CreateActionWithAnimationParameter(project, layout.GetEvents(), "MySprite");
@@ -3733,9 +3782,12 @@ TEST_CASE("RenameLayerEffect", "[common]") {
     auto &otherExternalEvents =
         project.InsertNewExternalEvents("My external events", 0);
     otherExternalEvents.SetAssociatedLayout("My other layout");
-    auto &object = layout.InsertNewObject(project, "MyExtension::Sprite", "MySprite", 0);
-    layout.InsertNewObject(project, "MyExtension::Sprite", "MySprite2", 1);
-    otherLayout.InsertNewObject(project, "MyExtension::Sprite", "MySprite", 0);
+    auto &object = layout.GetObjectsContainer().InsertNewObject(
+        project, "MyExtension::Sprite", "MySprite", 0);
+    layout.GetObjectsContainer().InsertNewObject(project, "MyExtension::Sprite",
+                                                 "MySprite2", 1);
+    otherLayout.GetObjectsContainer().InsertNewObject(
+        project, "MyExtension::Sprite", "MySprite", 0);
 
     auto &layoutAction =
         CreateActionWithLayerEffectParameter(project, layout.GetEvents(), "My layer");

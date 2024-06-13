@@ -281,7 +281,11 @@ const getAutocompletionsForText = function(
       return [];
     }
 
-    const object = getObjectByName(project, scope.layout, objectName);
+    const object = getObjectByName(
+      project.getObjectsContainer(),
+      scope.layout ? scope.layout.getObjectsContainer() : null,
+      objectName
+    );
     if (!object) {
       return [];
     }
@@ -306,7 +310,11 @@ const getAutocompletionsForText = function(
       return [];
     }
 
-    const object = getObjectByName(project, scope.layout, objectName);
+    const object = getObjectByName(
+      project.getObjectsContainer(),
+      scope.layout ? scope.layout.getObjectsContainer() : null,
+      objectName
+    );
     if (!object) {
       return [];
     }

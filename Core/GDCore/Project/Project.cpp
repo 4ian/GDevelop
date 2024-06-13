@@ -834,15 +834,15 @@ void Project::UnserializeFrom(const SerializerElement& element) {
         *this, eventsFunctionsExtensionElement);
   }
 
-  GetObjectGroups().UnserializeFrom(
+  objectsContainer.GetObjectGroups().UnserializeFrom(
       element.GetChild("objectsGroups", 0, "ObjectGroups"));
   resourcesManager.UnserializeFrom(
       element.GetChild("resources", 0, "Resources"));
-  UnserializeObjectsFrom(*this, element.GetChild("objects", 0, "Objects"));
+  objectsContainer.UnserializeObjectsFrom(*this, element.GetChild("objects", 0, "Objects"));
   if (element.HasChild("objectsFolderStructure")) {
-    UnserializeFoldersFrom(*this, element.GetChild("objectsFolderStructure", 0));
+    objectsContainer.UnserializeFoldersFrom(*this, element.GetChild("objectsFolderStructure", 0));
   }
-  AddMissingObjectsInRootFolder();
+  objectsContainer.AddMissingObjectsInRootFolder();
 
   GetVariables().UnserializeFrom(element.GetChild("variables", 0, "Variables"));
 
@@ -994,9 +994,9 @@ void Project::SerializeTo(SerializerElement& element) const {
     std::cout << "ERROR: The project current platform is NULL.";
 
   resourcesManager.SerializeTo(element.AddChild("resources"));
-  SerializeObjectsTo(element.AddChild("objects"));
-  SerializeFoldersTo(element.AddChild("objectsFolderStructure"));
-  GetObjectGroups().SerializeTo(element.AddChild("objectsGroups"));
+  objectsContainer.SerializeObjectsTo(element.AddChild("objects"));
+  objectsContainer.SerializeFoldersTo(element.AddChild("objectsFolderStructure"));
+  objectsContainer.GetObjectGroups().SerializeTo(element.AddChild("objectsGroups"));
   GetVariables().SerializeTo(element.AddChild("variables"));
 
   element.SetAttribute("firstLayout", firstLayout);
@@ -1163,7 +1163,6 @@ void Project::Init(const gd::Project& game) {
   platformSpecificAssets = game.platformSpecificAssets;
   loadingScreen = game.loadingScreen;
   watermark = game.watermark;
-  objectGroups = game.objectGroups;
 
   extensionProperties = game.extensionProperties;
 
@@ -1176,7 +1175,7 @@ void Project::Init(const gd::Project& game) {
 
   resourcesManager = game.resourcesManager;
 
-  initialObjects = gd::Clone(game.initialObjects);
+  objectsContainer = game.objectsContainer;
 
   scenes = gd::Clone(game.scenes);
 

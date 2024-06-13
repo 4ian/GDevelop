@@ -48,13 +48,13 @@ gd::ObjectConfiguration &CustomObjectConfiguration::GetChildObjectConfiguration(
     return badObjectConfiguration;
   }
 
-  if (!eventsBasedObject->HasObjectNamed(objectName)) {
+  if (!eventsBasedObject->GetObjectsContainer().HasObjectNamed(objectName)) {
     gd::LogError("Tried to get the configuration of a child-object:" + objectName
                 + " that doesn't exist in the event-based object: " + GetType());
     return badObjectConfiguration;
   }
 
-  auto &childObject = eventsBasedObject->GetObject(objectName);
+  auto &childObject = eventsBasedObject->GetObjectsContainer().GetObject(objectName);
   auto configurationPosition = childObjectConfigurations.find(objectName);
   if (configurationPosition == childObjectConfigurations.end()) {
     childObjectConfigurations.insert(std::make_pair(
@@ -212,7 +212,7 @@ void CustomObjectConfiguration::ExposeResources(gd::ArbitraryResourceWorker& wor
   }
   const auto &eventsBasedObject = project->GetEventsBasedObject(GetType());
 
-  for (auto& childObject : eventsBasedObject.GetObjects()) {
+  for (auto& childObject : eventsBasedObject.GetObjectsContainer().GetObjects()) {
     auto &configuration = GetChildObjectConfiguration(childObject->GetName());
     configuration.ExposeResources(worker);
   }

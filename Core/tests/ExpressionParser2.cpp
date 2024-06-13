@@ -35,15 +35,18 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
   // Create an instance of BuiltinObject.
   // This is not possible in practice.
-  auto &myObject = layout1.InsertNewObject(project, "", "MyObject", 0);
+  auto &myObject =
+      layout1.GetObjectsContainer().InsertNewObject(project, "", "MyObject", 0);
   myObject.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
 
-  auto &myGroup = layout1.GetObjectGroups().InsertNew("MyGroup");
+  auto &myGroup =
+      layout1.GetObjectsContainer().GetObjectGroups().InsertNew("MyGroup");
   myGroup.AddObject(myObject.GetName());
 
-  layout1.GetObjectGroups().InsertNew("EmptyGroup");
+  layout1.GetObjectsContainer().GetObjectGroups().InsertNew("EmptyGroup");
 
-  auto &mySpriteObject = layout1.InsertNewObject(project, "MyExtension::Sprite", "MySpriteObject", 1);
+  auto &mySpriteObject = layout1.GetObjectsContainer().InsertNewObject(
+      project, "MyExtension::Sprite", "MySpriteObject", 1);
   mySpriteObject.GetVariables().InsertNew("MyVariable");
   mySpriteObject.GetVariables().InsertNew("MyVariable2");
   mySpriteObject.GetVariables().InsertNew("MyVariable3");
@@ -51,15 +54,17 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   mySpriteObject.GetVariables().InsertNew("MyStringVariable").SetString("Test");
   // A variable with the same name as the object.
   mySpriteObject.GetVariables().InsertNew("MySpriteObject");
-  auto &mySpriteObject2 = layout1.InsertNewObject(project, "MyExtension::Sprite", "MySpriteObject2", 1);
+  auto &mySpriteObject2 = layout1.GetObjectsContainer().InsertNewObject(
+      project, "MyExtension::Sprite", "MySpriteObject2", 1);
   mySpriteObject2.GetVariables().InsertNew("MyVariable", 0);
   mySpriteObject2.GetVariables().InsertNew("MyVariable2", 1);
-  layout1.InsertNewObject(project,
-                          "MyExtension::FakeObjectWithDefaultBehavior",
-                          "FakeObjectWithDefaultBehavior",
-                          2);
+  layout1.GetObjectsContainer().InsertNewObject(
+      project, "MyExtension::FakeObjectWithDefaultBehavior",
+      "FakeObjectWithDefaultBehavior", 2);
 
-  auto &mySpriteGroup = layout1.GetObjectGroups().InsertNew("MySpriteObjects", 0);
+  auto &mySpriteGroup =
+      layout1.GetObjectsContainer().GetObjectGroups().InsertNew(
+          "MySpriteObjects", 0);
   mySpriteGroup.AddObject("MySpriteObject");
   mySpriteGroup.AddObject("MySpriteObject2");
 

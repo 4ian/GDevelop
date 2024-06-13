@@ -43,8 +43,8 @@ const ObjectInstanceVariablesDialog = ({
       const objectName = objectInstance.getObjectName();
       // TODO Use projectScopedContainers to get the object
       const variablesEditedAssociatedObject = getObjectByName(
-        project,
-        layout,
+        project.getObjectsContainer(),
+        layout.getObjectsContainer(),
         objectName
       );
       return variablesEditedAssociatedObject

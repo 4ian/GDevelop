@@ -121,8 +121,15 @@ const CompactInstancePropertiesEditor = ({
 
       const associatedObjectName = instance.getObjectName();
       // TODO: replace and remove layout
-      const object = getObjectByName(project, layout, associatedObjectName);
-      const properties = instance.getCustomProperties(project, layout);
+      const object = getObjectByName(
+        project.getObjectsContainer(),
+        layout.getObjectsContainer(),
+        associatedObjectName
+      );
+      const properties = instance.getCustomProperties(
+        project.getObjectsContainer(),
+        layout.getObjectsContainer()
+      );
       if (!object) return { object: undefined, instanceSchema: undefined };
 
       const is3DInstance = gd.MetadataProvider.getObjectMetadata(
@@ -132,9 +139,17 @@ const CompactInstancePropertiesEditor = ({
       const instanceSchemaForCustomProperties = propertiesMapToSchema(
         properties,
         (instance: gdInitialInstance) =>
-          instance.getCustomProperties(project, layout),
+          instance.getCustomProperties(
+            project.getObjectsContainer(),
+            layout.getObjectsContainer()
+          ),
         (instance: gdInitialInstance, name, value) =>
-          instance.updateCustomProperty(name, value, project, layout)
+          instance.updateCustomProperty(
+            name,
+            value,
+            project.getObjectsContainer(),
+            layout.getObjectsContainer()
+          )
       );
 
       const reorderedInstanceSchemaForCustomProperties = reorderInstanceSchemaForCustomProperties(

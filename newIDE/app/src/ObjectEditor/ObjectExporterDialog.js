@@ -143,7 +143,7 @@ const enumerateAllObjectsOfScene = (
   folderPath: string,
   allObjects: Array<EnumeratedObject>
 ) => {
-  const objectTreeItem = scene.getRootFolder();
+  const objectTreeItem = scene.getObjectsContainer().getRootFolder();
   mapFor(0, objectTreeItem.getChildrenCount(), i => {
     enumerateAllObjects(objectTreeItem.getChildAt(i), folderPath, allObjects);
   });

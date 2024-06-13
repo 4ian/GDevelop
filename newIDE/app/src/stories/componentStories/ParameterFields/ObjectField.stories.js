@@ -23,8 +23,8 @@ export const Default = () => (
       <ObjectField
         project={testProject.project}
         scope={{ project: testProject.project, layout: testProject.testLayout }}
-        globalObjectsContainer={testProject.project}
-        objectsContainer={testProject.testLayout}
+        globalObjectsContainer={testProject.project.getObjectsContainer()}
+        objectsContainer={testProject.testLayout.getObjectsContainer()}
         projectScopedContainersAccessor={
           testProject.testSceneProjectScopedContainersAccessor
         }
@@ -42,8 +42,8 @@ export const NonExistingObject = () => (
       <ObjectField
         project={testProject.project}
         scope={{ project: testProject.project, layout: testProject.testLayout }}
-        globalObjectsContainer={testProject.project}
-        objectsContainer={testProject.testLayout}
+        globalObjectsContainer={testProject.project.getObjectsContainer()}
+        objectsContainer={testProject.testLayout.getObjectsContainer()}
         projectScopedContainersAccessor={
           testProject.testSceneProjectScopedContainersAccessor
         }
@@ -77,8 +77,8 @@ export const WrongObjectType = () => {
             project: testProject.project,
             layout: testProject.testLayout,
           }}
-          globalObjectsContainer={testProject.project}
-          objectsContainer={testProject.testLayout}
+          globalObjectsContainer={testProject.project.getObjectsContainer()}
+          objectsContainer={testProject.testLayout.getObjectsContainer()}
           projectScopedContainersAccessor={
             testProject.testSceneProjectScopedContainersAccessor
           }
@@ -110,8 +110,8 @@ export const WithRequiredBehavior = () => {
             project: testProject.project,
             layout: testProject.testLayout,
           }}
-          globalObjectsContainer={testProject.project}
-          objectsContainer={testProject.testLayout}
+          globalObjectsContainer={testProject.project.getObjectsContainer()}
+          objectsContainer={testProject.testLayout.getObjectsContainer()}
           projectScopedContainersAccessor={
             testProject.testSceneProjectScopedContainersAccessor
           }

@@ -94,8 +94,8 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         ref={editor => (this.editor = editor)}
         project={project}
         layout={layout}
-        globalObjectsContainer={project}
-        objectsContainer={layout}
+        globalObjectsContainer={project.getObjectsContainer()}
+        objectsContainer={layout.getObjectsContainer()}
         layersContainer={layout.getLayers()}
         initialInstances={layout.getInitialInstances()}
         getInitialInstancesEditorSettings={() =>

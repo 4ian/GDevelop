@@ -13,20 +13,12 @@ EventsBasedObject::EventsBasedObject()
     : AbstractEventsBasedEntity(
         "MyObject",
         gd::EventsFunctionsContainer::FunctionOwner::Object),
-    ObjectsContainer(),
     isRenderedIn3D(false),
     isAnimatable(false),
     isTextContainer(false) {
 }
 
 EventsBasedObject::~EventsBasedObject() {}
-
-EventsBasedObject::EventsBasedObject(const gd::EventsBasedObject &_eventBasedObject)
-        : AbstractEventsBasedEntity(_eventBasedObject) {
-  // TODO Add a copy constructor in ObjectsContainer.
-  initialObjects = gd::Clone(_eventBasedObject.initialObjects);
-  objectGroups = _eventBasedObject.objectGroups;
-}
 
 void EventsBasedObject::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("defaultName", defaultName);
@@ -41,8 +33,8 @@ void EventsBasedObject::SerializeTo(SerializerElement& element) const {
   }
 
   AbstractEventsBasedEntity::SerializeTo(element);
-  SerializeObjectsTo(element.AddChild("objects"));
-  SerializeFoldersTo(element.AddChild("objectsFolderStructure"));
+  objectsContainer.SerializeObjectsTo(element.AddChild("objects"));
+  objectsContainer.SerializeFoldersTo(element.AddChild("objectsFolderStructure"));
 
   layers.SerializeLayersTo(element.AddChild("layers"));
   initialInstances.SerializeTo(element.AddChild("instances"));
@@ -56,11 +48,11 @@ void EventsBasedObject::UnserializeFrom(gd::Project& project,
   isTextContainer = element.GetBoolAttribute("isTextContainer", false);
 
   AbstractEventsBasedEntity::UnserializeFrom(project, element);
-  UnserializeObjectsFrom(project, element.GetChild("objects"));
+  objectsContainer.UnserializeObjectsFrom(project, element.GetChild("objects"));
   if (element.HasChild("objectsFolderStructure")) {
-    UnserializeFoldersFrom(project, element.GetChild("objectsFolderStructure", 0));
+    objectsContainer.UnserializeFoldersFrom(project, element.GetChild("objectsFolderStructure", 0));
   }
-  AddMissingObjectsInRootFolder();
+  objectsContainer.AddMissingObjectsInRootFolder();
 
   if (element.HasChild("layers")) {
     layers.UnserializeLayersFrom(element.GetChild("layers"));

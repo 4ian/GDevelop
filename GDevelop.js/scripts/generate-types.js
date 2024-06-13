@@ -289,24 +289,6 @@ type ParticleEmitterObject_RendererType = 0 | 1 | 2`
     // TODO: these should be expressed in Bindings.idl using "implements".
     shell.sed(
       '-i',
-      'declare class gdProject {',
-      'declare class gdProject extends gdObjectsContainer {',
-      'types/gdproject.js'
-    );
-    shell.sed(
-      '-i',
-      'declare class gdLayout {',
-      'declare class gdLayout extends gdObjectsContainer {',
-      'types/gdlayout.js'
-    );
-    shell.sed(
-      '-i',
-      'declare class gdEventsBasedObject {',
-      'declare class gdEventsBasedObject extends gdObjectsContainer {',
-      'types/gdeventsbasedobject.js'
-    );
-    shell.sed(
-      '-i',
       'declare class gdEventsFunctionsExtension {',
       'declare class gdEventsFunctionsExtension extends gdEventsFunctionsContainer {',
       'types/gdeventsfunctionsextension.js'

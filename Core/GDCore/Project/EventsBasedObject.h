@@ -3,8 +3,7 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDCORE_EVENTSBASEDOBJECT_H
-#define GDCORE_EVENTSBASEDOBJECT_H
+#pragma once
 
 #include <vector>
 #include "GDCore/Project/AbstractEventsBasedEntity.h"
@@ -28,11 +27,10 @@ namespace gd {
  *
  * \ingroup PlatformDefinition
  */
-class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity, public ObjectsContainer {
+class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
  public:
   EventsBasedObject();
   virtual ~EventsBasedObject();
-  EventsBasedObject(const gd::EventsBasedObject &_eventBasedObject);
 
   /**
    * \brief Return a pointer to a new EventsBasedObject constructed from
@@ -116,7 +114,6 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity, public Ob
   /** \name Layers
    */
   ///@{
-
   /**
    * \brief Get the layers of the custom object.
    */
@@ -126,13 +123,29 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity, public Ob
    * \brief Get the layers of the custom object.
    */
   gd::LayersContainer& GetLayers() { return layers; }
+  ///@}
 
+  /** \name Child objects
+   */
+  ///@{
+  /**
+   * \brief Get the objects of the custom object.
+   */
+  gd::ObjectsContainer& GetObjectsContainer() {
+    return objectsContainer;
+  }
+
+  /**
+   * \brief Get the objects of the custom object.
+   */
+  const gd::ObjectsContainer& GetObjectsContainer() const {
+    return objectsContainer;
+  }
   ///@}
 
   /** \name Instances
    */
   ///@{
-
   /**
    * \brief Get the instances of the custom object.
    */
@@ -146,7 +159,6 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity, public Ob
   const gd::InitialInstancesContainer& GetInitialInstances() const {
     return initialInstances;
   }
-
   ///@}
 
   void SerializeTo(SerializerElement& element) const override;
@@ -161,8 +173,7 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity, public Ob
   bool isTextContainer;
   gd::InitialInstancesContainer initialInstances;
   gd::LayersContainer layers;
+  gd::ObjectsContainer objectsContainer;
 };
 
 }  // namespace gd
-
-#endif  // GDCORE_EVENTSBASEDOBJECT_H

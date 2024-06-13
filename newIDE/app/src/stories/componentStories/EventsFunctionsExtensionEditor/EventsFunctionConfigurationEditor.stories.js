@@ -20,8 +20,8 @@ export const DefaultFreeFunction = () => (
   <FixedHeightFlexContainer height={500}>
     <EventsFunctionConfigurationEditor
       project={testProject.project}
-      globalObjectsContainer={testProject.project}
-      objectsContainer={testProject.testLayout}
+      globalObjectsContainer={testProject.project.getObjectsContainer()}
+      objectsContainer={testProject.testLayout.getObjectsContainer()}
       helpPagePath="/events/functions"
       eventsFunction={testProject.testEventsFunction}
       eventsBasedBehavior={null}
@@ -36,8 +36,8 @@ export const DefaultBehaviorFunction = () => (
   <FixedHeightFlexContainer height={500}>
     <EventsFunctionConfigurationEditor
       project={testProject.project}
-      globalObjectsContainer={testProject.project}
-      objectsContainer={testProject.testLayout}
+      globalObjectsContainer={testProject.project.getObjectsContainer()}
+      objectsContainer={testProject.testLayout.getObjectsContainer()}
       helpPagePath="/events/functions"
       eventsFunction={testProject.testBehaviorEventsFunction}
       eventsBasedBehavior={testProject.testEventsBasedBehavior}
@@ -52,8 +52,8 @@ export const DefaultBehaviorLifecycleFunction = () => (
   <FixedHeightFlexContainer height={500}>
     <EventsFunctionConfigurationEditor
       project={testProject.project}
-      globalObjectsContainer={testProject.project}
-      objectsContainer={testProject.testLayout}
+      globalObjectsContainer={testProject.project.getObjectsContainer()}
+      objectsContainer={testProject.testLayout.getObjectsContainer()}
       helpPagePath="/events/functions"
       eventsFunction={testProject.testBehaviorLifecycleEventsFunction}
       eventsBasedBehavior={testProject.testEventsBasedBehavior}
@@ -68,8 +68,8 @@ export const DefaultObjectFunction = () => (
   <FixedHeightFlexContainer height={500}>
     <EventsFunctionConfigurationEditor
       project={testProject.project}
-      globalObjectsContainer={testProject.project}
-      objectsContainer={testProject.testLayout}
+      globalObjectsContainer={testProject.project.getObjectsContainer()}
+      objectsContainer={testProject.testLayout.getObjectsContainer()}
       helpPagePath="/events/functions"
       eventsFunction={testProject.testObjectEventsFunction}
       eventsBasedBehavior={null}

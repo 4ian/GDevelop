@@ -70,7 +70,11 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       }
 
       let effectType: string | null = null;
-      const object = getObjectByName(project, scope.layout, objectOrGroupName);
+      const object = getObjectByName(
+        project.getObjectsContainer(),
+        scope.layout ? scope.layout.getObjectsContainer() : null,
+        objectOrGroupName
+      );
       if (object && object.getEffects().hasEffectNamed(effectName)) {
         effectType = object
           .getEffects()
@@ -80,8 +84,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
       if (!effectType) {
         const group = getObjectGroupByName(
-          project,
-          scope.layout,
+          project.getObjectsContainer(),
+          scope.layout ? scope.layout.getObjectsContainer() : null,
           objectOrGroupName
         );
         if (group) {
@@ -90,7 +94,11 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           const effectTypes: Array<string | null> = mapVector(
             group.getAllObjectsNames(),
             objectName => {
-              const object = getObjectByName(project, scope.layout, objectName);
+              const object = getObjectByName(
+                project.getObjectsContainer(),
+                scope.layout ? scope.layout.getObjectsContainer() : null,
+                objectName
+              );
               if (!object) {
                 // If object not found, we consider this as an error.
                 return null;

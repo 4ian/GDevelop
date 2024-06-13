@@ -455,6 +455,12 @@ export class ObjectsContainer extends EmscriptenObject {
   getRootFolder(): ObjectFolderOrObject;
   getAllObjectFolderOrObjects(): VectorObjectFolderOrObject;
   getObjectGroups(): ObjectGroupsContainer;
+  getTypeOfBehavior(layout: ObjectsContainer, name: string, searchInGroups: boolean): string;
+  getTypeOfObject(layout: ObjectsContainer, name: string, searchInGroups: boolean): string;
+  getBehaviorsOfObject(layout: ObjectsContainer, name: string, searchInGroups: boolean): VectorString;
+  isDefaultBehavior(layout: ObjectsContainer, objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): boolean;
+  getTypeOfBehaviorInObjectOrGroup(layout: ObjectsContainer, objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): string;
+  getBehaviorNamesInObjectOrGroup(layout: ObjectsContainer, objectOrGroupName: string, behaviorType: string, searchInGroups: boolean): VectorString;
 }
 
 export class Project extends EmscriptenObject {
@@ -562,32 +568,13 @@ export class Project extends EmscriptenObject {
   hasEventsBasedObject(type: string): boolean;
   getEventsBasedObject(type: string): EventsBasedObject;
   getVariables(): VariablesContainer;
+  getObjectsContainer(): ObjectsContainer;
   getResourcesManager(): ResourcesManager;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(element: SerializerElement): void;
   getWholeProjectDiagnosticReport(): WholeProjectDiagnosticReport;
   static isNameSafe(name: string): boolean;
   static getSafeName(name: string): string;
-  getTypeOfBehavior(layout: Layout, name: string, searchInGroups: boolean): string;
-  getTypeOfObject(layout: Layout, name: string, searchInGroups: boolean): string;
-  getBehaviorsOfObject(layout: Layout, name: string, searchInGroups: boolean): VectorString;
-  isDefaultBehavior(layout: Layout, objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): boolean;
-  getTypeOfBehaviorInObjectOrGroup(layout: Layout, objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): string;
-  getBehaviorNamesInObjectOrGroup(layout: Layout, objectOrGroupName: string, behaviorType: string, searchInGroups: boolean): VectorString;
-  insertNewObject(project: Project, type: string, name: string, pos: number): gdObject;
-  insertNewObjectInFolder(project: Project, type: string, name: string, folder: ObjectFolderOrObject, pos: number): gdObject;
-  insertObject(obj: gdObject, pos: number): gdObject;
-  hasObjectNamed(name: string): boolean;
-  getObject(name: string): gdObject;
-  getObjectAt(pos: number): gdObject;
-  getObjectPosition(name: string): number;
-  removeObject(name: string): void;
-  moveObject(oldIndex: number, newIndex: number): void;
-  moveObjectFolderOrObjectToAnotherContainerInFolder(objectFolderOrObject: ObjectFolderOrObject, newObjectsContainer: ObjectsContainer, parentObjectFolderOrObject: ObjectFolderOrObject, newPosition: number): void;
-  getObjectsCount(): number;
-  getRootFolder(): ObjectFolderOrObject;
-  getAllObjectFolderOrObjects(): VectorObjectFolderOrObject;
-  getObjectGroups(): ObjectGroupsContainer;
 }
 
 export class ObjectsContainersList extends EmscriptenObject {
@@ -746,6 +733,7 @@ export class Layout extends EmscriptenObject {
   getWindowDefaultTitle(): string;
   getInitialInstances(): InitialInstancesContainer;
   getVariables(): VariablesContainer;
+  getObjectsContainer(): ObjectsContainer;
   getEvents(): EventsList;
   getLayers(): LayersContainer;
   updateBehaviorsSharedData(project: Project): void;
@@ -766,20 +754,6 @@ export class Layout extends EmscriptenObject {
   unserializeFrom(project: Project, element: SerializerElement): void;
   setStopSoundsOnStartup(enable: boolean): void;
   stopSoundsOnStartup(): boolean;
-  insertNewObject(project: Project, type: string, name: string, pos: number): gdObject;
-  insertNewObjectInFolder(project: Project, type: string, name: string, folder: ObjectFolderOrObject, pos: number): gdObject;
-  insertObject(obj: gdObject, pos: number): gdObject;
-  hasObjectNamed(name: string): boolean;
-  getObject(name: string): gdObject;
-  getObjectAt(pos: number): gdObject;
-  getObjectPosition(name: string): number;
-  removeObject(name: string): void;
-  moveObject(oldIndex: number, newIndex: number): void;
-  moveObjectFolderOrObjectToAnotherContainerInFolder(objectFolderOrObject: ObjectFolderOrObject, newObjectsContainer: ObjectsContainer, parentObjectFolderOrObject: ObjectFolderOrObject, newPosition: number): void;
-  getObjectsCount(): number;
-  getRootFolder(): ObjectFolderOrObject;
-  getAllObjectFolderOrObjects(): VectorObjectFolderOrObject;
-  getObjectGroups(): ObjectGroupsContainer;
 }
 
 export class ExternalEvents extends EmscriptenObject {
@@ -2133,24 +2107,11 @@ export class EventsBasedObject extends AbstractEventsBasedEntity {
   isTextContainer(): boolean;
   getInitialInstances(): InitialInstancesContainer;
   getLayers(): LayersContainer;
+  getObjectsContainer(): ObjectsContainer;
   static getPropertyActionName(propertyName: string): string;
   static getPropertyConditionName(propertyName: string): string;
   static getPropertyExpressionName(propertyName: string): string;
   static getPropertyToggleActionName(propertyName: string): string;
-  insertNewObject(project: Project, type: string, name: string, pos: number): gdObject;
-  insertNewObjectInFolder(project: Project, type: string, name: string, folder: ObjectFolderOrObject, pos: number): gdObject;
-  insertObject(obj: gdObject, pos: number): gdObject;
-  hasObjectNamed(name: string): boolean;
-  getObject(name: string): gdObject;
-  getObjectAt(pos: number): gdObject;
-  getObjectPosition(name: string): number;
-  removeObject(name: string): void;
-  moveObject(oldIndex: number, newIndex: number): void;
-  moveObjectFolderOrObjectToAnotherContainerInFolder(objectFolderOrObject: ObjectFolderOrObject, newObjectsContainer: ObjectsContainer, parentObjectFolderOrObject: ObjectFolderOrObject, newPosition: number): void;
-  getObjectsCount(): number;
-  getRootFolder(): ObjectFolderOrObject;
-  getAllObjectFolderOrObjects(): VectorObjectFolderOrObject;
-  getObjectGroups(): ObjectGroupsContainer;
 }
 
 export class EventsBasedObjectsList extends EmscriptenObject {
@@ -2814,17 +2775,17 @@ export class MetadataDeclarationHelper extends EmscriptenObject {
 
 export function toNewVectorString(): VectorString;
 
-export function getTypeOfBehavior(layout: Layout, name: string, searchInGroups: boolean): string;
+export function getTypeOfBehavior(layout: ObjectsContainer, name: string, searchInGroups: boolean): string;
 
-export function getTypeOfObject(layout: Layout, name: string, searchInGroups: boolean): string;
+export function getTypeOfObject(layout: ObjectsContainer, name: string, searchInGroups: boolean): string;
 
-export function getBehaviorsOfObject(layout: Layout, name: string, searchInGroups: boolean): VectorString;
+export function getBehaviorsOfObject(layout: ObjectsContainer, name: string, searchInGroups: boolean): VectorString;
 
-export function isDefaultBehavior(layout: Layout, objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): boolean;
+export function isDefaultBehavior(layout: ObjectsContainer, objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): boolean;
 
-export function getTypeOfBehaviorInObjectOrGroup(layout: Layout, objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): string;
+export function getTypeOfBehaviorInObjectOrGroup(layout: ObjectsContainer, objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): string;
 
-export function getBehaviorNamesInObjectOrGroup(layout: Layout, objectOrGroupName: string, behaviorType: string, searchInGroups: boolean): VectorString;
+export function getBehaviorNamesInObjectOrGroup(layout: ObjectsContainer, objectOrGroupName: string, behaviorType: string, searchInGroups: boolean): VectorString;
 
 export function removeFromVectorParameterMetadata(index: number): void;
 

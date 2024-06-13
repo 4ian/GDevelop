@@ -104,7 +104,7 @@ const ObjectsRenderingService = {
         if (
           eventsBasedObject.isRenderedIn3D() &&
           eventsBasedObject.isAnimatable() &&
-          eventsBasedObject.getObjectsCount() === 0
+          eventsBasedObject.getObjectsContainer().getObjectsCount() === 0
         ) {
           return new RenderedSprite3DInstance(
             project,

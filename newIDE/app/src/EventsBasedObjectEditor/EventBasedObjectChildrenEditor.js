@@ -74,8 +74,13 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
       gd.Project.getSafeName(newName),
       tentativeNewName => {
         if (
-          eventsBasedObject.hasObjectNamed(tentativeNewName) ||
-          eventsBasedObject.getObjectGroups().has(tentativeNewName) ||
+          eventsBasedObject
+            .getObjectsContainer()
+            .hasObjectNamed(tentativeNewName) ||
+          eventsBasedObject
+            .getObjectsContainer()
+            .getObjectGroups()
+            .has(tentativeNewName) ||
           // TODO EBO Use a constant instead a hard coded value "Object".
           tentativeNewName === 'Object'
         ) {
@@ -228,7 +233,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 project={project}
                 unsavedChanges={this.props.unsavedChanges}
                 // $FlowFixMe gdObjectsContainer should be a member of gdEventsBasedObject instead of a base class.
-                objectsContainer={eventsBasedObject}
+                objectsContainer={eventsBasedObject.getObjectsContainer()}
                 layout={null}
                 // TODO EBO Allow to use project resources as place holders
                 resourceManagementProps={{

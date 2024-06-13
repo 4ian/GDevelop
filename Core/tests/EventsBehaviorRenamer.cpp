@@ -39,8 +39,8 @@ TEST_CASE("EventsBehaviorRenamer (expressions)", "[common]") {
   auto projectScopedContainers =
     gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
 
-  auto &object1 =
-      layout1.InsertNewObject(project, "MyExtension::Sprite", "Object1", 0);
+  auto &object1 = layout1.GetObjectsContainer().InsertNewObject(
+      project, "MyExtension::Sprite", "Object1", 0);
   object1.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
   object1.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior2");
 
@@ -80,8 +80,8 @@ TEST_CASE("EventsBehaviorRenamer (instructions)", "[common]") {
   auto projectScopedContainers =
     gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
 
-  auto &object1 =
-      layout1.InsertNewObject(project, "MyExtension::Sprite", "Object1", 0);
+  auto &object1 = layout1.GetObjectsContainer().InsertNewObject(
+      project, "MyExtension::Sprite", "Object1", 0);
   object1.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
   object1.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior2");
 

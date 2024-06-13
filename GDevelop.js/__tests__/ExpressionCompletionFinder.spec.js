@@ -65,12 +65,9 @@ describe('gd.ExpressionCompletionFinder', function () {
       project = new gd.ProjectHelper.createNewGDJSProject();
       layout = project.insertNewLayout('Scene', 0);
 
-      const object = layout.insertNewObject(
-        project,
-        'Sprite',
-        'MySpriteObject',
-        0
-      );
+      const object = layout
+        .getObjectsContainer()
+        .insertNewObject(project, 'Sprite', 'MySpriteObject', 0);
 
       const makeChildrenTestVariables = (structure) => {
         // Make a structure...
@@ -120,24 +117,19 @@ describe('gd.ExpressionCompletionFinder', function () {
         object.getVariables().insertNew('MyObjectVariableStructure', 2)
       );
 
-      const object2 = layout.insertNewObject(
-        project,
-        'Sprite',
-        'OtherSpriteObject',
-        1
-      );
+      const object2 = layout
+        .getObjectsContainer()
+        .insertNewObject(project, 'Sprite', 'OtherSpriteObject', 1);
       makeChildrenTestVariables(
         object2.getVariables().insertNew('MyObjectVariableStructure', 2)
       );
 
-      const object3 = layout.insertNewObject(
-        project,
-        'Sprite',
-        'UnrelatedSpriteObject',
-        2
-      );
+      const object3 = layout
+        .getObjectsContainer()
+        .insertNewObject(project, 'Sprite', 'UnrelatedSpriteObject', 2);
 
       const objectGroup = layout
+        .getObjectsContainer()
         .getObjectGroups()
         .insertNew('GroupOfSpriteObjects', 0);
       objectGroup.addObject('MySpriteObject');
@@ -1056,33 +1048,30 @@ describe('gd.ExpressionCompletionFinder', function () {
       project = new gd.ProjectHelper.createNewGDJSProject();
       layout = project.insertNewLayout('Scene', 0);
 
-      const object = layout.insertNewObject(
-        project,
-        'Sprite',
-        'MySpriteObject',
-        0
-      );
+      const object = layout
+        .getObjectsContainer()
+        .insertNewObject(project, 'Sprite', 'MySpriteObject', 0);
       object.getVariables().insertNew('MyObjectVariable', 0);
       object.getVariables().insertNew('MyObjectGroupVariable1', 0);
       object.getVariables().insertNew('MyObjectGroupVariable2', 0);
       object.getVariables().insertNew('MyObjectGroupVariable3', 0);
 
-      const object2 = layout.insertNewObject(
-        project,
-        'Sprite',
-        'MySpriteObject2',
-        1
-      );
+      const object2 = layout
+        .getObjectsContainer()
+        .insertNewObject(project, 'Sprite', 'MySpriteObject2', 1);
       object2.getVariables().insertNew('MyObjectGroupVariable1', 0);
       object2.getVariables().insertNew('MyObjectGroupVariable2', 0);
 
       const objectGroup = layout
+        .getObjectsContainer()
         .getObjectGroups()
         .insertNew('MyObjectGroup', 0);
       objectGroup.addObject('MySpriteObject');
       objectGroup.addObject('MySpriteObject2');
 
-      layout.insertNewObject(project, 'Sprite', 'UnrelatedSpriteObject3', 2);
+      layout
+        .getObjectsContainer()
+        .insertNewObject(project, 'Sprite', 'UnrelatedSpriteObject3', 2);
       layout.getVariables().insertNew('MyVariable', 0);
       layout.getVariables().insertNew('MyVariable2', 1);
       layout.getVariables().insertNew('UnrelatedVariable3', 2);

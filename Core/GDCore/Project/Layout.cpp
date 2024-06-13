@@ -143,22 +143,23 @@ void Layout::UpdateBehaviorsSharedData(gd::Project& project) {
   std::vector<gd::String> allBehaviorsNames;
 
   // Search in objects for the type and the name of every behaviors.
-  for (std::size_t i = 0; i < initialObjects.size(); ++i) {
+  for (std::size_t i = 0; i < objectsContainer.GetObjectsCount(); ++i) {
     std::vector<gd::String> objectBehaviors =
-        initialObjects[i]->GetAllBehaviorNames();
+        objectsContainer.GetObject(i).GetAllBehaviorNames();
     for (unsigned int j = 0; j < objectBehaviors.size(); ++j) {
       auto& behavior =
-          initialObjects[i]->GetBehavior(objectBehaviors[j]);
+          objectsContainer.GetObject(i).GetBehavior(objectBehaviors[j]);
       allBehaviorsTypes.push_back(behavior.GetTypeName());
       allBehaviorsNames.push_back(behavior.GetName());
     }
   }
-  for (std::size_t i = 0; i < project.GetObjectsCount(); ++i) {
+  auto &globalObjects = project.GetObjectsContainer();
+  for (std::size_t i = 0; i < globalObjects.GetObjectsCount(); ++i) {
     std::vector<gd::String> objectBehaviors =
-        project.GetObject(i).GetAllBehaviorNames();
+        globalObjects.GetObject(i).GetAllBehaviorNames();
     for (std::size_t j = 0; j < objectBehaviors.size(); ++j) {
       auto& behavior =
-          project.GetObject(i).GetBehavior(objectBehaviors[j]);
+          globalObjects.GetObject(i).GetBehavior(objectBehaviors[j]);
       allBehaviorsTypes.push_back(behavior.GetTypeName());
       allBehaviorsNames.push_back(behavior.GetName());
     }
@@ -242,11 +243,11 @@ void Layout::SerializeTo(SerializerElement& element) const {
 
   editorSettings.SerializeTo(element.AddChild("uiSettings"));
 
-  GetObjectGroups().SerializeTo(element.AddChild("objectsGroups"));
+  objectsContainer.GetObjectGroups().SerializeTo(element.AddChild("objectsGroups"));
   GetVariables().SerializeTo(element.AddChild("variables"));
   GetInitialInstances().SerializeTo(element.AddChild("instances"));
-  SerializeObjectsTo(element.AddChild("objects"));
-  SerializeFoldersTo(element.AddChild("objectsFolderStructure"));
+  objectsContainer.SerializeObjectsTo(element.AddChild("objects"));
+  objectsContainer.SerializeFoldersTo(element.AddChild("objectsFolderStructure"));
   gd::EventsListSerialization::SerializeEventsTo(events,
                                                  element.AddChild("events"));
 
@@ -283,16 +284,16 @@ void Layout::UnserializeFrom(gd::Project& project,
   editorSettings.UnserializeFrom(
       element.GetChild("uiSettings", 0, "UISettings"));
 
-  GetObjectGroups().UnserializeFrom(
+  objectsContainer.GetObjectGroups().UnserializeFrom(
       element.GetChild("objectsGroups", 0, "GroupesObjets"));
   gd::EventsListSerialization::UnserializeEventsFrom(
       project, GetEvents(), element.GetChild("events", 0, "Events"));
 
-  UnserializeObjectsFrom(project, element.GetChild("objects", 0, "Objets"));
+  objectsContainer.UnserializeObjectsFrom(project, element.GetChild("objects", 0, "Objets"));
   if (element.HasChild("objectsFolderStructure")) {
-    UnserializeFoldersFrom(project, element.GetChild("objectsFolderStructure", 0));
+    objectsContainer.UnserializeFoldersFrom(project, element.GetChild("objectsFolderStructure", 0));
   }
-  AddMissingObjectsInRootFolder();
+  objectsContainer.AddMissingObjectsInRootFolder();
 
   initialInstances.UnserializeFrom(
       element.GetChild("instances", 0, "Positions"));
@@ -353,7 +354,7 @@ void Layout::Init(const Layout& other) {
   layers = other.layers;
   variables = other.GetVariables();
 
-  initialObjects = gd::Clone(other.initialObjects);
+  objectsContainer = other.objectsContainer;
 
   behaviorsSharedData.clear();
   for (const auto& it : other.behaviorsSharedData) {
@@ -363,7 +364,6 @@ void Layout::Init(const Layout& other) {
 
   events = other.events;
   editorSettings = other.editorSettings;
-  objectGroups = other.objectGroups;
 }
 
 std::vector<gd::String> GetHiddenLayers(const Layout& layout) {

@@ -20,7 +20,8 @@ TEST_CASE("ExpressionParser2 - Benchmarks", "[common][events]") {
   gd::Platform platform;
   SetupProjectWithDummyPlatform(project, platform);
   auto &layout1 = project.InsertNewLayout("Layout1", 0);
-  layout1.InsertNewObject(project, "MyExtension::Sprite", "MySpriteObject", 0);
+  layout1.GetObjectsContainer().InsertNewObject(project, "MyExtension::Sprite",
+                                                "MySpriteObject", 0);
 
   auto projectScopedContainers = gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
 

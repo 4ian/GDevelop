@@ -7,6 +7,7 @@
 
 #include <algorithm>
 
+#include "GDCore/Tools/PolymorphicClone.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/ObjectFolderOrObject.h"
@@ -20,6 +21,22 @@ ObjectsContainer::ObjectsContainer() {
 }
 
 ObjectsContainer::~ObjectsContainer() {}
+
+ObjectsContainer::ObjectsContainer(const ObjectsContainer& other) {
+  Init(other);
+}
+
+ObjectsContainer& ObjectsContainer::operator=(
+    const ObjectsContainer& other) {
+  if (this != &other) Init(other);
+
+  return *this;
+}
+
+void ObjectsContainer::Init(const gd::ObjectsContainer& other) {
+  initialObjects = gd::Clone(other.initialObjects);
+  objectGroups = other.objectGroups;
+}
 
 void ObjectsContainer::SerializeObjectsTo(SerializerElement& element) const {
   element.ConsiderAsArrayOf("object");

@@ -472,6 +472,34 @@ interface ObjectsContainer {
     [Ref] ObjectFolderOrObject GetRootFolder();
     [Value] VectorObjectFolderOrObject GetAllObjectFolderOrObjects();
     [Ref] ObjectGroupsContainer GetObjectGroups();
+
+    [Const, Value] DOMString FREE_GetTypeOfBehavior(
+        [Const, Ref] ObjectsContainer layout,
+        [Const] DOMString name,
+        boolean searchInGroups);
+    [Const, Value] DOMString FREE_GetTypeOfObject(
+        [Const, Ref] ObjectsContainer layout,
+        [Const] DOMString name,
+        boolean searchInGroups);
+    [Value] VectorString FREE_GetBehaviorsOfObject(
+        [Const, Ref] ObjectsContainer layout,
+        [Const] DOMString name,
+        boolean searchInGroups);
+    boolean FREE_IsDefaultBehavior(
+        [Const, Ref] ObjectsContainer layout,
+        [Const] DOMString objectOrGroupName,
+        [Const] DOMString behaviorName,
+        boolean searchInGroups);
+    [Const, Value] DOMString FREE_GetTypeOfBehaviorInObjectOrGroup(
+        [Const, Ref] ObjectsContainer layout,
+        [Const] DOMString objectOrGroupName,
+        [Const] DOMString behaviorName,
+        boolean searchInGroups);
+    [Value] VectorString FREE_GetBehaviorNamesInObjectOrGroup(
+        [Const, Ref] ObjectsContainer layout,
+        [Const] DOMString objectOrGroupName,
+        [Const] DOMString behaviorType,
+        boolean searchInGroups);
 };
 
 interface Project {
@@ -589,6 +617,7 @@ interface Project {
     [Ref] EventsBasedObject GetEventsBasedObject([Const] DOMString type);
 
     [Ref] VariablesContainer GetVariables();
+    [Ref] ObjectsContainer GetObjectsContainer();
     [Ref] ResourcesManager GetResourcesManager();
 
     void SerializeTo([Ref] SerializerElement element);
@@ -598,29 +627,6 @@ interface Project {
 
     boolean STATIC_IsNameSafe([Const] DOMString name);
     [Const, Value] DOMString STATIC_GetSafeName([Const] DOMString name);
-
-    [Const, Value] DOMString FREE_GetTypeOfBehavior([Const, Ref] Layout layout, [Const] DOMString name, boolean searchInGroups);
-    [Const, Value] DOMString FREE_GetTypeOfObject([Const, Ref] Layout layout, [Const] DOMString name, boolean searchInGroups);
-    [Value] VectorString FREE_GetBehaviorsOfObject([Const, Ref] Layout layout, [Const] DOMString name, boolean searchInGroups);
-    boolean FREE_IsDefaultBehavior([Const, Ref] Layout layout, [Const] DOMString objectOrGroupName, [Const] DOMString behaviorName, boolean searchInGroups);
-    [Const, Value] DOMString FREE_GetTypeOfBehaviorInObjectOrGroup([Const, Ref] Layout layout, [Const] DOMString objectOrGroupName, [Const] DOMString behaviorName, boolean searchInGroups);
-    [Value] VectorString FREE_GetBehaviorNamesInObjectOrGroup([Const, Ref] Layout layout, [Const] DOMString objectOrGroupName, [Const] DOMString behaviorType, boolean searchInGroups);
-
-    // Inherited from gd::ObjectsContainer
-    [Ref] gdObject InsertNewObject([Ref] Project project, [Const] DOMString type, [Const] DOMString name, unsigned long pos);
-    [Ref] gdObject InsertNewObjectInFolder([Ref] Project project, [Const] DOMString type, [Const] DOMString name, [Ref] ObjectFolderOrObject folder, unsigned long pos);
-    [Ref] gdObject InsertObject([Const, Ref] gdObject obj, unsigned long pos);
-    boolean HasObjectNamed([Const] DOMString name);
-    [Ref] gdObject GetObject([Const] DOMString name);
-    [Ref] gdObject GetObjectAt(unsigned long pos);
-    unsigned long GetObjectPosition([Const] DOMString name);
-    void RemoveObject([Const] DOMString name);
-    void MoveObject(unsigned long oldIndex, unsigned long newIndex);
-    void MoveObjectFolderOrObjectToAnotherContainerInFolder([Ref] ObjectFolderOrObject objectFolderOrObject, [Ref] ObjectsContainer newObjectsContainer, [Ref] ObjectFolderOrObject parentObjectFolderOrObject, unsigned long newPosition);
-    unsigned long GetObjectsCount();
-    [Ref] ObjectFolderOrObject GetRootFolder();
-    [Value] VectorObjectFolderOrObject GetAllObjectFolderOrObjects();
-    [Ref] ObjectGroupsContainer GetObjectGroups();
 };
 
 enum ObjectsContainersList_VariableExistence {
@@ -875,6 +881,7 @@ interface Layout {
     [Const, Ref] DOMString GetWindowDefaultTitle();
     [Ref] InitialInstancesContainer GetInitialInstances();
     [Ref] VariablesContainer GetVariables();
+    [Ref] ObjectsContainer GetObjectsContainer();
     [Ref] EventsList GetEvents();
     [Ref] LayersContainer GetLayers();
 
@@ -901,22 +908,6 @@ interface Layout {
 
     void SetStopSoundsOnStartup(boolean enable);
     boolean StopSoundsOnStartup();
-
-    // Inherited from gd::ObjectsContainer
-    [Ref] gdObject InsertNewObject([Ref] Project project, [Const] DOMString type, [Const] DOMString name, unsigned long pos);
-    [Ref] gdObject InsertNewObjectInFolder([Ref] Project project, [Const] DOMString type, [Const] DOMString name, [Ref] ObjectFolderOrObject folder, unsigned long pos);
-    [Ref] gdObject InsertObject([Const, Ref] gdObject obj, unsigned long pos);
-    boolean HasObjectNamed([Const] DOMString name);
-    [Ref] gdObject GetObject([Const] DOMString name);
-    [Ref] gdObject GetObjectAt(unsigned long pos);
-    unsigned long GetObjectPosition([Const] DOMString name);
-    void RemoveObject([Const] DOMString name);
-    void MoveObject(unsigned long oldIndex, unsigned long newIndex);
-    void MoveObjectFolderOrObjectToAnotherContainerInFolder([Ref] ObjectFolderOrObject objectFolderOrObject, [Ref] ObjectsContainer newObjectsContainer, [Ref] ObjectFolderOrObject parentObjectFolderOrObject, unsigned long newPosition);
-    unsigned long GetObjectsCount();
-    [Ref] ObjectFolderOrObject GetRootFolder();
-    [Value] VectorObjectFolderOrObject GetAllObjectFolderOrObjects();
-    [Ref] ObjectGroupsContainer GetObjectGroups();
 };
 
 interface ExternalEvents {
@@ -2837,27 +2828,12 @@ interface EventsBasedObject {
 
     [Ref] InitialInstancesContainer GetInitialInstances();
     [Ref] LayersContainer GetLayers();
+    [Ref] ObjectsContainer GetObjectsContainer();
 
     [Const, Value] DOMString STATIC_GetPropertyActionName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetPropertyConditionName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetPropertyExpressionName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetPropertyToggleActionName([Const] DOMString propertyName);
-
-    // Inherited from gd::ObjectsContainer
-    [Ref] gdObject InsertNewObject([Ref] Project project, [Const] DOMString type, [Const] DOMString name, unsigned long pos);
-    [Ref] gdObject InsertNewObjectInFolder([Ref] Project project, [Const] DOMString type, [Const] DOMString name, [Ref] ObjectFolderOrObject folder, unsigned long pos);
-    [Ref] gdObject InsertObject([Const, Ref] gdObject obj, unsigned long pos);
-    boolean HasObjectNamed([Const] DOMString name);
-    [Ref] gdObject GetObject([Const] DOMString name);
-    [Ref] gdObject GetObjectAt(unsigned long pos);
-    unsigned long GetObjectPosition([Const] DOMString name);
-    void RemoveObject([Const] DOMString name);
-    void MoveObject(unsigned long oldIndex, unsigned long newIndex);
-    void MoveObjectFolderOrObjectToAnotherContainerInFolder([Ref] ObjectFolderOrObject objectFolderOrObject, [Ref] ObjectsContainer newObjectsContainer, [Ref] ObjectFolderOrObject parentObjectFolderOrObject, unsigned long newPosition);
-    unsigned long GetObjectsCount();
-    [Ref] ObjectFolderOrObject GetRootFolder();
-    [Value] VectorObjectFolderOrObject GetAllObjectFolderOrObjects();
-    [Ref] ObjectGroupsContainer GetObjectGroups();
 };
 EventsBasedObject implements AbstractEventsBasedEntity;
 

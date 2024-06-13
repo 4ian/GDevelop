@@ -180,8 +180,8 @@ export class ExternalEventsEditorContainer extends React.Component<
             unsavedChanges={this.props.unsavedChanges}
             project={project}
             scope={scope}
-            globalObjectsContainer={project}
-            objectsContainer={layout}
+            globalObjectsContainer={project.getObjectsContainer()}
+            objectsContainer={layout.getObjectsContainer()}
             projectScopedContainersAccessor={
               new ProjectScopedContainersAccessor(scope)
             }

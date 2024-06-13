@@ -40,6 +40,9 @@ class GD_CORE_API ObjectsContainer {
    */
   ObjectsContainer();
   virtual ~ObjectsContainer();
+  
+  ObjectsContainer(const ObjectsContainer&);
+  ObjectsContainer& operator=(const ObjectsContainer& rhs);
 
   /** \name Objects management
    * Members functions related to objects management.
@@ -230,6 +233,12 @@ class GD_CORE_API ObjectsContainer {
 
  private:
   std::unique_ptr<gd::ObjectFolderOrObject> rootFolder;
+
+  /**
+   * Initialize from another variables container, copying elements. Used by
+   * copy-ctor and assign-op. Don't forget to update me if members were changed!
+   */
+  void Init(const ObjectsContainer& other);
 };
 
 }  // namespace gd

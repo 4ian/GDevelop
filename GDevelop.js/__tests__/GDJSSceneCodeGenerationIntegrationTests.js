@@ -192,7 +192,7 @@ describe('libGD.js - GDJS Scene Code Generation integration tests', function () 
     beforeEach(() => {
       project = new gd.ProjectHelper.createNewGDJSProject();
       layout = project.insertNewLayout('Scene', 0);
-      layout.insertNewObject(project, '', 'MyObject', 0);
+      layout.getObjectsContainer().insertNewObject(project, '', 'MyObject', 0);
 
       // These variables are "simple" and their type will be known at code generation.
       layout.getVariables().insertNew('MyNumberVariable', 0).setValue(123);

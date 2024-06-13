@@ -249,7 +249,10 @@ const MosaicEditorsDisplay = React.forwardRef<
             <CompactInstancePropertiesEditorContainer
               i18n={i18n}
               project={project}
-              layout={layout /* TODO: remove or make optional */}
+              layout={layout}
+              objectsContainer={objectsContainer}
+              globalObjectsContainer={globalObjectsContainer}
+              layersContainer={layersContainer}
               projectScopedContainersAccessor={projectScopedContainersAccessor}
               instances={selectedInstances}
               editInstanceVariables={props.editInstanceVariables}

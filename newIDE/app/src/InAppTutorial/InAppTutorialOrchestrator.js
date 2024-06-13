@@ -857,7 +857,11 @@ const InAppTutorialOrchestrator = React.forwardRef<
       () => {
         if (!currentStep) return;
         const { nextStepTrigger, elementToHighlightId } = currentStep;
-        if (nextStepTrigger && nextStepTrigger.valueEquals) {
+        if (
+          nextStepTrigger &&
+          nextStepTrigger.valueEquals !== undefined &&
+          nextStepTrigger.valueEquals !== null
+        ) {
           if (!elementToHighlightId) return;
           inputExpectedValueRef.current = nextStepTrigger.valueEquals;
           setElementWithValueToWatchIfEquals(elementToHighlightId);

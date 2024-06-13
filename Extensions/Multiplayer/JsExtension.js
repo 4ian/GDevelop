@@ -57,7 +57,7 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .addIncludeFile('Extensions/Multiplayer/multiplayervariables.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
       .setFunctionName('gdjs.multiplayer.openLobbiesWindow');
 
     extension
@@ -85,7 +85,7 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .addIncludeFile('Extensions/Multiplayer/multiplayervariables.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
       .setFunctionName('gdjs.multiplayer.showLobbiesCloseButton');
 
     extension
@@ -113,7 +113,7 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .addIncludeFile('Extensions/Multiplayer/multiplayervariables.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
       .setFunctionName('gdjs.multiplayer.endLobbyGame');
 
     extension
@@ -143,7 +143,7 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .addIncludeFile('Extensions/Multiplayer/multiplayervariables.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
       .setFunctionName('gdjs.multiplayerMessageManager.sendMessage');
 
     extension
@@ -169,7 +169,7 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .addIncludeFile('Extensions/Multiplayer/multiplayervariables.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
       .setFunctionName('gdjs.multiplayer.isLobbiesWindowOpen');
 
     extension
@@ -194,7 +194,7 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .addIncludeFile('Extensions/Multiplayer/multiplayervariables.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
       .setFunctionName('gdjs.multiplayer.hasLobbyGameJustStarted');
 
     extension
@@ -219,7 +219,7 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .addIncludeFile('Extensions/Multiplayer/multiplayervariables.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
       .setFunctionName('gdjs.multiplayer.isLobbyGameRunning');
 
     extension
@@ -244,7 +244,7 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .addIncludeFile('Extensions/Multiplayer/multiplayervariables.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
       .setFunctionName('gdjs.multiplayer.hasLobbyGameJustEnded');
 
     extension
@@ -272,7 +272,7 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .addIncludeFile('Extensions/Multiplayer/multiplayervariables.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
       .setFunctionName('gdjs.multiplayerMessageManager.hasMessageBeenReceived');
 
     extension
@@ -297,7 +297,7 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .addIncludeFile('Extensions/Multiplayer/multiplayervariables.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
       .setFunctionName('gdjs.multiplayer.isPlayerHost');
 
     extension
@@ -322,7 +322,7 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .addIncludeFile('Extensions/Multiplayer/multiplayervariables.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
       .setFunctionName('gdjs.multiplayerMessageManager.hasAnyPlayerLeft');
 
     extension
@@ -348,7 +348,7 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .addIncludeFile('Extensions/Multiplayer/multiplayervariables.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
       .setFunctionName('gdjs.multiplayerMessageManager.hasPlayerLeft');
 
     extension
@@ -374,7 +374,7 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .addIncludeFile('Extensions/Multiplayer/multiplayervariables.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
       .setFunctionName('gdjs.multiplayerMessageManager.getMessageData');
 
     extension
@@ -398,7 +398,7 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .addIncludeFile('Extensions/Multiplayer/multiplayervariables.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('gdjs.multiplayer.getPlayersInLobbyCount');
 
@@ -423,7 +423,7 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .addIncludeFile('Extensions/Multiplayer/multiplayervariables.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('gdjs.multiplayer.getCurrentPlayerNumber');
 
@@ -453,7 +453,7 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .addIncludeFile('Extensions/Multiplayer/multiplayervariables.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
       .setFunctionName('gdjs.multiplayer.getPlayerUsername');
 
     extension
@@ -482,7 +482,7 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .addIncludeFile('Extensions/Multiplayer/multiplayervariables.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
       .setFunctionName('gdjs.multiplayerMessageManager.getPlayerPing');
 
     extension
@@ -511,9 +511,11 @@ module.exports = {
       )
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .addIncludeFile('Extensions/Multiplayer/multiplayervariables.js')
-      .setFunctionName('gdjs.multiplayerVariables.setPlayerVariableOwnership')
-      .setGetter('gdjs.multiplayerVariables.getPlayerVariableOwnership');
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
+      .setFunctionName(
+        'gdjs.multiplayerVariablesManager.setPlayerVariableOwnership'
+      )
+      .setGetter('gdjs.multiplayerVariablesManager.getPlayerVariableOwnership');
 
     extension
       .addAction(
@@ -541,8 +543,10 @@ module.exports = {
       )
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .addIncludeFile('Extensions/Multiplayer/multiplayervariables.js')
-      .setFunctionName('gdjs.multiplayerVariables.takeVariableOwnership');
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
+      .setFunctionName(
+        'gdjs.multiplayerVariablesManager.takeVariableOwnership'
+      );
 
     extension
       .addAction(
@@ -570,8 +574,10 @@ module.exports = {
       )
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .addIncludeFile('Extensions/Multiplayer/multiplayervariables.js')
-      .setFunctionName('gdjs.multiplayerVariables.removeVariableOwnership');
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
+      .setFunctionName(
+        'gdjs.multiplayerVariablesManager.removeVariableOwnership'
+      );
 
     extension
       .addAction(
@@ -599,9 +605,9 @@ module.exports = {
       )
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .addIncludeFile('Extensions/Multiplayer/multiplayervariables.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
       .setFunctionName(
-        'gdjs.multiplayerVariables.disableVariableSynchronization'
+        'gdjs.multiplayerVariablesManager.disableVariableSynchronization'
       );
 
     // Multiplayer object behavior
@@ -705,7 +711,7 @@ module.exports = {
       )
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .addIncludeFile('Extensions/Multiplayer/multiplayervariables.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
       .addIncludeFile(
         'Extensions/Multiplayer/multiplayerobjectruntimebehavior.js'
       );

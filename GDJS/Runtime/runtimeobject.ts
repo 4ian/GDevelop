@@ -463,7 +463,9 @@ namespace gdjs {
         }
       }
 
-      const variablesNetworkSyncData = this._variables.getNetworkSyncData();
+      const variablesNetworkSyncData = this._variables.getNetworkSyncData({
+        // No need to send the player number, as the owner of the object syncs all its variables.
+      });
 
       const effectsNetworkSyncData = {};
       for (const effectName in this._rendererEffects) {

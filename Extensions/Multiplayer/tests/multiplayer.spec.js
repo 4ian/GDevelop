@@ -152,7 +152,7 @@ describe('Multiplayer', () => {
    * Create a mocked P2P handler.
    * It stores the events sent to/from peers.
    */
-  const createP2PAndMultiplayerMessageManagerMock = () => {
+  const createP2PAndMultiplayerManagersMock = () => {
     const p2pState = {
       currentPeerId: '',
       otherPeerIds: [],
@@ -163,6 +163,9 @@ describe('Multiplayer', () => {
 
     /** @type {Record<string, gdjs.MultiplayerMessageManager>} */
     const peerMultiplayerMessageManager = {};
+
+    /** @type {Record<string, gdjs.MultiplayerVariablesManager>} */
+    const peerMultiplayerVariablesManager = {};
 
     const getPeerEvents = (peerId) =>
       (peerEvents[peerId] = peerEvents[peerId] || new Map());
@@ -253,6 +256,12 @@ describe('Multiplayer', () => {
         gdjs.multiplayerMessageManager = peerMultiplayerMessageManager[peerId] =
           peerMultiplayerMessageManager[peerId] ||
           gdjs.makeMultiplayerMessageManager();
+        // Switch the state of the MultiplayerVariablesManager.
+        gdjs.multiplayerVariablesManager = peerMultiplayerVariablesManager[
+          peerId
+        ] =
+          peerMultiplayerVariablesManager[peerId] ||
+          gdjs.makeMultiplayerVariablesManager();
 
         // Ensure the messageManager is aware of the other players.
         gdjs.multiplayerMessageManager.updatePlayersPingsForTests({
@@ -329,7 +338,7 @@ describe('Multiplayer', () => {
       const {
         switchToPeer,
         markAllPeerEventsAsProcessed,
-      } = createP2PAndMultiplayerMessageManagerMock();
+      } = createP2PAndMultiplayerManagersMock();
 
       switchToPeer({
         peerId: 'player-1',
@@ -516,7 +525,7 @@ describe('Multiplayer', () => {
         switchToPeer,
         markAllPeerEventsAsProcessed,
         expectNoEventsToBeProcessed,
-      } = createP2PAndMultiplayerMessageManagerMock();
+      } = createP2PAndMultiplayerManagersMock();
 
       switchToPeer({
         peerId: 'player-1',
@@ -598,7 +607,7 @@ describe('Multiplayer', () => {
       const {
         switchToPeer,
         markAllPeerEventsAsProcessed,
-      } = createP2PAndMultiplayerMessageManagerMock();
+      } = createP2PAndMultiplayerManagersMock();
 
       // Create an instance on the host's game:
       switchToPeer({
@@ -726,7 +735,7 @@ describe('Multiplayer', () => {
       const {
         switchToPeer,
         markAllPeerEventsAsProcessed,
-      } = createP2PAndMultiplayerMessageManagerMock();
+      } = createP2PAndMultiplayerManagersMock();
 
       // Create an instance on a player:
       switchToPeer({
@@ -930,7 +939,7 @@ describe('Multiplayer', () => {
         switchToPeer,
         markAllPeerEventsAsProcessed,
         expectNoEventsToBeProcessed,
-      } = createP2PAndMultiplayerMessageManagerMock();
+      } = createP2PAndMultiplayerManagersMock();
 
       // Create an instance on the host's game:
       switchToPeer({
@@ -1205,7 +1214,7 @@ describe('Multiplayer', () => {
       const {
         switchToPeer,
         markAllPeerEventsAsProcessed,
-      } = createP2PAndMultiplayerMessageManagerMock();
+      } = createP2PAndMultiplayerManagersMock();
 
       // Create an instance on a player:
       switchToPeer({
@@ -1413,7 +1422,7 @@ describe('Multiplayer', () => {
     });
 
     it('deletes an instance owned by another player after a bit (if not "reconciled" in the meantime)', async () => {
-      const { switchToPeer } = createP2PAndMultiplayerMessageManagerMock();
+      const { switchToPeer } = createP2PAndMultiplayerManagersMock();
 
       // Create an instance on a player (2), owned by another player (3).
       // We can assume it's because there is some common logic running for all players
@@ -1466,7 +1475,7 @@ describe('Multiplayer', () => {
       const {
         switchToPeer,
         markAllPeerEventsAsProcessed,
-      } = createP2PAndMultiplayerMessageManagerMock();
+      } = createP2PAndMultiplayerManagersMock();
 
       // Create an instance on the host's game:
       switchToPeer({
@@ -1743,7 +1752,7 @@ describe('Multiplayer', () => {
     };
 
     it('synchronizes scenes from the host to other players', async () => {
-      const { switchToPeer } = createP2PAndMultiplayerMessageManagerMock();
+      const { switchToPeer } = createP2PAndMultiplayerManagersMock();
 
       const gameLayoutData = [
         getFakeSceneAndExtensionData({ name: 'Scene1' }).sceneData,
@@ -1871,7 +1880,7 @@ describe('Multiplayer', () => {
       const {
         switchToPeer,
         markAllPeerEventsAsProcessed,
-      } = createP2PAndMultiplayerMessageManagerMock();
+      } = createP2PAndMultiplayerManagersMock();
 
       const gameLayoutData = [
         getFakeSceneAndExtensionData({ name: 'Scene1' }).sceneData,

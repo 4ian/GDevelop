@@ -425,9 +425,10 @@ namespace gdjs {
       );
       instanceOwnershipChangeMessageNames.forEach((messageName) => {
         if (gdjs.evtTools.p2p.onEvent(messageName, false)) {
+          const messageData = gdjs.evtTools.p2p.getEventData(messageName);
           let data;
           try {
-            data = JSON.parse(gdjs.evtTools.p2p.getEventData(messageName));
+            data = JSON.parse(messageData);
           } catch (e) {
             logger.error(
               `Error while parsing message ${messageName}: ${e.toString()}`
@@ -584,9 +585,10 @@ namespace gdjs {
       );
       objectUpdateMessageNames.forEach((messageName) => {
         if (gdjs.evtTools.p2p.onEvent(messageName, true)) {
+          const messageData = gdjs.evtTools.p2p.getEventData(messageName);
           let data;
           try {
-            data = JSON.parse(gdjs.evtTools.p2p.getEventData(messageName));
+            data = JSON.parse(messageData);
           } catch (e) {
             logger.error(
               `Error while parsing message ${messageName}: ${e.toString()}`
@@ -752,9 +754,10 @@ namespace gdjs {
       );
       variableOwnershipChangeMessageNames.forEach((messageName) => {
         if (gdjs.evtTools.p2p.onEvent(messageName, false)) {
+          const messageData = gdjs.evtTools.p2p.getEventData(messageName);
           let data;
           try {
-            data = JSON.parse(gdjs.evtTools.p2p.getEventData(messageName));
+            data = JSON.parse(messageData);
           } catch (e) {
             logger.error(
               `Error while parsing message ${messageName}: ${e.toString()}`
@@ -777,7 +780,7 @@ namespace gdjs {
               type: variableType,
               name: variableName,
               containerId,
-            } = gdjs.multiplayerVariables.getVariableTypeAndNameFromNetworkId(
+            } = gdjs.multiplayerVariablesManager.getVariableTypeAndNameFromNetworkId(
               variableNetworkId
             );
 
@@ -1105,7 +1108,7 @@ namespace gdjs {
                       type: variableType,
                       name: variableName,
                       containerId,
-                    } = gdjs.multiplayerVariables.getVariableTypeAndNameFromNetworkId(
+                    } = gdjs.multiplayerVariablesManager.getVariableTypeAndNameFromNetworkId(
                       variableNetworkId
                     );
 
@@ -1171,7 +1174,7 @@ namespace gdjs {
     };
 
     const destroyInstanceMessageNamePrefix = '#destroyInstance';
-    const destroyInstanceMessageNameRegex = /#destroy#owner_(\d+)#object_(.+)#instance_(.+)#scene_(.+)/;
+    const destroyInstanceMessageNameRegex = /#destroyInstance#owner_(\d+)#object_(.+)#instance_(.+)#scene_(.+)/;
     const createDestroyInstanceMessage = ({
       objectOwner,
       objectName,
@@ -1213,8 +1216,9 @@ namespace gdjs {
       destroyInstanceMessageNames.forEach((messageName) => {
         if (gdjs.evtTools.p2p.onEvent(messageName, false)) {
           let data;
+          const messageData = gdjs.evtTools.p2p.getEventData(messageName);
           try {
-            data = JSON.parse(gdjs.evtTools.p2p.getEventData(messageName));
+            data = JSON.parse(messageData);
           } catch (e) {
             logger.error(
               `Error while parsing message ${messageName}: ${e.toString()}`
@@ -1223,7 +1227,9 @@ namespace gdjs {
           }
           const messageSender = gdjs.evtTools.p2p.getEventSender(messageName);
           if (data && messageSender) {
-            logger.info(`Received message ${messageName} with data ${data}.`);
+            logger.info(
+              `Received message ${messageName} with data ${messageData}.`
+            );
             const matches = destroyInstanceMessageNameRegex.exec(messageName);
             if (!matches) {
               return;
@@ -1420,9 +1426,10 @@ namespace gdjs {
       customMessageNames.forEach((messageName) => {
         if (gdjs.evtTools.p2p.onEvent(messageName, false)) {
           const event = gdjs.evtTools.p2p.getEvent(messageName);
+          const messageData = event.getData();
           let data;
           try {
-            data = JSON.parse(event.getData());
+            data = JSON.parse(messageData);
           } catch (e) {
             logger.error(
               `Error while parsing message ${messageName}: ${e.toString()}`
@@ -1431,7 +1438,9 @@ namespace gdjs {
           }
           const uniqueMessageId = data.uniqueId;
           const messageSender = event.getSender();
-          logger.info(`Received message ${messageName} with data ${data}.`);
+          logger.info(
+            `Received custom message ${messageName} with data ${messageData}.`
+          );
           const matches = customMessageRegex.exec(messageName);
           if (!matches) {
             // This should not happen.
@@ -1448,10 +1457,6 @@ namespace gdjs {
             );
             return;
           }
-
-          logger.info(
-            `Received custom message ${messageName} with data ${data}.`
-          );
 
           const acknowledgmentMessageName = createAcknowledgeCustomMessageNameFromCustomMessage(
             messageName
@@ -1575,9 +1580,10 @@ namespace gdjs {
       );
       updateSceneMessageNames.forEach((messageName) => {
         if (gdjs.evtTools.p2p.onEvent(messageName, true)) {
+          const messageData = gdjs.evtTools.p2p.getEventData(messageName);
           let data;
           try {
-            data = JSON.parse(gdjs.evtTools.p2p.getEventData(messageName));
+            data = JSON.parse(messageData);
           } catch (e) {
             logger.error(
               `Error while parsing message ${messageName}: ${e.toString()}`
@@ -1732,9 +1738,10 @@ namespace gdjs {
       );
       updateGameMessageNames.forEach((messageName) => {
         if (gdjs.evtTools.p2p.onEvent(messageName, true)) {
+          const messageData = gdjs.evtTools.p2p.getEventData(messageName);
           let data;
           try {
-            data = JSON.parse(gdjs.evtTools.p2p.getEventData(messageName));
+            data = JSON.parse(messageData);
           } catch (e) {
             logger.error(
               `Error while parsing message ${messageName}: ${e.toString()}`
@@ -1810,9 +1817,10 @@ namespace gdjs {
       );
       heartbeatMessageNames.forEach((messageName) => {
         if (gdjs.evtTools.p2p.onEvent(messageName, false)) {
+          const messageData = gdjs.evtTools.p2p.getEventData(messageName);
           let data;
           try {
-            data = JSON.parse(gdjs.evtTools.p2p.getEventData(messageName));
+            data = JSON.parse(messageData);
           } catch (e) {
             logger.error(
               `Error while parsing message ${messageName}: ${e.toString()}`

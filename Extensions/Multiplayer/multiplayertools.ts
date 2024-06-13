@@ -78,7 +78,7 @@ namespace gdjs {
         gdjs.multiplayerMessageManager.handleDestroyInstanceMessagesReceived(
           runtimeScene
         );
-        gdjs.multiplayerVariables.handleChangeVariableOwnerMessagesToSend();
+        gdjs.multiplayerVariablesManager.handleChangeVariableOwnerMessagesToSend();
         gdjs.multiplayerMessageManager.handleUpdateGameMessagesToSend(
           runtimeScene
         );

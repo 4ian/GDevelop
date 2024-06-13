@@ -1,6 +1,11 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Multiplayer');
-  export namespace multiplayerVariables {
+
+  export type MultiplayerVariablesManager = ReturnType<
+    typeof makeMultiplayerVariablesManager
+  >;
+
+  export const makeMultiplayerVariablesManager = () => {
     const _variableOwnershipChangesToSyncAtEndOfFrame: {
       [variableNetworkId: string]: {
         variableName: string;
@@ -34,7 +39,7 @@ namespace gdjs {
       };
     };
 
-    export const getVariableTypeAndNameFromNetworkId = function (
+    const getVariableTypeAndNameFromNetworkId = function (
       variableNetworkId: string
     ): { type: string; name: string; containerId: string } {
       const parts = variableNetworkId.split('_');
@@ -109,14 +114,14 @@ namespace gdjs {
       return;
     };
 
-    export const getPlayerVariableOwnership = function (
+    const getPlayerVariableOwnership = function (
       runtimeScene: gdjs.RuntimeScene,
       variable: gdjs.Variable
     ) {
       return variable.getPlayerOwnership();
     };
 
-    export const setPlayerVariableOwnership = function (
+    const setPlayerVariableOwnership = function (
       runtimeScene: gdjs.RuntimeScene,
       variable: gdjs.Variable,
       newVariablePlayerNumber: number
@@ -179,7 +184,7 @@ namespace gdjs {
       });
     };
 
-    export const takeVariableOwnership = function (
+    const takeVariableOwnership = function (
       runtimeScene: gdjs.RuntimeScene,
       variable: gdjs.Variable
     ) {
@@ -187,21 +192,21 @@ namespace gdjs {
       setPlayerVariableOwnership(runtimeScene, variable, currentPlayerNumber);
     };
 
-    export const removeVariableOwnership = function (
+    const removeVariableOwnership = function (
       runtimeScene: gdjs.RuntimeScene,
       variable: gdjs.Variable
     ) {
       setPlayerVariableOwnership(runtimeScene, variable, 0);
     };
 
-    export const disableVariableSynchronization = function (
+    const disableVariableSynchronization = function (
       runtimeScene: gdjs.RuntimeScene,
       variable: gdjs.Variable
     ) {
       variable.disableSynchronization();
     };
 
-    export const handleChangeVariableOwnerMessagesToSend = function () {
+    const handleChangeVariableOwnerMessagesToSend = function () {
       if (!gdjs.multiplayer.isLobbyGameRunning()) {
         return;
       }
@@ -250,5 +255,20 @@ namespace gdjs {
         delete _variableOwnershipChangesToSyncAtEndOfFrame[variableNetworkId];
       }
     };
-  }
+
+    return {
+      getVariableTypeAndNameFromNetworkId,
+      getPlayerVariableOwnership,
+      setPlayerVariableOwnership,
+      takeVariableOwnership,
+      removeVariableOwnership,
+      disableVariableSynchronization,
+      handleChangeVariableOwnerMessagesToSend,
+    };
+  };
+
+  /**
+   * The MultiplayerVariablesManager used by the game.
+   */
+  export let multiplayerVariablesManager = makeMultiplayerVariablesManager();
 }

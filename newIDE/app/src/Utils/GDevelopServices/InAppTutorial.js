@@ -67,7 +67,7 @@ export type InAppTutorialFlowStepTrigger =
   | InAppTutorialFlowStepDOMChangeTrigger
   | {| editorIsActive: string |}
   | {| valueHasChanged: true |}
-  | {| valueEquals: string |}
+  | {| valueEquals: string | boolean |}
   | {| instanceAddedOnScene: string, instancesCount?: number |}
   | {| objectAddedInLayout: true |}
   | {| previewLaunched: true |}
@@ -77,7 +77,7 @@ export type InAppTutorialFlowStepFormattedTrigger =
   | InAppTutorialFlowStepDOMChangeTrigger
   | {| editorIsActive: string |}
   | {| valueHasChanged: true |}
-  | {| valueEquals: string |}
+  | {| valueEquals: string | boolean |}
   | {| instanceAddedOnScene: string, instancesCount?: number |}
   | {| objectAddedInLayout: true |}
   | {| previewLaunched: true |}

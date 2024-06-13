@@ -52,7 +52,7 @@ void AddAnotherEventsBasedExtensionWithDependency(gd::Project &project) {
   eventsBasedObject.SetFullName("My events based object");
   eventsBasedObject.SetDescription("An events based object for test");
 
-  gd::Object &object = eventsBasedObject.GetObjectsContainer().InsertNewObject(
+  gd::Object &object = eventsBasedObject.GetObjects().InsertNewObject(
       project, "MyExtension::Sprite", "MyObject", 0);
   gd::Behavior *behavior =
       object.AddNewBehavior(project, "MyEventsExtension::MyEventsBasedBehavior",
@@ -65,7 +65,7 @@ void SetupProject(gd::Project &project, gd::Platform &platform) {
   AddEventsBasedExtension(project);
 
   gd::Layout &layout = project.InsertNewLayout("Scene", 0);
-  gd::Object &object = layout.GetObjectsContainer().InsertNewObject(
+  gd::Object &object = layout.GetObjects().InsertNewObject(
       project, "MyExtension::Sprite", "MyObject", 0);
   gd::Behavior *behavior =
       object.AddNewBehavior(project, "MyEventsExtension::MyEventsBasedBehavior",
@@ -128,7 +128,7 @@ TEST_CASE("BehaviorSerialization", "[common]") {
     gd::Project writtenProject;
     SetupProject(writtenProject, platform);
     CheckBehaviorProperty(
-        writtenProject.GetLayout("Scene").GetObjectsContainer());
+        writtenProject.GetLayout("Scene").GetObjects());
 
     SerializerElement projectElement;
     writtenProject.SerializeTo(projectElement);
@@ -137,7 +137,7 @@ TEST_CASE("BehaviorSerialization", "[common]") {
     gd::Project readProject;
     readProject.AddPlatform(platform);
     readProject.UnserializeFrom(projectElement);
-    CheckBehaviorProperty(readProject.GetLayout("Scene").GetObjectsContainer());
+    CheckBehaviorProperty(readProject.GetLayout("Scene").GetObjects());
   }
 
   SECTION("Load a project with a property value on a custom behavior that no longer exists") {
@@ -159,7 +159,7 @@ TEST_CASE("BehaviorSerialization", "[common]") {
     // Add the events-based behavior back
     AddEventsBasedExtension(readProject);
 
-    CheckBehaviorProperty(readProject.GetLayout("Scene").GetObjectsContainer());
+    CheckBehaviorProperty(readProject.GetLayout("Scene").GetObjects());
   }
 
   SECTION("Save and load a project with an event based extension dependency") {
@@ -207,6 +207,6 @@ TEST_CASE("BehaviorSerialization", "[common]") {
     CheckBehaviorProperty(
         readProject
             .GetEventsBasedObject("MyOtherEventsExtension::MyEventsBasedObject")
-            .GetObjectsContainer());
+            .GetObjects());
   }
 }

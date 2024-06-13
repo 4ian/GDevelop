@@ -58,16 +58,16 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       }
 
       const object = getObjectByName(
-        project.getObjectsContainer(),
-        scope.layout ? scope.layout.getObjectsContainer() : null,
+        project.getObjects(),
+        scope.layout ? scope.layout.getObjects() : null,
         objectOrGroupName
       );
       if (object) {
         return enumerateEffectNames(object.getEffects()).sort();
       }
       const group = getObjectGroupByName(
-        project.getObjectsContainer(),
-        scope.layout ? scope.layout.getObjectsContainer() : null,
+        project.getObjects(),
+        scope.layout ? scope.layout.getObjects() : null,
         objectOrGroupName
       );
       if (group) {
@@ -75,8 +75,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           group.getAllObjectsNames(),
           objectName => {
             const object = getObjectByName(
-              project.getObjectsContainer(),
-              scope.layout ? scope.layout.getObjectsContainer() : null,
+              project.getObjects(),
+              scope.layout ? scope.layout.getObjects() : null,
               objectName
             );
             if (!object) {

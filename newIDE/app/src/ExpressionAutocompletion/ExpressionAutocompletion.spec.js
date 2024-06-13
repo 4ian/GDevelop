@@ -21,7 +21,7 @@ const makeTestContext = () => {
   testLayout.insertNewLayer('Foreground', 0);
 
   const object = testLayout
-    .getObjectsContainer()
+    .getObjects()
     .insertNewObject(project, 'Sprite', 'MySpriteObject', 0);
   const spriteConfiguration = gd.asSpriteConfiguration(
     object.getConfiguration()
@@ -38,7 +38,7 @@ const makeTestContext = () => {
   spriteConfiguration.getAnimations().addAnimation(animation);
 
   const spriteObjectWithBehaviors = testLayout
-    .getObjectsContainer()
+    .getObjects()
     .insertNewObject(project, 'Sprite', 'MySpriteObjectWithBehaviors', 0);
   spriteObjectWithBehaviors.addNewBehavior(
     project,

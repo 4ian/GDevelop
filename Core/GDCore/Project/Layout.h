@@ -111,14 +111,14 @@ class GD_CORE_API Layout {
   /**
    * \brief return the objects of the scene.
    */
-  gd::ObjectsContainer& GetObjectsContainer() {
+  gd::ObjectsContainer& GetObjects() {
     return objectsContainer;
   }
 
   /**
    * \brief Return the objects of the scene.
    */
-  const gd::ObjectsContainer& GetObjectsContainer() const {
+  const gd::ObjectsContainer& GetObjects() const {
     return objectsContainer;
   }
   ///@}

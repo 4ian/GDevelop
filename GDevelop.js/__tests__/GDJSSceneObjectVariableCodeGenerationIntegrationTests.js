@@ -17,7 +17,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     project = new gd.ProjectHelper.createNewGDJSProject();
     scene = project.insertNewLayout('Scene', 0);
     object = scene
-      .getObjectsContainer()
+      .getObjects()
       .insertNewObject(project, 'Sprite', 'MyObject', 0);
     const instance = scene.getInitialInstances().insertNewInitialInstance();
     instance.setObjectName('MyObject');

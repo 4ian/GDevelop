@@ -15,7 +15,7 @@ describe('libGD.js - GDJS project serialization tests', function () {
   it('should keep TextObject configuration after after a save and reload', function () {
     const checkConfiguration = (project) => {
       const layout = project.getLayout('Scene');
-      const object = layout.getObjectsContainer().getObject('MyObject');
+      const object = layout.getObjects().getObject('MyObject');
       const configuration = gd.asTextObjectConfiguration(
         object.getConfiguration()
       );
@@ -27,7 +27,7 @@ describe('libGD.js - GDJS project serialization tests', function () {
       const project = gd.ProjectHelper.createNewGDJSProject();
       const layout = project.insertNewLayout('Scene', 0);
       const object = layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(project, 'TextObject::Text', 'MyObject', 0);
       const configuration = gd.asTextObjectConfiguration(
         object.getConfiguration()
@@ -48,7 +48,7 @@ describe('libGD.js - GDJS project serialization tests', function () {
   it('should keep TiledSpriteObject configuration after a save and reload', function () {
     const checkConfiguration = (project) => {
       const layout = project.getLayout('Scene');
-      const object = layout.getObjectsContainer().getObject('MyObject');
+      const object = layout.getObjects().getObject('MyObject');
       const configuration = gd.asTiledSpriteConfiguration(
         object.getConfiguration()
       );
@@ -60,7 +60,7 @@ describe('libGD.js - GDJS project serialization tests', function () {
       const project = gd.ProjectHelper.createNewGDJSProject();
       const layout = project.insertNewLayout('Scene', 0);
       const object = layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(
           project,
           'TiledSpriteObject::TiledSprite',
@@ -86,7 +86,7 @@ describe('libGD.js - GDJS project serialization tests', function () {
   it('should keep PanelSpriteObject configuration after a save and reload', function () {
     const checkConfiguration = (project) => {
       const layout = project.getLayout('Scene');
-      const object = layout.getObjectsContainer().getObject('MyObject');
+      const object = layout.getObjects().getObject('MyObject');
       const configuration = gd.asPanelSpriteConfiguration(
         object.getConfiguration()
       );
@@ -98,7 +98,7 @@ describe('libGD.js - GDJS project serialization tests', function () {
       const project = gd.ProjectHelper.createNewGDJSProject();
       const layout = project.insertNewLayout('Scene', 0);
       const object = layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(
           project,
           'PanelSpriteObject::PanelSprite',
@@ -124,7 +124,7 @@ describe('libGD.js - GDJS project serialization tests', function () {
   it('should keep ShapePainterObject configuration after a save and reload', function () {
     const checkConfiguration = (project) => {
       const layout = project.getLayout('Scene');
-      const object = layout.getObjectsContainer().getObject('MyObject');
+      const object = layout.getObjects().getObject('MyObject');
       const configuration = gd.asShapePainterConfiguration(
         object.getConfiguration()
       );
@@ -136,7 +136,7 @@ describe('libGD.js - GDJS project serialization tests', function () {
       const project = gd.ProjectHelper.createNewGDJSProject();
       const layout = project.insertNewLayout('Scene', 0);
       const object = layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(project, 'PrimitiveDrawing::Drawer', 'MyObject', 0);
       const configuration = gd.asShapePainterConfiguration(
         object.getConfiguration()
@@ -158,7 +158,7 @@ describe('libGD.js - GDJS project serialization tests', function () {
   it('should keep ParticleEmitterObject configuration after a save and reload', function () {
     const checkConfiguration = (project) => {
       const layout = project.getLayout('Scene');
-      const object = layout.getObjectsContainer().getObject('MyObject');
+      const object = layout.getObjects().getObject('MyObject');
       const configuration = gd.asParticleEmitterConfiguration(
         object.getConfiguration()
       );
@@ -170,7 +170,7 @@ describe('libGD.js - GDJS project serialization tests', function () {
       const project = gd.ProjectHelper.createNewGDJSProject();
       const layout = project.insertNewLayout('Scene', 0);
       const object = layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(
           project,
           'ParticleSystem::ParticleEmitter',
@@ -197,7 +197,7 @@ describe('libGD.js - GDJS project serialization tests', function () {
     const project = gd.ProjectHelper.createNewGDJSProject();
     const layout = project.insertNewLayout('Scene', 0);
     const object = layout
-      .getObjectsContainer()
+      .getObjects()
       .insertNewObject(project, 'Sprite', 'MyObject', 0);
     const behavior = object.addNewBehavior(
       project,
@@ -213,7 +213,7 @@ describe('libGD.js - GDJS project serialization tests', function () {
   it('should keep behavior properties values after a save and reload', function () {
     const checkConfiguration = (project) => {
       const layout = project.getLayout('Scene');
-      const object = layout.getObjectsContainer().getObject('MyObject');
+      const object = layout.getObjects().getObject('MyObject');
       const behavior = object.getBehavior('DummyBehaviorWithSharedData');
       expect(
         behavior.getProperties().get('MyBehaviorProperty').getValue()
@@ -225,7 +225,7 @@ describe('libGD.js - GDJS project serialization tests', function () {
       const project = gd.ProjectHelper.createNewGDJSProject();
       const layout = project.insertNewLayout('Scene', 0);
       const object = layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(project, 'Sprite', 'MyObject', 0);
       const behavior = object.addNewBehavior(
         project,
@@ -249,7 +249,7 @@ describe('libGD.js - GDJS project serialization tests', function () {
     const project = gd.ProjectHelper.createNewGDJSProject();
     const layout = project.insertNewLayout('Scene', 0);
     const object = layout
-      .getObjectsContainer()
+      .getObjects()
       .insertNewObject(project, 'Sprite', 'MyObject', 0);
     const behavior = object.addNewBehavior(
       project,
@@ -269,7 +269,7 @@ describe('libGD.js - GDJS project serialization tests', function () {
   it('should keep behavior shared properties values after a save and reload', function () {
     const checkConfiguration = (project) => {
       const layout = project.getLayout('Scene');
-      const object = layout.getObjectsContainer().getObject('MyObject');
+      const object = layout.getObjects().getObject('MyObject');
       const sharedData = layout.getBehaviorSharedData(
         'DummyBehaviorWithSharedData'
       );
@@ -283,7 +283,7 @@ describe('libGD.js - GDJS project serialization tests', function () {
       const project = gd.ProjectHelper.createNewGDJSProject();
       const layout = project.insertNewLayout('Scene', 0);
       const object = layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(project, 'Sprite', 'MyObject', 0);
       const behavior = object.addNewBehavior(
         project,

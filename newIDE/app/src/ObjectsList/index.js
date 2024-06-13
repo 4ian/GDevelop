@@ -312,7 +312,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           defaultName,
           name =>
             objectsContainer.hasObjectNamed(name) ||
-            project.getObjectsContainer().hasObjectNamed(name)
+            project.getObjects().hasObjectNamed(name)
         );
 
         let object;
@@ -512,9 +512,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         // the object).
         onDeleteObjects(objectsWithContext, doRemove => {
           if (!doRemove) return;
-          const container = global
-            ? project.getObjectsContainer()
-            : objectsContainer;
+          const container = global ? project.getObjects() : objectsContainer;
           objectsToDelete.forEach(object => {
             container.removeObject(object.getName());
           });
@@ -606,7 +604,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           objectName,
           name =>
             objectsContainer.hasObjectNamed(name) ||
-            project.getObjectsContainer().hasObjectNamed(name),
+            project.getObjects().hasObjectNamed(name),
           ''
         );
 
@@ -627,7 +625,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
         const newObject = global
           ? project
-              .getObjectsContainer()
+              .getObjects()
               .insertNewObjectInFolder(
                 project,
                 objectType,
@@ -830,7 +828,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       return topToBottomAscendanceWithContext[firstClosedFolderIndex];
     };
 
-    const projectRootFolder = project.getObjectsContainer().getRootFolder();
+    const projectRootFolder = project.getObjects().getRootFolder();
     const containerRootFolder = objectsContainer.getRootFolder();
     const getTreeViewData = React.useCallback(
       (i18n: I18nType): Array<TreeViewItem> => {
@@ -950,14 +948,14 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         const destinationFolder =
           folder && folder.isFolder()
             ? folder
-            : project.getObjectsContainer().getRootFolder();
+            : project.getObjects().getRootFolder();
         if (objectFolderOrObject.isFolder()) return;
         const object = objectFolderOrObject.getObject();
 
         const objectName: string = object.getName();
         if (!objectsContainer.hasObjectNamed(objectName)) return;
 
-        if (project.getObjectsContainer().hasObjectNamed(objectName)) {
+        if (project.getObjects().hasObjectNamed(objectName)) {
           showWarningBox(
             i18n._(
               t`A global object with this name already exists. Please change the object name before setting it as a global object`
@@ -985,11 +983,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         // like InstancesRenderer can continue to work.
         objectsContainer.moveObjectFolderOrObjectToAnotherContainerInFolder(
           objectFolderOrObject,
-          project.getObjectsContainer(),
+          project.getObjects(),
           destinationFolder,
           typeof index === 'number'
             ? index
-            : project.getObjectsContainer().getObjectsCount()
+            : project.getObjects().getObjectsCount()
         );
         onObjectModified(true);
 
@@ -1313,9 +1311,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
         const { objectFolderOrObject, global } = item;
 
-        const container = global
-          ? project.getObjectsContainer()
-          : objectsContainer;
+        const container = global ? project.getObjects() : objectsContainer;
         const folderAndPathsInContainer = enumerateFoldersInContainer(
           container
         );

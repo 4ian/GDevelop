@@ -111,7 +111,7 @@ export const LayoutPublicAssetInstallSuccess = () => (
       onClose={action('onClose')}
       onAssetsAdded={action('onAssetsAdded')}
       project={testProject.project}
-      objectsContainer={testProject.testLayout.getObjectsContainer()}
+      objectsContainer={testProject.testLayout.getObjects()}
       onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
       resourceManagementProps={fakeResourceManagementProps}
       canInstallPrivateAsset={() => true}
@@ -131,7 +131,7 @@ export const LayoutPublicAssetInstallFailure = () => (
       onClose={action('onClose')}
       onAssetsAdded={action('onAssetsAdded')}
       project={testProject.project}
-      objectsContainer={testProject.testLayout.getObjectsContainer()}
+      objectsContainer={testProject.testLayout.getObjects()}
       onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
       resourceManagementProps={fakeResourceManagementProps}
       canInstallPrivateAsset={() => true}
@@ -151,7 +151,7 @@ export const LayoutPublicAssetAllAlreadyInstalled = () => (
       onClose={action('onClose')}
       onAssetsAdded={action('onAssetsAdded')}
       project={testProject.project}
-      objectsContainer={testProject.testLayout.getObjectsContainer()}
+      objectsContainer={testProject.testLayout.getObjects()}
       onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
       resourceManagementProps={fakeResourceManagementProps}
       canInstallPrivateAsset={() => true}
@@ -168,7 +168,7 @@ export const LayoutPublicAssetSomeAlreadyInstalled = () => (
       onClose={action('onClose')}
       onAssetsAdded={action('onAssetsAdded')}
       project={testProject.project}
-      objectsContainer={testProject.testLayout.getObjectsContainer()}
+      objectsContainer={testProject.testLayout.getObjects()}
       onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
       resourceManagementProps={fakeResourceManagementProps}
       canInstallPrivateAsset={() => true}
@@ -204,7 +204,7 @@ export const LayoutPrivateAssetInstallSuccess = () => {
           onClose={action('onClose')}
           onAssetsAdded={action('onAssetsAdded')}
           project={testProject.project}
-          objectsContainer={testProject.testLayout.getObjectsContainer()}
+          objectsContainer={testProject.testLayout.getObjects()}
           onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
           resourceManagementProps={fakeResourceManagementProps}
           canInstallPrivateAsset={() => true}
@@ -239,7 +239,7 @@ export const LayoutPrivateAssetInstallFailure = () => {
           onClose={action('onClose')}
           onAssetsAdded={action('onAssetsAdded')}
           project={testProject.project}
-          objectsContainer={testProject.testLayout.getObjectsContainer()}
+          objectsContainer={testProject.testLayout.getObjects()}
           onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
           resourceManagementProps={fakeResourceManagementProps}
           canInstallPrivateAsset={() => true}
@@ -258,7 +258,7 @@ export const LayoutPrivateAssetButCantInstall = () => (
       onClose={action('onClose')}
       onAssetsAdded={action('onAssetsAdded')}
       project={testProject.project}
-      objectsContainer={testProject.testLayout.getObjectsContainer()}
+      objectsContainer={testProject.testLayout.getObjects()}
       onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
       resourceManagementProps={fakeResourceManagementProps}
       canInstallPrivateAsset={() => false}
@@ -278,7 +278,7 @@ export const LayoutPrivateAssetButInstallingTooMany = () => (
       onClose={action('onClose')}
       onAssetsAdded={action('onAssetsAdded')}
       project={testProject.project}
-      objectsContainer={testProject.testLayout.getObjectsContainer()}
+      objectsContainer={testProject.testLayout.getObjects()}
       onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
       resourceManagementProps={fakeResourceManagementProps}
       canInstallPrivateAsset={() => true}

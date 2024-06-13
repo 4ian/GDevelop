@@ -237,13 +237,13 @@ describe('libGD.js - GDJS related tests', function () {
         .getEvents()
         .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
       layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(project, 'Sprite', 'MyObject', 0);
       layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(project, 'TextObject::Text', 'MyTextObject', 0);
       layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(
           project,
           'FakeObjectWithUnsupportedCapability::FakeObjectWithUnsupportedCapability',
@@ -334,10 +334,10 @@ describe('libGD.js - GDJS related tests', function () {
         .getEvents()
         .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
       layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(project, 'Sprite', 'MySprite', 0);
       const obj = layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(
           project,
           'FakeObjectWithUnsupportedCapability::FakeObjectWithUnsupportedCapability',
@@ -346,7 +346,7 @@ describe('libGD.js - GDJS related tests', function () {
         );
 
       const group = layout
-        .getObjectsContainer()
+        .getObjects()
         .getObjectGroups()
         .insertNew('MyGroup', 0);
       group.addObject('MySprite');

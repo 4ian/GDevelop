@@ -46,7 +46,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
     variable.PushNew().SetString("3");
   }
 
-  auto &mySpriteObject = layout1.GetObjectsContainer().InsertNewObject(
+  auto &mySpriteObject = layout1.GetObjects().InsertNewObject(
       project, "MyExtension::Sprite", "MySpriteObject", 0);
   mySpriteObject.GetVariables().InsertNew("MyNumberVariable").SetValue(123);
   mySpriteObject.GetVariables().InsertNew("MyStringVariable").SetString("Test");
@@ -54,14 +54,14 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       .InsertNew("MyStructureVariable")
       .GetChild("MyStringChild")
       .SetString("Test");
-  layout1.GetObjectsContainer().InsertNewObject(project, "MyExtension::Sprite",
+  layout1.GetObjects().InsertNewObject(project, "MyExtension::Sprite",
                                                 "MyOtherSpriteObject", 1);
-  layout1.GetObjectsContainer().InsertNewObject(
+  layout1.GetObjects().InsertNewObject(
       project, "MyExtension::FakeObjectWithDefaultBehavior",
       "FakeObjectWithDefaultBehavior", 2);
 
   // Also insert a variable having the same name as an object:
-  layout1.GetObjectsContainer().InsertNewObject(project, "MyExtension::Sprite",
+  layout1.GetObjects().InsertNewObject(project, "MyExtension::Sprite",
                                                 "ObjectWithNameReused", 3);
   layout1.GetVariables()
       .InsertNew("ObjectWithNameReused", 3)
@@ -72,12 +72,12 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
   project.GetVariables().InsertNew("SceneVariableWithNameReused", 0);
 
   auto &group =
-      layout1.GetObjectsContainer().GetObjectGroups().InsertNew("AllObjects");
+      layout1.GetObjects().GetObjectGroups().InsertNew("AllObjects");
   group.AddObject("MySpriteObject");
   group.AddObject("MyOtherSpriteObject");
   group.AddObject("FakeObjectWithDefaultBehavior");
 
-  auto &spriteGroup = layout1.GetObjectsContainer().GetObjectGroups().InsertNew(
+  auto &spriteGroup = layout1.GetObjects().GetObjectGroups().InsertNew(
       "MySpriteObjects");
   spriteGroup.AddObject("MySpriteObject");
   spriteGroup.AddObject("MyOtherSpriteObject");

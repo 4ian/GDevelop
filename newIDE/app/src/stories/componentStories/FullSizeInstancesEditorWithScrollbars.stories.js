@@ -39,8 +39,8 @@ export const Default = () => (
         project={testProject.project}
         layout={testProject.testLayout}
         layersContainer={testProject.testLayout.getLayers()}
-        globalObjectsContainer={testProject.project.getObjectsContainer()}
-        objectsContainer={testProject.testLayout.getObjectsContainer()}
+        globalObjectsContainer={testProject.project.getObjects()}
+        objectsContainer={testProject.testLayout.getObjects()}
         selectedLayer={''}
         initialInstances={testProject.testLayout.getInitialInstances()}
         instancesEditorSettings={instancesEditorSettings}

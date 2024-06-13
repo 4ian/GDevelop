@@ -71,8 +71,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
       let effectType: string | null = null;
       const object = getObjectByName(
-        project.getObjectsContainer(),
-        scope.layout ? scope.layout.getObjectsContainer() : null,
+        project.getObjects(),
+        scope.layout ? scope.layout.getObjects() : null,
         objectOrGroupName
       );
       if (object && object.getEffects().hasEffectNamed(effectName)) {
@@ -84,8 +84,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
       if (!effectType) {
         const group = getObjectGroupByName(
-          project.getObjectsContainer(),
-          scope.layout ? scope.layout.getObjectsContainer() : null,
+          project.getObjects(),
+          scope.layout ? scope.layout.getObjects() : null,
           objectOrGroupName
         );
         if (group) {
@@ -95,8 +95,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             group.getAllObjectsNames(),
             objectName => {
               const object = getObjectByName(
-                project.getObjectsContainer(),
-                scope.layout ? scope.layout.getObjectsContainer() : null,
+                project.getObjects(),
+                scope.layout ? scope.layout.getObjects() : null,
                 objectName
               );
               if (!object) {

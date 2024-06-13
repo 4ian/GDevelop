@@ -20,7 +20,7 @@ export const enumerateAssetStoreIds = (
 ): Set<string> => {
   // Add asset store ids of global objects.
   let allAssetStoreIds = enumerateObjectsContainerAssetStoreIds(
-    project.getObjectsContainer()
+    project.getObjects()
   );
 
   if (objectsContainer) {
@@ -39,7 +39,7 @@ export const enumerateAssetStoreIds = (
 
       allAssetStoreIds = new Set([
         ...allAssetStoreIds,
-        ...enumerateObjectsContainerAssetStoreIds(scene.getObjectsContainer()),
+        ...enumerateObjectsContainerAssetStoreIds(scene.getObjects()),
       ]);
     });
   }

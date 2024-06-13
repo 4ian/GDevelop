@@ -157,16 +157,16 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     .setLabel('Down padding')
     .setGroup('Padding');
   buttonEventBasedObject
-    .getObjectsContainer()
+    .getObjects()
     .insertNewObject(project, 'TextObject::Text', 'Label', 0);
   buttonEventBasedObject
-    .getObjectsContainer()
+    .getObjects()
     .insertNewObject(project, 'PanelSpriteObject::PanelSprite', 'Idle', 1);
   buttonEventBasedObject
-    .getObjectsContainer()
+    .getObjects()
     .insertNewObject(project, 'PanelSpriteObject::PanelSprite', 'Hovered', 2);
   buttonEventBasedObject
-    .getObjectsContainer()
+    .getObjects()
     .insertNewObject(project, 'PanelSpriteObject::PanelSprite', 'Pressed', 3);
   // Add a function
   const testObjectEventsFunction = buttonEventBasedObject
@@ -179,10 +179,10 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   // Create and expose some objects
   const testLayout = project.insertNewLayout('TestLayout', 0);
   const customObject = testLayout
-    .getObjectsContainer()
+    .getObjects()
     .insertNewObject(project, 'Button::PanelSpriteButton', 'MyButton', 0);
   const shapePainterObject = testLayout
-    .getObjectsContainer()
+    .getObjects()
     .insertNewObject(
       project,
       'PrimitiveDrawing::Drawer',
@@ -190,10 +190,10 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
       0
     );
   const textObject = testLayout
-    .getObjectsContainer()
+    .getObjects()
     .insertNewObject(project, 'TextObject::Text', 'MyTextObject', 0);
   const particleEmitter = testLayout
-    .getObjectsContainer()
+    .getObjects()
     .insertNewObject(
       project,
       'ParticleSystem::ParticleEmitter',
@@ -201,7 +201,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
       0
     );
   const tiledSpriteObject = testLayout
-    .getObjectsContainer()
+    .getObjects()
     .insertNewObject(
       project,
       'TiledSpriteObject::TiledSprite',
@@ -209,13 +209,13 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
       0
     );
   const cube3dObject = testLayout
-    .getObjectsContainer()
+    .getObjects()
     .insertNewObject(project, 'FakeScene3D::Cube3DObject', 'CubeObject', 0);
   const textInputObject = testLayout
-    .getObjectsContainer()
+    .getObjects()
     .insertNewObject(project, 'FakeTextInput::TextInput', 'TextInputObject', 0);
   const panelSpriteObject = testLayout
-    .getObjectsContainer()
+    .getObjects()
     .insertNewObject(
       project,
       'PanelSpriteObject::PanelSprite',
@@ -223,25 +223,25 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
       0
     );
   const spriteObject = testLayout
-    .getObjectsContainer()
+    .getObjects()
     .insertNewObject(project, 'Sprite', 'MySpriteObject', 0);
   const emptySpriteObject = testLayout
-    .getObjectsContainer()
+    .getObjects()
     .insertNewObject(project, 'Sprite', 'MyEmptySpriteObject', 0);
   const spriteObjectWithBehaviors = testLayout
-    .getObjectsContainer()
+    .getObjects()
     .insertNewObject(project, 'Sprite', 'MySpriteObjectWithBehaviors', 0);
   const spriteObjectWithoutBehaviors = testLayout
-    .getObjectsContainer()
+    .getObjects()
     .insertNewObject(project, 'Sprite', 'MySpriteObjectWithoutBehaviors', 0);
   const spriteObjectWithoutEffects = testLayout
-    .getObjectsContainer()
+    .getObjects()
     .insertNewObject(project, 'Sprite', 'MySpriteObjectWithoutEffect', 0);
   const spriteObjectWithEffects = testLayout
-    .getObjectsContainer()
+    .getObjects()
     .insertNewObject(project, 'Sprite', 'MySpriteObjectWithEffects', 0);
   testLayout
-    .getObjectsContainer()
+    .getObjects()
     .insertNewObject(
       project,
       'Sprite',
@@ -249,7 +249,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
       14
     );
   testLayout
-    .getObjectsContainer()
+    .getObjects()
     .insertNewObject(
       project,
       'FakeObjectWithUnsupportedCapability::FakeObjectWithUnsupportedCapability',
@@ -365,19 +365,19 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   );
   group4WithLongsNames.addObject('MySpriteObjectWithoutBehaviors');
   testLayout
-    .getObjectsContainer()
+    .getObjects()
     .getObjectGroups()
     .insert(group1, 0);
   testLayout
-    .getObjectsContainer()
+    .getObjects()
     .getObjectGroups()
     .insert(group2, 1);
   testLayout
-    .getObjectsContainer()
+    .getObjects()
     .getObjectGroups()
     .insert(group3, 2);
   testLayout
-    .getObjectsContainer()
+    .getObjects()
     .getObjectGroups()
     .insert(group4WithLongsNames, 3);
 
@@ -600,10 +600,10 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
 
   // Global objects
   project
-    .getObjectsContainer()
+    .getObjects()
     .insertNewObject(project, 'TextObject::Text', 'GlobalTextObject', 0);
   project
-    .getObjectsContainer()
+    .getObjects()
     .insertNewObject(
       project,
       'TiledSpriteObject::TiledSprite',
@@ -696,12 +696,12 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   // Create more dummy objects to test events with a lot of objects
   for (var i = 0; i < 6; ++i) {
     testLayout
-      .getObjectsContainer()
+      .getObjects()
       .insertNewObject(
         project,
         'Sprite',
         'VirtualControls' + (i !== 0 ? i : ''),
-        testLayout.getObjectsContainer().getObjectsCount()
+        testLayout.getObjects().getObjectsCount()
       );
   }
 

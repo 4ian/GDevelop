@@ -24,11 +24,9 @@ export const Default = () => (
       <div style={{ height: 250 }}>
         <ObjectGroupsList
           globalObjectGroups={testProject.project
-            .getObjectsContainer()
+            .getObjects()
             .getObjectGroups()}
-          objectGroups={testProject.testLayout
-            .getObjectsContainer()
-            .getObjectGroups()}
+          objectGroups={testProject.testLayout.getObjects().getObjectGroups()}
           onEditGroup={action('onEditGroup')}
           onRenameGroup={action('onRenameGroup')}
           onDeleteGroup={action('onDeleteGroup')}

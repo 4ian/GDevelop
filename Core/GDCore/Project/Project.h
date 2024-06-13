@@ -990,14 +990,14 @@ class GD_CORE_API Project {
   /**
    * \brief return the objects of the project.
    */
-  gd::ObjectsContainer& GetObjectsContainer() {
+  gd::ObjectsContainer& GetObjects() {
     return objectsContainer;
   }
 
   /**
    * \brief Return the objects of the project.
    */
-  const gd::ObjectsContainer& GetObjectsContainer() const {
+  const gd::ObjectsContainer& GetObjects() const {
     return objectsContainer;
   }
   ///@}

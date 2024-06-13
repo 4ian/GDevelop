@@ -467,9 +467,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       this.setState({
         editedObjectWithContext: {
           object: editedObject,
-          global: project
-            .getObjectsContainer()
-            .hasObjectNamed(editedObject.getName()),
+          global: project.getObjects().hasObjectNamed(editedObject.getName()),
         },
         editedObjectInitialTab: initialTab || 'properties',
       });
@@ -972,15 +970,11 @@ export default class SceneEditor extends React.Component<Props, State> {
               const otherLayout = project.getLayoutAt(i);
               const otherLayoutName = otherLayout.getName();
               if (layoutName !== otherLayoutName) {
-                if (
-                  otherLayout
-                    .getObjectsContainer()
-                    .hasObjectNamed(tentativeNewName)
-                ) {
+                if (otherLayout.getObjects().hasObjectNamed(tentativeNewName)) {
                   return otherLayoutName;
                 }
                 const groupContainer = otherLayout
-                  .getObjectsContainer()
+                  .getObjects()
                   .getObjectGroups();
                 if (groupContainer.has(tentativeNewName)) {
                   return otherLayoutName;
@@ -1179,14 +1173,10 @@ export default class SceneEditor extends React.Component<Props, State> {
         const otherLayout = project.getLayoutAt(i);
         const otherLayoutName = otherLayout.getName();
         if (layoutName !== otherLayoutName) {
-          if (
-            otherLayout.getObjectsContainer().hasObjectNamed(objectOrGroupName)
-          ) {
+          if (otherLayout.getObjects().hasObjectNamed(objectOrGroupName)) {
             return otherLayoutName;
           }
-          const groupContainer = otherLayout
-            .getObjectsContainer()
-            .getObjectGroups();
+          const groupContainer = otherLayout.getObjects().getObjectGroups();
           if (groupContainer.has(objectOrGroupName)) {
             return otherLayoutName;
           }
@@ -1710,8 +1700,8 @@ export default class SceneEditor extends React.Component<Props, State> {
       : null;
     const variablesEditedAssociatedObject = variablesEditedAssociatedObjectName
       ? getObjectByName(
-          project.getObjectsContainer(),
-          layout ? layout.getObjectsContainer() : null,
+          project.getObjects(),
+          layout ? layout.getObjects() : null,
           variablesEditedAssociatedObjectName
         )
       : null;

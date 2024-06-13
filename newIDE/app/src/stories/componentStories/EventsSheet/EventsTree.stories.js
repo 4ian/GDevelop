@@ -47,8 +47,8 @@ export const DefaultMediumScreenScopeInLayout = () => (
             project: testProject.project,
             layout: testProject.testLayout,
           }}
-          globalObjectsContainer={testProject.project.getObjectsContainer()}
-          objectsContainer={testProject.testLayout.getObjectsContainer()}
+          globalObjectsContainer={testProject.project.getObjects()}
+          objectsContainer={testProject.testLayout.getObjects()}
           selection={getInitialSelection()}
           onAddNewInstruction={action('add new instruction')}
           onPasteInstructions={action('paste instructions')}
@@ -91,8 +91,8 @@ export const DefaultSmallScreenScopeInLayout = () => (
             project: testProject.project,
             layout: testProject.testLayout,
           }}
-          globalObjectsContainer={testProject.project.getObjectsContainer()}
-          objectsContainer={testProject.testLayout.getObjectsContainer()}
+          globalObjectsContainer={testProject.project.getObjects()}
+          objectsContainer={testProject.testLayout.getObjects()}
           selection={getInitialSelection()}
           onAddNewInstruction={action('add new instruction')}
           onPasteInstructions={action('paste instructions')}
@@ -132,8 +132,8 @@ export const DefaultMediumScreenScopeNotInLayout = () => (
           events={testProject.testLayout.getEvents()}
           project={testProject.project}
           scope={{ project: testProject.project }}
-          globalObjectsContainer={testProject.project.getObjectsContainer()}
-          objectsContainer={testProject.testLayout.getObjectsContainer()}
+          globalObjectsContainer={testProject.project.getObjects()}
+          objectsContainer={testProject.testLayout.getObjects()}
           selection={getInitialSelection()}
           onAddNewInstruction={action('add new instruction')}
           onPasteInstructions={action('paste instructions')}
@@ -176,8 +176,8 @@ export const EmptySmallScreenScopeInALayout = () => (
             project: testProject.project,
             layout: testProject.testLayout,
           }}
-          globalObjectsContainer={testProject.project.getObjectsContainer()}
-          objectsContainer={testProject.testLayout.getObjectsContainer()}
+          globalObjectsContainer={testProject.project.getObjects()}
+          objectsContainer={testProject.testLayout.getObjects()}
           selection={getInitialSelection()}
           onAddNewInstruction={action('add new instruction')}
           onPasteInstructions={action('paste instructions')}

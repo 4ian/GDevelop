@@ -45,13 +45,13 @@ describe('ResourceUtils', () => {
 
     // Add objects using these resources
     const globalObject = project
-      .getObjectsContainer()
+      .getObjects()
       .insertNewObject(project, 'Sprite', 'MyGlobalObject', 0);
     addNewAnimationWithImageToSpriteObject(globalObject, 'fake-image1.png');
 
     const scene = project.insertNewLayout('MyScene', 0);
     const object = scene
-      .getObjectsContainer()
+      .getObjects()
       .insertNewObject(project, 'Sprite', 'MyObject', 0);
     addNewAnimationWithImageToSpriteObject(object, 'fake-image1.png');
 

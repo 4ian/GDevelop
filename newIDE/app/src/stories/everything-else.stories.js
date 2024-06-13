@@ -1390,8 +1390,8 @@ storiesOf('ParameterFields', module)
             project: testProject.project,
             layout: testProject.testLayout,
           }}
-          globalObjectsContainer={testProject.project.getObjectsContainer()}
-          objectsContainer={testProject.testLayout.getObjectsContainer()}
+          globalObjectsContainer={testProject.project.getObjects()}
+          objectsContainer={testProject.testLayout.getObjects()}
           projectScopedContainersAccessor={
             testProject.testSceneProjectScopedContainersAccessor
           }
@@ -1414,8 +1414,8 @@ storiesOf('ParameterFields', module)
             project: testProject.project,
             layout: testProject.testLayout,
           }}
-          globalObjectsContainer={testProject.project.getObjectsContainer()}
-          objectsContainer={testProject.testLayout.getObjectsContainer()}
+          globalObjectsContainer={testProject.project.getObjects()}
+          objectsContainer={testProject.testLayout.getObjects()}
           projectScopedContainersAccessor={
             testProject.testSceneProjectScopedContainersAccessor
           }
@@ -1436,8 +1436,8 @@ storiesOf('ParameterFields', module)
             project: testProject.project,
             layout: testProject.testLayout,
           }}
-          globalObjectsContainer={testProject.project.getObjectsContainer()}
-          objectsContainer={testProject.testLayout.getObjectsContainer()}
+          globalObjectsContainer={testProject.project.getObjects()}
+          objectsContainer={testProject.testLayout.getObjects()}
           projectScopedContainersAccessor={
             testProject.testSceneProjectScopedContainersAccessor
           }
@@ -1478,8 +1478,8 @@ storiesOf('ParameterFields', module)
             project: testProject.project,
             layout: testProject.testLayout,
           }}
-          globalObjectsContainer={testProject.project.getObjectsContainer()}
-          objectsContainer={testProject.testLayout.getObjectsContainer()}
+          globalObjectsContainer={testProject.project.getObjects()}
+          objectsContainer={testProject.testLayout.getObjects()}
           projectScopedContainersAccessor={
             testProject.testSceneProjectScopedContainersAccessor
           }
@@ -1497,8 +1497,8 @@ storiesOf('ParameterFields', module)
           scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
-          globalObjectsContainer={testProject.project.getObjectsContainer()}
-          objectsContainer={testProject.testLayout.getObjectsContainer()}
+          globalObjectsContainer={testProject.project.getObjects()}
+          objectsContainer={testProject.testLayout.getObjects()}
           projectScopedContainersAccessor={
             testProject.testSceneProjectScopedContainersAccessor
           }
@@ -1516,8 +1516,8 @@ storiesOf('ParameterFields', module)
             project: testProject.project,
             layout: testProject.testLayout,
           }}
-          globalObjectsContainer={testProject.project.getObjectsContainer()}
-          objectsContainer={testProject.testLayout.getObjectsContainer()}
+          globalObjectsContainer={testProject.project.getObjects()}
+          objectsContainer={testProject.testLayout.getObjects()}
           projectScopedContainersAccessor={
             testProject.testSceneProjectScopedContainersAccessor
           }
@@ -1535,8 +1535,8 @@ storiesOf('ParameterFields', module)
           scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
-          globalObjectsContainer={testProject.project.getObjectsContainer()}
-          objectsContainer={testProject.testLayout.getObjectsContainer()}
+          globalObjectsContainer={testProject.project.getObjects()}
+          objectsContainer={testProject.testLayout.getObjects()}
           projectScopedContainersAccessor={
             testProject.testSceneProjectScopedContainersAccessor
           }
@@ -1553,8 +1553,8 @@ storiesOf('ParameterFields', module)
           scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
-          globalObjectsContainer={testProject.project.getObjectsContainer()}
-          objectsContainer={testProject.testLayout.getObjectsContainer()}
+          globalObjectsContainer={testProject.project.getObjects()}
+          objectsContainer={testProject.testLayout.getObjects()}
           projectScopedContainersAccessor={
             testProject.testSceneProjectScopedContainersAccessor
           }
@@ -1571,8 +1571,8 @@ storiesOf('ParameterFields', module)
           scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
-          globalObjectsContainer={testProject.project.getObjectsContainer()}
-          objectsContainer={testProject.testLayout.getObjectsContainer()}
+          globalObjectsContainer={testProject.project.getObjects()}
+          objectsContainer={testProject.testLayout.getObjects()}
           projectScopedContainersAccessor={
             testProject.testSceneProjectScopedContainersAccessor
           }
@@ -1590,8 +1590,8 @@ storiesOf('ParameterFields', module)
             project: testProject.project,
             layout: testProject.testLayout,
           }}
-          globalObjectsContainer={testProject.project.getObjectsContainer()}
-          objectsContainer={testProject.testLayout.getObjectsContainer()}
+          globalObjectsContainer={testProject.project.getObjects()}
+          objectsContainer={testProject.testLayout.getObjects()}
           projectScopedContainersAccessor={
             testProject.testSceneProjectScopedContainersAccessor
           }
@@ -1609,8 +1609,8 @@ storiesOf('ParameterFields', module)
           scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
-          globalObjectsContainer={testProject.project.getObjectsContainer()}
-          objectsContainer={testProject.testLayout.getObjectsContainer()}
+          globalObjectsContainer={testProject.project.getObjects()}
+          objectsContainer={testProject.testLayout.getObjects()}
           projectScopedContainersAccessor={
             testProject.testSceneProjectScopedContainersAccessor
           }
@@ -1626,8 +1626,8 @@ storiesOf('ParameterFields', module)
           scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
-          globalObjectsContainer={testProject.project.getObjectsContainer()}
-          objectsContainer={testProject.testLayout.getObjectsContainer()}
+          globalObjectsContainer={testProject.project.getObjects()}
+          objectsContainer={testProject.testLayout.getObjects()}
           projectScopedContainersAccessor={
             testProject.testSceneProjectScopedContainersAccessor
           }
@@ -1643,8 +1643,8 @@ storiesOf('ParameterFields', module)
           scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
-          globalObjectsContainer={testProject.project.getObjectsContainer()}
-          objectsContainer={testProject.testLayout.getObjectsContainer()}
+          globalObjectsContainer={testProject.project.getObjects()}
+          objectsContainer={testProject.testLayout.getObjects()}
           projectScopedContainersAccessor={
             testProject.testSceneProjectScopedContainersAccessor
           }
@@ -1660,8 +1660,8 @@ storiesOf('ParameterFields', module)
           scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
-          globalObjectsContainer={testProject.project.getObjectsContainer()}
-          objectsContainer={testProject.testLayout.getObjectsContainer()}
+          globalObjectsContainer={testProject.project.getObjects()}
+          objectsContainer={testProject.testLayout.getObjects()}
           projectScopedContainersAccessor={
             testProject.testSceneProjectScopedContainersAccessor
           }
@@ -1678,8 +1678,8 @@ storiesOf('ParameterFields', module)
           scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
-          globalObjectsContainer={testProject.project.getObjectsContainer()}
-          objectsContainer={testProject.testLayout.getObjectsContainer()}
+          globalObjectsContainer={testProject.project.getObjects()}
+          objectsContainer={testProject.testLayout.getObjects()}
           projectScopedContainersAccessor={
             testProject.testSceneProjectScopedContainersAccessor
           }
@@ -1696,8 +1696,8 @@ storiesOf('ParameterFields', module)
           scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
-          globalObjectsContainer={testProject.project.getObjectsContainer()}
-          objectsContainer={testProject.testLayout.getObjectsContainer()}
+          globalObjectsContainer={testProject.project.getObjects()}
+          objectsContainer={testProject.testLayout.getObjects()}
           projectScopedContainersAccessor={
             testProject.testSceneProjectScopedContainersAccessor
           }
@@ -1714,8 +1714,8 @@ storiesOf('ParameterFields', module)
           scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
-          globalObjectsContainer={testProject.project.getObjectsContainer()}
-          objectsContainer={testProject.testLayout.getObjectsContainer()}
+          globalObjectsContainer={testProject.project.getObjects()}
+          objectsContainer={testProject.testLayout.getObjects()}
           projectScopedContainersAccessor={
             testProject.testSceneProjectScopedContainersAccessor
           }
@@ -1731,8 +1731,8 @@ storiesOf('ParameterFields', module)
           scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
-          globalObjectsContainer={testProject.project.getObjectsContainer()}
-          objectsContainer={testProject.testLayout.getObjectsContainer()}
+          globalObjectsContainer={testProject.project.getObjects()}
+          objectsContainer={testProject.testLayout.getObjects()}
           projectScopedContainersAccessor={
             testProject.testSceneProjectScopedContainersAccessor
           }
@@ -2148,8 +2148,8 @@ storiesOf('EventsSheet/EventsFunctionExtractorDialog', module)
     <EventsFunctionExtractorDialog
       project={testProject.project}
       scope={{ project: testProject.project, layout: testProject.testLayout }}
-      globalObjectsContainer={testProject.project.getObjectsContainer()}
-      objectsContainer={testProject.testLayout.getObjectsContainer()}
+      globalObjectsContainer={testProject.project.getObjects()}
+      objectsContainer={testProject.testLayout.getObjects()}
       serializedEvents={testProject.testSerializedEvents}
       onClose={action('close')}
       onCreate={action('create')}
@@ -2159,8 +2159,8 @@ storiesOf('EventsSheet/EventsFunctionExtractorDialog', module)
     <EventsFunctionExtractorDialog
       project={testProject.project}
       scope={{ project: testProject.project, layout: testProject.testLayout }}
-      globalObjectsContainer={testProject.project.getObjectsContainer()}
-      objectsContainer={testProject.testLayout.getObjectsContainer()}
+      globalObjectsContainer={testProject.project.getObjects()}
+      objectsContainer={testProject.testLayout.getObjects()}
       serializedEvents={testProject.testSerializedEventsWithLotsOfObjects}
       onClose={action('close')}
       onCreate={action('create')}
@@ -2268,8 +2268,8 @@ storiesOf('InstructionOrObjectSelector', module)
                 }}
                 currentTab={value}
                 onChangeTab={onChange}
-                globalObjectsContainer={testProject.project.getObjectsContainer()}
-                objectsContainer={testProject.testLayout.getObjectsContainer()}
+                globalObjectsContainer={testProject.project.getObjects()}
+                objectsContainer={testProject.testLayout.getObjects()}
                 isCondition
                 chosenInstructionType={'KeyPressed'}
                 onChooseInstruction={action('instruction chosen')}
@@ -2301,8 +2301,8 @@ storiesOf('InstructionOrObjectSelector', module)
                 }}
                 currentTab={value}
                 onChangeTab={onChange}
-                globalObjectsContainer={testProject.project.getObjectsContainer()}
-                objectsContainer={testProject.testLayout.getObjectsContainer()}
+                globalObjectsContainer={testProject.project.getObjects()}
+                objectsContainer={testProject.testLayout.getObjects()}
                 isCondition
                 chosenInstructionType={''}
                 onChooseInstruction={action('instruction chosen')}
@@ -2332,8 +2332,8 @@ storiesOf('InstructionEditorDialog', module)
             project: testProject.project,
             layout: testProject.testLayout,
           }}
-          globalObjectsContainer={testProject.project.getObjectsContainer()}
-          objectsContainer={testProject.testLayout.getObjectsContainer()}
+          globalObjectsContainer={testProject.project.getObjects()}
+          objectsContainer={testProject.testLayout.getObjects()}
           projectScopedContainersAccessor={
             testProject.testSceneProjectScopedContainersAccessor
           }
@@ -2358,8 +2358,8 @@ storiesOf('InstructionEditorDialog', module)
           open
           project={testProject.project}
           scope={{ project: testProject.project, layout: null }}
-          globalObjectsContainer={testProject.project.getObjectsContainer()}
-          objectsContainer={testProject.testLayout.getObjectsContainer()}
+          globalObjectsContainer={testProject.project.getObjects()}
+          objectsContainer={testProject.testLayout.getObjects()}
           projectScopedContainersAccessor={
             testProject.testSceneProjectScopedContainersAccessor
           }
@@ -2391,8 +2391,8 @@ storiesOf('InstructionEditorDialog', module)
             open
             project={testProject.project}
             scope={{ project: testProject.project, layout: null }}
-            globalObjectsContainer={testProject.project.getObjectsContainer()}
-            objectsContainer={testProject.testLayout.getObjectsContainer()}
+            globalObjectsContainer={testProject.project.getObjects()}
+            objectsContainer={testProject.testLayout.getObjects()}
             projectScopedContainersAccessor={
               testProject.testSceneProjectScopedContainersAccessor
             }
@@ -2435,8 +2435,8 @@ storiesOf('InstructionEditorMenu', module)
                   project: testProject.project,
                   layout: testProject.testLayout,
                 }}
-                globalObjectsContainer={testProject.project.getObjectsContainer()}
-                objectsContainer={testProject.testLayout.getObjectsContainer()}
+                globalObjectsContainer={testProject.project.getObjects()}
+                objectsContainer={testProject.testLayout.getObjects()}
                 projectScopedContainersAccessor={
                   testProject.testSceneProjectScopedContainersAccessor
                 }
@@ -2467,8 +2467,8 @@ storiesOf('ObjectSelector', module)
       render={(value, onChange) => (
         <ObjectSelector
           project={testProject.project}
-          globalObjectsContainer={testProject.project.getObjectsContainer()}
-          objectsContainer={testProject.testLayout.getObjectsContainer()}
+          globalObjectsContainer={testProject.project.getObjects()}
+          objectsContainer={testProject.testLayout.getObjects()}
           value={value}
           onChange={onChange}
           onChoose={action('onChoose in ObjectSelector')}
@@ -2486,8 +2486,8 @@ storiesOf('ObjectSelector', module)
       render={(value, onChange) => (
         <ObjectSelector
           project={testProject.project}
-          globalObjectsContainer={testProject.project.getObjectsContainer()}
-          objectsContainer={testProject.testLayout.getObjectsContainer()}
+          globalObjectsContainer={testProject.project.getObjects()}
+          objectsContainer={testProject.testLayout.getObjects()}
           value={value}
           onChange={onChange}
           onChoose={action('onChoose in ObjectSelector')}

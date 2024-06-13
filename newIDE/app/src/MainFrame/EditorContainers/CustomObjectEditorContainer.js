@@ -139,9 +139,9 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
           ref={editor => (this.editor = editor)}
           project={project}
           layout={null}
-          globalObjectsContainer={eventsBasedObject.getObjectsContainer()}
+          globalObjectsContainer={eventsBasedObject.getObjects()}
           objectsContainer={
-            eventsBasedObject.getObjectsContainer() /* TODO: set to null */
+            eventsBasedObject.getObjects() /* TODO: set to null */
           }
           layersContainer={eventsBasedObject.getLayers()}
           initialInstances={eventsBasedObject.getInitialInstances()}

@@ -92,8 +92,8 @@ export const Default = () => (
             project: testProject.project,
             layout: testProject.testLayout,
           }}
-          globalObjectsContainer={testProject.project.getObjectsContainer()}
-          objectsContainer={testProject.testLayout.getObjectsContainer()}
+          globalObjectsContainer={testProject.project.getObjects()}
+          objectsContainer={testProject.testLayout.getObjects()}
           projectScopedContainersAccessor={
             testProject.testSceneProjectScopedContainersAccessor
           }
@@ -116,8 +116,8 @@ export const InitialValidLeaderboard = () => (
             project: testProject.project,
             layout: testProject.testLayout,
           }}
-          globalObjectsContainer={testProject.project.getObjectsContainer()}
-          objectsContainer={testProject.testLayout.getObjectsContainer()}
+          globalObjectsContainer={testProject.project.getObjects()}
+          objectsContainer={testProject.testLayout.getObjects()}
           projectScopedContainersAccessor={
             testProject.testSceneProjectScopedContainersAccessor
           }
@@ -140,8 +140,8 @@ export const InitialInvalidLeaderboard = () => (
             project: testProject.project,
             layout: testProject.testLayout,
           }}
-          globalObjectsContainer={testProject.project.getObjectsContainer()}
-          objectsContainer={testProject.testLayout.getObjectsContainer()}
+          globalObjectsContainer={testProject.project.getObjects()}
+          objectsContainer={testProject.testLayout.getObjects()}
           projectScopedContainersAccessor={
             testProject.testSceneProjectScopedContainersAccessor
           }

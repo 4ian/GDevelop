@@ -79,14 +79,14 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
         .SetValue(123);
 
     // Declare variables in objects.
-    auto &object1 = layout1.GetObjectsContainer().InsertNewObject(
+    auto &object1 = layout1.GetObjects().InsertNewObject(
         project, "MyExtension::Sprite", "Object1", 0);
     object1.GetVariables().InsertNew("MyObjectVariable");
     object1.GetVariables()
         .InsertNew("MyObjectStructureVariable")
         .GetChild("MyChild")
         .SetValue(123);
-    auto &object2 = layout1.GetObjectsContainer().InsertNewObject(
+    auto &object2 = layout1.GetObjects().InsertNewObject(
         project, "MyExtension::Sprite", "Object2", 0);
     object2.GetVariables().InsertNew("MyObjectVariable");
     object2.GetVariables()
@@ -339,14 +339,14 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
             project, "BuiltinCommonInstructions::Repeat"));
 
     // Declare variables in objects.
-    auto &object1 = layout1.GetObjectsContainer().InsertNewObject(
+    auto &object1 = layout1.GetObjects().InsertNewObject(
         project, "MyExtension::Sprite", "Object1", 0);
     object1.GetVariables().InsertNew("MyObjectVariable");
     object1.GetVariables()
         .InsertNew("MyObjectStructureVariable")
         .GetChild("MyChild")
         .SetValue(123);
-    auto &object2 = layout1.GetObjectsContainer().InsertNewObject(
+    auto &object2 = layout1.GetObjects().InsertNewObject(
         project, "MyExtension::Sprite", "Object2", 0);
     object2.GetVariables().InsertNew("MyObjectVariable");
     object2.GetVariables()
@@ -354,7 +354,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
         .GetChild("MyChild")
         .SetValue(123);
 
-    auto &group = layout1.GetObjectsContainer().GetObjectGroups().InsertNew(
+    auto &group = layout1.GetObjects().GetObjectGroups().InsertNew(
         "MyObjectGroup");
     group.AddObject("Object1");
     group.AddObject("Object2");
@@ -537,14 +537,14 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
         .SetValue(123);
 
     // Declare variables in objects.
-    auto &object1 = layout1.GetObjectsContainer().InsertNewObject(
+    auto &object1 = layout1.GetObjects().InsertNewObject(
         project, "MyExtension::Sprite", "Object1", 0);
     object1.GetVariables().InsertNew("MyObjectVariable");
     object1.GetVariables()
         .InsertNew("MyObjectStructureVariable")
         .GetChild("MyChild")
         .SetValue(123);
-    auto &object2 = layout1.GetObjectsContainer().InsertNewObject(
+    auto &object2 = layout1.GetObjects().InsertNewObject(
         project, "MyExtension::Sprite", "Object2", 0);
     object2.GetVariables().InsertNew("MyObjectVariable");
     object2.GetVariables()
@@ -960,7 +960,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     SetupProjectWithDummyPlatform(project, platform);
 
     auto &scene = project.InsertNewLayout("Scene", 0);
-    auto &object = scene.GetObjectsContainer().InsertNewObject(
+    auto &object = scene.GetObjects().InsertNewObject(
         project, "MyExtension::Sprite", "Object", 0);
     object.GetVariables()
         .InsertNew("MyVariable")
@@ -1010,7 +1010,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     SetupProjectWithDummyPlatform(project, platform);
 
     auto &scene = project.InsertNewLayout("Scene", 0);
-    auto &object = scene.GetObjectsContainer().InsertNewObject(
+    auto &object = scene.GetObjects().InsertNewObject(
         project, "MyExtension::Sprite", "Object", 0);
     object.GetVariables()
         .InsertNew("MyVariable")
@@ -1058,7 +1058,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     SetupProjectWithDummyPlatform(project, platform);
 
     auto &scene = project.InsertNewLayout("Scene", 0);
-    auto &object = scene.GetObjectsContainer().InsertNewObject(
+    auto &object = scene.GetObjects().InsertNewObject(
         project, "MyExtension::Sprite", "Object", 0);
     object.GetVariables()
         .InsertNew("MyVariable")
@@ -1796,7 +1796,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     SetupProjectWithDummyPlatform(project, platform);
 
     auto &scene = project.InsertNewLayout("Scene", 0);
-    auto &object = scene.GetObjectsContainer().InsertNewObject(
+    auto &object = scene.GetObjects().InsertNewObject(
         project, "MyExtension::Sprite", "Object", 0);
     object.GetVariables().InsertNew("MyObjectVariable").SetValue(123);
 
@@ -1841,7 +1841,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     SetupProjectWithDummyPlatform(project, platform);
 
     auto &scene = project.InsertNewLayout("Scene", 0);
-    auto &object = scene.GetObjectsContainer().InsertNewObject(
+    auto &object = scene.GetObjects().InsertNewObject(
         project, "MyExtension::Sprite", "Object", 0);
     object.GetVariables()
         .InsertNew("MyObjectVariable")

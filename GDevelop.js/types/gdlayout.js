@@ -11,7 +11,7 @@ declare class gdLayout {
   getWindowDefaultTitle(): string;
   getInitialInstances(): gdInitialInstancesContainer;
   getVariables(): gdVariablesContainer;
-  getObjectsContainer(): gdObjectsContainer;
+  getObjects(): gdObjectsContainer;
   getEvents(): gdEventsList;
   getLayers(): gdLayersContainer;
   updateBehaviorsSharedData(project: gdProject): void;

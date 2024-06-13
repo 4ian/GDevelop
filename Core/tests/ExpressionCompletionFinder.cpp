@@ -23,7 +23,7 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
   SetupProjectWithDummyPlatform(project, platform);
   auto& layout1 = project.InsertNewLayout("Layout1", 0);
   layout1.GetVariables().InsertNew("myVariable");
-  auto &object1 = layout1.GetObjectsContainer().InsertNewObject(
+  auto &object1 = layout1.GetObjects().InsertNewObject(
       project, "MyExtension::Sprite", "MyObject", 0);
   object1.GetVariables().InsertNew("myObjectVariable");
 

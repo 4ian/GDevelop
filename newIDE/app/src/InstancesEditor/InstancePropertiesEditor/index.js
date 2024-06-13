@@ -328,13 +328,13 @@ const InstancePropertiesEditor = ({
 
       const associatedObjectName = instance.getObjectName();
       const object = getObjectByName(
-        project.getObjectsContainer(),
-        layout.getObjectsContainer(),
+        project.getObjects(),
+        layout.getObjects(),
         associatedObjectName
       );
       const properties = instance.getCustomProperties(
-        project.getObjectsContainer(),
-        layout.getObjectsContainer()
+        project.getObjects(),
+        layout.getObjects()
       );
       if (!object) return {};
 
@@ -346,15 +346,15 @@ const InstancePropertiesEditor = ({
         properties,
         (instance: gdInitialInstance) =>
           instance.getCustomProperties(
-            project.getObjectsContainer(),
-            layout.getObjectsContainer()
+            project.getObjects(),
+            layout.getObjects()
           ),
         (instance: gdInitialInstance, name, value) =>
           instance.updateCustomProperty(
             name,
             value,
-            project.getObjectsContainer(),
-            layout.getObjectsContainer()
+            project.getObjects(),
+            layout.getObjects()
           )
       );
       return {

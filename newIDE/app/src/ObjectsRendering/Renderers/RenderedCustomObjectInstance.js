@@ -207,7 +207,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
         customObjectConfiguration
       );
 
-      const childObjects = eventBasedObject.getObjectsContainer();
+      const childObjects = eventBasedObject.getObjects();
       mapReverseFor(0, childObjects.getObjectsCount(), i => {
         const childObject = childObjects.getObjectAt(i);
 
@@ -273,7 +273,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
         return null;
       }
       const associatedObject = getObjectByName(
-        eventBasedObject.getObjectsContainer(),
+        eventBasedObject.getObjects(),
         null,
         associatedObjectName
       );
@@ -443,7 +443,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
       }
       return 'res/unknown32.png';
     }
-    const childObjects = eventBasedObject.getObjectsContainer();
+    const childObjects = eventBasedObject.getObjects();
     for (let i = 0; i < childObjects.getObjectsCount(); i++) {
       const childObject = childObjects.getObjectAt(i);
       const childObjectConfiguration = customObjectConfiguration.getChildObjectConfiguration(

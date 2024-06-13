@@ -258,7 +258,7 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
 
   // Add child-objects
   for (auto &childObject :
-       eventsBasedObject.GetObjectsContainer().GetObjects()) {
+       eventsBasedObject.GetObjects().GetObjects()) {
     // child-object are never picked because they are not parameters.
     const auto& childName = ManObjListName(childObject->GetName());
     fullPreludeCode += "var this" + childName +
@@ -424,7 +424,7 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionContext(
 
     // Add child-objects
     for (auto &childObject :
-         eventsBasedObject.GetObjectsContainer().GetObjects()) {
+         eventsBasedObject.GetObjects().GetObjects()) {
       const auto& childName = ManObjListName(childObject->GetName());
       // child-object are never picked because they are not parameters.
       objectsGettersMap += ", " +
@@ -1358,16 +1358,16 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
     }
 
     if (HasProjectAndLayout()) {
-      if (GetLayout().GetObjectsContainer().HasObjectNamed(
+      if (GetLayout().GetObjects().HasObjectNamed(
               objectName)) // We check first layout's objects' list.
         variables = &GetLayout()
-                         .GetObjectsContainer()
+                         .GetObjects()
                          .GetObject(objectName)
                          .GetVariables();
-      else if (GetProject().GetObjectsContainer().HasObjectNamed(
+      else if (GetProject().GetObjects().HasObjectNamed(
                    objectName)) // Then the global objects list.
         variables = &GetProject()
-                         .GetObjectsContainer()
+                         .GetObjects()
                          .GetObject(objectName)
                          .GetVariables();
     }

@@ -122,13 +122,13 @@ const CompactInstancePropertiesEditor = ({
       const associatedObjectName = instance.getObjectName();
       // TODO: replace and remove layout
       const object = getObjectByName(
-        project.getObjectsContainer(),
-        layout.getObjectsContainer(),
+        project.getObjects(),
+        layout.getObjects(),
         associatedObjectName
       );
       const properties = instance.getCustomProperties(
-        project.getObjectsContainer(),
-        layout.getObjectsContainer()
+        project.getObjects(),
+        layout.getObjects()
       );
       if (!object) return { object: undefined, instanceSchema: undefined };
 
@@ -140,15 +140,15 @@ const CompactInstancePropertiesEditor = ({
         properties,
         (instance: gdInitialInstance) =>
           instance.getCustomProperties(
-            project.getObjectsContainer(),
-            layout.getObjectsContainer()
+            project.getObjects(),
+            layout.getObjects()
           ),
         (instance: gdInitialInstance, name, value) =>
           instance.updateCustomProperty(
             name,
             value,
-            project.getObjectsContainer(),
-            layout.getObjectsContainer()
+            project.getObjects(),
+            layout.getObjects()
           )
       );
 

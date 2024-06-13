@@ -151,7 +151,7 @@ describe('libGD.js', function () {
       ).toEqual([]);
 
       project
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(project, 'Sprite', 'MyObject', 0);
 
       expect(
@@ -219,16 +219,16 @@ describe('libGD.js', function () {
     });
     it('can have objects', function () {
       let object = layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(project, 'Sprite', 'MyObject', 0);
       let object2 = layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(project, 'TextObject::Text', 'MyObject2', 1);
 
-      expect(layout.getObjectsContainer().getObjectAt(0).ptr).toBe(object.ptr);
-      expect(layout.getObjectsContainer().getObjectAt(1).ptr).toBe(object2.ptr);
-      expect(layout.getObjectsContainer().getObjectAt(0).getType()).toBe('Sprite');
-      expect(layout.getObjectsContainer().getObjectAt(1).getType()).toBe('TextObject::Text');
+      expect(layout.getObjects().getObjectAt(0).ptr).toBe(object.ptr);
+      expect(layout.getObjects().getObjectAt(1).ptr).toBe(object2.ptr);
+      expect(layout.getObjects().getObjectAt(0).getType()).toBe('Sprite');
+      expect(layout.getObjects().getObjectAt(1).getType()).toBe('TextObject::Text');
     });
 
     afterAll(function () {
@@ -359,52 +359,52 @@ describe('libGD.js', function () {
     it('can move objects', function () {
       let layout = project.insertNewLayout('Scene', 0);
       let object = layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(project, 'Sprite', 'MyObject', 0);
       let object2 = layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(project, 'TextObject::Text', 'MyObject2', 1);
       let object3 = layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(project, 'TextObject::Text', 'MyObject3', 2);
 
-      expect(layout.getObjectsContainer().getObjectAt(0).getName()).toBe('MyObject');
-      expect(layout.getObjectsContainer().getObjectAt(1).getName()).toBe('MyObject2');
-      expect(layout.getObjectsContainer().getObjectAt(2).getName()).toBe('MyObject3');
-      layout.getObjectsContainer().moveObject(0, 2);
-      expect(layout.getObjectsContainer().getObjectAt(0).getName()).toBe('MyObject2');
-      expect(layout.getObjectsContainer().getObjectAt(1).getName()).toBe('MyObject3');
-      expect(layout.getObjectsContainer().getObjectAt(2).getName()).toBe('MyObject');
-      layout.getObjectsContainer().moveObject(0, 0);
-      expect(layout.getObjectsContainer().getObjectAt(0).getName()).toBe('MyObject2');
-      expect(layout.getObjectsContainer().getObjectAt(1).getName()).toBe('MyObject3');
-      expect(layout.getObjectsContainer().getObjectAt(2).getName()).toBe('MyObject');
-      layout.getObjectsContainer().moveObject(1, 0);
-      expect(layout.getObjectsContainer().getObjectAt(0).getName()).toBe('MyObject3');
-      expect(layout.getObjectsContainer().getObjectAt(1).getName()).toBe('MyObject2');
-      expect(layout.getObjectsContainer().getObjectAt(2).getName()).toBe('MyObject');
-      layout.getObjectsContainer().moveObject(0, 999);
-      expect(layout.getObjectsContainer().getObjectAt(0).getName()).toBe('MyObject3');
-      expect(layout.getObjectsContainer().getObjectAt(1).getName()).toBe('MyObject2');
-      expect(layout.getObjectsContainer().getObjectAt(2).getName()).toBe('MyObject');
+      expect(layout.getObjects().getObjectAt(0).getName()).toBe('MyObject');
+      expect(layout.getObjects().getObjectAt(1).getName()).toBe('MyObject2');
+      expect(layout.getObjects().getObjectAt(2).getName()).toBe('MyObject3');
+      layout.getObjects().moveObject(0, 2);
+      expect(layout.getObjects().getObjectAt(0).getName()).toBe('MyObject2');
+      expect(layout.getObjects().getObjectAt(1).getName()).toBe('MyObject3');
+      expect(layout.getObjects().getObjectAt(2).getName()).toBe('MyObject');
+      layout.getObjects().moveObject(0, 0);
+      expect(layout.getObjects().getObjectAt(0).getName()).toBe('MyObject2');
+      expect(layout.getObjects().getObjectAt(1).getName()).toBe('MyObject3');
+      expect(layout.getObjects().getObjectAt(2).getName()).toBe('MyObject');
+      layout.getObjects().moveObject(1, 0);
+      expect(layout.getObjects().getObjectAt(0).getName()).toBe('MyObject3');
+      expect(layout.getObjects().getObjectAt(1).getName()).toBe('MyObject2');
+      expect(layout.getObjects().getObjectAt(2).getName()).toBe('MyObject');
+      layout.getObjects().moveObject(0, 999);
+      expect(layout.getObjects().getObjectAt(0).getName()).toBe('MyObject3');
+      expect(layout.getObjects().getObjectAt(1).getName()).toBe('MyObject2');
+      expect(layout.getObjects().getObjectAt(2).getName()).toBe('MyObject');
     });
 
     it('can find position of objects', function () {
       let layout = project.insertNewLayout('Scene2', 0);
       let object = layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(project, 'Sprite', 'MyObject', 0);
       let object2 = layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(project, 'TextObject::Text', 'MyObject2', 1);
       let object3 = layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(project, 'TextObject::Text', 'MyObject3', 2);
 
-      expect(layout.getObjectsContainer().getObjectPosition('MyObject')).toBe(0);
-      expect(layout.getObjectsContainer().getObjectPosition('MyObject2')).toBe(1);
-      expect(layout.getObjectsContainer().getObjectPosition('MyObject3')).toBe(2);
-      expect(layout.getObjectsContainer().getObjectPosition('MyObject4')).toBe(-1);
+      expect(layout.getObjects().getObjectPosition('MyObject')).toBe(0);
+      expect(layout.getObjects().getObjectPosition('MyObject2')).toBe(1);
+      expect(layout.getObjects().getObjectPosition('MyObject3')).toBe(2);
+      expect(layout.getObjects().getObjectPosition('MyObject4')).toBe(-1);
     });
 
     afterAll(function () {
@@ -746,7 +746,7 @@ describe('libGD.js', function () {
       project = gd.ProjectHelper.createNewGDJSProject();
       layout = project.insertNewLayout('Scene', 0);
       layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(project, 'Sprite', 'MySpriteObject', 0);
 
       initialInstance = layout.getInitialInstances().insertNewInitialInstance();
@@ -777,10 +777,10 @@ describe('libGD.js', function () {
       expect(initialInstance.hasCustomDepth()).toBe(false);
     });
     it('Sprite object custom properties', function () {
-      initialInstance.updateCustomProperty('animation', '2', project.getObjectsContainer(), layout.getObjectsContainer());
+      initialInstance.updateCustomProperty('animation', '2', project.getObjects(), layout.getObjects());
       expect(
         initialInstance
-          .getCustomProperties(project.getObjectsContainer(), layout.getObjectsContainer())
+          .getCustomProperties(project.getObjects(), layout.getObjects())
           .get('animation')
           .getValue()
       ).toBe('2');
@@ -1510,7 +1510,7 @@ describe('libGD.js', function () {
 
       //Create an object using a resource
       let obj = project
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(project, 'Sprite', 'MyObject', 0);
       let sprite1 = new gd.Sprite();
       sprite1.setImageName('Used');
@@ -1578,7 +1578,7 @@ describe('libGD.js', function () {
     it('should be called with resources of the project', function (done) {
       let project = gd.ProjectHelper.createNewGDJSProject();
       let obj = project
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(project, 'Sprite', 'MyObject', 0);
       const spriteConfiguration = gd.asSpriteConfiguration(
         obj.getConfiguration()
@@ -1667,7 +1667,7 @@ describe('libGD.js', function () {
       const layout = project.insertNewLayout('Scene', 0);
 
       const object = layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(project, 'Sprite', 'MyObject', 0);
       const sprite1 = new gd.Sprite();
       sprite1.setImageName('Image1');
@@ -1685,7 +1685,7 @@ describe('libGD.js', function () {
       spriteObject.getAnimations().addAnimation(animation);
 
       const object2 = project
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(project, 'Sprite', 'MyObject2', 0);
       const spriteObject2 = gd.asSpriteConfiguration(
         object2.getConfiguration()
@@ -1752,7 +1752,7 @@ describe('libGD.js', function () {
       let project = gd.ProjectHelper.createNewGDJSProject();
       let layout = project.insertNewLayout('Scene', 0);
       let object = layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(project, 'Sprite', 'MyObject', 0);
 
       layout.updateBehaviorsSharedData(project);
@@ -1765,7 +1765,7 @@ describe('libGD.js', function () {
       expect(layout.hasBehaviorSharedData('Physics')).toBe(false);
       layout.updateBehaviorsSharedData(project);
       expect(layout.hasBehaviorSharedData('Physics')).toBe(true);
-      layout.getObjectsContainer().removeObject('MyObject');
+      layout.getObjects().removeObject('MyObject');
       expect(layout.hasBehaviorSharedData('Physics')).toBe(true);
       layout.updateBehaviorsSharedData(project);
       expect(layout.hasBehaviorSharedData('Physics')).toBe(false);
@@ -2019,10 +2019,10 @@ describe('libGD.js', function () {
       project = gd.ProjectHelper.createNewGDJSProject();
       layout = project.insertNewLayout('Scene', 0);
       object = layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(project, 'Sprite', 'MyObject', 0);
       object2 = layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(project, 'Sprite', 'MyObject2', 1);
     });
 
@@ -2033,7 +2033,7 @@ describe('libGD.js', function () {
     });
 
     it('can have its type retrieved with gd.getTypeOfObject', function () {
-      expect(gd.getTypeOfObject(project.getObjectsContainer(), layout.getObjectsContainer(), 'TheObject', true)).toBe(
+      expect(gd.getTypeOfObject(project.getObjects(), layout.getObjects(), 'TheObject', true)).toBe(
         'Sprite'
       );
     });
@@ -2052,8 +2052,8 @@ describe('libGD.js', function () {
 
     it('can have its behaviors retrieved with gd.getBehaviorsOfObject', function () {
       let behaviors = gd.getBehaviorsOfObject(
-        project.getObjectsContainer(),
-        layout.getObjectsContainer(),
+        project.getObjects(),
+        layout.getObjects(),
         'TheObject',
         true
       );
@@ -3040,7 +3040,7 @@ describe('libGD.js', function () {
     it('is a gd.Object', function () {
       const project = new gd.ProjectHelper.createNewGDJSProject();
       let object = project
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(project, 'Sprite', 'MySpriteObject');
 
       expect(object instanceof gd.Object).toBe(true);
@@ -3687,7 +3687,7 @@ describe('libGD.js', function () {
       project = new gd.ProjectHelper.createNewGDJSProject();
       layout = project.insertNewLayout('Scene', 0);
       layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(project, 'Sprite', 'MySpriteObject', 0);
     });
 
@@ -4514,7 +4514,7 @@ describe('libGD.js', function () {
     });
 
     test('objects container has a root ObjectFolderOrObject', () => {
-      const rootFolder = layout.getObjectsContainer().getRootFolder();
+      const rootFolder = layout.getObjects().getRootFolder();
       expect(rootFolder.isFolder()).toBe(true);
       expect(rootFolder.isRootFolder()).toBe(true);
       expect(rootFolder.getParent().isFolder()).toBe(true);
@@ -4524,19 +4524,19 @@ describe('libGD.js', function () {
 
     test('an object added to the object container is added to the root ObjectFolderOrObject', () => {
       let object = layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(project, 'Sprite', 'MyObject', 0);
-      const rootFolder = layout.getObjectsContainer().getRootFolder();
+      const rootFolder = layout.getObjects().getRootFolder();
       expect(rootFolder.hasObjectNamed('MyObject')).toBe(true);
       expect(rootFolder.isRootFolder()).toBe(true);
       expect(rootFolder.getChildrenCount()).toEqual(1);
-      layout.getObjectsContainer().removeObject('MyObject');
+      layout.getObjects().removeObject('MyObject');
       expect(rootFolder.hasObjectNamed('MyObject')).toBe(false);
       expect(rootFolder.getChildrenCount()).toEqual(0);
     });
 
     test('a folder can be added to the root folder', () => {
-      const rootFolder = layout.getObjectsContainer().getRootFolder();
+      const rootFolder = layout.getObjects().getRootFolder();
       const subFolder = rootFolder.insertNewFolder('Enemies', 1);
       expect(subFolder.getFolderName()).toEqual('Enemies');
       expect(subFolder.isRootFolder()).toBe(false);
@@ -4547,11 +4547,11 @@ describe('libGD.js', function () {
     });
 
     test('an object can be added to a specific folder', () => {
-      const rootFolder = layout.getObjectsContainer().getRootFolder();
+      const rootFolder = layout.getObjects().getRootFolder();
       const subFolder = rootFolder.insertNewFolder('Enemies', 0);
       const subSubFolder = subFolder.insertNewFolder('Turtles', 0);
       layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObjectInFolder(
           project,
           'Sprite',
@@ -4559,21 +4559,21 @@ describe('libGD.js', function () {
           subSubFolder,
           0
         );
-      expect(layout.getObjectsContainer().hasObjectNamed('RedTurtle')).toBe(true);
+      expect(layout.getObjects().hasObjectNamed('RedTurtle')).toBe(true);
       expect(subSubFolder.hasObjectNamed('RedTurtle')).toBe(true);
     });
 
     test('an ObjectFolderOrObject can be serialized and unserialized', () => {
-      const rootFolder = layout.getObjectsContainer().getRootFolder();
+      const rootFolder = layout.getObjects().getRootFolder();
       const object = layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(project, 'Sprite', 'MyObject', 0);
       const subFolder = rootFolder.insertNewFolder('Enemies', 1);
       const object2 = layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(project, 'Sprite', 'OtherObject', 1);
       const object3 = layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(project, 'Sprite', 'SubObject', 2);
       rootFolder.moveObjectFolderOrObjectToAnotherFolder(
         rootFolder.getObjectChild('SubObject'),
@@ -4601,9 +4601,9 @@ describe('libGD.js', function () {
       const layout2 = project.insertNewLayout('Scene2', 0);
       layout2.unserializeFrom(project, element);
 
-      expect(layout2.getObjectsContainer().hasObjectNamed('MyObject')).toBe(true);
-      expect(layout2.getObjectsContainer().hasObjectNamed('OtherObject')).toBe(true);
-      const rootFolder2 = layout.getObjectsContainer().getRootFolder();
+      expect(layout2.getObjects().hasObjectNamed('MyObject')).toBe(true);
+      expect(layout2.getObjects().hasObjectNamed('OtherObject')).toBe(true);
+      const rootFolder2 = layout.getObjects().getRootFolder();
       expect(rootFolder2.hasObjectNamed('MyObject')).toBe(true);
       expect(rootFolder2.hasObjectNamed('OtherObject')).toBe(true);
       expect(rootFolder2.getChildrenCount()).toEqual(3);
@@ -4623,16 +4623,16 @@ describe('libGD.js', function () {
     });
 
     test('an ObjectFolderOrObject can be serialized and unserialized and missing object folders or objects are added', () => {
-      const rootFolder = layout.getObjectsContainer().getRootFolder();
+      const rootFolder = layout.getObjects().getRootFolder();
       const object = layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(project, 'Sprite', 'MyObject', 0);
       const subFolder = rootFolder.insertNewFolder('Enemies', 1);
       const object2 = layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(project, 'Sprite', 'OtherObject', 1);
       const object3 = layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(project, 'Sprite', 'SubObject', 2);
       rootFolder.moveObjectFolderOrObjectToAnotherFolder(
         rootFolder.getObjectChild('SubObject'),
@@ -4659,9 +4659,9 @@ describe('libGD.js', function () {
         gd.Serializer.fromJSObject(layoutObject)
       );
 
-      expect(layout2.getObjectsContainer().hasObjectNamed('MyObject')).toBe(true);
-      expect(layout2.getObjectsContainer().hasObjectNamed('OtherObject')).toBe(true);
-      const rootFolder2 = layout.getObjectsContainer().getRootFolder();
+      expect(layout2.getObjects().hasObjectNamed('MyObject')).toBe(true);
+      expect(layout2.getObjects().hasObjectNamed('OtherObject')).toBe(true);
+      const rootFolder2 = layout.getObjects().getRootFolder();
       expect(rootFolder2.hasObjectNamed('MyObject')).toBe(true);
       expect(rootFolder2.hasObjectNamed('OtherObject')).toBe(true);
       expect(rootFolder2.getChildrenCount()).toEqual(3);
@@ -4677,13 +4677,13 @@ describe('libGD.js', function () {
     });
 
     test('a folder can be removed from its parent if empty', () => {
-      const rootFolder = layout.getObjectsContainer().getRootFolder();
+      const rootFolder = layout.getObjects().getRootFolder();
       const object = layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(project, 'Sprite', 'MyObject', 0);
       let subFolder = rootFolder.insertNewFolder('Enemies', 1);
       const object2 = layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(project, 'Sprite', 'OtherObject', 2);
       rootFolder.moveObjectFolderOrObjectToAnotherFolder(
         rootFolder.getObjectChild('OtherObject'),
@@ -4721,11 +4721,11 @@ describe('libGD.js', function () {
     });
 
     test("an ObjectFolderOrObject can test if it's a descendant of another one", () => {
-      const rootFolder = layout.getObjectsContainer().getRootFolder();
+      const rootFolder = layout.getObjects().getRootFolder();
       const subFolder = rootFolder.insertNewFolder('Depth1', 0);
       const subSubFolder = subFolder.insertNewFolder('Depth2', 0);
       const object = layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(project, 'Sprite', 'MyObject', 0);
       rootFolder.moveObjectFolderOrObjectToAnotherFolder(
         rootFolder.getObjectChild('MyObject'),
@@ -4762,11 +4762,11 @@ describe('libGD.js', function () {
       );
     });
     test('an ObjectFolderOrObject representing an object can be retrieved using the object name only', () => {
-      const rootFolder = layout.getObjectsContainer().getRootFolder();
+      const rootFolder = layout.getObjects().getRootFolder();
       const subFolder = rootFolder.insertNewFolder('Depth1', 0);
       const subSubFolder = subFolder.insertNewFolder('Depth2', 0);
       const object = layout
-        .getObjectsContainer()
+        .getObjects()
         .insertNewObject(project, 'Sprite', 'MyObject', 0);
       rootFolder.moveObjectFolderOrObjectToAnotherFolder(
         rootFolder.getObjectChild('MyObject'),

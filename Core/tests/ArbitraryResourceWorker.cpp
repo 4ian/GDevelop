@@ -94,7 +94,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
       spriteConfiguration.GetAnimations().AddAnimation(anim);
 
       gd::Object obj("myObject", "", spriteConfiguration.Clone());
-      project.GetObjectsContainer().InsertObject(obj, 0);
+      project.GetObjects().InsertObject(obj, 0);
 
       worker.files.clear();
       worker.images.clear();
@@ -141,7 +141,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
       spriteConfiguration.GetAnimations().AddAnimation(anim);
 
       gd::Object obj("myObject", "", spriteConfiguration.Clone());
-      layout.GetObjectsContainer().InsertObject(obj, 0);
+      layout.GetObjects().InsertObject(obj, 0);
 
       worker.files.clear();
       worker.images.clear();
@@ -378,7 +378,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
       auto& layout = project.InsertNewLayout("Scene", 0);
       layout.InsertNewLayer("MyLayer", 0);
       auto& layer = layout.GetLayer("MyLayer");
-      auto &object = layout.GetObjectsContainer().InsertNewObject(
+      auto &object = layout.GetObjects().InsertNewObject(
           project, "MyExtension::Sprite", "MyObject", 0);
       auto &effect = object.GetEffects().InsertNewEffect("MyEffect", 0);
       effect.SetEffectType("MyExtension::EffectWithResource");
@@ -441,7 +441,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
       spriteConfiguration.GetAnimations().AddAnimation(anim);
 
       gd::Object obj("myObject", "", spriteConfiguration.Clone());
-      layout.GetObjectsContainer().InsertObject(obj, 0);
+      layout.GetObjects().InsertObject(obj, 0);
 
       worker.files.clear();
       worker.images.clear();
@@ -895,7 +895,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
       auto& layout = project.InsertNewLayout("Scene", 0);
       layout.InsertNewLayer("MyLayer", 0);
       auto& layer = layout.GetLayer("MyLayer");
-      auto &object = layout.GetObjectsContainer().InsertNewObject(
+      auto &object = layout.GetObjects().InsertNewObject(
           project, "MyExtension::Sprite", "MyObject", 0);
       auto &effect = object.GetEffects().InsertNewEffect("MyEffect", 0);
       effect.SetEffectType("MyExtension::EffectWithResource");

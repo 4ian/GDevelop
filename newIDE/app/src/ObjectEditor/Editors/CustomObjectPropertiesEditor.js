@@ -169,7 +169,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
               ))}
               {propertiesSchema.length ||
               (eventBasedObject &&
-                (eventBasedObject.getObjectsContainer().getObjectsCount() ||
+                (eventBasedObject.getObjects().getObjectsCount() ||
                   eventBasedObject.isAnimatable())) ? (
                 <React.Fragment>
                   {extraInformation ? (
@@ -193,10 +193,10 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                   {eventBasedObject &&
                     mapFor(
                       0,
-                      eventBasedObject.getObjectsContainer().getObjectsCount(),
+                      eventBasedObject.getObjects().getObjectsCount(),
                       i => {
                         const childObject = eventBasedObject
-                          .getObjectsContainer()
+                          .getObjects()
                           .getObjectAt(i);
                         const childObjectConfiguration = customObjectConfiguration.getChildObjectConfiguration(
                           childObject.getName()

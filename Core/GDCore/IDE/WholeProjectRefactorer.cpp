@@ -86,10 +86,10 @@ WholeProjectRefactorer::GetAllObjectTypesUsingEventsBasedBehavior(
         }
       };
 
-  addTypesOfObjectsIn(project.GetObjectsContainer());
+  addTypesOfObjectsIn(project.GetObjects());
   for (std::size_t s = 0; s < project.GetLayoutsCount(); s++) {
     auto &layout = project.GetLayout(s);
-    addTypesOfObjectsIn(layout.GetObjectsContainer());
+    addTypesOfObjectsIn(layout.GetObjects());
   }
 
   return allTypes;
@@ -1178,13 +1178,13 @@ WholeProjectRefactorer::FindInvalidRequiredBehaviorProperties(
 
   // Find in global objects
   findInvalidRequiredBehaviorPropertiesInObjects(
-      project.GetObjectsContainer().GetObjects());
+      project.GetObjects().GetObjects());
 
   // Find in layout objects.
   for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
     const gd::Layout &layout = project.GetLayout(i);
     findInvalidRequiredBehaviorPropertiesInObjects(
-        layout.GetObjectsContainer().GetObjects());
+        layout.GetObjects().GetObjects());
   }
   return invalidRequiredBehaviorProperties;
 }
@@ -1523,7 +1523,7 @@ void WholeProjectRefactorer::ObjectRemovedInLayout(
   auto projectScopedContainers = gd::ProjectScopedContainers::
       MakeNewProjectScopedContainersForProjectAndLayout(project, layout);
 
-  auto &groups = layout.GetObjectsContainer().GetObjectGroups();
+  auto &groups = layout.GetObjects().GetObjectGroups();
   for (std::size_t g = 0; g < groups.size(); ++g) {
     if (groups[g].Find(objectName))
       groups[g].RemoveObject(objectName);
@@ -1566,7 +1566,7 @@ void WholeProjectRefactorer::ObjectOrGroupRenamedInLayout(
 
   // Object groups can't have instances or be in other groups
   if (!isObjectGroup) {
-    auto &groups = layout.GetObjectsContainer().GetObjectGroups();
+    auto &groups = layout.GetObjects().GetObjectGroups();
     layout.GetInitialInstances().RenameInstancesOfObject(oldName, newName);
     for (std::size_t g = 0; g < groups.size(); ++g) {
       groups[g].RenameObject(oldName, newName);
@@ -1752,7 +1752,7 @@ void WholeProjectRefactorer::ObjectOrGroupRenamedInEventsBasedObject(
     auto *function = functionUniquePtr.get();
     WholeProjectRefactorer::ObjectOrGroupRenamedInEventsFunction(
         project, *function, globalObjectsContainer,
-        eventsBasedObject.GetObjectsContainer(), oldName, newName,
+        eventsBasedObject.GetObjects(), oldName, newName,
         isObjectGroup);
   }
 }
@@ -1787,15 +1787,15 @@ void WholeProjectRefactorer::GlobalObjectOrGroupRenamed(
   // Object groups can't be in other groups
   if (!isObjectGroup) {
     for (std::size_t g = 0;
-         g < project.GetObjectsContainer().GetObjectGroups().size(); ++g) {
-      project.GetObjectsContainer().GetObjectGroups()[g].RenameObject(oldName,
+         g < project.GetObjects().GetObjectGroups().size(); ++g) {
+      project.GetObjects().GetObjectGroups()[g].RenameObject(oldName,
                                                                       newName);
     }
   }
 
   for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
     gd::Layout &layout = project.GetLayout(i);
-    if (layout.GetObjectsContainer().HasObjectNamed(oldName))
+    if (layout.GetObjects().HasObjectNamed(oldName))
       continue;
 
     ObjectOrGroupRenamedInLayout(project, layout, oldName, newName,
@@ -1805,14 +1805,14 @@ void WholeProjectRefactorer::GlobalObjectOrGroupRenamed(
 
 void WholeProjectRefactorer::GlobalObjectRemoved(
     gd::Project &project, const gd::String &objectName) {
-  auto &globalGroups = project.GetObjectsContainer().GetObjectGroups();
+  auto &globalGroups = project.GetObjects().GetObjectGroups();
   for (std::size_t g = 0; g < globalGroups.size(); ++g) {
     globalGroups[g].RemoveObject(objectName);
   }
 
   for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
     gd::Layout &layout = project.GetLayout(i);
-    if (layout.GetObjectsContainer().HasObjectNamed(objectName))
+    if (layout.GetObjects().HasObjectNamed(objectName))
       continue;
 
     ObjectRemovedInLayout(project, layout, objectName);
@@ -1823,7 +1823,7 @@ void WholeProjectRefactorer::BehaviorsAddedToGlobalObject(
     gd::Project &project, const gd::String &objectName) {
   for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
     gd::Layout &layout = project.GetLayout(i);
-    if (layout.GetObjectsContainer().HasObjectNamed(objectName))
+    if (layout.GetObjects().HasObjectNamed(objectName))
       continue;
 
     BehaviorsAddedToObjectInLayout(project, layout, objectName);

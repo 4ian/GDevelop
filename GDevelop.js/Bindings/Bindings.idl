@@ -617,7 +617,7 @@ interface Project {
     [Ref] EventsBasedObject GetEventsBasedObject([Const] DOMString type);
 
     [Ref] VariablesContainer GetVariables();
-    [Ref] ObjectsContainer GetObjectsContainer();
+    [Ref] ObjectsContainer GetObjects();
     [Ref] ResourcesManager GetResourcesManager();
 
     void SerializeTo([Ref] SerializerElement element);
@@ -881,7 +881,7 @@ interface Layout {
     [Const, Ref] DOMString GetWindowDefaultTitle();
     [Ref] InitialInstancesContainer GetInitialInstances();
     [Ref] VariablesContainer GetVariables();
-    [Ref] ObjectsContainer GetObjectsContainer();
+    [Ref] ObjectsContainer GetObjects();
     [Ref] EventsList GetEvents();
     [Ref] LayersContainer GetLayers();
 
@@ -2828,7 +2828,7 @@ interface EventsBasedObject {
 
     [Ref] InitialInstancesContainer GetInitialInstances();
     [Ref] LayersContainer GetLayers();
-    [Ref] ObjectsContainer GetObjectsContainer();
+    [Ref] ObjectsContainer GetObjects();
 
     [Const, Value] DOMString STATIC_GetPropertyActionName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetPropertyConditionName([Const] DOMString propertyName);

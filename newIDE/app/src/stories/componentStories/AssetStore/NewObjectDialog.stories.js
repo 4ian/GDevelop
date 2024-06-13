@@ -28,7 +28,7 @@ export const Default = () => {
             onClose={action('onClose')}
             onCreateNewObject={action('onCreateNewObject')}
             onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
-            objectsContainer={testProject.testLayout.getObjectsContainer()}
+            objectsContainer={testProject.testLayout.getObjects()}
             resourceManagementProps={fakeResourceManagementProps}
             canInstallPrivateAsset={() => false}
           />

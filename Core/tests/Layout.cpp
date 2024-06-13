@@ -25,12 +25,12 @@ TEST_CASE("Layout", "[common]") {
     SetupProjectWithDummyPlatform(project, platform);
 
     gd::Layout &layout = project.InsertNewLayout("Scene", 0);
-    gd::Object &object = layout.GetObjectsContainer().InsertNewObject(
+    gd::Object &object = layout.GetObjects().InsertNewObject(
         project, "MyExtension::Sprite", "MyObject", 0);
     object.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
 
     REQUIRE(GetTypeOfBehaviorInObjectOrGroup(
-                project.GetObjectsContainer(), layout.GetObjectsContainer(),
+                project.GetObjects(), layout.GetObjects(),
                 "MyObject", "MyBehavior", true) == "MyExtension::MyBehavior");
   }
 
@@ -40,11 +40,11 @@ TEST_CASE("Layout", "[common]") {
     SetupProjectWithDummyPlatform(project, platform);
 
     gd::Layout &layout = project.InsertNewLayout("Scene", 0);
-    gd::Object &object = layout.GetObjectsContainer().InsertNewObject(
+    gd::Object &object = layout.GetObjects().InsertNewObject(
         project, "MyExtension::Sprite", "MyObject", 0);
 
     REQUIRE(GetTypeOfBehaviorInObjectOrGroup(
-                project.GetObjectsContainer(), layout.GetObjectsContainer(),
+                project.GetObjects(), layout.GetObjects(),
                 "MyObject", "MyBehavior", true) == "");
   }
 
@@ -54,20 +54,20 @@ TEST_CASE("Layout", "[common]") {
     SetupProjectWithDummyPlatform(project, platform);
 
     gd::Layout &layout = project.InsertNewLayout("Scene", 0);
-    gd::Object &object1 = layout.GetObjectsContainer().InsertNewObject(
+    gd::Object &object1 = layout.GetObjects().InsertNewObject(
         project, "MyExtension::Sprite", "MyObject1", 0);
     object1.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
-    gd::Object &object2 = layout.GetObjectsContainer().InsertNewObject(
+    gd::Object &object2 = layout.GetObjects().InsertNewObject(
         project, "MyExtension::Sprite", "MyObject2", 0);
     object2.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
 
     auto &group =
-        layout.GetObjectsContainer().GetObjectGroups().InsertNew("MyGroup", 0);
+        layout.GetObjects().GetObjectGroups().InsertNew("MyGroup", 0);
     group.AddObject(object1.GetName());
     group.AddObject(object2.GetName());
 
     REQUIRE(GetTypeOfBehaviorInObjectOrGroup(
-                project.GetObjectsContainer(), layout.GetObjectsContainer(),
+                project.GetObjects(), layout.GetObjects(),
                 "MyGroup", "MyBehavior", true) == "MyExtension::MyBehavior");
   }
 
@@ -78,20 +78,20 @@ TEST_CASE("Layout", "[common]") {
     SetupProjectWithDummyPlatform(project, platform);
 
     gd::Layout &layout = project.InsertNewLayout("Scene", 0);
-    gd::Object &object1 = layout.GetObjectsContainer().InsertNewObject(
+    gd::Object &object1 = layout.GetObjects().InsertNewObject(
         project, "MyExtension::Sprite", "MyObject1", 0);
     object1.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
-    gd::Object &object2 = layout.GetObjectsContainer().InsertNewObject(
+    gd::Object &object2 = layout.GetObjects().InsertNewObject(
         project, "MyExtension::Sprite", "MyObject2", 0);
     // object2 doesn't have the behavior.
 
     auto &group =
-        layout.GetObjectsContainer().GetObjectGroups().InsertNew("MyGroup", 0);
+        layout.GetObjects().GetObjectGroups().InsertNew("MyGroup", 0);
     group.AddObject(object1.GetName());
     group.AddObject(object2.GetName());
 
     REQUIRE(GetTypeOfBehaviorInObjectOrGroup(
-                project.GetObjectsContainer(), layout.GetObjectsContainer(),
+                project.GetObjects(), layout.GetObjects(),
                 "MyGroup", "MyBehavior", true) == "");
   }
 
@@ -102,21 +102,21 @@ TEST_CASE("Layout", "[common]") {
     SetupProjectWithDummyPlatform(project, platform);
 
     gd::Layout &layout = project.InsertNewLayout("Scene", 0);
-    gd::Object &object1 = layout.GetObjectsContainer().InsertNewObject(
+    gd::Object &object1 = layout.GetObjects().InsertNewObject(
         project, "MyExtension::Sprite", "MyObject1", 0);
     object1.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
-    gd::Object &object2 = layout.GetObjectsContainer().InsertNewObject(
+    gd::Object &object2 = layout.GetObjects().InsertNewObject(
         project, "MyExtension::Sprite", "MyObject2", 0);
     object2.AddNewBehavior(project, "MyExtension::MyOtherBehavior",
                            "MyBehavior");
 
     auto &group =
-        layout.GetObjectsContainer().GetObjectGroups().InsertNew("MyGroup", 0);
+        layout.GetObjects().GetObjectGroups().InsertNew("MyGroup", 0);
     group.AddObject(object1.GetName());
     group.AddObject(object2.GetName());
 
     REQUIRE(GetTypeOfBehaviorInObjectOrGroup(
-                project.GetObjectsContainer(), layout.GetObjectsContainer(),
+                project.GetObjects(), layout.GetObjects(),
                 "MyGroup", "MyBehavior", true) == "");
   }
 
@@ -127,10 +127,10 @@ TEST_CASE("Layout", "[common]") {
 
     gd::Layout &layout = project.InsertNewLayout("Scene", 0);
     auto &group =
-        layout.GetObjectsContainer().GetObjectGroups().InsertNew("MyGroup", 0);
+        layout.GetObjects().GetObjectGroups().InsertNew("MyGroup", 0);
 
     REQUIRE(GetTypeOfBehaviorInObjectOrGroup(
-                project.GetObjectsContainer(), layout.GetObjectsContainer(),
+                project.GetObjects(), layout.GetObjects(),
                 "MyGroup", "MyBehavior", true) == "");
   }
 }

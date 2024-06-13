@@ -15,10 +15,7 @@ describe('EnumerateObjects', () => {
       containerObjectsList,
       projectObjectsList,
       allObjectsList,
-    } = enumerateObjects(
-      project.getObjectsContainer(),
-      testLayout.getObjectsContainer()
-    );
+    } = enumerateObjects(project.getObjects(), testLayout.getObjects());
 
     expect(containerObjectsList).toHaveLength(22);
     expect(projectObjectsList).toHaveLength(2);
@@ -34,8 +31,8 @@ describe('EnumerateObjects', () => {
     };
     Object.entries(countByType).forEach(([type, count]) => {
       const { allObjectsList } = enumerateObjects(
-        project.getObjectsContainer(),
-        testLayout.getObjectsContainer(),
+        project.getObjects(),
+        testLayout.getObjects(),
         {
           type,
         }
@@ -48,8 +45,8 @@ describe('EnumerateObjects', () => {
   it('can enumerate objects with a filter on object names', () => {
     const { project, testLayout } = makeTestProject(gd);
     const { allObjectsList } = enumerateObjects(
-      project.getObjectsContainer(),
-      testLayout.getObjectsContainer(),
+      project.getObjects(),
+      testLayout.getObjects(),
       {
         names: [
           'MyTiledSpriteObject',
@@ -66,8 +63,8 @@ describe('EnumerateObjects', () => {
   it('can enumerate objects with a filter on both object name and type', () => {
     const { project, testLayout } = makeTestProject(gd);
     const { allObjectsList } = enumerateObjects(
-      project.getObjectsContainer(),
-      testLayout.getObjectsContainer(),
+      project.getObjects(),
+      testLayout.getObjects(),
       {
         type: 'TiledSpriteObject::TiledSprite',
         names: [
@@ -85,7 +82,7 @@ describe('EnumerateObjects', () => {
   it('can enumerate groups from a project and scene', () => {
     const { testLayout } = makeTestProject(gd);
     const allGroupsList = enumerateGroups(
-      testLayout.getObjectsContainer().getObjectGroups()
+      testLayout.getObjects().getObjectGroups()
     );
 
     expect(allGroupsList).toHaveLength(4);
@@ -97,10 +94,7 @@ describe('EnumerateObjects', () => {
       containerObjectsList,
       projectObjectsList,
       allObjectsList,
-    } = enumerateObjects(
-      project.getObjectsContainer(),
-      testLayout.getObjectsContainer()
-    );
+    } = enumerateObjects(project.getObjects(), testLayout.getObjects());
 
     expect(
       filterObjectsList(containerObjectsList, {
@@ -153,7 +147,7 @@ describe('EnumerateObjects', () => {
   it('can do a case-insensitive search in the lists of groups of objects', () => {
     const { testLayout } = makeTestProject(gd);
     const objectGroupsList: GroupWithContextList = enumerateGroups(
-      testLayout.getObjectsContainer().getObjectGroups()
+      testLayout.getObjects().getObjectGroups()
     ).map(group => ({ group, global: false }));
 
     expect(

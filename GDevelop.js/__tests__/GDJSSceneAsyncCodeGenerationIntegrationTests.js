@@ -499,7 +499,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
 
   test('generate an asynchronous action with objects', function () {
     const object = scene
-      .getObjectsContainer()
+      .getObjects()
       .insertNewObject(project, 'Sprite', 'MyObjectA', 0);
     object.getVariables().insertNew('TestVariable', 0).setValue(0);
     const instance = scene.getInitialInstances().insertNewInitialInstance();

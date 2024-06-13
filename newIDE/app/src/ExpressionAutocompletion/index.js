@@ -282,8 +282,8 @@ const getAutocompletionsForText = function(
     }
 
     const object = getObjectByName(
-      project.getObjectsContainer(),
-      scope.layout ? scope.layout.getObjectsContainer() : null,
+      project.getObjects(),
+      scope.layout ? scope.layout.getObjects() : null,
       objectName
     );
     if (!object) {
@@ -311,8 +311,8 @@ const getAutocompletionsForText = function(
     }
 
     const object = getObjectByName(
-      project.getObjectsContainer(),
-      scope.layout ? scope.layout.getObjectsContainer() : null,
+      project.getObjects(),
+      scope.layout ? scope.layout.getObjects() : null,
       objectName
     );
     if (!object) {

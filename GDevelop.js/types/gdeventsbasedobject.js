@@ -17,7 +17,7 @@ declare class gdEventsBasedObject extends gdAbstractEventsBasedEntity {
   isTextContainer(): boolean;
   getInitialInstances(): gdInitialInstancesContainer;
   getLayers(): gdLayersContainer;
-  getObjectsContainer(): gdObjectsContainer;
+  getObjects(): gdObjectsContainer;
   static getPropertyActionName(propertyName: string): string;
   static getPropertyConditionName(propertyName: string): string;
   static getPropertyExpressionName(propertyName: string): string;

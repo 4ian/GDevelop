@@ -131,14 +131,14 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
   /**
    * \brief Get the objects of the custom object.
    */
-  gd::ObjectsContainer& GetObjectsContainer() {
+  gd::ObjectsContainer& GetObjects() {
     return objectsContainer;
   }
 
   /**
    * \brief Get the objects of the custom object.
    */
-  const gd::ObjectsContainer& GetObjectsContainer() const {
+  const gd::ObjectsContainer& GetObjects() const {
     return objectsContainer;
   }
   ///@}

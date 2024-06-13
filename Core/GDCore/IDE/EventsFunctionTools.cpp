@@ -92,14 +92,14 @@ void EventsFunctionTools::ObjectEventsFunctionToObjectsContainer(
                    "its parameters).");
     return;
   }
-  if (eventsBasedObject.GetObjectsContainer().HasObjectNamed("Object")) {
+  if (eventsBasedObject.GetObjects().HasObjectNamed("Object")) {
     gd::LogWarning("Child-objects can't be named Object because it's reserved"
                   "for the parent. ");
     return;
   }
 
   // ...and its children.
-  auto &children = eventsBasedObject.GetObjectsContainer().GetObjects();
+  auto &children = eventsBasedObject.GetObjects().GetObjects();
   for (auto &childObject : children) {
     auto child = childObject.get();
     outputObjectsContainer.InsertObject(*child, children.size());

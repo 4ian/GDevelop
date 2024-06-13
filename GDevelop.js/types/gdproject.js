@@ -104,7 +104,7 @@ declare class gdProject {
   hasEventsBasedObject(type: string): boolean;
   getEventsBasedObject(type: string): gdEventsBasedObject;
   getVariables(): gdVariablesContainer;
-  getObjectsContainer(): gdObjectsContainer;
+  getObjects(): gdObjectsContainer;
   getResourcesManager(): gdResourcesManager;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(element: gdSerializerElement): void;

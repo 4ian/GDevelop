@@ -568,7 +568,7 @@ export class Project extends EmscriptenObject {
   hasEventsBasedObject(type: string): boolean;
   getEventsBasedObject(type: string): EventsBasedObject;
   getVariables(): VariablesContainer;
-  getObjectsContainer(): ObjectsContainer;
+  getObjects(): ObjectsContainer;
   getResourcesManager(): ResourcesManager;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(element: SerializerElement): void;
@@ -733,7 +733,7 @@ export class Layout extends EmscriptenObject {
   getWindowDefaultTitle(): string;
   getInitialInstances(): InitialInstancesContainer;
   getVariables(): VariablesContainer;
-  getObjectsContainer(): ObjectsContainer;
+  getObjects(): ObjectsContainer;
   getEvents(): EventsList;
   getLayers(): LayersContainer;
   updateBehaviorsSharedData(project: Project): void;
@@ -2107,7 +2107,7 @@ export class EventsBasedObject extends AbstractEventsBasedEntity {
   isTextContainer(): boolean;
   getInitialInstances(): InitialInstancesContainer;
   getLayers(): LayersContainer;
-  getObjectsContainer(): ObjectsContainer;
+  getObjects(): ObjectsContainer;
   static getPropertyActionName(propertyName: string): string;
   static getPropertyConditionName(propertyName: string): string;
   static getPropertyExpressionName(propertyName: string): string;

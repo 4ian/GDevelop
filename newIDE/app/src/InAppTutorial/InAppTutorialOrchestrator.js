@@ -171,7 +171,7 @@ const countObjectsInScene = ({
     ? project.getLayout(sceneName)
     : project.getLayoutAt(0);
 
-  return layout.getObjectsContainer().getObjectsCount();
+  return layout.getObjects().getObjectsCount();
 };
 
 export const getEditorTabSelector = ({
@@ -360,17 +360,15 @@ const gatherProjectDataOnMultipleSteps = ({
               layoutName && project.hasLayoutNamed(layoutName)
                 ? project.getLayout(layoutName)
                 : project.getLayoutAt(0);
-            const layoutObjectsCount = layout
-              .getObjectsContainer()
-              .getObjectsCount();
+            const layoutObjectsCount = layout.getObjects().getObjectsCount();
             if (layoutObjectsCount === 0) {
               throw new Error(
                 `No object was found in layout after step ${index} of flow`
               );
             }
             newData[key] = layout
-              .getObjectsContainer()
-              .getObjectAt(layout.getObjectsContainer().getObjectsCount() - 1)
+              .getObjects()
+              .getObjectAt(layout.getObjects().getObjectsCount() - 1)
               .getName();
           }
         }

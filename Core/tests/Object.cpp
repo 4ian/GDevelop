@@ -36,7 +36,7 @@ TEST_CASE("Object", "[common]") {
     SetupProjectWithDummyPlatform(project, platform);
 
     gd::Layout &layout = project.InsertNewLayout("Scene", 0);
-    gd::Object &object = layout.GetObjectsContainer().InsertNewObject(
+    gd::Object &object = layout.GetObjects().InsertNewObject(
         project, "MyExtension::FakeObjectWithDefaultBehavior", "MyObject", 0);
 
     REQUIRE(object.HasBehaviorNamed("Effect"));

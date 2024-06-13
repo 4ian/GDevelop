@@ -153,7 +153,7 @@ void Layout::UpdateBehaviorsSharedData(gd::Project& project) {
       allBehaviorsNames.push_back(behavior.GetName());
     }
   }
-  auto &globalObjects = project.GetObjectsContainer();
+  auto &globalObjects = project.GetObjects();
   for (std::size_t i = 0; i < globalObjects.GetObjectsCount(); ++i) {
     std::vector<gd::String> objectBehaviors =
         globalObjects.GetObject(i).GetAllBehaviorNames();

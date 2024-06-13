@@ -133,8 +133,8 @@ const InstructionEditorDialog = ({
     !!chosenObjectInstructionsInfo && !!chosenObjectInstructionsInfoTree;
   const chosenObject = chosenObjectName
     ? getObjectByName(
-        project.getObjectsContainer(),
-        scope.layout ? scope.layout.getObjectsContainer() : null,
+        project.getObjects(),
+        scope.layout ? scope.layout.getObjects() : null,
         chosenObjectName
       )
     : null;

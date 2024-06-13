@@ -169,7 +169,7 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
     {
       id: TOP_DOWN_RPG_PIXEL_PERFECT_ID,
       title: t`Top-Down RPG Pixel Perfect`,
-      description: t`Learn how to make a character move like in the old Pokemon games.`,
+      description: t`Learn how to make a character move like in the retro Pokemon games.`,
       durationInMinutes: 2,
       renderImage: props => <TopDownRPGMovement {...props} />,
     },

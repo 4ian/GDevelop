@@ -738,6 +738,204 @@ describe('Multiplayer', () => {
       }
     });
 
+    it('does not synchronize a scene/global variable from players if defined as not synchronized', () => {
+      const {
+        switchToPeer,
+        markAllPeerEventsAsProcessed,
+        expectNoEventsToBeProcessed,
+      } = createP2PAndMultiplayerManagersMock();
+
+      switchToPeer({
+        peerId: 'player-1',
+        otherPeerIds: ['player-2', 'player-3'],
+        playerNumber: 1,
+      });
+
+      const p1RuntimeScene = makeTestRuntimeSceneWithNetworkId();
+      const p1SceneVariable = new gdjs.Variable();
+      p1SceneVariable.setString('P1 is master of this variable');
+      p1RuntimeScene.getVariables().add('MyVariable', p1SceneVariable);
+      p1SceneVariable.disableSynchronization(); // Disable synchronization.
+      const p1GlobalVariable = new gdjs.Variable();
+      p1GlobalVariable.setString('P1 is master of this variable');
+      p1RuntimeScene
+        .getGame()
+        .getVariables()
+        .add('MyGlobalVariable', p1GlobalVariable);
+      p1GlobalVariable.disableSynchronization(); // Disable synchronization.
+      p1RuntimeScene.renderAndStep(1000 / 60);
+
+      switchToPeer({
+        peerId: 'player-2',
+        otherPeerIds: ['player-1'],
+        playerNumber: 2,
+      });
+
+      // Create the variable on player 2 too.
+      const p2RuntimeScene = makeTestRuntimeSceneWithNetworkId();
+      const p2Scenevariable = new gdjs.Variable();
+      p2Scenevariable.setString('P2 is master of this variable');
+      p2RuntimeScene.getVariables().add('MyVariable', p2Scenevariable);
+      p2Scenevariable.disableSynchronization(); // Disable synchronization.
+      const p2GlobalVariable = new gdjs.Variable();
+      p2GlobalVariable.setString('This will be overriden');
+      p2RuntimeScene
+        .getGame()
+        .getVariables()
+        .add('MyGlobalVariable', p2GlobalVariable);
+      p2GlobalVariable.disableSynchronization(); // Disable synchronization.
+      p2RuntimeScene.renderAndStep(1000 / 60);
+
+      switchToPeer({
+        peerId: 'player-3',
+        otherPeerIds: ['player-1'],
+        playerNumber: 3,
+      });
+
+      // Create the variable on player 3 too.
+      const p3RuntimeScene = makeTestRuntimeSceneWithNetworkId();
+      const p3SceneVariable = new gdjs.Variable();
+      p3SceneVariable.setString('P3 is master of this variable');
+      p3RuntimeScene.getVariables().add('MyVariable', p3SceneVariable);
+      p3SceneVariable.disableSynchronization(); // Disable synchronization.
+      const p3GlobalVariable = new gdjs.Variable();
+      p3GlobalVariable.setString('P3 is master of this variable');
+      p3RuntimeScene
+        .getGame()
+        .getVariables()
+        .add('MyGlobalVariable', p3GlobalVariable);
+      p3GlobalVariable.disableSynchronization(); // Disable synchronization.
+      p3RuntimeScene.renderAndStep(1000 / 60);
+
+      markAllPeerEventsAsProcessed();
+      expectNoEventsToBeProcessed();
+
+      // Change the variables on player 3.
+      {
+        switchToPeer({
+          peerId: 'player-3',
+          otherPeerIds: ['player-1'],
+          playerNumber: 3,
+        });
+
+        p3RuntimeScene
+          .getVariables()
+          .get('MyVariable')
+          .setString('Changed by player 3');
+        p3RuntimeScene
+          .getGame()
+          .getVariables()
+          .get('MyGlobalVariable')
+          .setString('Changed by player 3');
+
+        p3RuntimeScene.renderAndStep(1000 / 60);
+      }
+      // Change the variables on player 2.
+      {
+        switchToPeer({
+          peerId: 'player-2',
+          otherPeerIds: ['player-1'],
+          playerNumber: 2,
+        });
+
+        p2RuntimeScene
+          .getVariables()
+          .get('MyVariable')
+          .setString('Changed by player 2');
+        p2RuntimeScene
+          .getGame()
+          .getVariables()
+          .get('MyGlobalVariable')
+          .setString('Changed by player 2');
+
+        p2RuntimeScene.renderAndStep(1000 / 60);
+      }
+
+      // Change the variables on player 1.
+      {
+        switchToPeer({
+          peerId: 'player-1',
+          otherPeerIds: ['player-2', 'player-3'],
+          playerNumber: 1,
+        });
+
+        p1RuntimeScene
+          .getVariables()
+          .get('MyVariable')
+          .setString('Changed by player 1');
+        p1RuntimeScene
+          .getGame()
+          .getVariables()
+          .get('MyGlobalVariable')
+          .setString('Changed by player 1');
+
+        p1RuntimeScene.renderAndStep(1000 / 60);
+      }
+
+      // Check the variables have not been overriden on player 2.
+      {
+        switchToPeer({
+          peerId: 'player-2',
+          otherPeerIds: ['player-1'],
+          playerNumber: 2,
+        });
+
+        p2RuntimeScene.renderAndStep(1000 / 60);
+        expect(
+          p2RuntimeScene.getVariables().get('MyVariable').getAsString()
+        ).to.be('Changed by player 2');
+        expect(
+          p2RuntimeScene
+            .getGame()
+            .getVariables()
+            .get('MyGlobalVariable')
+            .getAsString()
+        ).to.be('Changed by player 2');
+      }
+
+      // Check the variables have not been overriden on player 3.
+      {
+        switchToPeer({
+          peerId: 'player-3',
+          otherPeerIds: ['player-1'],
+          playerNumber: 3,
+        });
+
+        p3RuntimeScene.renderAndStep(1000 / 60);
+        expect(
+          p3RuntimeScene.getVariables().get('MyVariable').getAsString()
+        ).to.be('Changed by player 3');
+        expect(
+          p3RuntimeScene
+            .getGame()
+            .getVariables()
+            .get('MyGlobalVariable')
+            .getAsString()
+        ).to.be('Changed by player 3');
+      }
+
+      // Check the variables have not been overriden on the host.
+      {
+        switchToPeer({
+          peerId: 'player-1',
+          otherPeerIds: ['player-2', 'player-3'],
+          playerNumber: 1,
+        });
+
+        p1RuntimeScene.renderAndStep(1000 / 60);
+        expect(
+          p1RuntimeScene.getVariables().get('MyVariable').getAsString()
+        ).to.be('Changed by player 1');
+        expect(
+          p1RuntimeScene
+            .getGame()
+            .getVariables()
+            .get('MyGlobalVariable')
+            .getAsString()
+        ).to.be('Changed by player 1');
+      }
+    });
+
     it('synchronizes objects from the host to other players', () => {
       const {
         switchToPeer,

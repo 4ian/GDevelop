@@ -1416,8 +1416,21 @@ namespace gdjs {
     };
 
     const getMessageData = (messageName: string) => {
-      const data = gdjs.evtTools.p2p.getEventData(messageName);
-      return data;
+      const customMessageName = getCustomMessageNameFromUserMessageName(
+        messageName
+      );
+      const messageData = gdjs.evtTools.p2p.getEventData(customMessageName);
+      let data;
+      try {
+        data = JSON.parse(messageData);
+      } catch (e) {
+        logger.error(
+          `Error while parsing message ${messageName}: ${e.toString()}`
+        );
+        return '';
+      }
+
+      return data.data;
     };
 
     const handleCustomMessagesReceived = (): void => {

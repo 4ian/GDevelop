@@ -2732,6 +2732,7 @@ export class PreviewExportOptions extends EmscriptenObject {
   setExternalLayoutName(externalLayoutName: string): PreviewExportOptions;
   setIncludeFileHash(includeFile: string, hash: number): PreviewExportOptions;
   setProjectDataOnlyExport(enable: boolean): PreviewExportOptions;
+  setNativeMobileApp(enable: boolean): PreviewExportOptions;
   setFullLoadingScreen(enable: boolean): PreviewExportOptions;
   setIsDevelopmentEnvironment(enable: boolean): PreviewExportOptions;
   setNonRuntimeScriptsCacheBurst(value: number): PreviewExportOptions;

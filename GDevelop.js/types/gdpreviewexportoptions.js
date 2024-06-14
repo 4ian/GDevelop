@@ -8,6 +8,7 @@ declare class gdPreviewExportOptions {
   setExternalLayoutName(externalLayoutName: string): gdPreviewExportOptions;
   setIncludeFileHash(includeFile: string, hash: number): gdPreviewExportOptions;
   setProjectDataOnlyExport(enable: boolean): gdPreviewExportOptions;
+  setNativeMobileApp(enable: boolean): gdPreviewExportOptions;
   setFullLoadingScreen(enable: boolean): gdPreviewExportOptions;
   setIsDevelopmentEnvironment(enable: boolean): gdPreviewExportOptions;
   setNonRuntimeScriptsCacheBurst(value: number): gdPreviewExportOptions;

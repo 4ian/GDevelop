@@ -222,6 +222,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   }
   runtimeGameOptions.AddChild("projectDataOnlyExport")
       .SetBoolValue(options.projectDataOnlyExport);
+  runtimeGameOptions.AddChild("nativeMobileApp")
+      .SetBoolValue(options.nativeMobileApp);
   runtimeGameOptions.AddChild("websocketDebuggerServerAddress")
       .SetStringValue(options.websocketDebuggerServerAddress);
   runtimeGameOptions.AddChild("websocketDebuggerServerPort")

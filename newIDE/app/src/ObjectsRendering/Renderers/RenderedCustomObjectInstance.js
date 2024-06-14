@@ -222,12 +222,18 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
           gd.InitialInstance
         );
 
-        //Get the "RenderedInstance" object associated to the instance and tell it to update.
         const renderedInstance:
           | RenderedInstance
           | Rendered3DInstance
           | null = this.getRendererOfInstance(instance);
         if (!renderedInstance) return;
+
+        renderedInstance.wasUsed = true;
+
+        const pixiObject: PIXI.DisplayObject | null = renderedInstance.getPixiObject();
+        if (pixiObject) {
+          pixiObject.visible = false;
+        }
 
         const x = renderedInstance._instance.getX();
         const y = renderedInstance._instance.getY();
@@ -518,13 +524,23 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
       const { eventBasedObject } = this;
       if (eventBasedObject) {
         this._updateDimensions();
-        eventBasedObject
-          .getInitialInstances()
-          .iterateOverInstancesWithZOrdering(
-            // $FlowFixMe - gd.castObject is not supporting typings.
-            this.instancesRenderer,
-            '' // TODO: handle all layer
-          );
+        const layers = eventBasedObject.getLayers();
+        for (
+          let layerIndex = 0;
+          layerIndex < layers.getLayersCount();
+          layerIndex++
+        ) {
+          const layer = layers.getLayerAt(layerIndex);
+          if (layer.getVisibility()) {
+            eventBasedObject
+              .getInitialInstances()
+              .iterateOverInstancesWithZOrdering(
+                // $FlowFixMe - gd.castObject is not supporting typings.
+                this.instancesRenderer,
+                layer.getName()
+              );
+          }
+        }
         this._updatePixiObjectsZOrder();
         this._destroyUnusedInstanceRenderers();
       }

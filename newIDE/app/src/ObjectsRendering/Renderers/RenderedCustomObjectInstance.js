@@ -46,6 +46,18 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
   _defaultHeight = 48;
   _defaultDepth = 48;
 
+  /** Functor used to evaluate parent dimensions */
+  _instancesMeasurer: gdInitialInstanceJSFunctor;
+  /** Used to evaluate parent dimensions */
+  _temporaryAABB = {
+    minX: Number.MAX_VALUE,
+    minY: Number.MAX_VALUE,
+    minZ: Number.MAX_VALUE,
+    maxX: -Number.MAX_VALUE,
+    maxY: -Number.MAX_VALUE,
+    maxZ: -Number.MAX_VALUE,
+  };
+
   renderedInstances: { [number]: RenderedInstance | Rendered3DInstance } = {};
 
   eventBasedObject: gdEventsBasedObject | null;
@@ -200,6 +212,58 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
           renderedInstance.wasUsed = true;
         }
       };
+      // Functor used to evaluate parent dimensions
+      this._instancesMeasurer = new gd.InitialInstanceJSFunctor();
+      // $FlowFixMe - invoke is not writable
+      this._instancesMeasurer.invoke = instancePtr => {
+        // $FlowFixMe - wrapPointer is not exposed
+        const instance: gdInitialInstance = gd.wrapPointer(
+          instancePtr,
+          gd.InitialInstance
+        );
+
+        //Get the "RenderedInstance" object associated to the instance and tell it to update.
+        const renderedInstance:
+          | RenderedInstance
+          | Rendered3DInstance
+          | null = this.getRendererOfInstance(instance);
+        if (!renderedInstance) return;
+
+        const x = renderedInstance._instance.getX();
+        const y = renderedInstance._instance.getY();
+        const z = renderedInstance._instance.getZ();
+        const width = renderedInstance.getWidth();
+        const height = renderedInstance.getHeight();
+        const depth = renderedInstance.getDepth();
+        const originX = renderedInstance.getOriginX();
+        const originY = renderedInstance.getOriginY();
+        const originZ = renderedInstance.getOriginZ();
+
+        this._temporaryAABB.minX = Math.min(
+          this._temporaryAABB.minX,
+          x - originX
+        );
+        this._temporaryAABB.minY = Math.min(
+          this._temporaryAABB.minY,
+          y - originY
+        );
+        this._temporaryAABB.minZ = Math.min(
+          this._temporaryAABB.minZ,
+          z - originZ
+        );
+        this._temporaryAABB.maxX = Math.max(
+          this._temporaryAABB.maxX,
+          x - originX + width
+        );
+        this._temporaryAABB.maxY = Math.max(
+          this._temporaryAABB.maxY,
+          y - originY + height
+        );
+        this._temporaryAABB.maxZ = Math.max(
+          this._temporaryAABB.maxZ,
+          z - originZ + depth
+        );
+      };
       this._updateDimensions();
     } else {
       const childLayouts = getLayouts(
@@ -307,52 +371,19 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
       return;
     }
 
-    let minX = Number.MAX_VALUE;
-    let minY = Number.MAX_VALUE;
-    let minZ = Number.MAX_VALUE;
-    let maxX = -Number.MAX_VALUE;
-    let maxY = -Number.MAX_VALUE;
-    let maxZ = -Number.MAX_VALUE;
+    this._temporaryAABB.minX = Number.MAX_VALUE;
+    this._temporaryAABB.minY = Number.MAX_VALUE;
+    this._temporaryAABB.minZ = Number.MAX_VALUE;
+    this._temporaryAABB.maxX = -Number.MAX_VALUE;
+    this._temporaryAABB.maxY = -Number.MAX_VALUE;
+    this._temporaryAABB.maxZ = -Number.MAX_VALUE;
 
-    // Functor used to render an instance
-    let instancesMeasurer = new gd.InitialInstanceJSFunctor();
-    // $FlowFixMe - invoke is not writable
-    instancesMeasurer.invoke = instancePtr => {
-      // $FlowFixMe - wrapPointer is not exposed
-      const instance: gdInitialInstance = gd.wrapPointer(
-        instancePtr,
-        gd.InitialInstance
-      );
-
-      //Get the "RenderedInstance" object associated to the instance and tell it to update.
-      const renderedInstance:
-        | RenderedInstance
-        | Rendered3DInstance
-        | null = this.getRendererOfInstance(instance);
-      if (!renderedInstance) return;
-
-      const x = renderedInstance._instance.getX();
-      const y = renderedInstance._instance.getY();
-      const z = renderedInstance._instance.getZ();
-      const width = renderedInstance.getWidth();
-      const height = renderedInstance.getHeight();
-      const depth = renderedInstance.getDepth();
-      const originX = renderedInstance.getOriginX();
-      const originY = renderedInstance.getOriginY();
-      const originZ = renderedInstance.getOriginZ();
-
-      minX = Math.min(minX, x - originX);
-      minY = Math.min(minY, y - originY);
-      minZ = Math.min(minZ, z - originZ);
-      maxX = Math.max(maxX, x - originX + width);
-      maxY = Math.max(maxY, y - originY + height);
-      maxZ = Math.max(maxZ, z - originZ + depth);
-    };
     eventBasedObject.getInitialInstances().iterateOverInstances(
       // $FlowFixMe - gd.castObject is not supporting typings.
-      instancesMeasurer
+      this._instancesMeasurer
     );
-    instancesMeasurer.delete();
+
+    const { minX, minY, minZ, maxX, maxY, maxZ } = this._temporaryAABB;
 
     this._defaultWidth = maxX - minX;
     this._defaultHeight = maxY - minY;
@@ -398,6 +429,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
 
     // Destroy the object iterating on instances
     this.instancesRenderer.delete();
+    this._instancesMeasurer.delete();
 
     // Destroy the container.
     this._pixiObject.destroy(false);

@@ -32,6 +32,8 @@ namespace gdjs {
     scriptFiles?: Array<RuntimeGameOptionsScriptFile>;
     /** if true, export is a partial preview without events. */
     projectDataOnlyExport?: boolean;
+    /** if true, preview is launched from GDevelop native mobile app. */
+    nativeMobileApp?: boolean;
     /** The address of the debugger server, to reach out using WebSocket. */
     websocketDebuggerServerAddress?: string;
     /** The port of the debugger server, to reach out using WebSocket. */
@@ -267,7 +269,7 @@ namespace gdjs {
      * Return the additional options passed to the RuntimeGame when created.
      * @returns The additional options, if any.
      */
-    getAdditionalOptions(): RuntimeGameOptions | null {
+    getAdditionalOptions(): RuntimeGameOptions {
       return this._options;
     }
 

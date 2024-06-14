@@ -1220,12 +1220,31 @@ namespace gdjs {
     getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): GameNetworkSyncData | null {
-      const syncData = {
+      const syncData: GameNetworkSyncData = {
         var: this._variables.getNetworkSyncData(syncOptions),
         ss: this._sceneStack.getNetworkSyncData(syncOptions) || undefined,
       };
 
-      if (syncData.var.length === 0 && !syncData.ss) {
+      const extensionsVariablesSyncData = {};
+      this._variablesByExtensionName.forEach((variables, extensionName) => {
+        const extensionVariablesSyncData = variables.getNetworkSyncData(
+          syncOptions
+        );
+        // If there is no variables to sync, don't include the extension in the sync data.
+        if (extensionVariablesSyncData.length) {
+          extensionsVariablesSyncData[
+            extensionName
+          ] = extensionVariablesSyncData;
+        }
+      });
+      syncData.extVar = extensionsVariablesSyncData;
+
+      if (
+        (!syncData.var || syncData.var.length === 0) &&
+        !syncData.ss &&
+        (!syncData.extVar || Object.keys(syncData.extVar).length === 0)
+      ) {
+        // Nothing to sync.
         return null;
       }
 
@@ -1238,6 +1257,22 @@ namespace gdjs {
       }
       if (syncData.ss) {
         this._sceneStack.updateFromNetworkSyncData(syncData.ss);
+      }
+      if (syncData.extVar) {
+        for (const extensionName in syncData.extVar) {
+          if (!syncData.extVar.hasOwnProperty(extensionName)) {
+            continue;
+          }
+          const extensionVariablesData = syncData.extVar[extensionName];
+          const extensionVariables = this.getVariablesForExtension(
+            extensionName
+          );
+          if (extensionVariables) {
+            extensionVariables.updateFromNetworkSyncData(
+              extensionVariablesData
+            );
+          }
+        }
       }
     }
   }

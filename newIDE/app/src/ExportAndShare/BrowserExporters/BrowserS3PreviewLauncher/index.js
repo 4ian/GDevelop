@@ -15,6 +15,7 @@ import {
 import Window from '../../../Utils/Window';
 import { displayBlackLoadingScreen } from '../../../Utils/BrowserExternalWindowUtils';
 import { getGDevelopResourceJwtToken } from '../../../Utils/GDevelopServices/Project';
+import { isNativeMobileApp } from '../../../Utils/Platform';
 const gd: libGDevelop = global.gd;
 
 type State = {|
@@ -158,6 +159,8 @@ export default class BrowserS3PreviewLauncher extends React.Component<
       previewExportOptions.setFullLoadingScreen(
         previewOptions.fullLoadingScreen
       );
+
+      previewExportOptions.setNativeMobileApp(isNativeMobileApp());
 
       if (previewOptions.fallbackAuthor) {
         previewExportOptions.setFallbackAuthor(

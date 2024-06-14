@@ -328,7 +328,7 @@ export const LoadingScreenEditor = ({
                 const currentProgressBarMinWidth = loadingScreen.getProgressBarMinWidth();
                 const newProgressBarMinWidth = Math.max(
                   0,
-                  parseFloat(newValue)
+                  parseFloat(newValue) || 0
                 );
                 if (currentProgressBarMinWidth === newProgressBarMinWidth) {
                   return;
@@ -347,7 +347,7 @@ export const LoadingScreenEditor = ({
                 const currentProgressBarWidthPercent = loadingScreen.getProgressBarWidthPercent();
                 const newProgressBarWidthPercent = Math.min(
                   100,
-                  Math.max(1, parseFloat(newValue))
+                  Math.max(1, parseFloat(newValue) || 0)
                 );
                 if (
                   currentProgressBarWidthPercent === newProgressBarWidthPercent
@@ -371,7 +371,7 @@ export const LoadingScreenEditor = ({
                 const currentProgressBarMaxWidth = loadingScreen.getProgressBarMaxWidth();
                 const newProgressBarMaxWidth = Math.max(
                   0,
-                  parseFloat(newValue)
+                  parseFloat(newValue) || 0
                 );
                 if (currentProgressBarMaxWidth === newProgressBarMaxWidth) {
                   return;
@@ -390,7 +390,10 @@ export const LoadingScreenEditor = ({
               value={'' + loadingScreen.getProgressBarHeight()}
               onChange={newValue => {
                 const currentProgressBarHeight = loadingScreen.getProgressBarHeight();
-                const newProgressBarHeight = Math.max(1, parseFloat(newValue));
+                const newProgressBarHeight = Math.max(
+                  1,
+                  parseFloat(newValue) || 0
+                );
                 if (currentProgressBarHeight === newProgressBarHeight) {
                   return;
                 }
@@ -427,7 +430,7 @@ export const LoadingScreenEditor = ({
             type="number"
             value={'' + loadingScreen.getMinDuration()}
             onChange={newValue => {
-              const newMinDuration = Math.max(0, parseFloat(newValue));
+              const newMinDuration = Math.max(0, parseFloat(newValue) || 0);
               if (
                 newMinDuration < forcedLogo.minDuration &&
                 !watermark.isGDevelopWatermarkShown() &&
@@ -466,7 +469,7 @@ export const LoadingScreenEditor = ({
               onChange={newValue => {
                 const newLogoAndProgressLogoFadeInDelay = Math.max(
                   0,
-                  parseFloat(newValue)
+                  parseFloat(newValue) || 0
                 );
                 if (
                   newLogoAndProgressLogoFadeInDelay >
@@ -507,7 +510,7 @@ export const LoadingScreenEditor = ({
               onChange={newValue => {
                 const newLogoAndProgressFadeInDuration = Math.max(
                   0,
-                  parseFloat(newValue)
+                  parseFloat(newValue) || 0
                 );
                 if (
                   newLogoAndProgressFadeInDuration >

@@ -33,7 +33,7 @@ const getRequiredBehaviorTypes = (
       break;
     }
     const behaviorType = behaviorParameter.getExtraInfo();
-    if (behaviorType.length === '') {
+    if (behaviorType.length === 0) {
       continue;
     }
     const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(

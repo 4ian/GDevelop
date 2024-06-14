@@ -37,6 +37,7 @@ struct PreviewExportOptions {
       : project(project_),
         exportPath(exportPath_),
         useWindowMessageDebuggerClient(false),
+        nativeMobileApp(false),
         projectDataOnlyExport(false),
         fullLoadingScreen(false),
         isDevelopmentEnvironment(false),
@@ -73,6 +74,15 @@ struct PreviewExportOptions {
    */
   PreviewExportOptions &UseWindowMessageDebuggerClient() {
     useWindowMessageDebuggerClient = true;
+    return *this;
+  }
+
+  /**
+   * \brief Set that the preview is launched from a GDevelop native mobile app
+   * (iOS or Android).
+   */
+  PreviewExportOptions &SetNativeMobileApp(bool enable) {
+    nativeMobileApp = enable;
     return *this;
   }
 
@@ -186,6 +196,7 @@ struct PreviewExportOptions {
   gd::String externalLayoutName;
   gd::String fallbackAuthorUsername;
   gd::String fallbackAuthorId;
+  bool nativeMobileApp;
   std::map<gd::String, int> includeFileHashes;
   bool projectDataOnlyExport;
   bool fullLoadingScreen;

@@ -182,7 +182,7 @@ declare interface GameNetworkSyncData {
   var?: VariableNetworkSyncData[];
   ss?: SceneStackNetworkSyncData;
   extVar?: {
-    [extensionNale: string]: VariableNetworkSyncData[];
+    [extensionName: string]: VariableNetworkSyncData[];
   };
 }
 

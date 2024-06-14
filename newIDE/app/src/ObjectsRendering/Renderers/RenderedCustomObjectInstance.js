@@ -428,8 +428,12 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     }
 
     // Destroy the object iterating on instances
-    this.instancesRenderer.delete();
-    this._instancesMeasurer.delete();
+    if (this.instancesRenderer) {
+      this.instancesRenderer.delete();
+    }
+    if (this._instancesMeasurer) {
+      this._instancesMeasurer.delete();
+    }
 
     // Destroy the container.
     this._pixiObject.destroy(false);

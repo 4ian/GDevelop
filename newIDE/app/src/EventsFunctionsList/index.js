@@ -55,6 +55,7 @@ import { type GDevelopTheme } from '../UI/Theme';
 
 const gd: libGDevelop = global.gd;
 
+export const extensionConfigurationRootFolderId = 'extension-configuration';
 export const extensionObjectsRootFolderId = 'extension-objects';
 export const extensionBehaviorsRootFolderId = 'extension-behaviors';
 export const extensionFunctionsRootFolderId = 'extension-functions';
@@ -1035,7 +1036,7 @@ const EventsFunctionsList = React.forwardRef<
           {
             isRoot: true,
             content: new LabelTreeViewItemContent(
-              extensionBehaviorsRootFolderId,
+              extensionConfigurationRootFolderId,
               i18n._(t`Extension`)
             ),
             getChildren(i18n: I18nType): ?Array<TreeViewItem> {
@@ -1252,6 +1253,7 @@ const EventsFunctionsList = React.forwardRef<
       extensionObjectsRootFolderId,
       extensionBehaviorsRootFolderId,
       extensionFunctionsRootFolderId,
+      extensionConfigurationRootFolderId,
       ...objectTreeViewItems.map(item => item.content.getId()),
       ...behaviorTreeViewItems.map(item => item.content.getId()),
     ];

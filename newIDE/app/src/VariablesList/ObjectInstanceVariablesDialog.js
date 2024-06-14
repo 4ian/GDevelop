@@ -10,7 +10,9 @@ import getObjectByName from '../Utils/GetObjectByName';
 type Props = {|
   open: boolean,
   project: gdProject,
-  layout: gdLayout,
+  layout?: ?gdLayout,
+  objectsContainer: gdObjectsContainer,
+  globalObjectsContainer: gdObjectsContainer,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   objectInstance: gdInitialInstance,
   onApply: (selectedVariableName: string | null) => void,
@@ -28,6 +30,8 @@ type Props = {|
 const ObjectInstanceVariablesDialog = ({
   project,
   layout,
+  objectsContainer,
+  globalObjectsContainer,
   objectInstance,
   open,
   onCancel,
@@ -43,8 +47,8 @@ const ObjectInstanceVariablesDialog = ({
       const objectName = objectInstance.getObjectName();
       // TODO Use projectScopedContainers to get the object
       const variablesEditedAssociatedObject = getObjectByName(
-        project.getObjects(),
-        layout.getObjects(),
+        globalObjectsContainer,
+        objectsContainer,
         objectName
       );
       return variablesEditedAssociatedObject
@@ -64,17 +68,19 @@ const ObjectInstanceVariablesDialog = ({
                 </Trans>
               ),
               onComputeAllVariableNames: () =>
-                EventsRootVariablesFinder.findAllObjectVariables(
-                  project.getCurrentPlatform(),
-                  project,
-                  layout,
-                  objectName
-                ),
+                layout
+                  ? EventsRootVariablesFinder.findAllObjectVariables(
+                      project.getCurrentPlatform(),
+                      project,
+                      layout,
+                      objectName
+                    )
+                  : [],
             },
           ]
         : [];
     },
-    [layout, objectInstance, project]
+    [globalObjectsContainer, layout, objectInstance, project]
   );
 
   return (

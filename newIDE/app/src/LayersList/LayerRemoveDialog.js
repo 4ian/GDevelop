@@ -13,7 +13,9 @@ const gd: libGDevelop = global.gd;
 type Props = {|
   open: boolean,
   project: gdProject,
+  layout?: ?gdLayout,
   layersContainer: gdLayersContainer,
+  initialInstances: gdInitialInstancesContainer,
   layerRemoved: string,
   onClose: (doRemove: boolean, newLayer: string | null) => void,
 |};
@@ -43,12 +45,15 @@ export default class LayerRemoveDialog extends Component<Props, State> {
   render() {
     if (!this.props.layersContainer || !this.props.open) return null;
 
-    // TODO: adapt for layouts.
-    const instancesCountInLayout = gd.WholeProjectRefactorer.getLayoutAndExternalLayoutLayerInstancesCount(
-      this.props.project,
-      this.props.layersContainer,
-      this.props.layerRemoved
-    );
+    const instancesCountInLayout = this.props.layout
+      ? gd.WholeProjectRefactorer.getLayoutAndExternalLayoutLayerInstancesCount(
+          this.props.project,
+          this.props.layout,
+          this.props.layerRemoved
+        )
+      : this.props.initialInstances.getLayerInstancesCount(
+          this.props.layerRemoved
+        );
 
     let actions = [
       <FlatButton

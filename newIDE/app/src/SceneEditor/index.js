@@ -1964,6 +1964,8 @@ export default class SceneEditor extends React.Component<Props, State> {
                   <ObjectInstanceVariablesDialog
                     project={project}
                     layout={layout}
+                    objectsContainer={this.props.objectsContainer}
+                    globalObjectsContainer={this.props.globalObjectsContainer}
                     projectScopedContainersAccessor={
                       projectScopedContainersAccessor
                     }
@@ -1988,7 +1990,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                   <LayerRemoveDialog
                     open
                     project={project}
+                    layout={layout}
                     layersContainer={this.props.layersContainer}
+                    initialInstances={initialInstances}
                     layerRemoved={this.state.layerRemoved}
                     onClose={this.state.onCloseLayerRemoveDialog}
                   />

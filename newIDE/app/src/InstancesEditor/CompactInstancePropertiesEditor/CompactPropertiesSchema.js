@@ -427,7 +427,7 @@ export const makeSchema = ({
   forceUpdate: () => void,
   onEditObjectByName: (name: string) => void,
   onGetInstanceSize: gdInitialInstance => [number, number, number],
-  layersContainer: gdLayerContainer,
+  layersContainer: gdLayersContainer,
 |}): Schema => {
   const getInstanceWidth = (instance: gdInitialInstance) =>
     instance.hasCustomSize()

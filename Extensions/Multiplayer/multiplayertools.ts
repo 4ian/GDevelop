@@ -46,16 +46,27 @@ namespace gdjs {
 
         if (disableMultiplayerForTesting) return;
 
-        gdjs.multiplayerMessageManager.handleChangeOwnerMessages(runtimeScene);
-        gdjs.multiplayerMessageManager.handleUpdateObjectMessages(runtimeScene);
-        gdjs.multiplayerMessageManager.handleCustomMessages();
-        gdjs.multiplayerMessageManager.handleAcknowledgeMessages();
+        gdjs.multiplayerMessageManager.handleChangeInstanceOwnerMessagesReceived(
+          runtimeScene
+        );
+        gdjs.multiplayerMessageManager.handleUpdateInstanceMessagesReceived(
+          runtimeScene
+        );
+        gdjs.multiplayerMessageManager.handleCustomMessagesReceived();
+        gdjs.multiplayerMessageManager.handleAcknowledgeMessagesReceived();
         gdjs.multiplayerMessageManager.resendClearOrCancelAcknowledgedMessages(
           runtimeScene
         );
-        gdjs.multiplayerMessageManager.handleGameUpdatedMessages(runtimeScene);
-        gdjs.multiplayerMessageManager.handleSceneUpdatedMessages(runtimeScene);
-        gdjs.multiplayerMessageManager.handleHeartbeats();
+        gdjs.multiplayerMessageManager.handleChangeVariableOwnerMessagesReceived(
+          runtimeScene
+        );
+        gdjs.multiplayerMessageManager.handleUpdateGameMessagesReceived(
+          runtimeScene
+        );
+        gdjs.multiplayerMessageManager.handleUpdateSceneMessagesReceived(
+          runtimeScene
+        );
+        gdjs.multiplayerMessageManager.handleHeartbeatsToSend();
         gdjs.multiplayerMessageManager.handleDisconnectedPeers(runtimeScene);
       }
     );
@@ -64,11 +75,16 @@ namespace gdjs {
       (runtimeScene: gdjs.RuntimeScene) => {
         if (disableMultiplayerForTesting) return;
 
-        gdjs.multiplayerMessageManager.handleDestroyObjectMessages(
+        gdjs.multiplayerMessageManager.handleDestroyInstanceMessagesReceived(
           runtimeScene
         );
-        gdjs.multiplayerMessageManager.handleUpdateGameMessages(runtimeScene);
-        gdjs.multiplayerMessageManager.handleUpdateSceneMessages(runtimeScene);
+        gdjs.multiplayerVariablesManager.handleChangeVariableOwnerMessagesToSend();
+        gdjs.multiplayerMessageManager.handleUpdateGameMessagesToSend(
+          runtimeScene
+        );
+        gdjs.multiplayerMessageManager.handleUpdateSceneMessagesToSend(
+          runtimeScene
+        );
         gdjs.multiplayerMessageManager.handleHeartbeatsReceived();
         handleLeavingPlayer(runtimeScene);
         gdjs.multiplayerMessageManager.clearDisconnectedPeers();
@@ -146,7 +162,7 @@ namespace gdjs {
     /**
      * Returns the number of players in the lobby.
      */
-    export const getNumberOfPlayersInLobby = () => {
+    export const getPlayersInLobbyCount = () => {
       // If the game has not started yet, look at the lobby.
       if (!_isLobbyGameRunning && _lobby) {
         return _lobby.players.length;
@@ -165,7 +181,7 @@ namespace gdjs {
      * Return 0 if the player is not in the lobby.
      * Returns 1, 2, 3, ... if the player is in the lobby.
      */
-    export const getPlayerNumber = () => {
+    export const getCurrentPlayerNumber = () => {
       return playerNumber || 0;
     };
 
@@ -628,7 +644,7 @@ namespace gdjs {
       runtimeScene: gdjs.RuntimeScene
     ) {
       // When the countdown starts, if we are player number 1, then send the peerId to others so they can connect via P2P.
-      if (getPlayerNumber() === 1) {
+      if (getCurrentPlayerNumber() === 1) {
         sendPeerId();
       }
 

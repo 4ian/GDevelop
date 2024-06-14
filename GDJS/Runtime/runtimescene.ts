@@ -772,10 +772,43 @@ namespace gdjs {
       return this._isJustResumed;
     }
 
-    getNetworkSyncData(): LayoutNetworkSyncData {
-      const variablesNetworkSyncData = this._variables.getNetworkSyncData();
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): LayoutNetworkSyncData | null {
+      const syncedPlayerNumber = syncOptions.playerNumber;
+      const variablesNetworkSyncData = this._variables.getNetworkSyncData(
+        syncOptions
+      );
+      const extensionsVariablesSyncData = {};
+      this._variablesByExtensionName.forEach((variables, extensionName) => {
+        const extensionVariablesSyncData = variables.getNetworkSyncData(
+          syncOptions
+        );
+        // If there is no variables to sync, don't include the extension in the sync data.
+        if (extensionVariablesSyncData) {
+          extensionsVariablesSyncData[
+            extensionName
+          ] = extensionVariablesSyncData;
+        }
+      });
+
+      if (
+        syncedPlayerNumber !== undefined &&
+        syncedPlayerNumber !== 1 &&
+        (!this.networkId ||
+          (variablesNetworkSyncData.length === 0 &&
+            !Object.keys(extensionsVariablesSyncData).length))
+      ) {
+        // If we are getting sync data for a specific player,
+        // and they are not the host, there is no sync data to send if:
+        // - The scene has no networkId (it's either not a multiplayer scene or the scene is not yet networked).
+        // - There are no variables to sync in the scene or extensions.
+        return null;
+      }
+
       return {
         var: variablesNetworkSyncData,
+        extVar: extensionsVariablesSyncData,
         id: this.getOrCreateNetworkId(),
       };
     }
@@ -783,6 +816,22 @@ namespace gdjs {
     updateFromNetworkSyncData(syncData: LayoutNetworkSyncData) {
       if (syncData.var) {
         this._variables.updateFromNetworkSyncData(syncData.var);
+      }
+      if (syncData.extVar) {
+        for (const extensionName in syncData.extVar) {
+          if (!syncData.extVar.hasOwnProperty(extensionName)) {
+            continue;
+          }
+          const extensionVariablesData = syncData.extVar[extensionName];
+          const extensionVariables = this._variablesByExtensionName.get(
+            extensionName
+          );
+          if (extensionVariables) {
+            extensionVariables.updateFromNetworkSyncData(
+              extensionVariablesData
+            );
+          }
+        }
       }
     }
 

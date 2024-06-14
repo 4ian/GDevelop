@@ -111,6 +111,7 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/Extensions/PlayerAuthentication/playerauthenticationtools.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/PlayerAuthentication/playerauthenticationcomponents.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/Multiplayer/messageManager.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/Multiplayer/multiplayerVariablesManager.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/Multiplayer/multiplayertools.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/Multiplayer/multiplayercomponents.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/Multiplayer/multiplayerobjectruntimebehavior.js',

@@ -98,8 +98,7 @@ namespace gdjs {
     let lastHeartbeatTimestamp = 0;
     let _playersLastHeartbeatInfo: {
       [playerNumber: number]: {
-        lastDurations: number[];
-        lastHeartbeatAt: number;
+        lastRoundTripTimes: number[];
       };
     } = {};
     let _peerIdToPlayerNumber: { [peerId: string]: number } = {};
@@ -119,7 +118,7 @@ namespace gdjs {
       originalData: any;
       expectedMessageName: string;
       otherPeerIds: string[];
-      shouldCancelMessageIfTimesOut?: boolean;
+      shouldCancelMessageIfTimesOut: boolean;
       maxNumberOfRetries?: number;
       messageRetryTime?: number;
     }) => {
@@ -363,9 +362,9 @@ namespace gdjs {
       return instance;
     };
 
-    const changeOwnerMessageNamePrefix = '#changeOwner';
-    const changeOwnerMessageNameRegex = /#changeOwner#owner_(\d+)#object_(.+)#instance_(.+)/;
-    const createChangeOwnerMessage = ({
+    const changeInstanceOwnerMessageNamePrefix = '#changeInstanceOwner';
+    const changeInstanceOwnerMessageNameRegex = /#changeInstanceOwner#owner_(\d+)#object_(.+)#instance_(.+)/;
+    const createChangeInstanceOwnerMessage = ({
       objectOwner,
       objectName,
       instanceNetworkId,
@@ -392,7 +391,7 @@ namespace gdjs {
       };
     } => {
       return {
-        messageName: `${changeOwnerMessageNamePrefix}#owner_${objectOwner}#object_${objectName}#instance_${instanceNetworkId}`,
+        messageName: `${changeInstanceOwnerMessageNamePrefix}#owner_${objectOwner}#object_${objectName}#instance_${instanceNetworkId}`,
         messageData: {
           previousOwner: objectOwner,
           newOwner: newObjectOwner,
@@ -402,29 +401,33 @@ namespace gdjs {
         },
       };
     };
-    const objectOwnerChangedMessageNamePrefix = '#ownerChanged';
-    const objectOwnerChangedMessageNameRegex = /#ownerChanged#owner_(\d+)#object_(.+)#instance_(.+)/;
-    const createObjectOwnerChangedMessageNameFromChangeOwnerMessage = (
+    const instanceOwnerChangedMessageNamePrefix = '#instanceOwnerChanged';
+    const instanceOwnerChangedMessageNameRegex = /#instanceOwnerChanged#owner_(\d+)#object_(.+)#instance_(.+)/;
+    const createInstanceOwnerChangedMessageNameFromChangeInstanceOwnerMessage = (
       messageName: string
     ): string => {
       return messageName.replace(
-        changeOwnerMessageNamePrefix,
-        objectOwnerChangedMessageNamePrefix
+        changeInstanceOwnerMessageNamePrefix,
+        instanceOwnerChangedMessageNamePrefix
       );
     };
-    const handleChangeOwnerMessages = (runtimeScene: gdjs.RuntimeScene) => {
+    const handleChangeInstanceOwnerMessagesReceived = (
+      runtimeScene: gdjs.RuntimeScene
+    ) => {
       const p2pMessagesMap = gdjs.evtTools.p2p.getEvents();
       const messageNamesArray = Array.from(p2pMessagesMap.keys());
 
-      // When we receive ownership change messages, update the ownership of the objects in the scene.
-      const objectOwnershipChangeMessageNames = messageNamesArray.filter(
-        (messageName) => messageName.startsWith(changeOwnerMessageNamePrefix)
+      // When we receive ownership change messages, update the ownership of the instances in the scene.
+      const instanceOwnershipChangeMessageNames = messageNamesArray.filter(
+        (messageName) =>
+          messageName.startsWith(changeInstanceOwnerMessageNamePrefix)
       );
-      objectOwnershipChangeMessageNames.forEach((messageName) => {
+      instanceOwnershipChangeMessageNames.forEach((messageName) => {
         if (gdjs.evtTools.p2p.onEvent(messageName, false)) {
+          const messageData = gdjs.evtTools.p2p.getEventData(messageName);
           let data;
           try {
-            data = JSON.parse(gdjs.evtTools.p2p.getEventData(messageName));
+            data = JSON.parse(messageData);
           } catch (e) {
             logger.error(
               `Error while parsing message ${messageName}: ${e.toString()}`
@@ -433,7 +436,9 @@ namespace gdjs {
           }
           const messageSender = gdjs.evtTools.p2p.getEventSender(messageName);
           if (data) {
-            const matches = changeOwnerMessageNameRegex.exec(messageName);
+            const matches = changeInstanceOwnerMessageNameRegex.exec(
+              messageName
+            );
             if (!matches) {
               return;
             }
@@ -500,15 +505,15 @@ namespace gdjs {
             );
             behavior.playerNumber = newOwner;
 
-            const ownerChangedMessageName = createObjectOwnerChangedMessageNameFromChangeOwnerMessage(
+            const instanceOwnerChangedMessageName = createInstanceOwnerChangedMessageNameFromChangeInstanceOwnerMessage(
               messageName
             );
 
             logger.info(
               `Sending acknowledgment of ownership change of object ${objectName} from ${previousOwner} to ${newOwner} with instance network ID ${instanceNetworkId} to ${messageSender}.`
             );
-            // Once the object ownership has changed, we need to acknowledge it to the player who sent this message.
-            sendDataTo(messageSender, ownerChangedMessageName, {});
+            // Once the instance ownership has changed, we need to acknowledge it to the player who sent this message.
+            sendDataTo(messageSender, instanceOwnerChangedMessageName, {});
 
             // If we are the host,
             // so we need to relay the ownership change to others,
@@ -527,7 +532,7 @@ namespace gdjs {
               addExpectedMessageAcknowledgement({
                 originalMessageName: messageName,
                 originalData: data,
-                expectedMessageName: ownerChangedMessageName,
+                expectedMessageName: instanceOwnerChangedMessageName,
                 otherPeerIds,
                 // As we are the host, we do not cancel the message if it times out.
                 shouldCancelMessageIfTimesOut: false,
@@ -544,9 +549,9 @@ namespace gdjs {
       });
     };
 
-    const updateObjectMessageNamePrefix = '#update';
-    const updateObjectMessageNameRegex = /#update#owner_(\d+)#object_(.+)#instance_(.+)#scene_(.+)/;
-    const createUpdateObjectMessage = ({
+    const updateInstanceMessageNamePrefix = '#updateInstance';
+    const updateInstanceMessageNameRegex = /#updateInstance#owner_(\d+)#object_(.+)#instance_(.+)#scene_(.+)/;
+    const createUpdateInstanceMessage = ({
       objectOwner,
       objectName,
       instanceNetworkId,
@@ -563,23 +568,26 @@ namespace gdjs {
       messageData: any;
     } => {
       return {
-        messageName: `${updateObjectMessageNamePrefix}#owner_${objectOwner}#object_${objectName}#instance_${instanceNetworkId}#scene_${sceneNetworkId}`,
+        messageName: `${updateInstanceMessageNamePrefix}#owner_${objectOwner}#object_${objectName}#instance_${instanceNetworkId}#scene_${sceneNetworkId}`,
         messageData: objectNetworkSyncData,
       };
     };
-    const handleUpdateObjectMessages = (runtimeScene: gdjs.RuntimeScene) => {
+    const handleUpdateInstanceMessagesReceived = (
+      runtimeScene: gdjs.RuntimeScene
+    ) => {
       const p2pMessagesMap = gdjs.evtTools.p2p.getEvents();
       const messageNamesArray = Array.from(p2pMessagesMap.keys());
 
-      // When we receive update messages, update the objects in the scene.
+      // When we receive update messages, update the instances in the scene.
       const objectUpdateMessageNames = messageNamesArray.filter((messageName) =>
-        messageName.startsWith(updateObjectMessageNamePrefix)
+        messageName.startsWith(updateInstanceMessageNamePrefix)
       );
       objectUpdateMessageNames.forEach((messageName) => {
         if (gdjs.evtTools.p2p.onEvent(messageName, true)) {
+          const messageData = gdjs.evtTools.p2p.getEventData(messageName);
           let data;
           try {
-            data = JSON.parse(gdjs.evtTools.p2p.getEventData(messageName));
+            data = JSON.parse(messageData);
           } catch (e) {
             logger.error(
               `Error while parsing message ${messageName}: ${e.toString()}`
@@ -589,13 +597,13 @@ namespace gdjs {
           const messageSender = gdjs.evtTools.p2p.getEventSender(messageName);
 
           if (data) {
-            const matches = updateObjectMessageNameRegex.exec(messageName);
+            const matches = updateInstanceMessageNameRegex.exec(messageName);
             if (!matches) {
               return;
             }
             const ownerPlayerNumber = parseInt(matches[1], 10);
             if (ownerPlayerNumber === gdjs.multiplayer.playerNumber) {
-              // Do not update the object if we receive an message from ourselves.
+              // Do not update the instance if we receive an message from ourselves.
               // Should not happen but let's be safe.
               return;
             }
@@ -697,11 +705,189 @@ namespace gdjs {
       });
     };
 
+    const changeVariableOwnerMessageNamePrefix = '#changeVariableOwner';
+    const changeVariableOwnerMessageNameRegex = /#changeVariableOwner#owner_(\d+)#variable_(.+)/;
+    const createChangeVariableOwnerMessage = ({
+      variableOwner,
+      variableNetworkId,
+      newVariableOwner,
+    }: {
+      variableOwner: number;
+      variableNetworkId: string;
+      newVariableOwner: number;
+    }): {
+      messageName: string;
+      messageData: {
+        previousOwner: number;
+        newOwner: number;
+      };
+    } => {
+      return {
+        messageName: `${changeVariableOwnerMessageNamePrefix}#owner_${variableOwner}#variable_${variableNetworkId}`,
+        messageData: {
+          previousOwner: variableOwner,
+          newOwner: newVariableOwner,
+        },
+      };
+    };
+    const variableOwnerChangedMessageNamePrefix = '#variableOwnerChanged';
+    const variableOwnerChangedMessageNameRegex = /#variableOwnerChanged#owner_(\d+)#variable_(.+)/;
+    const createVariableOwnerChangedMessageNameFromChangeVariableOwnerMessage = (
+      messageName: string
+    ): string => {
+      return messageName.replace(
+        changeVariableOwnerMessageNamePrefix,
+        variableOwnerChangedMessageNamePrefix
+      );
+    };
+    const handleChangeVariableOwnerMessagesReceived = (
+      runtimeScene: gdjs.RuntimeScene
+    ) => {
+      const p2pMessagesMap = gdjs.evtTools.p2p.getEvents();
+      const messageNamesArray = Array.from(p2pMessagesMap.keys());
+
+      // When we receive ownership change messages, find the variable and update its ownership.
+      const variableOwnershipChangeMessageNames = messageNamesArray.filter(
+        (messageName) =>
+          messageName.startsWith(changeVariableOwnerMessageNamePrefix)
+      );
+      variableOwnershipChangeMessageNames.forEach((messageName) => {
+        if (gdjs.evtTools.p2p.onEvent(messageName, false)) {
+          const messageData = gdjs.evtTools.p2p.getEventData(messageName);
+          let data;
+          try {
+            data = JSON.parse(messageData);
+          } catch (e) {
+            logger.error(
+              `Error while parsing message ${messageName}: ${e.toString()}`
+            );
+            return;
+          }
+          const messageSender = gdjs.evtTools.p2p.getEventSender(messageName);
+          if (data) {
+            const matches = changeVariableOwnerMessageNameRegex.exec(
+              messageName
+            );
+            if (!matches) {
+              return;
+            }
+            const variableNetworkId = matches[2];
+            const previousOwner = data.previousOwner;
+            const newOwner = data.newOwner;
+
+            const {
+              type: variableType,
+              name: variableName,
+              containerId,
+            } = gdjs.multiplayerVariablesManager.getVariableTypeAndNameFromNetworkId(
+              variableNetworkId
+            );
+
+            // If this is a scene variable and we are not on the right scene, ignore it.
+            if (
+              variableType === 'scene' &&
+              containerId !== runtimeScene.networkId
+            ) {
+              logger.info(
+                `Variable ${variableName} is in scene ${containerId}, but we are on ${runtimeScene.networkId}. Skipping.`
+              );
+              // The variable is not in the current scene.
+              return;
+            }
+
+            const variablesContainer =
+              containerId === 'game'
+                ? runtimeScene.getGame().getVariables()
+                : runtimeScene.getVariables();
+
+            if (!variablesContainer.has(variableName)) {
+              // Variable not found, this should not happen.
+              logger.error(
+                `Variable with ID ${variableNetworkId} not found whilst syncing. This should not happen.`
+              );
+              return;
+            }
+
+            const variable = variablesContainer.get(variableName);
+
+            const currentPlayerVariableOwnership = variable.getPlayerOwnership();
+            // Change is coherent if:
+            const ownershipChangeIsCoherent =
+              // the variable is changing ownership from the same owner the host knew about,
+              currentPlayerVariableOwnership === previousOwner ||
+              // the variable is already owned by the new owner. (may have been changed by another player faster)
+              currentPlayerVariableOwnership === newOwner;
+            if (gdjs.multiplayer.isPlayerHost() && !ownershipChangeIsCoherent) {
+              // We received an ownership change message for a variable which is in an unexpected state.
+              // There may be some lag, and multiple ownership changes may have been sent by the other players.
+              // As the host, let's not change the ownership and let the player revert it.
+              logger.warn(
+                `Variable with ID ${variableNetworkId} does not have the expected owner. Wanted to change from ${previousOwner} to ${newOwner}, but variable has owner ${currentPlayerVariableOwnership}.`
+              );
+              return;
+            }
+
+            // Force the ownership change.
+            logger.info(
+              `Changing ownership of variable ${variableName} to ${newOwner}.`
+            );
+            variable.setPlayerOwnership(newOwner);
+
+            const variableOwnerChangedMessageName = createVariableOwnerChangedMessageNameFromChangeVariableOwnerMessage(
+              messageName
+            );
+
+            logger.info(
+              `Sending acknowledgment of ownership change of variable with ID ${variableNetworkId} from ${previousOwner} to ${newOwner} to ${messageSender}.`
+            );
+            // Once the variable ownership has changed, we need to acknowledge it to the player who sent this message.
+            sendDataTo(messageSender, variableOwnerChangedMessageName, {});
+
+            // If we are the host,
+            // we need to relay the ownership change to others,
+            // and expect an acknowledgment from them.
+            if (gdjs.multiplayer.isPlayerHost()) {
+              const connectedPeerIds = gdjs.evtTools.p2p.getAllPeers();
+              // We don't need to send the message to the player who sent the ownership change message.
+              const otherPeerIds = connectedPeerIds.filter(
+                (peerId) => peerId !== messageSender
+              );
+              if (!otherPeerIds.length) {
+                // No one else to relay the message to.
+                return;
+              }
+
+              addExpectedMessageAcknowledgement({
+                originalMessageName: messageName,
+                originalData: data,
+                expectedMessageName: variableOwnerChangedMessageName,
+                otherPeerIds,
+                // As we are the host, we do not cancel the message if it times out.
+                shouldCancelMessageIfTimesOut: false,
+              });
+              for (const peerId of otherPeerIds) {
+                logger.info(
+                  `Relaying ownership change of variable with Id ${variableNetworkId} to ${peerId}.`
+                );
+                sendDataTo(peerId, messageName, data);
+              }
+            }
+          }
+        }
+      });
+    };
+
     const getRegexFromAckMessageName = (messageName: string) => {
-      if (messageName.startsWith(objectDestroyedMessageNamePrefix)) {
-        return objectDestroyedMessageNameRegex;
-      } else if (messageName.startsWith(objectOwnerChangedMessageNamePrefix)) {
-        return objectOwnerChangedMessageNameRegex;
+      if (messageName.startsWith(instanceDestroyedMessageNamePrefix)) {
+        return instanceDestroyedMessageNameRegex;
+      } else if (
+        messageName.startsWith(instanceOwnerChangedMessageNamePrefix)
+      ) {
+        return instanceOwnerChangedMessageNameRegex;
+      } else if (
+        messageName.startsWith(variableOwnerChangedMessageNamePrefix)
+      ) {
+        return variableOwnerChangedMessageNameRegex;
       } else if (messageName.startsWith(customMessageAcknowledgePrefix)) {
         return customMessageAcknowledgeRegex;
       }
@@ -710,13 +896,14 @@ namespace gdjs {
 
     const isMessageAcknowledgement = (messageName: string) => {
       return (
-        messageName.startsWith(objectDestroyedMessageNamePrefix) ||
-        messageName.startsWith(objectOwnerChangedMessageNamePrefix) ||
+        messageName.startsWith(instanceDestroyedMessageNamePrefix) ||
+        messageName.startsWith(instanceOwnerChangedMessageNamePrefix) ||
+        messageName.startsWith(variableOwnerChangedMessageNamePrefix) ||
         messageName.startsWith(customMessageAcknowledgePrefix)
       );
     };
 
-    const handleAcknowledgeMessages = () => {
+    const handleAcknowledgeMessagesReceived = () => {
       const p2pMessagesMap = gdjs.evtTools.p2p.getEvents();
       const messageNamesArray = Array.from(p2pMessagesMap.keys());
       // When we receive acknowledgement messages, save it in the extension, to avoid sending the message again.
@@ -832,10 +1019,13 @@ namespace gdjs {
                 );
                 if (acknowledgements[peerId].shouldCancelMessageIfTimesOut) {
                   // If we should cancel the message if it times out, then revert it based on the original message.
+                  // INSTANCE OWNER CHANGE:
                   if (
-                    originalMessageName.startsWith(changeOwnerMessageNamePrefix)
+                    originalMessageName.startsWith(
+                      changeInstanceOwnerMessageNamePrefix
+                    )
                   ) {
-                    const matches = changeOwnerMessageNameRegex.exec(
+                    const matches = changeInstanceOwnerMessageNameRegex.exec(
                       originalMessageName
                     );
                     if (!matches) {
@@ -893,6 +1083,77 @@ namespace gdjs {
                     // Force the ownership change.
                     behavior.playerNumber = previousOwner || 0;
                   }
+
+                  // VARIABLE OWNER CHANGE:
+                  if (
+                    originalMessageName.startsWith(
+                      changeVariableOwnerMessageNamePrefix
+                    )
+                  ) {
+                    const matches = changeVariableOwnerMessageNameRegex.exec(
+                      originalMessageName
+                    );
+                    if (!matches) {
+                      // This should not happen, if it does, remove the acknowledgment and return.
+                      delete expectedMessageAcknowledgements[
+                        acknowledgemessageName
+                      ];
+                      return;
+                    }
+                    const variableNetworkId = matches[2];
+                    const previousOwner = originalData.previousOwner;
+
+                    const {
+                      type: variableType,
+                      name: variableName,
+                      containerId,
+                    } = gdjs.multiplayerVariablesManager.getVariableTypeAndNameFromNetworkId(
+                      variableNetworkId
+                    );
+
+                    // If this is a scene variable and we are not on the right scene, ignore it.
+                    if (
+                      variableType === 'scene' &&
+                      containerId !== runtimeScene.networkId
+                    ) {
+                      logger.info(
+                        `Variable ${variableName} is in scene ${containerId}, but we are on ${runtimeScene.networkId}. Skipping ownership revert.`
+                      );
+                      delete expectedMessageAcknowledgements[
+                        acknowledgemessageName
+                      ];
+                      return;
+                    }
+
+                    const variablesContainer =
+                      containerId === 'game'
+                        ? runtimeScene.getGame().getVariables()
+                        : runtimeScene.getVariables();
+
+                    if (!variablesContainer.has(variableName)) {
+                      // Variable not found, this should not happen.
+                      logger.error(
+                        `Variable with ID ${variableNetworkId} not found while reverting ownership. This should not happen.`
+                      );
+                      delete expectedMessageAcknowledgements[
+                        acknowledgemessageName
+                      ];
+                      return;
+                    }
+
+                    const variable = variablesContainer.get(variableName);
+
+                    if (previousOwner === undefined) {
+                      // No previous owner, cannot revert ownership.
+                      delete expectedMessageAcknowledgements[
+                        acknowledgemessageName
+                      ];
+                      return;
+                    }
+
+                    // Force the ownership change.
+                    variable.setPlayerOwnership(previousOwner || 0);
+                  }
                 }
                 delete expectedMessageAcknowledgements[acknowledgemessageName];
                 continue;
@@ -911,9 +1172,9 @@ namespace gdjs {
       });
     };
 
-    const destroyObjectMessageNamePrefix = '#destroy';
-    const destroyObjectMessageNameRegex = /#destroy#owner_(\d+)#object_(.+)#instance_(.+)#scene_(.+)/;
-    const createDestroyObjectMessage = ({
+    const destroyInstanceMessageNamePrefix = '#destroyInstance';
+    const destroyInstanceMessageNameRegex = /#destroyInstance#owner_(\d+)#object_(.+)#instance_(.+)#scene_(.+)/;
+    const createDestroyInstanceMessage = ({
       objectOwner,
       objectName,
       instanceNetworkId,
@@ -928,31 +1189,35 @@ namespace gdjs {
       messageData: any;
     } => {
       return {
-        messageName: `${destroyObjectMessageNamePrefix}#owner_${objectOwner}#object_${objectName}#instance_${instanceNetworkId}#scene_${sceneNetworkId}`,
+        messageName: `${destroyInstanceMessageNamePrefix}#owner_${objectOwner}#object_${objectName}#instance_${instanceNetworkId}#scene_${sceneNetworkId}`,
         messageData: {},
       };
     };
-    const objectDestroyedMessageNamePrefix = '#destroyed';
-    const objectDestroyedMessageNameRegex = /#destroyed#owner_(\d+)#object_(.+)#instance_(.+)/;
-    const createObjectDestroyedMessageNameFromDestroyMessage = (
+    const instanceDestroyedMessageNamePrefix = '#instanceDestroyed';
+    const instanceDestroyedMessageNameRegex = /#instanceDestroyed#owner_(\d+)#object_(.+)#instance_(.+)/;
+    const createInstanceDestroyedMessageNameFromDestroyInstanceMessage = (
       messageName: string
     ): string => {
       return messageName.replace(
-        destroyObjectMessageNamePrefix,
-        objectDestroyedMessageNamePrefix
+        destroyInstanceMessageNamePrefix,
+        instanceDestroyedMessageNamePrefix
       );
     };
-    const handleDestroyObjectMessages = (runtimeScene: gdjs.RuntimeScene) => {
+    const handleDestroyInstanceMessagesReceived = (
+      runtimeScene: gdjs.RuntimeScene
+    ) => {
       const p2pMessagesMap = gdjs.evtTools.p2p.getEvents();
       const messageNamesArray = Array.from(p2pMessagesMap.keys());
-      const destroyObjectMessageNames = messageNamesArray.filter(
-        (messageName) => messageName.startsWith(destroyObjectMessageNamePrefix)
+      const destroyInstanceMessageNames = messageNamesArray.filter(
+        (messageName) =>
+          messageName.startsWith(destroyInstanceMessageNamePrefix)
       );
-      destroyObjectMessageNames.forEach((messageName) => {
+      destroyInstanceMessageNames.forEach((messageName) => {
         if (gdjs.evtTools.p2p.onEvent(messageName, false)) {
           let data;
+          const messageData = gdjs.evtTools.p2p.getEventData(messageName);
           try {
-            data = JSON.parse(gdjs.evtTools.p2p.getEventData(messageName));
+            data = JSON.parse(messageData);
           } catch (e) {
             logger.error(
               `Error while parsing message ${messageName}: ${e.toString()}`
@@ -961,8 +1226,10 @@ namespace gdjs {
           }
           const messageSender = gdjs.evtTools.p2p.getEventSender(messageName);
           if (data && messageSender) {
-            logger.info(`Received message ${messageName} with data ${data}.`);
-            const matches = destroyObjectMessageNameRegex.exec(messageName);
+            logger.info(
+              `Received message ${messageName} with data ${messageData}.`
+            );
+            const matches = destroyInstanceMessageNameRegex.exec(messageName);
             if (!matches) {
               return;
             }
@@ -990,7 +1257,7 @@ namespace gdjs {
               instanceNetworkId,
             });
 
-            const destroyedMessageName = createObjectDestroyedMessageNameFromDestroyMessage(
+            const instanceDestroyedMessageName = createInstanceDestroyedMessageNameFromDestroyInstanceMessage(
               messageName
             );
 
@@ -1000,7 +1267,7 @@ namespace gdjs {
               );
               // Instance not found, it must have been destroyed already.
               // Send an acknowledgment to the player who sent the destroy message in case they missed it.
-              sendDataTo(messageSender, destroyedMessageName, {});
+              sendDataTo(messageSender, instanceDestroyedMessageName, {});
               return;
             }
 
@@ -1013,7 +1280,7 @@ namespace gdjs {
               `Sending acknowledgment of destruction of object ${objectName} with instance network ID ${instanceNetworkId} to ${messageSender}.`
             );
             // Once the object is destroyed, we need to acknowledge it to the player who sent the destroy message.
-            sendDataTo(messageSender, destroyedMessageName, {});
+            sendDataTo(messageSender, instanceDestroyedMessageName, {});
 
             // If we are the host, we need to relay the destruction to others.
             // And expect an acknowledgment from everyone else as well.
@@ -1031,8 +1298,10 @@ namespace gdjs {
               addExpectedMessageAcknowledgement({
                 originalMessageName: messageName,
                 originalData: data,
-                expectedMessageName: destroyedMessageName,
+                expectedMessageName: instanceDestroyedMessageName,
                 otherPeerIds,
+                // As we are the host, we do not cancel the message if it times out.
+                shouldCancelMessageIfTimesOut: false,
               });
               for (const peerId of otherPeerIds) {
                 sendDataTo(peerId, messageName, data);
@@ -1091,6 +1360,8 @@ namespace gdjs {
         originalData: messageData,
         expectedMessageName: acknowledgmentMessageName,
         otherPeerIds: connectedPeerIds, // Expect acknowledgment from all peers.
+        // custom messages cannot be reverted.
+        shouldCancelMessageIfTimesOut: false,
       });
       for (const peerId of connectedPeerIds) {
         sendDataTo(peerId, messageName, messageData);
@@ -1149,7 +1420,7 @@ namespace gdjs {
       return data;
     };
 
-    const handleCustomMessages = (): void => {
+    const handleCustomMessagesReceived = (): void => {
       const p2pMessagesMap = gdjs.evtTools.p2p.getEvents();
       const messageNamesArray = Array.from(p2pMessagesMap.keys());
       const customMessageNames = messageNamesArray.filter((messageName) =>
@@ -1158,9 +1429,10 @@ namespace gdjs {
       customMessageNames.forEach((messageName) => {
         if (gdjs.evtTools.p2p.onEvent(messageName, false)) {
           const event = gdjs.evtTools.p2p.getEvent(messageName);
+          const messageData = event.getData();
           let data;
           try {
-            data = JSON.parse(event.getData());
+            data = JSON.parse(messageData);
           } catch (e) {
             logger.error(
               `Error while parsing message ${messageName}: ${e.toString()}`
@@ -1169,7 +1441,9 @@ namespace gdjs {
           }
           const uniqueMessageId = data.uniqueId;
           const messageSender = event.getSender();
-          logger.info(`Received message ${messageName} with data ${data}.`);
+          logger.info(
+            `Received custom message ${messageName} with data ${messageData}.`
+          );
           const matches = customMessageRegex.exec(messageName);
           if (!matches) {
             // This should not happen.
@@ -1186,10 +1460,6 @@ namespace gdjs {
             );
             return;
           }
-
-          logger.info(
-            `Received custom message ${messageName} with data ${data}.`
-          );
 
           const acknowledgmentMessageName = createAcknowledgeCustomMessageNameFromCustomMessage(
             messageName
@@ -1215,6 +1485,8 @@ namespace gdjs {
               originalData: data,
               expectedMessageName: acknowledgmentMessageName,
               otherPeerIds: connectedPeerIds,
+              // As we are the host, we do not cancel the message if it times out.
+              shouldCancelMessageIfTimesOut: false,
             });
             for (const peerId of connectedPeerIds) {
               sendDataTo(peerId, messageName, data);
@@ -1263,14 +1535,16 @@ namespace gdjs {
       );
     };
 
-    const handleUpdateSceneMessages = (
+    const handleUpdateSceneMessagesToSend = (
       runtimeScene: gdjs.RuntimeScene
     ): void => {
-      // Only the host synchronizes the scene state.
-      if (!gdjs.multiplayer.isPlayerHost()) {
+      const sceneNetworkSyncData = runtimeScene.getNetworkSyncData({
+        playerNumber: gdjs.multiplayer.getCurrentPlayerNumber(),
+      });
+      if (!sceneNetworkSyncData) {
         return;
       }
-      const sceneNetworkSyncData = runtimeScene.getNetworkSyncData();
+
       const isSceneSyncDataDifferent = isSceneDifferentFromLastSync(
         sceneNetworkSyncData
       );
@@ -1301,41 +1575,58 @@ namespace gdjs {
       numberOfForcedSceneUpdates = Math.max(numberOfForcedSceneUpdates - 1, 0);
     };
 
-    const handleSceneUpdatedMessages = (runtimeScene: gdjs.RuntimeScene) => {
-      if (gdjs.multiplayer.isPlayerHost()) {
-        // Only other players need to update their scene.
-        return;
-      }
-
+    const handleUpdateSceneMessagesReceived = (
+      runtimeScene: gdjs.RuntimeScene
+    ) => {
       const p2pMessagesMap = gdjs.evtTools.p2p.getEvents();
       const messageNamesArray = Array.from(p2pMessagesMap.keys());
       const updateSceneMessageNames = messageNamesArray.filter((messageName) =>
         messageName.startsWith(updateSceneMessageNamePrefix)
       );
       updateSceneMessageNames.forEach((messageName) => {
-        if (gdjs.evtTools.p2p.onEvent(messageName, true)) {
-          let data;
-          try {
-            data = JSON.parse(gdjs.evtTools.p2p.getEventData(messageName));
-          } catch (e) {
-            logger.error(
-              `Error while parsing message ${messageName}: ${e.toString()}`
-            );
-            return;
-          }
-          const messageSender = gdjs.evtTools.p2p.getEventSender(messageName);
-          if (data && messageSender) {
-            const sceneNetworkId = data.id;
-
-            if (sceneNetworkId !== runtimeScene.networkId) {
-              logger.info(
-                `Received update of scene ${sceneNetworkId}, but we are on ${runtimeScene.networkId}. Skipping.`
+        if (gdjs.evtTools.p2p.onEvent(messageName, false)) {
+          const message = gdjs.evtTools.p2p.getEvent(messageName);
+          let messageData;
+          while ((messageData = message.getData())) {
+            let data;
+            try {
+              data = JSON.parse(messageData);
+            } catch (e) {
+              logger.error(
+                `Error while parsing message ${messageName}: ${e.toString()}`
               );
-              // The scene is not the current scene.
+              message.popData();
               return;
             }
+            const messageSender = gdjs.evtTools.p2p.getEventSender(messageName);
+            if (data && messageSender) {
+              const sceneNetworkId = data.id;
 
-            runtimeScene.updateFromNetworkSyncData(data);
+              if (sceneNetworkId !== runtimeScene.networkId) {
+                logger.info(
+                  `Received update of scene ${sceneNetworkId}, but we are on ${runtimeScene.networkId}. Skipping.`
+                );
+                message.popData();
+                // The scene is not the current scene.
+                return;
+              }
+
+              runtimeScene.updateFromNetworkSyncData(data);
+
+              // If we are are the host,
+              // we need to relay the scene update to others except the player who sent the update message.
+              if (gdjs.multiplayer.isPlayerHost()) {
+                const connectedPeerIds = gdjs.evtTools.p2p.getAllPeers();
+                for (const peerId of connectedPeerIds) {
+                  if (peerId === messageSender) {
+                    continue;
+                  }
+                  sendDataTo(peerId, messageName, data);
+                }
+              }
+            }
+
+            message.popData();
           }
         }
       });
@@ -1408,14 +1699,16 @@ namespace gdjs {
       return getTimeNow() - lastGameSyncTimestamp < 1000 / gameSyncDataTickRate;
     };
 
-    const handleUpdateGameMessages = (
+    const handleUpdateGameMessagesToSend = (
       runtimeScene: gdjs.RuntimeScene
     ): void => {
-      // Only the host synchronizes the global state.
-      if (!gdjs.multiplayer.isPlayerHost()) {
+      const gameNetworkSyncData = runtimeScene.getGame().getNetworkSyncData({
+        playerNumber: gdjs.multiplayer.getCurrentPlayerNumber(),
+      });
+      if (!gameNetworkSyncData) {
         return;
       }
-      const gameNetworkSyncData = runtimeScene.getGame().getNetworkSyncData();
+
       const isGameSyncDataDifferent = isGameDifferentFromLastSync(
         gameNetworkSyncData
       );
@@ -1446,30 +1739,48 @@ namespace gdjs {
       numberOfForcedGameUpdates = Math.max(numberOfForcedGameUpdates - 1, 0);
     };
 
-    const handleGameUpdatedMessages = (runtimeScene: gdjs.RuntimeScene) => {
-      if (gdjs.multiplayer.isPlayerHost()) {
-        return;
-      }
-
+    const handleUpdateGameMessagesReceived = (
+      runtimeScene: gdjs.RuntimeScene
+    ) => {
       const p2pMessagesMap = gdjs.evtTools.p2p.getEvents();
       const messageNamesArray = Array.from(p2pMessagesMap.keys());
       const updateGameMessageNames = messageNamesArray.filter((messageName) =>
         messageName.startsWith(updateGameMessageNamePrefix)
       );
       updateGameMessageNames.forEach((messageName) => {
-        if (gdjs.evtTools.p2p.onEvent(messageName, true)) {
-          let data;
-          try {
-            data = JSON.parse(gdjs.evtTools.p2p.getEventData(messageName));
-          } catch (e) {
-            logger.error(
-              `Error while parsing message ${messageName}: ${e.toString()}`
-            );
-            return;
-          }
-          const messageSender = gdjs.evtTools.p2p.getEventSender(messageName);
-          if (data && messageSender) {
-            runtimeScene.getGame().updateFromNetworkSyncData(data);
+        if (gdjs.evtTools.p2p.onEvent(messageName, false)) {
+          const message = gdjs.evtTools.p2p.getEvent(messageName);
+          let messageData;
+          while ((messageData = message.getData())) {
+            let data;
+            try {
+              data = JSON.parse(messageData);
+            } catch (e) {
+              logger.error(
+                `Error while parsing message ${messageName}: ${e.toString()}`
+              );
+              message.popData();
+              return;
+            }
+            const messageSender = message.getSender();
+            if (data && messageSender) {
+              runtimeScene.getGame().updateFromNetworkSyncData(data);
+
+              // If we are are the host,
+              // we need to relay the game update to others except the player who sent the update message.
+              if (gdjs.multiplayer.isPlayerHost()) {
+                const connectedPeerIds = gdjs.evtTools.p2p.getAllPeers();
+                for (const peerId of connectedPeerIds) {
+                  if (peerId === messageSender) {
+                    continue;
+                  }
+
+                  sendDataTo(peerId, messageName, data);
+                }
+              }
+            }
+
+            message.popData();
           }
         }
       });
@@ -1488,24 +1799,44 @@ namespace gdjs {
         playersPings[playerNumber] = getPlayerPing(parseInt(playerNumber, 10));
       }
       return {
-        messageName: `${heartbeatMessageNamePrefix}#${gdjs.multiplayer.getPlayerNumber()}`,
+        messageName: `${heartbeatMessageNamePrefix}#${gdjs.multiplayer.getCurrentPlayerNumber()}`,
         messageData: {
-          now: Date.now(),
+          now: getTimeNow(), // we send the current time to compute the ping.
           playersPings,
+        },
+      };
+    };
+    const createHeartbeatAnswerMessage = ({
+      heartbeatSentAt,
+    }: {
+      heartbeatSentAt: number;
+    }): {
+      messageName: string;
+      messageData: any;
+    } => {
+      return {
+        messageName: `${heartbeatMessageNamePrefix}#${gdjs.multiplayer.getCurrentPlayerNumber()}`,
+        messageData: {
+          sentAt: heartbeatSentAt,
         },
       };
     };
     const hasSentHeartbeatRecently = () => {
       return getTimeNow() - lastHeartbeatTimestamp < 1000 / heartbeatTickRate;
     };
-    const handleHeartbeats = () => {
+    const handleHeartbeatsToSend = () => {
+      // Only host sends heartbeats to all players regularly:
+      // - it allows them to send a heartbeat back immediately so that the host can compute the ping.
+      // - it allows to pass along the pings of all players to all players.
+      if (!gdjs.multiplayer.isPlayerHost()) {
+        return;
+      }
+
       const shouldSendHeartbeat = !hasSentHeartbeatRecently();
       if (!shouldSendHeartbeat) {
         return;
       }
 
-      // Players > 1 send heartbeats to the host.
-      // Host sends heartbeats to all players, allowing to pass along the pings of all players.
       const connectedPeerIds = gdjs.evtTools.p2p.getAllPeers();
       const { messageName, messageData } = createHeartbeatMessage();
       for (const peerId of connectedPeerIds) {
@@ -1523,9 +1854,10 @@ namespace gdjs {
       );
       heartbeatMessageNames.forEach((messageName) => {
         if (gdjs.evtTools.p2p.onEvent(messageName, false)) {
+          const messageData = gdjs.evtTools.p2p.getEventData(messageName);
           let data;
           try {
-            data = JSON.parse(gdjs.evtTools.p2p.getEventData(messageName));
+            data = JSON.parse(messageData);
           } catch (e) {
             logger.error(
               `Error while parsing message ${messageName}: ${e.toString()}`
@@ -1542,35 +1874,45 @@ namespace gdjs {
             // Ensure we know who is who.
             _peerIdToPlayerNumber[messageSender] = playerNumber;
 
-            // If we are not the host, save what the host told us about the pings.
+            // If we are not the host, save what the host told us about the pings and respond
+            // with a heartbeat immediately.
             if (!gdjs.multiplayer.isPlayerHost()) {
               _playersPings = data.playersPings;
+              const {
+                messageName: answerMessageName,
+                messageData: answerMessageData,
+              } = createHeartbeatAnswerMessage({
+                heartbeatSentAt: data.now, // We send back the time we received, so that the host can compute the ping.
+              });
+              sendDataTo(messageSender, answerMessageName, answerMessageData);
               return;
             }
 
-            // If we are the host, compute the pings.
-            const now = data.now;
-            const timeDifference = Math.round(Date.now() - now);
+            // If we are the host, compute the pings based on:
+            // - the time we received the heartbeat.
+            // - the time the heartbeat was sent.
+            const now = getTimeNow();
+            const heartbeatSentAt = data.sentAt;
+            const roundTripTime = Math.round(now - heartbeatSentAt);
             const playerLastHeartbeatInfo =
               _playersLastHeartbeatInfo[playerNumber] || {};
-            const playerLastHeartbeatDurations =
-              playerLastHeartbeatInfo.lastDurations || [];
-            playerLastHeartbeatDurations.push(timeDifference);
-            if (playerLastHeartbeatDurations.length > 5) {
-              // Keep only the last 5 heartbeats to compute the average.
-              playerLastHeartbeatDurations.shift();
+            const playerLastRoundTripTimes =
+              playerLastHeartbeatInfo.lastRoundTripTimes || [];
+            playerLastRoundTripTimes.push(roundTripTime);
+            if (playerLastRoundTripTimes.length > 5) {
+              // Keep only the last 5 RTT to compute the average.
+              playerLastRoundTripTimes.shift();
             }
             _playersLastHeartbeatInfo[playerNumber] = {
-              lastDurations: playerLastHeartbeatDurations,
-              lastHeartbeatAt: getTimeNow(),
+              lastRoundTripTimes: playerLastRoundTripTimes,
             };
 
             let sum = 0;
-            for (const duration of playerLastHeartbeatDurations) {
-              sum += duration;
+            for (const lastRoundTripTime of playerLastRoundTripTimes) {
+              sum += lastRoundTripTime;
             }
             const averagePing = Math.round(
-              sum / playerLastHeartbeatDurations.length
+              sum / playerLastRoundTripTimes.length / 2 // Divide by 2 to get the one way ping.
             );
             _playersPings[playerNumber] = averagePing;
           }
@@ -1736,32 +2078,46 @@ namespace gdjs {
     };
 
     return {
+      sendDataTo,
+      // Acks.
       addExpectedMessageAcknowledgement,
       clearExpectedMessageAcknowledgements,
-      sendDataTo,
-      createChangeOwnerMessage,
-      createObjectOwnerChangedMessageNameFromChangeOwnerMessage,
-      handleChangeOwnerMessages,
-      createUpdateObjectMessage,
-      handleUpdateObjectMessages,
-      handleAcknowledgeMessages,
+      handleAcknowledgeMessagesReceived,
       resendClearOrCancelAcknowledgedMessages,
-      createDestroyObjectMessage,
-      createObjectDestroyedMessageNameFromDestroyMessage,
-      handleDestroyObjectMessages,
+      // Instance ownership.
+      createChangeInstanceOwnerMessage,
+      createInstanceOwnerChangedMessageNameFromChangeInstanceOwnerMessage,
+      handleChangeInstanceOwnerMessagesReceived,
+      // Instance update.
+      createUpdateInstanceMessage,
+      handleUpdateInstanceMessagesReceived,
+      // Instance destruction.
+      createDestroyInstanceMessage,
+      createInstanceDestroyedMessageNameFromDestroyInstanceMessage,
+      handleDestroyInstanceMessagesReceived,
+      // Variable ownership.
+      createChangeVariableOwnerMessage,
+      createVariableOwnerChangedMessageNameFromChangeVariableOwnerMessage,
+      handleChangeVariableOwnerMessagesReceived,
+      // Custom messages.
       sendMessage,
       hasMessageBeenReceived,
       getMessageData,
-      handleCustomMessages,
+      handleCustomMessagesReceived,
+      // Scene update.
       createUpdateSceneMessage,
-      handleUpdateSceneMessages,
-      handleSceneUpdatedMessages,
+      handleUpdateSceneMessagesToSend,
+      handleUpdateSceneMessagesReceived,
+      // Game update.
       createUpdateGameMessage,
-      handleUpdateGameMessages,
-      handleGameUpdatedMessages,
-      handleHeartbeats,
+      handleUpdateGameMessagesToSend,
+      handleUpdateGameMessagesReceived,
+      // Heartbeats.
+      handleHeartbeatsToSend,
       handleHeartbeatsReceived,
+      // Connection/Disonnection.
       getPlayerPing,
+      updatePlayersPingsForTests,
       handleDisconnectedPeers,
       clearDisconnectedPeers,
       hasAnyPlayerLeft,
@@ -1769,9 +2125,9 @@ namespace gdjs {
       getDisconnectedPlayers,
       getNumberOfConnectedPlayers,
       isPlayerConnected,
+      // End game.
       sendEndGameMessage,
       handleEndGameMessages,
-      updatePlayersPingsForTests,
     };
   };
 

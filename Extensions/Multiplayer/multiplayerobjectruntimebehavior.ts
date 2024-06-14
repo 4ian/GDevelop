@@ -113,7 +113,7 @@ namespace gdjs {
     }
 
     private _isOwnerAsPlayerOrHost() {
-      const currentPlayerNumber = gdjs.multiplayer.getPlayerNumber();
+      const currentPlayerNumber = gdjs.multiplayer.getCurrentPlayerNumber();
 
       const isOwnerOfObject =
         currentPlayerNumber === this.playerNumber || // Player as owner.
@@ -345,7 +345,7 @@ namespace gdjs {
       const {
         messageName: updateMessageName,
         messageData: updateMessageData,
-      } = gdjs.multiplayerMessageManager.createUpdateObjectMessage({
+      } = gdjs.multiplayerMessageManager.createUpdateInstanceMessage({
         objectOwner: this.playerNumber,
         objectName,
         instanceNetworkId,
@@ -407,7 +407,7 @@ namespace gdjs {
         return;
       }
 
-      // For desruction of objects, we allow the host to destroy the object even if it is not the owner.
+      // For destruction of objects, we allow the host to destroy the object even if it is not the owner.
       // This is particularly helpful when a player disconnects, so the host can destroy the object they were owning.
       if (!this._isOwnerAsPlayerOrHost() && !gdjs.multiplayer.isPlayerHost()) {
         return;
@@ -434,7 +434,7 @@ namespace gdjs {
       const {
         messageName: updateMessageName,
         messageData: updateMessageData,
-      } = gdjs.multiplayerMessageManager.createUpdateObjectMessage({
+      } = gdjs.multiplayerMessageManager.createUpdateInstanceMessage({
         objectOwner: this.playerNumber,
         objectName,
         instanceNetworkId,
@@ -455,13 +455,13 @@ namespace gdjs {
       const {
         messageName: destroyMessageName,
         messageData: destroyMessageData,
-      } = gdjs.multiplayerMessageManager.createDestroyObjectMessage({
+      } = gdjs.multiplayerMessageManager.createDestroyInstanceMessage({
         objectOwner: this.playerNumber,
         objectName,
         instanceNetworkId,
         sceneNetworkId,
       });
-      const destroyedMessageName = gdjs.multiplayerMessageManager.createObjectDestroyedMessageNameFromDestroyMessage(
+      const destroyedMessageName = gdjs.multiplayerMessageManager.createInstanceDestroyedMessageNameFromDestroyInstanceMessage(
         destroyMessageName
       );
       gdjs.multiplayerMessageManager.addExpectedMessageAcknowledgement({
@@ -474,6 +474,8 @@ namespace gdjs {
         },
         expectedMessageName: destroyedMessageName,
         otherPeerIds,
+        // Destruction of objects are not reverted, as they will eventually be recreated by an update message.
+        shouldCancelMessageIfTimesOut: false,
       });
 
       this._sendDataToPeersWithIncreasedClock(
@@ -504,7 +506,7 @@ namespace gdjs {
       // If the host does not send an acknowledgment, we will revert the ownership.
       const previousObjectPlayerNumber = this.playerNumber;
       this.playerNumber = newObjectPlayerNumber;
-      const currentPlayerNumber = gdjs.multiplayer.getPlayerNumber();
+      const currentPlayerNumber = gdjs.multiplayer.getCurrentPlayerNumber();
 
       // If the lobby game is not running, do not try to update the ownership over the network,
       // as the game may create & update objects before the lobby game starts.
@@ -517,7 +519,7 @@ namespace gdjs {
         logger.info(
           'Object has no networkId, we change the ownership locally, but it will not be synchronized yet if we are not the owner.'
         );
-        if (newObjectPlayerNumber !== gdjs.multiplayer.getPlayerNumber()) {
+        if (newObjectPlayerNumber !== currentPlayerNumber) {
           // If we are not the new owner, we should not send a message to the host to change the ownership.
           // Just return and wait to receive an update message to reconcile this object.
           return;
@@ -539,7 +541,7 @@ namespace gdjs {
         const {
           messageName,
           messageData,
-        } = gdjs.multiplayerMessageManager.createChangeOwnerMessage({
+        } = gdjs.multiplayerMessageManager.createChangeInstanceOwnerMessage({
           objectOwner: previousObjectPlayerNumber,
           objectName,
           instanceNetworkId,
@@ -555,7 +557,7 @@ namespace gdjs {
         // In both cases, this represents the list of peers the current user is connected to.
         if (newObjectPlayerNumber === currentPlayerNumber) {
           const otherPeerIds = gdjs.evtTools.p2p.getAllPeers();
-          const changeOwnerAcknowledgedMessageName = gdjs.multiplayerMessageManager.createObjectOwnerChangedMessageNameFromChangeOwnerMessage(
+          const changeOwnerAcknowledgedMessageName = gdjs.multiplayerMessageManager.createInstanceOwnerChangedMessageNameFromChangeInstanceOwnerMessage(
             messageName
           );
           gdjs.multiplayerMessageManager.addExpectedMessageAcknowledgement({
@@ -588,7 +590,7 @@ namespace gdjs {
         const {
           messageName: updateMessageName,
           messageData: updateMessageData,
-        } = gdjs.multiplayerMessageManager.createUpdateObjectMessage({
+        } = gdjs.multiplayerMessageManager.createUpdateInstanceMessage({
           objectOwner: this.playerNumber,
           objectName,
           instanceNetworkId,
@@ -616,7 +618,7 @@ namespace gdjs {
     }
 
     takeObjectOwnership() {
-      this.setPlayerObjectOwnership(gdjs.multiplayer.getPlayerNumber());
+      this.setPlayerObjectOwnership(gdjs.multiplayer.getCurrentPlayerNumber());
     }
 
     getActionOnPlayerDisconnect() {

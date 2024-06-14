@@ -39,6 +39,8 @@ declare type ObjectData = {
   effects: Array<EffectData>;
 };
 
+declare type GetNetworkSyncDataOptions = { playerNumber?: number };
+
 /** Object containing basic properties for all objects synchronizing over the network. */
 declare type BasicObjectNetworkSyncData = {
   /** The position of the object on the X axis. */
@@ -122,6 +124,7 @@ declare type VariableNetworkSyncData = {
   value: string | float | boolean;
   children?: VariableNetworkSyncData[];
   type: VariableType;
+  owner: number;
 };
 
 /** Properties to set up a behavior. */
@@ -163,6 +166,9 @@ declare interface LayoutData {
 declare interface LayoutNetworkSyncData {
   id: string;
   var?: VariableNetworkSyncData[];
+  extVar?: {
+    [extensionName: string]: VariableNetworkSyncData[];
+  };
 }
 
 declare interface SceneStackSceneNetworkSyncData {
@@ -175,6 +181,9 @@ declare type SceneStackNetworkSyncData = SceneStackSceneNetworkSyncData[];
 declare interface GameNetworkSyncData {
   var?: VariableNetworkSyncData[];
   ss?: SceneStackNetworkSyncData;
+  extVar?: {
+    [extensionName: string]: VariableNetworkSyncData[];
+  };
 }
 
 declare interface EventsFunctionsExtensionData {

@@ -197,8 +197,17 @@ namespace gdjs {
       return this._wasFirstSceneLoaded;
     }
 
-    getNetworkSyncData(): SceneStackNetworkSyncData {
-      // If this method is called, we are the host, so we can take charge of
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): SceneStackNetworkSyncData | null {
+      const syncedPlayerNumber = syncOptions.playerNumber;
+      if (syncedPlayerNumber !== undefined && syncedPlayerNumber !== 1) {
+        // If we are getting sync data of a specific player,
+        // and they are not the host, we don't sync the scene stack.
+        return null;
+      }
+
+      // If we are the host, we can take charge of
       // generating a networkId for each scene if they don't have one.
       // They will be reconciled on the other players' games.
       const sceneStackSyncData: SceneStackSceneNetworkSyncData[] = [];

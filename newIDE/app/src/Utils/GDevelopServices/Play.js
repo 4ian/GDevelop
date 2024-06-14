@@ -502,3 +502,26 @@ export const updateLobbyConfiguration = async (
   );
   return response.data;
 };
+
+export const duplicateLobbyConfiguration = async ({
+  getAuthorizationHeader,
+  userId,
+  gameId,
+  sourceGameId,
+}: {|
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  gameId: string,
+  sourceGameId: string,
+|}): Promise<LobbyConfiguration> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.post(
+    `${GDevelopPlayApi.baseUrl}/game/${gameId}/lobby-configuration/action/copy`,
+    { sourceGameId },
+    {
+      headers: { Authorization: authorizationHeader },
+      params: { userId },
+    }
+  );
+  return response.data;
+};

@@ -178,6 +178,7 @@ import useVersionHistory from '../VersionHistory/UseVersionHistory';
 import { ProjectManagerDrawer } from '../ProjectManager/ProjectManagerDrawer';
 import DiagnosticReportDialog from '../ExportAndShare/DiagnosticReportDialog';
 import useSaveReminder from './UseSaveReminder';
+import { useMultiplayerLobbyConfigurator } from './UseMultiplayerLobbyConfigurator';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -410,6 +411,9 @@ const MainFrame = (props: Props) => {
     findLeaderboardsToReplace,
     renderLeaderboardReplacerDialog,
   } = useLeaderboardReplacer();
+  const {
+    configureMultiplayerLobbiesIfNeeded,
+  } = useMultiplayerLobbyConfigurator();
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
   );
@@ -1148,6 +1152,7 @@ const MainFrame = (props: Props) => {
       setNewProjectSetupDialogOpen(false);
       closeExampleStoreDialog({ deselectExampleAndGameTemplate: true });
       findLeaderboardsToReplace(project, oldProjectId);
+      configureMultiplayerLobbiesIfNeeded(project, oldProjectId);
       openSceneOrProjectManager({
         currentProject: project,
         editorTabs: editorTabs,

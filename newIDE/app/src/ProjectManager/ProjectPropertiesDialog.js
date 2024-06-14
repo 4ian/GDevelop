@@ -491,7 +491,7 @@ const ProjectPropertiesDialog = (props: Props) => {
                     onChange={value => {
                       const newResolutionWidth = Math.max(
                         1,
-                        parseInt(value, 10)
+                        parseInt(value, 10) || 0
                       );
                       if (newResolutionWidth === gameResolutionWidth) {
                         return;
@@ -509,7 +509,7 @@ const ProjectPropertiesDialog = (props: Props) => {
                     onChange={value => {
                       const newResolutionHeight = Math.max(
                         1,
-                        parseInt(value, 10)
+                        parseInt(value, 10) || 0
                       );
                       if (newResolutionHeight === gameResolutionHeight) {
                         return;
@@ -570,7 +570,7 @@ const ProjectPropertiesDialog = (props: Props) => {
                     type="number"
                     value={'' + minFPS}
                     onChange={value => {
-                      const newMinFPS = Math.max(0, parseInt(value, 10));
+                      const newMinFPS = Math.max(0, parseInt(value, 10) || 0);
                       if (newMinFPS === minFPS) {
                         return;
                       }
@@ -586,7 +586,7 @@ const ProjectPropertiesDialog = (props: Props) => {
                     type="number"
                     value={'' + maxFPS}
                     onChange={value => {
-                      const newMaxFPS = Math.max(0, parseInt(value, 10));
+                      const newMaxFPS = Math.max(0, parseInt(value, 10) || 0);
                       if (newMaxFPS === maxFPS) {
                         return;
                       }

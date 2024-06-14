@@ -120,6 +120,9 @@ namespace gdjs {
         'gameVersion',
         runtimeGame.getGameData().properties.version
       );
+      if (runtimeGame.getAdditionalOptions().nativeMobileApp) {
+        url.searchParams.set('nativeMobileApp', 'true');
+      }
       url.searchParams.set(
         'isPreview',
         runtimeGame.isPreview() ? 'true' : 'false'

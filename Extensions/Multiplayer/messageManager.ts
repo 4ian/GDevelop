@@ -98,8 +98,7 @@ namespace gdjs {
     let lastHeartbeatTimestamp = 0;
     let _playersLastHeartbeatInfo: {
       [playerNumber: number]: {
-        lastDurations: number[];
-        lastHeartbeatAt: number;
+        lastRoundTripTimes: number[];
       };
     } = {};
     let _peerIdToPlayerNumber: { [peerId: string]: number } = {};
@@ -1802,8 +1801,23 @@ namespace gdjs {
       return {
         messageName: `${heartbeatMessageNamePrefix}#${gdjs.multiplayer.getCurrentPlayerNumber()}`,
         messageData: {
-          now: Date.now(),
+          now: getTimeNow(), // we send the current time to compute the ping.
           playersPings,
+        },
+      };
+    };
+    const createHeartbeatAnswerMessage = ({
+      heartbeatSentAt,
+    }: {
+      heartbeatSentAt: number;
+    }): {
+      messageName: string;
+      messageData: any;
+    } => {
+      return {
+        messageName: `${heartbeatMessageNamePrefix}#${gdjs.multiplayer.getCurrentPlayerNumber()}`,
+        messageData: {
+          sentAt: heartbeatSentAt,
         },
       };
     };
@@ -1811,13 +1825,18 @@ namespace gdjs {
       return getTimeNow() - lastHeartbeatTimestamp < 1000 / heartbeatTickRate;
     };
     const handleHeartbeatsToSend = () => {
+      // Only host sends heartbeats to all players regularly:
+      // - it allows them to send a heartbeat back immediately so that the host can compute the ping.
+      // - it allows to pass along the pings of all players to all players.
+      if (!gdjs.multiplayer.isPlayerHost()) {
+        return;
+      }
+
       const shouldSendHeartbeat = !hasSentHeartbeatRecently();
       if (!shouldSendHeartbeat) {
         return;
       }
 
-      // Players > 1 send heartbeats to the host.
-      // Host sends heartbeats to all players, allowing to pass along the pings of all players.
       const connectedPeerIds = gdjs.evtTools.p2p.getAllPeers();
       const { messageName, messageData } = createHeartbeatMessage();
       for (const peerId of connectedPeerIds) {
@@ -1855,35 +1874,45 @@ namespace gdjs {
             // Ensure we know who is who.
             _peerIdToPlayerNumber[messageSender] = playerNumber;
 
-            // If we are not the host, save what the host told us about the pings.
+            // If we are not the host, save what the host told us about the pings and respond
+            // with a heartbeat immediately.
             if (!gdjs.multiplayer.isPlayerHost()) {
               _playersPings = data.playersPings;
+              const {
+                messageName: answerMessageName,
+                messageData: answerMessageData,
+              } = createHeartbeatAnswerMessage({
+                heartbeatSentAt: data.now, // We send back the time we received, so that the host can compute the ping.
+              });
+              sendDataTo(messageSender, answerMessageName, answerMessageData);
               return;
             }
 
-            // If we are the host, compute the pings.
-            const now = data.now;
-            const timeDifference = Math.round(Date.now() - now);
+            // If we are the host, compute the pings based on:
+            // - the time we received the heartbeat.
+            // - the time the heartbeat was sent.
+            const now = getTimeNow();
+            const heartbeatSentAt = data.sentAt;
+            const roundTripTime = Math.round(now - heartbeatSentAt);
             const playerLastHeartbeatInfo =
               _playersLastHeartbeatInfo[playerNumber] || {};
-            const playerLastHeartbeatDurations =
-              playerLastHeartbeatInfo.lastDurations || [];
-            playerLastHeartbeatDurations.push(timeDifference);
-            if (playerLastHeartbeatDurations.length > 5) {
-              // Keep only the last 5 heartbeats to compute the average.
-              playerLastHeartbeatDurations.shift();
+            const playerLastRoundTripTimes =
+              playerLastHeartbeatInfo.lastRoundTripTimes || [];
+            playerLastRoundTripTimes.push(roundTripTime);
+            if (playerLastRoundTripTimes.length > 5) {
+              // Keep only the last 5 RTT to compute the average.
+              playerLastRoundTripTimes.shift();
             }
             _playersLastHeartbeatInfo[playerNumber] = {
-              lastDurations: playerLastHeartbeatDurations,
-              lastHeartbeatAt: getTimeNow(),
+              lastRoundTripTimes: playerLastRoundTripTimes,
             };
 
             let sum = 0;
-            for (const duration of playerLastHeartbeatDurations) {
-              sum += duration;
+            for (const lastRoundTripTime of playerLastRoundTripTimes) {
+              sum += lastRoundTripTime;
             }
             const averagePing = Math.round(
-              sum / playerLastHeartbeatDurations.length
+              sum / playerLastRoundTripTimes.length / 2 // Divide by 2 to get the one way ping.
             );
             _playersPings[playerNumber] = averagePing;
           }

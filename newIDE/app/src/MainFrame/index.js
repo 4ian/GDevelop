@@ -142,7 +142,7 @@ import {
   sendInAppTutorialStarted,
   sendEventsExtractedAsFunction,
 } from '../Utils/Analytics/EventSender';
-import { useLeaderboardReplacer } from '../Leaderboard/useLeaderboardReplacer';
+import { useLeaderboardReplacer } from '../Leaderboard/UseLeaderboardReplacer';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import NewProjectSetupDialog from '../ProjectCreation/NewProjectSetupDialog';
 import {

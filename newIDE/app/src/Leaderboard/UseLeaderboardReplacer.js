@@ -22,7 +22,7 @@ import { duplicateLeaderboard } from '../Utils/GDevelopServices/Play';
 import { registerGame } from '../Utils/GDevelopServices/Game';
 import { toNewGdMapStringString } from '../Utils/MapStringString';
 
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 type ReplacePromptDialogProps = {|
   leaderboardsToReplace: ?Array<string>,
@@ -181,7 +181,7 @@ export const LeaderboardReplacerProgressDialog = ({
 
 type RetryOrAbandonCallback = () => void;
 
-type UseLeaderboardReplacerOutput = {
+type UseLeaderboardReplacerOutput = {|
   /**
    * Launch search through the whole project for leaderboard ids to replace.
    */
@@ -191,7 +191,7 @@ type UseLeaderboardReplacerOutput = {
    * Render, if needed, the dialog that will show the progress of leaderboard replacement.
    */
   renderLeaderboardReplacerDialog: () => React.Node,
-};
+|};
 
 type ErroredLeaderboard = {
   leaderboardId: string,
@@ -319,6 +319,7 @@ export const useLeaderboardReplacer = (): UseLeaderboardReplacerOutput => {
 
         gd.ProjectBrowserHelper.exposeProjectEvents(
           project,
+          // $FlowIgnore - eventsLeaderboardReplacer inherits from ArbitraryEventsWorker
           eventsLeaderboardReplacer
         );
         eventsLeaderboardReplacer.delete();
@@ -373,6 +374,7 @@ export const useLeaderboardReplacer = (): UseLeaderboardReplacerOutput => {
       setGameId(sourceGameId);
 
       const leaderboardsLister = new gd.EventsLeaderboardsLister(project);
+      // $FlowIgnore - leaderboardsLister inherits from ArbitraryEventsWorker
       gd.ProjectBrowserHelper.exposeProjectEvents(project, leaderboardsLister);
       const leaderboardIds = leaderboardsLister.getLeaderboardIds();
       setLeaderboardsToReplace(leaderboardIds.toNewVectorString().toJSArray());

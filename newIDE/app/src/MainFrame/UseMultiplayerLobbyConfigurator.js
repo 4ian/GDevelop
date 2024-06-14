@@ -3,14 +3,14 @@ import * as React from 'react';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { duplicateLobbyConfiguration } from '../Utils/GDevelopServices/Play';
 
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
-type UseMultiplayerLobbyConfiguratorOutput = {
+type UseMultiplayerLobbyConfiguratorOutput = {|
   configureMultiplayerLobbiesIfNeeded: (
     project: gdProject,
     sourceGameId: string
   ) => Promise<void>,
-};
+|};
 
 /**
  * Hook allowing to duplicate lobby configuration from another project, useful after
@@ -22,13 +22,6 @@ export const useMultiplayerLobbyConfigurator = (): UseMultiplayerLobbyConfigurat
   );
   const configureMultiplayerLobbiesIfNeeded = React.useCallback(
     async (project: gdProject, sourceGameId: string) => {
-      if (!profile) {
-        console.warn(
-          'User is not connected. Aborting multiplayer lobby configuration.'
-        );
-        return;
-      }
-
       const isMultiplayerExtensionUsed = gd.UsedExtensionsFinder.scanProject(
         project
       )
@@ -37,6 +30,13 @@ export const useMultiplayerLobbyConfigurator = (): UseMultiplayerLobbyConfigurat
         .toJSArray()
         .some(extensionName => extensionName === 'Multiplayer');
       if (!isMultiplayerExtensionUsed) return;
+
+      if (!profile) {
+        console.warn(
+          'User is not connected. Aborting multiplayer lobby configuration.'
+        );
+        return;
+      }
 
       try {
         await duplicateLobbyConfiguration({

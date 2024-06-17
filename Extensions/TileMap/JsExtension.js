@@ -1411,7 +1411,7 @@ module.exports = {
     );
 
     /**
-     * Renderer for instances of TileMap inside the IDE.
+     * Renderer for instances of TileMap collision mask inside the IDE.
      */
     class RenderedCollisionMaskInstance extends RenderedInstance {
       constructor(

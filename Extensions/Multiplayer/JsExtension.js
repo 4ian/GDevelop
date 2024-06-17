@@ -722,7 +722,7 @@ module.exports = {
         'PlayerObjectOwnership',
         _('Player object ownership'),
         _('the player owning the object'),
-        _('the player owning the object _PARAM0_'),
+        _('the player owning the instance'),
         _('Objects'),
         'JsPlatform/Extensions/multiplayer.svg'
       )

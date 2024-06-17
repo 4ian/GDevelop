@@ -151,10 +151,7 @@ namespace gdjs {
     }
 
     // private _logToConsoleWithThrottle(message: string) {
-    //   if (
-    //     getTimeNow() - this._lastLogTimestamp >
-    //     1000 / this._logTickRate
-    //   ) {
+    //   if (getTimeNow() - this._lastLogTimestamp > 1000 / this._logTickRate) {
     //     logger.info(message);
     //     this._lastLogTimestamp = getTimeNow();
     //   }
@@ -272,15 +269,17 @@ namespace gdjs {
         return;
       }
 
-      // this._logToConsoleWithThrottle(
-      //   `Synchronizing object ${this.owner.getName()} (instance ${
-      //     this.owner.networkId
-      //   }) with player ${this.playerNumber}`
-      // );
-
       const instanceNetworkId = this._getOrCreateInstanceNetworkId();
       const objectName = this.owner.getName();
       const objectNetworkSyncData = this.owner.getObjectNetworkSyncData();
+
+      // this._logToConsoleWithThrottle(
+      //   `Synchronizing object ${this.owner.getName()} (instance ${
+      //     this.owner.networkId
+      //   }) with player ${this.playerNumber} and data ${JSON.stringify(
+      //     objectNetworkSyncData
+      //   )}`
+      // );
 
       const areBasicObjectNetworkSyncDataDifferent = this._isBasicObjectNetworkSyncDataDifferentFromLastSync(
         {
@@ -524,6 +523,12 @@ namespace gdjs {
           // Just return and wait to receive an update message to reconcile this object.
           return;
         }
+        // If we don't have a networkId, we need to create one now that we are the owner.
+        // We are probably in a case where we created the object and then changed the ownership.
+        logger.info(
+          'We are the new owner, creating a networkId for the object.'
+        );
+        instanceNetworkId = this._getOrCreateInstanceNetworkId();
       }
 
       const sceneNetworkId = this.owner.getRuntimeScene().networkId;
@@ -534,58 +539,50 @@ namespace gdjs {
 
       const objectName = this.owner.getName();
 
-      if (instanceNetworkId) {
-        // When changing the ownership of an object with a networkId, we send a message to the host to ensure it is aware of the change,
-        // and can either accept it and broadcast it to other players, or reject it and do nothing with it.
-        // We expect an acknowledgment from the host, if not, we will retry and eventually revert the ownership.
-        const {
-          messageName,
-          messageData,
-        } = gdjs.multiplayerMessageManager.createChangeInstanceOwnerMessage({
-          objectOwner: previousObjectPlayerNumber,
-          objectName,
-          instanceNetworkId,
-          newObjectOwner: newObjectPlayerNumber,
-          instanceX: this.owner.getX(),
-          instanceY: this.owner.getY(),
-          sceneNetworkId,
+      // When changing the ownership of an object with a networkId, we send a message to the host to ensure it is aware of the change,
+      // and can either accept it and broadcast it to other players, or reject it and do nothing with it.
+      // We expect an acknowledgment from the host, if not, we will retry and eventually revert the ownership.
+      const {
+        messageName,
+        messageData,
+      } = gdjs.multiplayerMessageManager.createChangeInstanceOwnerMessage({
+        objectOwner: previousObjectPlayerNumber,
+        objectName,
+        instanceNetworkId,
+        newObjectOwner: newObjectPlayerNumber,
+        instanceX: this.owner.getX(),
+        instanceY: this.owner.getY(),
+        sceneNetworkId,
+      });
+      // Before sending the changeOwner message, if we are becoming the new owner,
+      // we want to ensure this message is acknowledged, by everyone we're connected to.
+      // If we are player 1, we are connected to everyone, so we expect an acknowledgment from everyone.
+      // If we are another player, we are only connected to player 1, so we expect an acknowledgment from player 1.
+      // In both cases, this represents the list of peers the current user is connected to.
+      if (newObjectPlayerNumber === currentPlayerNumber) {
+        const otherPeerIds = gdjs.evtTools.p2p.getAllPeers();
+        const changeOwnerAcknowledgedMessageName = gdjs.multiplayerMessageManager.createInstanceOwnerChangedMessageNameFromChangeInstanceOwnerMessage(
+          messageName
+        );
+        gdjs.multiplayerMessageManager.addExpectedMessageAcknowledgement({
+          originalMessageName: messageName,
+          originalData: {
+            ...messageData,
+            _clock: this._clock + 1, // Will be incremented by the time the message is sent.
+          },
+          expectedMessageName: changeOwnerAcknowledgedMessageName,
+          otherPeerIds,
+          // If we are not the host, we should revert the ownership if the host does not acknowledge the change.
+          shouldCancelMessageIfTimesOut: currentPlayerNumber !== 1,
         });
-        // Before sending the changeOwner message, if we are becoming the new owner,
-        // we want to ensure this message is acknowledged, by everyone we're connected to.
-        // If we are player 1, we are connected to everyone, so we expect an acknowledgment from everyone.
-        // If we are another player, we are only connected to player 1, so we expect an acknowledgment from player 1.
-        // In both cases, this represents the list of peers the current user is connected to.
-        if (newObjectPlayerNumber === currentPlayerNumber) {
-          const otherPeerIds = gdjs.evtTools.p2p.getAllPeers();
-          const changeOwnerAcknowledgedMessageName = gdjs.multiplayerMessageManager.createInstanceOwnerChangedMessageNameFromChangeInstanceOwnerMessage(
-            messageName
-          );
-          gdjs.multiplayerMessageManager.addExpectedMessageAcknowledgement({
-            originalMessageName: messageName,
-            originalData: {
-              ...messageData,
-              _clock: this._clock + 1, // Will be incremented by the time the message is sent.
-            },
-            expectedMessageName: changeOwnerAcknowledgedMessageName,
-            otherPeerIds,
-            // If we are not the host, we should revert the ownership if the host does not acknowledge the change.
-            shouldCancelMessageIfTimesOut: currentPlayerNumber !== 1,
-          });
-        }
-
-        logger.info('Sending change owner message', messageName);
-        this._sendDataToPeersWithIncreasedClock(messageName, messageData);
       }
+
+      logger.info('Sending change owner message', messageName);
+      this._sendDataToPeersWithIncreasedClock(messageName, messageData);
 
       // If we are the new owner, also send directly an update of the position,
       // so that the object is immediately moved on the screen and we don't wait for the next tick.
       if (newObjectPlayerNumber === currentPlayerNumber) {
-        if (!instanceNetworkId) {
-          // If we don't have a networkId, we need to create one now that we are the owner.
-          // We are probably in a case where we created the object and then changed the ownership.
-          instanceNetworkId = this._getOrCreateInstanceNetworkId();
-        }
-
         const objectNetworkSyncData = this.owner.getObjectNetworkSyncData();
         const {
           messageName: updateMessageName,

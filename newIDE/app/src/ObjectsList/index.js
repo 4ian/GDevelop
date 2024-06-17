@@ -554,7 +554,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         shortcutCallbacks: {},
       })
     );
-    
+
 
     const copyObjectFolderOrObjectWithContext = React.useCallback(
       (objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext) => {

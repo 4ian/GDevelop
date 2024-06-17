@@ -354,9 +354,11 @@ describe('Multiplayer', () => {
       const p1BooleanVariable = new gdjs.Variable();
       p1BooleanVariable.setBoolean(false);
 
-      p1RuntimeScene.getVariables().add('MyStringVariable', p1StringVariable);
-      p1RuntimeScene.getVariables().add('MyNumberVariable', p1NumberVariable);
-      p1RuntimeScene.getVariables().add('MyBooleanVariable', p1BooleanVariable);
+      p1RuntimeScene.getVariables().add('MyString_Variable', p1StringVariable);
+      p1RuntimeScene.getVariables().add('MyNumber_Variable', p1NumberVariable);
+      p1RuntimeScene
+        .getVariables()
+        .add('MyBoolean_Variable', p1BooleanVariable);
 
       p1RuntimeScene.renderAndStep(1000 / 60);
 
@@ -369,19 +371,23 @@ describe('Multiplayer', () => {
       const p2RuntimeScene = makeTestRuntimeSceneWithNetworkId();
       p2RuntimeScene.renderAndStep(1000 / 60);
       markAllPeerEventsAsProcessed();
-      expect(p2RuntimeScene.getVariables().has('MyStringVariable')).to.be(true);
-      expect(p2RuntimeScene.getVariables().has('MyNumberVariable')).to.be(true);
-      expect(p2RuntimeScene.getVariables().has('MyBooleanVariable')).to.be(
+      expect(p2RuntimeScene.getVariables().has('MyString_Variable')).to.be(
+        true
+      );
+      expect(p2RuntimeScene.getVariables().has('MyNumber_Variable')).to.be(
+        true
+      );
+      expect(p2RuntimeScene.getVariables().has('MyBoolean_Variable')).to.be(
         true
       );
       expect(
-        p2RuntimeScene.getVariables().get('MyStringVariable').getAsString()
+        p2RuntimeScene.getVariables().get('MyString_Variable').getAsString()
       ).to.be('Hello from remote world');
       expect(
-        p2RuntimeScene.getVariables().get('MyNumberVariable').getAsNumber()
+        p2RuntimeScene.getVariables().get('MyNumber_Variable').getAsNumber()
       ).to.be(42);
       expect(
-        p2RuntimeScene.getVariables().get('MyBooleanVariable').getAsBoolean()
+        p2RuntimeScene.getVariables().get('MyBoolean_Variable').getAsBoolean()
       ).to.be(false);
 
       // Also check global variables.

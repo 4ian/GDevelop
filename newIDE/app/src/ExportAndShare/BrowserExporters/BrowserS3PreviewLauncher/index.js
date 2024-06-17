@@ -13,7 +13,7 @@ import {
   registerNewPreviewWindow,
 } from './BrowserPreviewDebuggerServer';
 import Window from '../../../Utils/Window';
-import { displayBlackLoadingScreen } from '../../../Utils/BrowserExternalWindowUtils';
+import { displayBlackLoadingScreenOrThrow } from '../../../Utils/BrowserExternalWindowUtils';
 import { getGDevelopResourceJwtToken } from '../../../Utils/GDevelopServices/Project';
 import { isNativeMobileApp } from '../../../Utils/Platform';
 const gd: libGDevelop = global.gd;
@@ -48,8 +48,13 @@ export const immediatelyOpenNewPreviewWindow = (
     targetId,
     `width=${width},height=${height},left=${left},top=${top}`
   );
+  if (!previewWindow) {
+    throw new Error(
+      "Can't open the preview window because of browser restrictions."
+    );
+  }
 
-  displayBlackLoadingScreen(previewWindow);
+  displayBlackLoadingScreenOrThrow(previewWindow);
 
   return previewWindow;
 };
@@ -118,9 +123,17 @@ export default class BrowserS3PreviewLauncher extends React.Component<
 
     const previewWindows = existingPreviewWindow
       ? [existingPreviewWindow]
-      : Array.from({ length: numberOfWindows }, () =>
-          immediatelyOpenNewPreviewWindow(project)
-        );
+      : Array.from({ length: numberOfWindows }, () => {
+          try {
+            return immediatelyOpenNewPreviewWindow(project);
+          } catch (error) {
+            console.error(
+              'Unable to open a new preview window - this window will be ignored:',
+              error
+            );
+            return null;
+          }
+        }).filter(Boolean);
 
     try {
       await this.getPreviewDebuggerServer().startServer();

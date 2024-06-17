@@ -530,7 +530,11 @@ namespace gdjs {
         this.clearForces();
         for (let i = 0, len = networkSyncData.if.length; i < len; ++i) {
           const forceData = networkSyncData.if[i];
-          const recycledOrNewForce = RuntimeObject.forcesGarbage.pop() as gdjs.Force;
+          const recycledOrNewForce = this._getRecycledForce(
+            forceData.x,
+            forceData.y,
+            forceData.m
+          );
           recycledOrNewForce.updateFromNetworkSyncData(forceData);
           this._instantForces.push(recycledOrNewForce);
         }

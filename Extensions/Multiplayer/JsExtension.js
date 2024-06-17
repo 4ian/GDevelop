@@ -39,7 +39,7 @@ module.exports = {
           'Open the game lobbies window, where players can join lobbies or see the one they are in.'
         ),
         _('Open the game lobbies'),
-        '',
+        _('Lobbies'),
         'JsPlatform/Extensions/multiplayer.svg',
         'JsPlatform/Extensions/multiplayer.svg'
       )
@@ -66,7 +66,7 @@ module.exports = {
         _('Allow players to close the lobbies window'),
         _('Allow players to close the lobbies window. Allowed by default.'),
         _('Allow players to close the lobbies window: _PARAM1_'),
-        '',
+        _('Lobbies'),
         'JsPlatform/Extensions/multiplayer.svg',
         'JsPlatform/Extensions/multiplayer.svg'
       )
@@ -96,7 +96,7 @@ module.exports = {
           'End the lobby game. This will trigger the "Lobby game has just ended" condition.'
         ),
         _('End the lobby game'),
-        '',
+        _('Lobbies'),
         'JsPlatform/Extensions/multiplayer.svg',
         'JsPlatform/Extensions/multiplayer.svg'
       )
@@ -124,7 +124,7 @@ module.exports = {
           "Send a custom message to other players in the lobby, with an automatic retry system if it hasn't been received. Use with the condition 'Message has been received' to know when the message has been properly processed by the host."
         ),
         _('Send message _PARAM0_ to other players with content _PARAM1_'),
-        '',
+        _('Advanced'),
         'JsPlatform/Extensions/multiplayer.svg',
         'JsPlatform/Extensions/multiplayer.svg'
       )
@@ -152,7 +152,7 @@ module.exports = {
         _('Lobbies window is open'),
         _('Check if the lobbies window is open.'),
         _('Lobbies window is open'),
-        '',
+        _('Lobbies'),
         'JsPlatform/Extensions/multiplayer.svg',
         'JsPlatform/Extensions/multiplayer.svg'
       )
@@ -178,7 +178,7 @@ module.exports = {
         _('Lobby game has just started'),
         _('Check if the lobby game has just started.'),
         _('Lobby game has started'),
-        '',
+        _('Lobbies'),
         'JsPlatform/Extensions/multiplayer.svg',
         'JsPlatform/Extensions/multiplayer.svg'
       )
@@ -203,7 +203,7 @@ module.exports = {
         _('Lobby game is running'),
         _('Check if the lobby game is running.'),
         _('Lobby game is running'),
-        '',
+        _('Lobbies'),
         'JsPlatform/Extensions/multiplayer.svg',
         'JsPlatform/Extensions/multiplayer.svg'
       )
@@ -228,7 +228,7 @@ module.exports = {
         _('Lobby game has just ended'),
         _('Check if the lobby game has just ended.'),
         _('Lobby game has ended'),
-        '',
+        _('Lobbies'),
         'JsPlatform/Extensions/multiplayer.svg',
         'JsPlatform/Extensions/multiplayer.svg'
       )
@@ -255,7 +255,7 @@ module.exports = {
           'Check if a custom message has been received from another player. Will be true only for one frame.'
         ),
         _('Message _PARAM0_ has been received'),
-        '',
+        _('Advanced'),
         'JsPlatform/Extensions/multiplayer.svg',
         'JsPlatform/Extensions/multiplayer.svg'
       )
@@ -281,7 +281,7 @@ module.exports = {
         _('Player is host'),
         _('Check if the player is the host. (Player 1 is the host)'),
         _('Player is host'),
-        '',
+        _('Lobbies'),
         'JsPlatform/Extensions/multiplayer.svg',
         'JsPlatform/Extensions/multiplayer.svg'
       )
@@ -306,7 +306,7 @@ module.exports = {
         _('Any player has left'),
         _('Check if any player has left the lobby.'),
         _('Any player has left'),
-        '',
+        _('Lobbies'),
         'JsPlatform/Extensions/multiplayer.svg',
         'JsPlatform/Extensions/multiplayer.svg'
       )
@@ -331,7 +331,7 @@ module.exports = {
         _('Player has left'),
         _('Check if the player has left the lobby.'),
         _('Player _PARAM0_ has left'),
-        '',
+        _('Lobbies'),
         'JsPlatform/Extensions/multiplayer.svg',
         'JsPlatform/Extensions/multiplayer.svg'
       )
@@ -358,7 +358,7 @@ module.exports = {
         _(
           'Returns the data received when the specified message was received from another player.'
         ),
-        '',
+        _('Advanced'),
         'JsPlatform/Extensions/multiplayer.svg'
       )
       .addParameter('string', _('Message name'), '', false)
@@ -384,7 +384,7 @@ module.exports = {
         _('Number of players in lobby'),
         _('the number of players in the lobby'),
         _('the number of players in the lobby'),
-        '',
+        _('Lobbies'),
         'JsPlatform/Extensions/multiplayer.svg'
       )
       .setIncludeFile('Extensions/P2P/A_peer.js')
@@ -409,7 +409,7 @@ module.exports = {
         _('Current player number in lobby'),
         _('the current player number in the lobby (1, 2, ...)'),
         _('the current player number in the lobby'),
-        '',
+        _('Lobbies'),
         'JsPlatform/Extensions/multiplayer.svg'
       )
       .setIncludeFile('Extensions/P2P/A_peer.js')
@@ -432,7 +432,7 @@ module.exports = {
         'PlayerUsername',
         _('Player username in lobby'),
         _('Get the username of the player in the lobby.'),
-        '',
+        _('Lobbies'),
         'JsPlatform/Extensions/multiplayer.svg'
       )
       .addParameter(
@@ -461,7 +461,7 @@ module.exports = {
         'PlayerPing',
         _('Player ping in lobby'),
         _('Get the ping of the player in the lobby.'),
-        '',
+        _('Lobbies'),
         'JsPlatform/Extensions/multiplayer.svg'
       )
       .addParameter(
@@ -492,7 +492,7 @@ module.exports = {
         _('Player variable ownership'),
         _('the player owning the variable'),
         _('the player owning the variable _PARAM1_'),
-        '',
+        _('Variables'),
         'JsPlatform/Extensions/multiplayer.svg'
       )
       .addCodeOnlyParameter('currentScene', '')
@@ -525,7 +525,7 @@ module.exports = {
           'Take the ownership of the variable. It will then be synchronized to other players, with the current player as the owner.'
         ),
         _('Take ownership of _PARAM1_'),
-        '',
+        _('Variables'),
         'JsPlatform/Extensions/multiplayer.svg',
         'JsPlatform/Extensions/multiplayer.svg'
       )
@@ -556,7 +556,7 @@ module.exports = {
           'Remove the ownership of the variable. It will still be synchronized to other players, but the host owns it.'
         ),
         _('Remove ownership of _PARAM1_'),
-        '',
+        _('Variables'),
         'JsPlatform/Extensions/multiplayer.svg',
         'JsPlatform/Extensions/multiplayer.svg'
       )
@@ -587,7 +587,7 @@ module.exports = {
           'Disable synchronization of the variable over the network. It will not be sent to other players anymore.'
         ),
         _('Disable synchronization of _PARAM1_'),
-        '',
+        _('Variables'),
         'JsPlatform/Extensions/multiplayer.svg',
         'JsPlatform/Extensions/multiplayer.svg'
       )
@@ -723,7 +723,7 @@ module.exports = {
         _('Player object ownership'),
         _('the player owning the object'),
         _('the player owning the object _PARAM0_'),
-        '',
+        _('Objects'),
         'JsPlatform/Extensions/multiplayer.svg'
       )
       .addParameter('object', _('Object'), '', false)
@@ -744,7 +744,7 @@ module.exports = {
           'Check if the object is owned by the current player, as a player or the host.'
         ),
         _('Object _PARAM0_ is owned by current player'),
-        '',
+        _('Objects'),
         'JsPlatform/Extensions/multiplayer.svg',
         'JsPlatform/Extensions/multiplayer.svg'
       )
@@ -766,7 +766,7 @@ module.exports = {
           'Take the ownership of the object. It will then be synchronized to other players, with the current player as the owner.'
         ),
         _('Take ownership of _PARAM0_'),
-        '',
+        _('Objects'),
         'JsPlatform/Extensions/multiplayer.svg',
         'JsPlatform/Extensions/multiplayer.svg'
       )
@@ -788,7 +788,7 @@ module.exports = {
           'Remove the ownership of the object from the player. It will still be synchronized to other players, but the host owns it.'
         ),
         _('Remove ownership of _PARAM0_'),
-        '',
+        _('Objects'),
         'JsPlatform/Extensions/multiplayer.svg',
         'JsPlatform/Extensions/multiplayer.svg'
       )

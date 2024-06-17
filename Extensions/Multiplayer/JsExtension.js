@@ -491,7 +491,7 @@ module.exports = {
         'PlayerVariableOwnership',
         _('Player variable ownership'),
         _('the player owning the variable'),
-        _('the player owning the variable'),
+        _('the player owning the variable _PARAM1_'),
         '',
         'JsPlatform/Extensions/multiplayer.svg'
       )
@@ -722,7 +722,7 @@ module.exports = {
         'PlayerObjectOwnership',
         _('Player object ownership'),
         _('the player owning the object'),
-        _('the player owning the object'),
+        _('the player owning the object _PARAM0_'),
         '',
         'JsPlatform/Extensions/multiplayer.svg'
       )

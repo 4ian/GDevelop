@@ -139,6 +139,8 @@ namespace gdjs {
       }
       if (newNetworkSyncData.anim) {
         this._animator.updateFromObjectNetworkSyncData(newNetworkSyncData.anim);
+        // TODO: optimize updating the animation frame only if needed.
+        this._updateAnimationFrame();
       }
       if (
         newNetworkSyncData.ifx !== undefined ||

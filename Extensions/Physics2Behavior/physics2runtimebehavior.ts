@@ -485,7 +485,6 @@ namespace gdjs {
           ooa: this._objectOldAngle,
           oow: this._objectOldWidth,
           ooh: this._objectOldHeight,
-          vb: this._verticesBuffer,
         },
       };
     }
@@ -508,9 +507,6 @@ namespace gdjs {
       }
       if (behaviorSpecificProps.ooh !== undefined) {
         this._objectOldHeight = behaviorSpecificProps.ooh;
-      }
-      if (behaviorSpecificProps.vb !== undefined) {
-        this._verticesBuffer = behaviorSpecificProps.vb;
       }
     }
 

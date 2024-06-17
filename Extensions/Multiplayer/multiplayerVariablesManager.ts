@@ -51,7 +51,7 @@ namespace gdjs {
 
       return {
         type: parts[0] === 'game' ? 'global' : 'scene',
-        name: parts[1],
+        name: parts.slice(1).join('_'),
         containerId: parts[0],
       };
     };

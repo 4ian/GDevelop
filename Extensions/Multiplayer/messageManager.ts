@@ -679,7 +679,7 @@ namespace gdjs {
               behavior.playerNumber = ownerPlayerNumber;
             }
 
-            instance.updateFromObjectNetworkSyncData(data);
+            instance.updateFromNetworkSyncData(data);
 
             setLastClockReceivedForInstanceOnScene({
               sceneNetworkId,

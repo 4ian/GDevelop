@@ -397,9 +397,7 @@ namespace gdjs {
       };
     }
 
-    updateFromObjectNetworkSyncData(
-      networkSyncData: SpriteAnimatorNetworkSyncData
-    ) {
+    updateFromNetworkSyncData(networkSyncData: SpriteAnimatorNetworkSyncData) {
       this._currentAnimation = networkSyncData.an;
       this._currentDirection = networkSyncData.di;
       this._currentFrameIndex = networkSyncData.fr;

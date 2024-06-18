@@ -12,6 +12,24 @@ namespace gdjs {
   };
   export type SpineObjectData = ObjectData & SpineObjectDataType;
 
+  export type SpineNetworkSyncDataType = {
+    opa: float;
+    wid: float;
+    hei: float;
+    scaX: float;
+    scaY: float;
+    flipX: boolean;
+    flipY: boolean;
+    ani: number;
+    anmd: number;
+    anp: boolean;
+    anss: float;
+    anet: number;
+  };
+
+  export type SpineNetworkSyncData = ObjectNetworkSyncData &
+    SpineNetworkSyncDataType;
+
   export class SpineRuntimeObject
     extends gdjs.RuntimeObject
     implements
@@ -92,6 +110,86 @@ namespace gdjs {
       }
 
       return true;
+    }
+
+    getNetworkSyncData(): SpineNetworkSyncData {
+      return {
+        ...super.getNetworkSyncData(),
+        opa: this._opacity,
+        wid: this.getWidth(),
+        hei: this.getHeight(),
+        scaX: this.getScaleX(),
+        scaY: this.getScaleY(),
+        flipX: this.isFlippedX(),
+        flipY: this.isFlippedY(),
+        ani: this.getAnimationIndex(),
+        anmd: this.getAnimationMixingDuration(),
+        anp: this.isAnimationPaused(),
+        anss: this.getAnimationSpeedScale(),
+        anet: this.getAnimationElapsedTime(),
+      };
+    }
+
+    updateFromNetworkSyncData(syncData: SpineNetworkSyncData): void {
+      super.updateFromNetworkSyncData(syncData);
+
+      if (syncData.opa !== undefined && syncData.opa !== this._opacity) {
+        this.setOpacity(syncData.opa);
+      }
+      if (syncData.wid !== undefined && syncData.wid !== this.getWidth()) {
+        this.setWidth(syncData.wid);
+      }
+      if (syncData.hei !== undefined && syncData.hei !== this.getHeight()) {
+        this.setHeight(syncData.hei);
+      }
+      if (syncData.scaX !== undefined && syncData.scaX !== this.getScaleX()) {
+        this.setScaleX(syncData.scaX);
+      }
+      if (syncData.scaY !== undefined && syncData.scaY !== this.getScaleY()) {
+        this.setScaleY(syncData.scaY);
+      }
+      if (
+        syncData.flipX !== undefined &&
+        syncData.flipX !== this.isFlippedX()
+      ) {
+        this.flipX(syncData.flipX);
+      }
+      if (
+        syncData.flipY !== undefined &&
+        syncData.flipY !== this.isFlippedY()
+      ) {
+        this.flipY(syncData.flipY);
+      }
+      if (
+        syncData.ani !== undefined &&
+        syncData.ani !== this.getAnimationIndex()
+      ) {
+        this.setAnimationIndex(syncData.ani);
+      }
+      if (
+        syncData.anmd !== undefined &&
+        syncData.anmd !== this.getAnimationMixingDuration()
+      ) {
+        this.setAnimationMixingDuration(syncData.anmd);
+      }
+      if (
+        syncData.anp !== undefined &&
+        syncData.anp !== this.isAnimationPaused()
+      ) {
+        syncData.anp ? this.pauseAnimation() : this.resumeAnimation();
+      }
+      if (
+        syncData.anss !== undefined &&
+        syncData.anss !== this.getAnimationSpeedScale()
+      ) {
+        this.setAnimationSpeedScale(syncData.anss);
+      }
+      if (
+        syncData.anet !== undefined &&
+        syncData.anet !== this.getAnimationElapsedTime()
+      ) {
+        this.setAnimationElapsedTime(syncData.anet);
+      }
     }
 
     extraInitializationFromInitialInstance(

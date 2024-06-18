@@ -414,9 +414,9 @@ namespace gdjs {
       return true;
     }
 
-    getObjectNetworkSyncData(): Cube3DObjectNetworkSyncData {
+    getNetworkSyncData(): Cube3DObjectNetworkSyncData {
       return {
-        ...super.getObjectNetworkSyncData(),
+        ...super.getNetworkSyncData(),
         mt: this._materialType,
         fo: this._facesOrientation,
         bfu: this._backFaceUpThroughWhichAxisRotation,
@@ -426,10 +426,10 @@ namespace gdjs {
       };
     }
 
-    updateFromObjectNetworkSyncData(
+    updateFromNetworkSyncData(
       networkSyncData: Cube3DObjectNetworkSyncData
     ): void {
-      super.updateFromObjectNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData);
 
       if (networkSyncData.mt !== undefined) {
         this._materialType = networkSyncData.mt;

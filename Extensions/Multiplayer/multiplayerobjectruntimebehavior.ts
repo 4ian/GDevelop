@@ -271,7 +271,7 @@ namespace gdjs {
 
       const instanceNetworkId = this._getOrCreateInstanceNetworkId();
       const objectName = this.owner.getName();
-      const objectNetworkSyncData = this.owner.getObjectNetworkSyncData();
+      const objectNetworkSyncData = this.owner.getNetworkSyncData();
 
       // this._logToConsoleWithThrottle(
       //   `Synchronizing object ${this.owner.getName()} (instance ${
@@ -289,6 +289,7 @@ namespace gdjs {
           zo: objectNetworkSyncData.zo,
           a: objectNetworkSyncData.a,
           hid: objectNetworkSyncData.hid,
+          lay: objectNetworkSyncData.lay,
           if: objectNetworkSyncData.if,
           pfx: objectNetworkSyncData.pfx,
           pfy: objectNetworkSyncData.pfy,
@@ -367,6 +368,7 @@ namespace gdjs {
           zo: objectNetworkSyncData.zo,
           a: objectNetworkSyncData.a,
           hid: objectNetworkSyncData.hid,
+          lay: objectNetworkSyncData.lay,
           if: objectNetworkSyncData.if,
           pfx: objectNetworkSyncData.pfx,
           pfy: objectNetworkSyncData.pfy,
@@ -437,7 +439,7 @@ namespace gdjs {
         objectOwner: this.playerNumber,
         objectName,
         instanceNetworkId,
-        objectNetworkSyncData: this.owner.getObjectNetworkSyncData(),
+        objectNetworkSyncData: this.owner.getNetworkSyncData(),
         sceneNetworkId,
       });
       this._sendDataToPeersWithIncreasedClock(
@@ -583,7 +585,7 @@ namespace gdjs {
       // If we are the new owner, also send directly an update of the position,
       // so that the object is immediately moved on the screen and we don't wait for the next tick.
       if (newObjectPlayerNumber === currentPlayerNumber) {
-        const objectNetworkSyncData = this.owner.getObjectNetworkSyncData();
+        const objectNetworkSyncData = this.owner.getNetworkSyncData();
         const {
           messageName: updateMessageName,
           messageData: updateMessageData,

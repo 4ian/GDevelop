@@ -4,6 +4,23 @@ Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
  */
 namespace gdjs {
   const logger = new gdjs.Logger('Pathfinding behavior');
+
+  interface PathfindingNetworkSyncDataType {
+    // Syncing the path should be enough to have a good prediction.
+    path: FloatPoint[];
+    pf: boolean;
+    sp: number;
+    as: number;
+    cs: number;
+    tss: number;
+    re: boolean;
+    ma: number;
+  }
+
+  export interface PathfindingNetworkSyncData extends BehaviorNetworkSyncData {
+    props: PathfindingNetworkSyncDataType;
+  }
+
   /**
    * PathfindingRuntimeBehavior represents a behavior allowing objects to
    * follow a path computed to avoid obstacles.
@@ -115,6 +132,56 @@ namespace gdjs {
         this._smoothingMaxCellGap = newBehaviorData.smoothingMaxCellGap;
       }
       return true;
+    }
+
+    getNetworkSyncData(): PathfindingNetworkSyncData {
+      return {
+        ...super.getNetworkSyncData(),
+        props: {
+          path: this._path,
+          pf: this._pathFound,
+          sp: this._speed,
+          as: this._angularSpeed,
+          cs: this._currentSegment,
+          tss: this._totalSegmentDistance,
+          re: this._reachedEnd,
+          ma: this._movementAngle,
+        },
+      };
+    }
+
+    updateFromNetworkSyncData(
+      networkSyncData: PathfindingNetworkSyncData
+    ): void {
+      super.updateFromNetworkSyncData(networkSyncData);
+      const behaviorSpecificProps = networkSyncData.props;
+      if (behaviorSpecificProps.path !== undefined) {
+        this._path = behaviorSpecificProps.path;
+      }
+      if (behaviorSpecificProps.pf !== undefined) {
+        this._pathFound = behaviorSpecificProps.pf;
+      }
+      if (behaviorSpecificProps.sp !== undefined) {
+        this._speed = behaviorSpecificProps.sp;
+      }
+      if (behaviorSpecificProps.as !== undefined) {
+        this._angularSpeed = behaviorSpecificProps.as;
+      }
+      if (
+        behaviorSpecificProps.cs !== undefined &&
+        behaviorSpecificProps.cs !== this._currentSegment
+      ) {
+        this._currentSegment = behaviorSpecificProps.cs;
+      }
+      if (behaviorSpecificProps.tss !== undefined) {
+        this._totalSegmentDistance = behaviorSpecificProps.tss;
+      }
+      if (behaviorSpecificProps.re !== undefined) {
+        this._reachedEnd = behaviorSpecificProps.re;
+      }
+      if (behaviorSpecificProps.ma !== undefined) {
+        this._movementAngle = behaviorSpecificProps.ma;
+      }
     }
 
     setCellWidth(width: float): void {
@@ -407,7 +474,7 @@ namespace gdjs {
         return;
       }
 
-      //Not path found
+      // No path found
       this._pathFound = false;
     }
 

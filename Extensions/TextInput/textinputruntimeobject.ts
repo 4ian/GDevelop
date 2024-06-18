@@ -192,9 +192,9 @@ namespace gdjs {
       return true;
     }
 
-    getObjectNetworkSyncData(): TextInputNetworkSyncData {
+    getNetworkSyncData(): TextInputNetworkSyncData {
       return {
-        ...super.getObjectNetworkSyncData(),
+        ...super.getNetworkSyncData(),
         opa: this.getOpacity(),
         wid: this.getWidth(),
         hei: this.getHeight(),
@@ -214,8 +214,8 @@ namespace gdjs {
       };
     }
 
-    updateFromObjectNetworkSyncData(syncData: TextInputNetworkSyncData): void {
-      super.updateFromObjectNetworkSyncData(syncData);
+    updateFromNetworkSyncData(syncData: TextInputNetworkSyncData): void {
+      super.updateFromNetworkSyncData(syncData);
 
       if (syncData.opa !== undefined) this.setOpacity(syncData.opa);
       if (syncData.wid !== undefined) this.setWidth(syncData.wid);

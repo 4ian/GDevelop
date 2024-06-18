@@ -382,9 +382,9 @@ namespace gdjs {
       return true;
     }
 
-    getObjectNetworkSyncData(): ParticleEmitterObjectNetworkSyncData {
+    getNetworkSyncData(): ParticleEmitterObjectNetworkSyncData {
       return {
-        ...super.getObjectNetworkSyncData(),
+        ...super.getNetworkSyncData(),
         prms: this.particleRotationMinSpeed,
         prmx: this.particleRotationMaxSpeed,
         mpc: this.maxParticlesCount,
@@ -414,10 +414,10 @@ namespace gdjs {
       };
     }
 
-    updateFromObjectNetworkSyncData(
+    updateFromNetworkSyncData(
       syncData: ParticleEmitterObjectNetworkSyncData
     ): void {
-      super.updateFromObjectNetworkSyncData(syncData);
+      super.updateFromNetworkSyncData(syncData);
       if (syncData.x !== undefined) {
         this.setX(syncData.x);
       }

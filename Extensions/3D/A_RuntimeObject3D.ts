@@ -126,9 +126,9 @@ namespace gdjs {
       return true;
     }
 
-    getObjectNetworkSyncData(): Object3DNetworkSyncData {
+    getNetworkSyncData(): Object3DNetworkSyncData {
       return {
-        ...super.getObjectNetworkSyncData(),
+        ...super.getNetworkSyncData(),
         z: this.getZ(),
         w: this.getWidth(),
         h: this.getHeight(),
@@ -141,8 +141,8 @@ namespace gdjs {
       };
     }
 
-    updateFromObjectNetworkSyncData(networkSyncData: Object3DNetworkSyncData) {
-      super.updateFromObjectNetworkSyncData(networkSyncData);
+    updateFromNetworkSyncData(networkSyncData: Object3DNetworkSyncData) {
+      super.updateFromNetworkSyncData(networkSyncData);
       if (networkSyncData.z !== undefined) this.setZ(networkSyncData.z);
       if (networkSyncData.w !== undefined) this.setWidth(networkSyncData.w);
       if (networkSyncData.h !== undefined) this.setHeight(networkSyncData.h);

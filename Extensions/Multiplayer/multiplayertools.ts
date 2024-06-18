@@ -229,6 +229,14 @@ namespace gdjs {
         : `Player ${playerNumber}`;
     };
 
+    /**
+     * Returns the player username of the current player in the lobby.
+     */
+    export const getCurrentPlayerUsername = () => {
+      const currentPlayerNumber = getCurrentPlayerNumber();
+      return getPlayerUsername(currentPlayerNumber);
+    };
+
     const handleLeavingPlayer = (runtimeScene: gdjs.RuntimeScene) => {
       const disconnectedPlayers = gdjs.multiplayerMessageManager.getDisconnectedPlayers();
       if (disconnectedPlayers.length > 0) {

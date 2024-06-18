@@ -457,6 +457,29 @@ module.exports = {
       .setFunctionName('gdjs.multiplayer.getPlayerUsername');
 
     extension
+      .addStrExpression(
+        'CurrentPlayerUsername',
+        _('Current player username in lobby'),
+        _('Get the username of the current player in the lobby.'),
+        _('Lobbies'),
+        'JsPlatform/Extensions/multiplayer.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
+      .setFunctionName('gdjs.multiplayer.getCurrentPlayerUsername');
+
+    extension
       .addExpression(
         'PlayerPing',
         _('Player ping in lobby'),
@@ -484,6 +507,29 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
       .setFunctionName('gdjs.multiplayerMessageManager.getPlayerPing');
+
+    extension
+      .addExpression(
+        'CurrentPlayerPing',
+        _('Current player ping in lobby'),
+        _('Get the ping of the current player in the lobby.'),
+        _('Lobbies'),
+        'JsPlatform/Extensions/multiplayer.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
+      .setFunctionName('gdjs.multiplayerMessageManager.getCurrentPlayerPing');
 
     extension
       .addExpressionAndConditionAndAction(

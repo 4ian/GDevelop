@@ -148,7 +148,10 @@ Remember that you can also [search for new features in the community extensions]
 const generateExtensionHeaderText = ({ extension, depth }) => {
   return {
     text:
-      generateHeader({ headerName: extension.getFullName(), depth }).text +
+      generateHeader({
+        headerName: extension.getFullName() + (depth <= 1 ? ' Reference' : ''),
+        depth,
+      }).text +
       `
 ${extension.getDescription()} ${generateReadMoreLink(extension.getHelpPath())}
 `,

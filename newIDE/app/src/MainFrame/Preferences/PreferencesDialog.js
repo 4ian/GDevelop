@@ -293,7 +293,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
           <SelectField
             floatingLabelText={<Trans>Indent Scale in Events Sheet</Trans>}
             fullWidth
-            value={values.eventsSheetIndentScale}
+            value={values.eventsSheetIndentScale.toString()}
             onChange={(e, i, value) => {
               setEventsSheetIndentScale(parseInt(value, 10));
             }}

@@ -487,6 +487,7 @@ namespace gdjs {
         zo: this.zOrder,
         a: this.angle,
         hid: this.hidden,
+        lay: this.layer,
         if: this._instantForces.map((force) => force.getNetworkSyncData()),
         pfx: this._permanentForceX,
         pfy: this._permanentForceY,
@@ -522,6 +523,13 @@ namespace gdjs {
         this.hidden !== networkSyncData.hid
       ) {
         this.hide(networkSyncData.hid);
+      }
+
+      if (
+        networkSyncData.lay !== undefined &&
+        this.layer !== networkSyncData.lay
+      ) {
+        this.setLayer(networkSyncData.lay);
       }
 
       if (networkSyncData.if) {

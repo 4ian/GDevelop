@@ -43,18 +43,20 @@ declare type GetNetworkSyncDataOptions = { playerNumber?: number };
 
 /** Object containing basic properties for all objects synchronizing over the network. */
 declare type BasicObjectNetworkSyncData = {
-  /** The position of the object on the X axis. */
+  /** The position of the instance on the X axis. */
   x: number;
-  /** The position of the object on the Y axis. */
+  /** The position of the instance on the Y axis. */
   y: number;
-  /** The position of the object on the Z axis. Defined only for 3D games */
+  /** The position of the instance on the Z axis. Defined only for 3D games */
   z?: number;
-  /** Z order of the object */
+  /** Z order of the instance */
   zo: number;
-  /** The angle of the object. */
+  /** The angle of the instance. */
   a: number;
-  /** If the object is hidden */
+  /** If the instance is hidden */
   hid: boolean;
+  /** The layer where the instance lives  */
+  lay: string;
   /** All the instant forces */
   if: Array<ForceNetworkSyncData>;
   /** Permanent force on X */

@@ -16,6 +16,20 @@ namespace gdjs {
 
   export type VideoObjectData = ObjectData & VideoObjectDataType;
 
+  export type VideoNetworkSyncDataType = {
+    op: float;
+    wid: float;
+    hei: float;
+    // We don't sync volume, as it's probably a user setting?
+    pla: boolean;
+    loop: boolean;
+    ct: float;
+    ps: number;
+  };
+
+  export type VideoNetworkSyncData = ObjectNetworkSyncData &
+    VideoNetworkSyncDataType;
+
   /**
    * An object displaying a video on screen.
    *
@@ -84,6 +98,52 @@ namespace gdjs {
         return false;
       }
       return true;
+    }
+
+    getNetworkSyncData(): VideoNetworkSyncData {
+      return {
+        ...super.getNetworkSyncData(),
+        op: this._opacity,
+        wid: this.getWidth(),
+        hei: this.getHeight(),
+        pla: this.isPlayed(),
+        loop: this.isLooped(),
+        ct: this.getCurrentTime(),
+        ps: this.getPlaybackSpeed(),
+      };
+    }
+
+    updateFromNetworkSyncData(syncData: VideoNetworkSyncData): void {
+      super.updateFromNetworkSyncData(syncData);
+
+      if (this._opacity !== undefined && this._opacity && syncData.op) {
+        this.setOpacity(syncData.op);
+      }
+      if (this.getWidth() !== undefined && this.getWidth() !== syncData.wid) {
+        this.setWidth(syncData.wid);
+      }
+      if (this.getHeight() !== undefined && this.getHeight() !== syncData.hei) {
+        this.setHeight(syncData.hei);
+      }
+      if (syncData.pla !== undefined && this.isPlayed() !== syncData.pla) {
+        syncData.pla ? this.play() : this.pause();
+      }
+      if (syncData.loop !== undefined && this.isLooped() !== syncData.loop) {
+        this.setLoop(syncData.loop);
+      }
+      // We don't update the current time too regularly, only if it's off by a lot.
+      if (
+        syncData.ct !== undefined &&
+        Math.abs(this.getCurrentTime() - syncData.ct) > 3 // More than 3 seconds off
+      ) {
+        this.setCurrentTime(syncData.ct);
+      }
+      if (
+        syncData.ps !== undefined &&
+        this.getPlaybackSpeed() !== syncData.ps
+      ) {
+        this.setPlaybackSpeed(syncData.ps);
+      }
     }
 
     /**

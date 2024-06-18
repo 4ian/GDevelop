@@ -7,6 +7,19 @@ namespace gdjs {
   export interface RuntimeScene {
     physics2SharedData: gdjs.Physics2SharedData | null;
   }
+  interface Physics2NetworkSyncDataType {
+    tpx: number | undefined;
+    tpy: number | undefined;
+    tqa: number | undefined;
+    lvx: number | undefined;
+    lvy: number | undefined;
+    av: number | undefined;
+    aw: boolean | undefined;
+  }
+
+  export interface Physics2NetworkSyncData extends BehaviorNetworkSyncData {
+    props: Physics2NetworkSyncDataType;
+  }
   export class Physics2SharedData {
     gravityX: float;
     gravityY: float;
@@ -476,37 +489,72 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData() {
+    getNetworkSyncData(): Physics2NetworkSyncData {
+      const bodyProps = this._body
+        ? {
+            tpx: this._body.GetTransform().get_p().get_x(),
+            tpy: this._body.GetTransform().get_p().get_y(),
+            tqa: this._body.GetTransform().get_q().GetAngle(),
+            lvx: this._body.GetLinearVelocity().get_x(),
+            lvy: this._body.GetLinearVelocity().get_y(),
+            av: this._body.GetAngularVelocity(),
+            aw: this._body.IsAwake(),
+          }
+        : {
+            tpx: undefined,
+            tpy: undefined,
+            tqa: undefined,
+            lvx: undefined,
+            lvy: undefined,
+            av: undefined,
+            aw: undefined,
+          };
       return {
         ...super.getNetworkSyncData(),
         props: {
-          oox: this._objectOldX,
-          ooy: this._objectOldY,
-          ooa: this._objectOldAngle,
-          oow: this._objectOldWidth,
-          ooh: this._objectOldHeight,
+          ...bodyProps,
         },
       };
     }
 
-    updateFromNetworkSyncData(networkSyncData: any) {
+    updateFromNetworkSyncData(networkSyncData: Physics2NetworkSyncData) {
       super.updateFromNetworkSyncData(networkSyncData);
 
       const behaviorSpecificProps = networkSyncData.props;
-      if (behaviorSpecificProps.oox !== undefined) {
-        this._objectOldX = behaviorSpecificProps.oox;
+      if (
+        behaviorSpecificProps.tpx !== undefined &&
+        behaviorSpecificProps.tpy !== undefined &&
+        behaviorSpecificProps.tqa !== undefined
+      ) {
+        if (this._body) {
+          this._body.SetTransform(
+            this.b2Vec2(behaviorSpecificProps.tpx, behaviorSpecificProps.tpy),
+            behaviorSpecificProps.tqa
+          );
+        }
       }
-      if (behaviorSpecificProps.ooy !== undefined) {
-        this._objectOldY = behaviorSpecificProps.ooy;
+
+      if (
+        behaviorSpecificProps.lvx !== undefined &&
+        behaviorSpecificProps.lvy !== undefined
+      ) {
+        if (this._body) {
+          this._body.SetLinearVelocity(
+            this.b2Vec2(behaviorSpecificProps.lvx, behaviorSpecificProps.lvy)
+          );
+        }
       }
-      if (behaviorSpecificProps.ooa !== undefined) {
-        this._objectOldAngle = behaviorSpecificProps.ooa;
+
+      if (behaviorSpecificProps.av !== undefined) {
+        if (this._body) {
+          this._body.SetAngularVelocity(behaviorSpecificProps.av);
+        }
       }
-      if (behaviorSpecificProps.oow !== undefined) {
-        this._objectOldWidth = behaviorSpecificProps.oow;
-      }
-      if (behaviorSpecificProps.ooh !== undefined) {
-        this._objectOldHeight = behaviorSpecificProps.ooh;
+
+      if (behaviorSpecificProps.aw !== undefined) {
+        if (this._body) {
+          this._body.SetAwake(behaviorSpecificProps.aw);
+        }
       }
     }
 

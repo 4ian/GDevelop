@@ -408,9 +408,24 @@ namespace gdjs {
           }
         }, DEFAULT_WEBSOCKET_HEARTBEAT_INTERVAL);
 
-        // When socket is open, ask for the connectionId, so that we can inform the lobbies window.
+        // When socket is open, ask for the connectionId and send more session info, so that we can inform the lobbies window.
         if (_websocket) {
           _websocket.send(JSON.stringify({ action: 'getConnectionId' }));
+          // @ts-ignore - cordova param is added by Cordova.
+          const isCordova = !!window.cordova;
+          const devicePlatform =
+            // @ts-ignore - device param is added globally.
+            typeof device !== 'undefined' ? device.platform || '' : '';
+          const navigatorPlatform =
+            typeof navigator !== 'undefined' ? navigator.platform : '';
+          _websocket.send(
+            JSON.stringify({
+              action: 'sessionInformation',
+              isCordova,
+              devicePlatform,
+              navigatorPlatform,
+            })
+          );
         }
       };
       _websocket.onmessage = (event) => {
@@ -941,6 +956,10 @@ namespace gdjs {
 
       // Handle message.
       switch (event.data.id) {
+        case 'listenerReady': {
+          sendSessionInformation(runtimeScene);
+          break;
+        }
         case 'joinLobby': {
           if (!event.data.lobbyId) {
             throw new Error('Malformed message.');
@@ -974,6 +993,34 @@ namespace gdjs {
       logger.error(message);
       removeLobbiesContainer(runtimeScene);
       focusOnGame(runtimeScene);
+    };
+
+    const sendSessionInformation = (runtimeScene: gdjs.RuntimeScene) => {
+      const lobbiesIframe = multiplayerComponents.getLobbiesIframe(
+        runtimeScene
+      );
+      if (!lobbiesIframe || !lobbiesIframe.contentWindow) {
+        // Cannot send the message if the iframe is not opened.
+        return;
+      }
+
+      // @ts-ignore - cordova param is added by Cordova.
+      const isCordova = !!window.cordova;
+      const devicePlatform =
+        // @ts-ignore - device param is added globally.
+        typeof device !== 'undefined' ? device.platform || '' : '';
+      const navigatorPlatform =
+        typeof navigator !== 'undefined' ? navigator.platform : '';
+
+      lobbiesIframe.contentWindow.postMessage(
+        {
+          id: 'sessionInformation',
+          isCordova,
+          devicePlatform,
+          navigatorPlatform,
+        },
+        '*'
+      );
     };
 
     /**

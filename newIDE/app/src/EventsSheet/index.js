@@ -1927,6 +1927,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                 <EventsTree
                   ref={eventsTree => (this._eventsTree = eventsTree)}
                   key={events.ptr}
+                  indentScale={preferences.values.eventsSheetIndentScale}
                   onScroll={this._ensureFocused}
                   events={events}
                   project={project}

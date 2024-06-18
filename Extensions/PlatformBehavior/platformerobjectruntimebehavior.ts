@@ -144,6 +144,10 @@ namespace gdjs {
     // like in a multiplayer game, and we want to be able to predict the
     // movement of the object, even if the inputs are not updated every frame.
     _dontClearInputsBetweenFrames: boolean = false;
+    // This is useful when the object is synchronized over the network,
+    // object is controlled by the network and we want to ensure the current player
+    // cannot control it.
+    _ignoreDefaultControlsAsSyncedByNetwork: boolean = false;
 
     // This is useful for extensions that need to know
     // which keys were pressed and doesn't know the mapping
@@ -219,6 +223,7 @@ namespace gdjs {
       // This method is called, so we are synchronizing this object.
       // Let's clear the inputs between frames as we control it.
       this._dontClearInputsBetweenFrames = false;
+      this._ignoreDefaultControlsAsSyncedByNetwork = false;
 
       return {
         ...super.getNetworkSyncData(),
@@ -328,7 +333,7 @@ namespace gdjs {
       // When the object is synchronized from the network, the inputs must not be cleared.
       this._dontClearInputsBetweenFrames = true;
       // And we are not using the default controls.
-      this._ignoreDefaultControls = true;
+      this._ignoreDefaultControlsAsSyncedByNetwork = true;
     }
 
     updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
@@ -403,32 +408,38 @@ namespace gdjs {
       const inputManager = instanceContainer.getGame().getInputManager();
       this._leftKey ||
         (this._leftKey =
-          !this._ignoreDefaultControls && inputManager.isKeyPressed(LEFTKEY));
+          !this.shouldIgnoreDefaultControls() &&
+          inputManager.isKeyPressed(LEFTKEY));
       this._rightKey ||
         (this._rightKey =
-          !this._ignoreDefaultControls && inputManager.isKeyPressed(RIGHTKEY));
+          !this.shouldIgnoreDefaultControls() &&
+          inputManager.isKeyPressed(RIGHTKEY));
 
       this._jumpKey ||
         (this._jumpKey =
-          !this._ignoreDefaultControls &&
+          !this.shouldIgnoreDefaultControls() &&
           (inputManager.isKeyPressed(LSHIFTKEY) ||
             inputManager.isKeyPressed(RSHIFTKEY) ||
             inputManager.isKeyPressed(SPACEKEY)));
 
       this._ladderKey ||
         (this._ladderKey =
-          !this._ignoreDefaultControls && inputManager.isKeyPressed(UPKEY));
+          !this.shouldIgnoreDefaultControls() &&
+          inputManager.isKeyPressed(UPKEY));
 
       this._upKey ||
         (this._upKey =
-          !this._ignoreDefaultControls && inputManager.isKeyPressed(UPKEY));
+          !this.shouldIgnoreDefaultControls() &&
+          inputManager.isKeyPressed(UPKEY));
       this._downKey ||
         (this._downKey =
-          !this._ignoreDefaultControls && inputManager.isKeyPressed(DOWNKEY));
+          !this.shouldIgnoreDefaultControls() &&
+          inputManager.isKeyPressed(DOWNKEY));
 
       this._releasePlatformKey ||
         (this._releasePlatformKey =
-          !this._ignoreDefaultControls && inputManager.isKeyPressed(DOWNKEY));
+          !this.shouldIgnoreDefaultControls() &&
+          inputManager.isKeyPressed(DOWNKEY));
 
       this._requestedDeltaX += this._updateSpeed(timeDelta);
 
@@ -1634,6 +1645,17 @@ namespace gdjs {
      */
     ignoreDefaultControls(ignore: boolean) {
       this._ignoreDefaultControls = ignore;
+    }
+
+    /**
+     * Check if the default controls of the Platformer Object are ignored.
+     * @returns true if the default controls are ignored.
+     */
+    shouldIgnoreDefaultControls() {
+      return (
+        this._ignoreDefaultControls ||
+        this._ignoreDefaultControlsAsSyncedByNetwork
+      );
     }
 
     /**

@@ -28,6 +28,7 @@ import {
   reorderInstanceSchemaForCustomProperties,
 } from './CompactPropertiesSchema';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
+import TileMapPainter from '../TileMapPainter';
 
 export const styles = {
   paper: {
@@ -181,6 +182,8 @@ const CompactInstancePropertiesEditor = ({
 
   if (!object || !instance || !instanceSchema) return null;
 
+  const shouldDisplayTileMapPainter = object.getType() === 'TileMap::TileMap';
+
   return (
     <ErrorBoundary
       componentTitle={<Trans>Instance properties</Trans>}
@@ -202,6 +205,15 @@ const CompactInstancePropertiesEditor = ({
               onInstancesModified={onInstancesModified}
             />
           </Column>
+          {shouldDisplayTileMapPainter && (
+            <>
+              <Column>
+                <Spacer />
+                <Separator />
+                <TileMapPainter project={project} object={object} />
+              </Column>
+            </>
+          )}
           {object && shouldDisplayVariablesList ? (
             <>
               <Column>

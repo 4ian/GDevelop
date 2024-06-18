@@ -536,7 +536,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     );
 
     // Initialize keyboard shortcuts as empty.
-    // onDelete callback is set outside because it deletes the selected
+    // onDelete and onDuplicate callbacks are set outside because it deletes the selected
     // item (that is a props). As it is stored in a ref, the keyboard shortcut
     // instance does not update with selectedObjectFolderOrObjectsWithContext changes.
     const keyboardShortcutsRef = React.useRef<KeyboardShortcuts>(
@@ -544,21 +544,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         shortcutCallbacks: {},
       })
     );
-    React.useEffect(
-      () => {
-        if (keyboardShortcutsRef.current) {
-          keyboardShortcutsRef.current.setShortcutCallback('onDelete', () => {
-            deleteObjectFolderOrObjectWithContext(
-              selectedObjectFolderOrObjectsWithContext[0]
-            );
-          });
-        }
-      },
-      [
-        selectedObjectFolderOrObjectsWithContext,
-        deleteObjectFolderOrObjectWithContext,
-      ]
-    );
+    
 
     const copyObjectFolderOrObjectWithContext = React.useCallback(
       (objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext) => {
@@ -707,7 +693,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       [isMobile]
     );
 
-    const duplicateObject = React.useCallback(
+    const duplicateObjectFolderOrObjectWithContext = React.useCallback(
       (
         objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
         duplicateInScene?: boolean
@@ -750,6 +736,25 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         selectObjectFolderOrObjectWithContext,
       ]
     );
+
+    React.useEffect(() => {
+      if (keyboardShortcutsRef.current) {
+        keyboardShortcutsRef.current.setShortcutCallback('onDelete', () => {
+          deleteObjectFolderOrObjectWithContext(
+            selectedObjectFolderOrObjectsWithContext[0]
+          );
+        });
+        keyboardShortcutsRef.current.setShortcutCallback('onDuplicate', () => {
+          duplicateObjectFolderOrObjectWithContext(
+            selectedObjectFolderOrObjectsWithContext[0]
+          );
+        });
+      }
+    }, [
+      selectedObjectFolderOrObjectsWithContext,
+      deleteObjectFolderOrObjectWithContext,
+      duplicateObjectFolderOrObjectWithContext,
+    ]);
 
     const rename = React.useCallback(
       (item: TreeViewItem, newName: string) => {
@@ -1419,7 +1424,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           },
           {
             label: i18n._(t`Duplicate`),
-            click: () => duplicateObject(item),
+            click: () => duplicateObjectFolderOrObjectWithContext(item),
+            accelerator: 'CmdOrCtrl+D',
           },
           {
             label: i18n._(t`Rename`),
@@ -1513,7 +1519,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         selectedObjectFolderOrObjectsWithContext,
         copyObjectFolderOrObjectWithContext,
         cutObjectFolderOrObjectWithContext,
-        duplicateObject,
+        duplicateObjectFolderOrObjectWithContext,
         onEditObject,
         onExportAssets,
         selectObjectFolderOrObjectWithContext,

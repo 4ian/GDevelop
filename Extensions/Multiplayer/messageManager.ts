@@ -1943,6 +1943,11 @@ namespace gdjs {
       return _playersPings[playerNumber] || 0;
     };
 
+    const getCurrentPlayerPing = () => {
+      const currentPlayerNumber = gdjs.multiplayer.getCurrentPlayerNumber();
+      return getPlayerPing(currentPlayerNumber);
+    };
+
     const markPlayerAsDisconnected = (playerNumber: number) => {
       logger.info(`Marking player ${playerNumber} as disconnected.`);
       _playerNumbersWhoJustLeft.push(playerNumber);
@@ -2130,6 +2135,7 @@ namespace gdjs {
       handleHeartbeatsReceived,
       // Connection/Disonnection.
       getPlayerPing,
+      getCurrentPlayerPing,
       updatePlayersPingsForTests,
       handleDisconnectedPeers,
       clearDisconnectedPeers,

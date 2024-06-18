@@ -11,6 +11,60 @@ namespace gdjs {
     isCollidingAnyPlatform: boolean;
   };
 
+  interface OnFloorStateNetworkSyncData {
+    flx: number;
+    fly: number;
+    oh: number;
+  }
+
+  interface FallingStateNetworkSyncData {}
+
+  interface JumpingStateNetworkSyncData {
+    cjs: number;
+    tscjs: number;
+    jkhsjs: boolean;
+    jfd: boolean;
+  }
+
+  interface GrabbingPlatformStateNetworkSyncData {
+    gplx: float;
+    gply: float;
+  }
+
+  interface OnLadderStateNetworkSyncData {}
+
+  type StateNetworkSyncData =
+    | OnFloorStateNetworkSyncData
+    | FallingStateNetworkSyncData
+    | JumpingStateNetworkSyncData
+    | GrabbingPlatformStateNetworkSyncData
+    | OnLadderStateNetworkSyncData;
+
+  interface PlatformerObjectNetworkSyncDataType {
+    cs: float;
+    rdx: float;
+    rdy: float;
+    ldy: float;
+    cfs: float;
+    cj: boolean;
+    ldl: boolean;
+    lek: boolean;
+    rik: boolean;
+    lak: boolean;
+    upk: boolean;
+    dok: boolean;
+    juk: boolean;
+    rpk: boolean;
+    rlk: boolean;
+    sn: string;
+    ssd: StateNetworkSyncData;
+  }
+
+  export interface PlatformerObjectNetworkSyncData
+    extends BehaviorNetworkSyncData {
+    props: PlatformerObjectNetworkSyncDataType;
+  }
+
   /**
    * PlatformerObjectRuntimeBehavior represents a behavior allowing objects to be
    * considered as a platform by objects having PlatformerObject Behavior.
@@ -161,7 +215,7 @@ namespace gdjs {
       this._state = this._falling;
     }
 
-    getNetworkSyncData() {
+    getNetworkSyncData(): PlatformerObjectNetworkSyncData {
       // This method is called, so we are synchronizing this object.
       // Let's clear the inputs between frames as we control it.
       this._dontClearInputsBetweenFrames = false;
@@ -190,7 +244,9 @@ namespace gdjs {
       };
     }
 
-    updateFromNetworkSyncData(networkSyncData) {
+    updateFromNetworkSyncData(
+      networkSyncData: PlatformerObjectNetworkSyncData
+    ) {
       super.updateFromNetworkSyncData(networkSyncData);
 
       const behaviorSpecificProps = networkSyncData.props;
@@ -1776,9 +1832,9 @@ namespace gdjs {
      */
     beforeMovingY(timeDelta: float, oldX: float): void;
 
-    getNetworkSyncData(): any;
+    getNetworkSyncData(): StateNetworkSyncData;
 
-    updateFromNetworkSyncData(syncData: any): void;
+    updateFromNetworkSyncData(syncData: StateNetworkSyncData): void;
   }
 
   /**
@@ -2059,7 +2115,7 @@ namespace gdjs {
       }
     }
 
-    getNetworkSyncData(): any {
+    getNetworkSyncData(): OnFloorStateNetworkSyncData {
       return {
         flx: this._floorLastX,
         fly: this._floorLastY,
@@ -2067,7 +2123,7 @@ namespace gdjs {
       };
     }
 
-    updateFromNetworkSyncData(data: any) {
+    updateFromNetworkSyncData(data: OnFloorStateNetworkSyncData) {
       this._floorLastX = data.flx;
       this._floorLastY = data.fly;
       this._oldHeight = data.oh;
@@ -2130,11 +2186,11 @@ namespace gdjs {
       this._behavior._fall(timeDelta);
     }
 
-    getNetworkSyncData(): any {
+    getNetworkSyncData(): FallingStateNetworkSyncData {
       return {};
     }
 
-    updateFromNetworkSyncData(data: any) {}
+    updateFromNetworkSyncData(data: FallingStateNetworkSyncData) {}
 
     toString(): String {
       return 'Falling';
@@ -2249,7 +2305,7 @@ namespace gdjs {
       }
     }
 
-    getNetworkSyncData(): any {
+    getNetworkSyncData(): JumpingStateNetworkSyncData {
       return {
         cjs: this._currentJumpSpeed,
         tscjs: this._timeSinceCurrentJumpStart,
@@ -2258,7 +2314,7 @@ namespace gdjs {
       };
     }
 
-    updateFromNetworkSyncData(data: any) {
+    updateFromNetworkSyncData(data: JumpingStateNetworkSyncData) {
       this._currentJumpSpeed = data.cjs;
       this._timeSinceCurrentJumpStart = data.tscjs;
       this._jumpKeyHeldSinceJumpStart = data.jkhsjs;
@@ -2337,14 +2393,14 @@ namespace gdjs {
       this._grabbedPlatformLastY = this._grabbedPlatform.owner.getY();
     }
 
-    getNetworkSyncData(): any {
+    getNetworkSyncData(): GrabbingPlatformStateNetworkSyncData {
       return {
         gplx: this._grabbedPlatformLastX,
         gply: this._grabbedPlatformLastY,
       };
     }
 
-    updateFromNetworkSyncData(data: any) {
+    updateFromNetworkSyncData(data: GrabbingPlatformStateNetworkSyncData) {
       this._grabbedPlatformLastX = data.gplx;
       this._grabbedPlatformLastY = data.gply;
     }
@@ -2405,11 +2461,11 @@ namespace gdjs {
       }
     }
 
-    getNetworkSyncData(): any {
+    getNetworkSyncData(): OnLadderStateNetworkSyncData {
       return {};
     }
 
-    updateFromNetworkSyncData(data: any) {}
+    updateFromNetworkSyncData(data: OnLadderStateNetworkSyncData) {}
 
     toString(): String {
       return 'OnLadder';

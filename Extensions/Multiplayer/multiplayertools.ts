@@ -229,6 +229,14 @@ namespace gdjs {
         : `Player ${playerNumber}`;
     };
 
+    /**
+     * Returns the player username of the current player in the lobby.
+     */
+    export const getCurrentPlayerUsername = () => {
+      const currentPlayerNumber = getCurrentPlayerNumber();
+      return getPlayerUsername(currentPlayerNumber);
+    };
+
     const handleLeavingPlayer = (runtimeScene: gdjs.RuntimeScene) => {
       const disconnectedPlayers = gdjs.multiplayerMessageManager.getDisconnectedPlayers();
       if (disconnectedPlayers.length > 0) {
@@ -418,6 +426,11 @@ namespace gdjs {
 
               if (!connectionId || !positionInLobby) {
                 logger.error('No connectionId or position received');
+                gdjs.multiplayerComponents.displayErrorNotification(
+                  runtimeScene
+                );
+                // Close the websocket as something wrong happened.
+                if (_websocket) _websocket.close();
                 return;
               }
 

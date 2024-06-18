@@ -4,6 +4,24 @@ Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
  */
 
 namespace gdjs {
+  interface TopDownMovementNetworkSyncDataType {
+    a: float;
+    xv: float;
+    yv: float;
+    as: float;
+    lk: boolean;
+    rk: boolean;
+    uk: boolean;
+    dk: boolean;
+    wsu: boolean;
+    sa: float;
+    sf: float;
+  }
+
+  export interface TopDownMovementNetworkSyncData
+    extends BehaviorNetworkSyncData {
+    props: TopDownMovementNetworkSyncDataType;
+  }
   /**
    * Allows an object to move in 4 or 8 directions, with customizable speed, accelerations
    * and rotation.
@@ -83,7 +101,7 @@ namespace gdjs {
       this._movementAngleOffset = behaviorData.movementAngleOffset || 0;
     }
 
-    getNetworkSyncData() {
+    getNetworkSyncData(): TopDownMovementNetworkSyncData {
       // This method is called, so we are synchronizing this object.
       // Let's clear the inputs between frames as we control it.
       this._dontClearInputsBetweenFrames = false;
@@ -106,7 +124,9 @@ namespace gdjs {
       };
     }
 
-    updateFromNetworkSyncData(networkSyncData: BehaviorNetworkSyncData): void {
+    updateFromNetworkSyncData(
+      networkSyncData: TopDownMovementNetworkSyncData
+    ): void {
       super.updateFromNetworkSyncData(networkSyncData);
 
       const behaviorSpecificProps = networkSyncData.props;

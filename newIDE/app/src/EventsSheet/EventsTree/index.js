@@ -336,6 +336,7 @@ type EventsTreeProps = {|
   windowSize: WindowSizeType,
   eventsSheetHeight: number,
   fontSize?: number,
+  indentScale: number,
 
   preferences: Preferences,
   tutorials: ?Array<Tutorial>,
@@ -827,7 +828,11 @@ export default class ThemableEventsTree extends Component<
                 key={event.ptr}
                 eventsHeightsCache={this.eventsHeightsCache}
                 selection={this.props.selection}
-                leftIndentWidth={depth * getIndentWidth(this.props.windowSize)}
+                leftIndentWidth={
+                  depth *
+                  (getIndentWidth(this.props.windowSize) *
+                    this.props.indentScale)
+                }
                 onAddNewInstruction={instructionsListContext =>
                   this.props.onAddNewInstruction(
                     eventContext,
@@ -1018,7 +1023,9 @@ export default class ThemableEventsTree extends Component<
         )}
         <SortableTree
           treeData={treeData}
-          scaffoldBlockPxWidth={getIndentWidth(this.props.windowSize)}
+          scaffoldBlockPxWidth={
+            getIndentWidth(this.props.windowSize) * this.props.indentScale
+          }
           onChange={noop}
           onVisibilityToggle={this._onVisibilityToggle}
           canDrag={false}

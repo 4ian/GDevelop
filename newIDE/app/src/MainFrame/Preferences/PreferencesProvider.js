@@ -311,9 +311,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _setEventsSheetIndentScale(
-    eventsSheetIndentScale: boolean
-  ) {
+  _setEventsSheetIndentScale(eventsSheetIndentScale: number) {
     this.setState(
       state => ({
         values: {

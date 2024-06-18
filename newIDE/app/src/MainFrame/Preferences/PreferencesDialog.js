@@ -291,15 +291,11 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
             label={<Trans>Display assignment operators in Events Sheets</Trans>}
           />
           <SelectField
-            floatingLabelText={
-              <Trans>
-                Indent Scale in Events Sheet
-              </Trans>
-            }
+            floatingLabelText={<Trans>Indent Scale in Events Sheet</Trans>}
             fullWidth
             value={values.eventsSheetIndentScale}
-            onChange={(e, i, value: number) => {
-              setEventsSheetIndentScale(value);
+            onChange={(e, i, value) => {
+              setEventsSheetIndentScale(parseInt(value, 10));
             }}
           >
             <SelectOption value="1" label={t`100% (Default)`} />

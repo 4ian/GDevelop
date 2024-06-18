@@ -418,6 +418,11 @@ namespace gdjs {
 
               if (!connectionId || !positionInLobby) {
                 logger.error('No connectionId or position received');
+                gdjs.multiplayerComponents.displayErrorNotification(
+                  runtimeScene
+                );
+                // Close the websocket as something wrong happened.
+                if (_websocket) _websocket.close();
                 return;
               }
 

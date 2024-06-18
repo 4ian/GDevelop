@@ -1835,7 +1835,6 @@ const MainFrame = (props: Props) => {
       eventsFunctionsExtension: gdEventsFunctionsExtension,
       eventsBasedObject: gdEventsBasedObject
     ) => {
-      console.log('onOpenCustomObjectEditor');
       const { currentProject, editorTabs } = state;
       if (!currentProject) return;
 

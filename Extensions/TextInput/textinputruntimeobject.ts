@@ -42,6 +42,28 @@ namespace gdjs {
     };
   }
 
+  export type TextInputNetworkSyncDataType = {
+    opa: float;
+    wid: float;
+    hei: float;
+    txt: string;
+    frn: string;
+    fs: number;
+    place: string;
+    it: SupportedInputType;
+    tc: string;
+    fc: string;
+    fo: float;
+    bc: string;
+    bo: float;
+    bw: float;
+    dis: boolean;
+    ro: boolean;
+  };
+
+  export type TextInputNetworkSyncData = ObjectNetworkSyncData &
+    TextInputNetworkSyncDataType;
+
   const DEFAULT_WIDTH = 300;
   const DEFAULT_HEIGHT = 30;
 
@@ -168,6 +190,49 @@ namespace gdjs {
         this.setReadOnly(newObjectData.content.readOnly);
       }
       return true;
+    }
+
+    getObjectNetworkSyncData(): TextInputNetworkSyncData {
+      return {
+        ...super.getObjectNetworkSyncData(),
+        opa: this.getOpacity(),
+        wid: this.getWidth(),
+        hei: this.getHeight(),
+        txt: this.getText(),
+        frn: this.getFontResourceName(),
+        fs: this.getFontSize(),
+        place: this.getPlaceholder(),
+        it: this.getInputType(),
+        tc: this.getTextColor(),
+        fc: this.getFillColor(),
+        fo: this.getFillOpacity(),
+        bc: this.getBorderColor(),
+        bo: this.getBorderOpacity(),
+        bw: this.getBorderWidth(),
+        dis: this.isDisabled(),
+        ro: this.isReadOnly(),
+      };
+    }
+
+    updateFromObjectNetworkSyncData(syncData: TextInputNetworkSyncData): void {
+      super.updateFromObjectNetworkSyncData(syncData);
+
+      if (syncData.opa !== undefined) this.setOpacity(syncData.opa);
+      if (syncData.wid !== undefined) this.setWidth(syncData.wid);
+      if (syncData.hei !== undefined) this.setHeight(syncData.hei);
+      if (syncData.txt !== undefined) this.setText(syncData.txt);
+      if (syncData.frn !== undefined) this.setFontResourceName(syncData.frn);
+      if (syncData.fs !== undefined) this.setFontSize(syncData.fs);
+      if (syncData.place !== undefined) this.setPlaceholder(syncData.place);
+      if (syncData.it !== undefined) this.setInputType(syncData.it);
+      if (syncData.tc !== undefined) this.setTextColor(syncData.tc);
+      if (syncData.fc !== undefined) this.setFillColor(syncData.fc);
+      if (syncData.fo !== undefined) this.setFillOpacity(syncData.fo);
+      if (syncData.bc !== undefined) this.setBorderColor(syncData.bc);
+      if (syncData.bo !== undefined) this.setBorderOpacity(syncData.bo);
+      if (syncData.bw !== undefined) this.setBorderWidth(syncData.bw);
+      if (syncData.dis !== undefined) this.setDisabled(syncData.dis);
+      if (syncData.ro !== undefined) this.setReadOnly(syncData.ro);
     }
 
     updatePreRender(instanceContainer: RuntimeInstanceContainer): void {

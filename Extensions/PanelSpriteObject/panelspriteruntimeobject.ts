@@ -120,9 +120,9 @@ namespace gdjs {
       return true;
     }
 
-    getObjectNetworkSyncData(): PanelSpriteNetworkSyncData {
+    getNetworkSyncData(): PanelSpriteNetworkSyncData {
       return {
-        ...super.getObjectNetworkSyncData(),
+        ...super.getNetworkSyncData(),
         wid: this.getWidth(),
         hei: this.getHeight(),
         op: this.getOpacity(),
@@ -130,10 +130,10 @@ namespace gdjs {
       };
     }
 
-    updateFromObjectNetworkSyncData(
+    updateFromNetworkSyncData(
       networkSyncData: PanelSpriteNetworkSyncData
     ): void {
-      super.updateFromObjectNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData);
 
       // Texture is not synchronized, see if this is asked or not.
 

@@ -88,18 +88,16 @@ namespace gdjs {
       return true;
     }
 
-    getObjectNetworkSyncData(): LightNetworkSyncData {
+    getNetworkSyncData(): LightNetworkSyncData {
       return {
-        ...super.getObjectNetworkSyncData(),
+        ...super.getNetworkSyncData(),
         rad: this.getRadius(),
         col: this.getColor(),
       };
     }
 
-    updateFromObjectNetworkSyncData(
-      networkSyncData: LightNetworkSyncData
-    ): void {
-      super.updateFromObjectNetworkSyncData(networkSyncData);
+    updateFromNetworkSyncData(networkSyncData: LightNetworkSyncData): void {
+      super.updateFromNetworkSyncData(networkSyncData);
 
       if (networkSyncData.rad !== undefined) {
         this.setRadius(networkSyncData.rad);

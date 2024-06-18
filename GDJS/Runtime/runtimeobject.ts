@@ -453,7 +453,7 @@ namespace gdjs {
      * This can be redefined by objects to send more information.
      * @returns The full network sync data.
      */
-    getObjectNetworkSyncData(): ObjectNetworkSyncData {
+    getNetworkSyncData(): ObjectNetworkSyncData {
       const behaviorNetworkSyncData = {};
       for (let i = 0, len = this._behaviors.length; i < len; ++i) {
         const behavior = this._behaviors[i];
@@ -505,7 +505,7 @@ namespace gdjs {
      * @param networkSyncData The new data for the object.
      * @returns true if the object was updated, false if it could not (i.e: network sync is not supported).
      */
-    updateFromObjectNetworkSyncData(networkSyncData: ObjectNetworkSyncData) {
+    updateFromNetworkSyncData(networkSyncData: ObjectNetworkSyncData) {
       if (networkSyncData.x !== undefined) {
         this.setX(networkSyncData.x);
       }

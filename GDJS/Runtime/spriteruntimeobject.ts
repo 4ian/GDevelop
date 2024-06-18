@@ -107,9 +107,9 @@ namespace gdjs {
       return true;
     }
 
-    getObjectNetworkSyncData(): SpriteNetworkSyncData {
+    getNetworkSyncData(): SpriteNetworkSyncData {
       return {
-        ...super.getObjectNetworkSyncData(),
+        ...super.getNetworkSyncData(),
         anim: this._animator.getNetworkSyncData(),
         ifx: this.isFlippedX(),
         ify: this.isFlippedY(),
@@ -120,8 +120,8 @@ namespace gdjs {
       };
     }
 
-    updateFromObjectNetworkSyncData(newNetworkSyncData: SpriteNetworkSyncData) {
-      super.updateFromObjectNetworkSyncData(newNetworkSyncData);
+    updateFromNetworkSyncData(newNetworkSyncData: SpriteNetworkSyncData) {
+      super.updateFromNetworkSyncData(newNetworkSyncData);
       if (newNetworkSyncData.ifx !== undefined) {
         this.flipX(newNetworkSyncData.ifx);
       }
@@ -138,7 +138,7 @@ namespace gdjs {
         this.setOpacity(newNetworkSyncData.op);
       }
       if (newNetworkSyncData.anim) {
-        this._animator.updateFromObjectNetworkSyncData(newNetworkSyncData.anim);
+        this._animator.updateFromNetworkSyncData(newNetworkSyncData.anim);
         // TODO: optimize updating the animation frame only if needed.
         this._updateAnimationFrame();
       }

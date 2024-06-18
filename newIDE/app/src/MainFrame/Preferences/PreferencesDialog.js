@@ -54,6 +54,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setAutosaveOnPreview,
     setUseGDJSDevelopmentWatcher,
     setEventsSheetUseAssignmentOperators,
+    setEventsSheetIndentScale,
     getDefaultEditorMosaicNode,
     setDefaultEditorMosaicNode,
     setAutoOpenMostRecentProject,
@@ -289,6 +290,27 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
             labelPosition="right"
             label={<Trans>Display assignment operators in Events Sheets</Trans>}
           />
+          <SelectField
+            floatingLabelText={
+              <Trans>
+                Indent Scale in Events Sheet
+              </Trans>
+            }
+            fullWidth
+            value={values.eventsSheetIndentScale}
+            onChange={(e, i, value: number) => {
+              setEventsSheetIndentScale(value);
+            }}
+          >
+            <SelectOption value="1" label={t`100% (Default)`} />
+            <SelectOption value="2" label={t`200%`} />
+            <SelectOption value="3" label={t`300%`} />
+            <SelectOption value="4" label={t`400%`} />
+            <SelectOption value="5" label={t`500%`} />
+            <SelectOption value="6" label={t`600%`} />
+            <SelectOption value="7" label={t`700%`} />
+            <SelectOption value="8" label={t`800%`} />
+          </SelectField>
           <SelectField
             floatingLabelText={
               <Trans>

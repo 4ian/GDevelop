@@ -745,7 +745,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           );
         });
         keyboardShortcutsRef.current.setShortcutCallback('onDuplicate', () => {
+
           duplicateObjectFolderOrObjectWithContext(
+
             selectedObjectFolderOrObjectsWithContext[0]
           );
         });
@@ -754,6 +756,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       selectedObjectFolderOrObjectsWithContext,
       deleteObjectFolderOrObjectWithContext,
       duplicateObjectFolderOrObjectWithContext,
+
     ]);
 
     const rename = React.useCallback(

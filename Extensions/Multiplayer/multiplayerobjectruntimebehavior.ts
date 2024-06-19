@@ -5,6 +5,7 @@
 
 namespace gdjs {
   const logger = new gdjs.Logger('Multiplayer');
+  const debugLogger = new gdjs.Logger('Multiplayer - Debug');
   const getTimeNow =
     window.performance && typeof window.performance.now === 'function'
       ? window.performance.now.bind(window.performance)
@@ -92,7 +93,7 @@ namespace gdjs {
       // if it has not been assigned a networkId after a short delay.
       this._destroyInstanceTimeoutId = setTimeout(() => {
         if (!owner.networkId && gdjs.multiplayer.isLobbyGameRunning()) {
-          logger.info(
+          debugLogger.info(
             `Lobby game is running and object ${owner.getName()} has not been assigned a networkId after a short delay, destroying it.`
           );
           owner.deleteFromScene(instanceContainer);
@@ -252,7 +253,7 @@ namespace gdjs {
         this.playerNumber !== 0 && // Host is always connected.
         !gdjs.multiplayerMessageManager.isPlayerConnected(this.playerNumber)
       ) {
-        logger.info(
+        debugLogger.info(
           `Player number ${this.playerNumber} does not exist in the lobby at the moment. Destroying the object.`
         );
         this.owner.deleteFromScene(this.owner.getInstanceContainer());
@@ -419,7 +420,7 @@ namespace gdjs {
 
       // If it had no networkId, then it was not synchronized and we don't need to send a message.
       if (!instanceNetworkId) {
-        logger.info(
+        debugLogger.info(
           `Destroying object ${objectName} without networkId, no need to send a message.`
         );
         return;
@@ -486,7 +487,7 @@ namespace gdjs {
     }
 
     setPlayerObjectOwnership(newObjectPlayerNumber: number) {
-      logger.info(
+      debugLogger.info(
         `Setting ownership of object ${this.owner.getName()} (networkId: ${
           this.owner.networkId
         } to player ${newObjectPlayerNumber}.`
@@ -517,7 +518,7 @@ namespace gdjs {
 
       let instanceNetworkId = this.owner.networkId;
       if (!instanceNetworkId) {
-        logger.info(
+        debugLogger.info(
           'Object has no networkId, we change the ownership locally, but it will not be synchronized yet if we are not the owner.'
         );
         if (newObjectPlayerNumber !== currentPlayerNumber) {
@@ -527,7 +528,7 @@ namespace gdjs {
         }
         // If we don't have a networkId, we need to create one now that we are the owner.
         // We are probably in a case where we created the object and then changed the ownership.
-        logger.info(
+        debugLogger.info(
           'We are the new owner, creating a networkId for the object.'
         );
         instanceNetworkId = this._getOrCreateInstanceNetworkId();
@@ -579,7 +580,7 @@ namespace gdjs {
         });
       }
 
-      logger.info('Sending change owner message', messageName);
+      debugLogger.info('Sending change owner message', messageName);
       this._sendDataToPeersWithIncreasedClock(messageName, messageData);
 
       // If we are the new owner, also send directly an update of the position,

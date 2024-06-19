@@ -1,8 +1,5 @@
 namespace gdjs {
-  declare var cordova: any;
-
   const logger = new gdjs.Logger('Multiplayer');
-  const multiplayerComponents = gdjs.multiplayerComponents;
   export namespace multiplayer {
     /** Set to true in testing to avoid relying on the multiplayer extension. */
     export let disableMultiplayerForTesting = false;
@@ -252,7 +249,7 @@ namespace gdjs {
           );
 
           if (playerLeftPublicProfile) {
-            multiplayerComponents.displayPlayerLeftNotification(
+            gdjs.multiplayerComponents.displayPlayerLeftNotification(
               runtimeScene,
               (playerLeftPublicProfile && playerLeftPublicProfile.username) ||
                 'Player'
@@ -398,7 +395,6 @@ namespace gdjs {
         // Register a heartbeat to keep the connection alive.
         _websocketHeartbeatInterval = setInterval(() => {
           if (_websocket) {
-            logger.info('Heartbeat sent to keep connection alive.');
             _websocket.send(
               JSON.stringify({
                 action: 'heartbeat',
@@ -505,7 +501,7 @@ namespace gdjs {
           return;
         }
 
-        const lobbiesIframe = multiplayerComponents.getLobbiesIframe(
+        const lobbiesIframe = gdjs.multiplayerComponents.getLobbiesIframe(
           runtimeScene
         );
 
@@ -580,7 +576,7 @@ namespace gdjs {
       _lobbyId = lobbyId;
 
       // Then we inform the lobbies window that the player has joined.
-      const lobbiesIframe = multiplayerComponents.getLobbiesIframe(
+      const lobbiesIframe = gdjs.multiplayerComponents.getLobbiesIframe(
         runtimeScene
       );
 
@@ -638,7 +634,7 @@ namespace gdjs {
 
       // If the player is in the lobby, tell the lobbies window that the lobby has been updated,
       // as well as the player position.
-      const lobbiesIframe = multiplayerComponents.getLobbiesIframe(
+      const lobbiesIframe = gdjs.multiplayerComponents.getLobbiesIframe(
         runtimeScene
       );
 
@@ -665,7 +661,7 @@ namespace gdjs {
       }
 
       // Just pass along the message to the iframe so that it can display the countdown.
-      const lobbiesIframe = multiplayerComponents.getLobbiesIframe(
+      const lobbiesIframe = gdjs.multiplayerComponents.getLobbiesIframe(
         runtimeScene
       );
 
@@ -682,7 +678,9 @@ namespace gdjs {
       );
 
       // Prevent the player from leaving the lobby while the game is starting.
-      multiplayerComponents.hideLobbiesCloseButtonTemporarily(runtimeScene);
+      gdjs.multiplayerComponents.hideLobbiesCloseButtonTemporarily(
+        runtimeScene
+      );
     };
 
     /**
@@ -698,7 +696,9 @@ namespace gdjs {
       // If we are the host, still start the game, as this allows a player to test the game alone.
       const allConnectedPeers = gdjs.evtTools.p2p.getAllPeers();
       if (!isPlayerHost() && allConnectedPeers.length === 0) {
-        multiplayerComponents.displayConnectionErrorNotification(runtimeScene);
+        gdjs.multiplayerComponents.displayConnectionErrorNotification(
+          runtimeScene
+        );
         // Do as if the player left the lobby.
         handleLobbyLeaveEvent();
         removeLobbiesContainer(runtimeScene);
@@ -998,7 +998,7 @@ namespace gdjs {
       };
       window.addEventListener('message', _lobbiesMessageCallback, true);
 
-      multiplayerComponents.displayIframeInsideLobbiesContainer(
+      gdjs.multiplayerComponents.displayIframeInsideLobbiesContainer(
         runtimeScene,
         targetUrl
       );
@@ -1066,7 +1066,7 @@ namespace gdjs {
         return;
       }
 
-      multiplayerComponents.displayLobbies(
+      gdjs.multiplayerComponents.displayLobbies(
         runtimeScene,
         onLobbiesContainerDismissed
       );
@@ -1108,7 +1108,7 @@ namespace gdjs {
               '_blank'
             );
 
-      multiplayerComponents.addTextsToLoadingContainer(
+      gdjs.multiplayerComponents.addTextsToLoadingContainer(
         runtimeScene,
         _isGameRegistered,
         wikiOpenAction
@@ -1125,7 +1125,7 @@ namespace gdjs {
     export const isLobbiesWindowOpen = function (
       runtimeScene: gdjs.RuntimeScene
     ): boolean {
-      const lobbiesRootContainer = multiplayerComponents.getLobbiesRootContainer(
+      const lobbiesRootContainer = gdjs.multiplayerComponents.getLobbiesRootContainer(
         runtimeScene
       );
       return !!lobbiesRootContainer;
@@ -1135,7 +1135,7 @@ namespace gdjs {
       runtimeScene: gdjs.RuntimeScene,
       visible: boolean
     ) {
-      multiplayerComponents.changeLobbiesWindowCloseActionVisibility(
+      gdjs.multiplayerComponents.changeLobbiesWindowCloseActionVisibility(
         runtimeScene,
         visible
       );
@@ -1148,7 +1148,7 @@ namespace gdjs {
       runtimeScene: gdjs.RuntimeScene
     ) {
       removeLobbiesCallbacks();
-      multiplayerComponents.removeLobbiesContainer(runtimeScene);
+      gdjs.multiplayerComponents.removeLobbiesContainer(runtimeScene);
     };
 
     /*

@@ -404,9 +404,20 @@ namespace gdjs {
           }
         }, DEFAULT_WEBSOCKET_HEARTBEAT_INTERVAL);
 
-        // When socket is open, ask for the connectionId, so that we can inform the lobbies window.
+        // When socket is open, ask for the connectionId and send more session info, so that we can inform the lobbies window.
         if (_websocket) {
           _websocket.send(JSON.stringify({ action: 'getConnectionId' }));
+          const plarformInfo = runtimeScene.getGame().getPlatformInfo();
+          _websocket.send(
+            JSON.stringify({
+              action: 'sessionInformation',
+              connectionType: 'lobby',
+              isCordova: plarformInfo.isCordova,
+              devicePlatform: plarformInfo.devicePlatform,
+              navigatorPlatform: plarformInfo.navigatorPlatform,
+              hasTouch: plarformInfo.hasTouch,
+            })
+          );
         }
       };
       _websocket.onmessage = (event) => {
@@ -941,6 +952,10 @@ namespace gdjs {
 
       // Handle message.
       switch (event.data.id) {
+        case 'lobbiesListenerReady': {
+          sendSessionInformation(runtimeScene);
+          break;
+        }
         case 'joinLobby': {
           if (!event.data.lobbyId) {
             throw new Error('Malformed message.');
@@ -974,6 +989,29 @@ namespace gdjs {
       logger.error(message);
       removeLobbiesContainer(runtimeScene);
       focusOnGame(runtimeScene);
+    };
+
+    const sendSessionInformation = (runtimeScene: gdjs.RuntimeScene) => {
+      const lobbiesIframe = multiplayerComponents.getLobbiesIframe(
+        runtimeScene
+      );
+      if (!lobbiesIframe || !lobbiesIframe.contentWindow) {
+        // Cannot send the message if the iframe is not opened.
+        return;
+      }
+
+      const platformInfo = runtimeScene.getGame().getPlatformInfo();
+
+      lobbiesIframe.contentWindow.postMessage(
+        {
+          id: 'sessionInformation',
+          isCordova: platformInfo.isCordova,
+          devicePlatform: platformInfo.devicePlatform,
+          navigatorPlatform: platformInfo.navigatorPlatform,
+          hasTouch: platformInfo.hasTouch,
+        },
+        '*'
+      );
     };
 
     /**

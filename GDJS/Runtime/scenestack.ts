@@ -1,5 +1,6 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Scene stack');
+  const debugLogger = new gdjs.Logger('Multiplayer - Debug');
 
   /**
    * Hold the stack of scenes ({@link gdjs.RuntimeScene}) being played.
@@ -247,7 +248,7 @@ namespace gdjs {
         const sceneSyncData = sceneStackSyncData[i];
         const sceneAtThisPositionInOurStack = this._stack[i];
         if (!sceneAtThisPositionInOurStack) {
-          logger.info(
+          debugLogger.info(
             `Scene at position ${i} with name ${sceneSyncData.name} is missing from the stack, adding it.`
           );
           // We have less scenes in the stack than the host, let's add the scene.
@@ -260,7 +261,7 @@ namespace gdjs {
         }
 
         if (sceneAtThisPositionInOurStack.getName() !== sceneSyncData.name) {
-          logger.info(
+          debugLogger.info(
             `Scene at position ${i} and name ${sceneAtThisPositionInOurStack.getName()} is not the same as the expected ${
               sceneSyncData.name
             }, replacing.`
@@ -283,7 +284,7 @@ namespace gdjs {
           sceneSyncData.networkId &&
           sceneSyncData.name === sceneAtThisPositionInOurStack.getName()
         ) {
-          logger.info(
+          debugLogger.info(
             `Scene at position ${i} and name ${sceneAtThisPositionInOurStack.getName()} has no networkId, let's assume it's the right one and reconcile it with the id ${
               sceneSyncData.networkId
             }.`
@@ -300,7 +301,7 @@ namespace gdjs {
         if (
           sceneAtThisPositionInOurStack.networkId !== sceneSyncData.networkId
         ) {
-          logger.info(
+          debugLogger.info(
             `Scene at position ${i} and name ${sceneAtThisPositionInOurStack.getName()} has a different networkId ${
               sceneAtThisPositionInOurStack.networkId
             } than the expected ${sceneSyncData.networkId}, replacing.`

@@ -1,5 +1,10 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Multiplayer');
+  const debugLogger = new gdjs.Logger('Multiplayer - Debug');
+  // Comment this to see message logs and ease debugging:
+  gdjs.Logger.getDefaultConsoleLoggerOutput().discardGroup(
+    'Multiplayer - Debug'
+  );
 
   class RecentlySeenKeys {
     maxSize: number;
@@ -132,7 +137,7 @@ namespace gdjs {
         expectedMessageAcknowledgements[expectedMessageName] = {};
       }
 
-      logger.info(
+      debugLogger.info(
         `Adding expected message ${expectedMessageName} from ${otherPeerIds.join(
           ', '
         )}.`
@@ -294,7 +299,7 @@ namespace gdjs {
         ) || null;
 
       if (!instance) {
-        logger.info(
+        debugLogger.info(
           `instance ${objectName} ${instanceNetworkId} not found with network ID, trying to find it with persistent UUID.`
         );
         instance =
@@ -306,7 +311,7 @@ namespace gdjs {
           ) || null;
 
         if (instance) {
-          logger.info(
+          debugLogger.info(
             `instance ${objectName} ${instanceNetworkId} found with persistent UUID. Assigning network ID.`
           );
           // Set the network ID, as it was not set yet.
@@ -316,7 +321,7 @@ namespace gdjs {
 
       // If we know the position of the object, we can try to find the closest instance not synchronized yet.
       if (!instance && instanceX !== undefined && instanceY !== undefined) {
-        logger.info(
+        debugLogger.info(
           `instance ${objectName} ${instanceNetworkId} not found with network ID, trying to find it with position ${instanceX}/${instanceY}.`
         );
         // Instance not found, it must be a new object.
@@ -335,7 +340,7 @@ namespace gdjs {
         );
 
         if (closestInstance) {
-          logger.info(
+          debugLogger.info(
             `Found closest instance for object ${objectName} ${instanceNetworkId} with no network ID.`
           );
 
@@ -346,7 +351,7 @@ namespace gdjs {
 
       // If we still did not find the instance, and we should create it if not found, then create it.
       if (!instance && shouldCreateIfNotFound) {
-        logger.info(
+        debugLogger.info(
           `Instance ${instanceNetworkId} still not found, Creating instance ${objectName}.`
         );
         const newInstance = runtimeScene.createObject(objectName);
@@ -449,7 +454,7 @@ namespace gdjs {
             const sceneNetworkId = data.sceneNetworkId;
 
             if (sceneNetworkId !== runtimeScene.networkId) {
-              logger.info(
+              debugLogger.info(
                 `Object ${objectName} is in scene ${sceneNetworkId}, but we are on ${runtimeScene.networkId}. Skipping.`
               );
               // The object is not in the current scene.
@@ -466,7 +471,7 @@ namespace gdjs {
 
             if (!instance) {
               // Instance not found, it must have been destroyed already.
-              logger.info(
+              debugLogger.info(
                 `Instance ${instanceNetworkId} not found, it must have been destroyed.`
               );
               return;
@@ -476,7 +481,7 @@ namespace gdjs {
               'MultiplayerObject'
             ) as MultiplayerObjectRuntimeBehavior | null;
             if (!behavior) {
-              logger.warn(
+              debugLogger.info(
                 `Object ${objectName} does not have the MultiplayerObjectBehavior, cannot change ownership.`
               );
               return;
@@ -493,14 +498,14 @@ namespace gdjs {
               // We received an ownership change message for an object which is in an unexpected state.
               // There may be some lag, and multiple ownership changes may have been sent by the other players.
               // As the host, let's not change the ownership and let the player revert it.
-              logger.warn(
+              debugLogger.info(
                 `Object ${objectName} with instance network ID ${instanceNetworkId} does not have the expected owner. Wanted to change from ${previousOwner} to ${newOwner}, but object has owner ${currentPlayerObjectOwnership}.`
               );
               return;
             }
 
             // Force the ownership change.
-            logger.info(
+            debugLogger.info(
               `Changing ownership of object ${objectName} to ${newOwner}.`
             );
             behavior.playerNumber = newOwner;
@@ -509,7 +514,7 @@ namespace gdjs {
               messageName
             );
 
-            logger.info(
+            debugLogger.info(
               `Sending acknowledgment of ownership change of object ${objectName} from ${previousOwner} to ${newOwner} with instance network ID ${instanceNetworkId} to ${messageSender}.`
             );
             // Once the instance ownership has changed, we need to acknowledge it to the player who sent this message.
@@ -538,7 +543,7 @@ namespace gdjs {
                 shouldCancelMessageIfTimesOut: false,
               });
               for (const peerId of otherPeerIds) {
-                logger.info(
+                debugLogger.info(
                   `Relaying ownership change of object ${objectName} with instance network ID ${instanceNetworkId} to ${peerId}.`
                 );
                 sendDataTo(peerId, messageName, data);
@@ -612,7 +617,7 @@ namespace gdjs {
             const sceneNetworkId = matches[4];
 
             if (sceneNetworkId !== runtimeScene.networkId) {
-              logger.info(
+              debugLogger.info(
                 `Object ${objectName} is in scene ${sceneNetworkId}, but we are on ${runtimeScene.networkId}. Skipping.`
               );
               // The object is not in the current scene.
@@ -666,14 +671,14 @@ namespace gdjs {
               behavior.getPlayerObjectOwnership() ===
               gdjs.multiplayer.playerNumber
             ) {
-              logger.info(
+              debugLogger.info(
                 `Object ${objectName} with instance network ID ${instanceNetworkId} is owned by us ${gdjs.multiplayer.playerNumber}, ignoring update message from ${ownerPlayerNumber}.`
               );
               return;
             }
 
             if (behavior.getPlayerObjectOwnership() !== ownerPlayerNumber) {
-              logger.info(
+              debugLogger.info(
                 `Object ${objectName} with instance network ID ${instanceNetworkId} is owned by ${behavior.getPlayerObjectOwnership()} on our game, changing ownership to ${ownerPlayerNumber} as part of the update event.`
               );
               behavior.playerNumber = ownerPlayerNumber;
@@ -788,7 +793,7 @@ namespace gdjs {
               variableType === 'scene' &&
               containerId !== runtimeScene.networkId
             ) {
-              logger.info(
+              debugLogger.info(
                 `Variable ${variableName} is in scene ${containerId}, but we are on ${runtimeScene.networkId}. Skipping.`
               );
               // The variable is not in the current scene.
@@ -821,14 +826,14 @@ namespace gdjs {
               // We received an ownership change message for a variable which is in an unexpected state.
               // There may be some lag, and multiple ownership changes may have been sent by the other players.
               // As the host, let's not change the ownership and let the player revert it.
-              logger.warn(
+              debugLogger.info(
                 `Variable with ID ${variableNetworkId} does not have the expected owner. Wanted to change from ${previousOwner} to ${newOwner}, but variable has owner ${currentPlayerVariableOwnership}.`
               );
               return;
             }
 
             // Force the ownership change.
-            logger.info(
+            debugLogger.info(
               `Changing ownership of variable ${variableName} to ${newOwner}.`
             );
             variable.setPlayerOwnership(newOwner);
@@ -837,7 +842,7 @@ namespace gdjs {
               messageName
             );
 
-            logger.info(
+            debugLogger.info(
               `Sending acknowledgment of ownership change of variable with ID ${variableNetworkId} from ${previousOwner} to ${newOwner} to ${messageSender}.`
             );
             // Once the variable ownership has changed, we need to acknowledge it to the player who sent this message.
@@ -866,7 +871,7 @@ namespace gdjs {
                 shouldCancelMessageIfTimesOut: false,
               });
               for (const peerId of otherPeerIds) {
-                logger.info(
+                debugLogger.info(
                   `Relaying ownership change of variable with Id ${variableNetworkId} to ${peerId}.`
                 );
                 sendDataTo(peerId, messageName, data);
@@ -912,7 +917,9 @@ namespace gdjs {
       );
       acknowledgedMessageNames.forEach((messageName) => {
         if (gdjs.evtTools.p2p.onEvent(messageName, false)) {
-          logger.info(`Received acknowledgment for message ${messageName}.`);
+          debugLogger.info(
+            `Received acknowledgment for message ${messageName}.`
+          );
           const message = gdjs.evtTools.p2p.getEvent(messageName);
           let data;
           while ((data = message.getData())) {
@@ -966,7 +973,7 @@ namespace gdjs {
               });
             }
 
-            logger.info(
+            debugLogger.info(
               `Marking message ${messageName} as acknowledged from ${messageSender}.`
             );
             // Mark the acknowledgment as received.
@@ -996,7 +1003,7 @@ namespace gdjs {
         );
         if (!peerWhoHaventAcknowledged.length) {
           // All peers have acknowledged this message, we can clear the object.
-          logger.info(
+          debugLogger.info(
             `All peers have acknowledged message ${acknowledgemessageName}.`
           );
           delete expectedMessageAcknowledgements[acknowledgemessageName];
@@ -1014,7 +1021,7 @@ namespace gdjs {
             if (getTimeNow() - lastMessageSentAt > messageRetryTime) {
               if (currentNumberOfRetries >= maxNumberOfRetries) {
                 // We have retried too many times, let's give up.
-                logger.info(
+                debugLogger.info(
                   `Giving up on message ${acknowledgemessageName} for ${peerId}.`
                 );
                 if (acknowledgements[peerId].shouldCancelMessageIfTimesOut) {
@@ -1061,7 +1068,7 @@ namespace gdjs {
                       'MultiplayerObject'
                     ) as MultiplayerObjectRuntimeBehavior | null;
                     if (!behavior) {
-                      logger.warn(
+                      logger.error(
                         `Object ${objectName} does not have the MultiplayerObjectBehavior, cannot revert ownership.`
                       );
                       // Object does not have the MultiplayerObjectBehavior, cannot revert ownership.
@@ -1116,7 +1123,7 @@ namespace gdjs {
                       variableType === 'scene' &&
                       containerId !== runtimeScene.networkId
                     ) {
-                      logger.info(
+                      debugLogger.info(
                         `Variable ${variableName} is in scene ${containerId}, but we are on ${runtimeScene.networkId}. Skipping ownership revert.`
                       );
                       delete expectedMessageAcknowledgements[
@@ -1226,7 +1233,7 @@ namespace gdjs {
           }
           const messageSender = gdjs.evtTools.p2p.getEventSender(messageName);
           if (data && messageSender) {
-            logger.info(
+            debugLogger.info(
               `Received message ${messageName} with data ${messageData}.`
             );
             const matches = destroyInstanceMessageNameRegex.exec(messageName);
@@ -1245,7 +1252,7 @@ namespace gdjs {
 
             if (sceneNetworkId !== runtimeScene.networkId) {
               // The object is not in the current scene.
-              logger.info(
+              debugLogger.info(
                 `Object ${objectName} is in scene ${sceneNetworkId}, but we are on ${runtimeScene.networkId}. Skipping.`
               );
               return;
@@ -1262,7 +1269,7 @@ namespace gdjs {
             );
 
             if (!instance) {
-              logger.info(
+              debugLogger.info(
                 'Instance was not found in the scene, sending acknowledgment anyway.'
               );
               // Instance not found, it must have been destroyed already.
@@ -1271,12 +1278,12 @@ namespace gdjs {
               return;
             }
 
-            logger.info(
+            debugLogger.info(
               `Destroying object ${objectName} with instance network ID ${instanceNetworkId}.`
             );
             instance.deleteFromScene(runtimeScene);
 
-            logger.info(
+            debugLogger.info(
               `Sending acknowledgment of destruction of object ${objectName} with instance network ID ${instanceNetworkId} to ${messageSender}.`
             );
             // Once the object is destroyed, we need to acknowledge it to the player who sent the destroy message.
@@ -1454,7 +1461,7 @@ namespace gdjs {
           }
           const uniqueMessageId = data.uniqueId;
           const messageSender = event.getSender();
-          logger.info(
+          debugLogger.info(
             `Received custom message ${messageName} with data ${messageData}.`
           );
           const matches = customMessageRegex.exec(messageName);
@@ -1468,7 +1475,7 @@ namespace gdjs {
           if (processedCustomMessagesCache.has(customMessageCacheKey)) {
             // Message has already been processed recently. This can happen if the message is sent multiple times,
             // after not being acknowledged properly.
-            logger.info(
+            debugLogger.info(
               `Message ${messageName} has already been processed, skipping.`
             );
             return;
@@ -1477,7 +1484,7 @@ namespace gdjs {
           const acknowledgmentMessageName = createAcknowledgeCustomMessageNameFromCustomMessage(
             messageName
           );
-          logger.info(
+          debugLogger.info(
             `Sending acknowledgment of custom message ${messageName} to ${messageSender}.`
           );
           sendDataTo(messageSender, acknowledgmentMessageName, {});
@@ -1616,7 +1623,7 @@ namespace gdjs {
               const sceneNetworkId = data.id;
 
               if (sceneNetworkId !== runtimeScene.networkId) {
-                logger.info(
+                debugLogger.info(
                   `Received update of scene ${sceneNetworkId}, but we are on ${runtimeScene.networkId}. Skipping.`
                 );
                 message.popData();
@@ -1980,7 +1987,6 @@ namespace gdjs {
 
       const disconnectedPeer = gdjs.evtTools.p2p.getDisconnectedPeer();
       if (disconnectedPeer) {
-        logger.info(`Disconnected peer: ${disconnectedPeer}`);
         const disconnectedPlayerNumber =
           _peerIdToPlayerNumber[disconnectedPeer];
         if (!disconnectedPlayerNumber) {
@@ -1997,7 +2003,6 @@ namespace gdjs {
         if (gdjs.multiplayer.isPlayerHost()) {
           const instances = runtimeScene.getAdhocListOfAllInstances();
           for (const instance of instances) {
-            logger.info('Found instances ' + instance.getName());
             const behavior = instance.getBehavior(
               'MultiplayerObject'
             ) as MultiplayerObjectRuntimeBehavior | null;

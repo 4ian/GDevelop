@@ -1,5 +1,6 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Multiplayer');
+  const debugLogger = new gdjs.Logger('Multiplayer - Debug');
 
   export type MultiplayerVariablesManager = ReturnType<
     typeof makeMultiplayerVariablesManager
@@ -71,7 +72,7 @@ namespace gdjs {
           // Variable is being synchronized but the scene has no networkId yet.
           // It should have one assigned as soon as the scene is synchronized.
           // Skipping.
-          logger.info(
+          debugLogger.info(
             'Variable is being synchronized but the scene has no networkId yet.'
           );
           return;
@@ -126,7 +127,7 @@ namespace gdjs {
       variable: gdjs.Variable,
       newVariablePlayerNumber: number
     ) {
-      logger.info(
+      debugLogger.info(
         `Setting ownership of variable to player ${newVariablePlayerNumber}.`
       );
       if (newVariablePlayerNumber < 0) {
@@ -174,7 +175,7 @@ namespace gdjs {
         variableNetworkId
       );
 
-      logger.info(
+      debugLogger.info(
         `Adding variable to be synchronized: ${variableNetworkId} (type: ${variableType}) from owner ${previousVariablePlayerNumber} to ${newVariablePlayerNumber}.`
       );
       addVariableOwnershipChangeToSync({
@@ -241,7 +242,7 @@ namespace gdjs {
           });
         }
 
-        logger.info('Sending change owner message', messageName);
+        debugLogger.info('Sending change owner message', messageName);
         const connectedPeerIds = gdjs.evtTools.p2p.getAllPeers();
         for (const peerId of connectedPeerIds) {
           gdjs.multiplayerMessageManager.sendDataTo(

@@ -411,19 +411,14 @@ namespace gdjs {
         // When socket is open, ask for the connectionId and send more session info, so that we can inform the lobbies window.
         if (_websocket) {
           _websocket.send(JSON.stringify({ action: 'getConnectionId' }));
-          // @ts-ignore - cordova param is added by Cordova.
-          const isCordova = !!window.cordova;
-          const devicePlatform =
-            // @ts-ignore - device param is added globally.
-            typeof device !== 'undefined' ? device.platform || '' : '';
-          const navigatorPlatform =
-            typeof navigator !== 'undefined' ? navigator.platform : '';
+          const plarformInfo = gdjs.getPlatformInfo();
           _websocket.send(
             JSON.stringify({
               action: 'sessionInformation',
-              isCordova,
-              devicePlatform,
-              navigatorPlatform,
+              isCordova: plarformInfo.isCordova,
+              devicePlatform: plarformInfo.devicePlatform,
+              navigatorPlatform: plarformInfo.navigatorPlatform,
+              hasTouch: plarformInfo.hasTouch,
             })
           );
         }
@@ -956,7 +951,7 @@ namespace gdjs {
 
       // Handle message.
       switch (event.data.id) {
-        case 'listenerReady': {
+        case 'lobbiesListenerReady': {
           sendSessionInformation(runtimeScene);
           break;
         }
@@ -1004,20 +999,15 @@ namespace gdjs {
         return;
       }
 
-      // @ts-ignore - cordova param is added by Cordova.
-      const isCordova = !!window.cordova;
-      const devicePlatform =
-        // @ts-ignore - device param is added globally.
-        typeof device !== 'undefined' ? device.platform || '' : '';
-      const navigatorPlatform =
-        typeof navigator !== 'undefined' ? navigator.platform : '';
+      const platformInfo = gdjs.getPlatformInfo();
 
       lobbiesIframe.contentWindow.postMessage(
         {
           id: 'sessionInformation',
-          isCordova,
-          devicePlatform,
-          navigatorPlatform,
+          isCordova: platformInfo.isCordova,
+          devicePlatform: platformInfo.devicePlatform,
+          navigatorPlatform: platformInfo.navigatorPlatform,
+          hasTouch: platformInfo.hasTouch,
         },
         '*'
       );

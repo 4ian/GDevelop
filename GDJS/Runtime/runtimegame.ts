@@ -956,6 +956,7 @@ namespace gdjs {
        * either in sendedDuration or notYetSentDuration.
        **/
       let lastSessionResumeTime = Date.now();
+      const platform = gdjs.getPlatformInfo();
       fetch(baseUrl + '/session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -972,17 +973,10 @@ namespace gdjs {
             location: window.location.href,
           },
           platform: {
-            // @ts-ignore
-            isCordova: !!window.cordova,
-            devicePlatform:
-              // @ts-ignore
-              typeof device !== 'undefined' ? device.platform || '' : '',
-            navigatorPlatform:
-              typeof navigator !== 'undefined' ? navigator.platform : '',
-            hasTouch:
-              typeof navigator !== 'undefined'
-                ? !!navigator.maxTouchPoints && navigator.maxTouchPoints > 2
-                : false,
+            isCordova: platform.isCordova,
+            devicePlatform: platform.devicePlatform,
+            navigatorPlatform: platform.navigatorPlatform,
+            hasTouch: platform.hasTouch,
           },
         }),
       })

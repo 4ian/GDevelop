@@ -20,6 +20,7 @@ export const TIMER_IN_APP_TUTORIAL_ID = 'timer';
 export const OBJECT_3D_IN_APP_TUTORIAL_ID = 'object3d';
 export const KNIGHT_PLATFORMER_IN_APP_TUTORIAL_ID = 'knightPlatformer';
 export const TOP_DOWN_RPG_PIXEL_PERFECT_ID = 'topDownRPGPixelPerfect';
+export const FIRE_A_BULLET = 'fireABullet';
 
 export const guidedLessonsIds = [
   PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
@@ -30,6 +31,7 @@ export const guidedLessonsIds = [
   OBJECT_3D_IN_APP_TUTORIAL_ID,
   KNIGHT_PLATFORMER_IN_APP_TUTORIAL_ID,
   TOP_DOWN_RPG_PIXEL_PERFECT_ID,
+  FIRE_A_BULLET,
 ];
 
 export type InAppTutorialShortHeader = {|

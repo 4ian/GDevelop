@@ -20,7 +20,7 @@ import {
   JOYSTICK_IN_APP_TUTORIAL_ID,
   OBJECT_3D_IN_APP_TUTORIAL_ID,
   KNIGHT_PLATFORMER_IN_APP_TUTORIAL_ID,
-  TOP_DOWN_RPG_PIXEL_PERFECT_ID,
+  TOP_DOWN_RPG_MOVEMENT_ID,
   FIRE_A_BULLET,
   guidedLessonsIds,
 } from '../../../../Utils/GDevelopServices/InAppTutorial';
@@ -169,7 +169,7 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
       renderImage: props => <Platformer {...props} />,
     },
     {
-      id: TOP_DOWN_RPG_PIXEL_PERFECT_ID,
+      id: TOP_DOWN_RPG_MOVEMENT_ID,
       title: t`Top-Down RPG Pixel Perfect`,
       description: t`Learn how to make a character move like in the retro Pokemon games.`,
       durationInMinutes: 2,

@@ -21,6 +21,7 @@ import {
   OBJECT_3D_IN_APP_TUTORIAL_ID,
   KNIGHT_PLATFORMER_IN_APP_TUTORIAL_ID,
   TOP_DOWN_RPG_PIXEL_PERFECT_ID,
+  FIRE_A_BULLET,
   guidedLessonsIds,
 } from '../../../../Utils/GDevelopServices/InAppTutorial';
 import MultiplierScore from './Icons/MultiplierScore';
@@ -38,6 +39,7 @@ import Trophy from '../../../../UI/CustomSvgIcons/Trophy';
 import Object3D from './Icons/Object3D';
 import Platformer from './Icons/Platformer';
 import TopDownRPGMovement from './Icons/TopDownRPGMovement';
+import FireABullet from './Icons/FireAbullet';
 
 const getColumnsFromWindowSize = (
   windowSize: WindowSizeType,
@@ -172,6 +174,13 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
       description: t`Learn how to make a character move like in the retro Pokemon games.`,
       durationInMinutes: 2,
       renderImage: props => <TopDownRPGMovement {...props} />,
+    },
+    {
+      id: FIRE_A_BULLET,
+      title: t`Fire a Bullet`,
+      description: t`Learn how to fire bullets with the help of a behavior. Get ready for a Star Wars show.`,
+      durationInMinutes: 3,
+      renderImage: props => <FireABullet {...props} />,
     },
   ].filter(item => displayedGuidedLessonsIds.includes(item.id));
 

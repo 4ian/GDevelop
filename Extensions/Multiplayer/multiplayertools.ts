@@ -411,10 +411,11 @@ namespace gdjs {
         // When socket is open, ask for the connectionId and send more session info, so that we can inform the lobbies window.
         if (_websocket) {
           _websocket.send(JSON.stringify({ action: 'getConnectionId' }));
-          const plarformInfo = gdjs.getPlatformInfo();
+          const plarformInfo = runtimeScene.getGame().getPlatformInfo();
           _websocket.send(
             JSON.stringify({
               action: 'sessionInformation',
+              connectionType: 'lobby',
               isCordova: plarformInfo.isCordova,
               devicePlatform: plarformInfo.devicePlatform,
               navigatorPlatform: plarformInfo.navigatorPlatform,
@@ -999,7 +1000,7 @@ namespace gdjs {
         return;
       }
 
-      const platformInfo = gdjs.getPlatformInfo();
+      const platformInfo = runtimeScene.getGame().getPlatformInfo();
 
       lobbiesIframe.contentWindow.postMessage(
         {

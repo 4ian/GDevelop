@@ -902,6 +902,23 @@ namespace gdjs {
       }
     }
 
+    /**
+     * Helper function to get information about the platform running the game.
+     */
+    getPlatformInfo = () => ({
+      // @ts-ignore
+      isCordova: !!window.cordova,
+      devicePlatform:
+        // @ts-ignore
+        typeof device !== 'undefined' ? device.platform || '' : '',
+      navigatorPlatform:
+        typeof navigator !== 'undefined' ? navigator.platform : '',
+      hasTouch:
+        typeof navigator !== 'undefined'
+          ? !!navigator.maxTouchPoints && navigator.maxTouchPoints > 2
+          : false,
+    });
+
     _setupGameVisibilityEvents() {
       if (typeof navigator !== 'undefined' && typeof document !== 'undefined') {
         document.addEventListener('visibilitychange', () => {
@@ -956,7 +973,7 @@ namespace gdjs {
        * either in sendedDuration or notYetSentDuration.
        **/
       let lastSessionResumeTime = Date.now();
-      const platform = gdjs.getPlatformInfo();
+      const platform = this.getPlatformInfo();
       fetch(baseUrl + '/session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

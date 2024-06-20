@@ -11,7 +11,8 @@
 version: 2.1
 orbs:
   aws-cli: circleci/aws-cli@2.0.6
-  macos: circleci/macos@2.5.1
+  macos: circleci/macos@2.5.1 # For Rosetta (see below)
+  node: circleci/node@5.2.0 # For a recent npm version (see below)
 jobs:
   # Build the **entire** app for macOS.
   build-macos:
@@ -25,9 +26,9 @@ jobs:
       - run: sudo sysctl net.inet.tcp.tso=0
 
       # Install a recent version of npm to workaround a notarization issue because of a symlink made by npm: https://github.com/electron-userland/electron-builder/issues/7755
-      - run:
-          name: Install npm v10.8.1
-          command: npm install -g npm@10.8.1
+      # Node.js v20.14.0 comes with npm v10.7.0.
+      - node/install:
+          node-version: "20.14.0"
 
       # System dependencies (for Emscripten and upload)
       - run:

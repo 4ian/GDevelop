@@ -20,7 +20,9 @@ jobs:
     resource_class: macos.m1.large.gen1
     steps:
       - checkout
+      # Install Rosetta for AWS CLI and disable TSO to speed up S3 uploads (https://support.circleci.com/hc/en-us/articles/19334402064027-Troubleshooting-slow-uploads-to-S3-for-jobs-using-an-m1-macOS-resource-class)
       - macos/install-rosetta
+      - run: sudo sysctl net.inet.tcp.tso=0
 
       # System dependencies (for Emscripten and upload)
       - run:

@@ -22,12 +22,12 @@ jobs:
 
       # System dependencies (for Emscripten and upload)
       - run:
-          name: Install dependencies for Emscripten
-          command: brew install cmake
+          name: Install dependencies for AWS S3 upload
+          command: sudo softwareupdate --install-rosetta && curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg" && sudo installer -pkg AWSCLIV2.pkg -target /
 
       - run:
-          name: Install dependencies for AWS S3 upload
-          command: curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg" && sudo installer -pkg AWSCLIV2.pkg -target /
+          name: Install dependencies for Emscripten
+          command: brew install cmake
 
       - run:
           name: Install Emscripten (for GDevelop.js)

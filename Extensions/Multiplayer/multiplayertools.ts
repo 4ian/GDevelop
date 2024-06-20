@@ -992,7 +992,7 @@ namespace gdjs {
     };
 
     const sendSessionInformation = (runtimeScene: gdjs.RuntimeScene) => {
-      const lobbiesIframe = multiplayerComponents.getLobbiesIframe(
+      const lobbiesIframe = gdjs.multiplayerComponents.getLobbiesIframe(
         runtimeScene
       );
       if (!lobbiesIframe || !lobbiesIframe.contentWindow) {

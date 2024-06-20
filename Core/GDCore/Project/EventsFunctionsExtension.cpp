@@ -154,7 +154,7 @@ void EventsFunctionsExtension::UnserializeExtensionDeclarationFrom(
   for (size_t i = 0; i < dependenciesElement.GetChildrenCount(); ++i)
     dependencies.push_back(
         UnserializeDependencyFrom(dependenciesElement.GetChild(i)));
-  
+
   globalVariables.UnserializeFrom(element.GetChild("globalVariables"));
   sceneVariables.UnserializeFrom(element.GetChild("sceneVariables"));
 
@@ -184,7 +184,11 @@ void EventsFunctionsExtension::UnserializeExtensionImplementationFrom(
   UnserializeEventsFunctionsFrom(project, element.GetChild("eventsFunctions"));
   eventsBasedBehaviors.UnserializeElementsFrom(
       "eventsBasedBehavior", project, element.GetChild("eventsBasedBehaviors"));
-  eventsBasedObjects.UnserializeElementsFrom(
+
+  // It's important to load the objects without erasing them first as each object
+  // might reference other objects, and so need to know if a custom object exists
+  // in the project or not.
+  eventsBasedObjects.ProgressivelyUnserializeElementsFrom(
       "eventsBasedObject", project, element.GetChild("eventsBasedObjects"));
 }
 

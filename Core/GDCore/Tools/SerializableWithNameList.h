@@ -204,6 +204,10 @@ class SerializableWithNameList {
 
   void UnserializeElementsFrom(const gd::String& elementName,
                                const SerializerElement& element);
+
+  void ProgressivelyUnserializeElementsFrom(const gd::String& elementName,
+                               gd::Project& project,
+                               const SerializerElement& element);
   ///@}
 
  protected:

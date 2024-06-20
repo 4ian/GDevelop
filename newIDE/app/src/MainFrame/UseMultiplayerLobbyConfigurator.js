@@ -2,6 +2,7 @@
 import * as React from 'react';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { duplicateLobbyConfiguration } from '../Utils/GDevelopServices/Play';
+import { registerGame } from '../Utils/GDevelopServices/Game';
 
 const gd: libGDevelop = global.gd;
 
@@ -39,6 +40,20 @@ export const useMultiplayerLobbyConfigurator = (): UseMultiplayerLobbyConfigurat
       }
 
       try {
+        // Register game. The error will silently be caught if the game already exists.
+        try {
+          await registerGame(getAuthorizationHeader, profile.id, {
+            gameId: project.getProjectUuid(),
+            authorName: project.getAuthor() || 'Unspecified publisher',
+            gameName: project.getName() || 'Untitled game',
+            templateSlug: project.getTemplateSlug(),
+          });
+        } catch (error) {
+          console.error(
+            'Could not register game before lobby configuration: ',
+            error
+          );
+        }
         await duplicateLobbyConfiguration({
           userId: profile.id,
           getAuthorizationHeader,

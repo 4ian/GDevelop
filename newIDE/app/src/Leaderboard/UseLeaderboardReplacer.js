@@ -260,7 +260,10 @@ export const useLeaderboardReplacer = (): UseLeaderboardReplacerOutput => {
           templateSlug: project.getTemplateSlug(),
         });
       } catch (error) {
-        console.error('Could not register game: ', error);
+        console.error(
+          'Could not register game before leaderboard replacement: ',
+          error
+        );
       }
       setProgress(progressStep);
 

@@ -24,6 +24,11 @@ jobs:
       - macos/install-rosetta
       - run: sudo sysctl net.inet.tcp.tso=0
 
+      # Install a recent version of npm to workaround a notarization issue because of a symlink made by npm: https://github.com/electron-userland/electron-builder/issues/7755
+      - run:
+          name: Install npm v10.8.1
+          command: npm install -g npm@10.8.1
+
       # System dependencies (for Emscripten and upload)
       - run:
           name: Install dependencies for Emscripten

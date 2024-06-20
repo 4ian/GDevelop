@@ -11,6 +11,7 @@
 version: 2.1
 orbs:
   aws-cli: circleci/aws-cli@2.0.6
+  macos: circleci/macos@2.5.1
 jobs:
   # Build the **entire** app for macOS.
   build-macos:
@@ -19,15 +20,16 @@ jobs:
     resource_class: macos.m1.large.gen1
     steps:
       - checkout
+      - macos/install-rosetta
 
       # System dependencies (for Emscripten and upload)
       - run:
-          name: Install dependencies for AWS S3 upload
-          command: sudo softwareupdate --install-rosetta && curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg" && sudo installer -pkg AWSCLIV2.pkg -target /
-
-      - run:
           name: Install dependencies for Emscripten
           command: brew install cmake
+
+      - run:
+          name: Install dependencies for AWS S3 upload
+          command: curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg" && sudo installer -pkg AWSCLIV2.pkg -target /
 
       - run:
           name: Install Emscripten (for GDevelop.js)

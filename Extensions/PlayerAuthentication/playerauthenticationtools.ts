@@ -95,7 +95,7 @@ namespace gdjs {
         connectionId ? `&connectionId=${connectionId}` : ''
       }${
         runtimeGame.isUsingGDevelopDevelopmentEnvironment() ? '&dev=true' : ''
-      }`;
+      }&allowLoginProviders=true`;
     };
 
     /**

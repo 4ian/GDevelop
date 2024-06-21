@@ -30,6 +30,7 @@ import PixiResourcesLoader, {
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { PropertyResourceSelector, PropertyField } from './PropertyFields';
 import AlertMessage from '../../UI/AlertMessage';
+import Window from '../../Utils/Window';
 
 const gd: libGDevelop = global.gd;
 
@@ -47,6 +48,9 @@ const styles = {
     display: 'flex',
     flex: 1,
     alignItems: 'center',
+  },
+  neverShrinkingButton: {
+    flexShrink: 0,
   },
 };
 
@@ -307,9 +311,22 @@ const SpineEditor = ({
       <ScrollView ref={scrollView}>
         <ColumnStackLayout noMargin>
           {renderObjectNameField && renderObjectNameField()}
-          <AlertMessage kind="warning">
+          <AlertMessage
+            kind="warning"
+            renderRightButton={() => (
+              <FlatButton
+                style={styles.neverShrinkingButton}
+                label={<Trans>Purchase Spine</Trans>}
+                onClick={() =>
+                  Window.openExternalURL(
+                    'https://esotericsoftware.com/spine-purchase'
+                  )
+                }
+              />
+            )}
+          >
             <Trans>
-              You need to own a license of Spine to publish a game with a Spine
+              You must own a Spine license to publish a game with a Spine
               object.
             </Trans>
           </AlertMessage>

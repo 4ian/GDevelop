@@ -11,7 +11,7 @@ import {
   shouldActivate,
   shouldValidate,
 } from '../../UI/KeyboardShortcuts/InteractionKeys';
-import LocalIcon from '../../UI/CustomSvgIcons/ExternalEvents';
+import LocalVariableIcon from '../../UI/CustomSvgIcons/LocalVariable';
 import { getVariableTypeIcon } from '../ParameterFields/VariableField';
 
 const gd: libGDevelop = global.gd;
@@ -98,7 +98,7 @@ export const VariableDeclaration = (props: Props) => {
         <Trans>
           Declare{' '}
           <span>
-            <LocalIcon
+            <LocalVariableIcon
               className={classNames({
                 [icon]: true,
               })}

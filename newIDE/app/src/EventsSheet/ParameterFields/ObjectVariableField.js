@@ -14,7 +14,7 @@ import {
 import { getLastObjectParameterValue } from './ParameterMetadataTools';
 import getObjectByName from '../../Utils/GetObjectByName';
 import getObjectGroupByName from '../../Utils/GetObjectGroupByName';
-import ObjectIcon from '../../UI/CustomSvgIcons/Object';
+import ObjectVariableIcon from '../../UI/CustomSvgIcons/ObjectVariable';
 import { enumerateVariables } from './EnumerateVariables';
 import { intersectionBy } from 'lodash';
 
@@ -178,4 +178,4 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
 export const renderInlineObjectVariable = (
   props: ParameterInlineRendererProps
-) => renderVariableWithIcon(props, 'object variable', ObjectIcon);
+) => renderVariableWithIcon(props, 'object variable', ObjectVariableIcon);

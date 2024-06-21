@@ -999,7 +999,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     globalVariablesItemId,
                     i18n._(t`Global variables`),
                     openProjectVariables,
-                    'res/icons_default/publish_black.svg'
+                    'res/icons_default/global_variable24_black.svg'
                   )
                 ),
                 new LeafTreeViewItem(

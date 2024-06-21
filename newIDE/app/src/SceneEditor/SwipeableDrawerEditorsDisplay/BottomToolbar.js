@@ -12,23 +12,19 @@ import { type EditorId } from '..';
 import Paper from '../../UI/Paper';
 
 const iconSize = 24;
-const iconButtonPaddingTop = 8;
 /**
- * Padding bottom is bigger than padding top to leave space for the Android/iOS
+ * Padding bottom is added to toolbar to leave space for the Android/iOS
  * bottom navigation bar.
  */
-const iconButtonPaddingBottom = 20;
-const iconButtonPaddingHorizontal = 8;
+const toolbarPaddingBottom = 12;
+const iconButtonPadding = 8;
 const iconButtonLabelPadding = 2;
 const toolbarHeight =
-  iconSize +
-  2 * iconButtonLabelPadding +
-  iconButtonPaddingTop +
-  iconButtonPaddingBottom;
+  iconSize + 2 * iconButtonLabelPadding + 2 * iconButtonPadding;
 
 const styles = {
   iconButton: {
-    padding: `${iconButtonPaddingTop}px ${iconButtonPaddingHorizontal}px ${iconButtonPaddingBottom}px ${iconButtonPaddingHorizontal}px`,
+    padding: iconButtonPadding,
     fontSize: 'inherit',
   },
   buttonLabel: {
@@ -69,7 +65,7 @@ const editors = {
 const BottomToolbar = React.memo<Props>((props: Props) => {
   return (
     <Paper background="medium" square style={styles.container}>
-      <Toolbar height={toolbarHeight}>
+      <Toolbar height={toolbarHeight} paddingBottom={toolbarPaddingBottom}>
         <ToolbarGroup>
           {Object.keys(editors).map(editorId => {
             const { icon, buttonId } = editors[editorId];

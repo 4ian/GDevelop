@@ -100,7 +100,7 @@ void TiXmlBase::ConvertUTF32ToUTF8( unsigned long input, char* output, int* leng
 	else if ( input < 0x200000 )
 		*length = 4;
 	else
-		{ *length = 0; return; }	// This code won't covert this correctly anyway.
+		{ *length = 0; return; }	// This code won't convert this correctly anyway.
 
 	output += *length;
 

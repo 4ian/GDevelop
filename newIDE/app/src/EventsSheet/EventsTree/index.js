@@ -934,6 +934,7 @@ export default class ThemableEventsTree extends Component<
                   onDrop={this._onDrop}
                   activateTargets={!isDragged && !!this.state.draggedNode}
                   windowSize={this.props.windowSize}
+                  indentScale={this.props.indentScale}
                   getNodeAtPath={path =>
                     getNodeAtPath({
                       path,

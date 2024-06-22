@@ -874,7 +874,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       label: i18n._(t`Add`),
       submenu: [
         {
-          label: i18n._(t`Add New Event Below`),
+          label: i18n._(t` New Event Below`),
           click: () => {
             this.addNewEvent('BuiltinCommonInstructions::Standard');
           },
@@ -883,7 +883,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           ),
         },
         {
-          label: i18n._(t`Add Sub Event`),
+          label: i18n._(t` Sub Event`),
           click: () => this.addSubEvent(),
           enabled: this._selectionCanHaveSubEvents(),
           accelerator: getShortcutDisplayName(
@@ -891,7 +891,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           ),
         },
         {
-          label: i18n._(t`Add Local Variable`),
+          label: i18n._(t` Local Variable`),
           click: () => this.addLocalVariable(),
           enabled: this._selectionCanHaveLocalVariables(),
           accelerator: getShortcutDisplayName(
@@ -899,7 +899,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           ),
         },
         {
-          label: i18n._(t`Add Comment`),
+          label: i18n._(t` Comment`),
           click: () => {
             this.addNewEvent('BuiltinCommonInstructions::Comment');
           },
@@ -914,7 +914,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
               metadata.type !== 'BuiltinCommonInstructions::Comment'
           )
           .map(metadata => ({
-            label: i18n._(t`Add ${metadata.fullName}`),
+            label: i18n._(t` ${metadata.fullName}`),
             click: () => {
               this.addNewEvent(metadata.type);
             },

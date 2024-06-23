@@ -41,6 +41,7 @@ import {
   clampInstancesEditorZoom,
   getWheelStepZoomFactor,
 } from '../Utils/ZoomUtils';
+import Background from './Background';
 const gd: libGDevelop = global.gd;
 
 export const instancesEditorId = 'instances-editor-canvas';
@@ -129,12 +130,14 @@ export default class InstancesEditor extends Component<Props> {
   windowBorder: WindowBorder;
   windowMask: WindowMask;
   statusBar: StatusBar;
-  pixiContainer: PIXI.Container;
+  uiPixiContainer: PIXI.Container;
+  backgroundPixiContainer: PIXI.Container;
   backgroundArea: PIXI.Container;
   instancesRenderer: InstancesRenderer;
   viewPosition: ViewPosition;
   longTouchHandler: LongTouchHandler;
   grid: Grid;
+  background: Background;
   _unmounted = false;
   _renderingPaused = false;
   nextFrame: AnimationFrameID;
@@ -284,7 +287,8 @@ export default class InstancesEditor extends Component<Props> {
       }
     });
 
-    this.pixiContainer = new PIXI.Container(); // TODO (3D): rename this container.
+    this.uiPixiContainer = new PIXI.Container();
+    this.backgroundPixiContainer = new PIXI.Container();
 
     this.backgroundArea = new PIXI.Container();
     this.backgroundArea.hitArea = new PIXI.Rectangle(
@@ -345,7 +349,7 @@ export default class InstancesEditor extends Component<Props> {
       )
     );
     this.backgroundArea.addEventListener('panend', event => this._onPanEnd());
-    this.pixiContainer.addChild(this.backgroundArea);
+    this.uiPixiContainer.addChild(this.backgroundArea);
 
     this.viewPosition = new ViewPosition({
       initialViewX: project ? project.getGameResolutionWidth() / 2 : 0,
@@ -359,7 +363,7 @@ export default class InstancesEditor extends Component<Props> {
       viewPosition: this.viewPosition,
       instancesEditorSettings: this.props.instancesEditorSettings,
     });
-    this.pixiContainer.addChild(this.grid.getPixiObject());
+    this.uiPixiContainer.addChild(this.grid.getPixiObject());
 
     this.pinchHandler = new PinchHandler({
       canvas: this.pixiRenderer.view,
@@ -400,27 +404,30 @@ export default class InstancesEditor extends Component<Props> {
   _mountEditorComponents(props: Props) {
     //Remove and delete any existing editor component
     if (this.highlightedInstance) {
-      this.pixiContainer.removeChild(this.highlightedInstance.getPixiObject());
+      this.uiPixiContainer.removeChild(this.highlightedInstance.getPixiObject());
     }
     if (this.selectedInstances) {
-      this.pixiContainer.removeChild(this.selectedInstances.getPixiContainer());
+      this.uiPixiContainer.removeChild(this.selectedInstances.getPixiContainer());
     }
     if (this.instancesRenderer) {
-      this.pixiContainer.removeChild(this.instancesRenderer.getPixiContainer());
+      this.uiPixiContainer.removeChild(this.instancesRenderer.getPixiContainer());
       this.instancesRenderer.delete();
     }
     if (this.selectionRectangle) {
-      this.pixiContainer.removeChild(this.selectionRectangle.getPixiObject());
+      this.uiPixiContainer.removeChild(this.selectionRectangle.getPixiObject());
       this.selectionRectangle.delete();
     }
     if (this.windowBorder) {
-      this.pixiContainer.removeChild(this.windowBorder.getPixiObject());
+      this.uiPixiContainer.removeChild(this.windowBorder.getPixiObject());
     }
     if (this.windowMask) {
-      this.pixiContainer.removeChild(this.windowMask.getPixiObject());
+      this.uiPixiContainer.removeChild(this.windowMask.getPixiObject());
     }
     if (this.statusBar) {
-      this.pixiContainer.removeChild(this.statusBar.getPixiObject());
+      this.uiPixiContainer.removeChild(this.statusBar.getPixiObject());
+    }
+    if (this.background) {
+      this.backgroundPixiContainer.removeChild(this.background.getPixiObject());
     }
 
     this.instancesRenderer = new InstancesRenderer({
@@ -492,13 +499,20 @@ export default class InstancesEditor extends Component<Props> {
       getLastCursorSceneCoordinates: this.getLastCursorSceneCoordinates,
     });
 
-    this.pixiContainer.addChild(this.selectionRectangle.getPixiObject());
-    this.pixiContainer.addChild(this.instancesRenderer.getPixiContainer());
-    this.pixiContainer.addChild(this.windowBorder.getPixiObject());
-    this.pixiContainer.addChild(this.windowMask.getPixiObject());
-    this.pixiContainer.addChild(this.selectedInstances.getPixiContainer());
-    this.pixiContainer.addChild(this.highlightedInstance.getPixiObject());
-    this.pixiContainer.addChild(this.statusBar.getPixiObject());
+    this.uiPixiContainer.addChild(this.selectionRectangle.getPixiObject());
+    this.uiPixiContainer.addChild(this.instancesRenderer.getPixiContainer());
+    this.uiPixiContainer.addChild(this.windowBorder.getPixiObject());
+    this.uiPixiContainer.addChild(this.windowMask.getPixiObject());
+    this.uiPixiContainer.addChild(this.selectedInstances.getPixiContainer());
+    this.uiPixiContainer.addChild(this.highlightedInstance.getPixiObject());
+    this.uiPixiContainer.addChild(this.statusBar.getPixiObject());
+
+    this.background = new Background({
+      width: this.props.width,
+      height: this.props.height,
+      layout: props.layout || null,
+    });
+    this.backgroundPixiContainer.addChild(this.background.getPixiObject());
   }
 
   componentWillUnmount() {
@@ -525,8 +539,11 @@ export default class InstancesEditor extends Component<Props> {
     }
     if (this.nextFrame) cancelAnimationFrame(this.nextFrame);
     stopPIXITicker();
-    if (this.pixiContainer) {
-      this.pixiContainer.destroy();
+    if (this.uiPixiContainer) {
+      this.uiPixiContainer.destroy();
+    }
+    if (this.backgroundPixiContainer) {
+      this.backgroundPixiContainer.destroy();
     }
     if (this.pixiRenderer) {
       this.pixiRenderer.destroy();
@@ -551,6 +568,7 @@ export default class InstancesEditor extends Component<Props> {
         nextProps.width,
         nextProps.height
       );
+      this.background.resize(nextProps.width, nextProps.height);
 
       // Avoid flickering that could happen while waiting for next animation frame.
       this.fpsLimiter.forceNextUpdate();
@@ -1183,12 +1201,14 @@ export default class InstancesEditor extends Component<Props> {
       this.windowBorder.render();
       this.windowMask.render();
       this.statusBar.render();
+      this.background.render();
 
       this.instancesRenderer.render(
         this.pixiRenderer,
         this.threeRenderer,
         this.viewPosition,
-        this.pixiContainer
+        this.uiPixiContainer,
+        this.backgroundPixiContainer
       );
     }
     this.nextFrame = requestAnimationFrame(this._renderScene);

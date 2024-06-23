@@ -568,10 +568,10 @@ describe('MetadataDeclarationHelper', () => {
       .get('MyBehavior::SetPropertyValue');
     expect(action.getFullName()).toBe('Some value property');
     expect(action.getDescription()).toBe(
-      'Change the property value for the some value.'
+      'Change the property value for Value.'
     );
     expect(action.getSentence()).toBe(
-      'Change the property value for the some value of _PARAM0_: _PARAM2_ _PARAM3_'
+      'Change the property value for Value of _PARAM0_: _PARAM2_ _PARAM3_'
     );
     expect(action.isHidden()).toBe(false);
     expect(action.isPrivate()).toBe(true);
@@ -591,11 +591,11 @@ describe('MetadataDeclarationHelper', () => {
       .get('MyBehavior::PropertyValue');
     expect(condition.getFullName()).toBe('Some value property');
     expect(condition.getDescription()).toBe(
-      'Compare the property value for the some value.'
+      'Compare the property value for Value.'
     );
     // The IDE fixes the first letter case.
     expect(condition.getSentence()).toBe(
-      'The property value for the some value of _PARAM0_ _PARAM2_ _PARAM3_'
+      'The property value for Value of _PARAM0_ _PARAM2_ _PARAM3_'
     );
     expect(condition.isHidden()).toBe(false);
     expect(condition.isPrivate()).toBe(true);
@@ -615,7 +615,7 @@ describe('MetadataDeclarationHelper', () => {
       .get('PropertyValue');
     expect(expression.getFullName()).toBe('Some value property');
     expect(expression.getDescription()).toBe(
-      'Return the property value for the some value.'
+      'Return the property value for Value.'
     );
     expect(expression.isPrivate()).toBe(true);
 
@@ -746,10 +746,10 @@ describe('MetadataDeclarationHelper', () => {
       .get('MyBehavior::SetPropertyValue');
     expect(action.getFullName()).toBe('Some value property');
     expect(action.getDescription()).toBe(
-      'Update the property value for "some value".'
+      'Update the property value for Value.'
     );
     expect(action.getSentence()).toBe(
-      'Set property value for some value of _PARAM0_ to _PARAM2_'
+      'Set property value for Value of _PARAM0_ to _PARAM2_'
     );
     expect(action.isHidden()).toBe(false);
     expect(action.isPrivate()).toBe(true);
@@ -768,10 +768,10 @@ describe('MetadataDeclarationHelper', () => {
       .get('MyBehavior::PropertyValue');
     expect(condition.getFullName()).toBe('Some value property');
     expect(condition.getDescription()).toBe(
-      'Check the property value for some value.'
+      'Check the property value for Value.'
     );
     expect(condition.getSentence()).toBe(
-      'Property some value of _PARAM0_ is true'
+      'Property Value of _PARAM0_ is true'
     );
     expect(condition.isHidden()).toBe(false);
     expect(condition.isPrivate()).toBe(true);
@@ -823,10 +823,10 @@ describe('MetadataDeclarationHelper', () => {
       .get('MyBehavior::SetSharedPropertyValue');
     expect(action.getFullName()).toBe('Some value shared property');
     expect(action.getDescription()).toBe(
-      'Change the property value for the some value.'
+      'Change the property value for Value.'
     );
     expect(action.getSentence()).toBe(
-      'Change the property value for the some value of _PARAM0_: _PARAM2_ _PARAM3_'
+      'Change the property value for Value of _PARAM0_: _PARAM2_ _PARAM3_'
     );
     expect(action.isHidden()).toBe(false);
     expect(action.isPrivate()).toBe(true);
@@ -846,11 +846,11 @@ describe('MetadataDeclarationHelper', () => {
       .get('MyBehavior::SharedPropertyValue');
     expect(condition.getFullName()).toBe('Some value shared property');
     expect(condition.getDescription()).toBe(
-      'Compare the property value for the some value.'
+      'Compare the property value for Value.'
     );
     // The IDE fixes the first letter case.
     expect(condition.getSentence()).toBe(
-      'The property value for the some value of _PARAM0_ _PARAM2_ _PARAM3_'
+      'The property value for Value of _PARAM0_ _PARAM2_ _PARAM3_'
     );
     expect(condition.isHidden()).toBe(false);
     expect(condition.isPrivate()).toBe(true);
@@ -870,7 +870,7 @@ describe('MetadataDeclarationHelper', () => {
       .get('SharedPropertyValue');
     expect(expression.getFullName()).toBe('Some value shared property');
     expect(expression.getDescription()).toBe(
-      'Return the property value for the some value.'
+      'Return the property value for Value.'
     );
     expect(expression.isPrivate()).toBe(true);
 
@@ -922,10 +922,10 @@ describe('MetadataDeclarationHelper', () => {
       .get('MyBehavior::SetSharedPropertyValue');
     expect(action.getFullName()).toBe('Some value shared property');
     expect(action.getDescription()).toBe(
-      'Update the property value for "some value".'
+      'Update the property value for Value.'
     );
     expect(action.getSentence()).toBe(
-      'Set property value for some value of _PARAM0_ to _PARAM2_'
+      'Set property value for Value of _PARAM0_ to _PARAM2_'
     );
     expect(action.isHidden()).toBe(false);
     expect(action.isPrivate()).toBe(true);
@@ -944,10 +944,10 @@ describe('MetadataDeclarationHelper', () => {
       .get('MyBehavior::SharedPropertyValue');
     expect(condition.getFullName()).toBe('Some value shared property');
     expect(condition.getDescription()).toBe(
-      'Check the property value for some value.'
+      'Check the property value for Value.'
     );
     expect(condition.getSentence()).toBe(
-      'Property some value of _PARAM0_ is true'
+      'Property Value of _PARAM0_ is true'
     );
     expect(condition.isHidden()).toBe(false);
     expect(condition.isPrivate()).toBe(true);
@@ -1433,10 +1433,10 @@ describe('MetadataDeclarationHelper', () => {
       .get('MyObject::SetPropertyValue');
     expect(action.getFullName()).toBe('Some value property');
     expect(action.getDescription()).toBe(
-      'Change the property value for the some value.'
+      'Change the property value for Value.'
     );
     expect(action.getSentence()).toBe(
-      'Change the property value for the some value of _PARAM0_: _PARAM1_ _PARAM2_'
+      'Change the property value for Value of _PARAM0_: _PARAM1_ _PARAM2_'
     );
     expect(action.isHidden()).toBe(false);
     expect(action.isPrivate()).toBe(true);
@@ -1455,11 +1455,11 @@ describe('MetadataDeclarationHelper', () => {
       .get('MyObject::PropertyValue');
     expect(condition.getFullName()).toBe('Some value property');
     expect(condition.getDescription()).toBe(
-      'Compare the property value for the some value.'
+      'Compare the property value for Value.'
     );
     // The IDE fixes the first letter case.
     expect(condition.getSentence()).toBe(
-      'The property value for the some value of _PARAM0_ _PARAM1_ _PARAM2_'
+      'The property value for Value of _PARAM0_ _PARAM1_ _PARAM2_'
     );
     expect(condition.isHidden()).toBe(false);
     expect(condition.isPrivate()).toBe(true);
@@ -1478,7 +1478,7 @@ describe('MetadataDeclarationHelper', () => {
       .get('PropertyValue');
     expect(expression.getFullName()).toBe('Some value property');
     expect(expression.getDescription()).toBe(
-      'Return the property value for the some value.'
+      'Return the property value for Value.'
     );
     expect(expression.isPrivate()).toBe(true);
 
@@ -1527,10 +1527,10 @@ describe('MetadataDeclarationHelper', () => {
       .get('MyObject::SetPropertyValue');
     expect(action.getFullName()).toBe('Some value property');
     expect(action.getDescription()).toBe(
-      'Update the property value for "some value".'
+      'Update the property value for Value.'
     );
     expect(action.getSentence()).toBe(
-      'Set property value for some value of _PARAM0_ to _PARAM1_'
+      'Set property value for Value of _PARAM0_ to _PARAM1_'
     );
     expect(action.isHidden()).toBe(false);
     expect(action.isPrivate()).toBe(true);
@@ -1548,10 +1548,10 @@ describe('MetadataDeclarationHelper', () => {
       .get('MyObject::PropertyValue');
     expect(condition.getFullName()).toBe('Some value property');
     expect(condition.getDescription()).toBe(
-      'Check the property value for some value.'
+      'Check the property value for Value.'
     );
     expect(condition.getSentence()).toBe(
-      'Property some value of _PARAM0_ is true'
+      'Property Value of _PARAM0_ is true'
     );
     expect(condition.isHidden()).toBe(false);
     expect(condition.isPrivate()).toBe(true);

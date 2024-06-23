@@ -1034,15 +1034,13 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
   auto group = (eventsBasedEntity.GetFullName() || eventsBasedEntity.GetName())
         + " " + property.GetGroup() + " properties";
 
-  auto uncapitalizedLabel =
-      UncapitalizeFirstLetter(property.GetLabel()) || property.GetName();
   if (propertyType == "Boolean") {
     auto &conditionMetadata = entityMetadata.AddScopedCondition(
         conditionName, propertyLabel,
         _("Check the property value for <property_name>.")
-            .FindAndReplace("<property_name>", uncapitalizedLabel),
+            .FindAndReplace("<property_name>", property.GetName()),
         _("Property <property_name> of _PARAM0_ is true")
-            .FindAndReplace("<property_name>", uncapitalizedLabel),
+            .FindAndReplace("<property_name>", property.GetName()),
         group,
         GetExtensionIconUrl(extension), GetExtensionIconUrl(extension));
     addObjectAndBehaviorParameters(conditionMetadata);
@@ -1050,11 +1048,11 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
 
     auto &setterActionMetadata = entityMetadata.AddScopedAction(
         actionName, propertyLabel,
-        _("Update the property value for \"<property_name>\".")
-            .FindAndReplace("<property_name>", uncapitalizedLabel),
+        _("Update the property value for <property_name>.")
+            .FindAndReplace("<property_name>", property.GetName()),
         _("Set property value for <property_name> of _PARAM0_ to "
           "<property_value>")
-            .FindAndReplace("<property_name>", uncapitalizedLabel)
+            .FindAndReplace("<property_name>", property.GetName())
             .FindAndReplace("<property_value>",
                             "_PARAM" + gd::String::From(valueParameterIndex) +
                                 "_"),
@@ -1070,9 +1068,9 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
         _("Toggle the property value for <property_name>.\n"
           "If it was true, it will become false, and if it was false it "
           "will become true.")
-            .FindAndReplace("<property_name>", uncapitalizedLabel),
+            .FindAndReplace("<property_name>", property.GetName()),
         _("Toggle property <property_name> of _PARAM0_")
-            .FindAndReplace("<property_name>", uncapitalizedLabel),
+            .FindAndReplace("<property_name>", property.GetName()),
         group,
         GetExtensionIconUrl(extension), GetExtensionIconUrl(extension));
     addObjectAndBehaviorParameters(toggleActionMetadata);
@@ -1087,10 +1085,10 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
             gd::ValueTypeMetadata::GetPrimitiveValueType(
               gd::ValueTypeMetadata::ConvertPropertyTypeToValueType(propertyType)),
             expressionName, propertyLabel,
-            _("the property value for the <property_name>")
-                .FindAndReplace("<property_name>", uncapitalizedLabel),
-            _("the property value for the <property_name>")
-                .FindAndReplace("<property_name>", uncapitalizedLabel),
+            _("the property value for <property_name>")
+                .FindAndReplace("<property_name>", property.GetName()),
+            _("the property value for <property_name>")
+                .FindAndReplace("<property_name>", property.GetName()),
             group,
             GetExtensionIconUrl(extension));
     addObjectAndBehaviorParameters(propertyInstructionMetadata);

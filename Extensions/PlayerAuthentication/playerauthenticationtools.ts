@@ -21,10 +21,13 @@ namespace gdjs {
     let _authenticationIframeContainer: HTMLDivElement | null = null;
     let _authenticationTextContainer: HTMLDivElement | null = null;
     let _authenticationBanner: HTMLDivElement | null = null;
-    let _initialAuthenticationTimeoutId: NodeJS.Timeout | null = null;
+    let _automaticGamesPlatformAuthenticationTimeoutId: NodeJS.Timeout | null = null;
     let _authenticationTimeoutId: NodeJS.Timeout | null = null;
 
     // Communication methods.
+    let _automaticGamesPlatformAuthenticationCallback:
+      | ((event: MessageEvent) => void)
+      | null = null;
     let _authenticationMessageCallback:
       | ((event: MessageEvent) => void)
       | null = null;
@@ -46,8 +49,10 @@ namespace gdjs {
           // Automatic authentication is only valid when the game is hosted on GDevelop games platform.
           return;
         }
-        removeAuthenticationCallbacks(); // Remove any callback that could have been registered before.
-        _authenticationMessageCallback = (event: MessageEvent) => {
+        removeAutomaticGamesPlatformAuthenticationCallback(); // Remove any callback that could have been registered before.
+        _automaticGamesPlatformAuthenticationCallback = (
+          event: MessageEvent
+        ) => {
           receiveAuthenticationMessage({
             runtimeScene,
             event,
@@ -56,7 +61,7 @@ namespace gdjs {
         };
         window.addEventListener(
           'message',
-          _authenticationMessageCallback,
+          _automaticGamesPlatformAuthenticationCallback,
           true
         );
         logger.info(
@@ -69,9 +74,11 @@ namespace gdjs {
           '*' // We could restrict to GDevelop games platform but it's not necessary as the message is not sensitive, and it allows easy debugging.
         );
         // If no answer after 3 seconds, assume that the game is not embedded in GDevelop games platform, and remove the listener.
-        _initialAuthenticationTimeoutId = setTimeout(() => {
-          logger.info('Removing initial authentication listener.');
-          removeAuthenticationCallbacks();
+        _automaticGamesPlatformAuthenticationTimeoutId = setTimeout(() => {
+          logger.info(
+            'Removing automatic games platform authentication listener.'
+          );
+          removeAutomaticGamesPlatformAuthenticationCallback();
         }, 3000);
       }
     );
@@ -447,7 +454,7 @@ namespace gdjs {
             username: event.data.body.username,
             userToken: event.data.body.token,
           });
-          removeAuthenticationCallbacks();
+          removeAutomaticGamesPlatformAuthenticationCallback();
           refreshAuthenticationBannerIfAny(runtimeScene);
           break;
         }
@@ -505,8 +512,6 @@ namespace gdjs {
      * - the authentication window is closed
      */
     const clearAuthenticationWindowTimeout = () => {
-      if (_initialAuthenticationTimeoutId)
-        clearTimeout(_initialAuthenticationTimeoutId);
       if (_authenticationTimeoutId) clearTimeout(_authenticationTimeoutId);
     };
 
@@ -1103,6 +1108,24 @@ namespace gdjs {
           true
         );
         _authenticationMessageCallback = null;
+      }
+    };
+
+    /*
+     * Remove the automatic authentication callback when running on web.
+     */
+    const removeAutomaticGamesPlatformAuthenticationCallback = function () {
+      if (_automaticGamesPlatformAuthenticationCallback) {
+        window.removeEventListener(
+          'message',
+          _automaticGamesPlatformAuthenticationCallback,
+          true
+        );
+        _automaticGamesPlatformAuthenticationCallback = null;
+      }
+      if (_automaticGamesPlatformAuthenticationTimeoutId) {
+        clearTimeout(_automaticGamesPlatformAuthenticationTimeoutId);
+        _automaticGamesPlatformAuthenticationTimeoutId = null;
       }
     };
 

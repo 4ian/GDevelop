@@ -6,7 +6,7 @@ namespace gdjs {
 
     let _isGameRegistered: boolean | null = null;
     let _isCheckingIfGameIsRegistered = false;
-    let _isWaitingForLoginCallback = false;
+    let _isWaitingForLogin = false;
 
     let _hasLobbyGameJustStarted = false;
     export let _isLobbyGameRunning = false;
@@ -1064,7 +1064,7 @@ namespace gdjs {
         return;
       }
 
-      if (_isCheckingIfGameIsRegistered || _isWaitingForLoginCallback) {
+      if (_isCheckingIfGameIsRegistered || _isWaitingForLogin) {
         // The action is called multiple times, let's prevent that.
         return;
       }
@@ -1089,13 +1089,13 @@ namespace gdjs {
       const playerId = gdjs.playerAuthentication.getUserId();
       const playerToken = gdjs.playerAuthentication.getUserToken();
       if (!playerId || !playerToken) {
-        _isWaitingForLoginCallback = true;
+        _isWaitingForLogin = true;
         const {
           status,
         } = await gdjs.playerAuthentication.openAuthenticationWindow(
           runtimeScene
         ).promise;
-        _isWaitingForLoginCallback = false;
+        _isWaitingForLogin = false;
 
         if (status === 'logged') {
           openLobbiesWindow(runtimeScene);

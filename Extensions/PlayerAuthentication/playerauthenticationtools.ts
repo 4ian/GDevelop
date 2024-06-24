@@ -1,5 +1,6 @@
 namespace gdjs {
   declare var cordova: any;
+  declare var SafariViewController: any;
 
   const logger = new gdjs.Logger('Player Authentication');
   const authComponents = gdjs.playerAuthenticationComponents;
@@ -125,7 +126,7 @@ namespace gdjs {
         }
 
         // The game is an Android app.
-        return 'cordova';
+        return 'cordova-websocket';
       }
 
       // This can be a:
@@ -724,23 +725,38 @@ namespace gdjs {
             connectionId,
           });
 
-          _authenticationInAppWindow = cordova.InAppBrowser.open(
-            targetUrl,
-            'authentication',
-            'location=yes,toolbarcolor=#000000,hidenavigationbuttons=yes,closebuttoncolor=#FFFFFF' // location=yes is important to show the URL bar to the user.
-          );
-          if (!_authenticationInAppWindow) {
-            resolve('errored');
-            return;
-          }
-
-          _authenticationInAppWindow.addEventListener(
-            'exit',
-            () => {
-              resolve('dismissed');
-            },
-            true
-          );
+          SafariViewController.isAvailable(function (available: boolean) {
+            if (available) {
+              SafariViewController.show(
+                {
+                  url: targetUrl,
+                  hidden: false, // default false
+                  animated: true, // default true, note that 'hide' will reuse this preference (the 'Done' button will always animate though)
+                  transition: 'slide', // unless animated is false you can choose from: curl, flip, fade, slide (default)
+                  enterReaderModeIfAvailable: false, // default false
+                  barColor: '#000000',
+                  tintColor: '#ffffff',
+                  controlTintColor: '#ffffff',
+                },
+                function (result) {
+                  if (result.event === 'opened') {
+                    console.log('opened');
+                  } else if (result.event === 'loaded') {
+                    console.log('loaded');
+                  } else if (result.event === 'closed') {
+                    console.log('closed');
+                    resolve('dismissed');
+                  }
+                },
+                function (msg) {
+                  console.log('Error opening webview: ' + JSON.stringify(msg));
+                }
+              );
+            } else {
+              console.error('Plugin is not available');
+              resolve('errored');
+            }
+          });
         }
       );
 

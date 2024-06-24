@@ -730,30 +730,27 @@ namespace gdjs {
               SafariViewController.show(
                 {
                   url: targetUrl,
-                  hidden: false, // default false
-                  animated: true, // default true, note that 'hide' will reuse this preference (the 'Done' button will always animate though)
-                  transition: 'slide', // unless animated is false you can choose from: curl, flip, fade, slide (default)
-                  enterReaderModeIfAvailable: false, // default false
+                  hidden: false,
+                  animated: true,
+                  transition: 'slide',
+                  enterReaderModeIfAvailable: false,
                   barColor: '#000000',
                   tintColor: '#ffffff',
                   controlTintColor: '#ffffff',
                 },
-                function (result) {
-                  if (result.event === 'opened') {
-                    console.log('opened');
-                  } else if (result.event === 'loaded') {
-                    console.log('loaded');
-                  } else if (result.event === 'closed') {
-                    console.log('closed');
+                function (result: any) {
+                  // Other events are `opened` and `loaded`.
+                  if (result.event === 'closed') {
                     resolve('dismissed');
                   }
                 },
-                function (msg) {
-                  console.log('Error opening webview: ' + JSON.stringify(msg));
+                function (error: any) {
+                  logger.log('Error opening webview: ' + JSON.stringify(error));
+                  resolve('errored');
                 }
               );
             } else {
-              console.error('Plugin is not available');
+              logger.error('Plugin SafariViewController is not available');
               resolve('errored');
             }
           });
@@ -886,7 +883,7 @@ namespace gdjs {
           !_authenticationLoaderContainer ||
           !_authenticationTextContainer
         ) {
-          console.error(
+          logger.error(
             "Can't open an authentication iframe - no iframe container, loader container or text container was opened for it."
           );
           return;
@@ -953,12 +950,12 @@ namespace gdjs {
             return;
           }
 
-          let isDimissedAlready = false;
+          let isDismissedAlready = false;
           const onAuthenticationContainerDismissed = () => {
             cleanUpAuthWindowAndTimeouts(runtimeScene);
             displayAuthenticationBanner(runtimeScene);
 
-            isDimissedAlready = true;
+            isDismissedAlready = true;
             resolve({ status: 'dismissed' });
           };
 
@@ -1061,9 +1058,20 @@ namespace gdjs {
                 break;
             }
 
-            if (isDimissedAlready) return;
+            if (isDismissedAlready) return;
             if (status === 'dismissed') {
               onAuthenticationContainerDismissed();
+            } else if (
+              status === 'logged' &&
+              typeof SafariViewController !== 'undefined'
+            ) {
+              try {
+                SafariViewController.hide();
+              } catch (error) {
+                logger.info(
+                  'Could not hide login window. Waiting for user to do it.'
+                );
+              }
             }
 
             resolve({ status });

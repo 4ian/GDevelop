@@ -1,5 +1,6 @@
 namespace gdjs {
   declare var cordova: any;
+  declare var SafariViewController: any;
 
   const logger = new gdjs.Logger('Player Authentication');
   const authComponents = gdjs.playerAuthenticationComponents;
@@ -15,7 +16,6 @@ namespace gdjs {
 
     // Authentication display
     let _authenticationWindow: Window | null = null; // For Web.
-    let _authenticationInAppWindow: any | null = null; // For Cordova.
     let _authenticationRootContainer: HTMLDivElement | null = null;
     let _authenticationLoaderContainer: HTMLDivElement | null = null;
     let _authenticationIframeContainer: HTMLDivElement | null = null;
@@ -102,7 +102,7 @@ namespace gdjs {
         connectionId ? `&connectionId=${connectionId}` : ''
       }${
         runtimeGame.isUsingGDevelopDevelopmentEnvironment() ? '&dev=true' : ''
-      }`;
+      }&allowLoginProviders=true`;
     };
 
     /**
@@ -111,7 +111,7 @@ namespace gdjs {
      */
     const getPlayerAuthPlatform = (
       runtimeScene: RuntimeScene
-    ): 'electron' | 'cordova' | 'cordova-websocket' | 'web-iframe' | 'web' => {
+    ): 'electron' | 'cordova-websocket' | 'web-iframe' | 'web' => {
       const runtimeGame = runtimeScene.getGame();
       const electron = runtimeGame.getRenderer().getElectron();
       if (electron) {
@@ -126,13 +126,8 @@ namespace gdjs {
       if (shouldAuthenticationUseIframe(runtimeScene)) return 'web-iframe';
 
       if (typeof cordova !== 'undefined') {
-        if (cordova.platformId === 'ios') {
-          // The game is an iOS app.
-          return 'cordova-websocket';
-        }
-
-        // The game is an Android app.
-        return 'cordova';
+        // The game is an Android or an iOS app.
+        return 'cordova-websocket';
       }
 
       // This can be a:
@@ -311,7 +306,7 @@ namespace gdjs {
       removeAuthenticationContainer(runtimeScene);
       clearAuthenticationWindowTimeout();
 
-      // If there is a websocket communication (electron, cordova iOS), close it.
+      // If there is a websocket communication (electron, cordova), close it.
       if (_websocket) {
         logger.info('Closing authentication websocket connection.');
         _websocket.close();
@@ -322,10 +317,17 @@ namespace gdjs {
         _authenticationWindow.close();
         _authenticationWindow = null;
       }
-      // If an in-app browser was used (cordova), close it.
-      if (_authenticationInAppWindow) {
-        _authenticationInAppWindow.close();
-        _authenticationInAppWindow = null;
+
+      // If cordova (native mobile app), hide external window.
+      // TODO: calling hide does nothing on Android, the plugin should be updated to handle the action `hide`.
+      if (typeof SafariViewController !== 'undefined') {
+        try {
+          SafariViewController.hide();
+        } catch (error) {
+          logger.info(
+            'Could not hide login window. Waiting for user to do it.'
+          );
+        }
       }
     };
 
@@ -712,8 +714,8 @@ namespace gdjs {
       );
 
     /**
-     * Helper to handle authentication window on Cordova on iOS.
-     * We open an InAppBrowser window, and listen to the websocket to know when the user is logged in.
+     * Helper to handle authentication window on Cordova on iOS and Android.
+     * We open an external window, and listen to the websocket to know when the user is logged in.
      */
     const openAuthenticationWindowForCordovaWithWebSocket = (
       runtimeScene: gdjs.RuntimeScene,
@@ -729,79 +731,37 @@ namespace gdjs {
             connectionId,
           });
 
-          _authenticationInAppWindow = cordova.InAppBrowser.open(
-            targetUrl,
-            'authentication',
-            'location=yes,toolbarcolor=#000000,hidenavigationbuttons=yes,closebuttoncolor=#FFFFFF' // location=yes is important to show the URL bar to the user.
-          );
-          if (!_authenticationInAppWindow) {
-            resolve('errored');
-            return;
-          }
-
-          _authenticationInAppWindow.addEventListener(
-            'exit',
-            () => {
-              resolve('dismissed');
-            },
-            true
-          );
+          SafariViewController.isAvailable(function (available: boolean) {
+            if (available) {
+              SafariViewController.show(
+                {
+                  url: targetUrl,
+                  hidden: false,
+                  animated: true,
+                  transition: 'slide',
+                  enterReaderModeIfAvailable: false,
+                  barColor: '#000000',
+                  tintColor: '#ffffff',
+                  controlTintColor: '#ffffff',
+                },
+                function (result: any) {
+                  // Other events are `opened` and `loaded`.
+                  if (result.event === 'closed') {
+                    resolve('dismissed');
+                  }
+                },
+                function (error: any) {
+                  logger.log('Error opening webview: ' + JSON.stringify(error));
+                  resolve('errored');
+                }
+              );
+            } else {
+              logger.error('Plugin SafariViewController is not available');
+              resolve('errored');
+            }
+          });
         }
       );
-
-    /**
-     * Helper to handle authentication window on Cordova.
-     * We open an InAppBrowser window, and listen to messages posted on this window.
-     */
-    const openAuthenticationWindowForCordova = (
-      runtimeScene: gdjs.RuntimeScene,
-      gameId: string
-    ) =>
-      new Promise<AuthenticationWindowStatus>((resolve) => {
-        const targetUrl = getAuthWindowUrl({
-          runtimeGame: runtimeScene.getGame(),
-          gameId,
-        });
-
-        _authenticationInAppWindow = cordova.InAppBrowser.open(
-          targetUrl,
-          'authentication',
-          'location=yes,toolbarcolor=#000000,hidenavigationbuttons=yes,closebuttoncolor=#FFFFFF' // location=yes is important to show the URL bar to the user.
-        );
-        if (!_authenticationInAppWindow) {
-          resolve('errored');
-          return;
-        }
-
-        // Listen to messages posted on the authentication window, so that we can
-        // know when the user is authenticated.
-        let isDoneAlready = false;
-        _authenticationInAppWindow.addEventListener(
-          'message',
-          (event: MessageEvent) => {
-            receiveAuthenticationMessage({
-              runtimeScene,
-              event,
-              checkOrigin: false, // For Cordova we don't check the origin, as the message is read from the InAppBrowser directly.
-              onDone: (status) => {
-                if (isDoneAlready) return;
-                isDoneAlready = true;
-                resolve(status);
-              },
-            });
-          },
-          true
-        );
-        _authenticationInAppWindow.addEventListener(
-          'exit',
-          () => {
-            if (isDoneAlready) return;
-            isDoneAlready = true;
-            resolve('dismissed');
-          },
-          true
-        );
-      });
 
     /**
      * Helper to handle authentication window on web.
@@ -875,7 +835,7 @@ namespace gdjs {
           !_authenticationLoaderContainer ||
           !_authenticationTextContainer
         ) {
-          console.error(
+          logger.error(
             "Can't open an authentication iframe - no iframe container, loader container or text container was opened for it."
           );
           return;
@@ -942,12 +902,12 @@ namespace gdjs {
             return;
           }
 
-          let isDimissedAlready = false;
+          let isDismissedAlready = false;
           const onAuthenticationContainerDismissed = () => {
             cleanUpAuthWindowAndTimeouts(runtimeScene);
             displayAuthenticationBanner(runtimeScene);
 
-            isDimissedAlready = true;
+            isDismissedAlready = true;
             resolve({ status: 'dismissed' });
           };
 
@@ -1014,13 +974,6 @@ namespace gdjs {
                   _gameId
                 );
                 break;
-              case 'cordova':
-                // The game is an Android app.
-                status = await openAuthenticationWindowForCordova(
-                  runtimeScene,
-                  _gameId
-                );
-                break;
               case 'cordova-websocket':
                 // The game is an iOS app.
                 status = await openAuthenticationWindowForCordovaWithWebSocket(
@@ -1050,7 +1003,7 @@ namespace gdjs {
                 break;
             }
 
-            if (isDimissedAlready) return;
+            if (isDismissedAlready) return;
             if (status === 'dismissed') {
               onAuthenticationContainerDismissed();
             }

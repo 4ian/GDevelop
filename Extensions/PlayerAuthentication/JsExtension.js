@@ -33,9 +33,9 @@ module.exports = {
 
     extension
       .addDependency()
-      .setName('InAppBrowser Cordova plugin')
+      .setName('Safari View Controller Cordova plugin')
       .setDependencyType('cordova')
-      .setExportName('cordova-plugin-inappbrowser');
+      .setExportName('cordova-plugin-safariviewcontroller');
 
     extension
       .addAction(

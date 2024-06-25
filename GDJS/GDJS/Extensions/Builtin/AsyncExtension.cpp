@@ -16,8 +16,7 @@ AsyncExtension::AsyncExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsAsyncExtension(*this);
 
   GetAllEvents()["BuiltinAsync::Async"].SetCodeGenerator(
-      [](gd::BaseEvent &event_,
-         gd::EventsCodeGenerator &codeGenerator,
+      [](gd::BaseEvent &event_, gd::EventsCodeGenerator &codeGenerator,
          gd::EventsCodeGenerationContext &parentContext) {
         gd::AsyncEvent &event = dynamic_cast<gd::AsyncEvent &>(event_);
 
@@ -71,7 +70,8 @@ AsyncExtension::AsyncExtension() {
         }
 
         return "{\n" + parentAsyncObjectsListGetter + "{\n" +
-               asyncContextBuilder + asyncActionCode + "}\n" + "}\n";
+               asyncContextBuilder + asyncActionCode +
+               "}\n" + "}\n";
       });
 
   GetAllActions()["BuiltinAsync::ResolveAsyncEventsFunction"].SetFunctionName(

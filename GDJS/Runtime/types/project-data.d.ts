@@ -317,6 +317,9 @@ declare interface ProjectPropertiesData {
   author: string;
   authorIds: string[];
   authorUsernames: string[];
+  playerId: string;
+  playerUsername: string;
+  playerToken: string;
   windowWidth: number;
   windowHeight: number;
   latestCompilationDirectory: string;

@@ -8,8 +8,8 @@
 #include <map>
 #include <set>
 #include <string>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 #include "GDCore/String.h"
 namespace gd {
@@ -44,6 +44,9 @@ struct PreviewExportOptions {
         nonRuntimeScriptsCacheBurst(0),
         fallbackAuthorId(""),
         fallbackAuthorUsername(""),
+        playerId(""),
+        playerUsername(""),
+        playerToken(""),
         allowAuthenticationUsingIframeForPreview(false){};
 
   /**
@@ -65,6 +68,19 @@ struct PreviewExportOptions {
                                           const gd::String &username) {
     fallbackAuthorId = id;
     fallbackAuthorUsername = username;
+    return *this;
+  }
+
+  /**
+   * \brief Set the fallback author info (if info not present in project
+   * properties).
+   */
+  PreviewExportOptions &SetAuthenticatedPlayer(const gd::String &id,
+                                               const gd::String &username,
+                                               const gd::String &token) {
+    playerId = id;
+    playerUsername = username;
+    playerToken = token;
     return *this;
   }
 
@@ -196,6 +212,9 @@ struct PreviewExportOptions {
   gd::String externalLayoutName;
   gd::String fallbackAuthorUsername;
   gd::String fallbackAuthorId;
+  gd::String playerId;
+  gd::String playerUsername;
+  gd::String playerToken;
   bool nativeMobileApp;
   std::map<gd::String, int> includeFileHashes;
   bool projectDataOnlyExport;
@@ -277,12 +296,14 @@ class ExporterHelper {
    * in gdjs.runtimeGameOptions \return Empty string if everything is ok,
    * description of the error otherwise.
    */
-  static gd::String
-  ExportProjectData(gd::AbstractFileSystem &fs, gd::Project &project,
-                    gd::String filename,
-                    const gd::SerializerElement &runtimeGameOptions,
-                    std::set<gd::String> &projectUsedResources,
-                    std::unordered_map<gd::String, std::set<gd::String>> &layersUsedResources);
+  static gd::String ExportProjectData(
+      gd::AbstractFileSystem &fs,
+      gd::Project &project,
+      gd::String filename,
+      const gd::SerializerElement &runtimeGameOptions,
+      std::set<gd::String> &projectUsedResources,
+      std::unordered_map<gd::String, std::set<gd::String>>
+          &layersUsedResources);
 
   /**
    * \brief Copy all the resources of the project to to the export directory,
@@ -338,7 +359,8 @@ class ExporterHelper {
    * be exported along with the project. ( including "codeX.js" files ).
    */
   bool ExportEventsCode(
-      const gd::Project &project, gd::String outputDir,
+      const gd::Project &project,
+      gd::String outputDir,
       std::vector<gd::String> &includesFiles,
       gd::WholeProjectDiagnosticReport &wholeProjectDiagnosticReport,
       bool exportForPreview);
@@ -498,11 +520,12 @@ class ExporterHelper {
   gd::String codeOutputDir;  ///< The directory where JS code is outputted. Will
                              ///< be then copied to the final output directory.
 
-private:
+ private:
   static void SerializeUsedResources(
       gd::SerializerElement &rootElement,
       std::set<gd::String> &projectUsedResources,
-      std::unordered_map<gd::String, std::set<gd::String>> &layersUsedResources);
+      std::unordered_map<gd::String, std::set<gd::String>>
+          &layersUsedResources);
 };
 
 }  // namespace gdjs

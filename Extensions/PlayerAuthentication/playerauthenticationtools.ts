@@ -35,6 +35,68 @@ namespace gdjs {
 
     type AuthenticationWindowStatus = 'logged' | 'errored' | 'dismissed';
 
+    const handleAutomaticGamesPlatformAuthentication = (
+      runtimeScene: gdjs.RuntimeScene
+    ) => {
+      if (getPlayerAuthPlatform(runtimeScene) !== 'web') {
+        // Automatic authentication is only valid when the game is hosted on GDevelop games platform.
+        return;
+      }
+
+      removeAutomaticGamesPlatformAuthenticationCallback(); // Remove any callback that could have been registered before.
+      _automaticGamesPlatformAuthenticationCallback = (event: MessageEvent) => {
+        receiveAuthenticationMessage({
+          runtimeScene,
+          event,
+          checkOrigin: true,
+        });
+      };
+      window.addEventListener(
+        'message',
+        _automaticGamesPlatformAuthenticationCallback,
+        true
+      );
+      logger.info(
+        'Notifying parent window that player authentication is ready.'
+      );
+      window.parent.postMessage(
+        {
+          id: 'playerAuthReady',
+        },
+        '*' // We could restrict to GDevelop games platform but it's not necessary as the message is not sensitive, and it allows easy debugging.
+      );
+      // If no answer after 3 seconds, assume that the game is not embedded in GDevelop games platform, and remove the listener.
+      _automaticGamesPlatformAuthenticationTimeoutId = setTimeout(() => {
+        logger.info(
+          'Removing automatic games platform authentication listener.'
+        );
+        removeAutomaticGamesPlatformAuthenticationCallback();
+      }, 3000);
+    };
+
+    const handleAutomaticPreviewAuthentication = (
+      runtimeScene: gdjs.RuntimeScene
+    ) => {
+      const runtimeGameOptions = runtimeScene.getGame().getAdditionalOptions();
+      if (runtimeGameOptions && runtimeGameOptions.isPreview) {
+        // If the game is a preview, and the user is already authenticated, we can log them in automatically.
+        const playerId = runtimeGameOptions.playerId;
+        const playerToken = runtimeGameOptions.playerToken;
+        const playerUsername = runtimeGameOptions.playerUsername;
+        if (playerId && playerToken) {
+          logger.info(
+            `Automatically logging in the player with ID ${playerId} as it's a preview.`
+          );
+          saveAuthKeyToStorage({
+            userId: playerId,
+            username: playerUsername || null,
+            userToken: playerToken,
+          });
+          refreshAuthenticationBannerIfAny(runtimeScene);
+        }
+      }
+    };
+
     // Ensure that the condition "just logged in" is valid only for one frame.
     gdjs.registerRuntimeScenePostEventsCallback(() => {
       _justLoggedIn = false;
@@ -45,41 +107,8 @@ namespace gdjs {
     // Then send a message to the parent iframe to say that the player auth is ready.
     gdjs.registerFirstRuntimeSceneLoadedCallback(
       (runtimeScene: RuntimeScene) => {
-        if (getPlayerAuthPlatform(runtimeScene) !== 'web') {
-          // Automatic authentication is only valid when the game is hosted on GDevelop games platform.
-          return;
-        }
-        removeAutomaticGamesPlatformAuthenticationCallback(); // Remove any callback that could have been registered before.
-        _automaticGamesPlatformAuthenticationCallback = (
-          event: MessageEvent
-        ) => {
-          receiveAuthenticationMessage({
-            runtimeScene,
-            event,
-            checkOrigin: true,
-          });
-        };
-        window.addEventListener(
-          'message',
-          _automaticGamesPlatformAuthenticationCallback,
-          true
-        );
-        logger.info(
-          'Notifying parent window that player authentication is ready.'
-        );
-        window.parent.postMessage(
-          {
-            id: 'playerAuthReady',
-          },
-          '*' // We could restrict to GDevelop games platform but it's not necessary as the message is not sensitive, and it allows easy debugging.
-        );
-        // If no answer after 3 seconds, assume that the game is not embedded in GDevelop games platform, and remove the listener.
-        _automaticGamesPlatformAuthenticationTimeoutId = setTimeout(() => {
-          logger.info(
-            'Removing automatic games platform authentication listener.'
-          );
-          removeAutomaticGamesPlatformAuthenticationCallback();
-        }, 3000);
+        handleAutomaticPreviewAuthentication(runtimeScene);
+        handleAutomaticGamesPlatformAuthentication(runtimeScene);
       }
     );
 

@@ -538,7 +538,8 @@ const VariablesList = (props: Props) => {
   );
   // TODO Scroll to the initially selected variable and focus on the name.
   const [selectedNodes, doSetSelectedNodes] = React.useState<Array<string>>(
-    props.initiallySelectedVariableName
+    props.initiallySelectedVariableName &&
+      props.variablesContainer.has(props.initiallySelectedVariableName)
       ? [getNodeIdFromVariableName(props.initiallySelectedVariableName)]
       : []
   );

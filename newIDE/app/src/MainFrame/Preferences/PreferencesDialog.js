@@ -356,7 +356,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
             onToggle={(e, check) => setAutosaveOnPreview(check)}
             toggled={values.autosaveOnPreview}
             labelPosition="right"
-            label={<Trans>Auto-save project on Preview</Trans>}
+            label={<Trans>Auto-save project on preview</Trans>}
           />
           <Toggle
             onToggle={(e, check) =>

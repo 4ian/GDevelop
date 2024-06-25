@@ -75,6 +75,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setUseShortcutToClosePreviewWindow,
     setWatchProjectFolderFilesForLocalProjects,
     setDisplaySaveReminder,
+    setFetchPlayerTokenForPreviewAutomatically,
   } = React.useContext(PreferencesContext);
 
   const initialUse3DEditor = React.useRef<boolean>(values.use3DEditor);
@@ -356,6 +357,14 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
             toggled={values.autosaveOnPreview}
             labelPosition="right"
             label={<Trans>Auto-save project on Preview</Trans>}
+          />
+          <Toggle
+            onToggle={(e, check) =>
+              setFetchPlayerTokenForPreviewAutomatically(check)
+            }
+            toggled={values.fetchPlayerTokenForPreviewAutomatically}
+            labelPosition="right"
+            label={<Trans>Automatically log in as a player in preview</Trans>}
           />
           <Toggle
             onToggle={(e, check) =>

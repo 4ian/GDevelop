@@ -193,6 +193,12 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setDisplaySaveReminder: this._setDisplaySaveReminder.bind(this),
     getEditorStateForProject: this._getEditorStateForProject.bind(this),
     setEditorStateForProject: this._setEditorStateForProject.bind(this),
+    getFetchPlayerTokenForPreviewAutomatically: this._getFetchPlayerTokenForPreviewAutomatically.bind(
+      this
+    ),
+    setFetchPlayerTokenForPreviewAutomatically: this._setFetchPlayerTokenForPreviewAutomatically.bind(
+      this
+    ),
   };
 
   componentDidMount() {
@@ -977,6 +983,22 @@ export default class PreferencesProvider extends React.Component<Props, State> {
             ...state.values.editorStateByProject,
             [projectId]: editorState,
           },
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _getFetchPlayerTokenForPreviewAutomatically() {
+    return this.state.values.fetchPlayerTokenForPreviewAutomatically;
+  }
+
+  _setFetchPlayerTokenForPreviewAutomatically(newValue: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          fetchPlayerTokenForPreviewAutomatically: newValue,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

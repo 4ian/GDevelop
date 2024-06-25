@@ -2,6 +2,7 @@
 import * as React from 'react';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { getPlayerToken } from '../Utils/GDevelopServices/Play';
+import PreferencesContext from './Preferences/PreferencesContext';
 
 const gd: libGDevelop = global.gd;
 
@@ -25,14 +26,27 @@ export const useAuthenticatedPlayer = (): UseAuthenticatedPlayerOutput => {
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
   );
+  const { values: preferencesValues } = React.useContext(PreferencesContext);
   const playerTokensForPreview = React.useRef<PlayerTokensDict>({});
 
   const getAuthenticatedPlayerForPreview = React.useCallback(
     async (currentProject: ?gdProject) => {
       if (!profile || !currentProject) return null;
+      if (!preferencesValues.fetchPlayerTokenForPreviewAutomatically)
+        return null;
+
       const gameId = currentProject.getProjectUuid();
 
-      // todo add preference param here to disable this feature.
+      const playerTokenForPreview = playerTokensForPreview.current[gameId];
+      if (playerTokenForPreview) {
+        // If we already have a token, let's use it.
+        return {
+          playerId: profile.id,
+          playerUsername: profile.username || 'Player',
+          playerToken: playerTokenForPreview,
+        };
+      }
+
       const isMultiplayerOrPlayerAuthenticationExtensionUsed = gd.UsedExtensionsFinder.scanProject(
         currentProject
       )
@@ -46,25 +60,24 @@ export const useAuthenticatedPlayer = (): UseAuthenticatedPlayerOutput => {
         );
       if (!isMultiplayerOrPlayerAuthenticationExtensionUsed) return;
 
-      let playerTokenForPreview = playerTokensForPreview.current[gameId];
-
-      if (!playerTokenForPreview) {
-        const newPlayerTokenForGame = await getPlayerToken({
-          getAuthorizationHeader,
-          userId: profile.id,
-          gameId,
-        });
-        playerTokensForPreview.current[gameId] = newPlayerTokenForGame;
-        playerTokenForPreview = newPlayerTokenForGame;
-      }
+      const newPlayerTokenForGame = await getPlayerToken({
+        getAuthorizationHeader,
+        userId: profile.id,
+        gameId,
+      });
+      playerTokensForPreview.current[gameId] = newPlayerTokenForGame;
 
       return {
         playerId: profile.id,
         playerUsername: profile.username || 'Player',
-        playerToken: playerTokenForPreview,
+        playerToken: newPlayerTokenForGame,
       };
     },
-    [profile, getAuthorizationHeader]
+    [
+      profile,
+      getAuthorizationHeader,
+      preferencesValues.fetchPlayerTokenForPreviewAutomatically,
+    ]
   );
 
   // When player logs out, we should clear the tokens.

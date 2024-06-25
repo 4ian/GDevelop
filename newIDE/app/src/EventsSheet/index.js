@@ -914,7 +914,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
               metadata.type !== 'BuiltinCommonInstructions::Comment'
           )
           .map(metadata => ({
-            label: i18n._(t`${metadata.fullName}`),
+            label: metadata.fullName,
             click: () => {
               this.addNewEvent(metadata.type);
             },

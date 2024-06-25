@@ -709,11 +709,14 @@ EventsCodeGenerator::GenerateCallback(
   const gd::String actionsDeclarationsCode =
       GenerateObjectsDeclarationCode(callbackContext);
 
-  const gd::String callbackCode =
-      callbackFunctionName + " = function (" +
-      GenerateEventsParameters(callbackContext) + ") {\n" +
-      restoreLocalVariablesCode +
-      actionsDeclarationsCode + actionsCode + "}\n";
+  const gd::String clearLocalVariablesCode =
+      GenerateLocalVariablesStackAccessor() + ".length = 0;\n";
+
+  const gd::String callbackCode = callbackFunctionName + " = function (" +
+                                  GenerateEventsParameters(callbackContext) +
+                                  ") {\n" + restoreLocalVariablesCode +
+                                  actionsDeclarationsCode + actionsCode +
+                                  clearLocalVariablesCode + "}\n";
 
   AddCustomCodeOutsideMain(callbackCode);
 

@@ -25,7 +25,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
   const generateAndRunEventsForLayout = (events, logCode = false) => {
     const { runtimeScene, runCompiledEvents } = generateEventsForLayout(
       events,
-      (logCode = false)
+      logCode
     );
     runCompiledEvents();
     return runtimeScene;
@@ -376,7 +376,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
   });
 
   it('can execute async events without side effect on local variables of the scene', function () {
-    // Reproduce a bug where the async events were not clearing
+    // Try to reproduce a bug where the async events were not clearing
     // the local variable stack.
     // Local variables declarations were added over a not empty stack
     // whereas actions, conditions and expressions were still using
@@ -434,6 +434,10 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
     // The context switching happens here.
     runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();
     runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
+
+    // This test can't actually reproduce the issue because
+    // `runCompiledEvents()` instantiate `gdjs.SceneCode.localVariables`
+    // at every call.
 
     // Run scene events a second time.
     runCompiledEvents();

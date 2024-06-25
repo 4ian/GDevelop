@@ -23,6 +23,15 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
   });
 
   const generateAndRunEventsForLayout = (events, logCode = false) => {
+    const { runtimeScene, runCompiledEvents } = generateEventsForLayout(
+      events,
+      (logCode = false)
+    );
+    runCompiledEvents();
+    return runtimeScene;
+  };
+
+  const generateEventsForLayout = (events, logCode = false) => {
     const serializedProjectElement = new gd.SerializerElement();
     project.serializeTo(serializedProjectElement);
 
@@ -46,8 +55,10 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
     serializedProjectElement.delete();
     serializedSceneElement.delete();
 
-    runCompiledEvents(gdjs, runtimeScene, []);
-    return runtimeScene;
+    return {
+      runtimeScene,
+      runCompiledEvents: () => runCompiledEvents(gdjs, runtimeScene, []),
+    };
   };
 
   describe('Basics', () => {
@@ -362,6 +373,73 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
     expect(
       runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
     ).toBe(2 + 5);
+  });
+
+  it('can execute async events without side effect on local variables of the scene', function () {
+    // Reproduce a bug where the async events were not clearing
+    // the local variable stack.
+    // Local variables declarations were added over a not empty stack
+    // whereas actions, conditions and expressions were still using
+    // the expected stack index.
+
+    // The following comments apply to the second run of events.
+    scene.getVariables().insertNew('SuccessVariable', 0).setValue(0);
+    const { runtimeScene, runCompiledEvents } = generateEventsForLayout([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        // Expected: Define local variables at stack index 0.
+        // Actual: Define local variables at stack index 1.
+        variables: [{ name: 'MyLocalVariable', type: 'number', value: 0 }],
+        conditions: [],
+        actions: [
+          // Modify local variables at stack index 0.
+          {
+            type: { value: 'SetNumberVariable' },
+            parameters: ['MyLocalVariable', '=', '456'],
+          },
+        ],
+      },
+      // Expected: Pop local variables at stack index 0.
+      // Actual: Pop local variables at stack index 1.
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        // Expected: Define local variables at stack index 0.
+        // Actual: Define local variables at stack index 1.
+        variables: [{ name: 'MyLocalVariable', type: 'number', value: 123 }],
+        conditions: [],
+        actions: [
+          // Get local variables at stack index 0.
+          // Expected : The declaration value
+          // Actual : The value set by the previous event: 456
+          {
+            type: { value: 'SetNumberVariable' },
+            parameters: ['SuccessVariable', '=', 'MyLocalVariable'],
+          },
+          // The only purpose of the wait is to trigger context switches.
+          {
+            type: { value: 'Wait' },
+            parameters: ['1'],
+          },
+        ],
+      },
+    ]);
+
+    // Run scene events a first time.
+    runCompiledEvents();
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(123);
+
+    // Process the tasks (after faking it's finished).
+    // The context switching happens here.
+    runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();
+    runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
+
+    // Run scene events a second time.
+    runCompiledEvents();
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(123);
   });
 
   it('generates an async fork that shares a scene variable a non-async sub-event', function () {

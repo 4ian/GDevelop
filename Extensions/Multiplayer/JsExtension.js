@@ -175,7 +175,7 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
       .setFunctionName(
-        'gdjs.multiplayerMessageManager.sendCustomVariableMessage'
+        'gdjs.multiplayerMessageManager.sendVariableCustomMessage'
       );
 
     extension
@@ -207,7 +207,7 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
       .setFunctionName(
-        'gdjs.multiplayerMessageManager.getCustomVariableMessageData'
+        'gdjs.multiplayerMessageManager.getVariableCustomMessageData'
       );
 
     extension

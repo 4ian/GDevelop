@@ -1397,7 +1397,7 @@ namespace gdjs {
       }
     };
 
-    const sendCustomVariableMessage = (
+    const sendVariableCustomMessage = (
       userMessageName: string,
       variable: gdjs.Variable
     ) => {
@@ -1461,7 +1461,7 @@ namespace gdjs {
       return data.data;
     };
 
-    const getCustomVariableMessageData = (
+    const getVariableCustomMessageData = (
       userMessageName: string,
       variable: gdjs.Variable
     ) => {
@@ -2176,10 +2176,10 @@ namespace gdjs {
       handleChangeVariableOwnerMessagesReceived,
       // Custom messages.
       sendCustomMessage,
-      sendCustomVariableMessage,
-      hasCustomMessageBeenReceived,
       getCustomMessageData,
-      getCustomVariableMessageData,
+      sendVariableCustomMessage,
+      getVariableCustomMessageData,
+      hasCustomMessageBeenReceived,
       handleCustomMessagesReceived,
       getCustomMessageSender,
       // Scene update.

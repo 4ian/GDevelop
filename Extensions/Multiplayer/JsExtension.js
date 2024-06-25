@@ -144,7 +144,71 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .setFunctionName('gdjs.multiplayerMessageManager.sendMessage');
+      .setFunctionName('gdjs.multiplayerMessageManager.sendCustomMessage');
+
+    extension
+      .addAction(
+        'SendVariableMessage',
+        _('Send custom message to other players with a variable'),
+        _(
+          "Send a custom message to other players in the lobby containing a variable, with an automatic retry system if it hasn't been received. Use with the condition 'Message has been received' to know when the message has been properly processed by the host."
+        ),
+        _('Send message _PARAM0_ to other players with variable _PARAM1_'),
+        _('Advanced'),
+        'JsPlatform/Extensions/multiplayer.svg',
+        'JsPlatform/Extensions/multiplayer.svg'
+      )
+      .setHelpPath('/all-features/multiplayer')
+      .addParameter('string', _('Message name'), '', false)
+      .addParameter('variable', _('Variable'), '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
+      .setFunctionName(
+        'gdjs.multiplayerMessageManager.sendCustomVariableMessage'
+      );
+
+    extension
+      .addAction(
+        'GetMessageVariable',
+        _('Get message variable'),
+        _(
+          "Store the data of the specified message in a variable. Use with the condition 'Message has been received' to know when the message has been properly processed by the host."
+        ),
+        _('Save message _PARAM0_ data in _PARAM1_'),
+        _('Advanced'),
+        'JsPlatform/Extensions/multiplayer.svg',
+        'JsPlatform/Extensions/multiplayer.svg'
+      )
+      .setHelpPath('/all-features/multiplayer')
+      .addParameter('string', _('Message name'), '', false)
+      .addParameter('variable', _('Variable'), '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
+      .setFunctionName(
+        'gdjs.multiplayerMessageManager.getCustomVariableMessageData'
+      );
 
     extension
       .addCondition(
@@ -273,7 +337,9 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .setFunctionName('gdjs.multiplayerMessageManager.hasMessageBeenReceived');
+      .setFunctionName(
+        'gdjs.multiplayerMessageManager.hasCustomMessageBeenReceived'
+      );
 
     extension
       .addCondition(
@@ -375,7 +441,31 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .setFunctionName('gdjs.multiplayerMessageManager.getMessageData');
+      .setFunctionName('gdjs.multiplayerMessageManager.getCustomMessageData');
+
+    extension
+      .addStrExpression(
+        'MessageSender',
+        _('Message sender'),
+        _('Returns the player number of the sender of the specified message.'),
+        _('Advanced'),
+        'JsPlatform/Extensions/multiplayer.svg'
+      )
+      .addParameter('string', _('Message name'), '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
+      .setFunctionName('gdjs.multiplayerMessageManager.getCustomMessageSender');
 
     extension
       .addExpressionAndCondition(

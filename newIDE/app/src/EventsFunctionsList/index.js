@@ -1054,7 +1054,7 @@ const EventsFunctionsList = React.forwardRef<
                     extensionGlobalVariablesItemId,
                     i18n._(t`Extension global variables`),
                     onSelectExtensionGlobalVariables,
-                    'res/icons_default/publish_black.svg'
+                    'res/icons_default/global_variable24_black.svg'
                   )
                 ),
                 new LeafTreeViewItem(
@@ -1062,7 +1062,7 @@ const EventsFunctionsList = React.forwardRef<
                     extensionSceneVariablesItemId,
                     i18n._(t`Extension scene variables`),
                     onSelectExtensionSceneVariables,
-                    'res/icons_default/scene_black.svg'
+                    'res/icons_default/scene_variable24_black.svg'
                   )
                 ),
               ];

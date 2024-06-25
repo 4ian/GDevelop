@@ -17,7 +17,7 @@ import RedoIcon from '../UI/CustomSvgIcons/Redo';
 import ToolbarSearchIcon from '../UI/CustomSvgIcons/ToolbarSearch';
 import EditSceneIcon from '../UI/CustomSvgIcons/EditScene';
 import { getShortcutDisplayName, useShortcutMap } from '../KeyboardShortcuts';
-import AddLocalVariableIcon from '../UI/CustomSvgIcons/ExternalEvents';
+import AddLocalVariableIcon from '../UI/CustomSvgIcons/LocalVariable';
 
 type Props = {|
   onAddStandardEvent: () => void,

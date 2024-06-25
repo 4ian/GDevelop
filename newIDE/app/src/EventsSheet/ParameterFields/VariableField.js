@@ -34,10 +34,10 @@ import VariableStructureIcon from '../../VariablesList/Icons/VariableStructureIc
 import UnknownTypeIcon from '../../UI/CustomSvgIcons/Cross';
 import { type EnumeratedVariable } from './EnumerateVariables';
 import { LineStackLayout } from '../../UI/Layout';
-import GlobalIcon from '../../UI/CustomSvgIcons/Publish';
-import SceneIcon from '../../UI/CustomSvgIcons/Scene';
-import ObjectIcon from '../../UI/CustomSvgIcons/Object';
-import LocalIcon from '../../UI/CustomSvgIcons/ExternalEvents';
+import GlobalVariableIcon from '../../UI/CustomSvgIcons/GlobalVariable';
+import SceneVariableIcon from '../../UI/CustomSvgIcons/SceneVariable';
+import ObjectVariableIcon from '../../UI/CustomSvgIcons/ObjectVariable';
+import LocalVariableIcon from '../../UI/CustomSvgIcons/LocalVariable';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
 
 const gd: libGDevelop = global.gd;
@@ -128,14 +128,14 @@ export const getVariableSourceIcon = (
   switch (variableSourceType) {
     case gd.VariablesContainer.Global:
     case gd.VariablesContainer.ExtensionGlobal:
-      return GlobalIcon;
+      return GlobalVariableIcon;
     case gd.VariablesContainer.Scene:
     case gd.VariablesContainer.ExtensionScene:
-      return SceneIcon;
+      return SceneVariableIcon;
     case gd.VariablesContainer.Object:
-      return ObjectIcon;
+      return ObjectVariableIcon;
     case gd.VariablesContainer.Local:
-      return LocalIcon;
+      return LocalVariableIcon;
     default:
       return UnknownTypeIcon;
   }

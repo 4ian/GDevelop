@@ -12,7 +12,7 @@ import {
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
 import { enumerateVariables } from './EnumerateVariables';
-import SceneIcon from '../../UI/CustomSvgIcons/Scene';
+import SceneVariableIcon from '../../UI/CustomSvgIcons/SceneVariable';
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function SceneVariableField(props: ParameterFieldProps, ref) {
@@ -91,4 +91,4 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
 export const renderInlineSceneVariable = (
   props: ParameterInlineRendererProps
-) => renderVariableWithIcon(props, 'scene variable', SceneIcon);
+) => renderVariableWithIcon(props, 'scene variable', SceneVariableIcon);

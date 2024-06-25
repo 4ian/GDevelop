@@ -1353,7 +1353,10 @@ namespace gdjs {
       );
     };
 
-    const sendMessage = (userMessageName: string, userMessageData: string) => {
+    const sendCustomMessage = (
+      userMessageName: string,
+      userMessageData: any // can be a simple string message or a serialized variable.
+    ) => {
       const connectedPeerIds = gdjs.evtTools.p2p.getAllPeers();
       const { messageName, messageData } = createCustomMessage({
         userMessageName,
@@ -1370,6 +1373,11 @@ namespace gdjs {
         // custom messages cannot be reverted.
         shouldCancelMessageIfTimesOut: false,
       });
+      debugLogger.info(
+        `Sending custom message ${userMessageName} with data ${JSON.stringify(
+          userMessageData
+        )}.`
+      );
       for (const peerId of connectedPeerIds) {
         sendDataTo(peerId, messageName, messageData);
       }
@@ -1389,7 +1397,20 @@ namespace gdjs {
       }
     };
 
-    const hasMessageBeenReceived = (userMessageName: string) => {
+    const sendVariableCustomMessage = (
+      userMessageName: string,
+      variable: gdjs.Variable
+    ) => {
+      const userMessageData = variable.toJSObject();
+      debugLogger.info(
+        `Sending custom message ${userMessageName} with data ${JSON.stringify(
+          userMessageData
+        )}.`
+      );
+      sendCustomMessage(userMessageName, userMessageData);
+    };
+
+    const hasCustomMessageBeenReceived = (userMessageName: string) => {
       const messageName = getCustomMessageNameFromUserMessageName(
         userMessageName
       );
@@ -1422,9 +1443,9 @@ namespace gdjs {
       return false;
     };
 
-    const getMessageData = (messageName: string) => {
+    const getCustomMessageData = (userMessageName: string) => {
       const customMessageName = getCustomMessageNameFromUserMessageName(
-        messageName
+        userMessageName
       );
       const messageData = gdjs.evtTools.p2p.getEventData(customMessageName);
       let data;
@@ -1432,12 +1453,43 @@ namespace gdjs {
         data = JSON.parse(messageData);
       } catch (e) {
         logger.error(
-          `Error while parsing message ${messageName}: ${e.toString()}`
+          `Error while parsing message ${userMessageName}: ${e.toString()}`
         );
         return '';
       }
 
       return data.data;
+    };
+
+    const getVariableCustomMessageData = (
+      userMessageName: string,
+      variable: gdjs.Variable
+    ) => {
+      const data = getCustomMessageData(userMessageName);
+      if (!data) {
+        return;
+      }
+      debugLogger.info(
+        `Received custom message ${userMessageName} with data ${JSON.stringify(
+          data
+        )}.`
+      );
+      variable.fromJSObject(data);
+    };
+
+    const getCustomMessageSender = (userMessageName: string) => {
+      const customMessageName = getCustomMessageNameFromUserMessageName(
+        userMessageName
+      );
+      const messageSenderPeerId = gdjs.evtTools.p2p.getEventSender(
+        customMessageName
+      );
+      const messageSenderPlayerNumber =
+        _peerIdToPlayerNumber[messageSenderPeerId];
+      if (messageSenderPlayerNumber === undefined) {
+        return 0;
+      }
+      return messageSenderPlayerNumber;
     };
 
     const handleCustomMessagesReceived = (): void => {
@@ -2123,10 +2175,13 @@ namespace gdjs {
       createVariableOwnerChangedMessageNameFromChangeVariableOwnerMessage,
       handleChangeVariableOwnerMessagesReceived,
       // Custom messages.
-      sendMessage,
-      hasMessageBeenReceived,
-      getMessageData,
+      sendCustomMessage,
+      getCustomMessageData,
+      sendVariableCustomMessage,
+      getVariableCustomMessageData,
+      hasCustomMessageBeenReceived,
       handleCustomMessagesReceived,
+      getCustomMessageSender,
       // Scene update.
       createUpdateSceneMessage,
       handleUpdateSceneMessagesToSend,

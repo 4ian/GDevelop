@@ -179,7 +179,7 @@ import { ProjectManagerDrawer } from '../ProjectManager/ProjectManagerDrawer';
 import DiagnosticReportDialog from '../ExportAndShare/DiagnosticReportDialog';
 import useSaveReminder from './UseSaveReminder';
 import { useMultiplayerLobbyConfigurator } from './UseMultiplayerLobbyConfigurator';
-import { getPlayerToken } from '../Utils/GDevelopServices/Play';
+import { useAuthenticatedPlayer } from './UseAuthenticatedPlayer';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -460,7 +460,7 @@ const MainFrame = (props: Props) => {
     setFileMetadataOpeningMessage,
   ] = React.useState<?MessageDescriptor>(null);
 
-  const playerTokenForPreview = React.useRef<?string>(null);
+  const { getAuthenticatedPlayerForPreview } = useAuthenticatedPlayer();
 
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.
@@ -1534,42 +1534,6 @@ const MainFrame = (props: Props) => {
     ]
   );
 
-  const getAuthenticatedPlayerForPreview = React.useCallback(
-    async () => {
-      const userProfile = authenticatedUser.profile;
-      if (!userProfile || !currentProject) return null;
-      const gameId = currentProject.getProjectUuid();
-
-      // todo add preference param here to disable this feature.
-      const isMultiplayerOrPlayerAuthenticationExtensionUsed = gd.UsedExtensionsFinder.scanProject(
-        currentProject
-      )
-        .getUsedExtensions()
-        .toNewVectorString()
-        .toJSArray()
-        .some(
-          extensionName =>
-            extensionName === 'Multiplayer' ||
-            extensionName === 'PlayerAuthentication'
-        );
-      if (!isMultiplayerOrPlayerAuthenticationExtensionUsed) return;
-      if (!playerTokenForPreview.current) {
-        playerTokenForPreview.current = await getPlayerToken({
-          getAuthorizationHeader: authenticatedUser.getAuthorizationHeader,
-          userId: userProfile.id,
-          gameId,
-        });
-      }
-
-      return {
-        playerId: userProfile.id,
-        playerUsername: userProfile.username || 'Player',
-        playerToken: playerTokenForPreview.current,
-      };
-    },
-    [authenticatedUser, currentProject]
-  );
-
   const _launchPreview = React.useCallback(
     async ({
       networkPreview,
@@ -1619,7 +1583,9 @@ const MainFrame = (props: Props) => {
           }
         : null;
 
-      const authenticatedPlayer = await getAuthenticatedPlayerForPreview();
+      const authenticatedPlayer = await getAuthenticatedPlayerForPreview(
+        currentProject
+      );
 
       try {
         await eventsFunctionsExtensionsState.ensureLoadFinished();

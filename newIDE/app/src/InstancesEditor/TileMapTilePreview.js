@@ -117,13 +117,18 @@ class TileMapTilePreview {
       this.cache.set(cacheKey, texture);
     }
     const sprite = new PIXI.Sprite(texture);
-    sprite.width = this.viewPosition.toCanvasScale(tileSize)
-    sprite.height = this.viewPosition.toCanvasScale(tileSize)
+    sprite.width = this.viewPosition.toCanvasScale(tileSize);
+    sprite.height = this.viewPosition.toCanvasScale(tileSize);
 
     this.preview.addChild(sprite);
 
-    const [x, y] = this.getLastCursorSceneCoordinates();
-    const canvasCoordinates = this.viewPosition.toCanvasCoordinates(x, y);
+    const [cursorX, cursorY] = this.getLastCursorSceneCoordinates();
+    const canvasCoordinates = this.viewPosition.toCanvasCoordinates(
+      Math.floor((cursorX - instance.getX()) / tileSize) * tileSize +
+        instance.getX(),
+      Math.floor((cursorY - instance.getY()) / tileSize) * tileSize +
+        instance.getY()
+    );
     this.preview.position.x = canvasCoordinates[0];
     this.preview.position.y = canvasCoordinates[1];
   }

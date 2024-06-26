@@ -88,18 +88,21 @@ const Tile = ({ x, y, size, highlighted }: TileProps) => {
 type Props = {|
   project: gdProject,
   object: gdObject,
+  selectedTileMapTile: ?{| x: number, y: number |},
+  onSelectTileMapTile: (?{| x: number, y: number |}) => void,
 |};
 
-const TileMapPainter = ({ project, object }: Props) => {
+const TileMapPainter = ({
+  project,
+  object,
+  selectedTileMapTile,
+  onSelectTileMapTile,
+}: Props) => {
   const atlasResource = getAtlasResource({ project, object });
   const tileContainerRef = React.useRef<?HTMLDivElement>(null);
   const { columnCount, rowCount } = React.useMemo(() => getTileset(object), [
     object,
   ]);
-  const [selectedTile, setSelectedTile] = React.useState<?{
-    x: number,
-    y: number,
-  }>(null);
   const [hoveredTile, setHoveredTile] = React.useState<?{
     x: number,
     y: number,
@@ -131,14 +134,30 @@ const TileMapPainter = ({ project, object }: Props) => {
         columnCount - 1
       );
       const y = Math.min(Math.floor(mouseY / displayedTileSize), rowCount - 1);
-      setSelectedTile(selectedTile => {
-        if (selectedTile && selectedTile.x === x && selectedTile.y === y) {
-          return null;
-        }
-        return { x, y };
-      });
+      if (
+        selectedTileMapTile &&
+        selectedTileMapTile.x === x &&
+        selectedTileMapTile.y === y
+      ) {
+        onSelectTileMapTile(null);
+      } else {
+        onSelectTileMapTile({ x, y });
+      }
     },
-    [displayedTileSize, columnCount, rowCount]
+    [
+      displayedTileSize,
+      columnCount,
+      rowCount,
+      selectedTileMapTile,
+      onSelectTileMapTile,
+    ]
+  );
+
+  React.useEffect(
+    () => {
+      return () => onSelectTileMapTile(null);
+    },
+    [onSelectTileMapTile]
   );
 
   const onHoverAtlas = React.useCallback(
@@ -190,13 +209,13 @@ const TileMapPainter = ({ project, object }: Props) => {
               y={hoveredTile.y}
             />
           )}
-          {selectedTile && displayedTileSize && (
+          {selectedTileMapTile && displayedTileSize && (
             <Tile
               key={`selected-tile`}
               highlighted
               size={displayedTileSize}
-              x={selectedTile.x}
-              y={selectedTile.y}
+              x={selectedTileMapTile.x}
+              y={selectedTileMapTile.y}
             />
           )}
         </div>

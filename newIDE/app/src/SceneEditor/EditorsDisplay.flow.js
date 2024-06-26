@@ -93,6 +93,9 @@ export type SceneEditorsDisplayProps = {|
   isInstanceOf3DObject: gdInitialInstance => boolean,
   onSelectAllInstancesOfObjectInLayout: string => void,
 
+  selectedTileMapTile: ?{| x: number, y: number |},
+  onSelectTileMapTile: (?{| x: number, y: number |}) => void,
+
   canInstallPrivateAsset: () => boolean,
 
   instancesEditorSettings: InstancesEditorSettings,

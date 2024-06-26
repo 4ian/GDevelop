@@ -155,6 +155,8 @@ type State = {|
 
   selectedObjectFolderOrObjectsWithContext: Array<ObjectFolderOrObjectWithContext>,
   selectedLayer: string,
+
+  selectedTileMapTile: ?{| x: number, y: number |},
 |};
 
 type CopyCutPasteOptions = {|
@@ -203,6 +205,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         message: '',
         touchScreenMessage: '',
       },
+      selectedTileMapTile: null,
 
       selectedObjectFolderOrObjectsWithContext: [],
       selectedLayer: BASE_LAYER_NAME,
@@ -768,6 +771,10 @@ export default class SceneEditor extends React.Component<Props, State> {
   _onInstancesModified = (instances: Array<gdInitialInstance>) => {
     this.forceUpdate();
     //TODO: Save for redo with debounce (and cancel on unmount)
+  };
+
+  onSelectTileMapTile = (tile: ?{| x: number, y: number |}) => {
+    this.setState({ selectedTileMapTile: tile });
   };
 
   _onSelectInstances = (
@@ -1819,6 +1826,8 @@ export default class SceneEditor extends React.Component<Props, State> {
                 onSelectLayer={(layer: string) =>
                   this.setState({ selectedLayer: layer })
                 }
+                selectedTileMapTile={this.state.selectedTileMapTile}
+                onSelectTileMapTile={this.onSelectTileMapTile}
                 onExportAssets={this.openObjectExporterDialog}
                 onDeleteObjects={this._onDeleteObjects}
                 getValidatedObjectOrGroupName={

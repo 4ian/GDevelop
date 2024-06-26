@@ -60,6 +60,8 @@ type Props = {|
   unsavedChanges?: ?UnsavedChanges,
   i18n: I18nType,
   historyHandler?: HistoryHandler,
+  selectedTileMapTile: ?{| x: number, y: number |},
+  onSelectTileMapTile: (?{| x: number, y: number |}) => void,
 |};
 
 export type CompactInstancePropertiesEditorInterface = {|
@@ -81,6 +83,8 @@ const CompactInstancePropertiesEditor = ({
   editInstanceVariables,
   onInstancesModified,
   projectScopedContainersAccessor,
+  selectedTileMapTile,
+  onSelectTileMapTile,
 }: Props) => {
   const forceUpdate = useForceUpdate();
 
@@ -182,7 +186,8 @@ const CompactInstancePropertiesEditor = ({
 
   if (!object || !instance || !instanceSchema) return null;
 
-  const shouldDisplayTileMapPainter = object.getType() === 'TileMap::SimpleTileMap';
+  const shouldDisplayTileMapPainter =
+    object.getType() === 'TileMap::SimpleTileMap';
 
   return (
     <ErrorBoundary
@@ -210,7 +215,12 @@ const CompactInstancePropertiesEditor = ({
               <Column>
                 <Spacer />
                 <Separator />
-                <TileMapPainter project={project} object={object} />
+                <TileMapPainter
+                  project={project}
+                  object={object}
+                  selectedTileMapTile={selectedTileMapTile}
+                  onSelectTileMapTile={onSelectTileMapTile}
+                />
               </Column>
             </>
           )}

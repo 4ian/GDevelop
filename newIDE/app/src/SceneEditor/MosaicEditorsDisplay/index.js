@@ -264,6 +264,8 @@ const MosaicEditorsDisplay = React.forwardRef<
               ref={instancesPropertiesEditorRef}
               unsavedChanges={props.unsavedChanges}
               historyHandler={props.historyHandler}
+              selectedTileMapTile={props.selectedTileMapTile}
+              onSelectTileMapTile={props.onSelectTileMapTile}
             />
           )}
         </I18n>

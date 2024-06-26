@@ -18,10 +18,6 @@ type UseAuthenticatedPlayerOutput = {|
   |}>,
 |};
 
-/**
- * Hook allowing to duplicate lobby configuration from another project, useful after
- * opening a project from an example.
- */
 export const useAuthenticatedPlayer = (): UseAuthenticatedPlayerOutput => {
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
@@ -31,8 +27,11 @@ export const useAuthenticatedPlayer = (): UseAuthenticatedPlayerOutput => {
 
   const getAuthenticatedPlayerForPreview = React.useCallback(
     async (currentProject: ?gdProject) => {
-      if (!profile || !currentProject) return null;
-      if (!preferencesValues.fetchPlayerTokenForPreviewAutomatically)
+      if (
+        !profile ||
+        !currentProject ||
+        !preferencesValues.fetchPlayerTokenForPreviewAutomatically
+      )
         return null;
 
       const gameId = currentProject.getProjectUuid();

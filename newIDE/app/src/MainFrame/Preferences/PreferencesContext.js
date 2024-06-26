@@ -325,7 +325,6 @@ export type Preferences = {|
     projectId: string,
     editorState?: {| editorTabs: EditorTabsPersistedState |}
   ) => void,
-  getFetchPlayerTokenForPreviewAutomatically: () => boolean,
   setFetchPlayerTokenForPreviewAutomatically: (enabled: boolean) => void,
 |};
 
@@ -450,7 +449,6 @@ export const initialPreferences = {
   setDisplaySaveReminder: () => {},
   getEditorStateForProject: projectId => {},
   setEditorStateForProject: (projectId, editorState) => {},
-  getFetchPlayerTokenForPreviewAutomatically: () => true,
   setFetchPlayerTokenForPreviewAutomatically: (enabled: boolean) => {},
 };
 

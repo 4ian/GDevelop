@@ -36,6 +36,8 @@ import Window from '../../Utils/Window';
 import Checkbox from '../../UI/Checkbox';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 
+const LEADERBOARD_APPEARANCE_CUSTOM_CSS_MAX_LENGTH = 20000;
+
 const unitToAbbreviation = {
   hour: 'HH',
   minute: 'MM',
@@ -422,7 +424,18 @@ function LeaderboardAppearanceDialog({
                 </Line>
               </GetSubscriptionCard>
             ) : (
-              <LeaderboardPlaygroundCard />
+              <>
+                {customCss.length >
+                  LEADERBOARD_APPEARANCE_CUSTOM_CSS_MAX_LENGTH && (
+                  <AlertMessage kind="error">
+                    <Trans>
+                      Custom css value cannot exceed{' '}
+                      {LEADERBOARD_APPEARANCE_CUSTOM_CSS_MAX_LENGTH} characters.
+                    </Trans>
+                  </AlertMessage>
+                )}
+                <LeaderboardPlaygroundCard />
+              </>
             )}
             <Spacer />
             <Text size="sub-title" noMargin>

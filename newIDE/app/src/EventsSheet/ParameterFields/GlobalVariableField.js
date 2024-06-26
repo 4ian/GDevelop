@@ -4,6 +4,7 @@ import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flo
 import VariableField, {
   renderVariableWithIcon,
   type VariableFieldInterface,
+  type VariableDialogOpeningProps,
 } from './VariableField';
 import GlobalVariablesDialog from '../../VariablesList/GlobalVariablesDialog';
 import {
@@ -17,7 +18,10 @@ import GlobalVariableIcon from '../../UI/CustomSvgIcons/GlobalVariable';
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function GlobalVariableField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?VariableFieldInterface>(null);
-    const [editorOpen, setEditorOpen] = React.useState(false);
+    const [
+      editorOpen,
+      setEditorOpen,
+    ] = React.useState<VariableDialogOpeningProps | null>(null);
     const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
@@ -53,7 +57,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           onRequestClose={props.onRequestClose}
           onApply={props.onApply}
           ref={field}
-          onOpenDialog={() => setEditorOpen(true)}
+          onOpenDialog={setEditorOpen}
           globalObjectsContainer={props.globalObjectsContainer}
           objectsContainer={props.objectsContainer}
           projectScopedContainersAccessor={projectScopedContainersAccessor}
@@ -62,8 +66,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         {editorOpen && project && (
           <GlobalVariablesDialog
             project={project}
-            open={editorOpen}
-            onCancel={() => setEditorOpen(false)}
+            open
+            onCancel={() => setEditorOpen(null)}
             onApply={(selectedVariableName: string | null) => {
               if (
                 selectedVariableName &&
@@ -71,10 +75,14 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               ) {
                 props.onChange(selectedVariableName);
               }
-              setEditorOpen(false);
+              setEditorOpen(null);
               if (field.current) field.current.updateAutocompletions();
             }}
             preventRefactoringToDeleteInstructions
+            initiallySelectedVariableName={editorOpen.variableName}
+            shouldCreateInitiallySelectedVariableIfMissing={
+              editorOpen.shouldCreateIfMissing
+            }
           />
         )}
       </React.Fragment>

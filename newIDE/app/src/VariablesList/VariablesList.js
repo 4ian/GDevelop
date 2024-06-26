@@ -104,7 +104,7 @@ type Props = {|
   variablesContainer: gdVariablesContainer,
   areObjectVariables?: boolean,
   inheritedVariablesContainer?: gdVariablesContainer,
-  initiallySelectedVariableName?: string,
+  initiallySelectedVariableName?: ?string,
   /** Callback executed at mount to compute suggestions. */
   onComputeAllVariableNames?: () => Array<string>,
   /** To specify if history should be handled by parent. */

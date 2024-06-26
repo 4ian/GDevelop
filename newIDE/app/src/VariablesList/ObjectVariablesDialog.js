@@ -22,6 +22,7 @@ type Props = {|
    */
   preventRefactoringToDeleteInstructions?: boolean,
   initiallySelectedVariableName?: string,
+  shouldCreateInitiallySelectedVariableIfMissing?: boolean,
 |};
 
 const ObjectVariablesDialog = ({
@@ -35,6 +36,7 @@ const ObjectVariablesDialog = ({
   hotReloadPreviewButtonProps,
   preventRefactoringToDeleteInstructions,
   initiallySelectedVariableName,
+  shouldCreateInitiallySelectedVariableIfMissing,
   projectScopedContainersAccessor,
 }: Props) => {
   const onComputeAllVariableNames = React.useCallback(
@@ -54,7 +56,7 @@ const ObjectVariablesDialog = ({
     () => [
       {
         id: 'object-variables',
-        label: <Trans>Object variables</Trans>,
+        label: '',
         variablesContainer: variablesContainer,
         emptyPlaceholderTitle: <Trans>Add your first object variable</Trans>,
         emptyPlaceholderDescription: (
@@ -76,9 +78,12 @@ const ObjectVariablesDialog = ({
       open={open}
       onCancel={onCancel}
       onApply={onApply}
-      title={<Trans>Object variables</Trans>}
+      title={<Trans>{objectName} variables</Trans>}
       tabs={tabs}
       initiallySelectedVariableName={initiallySelectedVariableName}
+      shouldCreateInitiallySelectedVariableIfMissing={
+        shouldCreateInitiallySelectedVariableIfMissing
+      }
       helpPagePath={'/all-features/variables/object-variables'}
       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
       preventRefactoringToDeleteInstructions={

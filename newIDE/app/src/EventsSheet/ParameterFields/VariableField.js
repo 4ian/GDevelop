@@ -42,12 +42,17 @@ import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/E
 
 const gd: libGDevelop = global.gd;
 
+export type VariableDialogOpeningProps = {
+  variableName: string,
+  shouldCreateIfMissing: boolean,
+};
+
 type Props = {
   ...ParameterFieldProps,
   variablesContainers: Array<gdVariablesContainer>,
   enumerateVariables: () => Array<EnumeratedVariable>,
   forceDeclaration?: boolean,
-  onOpenDialog: ?() => void,
+  onOpenDialog: (VariableDialogOpeningProps => void) | null,
 };
 
 type VariableNameQuickAnalyzeResult = 0 | 1 | 2 | 3 | 4;
@@ -326,7 +331,23 @@ export default React.forwardRef<Props, VariableFieldInterface>(
                           translatableValue: t`Add or edit variables...`,
                           text: '',
                           value: '',
-                          onClick: onOpenDialog,
+                          onClick: () => {
+                            if (!field.current) {
+                              onOpenDialog({
+                                variableName: value,
+                                shouldCreateIfMissing: false,
+                              });
+                              return;
+                            }
+                            // Access to the input directly because the value
+                            // may not have been sent to onChange yet.
+                            const inputValue = field.current.getInputValue();
+                            onChange(inputValue);
+                            onOpenDialog({
+                              variableName: inputValue,
+                              shouldCreateIfMissing: true,
+                            });
+                          },
                         }
                       : null,
                   ].filter(Boolean)}
@@ -342,7 +363,14 @@ export default React.forwardRef<Props, VariableFieldInterface>(
                     disabled={!onOpenDialog}
                     primary
                     style={style}
-                    onClick={onOpenDialog}
+                    onClick={() => {
+                      if (onOpenDialog) {
+                        onOpenDialog({
+                          variableName: value,
+                          shouldCreateIfMissing: false,
+                        });
+                      }
+                    }}
                   />
                 ) : null
               }

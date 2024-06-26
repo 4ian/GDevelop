@@ -4,6 +4,7 @@ import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flo
 import VariableField, {
   renderVariableWithIcon,
   type VariableFieldInterface,
+  type VariableDialogOpeningProps,
 } from './VariableField';
 import ObjectVariablesDialog from '../../VariablesList/ObjectVariablesDialog';
 import {
@@ -59,7 +60,10 @@ export const getObjectOrGroupVariablesContainers = (
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ObjectVariableField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?VariableFieldInterface>(null);
-    const [editorOpen, setEditorOpen] = React.useState(false);
+    const [
+      editorOpen,
+      setEditorOpen,
+    ] = React.useState<VariableDialogOpeningProps | null>(null);
     const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
@@ -112,6 +116,23 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       [variablesContainers]
     );
 
+    const onVariableEditorApply = React.useCallback(
+      (selectedVariableName: string | null) => {
+        if (
+          selectedVariableName &&
+          selectedVariableName.startsWith(props.value)
+        ) {
+          props.onChange(selectedVariableName);
+        }
+        setEditorOpen(null);
+        // The variable editor may have refactor the events for a variable type
+        // change which may have change the currently edited instruction type.
+        if (onInstructionTypeChanged) onInstructionTypeChanged();
+        if (field.current) field.current.updateAutocompletions();
+      },
+      [onInstructionTypeChanged, props]
+    );
+
     return (
       <React.Fragment>
         <VariableField
@@ -134,7 +155,9 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           ref={field}
           // There is no variable editor for groups.
           onOpenDialog={
-            variablesContainers.length === 1 ? () => setEditorOpen(true) : null
+            variablesContainers.length === 1
+              ? props => setEditorOpen(props)
+              : null
           }
           globalObjectsContainer={props.globalObjectsContainer}
           objectsContainer={props.objectsContainer}
@@ -154,21 +177,14 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             projectScopedContainersAccessor={projectScopedContainersAccessor}
             objectName={objectName}
             variablesContainer={variablesContainers[0]}
-            open={editorOpen}
-            onCancel={() => setEditorOpen(false)}
-            onApply={(selectedVariableName: string | null) => {
-              if (
-                selectedVariableName &&
-                selectedVariableName.startsWith(props.value)
-              ) {
-                props.onChange(selectedVariableName);
-              }
-              setEditorOpen(false);
-              if (onInstructionTypeChanged) onInstructionTypeChanged();
-              if (field.current) field.current.updateAutocompletions();
-            }}
+            open
+            onCancel={() => setEditorOpen(null)}
+            onApply={onVariableEditorApply}
             preventRefactoringToDeleteInstructions
-            initiallySelectedVariableName={props.value}
+            initiallySelectedVariableName={editorOpen.variableName}
+            shouldCreateInitiallySelectedVariableIfMissing={
+              editorOpen.shouldCreateIfMissing
+            }
           />
         )}
       </React.Fragment>

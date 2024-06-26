@@ -339,6 +339,7 @@ const MosaicEditorsDisplay = React.forwardRef<
             editorRef.current = editor;
           }}
           pauseRendering={!props.isActive}
+          selectedTileMapTile={props.selectedTileMapTile}
         />
       ),
     },

@@ -182,7 +182,7 @@ const CompactInstancePropertiesEditor = ({
 
   if (!object || !instance || !instanceSchema) return null;
 
-  const shouldDisplayTileMapPainter = object.getType() === 'TileMap::TileMap';
+  const shouldDisplayTileMapPainter = object.getType() === 'TileMap::SimpleTileMap';
 
   return (
     <ErrorBoundary

@@ -1,119 +1,88 @@
 // @flow
 
 import * as React from 'react';
-import * as PIXI from 'pixi.js-legacy';
-import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
-import { FullSizeMeasurer } from '../UI/FullSizeMeasurer';
+import { Line } from '../UI/Grid';
+import { CorsAwareImage } from '../UI/CorsAwareImage';
+import ResourcesLoader from '../ResourcesLoader';
+import { createStyles, makeStyles } from '@material-ui/core';
 
-const identify = (data: Object) => {
-  if (data.tiledversion) {
-    console.info('Detected the json file was created in Tiled');
-    return {
-      kind: 'tiled',
-      data,
-    };
-  }
-
-  if (data.__header__ && data.__header__.app === 'LDtk') {
-    console.info('Detected the json/ldtk file was created in LDtk');
-    return {
-      kind: 'ldtk',
-      data,
-    };
-  }
-
-  console.warn(
-    "The loaded Tile Map data does not contain a 'tiledversion' or '__header__' key. Are you sure this file has been exported from Tiled (mapeditor.org) or LDtk (ldtk.io)?"
-  );
-
-  return null;
+const styles = {
+  tileContainer: { flex: 1, position: 'relative', display: 'flex' },
+  atlasImage: { flex: 1, imageRendering: 'pixelated' },
 };
 
-const getAtlasPathForLdtkTilemap = ({ data, levelIndex, layerIndex }) => {
-  const tilesetId =
-    data.levels[levelIndex].layerInstances[layerIndex].__tilesetDefUid;
-  const tileset = data.defs.tilesets.find(tileset => tileset.uid === tilesetId);
-  return {
-    atlasPath: tileset.relPath,
-    tileset,
-  };
-};
+const useStylesForTile = (highlighted: boolean) =>
+  makeStyles(theme =>
+    createStyles({
+      tile: {
+        position: 'absolute',
+        boxSizing: 'border-box',
+        border: highlighted ? '2px solid red' : undefined,
+        '&:hover': {
+          border: highlighted ? '2px solid pink' : '1px solid white',
+        },
+      },
+    })
+  )();
 
-const getAtlasResource = async ({
+const getAtlasResource = ({
   project,
   object,
-  layerIndex,
 }: {|
   project: gdProject,
   object: gdObject,
-  layerIndex: number,
-|}): Promise<?{ atlasResourceName: string, tileset: any }> => {
-  if (object.getType() !== 'TileMap::TileMap') {
+|}): ?{| atlasResourceName: string |} => {
+  if (object.getType() !== 'TileMap::SimpleTileMap') {
     return null;
   }
-  const resourcesManager = project.getResourcesManager();
   const atlasResourceName = object
     .getConfiguration()
     .getProperties()
     .get('tilemapAtlasImage')
     .getValue();
-  const tilesetResourceName = object
-    .getConfiguration()
-    .getProperties()
-    .get('tilesetJsonFile')
-    .getValue();
+  return {
+    atlasResourceName,
+  };
+};
 
-  if (atlasResourceName && tilesetResourceName) {
-    const tilesetResource = resourcesManager.getResource(tilesetResourceName);
-
-    const tilesetJsonData = await PixiResourcesLoader.getResourceJsonData(
-      project,
-      tilesetResource.getFile()
-    );
-
-    return {
-      atlasResourceName: atlasResourceName,
-      tileset: tilesetJsonData,
-    };
-  }
-
-  const tileMapResourceName = object
-    .getConfiguration()
-    .getProperties()
-    .get('tilemapJsonFile')
-    .getValue();
-  const levelIndex = parseInt(
+const getTileset = (object: gdObject) => {
+  const columnCount = parseFloat(
     object
       .getConfiguration()
       .getProperties()
-      .get('levelIndex')
-      .getValue(),
-    10
+      .get('columnCount')
+      .getValue()
   );
-
-  if (!tileMapResourceName) return null;
-  const tileMapResource = resourcesManager.getResource(tileMapResourceName);
-  const embeddedResourcesMapping = JSON.parse(tileMapResource.getMetadata())
-    .embeddedResourcesMapping;
-  const tileMapJsonData = await PixiResourcesLoader.getResourceJsonData(
-    project,
-    tileMapResource.getFile()
+  const rowCount = parseFloat(
+    object
+      .getConfiguration()
+      .getProperties()
+      .get('rowCount')
+      .getValue()
   );
+  return { rowCount, columnCount };
+};
 
-  const tileMap = identify(tileMapJsonData);
-  const { atlasPath, tileset } = getAtlasPathForLdtkTilemap({
-    data: tileMap.data,
-    levelIndex,
-    layerIndex,
-  });
-  const resourceName = embeddedResourcesMapping[atlasPath];
-  if (resourceName) {
-    return {
-      atlasResourceName: resourceName,
-      tileset,
-    };
-  }
-  return null;
+type TileProps = {|
+  x: number,
+  y: number,
+  size: number,
+  highlighted?: boolean,
+|};
+
+const Tile = ({ x, y, size, highlighted }: TileProps) => {
+  const classes = useStylesForTile(!!highlighted);
+  return (
+    <div
+      className={classes.tile}
+      style={{
+        left: x * size,
+        top: y * size,
+        width: size,
+        height: size,
+      }}
+    />
+  );
 };
 
 type Props = {|
@@ -122,103 +91,117 @@ type Props = {|
 |};
 
 const TileMapPainter = ({ project, object }: Props) => {
-  const [width, setWidth] = React.useState<?number>(null);
-  const [layerIndex, setLayerIndex] = React.useState<number>(0);
-  const pixiCanvasContainerRef = React.useRef<?HTMLDivElement>(null);
-  const pixiRendererRef = React.useRef<?PIXI.Renderer>(null);
-  const pixiContainerRef = React.useRef<?PIXI.Container>(null);
+  const atlasResource = getAtlasResource({ project, object });
+  const tileContainerRef = React.useRef<?HTMLDivElement>(null);
+  const { columnCount, rowCount } = React.useMemo(() => getTileset(object), [
+    object,
+  ]);
+  const [selectedTile, setSelectedTile] = React.useState<?{
+    x: number,
+    y: number,
+  }>(null);
+  const [hoveredTile, setHoveredTile] = React.useState<?{
+    x: number,
+    y: number,
+  }>(null);
 
-  const initializeAtlas = React.useCallback((_atlasResourceName: string) => {
-    const { current: pixiCanvasContainer } = pixiCanvasContainerRef;
-    if (!pixiCanvasContainer) return;
-    pixiRendererRef.current = PIXI.autoDetectRenderer({
-      width: 100,
-      height: 200,
-      // "preserveDrawingBuffer: true" is needed to avoid flickering and background issues on some mobile phones (see #585 #572 #566 #463)
-      preserveDrawingBuffer: true,
-      // Disable anti-aliasing (default) to avoid rendering issue (1px width line of extra pixels) when rendering pixel perfect tiled sprites.
-      antialias: false,
-      clearBeforeRender: false,
-      backgroundAlpha: 0,
-    });
-    pixiCanvasContainer.appendChild(pixiRendererRef.current.view);
-  }, []);
+  const imageWidth = tileContainerRef.current
+    ? parseFloat(
+        getComputedStyle(tileContainerRef.current).width.replace('px', '')
+      )
+    : 0;
+  const displayedTileSize = imageWidth ? imageWidth / columnCount : null;
 
-  React.useEffect(
-    () => {
-      (async () => {
-        const resource = await getAtlasResource({
-          project,
-          object,
-          layerIndex,
-        });
-        if (resource) {
-          initializeAtlas(resource.atlasResourceName);
-          const pixiTexture = resource.atlasResourceName
-            ? PixiResourcesLoader.getPIXITexture(
-                project,
-                resource.atlasResourceName
-              )
-            : null;
-          console.log('sprite');
-          const sprite = new PIXI.Sprite(pixiTexture);
-          if (!pixiTexture) return;
-          pixiContainerRef.current = new PIXI.Container();
-          sprite.width = pixiTexture.frame.width;
-          sprite.height = pixiTexture.frame.height;
-          pixiContainerRef.current.addChild(sprite);
-        }
-      })();
-    },
-    [project, object, layerIndex, initializeAtlas]
-  );
-
-  const requestRef = React.useRef();
-
-  const animate = React.useCallback(time => {
-    if (pixiRendererRef.current && pixiContainerRef.current) {
-      pixiRendererRef.current.render(pixiContainerRef.current);
-    }
-    requestRef.current = requestAnimationFrame(animate);
-  }, []);
-
-  React.useEffect(
-    () => {
-      requestRef.current = requestAnimationFrame(animate);
-      return () => cancelAnimationFrame(requestRef.current);
-    },
-    [animate]
-  );
-
-  React.useEffect(
-    () => {
-      if (!pixiRendererRef.current) return;
-      console.log(pixiRendererRef.current);
-      const sprite = pixiContainerRef.current.getChildAt(0);
-      sprite.width = width;
-      sprite.height =
-        (width * sprite.texture.frame.height) / sprite.texture.frame.width;
-      pixiRendererRef.current.resize(width, 200);
-    },
-    [width]
-  );
-
-  React.useEffect(() => {
-    return () => {
-      const { current: container } = pixiCanvasContainerRef;
-      if (container && container.firstChild) {
-        container.removeChild(container.firstChild);
+  const onClickAtlas = React.useCallback(
+    (event: MouseEvent) => {
+      if (
+        !(event.currentTarget instanceof HTMLDivElement) ||
+        // TODO: not working at first render on swipeable editor display (mobile), might be
+        // because tileContainerRef is not defined.
+        !displayedTileSize
+      ) {
+        return;
       }
-    };
-  }, []);
+      const bounds = event.currentTarget.getBoundingClientRect();
+
+      const mouseX = event.clientX - bounds.left + 1;
+      const mouseY = event.clientY - bounds.top + 1;
+      const x = Math.min(
+        Math.floor(mouseX / displayedTileSize),
+        columnCount - 1
+      );
+      const y = Math.min(Math.floor(mouseY / displayedTileSize), rowCount - 1);
+      setSelectedTile(selectedTile => {
+        if (selectedTile && selectedTile.x === x && selectedTile.y === y) {
+          return null;
+        }
+        return { x, y };
+      });
+    },
+    [displayedTileSize, columnCount, rowCount]
+  );
+
+  const onHoverAtlas = React.useCallback(
+    (event: MouseEvent) => {
+      if (
+        !(event.currentTarget instanceof HTMLDivElement) ||
+        !displayedTileSize
+      ) {
+        return;
+      }
+      const bounds = event.currentTarget.getBoundingClientRect();
+
+      const mouseX = event.clientX - bounds.left + 1;
+      const mouseY = event.clientY - bounds.top + 1;
+      const x = Math.min(
+        Math.floor(mouseX / displayedTileSize),
+        columnCount - 1
+      );
+      const y = Math.min(Math.floor(mouseY / displayedTileSize), rowCount - 1);
+      setHoveredTile({ x, y });
+    },
+    [displayedTileSize, columnCount, rowCount]
+  );
 
   return (
-    <FullSizeMeasurer>
-      {({ width }) => {
-        setWidth(width);
-        return <div style={{ flex: 1 }} ref={pixiCanvasContainerRef} />;
-      }}
-    </FullSizeMeasurer>
+    <Line justifyContent="stretch">
+      {atlasResource && (
+        <div
+          style={styles.tileContainer}
+          ref={tileContainerRef}
+          onMouseMove={onHoverAtlas}
+          onClick={onClickAtlas}
+        >
+          <CorsAwareImage
+            style={styles.atlasImage}
+            alt={atlasResource.atlasResourceName}
+            src={ResourcesLoader.getResourceFullUrl(
+              project,
+              atlasResource.atlasResourceName,
+              {}
+            )}
+          />
+
+          {hoveredTile && displayedTileSize && (
+            <Tile
+              key={`hovered-tile`}
+              size={displayedTileSize}
+              x={hoveredTile.x}
+              y={hoveredTile.y}
+            />
+          )}
+          {selectedTile && displayedTileSize && (
+            <Tile
+              key={`selected-tile`}
+              highlighted
+              size={displayedTileSize}
+              x={selectedTile.x}
+              y={selectedTile.y}
+            />
+          )}
+        </div>
+      )}
+    </Line>
   );
 };
 

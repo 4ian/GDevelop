@@ -228,7 +228,7 @@ namespace gdjs {
         // Before sending the change owner message, if we are becoming the new owner,
         // we want to ensure this message is acknowledged, by everyone we're connected to.
         if (variableData.newVariableOwner === currentPlayerNumber) {
-          const otherPeerIds = gdjs.evtTools.p2p.getAllPeers();
+          const otherPeerIds = gdjs.multiplayerPeerJsHelper.getAllPeers();
           const variableOwnerChangedMessageName = gdjs.multiplayerMessageManager.createVariableOwnerChangedMessageNameFromChangeVariableOwnerMessage(
             messageName
           );
@@ -243,14 +243,12 @@ namespace gdjs {
         }
 
         debugLogger.info('Sending change owner message', messageName);
-        const connectedPeerIds = gdjs.evtTools.p2p.getAllPeers();
-        for (const peerId of connectedPeerIds) {
-          gdjs.multiplayerMessageManager.sendDataTo(
-            peerId,
-            messageName,
-            messageData
-          );
-        }
+        const connectedPeerIds = gdjs.multiplayerPeerJsHelper.getAllPeers();
+        gdjs.multiplayerMessageManager.sendDataTo(
+          connectedPeerIds,
+          messageName,
+          messageData
+        );
 
         // Remove the variable from the list of variables ownership changes to sync.
         delete variableOwnershipChangesToSyncAtEndOfFrame[variableNetworkId];

@@ -525,3 +525,28 @@ export const duplicateLobbyConfiguration = async ({
   );
   return response.data;
 };
+
+export const getPlayerToken = async ({
+  getAuthorizationHeader,
+  userId,
+  gameId,
+}: {
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  gameId: string,
+}): Promise<string> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.post(
+    `${GDevelopPlayApi.baseUrl}/game/${gameId}/player-token`,
+    {},
+    {
+      headers: {
+        Authorization: authorizationHeader,
+      },
+      params: {
+        userId,
+      },
+    }
+  );
+  return response.data;
+};

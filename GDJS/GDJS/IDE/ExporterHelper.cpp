@@ -17,8 +17,8 @@
 #include <string>
 
 #include "GDCore/CommonTools.h"
-#include "GDCore/Events/CodeGeneration/EffectsCodeGenerator.h"
 #include "GDCore/Events/CodeGeneration/DiagnosticReport.h"
+#include "GDCore/Events/CodeGeneration/EffectsCodeGenerator.h"
 #include "GDCore/Extensions/Metadata/DependencyMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Platform.h"
@@ -178,8 +178,11 @@ bool ExporterHelper::ExportProjectForPixiPreview(
     wholeProjectDiagnosticReport.Clear();
 
     // Generate events code
-    if (!ExportEventsCode(immutableProject, codeOutputDir, includesFiles,
-                          wholeProjectDiagnosticReport, true)) {
+    if (!ExportEventsCode(immutableProject,
+                          codeOutputDir,
+                          includesFiles,
+                          wholeProjectDiagnosticReport,
+                          true)) {
       return false;
     }
 
@@ -199,11 +202,11 @@ bool ExporterHelper::ExportProjectForPixiPreview(
       gd::SceneResourcesFinder::FindProjectResources(exportedProject);
   std::unordered_map<gd::String, std::set<gd::String>> scenesUsedResources;
   for (std::size_t layoutIndex = 0;
-       layoutIndex < exportedProject.GetLayoutsCount(); layoutIndex++) {
+       layoutIndex < exportedProject.GetLayoutsCount();
+       layoutIndex++) {
     auto &layout = exportedProject.GetLayout(layoutIndex);
     scenesUsedResources[layout.GetName()] =
-        gd::SceneResourcesFinder::FindSceneResources(exportedProject,
-                                                          layout);
+        gd::SceneResourcesFinder::FindSceneResources(exportedProject, layout);
   }
 
   // Strip the project (*after* generating events as the events may use stripped
@@ -239,6 +242,13 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   }
   runtimeGameOptions.AddChild("allowAuthenticationUsingIframeForPreview")
       .SetBoolValue(options.allowAuthenticationUsingIframeForPreview);
+  if (!options.playerId.empty() && !options.playerToken.empty()) {
+    runtimeGameOptions.AddChild("playerUsername")
+        .SetStringValue(options.playerUsername);
+    runtimeGameOptions.AddChild("playerId").SetStringValue(options.playerId);
+    runtimeGameOptions.AddChild("playerToken")
+        .SetStringValue(options.playerToken);
+  }
 
   // Pass in the options the list of scripts files - useful for hot-reloading.
   auto &scriptFilesElement = runtimeGameOptions.AddChild("scriptFiles");
@@ -255,8 +265,11 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   }
 
   // Export the project
-  ExportProjectData(fs, exportedProject, codeOutputDir + "/data.js",
-                    runtimeGameOptions, projectUsedResources,
+  ExportProjectData(fs,
+                    exportedProject,
+                    codeOutputDir + "/data.js",
+                    runtimeGameOptions,
+                    projectUsedResources,
                     scenesUsedResources);
   includesFiles.push_back(codeOutputDir + "/data.js");
 
@@ -291,7 +304,8 @@ gd::String ExporterHelper::ExportProjectData(
   // Save the project to JSON
   gd::SerializerElement rootElement;
   project.SerializeTo(rootElement);
-  SerializeUsedResources(rootElement, projectUsedResources, scenesUsedResources);
+  SerializeUsedResources(
+      rootElement, projectUsedResources, scenesUsedResources);
   gd::String output =
       "gdjs.projectData = " + gd::Serializer::ToJSON(rootElement) + ";\n" +
       "gdjs.runtimeGameOptions = " +
@@ -306,7 +320,6 @@ void ExporterHelper::SerializeUsedResources(
     gd::SerializerElement &rootElement,
     std::set<gd::String> &projectUsedResources,
     std::unordered_map<gd::String, std::set<gd::String>> &scenesUsedResources) {
-
   auto serializeUsedResources =
       [](gd::SerializerElement &element,
          std::set<gd::String> &usedResources) -> void {
@@ -322,7 +335,8 @@ void ExporterHelper::SerializeUsedResources(
 
   auto &layoutsElement = rootElement.GetChild("layouts");
   for (std::size_t layoutIndex = 0;
-       layoutIndex < layoutsElement.GetChildrenCount(); layoutIndex++) {
+       layoutIndex < layoutsElement.GetChildrenCount();
+       layoutIndex++) {
     auto &layoutElement = layoutsElement.GetChild(layoutIndex);
     const auto layoutName = layoutElement.GetStringAttribute("name");
 
@@ -557,7 +571,7 @@ bool ExporterHelper::ExportFacebookInstantGamesFiles(const gd::Project &project,
 }
 
 bool ExporterHelper::ExportHtml5Files(const gd::Project &project,
-                                                     gd::String exportDir) {
+                                      gd::String exportDir) {
   if (!fs.WriteToFile(exportDir + "/manifest.webmanifest",
                       GenerateWebManifest(project))) {
     lastError = "Unable to export WebManifest.";
@@ -801,7 +815,8 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
     InsertUnique(includesFiles, "pixi-renderers/three.js");
     InsertUnique(includesFiles, "pixi-renderers/ThreeAddons.js");
     InsertUnique(includesFiles, "pixi-renderers/draco/gltf/draco_decoder.wasm");
-    InsertUnique(includesFiles, "pixi-renderers/draco/gltf/draco_wasm_wrapper.js");
+    InsertUnique(includesFiles,
+                 "pixi-renderers/draco/gltf/draco_wasm_wrapper.js");
   }
   if (pixiRenderers) {
     InsertUnique(includesFiles, "pixi-renderers/pixi.js");
@@ -813,7 +828,8 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
     InsertUnique(includesFiles, "pixi-renderers/pixi-bitmapfont-manager.js");
     InsertUnique(includesFiles,
                  "pixi-renderers/spriteruntimeobject-pixi-renderer.js");
-    InsertUnique(includesFiles, "pixi-renderers/CustomRuntimeObject2DPixiRenderer.js");
+    InsertUnique(includesFiles,
+                 "pixi-renderers/CustomRuntimeObject2DPixiRenderer.js");
     InsertUnique(includesFiles, "pixi-renderers/DebuggerPixiRenderer.js");
     InsertUnique(includesFiles,
                  "pixi-renderers/loadingscreen-pixi-renderer.js");
@@ -830,7 +846,8 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
     InsertUnique(includesFiles, "Extensions/3D/A_RuntimeObject3D.js");
     InsertUnique(includesFiles, "Extensions/3D/A_RuntimeObject3DRenderer.js");
     InsertUnique(includesFiles, "Extensions/3D/CustomRuntimeObject3D.js");
-    InsertUnique(includesFiles, "Extensions/3D/CustomRuntimeObject3DRenderer.js");
+    InsertUnique(includesFiles,
+                 "Extensions/3D/CustomRuntimeObject3DRenderer.js");
   }
 }
 
@@ -861,7 +878,8 @@ bool ExporterHelper::ExportEffectIncludes(
 }
 
 bool ExporterHelper::ExportEventsCode(
-    const gd::Project &project, gd::String outputDir,
+    const gd::Project &project,
+    gd::String outputDir,
     std::vector<gd::String> &includesFiles,
     gd::WholeProjectDiagnosticReport &wholeProjectDiagnosticReport,
     bool exportForPreview) {
@@ -871,13 +889,12 @@ bool ExporterHelper::ExportEventsCode(
     std::set<gd::String> eventsIncludes;
     const gd::Layout &layout = project.GetLayout(i);
 
-    auto &diagnosticReport = wholeProjectDiagnosticReport.AddNewDiagnosticReportForScene(
+    auto &diagnosticReport =
+        wholeProjectDiagnosticReport.AddNewDiagnosticReportForScene(
             layout.GetName());
     LayoutCodeGenerator layoutCodeGenerator(project);
     gd::String eventsOutput = layoutCodeGenerator.GenerateLayoutCompleteCode(
-        layout, eventsIncludes,
-        diagnosticReport,
-        !exportForPreview);
+        layout, eventsIncludes, diagnosticReport, !exportForPreview);
     gd::String filename =
         outputDir + "/" + "code" + gd::String::From(i) + ".js";
 

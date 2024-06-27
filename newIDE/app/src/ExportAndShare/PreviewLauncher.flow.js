@@ -10,6 +10,11 @@ export type PreviewOptions = {|
   projectDataOnlyExport: boolean,
   fullLoadingScreen: boolean,
   fallbackAuthor: ?{ id: string, username: string },
+  authenticatedPlayer: ?{
+    playerId: string,
+    playerUsername: string,
+    playerToken: string,
+  },
   numberOfWindows: number,
   getIsMenuBarHiddenInPreview: () => boolean,
   getIsAlwaysOnTopInPreview: () => boolean,

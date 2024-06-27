@@ -179,6 +179,7 @@ import { ProjectManagerDrawer } from '../ProjectManager/ProjectManagerDrawer';
 import DiagnosticReportDialog from '../ExportAndShare/DiagnosticReportDialog';
 import useSaveReminder from './UseSaveReminder';
 import { useMultiplayerLobbyConfigurator } from './UseMultiplayerLobbyConfigurator';
+import { useAuthenticatedPlayer } from './UseAuthenticatedPlayer';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -458,6 +459,8 @@ const MainFrame = (props: Props) => {
     fileMetadataOpeningMessage,
     setFileMetadataOpeningMessage,
   ] = React.useState<?MessageDescriptor>(null);
+
+  const { getAuthenticatedPlayerForPreview } = useAuthenticatedPlayer();
 
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.
@@ -1580,6 +1583,10 @@ const MainFrame = (props: Props) => {
           }
         : null;
 
+      const authenticatedPlayer = await getAuthenticatedPlayerForPreview(
+        currentProject
+      );
+
       try {
         await eventsFunctionsExtensionsState.ensureLoadFinished();
 
@@ -1592,6 +1599,7 @@ const MainFrame = (props: Props) => {
           projectDataOnlyExport: !!projectDataOnlyExport,
           fullLoadingScreen: !!fullLoadingScreen,
           fallbackAuthor,
+          authenticatedPlayer,
           getIsMenuBarHiddenInPreview: preferences.getIsMenuBarHiddenInPreview,
           getIsAlwaysOnTopInPreview: preferences.getIsAlwaysOnTopInPreview,
           numberOfWindows: numberOfWindows || 1,
@@ -1632,6 +1640,7 @@ const MainFrame = (props: Props) => {
       preferences.getIsAlwaysOnTopInPreview,
       preferences.values.openDiagnosticReportAutomatically,
       currentlyRunningInAppTutorial,
+      getAuthenticatedPlayerForPreview,
     ]
   );
 

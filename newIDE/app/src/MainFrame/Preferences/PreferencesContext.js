@@ -227,6 +227,7 @@ export type PreferencesValues = {|
   },
   displaySaveReminder: {| activated: boolean |}, // Store as object in case we need to add options.
   editorStateByProject: { [string]: { editorTabs: EditorTabsPersistedState } },
+  fetchPlayerTokenForPreviewAutomatically: boolean,
 |};
 
 /**
@@ -324,6 +325,7 @@ export type Preferences = {|
     projectId: string,
     editorState?: {| editorTabs: EditorTabsPersistedState |}
   ) => void,
+  setFetchPlayerTokenForPreviewAutomatically: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
@@ -377,6 +379,7 @@ export const initialPreferences = {
     newFeaturesAcknowledgements: {},
     displaySaveReminder: { activated: true },
     editorStateByProject: {},
+    fetchPlayerTokenForPreviewAutomatically: true,
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -446,6 +449,7 @@ export const initialPreferences = {
   setDisplaySaveReminder: () => {},
   getEditorStateForProject: projectId => {},
   setEditorStateForProject: (projectId, editorState) => {},
+  setFetchPlayerTokenForPreviewAutomatically: (enabled: boolean) => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

@@ -444,7 +444,7 @@ module.exports = {
       .setFunctionName('gdjs.multiplayerMessageManager.getCustomMessageData');
 
     extension
-      .addStrExpression(
+      .addExpression(
         'MessageSender',
         _('Message sender'),
         _('Returns the player number of the sender of the specified message.'),

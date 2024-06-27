@@ -44,7 +44,7 @@ const gd: libGDevelop = global.gd;
 
 export type VariableDialogOpeningProps = {
   variableName: string,
-  shouldCreateIfMissing: boolean,
+  shouldCreate: boolean,
 };
 
 type Props = {
@@ -302,6 +302,38 @@ export default React.forwardRef<Props, VariableFieldInterface>(
       !errorText &&
       value;
 
+    const openVariableEditor = React.useCallback(
+      () => {
+        if (!onOpenDialog) {
+          return;
+        }
+        // Access to the input directly because the value
+        // may not have been sent to onChange yet.
+        const fieldCurrentValue = field.current
+          ? field.current.getInputValue()
+          : value;
+        const isRootVariableDeclared =
+          variablesContainers &&
+          variablesContainers.some(variablesContainer =>
+            variablesContainer.has(getRootVariableName(fieldCurrentValue))
+          );
+
+        if (!field.current) {
+          onOpenDialog({
+            variableName: value,
+            shouldCreate: false,
+          });
+          return;
+        }
+        onChange(fieldCurrentValue);
+        onOpenDialog({
+          variableName: fieldCurrentValue,
+          shouldCreate: !isRootVariableDeclared,
+        });
+      },
+      [onChange, onOpenDialog, value, variablesContainers]
+    );
+
     return (
       <I18n>
         {({ i18n }) => (
@@ -331,23 +363,7 @@ export default React.forwardRef<Props, VariableFieldInterface>(
                           translatableValue: t`Add or edit variables...`,
                           text: '',
                           value: '',
-                          onClick: () => {
-                            if (!field.current) {
-                              onOpenDialog({
-                                variableName: value,
-                                shouldCreateIfMissing: false,
-                              });
-                              return;
-                            }
-                            // Access to the input directly because the value
-                            // may not have been sent to onChange yet.
-                            const inputValue = field.current.getInputValue();
-                            onChange(inputValue);
-                            onOpenDialog({
-                              variableName: inputValue,
-                              shouldCreateIfMissing: true,
-                            });
-                          },
+                          onClick: openVariableEditor,
                         }
                       : null,
                   ].filter(Boolean)}
@@ -367,7 +383,7 @@ export default React.forwardRef<Props, VariableFieldInterface>(
                       if (onOpenDialog) {
                         onOpenDialog({
                           variableName: value,
-                          shouldCreateIfMissing: false,
+                          shouldCreate: false,
                         });
                       }
                     }}

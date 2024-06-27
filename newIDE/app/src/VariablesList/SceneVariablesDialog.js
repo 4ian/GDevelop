@@ -19,7 +19,7 @@ type Props = {|
    */
   preventRefactoringToDeleteInstructions?: boolean,
   initiallySelectedVariableName?: string,
-  shouldCreateInitiallySelectedVariableIfMissing?: boolean,
+  shouldCreateInitiallySelectedVariable?: boolean,
 |};
 
 const SceneVariablesDialog = ({
@@ -31,7 +31,7 @@ const SceneVariablesDialog = ({
   hotReloadPreviewButtonProps,
   preventRefactoringToDeleteInstructions,
   initiallySelectedVariableName,
-  shouldCreateInitiallySelectedVariableIfMissing,
+  shouldCreateInitiallySelectedVariable,
 }: Props) => {
   const onComputeAllVariableNames = React.useCallback(
     () =>
@@ -78,8 +78,8 @@ const SceneVariablesDialog = ({
       title={<Trans>{layout.getName()} variables</Trans>}
       tabs={tabs}
       initiallySelectedVariableName={initiallySelectedVariableName}
-      shouldCreateInitiallySelectedVariableIfMissing={
-        shouldCreateInitiallySelectedVariableIfMissing
+      shouldCreateInitiallySelectedVariable={
+        shouldCreateInitiallySelectedVariable
       }
       helpPagePath={'/all-features/variables/scene-variables'}
       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}

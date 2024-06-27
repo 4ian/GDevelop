@@ -182,9 +182,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             onApply={onVariableEditorApply}
             preventRefactoringToDeleteInstructions
             initiallySelectedVariableName={editorOpen.variableName}
-            shouldCreateInitiallySelectedVariableIfMissing={
-              editorOpen.shouldCreateIfMissing
-            }
+            shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
           />
         )}
       </React.Fragment>

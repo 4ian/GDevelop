@@ -59,7 +59,7 @@ type Props = {|
   areObjectVariables?: boolean,
   initiallyOpenTabId?: string,
   initiallySelectedVariableName?: string,
-  shouldCreateInitiallySelectedVariableIfMissing?: boolean,
+  shouldCreateInitiallySelectedVariable?: boolean,
 
   project: gdProject,
   hotReloadPreviewButtonProps?: ?HotReloadPreviewButtonProps,
@@ -88,7 +88,7 @@ const VariablesEditorDialog = ({
   tabs,
   initiallyOpenTabId,
   initiallySelectedVariableName,
-  shouldCreateInitiallySelectedVariableIfMissing,
+  shouldCreateInitiallySelectedVariable,
   projectScopedContainersAccessor,
   areObjectVariables,
 }: Props) => {
@@ -116,7 +116,7 @@ const VariablesEditorDialog = ({
   }, []);
 
   const shouldCreateVariable = React.useRef<boolean>(
-    shouldCreateInitiallySelectedVariableIfMissing || false
+    shouldCreateInitiallySelectedVariable || false
   );
   const actualInitiallySelectedVariableName = React.useRef<?string>(
     initiallySelectedVariableName

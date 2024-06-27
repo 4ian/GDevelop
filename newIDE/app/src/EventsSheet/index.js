@@ -2137,7 +2137,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                     initiallySelectedVariableName={
                       this.state.editedVariable.variableName
                     }
-                    shouldCreateInitiallySelectedVariableIfMissing={
+                    shouldCreateInitiallySelectedVariable={
                       this.state.editedVariable.shouldCreateVariable
                     }
                   />

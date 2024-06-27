@@ -121,9 +121,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             onApply={onVariableEditorApply}
             isGlobalTabInitiallyOpen={isGlobal}
             initiallySelectedVariableName={editorOpen.variableName}
-            shouldCreateInitiallySelectedVariableIfMissing={
-              editorOpen.shouldCreateIfMissing
-            }
+            shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
           />
         )}
       </React.Fragment>

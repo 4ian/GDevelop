@@ -87,8 +87,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             }}
             preventRefactoringToDeleteInstructions
             initiallySelectedVariableName={editorOpen.variableName}
-            shouldCreateInitiallySelectedVariableIfMissing={
-              editorOpen.shouldCreateIfMissing || false
+            shouldCreateInitiallySelectedVariable={
+              editorOpen.shouldCreate || false
             }
           />
         )}

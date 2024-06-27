@@ -39,7 +39,6 @@ const requirableModules = {};
 const ObjectsRenderingService = {
   renderers: {
     unknownObjectType: RenderedUnknownInstance,
-    'TileMap::SimpleTileMap': RenderedUnknownInstance,
     Sprite: RenderedSpriteInstance,
     'TiledSpriteObject::TiledSprite': RenderedTiledSpriteInstance,
     'PanelSpriteObject::PanelSprite': RenderedPanelSpriteInstance,

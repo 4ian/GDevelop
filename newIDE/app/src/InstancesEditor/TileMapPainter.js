@@ -38,7 +38,7 @@ const getAtlasResource = ({
   const atlasResourceName = object
     .getConfiguration()
     .getProperties()
-    .get('tilemapAtlasImage')
+    .get('atlasImage')
     .getValue();
   return {
     atlasResourceName,

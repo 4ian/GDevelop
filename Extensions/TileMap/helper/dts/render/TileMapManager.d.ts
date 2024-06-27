@@ -45,6 +45,18 @@ export declare class TileMapManager {
   ): void;
   /**
    * @param loadTileMap The method that loads the Tiled JSON file in memory.
+   * @param callback A function called when the tile map is parsed.
+   */
+  getOrLoadSimpleTileMap(
+    serializedTileMap: string,
+    objectName: string,
+    tileSize: number,
+    columnCount: number,
+    rowCount: number,
+    callback: (tileMap: EditableTileMap | null) => void
+  ): void;
+  /**
+   * @param loadTileMap The method that loads the Tiled JSON file in memory.
    * @param getTexture The method that loads the atlas image file in memory.
    * @param atlasImageResourceName The resource name of the atlas image.
    * @param tileMapJsonResourceName The resource name of the tile map.
@@ -63,6 +75,23 @@ export declare class TileMapManager {
     tileMapJsonResourceName: string,
     tileSetJsonResourceName: string,
     levelIndex: number,
+    callback: (textureCache: TileTextureCache | null) => void
+  ): void;
+  /**
+   * @param loadTileMap The method that loads the Tiled JSON file in memory.
+   * @param getTexture The method that loads the atlas image file in memory.
+   * @param atlasImageResourceName The resource name of the atlas image.
+   * @param tileMapJsonResourceName The resource name of the tile map.
+   * @param tileSetJsonResourceName The resource name of the tile set.
+   * @param levelIndex The level of the tile map to load from.
+   * @param callback A function called when the tiles textures are split.
+   */
+  getOrLoadSimpleTileMapTextureCache(
+    getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>,
+    atlasImageResourceName: string,
+    tileSize: number,
+    columnCount: number,
+    rowCount: number,
     callback: (textureCache: TileTextureCache | null) => void
   ): void;
   clearCaches(): void;

@@ -92,7 +92,7 @@ class TileMapTilePreview {
     const atlasResourceName = object
       .getConfiguration()
       .getProperties()
-      .get('tilemapAtlasImage')
+      .get('atlasImage')
       .getValue();
     if (!atlasResourceName) return;
     // TODO: Burst cache when atlas resource is changed

@@ -54,6 +54,39 @@ export class EditableTileMap {
     this._layers = [];
   }
 
+  static from(editableTileMapAsJsObject: any): EditableTileMap {
+    const tileSet = new Map();
+
+    // TODO: Actually save and load tileset
+    new Array(200)
+      .fill(0)
+      .forEach((_, index) => tileSet.set(index, new TileDefinition(0)));
+
+    const tileMap = new EditableTileMap(
+      editableTileMapAsJsObject.tileWidth,
+      editableTileMapAsJsObject.tileHeight,
+      editableTileMapAsJsObject.dimX,
+      editableTileMapAsJsObject.dimY,
+      tileSet
+    );
+
+    editableTileMapAsJsObject.layers.forEach((layerAsJsObject: any) => {
+      tileMap.setTileLayer(EditableTileMapLayer.from(layerAsJsObject, tileMap));
+    });
+
+    return tileMap;
+  }
+
+  toJSObject(): Object {
+    return {
+      tileWidth: this.tileWidth,
+      tileHeight: this.tileHeight,
+      dimX: this.dimX,
+      dimY: this.dimY,
+      layers: this._layers.map((layer) => layer.toJSObject()),
+    };
+  }
+
   /**
    * @returns The tile map width in pixels.
    */
@@ -119,6 +152,12 @@ export class EditableTileMap {
     const layer = new EditableTileMapLayer(this, id);
     this._layers.push(layer);
     return layer;
+  }
+  /**
+   * @param layer the new layer to set.
+   */
+  setTileLayer(layer: EditableTileMapLayer): void {
+    this._layers.push(layer);
   }
 
   /**
@@ -209,6 +248,10 @@ abstract class AbstractEditableLayer {
 
   setVisible(visible: boolean): void {
     this.visible = visible;
+  }
+
+  toJSObject(): Object {
+    return {};
   }
 
   /**
@@ -338,6 +381,33 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
     this._alpha = 1;
   }
 
+  static from(
+    editableTileMapLayerAsJsObject: any,
+    tileMap: EditableTileMap
+  ): EditableTileMapLayer {
+    const layer = new EditableTileMapLayer(
+      tileMap,
+      editableTileMapLayerAsJsObject.id
+    );
+    layer.setAlpha(editableTileMapLayerAsJsObject.alpha);
+    editableTileMapLayerAsJsObject.tiles.forEach((row: Int32Array, y: number) =>
+      row.forEach((tileGID, x) => {
+        layer.setTileGID(x, y, tileGID);
+      })
+    );
+    return layer;
+  }
+
+  toJSObject(): Object {
+    return {
+      id: this.id,
+      alpha: this._alpha,
+      tiles: this._tiles.map((row, y) =>
+        row.map((_, x) => this.getTileGID(x, y))
+      ),
+    };
+  }
+
   /**
    * The opacity (between 0-1) of the layer
    */
@@ -371,6 +441,22 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
 
     // +1 because 0 mean null
     tilesRow[x] = tileId + 1;
+  }
+
+  /**
+   * @param x The layer column.
+   * @param y The layer row.
+   * @param tileGID The tile GID.
+   */
+  setTileGID(x: integer, y: integer, tileGID: integer): void {
+    const tilesRow = this._tiles[y];
+    if (!tilesRow || x >= tilesRow.length) {
+      // Coordinates are out of bounds, don't do anything.
+      return;
+    }
+
+    // +1 because 0 mean null
+    tilesRow[x] = tileGID + 1;
   }
 
   /**

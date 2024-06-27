@@ -41,6 +41,8 @@ export declare class EditableTileMap {
     dimY: integer,
     tileSet: Map<integer, TileDefinition>
   );
+  static from(editableTileMapAsJsObject: any): EditableTileMap;
+  toJSObject(): Object;
   /**
    * @returns The tile map width in pixels.
    */
@@ -79,6 +81,10 @@ export declare class EditableTileMap {
    * @returns The new layer.
    */
   addTileLayer(id: integer): EditableTileMapLayer;
+  /**
+   * @param layer the new layer to set.
+   */
+  setTileLayer(layer: EditableTileMapLayer): void;
   /**
    * @param id The identifier of the new layer.
    * @returns The new layer.
@@ -128,6 +134,7 @@ declare abstract class AbstractEditableLayer {
    */
   constructor(tileMap: EditableTileMap, id: integer);
   setVisible(visible: boolean): void;
+  toJSObject(): Object;
   /**
    * @returns true if the layer is visible.
    */
@@ -198,6 +205,11 @@ export declare class EditableTileMapLayer extends AbstractEditableLayer {
    * @param id The layer identifier.
    */
   constructor(tileMap: EditableTileMap, id: integer);
+  static from(
+    editableTileMapLayerAsJsObject: any,
+    tileMap: EditableTileMap
+  ): EditableTileMapLayer;
+  toJSObject(): Object;
   /**
    * The opacity (between 0-1) of the layer
    */
@@ -212,6 +224,12 @@ export declare class EditableTileMapLayer extends AbstractEditableLayer {
    * @param tileId The tile.
    */
   setTile(x: integer, y: integer, tileId: integer): void;
+  /**
+   * @param x The layer column.
+   * @param y The layer row.
+   * @param tileGID The tile GID.
+   */
+  setTileGID(x: integer, y: integer, tileGID: integer): void;
   /**
    * @param x The layer column.
    * @param y The layer row.

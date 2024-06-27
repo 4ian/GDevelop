@@ -178,26 +178,27 @@ export const useSerializableObjectsCancelableEditor = ({
   const preferences = React.useContext(PreferencesContext);
   const backdropClickBehavior = preferences.values.backdropClickBehavior;
 
+  const serializedElements = serializedElementsRef.current;
+  for (const [id, serializableObject] of serializableObjects) {
+    // Serialize the content of the object, to be used in case the user
+    // want to cancel their changes.
+    {
+      const serializedElement = serializedElements.get(id);
+      if (serializedElement) {
+        serializedElement.delete();
+        serializedElements.delete(id);
+      }
+    }
+    if (resetThenClearPersistentUuid) {
+      serializableObject.resetPersistentUuid();
+    }
+    const serializedElement = new gd.SerializerElement();
+    serializableObject.serializeTo(serializedElement);
+    serializedElements.set(id, serializedElement);
+  }
+
   React.useEffect(
     () => {
-      const serializedElements = serializedElementsRef.current;
-      for (const [id, serializableObject] of serializableObjects) {
-        // Serialize the content of the object, to be used in case the user
-        // want to cancel their changes.
-        {
-          const serializedElement = serializedElements.get(id);
-          if (serializedElement) {
-            serializedElement.delete();
-            serializedElements.delete(id);
-          }
-        }
-        if (resetThenClearPersistentUuid) {
-          serializableObject.resetPersistentUuid();
-        }
-        const serializedElement = new gd.SerializerElement();
-        serializableObject.serializeTo(serializedElement);
-        serializedElements.set(id, serializedElement);
-      }
       return () => {
         for (const [id, serializedElement] of serializedElements) {
           serializedElement.delete();
@@ -205,7 +206,7 @@ export const useSerializableObjectsCancelableEditor = ({
         }
       };
     },
-    [serializableObjects, resetThenClearPersistentUuid]
+    [serializedElements]
   );
 
   const getOriginalContentSerializedElements = React.useCallback(() => {

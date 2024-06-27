@@ -99,6 +99,15 @@ const VariablesEditorDialog = ({
       ),
     [tabs]
   );
+  const {
+    onCancelChanges,
+    notifyOfChange,
+    getOriginalContentSerializedElements,
+  } = useSerializableObjectsCancelableEditor({
+    serializableObjects,
+    onCancel,
+    resetThenClearPersistentUuid: true,
+  });
 
   const lastSelectedVariableNodeId = React.useRef<string | null>(null);
   const onSelectedVariableChange = React.useCallback((nodes: Array<string>) => {
@@ -119,6 +128,7 @@ const VariablesEditorDialog = ({
       tabs.indexOf(({ id }) => id === initiallyOpenTabId)
     );
     const { variablesContainer, inheritedVariablesContainer } = tabs[tabIndex];
+    console.log('insertInVariablesContainer');
     const { name: actualVariableName } = insertInVariablesContainer(
       variablesContainer,
       initiallySelectedVariableName
@@ -134,15 +144,6 @@ const VariablesEditorDialog = ({
     );
   }
 
-  const {
-    onCancelChanges,
-    notifyOfChange,
-    getOriginalContentSerializedElements,
-  } = useSerializableObjectsCancelableEditor({
-    serializableObjects,
-    onCancel,
-    resetThenClearPersistentUuid: true,
-  });
   const { isMobile } = useResponsiveWindowSize();
   const { DismissableTutorialMessage } = useDismissableTutorialMessage(
     'intro-variables'

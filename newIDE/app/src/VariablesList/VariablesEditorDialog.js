@@ -128,7 +128,6 @@ const VariablesEditorDialog = ({
       tabs.indexOf(({ id }) => id === initiallyOpenTabId)
     );
     const { variablesContainer, inheritedVariablesContainer } = tabs[tabIndex];
-    console.log('insertInVariablesContainer');
     const { name: actualVariableName } = insertInVariablesContainer(
       variablesContainer,
       initiallySelectedVariableName

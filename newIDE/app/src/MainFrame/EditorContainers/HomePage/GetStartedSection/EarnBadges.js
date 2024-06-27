@@ -58,6 +58,7 @@ const styles = {
     alignItems: 'center',
     zIndex: 1,
     gap: 4,
+    color: 'white',
   },
 };
 
@@ -93,7 +94,7 @@ const BadgeItem = ({
             {!hasThisBadge && (
               <div style={styles.badgeTextContainer}>
                 <Coin style={styles.badgeCoinIcon} />
-                <Text align="center" size="body" noMargin>
+                <Text align="center" size="body" noMargin color="inherit">
                   {achievement ? achievement.rewardValueInCredits : ''}{' '}
                 </Text>
               </div>

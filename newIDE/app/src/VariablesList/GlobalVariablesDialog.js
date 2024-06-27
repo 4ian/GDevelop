@@ -17,6 +17,8 @@ type Props = {|
    * project must be refactored to delete any reference to it.
    */
   preventRefactoringToDeleteInstructions?: boolean,
+  initiallySelectedVariableName?: string,
+  shouldCreateInitiallySelectedVariable?: boolean,
 |};
 
 const GlobalVariablesDialog = ({
@@ -26,6 +28,8 @@ const GlobalVariablesDialog = ({
   onApply,
   hotReloadPreviewButtonProps,
   preventRefactoringToDeleteInstructions,
+  initiallySelectedVariableName,
+  shouldCreateInitiallySelectedVariable,
 }: Props) => {
   const onComputeAllVariableNames = React.useCallback(
     () =>
@@ -71,6 +75,10 @@ const GlobalVariablesDialog = ({
       onApply={onApply}
       title={<Trans>Global variables</Trans>}
       tabs={tabs}
+      initiallySelectedVariableName={initiallySelectedVariableName}
+      shouldCreateInitiallySelectedVariable={
+        shouldCreateInitiallySelectedVariable
+      }
       helpPagePath={'/all-features/variables/global-variables'}
       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
       preventRefactoringToDeleteInstructions={

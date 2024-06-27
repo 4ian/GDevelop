@@ -5,6 +5,7 @@ import VariableField, {
   getRootVariableName,
   renderVariableWithIcon,
   type VariableFieldInterface,
+  type VariableDialogOpeningProps,
 } from './VariableField';
 import GlobalAndSceneVariablesDialog from '../../VariablesList/GlobalAndSceneVariablesDialog';
 import {
@@ -18,7 +19,10 @@ import { mapFor } from '../../Utils/MapFor';
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function AnyVariableField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?VariableFieldInterface>(null);
-    const [editorOpen, setEditorOpen] = React.useState(false);
+    const [
+      editorOpen,
+      setEditorOpen,
+    ] = React.useState<VariableDialogOpeningProps | null>(null);
     const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
@@ -66,7 +70,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         if (selectedVariableName && selectedVariableName.startsWith(value)) {
           onChange(selectedVariableName);
         }
-        setEditorOpen(false);
+        setEditorOpen(null);
         // The variable editor may have refactor the events for a variable type
         // change which may have change the currently edited instruction type.
         if (onInstructionTypeChanged) onInstructionTypeChanged();
@@ -97,7 +101,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           onRequestClose={props.onRequestClose}
           onApply={props.onApply}
           ref={field}
-          onOpenDialog={() => setEditorOpen(true)}
+          onOpenDialog={setEditorOpen}
           globalObjectsContainer={props.globalObjectsContainer}
           objectsContainer={props.objectsContainer}
           projectScopedContainersAccessor={projectScopedContainersAccessor}
@@ -113,10 +117,11 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           <GlobalAndSceneVariablesDialog
             projectScopedContainersAccessor={projectScopedContainersAccessor}
             open
-            onCancel={() => setEditorOpen(false)}
+            onCancel={() => setEditorOpen(null)}
             onApply={onVariableEditorApply}
             isGlobalTabInitiallyOpen={isGlobal}
-            initiallySelectedVariableName={props.value}
+            initiallySelectedVariableName={editorOpen.variableName}
+            shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
           />
         )}
       </React.Fragment>

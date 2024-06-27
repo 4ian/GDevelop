@@ -72,6 +72,7 @@ type Props = {|
 export type SemiControlledAutoCompleteInterface = {|
   focus: FieldFocusFunction,
   forceInputValueTo: (newValue: string) => void,
+  getInputValue: () => string,
 |};
 
 export const autocompleteStyles = {
@@ -270,6 +271,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
       forceInputValueTo: (newValue: string) => {
         if (inputValue !== null) setInputValue(newValue);
       },
+      getInputValue: () => (input.current ? input.current.value : ''),
     }));
 
     const currentInputValue = inputValue !== null ? inputValue : props.value;

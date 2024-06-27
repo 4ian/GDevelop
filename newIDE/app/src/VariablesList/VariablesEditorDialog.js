@@ -15,6 +15,9 @@ import { getVariableContextFromNodeId } from './VariableToTreeNodeHandling';
 import { Tabs } from '../UI/Tabs';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
+import { insertInVariablesContainer } from '../Utils/VariablesUtils';
+import { getRootVariableName } from '../EventsSheet/ParameterFields/VariableField';
+import { getNodeIdFromVariableName } from './VariableToTreeNodeHandling';
 
 const gd: libGDevelop = global.gd;
 
@@ -56,6 +59,7 @@ type Props = {|
   areObjectVariables?: boolean,
   initiallyOpenTabId?: string,
   initiallySelectedVariableName?: string,
+  shouldCreateInitiallySelectedVariable?: boolean,
 
   project: gdProject,
   hotReloadPreviewButtonProps?: ?HotReloadPreviewButtonProps,
@@ -84,6 +88,7 @@ const VariablesEditorDialog = ({
   tabs,
   initiallyOpenTabId,
   initiallySelectedVariableName,
+  shouldCreateInitiallySelectedVariable,
   projectScopedContainersAccessor,
   areObjectVariables,
 }: Props) => {
@@ -103,6 +108,41 @@ const VariablesEditorDialog = ({
     onCancel,
     resetThenClearPersistentUuid: true,
   });
+
+  const lastSelectedVariableNodeId = React.useRef<string | null>(null);
+  const onSelectedVariableChange = React.useCallback((nodes: Array<string>) => {
+    lastSelectedVariableNodeId.current =
+      nodes.length > 0 ? nodes[nodes.length - 1] : null;
+  }, []);
+
+  const shouldCreateVariable = React.useRef<boolean>(
+    shouldCreateInitiallySelectedVariable || false
+  );
+  const actualInitiallySelectedVariableName = React.useRef<?string>(
+    initiallySelectedVariableName
+  );
+  if (shouldCreateVariable.current) {
+    shouldCreateVariable.current = false;
+    const tabIndex = Math.max(
+      0,
+      tabs.indexOf(({ id }) => id === initiallyOpenTabId)
+    );
+    const { variablesContainer, inheritedVariablesContainer } = tabs[tabIndex];
+    const { name: actualVariableName } = insertInVariablesContainer(
+      variablesContainer,
+      initiallySelectedVariableName
+        ? getRootVariableName(initiallySelectedVariableName)
+        : 'Variable',
+      null,
+      variablesContainer.count(),
+      inheritedVariablesContainer
+    );
+    actualInitiallySelectedVariableName.current = actualVariableName;
+    lastSelectedVariableNodeId.current = getNodeIdFromVariableName(
+      actualVariableName
+    );
+  }
+
   const { isMobile } = useResponsiveWindowSize();
   const { DismissableTutorialMessage } = useDismissableTutorialMessage(
     'intro-variables'
@@ -110,12 +150,6 @@ const VariablesEditorDialog = ({
   const [currentTab, setCurrentTab] = React.useState(
     initiallyOpenTabId || tabs[0].id
   );
-
-  const lastSelectedVariableNodeId = React.useRef<string | null>(null);
-  const onSelectedVariableChange = React.useCallback((nodes: Array<string>) => {
-    lastSelectedVariableNodeId.current =
-      nodes.length > 0 ? nodes[nodes.length - 1] : null;
-  }, []);
 
   const onRefactorAndApply = React.useCallback(
     async () => {
@@ -265,7 +299,9 @@ const VariablesEditorDialog = ({
                   }
                   variablesContainer={variablesContainer}
                   areObjectVariables={areObjectVariables}
-                  initiallySelectedVariableName={initiallySelectedVariableName}
+                  initiallySelectedVariableName={
+                    actualInitiallySelectedVariableName.current
+                  }
                   inheritedVariablesContainer={inheritedVariablesContainer}
                   emptyPlaceholderTitle={emptyPlaceholderTitle}
                   emptyPlaceholderDescription={emptyPlaceholderDescription}

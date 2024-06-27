@@ -18,6 +18,8 @@ type Props = {|
    * project must be refactored to delete any reference to it.
    */
   preventRefactoringToDeleteInstructions?: boolean,
+  initiallySelectedVariableName?: string,
+  shouldCreateInitiallySelectedVariable?: boolean,
 |};
 
 const SceneVariablesDialog = ({
@@ -28,6 +30,8 @@ const SceneVariablesDialog = ({
   onApply,
   hotReloadPreviewButtonProps,
   preventRefactoringToDeleteInstructions,
+  initiallySelectedVariableName,
+  shouldCreateInitiallySelectedVariable,
 }: Props) => {
   const onComputeAllVariableNames = React.useCallback(
     () =>
@@ -73,6 +77,10 @@ const SceneVariablesDialog = ({
       onApply={onApply}
       title={<Trans>{layout.getName()} variables</Trans>}
       tabs={tabs}
+      initiallySelectedVariableName={initiallySelectedVariableName}
+      shouldCreateInitiallySelectedVariable={
+        shouldCreateInitiallySelectedVariable
+      }
       helpPagePath={'/all-features/variables/scene-variables'}
       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
       preventRefactoringToDeleteInstructions={

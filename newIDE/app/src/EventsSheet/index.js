@@ -112,7 +112,6 @@ import {
   registerOnResourceExternallyChangedCallback,
   unregisterOnResourceExternallyChangedCallback,
 } from '../MainFrame/ResourcesWatcher';
-import { insertInVariablesContainer } from '../Utils/VariablesUtils';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
 import LocalVariablesDialog from '../VariablesList/LocalVariablesDialog';
 import GlobalAndSceneVariablesDialog from '../VariablesList/GlobalAndSceneVariablesDialog';
@@ -183,6 +182,7 @@ type State = {|
   editedVariable: {
     variablesContainer: gdVariablesContainer,
     variableName: string,
+    shouldCreateVariable: boolean,
     eventContext: ?EventContext,
   } | null,
 
@@ -475,28 +475,14 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       );
     if (!eventContext) return;
 
-    const variablesContainer = eventContext.event.getVariables();
-    const { name: newName } = insertInVariablesContainer(
-      variablesContainer,
-      'Variable',
-      null,
-      variablesContainer.count(),
-      null
+    this.openVariablesEditor(
+      eventContext,
+      {
+        variablesContainer: eventContext.event.getVariables(),
+        variableName: 'Variable',
+      },
+      /* shouldCreateVariable: */ true
     );
-
-    this._eventsTree &&
-      this._eventsTree.forceEventsUpdate(() => {
-        const positions = this._getChangedEventRows([eventContext.event]);
-        this._saveChangesToHistory('ADD', {
-          positionsBeforeAction: positions,
-          positionAfterAction: positions,
-        });
-      });
-
-    this.openVariablesEditor(eventContext, {
-      variablesContainer,
-      variableName: newName,
-    });
   };
 
   _selectionCanHaveLocalVariables = () => {
@@ -711,12 +697,14 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
   openVariablesEditor = (
     eventContext: EventContext,
-    variableDeclarationContext: VariableDeclarationContext
+    variableDeclarationContext: VariableDeclarationContext,
+    shouldCreateVariable = false
   ) => {
     this.setState({
       editedVariable: {
         variablesContainer: variableDeclarationContext.variablesContainer,
         variableName: variableDeclarationContext.variableName,
+        shouldCreateVariable,
         eventContext,
       },
     });
@@ -2148,6 +2136,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                     }
                     initiallySelectedVariableName={
                       this.state.editedVariable.variableName
+                    }
+                    shouldCreateInitiallySelectedVariable={
+                      this.state.editedVariable.shouldCreateVariable
                     }
                   />
                 )}

@@ -42,12 +42,17 @@ import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/E
 
 const gd: libGDevelop = global.gd;
 
+export type VariableDialogOpeningProps = {
+  variableName: string,
+  shouldCreate: boolean,
+};
+
 type Props = {
   ...ParameterFieldProps,
   variablesContainers: Array<gdVariablesContainer>,
   enumerateVariables: () => Array<EnumeratedVariable>,
   forceDeclaration?: boolean,
-  onOpenDialog: ?() => void,
+  onOpenDialog: (VariableDialogOpeningProps => void) | null,
 };
 
 type VariableNameQuickAnalyzeResult = 0 | 1 | 2 | 3 | 4;
@@ -297,6 +302,31 @@ export default React.forwardRef<Props, VariableFieldInterface>(
       !errorText &&
       value;
 
+    const openVariableEditor = React.useCallback(
+      () => {
+        if (!onOpenDialog) {
+          return;
+        }
+        // Access to the input directly because the value
+        // may not have been sent to onChange yet.
+        const fieldCurrentValue = field.current
+          ? field.current.getInputValue()
+          : value;
+        const isRootVariableDeclared =
+          variablesContainers &&
+          variablesContainers.some(variablesContainer =>
+            variablesContainer.has(getRootVariableName(fieldCurrentValue))
+          );
+
+        onChange(fieldCurrentValue);
+        onOpenDialog({
+          variableName: fieldCurrentValue,
+          shouldCreate: !isRootVariableDeclared,
+        });
+      },
+      [onChange, onOpenDialog, value, variablesContainers]
+    );
+
     return (
       <I18n>
         {({ i18n }) => (
@@ -326,7 +356,7 @@ export default React.forwardRef<Props, VariableFieldInterface>(
                           translatableValue: t`Add or edit variables...`,
                           text: '',
                           value: '',
-                          onClick: onOpenDialog,
+                          onClick: openVariableEditor,
                         }
                       : null,
                   ].filter(Boolean)}
@@ -342,7 +372,14 @@ export default React.forwardRef<Props, VariableFieldInterface>(
                     disabled={!onOpenDialog}
                     primary
                     style={style}
-                    onClick={onOpenDialog}
+                    onClick={() => {
+                      if (onOpenDialog) {
+                        onOpenDialog({
+                          variableName: value,
+                          shouldCreate: false,
+                        });
+                      }
+                    }}
                   />
                 ) : null
               }

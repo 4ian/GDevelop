@@ -756,9 +756,12 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     ) => void
   ) => {
     if (eventsBasedBehavior) {
-      this._onAddBehaviorEventsFunction(onAddEventsFunctionCb);
+      this._onAddBehaviorEventsFunction(
+        eventsBasedBehavior,
+        onAddEventsFunctionCb
+      );
     } else if (eventsBasedObject) {
-      this._onAddObjectEventsFunction(onAddEventsFunctionCb);
+      this._onAddObjectEventsFunction(eventsBasedObject, onAddEventsFunctionCb);
     } else {
       this._onAddFreeEventsFunction(onAddEventsFunctionCb);
     }
@@ -776,24 +779,32 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   };
 
   _onAddBehaviorEventsFunction = (
+    eventsBasedBehavior: gdEventsBasedBehavior,
     onAddEventsFunctionCb: (
       parameters: ?EventsFunctionCreationParameters
     ) => void
   ) => {
     this.setState({
       behaviorMethodSelectorDialogOpen: true,
-      onAddEventsFunctionCb,
+      onAddEventsFunctionCb: parameters => {
+        onAddEventsFunctionCb(parameters);
+        this._onBehaviorEventsFunctionAdded(eventsBasedBehavior);
+      },
     });
   };
 
   _onAddObjectEventsFunction = (
+    eventsBasedObject: gdEventsBasedObject,
     onAddEventsFunctionCb: (
       parameters: ?EventsFunctionCreationParameters
     ) => void
   ) => {
     this.setState({
       objectMethodSelectorDialogOpen: true,
-      onAddEventsFunctionCb,
+      onAddEventsFunctionCb: parameters => {
+        onAddEventsFunctionCb(parameters);
+        this._onObjectEventsFunctionAdded(eventsBasedObject);
+      },
     });
   };
 
@@ -827,9 +838,20 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     );
   };
 
+  _onEventsFunctionAdded = (
+    selectedEventsFunction: gdEventsFunction,
+    eventsBasedBehavior: ?gdEventsBasedBehavior,
+    eventsBasedObject: ?gdEventsBasedObject
+  ) => {
+    if (eventsBasedBehavior) {
+      this._onBehaviorEventsFunctionAdded(eventsBasedBehavior);
+    } else if (eventsBasedObject) {
+      this._onObjectEventsFunctionAdded(eventsBasedObject);
+    }
+  };
+
   _onBehaviorEventsFunctionAdded = (
-    eventsBasedBehavior: gdEventsBasedBehavior,
-    eventsFunction: gdEventsFunction
+    eventsBasedBehavior: gdEventsBasedBehavior
   ) => {
     // This will create the mandatory parameters for the newly added function.
     gd.WholeProjectRefactorer.ensureBehaviorEventsFunctionsProperParameters(
@@ -838,10 +860,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     );
   };
 
-  _onObjectEventsFunctionAdded = (
-    eventsBasedObject: gdEventsBasedObject,
-    eventsFunction: gdEventsFunction
-  ) => {
+  _onObjectEventsFunctionAdded = (eventsBasedObject: gdEventsBasedObject) => {
     // This will create the mandatory parameters for the newly added function.
     gd.WholeProjectRefactorer.ensureObjectEventsFunctionsProperParameters(
       this.props.eventsFunctionsExtension,
@@ -1341,7 +1360,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 onDeleteEventsFunction={this._onDeleteEventsFunction}
                 onRenameEventsFunction={this._makeRenameEventsFunction(i18n)}
                 onAddEventsFunction={this._onAddEventsFunction}
-                onEventsFunctionAdded={() => {}}
+                onEventsFunctionAdded={this._onEventsFunctionAdded}
                 // Behaviors
                 selectedEventsBasedBehavior={selectedEventsBasedBehavior}
                 onSelectEventsBasedBehavior={this._selectEventsBasedBehavior}

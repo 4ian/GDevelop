@@ -677,7 +677,11 @@ const EventsFunctionsList = React.forwardRef<
               scrollToItem(functionItemId);
             }, 100); // A few ms is enough for a new render to be done.
 
-            onEventsFunctionAdded(eventsFunction);
+            onEventsFunctionAdded(
+              eventsFunction,
+              eventsBasedBehavior,
+              eventsBasedObject
+            );
             if (unsavedChanges) {
               unsavedChanges.triggerUnsavedChanges();
             }

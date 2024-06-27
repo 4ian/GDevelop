@@ -28,6 +28,8 @@ export class ProjectScopedContainersAccessor {
     this._scope = scope;
     this._parameterObjectsContainer = parameterObjectsContainer;
     this._eventPath = eventPath;
+    // Trigger parameterObjectsContainer update.
+    this.get();
   }
 
   getScope(): EventsScope {

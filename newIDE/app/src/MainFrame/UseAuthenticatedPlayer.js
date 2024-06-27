@@ -3,6 +3,7 @@ import * as React from 'react';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { getPlayerToken } from '../Utils/GDevelopServices/Play';
 import PreferencesContext from './Preferences/PreferencesContext';
+import { retryIfFailed } from '../Utils/RetryIfFailed';
 
 const gd: libGDevelop = global.gd;
 
@@ -31,8 +32,9 @@ export const useAuthenticatedPlayer = (): UseAuthenticatedPlayerOutput => {
         !profile ||
         !currentProject ||
         !preferencesValues.fetchPlayerTokenForPreviewAutomatically
-      )
+      ) {
         return null;
+      }
 
       const gameId = currentProject.getProjectUuid();
 
@@ -59,18 +61,26 @@ export const useAuthenticatedPlayer = (): UseAuthenticatedPlayerOutput => {
         );
       if (!isMultiplayerOrPlayerAuthenticationExtensionUsed) return;
 
-      const newPlayerTokenForGame = await getPlayerToken({
-        getAuthorizationHeader,
-        userId: profile.id,
-        gameId,
-      });
-      playerTokensForPreview.current[gameId] = newPlayerTokenForGame;
+      try {
+        await retryIfFailed({ times: 2 }, async () => {
+          const newPlayerTokenForGame = await getPlayerToken({
+            getAuthorizationHeader,
+            userId: profile.id,
+            gameId,
+          });
+          playerTokensForPreview.current[gameId] = newPlayerTokenForGame;
 
-      return {
-        playerId: profile.id,
-        playerUsername: profile.username || 'Player',
-        playerToken: newPlayerTokenForGame,
-      };
+          return {
+            playerId: profile.id,
+            playerUsername: profile.username || 'Player',
+            playerToken: newPlayerTokenForGame,
+          };
+        });
+      } catch (error) {
+        console.error('Error while fetching player token for preview:', error);
+
+        return null;
+      }
     },
     [
       profile,

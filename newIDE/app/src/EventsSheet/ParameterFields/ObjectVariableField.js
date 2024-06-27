@@ -83,6 +83,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       expression,
       parameterIndex,
       onInstructionTypeChanged,
+      value,
+      onChange,
     } = props;
 
     const objectName = getLastObjectParameterValue({
@@ -118,19 +120,16 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
     const onVariableEditorApply = React.useCallback(
       (selectedVariableName: string | null) => {
-        if (
-          selectedVariableName &&
-          selectedVariableName.startsWith(props.value)
-        ) {
-          props.onChange(selectedVariableName);
+        if (selectedVariableName && selectedVariableName.startsWith(value)) {
+          onChange(selectedVariableName);
         }
         setEditorOpen(null);
-        // The variable editor may have refactor the events for a variable type
-        // change which may have change the currently edited instruction type.
+        // The variable editor may have refactored the events for a variable type
+        // change which may have changed the currently edited instruction type.
         if (onInstructionTypeChanged) onInstructionTypeChanged();
         if (field.current) field.current.updateAutocompletions();
       },
-      [onInstructionTypeChanged, props]
+      [onChange, onInstructionTypeChanged, value]
     );
 
     return (
@@ -154,11 +153,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           onApply={props.onApply}
           ref={field}
           // There is no variable editor for groups.
-          onOpenDialog={
-            variablesContainers.length === 1
-              ? props => setEditorOpen(props)
-              : null
-          }
+          onOpenDialog={variablesContainers.length === 1 ? setEditorOpen : null}
           globalObjectsContainer={props.globalObjectsContainer}
           objectsContainer={props.objectsContainer}
           projectScopedContainersAccessor={projectScopedContainersAccessor}

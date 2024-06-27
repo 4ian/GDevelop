@@ -71,8 +71,8 @@ export const getNodeIdFromVariableContext = (
   }
   const parentPart = variableContext.lineage
     .map(({ name }) => name)
-    .join('$$.$$');
-  return (parentPart ? parentPart + '$.$' : '') + variableName;
+    .join(separator);
+  return (parentPart ? parentPart + separator : '') + variableName;
 };
 
 export const getVariableContextFromNodeId = (

@@ -318,13 +318,6 @@ export default React.forwardRef<Props, VariableFieldInterface>(
             variablesContainer.has(getRootVariableName(fieldCurrentValue))
           );
 
-        if (!field.current) {
-          onOpenDialog({
-            variableName: value,
-            shouldCreate: false,
-          });
-          return;
-        }
         onChange(fieldCurrentValue);
         onOpenDialog({
           variableName: fieldCurrentValue,

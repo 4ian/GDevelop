@@ -8,8 +8,10 @@ namespace gdjs {
      */
     type NetworkMessage = {
       messageName: string;
-      data: Uint8Array;
+      data: Uint8Array | string;
     };
+
+    export type CompressionMethod = 'none' | 'cs:gzip' | 'cs:deflate';
 
     /**
      * Helper to discard invalid messages when received.
@@ -109,15 +111,33 @@ namespace gdjs {
     const justConnectedPeers: string[] = [];
 
     /**
+     * The compression method used to compress data sent over the network.
+     */
+    let compressionMethod: CompressionMethod = 'none';
+    export const setCompressionMethod = (method: CompressionMethod) => {
+      compressionMethod = method;
+    };
+
+    /**
      * Helper function to compress data sent over the network.
      */
-    async function compressData(data: object): Promise<Uint8Array> {
-      const jsonString = JSON.stringify(data); // Convert object to JSON string
-      const encoder = new TextEncoder();
-      const array = encoder.encode(jsonString); // Convert string to Uint8Array
+    async function compressData(data: object): Promise<Uint8Array | string> {
+      if (compressionMethod === 'none') {
+        // If no compression is used, we just stringify the data,
+        // PeerJS will compress it to binary data.
+        const jsonString = JSON.stringify(data);
+        return jsonString;
+      }
 
-      // @ts-ignore - As of 09/2023 the CompressionStream is now available in all browsers.
-      const cs = new CompressionStream('gzip'); // Create a CompressionStream with gzip
+      const compressionStreamFormat =
+        compressionMethod === 'cs:gzip' ? 'gzip' : 'deflate';
+
+      const jsonString = JSON.stringify(data);
+      const encoder = new TextEncoder();
+      const array = encoder.encode(jsonString);
+
+      // @ts-ignore - We checked that CompressionStream is available in the browser.
+      const cs = new CompressionStream(compressionStreamFormat);
       const writer = cs.writable.getWriter();
       writer.write(array);
       writer.close();
@@ -143,12 +163,32 @@ namespace gdjs {
      * It returns the parsed JSON object, if valid, or undefined.
      */
     async function decompressData(
-      compressedData: Uint8Array
+      receivedData: Uint8Array | string
     ): Promise<object | undefined> {
-      // @ts-ignore - As of 09/2023 the DecompressionStream is now available in all browsers.
-      const ds = new DecompressionStream('gzip'); // Create a DecompressionStream with gzip
+      if (compressionMethod === 'none') {
+        // If no compression is used, we just parse the data.
+        if (typeof receivedData !== 'string') {
+          logger.error(
+            `Error while parsing message using compressionMethod ${compressionMethod}: received data is not a string.`
+          );
+          return;
+        }
+
+        try {
+          const parsedData = JSON.parse(receivedData);
+          return parsedData;
+        } catch (e) {
+          logger.error(`Error while parsing message: ${e.toString()}`);
+          return;
+        }
+      }
+      const compressionStreamFormat =
+        compressionMethod === 'cs:gzip' ? 'gzip' : 'deflate';
+
+      // @ts-ignore - We checked that DecompressionStream is available in the browser.
+      const ds = new DecompressionStream(compressionStreamFormat);
       const writer = ds.writable.getWriter();
-      writer.write(compressedData);
+      writer.write(receivedData);
       writer.close();
 
       const decompressedStream = ds.readable;

@@ -913,19 +913,34 @@ namespace gdjs {
     /**
      * Helper function to get information about the platform running the game.
      */
-    getPlatformInfo = () => ({
-      // @ts-ignore
-      isCordova: !!window.cordova,
-      devicePlatform:
+    getPlatformInfo = () => {
+      const supportedCompressionMethods: ('cs:gzip' | 'cs:deflate')[] = [];
+      try {
+        // @ts-ignore - We are checking if the CompressionStream is available.
+        new CompressionStream('gzip');
+        supportedCompressionMethods.push('cs:gzip');
+      } catch (e) {}
+      try {
+        // @ts-ignore - We are checking if the CompressionStream is available.
+        new CompressionStream('deflate');
+        supportedCompressionMethods.push('cs:deflate');
+      } catch (e) {}
+
+      return {
         // @ts-ignore
-        typeof device !== 'undefined' ? device.platform || '' : '',
-      navigatorPlatform:
-        typeof navigator !== 'undefined' ? navigator.platform : '',
-      hasTouch:
-        typeof navigator !== 'undefined'
-          ? !!navigator.maxTouchPoints && navigator.maxTouchPoints > 2
-          : false,
-    });
+        isCordova: !!window.cordova,
+        devicePlatform:
+          // @ts-ignore
+          typeof device !== 'undefined' ? device.platform || '' : '',
+        navigatorPlatform:
+          typeof navigator !== 'undefined' ? navigator.platform : '',
+        hasTouch:
+          typeof navigator !== 'undefined'
+            ? !!navigator.maxTouchPoints && navigator.maxTouchPoints > 2
+            : false,
+        supportedCompressionMethods: supportedCompressionMethods,
+      };
+    };
 
     _setupGameVisibilityEvents() {
       if (typeof navigator !== 'undefined' && typeof document !== 'undefined') {

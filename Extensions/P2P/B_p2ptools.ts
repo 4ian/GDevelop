@@ -296,8 +296,7 @@ namespace gdjs {
       ): boolean => {
         const event = getEvent(eventName);
         event.dataloss = defaultDataLoss;
-        const isTriggered = event.isTriggered();
-        return isTriggered;
+        return event.isTriggered();
       };
 
       /**
@@ -364,10 +363,8 @@ namespace gdjs {
        * @param eventName - The event to get data from.
        * @returns - The data as JSON.
        */
-      export const getEventData = (eventName: string) => {
-        const data = getEvent(eventName).getData();
-        return data;
-      };
+      export const getEventData = (eventName: string) =>
+        getEvent(eventName).getData();
 
       /**
        * Get the id of peer that caused the last trigger of an event.
@@ -387,8 +384,6 @@ namespace gdjs {
       ) => {
         variable.fromJSON(getEventData(eventName));
       };
-
-      export const getEvents = () => events;
 
       /**
        * Connects to a custom broker server.
@@ -512,11 +507,6 @@ namespace gdjs {
        * Get the ID of the peer that triggered onConnection.
        */
       export const getConnectedPeer = (): string => connectedPeers[0] || '';
-
-      /**
-       * Returns the list of all currently connected peers.
-       */
-      export const getAllPeers = () => Array.from(connections.keys());
 
       /**
        * A JavaScript-only function to get the raw P2P DataConnection.

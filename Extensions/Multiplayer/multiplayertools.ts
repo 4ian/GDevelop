@@ -407,15 +407,17 @@ namespace gdjs {
         // When socket is open, ask for the connectionId and send more session info, so that we can inform the lobbies window.
         if (_websocket) {
           _websocket.send(JSON.stringify({ action: 'getConnectionId' }));
-          const plarformInfo = runtimeScene.getGame().getPlatformInfo();
+          const platformInfo = runtimeScene.getGame().getPlatformInfo();
           _websocket.send(
             JSON.stringify({
               action: 'sessionInformation',
               connectionType: 'lobby',
-              isCordova: plarformInfo.isCordova,
-              devicePlatform: plarformInfo.devicePlatform,
-              navigatorPlatform: plarformInfo.navigatorPlatform,
-              hasTouch: plarformInfo.hasTouch,
+              isCordova: platformInfo.isCordova,
+              devicePlatform: platformInfo.devicePlatform,
+              navigatorPlatform: platformInfo.navigatorPlatform,
+              hasTouch: platformInfo.hasTouch,
+              supportedCompressionMethods:
+                platformInfo.supportedCompressionMethods,
             })
           );
         }
@@ -465,7 +467,9 @@ namespace gdjs {
               break;
             }
             case 'gameCountdownStarted': {
-              handleGameCountdownStartedEvent(runtimeScene);
+              const messageData = messageContent.data;
+              const compressionMethod = messageData.compressionMethod || 'none';
+              handleGameCountdownStartedEvent(runtimeScene, compressionMethod);
               break;
             }
             case 'gameStarted': {
@@ -664,8 +668,11 @@ namespace gdjs {
     };
 
     const handleGameCountdownStartedEvent = function (
-      runtimeScene: gdjs.RuntimeScene
+      runtimeScene: gdjs.RuntimeScene,
+      compressionMethod: gdjs.multiplayerPeerJsHelper.CompressionMethod
     ) {
+      gdjs.multiplayerPeerJsHelper.setCompressionMethod(compressionMethod);
+
       // When the countdown starts, if we are player number 1, then send the peerId to others so they can connect via P2P.
       if (getCurrentPlayerNumber() === 1) {
         sendPeerId();

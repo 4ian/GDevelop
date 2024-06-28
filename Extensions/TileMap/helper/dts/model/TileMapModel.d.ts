@@ -227,7 +227,12 @@ export declare class EditableTileMapLayer extends AbstractEditableLayer {
    * @param alpha The opacity between 0-1
    */
   setAlpha(alpha: float): void;
-  appendRowsAndColumns(columnsToAdd: number, rowsToAdd: number): void;
+  changeDimensions(
+    columnsToAppend: number,
+    columnsToUnshift: number,
+    rowsToAppend: number,
+    rowsToUnshift: number
+  ): void;
   /**
    * @param x The layer column.
    * @param y The layer row.

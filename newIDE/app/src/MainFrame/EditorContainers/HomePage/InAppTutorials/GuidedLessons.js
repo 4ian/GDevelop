@@ -186,9 +186,9 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
     },
     {
       id: COOP_PLATFORMER,
-      title: t`Co-op Multiplayer Platformer`,
-      description: t`Learn how to use the basic of the multiplayer in this co-op platformer.`,
-      durationInMinutes: 2,
+      title: t`The basics of the Multiplayer`,
+      description: t`Learn how to use multiplayer behavior and the ownership system in this co-op platformer.`,
+      durationInMinutes: 3,
       renderImage: props => <CoopPlatformer {...props} />,
     },
   ].filter(item => displayedGuidedLessonsIds.includes(item.id));

@@ -1574,6 +1574,7 @@ module.exports = {
 
         this.tileMapPixiObject = new Tilemap.CompositeTilemap();
         this._pixiObject = this.tileMapPixiObject;
+        this._editableTileMap = null;
 
         // Implement `containsPoint` so that we can set `interactive` to true and
         // the Tilemap will properly emit events when hovered/clicked.
@@ -1635,6 +1636,10 @@ module.exports = {
         );
       }
 
+      getEditableTileMap() {
+        return this._editableTileMap;
+      }
+
       /**
        * This is used to reload the Tilemap
        */
@@ -1693,6 +1698,8 @@ module.exports = {
                 return;
               }
 
+              this._editableTileMap = tileMap;
+
               manager.getOrLoadSimpleTileMapTextureCache(
                 (textureName) =>
                   this._pixiResourcesLoader.getPIXITexture(
@@ -1709,11 +1716,11 @@ module.exports = {
                 ) => {
                   this.onLoadingSuccess();
 
-                  this.width = tileMap.getWidth();
-                  this.height = tileMap.getHeight();
+                  this.width = this._editableTileMap.getWidth();
+                  this.height = this._editableTileMap.getHeight();
                   TilemapHelper.PixiTileMapHelper.updatePixiTileMap(
                     this.tileMapPixiObject,
-                    tileMap,
+                    this._editableTileMap,
                     textureCache,
                     'all',
                     0
@@ -1732,6 +1739,69 @@ module.exports = {
             loadTileMap();
           });
         }
+      }
+
+      updatePixiTileMap() {
+        const atlasImageResourceName = this._associatedObjectConfiguration
+          .getProperties()
+          .get('atlasImage')
+          .getValue();
+        const serializedTilemap = this._associatedObjectConfiguration
+          .getProperties()
+          .get('tilemap')
+          .getValue();
+
+        const tileSize = parseInt(
+          this._associatedObjectConfiguration
+            .getProperties()
+            .get('tileSize')
+            .getValue(),
+          10
+        );
+        const columnCount = parseInt(
+          this._associatedObjectConfiguration
+            .getProperties()
+            .get('columnCount')
+            .getValue(),
+          10
+        );
+        const rowCount = parseInt(
+          this._associatedObjectConfiguration
+            .getProperties()
+            .get('rowCount')
+            .getValue(),
+          10
+        );
+        /** @type {TileMapHelper.TileMapManager} */
+        const manager = TilemapHelper.TileMapManager.getManager(this._project);
+
+        manager.getOrLoadSimpleTileMapTextureCache(
+          (textureName) =>
+            this._pixiResourcesLoader.getPIXITexture(
+              this._project,
+              textureName
+            ),
+          atlasImageResourceName,
+          tileSize,
+          columnCount,
+          rowCount,
+          (
+            /** @type {TileMapHelper.TileTextureCache} */
+            textureCache
+          ) => {
+            this.onLoadingSuccess();
+
+            this.width = this._editableTileMap.getWidth();
+            this.height = this._editableTileMap.getHeight();
+            TilemapHelper.PixiTileMapHelper.updatePixiTileMap(
+              this.tileMapPixiObject,
+              this._editableTileMap,
+              textureCache,
+              'all',
+              0
+            );
+          }
+        );
       }
 
       /**

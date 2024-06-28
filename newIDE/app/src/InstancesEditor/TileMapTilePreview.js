@@ -6,7 +6,7 @@ import InstancesSelection from './InstancesSelection';
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import ViewPosition from './ViewPosition';
 
-const getTileset = (object: gdObject) => {
+export const getTileSet = (object: gdObject) => {
   const columnCount = parseFloat(
     object
       .getConfiguration()
@@ -88,7 +88,7 @@ class TileMapTilePreview {
       associatedObjectName
     );
     if (!object || object.getType() !== 'TileMap::SimpleTileMap') return;
-    const { tileSize } = getTileset(object);
+    const { tileSize } = getTileSet(object);
     const atlasResourceName = object
       .getConfiguration()
       .getProperties()

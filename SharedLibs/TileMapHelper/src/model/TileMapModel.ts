@@ -58,7 +58,7 @@ export class EditableTileMap {
     const tileSet = new Map();
 
     // TODO: Actually save and load tileset
-    new Array(200)
+    new Array(400)
       .fill(0)
       .forEach((_, index) => tileSet.set(index, new TileDefinition(0)));
 
@@ -153,11 +153,18 @@ export class EditableTileMap {
     this._layers.push(layer);
     return layer;
   }
+
   /**
    * @param layer the new layer to set.
    */
   setTileLayer(layer: EditableTileMapLayer): void {
     this._layers.push(layer);
+  }
+
+  getTileLayer(id: integer): EditableTileMapLayer | null {
+    const matchingLayer = this._layers.find((layer) => layer.id === id);
+    if (!(matchingLayer instanceof EditableTileMapLayer)) return null;
+    return matchingLayer;
   }
 
   /**

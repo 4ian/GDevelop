@@ -85,6 +85,7 @@ export declare class EditableTileMap {
    * @param layer the new layer to set.
    */
   setTileLayer(layer: EditableTileMapLayer): void;
+  getTileLayer(id: integer): EditableTileMapLayer | null;
   /**
    * @param id The identifier of the new layer.
    * @returns The new layer.

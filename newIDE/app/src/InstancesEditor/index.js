@@ -492,6 +492,7 @@ export default class InstancesEditor extends Component<Props> {
       project: props.project,
       layout: props.layout,
       getTileMapTile: this.getSelectedTileMapTile,
+      getRendererOfInstance: this.getRendererOfInstance,
       getLastCursorSceneCoordinates: this.getLastCursorSceneCoordinates,
       viewPosition: this.viewPosition,
     });
@@ -745,18 +746,16 @@ export default class InstancesEditor extends Component<Props> {
     const selectedInstances = instancesSelection.getSelectedInstances();
     if (selectedInstances.length !== 1) return;
     const selectedInstance = selectedInstances[0];
-    const renderedInstance = this.instancesRenderer.getRendererOfInstance(
-      selectedInstance.getLayer(),
-      selectedInstance
-    );
     const object = getObjectByName(
       project,
       layout,
       selectedInstance.getObjectName()
     );
     if (!object) return;
+    const renderedInstance = this.getRendererOfInstance(selectedInstance);
     if (
       object.getType() === 'TileMap::SimpleTileMap' &&
+      renderedInstance &&
       renderedInstance.constructor.name === 'RenderedSimpleTileMapInstance'
     ) {
       const editableTileMap = renderedInstance.getEditableTileMap();
@@ -766,27 +765,51 @@ export default class InstancesEditor extends Component<Props> {
         );
         return;
       }
+      let scaleX = 1,
+        scaleY = 1;
+      if (selectedInstance.hasCustomSize()) {
+        scaleX = selectedInstance.getCustomWidth() / editableTileMap.getWidth();
+        scaleY =
+          selectedInstance.getCustomHeight() / editableTileMap.getHeight();
+      }
+
       const tileSet = getTileSet(object);
       const x = Math.floor(
-        (sceneCoordinates.x - selectedInstance.getX()) / tileSet.tileSize
+        (sceneCoordinates.x - selectedInstance.getX()) /
+          (tileSet.tileSize * scaleX)
       );
       const y = Math.floor(
-        (sceneCoordinates.y - selectedInstance.getY()) / tileSet.tileSize
+        (sceneCoordinates.y - selectedInstance.getY()) /
+          (tileSet.tileSize * scaleY)
       );
       const editableTileMapLayer = editableTileMap.getTileLayer(0);
-      const { unshiftedRows, unshiftedColumns } = editableTileMapLayer.setTile(
+      const {
+        unshiftedRows,
+        unshiftedColumns,
+        appendedRows,
+        appendedColumns,
+      } = editableTileMapLayer.setTile(
         x,
         y,
         tileSet.rowCount * selectedTileMapTile.x + selectedTileMapTile.y
       );
-      // TODO: Take scale into account
       // TODO: Take rotation into account
       selectedInstance.setX(
-        selectedInstance.getX() - unshiftedColumns * tileSet.tileSize
+        selectedInstance.getX() - unshiftedColumns * (tileSet.tileSize * scaleX)
       );
       selectedInstance.setY(
-        selectedInstance.getY() - unshiftedRows * tileSet.tileSize
+        selectedInstance.getY() - unshiftedRows * (tileSet.tileSize * scaleY)
       );
+      if (selectedInstance.hasCustomSize()) {
+        selectedInstance.setCustomWidth(
+          selectedInstance.getCustomWidth() +
+            tileSet.tileSize * scaleX * (appendedColumns + unshiftedColumns)
+        );
+        selectedInstance.setCustomHeight(
+          selectedInstance.getCustomHeight() +
+            tileSet.tileSize * scaleY * (appendedRows + unshiftedRows)
+        );
+      }
       renderedInstance.updatePixiTileMap();
       object
         .getConfiguration()
@@ -795,6 +818,13 @@ export default class InstancesEditor extends Component<Props> {
           JSON.stringify(editableTileMap.toJSObject())
         );
     }
+  };
+
+  getRendererOfInstance = (instance: gdInitialInstance) => {
+    return this.instancesRenderer.getRendererOfInstance(
+      instance.getLayer(),
+      instance
+    );
   };
 
   _onDownBackground = (x: number, y: number, event?: PointerEvent) => {

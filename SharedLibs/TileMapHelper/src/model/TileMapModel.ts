@@ -508,7 +508,14 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
     x: integer,
     y: integer,
     tileId: integer
-  ): { unshiftedRows: number; unshiftedColumns: number } | undefined {
+  ):
+    | {
+        unshiftedRows: number;
+        unshiftedColumns: number;
+        appendedRows: number;
+        appendedColumns: number;
+      }
+    | undefined {
     const definition = this.tileMap.getTileDefinition(tileId);
     if (!definition) {
       console.error(`Invalid tile definition index: ${tileId}`);
@@ -538,7 +545,12 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
 
     // +1 because 0 mean null
     tilesRow[newX] = tileId + 1;
-    return { unshiftedRows: rowsToUnshift, unshiftedColumns: columnsToUnshift };
+    return {
+      unshiftedRows: rowsToUnshift,
+      unshiftedColumns: columnsToUnshift,
+      appendedRows: rowsToAdd,
+      appendedColumns: columnsToAdd,
+    };
   }
 
   /**

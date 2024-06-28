@@ -246,6 +246,8 @@ export declare class EditableTileMapLayer extends AbstractEditableLayer {
     | {
         unshiftedRows: number;
         unshiftedColumns: number;
+        appendedRows: number;
+        appendedColumns: number;
       }
     | undefined;
   /**

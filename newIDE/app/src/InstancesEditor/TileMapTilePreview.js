@@ -5,6 +5,8 @@ import getObjectByName from '../Utils/GetObjectByName';
 import InstancesSelection from './InstancesSelection';
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import ViewPosition from './ViewPosition';
+import RenderedInstance from '../ObjectsRendering/Renderers/RenderedInstance';
+import Rendered3DInstance from '../ObjectsRendering/Renderers/Rendered3DInstance';
 
 export const getTileSet = (object: gdObject) => {
   const columnCount = parseFloat(
@@ -37,6 +39,10 @@ type Props = {|
   instancesSelection: InstancesSelection,
   getLastCursorSceneCoordinates: () => [number, number],
   getTileMapTile: () => ?{| x: number, y: number |},
+  getRendererOfInstance: gdInitialInstance =>
+    | RenderedInstance
+    | Rendered3DInstance
+    | null,
   viewPosition: ViewPosition,
 |};
 
@@ -46,6 +52,10 @@ class TileMapTilePreview {
   instancesSelection: InstancesSelection;
   getLastCursorSceneCoordinates: () => [number, number];
   getTileMapTile: () => ?{| x: number, y: number |};
+  getRendererOfInstance: gdInitialInstance =>
+    | RenderedInstance
+    | Rendered3DInstance
+    | null;
   toCanvasCoordinates: (x: number, y: number) => [number, number];
   viewPosition: ViewPosition;
   cache: Map<string, PIXI.Texture>;
@@ -58,6 +68,7 @@ class TileMapTilePreview {
     project,
     layout,
     getTileMapTile,
+    getRendererOfInstance,
     viewPosition,
   }: Props) {
     this.project = project;
@@ -65,6 +76,7 @@ class TileMapTilePreview {
     this.instancesSelection = instancesSelection;
     this.getLastCursorSceneCoordinates = getLastCursorSceneCoordinates;
     this.getTileMapTile = getTileMapTile;
+    this.getRendererOfInstance = getRendererOfInstance;
     this.viewPosition = viewPosition;
     this.preview = new PIXI.Container();
     this.cache = new Map();
@@ -116,17 +128,38 @@ class TileMapTilePreview {
       texture = new PIXI.Texture(atlasTexture, rect);
       this.cache.set(cacheKey, texture);
     }
+    let scaleX = 1,
+      scaleY = 1;
+    if (instance.hasCustomSize()) {
+      const renderedInstance = this.getRendererOfInstance(instance);
+      if (
+        renderedInstance &&
+        renderedInstance.constructor.name === 'RenderedSimpleTileMapInstance'
+      ) {
+        const editableTileMap = renderedInstance.getEditableTileMap();
+        if (!editableTileMap) {
+          console.error(
+            `Could not find the editable tile map for instance of object ${instance.getObjectName()}`
+          );
+          return;
+        }
+        scaleX = instance.getCustomWidth() / editableTileMap.getWidth();
+        scaleY = instance.getCustomHeight() / editableTileMap.getHeight();
+      }
+    }
     const sprite = new PIXI.Sprite(texture);
-    sprite.width = this.viewPosition.toCanvasScale(tileSize);
-    sprite.height = this.viewPosition.toCanvasScale(tileSize);
+    sprite.width = this.viewPosition.toCanvasScale(tileSize) * scaleX;
+    sprite.height = this.viewPosition.toCanvasScale(tileSize) * scaleY;
 
     this.preview.addChild(sprite);
 
     const [cursorX, cursorY] = this.getLastCursorSceneCoordinates();
     const canvasCoordinates = this.viewPosition.toCanvasCoordinates(
-      Math.floor((cursorX - instance.getX()) / tileSize) * tileSize +
+      Math.floor((cursorX - instance.getX()) / (tileSize * scaleX)) *
+        (tileSize * scaleX) +
         instance.getX(),
-      Math.floor((cursorY - instance.getY()) / tileSize) * tileSize +
+      Math.floor((cursorY - instance.getY()) / (tileSize * scaleY)) *
+        (tileSize * scaleY) +
         instance.getY()
     );
     this.preview.position.x = canvasCoordinates[0];

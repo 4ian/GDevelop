@@ -774,10 +774,18 @@ export default class InstancesEditor extends Component<Props> {
         (sceneCoordinates.y - selectedInstance.getY()) / tileSet.tileSize
       );
       const editableTileMapLayer = editableTileMap.getTileLayer(0);
-      editableTileMapLayer.setTile(
+      const { unshiftedRows, unshiftedColumns } = editableTileMapLayer.setTile(
         x,
         y,
         tileSet.rowCount * selectedTileMapTile.x + selectedTileMapTile.y
+      );
+      // TODO: Take scale into account
+      // TODO: Take rotation into account
+      selectedInstance.setX(
+        selectedInstance.getX() - unshiftedColumns * tileSet.tileSize
+      );
+      selectedInstance.setY(
+        selectedInstance.getY() - unshiftedRows * tileSet.tileSize
       );
       renderedInstance.updatePixiTileMap();
       object

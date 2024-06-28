@@ -238,7 +238,16 @@ export declare class EditableTileMapLayer extends AbstractEditableLayer {
    * @param y The layer row.
    * @param tileId The tile.
    */
-  setTile(x: integer, y: integer, tileId: integer): void;
+  setTile(
+    x: integer,
+    y: integer,
+    tileId: integer
+  ):
+    | {
+        unshiftedRows: number;
+        unshiftedColumns: number;
+      }
+    | undefined;
   /**
    * @param x The layer column.
    * @param y The layer row.

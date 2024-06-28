@@ -24,11 +24,11 @@ export class EditableTileMap {
   /**
    * The number of tile columns in the map.
    */
-  private readonly dimX: integer;
+  private dimX: integer;
   /**
    * The number of tile rows in the map.
    */
-  private readonly dimY: integer;
+  private dimY: integer;
 
   /**
    * @param tileWidth The width of a tile.
@@ -127,6 +127,20 @@ export class EditableTileMap {
    */
   getDimensionY(): integer {
     return this.dimY;
+  }
+
+  /**
+   * @param dim The number of tile columns in the map.
+   */
+  setDimensionX(dim: integer): void {
+    this.dimX = dim;
+  }
+
+  /**
+   * @param dim The number of tile rows in the map.
+   */
+  setDimensionY(dim: integer): void {
+    this.dimY = dim;
   }
 
   /**
@@ -412,7 +426,13 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
       tiles: this._tiles.map((row, y) =>
         // Array.from is needed to convert Int32Array to Array. Otherwise, JSON.stringify
         // serializes it as an object with index as keys.
-        Array.from(row.map((_, x) => this.getTileGID(x, y)))
+        Array.from(
+          row.map(
+            (_, x) =>
+              // -1 corresponds to null value
+              this.getTileGID(x, y) || -1
+          )
+        )
       ),
     };
   }
@@ -431,6 +451,36 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
     this._alpha = alpha;
   }
 
+  appendRowsAndColumns(columnsToAdd: number, rowsToAdd: number) {
+    const initialRowCount = this._tiles.length;
+    const initialColumnCount = this._tiles[0].length;
+    if (columnsToAdd > 0) {
+      this._tiles.forEach((row, rowIndex) => {
+        const newRow = new Int32Array(initialColumnCount + columnsToAdd).fill(
+          0
+        );
+        newRow.set(row);
+        this._tiles[rowIndex] = newRow;
+      });
+    }
+    if (rowsToAdd > 0) {
+      this._tiles.length = initialRowCount + rowsToAdd;
+      for (
+        let rowIndex = initialRowCount;
+        rowIndex < this._tiles.length;
+        rowIndex++
+      ) {
+        this._tiles[rowIndex] = new Int32Array(
+          initialColumnCount + columnsToAdd
+        ).fill(0);
+      }
+    }
+    // TODO: Instead of setting the dimensions directly, should it call a method on
+    // EditableTileMap that will iterates over all the layers to change their dimensions?
+    this.tileMap.setDimensionX(initialColumnCount + columnsToAdd);
+    this.tileMap.setDimensionY(initialRowCount + rowsToAdd);
+  }
+
   /**
    * @param x The layer column.
    * @param y The layer row.
@@ -441,6 +491,11 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
     if (!definition) {
       console.error(`Invalid tile definition index: ${tileId}`);
       return;
+    }
+    const rowsToAdd = Math.max(0, y - (this._tiles.length - 1));
+    const columnsToAdd = Math.max(0, x - (this._tiles[0].length - 1));
+    if (rowsToAdd || columnsToAdd) {
+      this.appendRowsAndColumns(columnsToAdd, rowsToAdd);
     }
     const tilesRow = this._tiles[y];
     if (!tilesRow || x >= tilesRow.length) {

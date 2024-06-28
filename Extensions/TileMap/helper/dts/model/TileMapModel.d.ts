@@ -22,11 +22,11 @@ export declare class EditableTileMap {
   /**
    * The number of tile columns in the map.
    */
-  private readonly dimX;
+  private dimX;
   /**
    * The number of tile rows in the map.
    */
-  private readonly dimY;
+  private dimY;
   /**
    * @param tileWidth The width of a tile.
    * @param tileHeight The height of a tile.
@@ -67,6 +67,14 @@ export declare class EditableTileMap {
    * @returns The number of tile rows in the map.
    */
   getDimensionY(): integer;
+  /**
+   * @param dim The number of tile columns in the map.
+   */
+  setDimensionX(dim: integer): void;
+  /**
+   * @param dim The number of tile rows in the map.
+   */
+  setDimensionY(dim: integer): void;
   /**
    * @param tileId The tile identifier
    * @returns The tile definition form the tile set.
@@ -219,6 +227,7 @@ export declare class EditableTileMapLayer extends AbstractEditableLayer {
    * @param alpha The opacity between 0-1
    */
   setAlpha(alpha: float): void;
+  appendRowsAndColumns(columnsToAdd: number, rowsToAdd: number): void;
   /**
    * @param x The layer column.
    * @param y The layer row.

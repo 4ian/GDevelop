@@ -10,6 +10,7 @@ import ChevronArrowBottom from './CustomSvgIcons/ChevronArrowBottom';
 
 type Props = {|
   id?: string,
+  splitMenuButtonId?: string,
   label?: React.Node,
   primary?: boolean,
   disabled?: boolean,
@@ -50,6 +51,7 @@ const styles = {
 const FlatButtonWithSplitMenu = (props: Props) => {
   const {
     id,
+    splitMenuButtonId,
     buildMenuTemplate,
     onClick,
     label,
@@ -89,6 +91,7 @@ const FlatButtonWithSplitMenu = (props: Props) => {
         }
         element={
           <Button
+            id={splitMenuButtonId}
             onClick={shouldNeverBeCalled}
             focusRipple={focusRipple}
             style={styles.arrowDropDownButton}

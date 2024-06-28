@@ -198,6 +198,7 @@ const PreviewAndShareButtons = React.memo<PreviewAndShareButtonsProps>(
             ) : null
           }
           id="toolbar-preview-button"
+          splitMenuButtonId="toolbar-preview-split-menu-button"
           buildMenuTemplate={previewBuildMenuTemplate}
         />
         <ResponsiveRaisedButton

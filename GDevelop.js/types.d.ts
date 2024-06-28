@@ -2108,6 +2108,18 @@ export class EventsBasedObject extends AbstractEventsBasedEntity {
   getInitialInstances(): InitialInstancesContainer;
   getLayers(): LayersContainer;
   getObjects(): ObjectsContainer;
+  getAreaMinX(): number;
+  getAreaMinY(): number;
+  getAreaMinZ(): number;
+  getAreaMaxX(): number;
+  getAreaMaxY(): number;
+  getAreaMaxZ(): number;
+  setAreaMinX(value: number): void;
+  setAreaMinY(value: number): void;
+  setAreaMinZ(value: number): void;
+  setAreaMaxX(value: number): void;
+  setAreaMaxY(value: number): void;
+  setAreaMaxZ(value: number): void;
   static getPropertyActionName(propertyName: string): string;
   static getPropertyConditionName(propertyName: string): string;
   static getPropertyExpressionName(propertyName: string): string;

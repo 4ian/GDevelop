@@ -159,6 +159,114 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
   const gd::InitialInstancesContainer& GetInitialInstances() const {
     return initialInstances;
   }
+
+  /**
+   * \brief Get the left bound of the custom object.
+   * 
+   * This is used only if there is any initial instances.
+   * 
+   * \see EventsBasedObject::GetInitialInstances
+   */
+  int GetAreaMinX() const {
+    return areaMinX;
+  }
+
+  /**
+   * \brief Set the left bound of the custom object.
+   */
+  void SetAreaMinX(int areaMinX_) {
+    areaMinX = areaMinX_;
+  }
+
+  /**
+   * \brief Get the top bound of the custom object.
+   * 
+   * This is used only if there is any initial instances.
+   * 
+   * \see EventsBasedObject::GetInitialInstances
+   */
+  int GetAreaMinY() const {
+    return areaMinY;
+  }
+
+  /**
+   * \brief Set the top bound of the custom object.
+   */
+  void SetAreaMinY(int areaMinY_) {
+    areaMinY = areaMinY_;
+  }
+
+  /**
+   * \brief Get the min Z bound of the custom object.
+   * 
+   * This is used only if there is any initial instances.
+   * 
+   * \see EventsBasedObject::GetInitialInstances
+   */
+  int GetAreaMinZ() const {
+    return areaMinZ;
+  }
+
+  /**
+   * \brief Set the min Z bound of the custom object.
+   */
+  void SetAreaMinZ(int areaMinZ_) {
+    areaMinZ = areaMinZ_;
+  }
+
+  /**
+   * \brief Get the right bound of the custom object.
+   * 
+   * This is used only if there is any initial instances.
+   * 
+   * \see EventsBasedObject::GetInitialInstances
+   */
+  int GetAreaMaxX() const {
+    return areaMaxX;
+  }
+
+  /**
+   * \brief Set the right bound of the custom object.
+   */
+  void SetAreaMaxX(int areaMaxX_) {
+    areaMaxX = areaMaxX_;
+  }
+
+  /**
+   * \brief Get the bottom bound of the custom object.
+   * 
+   * This is used only if there is any initial instances.
+   * 
+   * \see EventsBasedObject::GetInitialInstances
+   */
+  int GetAreaMaxY() const {
+    return areaMaxY;
+  }
+
+  /**
+   * \brief Set the bottom bound of the custom object.
+   */
+  void SetAreaMaxY(int areaMaxY_) {
+    areaMaxY = areaMaxY_;
+  }
+
+  /**
+   * \brief Get the max Z bound of the custom object.
+   * 
+   * This is used only if there is any initial instances.
+   * 
+   * \see EventsBasedObject::GetInitialInstances
+   */
+  int GetAreaMaxZ() const {
+    return areaMaxZ;
+  }
+
+  /**
+   * \brief Set the bottom bound of the custom object.
+   */
+  void SetAreaMaxZ(int areaMaxZ_) {
+    areaMaxZ = areaMaxZ_;
+  }
   ///@}
 
   void SerializeTo(SerializerElement& element) const override;
@@ -174,6 +282,12 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
   gd::InitialInstancesContainer initialInstances;
   gd::LayersContainer layers;
   gd::ObjectsContainer objectsContainer;
+  double areaMinX;
+  double areaMinY;
+  double areaMinZ;
+  double areaMaxX;
+  double areaMaxY;
+  double areaMaxZ;
 };
 
 }  // namespace gd

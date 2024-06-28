@@ -15,7 +15,13 @@ EventsBasedObject::EventsBasedObject()
         gd::EventsFunctionsContainer::FunctionOwner::Object),
     isRenderedIn3D(false),
     isAnimatable(false),
-    isTextContainer(false) {
+    isTextContainer(false),
+    areaMinX(0),
+    areaMinY(0),
+    areaMinZ(0),
+    areaMaxX(64),
+    areaMaxY(64),
+    areaMaxZ(64) {
 }
 
 EventsBasedObject::~EventsBasedObject() {}
@@ -31,6 +37,12 @@ void EventsBasedObject::SerializeTo(SerializerElement& element) const {
   if (isTextContainer) {
     element.SetBoolAttribute("isTextContainer", true);
   }
+  element.SetIntAttribute("areaMinX", areaMinX);
+  element.SetIntAttribute("areaMinY", areaMinY);
+  element.SetIntAttribute("areaMinZ", areaMinZ);
+  element.SetIntAttribute("areaMaxX", areaMaxX);
+  element.SetIntAttribute("areaMaxY", areaMaxY);
+  element.SetIntAttribute("areaMaxZ", areaMaxZ);
 
   AbstractEventsBasedEntity::SerializeTo(element);
   objectsContainer.SerializeObjectsTo(element.AddChild("objects"));
@@ -46,6 +58,12 @@ void EventsBasedObject::UnserializeFrom(gd::Project& project,
   isRenderedIn3D = element.GetBoolAttribute("is3D", false);
   isAnimatable = element.GetBoolAttribute("isAnimatable", false);
   isTextContainer = element.GetBoolAttribute("isTextContainer", false);
+  areaMinX = element.GetIntAttribute("areaMinX", 0);
+  areaMinY = element.GetIntAttribute("areaMinY", 0);
+  areaMinZ = element.GetIntAttribute("areaMinZ", 0);
+  areaMaxX = element.GetIntAttribute("areaMaxX", 64);
+  areaMaxY = element.GetIntAttribute("areaMaxY", 64);
+  areaMaxZ = element.GetIntAttribute("areaMaxZ", 64);
 
   AbstractEventsBasedEntity::UnserializeFrom(project, element);
   objectsContainer.UnserializeObjectsFrom(project, element.GetChild("objects"));

@@ -22,6 +22,7 @@ import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/Even
 export type SceneEditorsDisplayProps = {|
   project: gdProject,
   layout: gdLayout | null,
+  eventsBasedObject: gdEventsBasedObject | null,
   layersContainer: gdLayersContainer,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
@@ -140,6 +141,7 @@ export type SceneEditorsDisplayInterface = {|
   |},
   startSceneRendering: (start: boolean) => void,
   instancesHandlers: {|
+    getContentAABB: () => Rectangle | null,
     getSelectionAABB: () => Rectangle,
     addInstances: (
       pos: [number, number],

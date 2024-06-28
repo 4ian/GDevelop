@@ -70,6 +70,7 @@ export type InstancesEditorShortcutsCallbacks = {|
 export type InstancesEditorPropsWithoutSizeAndScroll = {|
   project: gdProject,
   layout: gdLayout | null,
+  eventsBasedObject: gdEventsBasedObject | null,
   layersContainer: gdLayersContainer,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
@@ -168,7 +169,7 @@ export default class InstancesEditor extends Component<Props> {
     // project can be used here for initializing stuff, but don't keep references to it.
     // Instead, create editors in _mountEditorComponents (as they will be destroyed/recreated
     // if the project changes).
-    const { project, onMouseMove, onMouseLeave } = this.props;
+    const { onMouseMove, onMouseLeave } = this.props;
 
     this.keyboardShortcuts = new KeyboardShortcuts({
       shortcutCallbacks: {
@@ -351,9 +352,10 @@ export default class InstancesEditor extends Component<Props> {
     this.backgroundArea.addEventListener('panend', event => this._onPanEnd());
     this.uiPixiContainer.addChild(this.backgroundArea);
 
+    const areaRectangle = this.getAreaRectangle();
     this.viewPosition = new ViewPosition({
-      initialViewX: project ? project.getGameResolutionWidth() / 2 : 0,
-      initialViewY: project ? project.getGameResolutionHeight() / 2 : 0,
+      initialViewX: areaRectangle.centerX(),
+      initialViewY: areaRectangle.centerY(),
       width: this.props.width,
       height: this.props.height,
       instancesEditorSettings: this.props.instancesEditorSettings,
@@ -404,13 +406,19 @@ export default class InstancesEditor extends Component<Props> {
   _mountEditorComponents(props: Props) {
     //Remove and delete any existing editor component
     if (this.highlightedInstance) {
-      this.uiPixiContainer.removeChild(this.highlightedInstance.getPixiObject());
+      this.uiPixiContainer.removeChild(
+        this.highlightedInstance.getPixiObject()
+      );
     }
     if (this.selectedInstances) {
-      this.uiPixiContainer.removeChild(this.selectedInstances.getPixiContainer());
+      this.uiPixiContainer.removeChild(
+        this.selectedInstances.getPixiContainer()
+      );
     }
     if (this.instancesRenderer) {
-      this.uiPixiContainer.removeChild(this.instancesRenderer.getPixiContainer());
+      this.uiPixiContainer.removeChild(
+        this.instancesRenderer.getPixiContainer()
+      );
       this.instancesRenderer.delete();
     }
     if (this.selectionRectangle) {
@@ -485,7 +493,8 @@ export default class InstancesEditor extends Component<Props> {
     });
     this.windowBorder = new WindowBorder({
       project: props.project,
-      layout: props.layout || null,
+      layout: props.layout,
+      eventsBasedObject: props.eventsBasedObject,
       toCanvasCoordinates: this.viewPosition.toCanvasCoordinates,
     });
     this.windowMask = new WindowMask({
@@ -1092,12 +1101,12 @@ export default class InstancesEditor extends Component<Props> {
     return this.canvasArea.getBoundingClientRect();
   }
 
-  zoomToFitContent = () => {
+  getContentAABB = (): Rectangle | null => {
     const { initialInstances } = this.props;
-    if (initialInstances.getInstancesCount() === 0) return;
+    if (initialInstances.getInstancesCount() === 0) return null;
 
     const instanceMeasurer = this.instancesRenderer.getInstanceMeasurer();
-    let contentAABB: ?Rectangle;
+    let contentAABB: Rectangle | null = null;
     const getInstanceRectangle = new gd.InitialInstanceJSFunctor();
     // $FlowFixMe - invoke is not writable
     getInstanceRectangle.invoke = instancePtr => {
@@ -1120,18 +1129,39 @@ export default class InstancesEditor extends Component<Props> {
     // $FlowFixMe - JSFunctor is incompatible with Functor
     initialInstances.iterateOverInstances(getInstanceRectangle);
     getInstanceRectangle.delete();
+    return contentAABB;
+  };
+
+  zoomToFitContent = () => {
+    const contentAABB = this.getContentAABB();
     if (contentAABB) this.fitViewToRectangle(contentAABB, { adaptZoom: true });
   };
 
+  getAreaRectangle = (): Rectangle => {
+    const { eventsBasedObject, project } = this.props;
+    return eventsBasedObject
+      ? new Rectangle(
+          eventsBasedObject.getAreaMinX(),
+          eventsBasedObject.getAreaMinY(),
+          eventsBasedObject.getAreaMaxX(),
+          eventsBasedObject.getAreaMaxY()
+        )
+      : new Rectangle(
+          0,
+          0,
+          project.getGameResolutionWidth(),
+          project.getGameResolutionHeight()
+        );
+  };
+
   zoomToInitialPosition = () => {
-    const width = this.props.project.getGameResolutionWidth();
-    const height = this.props.project.getGameResolutionHeight();
-    const x = width / 2;
-    const y = height / 2;
+    const areaRectangle = this.getAreaRectangle();
     this.setZoomFactor(
-      getRecommendedInitialZoomFactor(Math.max(height, width))
+      getRecommendedInitialZoomFactor(
+        Math.max(areaRectangle.width(), areaRectangle.height())
+      )
     );
-    this.scrollTo(x, y);
+    this.scrollTo(areaRectangle.centerX(), areaRectangle.centerY());
   };
 
   zoomToFitSelection = (instances: Array<gdInitialInstance>) => {

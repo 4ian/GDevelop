@@ -14,6 +14,7 @@ import ObjectGroupEditorDialog from '../ObjectGroupEditor/ObjectGroupEditorDialo
 import InstancesSelection from '../InstancesEditor/InstancesSelection';
 import SetupGridDialog from './SetupGridDialog';
 import ScenePropertiesDialog from './ScenePropertiesDialog';
+import EventsBasedObjectScenePropertiesDialog from './EventsBasedObjectScenePropertiesDialog';
 import ExtractAsExternalLayoutDialog from './ExtractAsExternalLayoutDialog';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import MosaicEditorsDisplayToolbar from './MosaicEditorsDisplay/Toolbar';
@@ -98,6 +99,7 @@ const styles = {
 type Props = {|
   project: gdProject,
   layout: gdLayout | null,
+  eventsBasedObject: gdEventsBasedObject | null,
 
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
@@ -1275,7 +1277,13 @@ export default class SceneEditor extends React.Component<Props, State> {
     const { layout } = this.props;
 
     // TODO: context menu item for custom objects.
-    if (!layout) return [];
+    if (!layout)
+      return [
+        {
+          label: i18n._(t`Open scene properties`),
+          click: () => this.openSceneProperties(true),
+        },
+      ];
 
     return [
       {
@@ -1686,6 +1694,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     const {
       project,
       layout,
+      eventsBasedObject,
       initialInstances,
       resourceManagementProps,
       isActive,
@@ -1754,7 +1763,8 @@ export default class SceneEditor extends React.Component<Props, State> {
               <EditorsDisplay
                 ref={ref => (this.editorDisplay = ref)}
                 project={project}
-                layout={layout || null}
+                layout={layout}
+                eventsBasedObject={eventsBasedObject}
                 layersContainer={this.props.layersContainer}
                 globalObjectsContainer={this.props.globalObjectsContainer}
                 objectsContainer={this.props.objectsContainer}
@@ -2025,6 +2035,19 @@ export default class SceneEditor extends React.Component<Props, State> {
                   onEditVariables={() => this.editLayoutVariables(true)}
                   onOpenMoreSettings={this.props.onOpenMoreSettings}
                   resourceManagementProps={this.props.resourceManagementProps}
+                />
+              )}
+              {this.state.scenePropertiesDialogOpen && eventsBasedObject && (
+                <EventsBasedObjectScenePropertiesDialog
+                  project={project}
+                  eventsBasedObject={eventsBasedObject}
+                  onClose={() => this.openSceneProperties(false)}
+                  onApply={() => this.openSceneProperties(false)}
+                  getContentAABB={
+                    this.editorDisplay
+                      ? this.editorDisplay.instancesHandlers.getContentAABB
+                      : () => null
+                  }
                 />
               )}
               {!!this.state.layoutVariablesDialogOpen && layout && (

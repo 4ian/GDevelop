@@ -42,21 +42,6 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
 
   /** Functor used to render an instance */
   instancesRenderer: gdInitialInstanceJSFunctor;
-  _defaultWidth = 48;
-  _defaultHeight = 48;
-  _defaultDepth = 48;
-
-  /** Functor used to evaluate parent dimensions */
-  _instancesMeasurer: gdInitialInstanceJSFunctor;
-  /** Used to evaluate parent dimensions */
-  _temporaryAABB = {
-    minX: Number.MAX_VALUE,
-    minY: Number.MAX_VALUE,
-    minZ: Number.MAX_VALUE,
-    maxX: -Number.MAX_VALUE,
-    maxY: -Number.MAX_VALUE,
-    maxZ: -Number.MAX_VALUE,
-  };
 
   renderedInstances: { [number]: RenderedInstance | Rendered3DInstance } = {};
 
@@ -212,65 +197,6 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
           renderedInstance.wasUsed = true;
         }
       };
-      // Functor used to evaluate parent dimensions
-      this._instancesMeasurer = new gd.InitialInstanceJSFunctor();
-      // $FlowFixMe - invoke is not writable
-      this._instancesMeasurer.invoke = instancePtr => {
-        // $FlowFixMe - wrapPointer is not exposed
-        const instance: gdInitialInstance = gd.wrapPointer(
-          instancePtr,
-          gd.InitialInstance
-        );
-
-        const renderedInstance:
-          | RenderedInstance
-          | Rendered3DInstance
-          | null = this.getRendererOfInstance(instance);
-        if (!renderedInstance) return;
-
-        renderedInstance.wasUsed = true;
-
-        const pixiObject: PIXI.DisplayObject | null = renderedInstance.getPixiObject();
-        if (pixiObject) {
-          pixiObject.visible = false;
-        }
-
-        const x = renderedInstance._instance.getX();
-        const y = renderedInstance._instance.getY();
-        const z = renderedInstance._instance.getZ();
-        const width = renderedInstance.getWidth();
-        const height = renderedInstance.getHeight();
-        const depth = renderedInstance.getDepth();
-        const originX = renderedInstance.getOriginX();
-        const originY = renderedInstance.getOriginY();
-        const originZ = renderedInstance.getOriginZ();
-
-        this._temporaryAABB.minX = Math.min(
-          this._temporaryAABB.minX,
-          x - originX
-        );
-        this._temporaryAABB.minY = Math.min(
-          this._temporaryAABB.minY,
-          y - originY
-        );
-        this._temporaryAABB.minZ = Math.min(
-          this._temporaryAABB.minZ,
-          z - originZ
-        );
-        this._temporaryAABB.maxX = Math.max(
-          this._temporaryAABB.maxX,
-          x - originX + width
-        );
-        this._temporaryAABB.maxY = Math.max(
-          this._temporaryAABB.maxY,
-          y - originY + height
-        );
-        this._temporaryAABB.maxZ = Math.max(
-          this._temporaryAABB.maxZ,
-          z - originZ + depth
-        );
-      };
-      this._updateDimensions();
     } else {
       const childLayouts = getLayouts(
         eventBasedObject,
@@ -368,37 +294,6 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     return !!this.instancesRenderer;
   }
 
-  _updateDimensions() {
-    if (!this._isRenderedFromInitialInstances()) {
-      return;
-    }
-    const { eventBasedObject } = this;
-    if (!eventBasedObject) {
-      return;
-    }
-
-    this._temporaryAABB.minX = Number.MAX_VALUE;
-    this._temporaryAABB.minY = Number.MAX_VALUE;
-    this._temporaryAABB.minZ = Number.MAX_VALUE;
-    this._temporaryAABB.maxX = -Number.MAX_VALUE;
-    this._temporaryAABB.maxY = -Number.MAX_VALUE;
-    this._temporaryAABB.maxZ = -Number.MAX_VALUE;
-
-    eventBasedObject.getInitialInstances().iterateOverInstances(
-      // $FlowFixMe - gd.castObject is not supporting typings.
-      this._instancesMeasurer
-    );
-
-    const { minX, minY, minZ, maxX, maxY, maxZ } = this._temporaryAABB;
-
-    this._defaultWidth = maxX - minX;
-    this._defaultHeight = maxY - minY;
-    this._defaultDepth = maxZ - minZ;
-    this._proportionalOriginX = -minX / this._defaultWidth;
-    this._proportionalOriginY = -minY / this._defaultHeight;
-    this._proportionalOriginZ = -minZ / this._defaultDepth;
-  }
-
   /**
    * Remove rendered instances that are not associated to any instance anymore
    * (this can happen after an instance has been deleted).
@@ -436,9 +331,6 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     // Destroy the object iterating on instances
     if (this.instancesRenderer) {
       this.instancesRenderer.delete();
-    }
-    if (this._instancesMeasurer) {
-      this._instancesMeasurer.delete();
     }
 
     // Destroy the container.
@@ -523,7 +415,6 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     if (this._isRenderedFromInitialInstances()) {
       const { eventBasedObject } = this;
       if (eventBasedObject) {
-        this._updateDimensions();
         const layers = eventBasedObject.getLayers();
         for (
           let layerIndex = 0;
@@ -589,10 +480,13 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
         threeObject.scale.set(scaleX, scaleY, scaleZ);
       }
 
+      const { eventBasedObject } = this;
       const unscaledCenterX =
-        this.getDefaultWidth() * (0.5 - this._proportionalOriginX);
+        this.getDefaultWidth() / 2 +
+        (eventBasedObject ? eventBasedObject.getAreaMinX() : 0);
       const unscaledCenterY =
-        this.getDefaultHeight() * (0.5 - this._proportionalOriginY);
+        this.getDefaultHeight() / 2 +
+        (eventBasedObject ? eventBasedObject.getAreaMinY() : 0);
 
       this._pixiObject.pivot.x = unscaledCenterX;
       this._pixiObject.pivot.y = unscaledCenterY;
@@ -651,16 +545,22 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
   }
 
   getDefaultWidth() {
+    const { eventBasedObject } = this;
     return this._isRenderedFromInitialInstances()
-      ? this._defaultWidth
+      ? eventBasedObject
+        ? eventBasedObject.getAreaMaxX() - eventBasedObject.getAreaMinX()
+        : 48
       : this.childrenRenderedInstances.length > 0
       ? this.childrenRenderedInstances[0].getDefaultWidth()
       : 48;
   }
 
   getDefaultHeight() {
+    const { eventBasedObject } = this;
     return this._isRenderedFromInitialInstances()
-      ? this._defaultHeight
+      ? eventBasedObject
+        ? eventBasedObject.getAreaMaxY() - eventBasedObject.getAreaMinY()
+        : 48
       : this.childrenRenderedInstances.length > 0
       ? this.childrenRenderedInstances[0].getDefaultHeight()
       : 48;
@@ -668,7 +568,10 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
 
   getDefaultDepth() {
     if (this._isRenderedFromInitialInstances()) {
-      return this._defaultDepth;
+      const { eventBasedObject } = this;
+      return eventBasedObject
+        ? eventBasedObject.getAreaMaxZ() - eventBasedObject.getAreaMinZ()
+        : 48;
     }
     const firstInstance = this.childrenRenderedInstances[0];
     return firstInstance && firstInstance instanceof Rendered3DInstance
@@ -677,15 +580,36 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
   }
 
   getOriginX(): number {
-    return this._proportionalOriginX * this.getWidth();
+    const { eventBasedObject } = this;
+    return (
+      (this._isRenderedFromInitialInstances()
+        ? eventBasedObject
+          ? -eventBasedObject.getAreaMinX() / this.getDefaultWidth()
+          : 0
+        : this._proportionalOriginX) * this.getWidth()
+    );
   }
 
   getOriginY(): number {
-    return this._proportionalOriginY * this.getHeight();
+    const { eventBasedObject } = this;
+    return (
+      (this._isRenderedFromInitialInstances()
+        ? eventBasedObject
+          ? -eventBasedObject.getAreaMinY() / this.getDefaultHeight()
+          : 0
+        : this._proportionalOriginY) * this.getHeight()
+    );
   }
 
   getOriginZ(): number {
-    return this._proportionalOriginZ * this.getDepth();
+    const { eventBasedObject } = this;
+    return (
+      (this._isRenderedFromInitialInstances()
+        ? eventBasedObject
+          ? -eventBasedObject.getAreaMinZ() / this.getDefaultDepth()
+          : 0
+        : this._proportionalOriginZ) * this.getDepth()
+    );
   }
 
   getCenterX() {

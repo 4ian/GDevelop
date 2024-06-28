@@ -4,6 +4,7 @@ import * as PIXI from 'pixi.js-legacy';
 type Props = {
   width: number,
   height: number,
+  layout: gdLayout | null,
 };
 
 export default class Background {
@@ -15,6 +16,7 @@ export default class Background {
       width,
       height
     );
+    this._checkeredBackground.tint = 0x444444;
     this._checkeredBackground.visible = !layout;
   }
 

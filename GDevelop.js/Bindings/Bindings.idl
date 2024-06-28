@@ -2829,6 +2829,18 @@ interface EventsBasedObject {
     [Ref] InitialInstancesContainer GetInitialInstances();
     [Ref] LayersContainer GetLayers();
     [Ref] ObjectsContainer GetObjects();
+    double GetAreaMinX();
+    double GetAreaMinY();
+    double GetAreaMinZ();
+    double GetAreaMaxX();
+    double GetAreaMaxY();
+    double GetAreaMaxZ();
+    void SetAreaMinX(double value);
+    void SetAreaMinY(double value);
+    void SetAreaMinZ(double value);
+    void SetAreaMaxX(double value);
+    void SetAreaMaxY(double value);
+    void SetAreaMaxZ(double value);
 
     [Const, Value] DOMString STATIC_GetPropertyActionName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetPropertyConditionName([Const] DOMString propertyName);
@@ -2845,8 +2857,8 @@ interface EventsBasedObjectsList {
     [Ref] EventsBasedObject GetAt(unsigned long pos);
     void Remove([Const] DOMString name);
     void Move(unsigned long oldIndex, unsigned long newIndex);
-    unsigned long GetCount();
-    unsigned long GetPosition([Const, Ref] EventsBasedObject item);
+    long GetCount();
+    long GetPosition([Const, Ref] EventsBasedObject item);
 
     unsigned long size();
     [Ref] EventsBasedObject at(unsigned long index);

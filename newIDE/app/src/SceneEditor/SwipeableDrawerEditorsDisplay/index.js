@@ -58,6 +58,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
   const {
     project,
     layout,
+    eventsBasedObject,
     layersContainer,
     globalObjectsContainer,
     objectsContainer,
@@ -186,6 +187,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
         getViewPosition: editor ? editor.getViewPosition : noop,
       },
       instancesHandlers: {
+        getContentAABB: editor ? editor.getContentAABB : () => null,
         getSelectionAABB: editor
           ? editor.selectedInstances.getSelectionAABB
           : () => new Rectangle(),
@@ -242,6 +244,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
               width={width}
               project={project}
               layout={layout}
+              eventsBasedObject={eventsBasedObject}
               globalObjectsContainer={globalObjectsContainer}
               objectsContainer={objectsContainer}
               layersContainer={layersContainer}

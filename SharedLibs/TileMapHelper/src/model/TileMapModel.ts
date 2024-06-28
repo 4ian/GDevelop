@@ -410,7 +410,9 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
       id: this.id,
       alpha: this._alpha,
       tiles: this._tiles.map((row, y) =>
-        row.map((_, x) => this.getTileGID(x, y))
+        // Array.from is needed to convert Int32Array to Array. Otherwise, JSON.stringify
+        // serializes it as an object with index as keys.
+        Array.from(row.map((_, x) => this.getTileGID(x, y)))
       ),
     };
   }

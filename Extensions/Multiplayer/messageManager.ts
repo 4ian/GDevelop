@@ -1329,9 +1329,11 @@ namespace gdjs {
     const createCustomMessage = ({
       userMessageName,
       userMessageData,
+      senderPlayerNumber,
     }: {
       userMessageName: string;
       userMessageData: any;
+      senderPlayerNumber: number;
     }) => {
       const messageId = gdjs.makeUuid();
       return {
@@ -1339,6 +1341,7 @@ namespace gdjs {
         messageData: {
           data: userMessageData,
           uniqueId: messageId,
+          senderPlayerNumber, // We send the player number, so that other players who are not connected to us can know who sent the message.
         },
       };
     };
@@ -1358,9 +1361,11 @@ namespace gdjs {
       userMessageData: any // can be a simple string message or a serialized variable.
     ) => {
       const connectedPeerIds = gdjs.evtTools.p2p.getAllPeers();
+      const currentPlayerNumber = gdjs.multiplayer.getCurrentPlayerNumber();
       const { messageName, messageData } = createCustomMessage({
         userMessageName,
         userMessageData,
+        senderPlayerNumber: currentPlayerNumber,
       });
       const acknowledgmentMessageName = createAcknowledgeCustomMessageNameFromCustomMessage(
         messageName
@@ -1477,19 +1482,23 @@ namespace gdjs {
       variable.fromJSObject(data);
     };
 
-    const getCustomMessageSender = (userMessageName: string) => {
+    const getCustomMessageSender = (userMessageName: string): number => {
       const customMessageName = getCustomMessageNameFromUserMessageName(
         userMessageName
       );
-      const messageSenderPeerId = gdjs.evtTools.p2p.getEventSender(
-        customMessageName
-      );
-      const messageSenderPlayerNumber =
-        _peerIdToPlayerNumber[messageSenderPeerId];
-      if (messageSenderPlayerNumber === undefined) {
+      const messageData = gdjs.evtTools.p2p.getEventData(customMessageName);
+
+      let data;
+      try {
+        data = JSON.parse(messageData);
+      } catch (e) {
+        logger.error(
+          `Error while parsing message ${userMessageName}: ${e.toString()}`
+        );
         return 0;
       }
-      return messageSenderPlayerNumber;
+
+      return data.senderPlayerNumber;
     };
 
     const handleCustomMessagesReceived = (): void => {

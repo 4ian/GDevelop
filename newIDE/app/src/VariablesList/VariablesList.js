@@ -54,7 +54,9 @@ import {
   getMovementTypeWithinVariablesContainer,
   getOldestAncestryVariable,
   getNodeIdFromVariableName,
+  getNodeIdFromVariableContext,
   getVariableContextFromNodeId,
+  getParentVariableContext,
   inheritedPrefix,
   isAnAncestryOf,
   separator,
@@ -102,7 +104,7 @@ type Props = {|
   variablesContainer: gdVariablesContainer,
   areObjectVariables?: boolean,
   inheritedVariablesContainer?: gdVariablesContainer,
-  initiallySelectedVariableName?: string,
+  initiallySelectedVariableName?: ?string,
   /** Callback executed at mount to compute suggestions. */
   onComputeAllVariableNames?: () => Array<string>,
   /** To specify if history should be handled by parent. */
@@ -530,32 +532,6 @@ const VariablesList = (props: Props) => {
     })
   );
 
-  const [searchText, setSearchText] = React.useState<string>('');
-  const { onComputeAllVariableNames, onSelectedVariableChange } = props;
-  const allVariablesNames = React.useMemo<?Array<string>>(
-    () => (onComputeAllVariableNames ? onComputeAllVariableNames() : null),
-    [onComputeAllVariableNames]
-  );
-  // TODO Scroll to the initially selected variable and focus on the name.
-  const [selectedNodes, doSetSelectedNodes] = React.useState<Array<string>>(
-    props.initiallySelectedVariableName &&
-      props.variablesContainer.has(props.initiallySelectedVariableName)
-      ? [getNodeIdFromVariableName(props.initiallySelectedVariableName)]
-      : []
-  );
-  const setSelectedNodes = React.useCallback(
-    (nodes: Array<string> | ((nodes: Array<string>) => Array<string>)) => {
-      doSetSelectedNodes(selectedNodes => {
-        const newNodes = Array.isArray(nodes) ? nodes : nodes(selectedNodes);
-        if (onSelectedVariableChange) {
-          onSelectedVariableChange(newNodes);
-        }
-        return newNodes;
-      });
-    },
-    [onSelectedVariableChange]
-  );
-
   const [searchMatchingNodes, setSearchMatchingNodes] = React.useState<
     Array<string>
   >([]);
@@ -573,6 +549,48 @@ const VariablesList = (props: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const draggedNodeId = React.useRef<?string>(null);
   const forceUpdate = useForceUpdate();
+
+  const [searchText, setSearchText] = React.useState<string>('');
+  const { onComputeAllVariableNames, onSelectedVariableChange } = props;
+  const allVariablesNames = React.useMemo<?Array<string>>(
+    () => (onComputeAllVariableNames ? onComputeAllVariableNames() : null),
+    [onComputeAllVariableNames]
+  );
+  const [selectedNodes, doSetSelectedNodes] = React.useState<Array<string>>(
+    () => {
+      if (!props.initiallySelectedVariableName) {
+        return [];
+      }
+      let variableContext = getVariableContextFromNodeId(
+        getNodeIdFromVariableName(props.initiallySelectedVariableName),
+        props.variablesContainer
+      );
+      // When a child-variable is not declared, its direct parent is used.
+      if (!variableContext.variable) {
+        variableContext = getParentVariableContext(variableContext);
+      }
+      if (variableContext.variable) {
+        // TODO Add ref to child-variables to allow to focus them.
+        refocusNameField({ identifier: variableContext.variable.ptr });
+      }
+      const initialSelectedNodeId = variableContext.variable
+        ? getNodeIdFromVariableContext(variableContext)
+        : null;
+      return initialSelectedNodeId ? [initialSelectedNodeId] : [];
+    }
+  );
+  const setSelectedNodes = React.useCallback(
+    (nodes: Array<string> | ((nodes: Array<string>) => Array<string>)) => {
+      doSetSelectedNodes(selectedNodes => {
+        const newNodes = Array.isArray(nodes) ? nodes : nodes(selectedNodes);
+        if (onSelectedVariableChange) {
+          onSelectedVariableChange(newNodes);
+        }
+        return newNodes;
+      });
+    },
+    [onSelectedVariableChange]
+  );
 
   const triggerSearch = React.useCallback(
     () => {

@@ -3566,6 +3566,7 @@ interface PreviewExportOptions {
     [Ref] PreviewExportOptions UseWindowMessageDebuggerClient();
     [Ref] PreviewExportOptions SetLayoutName([Const] DOMString layoutName);
     [Ref] PreviewExportOptions SetFallbackAuthor([Const] DOMString id, [Const] DOMString username);
+    [Ref] PreviewExportOptions SetAuthenticatedPlayer([Const] DOMString playerId, [Const] DOMString playerUsername, [Const] DOMString playerToken);
     [Ref] PreviewExportOptions SetExternalLayoutName([Const] DOMString externalLayoutName);
     [Ref] PreviewExportOptions SetIncludeFileHash([Const] DOMString includeFile, long hash);
     [Ref] PreviewExportOptions SetProjectDataOnlyExport(boolean enable);

@@ -65,6 +65,14 @@ namespace gdjs {
     allowAuthenticationUsingIframeForPreview?: boolean;
 
     /**
+     * If set, this data is used to authenticate automatically when launching the game.
+     * This is only useful during previews.
+     */
+    playerUsername?: string;
+    playerId?: string;
+    playerToken?: string;
+
+    /**
      * If set, the game should use the specified environment for making calls
      * to GDevelop APIs ("dev" = development APIs).
      */

@@ -2729,6 +2729,7 @@ export class PreviewExportOptions extends EmscriptenObject {
   useWindowMessageDebuggerClient(): PreviewExportOptions;
   setLayoutName(layoutName: string): PreviewExportOptions;
   setFallbackAuthor(id: string, username: string): PreviewExportOptions;
+  setAuthenticatedPlayer(playerId: string, playerUsername: string, playerToken: string): PreviewExportOptions;
   setExternalLayoutName(externalLayoutName: string): PreviewExportOptions;
   setIncludeFileHash(includeFile: string, hash: number): PreviewExportOptions;
   setProjectDataOnlyExport(enable: boolean): PreviewExportOptions;

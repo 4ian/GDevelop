@@ -181,6 +181,13 @@ export default class BrowserS3PreviewLauncher extends React.Component<
           previewOptions.fallbackAuthor.username
         );
       }
+      if (previewOptions.authenticatedPlayer) {
+        previewExportOptions.setAuthenticatedPlayer(
+          previewOptions.authenticatedPlayer.playerId,
+          previewOptions.authenticatedPlayer.playerUsername,
+          previewOptions.authenticatedPlayer.playerToken
+        );
+      }
 
       // The token, if any, to be used to read resources on GDevelop Cloud buckets.
       const gdevelopResourceToken = getGDevelopResourceJwtToken();

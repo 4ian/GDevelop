@@ -256,6 +256,13 @@ export default class LocalPreviewLauncher extends React.Component<
                 previewOptions.fallbackAuthor.username
               );
             }
+            if (previewOptions.authenticatedPlayer) {
+              previewExportOptions.setAuthenticatedPlayer(
+                previewOptions.authenticatedPlayer.playerId,
+                previewOptions.authenticatedPlayer.playerUsername,
+                previewOptions.authenticatedPlayer.playerToken
+              );
+            }
 
             exporter.exportProjectForPixiPreview(previewExportOptions);
             previewExportOptions.delete();

@@ -14,6 +14,7 @@ type Props = {|
   hotReloadPreviewButtonProps?: ?HotReloadPreviewButtonProps,
   isGlobalTabInitiallyOpen?: boolean,
   initiallySelectedVariableName?: string,
+  shouldCreateInitiallySelectedVariable?: boolean,
 |};
 
 const GlobalAndSceneVariablesDialog = ({
@@ -24,6 +25,7 @@ const GlobalAndSceneVariablesDialog = ({
   hotReloadPreviewButtonProps,
   isGlobalTabInitiallyOpen,
   initiallySelectedVariableName,
+  shouldCreateInitiallySelectedVariable,
 }: Props) => {
   const {
     project,
@@ -119,6 +121,9 @@ const GlobalAndSceneVariablesDialog = ({
         isGlobalTabInitiallyOpen ? 'global-variables' : 'scene-variables'
       }
       initiallySelectedVariableName={initiallySelectedVariableName}
+      shouldCreateInitiallySelectedVariable={
+        shouldCreateInitiallySelectedVariable
+      }
       helpPagePath={'/all-features/variables/scene-variables'}
       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
       preventRefactoringToDeleteInstructions={true}

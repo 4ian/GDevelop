@@ -12,6 +12,7 @@ type Props = {|
   onApply: (selectedVariableName: string | null) => void,
   onCancel: () => void,
   initiallySelectedVariableName: string,
+  shouldCreateInitiallySelectedVariable?: boolean,
 |};
 
 const LocalVariablesDialog = ({
@@ -22,6 +23,7 @@ const LocalVariablesDialog = ({
   onCancel,
   onApply,
   initiallySelectedVariableName,
+  shouldCreateInitiallySelectedVariable,
 }: Props) => {
   const tabs = React.useMemo(
     () => [
@@ -48,6 +50,9 @@ const LocalVariablesDialog = ({
       preventRefactoringToDeleteInstructions
       id="local-variables-dialog"
       initiallySelectedVariableName={initiallySelectedVariableName}
+      shouldCreateInitiallySelectedVariable={
+        shouldCreateInitiallySelectedVariable
+      }
     />
   );
 };

@@ -855,9 +855,9 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
                   "CppPlatform/Extensions/platformicon.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformBehavior")
-        .AddParameter(
-            "string",
-            _("Platform type (\"Platform\", \"Jumpthru\" or \"Ladder\")"))
+        .AddParameter("stringWithSelector",
+              _("Platform type"),
+              "[\"Platform\",\"Jumpthru\",\"Ladder\"]");
         .MarkAsAdvanced()
         .SetFunctionName("ChangePlatformType");
   }

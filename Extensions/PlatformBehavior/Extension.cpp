@@ -857,7 +857,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PlatformBehavior")
         .AddParameter("stringWithSelector",
               _("Platform type"),
-              "[\"Platform\",\"Jumpthru\",\"Ladder\"]");
+              "[\"Platform\",\"Jumpthru\",\"Ladder\"]")
         .MarkAsAdvanced()
         .SetFunctionName("ChangePlatformType");
   }

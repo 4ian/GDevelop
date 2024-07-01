@@ -58,6 +58,7 @@ struct GD_CORE_API ExpressionParserError {
     MalformedObjectParameter,
     UnknownParameterType,
     MissingBehavior,
+    VariableNameCollision,
   };
 
   ExpressionParserError(gd::ExpressionParserError::ErrorType type_,

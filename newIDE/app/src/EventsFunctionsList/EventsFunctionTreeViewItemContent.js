@@ -57,7 +57,11 @@ export type EventsFunctionCallbacks = {|
     eventsBasedObject: ?gdEventsBasedObject,
     (parameters: ?EventsFunctionCreationParameters) => void
   ) => void,
-  onEventsFunctionAdded: (eventsFunction: gdEventsFunction) => void,
+  onEventsFunctionAdded: (
+    eventsFunction: gdEventsFunction,
+    eventsBasedBehavior: ?gdEventsBasedBehavior,
+    eventsBasedObject: ?gdEventsBasedObject
+  ) => void,
 |};
 
 export type EventFunctionCommonProps = {|
@@ -429,7 +433,11 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
       project
     );
     newEventsFunction.setName(newName);
-    this.props.onEventsFunctionAdded(newEventsFunction);
+    this.props.onEventsFunctionAdded(
+      newEventsFunction,
+      this.props.eventsBasedBehavior,
+      this.props.eventsBasedObject
+    );
 
     this._onEventsFunctionModified();
     this.props.onSelectEventsFunction(

@@ -39,6 +39,8 @@ import SceneVariableIcon from '../../UI/CustomSvgIcons/SceneVariable';
 import ObjectVariableIcon from '../../UI/CustomSvgIcons/ObjectVariable';
 import LocalVariableIcon from '../../UI/CustomSvgIcons/LocalVariable';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
+import Link from '../../UI/Link';
+import Add from '../../UI/CustomSvgIcons/Add';
 
 const gd: libGDevelop = global.gd;
 
@@ -239,6 +241,31 @@ export default React.forwardRef<Props, VariableFieldInterface>(
       [updateAutocompletions]
     );
 
+    const openVariableEditor = React.useCallback(
+      () => {
+        if (!onOpenDialog) {
+          return;
+        }
+        // Access to the input directly because the value
+        // may not have been sent to onChange yet.
+        const fieldCurrentValue = field.current
+          ? field.current.getInputValue()
+          : value;
+        const isRootVariableDeclared =
+          variablesContainers &&
+          variablesContainers.some(variablesContainer =>
+            variablesContainer.has(getRootVariableName(fieldCurrentValue))
+          );
+
+        onChange(fieldCurrentValue);
+        onOpenDialog({
+          variableName: fieldCurrentValue,
+          shouldCreate: !isRootVariableDeclared,
+        });
+      },
+      [onChange, onOpenDialog, value, variablesContainers]
+    );
+
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
       : undefined;
@@ -271,7 +298,10 @@ export default React.forwardRef<Props, VariableFieldInterface>(
         quicklyAnalysisResult ===
           VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE ? (
         <Trans>
-          This variable is not declared. Use the *variables editor* to add it.
+          This variable does not exist.{' '}
+          <Link onClick={openVariableEditor} href="#">
+            Click to add it.
+          </Link>
         </Trans>
       ) : null;
     const warningTranslatableText =
@@ -302,31 +332,6 @@ export default React.forwardRef<Props, VariableFieldInterface>(
       !errorText &&
       value;
 
-    const openVariableEditor = React.useCallback(
-      () => {
-        if (!onOpenDialog) {
-          return;
-        }
-        // Access to the input directly because the value
-        // may not have been sent to onChange yet.
-        const fieldCurrentValue = field.current
-          ? field.current.getInputValue()
-          : value;
-        const isRootVariableDeclared =
-          variablesContainers &&
-          variablesContainers.some(variablesContainer =>
-            variablesContainer.has(getRootVariableName(fieldCurrentValue))
-          );
-
-        onChange(fieldCurrentValue);
-        onOpenDialog({
-          variableName: fieldCurrentValue,
-          shouldCreate: !isRootVariableDeclared,
-        });
-      },
-      [onChange, onOpenDialog, value, variablesContainers]
-    );
-
     return (
       <I18n>
         {({ i18n }) => (
@@ -356,6 +361,7 @@ export default React.forwardRef<Props, VariableFieldInterface>(
                           translatableValue: t`Add or edit variables...`,
                           text: '',
                           value: '',
+                          renderIcon: () => <Add />,
                           onClick: openVariableEditor,
                         }
                       : null,

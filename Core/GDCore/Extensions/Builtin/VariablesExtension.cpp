@@ -231,8 +231,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
             "it is a text (string)."),
           _("Arrays and structures"),
           "res/actions/var.png")
-      .AddParameter("variable", _("Array variable"))
-      .SetRelevantForLayoutEventsOnly();
+      .AddParameter("variable", _("Array variable"));
 
   extension
       .AddExpression(
@@ -242,8 +241,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
             "it is a number."),
           _("Arrays and structures"),
           "res/actions/var.png")
-      .AddParameter("variable", _("Array variable"))
-      .SetRelevantForLayoutEventsOnly();
+      .AddParameter("variable", _("Array variable"));
 
   extension
       .AddStrExpression(
@@ -253,8 +251,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
             "it is a text (string)."),
           _("Arrays and structures"),
           "res/actions/var.png")
-      .AddParameter("variable", _("Array variable"))
-      .SetRelevantForLayoutEventsOnly();
+      .AddParameter("variable", _("Array variable"));
 
   extension
       .AddExpression(
@@ -264,8 +261,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
             "it is a number."),
           _("Arrays and structures"),
           "res/actions/var.png")
-      .AddParameter("variable", _("Array variable"))
-      .SetRelevantForLayoutEventsOnly();
+      .AddParameter("variable", _("Array variable"));
 
   // Legacy instructions
 
@@ -839,7 +835,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                      _("Number of children"),
                      _("Number of children in a scene array or "
                        "structure variable"),
-                     _("External variables/Scene variables/Arrays and structures"),
+                     _("Arrays and structures"),
                      "res/actions/var.png")
       .AddParameter("variable", _("Array or structure variable"), "AllowUndeclaredVariable");
 

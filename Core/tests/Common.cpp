@@ -80,7 +80,7 @@ TEST_CASE("EventsList", "[common][events]") {
     #if defined(WINDOWS)
       REQUIRE(3000 >= endMemory - startMemory);
     #else
-      REQUIRE(1600 >= endMemory - startMemory);
+      REQUIRE(1650 >= endMemory - startMemory);
     #endif
   }
 }

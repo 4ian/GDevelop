@@ -101,17 +101,19 @@ namespace gdjs {
       }, this._timeBeforeDestroyingObjectWithoutNetworkIdInMs);
     }
 
-    private _sendDataToPeersWithIncreasedClock(
+    private _sendDataToPeersWithIncreasedClock = async (
       messageName: string,
       data: Object
-    ) {
+    ) => {
       this._clock++;
       data['_clock'] = this._clock;
-      const connectedPeerIds = gdjs.evtTools.p2p.getAllPeers();
-      for (const peerId of connectedPeerIds) {
-        gdjs.multiplayerMessageManager.sendDataTo(peerId, messageName, data);
-      }
-    }
+      const connectedPeerIds = gdjs.multiplayerPeerJsHelper.getAllPeers();
+      await gdjs.multiplayerMessageManager.sendDataTo(
+        connectedPeerIds,
+        messageName,
+        data
+      );
+    };
 
     private _isOwnerAsPlayerOrHost() {
       const currentPlayerNumber = gdjs.multiplayer.getCurrentPlayerNumber();
@@ -453,7 +455,7 @@ namespace gdjs {
       // If we are player 1, we are connected to everyone, so we expect an acknowledgment from everyone.
       // If we are another player, we are only connected to player 1, so we expect an acknowledgment from player 1.
       // In both cases, this represents the list of peers the current user is connected to.
-      const otherPeerIds = gdjs.evtTools.p2p.getAllPeers();
+      const otherPeerIds = gdjs.multiplayerPeerJsHelper.getAllPeers();
       const {
         messageName: destroyMessageName,
         messageData: destroyMessageData,
@@ -563,7 +565,7 @@ namespace gdjs {
       // If we are another player, we are only connected to player 1, so we expect an acknowledgment from player 1.
       // In both cases, this represents the list of peers the current user is connected to.
       if (newObjectPlayerNumber === currentPlayerNumber) {
-        const otherPeerIds = gdjs.evtTools.p2p.getAllPeers();
+        const otherPeerIds = gdjs.multiplayerPeerJsHelper.getAllPeers();
         const changeOwnerAcknowledgedMessageName = gdjs.multiplayerMessageManager.createInstanceOwnerChangedMessageNameFromChangeInstanceOwnerMessage(
           messageName
         );
@@ -586,6 +588,9 @@ namespace gdjs {
       // If we are the new owner, also send directly an update of the position,
       // so that the object is immediately moved on the screen and we don't wait for the next tick.
       if (newObjectPlayerNumber === currentPlayerNumber) {
+        debugLogger.info(
+          'Sending update message to move the object immediately.'
+        );
         const objectNetworkSyncData = this.owner.getNetworkSyncData();
         const {
           messageName: updateMessageName,

@@ -48,7 +48,7 @@ type Props = {|
   project: gdProject,
   layout?: ?gdLayout,
   objectsContainer: gdObjectsContainer,
-  globalObjectsContainer: gdObjectsContainer,
+  globalObjectsContainer: gdObjectsContainer | null,
   layersContainer: gdLayersContainer,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   instances: Array<gdInitialInstance>,
@@ -133,7 +133,7 @@ const CompactInstancePropertiesEditor = ({
         associatedObjectName
       );
       const properties = instance.getCustomProperties(
-        globalObjectsContainer,
+        globalObjectsContainer || objectsContainer,
         objectsContainer
       );
       if (!object) return { object: undefined, instanceSchema: undefined };
@@ -146,14 +146,14 @@ const CompactInstancePropertiesEditor = ({
         properties,
         (instance: gdInitialInstance) =>
           instance.getCustomProperties(
-            globalObjectsContainer,
+            globalObjectsContainer || objectsContainer,
             objectsContainer
           ),
         (instance: gdInitialInstance, name, value) =>
           instance.updateCustomProperty(
             name,
             value,
-            globalObjectsContainer,
+            globalObjectsContainer || objectsContainer,
             objectsContainer
           )
       );

@@ -352,8 +352,9 @@ const MosaicEditorsDisplay = React.forwardRef<
                 ObjectsRenderingService
               )}
               project={project}
-              objectsContainer={objectsContainer}
               layout={layout}
+              globalObjectsContainer={globalObjectsContainer}
+              objectsContainer={objectsContainer}
               initialInstances={initialInstances}
               onSelectAllInstancesOfObjectInLayout={
                 props.onSelectAllInstancesOfObjectInLayout
@@ -399,7 +400,10 @@ const MosaicEditorsDisplay = React.forwardRef<
           {({ i18n }) => (
             <ObjectGroupsList
               ref={objectGroupsListRef}
-              globalObjectGroups={globalObjectsContainer.getObjectGroups()}
+              globalObjectGroups={
+                globalObjectsContainer &&
+                globalObjectsContainer.getObjectGroups()
+              }
               objectGroups={objectsContainer.getObjectGroups()}
               onEditGroup={props.onEditObjectGroup}
               onDeleteGroup={props.onDeleteObjectGroup}

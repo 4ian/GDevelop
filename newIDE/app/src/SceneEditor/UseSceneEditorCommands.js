@@ -7,7 +7,7 @@ import useLayersListCommands from '../LayersList/UseLayersListCommands';
 type Props = {|
   project: gdProject,
   layersContainer: gdLayersContainer,
-  globalObjectsContainer: gdObjectsContainer,
+  globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
   onEditObject: (object: gdObject) => void,
   onEditObjectVariables: (object: gdObject) => void,

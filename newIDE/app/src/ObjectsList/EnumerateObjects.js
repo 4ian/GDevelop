@@ -54,7 +54,7 @@ export const isSameObjectWithContext = (
 
 // TODO: support only a single list
 export const enumerateObjects = (
-  project: gdObjectsContainer,
+  globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
   filters: ?{| type?: string, names?: Array<string> |}
 ) => {
@@ -62,9 +62,10 @@ export const enumerateObjects = (
   const namesFilter = (filters && filters.names) || null;
   const filterObjectByType = typeFilter
     ? (object: gdObject): boolean => {
+        // TODO Use ProjectScopedContainers to get the object type
         return (
           gd.getTypeOfObject(
-            project,
+            globalObjectsContainer || objectsContainer,
             objectsContainer,
             object.getName(),
             false
@@ -97,10 +98,10 @@ export const enumerateObjects = (
     .map((object: gdObject): ObjectWithContext => ({ object, global: false }));
 
   const projectObjectsList: ObjectWithContextList =
-    project === objectsContainer
+    globalObjectsContainer === objectsContainer || !globalObjectsContainer
       ? []
-      : mapFor(0, project.getObjectsCount(), i => {
-          const object = project.getObjectAt(i);
+      : mapFor(0, globalObjectsContainer.getObjectsCount(), i => {
+          const object = globalObjectsContainer.getObjectAt(i);
           if (filterObjectByType && !filterObjectByType(object)) {
             return null;
           }
@@ -205,16 +206,17 @@ export const enumerateGroups = (
 };
 
 export const enumerateObjectsAndGroups = (
-  globalObjectsContainer: gdObjectsContainer,
+  globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
   objectType: ?string = undefined,
   requiredBehaviorTypes?: Array<string> = []
 ) => {
+  // TODO Use ProjectScopedContainers to get object types and behavior names.
   const filterObject = (object: gdObject): boolean => {
     return (
       (!objectType ||
         gd.getTypeOfObject(
-          globalObjectsContainer,
+          globalObjectsContainer || objectsContainer,
           objectsContainer,
           object.getName(),
           false
@@ -223,7 +225,7 @@ export const enumerateObjectsAndGroups = (
         requiredBehaviorType =>
           gd
             .getBehaviorNamesInObjectOrGroup(
-              globalObjectsContainer,
+              globalObjectsContainer || objectsContainer,
               objectsContainer,
               object.getName(),
               requiredBehaviorType,
@@ -237,7 +239,7 @@ export const enumerateObjectsAndGroups = (
     return (
       (!objectType ||
         gd.getTypeOfObject(
-          globalObjectsContainer,
+          globalObjectsContainer || objectsContainer,
           objectsContainer,
           group.getName(),
           true
@@ -246,7 +248,7 @@ export const enumerateObjectsAndGroups = (
         behaviorType =>
           gd
             .getBehaviorNamesInObjectOrGroup(
-              globalObjectsContainer,
+              globalObjectsContainer || objectsContainer,
               objectsContainer,
               group.getName(),
               behaviorType,
@@ -273,7 +275,7 @@ export const enumerateObjectsAndGroups = (
     .map(group => ({ group, global: false }));
 
   const projectObjectsList: ObjectWithContextList =
-    globalObjectsContainer === objectsContainer
+    globalObjectsContainer === objectsContainer || !globalObjectsContainer
       ? []
       : mapFor(0, globalObjectsContainer.getObjectsCount(), i =>
           globalObjectsContainer.getObjectAt(i)
@@ -281,11 +283,10 @@ export const enumerateObjectsAndGroups = (
           .filter(filterObject)
           .map(object => ({ object, global: true }));
 
-  const projectGroups = globalObjectsContainer.getObjectGroups();
   const projectGroupsList: GroupWithContextList =
-    globalObjectsContainer === objectsContainer
+    globalObjectsContainer === objectsContainer || !globalObjectsContainer
       ? []
-      : enumerateGroups(projectGroups)
+      : enumerateGroups(globalObjectsContainer.getObjectGroups())
           .filter(filterGroup)
           .map(group => ({ group, global: true }));
 

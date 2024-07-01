@@ -7,7 +7,7 @@ import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService
 
 const generateLayoutObjectsOptions = (
   project: gdProject,
-  globalObjectsContainer: gdObjectsContainer,
+  globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
   onChoose: (object: gdObject, arg: ?string) => void,
   onChooseArg: ?string
@@ -27,7 +27,7 @@ const generateLayoutObjectsOptions = (
 
 type Props = {|
   project: gdProject,
-  globalObjectsContainer: gdObjectsContainer,
+  globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
   onEditObject: (object: gdObject, initialTab: ?string) => void,
   onEditObjectVariables: (object: gdObject) => void,

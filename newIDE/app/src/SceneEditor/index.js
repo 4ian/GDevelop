@@ -101,7 +101,7 @@ type Props = {|
   layout: gdLayout | null,
   eventsBasedObject: gdEventsBasedObject | null,
 
-  globalObjectsContainer: gdObjectsContainer,
+  globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
   layersContainer: gdLayersContainer,
   initialInstances: gdInitialInstancesContainer,
@@ -491,7 +491,10 @@ export default class SceneEditor extends React.Component<Props, State> {
     const { globalObjectsContainer, objectsContainer } = this.props;
     if (objectsContainer.hasObjectNamed(objectName))
       this.editObject(objectsContainer.getObject(objectName), initialTab);
-    else if (globalObjectsContainer.hasObjectNamed(objectName))
+    else if (
+      globalObjectsContainer &&
+      globalObjectsContainer.hasObjectNamed(objectName)
+    )
       this.editObject(globalObjectsContainer.getObject(objectName), initialTab);
   };
 
@@ -684,7 +687,10 @@ export default class SceneEditor extends React.Component<Props, State> {
     // representing all the instances selected.
     const lastSelectedInstance = instances[instances.length - 1];
     const objectName = lastSelectedInstance.getObjectName();
-    if (globalObjectsContainer.hasObjectNamed(objectName)) {
+    if (
+      globalObjectsContainer &&
+      globalObjectsContainer.hasObjectNamed(objectName)
+    ) {
       this.setState(
         {
           selectedObjectFolderOrObjectsWithContext: [
@@ -953,11 +959,14 @@ export default class SceneEditor extends React.Component<Props, State> {
     const safeAndUniqueNewName = newNameGenerator(
       gd.Project.getSafeName(newName),
       tentativeNewName => {
+        // TODO Use ProjectScopedContainers to check if an object or a group exist.
         if (
           objectsContainer.hasObjectNamed(tentativeNewName) ||
-          globalObjectsContainer.hasObjectNamed(tentativeNewName) ||
+          (!!globalObjectsContainer &&
+            globalObjectsContainer.hasObjectNamed(tentativeNewName)) ||
           objectsContainer.getObjectGroups().has(tentativeNewName) ||
-          globalObjectsContainer.getObjectGroups().has(tentativeNewName)
+          (!!globalObjectsContainer &&
+            globalObjectsContainer.getObjectGroups().has(tentativeNewName))
         ) {
           return true;
         }

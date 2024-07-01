@@ -4,7 +4,7 @@ import { enumerateGroups } from '../ObjectsList/EnumerateObjects';
 import { useCommandWithOptions } from '../CommandPalette/CommandHooks';
 
 type Props = {|
-  globalObjectsContainer: gdObjectsContainer,
+  globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: ?gdObjectsContainer,
   onEditObjectGroup: (group: gdObjectGroup) => void,
 |};
@@ -19,7 +19,9 @@ const useObjectGroupsListCommands = (props: Props) => {
           ...(objectsContainer
             ? enumerateGroups(objectsContainer.getObjectGroups())
             : []),
-          ...enumerateGroups(globalObjectsContainer.getObjectGroups()),
+          ...(globalObjectsContainer
+            ? enumerateGroups(globalObjectsContainer.getObjectGroups())
+            : []),
         ].map(group => ({
           text: group.getName(),
           handler: () => onEditObjectGroup(group),

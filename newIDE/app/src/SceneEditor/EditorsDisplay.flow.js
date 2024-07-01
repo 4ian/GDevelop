@@ -24,7 +24,7 @@ export type SceneEditorsDisplayProps = {|
   layout: gdLayout | null,
   eventsBasedObject: gdEventsBasedObject | null,
   layersContainer: gdLayersContainer,
-  globalObjectsContainer: gdObjectsContainer,
+  globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   initialInstances: gdInitialInstancesContainer,

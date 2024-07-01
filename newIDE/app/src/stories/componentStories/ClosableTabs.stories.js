@@ -261,8 +261,9 @@ export const WithObjectsList = () => (
                 <ObjectsList
                   getThumbnail={() => 'res/unknown32.png'}
                   project={testProject.project}
-                  objectsContainer={testProject.testLayout.getObjects()}
                   layout={testProject.testLayout}
+                  globalObjectsContainer={testProject.project.getObjects()}
+                  objectsContainer={testProject.testLayout.getObjects()}
                   resourceManagementProps={fakeResourceManagementProps}
                   onEditObject={action('On edit object')}
                   onExportAssets={action('On export assets')}

@@ -23,14 +23,14 @@ type InfoBarEvent = 'onObjectAdded' | 'onInstanceAdded';
 type ObjectAddedOptions = {|
   object: gdObject,
   layersContainer: gdLayersContainer,
-  globalObjectsContainer: gdObjectsContainer,
+  globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
 |};
 
 type InstanceAddedOptions = {|
   instance: gdInitialInstance,
   layersContainer: gdLayersContainer,
-  globalObjectsContainer: gdObjectsContainer,
+  globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
 |};
 

@@ -72,7 +72,7 @@ export type InstancesEditorPropsWithoutSizeAndScroll = {|
   layout: gdLayout | null,
   eventsBasedObject: gdEventsBasedObject | null,
   layersContainer: gdLayersContainer,
-  globalObjectsContainer: gdObjectsContainer,
+  globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
   selectedLayer: string,
   initialInstances: gdInitialInstancesContainer,

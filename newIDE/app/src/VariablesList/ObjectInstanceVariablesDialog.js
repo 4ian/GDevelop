@@ -12,7 +12,7 @@ type Props = {|
   project: gdProject,
   layout?: ?gdLayout,
   objectsContainer: gdObjectsContainer,
-  globalObjectsContainer: gdObjectsContainer,
+  globalObjectsContainer: gdObjectsContainer | null,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   objectInstance: gdInitialInstance,
   onApply: (selectedVariableName: string | null) => void,
@@ -45,7 +45,6 @@ const ObjectInstanceVariablesDialog = ({
   const tabs = React.useMemo(
     () => {
       const objectName = objectInstance.getObjectName();
-      // TODO Use projectScopedContainers to get the object
       const variablesEditedAssociatedObject = getObjectByName(
         globalObjectsContainer,
         objectsContainer,
@@ -80,7 +79,7 @@ const ObjectInstanceVariablesDialog = ({
           ]
         : [];
     },
-    [globalObjectsContainer, layout, objectInstance, project]
+    [globalObjectsContainer, layout, objectInstance, objectsContainer, project]
   );
 
   return (

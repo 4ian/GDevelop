@@ -382,6 +382,28 @@ module.exports = {
       .setAsyncFunctionName('gdjs.fileSystem.deleteFileAsyncTask');
 
     extension
+      .addAction(
+        'ReadDirectory',
+        _('Read a directory'),
+        _(
+          'Reads the contents of a directory (all files and sub-directories) and stores them in an array.'
+        ),
+        _('Read the directory _PARAM0_ into _PARAM1_'),
+        _('Windows, Linux, MacOS/Asynchronous'),
+        'JsPlatform/Extensions/filesystem_delete_file32.png',
+        'JsPlatform/Extensions/filesystem_delete_file32.png'
+      )
+      .addParameter('string', _('Directory path'), '', false)
+      .addParameter('scenevar', _('Variable to store the result'), '', true)
+      .setParameterLongDescription(
+        'It is set to `"error"` if an error has occured, otherwise it is set to an array of all files and sub-directories present in the directory.'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/FileSystem/filesystemtools.js')
+      .setFunctionName('gdjs.fileSystem.readdir')
+      .setAsyncFunctionName('gdjs.fileSystem.readdirAsync');
+
+    extension
       .addStrExpression(
         'DesktopPath',
         _('Desktop folder'),

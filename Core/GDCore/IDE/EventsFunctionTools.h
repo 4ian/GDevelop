@@ -35,7 +35,7 @@ class GD_CORE_API EventsFunctionTools {
    */
   static void FreeEventsFunctionToObjectsContainer(
       const gd::Project& project,
-      const gd::EventsFunctionsContainer functionContainer,
+      const gd::EventsFunctionsContainer& functionContainer,
       const gd::EventsFunction& eventsFunction,
       gd::ObjectsContainer& outputObjectsContainer);
 

@@ -629,6 +629,18 @@ namespace gdjs {
     getActionOnPlayerDisconnect() {
       return this.actionOnPlayerDisconnect;
     }
+
+    enableBehaviorSynchronization(behaviorName: string, enable: boolean) {
+      const behavior = this.owner.getBehavior(behaviorName);
+      if (!behavior) {
+        logger.error(
+          `Behavior ${behaviorName} does not exist on object ${this.owner.getName()}`
+        );
+        return;
+      }
+
+      behavior.enableSynchronization(enable);
+    }
   }
   gdjs.registerBehavior(
     'Multiplayer::MultiplayerObjectBehavior',

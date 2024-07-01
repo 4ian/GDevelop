@@ -887,7 +887,7 @@ module.exports = {
         _('Player object ownership'),
         _('the player owning the object'),
         _('the player owning the instance'),
-        _('Objects'),
+        _('Multiplayer'),
         'JsPlatform/Extensions/multiplayer.svg'
       )
       .addParameter('object', _('Object'), '', false)
@@ -908,7 +908,7 @@ module.exports = {
           'Check if the object is owned by the current player, as a player or the host.'
         ),
         _('Object _PARAM0_ is owned by current player'),
-        _('Objects'),
+        _('Multiplayer'),
         'JsPlatform/Extensions/multiplayer.svg',
         'JsPlatform/Extensions/multiplayer.svg'
       )
@@ -930,7 +930,7 @@ module.exports = {
           'Take the ownership of the object. It will then be synchronized to other players, with the current player as the owner.'
         ),
         _('Take ownership of _PARAM0_'),
-        _('Objects'),
+        _('Multiplayer'),
         'JsPlatform/Extensions/multiplayer.svg',
         'JsPlatform/Extensions/multiplayer.svg'
       )
@@ -952,7 +952,7 @@ module.exports = {
           'Remove the ownership of the object from the player. It will still be synchronized to other players, but the host owns it.'
         ),
         _('Remove ownership of _PARAM0_'),
-        _('Objects'),
+        _('Multiplayer'),
         'JsPlatform/Extensions/multiplayer.svg',
         'JsPlatform/Extensions/multiplayer.svg'
       )
@@ -965,6 +965,30 @@ module.exports = {
       )
       .markAsAdvanced()
       .setFunctionName('removeObjectOwnership');
+
+    behavior
+      .addScopedAction(
+        'EnableBehaviorSynchronization',
+        _('Enable (or disable) the synchronization of a behavior'),
+        _(
+          "Enable or disable the synchronization of a behavior over the network. If disabled, the behavior's current state will not be sent to other players anymore."
+        ),
+        _('Enable synchronization of _PARAM2_ for _PARAM0_: _PARAM3_'),
+        _('Multiplayer'),
+        'JsPlatform/Extensions/multiplayer.svg',
+        'JsPlatform/Extensions/multiplayer.svg'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter(
+        'behavior',
+        _('Multiplayer behavior'),
+        'MultiplayerObjectBehavior',
+        false
+      )
+      .addParameter('behavior', _('Object behavior'), '', false)
+      .addParameter('yesorno', _('Enable synchronization'), '', false)
+      .markAsAdvanced()
+      .setFunctionName('enableBehaviorSynchronization');
 
     return extension;
   },

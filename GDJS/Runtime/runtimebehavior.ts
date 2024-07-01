@@ -40,6 +40,10 @@ namespace gdjs {
     _nameId: integer;
     _activated: boolean = true;
 
+    // When synchronised over the network, a behavior is always owned by the player owning the object,
+    // and always synced. If set to false, the behavior properties will not be synced to others.
+    _syncOverNetwork: boolean = true;
+
     /**
      * @param instanceContainer The container owning the object of the behavior
      * @param behaviorData The properties used to setup the behavior
@@ -229,6 +233,14 @@ namespace gdjs {
      */
     usesLifecycleFunction(): boolean {
       return true;
+    }
+
+    enableSynchronization(enable: boolean) {
+      this._syncOverNetwork = enable;
+    }
+
+    isSyncedOverNetwork(): boolean {
+      return this._syncOverNetwork;
     }
   }
   gdjs.registerBehavior('', gdjs.RuntimeBehavior);

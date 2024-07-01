@@ -41,6 +41,10 @@ describe('Multiplayer', () => {
               playerNumber: 0,
               actionOnPlayerDisconnect: 'Destroy',
             },
+            {
+              name: 'AnchorBehavior',
+              type: 'AnchorBehavior::AnchorBehavior',
+            },
           ],
           effects: [],
           // @ts-expect-error ts-migrate(2322) FIXME: Type '{ type: string; name: string; behaviors: nev... Remove this comment to see the full error message
@@ -2061,6 +2065,234 @@ describe('Multiplayer', () => {
         ).to.be(2);
       }
       markAllPeerMessagesAsProcessed();
+    });
+
+    it('synchronizes object behaviors from the host to other players', async () => {
+      const { switchToPeer } = createMultiplayerManagersMock();
+
+      // Create an instance on the host's game:
+      switchToPeer({
+        peerId: 'player-1',
+        otherPeerIds: ['player-2'],
+        playerNumber: 1,
+      });
+
+      const p1RuntimeScene = makeTestRuntimeSceneWithNetworkId();
+      p1RuntimeScene.createObject('MySpriteObject');
+      const {
+        object: p1SpriteObjectOriginal,
+      } = getObjectAndMultiplayerBehaviorsFromScene(
+        p1RuntimeScene,
+        'MySpriteObject'
+      )[0];
+      // Ensure anchor behavior is there.
+      /** @type {gdjs.AnchorRuntimeBehavior | null} */
+      // @ts-ignore - We know this returns an AnchorRuntimeBehavior
+      const p1AnchorBehaviorOriginal = p1SpriteObjectOriginal.getBehavior(
+        'AnchorBehavior'
+      );
+      if (!p1AnchorBehaviorOriginal)
+        throw new Error('No anchor behavior found');
+      expect(p1AnchorBehaviorOriginal._activated).to.be(true);
+
+      p1RuntimeScene.renderAndStep(1000 / 60);
+
+      // Check the object is created on the other peer with the behavior.
+      switchToPeer({
+        peerId: 'player-2',
+        otherPeerIds: ['player-1'],
+        playerNumber: 2,
+      });
+
+      const p2RuntimeScene = makeTestRuntimeSceneWithNetworkId();
+      p2RuntimeScene.renderAndStep(1000 / 60);
+      const {
+        object: p2SpriteObjectOriginal,
+      } = getObjectAndMultiplayerBehaviorsFromScene(
+        p2RuntimeScene,
+        'MySpriteObject'
+      )[0];
+      // Ensure anchor behavior is there.
+      /** @type {gdjs.AnchorRuntimeBehavior | null} */
+      // @ts-ignore - We know this returns an AnchorRuntimeBehavior
+      const p2AnchorBehaviorOriginal = p2SpriteObjectOriginal.getBehavior(
+        'AnchorBehavior'
+      );
+      if (!p2AnchorBehaviorOriginal)
+        throw new Error('No anchor behavior found');
+      expect(p2AnchorBehaviorOriginal._activated).to.be(true);
+
+      // Deactivate the behavior on the player 2
+      {
+        switchToPeer({
+          peerId: 'player-2',
+          otherPeerIds: ['player-1'],
+          playerNumber: 2,
+        });
+
+        const {
+          object: p2SpriteObject,
+        } = getObjectAndMultiplayerBehaviorsFromScene(
+          p2RuntimeScene,
+          'MySpriteObject'
+        )[0];
+        /** @type {gdjs.AnchorRuntimeBehavior | null} */
+        // @ts-ignore - We know this returns an AnchorRuntimeBehavior
+        const p2AnchorBehavior = p2SpriteObject.getBehavior('AnchorBehavior');
+        if (!p2AnchorBehavior) throw new Error('No anchor behavior found');
+        expect(p2AnchorBehavior._activated).to.be(true);
+        p2AnchorBehavior.activate(false);
+        p2RuntimeScene.renderAndStep(1000 / 60);
+      }
+
+      // Forward time on player 1, who is host.
+      {
+        switchToPeer({
+          peerId: 'player-1',
+          otherPeerIds: ['player-2'],
+          playerNumber: 1,
+        });
+        // As the object is not moving, it will not be synced a lot, so we need to wait a bit.
+        await delay(20);
+        p1RuntimeScene.renderAndStep(1000 / 60);
+      }
+
+      // Check the behavior is activated again on player 2, as they do not own the object.
+      {
+        switchToPeer({
+          peerId: 'player-2',
+          otherPeerIds: ['player-1'],
+          playerNumber: 2,
+        });
+        // As the object is not moving, it will not be synced a lot, so we need to wait a bit.
+        await delay(20);
+        p2RuntimeScene.renderAndStep(1000 / 60);
+
+        const {
+          object: p2SpriteObject,
+        } = getObjectAndMultiplayerBehaviorsFromScene(
+          p2RuntimeScene,
+          'MySpriteObject'
+        )[0];
+        /** @type {gdjs.AnchorRuntimeBehavior | null} */
+        // @ts-ignore - We know this returns an AnchorRuntimeBehavior
+        const p2AnchorBehavior = p2SpriteObject.getBehavior('AnchorBehavior');
+        if (!p2AnchorBehavior) throw new Error('No anchor behavior found');
+        expect(p2AnchorBehavior._activated).to.be(true);
+      }
+
+      // Deactivate the behavior on the host.
+      {
+        switchToPeer({
+          peerId: 'player-1',
+          otherPeerIds: ['player-2'],
+          playerNumber: 1,
+        });
+
+        const {
+          object: p1SpriteObject,
+        } = getObjectAndMultiplayerBehaviorsFromScene(
+          p1RuntimeScene,
+          'MySpriteObject'
+        )[0];
+        /** @type {gdjs.AnchorRuntimeBehavior | null} */
+        // @ts-ignore - We know this returns an AnchorRuntimeBehavior
+        const p1AnchorBehavior = p1SpriteObject.getBehavior('AnchorBehavior');
+        if (!p1AnchorBehavior) throw new Error('No anchor behavior found');
+        p1AnchorBehavior.activate(false);
+        // As the object is not moving, it will not be synced a lot, so we need to wait a bit.
+        await delay(20);
+        p1RuntimeScene.renderAndStep(1000 / 60);
+      }
+
+      // Check the behavior is deactivated on player 2, as per the host's decision.
+      {
+        switchToPeer({
+          peerId: 'player-2',
+          otherPeerIds: ['player-1'],
+          playerNumber: 2,
+        });
+
+        // As the object is not moving, it will not be synced a lot, so we need to wait a bit.
+        await delay(20);
+        p2RuntimeScene.renderAndStep(1000 / 60);
+        const {
+          object: p2SpriteObject,
+        } = getObjectAndMultiplayerBehaviorsFromScene(
+          p2RuntimeScene,
+          'MySpriteObject'
+        )[0];
+        /** @type {gdjs.AnchorRuntimeBehavior | null} */
+        // @ts-ignore - We know this returns an AnchorRuntimeBehavior
+        const p2AnchorBehavior = p2SpriteObject.getBehavior('AnchorBehavior');
+        if (!p2AnchorBehavior) throw new Error('No anchor behavior found');
+        expect(p2AnchorBehavior._activated).to.be(false);
+      }
+    });
+
+    it.only('does not synchronize object behaviors if defined as not synchronized', async () => {
+      const { switchToPeer } = createMultiplayerManagersMock();
+
+      // Create an instance on the host's game:
+      switchToPeer({
+        peerId: 'player-1',
+        otherPeerIds: ['player-2'],
+        playerNumber: 1,
+      });
+
+      const p1RuntimeScene = makeTestRuntimeSceneWithNetworkId();
+      p1RuntimeScene.createObject('MySpriteObject');
+      const {
+        object: p1SpriteObjectOriginal,
+        behavior: p1SpriteMultiplayerObjectBehavior,
+      } = getObjectAndMultiplayerBehaviorsFromScene(
+        p1RuntimeScene,
+        'MySpriteObject'
+      )[0];
+      // Ensure anchor behavior is there.
+      /** @type {gdjs.AnchorRuntimeBehavior | null} */
+      // @ts-ignore - We know this returns an AnchorRuntimeBehavior
+      const p1AnchorBehaviorOriginal = p1SpriteObjectOriginal.getBehavior(
+        'AnchorBehavior'
+      );
+      if (!p1AnchorBehaviorOriginal)
+        throw new Error('No anchor behavior found');
+      expect(p1AnchorBehaviorOriginal._activated).to.be(true);
+      // Deactivate it and mark it as not synchronized.
+      p1AnchorBehaviorOriginal.activate(false);
+      p1SpriteMultiplayerObjectBehavior.enableBehaviorSynchronization(
+        'AnchorBehavior',
+        false
+      );
+
+      p1RuntimeScene.renderAndStep(1000 / 60);
+
+      // Check the object is created on the other peer with the behavior.
+      switchToPeer({
+        peerId: 'player-2',
+        otherPeerIds: ['player-1'],
+        playerNumber: 2,
+      });
+
+      const p2RuntimeScene = makeTestRuntimeSceneWithNetworkId();
+      p2RuntimeScene.renderAndStep(1000 / 60);
+      const {
+        object: p2SpriteObjectOriginal,
+      } = getObjectAndMultiplayerBehaviorsFromScene(
+        p2RuntimeScene,
+        'MySpriteObject'
+      )[0];
+      // Ensure anchor behavior is there.
+      /** @type {gdjs.AnchorRuntimeBehavior | null} */
+      // @ts-ignore - We know this returns an AnchorRuntimeBehavior
+      const p2AnchorBehaviorOriginal = p2SpriteObjectOriginal.getBehavior(
+        'AnchorBehavior'
+      );
+      if (!p2AnchorBehaviorOriginal)
+        throw new Error('No anchor behavior found');
+
+      // It is activated as it is not synchronized.
+      expect(p2AnchorBehaviorOriginal._activated).to.be(true);
     });
   });
 

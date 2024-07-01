@@ -17,11 +17,11 @@ cache:
 addons:
   apt:
     sources:
-    - ubuntu-toolchain-r-test
+      - ubuntu-toolchain-r-test
     packages:
-    # Build dependencies:
-    - cmake
-    - p7zip-full
+      # Build dependencies:
+      - cmake
+      - p7zip-full
 
 before_install:
   # This workaround is required to avoid libstdc++ errors (Emscripten requires a recent version of libstdc++)
@@ -29,47 +29,48 @@ before_install:
   - sudo dpkg --force-all -i libstdc++6
 
 install:
-# Ensure we use a recent version of Node.js (and npm).
+  # Ensure we use a recent version of Node.js (and npm).
   - nvm install v16 && nvm use v16
-#Compile the tests only for GDCore
+  #Compile the tests only for GDCore
   - mkdir .build-tests
   - cd .build-tests
   - cmake -DBUILD_GDJS=FALSE -DBUILD_TESTS=TRUE -DCMAKE_CXX_COMPILER=$(which $CXX) -DCMAKE_C_COMPILER=$(which $CC) ..
   - make -j 4
   - cd ..
-# Install Emscripten (for GDevelop.js)
-  - git clone https://github.com/juj/emsdk.git
+  # Install Emscripten (for GDevelop.js)
+  # Specify the tag for the core repository to avois breaking changes.
+  - git clone --depth 1 --branch 3.1.21 https://github.com/juj/emsdk.git
   - cd emsdk && ./emsdk install 3.1.21 && ./emsdk activate 3.1.21 && cd ..
-# Install GDevelop.js dependencies
+  # Install GDevelop.js dependencies
   - cd GDevelop.js && npm install && cd ..
-# Build GDevelop.js
-# (in a subshell to avoid Emscripten polluting the Node.js and npm version for the rest of the build)
+  # Build GDevelop.js
+  # (in a subshell to avoid Emscripten polluting the Node.js and npm version for the rest of the build)
   - (set -e; cd GDevelop.js && source ../emsdk/emsdk_env.sh && npm run build && cd ..)
-# Install newIDE tests dependencies
+  # Install newIDE tests dependencies
   - npm -v
   - cd newIDE/app && npm install
   - cd ../..
-# Install GDJS tests dependencies
+  # Install GDJS tests dependencies
   - cd GDJS && npm install && cd tests && npm install
   - cd ../..
 
 script:
-# GDCore tests:
+  # GDCore tests:
   - cd .build-tests
   - Core/GDCore_tests
   - cd ..
-# GDevelop.js tests
+  # GDevelop.js tests
   - cd GDevelop.js
   - npm test
   - cd ..
-# newIDE tests:
+  # newIDE tests:
   - cd newIDE/app
   - npm test
   - npm run flow
   - npm run check-format
   - npm run check-script-types
   - cd ../..
-# GDJS tests:
+  # GDJS tests:
   - cd GDJS
   - npm run check-format
   - cd ..

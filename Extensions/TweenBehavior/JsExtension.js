@@ -558,6 +558,25 @@ module.exports = {
       .setFunctionName('gdjs.evtTools.tween.removeSceneTween');
 
     extension
+      .addAction(
+        'AwaitSceneTween',
+        _('Await the end of a scene tween'),
+        _(
+          'Waits until a tween has finished before continuing the execution of events.'
+        ),
+        _('Wait for tween _PARAM1_ to end'),
+        '',
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('string', _('Tween Identifier'), '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
+      .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
+      .setAsyncFunctionName('gdjs.evtTools.tween.awaitTween');
+
+    extension
       .addExpressionAndCondition(
         'number',
         'Progress',
@@ -2062,6 +2081,24 @@ module.exports = {
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .getCodeExtraInformation()
       .setFunctionName('removeTween');
+
+    behavior
+      .addAction(
+        'AwaitObjectTween',
+        _('Await the end of an object tween'),
+        _(
+          'Waits until a tween has finished before continuing the execution of events.'
+        ),
+        _('Wait for tween _PARAM2_ of _PARAM0_ to end'),
+        '',
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
+      .addParameter('string', _('Tween Identifier'), '', false)
+      .getCodeExtraInformation()
+      .setAsyncFunctionName('awaitTween');
 
     behavior
       .addExpressionAndCondition(

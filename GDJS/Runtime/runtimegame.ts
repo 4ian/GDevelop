@@ -20,6 +20,27 @@ namespace gdjs {
   const getGlobalResourceNames = (projectData: ProjectData): Array<string> =>
     projectData.usedResources.map((resource) => resource.name);
 
+  let supportedCompressionMethods: ('cs:gzip' | 'cs:deflate')[] | null = null;
+  const getSupportedCompressionMethods = (): ('cs:gzip' | 'cs:deflate')[] => {
+    if (!!supportedCompressionMethods) {
+      return supportedCompressionMethods;
+    }
+    supportedCompressionMethods = [];
+
+    try {
+      // @ts-ignore - We are checking if the CompressionStream is available.
+      new CompressionStream('gzip');
+      supportedCompressionMethods.push('cs:gzip');
+    } catch (e) {}
+    try {
+      // @ts-ignore - We are checking if the CompressionStream is available.
+      new CompressionStream('deflate');
+      supportedCompressionMethods.push('cs:deflate');
+    } catch (e) {}
+
+    return supportedCompressionMethods;
+  };
+
   /** Options given to the game at startup. */
   export type RuntimeGameOptions = {
     /** if true, force fullscreen. */
@@ -914,18 +935,6 @@ namespace gdjs {
      * Helper function to get information about the platform running the game.
      */
     getPlatformInfo = () => {
-      const supportedCompressionMethods: ('cs:gzip' | 'cs:deflate')[] = [];
-      try {
-        // @ts-ignore - We are checking if the CompressionStream is available.
-        new CompressionStream('gzip');
-        supportedCompressionMethods.push('cs:gzip');
-      } catch (e) {}
-      try {
-        // @ts-ignore - We are checking if the CompressionStream is available.
-        new CompressionStream('deflate');
-        supportedCompressionMethods.push('cs:deflate');
-      } catch (e) {}
-
       return {
         // @ts-ignore
         isCordova: !!window.cordova,
@@ -938,7 +947,7 @@ namespace gdjs {
           typeof navigator !== 'undefined'
             ? !!navigator.maxTouchPoints && navigator.maxTouchPoints > 2
             : false,
-        supportedCompressionMethods: supportedCompressionMethods,
+        supportedCompressionMethods: getSupportedCompressionMethods(),
       };
     };
 

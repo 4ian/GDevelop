@@ -142,6 +142,12 @@ void CustomObjectConfiguration::DoSerializeTo(SerializerElement& element) const 
         element.AddChild("instances"));
     eventsBasedObject->GetLayers().SerializeLayersTo(
         element.AddChild("layers"));
+    element.SetIntAttribute("areaMinX", eventsBasedObject->GetAreaMinX());
+    element.SetIntAttribute("areaMinY", eventsBasedObject->GetAreaMinY());
+    element.SetIntAttribute("areaMinZ", eventsBasedObject->GetAreaMinZ());
+    element.SetIntAttribute("areaMaxX", eventsBasedObject->GetAreaMaxX());
+    element.SetIntAttribute("areaMaxY", eventsBasedObject->GetAreaMaxY());
+    element.SetIntAttribute("areaMaxZ", eventsBasedObject->GetAreaMaxZ());
   }
 }
 void CustomObjectConfiguration::DoUnserializeFrom(Project& project,

@@ -13,6 +13,16 @@ namespace gdjs {
     childrenContent: { [objectName: string]: ObjectConfiguration & any };
     instances: InstanceData[];
     layers: LayerData[];
+    areaMinX: float;
+    areaMinY: float;
+    areaMinZ: float;
+    areaMaxX: float;
+    areaMaxY: float;
+    areaMaxZ: float;
+    defaultSize: {
+      min: [float, float, float];
+      max: [float, float, float];
+    } | null;
   };
 
   /**
@@ -39,6 +49,10 @@ namespace gdjs {
     private _untransformedHitBoxes: gdjs.Polygon[] = [];
     /** The dimension of this object is calculated from its children AABBs. */
     private _unrotatedAABB: AABB = { min: [0, 0], max: [0, 0] };
+    private _forcedDefaultSize: {
+      min: [float, float, float];
+      max: [float, float, float];
+    } | null = null;
     private _scaleX: float = 1;
     private _scaleY: float = 1;
     private _flippedX: boolean = false;
@@ -64,6 +78,7 @@ namespace gdjs {
       );
       this._renderer = this._createRender();
 
+      this.createDefaultSizeIfNeeded(objectData);
       this._instanceContainer.loadFrom(objectData);
 
       // The generated code calls onCreated at the constructor end
@@ -78,11 +93,32 @@ namespace gdjs {
     reinitialize(objectData: ObjectData & CustomObjectConfiguration) {
       super.reinitialize(objectData);
 
+      this.createDefaultSizeIfNeeded(objectData);
       this._instanceContainer.loadFrom(objectData);
       this._reinitializeRenderer();
 
       // The generated code calls the onCreated super implementation at the end.
       this.onCreated();
+    }
+
+    private createDefaultSizeIfNeeded(objectData: CustomObjectConfiguration) {
+      if (objectData.instances.length > 0) {
+        if (!objectData.defaultSize) {
+          objectData.defaultSize = {
+            min: [
+              objectData.areaMinX,
+              objectData.areaMinY,
+              objectData.areaMinZ,
+            ],
+            max: [
+              objectData.areaMaxX,
+              objectData.areaMaxY,
+              objectData.areaMaxZ,
+            ],
+          };
+        }
+        this._forcedDefaultSize = objectData.defaultSize;
+      }
     }
 
     updateFromObjectData(
@@ -341,36 +377,42 @@ namespace gdjs {
     }
 
     getDrawableX(): float {
+      let minX = 0;
+      if (this._forcedDefaultSize) {
+        minX = this._forcedDefaultSize.min[0];
+      }
       if (this._isUntransformedHitBoxesDirty) {
         this._updateUntransformedHitBoxes();
+        minX = this._unrotatedAABB.min[0];
       }
       const absScaleX = this.getScaleX();
       if (!this._flippedX) {
-        return this.x + this._unrotatedAABB.min[0] * absScaleX;
+        return this.x + minX * absScaleX;
       } else {
         return (
           this.x +
-          (-this._unrotatedAABB.min[0] -
-            this.getUnscaledWidth() +
-            2 * this.getUnscaledCenterX()) *
+          (-minX - this.getUnscaledWidth() + 2 * this.getUnscaledCenterX()) *
             absScaleX
         );
       }
     }
 
     getDrawableY(): float {
+      let minY = 0;
+      if (this._forcedDefaultSize) {
+        minY = this._forcedDefaultSize.min[1];
+      }
       if (this._isUntransformedHitBoxesDirty) {
         this._updateUntransformedHitBoxes();
+        minY = this._unrotatedAABB.min[1];
       }
       const absScaleY = this.getScaleY();
       if (!this._flippedY) {
-        return this.y + this._unrotatedAABB.min[1] * absScaleY;
+        return this.y + minY * absScaleY;
       } else {
         return (
           this.y +
-          (-this._unrotatedAABB.min[1] -
-            this.getUnscaledHeight() +
-            2 * this.getUnscaledCenterY()) *
+          (-minY - this.getUnscaledHeight() + 2 * this.getUnscaledCenterY()) *
             absScaleY
         );
       }
@@ -380,6 +422,9 @@ namespace gdjs {
      * @return the internal width of the object according to its children.
      */
     getUnscaledWidth(): float {
+      if (this._forcedDefaultSize) {
+        return this._forcedDefaultSize.max[0] - this._forcedDefaultSize.min[0];
+      }
       if (this._isUntransformedHitBoxesDirty) {
         this._updateUntransformedHitBoxes();
       }
@@ -390,6 +435,9 @@ namespace gdjs {
      * @return the internal height of the object according to its children.
      */
     getUnscaledHeight(): float {
+      if (this._forcedDefaultSize) {
+        return this._forcedDefaultSize.max[1] - this._forcedDefaultSize.min[1];
+      }
       if (this._isUntransformedHitBoxesDirty) {
         this._updateUntransformedHitBoxes();
       }
@@ -403,6 +451,11 @@ namespace gdjs {
       if (this._customCenter) {
         return this._customCenter[0];
       }
+      if (this._forcedDefaultSize) {
+        return (
+          (this._forcedDefaultSize.min[0] + this._forcedDefaultSize.max[0]) / 2
+        );
+      }
       if (this._isUntransformedHitBoxesDirty) {
         this._updateUntransformedHitBoxes();
       }
@@ -415,6 +468,11 @@ namespace gdjs {
     getUnscaledCenterY(): float {
       if (this._customCenter) {
         return this._customCenter[1];
+      }
+      if (this._forcedDefaultSize) {
+        return (
+          (this._forcedDefaultSize.min[1] + this._forcedDefaultSize.max[1]) / 2
+        );
       }
       if (this._isUntransformedHitBoxesDirty) {
         this._updateUntransformedHitBoxes();
@@ -449,9 +507,6 @@ namespace gdjs {
     }
 
     getCenterX(): float {
-      if (this._isUntransformedHitBoxesDirty) {
-        this._updateUntransformedHitBoxes();
-      }
       return (
         (this.getUnscaledCenterX() - this._unrotatedAABB.min[0]) *
         this.getScaleX()
@@ -459,9 +514,6 @@ namespace gdjs {
     }
 
     getCenterY(): float {
-      if (this._isUntransformedHitBoxesDirty) {
-        this._updateUntransformedHitBoxes();
-      }
       return (
         (this.getUnscaledCenterY() - this._unrotatedAABB.min[1]) *
         this.getScaleY()

@@ -1216,5 +1216,15 @@ namespace gdjs {
       const gameCanvas = runtimeScene.getGame().getRenderer().getCanvas();
       if (gameCanvas) gameCanvas.focus();
     };
+
+    /**
+     * Action to allow the player to leave the lobby in-game.
+     */
+    export const leaveGameLobby = async (runtimeScene: gdjs.RuntimeScene) => {
+      // Handle the case where the game has not started yet, so the player is in the lobby.
+      handleLobbyLeaveEvent();
+      // Handle the case where the game has started, so the player is in the game and connected to other players.
+      handleLobbyGameEnded();
+    };
   }
 }

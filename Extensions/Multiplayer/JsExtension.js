@@ -118,6 +118,34 @@ module.exports = {
 
     extension
       .addAction(
+        'LeaveGameLobby',
+        _('Leave Game Lobby'),
+        _(
+          'Leave the current game lobby. This will trigger the "Player has left" condition on the other players, and the "Lobby game has ended" condition on the player leaving.'
+        ),
+        _('Leave the game lobby'),
+        _('Lobbies'),
+        'JsPlatform/Extensions/multiplayer.svg',
+        'JsPlatform/Extensions/multiplayer.svg'
+      )
+      .setHelpPath('/all-features/multiplayer')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Multiplayer/peer.js')
+      .addIncludeFile('Extensions/Multiplayer/peerJsHelper.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
+      .setFunctionName('gdjs.multiplayer.leaveGameLobby');
+
+    extension
+      .addAction(
         'SendMessage',
         _('Send custom message to other players'),
         _(

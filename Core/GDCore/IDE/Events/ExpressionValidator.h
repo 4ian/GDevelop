@@ -203,13 +203,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     if (parentType == Type::Variable) {
       childType = parentType;
 
-      if (!currentParameterExtraInfo || *currentParameterExtraInfo != "AllowUndeclaredVariable") {
-        const auto& variablesContainersList = projectScopedContainers.GetVariablesContainersList();
-        if (!variablesContainersList.Has(node.name)) {
-          RaiseUndeclaredVariableError(_("No variable with this name found."), node.location, node.name);
-        }
-      }
-
+      CheckVariableExistence(node.location, node.name);
       if (node.child) {
         node.child->Visit(*this);
       }
@@ -333,12 +327,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       }
     }
     else if (parentType == Type::Variable) {
-      if (!currentParameterExtraInfo || *currentParameterExtraInfo != "AllowUndeclaredVariable") {
-        const auto& variablesContainersList = projectScopedContainers.GetVariablesContainersList();
-        if (!variablesContainersList.Has(node.identifierName)) {
-          RaiseUndeclaredVariableError(_("No variable with this name found."), node.location, node.identifierName);
-        }
-      }
+      CheckVariableExistence(node.location, node.identifierName);
     }
     else if (parentType != Type::Object && parentType != Type::LegacyVariable) {
       // It can't happen.
@@ -381,6 +370,45 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   Type ValidateFunction(const gd::FunctionCallNode& function);
   bool ValidateObjectVariableOrVariableOrProperty(const gd::IdentifierNode& identifier);
 
+  void CheckVariableExistence(const ExpressionParserLocation &location, const gd::String& name) {
+    if (!currentParameterExtraInfo || *currentParameterExtraInfo != "AllowUndeclaredVariable") {
+      projectScopedContainers.MatchIdentifierWithName<void>(
+          name,
+          [&]() {
+            // This represents an object.
+            RaiseVariableNameCollisionError(
+                _("This variable has the same name as an object. Consider "
+                  "renaming one or the other."),
+                location, name);
+          },
+          [&]() {
+            // This is a variable.
+          },
+          [&]() {
+            // This is a property.
+            // This error won't happen unless the priority is changed.
+            RaiseVariableNameCollisionError(
+                _("This variable has the same name as a property. Consider "
+                  "renaming one or the other."),
+                location, name);
+          },
+          [&]() {
+            // This is a parameter.
+            // This error won't happen unless the priority is changed.
+            RaiseVariableNameCollisionError(
+                _("This variable has the same name as a parameter. Consider "
+                  "renaming one or the other."),
+                location, name);
+          },
+          [&]() {
+            // This is something else.
+            RaiseUndeclaredVariableError(
+                _("No variable with this name found."), location,
+                name);
+          });
+    }
+  }
+
   void ReportAnyError(const ExpressionNode& node, bool isFatal = true) {
     if (node.diagnostic) {
       // Syntax errors are holden by the AST nodes.
@@ -422,6 +450,14 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
                                     const gd::String &objectName = "") {
     RaiseError(gd::ExpressionParserError::ErrorType::UndeclaredVariable,
                message, location, true, variableName, objectName);
+  }
+
+  void RaiseVariableNameCollisionError(const gd::String &message,
+                                    const ExpressionParserLocation &location,
+                                    const gd::String &variableName,
+                                    const gd::String &objectName = "") {
+    RaiseError(gd::ExpressionParserError::ErrorType::VariableNameCollision,
+               message, location, false, variableName, objectName);
   }
 
   void RaiseTypeError(const gd::String &message,

@@ -68,6 +68,7 @@ export const VariableNameQuickAnalyzeResults = {
   WRONG_SPACE: 2,
   WRONG_EXPRESSION: 3,
   UNDECLARED_VARIABLE: 4,
+  NAME_COLLISION_WITH_OBJECT: 5,
 };
 
 export const getRootVariableName = (name: string): string => {
@@ -90,7 +91,8 @@ export const getRootVariableName = (name: string): string => {
 // selector that offers the variables in the scope).
 export const quicklyAnalyzeVariableName = (
   name: string,
-  variablesContainers?: Array<gdVariablesContainer>
+  variablesContainers?: Array<gdVariablesContainer>,
+  projectScopedContainersAccessor?: ProjectScopedContainersAccessor
 ): VariableNameQuickAnalyzeResult => {
   if (!name) return VariableNameQuickAnalyzeResults.OK;
 
@@ -115,11 +117,22 @@ export const quicklyAnalyzeVariableName = (
     }
   }
 
+  const rootVariableName = getRootVariableName(name);
+  if (
+    projectScopedContainersAccessor &&
+    projectScopedContainersAccessor
+      .get()
+      .getObjectsContainersList()
+      .hasObjectOrGroupNamed(rootVariableName)
+  ) {
+    return VariableNameQuickAnalyzeResults.NAME_COLLISION_WITH_OBJECT;
+  }
+
   // Check at least the name of the root variable, it's the best we can do.
   if (
     variablesContainers &&
     !variablesContainers.some(variablesContainer =>
-      variablesContainer.has(getRootVariableName(name))
+      variablesContainer.has(rootVariableName)
     )
   ) {
     return VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE;
@@ -245,7 +258,8 @@ export default React.forwardRef<Props, VariableFieldInterface>(
 
     const quicklyAnalysisResult = quicklyAnalyzeVariableName(
       value,
-      variablesContainers
+      variablesContainers,
+      projectScopedContainersAccessor
     );
 
     const errorText =
@@ -273,12 +287,23 @@ export default React.forwardRef<Props, VariableFieldInterface>(
         <Trans>
           This variable is not declared. Use the *variables editor* to add it.
         </Trans>
+      ) : forceDeclaration &&
+        quicklyAnalysisResult ===
+          VariableNameQuickAnalyzeResults.NAME_COLLISION_WITH_OBJECT ? (
+        <Trans>
+          This variable has the same name as an object. Consider renaming one or
+          the other.
+        </Trans>
       ) : null;
     const warningTranslatableText =
       !forceDeclaration &&
       quicklyAnalysisResult ===
         VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE
         ? t`This variable is not declared. It's recommended to use the *variables editor* to add it.`
+        : !forceDeclaration &&
+          quicklyAnalysisResult ===
+            VariableNameQuickAnalyzeResults.NAME_COLLISION_WITH_OBJECT
+        ? t`This variable has the same name as an object. Consider renaming one or the other.`
         : null;
 
     const isSwitchableInstruction =

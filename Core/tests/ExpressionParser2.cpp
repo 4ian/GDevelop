@@ -2785,6 +2785,33 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
               "No variable with this name found.");
     }
 
+    SECTION("Variable name collision with an object") {
+      auto node = parser.ParseExpression("MySpriteObject");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                        "variable");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+      REQUIRE(validator.GetAllErrors().size() == 1);
+      REQUIRE(validator.GetAllErrors()[0]->GetMessage() ==
+              "This variable has the same name as an object. Consider renaming "
+              "one or the other.");
+    }
+
+    SECTION("Variable name collision with an object (with child-variables)") {
+      auto node = parser.ParseExpression("MySpriteObject.MyChild.MyChild");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "variable");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+      REQUIRE(validator.GetAllErrors().size() == 1);
+      REQUIRE(validator.GetAllErrors()[0]->GetMessage() ==
+              "This variable has the same name as an object. Consider renaming "
+              "one or the other.");
+    }
+
     SECTION("Declared scene variable") {
       auto node = parser.ParseExpression("MySceneVariable");
       REQUIRE(node != nullptr);

@@ -1377,7 +1377,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                        _("Variables"),
                        "res/actions/var.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Variable"));
+      .AddParameter("objectvar", _("Variable"))
+      .SetRelevantForFunctionEventsOnly();
 
   obj.AddExpression("ObjectTimerElapsedTime",
                     _("Object timer value"),

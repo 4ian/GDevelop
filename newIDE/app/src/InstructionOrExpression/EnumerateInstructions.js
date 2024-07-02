@@ -74,7 +74,10 @@ const isObjectInstruction = (
       // The instruction can be used with the object.
       return true;
     }
-    if (!objectBehaviorTypes.has(parameter.getExtraInfo())) {
+    if (
+      parameter.getExtraInfo() !== '' &&
+      !objectBehaviorTypes.has(parameter.getExtraInfo())
+    ) {
       return false;
     }
   }

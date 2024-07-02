@@ -455,13 +455,16 @@ namespace gdjs {
      */
     getNetworkSyncData(): ObjectNetworkSyncData {
       const behaviorNetworkSyncData = {};
-      for (let i = 0, len = this._behaviors.length; i < len; ++i) {
-        const behavior = this._behaviors[i];
+      this._behaviors.forEach((behavior) => {
+        if (!behavior.isSyncedOverNetwork()) {
+          return;
+        }
+
         const networkSyncData = behavior.getNetworkSyncData();
         if (networkSyncData) {
           behaviorNetworkSyncData[behavior.getName()] = networkSyncData;
         }
-      }
+      });
 
       const variablesNetworkSyncData = this._variables.getNetworkSyncData({
         // No need to send the player number, as the owner of the object syncs all its variables.

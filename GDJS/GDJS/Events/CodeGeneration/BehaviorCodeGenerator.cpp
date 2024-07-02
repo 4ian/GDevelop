@@ -6,8 +6,8 @@
 #include "BehaviorCodeGenerator.h"
 
 #include "EventsCodeGenerator.h"
-#include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/EventsBasedBehavior.h"
+#include "GDCore/Project/EventsFunctionsExtension.h"
 
 namespace gdjs {
 
@@ -223,6 +223,7 @@ CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME = class RUNTIME_BEHAVIOR_CLASSNAME ext
     };
   }
   updateFromNetworkSyncData(networkSyncData) {
+    super.updateFromNetworkSyncData(networkSyncData);
     UPDATE_FROM_NETWORK_SYNC_DATA_CODE
   }
 

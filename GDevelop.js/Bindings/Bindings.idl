@@ -2501,10 +2501,10 @@ interface WholeProjectRefactorer {
 };
 
 interface EventsBasedObjectDependencyFinder {
-  boolean STATIC_IsDependentFromObjectType(
+  boolean STATIC_IsDependentFromEventsBasedObject(
     [Const, Ref] Project project,
     [Const, Ref] EventsBasedObject eventsBasedObject,
-    [Const] DOMString dependencyObjectType);
+    [Const, Ref] EventsBasedObject dependency);
 };
 
 interface PropertyFunctionGenerator {

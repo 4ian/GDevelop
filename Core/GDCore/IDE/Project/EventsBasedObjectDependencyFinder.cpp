@@ -27,16 +27,4 @@ bool EventsBasedObjectDependencyFinder::IsDependentFromEventsBasedObject(
   }
   return false;
 }
-
-bool EventsBasedObjectDependencyFinder::IsDependentFromObjectType(
-    const gd::Project &project, const gd::EventsBasedObject &eventsBasedObject,
-    const gd::String &dependencyObjectType) {
-  if (!project.HasEventsBasedObject(dependencyObjectType)) {
-    return false;
-  }
-  return gd::EventsBasedObjectDependencyFinder::IsDependentFromEventsBasedObject(
-      project, eventsBasedObject,
-      project.GetEventsBasedObject(dependencyObjectType));
-}
-
 } // namespace gd

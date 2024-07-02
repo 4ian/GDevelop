@@ -1839,7 +1839,7 @@ export class WholeProjectRefactorer extends EmscriptenObject {
 }
 
 export class EventsBasedObjectDependencyFinder extends EmscriptenObject {
-  static isDependentFromObjectType(project: Project, eventsBasedObject: EventsBasedObject, dependencyObjectType: string): boolean;
+  static isDependentFromEventsBasedObject(project: Project, eventsBasedObject: EventsBasedObject, dependency: EventsBasedObject): boolean;
 }
 
 export class PropertyFunctionGenerator extends EmscriptenObject {

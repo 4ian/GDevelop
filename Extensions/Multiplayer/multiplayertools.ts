@@ -29,6 +29,7 @@ namespace gdjs {
 
     const DEFAULT_WEBSOCKET_HEARTBEAT_INTERVAL = 10000;
     const DEFAULT_LOBBY_HEARTBEAT_INTERVAL = 30000;
+    const DEFAULT_COUNTDOWN_SECONDS_TO_START = 5;
 
     // Save if we are on dev environment so we don't need to use the runtimeGame every time.
     let isUsingGDevelopDevelopmentEnvironment = false;
@@ -469,7 +470,14 @@ namespace gdjs {
             case 'gameCountdownStarted': {
               const messageData = messageContent.data;
               const compressionMethod = messageData.compressionMethod || 'none';
-              handleGameCountdownStartedEvent(runtimeScene, compressionMethod);
+              const secondsToStart =
+                messageData.secondsToStart ||
+                DEFAULT_COUNTDOWN_SECONDS_TO_START;
+              handleGameCountdownStartedEvent(
+                runtimeScene,
+                compressionMethod,
+                secondsToStart
+              );
               break;
             }
             case 'gameStarted': {
@@ -669,7 +677,8 @@ namespace gdjs {
 
     const handleGameCountdownStartedEvent = function (
       runtimeScene: gdjs.RuntimeScene,
-      compressionMethod: gdjs.multiplayerPeerJsHelper.CompressionMethod
+      compressionMethod: gdjs.multiplayerPeerJsHelper.CompressionMethod,
+      secondsToStart: number
     ) {
       gdjs.multiplayerPeerJsHelper.setCompressionMethod(compressionMethod);
 
@@ -691,6 +700,7 @@ namespace gdjs {
       lobbiesIframe.contentWindow.postMessage(
         {
           id: 'gameCountdownStarted',
+          secondsToStart,
         },
         '*' // We could restrict to GDevelop games platform but it's not necessary as the message is not sensitive, and it allows easy debugging.
       );

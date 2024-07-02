@@ -22,7 +22,6 @@ const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
-  globalObjectsContainer: gdObjectsContainer,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsBasedObject: gdEventsBasedObject,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
@@ -51,15 +50,12 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
     objectsWithContext: ObjectWithContext[],
     done: boolean => void
   ) => {
-    const { project, globalObjectsContainer, eventsBasedObject } = this.props;
+    const { project, eventsBasedObject } = this.props;
 
     objectsWithContext.forEach(objectWithContext => {
       const { object } = objectWithContext;
       gd.WholeProjectRefactorer.objectRemovedInEventsBasedObject(
         project,
-        eventsBasedObject,
-        globalObjectsContainer,
-        // $FlowFixMe gdObjectsContainer should be a member of gdEventsBasedObject instead of a base class.
         eventsBasedObject,
         object.getName()
       );
@@ -102,7 +98,11 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
 
   _onRenameObject = (objectWithContext: ObjectWithContext, newName: string) => {
     const { object } = objectWithContext;
-    const { project, globalObjectsContainer, eventsBasedObject } = this.props;
+    const {
+      project,
+      eventsBasedObject,
+      projectScopedContainersAccessor,
+    } = this.props;
 
     // newName is supposed to have been already validated
 
@@ -110,7 +110,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
     if (object.getName() !== newName) {
       gd.WholeProjectRefactorer.objectOrGroupRenamedInEventsBasedObject(
         project,
-        globalObjectsContainer,
+        projectScopedContainersAccessor.get(),
         eventsBasedObject,
         object.getName(),
         newName,

@@ -78,10 +78,19 @@ export class ProjectScopedContainersAccessor {
           );
         }
       } else {
-        projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForEventsFunctionsExtension(
-          project,
-          eventsFunctionsExtension
-        );
+        if (eventsBasedObject && this._parameterObjectsContainer) {
+          projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForEventsBasedObject(
+            project,
+            eventsFunctionsExtension,
+            eventsBasedObject,
+            this._parameterObjectsContainer
+          );
+        } else {
+          projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForEventsFunctionsExtension(
+            project,
+            eventsFunctionsExtension
+          );
+        }
       }
     } else {
       projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForProject(

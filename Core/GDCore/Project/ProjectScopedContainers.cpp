@@ -6,6 +6,7 @@
 #include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Events/Event.h"
+#include "GDCore/Extensions/PlatformExtension.h"
 
 namespace gd {
 
@@ -97,6 +98,40 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForObjectEventsFunction(
       eventsBasedObject.GetPropertyDescriptors());
   projectScopedContainers.AddParameters(eventsFunction.GetParametersForEvents(
       eventsBasedObject.GetEventsFunctions()));
+
+  return projectScopedContainers;
+}
+
+ProjectScopedContainers
+ProjectScopedContainers::MakeNewProjectScopedContainersForEventsBasedObject(
+    const gd::Project &project,
+    const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+    const gd::EventsBasedObject &eventsBasedObject,
+    gd::ObjectsContainer &outputObjectsContainer) {
+
+  outputObjectsContainer.GetObjects().clear();
+  outputObjectsContainer.GetObjectGroups().Clear();
+  auto &children = eventsBasedObject.GetObjects().GetObjects();
+  for (auto &childObject : children) {
+    auto child = childObject.get();
+    outputObjectsContainer.InsertObject(*child, children.size());
+  }
+  outputObjectsContainer.InsertNewObject(
+      project,
+      gd::PlatformExtension::GetObjectFullType(
+          eventsFunctionsExtension.GetName(), eventsBasedObject.GetName()),
+      "Object", outputObjectsContainer.GetObjectsCount());
+
+  ProjectScopedContainers projectScopedContainers(
+      ObjectsContainersList::MakeNewObjectsContainersListForContainer(
+          outputObjectsContainer),
+      VariablesContainersList::
+          MakeNewVariablesContainersListForEventsFunctionsExtension(
+              eventsFunctionsExtension),
+      PropertiesContainersList::MakeNewEmptyPropertiesContainersList());
+
+  projectScopedContainers.AddPropertiesContainer(
+      eventsBasedObject.GetPropertyDescriptors());
 
   return projectScopedContainers;
 }

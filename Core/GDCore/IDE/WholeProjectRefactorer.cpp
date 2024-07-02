@@ -1720,55 +1720,44 @@ void WholeProjectRefactorer::RenameObjectEffect(gd::Project &project,
 
 void WholeProjectRefactorer::ObjectRemovedInEventsBasedObject(
     gd::Project &project, gd::EventsBasedObject &eventsBasedObject,
-    gd::ObjectsContainer &globalObjectsContainer,
-    gd::ObjectsContainer &objectsContainer, const gd::String &objectName) {
+    const gd::String &objectName) {
   for (auto &functionUniquePtr :
        eventsBasedObject.GetEventsFunctions().GetInternalVector()) {
     auto function = functionUniquePtr.get();
-    WholeProjectRefactorer::ObjectRemovedInEventsFunction(
-        project, *function, globalObjectsContainer, objectsContainer,
-        objectName);
+    WholeProjectRefactorer::ObjectRemovedInEventsFunction(project, *function,
+                                                          objectName);
   }
 }
 
 void WholeProjectRefactorer::ObjectRemovedInEventsFunction(
     gd::Project &project, gd::EventsFunction &eventsFunction,
-    gd::ObjectsContainer &globalObjectsContainer,
-    gd::ObjectsContainer &objectsContainer, const gd::String &objectName) {
+    const gd::String &objectName) {
 
-  for (std::size_t g = 0; g < eventsFunction.GetObjectGroups().size();
-        ++g) {
+  for (std::size_t g = 0; g < eventsFunction.GetObjectGroups().size(); ++g) {
     if (eventsFunction.GetObjectGroups()[g].Find(objectName))
       eventsFunction.GetObjectGroups()[g].RemoveObject(objectName);
   }
 }
 
 void WholeProjectRefactorer::ObjectOrGroupRenamedInEventsBasedObject(
-    gd::Project &project, gd::ObjectsContainer &globalObjectsContainer,
+    gd::Project &project,
+    const gd::ProjectScopedContainers &projectScopedContainers,
     gd::EventsBasedObject &eventsBasedObject, const gd::String &oldName,
     const gd::String &newName, bool isObjectGroup) {
   for (auto &functionUniquePtr :
        eventsBasedObject.GetEventsFunctions().GetInternalVector()) {
     auto *function = functionUniquePtr.get();
     WholeProjectRefactorer::ObjectOrGroupRenamedInEventsFunction(
-        project, *function, globalObjectsContainer,
-        eventsBasedObject.GetObjects(), oldName, newName,
+        project, projectScopedContainers, *function, oldName, newName,
         isObjectGroup);
   }
 }
 
 void WholeProjectRefactorer::ObjectOrGroupRenamedInEventsFunction(
-    gd::Project &project, gd::EventsFunction &eventsFunction,
-    gd::ObjectsContainer &globalObjectsContainer,
-    gd::ObjectsContainer &objectsContainer, const gd::String &oldName,
+    gd::Project &project,
+    const gd::ProjectScopedContainers &projectScopedContainers,
+    gd::EventsFunction &eventsFunction, const gd::String &oldName,
     const gd::String &newName, bool isObjectGroup) {
-  // In theory we should pass a ProjectScopedContainers to this function so it
-  // does not have to construct one. In practice, this is ok because we only
-  // deal with objects.
-  auto projectScopedContainers =
-      gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(
-          globalObjectsContainer, objectsContainer);
-
   gd::EventsRefactorer::RenameObjectInEvents(
       project.GetCurrentPlatform(), projectScopedContainers,
       eventsFunction.GetEvents(), oldName, newName);

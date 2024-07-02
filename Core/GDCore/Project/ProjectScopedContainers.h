@@ -112,6 +112,13 @@ class ProjectScopedContainers {
       gd::ObjectsContainer &parameterObjectsContainer);
 
   static ProjectScopedContainers
+  MakeNewProjectScopedContainersForEventsBasedObject(
+      const gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      const gd::EventsBasedObject &eventsBasedObject,
+      gd::ObjectsContainer &outputObjectsContainer);
+
+  static ProjectScopedContainers
   MakeNewProjectScopedContainersWithLocalVariables(
       const ProjectScopedContainers &projectScopedContainers,
       const gd::BaseEvent &event);

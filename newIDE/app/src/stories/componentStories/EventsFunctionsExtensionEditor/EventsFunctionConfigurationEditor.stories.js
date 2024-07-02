@@ -20,7 +20,9 @@ export const DefaultFreeFunction = () => (
   <FixedHeightFlexContainer height={500}>
     <EventsFunctionConfigurationEditor
       project={testProject.project}
-      globalObjectsContainer={testProject.project.getObjects()}
+      projectScopedContainersAccessor={
+        testProject.emptySceneProjectScopedContainersAccessor
+      }
       objectsContainer={testProject.testLayout.getObjects()}
       helpPagePath="/events/functions"
       eventsFunction={testProject.testEventsFunction}
@@ -36,7 +38,9 @@ export const DefaultBehaviorFunction = () => (
   <FixedHeightFlexContainer height={500}>
     <EventsFunctionConfigurationEditor
       project={testProject.project}
-      globalObjectsContainer={testProject.project.getObjects()}
+      projectScopedContainersAccessor={
+        testProject.emptySceneProjectScopedContainersAccessor
+      }
       objectsContainer={testProject.testLayout.getObjects()}
       helpPagePath="/events/functions"
       eventsFunction={testProject.testBehaviorEventsFunction}
@@ -52,7 +56,9 @@ export const DefaultBehaviorLifecycleFunction = () => (
   <FixedHeightFlexContainer height={500}>
     <EventsFunctionConfigurationEditor
       project={testProject.project}
-      globalObjectsContainer={testProject.project.getObjects()}
+      projectScopedContainersAccessor={
+        testProject.emptySceneProjectScopedContainersAccessor
+      }
       objectsContainer={testProject.testLayout.getObjects()}
       helpPagePath="/events/functions"
       eventsFunction={testProject.testBehaviorLifecycleEventsFunction}
@@ -68,7 +74,9 @@ export const DefaultObjectFunction = () => (
   <FixedHeightFlexContainer height={500}>
     <EventsFunctionConfigurationEditor
       project={testProject.project}
-      globalObjectsContainer={testProject.project.getObjects()}
+      projectScopedContainersAccessor={
+        testProject.emptySceneProjectScopedContainersAccessor
+      }
       objectsContainer={testProject.testLayout.getObjects()}
       helpPagePath="/events/functions"
       eventsFunction={testProject.testObjectEventsFunction}

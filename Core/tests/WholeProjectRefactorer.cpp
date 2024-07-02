@@ -27,6 +27,7 @@
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/Project.h"
+#include "GDCore/Project/ProjectScopedContainers.h"
 #include "GDCore/Project/Variable.h"
 #include "catch.hpp"
 
@@ -1560,16 +1561,15 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       // events in this test.
 
       // Create the objects container for the events function
-      gd::ObjectsContainer globalObjectsContainer;
-      gd::ObjectsContainer objectsContainer;
-      gd::ParameterMetadataTools::ParametersToObjectsContainer(
-          project, eventsFunction.GetParameters(), objectsContainer);
-      // (this is strictly not necessary because we're not testing events in
-      // this test)
+      gd::ObjectsContainer parametersObjectsContainer;
+      auto projectScopedContainers = gd::ProjectScopedContainers::
+          MakeNewProjectScopedContainersForFreeEventsFunction(
+              project, eventsExtension, eventsFunction,
+              parametersObjectsContainer);
 
       // Trigger the refactoring after the renaming of an object
       gd::WholeProjectRefactorer::ObjectOrGroupRenamedInEventsFunction(
-          project, eventsFunction, globalObjectsContainer, objectsContainer,
+          project, projectScopedContainers, eventsFunction,
           "Object1", "RenamedObject1",
           /* isObjectGroup=*/false);
 
@@ -1589,20 +1589,21 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
           eventsExtension.GetEventsFunction("MyOtherEventsFunction");
 
       // Create the objects container for the events function
-      gd::ObjectsContainer globalObjectsContainer;
-      gd::ObjectsContainer objectsContainer;
-      gd::ParameterMetadataTools::ParametersToObjectsContainer(
-          project, eventsFunction.GetParameters(), objectsContainer);
+      gd::ObjectsContainer parametersObjectsContainer;
+      auto projectScopedContainers = gd::ProjectScopedContainers::
+          MakeNewProjectScopedContainersForFreeEventsFunction(
+              project, eventsExtension, eventsFunction,
+              parametersObjectsContainer);
 
       // Simulate a variable in ObjectWithMyBehavior, even if this is not
       // supported by the editor.
-      auto& objectWithMyBehavior = objectsContainer.GetObject("ObjectWithMyBehavior");
+      auto& objectWithMyBehavior = parametersObjectsContainer.GetObject("ObjectWithMyBehavior");
       objectWithMyBehavior.GetVariables().InsertNew("MyVariable");
       objectWithMyBehavior.GetVariables().InsertNew("MyStructureVariable").CastTo(gd::Variable::Structure);
 
       // Trigger the refactoring after the renaming of an object
       gd::WholeProjectRefactorer::ObjectOrGroupRenamedInEventsFunction(
-          project, eventsFunction, globalObjectsContainer, objectsContainer,
+          project, projectScopedContainers, eventsFunction,
           "ObjectWithMyBehavior", "RenamedObjectWithMyBehavior",
           /* isObjectGroup=*/false);
 
@@ -1631,12 +1632,16 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                .GetEventsBasedObjects()
                .Get("MyOtherEventsBasedObject");
 
-    // Create the objects container for the events function
-    gd::ObjectsContainer globalObjectsContainer;
+      // Create the objects container for the events function
+      gd::ObjectsContainer parametersObjectsContainer;
+      auto projectScopedContainers = gd::ProjectScopedContainers::
+          MakeNewProjectScopedContainersForEventsBasedObject(
+              project, eventsExtension, eventsBasedObject,
+              parametersObjectsContainer);
 
     // Trigger the refactoring after the renaming of an object
     gd::WholeProjectRefactorer::ObjectOrGroupRenamedInEventsBasedObject(
-        project, globalObjectsContainer, eventsBasedObject,
+        project, projectScopedContainers, eventsBasedObject,
         "ObjectWithMyBehavior", "RenamedObjectWithMyBehavior",
         /* isObjectGroup=*/false);
 
@@ -1674,17 +1679,9 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     // In theory, we would add the object parameters, but we're not testing
     // events in this test.
 
-    // Create the objects container for the events function
-    gd::ObjectsContainer globalObjectsContainer;
-    gd::ObjectsContainer objectsContainer;
-    gd::ParameterMetadataTools::ParametersToObjectsContainer(
-        project, eventsFunction.GetParameters(), objectsContainer);
-    // (this is strictly not necessary because we're not testing events in this
-    // test)
-
     // Trigger the refactoring after the renaming of an object
     gd::WholeProjectRefactorer::ObjectRemovedInEventsFunction(
-        project, eventsFunction, globalObjectsContainer, objectsContainer,
+        project, eventsFunction,
         "Object1");
 
     REQUIRE(objectGroup.Find("Object1") == false);

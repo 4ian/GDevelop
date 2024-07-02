@@ -37,6 +37,7 @@ class BehaviorMetadata;
 class UnfilledRequiredBehaviorPropertyProblem;
 class ProjectBrowser;
 class SerializerElement;
+class ProjectScopedContainers;
 struct VariablesRenamingChangesetNode;
 }  // namespace gd
 
@@ -416,8 +417,6 @@ class GD_CORE_API WholeProjectRefactorer {
   static void ObjectRemovedInEventsBasedObject(
       gd::Project& project,
       gd::EventsBasedObject& eventsBasedObject,
-      gd::ObjectsContainer& globalObjectsContainer,
-      gd::ObjectsContainer& objectsContainer,
       const gd::String& objectName);
 
   /**
@@ -427,7 +426,7 @@ class GD_CORE_API WholeProjectRefactorer {
    */
   static void ObjectOrGroupRenamedInEventsBasedObject(
       gd::Project& project,
-      gd::ObjectsContainer& globalObjectsContainer,
+      const gd::ProjectScopedContainers &projectScopedContainers,
       gd::EventsBasedObject& eventsBasedObject,
       const gd::String& oldName,
       const gd::String& newName,
@@ -440,9 +439,8 @@ class GD_CORE_API WholeProjectRefactorer {
    */
   static void ObjectOrGroupRenamedInEventsFunction(
       gd::Project& project,
+      const gd::ProjectScopedContainers &projectScopedContainers,
       gd::EventsFunction& eventsFunction,
-      gd::ObjectsContainer& globalObjectsContainer,
-      gd::ObjectsContainer& objectsContainer,
       const gd::String& oldName,
       const gd::String& newName,
       bool isObjectGroup);
@@ -455,8 +453,6 @@ class GD_CORE_API WholeProjectRefactorer {
   static void ObjectRemovedInEventsFunction(
       gd::Project& project,
       gd::EventsFunction& eventsFunction,
-      gd::ObjectsContainer& globalObjectsContainer,
-      gd::ObjectsContainer& objectsContainer,
       const gd::String& objectName);
 
   /**

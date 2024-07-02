@@ -26,10 +26,10 @@ declare class gdWholeProjectRefactorer {
   static objectOrGroupRenamedInLayout(project: gdProject, layout: gdLayout, oldName: string, newName: string, isObjectGroup: boolean): void;
   static objectRemovedInLayout(project: gdProject, layout: gdLayout, objectName: string): void;
   static behaviorsAddedToObjectInLayout(project: gdProject, layout: gdLayout, objectName: string): void;
-  static objectOrGroupRenamedInEventsFunction(project: gdProject, eventsFunction: gdEventsFunction, globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, oldName: string, newName: string, isObjectGroup: boolean): void;
-  static objectRemovedInEventsFunction(project: gdProject, eventsFunction: gdEventsFunction, globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string): void;
-  static objectOrGroupRenamedInEventsBasedObject(project: gdProject, globalObjectsContainer: gdObjectsContainer, eventsBasedObject: gdEventsBasedObject, oldName: string, newName: string, isObjectGroup: boolean): void;
-  static objectRemovedInEventsBasedObject(project: gdProject, eventsBasedObject: gdEventsBasedObject, globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string): void;
+  static objectOrGroupRenamedInEventsFunction(project: gdProject, projectScopedContainers: gdProjectScopedContainers, eventsFunction: gdEventsFunction, oldName: string, newName: string, isObjectGroup: boolean): void;
+  static objectRemovedInEventsFunction(project: gdProject, eventsFunction: gdEventsFunction, objectName: string): void;
+  static objectOrGroupRenamedInEventsBasedObject(project: gdProject, projectScopedContainers: gdProjectScopedContainers, eventsBasedObject: gdEventsBasedObject, oldName: string, newName: string, isObjectGroup: boolean): void;
+  static objectRemovedInEventsBasedObject(project: gdProject, eventsBasedObject: gdEventsBasedObject, objectName: string): void;
   static globalObjectOrGroupRenamed(project: gdProject, oldName: string, newName: string, isObjectGroup: boolean): void;
   static globalObjectRemoved(project: gdProject, objectName: string): void;
   static behaviorsAddedToGlobalObject(project: gdProject, objectName: string): void;

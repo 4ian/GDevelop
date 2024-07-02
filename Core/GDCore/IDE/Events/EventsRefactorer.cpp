@@ -296,7 +296,7 @@ class GD_CORE_API ExpressionObjectFinder : public ExpressionParser2NodeWorker {
 };
 
 bool EventsRefactorer::RenameObjectInActions(const gd::Platform& platform,
-                                             gd::ProjectScopedContainers& projectScopedContainers,
+                                             const gd::ProjectScopedContainers& projectScopedContainers,
                                              gd::InstructionsList& actions,
                                              gd::String oldName,
                                              gd::String newName) {
@@ -347,7 +347,7 @@ bool EventsRefactorer::RenameObjectInActions(const gd::Platform& platform,
 
 bool EventsRefactorer::RenameObjectInConditions(
     const gd::Platform& platform,
-    gd::ProjectScopedContainers& projectScopedContainers,
+    const gd::ProjectScopedContainers& projectScopedContainers,
     gd::InstructionsList& conditions,
     gd::String oldName,
     gd::String newName) {
@@ -399,7 +399,7 @@ bool EventsRefactorer::RenameObjectInConditions(
 
 bool EventsRefactorer::RenameObjectInEventParameters(
     const gd::Platform& platform,
-    gd::ProjectScopedContainers& projectScopedContainers,
+    const gd::ProjectScopedContainers& projectScopedContainers,
     gd::Expression& expression,
     gd::ParameterMetadata parameterMetadata,
     gd::String oldName,
@@ -432,7 +432,7 @@ bool EventsRefactorer::RenameObjectInEventParameters(
 }
 
 void EventsRefactorer::RenameObjectInEvents(const gd::Platform& platform,
-                                            gd::ProjectScopedContainers& projectScopedContainers,
+                                            const gd::ProjectScopedContainers& projectScopedContainers,
                                             gd::EventsList& events,
                                             gd::String oldName,
                                             gd::String newName) {
@@ -475,7 +475,7 @@ void EventsRefactorer::RenameObjectInEvents(const gd::Platform& platform,
 }
 
 bool EventsRefactorer::RemoveObjectInActions(const gd::Platform& platform,
-                                             gd::ProjectScopedContainers& projectScopedContainers,
+                                             const gd::ProjectScopedContainers& projectScopedContainers,
                                              gd::InstructionsList& actions,
                                              gd::String name) {
   bool somethingModified = false;
@@ -532,7 +532,7 @@ bool EventsRefactorer::RemoveObjectInActions(const gd::Platform& platform,
 
 bool EventsRefactorer::RemoveObjectInConditions(
     const gd::Platform& platform,
-    gd::ProjectScopedContainers& projectScopedContainers,
+    const gd::ProjectScopedContainers& projectScopedContainers,
     gd::InstructionsList& conditions,
     gd::String name) {
   bool somethingModified = false;

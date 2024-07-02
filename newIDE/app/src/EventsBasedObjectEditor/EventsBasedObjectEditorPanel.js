@@ -14,7 +14,6 @@ type TabName = 'configuration' | 'properties' | 'children';
 
 type Props = {|
   project: gdProject,
-  globalObjectsContainer: gdObjectsContainer,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsBasedObject: gdEventsBasedObject,
   onRenameProperty: (oldName: string, newName: string) => void,
@@ -25,7 +24,6 @@ type Props = {|
 
 export default function EventsBasedObjectEditorPanel({
   project,
-  globalObjectsContainer,
   eventsFunctionsExtension,
   eventsBasedObject,
   onRenameProperty,
@@ -99,7 +97,6 @@ export default function EventsBasedObjectEditorPanel({
         {currentTab === 'children' && (
           <EventBasedObjectChildrenEditor
             project={project}
-            globalObjectsContainer={globalObjectsContainer}
             eventsFunctionsExtension={eventsFunctionsExtension}
             eventsBasedObject={eventsBasedObject}
             projectScopedContainersAccessor={projectScopedContainersAccessor}

@@ -1171,10 +1171,13 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             {({ i18n }) => (
               <Background maxWidth>
                 {selectedEventsFunction &&
-                this._globalObjectsContainer &&
-                this._objectsContainer ? (
+                this._objectsContainer &&
+                this._projectScopedContainersAccessor ? (
                   <EventsFunctionConfigurationEditor
                     project={project}
+                    projectScopedContainersAccessor={
+                      this._projectScopedContainersAccessor
+                    }
                     eventsFunction={selectedEventsFunction}
                     eventsBasedBehavior={selectedEventsBasedBehavior}
                     eventsBasedObject={selectedEventsBasedObject}
@@ -1183,7 +1186,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                         selectedEventsBasedEntity.getEventsFunctions()) ||
                       eventsFunctionsExtension
                     }
-                    globalObjectsContainer={this._globalObjectsContainer}
                     objectsContainer={this._objectsContainer}
                     onConfigurationUpdated={this._onConfigurationUpdated}
                     helpPagePath={
@@ -1299,10 +1301,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
               }}
               onConfigurationUpdated={this._onConfigurationUpdated}
             />
-          ) : selectedEventsBasedObject && this._globalObjectsContainer ? (
+          ) : selectedEventsBasedObject ? (
             <EventsBasedObjectEditorPanel
               project={project}
-              globalObjectsContainer={this._globalObjectsContainer}
               eventsFunctionsExtension={eventsFunctionsExtension}
               eventsBasedObject={selectedEventsBasedObject}
               unsavedChanges={this.props.unsavedChanges}

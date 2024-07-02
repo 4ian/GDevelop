@@ -253,6 +253,47 @@ namespace gdjs {
         );
       };
 
+      export const _distanceToPosition = function (obj, x, y, distance) {
+        return obj.getSqDistanceToPosition(x, y) <= distance;
+      };
+
+      export const distanceToPositionTest = function (
+        objectsLists1: ObjectsLists,
+        x: float,
+        y: float,
+        distance: float,
+        inverted: boolean
+      ) {
+        let isTrue = false;
+        const squaredDistance = distance * distance;
+        const lists = gdjs.staticArray(
+          gdjs.evtTools.object.distanceToPositionTest
+        );
+        objectsLists1.values(lists);
+
+        for (let i = 0, len = lists.length; i < len; ++i) {
+          const arr = lists[i];
+          for (let k = 0, lenk = arr.length; k < lenk; ++k) {
+            const obj = arr[k];
+            const withinDistance =
+              obj.getSqDistanceToPosition(x, y) <= squaredDistance;
+            if (inverted ? !withinDistance : withinDistance) {
+              isTrue = true;
+              obj.pick = true;
+            } else {
+              obj.pick = false;
+            }
+          }
+        }
+
+        // Trim not picked objects from lists.
+        for (let i = 0, len = lists.length; i < len; ++i) {
+          gdjs.evtTools.object.filterPickedObjectsList(lists[i]);
+        }
+
+        return isTrue;
+      };
+
       export const _movesToward = function (obj1, obj2, tolerance) {
         if (obj1.hasNoForces()) {
           return false;

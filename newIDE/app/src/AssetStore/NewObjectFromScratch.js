@@ -50,7 +50,7 @@ const ObjectListItem = ({
       secondaryText={enumeratedObjectMetadata.description}
       secondaryTextLines={2}
       onClick={onClick}
-      disabled={!!enumeratedObjectMetadata.isDependentFromParent}
+      disabled={!!enumeratedObjectMetadata.isDependentWithParent}
     />
   );
 };
@@ -333,11 +333,23 @@ const getMergedInstalledWithDefaultEnumeratedObjectMetadataByCategory = ({
       const enumeratedObjectMetadatas =
         defaultEnumeratedObjectMetadatasByCategory[category];
       for (const enumeratedObjectMetadata of enumeratedObjectMetadatas) {
-        enumeratedObjectMetadata.isDependentFromParent = gd.EventsBasedObjectDependencyFinder.isDependentFromObjectType(
-          project,
-          eventsBasedObject,
+        if (!project.hasEventsBasedObject(enumeratedObjectMetadata.name)) {
+          continue;
+        }
+        const otherEventBasedObject = project.getEventsBasedObject(
           enumeratedObjectMetadata.name
         );
+        enumeratedObjectMetadata.isDependentWithParent =
+          gd.EventsBasedObjectDependencyFinder.isDependentFromEventsBasedObject(
+            project,
+            eventsBasedObject,
+            otherEventBasedObject
+          ) ||
+          gd.EventsBasedObjectDependencyFinder.isDependentFromEventsBasedObject(
+            project,
+            otherEventBasedObject,
+            eventsBasedObject
+          );
       }
     }
   }

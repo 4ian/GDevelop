@@ -25,10 +25,6 @@ public:
   static bool IsDependentFromEventsBasedObject(const gd::Project &project,
                               const gd::EventsBasedObject &eventsBasedObject,
                               const gd::EventsBasedObject &dependency);
-
-  static bool IsDependentFromObjectType(const gd::Project &project,
-                              const gd::EventsBasedObject &eventsBasedObject,
-                              const gd::String &dependencyObjectType);
 };
 
 } // namespace gd

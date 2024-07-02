@@ -15,6 +15,7 @@ export type EnumeratedObjectMetadata = {|
   categoryFullName: string,
   assetStorePackTag?: string,
   requiredExtensions?: Array<RequiredExtension>,
+  isDependentFromParent?: boolean,
 |};
 
 export type ObjectWithContext = {|

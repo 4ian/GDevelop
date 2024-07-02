@@ -1838,6 +1838,10 @@ export class WholeProjectRefactorer extends EmscriptenObject {
   static getLayoutAndExternalLayoutLayerInstancesCount(project: Project, layout: Layout, layerName: string): number;
 }
 
+export class EventsBasedObjectDependencyFinder extends EmscriptenObject {
+  static isDependentFromObjectType(project: Project, eventsBasedObject: EventsBasedObject, dependencyObjectType: string): boolean;
+}
+
 export class PropertyFunctionGenerator extends EmscriptenObject {
   static generateBehaviorGetterAndSetter(project: Project, extension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, property: NamedPropertyDescriptor, isSharedProperties: boolean): void;
   static generateObjectGetterAndSetter(project: Project, extension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, property: NamedPropertyDescriptor): void;

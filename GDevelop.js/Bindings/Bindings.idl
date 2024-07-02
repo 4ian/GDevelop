@@ -2500,6 +2500,13 @@ interface WholeProjectRefactorer {
     unsigned long STATIC_GetLayoutAndExternalLayoutLayerInstancesCount([Ref] Project project, [Ref] Layout layout, [Const] DOMString layerName);
 };
 
+interface EventsBasedObjectDependencyFinder {
+  boolean STATIC_IsDependentFromObjectType(
+    [Const, Ref] Project project,
+    [Const, Ref] EventsBasedObject eventsBasedObject,
+    [Const] DOMString dependencyObjectType);
+};
+
 interface PropertyFunctionGenerator {
     void STATIC_GenerateBehaviorGetterAndSetter([Ref] Project project, [Ref] EventsFunctionsExtension extension, [Ref] EventsBasedBehavior eventsBasedBehavior, [Const, Ref] NamedPropertyDescriptor property, boolean isSharedProperties);
     void STATIC_GenerateObjectGetterAndSetter([Ref] Project project, [Ref] EventsFunctionsExtension extension, [Ref] EventsBasedObject eventsBasedObject, [Const, Ref] NamedPropertyDescriptor property);

@@ -27,6 +27,7 @@ export const Default = () => (
         getThumbnail={() => 'res/unknown32.png'}
         project={testProject.project}
         layout={testProject.testLayout}
+        eventsBasedObject={null}
         globalObjectsContainer={testProject.project.getObjects()}
         objectsContainer={testProject.testLayout.getObjects()}
         resourceManagementProps={fakeResourceManagementProps}
@@ -58,6 +59,7 @@ export const WithSerializedObjectView = () => (
           getThumbnail={() => 'res/unknown32.png'}
           project={testProject.project}
           layout={testProject.testLayout}
+          eventsBasedObject={null}
           globalObjectsContainer={testProject.project.getObjects()}
           objectsContainer={testProject.testLayout.getObjects()}
           resourceManagementProps={fakeResourceManagementProps}

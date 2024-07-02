@@ -25,6 +25,7 @@ export const Default = () => {
           <NewObjectDialog
             project={testProject.project}
             layout={testProject.testLayout}
+            eventsBasedObject={null}
             onClose={action('onClose')}
             onCreateNewObject={action('onCreateNewObject')}
             onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}

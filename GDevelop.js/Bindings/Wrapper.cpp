@@ -55,6 +55,7 @@
 #include <GDCore/IDE/Project/ResourcesInUseHelper.h>
 #include <GDCore/IDE/Project/ResourcesMergingHelper.h>
 #include <GDCore/IDE/Project/ResourcesRenamer.h>
+#include <GDCore/IDE/Project/EventsBasedObjectDependencyFinder.h>
 #include <GDCore/IDE/ProjectBrowserHelper.h>
 #include <GDCore/IDE/PropertyFunctionGenerator.h>
 #include <GDCore/IDE/UnfilledRequiredBehaviorPropertyProblem.h>
@@ -698,6 +699,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_IsSwitchableObjectVariableInstruction IsSwitchableObjectVariableInstruction
 #define STATIC_GetSwitchableVariableInstructionIdentifier GetSwitchableVariableInstructionIdentifier
 #define STATIC_GetSwitchableInstructionVariableType GetSwitchableInstructionVariableType
+#define STATIC_IsDependentFromObjectType IsDependentFromObjectType
 
 #define STATIC_IsFreeFunctionOnlyCallingItself IsFreeFunctionOnlyCallingItself
 #define STATIC_IsBehaviorFunctionOnlyCallingItself \

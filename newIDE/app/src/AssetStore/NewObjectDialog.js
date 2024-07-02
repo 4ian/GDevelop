@@ -98,6 +98,7 @@ export const useFetchAssets = () => {
 type Props = {|
   project: gdProject,
   layout: ?gdLayout,
+  eventsBasedObject: gdEventsBasedObject | null,
   objectsContainer: gdObjectsContainer,
   resourceManagementProps: ResourceManagementProps,
   onClose: () => void,
@@ -110,6 +111,7 @@ type Props = {|
 function NewObjectDialog({
   project,
   layout,
+  eventsBasedObject,
   objectsContainer,
   resourceManagementProps,
   onClose,
@@ -494,6 +496,7 @@ function NewObjectDialog({
                 }}
                 isAssetBeingInstalled={isAssetBeingInstalled}
                 project={project}
+                eventsBasedObject={eventsBasedObject}
                 i18n={i18n}
               />
             )}

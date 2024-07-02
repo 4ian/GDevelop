@@ -22,6 +22,8 @@ import LoaderModal from '../UI/LoaderModal';
 import ChevronArrowLeft from '../UI/CustomSvgIcons/ChevronArrowLeft';
 import AssetsList from './AssetsList';
 
+const gd: libGDevelop = global.gd;
+
 const ObjectListItem = ({
   enumeratedObjectMetadata,
   onClick,
@@ -48,6 +50,7 @@ const ObjectListItem = ({
       secondaryText={enumeratedObjectMetadata.description}
       secondaryTextLines={2}
       onClick={onClick}
+      disabled={!!enumeratedObjectMetadata.isDependentFromParent}
     />
   );
 };
@@ -114,9 +117,11 @@ export const CustomObjectPackResults = ({
 const getMergedInstalledWithDefaultEnumeratedObjectMetadataByCategory = ({
   i18n,
   project,
+  eventsBasedObject,
 }: {|
   i18n: I18nType,
   project: gdProject,
+  eventsBasedObject: gdEventsBasedObject | null,
 |}): { [key: string]: Array<EnumeratedObjectMetadata> } => {
   const installedEnumeratedObjectMetadatas = enumerateObjectTypes(project);
 
@@ -323,11 +328,26 @@ const getMergedInstalledWithDefaultEnumeratedObjectMetadataByCategory = ({
     }
   );
 
+  if (eventsBasedObject) {
+    for (const category in defaultEnumeratedObjectMetadatasByCategory) {
+      const enumeratedObjectMetadatas =
+        defaultEnumeratedObjectMetadatasByCategory[category];
+      for (const enumeratedObjectMetadata of enumeratedObjectMetadatas) {
+        enumeratedObjectMetadata.isDependentFromParent = gd.EventsBasedObjectDependencyFinder.isDependentFromObjectType(
+          project,
+          eventsBasedObject,
+          enumeratedObjectMetadata.name
+        );
+      }
+    }
+  }
+
   return defaultEnumeratedObjectMetadatasByCategory;
 };
 
 type Props = {|
   project: gdProject,
+  eventsBasedObject: gdEventsBasedObject | null,
   onCreateNewObject: (type: string) => void,
   onCustomObjectSelected: (?EnumeratedObjectMetadata) => void,
   selectedCustomObject: ?EnumeratedObjectMetadata,
@@ -338,6 +358,7 @@ type Props = {|
 
 export default function NewObjectFromScratch({
   project,
+  eventsBasedObject,
   onCreateNewObject,
   onCustomObjectSelected,
   selectedCustomObject,
@@ -351,9 +372,10 @@ export default function NewObjectFromScratch({
     () =>
       getMergedInstalledWithDefaultEnumeratedObjectMetadataByCategory({
         project,
+        eventsBasedObject,
         i18n,
       }),
-    [project, i18n]
+    [project, eventsBasedObject, i18n]
   );
 
   const { DismissableTutorialMessage } = useDismissableTutorialMessage(

@@ -2063,7 +2063,9 @@ const MainFrame = (props: Props) => {
       }));
 
       // Re-open first layout as this is usually the entry point for a game.
-      const firstLayout = currentProject.getFirstLayout();
+      const firstLayout =
+        currentProject.getFirstLayout() || // First layout can be empty
+        currentProject.getLayoutAt(0).getName();
       openLayout(firstLayout, {
         openSceneEditor: true,
         openEventsEditor: true,

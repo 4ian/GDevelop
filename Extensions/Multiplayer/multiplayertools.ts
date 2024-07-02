@@ -1,5 +1,12 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Multiplayer');
+
+  type Lobby = {
+    id: string;
+    name: string;
+    status: string;
+    players: { playerId: string; status: string }[];
+  };
   export namespace multiplayer {
     /** Set to true in testing to avoid relying on the multiplayer extension. */
     export let disableMultiplayerForTesting = false;
@@ -13,12 +20,7 @@ namespace gdjs {
     let _hasLobbyGameJustEnded = false;
     let _lobbyId: string | null = null;
     let _connectionId: string | null = null;
-    export let _lobby: {
-      id: string;
-      name: string;
-      status: string;
-      players: { playerId: string; status: string }[];
-    } | null = null;
+    export let _lobby: Lobby | null = null;
     let _playerPublicProfiles: { id: string; username?: string }[] = [];
 
     // Communication methods.
@@ -464,7 +466,11 @@ namespace gdjs {
                 logger.error('No lobby received');
                 return;
               }
-              handleLobbyUpdatedEvent(runtimeScene, lobby, positionInLobby);
+              handleLobbyUpdatedEvent({
+                runtimeScene,
+                updatedLobby: lobby,
+                positionInLobby,
+              });
               break;
             }
             case 'gameCountdownStarted': {
@@ -473,11 +479,11 @@ namespace gdjs {
               const secondsToStart =
                 messageData.secondsToStart ||
                 DEFAULT_COUNTDOWN_SECONDS_TO_START;
-              handleGameCountdownStartedEvent(
+              handleGameCountdownStartedEvent({
                 runtimeScene,
                 compressionMethod,
-                secondsToStart
-              );
+                secondsToStart,
+              });
               break;
             }
             case 'gameStarted': {
@@ -486,7 +492,7 @@ namespace gdjs {
                 messageData.heartbeatInterval ||
                 DEFAULT_LOBBY_HEARTBEAT_INTERVAL;
 
-              handleGameStartedEvent(runtimeScene, heartbeatInterval);
+              handleGameStartedEvent({ runtimeScene, heartbeatInterval });
               break;
             }
             case 'peerId': {
@@ -501,7 +507,7 @@ namespace gdjs {
                 return;
               }
 
-              handlePeerIdEvent(peerId);
+              handlePeerIdEvent({ peerId });
               break;
             }
           }
@@ -637,11 +643,15 @@ namespace gdjs {
       _websocket = null;
     };
 
-    const handleLobbyUpdatedEvent = function (
-      runtimeScene: gdjs.RuntimeScene,
+    const handleLobbyUpdatedEvent = function ({
+      runtimeScene,
       updatedLobby,
-      positionInLobby: number
-    ) {
+      positionInLobby,
+    }: {
+      runtimeScene: gdjs.RuntimeScene;
+      updatedLobby: Lobby;
+      positionInLobby: number;
+    }) {
       // Update the object representing the lobby in the extension.
       _lobby = updatedLobby;
 
@@ -675,11 +685,15 @@ namespace gdjs {
       );
     };
 
-    const handleGameCountdownStartedEvent = function (
-      runtimeScene: gdjs.RuntimeScene,
-      compressionMethod: gdjs.multiplayerPeerJsHelper.CompressionMethod,
-      secondsToStart: number
-    ) {
+    const handleGameCountdownStartedEvent = function ({
+      runtimeScene,
+      compressionMethod,
+      secondsToStart,
+    }: {
+      runtimeScene: gdjs.RuntimeScene;
+      compressionMethod: gdjs.multiplayerPeerJsHelper.CompressionMethod;
+      secondsToStart: number;
+    }) {
       gdjs.multiplayerPeerJsHelper.setCompressionMethod(compressionMethod);
 
       // When the countdown starts, if we are player number 1, then send the peerId to others so they can connect via P2P.
@@ -715,10 +729,13 @@ namespace gdjs {
      * When the game receives the information that the game has started, close the
      * lobbies window, focus on the game, and set the flag to true.
      */
-    const handleGameStartedEvent = function (
-      runtimeScene: gdjs.RuntimeScene,
-      heartbeatInterval: number
-    ) {
+    const handleGameStartedEvent = function ({
+      runtimeScene,
+      heartbeatInterval,
+    }: {
+      runtimeScene: gdjs.RuntimeScene;
+      heartbeatInterval: number;
+    }) {
       // It is possible the connection to other players didn't work.
       // If that's the case, show an error message and leave the lobby.
       // If we are the host, still start the game, as this allows a player to test the game alone.
@@ -802,7 +819,7 @@ namespace gdjs {
      * When the game receives the information of the peerId, then
      * the player can connect to the peer.
      */
-    const handlePeerIdEvent = function (peerId: string) {
+    const handlePeerIdEvent = function ({ peerId }: { peerId: string }) {
       // When a peerId is received, trigger a P2P connection with the peer.
       const currentPeerId = gdjs.multiplayerPeerJsHelper.getCurrentId();
       if (!currentPeerId) {

@@ -277,6 +277,7 @@ const InstructionEditorDialog = ({
       ref={instructionParametersEditor}
       focusOnMount={shouldAutofocusInput && !!instructionType}
       noHelpButton
+      id="object-instruction-parameters"
     />
   );
 

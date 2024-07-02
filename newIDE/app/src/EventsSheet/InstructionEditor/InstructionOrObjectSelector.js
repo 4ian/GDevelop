@@ -437,11 +437,15 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                         </Subheader>
                       )}
                       {displayedObjectGroupsList.map(
-                        ({ item: groupWithContext, matches }) => {
+                        ({ item: groupWithContext, matches }, index) => {
                           const results = [];
 
                           results.push(
                             renderGroupObjectsListItem({
+                              id: 'objectGroup-item-' + index,
+                              data: {
+                                objectName: groupWithContext.group.getName(),
+                              },
                               groupWithContext,
                               iconSize,
                               onClick: () =>

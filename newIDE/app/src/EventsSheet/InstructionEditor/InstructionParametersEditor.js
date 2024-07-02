@@ -84,6 +84,7 @@ type Props = {|
     type: string
   ) => void,
   noHelpButton?: boolean,
+  id?: string,
 |};
 
 const isParameterVisible = (
@@ -119,6 +120,7 @@ const InstructionParametersEditor = React.forwardRef<
       style,
       openInstructionOrExpression,
       resourceManagementProps,
+      id,
     },
     ref
   ) => {
@@ -256,195 +258,199 @@ const InstructionParametersEditor = React.forwardRef<
 
     let parameterFieldIndex = 0;
     return (
-      <I18n>
-        {({ i18n }) => (
-          <ScrollView autoHideScrollbar>
-            <Column expand>
-              <Line alignItems="flex-start">
-                <img
-                  src={iconFilename}
-                  alt=""
-                  style={{
-                    ...styles.icon,
-                    filter: shouldInvertGrayScale
-                      ? 'grayscale(1) invert(1)'
-                      : undefined,
-                  }}
-                />
-                <Column expand>
-                  <Text style={styles.description}>
-                    {instructionMetadata.getDescription()}
-                  </Text>
-                </Column>
-              </Line>
-              {instructionExtraInformation && (
-                <Line>
-                  {instructionExtraInformation.identifier === undefined ? (
-                    <AlertMessage kind={instructionExtraInformation.kind}>
-                      {i18n._(instructionExtraInformation.message)}
-                    </AlertMessage>
-                  ) : (
-                    <DismissableAlertMessage
-                      kind={instructionExtraInformation.kind}
-                      identifier={instructionExtraInformation.identifier}
-                    >
-                      {i18n._(instructionExtraInformation.message)}
-                    </DismissableAlertMessage>
-                  )}
-                </Line>
-              )}
-              {tutorialIds.length ? (
-                <Line>
-                  <ColumnStackLayout expand>
-                    {tutorialIds.map(tutorialId => (
-                      <DismissableTutorialMessage
-                        key={tutorialId}
-                        tutorialId={tutorialId}
-                      />
-                    ))}
-                  </ColumnStackLayout>
-                </Line>
-              ) : null}
-              <Spacer />
-              <div
-                key={instructionType}
-                style={styles.parametersContainer}
-                id="instruction-parameters-container"
-              >
-                <ColumnStackLayout noMargin>
-                  {mapFor(0, instructionMetadata.getParametersCount(), i => {
-                    const parameterMetadata = instructionMetadata.getParameter(
-                      i
-                    );
-                    if (
-                      !isParameterVisible(
-                        parameterMetadata,
-                        i,
-                        objectParameterIndex
-                      )
-                    )
-                      return null;
-
-                    const parameterMetadataType = parameterMetadata.getType();
-                    const ParameterComponent = ParameterRenderingService.getParameterComponent(
-                      parameterMetadataType
-                    );
-
-                    // Track the field count on screen, to affect the ref to the
-                    // first visible field.
-                    const isFirstVisibleParameterField =
-                      parameterFieldIndex === 0;
-                    parameterFieldIndex++;
-
-                    return (
-                      <ParameterComponent
-                        instructionMetadata={instructionMetadata}
-                        instruction={instruction}
-                        parameterMetadata={parameterMetadata}
-                        parameterIndex={i}
-                        value={instruction.getParameter(i).getPlainString()}
-                        onChange={value => {
-                          if (
-                            instruction.getParameter(i).getPlainString() !==
-                            value
-                          ) {
-                            instruction.setParameter(i, value);
-                            setIsDirty(true);
-                            forceUpdate();
-                          }
-                        }}
-                        onInstructionTypeChanged={forceUpdate}
-                        project={project}
-                        scope={scope}
-                        globalObjectsContainer={globalObjectsContainer}
-                        objectsContainer={objectsContainer}
-                        projectScopedContainersAccessor={
-                          projectScopedContainersAccessor
-                        }
-                        key={i}
-                        parameterRenderingService={ParameterRenderingService}
-                        resourceManagementProps={resourceManagementProps}
-                        ref={field => {
-                          if (isFirstVisibleParameterField) {
-                            firstVisibleField.current = field;
-                          }
-                        }}
-                      />
-                    );
-                  })}
-                </ColumnStackLayout>
-                {getVisibleParametersCount(instructionMetadata, objectName) ===
-                  0 && (
-                  <EmptyMessage>
-                    <Trans>There is nothing to configure.</Trans>
-                  </EmptyMessage>
-                )}
-                {isCondition && (
-                  <Toggle
-                    label={<Trans>Invert condition</Trans>}
-                    labelPosition="right"
-                    toggled={instruction.isInverted()}
-                    style={styles.invertToggle}
-                    onToggle={(e, enabled) => {
-                      instruction.setInverted(enabled);
-                      forceUpdate();
+      <div id={id}>
+        <I18n>
+          {({ i18n }) => (
+            <ScrollView autoHideScrollbar>
+              <Column expand>
+                <Line alignItems="flex-start">
+                  <img
+                    src={iconFilename}
+                    alt=""
+                    style={{
+                      ...styles.icon,
+                      filter: shouldInvertGrayScale
+                        ? 'grayscale(1) invert(1)'
+                        : undefined,
                     }}
                   />
-                )}
-                {instructionMetadata.isOptionallyAsync() && (
-                  <Toggle
-                    label={
-                      <Trans>
-                        Wait for the action to end before executing the actions
-                        (and subevents) following it
-                      </Trans>
-                    }
-                    labelPosition="right"
-                    toggled={instruction.isAwaited()}
-                    style={styles.invertToggle}
-                    onToggle={(e, enabled) => {
-                      instruction.setAwaited(enabled);
-                      forceUpdate();
-                    }}
-                  />
-                )}
-                {isAnEventFunctionMetadata(instructionMetadata) && (
+                  <Column expand>
+                    <Text style={styles.description}>
+                      {instructionMetadata.getDescription()}
+                    </Text>
+                  </Column>
+                </Line>
+                {instructionExtraInformation && (
                   <Line>
-                    <FlatButton
-                      key={'open-extension'}
-                      label={
-                        isCondition ? (
-                          <Trans>Edit this condition events</Trans>
-                        ) : (
-                          <Trans>Edit this action events</Trans>
-                        )
-                      }
-                      onClick={() => {
-                        openExtension(i18n);
-                      }}
-                      leftIcon={<Edit />}
-                    />
+                    {instructionExtraInformation.identifier === undefined ? (
+                      <AlertMessage kind={instructionExtraInformation.kind}>
+                        {i18n._(instructionExtraInformation.message)}
+                      </AlertMessage>
+                    ) : (
+                      <DismissableAlertMessage
+                        kind={instructionExtraInformation.kind}
+                        identifier={instructionExtraInformation.identifier}
+                      >
+                        {i18n._(instructionExtraInformation.message)}
+                      </DismissableAlertMessage>
+                    )}
                   </Line>
                 )}
-              </div>
-              <Line>
-                {!noHelpButton && helpPage && (
-                  <HelpButton
-                    helpPagePath={instructionMetadata.getHelpPath()}
-                    label={
-                      isCondition ? (
-                        <Trans>Help for this condition</Trans>
-                      ) : (
-                        <Trans>Help for this action</Trans>
+                {tutorialIds.length ? (
+                  <Line>
+                    <ColumnStackLayout expand>
+                      {tutorialIds.map(tutorialId => (
+                        <DismissableTutorialMessage
+                          key={tutorialId}
+                          tutorialId={tutorialId}
+                        />
+                      ))}
+                    </ColumnStackLayout>
+                  </Line>
+                ) : null}
+                <Spacer />
+                <div
+                  key={instructionType}
+                  style={styles.parametersContainer}
+                  id="instruction-parameters-container"
+                >
+                  <ColumnStackLayout noMargin>
+                    {mapFor(0, instructionMetadata.getParametersCount(), i => {
+                      const parameterMetadata = instructionMetadata.getParameter(
+                        i
+                      );
+                      if (
+                        !isParameterVisible(
+                          parameterMetadata,
+                          i,
+                          objectParameterIndex
+                        )
                       )
-                    }
-                  />
-                )}
-              </Line>
-            </Column>
-          </ScrollView>
-        )}
-      </I18n>
+                        return null;
+
+                      const parameterMetadataType = parameterMetadata.getType();
+                      const ParameterComponent = ParameterRenderingService.getParameterComponent(
+                        parameterMetadataType
+                      );
+
+                      // Track the field count on screen, to affect the ref to the
+                      // first visible field.
+                      const isFirstVisibleParameterField =
+                        parameterFieldIndex === 0;
+                      parameterFieldIndex++;
+
+                      return (
+                        <ParameterComponent
+                          instructionMetadata={instructionMetadata}
+                          instruction={instruction}
+                          parameterMetadata={parameterMetadata}
+                          parameterIndex={i}
+                          value={instruction.getParameter(i).getPlainString()}
+                          onChange={value => {
+                            if (
+                              instruction.getParameter(i).getPlainString() !==
+                              value
+                            ) {
+                              instruction.setParameter(i, value);
+                              setIsDirty(true);
+                              forceUpdate();
+                            }
+                          }}
+                          onInstructionTypeChanged={forceUpdate}
+                          project={project}
+                          scope={scope}
+                          globalObjectsContainer={globalObjectsContainer}
+                          objectsContainer={objectsContainer}
+                          projectScopedContainersAccessor={
+                            projectScopedContainersAccessor
+                          }
+                          key={i}
+                          parameterRenderingService={ParameterRenderingService}
+                          resourceManagementProps={resourceManagementProps}
+                          ref={field => {
+                            if (isFirstVisibleParameterField) {
+                              firstVisibleField.current = field;
+                            }
+                          }}
+                        />
+                      );
+                    })}
+                  </ColumnStackLayout>
+                  {getVisibleParametersCount(
+                    instructionMetadata,
+                    objectName
+                  ) === 0 && (
+                    <EmptyMessage>
+                      <Trans>There is nothing to configure.</Trans>
+                    </EmptyMessage>
+                  )}
+                  {isCondition && (
+                    <Toggle
+                      label={<Trans>Invert condition</Trans>}
+                      labelPosition="right"
+                      toggled={instruction.isInverted()}
+                      style={styles.invertToggle}
+                      onToggle={(e, enabled) => {
+                        instruction.setInverted(enabled);
+                        forceUpdate();
+                      }}
+                    />
+                  )}
+                  {instructionMetadata.isOptionallyAsync() && (
+                    <Toggle
+                      label={
+                        <Trans>
+                          Wait for the action to end before executing the
+                          actions (and subevents) following it
+                        </Trans>
+                      }
+                      labelPosition="right"
+                      toggled={instruction.isAwaited()}
+                      style={styles.invertToggle}
+                      onToggle={(e, enabled) => {
+                        instruction.setAwaited(enabled);
+                        forceUpdate();
+                      }}
+                    />
+                  )}
+                  {isAnEventFunctionMetadata(instructionMetadata) && (
+                    <Line>
+                      <FlatButton
+                        key={'open-extension'}
+                        label={
+                          isCondition ? (
+                            <Trans>Edit this condition events</Trans>
+                          ) : (
+                            <Trans>Edit this action events</Trans>
+                          )
+                        }
+                        onClick={() => {
+                          openExtension(i18n);
+                        }}
+                        leftIcon={<Edit />}
+                      />
+                    </Line>
+                  )}
+                </div>
+                <Line>
+                  {!noHelpButton && helpPage && (
+                    <HelpButton
+                      helpPagePath={instructionMetadata.getHelpPath()}
+                      label={
+                        isCondition ? (
+                          <Trans>Help for this condition</Trans>
+                        ) : (
+                          <Trans>Help for this action</Trans>
+                        )
+                      }
+                    />
+                  )}
+                </Line>
+              </Column>
+            </ScrollView>
+          )}
+        </I18n>
+      </div>
     );
   }
 );

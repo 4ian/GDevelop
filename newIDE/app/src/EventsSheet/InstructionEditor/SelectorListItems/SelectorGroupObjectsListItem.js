@@ -8,6 +8,7 @@ import {
   getObjectOrObjectGroupListItemValue,
 } from './Keys';
 import HighlightedText from '../../../UI/Search/HighlightedText';
+import { type HTMLDataset } from '../../../Utils/HTMLDataset';
 
 type Props = {|
   groupWithContext: GroupWithContext,
@@ -15,6 +16,8 @@ type Props = {|
   onClick: () => void,
   selectedValue: ?string,
   matchesCoordinates: number[][],
+  id: ?string,
+  data?: HTMLDataset,
 |};
 
 export const renderGroupObjectsListItem = ({
@@ -23,10 +26,14 @@ export const renderGroupObjectsListItem = ({
   onClick,
   selectedValue,
   matchesCoordinates,
+  id,
+  data,
 }: Props) => {
   const groupName: string = groupWithContext.group.getName();
   return (
     <ListItem
+      id={id}
+      data={data}
       key={getObjectGroupListItemKey(groupWithContext)}
       selected={
         selectedValue === getObjectOrObjectGroupListItemValue(groupName)

@@ -59,10 +59,10 @@ export const useAuthenticatedPlayer = (): UseAuthenticatedPlayerOutput => {
             extensionName === 'Multiplayer' ||
             extensionName === 'PlayerAuthentication'
         );
-      if (!isMultiplayerOrPlayerAuthenticationExtensionUsed) return;
+      if (!isMultiplayerOrPlayerAuthenticationExtensionUsed) return null;
 
       try {
-        await retryIfFailed({ times: 2 }, async () => {
+        const authPlayer = await retryIfFailed({ times: 2 }, async () => {
           const newPlayerTokenForGame = await getPlayerToken({
             getAuthorizationHeader,
             userId: profile.id,
@@ -76,6 +76,8 @@ export const useAuthenticatedPlayer = (): UseAuthenticatedPlayerOutput => {
             playerToken: newPlayerTokenForGame,
           };
         });
+
+        return authPlayer;
       } catch (error) {
         console.error('Error while fetching player token for preview:', error);
 

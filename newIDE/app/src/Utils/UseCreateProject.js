@@ -39,6 +39,7 @@ type Props = {|
     project: gdProject,
     editorTabs: EditorTabsState,
     oldProjectId: string,
+    options?: { openAllScenes: boolean },
   |}) => Promise<void>,
   onError: () => void,
   onSuccessOrError: () => void,
@@ -110,7 +111,8 @@ const useCreateProject = ({
   const createProject = React.useCallback(
     async (
       newProjectSource: ?NewProjectSource,
-      newProjectSetup: NewProjectSetup
+      newProjectSetup: NewProjectSetup,
+      options?: { openAllScenes: boolean }
     ) => {
       if (!newProjectSource) return; // New project creation aborted.
 
@@ -221,6 +223,7 @@ const useCreateProject = ({
           project: currentProject,
           editorTabs,
           oldProjectId,
+          options,
         });
       } catch (rawError) {
         const { getWriteErrorMessage } = getStorageProviderOperations();
@@ -333,7 +336,9 @@ const useCreateProject = ({
         templateUrl,
         selectedInAppTutorialShortHeader.id
       );
-      await createProject(newProjectSource, newProjectSetup);
+      await createProject(newProjectSource, newProjectSetup, {
+        openAllScenes: true,
+      });
     },
     [beforeCreatingProject, createProject, getInAppTutorialShortHeader]
   );

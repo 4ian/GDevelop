@@ -2,14 +2,8 @@
 
 import axios from 'axios';
 import { GDevelopAssetApi } from './ApiConfigs';
-import optionalRequire from '../OptionalRequire';
 import { type MessageDescriptor } from '../i18n/MessageDescriptor.flow';
 import { type MessageByLocale } from '../i18n/MessageByLocale';
-import Window from '../Window';
-import { readJSONFile } from '../FileSystem';
-const path = optionalRequire('path');
-const remote = optionalRequire('@electron/remote');
-const app = remote ? remote.app : null;
 
 export const FLING_GAME_IN_APP_TUTORIAL_ID = 'flingGame';
 export const PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID = 'plinkoMultiplier';
@@ -21,6 +15,7 @@ export const OBJECT_3D_IN_APP_TUTORIAL_ID = 'object3d';
 export const KNIGHT_PLATFORMER_IN_APP_TUTORIAL_ID = 'knightPlatformer';
 export const TOP_DOWN_RPG_MOVEMENT_ID = 'topDownRPGMovement';
 export const FIRE_A_BULLET = 'fireABullet';
+export const COOP_PLATFORMER = 'coopPlatformer';
 
 export const guidedLessonsIds = [
   PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
@@ -32,6 +27,7 @@ export const guidedLessonsIds = [
   KNIGHT_PLATFORMER_IN_APP_TUTORIAL_ID,
   TOP_DOWN_RPG_MOVEMENT_ID,
   FIRE_A_BULLET,
+  COOP_PLATFORMER,
 ];
 
 export type InAppTutorialShortHeader = {|
@@ -145,39 +141,9 @@ export type InAppTutorial = {|
   isMiniTutorial?: boolean,
 |};
 
-const fetchLocalFileIfDesktop = async (filename: string): Promise<?Object> => {
-  const shouldRetrieveTutorialsLocally = !!remote && !Window.isDev();
-  if (!shouldRetrieveTutorialsLocally) return null;
-
-  const appPath = app ? app.getAppPath() : process.cwd();
-  // If on desktop released version, find json in resources.
-  // This allows making it available offline, and also to fix a version of the
-  // tutorials (so that it's not broken by a new version of GDevelop).
-  const filePath = path.join(
-    appPath,
-    '..', // If on dev env, replace with '../../app/resources' to test.
-    'inAppTutorials',
-    `${filename}.json`
-  );
-  const data = await readJSONFile(filePath);
-  return data;
-};
-
 export const fetchInAppTutorialShortHeaders = async (): Promise<
   Array<InAppTutorialShortHeader>
 > => {
-  try {
-    const inAppTutorialShortHeadersStoredLocally = await fetchLocalFileIfDesktop(
-      'inAppTutorialShortHeaders'
-    );
-    if (inAppTutorialShortHeadersStoredLocally)
-      return inAppTutorialShortHeadersStoredLocally;
-  } catch (error) {
-    console.warn(
-      'Could not read the short headers stored locally. Trying to fetch the API.'
-    );
-  }
-
   const response = await axios.get(
     `${GDevelopAssetApi.baseUrl}/in-app-tutorial-short-header`
   );
@@ -187,17 +153,6 @@ export const fetchInAppTutorialShortHeaders = async (): Promise<
 export const fetchInAppTutorial = async (
   shortHeader: InAppTutorialShortHeader
 ): Promise<InAppTutorial> => {
-  try {
-    const inAppTutorialStoredLocally = await fetchLocalFileIfDesktop(
-      shortHeader.id
-    );
-    if (inAppTutorialStoredLocally) return inAppTutorialStoredLocally;
-  } catch (error) {
-    console.warn(
-      'Could not read the in app tutorial stored locally. Trying to fetch the API.'
-    );
-  }
-
   const response = await axios.get(shortHeader.contentUrl);
   return response.data;
 };

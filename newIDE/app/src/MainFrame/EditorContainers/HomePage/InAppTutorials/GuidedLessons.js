@@ -22,6 +22,7 @@ import {
   KNIGHT_PLATFORMER_IN_APP_TUTORIAL_ID,
   TOP_DOWN_RPG_MOVEMENT_ID,
   FIRE_A_BULLET,
+  COOP_PLATFORMER,
   guidedLessonsIds,
 } from '../../../../Utils/GDevelopServices/InAppTutorial';
 import MultiplierScore from './Icons/MultiplierScore';
@@ -40,6 +41,7 @@ import Object3D from './Icons/Object3D';
 import Platformer from './Icons/Platformer';
 import TopDownRPGMovement from './Icons/TopDownRPGMovement';
 import FireABullet from './Icons/FireAbullet';
+import CoopPlatformer from './Icons/CoopPlatformer';
 
 const getColumnsFromWindowSize = (
   windowSize: WindowSizeType,
@@ -181,6 +183,13 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
       description: t`Learn how to fire bullets with the help of a behavior. Get ready for a Star Wars show.`,
       durationInMinutes: 3,
       renderImage: props => <FireABullet {...props} />,
+    },
+    {
+      id: COOP_PLATFORMER,
+      title: t`The basics of Multiplayer`,
+      description: t`Learn how to use the multiplayer behavior and the ownership system in this co-op platformer.`,
+      durationInMinutes: 3,
+      renderImage: props => <CoopPlatformer {...props} />,
     },
   ].filter(item => displayedGuidedLessonsIds.includes(item.id));
 

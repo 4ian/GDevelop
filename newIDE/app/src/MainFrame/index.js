@@ -1151,15 +1151,25 @@ const MainFrame = (props: Props) => {
       setIsProjectOpening(true);
     },
     getStorageProviderOperations,
-    afterCreatingProject: async ({ project, editorTabs, oldProjectId }) => {
+    afterCreatingProject: async ({
+      project,
+      editorTabs,
+      oldProjectId,
+      options,
+    }) => {
       setNewProjectSetupDialogOpen(false);
       closeExampleStoreDialog({ deselectExampleAndGameTemplate: true });
       findLeaderboardsToReplace(project, oldProjectId);
       configureMultiplayerLobbiesIfNeeded(project, oldProjectId);
-      openSceneOrProjectManager({
-        currentProject: project,
-        editorTabs: editorTabs,
-      });
+      options && options.openAllScenes
+        ? openAllScenes({
+            currentProject: project,
+            editorTabs,
+          })
+        : openSceneOrProjectManager({
+            currentProject: project,
+            editorTabs: editorTabs,
+          });
       setIsProjectClosedSoAvoidReloadingExtensions(false);
     },
     onError: () => {
@@ -2052,11 +2062,18 @@ const MainFrame = (props: Props) => {
         editorTabs: getEditorsTabStateWithAllScenes(newState),
       }));
 
+      // Re-open first layout as this is usually the entry point for a game.
+      const firstLayout = currentProject.getFirstLayout();
+      openLayout(firstLayout, {
+        openSceneEditor: true,
+        openEventsEditor: true,
+      });
+
       setIsLoadingProject(false);
       setLoaderModalProgress(null, null);
       openProjectManager(false);
     },
-    [getEditorsTabStateWithAllScenes, setState]
+    [getEditorsTabStateWithAllScenes, setState, openLayout]
   );
 
   const chooseProjectWithStorageProviderPicker = React.useCallback(

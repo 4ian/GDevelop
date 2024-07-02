@@ -634,7 +634,7 @@ namespace gdjs {
       const behavior = this.owner.getBehavior(behaviorName);
       if (!behavior) {
         logger.error(
-          `Behavior ${behaviorName} does not exist on object ${this.owner.getName()}`
+          `Behavior ${behaviorName} does not exist on object ${this.owner.getName()}.`
         );
         return;
       }

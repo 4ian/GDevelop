@@ -1640,6 +1640,25 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsSimple();
 
   extension
+      .AddCondition("DistanceToPosition",
+                    _("Distance between an object and a position"),
+                    _("Compare the distance between the object and a "
+                      "\"target\" position. If condition is "
+                      "inverted, objects that are farther than the specified "
+                      "distance will be picked."),
+                    _("_PARAM0_ distance to _PARAM1_;_PARAM2_ "
+                      "is below _PARAM3_ pixels"),
+                    _("Position"),
+                    "res/conditions/distance24.png",
+                    "res/conditions/distance.png")
+      .AddParameter("objectList", _("Object"))
+      .AddParameter("expression", _("Target X position"))
+      .AddParameter("expression", _("Target Y position"))
+      .AddParameter("expression", _("Distance"))
+      .AddCodeOnlyParameter("conditionInverted", "")
+      .MarkAsSimple();
+
+  extension
       .AddCondition(
           "AjoutObjConcern",
           _("Pick all objects"),

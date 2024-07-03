@@ -328,6 +328,25 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .SetDefaultValue("0");
 
   extension
+      .AddCondition(
+          "CameraZoom",
+          _("Camera zoom"),
+          _("Compare the zoom of a camera of a layer."),
+          _("Zoom of camera _PARAM2_ of layer _PARAM1_"),
+          "",
+          "res/conditions/camera24.png",
+          "res/conditions/camera.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("layer", _("Layer"), "", true)
+      .SetDefaultValue("\"\"")
+      .AddParameter("expression", _("Camera number (default : 0)"), "", true)
+      .SetDefaultValue("0")
+      .UseStandardRelationalOperatorParameters(
+          "number", gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Zoom")))
+      .MarkAsAdvanced();
+
+  extension
       .AddAction(
           "FixCamera",
           _("Center the camera on an object within limits"),

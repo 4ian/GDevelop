@@ -126,6 +126,9 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     const { project, isActive } = this.props;
     if (!project) return null;
 
+    const extension = this.getEventsFunctionsExtension();
+    if (!extension) return null;
+
     const eventsBasedObject = this.getEventsBasedObject();
     if (!eventsBasedObject) return null;
 
@@ -150,7 +153,12 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
               1024 // TODO
             )
           }
-          onOpenEvents={this.props.onOpenEvents}
+          onOpenEvents={() =>
+            this.props.openObjectEvents(
+              extension.getName(),
+              eventsBasedObject.getName()
+            )
+          }
           isActive={isActive}
           hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
           openBehaviorEvents={this.props.openBehaviorEvents}

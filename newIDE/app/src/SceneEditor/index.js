@@ -1285,19 +1285,10 @@ export default class SceneEditor extends React.Component<Props, State> {
   getContextMenuLayoutItems = (i18n: I18nType) => {
     const { layout } = this.props;
 
-    // TODO: context menu item for custom objects.
-    if (!layout)
-      return [
-        {
-          label: i18n._(t`Open scene properties`),
-          click: () => this.openSceneProperties(true),
-        },
-      ];
-
     return [
       {
         label: i18n._(t`Open scene events`),
-        click: () => this.props.onOpenEvents(layout.getName()),
+        click: () => this.props.onOpenEvents(layout ? layout.getName() : ''),
       },
       {
         label: i18n._(t`Open scene properties`),

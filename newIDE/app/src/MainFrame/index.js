@@ -1713,7 +1713,8 @@ const MainFrame = (props: Props) => {
     (
       name: string,
       initiallyFocusedFunctionName?: ?string,
-      initiallyFocusedBehaviorName?: ?string
+      initiallyFocusedBehaviorName?: ?string,
+      initiallyFocusedObjectName?: ?string
     ) => {
       setState(state => ({
         ...state,
@@ -1725,6 +1726,7 @@ const MainFrame = (props: Props) => {
           extraEditorProps: {
             initiallyFocusedFunctionName,
             initiallyFocusedBehaviorName,
+            initiallyFocusedObjectName,
           },
         }),
       }));
@@ -1799,6 +1801,25 @@ const MainFrame = (props: Props) => {
         extensionName
       );
       const functionName = getFunctionNameFromType(type);
+      const eventsBasedEntityName = functionName.behaviorName;
+
+      let eventBasedBehaviorName = null;
+      let eventBasedObjectName = null;
+      if (eventsBasedEntityName) {
+        if (
+          eventsFunctionsExtension
+            .getEventsBasedBehaviors()
+            .has(eventsBasedEntityName)
+        ) {
+          eventBasedBehaviorName = eventsBasedEntityName;
+        } else if (
+          eventsFunctionsExtension
+            .getEventsBasedObjects()
+            .has(eventsBasedEntityName)
+        ) {
+          eventBasedObjectName = eventsBasedEntityName;
+        }
+      }
 
       const foundTab = getEventsFunctionsExtensionEditor(
         editorTabs,
@@ -1808,7 +1829,8 @@ const MainFrame = (props: Props) => {
         // Open the given function and focus the tab
         foundTab.editor.selectEventsFunctionByName(
           functionName.name,
-          functionName.behaviorName
+          eventBasedBehaviorName,
+          eventBasedObjectName
         );
         setState(state => ({
           ...state,
@@ -1819,7 +1841,8 @@ const MainFrame = (props: Props) => {
         openEventsFunctionsExtension(
           extensionName,
           functionName.name,
-          functionName.behaviorName
+          eventBasedBehaviorName,
+          eventBasedObjectName
         );
       }
     } else {
@@ -1867,6 +1890,39 @@ const MainFrame = (props: Props) => {
     [getEditorOpeningOptions, setState, state]
   );
 
+  const openObjectEvents = (extensionName: string, objectName: string) => {
+    const { currentProject, editorTabs } = state;
+    if (!currentProject) return;
+
+    if (currentProject.hasEventsFunctionsExtensionNamed(extensionName)) {
+      // It's an events functions extension, open the editor for it.
+      const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
+        extensionName
+      );
+
+      const foundTab = getEventsFunctionsExtensionEditor(
+        editorTabs,
+        eventsFunctionsExtension
+      );
+      if (foundTab) {
+        // Open the given function and focus the tab
+        foundTab.editor.selectEventsBasedBehaviorByName(objectName);
+        setState(state => ({
+          ...state,
+          editorTabs: changeCurrentTab(editorTabs, foundTab.tabIndex),
+        }));
+      } else {
+        // Open a new editor for the extension and the given function
+        openEventsFunctionsExtension(extensionName, null, null, objectName);
+      }
+    } else {
+      // It's not an events functions extension, we should not be here.
+      console.warn(
+        `Extension with name=${extensionName} can not be opened (no editor for this)`
+      );
+    }
+  };
+
   const openBehaviorEvents = (extensionName: string, behaviorName: string) => {
     const { currentProject, editorTabs } = state;
     if (!currentProject) return;
@@ -1890,7 +1946,7 @@ const MainFrame = (props: Props) => {
         }));
       } else {
         // Open a new editor for the extension and the given function
-        openEventsFunctionsExtension(extensionName, null, behaviorName);
+        openEventsFunctionsExtension(extensionName, null, behaviorName, null);
       }
     } else {
       // It's not an events functions extension, we should not be here.
@@ -3336,6 +3392,7 @@ const MainFrame = (props: Props) => {
                     onCreateEventsFunction,
                     openInstructionOrExpression,
                     onOpenCustomObjectEditor: openCustomObjectEditor,
+                    openObjectEvents,
                     unsavedChanges: unsavedChanges,
                     canOpen: !!props.storageProviders.filter(
                       ({ hiddenInOpenDialog }) => !hiddenInOpenDialog

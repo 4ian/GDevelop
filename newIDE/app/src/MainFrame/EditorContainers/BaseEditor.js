@@ -16,6 +16,7 @@ export type EditorContainerExtraProps = {|
   // Events function extension editor
   initiallyFocusedFunctionName?: ?string,
   initiallyFocusedBehaviorName?: ?string,
+  initiallyFocusedObjectName?: ?string,
 
   // Homepage
   storageProviders?: Array<StorageProvider>,
@@ -57,6 +58,7 @@ export type RenderEditorContainerProps = {|
     gdEventsFunctionsExtension,
     gdEventsBasedObject
   ) => void,
+  openObjectEvents: (extensionName: string, objectName: string) => void,
 
   // Events function management:
   onLoadEventsFunctionsExtensions: () => Promise<void>,

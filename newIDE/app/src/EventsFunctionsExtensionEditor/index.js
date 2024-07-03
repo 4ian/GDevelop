@@ -70,6 +70,7 @@ type Props = {|
   onFunctionEdited?: () => void,
   initiallyFocusedFunctionName: ?string,
   initiallyFocusedBehaviorName: ?string,
+  initiallyFocusedObjectName: ?string,
   unsavedChanges?: ?UnsavedChanges,
   onOpenCustomObjectEditor: gdEventsBasedObject => void,
 |};
@@ -139,12 +140,15 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     if (this.props.initiallyFocusedFunctionName) {
       this.selectEventsFunctionByName(
         this.props.initiallyFocusedFunctionName,
-        this.props.initiallyFocusedBehaviorName
+        this.props.initiallyFocusedBehaviorName,
+        this.props.initiallyFocusedObjectName
       );
     } else if (this.props.initiallyFocusedBehaviorName) {
       this.selectEventsBasedBehaviorByName(
         this.props.initiallyFocusedBehaviorName
       );
+    } else if (this.props.initiallyFocusedObjectName) {
+      this.selectEventsBasedObjectByName(this.props.initiallyFocusedObjectName);
     }
   }
 
@@ -207,7 +211,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
 
   selectEventsFunctionByName = (
     functionName: string,
-    behaviorName: ?string
+    behaviorName: ?string,
+    objectName: ?string
   ) => {
     const { eventsFunctionsExtension } = this.props;
 
@@ -220,7 +225,21 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         if (behaviorEventsFunctions.hasEventsFunctionNamed(functionName)) {
           this._selectEventsFunction(
             behaviorEventsFunctions.getEventsFunction(functionName),
-            eventsBasedBehavior
+            eventsBasedBehavior,
+            null
+          );
+        }
+      }
+    } else if (objectName) {
+      const eventsBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
+      if (eventsBasedObjects.has(objectName)) {
+        const eventsBasedObject = eventsBasedObjects.get(objectName);
+        const eventsFunctions = eventsBasedObject.getEventsFunctions();
+        if (eventsFunctions.hasEventsFunctionNamed(functionName)) {
+          this._selectEventsFunction(
+            eventsFunctions.getEventsFunction(functionName),
+            null,
+            eventsBasedObject
           );
         }
       }
@@ -229,6 +248,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       if (eventsFunctionsExtension.hasEventsFunctionNamed(functionName)) {
         this._selectEventsFunction(
           eventsFunctionsExtension.getEventsFunction(functionName),
+          null,
           null
         );
       }
@@ -525,6 +545,16 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     if (eventsBasedBehaviorsList.has(behaviorName)) {
       this._selectEventsBasedBehavior(
         eventsBasedBehaviorsList.get(behaviorName)
+      );
+    }
+  };
+
+  selectEventsBasedObjectByName = (eventBasedObjectName: string) => {
+    const { eventsFunctionsExtension } = this.props;
+    const eventsBasedObjectsList = eventsFunctionsExtension.getEventsBasedObjects();
+    if (eventsBasedObjectsList.has(eventBasedObjectName)) {
+      this._selectEventsBasedObject(
+        eventsBasedObjectsList.get(eventBasedObjectName)
       );
     }
   };

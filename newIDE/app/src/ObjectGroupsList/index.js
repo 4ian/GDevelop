@@ -622,7 +622,7 @@ const arePropsEqual = (prevProps: Props, nextProps: Props): boolean =>
   // from the component.
   // If a change is made, the component won't notice it: you have to manually
   // call forceUpdate.
-  prevProps.globalObjectGroups === nextProps.globalObjectGroups ||
+  prevProps.globalObjectGroups === nextProps.globalObjectGroups &&
   prevProps.objectGroups === nextProps.objectGroups;
 
 const MemoizedObjectGroupsList = React.memo<Props, ObjectGroupsListInterface>(

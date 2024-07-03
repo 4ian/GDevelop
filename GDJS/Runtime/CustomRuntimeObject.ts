@@ -13,12 +13,18 @@ namespace gdjs {
     childrenContent: { [objectName: string]: ObjectConfiguration & any };
     instances: InstanceData[];
     layers: LayerData[];
+    // The flat representation of defaultSize.
     areaMinX: float;
     areaMinY: float;
     areaMinZ: float;
     areaMaxX: float;
     areaMaxY: float;
     areaMaxZ: float;
+    /**
+     * A value shared by every object instances.
+     *
+     * @see gdjs.CustomRuntimeObject._forcedDefaultSize
+     **/
     defaultSize: {
       min: [float, float, float];
       max: [float, float, float];
@@ -49,6 +55,11 @@ namespace gdjs {
     private _untransformedHitBoxes: gdjs.Polygon[] = [];
     /** The dimension of this object is calculated from its children AABBs. */
     private _unrotatedAABB: AABB = { min: [0, 0], max: [0, 0] };
+    /**
+     * The default size defined by users in the custom object initial instances editor.
+     *
+     * Don't modify it as it would affect every instance.
+     **/
     private _forcedDefaultSize: {
       min: [float, float, float];
       max: [float, float, float];
@@ -78,7 +89,7 @@ namespace gdjs {
       );
       this._renderer = this._createRender();
 
-      this.createDefaultSizeIfNeeded(objectData);
+      this._createDefaultSizeIfNeeded(objectData);
       this._instanceContainer.loadFrom(objectData);
 
       // The generated code calls onCreated at the constructor end
@@ -93,7 +104,7 @@ namespace gdjs {
     reinitialize(objectData: ObjectData & CustomObjectConfiguration) {
       super.reinitialize(objectData);
 
-      this.createDefaultSizeIfNeeded(objectData);
+      this._createDefaultSizeIfNeeded(objectData);
       this._instanceContainer.loadFrom(objectData);
       this._reinitializeRenderer();
 
@@ -101,7 +112,11 @@ namespace gdjs {
       this.onCreated();
     }
 
-    private createDefaultSizeIfNeeded(objectData: CustomObjectConfiguration) {
+    /**
+     * Initialize `defaultSize` if it doesn't exist.
+     * `defaultSize` is shared by every instance to save memory.
+     */
+    private _createDefaultSizeIfNeeded(objectData: CustomObjectConfiguration) {
       if (objectData.instances.length > 0) {
         if (!objectData.defaultSize) {
           objectData.defaultSize = {

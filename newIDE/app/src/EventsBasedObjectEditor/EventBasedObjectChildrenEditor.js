@@ -40,6 +40,8 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
 > {
   _objectsList: ?ObjectsListInterface;
 
+  // TODO Reset selectedObjectFolderOrObjectsWithContext when a different eventsBasedObject is passed.
+  // It will avoid to add objects in the tree of the wrong ObjectsContainer.
   state = {
     editedObjectWithContext: null,
     editedObjectInitialTab: 'properties',

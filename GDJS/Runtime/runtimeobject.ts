@@ -2720,19 +2720,6 @@ namespace gdjs {
     }
 
     /**
-     * Check the distance between an object and a position.
-     * @static
-     */
-    static distanceToPositionTest(
-      obj: RuntimeObject,
-      x: float,
-      y: float,
-      distance: float
-    ): boolean {
-      return obj.getSqDistanceToPosition(x, y) <= distance * distance;
-    }
-
-    /**
      * Return true if the cursor, or any touch, is on the object.
      *
      * @return true if the cursor, or any touch, is on the object.

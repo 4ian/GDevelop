@@ -257,7 +257,7 @@ namespace gdjs {
         return obj.getSqDistanceToPosition(x, y) <= distance;
       };
 
-      export const distanceToPositionTest = function (
+      export const isCloseToPosition = function (
         objectsLists1: ObjectsLists,
         x: float,
         y: float,
@@ -266,9 +266,7 @@ namespace gdjs {
       ) {
         let isTrue = false;
         const squaredDistance = distance * distance;
-        const lists = gdjs.staticArray(
-          gdjs.evtTools.object.distanceToPositionTest
-        );
+        const lists = gdjs.staticArray(gdjs.evtTools.object.isCloseToPosition);
         objectsLists1.values(lists);
 
         for (let i = 0, len = lists.length; i < len; ++i) {

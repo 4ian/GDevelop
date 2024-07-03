@@ -213,7 +213,7 @@ BaseObjectExtension::BaseObjectExtension() {
   GetAllConditions()["Distance"].SetFunctionName(
       "gdjs.evtTools.object.distanceTest");
   GetAllConditions()["DistanceToPosition"].SetFunctionName(
-      "gdjs.evtTools.object.distanceToPositionTest");
+      "gdjs.evtTools.object.isCloseToPosition");
   GetAllConditions()["SeDirige"].SetFunctionName(
       "gdjs.evtTools.object.movesTowardTest");
   GetAllConditions()["EstTourne"].SetFunctionName(

@@ -88,9 +88,6 @@ const useCreateProject = ({
     project.setVersion('1.0.0');
     project.getAuthorIds().clear();
     project.setAuthor('');
-    if (newProjectSetup.templateSlug) {
-      project.setTemplateSlug(newProjectSetup.templateSlug);
-    }
     if (newProjectSetup.width && newProjectSetup.height) {
       project.setGameResolutionSize(
         newProjectSetup.width,
@@ -141,6 +138,9 @@ const useCreateProject = ({
 
         const oldProjectId = currentProject.getProjectUuid();
         initialiseProjectProperties(currentProject, newProjectSetup);
+        if (newProjectSource.templateSlug) {
+          currentProject.setTemplateSlug(newProjectSource.templateSlug);
+        }
 
         if (authenticatedUser.profile) {
           // if the user is connected, try to register the game to avoid
@@ -276,10 +276,7 @@ const useCreateProject = ({
         i18n,
         exampleShortHeader,
       });
-      await createProject(newProjectSource, {
-        ...newProjectSetup,
-        templateSlug: exampleShortHeader.slug,
-      });
+      await createProject(newProjectSource, newProjectSetup);
     },
     [beforeCreatingProject, createProject]
   );

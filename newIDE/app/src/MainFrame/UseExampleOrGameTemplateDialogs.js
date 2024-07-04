@@ -1,13 +1,17 @@
 // @flow
 
 import * as React from 'react';
-import type { ExampleShortHeader } from '../Utils/GDevelopServices/Example';
+import {
+  listAllExamples,
+  type ExampleShortHeader,
+} from '../Utils/GDevelopServices/Example';
 import type { PrivateGameTemplateListingData } from '../Utils/GDevelopServices/Shop';
 import ExampleStoreDialog from '../AssetStore/ExampleStore/ExampleStoreDialog';
 import { ExampleDialog } from '../AssetStore/ExampleStore/ExampleDialog';
 import PrivateGameTemplateInformationDialog from '../AssetStore/PrivateGameTemplates/PrivateGameTemplateInformationDialog';
 import { PrivateGameTemplateStoreContext } from '../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import LoaderModal from '../UI/LoaderModal';
 
 type Props = {|
   isProjectOpening: boolean,
@@ -18,6 +22,7 @@ const useExampleOrGameTemplateDialogs = ({
   isProjectOpening,
   onOpenNewProjectSetupDialog,
 }: Props) => {
+  const [isFetchingExample, setIsFetchingExample] = React.useState(false);
   const [
     exampleStoreDialogOpen,
     setExampleStoreDialogOpen,
@@ -100,9 +105,37 @@ const useExampleOrGameTemplateDialogs = ({
     ]
   );
 
+  const fetchAndOpenNewProjectSetupDialogForExample = React.useCallback(
+    async (exampleSlug: string) => {
+      try {
+        setIsFetchingExample(true);
+        const fetchedAllExamples = await listAllExamples();
+        const exampleShortHeader = fetchedAllExamples.exampleShortHeaders.find(
+          exampleShortHeader => exampleShortHeader.slug === exampleSlug
+        );
+        if (!exampleShortHeader) {
+          throw new Error(
+            `Unable to find the example with slug "${exampleSlug}"`
+          );
+        }
+
+        setSelectedExampleShortHeader(exampleShortHeader);
+      } catch (error) {
+        console.error('Error caught while opening example:', error);
+        return;
+      } finally {
+        setIsFetchingExample(false);
+      }
+
+      onOpenNewProjectSetupDialog();
+    },
+    [setSelectedExampleShortHeader, onOpenNewProjectSetupDialog]
+  );
+
   const renderExampleOrGameTemplateDialogs = () => {
     return (
       <>
+        {isFetchingExample && <LoaderModal show />}
         {exampleStoreDialogOpen && (
           <ExampleStoreDialog
             open
@@ -168,6 +201,7 @@ const useExampleOrGameTemplateDialogs = ({
     onSelectExampleShortHeader: setSelectedExampleShortHeader,
     onSelectPrivateGameTemplate: setSelectedPrivateGameTemplate,
     renderExampleOrGameTemplateDialogs,
+    fetchAndOpenNewProjectSetupDialogForExample,
   };
 };
 

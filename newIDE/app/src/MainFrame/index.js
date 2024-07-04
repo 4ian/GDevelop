@@ -296,6 +296,7 @@ export type Props = {|
   renderGDJSDevelopmentWatcher?: ?() => React.Node,
   extensionsLoader?: JsExtensionsLoader,
   initialFileMetadataToOpen: ?FileMetadata,
+  initialExampleSlugToOpen: ?string,
   i18n: I18n,
 |};
 
@@ -485,6 +486,7 @@ const MainFrame = (props: Props) => {
     getStorageProviderResourceOperations,
     getStorageProvider,
     initialFileMetadataToOpen,
+    initialExampleSlugToOpen,
     i18n,
     renderGDJSDevelopmentWatcher,
     renderMainMenu,
@@ -513,6 +515,7 @@ const MainFrame = (props: Props) => {
     renderExampleOrGameTemplateDialogs,
     closeExampleStoreDialog,
     openExampleStoreDialog,
+    fetchAndOpenNewProjectSetupDialogForExample,
   } = useExampleOrGameTemplateDialogs({
     isProjectOpening,
     onOpenNewProjectSetupDialog: () => setNewProjectSetupDialogOpen(true),
@@ -531,79 +534,6 @@ const MainFrame = (props: Props) => {
    * Similar to `currentProjectRef`, an always fresh reference to the latest `currentFileMetadata`.
    */
   const currentFileMetadataRef = useStableUpToDateRef(currentFileMetadata);
-
-  React.useEffect(
-    () => {
-      openHomePage();
-      GD_STARTUP_TIMES.push(['MainFrameComponentDidMount', performance.now()]);
-      _loadExtensions()
-        .then(() =>
-          // Enable the GDJS development watcher *after* the extensions are loaded,
-          // to avoid the watcher interfering with the extension loading (by updating GDJS,
-          // which could lead in the extension loading failing for some extensions as file
-          // are removed/copied).
-          setState(state => ({
-            ...state,
-            gdjsDevelopmentWatcherEnabled: true,
-          }))
-        )
-        .then(async state => {
-          GD_STARTUP_TIMES.push([
-            'MainFrameComponentDidMountFinished',
-            performance.now(),
-          ]);
-
-          console.info('Startup times:', getStartupTimesSummary());
-
-          const {
-            getAutoOpenMostRecentProject,
-            getRecentProjectFiles,
-            hadProjectOpenedDuringLastSession,
-          } = preferences;
-
-          if (initialFileMetadataToOpen) {
-            // Open the initial file metadata (i.e: the file that was passed
-            // as argument and recognized by a storage provider). Note that the storage
-            // provider is assumed to be already set to the proper one.
-            const storageProviderOperations = getStorageProviderOperations();
-            const proceed = await ensureInteractionHappened(
-              storageProviderOperations
-            );
-            if (proceed) openInitialFileMetadata();
-          } else if (
-            getAutoOpenMostRecentProject() &&
-            hadProjectOpenedDuringLastSession() &&
-            getRecentProjectFiles()[0]
-          ) {
-            // Re-open the last opened project, if any and if asked to.
-            const fileMetadataAndStorageProviderName = getRecentProjectFiles()[0];
-            const storageProvider = findStorageProviderFor(
-              i18n,
-              props.storageProviders,
-              fileMetadataAndStorageProviderName
-            );
-            if (!storageProvider) return;
-
-            const storageProviderOperations = getStorageProviderOperations(
-              storageProvider
-            );
-            const proceed = await ensureInteractionHappened(
-              storageProviderOperations
-            );
-            if (proceed)
-              openFromFileMetadataWithStorageProvider(
-                fileMetadataAndStorageProviderName
-              );
-          }
-        })
-        .catch(() => {
-          /* Ignore errors */
-        });
-    },
-    // We want to run this effect only when the component did mount.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
 
   const getEditorOpeningOptions = React.useCallback(
     ({
@@ -3011,6 +2941,83 @@ const MainFrame = (props: Props) => {
       commandPaletteRef.current.open();
     }
   }, []);
+
+  React.useEffect(
+    () => {
+      openHomePage();
+      GD_STARTUP_TIMES.push(['MainFrameComponentDidMount', performance.now()]);
+      _loadExtensions()
+        .then(() =>
+          // Enable the GDJS development watcher *after* the extensions are loaded,
+          // to avoid the watcher interfering with the extension loading (by updating GDJS,
+          // which could lead in the extension loading failing for some extensions as file
+          // are removed/copied).
+          setState(state => ({
+            ...state,
+            gdjsDevelopmentWatcherEnabled: true,
+          }))
+        )
+        .then(async state => {
+          GD_STARTUP_TIMES.push([
+            'MainFrameComponentDidMountFinished',
+            performance.now(),
+          ]);
+
+          console.info('Startup times:', getStartupTimesSummary());
+
+          const {
+            getAutoOpenMostRecentProject,
+            getRecentProjectFiles,
+            hadProjectOpenedDuringLastSession,
+          } = preferences;
+
+          if (initialFileMetadataToOpen) {
+            // Open the initial file metadata (i.e: the file that was passed
+            // as argument and recognized by a storage provider). Note that the storage
+            // provider is assumed to be already set to the proper one.
+            const storageProviderOperations = getStorageProviderOperations();
+            const proceed = await ensureInteractionHappened(
+              storageProviderOperations
+            );
+            if (proceed) openInitialFileMetadata();
+          } else if (initialExampleSlugToOpen) {
+            await fetchAndOpenNewProjectSetupDialogForExample(
+              initialExampleSlugToOpen
+            );
+          } else if (
+            getAutoOpenMostRecentProject() &&
+            hadProjectOpenedDuringLastSession() &&
+            getRecentProjectFiles()[0]
+          ) {
+            // Re-open the last opened project, if any and if asked to.
+            const fileMetadataAndStorageProviderName = getRecentProjectFiles()[0];
+            const storageProvider = findStorageProviderFor(
+              i18n,
+              props.storageProviders,
+              fileMetadataAndStorageProviderName
+            );
+            if (!storageProvider) return;
+
+            const storageProviderOperations = getStorageProviderOperations(
+              storageProvider
+            );
+            const proceed = await ensureInteractionHappened(
+              storageProviderOperations
+            );
+            if (proceed)
+              openFromFileMetadataWithStorageProvider(
+                fileMetadataAndStorageProviderName
+              );
+          }
+        })
+        .catch(() => {
+          /* Ignore errors */
+        });
+    },
+    // We want to run this effect only when the component did mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
 
   useMainFrameCommands({
     i18n,

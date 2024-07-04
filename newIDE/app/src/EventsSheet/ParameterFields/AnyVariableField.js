@@ -92,6 +92,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           forceDeclaration
           project={project}
           instruction={instruction}
+          isObjectVariable={false}
           variablesContainers={variablesContainers}
           enumerateVariables={enumerateGlobalAndSceneVariables}
           parameterMetadata={props.parameterMetadata}

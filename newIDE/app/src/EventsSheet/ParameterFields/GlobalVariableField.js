@@ -48,6 +48,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     return (
       <React.Fragment>
         <VariableField
+          isObjectVariable={false}
           variablesContainers={variablesContainers}
           enumerateVariables={enumerateGlobaleVariables}
           parameterMetadata={props.parameterMetadata}

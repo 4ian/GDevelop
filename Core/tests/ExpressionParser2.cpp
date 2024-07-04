@@ -49,6 +49,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   mySpriteObject.GetVariables().InsertNew("MyVariable3");
   mySpriteObject.GetVariables().InsertNew("MyNumberVariable").SetValue(123);
   mySpriteObject.GetVariables().InsertNew("MyStringVariable").SetString("Test");
+  // A variable with the same name as the object.
+  mySpriteObject.GetVariables().InsertNew("MySpriteObject");
   auto &mySpriteObject2 = layout1.InsertNewObject(project, "MyExtension::Sprite", "MySpriteObject2", 1);
   mySpriteObject2.GetVariables().InsertNew("MyVariable", 0);
   mySpriteObject2.GetVariables().InsertNew("MyVariable2", 1);
@@ -1683,6 +1685,27 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
+  }
+
+  SECTION("Variable with the same name as an object") {
+    auto node = parser.ParseExpression("MySpriteObject.MySpriteObject");
+    REQUIRE(node != nullptr);
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "number|string");
+    node->Visit(validator);
+    REQUIRE(validator.GetFatalErrors().size() == 0);
+    REQUIRE(validator.GetAllErrors().size() == 0);
+  }
+
+  SECTION("Variable with the same name as an object (with child-variables)") {
+    auto node = parser.ParseExpression("MySpriteObject.MySpriteObject.MyChild.MyChild");
+    REQUIRE(node != nullptr);
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+    node->Visit(validator);
+    REQUIRE(validator.GetFatalErrors().size() == 0);
+    REQUIRE(validator.GetAllErrors().size() == 0);
   }
 
   SECTION("Invalid object variables (1 level, non existing object)") {

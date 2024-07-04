@@ -51,6 +51,7 @@ export type VariableDialogOpeningProps = {
 
 type Props = {
   ...ParameterFieldProps,
+  isObjectVariable: boolean,
   variablesContainers: Array<gdVariablesContainer>,
   enumerateVariables: () => Array<EnumeratedVariable>,
   forceDeclaration?: boolean,
@@ -94,7 +95,8 @@ export const getRootVariableName = (name: string): string => {
 export const quicklyAnalyzeVariableName = (
   name: string,
   variablesContainers?: Array<gdVariablesContainer>,
-  projectScopedContainersAccessor?: ProjectScopedContainersAccessor
+  projectScopedContainersAccessor?: ProjectScopedContainersAccessor,
+  isObjectVariable: boolean = false
 ): VariableNameQuickAnalyzeResult => {
   if (!name) return VariableNameQuickAnalyzeResults.OK;
 
@@ -121,6 +123,7 @@ export const quicklyAnalyzeVariableName = (
 
   const rootVariableName = getRootVariableName(name);
   if (
+    !isObjectVariable &&
     projectScopedContainersAccessor &&
     projectScopedContainersAccessor
       .get()
@@ -196,6 +199,7 @@ export default React.forwardRef<Props, VariableFieldInterface>(
       onApply,
       id,
       onInstructionTypeChanged,
+      isObjectVariable,
     } = props;
 
     const field = React.useRef<?SemiControlledAutoCompleteInterface>(null);
@@ -286,7 +290,8 @@ export default React.forwardRef<Props, VariableFieldInterface>(
     const quicklyAnalysisResult = quicklyAnalyzeVariableName(
       value,
       variablesContainers,
-      projectScopedContainersAccessor
+      projectScopedContainersAccessor,
+      isObjectVariable
     );
 
     const errorText =

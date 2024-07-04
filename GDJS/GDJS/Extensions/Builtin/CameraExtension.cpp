@@ -69,6 +69,8 @@ CameraExtension::CameraExtension() {
       .SetGetter("gdjs.evtTools.camera.getCameraRotation");
   GetAllActions()["ZoomCamera"].SetFunctionName(
       "gdjs.evtTools.camera.setCameraZoom");
+  GetAllConditions()["CameraZoom"].SetFunctionName(
+      "gdjs.evtTools.camera.getCameraZoom");
 
   GetAllExpressions()["CameraX"].SetFunctionName(
       "gdjs.evtTools.camera.getCameraX");  // Deprecated

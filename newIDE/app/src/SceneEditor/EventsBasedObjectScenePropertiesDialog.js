@@ -62,6 +62,10 @@ const EventsBasedObjectScenePropertiesDialog = ({
       setAreaMinY(contentAABB.top);
       setAreaMaxX(contentAABB.right);
       setAreaMaxY(contentAABB.bottom);
+      if (contentAABB.depth() > 0) {
+        setAreaMinZ(contentAABB.minZ);
+        setAreaMaxZ(contentAABB.maxZ);
+      }
     },
     [getContentAABB]
   );

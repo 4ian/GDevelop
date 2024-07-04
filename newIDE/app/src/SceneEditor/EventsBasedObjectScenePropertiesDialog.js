@@ -7,6 +7,7 @@ import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
 import RaisedButton from '../UI/RaisedButton';
 import Rectangle from '../Utils/Rectangle';
+import Checkbox from '../UI/Checkbox';
 
 type Props = {|
   eventsBasedObject: gdEventsBasedObject,
@@ -41,6 +42,9 @@ const EventsBasedObjectScenePropertiesDialog = ({
   const [areaMaxZ, setAreaMaxZ] = React.useState<number>(
     eventsBasedObject.getAreaMaxZ()
   );
+  const [isRenderedIn3D, setRenderedIn3D] = React.useState<boolean>(
+    eventsBasedObject.isRenderedIn3D()
+  );
 
   const onSubmit = () => {
     eventsBasedObject.setAreaMinX(areaMinX);
@@ -49,6 +53,7 @@ const EventsBasedObjectScenePropertiesDialog = ({
     eventsBasedObject.setAreaMaxX(areaMaxX);
     eventsBasedObject.setAreaMaxY(areaMaxY);
     eventsBasedObject.setAreaMaxZ(areaMaxZ);
+    eventsBasedObject.markAsRenderedIn3D(isRenderedIn3D);
     onApply();
   };
 
@@ -136,24 +141,31 @@ const EventsBasedObjectScenePropertiesDialog = ({
             onChange={(e, value) => setAreaMaxY(parseFloat(value) || 0)}
           />
         </LineStackLayout>
-        {eventsBasedObject.isRenderedIn3D() && (
-          <LineStackLayout expand noMargin>
-            <TextField
-              floatingLabelText={<Trans>Z min bound</Trans>}
-              fullWidth
-              type="number"
-              value={areaMaxZ}
-              onChange={(e, value) => setAreaMaxZ(parseFloat(value) || 0)}
-            />
-            <TextField
-              floatingLabelText={<Trans>Z max bound</Trans>}
-              fullWidth
-              type="number"
-              value={areaMinZ}
-              onChange={(e, value) => setAreaMinZ(parseFloat(value) || 0)}
-            />
-          </LineStackLayout>
-        )}
+        <LineStackLayout expand noMargin>
+          <TextField
+            floatingLabelText={<Trans>Z min bound</Trans>}
+            fullWidth
+            type="number"
+            value={areaMaxZ}
+            onChange={(e, value) => setAreaMaxZ(parseFloat(value) || 0)}
+            disabled={!isRenderedIn3D}
+          />
+          <TextField
+            floatingLabelText={<Trans>Z max bound</Trans>}
+            fullWidth
+            type="number"
+            value={areaMinZ}
+            onChange={(e, value) => setAreaMinZ(parseFloat(value) || 0)}
+            disabled={!isRenderedIn3D}
+          />
+        </LineStackLayout>
+        <LineStackLayout expand noMargin>
+          <Checkbox
+            label={<Trans>Use 3D rendering</Trans>}
+            checked={isRenderedIn3D}
+            onCheck={(e, checked) => setRenderedIn3D(checked)}
+          />
+        </LineStackLayout>
       </ColumnStackLayout>
     </Dialog>
   );

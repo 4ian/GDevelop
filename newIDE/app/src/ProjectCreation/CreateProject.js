@@ -15,6 +15,7 @@ export type NewProjectSource = {|
   project: ?gdProject,
   storageProvider: ?StorageProvider,
   fileMetadata: ?FileMetadata,
+  templateSlug?: ?string,
 |};
 
 const getNewProjectSourceFromUrl = (projectUrl: string): NewProjectSource => {
@@ -88,7 +89,9 @@ export const createNewProjectFromAIGeneratedProject = (
     exampleUrl: generatedProjectUrl,
     exampleSlug: 'generated-project',
   });
-  return getNewProjectSourceFromUrl(generatedProjectUrl);
+  const newProjectSource = getNewProjectSourceFromUrl(generatedProjectUrl);
+  newProjectSource.templateSlug = 'generated-project';
+  return newProjectSource;
 };
 
 export const createNewProjectFromTutorialTemplate = (
@@ -99,7 +102,9 @@ export const createNewProjectFromTutorialTemplate = (
     exampleUrl: tutorialTemplateUrl,
     exampleSlug: tutorialId,
   });
-  return getNewProjectSourceFromUrl(tutorialTemplateUrl);
+  const newProjectSource = getNewProjectSourceFromUrl(tutorialTemplateUrl);
+  newProjectSource.templateSlug = tutorialId;
+  return newProjectSource;
 };
 
 export const createNewProjectFromPrivateGameTemplate = (
@@ -110,7 +115,9 @@ export const createNewProjectFromPrivateGameTemplate = (
     exampleUrl: privateGameTemplateUrl,
     exampleSlug: privateGameTemplateTag,
   });
-  return getNewProjectSourceFromUrl(privateGameTemplateUrl);
+  const newProjectSource = getNewProjectSourceFromUrl(privateGameTemplateUrl);
+  newProjectSource.templateSlug = privateGameTemplateTag;
+  return newProjectSource;
 };
 
 export const createNewProjectFromExampleShortHeader = async ({
@@ -127,7 +134,9 @@ export const createNewProjectFromExampleShortHeader = async ({
       exampleUrl: example.projectFileUrl,
       exampleSlug: exampleShortHeader.slug,
     });
-    return getNewProjectSourceFromUrl(example.projectFileUrl);
+    const newProjectSource = getNewProjectSourceFromUrl(example.projectFileUrl);
+    newProjectSource.templateSlug = exampleShortHeader.slug;
+    return newProjectSource;
   } catch (error) {
     showErrorBox({
       message:

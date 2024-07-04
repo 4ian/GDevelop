@@ -114,6 +114,7 @@ export const create = (authentication: Authentication) => {
                 filterExamples: !isDev,
               })}
               initialFileMetadataToOpen={initialFileMetadataToOpen}
+              initialExampleSlugToOpen={appArguments['create-from-example'] || null}
             />
           )}
         </ProjectStorageProviders>

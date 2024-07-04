@@ -41,7 +41,7 @@ export const openExampleInWebApp = (example: Example) => {
   Window.openExternalURL(
     `${
       isDev ? 'http://localhost:3000' : 'https://editor.gdevelop.io'
-    }/?project=${example.projectFileUrl}`
+    }/?create-from-example=${example.slug}`
   );
 };
 

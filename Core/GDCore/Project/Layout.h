@@ -25,7 +25,6 @@ class Object;
 class Project;
 class InitialInstancesContainer;
 }  // namespace gd
-class TiXmlElement;
 class BaseProfiler;
 #undef GetObject  // Disable an annoying macro
 

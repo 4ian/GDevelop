@@ -8,7 +8,6 @@
 #define GDCORE_SERIALIZER_H
 #include <string>
 #include "GDCore/Serialization/SerializerElement.h"
-class TiXmlElement;
 
 namespace gd {
 

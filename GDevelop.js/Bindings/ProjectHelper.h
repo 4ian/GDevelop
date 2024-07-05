@@ -3,7 +3,6 @@
 #include "GDCore/Project/InitialInstancesContainer.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
-#include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/Tools/VersionWrapper.h"
 #include "GDJS/Extensions/JsPlatform.h"
 

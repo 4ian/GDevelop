@@ -9,7 +9,6 @@
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/EditorSettings.h"
 #include "GDCore/Project/InitialInstancesContainer.h"
 #include "GDCore/Serialization/SerializerElement.h"
-#include "GDCore/TinyXml/tinyxml.h"
 
 namespace gd {
 

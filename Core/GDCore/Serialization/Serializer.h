@@ -22,11 +22,7 @@ class GD_CORE_API Serializer {
  * Convert a gd::SerializerElement from/to XML.
  */
 ///@{
-#if !defined(EMSCRIPTEN)
-  static void ToXML(SerializerElement& element, TiXmlElement* xmlElement);
-  static void FromXML(SerializerElement& element,
-                      const TiXmlElement* xmlElement);
-#endif
+
   /**
    * \brief Escape a string for inclusion in a XML tag
    */

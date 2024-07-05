@@ -8,7 +8,6 @@
 #include "GDCore/Events/Serialization.h"
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"
 #include "GDCore/Serialization/SerializerElement.h"
-#include "GDCore/TinyXml/tinyxml.h"
 
 using namespace std;
 

@@ -11,7 +11,6 @@
 #include "GDCore/Project/Variable.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/String.h"
-#include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/Tools/UUID/UUID.h"
 
 namespace gd {

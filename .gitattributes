@@ -1,5 +1,4 @@
 Core/GDCore/Serialization/rapidjson/rapidjson.h/* linguist-vendored
-Core/GDCore/TinyXml/* linguist-vendored
 Extensions/ParticleSystem/SPARK/* linguist-vendored
 Extensions/PhysicsBehavior/Box2D/* linguist-vendored
 Extensions/PhysicsBehavior/box2djs/* linguist-vendored

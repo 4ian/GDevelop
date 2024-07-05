@@ -346,9 +346,12 @@ const getMergedInstalledWithDefaultEnumeratedObjectMetadataByCategory = ({
       );
 
       if (objectIndex !== -1) {
-        defaultEnumeratedObjectMetadatasByCategory[category][
-          objectIndex
-        ] = installedEnumeratedObjectMetadata;
+        defaultEnumeratedObjectMetadatasByCategory[category][objectIndex] = {
+          ...defaultEnumeratedObjectMetadatasByCategory[category][objectIndex],
+          ...installedEnumeratedObjectMetadata,
+          // Avoid to reinstall the extension every time an object is added.
+          ...{ requiredExtensions: [] },
+        };
       } else {
         defaultEnumeratedObjectMetadatasByCategory[category].push(
           installedEnumeratedObjectMetadata

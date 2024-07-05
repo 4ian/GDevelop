@@ -24,7 +24,6 @@
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/SourceFile.h"
 #include "GDCore/Serialization/Serializer.h"
-#include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
 #include "GDJS/Events/CodeGeneration/EventsCodeGenerator.h"

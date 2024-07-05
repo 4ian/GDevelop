@@ -17,90 +17,10 @@
 #include "rapidjson/document.h"
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/rapidjson.h"
-#if !defined(EMSCRIPTEN)
-#include "GDCore/TinyXml/tinyxml.h"
-#endif
 
 using namespace rapidjson;
 
 namespace gd {
-
-#if !defined(EMSCRIPTEN)
-void Serializer::ToXML(SerializerElement& element, TiXmlElement* xmlElement) {
-  if (!xmlElement) return;
-
-  if (element.IsValueUndefined()) {
-    const std::map<gd::String, SerializerValue>& attributes =
-        element.GetAllAttributes();
-    for (std::map<gd::String, SerializerValue>::const_iterator it =
-             attributes.begin();
-         it != attributes.end();
-         ++it) {
-      const SerializerValue& attr = it->second;
-
-      if (attr.IsBoolean())
-        xmlElement->SetAttribute(it->first.c_str(),
-                                 attr.GetBool() ? "true" : "false");
-      else if (attr.IsString())
-        xmlElement->SetAttribute(it->first.c_str(), attr.GetString().c_str());
-      else if (attr.IsInt())
-        xmlElement->SetAttribute(it->first.c_str(), attr.GetInt());
-      else if (attr.IsDouble())
-        xmlElement->SetDoubleAttribute(it->first.c_str(), attr.GetDouble());
-      else
-        xmlElement->SetAttribute(it->first.c_str(), attr.GetString().c_str());
-    }
-
-    const std::vector<
-        std::pair<gd::String, std::shared_ptr<SerializerElement> > >& children =
-        element.GetAllChildren();
-    for (size_t i = 0; i < children.size(); ++i) {
-      if (children[i].second == std::shared_ptr<SerializerElement>()) continue;
-
-      TiXmlElement* xmlChild = new TiXmlElement(children[i].first.c_str());
-      xmlElement->LinkEndChild(xmlChild);
-      ToXML(*children[i].second, xmlChild);
-    }
-  } else {
-    TiXmlText* xmlValue = new TiXmlText(element.GetValue().GetString().c_str());
-    xmlElement->LinkEndChild(xmlValue);
-  }
-}
-
-void Serializer::FromXML(SerializerElement& element,
-                         const TiXmlElement* xmlElement) {
-  if (!xmlElement) return;
-
-  const TiXmlAttribute* attr = xmlElement->FirstAttribute();
-  while (attr) {
-    if (attr->Name() != NULL) {
-      gd::String name = gd::String::FromUTF8(attr->Name()).ReplaceInvalid();
-      if (attr->Value())
-        element.SetAttribute(
-            name, gd::String::FromUTF8(attr->Value()).ReplaceInvalid());
-    }
-
-    attr = attr->Next();
-  }
-
-  const TiXmlElement* child = xmlElement->FirstChildElement();
-  while (child) {
-    if (child->Value()) {
-      gd::String name = gd::String::FromUTF8(child->Value()).ReplaceInvalid();
-      SerializerElement& childElement = element.AddChild(name);
-      FromXML(childElement, child);
-    }
-
-    child = child->NextSiblingElement();
-  }
-
-  if (xmlElement->GetText()) {
-    SerializerValue value;
-    value.Set(gd::String::FromUTF8(xmlElement->GetText()).ReplaceInvalid());
-    element.SetValue(value);
-  }
-}
-#endif
 
 gd::String Serializer::ToEscapedXMLString(const gd::String& str) {
   return str.FindAndReplace("&", "&amp;")

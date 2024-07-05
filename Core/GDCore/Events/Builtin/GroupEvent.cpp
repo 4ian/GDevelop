@@ -10,7 +10,6 @@
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDCore/Events/Serialization.h"
 #include "GDCore/Serialization/SerializerElement.h"
-#include "GDCore/TinyXml/tinyxml.h"
 
 using namespace std;
 

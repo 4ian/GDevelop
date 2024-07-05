@@ -12,7 +12,6 @@
 namespace gd {
 class SerializerElement;
 }
-class TiXmlElement;
 
 namespace gd {
 

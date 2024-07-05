@@ -34,7 +34,6 @@
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/String.h"
-#include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
 #include "GDCore/Tools/PolymorphicClone.h"

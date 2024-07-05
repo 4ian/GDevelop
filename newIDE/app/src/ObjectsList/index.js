@@ -313,7 +313,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             (project.getEventsBasedObject(objectType).getDefaultName() ||
               project.getEventsBasedObject(objectType).getName())
           : objectTypeToDefaultName[objectType] || 'NewObject';
-        console.log(objectType + ': ' + defaultName);
         const name = newNameGenerator(
           defaultName,
           name =>

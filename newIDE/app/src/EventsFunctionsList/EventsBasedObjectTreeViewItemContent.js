@@ -100,7 +100,9 @@ export class EventsBasedObjectTreeViewItemContent
   }
 
   getThumbnail(): ?string {
-    return 'res/functions/object_black.svg';
+    return this.eventsBasedObject.isRenderedIn3D()
+      ? 'res/functions/object3d_black.svg'
+      : 'res/functions/object2d_black.svg';
   }
 
   getDataset(): ?HTMLDataset {

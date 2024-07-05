@@ -22,9 +22,16 @@ namespace gd {
  */
 class EventsBasedObjectDependencyFinder {
 public:
-  static bool IsDependentFromEventsBasedObject(const gd::Project &project,
-                              const gd::EventsBasedObject &eventsBasedObject,
-                              const gd::EventsBasedObject &dependency);
+  static bool IsDependentFromEventsBasedObject(
+      const gd::Project &project,
+      const gd::EventsBasedObject &eventsBasedObject,
+      const gd::EventsBasedObject &dependency);
+
+private:
+  static bool IsDependentFromEventsBasedObject(
+      const gd::Project &project,
+      const gd::EventsBasedObject &eventsBasedObject,
+      const gd::EventsBasedObject &dependency, int depth);
 };
 
 } // namespace gd

@@ -13,6 +13,7 @@ export type EnumeratedObjectMetadata = {|
   description: string,
   iconFilename: string,
   categoryFullName: string,
+  isRenderedIn3D: boolean,
   assetStorePackTag?: string,
   requiredExtensions?: Array<RequiredExtension>,
   isDependentWithParent?: boolean,
@@ -153,6 +154,7 @@ export const enumerateObjectTypes = (
           description: objectMetadata.getDescription(),
           iconFilename: objectMetadata.getIconFilename(),
           categoryFullName: objectMetadata.getCategoryFullName(),
+          isRenderedIn3D: objectMetadata.isRenderedIn3D(),
         }));
     })
   );

@@ -146,7 +146,21 @@ const getMergedInstalledWithDefaultEnumeratedObjectMetadataByCategory = ({
       {
         name: 'Scene3D::Model3DObject',
       },
-    ],
+      eventsBasedObject && {
+        name: 'Sprite3D::Sprite3D',
+        fullName: i18n._(t`3D sprite`),
+        description: i18n._(t`An animated sprite in 3D.`),
+        iconFilename:
+          'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWdob3N0LW91dGxpbmUiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTIgMkM3LjAzIDIgMyA2LjAzIDMgMTFWMjJMNiAxOUw5IDIyTDEyIDE5TDE1IDIyTDE4IDE5TDIxIDIyVjExQzIxIDYuMDMgMTYuOTcgMiAxMiAyTTE5IDE3LjE3TDE4IDE2LjE3TDE2LjU5IDE3LjU5TDE1IDE5LjE3TDEzLjQxIDE3LjU5TDEyIDE2LjE3TDEwLjU5IDE3LjU5TDkgMTkuMTdMNy40MSAxNy41OUw2IDE2LjE3TDUgMTcuMTdWMTFDNSA3LjE0IDguMTQgNCAxMiA0UzE5IDcuMTQgMTkgMTFWMTcuMTdNMTEgMTBDMTEgMTEuMTEgMTAuMTEgMTIgOSAxMlM3IDExLjExIDcgMTAgNy45IDggOSA4IDExIDguOSAxMSAxME0xNyAxMEMxNyAxMS4xMSAxNi4xMSAxMiAxNSAxMlMxMyAxMS4xMSAxMyAxMCAxMy45IDggMTUgOCAxNyA4LjkgMTcgMTBaIiAvPjwvc3ZnPg==',
+        isRenderedIn3D: true,
+        requiredExtensions: [
+          {
+            extensionName: 'Sprite3D',
+            extensionVersion: '1.0.0',
+          },
+        ],
+      },
+    ].filter(Boolean),
     [translateExtensionCategory('Input', i18n)]: [
       {
         name: 'SpriteMultitouchJoystick::SpriteMultitouchJoystick',
@@ -154,6 +168,7 @@ const getMergedInstalledWithDefaultEnumeratedObjectMetadataByCategory = ({
         description: i18n._(t`Joystick for touchscreens.`),
         iconFilename:
           'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPGNpcmNsZSBjbGFzcz0ic3QwIiBjeD0iMTYiIGN5PSIxNiIgcj0iMTMiLz4NCjxwb2x5bGluZSBjbGFzcz0ic3QwIiBwb2ludHM9IjI4LjQsMTIgMjAsMTIgMjAsMy42ICIvPg0KPHBvbHlsaW5lIGNsYXNzPSJzdDAiIHBvaW50cz0iMjAsMjguNCAyMCwyMCAyOC40LDIwICIvPg0KPHBvbHlsaW5lIGNsYXNzPSJzdDAiIHBvaW50cz0iMy42LDIwIDEyLDIwIDEyLDI4LjQgIi8+DQo8cG9seWxpbmUgY2xhc3M9InN0MCIgcG9pbnRzPSIxMiwzLjYgMTIsMTIgMy42LDEyICIvPg0KPHBvbHlnb24gY2xhc3M9InN0MCIgcG9pbnRzPSIxNiw2IDE2LjcsNyAxNS4zLDcgIi8+DQo8cG9seWdvbiBjbGFzcz0ic3QwIiBwb2ludHM9IjE2LDI2IDE1LjMsMjUgMTYuNywyNSAiLz4NCjxwb2x5Z29uIGNsYXNzPSJzdDAiIHBvaW50cz0iNiwxNiA3LDE1LjMgNywxNi43ICIvPg0KPHBvbHlnb24gY2xhc3M9InN0MCIgcG9pbnRzPSIyNiwxNiAyNSwxNi43IDI1LDE1LjMgIi8+DQo8L3N2Zz4NCg==',
+        isRenderedIn3D: false,
         assetStorePackTag: 'multitouch joysticks',
         requiredExtensions: [
           {
@@ -173,7 +188,21 @@ const getMergedInstalledWithDefaultEnumeratedObjectMetadataByCategory = ({
       {
         name: 'BitmapText::BitmapTextObject',
       },
-    ],
+      eventsBasedObject && {
+        name: 'Text3D::Text3D',
+        fullName: i18n._(t`3D text`),
+        description: i18n._(t`Display a text in 3D.`),
+        iconFilename:
+          'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWZvcm1hdC10ZXh0IiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTE4LjUsNEwxOS42Niw4LjM1TDE4LjcsOC42MUMxOC4yNSw3Ljc0IDE3Ljc5LDYuODcgMTcuMjYsNi40M0MxNi43Myw2IDE2LjExLDYgMTUuNSw2SDEzVjE2LjVDMTMsMTcgMTMsMTcuNSAxMy4zMywxNy43NUMxMy42NywxOCAxNC4zMywxOCAxNSwxOFYxOUg5VjE4QzkuNjcsMTggMTAuMzMsMTggMTAuNjcsMTcuNzVDMTEsMTcuNSAxMSwxNyAxMSwxNi41VjZIOC41QzcuODksNiA3LjI3LDYgNi43NCw2LjQzQzYuMjEsNi44NyA1Ljc1LDcuNzQgNS4zLDguNjFMNC4zNCw4LjM1TDUuNSw0SDE4LjVaIiAvPjwvc3ZnPg==',
+        isRenderedIn3D: true,
+        requiredExtensions: [
+          {
+            extensionName: 'Text3D',
+            extensionVersion: '1.0.0',
+          },
+        ],
+      },
+    ].filter(Boolean),
     [translateExtensionCategory('User interface', i18n)]: [
       {
         name: 'PanelSpriteButton::PanelSpriteButton',
@@ -181,6 +210,7 @@ const getMergedInstalledWithDefaultEnumeratedObjectMetadataByCategory = ({
         description: i18n._(t`Resizable button with text customization.`),
         iconFilename:
           'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTI5LDIzSDNjLTEuMSwwLTItMC45LTItMlYxMWMwLTEuMSwwLjktMiwyLTJoMjZjMS4xLDAsMiwwLjksMiwydjEwQzMxLDIyLjEsMzAuMSwyMywyOSwyM3oiLz4NCjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xMywxOUwxMywxOWMtMS4xLDAtMi0wLjktMi0ydi0yYzAtMS4xLDAuOS0yLDItMmgwYzEuMSwwLDIsMC45LDIsMnYyQzE1LDE4LjEsMTQuMSwxOSwxMywxOXoiLz4NCjxsaW5lIGNsYXNzPSJzdDAiIHgxPSIxOCIgeTE9IjEzIiB4Mj0iMTgiIHkyPSIxOSIvPg0KPGxpbmUgY2xhc3M9InN0MCIgeDE9IjIxIiB5MT0iMTMiIHgyPSIxOCIgeTI9IjE3Ii8+DQo8bGluZSBjbGFzcz0ic3QwIiB4MT0iMjEiIHkxPSIxOSIgeDI9IjE5IiB5Mj0iMTYiLz4NCjwvc3ZnPg0K',
+        isRenderedIn3D: false,
         assetStorePackTag: 'menu buttons',
         requiredExtensions: [
           {
@@ -197,6 +227,7 @@ const getMergedInstalledWithDefaultEnumeratedObjectMetadataByCategory = ({
         ),
         iconFilename:
           'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPGNpcmNsZSBjbGFzcz0ic3QwIiBjeD0iMjMiIGN5PSI3IiByPSIzIi8+DQo8bGluZSBjbGFzcz0ic3QwIiB4MT0iMyIgeTE9IjciIHgyPSIyMCIgeTI9IjciLz4NCjxsaW5lIGNsYXNzPSJzdDAiIHgxPSIyOSIgeTE9IjciIHgyPSIyNiIgeTI9IjciLz4NCjxjaXJjbGUgY2xhc3M9InN0MCIgY3g9IjEyIiBjeT0iMTYiIHI9IjMiLz4NCjxsaW5lIGNsYXNzPSJzdDAiIHgxPSIzIiB5MT0iMTYiIHgyPSI5IiB5Mj0iMTYiLz4NCjxsaW5lIGNsYXNzPSJzdDAiIHgxPSIyOSIgeTE9IjE2IiB4Mj0iMTUiIHkyPSIxNiIvPg0KPGNpcmNsZSBjbGFzcz0ic3QwIiBjeD0iMjMiIGN5PSIyNSIgcj0iMyIvPg0KPGxpbmUgY2xhc3M9InN0MCIgeDE9IjMiIHkxPSIyNSIgeDI9IjIwIiB5Mj0iMjUiLz4NCjxsaW5lIGNsYXNzPSJzdDAiIHgxPSIyOSIgeTE9IjI1IiB4Mj0iMjYiIHkyPSIyNSIvPg0KPC9zdmc+DQo=',
+        isRenderedIn3D: false,
         assetStorePackTag: 'settings ui',
         requiredExtensions: [
           {
@@ -211,6 +242,7 @@ const getMergedInstalledWithDefaultEnumeratedObjectMetadataByCategory = ({
         description: i18n._(t`A toggle switch that users can click or touch.`),
         iconFilename:
           'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTIzLDIzSDljLTMuOSwwLTctMy4xLTctN3YwYzAtMy45LDMuMS03LDctN2gxNGMzLjksMCw3LDMuMSw3LDd2MEMzMCwxOS45LDI2LjksMjMsMjMsMjN6Ii8+DQo8Y2lyY2xlIGNsYXNzPSJzdDAiIGN4PSI5IiBjeT0iMTYiIHI9IjQiLz4NCjwvc3ZnPg0K',
+        isRenderedIn3D: false,
         assetStorePackTag: 'settings ui',
         requiredExtensions: [
           {
@@ -227,6 +259,7 @@ const getMergedInstalledWithDefaultEnumeratedObjectMetadataByCategory = ({
         ),
         iconFilename:
           'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8cGF0aCBkPSJNMjgsMTJIMTRINGMtMi4yLDAtNCwxLjgtNCw0czEuOCw0LDQsNGgxMGgxNGMyLjIsMCw0LTEuOCw0LTRTMzAuMiwxMiwyOCwxMnogTTQsMThjLTEuMSwwLTItMC45LTItMnMwLjktMiwyLTJoMTANCgljMS4xLDAsMiwwLjksMiwycy0wLjksMi0yLDJINHoiLz4NCjwvc3ZnPg0K',
+        isRenderedIn3D: false,
         assetStorePackTag: 'resource bars',
         requiredExtensions: [
           {
@@ -243,6 +276,7 @@ const getMergedInstalledWithDefaultEnumeratedObjectMetadataByCategory = ({
         ),
         iconFilename:
           'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWRvdHMtaG9yaXpvbnRhbCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0xNiwxMkEyLDIgMCAwLDEgMTgsMTBBMiwyIDAgMCwxIDIwLDEyQTIsMiAwIDAsMSAxOCwxNEEyLDIgMCAwLDEgMTYsMTJNMTAsMTJBMiwyIDAgMCwxIDEyLDEwQTIsMiAwIDAsMSAxNCwxMkEyLDIgMCAwLDEgMTIsMTRBMiwyIDAgMCwxIDEwLDEyTTQsMTJBMiwyIDAgMCwxIDYsMTBBMiwyIDAgMCwxIDgsMTJBMiwyIDAgMCwxIDYsMTRBMiwyIDAgMCwxIDQsMTJaIiAvPjwvc3ZnPg==',
+        isRenderedIn3D: false,
         assetStorePackTag: 'resource bars',
         requiredExtensions: [
           {
@@ -275,6 +309,7 @@ const getMergedInstalledWithDefaultEnumeratedObjectMetadataByCategory = ({
         ),
         iconFilename:
           'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWZpcmUiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTcuNjYgMTEuMkMxNy40MyAxMC45IDE3LjE1IDEwLjY0IDE2Ljg5IDEwLjM4QzE2LjIyIDkuNzggMTUuNDYgOS4zNSAxNC44MiA4LjcyQzEzLjMzIDcuMjYgMTMgNC44NSAxMy45NSAzQzEzIDMuMjMgMTIuMTcgMy43NSAxMS40NiA0LjMyQzguODcgNi40IDcuODUgMTAuMDcgOS4wNyAxMy4yMkM5LjExIDEzLjMyIDkuMTUgMTMuNDIgOS4xNSAxMy41NUM5LjE1IDEzLjc3IDkgMTMuOTcgOC44IDE0LjA1QzguNTcgMTQuMTUgOC4zMyAxNC4wOSA4LjE0IDEzLjkzQzguMDggMTMuODggOC4wNCAxMy44MyA4IDEzLjc2QzYuODcgMTIuMzMgNi42OSAxMC4yOCA3LjQ1IDguNjRDNS43OCAxMCA0Ljg3IDEyLjMgNSAxNC40N0M1LjA2IDE0Ljk3IDUuMTIgMTUuNDcgNS4yOSAxNS45N0M1LjQzIDE2LjU3IDUuNyAxNy4xNyA2IDE3LjdDNy4wOCAxOS40MyA4Ljk1IDIwLjY3IDEwLjk2IDIwLjkyQzEzLjEgMjEuMTkgMTUuMzkgMjAuOCAxNy4wMyAxOS4zMkMxOC44NiAxNy42NiAxOS41IDE1IDE4LjU2IDEyLjcyTDE4LjQzIDEyLjQ2QzE4LjIyIDEyIDE3LjY2IDExLjIgMTcuNjYgMTEuMk0xNC41IDE3LjVDMTQuMjIgMTcuNzQgMTMuNzYgMTggMTMuNCAxOC4xQzEyLjI4IDE4LjUgMTEuMTYgMTcuOTQgMTAuNSAxNy4yOEMxMS42OSAxNyAxMi40IDE2LjEyIDEyLjYxIDE1LjIzQzEyLjc4IDE0LjQzIDEyLjQ2IDEzLjc3IDEyLjMzIDEzQzEyLjIxIDEyLjI2IDEyLjIzIDExLjYzIDEyLjUgMTAuOTRDMTIuNjkgMTEuMzIgMTIuODkgMTEuNyAxMy4xMyAxMkMxMy45IDEzIDE1LjExIDEzLjQ0IDE1LjM3IDE0LjhDMTUuNDEgMTQuOTQgMTUuNDMgMTUuMDggMTUuNDMgMTUuMjNDMTUuNDYgMTYuMDUgMTUuMSAxNi45NSAxNC41IDE3LjVIMTQuNVoiIC8+PC9zdmc+',
+        isRenderedIn3D: true,
         assetStorePackTag: '3d particles',
         requiredExtensions: [
           {
@@ -339,17 +374,11 @@ const getMergedInstalledWithDefaultEnumeratedObjectMetadataByCategory = ({
         const otherEventBasedObject = project.getEventsBasedObject(
           enumeratedObjectMetadata.name
         );
-        enumeratedObjectMetadata.isDependentWithParent =
-          gd.EventsBasedObjectDependencyFinder.isDependentFromEventsBasedObject(
-            project,
-            eventsBasedObject,
-            otherEventBasedObject
-          ) ||
-          gd.EventsBasedObjectDependencyFinder.isDependentFromEventsBasedObject(
-            project,
-            otherEventBasedObject,
-            eventsBasedObject
-          );
+        enumeratedObjectMetadata.isDependentWithParent = gd.EventsBasedObjectDependencyFinder.isDependentFromEventsBasedObject(
+          project,
+          otherEventBasedObject,
+          eventsBasedObject
+        );
       }
     }
   }
@@ -403,9 +432,15 @@ export default function NewObjectFromScratch({
       )}
       <List>
         {Object.keys(enumeratedObjectMetadatasByCategory).map(category => {
-          const categoryEnumeratedObjectMetadatas =
-            enumeratedObjectMetadatasByCategory[category];
-          return (
+          const categoryEnumeratedObjectMetadatas = enumeratedObjectMetadatasByCategory[
+            category
+          ].filter(
+            enumeratedObjectMetadata =>
+              !eventsBasedObject ||
+              eventsBasedObject.isRenderedIn3D() ===
+                enumeratedObjectMetadata.isRenderedIn3D
+          );
+          return categoryEnumeratedObjectMetadatas.length === 0 ? null : (
             <React.Fragment key={category}>
               <Subheader>{category}</Subheader>
               {categoryEnumeratedObjectMetadatas.map(

@@ -507,9 +507,17 @@ export const makeSchema = ({
         title: i18n._(t`Rotation`),
         preventWrap: true,
         removeSpacers: true,
-        children: getRotationXAndRotationYFields({ i18n }),
+        children: [],
       },
-      getRotationZField({ i18n }),
+      {
+        children: [
+          getRotationZField({ i18n }),
+          {
+            type: 'row',
+            children: getRotationXAndRotationYFields({ i18n }),
+          },
+        ],
+      },
     ];
   }
 

@@ -34,10 +34,13 @@ import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import { enumerateAssetStoreIds } from './EnumerateAssetStoreIds';
 import PromisePool from '@supercharge/promise-pool';
-import NewObjectFromScratch from './NewObjectFromScratch';
+import NewObjectFromScratch, {
+  CustomObjectPackResults,
+} from './NewObjectFromScratch';
 import { getAssetShortHeadersToDisplay } from './AssetsList';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import type { ObjectFolderOrObjectWithContext } from '../ObjectsList/EnumerateObjectFolderOrObject';
+import LoaderModal from '../UI/LoaderModal';
 
 const isDev = Window.isDev();
 
@@ -282,12 +285,9 @@ function NewObjectDialog({
   );
 
   const onInstallEmptyCustomObject = React.useCallback(
-    async () => {
-      const requiredExtensions =
-        selectedCustomObjectEnumeratedMetadata &&
-        selectedCustomObjectEnumeratedMetadata.requiredExtensions;
-      if (!selectedCustomObjectEnumeratedMetadata || !requiredExtensions)
-        return;
+    async (enumeratedObjectMetadata: EnumeratedObjectMetadata) => {
+      const requiredExtensions = enumeratedObjectMetadata.requiredExtensions;
+      if (!requiredExtensions) return;
       try {
         setIsAssetBeingInstalled(true);
         const requiredExtensionInstallation = await checkRequiredExtensionsUpdate(
@@ -309,13 +309,13 @@ function NewObjectDialog({
           project,
         });
 
-        onCreateNewObject(selectedCustomObjectEnumeratedMetadata.name);
+        onCreateNewObject(enumeratedObjectMetadata.name);
       } catch (error) {
         console.error('Error while creating the object:', error);
         showAlert({
           title: t`Could not create the object`,
           message: t`There was an error while creating the object "${
-            selectedCustomObjectEnumeratedMetadata.fullName
+            enumeratedObjectMetadata.fullName
           }". Verify your internet connection or try again later.`,
         });
       } finally {
@@ -323,7 +323,6 @@ function NewObjectDialog({
       }
     },
     [
-      selectedCustomObjectEnumeratedMetadata,
       onCreateNewObject,
       project,
       showExtensionUpdateConfirmation,
@@ -409,7 +408,10 @@ function NewObjectDialog({
           )
         }
         primary
-        onClick={onInstallEmptyCustomObject}
+        onClick={() =>
+          selectedCustomObjectEnumeratedMetadata &&
+          onInstallEmptyCustomObject(selectedCustomObjectEnumeratedMetadata)
+        }
         id="skip-and-create-button"
         disabled={isAssetBeingInstalled}
       />
@@ -422,6 +424,21 @@ function NewObjectDialog({
       onClose();
     },
     [onClose]
+  );
+
+  const onObjectTypeSelected = React.useCallback(
+    (enumeratedObjectMetadata: EnumeratedObjectMetadata) => {
+      if (enumeratedObjectMetadata.assetStorePackTag) {
+        // When the object is from an asset store, display the objects from the pack
+        // so that the user can either pick a similar object or skip to create a new one.
+        setSelectedCustomObjectEnumeratedMetadata(enumeratedObjectMetadata);
+      } else if (enumeratedObjectMetadata.requiredExtensions) {
+        onInstallEmptyCustomObject(enumeratedObjectMetadata);
+      } else {
+        onCreateNewObject(enumeratedObjectMetadata.name);
+      }
+    },
+    [onCreateNewObject, onInstallEmptyCustomObject]
   );
 
   return (
@@ -481,26 +498,32 @@ function NewObjectDialog({
             {currentTab === 'asset-store' && (
               <AssetStore ref={assetStore} hideGameTemplates />
             )}
-            {currentTab === 'new-object' && (
-              <NewObjectFromScratch
-                onCreateNewObject={onCreateNewObject}
-                onCustomObjectSelected={
-                  setSelectedCustomObjectEnumeratedMetadata
-                }
-                selectedCustomObject={selectedCustomObjectEnumeratedMetadata}
-                onInstallAsset={async assetShortHeader => {
-                  const result = await onInstallAsset(assetShortHeader);
-                  if (result) {
-                    handleClose();
+            {currentTab === 'new-object' &&
+              (selectedCustomObjectEnumeratedMetadata &&
+              selectedCustomObjectEnumeratedMetadata.assetStorePackTag ? (
+                <CustomObjectPackResults
+                  packTag={
+                    selectedCustomObjectEnumeratedMetadata.assetStorePackTag
                   }
-                }}
-                isAssetBeingInstalled={isAssetBeingInstalled}
-                project={project}
-                eventsBasedObject={eventsBasedObject}
-                i18n={i18n}
-              />
-            )}
+                  onAssetSelect={async assetShortHeader => {
+                    const result = await onInstallAsset(assetShortHeader);
+                    if (result) {
+                      handleClose();
+                    }
+                  }}
+                  isAssetBeingInstalled={isAssetBeingInstalled}
+                  onBack={() => setSelectedCustomObjectEnumeratedMetadata(null)}
+                />
+              ) : (
+                <NewObjectFromScratch
+                  project={project}
+                  eventsBasedObject={eventsBasedObject}
+                  onObjectTypeSelected={onObjectTypeSelected}
+                  i18n={i18n}
+                />
+              ))}
           </Dialog>
+          {isAssetBeingInstalled && <LoaderModal show={true} />}
           {isAssetPackDialogInstallOpen &&
             displayedAssetShortHeaders &&
             openedAssetPack && (

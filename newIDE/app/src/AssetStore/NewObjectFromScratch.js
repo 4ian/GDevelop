@@ -18,7 +18,6 @@ import { type ChosenCategory } from '../UI/Search/FiltersChooser';
 import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 import TextButton from '../UI/TextButton';
 import { t, Trans } from '@lingui/macro';
-import LoaderModal from '../UI/LoaderModal';
 import ChevronArrowLeft from '../UI/CustomSvgIcons/ChevronArrowLeft';
 import AssetsList from './AssetsList';
 
@@ -109,7 +108,6 @@ export const CustomObjectPackResults = ({
           }}
         />
       </Column>
-      <LoaderModal show={isAssetBeingInstalled} />
     </>
   );
 };
@@ -348,17 +346,13 @@ const getMergedInstalledWithDefaultEnumeratedObjectMetadataByCategory = ({
       );
 
       if (objectIndex !== -1) {
-        const currentEnumeratedObjectMetadata =
-          defaultEnumeratedObjectMetadatasByCategory[category][objectIndex];
-        defaultEnumeratedObjectMetadatasByCategory[category][objectIndex] = {
-          ...currentEnumeratedObjectMetadata,
-          ...installedEnumeratedObjectMetadata,
-        };
+        defaultEnumeratedObjectMetadatasByCategory[category][
+          objectIndex
+        ] = installedEnumeratedObjectMetadata;
       } else {
-        defaultEnumeratedObjectMetadatasByCategory[category] = [
-          ...defaultEnumeratedObjectMetadatasByCategory[category],
-          installedEnumeratedObjectMetadata,
-        ];
+        defaultEnumeratedObjectMetadatasByCategory[category].push(
+          installedEnumeratedObjectMetadata
+        );
       }
     }
   );
@@ -389,22 +383,14 @@ const getMergedInstalledWithDefaultEnumeratedObjectMetadataByCategory = ({
 type Props = {|
   project: gdProject,
   eventsBasedObject: gdEventsBasedObject | null,
-  onCreateNewObject: (type: string) => void,
-  onCustomObjectSelected: (?EnumeratedObjectMetadata) => void,
-  selectedCustomObject: ?EnumeratedObjectMetadata,
-  onInstallAsset: (assetShortHeader: AssetShortHeader) => Promise<void>,
-  isAssetBeingInstalled: boolean,
+  onObjectTypeSelected: EnumeratedObjectMetadata => void,
   i18n: I18nType,
 |};
 
 export default function NewObjectFromScratch({
   project,
   eventsBasedObject,
-  onCreateNewObject,
-  onCustomObjectSelected,
-  selectedCustomObject,
-  onInstallAsset,
-  isAssetBeingInstalled,
+  onObjectTypeSelected,
   i18n,
 }: Props) {
   const enumeratedObjectMetadatasByCategory: {
@@ -423,7 +409,7 @@ export default function NewObjectFromScratch({
     'intro-object-types'
   );
 
-  return !selectedCustomObject || !selectedCustomObject.assetStorePackTag ? (
+  return (
     <ScrollView>
       {DismissableTutorialMessage && (
         <Line>
@@ -453,13 +439,7 @@ export default function NewObjectFromScratch({
                     }`.replace(/:/g, '-')}
                     onClick={() => {
                       sendNewObjectCreated(enumeratedObjectMetadata.name);
-                      if (enumeratedObjectMetadata.assetStorePackTag) {
-                        // When the object is from an asset store, display the objects from the pack
-                        // so that the user can either pick a similar object or skip to create a new one.
-                        onCustomObjectSelected(enumeratedObjectMetadata);
-                      } else {
-                        onCreateNewObject(enumeratedObjectMetadata.name);
-                      }
+                      onObjectTypeSelected(enumeratedObjectMetadata);
                     }}
                   />
                 )
@@ -469,12 +449,5 @@ export default function NewObjectFromScratch({
         })}
       </List>
     </ScrollView>
-  ) : (
-    <CustomObjectPackResults
-      packTag={selectedCustomObject.assetStorePackTag}
-      onAssetSelect={onInstallAsset}
-      isAssetBeingInstalled={isAssetBeingInstalled}
-      onBack={() => onCustomObjectSelected(null)}
-    />
   );
 }

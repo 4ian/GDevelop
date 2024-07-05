@@ -13,8 +13,11 @@ import HelpButton from '../UI/HelpButton';
 import { Line } from '../UI/Grid';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import RaisedButton from '../UI/RaisedButton';
+import Window from '../Utils/Window';
 
 const gd: libGDevelop = global.gd;
+
+const isDev = Window.isDev();
 
 type Props = {|
   eventsBasedObject: gdEventsBasedObject,
@@ -116,13 +119,15 @@ export default function EventsBasedObjectEditor({
           onChange();
         }}
       />
-      <Line noMargin justifyContent="center">
-        <RaisedButton
-          label={<Trans>Open visual editor for the object</Trans>}
-          primary
-          onClick={onOpenCustomObjectEditor}
-        />
-      </Line>
+      {isDev && (
+        <Line noMargin justifyContent="center">
+          <RaisedButton
+            label={<Trans>Open visual editor for the object</Trans>}
+            primary
+            onClick={onOpenCustomObjectEditor}
+          />
+        </Line>
+      )}
       <Line noMargin>
         <HelpButton
           key="help"

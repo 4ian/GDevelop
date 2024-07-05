@@ -36,11 +36,10 @@ import {
 } from '../../Utils/GDevelopServices/Badge';
 import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
 import { type EventsFunctionsExtensionsState } from '../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
-import inc from 'semver/functions/inc';
-import Toggle from '../../UI/Toggle';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import AlertMessage from '../../UI/AlertMessage';
 import { type GameAvailabilityError } from '../../GameDashboard/GameRegistration';
+import ProjectVersionSelector from './ProjectVersionSelector';
 
 type State = {|
   exportStep: BuildStep,
@@ -52,6 +51,7 @@ type State = {|
   shouldBumpVersionNumber: boolean,
   exportState: any,
   doneFooterOpen: boolean,
+  selectedVersionNumber: string,
 |};
 
 type Props = {|
@@ -69,10 +69,6 @@ type Props = {|
   builds: ?Array<Build>,
   onRefreshBuilds: () => Promise<void>,
 |};
-
-const getIncrementedVersionNumber = (project: gdProject) => {
-  return inc(project.getVersion(), 'patch', { loose: true });
-};
 
 const getBuildQuota = (
   authenticatedUser: AuthenticatedUser,
@@ -107,8 +103,8 @@ export default class ExportLauncher extends Component<Props, State> {
     exportState: this.props.exportPipeline.getInitialExportState(
       this.props.project
     ),
+    selectedVersionNumber: this.props.project.getVersion(),
   };
-  _candidateBumpedVersionNumber = '';
   buildsWatcher = new BuildsWatcher();
   launchWholeExport: ({|
     i18n: I18nType,
@@ -128,10 +124,6 @@ export default class ExportLauncher extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this._setupAchievementHook();
-
-    this._candidateBumpedVersionNumber = getIncrementedVersionNumber(
-      props.project
-    );
   }
   componentDidUpdate(prevProps: Props, prevState: State) {
     this._setupAchievementHook();
@@ -350,13 +342,7 @@ export default class ExportLauncher extends Component<Props, State> {
         exportState: this.state.exportState,
       };
 
-      if (
-        exportPipeline.shouldSuggestBumpingVersionNumber &&
-        exportPipeline.shouldSuggestBumpingVersionNumber() &&
-        this.state.shouldBumpVersionNumber
-      ) {
-        project.setVersion(this._candidateBumpedVersionNumber);
-      }
+      project.setVersion(this.state.selectedVersionNumber);
 
       setStep('export');
       this.setState({
@@ -515,8 +501,8 @@ export default class ExportLauncher extends Component<Props, State> {
       (exportStep === 'done' && !isBuildRunning) || errored;
     const isUsingOnlineBuildNonAuthenticated =
       !!exportPipeline.onlineBuildType && !authenticatedUser.authenticated;
-    const isOnlineBuildIncludedInSubscription =
-      !!buildQuota && buildQuota.max > 0;
+    const isIncludedInSubscriptionIfOnline =
+      !exportPipeline.onlineBuildType || (!!buildQuota && buildQuota.max > 0);
     const hasSomeBuildsRunning = hasBuildsCurrentlyRunning();
 
     return (
@@ -559,7 +545,7 @@ export default class ExportLauncher extends Component<Props, State> {
                   exportPipeline.renderTutorial()}
               </Column>
             )}
-            <Column expand justifyContent="center">
+            <Column expand justifyContent="center" alignItems="center">
               {!isUsingOnlineBuildNonAuthenticated && (
                 <Line alignItems="center" justifyContent="center">
                   {exportPipeline.renderHeader({
@@ -575,28 +561,16 @@ export default class ExportLauncher extends Component<Props, State> {
                 </Line>
               )}
               {!isUsingOnlineBuildNonAuthenticated &&
-                isOnlineBuildIncludedInSubscription &&
-                exportPipeline.shouldSuggestBumpingVersionNumber &&
-                exportPipeline.shouldSuggestBumpingVersionNumber() &&
+                isIncludedInSubscriptionIfOnline &&
                 !isExportAndBuildCompleteOrErrored && (
-                  <Line noMargin>
-                    <Toggle
-                      labelPosition="right"
-                      toggled={this.state.shouldBumpVersionNumber}
-                      label={
-                        <Trans>
-                          Increase version number to{' '}
-                          {this._candidateBumpedVersionNumber}
-                        </Trans>
-                      }
-                      onToggle={(e, toggled) => {
-                        this.setState({
-                          shouldBumpVersionNumber: toggled,
-                        });
-                      }}
-                      disabled={isExportingOrWaitingForBuild}
-                    />
-                  </Line>
+                  <ProjectVersionSelector
+                    project={project}
+                    versionNumber={this.state.selectedVersionNumber}
+                    onVersionNumberChanged={versionNumber => {
+                      this.setState({ selectedVersionNumber: versionNumber });
+                    }}
+                    disabled={isExportingOrWaitingForBuild}
+                  />
                 )}
               {!!exportPipeline.limitedBuilds &&
                 authenticatedUser.authenticated &&

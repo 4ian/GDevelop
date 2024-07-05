@@ -85,6 +85,8 @@ export const localCordovaExportPipeline: ExportPipeline<
       </Column>
     ) : null,
 
+  shouldSuggestBumpingVersionNumber: () => true,
+
   renderExportFlow: (props: ExportFlowProps) => (
     <ExportFlow {...props} exportPipelineName={exportPipelineName} />
   ),

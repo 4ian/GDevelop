@@ -44,6 +44,7 @@ export type Build = {
   targets?: Array<TargetName>,
   createdAt?: number, // Not defined for old builds.
   updatedAt: number,
+  gameVersion?: string,
 };
 
 export type BuildArtifactKeyName =
@@ -222,6 +223,7 @@ export const buildElectron = (
           type: 'electron-build',
           targets: targets.join(','),
           gameId,
+          gameVersion: options.gameVersion,
           filename: getBuildExtensionlessFilename(options),
           payWithCredits,
         },
@@ -253,6 +255,7 @@ export const buildWeb = (
           type: 'web-build',
           targets: 's3',
           gameId,
+          gameVersion: options.gameVersion,
           payWithCredits,
         },
         headers: {
@@ -293,6 +296,7 @@ export const buildCordovaAndroid = (
             targets: targets.join(','),
             gameId,
             filename: getBuildExtensionlessFilename(options),
+            gameVersion: options.gameVersion,
             payWithCredits,
           },
           headers: {
@@ -332,6 +336,7 @@ export const buildCordovaIos = (
             targets: targets.join(','),
             gameId,
             filename: getBuildExtensionlessFilename(options),
+            gameVersion: options.gameVersion,
             payWithCredits,
           },
           headers: {

@@ -76,6 +76,8 @@ export const localOnlineElectronExportPipeline: ExportPipeline<
 
   renderHeader: props => <SetupExportHeader {...props} />,
 
+  shouldSuggestBumpingVersionNumber: () => true,
+
   renderExportFlow: (props: ExportFlowProps) => (
     <ExportFlow {...props} exportPipelineName={exportPipelineName} />
   ),

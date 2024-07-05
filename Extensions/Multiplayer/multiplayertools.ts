@@ -109,9 +109,9 @@ namespace gdjs {
       // Uncomment to test the case of a failing loading:
       // return 'https://gd.games.wronglink';
 
-      const baseUrl = 'https://gd.games';
+      // const baseUrl = 'https://gd.games';
       // Uncomment to test locally:
-      // const baseUrl = 'http://localhost:4000';
+      const baseUrl = 'http://localhost:4000';
 
       const url = new URL(
         `${baseUrl}/games/${gameId}/lobbies${_lobbyId ? `/${_lobbyId}` : ''}`
@@ -627,8 +627,8 @@ namespace gdjs {
         },
         // Specify the origin to avoid leaking the playerToken.
         // Replace with '*' to test locally.
-        'https://gd.games'
-        // '*'
+        // 'https://gd.games'
+        '*'
       );
     };
 

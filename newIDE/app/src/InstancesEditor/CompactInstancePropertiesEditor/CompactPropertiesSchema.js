@@ -523,7 +523,6 @@ export const makeSchema = ({
       removeSpacers: true,
       children: getXAndYFields({ i18n }),
     },
-    getZOrderField({ i18n }),
     {
       name: 'Size',
       type: 'row',
@@ -562,6 +561,7 @@ export const makeSchema = ({
         },
       ],
     },
+    getZOrderField({ i18n }),
     getLayerField({ i18n, layout }),
     {
       name: 'Rotation',

@@ -47,12 +47,18 @@ const EventsBasedObjectScenePropertiesDialog = ({
   );
 
   const onSubmit = () => {
-    eventsBasedObject.setAreaMinX(areaMinX);
-    eventsBasedObject.setAreaMinY(areaMinY);
-    eventsBasedObject.setAreaMinZ(areaMinZ);
-    eventsBasedObject.setAreaMaxX(areaMaxX);
-    eventsBasedObject.setAreaMaxY(areaMaxY);
-    eventsBasedObject.setAreaMaxZ(areaMaxZ);
+    if (areaMinX > areaMaxX) {
+      eventsBasedObject.setAreaMinX(areaMinX);
+      eventsBasedObject.setAreaMinY(areaMinY);
+    }
+    if (areaMinY > areaMaxY) {
+      eventsBasedObject.setAreaMinZ(areaMinZ);
+      eventsBasedObject.setAreaMaxX(areaMaxX);
+    }
+    if (areaMinZ > areaMaxZ) {
+      eventsBasedObject.setAreaMaxY(areaMaxY);
+      eventsBasedObject.setAreaMaxZ(areaMaxZ);
+    }
     eventsBasedObject.markAsRenderedIn3D(isRenderedIn3D);
     onApply();
   };
@@ -63,10 +69,14 @@ const EventsBasedObjectScenePropertiesDialog = ({
       if (!contentAABB) {
         return;
       }
-      setAreaMinX(contentAABB.left);
-      setAreaMinY(contentAABB.top);
-      setAreaMaxX(contentAABB.right);
-      setAreaMaxY(contentAABB.bottom);
+      if (contentAABB.width() > 0) {
+        setAreaMinX(contentAABB.left);
+        setAreaMinY(contentAABB.top);
+      }
+      if (contentAABB.height() > 0) {
+        setAreaMaxX(contentAABB.right);
+        setAreaMaxY(contentAABB.bottom);
+      }
       if (contentAABB.depth() > 0) {
         setAreaMinZ(contentAABB.zMin);
         setAreaMaxZ(contentAABB.zMax);
@@ -116,6 +126,11 @@ const EventsBasedObjectScenePropertiesDialog = ({
             type="number"
             value={areaMinX}
             onChange={(e, value) => setAreaMinX(parseFloat(value) || 0)}
+            errorText={
+              areaMinX > areaMaxX ? (
+                <Trans>Left bound should be smaller than right bound</Trans>
+              ) : null
+            }
           />
           <TextField
             floatingLabelText={<Trans>Right bound</Trans>}
@@ -123,6 +138,11 @@ const EventsBasedObjectScenePropertiesDialog = ({
             type="number"
             value={areaMaxX}
             onChange={(e, value) => setAreaMaxX(parseFloat(value) || 0)}
+            errorText={
+              areaMinX > areaMaxX ? (
+                <Trans>Right bound should be greater than left bound</Trans>
+              ) : null
+            }
           />
         </LineStackLayout>
         <LineStackLayout expand noMargin>
@@ -132,6 +152,11 @@ const EventsBasedObjectScenePropertiesDialog = ({
             type="number"
             value={areaMinY}
             onChange={(e, value) => setAreaMinY(parseFloat(value) || 0)}
+            errorText={
+              areaMinY > areaMaxY ? (
+                <Trans>Top bound should be smaller than bottom bound</Trans>
+              ) : null
+            }
           />
           <TextField
             floatingLabelText={<Trans>Bottom bound</Trans>}
@@ -139,6 +164,11 @@ const EventsBasedObjectScenePropertiesDialog = ({
             type="number"
             value={areaMaxY}
             onChange={(e, value) => setAreaMaxY(parseFloat(value) || 0)}
+            errorText={
+              areaMinY > areaMaxY ? (
+                <Trans>Bottom bound should be greater than right bound</Trans>
+              ) : null
+            }
           />
         </LineStackLayout>
         <LineStackLayout expand noMargin>
@@ -146,17 +176,27 @@ const EventsBasedObjectScenePropertiesDialog = ({
             floatingLabelText={<Trans>Z min bound</Trans>}
             fullWidth
             type="number"
-            value={areaMaxZ}
-            onChange={(e, value) => setAreaMaxZ(parseFloat(value) || 0)}
+            value={areaMinZ}
+            onChange={(e, value) => setAreaMinZ(parseFloat(value) || 0)}
             disabled={!isRenderedIn3D}
+            errorText={
+              areaMinZ > areaMaxZ ? (
+                <Trans>Z min bound should be smaller than Z max bound</Trans>
+              ) : null
+            }
           />
           <TextField
             floatingLabelText={<Trans>Z max bound</Trans>}
             fullWidth
             type="number"
-            value={areaMinZ}
-            onChange={(e, value) => setAreaMinZ(parseFloat(value) || 0)}
+            value={areaMaxZ}
+            onChange={(e, value) => setAreaMaxZ(parseFloat(value) || 0)}
             disabled={!isRenderedIn3D}
+            errorText={
+              areaMinZ > areaMaxZ ? (
+                <Trans>Z max bound should be greater than Z min bound</Trans>
+              ) : null
+            }
           />
         </LineStackLayout>
         <LineStackLayout expand noMargin>

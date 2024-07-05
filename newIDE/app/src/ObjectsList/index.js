@@ -309,8 +309,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     const addObject = React.useCallback(
       (objectType: string) => {
         const defaultName = project.hasEventsBasedObject(objectType)
-          ? 'New' + project.getEventsBasedObject(objectType).getDefaultName()
+          ? 'New' +
+            (project.getEventsBasedObject(objectType).getDefaultName() ||
+              project.getEventsBasedObject(objectType).getName())
           : objectTypeToDefaultName[objectType] || 'NewObject';
+        console.log(objectType + ': ' + defaultName);
         const name = newNameGenerator(
           defaultName,
           name =>

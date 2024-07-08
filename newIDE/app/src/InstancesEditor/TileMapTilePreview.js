@@ -90,8 +90,7 @@ class TileMapTilePreview {
   render() {
     this.preview.removeChildren(0);
     const tileMapTileSelection = this.getTileMapTileSelection();
-    if (!tileMapTileSelection || !tileMapTileSelection.single) {
-      // TODO: Support other types of selections.
+    if (!tileMapTileSelection) {
       return;
     }
     const selection = this.instancesSelection.getSelectedInstances();
@@ -105,33 +104,42 @@ class TileMapTilePreview {
     );
     if (!object || object.getType() !== 'TileMap::SimpleTileMap') return;
     const { tileSize } = getTileSet(object);
-    const atlasResourceName = object
-      .getConfiguration()
-      .getProperties()
-      .get('atlasImage')
-      .getValue();
-    if (!atlasResourceName) return;
-    // TODO: Burst cache when atlas resource is changed
-    const cacheKey = `${atlasResourceName}-${tileSize}-${
-      tileMapTileSelection.single.x
-    }-${tileMapTileSelection.single.y}`;
-    let texture = this.cache.get(cacheKey);
-    if (!texture) {
-      const atlasTexture = PixiResourcesLoader.getPIXITexture(
-        this.project,
-        atlasResourceName
-      );
+    let texture;
+    if (tileMapTileSelection.single) {
+      const atlasResourceName = object
+        .getConfiguration()
+        .getProperties()
+        .get('atlasImage')
+        .getValue();
+      if (!atlasResourceName) return;
+      // TODO: Burst cache when atlas resource is changed
+      const cacheKey = `${atlasResourceName}-${tileSize}-${
+        tileMapTileSelection.single.x
+      }-${tileMapTileSelection.single.y}`;
+      texture = this.cache.get(cacheKey);
+      if (!texture) {
+        const atlasTexture = PixiResourcesLoader.getPIXITexture(
+          this.project,
+          atlasResourceName
+        );
 
-      const rect = new PIXI.Rectangle(
-        tileMapTileSelection.single.x * tileSize,
-        tileMapTileSelection.single.y * tileSize,
-        tileSize,
-        tileSize
-      );
+        const rect = new PIXI.Rectangle(
+          tileMapTileSelection.single.x * tileSize,
+          tileMapTileSelection.single.y * tileSize,
+          tileSize,
+          tileSize
+        );
 
-      texture = new PIXI.Texture(atlasTexture, rect);
-      this.cache.set(cacheKey, texture);
+        texture = new PIXI.Texture(atlasTexture, rect);
+        this.cache.set(cacheKey, texture);
+      }
+    } else if (tileMapTileSelection.erase) {
+      texture = PIXI.Texture.from(
+        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAARSURBVHgBY7h58+Z/BhgAcQA/VAcVLiw46wAAAABJRU5ErkJggg=='
+      );
+      texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
     }
+
     let scaleX = 1,
       scaleY = 1;
     if (instance.hasCustomSize()) {
@@ -159,14 +167,21 @@ class TileMapTilePreview {
     const spriteHeight = tileSizeInCanvas * scaleY;
 
     coordinates.forEach(({ x, y }) => {
-      // TODO: Find a way not to regenerate the sprites on each render.
-      const sprite = new PIXI.Sprite(texture);
-      sprite.width = spriteWidth;
-      sprite.height = spriteHeight;
       const steppedX = Math.floor((x - instance.getX()) / (tileSize * scaleX));
       const steppedY = Math.floor((y - instance.getY()) / (tileSize * scaleY));
       const key = `${steppedX};${steppedY}`;
       if (alreadyConsideredCoordinates.has(key)) return;
+      let sprite;
+      if (tileMapTileSelection.single) {
+        // TODO: Find a way not to regenerate the sprites on each render.
+        sprite = new PIXI.Sprite(texture);
+      } else {
+        sprite = new PIXI.TilingSprite(texture, 2, 2);
+        sprite.tileScale.x = this.viewPosition.toCanvasScale(scaleX);
+        sprite.tileScale.y = this.viewPosition.toCanvasScale(scaleY);
+      }
+      sprite.width = spriteWidth;
+      sprite.height = spriteHeight;
 
       sprite.x = this.viewPosition.toCanvasScale(
         steppedX * (tileSize * scaleX)

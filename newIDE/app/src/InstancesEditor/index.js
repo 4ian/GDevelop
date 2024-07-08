@@ -745,8 +745,7 @@ export default class InstancesEditor extends Component<Props> {
       project,
       layout,
     } = this.props;
-    if (!tileMapTileSelection || !tileMapTileSelection.single) {
-      // TODO: Support other types of selections.
+    if (!tileMapTileSelection) {
       return;
     }
     const selectedInstances = instancesSelection.getSelectedInstances();
@@ -781,7 +780,7 @@ export default class InstancesEditor extends Component<Props> {
       const tileSet = getTileSet(object);
       const editableTileMapLayer = editableTileMap.getTileLayer(0);
       const alreadyConsideredCoordinates = new Set();
-      const deduplicatedTileCoordinates = [];
+      const deduplicatedCoordinates = [];
       scenePathCoordinates.forEach(sceneCoordinates => {
         const x = Math.floor(
           (sceneCoordinates.x - selectedInstance.getX()) /
@@ -793,47 +792,54 @@ export default class InstancesEditor extends Component<Props> {
         );
         const key = `${x};${y}`;
         if (alreadyConsideredCoordinates.has(key)) return;
-        deduplicatedTileCoordinates.push({ x, y });
+        deduplicatedCoordinates.push({ x, y });
         alreadyConsideredCoordinates.add(key);
       });
-      // TODO: Optimize list execution to make sure the most important size changing operations are done first.
-      let cumulatedUnshiftedRows = 0,
-        cumulatedUnshiftedColumns = 0;
-      deduplicatedTileCoordinates.forEach(({ x, y }) => {
-        const {
-          unshiftedRows,
-          unshiftedColumns,
-          appendedRows,
-          appendedColumns,
-        } = editableTileMapLayer.setTile(
-          // If rows or columns have been unshifted in the previous tile setting operations,
-          // we have to take them into account for the current coordinates.
-          x + cumulatedUnshiftedColumns,
-          y + cumulatedUnshiftedRows,
-          tileSet.rowCount * tileMapTileSelection.single.x +
-            tileMapTileSelection.single.y
-        );
-        cumulatedUnshiftedRows += unshiftedRows;
-        cumulatedUnshiftedColumns += unshiftedColumns;
-        // TODO: Take rotation into account
-        selectedInstance.setX(
-          selectedInstance.getX() -
-            unshiftedColumns * (tileSet.tileSize * scaleX)
-        );
-        selectedInstance.setY(
-          selectedInstance.getY() - unshiftedRows * (tileSet.tileSize * scaleY)
-        );
-        if (selectedInstance.hasCustomSize()) {
-          selectedInstance.setCustomWidth(
-            selectedInstance.getCustomWidth() +
-              tileSet.tileSize * scaleX * (appendedColumns + unshiftedColumns)
+      if (tileMapTileSelection.single) {
+        // TODO: Optimize list execution to make sure the most important size changing operations are done first.
+        let cumulatedUnshiftedRows = 0,
+          cumulatedUnshiftedColumns = 0;
+        deduplicatedCoordinates.forEach(({ x, y }) => {
+          const {
+            unshiftedRows,
+            unshiftedColumns,
+            appendedRows,
+            appendedColumns,
+          } = editableTileMapLayer.setTile(
+            // If rows or columns have been unshifted in the previous tile setting operations,
+            // we have to take them into account for the current coordinates.
+            x + cumulatedUnshiftedColumns,
+            y + cumulatedUnshiftedRows,
+            tileSet.rowCount * tileMapTileSelection.single.x +
+              tileMapTileSelection.single.y
           );
-          selectedInstance.setCustomHeight(
-            selectedInstance.getCustomHeight() +
-              tileSet.tileSize * scaleY * (appendedRows + unshiftedRows)
+          cumulatedUnshiftedRows += unshiftedRows;
+          cumulatedUnshiftedColumns += unshiftedColumns;
+          // TODO: Take rotation into account
+          selectedInstance.setX(
+            selectedInstance.getX() -
+              unshiftedColumns * (tileSet.tileSize * scaleX)
           );
-        }
-      });
+          selectedInstance.setY(
+            selectedInstance.getY() -
+              unshiftedRows * (tileSet.tileSize * scaleY)
+          );
+          if (selectedInstance.hasCustomSize()) {
+            selectedInstance.setCustomWidth(
+              selectedInstance.getCustomWidth() +
+                tileSet.tileSize * scaleX * (appendedColumns + unshiftedColumns)
+            );
+            selectedInstance.setCustomHeight(
+              selectedInstance.getCustomHeight() +
+                tileSet.tileSize * scaleY * (appendedRows + unshiftedRows)
+            );
+          }
+        });
+      } else if (tileMapTileSelection.erase) {
+        deduplicatedCoordinates.forEach(({ x, y }) => {
+          editableTileMapLayer.removeTile(x, y);
+        });
+      }
       renderedInstance.updatePixiTileMap();
       object
         .getConfiguration()

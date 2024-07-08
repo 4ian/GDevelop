@@ -1,10 +1,13 @@
 // @flow
 
 import * as React from 'react';
-import { Line } from '../UI/Grid';
+import { Trans } from '@lingui/macro';
+import { createStyles, makeStyles } from '@material-ui/core/styles';
+import { Column, Line } from '../UI/Grid';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import ResourcesLoader from '../ResourcesLoader';
-import { createStyles, makeStyles } from '@material-ui/core';
+import Text from '../UI/Text';
+import Checkbox from '../UI/Checkbox';
 
 const styles = {
   tileContainer: { flex: 1, position: 'relative', display: 'flex' },
@@ -92,8 +95,7 @@ export type TileMapTileSelection =
       single: TileMapCoordinates,
     |}
   | {|
-      from: TileMapCoordinates,
-      to: TileMapCoordinates,
+      erase: boolean,
     |};
 
 type Props = {|
@@ -195,46 +197,61 @@ const TileMapPainter = ({
   );
 
   return (
-    <Line justifyContent="stretch">
-      {atlasResource && (
-        <div
-          style={styles.tileContainer}
-          ref={tileContainerRef}
-          onMouseMove={onHoverAtlas}
-          onClick={onClickAtlas}
-        >
-          <CorsAwareImage
-            style={styles.atlasImage}
-            alt={atlasResource.atlasResourceName}
-            src={ResourcesLoader.getResourceFullUrl(
-              project,
-              atlasResource.atlasResourceName,
-              {}
-            )}
-          />
-
-          {hoveredTile && displayedTileSize && (
-            <Tile
-              key={`hovered-tile`}
-              size={displayedTileSize}
-              x={hoveredTile.x}
-              y={hoveredTile.y}
+    <Column noMargin>
+      <Line>
+        <Text>
+          <Trans>Erase</Trans>
+        </Text>
+        <Checkbox
+          // TODO: Change tileMapTileSelection to add a `kind` attribute to differentiate cases.
+          checked={!!tileMapTileSelection && !!tileMapTileSelection.erase}
+          onCheck={(e, checked) => {
+            if (checked) onSelectTileMapTile({ erase: true });
+            else onSelectTileMapTile(null);
+          }}
+        />
+      </Line>
+      <Line justifyContent="stretch">
+        {atlasResource && (
+          <div
+            style={styles.tileContainer}
+            ref={tileContainerRef}
+            onMouseMove={onHoverAtlas}
+            onClick={onClickAtlas}
+          >
+            <CorsAwareImage
+              style={styles.atlasImage}
+              alt={atlasResource.atlasResourceName}
+              src={ResourcesLoader.getResourceFullUrl(
+                project,
+                atlasResource.atlasResourceName,
+                {}
+              )}
             />
-          )}
-          {tileMapTileSelection &&
-            tileMapTileSelection.single &&
-            displayedTileSize && (
+
+            {hoveredTile && displayedTileSize && (
               <Tile
-                key={`selected-tile`}
-                highlighted
+                key={`hovered-tile`}
                 size={displayedTileSize}
-                x={tileMapTileSelection.single.x}
-                y={tileMapTileSelection.single.y}
+                x={hoveredTile.x}
+                y={hoveredTile.y}
               />
             )}
-        </div>
-      )}
-    </Line>
+            {tileMapTileSelection &&
+              tileMapTileSelection.single &&
+              displayedTileSize && (
+                <Tile
+                  key={`selected-tile`}
+                  highlighted
+                  size={displayedTileSize}
+                  x={tileMapTileSelection.single.x}
+                  y={tileMapTileSelection.single.y}
+                />
+              )}
+          </div>
+        )}
+      </Line>
+    </Column>
   );
 };
 

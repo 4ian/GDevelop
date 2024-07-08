@@ -36,6 +36,8 @@ ObjectsContainer& ObjectsContainer::operator=(
 void ObjectsContainer::Init(const gd::ObjectsContainer& other) {
   initialObjects = gd::Clone(other.initialObjects);
   objectGroups = other.objectGroups;
+  // The objects folders are not copied.
+  // It's not an issue because the UI uses the serialization for duplication.
 }
 
 void ObjectsContainer::SerializeObjectsTo(SerializerElement& element) const {

@@ -126,7 +126,6 @@ const CompactInstancePropertiesEditor = ({
       if (!instance) return { object: undefined, instanceSchema: undefined };
 
       const associatedObjectName = instance.getObjectName();
-      // TODO: replace and remove layout
       const object = getObjectByName(
         globalObjectsContainer,
         objectsContainer,

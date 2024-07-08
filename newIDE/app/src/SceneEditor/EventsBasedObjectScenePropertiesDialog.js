@@ -47,15 +47,15 @@ const EventsBasedObjectScenePropertiesDialog = ({
   );
 
   const onSubmit = () => {
-    if (areaMinX > areaMaxX) {
+    if (areaMinX < areaMaxX) {
       eventsBasedObject.setAreaMinX(areaMinX);
       eventsBasedObject.setAreaMinY(areaMinY);
     }
-    if (areaMinY > areaMaxY) {
+    if (areaMinY < areaMaxY) {
       eventsBasedObject.setAreaMinZ(areaMinZ);
       eventsBasedObject.setAreaMaxX(areaMaxX);
     }
-    if (areaMinZ > areaMaxZ) {
+    if (areaMinZ < areaMaxZ) {
       eventsBasedObject.setAreaMaxY(areaMaxY);
       eventsBasedObject.setAreaMaxZ(areaMaxZ);
     }

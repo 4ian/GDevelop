@@ -352,7 +352,7 @@ export default class InstancesEditor extends Component<Props> {
     this.backgroundArea.addEventListener('panend', event => this._onPanEnd());
     this.uiPixiContainer.addChild(this.backgroundArea);
 
-    const areaRectangle = this.getAreaRectangle();
+    const areaRectangle = this._getAreaRectangle();
     this.viewPosition = new ViewPosition({
       initialViewX: areaRectangle.centerX(),
       initialViewY: areaRectangle.centerY(),
@@ -1137,7 +1137,7 @@ export default class InstancesEditor extends Component<Props> {
     if (contentAABB) this.fitViewToRectangle(contentAABB, { adaptZoom: true });
   };
 
-  getAreaRectangle = (): Rectangle => {
+  _getAreaRectangle = (): Rectangle => {
     const { eventsBasedObject, project } = this.props;
     return eventsBasedObject
       ? new Rectangle(
@@ -1155,7 +1155,7 @@ export default class InstancesEditor extends Component<Props> {
   };
 
   zoomToInitialPosition = () => {
-    const areaRectangle = this.getAreaRectangle();
+    const areaRectangle = this._getAreaRectangle();
     this.setZoomFactor(
       getRecommendedInitialZoomFactor(
         Math.max(areaRectangle.width(), areaRectangle.height())

@@ -24,7 +24,7 @@ bool EventsBasedObjectDependencyFinder::IsDependentFromEventsBasedObject(
   if (&eventsBasedObject == &dependency) {
     return true;
   }
-  if (depth > 1000) {
+  if (depth > 200) {
     return false;
   }
   for (auto &object : eventsBasedObject.GetObjects().GetObjects()) {

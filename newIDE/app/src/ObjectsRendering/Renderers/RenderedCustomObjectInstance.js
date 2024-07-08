@@ -136,7 +136,6 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     }
     this._isRenderedIn3D = eventBasedObject.isRenderedIn3D();
 
-    // TODO: do the proper rendering according to instances
     if (eventBasedObject.getInitialInstances().getInstancesCount() > 0) {
       // Functor used to render an instance
       this.instancesRenderer = new gd.InitialInstanceJSFunctor();

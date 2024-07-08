@@ -54,7 +54,6 @@ export const isSameObjectWithContext = (
   );
 };
 
-// TODO: support only a single list
 export const enumerateObjects = (
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,

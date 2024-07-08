@@ -49,14 +49,14 @@ const EventsBasedObjectScenePropertiesDialog = ({
   const onSubmit = () => {
     if (areaMinX < areaMaxX) {
       eventsBasedObject.setAreaMinX(areaMinX);
-      eventsBasedObject.setAreaMinY(areaMinY);
-    }
-    if (areaMinY < areaMaxY) {
-      eventsBasedObject.setAreaMinZ(areaMinZ);
       eventsBasedObject.setAreaMaxX(areaMaxX);
     }
-    if (areaMinZ < areaMaxZ) {
+    if (areaMinY < areaMaxY) {
+      eventsBasedObject.setAreaMinY(areaMinY);
       eventsBasedObject.setAreaMaxY(areaMaxY);
+    }
+    if (areaMinZ < areaMaxZ) {
+      eventsBasedObject.setAreaMinZ(areaMinZ);
       eventsBasedObject.setAreaMaxZ(areaMaxZ);
     }
     eventsBasedObject.markAsRenderedIn3D(isRenderedIn3D);

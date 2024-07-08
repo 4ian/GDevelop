@@ -451,7 +451,38 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
     this._alpha = alpha;
   }
 
-  changeDimensions(
+  reduceDimensions(
+    columnsToPop: number,
+    columnsToShift: number,
+    rowsToPop: number,
+    rowsToShift: number
+  ) {
+    const initialRowCount = this._tiles.length;
+    const initialColumnCount = this._tiles[0].length;
+
+    if (rowsToPop > 0 || rowsToShift > 0) {
+      this._tiles = this._tiles.slice(
+        rowsToShift,
+        rowsToPop ? -rowsToPop : undefined
+      );
+    }
+    if (columnsToPop > 0 || columnsToShift > 0) {
+      this._tiles.forEach((row, rowIndex) => {
+        this._tiles[rowIndex] = this._tiles[rowIndex].slice(
+          columnsToShift,
+          columnsToPop ? -columnsToPop : undefined
+        );
+      });
+    }
+    // TODO: Instead of setting the dimensions directly, should it call a method on
+    // EditableTileMap that will iterates over all the layers to change their dimensions?
+    this.tileMap.setDimensionX(
+      initialColumnCount - columnsToPop - columnsToShift
+    );
+    this.tileMap.setDimensionY(initialRowCount - rowsToPop - rowsToShift);
+  }
+
+  increaseDimensions(
     columnsToAppend: number,
     columnsToUnshift: number,
     rowsToAppend: number,
@@ -526,7 +557,7 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
     const rowsToUnshift = Math.abs(Math.min(0, y));
     const columnsToUnshift = Math.abs(Math.min(0, x));
     if (rowsToAdd || columnsToAdd || rowsToUnshift || columnsToUnshift) {
-      this.changeDimensions(
+      this.increaseDimensions(
         columnsToAdd,
         columnsToUnshift,
         rowsToAdd,
@@ -567,6 +598,57 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
 
     // +1 because 0 mean null
     tilesRow[x] = tileGID + 1;
+  }
+
+  trimEmptyColumnsAndRow(): {
+    shiftedRows: number;
+    shiftedColumns: number;
+    poppedRows: number;
+    poppedColumns: number;
+  } {
+    let rowsToShift = 0,
+      rowsToPop = 0;
+    const columnsToShiftByRow = new Array(this._tiles.length).fill(
+      this._tiles[0].length
+    );
+    const columnsToPopByRow = new Array(this._tiles.length).fill(
+      this._tiles[0].length
+    );
+    let isFirstNonEmptyRowFound = false;
+    for (let y = 0; y < this._tiles.length; y++) {
+      const row = this._tiles[y];
+      let isFirstNonEmptyColumnFound = false;
+      for (let x = 0; x < row.length; x++) {
+        const cell = row[x];
+        if (cell !== 0) {
+          columnsToPopByRow[y] = row.length - 1 - x;
+          if (!isFirstNonEmptyColumnFound) {
+            columnsToShiftByRow[y] = x;
+            isFirstNonEmptyColumnFound = true;
+          }
+        }
+      }
+      const isRowEmpty = !isFirstNonEmptyColumnFound;
+      if (!isRowEmpty) {
+        rowsToPop = this._tiles.length - 1 - y;
+        if (!isFirstNonEmptyRowFound) {
+          rowsToShift = y;
+          isFirstNonEmptyRowFound = true;
+        }
+      }
+    }
+    if (!isFirstNonEmptyRowFound) {
+      // TODO: Handle when tilemap is empty.
+    }
+    const columnsToShift = Math.min(...columnsToShiftByRow);
+    const columnsToPop = Math.min(...columnsToPopByRow);
+    this.reduceDimensions(columnsToPop, columnsToShift, rowsToPop, rowsToShift);
+    return {
+      shiftedRows: rowsToShift,
+      shiftedColumns: columnsToShift,
+      poppedRows: rowsToPop,
+      poppedColumns: columnsToPop,
+    };
   }
 
   /**

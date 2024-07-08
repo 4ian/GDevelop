@@ -227,7 +227,13 @@ export declare class EditableTileMapLayer extends AbstractEditableLayer {
    * @param alpha The opacity between 0-1
    */
   setAlpha(alpha: float): void;
-  changeDimensions(
+  reduceDimensions(
+    columnsToPop: number,
+    columnsToShift: number,
+    rowsToPop: number,
+    rowsToShift: number
+  ): void;
+  increaseDimensions(
     columnsToAppend: number,
     columnsToUnshift: number,
     rowsToAppend: number,
@@ -256,6 +262,12 @@ export declare class EditableTileMapLayer extends AbstractEditableLayer {
    * @param tileGID The tile GID.
    */
   setTileGID(x: integer, y: integer, tileGID: integer): void;
+  trimEmptyColumnsAndRow(): {
+    shiftedRows: number;
+    shiftedColumns: number;
+    poppedRows: number;
+    poppedColumns: number;
+  };
   /**
    * @param x The layer column.
    * @param y The layer row.

@@ -38,7 +38,7 @@ type Props = {|
   project: gdProject,
   layout: gdLayout,
   instancesSelection: InstancesSelection,
-  getLastCursorSceneCoordinates: () => [number, number],
+  getCoordinatesToRender: () => {| x: number, y: number |}[],
   getTileMapTileSelection: () => ?TileMapTileSelection,
   getRendererOfInstance: gdInitialInstance =>
     | RenderedInstance
@@ -51,7 +51,7 @@ class TileMapTilePreview {
   project: gdProject;
   layout: gdLayout;
   instancesSelection: InstancesSelection;
-  getLastCursorSceneCoordinates: () => [number, number];
+  getCoordinatesToRender: () => {| x: number, y: number |}[];
   getTileMapTileSelection: () => ?TileMapTileSelection;
   getRendererOfInstance: gdInitialInstance =>
     | RenderedInstance
@@ -65,7 +65,7 @@ class TileMapTilePreview {
 
   constructor({
     instancesSelection,
-    getLastCursorSceneCoordinates,
+    getCoordinatesToRender,
     project,
     layout,
     getTileMapTileSelection,
@@ -75,7 +75,7 @@ class TileMapTilePreview {
     this.project = project;
     this.layout = layout;
     this.instancesSelection = instancesSelection;
-    this.getLastCursorSceneCoordinates = getLastCursorSceneCoordinates;
+    this.getCoordinatesToRender = getCoordinatesToRender;
     this.getTileMapTileSelection = getTileMapTileSelection;
     this.getRendererOfInstance = getRendererOfInstance;
     this.viewPosition = viewPosition;
@@ -90,7 +90,10 @@ class TileMapTilePreview {
   render() {
     this.preview.removeChildren(0);
     const tileMapTileSelection = this.getTileMapTileSelection();
-    if (!tileMapTileSelection || !tileMapTileSelection.single) return;
+    if (!tileMapTileSelection || !tileMapTileSelection.single) {
+      // TODO: Support other types of selections.
+      return;
+    }
     const selection = this.instancesSelection.getSelectedInstances();
     if (selection.length !== 1) return;
     const instance = selection[0];
@@ -148,20 +151,37 @@ class TileMapTilePreview {
         scaleY = instance.getCustomHeight() / editableTileMap.getHeight();
       }
     }
-    const sprite = new PIXI.Sprite(texture);
-    sprite.width = this.viewPosition.toCanvasScale(tileSize) * scaleX;
-    sprite.height = this.viewPosition.toCanvasScale(tileSize) * scaleY;
 
-    this.preview.addChild(sprite);
+    const coordinates = this.getCoordinatesToRender();
+    const alreadyConsideredCoordinates = new Set();
+    const tileSizeInCanvas = this.viewPosition.toCanvasScale(tileSize);
+    const spriteWidth = tileSizeInCanvas * scaleX;
+    const spriteHeight = tileSizeInCanvas * scaleY;
 
-    const [cursorX, cursorY] = this.getLastCursorSceneCoordinates();
+    coordinates.forEach(({ x, y }) => {
+      // TODO: Find a way not to regenerate the sprites on each render.
+      const sprite = new PIXI.Sprite(texture);
+      sprite.width = spriteWidth;
+      sprite.height = spriteHeight;
+      const steppedX = Math.floor((x - instance.getX()) / (tileSize * scaleX));
+      const steppedY = Math.floor((y - instance.getY()) / (tileSize * scaleY));
+      const key = `${steppedX};${steppedY}`;
+      if (alreadyConsideredCoordinates.has(key)) return;
+
+      sprite.x = this.viewPosition.toCanvasScale(
+        steppedX * (tileSize * scaleX)
+      );
+      sprite.y = this.viewPosition.toCanvasScale(
+        steppedY * (tileSize * scaleY)
+      );
+
+      this.preview.addChild(sprite);
+      alreadyConsideredCoordinates.add(key);
+    });
+
     const canvasCoordinates = this.viewPosition.toCanvasCoordinates(
-      Math.floor((cursorX - instance.getX()) / (tileSize * scaleX)) *
-        (tileSize * scaleX) +
-        instance.getX(),
-      Math.floor((cursorY - instance.getY()) / (tileSize * scaleY)) *
-        (tileSize * scaleY) +
-        instance.getY()
+      instance.getX(),
+      instance.getY()
     );
     this.preview.position.x = canvasCoordinates[0];
     this.preview.position.y = canvasCoordinates[1];

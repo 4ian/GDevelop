@@ -494,7 +494,7 @@ export default class InstancesEditor extends Component<Props> {
       layout: props.layout,
       getTileMapTileSelection: this.getTileMapTileSelection,
       getRendererOfInstance: this.getRendererOfInstance,
-      getLastCursorSceneCoordinates: this.getLastCursorSceneCoordinates,
+      getCoordinatesToRender: this.getCoordinatesToRenderTileMapPreview,
       viewPosition: this.viewPosition,
     });
     this.clickInterceptor = new ClickInterceptor({
@@ -736,14 +736,19 @@ export default class InstancesEditor extends Component<Props> {
     this.lastCursorY = y;
   };
 
-  _onInterceptClick = (sceneCoordinates: {| x: number, y: number |}) => {
+  _onInterceptClick = (
+    scenePathCoordinates: Array<{| x: number, y: number |}>
+  ) => {
     const {
       tileMapTileSelection,
       instancesSelection,
       project,
       layout,
     } = this.props;
-    if (!tileMapTileSelection || !tileMapTileSelection.single) return;
+    if (!tileMapTileSelection || !tileMapTileSelection.single) {
+      // TODO: Support other types of selections.
+      return;
+    }
     const selectedInstances = instancesSelection.getSelectedInstances();
     if (selectedInstances.length !== 1) return;
     const selectedInstance = selectedInstances[0];
@@ -773,45 +778,62 @@ export default class InstancesEditor extends Component<Props> {
         scaleY =
           selectedInstance.getCustomHeight() / editableTileMap.getHeight();
       }
-
       const tileSet = getTileSet(object);
-      const x = Math.floor(
-        (sceneCoordinates.x - selectedInstance.getX()) /
-          (tileSet.tileSize * scaleX)
-      );
-      const y = Math.floor(
-        (sceneCoordinates.y - selectedInstance.getY()) /
-          (tileSet.tileSize * scaleY)
-      );
       const editableTileMapLayer = editableTileMap.getTileLayer(0);
-      const {
-        unshiftedRows,
-        unshiftedColumns,
-        appendedRows,
-        appendedColumns,
-      } = editableTileMapLayer.setTile(
-        x,
-        y,
-        tileSet.rowCount * tileMapTileSelection.single.x +
-          tileMapTileSelection.single.y
-      );
-      // TODO: Take rotation into account
-      selectedInstance.setX(
-        selectedInstance.getX() - unshiftedColumns * (tileSet.tileSize * scaleX)
-      );
-      selectedInstance.setY(
-        selectedInstance.getY() - unshiftedRows * (tileSet.tileSize * scaleY)
-      );
-      if (selectedInstance.hasCustomSize()) {
-        selectedInstance.setCustomWidth(
-          selectedInstance.getCustomWidth() +
-            tileSet.tileSize * scaleX * (appendedColumns + unshiftedColumns)
+      const alreadyConsideredCoordinates = new Set();
+      const deduplicatedTileCoordinates = [];
+      scenePathCoordinates.forEach(sceneCoordinates => {
+        const x = Math.floor(
+          (sceneCoordinates.x - selectedInstance.getX()) /
+            (tileSet.tileSize * scaleX)
         );
-        selectedInstance.setCustomHeight(
-          selectedInstance.getCustomHeight() +
-            tileSet.tileSize * scaleY * (appendedRows + unshiftedRows)
+        const y = Math.floor(
+          (sceneCoordinates.y - selectedInstance.getY()) /
+            (tileSet.tileSize * scaleY)
         );
-      }
+        const key = `${x};${y}`;
+        if (alreadyConsideredCoordinates.has(key)) return;
+        deduplicatedTileCoordinates.push({ x, y });
+        alreadyConsideredCoordinates.add(key);
+      });
+      // TODO: Optimize list execution to make sure the most important size changing operations are done first.
+      let cumulatedUnshiftedRows = 0,
+        cumulatedUnshiftedColumns = 0;
+      deduplicatedTileCoordinates.forEach(({ x, y }) => {
+        const {
+          unshiftedRows,
+          unshiftedColumns,
+          appendedRows,
+          appendedColumns,
+        } = editableTileMapLayer.setTile(
+          // If rows or columns have been unshifted in the previous tile setting operations,
+          // we have to take them into account for the current coordinates.
+          x + cumulatedUnshiftedColumns,
+          y + cumulatedUnshiftedRows,
+          tileSet.rowCount * tileMapTileSelection.single.x +
+            tileMapTileSelection.single.y
+        );
+        cumulatedUnshiftedRows += unshiftedRows;
+        cumulatedUnshiftedColumns += unshiftedColumns;
+        // TODO: Take rotation into account
+        selectedInstance.setX(
+          selectedInstance.getX() -
+            unshiftedColumns * (tileSet.tileSize * scaleX)
+        );
+        selectedInstance.setY(
+          selectedInstance.getY() - unshiftedRows * (tileSet.tileSize * scaleY)
+        );
+        if (selectedInstance.hasCustomSize()) {
+          selectedInstance.setCustomWidth(
+            selectedInstance.getCustomWidth() +
+              tileSet.tileSize * scaleX * (appendedColumns + unshiftedColumns)
+          );
+          selectedInstance.setCustomHeight(
+            selectedInstance.getCustomHeight() +
+              tileSet.tileSize * scaleY * (appendedRows + unshiftedRows)
+          );
+        }
+      });
       renderedInstance.updatePixiTileMap();
       object
         .getConfiguration()
@@ -1333,6 +1355,16 @@ export default class InstancesEditor extends Component<Props> {
       this.lastCursorX,
       this.lastCursorY
     );
+  };
+
+  getCoordinatesToRenderTileMapPreview = () => {
+    const clickInterceptorPointerPathCoordinates = this.clickInterceptor.getPointerPathCoordinates();
+    if (clickInterceptorPointerPathCoordinates)
+      return clickInterceptorPointerPathCoordinates;
+    const lastCursorSceneCoordinates = this.getLastCursorSceneCoordinates();
+    return [
+      { x: lastCursorSceneCoordinates[0], y: lastCursorSceneCoordinates[1] },
+    ];
   };
 
   getViewPosition = (): ?ViewPosition => {

@@ -4,16 +4,19 @@ import * as PIXI from 'pixi.js-legacy';
 import ViewPosition from './ViewPosition';
 import { type TileMapTileSelection } from './TileMapPainter';
 
+type Coordinates = {| x: number, y: number |};
+
 type Props = {|
   viewPosition: ViewPosition,
   getTileMapTileSelection: () => ?TileMapTileSelection,
-  onClick: (sceneCoordinates: {| x: number, y: number |}) => void,
+  onClick: (scenePathCoordinates: Array<Coordinates>) => void,
 |};
 
 class ClickInterceptor {
   viewPosition: ViewPosition;
   getTileMapTileSelection: () => ?TileMapTileSelection;
-  onClick: (sceneCoordinates: {| x: number, y: number |}) => void;
+  onClick: (scenePathCoordinates: Array<Coordinates>) => void;
+  pointerPathCoordinates: ?Array<Coordinates>;
 
   pixiContainer: PIXI.Container;
   interceptingSprite: PIXI.sprite;
@@ -25,14 +28,40 @@ class ClickInterceptor {
     this.interceptingSprite = new PIXI.Sprite();
     this.interceptingSprite.alpha = 0;
     this.interceptingSprite.interactive = true;
+    this.pointerPathCoordinates = null;
     this.interceptingSprite.addEventListener(
-      'click',
+      'pointerdown',
       (e: PIXI.FederatedPointerEvent) => {
         const sceneCoordinates = this.viewPosition.toSceneCoordinates(
           e.global.x,
           e.global.y
         );
-        this.onClick({ x: sceneCoordinates[0], y: sceneCoordinates[1] });
+        this.pointerPathCoordinates = [
+          { x: sceneCoordinates[0], y: sceneCoordinates[1] },
+        ];
+      }
+    );
+    this.interceptingSprite.addEventListener(
+      'pointerup',
+      (e: PIXI.FederatedPointerEvent) => {
+        if (!this.pointerPathCoordinates) return;
+        this.onClick(this.pointerPathCoordinates);
+        this.pointerPathCoordinates = null;
+      }
+    );
+    this.interceptingSprite.addEventListener(
+      'pointermove',
+      (e: PIXI.FederatedPointerEvent) => {
+        if (!this.pointerPathCoordinates) return;
+        const sceneCoordinates = this.viewPosition.toSceneCoordinates(
+          e.global.x,
+          e.global.y
+        );
+
+        this.pointerPathCoordinates.push({
+          x: sceneCoordinates[0],
+          y: sceneCoordinates[1],
+        });
       }
     );
     this.pixiContainer = new PIXI.Container();
@@ -41,6 +70,10 @@ class ClickInterceptor {
 
   getPixiObject(): PIXI.Container {
     return this.pixiContainer;
+  }
+
+  getPointerPathCoordinates(): ?Array<Coordinates> {
+    return this.pointerPathCoordinates;
   }
 
   render() {

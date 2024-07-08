@@ -839,6 +839,28 @@ export default class InstancesEditor extends Component<Props> {
         deduplicatedCoordinates.forEach(({ x, y }) => {
           editableTileMapLayer.removeTile(x, y);
         });
+        const {
+          shiftedRows,
+          shiftedColumns,
+          poppedRows,
+          poppedColumns,
+        } = editableTileMapLayer.trimEmptyColumnsAndRow();
+        selectedInstance.setX(
+          selectedInstance.getX() + shiftedColumns * (tileSet.tileSize * scaleX)
+        );
+        selectedInstance.setY(
+          selectedInstance.getY() + shiftedRows * (tileSet.tileSize * scaleY)
+        );
+        if (selectedInstance.hasCustomSize()) {
+          selectedInstance.setCustomWidth(
+            selectedInstance.getCustomWidth() -
+              tileSet.tileSize * scaleX * (poppedColumns + shiftedColumns)
+          );
+          selectedInstance.setCustomHeight(
+            selectedInstance.getCustomHeight() -
+              tileSet.tileSize * scaleY * (poppedRows + shiftedRows)
+          );
+        }
       }
       renderedInstance.updatePixiTileMap();
       object

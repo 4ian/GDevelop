@@ -198,7 +198,7 @@ const TileMapPainter = ({
 
   return (
     <Column noMargin>
-      <Line>
+      <Line alignItems="center">
         <Text>
           <Trans>Erase</Trans>
         </Text>

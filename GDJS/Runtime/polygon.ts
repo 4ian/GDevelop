@@ -17,6 +17,8 @@ namespace gdjs {
     farX: float;
     farY: float;
     farSqDist: float;
+    edgeX: float;
+    edgeY: float;
   };
 
   /** Build a new object to store collision test results. */
@@ -34,6 +36,8 @@ namespace gdjs {
       farX: 0,
       farY: 0,
       farSqDist: 0,
+      edgeX: 0,
+      edgeY: 0,
     };
   };
 
@@ -383,6 +387,9 @@ namespace gdjs {
             result.farX = startX;
             result.farY = startY;
             result.farSqDist = 0;
+            result.edgeX = s[0];
+            result.edgeY = s[1];
+            return result;
           }
           const t1 = minOverlap / Math.abs(rayB);
           const t2 = maxOverlap / Math.abs(rayB);
@@ -392,6 +399,8 @@ namespace gdjs {
           result.farX = startX + t2 * r[0];
           result.farY = startY + t2 * r[1];
           result.farSqDist = t2 * t2 * (r[0] * r[0] + r[1] * r[1]);
+          result.edgeX = s[0];
+          result.edgeY = s[1];
           return result;
         } else {
           if (crossRS !== 0 && 0 <= t && t <= 1 && 0 <= u && u <= 1) {
@@ -409,6 +418,8 @@ namespace gdjs {
               result.closeX = x;
               result.closeY = y;
               result.closeSqDist = sqDist;
+              result.edgeX = s[0];
+              result.edgeY = s[1];
               result.collision = true;
             } else {
               result.farX = x;
@@ -529,6 +540,8 @@ namespace gdjs {
       dest.farX = source.farX;
       dest.farY = source.farY;
       dest.farSqDist = source.farSqDist;
+      dest.edgeX = source.edgeX;
+      dest.edgeY = source.edgeY;
     }
 
     static makeNewRaycastTestResult = makeNewRaycastTestResult;

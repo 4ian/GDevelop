@@ -7,6 +7,7 @@ import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import ViewPosition from './ViewPosition';
 import RenderedInstance from '../ObjectsRendering/Renderers/RenderedInstance';
 import Rendered3DInstance from '../ObjectsRendering/Renderers/Rendered3DInstance';
+import { type TileMapTileSelection } from './TileMapPainter';
 
 export const getTileSet = (object: gdObject) => {
   const columnCount = parseFloat(
@@ -38,7 +39,7 @@ type Props = {|
   layout: gdLayout,
   instancesSelection: InstancesSelection,
   getLastCursorSceneCoordinates: () => [number, number],
-  getTileMapTile: () => ?{| x: number, y: number |},
+  getTileMapTileSelection: () => ?TileMapTileSelection,
   getRendererOfInstance: gdInitialInstance =>
     | RenderedInstance
     | Rendered3DInstance
@@ -51,7 +52,7 @@ class TileMapTilePreview {
   layout: gdLayout;
   instancesSelection: InstancesSelection;
   getLastCursorSceneCoordinates: () => [number, number];
-  getTileMapTile: () => ?{| x: number, y: number |};
+  getTileMapTileSelection: () => ?TileMapTileSelection;
   getRendererOfInstance: gdInitialInstance =>
     | RenderedInstance
     | Rendered3DInstance
@@ -67,7 +68,7 @@ class TileMapTilePreview {
     getLastCursorSceneCoordinates,
     project,
     layout,
-    getTileMapTile,
+    getTileMapTileSelection,
     getRendererOfInstance,
     viewPosition,
   }: Props) {
@@ -75,7 +76,7 @@ class TileMapTilePreview {
     this.layout = layout;
     this.instancesSelection = instancesSelection;
     this.getLastCursorSceneCoordinates = getLastCursorSceneCoordinates;
-    this.getTileMapTile = getTileMapTile;
+    this.getTileMapTileSelection = getTileMapTileSelection;
     this.getRendererOfInstance = getRendererOfInstance;
     this.viewPosition = viewPosition;
     this.preview = new PIXI.Container();
@@ -88,8 +89,8 @@ class TileMapTilePreview {
 
   render() {
     this.preview.removeChildren(0);
-    const tileMapTile = this.getTileMapTile();
-    if (!tileMapTile) return;
+    const tileMapTileSelection = this.getTileMapTileSelection();
+    if (!tileMapTileSelection || !tileMapTileSelection.single) return;
     const selection = this.instancesSelection.getSelectedInstances();
     if (selection.length !== 1) return;
     const instance = selection[0];
@@ -108,9 +109,9 @@ class TileMapTilePreview {
       .getValue();
     if (!atlasResourceName) return;
     // TODO: Burst cache when atlas resource is changed
-    const cacheKey = `${atlasResourceName}-${tileSize}-${tileMapTile.x}-${
-      tileMapTile.y
-    }`;
+    const cacheKey = `${atlasResourceName}-${tileSize}-${
+      tileMapTileSelection.single.x
+    }-${tileMapTileSelection.single.y}`;
     let texture = this.cache.get(cacheKey);
     if (!texture) {
       const atlasTexture = PixiResourcesLoader.getPIXITexture(
@@ -119,8 +120,8 @@ class TileMapTilePreview {
       );
 
       const rect = new PIXI.Rectangle(
-        tileMapTile.x * tileSize,
-        tileMapTile.y * tileSize,
+        tileMapTileSelection.single.x * tileSize,
+        tileMapTileSelection.single.y * tileSize,
         tileSize,
         tileSize
       );

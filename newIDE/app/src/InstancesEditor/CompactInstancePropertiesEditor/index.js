@@ -28,7 +28,7 @@ import {
   reorderInstanceSchemaForCustomProperties,
 } from './CompactPropertiesSchema';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
-import TileMapPainter from '../TileMapPainter';
+import TileMapPainter, { type TileMapTileSelection } from '../TileMapPainter';
 
 export const styles = {
   paper: {
@@ -60,8 +60,8 @@ type Props = {|
   unsavedChanges?: ?UnsavedChanges,
   i18n: I18nType,
   historyHandler?: HistoryHandler,
-  selectedTileMapTile: ?{| x: number, y: number |},
-  onSelectTileMapTile: (?{| x: number, y: number |}) => void,
+  tileMapTileSelection: ?TileMapTileSelection,
+  onSelectTileMapTile: (?TileMapTileSelection) => void,
 |};
 
 export type CompactInstancePropertiesEditorInterface = {|
@@ -83,7 +83,7 @@ const CompactInstancePropertiesEditor = ({
   editInstanceVariables,
   onInstancesModified,
   projectScopedContainersAccessor,
-  selectedTileMapTile,
+  tileMapTileSelection,
   onSelectTileMapTile,
 }: Props) => {
   const forceUpdate = useForceUpdate();
@@ -218,7 +218,7 @@ const CompactInstancePropertiesEditor = ({
                 <TileMapPainter
                   project={project}
                   object={object}
-                  selectedTileMapTile={selectedTileMapTile}
+                  tileMapTileSelection={tileMapTileSelection}
                   onSelectTileMapTile={onSelectTileMapTile}
                 />
               </Column>

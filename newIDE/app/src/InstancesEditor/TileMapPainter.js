@@ -85,17 +85,28 @@ const Tile = ({ x, y, size, highlighted }: TileProps) => {
   );
 };
 
+type TileMapCoordinates = {| x: number, y: number |};
+
+export type TileMapTileSelection =
+  | {|
+      single: TileMapCoordinates,
+    |}
+  | {|
+      from: TileMapCoordinates,
+      to: TileMapCoordinates,
+    |};
+
 type Props = {|
   project: gdProject,
   object: gdObject,
-  selectedTileMapTile: ?{| x: number, y: number |},
-  onSelectTileMapTile: (?{| x: number, y: number |}) => void,
+  tileMapTileSelection: ?TileMapTileSelection,
+  onSelectTileMapTile: (?TileMapTileSelection) => void,
 |};
 
 const TileMapPainter = ({
   project,
   object,
-  selectedTileMapTile,
+  tileMapTileSelection,
   onSelectTileMapTile,
 }: Props) => {
   const atlasResource = getAtlasResource({ project, object });
@@ -135,20 +146,21 @@ const TileMapPainter = ({
       );
       const y = Math.min(Math.floor(mouseY / displayedTileSize), rowCount - 1);
       if (
-        selectedTileMapTile &&
-        selectedTileMapTile.x === x &&
-        selectedTileMapTile.y === y
+        tileMapTileSelection &&
+        tileMapTileSelection.single &&
+        tileMapTileSelection.single.x === x &&
+        tileMapTileSelection.single.y === y
       ) {
         onSelectTileMapTile(null);
       } else {
-        onSelectTileMapTile({ x, y });
+        onSelectTileMapTile({ single: { x, y } });
       }
     },
     [
       displayedTileSize,
       columnCount,
       rowCount,
-      selectedTileMapTile,
+      tileMapTileSelection,
       onSelectTileMapTile,
     ]
   );
@@ -209,15 +221,17 @@ const TileMapPainter = ({
               y={hoveredTile.y}
             />
           )}
-          {selectedTileMapTile && displayedTileSize && (
-            <Tile
-              key={`selected-tile`}
-              highlighted
-              size={displayedTileSize}
-              x={selectedTileMapTile.x}
-              y={selectedTileMapTile.y}
-            />
-          )}
+          {tileMapTileSelection &&
+            tileMapTileSelection.single &&
+            displayedTileSize && (
+              <Tile
+                key={`selected-tile`}
+                highlighted
+                size={displayedTileSize}
+                x={tileMapTileSelection.single.x}
+                y={tileMapTileSelection.single.y}
+              />
+            )}
         </div>
       )}
     </Line>

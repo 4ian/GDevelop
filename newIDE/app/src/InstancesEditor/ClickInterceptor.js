@@ -2,25 +2,26 @@
 
 import * as PIXI from 'pixi.js-legacy';
 import ViewPosition from './ViewPosition';
+import { type TileMapTileSelection } from './TileMapPainter';
 
 type Props = {|
   viewPosition: ViewPosition,
-  getTileMapTile: () => ?{| x: number, y: number |},
+  getTileMapTileSelection: () => ?TileMapTileSelection,
   onClick: (sceneCoordinates: {| x: number, y: number |}) => void,
 |};
 
 class ClickInterceptor {
   viewPosition: ViewPosition;
-  getTileMapTile: () => ?{| x: number, y: number |};
+  getTileMapTileSelection: () => ?TileMapTileSelection;
   onClick: (sceneCoordinates: {| x: number, y: number |}) => void;
 
   pixiContainer: PIXI.Container;
   interceptingSprite: PIXI.sprite;
 
-  constructor({ viewPosition, getTileMapTile, onClick }: Props) {
+  constructor({ viewPosition, getTileMapTileSelection, onClick }: Props) {
     this.viewPosition = viewPosition;
     this.onClick = onClick;
-    this.getTileMapTile = getTileMapTile;
+    this.getTileMapTileSelection = getTileMapTileSelection;
     this.interceptingSprite = new PIXI.Sprite();
     this.interceptingSprite.alpha = 0;
     this.interceptingSprite.interactive = true;
@@ -44,8 +45,8 @@ class ClickInterceptor {
 
   render() {
     this.pixiContainer.removeChildren(0);
-    const tileMapTile = this.getTileMapTile();
-    if (!tileMapTile) return;
+    const tileMapTileSelection = this.getTileMapTileSelection();
+    if (!tileMapTileSelection) return;
     this.pixiContainer.position.x = 0;
     this.pixiContainer.position.y = 0;
     this.interceptingSprite.width = this.viewPosition.getWidth();

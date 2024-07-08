@@ -151,7 +151,10 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
         const renderedInstance:
           | RenderedInstance
           | Rendered3DInstance
-          | null = this.getRendererOfInstance(instance);
+          | null = this.getRendererOfInstance(
+          instance,
+          customObjectConfiguration
+        );
         if (!renderedInstance) return;
 
         const pixiObject: PIXI.DisplayObject | null = renderedInstance.getPixiObject();
@@ -258,21 +261,17 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     }
   }
 
-  getRendererOfInstance = (instance: gdInitialInstance) => {
+  getRendererOfInstance = (
+    instance: gdInitialInstance,
+    customObjectConfiguration: gdCustomObjectConfiguration
+  ) => {
     var renderedInstance = this.renderedInstances[instance.ptr];
     if (renderedInstance === undefined) {
       //No renderer associated yet, the instance must have been just created!...
-      const associatedObjectName = instance.getObjectName();
-      const { eventBasedObject } = this;
-      if (!eventBasedObject) {
-        return null;
-      }
-      const associatedObject = getObjectByName(
-        eventBasedObject.getObjects(),
-        null,
-        associatedObjectName
+
+      const childObjectConfiguration = customObjectConfiguration.getChildObjectConfiguration(
+        instance.getObjectName()
       );
-      if (!associatedObject) return null;
 
       //...so let's create a renderer.
       renderedInstance = this.renderedInstances[
@@ -280,7 +279,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
       ] = ObjectsRenderingService.createNewInstanceRenderer(
         this._project,
         instance,
-        associatedObject.getConfiguration(),
+        childObjectConfiguration,
         this._pixiObject,
         this._threeObjectPivot
       );

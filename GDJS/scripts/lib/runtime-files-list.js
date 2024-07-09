@@ -9,7 +9,17 @@ const extensionsRuntimePath = path.join(gdevelopRootPath, 'Extensions');
 const gdjsRuntimePath = path.join(gdjsRootPath, 'Runtime');
 
 // The extensions to be included in the bundled Runtime (will be built with esbuild or copied).
-const allowedExtensions = ['.js', '.ts', '.tsx', '.html', '.json', '.xml', '.map', '.wasm', '.txt'];
+const allowedExtensions = [
+  '.js',
+  '.ts',
+  '.tsx',
+  '.html',
+  '.json',
+  '.xml',
+  '.map',
+  '.wasm',
+  '.txt',
+];
 
 // These extensions will be built with esbuild (the other will be copied).
 const transformIncludedExtensions = ['.js', '.ts', '.tsx'];
@@ -40,6 +50,7 @@ const untransformedPaths = [
   'Extensions/DialogueTree/bondage.js/dist',
   'Extensions/Effects/pixi-filters',
   'Extensions/P2P/A_peer.js',
+  'Extensions/Multiplayer/peer.js',
   'Extensions/ParticleSystem/pixi-particles-pixi-renderer.min.js',
   'Extensions/Physics2Behavior/box2d.js',
   'Extensions/PhysicsBehavior/box2djs',

@@ -78,14 +78,6 @@ export const SubscriptionSuggestionProvider = ({
 
         // Would present App Store screen.
       } else {
-        if (hasMobileAppStoreSubscriptionPlan(authenticatedUser.subscription)) {
-          showAlert({
-            title: t`Subscription with the Apple App store or Google Play store`,
-            message: t`The subscription of this account was done using Apple or Google Play. Connect on your account on your Apple or Google device to manage it.`,
-          });
-          return;
-        }
-
         setFilter(subscriptionsFilter || null);
         setAnalyticsMetadata(metadata);
       }

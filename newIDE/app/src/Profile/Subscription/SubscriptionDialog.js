@@ -16,6 +16,7 @@ import {
   type SubscriptionPlanWithPricingSystems,
   type SubscriptionPlanPricingSystem,
   type Subscription,
+  hasMobileAppStoreSubscriptionPlan,
 } from '../../Utils/GDevelopServices/Usage';
 import EmptyMessage from '../../UI/EmptyMessage';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
@@ -745,6 +746,39 @@ export default function SubscriptionDialog({
               </EmptyMessage>
             </ColumnStackLayout>
           </Dialog>
+          {hasMobileAppStoreSubscriptionPlan(
+            authenticatedUser.subscription
+          ) && (
+            <Dialog
+              open
+              title={
+                <Trans>
+                  Subscription with the Apple App store or Google Play store
+                </Trans>
+              }
+              maxWidth="sm"
+              cannotBeDismissed
+              actions={[
+                <FlatButton
+                  key="close"
+                  label={
+                    <Trans>
+                      Understood, I'll check my Apple or Google account
+                    </Trans>
+                  }
+                  onClick={onClose}
+                />,
+              ]}
+            >
+              <Text>
+                <Trans>
+                  The subscription of this account was done using Apple or
+                  Google Play. Connect on your account on your Apple or Google
+                  device to manage it.
+                </Trans>
+              </Text>
+            </Dialog>
+          )}
           {!authenticatedUser.authenticated &&
             authenticatedUser.loginState !== 'loggingIn' && (
               <Dialog

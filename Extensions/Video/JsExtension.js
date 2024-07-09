@@ -106,10 +106,7 @@ module.exports = {
     ) {
       return false;
     };
-    videoObject.getInitialInstanceProperties = function (
-      content,
-      instance
-    ) {
+    videoObject.getInitialInstanceProperties = function (content, instance) {
       var instanceProperties = new gd.MapStringPropertyDescriptor();
       return instanceProperties;
     };

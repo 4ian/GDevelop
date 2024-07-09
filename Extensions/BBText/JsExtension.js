@@ -136,10 +136,7 @@ module.exports = {
     ) {
       return false;
     };
-    objectBBText.getInitialInstanceProperties = function (
-      content,
-      instance
-    ) {
+    objectBBText.getInitialInstanceProperties = function (content, instance) {
       var instanceProperties = new gd.MapStringPropertyDescriptor();
       return instanceProperties;
     };

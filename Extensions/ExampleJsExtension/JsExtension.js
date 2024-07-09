@@ -362,10 +362,7 @@ module.exports = {
 
       return false;
     };
-    dummyObject.getInitialInstanceProperties = function (
-      content,
-      instance
-    ) {
+    dummyObject.getInitialInstanceProperties = function (content, instance) {
       var instanceProperties = new gd.MapStringPropertyDescriptor();
 
       instanceProperties

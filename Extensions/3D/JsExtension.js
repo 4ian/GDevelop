@@ -1099,10 +1099,7 @@ module.exports = {
       return false;
     };
 
-    Cube3DObject.getInitialInstanceProperties = function (
-      content,
-      instance
-    ) {
+    Cube3DObject.getInitialInstanceProperties = function (content, instance) {
       const instanceProperties = new gd.MapStringPropertyDescriptor();
       return instanceProperties;
     };

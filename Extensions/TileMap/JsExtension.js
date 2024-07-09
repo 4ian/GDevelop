@@ -168,10 +168,7 @@ const defineTileMap = function (extension, _, gd) {
   ) {
     return false;
   };
-  objectTileMap.getInitialInstanceProperties = function (
-    content,
-    instance
-  ) {
+  objectTileMap.getInitialInstanceProperties = function (content, instance) {
     var instanceProperties = new gd.MapStringPropertyDescriptor();
     return instanceProperties;
   };

@@ -158,10 +158,7 @@ module.exports = {
       return false;
     };
 
-    lightObject.getInitialInstanceProperties = function (
-      content,
-      instance
-    ) {
+    lightObject.getInitialInstanceProperties = function (content, instance) {
       const instanceProperties = new gd.MapStringPropertyDescriptor();
 
       return instanceProperties;

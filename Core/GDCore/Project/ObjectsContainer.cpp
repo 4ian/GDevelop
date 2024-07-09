@@ -38,6 +38,7 @@ void ObjectsContainer::Init(const gd::ObjectsContainer& other) {
   objectGroups = other.objectGroups;
   // The objects folders are not copied.
   // It's not an issue because the UI uses the serialization for duplication.
+  rootFolder = gd::make_unique<gd::ObjectFolderOrObject>("__ROOT");
 }
 
 void ObjectsContainer::SerializeObjectsTo(SerializerElement& element) const {

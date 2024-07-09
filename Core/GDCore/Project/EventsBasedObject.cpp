@@ -47,6 +47,7 @@ void EventsBasedObject::SerializeTo(SerializerElement& element) const {
   AbstractEventsBasedEntity::SerializeTo(element);
   objectsContainer.SerializeObjectsTo(element.AddChild("objects"));
   objectsContainer.SerializeFoldersTo(element.AddChild("objectsFolderStructure"));
+  objectsContainer.GetObjectGroups().SerializeTo(element.AddChild("objectsGroups"));
 
   layers.SerializeLayersTo(element.AddChild("layers"));
   initialInstances.SerializeTo(element.AddChild("instances"));
@@ -71,6 +72,8 @@ void EventsBasedObject::UnserializeFrom(gd::Project& project,
     objectsContainer.UnserializeFoldersFrom(project, element.GetChild("objectsFolderStructure", 0));
   }
   objectsContainer.AddMissingObjectsInRootFolder();
+  objectsContainer.GetObjectGroups().UnserializeFrom(
+      element.GetChild("objectsGroups"));
 
   if (element.HasChild("layers")) {
     layers.UnserializeLayersFrom(element.GetChild("layers"));

@@ -157,27 +157,28 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     if (this._objectsContainer) this._objectsContainer.delete();
   }
 
-  _updateProjectScopedContainerFrom = (
-    project: gdProject,
-    eventsFunction: gdEventsFunction,
-    eventsBasedBehavior: ?gdEventsBasedBehavior,
-    eventsBasedObject: ?gdEventsBasedObject,
-    eventsFunctionsExtension: ?gdEventsFunctionsExtension
-  ) => {
-    if (
-      !eventsFunctionsExtension &&
-      !eventsBasedBehavior &&
-      !eventsBasedObject
-    ) {
-      throw new Error(
-        'No extension, behavior or object was specified when loading a function'
-      );
-    }
+  _updateProjectScopedContainer = () => {
+    this._updateProjectScopedContainerFrom({
+      eventsFunction: this.state.selectedEventsFunction,
+      eventsBasedBehavior: this.state.selectedEventsBasedBehavior,
+      eventsBasedObject: this.state.selectedEventsBasedObject,
+    });
+  };
+
+  _updateProjectScopedContainerFrom = ({
+    eventsBasedBehavior,
+    eventsBasedObject,
+    eventsFunction,
+  }: {|
+    eventsBasedBehavior?: ?gdEventsBasedBehavior,
+    eventsBasedObject?: ?gdEventsBasedObject,
+    eventsFunction?: ?gdEventsFunction,
+  |}) => {
     const scope = {
-      project,
+      project: this.props.project,
       layout: null,
       externalEvents: null,
-      eventsFunctionsExtension,
+      eventsFunctionsExtension: this.props.eventsFunctionsExtension,
       eventsBasedBehavior,
       eventsBasedObject,
       eventsFunction,
@@ -279,13 +280,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       this.props.onFunctionEdited();
     }
 
-    this._updateProjectScopedContainerFrom(
-      this.props.project,
-      selectedEventsFunction,
-      selectedEventsBasedBehavior,
-      selectedEventsBasedObject,
-      this.props.eventsFunctionsExtension
-    );
+    this._updateProjectScopedContainerFrom({
+      eventsFunction: selectedEventsFunction,
+      eventsBasedBehavior: selectedEventsBasedBehavior,
+      eventsBasedObject: selectedEventsBasedObject,
+    });
     this.setState(
       {
         selectedEventsFunction,
@@ -571,13 +570,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     selectedEventsBasedBehavior: ?gdEventsBasedBehavior
   ) => {
     this.onSelectionChanged(selectedEventsBasedBehavior, null);
-    this._updateProjectScopedContainerFrom(
-      this.props.project,
-      null,
-      selectedEventsBasedBehavior,
-      null,
-      this.props.eventsFunctionsExtension
-    );
+    this._updateProjectScopedContainerFrom({
+      eventsBasedBehavior: selectedEventsBasedBehavior,
+    });
     this.setState(
       {
         selectedEventsBasedBehavior,
@@ -602,13 +597,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     selectedEventsBasedObject: ?gdEventsBasedObject
   ) => {
     this.onSelectionChanged(null, selectedEventsBasedObject);
-    this._updateProjectScopedContainerFrom(
-      this.props.project,
-      null,
-      null,
-      selectedEventsBasedObject,
-      this.props.eventsFunctionsExtension
-    );
+    this._updateProjectScopedContainerFrom({
+      eventsBasedObject: selectedEventsBasedObject,
+    });
     this.setState(
       {
         selectedEventsBasedObject,
@@ -718,13 +709,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     // objects from objects containers will still refer to the old behavior name,
     // done before the call to gd.WholeProjectRefactorer.renameEventsBasedBehavior).
     if (this.state.selectedEventsFunction) {
-      this._updateProjectScopedContainerFrom(
-        this.props.project,
-        this.state.selectedEventsFunction,
-        this.state.selectedEventsBasedBehavior,
-        this.state.selectedEventsBasedObject,
-        this.props.eventsFunctionsExtension
-      );
+      this._updateProjectScopedContainer();
     }
   };
 
@@ -740,13 +725,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     // child-objects from child-objects containers will still refer to the old parent-object name,
     // done before the call to gd.WholeProjectRefactorer.renameEventsBasedObject).
     if (this.state.selectedEventsFunction) {
-      this._updateProjectScopedContainerFrom(
-        this.props.project,
-        this.state.selectedEventsFunction,
-        this.state.selectedEventsBasedBehavior,
-        this.state.selectedEventsBasedObject,
-        this.props.eventsFunctionsExtension
-      );
+      this._updateProjectScopedContainer();
     }
   };
 
@@ -1015,13 +994,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
           // changed so objects containers need to be re-created. Notably, the
           // type of the object that is handled by the behavior may have changed.
           if (this.state.selectedEventsFunction) {
-            this._updateProjectScopedContainerFrom(
-              this.props.project,
-              this.state.selectedEventsFunction,
-              this.state.selectedEventsBasedBehavior,
-              this.state.selectedEventsBasedObject,
-              this.props.eventsFunctionsExtension
-            );
+            this._updateProjectScopedContainer();
           }
         }
       }
@@ -1058,13 +1031,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
           // changed so objects containers need to be re-created. Notably, the
           // type of the object that is handled by the object may have changed.
           if (this.state.selectedEventsFunction) {
-            this._updateProjectScopedContainerFrom(
-              this.props.project,
-              this.state.selectedEventsFunction,
-              this.state.selectedEventsBasedBehavior,
-              this.state.selectedEventsBasedObject,
-              this.props.eventsFunctionsExtension
-            );
+            this._updateProjectScopedContainer();
           }
         }
       }
@@ -1240,13 +1207,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                         : '/events/functions'
                     }
                     onParametersOrGroupsUpdated={() => {
-                      this._updateProjectScopedContainerFrom(
-                        project,
-                        selectedEventsFunction,
-                        selectedEventsBasedBehavior,
-                        selectedEventsBasedObject,
-                        this.props.eventsFunctionsExtension
-                      );
+                      this._updateProjectScopedContainer();
                       this.forceUpdate();
                     }}
                     onMoveFreeEventsParameter={this._makeMoveFreeEventsParameter(

@@ -1727,6 +1727,14 @@ void WholeProjectRefactorer::ObjectRemovedInEventsBasedObject(
     WholeProjectRefactorer::ObjectRemovedInEventsFunction(project, *function,
                                                           objectName);
   }
+
+  auto &groups = eventsBasedObject.GetObjects().GetObjectGroups();
+  for (std::size_t g = 0; g < groups.size(); ++g) {
+    if (groups[g].Find(objectName))
+      groups[g].RemoveObject(objectName);
+  }
+  eventsBasedObject.GetInitialInstances().RemoveInitialInstancesOfObject(
+      objectName);
 }
 
 void WholeProjectRefactorer::ObjectRemovedInEventsFunction(
@@ -1750,6 +1758,16 @@ void WholeProjectRefactorer::ObjectOrGroupRenamedInEventsBasedObject(
     WholeProjectRefactorer::ObjectOrGroupRenamedInEventsFunction(
         project, projectScopedContainers, *function, oldName, newName,
         isObjectGroup);
+  }
+
+  // Object groups can't have instances or be in other groups
+  if (!isObjectGroup) {
+    eventsBasedObject.GetInitialInstances().RenameInstancesOfObject(oldName,
+                                                                    newName);
+    auto &groups = eventsBasedObject.GetObjects().GetObjectGroups();
+    for (std::size_t g = 0; g < groups.size(); ++g) {
+      groups[g].RenameObject(oldName, newName);
+    }
   }
 }
 

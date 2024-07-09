@@ -909,7 +909,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     objectsWithContext: ObjectWithContext[],
     done: boolean => void
   ) => {
-    const { project, layout } = this.props;
+    const { project, layout, eventsBasedObject } = this.props;
 
     objectsWithContext.forEach(objectWithContext => {
       const { object, global } = objectWithContext;
@@ -932,8 +932,12 @@ export default class SceneEditor extends React.Component<Props, State> {
             object.getName()
           );
         }
-      } else {
-        // TODO: refactoring for custom objects.
+      } else if (eventsBasedObject) {
+        gd.WholeProjectRefactorer.objectRemovedInLayout(
+          project,
+          eventsBasedObject,
+          object.getName()
+        );
       }
     });
 
@@ -1020,7 +1024,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     newName: string
   ) => {
     const { object, global } = objectWithContext;
-    const { project, layout } = this.props;
+    const { project, layout, eventsBasedObject } = this.props;
 
     // newName is supposed to have been already validated.
     // Avoid triggering renaming refactoring if name has not really changed
@@ -1045,8 +1049,14 @@ export default class SceneEditor extends React.Component<Props, State> {
           /* isObjectGroup=*/ false
         );
       }
-    } else {
-      // TODO: refactoring for custom objects.
+    } else if (eventsBasedObject) {
+      gd.WholeProjectRefactorer.objectOrGroupRenamedInEventsBasedObject(
+        project,
+        eventsBasedObject,
+        object.getName(),
+        newName,
+        /* isObjectGroup=*/ false
+      );
     }
 
     object.setName(newName);
@@ -1138,7 +1148,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     done: boolean => void
   ) => {
     const { group, global } = groupWithContext;
-    const { project, layout } = this.props;
+    const { project, layout, eventsBasedObject } = this.props;
 
     // newName is supposed to have been already validated
 
@@ -1162,8 +1172,14 @@ export default class SceneEditor extends React.Component<Props, State> {
           );
         }
       }
-    } else {
-      // TODO: refactoring for custom objects.
+    } else if (eventsBasedObject) {
+      gd.WholeProjectRefactorer.objectOrGroupRenamedInEventsBasedObject(
+        project,
+        eventsBasedObject,
+        group.getName(),
+        newName,
+        /* isObjectGroup=*/ true
+      );
     }
 
     done(true);

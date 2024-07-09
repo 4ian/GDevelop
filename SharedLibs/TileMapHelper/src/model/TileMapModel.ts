@@ -54,25 +54,42 @@ export class EditableTileMap {
     this._layers = [];
   }
 
-  static from(editableTileMapAsJsObject: any): EditableTileMap {
+  /**
+   * @param editableTileMapAsJsObject Serialized editable tile map object
+   * @param objectConfiguration
+   */
+  static from(
+    editableTileMapAsJsObject: any,
+    {
+      tileSize,
+      columnCount,
+      rowCount,
+    }: { tileSize: number; columnCount: number; rowCount: number }
+  ): EditableTileMap {
     const tileSet = new Map();
 
-    // TODO: Actually save and load tileset
-    new Array(400)
+    // TODO: Actually save and load tileset when useful.
+    new Array(columnCount * rowCount)
       .fill(0)
       .forEach((_, index) => tileSet.set(index, new TileDefinition(0)));
 
     const tileMap = new EditableTileMap(
-      editableTileMapAsJsObject.tileWidth,
-      editableTileMapAsJsObject.tileHeight,
-      editableTileMapAsJsObject.dimX,
-      editableTileMapAsJsObject.dimY,
+      editableTileMapAsJsObject.tileWidth || tileSize,
+      editableTileMapAsJsObject.tileHeight || tileSize,
+      editableTileMapAsJsObject.dimX || 2,
+      editableTileMapAsJsObject.dimY || 2,
       tileSet
     );
 
-    editableTileMapAsJsObject.layers.forEach((layerAsJsObject: any) => {
-      tileMap.setTileLayer(EditableTileMapLayer.from(layerAsJsObject, tileMap));
-    });
+    if (editableTileMapAsJsObject.layers) {
+      editableTileMapAsJsObject.layers.forEach((layerAsJsObject: any) => {
+        tileMap.setTileLayer(
+          EditableTileMapLayer.from(layerAsJsObject, tileMap)
+        );
+      });
+    } else {
+      tileMap.addTileLayer(0);
+    }
 
     return tileMap;
   }
@@ -247,7 +264,7 @@ export class EditableTileMap {
    * Returns true if all layers contain no defined tiled.
    */
   isEmpty(): boolean {
-    return this._layers.every(layer => layer.isEmpty())
+    return this._layers.every((layer) => layer.isEmpty());
   }
 }
 

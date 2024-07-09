@@ -129,16 +129,16 @@ export class TileMapManager {
     rowCount: number,
     callback: (tileMap: EditableTileMap | null) => void
   ): void {
-    const key = `${objectName}|${tileSize}|${columnCount}|${rowCount}`;
-    this._tileMapCache.getOrLoad(
-      key,
-      (tileMapLoadingCallback) => {
-        const tileMap = JSON.parse(serializedTileMap);
-        const editableTileMap = EditableTileMap.from(tileMap);
-        tileMapLoadingCallback(editableTileMap);
-      },
-      callback
-    );
+    // TODO: Is it useful to cache the tilemap since it belongs to an instance?
+    // const key = `${objectName}|${tileSize}|${columnCount}|${rowCount}`;
+    const tileMap = JSON.parse(serializedTileMap);
+
+    const editableTileMap = EditableTileMap.from(tileMap, {
+      tileSize,
+      columnCount,
+      rowCount,
+    });
+    callback(editableTileMap);
   }
 
   /**

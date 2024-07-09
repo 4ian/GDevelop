@@ -41,7 +41,22 @@ export declare class EditableTileMap {
     dimY: integer,
     tileSet: Map<integer, TileDefinition>
   );
-  static from(editableTileMapAsJsObject: any): EditableTileMap;
+  /**
+   * @param editableTileMapAsJsObject Serialized editable tile map object
+   * @param objectConfiguration
+   */
+  static from(
+    editableTileMapAsJsObject: any,
+    {
+      tileSize,
+      columnCount,
+      rowCount,
+    }: {
+      tileSize: number;
+      columnCount: number;
+      rowCount: number;
+    }
+  ): EditableTileMap;
   toJSObject(): Object;
   /**
    * @returns The tile map width in pixels.

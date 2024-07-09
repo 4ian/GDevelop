@@ -607,10 +607,6 @@ const defineSimpleTileMap = function (extension, _, gd) {
       objectContent.atlasImage = newValue;
       return true;
     }
-    if (propertyName === 'tilemap') {
-      objectContent.tilemap = newValue;
-      return true;
-    }
     if (propertyName === 'columnCount') {
       objectContent.columnCount = parseFloat(newValue);
       return true;
@@ -652,15 +648,6 @@ const defineSimpleTileMap = function (extension, _, gd) {
     );
 
     objectProperties.set(
-      'tilemap',
-      new gd.PropertyDescriptor(objectContent.tilemap || '{}')
-        .setType('string')
-        .setLabel(_('Tilemap'))
-        .setDescription(_('The tilemap.'))
-        .setHidden(true)
-    );
-
-    objectProperties.set(
       'atlasImage',
       new gd.PropertyDescriptor(objectContent.atlasImage)
         .setType('resource')
@@ -677,7 +664,6 @@ const defineSimpleTileMap = function (extension, _, gd) {
       rowCount: 4,
       columnCount: 4,
       tileSize: 8,
-      tilemap: '{}',
     })
   );
 
@@ -689,8 +675,13 @@ const defineSimpleTileMap = function (extension, _, gd) {
     project,
     layout
   ) {
+    if (propertyName === 'tilemap') {
+      instance.setRawStringProperty('tilemap', newValue);
+      return true;
+    }
     return false;
   };
+
   objectSimpleTileMap.getInitialInstanceProperties = function (
     content,
     instance,
@@ -698,6 +689,14 @@ const defineSimpleTileMap = function (extension, _, gd) {
     layout
   ) {
     var instanceProperties = new gd.MapStringPropertyDescriptor();
+
+    instanceProperties
+      .getOrCreate('tilemap')
+      .setValue(instance.getRawStringProperty('tileMap'))
+      .setType('string')
+      .setLabel('Tilemap')
+      .setHidden();
+
     return instanceProperties;
   };
 
@@ -1648,10 +1647,8 @@ module.exports = {
           .getProperties()
           .get('atlasImage')
           .getValue();
-        const serializedTilemap = this._associatedObjectConfiguration
-          .getProperties()
-          .get('tilemap')
-          .getValue();
+        const serializedTilemap =
+          this._instance.getRawStringProperty('tilemap') || '{}';
 
         const tileSize = parseInt(
           this._associatedObjectConfiguration
@@ -1722,8 +1719,8 @@ module.exports = {
                     this.tileMapPixiObject,
                     this._editableTileMap,
                     textureCache,
-                    'all',
-                    0
+                    'all', // No notion of visibility on simple tile maps.
+                    0 // Only one layer is used on simple tile maps.
                   );
                 }
               );
@@ -1746,10 +1743,8 @@ module.exports = {
           .getProperties()
           .get('atlasImage')
           .getValue();
-        const serializedTilemap = this._associatedObjectConfiguration
-          .getProperties()
-          .get('tilemap')
-          .getValue();
+        const serializedTilemap =
+          this._instance.getRawStringProperty('tilemap') || '{}';
 
         const tileSize = parseInt(
           this._associatedObjectConfiguration

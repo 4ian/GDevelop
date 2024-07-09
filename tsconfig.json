@@ -49,6 +49,7 @@
     "Extensions/Effects/pixi-filters/filter-alpha.js",
     "SharedLibs/TileMapHelper/**/*",
     "Extensions/Spine/pixi-spine/pixi-spine.js",
-    "Extensions/P2P/A_peer.js"
+    "Extensions/P2P/A_peer.js",
+    "Extensions/Multiplayer/peer.js"
   ]
 }

@@ -18,6 +18,9 @@ export const Default = () => (
   <DragAndDropContextProvider>
     <EventsBasedObjectEditorPanel
       project={testProject.project}
+      projectScopedContainersAccessor={
+        testProject.emptySceneProjectScopedContainersAccessor
+      }
       eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
       eventsBasedObject={testProject.testEventsBasedObject}
       onRenameProperty={action('property rename')}

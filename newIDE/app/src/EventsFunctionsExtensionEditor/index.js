@@ -1331,9 +1331,13 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
               }}
               onConfigurationUpdated={this._onConfigurationUpdated}
             />
-          ) : selectedEventsBasedObject ? (
+          ) : selectedEventsBasedObject &&
+            this._projectScopedContainersAccessor ? (
             <EventsBasedObjectEditorPanel
               project={project}
+              projectScopedContainersAccessor={
+                this._projectScopedContainersAccessor
+              }
               eventsFunctionsExtension={eventsFunctionsExtension}
               eventsBasedObject={selectedEventsBasedObject}
               unsavedChanges={this.props.unsavedChanges}

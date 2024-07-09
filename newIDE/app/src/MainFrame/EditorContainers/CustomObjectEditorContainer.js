@@ -10,6 +10,9 @@ import {
   unregisterOnResourceExternallyChangedCallback,
 } from '../ResourcesWatcher';
 import SceneEditor from '../../SceneEditor';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
+
+const gd: libGDevelop = global.gd;
 
 const styles = {
   container: {
@@ -22,6 +25,7 @@ const styles = {
 export class CustomObjectEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?SceneEditor;
   resourceExternallyChangedCallbackId: ?string;
+  _objectsContainer: gdObjectsContainer = new gd.ObjectsContainer();
 
   getProject(): ?gdProject {
     return this.props.project;
@@ -52,6 +56,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     unregisterOnResourceExternallyChangedCallback(
       this.resourceExternallyChangedCallbackId
     );
+    if (this._objectsContainer) this._objectsContainer.delete();
   }
 
   componentDidUpdate(prevProps: RenderEditorContainerProps) {
@@ -126,11 +131,20 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     const { project, isActive } = this.props;
     if (!project) return null;
 
-    const extension = this.getEventsFunctionsExtension();
-    if (!extension) return null;
+    const eventsFunctionsExtension = this.getEventsFunctionsExtension();
+    if (!eventsFunctionsExtension) return null;
 
     const eventsBasedObject = this.getEventsBasedObject();
     if (!eventsBasedObject) return null;
+
+    const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+      {
+        project,
+        eventsFunctionsExtension,
+        eventsBasedObject,
+      },
+      this._objectsContainer
+    );
 
     return (
       <div style={styles.container}>
@@ -141,6 +155,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
           unsavedChanges={this.props.unsavedChanges}
           ref={editor => (this.editor = editor)}
           project={project}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
           layout={null}
           eventsBasedObject={eventsBasedObject}
           globalObjectsContainer={null}
@@ -155,7 +170,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
           }
           onOpenEvents={() =>
             this.props.openObjectEvents(
-              extension.getName(),
+              eventsFunctionsExtension.getName(),
               eventsBasedObject.getName()
             )
           }

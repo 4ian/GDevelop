@@ -10,6 +10,7 @@ import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
 } from './BaseEditor';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
 
 export class SceneEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?SceneEditor;
@@ -85,6 +86,13 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
       return <div>No layout called {projectItemName} found!</div>;
     }
 
+    const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+      {
+        project,
+        layout,
+      }
+    );
+
     return (
       <SceneEditor
         setToolbar={this.props.setToolbar}
@@ -93,6 +101,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         unsavedChanges={this.props.unsavedChanges}
         ref={editor => (this.editor = editor)}
         project={project}
+        projectScopedContainersAccessor={projectScopedContainersAccessor}
         layout={layout}
         eventsBasedObject={null}
         globalObjectsContainer={project.getObjects()}

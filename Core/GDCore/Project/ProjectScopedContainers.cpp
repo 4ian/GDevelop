@@ -111,16 +111,13 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForEventsBasedObject(
 
   outputObjectsContainer.GetObjects().clear();
   outputObjectsContainer.GetObjectGroups().Clear();
-  auto &children = eventsBasedObject.GetObjects().GetObjects();
-  for (auto &childObject : children) {
-    auto child = childObject.get();
-    outputObjectsContainer.InsertObject(*child, children.size());
-  }
   outputObjectsContainer.InsertNewObject(
       project,
       gd::PlatformExtension::GetObjectFullType(
           eventsFunctionsExtension.GetName(), eventsBasedObject.GetName()),
       "Object", outputObjectsContainer.GetObjectsCount());
+  gd::EventsFunctionTools::CopyEventsBasedObjectChildrenToObjectsContainer(
+      eventsBasedObject, outputObjectsContainer);
 
   ProjectScopedContainers projectScopedContainers(
       ObjectsContainersList::MakeNewObjectsContainersListForContainer(

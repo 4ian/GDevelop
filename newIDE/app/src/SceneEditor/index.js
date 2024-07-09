@@ -98,6 +98,7 @@ const styles = {
 
 type Props = {|
   project: gdProject,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   layout: gdLayout | null,
   eventsBasedObject: gdEventsBasedObject | null,
 
@@ -933,7 +934,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           );
         }
       } else if (eventsBasedObject) {
-        gd.WholeProjectRefactorer.objectRemovedInLayout(
+        gd.WholeProjectRefactorer.objectRemovedInEventsBasedObject(
           project,
           eventsBasedObject,
           object.getName()
@@ -1024,7 +1025,12 @@ export default class SceneEditor extends React.Component<Props, State> {
     newName: string
   ) => {
     const { object, global } = objectWithContext;
-    const { project, layout, eventsBasedObject } = this.props;
+    const {
+      project,
+      layout,
+      eventsBasedObject,
+      projectScopedContainersAccessor,
+    } = this.props;
 
     // newName is supposed to have been already validated.
     // Avoid triggering renaming refactoring if name has not really changed
@@ -1052,6 +1058,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     } else if (eventsBasedObject) {
       gd.WholeProjectRefactorer.objectOrGroupRenamedInEventsBasedObject(
         project,
+        projectScopedContainersAccessor.get(),
         eventsBasedObject,
         object.getName(),
         newName,
@@ -1148,7 +1155,12 @@ export default class SceneEditor extends React.Component<Props, State> {
     done: boolean => void
   ) => {
     const { group, global } = groupWithContext;
-    const { project, layout, eventsBasedObject } = this.props;
+    const {
+      project,
+      layout,
+      eventsBasedObject,
+      projectScopedContainersAccessor,
+    } = this.props;
 
     // newName is supposed to have been already validated
 
@@ -1175,6 +1187,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     } else if (eventsBasedObject) {
       gd.WholeProjectRefactorer.objectOrGroupRenamedInEventsBasedObject(
         project,
+        projectScopedContainersAccessor.get(),
         eventsBasedObject,
         group.getName(),
         newName,
@@ -1709,6 +1722,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   render() {
     const {
       project,
+      projectScopedContainersAccessor,
       layout,
       eventsBasedObject,
       initialInstances,
@@ -1730,12 +1744,6 @@ export default class SceneEditor extends React.Component<Props, State> {
           variablesEditedAssociatedObjectName
         )
       : null;
-    const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
-      {
-        project,
-        layout,
-      }
-    );
 
     // Deactivate prettier on this variable to prevent spaces to be added by
     // line breaks.

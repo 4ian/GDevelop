@@ -14,6 +14,7 @@ type TabName = 'configuration' | 'properties' | 'children';
 
 type Props = {|
   project: gdProject,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsBasedObject: gdEventsBasedObject,
   onRenameProperty: (oldName: string, newName: string) => void,
@@ -24,6 +25,7 @@ type Props = {|
 
 export default function EventsBasedObjectEditorPanel({
   project,
+  projectScopedContainersAccessor,
   eventsFunctionsExtension,
   eventsBasedObject,
   onRenameProperty,
@@ -40,16 +42,6 @@ export default function EventsBasedObjectEditorPanel({
       }
     },
     [unsavedChanges]
-  );
-
-  const projectScopedContainersAccessor = React.useMemo(
-    () =>
-      new ProjectScopedContainersAccessor({
-        project,
-        eventsFunctionsExtension,
-        eventsBasedObject,
-      }),
-    [eventsBasedObject, eventsFunctionsExtension, project]
   );
 
   return (

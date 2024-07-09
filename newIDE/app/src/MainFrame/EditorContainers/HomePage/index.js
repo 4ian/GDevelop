@@ -232,8 +232,10 @@ export const HomePage = React.memo<Props>(
         fetchGames,
         onGameUpdated,
       } = useGamesList();
-      const openedGame =
-        (games && games.find(game => game.id === openedGameId)) || null;
+      const openedGame = React.useMemo(
+        () => (games && games.find(game => game.id === openedGameId)) || null,
+        [games, openedGameId]
+      );
       const {
         shouldDisplayNewFeatureHighlighting,
         acknowledgeNewFeature,

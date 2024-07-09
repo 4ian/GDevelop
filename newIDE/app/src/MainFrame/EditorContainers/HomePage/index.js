@@ -179,7 +179,7 @@ export const HomePage = React.memo<Props>(
         fetchGameTemplates,
         shop: { setInitialGameTemplateUserFriendlySlug },
       } = React.useContext(PrivateGameTemplateStoreContext);
-      const [openedGame, setOpenedGame] = React.useState<?Game>(null);
+      const [openedGameId, setOpenedGameId] = React.useState<?string>(null);
       const [
         gameDetailsCurrentTab,
         setGameDetailsCurrentTab,
@@ -226,7 +226,16 @@ export const HomePage = React.memo<Props>(
         displayTooltipDelayed,
         setDisplayTooltipDelayed,
       ] = React.useState<boolean>(false);
-      const { games, gamesFetchingError, fetchGames } = useGamesList();
+      const {
+        games,
+        gamesFetchingError,
+        fetchGames,
+        onGameUpdated,
+      } = useGamesList();
+      const openedGame = React.useMemo(
+        () => (games && games.find(game => game.id === openedGameId)) || null,
+        [games, openedGameId]
+      );
       const {
         shouldDisplayNewFeatureHighlighting,
         acknowledgeNewFeature,
@@ -342,6 +351,17 @@ export const HomePage = React.memo<Props>(
         [isActive, authenticated, onCloudProjectsChanged]
       );
 
+      // Refresh games list (as one could have been modified using the game dashboard
+      // in the project manager) when navigating to the "Manage" tab.
+      React.useEffect(
+        () => {
+          if (isActive && activeTab === 'manage' && authenticated) {
+            fetchGames();
+          }
+        },
+        [isActive, activeTab, authenticated, fetchGames]
+      );
+
       const getProject = React.useCallback(() => {
         return undefined;
       }, []);
@@ -412,19 +432,13 @@ export const HomePage = React.memo<Props>(
         [authenticated]
       );
 
-      const onManageGame = React.useCallback(
-        ({ gameId }: {| gameId: string |}) => {
-          if (!games) return;
-          const matchingGame = games.find(game => game.id === gameId);
-          if (!matchingGame) return;
-          setOpenedGame(matchingGame);
-          setActiveTab('manage');
-        },
-        [games]
-      );
+      const onManageGame = React.useCallback((gameId: string) => {
+        setOpenedGameId(gameId);
+        setActiveTab('manage');
+      }, []);
 
       const canManageGame = React.useCallback(
-        ({ gameId }: {| gameId: string |}): boolean => {
+        (gameId: string): boolean => {
           if (!games) return false;
           const matchingGameIndex = games.findIndex(game => game.id === gameId);
           return matchingGameIndex > -1;
@@ -443,9 +457,10 @@ export const HomePage = React.memo<Props>(
                       project={project}
                       games={games}
                       onRefreshGames={fetchGames}
+                      onGameUpdated={onGameUpdated}
                       gamesFetchingError={gamesFetchingError}
                       openedGame={openedGame}
-                      setOpenedGame={setOpenedGame}
+                      setOpenedGameId={setOpenedGameId}
                       currentTab={gameDetailsCurrentTab}
                       setCurrentTab={setGameDetailsCurrentTab}
                     />

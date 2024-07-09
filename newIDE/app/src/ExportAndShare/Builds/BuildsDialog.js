@@ -15,7 +15,7 @@ type Props = {|
   game: Game,
   open: boolean,
   onClose: () => void,
-  onGameUpdated: () => Promise<void>,
+  onGameUpdated: (game: Game) => void,
 |};
 
 const BuildsDialog = ({

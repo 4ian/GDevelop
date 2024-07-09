@@ -26,7 +26,7 @@ export const WithoutAProjectOpened = () => {
         project={null}
         games={[game1, game2]}
         onRefreshGames={action('onRefreshGames')}
-        onOpenGame={action('onOpenGame')}
+        onOpenGameId={action('onOpenGameId')}
       />
     </AuthenticatedUserContext.Provider>
   );

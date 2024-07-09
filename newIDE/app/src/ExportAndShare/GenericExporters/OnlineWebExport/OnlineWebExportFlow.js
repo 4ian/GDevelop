@@ -29,7 +29,7 @@ const OnlineWebExportFlow = ({
   launchExport,
   exportPipelineName,
   isExporting,
-  onGameUpdated,
+  onRefreshGame,
 }: OnlineWebExportFlowProps) => {
   const hasGameExistingBuilds =
     game && builds
@@ -109,7 +109,7 @@ const OnlineWebExportFlow = ({
         errored={errored}
         exportStep={exportStep}
         automaticallyOpenGameProperties={automaticallyOpenGameProperties}
-        onGameUpdated={onGameUpdated}
+        onRefreshGame={onRefreshGame}
         game={game}
       />
     </ColumnStackLayout>

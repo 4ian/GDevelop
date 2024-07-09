@@ -513,7 +513,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       false
     );
     const projectUuid = project.getProjectUuid();
-    const { games, fetchGames } = useGamesList();
+    const { games, fetchGames, onGameUpdated } = useGamesList();
     const { profile } = React.useContext(AuthenticatedUserContext);
     const userId = profile ? profile.id : null;
     React.useEffect(
@@ -526,8 +526,13 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       ? games.find(game => game.id === projectUuid)
       : null;
     const onOpenGamesDashboardDialog = React.useCallback(
-      () => setOpenGameDetails(true),
-      []
+      () => {
+        setOpenGameDetails(true);
+        // Refresh the games as it could have been modified using the game dashboard
+        // in the "Manage" tab from the home page.
+        fetchGames();
+      },
+      [fetchGames]
     );
 
     const [
@@ -1355,7 +1360,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     setOpenGameDetails(false);
                     fetchGames();
                   }}
-                  onGameUpdated={fetchGames}
+                  onGameUpdated={onGameUpdated}
                   onShareProject={onShareProject}
                 />
               )}

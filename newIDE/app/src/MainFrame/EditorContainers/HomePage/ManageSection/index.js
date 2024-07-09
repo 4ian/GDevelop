@@ -40,9 +40,10 @@ type Props = {|
   project: ?gdProject,
   games: ?Array<Game>,
   onRefreshGames: () => Promise<void>,
+  onGameUpdated: (game: Game) => void,
   gamesFetchingError: ?Error,
   openedGame: ?Game,
-  setOpenedGame: (?Game) => void,
+  setOpenedGameId: (gameId: ?string) => void,
   currentTab: GameDetailsTab,
   setCurrentTab: GameDetailsTab => void,
 |};
@@ -51,9 +52,10 @@ const ManageSection = ({
   project,
   games,
   onRefreshGames,
+  onGameUpdated,
   gamesFetchingError,
   openedGame,
-  setOpenedGame,
+  setOpenedGameId,
   currentTab,
   setCurrentTab,
 }: Props) => {
@@ -76,19 +78,19 @@ const ManageSection = ({
   React.useEffect(
     () => {
       if (openedGame && !profile) {
-        setOpenedGame(null);
+        setOpenedGameId(null);
       }
     },
     // Close game view is user logs out.
-    [profile, openedGame, setOpenedGame]
+    [profile, openedGame, setOpenedGameId]
   );
 
   const onBack = React.useCallback(
     () => {
       setCurrentTab('details');
-      setOpenedGame(null);
+      setOpenedGameId(null);
     },
-    [setCurrentTab, setOpenedGame]
+    [setCurrentTab, setOpenedGameId]
   );
 
   if (openedGame) {
@@ -117,7 +119,7 @@ const ManageSection = ({
               <GameDetails
                 game={openedGame}
                 project={project}
-                onGameUpdated={onRefreshGames}
+                onGameUpdated={onGameUpdated}
                 onGameDeleted={() => {
                   onBack();
                   onRefreshGames();
@@ -224,7 +226,7 @@ const ManageSection = ({
               project={project}
               games={games}
               onRefreshGames={onRefreshGames}
-              onOpenGame={setOpenedGame}
+              onOpenGameId={setOpenedGameId}
             />
           )
         ) : gamesFetchingError ? (

@@ -117,7 +117,7 @@ const BUILD_DEFAULT_NAME_TIME_FORMAT = 'yyyy-MM-dd-HH-mm-ss';
 type Props = {|
   build: Build,
   game: Game,
-  onGameUpdated?: () => Promise<void>,
+  onGameUpdated?: (game: Game) => void,
   gameUpdating: boolean,
   setGameUpdating: boolean => void,
   onBuildUpdated: Build => void,
@@ -256,7 +256,11 @@ export const BuildCard = ({
               />
             }
             header={
-              <Line noMargin alignItems="start" justifyContent="space-between">
+              <LineStackLayout
+                noMargin
+                alignItems="center"
+                justifyContent="space-between"
+              >
                 {!isMobile && <BuildAndCreatedAt build={build} />}
                 <Column expand noMargin justifyContent="center">
                   <Line noMargin justifyContent="end">
@@ -282,7 +286,7 @@ export const BuildCard = ({
                     )}
                   </Line>
                 </Column>
-              </Line>
+              </LineStackLayout>
             }
           >
             <Column expand noMargin>

@@ -26,7 +26,7 @@ type Props = {|
   error: ?Error,
   loadBuilds: () => void,
   game: Game,
-  onGameUpdated?: () => Promise<void>,
+  onGameUpdated?: (game: Game) => void,
   onBuildUpdated: Build => void,
   onBuildDeleted: Build => void,
 |};

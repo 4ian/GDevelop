@@ -93,7 +93,7 @@ export const gameDetailsTabs: TabOptions<GameDetailsTab> = [
 type Props = {|
   game: Game,
   project: ?gdProject,
-  onGameUpdated: () => Promise<void>,
+  onGameUpdated: (game: Game) => void,
   onGameDeleted: () => void,
   onLoading: boolean => void,
   currentTab: GameDetailsTab,
@@ -178,11 +178,11 @@ const GameDetails = ({
   );
 
   const handleGameUpdated = React.useCallback(
-    () => {
+    (game: Game) => {
       // Set Public Game to null to show the loader.
       // It will be refetched thanks to loadPublicGame, because Game is updated.
       setPublicGame(null);
-      onGameUpdated();
+      onGameUpdated(game);
     },
     [onGameUpdated]
   );
@@ -206,7 +206,7 @@ const GameDetails = ({
     try {
       setIsGameUpdating(true);
       const gameId = project.getProjectUuid();
-      await updateGame(getAuthorizationHeader, id, gameId, {
+      const updatedGame = await updateGame(getAuthorizationHeader, id, gameId, {
         authorName: project.getAuthor() || 'Unspecified publisher',
         gameName: project.getName() || 'Untitled game',
         categories: project.getCategories().toJSArray() || [],
@@ -276,7 +276,7 @@ const GameDetails = ({
         setIsGameUpdating(false);
         return false;
       }
-      handleGameUpdated();
+      handleGameUpdated(updatedGame);
     } catch (error) {
       console.error(
         'Unable to update the game:',
@@ -338,10 +338,15 @@ const GameDetails = ({
       const { id } = profile;
       try {
         setIsGameUpdating(true);
-        await updateGame(getAuthorizationHeader, id, game.id, {
-          publicWebBuildId: null,
-        });
-        handleGameUpdated();
+        const updatedGame = await updateGame(
+          getAuthorizationHeader,
+          id,
+          game.id,
+          {
+            publicWebBuildId: null,
+          }
+        );
+        handleGameUpdated(updatedGame);
       } catch (err) {
         console.error('Unable to update the game', err);
       } finally {

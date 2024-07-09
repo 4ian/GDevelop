@@ -99,7 +99,7 @@ const downloadButtons = [
 type Props = {|
   build: Build,
   game?: ?Game,
-  onGameUpdated?: () => Promise<void>,
+  onGameUpdated?: (game: Game) => void,
   gameUpdating?: boolean,
   setGameUpdating?: boolean => void,
   onCopyToClipboard?: () => void,
@@ -165,13 +165,18 @@ const BuildProgressAndActions = ({
       if (!answer) return;
       try {
         setGameUpdating(true);
-        await updateGame(getAuthorizationHeader, id, game.id, {
-          publicWebBuildId: buildId,
-        });
-        await onGameUpdated();
-        setGameUpdating(false);
+        const updatedGame = await updateGame(
+          getAuthorizationHeader,
+          id,
+          game.id,
+          {
+            publicWebBuildId: buildId,
+          }
+        );
+        onGameUpdated(updatedGame);
       } catch (err) {
         console.error('Unable to update the game', err);
+      } finally {
         setGameUpdating(false);
       }
     },
@@ -275,9 +280,14 @@ const BuildProgressAndActions = ({
             <ResponsiveLineStackLayout
               expand
               justifyContent="space-between"
+              alignItems="center"
               noMargin
             >
-              <ResponsiveLineStackLayout noMargin noColumnMargin>
+              <ResponsiveLineStackLayout
+                noMargin
+                noColumnMargin
+                alignItems="center"
+              >
                 {game && !!build.s3Key && (
                   <>
                     <Toggle

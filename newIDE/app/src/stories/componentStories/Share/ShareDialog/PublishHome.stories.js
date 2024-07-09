@@ -44,7 +44,7 @@ export const Default = () => {
       project={testProject.project}
       onSaveProject={action('onSaveProject')}
       isSavingProject={false}
-      onGameUpdated={action('onGameUpdated')}
+      onRefreshGame={action('onRefreshGame')}
       onChangeSubscription={action('onChangeSubscription')}
       isNavigationDisabled={false}
       setIsNavigationDisabled={action('setIsNavigationDisabled')}
@@ -74,7 +74,7 @@ export const OnlineWebExporterSelected = () => {
         project={testProject.project}
         onSaveProject={action('onSaveProject')}
         isSavingProject={false}
-        onGameUpdated={action('onGameUpdated')}
+        onRefreshGame={action('onRefreshGame')}
         onChangeSubscription={action('onChangeSubscription')}
         isNavigationDisabled={false}
         setIsNavigationDisabled={action('setIsNavigationDisabled')}
@@ -105,7 +105,7 @@ export const OnlineWebExporterSelectedForGameNotOwned = () => {
         project={testProject.project}
         onSaveProject={action('onSaveProject')}
         isSavingProject={false}
-        onGameUpdated={action('onGameUpdated')}
+        onRefreshGame={action('onRefreshGame')}
         onChangeSubscription={action('onChangeSubscription')}
         isNavigationDisabled={false}
         setIsNavigationDisabled={action('setIsNavigationDisabled')}
@@ -136,7 +136,7 @@ export const OnlyOnlineWebExporter = () => {
         project={testProject.project}
         onSaveProject={action('onSaveProject')}
         isSavingProject={false}
-        onGameUpdated={action('onGameUpdated')}
+        onRefreshGame={action('onRefreshGame')}
         onChangeSubscription={action('onChangeSubscription')}
         isNavigationDisabled={false}
         setIsNavigationDisabled={action('setIsNavigationDisabled')}

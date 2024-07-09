@@ -39,7 +39,7 @@ export type ExportFlowProps = {|
   isExporting: boolean,
   stepMaxProgress: number,
   stepCurrentProgress: number,
-  onGameUpdated: () => Promise<void>,
+  onRefreshGame: () => Promise<void>,
 |};
 
 /**

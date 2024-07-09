@@ -267,7 +267,7 @@ type PublishHomeProps = {|
   project: gdProject,
   onSaveProject: () => Promise<void>,
   isSavingProject: boolean,
-  onGameUpdated: () => Promise<void>,
+  onRefreshGame: () => Promise<void>,
   onChangeSubscription: () => void,
   isNavigationDisabled: boolean,
   setIsNavigationDisabled: (isNavigationDisabled: boolean) => void,
@@ -289,7 +289,7 @@ const PublishHome = ({
   onChangeSubscription,
   isNavigationDisabled,
   setIsNavigationDisabled,
-  onGameUpdated,
+  onRefreshGame,
   selectedExporter,
   onChooseSection,
   onChooseSubSection,
@@ -583,7 +583,7 @@ const PublishHome = ({
           project={project}
           onSaveProject={onSaveProject}
           isSavingProject={isSavingProject}
-          onGameUpdated={onGameUpdated}
+          onRefreshGame={onRefreshGame}
           onChangeSubscription={onChangeSubscription}
           setIsNavigationDisabled={setIsNavigationDisabled}
           game={game}

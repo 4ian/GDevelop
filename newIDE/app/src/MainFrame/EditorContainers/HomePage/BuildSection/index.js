@@ -116,8 +116,8 @@ type Props = {|
   storageProviders: Array<StorageProvider>,
   i18n: I18nType,
   onOpenExampleStore: () => void,
-  onManageGame: ({| gameId: string |}) => void,
-  canManageGame: ({| gameId: string |}) => boolean,
+  onManageGame: (gameId: string) => void,
+  canManageGame: (gameId: string) => boolean,
 |};
 
 const locateProjectFile = (file: FileMetadataAndStorageProviderName) => {
@@ -314,8 +314,8 @@ const BuildSection = ({
           { type: 'separator' },
           {
             label: i18n._(t`Manage game`),
-            click: () => onManageGame({ gameId }),
-            enabled: canManageGame({ gameId }),
+            click: () => onManageGame(gameId),
+            enabled: canManageGame(gameId),
           },
         ]
       );

@@ -242,6 +242,13 @@ export class EditableTileMap {
   setBackgroundResourceName(resourceName: string): void {
     this._backgroundResourceName = resourceName;
   }
+
+  /**
+   * Returns true if all layers contain no defined tiled.
+   */
+  isEmpty(): boolean {
+    return this._layers.every(layer => layer.isEmpty())
+  }
 }
 
 /**
@@ -281,6 +288,10 @@ abstract class AbstractEditableLayer {
   isVisible(): boolean {
     return this.visible;
   }
+
+  isEmpty(): boolean {
+    return true;
+  }
 }
 
 /**
@@ -300,6 +311,10 @@ export class EditableObjectLayer extends AbstractEditableLayer {
 
   add(object: TileObject): void {
     this.objects.push(object);
+  }
+
+  isEmpty(): boolean {
+    return this.objects.length === 0;
   }
 }
 
@@ -449,6 +464,10 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
    */
   setAlpha(alpha: float) {
     this._alpha = alpha;
+  }
+
+  isEmpty(): boolean {
+    return this._tiles.every((row) => row.every((cell) => cell === 0));
   }
 
   reduceDimensions(

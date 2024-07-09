@@ -123,6 +123,10 @@ export declare class EditableTileMap {
    * @param resourceName The name of the resource
    */
   setBackgroundResourceName(resourceName: string): void;
+  /**
+   * Returns true if all layers contain no defined tiled.
+   */
+  isEmpty(): boolean;
 }
 /**
  * A tile map layer.
@@ -148,6 +152,7 @@ declare abstract class AbstractEditableLayer {
    * @returns true if the layer is visible.
    */
   isVisible(): boolean;
+  isEmpty(): boolean;
 }
 /**
  * A layer where tiles are placed with pixel coordinates.
@@ -160,6 +165,7 @@ export declare class EditableObjectLayer extends AbstractEditableLayer {
    */
   constructor(tileMap: EditableTileMap, id: integer);
   add(object: TileObject): void;
+  isEmpty(): boolean;
 }
 /**
  * A tile that is placed with pixel coordinates.
@@ -227,6 +233,7 @@ export declare class EditableTileMapLayer extends AbstractEditableLayer {
    * @param alpha The opacity between 0-1
    */
   setAlpha(alpha: float): void;
+  isEmpty(): boolean;
   reduceDimensions(
     columnsToPop: number,
     columnsToShift: number,

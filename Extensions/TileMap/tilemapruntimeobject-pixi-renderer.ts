@@ -65,6 +65,18 @@ namespace gdjs {
       );
     }
 
+    refreshPixiTileMap(textureCache: TileMapHelper.TileTextureCache) {
+      if (!this._tileMap) return;
+      TileMapHelper.PixiTileMapHelper.updatePixiTileMap(
+        this._pixiObject,
+        this._tileMap,
+        textureCache,
+        // @ts-ignore
+        this._object._displayMode,
+        this._object._layerIndex
+      );
+    }
+
     updatePosition(): void {
       this._pixiObject.pivot.x = this.getTileMapWidth() / 2;
       this._pixiObject.pivot.y = this.getTileMapHeight() / 2;
@@ -126,6 +138,47 @@ namespace gdjs {
 
     getScaleY(): float {
       return this._pixiObject.scale.y;
+    }
+
+    /**
+     * @param x The layer column.
+     * @param y The layer row.
+     * @param layerIndex The layer index.
+     * @returns The tile's id.
+     */
+    getTileId(x: integer, y: integer, layerIndex: integer): integer {
+      const tileMap = this._tileMap;
+      if (!tileMap) return -1;
+      const layer = tileMap.getTileLayer(layerIndex);
+      if (!layer) return -1;
+      return layer.getTileId(x, y) || -1;
+    }
+
+    /**
+     * @param x The layer column.
+     * @param y The layer row.
+     * @param layerIndex The layer index.
+     * @param tileId The tile's id.
+     */
+    setTileId(x: integer, y: integer, layerIndex: integer, tileId: number) {
+      const tileMap = this._tileMap;
+      if (!tileMap) return;
+      const layer = tileMap.getTileLayer(layerIndex);
+      if (!layer) return;
+      layer.setTile(x, y, tileId);
+    }
+
+    /**
+     * @param x The layer column.
+     * @param y The layer row.
+     * @param layerIndex The layer index.
+     */
+    removeTile(x: integer, y: integer, layerIndex: integer) {
+      const tileMap = this._tileMap;
+      if (!tileMap) return;
+      const layer = tileMap.getTileLayer(layerIndex);
+      if (!layer) return;
+      layer.removeTile(x, y);
     }
 
     destroy(): void {

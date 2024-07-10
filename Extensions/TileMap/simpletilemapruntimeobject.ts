@@ -38,6 +38,7 @@ namespace gdjs {
     _displayMode = 'all';
     _layerIndex = 0;
     _initialTileMapAsJsObject: object | null = null;
+    _isTileMapDirty: boolean = false;
 
     constructor(instanceContainer: gdjs.RuntimeInstanceContainer, objectData) {
       super(instanceContainer, objectData);
@@ -62,7 +63,32 @@ namespace gdjs {
       return this._renderer.getRendererObject();
     }
 
-    update(instanceContainer: gdjs.RuntimeInstanceContainer): void {}
+    update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+      if (this._isTileMapDirty) {
+        this._tileMapManager.getOrLoadSimpleTileMapTextureCache(
+          (textureName) => {
+            return (this.getInstanceContainer()
+              .getGame()
+              .getImageManager()
+              .getPIXITexture(textureName) as unknown) as PIXI.BaseTexture<
+              PIXI.Resource
+            >;
+          },
+          this._atlasImage,
+          this._tileSize,
+          this._columnCount,
+          this._rowCount,
+          (textureCache: TileMapHelper.TileTextureCache | null) => {
+            if (!textureCache) {
+              // getOrLoadTextureCache already log warns and errors.
+              return;
+            }
+            this._renderer.refreshPixiTileMap(textureCache);
+          }
+        );
+        this._isTileMapDirty = false;
+      }
+    }
 
     updateFromObjectData(
       oldObjectData: SimpleTileMapObjectData,
@@ -278,6 +304,38 @@ namespace gdjs {
 
     getScaleY(): float {
       return this._renderer.getScaleY();
+    }
+
+    getTileAt(x: number, y: number): integer {
+      const columnIndex = Math.floor(
+        (x - this.getX()) / (this._tileSize * this.getScaleX())
+      );
+      const rowIndex = Math.floor(
+        (y - this.getY()) / (this._tileSize * this.getScaleY())
+      );
+      return this._renderer.getTileId(columnIndex, rowIndex, 0);
+    }
+
+    setTileAt(tileId: number, x: number, y: number) {
+      const columnIndex = Math.floor(
+        (x - this.getX()) / (this._tileSize * this.getScaleX())
+      );
+      const rowIndex = Math.floor(
+        (y - this.getY()) / (this._tileSize * this.getScaleY())
+      );
+      this._renderer.setTileId(columnIndex, rowIndex, 0, tileId);
+      this._isTileMapDirty = true;
+    }
+
+    removeTileAt(x: number, y: number) {
+      const columnIndex = Math.floor(
+        (x - this.getX()) / (this._tileSize * this.getScaleX())
+      );
+      const rowIndex = Math.floor(
+        (y - this.getY()) / (this._tileSize * this.getScaleY())
+      );
+      this._renderer.removeTile(columnIndex, rowIndex, 0);
+      this._isTileMapDirty = true;
     }
   }
   gdjs.registerObject(

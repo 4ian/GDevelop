@@ -719,6 +719,74 @@ const defineSimpleTileMap = function (extension, _, gd) {
     .addIncludeFile('Extensions/TileMap/pixi-tilemap/dist/pixi-tilemap.umd.js')
     .addIncludeFile('Extensions/TileMap/pako/dist/pako.min.js')
     .addIncludeFile('Extensions/TileMap/helper/TileMapHelper.js');
+
+  object
+    .addCondition(
+      'Tile',
+      _('Tile id'),
+      _('Check tile id at coordinates.'),
+      _('The tile id at coordinates _PARAM3_;_PARAM3_'),
+      '',
+      'JsPlatform/Extensions/tile_map.svg',
+      'JsPlatform/Extensions/tile_map.svg'
+    )
+    .addParameter('object', _('Tilemap'), '', false)
+    .useStandardRelationalOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions()
+    )
+    .addParameter('number', _('X'), '', false)
+    .addParameter('number', _('Y'), '', false)
+    .setFunctionName('getTileAt');
+
+  object
+    .addExpression(
+      'Tile',
+      _('Tile id'),
+      _('Check tile id at coordinates.'),
+      '',
+      'JsPlatform/Extensions/tile_map.svg'
+    )
+    .addParameter('object', _('Tilemap'), '', false)
+    .addParameter('number', _('X'), '', false)
+    .addParameter('number', _('Y'), '', false)
+    .setFunctionName('getTileAt');
+
+  object
+    .addAction(
+      'Tile',
+      _('Tile id'),
+      _('Set tile id at coordinates.'),
+      _('tile at coordinates _PARAM3_;_PARAM4_'),
+      '',
+      'JsPlatform/Extensions/tile_map.svg',
+      'JsPlatform/Extensions/tile_map.svg'
+    )
+    .addParameter('object', _('Tilemap'), '', false)
+    .useStandardOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions()
+    )
+    .addParameter('number', _('X'), '', false)
+    .addParameter('number', _('Y'), '', false)
+    .setFunctionName('setTileAt')
+    .setGetter('getTileAt');
+
+  object
+    .addAction(
+      'removeTileAt',
+      _('Remove tile'),
+      _('Remove the tile at the given coordinates'),
+      _('Remove tile at coordinates _PARAM1_;_PARAM2_'),
+      '',
+      'JsPlatform/Extensions/tile_map.svg',
+      'JsPlatform/Extensions/tile_map.svg'
+    )
+    .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
+    .addParameter('number', _('X'), '', false)
+    .addParameter('number', _('Y'), '', false)
+    .getCodeExtraInformation()
+    .setFunctionName('removeTileAt');
 };
 
 /**

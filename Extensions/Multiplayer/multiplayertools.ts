@@ -11,6 +11,8 @@ namespace gdjs {
     /** Set to true in testing to avoid relying on the multiplayer extension. */
     export let disableMultiplayerForTesting = false;
 
+    let isReadyToSendOrReceiveGameUpdateMessages = false;
+
     let _isGameRegistered: boolean | null = null;
     let _isCheckingIfGameIsRegistered = false;
     let _isWaitingForLogin = false;
@@ -46,6 +48,10 @@ namespace gdjs {
 
         if (disableMultiplayerForTesting) return;
 
+        gdjs.multiplayerMessageManager.handleHeartbeatsToSend();
+
+        if (!isReadyToSendOrReceiveGameUpdateMessages) return;
+
         gdjs.multiplayerMessageManager.handleChangeInstanceOwnerMessagesReceived(
           runtimeScene
         );
@@ -66,7 +72,6 @@ namespace gdjs {
         gdjs.multiplayerMessageManager.handleUpdateSceneMessagesReceived(
           runtimeScene
         );
-        gdjs.multiplayerMessageManager.handleHeartbeatsToSend();
         gdjs.multiplayerMessageManager.handleDisconnectedPeers(runtimeScene);
       }
     );
@@ -74,6 +79,10 @@ namespace gdjs {
     gdjs.registerRuntimeScenePostEventsCallback(
       (runtimeScene: gdjs.RuntimeScene) => {
         if (disableMultiplayerForTesting) return;
+
+        gdjs.multiplayerMessageManager.handleHeartbeatsReceived();
+
+        if (!isReadyToSendOrReceiveGameUpdateMessages) return;
 
         gdjs.multiplayerMessageManager.handleDestroyInstanceMessagesReceived(
           runtimeScene
@@ -85,7 +94,6 @@ namespace gdjs {
         gdjs.multiplayerMessageManager.handleUpdateSceneMessagesToSend(
           runtimeScene
         );
-        gdjs.multiplayerMessageManager.handleHeartbeatsReceived();
         handleLeavingPlayer(runtimeScene);
         gdjs.multiplayerMessageManager.clearDisconnectedPeers();
       }
@@ -144,6 +152,9 @@ namespace gdjs {
       if (playerToken) {
         url.searchParams.set('playerToken', playerToken);
       }
+      // Increment this value when a new feature is introduced so we can
+      // adapt the interface of the lobbies.
+      url.searchParams.set('multiplayerVersion', '2');
 
       return url.toString();
     };
@@ -783,6 +794,7 @@ namespace gdjs {
 
       // If we are connected to players, then the game can start.
       logger.info('Lobby game has started.');
+      isReadyToSendOrReceiveGameUpdateMessages = true;
       _hasLobbyGameJustStarted = true;
       _isLobbyGameRunning = true;
       removeLobbiesContainer(runtimeScene);
@@ -804,6 +816,7 @@ namespace gdjs {
       _lobbyId = null;
       _lobby = null;
       playerNumber = null;
+      isReadyToSendOrReceiveGameUpdateMessages = false;
       if (_lobbyHeartbeatInterval) {
         clearInterval(_lobbyHeartbeatInterval);
       }
@@ -875,6 +888,28 @@ namespace gdjs {
         JSON.stringify({
           action: 'startGame',
           connectionType: 'lobby',
+        })
+      );
+
+      // As the host, start sending messages to the players.
+      isReadyToSendOrReceiveGameUpdateMessages = true;
+    };
+
+    /**
+     * When the first heartbeat is received, we consider the connection to the host as working,
+     * we inform the backend services that the connection is ready, so it can start the game when
+     * everyone is ready.
+     */
+    export const markConnectionAsConnected = function () {
+      if (!_websocket) {
+        return;
+      }
+
+      _websocket.send(
+        JSON.stringify({
+          action: 'updateConnection',
+          connectionType: 'lobby',
+          status: 'connected',
         })
       );
     };

@@ -98,7 +98,8 @@ namespace gdjs {
     let lastSentGameSyncData: GameNetworkSyncData | null = null;
     let numberOfForcedGameUpdates = 0;
 
-    // Send heartbeat messages to host to ensure the connection is still alive.
+    // Send heartbeat messages from host to players, sensuring their connection is still alive,
+    // measure the ping, and send other useful info.
     const heartbeatTickRate = 1;
     let lastHeartbeatTimestamp = 0;
     let _playersLastHeartbeatInfo: {
@@ -1868,6 +1869,7 @@ namespace gdjs {
           // If we are not the host, save what the host told us about the pings and respond
           // with a heartbeat immediately.
           if (!gdjs.multiplayer.isPlayerHost()) {
+            const currentPlayerNumber = gdjs.multiplayer.getCurrentPlayerNumber();
             _playersPings = messageData.playersPings;
             const {
               messageName: answerMessageName,
@@ -1876,6 +1878,12 @@ namespace gdjs {
               heartbeatSentAt: messageData.now, // We send back the time we received, so that the host can compute the ping.
             });
             sendDataTo([messageSender], answerMessageName, answerMessageData);
+            // We have received a heartbeat from the host, informing us of our ping,
+            // so we can consider the connection as working.
+            if (_playersPings[currentPlayerNumber] !== undefined) {
+              gdjs.multiplayer.markConnectionAsConnected();
+            }
+
             return;
           }
 

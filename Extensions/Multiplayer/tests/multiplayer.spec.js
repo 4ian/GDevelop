@@ -316,12 +316,14 @@ describe('Multiplayer', () => {
     _originalP2pIfAny = gdjs.evtTools.p2p;
     gdjs.multiplayer.disableMultiplayerForTesting = false;
     gdjs.multiplayer._isLobbyGameRunning = true;
+    gdjs.multiplayer._isReadyToSendOrReceiveGameUpdateMessages = true;
     gdjs.multiplayer._lobby = fakeLobby;
   });
   afterEach(() => {
     gdjs.evtTools.p2p = _originalP2pIfAny;
     gdjs.multiplayer.disableMultiplayerForTesting = true;
     gdjs.multiplayer._isLobbyGameRunning = false;
+    gdjs.multiplayer._isReadyToSendOrReceiveGameUpdateMessages = false;
     gdjs.multiplayer._lobby = null;
   });
 
@@ -2230,7 +2232,7 @@ describe('Multiplayer', () => {
       }
     });
 
-    it.only('does not synchronize object behaviors if defined as not synchronized', async () => {
+    it('does not synchronize object behaviors if defined as not synchronized', async () => {
       const { switchToPeer } = createMultiplayerManagersMock();
 
       // Create an instance on the host's game:

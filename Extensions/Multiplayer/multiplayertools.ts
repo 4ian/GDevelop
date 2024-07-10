@@ -11,7 +11,7 @@ namespace gdjs {
     /** Set to true in testing to avoid relying on the multiplayer extension. */
     export let disableMultiplayerForTesting = false;
 
-    let isReadyToSendOrReceiveGameUpdateMessages = false;
+    export let _isReadyToSendOrReceiveGameUpdateMessages = false;
 
     let _isGameRegistered: boolean | null = null;
     let _isCheckingIfGameIsRegistered = false;
@@ -50,7 +50,7 @@ namespace gdjs {
 
         gdjs.multiplayerMessageManager.handleHeartbeatsToSend();
 
-        if (!isReadyToSendOrReceiveGameUpdateMessages) return;
+        if (!_isReadyToSendOrReceiveGameUpdateMessages) return;
 
         gdjs.multiplayerMessageManager.handleChangeInstanceOwnerMessagesReceived(
           runtimeScene
@@ -82,7 +82,7 @@ namespace gdjs {
 
         gdjs.multiplayerMessageManager.handleHeartbeatsReceived();
 
-        if (!isReadyToSendOrReceiveGameUpdateMessages) return;
+        if (!_isReadyToSendOrReceiveGameUpdateMessages) return;
 
         gdjs.multiplayerMessageManager.handleDestroyInstanceMessagesReceived(
           runtimeScene
@@ -794,7 +794,7 @@ namespace gdjs {
 
       // If we are connected to players, then the game can start.
       logger.info('Lobby game has started.');
-      isReadyToSendOrReceiveGameUpdateMessages = true;
+      _isReadyToSendOrReceiveGameUpdateMessages = true;
       _hasLobbyGameJustStarted = true;
       _isLobbyGameRunning = true;
       removeLobbiesContainer(runtimeScene);
@@ -816,7 +816,7 @@ namespace gdjs {
       _lobbyId = null;
       _lobby = null;
       playerNumber = null;
-      isReadyToSendOrReceiveGameUpdateMessages = false;
+      _isReadyToSendOrReceiveGameUpdateMessages = false;
       if (_lobbyHeartbeatInterval) {
         clearInterval(_lobbyHeartbeatInterval);
       }
@@ -892,7 +892,7 @@ namespace gdjs {
       );
 
       // As the host, start sending messages to the players.
-      isReadyToSendOrReceiveGameUpdateMessages = true;
+      _isReadyToSendOrReceiveGameUpdateMessages = true;
     };
 
     /**

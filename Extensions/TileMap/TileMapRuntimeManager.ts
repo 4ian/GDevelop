@@ -107,6 +107,32 @@ namespace gdjs {
       }
 
       /**
+       * @param getTexture The method that loads the atlas image file in memory.
+       * @param atlasImageResourceName The resource name of the atlas image.
+       * @param tileSize
+       * @param columnCount
+       * @param rowCount
+       * @param callback A function called when the tiles textures are split.
+       */
+      getOrLoadSimpleTileMapTextureCache(
+        getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>,
+        atlasImageResourceName: string,
+        tileSize: number,
+        columnCount: number,
+        rowCount: number,
+        callback: (textureCache: TileMapHelper.TileTextureCache | null) => void
+      ): void {
+        this._manager.getOrLoadSimpleTileMapTextureCache(
+          getTexture,
+          atlasImageResourceName,
+          tileSize,
+          columnCount,
+          rowCount,
+          callback
+        );
+      }
+
+      /**
        * Parse both JSON and set the content of the tile set in the right
        * attribute in the tile map to merge both parsed data.
        */

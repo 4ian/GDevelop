@@ -713,7 +713,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
     .addDefaultBehavior('ResizableCapability::ResizableBehavior')
     .addDefaultBehavior('ScalableCapability::ScalableBehavior')
     .addDefaultBehavior('OpacityCapability::OpacityBehavior')
-    .setIncludeFile('Extensions/TileMap/tilemapruntimeobject.js')
+    .setIncludeFile('Extensions/TileMap/simpletilemapruntimeobject.js')
     .addIncludeFile('Extensions/TileMap/TileMapRuntimeManager.js')
     .addIncludeFile('Extensions/TileMap/tilemapruntimeobject-pixi-renderer.js')
     .addIncludeFile('Extensions/TileMap/pixi-tilemap/dist/pixi-tilemap.umd.js')

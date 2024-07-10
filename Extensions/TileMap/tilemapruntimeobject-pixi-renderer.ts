@@ -7,7 +7,9 @@ namespace gdjs {
    * @class TileMapRuntimeObjectPixiRenderer
    */
   export class TileMapRuntimeObjectPixiRenderer {
-    private _object: any;
+    private _object:
+      | gdjs.TileMapRuntimeObject
+      | gdjs.SimpleTileMapRuntimeObject;
     private _tileMap: TileMapHelper.EditableTileMap | null = null;
 
     private _pixiObject: PIXI.tilemap.CompositeTilemap;
@@ -17,7 +19,9 @@ namespace gdjs {
      * @param instanceContainer The gdjs.RuntimeScene in which the object is
      */
     constructor(
-      runtimeObject: gdjs.TileMapRuntimeObject,
+      runtimeObject:
+        | gdjs.TileMapRuntimeObject
+        | gdjs.SimpleTileMapRuntimeObject,
       instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       this._object = runtimeObject;
@@ -55,6 +59,7 @@ namespace gdjs {
         this._pixiObject,
         tileMap,
         textureCache,
+        // @ts-ignore
         this._object._displayMode,
         this._object._layerIndex
       );

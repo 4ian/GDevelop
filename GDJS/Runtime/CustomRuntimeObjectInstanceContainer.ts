@@ -116,7 +116,7 @@ namespace gdjs {
         0,
         0,
         0,
-        // TODO: verify this.
+        // TODO EBO: handle hot-reloading for custom objects (including nested custom objects)
         true
       );
 

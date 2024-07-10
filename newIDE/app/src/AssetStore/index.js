@@ -574,23 +574,27 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                 hideGameTemplates ? t`Search assets` : `Search the shop`
               }
               value={searchText}
-              onChange={
-                isOnSearchResultPage
-                  ? // An existing search is already being done: just update the
-                    // search text and the store will update the search results.
-                    setSearchText
-                  : (newValue: string) => {
-                      setSearchText(newValue);
-
-                      // A new search is being initiated: navigate to the search page,
-                      // and clear the history as a new search was launched.
-                      if (!!newValue) {
-                        shopNavigationState.clearHistory();
-                        shopNavigationState.openSearchResultPage();
-                        openFiltersPanelIfAppropriate();
-                      }
-                    }
-              }
+              onChange={(newValue: string) => {
+                setSearchText(newValue);
+                if (isOnSearchResultPage) {
+                  // An existing search is already being done: just move to the
+                  // top search results.
+                  shopNavigationState.openSearchResultPage();
+                  const assetsListInterface = assetsList.current;
+                  if (assetsListInterface) {
+                    assetsListInterface.scrollToPosition(0);
+                    assetsListInterface.setPageBreakIndex(0);
+                  }
+                } else {
+                  // A new search is being initiated: navigate to the search page,
+                  // and clear the history as a new search was launched.
+                  if (!!newValue) {
+                    shopNavigationState.clearHistory();
+                    shopNavigationState.openSearchResultPage();
+                    openFiltersPanelIfAppropriate();
+                  }
+                }
+              }}
               onRequestSearch={() => {}}
               ref={searchBar}
               id="asset-store-search-bar"

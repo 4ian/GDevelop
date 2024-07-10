@@ -224,6 +224,7 @@ const PageBreakNavigation = ({
 export type AssetsListInterface = {|
   getScrollPosition: () => number,
   scrollToPosition: (y: number) => void,
+  setPageBreakIndex: (index: number) => void,
 |};
 
 type Props = {|
@@ -306,6 +307,9 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
       isNavigatingInsideFolder,
       setIsNavigatingInsideFolder,
     ] = React.useState<boolean>(false);
+    const [pageBreakIndex, setPageBreakIndex] = React.useState<number>(
+      (currentPage && currentPage.pageBreakIndex) || 0
+    );
     const { openedAssetPack, selectedFolders } = React.useMemo(
       () => {
         if (!currentPage) {
@@ -332,6 +336,9 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
         if (!scrollViewElement) return;
 
         scrollViewElement.scrollToPosition(y);
+      },
+      setPageBreakIndex: (index: number) => {
+        setPageBreakIndex(0);
       },
     }));
 
@@ -456,10 +463,6 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
         );
       },
       [allPrivateAssetPackListingDatas, openedAssetPack]
-    );
-
-    const [pageBreakIndex, setPageBreakIndex] = React.useState<number>(
-      (currentPage && currentPage.pageBreakIndex) || 0
     );
 
     const assetTiles = React.useMemo(

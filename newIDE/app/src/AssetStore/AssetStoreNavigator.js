@@ -164,7 +164,12 @@ export const useShopNavigation = (): NavigationState => {
             previousHistory.previousPages[
               previousHistory.previousPages.length - 1
             ];
-          if (!isSearchResultPage(currentPage)) {
+          if (isSearchResultPage(currentPage)) {
+            // The search has changed, show the best results.
+            currentPage.pageBreakIndex = 0;
+            currentPage.scrollPosition = 0;
+            return previousHistory;
+          } else {
             return {
               ...previousHistory,
               previousPages: [
@@ -173,8 +178,6 @@ export const useShopNavigation = (): NavigationState => {
               ],
             };
           }
-
-          return previousHistory;
         });
       },
       openTagPage: (tag: string) => {

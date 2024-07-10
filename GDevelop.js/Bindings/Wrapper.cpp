@@ -674,8 +674,10 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_GetBehaviorsWithType GetBehaviorsWithType
 #define STATIC_FixInvalidRequiredBehaviorProperties \
   FixInvalidRequiredBehaviorProperties
-#define STATIC_RemoveLayer RemoveLayer
-#define STATIC_MergeLayers MergeLayers
+#define STATIC_RemoveLayerInScene RemoveLayerInScene
+#define STATIC_MergeLayersInScene MergeLayersInScene
+#define STATIC_RemoveLayerInEventsBasedObject RemoveLayerInEventsBasedObject
+#define STATIC_MergeLayersInEventsBasedObject MergeLayersInEventsBasedObject
 #define STATIC_GetLayoutAndExternalLayoutLayerInstancesCount \
   GetLayoutAndExternalLayoutLayerInstancesCount
 

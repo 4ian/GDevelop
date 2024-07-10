@@ -1837,39 +1837,57 @@ void WholeProjectRefactorer::BehaviorsAddedToGlobalObject(
   }
 }
 
-void WholeProjectRefactorer::RemoveLayer(gd::Project &project,
-                                         gd::Layout &layout,
+void WholeProjectRefactorer::RemoveLayerInScene(gd::Project &project,
+                                         gd::Layout &scene,
                                          const gd::String &layerName) {
   if (layerName.empty())
     return;
 
-  layout.GetInitialInstances().RemoveAllInstancesOnLayer(layerName);
+  scene.GetInitialInstances().RemoveAllInstancesOnLayer(layerName);
 
   std::vector<gd::String> externalLayoutsNames =
-      GetAssociatedExternalLayouts(project, layout);
+      GetAssociatedExternalLayouts(project, scene);
   for (gd::String name : externalLayoutsNames) {
     auto &externalLayout = project.GetExternalLayout(name);
     externalLayout.GetInitialInstances().RemoveAllInstancesOnLayer(layerName);
   }
 }
 
-void WholeProjectRefactorer::MergeLayers(gd::Project &project,
-                                         gd::Layout &layout,
+void WholeProjectRefactorer::MergeLayersInScene(gd::Project &project,
+                                         gd::Layout &scene,
                                          const gd::String &originLayerName,
                                          const gd::String &targetLayerName) {
   if (originLayerName == targetLayerName || originLayerName.empty())
     return;
 
-  layout.GetInitialInstances().MoveInstancesToLayer(originLayerName,
+  scene.GetInitialInstances().MoveInstancesToLayer(originLayerName,
                                                     targetLayerName);
 
   std::vector<gd::String> externalLayoutsNames =
-      GetAssociatedExternalLayouts(project, layout);
+      GetAssociatedExternalLayouts(project, scene);
   for (gd::String name : externalLayoutsNames) {
     auto &externalLayout = project.GetExternalLayout(name);
     externalLayout.GetInitialInstances().MoveInstancesToLayer(originLayerName,
                                                               targetLayerName);
   }
+}
+
+void WholeProjectRefactorer::RemoveLayerInEventsBasedObject(
+    gd::EventsBasedObject &eventsBasedObject, const gd::String &layerName) {
+  if (layerName.empty())
+    return;
+
+  eventsBasedObject.GetInitialInstances().RemoveAllInstancesOnLayer(layerName);
+}
+
+void WholeProjectRefactorer::MergeLayersInEventsBasedObject(
+    gd::EventsBasedObject &eventsBasedObject, const gd::String &originLayerName,
+    const gd::String &targetLayerName) {
+  if (originLayerName == targetLayerName || originLayerName.empty())
+    return;
+
+  eventsBasedObject.GetInitialInstances().MoveInstancesToLayer(originLayerName,
+                                                               targetLayerName);
 }
 
 size_t WholeProjectRefactorer::GetLayoutAndExternalLayoutLayerInstancesCount(

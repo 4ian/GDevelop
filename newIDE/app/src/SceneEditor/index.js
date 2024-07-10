@@ -850,25 +850,32 @@ export default class SceneEditor extends React.Component<Props, State> {
               this.instancesSelection.unselectInstancesOnLayer(layerName);
 
               if (this.props.layout) {
-                gd.WholeProjectRefactorer.removeLayer(
+                gd.WholeProjectRefactorer.removeLayerInScene(
                   this.props.project,
                   this.props.layout,
                   layerName
                 );
-              } else {
-                // TODO: refactoring for custom objects.
+              } else if (this.props.eventsBasedObject) {
+                gd.WholeProjectRefactorer.removeLayerInEventsBasedObject(
+                  this.props.eventsBasedObject,
+                  layerName
+                );
               }
             } else {
               // Instances are not invalidated, so we can keep the selection.
               if (this.props.layout) {
-                gd.WholeProjectRefactorer.mergeLayers(
+                gd.WholeProjectRefactorer.mergeLayersInScene(
                   this.props.project,
                   this.props.layout,
                   layerName,
                   newLayer
                 );
-              } else {
-                // TODO: refactoring for custom objects.
+              } else if (this.props.eventsBasedObject) {
+                gd.WholeProjectRefactorer.mergeLayersInEventsBasedObject(
+                  this.props.eventsBasedObject,
+                  layerName,
+                  newLayer
+                );
               }
             }
           }
@@ -1669,7 +1676,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (layout) {
       layout.updateBehaviorsSharedData(project);
     } else {
-      // TODO: refactoring for custom objects.
+      // TODO EBO: refactoring for custom objects.
     }
   };
 

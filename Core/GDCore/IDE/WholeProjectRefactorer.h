@@ -514,15 +514,30 @@ class GD_CORE_API WholeProjectRefactorer {
   /**
    * \brief Remove all the instances from one layer.
    */
-  static void RemoveLayer(gd::Project &project, gd::Layout &layout,
+  static void RemoveLayerInScene(gd::Project &project, gd::Layout &scene,
                           const gd::String &layerName);
 
   /**
    * \brief Move all the instances from one layer into another.
    */
-  static void MergeLayers(gd::Project &project, gd::Layout &layout,
+  static void MergeLayersInScene(gd::Project &project, gd::Layout &scene,
                           const gd::String &originLayerName,
                           const gd::String &targetLayerName);
+
+  /**
+   * \brief Remove all the instances from one layer.
+   */
+  static void
+  RemoveLayerInEventsBasedObject(gd::EventsBasedObject &eventsBasedObject,
+                                 const gd::String &layerName);
+
+  /**
+   * \brief Move all the instances from one layer into another.
+   */
+  static void
+  MergeLayersInEventsBasedObject(gd::EventsBasedObject &eventsBasedObject,
+                                 const gd::String &originLayerName,
+                                 const gd::String &targetLayerName);
 
   /**
    * \brief Return the number of instances on the layer named \a layerName and

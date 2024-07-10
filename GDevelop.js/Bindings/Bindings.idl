@@ -2509,8 +2509,22 @@ interface WholeProjectRefactorer {
     [Value] VectorUnfilledRequiredBehaviorPropertyProblem STATIC_FindInvalidRequiredBehaviorProperties([Const, Ref] Project project);
     [Value] VectorString STATIC_GetBehaviorsWithType([Const, Ref] gdObject obj, [Const] DOMString type);
     boolean STATIC_FixInvalidRequiredBehaviorProperties([Ref] Project project);
-    void STATIC_RemoveLayer([Ref] Project project, [Ref] Layout layout, [Const] DOMString layerName);
-    void STATIC_MergeLayers([Ref] Project project, [Ref] Layout layout, [Const] DOMString originLayerName, [Const] DOMString targetLayerName);
+    void STATIC_RemoveLayerInScene(
+        [Ref] Project project,
+        [Ref] Layout scene,
+        [Const] DOMString layerName);
+    void STATIC_MergeLayersInScene(
+        [Ref] Project project,
+        [Ref] Layout scene,
+        [Const] DOMString originLayerName,
+        [Const] DOMString targetLayerName);
+    void STATIC_RemoveLayerInEventsBasedObject(
+        [Ref] EventsBasedObject eventsBasedObject,
+        [Const] DOMString layerName);
+    void STATIC_MergeLayersInEventsBasedObject(
+        [Ref] EventsBasedObject eventsBasedObject,
+        [Const] DOMString originLayerName,
+        [Const] DOMString targetLayerName);
     unsigned long STATIC_GetLayoutAndExternalLayoutLayerInstancesCount([Ref] Project project, [Ref] Layout layout, [Const] DOMString layerName);
 };
 

@@ -428,7 +428,7 @@ const LayerEditorDialog = (props: Props) => {
                 newName
               );
             } else {
-              // TODO: refactoring for custom objects.
+              // TODO EBO: refactoring for custom objects.
             }
           }}
           onEffectsUpdated={() => {

@@ -1834,8 +1834,10 @@ export class WholeProjectRefactorer extends EmscriptenObject {
   static findInvalidRequiredBehaviorProperties(project: Project): VectorUnfilledRequiredBehaviorPropertyProblem;
   static getBehaviorsWithType(obj: gdObject, type: string): VectorString;
   static fixInvalidRequiredBehaviorProperties(project: Project): boolean;
-  static removeLayer(project: Project, layout: Layout, layerName: string): void;
-  static mergeLayers(project: Project, layout: Layout, originLayerName: string, targetLayerName: string): void;
+  static removeLayerInScene(project: Project, scene: Layout, layerName: string): void;
+  static mergeLayersInScene(project: Project, scene: Layout, originLayerName: string, targetLayerName: string): void;
+  static removeLayerInEventsBasedObject(eventsBasedObject: EventsBasedObject, layerName: string): void;
+  static mergeLayersInEventsBasedObject(eventsBasedObject: EventsBasedObject, originLayerName: string, targetLayerName: string): void;
   static getLayoutAndExternalLayoutLayerInstancesCount(project: Project, layout: Layout, layerName: string): number;
 }
 

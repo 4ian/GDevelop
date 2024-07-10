@@ -4001,7 +4001,7 @@ TEST_CASE("RenameLayerEffect", "[common]") {
 }
 
 TEST_CASE("RemoveLayer", "[common]") {
-  SECTION("Can remove instances in a layout and its associated external layouts") {
+  SECTION("Can remove instances from a layer (in a scene and their associated external layouts)") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
@@ -4045,7 +4045,7 @@ TEST_CASE("RemoveLayer", "[common]") {
     REQUIRE(initialInstances.GetLayerInstancesCount("My layer") == 3);
     REQUIRE(externalInitialInstances.GetLayerInstancesCount("My layer") == 2);
 
-    gd::WholeProjectRefactorer::RemoveLayer(project, layout, "My layer");
+    gd::WholeProjectRefactorer::RemoveLayerInScene(project, layout, "My layer");
 
     REQUIRE(initialInstances.GetInstancesCount() == 2);
     REQUIRE(externalInitialInstances.GetInstancesCount() == 1);
@@ -4055,10 +4055,38 @@ TEST_CASE("RemoveLayer", "[common]") {
     REQUIRE(initialInstances.GetLayerInstancesCount("My layer") == 0);
     REQUIRE(externalInitialInstances.GetLayerInstancesCount("My layer") == 0);
   }
+
+  SECTION("Can remove instances from a layer (in an events-based object)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &eventsExtension =
+        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+    auto &eventsBasedObject = eventsExtension.GetEventsBasedObjects().InsertNew(
+        "MyEventsBasedObject", 0);
+    eventsBasedObject.GetLayers().InsertNewLayer("My layer", 0);
+
+    auto &initialInstances = eventsBasedObject.GetInitialInstances();
+    initialInstances.InsertNewInitialInstance().SetLayer("My layer");
+    initialInstances.InsertNewInitialInstance().SetLayer("My layer");
+    initialInstances.InsertNewInitialInstance().SetLayer("My layer");
+    initialInstances.InsertNewInitialInstance().SetLayer("");
+    initialInstances.InsertNewInitialInstance().SetLayer("");
+
+    REQUIRE(initialInstances.GetInstancesCount() == 5);
+    REQUIRE(initialInstances.GetLayerInstancesCount("My layer") == 3);
+
+    gd::WholeProjectRefactorer::RemoveLayerInEventsBasedObject(
+        eventsBasedObject, "My layer");
+
+    REQUIRE(initialInstances.GetInstancesCount() == 2);
+    REQUIRE(initialInstances.GetLayerInstancesCount("My layer") == 0);
+  }
 }
 
 TEST_CASE("MergeLayers", "[common]") {
-  SECTION("Can merge instances from a layout into another layout (and their associated external layouts)") {
+  SECTION("Can merge instances from a layer into another layer (in a scene and their associated external layouts)") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
@@ -4104,7 +4132,7 @@ TEST_CASE("MergeLayers", "[common]") {
     REQUIRE(initialInstances.GetLayerInstancesCount("My layer") == 3);
     REQUIRE(externalInitialInstances.GetLayerInstancesCount("My layer") == 2);
 
-    gd::WholeProjectRefactorer::MergeLayers(project, layout, "My layer", "");
+    gd::WholeProjectRefactorer::MergeLayersInScene(project, layout, "My layer", "");
 
     // No instance was removed.
     REQUIRE(initialInstances.GetInstancesCount() == 6);
@@ -4123,5 +4151,40 @@ TEST_CASE("MergeLayers", "[common]") {
     // Other layers from the same layout are untouched.
     REQUIRE(initialInstances.GetLayerInstancesCount("My other layer") == 1);
     REQUIRE(externalInitialInstances.GetLayerInstancesCount("My other layer") == 1);
+  }
+
+  SECTION("Can merge instances from a layer into another layer (in an events-based object)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &eventsExtension =
+        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+    auto &eventsBasedObject = eventsExtension.GetEventsBasedObjects().InsertNew(
+        "MyEventsBasedObject", 0);
+    eventsBasedObject.GetLayers().InsertNewLayer("My layer", 0);
+
+    auto &initialInstances = eventsBasedObject.GetInitialInstances();
+    initialInstances.InsertNewInitialInstance().SetLayer("My layer");
+    initialInstances.InsertNewInitialInstance().SetLayer("My layer");
+    initialInstances.InsertNewInitialInstance().SetLayer("My layer");
+    initialInstances.InsertNewInitialInstance().SetLayer("");
+    initialInstances.InsertNewInitialInstance().SetLayer("");
+    initialInstances.InsertNewInitialInstance().SetLayer("My other layer");
+
+    REQUIRE(initialInstances.GetInstancesCount() == 6);
+    REQUIRE(initialInstances.GetLayerInstancesCount("My layer") == 3);
+
+    gd::WholeProjectRefactorer::MergeLayersInEventsBasedObject(
+        eventsBasedObject, "My layer", "");
+
+    // No instance was removed.
+    REQUIRE(initialInstances.GetInstancesCount() == 6);
+
+    // No instance remain in "My layer".
+    REQUIRE(initialInstances.GetLayerInstancesCount("My layer") == 0);
+
+    // Other layers from the same layout are untouched.
+    REQUIRE(initialInstances.GetLayerInstancesCount("My other layer") == 1);
   }
 }

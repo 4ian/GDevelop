@@ -695,7 +695,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       .setValue(instance.getRawStringProperty('tileMap'))
       .setType('string')
       .setLabel('Tilemap')
-      .setHidden();
+      .setHidden(true);
 
     return instanceProperties;
   };

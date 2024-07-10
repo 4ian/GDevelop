@@ -197,6 +197,8 @@ describe('gdjs.RuntimeObject', () => {
       farX: 22,
       farY: 30,
       farSqDist: 544,
+      edgeX: 10,
+      edgeY: 0,
     });
 
     // Raycast beyond the object, still colliding with it:
@@ -209,6 +211,8 @@ describe('gdjs.RuntimeObject', () => {
       farX: 30,
       farY: 30,
       farSqDist: 800,
+      edgeX: 10,
+      edgeY: 0,
     });
 
     // Raycast with an end point far beyond the object, still colliding with it:
@@ -221,6 +225,8 @@ describe('gdjs.RuntimeObject', () => {
       farX: 30,
       farY: 30,
       farSqDist: 800,
+      edgeX: 10,
+      edgeY: 0,
     });
 
     // Vertical raycast, far from the origin:

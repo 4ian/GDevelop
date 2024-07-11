@@ -113,8 +113,17 @@ const getExtraInfoArray = (property: gdNamedPropertyDescriptor) => {
   return extraInfoVector.toJSArray();
 };
 
-export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
-  const { properties, onPropertiesUpdated, onEventsFunctionsAdded } = props;
+export default function EventsBasedBehaviorPropertiesEditor({
+  project,
+  extension,
+  eventsBasedBehavior,
+  properties,
+  isSceneProperties,
+  onPropertiesUpdated,
+  onRenameProperty,
+  onEventsFunctionsAdded,
+  behaviorObjectType,
+}: Props) {
   const scrollView = React.useRef<?ScrollViewInterface>(null);
   const [
     justAddedPropertyName,
@@ -159,7 +168,7 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
     [forceUpdate, onPropertiesUpdated, properties]
   );
 
-  const _removeProperty = React.useCallback(
+  const removeProperty = React.useCallback(
     (name: string) => {
       properties.remove(name);
       forceUpdate();
@@ -301,7 +310,7 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
     [properties, forceUpdate, onPropertiesUpdated]
   );
 
-  const _setChoiceExtraInfo = React.useCallback(
+  const setChoiceExtraInfo = React.useCallback(
     (property: gdNamedPropertyDescriptor) => {
       return (newExtraInfo: Array<string>) => {
         const defaultValueIndex = getExtraInfoArray(property).indexOf(
@@ -318,7 +327,7 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
     [forceUpdate]
   );
 
-  const _getPropertyGroupNames = React.useCallback(
+  const getPropertyGroupNames = React.useCallback(
     (): Array<string> => {
       const groupNames = new Set<string>();
       for (let i = 0; i < properties.size(); i++) {
@@ -437,15 +446,15 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
                                               properties,
                                               newName
                                             );
-                                            props.onRenameProperty(
+                                            onRenameProperty(
                                               property.getName(),
                                               validatedNewName
                                             );
                                             property.setName(validatedNewName);
 
                                             forceUpdate();
-                                            props.onPropertiesUpdated &&
-                                              props.onPropertiesUpdated();
+                                            onPropertiesUpdated &&
+                                              onPropertiesUpdated();
                                           }}
                                           fullWidth
                                         />
@@ -519,7 +528,7 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
                                         {
                                           label: i18n._(t`Delete`),
                                           click: () =>
-                                            _removeProperty(property.getName()),
+                                            removeProperty(property.getName()),
                                         },
                                         {
                                           label: i18n._(t`Copy`),
@@ -549,16 +558,16 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
                                           ),
                                           click: () => {
                                             gd.PropertyFunctionGenerator.generateBehaviorGetterAndSetter(
-                                              props.project,
-                                              props.extension,
-                                              props.eventsBasedBehavior,
+                                              project,
+                                              extension,
+                                              eventsBasedBehavior,
                                               property,
-                                              !!props.isSceneProperties
+                                              !!isSceneProperties
                                             );
                                             onEventsFunctionsAdded();
                                           },
                                           enabled: gd.PropertyFunctionGenerator.canGenerateGetterAndSetter(
-                                            props.eventsBasedBehavior,
+                                            eventsBasedBehavior,
                                             property
                                           ),
                                         },
@@ -580,8 +589,8 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
                                               property.setHidden(false);
                                             }
                                             forceUpdate();
-                                            props.onPropertiesUpdated &&
-                                              props.onPropertiesUpdated();
+                                            onPropertiesUpdated &&
+                                              onPropertiesUpdated();
                                           }}
                                           fullWidth
                                         >
@@ -610,7 +619,7 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
                                             value="Color"
                                             label={t`Color (text)`}
                                           />
-                                          {!props.isSceneProperties && (
+                                          {!isSceneProperties && (
                                             <SelectOption
                                               key="property-type-behavior"
                                               value="Behavior"
@@ -633,8 +642,8 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
                                                 )
                                               );
                                               forceUpdate();
-                                              props.onPropertiesUpdated &&
-                                                props.onPropertiesUpdated();
+                                              onPropertiesUpdated &&
+                                                onPropertiesUpdated();
                                             }}
                                             fullWidth
                                           >
@@ -683,8 +692,8 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
                                             onChange={newValue => {
                                               property.setValue(newValue);
                                               forceUpdate();
-                                              props.onPropertiesUpdated &&
-                                                props.onPropertiesUpdated();
+                                              onPropertiesUpdated &&
+                                                onPropertiesUpdated();
                                             }}
                                             fullWidth
                                           />
@@ -702,8 +711,8 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
                                             onChange={(e, i, value) => {
                                               property.setValue(value);
                                               forceUpdate();
-                                              props.onPropertiesUpdated &&
-                                                props.onPropertiesUpdated();
+                                              onPropertiesUpdated &&
+                                                onPropertiesUpdated();
                                             }}
                                             fullWidth
                                           >
@@ -721,9 +730,9 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
                                         )}
                                         {property.getType() === 'Behavior' && (
                                           <BehaviorTypeSelector
-                                            project={props.project}
+                                            project={project}
                                             objectType={
-                                              props.behaviorObjectType || ''
+                                              behaviorObjectType || ''
                                             }
                                             value={
                                               property.getExtraInfo().size() ===
@@ -740,8 +749,8 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
                                                 extraInfo.set(0, newValue);
                                               }
                                               forceUpdate();
-                                              props.onPropertiesUpdated &&
-                                                props.onPropertiesUpdated();
+                                              onPropertiesUpdated &&
+                                                onPropertiesUpdated();
                                             }}
                                             disabled={false}
                                           />
@@ -757,8 +766,8 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
                                             onChange={color => {
                                               property.setValue(color);
                                               forceUpdate();
-                                              props.onPropertiesUpdated &&
-                                                props.onPropertiesUpdated();
+                                              onPropertiesUpdated &&
+                                                onPropertiesUpdated();
                                             }}
                                           />
                                         )}
@@ -771,8 +780,8 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
                                             onChange={(e, i, value) => {
                                               property.setValue(value);
                                               forceUpdate();
-                                              props.onPropertiesUpdated &&
-                                                props.onPropertiesUpdated();
+                                              onPropertiesUpdated &&
+                                                onPropertiesUpdated();
                                             }}
                                             fullWidth
                                           >
@@ -793,7 +802,7 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
                                           extraInfo={getExtraInfoArray(
                                             property
                                           )}
-                                          setExtraInfo={_setChoiceExtraInfo(
+                                          setExtraInfo={setChoiceExtraInfo(
                                             property
                                           )}
                                         />
@@ -823,10 +832,10 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
                                           onChange={text => {
                                             property.setGroup(text);
                                             forceUpdate();
-                                            props.onPropertiesUpdated &&
-                                              props.onPropertiesUpdated();
+                                            onPropertiesUpdated &&
+                                              onPropertiesUpdated();
                                           }}
-                                          dataSource={_getPropertyGroupNames().map(
+                                          dataSource={getPropertyGroupNames().map(
                                             name => ({
                                               text: name,
                                               value: name,

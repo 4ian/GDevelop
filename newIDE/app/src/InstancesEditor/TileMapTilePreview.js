@@ -8,6 +8,51 @@ import ViewPosition from './ViewPosition';
 import RenderedInstance from '../ObjectsRendering/Renderers/RenderedInstance';
 import Rendered3DInstance from '../ObjectsRendering/Renderers/Rendered3DInstance';
 import { type TileMapTileSelection } from './TileMapPainter';
+import { AffineTransformation } from '../Utils/AffineTransformation';
+
+export const updateSceneToTileMapTransformation = (
+  instance: gdInitialInstance,
+  renderedInstance: RenderedInstance,
+  sceneToTileMapTransformation: AffineTransformation,
+  tileMapToSceneTransformation: AffineTransformation
+): ?{ scaleX: number, scaleY: number } => {
+  // TODO: Do not re-calculate if instance angle, position, dimensions and ptr are the same?
+  let scaleX = 1,
+    scaleY = 1;
+  if (instance.hasCustomSize()) {
+    const editableTileMap = renderedInstance.getEditableTileMap();
+    if (!editableTileMap) {
+      console.error(
+        `Could not find the editable tile map for instance of object ${instance.getObjectName()}`
+      );
+      return;
+    }
+    scaleX = instance.getCustomWidth() / editableTileMap.getWidth();
+    scaleY = instance.getCustomHeight() / editableTileMap.getHeight();
+  }
+  const absScaleX = Math.abs(scaleX);
+  const absScaleY = Math.abs(scaleY);
+
+  tileMapToSceneTransformation.setToIdentity();
+
+  // Translation
+  tileMapToSceneTransformation.translate(instance.getX(), instance.getY());
+
+  // Rotation
+  const angleInRadians = (instance.getAngle() * Math.PI) / 180;
+  tileMapToSceneTransformation.rotateAround(
+    angleInRadians,
+    renderedInstance.getCenterX(),
+    renderedInstance.getCenterY()
+  );
+
+  // Scale
+  tileMapToSceneTransformation.scale(absScaleX, absScaleY);
+
+  sceneToTileMapTransformation.copyFrom(tileMapToSceneTransformation);
+  sceneToTileMapTransformation.invert();
+  return { scaleX, scaleY };
+};
 
 export const getTileSet = (object: gdObject) => {
   const columnCount = parseFloat(
@@ -60,6 +105,8 @@ class TileMapTilePreview {
   toCanvasCoordinates: (x: number, y: number) => [number, number];
   viewPosition: ViewPosition;
   cache: Map<string, PIXI.Texture>;
+  sceneToTileMapTransformation: AffineTransformation;
+  tileMapToSceneTransformation: AffineTransformation;
 
   preview: PIXI.Container;
 
@@ -81,6 +128,8 @@ class TileMapTilePreview {
     this.viewPosition = viewPosition;
     this.preview = new PIXI.Container();
     this.cache = new Map();
+    this.sceneToTileMapTransformation = new AffineTransformation();
+    this.tileMapToSceneTransformation = new AffineTransformation();
   }
 
   getPixiObject(): PIXI.Container {
@@ -140,76 +189,69 @@ class TileMapTilePreview {
       texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
     }
 
-    let scaleX = 1,
-      scaleY = 1;
-    if (instance.hasCustomSize()) {
-      const renderedInstance = this.getRendererOfInstance(instance);
-      if (
-        renderedInstance &&
-        renderedInstance.constructor.name === 'RenderedSimpleTileMapInstance'
-      ) {
-        const editableTileMap = renderedInstance.getEditableTileMap();
-        if (!editableTileMap) {
-          console.error(
-            `Could not find the editable tile map for instance of object ${instance.getObjectName()}`
-          );
-          return;
-        }
-        scaleX = instance.getCustomWidth() / editableTileMap.getWidth();
-        scaleY = instance.getCustomHeight() / editableTileMap.getHeight();
-      }
+    const renderedInstance = this.getRendererOfInstance(instance);
+    if (
+      !renderedInstance ||
+      renderedInstance.constructor.name !== 'RenderedSimpleTileMapInstance'
+    ) {
+      return;
     }
 
+    const scales = updateSceneToTileMapTransformation(
+      instance,
+      renderedInstance,
+      this.sceneToTileMapTransformation,
+      this.tileMapToSceneTransformation
+    );
+    if (!scales) return;
+    const { scaleX, scaleY } = scales;
     const coordinates = this.getCoordinatesToRender();
     const alreadyConsideredCoordinates = new Set();
     const tileSizeInCanvas = this.viewPosition.toCanvasScale(tileSize);
     const spriteWidth = tileSizeInCanvas * scaleX;
     const spriteHeight = tileSizeInCanvas * scaleY;
 
+    let coordinatesInTileMap = [0, 0];
+    let coordinatesInScene = [0, 0];
+
     coordinates.forEach(({ x, y }) => {
-      const steppedX = Math.floor((x - instance.getX()) / (tileSize * scaleX));
-      const steppedY = Math.floor((y - instance.getY()) / (tileSize * scaleY));
-      const key = `${steppedX};${steppedY}`;
+      this.sceneToTileMapTransformation.transform([x, y], coordinatesInTileMap);
+      const gridX = Math.floor(coordinatesInTileMap[0] / tileSize);
+      const gridY = Math.floor(coordinatesInTileMap[1] / tileSize);
+      const key = `${gridX};${gridY}`;
       if (alreadyConsideredCoordinates.has(key)) return;
       let sprite;
-      let deltaX = 0,
-        deltaY = 0;
       if (tileMapTileSelection.single) {
         // TODO: Find a way not to regenerate the sprites on each render.
         sprite = new PIXI.Sprite(texture);
-        sprite.anchor.x = 0.5;
-        sprite.anchor.y = 0.5;
         if (tileMapTileSelection.flipHorizontally) {
           sprite.scale.x *= -1;
         }
         if (tileMapTileSelection.flipVertically) {
           sprite.scale.y *= -1;
         }
-        deltaX = spriteWidth / 2;
-        deltaY = spriteHeight / 2;
       } else {
         sprite = new PIXI.TilingSprite(texture, 2, 2);
         sprite.tileScale.x = this.viewPosition.toCanvasScale(scaleX);
         sprite.tileScale.y = this.viewPosition.toCanvasScale(scaleY);
       }
+      sprite.anchor.x = 0.5;
+      sprite.anchor.y = 0.5;
       sprite.width = spriteWidth;
       sprite.height = spriteHeight;
-
-      sprite.x =
-        this.viewPosition.toCanvasScale(steppedX * (tileSize * scaleX)) +
-        deltaX;
-      sprite.y =
-        this.viewPosition.toCanvasScale(steppedY * (tileSize * scaleY)) +
-        deltaY;
+      this.tileMapToSceneTransformation.transform(
+        [gridX * tileSize + tileSize / 2, gridY * tileSize + tileSize / 2],
+        coordinatesInScene
+      );
+      sprite.x = this.viewPosition.toCanvasScale(coordinatesInScene[0]);
+      sprite.y = this.viewPosition.toCanvasScale(coordinatesInScene[1]);
+      sprite.angle = instance.getAngle();
 
       this.preview.addChild(sprite);
       alreadyConsideredCoordinates.add(key);
     });
 
-    const canvasCoordinates = this.viewPosition.toCanvasCoordinates(
-      instance.getX(),
-      instance.getY()
-    );
+    const canvasCoordinates = this.viewPosition.toCanvasCoordinates(0, 0);
     this.preview.position.x = canvasCoordinates[0];
     this.preview.position.y = canvasCoordinates[1];
   }

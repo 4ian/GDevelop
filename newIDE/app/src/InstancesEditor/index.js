@@ -42,10 +42,14 @@ import {
   getWheelStepZoomFactor,
 } from '../Utils/ZoomUtils';
 import Background from './Background';
-import TileMapTilePreview, { getTileSet } from './TileMapTilePreview';
+import TileMapTilePreview, {
+  getTileSet,
+  updateSceneToTileMapTransformation,
+} from './TileMapTilePreview';
 import { type TileMapTileSelection } from './TileMapPainter';
 import ClickInterceptor from './ClickInterceptor';
 import getObjectByName from '../Utils/GetObjectByName';
+import { AffineTransformation } from '../Utils/AffineTransformation';
 const gd: libGDevelop = global.gd;
 
 export const instancesEditorId = 'instances-editor-canvas';
@@ -770,36 +774,39 @@ export default class InstancesEditor extends Component<Props> {
         );
         return;
       }
-      let scaleX = 1,
-        scaleY = 1;
-      if (selectedInstance.hasCustomSize()) {
-        scaleX = selectedInstance.getCustomWidth() / editableTileMap.getWidth();
-        scaleY =
-          selectedInstance.getCustomHeight() / editableTileMap.getHeight();
-      }
+      const sceneToTileMapTransformation = new AffineTransformation();
+      const tileMapToSceneTransformation = new AffineTransformation();
+      const scales = updateSceneToTileMapTransformation(
+        selectedInstance,
+        renderedInstance,
+        sceneToTileMapTransformation,
+        tileMapToSceneTransformation
+      );
+      if (!scales) return;
+      const { scaleX, scaleY } = scales;
       const tileSet = getTileSet(object);
       const editableTileMapLayer = editableTileMap.getTileLayer(0);
       const alreadyConsideredCoordinates = new Set();
       const deduplicatedCoordinates = [];
+      let coordinatesInTileMap = [0, 0];
+
       scenePathCoordinates.forEach(sceneCoordinates => {
-        const x = Math.floor(
-          (sceneCoordinates.x - selectedInstance.getX()) /
-            (tileSet.tileSize * scaleX)
+        sceneToTileMapTransformation.transform(
+          [sceneCoordinates.x, sceneCoordinates.y],
+          coordinatesInTileMap
         );
-        const y = Math.floor(
-          (sceneCoordinates.y - selectedInstance.getY()) /
-            (tileSet.tileSize * scaleY)
-        );
-        const key = `${x};${y}`;
+        const gridX = Math.floor(coordinatesInTileMap[0] / tileSet.tileSize);
+        const gridY = Math.floor(coordinatesInTileMap[1] / tileSet.tileSize);
+        const key = `${gridX};${gridY}`;
         if (alreadyConsideredCoordinates.has(key)) return;
-        deduplicatedCoordinates.push({ x, y });
+        deduplicatedCoordinates.push({ gridX, gridY });
         alreadyConsideredCoordinates.add(key);
       });
       if (tileMapTileSelection.single) {
         // TODO: Optimize list execution to make sure the most important size changing operations are done first.
         let cumulatedUnshiftedRows = 0,
           cumulatedUnshiftedColumns = 0;
-        deduplicatedCoordinates.forEach(({ x, y }) => {
+        deduplicatedCoordinates.forEach(({ gridX, gridY }) => {
           const {
             unshiftedRows,
             unshiftedColumns,
@@ -808,19 +815,22 @@ export default class InstancesEditor extends Component<Props> {
           } = editableTileMapLayer.setTile(
             // If rows or columns have been unshifted in the previous tile setting operations,
             // we have to take them into account for the current coordinates.
-            x + cumulatedUnshiftedColumns,
-            y + cumulatedUnshiftedRows,
+            gridX + cumulatedUnshiftedColumns,
+            gridY + cumulatedUnshiftedRows,
             tileSet.rowCount * tileMapTileSelection.single.x +
               tileMapTileSelection.single.y,
-              {
-                flipVertically: tileMapTileSelection.flipVertically,
-                flipHorizontally: tileMapTileSelection.flipHorizontally,
-                flipDiagonally: false,
-              }
+            {
+              flipVertically: tileMapTileSelection.flipVertically,
+              flipHorizontally: tileMapTileSelection.flipHorizontally,
+              flipDiagonally: false,
+            }
           );
           cumulatedUnshiftedRows += unshiftedRows;
           cumulatedUnshiftedColumns += unshiftedColumns;
-          // TODO: Take rotation into account
+          // The instance angle is not considered when moving the instance after
+          // rows/columns were added/removed because the instance position does not
+          // include the rotation transformation. Otherwise, we could have used
+          // tileMapToSceneTransformation to get the new position.
           selectedInstance.setX(
             selectedInstance.getX() -
               unshiftedColumns * (tileSet.tileSize * scaleX)
@@ -841,8 +851,8 @@ export default class InstancesEditor extends Component<Props> {
           }
         });
       } else if (tileMapTileSelection.erase) {
-        deduplicatedCoordinates.forEach(({ x, y }) => {
-          editableTileMapLayer.removeTile(x, y);
+        deduplicatedCoordinates.forEach(({ gridX, gridY }) => {
+          editableTileMapLayer.removeTile(gridX, gridY);
         });
         const {
           shiftedRows,
@@ -850,6 +860,10 @@ export default class InstancesEditor extends Component<Props> {
           poppedRows,
           poppedColumns,
         } = editableTileMapLayer.trimEmptyColumnsAndRow();
+        // The instance angle is not considered when moving the instance after
+        // rows/columns were added/removed because the instance position does not
+        // include the rotation transformation. Otherwise, we could have used
+        // tileMapToSceneTransformation to get the new position.
         selectedInstance.setX(
           selectedInstance.getX() + shiftedColumns * (tileSet.tileSize * scaleX)
         );

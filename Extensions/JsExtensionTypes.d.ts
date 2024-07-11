@@ -19,7 +19,6 @@ class RenderedInstance {
 
   constructor(
     project: gdProject,
-    layout: gdLayout,
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,
@@ -96,7 +95,6 @@ class Rendered3DInstance {
 
   constructor(
     project: gdProject,
-    layout: gdLayout,
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,

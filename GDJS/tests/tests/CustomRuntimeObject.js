@@ -18,7 +18,16 @@ describe('gdjs.CustomRuntimeObject', function () {
       variables: [],
       behaviors: [],
       effects: [],
+      instances: [],
+      layers: [],
       content: {},
+      areaMinX: 0,
+      areaMinY: 0,
+      areaMinZ: 0,
+      areaMaxX: 0,
+      areaMaxY: 0,
+      areaMaxZ: 0,
+      defaultSize: null,
       childrenContent: {
         MySprite: {
           updateIfNotVisible: false,

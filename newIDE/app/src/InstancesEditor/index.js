@@ -811,7 +811,12 @@ export default class InstancesEditor extends Component<Props> {
             x + cumulatedUnshiftedColumns,
             y + cumulatedUnshiftedRows,
             tileSet.rowCount * tileMapTileSelection.single.x +
-              tileMapTileSelection.single.y
+              tileMapTileSelection.single.y,
+              {
+                flipVertically: tileMapTileSelection.flipVertically,
+                flipHorizontally: tileMapTileSelection.flipHorizontally,
+                flipDiagonally: false,
+              }
           );
           cumulatedUnshiftedRows += unshiftedRows;
           cumulatedUnshiftedColumns += unshiftedColumns;

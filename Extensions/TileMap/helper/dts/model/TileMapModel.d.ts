@@ -265,11 +265,19 @@ export declare class EditableTileMapLayer extends AbstractEditableLayer {
    * @param x The layer column.
    * @param y The layer row.
    * @param tileId The tile.
+   * @param options Flipping options.
    */
   setTile(
     x: integer,
     y: integer,
-    tileId: integer
+    tileId: integer,
+    options?:
+      | {
+          flipVertically: boolean;
+          flipHorizontally: boolean;
+          flipDiagonally: boolean;
+        }
+      | undefined
   ):
     | {
         unshiftedRows: number;

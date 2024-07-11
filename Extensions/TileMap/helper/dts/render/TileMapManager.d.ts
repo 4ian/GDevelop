@@ -43,10 +43,6 @@ export declare class TileMapManager {
     pako: any,
     callback: (tileMap: EditableTileMap | null) => void
   ): void;
-  /**
-   * @param loadTileMap The method that loads the Tiled JSON file in memory.
-   * @param callback A function called when the tile map is parsed.
-   */
   getOrLoadSimpleTileMap(
     serializedTileMap: string,
     objectName: string,
@@ -78,12 +74,11 @@ export declare class TileMapManager {
     callback: (textureCache: TileTextureCache | null) => void
   ): void;
   /**
-   * @param loadTileMap The method that loads the Tiled JSON file in memory.
    * @param getTexture The method that loads the atlas image file in memory.
    * @param atlasImageResourceName The resource name of the atlas image.
-   * @param tileMapJsonResourceName The resource name of the tile map.
-   * @param tileSetJsonResourceName The resource name of the tile set.
-   * @param levelIndex The level of the tile map to load from.
+   * @param tileSize
+   * @param columnCount
+   * @param rowCount
    * @param callback A function called when the tiles textures are split.
    */
   getOrLoadSimpleTileMapTextureCache(

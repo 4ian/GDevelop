@@ -172,9 +172,21 @@ class TileMapTilePreview {
       const key = `${steppedX};${steppedY}`;
       if (alreadyConsideredCoordinates.has(key)) return;
       let sprite;
+      let deltaX = 0,
+        deltaY = 0;
       if (tileMapTileSelection.single) {
         // TODO: Find a way not to regenerate the sprites on each render.
         sprite = new PIXI.Sprite(texture);
+        sprite.anchor.x = 0.5;
+        sprite.anchor.y = 0.5;
+        if (tileMapTileSelection.flipHorizontally) {
+          sprite.scale.x *= -1;
+        }
+        if (tileMapTileSelection.flipVertically) {
+          sprite.scale.y *= -1;
+        }
+        deltaX = spriteWidth / 2;
+        deltaY = spriteHeight / 2;
       } else {
         sprite = new PIXI.TilingSprite(texture, 2, 2);
         sprite.tileScale.x = this.viewPosition.toCanvasScale(scaleX);
@@ -183,12 +195,12 @@ class TileMapTilePreview {
       sprite.width = spriteWidth;
       sprite.height = spriteHeight;
 
-      sprite.x = this.viewPosition.toCanvasScale(
-        steppedX * (tileSize * scaleX)
-      );
-      sprite.y = this.viewPosition.toCanvasScale(
-        steppedY * (tileSize * scaleY)
-      );
+      sprite.x =
+        this.viewPosition.toCanvasScale(steppedX * (tileSize * scaleX)) +
+        deltaX;
+      sprite.y =
+        this.viewPosition.toCanvasScale(steppedY * (tileSize * scaleY)) +
+        deltaY;
 
       this.preview.addChild(sprite);
       alreadyConsideredCoordinates.add(key);

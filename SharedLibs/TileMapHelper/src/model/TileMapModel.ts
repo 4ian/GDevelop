@@ -570,11 +570,23 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
    * @param x The layer column.
    * @param y The layer row.
    * @param tileId The tile.
+   * @param options Flipping options.
    */
   setTile(
     x: integer,
     y: integer,
-    tileId: integer
+    tileId: integer,
+    options:
+      | {
+          flipVertically: boolean;
+          flipHorizontally: boolean;
+          flipDiagonally: boolean;
+        }
+      | undefined = {
+      flipVertically: false,
+      flipHorizontally: false,
+      flipDiagonally: false,
+    }
   ):
     | {
         unshiftedRows: number;
@@ -610,8 +622,16 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
       return;
     }
 
-    // +1 because 0 mean null
-    tilesRow[newX] = tileId + 1;
+    tilesRow[newX] =
+      FlippingHelper.setFlippedHorizontally(
+        FlippingHelper.setFlippedVertically(
+          FlippingHelper.setFlippedDiagonally(tileId, options.flipDiagonally),
+          options.flipVertically
+        ),
+        options.flipHorizontally
+      ) +
+      // +1 because 0 mean null
+      1;
     return {
       unshiftedRows: rowsToUnshift,
       unshiftedColumns: columnsToUnshift,

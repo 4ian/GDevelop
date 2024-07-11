@@ -9,4 +9,3 @@ Extensions/Multiplayer/peer.js linguist-vendored
 Extensions/Shopify/shopify-buy.umd.polyfilled.min.js linguist-vendored
 Extensions/TileMap/pako/* linguist-vendored
 Extensions/TileMap/pixi-tilemap/* linguist-vendored
-Extensions/TweenBehavior/shifty.js linguist-vendored

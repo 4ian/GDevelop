@@ -61,8 +61,6 @@ namespace gdjs {
           endsWith(srcFilename, 'box2d.js') ||
           // Don't reload sha256.js library.
           endsWith(srcFilename, 'sha256.js') ||
-          // Don't reload shifty.js library.
-          endsWith(srcFilename, 'shifty.js') ||
           // Don't reload shopify-buy library.
           endsWith(srcFilename, 'shopify-buy.umd.polyfilled.min.js') ||
           // Don't reload pixi-multistyle-text library.

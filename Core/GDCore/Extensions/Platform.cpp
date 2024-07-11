@@ -96,11 +96,11 @@ std::shared_ptr<gd::PlatformExtension> Platform::GetExtension(
 std::unique_ptr<gd::ObjectConfiguration> Platform::CreateObjectConfiguration(
     gd::String type) const {
   if (creationFunctionTable.find(type) == creationFunctionTable.end()) {
-    gd::LogWarning("Tried to create an object with an unknown type: " + type
+    gd::LogWarning("Tried to create an object configuration with an unknown type: " + type
               + " for platform " + GetName() + "!");
     type = "";
     if (creationFunctionTable.find("") == creationFunctionTable.end()) {
-      gd::LogError("Unable to create a Base object!");
+      gd::LogFatalError("Unable to create a base object configuration!");
       return nullptr;
     }
   }

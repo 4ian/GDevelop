@@ -114,7 +114,6 @@ module.exports = {
 
       constructor(
         project,
-        layout,
         instance,
         associatedObjectConfiguration,
         pixiContainer,
@@ -122,7 +121,6 @@ module.exports = {
       ) {
         super(
           project,
-          layout,
           instance,
           associatedObjectConfiguration,
           pixiContainer,

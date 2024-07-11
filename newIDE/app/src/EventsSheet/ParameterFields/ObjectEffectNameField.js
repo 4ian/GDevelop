@@ -57,20 +57,28 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         return [];
       }
 
-      const object = getObjectByName(project, scope.layout, objectOrGroupName);
+      const object = getObjectByName(
+        project.getObjects(),
+        scope.layout ? scope.layout.getObjects() : null,
+        objectOrGroupName
+      );
       if (object) {
         return enumerateEffectNames(object.getEffects()).sort();
       }
       const group = getObjectGroupByName(
-        project,
-        scope.layout,
+        project.getObjects(),
+        scope.layout ? scope.layout.getObjects() : null,
         objectOrGroupName
       );
       if (group) {
         const effectsNamesByObject: string[][] = mapVector(
           group.getAllObjectsNames(),
           objectName => {
-            const object = getObjectByName(project, scope.layout, objectName);
+            const object = getObjectByName(
+              project.getObjects(),
+              scope.layout ? scope.layout.getObjects() : null,
+              objectName
+            );
             if (!object) {
               return null;
             }

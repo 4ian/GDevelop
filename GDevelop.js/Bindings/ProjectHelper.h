@@ -162,25 +162,25 @@ class ProjectHelper {
     gd::String originalValue = object
                                    .GetConfiguration()
                                    .GetInitialInstanceProperties(
-                                       instance, project, layout)[propertyName]
+                                       instance)[propertyName]
                                    .GetValue();
 
     std::unique_ptr<gd::Object> copiedObject = object.Clone();
     if (copiedObject
             ->GetConfiguration()
             .GetInitialInstanceProperties(
-                instance, project, layout)[propertyName]
+                instance)[propertyName]
             .GetValue() != originalValue) {
       return "FAIL: Cloned object does not return the same initial value for "
              "the instance property";
     }
 
     copiedObject->GetConfiguration().UpdateInitialInstanceProperty(
-        instance, propertyName, newValue, project, layout);
+        instance, propertyName, newValue);
     gd::String updatedValue = copiedObject
                                   ->GetConfiguration()
                                   .GetInitialInstanceProperties(
-                                      instance, project, layout)[propertyName]
+                                      instance)[propertyName]
                                   .GetValue();
     if (updatedValue != newValue) {
       return "FAIL: expected the newValue to be set for the instance property "

@@ -22,8 +22,8 @@ ObjectsContainersList
 ObjectsContainersList::MakeNewObjectsContainersListForProjectAndLayout(
     const gd::Project& project, const gd::Layout& layout) {
   ObjectsContainersList objectsContainersList;
-  objectsContainersList.Add(project);
-  objectsContainersList.Add(layout);
+  objectsContainersList.Add(project.GetObjects());
+  objectsContainersList.Add(layout.GetObjects());
   return objectsContainersList;
 }
 
@@ -31,7 +31,7 @@ ObjectsContainersList
 ObjectsContainersList::MakeNewObjectsContainersListForProject(
     const gd::Project& project) {
   ObjectsContainersList objectsContainersList;
-  objectsContainersList.Add(project);
+  objectsContainersList.Add(project.GetObjects());
   return objectsContainersList;
 }
 

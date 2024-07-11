@@ -11,32 +11,30 @@ describe('enumerateAssetStoreIds', () => {
   |} => {
     const project = gd.ProjectHelper.createNewGDJSProject();
 
-    const globalObject1 = project.insertNewObject(
-      project,
-      'Sprite',
-      'MyGlobalObject',
-      0
-    );
+    const globalObject1 = project
+      .getObjects()
+      .insertNewObject(project, 'Sprite', 'MyGlobalObject', 0);
     globalObject1.setAssetStoreId('1234');
-    project.insertNewObject(project, 'Sprite', 'MyGlobalObject2', 1);
-    const globalObject3 = project.insertNewObject(
-      project,
-      'Sprite',
-      'MyGlobalObject3',
-      2
-    );
+    project
+      .getObjects()
+      .insertNewObject(project, 'Sprite', 'MyGlobalObject2', 1);
+    const globalObject3 = project
+      .getObjects()
+      .insertNewObject(project, 'Sprite', 'MyGlobalObject3', 2);
     globalObject3.setAssetStoreId('56-78');
 
     const scene1 = project.insertNewLayout('Scene 1', 0);
     scene1
+      .getObjects()
       .insertNewObject(project, 'Sprite', 'Scene1Object1', 0)
       .setAssetStoreId('abcd');
-    scene1.insertNewObject(project, 'Sprite', 'Scene1Object2', 0);
+    scene1.getObjects().insertNewObject(project, 'Sprite', 'Scene1Object2', 0);
     const scene2 = project.insertNewLayout('Scene 2', 0);
     scene2
+      .getObjects()
       .insertNewObject(project, 'Sprite', 'Scene2Object1', 0)
       .setAssetStoreId('efgh');
-    scene2.insertNewObject(project, 'Sprite', 'Scene2Object2', 0);
+    scene2.getObjects().insertNewObject(project, 'Sprite', 'Scene2Object2', 0);
 
     return { project, scene1, scene2 };
   };
@@ -54,11 +52,11 @@ describe('enumerateAssetStoreIds', () => {
     const { project, scene1, scene2 } = makeNewTestProject();
 
     const scene1AssetStoreIds = [
-      ...enumerateAssetStoreIds(project, scene1),
+      ...enumerateAssetStoreIds(project, scene1.getObjects()),
     ].sort();
     expect(scene1AssetStoreIds).toEqual(['1234', '56-78', 'abcd'].sort());
     const scene2AssetStoreIds = [
-      ...enumerateAssetStoreIds(project, scene2),
+      ...enumerateAssetStoreIds(project, scene2.getObjects()),
     ].sort();
     expect(scene2AssetStoreIds).toEqual(['1234', '56-78', 'efgh'].sort());
 

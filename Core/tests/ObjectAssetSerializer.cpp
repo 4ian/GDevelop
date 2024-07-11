@@ -43,8 +43,8 @@ TEST_CASE("ObjectAssetSerializer", "[common]") {
         "MyEventsBasedObject", 0);
     eventsBasedObject.SetFullName("My events based object");
     eventsBasedObject.SetDescription("An events based object for test");
-    eventsBasedObject.InsertNewObject(project, "MyExtension::Sprite", "MyChild",
-                                      0);
+    eventsBasedObject.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MyChild", 0);
 
     auto &resourceManager = project.GetResourcesManager();
     gd::ImageResource imageResource;
@@ -54,7 +54,7 @@ TEST_CASE("ObjectAssetSerializer", "[common]") {
     resourceManager.AddResource(imageResource);
 
     gd::Layout &layout = project.InsertNewLayout("Scene", 0);
-    gd::Object &object = layout.InsertNewObject(
+    gd::Object &object = layout.GetObjects().InsertNewObject(
         project, "MyEventsExtension::MyEventsBasedObject", "MyObject", 0);
     auto &configuration = object.GetConfiguration();
     auto *customObjectConfiguration =

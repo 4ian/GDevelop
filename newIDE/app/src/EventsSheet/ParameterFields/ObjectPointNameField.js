@@ -48,7 +48,11 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         return [];
       }
 
-      const object = getObjectByName(project, scope.layout, objectOrGroupName);
+      const object = getObjectByName(
+        project.getObjects(),
+        scope.layout ? scope.layout.getObjects() : null,
+        objectOrGroupName
+      );
       if (object && object.getType() === 'Sprite') {
         const spriteConfiguration = gd.asSpriteConfiguration(
           object.getConfiguration()
@@ -66,8 +70,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       }
 
       const group = getObjectGroupByName(
-        project,
-        scope.layout,
+        project.getObjects(),
+        scope.layout ? scope.layout.getObjects() : null,
         objectOrGroupName
       );
       if (group) {
@@ -76,7 +80,11 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         const pointsNamesByObject = mapVector(
           group.getAllObjectsNames(),
           objectName => {
-            const object = getObjectByName(project, scope.layout, objectName);
+            const object = getObjectByName(
+              project.getObjects(),
+              scope.layout ? scope.layout.getObjects() : null,
+              objectName
+            );
             if (!object || object.getType() !== 'Sprite') {
               return null;
             }

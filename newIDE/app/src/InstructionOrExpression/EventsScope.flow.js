@@ -52,7 +52,10 @@ export class ProjectScopedContainersAccessor {
         layout
       );
     } else if (eventsFunctionsExtension) {
-      if (eventsFunction && this._parameterObjectsContainer) {
+      if (eventsFunction) {
+        if (!this._parameterObjectsContainer) {
+          throw new Error('Extension scope used without any ObjectsContainer');
+        }
         if (eventsBasedBehavior) {
           projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForBehaviorEventsFunction(
             project,
@@ -77,6 +80,16 @@ export class ProjectScopedContainersAccessor {
             this._parameterObjectsContainer
           );
         }
+      } else if (eventsBasedObject) {
+        if (!this._parameterObjectsContainer) {
+          throw new Error('Extension scope used without any ObjectsContainer');
+        }
+        projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForEventsBasedObject(
+          project,
+          eventsFunctionsExtension,
+          eventsBasedObject,
+          this._parameterObjectsContainer
+        );
       } else {
         projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForEventsFunctionsExtension(
           project,

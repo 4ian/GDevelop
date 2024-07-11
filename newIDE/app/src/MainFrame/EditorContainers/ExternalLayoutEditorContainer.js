@@ -25,6 +25,7 @@ import {
   registerOnResourceExternallyChangedCallback,
   unregisterOnResourceExternallyChangedCallback,
 } from '../ResourcesWatcher';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
 
 const styles = {
   container: {
@@ -185,6 +186,13 @@ export class ExternalLayoutEditorContainer extends React.Component<
       return <div>No external layout called {projectItemName} found!</div>;
     }
 
+    const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+      {
+        project,
+        layout,
+      }
+    );
+
     return (
       <div style={styles.container}>
         {layout && (
@@ -195,7 +203,12 @@ export class ExternalLayoutEditorContainer extends React.Component<
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
             ref={editor => (this.editor = editor)}
             project={project}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
             layout={layout}
+            eventsBasedObject={null}
+            globalObjectsContainer={project.getObjects()}
+            objectsContainer={layout.getObjects()}
+            layersContainer={layout.getLayers()}
             initialInstances={externalLayout.getInitialInstances()}
             getInitialInstancesEditorSettings={() =>
               prepareInstancesEditorSettings(

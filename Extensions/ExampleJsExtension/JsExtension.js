@@ -349,9 +349,7 @@ module.exports = {
       objectContent,
       instance,
       propertyName,
-      newValue,
-      project,
-      layout
+      newValue
     ) {
       if (propertyName === 'My instance property') {
         instance.setRawStringProperty('instanceprop1', newValue);
@@ -364,12 +362,7 @@ module.exports = {
 
       return false;
     };
-    dummyObject.getInitialInstanceProperties = function (
-      content,
-      instance,
-      project,
-      layout
-    ) {
+    dummyObject.getInitialInstanceProperties = function (content, instance) {
       var instanceProperties = new gd.MapStringPropertyDescriptor();
 
       instanceProperties
@@ -475,7 +468,6 @@ module.exports = {
     class RenderedDummyObjectInstance extends RenderedInstance {
       constructor(
         project,
-        layout,
         instance,
         associatedObjectConfiguration,
         pixiContainer,
@@ -483,7 +475,6 @@ module.exports = {
       ) {
         super(
           project,
-          layout,
           instance,
           associatedObjectConfiguration,
           pixiContainer,

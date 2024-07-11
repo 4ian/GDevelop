@@ -39,6 +39,7 @@ import {
   getEventsFunctionsExtensionEditor,
   notifyPreviewOrExportWillStart,
   moveTabToTheRightOfHoveredTab,
+  getCustomObjectEditor,
 } from './EditorTabs/EditorTabsHandler';
 import { renderDebuggerEditorContainer } from './EditorContainers/DebuggerEditorContainer';
 import { renderEventsEditorContainer } from './EditorContainers/EventsEditorContainer';
@@ -46,6 +47,7 @@ import { renderExternalEventsEditorContainer } from './EditorContainers/External
 import { renderSceneEditorContainer } from './EditorContainers/SceneEditorContainer';
 import { renderExternalLayoutEditorContainer } from './EditorContainers/ExternalLayoutEditorContainer';
 import { renderEventsFunctionsExtensionEditorContainer } from './EditorContainers/EventsFunctionsExtensionEditorContainer';
+import { renderCustomObjectEditorContainer } from './EditorContainers/CustomObjectEditorContainer';
 import { renderHomePageContainer } from './EditorContainers/HomePage';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
 import { type RenderEditorContainerPropsWithRef } from './EditorContainers/BaseEditor';
@@ -194,6 +196,7 @@ const editorKindToRenderer: {
   layout: renderSceneEditorContainer,
   'external layout': renderExternalLayoutEditorContainer,
   'events functions extension': renderEventsFunctionsExtensionEditorContainer,
+  'custom object': renderCustomObjectEditorContainer,
   'start page': renderHomePageContainer,
   resources: renderResourcesEditorContainer,
 };
@@ -556,6 +559,8 @@ const MainFrame = (props: Props) => {
           ? name + ` ${i18n._(t`(Events)`)}`
           : kind === 'events functions extension'
           ? name + ` ${i18n._(t`(Extension)`)}`
+          : kind === 'custom object'
+          ? name.split('.')[1] + ` ${i18n._(t`(Object)`)}`
           : name;
       const tabOptions =
         kind === 'layout'
@@ -569,6 +574,7 @@ const MainFrame = (props: Props) => {
         'external events',
         'external layout',
         'events functions extension',
+        'custom object',
       ].includes(kind)
         ? `${kind} ${name}`
         : kind;
@@ -1707,7 +1713,8 @@ const MainFrame = (props: Props) => {
     (
       name: string,
       initiallyFocusedFunctionName?: ?string,
-      initiallyFocusedBehaviorName?: ?string
+      initiallyFocusedBehaviorName?: ?string,
+      initiallyFocusedObjectName?: ?string
     ) => {
       setState(state => ({
         ...state,
@@ -1719,6 +1726,7 @@ const MainFrame = (props: Props) => {
           extraEditorProps: {
             initiallyFocusedFunctionName,
             initiallyFocusedBehaviorName,
+            initiallyFocusedObjectName,
           },
         }),
       }));
@@ -1793,6 +1801,25 @@ const MainFrame = (props: Props) => {
         extensionName
       );
       const functionName = getFunctionNameFromType(type);
+      const eventsBasedEntityName = functionName.behaviorName;
+
+      let eventBasedBehaviorName = null;
+      let eventBasedObjectName = null;
+      if (eventsBasedEntityName) {
+        if (
+          eventsFunctionsExtension
+            .getEventsBasedBehaviors()
+            .has(eventsBasedEntityName)
+        ) {
+          eventBasedBehaviorName = eventsBasedEntityName;
+        } else if (
+          eventsFunctionsExtension
+            .getEventsBasedObjects()
+            .has(eventsBasedEntityName)
+        ) {
+          eventBasedObjectName = eventsBasedEntityName;
+        }
+      }
 
       const foundTab = getEventsFunctionsExtensionEditor(
         editorTabs,
@@ -1802,7 +1829,8 @@ const MainFrame = (props: Props) => {
         // Open the given function and focus the tab
         foundTab.editor.selectEventsFunctionByName(
           functionName.name,
-          functionName.behaviorName
+          eventBasedBehaviorName,
+          eventBasedObjectName
         );
         setState(state => ({
           ...state,
@@ -1813,8 +1841,79 @@ const MainFrame = (props: Props) => {
         openEventsFunctionsExtension(
           extensionName,
           functionName.name,
-          functionName.behaviorName
+          eventBasedBehaviorName,
+          eventBasedObjectName
         );
+      }
+    } else {
+      // It's not an events functions extension, we should not be here.
+      console.warn(
+        `Extension with name=${extensionName} can not be opened (no editor for this)`
+      );
+    }
+  };
+
+  const openCustomObjectEditor = React.useCallback(
+    (
+      eventsFunctionsExtension: gdEventsFunctionsExtension,
+      eventsBasedObject: gdEventsBasedObject
+    ) => {
+      const { currentProject, editorTabs } = state;
+      if (!currentProject) return;
+
+      const foundTab = getCustomObjectEditor(
+        editorTabs,
+        eventsFunctionsExtension,
+        eventsBasedObject
+      );
+      if (foundTab) {
+        setState(state => ({
+          ...state,
+          editorTabs: changeCurrentTab(editorTabs, foundTab.tabIndex),
+        }));
+      } else {
+        // Open a new editor for the extension and the given function
+        setState(state => ({
+          ...state,
+          editorTabs: openEditorTab(state.editorTabs, {
+            ...getEditorOpeningOptions({
+              kind: 'custom object',
+              name:
+                eventsFunctionsExtension.getName() +
+                '.' +
+                eventsBasedObject.getName(),
+            }),
+          }),
+        }));
+      }
+    },
+    [getEditorOpeningOptions, setState, state]
+  );
+
+  const openObjectEvents = (extensionName: string, objectName: string) => {
+    const { currentProject, editorTabs } = state;
+    if (!currentProject) return;
+
+    if (currentProject.hasEventsFunctionsExtensionNamed(extensionName)) {
+      // It's an events functions extension, open the editor for it.
+      const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
+        extensionName
+      );
+
+      const foundTab = getEventsFunctionsExtensionEditor(
+        editorTabs,
+        eventsFunctionsExtension
+      );
+      if (foundTab) {
+        // Open the given function and focus the tab
+        foundTab.editor.selectEventsBasedBehaviorByName(objectName);
+        setState(state => ({
+          ...state,
+          editorTabs: changeCurrentTab(editorTabs, foundTab.tabIndex),
+        }));
+      } else {
+        // Open a new editor for the extension and the given function
+        openEventsFunctionsExtension(extensionName, null, null, objectName);
       }
     } else {
       // It's not an events functions extension, we should not be here.
@@ -1847,7 +1946,7 @@ const MainFrame = (props: Props) => {
         }));
       } else {
         // Open a new editor for the extension and the given function
-        openEventsFunctionsExtension(extensionName, null, behaviorName);
+        openEventsFunctionsExtension(extensionName, null, behaviorName, null);
       }
     } else {
       // It's not an events functions extension, we should not be here.
@@ -3292,6 +3391,8 @@ const MainFrame = (props: Props) => {
                     canSave,
                     onCreateEventsFunction,
                     openInstructionOrExpression,
+                    onOpenCustomObjectEditor: openCustomObjectEditor,
+                    openObjectEvents,
                     unsavedChanges: unsavedChanges,
                     canOpen: !!props.storageProviders.filter(
                       ({ hiddenInOpenDialog }) => !hiddenInOpenDialog

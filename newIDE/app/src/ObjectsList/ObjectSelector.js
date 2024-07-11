@@ -20,7 +20,7 @@ const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: ?gdProject,
-  globalObjectsContainer: gdObjectsContainer,
+  globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
 
   /** If specified, only this object type should be allowed to be selected. */
@@ -69,7 +69,7 @@ const getObjectsAndGroupsDataSource = ({
   excludedObjectOrGroupNames,
 }: {|
   project: ?gdProject,
-  globalObjectsContainer: gdObjectsContainer,
+  globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
   noGroups: ?boolean,
   allowedObjectType: ?string,
@@ -127,7 +127,7 @@ export const checkHasRequiredBehaviors = ({
   requiredBehaviorTypes,
   objectName,
 }: {|
-  globalObjectsContainer: gdObjectsContainer,
+  globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
   objectName: string,
   requiredBehaviorTypes?: Array<string>,
@@ -145,7 +145,7 @@ const getMissingBehaviors = ({
   requiredBehaviorTypes,
   objectName,
 }: {|
-  globalObjectsContainer: gdObjectsContainer,
+  globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
   objectName: string,
   requiredBehaviorTypes?: Array<string>,
@@ -169,7 +169,7 @@ const getMissingBehaviors = ({
     behaviorType =>
       gd
         .getBehaviorNamesInObjectOrGroup(
-          globalObjectsContainer,
+          globalObjectsContainer || objectsContainer,
           objectsContainer,
           objectName,
           behaviorType,

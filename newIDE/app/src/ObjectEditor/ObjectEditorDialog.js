@@ -47,7 +47,7 @@ type Props = {|
 
   // Passed down to object editors:
   project: gdProject,
-  layout?: gdLayout,
+  layout?: ?gdLayout,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   onComputeAllVariableNames: () => Array<string>,
   resourceManagementProps: ResourceManagementProps,
@@ -239,7 +239,7 @@ const InnerDialog = (props: InnerDialogProps) => {
           <EditorComponent
             objectConfiguration={props.object.getConfiguration()}
             project={props.project}
-            layout={props.layout}
+            layout={props.layout || null}
             object={props.object}
             resourceManagementProps={props.resourceManagementProps}
             onSizeUpdated={
@@ -322,17 +322,18 @@ const InnerDialog = (props: InnerDialogProps) => {
           project={props.project}
           resourceManagementProps={props.resourceManagementProps}
           effectsContainer={props.object.getEffects()}
-          onEffectsRenamed={(oldName, newName) =>
+          onEffectsRenamed={(oldName, newName) => {
             // TODO EBO Refactor event-based object events when an effect is renamed.
-            props.layout &&
-            gd.WholeProjectRefactorer.renameObjectEffect(
-              props.project,
-              props.layout,
-              props.object,
-              oldName,
-              newName
-            )
-          }
+            if (props.layout) {
+              gd.WholeProjectRefactorer.renameObjectEffect(
+                props.project,
+                props.layout,
+                props.object,
+                oldName,
+                newName
+              );
+            }
+          }}
           onEffectsUpdated={() => {
             forceUpdate(); /*Force update to ensure dialog is properly positioned*/
             notifyOfChange();

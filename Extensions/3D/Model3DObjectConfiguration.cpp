@@ -165,14 +165,13 @@ Model3DObjectConfiguration::GetProperties() const {
 
 bool Model3DObjectConfiguration::UpdateInitialInstanceProperty(
     gd::InitialInstance &instance, const gd::String &propertyName,
-    const gd::String &newValue, gd::Project &project, gd::Layout &layout) {
+    const gd::String &newValue) {
   return false;
 }
 
 std::map<gd::String, gd::PropertyDescriptor>
 Model3DObjectConfiguration::GetInitialInstanceProperties(
-    const gd::InitialInstance &instance, gd::Project &project,
-    gd::Layout &layout) {
+    const gd::InitialInstance &instance) {
   std::map<gd::String, gd::PropertyDescriptor> instanceProperties;
   return instanceProperties;
 }

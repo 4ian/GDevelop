@@ -48,7 +48,7 @@ namespace gd {
  *
  * \ingroup PlatformDefinition
  */
-class GD_CORE_API Project : public ObjectsContainer {
+class GD_CORE_API Project {
  public:
   Project();
   Project(const Project&);
@@ -984,6 +984,24 @@ class GD_CORE_API Project : public ObjectsContainer {
 
   ///@}
 
+  /** \name Global objects
+   */
+  ///@{
+  /**
+   * \brief return the objects of the project.
+   */
+  gd::ObjectsContainer& GetObjects() {
+    return objectsContainer;
+  }
+
+  /**
+   * \brief Return the objects of the project.
+   */
+  const gd::ObjectsContainer& GetObjects() const {
+    return objectsContainer;
+  }
+  ///@}
+
   /** \name Identifier names
    */
   ///@{
@@ -1090,6 +1108,7 @@ class GD_CORE_API Project : public ObjectsContainer {
                                           ///< startup.
   std::vector<std::unique_ptr<gd::Layout> > scenes;  ///< List of all scenes
   gd::VariablesContainer variables;  ///< Initial global variables
+  gd::ObjectsContainer objectsContainer;
   std::vector<std::unique_ptr<gd::ExternalLayout> >
       externalLayouts;  ///< List of all externals layouts
   std::vector<std::unique_ptr<gd::EventsFunctionsExtension> >

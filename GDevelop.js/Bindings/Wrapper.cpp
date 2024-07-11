@@ -55,6 +55,7 @@
 #include <GDCore/IDE/Project/ResourcesInUseHelper.h>
 #include <GDCore/IDE/Project/ResourcesMergingHelper.h>
 #include <GDCore/IDE/Project/ResourcesRenamer.h>
+#include <GDCore/IDE/Project/EventsBasedObjectDependencyFinder.h>
 #include <GDCore/IDE/ProjectBrowserHelper.h>
 #include <GDCore/IDE/PropertyFunctionGenerator.h>
 #include <GDCore/IDE/UnfilledRequiredBehaviorPropertyProblem.h>
@@ -72,6 +73,7 @@
 #include <GDCore/Project/InitialInstance.h>
 #include <GDCore/Project/InitialInstancesContainer.h>
 #include <GDCore/Project/Layout.h>
+#include <GDCore/Project/LayersContainer.h>
 #include <GDCore/Project/MeasurementBaseUnit.h>
 #include <GDCore/Project/MeasurementUnitElement.h>
 #include <GDCore/Project/NamedPropertyDescriptor.h>
@@ -590,6 +592,8 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
   MakeNewProjectScopedContainersForBehaviorEventsFunction
 #define STATIC_MakeNewProjectScopedContainersForObjectEventsFunction \
   MakeNewProjectScopedContainersForObjectEventsFunction
+#define STATIC_MakeNewProjectScopedContainersForEventsBasedObject \
+  MakeNewProjectScopedContainersForEventsBasedObject
 
 #define STATIC_GetExtensionAndBehaviorMetadata GetExtensionAndBehaviorMetadata
 #define STATIC_GetExtensionAndObjectMetadata GetExtensionAndObjectMetadata
@@ -670,8 +674,10 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_GetBehaviorsWithType GetBehaviorsWithType
 #define STATIC_FixInvalidRequiredBehaviorProperties \
   FixInvalidRequiredBehaviorProperties
-#define STATIC_RemoveLayer RemoveLayer
-#define STATIC_MergeLayers MergeLayers
+#define STATIC_RemoveLayerInScene RemoveLayerInScene
+#define STATIC_MergeLayersInScene MergeLayersInScene
+#define STATIC_RemoveLayerInEventsBasedObject RemoveLayerInEventsBasedObject
+#define STATIC_MergeLayersInEventsBasedObject MergeLayersInEventsBasedObject
 #define STATIC_GetLayoutAndExternalLayoutLayerInstancesCount \
   GetLayoutAndExternalLayoutLayerInstancesCount
 
@@ -697,6 +703,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_IsSwitchableObjectVariableInstruction IsSwitchableObjectVariableInstruction
 #define STATIC_GetSwitchableVariableInstructionIdentifier GetSwitchableVariableInstructionIdentifier
 #define STATIC_GetSwitchableInstructionVariableType GetSwitchableInstructionVariableType
+#define STATIC_IsDependentFromEventsBasedObject IsDependentFromEventsBasedObject
 
 #define STATIC_IsFreeFunctionOnlyCallingItself IsFreeFunctionOnlyCallingItself
 #define STATIC_IsBehaviorFunctionOnlyCallingItself \

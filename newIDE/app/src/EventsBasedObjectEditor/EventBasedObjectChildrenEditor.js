@@ -22,7 +22,6 @@ const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
-  globalObjectsContainer: gdObjectsContainer,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsBasedObject: gdEventsBasedObject,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
@@ -41,6 +40,8 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
 > {
   _objectsList: ?ObjectsListInterface;
 
+  // TODO Reset selectedObjectFolderOrObjectsWithContext when a different eventsBasedObject is passed.
+  // It will avoid to add objects in the tree of the wrong ObjectsContainer.
   state = {
     editedObjectWithContext: null,
     editedObjectInitialTab: 'properties',
@@ -51,15 +52,12 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
     objectsWithContext: ObjectWithContext[],
     done: boolean => void
   ) => {
-    const { project, globalObjectsContainer, eventsBasedObject } = this.props;
+    const { project, eventsBasedObject } = this.props;
 
     objectsWithContext.forEach(objectWithContext => {
       const { object } = objectWithContext;
       gd.WholeProjectRefactorer.objectRemovedInEventsBasedObject(
         project,
-        eventsBasedObject,
-        globalObjectsContainer,
-        // $FlowFixMe gdObjectsContainer should be a member of gdEventsBasedObject instead of a base class.
         eventsBasedObject,
         object.getName()
       );
@@ -74,8 +72,11 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
       gd.Project.getSafeName(newName),
       tentativeNewName => {
         if (
-          eventsBasedObject.hasObjectNamed(tentativeNewName) ||
-          eventsBasedObject.getObjectGroups().has(tentativeNewName) ||
+          eventsBasedObject.getObjects().hasObjectNamed(tentativeNewName) ||
+          eventsBasedObject
+            .getObjects()
+            .getObjectGroups()
+            .has(tentativeNewName) ||
           // TODO EBO Use a constant instead a hard coded value "Object".
           tentativeNewName === 'Object'
         ) {
@@ -99,7 +100,11 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
 
   _onRenameObject = (objectWithContext: ObjectWithContext, newName: string) => {
     const { object } = objectWithContext;
-    const { project, globalObjectsContainer, eventsBasedObject } = this.props;
+    const {
+      project,
+      eventsBasedObject,
+      projectScopedContainersAccessor,
+    } = this.props;
 
     // newName is supposed to have been already validated
 
@@ -107,7 +112,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
     if (object.getName() !== newName) {
       gd.WholeProjectRefactorer.objectOrGroupRenamedInEventsBasedObject(
         project,
-        globalObjectsContainer,
+        projectScopedContainersAccessor.get(),
         eventsBasedObject,
         object.getName(),
         newName,
@@ -211,9 +216,6 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
     const { eventsBasedObject, project, eventsFunctionsExtension } = this.props;
     const { selectedObjectFolderOrObjectsWithContext } = this.state;
 
-    // TODO EBO When adding an object, filter the object types to excludes
-    // object that depend (transitively) on this object to avoid cycles.
-
     // TODO EBO Add a button icon to mark some objects solid or not.
 
     return (
@@ -226,9 +228,11 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                   ObjectsRenderingService
                 )}
                 project={project}
+                eventsBasedObject={eventsBasedObject}
                 unsavedChanges={this.props.unsavedChanges}
                 // $FlowFixMe gdObjectsContainer should be a member of gdEventsBasedObject instead of a base class.
-                objectsContainer={eventsBasedObject}
+                objectsContainer={eventsBasedObject.getObjects()}
+                globalObjectsContainer={null}
                 layout={null}
                 // TODO EBO Allow to use project resources as place holders
                 resourceManagementProps={{

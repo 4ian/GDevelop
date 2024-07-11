@@ -17,8 +17,8 @@ export default {
 export const Default = () => (
   <ObjectGroupEditor
     project={testProject.project}
-    globalObjectsContainer={testProject.project}
-    objectsContainer={testProject.testLayout}
+    globalObjectsContainer={testProject.project.getObjects()}
+    objectsContainer={testProject.testLayout.getObjects()}
     group={testProject.group2}
   />
 );
@@ -26,8 +26,8 @@ export const Default = () => (
 export const WithLongObjectNames = () => (
   <ObjectGroupEditor
     project={testProject.project}
-    globalObjectsContainer={testProject.project}
-    objectsContainer={testProject.testLayout}
+    globalObjectsContainer={testProject.project.getObjects()}
+    objectsContainer={testProject.testLayout.getObjects()}
     group={testProject.group4WithLongsNames}
   />
 );

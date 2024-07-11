@@ -194,7 +194,9 @@ export type ObjectsListInterface = {|
 type Props = {|
   project: gdProject,
   layout: ?gdLayout,
+  eventsBasedObject: gdEventsBasedObject | null,
   initialInstances?: gdInitialInstancesContainer,
+  globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
   onSelectAllInstancesOfObjectInLayout?: string => void,
   resourceManagementProps: ResourceManagementProps,
@@ -236,7 +238,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     {
       project,
       layout,
+      eventsBasedObject,
       initialInstances,
+      globalObjectsContainer,
       objectsContainer,
       resourceManagementProps,
       onSelectAllInstancesOfObjectInLayout,
@@ -305,13 +309,16 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     const addObject = React.useCallback(
       (objectType: string) => {
         const defaultName = project.hasEventsBasedObject(objectType)
-          ? 'New' + project.getEventsBasedObject(objectType).getDefaultName()
+          ? 'New' +
+            (project.getEventsBasedObject(objectType).getDefaultName() ||
+              project.getEventsBasedObject(objectType).getName())
           : objectTypeToDefaultName[objectType] || 'NewObject';
         const name = newNameGenerator(
           defaultName,
           name =>
             objectsContainer.hasObjectNamed(name) ||
-            project.hasObjectNamed(name)
+            (!!globalObjectsContainer &&
+              globalObjectsContainer.hasObjectNamed(name))
         );
 
         let object;
@@ -389,6 +396,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         newObjectDialogOpen,
         onEditObject,
         objectsContainer,
+        globalObjectsContainer,
         onObjectCreated,
         onObjectFolderOrObjectWithContextSelected,
       ]
@@ -511,10 +519,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         // the object).
         onDeleteObjects(objectsWithContext, doRemove => {
           if (!doRemove) return;
-          const container = global ? project : objectsContainer;
-          objectsToDelete.forEach(object => {
-            container.removeObject(object.getName());
-          });
+          const container = global ? globalObjectsContainer : objectsContainer;
+          if (container) {
+            objectsToDelete.forEach(object => {
+              container.removeObject(object.getName());
+            });
+          }
 
           if (folderToDelete) {
             folderToDelete.getParent().removeFolderChild(folderToDelete);
@@ -525,13 +535,13 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         });
       },
       [
-        objectsContainer,
-        onDeleteObjects,
-        onObjectModified,
-        project,
-        forceUpdateList,
-        selectObjectFolderOrObjectWithContext,
         showDeleteConfirmation,
+        selectObjectFolderOrObjectWithContext,
+        onDeleteObjects,
+        forceUpdateList,
+        globalObjectsContainer,
+        objectsContainer,
+        onObjectModified,
       ]
     );
 
@@ -603,7 +613,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           objectName,
           name =>
             objectsContainer.hasObjectNamed(name) ||
-            project.hasObjectNamed(name),
+            (!!globalObjectsContainer &&
+              globalObjectsContainer.hasObjectNamed(name)),
           ''
         );
 
@@ -623,13 +634,15 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         }
 
         const newObject = global
-          ? project.insertNewObjectInFolder(
-              project,
-              objectType,
-              newName,
-              positionFolder,
-              positionInFolder + 1
-            )
+          ? project
+              .getObjects()
+              .insertNewObjectInFolder(
+                project,
+                objectType,
+                newName,
+                positionFolder,
+                positionInFolder + 1
+              )
           : objectsContainer.insertNewObjectInFolder(
               project,
               objectType,
@@ -648,7 +661,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
         return { object: newObject, global };
       },
-      [objectsContainer, project]
+      [globalObjectsContainer, objectsContainer, project]
     );
 
     const paste = React.useCallback(
@@ -825,15 +838,17 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       return topToBottomAscendanceWithContext[firstClosedFolderIndex];
     };
 
-    const projectRootFolder = project.getRootFolder();
-    const containerRootFolder = objectsContainer.getRootFolder();
+    const globalObjectsRootFolder = globalObjectsContainer
+      ? globalObjectsContainer.getRootFolder()
+      : null;
+    const objectsRootFolder = objectsContainer.getRootFolder();
     const getTreeViewData = React.useCallback(
       (i18n: I18nType): Array<TreeViewItem> => {
         const treeViewItems = [
-          {
+          globalObjectsRootFolder && {
             label: i18n._(t`Global Objects`),
             children:
-              projectRootFolder.getChildrenCount() === 0
+              globalObjectsRootFolder.getChildrenCount() === 0
                 ? [
                     {
                       label: (
@@ -855,7 +870,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                     },
                   ]
                 : null,
-            objectFolderOrObject: projectRootFolder,
+            objectFolderOrObject: globalObjectsRootFolder,
             global: true,
             isRoot: true,
             id: globalObjectsRootFolderId,
@@ -863,7 +878,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           {
             label: i18n._(t`Scene Objects`),
             children:
-              containerRootFolder.getChildrenCount() === 0
+              objectsRootFolder.getChildrenCount() === 0
                 ? [
                     {
                       label: i18n._(t`Start by adding a new object.`),
@@ -872,16 +887,16 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                     },
                   ]
                 : null,
-            objectFolderOrObject: containerRootFolder,
+            objectFolderOrObject: objectsRootFolder,
             global: false,
             isRoot: true,
             id: sceneObjectsRootFolderId,
           },
-        ];
+        ].filter(Boolean);
         // $FlowFixMe
         return treeViewItems;
       },
-      [projectRootFolder, containerRootFolder]
+      [globalObjectsRootFolder, objectsRootFolder]
     );
 
     const canMoveSelectionTo = React.useCallback(
@@ -941,16 +956,21 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         index?: number,
         folder?: gdObjectFolderOrObject,
       }) => {
+        if (!globalObjectsContainer) {
+          return;
+        }
         const { objectFolderOrObject } = objectFolderOrObjectWithContext;
         const destinationFolder =
-          folder && folder.isFolder() ? folder : project.getRootFolder();
+          folder && folder.isFolder()
+            ? folder
+            : globalObjectsContainer.getRootFolder();
         if (objectFolderOrObject.isFolder()) return;
         const object = objectFolderOrObject.getObject();
 
         const objectName: string = object.getName();
         if (!objectsContainer.hasObjectNamed(objectName)) return;
 
-        if (project.hasObjectNamed(objectName)) {
+        if (globalObjectsContainer.hasObjectNamed(objectName)) {
           showWarningBox(
             i18n._(
               t`A global object with this name already exists. Please change the object name before setting it as a global object`
@@ -978,9 +998,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         // like InstancesRenderer can continue to work.
         objectsContainer.moveObjectFolderOrObjectToAnotherContainerInFolder(
           objectFolderOrObject,
-          project,
+          globalObjectsContainer,
           destinationFolder,
-          typeof index === 'number' ? index : project.getObjectsCount()
+          typeof index === 'number'
+            ? index
+            : globalObjectsContainer.getObjectsCount()
         );
         onObjectModified(true);
 
@@ -1001,10 +1023,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         }, 100); // A few ms is enough for a new render to be done.
       },
       [
+        globalObjectsContainer,
         objectsContainer,
-        onObjectModified,
-        project,
         beforeSetAsGlobalObject,
+        onObjectModified,
         selectObjectFolderOrObjectWithContext,
       ]
     );
@@ -1304,7 +1326,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
         const { objectFolderOrObject, global } = item;
 
-        const container = global ? project : objectsContainer;
+        const container = global ? globalObjectsContainer : objectsContainer;
+        if (!container) {
+          return [];
+        }
         const folderAndPathsInContainer = enumerateFoldersInContainer(
           container
         );
@@ -1455,7 +1480,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             ),
           },
           { type: 'separator' },
-          {
+          globalObjectsContainer && {
             label: i18n._(t`Set as global object`),
             enabled: !isObjectFolderOrObjectWithContextGlobal(item),
             click: () => {
@@ -1498,12 +1523,14 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         ].filter(Boolean);
       },
       [
-        project,
+        globalObjectsContainer,
         objectsContainer,
         initialInstances,
+        project,
         preferences.values.userShortcutMap,
         canSetAsGlobalObject,
         onSelectAllInstancesOfObjectInLayout,
+        onExportAssets,
         paste,
         editName,
         deleteObjectFolderOrObjectWithContext,
@@ -1515,7 +1542,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         cutObjectFolderOrObjectWithContext,
         duplicateObject,
         onEditObject,
-        onExportAssets,
         selectObjectFolderOrObjectWithContext,
         setAsGlobalObject,
         onAddObjectInstance,
@@ -1527,9 +1553,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     // crash the app.
     const listKey = project.ptr + ';' + objectsContainer.ptr;
     const initiallyOpenedNodeIds = [
-      projectRootFolder.getChildrenCount() === 0
-        ? null
-        : globalObjectsRootFolderId,
+      globalObjectsRootFolder && globalObjectsRootFolder.getChildrenCount() > 0
+        ? globalObjectsRootFolderId
+        : null,
       sceneObjectsRootFolderId,
     ].filter(Boolean);
 
@@ -1656,6 +1682,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             onObjectsAddedFromAssets={onObjectsAddedFromAssets}
             project={project}
             layout={layout}
+            eventsBasedObject={eventsBasedObject}
             objectsContainer={objectsContainer}
             resourceManagementProps={resourceManagementProps}
             canInstallPrivateAsset={canInstallPrivateAsset}

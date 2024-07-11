@@ -25,13 +25,13 @@ TEST_CASE("Layout", "[common]") {
     SetupProjectWithDummyPlatform(project, platform);
 
     gd::Layout &layout = project.InsertNewLayout("Scene", 0);
-    gd::Object &object =
-        layout.InsertNewObject(project, "MyExtension::Sprite", "MyObject", 0);
+    gd::Object &object = layout.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MyObject", 0);
     object.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
 
-    REQUIRE(GetTypeOfBehaviorInObjectOrGroup(project, layout, "MyObject",
-                                             "MyBehavior", true) ==
-            "MyExtension::MyBehavior");
+    REQUIRE(GetTypeOfBehaviorInObjectOrGroup(
+                project.GetObjects(), layout.GetObjects(),
+                "MyObject", "MyBehavior", true) == "MyExtension::MyBehavior");
   }
 
   SECTION("Give an empty type for an object that doesn't have the behavior") {
@@ -40,11 +40,12 @@ TEST_CASE("Layout", "[common]") {
     SetupProjectWithDummyPlatform(project, platform);
 
     gd::Layout &layout = project.InsertNewLayout("Scene", 0);
-    gd::Object &object =
-        layout.InsertNewObject(project, "MyExtension::Sprite", "MyObject", 0);
+    gd::Object &object = layout.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MyObject", 0);
 
-    REQUIRE(GetTypeOfBehaviorInObjectOrGroup(project, layout, "MyObject",
-                                             "MyBehavior", true) == "");
+    REQUIRE(GetTypeOfBehaviorInObjectOrGroup(
+                project.GetObjects(), layout.GetObjects(),
+                "MyObject", "MyBehavior", true) == "");
   }
 
   SECTION("Find the type of a behavior in a group") {
@@ -53,63 +54,70 @@ TEST_CASE("Layout", "[common]") {
     SetupProjectWithDummyPlatform(project, platform);
 
     gd::Layout &layout = project.InsertNewLayout("Scene", 0);
-    gd::Object &object1 =
-        layout.InsertNewObject(project, "MyExtension::Sprite", "MyObject1", 0);
+    gd::Object &object1 = layout.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MyObject1", 0);
     object1.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
-    gd::Object &object2 =
-        layout.InsertNewObject(project, "MyExtension::Sprite", "MyObject2", 0);
+    gd::Object &object2 = layout.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MyObject2", 0);
     object2.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
 
-    auto &group = layout.GetObjectGroups().InsertNew("MyGroup", 0);
+    auto &group =
+        layout.GetObjects().GetObjectGroups().InsertNew("MyGroup", 0);
     group.AddObject(object1.GetName());
     group.AddObject(object2.GetName());
 
-    REQUIRE(GetTypeOfBehaviorInObjectOrGroup(project, layout, "MyGroup",
-                                             "MyBehavior", true) ==
-            "MyExtension::MyBehavior");
+    REQUIRE(GetTypeOfBehaviorInObjectOrGroup(
+                project.GetObjects(), layout.GetObjects(),
+                "MyGroup", "MyBehavior", true) == "MyExtension::MyBehavior");
   }
 
-  SECTION("Give an empty type for a group with an object missing the behavior") {
+  SECTION(
+      "Give an empty type for a group with an object missing the behavior") {
     gd::Platform platform;
     gd::Project project;
     SetupProjectWithDummyPlatform(project, platform);
 
     gd::Layout &layout = project.InsertNewLayout("Scene", 0);
-    gd::Object &object1 =
-        layout.InsertNewObject(project, "MyExtension::Sprite", "MyObject1", 0);
+    gd::Object &object1 = layout.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MyObject1", 0);
     object1.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
-    gd::Object &object2 =
-        layout.InsertNewObject(project, "MyExtension::Sprite", "MyObject2", 0);
+    gd::Object &object2 = layout.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MyObject2", 0);
     // object2 doesn't have the behavior.
 
-    auto &group = layout.GetObjectGroups().InsertNew("MyGroup", 0);
+    auto &group =
+        layout.GetObjects().GetObjectGroups().InsertNew("MyGroup", 0);
     group.AddObject(object1.GetName());
     group.AddObject(object2.GetName());
 
-    REQUIRE(GetTypeOfBehaviorInObjectOrGroup(project, layout, "MyGroup",
-                                             "MyBehavior", true) == "");
+    REQUIRE(GetTypeOfBehaviorInObjectOrGroup(
+                project.GetObjects(), layout.GetObjects(),
+                "MyGroup", "MyBehavior", true) == "");
   }
 
-  SECTION("Give an empty type for a group with behaviors of same name but different types") {
+  SECTION("Give an empty type for a group with behaviors of same name but "
+          "different types") {
     gd::Platform platform;
     gd::Project project;
     SetupProjectWithDummyPlatform(project, platform);
 
     gd::Layout &layout = project.InsertNewLayout("Scene", 0);
-    gd::Object &object1 =
-        layout.InsertNewObject(project, "MyExtension::Sprite", "MyObject1", 0);
+    gd::Object &object1 = layout.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MyObject1", 0);
     object1.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
-    gd::Object &object2 =
-        layout.InsertNewObject(project, "MyExtension::Sprite", "MyObject2", 0);
+    gd::Object &object2 = layout.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MyObject2", 0);
     object2.AddNewBehavior(project, "MyExtension::MyOtherBehavior",
                            "MyBehavior");
 
-    auto &group = layout.GetObjectGroups().InsertNew("MyGroup", 0);
+    auto &group =
+        layout.GetObjects().GetObjectGroups().InsertNew("MyGroup", 0);
     group.AddObject(object1.GetName());
     group.AddObject(object2.GetName());
 
-    REQUIRE(GetTypeOfBehaviorInObjectOrGroup(project, layout, "MyGroup",
-                                             "MyBehavior", true) == "");
+    REQUIRE(GetTypeOfBehaviorInObjectOrGroup(
+                project.GetObjects(), layout.GetObjects(),
+                "MyGroup", "MyBehavior", true) == "");
   }
 
   SECTION("Give an empty type for an empty group") {
@@ -118,9 +126,11 @@ TEST_CASE("Layout", "[common]") {
     SetupProjectWithDummyPlatform(project, platform);
 
     gd::Layout &layout = project.InsertNewLayout("Scene", 0);
-    auto &group = layout.GetObjectGroups().InsertNew("MyGroup", 0);
+    auto &group =
+        layout.GetObjects().GetObjectGroups().InsertNew("MyGroup", 0);
 
-    REQUIRE(GetTypeOfBehaviorInObjectOrGroup(project, layout, "MyGroup",
-                                             "MyBehavior", true) == "");
+    REQUIRE(GetTypeOfBehaviorInObjectOrGroup(
+                project.GetObjects(), layout.GetObjects(),
+                "MyGroup", "MyBehavior", true) == "");
   }
 }

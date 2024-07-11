@@ -156,30 +156,18 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     .setType('number')
     .setLabel('Down padding')
     .setGroup('Padding');
-  buttonEventBasedObject.insertNewObject(
-    project,
-    'TextObject::Text',
-    'Label',
-    0
-  );
-  buttonEventBasedObject.insertNewObject(
-    project,
-    'PanelSpriteObject::PanelSprite',
-    'Idle',
-    1
-  );
-  buttonEventBasedObject.insertNewObject(
-    project,
-    'PanelSpriteObject::PanelSprite',
-    'Hovered',
-    2
-  );
-  buttonEventBasedObject.insertNewObject(
-    project,
-    'PanelSpriteObject::PanelSprite',
-    'Pressed',
-    3
-  );
+  buttonEventBasedObject
+    .getObjects()
+    .insertNewObject(project, 'TextObject::Text', 'Label', 0);
+  buttonEventBasedObject
+    .getObjects()
+    .insertNewObject(project, 'PanelSpriteObject::PanelSprite', 'Idle', 1);
+  buttonEventBasedObject
+    .getObjects()
+    .insertNewObject(project, 'PanelSpriteObject::PanelSprite', 'Hovered', 2);
+  buttonEventBasedObject
+    .getObjects()
+    .insertNewObject(project, 'PanelSpriteObject::PanelSprite', 'Pressed', 3);
   // Add a function
   const testObjectEventsFunction = buttonEventBasedObject
     .getEventsFunctions()
@@ -190,102 +178,84 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
 
   // Create and expose some objects
   const testLayout = project.insertNewLayout('TestLayout', 0);
-  const customObject = testLayout.insertNewObject(
-    project,
-    'Button::PanelSpriteButton',
-    'MyButton',
-    0
-  );
-  const shapePainterObject = testLayout.insertNewObject(
-    project,
-    'PrimitiveDrawing::Drawer',
-    'MyShapePainterObject',
-    0
-  );
-  const textObject = testLayout.insertNewObject(
-    project,
-    'TextObject::Text',
-    'MyTextObject',
-    0
-  );
-  const particleEmitter = testLayout.insertNewObject(
-    project,
-    'ParticleSystem::ParticleEmitter',
-    'MyParticleEmitter',
-    0
-  );
-  const tiledSpriteObject = testLayout.insertNewObject(
-    project,
-    'TiledSpriteObject::TiledSprite',
-    'MyTiledSpriteObject',
-    0
-  );
-  const cube3dObject = testLayout.insertNewObject(
-    project,
-    'FakeScene3D::Cube3DObject',
-    'CubeObject',
-    0
-  );
-  const textInputObject = testLayout.insertNewObject(
-    project,
-    'FakeTextInput::TextInput',
-    'TextInputObject',
-    0
-  );
-  const panelSpriteObject = testLayout.insertNewObject(
-    project,
-    'PanelSpriteObject::PanelSprite',
-    'MyPanelSpriteObject',
-    0
-  );
-  const spriteObject = testLayout.insertNewObject(
-    project,
-    'Sprite',
-    'MySpriteObject',
-    0
-  );
-  const emptySpriteObject = testLayout.insertNewObject(
-    project,
-    'Sprite',
-    'MyEmptySpriteObject',
-    0
-  );
-  const spriteObjectWithBehaviors = testLayout.insertNewObject(
-    project,
-    'Sprite',
-    'MySpriteObjectWithBehaviors',
-    0
-  );
-  const spriteObjectWithoutBehaviors = testLayout.insertNewObject(
-    project,
-    'Sprite',
-    'MySpriteObjectWithoutBehaviors',
-    0
-  );
-  const spriteObjectWithoutEffects = testLayout.insertNewObject(
-    project,
-    'Sprite',
-    'MySpriteObjectWithoutEffect',
-    0
-  );
-  const spriteObjectWithEffects = testLayout.insertNewObject(
-    project,
-    'Sprite',
-    'MySpriteObjectWithEffects',
-    0
-  );
-  testLayout.insertNewObject(
-    project,
-    'Sprite',
-    'MySpriteObject_With_A_Veeeerrryyyyyyyyy_Looooooooooooong_Name',
-    14
-  );
-  testLayout.insertNewObject(
-    project,
-    'FakeObjectWithUnsupportedCapability::FakeObjectWithUnsupportedCapability',
-    'MyFakeObjectWithUnsupportedCapability',
-    15
-  );
+  const customObject = testLayout
+    .getObjects()
+    .insertNewObject(project, 'Button::PanelSpriteButton', 'MyButton', 0);
+  const shapePainterObject = testLayout
+    .getObjects()
+    .insertNewObject(
+      project,
+      'PrimitiveDrawing::Drawer',
+      'MyShapePainterObject',
+      0
+    );
+  const textObject = testLayout
+    .getObjects()
+    .insertNewObject(project, 'TextObject::Text', 'MyTextObject', 0);
+  const particleEmitter = testLayout
+    .getObjects()
+    .insertNewObject(
+      project,
+      'ParticleSystem::ParticleEmitter',
+      'MyParticleEmitter',
+      0
+    );
+  const tiledSpriteObject = testLayout
+    .getObjects()
+    .insertNewObject(
+      project,
+      'TiledSpriteObject::TiledSprite',
+      'MyTiledSpriteObject',
+      0
+    );
+  const cube3dObject = testLayout
+    .getObjects()
+    .insertNewObject(project, 'FakeScene3D::Cube3DObject', 'CubeObject', 0);
+  const textInputObject = testLayout
+    .getObjects()
+    .insertNewObject(project, 'FakeTextInput::TextInput', 'TextInputObject', 0);
+  const panelSpriteObject = testLayout
+    .getObjects()
+    .insertNewObject(
+      project,
+      'PanelSpriteObject::PanelSprite',
+      'MyPanelSpriteObject',
+      0
+    );
+  const spriteObject = testLayout
+    .getObjects()
+    .insertNewObject(project, 'Sprite', 'MySpriteObject', 0);
+  const emptySpriteObject = testLayout
+    .getObjects()
+    .insertNewObject(project, 'Sprite', 'MyEmptySpriteObject', 0);
+  const spriteObjectWithBehaviors = testLayout
+    .getObjects()
+    .insertNewObject(project, 'Sprite', 'MySpriteObjectWithBehaviors', 0);
+  const spriteObjectWithoutBehaviors = testLayout
+    .getObjects()
+    .insertNewObject(project, 'Sprite', 'MySpriteObjectWithoutBehaviors', 0);
+  const spriteObjectWithoutEffects = testLayout
+    .getObjects()
+    .insertNewObject(project, 'Sprite', 'MySpriteObjectWithoutEffect', 0);
+  const spriteObjectWithEffects = testLayout
+    .getObjects()
+    .insertNewObject(project, 'Sprite', 'MySpriteObjectWithEffects', 0);
+  testLayout
+    .getObjects()
+    .insertNewObject(
+      project,
+      'Sprite',
+      'MySpriteObject_With_A_Veeeerrryyyyyyyyy_Looooooooooooong_Name',
+      14
+    );
+  testLayout
+    .getObjects()
+    .insertNewObject(
+      project,
+      'FakeObjectWithUnsupportedCapability::FakeObjectWithUnsupportedCapability',
+      'MyFakeObjectWithUnsupportedCapability',
+      15
+    );
   const spriteObjectConfiguration = gd.asSpriteConfiguration(
     spriteObject.getConfiguration()
   );
@@ -394,10 +364,22 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     'MySpriteObject_With_A_Veeeerrryyyyyyyyy_Looooooooooooong_Name'
   );
   group4WithLongsNames.addObject('MySpriteObjectWithoutBehaviors');
-  testLayout.getObjectGroups().insert(group1, 0);
-  testLayout.getObjectGroups().insert(group2, 1);
-  testLayout.getObjectGroups().insert(group3, 2);
-  testLayout.getObjectGroups().insert(group4WithLongsNames, 3);
+  testLayout
+    .getObjects()
+    .getObjectGroups()
+    .insert(group1, 0);
+  testLayout
+    .getObjects()
+    .getObjectGroups()
+    .insert(group2, 1);
+  testLayout
+    .getObjects()
+    .getObjectGroups()
+    .insert(group3, 2);
+  testLayout
+    .getObjects()
+    .getObjectGroups()
+    .insert(group4WithLongsNames, 3);
 
   const testLayoutInstance1 = testLayout
     .getInitialInstances()
@@ -617,13 +599,17 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   const testInstruction = makeKeyPressedCondition('Space');
 
   // Global objects
-  project.insertNewObject(project, 'TextObject::Text', 'GlobalTextObject', 0);
-  project.insertNewObject(
-    project,
-    'TiledSpriteObject::TiledSprite',
-    'GlobalTiledSpriteObject',
-    0
-  );
+  project
+    .getObjects()
+    .insertNewObject(project, 'TextObject::Text', 'GlobalTextObject', 0);
+  project
+    .getObjects()
+    .insertNewObject(
+      project,
+      'TiledSpriteObject::TiledSprite',
+      'GlobalTiledSpriteObject',
+      0
+    );
 
   // External events
   const testExternalEvents1 = project.insertNewExternalEvents(
@@ -709,12 +695,14 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
 
   // Create more dummy objects to test events with a lot of objects
   for (var i = 0; i < 6; ++i) {
-    testLayout.insertNewObject(
-      project,
-      'Sprite',
-      'VirtualControls' + (i !== 0 ? i : ''),
-      testLayout.getObjectsCount()
-    );
+    testLayout
+      .getObjects()
+      .insertNewObject(
+        project,
+        'Sprite',
+        'VirtualControls' + (i !== 0 ? i : ''),
+        testLayout.getObjects().getObjectsCount()
+      );
   }
 
   const testSerializedEvents = JSON.parse(

@@ -169,7 +169,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
               ))}
               {propertiesSchema.length ||
               (eventBasedObject &&
-                (eventBasedObject.getObjectsCount() ||
+                (eventBasedObject.getObjects().getObjectsCount() ||
                   eventBasedObject.isAnimatable())) ? (
                 <React.Fragment>
                   {extraInformation ? (
@@ -191,86 +191,95 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                     resourceManagementProps={resourceManagementProps}
                   />
                   {eventBasedObject &&
-                    mapFor(0, eventBasedObject.getObjectsCount(), i => {
-                      const childObject = eventBasedObject.getObjectAt(i);
-                      const childObjectConfiguration = customObjectConfiguration.getChildObjectConfiguration(
-                        childObject.getName()
-                      );
-                      const editorConfiguration = ObjectsEditorService.getEditorConfiguration(
-                        project,
-                        childObjectConfiguration.getType()
-                      );
-                      const EditorComponent = editorConfiguration.component;
+                    mapFor(
+                      0,
+                      eventBasedObject.getObjects().getObjectsCount(),
+                      i => {
+                        const childObject = eventBasedObject
+                          .getObjects()
+                          .getObjectAt(i);
+                        const childObjectConfiguration = customObjectConfiguration.getChildObjectConfiguration(
+                          childObject.getName()
+                        );
+                        const editorConfiguration = ObjectsEditorService.getEditorConfiguration(
+                          project,
+                          childObjectConfiguration.getType()
+                        );
+                        const EditorComponent = editorConfiguration.component;
 
-                      const objectMetadata = gd.MetadataProvider.getObjectMetadata(
-                        gd.JsPlatform.get(),
-                        childObjectConfiguration.getType()
-                      );
-                      const iconUrl = objectMetadata.getIconFilename();
-                      const tutorialIds = getObjectTutorialIds(
-                        childObjectConfiguration.getType()
-                      );
-                      const enabledTutorialIds = tutorialIds.filter(
-                        tutorialId => !values.hiddenTutorialHints[tutorialId]
-                      );
-                      // TODO EBO: Add a protection against infinite loops in case
-                      // of object cycles (thought it should be forbidden).
-                      return (
-                        <Accordion key={childObject.getName()} defaultExpanded>
-                          <AccordionHeader>
-                            {iconUrl ? (
-                              <IconContainer
-                                src={iconUrl}
-                                alt={childObject.getName()}
-                                size={20}
-                              />
-                            ) : null}
-                            <Column expand>
-                              <Text size="block-title">
-                                {childObject.getName()}
-                              </Text>
-                            </Column>
-                          </AccordionHeader>
-                          <AccordionBody>
-                            <Column expand noMargin noOverflowParent>
-                              {enabledTutorialIds.length ? (
-                                <Line>
-                                  <ColumnStackLayout expand>
-                                    {tutorialIds.map(tutorialId => (
-                                      <DismissableTutorialMessage
-                                        key={tutorialId}
-                                        tutorialId={tutorialId}
-                                      />
-                                    ))}
-                                  </ColumnStackLayout>
-                                </Line>
+                        const objectMetadata = gd.MetadataProvider.getObjectMetadata(
+                          gd.JsPlatform.get(),
+                          childObjectConfiguration.getType()
+                        );
+                        const iconUrl = objectMetadata.getIconFilename();
+                        const tutorialIds = getObjectTutorialIds(
+                          childObjectConfiguration.getType()
+                        );
+                        const enabledTutorialIds = tutorialIds.filter(
+                          tutorialId => !values.hiddenTutorialHints[tutorialId]
+                        );
+                        // TODO EBO: Add a protection against infinite loops in case
+                        // of object cycles (thought it should be forbidden).
+                        return (
+                          <Accordion
+                            key={childObject.getName()}
+                            defaultExpanded
+                          >
+                            <AccordionHeader>
+                              {iconUrl ? (
+                                <IconContainer
+                                  src={iconUrl}
+                                  alt={childObject.getName()}
+                                  size={20}
+                                />
                               ) : null}
-                              <Line noMargin>
-                                <Column expand>
-                                  <EditorComponent
-                                    isChildObject
-                                    objectConfiguration={
-                                      childObjectConfiguration
-                                    }
-                                    project={project}
-                                    layout={layout}
-                                    resourceManagementProps={
-                                      resourceManagementProps
-                                    }
-                                    onSizeUpdated={
-                                      forceUpdate /*Force update to ensure dialog is properly positioned*/
-                                    }
-                                    objectName={
-                                      objectName + ' ' + childObject.getName()
-                                    }
-                                  />
-                                </Column>
-                              </Line>
-                            </Column>
-                          </AccordionBody>
-                        </Accordion>
-                      );
-                    })}
+                              <Column expand>
+                                <Text size="block-title">
+                                  {childObject.getName()}
+                                </Text>
+                              </Column>
+                            </AccordionHeader>
+                            <AccordionBody>
+                              <Column expand noMargin noOverflowParent>
+                                {enabledTutorialIds.length ? (
+                                  <Line>
+                                    <ColumnStackLayout expand>
+                                      {tutorialIds.map(tutorialId => (
+                                        <DismissableTutorialMessage
+                                          key={tutorialId}
+                                          tutorialId={tutorialId}
+                                        />
+                                      ))}
+                                    </ColumnStackLayout>
+                                  </Line>
+                                ) : null}
+                                <Line noMargin>
+                                  <Column expand>
+                                    <EditorComponent
+                                      isChildObject
+                                      objectConfiguration={
+                                        childObjectConfiguration
+                                      }
+                                      project={project}
+                                      layout={layout}
+                                      resourceManagementProps={
+                                        resourceManagementProps
+                                      }
+                                      onSizeUpdated={
+                                        forceUpdate /*Force update to ensure dialog is properly positioned*/
+                                      }
+                                      objectName={
+                                        objectName + ' ' + childObject.getName()
+                                      }
+                                    />
+                                  </Column>
+                                </Line>
+                              </Column>
+                            </AccordionBody>
+                          </Accordion>
+                        );
+                      }
+                    )}
                   {eventBasedObject && eventBasedObject.isAnimatable() && (
                     <Column expand>
                       <Text size="block-title">
@@ -382,18 +391,18 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                 resourcesLoader={ResourcesLoader}
                 project={project}
                 onPointsUpdated={onObjectUpdated}
-                onRenamedPoint={(oldName, newName) =>
+                onRenamedPoint={(oldName, newName) => {
                   // TODO EBO Refactor event-based object events when a point is renamed.
-                  layout &&
-                  object &&
-                  gd.WholeProjectRefactorer.renameObjectPoint(
-                    project,
-                    layout,
-                    object,
-                    oldName,
-                    newName
-                  )
-                }
+                  if (layout && object) {
+                    gd.WholeProjectRefactorer.renameObjectPoint(
+                      project,
+                      layout,
+                      object,
+                      oldName,
+                      newName
+                    );
+                  }
+                }}
               />
             </Dialog>
           )}

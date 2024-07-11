@@ -20,8 +20,8 @@ export const DefaultNoScope = () => (
       <EventsSheet
         project={testProject.project}
         scope={{ project: testProject.project, layout: testProject.testLayout }}
-        globalObjectsContainer={testProject.project}
-        objectsContainer={testProject.testLayout}
+        globalObjectsContainer={testProject.project.getObjects()}
+        objectsContainer={testProject.testLayout.getObjects()}
         projectScopedContainersAccessor={
           testProject.testSceneProjectScopedContainersAccessor
         }
@@ -49,8 +49,8 @@ export const EmptyNoScope = () => (
           project: testProject.project,
           layout: testProject.emptyLayout,
         }}
-        globalObjectsContainer={testProject.project}
-        objectsContainer={testProject.emptyLayout}
+        globalObjectsContainer={testProject.project.getObjects()}
+        objectsContainer={testProject.emptyLayout.getObjects()}
         projectScopedContainersAccessor={
           testProject.emptySceneProjectScopedContainersAccessor
         }

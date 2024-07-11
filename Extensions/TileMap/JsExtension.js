@@ -164,18 +164,11 @@ const defineTileMap = function (extension, _, gd) {
     objectContent,
     instance,
     propertyName,
-    newValue,
-    project,
-    layout
+    newValue
   ) {
     return false;
   };
-  objectTileMap.getInitialInstanceProperties = function (
-    content,
-    instance,
-    project,
-    layout
-  ) {
+  objectTileMap.getInitialInstanceProperties = function (content, instance) {
     var instanceProperties = new gd.MapStringPropertyDescriptor();
     return instanceProperties;
   };
@@ -761,17 +754,13 @@ const defineCollisionMask = function (extension, _, gd) {
     objectContent,
     instance,
     propertyName,
-    newValue,
-    project,
-    layout
+    newValue
   ) {
     return false;
   };
   collisionMaskObject.getInitialInstanceProperties = function (
     content,
-    instance,
-    project,
-    layout
+    instance
   ) {
     var instanceProperties = new gd.MapStringPropertyDescriptor();
     return instanceProperties;
@@ -1141,7 +1130,6 @@ module.exports = {
     class RenderedTileMapInstance extends RenderedInstance {
       constructor(
         project,
-        layout,
         instance,
         associatedObjectConfiguration,
         pixiContainer,
@@ -1149,7 +1137,6 @@ module.exports = {
       ) {
         super(
           project,
-          layout,
           instance,
           associatedObjectConfiguration,
           pixiContainer,
@@ -1429,7 +1416,6 @@ module.exports = {
     class RenderedCollisionMaskInstance extends RenderedInstance {
       constructor(
         project,
-        layout,
         instance,
         associatedObjectConfiguration,
         pixiContainer,
@@ -1437,7 +1423,6 @@ module.exports = {
       ) {
         super(
           project,
-          layout,
           instance,
           associatedObjectConfiguration,
           pixiContainer,

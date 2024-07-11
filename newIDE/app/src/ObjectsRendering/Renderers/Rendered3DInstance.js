@@ -10,7 +10,6 @@ import PixiResourcesLoader from '../PixiResourcesLoader';
  */
 export default class Rendered3DInstance {
   _project: gdProject;
-  _layout: gdLayout;
   _instance: gdInitialInstance;
   _associatedObjectConfiguration: gdObjectConfiguration;
   _pixiContainer: PIXI.Container;
@@ -22,7 +21,6 @@ export default class Rendered3DInstance {
 
   constructor(
     project: gdProject,
-    layout: gdLayout,
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,
@@ -36,7 +34,6 @@ export default class Rendered3DInstance {
     this._pixiContainer = pixiContainer;
     this._threeGroup = threeGroup;
     this._project = project;
-    this._layout = layout;
     this._pixiResourcesLoader = pixiResourcesLoader;
     this.wasUsed = true; //Used by InstancesRenderer to track rendered instance that are not used anymore.
   }

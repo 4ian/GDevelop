@@ -12,12 +12,13 @@ import { type GroupWithContext } from '../../ObjectsList/EnumerateObjects';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
 import newNameGenerator from '../../Utils/NewNameGenerator';
 import { type ExtensionItemConfigurationAttribute } from '../../EventsFunctionsExtensionEditor';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
 
 const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
-  globalObjectsContainer: gdObjectsContainer,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   objectsContainer: gdObjectsContainer,
   eventsFunction: gdEventsFunction,
   eventsBasedBehavior: ?gdEventsBasedBehavior,
@@ -68,16 +69,14 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
   };
 
   _getValidatedObjectOrGroupName = (newName: string) => {
-    const { objectsContainer, globalObjectsContainer } = this.props;
+    const { objectsContainer } = this.props;
 
     const safeAndUniqueNewName = newNameGenerator(
       gd.Project.getSafeName(newName),
       tentativeNewName => {
         if (
           objectsContainer.hasObjectNamed(tentativeNewName) ||
-          globalObjectsContainer.hasObjectNamed(tentativeNewName) ||
-          objectsContainer.getObjectGroups().has(tentativeNewName) ||
-          globalObjectsContainer.getObjectGroups().has(tentativeNewName)
+          objectsContainer.getObjectGroups().has(tentativeNewName)
         ) {
           return true;
         }
@@ -104,9 +103,8 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
     const { group } = groupWithContext;
     const {
       project,
+      projectScopedContainersAccessor,
       eventsFunction,
-      globalObjectsContainer,
-      objectsContainer,
     } = this.props;
 
     // newName is supposed to have been already validated
@@ -115,9 +113,8 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
     if (group.getName() !== newName) {
       gd.WholeProjectRefactorer.objectOrGroupRenamedInEventsFunction(
         project,
+        projectScopedContainersAccessor.get(),
         eventsFunction,
-        globalObjectsContainer,
-        objectsContainer,
         group.getName(),
         newName,
         /* isObjectGroup=*/ true
@@ -135,7 +132,6 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
   render() {
     const {
       project,
-      globalObjectsContainer,
       objectsContainer,
       eventsFunction,
       eventsBasedBehavior,
@@ -218,9 +214,9 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
         {this.state.currentTab === 'groups' ? (
           <ObjectGroupsListWithObjectGroupEditor
             project={project}
-            globalObjectsContainer={globalObjectsContainer}
+            globalObjectsContainer={null}
             objectsContainer={objectsContainer}
-            globalObjectGroups={globalObjectsContainer.getObjectGroups()}
+            globalObjectGroups={null}
             objectGroups={eventsFunction.getObjectGroups()}
             getValidatedObjectOrGroupName={this._getValidatedObjectOrGroupName}
             onRenameGroup={this._onRenameGroup}

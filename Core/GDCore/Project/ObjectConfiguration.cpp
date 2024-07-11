@@ -25,9 +25,7 @@ std::map<gd::String, gd::PropertyDescriptor> ObjectConfiguration::GetProperties(
 }
 
 std::map<gd::String, gd::PropertyDescriptor>
-ObjectConfiguration::GetInitialInstanceProperties(const gd::InitialInstance& instance,
-                                     gd::Project& project,
-                                     gd::Layout& layout) {
+ObjectConfiguration::GetInitialInstanceProperties(const gd::InitialInstance& instance) {
   std::map<gd::String, gd::PropertyDescriptor> nothing;
   return nothing;
 }

@@ -31,6 +31,7 @@ export type EventsBasedObjectCallbacks = {|
     cb: (boolean) => void
   ) => void,
   onEventsBasedObjectRenamed: (eventsBasedObject: gdEventsBasedObject) => void,
+  onOpenCustomObjectEditor: (eventsBasedObject: gdEventsBasedObject) => void,
 |};
 
 export type EventsBasedObjectProps = {|
@@ -99,7 +100,9 @@ export class EventsBasedObjectTreeViewItemContent
   }
 
   getThumbnail(): ?string {
-    return 'res/functions/object_black.svg';
+    return this.eventsBasedObject.isRenderedIn3D()
+      ? 'res/functions/object3d_black.svg'
+      : 'res/functions/object2d_black.svg';
   }
 
   getDataset(): ?HTMLDataset {
@@ -133,6 +136,11 @@ export class EventsBasedObjectTreeViewItemContent
 
   buildMenuTemplate(i18n: I18nType, index: number) {
     return [
+      {
+        label: i18n._(t`Open visual editor`),
+        click: () =>
+          this.props.onOpenCustomObjectEditor(this.eventsBasedObject),
+      },
       {
         label: i18n._(t`Add a function`),
         click: () => this.addFunctionAtSelection(),

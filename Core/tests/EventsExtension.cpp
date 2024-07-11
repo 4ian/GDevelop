@@ -63,7 +63,8 @@ TEST_CASE("Events-based extension", "[common]") {
     SetupProjectWithDummyPlatform(project, platform);
     auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
     auto &layout1 = project.InsertNewLayout("Layout1", 0);
-    auto &object = layout1.InsertNewObject(project, "MyExtension::Sprite", "Object1", 0);
+    auto &object = layout1.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "Object1", 0);
 
     // Attach a behavior to an object.
     auto *behavior = object.AddNewBehavior(project, "MyEventsExtension::MyEventsBasedBehavior", "MyEventsBasedBehavior");

@@ -17,7 +17,8 @@ const gd: libGDevelop = global.gd;
 export default class LayerRenderer {
   project: gdProject;
   instances: gdInitialInstancesContainer;
-  layout: gdLayout;
+  globalObjectsContainer: gdObjectsContainer;
+  objectsContainer: gdObjectsContainer | null;
   /** `layer` can be changed at any moment (see InstancesRenderer).
    * /!\ Don't store any other reference.
    */
@@ -80,7 +81,8 @@ export default class LayerRenderer {
 
   constructor({
     project,
-    layout,
+    globalObjectsContainer,
+    objectsContainer,
     layer,
     viewPosition,
     instances,
@@ -98,7 +100,8 @@ export default class LayerRenderer {
   }: {
     project: gdProject,
     instances: gdInitialInstancesContainer,
-    layout: gdLayout,
+    globalObjectsContainer: gdObjectsContainer,
+    objectsContainer: gdObjectsContainer | null,
     layer: gdLayer,
     viewPosition: ViewPosition,
     onInstanceClicked: gdInitialInstance => void,
@@ -120,7 +123,8 @@ export default class LayerRenderer {
   }) {
     this.project = project;
     this.instances = instances;
-    this.layout = layout;
+    this.globalObjectsContainer = globalObjectsContainer;
+    this.objectsContainer = objectsContainer;
     this.layer = layer; // /!\ Don't store any other reference.
     // `layer` can be changed at any moment (see InstancesRenderer).
     this.viewPosition = viewPosition;
@@ -371,8 +375,8 @@ export default class LayerRenderer {
       //No renderer associated yet, the instance must have been just created!...
       const associatedObjectName = instance.getObjectName();
       const associatedObject = getObjectByName(
-        this.project,
-        this.layout,
+        this.globalObjectsContainer,
+        this.objectsContainer,
         associatedObjectName
       );
       if (!associatedObject) return null;
@@ -382,7 +386,6 @@ export default class LayerRenderer {
         instance.ptr
       ] = ObjectsRenderingService.createNewInstanceRenderer(
         this.project,
-        this.layout,
         instance,
         associatedObject.getConfiguration(),
         this.pixiContainer,

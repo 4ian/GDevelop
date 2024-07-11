@@ -132,18 +132,11 @@ module.exports = {
       objectContent,
       instance,
       propertyName,
-      newValue,
-      project,
-      layout
+      newValue
     ) {
       return false;
     };
-    objectBBText.getInitialInstanceProperties = function (
-      content,
-      instance,
-      project,
-      layout
-    ) {
+    objectBBText.getInitialInstanceProperties = function (content, instance) {
       var instanceProperties = new gd.MapStringPropertyDescriptor();
       return instanceProperties;
     };
@@ -500,7 +493,6 @@ module.exports = {
     class RenderedBBTextInstance extends RenderedInstance {
       constructor(
         project,
-        layout,
         instance,
         associatedObjectConfiguration,
         pixiContainer,
@@ -508,7 +500,6 @@ module.exports = {
       ) {
         super(
           project,
-          layout,
           instance,
           associatedObjectConfiguration,
           pixiContainer,

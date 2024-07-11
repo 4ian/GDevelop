@@ -9,15 +9,17 @@
 #include <map>
 #include <memory>
 #include <vector>
+
 #include "GDCore/Events/EventsList.h"
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvas/EditorSettings.h"
 #include "GDCore/Project/BehaviorsSharedData.h"
 #include "GDCore/Project/InitialInstancesContainer.h"
 #include "GDCore/Project/Layer.h"
+#include "GDCore/Project/LayersContainer.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/String.h"
-#include "GDCore/IDE/Dialogs/LayoutEditorCanvas/EditorSettings.h"
 
 namespace gd {
 class BaseEvent;
@@ -35,7 +37,7 @@ namespace gd {
  *
  * \ingroup PlatformDefinition
  */
-class GD_CORE_API Layout : public ObjectsContainer {
+class GD_CORE_API Layout {
  public:
   Layout();
   Layout(const Layout&);
@@ -103,6 +105,24 @@ class GD_CORE_API Layout : public ObjectsContainer {
 
   ///@}
 
+  /** \name Layout's objects
+   */
+  ///@{
+  /**
+   * \brief return the objects of the scene.
+   */
+  gd::ObjectsContainer& GetObjects() {
+    return objectsContainer;
+  }
+
+  /**
+   * \brief Return the objects of the scene.
+   */
+  const gd::ObjectsContainer& GetObjects() const {
+    return objectsContainer;
+  }
+  ///@}
+
   /** \name Layout's initial instances
    * Members functions related to initial instances of objects created at the
    * layout start up
@@ -146,103 +166,96 @@ class GD_CORE_API Layout : public ObjectsContainer {
   ///@{
 
   /**
-   * Provide access to the gd::VariablesContainer member containing the layout
-   * variables \see gd::VariablesContainer
+   * \brief Get the variables of the scene.
+   *
+   * \see gd::VariablesContainer
    */
   inline const gd::VariablesContainer& GetVariables() const {
     return variables;
   }
 
   /**
-   * Provide access to the gd::VariablesContainer member containing the layout
-   * variables \see gd::VariablesContainer
+   * \brief Get the variables of the scene.
+   *
+   * \see gd::VariablesContainer
    */
   inline gd::VariablesContainer& GetVariables() { return variables; }
 
   ///@}
 
-  /** \name Layout layers management
-   * Members functions related to layout layers management.
-   * TODO: This could be moved to a separate class
+  /** \name Layers
    */
   ///@{
 
   /**
-   * \brief Return true if the layer called "name" exists.
+   * \brief Get the layers of the scene.
+   */
+  const gd::LayersContainer& GetLayers() const { return layers; }
+
+  /**
+   * \brief Get the layers of the scene.
+   */
+  gd::LayersContainer& GetLayers() { return layers; }
+
+  /**
+   * @deprecated
    */
   bool HasLayerNamed(const gd::String& name) const;
 
   /**
-   * \brief Return a reference to the layer called "name".
+   * @deprecated
    */
   Layer& GetLayer(const gd::String& name);
 
   /**
-   * \brief Return a reference to the layer called "name".
+   * @deprecated
    */
   const Layer& GetLayer(const gd::String& name) const;
 
   /**
-   * \brief Return a reference to the layer at position "index" in the layers
-   * list
+   * @deprecated
    */
   Layer& GetLayer(std::size_t index);
 
   /**
-   * \brief Return a reference to the layer at position "index" in the layers
-   * list
+   * @deprecated
    */
   const Layer& GetLayer(std::size_t index) const;
 
   /**
-   * \brief Return the position of the layer called "name" in the layers list
+   * @deprecated
    */
   std::size_t GetLayerPosition(const gd::String& name) const;
 
   /**
-   * Must return the number of layers.
+   * @deprecated
    */
   std::size_t GetLayersCount() const;
 
   /**
-   * Must add a new empty the layer sheet called "name" at the specified
-   * position in the layout list.
+   * @deprecated
    */
   void InsertNewLayer(const gd::String& name, std::size_t position);
 
   /**
-   * Must add a new the layer constructed from the layout passed as parameter.
-   * \note No pointer or reference must be kept on the layer passed as
-   * parameter. \param theLayer the layer that must be copied and inserted
-   * into the project \param position Insertion position. Even if the position
-   * is invalid, the layer must be inserted at the end of the layers list.
+   * @deprecated
    */
   void InsertLayer(const Layer& theLayer, std::size_t position);
 
   /**
-   * Must delete the layer named "name".
+   * @deprecated
    */
   void RemoveLayer(const gd::String& name);
 
   /**
-   * Swap the position of the specified layers.
+   * @deprecated
    */
   void SwapLayers(std::size_t firstLayerIndex, std::size_t secondLayerIndex);
 
   /**
-   * Change the position of the specified layer.
+   * @deprecated
    */
   void MoveLayer(std::size_t oldIndex, std::size_t newIndex);
-
-  /**
-   * \brief Serialize the layers.
-   */
-  void SerializeLayersTo(SerializerElement& element) const;
-
-  /**
-   * \brief Unserialize the layers.
-   */
-  void UnserializeLayersFrom(const SerializerElement& element);
   ///@}
 
   /**
@@ -274,14 +287,14 @@ class GD_CORE_API Layout : public ObjectsContainer {
   /**
    * \brief Get the shared data stored for a behavior
    */
-  gd::BehaviorsSharedData& GetBehaviorSharedData(const gd::String& behaviorName);
+  gd::BehaviorsSharedData& GetBehaviorSharedData(
+      const gd::String& behaviorName);
 
   /**
    * \brief Get a map of all shared data stored for behaviors
    */
   const std::map<gd::String, std::unique_ptr<gd::BehaviorsSharedData>>&
   GetAllBehaviorSharedData() const;
-
 
   /**
    * Return the settings associated to the layout.
@@ -295,9 +308,7 @@ class GD_CORE_API Layout : public ObjectsContainer {
    * Return the settings associated to the layout.
    * \see gd::EditorSettings
    */
-  gd::EditorSettings& GetAssociatedEditorSettings() {
-    return editorSettings;
-  }
+  gd::EditorSettings& GetAssociatedEditorSettings() { return editorSettings; }
 
   /** \name Other properties
    */
@@ -338,12 +349,12 @@ class GD_CORE_API Layout : public ObjectsContainer {
    * launched
    */
   bool StopSoundsOnStartup() const { return stopSoundsOnStartup; }
-///@}
+  ///@}
 
-/** \name Saving and loading
- * Members functions related to saving and loading the object.
- */
-///@{
+  /** \name Saving and loading
+   * Members functions related to saving and loading the object.
+   */
+  ///@{
   /**
    * \brief Serialize the layout.
    */
@@ -353,18 +364,7 @@ class GD_CORE_API Layout : public ObjectsContainer {
    * \brief Unserialize the layout.
    */
   void UnserializeFrom(gd::Project& project, const SerializerElement& element);
-///@}
-
-// TODO: GD C++ Platform specific code below
-  /**
-   * Get the profiler associated with the scene. Can be NULL.
-   */
-  BaseProfiler* GetProfiler() const { return profiler; };
-
-  /**
-   * Set the profiler associated with the scene. Can be NULL.
-   */
-  void SetProfiler(BaseProfiler* profiler_) { profiler = profiler_; };
+  ///@}
 
  private:
   gd::String name;         ///< Scene name
@@ -374,8 +374,9 @@ class GD_CORE_API Layout : public ObjectsContainer {
   unsigned int backgroundColorB;     ///< Background color Blue component
   gd::String title;                  ///< Title displayed in the window
   gd::VariablesContainer variables;  ///< Variables list
+  gd::ObjectsContainer objectsContainer;
   gd::InitialInstancesContainer initialInstances;  ///< Initial instances
-  std::vector<gd::Layer> initialLayers;            ///< Initial layers
+  gd::LayersContainer layers;
   std::map<gd::String, std::unique_ptr<gd::BehaviorsSharedData>>
       behaviorsSharedData;   ///< Initial shared datas of behaviors
   bool stopSoundsOnStartup;  ///< True to make the scene stop all sounds at
@@ -384,19 +385,13 @@ class GD_CORE_API Layout : public ObjectsContainer {
   bool disableInputWhenNotFocused;  /// If set to true, the input must be
                                     /// disabled when the window do not have the
                                     /// focus.
-  static gd::Layer badLayer;  ///< Null object, returned when GetLayer can not
-                              ///< find an appropriate layer.
   static gd::BehaviorsSharedData
       badBehaviorSharedData;  ///< Null object, returned when
-                           ///< GetBehaviorSharedData can not find the
-                           ///< specified behavior shared data.
+                              ///< GetBehaviorSharedData can not find the
+                              ///< specified behavior shared data.
 
   EventsList events;  ///< Scene events
   gd::EditorSettings editorSettings;
-
-// TODO: GD C++ Platform specific code below
-
-  BaseProfiler* profiler;  ///< Pointer to the profiler. Can be NULL.
 
   /**
    * Initialize from another layout. Used by copy-ctor and assign-op.
@@ -444,20 +439,24 @@ gd::String GD_CORE_API GetTypeOfObject(const ObjectsContainer& game,
                                        bool searchInGroups = true);
 /**
  * \brief Check if an object or all objects of a group has a behavior.
- * \deprecated Use gd::ObjectsContainersList::HasBehaviorInObjectOrGroup instead.
+ * \deprecated Use gd::ObjectsContainersList::HasBehaviorInObjectOrGroup
+ * instead.
  */
-bool GD_CORE_API HasBehaviorInObjectOrGroup(const gd::ObjectsContainer &project,
-                                            const gd::ObjectsContainer &layout,
-                                            const gd::String &objectOrGroupName,
-                                            const gd::String &behaviorName,
+bool GD_CORE_API HasBehaviorInObjectOrGroup(const gd::ObjectsContainer& project,
+                                            const gd::ObjectsContainer& layout,
+                                            const gd::String& objectOrGroupName,
+                                            const gd::String& behaviorName,
                                             bool searchInGroups = true);
 /**
- * \brief Get the names of behavior of a given type if an object or all objects of a group has it.
+ * \brief Get the names of behavior of a given type if an object or all objects
+ * of a group has it.
  */
-std::vector<gd::String> GD_CORE_API GetBehaviorNamesInObjectOrGroup(
-    const gd::ObjectsContainer &project, const gd::ObjectsContainer &layout,
-    const gd::String &objectOrGroupName, const gd::String &behaviorType,
-    bool searchInGroups);
+std::vector<gd::String> GD_CORE_API
+GetBehaviorNamesInObjectOrGroup(const gd::ObjectsContainer& project,
+                                const gd::ObjectsContainer& layout,
+                                const gd::String& objectOrGroupName,
+                                const gd::String& behaviorType,
+                                bool searchInGroups);
 
 /**
  * \brief Check if a behavior is a default one or doesn't exist in an object or
@@ -470,13 +469,15 @@ bool GD_CORE_API IsDefaultBehavior(const gd::ObjectsContainer& project,
                                    bool searchInGroups = true);
 
 /**
- * \brief Get the type of a behavior if an object or all objects of a group has it.
+ * \brief Get the type of a behavior if an object or all objects of a group has
+ * it.
  */
-gd::String GD_CORE_API GetTypeOfBehaviorInObjectOrGroup(const gd::ObjectsContainer &project,
-                                            const gd::ObjectsContainer &layout,
-                                            const gd::String &objectOrGroupName,
-                                            const gd::String &behaviorName,
-                                            bool searchInGroups = true);
+gd::String GD_CORE_API
+GetTypeOfBehaviorInObjectOrGroup(const gd::ObjectsContainer& project,
+                                 const gd::ObjectsContainer& layout,
+                                 const gd::String& objectOrGroupName,
+                                 const gd::String& behaviorName,
+                                 bool searchInGroups = true);
 /**
  * \brief Get a type from a behavior name
  * @return Type of the behavior.

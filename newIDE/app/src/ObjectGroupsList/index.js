@@ -81,7 +81,7 @@ const isGroupWithContextGlobal = (groupWithContext: GroupWithContext) =>
 export type ObjectGroupsListInterface = {| forceUpdate: () => void |};
 
 type Props = {|
-  globalObjectGroups: gdObjectGroupsContainer,
+  globalObjectGroups: gdObjectGroupsContainer | null,
   objectGroups: gdObjectGroupsContainer,
   onDeleteGroup: (groupWithContext: GroupWithContext, cb: Function) => void,
   onEditGroup: gdObjectGroup => void,
@@ -159,7 +159,9 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
       () => {
         const name = newNameGenerator(
           'Group',
-          name => objectGroups.has(name) || globalObjectGroups.has(name)
+          name =>
+            objectGroups.has(name) ||
+            (!!globalObjectGroups && globalObjectGroups.has(name))
         );
 
         const newObjectGroup = objectGroups.insertNew(
@@ -215,7 +217,9 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
           if (!doRemove) return;
 
           if (global) {
-            globalObjectGroups.remove(group.getName());
+            if (globalObjectGroups) {
+              globalObjectGroups.remove(group.getName());
+            }
           } else {
             objectGroups.remove(group.getName());
           }
@@ -242,13 +246,18 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
 
         const newName = newNameGenerator(
           group.getName(),
-          name => objectGroups.has(name) || globalObjectGroups.has(name),
+          name =>
+            objectGroups.has(name) ||
+            (!!globalObjectGroups && globalObjectGroups.has(name)),
           ''
         );
 
-        const container: gdObjectGroupsContainer = global
+        const container: gdObjectGroupsContainer | null = global
           ? globalObjectGroups
           : objectGroups;
+        if (!container) {
+          return;
+        }
 
         const serializedDuplicatedGroup = serializeToJSObject(group);
         const newGroup = container.insertNew(
@@ -296,6 +305,10 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
 
     const setAsGlobalGroup = React.useCallback(
       async (groupWithContext: GroupWithContext, index?: number) => {
+        if (!globalObjectGroups) {
+          return;
+        }
+
         const { group } = groupWithContext;
 
         const groupName = group.getName();
@@ -394,7 +407,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
           return;
         }
 
-        let container: gdObjectGroupsContainer;
+        let container: gdObjectGroupsContainer | null;
         let fromIndex: number;
         let toIndex: number;
 
@@ -405,12 +418,18 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
           container = selectedGroupWithContext.global
             ? globalObjectGroups
             : objectGroups;
+          if (!container) {
+            return;
+          }
 
           fromIndex = container.getPosition(
             selectedGroupWithContext.group.getName()
           );
           toIndex = container.getPosition(destinationItem.group.getName());
         } else if (!selectedGroupWithContext.global && destinationItem.global) {
+          if (!globalObjectGroups) {
+            return;
+          }
           const destinationIndex = globalObjectGroups.getPosition(
             destinationItem.group.getName()
           );
@@ -422,6 +441,9 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
         if (toIndex > fromIndex) toIndex -= 1;
         if (where === 'after') toIndex += 1;
 
+        if (!container) {
+          return;
+        }
         container.move(fromIndex, toIndex);
         onObjectGroupModified();
         if (treeViewRef.current) treeViewRef.current.forceUpdateList();
@@ -494,12 +516,15 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
         const objectGroupsList: GroupWithContextList = enumerateGroups(
           objectGroups
         ).map(group => ({ group, global: false }));
-        const globalObjectGroupsList: GroupWithContextList = enumerateGroups(
-          globalObjectGroups
-        ).map(group => ({ group, global: true }));
+        const globalObjectGroupsList: GroupWithContextList = globalObjectGroups
+          ? enumerateGroups(globalObjectGroups).map(group => ({
+              group,
+              global: true,
+            }))
+          : [];
 
         const treeViewItems = [
-          {
+          globalObjectGroups && {
             label: i18n._(t`Global Groups`),
             children:
               globalObjectGroupsList.length > 0
@@ -519,7 +544,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
             isRoot: true,
             id: sceneGroupsRootFolderId,
           },
-        ];
+        ].filter(Boolean);
 
         return treeViewItems;
       },
@@ -529,7 +554,10 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
     // Force List component to be mounted again if globalObjectGroups or objectGroups
     // has been changed. Avoid accessing to invalid objects that could
     // crash the app.
-    const listKey = objectGroups.ptr + ';' + globalObjectGroups.ptr;
+    const listKey =
+      objectGroups.ptr +
+      ';' +
+      (globalObjectGroups ? globalObjectGroups.ptr : '');
 
     return (
       <Background>

@@ -46,7 +46,10 @@ const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
-  layout: gdLayout,
+  layout?: ?gdLayout,
+  objectsContainer: gdObjectsContainer,
+  globalObjectsContainer: gdObjectsContainer | null,
+  layersContainer: gdLayersContainer,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   instances: Array<gdInitialInstance>,
   onEditObjectByName: string => void,
@@ -67,6 +70,9 @@ const CompactInstancePropertiesEditor = ({
   i18n,
   project,
   layout,
+  objectsContainer,
+  globalObjectsContainer,
+  layersContainer,
   unsavedChanges,
   historyHandler,
   onEditObjectByName,
@@ -84,10 +90,10 @@ const CompactInstancePropertiesEditor = ({
         is3DInstance: false,
         onGetInstanceSize,
         onEditObjectByName,
-        layout,
+        layersContainer,
         forceUpdate,
       }),
-    [i18n, onGetInstanceSize, onEditObjectByName, layout, forceUpdate]
+    [i18n, onGetInstanceSize, onEditObjectByName, layersContainer, forceUpdate]
   );
 
   const schemaFor3D: Schema = React.useMemo(
@@ -97,10 +103,10 @@ const CompactInstancePropertiesEditor = ({
         is3DInstance: true,
         onGetInstanceSize,
         onEditObjectByName,
-        layout,
+        layersContainer,
         forceUpdate,
       }),
-    [i18n, onGetInstanceSize, onEditObjectByName, layout, forceUpdate]
+    [i18n, onGetInstanceSize, onEditObjectByName, layersContainer, forceUpdate]
   );
 
   const instance = instances[0];
@@ -120,8 +126,15 @@ const CompactInstancePropertiesEditor = ({
       if (!instance) return { object: undefined, instanceSchema: undefined };
 
       const associatedObjectName = instance.getObjectName();
-      const object = getObjectByName(project, layout, associatedObjectName);
-      const properties = instance.getCustomProperties(project, layout);
+      const object = getObjectByName(
+        globalObjectsContainer,
+        objectsContainer,
+        associatedObjectName
+      );
+      const properties = instance.getCustomProperties(
+        globalObjectsContainer || objectsContainer,
+        objectsContainer
+      );
       if (!object) return { object: undefined, instanceSchema: undefined };
 
       const is3DInstance = gd.MetadataProvider.getObjectMetadata(
@@ -131,9 +144,17 @@ const CompactInstancePropertiesEditor = ({
       const instanceSchemaForCustomProperties = propertiesMapToSchema(
         properties,
         (instance: gdInitialInstance) =>
-          instance.getCustomProperties(project, layout),
+          instance.getCustomProperties(
+            globalObjectsContainer || objectsContainer,
+            objectsContainer
+          ),
         (instance: gdInitialInstance, name, value) =>
-          instance.updateCustomProperty(name, value, project, layout)
+          instance.updateCustomProperty(
+            name,
+            value,
+            globalObjectsContainer || objectsContainer,
+            objectsContainer
+          )
       );
 
       const reorderedInstanceSchemaForCustomProperties = reorderInstanceSchemaForCustomProperties(
@@ -147,7 +168,15 @@ const CompactInstancePropertiesEditor = ({
           : schemaFor2D.concat(reorderedInstanceSchemaForCustomProperties),
       };
     },
-    [project, layout, instance, schemaFor2D, schemaFor3D, i18n]
+    [
+      instance,
+      globalObjectsContainer,
+      objectsContainer,
+      project,
+      i18n,
+      schemaFor3D,
+      schemaFor2D,
+    ]
   );
 
   if (!object || !instance || !instanceSchema) return null;
@@ -202,7 +231,7 @@ const CompactInstancePropertiesEditor = ({
                 areObjectVariables
                 size="small"
                 onComputeAllVariableNames={() =>
-                  object
+                  object && layout
                     ? EventsRootVariablesFinder.findAllObjectVariables(
                         project.getCurrentPlatform(),
                         project,

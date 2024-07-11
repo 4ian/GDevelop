@@ -46,31 +46,39 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
     variable.PushNew().SetString("3");
   }
 
-  auto &mySpriteObject = layout1.InsertNewObject(project, "MyExtension::Sprite", "MySpriteObject", 0);
+  auto &mySpriteObject = layout1.GetObjects().InsertNewObject(
+      project, "MyExtension::Sprite", "MySpriteObject", 0);
   mySpriteObject.GetVariables().InsertNew("MyNumberVariable").SetValue(123);
   mySpriteObject.GetVariables().InsertNew("MyStringVariable").SetString("Test");
-  mySpriteObject.GetVariables().InsertNew("MyStructureVariable").GetChild("MyStringChild").SetString("Test");
-  layout1.InsertNewObject(
-      project, "MyExtension::Sprite", "MyOtherSpriteObject", 1);
-  layout1.InsertNewObject(project,
-                          "MyExtension::FakeObjectWithDefaultBehavior",
-                          "FakeObjectWithDefaultBehavior",
-                          2);
+  mySpriteObject.GetVariables()
+      .InsertNew("MyStructureVariable")
+      .GetChild("MyStringChild")
+      .SetString("Test");
+  layout1.GetObjects().InsertNewObject(project, "MyExtension::Sprite",
+                                                "MyOtherSpriteObject", 1);
+  layout1.GetObjects().InsertNewObject(
+      project, "MyExtension::FakeObjectWithDefaultBehavior",
+      "FakeObjectWithDefaultBehavior", 2);
 
   // Also insert a variable having the same name as an object:
-  layout1.InsertNewObject(project, "MyExtension::Sprite", "ObjectWithNameReused", 3);
-  layout1.GetVariables().InsertNew("ObjectWithNameReused", 3).GetChild("MyChild");
+  layout1.GetObjects().InsertNewObject(project, "MyExtension::Sprite",
+                                                "ObjectWithNameReused", 3);
+  layout1.GetVariables()
+      .InsertNew("ObjectWithNameReused", 3)
+      .GetChild("MyChild");
 
   // Also insert a global variable having the same name as a scene variable:
   layout1.GetVariables().InsertNew("SceneVariableWithNameReused", 4);
   project.GetVariables().InsertNew("SceneVariableWithNameReused", 0);
 
-  auto &group = layout1.GetObjectGroups().InsertNew("AllObjects");
+  auto &group =
+      layout1.GetObjects().GetObjectGroups().InsertNew("AllObjects");
   group.AddObject("MySpriteObject");
   group.AddObject("MyOtherSpriteObject");
   group.AddObject("FakeObjectWithDefaultBehavior");
 
-  auto &spriteGroup = layout1.GetObjectGroups().InsertNew("MySpriteObjects");
+  auto &spriteGroup = layout1.GetObjects().GetObjectGroups().InsertNew(
+      "MySpriteObjects");
   spriteGroup.AddObject("MySpriteObject");
   spriteGroup.AddObject("MyOtherSpriteObject");
 

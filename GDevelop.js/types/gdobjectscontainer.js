@@ -15,6 +15,12 @@ declare class gdObjectsContainer {
   getRootFolder(): gdObjectFolderOrObject;
   getAllObjectFolderOrObjects(): gdVectorObjectFolderOrObject;
   getObjectGroups(): gdObjectGroupsContainer;
+  getTypeOfBehavior(layout: gdObjectsContainer, name: string, searchInGroups: boolean): string;
+  getTypeOfObject(layout: gdObjectsContainer, name: string, searchInGroups: boolean): string;
+  getBehaviorsOfObject(layout: gdObjectsContainer, name: string, searchInGroups: boolean): gdVectorString;
+  isDefaultBehavior(layout: gdObjectsContainer, objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): boolean;
+  getTypeOfBehaviorInObjectOrGroup(layout: gdObjectsContainer, objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): string;
+  getBehaviorNamesInObjectOrGroup(layout: gdObjectsContainer, objectOrGroupName: string, behaviorType: string, searchInGroups: boolean): gdVectorString;
   delete(): void;
   ptr: number;
 };

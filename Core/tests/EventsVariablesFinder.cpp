@@ -268,7 +268,8 @@ TEST_CASE("EventsVariablesFinder (FindAllObjectVariables)", "[common]") {
     DeclareVariableExtension(project, platform);
 
     auto &layout = project.InsertNewLayout("Layout1", 0);
-    auto &object = layout.InsertNewObject(project, "", "MyObject", 0);
+    auto &object = layout.GetObjects().InsertNewObject(project, "",
+                                                                "MyObject", 0);
     layout.GetEvents().InsertEvent(
         UseObjectVariable("MyObject", "MyObjectVariable"));
 
@@ -285,7 +286,8 @@ TEST_CASE("EventsVariablesFinder (FindAllObjectVariables)", "[common]") {
     DeclareVariableExtension(project, platform);
 
     auto &layout = project.InsertNewLayout("Layout1", 0);
-    auto &object = layout.InsertNewObject(project, "", "MyObject", 0);
+    auto &object = layout.GetObjects().InsertNewObject(project, "",
+                                                                "MyObject", 0);
     layout.GetEvents().InsertEvent(
         UseObjectVariableInExpression("MyObject", "MyObjectVariable"));
 
@@ -302,7 +304,8 @@ TEST_CASE("EventsVariablesFinder (FindAllObjectVariables)", "[common]") {
     DeclareVariableExtension(project, platform);
 
     auto &layout = project.InsertNewLayout("Layout1", 0);
-    auto &object = layout.InsertNewObject(project, "", "MyObject", 0);
+    auto &object = layout.GetObjects().InsertNewObject(project, "",
+                                                                "MyObject", 0);
     auto &externalEvents = project.InsertNewExternalEvents("ExternalEvents", 0);
     externalEvents.GetEvents().InsertEvent(
         UseObjectVariable("MyObject", "MyObjectVariable"));
@@ -321,8 +324,10 @@ TEST_CASE("EventsVariablesFinder (FindAllObjectVariables)", "[common]") {
     DeclareVariableExtension(project, platform);
 
     auto &layout = project.InsertNewLayout("Layout1", 0);
-    auto &object1 = layout.InsertNewObject(project, "", "MyObject1", 0);
-    auto &object2 = layout.InsertNewObject(project, "", "MyObject2", 0);
+    auto &object1 = layout.GetObjects().InsertNewObject(
+        project, "", "MyObject1", 0);
+    auto &object2 = layout.GetObjects().InsertNewObject(
+        project, "", "MyObject2", 0);
     layout.GetEvents().InsertEvent(
         UseObjectVariable("MyObject1", "MyObjectVariable1"));
     layout.GetEvents().InsertEvent(
@@ -342,8 +347,10 @@ TEST_CASE("EventsVariablesFinder (FindAllObjectVariables)", "[common]") {
     DeclareVariableExtension(project, platform);
 
     auto &layout = project.InsertNewLayout("Layout1", 0);
-    auto &object1 = layout.InsertNewObject(project, "", "MyObject1", 0);
-    auto &object2 = layout.InsertNewObject(project, "", "MyObject2", 0);
+    auto &object1 = layout.GetObjects().InsertNewObject(
+        project, "", "MyObject1", 0);
+    auto &object2 = layout.GetObjects().InsertNewObject(
+        project, "", "MyObject2", 0);
     auto &externalEvents = project.InsertNewExternalEvents("ExternalEvents", 0);
     externalEvents.GetEvents().InsertEvent(
         UseObjectVariable("MyObject1", "MyObjectVariable1"));

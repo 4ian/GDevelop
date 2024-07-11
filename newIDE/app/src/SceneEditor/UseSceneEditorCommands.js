@@ -6,7 +6,9 @@ import useLayersListCommands from '../LayersList/UseLayersListCommands';
 
 type Props = {|
   project: gdProject,
-  layout: gdLayout,
+  layersContainer: gdLayersContainer,
+  globalObjectsContainer: gdObjectsContainer | null,
+  objectsContainer: gdObjectsContainer,
   onEditObject: (object: gdObject) => void,
   onEditObjectVariables: (object: gdObject) => void,
   onOpenSceneProperties: () => void,
@@ -18,7 +20,9 @@ type Props = {|
 const UseSceneEditorCommands = (props: Props) => {
   const {
     project,
-    layout,
+    layersContainer,
+    globalObjectsContainer,
+    objectsContainer,
     onEditObject,
     onEditObjectVariables,
     onOpenSceneProperties,
@@ -33,19 +37,20 @@ const UseSceneEditorCommands = (props: Props) => {
 
   useObjectsListCommands({
     project,
-    layout,
+    globalObjectsContainer,
+    objectsContainer,
     onEditObject,
     onEditObjectVariables,
   });
 
   useObjectGroupsListCommands({
-    project,
-    layout,
+    globalObjectsContainer,
+    objectsContainer,
     onEditObjectGroup,
   });
 
   useLayersListCommands({
-    layout,
+    layersContainer,
     onEditLayerEffects,
     onEditLayer,
   });

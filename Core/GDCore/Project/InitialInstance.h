@@ -4,8 +4,8 @@
  * reserved. This project is released under the MIT License.
  */
 
-#ifndef GDCORE_INITIALINSTANCE_H
-#define GDCORE_INITIALINSTANCE_H
+#pragma once
+
 #include <map>
 
 #include "GDCore/Project/VariablesContainer.h"
@@ -14,6 +14,7 @@ namespace gd {
 class PropertyDescriptor;
 class Project;
 class Layout;
+class ObjectsContainer;
 }  // namespace gd
 
 namespace gd {
@@ -263,18 +264,18 @@ class GD_CORE_API InitialInstance {
    * \note Common properties ( name, position... ) do not need to be
    * inserted in this map
    */
-  std::map<gd::String, gd::PropertyDescriptor> GetCustomProperties(
-      gd::Project& project, gd::Layout& layout);
+  std::map<gd::String, gd::PropertyDescriptor>
+  GetCustomProperties(gd::ObjectsContainer &globalObjectsContainer,
+                      gd::ObjectsContainer &objectsContainer);
 
   /**
    * \brief Update the property called \a name with the new \a value.
    *
    * \return false if the property could not be updated.
    */
-  bool UpdateCustomProperty(const gd::String& name,
-                            const gd::String& value,
-                            gd::Project& project,
-                            gd::Layout& layout);
+  bool UpdateCustomProperty(const gd::String &name, const gd::String &value,
+                            gd::ObjectsContainer &globalObjectsContainer,
+                            gd::ObjectsContainer &objectsContainer);
 
   /**
    * \brief Get the value of a double property stored in the instance.
@@ -361,5 +362,3 @@ class GD_CORE_API InitialInstance {
 };
 
 }  // namespace gd
-
-#endif  // GDCORE_INITIALINSTANCE_H

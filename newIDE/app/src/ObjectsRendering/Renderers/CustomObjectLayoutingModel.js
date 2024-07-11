@@ -516,11 +516,14 @@ export class ChildInstance {
   updateCustomProperty(
     name: string,
     value: string,
-    project: gdProject,
-    layout: gdLayout
+    globalObjectsContainer: gdObjectsContainer,
+    objectsContainer: gdObjectsContainer
   ) {}
 
-  getCustomProperties(project: gdProject, layout: gdLayout) {
+  getCustomProperties(
+    globalObjectsContainer: gdObjectsContainer,
+    objectsContainer: gdObjectsContainer
+  ) {
     return null;
   }
 

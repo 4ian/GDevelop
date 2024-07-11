@@ -58,7 +58,11 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         return [];
       }
 
-      const object = getObjectByName(project, scope.layout, objectName);
+      const object = getObjectByName(
+        project.getObjects(),
+        scope.layout ? scope.layout.getObjects() : null,
+        objectName
+      );
       if (!object) {
         return [];
       }

@@ -27,6 +27,9 @@ export const InstanceSprite2d = () => (
             i18n={i18n}
             project={testProject.project}
             layout={testProject.testLayout}
+            objectsContainer={testProject.testLayout.getObjects()}
+            globalObjectsContainer={testProject.project.getObjects()}
+            layersContainer={testProject.testLayout.getLayers()}
             projectScopedContainersAccessor={
               testProject.testSceneProjectScopedContainersAccessor
             }
@@ -50,6 +53,9 @@ export const InstanceCube3d = () => (
             i18n={i18n}
             project={testProject.project}
             layout={testProject.testLayout}
+            objectsContainer={testProject.testLayout.getObjects()}
+            globalObjectsContainer={testProject.project.getObjects()}
+            layersContainer={testProject.testLayout.getLayers()}
             projectScopedContainersAccessor={
               testProject.testSceneProjectScopedContainersAccessor
             }
@@ -73,6 +79,9 @@ export const InstanceTextInput = () => (
             i18n={i18n}
             project={testProject.project}
             layout={testProject.testLayout}
+            objectsContainer={testProject.testLayout.getObjects()}
+            globalObjectsContainer={testProject.project.getObjects()}
+            layersContainer={testProject.testLayout.getLayers()}
             projectScopedContainersAccessor={
               testProject.testSceneProjectScopedContainersAccessor
             }

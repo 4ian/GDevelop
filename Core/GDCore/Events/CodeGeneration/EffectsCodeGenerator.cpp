@@ -15,6 +15,7 @@
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/Project.h"
+#include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/IDE/ProjectBrowserHelper.h"
 
 namespace gd {
@@ -47,6 +48,9 @@ void EffectsCodeGenerator::GenerateEffectsIncludeFiles(
   
   // TODO Merge with UsedExtensionsFinder.
 
+  // TODO Factorize with the iteration on all effects for resource exposure.
+  // TODO Implement an ArbitraryEffectWorker and add a method in ProjectBrowserHelper
+
   // See also gd::Project::ExposeResources for a method that traverse the whole
   // project (this time for resources) and
   // WholeProjectRefactorer::ExposeProjectEvents.
@@ -68,6 +72,27 @@ void EffectsCodeGenerator::GenerateEffectsIncludeFiles(
 
   // Add objects effects
   gd::ProjectBrowserHelper::ExposeProjectObjects(project, effectsCodeGenerator);
+
+  // Add event-based objects layouts effects
+  for (std::size_t s = 0; s < project.GetEventsFunctionsExtensionsCount();
+       s++) {
+    auto &eventsFunctionExtension = project.GetEventsFunctionsExtension(s);
+
+    auto &eventsBasedObjects = eventsFunctionExtension.GetEventsBasedObjects();
+    for (std::size_t objectIndex = 0;
+         objectIndex < eventsBasedObjects.GetCount(); ++objectIndex) {
+      auto &eventsBasedObject = eventsBasedObjects.Get(objectIndex);
+
+      auto &layers = eventsBasedObject.GetLayers();
+      for (std::size_t l = 0; l < layers.GetLayersCount(); ++l) {
+        auto &effects = layers.GetLayer(l).GetEffects();
+        for (std::size_t e = 0; e < effects.GetEffectsCount(); ++e) {
+          auto &effect = effects.GetEffect(e);
+          effectsCodeGenerator.AddEffectIncludeFiles(effect);
+        }
+      }
+    }
+  }
 }
 
 }  // namespace gd

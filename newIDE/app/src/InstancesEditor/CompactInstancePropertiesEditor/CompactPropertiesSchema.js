@@ -123,15 +123,15 @@ const getZField = ({ i18n }: {| i18n: I18nType |}) => ({
 });
 const getLayerField = ({
   i18n,
-  layout,
+  layersContainer,
 }: {|
   i18n: I18nType,
-  layout: gdLayout,
+  layersContainer: gdLayersContainer,
 |}) => ({
   name: 'Layer',
   getLabel: () => i18n._(t`Layer`),
   valueType: 'string',
-  getChoices: () => enumerateLayers(layout),
+  getChoices: () => enumerateLayers(layersContainer),
   getValue: (instance: gdInitialInstance) => instance.getLayer(),
   setValue: (instance: gdInitialInstance, newValue: string) =>
     instance.setLayer(newValue),
@@ -420,14 +420,14 @@ export const makeSchema = ({
   forceUpdate,
   onEditObjectByName,
   onGetInstanceSize,
-  layout,
+  layersContainer,
 }: {|
   is3DInstance: boolean,
   i18n: I18nType,
   forceUpdate: () => void,
   onEditObjectByName: (name: string) => void,
   onGetInstanceSize: gdInitialInstance => [number, number, number],
-  layout: gdLayout,
+  layersContainer: gdLayersContainer,
 |}): Schema => {
   const getInstanceWidth = (instance: gdInitialInstance) =>
     instance.hasCustomSize()
@@ -500,7 +500,7 @@ export const makeSchema = ({
           },
         ],
       },
-      getLayerField({ i18n, layout }),
+      getLayerField({ i18n, layersContainer }),
       {
         name: 'Rotation',
         type: 'row',
@@ -562,7 +562,7 @@ export const makeSchema = ({
         },
       ],
     },
-    getLayerField({ i18n, layout }),
+    getLayerField({ i18n, layersContainer }),
     {
       name: 'Rotation',
       type: 'row',

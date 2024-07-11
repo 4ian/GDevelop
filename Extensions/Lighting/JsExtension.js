@@ -153,19 +153,12 @@ module.exports = {
       objectContent,
       instance,
       propertyName,
-      newValue,
-      project,
-      layout
+      newValue
     ) {
       return false;
     };
 
-    lightObject.getInitialInstanceProperties = function (
-      content,
-      instance,
-      project,
-      layout
-    ) {
+    lightObject.getInitialInstanceProperties = function (content, instance) {
       const instanceProperties = new gd.MapStringPropertyDescriptor();
 
       return instanceProperties;
@@ -247,7 +240,6 @@ module.exports = {
     class RenderedLightObjectInstance extends RenderedInstance {
       constructor(
         project,
-        layout,
         instance,
         associatedObjectConfiguration,
         pixiContainer,
@@ -255,7 +247,6 @@ module.exports = {
       ) {
         super(
           project,
-          layout,
           instance,
           associatedObjectConfiguration,
           pixiContainer,

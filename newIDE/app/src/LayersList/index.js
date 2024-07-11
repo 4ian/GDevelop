@@ -26,7 +26,8 @@ const DropTarget = makeDropTarget('layers-list');
 
 type LayersListBodyProps = {|
   project: gdProject,
-  layersContainer: gdLayout,
+  layout: gdLayout | null,
+  layersContainer: gdLayersContainer,
   selectedLayer: string,
   onSelectLayer: string => void,
   unsavedChanges?: ?UnsavedChanges,
@@ -56,6 +57,7 @@ const LayersListBody = (props: LayersListBodyProps) => {
 
   const {
     project,
+    layout,
     layersContainer,
     onEditEffects,
     onEdit,
@@ -126,12 +128,16 @@ const LayersListBody = (props: LayersListBodyProps) => {
             }));
           } else {
             layersContainer.getLayer(layerName).setName(newName);
-            gd.WholeProjectRefactorer.renameLayer(
-              project,
-              layersContainer,
-              layerName,
-              newName
-            );
+            if (layout) {
+              gd.WholeProjectRefactorer.renameLayer(
+                project,
+                layout,
+                layerName,
+                newName
+              );
+            } else {
+              // TODO EBO: refactoring for custom objects.
+            }
             onLayerRenamed();
             onLayerModified();
           }
@@ -179,10 +185,12 @@ const LayersListBody = (props: LayersListBodyProps) => {
                   }}
                 />
               )}
-              <BackgroundColorRow
-                layout={layersContainer}
-                onBackgroundColorChanged={onLayerModified}
-              />
+              {layout && (
+                <BackgroundColorRow
+                  layout={layout}
+                  onBackgroundColorChanged={onLayerModified}
+                />
+              )}
             </div>
           )
         }
@@ -195,7 +203,8 @@ type Props = {|
   project: gdProject,
   selectedLayer: string,
   onSelectLayer: string => void,
-  layersContainer: gdLayout,
+  layout: gdLayout | null,
+  layersContainer: gdLayersContainer,
   onEditLayerEffects: (layer: ?gdLayer) => void,
   onEditLayer: (layer: ?gdLayer) => void,
   onRemoveLayer: (layerName: string, cb: (done: boolean) => void) => void,
@@ -211,11 +220,11 @@ export type LayersListInterface = {|
   forceUpdate: () => void,
 |};
 
-const hasLightingLayer = (layout: gdLayout) => {
-  const layersCount = layout.getLayersCount();
+const hasLightingLayer = (layersContainer: gdLayersContainer) => {
+  const layersCount = layersContainer.getLayersCount();
   return (
     mapReverseFor(0, layersCount, i =>
-      layout.getLayerAt(i).isLightingLayer()
+      layersContainer.getLayerAt(i).isLightingLayer()
     ).filter(Boolean).length > 0
   );
 };
@@ -278,6 +287,7 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
                 selectedLayer={props.selectedLayer}
                 onSelectLayer={props.onSelectLayer}
                 project={props.project}
+                layout={props.layout}
                 layersContainer={props.layersContainer}
                 onEditEffects={props.onEditLayerEffects}
                 onEdit={props.onEditLayer}

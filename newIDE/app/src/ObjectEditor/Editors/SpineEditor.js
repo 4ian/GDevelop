@@ -283,6 +283,7 @@ const SpineEditor = ({
       }
 
       animation.setName(newName);
+      // TODO EBO Refactor event-based object events when an animation is renamed.
       if (layout && object) {
         gd.WholeProjectRefactorer.renameObjectAnimation(
           project,

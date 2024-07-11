@@ -44,16 +44,15 @@ describe('ResourceUtils', () => {
     project.getResourcesManager().addResource(audioResource2);
 
     // Add objects using these resources
-    const globalObject = project.insertNewObject(
-      project,
-      'Sprite',
-      'MyGlobalObject',
-      0
-    );
+    const globalObject = project
+      .getObjects()
+      .insertNewObject(project, 'Sprite', 'MyGlobalObject', 0);
     addNewAnimationWithImageToSpriteObject(globalObject, 'fake-image1.png');
 
     const scene = project.insertNewLayout('MyScene', 0);
-    const object = scene.insertNewObject(project, 'Sprite', 'MyObject', 0);
+    const object = scene
+      .getObjects()
+      .insertNewObject(project, 'Sprite', 'MyObject', 0);
     addNewAnimationWithImageToSpriteObject(object, 'fake-image1.png');
 
     // Also add an event referring to these resources.

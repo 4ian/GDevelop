@@ -226,9 +226,7 @@ module.exports = {
       objectContent,
       instance,
       propertyName,
-      newValue,
-      project,
-      layout
+      newValue
     ) {
       if (propertyName === 'initialValue') {
         instance.setRawStringProperty('initialValue', newValue);
@@ -242,9 +240,7 @@ module.exports = {
     };
     textInputObject.getInitialInstanceProperties = function (
       content,
-      instance,
-      project,
-      layout
+      instance
     ) {
       const instanceProperties = new gd.MapStringPropertyDescriptor();
 
@@ -643,7 +639,6 @@ module.exports = {
     class RenderedTextInputObjectInstance extends RenderedInstance {
       constructor(
         project,
-        layout,
         instance,
         associatedObjectConfiguration,
         pixiContainer,
@@ -651,7 +646,6 @@ module.exports = {
       ) {
         super(
           project,
-          layout,
           instance,
           associatedObjectConfiguration,
           pixiContainer,

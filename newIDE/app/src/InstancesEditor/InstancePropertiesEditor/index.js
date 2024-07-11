@@ -327,8 +327,15 @@ const InstancePropertiesEditor = ({
       if (!instance) return {};
 
       const associatedObjectName = instance.getObjectName();
-      const object = getObjectByName(project, layout, associatedObjectName);
-      const properties = instance.getCustomProperties(project, layout);
+      const object = getObjectByName(
+        project.getObjects(),
+        layout.getObjects(),
+        associatedObjectName
+      );
+      const properties = instance.getCustomProperties(
+        project.getObjects(),
+        layout.getObjects()
+      );
       if (!object) return {};
 
       const is3DInstance = gd.MetadataProvider.getObjectMetadata(
@@ -338,9 +345,17 @@ const InstancePropertiesEditor = ({
       const instanceSchemaForCustomProperties = propertiesMapToSchema(
         properties,
         (instance: gdInitialInstance) =>
-          instance.getCustomProperties(project, layout),
+          instance.getCustomProperties(
+            project.getObjects(),
+            layout.getObjects()
+          ),
         (instance: gdInitialInstance, name, value) =>
-          instance.updateCustomProperty(name, value, project, layout)
+          instance.updateCustomProperty(
+            name,
+            value,
+            project.getObjects(),
+            layout.getObjects()
+          )
       );
       return {
         object,

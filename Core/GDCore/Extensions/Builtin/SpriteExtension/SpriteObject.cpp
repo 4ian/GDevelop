@@ -64,9 +64,7 @@ void SpriteObject::ExposeResources(gd::ArbitraryResourceWorker& worker) {
 
 std::map<gd::String, gd::PropertyDescriptor>
 SpriteObject::GetInitialInstanceProperties(
-    const gd::InitialInstance& initialInstance,
-    gd::Project& project,
-    gd::Layout& scene) {
+    const gd::InitialInstance& initialInstance) {
   std::map<gd::String, gd::PropertyDescriptor> properties;
   properties["animation"] =
       gd::PropertyDescriptor(
@@ -80,9 +78,7 @@ SpriteObject::GetInitialInstanceProperties(
 bool SpriteObject::UpdateInitialInstanceProperty(
     gd::InitialInstance& initialInstance,
     const gd::String& name,
-    const gd::String& value,
-    gd::Project& project,
-    gd::Layout& scene) {
+    const gd::String& value) {
   if (name == "animation") {
     initialInstance.SetRawDoubleProperty(
         "animation", std::max(0, value.empty() ? 0 : value.To<int>()));

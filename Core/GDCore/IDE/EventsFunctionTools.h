@@ -68,5 +68,9 @@ class GD_CORE_API EventsFunctionTools {
       const gd::EventsBasedObject& eventsBasedObject,
       const gd::EventsFunction& eventsFunction,
       gd::ObjectsContainer& outputObjectsContainer);
+
+  static void CopyEventsBasedObjectChildrenToObjectsContainer(
+      const gd::EventsBasedObject &eventsBasedObject,
+      gd::ObjectsContainer &outputObjectsContainer);
 };
 }  // namespace gd

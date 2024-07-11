@@ -23,8 +23,10 @@ export const Default = () => (
     <SerializedObjectDisplay object={testProject.testLayout}>
       <div style={{ height: 250 }}>
         <ObjectGroupsList
-          globalObjectGroups={testProject.project.getObjectGroups()}
-          objectGroups={testProject.testLayout.getObjectGroups()}
+          globalObjectGroups={testProject.project
+            .getObjects()
+            .getObjectGroups()}
+          objectGroups={testProject.testLayout.getObjects().getObjectGroups()}
           onEditGroup={action('onEditGroup')}
           onRenameGroup={action('onRenameGroup')}
           onDeleteGroup={action('onDeleteGroup')}

@@ -1094,19 +1094,12 @@ module.exports = {
       objectContent,
       instance,
       propertyName,
-      newValue,
-      project,
-      layout
+      newValue
     ) {
       return false;
     };
 
-    Cube3DObject.getInitialInstanceProperties = function (
-      content,
-      instance,
-      project,
-      layout
-    ) {
+    Cube3DObject.getInitialInstanceProperties = function (content, instance) {
       const instanceProperties = new gd.MapStringPropertyDescriptor();
       return instanceProperties;
     };
@@ -2115,7 +2108,6 @@ module.exports = {
 
       constructor(
         project,
-        layout,
         instance,
         associatedObjectConfiguration,
         pixiContainer,
@@ -2123,7 +2115,6 @@ module.exports = {
       ) {
         super(
           project,
-          layout,
           instance,
           associatedObjectConfiguration,
           pixiContainer,
@@ -2300,7 +2291,6 @@ module.exports = {
     class RenderedCube3DObject3DInstance extends Rendered3DInstance {
       constructor(
         project,
-        layout,
         instance,
         associatedObjectConfiguration,
         pixiContainer,
@@ -2309,7 +2299,6 @@ module.exports = {
       ) {
         super(
           project,
-          layout,
           instance,
           associatedObjectConfiguration,
           pixiContainer,
@@ -2682,7 +2671,6 @@ module.exports = {
 
       constructor(
         project,
-        layout,
         instance,
         associatedObjectConfiguration,
         pixiContainer,
@@ -2690,7 +2678,6 @@ module.exports = {
       ) {
         super(
           project,
-          layout,
           instance,
           associatedObjectConfiguration,
           pixiContainer,
@@ -2945,7 +2932,6 @@ module.exports = {
 
       constructor(
         project,
-        layout,
         instance,
         associatedObjectConfiguration,
         pixiContainer,
@@ -2954,7 +2940,6 @@ module.exports = {
       ) {
         super(
           project,
-          layout,
           instance,
           associatedObjectConfiguration,
           pixiContainer,

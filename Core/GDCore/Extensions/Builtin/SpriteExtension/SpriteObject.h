@@ -47,14 +47,10 @@ class GD_CORE_API SpriteObject : public gd::ObjectConfiguration {
   bool UpdateProperty(const gd::String& name, const gd::String& value) override;
 
   std::map<gd::String, gd::PropertyDescriptor> GetInitialInstanceProperties(
-      const gd::InitialInstance& position,
-      gd::Project& project,
-      gd::Layout& scene) override;
+      const gd::InitialInstance& position) override;
   bool UpdateInitialInstanceProperty(gd::InitialInstance& position,
                                      const gd::String& name,
-                                     const gd::String& value,
-                                     gd::Project& project,
-                                     gd::Layout& scene) override;
+                                     const gd::String& value) override;
 
   /**
    * \brief Return the animation configuration.

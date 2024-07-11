@@ -31,8 +31,8 @@ export const AllResourceFields = () => (
               project: testProject.project,
               layout: testProject.testLayout,
             }}
-            globalObjectsContainer={testProject.project}
-            objectsContainer={testProject.testLayout}
+            globalObjectsContainer={testProject.project.getObjects()}
+            objectsContainer={testProject.testLayout.getObjects()}
             projectScopedContainersAccessor={
               testProject.testSceneProjectScopedContainersAccessor
             }
@@ -54,8 +54,8 @@ export const AllResourceFields = () => (
               project: testProject.project,
               layout: testProject.testLayout,
             }}
-            globalObjectsContainer={testProject.project}
-            objectsContainer={testProject.testLayout}
+            globalObjectsContainer={testProject.project.getObjects()}
+            objectsContainer={testProject.testLayout.getObjects()}
             projectScopedContainersAccessor={
               testProject.testSceneProjectScopedContainersAccessor
             }
@@ -77,8 +77,8 @@ export const AllResourceFields = () => (
               project: testProject.project,
               layout: testProject.testLayout,
             }}
-            globalObjectsContainer={testProject.project}
-            objectsContainer={testProject.testLayout}
+            globalObjectsContainer={testProject.project.getObjects()}
+            objectsContainer={testProject.testLayout.getObjects()}
             projectScopedContainersAccessor={
               testProject.testSceneProjectScopedContainersAccessor
             }
@@ -100,8 +100,8 @@ export const AllResourceFields = () => (
               project: testProject.project,
               layout: testProject.testLayout,
             }}
-            globalObjectsContainer={testProject.project}
-            objectsContainer={testProject.testLayout}
+            globalObjectsContainer={testProject.project.getObjects()}
+            objectsContainer={testProject.testLayout.getObjects()}
             projectScopedContainersAccessor={
               testProject.testSceneProjectScopedContainersAccessor
             }
@@ -123,8 +123,8 @@ export const AllResourceFields = () => (
               project: testProject.project,
               layout: testProject.testLayout,
             }}
-            globalObjectsContainer={testProject.project}
-            objectsContainer={testProject.testLayout}
+            globalObjectsContainer={testProject.project.getObjects()}
+            objectsContainer={testProject.testLayout.getObjects()}
             projectScopedContainersAccessor={
               testProject.testSceneProjectScopedContainersAccessor
             }
@@ -146,8 +146,8 @@ export const AllResourceFields = () => (
               project: testProject.project,
               layout: testProject.testLayout,
             }}
-            globalObjectsContainer={testProject.project}
-            objectsContainer={testProject.testLayout}
+            globalObjectsContainer={testProject.project.getObjects()}
+            objectsContainer={testProject.testLayout.getObjects()}
             projectScopedContainersAccessor={
               testProject.testSceneProjectScopedContainersAccessor
             }
@@ -169,8 +169,8 @@ export const AllResourceFields = () => (
               project: testProject.project,
               layout: testProject.testLayout,
             }}
-            globalObjectsContainer={testProject.project}
-            objectsContainer={testProject.testLayout}
+            globalObjectsContainer={testProject.project.getObjects()}
+            objectsContainer={testProject.testLayout.getObjects()}
             projectScopedContainersAccessor={
               testProject.testSceneProjectScopedContainersAccessor
             }
@@ -192,8 +192,8 @@ export const AllResourceFields = () => (
               project: testProject.project,
               layout: testProject.testLayout,
             }}
-            globalObjectsContainer={testProject.project}
-            objectsContainer={testProject.testLayout}
+            globalObjectsContainer={testProject.project.getObjects()}
+            objectsContainer={testProject.testLayout.getObjects()}
             projectScopedContainersAccessor={
               testProject.testSceneProjectScopedContainersAccessor
             }
@@ -215,8 +215,8 @@ export const AllResourceFields = () => (
               project: testProject.project,
               layout: testProject.testLayout,
             }}
-            globalObjectsContainer={testProject.project}
-            objectsContainer={testProject.testLayout}
+            globalObjectsContainer={testProject.project.getObjects()}
+            objectsContainer={testProject.testLayout.getObjects()}
             projectScopedContainersAccessor={
               testProject.testSceneProjectScopedContainersAccessor
             }
@@ -238,8 +238,8 @@ export const AllResourceFields = () => (
               project: testProject.project,
               layout: testProject.testLayout,
             }}
-            globalObjectsContainer={testProject.project}
-            objectsContainer={testProject.testLayout}
+            globalObjectsContainer={testProject.project.getObjects()}
+            objectsContainer={testProject.testLayout.getObjects()}
             projectScopedContainersAccessor={
               testProject.testSceneProjectScopedContainersAccessor
             }

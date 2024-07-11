@@ -195,7 +195,8 @@ TEST_CASE("EventsIdentifiersFinder (object timers)", "[common]") {
     DeclareTimerExtension(project, platform);
 
     auto &layout = project.InsertNewLayout("Layout1", 0);
-    auto &object = layout.InsertNewObject(project, "", "MyObject", 0);
+    auto &object = layout.GetObjects().InsertNewObject(project, "",
+                                                                "MyObject", 0);
     layout.GetEvents().InsertEvent(UseObjectTimer("MyObject", "MyObjectTimer"));
 
     auto identifierExpressions =
@@ -212,8 +213,10 @@ TEST_CASE("EventsIdentifiersFinder (object timers)", "[common]") {
     DeclareTimerExtension(project, platform);
 
     auto &layout = project.InsertNewLayout("Layout1", 0);
-    auto &object = layout.InsertNewObject(project, "", "MyObject", 0);
-    layout.GetEvents().InsertEvent(UseObjectTimerInExpression("MyObject", "MyObjectTimer"));
+    auto &object = layout.GetObjects().InsertNewObject(project, "",
+                                                                "MyObject", 0);
+    layout.GetEvents().InsertEvent(
+        UseObjectTimerInExpression("MyObject", "MyObjectTimer"));
 
     auto identifierExpressions =
         gd::EventsIdentifiersFinder::FindAllIdentifierExpressions(
@@ -229,7 +232,8 @@ TEST_CASE("EventsIdentifiersFinder (object timers)", "[common]") {
     DeclareTimerExtension(project, platform);
 
     auto &layout = project.InsertNewLayout("Layout1", 0);
-    auto &object = layout.InsertNewObject(project, "", "MyObject", 0);
+    auto &object = layout.GetObjects().InsertNewObject(project, "",
+                                                                "MyObject", 0);
     auto &externalEvents = project.InsertNewExternalEvents("ExternalEvents", 0);
     externalEvents.GetEvents().InsertEvent(
         UseObjectTimer("MyObject", "MyObjectTimer"));
@@ -249,8 +253,10 @@ TEST_CASE("EventsIdentifiersFinder (object timers)", "[common]") {
     DeclareTimerExtension(project, platform);
 
     auto &layout = project.InsertNewLayout("Layout1", 0);
-    auto &object1 = layout.InsertNewObject(project, "", "MyObject1", 0);
-    auto &object2 = layout.InsertNewObject(project, "", "MyObject2", 0);
+    auto &object1 = layout.GetObjects().InsertNewObject(
+        project, "", "MyObject1", 0);
+    auto &object2 = layout.GetObjects().InsertNewObject(
+        project, "", "MyObject2", 0);
     layout.GetEvents().InsertEvent(
         UseObjectTimer("MyObject1", "MyObjectTimer1"));
     layout.GetEvents().InsertEvent(
@@ -270,8 +276,10 @@ TEST_CASE("EventsIdentifiersFinder (object timers)", "[common]") {
     DeclareTimerExtension(project, platform);
 
     auto &layout = project.InsertNewLayout("Layout1", 0);
-    auto &object1 = layout.InsertNewObject(project, "", "MyObject1", 0);
-    auto &object2 = layout.InsertNewObject(project, "", "MyObject2", 0);
+    auto &object1 = layout.GetObjects().InsertNewObject(
+        project, "", "MyObject1", 0);
+    auto &object2 = layout.GetObjects().InsertNewObject(
+        project, "", "MyObject2", 0);
     auto &externalEvents = project.InsertNewExternalEvents("ExternalEvents", 0);
     externalEvents.GetEvents().InsertEvent(
         UseObjectTimer("MyObject1", "MyObjectTimer1"));

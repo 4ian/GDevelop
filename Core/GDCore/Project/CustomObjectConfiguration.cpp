@@ -35,19 +35,26 @@ std::unique_ptr<gd::ObjectConfiguration> CustomObjectConfiguration::Clone() cons
   return gd::make_unique<gd::CustomObjectConfiguration>(*this);
 }
 
-gd::ObjectConfiguration &CustomObjectConfiguration::GetChildObjectConfiguration(const gd::String &objectName) {
+const gd::EventsBasedObject* CustomObjectConfiguration::GetEventsBasedObject() const {
   if (!project->HasEventsBasedObject(GetType())) {
+    return nullptr;
+  }
+  return &project->GetEventsBasedObject(GetType());
+}
+
+gd::ObjectConfiguration &CustomObjectConfiguration::GetChildObjectConfiguration(const gd::String &objectName) {
+  const auto *eventsBasedObject = GetEventsBasedObject();
+  if (!eventsBasedObject) {
     return badObjectConfiguration;
   }
-  const auto &eventsBasedObject = project->GetEventsBasedObject(GetType());
 
-  if (!eventsBasedObject.HasObjectNamed(objectName)) {
+  if (!eventsBasedObject->GetObjects().HasObjectNamed(objectName)) {
     gd::LogError("Tried to get the configuration of a child-object:" + objectName
                 + " that doesn't exist in the event-based object: " + GetType());
     return badObjectConfiguration;
   }
 
-  auto &childObject = eventsBasedObject.GetObject(objectName);
+  auto &childObject = eventsBasedObject->GetObjects().GetObject(objectName);
   auto configurationPosition = childObjectConfigurations.find(objectName);
   if (configurationPosition == childObjectConfigurations.end()) {
     childObjectConfigurations.insert(std::make_pair(
@@ -90,8 +97,7 @@ bool CustomObjectConfiguration::UpdateProperty(const gd::String& propertyName,
 
 std::map<gd::String, gd::PropertyDescriptor>
 CustomObjectConfiguration::GetInitialInstanceProperties(
-    const gd::InitialInstance &initialInstance, gd::Project &project,
-    gd::Layout &scene) {
+    const gd::InitialInstance &initialInstance) {
   std::map<gd::String, gd::PropertyDescriptor> properties;
   if (!animations.HasNoAnimations()) {
     properties["animation"] =
@@ -105,7 +111,7 @@ CustomObjectConfiguration::GetInitialInstanceProperties(
 
 bool CustomObjectConfiguration::UpdateInitialInstanceProperty(
     gd::InitialInstance &initialInstance, const gd::String &name,
-    const gd::String &value, gd::Project &project, gd::Layout &scene) {
+    const gd::String &value) {
   if (name == "animation") {
     initialInstance.SetRawDoubleProperty(
         "animation", std::max(0, value.empty() ? 0 : value.To<int>()));
@@ -128,6 +134,20 @@ void CustomObjectConfiguration::DoSerializeTo(SerializerElement& element) const 
     auto &childConfiguration = pair.second;
     auto &childElement = childrenContentElement.AddChild(childName);
     childConfiguration->SerializeTo(childElement);
+  }
+
+  const auto *eventsBasedObject = GetEventsBasedObject();
+  if (eventsBasedObject) {
+    eventsBasedObject->GetInitialInstances().SerializeTo(
+        element.AddChild("instances"));
+    eventsBasedObject->GetLayers().SerializeLayersTo(
+        element.AddChild("layers"));
+    element.SetIntAttribute("areaMinX", eventsBasedObject->GetAreaMinX());
+    element.SetIntAttribute("areaMinY", eventsBasedObject->GetAreaMinY());
+    element.SetIntAttribute("areaMinZ", eventsBasedObject->GetAreaMinZ());
+    element.SetIntAttribute("areaMaxX", eventsBasedObject->GetAreaMaxX());
+    element.SetIntAttribute("areaMaxY", eventsBasedObject->GetAreaMaxY());
+    element.SetIntAttribute("areaMaxZ", eventsBasedObject->GetAreaMaxZ());
   }
 }
 void CustomObjectConfiguration::DoUnserializeFrom(Project& project,
@@ -198,7 +218,7 @@ void CustomObjectConfiguration::ExposeResources(gd::ArbitraryResourceWorker& wor
   }
   const auto &eventsBasedObject = project->GetEventsBasedObject(GetType());
 
-  for (auto& childObject : eventsBasedObject.GetObjects()) {
+  for (auto& childObject : eventsBasedObject.GetObjects().GetObjects()) {
     auto &configuration = GetChildObjectConfiguration(childObject->GetName());
     configuration.ExposeResources(worker);
   }

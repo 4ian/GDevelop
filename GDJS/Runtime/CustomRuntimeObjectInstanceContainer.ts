@@ -80,30 +80,45 @@ namespace gdjs {
         });
       }
 
-      // TODO EBO Remove it when the instance editor is done.
-      // Add a default layer
-      this.addLayer({
-        name: '',
-        visibility: true,
-        cameras: [
-          {
-            defaultSize: true,
-            defaultViewport: true,
-            height: 0,
-            viewportBottom: 0,
-            viewportLeft: 0,
-            viewportRight: 0,
-            viewportTop: 0,
-            width: 0,
-          },
-        ],
-        effects: [],
-        ambientLightColorR: 0,
-        ambientLightColorG: 0,
-        ambientLightColorB: 0,
-        isLightingLayer: false,
-        followBaseLayerCamera: false,
-      });
+      if (customObjectData.layers.length > 0) {
+        // Load layers
+        for (let i = 0, len = customObjectData.layers.length; i < len; ++i) {
+          this.addLayer(customObjectData.layers[i]);
+        }
+      } else {
+        // Add a default layer
+        this.addLayer({
+          name: '',
+          visibility: true,
+          cameras: [
+            {
+              defaultSize: true,
+              defaultViewport: true,
+              height: 0,
+              viewportBottom: 0,
+              viewportLeft: 0,
+              viewportRight: 0,
+              viewportTop: 0,
+              width: 0,
+            },
+          ],
+          effects: [],
+          ambientLightColorR: 0,
+          ambientLightColorG: 0,
+          ambientLightColorB: 0,
+          isLightingLayer: false,
+          followBaseLayerCamera: false,
+        });
+      }
+
+      this.createObjectsFrom(
+        customObjectData.instances,
+        0,
+        0,
+        0,
+        // TODO EBO: handle hot-reloading for custom objects (including nested custom objects)
+        true
+      );
 
       // Set up the default z order (for objects created from events)
       this._setLayerDefaultZOrders();

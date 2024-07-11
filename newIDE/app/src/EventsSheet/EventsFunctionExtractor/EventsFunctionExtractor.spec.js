@@ -46,8 +46,8 @@ describe('EventsFunctionExtractor', () => {
     setupFunctionFromEvents({
       project,
       scope: { project, layout: testLayout },
-      globalObjectsContainer: project,
-      objectsContainer: testLayout,
+      globalObjectsContainer: project.getObjects(),
+      objectsContainer: testLayout.getObjects(),
       serializedEvents,
       eventsFunction,
     });

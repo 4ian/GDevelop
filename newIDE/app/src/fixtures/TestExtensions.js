@@ -319,19 +319,12 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       objectContent,
       instance,
       propertyName,
-      newValue,
-      project,
-      layout
+      newValue
     ) {
       return false;
     };
     // $FlowExpectedError
-    fakeObject.getInitialInstanceProperties = function(
-      content,
-      instance,
-      project,
-      layout
-    ) {
+    fakeObject.getInitialInstanceProperties = function(content, instance) {
       var instanceProperties = new gd.MapStringPropertyDescriptor();
       return instanceProperties;
     };
@@ -446,9 +439,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       objectContent,
       instance,
       propertyName,
-      newValue,
-      project,
-      layout
+      newValue
     ) {
       if (propertyName === 'initialValue') {
         instance.setRawStringProperty('initialValue', newValue);

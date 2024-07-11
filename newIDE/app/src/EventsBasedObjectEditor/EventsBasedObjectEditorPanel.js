@@ -14,21 +14,23 @@ type TabName = 'configuration' | 'properties' | 'children';
 
 type Props = {|
   project: gdProject,
-  globalObjectsContainer: gdObjectsContainer,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsBasedObject: gdEventsBasedObject,
   onRenameProperty: (oldName: string, newName: string) => void,
   onEventsFunctionsAdded: () => void,
+  onOpenCustomObjectEditor: () => void,
   unsavedChanges?: ?UnsavedChanges,
 |};
 
 export default function EventsBasedObjectEditorPanel({
   project,
-  globalObjectsContainer,
+  projectScopedContainersAccessor,
   eventsFunctionsExtension,
   eventsBasedObject,
   onRenameProperty,
   onEventsFunctionsAdded,
+  onOpenCustomObjectEditor,
   unsavedChanges,
 }: Props) {
   const [currentTab, setCurrentTab] = React.useState<TabName>('configuration');
@@ -40,16 +42,6 @@ export default function EventsBasedObjectEditorPanel({
       }
     },
     [unsavedChanges]
-  );
-
-  const projectScopedContainersAccessor = React.useMemo(
-    () =>
-      new ProjectScopedContainersAccessor({
-        project,
-        eventsFunctionsExtension,
-        eventsBasedObject,
-      }),
-    [eventsBasedObject, eventsFunctionsExtension, project]
   );
 
   return (
@@ -81,6 +73,7 @@ export default function EventsBasedObjectEditorPanel({
           <EventsBasedObjectEditor
             eventsBasedObject={eventsBasedObject}
             unsavedChanges={unsavedChanges}
+            onOpenCustomObjectEditor={onOpenCustomObjectEditor}
           />
         )}
         {currentTab === 'properties' && (
@@ -96,7 +89,6 @@ export default function EventsBasedObjectEditorPanel({
         {currentTab === 'children' && (
           <EventBasedObjectChildrenEditor
             project={project}
-            globalObjectsContainer={globalObjectsContainer}
             eventsFunctionsExtension={eventsFunctionsExtension}
             eventsBasedObject={eventsBasedObject}
             projectScopedContainersAccessor={projectScopedContainersAccessor}

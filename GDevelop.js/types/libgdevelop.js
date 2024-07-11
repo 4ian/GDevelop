@@ -98,6 +98,7 @@ declare class libGDevelop {
   Effect: Class<gdEffect>;
   EffectsContainer: Class<gdEffectsContainer>;
   Layer: Class<gdLayer>;
+  LayersContainer: Class<gdLayersContainer>;
   PropertyDescriptor: Class<gdPropertyDescriptor>;
   MeasurementUnit: Class<gdMeasurementUnit>;
   MeasurementBaseUnit: Class<gdMeasurementBaseUnit>;
@@ -171,6 +172,7 @@ declare class libGDevelop {
   ResourceExposer: Class<gdResourceExposer>;
   VariablesChangeset: Class<gdVariablesChangeset>;
   WholeProjectRefactorer: Class<gdWholeProjectRefactorer>;
+  EventsBasedObjectDependencyFinder: Class<gdEventsBasedObjectDependencyFinder>;
   PropertyFunctionGenerator: Class<gdPropertyFunctionGenerator>;
   UsedExtensionsResult: Class<gdUsedExtensionsResult>;
   UsedExtensionsFinder: Class<gdUsedExtensionsFinder>;

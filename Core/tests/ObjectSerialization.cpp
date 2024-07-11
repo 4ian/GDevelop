@@ -43,8 +43,8 @@ gd::Object &SetupProjectWithSprite(gd::Project &project,
   SetupProjectWithDummyPlatform(project, platform);
 
   gd::Layout &layout = project.InsertNewLayout("Scene", 0);
-  gd::Object &object =
-      layout.InsertNewObject(project, "MyExtension::Sprite", "MyObject", 0);
+  gd::Object &object = layout.GetObjects().InsertNewObject(
+      project, "MyExtension::Sprite", "MyObject", 0);
   SetupSpriteConfiguration(object.GetConfiguration());
 
   return object;
@@ -98,7 +98,7 @@ void CheckSpriteConfiguration(gd::Object &object) {
 
 void CheckSpriteConfiguration(gd::Project &project) {
   auto &layout = project.GetLayout("Scene");
-  auto &object = layout.GetObject("MyObject");
+  auto &object = layout.GetObjects().GetObject("MyObject");
   CheckSpriteConfiguration(object);
 };
 
@@ -112,11 +112,11 @@ gd::Object &SetupProjectWithCustomObject(gd::Project &project,
       "MyEventsBasedObject", 0);
   eventsBasedObject.SetFullName("My events based object");
   eventsBasedObject.SetDescription("An events based object for test");
-  eventsBasedObject.InsertNewObject(project, "MyExtension::Sprite", "MyChild",
-                                    0);
+  eventsBasedObject.GetObjects().InsertNewObject(
+      project, "MyExtension::Sprite", "MyChild", 0);
 
   gd::Layout &layout = project.InsertNewLayout("Scene", 0);
-  gd::Object &object = layout.InsertNewObject(
+  gd::Object &object = layout.GetObjects().InsertNewObject(
       project, "MyEventsExtension::MyEventsBasedObject", "MyObject", 0);
   auto &configuration = object.GetConfiguration();
   auto *customObjectConfiguration =
@@ -167,7 +167,7 @@ void CheckCustomObjectConfiguration(gd::Object &object) {
 
 void CheckCustomObjectConfiguration(gd::Project &project) {
   auto &layout = project.GetLayout("Scene");
-  auto &object = layout.GetObject("MyObject");
+  auto &object = layout.GetObjects().GetObject("MyObject");
   CheckCustomObjectConfiguration(object);
 };
 } // namespace
@@ -232,7 +232,7 @@ TEST_CASE("ObjectSerialization", "[common]") {
     SetupProjectWithDummyPlatform(project, platform);
 
     gd::Layout &layout = project.InsertNewLayout("Scene", 0);
-    gd::Object &object = layout.InsertNewObject(
+    gd::Object &object = layout.GetObjects().InsertNewObject(
         project, "MyExtension::FakeObjectWithDefaultBehavior", "MyObject", 0);
     REQUIRE(object.HasBehaviorNamed("Effect"));
 

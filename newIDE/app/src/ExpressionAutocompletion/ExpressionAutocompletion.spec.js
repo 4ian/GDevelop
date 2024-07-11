@@ -20,12 +20,9 @@ const makeTestContext = () => {
   testLayout.insertNewLayer('Background', 0);
   testLayout.insertNewLayer('Foreground', 0);
 
-  const object = testLayout.insertNewObject(
-    project,
-    'Sprite',
-    'MySpriteObject',
-    0
-  );
+  const object = testLayout
+    .getObjects()
+    .insertNewObject(project, 'Sprite', 'MySpriteObject', 0);
   const spriteConfiguration = gd.asSpriteConfiguration(
     object.getConfiguration()
   );
@@ -40,12 +37,9 @@ const makeTestContext = () => {
   animation.setDirection(direction, 0);
   spriteConfiguration.getAnimations().addAnimation(animation);
 
-  const spriteObjectWithBehaviors = testLayout.insertNewObject(
-    project,
-    'Sprite',
-    'MySpriteObjectWithBehaviors',
-    0
-  );
+  const spriteObjectWithBehaviors = testLayout
+    .getObjects()
+    .insertNewObject(project, 'Sprite', 'MySpriteObjectWithBehaviors', 0);
   spriteObjectWithBehaviors.addNewBehavior(
     project,
     'PlatformBehavior::PlatformerObjectBehavior',

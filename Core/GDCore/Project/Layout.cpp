@@ -33,7 +33,6 @@ using namespace std;
 
 namespace gd {
 
-gd::Layer Layout::badLayer;
 gd::BehaviorsSharedData Layout::badBehaviorSharedData("", "");
 
 Layout::Layout(const Layout& other) { Init(other); }
@@ -53,12 +52,8 @@ Layout::Layout()
       stopSoundsOnStartup(true),
       standardSortMethod(true),
       disableInputWhenNotFocused(true),
-      profiler(NULL),
       variables(gd::VariablesContainer::SourceType::Scene)
 {
-  gd::Layer layer;
-  layer.SetCameraCount(1);
-  initialLayers.push_back(layer);
 }
 
 void Layout::SetName(const gd::String& name_) {
@@ -100,91 +95,47 @@ Layout::GetAllBehaviorSharedData() const {
 }
 
 gd::Layer& Layout::GetLayer(const gd::String& name) {
-  std::vector<gd::Layer>::iterator layer =
-      find_if(initialLayers.begin(),
-              initialLayers.end(),
-              bind2nd(gd::LayerHasName(), name));
-
-  if (layer != initialLayers.end()) return *layer;
-
-  return badLayer;
+  return layers.GetLayer(name);
 }
 
 const gd::Layer& Layout::GetLayer(const gd::String& name) const {
-  std::vector<gd::Layer>::const_iterator layer =
-      find_if(initialLayers.begin(),
-              initialLayers.end(),
-              bind2nd(gd::LayerHasName(), name));
-
-  if (layer != initialLayers.end()) return *layer;
-
-  return badLayer;
+  return layers.GetLayer(name);
 }
 
-gd::Layer& Layout::GetLayer(std::size_t index) { return initialLayers[index]; }
+gd::Layer& Layout::GetLayer(std::size_t index) { return layers.GetLayer(index); }
 
 const gd::Layer& Layout::GetLayer(std::size_t index) const {
-  return initialLayers[index];
+  return layers.GetLayer(index);
 }
 
-std::size_t Layout::GetLayersCount() const { return initialLayers.size(); }
+std::size_t Layout::GetLayersCount() const { return layers.GetLayersCount(); }
 
-#if defined(GD_IDE_ONLY)
 bool Layout::HasLayerNamed(const gd::String& name) const {
-  return (find_if(initialLayers.begin(),
-                  initialLayers.end(),
-                  bind2nd(gd::LayerHasName(), name)) != initialLayers.end());
+  return layers.HasLayerNamed(name);
 }
 std::size_t Layout::GetLayerPosition(const gd::String& name) const {
-  for (std::size_t i = 0; i < initialLayers.size(); ++i) {
-    if (initialLayers[i].GetName() == name) return i;
-  }
-  return gd::String::npos;
+  return layers.GetLayerPosition(name);
 }
 
 void Layout::InsertNewLayer(const gd::String& name, std::size_t position) {
-  gd::Layer newLayer;
-  newLayer.SetName(name);
-  if (position < initialLayers.size())
-    initialLayers.insert(initialLayers.begin() + position, newLayer);
-  else
-    initialLayers.push_back(newLayer);
+  layers.InsertNewLayer(name, position);
 }
 
 void Layout::InsertLayer(const gd::Layer& layer, std::size_t position) {
-  if (position < initialLayers.size())
-    initialLayers.insert(initialLayers.begin() + position, layer);
-  else
-    initialLayers.push_back(layer);
+  layers.InsertLayer(layer, position);
 }
 
 void Layout::RemoveLayer(const gd::String& name) {
-  std::vector<gd::Layer>::iterator layer =
-      find_if(initialLayers.begin(),
-              initialLayers.end(),
-              bind2nd(gd::LayerHasName(), name));
-  if (layer == initialLayers.end()) return;
-
-  initialLayers.erase(layer);
+  layers.RemoveLayer(name);
 }
 
 void Layout::SwapLayers(std::size_t firstLayerIndex,
                         std::size_t secondLayerIndex) {
-  if (firstLayerIndex >= initialLayers.size() ||
-      secondLayerIndex >= initialLayers.size())
-    return;
-
-  std::iter_swap(initialLayers.begin() + firstLayerIndex,
-                 initialLayers.begin() + secondLayerIndex);
+  layers.SwapLayers(firstLayerIndex, secondLayerIndex);
 }
 
 void Layout::MoveLayer(std::size_t oldIndex, std::size_t newIndex) {
-  if (oldIndex >= initialLayers.size() || newIndex >= initialLayers.size())
-    return;
-
-  auto layer = initialLayers[oldIndex];
-  initialLayers.erase(initialLayers.begin() + oldIndex);
-  InsertLayer(layer, newIndex);
+  layers.MoveLayer(oldIndex, newIndex);
 }
 
 void Layout::UpdateBehaviorsSharedData(gd::Project& project) {
@@ -192,22 +143,23 @@ void Layout::UpdateBehaviorsSharedData(gd::Project& project) {
   std::vector<gd::String> allBehaviorsNames;
 
   // Search in objects for the type and the name of every behaviors.
-  for (std::size_t i = 0; i < initialObjects.size(); ++i) {
+  for (std::size_t i = 0; i < objectsContainer.GetObjectsCount(); ++i) {
     std::vector<gd::String> objectBehaviors =
-        initialObjects[i]->GetAllBehaviorNames();
+        objectsContainer.GetObject(i).GetAllBehaviorNames();
     for (unsigned int j = 0; j < objectBehaviors.size(); ++j) {
       auto& behavior =
-          initialObjects[i]->GetBehavior(objectBehaviors[j]);
+          objectsContainer.GetObject(i).GetBehavior(objectBehaviors[j]);
       allBehaviorsTypes.push_back(behavior.GetTypeName());
       allBehaviorsNames.push_back(behavior.GetName());
     }
   }
-  for (std::size_t i = 0; i < project.GetObjectsCount(); ++i) {
+  auto &globalObjects = project.GetObjects();
+  for (std::size_t i = 0; i < globalObjects.GetObjectsCount(); ++i) {
     std::vector<gd::String> objectBehaviors =
-        project.GetObject(i).GetAllBehaviorNames();
+        globalObjects.GetObject(i).GetAllBehaviorNames();
     for (std::size_t j = 0; j < objectBehaviors.size(); ++j) {
       auto& behavior =
-          project.GetObject(i).GetBehavior(objectBehaviors[j]);
+          globalObjects.GetObject(i).GetBehavior(objectBehaviors[j]);
       allBehaviorsTypes.push_back(behavior.GetTypeName());
       allBehaviorsNames.push_back(behavior.GetName());
     }
@@ -291,15 +243,15 @@ void Layout::SerializeTo(SerializerElement& element) const {
 
   editorSettings.SerializeTo(element.AddChild("uiSettings"));
 
-  GetObjectGroups().SerializeTo(element.AddChild("objectsGroups"));
+  objectsContainer.GetObjectGroups().SerializeTo(element.AddChild("objectsGroups"));
   GetVariables().SerializeTo(element.AddChild("variables"));
   GetInitialInstances().SerializeTo(element.AddChild("instances"));
-  SerializeObjectsTo(element.AddChild("objects"));
-  SerializeFoldersTo(element.AddChild("objectsFolderStructure"));
+  objectsContainer.SerializeObjectsTo(element.AddChild("objects"));
+  objectsContainer.SerializeFoldersTo(element.AddChild("objectsFolderStructure"));
   gd::EventsListSerialization::SerializeEventsTo(events,
                                                  element.AddChild("events"));
 
-  SerializeLayersTo(element.AddChild("layers"));
+  layers.SerializeLayersTo(element.AddChild("layers"));
 
   SerializerElement& behaviorDatasElement =
       element.AddChild("behaviorsSharedData");
@@ -314,23 +266,6 @@ void Layout::SerializeTo(SerializerElement& element) const {
     dataElement.RemoveChild("name");
     dataElement.SetAttribute("type", it.second->GetTypeName());
     dataElement.SetAttribute("name", it.second->GetName());
-  }
-}
-
-void Layout::SerializeLayersTo(SerializerElement& element) const {
-  element.ConsiderAsArrayOf("layer");
-  for (std::size_t j = 0; j < GetLayersCount(); ++j)
-    GetLayer(j).SerializeTo(element.AddChild("layer"));
-}
-#endif
-
-void Layout::UnserializeLayersFrom(const SerializerElement& element) {
-  initialLayers.clear();
-  element.ConsiderAsArrayOf("layer", "Layer");
-  for (std::size_t i = 0; i < element.GetChildrenCount(); ++i) {
-    gd::Layer layer;
-    layer.UnserializeFrom(element.GetChild(i));
-    initialLayers.push_back(layer);
   }
 }
 
@@ -349,22 +284,22 @@ void Layout::UnserializeFrom(gd::Project& project,
   editorSettings.UnserializeFrom(
       element.GetChild("uiSettings", 0, "UISettings"));
 
-  GetObjectGroups().UnserializeFrom(
+  objectsContainer.GetObjectGroups().UnserializeFrom(
       element.GetChild("objectsGroups", 0, "GroupesObjets"));
   gd::EventsListSerialization::UnserializeEventsFrom(
       project, GetEvents(), element.GetChild("events", 0, "Events"));
 
-  UnserializeObjectsFrom(project, element.GetChild("objects", 0, "Objets"));
+  objectsContainer.UnserializeObjectsFrom(project, element.GetChild("objects", 0, "Objets"));
   if (element.HasChild("objectsFolderStructure")) {
-    UnserializeFoldersFrom(project, element.GetChild("objectsFolderStructure", 0));
+    objectsContainer.UnserializeFoldersFrom(project, element.GetChild("objectsFolderStructure", 0));
   }
-  AddMissingObjectsInRootFolder();
+  objectsContainer.AddMissingObjectsInRootFolder();
 
   initialInstances.UnserializeFrom(
       element.GetChild("instances", 0, "Positions"));
   variables.UnserializeFrom(element.GetChild("variables", 0, "Variables"));
 
-  UnserializeLayersFrom(element.GetChild("layers", 0, "Layers"));
+  layers.UnserializeLayersFrom(element.GetChild("layers", 0, "Layers"));
 
   // Compatibility with GD <= 4
   gd::String deprecatedTag1 = "automatismsSharedData";
@@ -416,10 +351,10 @@ void Layout::Init(const Layout& other) {
   stopSoundsOnStartup = other.stopSoundsOnStartup;
   disableInputWhenNotFocused = other.disableInputWhenNotFocused;
   initialInstances = other.initialInstances;
-  initialLayers = other.initialLayers;
+  layers = other.layers;
   variables = other.GetVariables();
 
-  initialObjects = gd::Clone(other.initialObjects);
+  objectsContainer = other.objectsContainer;
 
   behaviorsSharedData.clear();
   for (const auto& it : other.behaviorsSharedData) {
@@ -429,9 +364,6 @@ void Layout::Init(const Layout& other) {
 
   events = other.events;
   editorSettings = other.editorSettings;
-  objectGroups = other.objectGroups;
-
-  profiler = other.profiler;
 }
 
 std::vector<gd::String> GetHiddenLayers(const Layout& layout) {

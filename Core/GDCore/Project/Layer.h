@@ -294,17 +294,6 @@ class GD_CORE_API Layer {
   static gd::Camera badCamera;
 };
 
-/**
- * \brief Functor testing layer name
- *
- * \see gd::Layer
- */
-struct LayerHasName : public std::binary_function<gd::Layer, gd::String, bool> {
-  bool operator()(const Layer& layer, const gd::String& name) const {
-    return layer.GetName() == name;
-  }
-};
-
 }  // namespace gd
 
 #endif  // GDCORE_LAYER_H

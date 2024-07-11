@@ -19,7 +19,9 @@ export const enumerateAssetStoreIds = (
   objectsContainer: ?gdObjectsContainer
 ): Set<string> => {
   // Add asset store ids of global objects.
-  let allAssetStoreIds = enumerateObjectsContainerAssetStoreIds(project);
+  let allAssetStoreIds = enumerateObjectsContainerAssetStoreIds(
+    project.getObjects()
+  );
 
   if (objectsContainer) {
     // Add either the asset store ids of the specified objects container (i.e: a single scene)...
@@ -37,7 +39,7 @@ export const enumerateAssetStoreIds = (
 
       allAssetStoreIds = new Set([
         ...allAssetStoreIds,
-        ...enumerateObjectsContainerAssetStoreIds(scene),
+        ...enumerateObjectsContainerAssetStoreIds(scene.getObjects()),
       ]);
     });
   }

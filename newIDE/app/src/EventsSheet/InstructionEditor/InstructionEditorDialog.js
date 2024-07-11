@@ -132,7 +132,11 @@ const InstructionEditorDialog = ({
   const hasObjectChosen =
     !!chosenObjectInstructionsInfo && !!chosenObjectInstructionsInfoTree;
   const chosenObject = chosenObjectName
-    ? getObjectByName(project, scope.layout, chosenObjectName)
+    ? getObjectByName(
+        project.getObjects(),
+        scope.layout ? scope.layout.getObjects() : null,
+        chosenObjectName
+      )
     : null;
   const freeInstructionComponentRef = React.useRef<?InstructionOrObjectSelector>(
     null

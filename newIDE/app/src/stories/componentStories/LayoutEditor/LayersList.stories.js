@@ -32,7 +32,8 @@ export const Default = () => {
         }}
         onLayerRenamed={action('onLayerRenamed')}
         onCreateLayer={action('onCreateLayer')}
-        layersContainer={testProject.testLayout}
+        layout={testProject.testLayout}
+        layersContainer={testProject.testLayout.getLayers()}
         hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
       />
     </DragAndDropContextProvider>
@@ -56,7 +57,8 @@ export const SmallWidthAndHeight = () => {
           }}
           onLayerRenamed={action('onLayerRenamed')}
           onCreateLayer={action('onCreateLayer')}
-          layersContainer={testProject.testLayout}
+          layout={testProject.testLayout}
+          layersContainer={testProject.testLayout.getLayers()}
           hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
         />
       </div>

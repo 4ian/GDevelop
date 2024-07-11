@@ -82,6 +82,10 @@ const MosaicEditorsDisplay = React.forwardRef<
   const {
     project,
     layout,
+    eventsBasedObject,
+    layersContainer,
+    globalObjectsContainer,
+    objectsContainer,
     projectScopedContainersAccessor,
     initialInstances,
     selectedLayer,
@@ -194,6 +198,7 @@ const MosaicEditorsDisplay = React.forwardRef<
         getViewPosition: editor ? editor.getViewPosition : noop,
       },
       instancesHandlers: {
+        getContentAABB: editor ? editor.getContentAABB : () => null,
         getSelectionAABB: editor
           ? editor.selectedInstances.getSelectionAABB
           : () => new Rectangle(),
@@ -247,6 +252,9 @@ const MosaicEditorsDisplay = React.forwardRef<
               i18n={i18n}
               project={project}
               layout={layout}
+              objectsContainer={objectsContainer}
+              globalObjectsContainer={globalObjectsContainer}
+              layersContainer={layersContainer}
               projectScopedContainersAccessor={projectScopedContainersAccessor}
               instances={selectedInstances}
               editInstanceVariables={props.editInstanceVariables}
@@ -267,6 +275,7 @@ const MosaicEditorsDisplay = React.forwardRef<
       renderEditor: () => (
         <LayersList
           project={project}
+          layout={layout}
           selectedLayer={selectedLayer}
           onSelectLayer={props.onSelectLayer}
           onEditLayerEffects={props.editLayerEffects}
@@ -274,7 +283,7 @@ const MosaicEditorsDisplay = React.forwardRef<
           onRemoveLayer={props.onRemoveLayer}
           onLayerRenamed={props.onLayerRenamed}
           onCreateLayer={forceUpdateInstancesPropertiesEditor}
-          layersContainer={layout}
+          layersContainer={layersContainer}
           unsavedChanges={props.unsavedChanges}
           ref={layersListRef}
           hotReloadPreviewButtonProps={props.hotReloadPreviewButtonProps}
@@ -301,6 +310,10 @@ const MosaicEditorsDisplay = React.forwardRef<
         <FullSizeInstancesEditorWithScrollbars
           project={project}
           layout={layout}
+          eventsBasedObject={eventsBasedObject}
+          globalObjectsContainer={globalObjectsContainer}
+          objectsContainer={objectsContainer}
+          layersContainer={layersContainer}
           selectedLayer={selectedLayer}
           initialInstances={initialInstances}
           instancesEditorSettings={props.instancesEditorSettings}
@@ -339,8 +352,10 @@ const MosaicEditorsDisplay = React.forwardRef<
                 ObjectsRenderingService
               )}
               project={project}
-              objectsContainer={layout}
               layout={layout}
+              eventsBasedObject={eventsBasedObject}
+              globalObjectsContainer={globalObjectsContainer}
+              objectsContainer={objectsContainer}
               initialInstances={initialInstances}
               onSelectAllInstancesOfObjectInLayout={
                 props.onSelectAllInstancesOfObjectInLayout
@@ -386,8 +401,11 @@ const MosaicEditorsDisplay = React.forwardRef<
           {({ i18n }) => (
             <ObjectGroupsList
               ref={objectGroupsListRef}
-              globalObjectGroups={project.getObjectGroups()}
-              objectGroups={layout.getObjectGroups()}
+              globalObjectGroups={
+                globalObjectsContainer &&
+                globalObjectsContainer.getObjectGroups()
+              }
+              objectGroups={objectsContainer.getObjectGroups()}
               onEditGroup={props.onEditObjectGroup}
               onDeleteGroup={props.onDeleteObjectGroup}
               onRenameGroup={props.onRenameObjectGroup}

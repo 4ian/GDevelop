@@ -19,7 +19,8 @@ TEST_CASE("ExpressionParser2 - Naughty strings", "[common][events]") {
   gd::Platform platform;
   SetupProjectWithDummyPlatform(project, platform);
   auto &layout1 = project.InsertNewLayout("Layout1", 0);
-  layout1.InsertNewObject(project, "MyExtension::Sprite", "MySpriteObject", 0);
+  layout1.GetObjects().InsertNewObject(project, "MyExtension::Sprite",
+                                                "MySpriteObject", 0);
 
   gd::ExpressionParser2 parser;
 

@@ -236,14 +236,20 @@ describe('libGD.js - GDJS related tests', function () {
       const evt = layout
         .getEvents()
         .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
-      layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
-      layout.insertNewObject(project, 'TextObject::Text', 'MyTextObject', 0);
-      layout.insertNewObject(
-        project,
-        'FakeObjectWithUnsupportedCapability::FakeObjectWithUnsupportedCapability',
-        'MyFakeObjectWithUnsupportedCapability',
-        0
-      );
+      layout
+        .getObjects()
+        .insertNewObject(project, 'Sprite', 'MyObject', 0);
+      layout
+        .getObjects()
+        .insertNewObject(project, 'TextObject::Text', 'MyTextObject', 0);
+      layout
+        .getObjects()
+        .insertNewObject(
+          project,
+          'FakeObjectWithUnsupportedCapability::FakeObjectWithUnsupportedCapability',
+          'MyFakeObjectWithUnsupportedCapability',
+          0
+        );
 
       // Valid action (to check code generation is done).
       const action = new gd.Instruction();
@@ -327,15 +333,22 @@ describe('libGD.js - GDJS related tests', function () {
       const evt = layout
         .getEvents()
         .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
-      layout.insertNewObject(project, 'Sprite', 'MySprite', 0);
-      const obj = layout.insertNewObject(
-        project,
-        'FakeObjectWithUnsupportedCapability::FakeObjectWithUnsupportedCapability',
-        'MyFakeObjectWithUnsupportedCapability',
-        0
-      );
+      layout
+        .getObjects()
+        .insertNewObject(project, 'Sprite', 'MySprite', 0);
+      const obj = layout
+        .getObjects()
+        .insertNewObject(
+          project,
+          'FakeObjectWithUnsupportedCapability::FakeObjectWithUnsupportedCapability',
+          'MyFakeObjectWithUnsupportedCapability',
+          0
+        );
 
-      const group = layout.getObjectGroups().insertNew('MyGroup', 0);
+      const group = layout
+        .getObjects()
+        .getObjectGroups()
+        .insertNew('MyGroup', 0);
       group.addObject('MySprite');
       group.addObject('MyFakeObjectWithUnsupportedCapability');
 

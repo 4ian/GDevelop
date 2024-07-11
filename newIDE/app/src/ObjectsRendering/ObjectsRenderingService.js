@@ -75,7 +75,6 @@ const ObjectsRenderingService = {
   },
   createNewInstanceRenderer: function(
     project: gdProject,
-    layout: gdLayout,
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,
@@ -85,7 +84,6 @@ const ObjectsRenderingService = {
     if (threeGroup && this.renderers3D.hasOwnProperty(objectType)) {
       return new this.renderers3D[objectType](
         project,
-        layout,
         instance,
         associatedObjectConfiguration,
         pixiContainer,
@@ -95,7 +93,6 @@ const ObjectsRenderingService = {
     } else if (this.renderers.hasOwnProperty(objectType))
       return new this.renderers[objectType](
         project,
-        layout,
         instance,
         associatedObjectConfiguration,
         pixiContainer,
@@ -107,11 +104,10 @@ const ObjectsRenderingService = {
         if (
           eventsBasedObject.isRenderedIn3D() &&
           eventsBasedObject.isAnimatable() &&
-          eventsBasedObject.getObjectsCount() === 0
+          eventsBasedObject.getObjects().getObjectsCount() === 0
         ) {
           return new RenderedSprite3DInstance(
             project,
-            layout,
             instance,
             associatedObjectConfiguration,
             pixiContainer,
@@ -121,7 +117,6 @@ const ObjectsRenderingService = {
         } else {
           return new RenderedCustomObjectInstance(
             project,
-            layout,
             instance,
             associatedObjectConfiguration,
             pixiContainer,
@@ -136,7 +131,6 @@ const ObjectsRenderingService = {
       );
       return new this.renderers['unknownObjectType'](
         project,
-        layout,
         instance,
         associatedObjectConfiguration,
         pixiContainer,

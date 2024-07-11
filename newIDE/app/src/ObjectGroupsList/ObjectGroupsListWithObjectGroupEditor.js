@@ -7,9 +7,9 @@ import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 
 type Props = {|
   project: gdProject,
-  globalObjectsContainer: gdObjectsContainer,
+  globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
-  globalObjectGroups: gdObjectGroupsContainer,
+  globalObjectGroups: gdObjectGroupsContainer | null,
   objectGroups: gdObjectGroupsContainer,
   getValidatedObjectOrGroupName: (newName: string, global: boolean) => string,
   onDeleteGroup: (
@@ -72,7 +72,11 @@ export default class ObjectGroupsListWithObjectGroupEditor extends React.Compone
         {this.state.editedGroup && (
           <ObjectGroupEditorDialog
             project={project}
-            key={globalObjectsContainer.ptr + ';' + objectsContainer.ptr}
+            key={
+              (globalObjectsContainer ? globalObjectsContainer.ptr : '') +
+              ';' +
+              objectsContainer.ptr
+            }
             group={this.state.editedGroup}
             globalObjectsContainer={globalObjectsContainer}
             objectsContainer={objectsContainer}

@@ -250,7 +250,7 @@ void ProjectBrowserHelper::ExposeProjectObjects(
     gd::Project &project, gd::ArbitraryObjectsWorker &worker) {
 
   // Global objects
-  worker.Launch(project);
+  worker.Launch(project.GetObjects());
 
   // Layout objects
   for (size_t i = 0; i < project.GetLayoutsCount(); i++) {
@@ -265,7 +265,7 @@ void ProjectBrowserHelper::ExposeProjectObjects(
     for (auto &&eventsBasedObjectUniquePtr :
          eventsFunctionsExtension.GetEventsBasedObjects().GetInternalVector()) {
       auto eventsBasedObject = eventsBasedObjectUniquePtr.get();
-      worker.Launch(*eventsBasedObject);
+      worker.Launch(eventsBasedObject->GetObjects());
     }
   }
 };
@@ -275,7 +275,7 @@ void ProjectBrowserHelper::ExposeLayoutObjects(gd::Layout &layout,
   // In the future, layouts may have children object containers.
 
   // Layout objects
-  worker.Launch(layout);
+  worker.Launch(layout.GetObjects());
 }
 
 void ProjectBrowserHelper::ExposeProjectFunctions(

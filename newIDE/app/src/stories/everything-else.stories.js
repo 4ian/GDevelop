@@ -2592,6 +2592,7 @@ storiesOf('BehaviorTypeSelector', module)
   .add('default, for a base object', () => (
     <BehaviorTypeSelector
       project={testProject.project}
+      eventsFunctionsExtension={null}
       value={''}
       onChange={action('change')}
       objectType=""
@@ -2600,6 +2601,7 @@ storiesOf('BehaviorTypeSelector', module)
   .add('with a non existing behavior selected, for a base object', () => (
     <BehaviorTypeSelector
       project={testProject.project}
+      eventsFunctionsExtension={null}
       value={'MyCustomExtension::BehaviorThatIsNotYetLoaded'}
       onChange={action('change')}
       objectType=""
@@ -2608,6 +2610,7 @@ storiesOf('BehaviorTypeSelector', module)
   .add('default, for a text object', () => (
     <BehaviorTypeSelector
       project={testProject.project}
+      eventsFunctionsExtension={null}
       value={''}
       onChange={action('change')}
       objectType="TextObject::Text"

@@ -1197,6 +1197,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                         selectedEventsBasedEntity.getEventsFunctions()) ||
                       eventsFunctionsExtension
                     }
+                    eventsFunctionsExtension={eventsFunctionsExtension}
                     objectsContainer={this._objectsContainer}
                     onConfigurationUpdated={this._onConfigurationUpdated}
                     helpPagePath={

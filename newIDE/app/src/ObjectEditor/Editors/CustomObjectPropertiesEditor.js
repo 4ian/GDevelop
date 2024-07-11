@@ -54,6 +54,8 @@ const CustomObjectPropertiesEditor = (props: Props) => {
     objectConfiguration,
     project,
     layout,
+    eventsFunctionsExtension,
+    eventsBasedObject,
     object,
     objectName,
     resourceManagementProps,
@@ -262,6 +264,10 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                                       }
                                       project={project}
                                       layout={layout}
+                                      eventsFunctionsExtension={
+                                        eventsFunctionsExtension
+                                      }
+                                      eventsBasedObject={eventsBasedObject}
                                       resourceManagementProps={
                                         resourceManagementProps
                                       }
@@ -290,6 +296,8 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                         animations={animations}
                         project={project}
                         layout={layout}
+                        eventsFunctionsExtension={eventsFunctionsExtension}
+                        eventsBasedObject={eventsBasedObject}
                         object={object}
                         objectName={objectName}
                         resourceManagementProps={resourceManagementProps}
@@ -392,11 +400,22 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                 project={project}
                 onPointsUpdated={onObjectUpdated}
                 onRenamedPoint={(oldName, newName) => {
-                  // TODO EBO Refactor event-based object events when a point is renamed.
-                  if (layout && object) {
-                    gd.WholeProjectRefactorer.renameObjectPoint(
+                  if (!object) {
+                    return;
+                  }
+                  if (layout) {
+                    gd.WholeProjectRefactorer.renameObjectPointInScene(
                       project,
                       layout,
+                      object,
+                      oldName,
+                      newName
+                    );
+                  } else if (eventsFunctionsExtension && eventsBasedObject) {
+                    gd.WholeProjectRefactorer.renameObjectPointInEventsBasedObject(
+                      project,
+                      eventsFunctionsExtension,
+                      eventsBasedObject,
                       object,
                       oldName,
                       newName

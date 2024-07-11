@@ -25,12 +25,15 @@ import { Spacer } from '../UI/Grid';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
+
 const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
   resourceManagementProps: ResourceManagementProps,
-  layout: ?gdLayout,
+  layout: gdLayout | null,
+  eventsFunctionsExtension: gdEventsFunctionsExtension | null,
+  eventsBasedObject: gdEventsBasedObject | null,
   layer: gdLayer,
   initialInstances: gdInitialInstancesContainer,
 
@@ -42,14 +45,18 @@ type Props = {|
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
 |};
 
-const LayerEditorDialog = (props: Props) => {
-  const {
-    initialTab,
-    layer,
-    initialInstances,
-    onClose,
-    hotReloadPreviewButtonProps,
-  } = props;
+const LayerEditorDialog = ({
+  initialTab,
+  project,
+  layout,
+  eventsFunctionsExtension,
+  eventsBasedObject,
+  layer,
+  initialInstances,
+  onClose,
+  hotReloadPreviewButtonProps,
+  resourceManagementProps,
+}: Props) => {
   const forceUpdate = useForceUpdate();
   const {
     onCancelChanges,
@@ -235,7 +242,7 @@ const LayerEditorDialog = (props: Props) => {
               There are {instancesCount} instances of objects on this layer.
             </Trans>
           </Text>
-          {!props.project.getUseDeprecatedZeroAsDefaultZOrder() && (
+          {!project.getUseDeprecatedZeroAsDefaultZOrder() && (
             <Text>
               <Trans>
                 Objects created using events on this layer will be given a "Z
@@ -415,20 +422,27 @@ const LayerEditorDialog = (props: Props) => {
         <EffectsList
           target="layer"
           layerRenderingType={layer.getRenderingType()}
-          project={props.project}
-          resourceManagementProps={props.resourceManagementProps}
+          project={project}
+          resourceManagementProps={resourceManagementProps}
           effectsContainer={layer.getEffects()}
           onEffectsRenamed={(oldName, newName) => {
-            if (props.layout) {
-              gd.WholeProjectRefactorer.renameLayerEffect(
-                props.project,
-                props.layout,
-                props.layer,
+            if (layout) {
+              gd.WholeProjectRefactorer.renameLayerEffectInScene(
+                project,
+                layout,
+                layer,
                 oldName,
                 newName
               );
-            } else {
-              // TODO EBO: refactoring for custom objects.
+            } else if (eventsFunctionsExtension && eventsBasedObject) {
+              gd.WholeProjectRefactorer.renameLayerEffectInEventsBasedObject(
+                project,
+                eventsFunctionsExtension,
+                eventsBasedObject,
+                layer,
+                oldName,
+                newName
+              );
             }
           }}
           onEffectsUpdated={() => {

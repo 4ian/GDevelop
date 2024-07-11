@@ -21,9 +21,10 @@ type Props = {|
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   objectsContainer: gdObjectsContainer,
   eventsFunction: gdEventsFunction,
-  eventsBasedBehavior: ?gdEventsBasedBehavior,
-  eventsBasedObject: ?gdEventsBasedObject,
+  eventsBasedBehavior: gdEventsBasedBehavior | null,
+  eventsBasedObject: gdEventsBasedObject | null,
   eventsFunctionsContainer: gdEventsFunctionsContainer,
+  eventsFunctionsExtension: gdEventsFunctionsExtension,
   onParametersOrGroupsUpdated: () => void,
   helpPagePath?: string,
   onConfigurationUpdated?: (?ExtensionItemConfigurationAttribute) => void,
@@ -147,6 +148,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
       onMoveObjectEventsParameter,
       getFunctionGroupNames,
       eventsFunctionsContainer,
+      eventsFunctionsExtension,
     } = this.props;
 
     return (
@@ -182,6 +184,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                 eventsBasedBehavior={eventsBasedBehavior}
                 eventsBasedObject={eventsBasedObject}
                 eventsFunctionsContainer={eventsFunctionsContainer}
+                eventsFunctionsExtension={eventsFunctionsExtension}
                 helpPagePath={helpPagePath}
                 onConfigurationUpdated={onConfigurationUpdated}
                 renderConfigurationHeader={renderConfigurationHeader}
@@ -200,6 +203,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                 eventsBasedBehavior={eventsBasedBehavior}
                 eventsBasedObject={eventsBasedObject}
                 eventsFunctionsContainer={eventsFunctionsContainer}
+                eventsFunctionsExtension={eventsFunctionsExtension}
                 onParametersUpdated={onParametersOrGroupsUpdated}
                 helpPagePath={helpPagePath}
                 freezeParameters={freezeParameters}

@@ -1228,7 +1228,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       layout1.GetObjects().InsertNewObject(
           project, "MyExtension::Sprite", "Object2", 0);
 
-      gd::WholeProjectRefactorer::ObjectRemovedInLayout(project, layout1,
+      gd::WholeProjectRefactorer::ObjectRemovedInScene(project, layout1,
                                                         "Object1");
       gd::WholeProjectRefactorer::GlobalObjectRemoved(project, "GlobalObject1");
       REQUIRE(layout1.GetObjects().GetObjectGroups()[0].Find(
@@ -1262,7 +1262,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       layout1.GetInitialInstances().InsertInitialInstance(instance2);
       layout1.GetInitialInstances().InsertInitialInstance(instance3);
 
-      gd::WholeProjectRefactorer::ObjectRemovedInLayout(
+      gd::WholeProjectRefactorer::ObjectRemovedInScene(
           project, layout1, "Object1");
       gd::WholeProjectRefactorer::GlobalObjectRemoved(
           project, "GlobalObject1");
@@ -1306,7 +1306,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       externalLayout2.GetInitialInstances().InsertInitialInstance(instance2);
       externalLayout2.GetInitialInstances().InsertInitialInstance(instance3);
 
-      gd::WholeProjectRefactorer::ObjectRemovedInLayout(
+      gd::WholeProjectRefactorer::ObjectRemovedInScene(
           project, layout1, "Object1");
       gd::WholeProjectRefactorer::GlobalObjectRemoved(
           project, "GlobalObject1");
@@ -1344,7 +1344,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       layout1.GetObjects().InsertNewObject(
           project, "MyExtension::Sprite", "Object2", 0);
 
-      gd::WholeProjectRefactorer::ObjectOrGroupRenamedInLayout(
+      gd::WholeProjectRefactorer::ObjectOrGroupRenamedInScene(
           project, layout1, "Object1", "Object3", /* isObjectGroup =*/false);
       gd::WholeProjectRefactorer::GlobalObjectOrGroupRenamed(
           project, "GlobalObject1", "GlobalObject3", /* isObjectGroup =*/false);
@@ -1381,7 +1381,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       layout1.GetInitialInstances().InsertInitialInstance(instance2);
       layout1.GetInitialInstances().InsertInitialInstance(instance3);
 
-      gd::WholeProjectRefactorer::ObjectOrGroupRenamedInLayout(
+      gd::WholeProjectRefactorer::ObjectOrGroupRenamedInScene(
           project, layout1, "Object1", "Object3", /* isObjectGroup =*/false);
       gd::WholeProjectRefactorer::GlobalObjectOrGroupRenamed(
           project, "GlobalObject1", "GlobalObject3", /* isObjectGroup =*/false);
@@ -1427,7 +1427,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       externalLayout2.GetInitialInstances().InsertInitialInstance(instance2);
       externalLayout2.GetInitialInstances().InsertInitialInstance(instance3);
 
-      gd::WholeProjectRefactorer::ObjectOrGroupRenamedInLayout(
+      gd::WholeProjectRefactorer::ObjectOrGroupRenamedInScene(
           project, layout1, "Object1", "Object3", /* isObjectGroup =*/false);
       gd::WholeProjectRefactorer::GlobalObjectOrGroupRenamed(
           project, "GlobalObject1", "GlobalObject3", /* isObjectGroup =*/false);
@@ -1462,7 +1462,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       auto &layout = project.GetLayout("Scene");
 
       // Trigger the refactoring after the renaming of an object
-      gd::WholeProjectRefactorer::ObjectOrGroupRenamedInLayout(
+      gd::WholeProjectRefactorer::ObjectOrGroupRenamedInScene(
           project, layout, "ObjectWithMyBehavior",
           "RenamedObjectWithMyBehavior",
           /* isObjectGroup=*/false);
@@ -1490,7 +1490,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       auto &layout = project.GetLayout("Scene");
 
       // Trigger the refactoring after the renaming of a group
-      gd::WholeProjectRefactorer::ObjectOrGroupRenamedInLayout(
+      gd::WholeProjectRefactorer::ObjectOrGroupRenamedInScene(
           project, layout, "GroupWithMyBehavior", "RenamedGroupWithMyBehavior",
           /* isObjectGroup=*/true);
 
@@ -1534,7 +1534,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
 
     // Attach the behavior to the object.
     object.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
-    gd::WholeProjectRefactorer::BehaviorsAddedToObjectInLayout(project, scene,
+    gd::WholeProjectRefactorer::BehaviorsAddedToObjectInScene(project, scene,
                                                                "Object");
 
     // The behavior parameter is now filled.
@@ -3616,7 +3616,7 @@ TEST_CASE("RenameLayer", "[common]") {
     auto &otherExternalExpression = CreateExpressionWithLayerParameter(
         project, otherExternalEvents.GetEvents(), "My layer");
 
-    gd::WholeProjectRefactorer::RenameLayer(project, layout, "My layer",
+    gd::WholeProjectRefactorer::RenameLayerInScene(project, layout, "My layer",
                                             "My renamed layer");
 
     REQUIRE(layoutAction.GetParameter(3).GetPlainString() ==
@@ -3654,7 +3654,7 @@ TEST_CASE("RenameLayer", "[common]") {
     auto &layoutExpression =
         CreateExpressionWithLayerParameter(project, layout.GetEvents(), "My layer");
 
-    gd::WholeProjectRefactorer::RenameLayer(project, layout, "My layer",
+    gd::WholeProjectRefactorer::RenameLayerInScene(project, layout, "My layer",
                                             "layerA");
 
     REQUIRE(layoutExpression.GetParameter(0).GetPlainString() ==
@@ -3713,7 +3713,7 @@ TEST_CASE("RenameLayer", "[common]") {
     REQUIRE(otherInitialInstance1.GetLayer() == "My layer");
     REQUIRE(otherExternalInitialInstance1.GetLayer() == "My layer");
 
-    gd::WholeProjectRefactorer::RenameLayer(project, layout, "My layer", "My new layer");
+    gd::WholeProjectRefactorer::RenameLayerInScene(project, layout, "My layer", "My new layer");
 
     // Instances on the renamed layer are moved to the new layer.
     REQUIRE(initialInstance1.GetLayer() == "My new layer");
@@ -3738,7 +3738,7 @@ TEST_CASE("RenameLayer", "[common]") {
     auto &layoutAction =
         CreateActionWithEmptyLayerParameter(project, layout.GetEvents());
 
-    gd::WholeProjectRefactorer::RenameLayer(project, layout, "My layer",
+    gd::WholeProjectRefactorer::RenameLayerInScene(project, layout, "My layer",
                                             "layerA");
 
     REQUIRE(layoutAction.GetParameter(0).GetPlainString() == "");
@@ -3754,7 +3754,7 @@ TEST_CASE("RenameLayer", "[common]") {
     auto &layoutExpression =
         CreateExpressionWithLayerParameter(project, layout.GetEvents(), "My layer");
 
-    gd::WholeProjectRefactorer::RenameLayer(project, layout, "My layer",
+    gd::WholeProjectRefactorer::RenameLayerInScene(project, layout, "My layer",
                                             "");
 
     REQUIRE(layoutExpression.GetParameter(0).GetPlainString() ==
@@ -3772,7 +3772,7 @@ TEST_CASE("RenameLayer", "[common]") {
     auto &layoutExpression =
         CreateExpressionWithLayerParameter(project, layout.GetEvents(), "");
 
-    gd::WholeProjectRefactorer::RenameLayer(project, layout, "", "My layer");
+    gd::WholeProjectRefactorer::RenameLayerInScene(project, layout, "", "My layer");
 
     REQUIRE(layoutExpression.GetParameter(0).GetPlainString() ==
             "MyExtension::CameraCenterX(\"\") + "
@@ -3855,7 +3855,7 @@ TEST_CASE("RenameObjectAnimation", "[common]") {
     auto &wrongObjectExpression =
         CreateExpressionWithAnimationParameter(project, layout.GetEvents(), "MySprite2");
 
-    gd::WholeProjectRefactorer::RenameObjectAnimation(project, layout, object, "My animation",
+    gd::WholeProjectRefactorer::RenameObjectAnimationInScene(project, layout, object, "My animation",
                                             "My renamed animation");
 
     REQUIRE(layoutAction.GetParameter(1).GetPlainString() ==
@@ -3966,7 +3966,7 @@ TEST_CASE("RenameLayerEffect", "[common]") {
     auto &wrongLayerExpression =
         CreateExpressionWithLayerEffectParameter(project, layout.GetEvents(), "My layer 2");
 
-    gd::WholeProjectRefactorer::RenameLayerEffect(project, layout, layer, "My effect",
+    gd::WholeProjectRefactorer::RenameLayerEffectInScene(project, layout, layer, "My effect",
                                             "My renamed effect");
 
     REQUIRE(layoutAction.GetParameter(2).GetPlainString() ==

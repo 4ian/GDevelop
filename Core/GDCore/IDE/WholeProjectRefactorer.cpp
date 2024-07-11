@@ -1518,7 +1518,7 @@ void WholeProjectRefactorer::DoRenameObject(
   projectBrowser.ExposeFunctions(project, objectParameterRenamer);
 }
 
-void WholeProjectRefactorer::ObjectRemovedInLayout(
+void WholeProjectRefactorer::ObjectRemovedInScene(
     gd::Project &project, gd::Layout &layout, const gd::String &objectName) {
   auto projectScopedContainers = gd::ProjectScopedContainers::
       MakeNewProjectScopedContainersForProjectAndLayout(project, layout);
@@ -1540,7 +1540,7 @@ void WholeProjectRefactorer::ObjectRemovedInLayout(
   }
 }
 
-void WholeProjectRefactorer::BehaviorsAddedToObjectInLayout(
+void WholeProjectRefactorer::BehaviorsAddedToObjectInScene(
     gd::Project &project, gd::Layout &layout, const gd::String &objectName) {
   auto projectScopedContainers = gd::ProjectScopedContainers::
       MakeNewProjectScopedContainersForProjectAndLayout(project, layout);
@@ -1550,7 +1550,7 @@ void WholeProjectRefactorer::BehaviorsAddedToObjectInLayout(
       project, layout, behaviorParameterFiller);
 }
 
-void WholeProjectRefactorer::ObjectOrGroupRenamedInLayout(
+void WholeProjectRefactorer::ObjectOrGroupRenamedInScene(
     gd::Project &project, gd::Layout &layout, const gd::String &oldName,
     const gd::String &newName, bool isObjectGroup) {
   if (oldName == newName || newName.empty() || oldName.empty())
@@ -1641,81 +1641,150 @@ void WholeProjectRefactorer::RenameExternalEvents(gd::Project &project,
                                                 linkEventTargetRenamer);
 }
 
-void WholeProjectRefactorer::RenameLayer(gd::Project &project,
-                                         gd::Layout &layout,
-                                         const gd::String &oldName,
-                                         const gd::String &newName) {
+void WholeProjectRefactorer::RenameLayerInScene(gd::Project &project,
+                                                gd::Layout &scene,
+                                                const gd::String &oldName,
+                                                const gd::String &newName) {
   if (oldName == newName || newName.empty() || oldName.empty())
     return;
 
   gd::ProjectElementRenamer projectElementRenamer(project.GetCurrentPlatform(),
                                                   "layer", oldName, newName);
   gd::ProjectBrowserHelper::ExposeLayoutEventsAndExternalEvents(
-      project, layout, projectElementRenamer);
-  layout.GetInitialInstances().MoveInstancesToLayer(oldName, newName);
+      project, scene, projectElementRenamer);
+  scene.GetInitialInstances().MoveInstancesToLayer(oldName, newName);
 
   std::vector<gd::String> externalLayoutsNames =
-      GetAssociatedExternalLayouts(project, layout);
+      GetAssociatedExternalLayouts(project, scene);
   for (gd::String name : externalLayoutsNames) {
     auto &externalLayout = project.GetExternalLayout(name);
     externalLayout.GetInitialInstances().MoveInstancesToLayer(oldName, newName);
   }
 }
 
-void WholeProjectRefactorer::RenameLayerEffect(gd::Project &project,
-                                               gd::Layout &layout,
-                                               gd::Layer &layer,
-                                               const gd::String &oldName,
-                                               const gd::String &newName) {
+void WholeProjectRefactorer::RenameLayerInEventsBasedObject(
+    gd::Project &project,
+    gd::EventsFunctionsExtension &eventsFunctionsExtension,
+    gd::EventsBasedObject &eventsBasedObject, const gd::String &oldName,
+    const gd::String &newName) {
+  if (oldName == newName || newName.empty() || oldName.empty())
+    return;
+
+  gd::ProjectElementRenamer projectElementRenamer(project.GetCurrentPlatform(),
+                                                  "layer", oldName, newName);
+  gd::ProjectBrowserHelper::ExposeEventsBasedObjectEvents(
+      project, eventsFunctionsExtension, eventsBasedObject,
+      projectElementRenamer);
+  eventsBasedObject.GetInitialInstances().MoveInstancesToLayer(oldName,
+                                                               newName);
+}
+
+void WholeProjectRefactorer::RenameLayerEffectInScene(
+    gd::Project &project, gd::Layout &scene, gd::Layer &layer,
+    const gd::String &oldName, const gd::String &newName) {
   if (oldName == newName || newName.empty() || oldName.empty())
     return;
   gd::ProjectElementRenamer projectElementRenamer(
       project.GetCurrentPlatform(), "layerEffectName", oldName, newName);
   projectElementRenamer.SetLayerConstraint(layer.GetName());
   gd::ProjectBrowserHelper::ExposeLayoutEventsAndExternalEvents(
-      project, layout, projectElementRenamer);
+      project, scene, projectElementRenamer);
 }
 
-void WholeProjectRefactorer::RenameObjectAnimation(gd::Project &project,
-                                                   gd::Layout &layout,
-                                                   gd::Object &object,
-                                                   const gd::String &oldName,
-                                                   const gd::String &newName) {
+void WholeProjectRefactorer::RenameLayerEffectInEventsBasedObject(
+    gd::Project &project,
+    gd::EventsFunctionsExtension &eventsFunctionsExtension,
+    gd::EventsBasedObject &eventsBasedObject, gd::Layer &layer,
+    const gd::String &oldName, const gd::String &newName) {
+  if (oldName == newName || newName.empty() || oldName.empty())
+    return;
+  gd::ProjectElementRenamer projectElementRenamer(
+      project.GetCurrentPlatform(), "layerEffectName", oldName, newName);
+  projectElementRenamer.SetLayerConstraint(layer.GetName());
+  gd::ProjectBrowserHelper::ExposeEventsBasedObjectEvents(
+      project, eventsFunctionsExtension, eventsBasedObject,
+      projectElementRenamer);
+}
+
+void WholeProjectRefactorer::RenameObjectAnimationInScene(
+    gd::Project &project, gd::Layout &scene, gd::Object &object,
+    const gd::String &oldName, const gd::String &newName) {
   if (oldName == newName || newName.empty() || oldName.empty())
     return;
   gd::ProjectElementRenamer projectElementRenamer(
       project.GetCurrentPlatform(), "objectAnimationName", oldName, newName);
   projectElementRenamer.SetObjectConstraint(object.GetName());
   gd::ProjectBrowserHelper::ExposeLayoutEventsAndExternalEvents(
-      project, layout, projectElementRenamer);
+      project, scene, projectElementRenamer);
 }
 
-void WholeProjectRefactorer::RenameObjectPoint(gd::Project &project,
-                                               gd::Layout &layout,
-                                               gd::Object &object,
-                                               const gd::String &oldName,
-                                               const gd::String &newName) {
+void WholeProjectRefactorer::RenameObjectAnimationInEventsBasedObject(
+    gd::Project &project,
+    gd::EventsFunctionsExtension &eventsFunctionsExtension,
+    gd::EventsBasedObject &eventsBasedObject, gd::Object &object,
+    const gd::String &oldName, const gd::String &newName) {
+  if (oldName == newName || newName.empty() || oldName.empty())
+    return;
+  gd::ProjectElementRenamer projectElementRenamer(
+      project.GetCurrentPlatform(), "objectAnimationName", oldName, newName);
+  projectElementRenamer.SetObjectConstraint(object.GetName());
+  gd::ProjectBrowserHelper::ExposeEventsBasedObjectEvents(
+      project, eventsFunctionsExtension, eventsBasedObject,
+      projectElementRenamer);
+}
+
+void WholeProjectRefactorer::RenameObjectPointInScene(
+    gd::Project &project, gd::Layout &scene, gd::Object &object,
+    const gd::String &oldName, const gd::String &newName) {
   if (oldName == newName || newName.empty() || oldName.empty())
     return;
   gd::ProjectElementRenamer projectElementRenamer(
       project.GetCurrentPlatform(), "objectPointName", oldName, newName);
   projectElementRenamer.SetObjectConstraint(object.GetName());
   gd::ProjectBrowserHelper::ExposeLayoutEventsAndExternalEvents(
-      project, layout, projectElementRenamer);
+      project, scene, projectElementRenamer);
 }
 
-void WholeProjectRefactorer::RenameObjectEffect(gd::Project &project,
-                                                gd::Layout &layout,
-                                                gd::Object &object,
-                                                const gd::String &oldName,
-                                                const gd::String &newName) {
+void WholeProjectRefactorer::RenameObjectPointInEventsBasedObject(
+    gd::Project &project,
+    gd::EventsFunctionsExtension &eventsFunctionsExtension,
+    gd::EventsBasedObject &eventsBasedObject, gd::Object &object,
+    const gd::String &oldName, const gd::String &newName) {
+  if (oldName == newName || newName.empty() || oldName.empty())
+    return;
+  gd::ProjectElementRenamer projectElementRenamer(
+      project.GetCurrentPlatform(), "objectPointName", oldName, newName);
+  projectElementRenamer.SetObjectConstraint(object.GetName());
+  gd::ProjectBrowserHelper::ExposeEventsBasedObjectEvents(
+      project, eventsFunctionsExtension, eventsBasedObject,
+      projectElementRenamer);
+}
+
+void WholeProjectRefactorer::RenameObjectEffectInScene(
+    gd::Project &project, gd::Layout &scene, gd::Object &object,
+    const gd::String &oldName, const gd::String &newName) {
   if (oldName == newName || newName.empty() || oldName.empty())
     return;
   gd::ProjectElementRenamer projectElementRenamer(
       project.GetCurrentPlatform(), "objectEffectName", oldName, newName);
   projectElementRenamer.SetObjectConstraint(object.GetName());
   gd::ProjectBrowserHelper::ExposeLayoutEventsAndExternalEvents(
-      project, layout, projectElementRenamer);
+      project, scene, projectElementRenamer);
+}
+
+void WholeProjectRefactorer::RenameObjectEffectInEventsBasedObject(
+    gd::Project &project,
+    gd::EventsFunctionsExtension &eventsFunctionsExtension,
+    gd::EventsBasedObject &eventsBasedObject, gd::Object &object,
+    const gd::String &oldName, const gd::String &newName) {
+  if (oldName == newName || newName.empty() || oldName.empty())
+    return;
+  gd::ProjectElementRenamer projectElementRenamer(
+      project.GetCurrentPlatform(), "objectEffectName", oldName, newName);
+  projectElementRenamer.SetObjectConstraint(object.GetName());
+  gd::ProjectBrowserHelper::ExposeEventsBasedObjectEvents(
+      project, eventsFunctionsExtension, eventsBasedObject,
+      projectElementRenamer);
 }
 
 void WholeProjectRefactorer::ObjectRemovedInEventsBasedObject(
@@ -1805,7 +1874,7 @@ void WholeProjectRefactorer::GlobalObjectOrGroupRenamed(
     if (layout.GetObjects().HasObjectNamed(oldName))
       continue;
 
-    ObjectOrGroupRenamedInLayout(project, layout, oldName, newName,
+    ObjectOrGroupRenamedInScene(project, layout, oldName, newName,
                                  isObjectGroup);
   }
 }
@@ -1822,7 +1891,7 @@ void WholeProjectRefactorer::GlobalObjectRemoved(
     if (layout.GetObjects().HasObjectNamed(objectName))
       continue;
 
-    ObjectRemovedInLayout(project, layout, objectName);
+    ObjectRemovedInScene(project, layout, objectName);
   }
 }
 
@@ -1833,7 +1902,7 @@ void WholeProjectRefactorer::BehaviorsAddedToGlobalObject(
     if (layout.GetObjects().HasObjectNamed(objectName))
       continue;
 
-    BehaviorsAddedToObjectInLayout(project, layout, objectName);
+    BehaviorsAddedToObjectInScene(project, layout, objectName);
   }
 }
 

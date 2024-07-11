@@ -29,6 +29,8 @@ export const CustomObject = () => (
       getValidatedObjectOrGroupName={newName => newName}
       project={testProject.project}
       layout={testProject.testLayout}
+      eventsFunctionsExtension={null}
+      eventsBasedObject={null}
       resourceManagementProps={fakeResourceManagementProps}
       onComputeAllVariableNames={() => []}
       onUpdateBehaviorsSharedData={() => {}}
@@ -57,6 +59,8 @@ export const StandardObject = () => (
       getValidatedObjectOrGroupName={newName => newName}
       project={testProject.project}
       layout={testProject.testLayout}
+      eventsFunctionsExtension={null}
+      eventsBasedObject={null}
       resourceManagementProps={fakeResourceManagementProps}
       onComputeAllVariableNames={() => []}
       onUpdateBehaviorsSharedData={() => {}}

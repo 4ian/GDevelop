@@ -58,6 +58,8 @@ const SpineEditor = ({
   objectConfiguration,
   project,
   layout,
+  eventsFunctionsExtension,
+  eventsBasedObject,
   object,
   onSizeUpdated,
   onObjectUpdated,
@@ -283,15 +285,25 @@ const SpineEditor = ({
       }
 
       animation.setName(newName);
-      // TODO EBO Refactor event-based object events when an animation is renamed.
-      if (layout && object) {
-        gd.WholeProjectRefactorer.renameObjectAnimation(
-          project,
-          layout,
-          object,
-          currentName,
-          newName
-        );
+      if (object) {
+        if (layout) {
+          gd.WholeProjectRefactorer.renameObjectAnimationInScene(
+            project,
+            layout,
+            object,
+            currentName,
+            newName
+          );
+        } else if (eventsFunctionsExtension && eventsBasedObject) {
+          gd.WholeProjectRefactorer.renameObjectAnimationInEventsBasedObject(
+            project,
+            eventsFunctionsExtension,
+            eventsBasedObject,
+            object,
+            currentName,
+            newName
+          );
+        }
       }
       forceUpdate();
       if (onObjectUpdated) onObjectUpdated();
@@ -300,6 +312,8 @@ const SpineEditor = ({
       spineConfiguration,
       layout,
       object,
+      eventsFunctionsExtension,
+      eventsBasedObject,
       forceUpdate,
       onObjectUpdated,
       nameErrors,

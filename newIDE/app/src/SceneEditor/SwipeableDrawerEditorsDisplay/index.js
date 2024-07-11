@@ -58,6 +58,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
   const {
     project,
     layout,
+    eventsFunctionsExtension,
     eventsBasedObject,
     layersContainer,
     globalObjectsContainer,
@@ -408,6 +409,8 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                 <LayersList
                   project={project}
                   layout={layout}
+                  eventsFunctionsExtension={eventsFunctionsExtension}
+                  eventsBasedObject={eventsBasedObject}
                   selectedLayer={selectedLayer}
                   onSelectLayer={props.onSelectLayer}
                   onEditLayerEffects={props.editLayerEffects}

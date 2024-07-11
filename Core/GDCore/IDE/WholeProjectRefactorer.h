@@ -68,7 +68,7 @@ struct VariablesChangeset : VariablesRenamingChangesetNode {
  * \brief Tool functions to do refactoring on the whole project after
  * changes like deletion or renaming of an object.
  *
- * \TODO Ideally ObjectOrGroupRenamedInLayout, ObjectRemovedInLayout,
+ * \TODO Ideally ObjectOrGroupRenamedInScene, ObjectRemovedInScene,
  * GlobalObjectOrGroupRenamed, GlobalObjectRemoved would be implemented
  * using ExposeProjectEvents.
  */
@@ -339,40 +339,91 @@ class GD_CORE_API WholeProjectRefactorer {
   static void RenameExternalEvents(gd::Project &project,
                                    const gd::String &oldName,
                                    const gd::String &newName);
+
   /**
    * \brief Refactor the project after a layer is renamed.
    */
-  static void RenameLayer(gd::Project &project, gd::Layout &layout,
-                          const gd::String &oldName, const gd::String &newName);
+  static void RenameLayerInScene(gd::Project &project, gd::Layout &scene,
+                                 const gd::String &oldName,
+                                 const gd::String &newName);
+
+  /**
+   * \brief Refactor the project after a layer is renamed.
+   */
+  static void RenameLayerInEventsBasedObject(
+      gd::Project &project,
+      gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      gd::EventsBasedObject &eventsBasedObject, const gd::String &oldName,
+      const gd::String &newName);
 
   /**
    * \brief Refactor the project after a layer effect is renamed.
    */
-  static void RenameLayerEffect(gd::Project &project, gd::Layout &layout,
-                                gd::Layer &layer, const gd::String &oldName,
-                                const gd::String &newName);
+  static void RenameLayerEffectInScene(gd::Project &project, gd::Layout &scene,
+                                       gd::Layer &layer,
+                                       const gd::String &oldName,
+                                       const gd::String &newName);
+
+  /**
+   * \brief Refactor the project after a layer effect is renamed.
+   */
+  static void RenameLayerEffectInEventsBasedObject(
+      gd::Project &project,
+      gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      gd::EventsBasedObject &eventsBasedObject, gd::Layer &layer,
+      const gd::String &oldName, const gd::String &newName);
 
   /**
    * \brief Refactor the project after an object animation is renamed.
    */
-  static void RenameObjectAnimation(gd::Project &project, gd::Layout &layout,
-                                    gd::Object &object,
-                                    const gd::String &oldName,
-                                    const gd::String &newName);
+  static void RenameObjectAnimationInScene(gd::Project &project,
+                                           gd::Layout &scene,
+                                           gd::Object &object,
+                                           const gd::String &oldName,
+                                           const gd::String &newName);
+
+  /**
+   * \brief Refactor the project after an object animation is renamed.
+   */
+  static void RenameObjectAnimationInEventsBasedObject(
+      gd::Project &project,
+      gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      gd::EventsBasedObject &eventsBasedObject, gd::Object &object,
+      const gd::String &oldName, const gd::String &newName);
 
   /**
    * \brief Refactor the project after an object point is renamed.
    */
-  static void RenameObjectPoint(gd::Project &project, gd::Layout &layout,
-                                gd::Object &object, const gd::String &oldName,
-                                const gd::String &newName);
+  static void RenameObjectPointInScene(gd::Project &project, gd::Layout &scene,
+                                       gd::Object &object,
+                                       const gd::String &oldName,
+                                       const gd::String &newName);
+
+  /**
+   * \brief Refactor the project after an object point is renamed.
+   */
+  static void RenameObjectPointInEventsBasedObject(
+      gd::Project &project,
+      gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      gd::EventsBasedObject &eventsBasedObject, gd::Object &object,
+      const gd::String &oldName, const gd::String &newName);
 
   /**
    * \brief Refactor the project after an object effect is renamed.
    */
-  static void RenameObjectEffect(gd::Project &project, gd::Layout &layout,
-                                 gd::Object &object, const gd::String &oldName,
-                                 const gd::String &newName);
+  static void RenameObjectEffectInScene(gd::Project &project, gd::Layout &scene,
+                                        gd::Object &object,
+                                        const gd::String &oldName,
+                                        const gd::String &newName);
+
+  /**
+   * \brief Refactor the project after an object effect is renamed.
+   */
+  static void RenameObjectEffectInEventsBasedObject(
+      gd::Project &project,
+      gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      gd::EventsBasedObject &eventsBasedObject, gd::Object &object,
+      const gd::String &oldName, const gd::String &newName);
 
   /**
    * \brief Refactor the project after an object is renamed in a layout
@@ -380,11 +431,11 @@ class GD_CORE_API WholeProjectRefactorer {
    * This will update the layout, all external layouts associated with it
    * and all external events associated with it.
    */
-  static void ObjectOrGroupRenamedInLayout(gd::Project& project,
-                                           gd::Layout& layout,
-                                           const gd::String& oldName,
-                                           const gd::String& newName,
-                                           bool isObjectGroup);
+  static void ObjectOrGroupRenamedInScene(gd::Project &project,
+                                          gd::Layout &scene,
+                                          const gd::String &oldName,
+                                          const gd::String &newName,
+                                          bool isObjectGroup);
 
   /**
    * \brief Refactor the project after an object is removed in a layout
@@ -392,9 +443,8 @@ class GD_CORE_API WholeProjectRefactorer {
    * This will update the layout, all external layouts associated with it
    * and all external events associated with it.
    */
-  static void ObjectRemovedInLayout(gd::Project& project,
-                                           gd::Layout& layout,
-                                           const gd::String& objectName);
+  static void ObjectRemovedInScene(gd::Project &project, gd::Layout &scene,
+                                   const gd::String &objectName);
 
   /**
    * \brief Refactor the project after behaviors are added to an object in a
@@ -404,9 +454,9 @@ class GD_CORE_API WholeProjectRefactorer {
    * The refactor is actually applied to all objects because it allow to handle
    * groups.
    */
-  static void BehaviorsAddedToObjectInLayout(gd::Project &project,
-                                             gd::Layout &layout,
-                                             const gd::String &objectName);
+  static void BehaviorsAddedToObjectInScene(gd::Project &project,
+                                            gd::Layout &layout,
+                                            const gd::String &objectName);
 
   /**
    * \brief Refactor the project after an object is removed in an events-based

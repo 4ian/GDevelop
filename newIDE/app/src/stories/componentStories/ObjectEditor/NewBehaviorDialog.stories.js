@@ -48,6 +48,7 @@ export const DefaultForSpriteObject = () => (
     <NewBehaviorDialog
       open
       project={testProject.project}
+      eventsFunctionsExtension={null}
       objectType={'Sprite'}
       onClose={action('on close')}
       onChoose={action('on choose')}
@@ -77,6 +78,7 @@ export const WithCommunityExtensions = () => {
           <NewBehaviorDialog
             open
             project={testProject.project}
+            eventsFunctionsExtension={null}
             objectType={'Sprite'}
             onClose={action('on close')}
             onChoose={action('on choose')}
@@ -98,6 +100,7 @@ export const WithServerSideErrors = () => (
       <NewBehaviorDialog
         open
         project={testProject.project}
+        eventsFunctionsExtension={null}
         objectType={'Sprite'}
         onClose={action('on close')}
         onChoose={action('on choose')}

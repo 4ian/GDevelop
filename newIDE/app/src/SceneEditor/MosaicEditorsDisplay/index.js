@@ -82,6 +82,7 @@ const MosaicEditorsDisplay = React.forwardRef<
   const {
     project,
     layout,
+    eventsFunctionsExtension,
     eventsBasedObject,
     layersContainer,
     globalObjectsContainer,
@@ -276,6 +277,8 @@ const MosaicEditorsDisplay = React.forwardRef<
         <LayersList
           project={project}
           layout={layout}
+          eventsFunctionsExtension={eventsFunctionsExtension}
+          eventsBasedObject={eventsBasedObject}
           selectedLayer={selectedLayer}
           onSelectLayer={props.onSelectLayer}
           onEditLayerEffects={props.editLayerEffects}

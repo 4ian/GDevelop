@@ -14,6 +14,7 @@ import useForceUpdate from '../../Utils/UseForceUpdate';
 
 type Props = {|
   project: gdProject,
+  eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   valueTypeMetadata: gdValueTypeMetadata,
   onTypeUpdated: () => void,
   disabled?: boolean,
@@ -44,6 +45,7 @@ const getIdentifierName = (scopedIdentifier: string) =>
 
 export default function ValueTypeEditor({
   project,
+  eventsFunctionsExtension,
   valueTypeMetadata,
   disabled,
   isTypeSelectorShown,
@@ -191,6 +193,7 @@ export default function ValueTypeEditor({
             {valueTypeMetadata.isBehavior() && (
               <BehaviorTypeSelector
                 project={project}
+                eventsFunctionsExtension={eventsFunctionsExtension}
                 objectType={getLastObjectParameterObjectType()}
                 value={valueTypeMetadata.getExtraInfo()}
                 onChange={(value: string) => {

@@ -313,6 +313,7 @@ namespace gdjs {
       const rowIndex = Math.floor(
         (y - this.getY()) / (this._tileSize * this.getScaleY())
       );
+      // TODO: Take rotation into account.
       return this._renderer.getTileId(columnIndex, rowIndex, 0);
     }
 
@@ -323,6 +324,8 @@ namespace gdjs {
       const rowIndex = Math.floor(
         (y - this.getY()) / (this._tileSize * this.getScaleY())
       );
+      // TODO: Take rotation into account.
+      // TODO: Use return values of method to reposition the object.
       this._renderer.setTileId(columnIndex, rowIndex, 0, tileId);
       this._isTileMapDirty = true;
     }
@@ -334,6 +337,8 @@ namespace gdjs {
       const rowIndex = Math.floor(
         (y - this.getY()) / (this._tileSize * this.getScaleY())
       );
+      // TODO: Take rotation into account.
+      // TODO: Use return values of method to reposition the object.
       this._renderer.removeTile(columnIndex, rowIndex, 0);
       this._isTileMapDirty = true;
     }

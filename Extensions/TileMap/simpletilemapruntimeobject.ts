@@ -325,7 +325,8 @@ namespace gdjs {
         (y - this.getY()) / (this._tileSize * this.getScaleY())
       );
       // TODO: Take rotation into account.
-      // TODO: Use return values of method to reposition the object.
+      // TODO: Use return values of method to reposition the object and change dimensions.
+      //       OR do not allow to set tile outside of tilemap.
       this._renderer.setTileId(columnIndex, rowIndex, 0, tileId);
       this._isTileMapDirty = true;
     }
@@ -338,7 +339,8 @@ namespace gdjs {
         (y - this.getY()) / (this._tileSize * this.getScaleY())
       );
       // TODO: Take rotation into account.
-      // TODO: Use return values of method to reposition the object.
+      // TODO: Use return values of method to reposition the object and change dimensions.
+      //       OR do not allow to set tile outside of tilemap.
       this._renderer.removeTile(columnIndex, rowIndex, 0);
       this._isTileMapDirty = true;
     }

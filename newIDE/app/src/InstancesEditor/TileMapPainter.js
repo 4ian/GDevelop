@@ -1,17 +1,21 @@
 // @flow
 
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 import { Column, Line } from '../UI/Grid';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import ResourcesLoader from '../ResourcesLoader';
-import Text from '../UI/Text';
-import Checkbox from '../UI/Checkbox';
+import Erase from '../UI/CustomSvgIcons/Erase';
+import Brush from '../UI/CustomSvgIcons/Brush';
+import IconButton from '../UI/IconButton';
+import { LineStackLayout } from '../UI/Layout';
+import FlipHorizontal from '../UI/CustomSvgIcons/FlipHorizontal';
+import FlipVertical from '../UI/CustomSvgIcons/FlipVertical';
 
 const styles = {
   tileContainer: { flex: 1, position: 'relative', display: 'flex' },
   atlasImage: { flex: 1, imageRendering: 'pixelated' },
+  icon: { fontSize: 18 },
 };
 
 const useStylesForTile = (highlighted: boolean) =>
@@ -93,6 +97,8 @@ type TileMapCoordinates = {| x: number, y: number |};
 export type TileMapTileSelection =
   | {|
       single: TileMapCoordinates,
+      flipHorizontally: boolean,
+      flipVertically: boolean,
     |}
   | {|
       erase: boolean,
@@ -112,6 +118,18 @@ const TileMapPainter = ({
   onSelectTileMapTile,
 }: Props) => {
   const atlasResource = getAtlasResource({ project, object });
+  const [
+    shouldFlipVertically,
+    setShouldFlipVertically,
+  ] = React.useState<boolean>(false);
+  const [
+    shouldFlipHorizontally,
+    setShouldFlipHorizontally,
+  ] = React.useState<boolean>(false);
+  const [
+    lastSelectedTile,
+    setLastSelectedTile,
+  ] = React.useState<?TileMapCoordinates>(null);
   const tileContainerRef = React.useRef<?HTMLDivElement>(null);
   const { columnCount, rowCount } = React.useMemo(() => getTileset(object), [
     object,
@@ -155,7 +173,11 @@ const TileMapPainter = ({
       ) {
         onSelectTileMapTile(null);
       } else {
-        onSelectTileMapTile({ single: { x, y } });
+        onSelectTileMapTile({
+          single: { x, y },
+          flipHorizontally: shouldFlipHorizontally,
+          flipVertically: shouldFlipVertically,
+        });
       }
     },
     [
@@ -164,6 +186,8 @@ const TileMapPainter = ({
       rowCount,
       tileMapTileSelection,
       onSelectTileMapTile,
+      shouldFlipHorizontally,
+      shouldFlipVertically,
     ]
   );
 
@@ -172,6 +196,18 @@ const TileMapPainter = ({
       return () => onSelectTileMapTile(null);
     },
     [onSelectTileMapTile]
+  );
+
+  React.useEffect(
+    () => {
+      if (tileMapTileSelection && tileMapTileSelection.single) {
+        setLastSelectedTile({
+          x: tileMapTileSelection.single.x,
+          y: tileMapTileSelection.single.y,
+        });
+      }
+    },
+    [tileMapTileSelection]
   );
 
   const onHoverAtlas = React.useCallback(
@@ -198,19 +234,69 @@ const TileMapPainter = ({
 
   return (
     <Column noMargin>
-      <Line alignItems="center">
-        <Text>
-          <Trans>Erase</Trans>
-        </Text>
-        <Checkbox
+      <LineStackLayout alignItems="center">
+        <IconButton
+          size="small"
           // TODO: Change tileMapTileSelection to add a `kind` attribute to differentiate cases.
-          checked={!!tileMapTileSelection && !!tileMapTileSelection.erase}
-          onCheck={(e, checked) => {
-            if (checked) onSelectTileMapTile({ erase: true });
-            else onSelectTileMapTile(null);
+          selected={!!tileMapTileSelection && !!tileMapTileSelection.erase}
+          onClick={e => {
+            if (!!tileMapTileSelection && !!tileMapTileSelection.erase)
+              onSelectTileMapTile(null);
+            else onSelectTileMapTile({ erase: true });
           }}
-        />
-      </Line>
+        >
+          <Erase style={styles.icon} />
+        </IconButton>
+        <IconButton
+          size="small"
+          // TODO: Change tileMapTileSelection to add a `kind` attribute to differentiate cases.
+          selected={!!tileMapTileSelection && !!tileMapTileSelection.single}
+          onClick={e => {
+            if (!!tileMapTileSelection && !!tileMapTileSelection.single)
+              onSelectTileMapTile(null);
+            else
+              onSelectTileMapTile({
+                single: lastSelectedTile || { x: 0, y: 0 },
+                flipHorizontally: shouldFlipHorizontally,
+                flipVertically: shouldFlipVertically,
+              });
+          }}
+        >
+          <Brush style={styles.icon} />
+        </IconButton>
+        <IconButton
+          size="small"
+          selected={shouldFlipHorizontally}
+          onClick={e => {
+            const newShouldFlipHorizontally = !shouldFlipHorizontally;
+            setShouldFlipHorizontally(newShouldFlipHorizontally);
+            if (!!tileMapTileSelection && !!tileMapTileSelection.single) {
+              onSelectTileMapTile({
+                ...tileMapTileSelection,
+                flipHorizontally: newShouldFlipHorizontally,
+              });
+            }
+          }}
+        >
+          <FlipHorizontal style={styles.icon} />
+        </IconButton>
+        <IconButton
+          size="small"
+          selected={shouldFlipVertically}
+          onClick={e => {
+            const newShouldFlipVertically = !shouldFlipVertically;
+            setShouldFlipVertically(newShouldFlipVertically);
+            if (!!tileMapTileSelection && !!tileMapTileSelection.single) {
+              onSelectTileMapTile({
+                ...tileMapTileSelection,
+                flipVertically: newShouldFlipVertically,
+              });
+            }
+          }}
+        >
+          <FlipVertical style={styles.icon} />
+        </IconButton>
+      </LineStackLayout>
       <Line justifyContent="stretch">
         {atlasResource && (
           <div

@@ -165,7 +165,7 @@ namespace gdjs {
       if (!tileMap) return;
       const layer = tileMap.getTileLayer(layerIndex);
       if (!layer) return;
-      layer.setTile(x, y, tileId);
+      return layer.setTile(x, y, tileId);
     }
 
     /**
@@ -178,7 +178,17 @@ namespace gdjs {
       if (!tileMap) return;
       const layer = tileMap.getTileLayer(layerIndex);
       if (!layer) return;
-      layer.removeTile(x, y);
+      return layer.removeTile(x, y);
+    }
+    /**
+     * @param layerIndex The layer index.
+     */
+    trimEmptyColumnsAndRows(layerIndex: integer) {
+      const tileMap = this._tileMap;
+      if (!tileMap) return;
+      const layer = tileMap.getTileLayer(layerIndex);
+      if (!layer) return;
+      return layer.trimEmptyColumnsAndRow();
     }
 
     destroy(): void {

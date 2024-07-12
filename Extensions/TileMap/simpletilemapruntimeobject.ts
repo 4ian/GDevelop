@@ -39,6 +39,7 @@ namespace gdjs {
     _layerIndex = 0;
     _initialTileMapAsJsObject: object | null = null;
     _isTileMapDirty: boolean = false;
+    _sceneToTileMapTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
 
     constructor(instanceContainer: gdjs.RuntimeInstanceContainer, objectData) {
       super(instanceContainer, objectData);
@@ -306,25 +307,57 @@ namespace gdjs {
       return this._renderer.getScaleY();
     }
 
+    updateTransformation() {
+      const absScaleX = Math.abs(this._renderer.getScaleX());
+      const absScaleY = Math.abs(this._renderer.getScaleY());
+
+      this._sceneToTileMapTransformation.setToIdentity();
+
+      // Translation
+      this._sceneToTileMapTransformation.translate(this.getX(), this.getY());
+
+      // Rotation
+      const angleInRadians = (this.getAngle() * Math.PI) / 180;
+      this._sceneToTileMapTransformation.rotateAround(
+        angleInRadians,
+        this.getCenterX(),
+        this.getCenterY()
+      );
+
+      // Scale
+      this._sceneToTileMapTransformation.scale(absScaleX, absScaleY);
+
+      this._sceneToTileMapTransformation.invert();
+    }
+
+    getGridCoordinatesFromSceneCoordinates(
+      x: number,
+      y: number
+    ): [number, number] {
+      this.updateTransformation();
+
+      const gridCoordinates: FloatPoint = [0, 0];
+      this._sceneToTileMapTransformation.transform([x, y], gridCoordinates);
+
+      const columnIndex = Math.floor(gridCoordinates[0] / this._tileSize);
+      const rowIndex = Math.floor(gridCoordinates[1] / this._tileSize);
+
+      return [columnIndex, rowIndex];
+    }
+
     getTileAt(x: number, y: number): integer {
-      const columnIndex = Math.floor(
-        (x - this.getX()) / (this._tileSize * this.getScaleX())
-      );
-      const rowIndex = Math.floor(
-        (y - this.getY()) / (this._tileSize * this.getScaleY())
-      );
-      // TODO: Take rotation into account.
+      const [
+        columnIndex,
+        rowIndex,
+      ] = this.getGridCoordinatesFromSceneCoordinates(x, y);
       return this._renderer.getTileId(columnIndex, rowIndex, 0);
     }
 
     setTileAt(tileId: number, x: number, y: number) {
-      const columnIndex = Math.floor(
-        (x - this.getX()) / (this._tileSize * this.getScaleX())
-      );
-      const rowIndex = Math.floor(
-        (y - this.getY()) / (this._tileSize * this.getScaleY())
-      );
-      // TODO: Take rotation into account.
+      const [
+        columnIndex,
+        rowIndex,
+      ] = this.getGridCoordinatesFromSceneCoordinates(x, y);
       // TODO: Use return values of method to reposition the object and change dimensions.
       //       OR do not allow to set tile outside of tilemap.
       this._renderer.setTileId(columnIndex, rowIndex, 0, tileId);
@@ -332,13 +365,10 @@ namespace gdjs {
     }
 
     removeTileAt(x: number, y: number) {
-      const columnIndex = Math.floor(
-        (x - this.getX()) / (this._tileSize * this.getScaleX())
-      );
-      const rowIndex = Math.floor(
-        (y - this.getY()) / (this._tileSize * this.getScaleY())
-      );
-      // TODO: Take rotation into account.
+      const [
+        columnIndex,
+        rowIndex,
+      ] = this.getGridCoordinatesFromSceneCoordinates(x, y);
       // TODO: Use return values of method to reposition the object and change dimensions.
       //       OR do not allow to set tile outside of tilemap.
       this._renderer.removeTile(columnIndex, rowIndex, 0);

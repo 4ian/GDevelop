@@ -35,9 +35,12 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
     // The list is not kept with a memo because layers could be changed by
     // another component without this one to know.
-    const layerNames = layout
-      ? mapFor(0, layout.getLayersCount(), i => {
-          const layer = layout.getLayerAt(i);
+
+    const layersSource = layout || eventsBasedObject;
+    const layersContainer = layersSource ? layersSource.getLayers() : null;
+    const layerNames = layersContainer
+      ? mapFor(0, layersContainer.getLayersCount(), i => {
+          const layer = layersContainer.getLayerAt(i);
           return layer.getName();
         })
       : [];

@@ -38,8 +38,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     // We don't memo/callback this, as we want to recompute it every time something changes.
     // Because of the function getPreviousParameterValue.
     const getEffectNames = () => {
-      if (!layout) return [];
-
+      const layersSource = layout || eventsBasedObject;
+      if (!layersSource) return [];
       const layerName =
         tryExtractStringLiteralContent(
           getPreviousParameterValue({
@@ -48,8 +48,9 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             parameterIndex,
           })
         ) || ''; // If no layer name is provided, this is the Base layer.
-      if (!layout.hasLayerNamed(layerName)) return [];
-      const layer = layout.getLayer(layerName);
+      const layersContainer = layersSource.getLayers();
+      if (!layersContainer.hasLayerNamed(layerName)) return [];
+      const layer = layersContainer.getLayer(layerName);
 
       return enumerateEffectNames(layer.getEffects()).sort();
     };

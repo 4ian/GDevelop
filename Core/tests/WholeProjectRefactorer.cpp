@@ -3584,7 +3584,7 @@ CreateExpressionWithLayerParameter(gd::Project &project,
 } // namespace
 
 TEST_CASE("RenameLayer", "[common]") {
-  SECTION("Can update layer names in events") {
+  SECTION("Can update layer names in scene events") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
@@ -3644,6 +3644,38 @@ TEST_CASE("RenameLayer", "[common]") {
             "MyExtension::CameraCenterX(\"My layer\")");
   }
 
+  SECTION("Can update layer names in event-based object events") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &eventsExtension =
+        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+    auto &eventsBasedObject = eventsExtension.GetEventsBasedObjects().InsertNew(
+        "MyEventsBasedObject", 0);
+    auto &eventsFunction =
+        eventsBasedObject.GetEventsFunctions().InsertNewEventsFunction(
+            "MyEventsFunction", 0);
+    gd::WholeProjectRefactorer::EnsureObjectEventsFunctionsProperParameters(
+        eventsExtension, eventsBasedObject);
+
+    auto &action =
+        CreateActionWithLayerParameter(project, eventsFunction.GetEvents());
+
+    auto &expression = CreateExpressionWithLayerParameter(
+        project, eventsFunction.GetEvents(), "My layer");
+
+    gd::WholeProjectRefactorer::RenameLayerInEventsBasedObject(
+        project, eventsExtension, eventsBasedObject, "My layer",
+        "My renamed layer");
+
+    REQUIRE(action.GetParameter(3).GetPlainString() == "\"My renamed layer\"");
+
+    REQUIRE(expression.GetParameter(0).GetPlainString() ==
+            "MyExtension::CameraCenterX(\"My renamed layer\") + "
+            "MyExtension::CameraCenterX(\"My renamed layer\")");
+  }
+
   SECTION("Can update layer names in expressions with a smaller name") {
     gd::Project project;
     gd::Platform platform;
@@ -3662,7 +3694,7 @@ TEST_CASE("RenameLayer", "[common]") {
             "MyExtension::CameraCenterX(\"layerA\")");
   }
 
-  SECTION("Renaming a layer also moves the instances on this layer and of the associated external layouts") {
+  SECTION("Renaming a layer also moves the instances on this layer in its scene and associated external layouts") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
@@ -3726,6 +3758,46 @@ TEST_CASE("RenameLayer", "[common]") {
     // Instances on the renamed layer of other layouts & external layouts are not moved.
     REQUIRE(otherInitialInstance1.GetLayer() == "My layer");
     REQUIRE(otherExternalInitialInstance1.GetLayer() == "My layer");
+  }
+
+  SECTION("Renaming a layer also moves the instances on this layer in its "
+          "event-based object") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &eventsExtension =
+        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+    auto &eventsBasedObject = eventsExtension.GetEventsBasedObjects().InsertNew(
+        "MyEventsBasedObject", 0);
+    auto &eventsFunction =
+        eventsBasedObject.GetEventsFunctions().InsertNewEventsFunction(
+            "MyEventsFunction", 0);
+    gd::WholeProjectRefactorer::EnsureObjectEventsFunctionsProperParameters(
+        eventsExtension, eventsBasedObject);
+
+    eventsBasedObject.GetLayers().InsertNewLayer("My layer", 0);
+
+    auto &initialInstances = eventsBasedObject.GetInitialInstances();
+    auto &initialInstance1 = initialInstances.InsertNewInitialInstance();
+    initialInstance1.SetLayer("My layer");
+    auto &initialInstance2 = initialInstances.InsertNewInitialInstance();
+    initialInstance2.SetLayer("My layer");
+    auto &initialInstance3 = initialInstances.InsertNewInitialInstance();
+    initialInstance3.SetLayer("");
+
+    REQUIRE(initialInstance1.GetLayer() == "My layer");
+    REQUIRE(initialInstance2.GetLayer() == "My layer");
+    REQUIRE(initialInstance3.GetLayer() == "");
+
+    gd::WholeProjectRefactorer::RenameLayerInEventsBasedObject(
+        project, eventsExtension, eventsBasedObject, "My layer",
+        "My new layer");
+
+    // Instances on the renamed layer are moved to the new layer.
+    REQUIRE(initialInstance1.GetLayer() == "My new layer");
+    REQUIRE(initialInstance2.GetLayer() == "My new layer");
+    REQUIRE(initialInstance3.GetLayer() == "");
   }
 
   SECTION("Can rename a layer when a layer parameter is empty") {
@@ -3813,7 +3885,7 @@ CreateExpressionWithAnimationParameter(gd::Project &project,
 } // namespace
 
 TEST_CASE("RenameObjectAnimation", "[common]") {
-  SECTION("Can update object animation names in event") {
+  SECTION("Can update object animation names in scene events") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
@@ -3887,6 +3959,53 @@ TEST_CASE("RenameObjectAnimation", "[common]") {
             "MySprite2.AnimationFrameCount(\"My animation\") + "
             "MySprite2.AnimationFrameCount(\"My animation\")");
   }
+
+  SECTION("Can update object animation names in events-based object events") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &eventsExtension =
+        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+    auto &eventsBasedObject = eventsExtension.GetEventsBasedObjects().InsertNew(
+        "MyEventsBasedObject", 0);
+    auto &eventsFunction =
+        eventsBasedObject.GetEventsFunctions().InsertNewEventsFunction(
+            "MyEventsFunction", 0);
+    gd::WholeProjectRefactorer::EnsureObjectEventsFunctionsProperParameters(
+        eventsExtension, eventsBasedObject);
+
+    auto &object = eventsBasedObject.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MySprite", 0);
+    eventsBasedObject.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MySprite2", 1);
+
+    auto &action = CreateActionWithAnimationParameter(
+        project, eventsFunction.GetEvents(), "MySprite");
+    auto &wrongObjectAction = CreateActionWithAnimationParameter(
+        project, eventsFunction.GetEvents(), "MySprite2");
+
+    auto &expression = CreateExpressionWithAnimationParameter(
+        project, eventsFunction.GetEvents(), "MySprite");
+    auto &wrongObjectExpression = CreateExpressionWithAnimationParameter(
+        project, eventsFunction.GetEvents(), "MySprite2");
+
+    gd::WholeProjectRefactorer::RenameObjectAnimationInEventsBasedObject(
+        project, eventsExtension, eventsBasedObject, object, "My animation",
+        "My renamed animation");
+
+    REQUIRE(action.GetParameter(1).GetPlainString() ==
+            "\"My renamed animation\"");
+    REQUIRE(wrongObjectAction.GetParameter(1).GetPlainString() ==
+            "\"My animation\"");
+
+    REQUIRE(expression.GetParameter(0).GetPlainString() ==
+            "MySprite.AnimationFrameCount(\"My renamed animation\") + "
+            "MySprite.AnimationFrameCount(\"My renamed animation\")");
+    REQUIRE(wrongObjectExpression.GetParameter(0).GetPlainString() ==
+            "MySprite2.AnimationFrameCount(\"My animation\") + "
+            "MySprite2.AnimationFrameCount(\"My animation\")");
+  }
 }
 
 namespace {
@@ -3922,7 +4041,7 @@ CreateExpressionWithLayerEffectParameter(gd::Project &project,
 } // namespace
 
 TEST_CASE("RenameLayerEffect", "[common]") {
-  SECTION("Can update layer effect names in event") {
+  SECTION("Can update layer effect names in scene events") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
@@ -3998,10 +4117,61 @@ TEST_CASE("RenameLayerEffect", "[common]") {
             "MyExtension::LayerEffectParameter(\"My layer 2\", \"My effect\") + "
             "MyExtension::LayerEffectParameter(\"My layer 2\", \"My effect\")");
   }
+
+  SECTION("Can update layer effect names in events-based object events") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &eventsExtension =
+        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+    auto &eventsBasedObject = eventsExtension.GetEventsBasedObjects().InsertNew(
+        "MyEventsBasedObject", 0);
+    auto &eventsFunction =
+        eventsBasedObject.GetEventsFunctions().InsertNewEventsFunction(
+            "MyEventsFunction", 0);
+    gd::WholeProjectRefactorer::EnsureObjectEventsFunctionsProperParameters(
+        eventsExtension, eventsBasedObject);
+
+    eventsBasedObject.GetLayers().InsertNewLayer("My layer", 0);
+    auto &layer = eventsBasedObject.GetLayers().GetLayer("My layer");
+    auto &object = eventsBasedObject.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MySprite", 0);
+    eventsBasedObject.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MySprite2", 1);
+
+    auto &action = CreateActionWithLayerEffectParameter(
+        project, eventsFunction.GetEvents(), "My layer");
+    auto &wrongLayerAction = CreateActionWithLayerEffectParameter(
+        project, eventsFunction.GetEvents(), "My layer 2");
+
+    auto &expression = CreateExpressionWithLayerEffectParameter(
+        project, eventsFunction.GetEvents(), "My layer");
+    auto &wrongLayerExpression = CreateExpressionWithLayerEffectParameter(
+        project, eventsFunction.GetEvents(), "My layer 2");
+
+    gd::WholeProjectRefactorer::RenameLayerEffectInEventsBasedObject(
+        project, eventsExtension, eventsBasedObject, layer, "My effect",
+        "My renamed effect");
+
+    REQUIRE(action.GetParameter(2).GetPlainString() == "\"My renamed effect\"");
+    REQUIRE(wrongLayerAction.GetParameter(2).GetPlainString() ==
+            "\"My effect\"");
+
+    REQUIRE(expression.GetParameter(0).GetPlainString() ==
+            "MyExtension::LayerEffectParameter(\"My layer\", \"My renamed "
+            "effect\") + "
+            "MyExtension::LayerEffectParameter(\"My layer\", \"My renamed "
+            "effect\")");
+    REQUIRE(
+        wrongLayerExpression.GetParameter(0).GetPlainString() ==
+        "MyExtension::LayerEffectParameter(\"My layer 2\", \"My effect\") + "
+        "MyExtension::LayerEffectParameter(\"My layer 2\", \"My effect\")");
+  }
 }
 
 TEST_CASE("RemoveLayer", "[common]") {
-  SECTION("Can remove instances from a layer (in a scene and their associated external layouts)") {
+  SECTION("Can remove instances from a layer (in a scene and its associated external layouts)") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
@@ -4086,7 +4256,7 @@ TEST_CASE("RemoveLayer", "[common]") {
 }
 
 TEST_CASE("MergeLayers", "[common]") {
-  SECTION("Can merge instances from a layer into another layer (in a scene and their associated external layouts)") {
+  SECTION("Can merge instances from a layer into another layer (in a scene and its associated external layouts)") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);

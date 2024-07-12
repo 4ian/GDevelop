@@ -28,6 +28,11 @@ namespace gdjs {
   export class SimpleTileMapRuntimeObject
     extends gdjs.RuntimeObject
     implements gdjs.Resizable, gdjs.Scalable, gdjs.OpacityHandler {
+    /**
+     * A reusable Point to avoid allocations.
+     */
+    private static readonly workingPoint: FloatPoint = [0, 0];
+
     _opacity: float;
     _atlasImage: string;
     _tileMapManager: gdjs.TileMap.TileMapRuntimeManager;
@@ -336,7 +341,8 @@ namespace gdjs {
     ): [number, number] {
       this.updateTransformation();
 
-      const gridCoordinates: FloatPoint = [0, 0];
+      const gridCoordinates: FloatPoint =
+        SimpleTileMapRuntimeObject.workingPoint;
       this._sceneToTileMapTransformation.transform([x, y], gridCoordinates);
 
       const columnIndex = Math.floor(gridCoordinates[0] / this._tileSize);

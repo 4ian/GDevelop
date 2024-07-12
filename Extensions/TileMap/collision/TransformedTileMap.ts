@@ -30,7 +30,7 @@ namespace gdjs {
        */
       _transformationUpToDateCount: integer = 1;
       /**
-       * An reusable Point to avoid allocations.
+       * A reusable Point to avoid allocations.
        */
       private static readonly workingPoint: FloatPoint = [0, 0];
 

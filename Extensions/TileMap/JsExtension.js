@@ -757,7 +757,9 @@ const defineSimpleTileMap = function (extension, _, gd) {
       'Tile',
       _('Tile id'),
       _('Set tile id at coordinates.'),
-      _('tile at coordinates _PARAM3_;_PARAM4_'),
+      _(
+        'tile at coordinates _PARAM3_;_PARAM4_ (flip horizontally _PARAM5_, flip vertically _PARAM6_)'
+      ),
       '',
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
@@ -769,6 +771,10 @@ const defineSimpleTileMap = function (extension, _, gd) {
     )
     .addParameter('number', _('X'), '', false)
     .addParameter('number', _('Y'), '', false)
+    .addParameter('yesorno', _('Flip horizontally'), '', false)
+    .setDefaultValue('false')
+    .addParameter('yesorno', _('Flip vertically'), '', false)
+    .setDefaultValue('false')
     .setFunctionName('setTileAt')
     .setGetter('getTileAt');
 

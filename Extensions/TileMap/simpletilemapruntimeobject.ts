@@ -359,7 +359,13 @@ namespace gdjs {
       return this._renderer.getTileId(columnIndex, rowIndex, 0);
     }
 
-    setTileAt(tileId: number, x: number, y: number) {
+    setTileAt(
+      tileId: number,
+      x: number,
+      y: number,
+      flipHorizontally: boolean,
+      flipVertically: boolean
+    ) {
       const [
         columnIndex,
         rowIndex,
@@ -368,7 +374,8 @@ namespace gdjs {
         columnIndex,
         rowIndex,
         0,
-        tileId
+        tileId,
+        { flipHorizontally, flipVertically, flipDiagonally: false }
       );
       this._isTileMapDirty = true;
       if (addedData) {

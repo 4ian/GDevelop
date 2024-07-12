@@ -160,12 +160,24 @@ namespace gdjs {
      * @param layerIndex The layer index.
      * @param tileId The tile's id.
      */
-    setTileId(x: integer, y: integer, layerIndex: integer, tileId: number) {
+    setTileId(
+      x: integer,
+      y: integer,
+      layerIndex: integer,
+      tileId: number,
+      options?:
+        | {
+            flipVertically: boolean;
+            flipHorizontally: boolean;
+            flipDiagonally: boolean;
+          }
+        | undefined
+    ) {
       const tileMap = this._tileMap;
       if (!tileMap) return;
       const layer = tileMap.getTileLayer(layerIndex);
       if (!layer) return;
-      return layer.setTile(x, y, tileId);
+      return layer.setTile(x, y, tileId, options);
     }
 
     /**

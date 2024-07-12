@@ -81,7 +81,7 @@ export const getTileSet = (object: gdObject) => {
 
 type Props = {|
   project: gdProject,
-  layout: gdLayout,
+  layout: gdLayout | null,
   instancesSelection: InstancesSelection,
   getCoordinatesToRender: () => {| x: number, y: number |}[],
   getTileMapTileSelection: () => ?TileMapTileSelection,
@@ -94,7 +94,7 @@ type Props = {|
 
 class TileMapTilePreview {
   project: gdProject;
-  layout: gdLayout;
+  layout: gdLayout | null;
   instancesSelection: InstancesSelection;
   getCoordinatesToRender: () => {| x: number, y: number |}[];
   getTileMapTileSelection: () => ?TileMapTileSelection;
@@ -147,9 +147,9 @@ class TileMapTilePreview {
     const instance = selection[0];
     const associatedObjectName = instance.getObjectName();
     const object = getObjectByName(
-      this.project,
-      this.layout,
-      associatedObjectName
+      this.project.getObjects(),
+      this.layout ? this.layout.getObjects() : null,
+  associatedObjectName
     );
     if (!object || object.getType() !== 'TileMap::SimpleTileMap') return;
     const { tileSize } = getTileSet(object);

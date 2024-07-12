@@ -668,12 +668,9 @@ const defineSimpleTileMap = function (extension, _, gd) {
   );
 
   objectSimpleTileMap.updateInitialInstanceProperty = function (
-    objectContent,
     instance,
     propertyName,
     newValue,
-    project,
-    layout
   ) {
     if (propertyName === 'tilemap') {
       instance.setRawStringProperty('tilemap', newValue);
@@ -683,10 +680,8 @@ const defineSimpleTileMap = function (extension, _, gd) {
   };
 
   objectSimpleTileMap.getInitialInstanceProperties = function (
-    content,
+    objectContent,
     instance,
-    project,
-    layout
   ) {
     var instanceProperties = new gd.MapStringPropertyDescriptor();
 
@@ -1628,7 +1623,6 @@ module.exports = {
     class RenderedSimpleTileMapInstance extends RenderedInstance {
       constructor(
         project,
-        layout,
         instance,
         associatedObjectConfiguration,
         pixiContainer,
@@ -1636,7 +1630,6 @@ module.exports = {
       ) {
         super(
           project,
-          layout,
           instance,
           associatedObjectConfiguration,
           pixiContainer,

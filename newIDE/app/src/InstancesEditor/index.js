@@ -422,10 +422,10 @@ export default class InstancesEditor extends Component<Props> {
       );
     }
     if (this.tileMapTilePreview) {
-      this.pixiContainer.removeChild(this.tileMapTilePreview.getPixiObject());
+      this.uiPixiContainer.removeChild(this.tileMapTilePreview.getPixiObject());
     }
     if (this.clickInterceptor) {
-      this.pixiContainer.removeChild(this.clickInterceptor.getPixiObject());
+      this.uiPixiContainer.removeChild(this.clickInterceptor.getPixiObject());
     }
     if (this.selectedInstances) {
       this.uiPixiContainer.removeChild(
@@ -756,8 +756,8 @@ export default class InstancesEditor extends Component<Props> {
     if (selectedInstances.length !== 1) return;
     const selectedInstance = selectedInstances[0];
     const object = getObjectByName(
-      project,
-      layout,
+      project.getObjects(),
+      layout ? layout.getObjects() : null,
       selectedInstance.getObjectName()
     );
     if (!object) return;

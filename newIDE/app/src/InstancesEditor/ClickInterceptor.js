@@ -52,13 +52,14 @@ class ClickInterceptor {
     this.interceptingSprite.addEventListener(
       'pointermove',
       (e: PIXI.FederatedPointerEvent) => {
-        if (!this.pointerPathCoordinates) return;
+        const pointerPathCoordinates = this.pointerPathCoordinates;
+        if (!pointerPathCoordinates) return;
         const sceneCoordinates = this.viewPosition.toSceneCoordinates(
           e.global.x,
           e.global.y
         );
 
-        this.pointerPathCoordinates.push({
+        pointerPathCoordinates.push({
           x: sceneCoordinates[0],
           y: sceneCoordinates[1],
         });

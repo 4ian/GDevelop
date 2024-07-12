@@ -45,6 +45,7 @@ namespace gdjs {
     _initialTileMapAsJsObject: object | null = null;
     _isTileMapDirty: boolean = false;
     _sceneToTileMapTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
+    _collisionTileMap: gdjs.TileMap.TransformedCollisionTileMap | null = null;
 
     constructor(instanceContainer: gdjs.RuntimeInstanceContainer, objectData) {
       super(instanceContainer, objectData);
@@ -153,7 +154,7 @@ namespace gdjs {
 
       // 2. Update the renderer so that it updates the tilemap object
       // (used for width and position calculations).
-      this._updateTileMap();
+      const tileMap = this._updateTileMap();
 
       // 3. Set custom dimensions if applicable.
       if (initialInstanceData.customSize) {
@@ -163,9 +164,14 @@ namespace gdjs {
 
       // 4. Update position (calculations based on renderer's dimensions).
       this._renderer.updatePosition();
+
+      this._collisionTileMap = new gdjs.TileMap.TransformedCollisionTileMap(
+        tileMap,
+        'collision'
+      );
     }
 
-    private _updateTileMap(): void {
+    private _updateTileMap(): TileMapHelper.EditableTileMap {
       const tileMap = TileMapHelper.EditableTileMap.from(
         this._initialTileMapAsJsObject,
         {
@@ -195,6 +201,7 @@ namespace gdjs {
           this._renderer.updatePixiTileMap(tileMap, textureCache);
         }
       );
+      return tileMap;
     }
 
     onDestroyed(): void {
@@ -312,6 +319,41 @@ namespace gdjs {
       return this._renderer.getScaleY();
     }
 
+    /**
+     * This method is expensive and should not be called.
+     * Prefer using {@link getHitBoxesAround} rather than getHitBoxes.
+     */
+    getHitBoxes(): gdjs.Polygon[] {
+      if (this.hitBoxesDirty) {
+        this.updateHitBoxes();
+        this.updateAABB();
+        this.hitBoxesDirty = false;
+      }
+      return this.hitBoxes;
+    }
+
+    getHitBoxesAround(
+      left: float,
+      top: float,
+      right: float,
+      bottom: float
+    ): Iterable<gdjs.Polygon> {
+      // This implementation doesn't call updateHitBoxes.
+      // It's important for good performances because there is no need to
+      // update the whole collision mask where only a few hitboxes must be
+      // checked.
+      this.updateTransformation();
+      const collisionTileMap = this._collisionTileMap;
+      if (!collisionTileMap) return [];
+      return collisionTileMap.getHitboxesAround(
+        'collision',
+        left,
+        top,
+        right,
+        bottom
+      );
+    }
+
     updateTransformation() {
       const absScaleX = Math.abs(this._renderer.getScaleX());
       const absScaleY = Math.abs(this._renderer.getScaleY());
@@ -331,7 +373,15 @@ namespace gdjs {
 
       // Scale
       this._sceneToTileMapTransformation.scale(absScaleX, absScaleY);
-
+      if (this._collisionTileMap) {
+        const collisionTileMapTransformation = this._collisionTileMap.getTransformation();
+        collisionTileMapTransformation.copyFrom(
+          this._sceneToTileMapTransformation
+        );
+        this._collisionTileMap.setTransformation(
+          collisionTileMapTransformation
+        );
+      }
       this._sceneToTileMapTransformation.invert();
     }
 

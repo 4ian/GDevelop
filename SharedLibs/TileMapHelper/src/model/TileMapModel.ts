@@ -66,12 +66,20 @@ export class EditableTileMap {
       rowCount,
     }: { tileSize: number; columnCount: number; rowCount: number }
   ): EditableTileMap {
-    const tileSet = new Map();
+    const tileSet = new Map<number, TileDefinition>();
 
     // TODO: Actually save and load tileset when useful.
-    new Array(columnCount * rowCount)
-      .fill(0)
-      .forEach((_, index) => tileSet.set(index, new TileDefinition(0)));
+    new Array(columnCount * rowCount).fill(0).forEach((_, index) => {
+      tileSet.set(index, new TileDefinition(0));
+      if (index === 132) {
+        tileSet.get(index).addHitBox('collision', [
+          [0, 0],
+          [0, tileSize],
+          [tileSize, tileSize],
+          [tileSize, 0],
+        ])
+      }
+    });
 
     const tileMap = new EditableTileMap(
       editableTileMapAsJsObject.tileWidth || tileSize,

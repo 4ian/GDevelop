@@ -717,6 +717,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
     .addIncludeFile('Extensions/TileMap/TileMapRuntimeManager.js')
     .addIncludeFile('Extensions/TileMap/tilemapruntimeobject-pixi-renderer.js')
     .addIncludeFile('Extensions/TileMap/pixi-tilemap/dist/pixi-tilemap.umd.js')
+    .addIncludeFile('Extensions/TileMap/collision/TransformedTileMap.js')
     .addIncludeFile('Extensions/TileMap/pako/dist/pako.min.js')
     .addIncludeFile('Extensions/TileMap/helper/TileMapHelper.js');
 

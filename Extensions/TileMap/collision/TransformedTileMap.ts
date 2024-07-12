@@ -64,7 +64,7 @@ namespace gdjs {
       }
 
       /**
-       * @param transformation the transformation from the time map coordinate
+       * @param transformation the transformation from the tile map coordinate
        * (in pixels) to the scene coordinate (in pixels).
        */
       setTransformation(transformation: gdjs.AffineTransformation) {

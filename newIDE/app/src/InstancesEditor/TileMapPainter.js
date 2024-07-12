@@ -75,9 +75,10 @@ type TileProps = {|
   y: number,
   size: number,
   highlighted?: boolean,
+  title?: string,
 |};
 
-const Tile = ({ x, y, size, highlighted }: TileProps) => {
+const Tile = ({ x, y, size, highlighted, title }: TileProps) => {
   const classes = useStylesForTile(!!highlighted);
   return (
     <div
@@ -88,6 +89,8 @@ const Tile = ({ x, y, size, highlighted }: TileProps) => {
         width: size,
         height: size,
       }}
+      // TODO: find a way to display title on mobile.
+      title={title}
     />
   );
 };
@@ -321,6 +324,7 @@ const TileMapPainter = ({
                 size={displayedTileSize}
                 x={hoveredTile.x}
                 y={hoveredTile.y}
+                title={(hoveredTile.x * rowCount + hoveredTile.y).toString()}
               />
             )}
             {tileMapTileSelection &&
@@ -332,6 +336,10 @@ const TileMapPainter = ({
                   size={displayedTileSize}
                   x={tileMapTileSelection.single.x}
                   y={tileMapTileSelection.single.y}
+                  title={(
+                    tileMapTileSelection.single.x * rowCount +
+                    tileMapTileSelection.single.y
+                  ).toString()}
                 />
               )}
           </div>

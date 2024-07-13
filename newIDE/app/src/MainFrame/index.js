@@ -548,12 +548,12 @@ const MainFrame = (props: Props) => {
       kind,
       name,
       dontFocusTab,
-      customIconUrl,
+      project,
     }: {
       kind: EditorKind,
       name: string,
       dontFocusTab?: boolean,
-      customIconUrl?: ?string,
+      project?: ?gdProject,
     }) => {
       const label =
         kind === 'resources'
@@ -583,6 +583,19 @@ const MainFrame = (props: Props) => {
       ].includes(kind)
         ? `${kind} ${name}`
         : kind;
+
+      let customIconUrl = null;
+      if (
+        (kind === 'events functions extension' ||
+          kind === 'events functions extension') &&
+        project &&
+        project.hasEventsFunctionsExtensionNamed(kind)
+      ) {
+        const eventsFunctionsExtension = project.getEventsFunctionsExtension(
+          kind
+        );
+        customIconUrl = eventsFunctionsExtension.getIconUrl();
+      }
       const icon =
         kind === 'start page' ? (
           <HomeIcon titleAccess="Home" />
@@ -597,6 +610,7 @@ const MainFrame = (props: Props) => {
         ) : kind === 'events functions extension' ? (
           <ExtensionIcon />
         ) : null;
+
       const closable = kind !== 'start page';
       const extraEditorProps =
         kind === 'start page'
@@ -1733,19 +1747,13 @@ const MainFrame = (props: Props) => {
       initiallyFocusedBehaviorName?: ?string,
       initiallyFocusedObjectName?: ?string
     ) => {
-      const eventsFunctionsExtension =
-        currentProject && currentProject.hasEventsFunctionsExtensionNamed(name)
-          ? currentProject.getEventsFunctionsExtension(name)
-          : null;
       setState(state => ({
         ...state,
         editorTabs: openEditorTab(state.editorTabs, {
           ...getEditorOpeningOptions({
             kind: 'events functions extension',
             name,
-            customIconUrl: eventsFunctionsExtension
-              ? eventsFunctionsExtension.getIconUrl()
-              : null,
+            project: currentProject,
           }),
           extraEditorProps: {
             initiallyFocusedFunctionName,
@@ -1906,7 +1914,7 @@ const MainFrame = (props: Props) => {
                 eventsFunctionsExtension.getName() +
                 '.' +
                 eventsBasedObject.getName(),
-              customIconUrl: eventsFunctionsExtension.getIconUrl(),
+              project: currentProject,
             }),
           }),
         }));

@@ -22,7 +22,7 @@ type Props = {|
     kind: EditorKind,
     name: string,
     dontFocusTab?: boolean,
-    customIconUrl?: ?string,
+    project?: ?gdProject,
   |}) => EditorOpeningOptions,
 |};
 
@@ -121,20 +121,6 @@ const useEditorTabsStateSaving = ({
 
       const editorsOpeningOptions = editorState.editorTabs.editors
         .map(editorMetadata => {
-          let customIconUrl = null;
-          if (
-            (editorMetadata.editorKind === 'events functions extension' ||
-              editorMetadata.editorKind === 'events functions extension') &&
-            editorMetadata.projectItemName &&
-            project.hasEventsFunctionsExtensionNamed(
-              editorMetadata.projectItemName
-            )
-          ) {
-            const eventsFunctionsExtension = project.getEventsFunctionsExtension(
-              editorMetadata.projectItemName
-            );
-            customIconUrl = eventsFunctionsExtension.getIconUrl();
-          }
           if (
             projectHasItem({
               project,
@@ -146,7 +132,7 @@ const useEditorTabsStateSaving = ({
               kind: editorMetadata.editorKind,
               name: editorMetadata.projectItemName || '',
               dontFocusTab: true,
-              customIconUrl,
+              project,
             });
           }
           // If the project does not contain the target item (it could happen if

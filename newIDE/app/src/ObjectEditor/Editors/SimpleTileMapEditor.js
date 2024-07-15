@@ -8,7 +8,10 @@ import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import { Trans } from '@lingui/macro';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { PropertyResourceSelector } from './PropertyFields';
-import TileMapPainter from '../../InstancesEditor/TileMapPainter';
+import TileMapPainter, {
+  getGridCoordinatesFromTileId,
+  getTileIdFromGridCoordinates,
+} from '../../InstancesEditor/TileMapPainter';
 import type { TileMapTileSelection } from '../../InstancesEditor/TileMapPainter';
 
 const SimpleTileMapEditor = ({
@@ -23,15 +26,22 @@ const SimpleTileMapEditor = ({
 }: EditorProps) => {
   const forceUpdate = useForceUpdate();
   const objectProperties = objectConfiguration.getProperties();
-  const tileSize = objectProperties.get('tileSize').getValue();
+  const tileSize = parseFloat(objectProperties.get('tileSize').getValue());
+  const rowCount = parseFloat(objectProperties.get('rowCount').getValue());
   const atlasImage = objectProperties.get('atlasImage').getValue();
-  const [
-    tileMapTileSelection,
-    setTileMapTileSelection,
-  ] = React.useState<?TileMapTileSelection>(
-    // TODO: Use one stored in object configuration
-    null
-  );
+  const tilesWithHitBox = objectProperties
+    .get('tilesWithHitBox')
+    .getValue()
+    .split(',')
+    .filter(value => !!value)
+    .map(idAsString =>
+      getGridCoordinatesFromTileId({ id: parseInt(idAsString, 10), rowCount })
+    );
+
+  const tileMapTileSelection = {
+    kind: 'multiple',
+    coordinates: tilesWithHitBox,
+  };
 
   const setTileSize = React.useCallback(
     (value: number) => {
@@ -43,6 +53,24 @@ const SimpleTileMapEditor = ({
       forceUpdate();
     },
     [forceUpdate, objectConfiguration]
+  );
+
+  const onChangeTilesWithHitBox = React.useCallback(
+    (tileMapTileSelection: ?TileMapTileSelection) => {
+      if (!tileMapTileSelection || tileMapTileSelection.kind !== 'multiple') {
+        return;
+      }
+      objectConfiguration.updateProperty(
+        'tilesWithHitBox',
+        tileMapTileSelection.coordinates
+          .map(coordinates =>
+            getTileIdFromGridCoordinates({ ...coordinates, rowCount })
+          )
+          .join(',')
+      );
+      forceUpdate();
+    },
+    [rowCount, objectConfiguration, forceUpdate]
   );
 
   const onChangeAtlasImage = React.useCallback(
@@ -76,7 +104,7 @@ const SimpleTileMapEditor = ({
               project={project}
               objectConfiguration={objectConfiguration}
               tileMapTileSelection={tileMapTileSelection}
-              onSelectTileMapTile={setTileMapTileSelection}
+              onSelectTileMapTile={onChangeTilesWithHitBox}
               showPaintingToolbar={false}
               allowMultipleSelection
             />

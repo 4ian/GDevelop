@@ -619,6 +619,10 @@ const defineSimpleTileMap = function (extension, _, gd) {
       objectContent.tileSize = parseFloat(newValue);
       return true;
     }
+    if (propertyName === 'tilesWithHitBox') {
+      objectContent.tilesWithHitBox = newValue;
+      return true;
+    }
 
     return false;
   };
@@ -631,6 +635,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
         .setType('number')
         .setLabel(_('Columns'))
         .setDescription(_('Number of columns.'))
+        .setHidden(true)
     );
     objectProperties.set(
       'rowCount',
@@ -638,6 +643,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
         .setType('number')
         .setLabel(_('Rows'))
         .setDescription(_('Number of rows.'))
+        .setHidden(true)
     );
     objectProperties.set(
       'tileSize',
@@ -645,6 +651,16 @@ const defineSimpleTileMap = function (extension, _, gd) {
         .setType('number')
         .setLabel(_('Tile size'))
         .setDescription(_('Tile size in pixels.'))
+    );
+    objectProperties.set(
+      'tilesWithHitBox',
+      new gd.PropertyDescriptor(objectContent.tilesWithHitBox || '')
+        .setType('string')
+        .setLabel(_('Tile ids with hit box'))
+        .setDescription(
+          _('The list of tile ids with a hit box (separated by commas).')
+        )
+        .setHidden(true)
     );
 
     objectProperties.set(
@@ -664,6 +680,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       rowCount: 4,
       columnCount: 4,
       tileSize: 8,
+      tilesWithHitBox: '',
     })
   );
 

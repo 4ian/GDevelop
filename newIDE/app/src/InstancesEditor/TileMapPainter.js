@@ -19,6 +19,28 @@ const styles = {
   icon: { fontSize: 18 },
 };
 
+export const getTileIdFromGridCoordinates = ({
+  x,
+  y,
+  rowCount,
+}: {|
+  x: number,
+  y: number,
+  rowCount: number,
+|}): number => x * rowCount + y;
+
+export const getGridCoordinatesFromTileId = ({
+  id,
+  rowCount,
+}: {|
+  id: number,
+  rowCount: number,
+|}): {| x: number, y: number |} => {
+  const y = id % rowCount;
+  const x = (id - y) / rowCount;
+  return { x, y };
+};
+
 const useStylesForTile = (highlighted: boolean) =>
   makeStyles(theme =>
     createStyles({
@@ -382,7 +404,11 @@ const TileMapPainter = ({
                 size={displayedTileSize}
                 x={hoveredTile.x}
                 y={hoveredTile.y}
-                title={(hoveredTile.x * rowCount + hoveredTile.y).toString()}
+                title={getTileIdFromGridCoordinates({
+                  x: hoveredTile.x,
+                  y: hoveredTile.y,
+                  rowCount,
+                }).toString()}
               />
             )}
             {tileMapTileSelection &&
@@ -394,17 +420,22 @@ const TileMapPainter = ({
                   size={displayedTileSize}
                   x={tileMapTileSelection.coordinates.x}
                   y={tileMapTileSelection.coordinates.y}
-                  title={(
-                    tileMapTileSelection.coordinates.x * rowCount +
-                    tileMapTileSelection.coordinates.y
-                  ).toString()}
+                  title={getTileIdFromGridCoordinates({
+                    x: tileMapTileSelection.coordinates.x,
+                    y: tileMapTileSelection.coordinates.y,
+                    rowCount,
+                  }).toString()}
                 />
               )}
             {tileMapTileSelection &&
               tileMapTileSelection.kind === 'multiple' &&
               displayedTileSize &&
               tileMapTileSelection.coordinates.map(coordinates => {
-                const id = coordinates.x * rowCount + coordinates.y;
+                const id = getTileIdFromGridCoordinates({
+                  x: coordinates.x,
+                  y: coordinates.y,
+                  rowCount,
+                });
                 return (
                   <Tile
                     key={`selected-tile-${id}`}

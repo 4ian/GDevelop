@@ -154,7 +154,7 @@ class TileMapTilePreview {
     if (!object || object.getType() !== 'TileMap::SimpleTileMap') return;
     const { tileSize } = getTileSet(object);
     let texture;
-    if (tileMapTileSelection.single) {
+    if (tileMapTileSelection.kind === 'single') {
       const atlasResourceName = object
         .getConfiguration()
         .getProperties()
@@ -163,8 +163,8 @@ class TileMapTilePreview {
       if (!atlasResourceName) return;
       // TODO: Burst cache when atlas resource is changed
       const cacheKey = `${atlasResourceName}-${tileSize}-${
-        tileMapTileSelection.single.x
-      }-${tileMapTileSelection.single.y}`;
+        tileMapTileSelection.coordinates.x
+      }-${tileMapTileSelection.coordinates.y}`;
       texture = this.cache.get(cacheKey);
       if (!texture) {
         const atlasTexture = PixiResourcesLoader.getPIXITexture(
@@ -173,8 +173,8 @@ class TileMapTilePreview {
         );
 
         const rect = new PIXI.Rectangle(
-          tileMapTileSelection.single.x * tileSize,
-          tileMapTileSelection.single.y * tileSize,
+          tileMapTileSelection.coordinates.x * tileSize,
+          tileMapTileSelection.coordinates.y * tileSize,
           tileSize,
           tileSize
         );
@@ -182,7 +182,7 @@ class TileMapTilePreview {
         texture = new PIXI.Texture(atlasTexture, rect);
         this.cache.set(cacheKey, texture);
       }
-    } else if (tileMapTileSelection.erase) {
+    } else if (tileMapTileSelection.kind === 'erase') {
       texture = PIXI.Texture.from(
         'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAARSURBVHgBY7h58+Z/BhgAcQA/VAcVLiw46wAAAABJRU5ErkJggg=='
       );
@@ -221,7 +221,7 @@ class TileMapTilePreview {
       const key = `${gridX};${gridY}`;
       if (alreadyConsideredCoordinates.has(key)) return;
       let sprite;
-      if (tileMapTileSelection.single) {
+      if (tileMapTileSelection.kind === 'single') {
         // TODO: Find a way not to regenerate the sprites on each render.
         sprite = new PIXI.Sprite(texture);
         if (tileMapTileSelection.flipHorizontally) {

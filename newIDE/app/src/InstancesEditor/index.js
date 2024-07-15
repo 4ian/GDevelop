@@ -802,7 +802,7 @@ export default class InstancesEditor extends Component<Props> {
         deduplicatedCoordinates.push({ gridX, gridY });
         alreadyConsideredCoordinates.add(key);
       });
-      if (tileMapTileSelection.single) {
+      if (tileMapTileSelection.kind === 'single') {
         // TODO: Optimize list execution to make sure the most important size changing operations are done first.
         let cumulatedUnshiftedRows = 0,
           cumulatedUnshiftedColumns = 0;
@@ -817,8 +817,8 @@ export default class InstancesEditor extends Component<Props> {
             // we have to take them into account for the current coordinates.
             gridX + cumulatedUnshiftedColumns,
             gridY + cumulatedUnshiftedRows,
-            tileSet.rowCount * tileMapTileSelection.single.x +
-              tileMapTileSelection.single.y,
+            tileSet.rowCount * tileMapTileSelection.coordinates.x +
+              tileMapTileSelection.coordinates.y,
             {
               flipVertically: tileMapTileSelection.flipVertically,
               flipHorizontally: tileMapTileSelection.flipHorizontally,
@@ -850,7 +850,7 @@ export default class InstancesEditor extends Component<Props> {
             );
           }
         });
-      } else if (tileMapTileSelection.erase) {
+      } else if (tileMapTileSelection.kind === 'erase') {
         deduplicatedCoordinates.forEach(({ gridX, gridY }) => {
           editableTileMapLayer.removeTile(gridX, gridY);
         });

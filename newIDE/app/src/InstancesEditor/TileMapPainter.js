@@ -34,16 +34,12 @@ const useStylesForTile = (highlighted: boolean) =>
 
 const getAtlasResource = ({
   project,
-  object,
+  objectConfiguration,
 }: {|
   project: gdProject,
-  object: gdObject,
+  objectConfiguration: gdObjectConfiguration,
 |}): ?{| atlasResourceName: string |} => {
-  if (object.getType() !== 'TileMap::SimpleTileMap') {
-    return null;
-  }
-  const atlasResourceName = object
-    .getConfiguration()
+  const atlasResourceName = objectConfiguration
     .getProperties()
     .get('atlasImage')
     .getValue();
@@ -52,17 +48,15 @@ const getAtlasResource = ({
   };
 };
 
-const getTileset = (object: gdObject) => {
+const getTileset = (objectConfiguration: gdObjectConfiguration) => {
   const columnCount = parseFloat(
-    object
-      .getConfiguration()
+    objectConfiguration
       .getProperties()
       .get('columnCount')
       .getValue()
   );
   const rowCount = parseFloat(
-    object
-      .getConfiguration()
+    objectConfiguration
       .getProperties()
       .get('rowCount')
       .getValue()
@@ -99,28 +93,29 @@ type TileMapCoordinates = {| x: number, y: number |};
 
 export type TileMapTileSelection =
   | {|
-      single: TileMapCoordinates,
+      kind: 'single',
+      coordinates: TileMapCoordinates,
       flipHorizontally: boolean,
       flipVertically: boolean,
     |}
   | {|
-      erase: boolean,
+      kind: 'erase',
     |};
 
 type Props = {|
   project: gdProject,
-  object: gdObject,
+  objectConfiguration: gdObjectConfiguration,
   tileMapTileSelection: ?TileMapTileSelection,
   onSelectTileMapTile: (?TileMapTileSelection) => void,
 |};
 
 const TileMapPainter = ({
   project,
-  object,
+  objectConfiguration,
   tileMapTileSelection,
   onSelectTileMapTile,
 }: Props) => {
-  const atlasResource = getAtlasResource({ project, object });
+  const atlasResource = getAtlasResource({ project, objectConfiguration });
   const [
     shouldFlipVertically,
     setShouldFlipVertically,
@@ -134,9 +129,10 @@ const TileMapPainter = ({
     setLastSelectedTile,
   ] = React.useState<?TileMapCoordinates>(null);
   const tileContainerRef = React.useRef<?HTMLDivElement>(null);
-  const { columnCount, rowCount } = React.useMemo(() => getTileset(object), [
-    object,
-  ]);
+  const { columnCount, rowCount } = React.useMemo(
+    () => getTileset(objectConfiguration),
+    [objectConfiguration]
+  );
   const [hoveredTile, setHoveredTile] = React.useState<?{
     x: number,
     y: number,
@@ -170,14 +166,15 @@ const TileMapPainter = ({
       const y = Math.min(Math.floor(mouseY / displayedTileSize), rowCount - 1);
       if (
         tileMapTileSelection &&
-        tileMapTileSelection.single &&
-        tileMapTileSelection.single.x === x &&
-        tileMapTileSelection.single.y === y
+        tileMapTileSelection.kind === 'single' &&
+        tileMapTileSelection.coordinates.x === x &&
+        tileMapTileSelection.coordinates.y === y
       ) {
         onSelectTileMapTile(null);
       } else {
         onSelectTileMapTile({
-          single: { x, y },
+          kind: 'single',
+          coordinates: { x, y },
           flipHorizontally: shouldFlipHorizontally,
           flipVertically: shouldFlipVertically,
         });
@@ -203,10 +200,10 @@ const TileMapPainter = ({
 
   React.useEffect(
     () => {
-      if (tileMapTileSelection && tileMapTileSelection.single) {
+      if (tileMapTileSelection && tileMapTileSelection.kind === 'single') {
         setLastSelectedTile({
-          x: tileMapTileSelection.single.x,
-          y: tileMapTileSelection.single.y,
+          x: tileMapTileSelection.coordinates.x,
+          y: tileMapTileSelection.coordinates.y,
         });
       }
     },
@@ -240,26 +237,32 @@ const TileMapPainter = ({
       <LineStackLayout alignItems="center">
         <IconButton
           size="small"
-          // TODO: Change tileMapTileSelection to add a `kind` attribute to differentiate cases.
-          selected={!!tileMapTileSelection && !!tileMapTileSelection.erase}
+          selected={
+            !!tileMapTileSelection && tileMapTileSelection.kind === 'erase'
+          }
           onClick={e => {
-            if (!!tileMapTileSelection && !!tileMapTileSelection.erase)
+            if (!!tileMapTileSelection && tileMapTileSelection.kind === 'erase')
               onSelectTileMapTile(null);
-            else onSelectTileMapTile({ erase: true });
+            else onSelectTileMapTile({ kind: 'erase' });
           }}
         >
           <Erase style={styles.icon} />
         </IconButton>
         <IconButton
           size="small"
-          // TODO: Change tileMapTileSelection to add a `kind` attribute to differentiate cases.
-          selected={!!tileMapTileSelection && !!tileMapTileSelection.single}
+          selected={
+            !!tileMapTileSelection && tileMapTileSelection.kind === 'single'
+          }
           onClick={e => {
-            if (!!tileMapTileSelection && !!tileMapTileSelection.single)
+            if (
+              !!tileMapTileSelection &&
+              tileMapTileSelection.kind === 'single'
+            )
               onSelectTileMapTile(null);
             else
               onSelectTileMapTile({
-                single: lastSelectedTile || { x: 0, y: 0 },
+                kind: 'single',
+                coordinates: lastSelectedTile || { x: 0, y: 0 },
                 flipHorizontally: shouldFlipHorizontally,
                 flipVertically: shouldFlipVertically,
               });
@@ -273,7 +276,10 @@ const TileMapPainter = ({
           onClick={e => {
             const newShouldFlipHorizontally = !shouldFlipHorizontally;
             setShouldFlipHorizontally(newShouldFlipHorizontally);
-            if (!!tileMapTileSelection && !!tileMapTileSelection.single) {
+            if (
+              !!tileMapTileSelection &&
+              tileMapTileSelection.kind === 'single'
+            ) {
               onSelectTileMapTile({
                 ...tileMapTileSelection,
                 flipHorizontally: newShouldFlipHorizontally,
@@ -289,7 +295,10 @@ const TileMapPainter = ({
           onClick={e => {
             const newShouldFlipVertically = !shouldFlipVertically;
             setShouldFlipVertically(newShouldFlipVertically);
-            if (!!tileMapTileSelection && !!tileMapTileSelection.single) {
+            if (
+              !!tileMapTileSelection &&
+              tileMapTileSelection.kind === 'single'
+            ) {
               onSelectTileMapTile({
                 ...tileMapTileSelection,
                 flipVertically: newShouldFlipVertically,
@@ -328,17 +337,17 @@ const TileMapPainter = ({
               />
             )}
             {tileMapTileSelection &&
-              tileMapTileSelection.single &&
+              tileMapTileSelection.kind === 'single' &&
               displayedTileSize && (
                 <Tile
                   key={`selected-tile`}
                   highlighted
                   size={displayedTileSize}
-                  x={tileMapTileSelection.single.x}
-                  y={tileMapTileSelection.single.y}
+                  x={tileMapTileSelection.coordinates.x}
+                  y={tileMapTileSelection.coordinates.y}
                   title={(
-                    tileMapTileSelection.single.x * rowCount +
-                    tileMapTileSelection.single.y
+                    tileMapTileSelection.coordinates.x * rowCount +
+                    tileMapTileSelection.coordinates.y
                   ).toString()}
                 />
               )}

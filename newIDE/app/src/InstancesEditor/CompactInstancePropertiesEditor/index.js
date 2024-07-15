@@ -217,7 +217,7 @@ const CompactInstancePropertiesEditor = ({
                 <Separator />
                 <TileMapPainter
                   project={project}
-                  object={object}
+                  objectConfiguration={object.getConfiguration()}
                   tileMapTileSelection={tileMapTileSelection}
                   onSelectTileMapTile={onSelectTileMapTile}
                 />

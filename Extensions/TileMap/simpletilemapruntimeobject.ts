@@ -46,6 +46,7 @@ namespace gdjs {
     _isTileMapDirty: boolean = false;
     _sceneToTileMapTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
     _collisionTileMap: gdjs.TileMap.TransformedCollisionTileMap | null = null;
+    // TODO: Add a debug mode like for TileMapCollisionMaskRuntimeObject to draw?
 
     constructor(instanceContainer: gdjs.RuntimeInstanceContainer, objectData) {
       super(instanceContainer, objectData);
@@ -169,6 +170,7 @@ namespace gdjs {
         tileMap,
         'collision'
       );
+      this.updateTransformation();
     }
 
     private _updateTileMap(): TileMapHelper.EditableTileMap {
@@ -332,6 +334,95 @@ namespace gdjs {
       return this.hitBoxes;
     }
 
+    updateHitBoxes(): void {
+      this.updateTransformation();
+      if (!this._collisionTileMap) return;
+      // Update the RuntimeObject hitboxes attribute.
+      for (const _ of this._collisionTileMap.getAllHitboxes('collision')) {
+        // RuntimeObject.hitBoxes contains the same polygons instances as the
+        // hitboxes from the tiles.
+        //
+        // When hitboxes for a tile is asked to the model, they are updated
+        // according to the new object location if needed.
+        // Iterating over all the tiles forces them to update their hitboxes.
+        //
+        // The hitboxes array is built by _updateTileMap().
+      }
+      this.hitBoxesDirty = false;
+      this.updateAABB();
+    }
+
+    // This implementation doesn't use updateHitBoxes.
+    // It's important for good performances.
+    updateAABB(): void {
+      if (this.getAngle() === 0) {
+        // Fast computation of AABB for non rotated object
+        this.aabb.min[0] = this.x;
+        this.aabb.min[1] = this.y;
+        this.aabb.max[0] = this.aabb.min[0] + this.getWidth();
+        this.aabb.max[1] = this.aabb.min[1] + this.getHeight();
+      } else {
+        if (!this._collisionTileMap) return;
+        const affineTransformation = this._collisionTileMap.getTransformation();
+
+        const left = 0;
+        const right = this._collisionTileMap.getWidth();
+        const top = 0;
+        const bottom = this._collisionTileMap.getHeight();
+
+        const workingPoint = this.aabb.min;
+
+        workingPoint[0] = left;
+        workingPoint[1] = top;
+        affineTransformation.transform(workingPoint, workingPoint);
+        const topLeftX = workingPoint[0];
+        const topLeftY = workingPoint[1];
+
+        workingPoint[0] = right;
+        workingPoint[1] = top;
+        affineTransformation.transform(workingPoint, workingPoint);
+        const topRightX = workingPoint[0];
+        const topRightY = workingPoint[1];
+
+        workingPoint[0] = right;
+        workingPoint[1] = bottom;
+        affineTransformation.transform(workingPoint, workingPoint);
+        const bottomRightX = workingPoint[0];
+        const bottomRightY = workingPoint[1];
+
+        workingPoint[0] = left;
+        workingPoint[1] = bottom;
+        affineTransformation.transform(workingPoint, workingPoint);
+        const bottomLeftX = workingPoint[0];
+        const bottomLeftY = workingPoint[1];
+
+        this.aabb.min[0] = Math.min(
+          topLeftX,
+          topRightX,
+          bottomRightX,
+          bottomLeftX
+        );
+        this.aabb.max[0] = Math.max(
+          topLeftX,
+          topRightX,
+          bottomRightX,
+          bottomLeftX
+        );
+        this.aabb.min[1] = Math.min(
+          topLeftY,
+          topRightY,
+          bottomRightY,
+          bottomLeftY
+        );
+        this.aabb.max[1] = Math.max(
+          topLeftY,
+          topRightY,
+          bottomRightY,
+          bottomLeftY
+        );
+      }
+    }
+
     getHitBoxesAround(
       left: float,
       top: float,
@@ -343,9 +434,8 @@ namespace gdjs {
       // update the whole collision mask where only a few hitboxes must be
       // checked.
       this.updateTransformation();
-      const collisionTileMap = this._collisionTileMap;
-      if (!collisionTileMap) return [];
-      return collisionTileMap.getHitboxesAround(
+      if (!this._collisionTileMap) return [];
+      return this._collisionTileMap.getHitboxesAround(
         'collision',
         left,
         top,

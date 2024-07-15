@@ -670,7 +670,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
   objectSimpleTileMap.updateInitialInstanceProperty = function (
     instance,
     propertyName,
-    newValue,
+    newValue
   ) {
     if (propertyName === 'tilemap') {
       instance.setRawStringProperty('tilemap', newValue);
@@ -681,7 +681,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
 
   objectSimpleTileMap.getInitialInstanceProperties = function (
     objectContent,
-    instance,
+    instance
   ) {
     var instanceProperties = new gd.MapStringPropertyDescriptor();
 

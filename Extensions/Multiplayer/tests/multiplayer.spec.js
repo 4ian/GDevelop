@@ -83,6 +83,11 @@ describe('Multiplayer', () => {
 
   const makeTestRuntimeSceneWithNetworkId = (timeDelta = 1000 / 60) => {
     const runtimeGame = gdjs.getPixiRuntimeGame();
+    gdjs.projectData = {
+      properties: {
+        projectUuid: 'fake-hardcoded-project-uuid',
+      },
+    };
     const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
     runtimeScene.loadFromScene(
       getFakeSceneAndExtensionData({ name: 'Scene1' })
@@ -252,10 +257,22 @@ describe('Multiplayer', () => {
           gdjs.makeMultiplayerVariablesManager();
 
         // Ensure the messageManager is aware of the other players.
-        gdjs.multiplayerMessageManager.updatePlayersPingsForTests({
-          1: 0,
-          2: 20,
-          3: 40,
+        gdjs.multiplayerMessageManager.updatePlayersInfoForTests({
+          1: {
+            ping: 0,
+            playerId: 'player-1',
+            username: 'Player 1',
+          },
+          2: {
+            ping: 20,
+            playerId: 'player-2',
+            username: 'Player 2',
+          },
+          3: {
+            ping: 40,
+            playerId: 'player-3',
+            username: 'Player 3',
+          },
         });
 
         // Switch the state of the game.
@@ -292,39 +309,17 @@ describe('Multiplayer', () => {
 
   let _originalP2pIfAny = undefined;
 
-  const fakeLobby = {
-    id: 'fake-lobby-id',
-    name: 'Fake lobby',
-    status: 'Playing',
-    players: [
-      {
-        playerId: 'player-1',
-        status: 'Playing',
-      },
-      {
-        playerId: 'player-2',
-        status: 'Playing',
-      },
-      {
-        playerId: 'player-3',
-        status: 'Playing',
-      },
-    ],
-  };
-
   beforeEach(() => {
     _originalP2pIfAny = gdjs.multiplayerPeerJsHelper;
     gdjs.multiplayer.disableMultiplayerForTesting = false;
     gdjs.multiplayer._isLobbyGameRunning = true;
     gdjs.multiplayer._isReadyToSendOrReceiveGameUpdateMessages = true;
-    gdjs.multiplayer._lobby = fakeLobby;
   });
   afterEach(() => {
     gdjs.multiplayerPeerJsHelper = _originalP2pIfAny;
     gdjs.multiplayer.disableMultiplayerForTesting = true;
     gdjs.multiplayer._isLobbyGameRunning = false;
     gdjs.multiplayer._isReadyToSendOrReceiveGameUpdateMessages = false;
-    gdjs.multiplayer._lobby = null;
   });
 
   describe('Single scene tests', () => {

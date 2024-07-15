@@ -428,7 +428,7 @@ namespace gdjs {
     export const isReady = () => ready;
 
     /**
-     * Return any disconnected peers.
+     * Return peers that have disconnected in the frame.
      */
     export const getJustDisconnectedPeers = () => justDisconnectedPeers;
 

@@ -1,12 +1,6 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Multiplayer');
 
-  type Lobby = {
-    id: string;
-    name: string;
-    status: string;
-    players: { playerId: string; status: string }[];
-  };
   export namespace multiplayer {
     /** Set to true in testing to avoid relying on the multiplayer extension. */
     export let disableMultiplayerForTesting = false;
@@ -22,8 +16,6 @@ namespace gdjs {
     let _hasLobbyGameJustEnded = false;
     let _lobbyId: string | null = null;
     let _connectionId: string | null = null;
-    export let _lobby: Lobby | null = null;
-    let _playerPublicProfiles: { id: string; username?: string }[] = [];
 
     // Communication methods.
     let _lobbiesMessageCallback: ((event: MessageEvent) => void) | null = null;
@@ -49,8 +41,9 @@ namespace gdjs {
         if (disableMultiplayerForTesting) return;
 
         gdjs.multiplayerMessageManager.handleHeartbeatsToSend();
-
-        if (!_isReadyToSendOrReceiveGameUpdateMessages) return;
+        gdjs.multiplayerMessageManager.handleJustDisconnectedPeers(
+          runtimeScene
+        );
 
         gdjs.multiplayerMessageManager.handleChangeInstanceOwnerMessagesReceived(
           runtimeScene
@@ -72,7 +65,6 @@ namespace gdjs {
         gdjs.multiplayerMessageManager.handleUpdateSceneMessagesReceived(
           runtimeScene
         );
-        gdjs.multiplayerMessageManager.handleDisconnectedPeers(runtimeScene);
       }
     );
 
@@ -80,9 +72,10 @@ namespace gdjs {
       (runtimeScene: gdjs.RuntimeScene) => {
         if (disableMultiplayerForTesting) return;
 
+        handleLeavingPlayer(runtimeScene);
+        handleJoiningPlayer(runtimeScene);
+        // Joining players are handled in the heartbeats directly.
         gdjs.multiplayerMessageManager.handleHeartbeatsReceived();
-
-        if (!_isReadyToSendOrReceiveGameUpdateMessages) return;
 
         gdjs.multiplayerMessageManager.handleDestroyInstanceMessagesReceived(
           runtimeScene
@@ -94,8 +87,6 @@ namespace gdjs {
         gdjs.multiplayerMessageManager.handleUpdateSceneMessagesToSend(
           runtimeScene
         );
-        handleLeavingPlayer(runtimeScene);
-        gdjs.multiplayerMessageManager.clearDisconnectedPeers();
       }
     );
 
@@ -167,6 +158,9 @@ namespace gdjs {
 
     export const isLobbyGameRunning = () => _isLobbyGameRunning;
 
+    export const isReadyToSendOrReceiveGameUpdateMessages = () =>
+      _isReadyToSendOrReceiveGameUpdateMessages;
+
     /**
      * Returns true if the game has just ended,
      * useful to switch back to to the main menu.
@@ -177,17 +171,9 @@ namespace gdjs {
      * Returns the number of players in the lobby.
      */
     export const getPlayersInLobbyCount = () => {
-      // If the game has not started yet, look at the lobby.
-      if (!_isLobbyGameRunning && _lobby) {
-        return _lobby.players.length;
-      }
-
-      // If the game has started, look at the pings received from the players.
-      if (_isLobbyGameRunning) {
-        return gdjs.multiplayerMessageManager.getNumberOfConnectedPlayers();
-      }
-
-      return 0;
+      // Wether the lobby game has started or not, the number of players in the lobby
+      // is the number of connected players.
+      return gdjs.multiplayerMessageManager.getNumberOfConnectedPlayers();
     };
 
     /**
@@ -207,37 +193,11 @@ namespace gdjs {
     };
 
     /**
-     * Returns the player ID of the player at the given number in the lobby.
-     * The number is shifted by one, so that the first player has number  1.
-     */
-    const getPlayerId = (playerNumber: number) => {
-      if (!_lobby) {
-        return '';
-      }
-      const index = playerNumber - 1;
-      if (index < 0 || index >= _lobby.players.length) {
-        return '';
-      }
-      return _lobby.players[index].playerId;
-    };
-
-    /**
      * Returns the player username at the given number in the lobby.
      * The number is shifted by one, so that the first player has number 1.
      */
     export const getPlayerUsername = (playerNumber: number) => {
-      const playerId = getPlayerId(playerNumber);
-      if (!playerId) {
-        return '';
-      }
-
-      const playerPublicProfile = _playerPublicProfiles.find(
-        (profile) => profile.id === playerId
-      );
-
-      return playerPublicProfile
-        ? playerPublicProfile.username
-        : `Player ${playerNumber}`;
+      return gdjs.multiplayerMessageManager.getPlayerUsername(playerNumber);
     };
 
     /**
@@ -249,28 +209,33 @@ namespace gdjs {
     };
 
     const handleLeavingPlayer = (runtimeScene: gdjs.RuntimeScene) => {
-      const disconnectedPlayers = gdjs.multiplayerMessageManager.getDisconnectedPlayers();
-      if (disconnectedPlayers.length > 0) {
-        for (const playerNumber of disconnectedPlayers) {
-          const playerLeftId = getPlayerId(playerNumber);
-
-          if (!playerLeftId) {
-            return;
-          }
-
-          const playerLeftPublicProfile = _playerPublicProfiles.find(
-            (profile) => profile.id === playerLeftId
-          );
-
-          if (playerLeftPublicProfile) {
-            gdjs.multiplayerComponents.displayPlayerLeftNotification(
-              runtimeScene,
-              (playerLeftPublicProfile && playerLeftPublicProfile.username) ||
-                'Player'
-            );
-          }
-        }
+      const lastestPlayerWhoJustLeft = gdjs.multiplayerMessageManager.getLatestPlayerWhoJustLeft();
+      if (lastestPlayerWhoJustLeft) {
+        const playerUsername = getPlayerUsername(lastestPlayerWhoJustLeft);
+        gdjs.multiplayerComponents.displayPlayerLeftNotification(
+          runtimeScene,
+          playerUsername
+        );
       }
+      // We remove the players who just left 1 by 1, so that they can be treated in different frames.
+      // This is especially important if the expression to know the latest player who just left is used,
+      // to avoid missing a player leaving.
+      gdjs.multiplayerMessageManager.removePlayerWhoJustLeft();
+    };
+
+    const handleJoiningPlayer = (runtimeScene: gdjs.RuntimeScene) => {
+      const lastestPlayerWhoJustJoined = gdjs.multiplayerMessageManager.getLatestPlayerWhoJustJoined();
+      if (lastestPlayerWhoJustJoined) {
+        const playerUsername = getPlayerUsername(lastestPlayerWhoJustJoined);
+        gdjs.multiplayerComponents.displayPlayerJoinedNotification(
+          runtimeScene,
+          playerUsername
+        );
+      }
+      // We remove the players who just joined 1 by 1, so that they can be treated in different frames.
+      // This is especially important if the expression to know the latest player who just joined is used,
+      // to avoid missing a player joining.
+      gdjs.multiplayerMessageManager.removePlayerWhoJustJoined();
     };
 
     /**
@@ -309,61 +274,7 @@ namespace gdjs {
       );
     };
 
-    const getUserPublicProfile = async (
-      userId: string,
-      isDev: boolean
-    ): Promise<{ id: string; username?: string }> => {
-      const rootApi = isDev
-        ? 'https://api-dev.gdevelop.io'
-        : 'https://api.gdevelop.io';
-      const url = `${rootApi}/user/user-public-profile/${userId}`;
-      const response = await fetch(url);
-      return response.json();
-    };
-
-    const updatePlayerPublicProfiles = async (isDev: boolean) => {
-      if (!_lobby) {
-        return;
-      }
-
-      const playerIds = _lobby.players.map((player) => player.playerId);
-      const currentPlayerPublicProfileIds = _playerPublicProfiles.map(
-        (profile) => profile.id
-      );
-      const addedPlayerIds = playerIds.filter(
-        (id) => !currentPlayerPublicProfileIds.includes(id)
-      );
-      const removedPlayerIds = currentPlayerPublicProfileIds.filter(
-        (id) => !playerIds.includes(id)
-      );
-      if (addedPlayerIds.length === 0 && removedPlayerIds.length === 0) {
-        return;
-      }
-
-      if (addedPlayerIds.length > 0) {
-        const addedPlayerPublicProfiles = await Promise.all(
-          addedPlayerIds.map(async (id) => {
-            const userPublicProfile = await getUserPublicProfile(id, isDev);
-            return userPublicProfile;
-          })
-        );
-
-        _playerPublicProfiles = [
-          ..._playerPublicProfiles,
-          ...addedPlayerPublicProfiles,
-        ];
-      }
-
-      if (removedPlayerIds.length > 0) {
-        const updatedPlayerPublicProfiles = _playerPublicProfiles.filter(
-          (profile) => !removedPlayerIds.includes(profile.id)
-        );
-
-        _playerPublicProfiles = updatedPlayerPublicProfiles;
-      }
-    };
-
-    const handleLobbyJoinEvent = function (
+    const handleJoinLobbyEvent = function (
       runtimeScene: gdjs.RuntimeScene,
       lobbyId: string
     ) {
@@ -378,7 +289,6 @@ namespace gdjs {
         _connectionId = null;
         playerNumber = null;
         _lobbyId = null;
-        _lobby = null;
         _websocket = null;
       }
 
@@ -471,15 +381,9 @@ namespace gdjs {
             }
             case 'lobbyUpdated': {
               const messageData = messageContent.data;
-              const lobby = messageData.lobby;
               const positionInLobby = messageData.positionInLobby;
-              if (!lobby) {
-                logger.error('No lobby received');
-                return;
-              }
               handleLobbyUpdatedEvent({
                 runtimeScene,
-                updatedLobby: lobby,
                 positionInLobby,
               });
               break;
@@ -513,12 +417,13 @@ namespace gdjs {
                 return;
               }
               const peerId = messageData.peerId;
-              if (!peerId) {
+              const compressionMethod = messageData.compressionMethod;
+              if (!peerId || !compressionMethod) {
                 logger.error('Malformed message received');
                 return;
               }
 
-              handlePeerIdEvent({ peerId });
+              handlePeerIdEvent({ peerId, compressionMethod });
               break;
             }
           }
@@ -638,42 +543,30 @@ namespace gdjs {
         },
         // Specify the origin to avoid leaking the playerToken.
         // Replace with '*' to test locally.
-        'https://gd.games'
-        // '*'
+        // 'https://gd.games'
+        '*'
       );
     };
 
-    const handleLobbyLeaveEvent = function () {
+    const handleLeaveLobbyEvent = function () {
       if (_websocket) {
         _websocket.close();
       }
       _connectionId = null;
       playerNumber = null;
       _lobbyId = null;
-      _lobby = null;
       _websocket = null;
     };
 
     const handleLobbyUpdatedEvent = function ({
       runtimeScene,
-      updatedLobby,
       positionInLobby,
     }: {
       runtimeScene: gdjs.RuntimeScene;
-      updatedLobby: Lobby;
       positionInLobby: number;
     }) {
-      // Update the object representing the lobby in the extension.
-      _lobby = updatedLobby;
-
-      // If the lobby is playing, do not update anything.
-      if (updatedLobby.status === 'playing') {
-        return;
-      }
-
-      // Update the profiles so we can use the usernames of the players.
-      updatePlayerPublicProfiles(isUsingGDevelopDevelopmentEnvironment);
-
+      // This is mainly useful when joining a lobby, or when the lobby is updated before the game starts.
+      // The position in lobby should never change after the game has started (the WS is closed anyway).
       playerNumber = positionInLobby;
 
       // If the player is in the lobby, tell the lobbies window that the lobby has been updated,
@@ -683,7 +576,6 @@ namespace gdjs {
       );
 
       if (!lobbiesIframe || !lobbiesIframe.contentWindow) {
-        logger.info('The lobbies iframe is not opened, not sending message.');
         return;
       }
 
@@ -756,7 +648,7 @@ namespace gdjs {
           runtimeScene
         );
         // Do as if the player left the lobby.
-        handleLobbyLeaveEvent();
+        handleLeaveLobbyEvent();
         removeLobbiesContainer(runtimeScene);
         focusOnGame(runtimeScene);
         return;
@@ -785,15 +677,26 @@ namespace gdjs {
           let heartbeatUrl = `${rootApi}/play/game/${gameId}/public-lobby/${_lobbyId}/action/heartbeat`;
           headers['Authorization'] = `player-game-token ${playerToken}`;
           heartbeatUrl += `?playerId=${playerId}`;
+          const players = gdjs.multiplayerMessageManager.getConnectedPlayers();
           await fetch(heartbeatUrl, {
             method: 'POST',
             headers,
+            body: JSON.stringify({
+              players,
+            }),
           });
         }, heartbeatInterval);
       }
 
       // If we are connected to players, then the game can start.
       logger.info('Lobby game has started.');
+      // In case we're joining an existing lobby, read the saved messages to catch-up with the game state.
+      gdjs.multiplayerMessageManager.handleUpdateGameMessagesSaved(
+        runtimeScene
+      );
+      gdjs.multiplayerMessageManager.handleUpdateSceneMessagesSaved(
+        runtimeScene
+      );
       _isReadyToSendOrReceiveGameUpdateMessages = true;
       _hasLobbyGameJustStarted = true;
       _isLobbyGameRunning = true;
@@ -814,7 +717,6 @@ namespace gdjs {
       _hasLobbyGameJustEnded = true;
       _isLobbyGameRunning = false;
       _lobbyId = null;
-      _lobby = null;
       playerNumber = null;
       _isReadyToSendOrReceiveGameUpdateMessages = false;
       if (_lobbyHeartbeatInterval) {
@@ -825,15 +727,22 @@ namespace gdjs {
       gdjs.multiplayerPeerJsHelper.disconnectFromAllPeers();
 
       // Clear the expected acknowledgments, as the game is ending.
-      gdjs.multiplayerMessageManager.clearExpectedMessageAcknowledgements();
+      gdjs.multiplayerMessageManager.clearMessagesTempData();
     };
 
     /**
      * When the game receives the information of the peerId, then
      * the player can connect to the peer.
      */
-    const handlePeerIdEvent = function ({ peerId }: { peerId: string }) {
-      // When a peerId is received, trigger a P2P connection with the peer.
+    const handlePeerIdEvent = function ({
+      peerId,
+      compressionMethod,
+    }: {
+      peerId: string;
+      compressionMethod: gdjs.multiplayerPeerJsHelper.CompressionMethod;
+    }) {
+      // When a peerId is received, trigger a P2P connection with the peer, just after setting the compression method.
+      gdjs.multiplayerPeerJsHelper.setCompressionMethod(compressionMethod);
       const currentPeerId = gdjs.multiplayerPeerJsHelper.getCurrentId();
       if (!currentPeerId) {
         logger.error(
@@ -855,7 +764,7 @@ namespace gdjs {
      * players in the lobby via the websocket.
      * It will then trigger an event from the websocket to all players in the lobby.
      */
-    const handleGameCountdownStartMessage = function () {
+    const handleStartGameCountdownMessage = function () {
       if (!_websocket) {
         logger.error(
           'No connection to send the start countdown message. Are you connected to a lobby?'
@@ -876,7 +785,7 @@ namespace gdjs {
      * players in the lobby via the websocket.
      * It will then trigger an event from the websocket to all players in the lobby.
      */
-    const handleGameStartMessage = function () {
+    const handleStartGameMessage = function () {
       if (!_websocket) {
         logger.error(
           'No connection to send the start countdown message. Are you connected to a lobby?'
@@ -893,6 +802,26 @@ namespace gdjs {
 
       // As the host, start sending messages to the players.
       _isReadyToSendOrReceiveGameUpdateMessages = true;
+    };
+
+    /**
+     * When the game receives a join game message from the lobby, send it via the WS
+     * waiting for a peerId to be received and that the connection happens automatically.
+     */
+    const handleJoinGameMessage = function () {
+      if (!_websocket) {
+        logger.error(
+          'No connection to send the start countdown message. Are you connected to a lobby?'
+        );
+        return;
+      }
+
+      _websocket.send(
+        JSON.stringify({
+          action: 'joinGame',
+          connectionType: 'lobby',
+        })
+      );
     };
 
     /**
@@ -976,7 +905,7 @@ namespace gdjs {
      * Helper to send the ID from PeerJS to the lobby players.
      */
     const sendPeerId = function () {
-      if (!_websocket || !_lobby) {
+      if (!_websocket) {
         logger.error(
           'No connection to send the message. Are you connected to a lobby?'
         );
@@ -1032,19 +961,23 @@ namespace gdjs {
             throw new Error('Malformed message.');
           }
 
-          handleLobbyJoinEvent(runtimeScene, event.data.lobbyId);
+          handleJoinLobbyEvent(runtimeScene, event.data.lobbyId);
           break;
         }
         case 'startGameCountdown': {
-          handleGameCountdownStartMessage();
+          handleStartGameCountdownMessage();
           break;
         }
         case 'startGame': {
-          handleGameStartMessage();
+          handleStartGameMessage();
           break;
         }
         case 'leaveLobby': {
-          handleLobbyLeaveEvent();
+          handleLeaveLobbyEvent();
+          break;
+        }
+        case 'joinGame': {
+          handleJoinGameMessage();
           break;
         }
       }
@@ -1282,9 +1215,9 @@ namespace gdjs {
     /**
      * Action to allow the player to leave the lobby in-game.
      */
-    export const leaveGameLobby = async (runtimeScene: gdjs.RuntimeScene) => {
+    export const leaveGameLobby = async () => {
       // Handle the case where the game has not started yet, so the player is in the lobby.
-      handleLobbyLeaveEvent();
+      handleLeaveLobbyEvent();
       // Handle the case where the game has started, so the player is in the game and connected to other players.
       handleLobbyGameEnded();
     };

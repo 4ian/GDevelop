@@ -22,6 +22,7 @@ import { getHelpLink } from '../Utils/HelpLink';
 import Window from '../Utils/Window';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
+import InlineCheckbox from '../UI/InlineCheckbox';
 
 const defaultMaximumNumberOfPlayers = 4;
 const minimumValueForMaximumNumberOfPlayers = 2;
@@ -37,6 +38,9 @@ const MultiplayerAdmin = ({ gameId }: Props) => {
   const [isSaving, setIsSaving] = React.useState<boolean>(false);
   const [maxPlayersValue, setMaxPlayersValue] = React.useState<number>(2);
   const [minPlayersValue, setMinPlayersValue] = React.useState<number>(1);
+  const [canJoinAfterStart, setCanJoinAfterStart] = React.useState<boolean>(
+    false
+  );
   const { getAuthorizationHeader, profile, limits } = React.useContext(
     AuthenticatedUserContext
   );
@@ -55,6 +59,7 @@ const MultiplayerAdmin = ({ gameId }: Props) => {
       if (lobbyConfiguration) {
         setMaxPlayersValue(lobbyConfiguration.maxPlayers);
         setMinPlayersValue(lobbyConfiguration.minPlayers);
+        setCanJoinAfterStart(lobbyConfiguration.canJoinAfterStart);
         return;
       }
 
@@ -165,6 +170,7 @@ const MultiplayerAdmin = ({ gameId }: Props) => {
             gameId,
             maxPlayers: maxPlayersValue,
             minPlayers: minPlayersValue,
+            canJoinAfterStart,
           }
         );
         setLobbyConfiguration(updatedLobbyConfiguration);
@@ -183,13 +189,21 @@ const MultiplayerAdmin = ({ gameId }: Props) => {
         setIsSaving(false);
       }
     },
-    [getAuthorizationHeader, gameId, userId, maxPlayersValue, minPlayersValue]
+    [
+      getAuthorizationHeader,
+      gameId,
+      userId,
+      maxPlayersValue,
+      minPlayersValue,
+      canJoinAfterStart,
+    ]
   );
 
   const hasUnsavedModifications =
     lobbyConfiguration &&
     (lobbyConfiguration.maxPlayers !== maxPlayersValue ||
-      lobbyConfiguration.minPlayers !== minPlayersValue);
+      lobbyConfiguration.minPlayers !== minPlayersValue ||
+      lobbyConfiguration.canJoinAfterStart !== canJoinAfterStart);
   const canSave = hasUnsavedModifications;
 
   const helpLink = getHelpLink('/all-features/multiplayer/');
@@ -255,6 +269,17 @@ const MultiplayerAdmin = ({ gameId }: Props) => {
           >
             {maxPlayersSelectOptions}
           </SelectField>
+        </Line>
+        <Line noMargin>
+          <InlineCheckbox
+            label={
+              <Trans>Allow players to join after the game has started</Trans>
+            }
+            checked={canJoinAfterStart}
+            onCheck={(e, checked) => {
+              setCanJoinAfterStart(checked);
+            }}
+          />
         </Line>
         <Line noMargin justifyContent="flex-end">
           <LeftLoader isLoading={isSaving}>

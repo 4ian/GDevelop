@@ -347,11 +347,9 @@ const AboutDialog = ({ onClose, updateStatus }: Props) => {
               </Text>
               {!!electron && electronUpdateStatusString ? (
                 <ColumnStackLayout noMargin>
-                  <Text>
-                    <Trans>{electronUpdateStatusString}</Trans>
-                  </Text>
+                  <Text>{electronUpdateStatusString}</Text>
                   <FlatButton
-                    label={<Trans>electronUpdateButtonLabel</Trans>}
+                    label={electronUpdateButtonLabel}
                     onClick={() =>
                       checkUpdates(
                         canDownloadElectronUpdate(updateStatus.status)

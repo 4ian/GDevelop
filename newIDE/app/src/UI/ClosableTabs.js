@@ -113,6 +113,7 @@ export type ClosableTabProps = {|
   active: boolean,
   label: ?React.Node,
   icon: ?React.Node,
+  renderCustomIcon?: ?(lightness: number) => React.Node,
   closable: boolean,
   onClose: () => void,
   onCloseOthers: () => void,
@@ -130,6 +131,7 @@ export function ClosableTab({
   onCloseAll,
   label,
   icon,
+  renderCustomIcon,
   closable,
   onClick,
   onActivated,
@@ -173,9 +175,18 @@ export function ClosableTab({
   );
 
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const textColor = !active
-    ? gdevelopTheme.closableTabs.textColor
-    : gdevelopTheme.closableTabs.selectedTextColor;
+  const textColor = active
+    ? gdevelopTheme.closableTabs.selectedTextColor
+    : gdevelopTheme.closableTabs.textColor;
+
+  const lightness =
+    gdevelopTheme.palette.type === 'dark'
+      ? active
+        ? 0.978
+        : 0.776
+      : active
+      ? 0.022
+      : 0.224;
 
   return (
     <React.Fragment>
@@ -221,8 +232,8 @@ export function ClosableTab({
               fontFamily: gdevelopTheme.closableTabs.fontFamily,
             }}
           >
-            {icon}
-            {icon && label ? <Spacer /> : null}
+            {renderCustomIcon ? renderCustomIcon(lightness) : icon}
+            {(icon || renderCustomIcon) && label ? <Spacer /> : null}
             {label && <span style={styles.tabLabel}>{label}</span>}
           </span>
         </ButtonBase>

@@ -584,7 +584,7 @@ const MainFrame = (props: Props) => {
         ? `${kind} ${name}`
         : kind;
 
-      let customIconUrl = null;
+      let customIconUrl = '';
       if (
         (kind === 'events functions extension' ||
           kind === 'events functions extension') &&
@@ -605,8 +605,6 @@ const MainFrame = (props: Props) => {
           <ExternalEventsIcon />
         ) : kind === 'external layout' ? (
           <ExternalLayoutIcon />
-        ) : customIconUrl ? (
-          <ListIcon iconSize={20} src={customIconUrl} />
         ) : kind === 'events functions extension' ? (
           <ExtensionIcon />
         ) : null;
@@ -618,6 +616,15 @@ const MainFrame = (props: Props) => {
           : undefined;
       return {
         icon,
+        renderCustomIcon: customIconUrl
+          ? (lightness: number) => (
+              <ListIcon
+                iconSize={20}
+                src={customIconUrl}
+                lightness={lightness}
+              />
+            )
+          : null,
         closable,
         label,
         projectItemName: name,

@@ -69,6 +69,7 @@ export function DraggableEditorTabs({
             index={id}
             label={editorTab.label}
             icon={editorTab.icon}
+            renderCustomIcon={editorTab.renderCustomIcon}
             key={editorTab.key}
             id={getTabId(editorTab)}
             data={editorTab.tabOptions ? editorTab.tabOptions.data : undefined}
@@ -113,6 +114,7 @@ export function DraggableClosableTab({
   onCloseAll,
   label,
   icon,
+  renderCustomIcon,
   closable,
   onClick,
   onActivated,
@@ -152,6 +154,7 @@ export function DraggableClosableTab({
                   onCloseAll={onCloseAll}
                   label={label}
                   icon={icon}
+                  renderCustomIcon={renderCustomIcon}
                   closable={closable}
                   onClick={onClick}
                   onActivated={onActivated}

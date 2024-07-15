@@ -15,6 +15,7 @@ type SizeProps =
 
 type Props = {|
   src: string,
+  lightness?: ?number,
   tooltip?: string,
   disabled?: boolean,
   /**
@@ -41,6 +42,7 @@ function ListIcon(props: Props) {
     isGDevelopIcon,
     cssAnimation,
     useExactIconSize,
+    lightness,
   } = props;
 
   const iconWidth =
@@ -58,11 +60,15 @@ function ListIcon(props: Props) {
   const shouldInvertGrayScale = paletteType === 'dark' && isBlackIcon;
 
   let filter = undefined;
-  if (shouldInvertGrayScale) filter = 'grayscale(1) invert(1)';
-  else if (isGDevelopIcon && !isBlackIcon)
+  if (lightness != null && Number.isFinite(lightness)) {
+    filter = `grayscale(1) invert(1) brightness(${lightness})`;
+  } else if (shouldInvertGrayScale) {
+    filter = 'grayscale(1) invert(1)';
+  } else if (isGDevelopIcon && !isBlackIcon) {
     filter = disabled
       ? 'grayscale(100%)'
       : gdevelopTheme.gdevelopIconsCSSFilter;
+  }
 
   const style = {
     maxWidth: useExactIconSize ? undefined : iconWidth,

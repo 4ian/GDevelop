@@ -35,6 +35,7 @@ export type EditorTab = {|
   /** The label shown on the tab. */
   label?: string,
   icon?: React.Node,
+  renderCustomIcon: ?(lightness: number) => React.Node,
   /** the html dataset object to set on the tab button. */
   tabOptions?: TabOptions,
   /** The name of the layout/external layout/external events/extension. */
@@ -78,6 +79,7 @@ export type EditorTabsPersistedState = {|
 export type EditorOpeningOptions = {|
   label?: string,
   icon?: React.Node,
+  renderCustomIcon?: ?(lightness: number) => React.Node,
   projectItemName: ?string,
   tabOptions?: TabOptions,
   renderEditorContainer: (
@@ -125,6 +127,7 @@ export const openEditorTab = (
   {
     label,
     icon,
+    renderCustomIcon,
     projectItemName,
     tabOptions,
     renderEditorContainer,
@@ -148,6 +151,7 @@ export const openEditorTab = (
   const editorTab: EditorTab = {
     label,
     icon,
+    renderCustomIcon,
     projectItemName,
     tabOptions,
     renderEditorContainer,

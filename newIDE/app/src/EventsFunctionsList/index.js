@@ -45,6 +45,7 @@ import {
   getObjectTreeViewItemId,
   type EventsBasedObjectProps,
   type EventsBasedObjectCallbacks,
+  type EventsBasedObjectCreationParameters,
 } from './EventsBasedObjectTreeViewItemContent';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
@@ -538,6 +539,7 @@ const EventsFunctionsList = React.forwardRef<
       onDeleteEventsBasedObject,
       onRenameEventsBasedObject,
       onEventsBasedObjectRenamed,
+      onAddEventsBasedObject,
       selectedEventsFunction,
       selectedEventsBasedBehavior,
       selectedEventsBasedObject,
@@ -774,47 +776,57 @@ const EventsFunctionsList = React.forwardRef<
 
     const addNewEventsBasedObject = React.useCallback(
       () => {
-        const eventBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
+        onAddEventsBasedObject(
+          (parameters: ?EventsBasedObjectCreationParameters) => {
+            if (!parameters) {
+              return;
+            }
 
-        const name = newNameGenerator('MyObject', name =>
-          eventBasedObjects.has(name)
+            const eventBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
+
+            const name = newNameGenerator('MyObject', name =>
+              eventBasedObjects.has(name)
+            );
+            const newEventsBasedObject = eventBasedObjects.insertNew(
+              name,
+              eventBasedObjects.getCount()
+            );
+            newEventsBasedObject.markAsRenderedIn3D(parameters.isRenderedIn3D);
+            if (unsavedChanges) {
+              unsavedChanges.triggerUnsavedChanges();
+            }
+            forceUpdate();
+
+            const objectItemId = getObjectTreeViewItemId(newEventsBasedObject);
+
+            if (treeViewRef.current) {
+              treeViewRef.current.openItems([
+                objectItemId,
+                extensionObjectsRootFolderId,
+              ]);
+            }
+            // Scroll to the new function.
+            // Ideally, we'd wait for the list to be updated to scroll, but
+            // to simplify the code, we just wait a few ms for a new render
+            // to be done.
+            setTimeout(() => {
+              scrollToItem(objectItemId);
+            }, 100); // A few ms is enough for a new render to be done.
+
+            // We focus it so the user can edit the name directly.
+            onSelectEventsBasedObject(newEventsBasedObject);
+            editName(objectItemId);
+          }
         );
-        const newEventsBasedObject = eventBasedObjects.insertNew(
-          name,
-          eventBasedObjects.getCount()
-        );
-        if (unsavedChanges) {
-          unsavedChanges.triggerUnsavedChanges();
-        }
-        forceUpdate();
-
-        const objectItemId = getObjectTreeViewItemId(newEventsBasedObject);
-
-        if (treeViewRef.current) {
-          treeViewRef.current.openItems([
-            objectItemId,
-            extensionObjectsRootFolderId,
-          ]);
-        }
-        // Scroll to the new function.
-        // Ideally, we'd wait for the list to be updated to scroll, but
-        // to simplify the code, we just wait a few ms for a new render
-        // to be done.
-        setTimeout(() => {
-          scrollToItem(objectItemId);
-        }, 100); // A few ms is enough for a new render to be done.
-
-        // We focus it so the user can edit the name directly.
-        onSelectEventsBasedObject(newEventsBasedObject);
-        editName(objectItemId);
       },
       [
-        editName,
+        onAddEventsBasedObject,
         eventsFunctionsExtension,
-        forceUpdate,
-        scrollToItem,
-        onSelectEventsBasedObject,
         unsavedChanges,
+        forceUpdate,
+        onSelectEventsBasedObject,
+        editName,
+        scrollToItem,
       ]
     );
 
@@ -986,6 +998,7 @@ const EventsFunctionsList = React.forwardRef<
         onDeleteEventsBasedObject,
         onRenameEventsBasedObject,
         onEventsBasedObjectRenamed,
+        onAddEventsBasedObject,
         addNewEventsFunction,
         selectedEventsBasedBehavior,
         selectedEventsBasedObject,
@@ -1009,6 +1022,7 @@ const EventsFunctionsList = React.forwardRef<
         onDeleteEventsBasedObject,
         onRenameEventsBasedObject,
         onEventsBasedObjectRenamed,
+        onAddEventsBasedObject,
         addNewEventsFunction,
         selectedEventsBasedBehavior,
         selectedEventsBasedObject,

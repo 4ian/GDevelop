@@ -220,6 +220,8 @@ const CompactInstancePropertiesEditor = ({
                   objectConfiguration={object.getConfiguration()}
                   tileMapTileSelection={tileMapTileSelection}
                   onSelectTileMapTile={onSelectTileMapTile}
+                  showPaintingToolbar
+                  allowMultipleSelection={false}
                 />
               </Column>
             </>

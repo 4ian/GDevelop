@@ -11,6 +11,7 @@ import IconButton from '../UI/IconButton';
 import { LineStackLayout } from '../UI/Layout';
 import FlipHorizontal from '../UI/CustomSvgIcons/FlipHorizontal';
 import FlipVertical from '../UI/CustomSvgIcons/FlipVertical';
+import useForceUpdate from '../Utils/UseForceUpdate';
 
 const styles = {
   tileContainer: { flex: 1, position: 'relative', display: 'flex' },
@@ -99,6 +100,10 @@ export type TileMapTileSelection =
       flipVertically: boolean,
     |}
   | {|
+      kind: 'multiple',
+      coordinates: TileMapCoordinates[],
+    |}
+  | {|
       kind: 'erase',
     |};
 
@@ -107,6 +112,8 @@ type Props = {|
   objectConfiguration: gdObjectConfiguration,
   tileMapTileSelection: ?TileMapTileSelection,
   onSelectTileMapTile: (?TileMapTileSelection) => void,
+  allowMultipleSelection: boolean,
+  showPaintingToolbar: boolean,
 |};
 
 const TileMapPainter = ({
@@ -114,7 +121,10 @@ const TileMapPainter = ({
   objectConfiguration,
   tileMapTileSelection,
   onSelectTileMapTile,
+  allowMultipleSelection,
+  showPaintingToolbar,
 }: Props) => {
+  const forceUpdate = useForceUpdate();
   const atlasResource = getAtlasResource({ project, objectConfiguration });
   const [
     shouldFlipVertically,
@@ -145,6 +155,15 @@ const TileMapPainter = ({
     : 0;
   const displayedTileSize = imageWidth ? imageWidth / columnCount : null;
 
+  React.useEffect(
+    () => {
+      forceUpdate();
+    },
+    // Force update component after first mount to make sure displayedTileSize
+    // can be computed after ref has been set.
+    [forceUpdate]
+  );
+
   const onClickAtlas = React.useCallback(
     (event: MouseEvent) => {
       if (
@@ -164,20 +183,44 @@ const TileMapPainter = ({
         columnCount - 1
       );
       const y = Math.min(Math.floor(mouseY / displayedTileSize), rowCount - 1);
-      if (
-        tileMapTileSelection &&
-        tileMapTileSelection.kind === 'single' &&
-        tileMapTileSelection.coordinates.x === x &&
-        tileMapTileSelection.coordinates.y === y
-      ) {
-        onSelectTileMapTile(null);
+      if (allowMultipleSelection) {
+        const isAlreadySelected =
+          tileMapTileSelection &&
+          tileMapTileSelection.kind === 'multiple' &&
+          tileMapTileSelection.coordinates.some(
+            coordinates => coordinates.x === x && coordinates.y === y
+          );
+        const newSelection =
+          tileMapTileSelection && tileMapTileSelection.kind === 'multiple'
+            ? { ...tileMapTileSelection }
+            : { kind: 'multiple', coordinates: [] };
+        if (!isAlreadySelected) {
+          newSelection.coordinates.push({ x, y });
+        } else {
+          const index = newSelection.coordinates.findIndex(
+            coordinates => coordinates.x === x && coordinates.y === y
+          );
+          if (index > -1) {
+            newSelection.coordinates.splice(index, 1);
+          }
+        }
+        onSelectTileMapTile(newSelection);
       } else {
-        onSelectTileMapTile({
-          kind: 'single',
-          coordinates: { x, y },
-          flipHorizontally: shouldFlipHorizontally,
-          flipVertically: shouldFlipVertically,
-        });
+        if (
+          tileMapTileSelection &&
+          tileMapTileSelection.kind === 'single' &&
+          tileMapTileSelection.coordinates.x === x &&
+          tileMapTileSelection.coordinates.y === y
+        ) {
+          onSelectTileMapTile(null);
+        } else {
+          onSelectTileMapTile({
+            kind: 'single',
+            coordinates: { x, y },
+            flipHorizontally: shouldFlipHorizontally,
+            flipVertically: shouldFlipVertically,
+          });
+        }
       }
     },
     [
@@ -188,6 +231,7 @@ const TileMapPainter = ({
       onSelectTileMapTile,
       shouldFlipHorizontally,
       shouldFlipVertically,
+      allowMultipleSelection,
     ]
   );
 
@@ -234,81 +278,86 @@ const TileMapPainter = ({
 
   return (
     <Column noMargin>
-      <LineStackLayout alignItems="center">
-        <IconButton
-          size="small"
-          selected={
-            !!tileMapTileSelection && tileMapTileSelection.kind === 'erase'
-          }
-          onClick={e => {
-            if (!!tileMapTileSelection && tileMapTileSelection.kind === 'erase')
-              onSelectTileMapTile(null);
-            else onSelectTileMapTile({ kind: 'erase' });
-          }}
-        >
-          <Erase style={styles.icon} />
-        </IconButton>
-        <IconButton
-          size="small"
-          selected={
-            !!tileMapTileSelection && tileMapTileSelection.kind === 'single'
-          }
-          onClick={e => {
-            if (
-              !!tileMapTileSelection &&
-              tileMapTileSelection.kind === 'single'
-            )
-              onSelectTileMapTile(null);
-            else
-              onSelectTileMapTile({
-                kind: 'single',
-                coordinates: lastSelectedTile || { x: 0, y: 0 },
-                flipHorizontally: shouldFlipHorizontally,
-                flipVertically: shouldFlipVertically,
-              });
-          }}
-        >
-          <Brush style={styles.icon} />
-        </IconButton>
-        <IconButton
-          size="small"
-          selected={shouldFlipHorizontally}
-          onClick={e => {
-            const newShouldFlipHorizontally = !shouldFlipHorizontally;
-            setShouldFlipHorizontally(newShouldFlipHorizontally);
-            if (
-              !!tileMapTileSelection &&
-              tileMapTileSelection.kind === 'single'
-            ) {
-              onSelectTileMapTile({
-                ...tileMapTileSelection,
-                flipHorizontally: newShouldFlipHorizontally,
-              });
+      {showPaintingToolbar && (
+        <LineStackLayout alignItems="center">
+          <IconButton
+            size="small"
+            selected={
+              !!tileMapTileSelection && tileMapTileSelection.kind === 'erase'
             }
-          }}
-        >
-          <FlipHorizontal style={styles.icon} />
-        </IconButton>
-        <IconButton
-          size="small"
-          selected={shouldFlipVertically}
-          onClick={e => {
-            const newShouldFlipVertically = !shouldFlipVertically;
-            setShouldFlipVertically(newShouldFlipVertically);
-            if (
-              !!tileMapTileSelection &&
-              tileMapTileSelection.kind === 'single'
-            ) {
-              onSelectTileMapTile({
-                ...tileMapTileSelection,
-                flipVertically: newShouldFlipVertically,
-              });
+            onClick={e => {
+              if (
+                !!tileMapTileSelection &&
+                tileMapTileSelection.kind === 'erase'
+              )
+                onSelectTileMapTile(null);
+              else onSelectTileMapTile({ kind: 'erase' });
+            }}
+          >
+            <Erase style={styles.icon} />
+          </IconButton>
+          <IconButton
+            size="small"
+            selected={
+              !!tileMapTileSelection && tileMapTileSelection.kind === 'single'
             }
-          }}
-        >
-          <FlipVertical style={styles.icon} />
-        </IconButton>
-      </LineStackLayout>
+            onClick={e => {
+              if (
+                !!tileMapTileSelection &&
+                tileMapTileSelection.kind === 'single'
+              )
+                onSelectTileMapTile(null);
+              else
+                onSelectTileMapTile({
+                  kind: 'single',
+                  coordinates: lastSelectedTile || { x: 0, y: 0 },
+                  flipHorizontally: shouldFlipHorizontally,
+                  flipVertically: shouldFlipVertically,
+                });
+            }}
+          >
+            <Brush style={styles.icon} />
+          </IconButton>
+          <IconButton
+            size="small"
+            selected={shouldFlipHorizontally}
+            onClick={e => {
+              const newShouldFlipHorizontally = !shouldFlipHorizontally;
+              setShouldFlipHorizontally(newShouldFlipHorizontally);
+              if (
+                !!tileMapTileSelection &&
+                tileMapTileSelection.kind === 'single'
+              ) {
+                onSelectTileMapTile({
+                  ...tileMapTileSelection,
+                  flipHorizontally: newShouldFlipHorizontally,
+                });
+              }
+            }}
+          >
+            <FlipHorizontal style={styles.icon} />
+          </IconButton>
+          <IconButton
+            size="small"
+            selected={shouldFlipVertically}
+            onClick={e => {
+              const newShouldFlipVertically = !shouldFlipVertically;
+              setShouldFlipVertically(newShouldFlipVertically);
+              if (
+                !!tileMapTileSelection &&
+                tileMapTileSelection.kind === 'single'
+              ) {
+                onSelectTileMapTile({
+                  ...tileMapTileSelection,
+                  flipVertically: newShouldFlipVertically,
+                });
+              }
+            }}
+          >
+            <FlipVertical style={styles.icon} />
+          </IconButton>
+        </LineStackLayout>
+      )}
       <Line justifyContent="stretch">
         {atlasResource && (
           <div
@@ -351,6 +400,22 @@ const TileMapPainter = ({
                   ).toString()}
                 />
               )}
+            {tileMapTileSelection &&
+              tileMapTileSelection.kind === 'multiple' &&
+              displayedTileSize &&
+              tileMapTileSelection.coordinates.map(coordinates => {
+                const id = coordinates.x * rowCount + coordinates.y;
+                return (
+                  <Tile
+                    key={`selected-tile-${id}`}
+                    highlighted
+                    size={displayedTileSize}
+                    x={coordinates.x}
+                    y={coordinates.y}
+                    title={id.toString()}
+                  />
+                );
+              })}
           </div>
         )}
       </Line>

@@ -20,7 +20,7 @@ export const getElectronUpdateNotificationTitle = (
   updateStatus: ElectronUpdateStatus
 ) => {
   if (updateStatus.status === 'update-available')
-    return 'A new update is available!';
+    return <Trans>A new update is available!</Trans>;
 
   return '';
 };
@@ -29,27 +29,38 @@ export const getElectronUpdateNotificationBody = (
   updateStatus: ElectronUpdateStatus
 ) => {
   if (updateStatus.status === 'update-available')
-    return 'It will be downloaded and installed automatically (unless you deactivated this in preferences)';
+    return (
+      <Trans>
+        It will be downloaded and installed automatically (unless you
+        deactivated this in preferences)
+      </Trans>
+    );
 
   return '';
 };
 
 export const getElectronUpdateStatusLabel = (status: string) => {
-  if (status === 'checking-for-update') return 'Checking for update...';
-  if (status === 'update-available') return 'A new update is available!';
+  if (status === 'checking-for-update')
+    return <Trans>Checking for update...</Trans>;
+  if (status === 'update-available')
+    return <Trans>A new update is available!</Trans>;
   if (status === 'update-not-available')
-    return "No update available. You're using the latest version!";
-  if (status === 'error') return 'Error while checking update';
+    return <Trans>No update available. You're using the latest version!</Trans>;
+  if (status === 'error') return <Trans>Error while checking update</Trans>;
   if (status === 'download-progress')
-    return 'A new update is being downloaded...';
+    return <Trans>A new update is being downloaded...</Trans>;
   if (status === 'update-downloaded')
-    return 'A new update will be installed after you quit and relaunch GDevelop';
+    return (
+      <Trans>
+        A new update will be installed after you quit and relaunch GDevelop
+      </Trans>
+    );
   return '';
 };
 
 export const getElectronUpdateButtonLabel = (status: string) => {
   if (status === 'update-available') return 'Update GDevelop to latest version';
-  return 'Check again for new updates';
+  return <Trans>Check again for new updates</Trans>;
 };
 
 export const canDownloadElectronUpdate = (status: string) => {

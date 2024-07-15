@@ -589,10 +589,10 @@ const MainFrame = (props: Props) => {
         (kind === 'events functions extension' ||
           kind === 'events functions extension') &&
         project &&
-        project.hasEventsFunctionsExtensionNamed(kind)
+        project.hasEventsFunctionsExtensionNamed(name)
       ) {
         const eventsFunctionsExtension = project.getEventsFunctionsExtension(
-          kind
+          name
         );
         customIconUrl = eventsFunctionsExtension.getIconUrl();
       }
@@ -606,7 +606,7 @@ const MainFrame = (props: Props) => {
         ) : kind === 'external layout' ? (
           <ExternalLayoutIcon />
         ) : customIconUrl ? (
-          <ListIcon iconSize={22} src={customIconUrl} />
+          <ListIcon iconSize={20} src={customIconUrl} />
         ) : kind === 'events functions extension' ? (
           <ExtensionIcon />
         ) : null;

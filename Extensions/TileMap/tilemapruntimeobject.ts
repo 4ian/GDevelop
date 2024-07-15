@@ -413,6 +413,7 @@ namespace gdjs {
     setOpacity(opacity: float): void {
       this._opacity = opacity;
       this._renderer.updateOpacity();
+      // TODO: Set all tile layers alpha and re-render tilemap.
     }
 
     getOpacity(): float {

@@ -90,6 +90,20 @@ namespace gdjs {
 
     updateOpacity(): void {
       this._pixiObject.alpha = this._object._opacity / 255;
+      const tileMap = this._tileMap;
+      if (!tileMap) return;
+      for (const layer of tileMap.getLayers()) {
+        if (
+          (this._object._displayMode === 'index' &&
+            this._object._layerIndex !== layer.id) ||
+          (this._object._displayMode === 'visible' && !layer.isVisible())
+        ) {
+          continue;
+        }
+        if (layer instanceof TileMapHelper.EditableTileMapLayer) {
+          layer.setAlpha(this._pixiObject.alpha);
+        }
+      }
     }
 
     getTileMapWidth() {

@@ -299,6 +299,7 @@ namespace gdjs {
     setOpacity(opacity: float): void {
       this._opacity = opacity;
       this._renderer.updateOpacity();
+      this._isTileMapDirty = true;
     }
 
     getOpacity(): float {

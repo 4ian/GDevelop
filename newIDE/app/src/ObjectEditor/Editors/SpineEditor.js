@@ -308,246 +308,238 @@ const SpineEditor = ({
   );
 
   return (
-    <>
-      <ScrollView ref={scrollView}>
-        <ColumnStackLayout noMargin>
-          {renderObjectNameField && renderObjectNameField()}
-          <AlertMessage
-            kind="warning"
-            renderRightButton={() => (
-              <FlatButton
-                style={styles.neverShrinkingButton}
-                label={<Trans>Purchase Spine</Trans>}
-                onClick={() =>
-                  Window.openExternalURL(
-                    'https://esotericsoftware.com/spine-purchase'
-                  )
-                }
-              />
-            )}
-          >
-            <Trans>
-              You must own a Spine license to publish a game with a Spine
-              object.
-            </Trans>
-          </AlertMessage>
-          <PropertyResourceSelector
-            objectConfiguration={objectConfiguration}
-            propertyName="spineResourceName"
-            project={project}
-            resourceManagementProps={resourceManagementProps}
-            onChange={onChangeSpineResourceName}
-          />
-          {!spineData.skeleton && spineData.loadingErrorReason ? (
-            <AlertMessage kind="error">
-              {spineData.loadingErrorReason === 'invalid-spine-resource' ? (
-                <Trans>
-                  The selected resource is not a proper Spine resource.
-                </Trans>
-              ) : spineData.loadingErrorReason ===
-                'missing-texture-atlas-name' ? (
-                <Trans>Missing texture atlas name in the Spine file.</Trans>
-              ) : spineData.loadingErrorReason ===
-                'spine-resource-loading-error' ? (
-                <Trans>
-                  Error while loading the Spine resource (
-                  {spineData.loadingError
-                    ? spineData.loadingError.message
-                    : 'Unknown error'}
-                  ).
-                </Trans>
-              ) : spineData.loadingErrorReason === 'invalid-atlas-resource' ? (
-                <Trans>
-                  The Atlas embedded in the Spine fine can't be located.
-                </Trans>
-              ) : spineData.loadingErrorReason ===
-                'missing-texture-resources' ? (
-                <Trans>Missing texture for an atlas in the Spine file.</Trans>
-              ) : spineData.loadingErrorReason ===
-                'atlas-resource-loading-error' ? (
-                <Trans>
-                  Error while loading the Spine Texture Atlas resource (
-                  {spineData.loadingError
-                    ? spineData.loadingError.message
-                    : 'Unknown error'}
-                  ).
-                </Trans>
-              ) : null}
-            </AlertMessage>
-          ) : null}
-          <Text size="block-title" noMargin>
-            <Trans>Default size</Trans>
-          </Text>
-          <PropertyField
-            objectConfiguration={objectConfiguration}
-            propertyName="scale"
-          />
-          {sourceSelectOptions.length && (
-            <>
-              <Text size="block-title">Animations</Text>
-              <Column noMargin expand useFullHeight>
-                {spineConfiguration.getAnimationsCount() === 0 ? (
-                  <Column noMargin expand justifyContent="center">
-                    <EmptyPlaceholder
-                      title={<Trans>Add your first animation</Trans>}
-                      description={
-                        <Trans>
-                          Import one or more animations that are available in
-                          this Spine file.
-                        </Trans>
-                      }
-                      actionLabel={<Trans>Add an animation</Trans>}
-                      onAction={addAnimation}
-                    />
-                  </Column>
-                ) : (
-                  <React.Fragment>
-                    {mapFor(
-                      0,
-                      spineConfiguration.getAnimationsCount(),
-                      animationIndex => {
-                        const animation = spineConfiguration.getAnimation(
-                          animationIndex
-                        );
-
-                        const animationRef =
-                          justAddedAnimationName === animation.getName()
-                            ? justAddedAnimationElement
-                            : null;
-
-                        return (
-                          <DragSourceAndDropTarget
-                            key={animationIndex}
-                            beginDrag={() => {
-                              draggedAnimationIndex.current = animationIndex;
-                              return {};
-                            }}
-                            canDrag={() => true}
-                            canDrop={() => true}
-                            drop={() => {
-                              moveAnimation(animationIndex);
-                            }}
-                          >
-                            {({
-                              connectDragSource,
-                              connectDropTarget,
-                              isOver,
-                              canDrop,
-                            }) =>
-                              connectDropTarget(
-                                <div
-                                  key={animationIndex}
-                                  style={styles.rowContainer}
-                                >
-                                  {isOver && (
-                                    <DropIndicator canDrop={canDrop} />
-                                  )}
-                                  <div
-                                    ref={animationRef}
-                                    style={{
-                                      ...styles.rowContent,
-                                      backgroundColor:
-                                        gdevelopTheme.list.itemsBackgroundColor,
-                                    }}
-                                  >
-                                    <Line noMargin expand alignItems="center">
-                                      {connectDragSource(
-                                        <span>
-                                          <Column>
-                                            <DragHandleIcon />
-                                          </Column>
-                                        </span>
-                                      )}
-                                      <Text noMargin noShrink>
-                                        <Trans>
-                                          Animation #{animationIndex}
-                                        </Trans>
-                                      </Text>
-                                      <Spacer />
-                                      <SemiControlledTextField
-                                        margin="none"
-                                        commitOnBlur
-                                        errorText={nameErrors[animationIndex]}
-                                        translatableHintText={t`Optional animation name`}
-                                        value={animation.getName()}
-                                        onChange={text =>
-                                          changeAnimationName(
-                                            animationIndex,
-                                            text
-                                          )
-                                        }
-                                        fullWidth
-                                      />
-                                      <IconButton
-                                        size="small"
-                                        onClick={() =>
-                                          removeAnimation(animationIndex)
-                                        }
-                                      >
-                                        <Trash />
-                                      </IconButton>
-                                    </Line>
-                                    <Spacer />
-                                  </div>
-                                  <Spacer />
-                                  <ColumnStackLayout expand>
-                                    <SelectField
-                                      id="animation-source-field"
-                                      value={animation.getSource()}
-                                      onChange={(event, value) => {
-                                        animation.setSource(event.target.value);
-                                        forceUpdate();
-                                      }}
-                                      margin="dense"
-                                      fullWidth
-                                      floatingLabelText={
-                                        <Trans>Spine animation name</Trans>
-                                      }
-                                      translatableHintText={t`Choose an animation`}
-                                    >
-                                      {sourceSelectOptions}
-                                    </SelectField>
-                                    <Checkbox
-                                      label={<Trans>Loop</Trans>}
-                                      checked={animation.shouldLoop()}
-                                      onCheck={(e, checked) => {
-                                        animation.setShouldLoop(checked);
-                                        forceUpdate();
-                                      }}
-                                    />
-                                  </ColumnStackLayout>
-                                </div>
-                              )
-                            }
-                          </DragSourceAndDropTarget>
-                        );
-                      }
-                    )}
-                  </React.Fragment>
-                )}
-              </Column>
-              <Column noMargin>
-                <ResponsiveLineStackLayout
-                  justifyContent="space-between"
-                  noColumnMargin
-                >
-                  <FlatButton
-                    label={<Trans>Scan missing animations</Trans>}
-                    onClick={scanNewAnimations}
-                  />
-                  <RaisedButton
-                    label={<Trans>Add an animation</Trans>}
-                    primary
-                    onClick={addAnimation}
-                    icon={<Add />}
-                  />
-                </ResponsiveLineStackLayout>
-              </Column>
-            </>
+    <ScrollView ref={scrollView}>
+      <ColumnStackLayout noMargin>
+        {renderObjectNameField && renderObjectNameField()}
+        <AlertMessage
+          kind="warning"
+          renderRightButton={() => (
+            <FlatButton
+              style={styles.neverShrinkingButton}
+              label={<Trans>Purchase Spine</Trans>}
+              onClick={() =>
+                Window.openExternalURL(
+                  'https://esotericsoftware.com/spine-purchase'
+                )
+              }
+            />
           )}
-        </ColumnStackLayout>
-      </ScrollView>
-    </>
+        >
+          <Trans>
+            You must own a Spine license to publish a game with a Spine object.
+          </Trans>
+        </AlertMessage>
+        <PropertyResourceSelector
+          objectConfiguration={objectConfiguration}
+          propertyName="spineResourceName"
+          project={project}
+          resourceManagementProps={resourceManagementProps}
+          onChange={onChangeSpineResourceName}
+        />
+        {!spineData.skeleton && spineData.loadingErrorReason ? (
+          <AlertMessage kind="error">
+            {spineData.loadingErrorReason === 'invalid-spine-resource' ? (
+              <Trans>
+                The selected resource is not a proper Spine resource.
+              </Trans>
+            ) : spineData.loadingErrorReason ===
+              'missing-texture-atlas-name' ? (
+              <Trans>Missing texture atlas name in the Spine file.</Trans>
+            ) : spineData.loadingErrorReason ===
+              'spine-resource-loading-error' ? (
+              <Trans>
+                Error while loading the Spine resource (
+                {spineData.loadingError
+                  ? spineData.loadingError.message
+                  : 'Unknown error'}
+                ).
+              </Trans>
+            ) : spineData.loadingErrorReason === 'invalid-atlas-resource' ? (
+              <Trans>
+                The Atlas embedded in the Spine fine can't be located.
+              </Trans>
+            ) : spineData.loadingErrorReason === 'missing-texture-resources' ? (
+              <Trans>Missing texture for an atlas in the Spine file.</Trans>
+            ) : spineData.loadingErrorReason ===
+              'atlas-resource-loading-error' ? (
+              <Trans>
+                Error while loading the Spine Texture Atlas resource (
+                {spineData.loadingError
+                  ? spineData.loadingError.message
+                  : 'Unknown error'}
+                ).
+              </Trans>
+            ) : null}
+          </AlertMessage>
+        ) : null}
+        <Text size="block-title" noMargin>
+          <Trans>Default size</Trans>
+        </Text>
+        <PropertyField
+          objectConfiguration={objectConfiguration}
+          propertyName="scale"
+        />
+        {sourceSelectOptions.length && (
+          <>
+            <Text size="block-title">Animations</Text>
+            <Column noMargin expand useFullHeight>
+              {spineConfiguration.getAnimationsCount() === 0 ? (
+                <Column noMargin expand justifyContent="center">
+                  <EmptyPlaceholder
+                    title={<Trans>Add your first animation</Trans>}
+                    description={
+                      <Trans>
+                        Import one or more animations that are available in this
+                        Spine file.
+                      </Trans>
+                    }
+                    actionLabel={<Trans>Add an animation</Trans>}
+                    onAction={addAnimation}
+                  />
+                </Column>
+              ) : (
+                <React.Fragment>
+                  {mapFor(
+                    0,
+                    spineConfiguration.getAnimationsCount(),
+                    animationIndex => {
+                      const animation = spineConfiguration.getAnimation(
+                        animationIndex
+                      );
+
+                      const animationRef =
+                        justAddedAnimationName === animation.getName()
+                          ? justAddedAnimationElement
+                          : null;
+
+                      return (
+                        <DragSourceAndDropTarget
+                          key={animationIndex}
+                          beginDrag={() => {
+                            draggedAnimationIndex.current = animationIndex;
+                            return {};
+                          }}
+                          canDrag={() => true}
+                          canDrop={() => true}
+                          drop={() => {
+                            moveAnimation(animationIndex);
+                          }}
+                        >
+                          {({
+                            connectDragSource,
+                            connectDropTarget,
+                            isOver,
+                            canDrop,
+                          }) =>
+                            connectDropTarget(
+                              <div
+                                key={animationIndex}
+                                style={styles.rowContainer}
+                              >
+                                {isOver && <DropIndicator canDrop={canDrop} />}
+                                <div
+                                  ref={animationRef}
+                                  style={{
+                                    ...styles.rowContent,
+                                    backgroundColor:
+                                      gdevelopTheme.list.itemsBackgroundColor,
+                                  }}
+                                >
+                                  <Line noMargin expand alignItems="center">
+                                    {connectDragSource(
+                                      <span>
+                                        <Column>
+                                          <DragHandleIcon />
+                                        </Column>
+                                      </span>
+                                    )}
+                                    <Text noMargin noShrink>
+                                      <Trans>Animation #{animationIndex}</Trans>
+                                    </Text>
+                                    <Spacer />
+                                    <SemiControlledTextField
+                                      margin="none"
+                                      commitOnBlur
+                                      errorText={nameErrors[animationIndex]}
+                                      translatableHintText={t`Optional animation name`}
+                                      value={animation.getName()}
+                                      onChange={text =>
+                                        changeAnimationName(
+                                          animationIndex,
+                                          text
+                                        )
+                                      }
+                                      fullWidth
+                                    />
+                                    <IconButton
+                                      size="small"
+                                      onClick={() =>
+                                        removeAnimation(animationIndex)
+                                      }
+                                    >
+                                      <Trash />
+                                    </IconButton>
+                                  </Line>
+                                  <Spacer />
+                                </div>
+                                <Spacer />
+                                <ColumnStackLayout expand>
+                                  <SelectField
+                                    id="animation-source-field"
+                                    value={animation.getSource()}
+                                    onChange={(event, value) => {
+                                      animation.setSource(event.target.value);
+                                      forceUpdate();
+                                    }}
+                                    margin="dense"
+                                    fullWidth
+                                    floatingLabelText={
+                                      <Trans>Spine animation name</Trans>
+                                    }
+                                    translatableHintText={t`Choose an animation`}
+                                  >
+                                    {sourceSelectOptions}
+                                  </SelectField>
+                                  <Checkbox
+                                    label={<Trans>Loop</Trans>}
+                                    checked={animation.shouldLoop()}
+                                    onCheck={(e, checked) => {
+                                      animation.setShouldLoop(checked);
+                                      forceUpdate();
+                                    }}
+                                  />
+                                </ColumnStackLayout>
+                              </div>
+                            )
+                          }
+                        </DragSourceAndDropTarget>
+                      );
+                    }
+                  )}
+                </React.Fragment>
+              )}
+            </Column>
+            <Column noMargin>
+              <ResponsiveLineStackLayout
+                justifyContent="space-between"
+                noColumnMargin
+              >
+                <FlatButton
+                  label={<Trans>Scan missing animations</Trans>}
+                  onClick={scanNewAnimations}
+                />
+                <RaisedButton
+                  label={<Trans>Add an animation</Trans>}
+                  primary
+                  onClick={addAnimation}
+                  icon={<Add />}
+                />
+              </ResponsiveLineStackLayout>
+            </Column>
+          </>
+        )}
+      </ColumnStackLayout>
+    </ScrollView>
   );
 };
 

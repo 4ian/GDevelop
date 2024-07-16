@@ -71,14 +71,6 @@ export class EditableTileMap {
     // TODO: Actually save and load tileset when useful.
     new Array(columnCount * rowCount).fill(0).forEach((_, index) => {
       tileSet.set(index, new TileDefinition(0));
-      if (index === 132) {
-        tileSet.get(index).addHitBox('collision', [
-          [0, 0],
-          [0, tileSize],
-          [tileSize, tileSize],
-          [tileSize, 0],
-        ])
-      }
     });
 
     const tileMap = new EditableTileMap(

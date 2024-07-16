@@ -43,9 +43,11 @@ namespace gdjs {
     _displayMode = 'all';
     _layerIndex = 0;
     _initialTileMapAsJsObject: object | null = null;
+    _initialTilesWithHitBox: number[];
     _isTileMapDirty: boolean = false;
     _sceneToTileMapTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
     _collisionTileMap: gdjs.TileMap.TransformedCollisionTileMap | null = null;
+    _hitBoxTag: string = 'collision';
     // TODO: Add a debug mode like for TileMapCollisionMaskRuntimeObject to draw?
 
     constructor(instanceContainer: gdjs.RuntimeInstanceContainer, objectData) {
@@ -55,6 +57,11 @@ namespace gdjs {
       this._rowCount = objectData.content.rowCount;
       this._columnCount = objectData.content.columnCount;
       this._tileSize = objectData.content.tileSize;
+      this._initialTilesWithHitBox = (objectData.content
+        .tilesWithHitBox as string)
+        .split(',')
+        .filter((id) => !!id)
+        .map((idAsString) => parseInt(idAsString, 10));
       this._tileMapManager = gdjs.TileMap.TileMapRuntimeManager.getManager(
         instanceContainer
       );
@@ -155,7 +162,7 @@ namespace gdjs {
 
       // 2. Update the renderer so that it updates the tilemap object
       // (used for width and position calculations).
-      const tileMap = this._updateTileMap();
+      const tileMap = this._loadInitialTileMap();
 
       // 3. Set custom dimensions if applicable.
       if (initialInstanceData.customSize) {
@@ -168,12 +175,12 @@ namespace gdjs {
 
       this._collisionTileMap = new gdjs.TileMap.TransformedCollisionTileMap(
         tileMap,
-        'collision'
+        this._hitBoxTag
       );
       this.updateTransformation();
     }
 
-    private _updateTileMap(): TileMapHelper.EditableTileMap {
+    private _loadInitialTileMap(): TileMapHelper.EditableTileMap {
       const tileMap = TileMapHelper.EditableTileMap.from(
         this._initialTileMapAsJsObject,
         {
@@ -182,6 +189,21 @@ namespace gdjs {
           rowCount: this._rowCount,
         }
       );
+      this._initialTilesWithHitBox.forEach((tileId) => {
+        const tileDefinition = tileMap.getTileDefinition(tileId);
+        if (!tileDefinition) {
+          console.warn(
+            `Could not set hit box for tile with id ${tileId}. Continuing.`
+          );
+          return;
+        }
+        tileDefinition.addHitBox(this._hitBoxTag, [
+          [0, 0],
+          [0, tileMap.getTileHeight()],
+          [tileMap.getTileWidth(), tileMap.getTileHeight()],
+          [tileMap.getTileWidth(), 0],
+        ]);
+      });
       this._tileMapManager.getOrLoadSimpleTileMapTextureCache(
         (textureName) => {
           return (this.getInstanceContainer()
@@ -339,7 +361,7 @@ namespace gdjs {
       this.updateTransformation();
       if (!this._collisionTileMap) return;
       // Update the RuntimeObject hitboxes attribute.
-      for (const _ of this._collisionTileMap.getAllHitboxes('collision')) {
+      for (const _ of this._collisionTileMap.getAllHitboxes(this._hitBoxTag)) {
         // RuntimeObject.hitBoxes contains the same polygons instances as the
         // hitboxes from the tiles.
         //
@@ -347,7 +369,7 @@ namespace gdjs {
         // according to the new object location if needed.
         // Iterating over all the tiles forces them to update their hitboxes.
         //
-        // The hitboxes array is built by _updateTileMap().
+        // The hitboxes array is built by _loadInitialTileMap().
       }
       this.hitBoxesDirty = false;
       this.updateAABB();
@@ -437,7 +459,7 @@ namespace gdjs {
       this.updateTransformation();
       if (!this._collisionTileMap) return [];
       return this._collisionTileMap.getHitboxesAround(
-        'collision',
+        this._hitBoxTag,
         left,
         top,
         right,

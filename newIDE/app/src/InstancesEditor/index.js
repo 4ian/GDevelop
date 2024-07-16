@@ -105,6 +105,7 @@ export type InstancesEditorPropsWithoutSizeAndScroll = {|
   pauseRendering: boolean,
   instancesEditorShortcutsCallbacks: InstancesEditorShortcutsCallbacks,
   tileMapTileSelection: ?TileMapTileSelection,
+  onSelectTileMapTile: (?TileMapTileSelection) => void,
 |};
 
 type Props = {|
@@ -1263,8 +1264,10 @@ export default class InstancesEditor extends Component<Props> {
   };
 
   onPressEscape = () => {
-    if (this.clickInterceptor) {
+    if (this.clickInterceptor && this.clickInterceptor.isIntercepting()) {
       this.clickInterceptor.cancelClickInterception();
+    } else if (this.props.tileMapTileSelection) {
+      this.props.onSelectTileMapTile(null);
     }
   };
 

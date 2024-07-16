@@ -703,7 +703,8 @@ namespace gdjs {
    */
   gdjs.dialogueTree.getVisitedBranchTitles = function () {
     if (this.dialogueIsRunning) {
-      return Object.keys(this.runner.visited).join(',');
+      console.log({runner: this.runner})
+      // return Object.keys(this.runner.visited).join(',');
     }
     return '';
   };
@@ -717,10 +718,12 @@ namespace gdjs {
     if (!title) {
       title = this.dialogueBranchTitle;
     }
-    return (
-      Object.keys(this.runner.visited).includes(title) &&
-      this.runner.visited[title]
-    );
+    console.log({bondage})
+    return false;
+    // return (
+    //   Object.keys(this.runner.visited).includes(title) &&
+    //   this.runner.visited[title]
+    // );
   };
 
   /**

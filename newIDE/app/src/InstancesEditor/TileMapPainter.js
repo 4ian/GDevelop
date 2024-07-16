@@ -55,22 +55,6 @@ const useStylesForTile = (highlighted: boolean) =>
     })
   )();
 
-const getAtlasResource = ({
-  project,
-  objectConfiguration,
-}: {|
-  project: gdProject,
-  objectConfiguration: gdObjectConfiguration,
-|}): ?{| atlasResourceName: string |} => {
-  const atlasResourceName = objectConfiguration
-    .getProperties()
-    .get('atlasImage')
-    .getValue();
-  return {
-    atlasResourceName,
-  };
-};
-
 const getTileset = (objectConfiguration: gdObjectConfiguration) => {
   const columnCount = parseFloat(
     objectConfiguration
@@ -136,6 +120,10 @@ type Props = {|
   onSelectTileMapTile: (?TileMapTileSelection) => void,
   allowMultipleSelection: boolean,
   showPaintingToolbar: boolean,
+  onAtlasImageLoaded?: (
+    e: SyntheticEvent<HTMLImageElement>,
+    atlasResourceName: string
+  ) => void,
 |};
 
 const TileMapPainter = ({
@@ -145,9 +133,13 @@ const TileMapPainter = ({
   onSelectTileMapTile,
   allowMultipleSelection,
   showPaintingToolbar,
+  onAtlasImageLoaded,
 }: Props) => {
   const forceUpdate = useForceUpdate();
-  const atlasResource = getAtlasResource({ project, objectConfiguration });
+  const atlasResourceName = objectConfiguration
+    .getProperties()
+    .get('atlasImage')
+    .getValue();
   const [
     shouldFlipVertically,
     setShouldFlipVertically,
@@ -161,10 +153,8 @@ const TileMapPainter = ({
     setLastSelectedTile,
   ] = React.useState<?TileMapCoordinates>(null);
   const tileContainerRef = React.useRef<?HTMLDivElement>(null);
-  const { columnCount, rowCount } = React.useMemo(
-    () => getTileset(objectConfiguration),
-    [objectConfiguration]
-  );
+  const { columnCount, rowCount } = getTileset(objectConfiguration);
+
   const [hoveredTile, setHoveredTile] = React.useState<?{
     x: number,
     y: number,
@@ -259,6 +249,7 @@ const TileMapPainter = ({
 
   React.useEffect(
     () => {
+      // On dismount, remove tile map selection.
       return () => onSelectTileMapTile(null);
     },
     [onSelectTileMapTile]
@@ -381,7 +372,7 @@ const TileMapPainter = ({
         </LineStackLayout>
       )}
       <Line justifyContent="stretch">
-        {atlasResource && (
+        {atlasResourceName && (
           <div
             style={styles.tileContainer}
             ref={tileContainerRef}
@@ -390,12 +381,16 @@ const TileMapPainter = ({
           >
             <CorsAwareImage
               style={styles.atlasImage}
-              alt={atlasResource.atlasResourceName}
+              alt={atlasResourceName}
               src={ResourcesLoader.getResourceFullUrl(
                 project,
-                atlasResource.atlasResourceName,
+                atlasResourceName,
                 {}
               )}
+              onLoad={e => {
+                if (onAtlasImageLoaded)
+                  onAtlasImageLoaded(e, atlasResourceName);
+              }}
             />
 
             {hoveredTile && displayedTileSize && (

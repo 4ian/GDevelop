@@ -4,6 +4,11 @@ import * as React from 'react';
 import './MainFrame.css';
 import Snackbar from '@material-ui/core/Snackbar';
 import HomeIcon from '../UI/CustomSvgIcons/Home';
+import DebuggerIcon from '../UI/CustomSvgIcons/Debug';
+import ProjectResourcesIcon from '../UI/CustomSvgIcons/ProjectResources';
+import ExternalEventsIcon from '../UI/CustomSvgIcons/ExternalEvents';
+import ExternalLayoutIcon from '../UI/CustomSvgIcons/ExternalLayout';
+import ExtensionIcon from '../UI/CustomSvgIcons/Extension';
 import Toolbar, { type ToolbarInterface } from './Toolbar';
 import ProjectTitlebar from './ProjectTitlebar';
 import PreferencesDialog from './Preferences/PreferencesDialog';
@@ -182,6 +187,7 @@ import DiagnosticReportDialog from '../ExportAndShare/DiagnosticReportDialog';
 import useSaveReminder from './UseSaveReminder';
 import { useMultiplayerLobbyConfigurator } from './UseMultiplayerLobbyConfigurator';
 import { useAuthenticatedPlayer } from './UseAuthenticatedPlayer';
+import ListIcon from '../UI/ListIcon';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -543,10 +549,12 @@ const MainFrame = (props: Props) => {
       kind,
       name,
       dontFocusTab,
+      project,
     }: {
       kind: EditorKind,
       name: string,
       dontFocusTab?: boolean,
+      project?: ?gdProject,
     }) => {
       const label =
         kind === 'resources'
@@ -557,8 +565,6 @@ const MainFrame = (props: Props) => {
           ? i18n._(t`Debugger`)
           : kind === 'layout events'
           ? name + ` ${i18n._(t`(Events)`)}`
-          : kind === 'events functions extension'
-          ? name + ` ${i18n._(t`(Extension)`)}`
           : kind === 'custom object'
           ? name.split('.')[1] + ` ${i18n._(t`(Object)`)}`
           : name;
@@ -578,8 +584,33 @@ const MainFrame = (props: Props) => {
       ].includes(kind)
         ? `${kind} ${name}`
         : kind;
+
+      let customIconUrl = '';
+      if (
+        (kind === 'events functions extension' || kind === 'custom object') &&
+        project &&
+        project.hasEventsFunctionsExtensionNamed(name)
+      ) {
+        const eventsFunctionsExtension = project.getEventsFunctionsExtension(
+          name
+        );
+        customIconUrl = eventsFunctionsExtension.getIconUrl();
+      }
       const icon =
-        kind === 'start page' ? <HomeIcon titleAccess="Home" /> : undefined;
+        kind === 'start page' ? (
+          <HomeIcon titleAccess="Home" />
+        ) : kind === 'debugger' ? (
+          <DebuggerIcon />
+        ) : kind === 'resources' ? (
+          <ProjectResourcesIcon />
+        ) : kind === 'external events' ? (
+          <ExternalEventsIcon />
+        ) : kind === 'external layout' ? (
+          <ExternalLayoutIcon />
+        ) : kind === 'events functions extension' ? (
+          <ExtensionIcon />
+        ) : null;
+
       const closable = kind !== 'start page';
       const extraEditorProps =
         kind === 'start page'
@@ -587,6 +618,15 @@ const MainFrame = (props: Props) => {
           : undefined;
       return {
         icon,
+        renderCustomIcon: customIconUrl
+          ? (brightness: number) => (
+              <ListIcon
+                iconSize={20}
+                src={customIconUrl}
+                brightness={brightness}
+              />
+            )
+          : null,
         closable,
         label,
         projectItemName: name,
@@ -1722,6 +1762,7 @@ const MainFrame = (props: Props) => {
           ...getEditorOpeningOptions({
             kind: 'events functions extension',
             name,
+            project: currentProject,
           }),
           extraEditorProps: {
             initiallyFocusedFunctionName,
@@ -1731,7 +1772,7 @@ const MainFrame = (props: Props) => {
         }),
       }));
     },
-    [setState, getEditorOpeningOptions]
+    [currentProject, setState, getEditorOpeningOptions]
   );
 
   const openResources = React.useCallback(
@@ -1882,6 +1923,7 @@ const MainFrame = (props: Props) => {
                 eventsFunctionsExtension.getName() +
                 '.' +
                 eventsBasedObject.getName(),
+              project: currentProject,
             }),
           }),
         }));

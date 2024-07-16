@@ -1793,10 +1793,11 @@ module.exports = {
                 columnCount,
                 rowCount,
                 (
-                  /** @type {TileMapHelper.TileTextureCache} */
+                  /** @type {TileMapHelper.TileTextureCache | null} */
                   textureCache
                 ) => {
                   this.onLoadingSuccess();
+                  if (!this._editableTileMap) return;
 
                   this.width = this._editableTileMap.getWidth();
                   this.height = this._editableTileMap.getHeight();
@@ -1828,8 +1829,6 @@ module.exports = {
           .getProperties()
           .get('atlasImage')
           .getValue();
-        const serializedTilemap =
-          this._instance.getRawStringProperty('tilemap') || '{}';
 
         const tileSize = parseInt(
           this._associatedObjectConfiguration
@@ -1866,10 +1865,11 @@ module.exports = {
           columnCount,
           rowCount,
           (
-            /** @type {TileMapHelper.TileTextureCache} */
+            /** @type {TileMapHelper.TileTextureCache | null} */
             textureCache
           ) => {
             this.onLoadingSuccess();
+            if (!this._editableTileMap) return;
 
             this.width = this._editableTileMap.getWidth();
             this.height = this._editableTileMap.getHeight();

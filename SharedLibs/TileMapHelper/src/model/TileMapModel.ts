@@ -417,7 +417,7 @@ export class TileObject {
  * A tile map layer with tile organized in grid.
  */
 export class EditableTileMapLayer extends AbstractEditableLayer {
-  private readonly _tiles: Int32Array[];
+  private _tiles: Int32Array[];
   private _alpha: float;
 
   /**

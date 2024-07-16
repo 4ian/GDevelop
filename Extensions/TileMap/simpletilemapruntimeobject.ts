@@ -6,6 +6,8 @@ namespace gdjs {
       atlasImage: string;
       rowCount: number;
       columnCount: number;
+      tileSize: number;
+      tilesWithHitBox: string;
     };
   };
 
@@ -17,6 +19,7 @@ namespace gdjs {
     ai: string;
     wid: number;
     hei: number;
+    // TODO: Support tilemap synchronization. Find an efficient way to send tiles changes.
   };
 
   export type SimpleTileMapNetworkSyncData = ObjectNetworkSyncData &
@@ -50,7 +53,10 @@ namespace gdjs {
     _hitBoxTag: string = 'collision';
     // TODO: Add a debug mode like for TileMapCollisionMaskRuntimeObject to draw?
 
-    constructor(instanceContainer: gdjs.RuntimeInstanceContainer, objectData) {
+    constructor(
+      instanceContainer: gdjs.RuntimeInstanceContainer,
+      objectData: SimpleTileMapObjectDataType
+    ) {
       super(instanceContainer, objectData);
       this._opacity = objectData.content.opacity;
       this._atlasImage = objectData.content.atlasImage;

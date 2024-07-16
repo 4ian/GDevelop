@@ -521,6 +521,7 @@ namespace gdjs {
         return [];
       },
       pushVariableCopy: () => {},
+      _pushVariable: () => {},
       pushValue: () => {},
       removeAtIndex: function () {
         return;

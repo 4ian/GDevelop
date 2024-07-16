@@ -5,6 +5,7 @@ import './MainFrame.css';
 import Snackbar from '@material-ui/core/Snackbar';
 import HomeIcon from '../UI/CustomSvgIcons/Home';
 import DebuggerIcon from '../UI/CustomSvgIcons/Debug';
+import ProjectResourcesIcon from '../UI/CustomSvgIcons/ProjectResources';
 import ExternalEventsIcon from '../UI/CustomSvgIcons/ExternalEvents';
 import ExternalLayoutIcon from '../UI/CustomSvgIcons/ExternalLayout';
 import ExtensionIcon from '../UI/CustomSvgIcons/Extension';
@@ -586,8 +587,7 @@ const MainFrame = (props: Props) => {
 
       let customIconUrl = '';
       if (
-        (kind === 'events functions extension' ||
-          kind === 'events functions extension') &&
+        (kind === 'events functions extension' || kind === 'custom object') &&
         project &&
         project.hasEventsFunctionsExtensionNamed(name)
       ) {
@@ -601,6 +601,8 @@ const MainFrame = (props: Props) => {
           <HomeIcon titleAccess="Home" />
         ) : kind === 'debugger' ? (
           <DebuggerIcon />
+        ) : kind === 'resources' ? (
+          <ProjectResourcesIcon />
         ) : kind === 'external events' ? (
           <ExternalEventsIcon />
         ) : kind === 'external layout' ? (
@@ -617,11 +619,11 @@ const MainFrame = (props: Props) => {
       return {
         icon,
         renderCustomIcon: customIconUrl
-          ? (lightness: number) => (
+          ? (brightness: number) => (
               <ListIcon
                 iconSize={20}
                 src={customIconUrl}
-                lightness={lightness}
+                brightness={brightness}
               />
             )
           : null,

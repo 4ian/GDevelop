@@ -15,7 +15,7 @@ type SizeProps =
 
 type Props = {|
   src: string,
-  lightness?: ?number,
+  brightness?: ?number,
   tooltip?: string,
   disabled?: boolean,
   /**
@@ -42,7 +42,7 @@ function ListIcon(props: Props) {
     isGDevelopIcon,
     cssAnimation,
     useExactIconSize,
-    lightness,
+    brightness,
   } = props;
 
   const iconWidth =
@@ -60,8 +60,8 @@ function ListIcon(props: Props) {
   const shouldInvertGrayScale = paletteType === 'dark' && isBlackIcon;
 
   let filter = undefined;
-  if (lightness != null && Number.isFinite(lightness)) {
-    filter = `grayscale(1) invert(1) brightness(${lightness})`;
+  if (brightness != null && Number.isFinite(brightness)) {
+    filter = `grayscale(1) invert(1) brightness(${brightness})`;
   } else if (shouldInvertGrayScale) {
     filter = 'grayscale(1) invert(1)';
   } else if (isGDevelopIcon && !isBlackIcon) {

@@ -3,7 +3,7 @@
 import * as React from 'react';
 import type { EditorProps } from './EditorProps.flow';
 import ScrollView from '../../UI/ScrollView';
-import { ColumnStackLayout } from '../../UI/Layout';
+import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import { Trans } from '@lingui/macro';
 import useForceUpdate from '../../Utils/UseForceUpdate';
@@ -13,6 +13,8 @@ import TileMapPainter, {
   getTileIdFromGridCoordinates,
 } from '../../InstancesEditor/TileMapPainter';
 import type { TileMapTileSelection } from '../../InstancesEditor/TileMapPainter';
+import { Column, Line } from '../../UI/Grid';
+import Text from '../../UI/Text';
 
 const SimpleTileMapEditor = ({
   objectConfiguration,
@@ -99,16 +101,45 @@ const SimpleTileMapEditor = ({
           onChange={onChangeAtlasImage}
         />
         {atlasImage && (
-          <div style={{ maxWidth: 400 }}>
-            <TileMapPainter
-              project={project}
-              objectConfiguration={objectConfiguration}
-              tileMapTileSelection={tileMapTileSelection}
-              onSelectTileMapTile={onChangeTilesWithHitBox}
-              showPaintingToolbar={false}
-              allowMultipleSelection
-            />
-          </div>
+          <ResponsiveLineStackLayout>
+            <Column noMargin expand>
+              {tileMapTileSelection.coordinates.length === 0 ? (
+                <Text>
+                  <Trans>No tile configured to have a hit box.</Trans>
+                </Text>
+              ) : (
+                <>
+                  <Text>
+                    <Trans>Those tiles are configured to have a hit box:</Trans>
+                  </Text>
+                  {tileMapTileSelection.coordinates.map(coordinates => {
+                    const id = getTileIdFromGridCoordinates({
+                      rowCount,
+                      ...coordinates,
+                    });
+                    return (
+                      <Line noMargin key={id}>
+                        <Text noMargin>
+                          <Trans>Column:</Trans> {coordinates.x + 1}{' '}
+                          <Trans>Row:</Trans> {coordinates.y + 1} (id {id})
+                        </Text>
+                      </Line>
+                    );
+                  })}
+                </>
+              )}
+            </Column>
+            <Column noMargin expand>
+              <TileMapPainter
+                project={project}
+                objectConfiguration={objectConfiguration}
+                tileMapTileSelection={tileMapTileSelection}
+                onSelectTileMapTile={onChangeTilesWithHitBox}
+                showPaintingToolbar={false}
+                allowMultipleSelection
+              />
+            </Column>
+          </ResponsiveLineStackLayout>
         )}
       </ColumnStackLayout>
     </ScrollView>

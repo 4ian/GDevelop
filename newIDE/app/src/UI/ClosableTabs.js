@@ -230,6 +230,7 @@ export function ClosableTab({
               height: gdevelopTheme.closableTabs.height,
               color: textColor,
               fontFamily: gdevelopTheme.closableTabs.fontFamily,
+              marginRight: closable ? 0 : 10,
             }}
           >
             {renderCustomIcon ? renderCustomIcon(brightness) : icon}

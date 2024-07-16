@@ -84,6 +84,7 @@ describe('Multiplayer', () => {
   const makeTestRuntimeSceneWithNetworkId = (timeDelta = 1000 / 60) => {
     const runtimeGame = gdjs.getPixiRuntimeGame();
     gdjs.projectData = {
+      // @ts-ignore - we don't set all project props.
       properties: {
         projectUuid: 'fake-hardcoded-project-uuid',
       },

@@ -852,6 +852,7 @@ export default class InstancesEditor extends Component<Props> {
             );
           }
         });
+        this.props.onInstancesResized([selectedInstance]);
       } else if (tileMapTileSelection.kind === 'erase') {
         deduplicatedCoordinates.forEach(({ gridX, gridY }) => {
           editableTileMapLayer.removeTile(gridX, gridY);
@@ -882,6 +883,7 @@ export default class InstancesEditor extends Component<Props> {
               tileSet.tileSize * scaleY * (poppedRows + shiftedRows)
           );
         }
+        this.props.onInstancesResized([selectedInstance]);
       }
       renderedInstance.updatePixiTileMap();
       selectedInstance.setRawStringProperty(

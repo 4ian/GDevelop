@@ -12,7 +12,7 @@ import { AffineTransformation } from '../Utils/AffineTransformation';
 
 export const updateSceneToTileMapTransformation = (
   instance: gdInitialInstance,
-  renderedInstance: RenderedInstance,
+  renderedInstance: RenderedInstance | Rendered3DInstance,
   sceneToTileMapTransformation: AffineTransformation,
   tileMapToSceneTransformation: AffineTransformation
 ): ?{ scaleX: number, scaleY: number } => {
@@ -20,10 +20,20 @@ export const updateSceneToTileMapTransformation = (
   let scaleX = 1,
     scaleY = 1;
   if (instance.hasCustomSize()) {
+    if (
+      // $FlowIgnore
+      !renderedInstance.getEditableTileMap
+    ) {
+      console.error(
+        `Instance of ${instance.getObjectName()} seems to not be a RenderedSimpleTileMapInstance (method getEditableTileMap does not exist).`
+      );
+      return;
+    }
+    // $FlowIgnore
     const editableTileMap = renderedInstance.getEditableTileMap();
     if (!editableTileMap) {
       console.error(
-        `Could not find the editable tile map for instance of object ${instance.getObjectName()}`
+        `Could not find the editable tile map for instance of object ${instance.getObjectName()}.`
       );
       return;
     }

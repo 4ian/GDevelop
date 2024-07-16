@@ -72,6 +72,8 @@ export const Default = () => (
         }}
         wrappedEditorRef={() => {}}
         pauseRendering={false}
+        tileMapTileSelection={null}
+        onSelectTileMapTile={() => {}}
       />
     </DragAndDropContextProvider>
   </FixedHeightFlexContainer>

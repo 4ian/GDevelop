@@ -50,5 +50,9 @@ namespace gdjs {
       this._nameToContent.clear();
       this._fileToContent.clear();
     }
+
+    getAllValues(): IterableIterator<C> {
+      return this._fileToContent.values();
+    }
   }
 }

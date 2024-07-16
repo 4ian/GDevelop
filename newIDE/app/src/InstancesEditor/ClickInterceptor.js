@@ -17,6 +17,7 @@ class ClickInterceptor {
   getTileMapTileSelection: () => ?TileMapTileSelection;
   onClick: (scenePathCoordinates: Array<Coordinates>) => void;
   pointerPathCoordinates: ?Array<Coordinates>;
+  _shouldCancelClick: boolean = false;
 
   pixiContainer: PIXI.Container;
   interceptingSprite: PIXI.sprite;
@@ -32,6 +33,7 @@ class ClickInterceptor {
     this.interceptingSprite.addEventListener(
       'pointerdown',
       (e: PIXI.FederatedPointerEvent) => {
+        this._shouldCancelClick = false;
         const sceneCoordinates = this.viewPosition.toSceneCoordinates(
           e.global.x,
           e.global.y
@@ -45,6 +47,10 @@ class ClickInterceptor {
       'pointerup',
       (e: PIXI.FederatedPointerEvent) => {
         if (!this.pointerPathCoordinates) return;
+        if (this._shouldCancelClick) {
+          this._shouldCancelClick = false;
+          return;
+        }
         this.onClick(this.pointerPathCoordinates);
         this.pointerPathCoordinates = null;
       }
@@ -52,8 +58,10 @@ class ClickInterceptor {
     this.interceptingSprite.addEventListener(
       'pointermove',
       (e: PIXI.FederatedPointerEvent) => {
+        if (this._shouldCancelClick) return;
         const pointerPathCoordinates = this.pointerPathCoordinates;
         if (!pointerPathCoordinates) return;
+
         const sceneCoordinates = this.viewPosition.toSceneCoordinates(
           e.global.x,
           e.global.y
@@ -75,6 +83,13 @@ class ClickInterceptor {
 
   getPointerPathCoordinates(): ?Array<Coordinates> {
     return this.pointerPathCoordinates;
+  }
+
+  cancelClickInterception() {
+    this._shouldCancelClick = true;
+    if (this.pointerPathCoordinates) {
+      this.pointerPathCoordinates = null;
+    }
   }
 
   render() {

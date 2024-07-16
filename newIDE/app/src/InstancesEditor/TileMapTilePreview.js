@@ -149,7 +149,7 @@ class TileMapTilePreview {
     const object = getObjectByName(
       this.project.getObjects(),
       this.layout ? this.layout.getObjects() : null,
-  associatedObjectName
+      associatedObjectName
     );
     if (!object || object.getType() !== 'TileMap::SimpleTileMap') return;
     const { tileSize } = getTileSet(object);

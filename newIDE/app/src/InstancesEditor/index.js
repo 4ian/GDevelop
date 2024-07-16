@@ -185,6 +185,7 @@ export default class InstancesEditor extends Component<Props> {
     this.keyboardShortcuts = new KeyboardShortcuts({
       shortcutCallbacks: {
         onMove: this.moveSelection,
+        onEscape: this.onPressEscape,
         ...this.props.instancesEditorShortcutsCallbacks,
       },
     });
@@ -1261,6 +1262,12 @@ export default class InstancesEditor extends Component<Props> {
     this.onInstancesMovedDebounced(unlockedSelectedInstances);
   };
 
+  onPressEscape = () => {
+    if (this.clickInterceptor) {
+      this.clickInterceptor.cancelClickInterception();
+    }
+  };
+
   scrollBy(x: number, y: number) {
     this.fpsLimiter.notifyInteractionHappened();
     this.viewPosition.scrollBy(x, y);
@@ -1404,8 +1411,9 @@ export default class InstancesEditor extends Component<Props> {
 
   getCoordinatesToRenderTileMapPreview = () => {
     const clickInterceptorPointerPathCoordinates = this.clickInterceptor.getPointerPathCoordinates();
-    if (clickInterceptorPointerPathCoordinates)
+    if (clickInterceptorPointerPathCoordinates) {
       return clickInterceptorPointerPathCoordinates;
+    }
     const lastCursorSceneCoordinates = this.getLastCursorSceneCoordinates();
     return [
       { x: lastCursorSceneCoordinates[0], y: lastCursorSceneCoordinates[1] },

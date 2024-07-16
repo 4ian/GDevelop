@@ -346,7 +346,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     ).toBe(1);
   });
 
-  it('can generate a local child-variable condition', function () {
+  it('can generate a local child-variable condition on a structure', function () {
     scene.getVariables().insertNew('SuccessVariable', 0).setValue(0);
     const runtimeScene = generateAndRunEventsForLayout([
       {
@@ -362,6 +362,38 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
           {
             type: { inverted: false, value: 'NumberVariable' },
             parameters: ['MyLocalVariable.MyChild', '=', '123'],
+          },
+        ],
+        actions: [
+          {
+            type: { value: 'SetNumberVariable' },
+            parameters: ['SuccessVariable', '=', '1'],
+          },
+        ],
+        events: [],
+      },
+    ]);
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(1);
+  });
+
+  it('can generate a local child-variable condition on an array', function () {
+    scene.getVariables().insertNew('SuccessVariable', 0).setValue(0);
+    const runtimeScene = generateAndRunEventsForLayout([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        variables: [
+          {
+            name: 'MyLocalVariable',
+            type: 'array',
+            children: [{ name: '0', type: 'number', value: 123 }],
+          },
+        ],
+        conditions: [
+          {
+            type: { inverted: false, value: 'NumberVariable' },
+            parameters: ['MyLocalVariable[0]', '=', '123'],
           },
         ],
         actions: [

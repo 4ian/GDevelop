@@ -489,6 +489,7 @@ export default class InstancesEditor extends Component<Props> {
       onRotateEnd: this._onRotateEnd,
       instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
       toCanvasCoordinates: this.viewPosition.toCanvasCoordinates,
+      getFillColor: this.getSelectedInstancesObjectFillColor,
       screenType: this.props.screenType,
       keyboardShortcuts: this.keyboardShortcuts,
       onPanMove: this._onPanMove,
@@ -695,6 +696,13 @@ export default class InstancesEditor extends Component<Props> {
 
   getTileMapTileSelection = () => {
     return this.props.tileMapTileSelection;
+  };
+
+  getSelectedInstancesObjectFillColor = (
+    isLocked: boolean
+  ): {| color: number, alpha: number |} => {
+    if (this.props.tileMapTileSelection) return { color: 0xfff, alpha: 0 };
+    return { color: isLocked ? 0xbc5753 : 0x6868e8, alpha: 1 };
   };
 
   getZoomFactor = () => {

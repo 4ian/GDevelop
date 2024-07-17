@@ -27,9 +27,6 @@ import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewB
 import { getInstanceCountInLayoutForObject } from '../Utils/Layout';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
-import { getShortcutDisplayName } from '../KeyboardShortcuts';
-import defaultShortcuts from '../KeyboardShortcuts/DefaultShortcuts';
-import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { Column, Line } from '../UI/Grid';
 import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
 import Add from '../UI/CustomSvgIcons/Add';
@@ -188,7 +185,6 @@ export type ObjectsListInterface = {|
   forceUpdateList: () => void,
   openNewObjectDialog: () => void,
   closeNewObjectDialog: () => void,
-  renameObjectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext => void,
 |};
 
 type Props = {|
@@ -266,7 +262,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     }: Props,
     ref
   ) => {
-    const preferences = React.useContext(PreferencesContext);
     const { currentlyRunningInAppTutorial } = React.useContext(
       InAppTutorialContext
     );
@@ -297,10 +292,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       },
       closeNewObjectDialog: () => {
         setNewObjectDialogOpen(null);
-      },
-      renameObjectFolderOrObjectWithContext: objectFolderOrObjectWithContext => {
-        if (treeViewRef.current)
-          treeViewRef.current.renameItem(objectFolderOrObjectWithContext);
       },
     }));
 
@@ -546,7 +537,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     );
 
     // Initialize keyboard shortcuts as empty.
-    // onDelete and onDuplicate callbacks are set outside because it deletes the selected
+    // onDelete, onDuplicate and onRename callbacks are set in an effect because it applies to the selected
     // item (that is a props). As it is stored in a ref, the keyboard shortcut
     // instance does not update with selectedObjectFolderOrObjectsWithContext changes.
     const keyboardShortcutsRef = React.useRef<KeyboardShortcuts>(
@@ -762,11 +753,17 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             selectedObjectFolderOrObjectsWithContext[0]
           );
         });
+        keyboardShortcutsRef.current.setShortcutCallback('onRename', () => {
+          editName(
+            selectedObjectFolderOrObjectsWithContext[0]
+          );
+        });
       }
     }, [
       selectedObjectFolderOrObjectsWithContext,
       deleteObjectFolderOrObjectWithContext,
       duplicateObjectFolderOrObjectWithContext,
+      editName,
     ]);
 
     const rename = React.useCallback(
@@ -1360,10 +1357,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             {
               label: i18n._(t`Rename`),
               click: () => editName(item),
-              accelerator: getShortcutDisplayName(
-                preferences.values.userShortcutMap['RENAME_SCENE_OBJECT'] ||
-                  defaultShortcuts.RENAME_SCENE_OBJECT
-              ),
+              accelerator: 'F2',
             },
             {
               label: i18n._(t`Delete`),
@@ -1455,10 +1449,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           {
             label: i18n._(t`Rename`),
             click: () => editName(item),
-            accelerator: getShortcutDisplayName(
-              preferences.values.userShortcutMap['RENAME_SCENE_OBJECT'] ||
-                defaultShortcuts.RENAME_SCENE_OBJECT
-            ),
+            accelerator: 'F2',
           },
           {
             label: i18n._(t`Delete`),
@@ -1533,7 +1524,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         objectsContainer,
         initialInstances,
         project,
-        preferences.values.userShortcutMap,
         canSetAsGlobalObject,
         onSelectAllInstancesOfObjectInLayout,
         onExportAssets,

@@ -148,15 +148,6 @@ const MosaicEditorsDisplay = React.forwardRef<
     if (!editorMosaicRef.current) return false;
     return editorMosaicRef.current.getOpenedEditorNames().includes(editorId);
   }, []);
-  const renameObjectFolderOrObjectWithContext = React.useCallback(
-    objectWithContext => {
-      if (objectsListRef.current)
-        objectsListRef.current.renameObjectFolderOrObjectWithContext(
-          objectWithContext
-        );
-    },
-    []
-  );
 
   const startSceneRendering = React.useCallback((start: boolean) => {
     const editor = editorRef.current;
@@ -179,7 +170,6 @@ const MosaicEditorsDisplay = React.forwardRef<
       toggleEditorView,
       isEditorVisible,
       startSceneRendering,
-      renameObjectFolderOrObjectWithContext,
       viewControls: {
         zoomBy: editor ? editor.zoomBy : noop,
         setZoomFactor: editor ? editor.setZoomFactor : noop,

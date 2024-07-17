@@ -36,8 +36,6 @@ type Props = {|
   setZoomFactor: number => void,
   onOpenSettings: () => void,
   settingsIcon: React.Node,
-  canRenameObject: boolean,
-  onRenameObject: () => void,
   onOpenSceneVariables: () => void,
 |};
 
@@ -59,8 +57,6 @@ const Toolbar = React.memo<Props>(function(props) {
         toggleGrid={props.toggleGrid}
         setupGrid={props.openSetupGrid}
         canDeleteSelection={props.selectedInstancesCount !== 0}
-        canRenameObject={props.canRenameObject}
-        onRenameObject={props.onRenameObject}
         onOpenSceneVariables={props.onOpenSceneVariables}
       />
       <IconButton

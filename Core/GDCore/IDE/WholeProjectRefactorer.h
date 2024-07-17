@@ -19,6 +19,7 @@ class Project;
 class Layout;
 class Layer;
 class Object;
+class ObjectGroup;
 class String;
 class EventsFunctionsExtension;
 class EventsFunction;
@@ -58,6 +59,7 @@ struct VariablesChangeset : VariablesRenamingChangesetNode {
    * would take more time than checking the instruction type is rightly set.
    */
   std::unordered_set<gd::String> typeChangedVariableNames;
+  std::unordered_set<gd::String> valueChangedVariableNames;
 
   bool HasRemovedVariables() { return !removedVariableNames.empty(); }
 
@@ -90,6 +92,16 @@ class GD_CORE_API WholeProjectRefactorer {
       gd::Project &project, gd::VariablesContainer &variablesContainer,
       const gd::VariablesChangeset &changeset,
       const gd::SerializerElement &originalSerializedVariables);
+
+  /**
+   * \brief Refactor the project according to the changes (renaming or deletion)
+   * made to variables of a group.
+   */
+  static void ApplyRefactoringForGroupVariablesContainer(
+      gd::Project &project, gd::ObjectsContainer &globalObjectsContainer,
+      gd::ObjectsContainer &objectsContainer,
+      gd::VariablesContainer &groupVariablesContainer,
+      gd::ObjectGroup objectGroup, const gd::VariablesChangeset &changeset);
 
   /**
    * \brief Refactor the project **before** an events function extension is

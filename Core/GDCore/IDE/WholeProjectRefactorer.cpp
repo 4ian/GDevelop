@@ -11,22 +11,23 @@
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/DependenciesAnalyzer.h"
+#include "GDCore/IDE/GroupVariableHelper.h"
 #include "GDCore/IDE/EventBasedBehaviorBrowser.h"
 #include "GDCore/IDE/Events/ArbitraryEventsWorker.h"
+#include "GDCore/IDE/Events/BehaviorParametersFiller.h"
 #include "GDCore/IDE/Events/BehaviorTypeRenamer.h"
 #include "GDCore/IDE/Events/CustomObjectTypeRenamer.h"
 #include "GDCore/IDE/Events/EventsBehaviorRenamer.h"
 #include "GDCore/IDE/Events/EventsPropertyReplacer.h"
 #include "GDCore/IDE/Events/EventsRefactorer.h"
-#include "GDCore/IDE/Events/EventsVariableReplacer.h"
 #include "GDCore/IDE/Events/EventsVariableInstructionTypeSwitcher.h"
+#include "GDCore/IDE/Events/EventsVariableReplacer.h"
 #include "GDCore/IDE/Events/ExpressionsParameterMover.h"
 #include "GDCore/IDE/Events/ExpressionsRenamer.h"
 #include "GDCore/IDE/Events/InstructionsParameterMover.h"
 #include "GDCore/IDE/Events/InstructionsTypeRenamer.h"
 #include "GDCore/IDE/Events/LinkEventTargetRenamer.h"
 #include "GDCore/IDE/Events/ProjectElementRenamer.h"
-#include "GDCore/IDE/Events/BehaviorParametersFiller.h"
 #include "GDCore/IDE/EventsFunctionTools.h"
 #include "GDCore/IDE/Project/ArbitraryBehaviorSharedDataWorker.h"
 #include "GDCore/IDE/Project/ArbitraryEventBasedBehaviorsWorker.h"
@@ -182,8 +183,12 @@ WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
       }
 
       const auto &oldVariable = oldVariablesContainer.Get(oldName);
-      if (gd::WholeProjectRefactorer::HasAnyVariableTypeChanged(oldVariable, variable)) {
+      if (gd::WholeProjectRefactorer::HasAnyVariableTypeChanged(oldVariable,
+                                                                variable)) {
         changeset.typeChangedVariableNames.insert(variableName);
+      }
+      if (oldVariable != variable) {
+        changeset.valueChangedVariableNames.insert(variableName);
       }
 
       const auto &variablesRenamingChangesetNode =
@@ -310,8 +315,8 @@ void WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
 
   // Rename and remove variables
   gd::EventsVariableReplacer eventsVariableReplacer(
-      project.GetCurrentPlatform(), variablesContainer,
-      changeset, changeset.removedVariableNames);
+      project.GetCurrentPlatform(), changeset, changeset.removedVariableNames,
+      variablesContainer);
   gd::ProjectBrowserHelper::ExposeProjectEvents(project,
                                                 eventsVariableReplacer);
 
@@ -321,8 +326,70 @@ void WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
   // Switch types of instructions
   gd::EventsVariableInstructionTypeSwitcher
       eventsVariableInstructionTypeSwitcher(project.GetCurrentPlatform(),
-                                            variablesContainer,
-                                            changeset.typeChangedVariableNames);
+                                            changeset.typeChangedVariableNames,
+                                            variablesContainer);
+  gd::ProjectBrowserHelper::ExposeProjectEvents(
+      project, eventsVariableInstructionTypeSwitcher);
+}
+
+void WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
+    gd::Project &project, gd::ObjectsContainer &globalObjectsContainer,
+    gd::ObjectsContainer &objectsContainer,
+    gd::VariablesContainer &groupVariablesContainer,
+    gd::ObjectGroup objectGroup, const gd::VariablesChangeset &changeset) {
+
+  // Rename variables in events for the group objects.
+  for (const gd::String &objectName : objectGroup.GetAllObjectsNames()) {
+    const bool hasObject = objectsContainer.HasObjectNamed(objectName);
+    if (!hasObject && !globalObjectsContainer.HasObjectNamed(objectName)) {
+      continue;
+    }
+    auto &object = hasObject ? objectsContainer.GetObject(objectName)
+                             : globalObjectsContainer.GetObject(objectName);
+    auto &variablesContainer = object.GetVariables();
+
+    gd::EventsVariableReplacer eventsVariableReplacer(
+        project.GetCurrentPlatform(), changeset,
+        changeset.removedVariableNames, variablesContainer);
+    gd::ProjectBrowserHelper::ExposeProjectEvents(project,
+                                                  eventsVariableReplacer);
+  }
+
+  // Rename variables in events for the group.
+  gd::EventsVariableReplacer eventsVariableReplacer(
+      project.GetCurrentPlatform(), changeset, changeset.removedVariableNames,
+      objectGroup.GetName());
+  gd::ProjectBrowserHelper::ExposeProjectEvents(project,
+                                                eventsVariableReplacer);
+
+  // Apply changes to objects.
+  gd::GroupVariableHelper::ApplyChangesToObjects(
+      globalObjectsContainer, objectsContainer, groupVariablesContainer,
+      objectGroup, changeset);
+
+  // Switch types of instructions for the group objects.
+  for (const gd::String &objectName : objectGroup.GetAllObjectsNames()) {
+    const bool hasObject = objectsContainer.HasObjectNamed(objectName);
+    if (!hasObject && !globalObjectsContainer.HasObjectNamed(objectName)) {
+      continue;
+    }
+    auto &object = hasObject ? objectsContainer.GetObject(objectName)
+                             : globalObjectsContainer.GetObject(objectName);
+    auto &variablesContainer = object.GetVariables();
+
+    gd::EventsVariableInstructionTypeSwitcher
+        eventsVariableInstructionTypeSwitcher(
+            project.GetCurrentPlatform(), changeset.typeChangedVariableNames,
+            variablesContainer);
+    gd::ProjectBrowserHelper::ExposeProjectEvents(
+        project, eventsVariableInstructionTypeSwitcher);
+  }
+
+  // Switch types of instructions for the group.
+  gd::EventsVariableInstructionTypeSwitcher
+      eventsVariableInstructionTypeSwitcher(project.GetCurrentPlatform(),
+                                            changeset.typeChangedVariableNames,
+                                            objectGroup.GetName());
   gd::ProjectBrowserHelper::ExposeProjectEvents(
       project, eventsVariableInstructionTypeSwitcher);
 }
@@ -849,7 +916,8 @@ void WholeProjectRefactorer::RenameEventsBasedBehaviorProperty(
                                               oldPropertyName, newPropertyName);
 
     gd::ProjectBrowserHelper::ExposeEventsBasedBehaviorEvents(
-        project, eventsFunctionsExtension, eventsBasedBehavior, behaviorRenamer);
+        project, eventsFunctionsExtension, eventsBasedBehavior,
+        behaviorRenamer);
   } else {
     // Properties that represent primitive values will be used through
     // their related actions/conditions/expressions. Rename these.
@@ -919,7 +987,8 @@ void WholeProjectRefactorer::RenameEventsBasedBehaviorSharedProperty(
                                               oldPropertyName, newPropertyName);
 
     gd::ProjectBrowserHelper::ExposeEventsBasedBehaviorEvents(
-        project, eventsFunctionsExtension, eventsBasedBehavior, behaviorRenamer);
+        project, eventsFunctionsExtension, eventsBasedBehavior,
+        behaviorRenamer);
   } else {
     // Properties that represent primitive values will be used through
     // their related actions/conditions/expressions. Rename these.
@@ -1862,10 +1931,9 @@ void WholeProjectRefactorer::GlobalObjectOrGroupRenamed(
     bool isObjectGroup) {
   // Object groups can't be in other groups
   if (!isObjectGroup) {
-    for (std::size_t g = 0;
-         g < project.GetObjects().GetObjectGroups().size(); ++g) {
-      project.GetObjects().GetObjectGroups()[g].RenameObject(oldName,
-                                                                      newName);
+    for (std::size_t g = 0; g < project.GetObjects().GetObjectGroups().size();
+         ++g) {
+      project.GetObjects().GetObjectGroups()[g].RenameObject(oldName, newName);
     }
   }
 
@@ -1879,8 +1947,8 @@ void WholeProjectRefactorer::GlobalObjectOrGroupRenamed(
   }
 }
 
-void WholeProjectRefactorer::GlobalObjectRemoved(
-    gd::Project &project, const gd::String &objectName) {
+void WholeProjectRefactorer::GlobalObjectRemoved(gd::Project &project,
+                                                 const gd::String &objectName) {
   auto &globalGroups = project.GetObjects().GetObjectGroups();
   for (std::size_t g = 0; g < globalGroups.size(); ++g) {
     globalGroups[g].RemoveObject(objectName);
@@ -1907,8 +1975,8 @@ void WholeProjectRefactorer::BehaviorsAddedToGlobalObject(
 }
 
 void WholeProjectRefactorer::RemoveLayerInScene(gd::Project &project,
-                                         gd::Layout &scene,
-                                         const gd::String &layerName) {
+                                                gd::Layout &scene,
+                                                const gd::String &layerName) {
   if (layerName.empty())
     return;
 
@@ -1922,15 +1990,14 @@ void WholeProjectRefactorer::RemoveLayerInScene(gd::Project &project,
   }
 }
 
-void WholeProjectRefactorer::MergeLayersInScene(gd::Project &project,
-                                         gd::Layout &scene,
-                                         const gd::String &originLayerName,
-                                         const gd::String &targetLayerName) {
+void WholeProjectRefactorer::MergeLayersInScene(
+    gd::Project &project, gd::Layout &scene, const gd::String &originLayerName,
+    const gd::String &targetLayerName) {
   if (originLayerName == targetLayerName || originLayerName.empty())
     return;
 
   scene.GetInitialInstances().MoveInstancesToLayer(originLayerName,
-                                                    targetLayerName);
+                                                   targetLayerName);
 
   std::vector<gd::String> externalLayoutsNames =
       GetAssociatedExternalLayouts(project, scene);

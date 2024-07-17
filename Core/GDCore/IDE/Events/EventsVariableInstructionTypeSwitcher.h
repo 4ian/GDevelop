@@ -33,11 +33,20 @@ class GD_CORE_API EventsVariableInstructionTypeSwitcher
 public:
   EventsVariableInstructionTypeSwitcher(
       const gd::Platform &platform_,
-      const gd::VariablesContainer &targetVariablesContainer_,
-      const std::unordered_set<gd::String> &typeChangedVariableNames_)
+      const std::unordered_set<gd::String> &typeChangedVariableNames_,
+      const gd::VariablesContainer &targetVariablesContainer_)
       : platform(platform_),
+        typeChangedVariableNames(typeChangedVariableNames_),
         targetVariablesContainer(targetVariablesContainer_),
-        typeChangedVariableNames(typeChangedVariableNames_){};
+        groupName(""){};
+  EventsVariableInstructionTypeSwitcher(
+      const gd::Platform &platform_,
+      const std::unordered_set<gd::String> &typeChangedVariableNames_,
+      const gd::String &groupName_)
+      : platform(platform_),
+        typeChangedVariableNames(typeChangedVariableNames_),
+        targetVariablesContainer(nullVariablesContainer),
+        groupName(groupName_){};
   virtual ~EventsVariableInstructionTypeSwitcher();
 
  private:
@@ -46,8 +55,13 @@ public:
 
   const gd::Platform &platform;
   const gd::VariablesContainer &targetVariablesContainer;
-  gd::String objectName;
+  /**
+   * Groups don't have VariablesContainer
+   */
+  const gd::String groupName;
   const std::unordered_set<gd::String> &typeChangedVariableNames;
+
+  static VariablesContainer nullVariablesContainer;
 };
 
 } // namespace gd

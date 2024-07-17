@@ -30,6 +30,8 @@ gd::String Variable::TypeAsString(Type t) {
       return "structure";
     case Type::Array:
       return "array";
+    case Type::MixedTypes:
+      return "mixed";
     default:
       return "error-type";
   }
@@ -46,6 +48,8 @@ Variable::Type Variable::StringAsType(const gd::String& str) {
     return Type::Structure;
   else if (str == "array")
     return Type::Array;
+  else if (str == "mixed")
+    return Type::MixedTypes;
 
   // Default to number
   return Type::Number;
@@ -85,6 +89,9 @@ void Variable::CastTo(const Type newType) {
     type = Type::Array;
     // Free now unused memory
     children.clear();
+  } else if (newType == Type::MixedTypes) {
+    type = Type::MixedTypes;
+    hasMixedValues = true;
   }
 }
 
@@ -214,6 +221,7 @@ Variable& Variable::PushNew() {
       variable.SetBool(false);
     }
   }
+  hasMixedValues = false;
   return variable;
 };
 
@@ -411,4 +419,40 @@ void Variable::CopyChildren(const gd::Variable& other) {
     childrenArray.push_back(std::make_shared<gd::Variable>(*child.get()));
   }
 }
+
+bool Variable::operator==(const gd::Variable &variable) const {
+  if (type != variable.type || hasMixedValues || variable.hasMixedValues) {
+    return false;
+  }
+  if (type == Variable::Type::Number) {
+    return value == variable.value;
+  }
+  if (type == Variable::Type::String) {
+    return str == variable.str;
+  }
+  if (type == Variable::Type::Boolean) {
+    return boolVal == variable.boolVal;
+  }
+  if (type == Variable::Type::Boolean) {
+    return boolVal == variable.boolVal;
+  }
+  if (type == Variable::Type::Structure) {
+    return children == variable.children;
+  }
+  if (type == Variable::Type::Array) {
+    return childrenArray == variable.childrenArray;
+  }
+  // MixedTypes variables can't equal another variable.
+  return false;
+}
+
+bool Variable::operator!=(const gd::Variable &variable) const {
+  return !(*this == variable);
+}
+
+void Variable::MarkAsMixedValues() {
+  hasMixedValues = true;
+  ClearChildren();
+}
+
 }  // namespace gd

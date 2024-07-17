@@ -76,8 +76,8 @@ export class EditableTileMap {
     const tileMap = new EditableTileMap(
       editableTileMapAsJsObject.tileWidth || tileSize,
       editableTileMapAsJsObject.tileHeight || tileSize,
-      editableTileMapAsJsObject.dimX || 2,
-      editableTileMapAsJsObject.dimY || 2,
+      editableTileMapAsJsObject.dimX || 1,
+      editableTileMapAsJsObject.dimY || 1,
       tileSet
     );
 
@@ -426,12 +426,19 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
    */
   constructor(tileMap: EditableTileMap, id: integer) {
     super(tileMap, id);
-    this._tiles = [];
-    this._tiles.length = this.tileMap.getDimensionY();
-    for (let index = 0; index < this._tiles.length; index++) {
-      this._tiles[index] = new Int32Array(this.tileMap.getDimensionX());
-    }
+    this.buildEmptyLayer(
+      this.tileMap.getDimensionX(),
+      this.tileMap.getDimensionY()
+    );
     this._alpha = 1;
+  }
+
+  buildEmptyLayer(dimensionX: number, dimensionY: number) {
+    this._tiles = [];
+    this._tiles.length = dimensionY;
+    for (let index = 0; index < this._tiles.length; index++) {
+      this._tiles[index] = new Int32Array(dimensionX);
+    }
   }
 
   static from(
@@ -664,6 +671,8 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
   } {
     let rowsToShift = 0,
       rowsToPop = 0;
+    const initialDimensionX = this.getDimensionX();
+    const initialDimensionY = this.getDimensionY();
     const columnsToShiftByRow = new Array(this._tiles.length).fill(
       this._tiles[0].length
     );
@@ -694,7 +703,20 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
       }
     }
     if (!isFirstNonEmptyRowFound) {
-      // TODO: Handle when tilemap is empty.
+      // The tile map is empty. Instead of having an object with null width and height,
+      // the tile map is resized to have a size of 1x1 with an empty tile. This is useful
+      // in the editor. It might need to have a different behavior in the runtime.
+      this.buildEmptyLayer(1, 1);
+      // TODO: Instead of setting the dimensions directly, should it call a method on
+      // EditableTileMap that will iterates over all the layers to change their dimensions?
+      this.tileMap.setDimensionX(1);
+      this.tileMap.setDimensionY(1);
+      return {
+        shiftedColumns: 0,
+        shiftedRows: 0,
+        poppedColumns: initialDimensionX - 1,
+        poppedRows: initialDimensionY - 1,
+      };
     }
     const columnsToShift = Math.min(...columnsToShiftByRow);
     const columnsToPop = Math.min(...columnsToPopByRow);

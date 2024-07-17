@@ -228,13 +228,14 @@ export declare class TileObject {
  * A tile map layer with tile organized in grid.
  */
 export declare class EditableTileMapLayer extends AbstractEditableLayer {
-  private readonly _tiles;
+  private _tiles;
   private _alpha;
   /**
    * @param tileMap The layer tile map.
    * @param id The layer identifier.
    */
   constructor(tileMap: EditableTileMap, id: integer);
+  buildEmptyLayer(dimensionX: number, dimensionY: number): void;
   static from(
     editableTileMapLayerAsJsObject: any,
     tileMap: EditableTileMap

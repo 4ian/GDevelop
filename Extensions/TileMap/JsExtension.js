@@ -677,8 +677,8 @@ const defineSimpleTileMap = function (extension, _, gd) {
   objectSimpleTileMap.setRawJSONContent(
     JSON.stringify({
       atlasImage: '',
-      rowCount: 4,
-      columnCount: 4,
+      rowCount: 1,
+      columnCount: 1,
       tileSize: 8,
       tilesWithHitBox: '',
     })
@@ -1638,6 +1638,16 @@ module.exports = {
      * Renderer for instances of SimpleTileMap inside the IDE.
      */
     class RenderedSimpleTileMapInstance extends RenderedInstance {
+      _placeholderPixiObject = new PIXI.Text(
+        'Select the instance\nand start painting',
+        new PIXI.TextStyle({
+          fontFamily: 'Arial',
+          fontSize: 20,
+          align: 'center',
+          padding: 5,
+        })
+      );
+
       constructor(
         project,
         instance,
@@ -1657,7 +1667,8 @@ module.exports = {
         Tilemap.settings.use32bitIndex = true;
 
         this.tileMapPixiObject = new Tilemap.CompositeTilemap();
-        this._pixiObject = this.tileMapPixiObject;
+        this._pixiObject = new PIXI.Container();
+        this._pixiObject.addChild(this.tileMapPixiObject);
         this._editableTileMap = null;
 
         // Implement `containsPoint` so that we can set `interactive` to true and
@@ -1666,7 +1677,17 @@ module.exports = {
         this._pixiObject.containsPoint = (position) => {
           // Turns the world position to the local object coordinates
           const localPosition = new PIXI.Point();
-          this._pixiObject.worldTransform.applyInverse(position, localPosition);
+          if (this.tileMapPixiObject.visible) {
+            this.tileMapPixiObject.worldTransform.applyInverse(
+              position,
+              localPosition
+            );
+          } else {
+            this._placeholderPixiObject.worldTransform.applyInverse(
+              position,
+              localPosition
+            );
+          }
 
           return (
             localPosition.x >= 0 &&
@@ -1675,6 +1696,10 @@ module.exports = {
             localPosition.y < this.height
           );
         };
+        this._placeholderPixiObject.interactive = true;
+        this._placeholderPixiObject.anchor.x = 0.5;
+        this._placeholderPixiObject.anchor.y = 0.5;
+        this._pixiObject.addChild(this._placeholderPixiObject);
         this._pixiContainer.addChild(this._pixiObject);
         this.width = 48;
         this.height = 48;
@@ -1888,34 +1913,50 @@ module.exports = {
        * This is called to update the PIXI object on the scene editor
        */
       update() {
-        if (this._instance.hasCustomSize()) {
-          this._pixiObject.scale.x = this.getCustomWidth() / this.width;
-          this._pixiObject.scale.y = this.getCustomHeight() / this.height;
+        const isTileMapEmpty = this._editableTileMap
+          ? this._editableTileMap.isEmpty()
+          : false;
+        let objectToChange;
+        if (isTileMapEmpty) {
+          this._placeholderPixiObject.visible = true;
+          this.tileMapPixiObject.visible = false;
+          objectToChange = this._placeholderPixiObject;
         } else {
-          this._pixiObject.scale.x = 1;
-          this._pixiObject.scale.y = 1;
+          this._placeholderPixiObject.visible = false;
+          this.tileMapPixiObject.visible = true;
+          objectToChange = this.tileMapPixiObject;
         }
 
-        // Place the center of rotation in the center of the object. Because pivot position in Pixi
-        // is in the **local coordinates of the object**, we need to find back the original width
-        // and height of the object before scaling (then divide by 2 to find the center)
-        const originalWidth = this.width;
-        const originalHeight = this.height;
-        this._pixiObject.pivot.x = originalWidth / 2;
-        this._pixiObject.pivot.y = originalHeight / 2;
+        if (!isTileMapEmpty) {
+          // Don't change size of placeholder object.
+          if (this._instance.hasCustomSize()) {
+            objectToChange.scale.x = this.getCustomWidth() / this.width;
+            objectToChange.scale.y = this.getCustomHeight() / this.height;
+          } else {
+            objectToChange.scale.x = 1;
+            objectToChange.scale.y = 1;
+          }
 
+          // Place the center of rotation in the center of the object. Because pivot position in Pixi
+          // is in the **local coordinates of the object**, we need to find back the original width
+          // and height of the object before scaling (then divide by 2 to find the center)
+          const originalWidth = this.width;
+          const originalHeight = this.height;
+          objectToChange.pivot.x = originalWidth / 2;
+          objectToChange.pivot.y = originalHeight / 2;
+        }
         // Modifying the pivot position also has an impact on the transform. The instance (X,Y) position
         // of this object refers to the top-left point, but now in Pixi, as we changed the pivot, the Pixi
         // object (X,Y) position refers to the center. So we add an offset to convert from top-left to center.
-        this._pixiObject.x =
+        objectToChange.x =
           this._instance.getX() +
-          this._pixiObject.pivot.x * this._pixiObject.scale.x;
-        this._pixiObject.y =
+          objectToChange.pivot.x * objectToChange.scale.x;
+        objectToChange.y =
           this._instance.getY() +
-          this._pixiObject.pivot.y * this._pixiObject.scale.y;
+          objectToChange.pivot.y * objectToChange.scale.y;
 
         // Rotation works as intended because we put the pivot in the center
-        this._pixiObject.rotation = RenderedInstance.toRad(
+        objectToChange.rotation = RenderedInstance.toRad(
           this._instance.getAngle()
         );
       }

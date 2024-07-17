@@ -118,18 +118,19 @@ export class TileMapManager {
   }
 
   getOrLoadSimpleTileMap(
-    serializedTileMap: string,
+    tileMapAsJsObject: object,
     objectName: string,
     tileSize: number,
     columnCount: number,
     rowCount: number,
-    callback: (tileMap: EditableTileMap | null) => void
+    // Logic using callback has been set up to mimic what has been done for other
+    // loading methods. But it could be refactored to directly return the tile map.
+    callback: (tileMap: EditableTileMap) => void
   ): void {
     // TODO: Is it useful to cache the tilemap since it belongs to an instance?
     // const key = `${objectName}|${tileSize}|${columnCount}|${rowCount}`;
-    const tileMap = JSON.parse(serializedTileMap);
 
-    const editableTileMap = EditableTileMap.from(tileMap, {
+    const editableTileMap = EditableTileMap.from(tileMapAsJsObject, {
       tileSize,
       columnCount,
       rowCount,

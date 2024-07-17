@@ -18,7 +18,13 @@ const nearlyEqual = (a: number, b: number, epsilon: number): boolean => {
   if (a === b) {
     // shortcut, handles infinities
     return true;
-  } else if (a == 0 || b == 0 || absA + absB < Number.EPSILON) {
+  } else if (
+    // eslint-disable-next-line
+    a == 0 ||
+    // eslint-disable-next-line
+    b == 0 ||
+    absA + absB < Number.EPSILON
+  ) {
     // a or b is zero or both are extremely close to it
     // relative error is less meaningful here
     return diff < epsilon * Number.EPSILON;

@@ -79,6 +79,24 @@ namespace gdjs {
         );
       }
 
+      getOrLoadSimpleTileMap(
+        tileMapAsJsObject: object,
+        objectName: string,
+        tileSize: number,
+        columnCount: number,
+        rowCount: number,
+        callback: (tileMap: TileMapHelper.EditableTileMap) => void
+      ): void {
+        this._manager.getOrLoadSimpleTileMap(
+          tileMapAsJsObject,
+          objectName,
+          tileSize,
+          columnCount,
+          rowCount,
+          callback
+        );
+      }
+
       /**
        * @param getTexture The method that loads the atlas image file in memory.
        * @param atlasImageResourceName The resource name of the atlas image.

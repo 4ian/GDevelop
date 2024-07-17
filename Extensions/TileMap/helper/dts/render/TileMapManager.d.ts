@@ -44,12 +44,12 @@ export declare class TileMapManager {
     callback: (tileMap: EditableTileMap | null) => void
   ): void;
   getOrLoadSimpleTileMap(
-    serializedTileMap: string,
+    tileMapAsJsObject: object,
     objectName: string,
     tileSize: number,
     columnCount: number,
     rowCount: number,
-    callback: (tileMap: EditableTileMap | null) => void
+    callback: (tileMap: EditableTileMap) => void
   ): void;
   /**
    * @param loadTileMap The method that loads the Tiled JSON file in memory.

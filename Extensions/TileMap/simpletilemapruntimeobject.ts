@@ -177,70 +177,76 @@ namespace gdjs {
 
       // 2. Update the renderer so that it updates the tilemap object
       // (used for width and position calculations).
-      const tileMap = this._loadInitialTileMap();
+      this._loadInitialTileMap((tileMap: TileMapHelper.EditableTileMap) => {
+        // 3. Set custom dimensions if applicable.
+        if (initialInstanceData.customSize) {
+          this.setWidth(initialInstanceData.width);
+          this.setHeight(initialInstanceData.height);
+        }
 
-      // 3. Set custom dimensions if applicable.
-      if (initialInstanceData.customSize) {
-        this.setWidth(initialInstanceData.width);
-        this.setHeight(initialInstanceData.height);
-      }
+        // 4. Update position (calculations based on renderer's dimensions).
+        this._renderer.updatePosition();
 
-      // 4. Update position (calculations based on renderer's dimensions).
-      this._renderer.updatePosition();
-
-      this._collisionTileMap = new gdjs.TileMap.TransformedCollisionTileMap(
-        tileMap,
-        this._hitBoxTag
-      );
-      this.updateTransformation();
+        this._collisionTileMap = new gdjs.TileMap.TransformedCollisionTileMap(
+          tileMap,
+          this._hitBoxTag
+        );
+        this.updateTransformation();
+      });
     }
 
-    private _loadInitialTileMap(): TileMapHelper.EditableTileMap {
-      const tileMap = TileMapHelper.EditableTileMap.from(
+    private _loadInitialTileMap(
+      tileMapLoadingCallback: (tileMap: TileMapHelper.EditableTileMap) => void
+    ): void {
+      if (!this._initialTileMapAsJsObject) return;
+
+      this._tileMapManager.getOrLoadSimpleTileMap(
         this._initialTileMapAsJsObject,
-        {
-          tileSize: this._tileSize,
-          columnCount: this._columnCount,
-          rowCount: this._rowCount,
-        }
-      );
-      this._initialTilesWithHitBox.forEach((tileId) => {
-        const tileDefinition = tileMap.getTileDefinition(tileId);
-        if (!tileDefinition) {
-          console.warn(
-            `Could not set hit box for tile with id ${tileId}. Continuing.`
-          );
-          return;
-        }
-        tileDefinition.addHitBox(this._hitBoxTag, [
-          [0, 0],
-          [0, tileMap.getTileHeight()],
-          [tileMap.getTileWidth(), tileMap.getTileHeight()],
-          [tileMap.getTileWidth(), 0],
-        ]);
-      });
-      this._tileMapManager.getOrLoadSimpleTileMapTextureCache(
-        (textureName) => {
-          return (this.getInstanceContainer()
-            .getGame()
-            .getImageManager()
-            .getPIXITexture(textureName) as unknown) as PIXI.BaseTexture<
-            PIXI.Resource
-          >;
-        },
-        this._atlasImage,
+        this.name,
         this._tileSize,
         this._columnCount,
         this._rowCount,
-        (textureCache: TileMapHelper.TileTextureCache | null) => {
-          if (!textureCache) {
-            // getOrLoadTextureCache already log warns and errors.
-            return;
-          }
-          this._renderer.updatePixiTileMap(tileMap, textureCache);
+        (tileMap: TileMapHelper.EditableTileMap) => {
+          this._initialTilesWithHitBox.forEach((tileId) => {
+            const tileDefinition = tileMap.getTileDefinition(tileId);
+            if (!tileDefinition) {
+              console.warn(
+                `Could not set hit box for tile with id ${tileId}. Continuing.`
+              );
+              return;
+            }
+            tileDefinition.addHitBox(this._hitBoxTag, [
+              [0, 0],
+              [0, tileMap.getTileHeight()],
+              [tileMap.getTileWidth(), tileMap.getTileHeight()],
+              [tileMap.getTileWidth(), 0],
+            ]);
+          });
+
+          this._tileMapManager.getOrLoadSimpleTileMapTextureCache(
+            (textureName) => {
+              return (this.getInstanceContainer()
+                .getGame()
+                .getImageManager()
+                .getPIXITexture(textureName) as unknown) as PIXI.BaseTexture<
+                PIXI.Resource
+              >;
+            },
+            this._atlasImage,
+            this._tileSize,
+            this._columnCount,
+            this._rowCount,
+            (textureCache: TileMapHelper.TileTextureCache | null) => {
+              if (!textureCache) {
+                // getOrLoadTextureCache already log warns and errors.
+                return;
+              }
+              this._renderer.updatePixiTileMap(tileMap, textureCache);
+              tileMapLoadingCallback(tileMap);
+            }
+          );
         }
       );
-      return tileMap;
     }
 
     onDestroyed(): void {
@@ -383,8 +389,6 @@ namespace gdjs {
         // When hitboxes for a tile is asked to the model, they are updated
         // according to the new object location if needed.
         // Iterating over all the tiles forces them to update their hitboxes.
-        //
-        // The hitboxes array is built by _loadInitialTileMap().
       }
       this.hitBoxesDirty = false;
       this.updateAABB();

@@ -1757,8 +1757,9 @@ module.exports = {
           .getProperties()
           .get('atlasImage')
           .getValue();
-        const serializedTilemap =
-          this._instance.getRawStringProperty('tilemap') || '{}';
+        const tilemapAsJSObject = JSON.parse(
+          this._instance.getRawStringProperty('tilemap') || '{}'
+        );
 
         const tileSize = parseInt(
           this._associatedObjectConfiguration
@@ -1793,7 +1794,7 @@ module.exports = {
             this._project
           );
           manager.getOrLoadSimpleTileMap(
-            serializedTilemap,
+            tilemapAsJSObject,
             this._objectName,
             tileSize,
             columnCount,

@@ -19,6 +19,17 @@ const styles = {
   icon: { fontSize: 18 },
 };
 
+/**
+ * Returns the tile id in a tile set.
+ * This id corresponds to the index of the tile if the tile set
+ * is flattened so that each column is put right after the previous one.
+ * Example:
+ *   1 | 4 | 7
+ *   2 | 5 | 8
+ *   3 | 6 | 9
+ * @param argument Object that contains x the horizontal position of the tile, y the vertical position and rowCount the number of rows in the tile set.
+ * @returns the id of the tile.
+ */
 export const getTileIdFromGridCoordinates = ({
   x,
   y,
@@ -29,6 +40,17 @@ export const getTileIdFromGridCoordinates = ({
   rowCount: number,
 |}): number => x * rowCount + y;
 
+/**
+ * Returns the coordinates of a tile in a tile set given its id.
+ * This id corresponds to the index of the tile if the tile set
+ * is flattened so that each column is put right after the previous one.
+ * Example:
+ *   1 | 4 | 7
+ *   2 | 5 | 8
+ *   3 | 6 | 9
+ * @param argument Object that contains id the id of the tile and rowCount the number of rows in the tile set.
+ * @returns the id of the tile.
+ */
 export const getGridCoordinatesFromTileId = ({
   id,
   rowCount,

@@ -38,7 +38,6 @@ import {
 } from '../../../Utils/Analytics/EventSender';
 import RouterContext, { type RouteArguments } from '../../RouterContext';
 import { type GameDetailsTab } from '../../../GameDashboard/GameDetails';
-import { type Game } from '../../../Utils/GDevelopServices/Game';
 import useGamesList from '../../../GameDashboard/UseGamesList';
 import useDisplayNewFeature from '../../../Utils/UseDisplayNewFeature';
 import HighlightingTooltip from '../../../UI/HighlightingTooltip';

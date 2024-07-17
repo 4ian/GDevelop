@@ -18,7 +18,6 @@ import {
 } from './CustomObjectLayoutingModel';
 import * as PIXI from 'pixi.js-legacy';
 import * as THREE from 'three';
-import getObjectByName from '../../Utils/GetObjectByName';
 
 const gd: libGDevelop = global.gd;
 

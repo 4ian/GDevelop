@@ -142,13 +142,22 @@ namespace gdjs {
     ): void {
       super.updateFromNetworkSyncData(networkSyncData);
 
-      if (networkSyncData.op !== undefined) {
+      if (
+        networkSyncData.op !== undefined &&
+        networkSyncData.op !== this._opacity
+      ) {
         this.setOpacity(networkSyncData.op);
       }
-      if (networkSyncData.wid !== undefined) {
+      if (
+        networkSyncData.wid !== undefined &&
+        networkSyncData.wid !== this.getWidth()
+      ) {
         this.setWidth(networkSyncData.wid);
       }
-      if (networkSyncData.hei !== undefined) {
+      if (
+        networkSyncData.hei !== undefined &&
+        networkSyncData.hei !== this.getHeight()
+      ) {
         this.setHeight(networkSyncData.hei);
       }
       if (networkSyncData.ai !== undefined) {

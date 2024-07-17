@@ -55,6 +55,10 @@ export class EditableTileMap {
   }
 
   /**
+   * Loads EditableTileMap from serialized data.
+   * Uses object configuration as the source of truth as the serialized data
+   * might contain expired data (if the tile set configuration has changed and
+   * the serialized data was not updated).
    * @param editableTileMapAsJsObject Serialized editable tile map object
    * @param objectConfiguration
    */
@@ -62,20 +66,22 @@ export class EditableTileMap {
     editableTileMapAsJsObject: any,
     {
       tileSize,
-      columnCount,
-      rowCount,
-    }: { tileSize: number; columnCount: number; rowCount: number }
+      tileSetColumnCount,
+      tileSetRowCount,
+    }: { tileSize: number; tileSetColumnCount: number; tileSetRowCount: number }
   ): EditableTileMap {
     const tileSet = new Map<number, TileDefinition>();
 
-    // TODO: Actually save and load tileset when useful.
-    new Array(columnCount * rowCount).fill(0).forEach((_, index) => {
-      tileSet.set(index, new TileDefinition(0));
-    });
+    // TODO: Actually save and load tile set when useful.
+    new Array(tileSetColumnCount * tileSetRowCount)
+      .fill(0)
+      .forEach((_, index) => {
+        tileSet.set(index, new TileDefinition(0));
+      });
 
     const tileMap = new EditableTileMap(
-      editableTileMapAsJsObject.tileWidth || tileSize,
-      editableTileMapAsJsObject.tileHeight || tileSize,
+      tileSize || editableTileMapAsJsObject.tileWidth,
+      tileSize || editableTileMapAsJsObject.tileHeight,
       editableTileMapAsJsObject.dimX || 1,
       editableTileMapAsJsObject.dimY || 1,
       tileSet
@@ -84,7 +90,11 @@ export class EditableTileMap {
     if (editableTileMapAsJsObject.layers) {
       editableTileMapAsJsObject.layers.forEach((layerAsJsObject: any) => {
         tileMap.setTileLayer(
-          EditableTileMapLayer.from(layerAsJsObject, tileMap)
+          EditableTileMapLayer.from(
+            layerAsJsObject,
+            tileMap,
+            (tileId) => tileId < tileSetColumnCount * tileSetRowCount
+          )
         );
       });
     } else {
@@ -443,7 +453,8 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
 
   static from(
     editableTileMapLayerAsJsObject: any,
-    tileMap: EditableTileMap
+    tileMap: EditableTileMap,
+    isTileIdValid: (tileId: number) => boolean
   ): EditableTileMapLayer {
     const layer = new EditableTileMapLayer(
       tileMap,
@@ -452,7 +463,10 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
     layer.setAlpha(editableTileMapLayerAsJsObject.alpha);
     editableTileMapLayerAsJsObject.tiles.forEach((row: Int32Array, y: number) =>
       row.forEach((tileGID, x) => {
-        layer.setTileGID(x, y, tileGID);
+        const tileId = FlippingHelper.getTileId(tileGID);
+        if (isTileIdValid(tileId)) {
+          layer.setTileGID(x, y, tileGID);
+        }
       })
     );
     return layer;

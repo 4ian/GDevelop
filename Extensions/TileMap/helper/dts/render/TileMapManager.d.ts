@@ -47,8 +47,8 @@ export declare class TileMapManager {
     tileMapAsJsObject: object,
     objectName: string,
     tileSize: number,
-    columnCount: number,
-    rowCount: number,
+    tileSetColumnCount: number,
+    tileSetRowCount: number,
     callback: (tileMap: EditableTileMap) => void
   ): void;
   /**

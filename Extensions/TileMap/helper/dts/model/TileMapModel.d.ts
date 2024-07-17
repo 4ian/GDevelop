@@ -42,6 +42,10 @@ export declare class EditableTileMap {
     tileSet: Map<integer, TileDefinition>
   );
   /**
+   * Loads EditableTileMap from serialized data.
+   * Uses object configuration as the source of truth as the serialized data
+   * might contain expired data (if the tile set configuration has changed and
+   * the serialized data was not updated).
    * @param editableTileMapAsJsObject Serialized editable tile map object
    * @param objectConfiguration
    */
@@ -49,12 +53,12 @@ export declare class EditableTileMap {
     editableTileMapAsJsObject: any,
     {
       tileSize,
-      columnCount,
-      rowCount,
+      tileSetColumnCount,
+      tileSetRowCount,
     }: {
       tileSize: number;
-      columnCount: number;
-      rowCount: number;
+      tileSetColumnCount: number;
+      tileSetRowCount: number;
     }
   ): EditableTileMap;
   toJSObject(): Object;
@@ -238,7 +242,8 @@ export declare class EditableTileMapLayer extends AbstractEditableLayer {
   buildEmptyLayer(dimensionX: number, dimensionY: number): void;
   static from(
     editableTileMapLayerAsJsObject: any,
-    tileMap: EditableTileMap
+    tileMap: EditableTileMap,
+    isTileIdValid: (tileId: number) => boolean
   ): EditableTileMapLayer;
   toJSObject(): Object;
   /**

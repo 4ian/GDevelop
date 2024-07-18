@@ -26,6 +26,7 @@ import TreeView, { type TreeViewInterface } from '../UI/TreeView';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import ErrorBoundary from '../UI/ErrorBoundary';
+import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 
 export const groupWithContextReactDndType = 'GD_GROUP_WITH_CONTEXT';
 
@@ -129,6 +130,16 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
     } = useAlertDialog();
 
     React.useImperativeHandle(ref, () => ({ forceUpdate }));
+
+    // Initialize keyboard shortcuts as empty.
+    // onDelete, onDuplicate and onRename callbacks are set in an effect because it applies to
+    // the selected item (that is a state variable). As it is stored in a ref, the keyboard shortcut
+    // instance does not update with selectedGroupWithContext changes.
+    const keyboardShortcutsRef = React.useRef<KeyboardShortcuts>(
+      new KeyboardShortcuts({
+        shortcutCallbacks: {},
+      })
+    );
 
     const scrollToItem = React.useCallback(
       (groupWithContext: GroupWithContext) => {
@@ -271,10 +282,11 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
           'unserializeFrom'
         );
         newGroup.setName(newName); // Unserialization has overwritten the name.
-
+        setSelectedGroupWithContext({ group: newGroup, global });
+        onEditName({ group: newGroup, global });
         onObjectGroupModified();
       },
-      [globalObjectGroups, objectGroups, onObjectGroupModified]
+      [globalObjectGroups, objectGroups, onObjectGroupModified, onEditName]
     );
 
     const onRename = React.useCallback(
@@ -551,6 +563,29 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
       [globalObjectGroups, objectGroups]
     );
 
+    React.useEffect(
+      () => {
+        if (keyboardShortcutsRef.current) {
+          keyboardShortcutsRef.current.setShortcutCallback('onDelete', () => {
+            if (!selectedGroupWithContext) return;
+            onDelete(selectedGroupWithContext);
+          });
+          keyboardShortcutsRef.current.setShortcutCallback(
+            'onDuplicate',
+            () => {
+              if (!selectedGroupWithContext) return;
+              onDuplicate(selectedGroupWithContext);
+            }
+          );
+          keyboardShortcutsRef.current.setShortcutCallback('onRename', () => {
+            if (!selectedGroupWithContext) return;
+            onEditName(selectedGroupWithContext);
+          });
+        }
+      },
+      [selectedGroupWithContext, onDelete, onDuplicate, onEditName]
+    );
+
     // Force List component to be mounted again if globalObjectGroups or objectGroups
     // has been changed. Avoid accessing to invalid objects that could
     // crash the app.
@@ -571,7 +606,12 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
             />
           </Column>
         </Line>
-        <div style={styles.listContainer}>
+        <div
+          style={styles.listContainer}
+          onKeyDown={keyboardShortcutsRef.current.onKeyDown}
+          onKeyUp={keyboardShortcutsRef.current.onKeyUp}
+          id="objects-groups-list"
+        >
           <I18n>
             {({ i18n }) => {
               const treeViewData = getTreeViewData(i18n);

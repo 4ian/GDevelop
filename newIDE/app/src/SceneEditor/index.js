@@ -308,10 +308,6 @@ export default class SceneEditor extends React.Component<Props, State> {
           redo={this.redo}
           onOpenSettings={this.openSceneProperties}
           settingsIcon={editSceneIconReactNode}
-          canRenameObject={
-            this.state.selectedObjectFolderOrObjectsWithContext.length === 1
-          }
-          onRenameObject={this._startRenamingSelectedObject}
           onOpenSceneVariables={this.editLayoutVariables}
         />
       );
@@ -340,10 +336,6 @@ export default class SceneEditor extends React.Component<Props, State> {
           redo={this.redo}
           onOpenSettings={this.openSceneProperties}
           settingsIcon={editSceneIconReactNode}
-          canRenameObject={
-            this.state.selectedObjectFolderOrObjectsWithContext.length === 1
-          }
-          onRenameObject={this._startRenamingSelectedObject}
           onOpenSceneVariables={this.editLayoutVariables}
         />
       );
@@ -894,18 +886,6 @@ export default class SceneEditor extends React.Component<Props, State> {
         });
       },
     });
-  };
-
-  _startRenamingSelectedObject = () => {
-    const firstSelectedObjectFolderOrObject = this.state
-      .selectedObjectFolderOrObjectsWithContext[0];
-    if (!firstSelectedObjectFolderOrObject) return;
-
-    if (this.editorDisplay)
-      this.editorDisplay.renameObjectFolderOrObjectWithContext(
-        firstSelectedObjectFolderOrObject
-      );
-    this.updateToolbar();
   };
 
   _onLayerRenamed = () => {

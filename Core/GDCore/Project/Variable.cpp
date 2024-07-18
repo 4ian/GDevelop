@@ -392,7 +392,8 @@ Variable::Variable(const Variable& other)
       folded(other.folded),
       boolVal(other.boolVal),
       type(other.type),
-      persistentUuid(other.persistentUuid) {
+      persistentUuid(other.persistentUuid),
+      hasMixedValues(other.hasMixedValues) {
   CopyChildren(other);
 }
 
@@ -404,6 +405,7 @@ Variable& Variable::operator=(const Variable& other) {
     boolVal = other.boolVal;
     type = other.type;
     persistentUuid = other.persistentUuid;
+    hasMixedValues = other.hasMixedValues;
     CopyChildren(other);
   }
 
@@ -437,10 +439,34 @@ bool Variable::operator==(const gd::Variable &variable) const {
     return boolVal == variable.boolVal;
   }
   if (type == Variable::Type::Structure) {
-    return children == variable.children;
+    if (children.size() != variable.children.size()) {
+      return false;
+    }
+    for (auto &pair : children) {
+      const gd::String &name = pair.first;
+      const auto &child = pair.second;
+
+      auto it = variable.children.find(name);
+      if (it == children.end()) {
+        return false;
+      }
+      auto &otherChild = it->second;
+      if (*child != *otherChild) {
+        return false;
+      }
+    }
+    return true;
   }
   if (type == Variable::Type::Array) {
-    return childrenArray == variable.childrenArray;
+    if (childrenArray.size() != variable.childrenArray.size()) {
+      return false;
+    }
+    for (int i = 0; i < childrenArray.size(); ++i) {
+      if (*childrenArray[i] != *variable.childrenArray[i]) {
+        return false;
+      }
+    }
+    return true;
   }
   // MixedTypes variables can't equal another variable.
   return false;

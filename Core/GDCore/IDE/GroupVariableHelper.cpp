@@ -67,7 +67,8 @@ void GroupVariableHelper::ApplyChangesToObjects(
     }
     for (const gd::String &variableName : changeset.addedVariableNames) {
       variablesContainer.Insert(variableName,
-                                groupVariablesContainer.Get(variableName), variablesContainer.Count());
+                                groupVariablesContainer.Get(variableName),
+                                variablesContainer.Count());
     }
     for (const auto &pair : changeset.oldToNewVariableNames) {
       const gd::String &oldVariableName = pair.first;

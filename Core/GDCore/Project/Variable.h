@@ -52,7 +52,7 @@ class GD_CORE_API Variable {
   /**
    * \brief Default constructor creating a variable with 0 as value.
    */
-  Variable() : value(0), type(Type::Number){};
+  Variable() : value(0), type(Type::Number), hasMixedValues(false) {};
   Variable(const Variable&);
   virtual ~Variable(){};
 

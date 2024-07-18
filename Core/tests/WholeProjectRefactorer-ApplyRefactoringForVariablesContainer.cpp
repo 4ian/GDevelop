@@ -1999,7 +1999,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
             456);
   }
 
-  SECTION("Can change a group variable mixed value") {
+  SECTION("Can change the value of a group variable with mixed values") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
@@ -2043,6 +2043,111 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     REQUIRE(object.GetVariables().Get("MyGroupVariable").GetValue() == 456);
     REQUIRE(otherObject.GetVariables().Get("MyGroupVariable").GetValue() ==
             456);
+  }
+
+  SECTION("Can keep mixed values of a group variable") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &scene = project.InsertNewLayout("Scene", 0);
+    auto &object = scene.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "Object", 0);
+    object.GetVariables().InsertNew("MyGroupVariable").SetValue(111);
+    auto &otherObject = scene.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "OtherObject", 0);
+    otherObject.GetVariables().InsertNew("MyGroupVariable").SetValue(222);
+    auto &group = scene.GetObjects().GetObjectGroups().InsertNew("Group");
+    group.AddObject("Object");
+    group.AddObject("OtherObject");
+
+    auto projectScopedContainers = gd::ProjectScopedContainers::
+        MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
+    gd::VariablesContainer groupVariables =
+        gd::GroupVariableHelper::MergeVariableContainers(
+            projectScopedContainers.GetObjectsContainersList(), group);
+
+    REQUIRE(groupVariables.Has("MyGroupVariable"));
+    REQUIRE(groupVariables.Get("MyGroupVariable").HasMixedValues());
+
+    // Do the changes and launch the refactoring.
+    groupVariables.ResetPersistentUuid();
+    gd::SerializerElement originalSerializedVariables;
+    groupVariables.SerializeTo(originalSerializedVariables);
+
+    // Don't change anything
+    auto changeset =
+        gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
+            originalSerializedVariables, groupVariables);
+
+    REQUIRE(changeset.valueChangedVariableNames.size() == 0);
+
+    gd::WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
+        project, project.GetObjects(), scene.GetObjects(), groupVariables,
+        group, changeset);
+
+    REQUIRE(object.GetVariables().Get("MyGroupVariable").GetValue() == 111);
+    REQUIRE(otherObject.GetVariables().Get("MyGroupVariable").GetValue() ==
+            222);
+  }
+
+  SECTION("Can change a group child-variable value") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &scene = project.InsertNewLayout("Scene", 0);
+    auto &object = scene.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "Object", 0);
+    object.GetVariables()
+        .InsertNew("MyGroupVariable")
+        .GetChild("MyChild")
+        .SetValue(123);
+    auto &otherObject = scene.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "OtherObject", 0);
+    otherObject.GetVariables()
+        .InsertNew("MyGroupVariable")
+        .GetChild("MyChild")
+        .SetValue(123);
+    auto &group = scene.GetObjects().GetObjectGroups().InsertNew("Group");
+    group.AddObject("Object");
+    group.AddObject("OtherObject");
+
+    auto projectScopedContainers = gd::ProjectScopedContainers::
+        MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
+    gd::VariablesContainer groupVariables =
+        gd::GroupVariableHelper::MergeVariableContainers(
+            projectScopedContainers.GetObjectsContainersList(), group);
+
+    REQUIRE(groupVariables.Has("MyGroupVariable"));
+    REQUIRE(!groupVariables.Get("MyGroupVariable").HasMixedValues());
+    REQUIRE(groupVariables.Get("MyGroupVariable").HasChild("MyChild"));
+    REQUIRE(groupVariables.Get("MyGroupVariable").GetChild("MyChild") == 123);
+
+    // Do the changes and launch the refactoring.
+    groupVariables.ResetPersistentUuid();
+    gd::SerializerElement originalSerializedVariables;
+    groupVariables.SerializeTo(originalSerializedVariables);
+
+    groupVariables.Get("MyGroupVariable").GetChild("MyChild").SetValue(456);
+    auto changeset =
+        gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
+            originalSerializedVariables, groupVariables);
+
+    REQUIRE(changeset.valueChangedVariableNames.size() == 1);
+
+    gd::WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
+        project, project.GetObjects(), scene.GetObjects(), groupVariables,
+        group, changeset);
+
+    REQUIRE(object.GetVariables()
+                .Get("MyGroupVariable")
+                .GetChild("MyChild")
+                .GetValue() == 456);
+    REQUIRE(otherObject.GetVariables()
+                .Get("MyGroupVariable")
+                .GetChild("MyChild")
+                .GetValue() == 456);
   }
 
   SECTION("Can remove a group variable") {

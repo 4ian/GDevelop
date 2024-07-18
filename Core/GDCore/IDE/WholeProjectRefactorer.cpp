@@ -189,7 +189,9 @@ WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
                                                                 variable)) {
         changeset.typeChangedVariableNames.insert(variableName);
       }
-      if (oldVariable != variable) {
+      if (oldVariable != variable
+        // Mixed values are never equals, but they must not override anything.
+        && !variable.HasMixedValues()) {
         changeset.valueChangedVariableNames.insert(variableName);
       }
 

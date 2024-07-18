@@ -2,7 +2,7 @@
 
 import * as PIXI from 'pixi.js-legacy';
 import ViewPosition from './ViewPosition';
-import { type TileMapTileSelection } from './TileMapPainter';
+import { type TileMapTileSelection } from './TileSetVisualizer';
 
 type Coordinates = {| x: number, y: number |};
 

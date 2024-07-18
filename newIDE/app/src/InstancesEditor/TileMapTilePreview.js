@@ -7,7 +7,7 @@ import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import ViewPosition from './ViewPosition';
 import RenderedInstance from '../ObjectsRendering/Renderers/RenderedInstance';
 import Rendered3DInstance from '../ObjectsRendering/Renderers/Rendered3DInstance';
-import { type TileMapTileSelection } from './TileMapPainter';
+import { type TileMapTileSelection } from './TileSetVisualizer';
 import { AffineTransformation } from '../Utils/AffineTransformation';
 
 export const updateSceneToTileMapTransformation = (

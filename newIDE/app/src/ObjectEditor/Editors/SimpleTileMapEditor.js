@@ -8,11 +8,11 @@ import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import { Trans } from '@lingui/macro';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { PropertyResourceSelector } from './PropertyFields';
-import TileMapPainter, {
+import TileSetVisualizer, {
   getGridCoordinatesFromTileId,
   getTileIdFromGridCoordinates,
-} from '../../InstancesEditor/TileMapPainter';
-import type { TileMapTileSelection } from '../../InstancesEditor/TileMapPainter';
+} from '../../InstancesEditor/TileSetVisualizer';
+import type { TileMapTileSelection } from '../../InstancesEditor/TileSetVisualizer';
 import { Column, Line } from '../../UI/Grid';
 import Text from '../../UI/Text';
 import AlertMessage from '../../UI/AlertMessage';
@@ -220,7 +220,7 @@ const SimpleTileMapEditor = ({
               )}
             </Column>
             <Column noMargin expand>
-              <TileMapPainter
+              <TileSetVisualizer
                 project={project}
                 objectConfiguration={objectConfiguration}
                 tileMapTileSelection={tileMapTileSelection}

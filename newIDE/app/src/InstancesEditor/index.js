@@ -46,7 +46,7 @@ import TileMapTilePreview, {
   getTileSet,
   updateSceneToTileMapTransformation,
 } from './TileMapTilePreview';
-import { type TileMapTileSelection } from './TileMapPainter';
+import { type TileMapTileSelection } from './TileSetVisualizer';
 import ClickInterceptor from './ClickInterceptor';
 import getObjectByName from '../Utils/GetObjectByName';
 import { AffineTransformation } from '../Utils/AffineTransformation';

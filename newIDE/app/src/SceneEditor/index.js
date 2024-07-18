@@ -74,7 +74,7 @@ import {
 } from '../MainFrame/ResourcesWatcher';
 import { unserializeFromJSObject } from '../Utils/Serializer';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
-import { type TileMapTileSelection } from '../InstancesEditor/TileMapPainter';
+import { type TileMapTileSelection } from '../InstancesEditor/TileSetVisualizer';
 
 const gd: libGDevelop = global.gd;
 

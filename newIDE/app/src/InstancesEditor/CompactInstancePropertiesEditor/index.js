@@ -28,7 +28,7 @@ import {
   reorderInstanceSchemaForCustomProperties,
 } from './CompactPropertiesSchema';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
-import TileMapPainter, { type TileMapTileSelection } from '../TileMapPainter';
+import TileSetVisualizer, { type TileMapTileSelection } from '../TileSetVisualizer';
 
 export const styles = {
   paper: {
@@ -186,7 +186,7 @@ const CompactInstancePropertiesEditor = ({
 
   if (!object || !instance || !instanceSchema) return null;
 
-  const shouldDisplayTileMapPainter =
+  const shouldDisplayTileSetVisualizer =
     object.getType() === 'TileMap::SimpleTileMap';
 
   return (
@@ -210,12 +210,12 @@ const CompactInstancePropertiesEditor = ({
               onInstancesModified={onInstancesModified}
             />
           </Column>
-          {shouldDisplayTileMapPainter && (
+          {shouldDisplayTileSetVisualizer && (
             <>
               <Column>
                 <Spacer />
                 <Separator />
-                <TileMapPainter
+                <TileSetVisualizer
                   project={project}
                   objectConfiguration={object.getConfiguration()}
                   tileMapTileSelection={tileMapTileSelection}

@@ -18,7 +18,7 @@ import Rectangle from '../Utils/Rectangle';
 import ViewPosition from '../InstancesEditor/ViewPosition';
 import { type ObjectFolderOrObjectWithContext } from '../ObjectsList/EnumerateObjectFolderOrObject';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
-import { type TileMapTileSelection } from '../InstancesEditor/TileMapPainter';
+import { type TileMapTileSelection } from '../InstancesEditor/TileSetVisualizer';
 
 export type SceneEditorsDisplayProps = {|
   project: gdProject,

@@ -148,7 +148,7 @@ type Props = {|
   ) => void,
 |};
 
-const TileMapPainter = ({
+const TileSetVisualizer = ({
   project,
   objectConfiguration,
   tileMapTileSelection,
@@ -471,4 +471,4 @@ const TileMapPainter = ({
   );
 };
 
-export default TileMapPainter;
+export default TileSetVisualizer;

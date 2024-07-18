@@ -19,6 +19,7 @@
 #include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/IDE/GroupVariableHelper.h"
 #include "GDCore/IDE/WholeProjectRefactorer.h"
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
@@ -324,6 +325,72 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
       REQUIRE(gd::Serializer::ToJSON(serializedLayout2) ==
               gd::Serializer::ToJSON(originalSerializedLayout2));
     }
+  }
+
+  SECTION("Can rename a global variable without renaming scene variables of the same name (legacy)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &layout1 = project.InsertNewLayout("Layout1", 0);
+    gd::StandardEvent &event =
+        dynamic_cast<gd::StandardEvent &>(layout1.GetEvents().InsertNewEvent(
+            project, "BuiltinCommonInstructions::Standard"));
+
+    // Declare 2 variables with the same name.
+    project.GetVariables().InsertNew("SharedVariableName", 0).SetValue(123);
+    layout1.GetVariables().InsertNew("SharedVariableName", 0).SetValue(123);
+
+    // Expressions with "old" parameter types: "scenevar", "globalvar":
+    {
+      gd::Instruction action;
+      action.SetType("MyExtension::DoSomething");
+      action.SetParametersCount(1);
+      action.SetParameter(
+          0,
+          gd::Expression(
+              "1 + "
+              "MyExtension::GetGlobalVariableAsNumber(SharedVariableName) + "
+              "MyExtension::GetVariableAsNumber(SharedVariableName)"));
+      event.GetActions().Insert(action);
+    }
+    {
+      gd::Instruction action;
+      action.SetType("MyExtension::DoSomethingWithLegacyPreScopedVariables");
+      action.SetParametersCount(4);
+      // a scenevar parameter
+      action.SetParameter(0, gd::Expression("SharedVariableName"));
+      // a globalvar parameter
+      action.SetParameter(1, gd::Expression("SharedVariableName"));
+      action.SetParameter(2, gd::Expression("Object2"));
+      action.SetParameter(3, gd::Expression("MyObjectVariable"));
+      event.GetActions().Insert(action);
+    }
+
+    // Do the changes and launch the refactoring.
+    project.GetVariables().ResetPersistentUuid();
+    gd::SerializerElement originalSerializedProjectVariables;
+    project.GetVariables().SerializeTo(originalSerializedProjectVariables);
+
+    project.GetVariables().Rename("SharedVariableName",
+                                  "RenamedGlobalVariableFromASharedName");
+    auto changeset =
+        gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
+            originalSerializedProjectVariables,
+            project.GetVariables());
+    gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
+        project, project.GetVariables(), changeset, originalSerializedProjectVariables);
+
+    // Updated access to variables using the legacy "pre-scoped" "scenevar",
+    // "globalvar" and "objectvar" parameters in expressions:
+    REQUIRE(event.GetActions()[0].GetParameter(0).GetPlainString() ==
+            "1 + "
+            // "globalvar" and "scenevar" in a free function:
+            "MyExtension::GetGlobalVariableAsNumber(RenamedGlobalVariableFromASharedName) + "
+            "MyExtension::GetVariableAsNumber(SharedVariableName)");
+
+      // Updated "scenevar" and "globalvar" parameters of an instruction:
+      REQUIRE(event.GetActions()[1].GetParameter(0).GetPlainString() ==
+              "SharedVariableName");
   }
 
   SECTION("Variable renamed (object group)") {
@@ -1884,5 +1951,107 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
 
     // Check the the action has changed to follow the variable type.
     REQUIRE(event.GetActions()[0].GetType() == "SetStringObjectVariable");
+  }
+
+  SECTION("Can change a group variable value") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &scene = project.InsertNewLayout("Scene", 0);
+    auto &object = scene.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "Object", 0);
+    object.GetVariables().InsertNew("MyGroupVariable").SetValue(123);
+    auto &otherObject = scene.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "OtherObject", 0);
+    otherObject.GetVariables().InsertNew("MyGroupVariable").SetValue(123);
+    auto &group = scene.GetObjects().GetObjectGroups().InsertNew("Group");
+    group.AddObject("Object");
+    group.AddObject("OtherObject");
+
+
+    auto projectScopedContainers = gd::ProjectScopedContainers::
+        MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
+    gd::VariablesContainer groupVariables =
+        gd::GroupVariableHelper::MergeVariableContainers(
+            projectScopedContainers.GetObjectsContainersList(), group);
+
+    // Do the changes and launch the refactoring.
+    groupVariables.ResetPersistentUuid();
+    gd::SerializerElement originalSerializedVariables;
+    groupVariables.SerializeTo(originalSerializedVariables);
+
+    groupVariables.Get("MyGroupVariable").SetValue(456);
+    auto changeset =
+        gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
+            originalSerializedVariables, groupVariables);
+
+    REQUIRE(changeset.valueChangedVariableNames.size() == 1);
+
+    gd::WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
+        project, project.GetObjects(), scene.GetObjects(), groupVariables,
+        group, changeset);
+
+    REQUIRE(object.GetVariables().Get("MyGroupVariable").GetValue() == 456);
+    REQUIRE(otherObject.GetVariables().Get("MyGroupVariable").GetValue() ==
+            456);
+  }
+
+  SECTION("Can rename a group variable") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &scene = project.InsertNewLayout("Scene", 0);
+    auto &object = scene.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "Object", 0);
+    object.GetVariables().InsertNew("MyGroupVariable").SetValue(123);
+    auto &otherObject = scene.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "OtherObject", 0);
+    otherObject.GetVariables().InsertNew("MyGroupVariable").SetValue(123);
+    auto &group = scene.GetObjects().GetObjectGroups().InsertNew("Group");
+    group.AddObject("Object");
+    group.AddObject("OtherObject");
+    gd::StandardEvent &event =
+        dynamic_cast<gd::StandardEvent &>(scene.GetEvents().InsertNewEvent(
+            project, "BuiltinCommonInstructions::Standard"));
+
+    {
+      gd::Instruction action;
+      action.SetType("SetNumberObjectVariable");
+      action.SetParametersCount(4);
+      action.SetParameter(0, gd::Expression("Group"));
+      action.SetParameter(1, gd::Expression("MyGroupVariable"));
+      action.SetParameter(2, gd::Expression("="));
+      action.SetParameter(3, gd::Expression("Object.MyGroupVariable"));
+      event.GetActions().Insert(action);
+    }
+
+    auto projectScopedContainers = gd::ProjectScopedContainers::
+        MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
+    gd::VariablesContainer groupVariables =
+        gd::GroupVariableHelper::MergeVariableContainers(
+            projectScopedContainers.GetObjectsContainersList(), group);
+
+    // Do the changes and launch the refactoring.
+    groupVariables.ResetPersistentUuid();
+    gd::SerializerElement originalSerializedVariables;
+    groupVariables.SerializeTo(originalSerializedVariables);
+
+    groupVariables.Rename("MyGroupVariable", "MyRenamedGroupVariable");
+    auto changeset =
+        gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
+            originalSerializedVariables, groupVariables);
+
+    REQUIRE(changeset.oldToNewVariableNames.size() == 1);
+
+    gd::WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
+        project, project.GetObjects(), scene.GetObjects(), groupVariables,
+        group, changeset);
+
+    REQUIRE(event.GetActions()[0].GetParameter(1).GetPlainString() ==
+            "MyRenamedGroupVariable");
+    REQUIRE(event.GetActions()[0].GetParameter(3).GetPlainString() ==
+            "Object.MyRenamedGroupVariable");
   }
 }

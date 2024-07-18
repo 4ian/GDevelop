@@ -94,7 +94,7 @@ class GD_CORE_API ExpressionVariableReplacer
       // A scope was forced. Honor it: it means this node represents a variable
       // of the forced variables container.
       if (forcedVariablesContainer == &targetVariablesContainer ||
-          forcedObjectName == targetGroupName) {
+          (forcedObjectName == targetGroupName && !targetGroupName.empty())) {
         RenameOrRemoveVariableOfTargetVariableContainer(node.name);
       }
 
@@ -158,7 +158,7 @@ class GD_CORE_API ExpressionVariableReplacer
       // objectNameToUseForVariableAccessor.
       if (objectsContainersList.HasObjectOrGroupVariablesContainer(
               objectNameToUseForVariableAccessor, targetVariablesContainer) ||
-          objectNameToUseForVariableAccessor == targetGroupName) {
+          (objectNameToUseForVariableAccessor == targetGroupName && !targetGroupName.empty())) {
         objectNameToUseForVariableAccessor = "";
         // The node represents an object variable, and this object variables are
         // the target. Do the replacement or removals:
@@ -209,7 +209,7 @@ class GD_CORE_API ExpressionVariableReplacer
       // A scope was forced. Honor it: it means this node represents a variable
       // of the forced variables container.
       if (forcedVariablesContainer == &targetVariablesContainer ||
-          forcedObjectName == targetGroupName) {
+          (forcedObjectName == targetGroupName && !targetGroupName.empty())) {
         renameVariableAndChild();
       }
       return;
@@ -223,7 +223,7 @@ class GD_CORE_API ExpressionVariableReplacer
           // This represents an object.
           if (objectsContainersList.HasObjectOrGroupVariablesContainer(
                   node.identifierName, targetVariablesContainer) ||
-              node.identifierName == targetGroupName) {
+              (node.identifierName == targetGroupName && !targetGroupName.empty())) {
             // The node represents an object variable, and this object variables
             // are the target. Do the replacement or removals:
             PushVariablesRenamingChangesetRoot();

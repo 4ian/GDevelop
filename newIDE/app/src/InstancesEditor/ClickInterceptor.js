@@ -70,10 +70,17 @@ class ClickInterceptor {
           e.global.y
         );
 
-        pointerPathCoordinates.push({
-          x: sceneCoordinates[0],
-          y: sceneCoordinates[1],
-        });
+        if (pointerPathCoordinates[1]) {
+          pointerPathCoordinates[1] = {
+            x: sceneCoordinates[0],
+            y: sceneCoordinates[1],
+          };
+        } else {
+          pointerPathCoordinates.push({
+            x: sceneCoordinates[0],
+            y: sceneCoordinates[1],
+          });
+        }
       }
     );
     this.pixiContainer = new PIXI.Container();

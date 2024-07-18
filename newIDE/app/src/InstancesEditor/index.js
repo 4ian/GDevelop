@@ -44,6 +44,7 @@ import {
 import Background from './Background';
 import TileMapTilePreview, {
   getTileSet,
+  getTilesGridCoordinatesFromPointerSceneCoordinates,
   updateSceneToTileMapTransformation,
 } from './TileMapTilePreview';
 import { type TileMapTileSelection } from './TileSetVisualizer';
@@ -750,9 +751,7 @@ export default class InstancesEditor extends Component<Props> {
     this.lastCursorY = y;
   };
 
-  _onInterceptClick = (
-    scenePathCoordinates: Array<{| x: number, y: number |}>
-  ) => {
+  _onInterceptClick = (sceneCoordinates: Array<{| x: number, y: number |}>) => {
     const {
       tileMapTileSelection,
       instancesSelection,
@@ -796,27 +795,19 @@ export default class InstancesEditor extends Component<Props> {
       const { scaleX, scaleY } = scales;
       const tileSet = getTileSet(object);
       const editableTileMapLayer = editableTileMap.getTileLayer(0);
-      const alreadyConsideredCoordinates = new Set();
-      const deduplicatedCoordinates = [];
-      let coordinatesInTileMap = [0, 0];
+      const tileMapGridCoordinates = getTilesGridCoordinatesFromPointerSceneCoordinates(
+        {
+          coordinates: sceneCoordinates,
+          tileSize: tileSet.tileSize,
+          sceneToTileMapTransformation,
+        }
+      );
 
-      scenePathCoordinates.forEach(sceneCoordinates => {
-        sceneToTileMapTransformation.transform(
-          [sceneCoordinates.x, sceneCoordinates.y],
-          coordinatesInTileMap
-        );
-        const gridX = Math.floor(coordinatesInTileMap[0] / tileSet.tileSize);
-        const gridY = Math.floor(coordinatesInTileMap[1] / tileSet.tileSize);
-        const key = `${gridX};${gridY}`;
-        if (alreadyConsideredCoordinates.has(key)) return;
-        deduplicatedCoordinates.push({ gridX, gridY });
-        alreadyConsideredCoordinates.add(key);
-      });
       if (tileMapTileSelection.kind === 'single') {
         // TODO: Optimize list execution to make sure the most important size changing operations are done first.
         let cumulatedUnshiftedRows = 0,
           cumulatedUnshiftedColumns = 0;
-        deduplicatedCoordinates.forEach(({ gridX, gridY }) => {
+        tileMapGridCoordinates.forEach(({ x: gridX, y: gridY }) => {
           const {
             unshiftedRows,
             unshiftedColumns,
@@ -862,7 +853,7 @@ export default class InstancesEditor extends Component<Props> {
         });
         this.props.onInstancesResized([selectedInstance]);
       } else if (tileMapTileSelection.kind === 'erase') {
-        deduplicatedCoordinates.forEach(({ gridX, gridY }) => {
+        tileMapGridCoordinates.forEach(({ x: gridX, y: gridY }) => {
           editableTileMapLayer.removeTile(gridX, gridY);
         });
         const {

@@ -98,10 +98,20 @@ type TileProps = {|
   y: number,
   size: number,
   highlighted?: boolean,
+  width?: number,
+  height?: number,
   title?: string,
 |};
 
-const Tile = ({ x, y, size, highlighted, title }: TileProps) => {
+const Tile = ({
+  x,
+  y,
+  size,
+  width = 1,
+  height = 1,
+  highlighted,
+  title,
+}: TileProps) => {
   const classes = useStylesForTile(!!highlighted);
   return (
     <div
@@ -109,8 +119,8 @@ const Tile = ({ x, y, size, highlighted, title }: TileProps) => {
       style={{
         left: x * size,
         top: y * size,
-        width: size,
-        height: size,
+        width: size * width,
+        height: size * height,
       }}
       // TODO: find a way to display title on mobile.
       title={title}
@@ -180,6 +190,14 @@ const TileSetVisualizer = ({
     x: number,
     y: number,
   |}>(null);
+  const [
+    rectangularSelectionTilePreview,
+    setRectangularSelectionTilePreview,
+  ] = React.useState<?{|
+    topLeftCoordinates: TileMapCoordinates,
+    width: number,
+    height: number,
+  |}>(null);
 
   const [hoveredTile, setHoveredTile] = React.useState<?{
     x: number,
@@ -212,6 +230,51 @@ const TileSetVisualizer = ({
 
     setClickStartCoordinates({ x: mouseX, y: mouseY });
   }, []);
+
+  const onPointerMove = React.useCallback(
+    (event: PointerEvent) => {
+      if (
+        !clickStartCoordinates ||
+        !(event.currentTarget instanceof HTMLDivElement) ||
+        !displayedTileSize ||
+        !allowMultipleSelection
+      ) {
+        return;
+      }
+      const bounds = event.currentTarget.getBoundingClientRect();
+
+      const mouseX = event.clientX - bounds.left + 1;
+      const mouseY = event.clientY - bounds.top + 1;
+      const x = Math.min(
+        Math.floor(mouseX / displayedTileSize),
+        columnCount - 1
+      );
+      const y = Math.min(Math.floor(mouseY / displayedTileSize), rowCount - 1);
+      const startX = Math.min(
+        Math.floor(clickStartCoordinates.x / displayedTileSize),
+        columnCount - 1
+      );
+      const startY = Math.min(
+        Math.floor(clickStartCoordinates.y / displayedTileSize),
+        rowCount - 1
+      );
+      setRectangularSelectionTilePreview({
+        topLeftCoordinates: {
+          x: Math.min(x, startX),
+          y: Math.min(y, startY),
+        },
+        width: Math.abs(x - startX) + 1,
+        height: Math.abs(y - startY) + 1,
+      });
+    },
+    [
+      displayedTileSize,
+      columnCount,
+      rowCount,
+      allowMultipleSelection,
+      clickStartCoordinates,
+    ]
+  );
 
   const onPointerUp = React.useCallback(
     (event: MouseEvent) => {
@@ -322,6 +385,7 @@ const TileSetVisualizer = ({
         onSelectTileMapTile(newSelection);
       } finally {
         setClickStartCoordinates(null);
+        setRectangularSelectionTilePreview(null);
       }
     },
     [
@@ -469,6 +533,7 @@ const TileSetVisualizer = ({
             onMouseMove={onHoverAtlas}
             onPointerDown={onPointerDown}
             onPointerUp={onPointerUp}
+            onPointerMove={onPointerMove}
           >
             <CorsAwareImage
               style={styles.atlasImage}
@@ -533,6 +598,17 @@ const TileSetVisualizer = ({
                   />
                 );
               })}
+            {rectangularSelectionTilePreview && displayedTileSize && (
+              <Tile
+                key={`preview-tile`}
+                highlighted
+                size={displayedTileSize}
+                x={rectangularSelectionTilePreview.topLeftCoordinates.x}
+                y={rectangularSelectionTilePreview.topLeftCoordinates.y}
+                width={rectangularSelectionTilePreview.width}
+                height={rectangularSelectionTilePreview.height}
+              />
+            )}
           </div>
         )}
       </Line>

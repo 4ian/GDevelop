@@ -60,6 +60,7 @@ struct VariablesChangeset : VariablesRenamingChangesetNode {
    */
   std::unordered_set<gd::String> typeChangedVariableNames;
   std::unordered_set<gd::String> valueChangedVariableNames;
+  std::unordered_set<gd::String> addedVariableNames;
 
   bool HasRemovedVariables() { return !removedVariableNames.empty(); }
 

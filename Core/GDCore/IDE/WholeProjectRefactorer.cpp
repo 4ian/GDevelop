@@ -141,6 +141,7 @@ void WholeProjectRefactorer::EnsureObjectEventsFunctionsProperParameters(
   }
 }
 
+// TODO Handle position changes for group variables.
 VariablesChangeset
 WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
     const gd::SerializerElement &oldSerializedVariablesContainer,
@@ -174,6 +175,7 @@ WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
         removedUuidAndNames.find(variable.GetPersistentUuid());
     if (existingOldVariableUuidAndName == removedUuidAndNames.end()) {
       // This is a new variable.
+      changeset.addedVariableNames.insert(variableName);
     } else {
       const gd::String &oldName = existingOldVariableUuidAndName->second;
 

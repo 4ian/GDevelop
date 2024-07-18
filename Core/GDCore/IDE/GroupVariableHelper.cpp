@@ -48,6 +48,7 @@ gd::VariablesContainer GroupVariableHelper::MergeVariableContainers(
   return mergedVariablesContainer;
 }
 
+// TODO Handle position changes.
 void GroupVariableHelper::ApplyChangesToObjects(
     gd::ObjectsContainer &globalObjectsContainer,
     gd::ObjectsContainer &objectsContainer,
@@ -63,6 +64,10 @@ void GroupVariableHelper::ApplyChangesToObjects(
     auto &variablesContainer = object.GetVariables();
     for (const gd::String &variableName : changeset.removedVariableNames) {
       variablesContainer.Remove(variableName);
+    }
+    for (const gd::String &variableName : changeset.addedVariableNames) {
+      variablesContainer.Insert(variableName,
+                                groupVariablesContainer.Get(variableName), variablesContainer.Count());
     }
     for (const auto &pair : changeset.oldToNewVariableNames) {
       const gd::String &oldVariableName = pair.first;

@@ -28,7 +28,9 @@ import {
   reorderInstanceSchemaForCustomProperties,
 } from './CompactPropertiesSchema';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
-import TileSetVisualizer, { type TileMapTileSelection } from '../TileSetVisualizer';
+import TileSetVisualizer, {
+  type TileMapTileSelection,
+} from '../TileSetVisualizer';
 
 export const styles = {
   paper: {

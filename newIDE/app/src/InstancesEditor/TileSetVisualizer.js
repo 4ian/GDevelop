@@ -176,6 +176,10 @@ const TileSetVisualizer = ({
   ] = React.useState<?TileMapCoordinates>(null);
   const tileContainerRef = React.useRef<?HTMLDivElement>(null);
   const { columnCount, rowCount } = getTileset(objectConfiguration);
+  const [clickStartCoordinates, setClickStartCoordinates] = React.useState<?{|
+    x: number,
+    y: number,
+  |}>(null);
 
   const [hoveredTile, setHoveredTile] = React.useState<?{
     x: number,
@@ -198,63 +202,126 @@ const TileSetVisualizer = ({
     [forceUpdate]
   );
 
-  const onClickAtlas = React.useCallback(
-    (event: MouseEvent) => {
-      if (
-        !(event.currentTarget instanceof HTMLDivElement) ||
-        // TODO: not working at first render on swipeable editor display (mobile), might be
-        // because tileContainerRef is not defined.
-        !displayedTileSize
-      ) {
-        return;
-      }
-      const bounds = event.currentTarget.getBoundingClientRect();
+  const onPointerDown = React.useCallback((event: PointerEvent) => {
+    if (!(event.currentTarget instanceof HTMLDivElement)) {
+      return;
+    }
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const mouseX = event.clientX - bounds.left + 1;
+    const mouseY = event.clientY - bounds.top + 1;
 
-      const mouseX = event.clientX - bounds.left + 1;
-      const mouseY = event.clientY - bounds.top + 1;
-      const x = Math.min(
-        Math.floor(mouseX / displayedTileSize),
-        columnCount - 1
-      );
-      const y = Math.min(Math.floor(mouseY / displayedTileSize), rowCount - 1);
-      if (allowMultipleSelection) {
-        const isAlreadySelected =
-          tileMapTileSelection &&
-          tileMapTileSelection.kind === 'multiple' &&
-          tileMapTileSelection.coordinates.some(
-            coordinates => coordinates.x === x && coordinates.y === y
-          );
+    setClickStartCoordinates({ x: mouseX, y: mouseY });
+  }, []);
+
+  const onPointerUp = React.useCallback(
+    (event: MouseEvent) => {
+      try {
+        if (
+          !(event.currentTarget instanceof HTMLDivElement) ||
+          !displayedTileSize
+        ) {
+          return;
+        }
+        const bounds = event.currentTarget.getBoundingClientRect();
+
+        const mouseX = event.clientX - bounds.left + 1;
+        const mouseY = event.clientY - bounds.top + 1;
+        const x = Math.min(
+          Math.floor(mouseX / displayedTileSize),
+          columnCount - 1
+        );
+        const y = Math.min(
+          Math.floor(mouseY / displayedTileSize),
+          rowCount - 1
+        );
+        if (!allowMultipleSelection) {
+          if (
+            tileMapTileSelection &&
+            tileMapTileSelection.kind === 'single' &&
+            tileMapTileSelection.coordinates.x === x &&
+            tileMapTileSelection.coordinates.y === y
+          ) {
+            onSelectTileMapTile(null);
+          } else {
+            onSelectTileMapTile({
+              kind: 'single',
+              coordinates: { x, y },
+              flipHorizontally: shouldFlipHorizontally,
+              flipVertically: shouldFlipVertically,
+            });
+          }
+          return;
+        }
+        if (!clickStartCoordinates) return;
+
+        const startX = Math.min(
+          Math.floor(clickStartCoordinates.x / displayedTileSize),
+          columnCount - 1
+        );
+        const startY = Math.min(
+          Math.floor(clickStartCoordinates.y / displayedTileSize),
+          rowCount - 1
+        );
         const newSelection =
           tileMapTileSelection && tileMapTileSelection.kind === 'multiple'
             ? { ...tileMapTileSelection }
             : { kind: 'multiple', coordinates: [] };
-        if (!isAlreadySelected) {
-          newSelection.coordinates.push({ x, y });
+        if (startX === x && startY === y) {
+          // Click on a tile.
+          const isAlreadySelected =
+            tileMapTileSelection &&
+            tileMapTileSelection.kind === 'multiple' &&
+            tileMapTileSelection.coordinates.some(
+              coordinates => coordinates.x === x && coordinates.y === y
+            );
+          if (!isAlreadySelected) {
+            newSelection.coordinates.push({ x, y });
+          } else {
+            const index = newSelection.coordinates.findIndex(
+              coordinates => coordinates.x === x && coordinates.y === y
+            );
+            if (index > -1) {
+              newSelection.coordinates.splice(index, 1);
+            }
+          }
         } else {
-          const index = newSelection.coordinates.findIndex(
-            coordinates => coordinates.x === x && coordinates.y === y
-          );
-          if (index > -1) {
-            newSelection.coordinates.splice(index, 1);
+          for (
+            let columnIndex = Math.min(startX, x);
+            columnIndex <= Math.max(startX, x);
+            columnIndex++
+          ) {
+            for (
+              let rowIndex = Math.min(startY, y);
+              rowIndex <= Math.max(startY, y);
+              rowIndex++
+            ) {
+              const isAlreadySelected =
+                newSelection &&
+                newSelection.kind === 'multiple' &&
+                newSelection.coordinates.some(
+                  coordinates =>
+                    coordinates.x === columnIndex && coordinates.y === rowIndex
+                );
+              if (!isAlreadySelected) {
+                newSelection.coordinates.push({
+                  x: columnIndex,
+                  y: rowIndex,
+                });
+              } else {
+                const index = newSelection.coordinates.findIndex(
+                  coordinates =>
+                    coordinates.x === columnIndex && coordinates.y === rowIndex
+                );
+                if (index > -1) {
+                  newSelection.coordinates.splice(index, 1);
+                }
+              }
+            }
           }
         }
         onSelectTileMapTile(newSelection);
-      } else {
-        if (
-          tileMapTileSelection &&
-          tileMapTileSelection.kind === 'single' &&
-          tileMapTileSelection.coordinates.x === x &&
-          tileMapTileSelection.coordinates.y === y
-        ) {
-          onSelectTileMapTile(null);
-        } else {
-          onSelectTileMapTile({
-            kind: 'single',
-            coordinates: { x, y },
-            flipHorizontally: shouldFlipHorizontally,
-            flipVertically: shouldFlipVertically,
-          });
-        }
+      } finally {
+        setClickStartCoordinates(null);
       }
     },
     [
@@ -266,6 +333,7 @@ const TileSetVisualizer = ({
       shouldFlipHorizontally,
       shouldFlipVertically,
       allowMultipleSelection,
+      clickStartCoordinates,
     ]
   );
 
@@ -399,7 +467,8 @@ const TileSetVisualizer = ({
             style={styles.tileContainer}
             ref={tileContainerRef}
             onMouseMove={onHoverAtlas}
-            onClick={onClickAtlas}
+            onPointerDown={onPointerDown}
+            onPointerUp={onPointerUp}
           >
             <CorsAwareImage
               style={styles.atlasImage}

@@ -19,6 +19,22 @@ const styles = {
   icon: { fontSize: 18 },
 };
 
+const useStylesForTile = (highlighted: boolean) =>
+  makeStyles(theme =>
+    createStyles({
+      tile: {
+        position: 'absolute',
+        boxSizing: 'border-box',
+        border: highlighted ? '2px solid red' : undefined,
+        '&:hover': {
+          border: highlighted ? '2px solid pink' : '1px solid white',
+        },
+      },
+    })
+  )();
+
+type TileMapCoordinates = {| x: number, y: number |};
+
 /**
  * Returns the tile id in a tile set.
  * This id corresponds to the index of the tile if the tile set
@@ -63,34 +79,37 @@ export const getGridCoordinatesFromTileId = ({
   return { x, y };
 };
 
-const useStylesForTile = (highlighted: boolean) =>
-  makeStyles(theme =>
-    createStyles({
-      tile: {
-        position: 'absolute',
-        boxSizing: 'border-box',
-        border: highlighted ? '2px solid red' : undefined,
-        '&:hover': {
-          border: highlighted ? '2px solid pink' : '1px solid white',
-        },
-      },
-    })
-  )();
+const getGridCoordinatesFromPointerCoordinates = ({
+  displayedTileSize,
+  pointerX,
+  pointerY,
+  columnCount,
+  rowCount,
+}: {|
+  displayedTileSize: number,
+  pointerX: number,
+  pointerY: number,
+  columnCount: number,
+  rowCount: number,
+|}): TileMapCoordinates => {
+  const x = Math.min(Math.floor(pointerX / displayedTileSize), columnCount - 1);
+  const y = Math.min(Math.floor(pointerY / displayedTileSize), rowCount - 1);
+  return { x, y };
+};
 
-const getTileset = (objectConfiguration: gdObjectConfiguration) => {
-  const columnCount = parseFloat(
-    objectConfiguration
-      .getProperties()
-      .get('columnCount')
-      .getValue()
+const addOrRemoveCoordinatesInArray = (
+  array: TileMapCoordinates[],
+  newCoordinates: TileMapCoordinates
+) => {
+  const indexInArray = array.findIndex(
+    coordinates =>
+      coordinates.x === newCoordinates.x && coordinates.y === newCoordinates.y
   );
-  const rowCount = parseFloat(
-    objectConfiguration
-      .getProperties()
-      .get('rowCount')
-      .getValue()
-  );
-  return { rowCount, columnCount };
+  if (indexInArray === -1) {
+    array.push(newCoordinates);
+  } else {
+    array.splice(indexInArray, 1);
+  }
 };
 
 type TileProps = {|
@@ -127,8 +146,6 @@ const Tile = ({
     />
   );
 };
-
-type TileMapCoordinates = {| x: number, y: number |};
 
 export type TileMapTileSelection =
   | {|
@@ -185,7 +202,18 @@ const TileSetVisualizer = ({
     setLastSelectedTile,
   ] = React.useState<?TileMapCoordinates>(null);
   const tileContainerRef = React.useRef<?HTMLDivElement>(null);
-  const { columnCount, rowCount } = getTileset(objectConfiguration);
+  const columnCount = parseFloat(
+    objectConfiguration
+      .getProperties()
+      .get('columnCount')
+      .getValue()
+  );
+  const rowCount = parseFloat(
+    objectConfiguration
+      .getProperties()
+      .get('rowCount')
+      .getValue()
+  );
   const [clickStartCoordinates, setClickStartCoordinates] = React.useState<?{|
     x: number,
     y: number,
@@ -245,19 +273,23 @@ const TileSetVisualizer = ({
 
       const mouseX = event.clientX - bounds.left + 1;
       const mouseY = event.clientY - bounds.top + 1;
-      const x = Math.min(
-        Math.floor(mouseX / displayedTileSize),
-        columnCount - 1
+      const { x, y } = getGridCoordinatesFromPointerCoordinates({
+        pointerX: mouseX,
+        pointerY: mouseY,
+        columnCount,
+        rowCount,
+        displayedTileSize,
+      });
+      const { x: startX, y: startY } = getGridCoordinatesFromPointerCoordinates(
+        {
+          pointerX: clickStartCoordinates.x,
+          pointerY: clickStartCoordinates.y,
+          columnCount,
+          rowCount,
+          displayedTileSize,
+        }
       );
-      const y = Math.min(Math.floor(mouseY / displayedTileSize), rowCount - 1);
-      const startX = Math.min(
-        Math.floor(clickStartCoordinates.x / displayedTileSize),
-        columnCount - 1
-      );
-      const startY = Math.min(
-        Math.floor(clickStartCoordinates.y / displayedTileSize),
-        rowCount - 1
-      );
+
       setRectangularSelectionTilePreview({
         topLeftCoordinates: {
           x: Math.min(x, startX),
@@ -289,14 +321,13 @@ const TileSetVisualizer = ({
 
         const mouseX = event.clientX - bounds.left + 1;
         const mouseY = event.clientY - bounds.top + 1;
-        const x = Math.min(
-          Math.floor(mouseX / displayedTileSize),
-          columnCount - 1
-        );
-        const y = Math.min(
-          Math.floor(mouseY / displayedTileSize),
-          rowCount - 1
-        );
+        const { x, y } = getGridCoordinatesFromPointerCoordinates({
+          pointerX: mouseX,
+          pointerY: mouseY,
+          columnCount,
+          rowCount,
+          displayedTileSize,
+        });
         if (!allowMultipleSelection) {
           if (
             tileMapTileSelection &&
@@ -317,35 +348,30 @@ const TileSetVisualizer = ({
         }
         if (!clickStartCoordinates) return;
 
-        const startX = Math.min(
-          Math.floor(clickStartCoordinates.x / displayedTileSize),
-          columnCount - 1
-        );
-        const startY = Math.min(
-          Math.floor(clickStartCoordinates.y / displayedTileSize),
-          rowCount - 1
-        );
+        const {
+          x: startX,
+          y: startY,
+        } = getGridCoordinatesFromPointerCoordinates({
+          pointerX: clickStartCoordinates.x,
+          pointerY: clickStartCoordinates.y,
+          columnCount,
+          rowCount,
+          displayedTileSize,
+        });
         const newSelection =
           tileMapTileSelection && tileMapTileSelection.kind === 'multiple'
             ? { ...tileMapTileSelection }
             : { kind: 'multiple', coordinates: [] };
         if (startX === x && startY === y) {
-          // Click on a tile.
-          const isAlreadySelected =
+          if (
             tileMapTileSelection &&
-            tileMapTileSelection.kind === 'multiple' &&
-            tileMapTileSelection.coordinates.some(
-              coordinates => coordinates.x === x && coordinates.y === y
-            );
-          if (!isAlreadySelected) {
-            newSelection.coordinates.push({ x, y });
-          } else {
-            const index = newSelection.coordinates.findIndex(
-              coordinates => coordinates.x === x && coordinates.y === y
-            );
-            if (index > -1) {
-              newSelection.coordinates.splice(index, 1);
-            }
+            // Click on a tile.
+            tileMapTileSelection.kind === 'multiple'
+          ) {
+            addOrRemoveCoordinatesInArray(newSelection.coordinates, {
+              x,
+              y,
+            });
           }
         } else {
           for (
@@ -358,26 +384,11 @@ const TileSetVisualizer = ({
               rowIndex <= Math.max(startY, y);
               rowIndex++
             ) {
-              const isAlreadySelected =
-                newSelection &&
-                newSelection.kind === 'multiple' &&
-                newSelection.coordinates.some(
-                  coordinates =>
-                    coordinates.x === columnIndex && coordinates.y === rowIndex
-                );
-              if (!isAlreadySelected) {
-                newSelection.coordinates.push({
+              if (newSelection && newSelection.kind === 'multiple') {
+                addOrRemoveCoordinatesInArray(newSelection.coordinates, {
                   x: columnIndex,
                   y: rowIndex,
                 });
-              } else {
-                const index = newSelection.coordinates.findIndex(
-                  coordinates =>
-                    coordinates.x === columnIndex && coordinates.y === rowIndex
-                );
-                if (index > -1) {
-                  newSelection.coordinates.splice(index, 1);
-                }
               }
             }
           }
@@ -433,11 +444,13 @@ const TileSetVisualizer = ({
 
       const mouseX = event.clientX - bounds.left + 1;
       const mouseY = event.clientY - bounds.top + 1;
-      const x = Math.min(
-        Math.floor(mouseX / displayedTileSize),
-        columnCount - 1
-      );
-      const y = Math.min(Math.floor(mouseY / displayedTileSize), rowCount - 1);
+      const { x, y } = getGridCoordinatesFromPointerCoordinates({
+        pointerX: mouseX,
+        pointerY: mouseY,
+        columnCount,
+        rowCount,
+        displayedTileSize,
+      });
       setHoveredTile({ x, y });
     },
     [displayedTileSize, columnCount, rowCount]

@@ -51,6 +51,8 @@ namespace gdjs {
     _sceneToTileMapTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
     _collisionTileMap: gdjs.TileMap.TransformedCollisionTileMap | null = null;
     _hitBoxTag: string = 'collision';
+    private _transformationIsUpToDate: boolean = false;
+
     // TODO: Add a debug mode like for TileMapCollisionMaskRuntimeObject to draw?
 
     constructor(
@@ -107,6 +109,10 @@ namespace gdjs {
             this._renderer.refreshPixiTileMap(textureCache);
           }
         );
+        if (this._collisionTileMap) {
+          const tileMap = this._renderer.getTileMap();
+          if (tileMap) this._collisionTileMap.updateFromTileMap(tileMap);
+        }
         this._isTileMapDirty = false;
       }
     }
@@ -257,6 +263,7 @@ namespace gdjs {
     setWidth(width: float): void {
       if (this.getWidth() === width) return;
 
+      this._transformationIsUpToDate = false;
       this._renderer.setWidth(width);
       this.invalidateHitboxes();
     }
@@ -264,6 +271,7 @@ namespace gdjs {
     setHeight(height: float): void {
       if (this.getHeight() === height) return;
 
+      this._transformationIsUpToDate = false;
       this._renderer.setHeight(height);
       this.invalidateHitboxes();
     }
@@ -271,6 +279,7 @@ namespace gdjs {
     setSize(newWidth: float, newHeight: float): void {
       this.setWidth(newWidth);
       this.setHeight(newHeight);
+      this._transformationIsUpToDate = false;
     }
 
     /**
@@ -292,6 +301,7 @@ namespace gdjs {
     setScale(scale: float): void {
       this.setScaleX(scale);
       this.setScaleY(scale);
+      this._transformationIsUpToDate = false;
     }
 
     /**
@@ -307,6 +317,7 @@ namespace gdjs {
 
       this._renderer.setScaleX(scaleX);
       this.invalidateHitboxes();
+      this._transformationIsUpToDate = false;
     }
 
     /**
@@ -322,21 +333,25 @@ namespace gdjs {
 
       this._renderer.setScaleY(scaleY);
       this.invalidateHitboxes();
+      this._transformationIsUpToDate = false;
     }
 
     setX(x: float): void {
       super.setX(x);
       this._renderer.updatePosition();
+      this._transformationIsUpToDate = false;
     }
 
     setY(y: float): void {
       super.setY(y);
       this._renderer.updatePosition();
+      this._transformationIsUpToDate = false;
     }
 
     setAngle(angle: float): void {
       super.setAngle(angle);
       this._renderer.updateAngle();
+      this._transformationIsUpToDate = false;
     }
 
     setOpacity(opacity: float): void {
@@ -487,6 +502,9 @@ namespace gdjs {
     }
 
     updateTransformation() {
+      if (this._transformationIsUpToDate) {
+        return;
+      }
       const absScaleX = Math.abs(this._renderer.getScaleX());
       const absScaleY = Math.abs(this._renderer.getScaleY());
 
@@ -515,6 +533,7 @@ namespace gdjs {
         );
       }
       this._sceneToTileMapTransformation.invert();
+      this._transformationIsUpToDate = true;
     }
 
     getGridCoordinatesFromSceneCoordinates(
@@ -580,6 +599,7 @@ namespace gdjs {
           this.invalidateHitboxes();
         }
       }
+      this._transformationIsUpToDate = false;
     }
 
     removeTileAt(x: number, y: number) {
@@ -612,6 +632,7 @@ namespace gdjs {
           this.invalidateHitboxes();
         }
       }
+      this._transformationIsUpToDate = false;
     }
   }
   gdjs.registerObject(

@@ -77,6 +77,10 @@ namespace gdjs {
       );
     }
 
+    getTileMap(): TileMapHelper.EditableTileMap | null {
+      return this._tileMap;
+    }
+
     updatePosition(): void {
       this._pixiObject.pivot.x = this.getTileMapWidth() / 2;
       this._pixiObject.pivot.y = this.getTileMapHeight() / 2;

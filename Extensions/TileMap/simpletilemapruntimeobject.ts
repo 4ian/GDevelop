@@ -552,6 +552,14 @@ namespace gdjs {
       return [columnIndex, rowIndex];
     }
 
+    getColumnIndexAtSceneCoordinates(x: float, y: float): integer {
+      return this.getGridCoordinatesFromSceneCoordinates(x, y)[0];
+    }
+
+    getRowIndexAtSceneCoordinates(x: float, y: float): integer {
+      return this.getGridCoordinatesFromSceneCoordinates(x, y)[1];
+    }
+
     getTileAtSceneCoordinates(x: float, y: float): integer {
       const [
         columnIndex,

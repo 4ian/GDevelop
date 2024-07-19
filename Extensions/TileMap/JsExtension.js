@@ -733,17 +733,35 @@ const defineSimpleTileMap = function (extension, _, gd) {
     .addIncludeFile('Extensions/TileMap/pako/dist/pako.min.js')
     .addIncludeFile('Extensions/TileMap/helper/TileMapHelper.js');
 
-  // object.addExpression(
-  //   'SceneToTileMapGridConversion',
-  //   _('Tile map grid coordinates'),
-  //   _('Get the tile coordinates corresponding to the scene coordinates.'),
-  //   '',
-  //   'JsPlatform/Extensions/tile_map.svg'
-  // )
-  // .addParameter('object', _('Tilemap'), '', false)
-  // .addParameter('number', _('X'), '', false)
-  // .addParameter('number', _('Y'), '', false)
-  // .setFunctionName('getTileAt');
+  object
+    .addExpression(
+      'GridHorizontalCoordinateFromSceneCoordinates',
+      _('Tile map grid horizontal coordinate'),
+      _(
+        'Get the tile horizontal coordinates in the tilemap corresponding to the scene coordinates.'
+      ),
+      '',
+      'JsPlatform/Extensions/tile_map.svg'
+    )
+    .addParameter('object', _('Tilemap'), '', false)
+    .addParameter('number', _('X'), '', false)
+    .addParameter('number', _('Y'), '', false)
+    .setFunctionName('getColumnIndexAtSceneCoordinates');
+
+  object
+    .addExpression(
+      'GridVerticalCoordinateFromSceneCoordinates',
+      _('Tile map grid vertical coordinate'),
+      _(
+        'Get the tile vertical coordinates in the tilemap corresponding to the scene coordinates.'
+      ),
+      '',
+      'JsPlatform/Extensions/tile_map.svg'
+    )
+    .addParameter('object', _('Tilemap'), '', false)
+    .addParameter('number', _('X'), '', false)
+    .addParameter('number', _('Y'), '', false)
+    .setFunctionName('getRowIndexAtSceneCoordinates');
 
   object
     .addExpressionAndConditionAndAction(

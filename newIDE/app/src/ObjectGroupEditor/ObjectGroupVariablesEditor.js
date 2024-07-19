@@ -36,18 +36,19 @@ const ObjectGroupVariableEditor = React.forwardRef<
     ref
   ) => {
     // TODO Is it a memory leak?
-    const groupVariableContainer = React.useRef(
-      gd.GroupVariableHelper.mergeVariableContainers(
+    const groupVariablesContainer = React.useRef<gdVariablesContainer | null>(null);
+    if (!groupVariablesContainer.current) {
+      groupVariablesContainer.current = gd.GroupVariableHelper.mergeVariableContainers(
         projectScopedContainersAccessor.get().getObjectsContainersList(),
         group
       )
-    );
+    }
 
     const {
       notifyOfChange,
       getOriginalContentSerializedElement,
     } = useSerializableObjectCancelableEditor({
-      serializableObject: groupVariableContainer.current,
+      serializableObject: groupVariablesContainer.current,
       onCancel: () => {},
       resetThenClearPersistentUuid: true,
     });
@@ -60,19 +61,19 @@ const ObjectGroupVariableEditor = React.forwardRef<
       const originalSerializedVariables = getOriginalContentSerializedElement();
       const changeset = gd.WholeProjectRefactorer.computeChangesetForVariablesContainer(
         originalSerializedVariables,
-        groupVariableContainer.current
+        groupVariablesContainer.current
       );
 
       gd.WholeProjectRefactorer.applyRefactoringForGroupVariablesContainer(
         project,
         globalObjectsContainer || objectsContainer,
         objectsContainer,
-        groupVariableContainer.current,
+        groupVariablesContainer.current,
         group,
         changeset,
         originalSerializedVariables
       );
-      groupVariableContainer.current.clearPersistentUuid();
+      groupVariablesContainer.current.clearPersistentUuid();
     };
 
     React.useImperativeHandle(ref, () => ({
@@ -81,7 +82,7 @@ const ObjectGroupVariableEditor = React.forwardRef<
 
     return (
       <>
-        {groupVariableContainer.current.count() > 0 &&
+        {groupVariablesContainer.current.count() > 0 &&
           DismissableTutorialMessage && (
             <Line>
               <Column noMargin expand>
@@ -91,7 +92,7 @@ const ObjectGroupVariableEditor = React.forwardRef<
           )}
         <VariablesList
           projectScopedContainersAccessor={projectScopedContainersAccessor}
-          variablesContainer={groupVariableContainer.current}
+          variablesContainer={groupVariablesContainer.current}
           areObjectVariables
           emptyPlaceholderTitle={<Trans>Add your first object variable</Trans>}
           emptyPlaceholderDescription={

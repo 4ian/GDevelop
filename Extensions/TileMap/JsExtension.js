@@ -176,7 +176,7 @@ const defineTileMap = function (extension, _, gd) {
   const object = extension
     .addObject(
       'TileMap',
-      _('Tilemap'),
+      _('External Tilemap (Tiled/LDtk)'),
       _(
         'Displays a tiled-based map, made with the Tiled editor (https://www.mapeditor.org/) or the LDtk editor (https://ldtk.io/).'
       ),
@@ -715,7 +715,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
   const object = extension
     .addObject(
       'SimpleTileMap',
-      _('Simple Tilemap'),
+      _('Tilemap'),
       _('Displays a tiled-based map.'),
       'JsPlatform/Extensions/tile_map.svg',
       objectSimpleTileMap
@@ -986,7 +986,7 @@ const defineCollisionMask = function (extension, _, gd) {
   const object = extension
     .addObject(
       'CollisionMask',
-      _('Tilemap collision mask'),
+      _('External Tilemap (Tiled/LDtk) collision mask'),
       _('Invisible object handling collisions with parts of a tilemap.'),
       'JsPlatform/Extensions/tile_map_collision_mask32.svg',
       collisionMaskObject

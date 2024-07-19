@@ -49,6 +49,7 @@ namespace gdjs {
     _initialTilesWithHitBox: number[];
     _isTileMapDirty: boolean = false;
     _sceneToTileMapTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
+    _tileMapToSceneTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
     _collisionTileMap: gdjs.TileMap.TransformedCollisionTileMap | null = null;
     _hitBoxTag: string = 'collision';
     private _transformationIsUpToDate: boolean = false;
@@ -508,32 +509,67 @@ namespace gdjs {
       const absScaleX = Math.abs(this._renderer.getScaleX());
       const absScaleY = Math.abs(this._renderer.getScaleY());
 
-      this._sceneToTileMapTransformation.setToIdentity();
+      this._tileMapToSceneTransformation.setToIdentity();
 
       // Translation
-      this._sceneToTileMapTransformation.translate(this.getX(), this.getY());
+      this._tileMapToSceneTransformation.translate(this.getX(), this.getY());
 
       // Rotation
       const angleInRadians = (this.getAngle() * Math.PI) / 180;
-      this._sceneToTileMapTransformation.rotateAround(
+      this._tileMapToSceneTransformation.rotateAround(
         angleInRadians,
         this.getCenterX(),
         this.getCenterY()
       );
 
       // Scale
-      this._sceneToTileMapTransformation.scale(absScaleX, absScaleY);
+      this._tileMapToSceneTransformation.scale(absScaleX, absScaleY);
       if (this._collisionTileMap) {
         const collisionTileMapTransformation = this._collisionTileMap.getTransformation();
         collisionTileMapTransformation.copyFrom(
-          this._sceneToTileMapTransformation
+          this._tileMapToSceneTransformation
         );
         this._collisionTileMap.setTransformation(
           collisionTileMapTransformation
         );
       }
+      this._sceneToTileMapTransformation.copyFrom(
+        this._tileMapToSceneTransformation
+      );
       this._sceneToTileMapTransformation.invert();
       this._transformationIsUpToDate = true;
+    }
+
+    getSceneXCoordinateOfTileCenter(
+      columnIndex: integer,
+      rowIndex: integer
+    ): float {
+      const sceneCoordinates: FloatPoint =
+        SimpleTileMapRuntimeObject.workingPoint;
+      this._tileMapToSceneTransformation.transform(
+        [
+          (columnIndex + 0.5) * this._tileSize,
+          (rowIndex + 0.5) * this._tileSize,
+        ],
+        sceneCoordinates
+      );
+      return sceneCoordinates[0];
+    }
+
+    getSceneYCoordinateOfTileCenter(
+      columnIndex: integer,
+      rowIndex: integer
+    ): float {
+      const sceneCoordinates: FloatPoint =
+        SimpleTileMapRuntimeObject.workingPoint;
+      this._tileMapToSceneTransformation.transform(
+        [
+          (columnIndex + 0.5) * this._tileSize,
+          (rowIndex + 0.5) * this._tileSize,
+        ],
+        sceneCoordinates
+      );
+      return sceneCoordinates[1];
     }
 
     getGridCoordinatesFromSceneCoordinates(

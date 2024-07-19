@@ -735,6 +735,32 @@ const defineSimpleTileMap = function (extension, _, gd) {
 
   object
     .addExpression(
+      'SceneXCoordinateOfTileCenter',
+      _('Scene X coordinate of tile'),
+      _('Get the scene X position of the center of the tile'),
+      '',
+      'JsPlatform/Extensions/tile_map.svg'
+    )
+    .addParameter('object', _('Tilemap'), '', false)
+    .addParameter('number', _('X'), '', false)
+    .addParameter('number', _('Y'), '', false)
+    .setFunctionName('getSceneXCoordinateOfTileCenter');
+
+  object
+    .addExpression(
+      'SceneYCoordinateOfTileCenter',
+      _('Scene Y coordinate of tile'),
+      _('Get the scene Y position of the center of the tile'),
+      '',
+      'JsPlatform/Extensions/tile_map.svg'
+    )
+    .addParameter('object', _('Tilemap'), '', false)
+    .addParameter('number', _('X'), '', false)
+    .addParameter('number', _('Y'), '', false)
+    .setFunctionName('getSceneYCoordinateOfTileCenter');
+
+  object
+    .addExpression(
       'GridHorizontalCoordinateFromSceneCoordinates',
       _('Tile map grid horizontal coordinate'),
       _(

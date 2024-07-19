@@ -2094,7 +2094,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
 
     gd::WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
         project, project.GetObjects(), scene.GetObjects(), groupVariables,
-        group, changeset);
+        group, changeset, originalSerializedVariables);
 
     REQUIRE(object.GetVariables().Get("MyGroupVariable").GetValue() == 456);
     REQUIRE(otherObject.GetVariables().Get("MyGroupVariable").GetValue() ==
@@ -2140,7 +2140,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
 
     gd::WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
         project, project.GetObjects(), scene.GetObjects(), groupVariables,
-        group, changeset);
+        group, changeset, originalSerializedVariables);
 
     REQUIRE(object.GetVariables().Get("MyGroupVariable").GetValue() == 456);
     REQUIRE(otherObject.GetVariables().Get("MyGroupVariable").GetValue() ==
@@ -2186,11 +2186,65 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
 
     gd::WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
         project, project.GetObjects(), scene.GetObjects(), groupVariables,
-        group, changeset);
+        group, changeset, originalSerializedVariables);
 
     REQUIRE(object.GetVariables().Get("MyGroupVariable").GetValue() == 111);
     REQUIRE(otherObject.GetVariables().Get("MyGroupVariable").GetValue() ==
             222);
+  }
+
+  SECTION("Can fill group variables in a new object") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &scene = project.InsertNewLayout("Scene", 0);
+    auto &object = scene.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "Object", 0);
+    object.GetVariables().InsertNew("MyGroupVariable").SetValue(123);
+    object.GetVariables().InsertNew("MyObjectVariable").SetValue(456);
+
+    auto &otherObject = scene.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "OtherObject", 0);
+    otherObject.GetVariables().InsertNew("MyGroupVariable").SetValue(123);
+    object.GetVariables().InsertNew("MyOtherObjectVariable").SetValue(456);
+
+    // The object is not in the group initially.
+    auto &newObject = scene.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "NewObject", 0);
+    newObject.GetVariables().InsertNew("MyNewObjectVariable").SetValue(456);
+
+    auto &group = scene.GetObjects().GetObjectGroups().InsertNew("Group");
+    group.AddObject("Object");
+    group.AddObject("OtherObject");
+
+    auto projectScopedContainers = gd::ProjectScopedContainers::
+        MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
+    gd::VariablesContainer groupVariables =
+        gd::GroupVariableHelper::MergeVariableContainers(
+            projectScopedContainers.GetObjectsContainersList(), group);
+
+    REQUIRE(groupVariables.Count() == 1);
+    REQUIRE(groupVariables.Has("MyGroupVariable"));
+    REQUIRE(groupVariables.Get("MyGroupVariable").GetValue() == 123);
+
+    // Do the changes and launch the refactoring.
+    groupVariables.ResetPersistentUuid();
+    gd::SerializerElement originalSerializedVariables;
+    groupVariables.SerializeTo(originalSerializedVariables);
+
+    group.AddObject("NewObject");
+    auto changeset =
+        gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
+            originalSerializedVariables, groupVariables);
+
+    gd::WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
+        project, project.GetObjects(), scene.GetObjects(), groupVariables,
+        group, changeset, originalSerializedVariables);
+
+    REQUIRE(newObject.GetVariables().Count() == 2);
+    REQUIRE(newObject.GetVariables().Get("MyGroupVariable").GetValue() == 123);
+    REQUIRE(newObject.GetVariables().Get("MyNewObjectVariable").GetValue() == 456);
   }
 
   SECTION("Can change a group child-variable value") {
@@ -2240,7 +2294,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
 
     gd::WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
         project, project.GetObjects(), scene.GetObjects(), groupVariables,
-        group, changeset);
+        group, changeset, originalSerializedVariables);
 
     REQUIRE(object.GetVariables()
                 .Get("MyGroupVariable")
@@ -2290,7 +2344,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
 
     gd::WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
         project, project.GetObjects(), scene.GetObjects(), groupVariables,
-        group, changeset);
+        group, changeset, originalSerializedVariables);
 
     REQUIRE(!object.GetVariables().Has("MyGroupVariable"));
     REQUIRE(!otherObject.GetVariables().Has("MyGroupVariable"));
@@ -2332,7 +2386,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
 
     gd::WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
         project, project.GetObjects(), scene.GetObjects(), groupVariables,
-        group, changeset);
+        group, changeset, originalSerializedVariables);
 
     REQUIRE(object.GetVariables().Get("MyGroupVariable").GetValue() == 456);
     REQUIRE(otherObject.GetVariables().Get("MyGroupVariable").GetValue() ==
@@ -2412,7 +2466,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
 
     gd::WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
         project, project.GetObjects(), scene.GetObjects(), groupVariables,
-        group, changeset);
+        group, changeset, originalSerializedVariables);
 
     REQUIRE(event.GetActions()[0].GetParameter(1).GetPlainString() ==
             "MyRenamedGroupVariable");
@@ -2482,7 +2536,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
 
     gd::WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
         project, project.GetObjects(), scene.GetObjects(), groupVariables,
-        group, changeset);
+        group, changeset, originalSerializedVariables);
 
     REQUIRE(event.GetActions()[0].GetParameter(1).GetPlainString() ==
             "MyGroupVariable");

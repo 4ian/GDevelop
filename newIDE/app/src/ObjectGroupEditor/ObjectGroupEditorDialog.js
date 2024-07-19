@@ -27,11 +27,11 @@ const ObjectGroupEditorDialog = ({
   objectsContainer,
   initialTab,
 }: Props) => {
-  const [isEmpty, setEmpty] = React.useState<boolean>(
+  const isEmpty = React.useRef<boolean>(
     group.getAllObjectsNames().size() === 0
   );
 
-  return isEmpty ? (
+  return isEmpty.current ? (
     <NewObjectGroupEditorDialog
       project={project}
       projectScopedContainersAccessor={projectScopedContainersAccessor}

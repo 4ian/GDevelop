@@ -101,8 +101,10 @@ class GD_CORE_API WholeProjectRefactorer {
   static void ApplyRefactoringForGroupVariablesContainer(
       gd::Project &project, gd::ObjectsContainer &globalObjectsContainer,
       gd::ObjectsContainer &objectsContainer,
-      gd::VariablesContainer &groupVariablesContainer,
-      gd::ObjectGroup &objectGroup, const gd::VariablesChangeset &changeset);
+      const gd::VariablesContainer &groupVariablesContainer,
+      const gd::ObjectGroup &objectGroup,
+      const gd::VariablesChangeset &changeset,
+      const gd::SerializerElement &originalSerializedVariables);
 
   /**
    * \brief Refactor the project **before** an events function extension is

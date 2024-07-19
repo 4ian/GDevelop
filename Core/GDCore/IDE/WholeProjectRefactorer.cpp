@@ -339,8 +339,10 @@ void WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
 void WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
     gd::Project &project, gd::ObjectsContainer &globalObjectsContainer,
     gd::ObjectsContainer &objectsContainer,
-    gd::VariablesContainer &groupVariablesContainer,
-    gd::ObjectGroup &objectGroup, const gd::VariablesChangeset &changeset) {
+    const gd::VariablesContainer &groupVariablesContainer,
+    const gd::ObjectGroup &objectGroup,
+    const gd::VariablesChangeset &changeset,
+    const gd::SerializerElement &originalSerializedVariables) {
 
   // While we support refactoring that would remove all references (actions, conditions...)
   // it's both a bit dangerous for the user and we would need to show the user what
@@ -373,6 +375,11 @@ void WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
                                                 eventsVariableReplacer);
 
   // Apply changes to objects.
+  gd::GroupVariableHelper::FillMissingGroupVariablesToObjects(
+      globalObjectsContainer,
+      objectsContainer,
+      objectGroup,
+      originalSerializedVariables);
   gd::GroupVariableHelper::ApplyChangesToObjects(
       globalObjectsContainer, objectsContainer, groupVariablesContainer,
       objectGroup, changeset);

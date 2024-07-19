@@ -64,6 +64,36 @@ gd::VariablesContainer GroupVariableHelper::MergeVariableContainers(
   return mergedVariablesContainer;
 }
 
+void GroupVariableHelper::FillMissingGroupVariablesToObjects(
+    gd::ObjectsContainer &globalObjectsContainer,
+    gd::ObjectsContainer &objectsContainer,
+    const gd::ObjectGroup &objectGroup,
+    const gd::SerializerElement &originalSerializedVariables) {
+  gd::VariablesContainer groupVariablesContainer;
+  groupVariablesContainer.UnserializeFrom(originalSerializedVariables);
+  // Add missing variables to objects added in the group.
+  for (const gd::String &objectName : objectGroup.GetAllObjectsNames()) {
+    const bool hasObject = objectsContainer.HasObjectNamed(objectName);
+    if (!hasObject && !globalObjectsContainer.HasObjectNamed(objectName)) {
+      continue;
+    }
+    auto &object = hasObject ? objectsContainer.GetObject(objectName)
+                             : globalObjectsContainer.GetObject(objectName);
+    auto &variablesContainer = object.GetVariables();
+    for (std::size_t variableIndex = 0;
+         variableIndex < groupVariablesContainer.Count(); ++variableIndex) {
+      auto &groupVariable = groupVariablesContainer.Get(variableIndex);
+      const auto &variableName =
+          groupVariablesContainer.GetNameAt(variableIndex);
+
+      if (!variablesContainer.Has(variableName)) {
+        variablesContainer.Insert(variableName, groupVariable,
+                                  variablesContainer.Count());
+      }
+    }
+  }
+};
+
 // TODO Handle position changes.
 void GroupVariableHelper::ApplyChangesToObjects(
     gd::ObjectsContainer &globalObjectsContainer,

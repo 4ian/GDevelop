@@ -36,20 +36,18 @@ const ObjectGroupVariableEditor = React.forwardRef<
     ref
   ) => {
     // TODO Is it a memory leak?
-    const groupVariableContainer = React.useMemo(
-      () =>
-        gd.GroupVariableHelper.mergeVariableContainers(
-          projectScopedContainersAccessor.get().getObjectsContainersList(),
-          group
-        ),
-      [group, projectScopedContainersAccessor]
+    const groupVariableContainer = React.useRef(
+      gd.GroupVariableHelper.mergeVariableContainers(
+        projectScopedContainersAccessor.get().getObjectsContainersList(),
+        group
+      )
     );
 
     const {
       notifyOfChange,
       getOriginalContentSerializedElement,
     } = useSerializableObjectCancelableEditor({
-      serializableObject: groupVariableContainer,
+      serializableObject: groupVariableContainer.current,
       onCancel: () => {},
       resetThenClearPersistentUuid: true,
     });
@@ -62,18 +60,19 @@ const ObjectGroupVariableEditor = React.forwardRef<
       const originalSerializedVariables = getOriginalContentSerializedElement();
       const changeset = gd.WholeProjectRefactorer.computeChangesetForVariablesContainer(
         originalSerializedVariables,
-        groupVariableContainer
+        groupVariableContainer.current
       );
 
       gd.WholeProjectRefactorer.applyRefactoringForGroupVariablesContainer(
         project,
         globalObjectsContainer || objectsContainer,
         objectsContainer,
-        groupVariableContainer,
+        groupVariableContainer.current,
         group,
-        changeset
+        changeset,
+        originalSerializedVariables
       );
-      groupVariableContainer.clearPersistentUuid();
+      groupVariableContainer.current.clearPersistentUuid();
     };
 
     React.useImperativeHandle(ref, () => ({
@@ -82,16 +81,17 @@ const ObjectGroupVariableEditor = React.forwardRef<
 
     return (
       <>
-        {groupVariableContainer.count() > 0 && DismissableTutorialMessage && (
-          <Line>
-            <Column noMargin expand>
-              {DismissableTutorialMessage}
-            </Column>
-          </Line>
-        )}
+        {groupVariableContainer.current.count() > 0 &&
+          DismissableTutorialMessage && (
+            <Line>
+              <Column noMargin expand>
+                {DismissableTutorialMessage}
+              </Column>
+            </Line>
+          )}
         <VariablesList
           projectScopedContainersAccessor={projectScopedContainersAccessor}
-          variablesContainer={groupVariableContainer}
+          variablesContainer={groupVariableContainer.current}
           areObjectVariables
           emptyPlaceholderTitle={<Trans>Add your first object variable</Trans>}
           emptyPlaceholderDescription={

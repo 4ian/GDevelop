@@ -32,6 +32,15 @@ public:
   /**
    * @brief
    */
+  static void FillMissingGroupVariablesToObjects(
+      gd::ObjectsContainer &globalObjectsContainer,
+      gd::ObjectsContainer &objectsContainer,
+      const gd::ObjectGroup &objectGroup,
+      const gd::SerializerElement &originalSerializedVariables);
+
+  /**
+   * @brief
+   */
   static void
   ApplyChangesToObjects(gd::ObjectsContainer &globalObjectsContainers,
                         gd::ObjectsContainer &objectsContainers,

@@ -10,10 +10,8 @@ import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import { useSerializableObjectCancelableEditor } from '../Utils/SerializableObjectCancelableEditor';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { Tabs } from '../UI/Tabs';
-import { Column, Line } from '../UI/Grid';
+import { Column } from '../UI/Grid';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
-
-const gd: libGDevelop = global.gd;
 
 export type ObjectGroupEditorTab = 'objects' | 'variables';
 
@@ -47,9 +45,6 @@ const EditedObjectGroupEditorDialog = ({
     onCancel,
   });
 
-  const [isEmpty, setEmpty] = React.useState<boolean>(
-    group.getAllObjectsNames().size() === 0
-  );
   const [currentTab, setCurrentTab] = React.useState<ObjectGroupEditorTab>(
     initialTab || 'objects'
   );

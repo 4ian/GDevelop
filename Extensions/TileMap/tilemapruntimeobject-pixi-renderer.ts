@@ -178,24 +178,35 @@ namespace gdjs {
      * @param layerIndex The layer index.
      * @param tileId The tile's id.
      */
-    setTileId(
+    setTileId(x: integer, y: integer, layerIndex: integer, tileId: number) {
+      const tileMap = this._tileMap;
+      if (!tileMap) return;
+      const layer = tileMap.getTileLayer(layerIndex);
+      if (!layer) return;
+      return layer.setTile(x, y, tileId);
+    }
+
+    /**
+     * @param x The layer column.
+     * @param y The layer row.
+     * @param layerIndex The layer index.
+     * @param tileId The tile's id.
+     */
+    flipTile(
       x: integer,
       y: integer,
       layerIndex: integer,
-      tileId: number,
-      options?:
-        | {
-            flipVertically: boolean;
-            flipHorizontally: boolean;
-            flipDiagonally: boolean;
-          }
-        | undefined
+      flipHorizontally: boolean,
+      flipVertically: boolean,
+      flipDiagonally: boolean
     ) {
       const tileMap = this._tileMap;
       if (!tileMap) return;
       const layer = tileMap.getTileLayer(layerIndex);
       if (!layer) return;
-      return layer.setTile(x, y, tileId, options);
+      layer.setFlippedHorizontally(x, y, flipHorizontally);
+      layer.setFlippedVertically(x, y, flipVertically);
+      layer.setFlippedDiagonally(x, y, flipDiagonally);
     }
 
     /**

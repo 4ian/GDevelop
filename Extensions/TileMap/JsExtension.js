@@ -733,70 +733,62 @@ const defineSimpleTileMap = function (extension, _, gd) {
     .addIncludeFile('Extensions/TileMap/pako/dist/pako.min.js')
     .addIncludeFile('Extensions/TileMap/helper/TileMapHelper.js');
 
-  object
-    .addCondition(
-      'Tile',
-      _('Tile id'),
-      _('Check tile id at coordinates.'),
-      _('The tile id at coordinates _PARAM3_;_PARAM3_'),
-      '',
-      'JsPlatform/Extensions/tile_map.svg',
-      'JsPlatform/Extensions/tile_map.svg'
-    )
-    .addParameter('object', _('Tilemap'), '', false)
-    .useStandardRelationalOperatorParameters(
-      'number',
-      gd.ParameterOptions.makeNewOptions()
-    )
-    .addParameter('number', _('X'), '', false)
-    .addParameter('number', _('Y'), '', false)
-    .setFunctionName('getTileAt');
+  // object.addExpression(
+  //   'SceneToTileMapGridConversion',
+  //   _('Tile map grid coordinates'),
+  //   _('Get the tile coordinates corresponding to the scene coordinates.'),
+  //   '',
+  //   'JsPlatform/Extensions/tile_map.svg'
+  // )
+  // .addParameter('object', _('Tilemap'), '', false)
+  // .addParameter('number', _('X'), '', false)
+  // .addParameter('number', _('Y'), '', false)
+  // .setFunctionName('getTileAt');
 
   object
-    .addExpression(
-      'Tile',
-      _('Tile id'),
-      _('Check tile id at coordinates.'),
+    .addExpressionAndConditionAndAction(
+      'number',
+      'TileIdAtSceneCoordinates',
+      _('Tile identifier (scene)'),
+      _('the id of the tile at the scene coordinates'),
+      _('the tile id at scene coordinates _PARAM3_;_PARAM4_'),
       '',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', _('Tilemap'), '', false)
+    .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
+    .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
     .addParameter('number', _('X'), '', false)
     .addParameter('number', _('Y'), '', false)
-    .setFunctionName('getTileAt');
+    .setFunctionName('setTileAtSceneCoordinates')
+    .setGetter('getTileAtSceneCoordinates');
 
   object
     .addAction(
-      'Tile',
-      _('Tile id'),
-      _('Set tile id at coordinates.'),
+      'FlipTileAtSceneCoordinates',
+      _('Flip tile (scene)'),
+      _('Flip tile at scene coordinates.'),
       _(
-        'tile at coordinates _PARAM3_;_PARAM4_ (flip horizontally _PARAM5_, flip vertically _PARAM6_)'
+        'Flip tile at scene coordinates _PARAM1_;_PARAM2_: flip horizontally _PARAM3_, flip vertically _PARAM4_'
       ),
       '',
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', _('Tilemap'), '', false)
-    .useStandardOperatorParameters(
-      'number',
-      gd.ParameterOptions.makeNewOptions()
-    )
+    .addParameter('object', _('Tile map'), '', false)
     .addParameter('number', _('X'), '', false)
     .addParameter('number', _('Y'), '', false)
     .addParameter('yesorno', _('Flip horizontally'), '', false)
     .setDefaultValue('false')
     .addParameter('yesorno', _('Flip vertically'), '', false)
     .setDefaultValue('false')
-    .setFunctionName('setTileAt')
-    .setGetter('getTileAt');
+    .setFunctionName('flipTileAtSceneCoordinates');
 
   object
     .addAction(
-      'removeTileAt',
-      _('Remove tile'),
-      _('Remove the tile at the given coordinates'),
-      _('Remove tile at coordinates _PARAM1_;_PARAM2_'),
+      'RemoveTileAtSceneCoordinates',
+      _('Remove tile (scene)'),
+      _('Remove the tile at the scene coordinates'),
+      _('Remove tile at scene coordinates _PARAM1_;_PARAM2_'),
       '',
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
@@ -805,7 +797,61 @@ const defineSimpleTileMap = function (extension, _, gd) {
     .addParameter('number', _('X'), '', false)
     .addParameter('number', _('Y'), '', false)
     .getCodeExtraInformation()
-    .setFunctionName('removeTileAt');
+    .setFunctionName('removeTileAtSceneCoordinates');
+
+  object
+    .addExpressionAndConditionAndAction(
+      'number',
+      'TileIdAtGridCoordinates',
+      _('Tile identifier (grid)'),
+      _('the id of the tile at the grid coordinates'),
+      _('the tile id at grid coordinates _PARAM2_;_PARAM3_'),
+      '',
+      'JsPlatform/Extensions/tile_map.svg'
+    )
+    .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
+    .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+    .addParameter('number', _('X'), '', false)
+    .addParameter('number', _('Y'), '', false)
+    .setFunctionName('setTileAtGridCoordinates')
+    .setGetter('getTileAtGridCoordinates');
+
+  object
+    .addAction(
+      'FlipTileAtGridCoordinates',
+      _('Flip tile (grid)'),
+      _('Flip tile at grid coordinates.'),
+      _(
+        'Flip tile at grid coordinates _PARAM1_;_PARAM2_: flip horizontally _PARAM3_, flip vertically _PARAM4_'
+      ),
+      '',
+      'JsPlatform/Extensions/tile_map.svg',
+      'JsPlatform/Extensions/tile_map.svg'
+    )
+    .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
+    .addParameter('number', _('X'), '', false)
+    .addParameter('number', _('Y'), '', false)
+    .addParameter('yesorno', _('Flip horizontally'), '', false)
+    .setDefaultValue('false')
+    .addParameter('yesorno', _('Flip vertically'), '', false)
+    .setDefaultValue('false')
+    .setFunctionName('flipTileAtGridCoordinates');
+
+  object
+    .addAction(
+      'RemoveTileAtGridCoordinates',
+      _('Remove tile (grid)'),
+      _('Remove the tile at the grid coordinates'),
+      _('Remove tile at grid coordinates _PARAM1_;_PARAM2_'),
+      '',
+      'JsPlatform/Extensions/tile_map.svg',
+      'JsPlatform/Extensions/tile_map.svg'
+    )
+    .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
+    .addParameter('number', _('X'), '', false)
+    .addParameter('number', _('Y'), '', false)
+    .getCodeExtraInformation()
+    .setFunctionName('removeTileAtGridCoordinates');
 };
 
 /**

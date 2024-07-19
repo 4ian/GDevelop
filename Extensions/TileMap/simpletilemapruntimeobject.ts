@@ -537,9 +537,9 @@ namespace gdjs {
     }
 
     getGridCoordinatesFromSceneCoordinates(
-      x: number,
-      y: number
-    ): [number, number] {
+      x: float,
+      y: float
+    ): [integer, integer] {
       this.updateTransformation();
 
       const gridCoordinates: FloatPoint =
@@ -552,31 +552,36 @@ namespace gdjs {
       return [columnIndex, rowIndex];
     }
 
-    getTileAt(x: number, y: number): integer {
+    getTileAtSceneCoordinates(x: float, y: float): integer {
       const [
         columnIndex,
         rowIndex,
       ] = this.getGridCoordinatesFromSceneCoordinates(x, y);
+      return this.getTileAtGridCoordinates(columnIndex, rowIndex);
+    }
+
+    getTileAtGridCoordinates(columnIndex: integer, rowIndex: integer): integer {
       return this._renderer.getTileId(columnIndex, rowIndex, 0);
     }
 
-    setTileAt(
-      tileId: number,
-      x: number,
-      y: number,
-      flipHorizontally: boolean,
-      flipVertically: boolean
-    ) {
+    setTileAtSceneCoordinates(tileId: number, x: float, y: float) {
       const [
         columnIndex,
         rowIndex,
       ] = this.getGridCoordinatesFromSceneCoordinates(x, y);
+      this.setTileAtGridCoordinates(tileId, columnIndex, rowIndex);
+    }
+
+    setTileAtGridCoordinates(
+      tileId: number,
+      columnIndex: integer,
+      rowIndex: integer
+    ) {
       const addedData = this._renderer.setTileId(
         columnIndex,
         rowIndex,
         0,
-        tileId,
-        { flipHorizontally, flipVertically, flipDiagonally: false }
+        tileId
       );
       this._isTileMapDirty = true;
       if (addedData) {
@@ -602,11 +607,52 @@ namespace gdjs {
       this._transformationIsUpToDate = false;
     }
 
-    removeTileAt(x: number, y: number) {
+    flipTileAtSceneCoordinates(
+      x: float,
+      y: float,
+      flipHorizontally: boolean,
+      flipVertically: boolean
+    ) {
       const [
         columnIndex,
         rowIndex,
       ] = this.getGridCoordinatesFromSceneCoordinates(x, y);
+      this.flipTileAtGridCoordinates(
+        columnIndex,
+        rowIndex,
+        flipHorizontally,
+        flipVertically
+      );
+    }
+
+    flipTileAtGridCoordinates(
+      columnIndex: integer,
+      rowIndex: integer,
+      flipHorizontally: boolean,
+      flipVertically: boolean
+    ) {
+      this._renderer.flipTile(
+        columnIndex,
+        rowIndex,
+        0,
+        flipHorizontally,
+        flipVertically,
+        false
+      );
+      this._isTileMapDirty = true;
+      // No need to invalidate hit boxes since at the moment, collision mask
+      // cannot be configured on each tile.
+    }
+
+    removeTileAtSceneCoordinates(x: float, y: float) {
+      const [
+        columnIndex,
+        rowIndex,
+      ] = this.getGridCoordinatesFromSceneCoordinates(x, y);
+      this.removeTileAtGridCoordinates(columnIndex, rowIndex);
+    }
+
+    removeTileAtGridCoordinates(columnIndex: integer, rowIndex: integer) {
       this._renderer.removeTile(columnIndex, rowIndex, 0);
       this._isTileMapDirty = true;
       const removedData = this._renderer.trimEmptyColumnsAndRows(0);

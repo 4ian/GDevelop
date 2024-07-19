@@ -51,6 +51,7 @@ const ObjectGroupVariableEditor = React.forwardRef<
     } = useSerializableObjectCancelableEditor({
       serializableObject: groupVariableContainer,
       onCancel: () => {},
+      resetThenClearPersistentUuid: true,
     });
 
     const { DismissableTutorialMessage } = useDismissableTutorialMessage(

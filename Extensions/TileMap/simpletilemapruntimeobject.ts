@@ -652,6 +652,38 @@ namespace gdjs {
       // cannot be configured on each tile.
     }
 
+    isTileFlippedHorizontallyAtSceneCoordinates(x: float, y: float) {
+      const [
+        columnIndex,
+        rowIndex,
+      ] = this.getGridCoordinatesFromSceneCoordinates(x, y);
+
+      return this._renderer.isTileFlippedHorizontally(columnIndex, rowIndex, 0);
+    }
+
+    isTileFlippedHorizontallyAtGridCoordinates(
+      columnIndex: integer,
+      rowIndex: integer
+    ) {
+      return this._renderer.isTileFlippedHorizontally(columnIndex, rowIndex, 0);
+    }
+
+    isTileFlippedVerticallyAtSceneCoordinates(x: float, y: float) {
+      const [
+        columnIndex,
+        rowIndex,
+      ] = this.getGridCoordinatesFromSceneCoordinates(x, y);
+
+      return this._renderer.isTileFlippedVertically(columnIndex, rowIndex, 0);
+    }
+
+    isTileFlippedVerticallyAtGridCoordinates(
+      columnIndex: integer,
+      rowIndex: integer
+    ) {
+      return this._renderer.isTileFlippedVertically(columnIndex, rowIndex, 0);
+    }
+
     removeTileAtSceneCoordinates(x: float, y: float) {
       const [
         columnIndex,

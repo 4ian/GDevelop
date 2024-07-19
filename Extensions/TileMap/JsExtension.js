@@ -870,6 +870,76 @@ const defineSimpleTileMap = function (extension, _, gd) {
     .addParameter('number', _('Y'), '', false)
     .getCodeExtraInformation()
     .setFunctionName('removeTileAtGridCoordinates');
+
+  object
+    .addCondition(
+      'IsTileFlippedHorizontallyAtSceneCoordinates',
+      _('Tile flipped horizontally (scene)'),
+      _('Check if tile at scene coordinates is flipped horizontally'),
+      _(
+        'The tile at scene coordinates _PARAM1_;_PARAM2_ is flipped horizontally'
+      ),
+      '',
+      'res/actions/flipX24.png',
+      'res/actions/flipX.png'
+    )
+    .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
+    .addParameter('number', _('X'), '', false)
+    .addParameter('number', _('Y'), '', false)
+    .getCodeExtraInformation()
+    .setFunctionName('isTileFlippedHorizontallyAtSceneCoordinates');
+
+  object
+    .addCondition(
+      'IsTileFlippedVerticallyAtSceneCoordinates',
+      _('Tile flipped vertically (scene)'),
+      _('Check if tile at scene coordinates is flipped vertically'),
+      _(
+        'The tile at scene coordinates _PARAM1_;_PARAM2_ is flipped vertically'
+      ),
+      '',
+      'res/actions/flipY24.png',
+      'res/actions/flipY.png'
+    )
+    .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
+    .addParameter('number', _('X'), '', false)
+    .addParameter('number', _('Y'), '', false)
+    .getCodeExtraInformation()
+    .setFunctionName('isTileFlippedVerticallyAtSceneCoordinates');
+
+  object
+    .addCondition(
+      'IsTileFlippedHorizontallyAtGridCoordinates',
+      _('Tile flipped horizontally (grid)'),
+      _('Check if tile at grid coordinates is flipped horizontally'),
+      _(
+        'The tile at grid coordinates _PARAM1_;_PARAM2_ is flipped horizontally'
+      ),
+      '',
+      'res/actions/flipX24.png',
+      'res/actions/flipX.png'
+    )
+    .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
+    .addParameter('number', _('X'), '', false)
+    .addParameter('number', _('Y'), '', false)
+    .getCodeExtraInformation()
+    .setFunctionName('isTileFlippedHorizontallyAtGridCoordinates');
+
+  object
+    .addCondition(
+      'IsTileFlippedVerticallyAtGridCoordinates',
+      _('Tile flipped vertically (grid)'),
+      _('Check if tile at grid coordinates is flipped vertically'),
+      _('The tile at grid coordinates _PARAM1_;_PARAM2_ is flipped vertically'),
+      '',
+      'res/actions/flipY24.png',
+      'res/actions/flipY.png'
+    )
+    .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
+    .addParameter('number', _('X'), '', false)
+    .addParameter('number', _('Y'), '', false)
+    .getCodeExtraInformation()
+    .setFunctionName('isTileFlippedVerticallyAtGridCoordinates');
 };
 
 /**

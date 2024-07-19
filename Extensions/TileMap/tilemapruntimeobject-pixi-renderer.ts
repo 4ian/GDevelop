@@ -214,6 +214,40 @@ namespace gdjs {
      * @param y The layer row.
      * @param layerIndex The layer index.
      */
+    isTileFlippedHorizontally(
+      x: integer,
+      y: integer,
+      layerIndex: integer
+    ): boolean {
+      const tileMap = this._tileMap;
+      if (!tileMap) return false;
+      const layer = tileMap.getTileLayer(layerIndex);
+      if (!layer) return false;
+      return layer.isFlippedHorizontally(x, y);
+    }
+
+    /**
+     * @param x The layer column.
+     * @param y The layer row.
+     * @param layerIndex The layer index.
+     */
+    isTileFlippedVertically(
+      x: integer,
+      y: integer,
+      layerIndex: integer
+    ): boolean {
+      const tileMap = this._tileMap;
+      if (!tileMap) return false;
+      const layer = tileMap.getTileLayer(layerIndex);
+      if (!layer) return false;
+      return layer.isFlippedVertically(x, y);
+    }
+
+    /**
+     * @param x The layer column.
+     * @param y The layer row.
+     * @param layerIndex The layer index.
+     */
     removeTile(x: integer, y: integer, layerIndex: integer) {
       const tileMap = this._tileMap;
       if (!tileMap) return;

@@ -4,9 +4,11 @@ import ObjectGroupsList from '.';
 import ObjectGroupEditorDialog from '../ObjectGroupEditor/ObjectGroupEditorDialog';
 import { type GroupWithContext } from '../ObjectsList/EnumerateObjects';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
 
 type Props = {|
   project: gdProject,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
   globalObjectGroups: gdObjectGroupsContainer | null,
@@ -72,6 +74,9 @@ export default class ObjectGroupsListWithObjectGroupEditor extends React.Compone
         {this.state.editedGroup && (
           <ObjectGroupEditorDialog
             project={project}
+            projectScopedContainersAccessor={
+              this.props.projectScopedContainersAccessor
+            }
             key={
               (globalObjectsContainer ? globalObjectsContainer.ptr : '') +
               ';' +
@@ -85,6 +90,8 @@ export default class ObjectGroupsListWithObjectGroupEditor extends React.Compone
               if (this.props.onGroupsUpdated) this.props.onGroupsUpdated();
               this.editGroup(null);
             }}
+            // TODO
+            initialTab={'objects'}
           />
         )}
       </React.Fragment>

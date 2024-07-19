@@ -1979,11 +1979,16 @@ export default class SceneEditor extends React.Component<Props, State> {
               {!!this.state.editedGroup && (
                 <ObjectGroupEditorDialog
                   project={project}
+                  projectScopedContainersAccessor={
+                    projectScopedContainersAccessor
+                  }
                   group={this.state.editedGroup}
                   objectsContainer={this.props.objectsContainer}
                   globalObjectsContainer={this.props.globalObjectsContainer}
                   onCancel={() => this.editGroup(null)}
                   onApply={() => this.editGroup(null)}
+                  // TODO
+                  initialTab={'objects'}
                 />
               )}
               {this.state.setupGridOpen && (

@@ -340,7 +340,13 @@ void WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
     gd::Project &project, gd::ObjectsContainer &globalObjectsContainer,
     gd::ObjectsContainer &objectsContainer,
     gd::VariablesContainer &groupVariablesContainer,
-    gd::ObjectGroup objectGroup, const gd::VariablesChangeset &changeset) {
+    gd::ObjectGroup &objectGroup, const gd::VariablesChangeset &changeset) {
+
+  // While we support refactoring that would remove all references (actions, conditions...)
+  // it's both a bit dangerous for the user and we would need to show the user what
+  // will be removed before doing so. For now, just clear the removed variables so they don't
+  // trigger any refactoring.
+  std::unordered_set<gd::String> removedVariableNames;
 
   // Rename variables in events for the group objects.
   for (const gd::String &objectName : objectGroup.GetAllObjectsNames()) {
@@ -354,14 +360,14 @@ void WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
 
     gd::EventsVariableReplacer eventsVariableReplacer(
         project.GetCurrentPlatform(), changeset,
-        changeset.removedVariableNames, variablesContainer);
+        removedVariableNames, variablesContainer);
     gd::ProjectBrowserHelper::ExposeProjectEvents(project,
                                                   eventsVariableReplacer);
   }
 
   // Rename variables in events for the group.
   gd::EventsVariableReplacer eventsVariableReplacer(
-      project.GetCurrentPlatform(), changeset, changeset.removedVariableNames,
+      project.GetCurrentPlatform(), changeset, removedVariableNames,
       objectGroup.GetName());
   gd::ProjectBrowserHelper::ExposeProjectEvents(project,
                                                 eventsVariableReplacer);

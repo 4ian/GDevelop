@@ -2352,6 +2352,13 @@ interface WholeProjectRefactorer {
       [Ref] VariablesContainer newVariablesContainer,
       [Const, Ref] VariablesChangeset changeset,
       [Const, Ref] SerializerElement originalSerializedVariables);
+    void STATIC_ApplyRefactoringForGroupVariablesContainer(
+      [Ref] Project project,
+      [Ref] ObjectsContainer globalObjectsContainer,
+      [Ref] ObjectsContainer objectsContainer,
+      [Ref] VariablesContainer groupVariablesContainer,
+      [Ref] ObjectGroup objectGroup,
+      [Const, Ref] VariablesChangeset changeset);
     void STATIC_RenameEventsFunctionsExtension(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,

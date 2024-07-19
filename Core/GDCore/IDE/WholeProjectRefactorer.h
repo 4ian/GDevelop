@@ -102,7 +102,7 @@ class GD_CORE_API WholeProjectRefactorer {
       gd::Project &project, gd::ObjectsContainer &globalObjectsContainer,
       gd::ObjectsContainer &objectsContainer,
       gd::VariablesContainer &groupVariablesContainer,
-      gd::ObjectGroup objectGroup, const gd::VariablesChangeset &changeset);
+      gd::ObjectGroup &objectGroup, const gd::VariablesChangeset &changeset);
 
   /**
    * \brief Refactor the project **before** an events function extension is

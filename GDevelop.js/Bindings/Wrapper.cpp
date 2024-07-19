@@ -724,6 +724,8 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_GetBehaviorFullType GetBehaviorFullType
 #define STATIC_ApplyRefactoringForVariablesContainer \
   ApplyRefactoringForVariablesContainer
+#define STATIC_ApplyRefactoringForGroupVariablesContainer \
+  ApplyRefactoringForGroupVariablesContainer
 #define STATIC_ComputeChangesetForVariablesContainer \
   ComputeChangesetForVariablesContainer
 #define STATIC_MergeVariableContainers MergeVariableContainers

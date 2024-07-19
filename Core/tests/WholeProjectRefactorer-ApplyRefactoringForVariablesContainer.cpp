@@ -1953,6 +1953,108 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     REQUIRE(event.GetActions()[0].GetType() == "SetStringObjectVariable");
   }
 
+  SECTION("Can find shared variables of a group") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &scene = project.InsertNewLayout("Scene", 0);
+    auto &object = scene.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "Object", 0);
+    object.GetVariables().InsertNew("MyGroupVariable").SetValue(123);
+    object.GetVariables().InsertNew("MyObjectVariable").SetValue(456);
+
+    auto &otherObject = scene.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "OtherObject", 0);
+    otherObject.GetVariables().InsertNew("MyGroupVariable").SetValue(123);
+    object.GetVariables().InsertNew("MyOtherObjectVariable").SetValue(456);
+
+    auto &group = scene.GetObjects().GetObjectGroups().InsertNew("Group");
+    group.AddObject("Object");
+    group.AddObject("OtherObject");
+
+    auto projectScopedContainers = gd::ProjectScopedContainers::
+        MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
+    gd::VariablesContainer groupVariables =
+        gd::GroupVariableHelper::MergeVariableContainers(
+            projectScopedContainers.GetObjectsContainersList(), group);
+    
+    REQUIRE(groupVariables.Count() == 1);
+    REQUIRE(groupVariables.Has("MyGroupVariable"));
+    REQUIRE(groupVariables.Get("MyGroupVariable").GetValue() == 123);
+  }
+
+  SECTION("Can find shared variables of a group with one of the objects which doesn't exist") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &scene = project.InsertNewLayout("Scene", 0);
+    auto &object = scene.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "Object", 0);
+    object.GetVariables().InsertNew("MyGroupVariable").SetValue(123);
+    object.GetVariables().InsertNew("MyObjectVariable").SetValue(456);
+
+    auto &otherObject = scene.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "OtherObject", 0);
+    otherObject.GetVariables().InsertNew("MyGroupVariable").SetValue(123);
+    object.GetVariables().InsertNew("MyOtherObjectVariable").SetValue(456);
+
+    auto &group = scene.GetObjects().GetObjectGroups().InsertNew("Group");
+    group.AddObject("WrongObject");
+    group.AddObject("Object");
+    group.AddObject("OtherObject");
+
+    auto projectScopedContainers = gd::ProjectScopedContainers::
+        MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
+    gd::VariablesContainer groupVariables =
+        gd::GroupVariableHelper::MergeVariableContainers(
+            projectScopedContainers.GetObjectsContainersList(), group);
+    
+    REQUIRE(groupVariables.Count() == 1);
+    REQUIRE(groupVariables.Has("MyGroupVariable"));
+    REQUIRE(groupVariables.Get("MyGroupVariable").GetValue() == 123);
+  }
+
+  SECTION("Can find shared variables of an empty group") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &scene = project.InsertNewLayout("Scene", 0);
+
+    auto &group = scene.GetObjects().GetObjectGroups().InsertNew("Group");
+
+    auto projectScopedContainers = gd::ProjectScopedContainers::
+        MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
+    gd::VariablesContainer groupVariables =
+        gd::GroupVariableHelper::MergeVariableContainers(
+            projectScopedContainers.GetObjectsContainersList(), group);
+    
+    REQUIRE(groupVariables.Count() == 0);
+  }
+
+  SECTION("Can find shared variables of a group with only non-existing objects") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &scene = project.InsertNewLayout("Scene", 0);
+
+    auto &group = scene.GetObjects().GetObjectGroups().InsertNew("Group");
+    // These objects don't exists.
+    group.AddObject("Object");
+    group.AddObject("OtherObject");
+
+    auto projectScopedContainers = gd::ProjectScopedContainers::
+        MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
+    gd::VariablesContainer groupVariables =
+        gd::GroupVariableHelper::MergeVariableContainers(
+            projectScopedContainers.GetObjectsContainersList(), group);
+    
+    REQUIRE(groupVariables.Count() == 0);
+  }
+
   SECTION("Can change a group variable value") {
     gd::Project project;
     gd::Platform platform;

@@ -27,7 +27,7 @@ public:
    */
   static gd::VariablesContainer MergeVariableContainers(
       const gd::ObjectsContainersList &objectsContainersList,
-      const gd::ObjectGroup objectGroup);
+      const gd::ObjectGroup &objectGroup);
 
   /**
    * @brief
@@ -35,8 +35,8 @@ public:
   static void
   ApplyChangesToObjects(gd::ObjectsContainer &globalObjectsContainers,
                         gd::ObjectsContainer &objectsContainers,
-                        gd::VariablesContainer &groupVariablesContainer,
-                        gd::ObjectGroup objectGroup,
+                        const gd::VariablesContainer &groupVariablesContainer,
+                        const gd::ObjectGroup &objectGroup,
                         const gd::VariablesChangeset &changeset);
 };
 

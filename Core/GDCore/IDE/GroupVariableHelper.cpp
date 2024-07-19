@@ -18,30 +18,46 @@ namespace gd {
 
 gd::VariablesContainer GroupVariableHelper::MergeVariableContainers(
     const gd::ObjectsContainersList &objectsContainersList,
-    const gd::ObjectGroup objectGroup) {
+    const gd::ObjectGroup &objectGroup) {
   gd::VariablesContainer mergedVariablesContainer;
 
-  for (const gd::String &objectName : objectGroup.GetAllObjectsNames()) {
+  const auto &objectNames = objectGroup.GetAllObjectsNames();
+  std::size_t objectIndex = 0;
+  bool isFirstObjectFound = false;
+  for (; objectIndex < objectNames.size() && !isFirstObjectFound;
+       objectIndex++) {
+    const gd::String &objectName = objectNames[objectIndex];
+    if (!objectsContainersList.HasObjectOrGroupNamed(objectName)) {
+      continue;
+    }
+    isFirstObjectFound = true;
+    mergedVariablesContainer =
+        *objectsContainersList.GetObjectOrGroupVariablesContainer(objectName);
+  }
+  for (; objectIndex < objectNames.size(); objectIndex++) {
+    const gd::String &objectName = objectNames[objectIndex];
     if (!objectsContainersList.HasObjectOrGroupNamed(objectName)) {
       continue;
     }
     const auto &variablesContainer =
         *objectsContainersList.GetObjectOrGroupVariablesContainer(objectName);
 
-    for (std::size_t i = 0; i < variablesContainer.Count(); ++i) {
-      const auto &variable = variablesContainer.Get(i);
-      const auto &variableName = variablesContainer.GetNameAt(i);
+    for (std::size_t variableIndex = 0;
+         variableIndex < mergedVariablesContainer.Count(); ++variableIndex) {
+      auto &mergedVariable = mergedVariablesContainer.Get(variableIndex);
+      const auto &variableName =
+          mergedVariablesContainer.GetNameAt(variableIndex);
 
-      if (mergedVariablesContainer.Has(variableName)) {
-        auto &mergedVariable = mergedVariablesContainer.Get(variableName);
+      if (variablesContainer.Has(variableName)) {
+        auto &variable = variablesContainer.Get(variableName);
         if (mergedVariable.GetType() != variable.GetType()) {
           mergedVariable.CastTo(gd::Variable::Type::MixedTypes);
         } else if (mergedVariable != variable) {
           mergedVariable.MarkAsMixedValues();
         }
       } else {
-        mergedVariablesContainer.Insert(variableName, variable,
-                                        mergedVariablesContainer.Count());
+        mergedVariablesContainer.Remove(variableName);
+        variableIndex--;
       }
     }
   }
@@ -52,8 +68,9 @@ gd::VariablesContainer GroupVariableHelper::MergeVariableContainers(
 void GroupVariableHelper::ApplyChangesToObjects(
     gd::ObjectsContainer &globalObjectsContainer,
     gd::ObjectsContainer &objectsContainer,
-    gd::VariablesContainer &groupVariablesContainer,
-    gd::ObjectGroup objectGroup, const gd::VariablesChangeset &changeset) {
+    const gd::VariablesContainer &groupVariablesContainer,
+    const gd::ObjectGroup &objectGroup,
+    const gd::VariablesChangeset &changeset) {
   for (const gd::String &objectName : objectGroup.GetAllObjectsNames()) {
     const bool hasObject = objectsContainer.HasObjectNamed(objectName);
     if (!hasObject && !globalObjectsContainer.HasObjectNamed(objectName)) {

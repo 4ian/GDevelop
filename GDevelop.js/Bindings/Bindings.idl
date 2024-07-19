@@ -352,6 +352,12 @@ interface ObjectGroup {
     void UnserializeFrom([Const, Ref] SerializerElement element);
 };
 
+interface GroupVariableHelper {
+    [Value] VariablesContainer STATIC_MergeVariableContainers(
+    [Const, Ref] ObjectsContainersList objectsContainersList,
+    [Const, Ref] ObjectGroup objectGroup);
+};
+
 interface ObjectGroupsContainer {
     void ObjectGroupsContainer();
 

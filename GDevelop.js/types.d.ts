@@ -346,6 +346,10 @@ export class ObjectGroup extends EmscriptenObject {
   unserializeFrom(element: SerializerElement): void;
 }
 
+export class GroupVariableHelper extends EmscriptenObject {
+  static mergeVariableContainers(objectsContainersList: ObjectsContainersList, objectGroup: ObjectGroup): VariablesContainer;
+}
+
 export class ObjectGroupsContainer extends EmscriptenObject {
   constructor();
   has(name: string): boolean;

@@ -3,15 +3,16 @@ import { Trans } from '@lingui/macro';
 import React from 'react';
 import FlatButton from '../UI/FlatButton';
 import ObjectGroupEditor from '.';
-import ObjectGroupVariablesEditor, {
-  type ObjectGroupVariableEditorDialogInterface,
-} from './ObjectGroupVariablesEditor';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import { useSerializableObjectCancelableEditor } from '../Utils/SerializableObjectCancelableEditor';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { Tabs } from '../UI/Tabs';
-import { Column } from '../UI/Grid';
+import { Column, Line } from '../UI/Grid';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
+import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessage';
+import VariablesList from '../VariablesList/VariablesList';
+
+const gd: libGDevelop = global.gd;
 
 export type ObjectGroupEditorTab = 'objects' | 'variables';
 
@@ -49,16 +50,50 @@ const EditedObjectGroupEditorDialog = ({
     initialTab || 'objects'
   );
 
-  const objectGroupVariablesEditorInterface = React.useRef<ObjectGroupVariableEditorDialogInterface | null>(
+  // TODO Is it a memory leak?
+  const groupVariablesContainer = ((React.useRef<gdVariablesContainer | null>(
     null
-  );
+  ): any): { current: gdVariablesContainer });
+  if (!groupVariablesContainer.current) {
+    groupVariablesContainer.current = gd.GroupVariableHelper.mergeVariableContainers(
+      projectScopedContainersAccessor.get().getObjectsContainersList(),
+      group
+    );
+  }
+
+  const {
+    notifyOfChange: notifyOfVariableChange,
+    getOriginalContentSerializedElement: getOriginalVariablesSerializedElement,
+  } = useSerializableObjectCancelableEditor({
+    serializableObject: groupVariablesContainer.current,
+    onCancel: () => {},
+    resetThenClearPersistentUuid: true,
+  });
 
   const apply = async () => {
     onApply();
-    if (objectGroupVariablesEditorInterface.current) {
-      objectGroupVariablesEditorInterface.current.applyChanges();
-    }
+
+    const originalSerializedVariables = getOriginalVariablesSerializedElement();
+    const changeset = gd.WholeProjectRefactorer.computeChangesetForVariablesContainer(
+      originalSerializedVariables,
+      groupVariablesContainer.current
+    );
+
+    gd.WholeProjectRefactorer.applyRefactoringForGroupVariablesContainer(
+      project,
+      globalObjectsContainer || objectsContainer,
+      objectsContainer,
+      groupVariablesContainer.current,
+      group,
+      changeset,
+      originalSerializedVariables
+    );
+    groupVariablesContainer.current.clearPersistentUuid();
   };
+
+  const { DismissableTutorialMessage } = useDismissableTutorialMessage(
+    'intro-variables'
+  );
 
   return (
     <Dialog
@@ -114,13 +149,30 @@ const EditedObjectGroupEditorDialog = ({
       )}
       {currentTab === 'variables' && (
         <Column expand noMargin>
-          <ObjectGroupVariablesEditor
-            ref={objectGroupVariablesEditorInterface}
-            project={project}
+          {groupVariablesContainer.current.count() > 0 &&
+            DismissableTutorialMessage && (
+              <Line>
+                <Column noMargin expand>
+                  {DismissableTutorialMessage}
+                </Column>
+              </Line>
+            )}
+          <VariablesList
             projectScopedContainersAccessor={projectScopedContainersAccessor}
-            globalObjectsContainer={globalObjectsContainer}
-            objectsContainer={objectsContainer}
-            group={group}
+            variablesContainer={groupVariablesContainer.current}
+            areObjectVariables
+            emptyPlaceholderTitle={
+              <Trans>Add your first object variable</Trans>
+            }
+            emptyPlaceholderDescription={
+              <Trans>
+                These variables hold additional information on an object.
+              </Trans>
+            }
+            helpPagePath={'/all-features/variables/object-variables'}
+            // TODO
+            //onComputeAllVariableNames={onComputeAllVariableNames}
+            onVariablesUpdated={notifyOfVariableChange}
           />
         </Column>
       )}

@@ -224,6 +224,7 @@ const CompactInstancePropertiesEditor = ({
                   onSelectTileMapTile={onSelectTileMapTile}
                   showPaintingToolbar
                   allowMultipleSelection={false}
+                  interactive
                 />
               </Column>
             </>

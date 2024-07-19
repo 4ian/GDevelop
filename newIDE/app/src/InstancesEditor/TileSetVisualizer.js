@@ -169,6 +169,7 @@ type Props = {|
   onSelectTileMapTile: (?TileMapTileSelection) => void,
   allowMultipleSelection: boolean,
   showPaintingToolbar: boolean,
+  interactive: boolean,
   onAtlasImageLoaded?: (
     e: SyntheticEvent<HTMLImageElement>,
     atlasResourceName: string
@@ -182,6 +183,7 @@ const TileSetVisualizer = ({
   onSelectTileMapTile,
   allowMultipleSelection,
   showPaintingToolbar,
+  interactive,
   onAtlasImageLoaded,
 }: Props) => {
   const forceUpdate = useForceUpdate();
@@ -456,6 +458,13 @@ const TileSetVisualizer = ({
     [displayedTileSize, columnCount, rowCount]
   );
 
+  const interactionCallbacks = {
+    onMouseMove: onHoverAtlas,
+    onPointerDown: onPointerDown,
+    onPointerUp: onPointerUp,
+    onPointerMove: onPointerMove,
+  };
+
   return (
     <Column noMargin>
       {showPaintingToolbar && (
@@ -543,10 +552,7 @@ const TileSetVisualizer = ({
           <div
             style={styles.tileContainer}
             ref={tileContainerRef}
-            onMouseMove={onHoverAtlas}
-            onPointerDown={onPointerDown}
-            onPointerUp={onPointerUp}
-            onPointerMove={onPointerMove}
+            {...(interactive ? interactionCallbacks : undefined)}
           >
             <CorsAwareImage
               style={styles.atlasImage}
@@ -562,7 +568,7 @@ const TileSetVisualizer = ({
               }}
             />
 
-            {hoveredTile && displayedTileSize && (
+            {interactive && hoveredTile && displayedTileSize && (
               <Tile
                 key={`hovered-tile`}
                 size={displayedTileSize}
@@ -611,17 +617,19 @@ const TileSetVisualizer = ({
                   />
                 );
               })}
-            {rectangularSelectionTilePreview && displayedTileSize && (
-              <Tile
-                key={`preview-tile`}
-                highlighted
-                size={displayedTileSize}
-                x={rectangularSelectionTilePreview.topLeftCoordinates.x}
-                y={rectangularSelectionTilePreview.topLeftCoordinates.y}
-                width={rectangularSelectionTilePreview.width}
-                height={rectangularSelectionTilePreview.height}
-              />
-            )}
+            {interactive &&
+              rectangularSelectionTilePreview &&
+              displayedTileSize && (
+                <Tile
+                  key={`preview-tile`}
+                  highlighted
+                  size={displayedTileSize}
+                  x={rectangularSelectionTilePreview.topLeftCoordinates.x}
+                  y={rectangularSelectionTilePreview.topLeftCoordinates.y}
+                  width={rectangularSelectionTilePreview.width}
+                  height={rectangularSelectionTilePreview.height}
+                />
+              )}
           </div>
         )}
       </Line>

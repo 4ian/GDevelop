@@ -13,9 +13,9 @@ import TileSetVisualizer, {
   getTileIdFromGridCoordinates,
 } from '../../InstancesEditor/TileSetVisualizer';
 import type { TileMapTileSelection } from '../../InstancesEditor/TileSetVisualizer';
-import { Column, Line } from '../../UI/Grid';
-import Text from '../../UI/Text';
+import { Column } from '../../UI/Grid';
 import AlertMessage from '../../UI/AlertMessage';
+import Checkbox from '../../UI/Checkbox';
 
 const SimpleTileMapEditor = ({
   objectConfiguration,
@@ -33,6 +33,9 @@ const SimpleTileMapEditor = ({
   const rowCount = parseFloat(objectProperties.get('rowCount').getValue());
   const columnCount = parseFloat(
     objectProperties.get('columnCount').getValue()
+  );
+  const [configureHitBoxes, setConfigureHitBoxes] = React.useState<boolean>(
+    false
   );
   const [error, setError] = React.useState<React.Node>(null);
   const atlasImage = objectProperties.get('atlasImage').getValue();
@@ -193,31 +196,11 @@ const SimpleTileMapEditor = ({
         {atlasImage && (
           <ResponsiveLineStackLayout>
             <Column noMargin expand>
-              {tileMapTileSelection.coordinates.length === 0 ? (
-                <Text>
-                  <Trans>No tile configured to have a hit box.</Trans>
-                </Text>
-              ) : (
-                <>
-                  <Text>
-                    <Trans>Those tiles are configured to have a hit box:</Trans>
-                  </Text>
-                  {tileMapTileSelection.coordinates.map(coordinates => {
-                    const id = getTileIdFromGridCoordinates({
-                      rowCount,
-                      ...coordinates,
-                    });
-                    return (
-                      <Line noMargin key={id}>
-                        <Text noMargin>
-                          <Trans>Column:</Trans> {coordinates.x + 1}{' '}
-                          <Trans>Row:</Trans> {coordinates.y + 1} (id {id})
-                        </Text>
-                      </Line>
-                    );
-                  })}
-                </>
-              )}
+              <Checkbox
+                checked={configureHitBoxes}
+                onCheck={(e, checked) => setConfigureHitBoxes(checked)}
+                label={<Trans>Configure tiles with hit boxes</Trans>}
+              />
             </Column>
             <Column noMargin expand>
               <TileSetVisualizer
@@ -228,6 +211,7 @@ const SimpleTileMapEditor = ({
                 showPaintingToolbar={false}
                 allowMultipleSelection
                 onAtlasImageLoaded={onAtlasImageLoaded}
+                interactive={configureHitBoxes}
               />
             </Column>
           </ResponsiveLineStackLayout>

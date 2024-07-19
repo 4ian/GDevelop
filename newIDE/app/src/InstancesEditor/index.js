@@ -776,6 +776,7 @@ export default class InstancesEditor extends Component<Props> {
       renderedInstance &&
       renderedInstance.constructor.name === 'RenderedSimpleTileMapInstance'
     ) {
+      // $FlowIgnore
       const editableTileMap = renderedInstance.getEditableTileMap();
       if (!editableTileMap) {
         console.error(
@@ -884,6 +885,7 @@ export default class InstancesEditor extends Component<Props> {
         }
         this.props.onInstancesResized([selectedInstance]);
       }
+      // $FlowIgnore
       renderedInstance.updatePixiTileMap();
       selectedInstance.setRawStringProperty(
         'tilemap',

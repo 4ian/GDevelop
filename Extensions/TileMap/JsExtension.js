@@ -735,33 +735,33 @@ const defineSimpleTileMap = function (extension, _, gd) {
 
   object
     .addExpression(
-      'SceneXCoordinateOfTileCenter',
+      'TileCenterX',
       _('Scene X coordinate of tile'),
       _('Get the scene X position of the center of the tile'),
       '',
       'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', _('Tilemap'), '', false)
-    .addParameter('number', _('X'), '', false)
-    .addParameter('number', _('Y'), '', false)
+    .addParameter('number', _('Grid X'), '', false)
+    .addParameter('number', _('Grid Y'), '', false)
     .setFunctionName('getSceneXCoordinateOfTileCenter');
 
   object
     .addExpression(
-      'SceneYCoordinateOfTileCenter',
+      'TileCenterY',
       _('Scene Y coordinate of tile'),
       _('Get the scene Y position of the center of the tile'),
       '',
       'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', _('Tilemap'), '', false)
-    .addParameter('number', _('X'), '', false)
-    .addParameter('number', _('Y'), '', false)
+    .addParameter('number', _('Grid X'), '', false)
+    .addParameter('number', _('Grid Y'), '', false)
     .setFunctionName('getSceneYCoordinateOfTileCenter');
 
   object
     .addExpression(
-      'GridHorizontalCoordinateFromSceneCoordinates',
+      'GridX',
       _('Tile map grid horizontal coordinate'),
       _(
         'Get the tile horizontal coordinates in the tilemap corresponding to the scene coordinates.'
@@ -770,13 +770,13 @@ const defineSimpleTileMap = function (extension, _, gd) {
       'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', _('Tilemap'), '', false)
-    .addParameter('number', _('X'), '', false)
-    .addParameter('number', _('Y'), '', false)
+    .addParameter('number', _('Position X'), '', false)
+    .addParameter('number', _('Position Y'), '', false)
     .setFunctionName('getColumnIndexAtSceneCoordinates');
 
   object
     .addExpression(
-      'GridVerticalCoordinateFromSceneCoordinates',
+      'GridY',
       _('Tile map grid vertical coordinate'),
       _(
         'Get the tile vertical coordinates in the tilemap corresponding to the scene coordinates.'
@@ -785,14 +785,14 @@ const defineSimpleTileMap = function (extension, _, gd) {
       'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', _('Tilemap'), '', false)
-    .addParameter('number', _('X'), '', false)
-    .addParameter('number', _('Y'), '', false)
+    .addParameter('number', _('Position X'), '', false)
+    .addParameter('number', _('Position Y'), '', false)
     .setFunctionName('getRowIndexAtSceneCoordinates');
 
   object
     .addExpressionAndConditionAndAction(
       'number',
-      'TileIdAtSceneCoordinates',
+      'TileIdAtPosition',
       _('Tile identifier (scene)'),
       _('the id of the tile at the scene coordinates'),
       _('the tile id at scene coordinates _PARAM3_;_PARAM4_'),
@@ -801,8 +801,8 @@ const defineSimpleTileMap = function (extension, _, gd) {
     )
     .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
     .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
-    .addParameter('number', _('X'), '', false)
-    .addParameter('number', _('Y'), '', false)
+    .addParameter('number', _('Position X'), '', false)
+    .addParameter('number', _('Position Y'), '', false)
     .setFunctionName('setTileAtSceneCoordinates')
     .setGetter('getTileAtSceneCoordinates');
 
@@ -819,8 +819,8 @@ const defineSimpleTileMap = function (extension, _, gd) {
       'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', _('Tile map'), '', false)
-    .addParameter('number', _('X'), '', false)
-    .addParameter('number', _('Y'), '', false)
+    .addParameter('number', _('Position X'), '', false)
+    .addParameter('number', _('Position Y'), '', false)
     .addParameter('yesorno', _('Flip horizontally'), '', false)
     .setDefaultValue('false')
     .addParameter('yesorno', _('Flip vertically'), '', false)
@@ -838,15 +838,15 @@ const defineSimpleTileMap = function (extension, _, gd) {
       'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
-    .addParameter('number', _('X'), '', false)
-    .addParameter('number', _('Y'), '', false)
+    .addParameter('number', _('Position X'), '', false)
+    .addParameter('number', _('Position Y'), '', false)
     .getCodeExtraInformation()
     .setFunctionName('removeTileAtSceneCoordinates');
 
   object
     .addExpressionAndConditionAndAction(
       'number',
-      'TileIdAtGridCoordinates',
+      'TileIdAtGrid',
       _('Tile identifier (grid)'),
       _('the id of the tile at the grid coordinates'),
       _('the tile id at grid coordinates _PARAM2_;_PARAM3_'),
@@ -855,8 +855,8 @@ const defineSimpleTileMap = function (extension, _, gd) {
     )
     .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
     .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
-    .addParameter('number', _('X'), '', false)
-    .addParameter('number', _('Y'), '', false)
+    .addParameter('number', _('Grid X'), '', false)
+    .addParameter('number', _('Grid Y'), '', false)
     .setFunctionName('setTileAtGridCoordinates')
     .setGetter('getTileAtGridCoordinates');
 
@@ -873,8 +873,8 @@ const defineSimpleTileMap = function (extension, _, gd) {
       'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
-    .addParameter('number', _('X'), '', false)
-    .addParameter('number', _('Y'), '', false)
+    .addParameter('number', _('Grid X'), '', false)
+    .addParameter('number', _('Grid Y'), '', false)
     .addParameter('yesorno', _('Flip horizontally'), '', false)
     .setDefaultValue('false')
     .addParameter('yesorno', _('Flip vertically'), '', false)
@@ -892,8 +892,8 @@ const defineSimpleTileMap = function (extension, _, gd) {
       'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
-    .addParameter('number', _('X'), '', false)
-    .addParameter('number', _('Y'), '', false)
+    .addParameter('number', _('Grid X'), '', false)
+    .addParameter('number', _('Grid Y'), '', false)
     .getCodeExtraInformation()
     .setFunctionName('removeTileAtGridCoordinates');
 
@@ -910,8 +910,8 @@ const defineSimpleTileMap = function (extension, _, gd) {
       'res/actions/flipX.png'
     )
     .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
-    .addParameter('number', _('X'), '', false)
-    .addParameter('number', _('Y'), '', false)
+    .addParameter('number', _('Position X'), '', false)
+    .addParameter('number', _('Position Y'), '', false)
     .getCodeExtraInformation()
     .setFunctionName('isTileFlippedHorizontallyAtSceneCoordinates');
 
@@ -928,8 +928,8 @@ const defineSimpleTileMap = function (extension, _, gd) {
       'res/actions/flipY.png'
     )
     .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
-    .addParameter('number', _('X'), '', false)
-    .addParameter('number', _('Y'), '', false)
+    .addParameter('number', _('Position X'), '', false)
+    .addParameter('number', _('Position Y'), '', false)
     .getCodeExtraInformation()
     .setFunctionName('isTileFlippedVerticallyAtSceneCoordinates');
 
@@ -946,8 +946,8 @@ const defineSimpleTileMap = function (extension, _, gd) {
       'res/actions/flipX.png'
     )
     .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
-    .addParameter('number', _('X'), '', false)
-    .addParameter('number', _('Y'), '', false)
+    .addParameter('number', _('Grid X'), '', false)
+    .addParameter('number', _('Grid Y'), '', false)
     .getCodeExtraInformation()
     .setFunctionName('isTileFlippedHorizontallyAtGridCoordinates');
 
@@ -962,8 +962,8 @@ const defineSimpleTileMap = function (extension, _, gd) {
       'res/actions/flipY.png'
     )
     .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
-    .addParameter('number', _('X'), '', false)
-    .addParameter('number', _('Y'), '', false)
+    .addParameter('number', _('Grid X'), '', false)
+    .addParameter('number', _('Grid Y'), '', false)
     .getCodeExtraInformation()
     .setFunctionName('isTileFlippedVerticallyAtGridCoordinates');
 };

@@ -169,7 +169,8 @@ describe('Multiplayer', () => {
   const createMultiplayerManagersMock = () => {
     const p2pState = {
       currentPeerId: '',
-      otherPeerIds: [],
+      justDisconnectedPeers: [],
+      allConnectedPlayers: [],
     };
 
     /** @type {Record<string, Map<string, MockedMessagesList>>} */
@@ -230,21 +231,42 @@ describe('Multiplayer', () => {
       useDefaultBrokerServer: () => {},
       useCustomICECandidate: () => {},
       forceUseRelayServer: (shouldUseRelayServer) => {},
-      getCurrentId: () => 'fake-current-id',
+      getCurrentId: () => p2pState.currentPeerId,
       isReady: () => true,
-      getJustDisconnectedPeers: () => [],
+      getJustDisconnectedPeers: () => p2pState.justDisconnectedPeers,
       getAllPeers: () => p2pState.otherPeerIds,
     };
 
     gdjs.multiplayerPeerJsHelper = peerJsHelperMock;
 
     return {
-      switchToPeer: ({ peerId, otherPeerIds, playerNumber }) => {
+      /**
+       *
+       * @param {{ playerNumber: number, allConnectedPlayers: {playerNumber: number, peerId: string}[], justDisconnectedPeers?: string[]}} options
+       */
+      switchToPeer: ({
+        playerNumber,
+        allConnectedPlayers,
+        justDisconnectedPeers,
+      }) => {
+        const peerId = allConnectedPlayers.find(
+          (player) => player.playerNumber === playerNumber
+        ).peerId;
         // console.log('## SWITCHING TO PEER', peerId);
 
         // Switch the state of the peerJs mock.
         p2pState.currentPeerId = peerId;
-        p2pState.otherPeerIds = otherPeerIds;
+        p2pState.justDisconnectedPeers = justDisconnectedPeers || [];
+        // Player 1 is connected to everyone else, and everyone else is connected to player 1.
+        if (playerNumber === 1) {
+          p2pState.otherPeerIds = allConnectedPlayers
+            .filter((player) => player.playerNumber !== 1)
+            .map((player) => player.peerId);
+        } else {
+          p2pState.otherPeerIds = allConnectedPlayers
+            .filter((player) => player.playerNumber === 1)
+            .map((player) => player.peerId);
+        }
 
         // Switch the state of the MultiplayerMessageManager.
         gdjs.multiplayerMessageManager = peerMultiplayerMessageManager[peerId] =
@@ -258,23 +280,16 @@ describe('Multiplayer', () => {
           gdjs.makeMultiplayerVariablesManager();
 
         // Ensure the messageManager is aware of the other players.
-        gdjs.multiplayerMessageManager.updatePlayersInfoForTests({
-          1: {
-            ping: 0,
-            playerId: 'player-1',
-            username: 'Player 1',
-          },
-          2: {
-            ping: 20,
-            playerId: 'player-2',
-            username: 'Player 2',
-          },
-          3: {
-            ping: 40,
-            playerId: 'player-3',
-            username: 'Player 3',
-          },
-        });
+        const playersInfo = allConnectedPlayers.reduce((acc, player) => {
+          acc[player.playerNumber] = {
+            ping: Math.random() * 100,
+            playerId: `player-${player.playerNumber}`,
+            username: `Player ${player.playerNumber}`,
+          };
+          return acc;
+        }, {});
+
+        gdjs.multiplayerMessageManager.updatePlayersInfoForTests(playersInfo);
 
         // Switch the state of the game.
         gdjs.multiplayer.playerNumber = playerNumber;
@@ -329,11 +344,14 @@ describe('Multiplayer', () => {
         switchToPeer,
         markAllPeerMessagesAsProcessed,
       } = createMultiplayerManagersMock();
+      const allConnectedPlayers = [
+        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 2, peerId: 'player-2' },
+      ];
 
       switchToPeer({
-        peerId: 'player-1',
-        otherPeerIds: ['player-2'],
         playerNumber: 1,
+        allConnectedPlayers,
       });
 
       const p1RuntimeScene = makeTestRuntimeSceneWithNetworkId();
@@ -353,9 +371,8 @@ describe('Multiplayer', () => {
       p1RuntimeScene.renderAndStep(1000 / 60);
 
       switchToPeer({
-        peerId: 'player-2',
-        otherPeerIds: ['player-1'],
         playerNumber: 2,
+        allConnectedPlayers,
       });
 
       const p2RuntimeScene = makeTestRuntimeSceneWithNetworkId();
@@ -382,9 +399,8 @@ describe('Multiplayer', () => {
 
       // Also check global variables.
       switchToPeer({
-        peerId: 'player-1',
-        otherPeerIds: ['player-2'],
         playerNumber: 1,
+        allConnectedPlayers,
       });
 
       const p1GlobalStringVariable = new gdjs.Variable();
@@ -443,9 +459,8 @@ describe('Multiplayer', () => {
       p1RuntimeScene.renderAndStep(1000 / 60);
 
       switchToPeer({
-        peerId: 'player-2',
-        otherPeerIds: ['player-1'],
         playerNumber: 2,
+        allConnectedPlayers,
       });
 
       p2RuntimeScene.renderAndStep(1000 / 60);
@@ -523,10 +538,14 @@ describe('Multiplayer', () => {
         expectNoMessagesToBeProcessed,
       } = createMultiplayerManagersMock();
 
+      const allConnectedPlayers = [
+        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 2, peerId: 'player-2' },
+      ];
+
       switchToPeer({
-        peerId: 'player-1',
-        otherPeerIds: ['player-2'],
         playerNumber: 1,
+        allConnectedPlayers,
       });
 
       const p1RuntimeScene = makeTestRuntimeSceneWithNetworkId();
@@ -537,9 +556,8 @@ describe('Multiplayer', () => {
       p1RuntimeScene.renderAndStep(1000 / 60);
 
       switchToPeer({
-        peerId: 'player-2',
-        otherPeerIds: ['player-1'],
         playerNumber: 2,
+        allConnectedPlayers,
       });
 
       // Verify player 2 can create variables, but the one from the host will override any value set for it
@@ -569,18 +587,16 @@ describe('Multiplayer', () => {
       // Check the host sends again the variable, even if not changed, for reliability
       // (allows to work around a dropped message, without using a real acknowledgement).
       switchToPeer({
-        peerId: 'player-1',
-        otherPeerIds: ['player-2'],
         playerNumber: 1,
+        allConnectedPlayers,
       });
 
       p1RuntimeScene.renderAndStep(1000 / 60);
 
       // Check the variable on player 2 is overriden again.
       switchToPeer({
-        peerId: 'player-2',
-        otherPeerIds: ['player-1'],
         playerNumber: 2,
+        allConnectedPlayers,
       });
 
       p2RuntimeScene
@@ -606,10 +622,15 @@ describe('Multiplayer', () => {
         expectNoMessagesToBeProcessed,
       } = createMultiplayerManagersMock();
 
+      const allConnectedPlayers = [
+        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 2, peerId: 'player-2' },
+        { playerNumber: 3, peerId: 'player-3' },
+      ];
+
       switchToPeer({
-        peerId: 'player-1',
-        otherPeerIds: ['player-2', 'player-3'],
         playerNumber: 1,
+        allConnectedPlayers,
       });
 
       const p1RuntimeScene = makeTestRuntimeSceneWithNetworkId();
@@ -627,9 +648,8 @@ describe('Multiplayer', () => {
       p1RuntimeScene.renderAndStep(1000 / 60);
 
       switchToPeer({
-        peerId: 'player-2',
-        otherPeerIds: ['player-1'],
         playerNumber: 2,
+        allConnectedPlayers,
       });
 
       // Create the variable on player 2 too.
@@ -648,9 +668,8 @@ describe('Multiplayer', () => {
       p2RuntimeScene.renderAndStep(1000 / 60);
 
       switchToPeer({
-        peerId: 'player-3',
-        otherPeerIds: ['player-1'],
         playerNumber: 3,
+        allConnectedPlayers,
       });
 
       // Create the variable on player 3 too, which is the owner.
@@ -674,9 +693,8 @@ describe('Multiplayer', () => {
       // Change the variables on player 3.
       {
         switchToPeer({
-          peerId: 'player-3',
-          otherPeerIds: ['player-1'],
           playerNumber: 3,
+          allConnectedPlayers,
         });
 
         p3RuntimeScene
@@ -694,9 +712,8 @@ describe('Multiplayer', () => {
       // Check the variables are synchronized on the host.
       {
         switchToPeer({
-          peerId: 'player-1',
-          otherPeerIds: ['player-2', 'player-3'],
           playerNumber: 1,
+          allConnectedPlayers,
         });
 
         p1RuntimeScene.renderAndStep(1000 / 60);
@@ -715,9 +732,8 @@ describe('Multiplayer', () => {
       // Check the variable is synchronized on the other player.
       {
         switchToPeer({
-          peerId: 'player-2',
-          otherPeerIds: ['player-1'],
           playerNumber: 2,
+          allConnectedPlayers,
         });
 
         p2RuntimeScene.renderAndStep(1000 / 60);
@@ -741,10 +757,15 @@ describe('Multiplayer', () => {
         expectNoMessagesToBeProcessed,
       } = createMultiplayerManagersMock();
 
+      const allConnectedPlayers = [
+        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 2, peerId: 'player-2' },
+        { playerNumber: 3, peerId: 'player-3' },
+      ];
+
       switchToPeer({
-        peerId: 'player-1',
-        otherPeerIds: ['player-2', 'player-3'],
         playerNumber: 1,
+        allConnectedPlayers,
       });
 
       const p1RuntimeScene = makeTestRuntimeSceneWithNetworkId();
@@ -762,9 +783,8 @@ describe('Multiplayer', () => {
       p1RuntimeScene.renderAndStep(1000 / 60);
 
       switchToPeer({
-        peerId: 'player-2',
-        otherPeerIds: ['player-1'],
         playerNumber: 2,
+        allConnectedPlayers,
       });
 
       // Create the variable on player 2 too.
@@ -783,9 +803,8 @@ describe('Multiplayer', () => {
       p2RuntimeScene.renderAndStep(1000 / 60);
 
       switchToPeer({
-        peerId: 'player-3',
-        otherPeerIds: ['player-1'],
         playerNumber: 3,
+        allConnectedPlayers,
       });
 
       // Create the variable on player 3 too.
@@ -809,9 +828,8 @@ describe('Multiplayer', () => {
       // Change the variables on player 3.
       {
         switchToPeer({
-          peerId: 'player-3',
-          otherPeerIds: ['player-1'],
           playerNumber: 3,
+          allConnectedPlayers,
         });
 
         p3RuntimeScene
@@ -829,9 +847,8 @@ describe('Multiplayer', () => {
       // Change the variables on player 2.
       {
         switchToPeer({
-          peerId: 'player-2',
-          otherPeerIds: ['player-1'],
           playerNumber: 2,
+          allConnectedPlayers,
         });
 
         p2RuntimeScene
@@ -850,9 +867,8 @@ describe('Multiplayer', () => {
       // Change the variables on player 1.
       {
         switchToPeer({
-          peerId: 'player-1',
-          otherPeerIds: ['player-2', 'player-3'],
           playerNumber: 1,
+          allConnectedPlayers,
         });
 
         p1RuntimeScene
@@ -871,9 +887,8 @@ describe('Multiplayer', () => {
       // Check the variables have not been overriden on player 2.
       {
         switchToPeer({
-          peerId: 'player-2',
-          otherPeerIds: ['player-1'],
           playerNumber: 2,
+          allConnectedPlayers,
         });
 
         p2RuntimeScene.renderAndStep(1000 / 60);
@@ -892,9 +907,8 @@ describe('Multiplayer', () => {
       // Check the variables have not been overriden on player 3.
       {
         switchToPeer({
-          peerId: 'player-3',
-          otherPeerIds: ['player-1'],
           playerNumber: 3,
+          allConnectedPlayers,
         });
 
         p3RuntimeScene.renderAndStep(1000 / 60);
@@ -913,9 +927,8 @@ describe('Multiplayer', () => {
       // Check the variables have not been overriden on the host.
       {
         switchToPeer({
-          peerId: 'player-1',
-          otherPeerIds: ['player-2', 'player-3'],
           playerNumber: 1,
+          allConnectedPlayers,
         });
 
         p1RuntimeScene.renderAndStep(1000 / 60);
@@ -938,11 +951,15 @@ describe('Multiplayer', () => {
         markAllPeerMessagesAsProcessed,
       } = createMultiplayerManagersMock();
 
+      const allConnectedPlayers = [
+        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 2, peerId: 'player-2' },
+      ];
+
       // Create an instance on the host's game:
       switchToPeer({
-        peerId: 'player-1',
-        otherPeerIds: ['player-2', 'player-3'],
         playerNumber: 1,
+        allConnectedPlayers,
       });
 
       const p1RuntimeScene = makeTestRuntimeSceneWithNetworkId();
@@ -960,9 +977,8 @@ describe('Multiplayer', () => {
 
       // Check the object is created on the other peer.
       switchToPeer({
-        peerId: 'player-2',
-        otherPeerIds: ['player-1'],
         playerNumber: 2,
+        allConnectedPlayers,
       });
 
       const p2RuntimeScene = makeTestRuntimeSceneWithNetworkId();
@@ -984,9 +1000,8 @@ describe('Multiplayer', () => {
       // Move the object on the host's game:
       {
         switchToPeer({
-          peerId: 'player-1',
-          otherPeerIds: ['player-2', 'player-3'],
           playerNumber: 1,
+          allConnectedPlayers,
         });
 
         const {
@@ -1006,9 +1021,8 @@ describe('Multiplayer', () => {
       // Check the object is moved on the other peer.
       {
         switchToPeer({
-          peerId: 'player-2',
-          otherPeerIds: ['player-1'],
           playerNumber: 2,
+          allConnectedPlayers,
         });
         p2RuntimeScene.renderAndStep(1000 / 60);
         markAllPeerMessagesAsProcessed();
@@ -1027,9 +1041,8 @@ describe('Multiplayer', () => {
       // Destroy the object on the host's game:
       {
         switchToPeer({
-          peerId: 'player-1',
-          otherPeerIds: ['player-2', 'player-3'],
           playerNumber: 1,
+          allConnectedPlayers,
         });
 
         const {
@@ -1046,9 +1059,8 @@ describe('Multiplayer', () => {
       // Check the object is deleted on the other peer.
       {
         switchToPeer({
-          peerId: 'player-2',
-          otherPeerIds: ['player-1'],
           playerNumber: 2,
+          allConnectedPlayers,
         });
         p2RuntimeScene.renderAndStep(1000 / 60);
         markAllPeerMessagesAsProcessed();
@@ -1066,11 +1078,16 @@ describe('Multiplayer', () => {
         markAllPeerMessagesAsProcessed,
       } = createMultiplayerManagersMock();
 
+      const allConnectedPlayers = [
+        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 2, peerId: 'player-2' },
+        { playerNumber: 3, peerId: 'player-3' },
+      ];
+
       // Create an instance on a player:
       switchToPeer({
-        peerId: 'player-2',
-        otherPeerIds: ['player-1'],
         playerNumber: 2,
+        allConnectedPlayers,
       });
 
       const p2RuntimeScene = makeTestRuntimeSceneWithNetworkId();
@@ -1090,9 +1107,8 @@ describe('Multiplayer', () => {
 
       // Check the object is created on the host's game.
       switchToPeer({
-        peerId: 'player-1',
-        otherPeerIds: ['player-2', 'player-3'],
         playerNumber: 1,
+        allConnectedPlayers,
       });
 
       const p1RuntimeScene = makeTestRuntimeSceneWithNetworkId();
@@ -1113,9 +1129,8 @@ describe('Multiplayer', () => {
 
       // Check the object is created on the other player.
       switchToPeer({
-        peerId: 'player-3',
-        otherPeerIds: ['player-1'],
         playerNumber: 3,
+        allConnectedPlayers,
       });
 
       const p3RuntimeScene = makeTestRuntimeSceneWithNetworkId();
@@ -1139,9 +1154,8 @@ describe('Multiplayer', () => {
       // Move the object on the player:
       {
         switchToPeer({
-          peerId: 'player-2',
-          otherPeerIds: ['player-1'],
           playerNumber: 2,
+          allConnectedPlayers,
         });
 
         const {
@@ -1161,9 +1175,8 @@ describe('Multiplayer', () => {
       // Check the object is moved on the host's game.
       {
         switchToPeer({
-          peerId: 'player-1',
-          otherPeerIds: ['player-2', 'player-3'],
           playerNumber: 1,
+          allConnectedPlayers,
         });
         p1RuntimeScene.renderAndStep(1000 / 60);
 
@@ -1181,9 +1194,8 @@ describe('Multiplayer', () => {
       // Check the object is moved on the other player.
       {
         switchToPeer({
-          peerId: 'player-3',
-          otherPeerIds: ['player-1'],
           playerNumber: 3,
+          allConnectedPlayers,
         });
         p3RuntimeScene.renderAndStep(1000 / 60);
         markAllPeerMessagesAsProcessed();
@@ -1202,9 +1214,8 @@ describe('Multiplayer', () => {
       // Destroy the object (on player 2):
       {
         switchToPeer({
-          peerId: 'player-2',
-          otherPeerIds: ['player-1'],
           playerNumber: 2,
+          allConnectedPlayers,
         });
 
         const {
@@ -1221,9 +1232,8 @@ describe('Multiplayer', () => {
       // Check the object is deleted on the host's game.
       {
         switchToPeer({
-          peerId: 'player-1',
-          otherPeerIds: ['player-2', 'player-3'],
           playerNumber: 1,
+          allConnectedPlayers,
         });
 
         const p1ObjectsAndBehaviors = getObjectAndMultiplayerBehaviorsFromScene(
@@ -1242,9 +1252,8 @@ describe('Multiplayer', () => {
       // Check the object is deleted on the other player.
       {
         switchToPeer({
-          peerId: 'player-3',
-          otherPeerIds: ['player-1'],
           playerNumber: 3,
+          allConnectedPlayers,
         });
 
         const p3ObjectsAndBehaviors = getObjectAndMultiplayerBehaviorsFromScene(
@@ -1270,11 +1279,16 @@ describe('Multiplayer', () => {
         expectNoMessagesToBeProcessed,
       } = createMultiplayerManagersMock();
 
+      const allConnectedPlayers = [
+        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 2, peerId: 'player-2' },
+        { playerNumber: 3, peerId: 'player-3' },
+      ];
+
       // Create an instance on the host's game:
       switchToPeer({
-        peerId: 'player-1',
-        otherPeerIds: ['player-2', 'player-3'],
         playerNumber: 1,
+        allConnectedPlayers,
       });
 
       const p1RuntimeScene = makeTestRuntimeSceneWithNetworkId();
@@ -1292,9 +1306,8 @@ describe('Multiplayer', () => {
 
       // Check the object is created on the players.
       switchToPeer({
-        peerId: 'player-2',
-        otherPeerIds: ['player-1'],
         playerNumber: 2,
+        allConnectedPlayers,
       });
 
       const p2RuntimeScene = makeTestRuntimeSceneWithNetworkId();
@@ -1309,9 +1322,8 @@ describe('Multiplayer', () => {
       expect(p2SpriteObjectOriginal.getY()).to.be(143);
 
       switchToPeer({
-        peerId: 'player-3',
-        otherPeerIds: ['player-1'],
         playerNumber: 3,
+        allConnectedPlayers,
       });
 
       const p3RuntimeScene = makeTestRuntimeSceneWithNetworkId();
@@ -1332,9 +1344,8 @@ describe('Multiplayer', () => {
       // host to acknowledge the change).
       {
         switchToPeer({
-          peerId: 'player-3',
-          otherPeerIds: ['player-1'],
           playerNumber: 3,
+          allConnectedPlayers,
         });
 
         const {
@@ -1354,9 +1365,8 @@ describe('Multiplayer', () => {
       // Check the host is notified of the new ownership (and the new position).
       {
         switchToPeer({
-          peerId: 'player-1',
-          otherPeerIds: ['player-2', 'player-3'],
           playerNumber: 1,
+          allConnectedPlayers,
         });
 
         p1RuntimeScene.renderAndStep(1000 / 60);
@@ -1377,9 +1387,8 @@ describe('Multiplayer', () => {
       // Check the player 2 is notified of the new ownership (and the new position).
       {
         switchToPeer({
-          peerId: 'player-2',
-          otherPeerIds: ['player-1'],
           playerNumber: 2,
+          allConnectedPlayers,
         });
 
         p2RuntimeScene.renderAndStep(1000 / 60);
@@ -1405,9 +1414,8 @@ describe('Multiplayer', () => {
       // It will also communicate the new position/changes to the instance.
       {
         switchToPeer({
-          peerId: 'player-2',
-          otherPeerIds: ['player-1'],
           playerNumber: 2,
+          allConnectedPlayers,
         });
 
         const {
@@ -1427,9 +1435,8 @@ describe('Multiplayer', () => {
       // Check the host is notified of the new ownership.
       {
         switchToPeer({
-          peerId: 'player-1',
-          otherPeerIds: ['player-2', 'player-3'],
           playerNumber: 1,
+          allConnectedPlayers,
         });
 
         const {
@@ -1456,9 +1463,8 @@ describe('Multiplayer', () => {
       // Check the player 3 is notified of the new ownership.
       {
         switchToPeer({
-          peerId: 'player-3',
-          otherPeerIds: ['player-1'],
           playerNumber: 3,
+          allConnectedPlayers,
         });
 
         const {
@@ -1487,9 +1493,8 @@ describe('Multiplayer', () => {
       // Check that the position given by player 2 is updated on the host and player 3.
       {
         switchToPeer({
-          peerId: 'player-1',
-          otherPeerIds: ['player-2', 'player-3'],
           playerNumber: 1,
+          allConnectedPlayers,
         });
 
         const {
@@ -1511,9 +1516,8 @@ describe('Multiplayer', () => {
         expect(p1SpriteObject.getY()).to.be(243);
 
         switchToPeer({
-          peerId: 'player-3',
-          otherPeerIds: ['player-1'],
           playerNumber: 3,
+          allConnectedPlayers,
         });
 
         const {
@@ -1545,11 +1549,16 @@ describe('Multiplayer', () => {
         markAllPeerMessagesAsProcessed,
       } = createMultiplayerManagersMock();
 
+      const allConnectedPlayers = [
+        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 2, peerId: 'player-2' },
+        { playerNumber: 3, peerId: 'player-3' },
+      ];
+
       // Create an instance on a player:
       switchToPeer({
-        peerId: 'player-2',
-        otherPeerIds: ['player-1'],
         playerNumber: 2,
+        allConnectedPlayers,
       });
 
       const p2RuntimeScene = makeTestRuntimeSceneWithNetworkId();
@@ -1569,9 +1578,8 @@ describe('Multiplayer', () => {
 
       // Check the object is created on the host's game.
       switchToPeer({
-        peerId: 'player-1',
-        otherPeerIds: ['player-2', 'player-3'],
         playerNumber: 1,
+        allConnectedPlayers,
       });
 
       const p1RuntimeScene = makeTestRuntimeSceneWithNetworkId();
@@ -1593,9 +1601,8 @@ describe('Multiplayer', () => {
 
       // Check the object is created on the other player.
       switchToPeer({
-        peerId: 'player-3',
-        otherPeerIds: ['player-1'],
         playerNumber: 3,
+        allConnectedPlayers,
       });
 
       const p3RuntimeScene = makeTestRuntimeSceneWithNetworkId();
@@ -1623,9 +1630,8 @@ describe('Multiplayer', () => {
       // resulting in the creation of this instance everywhere.
       {
         switchToPeer({
-          peerId: 'player-1',
-          otherPeerIds: ['player-2', 'player-3'],
           playerNumber: 1,
+          allConnectedPlayers,
         });
         p1RuntimeScene.createObject('MySpriteObject');
         const {
@@ -1650,9 +1656,8 @@ describe('Multiplayer', () => {
         expect(p1Object2.getY()).to.be(0);
 
         switchToPeer({
-          peerId: 'player-3',
-          otherPeerIds: ['player-1'],
           playerNumber: 3,
+          allConnectedPlayers,
         });
         p3RuntimeScene.createObject('MySpriteObject');
         const {
@@ -1680,9 +1685,8 @@ describe('Multiplayer', () => {
       // Create an instance on player 2, owned by player 2.
       {
         switchToPeer({
-          peerId: 'player-2',
-          otherPeerIds: ['player-1'],
           playerNumber: 2,
+          allConnectedPlayers,
         });
         p2RuntimeScene.createObject('MySpriteObject');
         const p2ObjectsAndBehaviors = getObjectAndMultiplayerBehaviorsFromScene(
@@ -1709,9 +1713,8 @@ describe('Multiplayer', () => {
       // their "ghost" instance for it.
       {
         switchToPeer({
-          peerId: 'player-1',
-          otherPeerIds: ['player-2', 'player-3'],
           playerNumber: 1,
+          allConnectedPlayers,
         });
 
         p1RuntimeScene.renderAndStep(1000 / 60);
@@ -1728,9 +1731,8 @@ describe('Multiplayer', () => {
         expect(p1Object2.getY()).to.be(43);
 
         switchToPeer({
-          peerId: 'player-3',
-          otherPeerIds: ['player-1'],
           playerNumber: 3,
+          allConnectedPlayers,
         });
 
         p3RuntimeScene.renderAndStep(1000 / 60);
@@ -1753,14 +1755,19 @@ describe('Multiplayer', () => {
     it('deletes an instance owned by another player after a bit (if not "reconciled" in the meantime)', async () => {
       const { switchToPeer } = createMultiplayerManagersMock();
 
+      const allConnectedPlayers = [
+        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 2, peerId: 'player-2' },
+        { playerNumber: 3, peerId: 'player-3' },
+      ];
+
       // Create an instance on a player (2), owned by another player (3).
       // We can assume it's because there is some common logic running for all players
       // resulting in the creation of this instance everywhere.
 
       switchToPeer({
-        peerId: 'player-2',
-        otherPeerIds: ['player-1'],
         playerNumber: 2,
+        allConnectedPlayers,
       });
 
       const p2RuntimeScene = makeTestRuntimeSceneWithNetworkId();
@@ -1800,17 +1807,59 @@ describe('Multiplayer', () => {
       expect(p2ObjectsUpdated2.length).to.be(0);
     });
 
+    it('deletes an instance owned by another player instantly if not belonging to an existing player', async () => {
+      const { switchToPeer } = createMultiplayerManagersMock();
+
+      const allConnectedPlayers = [
+        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 2, peerId: 'player-2' },
+      ];
+
+      // Create an instance on a player (2), owned by another player (3).
+      // We can assume it's because there is some common logic running for all players
+      // resulting in the creation of this instance everywhere.
+
+      switchToPeer({
+        playerNumber: 2,
+        allConnectedPlayers,
+      });
+
+      const p2RuntimeScene = makeTestRuntimeSceneWithNetworkId();
+      p2RuntimeScene.createObject('MySpriteObject');
+
+      const {
+        object: mySpriteObject1,
+        behavior: p2SpriteMultiplayerObjectBehavior,
+      } = getObjectAndMultiplayerBehaviorsFromScene(
+        p2RuntimeScene,
+        'MySpriteObject'
+      )[0];
+      mySpriteObject1.setX(142);
+      mySpriteObject1.setY(143);
+      p2SpriteMultiplayerObjectBehavior.setPlayerObjectOwnership(3);
+
+      p2RuntimeScene.renderAndStep(1000 / 60);
+      const p2Objects = p2RuntimeScene.getObjects('MySpriteObject');
+      if (!p2Objects) throw new Error('No object found');
+      expect(p2Objects.length).to.be(0);
+    });
+
     it('gives priority to the first ownership change and revert the wrong one', async () => {
       const {
         switchToPeer,
         markAllPeerMessagesAsProcessed,
       } = createMultiplayerManagersMock();
 
+      const allConnectedPlayers = [
+        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 2, peerId: 'player-2' },
+        { playerNumber: 3, peerId: 'player-3' },
+      ];
+
       // Create an instance on the host's game:
       switchToPeer({
-        peerId: 'player-1',
-        otherPeerIds: ['player-2', 'player-3'],
         playerNumber: 1,
+        allConnectedPlayers,
       });
 
       const p1RuntimeScene = makeTestRuntimeSceneWithNetworkId();
@@ -1833,9 +1882,8 @@ describe('Multiplayer', () => {
 
       // Check the object is created on the other players.
       switchToPeer({
-        peerId: 'player-2',
-        otherPeerIds: ['player-1'],
         playerNumber: 2,
+        allConnectedPlayers,
       });
 
       const p2RuntimeScene = makeTestRuntimeSceneWithNetworkId();
@@ -1855,9 +1903,8 @@ describe('Multiplayer', () => {
       expect(p2SpriteObject.getY()).to.be(143);
 
       switchToPeer({
-        peerId: 'player-3',
-        otherPeerIds: ['player-1'],
         playerNumber: 3,
+        allConnectedPlayers,
       });
 
       const p3RuntimeScene = makeTestRuntimeSceneWithNetworkId();
@@ -1882,9 +1929,8 @@ describe('Multiplayer', () => {
       // Now, try to change ownership to player 2 and 3 at the "same time".
       {
         switchToPeer({
-          peerId: 'player-2',
-          otherPeerIds: ['player-1'],
           playerNumber: 2,
+          allConnectedPlayers,
         });
 
         const {
@@ -1898,9 +1944,8 @@ describe('Multiplayer', () => {
         p2RuntimeScene.renderAndStep(1000 / 60);
 
         switchToPeer({
-          peerId: 'player-3',
-          otherPeerIds: ['player-1'],
           playerNumber: 3,
+          allConnectedPlayers,
         });
 
         const {
@@ -1917,9 +1962,8 @@ describe('Multiplayer', () => {
       // Verify the host honors the first one (ownership change from 0 to 2).
       {
         switchToPeer({
-          peerId: 'player-1',
-          otherPeerIds: ['player-2', 'player-3'],
           playerNumber: 1,
+          allConnectedPlayers,
         });
         const {
           behavior: p1SpriteMultiplayerObjectBehavior,
@@ -1953,9 +1997,8 @@ describe('Multiplayer', () => {
       {
         for (let i = 0; i < 4; i++) {
           switchToPeer({
-            peerId: 'player-3',
-            otherPeerIds: ['player-1'],
             playerNumber: 3,
+            allConnectedPlayers,
           });
 
           p3RuntimeScene.renderAndStep(1000 / 60);
@@ -1979,9 +2022,8 @@ describe('Multiplayer', () => {
       // Check ownership was reverted.
       {
         switchToPeer({
-          peerId: 'player-3',
-          otherPeerIds: ['player-1'],
           playerNumber: 3,
+          allConnectedPlayers,
         });
 
         p3RuntimeScene.renderAndStep(1000 / 60);
@@ -2001,9 +2043,8 @@ describe('Multiplayer', () => {
       // Move the object on the player 2:
       {
         switchToPeer({
-          peerId: 'player-2',
-          otherPeerIds: ['player-1'],
           playerNumber: 2,
+          allConnectedPlayers,
         });
 
         const {
@@ -2022,9 +2063,8 @@ describe('Multiplayer', () => {
       // Check the object is moved on the host.
       {
         switchToPeer({
-          peerId: 'player-1',
-          otherPeerIds: ['player-2', 'player-3'],
           playerNumber: 1,
+          allConnectedPlayers,
         });
         p1RuntimeScene.renderAndStep(1000 / 60);
 
@@ -2042,9 +2082,8 @@ describe('Multiplayer', () => {
       // Check the object is moved on the other player.
       {
         switchToPeer({
-          peerId: 'player-3',
-          otherPeerIds: ['player-1'],
           playerNumber: 3,
+          allConnectedPlayers,
         });
         p3RuntimeScene.renderAndStep(1000 / 60);
 
@@ -2068,11 +2107,15 @@ describe('Multiplayer', () => {
     it('synchronizes object behaviors from the host to other players', async () => {
       const { switchToPeer } = createMultiplayerManagersMock();
 
+      const allConnectedPlayers = [
+        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 2, peerId: 'player-2' },
+      ];
+
       // Create an instance on the host's game:
       switchToPeer({
-        peerId: 'player-1',
-        otherPeerIds: ['player-2'],
         playerNumber: 1,
+        allConnectedPlayers,
       });
 
       const p1RuntimeScene = makeTestRuntimeSceneWithNetworkId();
@@ -2096,9 +2139,8 @@ describe('Multiplayer', () => {
 
       // Check the object is created on the other peer with the behavior.
       switchToPeer({
-        peerId: 'player-2',
-        otherPeerIds: ['player-1'],
         playerNumber: 2,
+        allConnectedPlayers,
       });
 
       const p2RuntimeScene = makeTestRuntimeSceneWithNetworkId();
@@ -2121,9 +2163,8 @@ describe('Multiplayer', () => {
       // Deactivate the behavior on the player 2
       {
         switchToPeer({
-          peerId: 'player-2',
-          otherPeerIds: ['player-1'],
           playerNumber: 2,
+          allConnectedPlayers,
         });
 
         const {
@@ -2144,9 +2185,8 @@ describe('Multiplayer', () => {
       // Forward time on player 1, who is host.
       {
         switchToPeer({
-          peerId: 'player-1',
-          otherPeerIds: ['player-2'],
           playerNumber: 1,
+          allConnectedPlayers,
         });
         // As the object is not moving, it will not be synced a lot, so we need to wait a bit.
         await delay(20);
@@ -2156,9 +2196,8 @@ describe('Multiplayer', () => {
       // Check the behavior is activated again on player 2, as they do not own the object.
       {
         switchToPeer({
-          peerId: 'player-2',
-          otherPeerIds: ['player-1'],
           playerNumber: 2,
+          allConnectedPlayers,
         });
         // As the object is not moving, it will not be synced a lot, so we need to wait a bit.
         await delay(20);
@@ -2180,9 +2219,8 @@ describe('Multiplayer', () => {
       // Deactivate the behavior on the host.
       {
         switchToPeer({
-          peerId: 'player-1',
-          otherPeerIds: ['player-2'],
           playerNumber: 1,
+          allConnectedPlayers,
         });
 
         const {
@@ -2204,9 +2242,8 @@ describe('Multiplayer', () => {
       // Check the behavior is deactivated on player 2, as per the host's decision.
       {
         switchToPeer({
-          peerId: 'player-2',
-          otherPeerIds: ['player-1'],
           playerNumber: 2,
+          allConnectedPlayers,
         });
 
         // As the object is not moving, it will not be synced a lot, so we need to wait a bit.
@@ -2229,11 +2266,15 @@ describe('Multiplayer', () => {
     it('does not synchronize object behaviors if defined as not synchronized', async () => {
       const { switchToPeer } = createMultiplayerManagersMock();
 
+      const allConnectedPlayers = [
+        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 2, peerId: 'player-2' },
+      ];
+
       // Create an instance on the host's game:
       switchToPeer({
-        peerId: 'player-1',
-        otherPeerIds: ['player-2'],
         playerNumber: 1,
+        allConnectedPlayers,
       });
 
       const p1RuntimeScene = makeTestRuntimeSceneWithNetworkId();
@@ -2264,9 +2305,8 @@ describe('Multiplayer', () => {
 
       // Check the object is created on the other peer with the behavior.
       switchToPeer({
-        peerId: 'player-2',
-        otherPeerIds: ['player-1'],
         playerNumber: 2,
+        allConnectedPlayers,
       });
 
       const p2RuntimeScene = makeTestRuntimeSceneWithNetworkId();
@@ -2313,6 +2353,11 @@ describe('Multiplayer', () => {
         getFakeSceneAndExtensionData({ name: 'Scene3' }).sceneData,
       ];
 
+      const allConnectedPlayers = [
+        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 2, peerId: 'player-2' },
+      ];
+
       // Launch two games.
       const p1RuntimeGame = gdjs.getPixiRuntimeGame({
         layouts: gameLayoutData,
@@ -2328,9 +2373,8 @@ describe('Multiplayer', () => {
 
       // Launch two scenes on the host:
       switchToPeer({
-        peerId: 'player-1',
-        otherPeerIds: ['player-2', 'player-3'],
         playerNumber: 1,
+        allConnectedPlayers,
       });
 
       p1RuntimeGame.getSceneStack().push('Scene1');
@@ -2341,9 +2385,8 @@ describe('Multiplayer', () => {
 
       // Launch the game on a client, with just the first scene.
       switchToPeer({
-        peerId: 'player-2',
-        otherPeerIds: ['player-1'],
         playerNumber: 2,
+        allConnectedPlayers,
       });
 
       p2RuntimeGame.getSceneStack().push('Scene1');
@@ -2356,9 +2399,8 @@ describe('Multiplayer', () => {
 
       // Start again the same scene (Scene3) on the host's game
       switchToPeer({
-        peerId: 'player-1',
-        otherPeerIds: ['player-2'],
         playerNumber: 1,
+        allConnectedPlayers,
       });
 
       let p1FirstScene3NetworkId;
@@ -2383,9 +2425,8 @@ describe('Multiplayer', () => {
 
       // Ensure the second Scene3 is also started on the player.
       switchToPeer({
-        peerId: 'player-2',
-        otherPeerIds: ['player-1'],
         playerNumber: 2,
+        allConnectedPlayers,
       });
       {
         const { currentScene } = checkCurrentSceneIs(p2RuntimeGame, 'Scene3');
@@ -2400,9 +2441,8 @@ describe('Multiplayer', () => {
 
       // Remove the two Scene3 on the host's game.
       switchToPeer({
-        peerId: 'player-1',
-        otherPeerIds: ['player-2'],
         playerNumber: 1,
+        allConnectedPlayers,
       });
       p1RuntimeGame.getSceneStack().pop();
       p1RuntimeGame.getSceneStack().pop();
@@ -2416,9 +2456,8 @@ describe('Multiplayer', () => {
 
       // Check that the player also goes back to Scene1:
       switchToPeer({
-        peerId: 'player-2',
-        otherPeerIds: ['player-1'],
         playerNumber: 2,
+        allConnectedPlayers,
       });
 
       checkCurrentSceneIs(p2RuntimeGame, 'Scene3');
@@ -2434,6 +2473,11 @@ describe('Multiplayer', () => {
         switchToPeer,
         markAllPeerMessagesAsProcessed,
       } = createMultiplayerManagersMock();
+
+      const allConnectedPlayers = [
+        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 2, peerId: 'player-2' },
+      ];
 
       const gameLayoutData = [
         getFakeSceneAndExtensionData({ name: 'Scene1' }).sceneData,
@@ -2456,9 +2500,8 @@ describe('Multiplayer', () => {
 
       // Launch two scenes on the host's game:
       switchToPeer({
-        peerId: 'player-1',
-        otherPeerIds: ['player-2', 'player-3'],
         playerNumber: 1,
+        allConnectedPlayers,
       });
 
       p1RuntimeGame.getSceneStack().push('Scene1');
@@ -2468,9 +2511,8 @@ describe('Multiplayer', () => {
 
       // Launch the game on a client, with just the first scene.
       switchToPeer({
-        peerId: 'player-2',
-        otherPeerIds: ['player-1'],
         playerNumber: 2,
+        allConnectedPlayers,
       });
 
       p2RuntimeGame.getSceneStack().push('Scene1');
@@ -2489,9 +2531,8 @@ describe('Multiplayer', () => {
 
       // Launch a second scene, this time on the host's game:
       switchToPeer({
-        peerId: 'player-1',
-        otherPeerIds: ['player-2', 'player-3'],
         playerNumber: 1,
+        allConnectedPlayers,
       });
 
       p1RuntimeGame.getSceneStack().push('Scene2');
@@ -2502,9 +2543,8 @@ describe('Multiplayer', () => {
 
       // Check the network id of the scene on the player is reconciled with the host.
       switchToPeer({
-        peerId: 'player-2',
-        otherPeerIds: ['player-1'],
         playerNumber: 2,
+        allConnectedPlayers,
       });
 
       expect(

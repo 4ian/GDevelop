@@ -156,7 +156,7 @@ export namespace TiledTileMapLoader {
           layerData = tiledLayer.data as integer[];
         }
         if (layerData) {
-          const collisionTileLayer = collisionTileMap.addTileLayer(
+          const collisionTileLayer = collisionTileMap.addNewTileLayer(
             tiledLayer.id
           );
           collisionTileLayer.setAlpha(tiledLayer.opacity);

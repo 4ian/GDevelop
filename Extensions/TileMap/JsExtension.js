@@ -737,7 +737,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
     .addExpression(
       'TileCenterX',
       _('Scene X coordinate of tile'),
-      _('Get the scene X position of the center of the tile'),
+      _('Get the scene X position of the center of the tile.'),
       '',
       'JsPlatform/Extensions/tile_map.svg'
     )
@@ -750,7 +750,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
     .addExpression(
       'TileCenterY',
       _('Scene Y coordinate of tile'),
-      _('Get the scene Y position of the center of the tile'),
+      _('Get the scene Y position of the center of the tile.'),
       '',
       'JsPlatform/Extensions/tile_map.svg'
     )
@@ -848,7 +848,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
     .addAction(
       'RemoveTileAtPosition',
       _('Remove tile (at position)'),
-      _('Remove the tile at the scene coordinates'),
+      _('Remove the tile at the scene coordinates.'),
       _('Remove tile at scene coordinates _PARAM1_ ; _PARAM2_'),
       '',
       'JsPlatform/Extensions/tile_map.svg',
@@ -919,7 +919,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
     .addAction(
       'RemoveTileAtGridCoordinates',
       _('Remove tile (on the grid)'),
-      _('Remove the tile at the grid coordinates'),
+      _('Remove the tile at the grid coordinates.'),
       _('Remove tile at grid coordinates _PARAM1_ ; _PARAM2_'),
       '',
       'JsPlatform/Extensions/tile_map.svg',
@@ -935,7 +935,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
     .addCondition(
       'IsTileFlippedOnXAtPosition',
       _('Tile flipped horizontally (at position)'),
-      _('Check if tile at scene coordinates is flipped horizontally'),
+      _('Check if tile at scene coordinates is flipped horizontally.'),
       _(
         'The tile at scene coordinates _PARAM1_ ; _PARAM2_ is flipped horizontally'
       ),
@@ -953,7 +953,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
     .addCondition(
       'IsTileFlippedOnYAtPosition',
       _('Tile flipped vertically (at position)'),
-      _('Check if tile at scene coordinates is flipped vertically'),
+      _('Check if tile at scene coordinates is flipped vertically.'),
       _(
         'The tile at scene coordinates _PARAM1_ ; _PARAM2_ is flipped vertically'
       ),
@@ -971,7 +971,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
     .addCondition(
       'IsTileFlippedOnXAtGridCoordinates',
       _('Tile flipped horizontally (on the grid)'),
-      _('Check if tile at grid coordinates is flipped horizontally'),
+      _('Check if tile at grid coordinates is flipped horizontally.'),
       _(
         'The tile at grid coordinates _PARAM1_ ; _PARAM2_ is flipped horizontally'
       ),
@@ -989,7 +989,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
     .addCondition(
       'IsTileFlippedOnYAtGridCoordinates',
       _('Tile flipped vertically (on the grid)'),
-      _('Check if tile at grid coordinates is flipped vertically'),
+      _('Check if tile at grid coordinates is flipped vertically.'),
       _(
         'The tile at grid coordinates _PARAM1_ ; _PARAM2_ is flipped vertically'
       ),

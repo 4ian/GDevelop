@@ -89,7 +89,7 @@ export class EditableTileMap {
 
     if (editableTileMapAsJsObject.layers) {
       editableTileMapAsJsObject.layers.forEach((layerAsJsObject: any) => {
-        tileMap.setTileLayer(
+        tileMap.addTileLayer(
           EditableTileMapLayer.from(
             layerAsJsObject,
             tileMap,
@@ -98,7 +98,7 @@ export class EditableTileMap {
         );
       });
     } else {
-      tileMap.addTileLayer(0);
+      tileMap.addNewTileLayer(0);
     }
 
     return tileMap;
@@ -189,7 +189,7 @@ export class EditableTileMap {
    * @param id The identifier of the new layer.
    * @returns The new layer.
    */
-  addTileLayer(id: integer): EditableTileMapLayer {
+  addNewTileLayer(id: integer): EditableTileMapLayer {
     const layer = new EditableTileMapLayer(this, id);
     this._layers.push(layer);
     return layer;
@@ -198,7 +198,7 @@ export class EditableTileMap {
   /**
    * @param layer the new layer to set.
    */
-  setTileLayer(layer: EditableTileMapLayer): void {
+  addTileLayer(layer: EditableTileMapLayer): void {
     this._layers.push(layer);
   }
 

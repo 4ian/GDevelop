@@ -165,10 +165,19 @@ export const useShopNavigation = (): NavigationState => {
               previousHistory.previousPages.length - 1
             ];
           if (isSearchResultPage(currentPage)) {
-            // The search has changed, show the best results.
-            currentPage.pageBreakIndex = 0;
-            currentPage.scrollPosition = 0;
-            return previousHistory;
+            const updatedCurrentPage = {
+              ...currentPage,
+              pageBreakIndex: 0,
+              scrollPosition: 0,
+            };
+            return {
+              ...previousHistory,
+              previousPages: [
+                // All pages except the last one
+                ...previousHistory.previousPages.slice(0, -1),
+                updatedCurrentPage,
+              ],
+            };
           } else {
             return {
               ...previousHistory,

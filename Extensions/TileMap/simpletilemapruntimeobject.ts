@@ -397,15 +397,9 @@ namespace gdjs {
     updateHitBoxes(): void {
       this.updateTransformation();
       if (!this._collisionTileMap) return;
-      // Update the RuntimeObject hitboxes attribute.
-      for (const _ of this._collisionTileMap.getAllHitboxes(this._hitBoxTag)) {
-        // RuntimeObject.hitBoxes contains the same polygons instances as the
-        // hitboxes from the tiles.
-        //
-        // When hitboxes for a tile is asked to the model, they are updated
-        // according to the new object location if needed.
-        // Iterating over all the tiles forces them to update their hitboxes.
-      }
+      this.hitBoxes = Array.from(
+        this._collisionTileMap.getAllHitboxes(this._hitBoxTag)
+      );
       this.hitBoxesDirty = false;
       this.updateAABB();
     }

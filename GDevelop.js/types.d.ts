@@ -21,11 +21,12 @@ declare class EmscriptenObject {
 
 export enum Variable_Type {
   Unknown = 0,
-  String = 1,
-  Number = 2,
-  Boolean = 3,
-  Structure = 4,
-  Array = 5,
+  MixedTypes = 1,
+  String = 2,
+  Number = 3,
+  Boolean = 4,
+  Structure = 5,
+  Array = 6,
 }
 
 export enum VariablesContainer_SourceType {
@@ -279,6 +280,7 @@ export class Variable extends EmscriptenObject {
   getValue(): number;
   setBool(val: boolean): void;
   getBool(): boolean;
+  hasMixedValues(): boolean;
   setFolded(val: boolean): void;
   isFolded(): boolean;
   getChildrenCount(): number;

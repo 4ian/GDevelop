@@ -108,5 +108,7 @@ export const hasVariablesContainerSubChildren = (
     return isCollectionVariable(variable) && variable.getChildrenCount() > 0;
   }).some(Boolean);
 
-export const isCollectionVariable = (variable: gdVariable): boolean =>
-  !gd.Variable.isPrimitive(variable.getType());
+export const isCollectionVariable = (variable: gdVariable): boolean => {
+  const type = variable.getType();
+  return type !== gd.Variable.MixedTypes && !gd.Variable.isPrimitive(type);
+};

@@ -9,6 +9,7 @@ type SimpleTextFieldProps = {|
   type: 'number' | 'text',
   onChange: (newValue: string, context: any) => void,
   value: string,
+  hint?: string,
   id: string,
   additionalContext?: any,
   italic?: boolean,
@@ -110,6 +111,7 @@ export const SimpleTextField = React.memo<
             ref={inputRef}
             type={props.type}
             defaultValue={props.value}
+            placeholder={props.hint || ''}
             onClick={stopPropagation}
             onDoubleClick={stopPropagation}
             onBlur={e => {

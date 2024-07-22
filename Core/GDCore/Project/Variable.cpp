@@ -60,6 +60,7 @@ bool Variable::IsPrimitive(const Type type) {
 }
 
 void Variable::CastTo(const Type newType) {
+  hasMixedValues = false;
   if (newType == Type::Number)
     SetValue(GetValue());
   else if (newType == Type::String)
@@ -149,6 +150,7 @@ Variable& Variable::GetChild(const gd::String& name) {
   if (it != children.end()) return *it->second;
 
   type = Type::Structure;
+  hasMixedValues = false;
   children[name] = std::make_shared<gd::Variable>();
   return *children[name];
 }
@@ -209,6 +211,7 @@ Variable& Variable::PushNew() {
   const size_t count = GetChildrenCount();
   auto& variable = GetAtIndex(count);
   if (type == Type::Array && count > 0) {
+    hasMixedValues = false;
     const auto childType = GetAtIndex(count - 1).type;
     variable.type = childType;
     if (childType == Type::Number) {
@@ -221,7 +224,6 @@ Variable& Variable::PushNew() {
       variable.SetBool(false);
     }
   }
-  hasMixedValues = false;
   return variable;
 };
 
@@ -232,6 +234,7 @@ void Variable::RemoveAtIndex(const size_t index) {
 
 bool Variable::InsertAtIndex(const gd::Variable& variable, const size_t index) {
   if (type != Type::Array) return false;
+  hasMixedValues = false;
   auto newVariable = std::make_shared<gd::Variable>(variable);
   if (index < childrenArray.size()) {
     childrenArray.insert(childrenArray.begin() + index, newVariable);
@@ -246,6 +249,7 @@ bool Variable::InsertChild(const gd::String& name,
   if (type != Type::Structure || HasChild(name)) {
     return false;
   }
+  hasMixedValues = false;
   children[name] = std::make_shared<gd::Variable>(variable);
   return true;
 };

@@ -226,6 +226,7 @@ interface PairStringVariable {
 
 enum Variable_Type {
     "Variable::Unknown",
+    "Variable::MixedTypes",
     "Variable::String",
     "Variable::Number",
     "Variable::Boolean",
@@ -264,6 +265,7 @@ interface Variable {
     double GetValue();
     void SetBool([Const] boolean val);
     boolean GetBool();
+    boolean HasMixedValues();
     void SetFolded(boolean val);
     boolean IsFolded();
 

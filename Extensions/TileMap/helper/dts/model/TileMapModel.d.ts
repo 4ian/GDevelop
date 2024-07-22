@@ -146,6 +146,23 @@ export declare class EditableTileMap {
    * Returns true if all layers contain no defined tiled.
    */
   isEmpty(): boolean;
+  getTileId(x: integer, y: integer, layerId: integer): integer;
+  setTile(
+    x: integer,
+    y: integer,
+    layerId: integer,
+    tileId: number
+  ): {
+    unshiftedRows: number;
+    unshiftedColumns: number;
+    appendedRows: number;
+    appendedColumns: number;
+  };
+  flipTileOnY(x: integer, y: integer, layerId: integer, flip: boolean): void;
+  flipTileOnX(x: integer, y: integer, layerId: integer, flip: boolean): void;
+  isTileFlippedOnX(x: integer, y: integer, layerId: integer): boolean;
+  isTileFlippedOnY(x: integer, y: integer, layerId: integer): boolean;
+  removeTile(x: integer, y: integer, layerId: integer): void;
 }
 /**
  * A tile map layer.
@@ -271,19 +288,11 @@ export declare class EditableTileMapLayer extends AbstractEditableLayer {
    * @param x The layer column.
    * @param y The layer row.
    * @param tileId The tile.
-   * @param options Flipping options.
    */
   setTile(
     x: integer,
     y: integer,
-    tileId: integer,
-    options?:
-      | {
-          flipVertically: boolean;
-          flipHorizontally: boolean;
-          flipDiagonally: boolean;
-        }
-      | undefined
+    tileId: integer
   ):
     | {
         unshiftedRows: number;

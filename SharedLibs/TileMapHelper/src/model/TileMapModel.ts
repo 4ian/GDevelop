@@ -276,6 +276,43 @@ export class EditableTileMap {
   isEmpty(): boolean {
     return this._layers.every((layer) => layer.isEmpty());
   }
+
+  getTileId(x: integer, y: integer, layerId: integer): integer {
+    const layer = this.getTileLayer(layerId);
+    if (!layer) return -1;
+    const tileId = layer.getTileId(x, y);
+    return tileId === undefined ? -1 : tileId;
+  }
+  setTile(x: integer, y: integer, layerId: integer, tileId: number) {
+    const layer = this.getTileLayer(layerId);
+    if (!layer) return;
+    return layer.setTile(x, y, tileId);
+  }
+  flipTileOnY(x: integer, y: integer, layerId: integer, flip: boolean) {
+    const layer = this.getTileLayer(layerId);
+    if (!layer) return;
+    layer.setFlippedVertically(x, y, flip);
+  }
+  flipTileOnX(x: integer, y: integer, layerId: integer, flip: boolean) {
+    const layer = this.getTileLayer(layerId);
+    if (!layer) return;
+    layer.setFlippedHorizontally(x, y, flip);
+  }
+  isTileFlippedOnX(x: integer, y: integer, layerId: integer): boolean {
+    const layer = this.getTileLayer(layerId);
+    if (!layer) return false;
+    return layer.isFlippedHorizontally(x, y);
+  }
+  isTileFlippedOnY(x: integer, y: integer, layerId: integer): boolean {
+    const layer = this.getTileLayer(layerId);
+    if (!layer) return false;
+    return layer.isFlippedVertically(x, y);
+  }
+  removeTile(x: integer, y: integer, layerId: integer) {
+    const layer = this.getTileLayer(layerId);
+    if (!layer) return;
+    layer.removeTile(x, y);
+  }
 }
 
 /**
@@ -557,6 +594,10 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
       });
     }
     if (rowsToAppend > 0 || rowsToUnshift > 0) {
+      // TODO: Consider over-provisioning columns and rows to avoid this operation being made
+      // too often, especially in a case where tiles are added towards the outside.
+      // Beware of over-provisioning rows above and/or columns on the left as it is supposed
+      // to change the object position.
       this._tiles.unshift(
         ...new Array(rowsToUnshift)
           .fill(0)
@@ -591,23 +632,11 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
    * @param x The layer column.
    * @param y The layer row.
    * @param tileId The tile.
-   * @param options Flipping options.
    */
   setTile(
     x: integer,
     y: integer,
-    tileId: integer,
-    options:
-      | {
-          flipVertically: boolean;
-          flipHorizontally: boolean;
-          flipDiagonally: boolean;
-        }
-      | undefined = {
-      flipVertically: false,
-      flipHorizontally: false,
-      flipDiagonally: false,
-    }
+    tileId: integer
   ):
     | {
         unshiftedRows: number;
@@ -644,14 +673,8 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
     }
 
     tilesRow[newX] =
-      FlippingHelper.setFlippedHorizontally(
-        FlippingHelper.setFlippedVertically(
-          FlippingHelper.setFlippedDiagonally(tileId, options.flipDiagonally),
-          options.flipVertically
-        ),
-        options.flipHorizontally
-      ) +
-      // +1 because 0 mean null
+      tileId +
+      // +1 because 0 means null
       1;
     return {
       unshiftedRows: rowsToUnshift,
@@ -673,7 +696,7 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
       return;
     }
 
-    // +1 because 0 mean null
+    // +1 because 0 means null
     tilesRow[x] = tileGID + 1;
   }
 
@@ -754,7 +777,7 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
       return;
     }
 
-    // 0 mean null
+    // 0 means null
     tilesRow[x] = 0;
   }
 

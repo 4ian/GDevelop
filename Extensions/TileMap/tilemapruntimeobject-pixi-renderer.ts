@@ -167,9 +167,7 @@ namespace gdjs {
     getTileId(x: integer, y: integer, layerIndex: integer): integer {
       const tileMap = this._tileMap;
       if (!tileMap) return -1;
-      const layer = tileMap.getTileLayer(layerIndex);
-      if (!layer) return -1;
-      return layer.getTileId(x, y) || -1;
+      return tileMap.getTileId(x, y, layerIndex);
     }
 
     /**
@@ -181,9 +179,7 @@ namespace gdjs {
     setTileId(x: integer, y: integer, layerIndex: integer, tileId: number) {
       const tileMap = this._tileMap;
       if (!tileMap) return;
-      const layer = tileMap.getTileLayer(layerIndex);
-      if (!layer) return;
-      return layer.setTile(x, y, tileId);
+      return tileMap.setTile(x, y, layerIndex, tileId);
     }
 
     /**
@@ -195,9 +191,7 @@ namespace gdjs {
     flipTileOnY(x: integer, y: integer, layerIndex: integer, flip: boolean) {
       const tileMap = this._tileMap;
       if (!tileMap) return;
-      const layer = tileMap.getTileLayer(layerIndex);
-      if (!layer) return;
-      layer.setFlippedVertically(x, y, flip);
+      tileMap.flipTileOnY(x, y, layerIndex, flip);
     }
 
     /**
@@ -209,9 +203,7 @@ namespace gdjs {
     flipTileOnX(x: integer, y: integer, layerIndex: integer, flip: boolean) {
       const tileMap = this._tileMap;
       if (!tileMap) return;
-      const layer = tileMap.getTileLayer(layerIndex);
-      if (!layer) return;
-      layer.setFlippedHorizontally(x, y, flip);
+      tileMap.flipTileOnX(x, y, layerIndex, flip);
     }
 
     /**
@@ -222,9 +214,7 @@ namespace gdjs {
     isTileFlippedOnX(x: integer, y: integer, layerIndex: integer): boolean {
       const tileMap = this._tileMap;
       if (!tileMap) return false;
-      const layer = tileMap.getTileLayer(layerIndex);
-      if (!layer) return false;
-      return layer.isFlippedHorizontally(x, y);
+      return tileMap.isTileFlippedOnX(x, y, layerIndex);
     }
 
     /**
@@ -235,9 +225,7 @@ namespace gdjs {
     isTileFlippedOnY(x: integer, y: integer, layerIndex: integer): boolean {
       const tileMap = this._tileMap;
       if (!tileMap) return false;
-      const layer = tileMap.getTileLayer(layerIndex);
-      if (!layer) return false;
-      return layer.isFlippedVertically(x, y);
+      return tileMap.isTileFlippedOnY(x, y, layerIndex);
     }
 
     /**
@@ -248,9 +236,7 @@ namespace gdjs {
     removeTile(x: integer, y: integer, layerIndex: integer) {
       const tileMap = this._tileMap;
       if (!tileMap) return;
-      const layer = tileMap.getTileLayer(layerIndex);
-      if (!layer) return;
-      return layer.removeTile(x, y);
+      return tileMap.removeTile(x, y, layerIndex);
     }
     /**
      * @param layerIndex The layer index.

@@ -645,73 +645,68 @@ namespace gdjs {
       this._transformationIsUpToDate = false;
     }
 
-    flipTileAtSceneCoordinates(
-      x: float,
-      y: float,
-      flipHorizontally: boolean,
-      flipVertically: boolean
-    ) {
+    flipTileOnYAtPosition(x: float, y: float, flip: boolean) {
       const [
         columnIndex,
         rowIndex,
       ] = this.getGridCoordinatesFromSceneCoordinates(x, y);
-      this.flipTileAtGridCoordinates(
-        columnIndex,
-        rowIndex,
-        flipHorizontally,
-        flipVertically
-      );
+      this.flipTileOnYAtGridCoordinates(columnIndex, rowIndex, flip);
     }
 
-    flipTileAtGridCoordinates(
-      columnIndex: integer,
-      rowIndex: integer,
-      flipHorizontally: boolean,
-      flipVertically: boolean
-    ) {
-      this._renderer.flipTile(
+    flipTileOnXAtPosition(x: float, y: float, flip: boolean) {
+      const [
         columnIndex,
         rowIndex,
-        0,
-        flipHorizontally,
-        flipVertically,
-        false
-      );
+      ] = this.getGridCoordinatesFromSceneCoordinates(x, y);
+      this.flipTileOnXAtGridCoordinates(columnIndex, rowIndex, flip);
+    }
+
+    flipTileOnYAtGridCoordinates(
+      columnIndex: integer,
+      rowIndex: integer,
+      flip: boolean
+    ) {
+      this._renderer.flipTileOnY(columnIndex, rowIndex, 0, flip);
       this._isTileMapDirty = true;
       // No need to invalidate hit boxes since at the moment, collision mask
       // cannot be configured on each tile.
     }
 
-    isTileFlippedHorizontallyAtSceneCoordinates(x: float, y: float) {
+    flipTileOnXAtGridCoordinates(
+      columnIndex: integer,
+      rowIndex: integer,
+      flip: boolean
+    ) {
+      this._renderer.flipTileOnX(columnIndex, rowIndex, 0, flip);
+      this._isTileMapDirty = true;
+      // No need to invalidate hit boxes since at the moment, collision mask
+      // cannot be configured on each tile.
+    }
+
+    isTileFlippedOnXAtPosition(x: float, y: float) {
       const [
         columnIndex,
         rowIndex,
       ] = this.getGridCoordinatesFromSceneCoordinates(x, y);
 
-      return this._renderer.isTileFlippedHorizontally(columnIndex, rowIndex, 0);
+      return this._renderer.isTileFlippedOnX(columnIndex, rowIndex, 0);
     }
 
-    isTileFlippedHorizontallyAtGridCoordinates(
-      columnIndex: integer,
-      rowIndex: integer
-    ) {
-      return this._renderer.isTileFlippedHorizontally(columnIndex, rowIndex, 0);
+    isTileFlippedOnXAtGridCoordinates(columnIndex: integer, rowIndex: integer) {
+      return this._renderer.isTileFlippedOnX(columnIndex, rowIndex, 0);
     }
 
-    isTileFlippedVerticallyAtSceneCoordinates(x: float, y: float) {
+    isTileFlippedOnYAtPosition(x: float, y: float) {
       const [
         columnIndex,
         rowIndex,
       ] = this.getGridCoordinatesFromSceneCoordinates(x, y);
 
-      return this._renderer.isTileFlippedVertically(columnIndex, rowIndex, 0);
+      return this._renderer.isTileFlippedOnY(columnIndex, rowIndex, 0);
     }
 
-    isTileFlippedVerticallyAtGridCoordinates(
-      columnIndex: integer,
-      rowIndex: integer
-    ) {
-      return this._renderer.isTileFlippedVertically(columnIndex, rowIndex, 0);
+    isTileFlippedOnYAtGridCoordinates(columnIndex: integer, rowIndex: integer) {
+      return this._renderer.isTileFlippedOnY(columnIndex, rowIndex, 0);
     }
 
     removeTileAtSceneCoordinates(x: float, y: float) {

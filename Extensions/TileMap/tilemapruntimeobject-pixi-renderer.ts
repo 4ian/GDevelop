@@ -190,23 +190,28 @@ namespace gdjs {
      * @param x The layer column.
      * @param y The layer row.
      * @param layerIndex The layer index.
-     * @param tileId The tile's id.
+     * @param flip true if the tile should be flipped.
      */
-    flipTile(
-      x: integer,
-      y: integer,
-      layerIndex: integer,
-      flipHorizontally: boolean,
-      flipVertically: boolean,
-      flipDiagonally: boolean
-    ) {
+    flipTileOnY(x: integer, y: integer, layerIndex: integer, flip: boolean) {
       const tileMap = this._tileMap;
       if (!tileMap) return;
       const layer = tileMap.getTileLayer(layerIndex);
       if (!layer) return;
-      layer.setFlippedHorizontally(x, y, flipHorizontally);
-      layer.setFlippedVertically(x, y, flipVertically);
-      layer.setFlippedDiagonally(x, y, flipDiagonally);
+      layer.setFlippedVertically(x, y, flip);
+    }
+
+    /**
+     * @param x The layer column.
+     * @param y The layer row.
+     * @param layerIndex The layer index.
+     * @param flip true if the tile should be flipped.
+     */
+    flipTileOnX(x: integer, y: integer, layerIndex: integer, flip: boolean) {
+      const tileMap = this._tileMap;
+      if (!tileMap) return;
+      const layer = tileMap.getTileLayer(layerIndex);
+      if (!layer) return;
+      layer.setFlippedHorizontally(x, y, flip);
     }
 
     /**
@@ -214,11 +219,7 @@ namespace gdjs {
      * @param y The layer row.
      * @param layerIndex The layer index.
      */
-    isTileFlippedHorizontally(
-      x: integer,
-      y: integer,
-      layerIndex: integer
-    ): boolean {
+    isTileFlippedOnX(x: integer, y: integer, layerIndex: integer): boolean {
       const tileMap = this._tileMap;
       if (!tileMap) return false;
       const layer = tileMap.getTileLayer(layerIndex);
@@ -231,11 +232,7 @@ namespace gdjs {
      * @param y The layer row.
      * @param layerIndex The layer index.
      */
-    isTileFlippedVertically(
-      x: integer,
-      y: integer,
-      layerIndex: integer
-    ): boolean {
+    isTileFlippedOnY(x: integer, y: integer, layerIndex: integer): boolean {
       const tileMap = this._tileMap;
       if (!tileMap) return false;
       const layer = tileMap.getTileLayer(layerIndex);

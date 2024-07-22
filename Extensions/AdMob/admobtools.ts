@@ -67,6 +67,7 @@ namespace gdjs {
 
     // Admob does not initialize automatically, so we store a flag to know if it's initialized.
     let admobStarted = false;
+    let isStarting = false;
     let isUsingTestAds = false;
 
     // Banner
@@ -115,9 +116,13 @@ namespace gdjs {
       async () => {
         // Obtain user consent ?
 
+        logger.info('Starting AdMob.');
+        isStarting = true;
+
         await admob.start();
 
         logger.info('AdMob successfully started.');
+        isStarting = false;
         admobStarted = true;
       },
       false
@@ -126,15 +131,32 @@ namespace gdjs {
     /**
      * Helper to know if we are on mobile and admob is correctly initialized.
      */
-    const checkIfAdMobIsAvailable = () => {
+    const checkIfAdMobIsAvailable = async () => {
       if (typeof cordova === 'undefined') {
         logger.warn('We are not on mobile, AdMob will not be available.');
         return false;
       }
-      if (typeof admob === 'undefined' || !admobStarted) {
-        logger.warn('AdMob has not been configured or started properly.');
+      if (typeof admob === 'undefined') {
+        logger.warn('AdMob has not been configured properly.');
         return false;
       }
+
+      if (!admobStarted) {
+        if (isStarting) {
+          // Delay the call until AdMob is started, up to 5 seconds.
+          let time = 0;
+          while (!admobStarted && time < 5000) {
+            await new Promise((resolve) => setTimeout(resolve, 100));
+            time += 100;
+          }
+        }
+
+        if (!admobStarted) {
+          logger.warn('AdMob is not started.');
+          return false;
+        }
+      }
+
       return true;
     };
 
@@ -164,8 +186,10 @@ namespace gdjs {
      * charging advertisers. If you click on too many ads without being in test mode, you risk your
      * account being flagged for invalid activity.
      */
-    export const setTestMode = (enable: boolean) => {
-      if (!checkIfAdMobIsAvailable()) return;
+    export const setTestMode = async (enable: boolean) => {
+      if (!(await checkIfAdMobIsAvailable())) return;
+
+      logger.info('Setting AdMob test mode to:', enable);
 
       isUsingTestAds = enable;
     };
@@ -185,7 +209,7 @@ namespace gdjs {
       displayLandscape,
       displayWhenLoaded
     ) => {
-      if (!checkIfAdMobIsAvailable()) return;
+      if (!(await checkIfAdMobIsAvailable())) return;
       // If an appOpen is already loading or showing, we don't stop it.
       if (appOpenLoading || appOpenShowing) {
         return;
@@ -242,7 +266,7 @@ namespace gdjs {
 
     /** Show the loaded appOpen. */
     export const showAppOpen = async () => {
-      if (!checkIfAdMobIsAvailable()) return;
+      if (!(await checkIfAdMobIsAvailable())) return;
 
       if (!appOpen) {
         logger.warn('App Open has not been set up, call loadAppOpen first.');
@@ -293,7 +317,7 @@ namespace gdjs {
      * If a banner is already set up, it will be hidden and replaced by the new one.
      */
     export const setupBanner = async (androidAdUnitId, iosAdUnitId, atTop) => {
-      if (!checkIfAdMobIsAvailable()) return;
+      if (!(await checkIfAdMobIsAvailable())) return;
       const adUnitId = getAdUnitId(androidAdUnitId, iosAdUnitId, 'banner');
       if (!adUnitId) return;
 
@@ -354,7 +378,7 @@ namespace gdjs {
 
     /** Hide the banner shown on screen. */
     export const hideBanner = async () => {
-      if (!checkIfAdMobIsAvailable()) return;
+      if (!(await checkIfAdMobIsAvailable())) return;
 
       if (!banner || !bannerShowing) {
         logger.warn('No banner is being shown.');
@@ -381,7 +405,7 @@ namespace gdjs {
       iosAdUnitId,
       displayWhenLoaded
     ) => {
-      if (!checkIfAdMobIsAvailable()) return;
+      if (!(await checkIfAdMobIsAvailable())) return;
       // If an interstitial is already loading or showing, we don't stop it.
       if (interstitialLoading || interstitialShowing) {
         return;
@@ -440,7 +464,7 @@ namespace gdjs {
 
     /** Show the loaded interstitial. */
     export const showInterstitial = async () => {
-      if (!checkIfAdMobIsAvailable()) return;
+      if (!(await checkIfAdMobIsAvailable())) return;
 
       if (!interstitial) {
         logger.warn(
@@ -495,7 +519,7 @@ namespace gdjs {
       iosAdUnitID,
       displayWhenLoaded
     ) => {
-      if (!checkIfAdMobIsAvailable()) return;
+      if (!(await checkIfAdMobIsAvailable())) return;
       if (rewardedInterstitialLoading || rewardedInterstitialShowing) {
         return;
       }
@@ -557,7 +581,7 @@ namespace gdjs {
 
     /** Show the loaded reward interstitial. */
     export const showRewardedInterstitial = async () => {
-      if (!checkIfAdMobIsAvailable()) return;
+      if (!(await checkIfAdMobIsAvailable())) return;
 
       if (!rewardedInterstitial) {
         logger.warn(
@@ -614,7 +638,7 @@ namespace gdjs {
       iosAdUnitID,
       displayWhenLoaded
     ) => {
-      if (!checkIfAdMobIsAvailable()) return;
+      if (!(await checkIfAdMobIsAvailable())) return;
       if (rewardedVideoLoading || rewardedVideoShowing) {
         return;
       }
@@ -672,7 +696,7 @@ namespace gdjs {
 
     /** Show the loaded reward video. */
     export const showRewardedVideo = async () => {
-      if (!checkIfAdMobIsAvailable()) return;
+      if (!(await checkIfAdMobIsAvailable())) return;
 
       if (!rewardedVideo) {
         logger.warn('Video has not been set up, call loadRewardedVideo first.');

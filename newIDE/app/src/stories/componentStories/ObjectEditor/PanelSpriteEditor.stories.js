@@ -24,6 +24,8 @@ export const Default = () => (
       objectConfiguration={testProject.panelSpriteObject.getConfiguration()}
       project={testProject.project}
       layout={testProject.testLayout}
+      eventsFunctionsExtension={null}
+      eventsBasedObject={null}
       resourceManagementProps={fakeResourceManagementProps}
       onSizeUpdated={() => {}}
       object={testProject.panelSpriteObject}

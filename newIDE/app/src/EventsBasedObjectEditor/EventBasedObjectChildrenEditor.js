@@ -283,7 +283,9 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 object={this.state.editedObjectWithContext.object}
                 initialTab={this.state.editedObjectInitialTab}
                 project={project}
+                layout={null}
                 eventsFunctionsExtension={eventsFunctionsExtension}
+                eventsBasedObject={eventsBasedObject}
                 projectScopedContainersAccessor={
                   this.props.projectScopedContainersAccessor
                 }

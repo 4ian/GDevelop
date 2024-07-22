@@ -28,9 +28,10 @@ const gd: libGDevelop = global.gd;
 type Props = {|
   project: gdProject,
   eventsFunction: gdEventsFunction,
-  eventsBasedBehavior: ?gdEventsBasedBehavior,
-  eventsBasedObject: ?gdEventsBasedObject,
-  eventsFunctionsContainer: ?gdEventsFunctionsContainer,
+  eventsBasedBehavior: gdEventsBasedBehavior | null,
+  eventsBasedObject: gdEventsBasedObject | null,
+  eventsFunctionsContainer: gdEventsFunctionsContainer | null,
+  eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   onParametersUpdated: () => void,
   helpPagePath?: string,
   freezeParameters?: boolean,
@@ -68,6 +69,7 @@ export const EventsFunctionParametersEditor = ({
   eventsBasedBehavior,
   eventsBasedObject,
   eventsFunctionsContainer,
+  eventsFunctionsExtension,
   onParametersUpdated,
   helpPagePath,
   freezeParameters,
@@ -400,6 +402,7 @@ export const EventsFunctionParametersEditor = ({
                       <ColumnStackLayout expand noMargin>
                         <ValueTypeEditor
                           project={project}
+                          eventsFunctionsExtension={eventsFunctionsExtension}
                           valueTypeMetadata={parameter.getValueTypeMetadata()}
                           disabled={isParameterDisabled(i)}
                           isTypeSelectorShown={isParameterTypeShown(i)}

@@ -205,6 +205,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
             project={project}
             projectScopedContainersAccessor={projectScopedContainersAccessor}
             layout={layout}
+            eventsFunctionsExtension={null}
             eventsBasedObject={null}
             globalObjectsContainer={project.getObjects()}
             objectsContainer={layout.getObjects()}

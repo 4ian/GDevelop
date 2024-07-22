@@ -100,6 +100,7 @@ type Props = {|
   project: gdProject,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   layout: gdLayout | null,
+  eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   eventsBasedObject: gdEventsBasedObject | null,
 
   globalObjectsContainer: gdObjectsContainer | null,
@@ -914,7 +915,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             object.getName()
           );
         } else {
-          gd.WholeProjectRefactorer.objectRemovedInLayout(
+          gd.WholeProjectRefactorer.objectRemovedInScene(
             project,
             layout,
             object.getName()
@@ -1034,7 +1035,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           /* isObjectGroup=*/ false
         );
       } else {
-        gd.WholeProjectRefactorer.objectOrGroupRenamedInLayout(
+        gd.WholeProjectRefactorer.objectOrGroupRenamedInScene(
           project,
           layout,
           object.getName(),
@@ -1162,7 +1163,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             /* isObjectGroup=*/ true
           );
         } else {
-          gd.WholeProjectRefactorer.objectOrGroupRenamedInLayout(
+          gd.WholeProjectRefactorer.objectOrGroupRenamedInScene(
             project,
             layout,
             group.getName(),
@@ -1711,6 +1712,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       project,
       projectScopedContainersAccessor,
       layout,
+      eventsFunctionsExtension,
       eventsBasedObject,
       initialInstances,
       resourceManagementProps,
@@ -1775,6 +1777,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 ref={ref => (this.editorDisplay = ref)}
                 project={project}
                 layout={layout}
+                eventsFunctionsExtension={eventsFunctionsExtension}
                 eventsBasedObject={eventsBasedObject}
                 layersContainer={this.props.layersContainer}
                 globalObjectsContainer={this.props.globalObjectsContainer}
@@ -1880,6 +1883,8 @@ export default class SceneEditor extends React.Component<Props, State> {
                         initialTab={this.state.editedObjectInitialTab}
                         project={project}
                         layout={layout}
+                        eventsFunctionsExtension={eventsFunctionsExtension}
+                        eventsBasedObject={eventsBasedObject}
                         projectScopedContainersAccessor={
                           projectScopedContainersAccessor
                         }
@@ -1926,7 +1931,8 @@ export default class SceneEditor extends React.Component<Props, State> {
                                   editedObjectWithContext.object.getName()
                                 );
                               } else {
-                                gd.WholeProjectRefactorer.behaviorsAddedToObjectInLayout(
+                                // TODO EBO Add same refactor for event-based objects
+                                gd.WholeProjectRefactorer.behaviorsAddedToObjectInScene(
                                   project,
                                   layout,
                                   editedObjectWithContext.object.getName()
@@ -2023,6 +2029,8 @@ export default class SceneEditor extends React.Component<Props, State> {
                   project={project}
                   resourceManagementProps={this.props.resourceManagementProps}
                   layout={layout}
+                  eventsFunctionsExtension={eventsFunctionsExtension}
+                  eventsBasedObject={eventsBasedObject}
                   layer={this.state.editedLayer}
                   initialInstances={initialInstances}
                   initialTab={this.state.editedLayerInitialTab}

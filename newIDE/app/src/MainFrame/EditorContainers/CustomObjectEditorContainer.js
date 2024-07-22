@@ -157,6 +157,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
           project={project}
           projectScopedContainersAccessor={projectScopedContainersAccessor}
           layout={null}
+          eventsFunctionsExtension={eventsFunctionsExtension}
           eventsBasedObject={eventsBasedObject}
           globalObjectsContainer={null}
           objectsContainer={eventsBasedObject.getObjects()}

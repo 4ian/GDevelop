@@ -23,6 +23,8 @@ export const Default = () => {
     <DragAndDropContextProvider>
       <LayersList
         project={testProject.project}
+        eventsFunctionsExtension={null}
+        eventsBasedObject={null}
         selectedLayer={selectedLayer}
         onSelectLayer={setSelectedLayer}
         onEditLayerEffects={action('onEditLayerEffects')}
@@ -48,6 +50,8 @@ export const SmallWidthAndHeight = () => {
       <div style={{ width: 250, height: 200 }}>
         <LayersList
           project={testProject.project}
+          eventsFunctionsExtension={null}
+          eventsBasedObject={null}
           selectedLayer={selectedLayer}
           onSelectLayer={setSelectedLayer}
           onEditLayerEffects={action('onEditLayerEffects')}

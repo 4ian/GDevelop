@@ -3643,7 +3643,7 @@ describe('libGD.js', function () {
       instance1.setObjectName('Object1');
       instance2.setObjectName('Object2');
 
-      gd.WholeProjectRefactorer.objectOrGroupRenamedInLayout(
+      gd.WholeProjectRefactorer.objectOrGroupRenamedInScene(
         project,
         layout,
         'Object1',
@@ -3660,7 +3660,7 @@ describe('libGD.js', function () {
         true
       );
 
-      gd.WholeProjectRefactorer.objectRemovedInLayout(
+      gd.WholeProjectRefactorer.objectRemovedInScene(
         project,
         layout,
         'Object3',

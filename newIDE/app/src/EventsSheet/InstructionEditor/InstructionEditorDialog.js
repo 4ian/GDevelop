@@ -427,7 +427,7 @@ const InstructionEditorDialog = ({
       {newBehaviorDialogOpen && chosenObject && (
         <NewBehaviorDialog
           project={project}
-          eventsFunctionsExtension={scope.eventsFunctionsExtension}
+          eventsFunctionsExtension={scope.eventsFunctionsExtension || null}
           open={newBehaviorDialogOpen}
           objectType={chosenObject.getType()}
           objectBehaviorsTypes={listObjectBehaviorsTypes(chosenObject)}

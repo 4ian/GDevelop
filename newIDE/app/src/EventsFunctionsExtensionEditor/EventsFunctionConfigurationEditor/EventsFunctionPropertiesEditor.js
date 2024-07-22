@@ -29,9 +29,10 @@ const gd: libGDevelop = global.gd;
 type Props = {|
   project: gdProject,
   eventsFunction: gdEventsFunction,
-  eventsBasedBehavior: ?gdEventsBasedBehavior,
-  eventsBasedObject: ?gdEventsBasedObject,
-  eventsFunctionsContainer: ?gdEventsFunctionsContainer,
+  eventsBasedBehavior: gdEventsBasedBehavior | null,
+  eventsBasedObject: gdEventsBasedObject | null,
+  eventsFunctionsContainer: gdEventsFunctionsContainer | null,
+  eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   helpPagePath?: string,
   onConfigurationUpdated?: (?ExtensionItemConfigurationAttribute) => void,
   renderConfigurationHeader?: () => React.Node,
@@ -143,6 +144,7 @@ const getDescriptionHintText = (
 
 export const EventsFunctionPropertiesEditor = ({
   project,
+  eventsFunctionsExtension,
   eventsFunction,
   freezeEventsFunctionType,
   onConfigurationUpdated,
@@ -500,6 +502,7 @@ export const EventsFunctionPropertiesEditor = ({
                     <ValueTypeEditor
                       isExpressionType
                       project={project}
+                      eventsFunctionsExtension={eventsFunctionsExtension}
                       valueTypeMetadata={eventsFunction.getExpressionType()}
                       isTypeSelectorShown={true}
                       onTypeUpdated={() => {

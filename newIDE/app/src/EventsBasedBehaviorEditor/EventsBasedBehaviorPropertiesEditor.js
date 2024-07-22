@@ -731,6 +731,7 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                         {property.getType() === 'Behavior' && (
                                           <BehaviorTypeSelector
                                             project={project}
+                                            eventsFunctionsExtension={extension}
                                             objectType={
                                               behaviorObjectType || ''
                                             }

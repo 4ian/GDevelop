@@ -2433,43 +2433,82 @@ interface WholeProjectRefactorer {
       [Ref] Project project,
       [Const] DOMString oldName,
       [Const] DOMString newName);
-    void STATIC_RenameLayer(
+    void STATIC_RenameLayerInScene(
       [Ref] Project project,
-      [Ref] Layout layout,
+      [Ref] Layout scene,
       [Const] DOMString oldName,
       [Const] DOMString newName);
-    void STATIC_RenameLayerEffect(
+    void STATIC_RenameLayerInEventsBasedObject(
       [Ref] Project project,
-      [Ref] Layout layout,
+      [Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Ref] EventsBasedObject eventsBasedObject,
+      [Const] DOMString oldName,
+      [Const] DOMString newName);
+    void STATIC_RenameLayerEffectInScene(
+      [Ref] Project project,
+      [Ref] Layout scene,
       [Ref] Layer layer,
       [Const] DOMString oldName,
       [Const] DOMString newName);
-    void STATIC_RenameObjectAnimation(
+    void STATIC_RenameLayerEffectInEventsBasedObject(
       [Ref] Project project,
-      [Ref] Layout layout,
+      [Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Ref] EventsBasedObject eventsBasedObject,
+      [Ref] Layer layer,
+      [Const] DOMString oldName,
+      [Const] DOMString newName);
+    void STATIC_RenameObjectAnimationInScene(
+      [Ref] Project project,
+      [Ref] Layout scene,
       [Ref] gdObject gdObject,
       [Const] DOMString oldName,
       [Const] DOMString newName);
-    void STATIC_RenameObjectPoint(
+    void STATIC_RenameObjectAnimationInEventsBasedObject(
       [Ref] Project project,
-      [Ref] Layout layout,
+      [Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Ref] EventsBasedObject eventsBasedObject,
       [Ref] gdObject gdObject,
       [Const] DOMString oldName,
       [Const] DOMString newName);
-    void STATIC_RenameObjectEffect(
+    void STATIC_RenameObjectPointInScene(
       [Ref] Project project,
-      [Ref] Layout layout,
+      [Ref] Layout scene,
       [Ref] gdObject gdObject,
       [Const] DOMString oldName,
       [Const] DOMString newName);
-    void STATIC_ObjectOrGroupRenamedInLayout([Ref] Project project, [Ref] Layout layout, [Const] DOMString oldName, [Const] DOMString newName, boolean isObjectGroup);
-    void STATIC_ObjectRemovedInLayout(
+    void STATIC_RenameObjectPointInEventsBasedObject(
+      [Ref] Project project,
+      [Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Ref] EventsBasedObject eventsBasedObject,
+      [Ref] gdObject gdObject,
+      [Const] DOMString oldName,
+      [Const] DOMString newName);
+    void STATIC_RenameObjectEffectInScene(
+      [Ref] Project project,
+      [Ref] Layout scene,
+      [Ref] gdObject gdObject,
+      [Const] DOMString oldName,
+      [Const] DOMString newName);
+    void STATIC_RenameObjectEffectInEventsBasedObject(
+      [Ref] Project project,
+      [Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Ref] EventsBasedObject eventsBasedObject,
+      [Ref] gdObject gdObject,
+      [Const] DOMString oldName,
+      [Const] DOMString newName);
+    void STATIC_ObjectOrGroupRenamedInScene(
         [Ref] Project project,
-        [Ref] Layout layout,
+        [Ref] Layout scene,
+        [Const] DOMString oldName,
+        [Const] DOMString newName,
+        boolean isObjectGroup);
+    void STATIC_ObjectRemovedInScene(
+        [Ref] Project project,
+        [Ref] Layout scene,
         [Const] DOMString objectName);
-    void STATIC_BehaviorsAddedToObjectInLayout(
+    void STATIC_BehaviorsAddedToObjectInScene(
         [Ref] Project project,
-        [Ref] Layout layout,
+        [Ref] Layout scene,
         [Const] DOMString objectName);
     void STATIC_ObjectOrGroupRenamedInEventsFunction(
         [Ref] Project project,

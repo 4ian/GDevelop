@@ -6,6 +6,8 @@ import Snackbar from '@material-ui/core/Snackbar';
 import HomeIcon from '../UI/CustomSvgIcons/Home';
 import DebuggerIcon from '../UI/CustomSvgIcons/Debug';
 import ProjectResourcesIcon from '../UI/CustomSvgIcons/ProjectResources';
+import SceneIcon from '../UI/CustomSvgIcons/Scene';
+import EventsIcon from '../UI/CustomSvgIcons/Events';
 import ExternalEventsIcon from '../UI/CustomSvgIcons/ExternalEvents';
 import ExternalLayoutIcon from '../UI/CustomSvgIcons/ExternalLayout';
 import ExtensionIcon from '../UI/CustomSvgIcons/Extension';
@@ -603,6 +605,10 @@ const MainFrame = (props: Props) => {
           <DebuggerIcon />
         ) : kind === 'resources' ? (
           <ProjectResourcesIcon />
+        ) : kind === 'layout' ? (
+          <SceneIcon />
+        ) : kind === 'layout events' ? (
+          <EventsIcon />
         ) : kind === 'external events' ? (
           <ExternalEventsIcon />
         ) : kind === 'external layout' ? (

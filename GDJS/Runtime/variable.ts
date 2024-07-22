@@ -621,6 +621,16 @@ namespace gdjs {
     }
 
     /**
+     * Pushes a variable into the array without duplicating it first.
+     * This should only be used by generated code.
+     */
+    _pushVariable(variable: gdjs.Variable) {
+      if (this._type !== 'array') this.castTo('array');
+
+      this._childrenArray.push(variable);
+    }
+
+    /**
      * Pushes a value into the array.
      */
     pushValue(value: string | float | boolean) {

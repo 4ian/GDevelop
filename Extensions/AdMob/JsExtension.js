@@ -166,11 +166,11 @@ module.exports = {
       )
       .addParameter('string', _('Android app open ID'), '', false)
       .setParameterLongDescription(
-        'Get it from your AdMob account. You can use `"ca-app-pub-3940256099942544/3419835294"` for loading a test app open.'
+        'Get it from your AdMob account. You can use `"ca-app-pub-3940256099942544/9257395921"` for loading a test app open.'
       )
       .addParameter('string', _('iOS app open ID'), '', false)
       .setParameterLongDescription(
-        'Get it from your AdMob account. You can use `"ca-app-pub-3940256099942544/5662855259"` for loading a test app open.'
+        'Get it from your AdMob account. You can use `"ca-app-pub-3940256099942544/5575463023"` for loading a test app open.'
       )
       .addParameter(
         'yesorno',

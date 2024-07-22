@@ -7,8 +7,8 @@ namespace gdjs {
 
     const testAdIds = {
       appOpen: {
-        android: 'ca-app-pub-3940256099942544/3419835294',
-        ios: 'ca-app-pub-3940256099942544/5662855259',
+        android: 'ca-app-pub-3940256099942544/9257395921',
+        ios: 'ca-app-pub-3940256099942544/5575463023',
       },
       banner: {
         android: 'ca-app-pub-3940256099942544/6300978111',

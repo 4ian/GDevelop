@@ -164,7 +164,21 @@ export const useShopNavigation = (): NavigationState => {
             previousHistory.previousPages[
               previousHistory.previousPages.length - 1
             ];
-          if (!isSearchResultPage(currentPage)) {
+          if (isSearchResultPage(currentPage)) {
+            const updatedCurrentPage = {
+              ...currentPage,
+              pageBreakIndex: 0,
+              scrollPosition: 0,
+            };
+            return {
+              ...previousHistory,
+              previousPages: [
+                // All pages except the last one
+                ...previousHistory.previousPages.slice(0, -1),
+                updatedCurrentPage,
+              ],
+            };
+          } else {
             return {
               ...previousHistory,
               previousPages: [
@@ -173,8 +187,6 @@ export const useShopNavigation = (): NavigationState => {
               ],
             };
           }
-
-          return previousHistory;
         });
       },
       openTagPage: (tag: string) => {

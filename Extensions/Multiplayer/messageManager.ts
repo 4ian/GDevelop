@@ -1942,7 +1942,10 @@ namespace gdjs {
       };
     };
     const hasSentHeartbeatRecently = () => {
-      return getTimeNow() - lastHeartbeatTimestamp < 1000 / heartbeatTickRate;
+      return (
+        !!lastHeartbeatTimestamp &&
+        getTimeNow() - lastHeartbeatTimestamp < 1000 / heartbeatTickRate
+      );
     };
     const handleHeartbeatsToSend = () => {
       // Only host sends heartbeats to all players regularly:
@@ -2302,10 +2305,6 @@ namespace gdjs {
       gdjs.multiplayer.handleLobbyGameEnded();
     };
 
-    const updatePlayersInfoForTests = (playersInfo) => {
-      _playersInfo = playersInfo;
-    };
-
     const clearMessagesTempData = () => {
       _playersLastRoundTripTimes = {};
       _playersInfo = {};
@@ -2365,7 +2364,6 @@ namespace gdjs {
       getCurrentPlayerPing,
       getPlayerUsername,
       getPlayerId,
-      updatePlayersInfoForTests,
       // Connected players.
       handleJustDisconnectedPeers,
       getConnectedPlayers,

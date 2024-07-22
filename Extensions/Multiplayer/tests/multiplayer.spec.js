@@ -239,87 +239,136 @@ describe('Multiplayer', () => {
 
     gdjs.multiplayerPeerJsHelper = peerJsHelperMock;
 
-    return {
-      /**
-       *
-       * @param {{ playerNumber: number, allConnectedPlayers: {playerNumber: number, peerId: string}[], justDisconnectedPeers?: string[]}} options
-       */
-      switchToPeer: ({
-        playerNumber,
-        allConnectedPlayers,
-        justDisconnectedPeers,
-      }) => {
-        const peerId = allConnectedPlayers.find(
-          (player) => player.playerNumber === playerNumber
-        ).peerId;
-        // console.log('## SWITCHING TO PEER', peerId);
-
-        // Switch the state of the peerJs mock.
-        p2pState.currentPeerId = peerId;
-        p2pState.justDisconnectedPeers = justDisconnectedPeers || [];
-        // Player 1 is connected to everyone else, and everyone else is connected to player 1.
-        if (playerNumber === 1) {
-          p2pState.otherPeerIds = allConnectedPlayers
-            .filter((player) => player.playerNumber !== 1)
-            .map((player) => player.peerId);
-        } else {
-          p2pState.otherPeerIds = allConnectedPlayers
-            .filter((player) => player.playerNumber === 1)
-            .map((player) => player.peerId);
+    /**
+     * Helper to clear all messages stored in the peer messages lists.
+     */
+    const markAllPeerMessagesAsProcessed = () => {
+      for (const allMessagesList of Object.values(peerAllMessagesMap)) {
+        for (const messagesList of allMessagesList.values()) {
+          messagesList.data = [];
         }
+      }
+    };
 
-        // Switch the state of the MultiplayerMessageManager.
-        gdjs.multiplayerMessageManager = peerMultiplayerMessageManager[peerId] =
-          peerMultiplayerMessageManager[peerId] ||
-          gdjs.makeMultiplayerMessageManager();
-        // Switch the state of the MultiplayerVariablesManager.
-        gdjs.multiplayerVariablesManager = peerMultiplayerVariablesManager[
-          peerId
-        ] =
-          peerMultiplayerVariablesManager[peerId] ||
-          gdjs.makeMultiplayerVariablesManager();
+    const expectNoMessagesToBeProcessed = () => {
+      for (const allMessagesList of Object.values(peerAllMessagesMap)) {
+        for (const messagesList of allMessagesList.values()) {
+          expect(messagesList.getMessages().length).to.be(0);
+        }
+      }
+    };
 
-        // Ensure the messageManager is aware of the other players.
-        const playersInfo = allConnectedPlayers.reduce((acc, player) => {
-          acc[player.playerNumber] = {
-            ping: Math.random() * 100,
-            playerId: `player-${player.playerNumber}`,
-            username: `Player ${player.playerNumber}`,
-          };
-          return acc;
-        }, {});
+    /**
+     * @param {{ playerNumber: number, allConnectedPlayers: {playerNumber: number, peerId: string}[], justDisconnectedPeers?: string[]}} options
+     */
+    const switchToPeer = ({
+      playerNumber,
+      allConnectedPlayers,
+      justDisconnectedPeers,
+    }) => {
+      const peerId = allConnectedPlayers.find(
+        (player) => player.playerNumber === playerNumber
+      ).peerId;
+      console.log('## SWITCHING TO PEER', peerId);
 
-        gdjs.multiplayerMessageManager.updatePlayersInfoForTests(playersInfo);
+      // Switch the state of the peerJs mock.
+      p2pState.currentPeerId = peerId;
+      p2pState.justDisconnectedPeers = justDisconnectedPeers || [];
+      // Player 1 is connected to everyone else, and everyone else is connected to player 1.
+      if (playerNumber === 1) {
+        p2pState.otherPeerIds = allConnectedPlayers
+          .filter((player) => player.playerNumber !== 1)
+          .map((player) => player.peerId);
+      } else {
+        p2pState.otherPeerIds = allConnectedPlayers
+          .filter((player) => player.playerNumber === 1)
+          .map((player) => player.peerId);
+      }
 
-        // Switch the state of the game.
-        gdjs.multiplayer.playerNumber = playerNumber;
-      },
-      logMessages: () => {
-        Object.keys(peerAllMessagesMap).forEach((peerId) => {
-          console.log(`## PEER ${peerId} messages:`);
-          for (const [messageName, messagesList] of peerAllMessagesMap[
-            peerId
-          ]) {
-            console.log(
-              `${messageName}: ${JSON.stringify(messagesList.getMessages())}`
-            );
-          }
+      // Switch the state of the MultiplayerMessageManager.
+      gdjs.multiplayerMessageManager = peerMultiplayerMessageManager[peerId];
+      // Switch the state of the MultiplayerVariablesManager.
+      gdjs.multiplayerVariablesManager =
+        peerMultiplayerVariablesManager[peerId];
+      // Switch the state of the game.
+      gdjs.multiplayer.playerNumber = playerNumber;
+    };
+
+    /**
+     * Helper to fast forward a bit of time in players games, so that heartbeats
+     * are sent and all players are aware of each other.
+     * @param {{ playerNumber: number, peerId: string}} players
+     */
+    const initiateGameWithPlayers = (players) => {
+      // Create the instances of the MultiplayerMessageManager and MultiplayerVariablesManager
+      // for each player.
+      for (const player of players) {
+        peerMultiplayerMessageManager[
+          player.peerId
+        ] = gdjs.makeMultiplayerMessageManager();
+        peerMultiplayerVariablesManager[
+          player.peerId
+        ] = gdjs.makeMultiplayerVariablesManager();
+      }
+
+      // Use a scene to simulate the game loop moving forward.
+      const runtimeScene = makeTestRuntimeSceneWithNetworkId();
+      runtimeScene.renderAndStep(1000 / 60);
+
+      // Speed up time on player 1 to send heartbeats.
+      switchToPeer({
+        playerNumber: 1,
+        allConnectedPlayers: players,
+      });
+      runtimeScene.renderAndStep(1000 / 60);
+
+      // Speed up time on other players to receive heartbeats and send them back.
+      for (const player of players) {
+        if (player.playerNumber === 1) continue;
+        switchToPeer({
+          playerNumber: player.playerNumber,
+          allConnectedPlayers: players,
         });
-      },
-      markAllPeerMessagesAsProcessed: () => {
-        for (const allMessagesList of Object.values(peerAllMessagesMap)) {
-          for (const messagesList of allMessagesList.values()) {
-            messagesList.data = [];
-          }
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+
+      // Speed up time on player 1 to receive heartbeats and send them back.
+      switchToPeer({
+        playerNumber: 1,
+        allConnectedPlayers: players,
+      });
+      runtimeScene.renderAndStep(1000 / 60);
+
+      // Speed up time on other players to receive updated heartbeats with players info.
+      for (const player of players) {
+        if (player.playerNumber === 1) continue;
+        switchToPeer({
+          playerNumber: player.playerNumber,
+          allConnectedPlayers: players,
+        });
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+
+      markAllPeerMessagesAsProcessed();
+    };
+
+    const logMessages = () => {
+      Object.keys(peerAllMessagesMap).forEach((peerId) => {
+        console.log(`## PEER ${peerId} messages:`);
+        for (const [messageName, messagesList] of peerAllMessagesMap[peerId]) {
+          console.log(
+            `${messageName}: ${JSON.stringify(messagesList.getMessages())}`
+          );
         }
-      },
-      expectNoMessagesToBeProcessed: () => {
-        for (const allMessagesList of Object.values(peerAllMessagesMap)) {
-          for (const messagesList of allMessagesList.values()) {
-            expect(messagesList.getMessages().length).to.be(0);
-          }
-        }
-      },
+      });
+    };
+
+    return {
+      initiateGameWithPlayers,
+      switchToPeer,
+      logMessages,
+      markAllPeerMessagesAsProcessed,
+      expectNoMessagesToBeProcessed,
     };
   };
 
@@ -343,11 +392,13 @@ describe('Multiplayer', () => {
       const {
         switchToPeer,
         markAllPeerMessagesAsProcessed,
+        initiateGameWithPlayers,
       } = createMultiplayerManagersMock();
       const allConnectedPlayers = [
         { playerNumber: 1, peerId: 'player-1' },
         { playerNumber: 2, peerId: 'player-2' },
       ];
+      initiateGameWithPlayers(allConnectedPlayers);
 
       switchToPeer({
         playerNumber: 1,
@@ -536,12 +587,14 @@ describe('Multiplayer', () => {
         switchToPeer,
         markAllPeerMessagesAsProcessed,
         expectNoMessagesToBeProcessed,
+        initiateGameWithPlayers,
       } = createMultiplayerManagersMock();
 
       const allConnectedPlayers = [
         { playerNumber: 1, peerId: 'player-1' },
         { playerNumber: 2, peerId: 'player-2' },
       ];
+      initiateGameWithPlayers(allConnectedPlayers);
 
       switchToPeer({
         playerNumber: 1,
@@ -620,6 +673,7 @@ describe('Multiplayer', () => {
         switchToPeer,
         markAllPeerMessagesAsProcessed,
         expectNoMessagesToBeProcessed,
+        initiateGameWithPlayers,
       } = createMultiplayerManagersMock();
 
       const allConnectedPlayers = [
@@ -627,6 +681,7 @@ describe('Multiplayer', () => {
         { playerNumber: 2, peerId: 'player-2' },
         { playerNumber: 3, peerId: 'player-3' },
       ];
+      initiateGameWithPlayers(allConnectedPlayers);
 
       switchToPeer({
         playerNumber: 1,
@@ -755,6 +810,7 @@ describe('Multiplayer', () => {
         switchToPeer,
         markAllPeerMessagesAsProcessed,
         expectNoMessagesToBeProcessed,
+        initiateGameWithPlayers,
       } = createMultiplayerManagersMock();
 
       const allConnectedPlayers = [
@@ -762,6 +818,7 @@ describe('Multiplayer', () => {
         { playerNumber: 2, peerId: 'player-2' },
         { playerNumber: 3, peerId: 'player-3' },
       ];
+      initiateGameWithPlayers(allConnectedPlayers);
 
       switchToPeer({
         playerNumber: 1,
@@ -949,12 +1006,14 @@ describe('Multiplayer', () => {
       const {
         switchToPeer,
         markAllPeerMessagesAsProcessed,
+        initiateGameWithPlayers,
       } = createMultiplayerManagersMock();
 
       const allConnectedPlayers = [
         { playerNumber: 1, peerId: 'player-1' },
         { playerNumber: 2, peerId: 'player-2' },
       ];
+      initiateGameWithPlayers(allConnectedPlayers);
 
       // Create an instance on the host's game:
       switchToPeer({
@@ -1076,6 +1135,7 @@ describe('Multiplayer', () => {
       const {
         switchToPeer,
         markAllPeerMessagesAsProcessed,
+        initiateGameWithPlayers,
       } = createMultiplayerManagersMock();
 
       const allConnectedPlayers = [
@@ -1083,6 +1143,7 @@ describe('Multiplayer', () => {
         { playerNumber: 2, peerId: 'player-2' },
         { playerNumber: 3, peerId: 'player-3' },
       ];
+      initiateGameWithPlayers(allConnectedPlayers);
 
       // Create an instance on a player:
       switchToPeer({
@@ -1277,6 +1338,7 @@ describe('Multiplayer', () => {
         switchToPeer,
         markAllPeerMessagesAsProcessed,
         expectNoMessagesToBeProcessed,
+        initiateGameWithPlayers,
       } = createMultiplayerManagersMock();
 
       const allConnectedPlayers = [
@@ -1284,6 +1346,7 @@ describe('Multiplayer', () => {
         { playerNumber: 2, peerId: 'player-2' },
         { playerNumber: 3, peerId: 'player-3' },
       ];
+      initiateGameWithPlayers(allConnectedPlayers);
 
       // Create an instance on the host's game:
       switchToPeer({
@@ -1547,6 +1610,7 @@ describe('Multiplayer', () => {
       const {
         switchToPeer,
         markAllPeerMessagesAsProcessed,
+        initiateGameWithPlayers,
       } = createMultiplayerManagersMock();
 
       const allConnectedPlayers = [
@@ -1554,6 +1618,7 @@ describe('Multiplayer', () => {
         { playerNumber: 2, peerId: 'player-2' },
         { playerNumber: 3, peerId: 'player-3' },
       ];
+      initiateGameWithPlayers(allConnectedPlayers);
 
       // Create an instance on a player:
       switchToPeer({
@@ -1753,13 +1818,17 @@ describe('Multiplayer', () => {
     });
 
     it('deletes an instance owned by another player after a bit (if not "reconciled" in the meantime)', async () => {
-      const { switchToPeer } = createMultiplayerManagersMock();
+      const {
+        switchToPeer,
+        initiateGameWithPlayers,
+      } = createMultiplayerManagersMock();
 
       const allConnectedPlayers = [
         { playerNumber: 1, peerId: 'player-1' },
         { playerNumber: 2, peerId: 'player-2' },
         { playerNumber: 3, peerId: 'player-3' },
       ];
+      initiateGameWithPlayers(allConnectedPlayers);
 
       // Create an instance on a player (2), owned by another player (3).
       // We can assume it's because there is some common logic running for all players
@@ -1808,12 +1877,16 @@ describe('Multiplayer', () => {
     });
 
     it('deletes an instance owned by another player instantly if not belonging to an existing player', async () => {
-      const { switchToPeer } = createMultiplayerManagersMock();
+      const {
+        switchToPeer,
+        initiateGameWithPlayers,
+      } = createMultiplayerManagersMock();
 
       const allConnectedPlayers = [
         { playerNumber: 1, peerId: 'player-1' },
         { playerNumber: 2, peerId: 'player-2' },
       ];
+      initiateGameWithPlayers(allConnectedPlayers);
 
       // Create an instance on a player (2), owned by another player (3).
       // We can assume it's because there is some common logic running for all players
@@ -1848,6 +1921,7 @@ describe('Multiplayer', () => {
       const {
         switchToPeer,
         markAllPeerMessagesAsProcessed,
+        initiateGameWithPlayers,
       } = createMultiplayerManagersMock();
 
       const allConnectedPlayers = [
@@ -1855,6 +1929,7 @@ describe('Multiplayer', () => {
         { playerNumber: 2, peerId: 'player-2' },
         { playerNumber: 3, peerId: 'player-3' },
       ];
+      initiateGameWithPlayers(allConnectedPlayers);
 
       // Create an instance on the host's game:
       switchToPeer({
@@ -2105,12 +2180,16 @@ describe('Multiplayer', () => {
     });
 
     it('synchronizes object behaviors from the host to other players', async () => {
-      const { switchToPeer } = createMultiplayerManagersMock();
+      const {
+        switchToPeer,
+        initiateGameWithPlayers,
+      } = createMultiplayerManagersMock();
 
       const allConnectedPlayers = [
         { playerNumber: 1, peerId: 'player-1' },
         { playerNumber: 2, peerId: 'player-2' },
       ];
+      initiateGameWithPlayers(allConnectedPlayers);
 
       // Create an instance on the host's game:
       switchToPeer({
@@ -2264,12 +2343,16 @@ describe('Multiplayer', () => {
     });
 
     it('does not synchronize object behaviors if defined as not synchronized', async () => {
-      const { switchToPeer } = createMultiplayerManagersMock();
+      const {
+        switchToPeer,
+        initiateGameWithPlayers,
+      } = createMultiplayerManagersMock();
 
       const allConnectedPlayers = [
         { playerNumber: 1, peerId: 'player-1' },
         { playerNumber: 2, peerId: 'player-2' },
       ];
+      initiateGameWithPlayers(allConnectedPlayers);
 
       // Create an instance on the host's game:
       switchToPeer({
@@ -2345,17 +2428,21 @@ describe('Multiplayer', () => {
     };
 
     it('synchronizes scenes from the host to other players', async () => {
-      const { switchToPeer } = createMultiplayerManagersMock();
+      const {
+        switchToPeer,
+        initiateGameWithPlayers,
+      } = createMultiplayerManagersMock();
+
+      const allConnectedPlayers = [
+        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 2, peerId: 'player-2' },
+      ];
+      initiateGameWithPlayers(allConnectedPlayers);
 
       const gameLayoutData = [
         getFakeSceneAndExtensionData({ name: 'Scene1' }).sceneData,
         getFakeSceneAndExtensionData({ name: 'Scene2' }).sceneData,
         getFakeSceneAndExtensionData({ name: 'Scene3' }).sceneData,
-      ];
-
-      const allConnectedPlayers = [
-        { playerNumber: 1, peerId: 'player-1' },
-        { playerNumber: 2, peerId: 'player-2' },
       ];
 
       // Launch two games.
@@ -2472,12 +2559,14 @@ describe('Multiplayer', () => {
       const {
         switchToPeer,
         markAllPeerMessagesAsProcessed,
+        initiateGameWithPlayers,
       } = createMultiplayerManagersMock();
 
       const allConnectedPlayers = [
         { playerNumber: 1, peerId: 'player-1' },
         { playerNumber: 2, peerId: 'player-2' },
       ];
+      initiateGameWithPlayers(allConnectedPlayers);
 
       const gameLayoutData = [
         getFakeSceneAndExtensionData({ name: 'Scene1' }).sceneData,

@@ -39,14 +39,25 @@ const ObjectGroupEditorDialog = ({
   );
 
   const onApplyToEmptyGroup = React.useCallback(
-    (groupObjectNames: Array<string>) => {
+    (
+      objectGroupName: string,
+      shouldSpreadAnyVariables: boolean,
+      groupObjectNames: Array<string>
+    ) => {
+      // TODO Handle shouldSpreadAnyVariables
       if (editedObjectGroup) {
         for (const objectName of groupObjectNames) {
           editedObjectGroup.addObject(objectName);
         }
-        onApply();
+        if (groupObjectNames.length === 0) {
+          // An empty group would have shown the same dialog.
+          onApply();
+        } else {
+          setEditedObjectGroup(editedObjectGroup);
+          setSelectedTab('variables');
+        }
       } else {
-        const name = newNameGenerator('Group', name =>
+        const name = newNameGenerator(objectGroupName || 'Group', name =>
           projectScopedContainersAccessor
             .get()
             .getObjectsContainersList()
@@ -61,9 +72,14 @@ const ObjectGroupEditorDialog = ({
         for (const objectName of groupObjectNames) {
           newObjectGroup.addObject(objectName);
         }
-        setEditedObjectGroup(newObjectGroup);
-        setSelectedTab('variables');
         onObjectGroupAdded();
+        if (groupObjectNames.length === 0) {
+          // An empty group would have shown the same dialog.
+          onApply();
+        } else {
+          setEditedObjectGroup(newObjectGroup);
+          setSelectedTab('variables');
+        }
       }
     },
     [
@@ -84,6 +100,7 @@ const ObjectGroupEditorDialog = ({
       onCancel={onCancel}
       globalObjectsContainer={globalObjectsContainer}
       objectsContainer={objectsContainer}
+      isGroupAlreadyAdded={!!editedObjectGroup}
     />
   ) : (
     <EditedObjectGroupEditorDialog

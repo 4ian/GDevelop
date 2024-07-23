@@ -1,21 +1,29 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import React from 'react';
 import FlatButton from '../UI/FlatButton';
 import ObjectGroupEditor from '.';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
+import SemiControlledTextField from '../UI/SemiControlledTextField';
+import { ColumnStackLayout } from '../UI/Layout';
+import Checkbox from '../UI/Checkbox';
 
 export type ObjectGroupEditorTab = 'objects' | 'variables';
 
 type Props = {|
   project: gdProject,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
-  onApply: (groupObjectNames: Array<string>) => void,
+  onApply: (
+    objectGroupName: string,
+    shouldAnyVariables: boolean,
+    groupObjectNames: Array<string>
+  ) => void,
   onCancel: () => void,
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
+  isGroupAlreadyAdded: boolean,
 |};
 
 const NewObjectGroupEditorDialog = ({
@@ -25,9 +33,15 @@ const NewObjectGroupEditorDialog = ({
   onCancel,
   globalObjectsContainer,
   objectsContainer,
+  isGroupAlreadyAdded,
 }: Props) => {
   const forceUpdate = useForceUpdate();
 
+  const [objectGroupName, setObjectGroupName] = React.useState<string>('');
+  const [
+    shouldSpreadAnyVariables,
+    setShouldSpreadAnyVariables,
+  ] = React.useState<boolean>(false);
   const [groupObjectNames, setGroupObjectNames] = React.useState<Array<string>>(
     []
   );
@@ -59,9 +73,9 @@ const NewObjectGroupEditorDialog = ({
 
   const apply = React.useCallback(
     () => {
-      onApply(groupObjectNames);
+      onApply(objectGroupName, shouldSpreadAnyVariables, groupObjectNames);
     },
-    [groupObjectNames, onApply]
+    [groupObjectNames, objectGroupName, onApply, shouldSpreadAnyVariables]
   );
 
   return (
@@ -86,6 +100,28 @@ const NewObjectGroupEditorDialog = ({
       onApply={apply}
       open
       maxWidth="sm"
+      fixedContent={
+        <ColumnStackLayout>
+          {!isGroupAlreadyAdded && (
+            <SemiControlledTextField
+              fullWidth
+              id="object-name"
+              commitOnBlur
+              floatingLabelText={<Trans>Group name</Trans>}
+              floatingLabelFixed
+              value={objectGroupName}
+              translatableHintText={t`Group name`}
+              onChange={setObjectGroupName}
+              autoFocus="desktop"
+            />
+          )}
+          <Checkbox
+            label={<Trans>Add any object variable to the group</Trans>}
+            checked={shouldSpreadAnyVariables}
+            onCheck={(e, checked) => setShouldSpreadAnyVariables(checked)}
+          />
+        </ColumnStackLayout>
+      }
     >
       <ObjectGroupEditor
         project={project}

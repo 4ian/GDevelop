@@ -47,7 +47,10 @@ import TileMapTilePreview, {
   getTilesGridCoordinatesFromPointerSceneCoordinates,
   updateSceneToTileMapTransformation,
 } from './TileMapTilePreview';
-import { type TileMapTileSelection } from './TileSetVisualizer';
+import {
+  getTileIdFromGridCoordinates,
+  type TileMapTileSelection,
+} from './TileSetVisualizer';
 import ClickInterceptor from './ClickInterceptor';
 import getObjectByName from '../Utils/GetObjectByName';
 import { AffineTransformation } from '../Utils/AffineTransformation';
@@ -819,8 +822,10 @@ export default class InstancesEditor extends Component<Props> {
             // we have to take them into account for the current coordinates.
             gridX + cumulatedUnshiftedColumns,
             gridY + cumulatedUnshiftedRows,
-            tileSet.rowCount * tileMapTileSelection.coordinates.x +
-              tileMapTileSelection.coordinates.y,
+            getTileIdFromGridCoordinates({
+              rowCount: tileSet.rowCount,
+              ...tileMapTileSelection.coordinates,
+            }),
             {
               flipVertically: tileMapTileSelection.flipVertically,
               flipHorizontally: tileMapTileSelection.flipHorizontally,

@@ -517,11 +517,12 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
         // Array.from is needed to convert Int32Array to Array. Otherwise, JSON.stringify
         // serializes it as an object with index as keys.
         Array.from(
-          row.map(
-            (_, x) =>
-              // -1 corresponds to null value
-              this.getTileGID(x, y) || -1
-          )
+          row.map((_, x) => {
+            const tileGID = this.getTileGID(x, y);
+            // -1 corresponds to null value
+            if (tileGID === undefined) return -1;
+            return tileGID;
+          })
         )
       ),
     };

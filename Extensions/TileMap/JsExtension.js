@@ -1745,14 +1745,14 @@ module.exports = {
 
       async _loadTileMap(tilemapJsonFile, tilesetJsonFile) {
         try {
-          const tileMapJsonData =
-            await this._pixiResourcesLoader.getResourceJsonData(
-              this._project,
-              tilemapJsonFile
-            );
+          const tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
+            this._project,
+            tilemapJsonFile
+          );
 
-          const tileMap =
-            TilemapHelper.TileMapManager.identify(tileMapJsonData);
+          const tileMap = TilemapHelper.TileMapManager.identify(
+            tileMapJsonData
+          );
 
           if (tileMap.kind === 'tiled') {
             const tilesetJsonData = tilesetJsonFile
@@ -1902,9 +1902,9 @@ module.exports = {
         this._placeholderImagePixiObject.interactive = true;
         this._placeholderTextPixiObject.anchor.x = 0.5;
         this._placeholderTextPixiObject.anchor.y = 0.5;
-        this._placeholderTextPixiObject.y = 30
-        this._placeholderImagePixiObject.y = -30
-        this._placeholderImagePixiObject.x = -16
+        this._placeholderTextPixiObject.y = 30;
+        this._placeholderImagePixiObject.y = -30;
+        this._placeholderImagePixiObject.x = -16;
         this._placeholderPixiObject.addChild(this._placeholderTextPixiObject);
         this._placeholderPixiObject.addChild(this._placeholderImagePixiObject);
         this._pixiObject.addChild(this._placeholderPixiObject);
@@ -2349,14 +2349,14 @@ module.exports = {
 
       async _loadTileMap(tilemapJsonFile, tilesetJsonFile) {
         try {
-          const tileMapJsonData =
-            await this._pixiResourcesLoader.getResourceJsonData(
-              this._project,
-              tilemapJsonFile
-            );
+          const tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
+            this._project,
+            tilemapJsonFile
+          );
 
-          const tileMap =
-            TilemapHelper.TileMapManager.identify(tileMapJsonData);
+          const tileMap = TilemapHelper.TileMapManager.identify(
+            tileMapJsonData
+          );
 
           if (tileMap.kind === 'tiled') {
             const tilesetJsonData = tilesetJsonFile

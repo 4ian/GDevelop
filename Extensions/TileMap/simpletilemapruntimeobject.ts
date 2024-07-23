@@ -625,33 +625,9 @@ namespace gdjs {
       columnIndex: integer,
       rowIndex: integer
     ) {
-      const addedData = this._renderer.setTileId(
-        columnIndex,
-        rowIndex,
-        0,
-        tileId
-      );
+      this._renderer.setTileId(columnIndex, rowIndex, 0, tileId);
       this._isTileMapDirty = true;
-      if (addedData) {
-        const {
-          unshiftedRows,
-          unshiftedColumns,
-          appendedColumns,
-          appendedRows,
-        } = addedData;
-        const scaleX = this.getScaleX();
-        const scaleY = this.getScaleY();
-        this.setX(this.getX() - unshiftedColumns * (this._tileSize * scaleX));
-        this.setY(this.getY() - unshiftedRows * (this._tileSize * scaleY));
-        if (
-          unshiftedColumns > 0 ||
-          unshiftedRows > 0 ||
-          appendedColumns > 0 ||
-          appendedRows > 0
-        ) {
-          this.invalidateHitboxes();
-        }
-      }
+      this.invalidateHitboxes();
       this._transformationIsUpToDate = false;
     }
 
@@ -730,29 +706,7 @@ namespace gdjs {
     removeTileAtGridCoordinates(columnIndex: integer, rowIndex: integer) {
       this._renderer.removeTile(columnIndex, rowIndex, 0);
       this._isTileMapDirty = true;
-      const removedData = this._renderer.trimEmptyColumnsAndRows(0);
-      if (removedData) {
-        const {
-          shiftedRows,
-          shiftedColumns,
-          poppedColumns,
-          poppedRows,
-        } = removedData;
-        this.setX(
-          this.getX() + shiftedColumns * (this._tileSize * this.getScaleX())
-        );
-        this.setY(
-          this.getY() + shiftedRows * (this._tileSize * this.getScaleY())
-        );
-        if (
-          shiftedColumns > 0 ||
-          shiftedRows > 0 ||
-          poppedColumns > 0 ||
-          poppedRows > 0
-        ) {
-          this.invalidateHitboxes();
-        }
-      }
+      this.invalidateHitboxes();
       this._transformationIsUpToDate = false;
     }
   }

@@ -876,7 +876,7 @@ export default class InstancesEditor extends Component<Props> {
         this.props.onInstancesResized([selectedInstance]);
       } else if (tileMapTileSelection.kind === 'erase') {
         tileMapGridCoordinates.forEach(({ x: gridX, y: gridY }) => {
-          editableTileMap.removeTile(gridX, gridY);
+          editableTileMap.removeTile(gridX, gridY, 0);
         });
         const {
           shiftedRows,

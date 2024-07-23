@@ -772,7 +772,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
     .addParameter('object', _('Tilemap'), 'SimpleTileMap', false)
     .addParameter('number', _('Position X'), '', false)
     .addParameter('number', _('Position Y'), '', false)
-    .setFunctionName('getColumnIndexAtSceneCoordinates');
+    .setFunctionName('getColumnIndexAtPosition');
 
   object
     .addExpression(
@@ -787,7 +787,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
     .addParameter('object', _('Tilemap'), 'SimpleTileMap', false)
     .addParameter('number', _('Position X'), '', false)
     .addParameter('number', _('Position Y'), '', false)
-    .setFunctionName('getRowIndexAtSceneCoordinates');
+    .setFunctionName('getRowIndexAtPosition');
 
   object
     .addExpressionAndConditionAndAction(
@@ -803,8 +803,8 @@ const defineSimpleTileMap = function (extension, _, gd) {
     .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
     .addParameter('number', _('Position X'), '', false)
     .addParameter('number', _('Position Y'), '', false)
-    .setFunctionName('setTileAtSceneCoordinates')
-    .setGetter('getTileAtSceneCoordinates');
+    .setFunctionName('setTileAtPosition')
+    .setGetter('getTileAtPosition');
 
   object
     .addAction(

@@ -592,15 +592,15 @@ namespace gdjs {
       return [columnIndex, rowIndex];
     }
 
-    getColumnIndexAtSceneCoordinates(x: float, y: float): integer {
+    getColumnIndexAtPosition(x: float, y: float): integer {
       return this.getGridCoordinatesFromSceneCoordinates(x, y)[0];
     }
 
-    getRowIndexAtSceneCoordinates(x: float, y: float): integer {
+    getRowIndexAtPosition(x: float, y: float): integer {
       return this.getGridCoordinatesFromSceneCoordinates(x, y)[1];
     }
 
-    getTileAtSceneCoordinates(x: float, y: float): integer {
+    getTileAtPosition(x: float, y: float): integer {
       const [
         columnIndex,
         rowIndex,
@@ -612,7 +612,7 @@ namespace gdjs {
       return this._renderer.getTileId(columnIndex, rowIndex, 0);
     }
 
-    setTileAtSceneCoordinates(tileId: number, x: float, y: float) {
+    setTileAtPosition(tileId: number, x: float, y: float) {
       const [
         columnIndex,
         rowIndex,
@@ -695,7 +695,7 @@ namespace gdjs {
       return this._renderer.isTileFlippedOnY(columnIndex, rowIndex, 0);
     }
 
-    removeTileAtSceneCoordinates(x: float, y: float) {
+    removeTileAtPosition(x: float, y: float) {
       const [
         columnIndex,
         rowIndex,

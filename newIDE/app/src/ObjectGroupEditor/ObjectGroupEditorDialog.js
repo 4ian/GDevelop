@@ -13,7 +13,7 @@ type Props = {|
   group: gdObjectGroup | null,
   onApply: () => void,
   onCancel: () => void,
-  onObjectGroupAdded: () => void,
+  onObjectGroupAdded: (objectGroup: gdObjectGroup) => void,
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
   initialTab?: ?ObjectGroupEditorTab,
@@ -72,7 +72,7 @@ const ObjectGroupEditorDialog = ({
         for (const objectName of groupObjectNames) {
           newObjectGroup.addObject(objectName);
         }
-        onObjectGroupAdded();
+        onObjectGroupAdded(newObjectGroup);
         if (groupObjectNames.length === 0) {
           // An empty group would have shown the same dialog.
           onApply();

@@ -1998,9 +1998,11 @@ export default class SceneEditor extends React.Component<Props, State> {
                   globalObjectsContainer={this.props.globalObjectsContainer}
                   onCancel={this._closeObjectGroupEditorDialog}
                   onApply={this._closeObjectGroupEditorDialog}
-                  onObjectGroupAdded={() => {
+                  onObjectGroupAdded={(objectGroup: gdObjectGroup) => {
                     if (this.editorDisplay) {
-                      this.editorDisplay.forceUpdateObjectGroupsList();
+                      this.editorDisplay.scrollObjectGroupsListToObjectGroup(
+                        objectGroup
+                      );
                     }
                   }}
                   initialTab={'objects'}

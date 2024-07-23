@@ -118,6 +118,13 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
   const forceUpdateObjectGroupsList = React.useCallback(() => {
     if (objectGroupsListRef.current) objectGroupsListRef.current.forceUpdate();
   }, []);
+  const scrollObjectGroupsListToObjectGroup = React.useCallback(
+    (objectGroup: gdObjectGroup) => {
+      if (objectGroupsListRef.current)
+        objectGroupsListRef.current.scrollToObjectGroup(objectGroup);
+    },
+    []
+  );
   const forceUpdateLayersList = React.useCallback(() => {
     if (layersListRef.current) layersListRef.current.forceUpdate();
   }, []);
@@ -155,6 +162,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
       forceUpdateInstancesPropertiesEditor,
       forceUpdateObjectsList,
       forceUpdateObjectGroupsList,
+      scrollObjectGroupsListToObjectGroup,
       forceUpdateLayersList,
       openNewObjectDialog,
       toggleEditorView: halfOpenOrCloseDrawerOnEditor,

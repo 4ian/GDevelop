@@ -126,6 +126,7 @@ export type SceneEditorsDisplayInterface = {|
   forceUpdateInstancesPropertiesEditor: () => void,
   forceUpdateObjectsList: () => void,
   forceUpdateObjectGroupsList: () => void,
+  scrollObjectGroupsListToObjectGroup: (objectGroup: gdObjectGroup) => void,
   forceUpdateLayersList: () => void,
   openNewObjectDialog: () => void,
   toggleEditorView: (editorId: EditorId) => void,

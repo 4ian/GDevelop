@@ -81,7 +81,7 @@ const isGroupWithContextGlobal = (groupWithContext: GroupWithContext) =>
 
 export type ObjectGroupsListInterface = {|
   forceUpdate: () => void,
-  renameNewObjectGroup: (newObjectGroup: gdObjectGroup) => void,
+  scrollToObjectGroup: (newObjectGroup: gdObjectGroup) => void,
 |};
 
 type Props = {|
@@ -134,12 +134,14 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
 
     React.useImperativeHandle(ref, () => ({
       forceUpdate,
-      renameNewObjectGroup: (newObjectGroup: gdObjectGroup) => {
+      scrollToObjectGroup: (objectGroup: gdObjectGroup) => {
         onObjectGroupModified();
 
         const groupWithContext: GroupWithContext = {
-          group: newObjectGroup,
-          global: false, // A new group is not global by default.
+          group: objectGroup,
+          global:
+            !!globalObjectGroups &&
+            globalObjectGroups.has(objectGroup.getName()),
         };
 
         if (treeViewRef.current)
@@ -152,9 +154,6 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
         setTimeout(() => {
           scrollToItem(groupWithContext);
         }, 100); // A few ms is enough for a new render to be done.
-
-        // We focus it so the user can edit the name directly.
-        onEditName(groupWithContext);
       },
     }));
 

@@ -91,9 +91,11 @@ const ObjectGroupsListWithObjectGroupEditor = ({
             if (onGroupsUpdated) onGroupsUpdated();
             setEditedGroup(null);
           }}
-          onObjectGroupAdded={() => {
+          onObjectGroupAdded={(objectGroup: gdObjectGroup) => {
             if (objectGroupsListInterface.current) {
-              objectGroupsListInterface.current.forceUpdate();
+              objectGroupsListInterface.current.scrollToObjectGroup(
+                objectGroup
+              );
             }
           }}
           initialTab={'objects'}

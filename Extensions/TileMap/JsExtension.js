@@ -814,7 +814,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       _(
         'Flip tile vertically at scene coordinates _PARAM1_ ; _PARAM2_: _PARAM3_'
       ),
-      '',
+      _('Effects'),
       'res/actions/flipY24.png',
       'res/actions/flipY.png'
     )
@@ -833,7 +833,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       _(
         'Flip tile horizontally at scene coordinates _PARAM1_ ; _PARAM2_: _PARAM3_'
       ),
-      '',
+      _('Effects'),
       'res/actions/flipX24.png',
       'res/actions/flipX.png'
     )
@@ -885,7 +885,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       _(
         'Flip tile vertically at grid coordinates _PARAM1_ ; _PARAM2_: _PARAM3_'
       ),
-      '',
+      _('Effects'),
       'res/actions/flipY24.png',
       'res/actions/flipY.png'
     )
@@ -904,7 +904,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       _(
         'Flip tile horizontally at grid coordinates _PARAM1_ ; _PARAM2_: _PARAM3_'
       ),
-      '',
+      _('Effects'),
       'res/actions/flipX24.png',
       'res/actions/flipX.png'
     )
@@ -939,7 +939,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       _(
         'The tile at scene coordinates _PARAM1_ ; _PARAM2_ is flipped horizontally'
       ),
-      '',
+      _('Effects'),
       'res/actions/flipX24.png',
       'res/actions/flipX.png'
     )
@@ -957,7 +957,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       _(
         'The tile at scene coordinates _PARAM1_ ; _PARAM2_ is flipped vertically'
       ),
-      '',
+      _('Effects'),
       'res/actions/flipY24.png',
       'res/actions/flipY.png'
     )
@@ -975,7 +975,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       _(
         'The tile at grid coordinates _PARAM1_ ; _PARAM2_ is flipped horizontally'
       ),
-      '',
+      _('Effects'),
       'res/actions/flipX24.png',
       'res/actions/flipX.png'
     )
@@ -993,7 +993,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       _(
         'The tile at grid coordinates _PARAM1_ ; _PARAM2_ is flipped vertically'
       ),
-      '',
+      _('Effects'),
       'res/actions/flipY24.png',
       'res/actions/flipY.png'
     )

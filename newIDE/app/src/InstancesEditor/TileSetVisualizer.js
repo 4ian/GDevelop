@@ -429,14 +429,6 @@ const TileSetVisualizer = ({
 
   React.useEffect(
     () => {
-      // On dismount, remove tile map selection.
-      return () => onSelectTileMapTile(null);
-    },
-    [onSelectTileMapTile]
-  );
-
-  React.useEffect(
-    () => {
       if (tileMapTileSelection && tileMapTileSelection.kind === 'single') {
         setLastSelectedTile({
           x: tileMapTileSelection.coordinates.x,

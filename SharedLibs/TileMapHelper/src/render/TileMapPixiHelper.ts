@@ -77,7 +77,11 @@ export namespace PixiTileMapHelper {
 
         const texture = new PIXI.Texture(atlasTexture, rect);
 
-        textureCache.setTexture(rowCount * x + y, texture);
+        textureCache.setTexture(
+          // Id of the tile
+          rowCount * x + y,
+          texture
+        );
       }
     }
     return textureCache;

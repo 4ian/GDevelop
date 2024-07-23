@@ -186,10 +186,20 @@ const CompactInstancePropertiesEditor = ({
     ]
   );
 
-  if (!object || !instance || !instanceSchema) return null;
-
   const shouldDisplayTileSetVisualizer =
-    object.getType() === 'TileMap::SimpleTileMap';
+    !!object && object.getType() === 'TileMap::SimpleTileMap';
+
+  React.useEffect(
+    () => {
+      if (!shouldDisplayTileSetVisualizer) {
+        onSelectTileMapTile(null);
+      }
+      return;
+    },
+    [shouldDisplayTileSetVisualizer, onSelectTileMapTile]
+  );
+
+  if (!object || !instance || !instanceSchema) return null;
 
   return (
     <ErrorBoundary

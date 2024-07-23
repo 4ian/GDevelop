@@ -628,7 +628,6 @@ namespace gdjs {
       this._renderer.setTileId(columnIndex, rowIndex, 0, tileId);
       this._isTileMapDirty = true;
       this.invalidateHitboxes();
-      this._transformationIsUpToDate = false;
     }
 
     flipTileOnYAtPosition(x: float, y: float, flip: boolean) {
@@ -707,7 +706,6 @@ namespace gdjs {
       this._renderer.removeTile(columnIndex, rowIndex, 0);
       this._isTileMapDirty = true;
       this.invalidateHitboxes();
-      this._transformationIsUpToDate = false;
     }
   }
   gdjs.registerObject(

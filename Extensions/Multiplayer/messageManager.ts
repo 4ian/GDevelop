@@ -41,6 +41,25 @@ namespace gdjs {
     };
   }
 
+  class SavedSyncDataUpdates<T> {
+    private _updates: T[] = [];
+
+    store(update: T) {
+      this._updates.push(update);
+      if (this._updates.length > 10) {
+        this._updates.shift();
+      }
+    }
+
+    getUpdates() {
+      return this._updates;
+    }
+
+    clear() {
+      this._updates = [];
+    }
+  }
+
   export type MultiplayerMessageManager = ReturnType<
     typeof makeMultiplayerMessageManager
   >;
@@ -96,14 +115,18 @@ namespace gdjs {
     let lastSceneSyncTimestamp = 0;
     let lastSentSceneSyncData: LayoutNetworkSyncData | null = null;
     let numberOfForcedSceneUpdates = 0;
-    let lastReceivedSceneSyncDataUpdates: LayoutNetworkSyncData[] = [];
+    let lastReceivedSceneSyncDataUpdates = new SavedSyncDataUpdates<
+      LayoutNetworkSyncData
+    >();
 
     // The number of times per second the game data should be synchronized.
     const gameSyncDataTickRate = 1;
     let lastGameSyncTimestamp = 0;
     let lastSentGameSyncData: GameNetworkSyncData | null = null;
     let numberOfForcedGameUpdates = 0;
-    let lastReceivedGameSyncDataUpdates: GameNetworkSyncData[] = [];
+    let lastReceivedGameSyncDataUpdates = new SavedSyncDataUpdates<
+      GameNetworkSyncData
+    >();
 
     // Send heartbeat messages from host to players, ensuring their connection is still alive,
     // measure the ping, and send other useful info.
@@ -1692,11 +1715,7 @@ namespace gdjs {
           } else {
             // If the game is not ready to receive game update messages, we need to save the data for later use.
             // This can happen when joining a game that is already running.
-            lastReceivedSceneSyncDataUpdates.push(messageData);
-            if (lastReceivedSceneSyncDataUpdates.length > 10) {
-              // We only keep the last 10 updates.
-              lastReceivedSceneSyncDataUpdates.shift();
-            }
+            lastReceivedSceneSyncDataUpdates.store(messageData);
           }
 
           // If we are are the host,
@@ -1712,28 +1731,6 @@ namespace gdjs {
           }
         });
       });
-    };
-
-    const handleUpdateSceneMessagesSaved = (
-      runtimeScene: gdjs.RuntimeScene
-    ) => {
-      lastReceivedSceneSyncDataUpdates.forEach((messageData) => {
-        const sceneNetworkId = messageData.id;
-
-        if (sceneNetworkId !== runtimeScene.networkId) {
-          debugLogger.info(
-            `Saved update of scene ${sceneNetworkId}, but we are on ${runtimeScene.networkId}. Skipping.`
-          );
-          // The scene is not the current scene.
-          return;
-        }
-
-        // Force the update even if the game is not ready to receive game update messages.
-        runtimeScene.updateFromNetworkSyncData(messageData);
-      });
-
-      // Clear the saved updates.
-      lastReceivedSceneSyncDataUpdates = [];
     };
 
     const updateGameMessageNamePrefix = '#updateGame';
@@ -1867,11 +1864,7 @@ namespace gdjs {
           } else {
             // If the game is not ready to receive game update messages, we need to save the data for later use.
             // This can happen when joining a game that is already running.
-            lastReceivedGameSyncDataUpdates.push(messageData);
-            if (lastReceivedGameSyncDataUpdates.length > 10) {
-              // We only keep the last 10 updates.
-              lastReceivedGameSyncDataUpdates.shift();
-            }
+            lastReceivedGameSyncDataUpdates.store(messageData);
           }
 
           // If we are are the host,
@@ -1889,13 +1882,26 @@ namespace gdjs {
       });
     };
 
-    const handleUpdateGameMessagesSaved = (runtimeScene: gdjs.RuntimeScene) => {
-      lastReceivedGameSyncDataUpdates.forEach((messageData) => {
+    const handleSavedUpdateMessages = (runtimeScene: gdjs.RuntimeScene) => {
+      // Reapply the game saved updates.
+      lastReceivedGameSyncDataUpdates.getUpdates().forEach((messageData) => {
         runtimeScene.getGame().updateFromNetworkSyncData(messageData);
       });
+      lastReceivedGameSyncDataUpdates.clear();
 
-      // Clear the saved updates.
-      lastReceivedGameSyncDataUpdates = [];
+      // Then reapply the scene saved updates.
+      lastReceivedSceneSyncDataUpdates.getUpdates().forEach((messageData) => {
+        const sceneNetworkId = messageData.id;
+
+        if (sceneNetworkId !== runtimeScene.networkId) {
+          debugLogger.info(
+            `Saved update of scene ${sceneNetworkId}, but we are on ${runtimeScene.networkId}. Skipping.`
+          );
+          // The scene is not the current scene.
+          return;
+        }
+      });
+      lastReceivedSceneSyncDataUpdates.clear();
     };
 
     const heartbeatMessageNamePrefix = '#heartbeat';
@@ -1999,9 +2005,9 @@ namespace gdjs {
             const receivedPlayerNumbers = Object.keys(
               messageData.playersInfo
             ).map((playerNumber) => parseInt(playerNumber, 10));
-            const currentlyKnownPingForCurrentUser = getPlayerPing(
-              currentPlayerNumber
-            );
+            const currentlyKnownPingForCurrentUser =
+              _playersInfo[currentPlayerNumber] &&
+              _playersInfo[currentPlayerNumber].ping;
             // If there are no players info yet, we're probably just connecting.
             // This can happen when joining a game that is already running.
             // Do not handle this case to avoid displaying too many notifications.
@@ -2030,7 +2036,11 @@ namespace gdjs {
             }
 
             // Save the players info received from the host.
-            _playersInfo = messageData.playersInfo;
+            // Avoid overwriting the whole object as it can mess up tests that rely on the object reference.
+            for (const playerNumber in messageData.playersInfo) {
+              _playersInfo[playerNumber] =
+                messageData.playersInfo[playerNumber];
+            }
 
             const {
               messageName: answerMessageName,
@@ -2046,7 +2056,7 @@ namespace gdjs {
               _playersInfo[currentPlayerNumber].ping !== undefined
             ) {
               gdjs.multiplayer.markConnectionAsConnected();
-              if (!currentlyKnownPingForCurrentUser) {
+              if (currentlyKnownPingForCurrentUser === undefined) {
                 // We just connected, let's add ourselves to the list of players who just connected,
                 // for the notification and the events.
                 _playerNumbersWhoJustJoined.push(currentPlayerNumber);
@@ -2104,7 +2114,11 @@ namespace gdjs {
     };
 
     const getPlayerPing = (playerNumber: number) => {
-      return (_playersInfo[playerNumber] || {}).ping || 0;
+      const playerInfo = _playersInfo[playerNumber];
+      if (!playerInfo) {
+        return 0;
+      }
+      return playerInfo.ping || 0;
     };
 
     const getCurrentPlayerPing = () => {
@@ -2223,8 +2237,10 @@ namespace gdjs {
       return _playerNumbersWhoJustLeft[0] || 0;
     };
     const removePlayerWhoJustLeft = (): void => {
-      const playerNumberWhoLeft = _playerNumbersWhoJustLeft.shift();
+      // Avoid using shift for test purposes, as it modifies the reference.
+      const playerNumberWhoLeft = _playerNumbersWhoJustLeft[0];
       if (playerNumberWhoLeft !== undefined) {
+        _playerNumbersWhoJustLeft = _playerNumbersWhoJustLeft.slice(1);
         delete _temporaryPlayerNumberToUsername[playerNumberWhoLeft];
       }
     };
@@ -2242,7 +2258,11 @@ namespace gdjs {
       return _playerNumbersWhoJustJoined[0] || 0;
     };
     const removePlayerWhoJustJoined = (): void => {
-      _playerNumbersWhoJustJoined.shift();
+      // Avoid using shift for test purposes, as it modifies the reference.
+      const playerNumberWhoJoined = _playerNumbersWhoJustJoined[0];
+      if (playerNumberWhoJoined !== undefined) {
+        _playerNumbersWhoJustJoined = _playerNumbersWhoJustJoined.slice(1);
+      }
     };
 
     const getConnectedPlayers = () => {
@@ -2308,8 +2328,8 @@ namespace gdjs {
     const clearMessagesTempData = () => {
       _playersLastRoundTripTimes = {};
       _playersInfo = {};
-      lastReceivedGameSyncDataUpdates = [];
-      lastReceivedSceneSyncDataUpdates = [];
+      lastReceivedGameSyncDataUpdates.clear();
+      lastReceivedSceneSyncDataUpdates.clear();
       processedCustomMessagesCache.clear();
       _playerNumbersWhoJustLeft = [];
       _playerNumbersWhoJustJoined = [];
@@ -2350,12 +2370,11 @@ namespace gdjs {
       createUpdateSceneMessage,
       handleUpdateSceneMessagesToSend,
       handleUpdateSceneMessagesReceived,
-      handleUpdateSceneMessagesSaved,
       // Game update.
       createUpdateGameMessage,
       handleUpdateGameMessagesToSend,
       handleUpdateGameMessagesReceived,
-      handleUpdateGameMessagesSaved,
+      handleSavedUpdateMessages,
       // Heartbeats.
       handleHeartbeatsToSend,
       handleHeartbeatsReceived,

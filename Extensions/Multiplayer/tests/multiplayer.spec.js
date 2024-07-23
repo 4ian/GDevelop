@@ -167,10 +167,13 @@ describe('Multiplayer', () => {
    * It stores the messages sent to/from peers.
    */
   const createMultiplayerManagersMock = () => {
+    /**
+     * @type {{ currentPeerId: string, otherPeerIds: string[], justDisconnectedPeers: string[] }}
+     */
     const p2pState = {
       currentPeerId: '',
+      otherPeerIds: [],
       justDisconnectedPeers: [],
-      allConnectedPlayers: [],
     };
 
     /** @type {Record<string, Map<string, MockedMessagesList>>} */
@@ -213,7 +216,11 @@ describe('Multiplayer', () => {
           peerAllMessagesMap.set(messageName, peerMessagesList);
         }
 
-        peerMessagesList.pushMessage(messageData, p2pState.currentPeerId);
+        // We clone the message data to simulate the fact that it's sent over the network,
+        // so that the original message data is not modified by the receiver.
+        const clonedMessageData = JSON.parse(JSON.stringify(messageData));
+
+        peerMessagesList.pushMessage(clonedMessageData, p2pState.currentPeerId);
       }
     };
 
@@ -266,10 +273,13 @@ describe('Multiplayer', () => {
       allConnectedPlayers,
       justDisconnectedPeers,
     }) => {
-      const peerId = allConnectedPlayers.find(
+      const connectedPlayer = allConnectedPlayers.find(
         (player) => player.playerNumber === playerNumber
-      ).peerId;
-      console.log('## SWITCHING TO PEER', peerId);
+      );
+      if (!connectedPlayer)
+        throw new Error(`No player found for player ${playerNumber}`);
+      const peerId = connectedPlayer.peerId;
+      // console.log('## SWITCHING TO PEER', peerId);
 
       // Switch the state of the peerJs mock.
       p2pState.currentPeerId = peerId;
@@ -286,10 +296,16 @@ describe('Multiplayer', () => {
       }
 
       // Switch the state of the MultiplayerMessageManager.
-      gdjs.multiplayerMessageManager = peerMultiplayerMessageManager[peerId];
+      gdjs.multiplayerMessageManager = peerMultiplayerMessageManager[peerId] =
+        peerMultiplayerMessageManager[peerId] ||
+        gdjs.makeMultiplayerMessageManager();
+
       // Switch the state of the MultiplayerVariablesManager.
-      gdjs.multiplayerVariablesManager =
-        peerMultiplayerVariablesManager[peerId];
+      gdjs.multiplayerVariablesManager = peerMultiplayerVariablesManager[
+        peerId
+      ] =
+        peerMultiplayerVariablesManager[peerId] ||
+        gdjs.makeMultiplayerVariablesManager();
       // Switch the state of the game.
       gdjs.multiplayer.playerNumber = playerNumber;
     };
@@ -297,7 +313,7 @@ describe('Multiplayer', () => {
     /**
      * Helper to fast forward a bit of time in players games, so that heartbeats
      * are sent and all players are aware of each other.
-     * @param {{ playerNumber: number, peerId: string}} players
+     * @param {{ playerNumber: number, peerId: string}[]} players
      */
     const initiateGameWithPlayers = (players) => {
       // Create the instances of the MultiplayerMessageManager and MultiplayerVariablesManager
@@ -2644,6 +2660,100 @@ describe('Multiplayer', () => {
       expect(
         checkCurrentSceneIs(p2RuntimeGame, 'Scene2').currentScene.networkId
       ).to.be(p1Scene2NetworkId);
+    });
+  });
+
+  describe('Player joins and leaves', () => {
+    it('detects a player leaving and send it to other players', async () => {
+      const {
+        switchToPeer,
+        initiateGameWithPlayers,
+      } = createMultiplayerManagersMock();
+
+      const allConnectedPlayers = [
+        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 2, peerId: 'player-2' },
+        { playerNumber: 3, peerId: 'player-3' },
+      ];
+      initiateGameWithPlayers(allConnectedPlayers);
+      const runtimeScene = makeTestRuntimeSceneWithNetworkId();
+
+      // Player 2 leaves.
+      const newConnectedPlayers = [
+        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 3, peerId: 'player-3' },
+      ];
+      // Host sees the player 2 leaving.
+      switchToPeer({
+        playerNumber: 1,
+        allConnectedPlayers: newConnectedPlayers,
+        justDisconnectedPeers: ['player-2'],
+      });
+      runtimeScene.renderAndStep(1000 / 60);
+
+      // Player 3 sees the player 2 leaving, via the heartbeat from the host.
+      switchToPeer({
+        playerNumber: 3,
+        allConnectedPlayers: newConnectedPlayers,
+      });
+      runtimeScene.renderAndStep(1000 / 60);
+      const p2PlayersLeft = gdjs.multiplayerMessageManager.getPlayersWhoJustLeft();
+      expect(p2PlayersLeft).to.be.eql([2]);
+    });
+    it('detects a player joining and send it to other players', async () => {
+      const {
+        switchToPeer,
+        initiateGameWithPlayers,
+      } = createMultiplayerManagersMock();
+
+      const allConnectedPlayers = [
+        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 3, peerId: 'player-3' },
+      ];
+      initiateGameWithPlayers(allConnectedPlayers);
+      const runtimeScene = makeTestRuntimeSceneWithNetworkId();
+
+      // Heartbeats are sent every second, so wait for a bit.
+      await delay(1000);
+
+      // Player 2 joins.
+      const newConnectedPlayers = [
+        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 2, peerId: 'player-2' },
+        { playerNumber: 3, peerId: 'player-3' },
+      ];
+
+      // Host sees the player 2 joining and send them a heartbeat.
+      switchToPeer({
+        playerNumber: 1,
+        allConnectedPlayers: newConnectedPlayers,
+      });
+      runtimeScene.renderAndStep(1000 / 60);
+
+      // Player 2 receives the heartbeat and respond.
+      switchToPeer({
+        playerNumber: 2,
+        allConnectedPlayers: newConnectedPlayers,
+      });
+      runtimeScene.renderAndStep(1000 / 60);
+
+      // Host receives player 2 response and send them back their ping.
+      switchToPeer({
+        playerNumber: 1,
+        allConnectedPlayers: newConnectedPlayers,
+      });
+      runtimeScene.renderAndStep(1000 / 60);
+      const p1PlayersJoined = gdjs.multiplayerMessageManager.getPlayersWhoJustJoined();
+      expect(p1PlayersJoined).to.be.eql([2]);
+
+      // Player 3 also sees the player 2 joining.
+      switchToPeer({
+        playerNumber: 3,
+        allConnectedPlayers: newConnectedPlayers,
+      });
+      runtimeScene.renderAndStep(1000 / 60);
+      const p3PlayersJoined = gdjs.multiplayerMessageManager.getPlayersWhoJustJoined();
+      expect(p3PlayersJoined).to.be.eql([2]);
     });
   });
 });

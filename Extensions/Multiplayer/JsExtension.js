@@ -447,8 +447,8 @@ module.exports = {
 
     extension
       .addExpression(
-        'LastPlayerLeftNumber',
-        _('Last player left number'),
+        'LastLeftPlayerNumber',
+        _('Last left player number'),
         _('Returns the number of the player that has just left the lobby.'),
         _('Lobbies'),
         'JsPlatform/Extensions/multiplayer.svg'
@@ -523,8 +523,8 @@ module.exports = {
 
     extension
       .addExpression(
-        'LastPlayerJoinedNumber',
-        _('Last player joined number'),
+        'LastJoinedPlayerNumber',
+        _('Last joined player number'),
         _('Returns the number of the player that has just joined the lobby.'),
         _('Lobbies'),
         'JsPlatform/Extensions/multiplayer.svg'

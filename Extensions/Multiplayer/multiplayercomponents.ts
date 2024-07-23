@@ -441,7 +441,6 @@ namespace gdjs {
     const removeNotificationAndShiftOthers = function (
       notificationContainerId: string
     ) {
-      logger.info('Removing notification:', notificationContainerId);
       const notification = document.getElementById(notificationContainerId);
       if (!notification) {
         logger.error('Notification not found.');

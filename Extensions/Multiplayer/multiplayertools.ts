@@ -72,9 +72,11 @@ namespace gdjs {
       (runtimeScene: gdjs.RuntimeScene) => {
         if (disableMultiplayerForTesting) return;
 
+        // Handle joining and leaving players to show notifications accordingly.
         handleLeavingPlayer(runtimeScene);
         handleJoiningPlayer(runtimeScene);
-        // Joining players are handled in the heartbeats directly.
+
+        // Then look at the heartbeats received to know if a new player has joined/left.
         gdjs.multiplayerMessageManager.handleHeartbeatsReceived();
 
         gdjs.multiplayerMessageManager.handleDestroyInstanceMessagesReceived(
@@ -171,7 +173,7 @@ namespace gdjs {
      * Returns the number of players in the lobby.
      */
     export const getPlayersInLobbyCount = () => {
-      // Wether the lobby game has started or not, the number of players in the lobby
+      // Whether the lobby game has started or not, the number of players in the lobby
       // is the number of connected players.
       return gdjs.multiplayerMessageManager.getNumberOfConnectedPlayers();
     };
@@ -543,8 +545,8 @@ namespace gdjs {
         },
         // Specify the origin to avoid leaking the playerToken.
         // Replace with '*' to test locally.
-        // 'https://gd.games'
-        '*'
+        'https://gd.games'
+        // '*'
       );
     };
 
@@ -691,12 +693,7 @@ namespace gdjs {
       // If we are connected to players, then the game can start.
       logger.info('Lobby game has started.');
       // In case we're joining an existing lobby, read the saved messages to catch-up with the game state.
-      gdjs.multiplayerMessageManager.handleUpdateGameMessagesSaved(
-        runtimeScene
-      );
-      gdjs.multiplayerMessageManager.handleUpdateSceneMessagesSaved(
-        runtimeScene
-      );
+      gdjs.multiplayerMessageManager.handleSavedUpdateMessages(runtimeScene);
       _isReadyToSendOrReceiveGameUpdateMessages = true;
       _hasLobbyGameJustStarted = true;
       _isLobbyGameRunning = true;

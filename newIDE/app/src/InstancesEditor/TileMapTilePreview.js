@@ -274,7 +274,15 @@ class TileMapTilePreview {
           tileSize
         );
 
-        texture = new PIXI.Texture(atlasTexture, rect);
+        try {
+          texture = new PIXI.Texture(atlasTexture, rect);
+        } catch (error) {
+          console.error(
+            `Tile could not be extracted from atlas texture:`,
+            error
+          );
+          texture = PixiResourcesLoader.getInvalidPIXITexture();
+        }
         this.cache.set(cacheKey, texture);
       }
     } else if (tileMapTileSelection.kind === 'erase') {

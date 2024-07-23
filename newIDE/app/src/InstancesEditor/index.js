@@ -812,26 +812,32 @@ export default class InstancesEditor extends Component<Props> {
         let cumulatedUnshiftedRows = 0,
           cumulatedUnshiftedColumns = 0;
         tileMapGridCoordinates.forEach(({ x: gridX, y: gridY }) => {
-          const {
-            unshiftedRows,
-            unshiftedColumns,
-            appendedRows,
-            appendedColumns,
-          } = editableTileMapLayer.setTile(
+          const tileId = getTileIdFromGridCoordinates({
+            rowCount: tileSet.rowCount,
+            ...tileMapTileSelection.coordinates,
+          });
+          const addedRowsAndColumnsData = editableTileMapLayer.setTile(
             // If rows or columns have been unshifted in the previous tile setting operations,
             // we have to take them into account for the current coordinates.
             gridX + cumulatedUnshiftedColumns,
             gridY + cumulatedUnshiftedRows,
-            getTileIdFromGridCoordinates({
-              rowCount: tileSet.rowCount,
-              ...tileMapTileSelection.coordinates,
-            }),
+            tileId,
             {
               flipVertically: tileMapTileSelection.flipVertically,
               flipHorizontally: tileMapTileSelection.flipHorizontally,
               flipDiagonally: false,
             }
           );
+          if (!addedRowsAndColumnsData) {
+            console.warn(`The tile with id ${tileId} could not be added.`);
+            return;
+          }
+          const {
+            unshiftedRows,
+            unshiftedColumns,
+            appendedRows,
+            appendedColumns,
+          } = addedRowsAndColumnsData;
           cumulatedUnshiftedRows += unshiftedRows;
           cumulatedUnshiftedColumns += unshiftedColumns;
           // The instance angle is not considered when moving the instance after

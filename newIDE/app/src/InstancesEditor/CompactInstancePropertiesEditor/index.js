@@ -192,11 +192,23 @@ const CompactInstancePropertiesEditor = ({
   React.useEffect(
     () => {
       if (!shouldDisplayTileSetVisualizer) {
+        // Reset tile map tile selection if tile set visualizer should
+        // not be displayed (an instance that is not a tile map is selected).
         onSelectTileMapTile(null);
       }
-      return;
+      // Reset tile map tile selection if the component is unmounted
+      // (Useful when component is unmounted on an Undo user command).
+      return () => onSelectTileMapTile(null);
     },
     [shouldDisplayTileSetVisualizer, onSelectTileMapTile]
+  );
+
+  React.useEffect(
+    () => {
+      onSelectTileMapTile(null);
+    },
+    // Reset tile map tile selection if instance changes.
+    [instance.ptr, onSelectTileMapTile]
   );
 
   if (!object || !instance || !instanceSchema) return null;

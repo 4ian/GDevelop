@@ -85,6 +85,7 @@ namespace gdjs {
         tileSize: number,
         columnCount: number,
         rowCount: number,
+        allowOutOfBoundTileSetting: boolean,
         callback: (tileMap: TileMapHelper.EditableTileMap) => void
       ): void {
         this._manager.getOrLoadSimpleTileMap(
@@ -93,6 +94,7 @@ namespace gdjs {
           tileSize,
           columnCount,
           rowCount,
+          allowOutOfBoundTileSetting,
           callback
         );
       }

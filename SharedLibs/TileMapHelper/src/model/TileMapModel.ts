@@ -29,6 +29,11 @@ export class EditableTileMap {
    * The number of tile rows in the map.
    */
   private dimY: integer;
+  /**
+   * True if is allowed to set a tile out of the tile map's bounds.
+   * Useful when editing the tile map easily.
+   */
+  readonly _allowOutOfBoundTileSetting: boolean;
 
   /**
    * @param tileWidth The width of a tile.
@@ -44,7 +49,8 @@ export class EditableTileMap {
     dimY: integer,
     // TODO should the tile set be built internally?
     // It's not meant to change and it avoid to do a copy.
-    tileSet: Map<integer, TileDefinition>
+    tileSet: Map<integer, TileDefinition>,
+    allowOutOfBoundTileSetting: boolean
   ) {
     this.tileWidth = tileWidth;
     this.tileHeight = tileHeight;
@@ -52,6 +58,7 @@ export class EditableTileMap {
     this.dimY = dimY;
     this._tileSet = tileSet;
     this._layers = [];
+    this._allowOutOfBoundTileSetting = allowOutOfBoundTileSetting;
   }
 
   /**
@@ -68,7 +75,12 @@ export class EditableTileMap {
       tileSize,
       tileSetColumnCount,
       tileSetRowCount,
-    }: { tileSize: number; tileSetColumnCount: number; tileSetRowCount: number }
+    }: {
+      tileSize: number;
+      tileSetColumnCount: number;
+      tileSetRowCount: number;
+    },
+    allowOutOfBoundTileSetting: boolean
   ): EditableTileMap {
     const tileSet = new Map<number, TileDefinition>();
 
@@ -84,7 +96,8 @@ export class EditableTileMap {
       tileSize || editableTileMapAsJsObject.tileHeight,
       editableTileMapAsJsObject.dimX || 1,
       editableTileMapAsJsObject.dimY || 1,
-      tileSet
+      tileSet,
+      allowOutOfBoundTileSetting
     );
 
     if (editableTileMapAsJsObject.layers) {
@@ -284,6 +297,12 @@ export class EditableTileMap {
     return tileId === undefined ? -1 : tileId;
   }
   setTile(x: integer, y: integer, layerId: integer, tileId: number) {
+    if (
+      !this._allowOutOfBoundTileSetting &&
+      (x < 0 || x >= this.dimX || y < 0 || y >= this.dimY)
+    ) {
+      return;
+    }
     const layer = this.getTileLayer(layerId);
     if (!layer) return;
     return layer.setTile(x, y, tileId);
@@ -309,9 +328,22 @@ export class EditableTileMap {
     return layer.isFlippedVertically(x, y);
   }
   removeTile(x: integer, y: integer, layerId: integer) {
+    if (
+      !this._allowOutOfBoundTileSetting &&
+      (x < 0 || x >= this.dimX || y < 0 || y >= this.dimY)
+    ) {
+      return;
+    }
     const layer = this.getTileLayer(layerId);
     if (!layer) return;
     layer.removeTile(x, y);
+  }
+  trimEmptyColumnsAndRow(layerId: integer) {
+    // TODO: Remove this method when editing on a multi-layer tile map is possible,
+    // as it might become forbidden to use.
+    const layer = this.getTileLayer(layerId);
+    if (!layer) return;
+    return layer.trimEmptyColumnsAndRow();
   }
 }
 
@@ -656,12 +688,14 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
     const rowsToUnshift = Math.abs(Math.min(0, y));
     const columnsToUnshift = Math.abs(Math.min(0, x));
     if (rowsToAdd || columnsToAdd || rowsToUnshift || columnsToUnshift) {
-      this.increaseDimensions(
-        columnsToAdd,
-        columnsToUnshift,
-        rowsToAdd,
-        rowsToUnshift
-      );
+      if (this.tileMap._allowOutOfBoundTileSetting) {
+        this.increaseDimensions(
+          columnsToAdd,
+          columnsToUnshift,
+          rowsToAdd,
+          rowsToUnshift
+        );
+      } else return;
     }
     // Dimensions have been changed to support setting tiles in positions below 0.
     // So we adapt the indices.

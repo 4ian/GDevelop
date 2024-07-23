@@ -798,7 +798,6 @@ export default class InstancesEditor extends Component<Props> {
       if (!scales) return;
       const { scaleX, scaleY } = scales;
       const tileSet = getTileSet(object);
-      const editableTileMapLayer = editableTileMap.getTileLayer(0);
       const tileMapGridCoordinates = getTilesGridCoordinatesFromPointerSceneCoordinates(
         {
           coordinates: sceneCoordinates,
@@ -816,17 +815,15 @@ export default class InstancesEditor extends Component<Props> {
             rowCount: tileSet.rowCount,
             ...tileMapTileSelection.coordinates,
           });
-          const addedRowsAndColumnsData = editableTileMapLayer.setTile(
-            // If rows or columns have been unshifted in the previous tile setting operations,
-            // we have to take them into account for the current coordinates.
-            gridX + cumulatedUnshiftedColumns,
-            gridY + cumulatedUnshiftedRows,
-            tileId,
-            {
-              flipVertically: tileMapTileSelection.flipVertically,
-              flipHorizontally: tileMapTileSelection.flipHorizontally,
-              flipDiagonally: false,
-            }
+          // If rows or columns have been unshifted in the previous tile setting operations,
+          // we have to take them into account for the current coordinates.
+          const x = gridX + cumulatedUnshiftedColumns;
+          const y = gridY + cumulatedUnshiftedRows;
+          const addedRowsAndColumnsData = editableTileMap.setTile(
+            x,
+            y,
+            0,
+            tileId
           );
           if (!addedRowsAndColumnsData) {
             console.warn(`The tile with id ${tileId} could not be added.`);
@@ -838,6 +835,19 @@ export default class InstancesEditor extends Component<Props> {
             appendedRows,
             appendedColumns,
           } = addedRowsAndColumnsData;
+          editableTileMap.flipTileOnX(
+            x + unshiftedColumns,
+            y + unshiftedRows,
+            0,
+            tileMapTileSelection.flipHorizontally
+          );
+          editableTileMap.flipTileOnY(
+            x + unshiftedColumns,
+            y + unshiftedRows,
+            0,
+            tileMapTileSelection.flipVertically
+          );
+
           cumulatedUnshiftedRows += unshiftedRows;
           cumulatedUnshiftedColumns += unshiftedColumns;
           // The instance angle is not considered when moving the instance after
@@ -866,14 +876,14 @@ export default class InstancesEditor extends Component<Props> {
         this.props.onInstancesResized([selectedInstance]);
       } else if (tileMapTileSelection.kind === 'erase') {
         tileMapGridCoordinates.forEach(({ x: gridX, y: gridY }) => {
-          editableTileMapLayer.removeTile(gridX, gridY);
+          editableTileMap.removeTile(gridX, gridY);
         });
         const {
           shiftedRows,
           shiftedColumns,
           poppedRows,
           poppedColumns,
-        } = editableTileMapLayer.trimEmptyColumnsAndRow();
+        } = editableTileMap.trimEmptyColumnsAndRow(0);
         // The instance angle is not considered when moving the instance after
         // rows/columns were added/removed because the instance position does not
         // include the rotation transformation. Otherwise, we could have used

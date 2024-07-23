@@ -222,6 +222,7 @@ namespace gdjs {
         this._tileSize,
         this._columnCount,
         this._rowCount,
+        /* allowOutOfBoundTileSetting */ false,
         (tileMap: TileMapHelper.EditableTileMap) => {
           this._initialTilesWithHitBox.forEach((tileId) => {
             const tileDefinition = tileMap.getTileDefinition(tileId);

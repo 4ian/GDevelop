@@ -49,6 +49,7 @@ export declare class TileMapManager {
     tileSize: number,
     tileSetColumnCount: number,
     tileSetRowCount: number,
+    allowOutOfBoundTileSetting: boolean,
     callback: (tileMap: EditableTileMap) => void
   ): void;
   /**

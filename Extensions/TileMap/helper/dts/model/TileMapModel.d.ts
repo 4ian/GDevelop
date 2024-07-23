@@ -28,6 +28,11 @@ export declare class EditableTileMap {
    */
   private dimY;
   /**
+   * True if is allowed to set a tile out of the tile map's bounds.
+   * Useful when editing the tile map easily.
+   */
+  readonly _allowOutOfBoundTileSetting: boolean;
+  /**
    * @param tileWidth The width of a tile.
    * @param tileHeight The height of a tile.
    * @param dimX The number of tile columns in the map.
@@ -39,7 +44,8 @@ export declare class EditableTileMap {
     tileHeight: integer,
     dimX: integer,
     dimY: integer,
-    tileSet: Map<integer, TileDefinition>
+    tileSet: Map<integer, TileDefinition>,
+    allowOutOfBoundTileSetting: boolean
   );
   /**
    * Loads EditableTileMap from serialized data.
@@ -59,7 +65,8 @@ export declare class EditableTileMap {
       tileSize: number;
       tileSetColumnCount: number;
       tileSetRowCount: number;
-    }
+    },
+    allowOutOfBoundTileSetting: boolean
   ): EditableTileMap;
   toJSObject(): Object;
   /**
@@ -163,6 +170,14 @@ export declare class EditableTileMap {
   isTileFlippedOnX(x: integer, y: integer, layerId: integer): boolean;
   isTileFlippedOnY(x: integer, y: integer, layerId: integer): boolean;
   removeTile(x: integer, y: integer, layerId: integer): void;
+  trimEmptyColumnsAndRow(
+    layerId: integer
+  ): {
+    shiftedRows: number;
+    shiftedColumns: number;
+    poppedRows: number;
+    poppedColumns: number;
+  };
 }
 /**
  * A tile map layer.

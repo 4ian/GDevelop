@@ -131,6 +131,7 @@ namespace gdjs {
         // TODO: support changing the atlas texture
         return false;
       }
+      // Map content is updated at hot-reload by extraInitializationFromInitialInstance.
       return true;
     }
 
@@ -194,10 +195,18 @@ namespace gdjs {
         // 4. Update position (calculations based on renderer's dimensions).
         this._renderer.updatePosition();
 
-        this._collisionTileMap = new gdjs.TileMap.TransformedCollisionTileMap(
-          tileMap,
-          this._hitBoxTag
-        );
+        if (this._collisionTileMap) {
+          // If collision tile map is already defined, there's a good chance it means
+          // extraInitializationFromInitialInstance is called when hot reloading the
+          // scene so the collision is tile map is updated instead of being re-created.
+          this._collisionTileMap.updateFromTileMap(tileMap);
+        } else {
+          this._collisionTileMap = new gdjs.TileMap.TransformedCollisionTileMap(
+            tileMap,
+            this._hitBoxTag
+          );
+        }
+
         this.updateTransformation();
       });
     }

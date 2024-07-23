@@ -91,6 +91,34 @@ const EditedObjectGroupEditorDialog = ({
     groupVariablesContainer.current.clearPersistentUuid();
   };
 
+  const [groupObjectNames, setGroupObjectNames] = React.useState<Array<string>>(
+    () => group.getAllObjectsNames().toJSArray()
+  );
+
+  const removeObject = React.useCallback(
+    (objectName: string) => {
+      group.removeObject(objectName);
+
+      setGroupObjectNames(group.getAllObjectsNames().toJSArray());
+      // Force update to ensure dialog is properly positioned
+      forceUpdate();
+      notifyOfChange();
+    },
+    [forceUpdate, group, notifyOfChange]
+  );
+
+  const addObject = React.useCallback(
+    (objectName: string) => {
+      group.addObject(objectName);
+
+      setGroupObjectNames(group.getAllObjectsNames().toJSArray());
+      // Force update to ensure dialog is properly positioned
+      forceUpdate();
+      notifyOfChange();
+    },
+    [forceUpdate, group, notifyOfChange]
+  );
+
   const { DismissableTutorialMessage } = useDismissableTutorialMessage(
     'intro-variables'
   );
@@ -138,13 +166,12 @@ const EditedObjectGroupEditorDialog = ({
       {currentTab === 'objects' && (
         <ObjectGroupEditor
           project={project}
-          group={group}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
           globalObjectsContainer={globalObjectsContainer}
           objectsContainer={objectsContainer}
-          onSizeUpdated={
-            forceUpdate /*Force update to ensure dialog is properly positioned*/
-          }
-          onObjectGroupUpdated={notifyOfChange}
+          groupObjectNames={groupObjectNames}
+          onObjectAdded={addObject}
+          onObjectRemoved={removeObject}
         />
       )}
       {currentTab === 'variables' && (

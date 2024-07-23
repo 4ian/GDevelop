@@ -403,6 +403,7 @@ const MosaicEditorsDisplay = React.forwardRef<
                 globalObjectsContainer.getObjectGroups()
               }
               objectGroups={objectsContainer.getObjectGroups()}
+              onCreateGroup={props.onCreateObjectGroup}
               onEditGroup={props.onEditObjectGroup}
               onDeleteGroup={props.onDeleteObjectGroup}
               onRenameGroup={props.onRenameObjectGroup}

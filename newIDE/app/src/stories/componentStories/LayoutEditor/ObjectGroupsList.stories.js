@@ -27,6 +27,7 @@ export const Default = () => (
             .getObjects()
             .getObjectGroups()}
           objectGroups={testProject.testLayout.getObjects().getObjectGroups()}
+          onCreateGroup={action('onCreateGroup')}
           onEditGroup={action('onEditGroup')}
           onRenameGroup={action('onRenameGroup')}
           onDeleteGroup={action('onDeleteGroup')}

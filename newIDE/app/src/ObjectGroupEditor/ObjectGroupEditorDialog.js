@@ -5,16 +5,18 @@ import NewObjectGroupEditorDialog from './NewObjectGroupEditorDialog';
 import EditedObjectGroupEditorDialog, {
   type ObjectGroupEditorTab,
 } from './EditedObjectGroupEditorDialog';
+import newNameGenerator from '../Utils/NewNameGenerator';
 
 type Props = {|
   project: gdProject,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
-  group: gdObjectGroup,
+  group: gdObjectGroup | null,
   onApply: () => void,
   onCancel: () => void,
+  onObjectGroupAdded: () => void,
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
-  initialTab: ?ObjectGroupEditorTab,
+  initialTab?: ?ObjectGroupEditorTab,
 |};
 
 const ObjectGroupEditorDialog = ({
@@ -23,35 +25,76 @@ const ObjectGroupEditorDialog = ({
   group,
   onApply,
   onCancel,
+  onObjectGroupAdded,
   globalObjectsContainer,
   objectsContainer,
   initialTab,
 }: Props) => {
-  const isEmpty = React.useRef<boolean>(
-    group.getAllObjectsNames().size() === 0
+  const [
+    editedObjectGroup,
+    setEditedObjectGroup,
+  ] = React.useState<gdObjectGroup | null>(group);
+  const [selectedTab, setSelectedTab] = React.useState<ObjectGroupEditorTab>(
+    initialTab || 'objects'
   );
 
-  return isEmpty.current ? (
+  const onApplyToEmptyGroup = React.useCallback(
+    (groupObjectNames: Array<string>) => {
+      if (editedObjectGroup) {
+        for (const objectName of groupObjectNames) {
+          editedObjectGroup.addObject(objectName);
+        }
+        onApply();
+      } else {
+        const name = newNameGenerator('Group', name =>
+          projectScopedContainersAccessor
+            .get()
+            .getObjectsContainersList()
+            .hasObjectOrGroupNamed(name)
+        );
+
+        const objectGroupContainer = objectsContainer.getObjectGroups();
+        const newObjectGroup = objectGroupContainer.insertNew(
+          name,
+          objectGroupContainer.count()
+        );
+        for (const objectName of groupObjectNames) {
+          newObjectGroup.addObject(objectName);
+        }
+        setEditedObjectGroup(newObjectGroup);
+        setSelectedTab('variables');
+        onObjectGroupAdded();
+      }
+    },
+    [
+      editedObjectGroup,
+      objectsContainer,
+      onApply,
+      onObjectGroupAdded,
+      projectScopedContainersAccessor,
+    ]
+  );
+
+  return !editedObjectGroup ||
+    editedObjectGroup.getAllObjectsNames().size() === 0 ? (
     <NewObjectGroupEditorDialog
       project={project}
       projectScopedContainersAccessor={projectScopedContainersAccessor}
-      group={group}
-      onApply={onApply}
+      onApply={onApplyToEmptyGroup}
       onCancel={onCancel}
       globalObjectsContainer={globalObjectsContainer}
       objectsContainer={objectsContainer}
-      initialTab={initialTab}
     />
   ) : (
     <EditedObjectGroupEditorDialog
       project={project}
       projectScopedContainersAccessor={projectScopedContainersAccessor}
-      group={group}
+      group={editedObjectGroup}
       onApply={onApply}
       onCancel={onCancel}
       globalObjectsContainer={globalObjectsContainer}
       objectsContainer={objectsContainer}
-      initialTab={initialTab}
+      initialTab={selectedTab}
     />
   );
 };

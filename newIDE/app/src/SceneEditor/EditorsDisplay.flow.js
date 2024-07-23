@@ -65,6 +65,7 @@ export type SceneEditorsDisplayProps = {|
     newName: string,
     done: (boolean) => void
   ) => void,
+  onCreateObjectGroup: () => void,
   onEditObjectGroup: (?gdObjectGroup) => void,
   onDeleteObjectGroup: (
     groupWithContext: GroupWithContext,

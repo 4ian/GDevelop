@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import ObjectGroupsList from '.';
+import ObjectGroupsList, { type ObjectGroupsListInterface } from '.';
 import ObjectGroupEditorDialog from '../ObjectGroupEditor/ObjectGroupEditorDialog';
 import { type GroupWithContext } from '../ObjectsList/EnumerateObjects';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
@@ -28,73 +28,79 @@ type Props = {|
   unsavedChanges?: ?UnsavedChanges,
 |};
 
-type State = {|
-  editedGroup: ?gdObjectGroup,
-|};
-
 /**
  * Helper showing the list of groups and embedding the editor to edit a group.
  */
-export default class ObjectGroupsListWithObjectGroupEditor extends React.Component<
-  Props,
-  State
-> {
-  state = {
-    editedGroup: null,
-  };
+const ObjectGroupsListWithObjectGroupEditor = ({
+  project,
+  projectScopedContainersAccessor,
+  globalObjectsContainer,
+  objectsContainer,
+  globalObjectGroups,
+  objectGroups,
+  getValidatedObjectOrGroupName,
+  onDeleteGroup,
+  onRenameGroup,
+  onGroupsUpdated,
+  canSetAsGlobalGroup,
+  unsavedChanges,
+}: Props) => {
+  const [editedGroup, setEditedGroup] = React.useState<gdObjectGroup | null>(
+    null
+  );
+  const [isCreatingNewGroup, setCreatingNewGroup] = React.useState<boolean>(
+    false
+  );
+  const objectGroupsListInterface = React.useRef<ObjectGroupsListInterface | null>(
+    null
+  );
 
-  editGroup = (editedGroup: ?gdObjectGroup) => this.setState({ editedGroup });
-
-  render() {
-    const {
-      project,
-      objectsContainer,
-      globalObjectsContainer,
-      objectGroups,
-      globalObjectGroups,
-    } = this.props;
-
-    return (
-      <React.Fragment>
-        <ObjectGroupsList
-          globalObjectGroups={globalObjectGroups}
-          objectGroups={objectGroups}
-          onEditGroup={this.editGroup}
-          onDeleteGroup={this.props.onDeleteGroup}
-          onRenameGroup={this.props.onRenameGroup}
-          getValidatedObjectOrGroupName={
-            this.props.getValidatedObjectOrGroupName
+  return (
+    <React.Fragment>
+      <ObjectGroupsList
+        ref={objectGroupsListInterface}
+        globalObjectGroups={globalObjectGroups}
+        objectGroups={objectGroups}
+        onCreateGroup={() => setCreatingNewGroup(true)}
+        onEditGroup={setEditedGroup}
+        onDeleteGroup={onDeleteGroup}
+        onRenameGroup={onRenameGroup}
+        getValidatedObjectOrGroupName={getValidatedObjectOrGroupName}
+        onGroupRemoved={onGroupsUpdated}
+        onGroupRenamed={onGroupsUpdated}
+        canSetAsGlobalGroup={canSetAsGlobalGroup}
+        unsavedChanges={unsavedChanges}
+      />
+      {(editedGroup || isCreatingNewGroup) && (
+        <ObjectGroupEditorDialog
+          project={project}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
+          key={
+            (globalObjectsContainer ? globalObjectsContainer.ptr : '') +
+            ';' +
+            objectsContainer.ptr
           }
-          onGroupAdded={this.props.onGroupsUpdated}
-          onGroupRemoved={this.props.onGroupsUpdated}
-          onGroupRenamed={this.props.onGroupsUpdated}
-          canSetAsGlobalGroup={this.props.canSetAsGlobalGroup}
-          unsavedChanges={this.props.unsavedChanges}
+          group={editedGroup}
+          globalObjectsContainer={globalObjectsContainer}
+          objectsContainer={objectsContainer}
+          onCancel={() => {
+            setEditedGroup(null);
+            setCreatingNewGroup(false);
+          }}
+          onApply={() => {
+            if (onGroupsUpdated) onGroupsUpdated();
+            setEditedGroup(null);
+          }}
+          onObjectGroupAdded={() => {
+            if (objectGroupsListInterface.current) {
+              objectGroupsListInterface.current.forceUpdate();
+            }
+          }}
+          initialTab={'objects'}
         />
-        {this.state.editedGroup && (
-          <ObjectGroupEditorDialog
-            project={project}
-            projectScopedContainersAccessor={
-              this.props.projectScopedContainersAccessor
-            }
-            key={
-              (globalObjectsContainer ? globalObjectsContainer.ptr : '') +
-              ';' +
-              objectsContainer.ptr
-            }
-            group={this.state.editedGroup}
-            globalObjectsContainer={globalObjectsContainer}
-            objectsContainer={objectsContainer}
-            onCancel={() => this.editGroup(null)}
-            onApply={() => {
-              if (this.props.onGroupsUpdated) this.props.onGroupsUpdated();
-              this.editGroup(null);
-            }}
-            // TODO
-            initialTab={'objects'}
-          />
-        )}
-      </React.Fragment>
-    );
-  }
-}
+      )}
+    </React.Fragment>
+  );
+};
+
+export default ObjectGroupsListWithObjectGroupEditor;

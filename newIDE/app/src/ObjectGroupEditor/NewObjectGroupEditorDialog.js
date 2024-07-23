@@ -4,7 +4,6 @@ import React from 'react';
 import FlatButton from '../UI/FlatButton';
 import ObjectGroupEditor from '.';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
-import { useSerializableObjectCancelableEditor } from '../Utils/SerializableObjectCancelableEditor';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
 
@@ -13,64 +12,89 @@ export type ObjectGroupEditorTab = 'objects' | 'variables';
 type Props = {|
   project: gdProject,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
-  group: gdObjectGroup,
-  onApply: () => void,
+  onApply: (groupObjectNames: Array<string>) => void,
   onCancel: () => void,
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
-  initialTab: ?ObjectGroupEditorTab,
 |};
 
 const NewObjectGroupEditorDialog = ({
   project,
   projectScopedContainersAccessor,
-  group,
   onApply,
   onCancel,
   globalObjectsContainer,
   objectsContainer,
-  initialTab,
 }: Props) => {
   const forceUpdate = useForceUpdate();
-  const {
-    onCancelChanges,
-    notifyOfChange,
-  } = useSerializableObjectCancelableEditor({
-    serializableObject: group,
-    onCancel,
-  });
+
+  const [groupObjectNames, setGroupObjectNames] = React.useState<Array<string>>(
+    []
+  );
+
+  const removeObject = React.useCallback(
+    (removedObjectName: string) => {
+      setGroupObjectNames(groupObjects =>
+        groupObjects.filter(objectName => objectName !== removedObjectName)
+      );
+
+      // Force update to ensure dialog is properly positioned
+      forceUpdate();
+    },
+    [forceUpdate]
+  );
+
+  const addObject = React.useCallback(
+    (objectName: string) => {
+      setGroupObjectNames(groupObjectNames => [
+        ...groupObjectNames,
+        objectName,
+      ]);
+
+      // Force update to ensure dialog is properly positioned
+      forceUpdate();
+    },
+    [forceUpdate]
+  );
+
+  const apply = React.useCallback(
+    () => {
+      onApply(groupObjectNames);
+    },
+    [groupObjectNames, onApply]
+  );
 
   return (
     <Dialog
-      title={<Trans>Edit {group.getName()}</Trans>}
-      key={group.ptr}
+      title={<Trans>Create a new group</Trans>}
+      key={'create-group-dialog'}
       actions={[
         <FlatButton
           key="cancel"
           label={<Trans>Cancel</Trans>}
           keyboardFocused
-          onClick={onCancelChanges}
+          onClick={onCancel}
         />,
         <DialogPrimaryButton
           key="apply"
-          label={<Trans>Apply</Trans>}
+          label={<Trans>Create</Trans>}
           primary
-          onClick={onApply}
+          onClick={apply}
         />,
       ]}
-      onRequestClose={onCancelChanges}
-      onApply={onApply}
+      onRequestClose={onCancel}
+      onApply={apply}
       open
+      maxWidth="sm"
     >
       <ObjectGroupEditor
         project={project}
-        group={group}
+        projectScopedContainersAccessor={projectScopedContainersAccessor}
         globalObjectsContainer={globalObjectsContainer}
         objectsContainer={objectsContainer}
-        onSizeUpdated={
-          forceUpdate /*Force update to ensure dialog is properly positioned*/
-        }
-        onObjectGroupUpdated={notifyOfChange}
+        groupObjectNames={groupObjectNames}
+        onObjectAdded={addObject}
+        onObjectRemoved={removeObject}
       />
     </Dialog>
   );

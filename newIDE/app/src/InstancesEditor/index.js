@@ -806,7 +806,10 @@ export default class InstancesEditor extends Component<Props> {
         }
       );
 
+      let shouldTrimAfterOperations = false;
+
       if (tileMapTileSelection.kind === 'single') {
+        shouldTrimAfterOperations = editableTileMap.isEmpty();
         // TODO: Optimize list execution to make sure the most important size changing operations are done first.
         let cumulatedUnshiftedRows = 0,
           cumulatedUnshiftedColumns = 0;
@@ -873,11 +876,20 @@ export default class InstancesEditor extends Component<Props> {
             );
           }
         });
+
         this.props.onInstancesResized([selectedInstance]);
       } else if (tileMapTileSelection.kind === 'erase') {
         tileMapGridCoordinates.forEach(({ x: gridX, y: gridY }) => {
           editableTileMap.removeTile(gridX, gridY, 0);
         });
+        shouldTrimAfterOperations = true;
+
+        this.props.onInstancesResized([selectedInstance]);
+      } else {
+        return;
+      }
+
+      if (shouldTrimAfterOperations) {
         const {
           shiftedRows,
           shiftedColumns,
@@ -904,7 +916,6 @@ export default class InstancesEditor extends Component<Props> {
               tileSet.tileSize * scaleY * (poppedRows + shiftedRows)
           );
         }
-        this.props.onInstancesResized([selectedInstance]);
       }
       // $FlowIgnore
       renderedInstance.updatePixiTileMap();

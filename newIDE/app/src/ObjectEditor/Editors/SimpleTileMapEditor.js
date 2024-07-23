@@ -145,7 +145,7 @@ const SimpleTileMapEditor = ({
       if (!Number.isInteger(_rowCount) || !Number.isInteger(_columnCount)) {
         setError(
           <Trans>
-            The new atlas image dimensions is not compatible with the tile size.
+            The new atlas image size is not compatible with the tile size.
           </Trans>
         );
       }
@@ -176,6 +176,7 @@ const SimpleTileMapEditor = ({
     <ScrollView>
       <ColumnStackLayout noMargin>
         {!!renderObjectNameField && renderObjectNameField()}
+        {/* TODO: Should this be a Select field with all possible values given the atlas image size? */}
         <SemiControlledTextField
           floatingLabelFixed
           floatingLabelText={<Trans>Tile size</Trans>}

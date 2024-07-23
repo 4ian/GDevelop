@@ -211,12 +211,17 @@ const CompactInstancePropertiesEditor = ({
               instances={instances}
               onInstancesModified={onInstancesModified}
             />
+            <Spacer />
           </Column>
           {shouldDisplayTileSetVisualizer && (
             <>
               <Column>
-                <Spacer />
                 <Separator />
+                <Line alignItems="center" justifyContent="space-between">
+                  <Text size="sub-title" noMargin>
+                    <Trans>Tilemap painter</Trans>
+                  </Text>
+                </Line>
                 <TileSetVisualizer
                   project={project}
                   objectConfiguration={object.getConfiguration()}
@@ -232,7 +237,6 @@ const CompactInstancePropertiesEditor = ({
           {object && shouldDisplayVariablesList ? (
             <>
               <Column>
-                <Spacer />
                 <Separator />
                 <Line alignItems="center" justifyContent="space-between">
                   <Text size="sub-title" noMargin>

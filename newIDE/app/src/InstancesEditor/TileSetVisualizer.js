@@ -14,7 +14,12 @@ import FlipVertical from '../UI/CustomSvgIcons/FlipVertical';
 import useForceUpdate from '../Utils/UseForceUpdate';
 
 const styles = {
-  tileContainer: { flex: 1, position: 'relative', display: 'flex' },
+  tileContainer: {
+    flex: 1,
+    position: 'relative',
+    display: 'flex',
+    overflow: 'auto',
+  },
   atlasImage: { flex: 1, imageRendering: 'pixelated' },
   icon: { fontSize: 18 },
 };
@@ -27,7 +32,9 @@ const useStylesForTile = (highlighted: boolean) =>
         boxSizing: 'border-box',
         border: highlighted ? '2px solid red' : undefined,
         '&:hover': {
-          border: highlighted ? '2px solid pink' : '1px solid white',
+          border: highlighted
+            ? '2px solid orange'
+            : `1px solid ${theme.palette.type === 'dark' ? 'white' : 'black'}`,
         },
       },
     })
@@ -95,6 +102,21 @@ const getGridCoordinatesFromPointerCoordinates = ({
   const x = Math.min(Math.floor(pointerX / displayedTileSize), columnCount - 1);
   const y = Math.min(Math.floor(pointerY / displayedTileSize), rowCount - 1);
   return { x, y };
+};
+
+const getImageCoordinatesFromPointerEvent = (
+  event: PointerEvent | MouseEvent
+) => {
+  const divContainer = event.currentTarget;
+  if (!(divContainer instanceof HTMLDivElement)) {
+    return;
+  }
+
+  const bounds = divContainer.getBoundingClientRect();
+
+  const mouseX = event.clientX + divContainer.scrollLeft - bounds.left + 1;
+  const mouseY = event.clientY - bounds.top + 1;
+  return { mouseX, mouseY };
 };
 
 const addOrRemoveCoordinatesInArray = (
@@ -233,11 +255,11 @@ const TileSetVisualizer = ({
     x: number,
     y: number,
   }>(null);
-
-  const imageWidth = tileContainerRef.current
-    ? parseFloat(
-        getComputedStyle(tileContainerRef.current).width.replace('px', '')
-      )
+  const imageElement = tileContainerRef.current
+    ? tileContainerRef.current.getElementsByTagName('img')[0]
+    : null;
+  const imageWidth = imageElement
+    ? parseFloat(getComputedStyle(imageElement).width.replace('px', ''))
     : 0;
   const displayedTileSize = imageWidth ? imageWidth / columnCount : null;
 
@@ -251,33 +273,29 @@ const TileSetVisualizer = ({
   );
 
   const onPointerDown = React.useCallback((event: PointerEvent) => {
-    if (!(event.currentTarget instanceof HTMLDivElement)) {
-      return;
-    }
-    const bounds = event.currentTarget.getBoundingClientRect();
-    const mouseX = event.clientX - bounds.left + 1;
-    const mouseY = event.clientY - bounds.top + 1;
-
-    setClickStartCoordinates({ x: mouseX, y: mouseY });
+    const imageCoordinates = getImageCoordinatesFromPointerEvent(event);
+    if (!imageCoordinates) return;
+    setClickStartCoordinates({
+      x: imageCoordinates.mouseX,
+      y: imageCoordinates.mouseY,
+    });
   }, []);
 
   const onPointerMove = React.useCallback(
     (event: PointerEvent) => {
       if (
         !clickStartCoordinates ||
-        !(event.currentTarget instanceof HTMLDivElement) ||
         !displayedTileSize ||
         !allowMultipleSelection
       ) {
         return;
       }
-      const bounds = event.currentTarget.getBoundingClientRect();
+      const imageCoordinates = getImageCoordinatesFromPointerEvent(event);
+      if (!imageCoordinates) return;
 
-      const mouseX = event.clientX - bounds.left + 1;
-      const mouseY = event.clientY - bounds.top + 1;
       const { x, y } = getGridCoordinatesFromPointerCoordinates({
-        pointerX: mouseX,
-        pointerY: mouseY,
+        pointerX: imageCoordinates.mouseX,
+        pointerY: imageCoordinates.mouseY,
         columnCount,
         rowCount,
         displayedTileSize,
@@ -313,19 +331,14 @@ const TileSetVisualizer = ({
   const onPointerUp = React.useCallback(
     (event: MouseEvent) => {
       try {
-        if (
-          !(event.currentTarget instanceof HTMLDivElement) ||
-          !displayedTileSize
-        ) {
-          return;
-        }
-        const bounds = event.currentTarget.getBoundingClientRect();
+        if (!displayedTileSize) return;
 
-        const mouseX = event.clientX - bounds.left + 1;
-        const mouseY = event.clientY - bounds.top + 1;
+        const imageCoordinates = getImageCoordinatesFromPointerEvent(event);
+        if (!imageCoordinates) return;
+
         const { x, y } = getGridCoordinatesFromPointerCoordinates({
-          pointerX: mouseX,
-          pointerY: mouseY,
+          pointerX: imageCoordinates.mouseX,
+          pointerY: imageCoordinates.mouseY,
           columnCount,
           rowCount,
           displayedTileSize,
@@ -436,19 +449,13 @@ const TileSetVisualizer = ({
 
   const onHoverAtlas = React.useCallback(
     (event: MouseEvent) => {
-      if (
-        !(event.currentTarget instanceof HTMLDivElement) ||
-        !displayedTileSize
-      ) {
-        return;
-      }
-      const bounds = event.currentTarget.getBoundingClientRect();
+      if (!displayedTileSize) return;
 
-      const mouseX = event.clientX - bounds.left + 1;
-      const mouseY = event.clientY - bounds.top + 1;
+      const imageCoordinates = getImageCoordinatesFromPointerEvent(event);
+      if (!imageCoordinates) return;
       const { x, y } = getGridCoordinatesFromPointerCoordinates({
-        pointerX: mouseX,
-        pointerY: mouseY,
+        pointerX: imageCoordinates.mouseX,
+        pointerY: imageCoordinates.mouseY,
         columnCount,
         rowCount,
         displayedTileSize,

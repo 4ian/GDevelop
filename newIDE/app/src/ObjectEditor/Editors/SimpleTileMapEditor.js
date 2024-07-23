@@ -3,7 +3,7 @@
 import * as React from 'react';
 import type { EditorProps } from './EditorProps.flow';
 import ScrollView from '../../UI/ScrollView';
-import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
+import { ColumnStackLayout } from '../../UI/Layout';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import { Trans } from '@lingui/macro';
 import useForceUpdate from '../../Utils/UseForceUpdate';
@@ -13,9 +13,9 @@ import TileSetVisualizer, {
   getTileIdFromGridCoordinates,
 } from '../../InstancesEditor/TileSetVisualizer';
 import type { TileMapTileSelection } from '../../InstancesEditor/TileSetVisualizer';
-import { Column } from '../../UI/Grid';
+import { Column, Line } from '../../UI/Grid';
 import AlertMessage from '../../UI/AlertMessage';
-import Checkbox from '../../UI/Checkbox';
+import Text from '../../UI/Text';
 
 const SimpleTileMapEditor = ({
   objectConfiguration,
@@ -33,9 +33,6 @@ const SimpleTileMapEditor = ({
   const rowCount = parseFloat(objectProperties.get('rowCount').getValue());
   const columnCount = parseFloat(
     objectProperties.get('columnCount').getValue()
-  );
-  const [configureHitBoxes, setConfigureHitBoxes] = React.useState<boolean>(
-    false
   );
   const [error, setError] = React.useState<React.Node>(null);
   const atlasImage = objectProperties.get('atlasImage').getValue();
@@ -194,27 +191,31 @@ const SimpleTileMapEditor = ({
         />
         {error && <AlertMessage kind="error">{error}</AlertMessage>}
         {atlasImage && (
-          <ResponsiveLineStackLayout>
-            <Column noMargin expand>
-              <Checkbox
-                checked={configureHitBoxes}
-                onCheck={(e, checked) => setConfigureHitBoxes(checked)}
-                label={<Trans>Configure tiles with hit boxes</Trans>}
-              />
-            </Column>
-            <Column noMargin expand>
-              <TileSetVisualizer
-                project={project}
-                objectConfiguration={objectConfiguration}
-                tileMapTileSelection={tileMapTileSelection}
-                onSelectTileMapTile={onChangeTilesWithHitBox}
-                showPaintingToolbar={false}
-                allowMultipleSelection
-                onAtlasImageLoaded={onAtlasImageLoaded}
-                interactive={configureHitBoxes}
-              />
-            </Column>
-          </ResponsiveLineStackLayout>
+          <>
+            <Line>
+              <Column noMargin>
+                <Text noMargin size="sub-title">
+                  <Trans>Configure tile’s hit boxes</Trans>
+                </Text>
+                <Text noMargin>
+                  <Trans>
+                    Click on the tilemap grid to activate or deactivate hit
+                    boxes.
+                  </Trans>
+                </Text>
+              </Column>
+            </Line>
+            <TileSetVisualizer
+              project={project}
+              objectConfiguration={objectConfiguration}
+              tileMapTileSelection={tileMapTileSelection}
+              onSelectTileMapTile={onChangeTilesWithHitBox}
+              showPaintingToolbar={false}
+              allowMultipleSelection
+              onAtlasImageLoaded={onAtlasImageLoaded}
+              interactive={true}
+            />
+          </>
         )}
       </ColumnStackLayout>
     </ScrollView>

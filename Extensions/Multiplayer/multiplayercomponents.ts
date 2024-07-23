@@ -11,6 +11,8 @@ namespace gdjs {
 
     let canLobbyBeClosed = true;
 
+    const notificationContainerIds: string[] = [];
+
     export const getDomElementContainer = (
       runtimeScene: gdjs.RuntimeScene
     ): HTMLDivElement | null => {
@@ -387,7 +389,7 @@ namespace gdjs {
       // to allow the player to leave the lobby.
       setTimeout(() => {
         closeContainer.style.visibility = 'inherit';
-      }, 5000);
+      }, 10000);
     };
 
     /**
@@ -398,7 +400,6 @@ namespace gdjs {
     ) {
       showNotification(
         runtimeScene,
-        'error-notification',
         'An error occurred while displaying the game lobbies, please try again.',
         'error'
       );
@@ -411,26 +412,57 @@ namespace gdjs {
       runtimeScene: gdjs.RuntimeScene,
       playerName: string
     ) {
-      showNotification(
-        runtimeScene,
-        'player-left-notification',
-        `${playerName} has left the game.`,
-        'warning'
-      );
+      showNotification(runtimeScene, `${playerName} left.`, 'warning');
     };
 
     /**
-     * Create, display, and hide a notification when a player leaves the game.
+     * Create, display, and hide a notification when a player joins the game.
+     */
+    export const displayPlayerJoinedNotification = function (
+      runtimeScene: gdjs.RuntimeScene,
+      playerName: string
+    ) {
+      showNotification(runtimeScene, `${playerName} joined.`, 'success');
+    };
+
+    /**
+     * Create, display, and hide a notification when an error happens on connection.
      */
     export const displayConnectionErrorNotification = function (
       runtimeScene: gdjs.RuntimeScene
     ) {
       showNotification(
         runtimeScene,
-        'connection-error-notification',
         'Could not connect to other players.',
         'error'
       );
+    };
+
+    const removeNotificationAndShiftOthers = function (
+      notificationContainerId: string
+    ) {
+      const notification = document.getElementById(notificationContainerId);
+      if (!notification) {
+        logger.error('Notification not found.');
+        return;
+      }
+      const index = notificationContainerIds.indexOf(notificationContainerId);
+      if (index !== -1) {
+        notificationContainerIds.splice(index, 1);
+      }
+      notification.remove();
+
+      // Shift the other notifications up.
+      for (let i = 0; i < notificationContainerIds.length; i++) {
+        const notification = document.getElementById(
+          notificationContainerIds[i]
+        );
+        if (!notification) {
+          logger.error('Notification not found.');
+          continue;
+        }
+        notification.style.top = `${12 + i * 32}px`;
+      }
     };
 
     /**
@@ -438,10 +470,24 @@ namespace gdjs {
      */
     export const showNotification = function (
       runtimeScene: gdjs.RuntimeScene,
-      id: string,
       content: string,
       type: 'success' | 'warning' | 'error'
     ) {
+      // When we show a notification, we add it below the other ones.
+      // We also remove the oldest one if there are too many > 5.
+      if (notificationContainerIds.length > 5) {
+        const oldestNotificationId = notificationContainerIds.shift();
+        if (!oldestNotificationId) {
+          logger.error('No oldest notification ID found.');
+          return;
+        }
+
+        removeNotificationAndShiftOthers(oldestNotificationId);
+      }
+
+      // We generate a random ID for the notification, so they can stack.
+      const id = `notification-${Math.random().toString(36).substring(7)}`;
+
       const domContainer = runtimeScene
         .getGame()
         .getRenderer()
@@ -461,7 +507,8 @@ namespace gdjs {
           : type === 'warning'
           ? '#FFA500'
           : '#FF0000';
-      divContainer.style.top = '12px';
+      // Space the notifications vertically, based on how many there are.
+      divContainer.style.top = `${12 + notificationContainerIds.length * 32}px`;
       divContainer.style.right = '16px';
       divContainer.style.padding = '6px 32px 6px 6px';
       // Use zIndex 1 to make sure it is below the iframe.
@@ -496,8 +543,9 @@ namespace gdjs {
       loggedText.style.margin = '0px';
 
       divContainer.appendChild(loggedText);
-
       domContainer.appendChild(divContainer);
+      notificationContainerIds.push(id);
+
       const animationTime = 700;
       const notificationTime = 5000;
       setTimeout(() => {
@@ -518,7 +566,7 @@ namespace gdjs {
       }, notificationTime);
       // Use timeout because onanimationend listener does not work.
       setTimeout(() => {
-        divContainer.remove();
+        removeNotificationAndShiftOthers(id);
       }, notificationTime + animationTime);
     };
 

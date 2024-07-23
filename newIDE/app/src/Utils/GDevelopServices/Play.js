@@ -95,6 +95,7 @@ export type LobbyConfiguration = {|
   gameId: string,
   maxPlayers: number,
   minPlayers: number,
+  canJoinAfterStart: boolean,
 |};
 
 export const shortenUuidForDisplay = (uuid: string): string =>
@@ -483,16 +484,18 @@ export const updateLobbyConfiguration = async (
     gameId,
     maxPlayers,
     minPlayers,
+    canJoinAfterStart,
   }: {|
     gameId: string,
     maxPlayers: number,
     minPlayers: number,
+    canJoinAfterStart: boolean,
   |}
 ): Promise<LobbyConfiguration> => {
   const authorizationHeader = await getAuthorizationHeader();
   const response = await axios.patch(
     `${GDevelopPlayApi.baseUrl}/game/${gameId}/lobby-configuration`,
-    { maxPlayers, minPlayers },
+    { maxPlayers, minPlayers, canJoinAfterStart },
     {
       params: { userId },
       headers: {

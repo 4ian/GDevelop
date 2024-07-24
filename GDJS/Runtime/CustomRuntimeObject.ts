@@ -395,9 +395,10 @@ namespace gdjs {
       let minX = 0;
       if (this._forcedDefaultSize) {
         minX = this._forcedDefaultSize.min[0];
-      }
-      if (this._isUntransformedHitBoxesDirty) {
-        this._updateUntransformedHitBoxes();
+      } else {
+        if (this._isUntransformedHitBoxesDirty) {
+          this._updateUntransformedHitBoxes();
+        }
         minX = this._unrotatedAABB.min[0];
       }
       const absScaleX = this.getScaleX();
@@ -416,9 +417,10 @@ namespace gdjs {
       let minY = 0;
       if (this._forcedDefaultSize) {
         minY = this._forcedDefaultSize.min[1];
-      }
-      if (this._isUntransformedHitBoxesDirty) {
-        this._updateUntransformedHitBoxes();
+      } else {
+        if (this._isUntransformedHitBoxesDirty) {
+          this._updateUntransformedHitBoxes();
+        }
         minY = this._unrotatedAABB.min[1];
       }
       const absScaleY = this.getScaleY();

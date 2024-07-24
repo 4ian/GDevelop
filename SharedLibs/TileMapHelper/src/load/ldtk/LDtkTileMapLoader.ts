@@ -76,7 +76,6 @@ export namespace LDtkTileMapLoader {
       dimX,
       dimY,
       tileSet,
-      /* allowOutOfBoundTileSetting */ false
     );
     const composedTileMap = new Map<string, TileDefinition>();
     let nextComposedTileId = 0xfffffff;

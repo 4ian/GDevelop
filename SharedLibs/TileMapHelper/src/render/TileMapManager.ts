@@ -4,6 +4,7 @@ import { TileTextureCache } from "./TileTextureCache";
 import { PixiTileMapHelper } from "./TileMapPixiHelper";
 import { TileMapLoader } from "../load/TileMapLoader";
 import { TileMapFileContent } from "../load/TileMapFileContent";
+import { EditableTileMapAsJsObject } from "../model/CommonTypes";
 
 /**
  * A holder to share tile maps across the 2 extension objects.
@@ -118,12 +119,11 @@ export class TileMapManager {
   }
 
   getOrLoadSimpleTileMap(
-    tileMapAsJsObject: object,
+    tileMapAsJsObject: EditableTileMapAsJsObject,
     objectName: string,
     tileSize: number,
     tileSetColumnCount: number,
     tileSetRowCount: number,
-    allowOutOfBoundTileSetting: boolean,
     // Logic using callback has been set up to mimic what has been done for other
     // loading methods. But it could be refactored to directly return the tile map.
     callback: (tileMap: EditableTileMap) => void
@@ -138,7 +138,6 @@ export class TileMapManager {
         tileSetColumnCount,
         tileSetRowCount,
       },
-      allowOutOfBoundTileSetting
     );
     callback(editableTileMap);
   }

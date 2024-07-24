@@ -813,66 +813,84 @@ export default class InstancesEditor extends Component<Props> {
         // TODO: Optimize list execution to make sure the most important size changing operations are done first.
         let cumulatedUnshiftedRows = 0,
           cumulatedUnshiftedColumns = 0;
+        const tileId = getTileIdFromGridCoordinates({
+          rowCount: tileSet.rowCount,
+          ...tileMapTileSelection.coordinates,
+        });
+
+        const tileDefinition = editableTileMap.getTileDefinition(tileId);
+        if (!tileDefinition) return;
+
+        const layer = editableTileMap.getTileLayer(0);
+        if (!layer) return;
+
         tileMapGridCoordinates.forEach(({ x: gridX, y: gridY }) => {
-          const tileId = getTileIdFromGridCoordinates({
-            rowCount: tileSet.rowCount,
-            ...tileMapTileSelection.coordinates,
-          });
           // If rows or columns have been unshifted in the previous tile setting operations,
           // we have to take them into account for the current coordinates.
           const x = gridX + cumulatedUnshiftedColumns;
           const y = gridY + cumulatedUnshiftedRows;
-          const addedRowsAndColumnsData = editableTileMap.setTile(
-            x,
-            y,
+          const rowsToAppend = Math.max(
             0,
-            tileId
+            y - (editableTileMap.getDimensionY() - 1)
           );
-          if (!addedRowsAndColumnsData) {
-            console.warn(`The tile with id ${tileId} could not be added.`);
-            return;
+          const columnsToAppend = Math.max(
+            0,
+            x - (editableTileMap.getDimensionX() - 1)
+          );
+          const rowsToUnshift = Math.abs(Math.min(0, y));
+          const columnsToUnshift = Math.abs(Math.min(0, x));
+          if (
+            rowsToAppend > 0 ||
+            columnsToAppend > 0 ||
+            rowsToUnshift > 0 ||
+            columnsToUnshift > 0
+          ) {
+            editableTileMap.increaseDimensions(
+              columnsToAppend,
+              columnsToUnshift,
+              rowsToAppend,
+              rowsToUnshift
+            );
           }
-          const {
-            unshiftedRows,
-            unshiftedColumns,
-            appendedRows,
-            appendedColumns,
-          } = addedRowsAndColumnsData;
+          const newX = x + columnsToUnshift;
+          const newY = y + rowsToUnshift;
+
+          editableTileMap.setTile(newX, newY, 0, tileId);
           editableTileMap.flipTileOnX(
-            x + unshiftedColumns,
-            y + unshiftedRows,
+            newX,
+            newY,
             0,
             tileMapTileSelection.flipHorizontally
           );
           editableTileMap.flipTileOnY(
-            x + unshiftedColumns,
-            y + unshiftedRows,
+            newX,
+            newY,
             0,
             tileMapTileSelection.flipVertically
           );
 
-          cumulatedUnshiftedRows += unshiftedRows;
-          cumulatedUnshiftedColumns += unshiftedColumns;
+          cumulatedUnshiftedRows += rowsToUnshift;
+          cumulatedUnshiftedColumns += columnsToUnshift;
           // The instance angle is not considered when moving the instance after
           // rows/columns were added/removed because the instance position does not
           // include the rotation transformation. Otherwise, we could have used
           // tileMapToSceneTransformation to get the new position.
           selectedInstance.setX(
             selectedInstance.getX() -
-              unshiftedColumns * (tileSet.tileSize * scaleX)
+              columnsToUnshift * (tileSet.tileSize * scaleX)
           );
           selectedInstance.setY(
             selectedInstance.getY() -
-              unshiftedRows * (tileSet.tileSize * scaleY)
+              rowsToUnshift * (tileSet.tileSize * scaleY)
           );
           if (selectedInstance.hasCustomSize()) {
             selectedInstance.setCustomWidth(
               selectedInstance.getCustomWidth() +
-                tileSet.tileSize * scaleX * (appendedColumns + unshiftedColumns)
+                tileSet.tileSize * scaleX * (columnsToAppend + columnsToUnshift)
             );
             selectedInstance.setCustomHeight(
               selectedInstance.getCustomHeight() +
-                tileSet.tileSize * scaleY * (appendedRows + unshiftedRows)
+                tileSet.tileSize * scaleY * (rowsToAppend + rowsToUnshift)
             );
           }
         });

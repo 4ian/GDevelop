@@ -118,7 +118,6 @@ export namespace TiledTileMapLoader {
       tiledTileMap.width,
       tiledTileMap.height,
       definitions,
-      /* allowOutOfBoundTileSetting */ false
     );
 
     for (const tiledLayer of tiledTileMap.layers) {

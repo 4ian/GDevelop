@@ -2031,7 +2031,6 @@ module.exports = {
             tileSize,
             columnCount,
             rowCount,
-            /* allowOutOfBoundTileSetting */ true,
             (tileMap) => {
               if (!tileMap) {
                 this.onLoadingError();

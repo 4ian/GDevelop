@@ -45,7 +45,7 @@ namespace gdjs {
     _tileSize: number;
     _displayMode = 'all';
     _layerIndex = 0;
-    _initialTileMapAsJsObject: object | null = null;
+    _initialTileMapAsJsObject: TileMapHelper.EditableTileMapAsJsObject | null = null;
     _initialTilesWithHitBox: number[];
     _isTileMapDirty: boolean = false;
     _sceneToTileMapTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
@@ -222,7 +222,6 @@ namespace gdjs {
         this._tileSize,
         this._columnCount,
         this._rowCount,
-        /* allowOutOfBoundTileSetting */ false,
         (tileMap: TileMapHelper.EditableTileMap) => {
           this._initialTilesWithHitBox.forEach((tileId) => {
             const tileDefinition = tileMap.getTileDefinition(tileId);

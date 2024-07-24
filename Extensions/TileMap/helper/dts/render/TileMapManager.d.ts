@@ -1,6 +1,7 @@
 import { EditableTileMap } from '../model/TileMapModel';
 import { TileTextureCache } from './TileTextureCache';
 import { TileMapFileContent } from '../load/TileMapFileContent';
+import { EditableTileMapAsJsObject } from '../model/CommonTypes';
 /**
  * A holder to share tile maps across the 2 extension objects.
  *
@@ -44,12 +45,11 @@ export declare class TileMapManager {
     callback: (tileMap: EditableTileMap | null) => void
   ): void;
   getOrLoadSimpleTileMap(
-    tileMapAsJsObject: object,
+    tileMapAsJsObject: EditableTileMapAsJsObject,
     objectName: string,
     tileSize: number,
     tileSetColumnCount: number,
     tileSetRowCount: number,
-    allowOutOfBoundTileSetting: boolean,
     callback: (tileMap: EditableTileMap) => void
   ): void;
   /**

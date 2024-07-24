@@ -1,4 +1,10 @@
-import { PolygonVertices, integer, float } from './CommonTypes';
+import {
+  PolygonVertices,
+  integer,
+  float,
+  EditableTileMapAsJsObject,
+  EditableTileMapLayerAsJsObject,
+} from './CommonTypes';
 /**
  * A tile map model.
  *
@@ -31,7 +37,6 @@ export declare class EditableTileMap {
    * True if is allowed to set a tile out of the tile map's bounds.
    * Useful when editing the tile map easily.
    */
-  readonly _allowOutOfBoundTileSetting: boolean;
   /**
    * @param tileWidth The width of a tile.
    * @param tileHeight The height of a tile.
@@ -44,8 +49,7 @@ export declare class EditableTileMap {
     tileHeight: integer,
     dimX: integer,
     dimY: integer,
-    tileSet: Map<integer, TileDefinition>,
-    allowOutOfBoundTileSetting: boolean
+    tileSet: Map<integer, TileDefinition>
   );
   /**
    * Loads EditableTileMap from serialized data.
@@ -56,7 +60,7 @@ export declare class EditableTileMap {
    * @param objectConfiguration
    */
   static from(
-    editableTileMapAsJsObject: any,
+    editableTileMapAsJsObject: EditableTileMapAsJsObject,
     {
       tileSize,
       tileSetColumnCount,
@@ -65,8 +69,7 @@ export declare class EditableTileMap {
       tileSize: number;
       tileSetColumnCount: number;
       tileSetRowCount: number;
-    },
-    allowOutOfBoundTileSetting: boolean
+    }
   ): EditableTileMap;
   toJSObject(): Object;
   /**
@@ -94,10 +97,24 @@ export declare class EditableTileMap {
    */
   getDimensionY(): integer;
   /**
+   * Changes the number of columns in the tile map by adding/removing
+   * columns at the end.
    * @param dim The number of tile columns in the map.
    */
   setDimensionX(dim: integer): void;
   /**
+   * Increases dimensions of the tile map by adding columns and rows
+   * at the start and/or at the end of the grid.
+   */
+  increaseDimensions(
+    columnsToAppend: number,
+    columnsToUnshift: number,
+    rowsToAppend: number,
+    rowsToUnshift: number
+  ): void;
+  /**
+   * Changes the number of row in the tile map by adding/removing
+   * rows at the end.
    * @param dim The number of tile rows in the map.
    */
   setDimensionY(dim: integer): void;
@@ -154,17 +171,7 @@ export declare class EditableTileMap {
    */
   isEmpty(): boolean;
   getTileId(x: integer, y: integer, layerId: integer): integer;
-  setTile(
-    x: integer,
-    y: integer,
-    layerId: integer,
-    tileId: number
-  ): {
-    unshiftedRows: number;
-    unshiftedColumns: number;
-    appendedRows: number;
-    appendedColumns: number;
-  };
+  setTile(x: integer, y: integer, layerId: integer, tileId: number): void;
   flipTileOnY(x: integer, y: integer, layerId: integer, flip: boolean): void;
   flipTileOnX(x: integer, y: integer, layerId: integer, flip: boolean): void;
   isTileFlippedOnX(x: integer, y: integer, layerId: integer): boolean;
@@ -275,7 +282,7 @@ export declare class EditableTileMapLayer extends AbstractEditableLayer {
   constructor(tileMap: EditableTileMap, id: integer);
   buildEmptyLayer(dimensionX: number, dimensionY: number): void;
   static from(
-    editableTileMapLayerAsJsObject: any,
+    editableTileMapLayerAsJsObject: EditableTileMapLayerAsJsObject,
     tileMap: EditableTileMap,
     isTileIdValid: (tileId: number) => boolean
   ): EditableTileMapLayer;

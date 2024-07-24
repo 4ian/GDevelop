@@ -179,6 +179,13 @@ namespace gdjs {
     };
 
     /**
+     * Returns true if the player at this position is connected to the lobby.
+     */
+    export const isPlayerConnectedToLobby = (playerNumber: number) => {
+      return gdjs.multiplayerMessageManager.isPlayerConnected(playerNumber);
+    };
+
+    /**
      * Returns the position of the current player in the lobby.
      * Return 0 if the player is not in the lobby.
      * Returns 1, 2, 3, ... if the player is in the lobby.

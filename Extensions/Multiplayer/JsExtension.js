@@ -622,6 +622,37 @@ module.exports = {
       .setFunctionName('gdjs.multiplayer.getPlayersInLobbyCount');
 
     extension
+      .addCondition(
+        'IsPlayerConnected',
+        _('Player is connected'),
+        _('Check if the specified player is connected to the lobby.'),
+        _('Player _PARAM0_ is connected'),
+        _('Lobbies'),
+        'JsPlatform/Extensions/multiplayer.svg',
+        'JsPlatform/Extensions/multiplayer.svg'
+      )
+      .addParameter(
+        'number',
+        _('The position of the player in the lobby (1, 2, ...)'),
+        '',
+        false
+      )
+      .setHelpPath('/all-features/multiplayer')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Multiplayer/peer.js')
+      .addIncludeFile('Extensions/Multiplayer/peerJsHelper.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
+      .setFunctionName('gdjs.multiplayer.isPlayerConnectedToLobby');
+
+    extension
       .addExpressionAndCondition(
         'number',
         'CurrentPlayerNumber',

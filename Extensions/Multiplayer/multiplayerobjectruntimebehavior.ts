@@ -250,7 +250,7 @@ namespace gdjs {
         return;
       }
 
-      // If game is running and object belong to a player that is not connected, destroy the object.
+      // If game is running and the object belongs to a player who is not connected, destroy the object.
       if (
         this.playerNumber !== 0 && // Host is always connected.
         !gdjs.multiplayerMessageManager.isPlayerConnected(this.playerNumber)

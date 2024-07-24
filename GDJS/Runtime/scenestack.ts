@@ -37,6 +37,15 @@ namespace gdjs {
       if (this._isNextLayoutLoading || this._stack.length === 0) {
         return false;
       }
+
+      const hasMadeChangeToStack = this.applyUpdateFromNetworkSyncDataIfAny();
+      if (hasMadeChangeToStack) {
+        // If we have made changes to the stack as part of the network sync,
+        // we trust the network to be the source of truth for the scene stack,
+        // and skip any other requests to change the scene stack.
+        return true;
+      }
+
       const currentScene = this._stack[this._stack.length - 1];
       if (currentScene.renderAndStep(elapsedTime)) {
         const request = currentScene.getRequestedChange();
@@ -57,8 +66,6 @@ namespace gdjs {
           logger.error('Unrecognized change in scene stack: ' + request);
         }
       }
-
-      this.applyUpdateFromNetworkSyncDataIfAny();
 
       return true;
     }
@@ -232,9 +239,10 @@ namespace gdjs {
       this._sceneStackSyncDataToApply = sceneStackSyncData;
     }
 
-    applyUpdateFromNetworkSyncDataIfAny(): void {
+    applyUpdateFromNetworkSyncDataIfAny(): boolean {
       const sceneStackSyncData = this._sceneStackSyncDataToApply;
-      if (!sceneStackSyncData) return;
+      let hasMadeChangeToStack = false;
+      if (!sceneStackSyncData) return hasMadeChangeToStack;
 
       this._sceneStackSyncDataToApply = null;
 
@@ -256,6 +264,7 @@ namespace gdjs {
           if (newScene) {
             newScene.networkId = sceneSyncData.networkId;
           }
+          hasMadeChangeToStack = true;
           // Continue to the next scene in the stack received from the host.
           continue;
         }
@@ -275,6 +284,7 @@ namespace gdjs {
           if (newScene) {
             newScene.networkId = sceneSyncData.networkId;
           }
+          hasMadeChangeToStack = true;
           // Continue to the next scene in the stack received from the host.
           continue;
         }
@@ -317,6 +327,7 @@ namespace gdjs {
           if (newScene) {
             newScene.networkId = sceneSyncData.networkId;
           }
+          hasMadeChangeToStack = true;
           // Continue to the next scene in the stack received from the host.
           continue;
         }
@@ -330,7 +341,10 @@ namespace gdjs {
       if (this._stack.length > sceneStackSyncData.length) {
         const popCount = this._stack.length - sceneStackSyncData.length;
         this.pop(popCount);
+        hasMadeChangeToStack = true;
       }
+
+      return hasMadeChangeToStack;
     }
   }
 }

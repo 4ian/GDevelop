@@ -1,6 +1,20 @@
 import { PolygonVertices, integer, float } from "./CommonTypes";
 import { FlippingHelper } from "./GID";
 
+type EditableTileMapLayerAsJsObject = {
+  id: number;
+  alpha: number;
+  tiles: number[][];
+};
+
+type EditableTileMapAsJsObject = {
+  tileWidth: number;
+  tileHeight: number;
+  dimX: number;
+  dimY: number;
+  layers: EditableTileMapLayerAsJsObject[];
+};
+
 /**
  * A tile map model.
  *
@@ -70,7 +84,7 @@ export class EditableTileMap {
    * @param objectConfiguration
    */
   static from(
-    editableTileMapAsJsObject: any,
+    editableTileMapAsJsObject: EditableTileMapAsJsObject,
     {
       tileSize,
       tileSetColumnCount,
@@ -631,7 +645,7 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
   }
 
   static from(
-    editableTileMapLayerAsJsObject: any,
+    editableTileMapLayerAsJsObject: EditableTileMapLayerAsJsObject,
     tileMap: EditableTileMap,
     isTileIdValid: (tileId: number) => boolean
   ): EditableTileMapLayer {
@@ -640,7 +654,7 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
       editableTileMapLayerAsJsObject.id
     );
     layer.setAlpha(editableTileMapLayerAsJsObject.alpha);
-    editableTileMapLayerAsJsObject.tiles.forEach((row: Int32Array, y: number) =>
+    editableTileMapLayerAsJsObject.tiles.forEach((row: number[], y: number) =>
       row.forEach((tileGID, x) => {
         const tileId = FlippingHelper.getTileId(tileGID);
         if (isTileIdValid(tileId)) {

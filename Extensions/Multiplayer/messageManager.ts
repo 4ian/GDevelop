@@ -358,31 +358,10 @@ namespace gdjs {
           (instance) => instance.networkId === instanceNetworkId
         ) || null;
 
-      if (!instance) {
-        debugLogger.info(
-          `instance ${objectName} ${instanceNetworkId} not found with network ID, trying to find it with persistent UUID.`
-        );
-        instance =
-          instances.find(
-            (instance) =>
-              // For objects created from the start, the network ID is not set yet.
-              instance.persistentUuid &&
-              instance.persistentUuid.substring(0, 8) === instanceNetworkId
-          ) || null;
-
-        if (instance) {
-          debugLogger.info(
-            `instance ${objectName} ${instanceNetworkId} found with persistent UUID. Assigning network ID.`
-          );
-          // Set the network ID, as it was not set yet.
-          instance.networkId = instanceNetworkId;
-        }
-      }
-
       // If we know the position of the object, we can try to find the closest instance not synchronized yet.
       if (!instance && instanceX !== undefined && instanceY !== undefined) {
         debugLogger.info(
-          `instance ${objectName} ${instanceNetworkId} not found with network ID or persistent UUID, trying to find it with position ${instanceX}/${instanceY}.`
+          `instance ${objectName} ${instanceNetworkId} not found with network ID, trying to find it with position ${instanceX}/${instanceY}.`
         );
         // Instance not found, it must be a new object.
         // 2 cases :
@@ -2186,16 +2165,12 @@ namespace gdjs {
       // If Player 1 has disconnected, just end the game.
       if (playerNumber === 1) {
         logger.info('Host has disconnected, ending the game.');
-        clearMessagesTempData();
+        clearAllMessagesTempData();
         gdjs.multiplayer.handleLobbyGameEnded();
         return;
       }
 
-      // Remove the player from the list of players.
-      // This will cause the next hearbeat to not include this player
-      // and the others will consider them as disconnected.
-      delete _playersLastRoundTripTimes[playerNumber];
-      delete _playersInfo[playerNumber];
+      clearPlayerTempData(playerNumber);
       // If we are the host, send a heartbeat right away so that everyone is aware of the disconnection
       // on approximately the same frame.
       if (gdjs.multiplayer.isPlayerHost()) {
@@ -2369,11 +2344,11 @@ namespace gdjs {
 
       // If the message is received more than 1 time, we just ignore it and end the game.
 
-      clearMessagesTempData();
+      clearAllMessagesTempData();
       gdjs.multiplayer.handleLobbyGameEnded();
     };
 
-    const clearMessagesTempData = () => {
+    const clearAllMessagesTempData = () => {
       _playersLastRoundTripTimes = {};
       _playersInfo = {};
       lastReceivedGameSyncDataUpdates.clear();
@@ -2383,6 +2358,14 @@ namespace gdjs {
       _playerNumbersWhoJustJoined = [];
       expectedMessageAcknowledgements = {};
       _lastClockReceivedByInstanceByScene = {};
+    };
+
+    const clearPlayerTempData = (playerNumber: number) => {
+      // Remove the player from the list of players.
+      // This will cause the next hearbeat to not include this player
+      // and the others will consider them as disconnected.
+      delete _playersLastRoundTripTimes[playerNumber];
+      delete _playersInfo[playerNumber];
     };
 
     return {
@@ -2451,7 +2434,7 @@ namespace gdjs {
       // End game.
       sendEndGameMessage,
       handleEndGameMessages,
-      clearMessagesTempData,
+      clearAllMessagesTempData,
     };
   };
 

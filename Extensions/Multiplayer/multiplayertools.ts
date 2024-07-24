@@ -61,8 +61,13 @@ namespace gdjs {
         );
         // In case we're joining an existing lobby, it's possible we haven't
         // fully caught up with the game state yet, especially if a scene is loading.
-        // We look at them every frame to ensure we don't miss any.
-        gdjs.multiplayerMessageManager.handleSavedUpdateMessages(runtimeScene);
+        // We look at them every frame, from the moment the lobby has started,
+        // to ensure we don't miss any.
+        if (_isLobbyGameRunning) {
+          gdjs.multiplayerMessageManager.handleSavedUpdateMessages(
+            runtimeScene
+          );
+        }
         gdjs.multiplayerMessageManager.handleUpdateGameMessagesReceived(
           runtimeScene
         );
@@ -735,7 +740,7 @@ namespace gdjs {
       gdjs.multiplayerPeerJsHelper.disconnectFromAllPeers();
 
       // Clear the expected acknowledgments, as the game is ending.
-      gdjs.multiplayerMessageManager.clearMessagesTempData();
+      gdjs.multiplayerMessageManager.clearAllMessagesTempData();
     };
 
     /**

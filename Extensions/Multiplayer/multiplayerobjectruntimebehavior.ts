@@ -167,12 +167,9 @@ namespace gdjs {
 
     private _getOrCreateInstanceNetworkId() {
       if (!this.owner.networkId) {
-        // no ID for this object, let's generate one so it can be identified by other players.
-        // Either use the persistentUuid if it exists, or generate a new one.
+        // No ID for this object, let's generate one so it can be identified by other players.
         // Keep it short to avoid sending too much data.
-        const newID = this.owner.persistentUuid
-          ? this.owner.persistentUuid.substring(0, 8)
-          : gdjs.makeUuid().substring(0, 8);
+        const newID = gdjs.makeUuid().substring(0, 8);
         this.owner.networkId = newID;
       }
 

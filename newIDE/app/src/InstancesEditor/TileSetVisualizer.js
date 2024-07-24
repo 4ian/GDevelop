@@ -275,6 +275,10 @@ const TileSetVisualizer = ({
     x: number,
     y: number,
   |}>(null);
+  const [touchStartCoordinates, setTouchStartCoordinates] = React.useState<?{|
+    x: number,
+    y: number,
+  |}>(null);
   const [shouldCancelClick, setShouldCancelClick] = React.useState<boolean>(
     false
   );
@@ -336,6 +340,9 @@ const TileSetVisualizer = ({
   );
 
   const onPointerDown = React.useCallback((event: PointerEvent) => {
+    if (event.pointerType === 'touch') {
+      setTouchStartCoordinates({ x: event.pageX, y: event.pageY });
+    }
     const imageCoordinates = getImageCoordinatesFromPointerEvent(event);
     if (!imageCoordinates) return;
     setClickStartCoordinates({
@@ -349,7 +356,8 @@ const TileSetVisualizer = ({
       if (
         !clickStartCoordinates ||
         !displayedTileSize ||
-        !allowMultipleSelection
+        !allowMultipleSelection ||
+        event.pointerType === 'touch'
       ) {
         return;
       }
@@ -392,13 +400,26 @@ const TileSetVisualizer = ({
   );
 
   const onPointerUp = React.useCallback(
-    (event: MouseEvent) => {
+    (event: PointerEvent) => {
       try {
         if (!displayedTileSize) return;
         if (shouldCancelClick) {
           setShouldCancelClick(false);
           setTileIdDisplayGridCoordinates(null);
           return;
+        }
+
+        let isTouchDevice = false;
+
+        if (event.pointerType === 'touch') {
+          isTouchDevice = true;
+          if (
+            !touchStartCoordinates ||
+            Math.abs(event.pageX - touchStartCoordinates.x) > 30 ||
+            Math.abs(event.pageY - touchStartCoordinates.y) > 30
+          ) {
+            return;
+          }
         }
 
         const imageCoordinates = getImageCoordinatesFromPointerEvent(event);
@@ -445,10 +466,14 @@ const TileSetVisualizer = ({
           tileMapTileSelection && tileMapTileSelection.kind === 'multiple'
             ? { ...tileMapTileSelection }
             : { kind: 'multiple', coordinates: [] };
-        if (startX === x && startY === y) {
+        // Click on a tile.
+        if (
+          (startX === x && startY === y) ||
+          // Do not allow rectangular select on touch device as it conflicts with basic scrolling gestures.
+          isTouchDevice
+        ) {
           if (
             tileMapTileSelection &&
-            // Click on a tile.
             tileMapTileSelection.kind === 'multiple'
           ) {
             addOrRemoveCoordinatesInArray(newSelection.coordinates, {
@@ -480,6 +505,7 @@ const TileSetVisualizer = ({
       } finally {
         setClickStartCoordinates(null);
         setRectangularSelectionTilePreview(null);
+        setTouchStartCoordinates(null);
       }
     },
     [
@@ -493,6 +519,7 @@ const TileSetVisualizer = ({
       allowMultipleSelection,
       clickStartCoordinates,
       shouldCancelClick,
+      touchStartCoordinates,
     ]
   );
 
@@ -528,9 +555,9 @@ const TileSetVisualizer = ({
 
   const interactionCallbacks = {
     onMouseMove: onHoverAtlas,
-    onPointerDown: onPointerDown,
-    onPointerUp: onPointerUp,
-    onPointerMove: onPointerMove,
+    onPointerDown,
+    onPointerUp,
+    onPointerMove,
   };
 
   return (

@@ -176,7 +176,7 @@ const ObjectsEditorService = {
         objectConfiguration: gdObjectConfiguration
       ): gdObjectJsImplementation =>
         gd.asObjectJsImplementation(objectConfiguration),
-      helpPagePath: '/objects/tilemap', // TODO: create wiki page.
+      helpPagePath: '/objects/simple_tilemap',
     },
     'TiledSpriteObject::TiledSprite': {
       component: TiledSpriteEditor,

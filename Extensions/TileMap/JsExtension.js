@@ -1535,12 +1535,6 @@ module.exports = {
         helpPagePath: '/objects/tilemap',
       })
     );
-    objectsEditorService.registerEditorConfiguration(
-      'TileMap::SimpleTileMap',
-      objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
-        helpPagePath: '/objects/tilemap',
-      })
-    );
   },
   /**
    * Register renderers for instance of objects on the scene editor.

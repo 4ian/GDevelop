@@ -25,6 +25,14 @@ public:
   /**
    * @brief
    */
+  static void
+  FillAnyVariableBetweenObjects(gd::ObjectsContainer &globalObjectsContainer,
+                                gd::ObjectsContainer &objectsContainer,
+                                const gd::ObjectGroup &objectGroup);
+
+  /**
+   * @brief
+   */
   static gd::VariablesContainer MergeVariableContainers(
       const gd::ObjectsContainersList &objectsContainersList,
       const gd::ObjectGroup &objectGroup);

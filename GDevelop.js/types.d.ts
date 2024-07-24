@@ -350,6 +350,7 @@ export class ObjectGroup extends EmscriptenObject {
 
 export class GroupVariableHelper extends EmscriptenObject {
   static mergeVariableContainers(objectsContainersList: ObjectsContainersList, objectGroup: ObjectGroup): VariablesContainer;
+  static fillAnyVariableBetweenObjects(globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, objectGroup: ObjectGroup): void;
 }
 
 export class ObjectGroupsContainer extends EmscriptenObject {

@@ -729,6 +729,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_ComputeChangesetForVariablesContainer \
   ComputeChangesetForVariablesContainer
 #define STATIC_MergeVariableContainers MergeVariableContainers
+#define STATIC_FillAnyVariableBetweenObjects FillAnyVariableBetweenObjects
 #define STATIC_RenameEventsFunctionsExtension RenameEventsFunctionsExtension
 #define STATIC_UpdateExtensionNameInEventsBasedBehavior \
   UpdateExtensionNameInEventsBasedBehavior

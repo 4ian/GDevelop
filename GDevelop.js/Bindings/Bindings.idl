@@ -356,8 +356,12 @@ interface ObjectGroup {
 
 interface GroupVariableHelper {
     [Value] VariablesContainer STATIC_MergeVariableContainers(
-    [Const, Ref] ObjectsContainersList objectsContainersList,
-    [Const, Ref] ObjectGroup objectGroup);
+        [Const, Ref] ObjectsContainersList objectsContainersList,
+        [Const, Ref] ObjectGroup objectGroup);
+    void STATIC_FillAnyVariableBetweenObjects(
+        [Ref] ObjectsContainer globalObjectsContainer,
+        [Ref] ObjectsContainer objectsContainer,
+        [Const, Ref] ObjectGroup objectGroup);
 };
 
 interface ObjectGroupsContainer {

@@ -7,6 +7,8 @@ import EditedObjectGroupEditorDialog, {
 } from './EditedObjectGroupEditorDialog';
 import newNameGenerator from '../Utils/NewNameGenerator';
 
+const gd: libGDevelop = global.gd;
+
 type Props = {|
   project: gdProject,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
@@ -44,18 +46,9 @@ const ObjectGroupEditorDialog = ({
       shouldSpreadAnyVariables: boolean,
       groupObjectNames: Array<string>
     ) => {
-      // TODO Handle shouldSpreadAnyVariables
+      let objectGroup;
       if (editedObjectGroup) {
-        for (const objectName of groupObjectNames) {
-          editedObjectGroup.addObject(objectName);
-        }
-        if (groupObjectNames.length === 0) {
-          // An empty group would have shown the same dialog.
-          onApply();
-        } else {
-          setEditedObjectGroup(editedObjectGroup);
-          setSelectedTab('variables');
-        }
+        objectGroup = editedObjectGroup;
       } else {
         const name = newNameGenerator(objectGroupName || 'Group', name =>
           projectScopedContainersAccessor
@@ -63,27 +56,34 @@ const ObjectGroupEditorDialog = ({
             .getObjectsContainersList()
             .hasObjectOrGroupNamed(name)
         );
-
         const objectGroupContainer = objectsContainer.getObjectGroups();
-        const newObjectGroup = objectGroupContainer.insertNew(
+        objectGroup = objectGroupContainer.insertNew(
           name,
           objectGroupContainer.count()
         );
-        for (const objectName of groupObjectNames) {
-          newObjectGroup.addObject(objectName);
-        }
-        onObjectGroupAdded(newObjectGroup);
-        if (groupObjectNames.length === 0) {
-          // An empty group would have shown the same dialog.
-          onApply();
-        } else {
-          setEditedObjectGroup(newObjectGroup);
-          setSelectedTab('variables');
-        }
+        onObjectGroupAdded(objectGroup);
       }
+      if (groupObjectNames.length === 0) {
+        // An empty group would have shown the same dialog.
+        onApply();
+        return;
+      }
+      for (const objectName of groupObjectNames) {
+        objectGroup.addObject(objectName);
+      }
+      if (shouldSpreadAnyVariables) {
+        gd.GroupVariableHelper.fillAnyVariableBetweenObjects(
+          globalObjectsContainer || objectsContainer,
+          objectsContainer,
+          objectGroup
+        );
+      }
+      setEditedObjectGroup(objectGroup);
+      setSelectedTab('variables');
     },
     [
       editedObjectGroup,
+      globalObjectsContainer,
       objectsContainer,
       onApply,
       onObjectGroupAdded,

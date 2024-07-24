@@ -16,6 +16,55 @@
 
 namespace gd {
 
+void GroupVariableHelper::FillAnyVariableBetweenObjects(
+    gd::ObjectsContainer &globalObjectsContainer,
+    gd::ObjectsContainer &objectsContainer,
+    const gd::ObjectGroup &objectGroup) {
+  const auto &objectNames = objectGroup.GetAllObjectsNames();
+  for (const gd::String &sourceObjectName : objectNames) {
+    const bool hasObject = objectsContainer.HasObjectNamed(sourceObjectName);
+    if (!hasObject &&
+        !globalObjectsContainer.HasObjectNamed(sourceObjectName)) {
+      continue;
+    }
+    const auto &sourceObject =
+        hasObject ? objectsContainer.GetObject(sourceObjectName)
+                  : globalObjectsContainer.GetObject(sourceObjectName);
+    const auto &sourceVariablesContainer = sourceObject.GetVariables();
+
+    for (const gd::String &destinationObjectName : objectNames) {
+      if (sourceObjectName == destinationObjectName) {
+        continue;
+      }
+      const bool hasObject =
+          objectsContainer.HasObjectNamed(destinationObjectName);
+      if (!hasObject &&
+          !globalObjectsContainer.HasObjectNamed(destinationObjectName)) {
+        continue;
+      }
+      auto &destinationObject =
+          hasObject ? objectsContainer.GetObject(destinationObjectName)
+                    : globalObjectsContainer.GetObject(destinationObjectName);
+      auto &destinationVariablesContainer = destinationObject.GetVariables();
+
+      for (std::size_t sourceVariableIndex = 0;
+           sourceVariableIndex < sourceVariablesContainer.Count();
+           ++sourceVariableIndex) {
+        auto &sourceVariable =
+            sourceVariablesContainer.Get(sourceVariableIndex);
+        const auto &variableName =
+            sourceVariablesContainer.GetNameAt(sourceVariableIndex);
+
+        if (!destinationVariablesContainer.Has(variableName)) {
+          destinationVariablesContainer.Insert(
+              variableName, sourceVariable,
+              destinationVariablesContainer.Count());
+        }
+      }
+    }
+  }
+}
+
 gd::VariablesContainer GroupVariableHelper::MergeVariableContainers(
     const gd::ObjectsContainersList &objectsContainersList,
     const gd::ObjectGroup &objectGroup) {
@@ -66,8 +115,7 @@ gd::VariablesContainer GroupVariableHelper::MergeVariableContainers(
 
 void GroupVariableHelper::FillMissingGroupVariablesToObjects(
     gd::ObjectsContainer &globalObjectsContainer,
-    gd::ObjectsContainer &objectsContainer,
-    const gd::ObjectGroup &objectGroup,
+    gd::ObjectsContainer &objectsContainer, const gd::ObjectGroup &objectGroup,
     const gd::SerializerElement &originalSerializedVariables) {
   gd::VariablesContainer groupVariablesContainer;
   groupVariablesContainer.UnserializeFrom(originalSerializedVariables);

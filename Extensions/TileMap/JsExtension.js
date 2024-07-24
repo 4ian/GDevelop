@@ -715,7 +715,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
   const object = extension
     .addObject(
       'SimpleTileMap',
-      _('Tilemap'),
+      _('Tile map'),
       _('Displays a tiled-based map.'),
       'JsPlatform/Extensions/tile_map.svg',
       objectSimpleTileMap
@@ -741,7 +741,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       '',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', _('Tilemap'), 'SimpleTileMap', false)
+    .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
     .addParameter('number', _('Grid X'), '', false)
     .addParameter('number', _('Grid Y'), '', false)
     .setFunctionName('getSceneXCoordinateOfTileCenter');
@@ -754,7 +754,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       '',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', _('Tilemap'), 'SimpleTileMap', false)
+    .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
     .addParameter('number', _('Grid X'), '', false)
     .addParameter('number', _('Grid Y'), '', false)
     .setFunctionName('getSceneYCoordinateOfTileCenter');
@@ -762,14 +762,14 @@ const defineSimpleTileMap = function (extension, _, gd) {
   object
     .addExpression(
       'GridX',
-      _('Tile map grid horizontal coordinate'),
+      _('Tile map grid column coordinate'),
       _(
-        'Get the tile horizontal coordinates in the tilemap corresponding to the scene coordinates.'
+        'Get the grid column coordinates in the tile map corresponding to the scene coordinates.'
       ),
       '',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', _('Tilemap'), 'SimpleTileMap', false)
+    .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
     .addParameter('number', _('Position X'), '', false)
     .addParameter('number', _('Position Y'), '', false)
     .setFunctionName('getColumnIndexAtPosition');
@@ -777,14 +777,14 @@ const defineSimpleTileMap = function (extension, _, gd) {
   object
     .addExpression(
       'GridY',
-      _('Tile map grid vertical coordinate'),
+      _('Tile map grid row coordinate'),
       _(
-        'Get the tile vertical coordinates in the tilemap corresponding to the scene coordinates.'
+        'Get the grid row coordinates in the tile map corresponding to the scene coordinates.'
       ),
       '',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', _('Tilemap'), 'SimpleTileMap', false)
+    .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
     .addParameter('number', _('Position X'), '', false)
     .addParameter('number', _('Position Y'), '', false)
     .setFunctionName('getRowIndexAtPosition');
@@ -1006,32 +1006,32 @@ const defineSimpleTileMap = function (extension, _, gd) {
   object
     .addExpressionAndConditionAndAction(
       'number',
-      'GridHeight',
-      _('Grid height'),
-      _('the grid height (number of rows) in the tile map'),
-      _('the grid height'),
+      'GridRowCount',
+      _('Grid row count'),
+      _('the grid row count in the tile map'),
+      _('the grid row count'),
       _('Size'),
       'res/actions/scaleHeight24_black.png'
     )
     .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
     .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
-    .setFunctionName('setGridHeight')
-    .setGetter('getGridHeight');
+    .setFunctionName('setGridRowCount')
+    .setGetter('getGridRowCount');
 
   object
     .addExpressionAndConditionAndAction(
       'number',
-      'GridWidth',
-      _('Grid width'),
-      _('the grid width (number of columns) in the tile map'),
-      _('the grid width'),
+      'GridColumnCount',
+      _('Grid column count'),
+      _('the grid column count in the tile map'),
+      _('the grid column count'),
       _('Size'),
       'res/actions/scaleWidth24_black.png'
     )
     .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
     .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
-    .setFunctionName('setGridWidth')
-    .setGetter('getGridWidth');
+    .setFunctionName('setGridColumnCount')
+    .setGetter('getGridColumnCount');
 };
 
 /**
@@ -1463,7 +1463,7 @@ module.exports = {
     extension
       .setExtensionInformation(
         'TileMap',
-        _('Tilemap'),
+        _('Tile map'),
         _(
           "The Tilemap object can be used to display tile-based objects. It's a good way to create maps for RPG, strategy games or create objects by assembling tiles, useful for platformer, retro-looking games, etc..."
         ),

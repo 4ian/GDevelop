@@ -708,26 +708,26 @@ namespace gdjs {
       this.invalidateHitboxes();
     }
 
-    setGridHeight(targetRowCount: integer) {
+    setGridRowCount(targetRowCount: integer) {
       if (targetRowCount <= 0) return;
-      this._renderer.setGridHeight(targetRowCount);
+      this._renderer.setGridRowCount(targetRowCount);
       this._isTileMapDirty = true;
       this.invalidateHitboxes();
     }
 
-    setGridWidth(targetColumnCount: integer) {
+    setGridColumnCount(targetColumnCount: integer) {
       if (targetColumnCount <= 0) return;
-      this._renderer.setGridWidth(targetColumnCount);
+      this._renderer.setGridColumnCount(targetColumnCount);
       this._isTileMapDirty = true;
       this.invalidateHitboxes();
     }
 
-    getGridHeight(): integer {
-      return this._renderer.getGridHeight();
+    getGridRowCount(): integer {
+      return this._renderer.getGridRowCount();
     }
 
-    getGridWidth(): integer {
-      return this._renderer.getGridWidth();
+    getGridColumnCount(): integer {
+      return this._renderer.getGridColumnCount();
     }
   }
   gdjs.registerObject(

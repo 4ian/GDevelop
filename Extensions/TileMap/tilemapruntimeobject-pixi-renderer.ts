@@ -245,7 +245,7 @@ namespace gdjs {
     /**
      * @param targetRowCount The number of rows to have.
      */
-    setGridHeight(targetRowCount: integer) {
+    setGridRowCount(targetRowCount: integer) {
       const tileMap = this._tileMap;
       if (!tileMap) return;
       return tileMap.setDimensionY(targetRowCount);
@@ -253,19 +253,19 @@ namespace gdjs {
     /**
      * @param targetColumnCount The number of rows to have.
      */
-    setGridWidth(targetColumnCount: integer) {
+    setGridColumnCount(targetColumnCount: integer) {
       const tileMap = this._tileMap;
       if (!tileMap) return;
       return tileMap.setDimensionX(targetColumnCount);
     }
 
-    getGridHeight(): integer {
+    getGridRowCount(): integer {
       const tileMap = this._tileMap;
       if (!tileMap) return 0;
       return tileMap.getDimensionY();
     }
 
-    getGridWidth(): integer {
+    getGridColumnCount(): integer {
       const tileMap = this._tileMap;
       if (!tileMap) return 0;
       return tileMap.getDimensionX();

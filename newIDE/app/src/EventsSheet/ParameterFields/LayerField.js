@@ -31,12 +31,16 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       focus,
     }));
 
-    const { layout } = props.scope;
+    const { layout, eventsFunctionsExtension, eventsBasedObject } = props.scope;
+
     // The list is not kept with a memo because layers could be changed by
     // another component without this one to know.
-    const layerNames = layout
-      ? mapFor(0, layout.getLayersCount(), i => {
-          const layer = layout.getLayerAt(i);
+
+    const layersSource = layout || eventsBasedObject;
+    const layersContainer = layersSource ? layersSource.getLayers() : null;
+    const layerNames = layersContainer
+      ? mapFor(0, layersContainer.getLayersCount(), i => {
+          const layer = layersContainer.getLayerAt(i);
           return layer.getName();
         })
       : [];
@@ -45,10 +49,11 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       layerName => `"${layerName}"` === props.value
     );
 
+    const canAutocomplete = !eventsFunctionsExtension || eventsBasedObject;
+
     // If the current value is not in the list of layers, display an expression field.
     const [isExpressionField, setIsExpressionField] = React.useState(
-      (!!props.value && !isCurrentValueInLayersList) ||
-        props.scope.eventsFunctionsExtension
+      (!!props.value && !isCurrentValueInLayersList) || !canAutocomplete
     );
 
     const switchFieldType = () => {
@@ -122,25 +127,27 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           )
         }
         renderButton={style =>
-          props.scope.eventsFunctionsExtension ? null : isExpressionField ? (
-            <FlatButton
-              id="switch-expression-select"
-              leftIcon={<TypeCursorSelect />}
-              style={style}
-              primary
-              label={<Trans>Select a layer</Trans>}
-              onClick={switchFieldType}
-            />
-          ) : (
-            <RaisedButton
-              id="switch-expression-select"
-              icon={<Functions />}
-              style={style}
-              primary
-              label={<Trans>Use an expression</Trans>}
-              onClick={switchFieldType}
-            />
-          )
+          canAutocomplete ? (
+            isExpressionField ? (
+              <FlatButton
+                id="switch-expression-select"
+                leftIcon={<TypeCursorSelect />}
+                style={style}
+                primary
+                label={<Trans>Select a layer</Trans>}
+                onClick={switchFieldType}
+              />
+            ) : (
+              <RaisedButton
+                id="switch-expression-select"
+                icon={<Functions />}
+                style={style}
+                primary
+                label={<Trans>Use an expression</Trans>}
+                onClick={switchFieldType}
+              />
+            )
+          ) : null
         }
       />
     );

@@ -33,13 +33,13 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       focus,
     }));
     const { scope, instruction, expression, parameterIndex } = props;
+    const { layout, eventsFunctionsExtension, eventsBasedObject } = scope;
 
     // We don't memo/callback this, as we want to recompute it every time something changes.
     // Because of the function getPreviousParameterValue.
     const getEffectNames = () => {
-      const { layout } = scope;
-      if (!layout) return [];
-
+      const layersSource = layout || eventsBasedObject;
+      if (!layersSource) return [];
       const layerName =
         tryExtractStringLiteralContent(
           getPreviousParameterValue({
@@ -48,8 +48,9 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             parameterIndex,
           })
         ) || ''; // If no layer name is provided, this is the Base layer.
-      if (!layout.hasLayerNamed(layerName)) return [];
-      const layer = layout.getLayer(layerName);
+      const layersContainer = layersSource.getLayers();
+      if (!layersContainer.hasLayerNamed(layerName)) return [];
+      const layer = layersContainer.getLayer(layerName);
 
       return enumerateEffectNames(layer.getEffects()).sort();
     };
@@ -60,10 +61,11 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       effectName => `"${effectName}"` === props.value
     );
 
+    const canAutocomplete = !eventsFunctionsExtension || eventsBasedObject;
+
     // If the current value is not in the list, display an expression field.
     const [isExpressionField, setIsExpressionField] = React.useState(
-      (!!props.value && !isCurrentValueInEffectNamesList) ||
-        props.scope.eventsFunctionsExtension
+      (!!props.value && !isCurrentValueInEffectNamesList) || !canAutocomplete
     );
 
     const switchFieldType = () => {
@@ -133,25 +135,27 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           )
         }
         renderButton={style =>
-          props.scope.eventsFunctionsExtension ? null : isExpressionField ? (
-            <FlatButton
-              id="switch-expression-select"
-              leftIcon={<TypeCursorSelect />}
-              style={style}
-              primary
-              label={<Trans>Select an effect</Trans>}
-              onClick={switchFieldType}
-            />
-          ) : (
-            <RaisedButton
-              id="switch-expression-select"
-              icon={<Functions />}
-              style={style}
-              primary
-              label={<Trans>Use an expression</Trans>}
-              onClick={switchFieldType}
-            />
-          )
+          canAutocomplete ? (
+            isExpressionField ? (
+              <FlatButton
+                id="switch-expression-select"
+                leftIcon={<TypeCursorSelect />}
+                style={style}
+                primary
+                label={<Trans>Select an effect</Trans>}
+                onClick={switchFieldType}
+              />
+            ) : (
+              <RaisedButton
+                id="switch-expression-select"
+                icon={<Functions />}
+                style={style}
+                primary
+                label={<Trans>Use an expression</Trans>}
+                onClick={switchFieldType}
+              />
+            )
+          ) : null
         }
       />
     );

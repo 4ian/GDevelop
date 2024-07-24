@@ -50,11 +50,12 @@ const EditedObjectGroupEditorDialog = ({
     initialTab || 'objects'
   );
 
-  // TODO Is it a memory leak?
   const groupVariablesContainer = ((React.useRef<gdVariablesContainer | null>(
     null
   ): any): { current: gdVariablesContainer });
   if (!groupVariablesContainer.current) {
+    // The VariablesContainer is returned by value.
+    // Thus, the same instance is reused every time.
     groupVariablesContainer.current = gd.GroupVariableHelper.mergeVariableContainers(
       projectScopedContainersAccessor.get().getObjectsContainersList(),
       group
@@ -189,11 +190,11 @@ const EditedObjectGroupEditorDialog = ({
             variablesContainer={groupVariablesContainer.current}
             areObjectVariables
             emptyPlaceholderTitle={
-              <Trans>Add your first object variable</Trans>
+              <Trans>Add your first object group variable</Trans>
             }
             emptyPlaceholderDescription={
               <Trans>
-                These variables hold additional information on an object.
+                These variables hold additional information on an object group.
               </Trans>
             }
             helpPagePath={'/all-features/variables/object-variables'}

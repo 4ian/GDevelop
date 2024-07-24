@@ -93,6 +93,9 @@ namespace gdjs {
     }
 
     updateOpacity(): void {
+      // TODO: Currently, the renderer does not use the object alpha to set
+      // opacity. Setting alpha on each layer tile might not be useful as
+      // each layer would be separately transparent instead of the whole tilemap.
       this._pixiObject.alpha = this._object._opacity / 255;
       const tileMap = this._tileMap;
       if (!tileMap) return;

@@ -59,6 +59,10 @@ namespace gdjs {
         gdjs.multiplayerMessageManager.handleChangeVariableOwnerMessagesReceived(
           runtimeScene
         );
+        // In case we're joining an existing lobby, it's possible we haven't
+        // fully caught up with the game state yet, especially if a scene is loading.
+        // We look at them every frame to ensure we don't miss any.
+        gdjs.multiplayerMessageManager.handleSavedUpdateMessages(runtimeScene);
         gdjs.multiplayerMessageManager.handleUpdateGameMessagesReceived(
           runtimeScene
         );

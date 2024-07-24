@@ -55,6 +55,13 @@ namespace gdjs {
       return this._updates;
     }
 
+    remove(update: T) {
+      const index = this._updates.indexOf(update);
+      if (index !== -1) {
+        this._updates.splice(index, 1);
+      }
+    }
+
     clear() {
       this._updates = [];
     }
@@ -375,7 +382,7 @@ namespace gdjs {
       // If we know the position of the object, we can try to find the closest instance not synchronized yet.
       if (!instance && instanceX !== undefined && instanceY !== undefined) {
         debugLogger.info(
-          `instance ${objectName} ${instanceNetworkId} not found with network ID, trying to find it with position ${instanceX}/${instanceY}.`
+          `instance ${objectName} ${instanceNetworkId} not found with network ID or persistent UUID, trying to find it with position ${instanceX}/${instanceY}.`
         );
         // Instance not found, it must be a new object.
         // 2 cases :
@@ -1729,20 +1736,24 @@ namespace gdjs {
           const messageSender = message.getSender();
           const sceneNetworkId = messageData.id;
 
-          if (sceneNetworkId !== runtimeScene.networkId) {
-            debugLogger.info(
-              `Received update of scene ${sceneNetworkId}, but we are on ${runtimeScene.networkId}. Skipping.`
-            );
-            // The scene is not the current scene.
-            return;
-          }
-
           if (gdjs.multiplayer.isReadyToSendOrReceiveGameUpdateMessages()) {
+            if (sceneNetworkId !== runtimeScene.networkId) {
+              debugLogger.info(
+                `Received update of scene ${sceneNetworkId}, but we are on ${runtimeScene.networkId}. Skipping.`
+              );
+              // The scene is not the current scene.
+              return;
+            }
+
             runtimeScene.updateFromNetworkSyncData(messageData);
           } else {
             // If the game is not ready to receive game update messages, we need to save the data for later use.
             // This can happen when joining a game that is already running.
+            debugLogger.info(
+              `Saving scene ${sceneNetworkId} update message for later use.`
+            );
             lastReceivedSceneSyncDataUpdates.store(messageData);
+            return;
           }
 
           // If we are are the host,
@@ -1891,7 +1902,9 @@ namespace gdjs {
           } else {
             // If the game is not ready to receive game update messages, we need to save the data for later use.
             // This can happen when joining a game that is already running.
+            debugLogger.info(`Saving game update message for later use.`);
             lastReceivedGameSyncDataUpdates.store(messageData);
+            return;
           }
 
           // If we are are the host,
@@ -1912,8 +1925,10 @@ namespace gdjs {
     const handleSavedUpdateMessages = (runtimeScene: gdjs.RuntimeScene) => {
       // Reapply the game saved updates.
       lastReceivedGameSyncDataUpdates.getUpdates().forEach((messageData) => {
+        debugLogger.info(`Reapplying saved update of game.`);
         runtimeScene.getGame().updateFromNetworkSyncData(messageData);
       });
+      // Game updates are always applied properly, so we can clear them.
       lastReceivedGameSyncDataUpdates.clear();
 
       // Then reapply the scene saved updates.
@@ -1922,13 +1937,19 @@ namespace gdjs {
 
         if (sceneNetworkId !== runtimeScene.networkId) {
           debugLogger.info(
-            `Saved update of scene ${sceneNetworkId}, but we are on ${runtimeScene.networkId}. Skipping.`
+            `Trying to apply saved update of scene ${sceneNetworkId}, but we are on ${runtimeScene.networkId}. Skipping.`
           );
           // The scene is not the current scene.
           return;
         }
+
+        debugLogger.info(`Reapplying saved update of scene ${sceneNetworkId}.`);
+
+        runtimeScene.updateFromNetworkSyncData(messageData);
+        // We only remove the message if it was successfully applied, so it can be reapplied later,
+        // in case we were not on the right scene.
+        lastReceivedSceneSyncDataUpdates.remove(messageData);
       });
-      lastReceivedSceneSyncDataUpdates.clear();
     };
 
     const heartbeatMessageNamePrefix = '#heartbeat';

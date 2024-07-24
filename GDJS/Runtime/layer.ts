@@ -318,7 +318,7 @@ namespace gdjs {
      * Convert a point from the container coordinates (for example,
      * an object position) to the canvas coordinates.
      *
-     * This method doesn't handle 3D rotations.
+     * This method handles 3D rotations.
      *
      * @param x The x position, in container coordinates.
      * @param y The y position, in container coordinates.
@@ -335,6 +335,11 @@ namespace gdjs {
 
       // The result parameter used to be optional.
       let position = result || [0, 0];
+
+      if (this._renderer.isCameraRotatedIn3D()) {
+        return this._renderer.transformFrom3DWorld(x, y, 0, cameraId, result);
+      }
+
       x -= this.getCameraX(cameraId);
       y -= this.getCameraY(cameraId);
 

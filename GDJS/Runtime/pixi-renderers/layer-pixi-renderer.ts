@@ -575,6 +575,37 @@ namespace gdjs {
       return result;
     }
 
+    transformFrom3DWorld(
+      worldX: float,
+      worldY: float,
+      worldZ: float,
+      cameraId: integer,
+      result: FloatPoint
+    ): FloatPoint {
+      const camera = this._threeCamera;
+      if (!camera) {
+        result[0] = 0;
+        result[1] = 0;
+        return result;
+      }
+      const width = this._layer.getWidth();
+      const height = this._layer.getHeight();
+
+      let vector = LayerPixiRenderer.vectorForProjections;
+      if (!vector) {
+        vector = new THREE.Vector3();
+        LayerPixiRenderer.vectorForProjections = vector;
+      }
+
+      // https://stackoverflow.com/questions/11586527/converting-world-coordinates-to-screen-coordinates-in-three-js-using-projection
+      vector.set(worldX, -worldY, worldZ);
+      vector.project(camera);
+
+      result[0] = (vector.x * width) / 2 + width / 2;
+      result[1] = (-vector.y * height) / 2 + height / 2;
+      return result;
+    }
+
     updateVisibility(visible: boolean): void {
       this._pixiContainer.visible = !!visible;
       if (this._threeGroup) this._threeGroup.visible = !!visible;

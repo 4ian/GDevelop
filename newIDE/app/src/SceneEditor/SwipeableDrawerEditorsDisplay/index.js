@@ -261,6 +261,8 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
               }
               pauseRendering={!props.isActive}
               showObjectInstancesIn3D={values.use3DEditor}
+              tileMapTileSelection={props.tileMapTileSelection}
+              onSelectTileMapTile={props.onSelectTileMapTile}
             />
           </ErrorBoundary>
           <div style={styles.bottomContainer} id={swipeableDrawerContainerId}>
@@ -349,6 +351,8 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                       ref={instancesPropertiesEditorRef}
                       unsavedChanges={props.unsavedChanges}
                       historyHandler={props.historyHandler}
+                      tileMapTileSelection={props.tileMapTileSelection}
+                      onSelectTileMapTile={props.onSelectTileMapTile}
                     />
                   )}
                 </I18n>

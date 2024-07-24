@@ -52,6 +52,7 @@ export default class RenderedUnknownInstance extends RenderedInstance {
     this._pixiObject.lineTo(width / 2, -height / 2);
     this._pixiObject.lineTo(width / 2, height / 2);
     this._pixiObject.lineTo(-width / 2, height / 2);
+    this._pixiObject.lineTo(-width / 2, -height / 2);
     this._pixiObject.endFill();
 
     this._pixiObject.position.x = this._instance.getX() + width / 2;

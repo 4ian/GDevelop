@@ -33,7 +33,7 @@ namespace gdjs {
     TilemapNetworkSyncDataType;
 
   /**
-   * Displays a Tilemap object (mapeditor.org supported).
+   * Displays a Tilemap object (LDtk and Tiled).
    */
   export class TileMapRuntimeObject
     extends gdjs.RuntimeObject

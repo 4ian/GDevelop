@@ -255,6 +255,8 @@ const MosaicEditorsDisplay = React.forwardRef<
               ref={instancesPropertiesEditorRef}
               unsavedChanges={props.unsavedChanges}
               historyHandler={props.historyHandler}
+              tileMapTileSelection={props.tileMapTileSelection}
+              onSelectTileMapTile={props.onSelectTileMapTile}
             />
           )}
         </I18n>
@@ -330,6 +332,8 @@ const MosaicEditorsDisplay = React.forwardRef<
             editorRef.current = editor;
           }}
           pauseRendering={!props.isActive}
+          tileMapTileSelection={props.tileMapTileSelection}
+          onSelectTileMapTile={props.onSelectTileMapTile}
         />
       ),
     },

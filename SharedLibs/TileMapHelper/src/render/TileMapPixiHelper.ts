@@ -14,7 +14,7 @@ export namespace PixiTileMapHelper {
   /**
    * Split an atlas image into Pixi textures.
    *
-   * @param tiledMap A tile map exported from Tiled.
+   * @param tiledMap A tile map exported from Tiled or LDtk.
    * @param levelIndex The level of the tile map to load from.
    * @param atlasTexture The texture containing the whole tile set.
    * @param getTexture A getter to load a texture. Used if atlasTexture is not specified.
@@ -48,6 +48,43 @@ export namespace PixiTileMapHelper {
     );
 
     return null;
+  }
+
+  /**
+   * Split an atlas image into Pixi textures.
+   *
+   * @param atlasTexture The texture containing the whole tile set.
+   * @param columnCount The number of columns.
+   * @param rowCount The number of rows.
+   * @param tileSize The squared tile size.
+   * @returns A textures cache.
+   */
+  export function parseSimpleTileMapAtlas(
+    atlasTexture: PIXI.BaseTexture<PIXI.Resource>,
+    columnCount: number,
+    rowCount: number,
+    tileSize: number
+  ): TileTextureCache {
+    const textureCache = new TileTextureCache();
+    for (let x = 0; x < columnCount; x++) {
+      for (let y = 0; y < rowCount; y++) {
+        const rect = new PIXI.Rectangle(
+          x * tileSize,
+          y * tileSize,
+          tileSize,
+          tileSize
+        );
+
+        const texture = new PIXI.Texture(atlasTexture, rect);
+
+        textureCache.setTexture(
+          // Id of the tile
+          rowCount * x + y,
+          texture
+        );
+      }
+    }
+    return textureCache;
   }
 
   /**

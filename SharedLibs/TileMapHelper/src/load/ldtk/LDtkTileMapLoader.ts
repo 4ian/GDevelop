@@ -75,7 +75,7 @@ export namespace LDtkTileMapLoader {
       gridSize,
       dimX,
       dimY,
-      tileSet
+      tileSet,
     );
     const composedTileMap = new Map<string, TileDefinition>();
     let nextComposedTileId = 0xfffffff;
@@ -89,7 +89,7 @@ export namespace LDtkTileMapLoader {
       const gridSize = layer.__gridSize;
       const tilesetId = layer.__tilesetDefUid;
 
-      const editableTileLayer = editableTileMap.addTileLayer(iLayer);
+      const editableTileLayer = editableTileMap.addNewTileLayer(iLayer);
       editableTileLayer.setAlpha(layer.__opacity);
       editableTileLayer.setVisible(layer.visible);
 

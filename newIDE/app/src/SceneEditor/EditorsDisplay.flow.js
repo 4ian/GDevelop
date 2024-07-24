@@ -18,6 +18,7 @@ import Rectangle from '../Utils/Rectangle';
 import ViewPosition from '../InstancesEditor/ViewPosition';
 import { type ObjectFolderOrObjectWithContext } from '../ObjectsList/EnumerateObjectFolderOrObject';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
+import { type TileMapTileSelection } from '../InstancesEditor/TileSetVisualizer';
 
 export type SceneEditorsDisplayProps = {|
   project: gdProject,
@@ -93,6 +94,9 @@ export type SceneEditorsDisplayProps = {|
   onInstancesRotated: (Array<gdInitialInstance>) => void,
   isInstanceOf3DObject: gdInitialInstance => boolean,
   onSelectAllInstancesOfObjectInLayout: string => void,
+
+  tileMapTileSelection: ?TileMapTileSelection,
+  onSelectTileMapTile: (?TileMapTileSelection) => void,
 
   canInstallPrivateAsset: () => boolean,
 

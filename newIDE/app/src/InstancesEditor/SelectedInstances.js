@@ -31,6 +31,7 @@ type Props = {|
   keyboardShortcuts: KeyboardShortcuts,
   onPanMove: (deltaX: number, deltaY: number, x: number, y: number) => void,
   onPanEnd: () => void,
+  getFillColor: (isLocked: boolean) => {| color: number, alpha: number |},
 |};
 
 const getButtonSizes = (screenType: ScreenType) => {
@@ -84,6 +85,7 @@ export default class SelectedInstances {
   keyboardShortcuts: KeyboardShortcuts;
   onPanMove: (deltaX: number, deltaY: number, x: number, y: number) => void;
   onPanEnd: () => void;
+  getFillColor: (isLocked: boolean) => {| color: number, alpha: number |};
 
   pixiContainer = new PIXI.Container();
   rectanglesContainer = new PIXI.Container();
@@ -112,6 +114,7 @@ export default class SelectedInstances {
     keyboardShortcuts,
     onPanMove,
     onPanEnd,
+    getFillColor,
   }: Props) {
     this.instanceMeasurer = instanceMeasurer;
     this.onResize = onResize;
@@ -124,6 +127,7 @@ export default class SelectedInstances {
     this.keyboardShortcuts = keyboardShortcuts;
     this.onPanMove = onPanMove;
     this.onPanEnd = onPanEnd;
+    this.getFillColor = getFillColor;
 
     this.pixiContainer.addChild(this.rectanglesContainer);
 
@@ -326,9 +330,9 @@ export default class SelectedInstances {
       );
 
       this.selectedRectangles[i].clear();
-      const selectionRectangleColor = instance.isLocked() ? 0xbc5753 : 0x6868e8;
-      this.selectedRectangles[i].beginFill(selectionRectangleColor);
-      this.selectedRectangles[i].lineStyle(1, selectionRectangleColor, 1);
+      const { color, alpha } = this.getFillColor(instance.isLocked());
+      this.selectedRectangles[i].beginFill(color, alpha);
+      this.selectedRectangles[i].lineStyle(1, color, 1);
       this.selectedRectangles[i].fill.alpha = 0.3;
       this.selectedRectangles[i].alpha = 0.8;
       this.selectedRectangles[i].drawRect(

@@ -74,6 +74,7 @@ import {
 } from '../MainFrame/ResourcesWatcher';
 import { unserializeFromJSObject } from '../Utils/Serializer';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
+import { type TileMapTileSelection } from '../InstancesEditor/TileSetVisualizer';
 
 const gd: libGDevelop = global.gd;
 
@@ -156,6 +157,8 @@ type State = {|
 
   selectedObjectFolderOrObjectsWithContext: Array<ObjectFolderOrObjectWithContext>,
   selectedLayer: string,
+
+  tileMapTileSelection: ?TileMapTileSelection,
 |};
 
 type CopyCutPasteOptions = {|
@@ -204,6 +207,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         message: '',
         touchScreenMessage: '',
       },
+      tileMapTileSelection: null,
 
       selectedObjectFolderOrObjectsWithContext: [],
       selectedLayer: BASE_LAYER_NAME,
@@ -761,6 +765,10 @@ export default class SceneEditor extends React.Component<Props, State> {
   _onInstancesModified = (instances: Array<gdInitialInstance>) => {
     this.forceUpdate();
     //TODO: Save for redo with debounce (and cancel on unmount)
+  };
+
+  onSelectTileMapTile = (tileMapTileSelection: ?TileMapTileSelection) => {
+    this.setState({ tileMapTileSelection });
   };
 
   _onSelectInstances = (
@@ -1802,6 +1810,8 @@ export default class SceneEditor extends React.Component<Props, State> {
                 onSelectLayer={(layer: string) =>
                   this.setState({ selectedLayer: layer })
                 }
+                tileMapTileSelection={this.state.tileMapTileSelection}
+                onSelectTileMapTile={this.onSelectTileMapTile}
                 onExportAssets={this.openObjectExporterDialog}
                 onDeleteObjects={this._onDeleteObjects}
                 getValidatedObjectOrGroupName={

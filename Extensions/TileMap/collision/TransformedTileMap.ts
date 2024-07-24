@@ -30,7 +30,7 @@ namespace gdjs {
        */
       _transformationUpToDateCount: integer = 1;
       /**
-       * An reusable Point to avoid allocations.
+       * A reusable Point to avoid allocations.
        */
       private static readonly workingPoint: FloatPoint = [0, 0];
 
@@ -41,14 +41,28 @@ namespace gdjs {
         this._source = source;
         this.tag = tag;
         this._layers = new Map<integer, TransformedCollisionTileMapLayer>();
-        for (const sourceLayer of source.getLayers()) {
+        this._buildLayersFromTileMap(source, this._layers);
+      }
+
+      updateFromTileMap(tileMap: TileMapHelper.EditableTileMap) {
+        this._source = tileMap;
+        this._layers = new Map<integer, TransformedCollisionTileMapLayer>();
+
+        this._buildLayersFromTileMap(tileMap, this._layers);
+      }
+
+      _buildLayersFromTileMap(
+        tileMap: TileMapHelper.EditableTileMap,
+        layers: Map<integer, TransformedCollisionTileMapLayer>
+      ) {
+        for (const sourceLayer of tileMap.getLayers()) {
           // TODO A visitor could be used to avoid a cast.
           if (!(sourceLayer instanceof TileMapHelper.EditableTileMapLayer)) {
             // TODO Collision mask for object layers is not handled.
             continue;
           }
           const tileLayer = sourceLayer as TileMapHelper.EditableTileMapLayer;
-          this._layers.set(
+          layers.set(
             tileLayer.id,
             new TransformedCollisionTileMapLayer(this, tileLayer)
           );
@@ -64,7 +78,7 @@ namespace gdjs {
       }
 
       /**
-       * @param transformation the transformation from the time map coordinate
+       * @param transformation the transformation from the tile map coordinate
        * (in pixels) to the scene coordinate (in pixels).
        */
       setTransformation(transformation: gdjs.AffineTransformation) {

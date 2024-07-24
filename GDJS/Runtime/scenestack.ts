@@ -40,6 +40,9 @@ namespace gdjs {
 
       const hasMadeChangeToStack = this.applyUpdateFromNetworkSyncDataIfAny();
       if (hasMadeChangeToStack) {
+        debugLogger.info(
+          'Scene stack has been updated from network sync data, skipping step.'
+        );
         // If we have made changes to the stack as part of the network sync,
         // we trust the network to be the source of truth for the scene stack,
         // and skip any other requests to change the scene stack.

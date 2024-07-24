@@ -2497,7 +2497,9 @@ describe('Multiplayer', () => {
       // Ensure the second scene (Scene3) is started.
       checkCurrentSceneIs(p2RuntimeGame, 'Scene1');
       p2RuntimeGame.getSceneStack().step(1000 / 60);
+      p2RuntimeGame.getSceneStack().step(1000 / 60);
       checkCurrentSceneIs(p2RuntimeGame, 'Scene3');
+
       p2RuntimeGame.getSceneStack().step(1000 / 60);
 
       // Start again the same scene (Scene3) on the host's game
@@ -2509,16 +2511,16 @@ describe('Multiplayer', () => {
       let p1FirstScene3NetworkId;
       checkCurrentSceneIs(p1RuntimeGame, 'Scene3');
       {
-        const { currentScene } = checkCurrentSceneIs(p1RuntimeGame, 'Scene3');
         p1RuntimeGame.getSceneStack().step(1000 / 60);
+        const { currentScene } = checkCurrentSceneIs(p1RuntimeGame, 'Scene3');
         p1FirstScene3NetworkId = currentScene.networkId;
       }
 
       p1RuntimeGame.getSceneStack().push('Scene3');
       let p1SecondScene3NetworkId;
       {
-        const { currentScene } = checkCurrentSceneIs(p1RuntimeGame, 'Scene3');
         p1RuntimeGame.getSceneStack().step(1000 / 60);
+        const { currentScene } = checkCurrentSceneIs(p1RuntimeGame, 'Scene3');
         p1SecondScene3NetworkId = currentScene.networkId;
       }
 
@@ -2532,13 +2534,13 @@ describe('Multiplayer', () => {
         allConnectedPlayers,
       });
       {
-        const { currentScene } = checkCurrentSceneIs(p2RuntimeGame, 'Scene3');
         p2RuntimeGame.getSceneStack().step(1000 / 60);
+        const { currentScene } = checkCurrentSceneIs(p2RuntimeGame, 'Scene3');
         expect(currentScene.networkId).to.be(p1FirstScene3NetworkId);
       }
       {
-        const { currentScene } = checkCurrentSceneIs(p2RuntimeGame, 'Scene3');
         p2RuntimeGame.getSceneStack().step(1000 / 60);
+        const { currentScene } = checkCurrentSceneIs(p2RuntimeGame, 'Scene3');
         expect(currentScene.networkId).to.be(p1SecondScene3NetworkId);
       }
 
@@ -2552,8 +2554,8 @@ describe('Multiplayer', () => {
 
       let p1Scene1NetworkId;
       {
-        const { currentScene } = checkCurrentSceneIs(p1RuntimeGame, 'Scene1');
         p1RuntimeGame.getSceneStack().step(1000 / 60);
+        const { currentScene } = checkCurrentSceneIs(p1RuntimeGame, 'Scene1');
         p1Scene1NetworkId = currentScene.networkId;
       }
 
@@ -2564,8 +2566,9 @@ describe('Multiplayer', () => {
       });
 
       checkCurrentSceneIs(p2RuntimeGame, 'Scene3');
-      p2RuntimeGame.getSceneStack().step(1000 / 60);
       {
+        p2RuntimeGame.getSceneStack().step(1000 / 60);
+        p2RuntimeGame.getSceneStack().step(1000 / 60);
         const { currentScene } = checkCurrentSceneIs(p2RuntimeGame, 'Scene1');
         expect(currentScene.networkId).to.be(p1Scene1NetworkId);
       }
@@ -2625,6 +2628,7 @@ describe('Multiplayer', () => {
 
       checkCurrentSceneIs(p2RuntimeGame, 'Scene1');
       markAllPeerMessagesAsProcessed();
+      p2RuntimeGame.getSceneStack().step(1000 / 60);
 
       // Launch a second scene, first on the player:
       p2RuntimeGame.getSceneStack().push('Scene2');
@@ -2655,6 +2659,7 @@ describe('Multiplayer', () => {
       expect(
         checkCurrentSceneIs(p2RuntimeGame, 'Scene2').currentScene.networkId
       ).to.be(null);
+      p2RuntimeGame.getSceneStack().step(1000 / 60);
       p2RuntimeGame.getSceneStack().step(1000 / 60);
 
       expect(

@@ -104,7 +104,8 @@ namespace gdjs {
         1,
         0,
         0,
-        new Map()
+        new Map(),
+        /* allowOutOfBoundTileSetting */ false,
       );
       this._collisionTileMap = new gdjs.TileMap.TransformedCollisionTileMap(
         editableTileMap,

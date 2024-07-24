@@ -60,6 +60,33 @@ namespace gdjs {
     }
   }
 
+  /**
+   * Helper function to clone an object without reassigning the target object.
+   * It's mainly helpful for tests, where multiple instances of the MultiplayerMessageManager are created,
+   * and prevents keeping references to the same object.
+   */
+  const cloneObjectWithoutOverwriting = ({
+    target,
+    source,
+  }: {
+    target: Object;
+    source: Object;
+  }) => {
+    // Add the new properties.
+    for (const key in source) {
+      if (source.hasOwnProperty(key) && !target.hasOwnProperty(key)) {
+        target[key] = source[key];
+      }
+    }
+
+    // Remove the properties that are not in the source.
+    for (const key in target) {
+      if (target.hasOwnProperty(key) && !source.hasOwnProperty(key)) {
+        delete target[key];
+      }
+    }
+  };
+
   export type MultiplayerMessageManager = ReturnType<
     typeof makeMultiplayerMessageManager
   >;
@@ -2037,10 +2064,10 @@ namespace gdjs {
 
             // Save the players info received from the host.
             // Avoid overwriting the whole object as it can mess up tests that rely on the object reference.
-            for (const playerNumber in messageData.playersInfo) {
-              _playersInfo[playerNumber] =
-                messageData.playersInfo[playerNumber];
-            }
+            cloneObjectWithoutOverwriting({
+              source: messageData.playersInfo,
+              target: _playersInfo,
+            });
 
             const {
               messageName: answerMessageName,

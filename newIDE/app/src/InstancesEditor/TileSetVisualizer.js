@@ -12,6 +12,8 @@ import { LineStackLayout } from '../UI/Layout';
 import FlipHorizontal from '../UI/CustomSvgIcons/FlipHorizontal';
 import FlipVertical from '../UI/CustomSvgIcons/FlipVertical';
 import useForceUpdate from '../Utils/UseForceUpdate';
+import { useLongTouch, type ClientCoordinates } from '../Utils/UseLongTouch';
+import Text from '../UI/Text';
 
 const styles = {
   tileContainer: {
@@ -22,6 +24,17 @@ const styles = {
   },
   atlasImage: { flex: 1, imageRendering: 'pixelated' },
   icon: { fontSize: 18 },
+  tooltipContent: {
+    position: 'absolute',
+    // Outside of theme.
+    background: 'white',
+    border: '1px solid black',
+    color: 'black',
+    padding: '1px 3px',
+  },
+  tooltipAnchor: {
+    position: 'relative',
+  },
 };
 
 const useStylesForTile = (highlighted: boolean) =>
@@ -105,7 +118,7 @@ const getGridCoordinatesFromPointerCoordinates = ({
 };
 
 const getImageCoordinatesFromPointerEvent = (
-  event: PointerEvent | MouseEvent
+  event: PointerEvent | MouseEvent | ClientCoordinates
 ) => {
   const divContainer = event.currentTarget;
   if (!(divContainer instanceof HTMLDivElement)) {
@@ -142,6 +155,7 @@ type TileProps = {|
   width?: number,
   height?: number,
   title?: string,
+  displayTooltip?: boolean,
 |};
 
 const Tile = ({
@@ -152,8 +166,13 @@ const Tile = ({
   height = 1,
   highlighted,
   title,
+  displayTooltip,
 }: TileProps) => {
   const classes = useStylesForTile(!!highlighted);
+  // Tooltip position has to be adapted because the image is in a overflow auto parent
+  // that hides the tooltip if it is displayed outside of itself.
+  const position =
+    x <= 1 && y <= 1 ? { right: -30 } : y <= 1 ? { left: -40 } : { top: -40 };
   return (
     <div
       className={classes.tile}
@@ -163,9 +182,23 @@ const Tile = ({
         width: size * width,
         height: size * height,
       }}
-      // TODO: find a way to display title on mobile.
       title={title}
-    />
+    >
+      {displayTooltip && (
+        <div style={styles.tooltipAnchor}>
+          <div
+            style={{
+              ...styles.tooltipContent,
+              ...position,
+            }}
+          >
+            <Text color="inherit" noMargin>
+              {title}
+            </Text>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 
@@ -242,6 +275,13 @@ const TileSetVisualizer = ({
     x: number,
     y: number,
   |}>(null);
+  const [shouldCancelClick, setShouldCancelClick] = React.useState<boolean>(
+    false
+  );
+  const [
+    tileIdDisplayGridCoordinates,
+    setTileIdDisplayGridCoordinates,
+  ] = React.useState<?TileMapCoordinates>(null);
   const [
     rectangularSelectionTilePreview,
     setRectangularSelectionTilePreview,
@@ -262,6 +302,29 @@ const TileSetVisualizer = ({
     ? parseFloat(getComputedStyle(imageElement).width.replace('px', ''))
     : 0;
   const displayedTileSize = imageWidth ? imageWidth / columnCount : null;
+
+  const displayTileIdTooltip = React.useCallback(
+    (e: ClientCoordinates) => {
+      setShouldCancelClick(true);
+      if (!displayedTileSize) return;
+
+      const imageCoordinates = getImageCoordinatesFromPointerEvent(e);
+      if (!imageCoordinates) return;
+
+      const { x, y } = getGridCoordinatesFromPointerCoordinates({
+        pointerX: imageCoordinates.mouseX,
+        pointerY: imageCoordinates.mouseY,
+        columnCount,
+        rowCount,
+        displayedTileSize,
+      });
+
+      setTileIdDisplayGridCoordinates({ x, y });
+    },
+    [displayedTileSize, columnCount, rowCount]
+  );
+
+  const longTouchProps = useLongTouch(displayTileIdTooltip);
 
   React.useEffect(
     () => {
@@ -332,6 +395,11 @@ const TileSetVisualizer = ({
     (event: MouseEvent) => {
       try {
         if (!displayedTileSize) return;
+        if (shouldCancelClick) {
+          setShouldCancelClick(false);
+          setTileIdDisplayGridCoordinates(null);
+          return;
+        }
 
         const imageCoordinates = getImageCoordinatesFromPointerEvent(event);
         if (!imageCoordinates) return;
@@ -424,6 +492,7 @@ const TileSetVisualizer = ({
       shouldFlipVertically,
       allowMultipleSelection,
       clickStartCoordinates,
+      shouldCancelClick,
     ]
   );
 
@@ -566,6 +635,7 @@ const TileSetVisualizer = ({
             style={styles.tileContainer}
             ref={tileContainerRef}
             {...(interactive ? interactionCallbacks : undefined)}
+            {...longTouchProps}
           >
             <CorsAwareImage
               style={styles.atlasImage}
@@ -643,6 +713,21 @@ const TileSetVisualizer = ({
                   height={rectangularSelectionTilePreview.height}
                 />
               )}
+            {tileIdDisplayGridCoordinates && displayedTileSize && (
+              <Tile
+                key={`id-tooltip-tile`}
+                highlighted
+                size={displayedTileSize}
+                x={tileIdDisplayGridCoordinates.x}
+                y={tileIdDisplayGridCoordinates.y}
+                title={getTileIdFromGridCoordinates({
+                  x: tileIdDisplayGridCoordinates.x,
+                  y: tileIdDisplayGridCoordinates.y,
+                  rowCount,
+                }).toString()}
+                displayTooltip
+              />
+            )}
           </div>
         )}
       </Line>

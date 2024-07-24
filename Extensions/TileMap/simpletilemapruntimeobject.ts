@@ -707,6 +707,28 @@ namespace gdjs {
       this._isTileMapDirty = true;
       this.invalidateHitboxes();
     }
+
+    setGridHeight(targetRowCount: integer) {
+      if (targetRowCount <= 0) return;
+      this._renderer.setGridHeight(targetRowCount);
+      this._isTileMapDirty = true;
+      this.invalidateHitboxes();
+    }
+
+    setGridWidth(targetColumnCount: integer) {
+      if (targetColumnCount <= 0) return;
+      this._renderer.setGridWidth(targetColumnCount);
+      this._isTileMapDirty = true;
+      this.invalidateHitboxes();
+    }
+
+    getGridHeight(): integer {
+      return this._renderer.getGridHeight();
+    }
+
+    getGridWidth(): integer {
+      return this._renderer.getGridWidth();
+    }
   }
   gdjs.registerObject(
     'TileMap::SimpleTileMap',

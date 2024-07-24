@@ -170,6 +170,44 @@ export class EditableTileMap {
   }
 
   /**
+   * @param dim The number of tile columns in the map.
+   */
+  setDimensionX(dim: integer): void {
+    if (dim === this.dimX) return;
+    const columnDelta = dim - this.dimX;
+    for (const layer of this.getLayers()) {
+      // TODO: Implement dimensions changes for EditableObjectLayer.
+      if (layer instanceof EditableTileMapLayer) {
+        if (columnDelta > 0) {
+          layer.increaseDimensions(columnDelta, 0, 0, 0);
+        } else {
+          layer.reduceDimensions(-columnDelta, 0, 0, 0);
+        }
+      }
+    }
+    this.dimX = dim;
+  }
+
+  /**
+   * @param dim The number of tile rows in the map.
+   */
+  setDimensionY(dim: integer): void {
+    if (dim === this.dimY) return;
+    const rowDelta = dim - this.dimY;
+    for (const layer of this.getLayers()) {
+      // TODO: Implement dimensions changes for EditableObjectLayer.
+      if (layer instanceof EditableTileMapLayer) {
+        if (rowDelta > 0) {
+          layer.increaseDimensions(0, 0, rowDelta, 0);
+        } else {
+          layer.reduceDimensions(0, 0, -rowDelta, 0);
+        }
+      }
+    }
+    this.dimY = dim;
+  }
+
+  /**
    * @param tileId The tile identifier
    * @returns The tile definition form the tile set.
    */

@@ -239,6 +239,35 @@ namespace gdjs {
       return tileMap.removeTile(x, y, layerIndex);
     }
 
+    /**
+     * @param targetRowCount The number of rows to have.
+     */
+    setGridHeight(targetRowCount: integer) {
+      const tileMap = this._tileMap;
+      if (!tileMap) return;
+      return tileMap.setDimensionY(targetRowCount);
+    }
+    /**
+     * @param targetColumnCount The number of rows to have.
+     */
+    setGridWidth(targetColumnCount: integer) {
+      const tileMap = this._tileMap;
+      if (!tileMap) return;
+      return tileMap.setDimensionX(targetColumnCount);
+    }
+
+    getGridHeight(): integer {
+      const tileMap = this._tileMap;
+      if (!tileMap) return 0;
+      return tileMap.getDimensionY();
+    }
+
+    getGridWidth(): integer {
+      const tileMap = this._tileMap;
+      if (!tileMap) return 0;
+      return tileMap.getDimensionX();
+    }
+
     destroy(): void {
       // Keep textures because they are shared by all tile maps.
       this._pixiObject.destroy(false);

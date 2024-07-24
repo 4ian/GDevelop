@@ -1002,6 +1002,36 @@ const defineSimpleTileMap = function (extension, _, gd) {
     .addParameter('number', _('Grid Y'), '', false)
     .getCodeExtraInformation()
     .setFunctionName('isTileFlippedOnYAtGridCoordinates');
+
+  object
+    .addExpressionAndConditionAndAction(
+      'number',
+      'GridHeight',
+      _('Grid height'),
+      _('the grid height (number of rows) in the tile map'),
+      _('the grid height'),
+      _('Size'),
+      'res/actions/scaleHeight24_black.png'
+    )
+    .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
+    .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+    .setFunctionName('setGridHeight')
+    .setGetter('getGridHeight');
+
+  object
+    .addExpressionAndConditionAndAction(
+      'number',
+      'GridWidth',
+      _('Grid width'),
+      _('the grid width (number of columns) in the tile map'),
+      _('the grid width'),
+      _('Size'),
+      'res/actions/scaleWidth24_black.png'
+    )
+    .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
+    .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+    .setFunctionName('setGridWidth')
+    .setGetter('getGridWidth');
 };
 
 /**

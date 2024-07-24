@@ -94,6 +94,14 @@ export declare class EditableTileMap {
    */
   getDimensionY(): integer;
   /**
+   * @param dim The number of tile columns in the map.
+   */
+  setDimensionX(dim: integer): void;
+  /**
+   * @param dim The number of tile rows in the map.
+   */
+  setDimensionY(dim: integer): void;
+  /**
    * @param tileId The tile identifier
    * @returns The tile definition form the tile set.
    */

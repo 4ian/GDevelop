@@ -98,6 +98,7 @@ const VariableTypeSelector = React.memo<Props>((props: Props) => {
           <Spacer />
           <SelectField
             value={props.variableType}
+            translatableHintText={t`Mixed`}
             margin="none"
             stopPropagationOnClick
             onChange={event =>

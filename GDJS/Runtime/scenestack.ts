@@ -251,7 +251,7 @@ namespace gdjs {
           debugLogger.info(
             `Scene at position ${i} with name ${sceneSyncData.name} is missing from the stack, adding it.`
           );
-          // We have less scenes in the stack than the host, let's add the scene.
+          // We have fewer scenes in the stack than the host, let's add the scene.
           const newScene = this.push(sceneSyncData.name);
           if (newScene) {
             newScene.networkId = sceneSyncData.networkId;

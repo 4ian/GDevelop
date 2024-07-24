@@ -170,20 +170,6 @@ export class EditableTileMap {
   }
 
   /**
-   * @param dim The number of tile columns in the map.
-   */
-  setDimensionX(dim: integer): void {
-    this.dimX = dim;
-  }
-
-  /**
-   * @param dim The number of tile rows in the map.
-   */
-  setDimensionY(dim: integer): void {
-    this.dimY = dim;
-  }
-
-  /**
    * @param tileId The tile identifier
    * @returns The tile definition form the tile set.
    */
@@ -296,17 +282,54 @@ export class EditableTileMap {
     const tileId = layer.getTileId(x, y);
     return tileId === undefined ? -1 : tileId;
   }
+
   setTile(x: integer, y: integer, layerId: integer, tileId: number) {
-    if (
-      !this._allowOutOfBoundTileSetting &&
-      (x < 0 || x >= this.dimX || y < 0 || y >= this.dimY)
-    ) {
+    const definition = this.getTileDefinition(tileId);
+    if (!definition) {
+      console.error(`Invalid tile definition index: ${tileId}`);
       return;
     }
     const layer = this.getTileLayer(layerId);
     if (!layer) return;
-    return layer.setTile(x, y, tileId);
+
+    const initialRowCount = this.dimY;
+    const initialColumnCount = this.dimX;
+
+    const rowsToAdd = Math.max(0, y - (this.dimY - 1));
+    const columnsToAdd = Math.max(0, x - (this.dimX - 1));
+    const rowsToUnshift = Math.abs(Math.min(0, y));
+    const columnsToUnshift = Math.abs(Math.min(0, x));
+    if (rowsToAdd || columnsToAdd || rowsToUnshift || columnsToUnshift) {
+      if (!this._allowOutOfBoundTileSetting) return;
+      else {
+        for (const layer of this.getLayers()) {
+          // TODO: Implement dimensions changes for EditableObjectLayer.
+          if (layer instanceof EditableTileMapLayer) {
+            layer.increaseDimensions(
+              columnsToAdd,
+              columnsToUnshift,
+              rowsToAdd,
+              rowsToUnshift
+            );
+          }
+        }
+      }
+    }
+    // Dimensions have been changed to support setting tiles in positions below 0.
+    // So we adapt the indices.
+    layer.setTile(x + columnsToUnshift, y + rowsToUnshift, tileId);
+
+    this.dimX = initialColumnCount + columnsToAdd + columnsToUnshift;
+    this.dimY = initialRowCount + rowsToAdd + rowsToUnshift;
+
+    return {
+      unshiftedRows: rowsToUnshift,
+      unshiftedColumns: columnsToUnshift,
+      appendedRows: rowsToAdd,
+      appendedColumns: columnsToAdd,
+    };
   }
+
   flipTileOnY(x: integer, y: integer, layerId: integer, flip: boolean) {
     const layer = this.getTileLayer(layerId);
     if (!layer) return;
@@ -338,12 +361,61 @@ export class EditableTileMap {
     if (!layer) return;
     layer.removeTile(x, y);
   }
-  trimEmptyColumnsAndRow(layerId: integer) {
-    // TODO: Remove this method when editing on a multi-layer tile map is possible,
-    // as it might become forbidden to use.
+
+  trimEmptyColumnsAndRowToFitLayer(
+    layerId: integer
+  ):
+    | {
+        poppedRows: number;
+        poppedColumns: number;
+        shiftedRows: number;
+        shiftedColumns: number;
+      }
+    | undefined {
     const layer = this.getTileLayer(layerId);
     if (!layer) return;
-    return layer.trimEmptyColumnsAndRow();
+    const initialRowCount = this.dimY;
+    const initialColumnCount = this.dimX;
+    if (layer.isEmpty() && this._layers.length === 1) {
+      // The tile map is empty. Instead of having an object with null width and height,
+      // the tile map is resized to have a size of 1x1 with an empty tile. This is useful
+      // in the editor. It might need to have a different behavior in the runtime.
+      layer.buildEmptyLayer(1, 1);
+      this.dimX = 1;
+      this.dimY = 1;
+      return {
+        shiftedRows: 0,
+        shiftedColumns: 0,
+        poppedRows: initialRowCount - 1,
+        poppedColumns: initialColumnCount - 1,
+      };
+    }
+    const trimmingData = layer.getTrimmingData();
+
+    for (const layer of this.getLayers()) {
+      // TODO: Implement dimensions changes for EditableObjectLayer.
+      if (layer instanceof EditableTileMapLayer) {
+        layer.reduceDimensions(
+          trimmingData.columnsToPop,
+          trimmingData.columnsToShift,
+          trimmingData.rowsToPop,
+          trimmingData.rowsToShift
+        );
+      }
+    }
+    this.dimX =
+      initialColumnCount -
+      trimmingData.columnsToPop -
+      trimmingData.columnsToShift;
+    this.dimY =
+      initialRowCount - trimmingData.rowsToPop - trimmingData.rowsToShift;
+
+    return {
+      poppedRows: trimmingData.rowsToPop,
+      poppedColumns: trimmingData.columnsToPop,
+      shiftedRows: trimmingData.rowsToShift,
+      shiftedColumns: trimmingData.columnsToShift,
+    };
   }
 }
 
@@ -584,9 +656,6 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
     rowsToPop: number,
     rowsToShift: number
   ) {
-    const initialRowCount = this._tiles.length;
-    const initialColumnCount = this._tiles[0].length;
-
     if (rowsToPop > 0 || rowsToShift > 0) {
       this._tiles = this._tiles.slice(
         rowsToShift,
@@ -601,12 +670,6 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
         );
       });
     }
-    // TODO: Instead of setting the dimensions directly, should it call a method on
-    // EditableTileMap that will iterates over all the layers to change their dimensions?
-    this.tileMap.setDimensionX(
-      initialColumnCount - columnsToPop - columnsToShift
-    );
-    this.tileMap.setDimensionY(initialRowCount - rowsToPop - rowsToShift);
   }
 
   increaseDimensions(
@@ -653,12 +716,6 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
         ).fill(0);
       }
     }
-    // TODO: Instead of setting the dimensions directly, should it call a method on
-    // EditableTileMap that will iterates over all the layers to change their dimensions?
-    this.tileMap.setDimensionX(
-      initialColumnCount + columnsToAppend + columnsToUnshift
-    );
-    this.tileMap.setDimensionY(initialRowCount + rowsToAppend + rowsToUnshift);
   }
 
   /**
@@ -666,57 +723,20 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
    * @param y The layer row.
    * @param tileId The tile.
    */
-  setTile(
-    x: integer,
-    y: integer,
-    tileId: integer
-  ):
-    | {
-        unshiftedRows: number;
-        unshiftedColumns: number;
-        appendedRows: number;
-        appendedColumns: number;
-      }
-    | undefined {
+  setTile(x: integer, y: integer, tileId: integer) {
     const definition = this.tileMap.getTileDefinition(tileId);
     if (!definition) {
       console.error(`Invalid tile definition index: ${tileId}`);
       return;
     }
-    const rowsToAdd = Math.max(0, y - (this._tiles.length - 1));
-    const columnsToAdd = Math.max(0, x - (this._tiles[0].length - 1));
-    const rowsToUnshift = Math.abs(Math.min(0, y));
-    const columnsToUnshift = Math.abs(Math.min(0, x));
-    if (rowsToAdd || columnsToAdd || rowsToUnshift || columnsToUnshift) {
-      if (this.tileMap._allowOutOfBoundTileSetting) {
-        this.increaseDimensions(
-          columnsToAdd,
-          columnsToUnshift,
-          rowsToAdd,
-          rowsToUnshift
-        );
-      } else return;
-    }
-    // Dimensions have been changed to support setting tiles in positions below 0.
-    // So we adapt the indices.
-    const newX = x + columnsToUnshift;
-    const newY = y + rowsToUnshift;
-    const tilesRow = this._tiles[newY];
+    const tilesRow = this._tiles[y];
     if (!tilesRow || x >= tilesRow.length) {
       // Coordinates are out of bounds, don't do anything.
       return;
     }
 
-    tilesRow[newX] =
-      tileId +
-      // +1 because 0 means null
-      1;
-    return {
-      unshiftedRows: rowsToUnshift,
-      unshiftedColumns: columnsToUnshift,
-      appendedRows: rowsToAdd,
-      appendedColumns: columnsToAdd,
-    };
+    // +1 because 0 means null
+    tilesRow[x] = tileId + 1;
   }
 
   /**
@@ -735,11 +755,11 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
     tilesRow[x] = tileGID + 1;
   }
 
-  trimEmptyColumnsAndRow(): {
-    shiftedRows: number;
-    shiftedColumns: number;
-    poppedRows: number;
-    poppedColumns: number;
+  getTrimmingData(): {
+    rowsToShift: number;
+    columnsToShift: number;
+    rowsToPop: number;
+    columnsToPop: number;
   } {
     let rowsToShift = 0,
       rowsToPop = 0;
@@ -775,29 +795,20 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
       }
     }
     if (!isFirstNonEmptyRowFound) {
-      // The tile map is empty. Instead of having an object with null width and height,
-      // the tile map is resized to have a size of 1x1 with an empty tile. This is useful
-      // in the editor. It might need to have a different behavior in the runtime.
-      this.buildEmptyLayer(1, 1);
-      // TODO: Instead of setting the dimensions directly, should it call a method on
-      // EditableTileMap that will iterates over all the layers to change their dimensions?
-      this.tileMap.setDimensionX(1);
-      this.tileMap.setDimensionY(1);
       return {
-        shiftedColumns: 0,
-        shiftedRows: 0,
-        poppedColumns: initialDimensionX - 1,
-        poppedRows: initialDimensionY - 1,
+        columnsToShift: 0,
+        rowsToShift: 0,
+        columnsToPop: initialDimensionX - 1,
+        rowsToPop: initialDimensionY - 1,
       };
     }
     const columnsToShift = Math.min(...columnsToShiftByRow);
     const columnsToPop = Math.min(...columnsToPopByRow);
-    this.reduceDimensions(columnsToPop, columnsToShift, rowsToPop, rowsToShift);
     return {
-      shiftedRows: rowsToShift,
-      shiftedColumns: columnsToShift,
-      poppedRows: rowsToPop,
-      poppedColumns: columnsToPop,
+      rowsToShift,
+      columnsToShift,
+      rowsToPop,
+      columnsToPop,
     };
   }
 

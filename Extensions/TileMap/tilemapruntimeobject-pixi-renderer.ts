@@ -238,16 +238,6 @@ namespace gdjs {
       if (!tileMap) return;
       return tileMap.removeTile(x, y, layerIndex);
     }
-    /**
-     * @param layerIndex The layer index.
-     */
-    trimEmptyColumnsAndRows(layerIndex: integer) {
-      const tileMap = this._tileMap;
-      if (!tileMap) return;
-      const layer = tileMap.getTileLayer(layerIndex);
-      if (!layer) return;
-      return layer.trimEmptyColumnsAndRow();
-    }
 
     destroy(): void {
       // Keep textures because they are shared by all tile maps.

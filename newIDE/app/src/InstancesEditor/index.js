@@ -890,31 +890,35 @@ export default class InstancesEditor extends Component<Props> {
       }
 
       if (shouldTrimAfterOperations) {
-        const {
-          shiftedRows,
-          shiftedColumns,
-          poppedRows,
-          poppedColumns,
-        } = editableTileMap.trimEmptyColumnsAndRow(0);
-        // The instance angle is not considered when moving the instance after
-        // rows/columns were added/removed because the instance position does not
-        // include the rotation transformation. Otherwise, we could have used
-        // tileMapToSceneTransformation to get the new position.
-        selectedInstance.setX(
-          selectedInstance.getX() + shiftedColumns * (tileSet.tileSize * scaleX)
-        );
-        selectedInstance.setY(
-          selectedInstance.getY() + shiftedRows * (tileSet.tileSize * scaleY)
-        );
-        if (selectedInstance.hasCustomSize()) {
-          selectedInstance.setCustomWidth(
-            selectedInstance.getCustomWidth() -
-              tileSet.tileSize * scaleX * (poppedColumns + shiftedColumns)
+        const trimData = editableTileMap.trimEmptyColumnsAndRowToFitLayer(0);
+        if (trimData) {
+          const {
+            shiftedRows,
+            shiftedColumns,
+            poppedRows,
+            poppedColumns,
+          } = trimData;
+          // The instance angle is not considered when moving the instance after
+          // rows/columns were added/removed because the instance position does not
+          // include the rotation transformation. Otherwise, we could have used
+          // tileMapToSceneTransformation to get the new position.
+          selectedInstance.setX(
+            selectedInstance.getX() +
+              shiftedColumns * (tileSet.tileSize * scaleX)
           );
-          selectedInstance.setCustomHeight(
-            selectedInstance.getCustomHeight() -
-              tileSet.tileSize * scaleY * (poppedRows + shiftedRows)
+          selectedInstance.setY(
+            selectedInstance.getY() + shiftedRows * (tileSet.tileSize * scaleY)
           );
+          if (selectedInstance.hasCustomSize()) {
+            selectedInstance.setCustomWidth(
+              selectedInstance.getCustomWidth() -
+                tileSet.tileSize * scaleX * (poppedColumns + shiftedColumns)
+            );
+            selectedInstance.setCustomHeight(
+              selectedInstance.getCustomHeight() -
+                tileSet.tileSize * scaleY * (poppedRows + shiftedRows)
+            );
+          }
         }
       }
       // $FlowIgnore

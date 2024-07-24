@@ -94,14 +94,6 @@ export declare class EditableTileMap {
    */
   getDimensionY(): integer;
   /**
-   * @param dim The number of tile columns in the map.
-   */
-  setDimensionX(dim: integer): void;
-  /**
-   * @param dim The number of tile rows in the map.
-   */
-  setDimensionY(dim: integer): void;
-  /**
    * @param tileId The tile identifier
    * @returns The tile definition form the tile set.
    */
@@ -170,14 +162,16 @@ export declare class EditableTileMap {
   isTileFlippedOnX(x: integer, y: integer, layerId: integer): boolean;
   isTileFlippedOnY(x: integer, y: integer, layerId: integer): boolean;
   removeTile(x: integer, y: integer, layerId: integer): void;
-  trimEmptyColumnsAndRow(
+  trimEmptyColumnsAndRowToFitLayer(
     layerId: integer
-  ): {
-    shiftedRows: number;
-    shiftedColumns: number;
-    poppedRows: number;
-    poppedColumns: number;
-  };
+  ):
+    | {
+        poppedRows: number;
+        poppedColumns: number;
+        shiftedRows: number;
+        shiftedColumns: number;
+      }
+    | undefined;
 }
 /**
  * A tile map layer.
@@ -304,29 +298,18 @@ export declare class EditableTileMapLayer extends AbstractEditableLayer {
    * @param y The layer row.
    * @param tileId The tile.
    */
-  setTile(
-    x: integer,
-    y: integer,
-    tileId: integer
-  ):
-    | {
-        unshiftedRows: number;
-        unshiftedColumns: number;
-        appendedRows: number;
-        appendedColumns: number;
-      }
-    | undefined;
+  setTile(x: integer, y: integer, tileId: integer): void;
   /**
    * @param x The layer column.
    * @param y The layer row.
    * @param tileGID The tile GID.
    */
   setTileGID(x: integer, y: integer, tileGID: integer): void;
-  trimEmptyColumnsAndRow(): {
-    shiftedRows: number;
-    shiftedColumns: number;
-    poppedRows: number;
-    poppedColumns: number;
+  getTrimmingData(): {
+    rowsToShift: number;
+    columnsToShift: number;
+    rowsToPop: number;
+    columnsToPop: number;
   };
   /**
    * @param x The layer column.

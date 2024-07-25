@@ -55,6 +55,13 @@ namespace gdjs {
       return this._updates;
     }
 
+    remove(update: T) {
+      const index = this._updates.indexOf(update);
+      if (index !== -1) {
+        this._updates.splice(index, 1);
+      }
+    }
+
     clear() {
       this._updates = [];
     }
@@ -350,27 +357,6 @@ namespace gdjs {
         instances.find(
           (instance) => instance.networkId === instanceNetworkId
         ) || null;
-
-      if (!instance) {
-        debugLogger.info(
-          `instance ${objectName} ${instanceNetworkId} not found with network ID, trying to find it with persistent UUID.`
-        );
-        instance =
-          instances.find(
-            (instance) =>
-              // For objects created from the start, the network ID is not set yet.
-              instance.persistentUuid &&
-              instance.persistentUuid.substring(0, 8) === instanceNetworkId
-          ) || null;
-
-        if (instance) {
-          debugLogger.info(
-            `instance ${objectName} ${instanceNetworkId} found with persistent UUID. Assigning network ID.`
-          );
-          // Set the network ID, as it was not set yet.
-          instance.networkId = instanceNetworkId;
-        }
-      }
 
       // If we know the position of the object, we can try to find the closest instance not synchronized yet.
       if (!instance && instanceX !== undefined && instanceY !== undefined) {
@@ -1729,20 +1715,24 @@ namespace gdjs {
           const messageSender = message.getSender();
           const sceneNetworkId = messageData.id;
 
-          if (sceneNetworkId !== runtimeScene.networkId) {
-            debugLogger.info(
-              `Received update of scene ${sceneNetworkId}, but we are on ${runtimeScene.networkId}. Skipping.`
-            );
-            // The scene is not the current scene.
-            return;
-          }
-
           if (gdjs.multiplayer.isReadyToSendOrReceiveGameUpdateMessages()) {
+            if (sceneNetworkId !== runtimeScene.networkId) {
+              debugLogger.info(
+                `Received update of scene ${sceneNetworkId}, but we are on ${runtimeScene.networkId}. Skipping.`
+              );
+              // The scene is not the current scene.
+              return;
+            }
+
             runtimeScene.updateFromNetworkSyncData(messageData);
           } else {
             // If the game is not ready to receive game update messages, we need to save the data for later use.
             // This can happen when joining a game that is already running.
+            debugLogger.info(
+              `Saving scene ${sceneNetworkId} update message for later use.`
+            );
             lastReceivedSceneSyncDataUpdates.store(messageData);
+            return;
           }
 
           // If we are are the host,
@@ -1891,7 +1881,9 @@ namespace gdjs {
           } else {
             // If the game is not ready to receive game update messages, we need to save the data for later use.
             // This can happen when joining a game that is already running.
+            debugLogger.info(`Saving game update message for later use.`);
             lastReceivedGameSyncDataUpdates.store(messageData);
+            return;
           }
 
           // If we are are the host,
@@ -1912,8 +1904,10 @@ namespace gdjs {
     const handleSavedUpdateMessages = (runtimeScene: gdjs.RuntimeScene) => {
       // Reapply the game saved updates.
       lastReceivedGameSyncDataUpdates.getUpdates().forEach((messageData) => {
+        debugLogger.info(`Reapplying saved update of game.`);
         runtimeScene.getGame().updateFromNetworkSyncData(messageData);
       });
+      // Game updates are always applied properly, so we can clear them.
       lastReceivedGameSyncDataUpdates.clear();
 
       // Then reapply the scene saved updates.
@@ -1922,13 +1916,19 @@ namespace gdjs {
 
         if (sceneNetworkId !== runtimeScene.networkId) {
           debugLogger.info(
-            `Saved update of scene ${sceneNetworkId}, but we are on ${runtimeScene.networkId}. Skipping.`
+            `Trying to apply saved update of scene ${sceneNetworkId}, but we are on ${runtimeScene.networkId}. Skipping.`
           );
           // The scene is not the current scene.
           return;
         }
+
+        debugLogger.info(`Reapplying saved update of scene ${sceneNetworkId}.`);
+
+        runtimeScene.updateFromNetworkSyncData(messageData);
+        // We only remove the message if it was successfully applied, so it can be reapplied later,
+        // in case we were not on the right scene.
+        lastReceivedSceneSyncDataUpdates.remove(messageData);
       });
-      lastReceivedSceneSyncDataUpdates.clear();
     };
 
     const heartbeatMessageNamePrefix = '#heartbeat';
@@ -2165,16 +2165,12 @@ namespace gdjs {
       // If Player 1 has disconnected, just end the game.
       if (playerNumber === 1) {
         logger.info('Host has disconnected, ending the game.');
-        clearMessagesTempData();
+        clearAllMessagesTempData();
         gdjs.multiplayer.handleLobbyGameEnded();
         return;
       }
 
-      // Remove the player from the list of players.
-      // This will cause the next hearbeat to not include this player
-      // and the others will consider them as disconnected.
-      delete _playersLastRoundTripTimes[playerNumber];
-      delete _playersInfo[playerNumber];
+      clearPlayerTempData(playerNumber);
       // If we are the host, send a heartbeat right away so that everyone is aware of the disconnection
       // on approximately the same frame.
       if (gdjs.multiplayer.isPlayerHost()) {
@@ -2348,11 +2344,11 @@ namespace gdjs {
 
       // If the message is received more than 1 time, we just ignore it and end the game.
 
-      clearMessagesTempData();
+      clearAllMessagesTempData();
       gdjs.multiplayer.handleLobbyGameEnded();
     };
 
-    const clearMessagesTempData = () => {
+    const clearAllMessagesTempData = () => {
       _playersLastRoundTripTimes = {};
       _playersInfo = {};
       lastReceivedGameSyncDataUpdates.clear();
@@ -2362,6 +2358,14 @@ namespace gdjs {
       _playerNumbersWhoJustJoined = [];
       expectedMessageAcknowledgements = {};
       _lastClockReceivedByInstanceByScene = {};
+    };
+
+    const clearPlayerTempData = (playerNumber: number) => {
+      // Remove the player from the list of players.
+      // This will cause the next hearbeat to not include this player
+      // and the others will consider them as disconnected.
+      delete _playersLastRoundTripTimes[playerNumber];
+      delete _playersInfo[playerNumber];
     };
 
     return {
@@ -2430,7 +2434,7 @@ namespace gdjs {
       // End game.
       sendEndGameMessage,
       handleEndGameMessages,
-      clearMessagesTempData,
+      clearAllMessagesTempData,
     };
   };
 

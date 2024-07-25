@@ -92,9 +92,14 @@ namespace gdjs {
       // To handle this case and avoid having an object not synchronized, we set a timeout to destroy the object
       // if it has not been assigned a networkId after a short delay.
       this._destroyInstanceTimeoutId = setTimeout(() => {
-        if (!owner.networkId && gdjs.multiplayer.isLobbyGameRunning()) {
+        const sceneNetworkId = this.owner.getRuntimeScene().networkId;
+        if (
+          !owner.networkId &&
+          gdjs.multiplayer.isLobbyGameRunning() &&
+          sceneNetworkId
+        ) {
           debugLogger.info(
-            `Lobby game is running and object ${owner.getName()} has not been assigned a networkId after a short delay, destroying it.`
+            `Lobby game is running on a synced scene and object ${owner.getName()} has not been assigned a networkId after a short delay, destroying it.`
           );
           owner.deleteFromScene(instanceContainer);
         }
@@ -162,12 +167,9 @@ namespace gdjs {
 
     private _getOrCreateInstanceNetworkId() {
       if (!this.owner.networkId) {
-        // no ID for this object, let's generate one so it can be identified by other players.
-        // Either use the persistentUuid if it exists, or generate a new one.
+        // No ID for this object, let's generate one so it can be identified by other players.
         // Keep it short to avoid sending too much data.
-        const newID = this.owner.persistentUuid
-          ? this.owner.persistentUuid.substring(0, 8)
-          : gdjs.makeUuid().substring(0, 8);
+        const newID = gdjs.makeUuid().substring(0, 8);
         this.owner.networkId = newID;
       }
 
@@ -250,7 +252,8 @@ namespace gdjs {
         return;
       }
 
-      // If game is running and object belong to a player that is not connected, destroy the object.
+      // If game is running and the object belongs to a player who is not connected, destroy the object.
+      // As the game may create objects before the lobby game starts, we don't want to destroy them if it's not running.
       if (
         this.playerNumber !== 0 && // Host is always connected.
         !gdjs.multiplayerMessageManager.isPlayerConnected(this.playerNumber)
@@ -405,8 +408,7 @@ namespace gdjs {
         this._destroyInstanceTimeoutId = null;
       }
 
-      // If the lobby game is not running, do not try to destroy the object,
-      // as the game may create objects before the lobby game starts, and we don't want to destroy them.
+      // If the lobby game is not running, no need to send a message to destroy the object.
       if (!gdjs.multiplayer.isLobbyGameRunning()) {
         return;
       }

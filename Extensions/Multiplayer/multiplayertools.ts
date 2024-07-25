@@ -672,13 +672,31 @@ namespace gdjs {
       headers['Authorization'] = `player-game-token ${playerToken}`;
       heartbeatUrl += `?playerId=${playerId}`;
       const players = gdjs.multiplayerMessageManager.getConnectedPlayers();
-      await fetch(heartbeatUrl, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          players,
-        }),
-      });
+      try {
+        await fetch(heartbeatUrl, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            players,
+          }),
+        });
+      } catch (error) {
+        logger.error('Error while sending heartbeat, retrying:', error);
+        try {
+          await fetch(heartbeatUrl, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({
+              players,
+            }),
+          });
+        } catch (error) {
+          logger.error(
+            'Error while sending heartbeat a second time. Giving up:',
+            error
+          );
+        }
+      }
     };
 
     /**

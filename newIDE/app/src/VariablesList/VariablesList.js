@@ -161,6 +161,7 @@ type VariableRowProps = {|
   isTopLevel: boolean,
   type: Variable_Type,
   onChangeType: (string, nodeId: string) => void,
+  hasMixedValues: boolean,
   valueAsString: string | null,
   valueAsBool: boolean | null,
   onChangeValue: (string, nodeId: string) => void,
@@ -169,6 +170,7 @@ type VariableRowProps = {|
   onAddChild: string => void,
   editInheritedVariable: string => void,
   deleteNode: string => void,
+  i18n: I18nType,
 |};
 
 const VariableRow = React.memo<VariableRowProps>(
@@ -198,6 +200,7 @@ const VariableRow = React.memo<VariableRowProps>(
     isTopLevel,
     type,
     onChangeType,
+    hasMixedValues,
     valueAsString,
     valueAsBool,
     onChangeValue,
@@ -207,6 +210,7 @@ const VariableRow = React.memo<VariableRowProps>(
     editInheritedVariable,
     deleteNode,
     directlyStoreValueChangesWhileEditing,
+    i18n,
   }: VariableRowProps) => {
     const shouldWrap =
       isNarrow ||
@@ -352,7 +356,9 @@ const VariableRow = React.memo<VariableRowProps>(
                                 noMargin
                                 color="inherit"
                               >
-                                {valueAsBool ? (
+                                {hasMixedValues ? (
+                                  <Trans>Mixed values</Trans>
+                                ) : valueAsBool ? (
                                   <Trans>True</Trans>
                                 ) : (
                                   <Trans>False</Trans>
@@ -407,15 +413,19 @@ const VariableRow = React.memo<VariableRowProps>(
                             }
                             key="value"
                             disabled={
+                              type === gd.Variable.MixedTypes ||
                               isCollection ||
                               (isInherited && !isTopLevel) ||
                               hasLineBreaks
                             }
+                            hint={hasMixedValues ? i18n._('Mixed values') : ''}
                             onChange={onChangeValue}
                             value={
-                              // If line breaks are present, disable the field (as it's
-                              // single line only) and make line breaks visible.
-                              hasLineBreaks
+                              hasMixedValues
+                                ? ''
+                                : // If line breaks are present, disable the field (as it's
+                                // single line only) and make line breaks visible.
+                                hasLineBreaks
                                 ? (valueAsString || '').replace(/\n/g, '↵')
                                 : valueAsString || ''
                             }
@@ -1367,6 +1377,7 @@ const VariablesList = (props: Props) => {
       }
     }
 
+    const hasMixedValues = variable.hasMixedValues();
     const valueAsString = isCollection
       ? i18n._(
           variable.getChildrenCount() === 0
@@ -1413,6 +1424,7 @@ const VariablesList = (props: Props) => {
         type={type}
         variablePointer={variablePointer}
         onChangeType={onChangeType}
+        hasMixedValues={hasMixedValues}
         valueAsString={valueAsString}
         valueAsBool={valueAsBool}
         onChangeValue={onChangeValue}
@@ -1423,6 +1435,7 @@ const VariablesList = (props: Props) => {
         directlyStoreValueChangesWhileEditing={
           !!props.directlyStoreValueChangesWhileEditing
         }
+        i18n={i18n}
       />
     );
 
@@ -1632,6 +1645,10 @@ const VariablesList = (props: Props) => {
         variable = changedVariable;
       }
       if (!variable) return;
+      if (variable.hasMixedValues() && newValue.length === 0) {
+        // Keep mixed values if nothing was typed.
+        return;
+      }
       switch (variable.getType()) {
         case gd.Variable.String:
           if (variable.getString() === newValue) return;

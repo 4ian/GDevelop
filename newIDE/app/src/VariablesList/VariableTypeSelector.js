@@ -9,6 +9,7 @@ import VariableNumberIcon from './Icons/VariableNumberIcon';
 import VariableBooleanIcon from './Icons/VariableBooleanIcon';
 import VariableArrayIcon from './Icons/VariableArrayIcon';
 import VariableStructureIcon from './Icons/VariableStructureIcon';
+import VariableMixedTypesIcon from '../UI/CustomSvgIcons/Cross';
 import { Line, Spacer } from '../UI/Grid';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 const gd = global.gd;
@@ -54,6 +55,7 @@ const getOptions = () => {
 export const getVariableTypeToIcon = (): { [Variable_Type]: any } => {
   if (!variableTypeToIcon) {
     variableTypeToIcon = {
+      [gd.Variable.MixedTypes]: VariableMixedTypesIcon,
       [gd.Variable.String]: VariableStringIcon,
       [gd.Variable.Number]: VariableNumberIcon,
       [gd.Variable.Boolean]: VariableBooleanIcon,
@@ -96,6 +98,7 @@ const VariableTypeSelector = React.memo<Props>((props: Props) => {
           <Spacer />
           <SelectField
             value={props.variableType}
+            translatableHintText={t`Mixed`}
             margin="none"
             stopPropagationOnClick
             onChange={event =>

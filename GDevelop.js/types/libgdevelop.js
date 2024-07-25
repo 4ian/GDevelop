@@ -71,6 +71,7 @@ declare class libGDevelop {
   VariablesContainer: Class<gdVariablesContainer>;
   VariablesContainersList: Class<gdVariablesContainersList>;
   ObjectGroup: Class<gdObjectGroup>;
+  GroupVariableHelper: Class<gdGroupVariableHelper>;
   ObjectGroupsContainer: Class<gdObjectGroupsContainer>;
   PlatformSpecificAssets: Class<gdPlatformSpecificAssets>;
   LoadingScreen: Class<gdLoadingScreen>;

@@ -131,6 +131,19 @@ export const getVariableContextFromNodeId = (
   };
 };
 
+export const getVariablePathFromNodeId = (
+  nodeId: string,
+  variablesContainer: gdVariablesContainer
+): string => {
+  const variableContext = getVariableContextFromNodeId(
+    nodeId,
+    variablesContainer
+  );
+  const variablePath = variableContext.lineage.map(variable => variable.name);
+  variablePath.push(variableContext.name);
+  return variablePath.join('.');
+};
+
 export const getParentVariableContext = (
   variableContext: VariableContext
 ): VariableContext => {

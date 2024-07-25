@@ -1,71 +1,121 @@
 // @flow
-import { Trans } from '@lingui/macro';
 import React from 'react';
-import FlatButton from '../UI/FlatButton';
-import ObjectGroupEditor from '.';
-import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
-import { useSerializableObjectCancelableEditor } from '../Utils/SerializableObjectCancelableEditor';
-import useForceUpdate from '../Utils/UseForceUpdate';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
+import NewObjectGroupEditorDialog from './NewObjectGroupEditorDialog';
+import EditedObjectGroupEditorDialog, {
+  type ObjectGroupEditorTab,
+} from './EditedObjectGroupEditorDialog';
+import newNameGenerator from '../Utils/NewNameGenerator';
+
+const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
-  group: gdObjectGroup,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
+  group: gdObjectGroup | null,
   onApply: () => void,
   onCancel: () => void,
+  onObjectGroupAdded: (objectGroup: gdObjectGroup) => void,
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
+  initialTab?: ?ObjectGroupEditorTab,
+  onComputeAllVariableNames?: () => Array<string>,
 |};
 
 const ObjectGroupEditorDialog = ({
   project,
+  projectScopedContainersAccessor,
   group,
   onApply,
   onCancel,
+  onObjectGroupAdded,
   globalObjectsContainer,
   objectsContainer,
+  initialTab,
+  onComputeAllVariableNames,
 }: Props) => {
-  const forceUpdate = useForceUpdate();
-  const {
-    onCancelChanges,
-    notifyOfChange,
-  } = useSerializableObjectCancelableEditor({
-    serializableObject: group,
-    onCancel,
-  });
+  const [
+    editedObjectGroup,
+    setEditedObjectGroup,
+  ] = React.useState<gdObjectGroup | null>(group);
+  const [selectedTab, setSelectedTab] = React.useState<ObjectGroupEditorTab>(
+    initialTab || 'objects'
+  );
 
-  return (
-    <Dialog
-      title={<Trans>Edit {group.getName()}</Trans>}
-      key={group.ptr}
-      actions={[
-        <FlatButton
-          key="cancel"
-          label={<Trans>Cancel</Trans>}
-          keyboardFocused
-          onClick={onCancelChanges}
-        />,
-        <DialogPrimaryButton
-          key="apply"
-          label={<Trans>Apply</Trans>}
-          primary
-          onClick={onApply}
-        />,
-      ]}
-      onRequestClose={onCancelChanges}
+  const onApplyToEmptyGroup = React.useCallback(
+    (
+      objectGroupName: string,
+      shouldSpreadAnyVariables: boolean,
+      groupObjectNames: Array<string>
+    ) => {
+      let objectGroup;
+      if (editedObjectGroup) {
+        objectGroup = editedObjectGroup;
+      } else {
+        const name = newNameGenerator(objectGroupName || 'Group', name =>
+          projectScopedContainersAccessor
+            .get()
+            .getObjectsContainersList()
+            .hasObjectOrGroupNamed(name)
+        );
+        const objectGroupContainer = objectsContainer.getObjectGroups();
+        objectGroup = objectGroupContainer.insertNew(
+          name,
+          objectGroupContainer.count()
+        );
+        onObjectGroupAdded(objectGroup);
+      }
+      if (groupObjectNames.length === 0) {
+        // An empty group would have shown the same dialog.
+        onApply();
+        return;
+      }
+      for (const objectName of groupObjectNames) {
+        objectGroup.addObject(objectName);
+      }
+      if (shouldSpreadAnyVariables) {
+        gd.GroupVariableHelper.fillAnyVariableBetweenObjects(
+          globalObjectsContainer || objectsContainer,
+          objectsContainer,
+          objectGroup
+        );
+      }
+      setEditedObjectGroup(objectGroup);
+      setSelectedTab('variables');
+    },
+    [
+      editedObjectGroup,
+      globalObjectsContainer,
+      objectsContainer,
+      onApply,
+      onObjectGroupAdded,
+      projectScopedContainersAccessor,
+    ]
+  );
+
+  return !editedObjectGroup ||
+    editedObjectGroup.getAllObjectsNames().size() === 0 ? (
+    <NewObjectGroupEditorDialog
+      project={project}
+      projectScopedContainersAccessor={projectScopedContainersAccessor}
+      onApply={onApplyToEmptyGroup}
+      onCancel={onCancel}
+      globalObjectsContainer={globalObjectsContainer}
+      objectsContainer={objectsContainer}
+      isGroupAlreadyAdded={!!editedObjectGroup}
+    />
+  ) : (
+    <EditedObjectGroupEditorDialog
+      project={project}
+      projectScopedContainersAccessor={projectScopedContainersAccessor}
+      group={editedObjectGroup}
       onApply={onApply}
-      open
-    >
-      <ObjectGroupEditor
-        project={project}
-        group={group}
-        globalObjectsContainer={globalObjectsContainer}
-        objectsContainer={objectsContainer}
-        onSizeUpdated={
-          forceUpdate /*Force update to ensure dialog is properly positioned*/
-        }
-        onObjectGroupUpdated={notifyOfChange}
-      />
-    </Dialog>
+      onCancel={onCancel}
+      globalObjectsContainer={globalObjectsContainer}
+      objectsContainer={objectsContainer}
+      initialTab={selectedTab}
+      onComputeAllVariableNames={onComputeAllVariableNames}
+    />
   );
 };
 

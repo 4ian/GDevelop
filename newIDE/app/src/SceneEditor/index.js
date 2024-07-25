@@ -146,7 +146,8 @@ type State = {|
   invisibleLayerOnWhichInstancesHaveJustBeenAdded: string | null,
   extractAsExternalLayoutDialogOpen: boolean,
 
-  editedGroup: ?gdObjectGroup,
+  editedGroup: gdObjectGroup | null,
+  isCreatingNewGroup: boolean,
 
   instancesEditorSettings: InstancesEditorSettings,
   history: HistoryState,
@@ -192,6 +193,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       variablesEditedInstance: null,
       newObjectInstanceSceneCoordinates: null,
       editedGroup: null,
+      isCreatingNewGroup: false,
       extractAsExternalLayoutDialogOpen: false,
 
       instancesEditorSettings: props.getInitialInstancesEditorSettings(),
@@ -496,8 +498,16 @@ export default class SceneEditor extends React.Component<Props, State> {
       this.editObject(globalObjectsContainer.getObject(objectName), initialTab);
   };
 
-  editGroup = (group: ?gdObjectGroup) => {
-    this.setState({ editedGroup: group });
+  _editObjectGroup = (group: ?gdObjectGroup) => {
+    this.setState({ editedGroup: group, isCreatingNewGroup: false });
+  };
+
+  _createObjectGroup = () => {
+    this.setState({ editedGroup: null, isCreatingNewGroup: true });
+  };
+
+  _closeObjectGroupEditorDialog = () => {
+    this.setState({ editedGroup: null, isCreatingNewGroup: false });
   };
 
   setInstancesEditorSettings = (
@@ -1138,14 +1148,14 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.forceUpdatePropertiesEditor();
   };
 
-  _onDeleteGroup = (
+  _onDeleteObjectGroup = (
     groupWithContext: GroupWithContext,
     done: boolean => void
   ) => {
     done(true);
   };
 
-  _onRenameGroup = (
+  _onRenameObjectGroup = (
     groupWithContext: GroupWithContext,
     newName: string,
     done: boolean => void
@@ -1777,7 +1787,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                   this.editObject(object, 'variables');
                 }}
                 onOpenSceneProperties={this.openSceneProperties}
-                onEditObjectGroup={this.editGroup}
+                onEditObjectGroup={this._editObjectGroup}
                 onEditLayerEffects={this.editLayerEffects}
                 onEditLayer={this.editLayer}
               />
@@ -1817,9 +1827,10 @@ export default class SceneEditor extends React.Component<Props, State> {
                 getValidatedObjectOrGroupName={
                   this._getValidatedObjectOrGroupName
                 }
-                onEditObjectGroup={this.editGroup}
-                onDeleteObjectGroup={this._onDeleteGroup}
-                onRenameObjectGroup={this._onRenameGroup}
+                onCreateObjectGroup={this._createObjectGroup}
+                onEditObjectGroup={this._editObjectGroup}
+                onDeleteObjectGroup={this._onDeleteObjectGroup}
+                onRenameObjectGroup={this._onRenameObjectGroup}
                 canObjectOrGroupBeGlobal={this.canObjectOrGroupBeGlobal}
                 updateBehaviorsSharedData={this.updateBehaviorsSharedData}
                 onEditObject={this.props.onEditObject || this.editObject}
@@ -1976,14 +1987,37 @@ export default class SceneEditor extends React.Component<Props, State> {
                   onClose={() => this.openObjectExporterDialog(false)}
                 />
               )}
-              {!!this.state.editedGroup && (
+              {(this.state.editedGroup || this.state.isCreatingNewGroup) && (
                 <ObjectGroupEditorDialog
                   project={project}
+                  projectScopedContainersAccessor={
+                    projectScopedContainersAccessor
+                  }
                   group={this.state.editedGroup}
                   objectsContainer={this.props.objectsContainer}
                   globalObjectsContainer={this.props.globalObjectsContainer}
-                  onCancel={() => this.editGroup(null)}
-                  onApply={() => this.editGroup(null)}
+                  onCancel={this._closeObjectGroupEditorDialog}
+                  onApply={this._closeObjectGroupEditorDialog}
+                  onObjectGroupAdded={(objectGroup: gdObjectGroup) => {
+                    if (this.editorDisplay) {
+                      this.editorDisplay.scrollObjectGroupsListToObjectGroup(
+                        objectGroup
+                      );
+                    }
+                  }}
+                  initialTab={'objects'}
+                  onComputeAllVariableNames={() => {
+                    const { editedGroup } = this.state;
+                    if (!editedGroup) return [];
+                    if (!layout) return [];
+
+                    return EventsRootVariablesFinder.findAllObjectVariables(
+                      project.getCurrentPlatform(),
+                      project,
+                      layout, // TODO: Handle this for custom objects?
+                      editedGroup.getName()
+                    );
+                  }}
                 />
               )}
               {this.state.setupGridOpen && (

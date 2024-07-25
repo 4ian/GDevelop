@@ -65,6 +65,7 @@ export type SceneEditorsDisplayProps = {|
     newName: string,
     done: (boolean) => void
   ) => void,
+  onCreateObjectGroup: () => void,
   onEditObjectGroup: (?gdObjectGroup) => void,
   onDeleteObjectGroup: (
     groupWithContext: GroupWithContext,
@@ -125,6 +126,7 @@ export type SceneEditorsDisplayInterface = {|
   forceUpdateInstancesPropertiesEditor: () => void,
   forceUpdateObjectsList: () => void,
   forceUpdateObjectGroupsList: () => void,
+  scrollObjectGroupsListToObjectGroup: (objectGroup: gdObjectGroup) => void,
   forceUpdateLayersList: () => void,
   openNewObjectDialog: () => void,
   toggleEditorView: (editorId: EditorId) => void,

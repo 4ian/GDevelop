@@ -17,7 +17,7 @@
 namespace gd {
 class VariablesContainer;
 class Platform;
-}  // namespace gd
+} // namespace gd
 
 namespace gd {
 /**
@@ -33,21 +33,36 @@ class GD_CORE_API EventsVariableInstructionTypeSwitcher
 public:
   EventsVariableInstructionTypeSwitcher(
       const gd::Platform &platform_,
-      const gd::VariablesContainer &targetVariablesContainer_,
-      const std::unordered_set<gd::String> &typeChangedVariableNames_)
+      const std::unordered_set<gd::String> &typeChangedVariableNames_,
+      const gd::VariablesContainer &targetVariablesContainer_)
       : platform(platform_),
-        targetVariablesContainer(targetVariablesContainer_),
-        typeChangedVariableNames(typeChangedVariableNames_){};
+        typeChangedVariableNames(typeChangedVariableNames_),
+        targetVariablesContainer(targetVariablesContainer_), groupName(""){};
+  EventsVariableInstructionTypeSwitcher(
+      const gd::Platform &platform_,
+      const std::unordered_set<gd::String> &typeChangedVariableNames_,
+      const gd::String &groupName_)
+      : platform(platform_),
+        typeChangedVariableNames(typeChangedVariableNames_),
+        targetVariablesContainer(nullVariablesContainer),
+        groupName(groupName_){};
   virtual ~EventsVariableInstructionTypeSwitcher();
 
- private:
+private:
   bool DoVisitInstruction(gd::Instruction &instruction,
                           bool isCondition) override;
 
   const gd::Platform &platform;
   const gd::VariablesContainer &targetVariablesContainer;
-  gd::String objectName;
+  /**
+   * Groups don't have VariablesContainer, so `targetVariablesContainer` will be
+   * pointing to `nullVariablesContainer` and the group name is use instead to
+   * check which instruction to modify.
+   */
+  const gd::String groupName;
   const std::unordered_set<gd::String> &typeChangedVariableNames;
+
+  static VariablesContainer nullVariablesContainer;
 };
 
 } // namespace gd

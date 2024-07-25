@@ -133,6 +133,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
   render() {
     const {
       project,
+      projectScopedContainersAccessor,
       objectsContainer,
       eventsFunction,
       eventsBasedBehavior,
@@ -218,6 +219,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
         {this.state.currentTab === 'groups' ? (
           <ObjectGroupsListWithObjectGroupEditor
             project={project}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
             globalObjectsContainer={null}
             objectsContainer={objectsContainer}
             globalObjectGroups={null}

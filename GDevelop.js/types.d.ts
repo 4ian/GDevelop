@@ -21,11 +21,12 @@ declare class EmscriptenObject {
 
 export enum Variable_Type {
   Unknown = 0,
-  String = 1,
-  Number = 2,
-  Boolean = 3,
-  Structure = 4,
-  Array = 5,
+  MixedTypes = 1,
+  String = 2,
+  Number = 3,
+  Boolean = 4,
+  Structure = 5,
+  Array = 6,
 }
 
 export enum VariablesContainer_SourceType {
@@ -279,6 +280,7 @@ export class Variable extends EmscriptenObject {
   getValue(): number;
   setBool(val: boolean): void;
   getBool(): boolean;
+  hasMixedValues(): boolean;
   setFolded(val: boolean): void;
   isFolded(): boolean;
   getChildrenCount(): number;
@@ -344,6 +346,11 @@ export class ObjectGroup extends EmscriptenObject {
   getAllObjectsNames(): VectorString;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(element: SerializerElement): void;
+}
+
+export class GroupVariableHelper extends EmscriptenObject {
+  static mergeVariableContainers(objectsContainersList: ObjectsContainersList, objectGroup: ObjectGroup): VariablesContainer;
+  static fillAnyVariableBetweenObjects(globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, objectGroup: ObjectGroup): void;
 }
 
 export class ObjectGroupsContainer extends EmscriptenObject {
@@ -1794,6 +1801,7 @@ export class VariablesChangeset extends EmscriptenObject {
 export class WholeProjectRefactorer extends EmscriptenObject {
   static computeChangesetForVariablesContainer(oldSerializedVariablesContainer: SerializerElement, newVariablesContainer: VariablesContainer): VariablesChangeset;
   static applyRefactoringForVariablesContainer(project: Project, newVariablesContainer: VariablesContainer, changeset: VariablesChangeset, originalSerializedVariables: SerializerElement): void;
+  static applyRefactoringForGroupVariablesContainer(project: Project, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, groupVariablesContainer: VariablesContainer, objectGroup: ObjectGroup, changeset: VariablesChangeset, originalSerializedVariables: SerializerElement): void;
   static renameEventsFunctionsExtension(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, oldName: string, newName: string): void;
   static updateExtensionNameInEventsBasedBehavior(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, sourceExtensionName: string): void;
   static renameEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, oldName: string, newName: string): void;

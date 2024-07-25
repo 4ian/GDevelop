@@ -282,6 +282,9 @@ void Variable::SerializeTo(SerializerElement& element) const {
       child->SerializeTo(childrenElement.AddChild("variable"));
     }
   }
+  if (hasMixedValues) {
+    element.SetBoolAttribute("hasMixedValues", true);
+  }
 }
 
 void Variable::UnserializeFrom(const SerializerElement& element) {
@@ -324,6 +327,9 @@ void Variable::UnserializeFrom(const SerializerElement& element) {
       } else if (type == Type::Array)
         PushNew().UnserializeFrom(childElement);
     }
+  }
+  if (element.GetBoolAttribute("hasMixedValues", false)) {
+    MarkAsMixedValues();
   }
 }
 

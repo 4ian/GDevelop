@@ -2147,6 +2147,102 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
             456);
   }
 
+  SECTION("Can change a group variable mixed value to the value of the 1st object variable") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &scene = project.InsertNewLayout("Scene", 0);
+    auto &object = scene.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "Object", 0);
+    object.GetVariables().InsertNew("MyGroupVariable").SetValue(111);
+    auto &otherObject = scene.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "OtherObject", 0);
+    otherObject.GetVariables().InsertNew("MyGroupVariable").SetValue(222);
+    auto &group = scene.GetObjects().GetObjectGroups().InsertNew("Group");
+    group.AddObject("Object");
+    group.AddObject("OtherObject");
+
+    auto projectScopedContainers = gd::ProjectScopedContainers::
+        MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
+    gd::VariablesContainer groupVariables =
+        gd::GroupVariableHelper::MergeVariableContainers(
+            projectScopedContainers.GetObjectsContainersList(), group);
+    
+    REQUIRE(groupVariables.Has("MyGroupVariable"));
+    REQUIRE(groupVariables.Get("MyGroupVariable").HasMixedValues());
+
+    // Do the changes and launch the refactoring.
+    groupVariables.ResetPersistentUuid();
+    gd::SerializerElement originalSerializedVariables;
+    groupVariables.SerializeTo(originalSerializedVariables);
+
+    // The value 111 might be set for the group as it's the 1st one that is found.
+    // Ensure that the mixed value flag is used.
+    groupVariables.Get("MyGroupVariable").SetValue(111);
+    auto changeset =
+        gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
+            originalSerializedVariables, groupVariables);
+
+    REQUIRE(changeset.valueChangedVariableNames.size() == 1);
+
+    gd::WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
+        project, project.GetObjects(), scene.GetObjects(), groupVariables,
+        group, changeset, originalSerializedVariables);
+
+    REQUIRE(object.GetVariables().Get("MyGroupVariable").GetValue() == 111);
+    REQUIRE(otherObject.GetVariables().Get("MyGroupVariable").GetValue() ==
+            111);
+  }
+
+  SECTION("Can change a group variable mixed value to 0") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &scene = project.InsertNewLayout("Scene", 0);
+    auto &object = scene.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "Object", 0);
+    object.GetVariables().InsertNew("MyGroupVariable").SetValue(111);
+    auto &otherObject = scene.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "OtherObject", 0);
+    otherObject.GetVariables().InsertNew("MyGroupVariable").SetValue(222);
+    auto &group = scene.GetObjects().GetObjectGroups().InsertNew("Group");
+    group.AddObject("Object");
+    group.AddObject("OtherObject");
+
+    auto projectScopedContainers = gd::ProjectScopedContainers::
+        MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
+    gd::VariablesContainer groupVariables =
+        gd::GroupVariableHelper::MergeVariableContainers(
+            projectScopedContainers.GetObjectsContainersList(), group);
+    
+    REQUIRE(groupVariables.Has("MyGroupVariable"));
+    REQUIRE(groupVariables.Get("MyGroupVariable").HasMixedValues());
+
+    // Do the changes and launch the refactoring.
+    groupVariables.ResetPersistentUuid();
+    gd::SerializerElement originalSerializedVariables;
+    groupVariables.SerializeTo(originalSerializedVariables);
+
+    // The value 0 might be set for the group as a default value when there is mixed value.
+    // Ensure that the mixed value flag is used.
+    groupVariables.Get("MyGroupVariable").SetValue(0);
+    auto changeset =
+        gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
+            originalSerializedVariables, groupVariables);
+
+    REQUIRE(changeset.valueChangedVariableNames.size() == 1);
+
+    gd::WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
+        project, project.GetObjects(), scene.GetObjects(), groupVariables,
+        group, changeset, originalSerializedVariables);
+
+    REQUIRE(object.GetVariables().Get("MyGroupVariable").GetValue() == 0);
+    REQUIRE(otherObject.GetVariables().Get("MyGroupVariable").GetValue() ==
+            0);
+  }
+
   SECTION("Can keep mixed values of a group variable") {
     gd::Project project;
     gd::Platform platform;

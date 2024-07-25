@@ -45,7 +45,7 @@ namespace gdjs {
     readonly _tileSize: number;
     _displayMode = 'all';
     _layerIndex = 0;
-    readonly _initialTileMapAsJsObject: TileMapHelper.EditableTileMapAsJsObject | null = null;
+    _initialTileMapAsJsObject: TileMapHelper.EditableTileMapAsJsObject | null = null;
     readonly _initialTilesWithHitBox: number[];
     _isTileMapDirty: boolean = false;
     _sceneToTileMapTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();

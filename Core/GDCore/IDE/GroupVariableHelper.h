@@ -18,12 +18,20 @@ struct VariablesChangeset;
 namespace gd {
 
 /**
- * \brief
+ * Help handling variables of group objects as a whole.
+ *
+ * This is used by the object group variable editor.
  */
 class GD_CORE_API GroupVariableHelper {
 public:
   /**
-   * @brief
+   * Copy every variable from every object of the group to the other object
+   * if they don't have it already.
+   *
+   * In the editor, when an object group is created, users can choose between:
+   * - doing no change and only see variables that are already shared by any
+   * objects of the group
+   * - applying this function and see every variable
    */
   static void
   FillAnyVariableBetweenObjects(gd::ObjectsContainer &globalObjectsContainer,
@@ -31,14 +39,20 @@ public:
                                 const gd::ObjectGroup &objectGroup);
 
   /**
-   * @brief
+   * Build a variable container with the intersection of variables from the
+   * every objects of the given group.
    */
   static gd::VariablesContainer MergeVariableContainers(
       const gd::ObjectsContainersList &objectsContainersList,
       const gd::ObjectGroup &objectGroup);
 
   /**
-   * @brief
+   * @brief Copy the variables of the group to all objects.
+   *
+   * Objects can be added during the group edition and may not necessarily have
+   * all the variables initially shared by the group.
+   *
+   * \see gd::GroupVariableHelper::MergeVariableContainers
    */
   static void FillMissingGroupVariablesToObjects(
       gd::ObjectsContainer &globalObjectsContainer,
@@ -47,7 +61,8 @@ public:
       const gd::SerializerElement &originalSerializedVariables);
 
   /**
-   * @brief
+   * @brief Apply the changes done with the variables editor to the objects of
+   * the group.
    */
   static void
   ApplyChangesToObjects(gd::ObjectsContainer &globalObjectsContainers,

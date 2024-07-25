@@ -871,8 +871,14 @@ gd::String EventsCodeGenerator::GenerateObjectAction(
   // Create call
   gd::String call;
   if (instrInfos.codeExtraInformation.type == "number" ||
-      instrInfos.codeExtraInformation.type == "string" || 
-      instrInfos.codeExtraInformation.type == "boolean") {
+      instrInfos.codeExtraInformation.type == "string" ||
+      // Boolean variable action uses Mutators
+      // where addExpressionAndConditionAndAction uses MutatorAndOrAccessor.
+      // This hack allow boolean variable operator to be generated without side
+      // effect on other instructions.
+      (instrInfos.codeExtraInformation.type == "boolean" &&
+       instrInfos.codeExtraInformation.accessType ==
+           gd::InstructionMetadata::ExtraInformation::AccessType::Mutators)) {
     if (instrInfos.codeExtraInformation.accessType ==
         gd::InstructionMetadata::ExtraInformation::MutatorAndOrAccessor)
       call = GenerateOperatorCall(
@@ -932,9 +938,8 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
 
   // Create call
   gd::String call;
-  if ((instrInfos.codeExtraInformation.type == "number" ||
-       instrInfos.codeExtraInformation.type == "string" || 
-      instrInfos.codeExtraInformation.type == "boolean")) {
+  if (instrInfos.codeExtraInformation.type == "number" ||
+       instrInfos.codeExtraInformation.type == "string") {
     if (instrInfos.codeExtraInformation.accessType ==
         gd::InstructionMetadata::ExtraInformation::MutatorAndOrAccessor)
       call = GenerateOperatorCall(

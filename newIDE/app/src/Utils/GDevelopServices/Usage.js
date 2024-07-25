@@ -281,6 +281,10 @@ export const getUserLimits = async (
       Authorization: authorizationHeader,
     },
   });
+  if (response.data.capabilities.classrooms.hidePlayTab) {
+    response.data.capabilities.classrooms.hideCommunityTab = true;
+    response.data.capabilities.classrooms.hidePremiumProducts = true;
+  }
   return response.data;
 };
 
@@ -485,3 +489,10 @@ export const canUseClassroomFeature = (limits: ?Limits) =>
   limits &&
   limits.capabilities.classrooms &&
   limits.capabilities.classrooms.showClassroomTab;
+
+export const shouldHideClassroomTab = (limits: ?Limits) =>
+  !limits ||
+  !limits.capabilities.classrooms ||
+  limits.capabilities.classrooms.showClassroomTab
+    ? false
+    : true;

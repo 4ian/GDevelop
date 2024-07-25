@@ -18,7 +18,7 @@ import GDevelopGLogo from '../../../UI/CustomSvgIcons/GDevelopGLogo';
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
 import HomePageMenuBar from './HomePageMenuBar';
 import {
-  canUseClassroomFeature,
+  shouldHideClassroomTab,
   type Limits,
 } from '../../../Utils/GDevelopServices/Usage';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
@@ -158,11 +158,9 @@ export const getTabsToDisplay = ({
   const tabs = [
     'get-started',
     'build',
-    canUseClassroomFeature(limits)
+    !shouldHideClassroomTab(limits) && !isNativeMobileApp()
       ? 'team-view'
-      : isNativeMobileApp()
-      ? null
-      : 'team-view',
+      : null,
     'manage',
     displayShopTab ? 'shop' : null,
     'learn',

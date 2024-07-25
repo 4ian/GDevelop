@@ -48,6 +48,8 @@ const ObjectGroupVariablesDialog = ({
   shouldCreateInitiallySelectedVariable,
   onComputeAllVariableNames,
 }: Props) => {
+  // The initialization is done in the `if` to avoid `mergeVariableContainers`
+  // to be called at every updates.
   const groupVariablesContainer = ((React.useRef<gdVariablesContainer | null>(
     null
   ): any): { current: gdVariablesContainer });

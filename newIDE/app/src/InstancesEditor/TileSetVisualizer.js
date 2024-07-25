@@ -69,12 +69,12 @@ type TileMapCoordinates = {| x: number, y: number |};
 export const getTileIdFromGridCoordinates = ({
   x,
   y,
-  rowCount,
+  columnCount,
 }: {|
   x: number,
   y: number,
-  rowCount: number,
-|}): number => x * rowCount + y;
+  columnCount: number,
+|}): number => y * columnCount + x;
 
 /**
  * Returns the coordinates of a tile in a tile set given its id.
@@ -89,13 +89,13 @@ export const getTileIdFromGridCoordinates = ({
  */
 export const getGridCoordinatesFromTileId = ({
   id,
-  rowCount,
+  columnCount,
 }: {|
   id: number,
-  rowCount: number,
+  columnCount: number,
 |}): {| x: number, y: number |} => {
-  const y = id % rowCount;
-  const x = (id - y) / rowCount;
+  const x = id % columnCount;
+  const y = (id - x) / columnCount;
   return { x, y };
 };
 
@@ -687,7 +687,7 @@ const TileSetVisualizer = ({
                 title={getTileIdFromGridCoordinates({
                   x: hoveredTile.x,
                   y: hoveredTile.y,
-                  rowCount,
+                  columnCount,
                 }).toString()}
               />
             )}
@@ -703,7 +703,7 @@ const TileSetVisualizer = ({
                   title={getTileIdFromGridCoordinates({
                     x: tileMapTileSelection.coordinates.x,
                     y: tileMapTileSelection.coordinates.y,
-                    rowCount,
+                    columnCount,
                   }).toString()}
                 />
               )}
@@ -714,7 +714,7 @@ const TileSetVisualizer = ({
                 const id = getTileIdFromGridCoordinates({
                   x: coordinates.x,
                   y: coordinates.y,
-                  rowCount,
+                  columnCount,
                 });
                 return (
                   <Tile
@@ -750,7 +750,7 @@ const TileSetVisualizer = ({
                 title={getTileIdFromGridCoordinates({
                   x: tileIdDisplayGridCoordinates.x,
                   y: tileIdDisplayGridCoordinates.y,
-                  rowCount,
+                  columnCount,
                 }).toString()}
                 displayTooltip
               />

@@ -735,6 +735,28 @@ const defineSimpleTileMap = function (extension, _, gd) {
 
   object
     .addExpression(
+      'TilesetColumnCount',
+      _('Tileset column count'),
+      _('Get the number of column in the tileset.'),
+      '',
+      'JsPlatform/Extensions/tile_map.svg'
+    )
+    .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
+    .setFunctionName('getTilesetColumnCount');
+
+  object
+    .addExpression(
+      'TilesetRowCount',
+      _('Tileset row count'),
+      _('Get the number of row in the tileset.'),
+      '',
+      'JsPlatform/Extensions/tile_map.svg'
+    )
+    .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
+    .setFunctionName('getTilesetRowCount');
+
+  object
+    .addExpression(
       'TileCenterX',
       _('Scene X coordinate of tile'),
       _('Get the scene X position of the center of the tile.'),

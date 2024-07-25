@@ -814,7 +814,7 @@ export default class InstancesEditor extends Component<Props> {
         let cumulatedUnshiftedRows = 0,
           cumulatedUnshiftedColumns = 0;
         const tileId = getTileIdFromGridCoordinates({
-          rowCount: tileSet.rowCount,
+          columnCount: tileSet.columnCount,
           ...tileMapTileSelection.coordinates,
         });
 

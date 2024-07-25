@@ -44,7 +44,7 @@ const SimpleTileMapEditor = ({
     .filter(value => !!value)
     .map(idAsString => parseInt(idAsString, 10));
   const tilesWithHitBoxCoordinates = tilesWithHitBox.map(id =>
-    getGridCoordinatesFromTileId({ id, rowCount })
+    getGridCoordinatesFromTileId({ id, columnCount })
   );
   const [
     loadedAtlasImageDimensions,
@@ -118,14 +118,14 @@ const SimpleTileMapEditor = ({
         'tilesWithHitBox',
         tileMapTileSelection.coordinates
           .map(coordinates =>
-            getTileIdFromGridCoordinates({ ...coordinates, rowCount })
+            getTileIdFromGridCoordinates({ ...coordinates, columnCount })
           )
           .join(',')
       );
       if (onObjectUpdated) onObjectUpdated();
       forceUpdate();
     },
-    [rowCount, objectConfiguration, forceUpdate, onObjectUpdated]
+    [columnCount, objectConfiguration, forceUpdate, onObjectUpdated]
   );
 
   const onChangeAtlasImage = React.useCallback(

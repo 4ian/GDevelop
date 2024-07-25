@@ -79,7 +79,7 @@ export namespace PixiTileMapHelper {
 
         textureCache.setTexture(
           // Id of the tile
-          rowCount * x + y,
+          columnCount * y + x,
           texture
         );
       }

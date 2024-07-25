@@ -52,10 +52,11 @@ const ObjectGroupVariablesDialog = ({
   const groupVariablesContainer = useValueWithInit(
     // The VariablesContainer is returned by value.
     // Thus, the same instance is reused every time.
-    () => gd.GroupVariableHelper.mergeVariableContainers(
-      projectScopedContainersAccessor.get().getObjectsContainersList(),
-      objectGroup
-    )
+    () =>
+      gd.GroupVariableHelper.mergeVariableContainers(
+        projectScopedContainersAccessor.get().getObjectsContainersList(),
+        objectGroup
+      )
   );
 
   const {

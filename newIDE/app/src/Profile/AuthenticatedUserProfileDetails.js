@@ -32,6 +32,10 @@ const AuthenticatedUserProfileDetails = ({
     [authenticatedUser]
   );
 
+  const isStudentAccount =
+    !!authenticatedUser.subscription &&
+    !!authenticatedUser.subscription.benefitsFromEducationPlan;
+
   return firebaseUser && profile ? (
     <ColumnStackLayout noMargin>
       {firebaseUser && !firebaseUser.emailVerified && (
@@ -62,6 +66,7 @@ const AuthenticatedUserProfileDetails = ({
         achievements={authenticatedUser.achievements}
         onOpenChangeEmailDialog={onOpenChangeEmailDialog}
         onOpenEditProfileDialog={onOpenEditProfileDialog}
+        hideSocials={isStudentAccount}
       />
     </ColumnStackLayout>
   ) : (

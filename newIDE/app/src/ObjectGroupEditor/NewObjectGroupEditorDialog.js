@@ -9,6 +9,7 @@ import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/Even
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import { ColumnStackLayout } from '../UI/Layout';
 import Checkbox from '../UI/Checkbox';
+import HelpButton from '../UI/HelpButton';
 
 export type ObjectGroupEditorTab = 'objects' | 'variables';
 
@@ -95,6 +96,9 @@ const NewObjectGroupEditorDialog = ({
           primary
           onClick={apply}
         />,
+      ]}
+      secondaryActions={[
+        <HelpButton key="help-button" helpPagePath="/objects/object-group" />,
       ]}
       onRequestClose={onCancel}
       onApply={apply}

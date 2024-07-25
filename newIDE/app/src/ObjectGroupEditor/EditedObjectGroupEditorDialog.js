@@ -11,6 +11,7 @@ import { Column, Line } from '../UI/Grid';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
 import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessage';
 import VariablesList from '../VariablesList/VariablesList';
+import HelpButton from '../UI/HelpButton';
 
 const gd: libGDevelop = global.gd;
 
@@ -135,6 +136,9 @@ const EditedObjectGroupEditorDialog = ({
           primary
           onClick={apply}
         />,
+      ]}
+      secondaryActions={[
+        <HelpButton key="help-button" helpPagePath="/objects/object-group" />,
       ]}
       onRequestClose={onCancelChanges}
       onApply={apply}

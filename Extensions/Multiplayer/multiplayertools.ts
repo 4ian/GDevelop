@@ -190,7 +190,7 @@ namespace gdjs {
     /**
      * Returns true if the player at this position is connected to the lobby.
      */
-    export const isPlayerConnectedToLobby = (playerNumber: number) => {
+    export const isPlayerConnected = (playerNumber: number) => {
       return gdjs.multiplayerMessageManager.isPlayerConnected(playerNumber);
     };
 

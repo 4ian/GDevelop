@@ -45,7 +45,7 @@ namespace gdjs {
         );
         // If we have made changes to the stack as part of the network sync,
         // we trust the network to be the source of truth for the scene stack,
-        // and skip any other requests to change the scene stack.
+        // and skip the scene rendering (and so any other request to change the scene stack from it)
         return true;
       }
 

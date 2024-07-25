@@ -105,7 +105,7 @@ const NewObjectGroupEditorDialog = ({
           {!isGroupAlreadyAdded && (
             <SemiControlledTextField
               fullWidth
-              id="object-name"
+              id="group-name"
               commitOnBlur
               floatingLabelText={<Trans>Group name</Trans>}
               floatingLabelFixed

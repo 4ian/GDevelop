@@ -142,7 +142,9 @@ void GroupVariableHelper::FillMissingGroupVariablesToObjects(
   }
 };
 
-// TODO Handle position changes.
+// TODO Handle position changes for group variables.
+// We could try to change the order of object variables in a way that the next
+// call to MergeVariableContainers rebuild them in the same order.
 void GroupVariableHelper::ApplyChangesToObjects(
     gd::ObjectsContainer &globalObjectsContainer,
     gd::ObjectsContainer &objectsContainer,

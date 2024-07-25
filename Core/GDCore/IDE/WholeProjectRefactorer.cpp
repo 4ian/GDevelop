@@ -141,7 +141,6 @@ void WholeProjectRefactorer::EnsureObjectEventsFunctionsProperParameters(
   }
 }
 
-// TODO Handle position changes for group variables.
 VariablesChangeset
 WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
     const gd::SerializerElement &oldSerializedVariablesContainer,

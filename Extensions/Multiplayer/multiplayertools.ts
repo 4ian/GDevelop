@@ -234,11 +234,15 @@ namespace gdjs {
           runtimeScene,
           playerUsername
         );
+        // We remove the players who just left 1 by 1, so that they can be treated in different frames.
+        // This is especially important if the expression to know the latest player who just left is used,
+        // to avoid missing a player leaving.
+        gdjs.multiplayerMessageManager.removePlayerWhoJustLeft();
+
+        // When a player leaves, we send a heartbeat to the backend so that they're aware of the players in the lobby.
+        // Do not await as we want don't want to block the execution of the of the rest of the logic.
+        sendHeartbeatToBackend();
       }
-      // We remove the players who just left 1 by 1, so that they can be treated in different frames.
-      // This is especially important if the expression to know the latest player who just left is used,
-      // to avoid missing a player leaving.
-      gdjs.multiplayerMessageManager.removePlayerWhoJustLeft();
     };
 
     const handleJoiningPlayer = (runtimeScene: gdjs.RuntimeScene) => {
@@ -646,6 +650,37 @@ namespace gdjs {
       );
     };
 
+    const sendHeartbeatToBackend = async function () {
+      const gameId = gdjs.projectData.properties.projectUuid;
+      const playerId = gdjs.playerAuthentication.getUserId();
+      const playerToken = gdjs.playerAuthentication.getUserToken();
+
+      if (!gameId || !playerId || !playerToken || !_lobbyId) {
+        logger.error(
+          'Cannot keep the lobby playing without the game ID or player ID.'
+        );
+        return;
+      }
+
+      const rootApi = isUsingGDevelopDevelopmentEnvironment
+        ? 'https://api-dev.gdevelop.io'
+        : 'https://api.gdevelop.io';
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+      let heartbeatUrl = `${rootApi}/play/game/${gameId}/public-lobby/${_lobbyId}/action/heartbeat`;
+      headers['Authorization'] = `player-game-token ${playerToken}`;
+      heartbeatUrl += `?playerId=${playerId}`;
+      const players = gdjs.multiplayerMessageManager.getConnectedPlayers();
+      await fetch(heartbeatUrl, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          players,
+        }),
+      });
+    };
+
     /**
      * When the game receives the information that the game has started, close the
      * lobbies window, focus on the game, and set the flag to true.
@@ -674,35 +709,8 @@ namespace gdjs {
 
       // If we are the host, start pinging the backend to let it know the lobby is running.
       if (isPlayerHost()) {
-        const gameId = gdjs.projectData.properties.projectUuid;
-        const playerId = gdjs.playerAuthentication.getUserId();
-        const playerToken = gdjs.playerAuthentication.getUserToken();
-
-        if (!gameId || !playerId || !playerToken || !_lobbyId) {
-          logger.error(
-            'Cannot keep the lobby playing without the game ID or player ID.'
-          );
-          return;
-        }
-
         _lobbyHeartbeatInterval = setInterval(async () => {
-          const rootApi = isUsingGDevelopDevelopmentEnvironment
-            ? 'https://api-dev.gdevelop.io'
-            : 'https://api.gdevelop.io';
-          const headers = {
-            'Content-Type': 'application/json',
-          };
-          let heartbeatUrl = `${rootApi}/play/game/${gameId}/public-lobby/${_lobbyId}/action/heartbeat`;
-          headers['Authorization'] = `player-game-token ${playerToken}`;
-          heartbeatUrl += `?playerId=${playerId}`;
-          const players = gdjs.multiplayerMessageManager.getConnectedPlayers();
-          await fetch(heartbeatUrl, {
-            method: 'POST',
-            headers,
-            body: JSON.stringify({
-              players,
-            }),
-          });
+          await sendHeartbeatToBackend();
         }, heartbeatInterval);
       }
 

@@ -12,6 +12,7 @@ import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/Even
 import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessage';
 import VariablesList from '../VariablesList/VariablesList';
 import HelpButton from '../UI/HelpButton';
+import useValueWithInit from '../Utils/UseRefInitHook';
 
 const gd: libGDevelop = global.gd;
 
@@ -53,25 +54,20 @@ const EditedObjectGroupEditorDialog = ({
     initialTab || 'objects'
   );
 
-  // The initialization is done in the `if` to avoid `mergeVariableContainers`
-  // to be called at every updates.
-  const groupVariablesContainer = ((React.useRef<gdVariablesContainer | null>(
-    null
-  ): any): { current: gdVariablesContainer });
-  if (!groupVariablesContainer.current) {
+  const groupVariablesContainer = useValueWithInit(
     // The VariablesContainer is returned by value.
     // Thus, the same instance is reused every time.
-    groupVariablesContainer.current = gd.GroupVariableHelper.mergeVariableContainers(
+    () => gd.GroupVariableHelper.mergeVariableContainers(
       projectScopedContainersAccessor.get().getObjectsContainersList(),
       group
-    );
-  }
+    )
+  );
 
   const {
     notifyOfChange: notifyOfVariableChange,
     getOriginalContentSerializedElement: getOriginalVariablesSerializedElement,
   } = useSerializableObjectCancelableEditor({
-    serializableObject: groupVariablesContainer.current,
+    serializableObject: groupVariablesContainer,
     onCancel: () => {},
     resetThenClearPersistentUuid: true,
   });
@@ -82,19 +78,19 @@ const EditedObjectGroupEditorDialog = ({
     const originalSerializedVariables = getOriginalVariablesSerializedElement();
     const changeset = gd.WholeProjectRefactorer.computeChangesetForVariablesContainer(
       originalSerializedVariables,
-      groupVariablesContainer.current
+      groupVariablesContainer
     );
 
     gd.WholeProjectRefactorer.applyRefactoringForGroupVariablesContainer(
       project,
       globalObjectsContainer || objectsContainer,
       objectsContainer,
-      groupVariablesContainer.current,
+      groupVariablesContainer,
       group,
       changeset,
       originalSerializedVariables
     );
-    groupVariablesContainer.current.clearPersistentUuid();
+    groupVariablesContainer.clearPersistentUuid();
   };
 
   const removeObject = React.useCallback(
@@ -177,17 +173,16 @@ const EditedObjectGroupEditorDialog = ({
       )}
       {currentTab === 'variables' && (
         <Column expand noMargin>
-          {groupVariablesContainer.current.count() > 0 &&
-            DismissableTutorialMessage && (
-              <Line>
-                <Column noMargin expand>
-                  {DismissableTutorialMessage}
-                </Column>
-              </Line>
-            )}
+          {groupVariablesContainer.count() > 0 && DismissableTutorialMessage && (
+            <Line>
+              <Column noMargin expand>
+                {DismissableTutorialMessage}
+              </Column>
+            </Line>
+          )}
           <VariablesList
             projectScopedContainersAccessor={projectScopedContainersAccessor}
-            variablesContainer={groupVariablesContainer.current}
+            variablesContainer={groupVariablesContainer}
             areObjectVariables
             emptyPlaceholderTitle={
               <Trans>Add your first object group variable</Trans>

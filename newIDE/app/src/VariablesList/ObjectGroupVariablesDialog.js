@@ -16,6 +16,7 @@ import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/Even
 import { insertInVariablesContainer } from '../Utils/VariablesUtils';
 import { getRootVariableName } from '../EventsSheet/ParameterFields/VariableField';
 import { getNodeIdFromVariableName } from './VariableToTreeNodeHandling';
+import useValueWithInit from '../Utils/UseRefInitHook';
 
 const gd: libGDevelop = global.gd;
 
@@ -48,25 +49,20 @@ const ObjectGroupVariablesDialog = ({
   shouldCreateInitiallySelectedVariable,
   onComputeAllVariableNames,
 }: Props) => {
-  // The initialization is done in the `if` to avoid `mergeVariableContainers`
-  // to be called at every updates.
-  const groupVariablesContainer = ((React.useRef<gdVariablesContainer | null>(
-    null
-  ): any): { current: gdVariablesContainer });
-  if (!groupVariablesContainer.current) {
+  const groupVariablesContainer = useValueWithInit(
     // The VariablesContainer is returned by value.
     // Thus, the same instance is reused every time.
-    groupVariablesContainer.current = gd.GroupVariableHelper.mergeVariableContainers(
+    () => gd.GroupVariableHelper.mergeVariableContainers(
       projectScopedContainersAccessor.get().getObjectsContainersList(),
       objectGroup
-    );
-  }
+    )
+  );
 
   const {
     notifyOfChange: notifyOfVariableChange,
     getOriginalContentSerializedElement: getOriginalVariablesSerializedElement,
   } = useSerializableObjectCancelableEditor({
-    serializableObject: groupVariablesContainer.current,
+    serializableObject: groupVariablesContainer,
     onCancel: () => {},
     resetThenClearPersistentUuid: true,
   });
@@ -76,26 +72,26 @@ const ObjectGroupVariablesDialog = ({
       lastSelectedVariableNodeId.current &&
         getVariablePathFromNodeId(
           lastSelectedVariableNodeId.current,
-          groupVariablesContainer.current
+          groupVariablesContainer
         )
     );
 
     const originalSerializedVariables = getOriginalVariablesSerializedElement();
     const changeset = gd.WholeProjectRefactorer.computeChangesetForVariablesContainer(
       originalSerializedVariables,
-      groupVariablesContainer.current
+      groupVariablesContainer
     );
 
     gd.WholeProjectRefactorer.applyRefactoringForGroupVariablesContainer(
       project,
       globalObjectsContainer || objectsContainer,
       objectsContainer,
-      groupVariablesContainer.current,
+      groupVariablesContainer,
       objectGroup,
       changeset,
       originalSerializedVariables
     );
-    groupVariablesContainer.current.clearPersistentUuid();
+    groupVariablesContainer.clearPersistentUuid();
   };
 
   const lastSelectedVariableNodeId = React.useRef<string | null>(null);
@@ -113,12 +109,12 @@ const ObjectGroupVariablesDialog = ({
   if (shouldCreateVariable.current) {
     shouldCreateVariable.current = false;
     const { name: actualVariableName } = insertInVariablesContainer(
-      groupVariablesContainer.current,
+      groupVariablesContainer,
       initiallySelectedVariableName
         ? getRootVariableName(initiallySelectedVariableName)
         : 'Variable',
       null,
-      groupVariablesContainer.current.count(),
+      groupVariablesContainer.count(),
       null
     );
     actualInitiallySelectedVariableName.current = actualVariableName;
@@ -168,15 +164,14 @@ const ObjectGroupVariablesDialog = ({
       id="object-group-variables-dialog"
     >
       <Column expand noMargin noOverflowParent>
-        {groupVariablesContainer.current.count() > 0 &&
-          DismissableTutorialMessage && (
-            <Line>
-              <Column expand>{DismissableTutorialMessage}</Column>
-            </Line>
-          )}
+        {groupVariablesContainer.count() > 0 && DismissableTutorialMessage && (
+          <Line>
+            <Column expand>{DismissableTutorialMessage}</Column>
+          </Line>
+        )}
         <VariablesList
           projectScopedContainersAccessor={projectScopedContainersAccessor}
-          variablesContainer={groupVariablesContainer.current}
+          variablesContainer={groupVariablesContainer}
           areObjectVariables
           initiallySelectedVariableName={
             actualInitiallySelectedVariableName.current

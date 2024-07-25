@@ -40,13 +40,13 @@ namespace gdjs {
     _atlasImage: string;
     _tileMapManager: gdjs.TileMap.TileMapRuntimeManager;
     _renderer: gdjs.TileMapRuntimeObjectPixiRenderer;
-    _rowCount: number;
-    _columnCount: number;
-    _tileSize: number;
+    readonly _rowCount: number;
+    readonly _columnCount: number;
+    readonly _tileSize: number;
     _displayMode = 'all';
     _layerIndex = 0;
-    _initialTileMapAsJsObject: TileMapHelper.EditableTileMapAsJsObject | null = null;
-    _initialTilesWithHitBox: number[];
+    readonly _initialTileMapAsJsObject: TileMapHelper.EditableTileMapAsJsObject | null = null;
+    readonly _initialTilesWithHitBox: number[];
     _isTileMapDirty: boolean = false;
     _sceneToTileMapTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
     _tileMapToSceneTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
@@ -727,6 +727,14 @@ namespace gdjs {
 
     getGridColumnCount(): integer {
       return this._renderer.getGridColumnCount();
+    }
+
+    getTilesetColumnCount(): integer {
+      return this._columnCount;
+    }
+
+    getTilesetRowCount(): integer {
+      return this._rowCount;
     }
   }
   gdjs.registerObject(

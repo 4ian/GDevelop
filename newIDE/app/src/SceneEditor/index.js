@@ -2006,6 +2006,18 @@ export default class SceneEditor extends React.Component<Props, State> {
                     }
                   }}
                   initialTab={'objects'}
+                  onComputeAllVariableNames={() => {
+                    const { editedGroup } = this.state;
+                    if (!editedGroup) return [];
+                    if (!layout) return [];
+
+                    return EventsRootVariablesFinder.findAllObjectVariables(
+                      project.getCurrentPlatform(),
+                      project,
+                      layout, // TODO: Handle this for custom objects?
+                      editedGroup.getName()
+                    );
+                  }}
                 />
               )}
               {this.state.setupGridOpen && (

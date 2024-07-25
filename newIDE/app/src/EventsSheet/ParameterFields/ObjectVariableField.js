@@ -19,6 +19,7 @@ import getObjectGroupByName from '../../Utils/GetObjectGroupByName';
 import ObjectVariableIcon from '../../UI/CustomSvgIcons/ObjectVariable';
 import { enumerateVariables } from './EnumerateVariables';
 import { intersectionBy } from 'lodash';
+import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
 
 const gd: libGDevelop = global.gd;
 
@@ -140,6 +141,20 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       [onChange, onInstructionTypeChanged, value]
     );
 
+    const onComputeAllVariableNames = React.useCallback(
+      () => {
+        if (!project || !layout || !objectName) return [];
+
+        return EventsRootVariablesFinder.findAllObjectVariables(
+          project.getCurrentPlatform(),
+          project,
+          layout, // TODO: Handle this for custom objects?
+          objectName
+        );
+      },
+      [layout, objectName, project]
+    );
+
     return (
       <React.Fragment>
         <VariableField
@@ -176,7 +191,6 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         {editorOpen && project && !objectGroup && (
           <ObjectVariablesDialog
             project={project}
-            layout={layout}
             projectScopedContainersAccessor={projectScopedContainersAccessor}
             objectName={objectName}
             variablesContainer={variablesContainers[0]}
@@ -186,6 +200,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             preventRefactoringToDeleteInstructions
             initiallySelectedVariableName={editorOpen.variableName}
             shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
+            onComputeAllVariableNames={onComputeAllVariableNames}
           />
         )}
         {editorOpen && project && objectGroup && (
@@ -200,6 +215,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             open
             initiallySelectedVariableName={editorOpen.variableName}
             shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
+            onComputeAllVariableNames={onComputeAllVariableNames}
           />
         )}
       </React.Fragment>

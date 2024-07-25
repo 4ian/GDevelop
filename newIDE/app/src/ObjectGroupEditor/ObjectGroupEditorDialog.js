@@ -19,6 +19,7 @@ type Props = {|
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
   initialTab?: ?ObjectGroupEditorTab,
+  onComputeAllVariableNames?: () => Array<string>,
 |};
 
 const ObjectGroupEditorDialog = ({
@@ -31,6 +32,7 @@ const ObjectGroupEditorDialog = ({
   globalObjectsContainer,
   objectsContainer,
   initialTab,
+  onComputeAllVariableNames,
 }: Props) => {
   const [
     editedObjectGroup,
@@ -112,6 +114,7 @@ const ObjectGroupEditorDialog = ({
       globalObjectsContainer={globalObjectsContainer}
       objectsContainer={objectsContainer}
       initialTab={selectedTab}
+      onComputeAllVariableNames={onComputeAllVariableNames}
     />
   );
 };

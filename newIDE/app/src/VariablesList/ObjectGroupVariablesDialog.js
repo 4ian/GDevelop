@@ -31,9 +31,10 @@ type Props = {|
   initiallySelectedVariableName?: string,
   shouldCreateInitiallySelectedVariable?: boolean,
   hotReloadPreviewButtonProps?: ?HotReloadPreviewButtonProps,
+  onComputeAllVariableNames: () => Array<string>,
 |};
 
-const ObjectGroupVariablesEditorDialog = ({
+const ObjectGroupVariablesDialog = ({
   project,
   projectScopedContainersAccessor,
   globalObjectsContainer,
@@ -45,6 +46,7 @@ const ObjectGroupVariablesEditorDialog = ({
   hotReloadPreviewButtonProps,
   initiallySelectedVariableName,
   shouldCreateInitiallySelectedVariable,
+  onComputeAllVariableNames,
 }: Props) => {
   const groupVariablesContainer = ((React.useRef<gdVariablesContainer | null>(
     null
@@ -187,8 +189,7 @@ const ObjectGroupVariablesEditorDialog = ({
             </Trans>
           }
           helpPagePath={'/all-features/variables/object-variables'}
-          // TODO
-          //onComputeAllVariableNames={onComputeAllVariableNames}
+          onComputeAllVariableNames={onComputeAllVariableNames}
           onVariablesUpdated={notifyOfVariableChange}
           onSelectedVariableChange={onSelectedVariableChange}
         />
@@ -197,4 +198,4 @@ const ObjectGroupVariablesEditorDialog = ({
   );
 };
 
-export default ObjectGroupVariablesEditorDialog;
+export default ObjectGroupVariablesDialog;

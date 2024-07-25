@@ -25,6 +25,7 @@ type Props = {|
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
   initialTab: ?ObjectGroupEditorTab,
+  onComputeAllVariableNames?: () => Array<string>,
 |};
 
 const EditedObjectGroupEditorDialog = ({
@@ -36,6 +37,7 @@ const EditedObjectGroupEditorDialog = ({
   globalObjectsContainer,
   objectsContainer,
   initialTab,
+  onComputeAllVariableNames,
 }: Props) => {
   const forceUpdate = useForceUpdate();
   const {
@@ -191,8 +193,7 @@ const EditedObjectGroupEditorDialog = ({
               </Trans>
             }
             helpPagePath={'/all-features/variables/object-variables'}
-            // TODO
-            //onComputeAllVariableNames={onComputeAllVariableNames}
+            onComputeAllVariableNames={onComputeAllVariableNames}
             onVariablesUpdated={notifyOfVariableChange}
           />
         </Column>

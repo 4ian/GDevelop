@@ -3,13 +3,11 @@ import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import VariablesEditorDialog from './VariablesEditorDialog';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
-import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
 
 type Props = {|
   open: boolean,
   project: gdProject,
-  layout?: ?gdLayout,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   objectName?: ?string,
   variablesContainer: gdVariablesContainer,
@@ -23,11 +21,11 @@ type Props = {|
   preventRefactoringToDeleteInstructions?: boolean,
   initiallySelectedVariableName?: string,
   shouldCreateInitiallySelectedVariable?: boolean,
+  onComputeAllVariableNames: () => Array<string>,
 |};
 
 const ObjectVariablesDialog = ({
   project,
-  layout,
   objectName,
   variablesContainer,
   open,
@@ -38,20 +36,8 @@ const ObjectVariablesDialog = ({
   initiallySelectedVariableName,
   shouldCreateInitiallySelectedVariable,
   projectScopedContainersAccessor,
+  onComputeAllVariableNames,
 }: Props) => {
-  const onComputeAllVariableNames = React.useCallback(
-    () =>
-      project && layout && objectName
-        ? EventsRootVariablesFinder.findAllObjectVariables(
-            project.getCurrentPlatform(),
-            project,
-            layout,
-            objectName
-          )
-        : [],
-    [layout, objectName, project]
-  );
-
   const tabs = React.useMemo(
     () => [
       {

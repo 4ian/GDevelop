@@ -25,7 +25,7 @@ namespace gd {
 class GD_CORE_API GroupVariableHelper {
 public:
   /**
-   * Copy every variable from every object of the group to the other object
+   * Copy every variable from every object of the group to the other objects
    * if they don't have it already.
    *
    * In the editor, when an object group is created, users can choose between:

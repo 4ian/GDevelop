@@ -94,7 +94,7 @@ class GD_CORE_API ExpressionVariableReplacer
       // A scope was forced. Honor it: it means this node represents a variable
       // of the forced variables container.
       if (forcedVariablesContainer == &targetVariablesContainer ||
-          (forcedObjectName == targetGroupName && !targetGroupName.empty())) {
+          IsTargetingObjectGroup(forcedObjectName)) {
         RenameOrRemoveVariableOfTargetVariableContainer(node.name);
       }
 
@@ -158,7 +158,7 @@ class GD_CORE_API ExpressionVariableReplacer
       // objectNameToUseForVariableAccessor.
       if (objectsContainersList.HasObjectOrGroupVariablesContainer(
               objectNameToUseForVariableAccessor, targetVariablesContainer) ||
-          (objectNameToUseForVariableAccessor == targetGroupName && !targetGroupName.empty())) {
+          IsTargetingObjectGroup(objectNameToUseForVariableAccessor)) {
         objectNameToUseForVariableAccessor = "";
         // The node represents an object variable, and this object variables are
         // the target. Do the replacement or removals:
@@ -209,7 +209,7 @@ class GD_CORE_API ExpressionVariableReplacer
       // A scope was forced. Honor it: it means this node represents a variable
       // of the forced variables container.
       if (forcedVariablesContainer == &targetVariablesContainer ||
-          (forcedObjectName == targetGroupName && !targetGroupName.empty())) {
+          IsTargetingObjectGroup(forcedObjectName)) {
         renameVariableAndChild();
       }
       return;
@@ -223,7 +223,7 @@ class GD_CORE_API ExpressionVariableReplacer
           // This represents an object.
           if (objectsContainersList.HasObjectOrGroupVariablesContainer(
                   node.identifierName, targetVariablesContainer) ||
-              (node.identifierName == targetGroupName && !targetGroupName.empty())) {
+              IsTargetingObjectGroup(node.identifierName)) {
             // The node represents an object variable, and this object variables
             // are the target. Do the replacement or removals:
             PushVariablesRenamingChangesetRoot();
@@ -309,6 +309,10 @@ class GD_CORE_API ExpressionVariableReplacer
  private:
   bool hasDoneRenaming;
   bool removedVariableUsed;
+
+  bool IsTargetingObjectGroup(const gd::String &objectGroupName) {
+    return !targetGroupName.empty() && objectGroupName == targetGroupName;
+  }
 
   bool RenameOrRemoveVariableOfTargetVariableContainer(
       gd::String& variableName) {
@@ -400,7 +404,9 @@ class GD_CORE_API ExpressionVariableReplacer
   // Renaming or removing to do:
   const gd::VariablesContainer& targetVariablesContainer;
   /**
-   * Groups don't have VariablesContainer
+   * Groups don't have VariablesContainer, so `targetVariablesContainer` will be
+   * pointing to `nullVariablesContainer` and the group name is use instead to
+   * check which variable accesses to modify in expressions.
    */
   const gd::String& targetGroupName;
   const VariablesRenamingChangesetNode &variablesRenamingChangesetRoot;

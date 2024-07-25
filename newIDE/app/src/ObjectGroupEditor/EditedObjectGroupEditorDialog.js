@@ -92,15 +92,9 @@ const EditedObjectGroupEditorDialog = ({
     groupVariablesContainer.current.clearPersistentUuid();
   };
 
-  const [groupObjectNames, setGroupObjectNames] = React.useState<Array<string>>(
-    () => group.getAllObjectsNames().toJSArray()
-  );
-
   const removeObject = React.useCallback(
     (objectName: string) => {
       group.removeObject(objectName);
-
-      setGroupObjectNames(group.getAllObjectsNames().toJSArray());
       // Force update to ensure dialog is properly positioned
       forceUpdate();
       notifyOfChange();
@@ -111,8 +105,6 @@ const EditedObjectGroupEditorDialog = ({
   const addObject = React.useCallback(
     (objectName: string) => {
       group.addObject(objectName);
-
-      setGroupObjectNames(group.getAllObjectsNames().toJSArray());
       // Force update to ensure dialog is properly positioned
       forceUpdate();
       notifyOfChange();
@@ -170,7 +162,7 @@ const EditedObjectGroupEditorDialog = ({
           projectScopedContainersAccessor={projectScopedContainersAccessor}
           globalObjectsContainer={globalObjectsContainer}
           objectsContainer={objectsContainer}
-          groupObjectNames={groupObjectNames}
+          groupObjectNames={group.getAllObjectsNames().toJSArray()}
           onObjectAdded={addObject}
           onObjectRemoved={removeObject}
         />
@@ -194,7 +186,8 @@ const EditedObjectGroupEditorDialog = ({
             }
             emptyPlaceholderDescription={
               <Trans>
-                These variables hold additional information on an object group.
+                These variables hold additional information and are available on
+                all objects of the group.
               </Trans>
             }
             helpPagePath={'/all-features/variables/object-variables'}

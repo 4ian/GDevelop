@@ -67,7 +67,9 @@ class GD_CORE_API EventsVariableReplacer
   const gd::Platform &platform;
   const gd::VariablesContainer &targetVariablesContainer;
   /**
-   * Groups don't have VariablesContainer
+   * Groups don't have VariablesContainer, so `targetVariablesContainer` will be
+   * pointing to `nullVariablesContainer` and the group name is use instead to
+   * check which variable accesses to modify in expressions.
    */
   const gd::String targetGroupName;
   const VariablesRenamingChangesetNode &variablesRenamingChangesetRoot;

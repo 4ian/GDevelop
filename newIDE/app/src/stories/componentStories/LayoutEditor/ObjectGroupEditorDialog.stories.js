@@ -9,7 +9,7 @@ import { testProject } from '../../GDevelopJsInitializerDecorator';
 import ObjectGroupEditorDialog from '../../../ObjectGroupEditor/ObjectGroupEditorDialog';
 
 export default {
-  title: 'LayoutEditor/ObjectGroupEditor',
+  title: 'LayoutEditor/ObjectGroupEditorDialog',
   component: ObjectGroupEditorDialog,
 };
 

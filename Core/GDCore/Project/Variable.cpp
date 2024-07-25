@@ -445,9 +445,6 @@ bool Variable::operator==(const gd::Variable &variable) const {
   if (type == Variable::Type::Boolean) {
     return boolVal == variable.boolVal;
   }
-  if (type == Variable::Type::Boolean) {
-    return boolVal == variable.boolVal;
-  }
   if (type == Variable::Type::Structure) {
     if (children.size() != variable.children.size()) {
       return false;

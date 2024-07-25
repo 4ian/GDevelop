@@ -17,7 +17,7 @@
 namespace gd {
 class VariablesContainer;
 class Platform;
-}  // namespace gd
+} // namespace gd
 
 namespace gd {
 /**
@@ -37,8 +37,7 @@ public:
       const gd::VariablesContainer &targetVariablesContainer_)
       : platform(platform_),
         typeChangedVariableNames(typeChangedVariableNames_),
-        targetVariablesContainer(targetVariablesContainer_),
-        groupName(""){};
+        targetVariablesContainer(targetVariablesContainer_), groupName(""){};
   EventsVariableInstructionTypeSwitcher(
       const gd::Platform &platform_,
       const std::unordered_set<gd::String> &typeChangedVariableNames_,
@@ -49,14 +48,16 @@ public:
         groupName(groupName_){};
   virtual ~EventsVariableInstructionTypeSwitcher();
 
- private:
+private:
   bool DoVisitInstruction(gd::Instruction &instruction,
                           bool isCondition) override;
 
   const gd::Platform &platform;
   const gd::VariablesContainer &targetVariablesContainer;
   /**
-   * Groups don't have VariablesContainer
+   * Groups don't have VariablesContainer, so `targetVariablesContainer` will be
+   * pointing to `nullVariablesContainer` and the group name is use instead to
+   * check which instruction to modify.
    */
   const gd::String groupName;
   const std::unordered_set<gd::String> &typeChangedVariableNames;

@@ -102,7 +102,6 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           objectName
         )
       : null;
-    console.log(objectGroup);
 
     const { layout } = scope;
     const variablesContainers = React.useMemo<Array<gdVariablesContainer>>(

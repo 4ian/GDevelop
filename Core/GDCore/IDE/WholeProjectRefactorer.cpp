@@ -350,7 +350,7 @@ void WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
   // trigger any refactoring.
   std::unordered_set<gd::String> removedVariableNames;
 
-  // Rename variables in events for the group objects.
+  // Rename variables in events for the objects of the group.
   for (const gd::String &objectName : objectGroup.GetAllObjectsNames()) {
     const bool hasObject = objectsContainer.HasObjectNamed(objectName);
     if (!hasObject && !globalObjectsContainer.HasObjectNamed(objectName)) {

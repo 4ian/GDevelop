@@ -1,6 +1,7 @@
 // @flow
 
 import * as React from 'react';
+import { t } from '@lingui/macro';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 import { Column, Line, Spacer } from '../UI/Grid';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
@@ -568,6 +569,7 @@ const TileSetVisualizer = ({
             <LineStackLayout alignItems="center" noMargin>
               <IconButton
                 size="small"
+                tooltip={t`Paint`}
                 selected={
                   !!tileMapTileSelection &&
                   tileMapTileSelection.kind === 'single'
@@ -591,6 +593,7 @@ const TileSetVisualizer = ({
               </IconButton>
               <IconButton
                 size="small"
+                tooltip={t`Horizontal flip`}
                 selected={shouldFlipHorizontally}
                 disabled={
                   !tileMapTileSelection ||
@@ -614,6 +617,7 @@ const TileSetVisualizer = ({
               </IconButton>
               <IconButton
                 size="small"
+                tooltip={t`Vertical flip`}
                 selected={shouldFlipVertically}
                 disabled={
                   !tileMapTileSelection ||
@@ -638,6 +642,7 @@ const TileSetVisualizer = ({
             </LineStackLayout>
             <IconButton
               size="small"
+              tooltip={t`Erase`}
               selected={
                 !!tileMapTileSelection && tileMapTileSelection.kind === 'erase'
               }

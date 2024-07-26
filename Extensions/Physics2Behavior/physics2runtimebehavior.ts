@@ -1528,6 +1528,17 @@ namespace gdjs {
       );
     }
 
+    isLinearVelocityAngleAround(degreeAngle: float, tolerance: float) {
+      return (
+        Math.abs(
+          gdjs.evtTools.common.angleDifference(
+            this.getLinearVelocityAngle(),
+            degreeAngle
+          )
+        ) <= tolerance
+      );
+    }
+
     getAngularVelocity(): float {
       // If there is no body, set a new one
       if (this._body === null) {
@@ -1957,9 +1968,9 @@ namespace gdjs {
       }
 
       // Get the second body
-      const otherBody = (other.getBehavior(
-        this.name
-      ) as gdjs.Physics2RuntimeBehavior).getBody();
+      const otherBody = (
+        other.getBehavior(this.name) as gdjs.Physics2RuntimeBehavior
+      ).getBody();
 
       // If the first and second objects/bodies are the same, return
       if (this._body === otherBody) {
@@ -2206,9 +2217,9 @@ namespace gdjs {
       }
 
       // Get the second body
-      const otherBody = (other.getBehavior(
-        this.name
-      ) as gdjs.Physics2RuntimeBehavior).getBody();
+      const otherBody = (
+        other.getBehavior(this.name) as gdjs.Physics2RuntimeBehavior
+      ).getBody();
 
       // If the first and second objects/bodies are the same, return
       if (this._body === otherBody) {
@@ -2507,9 +2518,9 @@ namespace gdjs {
       }
 
       // Get the second body
-      const otherBody = (other.getBehavior(
-        this.name
-      ) as gdjs.Physics2RuntimeBehavior).getBody();
+      const otherBody = (
+        other.getBehavior(this.name) as gdjs.Physics2RuntimeBehavior
+      ).getBody();
 
       // If the first and second objects/bodies are the same, return
       if (this._body === otherBody) {
@@ -2878,9 +2889,9 @@ namespace gdjs {
       }
 
       // Get the second body
-      const otherBody = (other.getBehavior(
-        this.name
-      ) as gdjs.Physics2RuntimeBehavior).getBody();
+      const otherBody = (
+        other.getBehavior(this.name) as gdjs.Physics2RuntimeBehavior
+      ).getBody();
 
       // If the first and second objects/bodies are the same, return
       if (this._body === otherBody) {
@@ -3360,9 +3371,9 @@ namespace gdjs {
       }
 
       // Get the second body
-      const otherBody = (other.getBehavior(
-        this.name
-      ) as gdjs.Physics2RuntimeBehavior).getBody();
+      const otherBody = (
+        other.getBehavior(this.name) as gdjs.Physics2RuntimeBehavior
+      ).getBody();
 
       // If the first and second objects/bodies are the same, return
       if (this._body === otherBody) {
@@ -3641,9 +3652,9 @@ namespace gdjs {
       }
 
       // Get the second body
-      const otherBody = (other.getBehavior(
-        this.name
-      ) as gdjs.Physics2RuntimeBehavior).getBody();
+      const otherBody = (
+        other.getBehavior(this.name) as gdjs.Physics2RuntimeBehavior
+      ).getBody();
 
       // If the first and second objects/bodies are the same, return
       if (this._body === otherBody) {
@@ -3791,9 +3802,9 @@ namespace gdjs {
       }
 
       // Get the second body
-      const otherBody = (other.getBehavior(
-        this.name
-      ) as gdjs.Physics2RuntimeBehavior).getBody();
+      const otherBody = (
+        other.getBehavior(this.name) as gdjs.Physics2RuntimeBehavior
+      ).getBody();
 
       // If the first and second objects/bodies are the same, return
       if (this._body === otherBody) {
@@ -3900,9 +3911,9 @@ namespace gdjs {
       }
 
       // Get the second body
-      const otherBody = (other.getBehavior(
-        this.name
-      ) as gdjs.Physics2RuntimeBehavior).getBody();
+      const otherBody = (
+        other.getBehavior(this.name) as gdjs.Physics2RuntimeBehavior
+      ).getBody();
 
       // If the first and second objects/bodies are the same, return
       if (this._body === otherBody) {
@@ -4035,9 +4046,9 @@ namespace gdjs {
       }
 
       // Get the second body
-      const otherBody = (other.getBehavior(
-        this.name
-      ) as gdjs.Physics2RuntimeBehavior).getBody();
+      const otherBody = (
+        other.getBehavior(this.name) as gdjs.Physics2RuntimeBehavior
+      ).getBody();
 
       // If the first and second objects/bodies are the same, return
       if (this._body === otherBody) {

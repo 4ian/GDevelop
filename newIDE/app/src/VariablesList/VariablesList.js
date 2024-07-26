@@ -1194,8 +1194,8 @@ const VariablesList = (props: Props) => {
       } else if (type === gd.Variable.Array) {
         variable.pushNew();
       }
-      _onChange();
       if (variable.isFolded()) variable.setFolded(false);
+      _onChange();
       forceUpdate();
     },
     [_onChange, forceUpdate, props.variablesContainer]

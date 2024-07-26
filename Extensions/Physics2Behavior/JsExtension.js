@@ -1418,22 +1418,22 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('getLinearVelocityAngle');
 
-      aut
-        .addCondition(
-          'IsLinearVelocityAngleAround',
-          _('Linear velocity angle'),
-          _('Compare the linear velocity angle of the object.'),
-          _('Angle of movement of _PARAM0_ is _PARAM2_ ± _PARAM3_°'),
-          _('Velocity'),
-          'res/physics32.png',
-          'res/physics32.png'
-        )
-        .addParameter('object', _('Object'), '', false)
-        .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-        .addParameter("expression", _("Angle (in degrees)"))
-        .addParameter("expression", _("Tolerance (in degrees)"))
-        .getCodeExtraInformation()
-        .setFunctionName('isLinearVelocityAngleAround');
+    aut
+      .addCondition(
+        'IsLinearVelocityAngleAround',
+        _('Linear velocity angle'),
+        _('Compare the linear velocity angle of the object.'),
+        _('Angle of movement of _PARAM0_ is _PARAM2_ ± _PARAM3_°'),
+        _('Velocity'),
+        'res/physics32.png',
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
+      .addParameter('expression', _('Angle (in degrees)'))
+      .addParameter('expression', _('Tolerance (in degrees)'))
+      .getCodeExtraInformation()
+      .setFunctionName('isLinearVelocityAngleAround');
 
     aut
       .addAction(

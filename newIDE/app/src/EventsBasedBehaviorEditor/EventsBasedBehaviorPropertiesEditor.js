@@ -37,6 +37,7 @@ import PasteIcon from '../UI/CustomSvgIcons/Clipboard';
 import ResponsiveFlatButton from '../UI/ResponsiveFlatButton';
 import { EmptyPlaceholder } from '../UI/EmptyPlaceholder';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
+import SearchBar from '../UI/SearchBar';
 
 const gd: libGDevelop = global.gd;
 
@@ -154,6 +155,50 @@ export default function EventsBasedBehaviorPropertiesEditor({
 
   const forceUpdate = useForceUpdate();
 
+  const [searchText, setSearchText] = React.useState<string>('');
+  const [
+    searchMatchingPropertyNames,
+    setSearchMatchingPropertyNames,
+  ] = React.useState<Array<string>>([]);
+
+  const triggerSearch = React.useCallback(
+    () => {
+      const matchingProperties = mapVector(
+        properties,
+        (property: gdNamedPropertyDescriptor, i: number) => {
+          const lowerCaseSearchText = searchText.toLowerCase();
+          return property
+            .getName()
+            .toLowerCase()
+            .includes(lowerCaseSearchText) ||
+            property
+              .getLabel()
+              .toLowerCase()
+              .includes(lowerCaseSearchText) ||
+            property
+              .getGroup()
+              .toLowerCase()
+              .includes(lowerCaseSearchText)
+            ? property.getName()
+            : null;
+        }
+      ).filter(Boolean);
+      setSearchMatchingPropertyNames(matchingProperties);
+    },
+    [properties, searchText]
+  );
+
+  React.useEffect(
+    () => {
+      if (searchText) {
+        triggerSearch();
+      } else {
+        setSearchMatchingPropertyNames([]);
+      }
+    },
+    [searchText, triggerSearch]
+  );
+
   const addProperty = React.useCallback(
     () => {
       const newName = newNameGenerator('Property', name =>
@@ -164,6 +209,7 @@ export default function EventsBasedBehaviorPropertiesEditor({
       forceUpdate();
       onPropertiesUpdated && onPropertiesUpdated();
       setJustAddedPropertyName(newName);
+      setSearchText('');
     },
     [forceUpdate, onPropertiesUpdated, properties]
   );
@@ -387,6 +433,15 @@ export default function EventsBasedBehaviorPropertiesEditor({
                           justAddedPropertyName === property.getName()
                             ? justAddedPropertyElement
                             : null;
+
+                        if (
+                          searchText &&
+                          !searchMatchingPropertyNames.includes(
+                            property.getName()
+                          )
+                        ) {
+                          return null;
+                        }
 
                         return (
                           <DragSourceAndDropTarget
@@ -882,6 +937,12 @@ export default function EventsBasedBehaviorPropertiesEditor({
                         pastePropertiesAtTheEnd();
                       }}
                       disabled={!isClipboardContainingProperties}
+                    />
+                    <SearchBar
+                      value={searchText}
+                      onRequestSearch={() => {}}
+                      onChange={text => setSearchText(text)}
+                      placeholder={t`Search properties`}
                     />
                   </LineStackLayout>
                   <LineStackLayout justifyContent="flex-end" expand>

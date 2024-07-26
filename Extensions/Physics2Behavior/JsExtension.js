@@ -1419,7 +1419,7 @@ module.exports = {
       .setFunctionName('getLinearVelocityAngle');
 
     aut
-      .addCondition(
+      .addScopedCondition(
         'IsLinearVelocityAngleAround',
         _('Linear velocity angle'),
         _('Compare the linear velocity angle of the object.'),

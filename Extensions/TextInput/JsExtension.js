@@ -397,7 +397,6 @@ module.exports = {
               'telephone number',
               'url',
               'search',
-              'email',
             ])
           )
       )

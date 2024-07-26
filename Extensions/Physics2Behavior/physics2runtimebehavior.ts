@@ -1528,6 +1528,17 @@ namespace gdjs {
       );
     }
 
+    isLinearVelocityAngleAround(degreeAngle: float, tolerance: float) {
+      return (
+        Math.abs(
+          gdjs.evtTools.common.angleDifference(
+            this.getLinearVelocityAngle(),
+            degreeAngle
+          )
+        ) <= tolerance
+      );
+    }
+
     getAngularVelocity(): float {
       // If there is no body, set a new one
       if (this._body === null) {

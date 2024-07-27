@@ -158,6 +158,7 @@ export default function EventsBasedObjectPropertiesEditor({
 
   const triggerSearch = React.useCallback(
     () => {
+      const properties = eventsBasedObject.getPropertyDescriptors();
       const matchingPropertyNames = mapVector(
         properties,
         (property: gdNamedPropertyDescriptor, i: number) => {
@@ -180,7 +181,7 @@ export default function EventsBasedObjectPropertiesEditor({
       ).filter(Boolean);
       setSearchMatchingPropertyNames(matchingPropertyNames);
     },
-    [properties, searchText]
+    [eventsBasedObject, searchText]
   );
 
   React.useEffect(

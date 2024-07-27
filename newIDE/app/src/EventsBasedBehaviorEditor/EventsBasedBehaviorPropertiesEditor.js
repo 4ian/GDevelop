@@ -163,7 +163,7 @@ export default function EventsBasedBehaviorPropertiesEditor({
 
   const triggerSearch = React.useCallback(
     () => {
-      const matchingProperties = mapVector(
+      const matchingPropertyNames = mapVector(
         properties,
         (property: gdNamedPropertyDescriptor, i: number) => {
           const lowerCaseSearchText = searchText.toLowerCase();
@@ -183,7 +183,7 @@ export default function EventsBasedBehaviorPropertiesEditor({
             : null;
         }
       ).filter(Boolean);
-      setSearchMatchingPropertyNames(matchingProperties);
+      setSearchMatchingPropertyNames(matchingPropertyNames);
     },
     [properties, searchText]
   );
@@ -297,6 +297,7 @@ export default function EventsBasedBehaviorPropertiesEditor({
         }
       }
 
+      setSearchText('');
       forceUpdate();
       if (firstAddedPropertyName) {
         setJustAddedPropertyName(firstAddedPropertyName);

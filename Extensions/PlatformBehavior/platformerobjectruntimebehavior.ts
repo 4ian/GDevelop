@@ -1916,6 +1916,7 @@ namespace gdjs {
 
     leave() {
       this._floorPlatform = null;
+      this._floorPolygon = null;
     }
 
     updateFloorPosition() {

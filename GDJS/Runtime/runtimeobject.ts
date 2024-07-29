@@ -2541,12 +2541,14 @@ namespace gdjs {
      * @param obj1 The first runtimeObject
      * @param obj2 The second runtimeObject
      * @param ignoreTouchingEdges If true, then edges that are touching each other, without the hitbox polygons actually overlapping, won't be considered in collision.
+     * @param ignoredObject1Polygon A polygon from the `obj1` collision mask to ignore
      * @return true if obj1 and obj2 are in collision
      */
     static collisionTest(
       obj1: gdjs.RuntimeObject,
       obj2: gdjs.RuntimeObject,
-      ignoreTouchingEdges: boolean
+      ignoreTouchingEdges: boolean,
+      ignoredObject1Polygon: gdjs.Polygon | null = null
     ): boolean {
       //First check if bounding circle are too far.
       const o1centerX = obj1.getCenterX();
@@ -2600,6 +2602,9 @@ namespace gdjs {
       );
 
       for (const hitBox1 of hitBoxes1) {
+        if (hitBox1 === ignoredObject1Polygon) {
+          continue;
+        }
         for (const hitBox2 of hitBoxes2) {
           if (
             gdjs.Polygon.collisionTest(hitBox1, hitBox2, ignoreTouchingEdges)

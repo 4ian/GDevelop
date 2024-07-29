@@ -1,6 +1,7 @@
 // @flow
 import { Trans, t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
+import type { Subscription } from '../Utils/GDevelopServices/Usage';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
@@ -59,36 +60,45 @@ export type GameDetailsTab =
   | 'leaderboards'
   | 'marketing';
 
-export const gameDetailsTabs: TabOptions<GameDetailsTab> = [
-  {
-    value: 'details',
-    label: <Trans>Details</Trans>,
-  },
-  {
-    value: 'builds',
-    label: <Trans>Builds</Trans>,
-  },
-  {
-    value: 'feedback',
-    label: <Trans>Feedback</Trans>,
-  },
-  {
-    value: 'analytics',
-    label: <Trans>Analytics</Trans>,
-  },
-  {
-    value: 'multiplayer',
-    label: <Trans>Multiplayer</Trans>,
-  },
-  {
-    value: 'leaderboards',
-    label: <Trans>Leaderboards</Trans>,
-  },
-  {
-    value: 'marketing',
-    label: <Trans>Marketing & Ads</Trans>,
-  },
-];
+export const getGameDetailsTabs = (
+  userSubscription?: ?Subscription
+): TabOptions<GameDetailsTab> => {
+  const isStudentAccount =
+    !!userSubscription && !!userSubscription.benefitsFromEducationPlan;
+
+  return [
+    {
+      value: 'details',
+      label: <Trans>Details</Trans>,
+    },
+    {
+      value: 'builds',
+      label: <Trans>Builds</Trans>,
+    },
+    {
+      value: 'feedback',
+      label: <Trans>Feedback</Trans>,
+    },
+    {
+      value: 'analytics',
+      label: <Trans>Analytics</Trans>,
+    },
+    {
+      value: 'multiplayer',
+      label: <Trans>Multiplayer</Trans>,
+    },
+    {
+      value: 'leaderboards',
+      label: <Trans>Leaderboards</Trans>,
+    },
+    isStudentAccount
+      ? null
+      : {
+          value: 'marketing',
+          label: <Trans>Marketing & Ads</Trans>,
+        },
+  ].filter(Boolean);
+};
 
 type Props = {|
   game: Game,
@@ -114,9 +124,10 @@ const GameDetails = ({
   const { routeArguments, removeRouteArguments } = React.useContext(
     RouterContext
   );
-  const { getAuthorizationHeader, profile } = React.useContext(
+  const { getAuthorizationHeader, profile, subscription } = React.useContext(
     AuthenticatedUserContext
   );
+
   const [
     gameUnregisterErrorText,
     setGameUnregisterErrorText,
@@ -137,7 +148,7 @@ const GameDetails = ({
     () => {
       if (routeArguments['games-dashboard-tab']) {
         // Ensure that the tab is valid.
-        const gameDetailsTab = gameDetailsTabs.find(
+        const gameDetailsTab = getGameDetailsTabs(subscription).find(
           gameDetailsTab =>
             gameDetailsTab.value === routeArguments['games-dashboard-tab']
         );
@@ -146,7 +157,7 @@ const GameDetails = ({
         removeRouteArguments(['games-dashboard-tab']);
       }
     },
-    [routeArguments, removeRouteArguments, setCurrentTab]
+    [routeArguments, removeRouteArguments, setCurrentTab, subscription]
   );
 
   const loadPublicGame = React.useCallback(

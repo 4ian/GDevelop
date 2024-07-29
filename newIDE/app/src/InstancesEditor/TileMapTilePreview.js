@@ -12,7 +12,11 @@ import { AffineTransformation } from '../Utils/AffineTransformation';
 
 export const updateSceneToTileMapTransformation = (
   instance: gdInitialInstance,
-  renderedInstance: RenderedInstance | Rendered3DInstance,
+  renderedInstance: {
+    getEditableTileMap: () => any,
+    getCenterX: () => number,
+    getCenterY: () => number,
+  },
   sceneToTileMapTransformation: AffineTransformation,
   tileMapToSceneTransformation: AffineTransformation
 ): ?{ scaleX: number, scaleY: number } => {
@@ -20,16 +24,6 @@ export const updateSceneToTileMapTransformation = (
   let scaleX = 1,
     scaleY = 1;
   if (instance.hasCustomSize()) {
-    if (
-      // $FlowIgnore
-      !renderedInstance.getEditableTileMap
-    ) {
-      console.error(
-        `Instance of ${instance.getObjectName()} seems to not be a RenderedSimpleTileMapInstance (method getEditableTileMap does not exist).`
-      );
-      return;
-    }
-    // $FlowIgnore
     const editableTileMap = renderedInstance.getEditableTileMap();
     if (!editableTileMap) {
       console.error(
@@ -295,13 +289,18 @@ class TileMapTilePreview {
     const renderedInstance = this.getRendererOfInstance(instance);
     if (
       !renderedInstance ||
-      renderedInstance.constructor.name !== 'RenderedSimpleTileMapInstance'
+      // $FlowFixMe - TODO: Replace this check with a `instanceof RenderedSimpleTileMapInstance`
+      !renderedInstance.getEditableTileMap
     ) {
+      console.error(
+        `Instance of ${instance.getObjectName()} seems to not be a RenderedSimpleTileMapInstance (method getEditableTileMap does not exist).`
+      );
       return;
     }
 
     const scales = updateSceneToTileMapTransformation(
       instance,
+      // $FlowFixMe
       renderedInstance,
       this.sceneToTileMapTransformation,
       this.tileMapToSceneTransformation

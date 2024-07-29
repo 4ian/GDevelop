@@ -126,8 +126,8 @@ type Props = {|
 export default class InstancesEditor extends Component<Props> {
   lastContextMenuX = 0;
   lastContextMenuY = 0;
-  lastCursorX = 0;
-  lastCursorY = 0;
+  lastCursorX: number | null = null;
+  lastCursorY: number | null = null;
   fpsLimiter = new FpsLimiter({ maxFps: 60, idleFps: 10 });
   canvasArea: ?HTMLDivElement;
   pixiRenderer: PIXI.Renderer;
@@ -689,8 +689,10 @@ export default class InstancesEditor extends Component<Props> {
    */
   zoomOnCursorBy(value: number) {
     const beforeZoomCursorPosition = this.getLastCursorSceneCoordinates();
+    if (!beforeZoomCursorPosition) return;
     this.setZoomFactor(this.getZoomFactor() * value);
     const afterZoomCursorPosition = this.getLastCursorSceneCoordinates();
+    if (!afterZoomCursorPosition) return;
     // Compensate for the cursor change in position
     this.scrollBy(
       beforeZoomCursorPosition[0] - afterZoomCursorPosition[0],
@@ -777,9 +779,8 @@ export default class InstancesEditor extends Component<Props> {
     if (
       object.getType() === 'TileMap::SimpleTileMap' &&
       renderedInstance &&
-      renderedInstance.constructor.name === 'RenderedSimpleTileMapInstance'
+      !!renderedInstance.getEditableTileMap
     ) {
-      // $FlowIgnore
       const editableTileMap = renderedInstance.getEditableTileMap();
       if (!editableTileMap) {
         console.error(
@@ -1462,7 +1463,8 @@ export default class InstancesEditor extends Component<Props> {
     );
   };
 
-  getLastCursorSceneCoordinates = () => {
+  getLastCursorSceneCoordinates = (): [number, number] | null => {
+    if (this.lastCursorX === null || this.lastCursorY === null) return null;
     return this.viewPosition.toSceneCoordinates(
       this.lastCursorX,
       this.lastCursorY
@@ -1475,6 +1477,7 @@ export default class InstancesEditor extends Component<Props> {
       return clickInterceptorPointerPathCoordinates;
     }
     const lastCursorSceneCoordinates = this.getLastCursorSceneCoordinates();
+    if (!lastCursorSceneCoordinates) return [];
     return [
       { x: lastCursorSceneCoordinates[0], y: lastCursorSceneCoordinates[1] },
     ];

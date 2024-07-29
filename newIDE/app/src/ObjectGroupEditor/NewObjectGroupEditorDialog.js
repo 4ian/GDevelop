@@ -82,12 +82,11 @@ const NewObjectGroupEditorDialog = ({
   return (
     <Dialog
       title={<Trans>Create a new group</Trans>}
-      key={'create-group-dialog'}
+      id="create-group-dialog"
       actions={[
         <FlatButton
           key="cancel"
           label={<Trans>Cancel</Trans>}
-          keyboardFocused
           onClick={onCancel}
         />,
         <DialogPrimaryButton
@@ -105,7 +104,7 @@ const NewObjectGroupEditorDialog = ({
       open
       maxWidth="sm"
       fixedContent={
-        <ColumnStackLayout>
+        <ColumnStackLayout noMargin>
           {!isGroupAlreadyAdded && (
             <SemiControlledTextField
               fullWidth

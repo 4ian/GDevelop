@@ -174,8 +174,6 @@ const Tile = ({
   highlighted,
 }: TileProps) => {
   const classes = useStylesForTile(!!highlighted);
-  // Tooltip position has to be adapted because the image is in a overflow auto parent
-  // that hides the tooltip if it is displayed outside of itself.
   return (
     <div
       className={classes.tile}
@@ -547,24 +545,6 @@ const TileSetVisualizer = ({
     },
     [displayedTileSize, columnCount, rowCount]
   );
-
-  // const getTooltipRelativePosition = React.useCallback(
-  //   ({ x, y }: {| x: number, y: number |}): ?{| x: number, y: number |} => {
-  //     if (!tilesetAndTooltipContainerRef.current) return null;
-  //     const parentBoundingClientRect = tilesetAndTooltipContainerRef.current.getBoundingClientRect();
-  //     if (parentBoundingClientRect.right - x < 40) {
-  //       return {
-  //         x: parentBoundingClientRect.right - 40,
-  //         y: y - parentBoundingClientRect.top,
-  //       };
-  //     }
-  //     return {
-  //       x: x - parentBoundingClientRect.left,
-  //       y: y - parentBoundingClientRect.top,
-  //     };
-  //   },
-  //   []
-  // );
 
   const onMouseMove = React.useCallback(
     event => {

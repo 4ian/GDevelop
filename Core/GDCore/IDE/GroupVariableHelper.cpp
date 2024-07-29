@@ -163,6 +163,11 @@ void GroupVariableHelper::ApplyChangesToObjects(
       variablesContainer.Remove(variableName);
     }
     for (const gd::String &variableName : changeset.addedVariableNames) {
+      if (variablesContainer.Has(variableName)) {
+        // It can happens if an object already had the variable but it was not
+        // shared by other object of the group.
+        continue;
+      }
       variablesContainer.Insert(variableName,
                                 groupVariablesContainer.Get(variableName),
                                 variablesContainer.Count());
@@ -170,7 +175,13 @@ void GroupVariableHelper::ApplyChangesToObjects(
     for (const auto &pair : changeset.oldToNewVariableNames) {
       const gd::String &oldVariableName = pair.first;
       const gd::String &newVariableName = pair.second;
-      variablesContainer.Rename(oldVariableName, newVariableName);
+      if (variablesContainer.Has(newVariableName)) {
+        // It can happens if an object already had the variable but it was not
+        // shared by other object of the group.
+        variablesContainer.Remove(oldVariableName);
+      } else {
+        variablesContainer.Rename(oldVariableName, newVariableName);
+      }
     }
     // Apply type and value changes
     for (const gd::String &variableName : changeset.valueChangedVariableNames) {

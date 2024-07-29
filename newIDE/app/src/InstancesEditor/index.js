@@ -42,11 +42,11 @@ import {
   getWheelStepZoomFactor,
 } from '../Utils/ZoomUtils';
 import Background from './Background';
-import TileMapTilePreview, {
+import TileMapPaintingPreview, {
   getTileSet,
   getTilesGridCoordinatesFromPointerSceneCoordinates,
   updateSceneToTileMapTransformation,
-} from './TileMapTilePreview';
+} from './TileMapPaintingPreview';
 import {
   getTileIdFromGridCoordinates,
   type TileMapTileSelection,
@@ -138,7 +138,7 @@ export default class InstancesEditor extends Component<Props> {
   _instancesAdder: InstancesAdder;
   selectionRectangle: SelectionRectangle;
   selectedInstances: SelectedInstances;
-  tileMapTilePreview: TileMapTilePreview;
+  tileMapPaintingPreview: TileMapPaintingPreview;
   clickInterceptor: ClickInterceptor;
   highlightedInstance: HighlightedInstance;
   instancesResizer: InstancesResizer;
@@ -427,8 +427,10 @@ export default class InstancesEditor extends Component<Props> {
         this.highlightedInstance.getPixiObject()
       );
     }
-    if (this.tileMapTilePreview) {
-      this.uiPixiContainer.removeChild(this.tileMapTilePreview.getPixiObject());
+    if (this.tileMapPaintingPreview) {
+      this.uiPixiContainer.removeChild(
+        this.tileMapPaintingPreview.getPixiObject()
+      );
     }
     if (this.clickInterceptor) {
       this.uiPixiContainer.removeChild(this.clickInterceptor.getPixiObject());
@@ -499,7 +501,7 @@ export default class InstancesEditor extends Component<Props> {
       onPanMove: this._onPanMove,
       onPanEnd: this._onPanEnd,
     });
-    this.tileMapTilePreview = new TileMapTilePreview({
+    this.tileMapPaintingPreview = new TileMapPaintingPreview({
       instancesSelection: this.props.instancesSelection,
       project: props.project,
       layout: props.layout,
@@ -553,7 +555,7 @@ export default class InstancesEditor extends Component<Props> {
     this.uiPixiContainer.addChild(this.selectedInstances.getPixiContainer());
     this.uiPixiContainer.addChild(this.highlightedInstance.getPixiObject());
     this.uiPixiContainer.addChild(this.statusBar.getPixiObject());
-    this.uiPixiContainer.addChild(this.tileMapTilePreview.getPixiObject());
+    this.uiPixiContainer.addChild(this.tileMapPaintingPreview.getPixiObject());
     this.uiPixiContainer.addChild(this.clickInterceptor.getPixiObject());
 
     this.background = new Background({
@@ -779,8 +781,10 @@ export default class InstancesEditor extends Component<Props> {
     if (
       object.getType() === 'TileMap::SimpleTileMap' &&
       renderedInstance &&
+      // $FlowFixMe - We are confident the renderedInstance is an instance of RenderedSimpleTileMapInstance.
       !!renderedInstance.getEditableTileMap
     ) {
+      // $FlowFixMe
       const editableTileMap = renderedInstance.getEditableTileMap();
       if (!editableTileMap) {
         console.error(
@@ -792,6 +796,7 @@ export default class InstancesEditor extends Component<Props> {
       const tileMapToSceneTransformation = new AffineTransformation();
       const scales = updateSceneToTileMapTransformation(
         selectedInstance,
+        // $FlowFixMe
         renderedInstance,
         sceneToTileMapTransformation,
         tileMapToSceneTransformation
@@ -1500,7 +1505,7 @@ export default class InstancesEditor extends Component<Props> {
       this.canvasCursor.render();
       this.grid.render();
       this.highlightedInstance.render();
-      this.tileMapTilePreview.render();
+      this.tileMapPaintingPreview.render();
       this.clickInterceptor.render();
       this.selectedInstances.render();
       this.selectionRectangle.render();

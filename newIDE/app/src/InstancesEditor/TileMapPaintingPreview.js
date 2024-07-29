@@ -13,9 +13,9 @@ import { AffineTransformation } from '../Utils/AffineTransformation';
 export const updateSceneToTileMapTransformation = (
   instance: gdInitialInstance,
   renderedInstance: {
-    getEditableTileMap: () => any,
-    getCenterX: () => number,
-    getCenterY: () => number,
+    +getEditableTileMap: () => any,
+    +getCenterX: () => number,
+    +getCenterY: () => number,
   },
   sceneToTileMapTransformation: AffineTransformation,
   tileMapToSceneTransformation: AffineTransformation
@@ -182,7 +182,7 @@ type Props = {|
   viewPosition: ViewPosition,
 |};
 
-class TileMapTilePreview {
+class TileMapPaintingPreview {
   project: gdProject;
   layout: gdLayout | null;
   instancesSelection: InstancesSelection;
@@ -363,4 +363,4 @@ class TileMapTilePreview {
   }
 }
 
-export default TileMapTilePreview;
+export default TileMapPaintingPreview;

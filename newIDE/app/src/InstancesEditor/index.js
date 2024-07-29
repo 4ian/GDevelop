@@ -42,11 +42,11 @@ import {
   getWheelStepZoomFactor,
 } from '../Utils/ZoomUtils';
 import Background from './Background';
-import TileMapTilePreview, {
+import TileMapPaintingPreview, {
   getTileSet,
   getTilesGridCoordinatesFromPointerSceneCoordinates,
   updateSceneToTileMapTransformation,
-} from './TileMapTilePreview';
+} from './TileMapPaintingPreview';
 import {
   getTileIdFromGridCoordinates,
   type TileMapTileSelection,
@@ -126,8 +126,8 @@ type Props = {|
 export default class InstancesEditor extends Component<Props> {
   lastContextMenuX = 0;
   lastContextMenuY = 0;
-  lastCursorX = 0;
-  lastCursorY = 0;
+  lastCursorX: number | null = null;
+  lastCursorY: number | null = null;
   fpsLimiter = new FpsLimiter({ maxFps: 60, idleFps: 10 });
   canvasArea: ?HTMLDivElement;
   pixiRenderer: PIXI.Renderer;
@@ -138,7 +138,7 @@ export default class InstancesEditor extends Component<Props> {
   _instancesAdder: InstancesAdder;
   selectionRectangle: SelectionRectangle;
   selectedInstances: SelectedInstances;
-  tileMapTilePreview: TileMapTilePreview;
+  tileMapPaintingPreview: TileMapPaintingPreview;
   clickInterceptor: ClickInterceptor;
   highlightedInstance: HighlightedInstance;
   instancesResizer: InstancesResizer;
@@ -427,8 +427,10 @@ export default class InstancesEditor extends Component<Props> {
         this.highlightedInstance.getPixiObject()
       );
     }
-    if (this.tileMapTilePreview) {
-      this.uiPixiContainer.removeChild(this.tileMapTilePreview.getPixiObject());
+    if (this.tileMapPaintingPreview) {
+      this.uiPixiContainer.removeChild(
+        this.tileMapPaintingPreview.getPixiObject()
+      );
     }
     if (this.clickInterceptor) {
       this.uiPixiContainer.removeChild(this.clickInterceptor.getPixiObject());
@@ -499,7 +501,7 @@ export default class InstancesEditor extends Component<Props> {
       onPanMove: this._onPanMove,
       onPanEnd: this._onPanEnd,
     });
-    this.tileMapTilePreview = new TileMapTilePreview({
+    this.tileMapPaintingPreview = new TileMapPaintingPreview({
       instancesSelection: this.props.instancesSelection,
       project: props.project,
       layout: props.layout,
@@ -553,7 +555,7 @@ export default class InstancesEditor extends Component<Props> {
     this.uiPixiContainer.addChild(this.selectedInstances.getPixiContainer());
     this.uiPixiContainer.addChild(this.highlightedInstance.getPixiObject());
     this.uiPixiContainer.addChild(this.statusBar.getPixiObject());
-    this.uiPixiContainer.addChild(this.tileMapTilePreview.getPixiObject());
+    this.uiPixiContainer.addChild(this.tileMapPaintingPreview.getPixiObject());
     this.uiPixiContainer.addChild(this.clickInterceptor.getPixiObject());
 
     this.background = new Background({
@@ -689,8 +691,10 @@ export default class InstancesEditor extends Component<Props> {
    */
   zoomOnCursorBy(value: number) {
     const beforeZoomCursorPosition = this.getLastCursorSceneCoordinates();
+    if (!beforeZoomCursorPosition) return;
     this.setZoomFactor(this.getZoomFactor() * value);
     const afterZoomCursorPosition = this.getLastCursorSceneCoordinates();
+    if (!afterZoomCursorPosition) return;
     // Compensate for the cursor change in position
     this.scrollBy(
       beforeZoomCursorPosition[0] - afterZoomCursorPosition[0],
@@ -777,9 +781,10 @@ export default class InstancesEditor extends Component<Props> {
     if (
       object.getType() === 'TileMap::SimpleTileMap' &&
       renderedInstance &&
-      renderedInstance.constructor.name === 'RenderedSimpleTileMapInstance'
+      // $FlowFixMe - We are confident the renderedInstance is an instance of RenderedSimpleTileMapInstance.
+      !!renderedInstance.getEditableTileMap
     ) {
-      // $FlowIgnore
+      // $FlowFixMe
       const editableTileMap = renderedInstance.getEditableTileMap();
       if (!editableTileMap) {
         console.error(
@@ -791,6 +796,7 @@ export default class InstancesEditor extends Component<Props> {
       const tileMapToSceneTransformation = new AffineTransformation();
       const scales = updateSceneToTileMapTransformation(
         selectedInstance,
+        // $FlowFixMe
         renderedInstance,
         sceneToTileMapTransformation,
         tileMapToSceneTransformation
@@ -1462,7 +1468,8 @@ export default class InstancesEditor extends Component<Props> {
     );
   };
 
-  getLastCursorSceneCoordinates = () => {
+  getLastCursorSceneCoordinates = (): [number, number] | null => {
+    if (this.lastCursorX === null || this.lastCursorY === null) return null;
     return this.viewPosition.toSceneCoordinates(
       this.lastCursorX,
       this.lastCursorY
@@ -1475,6 +1482,7 @@ export default class InstancesEditor extends Component<Props> {
       return clickInterceptorPointerPathCoordinates;
     }
     const lastCursorSceneCoordinates = this.getLastCursorSceneCoordinates();
+    if (!lastCursorSceneCoordinates) return [];
     return [
       { x: lastCursorSceneCoordinates[0], y: lastCursorSceneCoordinates[1] },
     ];
@@ -1497,7 +1505,7 @@ export default class InstancesEditor extends Component<Props> {
       this.canvasCursor.render();
       this.grid.render();
       this.highlightedInstance.render();
-      this.tileMapTilePreview.render();
+      this.tileMapPaintingPreview.render();
       this.clickInterceptor.render();
       this.selectedInstances.render();
       this.selectionRectangle.render();

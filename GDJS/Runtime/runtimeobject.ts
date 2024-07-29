@@ -2541,6 +2541,7 @@ namespace gdjs {
      * @param obj1 The first runtimeObject
      * @param obj2 The second runtimeObject
      * @param ignoreTouchingEdges If true, then edges that are touching each other, without the hitbox polygons actually overlapping, won't be considered in collision.
+     * @param ignoredObject1Polygon A polygon from the `obj1` collision mask to ignore
      * @return true if obj1 and obj2 are in collision
      */
     static collisionTest(

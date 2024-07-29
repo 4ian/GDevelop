@@ -7,7 +7,8 @@ namespace gdjs {
    * Returned by _findHighestFloorAndMoveOnTop
    */
   type PlatformSearchResult = {
-    highestGround: gdjs.PlatformRuntimeBehavior | null;
+    highestGroundPlatform: gdjs.PlatformRuntimeBehavior | null;
+    highestGroundPolygon: gdjs.Polygon | null;
     isCollidingAnyPlatform: boolean;
   };
 
@@ -74,7 +75,8 @@ namespace gdjs {
      * Returned by _findHighestFloorAndMoveOnTop
      */
     private static readonly _platformSearchResult: PlatformSearchResult = {
-      highestGround: null,
+      highestGroundPlatform: null,
+      highestGroundPolygon: null,
       isCollidingAnyPlatform: false,
     };
 
@@ -612,7 +614,8 @@ namespace gdjs {
             this._potentialCollidingObjects,
             floorPlatformId,
             /*excludeJumpthrus=*/
-            true
+            true,
+            this._onFloor.getFloorPolygon()
           )
         ) {
           if (
@@ -648,12 +651,12 @@ namespace gdjs {
           // This is to be consistent on all floor collision.
           // The object will land right on floor.
 
-          const { highestGround } = this._findHighestFloorAndMoveOnTop(
+          const { highestGroundPlatform } = this._findHighestFloorAndMoveOnTop(
             this._potentialCollidingObjects,
             0,
             this._requestedDeltaY
           );
-          if (!highestGround) {
+          if (!highestGroundPlatform) {
             object.setY(object.getY() + this._requestedDeltaY);
           }
         } else {
@@ -706,10 +709,13 @@ namespace gdjs {
       this._falling.enter(from);
     }
 
-    _setOnFloor(collidingPlatform: gdjs.PlatformRuntimeBehavior) {
+    _setOnFloor(
+      collidingPlatform: gdjs.PlatformRuntimeBehavior,
+      floorPolygon: gdjs.Polygon
+    ) {
       this._state.leave();
       this._state = this._onFloor;
-      this._onFloor.enter(collidingPlatform);
+      this._onFloor.enter(collidingPlatform, floorPolygon);
     }
 
     private _setJumping() {
@@ -803,22 +809,28 @@ namespace gdjs {
 
       // The interval could be smaller.
       // It's just for rounding errors.
-      const { highestGround } = this._findHighestFloorAndMoveOnTop(
+      const {
+        highestGroundPlatform,
+        highestGroundPolygon,
+      } = this._findHighestFloorAndMoveOnTop(
         this._potentialCollidingObjects,
         -1,
         1
       );
       // don't fall if GrabbingPlatform or OnLadder
       if (this._state === this._onFloor) {
-        if (!highestGround) {
+        if (!highestGroundPlatform || !highestGroundPolygon) {
           this._setFalling();
-        } else if (highestGround === this._onFloor.getFloorPlatform()) {
+        } else if (
+          highestGroundPlatform === this._onFloor.getFloorPlatform() &&
+          highestGroundPolygon === this._onFloor.getFloorPolygon()
+        ) {
           this._onFloor.updateFloorPosition();
         } else {
-          this._setOnFloor(highestGround);
+          this._setOnFloor(highestGroundPlatform, highestGroundPolygon);
         }
-      } else if (highestGround && canLand) {
-        this._setOnFloor(highestGround);
+      } else if (highestGroundPlatform && highestGroundPolygon && canLand) {
+        this._setOnFloor(highestGroundPlatform, highestGroundPolygon);
       } else {
         // The object can't land.
         object.setY(oldY);
@@ -930,13 +942,15 @@ namespace gdjs {
      */
     _isCollidingWithOneOf(
       candidates: gdjs.PlatformRuntimeBehavior[],
-      exceptThisOne?: number | null,
-      excludeJumpThrus?: boolean
+      ignoredPlatformId?: number | null,
+      excludeJumpThrus?: boolean,
+      ignoredPolygon?: gdjs.Polygon | null
     ) {
       excludeJumpThrus = !!excludeJumpThrus;
       for (let i = 0; i < candidates.length; ++i) {
         const platform = candidates[i];
-        if (platform.owner.id === exceptThisOne) {
+        const isPlatformIgnored = platform.owner.id === ignoredPlatformId;
+        if (isPlatformIgnored && !ignoredPolygon) {
           continue;
         }
         if (
@@ -952,9 +966,10 @@ namespace gdjs {
         }
         if (
           gdjs.RuntimeObject.collisionTest(
-            this.owner,
             platform.owner,
-            this._ignoreTouchingEdges
+            this.owner,
+            this._ignoreTouchingEdges,
+            isPlatformIgnored ? ignoredPolygon : null
           )
         ) {
           return true;
@@ -982,7 +997,8 @@ namespace gdjs {
       context.initializeBeforeSearch(this, upwardDeltaY, downwardDeltaY);
 
       let totalHighestY = Number.MAX_VALUE;
-      let highestGround: gdjs.PlatformRuntimeBehavior | null = null;
+      let highestGroundPlatform: gdjs.PlatformRuntimeBehavior | null = null;
+      let highestGroundPolygon: gdjs.Polygon | null = null;
       let isCollidingAnyPlatform = false;
       for (const platform of candidates) {
         if (
@@ -1032,7 +1048,8 @@ namespace gdjs {
           // and is too high for the character to walk on.
           // This will still be an obstacle even if there
           // are other platforms that fit the requirements.
-          highestGround = null;
+          highestGroundPlatform = null;
+          highestGroundPolygon = null;
           break;
         }
 
@@ -1041,16 +1058,18 @@ namespace gdjs {
           highestRelativeY < totalHighestY
         ) {
           totalHighestY = highestRelativeY;
-          highestGround = platform;
+          highestGroundPlatform = platform;
+          highestGroundPolygon = context.highestFloorPolygon;
         }
       }
-      if (highestGround) {
+      if (highestGroundPlatform) {
         const object = this.owner;
         object.setY(object.getY() + totalHighestY);
       }
       const returnValue =
         gdjs.PlatformerObjectRuntimeBehavior._platformSearchResult;
-      returnValue.highestGround = highestGround;
+      returnValue.highestGroundPlatform = highestGroundPlatform;
+      returnValue.highestGroundPolygon = highestGroundPolygon;
       returnValue.isCollidingAnyPlatform = isCollidingAnyPlatform;
       return returnValue;
     }
@@ -1115,7 +1134,7 @@ namespace gdjs {
             (vertex[0] === context.ownerMaxX &&
               (previousVertex[0] < vertex[0] || nextVertex[0] < vertex[0]))
           ) {
-            context.addPointConstraint(vertex[1]);
+            context.addPointConstraint(vertex[1], hitbox);
           }
 
           const deltaX = vertex[0] - previousVertex[0];
@@ -1133,7 +1152,7 @@ namespace gdjs {
                 previousVertex[1] +
                 ((context.ownerMinX - previousVertex[0]) * deltaY) / deltaX;
 
-              context.addPointConstraint(intersectionY);
+              context.addPointConstraint(intersectionY, hitbox);
             }
             // Check intersection on the right side of owner
             if (
@@ -1147,7 +1166,7 @@ namespace gdjs {
                 previousVertex[1] +
                 ((context.ownerMaxX - previousVertex[0]) * deltaY) / deltaX;
 
-              context.addPointConstraint(intersectionY);
+              context.addPointConstraint(intersectionY, hitbox);
             }
           }
           if (context.floorIsTooHigh()) {
@@ -1867,6 +1886,7 @@ namespace gdjs {
   class OnFloor implements State {
     private _behavior: PlatformerObjectRuntimeBehavior;
     private _floorPlatform: gdjs.PlatformRuntimeBehavior | null = null;
+    private _floorPolygon: gdjs.Polygon | null = null;
     private _floorLastX: float = 0;
     private _floorLastY: float = 0;
     _oldHeight: float = 0;
@@ -1879,8 +1899,16 @@ namespace gdjs {
       return this._floorPlatform;
     }
 
-    enter(floorPlatform: gdjs.PlatformRuntimeBehavior) {
+    getFloorPolygon() {
+      return this._floorPolygon;
+    }
+
+    enter(
+      floorPlatform: gdjs.PlatformRuntimeBehavior,
+      floorPolygon: gdjs.Polygon
+    ) {
       this._floorPlatform = floorPlatform;
+      this._floorPolygon = floorPolygon;
       this.updateFloorPosition();
       this._behavior._canJump = true;
       this._behavior._currentFallSpeed = 0;
@@ -2000,17 +2028,23 @@ namespace gdjs {
           behavior._requestedDeltaX * behavior._slopeClimbingFactor
         );
         const {
-          highestGround,
+          highestGroundPlatform,
+          highestGroundPolygon,
           isCollidingAnyPlatform,
         } = behavior._findHighestFloorAndMoveOnTop(
           behavior._potentialCollidingObjects,
           -deltaMaxY,
           deltaMaxY
         );
-        if (highestGround && highestGround !== this._floorPlatform) {
-          behavior._setOnFloor(highestGround);
+        if (
+          highestGroundPlatform &&
+          highestGroundPolygon &&
+          (highestGroundPlatform !== this._floorPlatform ||
+            highestGroundPolygon !== this._floorPolygon)
+        ) {
+          behavior._setOnFloor(highestGroundPlatform, highestGroundPolygon);
         }
-        if (highestGround === null && isCollidingAnyPlatform) {
+        if (highestGroundPlatform === null && isCollidingAnyPlatform) {
           // Unable to follow the floor (too steep): go back to the original position.
           behavior.owner.setX(oldX);
         }
@@ -2020,7 +2054,7 @@ namespace gdjs {
 
         // Try to follow the platform until the obstacle.
         const {
-          highestGround: highestGroundOnPlatform,
+          highestGroundPlatform: highestGroundOnPlatform,
           isCollidingAnyPlatform,
         } = behavior._findHighestFloorAndMoveOnTop(
           behavior._potentialCollidingObjects,
@@ -2055,7 +2089,7 @@ namespace gdjs {
           // 1. Try to move 1 pixel on the X axis to climb the junction.
           object.setX(object.getX() + Math.sign(requestedDeltaX));
           const {
-            highestGround: highestGroundAtJunction,
+            highestGroundPlatform: highestGroundAtJunction,
           } = behavior._findHighestFloorAndMoveOnTop(
             behavior._potentialCollidingObjects,
             // Look up from at least 1 pixel to bypass not perfectly aligned floors.
@@ -2075,23 +2109,27 @@ namespace gdjs {
               );
             object.setX(object.getX() + deltaX);
             const {
-              highestGround: highestGroundOnObstacle,
+              highestGroundPlatform: highestGroundOnObstacle,
+              highestGroundPolygon,
             } = behavior._findHighestFloorAndMoveOnTop(
               behavior._potentialCollidingObjects,
               // Do an exact slope angle check.
               -Math.abs(deltaX) * behavior._slopeClimbingFactor,
               0
             );
-            if (highestGroundOnObstacle) {
+            if (highestGroundOnObstacle && highestGroundPolygon) {
               // The obstacle slope can be climbed.
               if (Math.abs(remainingDeltaX) >= 2) {
-                behavior._setOnFloor(highestGroundOnObstacle);
+                behavior._setOnFloor(
+                  highestGroundOnObstacle,
+                  highestGroundPolygon
+                );
               } else {
                 // We went too far in order to check that.
                 // Now, find the right position on the obstacles.
                 object.setPosition(oldX + requestedDeltaX, beforeObstacleY);
                 const {
-                  highestGround: highestGroundOnObstacle,
+                  highestGroundPlatform: highestGroundOnObstacle,
                 } = behavior._findHighestFloorAndMoveOnTop(
                   behavior._potentialCollidingObjects,
                   // requestedDeltaX can be small when the object start moving.
@@ -2103,8 +2141,11 @@ namespace gdjs {
                   0
                 );
                 // Should always be true
-                if (highestGroundOnObstacle) {
-                  behavior._setOnFloor(highestGroundOnObstacle);
+                if (highestGroundOnObstacle && highestGroundPolygon) {
+                  behavior._setOnFloor(
+                    highestGroundOnObstacle,
+                    highestGroundPolygon
+                  );
                 }
               }
             } else {
@@ -2578,6 +2619,8 @@ namespace gdjs {
      */
     foundUnderBottom: boolean = false;
 
+    highestFloorPolygon: gdjs.Polygon | null = null;
+
     initializeBeforeSearch(
       behavior: PlatformerObjectRuntimeBehavior,
       upwardDeltaY: float,
@@ -2653,7 +2696,7 @@ namespace gdjs {
      * and update the context with this new constraint.
      * @param y
      */
-    addPointConstraint(y: float): void {
+    addPointConstraint(y: float, sourcePolygon: gdjs.Polygon): void {
       if (y < this.floorMinY) {
         // The platform is too high to walk on...
         if (y > this.headMaxY) {
@@ -2693,6 +2736,7 @@ namespace gdjs {
           this.allowedMaxDeltaY,
           y - this.ownerMaxY
         );
+        this.highestFloorPolygon = sourcePolygon;
       }
     }
   }

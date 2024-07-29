@@ -1644,8 +1644,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       behavior = object.getBehavior('auto1');
       object.setCustomWidthAndHeight(10, 20);
       runtimeScene.addObject(object);
-      // The object is in the corner of the platform.
-      object.setPosition(80 - 10, 80 - 20);
     });
 
     [
@@ -1672,6 +1670,9 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       it(`can jump while moving against a wall ${wallBeing}`, function () {
         createPlatforms(runtimeScene);
 
+        // The object is in the corner of the platform.
+        object.setPosition(80 - 10, 80 - 20);
+
         // The object stays on the platform.
         for (let i = 0; i < 5; ++i) {
           runtimeScene.renderAndStep(1000 / 60);
@@ -1695,6 +1696,32 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           expect(object.getX()).to.be(80 - 10);
           expect(object.getY()).to.be.lessThan(oldY);
         }
+      });
+
+      it(`can move against a wall ${wallBeing}`, function () {
+        createPlatforms(runtimeScene);
+
+        // The object is 20 pixels from the wall.
+        object.setPosition(80 - 10 - 10, 80 - 20);
+
+        // The object stays on the platform.
+        for (let i = 0; i < 5; ++i) {
+          runtimeScene.renderAndStep(1000 / 60);
+        }
+        expect(object.getY()).to.within(60 - epsilon, 60 + epsilon);
+        expect(behavior.isFalling()).to.be(false);
+        expect(behavior.isFallingWithoutJumping()).to.be(false);
+        expect(behavior.isMoving()).to.be(false);
+
+        // It's important the character moves from several pixels per frame.
+        behavior.setCurrentSpeed(behavior.getMaxSpeed());
+        for (let i = 0; i < 10; ++i) {
+          const oldY = object.getY();
+          behavior.simulateRightKey();
+          runtimeScene.renderAndStep(1000 / 60);
+        }
+        // The object is against the wall.
+        expect(object.getX()).to.be(80 - 10);
       });
     });
   });

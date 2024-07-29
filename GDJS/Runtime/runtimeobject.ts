@@ -2546,7 +2546,8 @@ namespace gdjs {
     static collisionTest(
       obj1: gdjs.RuntimeObject,
       obj2: gdjs.RuntimeObject,
-      ignoreTouchingEdges: boolean
+      ignoreTouchingEdges: boolean,
+      ignoredObject1Polygon: gdjs.Polygon | null = null
     ): boolean {
       //First check if bounding circle are too far.
       const o1centerX = obj1.getCenterX();
@@ -2600,6 +2601,9 @@ namespace gdjs {
       );
 
       for (const hitBox1 of hitBoxes1) {
+        if (hitBox1 === ignoredObject1Polygon) {
+          continue;
+        }
         for (const hitBox2 of hitBoxes2) {
           if (
             gdjs.Polygon.collisionTest(hitBox1, hitBox2, ignoreTouchingEdges)

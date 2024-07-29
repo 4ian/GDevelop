@@ -53,6 +53,7 @@ import { I18n } from '@lingui/react';
 import GetSubscriptionCard from '../Profile/Subscription/GetSubscriptionCard';
 import { type PrivateGameTemplateListingData } from '../Utils/GDevelopServices/Shop';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
+import { CLOUD_PROJECT_NAME_MAX_LENGTH } from '../Utils/GDevelopServices/Project';
 
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
@@ -108,11 +109,12 @@ const NewProjectSetupDialog = ({
   authenticatedUser,
 }: Props): React.Node => {
   const generateProjectName = () =>
-    selectedExampleShortHeader
+    (selectedExampleShortHeader
       ? `${generateName()} (${selectedExampleShortHeader.name})`
       : selectedPrivateGameTemplateListingData
       ? `${generateName()} (${selectedPrivateGameTemplateListingData.name})`
-      : generateName();
+      : generateName()
+    ).slice(0, CLOUD_PROJECT_NAME_MAX_LENGTH);
 
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
@@ -464,7 +466,7 @@ const NewProjectSetupDialog = ({
                 </IconButton>
               }
               autoFocus="desktop"
-              maxLength={100}
+              maxLength={CLOUD_PROJECT_NAME_MAX_LENGTH}
             />
             <SelectField
               fullWidth

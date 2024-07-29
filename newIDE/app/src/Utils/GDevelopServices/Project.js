@@ -12,7 +12,7 @@ import { unzipFirstEntryOfBlob } from '../Zip.js/Utils';
 import { extractGDevelopApiErrorStatusAndCode } from './Errors';
 import { extractNextPageUriFromLinkHeader } from './Play';
 
-export const CLOUD_PROJECT_NAME_MAX_LENGTH = 50;
+export const CLOUD_PROJECT_NAME_MAX_LENGTH = 60;
 export const CLOUD_PROJECT_VERSION_LABEL_MAX_LENGTH = 50;
 export const PROJECT_RESOURCE_MAX_SIZE_IN_BYTES = 15 * 1000 * 1000;
 
@@ -266,16 +266,20 @@ export const createCloudProject = async (
   const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
   if (!firebaseUser) return null;
 
+  const cleanedAttributes = {
+    ...cloudProjectCreationPayload,
+    name: cloudProjectCreationPayload.name.slice(
+      0,
+      CLOUD_PROJECT_NAME_MAX_LENGTH
+    ),
+  };
+
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await apiClient.post(
-    '/project',
-    cloudProjectCreationPayload,
-    {
-      headers: { Authorization: authorizationHeader },
-      params: { userId },
-    }
-  );
+  const response = await apiClient.post('/project', cleanedAttributes, {
+    headers: { Authorization: authorizationHeader },
+    params: { userId },
+  });
   return response.data;
 };
 

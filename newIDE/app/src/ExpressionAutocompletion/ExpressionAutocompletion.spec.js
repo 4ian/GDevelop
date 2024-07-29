@@ -384,6 +384,44 @@ describe('ExpressionAutocompletion', () => {
       );
     });
 
+    it('can autocomplete behaviors (1) ignoring case', () => {
+      const { project, testLayout, parser } = makeTestContext();
+      const scope = { project, layout: testLayout };
+
+      const expressionNode = parser
+        .parseExpression('MySpriteObjectWithBehaviors.plat')
+        .get();
+      const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+        scope
+      );
+      const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+        gd.JsPlatform.get(),
+        projectScopedContainersAccessor.get(),
+        'number',
+        expressionNode,
+        28
+      );
+      const autocompletions = getAutocompletionsFromDescriptions(
+        {
+          gd,
+          project: project,
+          projectScopedContainersAccessor,
+          scope,
+        },
+        completionDescriptions,
+        makeFakeI18n()
+      );
+      expect(autocompletions).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            completion: 'PlatformerObject',
+            addNamespaceSeparator: true,
+            isExact: false,
+          }),
+        ])
+      );
+    });
+
     it('can autocomplete behaviors (2)', () => {
       const { project, testLayout, parser } = makeTestContext();
       const scope = { project, layout: testLayout };

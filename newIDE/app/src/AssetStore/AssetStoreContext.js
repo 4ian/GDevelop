@@ -190,9 +190,11 @@ export const AssetStoreStateProvider = ({
     publicAssetShortHeaders,
     setPublicAssetShortHeaders,
   ] = React.useState<?Array<AssetShortHeader>>(null);
-  const { receivedAssetShortHeaders, receivedAssetPacks } = React.useContext(
-    AuthenticatedUserContext
-  );
+  const {
+    receivedAssetShortHeaders,
+    receivedAssetPacks,
+    subscription,
+  } = React.useContext(AuthenticatedUserContext);
   const [filters, setFilters] = React.useState<?Filters>(null);
   const [
     publicAssetPacks,
@@ -283,6 +285,8 @@ export const AssetStoreStateProvider = ({
   const assetPackSearchFilters = React.useMemo<
     Array<SearchFilter<PublicAssetPack | PrivateAssetPackListingData>>
   >(() => [assetPackTypeFilter], [assetPackTypeFilter]);
+  const isStudentAccount =
+    !!subscription && !!subscription.benefitsFromEducationPlan;
 
   const fetchAssetsAndFilters = React.useCallback(
     () => {
@@ -297,7 +301,9 @@ export const AssetStoreStateProvider = ({
           } = await listAllPublicAssets({ environment });
           const fetchedAuthors = await listAllAuthors({ environment });
           const fetchedLicenses = await listAllLicenses({ environment });
-          const fetchedPrivateAssetPackListingDatas = await listListedPrivateAssetPacks();
+          const fetchedPrivateAssetPackListingDatas = isStudentAccount
+            ? []
+            : await listListedPrivateAssetPacks();
 
           console.info(
             `Loaded ${
@@ -321,7 +327,7 @@ export const AssetStoreStateProvider = ({
         }
       })();
     },
-    [environment]
+    [environment, isStudentAccount]
   );
 
   // When the public assets or the private assets are loaded, regenerate the

@@ -175,7 +175,7 @@ const ProfileDialog = ({ open, onClose }: Props) => {
                 authenticatedUser.onOpenChangeEmailDialog
               }
             />
-            {subscriptionPlansWithPricingSystems ? (
+            {isStudentAccount ? null : subscriptionPlansWithPricingSystems ? (
               <SubscriptionDetails
                 subscription={authenticatedUser.subscription}
                 subscriptionPlansWithPricingSystems={
@@ -215,7 +215,9 @@ const ProfileDialog = ({ open, onClose }: Props) => {
                 <CreditsStatusBanner displayPurchaseAction />
               </Column>
             )}
-            <ContributionsDetails userId={authenticatedUser.profile.id} />
+            {!isStudentAccount && (
+              <ContributionsDetails userId={authenticatedUser.profile.id} />
+            )}
             {isConnected && (
               <div ref={userAchievementsContainerRef}>
                 <UserAchievements

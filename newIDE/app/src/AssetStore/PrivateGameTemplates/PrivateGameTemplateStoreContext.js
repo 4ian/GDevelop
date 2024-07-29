@@ -18,6 +18,7 @@ import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { t } from '@lingui/macro';
 import { sendGameTemplateInformationOpened } from '../../Utils/Analytics/EventSender';
 import { PRIVATE_GAME_TEMPLATES_FETCH_TIMEOUT } from '../../Utils/GlobalFetchTimeouts';
+import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 
 const defaultSearchText = '';
 const excludedTiers = new Set(); // No tiers for game templates.
@@ -102,6 +103,8 @@ export const PrivateGameTemplateStoreStateProvider = ({
   shopNavigationState,
   children,
 }: PrivateGameTemplateStoreStateProviderProps) => {
+  const { subscription } = React.useContext(AuthenticatedUserContext);
+
   const [
     gameTemplateFilters,
     setGameTemplateFilters,
@@ -126,6 +129,9 @@ export const PrivateGameTemplateStoreStateProvider = ({
   );
   const filtersStateForExampleStore = useFilters();
 
+  const isStudentAccount =
+    !!subscription && !!subscription.benefitsFromEducationPlan;
+
   const fetchGameTemplates = React.useCallback(
     () => {
       // If the game templates are already loaded, don't load them again.
@@ -136,7 +142,9 @@ export const PrivateGameTemplateStoreStateProvider = ({
         isLoading.current = true;
 
         try {
-          const fetchedPrivateGameTemplateListingDatas = await listListedPrivateGameTemplates();
+          const fetchedPrivateGameTemplateListingDatas = isStudentAccount
+            ? []
+            : await listListedPrivateGameTemplates();
 
           console.info(
             `Loaded ${
@@ -177,7 +185,7 @@ export const PrivateGameTemplateStoreStateProvider = ({
         isLoading.current = false;
       })();
     },
-    [privateGameTemplateListingDatas]
+    [privateGameTemplateListingDatas, isStudentAccount]
   );
 
   // When the game templates are loaded,

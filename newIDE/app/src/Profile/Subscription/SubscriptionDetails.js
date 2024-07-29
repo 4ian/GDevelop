@@ -286,41 +286,36 @@ const SubscriptionDetails = ({
               hidePrice={
                 // A redemption code means the price does not really reflect what was paid, so we hide it.
                 !!redemptionCodeExpirationDate ||
-                hasMobileAppStoreSubscriptionPlan(subscription) ||
-                !!subscription.benefitsFromEducationPlan
+                hasMobileAppStoreSubscriptionPlan(subscription)
               }
-              actions={
-                subscription.benefitsFromEducationPlan
-                  ? null
-                  : [
-                      !redemptionCodeExpirationDate &&
-                      !hasMobileAppStoreSubscriptionPlan(subscription) &&
-                      !hasSubscriptionBeenManuallyAdded(subscription) ? (
-                        <FlatButton
-                          key="manage-payments"
-                          label={
-                            <LeftLoader isLoading={isManageSubscriptionLoading}>
-                              <Trans>Manage payments</Trans>
-                            </LeftLoader>
-                          }
-                          primary
-                          onClick={onManageSubscription}
-                          disabled={isManageSubscriptionLoading}
-                        />
-                      ) : null,
-                      <RaisedButton
-                        key="manage-subscription"
-                        label={<Trans>Manage subscription</Trans>}
-                        primary
-                        onClick={() =>
-                          openSubscriptionDialog({
-                            analyticsMetadata: { reason: 'Consult profile' },
-                          })
-                        }
-                        disabled={isManageSubscriptionLoading}
-                      />,
-                    ].filter(Boolean)
-              }
+              actions={[
+                !redemptionCodeExpirationDate &&
+                !hasMobileAppStoreSubscriptionPlan(subscription) &&
+                !hasSubscriptionBeenManuallyAdded(subscription) ? (
+                  <FlatButton
+                    key="manage-payments"
+                    label={
+                      <LeftLoader isLoading={isManageSubscriptionLoading}>
+                        <Trans>Manage payments</Trans>
+                      </LeftLoader>
+                    }
+                    primary
+                    onClick={onManageSubscription}
+                    disabled={isManageSubscriptionLoading}
+                  />
+                ) : null,
+                <RaisedButton
+                  key="manage-subscription"
+                  label={<Trans>Manage subscription</Trans>}
+                  primary
+                  onClick={() =>
+                    openSubscriptionDialog({
+                      analyticsMetadata: { reason: 'Consult profile' },
+                    })
+                  }
+                  disabled={isManageSubscriptionLoading}
+                />,
+              ].filter(Boolean)}
               isHighlighted
               background="medium"
             />

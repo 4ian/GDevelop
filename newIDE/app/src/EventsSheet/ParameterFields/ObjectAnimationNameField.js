@@ -34,7 +34,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     }));
 
     const {
-      project,
+      projectScopedContainersAccessor,
       scope,
       instructionMetadata,
       instruction,
@@ -43,7 +43,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       parameterIndex,
     } = props;
 
-    const { layout, eventsFunctionsExtension, eventsBasedObject } = scope;
+    const { eventsFunctionsExtension, eventsBasedObject } = scope;
 
     // We don't memo/callback this, as we want to recompute it every time something changes.
     // Because of the function getLastObjectParameterValue.
@@ -55,83 +55,20 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         expression,
         parameterIndex,
       });
-
-      if (!objectName || !project) {
-        return [];
-      }
-
-      const object = getObjectByName(
-        project.getObjects(),
-        layout ? layout.getObjects() : null,
-        objectName
-      );
-      if (!object) {
-        return [];
-      }
-
-      if (object.getType() === 'Sprite') {
-        const spriteConfiguration = gd.asSpriteConfiguration(
-          object.getConfiguration()
-        );
-        const animations = spriteConfiguration.getAnimations();
-
-        return mapFor(0, animations.getAnimationsCount(), index => {
-          const animationName = animations.getAnimation(index).getName();
-          return animationName.length > 0 ? animationName : null;
-        }).filter(Boolean);
-      } else if (object.getType() === 'Scene3D::Model3DObject') {
-        const model3DConfiguration = gd.asModel3DConfiguration(
-          object.getConfiguration()
-        );
-
-        return mapFor(0, model3DConfiguration.getAnimationsCount(), index => {
-          const animationName = model3DConfiguration
-            .getAnimation(index)
-            .getName();
-          return animationName.length > 0 ? animationName : null;
-        })
-          .filter(Boolean)
-          .sort();
-      } else if (object.getType() === 'SpineObject::SpineObject') {
-        const spineConfiguration = gd.asSpineConfiguration(
-          object.getConfiguration()
-        );
-
-        return mapFor(0, spineConfiguration.getAnimationsCount(), index => {
-          const animationName = spineConfiguration
-            .getAnimation(index)
-            .getName();
-          return animationName.length > 0 ? animationName : null;
-        })
-          .filter(Boolean)
-          .sort();
-      } else if (project.hasEventsBasedObject(object.getType())) {
-        const eventsBasedObject = project.getEventsBasedObject(
-          object.getType()
-        );
-        if (eventsBasedObject.isAnimatable()) {
-          const customObjectConfiguration = gd.asCustomObjectConfiguration(
-            object.getConfiguration()
-          );
-          const animations = customObjectConfiguration.getAnimations();
-
-          return mapFor(0, animations.getAnimationsCount(), index => {
-            const animationName = animations.getAnimation(index).getName();
-            return animationName.length > 0 ? animationName : null;
-          }).filter(Boolean);
-        }
-      }
-
-      return [];
+      return objectName
+        ? projectScopedContainersAccessor
+            .get()
+            .getObjectsContainersList()
+            .getAnimationNamesOfObject(objectName)
+            .toJSArray()
+        : [];
     };
-
-    const animationNames = getAnimationNames();
+    const canAutocomplete = !eventsFunctionsExtension || eventsBasedObject;
+    const animationNames = canAutocomplete ? getAnimationNames() : [];
 
     const isCurrentValueInAnimationNamesList = !!animationNames.find(
       animationName => `"${animationName}"` === props.value
     );
-
-    const canAutocomplete = !eventsFunctionsExtension || eventsBasedObject;
 
     // If the current value is not in the list of animation names, display an expression field.
     const [isExpressionField, setIsExpressionField] = React.useState(

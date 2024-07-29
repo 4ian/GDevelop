@@ -165,7 +165,36 @@ class GD_CORE_API ObjectConfiguration {
   void UnserializeFrom(gd::Project& project, const SerializerElement& element);
   ///@}
 
- protected:
+  /** \name Animations
+   * Members functions related to object animations
+   */
+  ///@{
+  /**
+   * \brief Return the number of animations declared in this object
+   * configuration.
+   */
+  virtual size_t GetAnimationsCount() const {
+    return 0;
+  };
+
+  /**
+   * \brief Return the name of an animation declared in this object
+   * configuration.
+   */
+  virtual const gd::String &GetAnimationName(size_t index) const {
+    return badAnimationName;
+  }
+
+  /**
+   * \brief Return true if an animation is declared in this object
+   * configuration for a given name.
+   */
+  virtual bool HasAnimationNamed(const gd::String &animationName) const {
+    return false;
+  }
+  ///@}
+
+protected:
   gd::String type; ///< Which type of object is represented by this
                    ///< configuration.
 
@@ -181,6 +210,9 @@ class GD_CORE_API ObjectConfiguration {
    * custom attributes.
    */
   virtual void DoSerializeTo(SerializerElement& element) const {};
+
+private:
+  static gd::String badAnimationName;
 };
 
 }  // namespace gd

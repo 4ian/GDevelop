@@ -52,6 +52,12 @@ class GD_CORE_API SpriteObject : public gd::ObjectConfiguration {
                                      const gd::String& name,
                                      const gd::String& value) override;
 
+  size_t GetAnimationsCount() const override;
+
+  const gd::String &GetAnimationName(size_t index) const override;
+
+  bool HasAnimationNamed(const gd::String &animationName) const override;
+  
   /**
    * \brief Return the animation configuration.
    */

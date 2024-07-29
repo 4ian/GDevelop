@@ -93,15 +93,11 @@ public:
    */
   SpineAnimation &GetAnimation(std::size_t nb);
 
-  /**
-   * \brief Return the number of animations this object has.
-   */
-  std::size_t GetAnimationsCount() const { return animations.size(); };
+  std::size_t GetAnimationsCount() const override { return animations.size(); };
 
-  /**
-   * \brief Return true if the animation called "name" exists.
-   */
-  bool HasAnimationNamed(const gd::String& name) const;
+  const gd::String &GetAnimationName(size_t index) const override;
+
+  bool HasAnimationNamed(const gd::String &animationName) const override;
 
   /**
    * \brief Add an animation at the end of the existing ones.

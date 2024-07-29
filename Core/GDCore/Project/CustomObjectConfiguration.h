@@ -67,6 +67,12 @@ class CustomObjectConfiguration : public gd::ObjectConfiguration {
 
   gd::ObjectConfiguration &GetChildObjectConfiguration(const gd::String& objectName);
 
+  std::size_t GetAnimationsCount() const override;
+
+  const gd::String &GetAnimationName(size_t index) const override;
+
+  bool HasAnimationNamed(const gd::String &animationName) const override;
+
   /**
    * \brief Return the animation configuration for Animatable custom objects.
    */

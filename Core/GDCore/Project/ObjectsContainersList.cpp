@@ -73,6 +73,15 @@ bool ObjectsContainersList::HasObjectNamed(const gd::String& name) const {
   return false;
 }
 
+const gd::Object* ObjectsContainersList::GetObject(const gd::String& name) const {
+  for (auto it = objectsContainers.rbegin(); it != objectsContainers.rend();
+       ++it) {
+    if ((*it)->HasObjectNamed(name)) return &(*it)->GetObject(name);
+  }
+
+  return nullptr;
+}
+
 ObjectsContainersList::VariableExistence
 ObjectsContainersList::HasObjectOrGroupWithVariableNamed(
     const gd::String& objectOrGroupName, const gd::String& variableName) const {
@@ -519,6 +528,65 @@ std::vector<gd::String> ObjectsContainersList::GetBehaviorsOfObject(
   }
   return gd::GetBehaviorsOfObject(
       *objectsContainers[0], *objectsContainers[1], objectName, searchInGroups);
+}
+
+std::vector<gd::String> ObjectsContainersList::GetAnimationNamesOfObject(
+    const gd::String &objectOrGroupName) const {
+  std::vector<gd::String> animationNames;
+
+  for (auto it = objectsContainers.rbegin(); it != objectsContainers.rend();
+       ++it) {
+    if ((*it)->HasObjectNamed(objectOrGroupName)) {
+      const auto &objectConfiguration =
+          (*it)->GetObject(objectOrGroupName).GetConfiguration();
+
+      for (size_t index = 0; index < objectConfiguration.GetAnimationsCount();
+           index++) {
+        animationNames.push_back(objectConfiguration.GetAnimationName(index));
+      }
+      return animationNames;
+    }
+    if ((*it)->GetObjectGroups().Has(objectOrGroupName)) {
+      const auto &objectGroup = (*it)->GetObjectGroups().Get(objectOrGroupName);
+      const auto &objectNames = objectGroup.GetAllObjectsNames();
+
+      std::size_t objectIndex = 0;
+      bool isFirstObjectFound = false;
+      for (; objectIndex < objectNames.size() && !isFirstObjectFound;
+           objectIndex++) {
+        const gd::String &objectName = objectNames[objectIndex];
+        if (!HasObjectNamed(objectName)) {
+          continue;
+        }
+        isFirstObjectFound = true;
+        const auto &objectConfiguration =
+            GetObject(objectName)->GetConfiguration();
+        for (size_t index = 0; index < objectConfiguration.GetAnimationsCount();
+             index++) {
+          animationNames.push_back(objectConfiguration.GetAnimationName(index));
+        }
+      }
+      for (; objectIndex < objectNames.size(); objectIndex++) {
+        const gd::String &objectName = objectNames[objectIndex];
+        if (!HasObjectNamed(objectName)) {
+          continue;
+        }
+        const auto &objectConfiguration =
+            GetObject(objectName)->GetConfiguration();
+
+        for (size_t animationIndex = 0; animationIndex < animationNames.size();
+             animationIndex++) {
+          if (!objectConfiguration.HasAnimationNamed(
+                  animationNames[animationIndex])) {
+            animationNames.erase(animationNames.begin() + animationIndex);
+            animationIndex--;
+          }
+        }
+      }
+      return animationNames;
+    }
+  }
+  return animationNames;
 }
 
 }  // namespace gd

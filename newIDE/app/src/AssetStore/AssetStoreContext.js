@@ -565,8 +565,8 @@ export const AssetStoreStateProvider = ({
     () => ({
       assetShortHeadersSearchResults,
       publicAssetPacksSearchResults,
-      privateAssetPackListingDatasSearchResults: privateAssetPackListingDatas
-        ? null
+      privateAssetPackListingDatasSearchResults: hidePremiumProducts
+        ? []
         : privateAssetPackListingDatasSearchResults,
       fetchAssetsAndFilters,
       filters,

@@ -152,6 +152,13 @@
             }
           ]
         }
+      ],
+      "no-restricted-syntax": [
+        "error",
+        {
+          "selector": "MemberExpression[object.property.name='constructor'][property.name='name']",
+          "message": "'constructor.name' is not reliable (can become 'E', 'P' and etc.) in production build."
+        }
       ]
     },
     "overrides": [

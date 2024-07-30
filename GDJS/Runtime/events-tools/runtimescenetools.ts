@@ -221,6 +221,8 @@ namespace gdjs {
           return now.getDate();
         } else if (what === 'mon') {
           return now.getMonth();
+        } else if (what === 'fullyear') {
+          return now.getFullYear();
         } else if (what === 'year') {
           //Conform to the C way of returning years.
           return now.getFullYear() - 1900;

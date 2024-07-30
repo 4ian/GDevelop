@@ -1275,6 +1275,14 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       },
       () => {
         if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+        // The focus is lost because the button "(or paste conditions/actions)"
+        // no long exist.
+        // Ideally, we'd wait for the events to be updated, but
+        // to simplify the code, we just wait a few ms for a new render
+        // to be done.
+        setTimeout(() => {
+          this._ensureFocused();
+        }, 100); // A few ms is enough for a new render to be done.
       }
     );
   };

@@ -249,9 +249,9 @@ const GetStartedSection = ({
   );
 
   const shouldDisplayAnnouncements =
-    !authenticatedUser ||
-    !authenticatedUser.subscription ||
-    !authenticatedUser.subscription.benefitsFromEducationPlan;
+    !authenticatedUser.limits ||
+    !authenticatedUser.limits.capabilities.classrooms ||
+    !authenticatedUser.limits.capabilities.classrooms.hideCommunityTab;
 
   if (
     (creatingOrLoggingInAccount || loginState === 'loggingIn') &&

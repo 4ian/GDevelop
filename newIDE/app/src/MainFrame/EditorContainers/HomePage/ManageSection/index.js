@@ -114,7 +114,7 @@ const ManageSection = ({
               <Tabs
                 value={currentTab}
                 onChange={setCurrentTab}
-                options={getGameDetailsTabs(authenticatedUser.subscription)}
+                options={getGameDetailsTabs(authenticatedUser.limits)}
               />
               <GameDetails
                 game={openedGame}

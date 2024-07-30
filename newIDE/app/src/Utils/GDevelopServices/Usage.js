@@ -77,6 +77,7 @@ export type Capabilities = {|
   classrooms?: {
     hidePlayTab: boolean,
     hideCommunityTab: boolean,
+    hideSocials: boolean,
     hidePremiumProducts: boolean,
     hideUpgradeNotice: boolean,
     showClassroomTab: boolean,

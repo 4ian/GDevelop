@@ -27,6 +27,7 @@ import { type Badge, type Achievement } from '../Utils/GDevelopServices/Badge';
 import {
   hasValidSubscriptionPlan,
   type Subscription,
+  type Limits,
 } from '../Utils/GDevelopServices/Usage';
 import LeftLoader from '../UI/LeftLoader';
 import {
@@ -53,6 +54,7 @@ import { Line } from '../UI/Grid';
 
 export type EditProfileDialogProps = {|
   profile: Profile,
+  limits: ?Limits,
   achievements: ?Array<Achievement>,
   badges: ?Array<Badge>,
   subscription: ?Subscription,
@@ -242,6 +244,7 @@ const CommunityLinkLine = ({
 const EditProfileDialog = ({
   profile,
   subscription,
+  limits,
   achievements,
   badges,
   onClose,
@@ -369,6 +372,10 @@ const EditProfileDialog = ({
 
   const isStudentAccount =
     !!subscription && !!subscription.benefitsFromEducationPlan;
+  const hideSocials =
+    !!limits &&
+    !!limits.capabilities.classrooms &&
+    limits.capabilities.classrooms.hideSocials;
 
   const canDelete = !actionInProgress;
 
@@ -466,7 +473,7 @@ const EditProfileDialog = ({
               <Text size="sub-title" noMargin>
                 <Trans>Creator profile</Trans>
               </Text>
-              {!isStudentAccount && (
+              {!hideSocials && (
                 <TextField
                   value={discordUsername}
                   floatingLabelText={<Trans>Discord username</Trans>}
@@ -497,7 +504,7 @@ const EditProfileDialog = ({
                 floatingLabelFixed
                 maxLength={10000}
               />
-              {!isStudentAccount && (
+              {!hideSocials && (
                 <>
                   <Text size="sub-title" noMargin>
                     <Trans>Socials</Trans>

@@ -404,9 +404,9 @@ const BuildSection = ({
   );
 
   const shouldDisplayAnnouncements =
-    !authenticatedUser ||
-    !authenticatedUser.subscription ||
-    !authenticatedUser.subscription.benefitsFromEducationPlan;
+    !authenticatedUser.limits ||
+    !authenticatedUser.limits.capabilities.classrooms ||
+    !authenticatedUser.limits.capabilities.classrooms.hideCommunityTab;
 
   const skeletonLineHeight = getProjectLineHeight({ isMobile });
   const pageContent = showAllGameTemplates ? (

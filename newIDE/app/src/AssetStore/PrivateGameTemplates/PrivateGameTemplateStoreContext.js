@@ -103,7 +103,7 @@ export const PrivateGameTemplateStoreStateProvider = ({
   shopNavigationState,
   children,
 }: PrivateGameTemplateStoreStateProviderProps) => {
-  const { subscription } = React.useContext(AuthenticatedUserContext);
+  const { limits } = React.useContext(AuthenticatedUserContext);
 
   const [
     gameTemplateFilters,
@@ -129,8 +129,10 @@ export const PrivateGameTemplateStoreStateProvider = ({
   );
   const filtersStateForExampleStore = useFilters();
 
-  const isStudentAccount =
-    !!subscription && !!subscription.benefitsFromEducationPlan;
+  const hidePremiumProducts =
+    !!limits &&
+    !!limits.capabilities.classrooms &&
+    limits.capabilities.classrooms.hidePremiumProducts;
 
   const fetchGameTemplates = React.useCallback(
     () => {
@@ -142,7 +144,7 @@ export const PrivateGameTemplateStoreStateProvider = ({
         isLoading.current = true;
 
         try {
-          const fetchedPrivateGameTemplateListingDatas = isStudentAccount
+          const fetchedPrivateGameTemplateListingDatas = hidePremiumProducts
             ? []
             : await listListedPrivateGameTemplates();
 
@@ -185,7 +187,7 @@ export const PrivateGameTemplateStoreStateProvider = ({
         isLoading.current = false;
       })();
     },
-    [privateGameTemplateListingDatas, isStudentAccount]
+    [privateGameTemplateListingDatas, hidePremiumProducts]
   );
 
   // When the game templates are loaded,

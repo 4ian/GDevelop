@@ -1,7 +1,7 @@
 // @flow
 import { Trans, t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
-import type { Subscription } from '../Utils/GDevelopServices/Usage';
+import type { Limits } from '../Utils/GDevelopServices/Usage';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
@@ -61,10 +61,12 @@ export type GameDetailsTab =
   | 'marketing';
 
 export const getGameDetailsTabs = (
-  userSubscription?: ?Subscription
+  userLimits?: ?Limits
 ): TabOptions<GameDetailsTab> => {
-  const isStudentAccount =
-    !!userSubscription && !!userSubscription.benefitsFromEducationPlan;
+  const hidePremiumProducts =
+    !!userLimits &&
+    !!userLimits.capabilities.classrooms &&
+    userLimits.capabilities.classrooms.hidePremiumProducts;
 
   return [
     {
@@ -91,7 +93,7 @@ export const getGameDetailsTabs = (
       value: 'leaderboards',
       label: <Trans>Leaderboards</Trans>,
     },
-    isStudentAccount
+    hidePremiumProducts
       ? null
       : {
           value: 'marketing',
@@ -124,7 +126,7 @@ const GameDetails = ({
   const { routeArguments, removeRouteArguments } = React.useContext(
     RouterContext
   );
-  const { getAuthorizationHeader, profile, subscription } = React.useContext(
+  const { getAuthorizationHeader, profile, limits } = React.useContext(
     AuthenticatedUserContext
   );
 
@@ -148,7 +150,7 @@ const GameDetails = ({
     () => {
       if (routeArguments['games-dashboard-tab']) {
         // Ensure that the tab is valid.
-        const gameDetailsTab = getGameDetailsTabs(subscription).find(
+        const gameDetailsTab = getGameDetailsTabs(limits).find(
           gameDetailsTab =>
             gameDetailsTab.value === routeArguments['games-dashboard-tab']
         );
@@ -157,7 +159,7 @@ const GameDetails = ({
         removeRouteArguments(['games-dashboard-tab']);
       }
     },
-    [routeArguments, removeRouteArguments, setCurrentTab, subscription]
+    [routeArguments, removeRouteArguments, setCurrentTab, limits]
   );
 
   const loadPublicGame = React.useCallback(

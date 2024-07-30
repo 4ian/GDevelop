@@ -19,9 +19,12 @@ type Props = {|
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
   /**
-   * Event-based functions only have an ObjectGroupContainer.
-   * It must be used instead of the one from the temporary ObjectsContainer
-   * used for parameters.
+   * Event-based functions have an ObjectGroupContainer containing the groups,
+   * but no ObjectsContainer. Instead, the ObjectsContainer is generated from
+   * their parameters.
+   *
+   * This parameter allows to use a different ObjectGroupsContainer than the
+   * one found in the ObjectsContainer.
    */
   bypassedObjectGroupsContainer?: ?gdObjectGroupsContainer,
   initialTab?: ?ObjectGroupEditorTab,

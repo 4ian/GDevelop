@@ -377,7 +377,7 @@ std::vector<gd::String> ObjectsContainersList::ExpandObjectName(
   }
 
   // Ensure that all returned objects actually exists (i.e: if some groups have
-  // names refering to non existing objects, don't return them).
+  // names referring to non existing objects, don't return them).
   for (std::size_t i = 0; i < realObjects.size();) {
     if (!HasObjectNamed(realObjects[i]))
       realObjects.erase(realObjects.begin() + i);

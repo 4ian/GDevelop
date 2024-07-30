@@ -17,7 +17,7 @@ export default class InstancesRenderer {
   instances: gdInitialInstancesContainer;
   layout: gdLayout | null;
   layersContainer: gdLayersContainer;
-  globalObjectsContainer: gdObjectsContainer;
+  globalObjectsContainer: gdObjectsContainer | null;
   objectsContainer: gdObjectsContainer | null;
   viewPosition: ViewPosition;
   onInstanceClicked: gdInitialInstance => void;
@@ -52,6 +52,7 @@ export default class InstancesRenderer {
   constructor({
     project,
     layersContainer,
+    globalObjectsContainer,
     objectsContainer,
     layout,
     instances,
@@ -66,10 +67,11 @@ export default class InstancesRenderer {
     onDownInstance,
     onUpInstance,
     showObjectInstancesIn3D,
-  }: {
+  }: {|
     project: gdProject,
     instances: gdInitialInstancesContainer,
     layersContainer: gdLayersContainer,
+    globalObjectsContainer: gdObjectsContainer | null,
     objectsContainer: gdObjectsContainer,
     layout: gdLayout | null,
     viewPosition: ViewPosition,
@@ -88,8 +90,9 @@ export default class InstancesRenderer {
     onDownInstance: (gdInitialInstance, number, number) => void,
     onUpInstance: (gdInitialInstance, number, number) => void,
     showObjectInstancesIn3D: boolean,
-  }) {
+  |}) {
     this.project = project;
+    this.globalObjectsContainer = globalObjectsContainer;
     this.instances = instances;
     this.layout = layout;
     this.layersContainer = layersContainer;

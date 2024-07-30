@@ -18,6 +18,12 @@ type Props = {|
   onObjectGroupAdded: (objectGroup: gdObjectGroup) => void,
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
+  /**
+   * Event-based functions only have an ObjectGroupContainer.
+   * It must be used instead of the one from the temporary ObjectsContainer
+   * used for parameters.
+   */
+  bypassedObjectGroupsContainer?: ?gdObjectGroupsContainer,
   initialTab?: ?ObjectGroupEditorTab,
   onComputeAllVariableNames?: () => Array<string>,
 |};
@@ -31,6 +37,7 @@ const ObjectGroupEditorDialog = ({
   onObjectGroupAdded,
   globalObjectsContainer,
   objectsContainer,
+  bypassedObjectGroupsContainer,
   initialTab,
   onComputeAllVariableNames,
 }: Props) => {
@@ -58,7 +65,8 @@ const ObjectGroupEditorDialog = ({
             .getObjectsContainersList()
             .hasObjectOrGroupNamed(name)
         );
-        const objectGroupContainer = objectsContainer.getObjectGroups();
+        const objectGroupContainer =
+          bypassedObjectGroupsContainer || objectsContainer.getObjectGroups();
         objectGroup = objectGroupContainer.insertNew(
           name,
           objectGroupContainer.count()
@@ -84,6 +92,7 @@ const ObjectGroupEditorDialog = ({
       setSelectedTab('variables');
     },
     [
+      bypassedObjectGroupsContainer,
       editedObjectGroup,
       globalObjectsContainer,
       objectsContainer,

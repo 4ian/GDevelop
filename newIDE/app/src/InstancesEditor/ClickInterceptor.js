@@ -62,6 +62,21 @@ class ClickInterceptor {
         this._endClickInterception();
       }
     );
+    // It's important to listen to pointerleave event, as it can happen that
+    // the user moves the touch/pointer outside the canvas - in which case pointerup
+    // is NOT called.
+    this.interceptingSprite.addEventListener(
+      'pointerleave',
+      (e: PIXI.FederatedMouseEvent) => {
+        if (e.pointerType === 'touch') {
+          this._touchingPointerIds.delete(e.pointerId);
+          if (this._touchingPointerIds.size === 0) {
+            this._cancelUntilNoMoreTouches = false;
+          }
+        }
+        this._endClickInterception();
+      }
+    );
     this.interceptingSprite.addEventListener(
       'pointermove',
       (e: PIXI.FederatedPointerEvent) => {

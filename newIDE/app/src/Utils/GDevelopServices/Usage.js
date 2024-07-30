@@ -282,10 +282,6 @@ export const getUserLimits = async (
       Authorization: authorizationHeader,
     },
   });
-  if (response.data.capabilities.classrooms.hidePlayTab) {
-    response.data.capabilities.classrooms.hideCommunityTab = true;
-    response.data.capabilities.classrooms.hidePremiumProducts = true;
-  }
   return response.data;
 };
 

@@ -83,6 +83,7 @@ const ObjectGroupsListWithObjectGroupEditor = ({
           group={editedGroup}
           globalObjectsContainer={globalObjectsContainer}
           objectsContainer={objectsContainer}
+          bypassedObjectGroupsContainer={objectGroups}
           onCancel={() => {
             setEditedGroup(null);
             setCreatingNewGroup(false);

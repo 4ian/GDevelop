@@ -34,7 +34,7 @@ const getLocaleSourceCatalogFiles = localeName => {
   if (localeName === 'pseudo_LOCALE') return ['ide-messages.pot'];
 
   return ['ide-messages.po', 'gdcore-gdcpp-gdjs-extensions-messages.po'];
-}
+};
 
 const getLocalePath = localeName => {
   return path.join(localesBasePath, localeName);

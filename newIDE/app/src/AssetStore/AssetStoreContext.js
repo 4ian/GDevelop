@@ -303,9 +303,7 @@ export const AssetStoreStateProvider = ({
           } = await listAllPublicAssets({ environment });
           const fetchedAuthors = await listAllAuthors({ environment });
           const fetchedLicenses = await listAllLicenses({ environment });
-          const fetchedPrivateAssetPackListingDatas = hidePremiumProducts
-            ? []
-            : await listListedPrivateAssetPacks();
+          const fetchedPrivateAssetPackListingDatas = await listListedPrivateAssetPacks();
 
           console.info(
             `Loaded ${
@@ -329,7 +327,7 @@ export const AssetStoreStateProvider = ({
         }
       })();
     },
-    [environment, hidePremiumProducts]
+    [environment]
   );
 
   // When the public assets or the private assets are loaded, regenerate the
@@ -461,6 +459,7 @@ export const AssetStoreStateProvider = ({
         return null;
       }
       const privateAssetPackListingDatasById = {};
+      if (hidePremiumProducts) return privateAssetPackListingDatasById;
       privateAssetPackListingDatas.forEach(privateAssetPackListingData => {
         const id = privateAssetPackListingData.id;
         if (privateAssetPackListingDatasById[id]) {
@@ -470,7 +469,7 @@ export const AssetStoreStateProvider = ({
       });
       return privateAssetPackListingDatasById;
     },
-    [privateAssetPackListingDatas]
+    [privateAssetPackListingDatas, hidePremiumProducts]
   );
 
   const currentPage = shopNavigationState.getCurrentPage();
@@ -566,11 +565,15 @@ export const AssetStoreStateProvider = ({
     () => ({
       assetShortHeadersSearchResults,
       publicAssetPacksSearchResults,
-      privateAssetPackListingDatasSearchResults,
+      privateAssetPackListingDatasSearchResults: privateAssetPackListingDatas
+        ? null
+        : privateAssetPackListingDatasSearchResults,
       fetchAssetsAndFilters,
       filters,
       publicAssetPacks,
-      privateAssetPackListingDatas,
+      privateAssetPackListingDatas: hidePremiumProducts
+        ? []
+        : privateAssetPackListingDatas,
       authors,
       licenses,
       environment,
@@ -600,6 +603,7 @@ export const AssetStoreStateProvider = ({
       setInitialPackUserFriendlySlug,
     }),
     [
+      hidePremiumProducts,
       assetShortHeadersSearchResults,
       publicAssetPacksSearchResults,
       privateAssetPackListingDatasSearchResults,

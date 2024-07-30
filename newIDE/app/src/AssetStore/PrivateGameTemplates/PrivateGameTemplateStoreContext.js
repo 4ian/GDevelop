@@ -144,9 +144,7 @@ export const PrivateGameTemplateStoreStateProvider = ({
         isLoading.current = true;
 
         try {
-          const fetchedPrivateGameTemplateListingDatas = hidePremiumProducts
-            ? []
-            : await listListedPrivateGameTemplates();
+          const fetchedPrivateGameTemplateListingDatas = await listListedPrivateGameTemplates();
 
           console.info(
             `Loaded ${
@@ -187,7 +185,7 @@ export const PrivateGameTemplateStoreStateProvider = ({
         isLoading.current = false;
       })();
     },
-    [privateGameTemplateListingDatas, hidePremiumProducts]
+    [privateGameTemplateListingDatas]
   );
 
   // When the game templates are loaded,
@@ -267,6 +265,7 @@ export const PrivateGameTemplateStoreStateProvider = ({
         return null;
       }
       const privateGameTemplateListingDatasById = {};
+      if (hidePremiumProducts) return privateGameTemplateListingDatasById;
       privateGameTemplateListingDatas.forEach(
         privateGameTemplateListingData => {
           const id = privateGameTemplateListingData.id;
@@ -282,7 +281,7 @@ export const PrivateGameTemplateStoreStateProvider = ({
       );
       return privateGameTemplateListingDatasById;
     },
-    [privateGameTemplateListingDatas]
+    [privateGameTemplateListingDatas, hidePremiumProducts]
   );
 
   const currentPage = shopNavigationState.getCurrentPage();
@@ -309,25 +308,32 @@ export const PrivateGameTemplateStoreStateProvider = ({
 
   const PrivateGameTemplateStoreState = React.useMemo(
     () => ({
-      privateGameTemplateListingDatas,
+      privateGameTemplateListingDatas: hidePremiumProducts
+        ? []
+        : privateGameTemplateListingDatas,
       error,
       gameTemplateFilters,
       fetchGameTemplates,
       shop: {
-        privateGameTemplateListingDatasSearchResults: privateGameTemplateListingDatasSearchResultsForShop,
+        privateGameTemplateListingDatasSearchResults: hidePremiumProducts
+          ? []
+          : privateGameTemplateListingDatasSearchResultsForShop,
         searchText: shopSearchText,
         setSearchText: setShopSearchText,
         filtersState: currentPage.filtersState,
         setInitialGameTemplateUserFriendlySlug,
       },
       exampleStore: {
-        privateGameTemplateListingDatasSearchResults: privateGameTemplateListingDatasSearchResultsForExampleStore,
+        privateGameTemplateListingDatasSearchResults: hidePremiumProducts
+          ? []
+          : privateGameTemplateListingDatasSearchResultsForExampleStore,
         searchText: exampleStoreSearchText,
         setSearchText: setExampleStoreSearchText,
         filtersState: filtersStateForExampleStore,
       },
     }),
     [
+      hidePremiumProducts,
       privateGameTemplateListingDatas,
       error,
       gameTemplateFilters,

@@ -17,7 +17,7 @@ const gd: libGDevelop = global.gd;
 export default class LayerRenderer {
   project: gdProject;
   instances: gdInitialInstancesContainer;
-  globalObjectsContainer: gdObjectsContainer;
+  globalObjectsContainer: gdObjectsContainer | null;
   objectsContainer: gdObjectsContainer | null;
   /** `layer` can be changed at any moment (see InstancesRenderer).
    * /!\ Don't store any other reference.
@@ -100,7 +100,7 @@ export default class LayerRenderer {
   }: {
     project: gdProject,
     instances: gdInitialInstancesContainer,
-    globalObjectsContainer: gdObjectsContainer,
+    globalObjectsContainer: gdObjectsContainer | null,
     objectsContainer: gdObjectsContainer | null,
     layer: gdLayer,
     viewPosition: ViewPosition,

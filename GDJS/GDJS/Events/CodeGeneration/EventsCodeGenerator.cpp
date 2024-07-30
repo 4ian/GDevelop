@@ -85,8 +85,8 @@ gd::String EventsCodeGenerator::GenerateEventsListCompleteFunctionCode(
         functionArgumentsCode +
       ") {\n" +
         functionPreEventsCode + "\n" +
-        globalObjectListsReset + "\n" +
         wholeEventsCode + "\n" +
+        globalObjectListsReset + "\n" +
         functionPostEventsCode + "\n" +
         functionReturnCode + "\n" +
       "}\n";

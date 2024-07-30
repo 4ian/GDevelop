@@ -190,9 +190,11 @@ export const AssetStoreStateProvider = ({
     publicAssetShortHeaders,
     setPublicAssetShortHeaders,
   ] = React.useState<?Array<AssetShortHeader>>(null);
-  const { receivedAssetShortHeaders, receivedAssetPacks } = React.useContext(
-    AuthenticatedUserContext
-  );
+  const {
+    receivedAssetShortHeaders,
+    receivedAssetPacks,
+    limits,
+  } = React.useContext(AuthenticatedUserContext);
   const [filters, setFilters] = React.useState<?Filters>(null);
   const [
     publicAssetPacks,
@@ -283,6 +285,10 @@ export const AssetStoreStateProvider = ({
   const assetPackSearchFilters = React.useMemo<
     Array<SearchFilter<PublicAssetPack | PrivateAssetPackListingData>>
   >(() => [assetPackTypeFilter], [assetPackTypeFilter]);
+  const hidePremiumProducts =
+    !!limits &&
+    !!limits.capabilities.classrooms &&
+    limits.capabilities.classrooms.hidePremiumProducts;
 
   const fetchAssetsAndFilters = React.useCallback(
     () => {
@@ -453,6 +459,7 @@ export const AssetStoreStateProvider = ({
         return null;
       }
       const privateAssetPackListingDatasById = {};
+      if (hidePremiumProducts) return privateAssetPackListingDatasById;
       privateAssetPackListingDatas.forEach(privateAssetPackListingData => {
         const id = privateAssetPackListingData.id;
         if (privateAssetPackListingDatasById[id]) {
@@ -462,7 +469,7 @@ export const AssetStoreStateProvider = ({
       });
       return privateAssetPackListingDatasById;
     },
-    [privateAssetPackListingDatas]
+    [privateAssetPackListingDatas, hidePremiumProducts]
   );
 
   const currentPage = shopNavigationState.getCurrentPage();
@@ -558,11 +565,15 @@ export const AssetStoreStateProvider = ({
     () => ({
       assetShortHeadersSearchResults,
       publicAssetPacksSearchResults,
-      privateAssetPackListingDatasSearchResults,
+      privateAssetPackListingDatasSearchResults: hidePremiumProducts
+        ? []
+        : privateAssetPackListingDatasSearchResults,
       fetchAssetsAndFilters,
       filters,
       publicAssetPacks,
-      privateAssetPackListingDatas,
+      privateAssetPackListingDatas: hidePremiumProducts
+        ? []
+        : privateAssetPackListingDatas,
       authors,
       licenses,
       environment,
@@ -592,6 +603,7 @@ export const AssetStoreStateProvider = ({
       setInitialPackUserFriendlySlug,
     }),
     [
+      hidePremiumProducts,
       assetShortHeadersSearchResults,
       publicAssetPacksSearchResults,
       privateAssetPackListingDatasSearchResults,

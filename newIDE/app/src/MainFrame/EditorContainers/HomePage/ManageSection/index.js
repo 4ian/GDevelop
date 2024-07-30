@@ -22,7 +22,7 @@ import Link from '../../../../UI/Link';
 import Window from '../../../../Utils/Window';
 import { getHelpLink } from '../../../../Utils/HelpLink';
 import GameDetails, {
-  gameDetailsTabs,
+  getGameDetailsTabs,
   type GameDetailsTab,
 } from '../../../../GameDashboard/GameDetails';
 import { Tabs } from '../../../../UI/Tabs';
@@ -114,7 +114,7 @@ const ManageSection = ({
               <Tabs
                 value={currentTab}
                 onChange={setCurrentTab}
-                options={gameDetailsTabs}
+                options={getGameDetailsTabs(authenticatedUser.limits)}
               />
               <GameDetails
                 game={openedGame}

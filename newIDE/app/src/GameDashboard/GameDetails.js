@@ -1,6 +1,7 @@
 // @flow
 import { Trans, t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
+import type { Limits } from '../Utils/GDevelopServices/Usage';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
@@ -59,36 +60,47 @@ export type GameDetailsTab =
   | 'leaderboards'
   | 'marketing';
 
-export const gameDetailsTabs: TabOptions<GameDetailsTab> = [
-  {
-    value: 'details',
-    label: <Trans>Details</Trans>,
-  },
-  {
-    value: 'builds',
-    label: <Trans>Builds</Trans>,
-  },
-  {
-    value: 'feedback',
-    label: <Trans>Feedback</Trans>,
-  },
-  {
-    value: 'analytics',
-    label: <Trans>Analytics</Trans>,
-  },
-  {
-    value: 'multiplayer',
-    label: <Trans>Multiplayer</Trans>,
-  },
-  {
-    value: 'leaderboards',
-    label: <Trans>Leaderboards</Trans>,
-  },
-  {
-    value: 'marketing',
-    label: <Trans>Marketing & Ads</Trans>,
-  },
-];
+export const getGameDetailsTabs = (
+  userLimits?: ?Limits
+): TabOptions<GameDetailsTab> => {
+  const hidePremiumProducts =
+    !!userLimits &&
+    !!userLimits.capabilities.classrooms &&
+    userLimits.capabilities.classrooms.hidePremiumProducts;
+
+  return [
+    {
+      value: 'details',
+      label: <Trans>Details</Trans>,
+    },
+    {
+      value: 'builds',
+      label: <Trans>Builds</Trans>,
+    },
+    {
+      value: 'feedback',
+      label: <Trans>Feedback</Trans>,
+    },
+    {
+      value: 'analytics',
+      label: <Trans>Analytics</Trans>,
+    },
+    {
+      value: 'multiplayer',
+      label: <Trans>Multiplayer</Trans>,
+    },
+    {
+      value: 'leaderboards',
+      label: <Trans>Leaderboards</Trans>,
+    },
+    hidePremiumProducts
+      ? null
+      : {
+          value: 'marketing',
+          label: <Trans>Marketing & Ads</Trans>,
+        },
+  ].filter(Boolean);
+};
 
 type Props = {|
   game: Game,
@@ -114,9 +126,10 @@ const GameDetails = ({
   const { routeArguments, removeRouteArguments } = React.useContext(
     RouterContext
   );
-  const { getAuthorizationHeader, profile } = React.useContext(
+  const { getAuthorizationHeader, profile, limits } = React.useContext(
     AuthenticatedUserContext
   );
+
   const [
     gameUnregisterErrorText,
     setGameUnregisterErrorText,
@@ -137,7 +150,7 @@ const GameDetails = ({
     () => {
       if (routeArguments['games-dashboard-tab']) {
         // Ensure that the tab is valid.
-        const gameDetailsTab = gameDetailsTabs.find(
+        const gameDetailsTab = getGameDetailsTabs(limits).find(
           gameDetailsTab =>
             gameDetailsTab.value === routeArguments['games-dashboard-tab']
         );
@@ -146,7 +159,7 @@ const GameDetails = ({
         removeRouteArguments(['games-dashboard-tab']);
       }
     },
-    [routeArguments, removeRouteArguments, setCurrentTab]
+    [routeArguments, removeRouteArguments, setCurrentTab, limits]
   );
 
   const loadPublicGame = React.useCallback(

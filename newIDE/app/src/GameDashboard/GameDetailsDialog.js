@@ -8,7 +8,7 @@ import Dialog from '../UI/Dialog';
 import { Tabs } from '../UI/Tabs';
 import HelpButton from '../UI/HelpButton';
 import GameDetails, {
-  gameDetailsTabs,
+  getGameDetailsTabs,
   type GameDetailsTab,
 } from './GameDetails';
 import { EmptyPlaceholder } from '../UI/EmptyPlaceholder';
@@ -38,7 +38,7 @@ export const GameDetailsDialog = ({
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [currentTab, setCurrentTab] = React.useState<GameDetailsTab>('details');
 
-  const { profile, onOpenLoginDialog } = React.useContext(
+  const { profile, onOpenLoginDialog, limits } = React.useContext(
     AuthenticatedUserContext
   );
   const onClickShare = React.useCallback(
@@ -94,7 +94,7 @@ export const GameDetailsDialog = ({
             <Tabs
               value={currentTab}
               onChange={setCurrentTab}
-              options={gameDetailsTabs}
+              options={getGameDetailsTabs(limits)}
             />
           }
         >

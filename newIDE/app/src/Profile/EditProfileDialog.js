@@ -27,6 +27,7 @@ import { type Badge, type Achievement } from '../Utils/GDevelopServices/Badge';
 import {
   hasValidSubscriptionPlan,
   type Subscription,
+  type Limits,
 } from '../Utils/GDevelopServices/Usage';
 import LeftLoader from '../UI/LeftLoader';
 import {
@@ -53,6 +54,7 @@ import { Line } from '../UI/Grid';
 
 export type EditProfileDialogProps = {|
   profile: Profile,
+  limits: ?Limits,
   achievements: ?Array<Achievement>,
   badges: ?Array<Badge>,
   subscription: ?Subscription,
@@ -242,6 +244,7 @@ const CommunityLinkLine = ({
 const EditProfileDialog = ({
   profile,
   subscription,
+  limits,
   achievements,
   badges,
   onClose,
@@ -367,12 +370,20 @@ const EditProfileDialog = ({
     });
   };
 
+  const isStudentAccount =
+    !!subscription && !!subscription.benefitsFromEducationPlan;
+  const hideSocials =
+    !!limits &&
+    !!limits.capabilities.classrooms &&
+    limits.capabilities.classrooms.hideSocials;
+
   const canDelete = !actionInProgress;
 
   const onDeleteAccount = React.useCallback(
     async (i18n: I18nType) => {
-      if (!canDelete) return;
-
+      if (!canDelete || isStudentAccount) {
+        return;
+      }
       if (hasValidSubscriptionPlan(subscription)) {
         await showAlert({
           title: t`You have an active subscription`,
@@ -398,6 +409,7 @@ const EditProfileDialog = ({
       subscription,
       showDeleteConfirmation,
       showAlert,
+      isStudentAccount,
     ]
   );
 
@@ -420,12 +432,14 @@ const EditProfileDialog = ({
   ];
 
   const secondaryActions = [
-    <TextButton
-      label={<Trans>Delete my account</Trans>}
-      disabled={actionInProgress}
-      key="delete"
-      onClick={onDeleteAccount}
-    />,
+    isStudentAccount ? null : (
+      <TextButton
+        label={<Trans>Delete my account</Trans>}
+        disabled={actionInProgress}
+        key="delete"
+        onClick={onDeleteAccount}
+      />
+    ),
   ];
 
   return (
@@ -459,20 +473,22 @@ const EditProfileDialog = ({
               <Text size="sub-title" noMargin>
                 <Trans>Creator profile</Trans>
               </Text>
-              <TextField
-                value={discordUsername}
-                floatingLabelText={<Trans>Discord username</Trans>}
-                fullWidth
-                translatableHintText={t`Your Discord username`}
-                onChange={(e, value) => {
-                  setDiscordUsername(value);
-                }}
-                disabled={actionInProgress}
-                maxLength={discordUsernameConfig.maxLength}
-                helperMarkdownText={i18n._(
-                  t`Add your Discord username to get access to a dedicated channel if you have a Gold or Pro subscription! Join the [GDevelop Discord](https://discord.gg/gdevelop).`
-                )}
-              />
+              {!hideSocials && (
+                <TextField
+                  value={discordUsername}
+                  floatingLabelText={<Trans>Discord username</Trans>}
+                  fullWidth
+                  translatableHintText={t`Your Discord username`}
+                  onChange={(e, value) => {
+                    setDiscordUsername(value);
+                  }}
+                  disabled={actionInProgress}
+                  maxLength={discordUsernameConfig.maxLength}
+                  helperMarkdownText={i18n._(
+                    t`Add your Discord username to get access to a dedicated channel if you have a Gold or Pro subscription! Join the [GDevelop Discord](https://discord.gg/gdevelop).`
+                  )}
+                />
+              )}
               <TextField
                 value={description}
                 floatingLabelText={<Trans>Bio</Trans>}
@@ -488,158 +504,162 @@ const EditProfileDialog = ({
                 floatingLabelFixed
                 maxLength={10000}
               />
-              <Text size="sub-title" noMargin>
-                <Trans>Socials</Trans>
-              </Text>
-              <CommunityLinkWithFollow
-                badges={badges}
-                achievements={achievements}
-                achievementId="github-star"
-                value={githubUsername}
-                onChange={setGithubUsername}
-                onUpdateFollow={() => onUpdateGitHubStar(githubUsername)}
-                getMessageFromUpdate={
-                  communityLinksConfig.githubUsername.getMessageFromUpdate
-                }
-                disabled={actionInProgress}
-                maxLength={communityLinksConfig.githubUsername.maxLength}
-                prefix={communityLinksConfig.githubUsername.prefix}
-                getRewardMessage={
-                  communityLinksConfig.githubUsername.getRewardMessage
-                }
-                translatableHintText={t`username`}
-                icon={communityLinksConfig.githubUsername.icon}
-              />
-              <CommunityLinkWithFollow
-                badges={badges}
-                achievements={achievements}
-                achievementId="twitter-follow"
-                value={twitterUsername}
-                onChange={setTwitterUsername}
-                onUpdateFollow={() =>
-                  onUpdateTwitterFollow(updatedCommunityLinks)
-                }
-                getMessageFromUpdate={
-                  communityLinksConfig.twitterUsername.getMessageFromUpdate
-                }
-                disabled={actionInProgress}
-                maxLength={communityLinksConfig.twitterUsername.maxLength}
-                prefix={communityLinksConfig.twitterUsername.prefix}
-                getRewardMessage={
-                  communityLinksConfig.twitterUsername.getRewardMessage
-                }
-                translatableHintText={t`username`}
-                icon={communityLinksConfig.twitterUsername.icon}
-              />
-              <CommunityLinkWithFollow
-                badges={badges}
-                achievements={achievements}
-                achievementId="tiktok-follow"
-                value={tiktokUsername}
-                onChange={setTiktokUsername}
-                onUpdateFollow={() =>
-                  onUpdateTiktokFollow(updatedCommunityLinks)
-                }
-                getMessageFromUpdate={
-                  communityLinksConfig.tiktokUsername.getMessageFromUpdate
-                }
-                disabled={actionInProgress}
-                maxLength={communityLinksConfig.tiktokUsername.maxLength}
-                prefix={communityLinksConfig.tiktokUsername.prefix}
-                getRewardMessage={
-                  communityLinksConfig.tiktokUsername.getRewardMessage
-                }
-                translatableHintText={t`username`}
-                icon={communityLinksConfig.tiktokUsername.icon}
-              />
-              <CommunityLinkLine
-                id="personalWebsiteLink"
-                value={personalWebsiteLink}
-                translatableHintText={t`Personal website, itch.io page, etc.`}
-                onChange={(e, value) => {
-                  setPersonalWebsiteLink(value);
-                }}
-                disabled={actionInProgress}
-              />
-              <CommunityLinkLine
-                id="personalWebsite2Link"
-                value={personalWebsite2Link}
-                translatableHintText={t`Another personal website, newgrounds.com page, etc.`}
-                onChange={(e, value) => {
-                  setPersonalWebsite2Link(value);
-                }}
-                disabled={actionInProgress}
-              />
-              <CommunityLinkLine
-                id="facebookUsername"
-                value={facebookUsername}
-                translatableHintText={t`username`}
-                onChange={(e, value) => {
-                  setFacebookUsername(value);
-                }}
-                disabled={actionInProgress}
-              />
-              <CommunityLinkLine
-                id="youtubeUsername"
-                value={youtubeUsername}
-                translatableHintText={t`username`}
-                onChange={(e, value) => {
-                  setYoutubeUsername(value);
-                }}
-                disabled={actionInProgress}
-              />
-              <CommunityLinkLine
-                id="instagramUsername"
-                value={instagramUsername}
-                translatableHintText={t`username`}
-                onChange={(e, value) => {
-                  setInstagramUsername(value);
-                }}
-                disabled={actionInProgress}
-              />
-              <CommunityLinkLine
-                id="redditUsername"
-                value={redditUsername}
-                translatableHintText={t`username`}
-                onChange={(e, value) => {
-                  setRedditUsername(value);
-                }}
-                disabled={actionInProgress}
-              />
-              <CommunityLinkLine
-                id="snapchatUsername"
-                value={snapchatUsername}
-                translatableHintText={t`username`}
-                onChange={(e, value) => {
-                  setSnapchatUsername(value);
-                }}
-                disabled={actionInProgress}
-              />
-              <CommunityLinkLine
-                id="discordServerLink"
-                value={discordServerLink}
-                translatableHintText={t`Discord server, e.g: https://discord.gg/...`}
-                onChange={(e, value) => {
-                  setDiscordServerLink(value);
-                }}
-                disabled={actionInProgress}
-              />
-              <TextField
-                value={donateLink}
-                floatingLabelText={<Trans>Donate link</Trans>}
-                fullWidth
-                translatableHintText={t`Do you have a Patreon? Ko-fi? Paypal?`}
-                onChange={(e, value) => {
-                  setDonateLink(value);
-                }}
-                disabled={actionInProgress}
-                floatingLabelFixed
-                helperMarkdownText={i18n._(
-                  t`Add a link to your donation page. It will be displayed on your gd.games profile and game pages.`
-                )}
-                errorText={donateLinkError}
-                maxLength={donateLinkConfig.maxLength}
-              />
+              {!hideSocials && (
+                <>
+                  <Text size="sub-title" noMargin>
+                    <Trans>Socials</Trans>
+                  </Text>
+                  <CommunityLinkWithFollow
+                    badges={badges}
+                    achievements={achievements}
+                    achievementId="github-star"
+                    value={githubUsername}
+                    onChange={setGithubUsername}
+                    onUpdateFollow={() => onUpdateGitHubStar(githubUsername)}
+                    getMessageFromUpdate={
+                      communityLinksConfig.githubUsername.getMessageFromUpdate
+                    }
+                    disabled={actionInProgress}
+                    maxLength={communityLinksConfig.githubUsername.maxLength}
+                    prefix={communityLinksConfig.githubUsername.prefix}
+                    getRewardMessage={
+                      communityLinksConfig.githubUsername.getRewardMessage
+                    }
+                    translatableHintText={t`username`}
+                    icon={communityLinksConfig.githubUsername.icon}
+                  />
+                  <CommunityLinkWithFollow
+                    badges={badges}
+                    achievements={achievements}
+                    achievementId="twitter-follow"
+                    value={twitterUsername}
+                    onChange={setTwitterUsername}
+                    onUpdateFollow={() =>
+                      onUpdateTwitterFollow(updatedCommunityLinks)
+                    }
+                    getMessageFromUpdate={
+                      communityLinksConfig.twitterUsername.getMessageFromUpdate
+                    }
+                    disabled={actionInProgress}
+                    maxLength={communityLinksConfig.twitterUsername.maxLength}
+                    prefix={communityLinksConfig.twitterUsername.prefix}
+                    getRewardMessage={
+                      communityLinksConfig.twitterUsername.getRewardMessage
+                    }
+                    translatableHintText={t`username`}
+                    icon={communityLinksConfig.twitterUsername.icon}
+                  />
+                  <CommunityLinkWithFollow
+                    badges={badges}
+                    achievements={achievements}
+                    achievementId="tiktok-follow"
+                    value={tiktokUsername}
+                    onChange={setTiktokUsername}
+                    onUpdateFollow={() =>
+                      onUpdateTiktokFollow(updatedCommunityLinks)
+                    }
+                    getMessageFromUpdate={
+                      communityLinksConfig.tiktokUsername.getMessageFromUpdate
+                    }
+                    disabled={actionInProgress}
+                    maxLength={communityLinksConfig.tiktokUsername.maxLength}
+                    prefix={communityLinksConfig.tiktokUsername.prefix}
+                    getRewardMessage={
+                      communityLinksConfig.tiktokUsername.getRewardMessage
+                    }
+                    translatableHintText={t`username`}
+                    icon={communityLinksConfig.tiktokUsername.icon}
+                  />
+                  <CommunityLinkLine
+                    id="personalWebsiteLink"
+                    value={personalWebsiteLink}
+                    translatableHintText={t`Personal website, itch.io page, etc.`}
+                    onChange={(e, value) => {
+                      setPersonalWebsiteLink(value);
+                    }}
+                    disabled={actionInProgress}
+                  />
+                  <CommunityLinkLine
+                    id="personalWebsite2Link"
+                    value={personalWebsite2Link}
+                    translatableHintText={t`Another personal website, newgrounds.com page, etc.`}
+                    onChange={(e, value) => {
+                      setPersonalWebsite2Link(value);
+                    }}
+                    disabled={actionInProgress}
+                  />
+                  <CommunityLinkLine
+                    id="facebookUsername"
+                    value={facebookUsername}
+                    translatableHintText={t`username`}
+                    onChange={(e, value) => {
+                      setFacebookUsername(value);
+                    }}
+                    disabled={actionInProgress}
+                  />
+                  <CommunityLinkLine
+                    id="youtubeUsername"
+                    value={youtubeUsername}
+                    translatableHintText={t`username`}
+                    onChange={(e, value) => {
+                      setYoutubeUsername(value);
+                    }}
+                    disabled={actionInProgress}
+                  />
+                  <CommunityLinkLine
+                    id="instagramUsername"
+                    value={instagramUsername}
+                    translatableHintText={t`username`}
+                    onChange={(e, value) => {
+                      setInstagramUsername(value);
+                    }}
+                    disabled={actionInProgress}
+                  />
+                  <CommunityLinkLine
+                    id="redditUsername"
+                    value={redditUsername}
+                    translatableHintText={t`username`}
+                    onChange={(e, value) => {
+                      setRedditUsername(value);
+                    }}
+                    disabled={actionInProgress}
+                  />
+                  <CommunityLinkLine
+                    id="snapchatUsername"
+                    value={snapchatUsername}
+                    translatableHintText={t`username`}
+                    onChange={(e, value) => {
+                      setSnapchatUsername(value);
+                    }}
+                    disabled={actionInProgress}
+                  />
+                  <CommunityLinkLine
+                    id="discordServerLink"
+                    value={discordServerLink}
+                    translatableHintText={t`Discord server, e.g: https://discord.gg/...`}
+                    onChange={(e, value) => {
+                      setDiscordServerLink(value);
+                    }}
+                    disabled={actionInProgress}
+                  />
+                  <TextField
+                    value={donateLink}
+                    floatingLabelText={<Trans>Donate link</Trans>}
+                    fullWidth
+                    translatableHintText={t`Do you have a Patreon? Ko-fi? Paypal?`}
+                    onChange={(e, value) => {
+                      setDonateLink(value);
+                    }}
+                    disabled={actionInProgress}
+                    floatingLabelFixed
+                    helperMarkdownText={i18n._(
+                      t`Add a link to your donation page. It will be displayed on your gd.games profile and game pages.`
+                    )}
+                    errorText={donateLinkError}
+                    maxLength={donateLinkConfig.maxLength}
+                  />
+                </>
+              )}
               <Text size="sub-title" noMargin>
                 <Trans>Notifications</Trans>
               </Text>

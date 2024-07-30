@@ -248,6 +248,11 @@ const GetStartedSection = ({
     [lastVisitedAuthenticationStep]
   );
 
+  const shouldDisplayAnnouncements =
+    !authenticatedUser.limits ||
+    !authenticatedUser.limits.capabilities.classrooms ||
+    !authenticatedUser.limits.capabilities.classrooms.hideCommunityTab;
+
   if (
     (creatingOrLoggingInAccount || loginState === 'loggingIn') &&
     // Do not display loader if the user is already seeing the recommendations.
@@ -633,7 +638,7 @@ const GetStartedSection = ({
           title={<Trans>Start making games</Trans>}
           renderSubtitle={renderSubtitle}
           flexBody
-          showUrgentAnnouncements
+          showUrgentAnnouncements={shouldDisplayAnnouncements}
         >
           <RecommendationList
             authenticatedUser={authenticatedUser}

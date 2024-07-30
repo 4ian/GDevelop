@@ -76,6 +76,9 @@ export type Capabilities = {|
   },
   classrooms?: {
     hidePlayTab: boolean,
+    hideCommunityTab: boolean,
+    hideSocials: boolean,
+    hidePremiumProducts: boolean,
     hideUpgradeNotice: boolean,
     showClassroomTab: boolean,
   },
@@ -483,3 +486,10 @@ export const canUseClassroomFeature = (limits: ?Limits) =>
   limits &&
   limits.capabilities.classrooms &&
   limits.capabilities.classrooms.showClassroomTab;
+
+export const shouldHideClassroomTab = (limits: ?Limits) =>
+  !limits ||
+  !limits.capabilities.classrooms ||
+  limits.capabilities.classrooms.showClassroomTab
+    ? false
+    : true;

@@ -1398,6 +1398,7 @@ export default class AuthenticatedUserProvider extends React.Component<
                 <EditProfileDialog
                   profile={this.state.authenticatedUser.profile}
                   achievements={this.state.authenticatedUser.achievements}
+                  limits={this.state.authenticatedUser.limits}
                   badges={this.state.authenticatedUser.badges}
                   subscription={this.state.authenticatedUser.subscription}
                   onClose={() => this.openEditProfileDialog(false)}

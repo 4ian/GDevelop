@@ -7,6 +7,10 @@ import EditProfileDialog, {
   type EditProfileDialogProps,
 } from '../../../Profile/EditProfileDialog';
 import { fakeAchievements } from '../../../fixtures/GDevelopServicesTestData/FakeAchievements';
+import {
+  limitsForStudentUser,
+  limitsForNoSubscriptionUser,
+} from '../../../fixtures/GDevelopServicesTestData';
 
 export default {
   title: 'Profile/EditProfileDialog',
@@ -74,6 +78,7 @@ const defaultProps: EditProfileDialogProps = {
     updatedAt: 12345,
     pricingSystemId: 'whatever',
   },
+  limits: limitsForNoSubscriptionUser,
 };
 export const WithSubscription = () => <EditProfileDialog {...defaultProps} />;
 
@@ -162,4 +167,7 @@ export const ErrorFromBackend = () => (
 
 export const Submitting = () => (
   <EditProfileDialog {...defaultProps} actionInProgress />
+);
+export const WithStudentUser = () => (
+  <EditProfileDialog {...defaultProps} limits={limitsForStudentUser} />
 );

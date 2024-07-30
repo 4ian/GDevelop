@@ -357,6 +357,12 @@ const BuildSection = ({
     return b.fileMetadata.lastModifiedDate - a.fileMetadata.lastModifiedDate;
   });
 
+  const shouldDisplayPremiumGameTemplates =
+    !authenticatedUser ||
+    !authenticatedUser.limits ||
+    !authenticatedUser.limits.capabilities.classrooms ||
+    !authenticatedUser.limits.capabilities.classrooms.hidePremiumProducts;
+
   const examplesAndTemplatesToDisplay = React.useMemo(
     () =>
       getExampleAndTemplateItemsForBuildSection({
@@ -377,7 +383,11 @@ const BuildSection = ({
           : isMobile
           ? 16
           : 20,
-        privateGameTemplatesPeriodicity: isMobile ? 2 : 3,
+        privateGameTemplatesPeriodicity: shouldDisplayPremiumGameTemplates
+          ? isMobile
+            ? 2
+            : 3
+          : 0,
       }),
     [
       authenticatedUser.receivedGameTemplates,
@@ -389,8 +399,14 @@ const BuildSection = ({
       i18n,
       isMobile,
       allGameTemplatesAndExamplesFlaggedAsGameCount,
+      shouldDisplayPremiumGameTemplates,
     ]
   );
+
+  const shouldDisplayAnnouncements =
+    !authenticatedUser.limits ||
+    !authenticatedUser.limits.capabilities.classrooms ||
+    !authenticatedUser.limits.capabilities.classrooms.hideCommunityTab;
 
   const skeletonLineHeight = getProjectLineHeight({ isMobile });
   const pageContent = showAllGameTemplates ? (
@@ -420,7 +436,7 @@ const BuildSection = ({
   ) : (
     <SectionContainer
       title={<Trans>My projects</Trans>}
-      showUrgentAnnouncements
+      showUrgentAnnouncements={shouldDisplayAnnouncements}
       renderFooter={
         limits && hasTooManyCloudProjects
           ? () => (
@@ -453,10 +469,14 @@ const BuildSection = ({
           roundedImages
           displayArrowsOnDesktop
         />
-        <Spacer />
-        <Column noMargin>
-          <PromotionsSlideshow />
-        </Column>
+        {shouldDisplayAnnouncements && (
+          <>
+            <Spacer />
+            <Column noMargin>
+              <PromotionsSlideshow />
+            </Column>
+          </>
+        )}
       </SectionRow>
       <SectionRow>
         <ResponsiveLineStackLayout

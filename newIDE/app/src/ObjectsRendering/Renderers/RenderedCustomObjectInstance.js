@@ -526,9 +526,12 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
           RenderedInstance.toRad(this._instance.getRotationY()),
           RenderedInstance.toRad(this._instance.getAngle())
         );
+        this._pixiObject.pivot.x = centerX - originX;
+        this._pixiObject.pivot.y = centerY - originY;
+      } else {
+        this._pixiObject.pivot.x = centerX;
+        this._pixiObject.pivot.y = centerY;
       }
-      this._pixiObject.pivot.x = centerX - originX;
-      this._pixiObject.pivot.y = centerY - originY;
       this._pixiObject.position.x = this._instance.getX() + centerX - originX;
       this._pixiObject.position.y = this._instance.getY() + centerY - originY;
 

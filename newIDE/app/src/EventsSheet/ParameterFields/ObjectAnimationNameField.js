@@ -7,9 +7,7 @@ import {
   type ParameterFieldInterface,
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
-import getObjectByName from '../../Utils/GetObjectByName';
 import { getLastObjectParameterValue } from './ParameterMetadataTools';
-import { mapFor } from '../../Utils/MapFor';
 import SelectField, { type SelectFieldInterface } from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 import { TextFieldWithButtonLayout } from '../../UI/Layout';
@@ -17,8 +15,6 @@ import FlatButton from '../../UI/FlatButton';
 import RaisedButton from '../../UI/RaisedButton';
 import Functions from '@material-ui/icons/Functions';
 import TypeCursorSelect from '../../UI/CustomSvgIcons/TypeCursorSelect';
-
-const gd: libGDevelop = global.gd;
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ObjectAnimationNameField(props: ParameterFieldProps, ref) {

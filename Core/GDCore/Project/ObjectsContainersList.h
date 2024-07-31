@@ -129,7 +129,17 @@ class GD_CORE_API ObjectsContainersList {
       const gd::String& objectName, bool searchInGroups = true) const;
 
   /**
-   * \brief Return a list containing all objects refered to by the group.
+   * \brief Get the animation names of an object/group.
+   * \note The animation names of a group are the animation names common to
+   * every object of the group.
+   *
+   * @return The names of animations
+   */
+  std::vector<gd::String>
+  GetAnimationNamesOfObject(const gd::String &objectOrGroupName) const;
+
+  /**
+   * \brief Return a list containing all objects referred to by the group.
    * If an object name is passed, then only this object name is returned.
    *
    * If \a onlyObjectToSelectIfPresent is set and present in the group(s),
@@ -169,6 +179,8 @@ class GD_CORE_API ObjectsContainersList {
 
  private:
   bool HasObjectNamed(const gd::String& name) const;
+
+  const gd::Object* GetObject(const gd::String& name) const;
 
   bool HasObjectWithVariableNamed(const gd::String& objectName,
                                   const gd::String& variableName) const;

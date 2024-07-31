@@ -87,6 +87,19 @@ bool SpriteObject::UpdateInitialInstanceProperty(
   return true;
 }
 
+size_t SpriteObject::GetAnimationsCount() const {
+  return animations.GetAnimationsCount();
+}
+
+const gd::String &SpriteObject::GetAnimationName(size_t index) const {
+  return animations.GetAnimation(index).GetName();
+}
+
+bool SpriteObject::HasAnimationNamed(
+    const gd::String &name) const {
+  return animations.HasAnimationNamed(name);
+}
+
 const SpriteAnimationList& SpriteObject::GetAnimations() const {
   return animations;
 }

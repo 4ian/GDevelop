@@ -235,6 +235,19 @@ void Model3DObjectConfiguration::ExposeResources(
   worker.ExposeModel3D(modelResourceName);
 }
 
+const gd::String &
+Model3DObjectConfiguration::GetAnimationName(size_t index) const {
+  return GetAnimation(index).GetName();
+}
+
+bool Model3DObjectConfiguration::HasAnimationNamed(
+    const gd::String &name) const {
+  return !name.empty() && (find_if(animations.begin(), animations.end(),
+                                   [&name](const Model3DAnimation &animation) {
+                                     return animation.GetName() == name;
+                                   }) != animations.end());
+}
+
 Model3DAnimation Model3DObjectConfiguration::badAnimation;
 
 const Model3DAnimation &
@@ -250,14 +263,6 @@ Model3DAnimation &Model3DObjectConfiguration::GetAnimation(std::size_t nb) {
     return badAnimation;
 
   return animations[nb];
-}
-
-bool Model3DObjectConfiguration::HasAnimationNamed(
-    const gd::String &name) const {
-  return !name.empty() && (find_if(animations.begin(), animations.end(),
-                                   [&name](const Model3DAnimation &animation) {
-                                     return animation.GetName() == name;
-                                   }) != animations.end());
 }
 
 void Model3DObjectConfiguration::AddAnimation(

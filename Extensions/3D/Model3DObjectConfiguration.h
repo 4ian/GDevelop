@@ -85,6 +85,12 @@ public:
    * Methods related to animations management
    */
   ///@{
+  std::size_t GetAnimationsCount() const override { return animations.size(); };
+
+  const gd::String &GetAnimationName(size_t index) const override;
+
+  bool HasAnimationNamed(const gd::String &animationName) const override;
+
   /**
    * \brief Return the animation at the specified index.
    * If the index is out of bound, a "bad animation" object is returned.
@@ -96,16 +102,6 @@ public:
    * If the index is out of bound, a "bad animation" object is returned.
    */
   Model3DAnimation &GetAnimation(std::size_t nb);
-
-  /**
-   * \brief Return the number of animations this object has.
-   */
-  std::size_t GetAnimationsCount() const { return animations.size(); };
-
-  /**
-   * \brief Return true if the animation called "name" exists.
-   */
-  bool HasAnimationNamed(const gd::String& name) const;
 
   /**
    * \brief Add an animation at the end of the existing ones.

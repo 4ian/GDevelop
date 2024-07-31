@@ -224,6 +224,20 @@ void CustomObjectConfiguration::ExposeResources(gd::ArbitraryResourceWorker& wor
   }
 }
 
+std::size_t CustomObjectConfiguration::GetAnimationsCount() const {
+  return animations.GetAnimationsCount();
+}
+
+const gd::String &
+CustomObjectConfiguration::GetAnimationName(size_t index) const {
+  return animations.GetAnimation(index).GetName();
+}
+
+bool CustomObjectConfiguration::HasAnimationNamed(
+    const gd::String &name) const {
+  return animations.HasAnimationNamed(name);
+}
+
 const SpriteAnimationList& CustomObjectConfiguration::GetAnimations() const {
   return animations;
 }

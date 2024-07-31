@@ -1,5 +1,5 @@
 // @flow
-import { mapVector } from '../../Utils/MapFor';
+import { mapFor } from '../../Utils/MapFor';
 const gd: libGDevelop = global.gd;
 
 export const enumerateParametersUsableInExpressions = (
@@ -7,10 +7,13 @@ export const enumerateParametersUsableInExpressions = (
   eventsFunction: gdEventsFunction,
   allowedParameterTypes: string[]
 ): Array<gdParameterMetadata> => {
-  return mapVector(
-    eventsFunction.getParametersForEvents(eventsFunctionsContainer),
-    parameterMetadata =>
-      !parameterMetadata.isCodeOnly() &&
+  const parameters = eventsFunction.getParametersForEvents(eventsFunctionsContainer);
+  return mapFor(
+    0,
+    parameters.getParametersCount(),
+    i => {
+      const parameterMetadata = parameters.getParameterAt(i);
+      return !parameterMetadata.isCodeOnly() &&
       !gd.ParameterMetadata.isObject(parameterMetadata.getType()) &&
       !gd.ParameterMetadata.isBehavior(parameterMetadata.getType()) &&
       (allowedParameterTypes.length === 0 ||
@@ -20,6 +23,7 @@ export const enumerateParametersUsableInExpressions = (
           )
         ))
         ? parameterMetadata
-        : null
+        : null;
+    }   
   ).filter(Boolean);
 };

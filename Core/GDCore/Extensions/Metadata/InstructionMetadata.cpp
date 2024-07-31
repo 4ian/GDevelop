@@ -9,6 +9,7 @@
 
 #include "GDCore/CommonTools.h"
 #include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/Project/ParameterMetadataContainer.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
@@ -77,7 +78,7 @@ InstructionMetadata& InstructionMetadata::AddParameter(
   // TODO: Assert against supplementaryInformation === "emsc" (when running with
   // Emscripten), and warn about a missing argument when calling addParameter.
 
-  parameters.push_back(info);
+  parameters.InsertParameter(info, parameters.GetParametersCount());
   return *this;
 }
 
@@ -88,7 +89,7 @@ InstructionMetadata& InstructionMetadata::AddCodeOnlyParameter(
   info.codeOnly = true;
   info.SetExtraInfo(supplementaryInformation);
 
-  parameters.push_back(info);
+  parameters.InsertParameter(info, parameters.GetParametersCount());
   return *this;
 }
 
@@ -102,7 +103,7 @@ InstructionMetadata& InstructionMetadata::UseStandardOperatorParameters(
     AddParameter(
         "yesorno",
         options.description.empty() ? _("New value") : options.description);
-    size_t valueParamIndex = parameters.size() - 1;
+    size_t valueParamIndex = parameters.GetParametersCount() - 1;
 
     if (isObjectInstruction || isBehaviorInstruction) {
       gd::String templateSentence = _("Set _PARAM0_ as <subject>: <value>");
@@ -127,8 +128,8 @@ InstructionMetadata& InstructionMetadata::UseStandardOperatorParameters(
                  options.description.empty() ? _("Value") : options.description,
                  options.typeExtraInfo);
 
-    size_t operatorParamIndex = parameters.size() - 2;
-    size_t valueParamIndex = parameters.size() - 1;
+    size_t operatorParamIndex = parameters.GetParametersCount() - 2;
+    size_t valueParamIndex = parameters.GetParametersCount() - 1;
 
     if (isObjectInstruction || isBehaviorInstruction) {
       gd::String templateSentence = _("Change <subject> of _PARAM0_: <operator> <value>");
@@ -181,8 +182,8 @@ InstructionMetadata::UseStandardRelationalOperatorParameters(
     AddParameter(type,
                  options.description.empty() ? _("Value to compare") : options.description,
                  options.typeExtraInfo);
-    size_t operatorParamIndex = parameters.size() - 2;
-    size_t valueParamIndex = parameters.size() - 1;
+    size_t operatorParamIndex = parameters.GetParametersCount() - 2;
+    size_t valueParamIndex = parameters.GetParametersCount() - 1;
 
     if (isObjectInstruction || isBehaviorInstruction) {
       gd::String templateSentence = _("<subject> of _PARAM0_ <operator> <value>");

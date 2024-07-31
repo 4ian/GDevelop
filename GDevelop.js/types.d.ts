@@ -611,7 +611,7 @@ export class ProjectScopedContainers extends EmscriptenObject {
   static makeNewProjectScopedContainersForEventsBasedObject(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, outputObjectsContainer: ObjectsContainer): ProjectScopedContainers;
   static makeNewProjectScopedContainersWithLocalVariables(projectScopedContainers: ProjectScopedContainers, event: BaseEvent): ProjectScopedContainers;
   addPropertiesContainer(propertiesContainer: PropertiesContainer): ProjectScopedContainers;
-  addParameters(parameters: VectorParameterMetadata): ProjectScopedContainers;
+  addParameters(parameters: ParameterMetadataContainer): ProjectScopedContainers;
   getObjectsContainersList(): ObjectsContainersList;
   getVariablesContainersList(): VariablesContainersList;
 }
@@ -1283,7 +1283,7 @@ export class InstructionMetadata extends AbstractFunctionMetadata {
   canHaveSubInstructions(): boolean;
   getParameter(index: number): ParameterMetadata;
   getParametersCount(): number;
-  getParameters(): VectorParameterMetadata;
+  getParameters(): ParameterMetadataContainer;
   getUsageComplexity(): number;
   isHidden(): boolean;
   isPrivate(): boolean;
@@ -1461,8 +1461,8 @@ export class VectorParameterMetadata extends EmscriptenObject {
 }
 
 export class ParameterMetadataTools extends EmscriptenObject {
-  static parametersToObjectsContainer(project: Project, parameters: VectorParameterMetadata, outputObjectsContainer: ObjectsContainer): void;
-  static getObjectParameterIndexFor(parameters: VectorParameterMetadata, parameterIndex: number): number;
+  static parametersToObjectsContainer(project: Project, parameters: ParameterMetadataContainer, outputObjectsContainer: ObjectsContainer): void;
+  static getObjectParameterIndexFor(parameters: ParameterMetadataContainer, parameterIndex: number): number;
 }
 
 export class ObjectMetadata extends EmscriptenObject {
@@ -2063,11 +2063,24 @@ export class EventsFunction extends EmscriptenObject {
   setFunctionType(type: EventsFunction_FunctionType): EventsFunction;
   getFunctionType(): EventsFunction_FunctionType;
   getEvents(): EventsList;
-  getParameters(): VectorParameterMetadata;
-  getParametersForEvents(functionsContainer: EventsFunctionsContainer): VectorParameterMetadata;
+  getParameters(): ParameterMetadataContainer;
+  getParametersForEvents(functionsContainer: EventsFunctionsContainer): ParameterMetadataContainer;
   getObjectGroups(): ObjectGroupsContainer;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
+}
+
+export class ParameterMetadataContainer extends EmscriptenObject {
+  insertNewParameter(name: string, pos: number): ParameterMetadata;
+  insertParameter(parameterMetadata: ParameterMetadata, pos: number): ParameterMetadata;
+  hasParameterNamed(name: string): boolean;
+  getParameter(name: string): ParameterMetadata;
+  getParameterAt(pos: number): ParameterMetadata;
+  removeParameter(name: string): void;
+  moveParameter(oldIndex: number, newIndex: number): void;
+  getParametersCount(): number;
+  getParameterPosition(parameterMetadata: ParameterMetadata): number;
+  clearParameters(): void;
 }
 
 export class EventsFunctionsContainer extends EmscriptenObject {

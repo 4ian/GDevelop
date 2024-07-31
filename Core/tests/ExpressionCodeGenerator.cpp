@@ -527,15 +527,9 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
     }
   }
   SECTION("Parameters (1 level)") {
-    std::vector<gd::ParameterMetadata> parameters;
-    gd::ParameterMetadata param1;
-    param1.SetName("MyParameter1");
-    param1.SetType("number");
-    gd::ParameterMetadata param2;
-    param2.SetName("MyParameter2");
-    param2.SetType("string");
-    parameters.push_back(param1);
-    parameters.push_back(param2);
+    gd::ParameterMetadataContainer parameters;
+    parameters.InsertNewParameter("MyParameter1", 0).SetType("number");
+    parameters.InsertNewParameter("MyParameter2", 1).SetType("string");
 
     auto projectScopedContainersWithParameters = gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
     projectScopedContainersWithParameters.AddParameters(parameters);
@@ -568,19 +562,10 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
     }
   }
   SECTION("Parameters (1 level, number|string)") {
-    std::vector<gd::ParameterMetadata> parameters;
-    gd::ParameterMetadata param1;
-    param1.SetName("MyNumberParameter");
-    param1.SetType("number");
-    gd::ParameterMetadata param2;
-    param2.SetName("MyStringParameter");
-    param2.SetType("string");
-    gd::ParameterMetadata param3;
-    param3.SetName("MyBooleanParameter");
-    param3.SetType("yesorno");
-    parameters.push_back(param1);
-    parameters.push_back(param2);
-    parameters.push_back(param3);
+    gd::ParameterMetadataContainer parameters;
+    parameters.InsertNewParameter("MyNumberParameter", 0).SetType("number");
+    parameters.InsertNewParameter("MyStringParameter", 1).SetType("string");
+    parameters.InsertNewParameter("MyBooleanParameter", 2).SetType("yesorno");
 
     auto projectScopedContainersWithParameters = gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
     projectScopedContainersWithParameters.AddParameters(parameters);

@@ -9,6 +9,7 @@
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/ObjectsContainersList.h"
+#include "GDCore/Project/ParameterMetadataContainer.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/String.h"
 #include "InstructionMetadata.h"
@@ -20,13 +21,13 @@ const ParameterMetadata ParameterMetadataTools::badParameterMetadata;
 
 void ParameterMetadataTools::ParametersToObjectsContainer(
     const gd::Project& project,
-    const std::vector<gd::ParameterMetadata>& parameters,
+    const ParameterMetadataContainer& parameters,
     gd::ObjectsContainer& outputObjectsContainer) {
   outputObjectsContainer.GetObjects().clear();
 
   gd::String lastObjectName;
-  for (std::size_t i = 0; i < parameters.size(); ++i) {
-    const auto& parameter = parameters[i];
+  for (std::size_t i = 0; i < parameters.GetParametersCount(); ++i) {
+    const auto& parameter = parameters.GetParameter(i);
     if (parameter.GetName().empty()) continue;
 
     if (gd::ParameterMetadata::IsObject(parameter.GetType())) {
@@ -61,31 +62,34 @@ void ParameterMetadataTools::ParametersToObjectsContainer(
 }
 
 void ParameterMetadataTools::ForEachParameterMatchingSearch(
-    const std::vector<const std::vector<gd::ParameterMetadata>*>&
+    const std::vector<const ParameterMetadataContainer*>&
         parametersVectorsList,
     const gd::String& search,
     std::function<void(const gd::ParameterMetadata&)> cb) {
   for (auto it = parametersVectorsList.rbegin();
        it != parametersVectorsList.rend();
        ++it) {
-    const std::vector<gd::ParameterMetadata>* parametersVector = *it;
+    const ParameterMetadataContainer* parametersVector = *it;
 
-    for (const auto& parameterMetadata: *parametersVector) {
-      if (parameterMetadata.GetName().FindCaseInsensitive(search) != gd::String::npos) cb(parameterMetadata);
+    for (const auto &parameterMetadata :
+         parametersVector->GetInternalVector()) {
+      if (parameterMetadata->GetName().FindCaseInsensitive(search) !=
+          gd::String::npos)
+        cb(*parameterMetadata);
     }
   }
 }
 
 bool ParameterMetadataTools::Has(
-      const std::vector<const std::vector<gd::ParameterMetadata>*>& parametersVectorsList,
+      const std::vector<const ParameterMetadataContainer*>& parametersVectorsList,
       const gd::String& parameterName) {
   for (auto it = parametersVectorsList.rbegin();
        it != parametersVectorsList.rend();
        ++it) {
-    const std::vector<gd::ParameterMetadata>* parametersVector = *it;
+    const ParameterMetadataContainer* parametersVector = *it;
 
-    for (const auto& parameterMetadata: *parametersVector) {
-      if (parameterMetadata.GetName() == parameterName) return true;
+    for (const auto& parameterMetadata: parametersVector->GetInternalVector()) {
+      if (parameterMetadata->GetName() == parameterName) return true;
     }
   }
 
@@ -93,16 +97,18 @@ bool ParameterMetadataTools::Has(
 }
 
 const gd::ParameterMetadata& ParameterMetadataTools::Get(
-    const std::vector<const std::vector<gd::ParameterMetadata>*>&
+    const std::vector<const ParameterMetadataContainer*>&
         parametersVectorsList,
     const gd::String& parameterName) {
   for (auto it = parametersVectorsList.rbegin();
        it != parametersVectorsList.rend();
        ++it) {
-    const std::vector<gd::ParameterMetadata>* parametersVector = *it;
+    const ParameterMetadataContainer* parametersVector = *it;
 
-    for (const auto& parameterMetadata: *parametersVector) {
-      if (parameterMetadata.GetName() == parameterName) return parameterMetadata;
+    for (const auto &parameterMetadata :
+         parametersVector->GetInternalVector()) {
+      if (parameterMetadata->GetName() == parameterName)
+        return *parameterMetadata;
     }
   }
 
@@ -111,7 +117,7 @@ const gd::ParameterMetadata& ParameterMetadataTools::Get(
 
 void ParameterMetadataTools::IterateOverParameters(
     const std::vector<gd::Expression>& parameters,
-    const std::vector<gd::ParameterMetadata>& parametersMetadata,
+    const ParameterMetadataContainer& parametersMetadata,
     std::function<void(const gd::ParameterMetadata& parameterMetadata,
                        const gd::Expression& parameterValue,
                        const gd::String& lastObjectName)> fn) {
@@ -128,15 +134,17 @@ void ParameterMetadataTools::IterateOverParameters(
 
 void ParameterMetadataTools::IterateOverParametersWithIndex(
     const std::vector<gd::Expression>& parameters,
-    const std::vector<gd::ParameterMetadata>& parametersMetadata,
+    const ParameterMetadataContainer& parametersMetadata,
     std::function<void(const gd::ParameterMetadata& parameterMetadata,
                        const gd::Expression& parameterValue,
                        size_t parameterIndex,
                        const gd::String& lastObjectName)> fn) {
   gd::String lastObjectName = "";
-  for (std::size_t pNb = 0; pNb < parametersMetadata.size(); ++pNb) {
-    const gd::ParameterMetadata& parameterMetadata = parametersMetadata[pNb];
-    const gd::Expression& parameterValue =
+  for (std::size_t pNb = 0; pNb < parametersMetadata.GetParametersCount();
+       ++pNb) {
+    const gd::ParameterMetadata &parameterMetadata =
+        parametersMetadata.GetParameter(pNb);
+    const gd::Expression &parameterValue =
         pNb < parameters.size() ? parameters[pNb].GetPlainString() : "";
     const gd::Expression& parameterValueOrDefault =
         parameterValue.GetPlainString().empty() && parameterMetadata.IsOptional()
@@ -204,16 +212,17 @@ void ParameterMetadataTools::IterateOverParametersWithIndex(
 }
 
 size_t ParameterMetadataTools::GetObjectParameterIndexFor(
-    const std::vector<gd::ParameterMetadata>& parametersMetadata,
+    const ParameterMetadataContainer& parametersMetadata,
     size_t parameterIndex) {
   // By convention, parameters that require
   // an object (mainly, "objectvar" and "behavior") should be placed after
   // the object in the list of parameters (if possible, just after).
   // Search "lastObjectName" in the codebase for other place where this
   // convention is enforced.
-  for (std::size_t pNb = parameterIndex; pNb < parametersMetadata.size();
-       pNb--) {
-    if (gd::ParameterMetadata::IsObject(parametersMetadata[pNb].GetType())) {
+  for (std::size_t pNb = parameterIndex;
+       pNb < parametersMetadata.GetParametersCount(); pNb--) {
+    if (gd::ParameterMetadata::IsObject(
+            parametersMetadata.GetParameter(pNb).GetType())) {
       return pNb;
     }
   }

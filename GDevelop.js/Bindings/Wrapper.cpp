@@ -843,6 +843,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define RemoveAt Remove
 #define GetEventsFunctionAt GetEventsFunction
 #define GetEffectAt GetEffect
+#define GetParameterAt GetParameter
 
 // We don't use prefix in .idl file to workaround a webidl_binder.py bug
 // that can't find in its list of interfaces a class which has a prefix.

@@ -43,7 +43,7 @@ InstructionSentenceFormatter::GetAsFormattedText(
     parse = false;
     size_t firstParamPosition = gd::String::npos;
     size_t firstParamIndex = gd::String::npos;
-    for (std::size_t i = 0; i < metadata.parameters.size(); ++i) {
+    for (std::size_t i = 0; i < metadata.parameters.GetParametersCount(); ++i) {
       size_t paramPosition =
           sentence.find("_PARAM" + gd::String::From(i) + "_");
       if (paramPosition < firstParamPosition) {

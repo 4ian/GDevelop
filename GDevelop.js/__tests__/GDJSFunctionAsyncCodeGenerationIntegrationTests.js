@@ -222,11 +222,11 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
         .getEvents()
         .unserializeFrom(project, eventsSerializerElement);
 
-      const parameter = new gd.ParameterMetadata();
-      parameter.setType('number');
-      parameter.setName('IncreaseValue');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.delete();
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('IncreaseValue', 0)
+        .setType('number');
+
       const runCompiledEvents = generateCompiledEventsForEventsFunction(
         gd,
         project,
@@ -370,14 +370,14 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
         .getEvents()
         .unserializeFrom(project, eventsSerializerElement);
 
-      const parameter = new gd.ParameterMetadata();
-      parameter.setType('number');
-      parameter.setName('IncreaseValue');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.setType('object');
-      parameter.setName('MyParamObject');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.delete();
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('IncreaseValue', 0)
+        .setType('number');
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('MyParamObject', 1)
+        .setType('object');
 
       const runCompiledEvents = generateCompiledEventsForEventsFunction(
         gd,
@@ -486,14 +486,14 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
         .getEvents()
         .unserializeFrom(project, eventsSerializerElement);
 
-      const parameter = new gd.ParameterMetadata();
-      parameter.setType('number');
-      parameter.setName('IncreaseValue');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.setType('object');
-      parameter.setName('MyParamObject');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.delete();
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('IncreaseValue', 0)
+        .setType('number');
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('MyParamObject', 1)
+        .setType('object');
 
       const runCompiledEvents = generateCompiledEventsForEventsFunction(
         gd,
@@ -625,14 +625,14 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
         .getEvents()
         .unserializeFrom(project, eventsSerializerElement);
 
-      const parameter = new gd.ParameterMetadata();
-      parameter.setType('number');
-      parameter.setName('IncreaseValue');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.setType('object');
-      parameter.setName('MyParamObject');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.delete();
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('IncreaseValue', 0)
+        .setType('number');
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('MyParamObject', 1)
+        .setType('object');
 
       const runCompiledEvents = generateCompiledEventsForEventsFunction(
         gd,
@@ -805,14 +805,14 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
         .getEvents()
         .unserializeFrom(project, eventsSerializerElement);
 
-      const parameter = new gd.ParameterMetadata();
-      parameter.setType('number');
-      parameter.setName('IncreaseValue');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.setType('object');
-      parameter.setName('MyParamObject');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.delete();
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('IncreaseValue', 0)
+        .setType('number');
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('MyParamObject', 1)
+        .setType('object');
 
       const runCompiledEvents = generateCompiledEventsForEventsFunction(
         gd,
@@ -977,14 +977,14 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
         .getEvents()
         .unserializeFrom(project, eventsSerializerElement);
 
-      const parameter = new gd.ParameterMetadata();
-      parameter.setType('number');
-      parameter.setName('IncreaseValue');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.setType('object');
-      parameter.setName('MyParamObject');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.delete();
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('IncreaseValue', 0)
+        .setType('number');
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('MyParamObject', 1)
+        .setType('object');
 
       const runCompiledEvents = generateCompiledEventsForEventsFunction(
         gd,
@@ -1107,14 +1107,14 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
         .getEvents()
         .unserializeFrom(project, eventsSerializerElement);
 
-      const parameter = new gd.ParameterMetadata();
-      parameter.setType('number');
-      parameter.setName('IncreaseValue');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.setType('object');
-      parameter.setName('MyParamObject');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.delete();
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('IncreaseValue', 0)
+        .setType('number');
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('MyParamObject', 1)
+        .setType('object');
 
       const runCompiledEvents = generateCompiledEventsForEventsFunction(
         gd,
@@ -1245,14 +1245,14 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
         .getEvents()
         .unserializeFrom(project, eventsSerializerElement);
 
-      const parameter = new gd.ParameterMetadata();
-      parameter.setType('number');
-      parameter.setName('IncreaseValue');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.setType('object');
-      parameter.setName('MyParamObject');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.delete();
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('IncreaseValue', 0)
+        .setType('number');
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('MyParamObject', 1)
+        .setType('object');
 
       const runCompiledEvents = generateCompiledEventsForEventsFunction(
         gd,
@@ -1399,17 +1399,18 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
         .getEvents()
         .unserializeFrom(project, eventsSerializerElement);
 
-      const parameter = new gd.ParameterMetadata();
-      parameter.setType('number');
-      parameter.setName('IncreaseValue');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.setType('object');
-      parameter.setName('MyParamObject1');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.setType('object');
-      parameter.setName('MyParamObject2');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.delete();
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('IncreaseValue', 0)
+        .setType('number');
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('MyParamObject', 1)
+        .setType('object');
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('MyParamObject2', 2)
+        .setType('object');
 
       // Create a group that refers to both objects passed as parameters.
       const myGroup = eventsFunction.getObjectGroups().insertNew('MyGroup', 0);
@@ -1567,17 +1568,18 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
         .getEvents()
         .unserializeFrom(project, eventsSerializerElement);
 
-      const parameter = new gd.ParameterMetadata();
-      parameter.setType('number');
-      parameter.setName('IncreaseValue');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.setType('object');
-      parameter.setName('MyParamObject1');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.setType('object');
-      parameter.setName('MyParamObject2');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.delete();
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('IncreaseValue', 0)
+        .setType('number');
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('MyParamObject', 1)
+        .setType('object');
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('MyParamObject2', 2)
+        .setType('object');
 
       // Create a group that refers to both objects passed as parameters.
       const myGroup = eventsFunction.getObjectGroups().insertNew('MyGroup', 0);
@@ -1725,14 +1727,14 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
         .getEvents()
         .unserializeFrom(project, eventsSerializerElement);
 
-      const parameter = new gd.ParameterMetadata();
-      parameter.setType('number');
-      parameter.setName('IncreaseValue');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.setType('object');
-      parameter.setName('MyParamObject');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.delete();
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('IncreaseValue', 0)
+        .setType('number');
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('MyParamObject', 1)
+        .setType('object');
 
       const runCompiledEvents = generateCompiledEventsForEventsFunction(
         gd,
@@ -1833,14 +1835,14 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
         .getEvents()
         .unserializeFrom(project, eventsSerializerElement);
 
-      const parameter = new gd.ParameterMetadata();
-      parameter.setType('number');
-      parameter.setName('IncreaseValue');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.setType('object');
-      parameter.setName('MyParamObject');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.delete();
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('IncreaseValue', 0)
+        .setType('number');
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('MyParamObject', 1)
+        .setType('object');
 
       const runCompiledEvents = generateCompiledEventsForEventsFunction(
         gd,
@@ -1950,14 +1952,14 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
         .getEvents()
         .unserializeFrom(project, eventsSerializerElement);
 
-      const parameter = new gd.ParameterMetadata();
-      parameter.setType('number');
-      parameter.setName('IncreaseValue');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.setType('object');
-      parameter.setName('MyParamObject');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.delete();
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('IncreaseValue', 0)
+        .setType('number');
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('MyParamObject', 1)
+        .setType('object');
 
       const runCompiledEvents = generateCompiledEventsForEventsFunction(
         gd,
@@ -2068,14 +2070,14 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
         .getEvents()
         .unserializeFrom(project, eventsSerializerElement);
 
-      const parameter = new gd.ParameterMetadata();
-      parameter.setType('number');
-      parameter.setName('IncreaseValue');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.setType('object');
-      parameter.setName('MyParamObject');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.delete();
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('IncreaseValue', 0)
+        .setType('number');
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('MyParamObject', 1)
+        .setType('object');
 
       const runCompiledEvents = generateCompiledEventsForEventsFunction(
         gd,
@@ -2220,14 +2222,14 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
         .getEvents()
         .unserializeFrom(project, eventsSerializerElement);
 
-      const parameter = new gd.ParameterMetadata();
-      parameter.setType('number');
-      parameter.setName('IncreaseValue');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.setType('object');
-      parameter.setName('MyParamObject');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.delete();
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('IncreaseValue', 0)
+        .setType('number');
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('MyParamObject', 1)
+        .setType('object');
 
       const runCompiledEvents = generateCompiledEventsForEventsFunction(
         gd,
@@ -2419,17 +2421,15 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
           .getEvents()
           .unserializeFrom(project, eventsSerializerElement);
 
-        const parameter = new gd.ParameterMetadata();
-        parameter.setType('number');
-        parameter.setName('IncreaseValue');
-        eventsFunction.getParameters().push_back(parameter);
-        parameter.setType('object');
-        parameter.setName('MyParamObject');
-        parameter.setExtraInfo(
-          'FakeObjectWithAsyncAction::FakeObjectWithAsyncAction'
-        );
-        eventsFunction.getParameters().push_back(parameter);
-        parameter.delete();
+        eventsFunction
+          .getParameters()
+          .insertNewParameter('IncreaseValue', 0)
+          .setType('number');
+        eventsFunction
+          .getParameters()
+          .insertNewParameter('MyParamObject', 1)
+          .setType('object')
+          .setExtraInfo('FakeObjectWithAsyncAction::FakeObjectWithAsyncAction');
 
         const runCompiledEvents = generateCompiledEventsForEventsFunction(
           gd,
@@ -2483,17 +2483,15 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
           .getEvents()
           .unserializeFrom(project, eventsSerializerElement);
 
-        const parameter = new gd.ParameterMetadata();
-        parameter.setType('number');
-        parameter.setName('IncreaseValue');
-        eventsFunction.getParameters().push_back(parameter);
-        parameter.setType('object');
-        parameter.setName('MyParamObject');
-        parameter.setExtraInfo(
-          'FakeObjectWithAsyncAction::FakeObjectWithAsyncAction'
-        );
-        eventsFunction.getParameters().push_back(parameter);
-        parameter.delete();
+        eventsFunction
+          .getParameters()
+          .insertNewParameter('IncreaseValue', 0)
+          .setType('number');
+        eventsFunction
+          .getParameters()
+          .insertNewParameter('MyParamObject', 1)
+          .setType('object')
+          .setExtraInfo('FakeObjectWithAsyncAction::FakeObjectWithAsyncAction');
 
         const runCompiledEvents = generateCompiledEventsForEventsFunction(
           gd,
@@ -2547,17 +2545,15 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
           .getEvents()
           .unserializeFrom(project, eventsSerializerElement);
 
-        const parameter = new gd.ParameterMetadata();
-        parameter.setType('number');
-        parameter.setName('IncreaseValue');
-        eventsFunction.getParameters().push_back(parameter);
-        parameter.setType('object');
-        parameter.setName('MyParamObject');
-        parameter.setExtraInfo(
-          'FakeObjectWithAsyncAction::FakeObjectWithAsyncAction'
-        );
-        eventsFunction.getParameters().push_back(parameter);
-        parameter.delete();
+        eventsFunction
+          .getParameters()
+          .insertNewParameter('IncreaseValue', 0)
+          .setType('number');
+        eventsFunction
+          .getParameters()
+          .insertNewParameter('MyParamObject', 1)
+          .setType('object')
+          .setExtraInfo('FakeObjectWithAsyncAction::FakeObjectWithAsyncAction');
 
         const runCompiledEvents = generateCompiledEventsForEventsFunction(
           gd,
@@ -2703,17 +2699,15 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
         .getEvents()
         .unserializeFrom(project, eventsSerializerElement);
 
-      const parameter = new gd.ParameterMetadata();
-      parameter.setType('number');
-      parameter.setName('IncreaseValue');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.setType('object');
-      parameter.setName('MyParamObject');
-      parameter.setExtraInfo(
-        'FakeObjectWithAsyncAction::FakeObjectWithAsyncAction'
-      );
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.delete();
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('IncreaseValue', 0)
+        .setType('number');
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('MyParamObject', 1)
+        .setType('object')
+        .setExtraInfo('FakeObjectWithAsyncAction::FakeObjectWithAsyncAction');
 
       const runCompiledEvents = generateCompiledEventsForEventsFunction(
         gd,
@@ -2834,14 +2828,14 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
         .getEvents()
         .unserializeFrom(project, eventsSerializerElement);
 
-      const parameter = new gd.ParameterMetadata();
-      parameter.setType('number');
-      parameter.setName('IncreaseValue');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.setType('object');
-      parameter.setName('MyParamObject');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.delete();
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('IncreaseValue', 0)
+        .setType('number');
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('MyParamObject', 1)
+        .setType('object');
 
       const runCompiledEvents = generateCompiledEventsForEventsFunction(
         gd,
@@ -2963,14 +2957,14 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
         .getEvents()
         .unserializeFrom(project, eventsSerializerElement);
 
-      const parameter = new gd.ParameterMetadata();
-      parameter.setType('number');
-      parameter.setName('IncreaseValue');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.setType('object');
-      parameter.setName('MyParamObject');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.delete();
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('IncreaseValue', 0)
+        .setType('number');
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('MyParamObject', 1)
+        .setType('object');
 
       const runCompiledEvents = generateCompiledEventsForEventsFunction(
         gd,
@@ -3064,14 +3058,14 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
         .getEvents()
         .unserializeFrom(project, eventsSerializerElement);
 
-      const parameter = new gd.ParameterMetadata();
-      parameter.setType('number');
-      parameter.setName('IncreaseValue');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.setType('object');
-      parameter.setName('MyParamObject');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.delete();
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('IncreaseValue', 0)
+        .setType('number');
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('MyParamObject', 1)
+        .setType('object');
 
       const runCompiledEvents = generateCompiledEventsForEventsFunction(
         gd,
@@ -3201,20 +3195,19 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
         .getEvents()
         .unserializeFrom(project, eventsSerializerElement);
 
-      const parameter = new gd.ParameterMetadata();
-      parameter.setType('number');
-      parameter.setName('IncreaseValue');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.setType('object');
-      parameter.setName('MyParamObject');
-      parameter.setExtraInfo(
-        'FakeObjectWithAsyncAction::FakeObjectWithAsyncAction'
-      );
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.setType('object');
-      parameter.setName('MyOtherParamObject');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.delete();
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('IncreaseValue', 0)
+        .setType('number');
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('MyParamObject', 1)
+        .setType('object')
+        .setExtraInfo('FakeObjectWithAsyncAction::FakeObjectWithAsyncAction');
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('MyOtherParamObject', 2)
+        .setType('object');
 
       const runCompiledEvents = generateCompiledEventsForEventsFunction(
         gd,
@@ -3457,20 +3450,19 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
         .getEvents()
         .unserializeFrom(project, eventsSerializerElement);
 
-      const parameter = new gd.ParameterMetadata();
-      parameter.setType('number');
-      parameter.setName('IncreaseValue');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.setType('object');
-      parameter.setName('MyParamObject');
-      parameter.setExtraInfo(
-        'FakeObjectWithAsyncAction::FakeObjectWithAsyncAction'
-      );
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.setType('object');
-      parameter.setName('MyOtherParamObject');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.delete();
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('IncreaseValue', 0)
+        .setType('number');
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('MyParamObject', 1)
+        .setType('object')
+        .setExtraInfo('FakeObjectWithAsyncAction::FakeObjectWithAsyncAction');
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('MyOtherParamObject', 2)
+        .setType('object');
 
       const runCompiledEvents = generateCompiledEventsForEventsFunction(
         gd,

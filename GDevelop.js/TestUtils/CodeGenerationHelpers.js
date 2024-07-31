@@ -40,18 +40,18 @@ function generateCompiledEventsForEventsFunctionWithContext(
   logCode = false
 ) {
   const namespace = 'functionNamespace';
-  const eventsFunctionsExtensionCodeGenerator =
-    new gd.EventsFunctionsExtensionCodeGenerator(project);
+  const eventsFunctionsExtensionCodeGenerator = new gd.EventsFunctionsExtensionCodeGenerator(
+    project
+  );
 
   const includeFiles = new gd.SetString();
-  const code =
-    eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
-      extension,
-      eventsFunction,
-      namespace,
-      includeFiles,
-      true
-    );
+  const code = eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
+    extension,
+    eventsFunction,
+    namespace,
+    includeFiles,
+    true
+  );
 
   eventsFunctionsExtensionCodeGenerator.delete();
   includeFiles.delete();
@@ -234,37 +234,46 @@ function generateCompiledEventsForSerializedEventsBasedExtension(
     objects: {},
   };
 
-  const eventsFunctionsExtensionCodeGenerator =
-    new gd.EventsFunctionsExtensionCodeGenerator(project);
+  const eventsFunctionsExtensionCodeGenerator = new gd.EventsFunctionsExtensionCodeGenerator(
+    project
+  );
   for (let i = 0; i < extension.getEventsFunctionsCount(); i++) {
     const eventsFunction = extension.getEventsFunctionAt(i);
-    generatedExtensionModule.freeFunctions[eventsFunction.getName()] =
-      generatedEventsCodeToJSFunction(
-        eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
-          extension,
-          eventsFunction,
-          codeNamespace,
-          includeFiles,
-          true
-        ),
-        gdjs,
-        runtimeScene
-      );
+    generatedExtensionModule.freeFunctions[
+      eventsFunction.getName()
+    ] = generatedEventsCodeToJSFunction(
+      eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
+        extension,
+        eventsFunction,
+        codeNamespace,
+        includeFiles,
+        true
+      ),
+      gdjs,
+      runtimeScene
+    );
   }
   eventsFunctionsExtensionCodeGenerator.delete();
 
   const behaviorsList = extension.getEventsBasedBehaviors();
   for (let i = 0; i < behaviorsList.getCount(); i++) {
     const behavior = behaviorsList.getAt(i);
-    generatedExtensionModule.behaviors[behavior.getName()] =
-      generateCompiledEventsForEventsBasedBehavior(gd, project, behavior, gdjs);
+    generatedExtensionModule.behaviors[
+      behavior.getName()
+    ] = generateCompiledEventsForEventsBasedBehavior(
+      gd,
+      project,
+      behavior,
+      gdjs
+    );
   }
 
   const objectsLists = extension.getEventsBasedObjects();
   for (let i = 0; i < objectsLists.getCount(); i++) {
     const obj = objectsLists.getAt(i);
-    generatedExtensionModule.objects[obj.getName()] =
-      generateCompiledEventsForEventsBasedObject(gd, project, obj, gdjs);
+    generatedExtensionModule.objects[
+      obj.getName()
+    ] = generateCompiledEventsForEventsBasedObject(gd, project, obj, gdjs);
   }
 
   includeFiles.delete();
@@ -295,9 +304,7 @@ function generateCompiledEventsFromSerializedEvents(
       for (const groupName in groups) {
         const objectsNames = groups[groupName];
 
-        const group = eventsFunction
-          .getObjectGroups()
-          .insertNew(groupName, 0);
+        const group = eventsFunction.getObjectGroups().insertNew(groupName, 0);
         for (const objectName of objectsNames) {
           group.addObject(objectName);
         }
@@ -308,11 +315,10 @@ function generateCompiledEventsFromSerializedEvents(
       for (const parameterName in parameterTypes) {
         const parameterType = parameterTypes[parameterName];
 
-        const parameter = new gd.ParameterMetadata();
-        parameter.setType(parameterType);
-        parameter.setName(parameterName);
-        eventsFunction.getParameters().push_back(parameter);
-        parameter.delete();
+        const parameters = eventsFunction.getParameters();
+        parameters
+          .addNewParameter(parameterName)
+          .setType(parameterType);
       }
     }
   }
@@ -354,9 +360,7 @@ function generateCompiledEventsFunctionFromSerializedEvents(
       for (const groupName in groups) {
         const objectsNames = groups[groupName];
 
-        const group = eventsFunction
-          .getObjectGroups()
-          .insertNew(groupName, 0);
+        const group = eventsFunction.getObjectGroups().insertNew(groupName, 0);
         for (const objectName of objectsNames) {
           group.addObject(objectName);
         }
@@ -367,11 +371,10 @@ function generateCompiledEventsFunctionFromSerializedEvents(
       for (const parameterName in parameterTypes) {
         const parameterType = parameterTypes[parameterName];
 
-        const parameter = new gd.ParameterMetadata();
-        parameter.setType(parameterType);
-        parameter.setName(parameterName);
-        eventsFunction.getParameters().push_back(parameter);
-        parameter.delete();
+        const parameters = eventsFunction.getParameters();
+        parameters
+          .addNewParameter(parameterName)
+          .setType(parameterType);
       }
     }
   }

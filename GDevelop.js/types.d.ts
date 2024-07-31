@@ -2081,6 +2081,7 @@ export class ParameterMetadataContainer extends EmscriptenObject {
   getParametersCount(): number;
   getParameterPosition(parameterMetadata: ParameterMetadata): number;
   clearParameters(): void;
+  addNewParameter(name: string): ParameterMetadata;
 }
 
 export class EventsFunctionsContainer extends EmscriptenObject {

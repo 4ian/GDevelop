@@ -5,10 +5,10 @@
  */
 #pragma once
 
-#include <vector>
 #include "GDCore/Extensions/Metadata/ParameterMetadata.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/SerializableWithNameList.h"
+#include <vector>
 namespace gd {
 class SerializerElement;
 }
@@ -33,9 +33,7 @@ public:
   /**
    * \brief Check if the function with the specified name exists.
    */
-  bool HasParameterNamed(const gd::String& name) const {
-    return Has(name);
-  }
+  bool HasParameterNamed(const gd::String &name) const { return Has(name); }
 
   /**
    * \brief Get the function with the specified name.
@@ -43,7 +41,7 @@ public:
    * \warning Trying to access to a not existing function will result in
    * undefined behavior.
    */
-  gd::ParameterMetadata& GetParameter(const gd::String& name) {
+  gd::ParameterMetadata &GetParameter(const gd::String &name) {
     return Get(name);
   }
 
@@ -53,7 +51,7 @@ public:
    * \warning Trying to access to a not existing function will result in
    * undefined behavior.
    */
-  const gd::ParameterMetadata& GetParameter(const gd::String& name) const {
+  const gd::ParameterMetadata &GetParameter(const gd::String &name) const {
     return Get(name);
   }
 
@@ -63,9 +61,7 @@ public:
    * \warning Trying to access to a not existing function will result in
    * undefined behavior.
    */
-  gd::ParameterMetadata& GetParameter(std::size_t index) {
-    return Get(index);
-  }
+  gd::ParameterMetadata &GetParameter(std::size_t index) { return Get(index); }
 
   /**
    * \brief Get the function at the specified index in the list.
@@ -73,7 +69,7 @@ public:
    * \warning Trying to access to a not existing function will result in
    * undefined behavior.
    */
-  const gd::ParameterMetadata& GetParameter(std::size_t index) const {
+  const gd::ParameterMetadata &GetParameter(std::size_t index) const {
     return Get(index);
   }
 
@@ -82,35 +78,42 @@ public:
    */
   std::size_t GetParametersCount() const { return GetCount(); }
 
-  gd::ParameterMetadata& InsertNewParameter(const gd::String& name,
-                                              std::size_t position) {
+  gd::ParameterMetadata &InsertNewParameter(const gd::String &name,
+                                            std::size_t position) {
     return InsertNew(name, position);
   }
-  gd::ParameterMetadata& InsertParameter(const gd::ParameterMetadata& object,
-                                           std::size_t position) {
+  gd::ParameterMetadata &InsertParameter(const gd::ParameterMetadata &object,
+                                         std::size_t position) {
     return Insert(object, position);
   }
-  void RemoveParameter(const gd::String& name) { return Remove(name); }
+  gd::ParameterMetadata &AddNewParameter(const gd::String &name) {
+    return InsertNew(name, GetCount());
+  }
+  gd::ParameterMetadata &AddParameter(const gd::ParameterMetadata &object) {
+    return Insert(object, GetCount());
+  }
+  void RemoveParameter(const gd::String &name) { return Remove(name); }
   void ClearParameters() { return Clear(); }
   void MoveParameter(std::size_t oldIndex, std::size_t newIndex) {
     return Move(oldIndex, newIndex);
   };
-  std::size_t GetParameterPosition(const gd::ParameterMetadata& parameterMetadata) {
+  std::size_t
+  GetParameterPosition(const gd::ParameterMetadata &parameterMetadata) {
     return GetPosition(parameterMetadata);
   };
 
   /**
    * \brief Provide a raw access to the vector containing the functions.
    */
-  const std::vector<std::unique_ptr<gd::ParameterMetadata>>& GetInternalVector()
-      const {
+  const std::vector<std::unique_ptr<gd::ParameterMetadata>> &
+  GetInternalVector() const {
     return elements;
   };
 
   /**
    * \brief Provide a raw access to the vector containing the functions.
    */
-  std::vector<std::unique_ptr<gd::ParameterMetadata>>& GetInternalVector() {
+  std::vector<std::unique_ptr<gd::ParameterMetadata>> &GetInternalVector() {
     return elements;
   };
   ///@}
@@ -121,25 +124,25 @@ public:
   /**
    * \brief Serialize events functions.
    */
-  void SerializeParametersTo(SerializerElement& element) const {
+  void SerializeParametersTo(SerializerElement &element) const {
     return SerializeElementsTo("parameters", element);
   };
 
   /**
    * \brief Unserialize the events functions.
    */
-  void UnserializeParametersFrom(const SerializerElement& element) {
+  void UnserializeParametersFrom(const SerializerElement &element) {
     return UnserializeElementsFrom("parameters", element);
   };
   ///@}
- protected:
+protected:
   /**
    * Initialize object using another object. Used by copy-ctor and assign-op.
    * Don't forget to update me if members were changed!
    */
-  void Init(const gd::ParameterMetadataContainer& other) {
+  void Init(const gd::ParameterMetadataContainer &other) {
     return SerializableWithNameList<gd::ParameterMetadata>::Init(other);
   };
 };
 
-}  // namespace gd
+} // namespace gd

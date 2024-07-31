@@ -10,6 +10,7 @@ declare class gdParameterMetadataContainer {
   getParametersCount(): number;
   getParameterPosition(parameterMetadata: gdParameterMetadata): number;
   clearParameters(): void;
+  addNewParameter(name: string): gdParameterMetadata;
   delete(): void;
   ptr: number;
 };

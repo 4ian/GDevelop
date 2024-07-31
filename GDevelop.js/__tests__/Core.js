@@ -4214,26 +4214,15 @@ describe('libGD.js', function () {
     });
 
     it('can give the previous object parameter', function () {
-      const parameters = new gd.VectorParameterMetadata();
+      const eventsFunction = new gd.EventsFunction();
+      const parameters = eventsFunction.getParameters();
       const parameter1 = new gd.ParameterMetadata();
-      parameter1.setType('objectList');
-      const parameter2 = new gd.ParameterMetadata();
-      parameter2.setType('behavior');
-      const parameter3 = new gd.ParameterMetadata();
-      parameter3.setType('objectList');
-      const parameter4 = new gd.ParameterMetadata();
-      parameter4.setType('string');
-      const parameter5 = new gd.ParameterMetadata();
-      parameter5.setType('objectvar');
-      const parameter6 = new gd.ParameterMetadata();
-      parameter6.setType('objectvar');
-
-      parameters.push_back(parameter1);
-      parameters.push_back(parameter2);
-      parameters.push_back(parameter3);
-      parameters.push_back(parameter4);
-      parameters.push_back(parameter5);
-      parameters.push_back(parameter6);
+      parameters.insertNewParameter('Param1', 0).setType('objectList');
+      parameters.insertNewParameter('Param2', 1).setType('behavior');
+      parameters.insertNewParameter('Param3', 2).setType('objectList');
+      parameters.insertNewParameter('Param4', 3).setType('string');
+      parameters.insertNewParameter('Param5', 4).setType('objectvar');
+      parameters.insertNewParameter('Param6', 5).setType('objectvar');
 
       objectsContainer = new gd.ObjectsContainer();
       expect(
@@ -4257,6 +4246,8 @@ describe('libGD.js', function () {
       expect(
         gd.ParameterMetadataTools.getObjectParameterIndexFor(parameters, 999)
       ).toBe(-1);
+
+      eventsFunction.delete();
     });
   });
 

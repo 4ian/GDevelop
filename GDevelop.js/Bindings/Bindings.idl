@@ -2870,6 +2870,7 @@ interface ParameterMetadataContainer {
     unsigned long GetParametersCount();
     unsigned long GetParameterPosition([Const, Ref] ParameterMetadata parameterMetadata);
     void ClearParameters();
+    [Ref] ParameterMetadata AddNewParameter([Const] DOMString name);
 };
 
 enum EventsFunctionsContainer_FunctionOwner {

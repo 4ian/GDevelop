@@ -93,7 +93,7 @@ export const setupFunctionFromEvents = ({
   parameters.clearParameters();
   [...parameterGroupNames, ...parameterObjectNames].forEach(objectName => {
     parameters
-      .insertNewParameter(objectName, parameters.getParametersCount())
+      .addNewParameter(objectName)
       .setType('objectList')
       .setExtraInfo(
         projectScopedContainers
@@ -108,7 +108,7 @@ export const setupFunctionFromEvents = ({
 
     behaviorNames.forEach(behaviorName => {
       parameters
-        .insertNewParameter(behaviorName, parameters.getParametersCount())
+        .addNewParameter(behaviorName)
         .setType('behavior')
         .setName(behaviorName)
         .setExtraInfo(

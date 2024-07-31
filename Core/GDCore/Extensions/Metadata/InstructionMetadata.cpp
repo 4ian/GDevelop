@@ -78,7 +78,7 @@ InstructionMetadata& InstructionMetadata::AddParameter(
   // TODO: Assert against supplementaryInformation === "emsc" (when running with
   // Emscripten), and warn about a missing argument when calling addParameter.
 
-  parameters.InsertParameter(info, parameters.GetParametersCount());
+  parameters.AddParameter(info);
   return *this;
 }
 
@@ -89,7 +89,7 @@ InstructionMetadata& InstructionMetadata::AddCodeOnlyParameter(
   info.codeOnly = true;
   info.SetExtraInfo(supplementaryInformation);
 
-  parameters.InsertParameter(info, parameters.GetParametersCount());
+  parameters.AddParameter(info);
   return *this;
 }
 

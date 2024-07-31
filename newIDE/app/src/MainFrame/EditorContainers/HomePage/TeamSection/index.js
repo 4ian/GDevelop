@@ -84,6 +84,8 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
   ) => {
     const {
       groups,
+      team,
+      admins,
       members,
       memberships,
       onChangeGroupName,
@@ -306,6 +308,31 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
                 </ColumnStackLayout>
               </Line>
             </Paper>
+          )}
+          {team && members && admins && (
+            <Column noMargin>
+              <Text noMargin>
+                <Trans>Your team has {team.seats} seats:</Trans>
+              </Text>
+              <li>
+                <Text displayInlineAsSpan noMargin>
+                  <Trans>{members.length} students</Trans>
+                </Text>
+              </li>
+              <li>
+                <Text displayInlineAsSpan noMargin>
+                  <Trans>{admins.length} admins (one is you)</Trans>
+                </Text>
+              </li>
+              <li>
+                <Text displayInlineAsSpan noMargin>
+                  <Trans>
+                    {team.seats - members.length - admins.length} available
+                    seats
+                  </Trans>
+                </Text>
+              </li>
+            </Column>
           )}
           <div style={styles.roomsContainer}>
             <Line justifyContent="space-between" alignItems="center">

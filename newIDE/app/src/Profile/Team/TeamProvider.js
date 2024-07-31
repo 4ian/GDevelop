@@ -15,6 +15,7 @@ import {
   updateUserGroup,
   deleteGroup,
   createGroup,
+  listTeamAdmins,
 } from '../../Utils/GDevelopServices/User';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import { listOtherUserCloudProjects } from '../../Utils/GDevelopServices/Project';
@@ -31,6 +32,7 @@ const TeamProvider = ({ children }: Props) => {
   const [groups, setGroups] = React.useState<?(TeamGroup[])>(null);
   const [team, setTeam] = React.useState<?Team>(null);
   const [members, setMembers] = React.useState<?(User[])>(null);
+  const [admins, setAdmins] = React.useState<?(User[])>(null);
   const [memberships, setMemberships] = React.useState<?(TeamMembership[])>(
     null
   );
@@ -93,6 +95,12 @@ const TeamProvider = ({ children }: Props) => {
         team.id
       );
       setMembers(teamMembers);
+      const teamAdmins = await listTeamAdmins(
+        getAuthorizationHeader,
+        profile.id,
+        team.id
+      );
+      setAdmins(teamAdmins);
     },
     [team, getAuthorizationHeader, profile]
   );
@@ -231,6 +239,7 @@ const TeamProvider = ({ children }: Props) => {
       value={{
         team,
         groups,
+        admins,
         members,
         memberships,
         onChangeGroupName,

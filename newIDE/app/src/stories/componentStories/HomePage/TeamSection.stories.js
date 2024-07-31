@@ -35,6 +35,15 @@ const team: Team = {
   seats: 8,
 };
 
+const initialAdmins: Array<User> = [
+  // $FlowIgnore - the whole user object is not needed for this component
+  {
+    id: 'user0',
+    email: 'user0@teacher.com',
+    username: 'Teacher',
+  },
+];
+
 const initialMembers: Array<User> = [
   // $FlowIgnore - the whole user object is not needed for this component
   {
@@ -259,6 +268,7 @@ const MockTeamProvider = ({
             team: loading ? null : team,
             members: loading ? null : members,
             groups: loading ? null : groups,
+            admins: initialAdmins,
             memberships: loading ? null : memberships,
             onChangeGroupName: changeGroupName,
             onChangeUserGroup: changeUserGroup,

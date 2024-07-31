@@ -216,6 +216,19 @@ export const listTeamMembers = async (
   return response.data;
 };
 
+export const listTeamAdmins = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  teamId: string
+): Promise<Array<User>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await client.get(`/user`, {
+    headers: { Authorization: authorizationHeader },
+    params: { userId, teamId, memberType: 'admin' },
+  });
+  return response.data;
+};
+
 export const listTeamMemberships = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,

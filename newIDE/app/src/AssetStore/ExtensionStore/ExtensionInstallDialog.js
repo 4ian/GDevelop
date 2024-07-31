@@ -176,7 +176,7 @@ const ExtensionInstallDialog = ({
                   <Trans>Not compatible</Trans>
                 ) : isAlreadyInstalled ? (
                   isFromStore ? (
-                    extensionUpdate ? (
+                    extensionUpdate && installedExtension && extensionShortHeader.version !== installedExtension.getVersion() ? (
                       extensionShortHeader.tier === 'community' ? (
                         <Trans>Update (could break the project)</Trans>
                       ) : (
@@ -241,7 +241,7 @@ const ExtensionInstallDialog = ({
           />
           <Column expand>
             <Text noMargin size="body2">
-              {extensionUpdate && installedExtension ? (
+              {extensionUpdate && installedExtension && extensionShortHeader.version !== installedExtension.getVersion() ? (
                 <Trans>{`Version ${installedExtension.getVersion()} (${
                   extensionShortHeader.version
                 } available)`}</Trans>

@@ -216,7 +216,7 @@ const EducationMarketingSection = ({
       </ColumnStackLayout>
     </Form>
   );
-  console.log(gdevelopTheme);
+
   return (
     <SectionContainer title={<Trans>Classrooms</Trans>}>
       <SectionRow>

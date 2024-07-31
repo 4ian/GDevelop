@@ -888,7 +888,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       'TileIdAtGrid',
       _('Tile (on the grid)'),
       _('the id of the tile at the grid coordinates'),
-      _('the tile id at grid coordinates _PARAM2_ ; _PARAM3_'),
+      _('the tile id at grid coordinates _PARAM3_ ; _PARAM4_'),
       '',
       'JsPlatform/Extensions/tile_map.svg'
     )

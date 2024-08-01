@@ -54,6 +54,7 @@ import Text from '../UI/Text';
 import { capitalize } from 'lodash';
 import PrivateGameTemplateInformationPage from './PrivateGameTemplates/PrivateGameTemplateInformationPage';
 import { PrivateGameTemplateStoreContext } from './PrivateGameTemplates/PrivateGameTemplateStoreContext';
+import { ObjectTypeAssetStoreSearchFilter } from './AssetStoreSearchFilter';
 
 type Props = {|
   hideGameTemplates?: boolean, // TODO: if we add more options, use an array instead.
@@ -62,11 +63,17 @@ type Props = {|
     privateGameTemplateListingData: PrivateGameTemplateListingData
   ) => void,
   onOpenProfile?: () => void,
+  assetSwappedObject?: ?gdObject,
 |};
 
 export type AssetStoreInterface = {|
   onClose: () => void,
 |};
+
+// TODO
+const toAssetStoreType = (type: string) => {
+  return type === 'Sprite' ? 'sprite' : type;
+};
 
 const identifyAssetPackKind = ({
   privateAssetPackListingDatas,
@@ -100,6 +107,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       displayPromotions,
       onOpenPrivateGameTemplateListingData,
       onOpenProfile,
+      assetSwappedObject,
     }: Props,
     ref
   ) => {
@@ -115,7 +123,44 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       searchText,
       setSearchText: setAssetStoreSearchText,
       clearAllFilters: clearAllAssetStoreFilters,
+      assetFiltersState,
     } = React.useContext(AssetStoreContext);
+
+    React.useEffect(
+      () => {
+        if (!assetSwappedObject && shopNavigationState.isAssetSwappingHistory) {
+          shopNavigationState.openHome();
+        }
+        if (
+          assetSwappedObject &&
+          (!shopNavigationState.isAssetSwappingHistory ||
+            !shopNavigationState.isRootPage)
+        ) {
+          shopNavigationState.openAssetSwapping();
+        }
+      },
+      [assetSwappedObject, shopNavigationState]
+    );
+    React.useEffect(
+      () => {
+        if (!assetSwappedObject) {
+          return;
+        }
+        const assetSwappingType = toAssetStoreType(
+          assetSwappedObject.getType()
+        );
+        if (
+          assetFiltersState.objectTypeFilter.objectTypes.size !== 1 ||
+          !assetFiltersState.objectTypeFilter.objectTypes.has(assetSwappingType)
+        ) {
+          assetFiltersState.setObjectTypeFilter(
+            new ObjectTypeAssetStoreSearchFilter(new Set([assetSwappingType]))
+          );
+        }
+      },
+      [assetFiltersState, assetSwappedObject, shopNavigationState]
+    );
+
     const {
       privateGameTemplateListingDatas,
       error: privateGameTemplateStoreError,
@@ -559,7 +604,9 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
             tooltip={t`Back to discover`}
             onClick={() => {
               setSearchText('');
-              const page = shopNavigationState.openHome();
+              const page = assetSwappedObject
+                ? shopNavigationState.openAssetSwapping()
+                : shopNavigationState.openHome();
               setScrollUpdateIsNeeded(page);
               clearAllAssetStoreFilters();
               setIsFiltersPanelOpen(false);
@@ -614,27 +661,31 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
           <Line justifyContent="space-between" noMargin alignItems="center">
             {(!isOnHomePage || !!openedShopCategory) && (
               <>
-                <Column expand alignItems="flex-start" noMargin>
-                  <TextButton
-                    icon={<ChevronArrowLeft />}
-                    label={<Trans>Back</Trans>}
-                    onClick={async () => {
-                      const page = shopNavigationState.backToPreviousPage();
-                      const isUpdatingSearchtext = reApplySearchTextIfNeeded(
-                        page
-                      );
-                      if (isUpdatingSearchtext) {
-                        // Updating the search is not instant, so we cannot apply the scroll position
-                        // right away. We force a wait as there's no easy way to know when results are completely updated.
-                        await new Promise(resolve => setTimeout(resolve, 500));
-                        setScrollUpdateIsNeeded(page);
-                        applyBackScrollPosition(page); // We apply it manually, because the layout effect won't be called again.
-                      } else {
-                        setScrollUpdateIsNeeded(page);
-                      }
-                    }}
-                  />
-                </Column>
+                {shopNavigationState.isRootPage ? null : (
+                  <Column expand alignItems="flex-start" noMargin>
+                    <TextButton
+                      icon={<ChevronArrowLeft />}
+                      label={<Trans>Back</Trans>}
+                      onClick={async () => {
+                        const page = shopNavigationState.backToPreviousPage();
+                        const isUpdatingSearchtext = reApplySearchTextIfNeeded(
+                          page
+                        );
+                        if (isUpdatingSearchtext) {
+                          // Updating the search is not instant, so we cannot apply the scroll position
+                          // right away. We force a wait as there's no easy way to know when results are completely updated.
+                          await new Promise(resolve =>
+                            setTimeout(resolve, 500)
+                          );
+                          setScrollUpdateIsNeeded(page);
+                          applyBackScrollPosition(page); // We apply it manually, because the layout effect won't be called again.
+                        } else {
+                          setScrollUpdateIsNeeded(page);
+                        }
+                      }}
+                    />
+                  </Column>
+                )}
                 {(openedAssetPack ||
                   openedPrivateAssetPackListingData ||
                   filtersState.chosenCategory) && (
@@ -711,12 +762,18 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
             )
           ) : isOnSearchResultPage ? (
             <AssetsList
-              publicAssetPacks={publicAssetPacksSearchResults}
+              publicAssetPacks={
+                assetSwappedObject ? [] : publicAssetPacksSearchResults
+              }
               privateAssetPackListingDatas={
-                privateAssetPackListingDatasSearchResults
+                assetSwappedObject
+                  ? []
+                  : privateAssetPackListingDatasSearchResults
               }
               privateGameTemplateListingDatas={
-                privateGameTemplateListingDatasSearchResults
+                assetSwappedObject
+                  ? []
+                  : privateGameTemplateListingDatasSearchResults
               }
               assetShortHeaders={assetShortHeadersSearchResults}
               ref={assetsList}
@@ -783,7 +840,9 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                     </Line>
                   </Column>
                   <Line justifyContent="space-between" alignItems="center">
-                    <AssetStoreFilterPanel />
+                    <AssetStoreFilterPanel
+                      assetSwappedObject={assetSwappedObject}
+                    />
                   </Line>
                 </Column>
               </ScrollView>

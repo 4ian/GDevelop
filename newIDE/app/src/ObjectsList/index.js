@@ -9,6 +9,7 @@ import { AutoSizer } from 'react-virtualized';
 import Background from '../UI/Background';
 import SearchBar from '../UI/SearchBar';
 import NewObjectDialog from '../AssetStore/NewObjectDialog';
+import AssetSwappingDialog from '../AssetStore/AssetSwappingDialog';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
 import Window from '../Utils/Window';
@@ -297,6 +298,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       },
     }));
 
+    const [
+      objectAssetSwappingDialogOpen,
+      setObjectAssetSwappingDialogOpen,
+    ] = React.useState<{ object: gdObject } | null>(null);
+
     // Initialize keyboard shortcuts as empty.
     // onDelete, onDuplicate and onRename callbacks are set in an effect because it applies
     // to the selected item (that is a props). As it is stored in a ref, the keyboard shortcut
@@ -430,6 +436,15 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       },
       [onObjectCreated, objectsContainer]
     );
+
+    const swapObjectAsset = React.useCallback((object: gdObject) => {
+      setObjectAssetSwappingDialogOpen({ object });
+    }, []);
+
+    const canSwapAssetOfObject = React.useCallback((object: gdObject) => {
+      const type = object.getType();
+      return type === 'Scene3D::Model3DObject' || type === 'Sprite';
+    }, []);
 
     const onAddNewObject = React.useCallback(
       (item: ObjectFolderOrObjectWithContext | null) => {
@@ -1480,6 +1495,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             ),
           },
           { type: 'separator' },
+          {
+            label: i18n._(t`Swap asset`),
+            click: () => swapObjectAsset(object),
+            enabled: canSwapAssetOfObject(object),
+          },
+          { type: 'separator' },
           globalObjectsContainer && {
             label: i18n._(t`Set as global object`),
             enabled: !isObjectFolderOrObjectWithContextGlobal(item),
@@ -1527,6 +1548,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         objectsContainer,
         initialInstances,
         project,
+        canSwapAssetOfObject,
         canSetAsGlobalObject,
         onSelectAllInstancesOfObjectInLayout,
         onExportAssets,
@@ -1541,6 +1563,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         cutObjectFolderOrObjectWithContext,
         duplicateObjectFolderOrObjectWithContext,
         onEditObject,
+        swapObjectAsset,
         selectObjectFolderOrObjectWithContext,
         setAsGlobalObject,
         onAddObjectInstance,
@@ -1686,6 +1709,21 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             resourceManagementProps={resourceManagementProps}
             canInstallPrivateAsset={canInstallPrivateAsset}
             targetObjectFolderOrObjectWithContext={newObjectDialogOpen.from}
+          />
+        )}
+        {objectAssetSwappingDialogOpen && (
+          <AssetSwappingDialog
+            onClose={() => setObjectAssetSwappingDialogOpen(null)}
+            onCreateNewObject={() => {}}
+            onObjectsAddedFromAssets={() => {}}
+            project={project}
+            layout={layout}
+            eventsBasedObject={eventsBasedObject}
+            objectsContainer={objectsContainer}
+            object={objectAssetSwappingDialogOpen.object}
+            resourceManagementProps={resourceManagementProps}
+            canInstallPrivateAsset={canInstallPrivateAsset}
+            targetObjectFolderOrObjectWithContext={null}
           />
         )}
       </Background>

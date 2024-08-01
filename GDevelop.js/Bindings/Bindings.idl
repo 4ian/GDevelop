@@ -800,6 +800,8 @@ interface ObjectConfiguration {
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
+
+    unsigned long GetAnimationsCount();
 };
 
 interface UniquePtrObjectConfiguration {

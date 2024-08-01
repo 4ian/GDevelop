@@ -10,6 +10,7 @@ declare class gdObjectConfiguration {
   exposeResources(worker: gdArbitraryResourceWorker): void;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(project: gdProject, element: gdSerializerElement): void;
+  getAnimationsCount(): number;
   delete(): void;
   ptr: number;
 };

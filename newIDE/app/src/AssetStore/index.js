@@ -54,7 +54,7 @@ import Text from '../UI/Text';
 import { capitalize } from 'lodash';
 import PrivateGameTemplateInformationPage from './PrivateGameTemplates/PrivateGameTemplateInformationPage';
 import { PrivateGameTemplateStoreContext } from './PrivateGameTemplates/PrivateGameTemplateStoreContext';
-import { ObjectTypeAssetStoreSearchFilter } from './AssetStoreSearchFilter';
+import { AssetSwappingAssetStoreSearchFilter } from './AssetStoreSearchFilter';
 
 type Props = {|
   hideGameTemplates?: boolean, // TODO: if we add more options, use an array instead.
@@ -69,11 +69,6 @@ type Props = {|
 export type AssetStoreInterface = {|
   onClose: () => void,
 |};
-
-// TODO
-const toAssetStoreType = (type: string) => {
-  return type === 'Sprite' ? 'sprite' : type;
-};
 
 const identifyAssetPackKind = ({
   privateAssetPackListingDatas,
@@ -124,34 +119,42 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       setSearchText: setAssetStoreSearchText,
       clearAllFilters: clearAllAssetStoreFilters,
       assetFiltersState,
+      assetShortHeadersById,
     } = React.useContext(AssetStoreContext);
 
     const assetSwappedObjectPtr = React.useRef<number | null>(null);
     React.useEffect(
       () => {
         if (assetSwappedObject) {
-          if (
-            assetSwappedObjectPtr.current !== assetSwappedObject.ptr
-          ) {
+          if (assetSwappedObjectPtr.current !== assetSwappedObject.ptr) {
             shopNavigationState.openAssetSwapping();
-            const assetSwappingType = toAssetStoreType(assetSwappedObject.getType());
-            assetFiltersState.setObjectTypeFilter(
-              new ObjectTypeAssetStoreSearchFilter(new Set([assetSwappingType]))
+            const assetShortHeader = assetShortHeadersById
+              ? assetShortHeadersById[assetSwappedObject.getAssetStoreId()]
+              : null;
+            assetFiltersState.setAssetSwappingFilter(
+              new AssetSwappingAssetStoreSearchFilter(
+                assetSwappedObject,
+                assetShortHeader
+              )
             );
           }
           assetSwappedObjectPtr.current = assetSwappedObject.ptr;
-        }
-        else {
+        } else {
           if (assetSwappedObjectPtr.current !== 0) {
             shopNavigationState.openHome();
-            assetFiltersState.setObjectTypeFilter(
-              new ObjectTypeAssetStoreSearchFilter(new Set())
+            assetFiltersState.setAssetSwappingFilter(
+              new AssetSwappingAssetStoreSearchFilter()
             );
           }
           assetSwappedObjectPtr.current = 0;
         }
       },
-      [assetFiltersState, assetSwappedObject, shopNavigationState]
+      [
+        assetFiltersState,
+        assetShortHeadersById,
+        assetSwappedObject,
+        shopNavigationState,
+      ]
     );
 
     const {

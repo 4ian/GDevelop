@@ -321,7 +321,7 @@ function AssetSwappingDialog({
       {({ i18n }) => (
         <>
           <Dialog
-            title={<Trans>Asset swapping</Trans>}
+            title={<Trans>Asset swapping of {object.getName()}</Trans>}
             secondaryActions={[
               <HelpButton helpPagePath="/objects" key="help" />,
             ]}

@@ -335,23 +335,25 @@ export const AssetStoreFilterPanel = ({
           onChoiceChange();
         }}
       />
-      {assetSwappedObject ? null : (<SetFilter
-        filterKey="ObjectType"
-        title={<Trans>Type of objects</Trans>}
-        choices={[
-          { label: t`Sprite`, value: 'sprite' },
-          { label: t`Tiled sprite`, value: 'tiled' },
-          { label: t`Panel sprite`, value: '9patch' },
-          { label: t`3D model`, value: 'Scene3D::Model3DObject' },
-        ]}
-        values={assetFiltersState.objectTypeFilter.objectTypes}
-        setValues={values => {
-          assetFiltersState.setObjectTypeFilter(
-            new ObjectTypeAssetStoreSearchFilter(values)
-          );
-          onChoiceChange();
-        }}
-      />)}
+      {assetSwappedObject ? null : (
+        <SetFilter
+          filterKey="ObjectType"
+          title={<Trans>Type of objects</Trans>}
+          choices={[
+            { label: t`Sprite`, value: 'sprite' },
+            { label: t`Tiled sprite`, value: 'tiled' },
+            { label: t`Panel sprite`, value: '9patch' },
+            { label: t`3D model`, value: 'Scene3D::Model3DObject' },
+          ]}
+          values={assetFiltersState.objectTypeFilter.objectTypes}
+          setValues={values => {
+            assetFiltersState.setObjectTypeFilter(
+              new ObjectTypeAssetStoreSearchFilter(values)
+            );
+            onChoiceChange();
+          }}
+        />
+      )}
       <ColorFilter
         filterKey="Color"
         title={<Trans>Color</Trans>}

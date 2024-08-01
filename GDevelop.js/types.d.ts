@@ -671,6 +671,7 @@ export class ObjectConfiguration extends EmscriptenObject {
   exposeResources(worker: ArbitraryResourceWorker): void;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
+  getAnimationsCount(): number;
 }
 
 export class UniquePtrObjectConfiguration extends EmscriptenObject {

@@ -261,6 +261,124 @@ export class ColorAssetStoreSearchFilter
   }
 }
 
+// TODO
+const toAssetStoreType = (type: string) => {
+  return type === 'Sprite' ? 'sprite' : type;
+};
+
+export class AssetSwappingAssetStoreSearchFilter
+  implements SearchFilter<AssetShortHeader> {
+  isEnabled: boolean;
+  objectType: string;
+  hasSeveralState: boolean;
+  other: AssetShortHeader | null;
+  tags: Array<string>;
+
+  constructor(
+    object: gdObject | null = null,
+    assetShortHeader: AssetShortHeader | null = null
+  ) {
+    if (object) {
+      this.isEnabled = true;
+      this.objectType = assetShortHeader
+        ? assetShortHeader.objectType
+        : toAssetStoreType(object.getType());
+      this.hasSeveralState = object.getConfiguration().getAnimationsCount() > 0;
+      this.other = assetShortHeader;
+      // The asset pack tag is not relevent.
+      this.tags = assetShortHeader ? assetShortHeader.tags.splice(0, 1) : [];
+    } else {
+      this.isEnabled = false;
+      this.objectType = '';
+      this.hasSeveralState = false;
+      this.other = null;
+      this.tags = [];
+    }
+  }
+
+  getPertinence(searchItem: AssetShortHeader): number {
+    if (!this.isEnabled) {
+      return 1;
+    }
+    if (
+      this.other === searchItem ||
+      this.objectType !== searchItem.objectType
+    ) {
+      return 0;
+    }
+
+    let similitude = 1;
+
+    {
+      const hasSeveralState = searchItem.animationsCount > 1;
+      if (this.hasSeveralState !== hasSeveralState) {
+        similitude *= 0.75;
+      }
+    }
+
+    const { other } = this;
+    if (!other) {
+      return similitude;
+    }
+
+    {
+      const isTopDown = searchItem.tags.includes('top-down');
+      const isIsometric = searchItem.tags.includes('isometric');
+      const isSideView = searchItem.tags.includes('side view');
+
+      const otherIsTopDown = other.tags.includes('top-down');
+      const otherIsIsometric = other.tags.includes('isometric');
+      const otherIsSideView = other.tags.includes('side view');
+
+      const areCompatible =
+        (isTopDown && otherIsTopDown) ||
+        (isIsometric && otherIsIsometric) ||
+        (isSideView && otherIsSideView) ||
+        (!isTopDown &&
+          !isIsometric &&
+          !isSideView &&
+          !otherIsTopDown &&
+          !otherIsIsometric &&
+          !otherIsSideView);
+      if (!areCompatible) {
+        similitude *= 0.5;
+      }
+    }
+
+    if (other.tags.length > 0) {
+      const sharedTagsCount = other.tags.reduce(
+        (accumulator, currentValue) =>
+          accumulator + (searchItem.tags.includes(currentValue) ? 1 : 0),
+        0
+      );
+      similitude *= 0.5 + (0.5 * sharedTagsCount) / other.tags.length;
+    }
+
+    {
+      const surface = searchItem.width * searchItem.height;
+      const otherSurface = other.width * other.height;
+      const smallestSurface = Math.min(surface, otherSurface);
+      const greatestSurface = Math.max(surface, otherSurface);
+
+      similitude *= 0.9 + (0.1 * smallestSurface) / greatestSurface;
+    }
+    {
+      const ratio = searchItem.width / searchItem.height;
+      const otherRatio = other.width / other.height;
+      const smallestRatio = Math.min(ratio, otherRatio);
+      const greatestRatio = Math.max(ratio, otherRatio);
+
+      similitude *= 0.9 + (0.1 * smallestRatio) / greatestRatio;
+    }
+
+    return similitude;
+  }
+
+  hasFilters(): boolean {
+    return true;
+  }
+}
+
 export class SimilarAssetStoreSearchFilter
   implements SearchFilter<AssetShortHeader> {
   other: AssetShortHeader;

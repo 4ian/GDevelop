@@ -126,36 +126,29 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       assetFiltersState,
     } = React.useContext(AssetStoreContext);
 
+    const assetSwappedObjectPtr = React.useRef<number | null>(null);
     React.useEffect(
       () => {
-        if (!assetSwappedObject && shopNavigationState.isAssetSwappingHistory) {
-          shopNavigationState.openHome();
+        if (assetSwappedObject) {
+          if (
+            assetSwappedObjectPtr.current !== assetSwappedObject.ptr
+          ) {
+            shopNavigationState.openAssetSwapping();
+            const assetSwappingType = toAssetStoreType(assetSwappedObject.getType());
+            assetFiltersState.setObjectTypeFilter(
+              new ObjectTypeAssetStoreSearchFilter(new Set([assetSwappingType]))
+            );
+          }
+          assetSwappedObjectPtr.current = assetSwappedObject.ptr;
         }
-        if (
-          assetSwappedObject &&
-          (!shopNavigationState.isAssetSwappingHistory ||
-            !shopNavigationState.isRootPage)
-        ) {
-          shopNavigationState.openAssetSwapping();
-        }
-      },
-      [assetSwappedObject, shopNavigationState]
-    );
-    React.useEffect(
-      () => {
-        if (!assetSwappedObject) {
-          return;
-        }
-        const assetSwappingType = toAssetStoreType(
-          assetSwappedObject.getType()
-        );
-        if (
-          assetFiltersState.objectTypeFilter.objectTypes.size !== 1 ||
-          !assetFiltersState.objectTypeFilter.objectTypes.has(assetSwappingType)
-        ) {
-          assetFiltersState.setObjectTypeFilter(
-            new ObjectTypeAssetStoreSearchFilter(new Set([assetSwappingType]))
-          );
+        else {
+          if (assetSwappedObjectPtr.current !== 0) {
+            shopNavigationState.openHome();
+            assetFiltersState.setObjectTypeFilter(
+              new ObjectTypeAssetStoreSearchFilter(new Set())
+            );
+          }
+          assetSwappedObjectPtr.current = 0;
         }
       },
       [assetFiltersState, assetSwappedObject, shopNavigationState]

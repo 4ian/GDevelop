@@ -454,7 +454,7 @@ bool Variable::operator==(const gd::Variable &variable) const {
       const auto &child = pair.second;
 
       auto it = variable.children.find(name);
-      if (it == children.end()) {
+      if (it == variable.children.end()) {
         return false;
       }
       auto &otherChild = it->second;

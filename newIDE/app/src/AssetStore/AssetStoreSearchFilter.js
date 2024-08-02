@@ -266,6 +266,22 @@ const toAssetStoreType = (type: string) => {
   return type === 'Sprite' ? 'sprite' : type;
 };
 
+// Thematic tags are noise for asset swapping as changing the theme may be what
+// users are looking for.
+const ignoredThematicTags = new Set([
+  'top-down',
+  'isometric',
+  'side view',
+  'pixel art',
+  'pirate',
+  'space',
+  'sea',
+  'city',
+  'medieval',
+  'nature',
+  'forest',
+]);
+
 export class AssetSwappingAssetStoreSearchFilter
   implements SearchFilter<AssetShortHeader> {
   isEnabled: boolean;
@@ -286,7 +302,11 @@ export class AssetSwappingAssetStoreSearchFilter
       this.hasSeveralState = object.getConfiguration().getAnimationsCount() > 0;
       this.other = assetShortHeader;
       // The asset pack tag is not relevent.
-      this.tags = assetShortHeader ? assetShortHeader.tags.splice(0, 1) : [];
+      this.tags = assetShortHeader
+        ? assetShortHeader.tags
+            .slice(1)
+            .filter(tags => !ignoredThematicTags.has(tags))
+        : [];
     } else {
       this.isEnabled = false;
       this.objectType = '';
@@ -297,6 +317,8 @@ export class AssetSwappingAssetStoreSearchFilter
   }
 
   getPertinence(searchItem: AssetShortHeader): number {
+    // As the sort is done with a dichotomy, items with similitude under 0.5
+    // are not sorted at all.
     if (!this.isEnabled) {
       return 1;
     }
@@ -309,15 +331,13 @@ export class AssetSwappingAssetStoreSearchFilter
 
     let similitude = 1;
 
-    {
-      const hasSeveralState = searchItem.animationsCount > 1;
-      if (this.hasSeveralState !== hasSeveralState) {
-        similitude *= 0.75;
-      }
-    }
-
     const { other } = this;
     if (!other) {
+      const hasSeveralState = searchItem.animationsCount > 1;
+      if (this.hasSeveralState && !hasSeveralState) {
+        similitude *= 0.8;
+      }
+
       return similitude;
     }
 
@@ -341,17 +361,17 @@ export class AssetSwappingAssetStoreSearchFilter
           !otherIsIsometric &&
           !otherIsSideView);
       if (!areCompatible) {
-        similitude *= 0.5;
+        similitude *= 0.8;
       }
     }
 
-    if (other.tags.length > 0) {
-      const sharedTagsCount = other.tags.reduce(
+    if (this.tags.length > 0) {
+      const sharedTagsCount = this.tags.reduce(
         (accumulator, currentValue) =>
           accumulator + (searchItem.tags.includes(currentValue) ? 1 : 0),
         0
       );
-      similitude *= 0.5 + (0.5 * sharedTagsCount) / other.tags.length;
+      similitude *= 0.8 + (0.2 * sharedTagsCount) / this.tags.length;
     }
 
     {
@@ -360,7 +380,7 @@ export class AssetSwappingAssetStoreSearchFilter
       const smallestSurface = Math.min(surface, otherSurface);
       const greatestSurface = Math.max(surface, otherSurface);
 
-      similitude *= 0.9 + (0.1 * smallestSurface) / greatestSurface;
+      similitude *= 0.95 + (0.05 * smallestSurface) / greatestSurface;
     }
     {
       const ratio = searchItem.width / searchItem.height;
@@ -368,7 +388,20 @@ export class AssetSwappingAssetStoreSearchFilter
       const smallestRatio = Math.min(ratio, otherRatio);
       const greatestRatio = Math.max(ratio, otherRatio);
 
-      similitude *= 0.9 + (0.1 * smallestRatio) / greatestRatio;
+      similitude *= 0.95 + (0.05 * smallestRatio) / greatestRatio;
+    }
+
+    const hasAnimatedState = searchItem.maxFramesCount > 1;
+    const hasSeveralState = searchItem.animationsCount > 1;
+    const otherHasAnimatedState = this.other.maxFramesCount > 1;
+    const otherHasSeveralState = this.other.animationsCount > 1;
+    if (
+      hasAnimatedState === otherHasAnimatedState &&
+      hasSeveralState === otherHasSeveralState
+    ) {
+      // There is not a lot of animated assets in the store.
+      // This ensures they are shown.
+      similitude = 0.76 + 0.24 * ((Math.max(0.5, similitude) - 0.5) * 2);
     }
 
     return similitude;

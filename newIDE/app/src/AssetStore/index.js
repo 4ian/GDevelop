@@ -128,6 +128,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         if (assetSwappedObject) {
           if (assetSwappedObjectPtr.current !== assetSwappedObject.ptr) {
             shopNavigationState.openAssetSwapping();
+            setAssetStoreSearchText('');
             const assetShortHeader = assetShortHeadersById
               ? assetShortHeadersById[assetSwappedObject.getAssetStoreId()]
               : null;
@@ -153,6 +154,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         assetFiltersState,
         assetShortHeadersById,
         assetSwappedObject,
+        setAssetStoreSearchText,
         shopNavigationState,
       ]
     );

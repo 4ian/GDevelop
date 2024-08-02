@@ -33,6 +33,10 @@ import { getAssetShortHeadersToDisplay } from './AssetsList';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import type { ObjectFolderOrObjectWithContext } from '../ObjectsList/EnumerateObjectFolderOrObject';
 import LoaderModal from '../UI/LoaderModal';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../Utils/Serializer';
 
 const isDev = Window.isDev();
 
@@ -52,6 +56,34 @@ export const useExtensionUpdateAlertDialog = () => {
       dismissButtonLabel: t`Skip the update`,
     });
   };
+};
+
+const mergeAnimations = (
+  objectsAnimations: Array<{ name: string }>,
+  assetAnimations: Array<{ name: string }>
+) => {
+  const animations = [];
+  // Ensure the object don't loose any animation.
+  for (const objectAnimation of objectsAnimations) {
+    const assetAnimation = assetAnimations.find(
+      assetAnimation => assetAnimation.name === objectAnimation.name
+    ) || {
+      ...assetAnimations[0],
+      name: objectAnimation.name,
+    };
+    animations.push(assetAnimation);
+  }
+  // Add extra animations from the asset.
+  for (const assetAnimation of assetAnimations) {
+    if (
+      !objectsAnimations.some(
+        objectAnimation => objectAnimation.name === assetAnimation.name
+      )
+    ) {
+      animations.push(assetAnimation);
+    }
+  }
+  return animations;
 };
 
 export const useFetchAssets = () => {
@@ -227,6 +259,47 @@ function AssetSwappingDialog({
           assetPackKind: isPrivate ? 'private' : 'public',
         });
 
+        if (installOutput.createdObjects.length > 0) {
+          const assetObject = installOutput.createdObjects[0];
+          const serializedAssetObject = serializeToJSObject(assetObject);
+          const serializedObject = serializeToJSObject(object);
+          if (object.getType() === 'Sprite') {
+            serializedObject.animations = mergeAnimations(
+              serializedObject.animations,
+              serializedAssetObject.animations
+            );
+          } else if (object.getType() === 'Scene3D::Model3DObject') {
+            const animations = (serializedObject.animations = mergeAnimations(
+              serializedObject.content.animations,
+              serializedAssetObject.content.animations
+            ));
+
+            const objectVolume =
+              serializedObject.content.width *
+              serializedObject.content.height *
+              serializedObject.content.depth;
+            const assetVolume =
+              serializedAssetObject.content.width *
+              serializedAssetObject.content.height *
+              serializedAssetObject.content.depth;
+
+            serializedObject.content = serializedAssetObject.content;
+            serializedObject.content.animation = animations;
+            serializedObject.content.width *= objectVolume / assetVolume;
+            serializedObject.content.height *= objectVolume / assetVolume;
+            serializedObject.content.depth *= objectVolume / assetVolume;
+          }
+          unserializeFromJSObject(
+            object,
+            serializedObject,
+            'unserializeFrom',
+            project
+          );
+        }
+        for (const createdObject of installOutput.createdObjects) {
+          objectsContainer.removeObject(createdObject.getName());
+        }
+
         onObjectsAddedFromAssets(installOutput.createdObjects);
 
         await resourceManagementProps.onFetchNewlyAddedResources();
@@ -248,15 +321,16 @@ function AssetSwappingDialog({
       fetchAssets,
       project,
       showExtensionUpdateConfirmation,
-      installPrivateAsset,
       eventsFunctionsExtensionsState,
+      installPrivateAsset,
       objectsContainer,
+      targetObjectFolderOrObjectWithContext,
       openedAssetPack,
+      onObjectsAddedFromAssets,
       resourceManagementProps,
       canInstallPrivateAsset,
       showAlert,
-      onObjectsAddedFromAssets,
-      targetObjectFolderOrObjectWithContext,
+      object,
     ]
   );
 

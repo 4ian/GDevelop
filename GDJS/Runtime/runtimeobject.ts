@@ -318,7 +318,10 @@ namespace gdjs {
       this.layer = '';
       this._livingOnScene = true;
       //@ts-ignore Reinitialize is like a constructor, it can overwrite the readonly property.
-      this.id = runtimeScene.createNewUniqueId();
+      this.id = runtimeScene
+        //
+        .getScene()
+        .createNewUniqueId();
       this.persistentUuid = null;
       this.networkId = null;
       this.pick = false;

@@ -4156,42 +4156,41 @@ describe('libGD.js', function () {
     it('can create an object container from parameters', function () {
       const project = gd.ProjectHelper.createNewGDJSProject();
 
-      const parameters = new gd.VectorParameterMetadata();
-      const parameter1 = new gd.ParameterMetadata();
-      parameter1.setType('objectList');
-      parameter1.setName('MyObjectWithoutType');
-      parameter1.setDescription('The first object to be used');
-      const parameter2 = new gd.ParameterMetadata();
-      parameter2.setType('expression');
-      parameter2.setName('MyNumber');
-      parameter2.setDescription('Some number');
-      const parameter3 = new gd.ParameterMetadata();
-      parameter3.setType('objectList');
-      // parameter3.setName(''); No name for this parameter
-      parameter3.setDescription(
-        'This parameter will be skipped, as it has no name'
-      );
-      parameter3.setExtraInfo('Sprite');
-      const parameter4 = new gd.ParameterMetadata();
-      parameter4.setType('string');
-      parameter4.setName('MyString');
-      parameter4.setDescription('Some string');
-      const parameter5 = new gd.ParameterMetadata();
-      parameter5.setType('objectList');
-      parameter5.setName('MySpriteObject');
-      parameter5.setDescription('The second object to be used, a sprite');
-      parameter5.setExtraInfo('Sprite');
+      const eventsFunction = new gd.EventsFunction();
+      const parameters = eventsFunction.getParameters();
+      parameters
+        .addNewParameter('MyObjectWithoutType')
+        .setType('objectList')
+        .setDescription('The first object to be used');
+      parameters
+        .addNewParameter('MyNumber')
+        .setType('expression')
+        .setDescription('Some number');
+      // No name for this parameter
+      parameters
+        .addNewParameter('')
+        .setType('objectList')
+        .setExtraInfo('Sprite')
+        .setDescription('This parameter will be skipped, as it has no name')
+      parameters
+        .addNewParameter('MyString')
+        .setType('string')
+        .setDescription('Some string');
+      parameters
+        .addNewParameter('MySpriteObject')
+        .setType('objectList')
+        .setExtraInfo('Sprite')
+        .setDescription('The second object to be used, a sprite');
 
-      parameters.push_back(parameter1);
-      parameters.push_back(parameter2);
-      parameters.push_back(parameter3);
-      parameters.push_back(parameter4);
-      parameters.push_back(parameter5);
+      parameters
+        .addNewParameter('MySpriteObject2')
+        .setType('objectList')
+        .setExtraInfo('Sprite')
+        .setDescription('The second object to be used, a sprite');
+      expect(parameters.getParametersCount()).toBe(6);
 
-      parameters.push_back(parameter5);
-      expect(parameters.size()).toBe(6);
-      gd.removeFromVectorParameterMetadata(parameters, 5);
-      expect(parameters.size()).toBe(5);
+      parameters.removeParameter('MySpriteObject2');
+      expect(parameters.getParametersCount()).toBe(5);
 
       objectsContainer = new gd.ObjectsContainer();
       gd.ParameterMetadataTools.parametersToObjectsContainer(
@@ -4210,6 +4209,7 @@ describe('libGD.js', function () {
         'Sprite'
       );
 
+      eventsFunction.delete();
       project.delete();
     });
 

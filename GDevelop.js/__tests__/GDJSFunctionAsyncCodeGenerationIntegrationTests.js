@@ -1401,15 +1401,15 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
 
       eventsFunction
         .getParameters()
-        .insertNewParameter('IncreaseValue', 0)
+        .addNewParameter('IncreaseValue')
         .setType('number');
       eventsFunction
         .getParameters()
-        .insertNewParameter('MyParamObject', 1)
+        .addNewParameter('MyParamObject')
         .setType('object');
       eventsFunction
         .getParameters()
-        .insertNewParameter('MyParamObject2', 2)
+        .addNewParameter('MyParamObject2')
         .setType('object');
 
       // Create a group that refers to both objects passed as parameters.
@@ -1570,15 +1570,15 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
 
       eventsFunction
         .getParameters()
-        .insertNewParameter('IncreaseValue', 0)
+        .addNewParameter('IncreaseValue')
         .setType('number');
       eventsFunction
         .getParameters()
-        .insertNewParameter('MyParamObject', 1)
+        .addNewParameter('MyParamObject')
         .setType('object');
       eventsFunction
         .getParameters()
-        .insertNewParameter('MyParamObject2', 2)
+        .addNewParameter('MyParamObject2')
         .setType('object');
 
       // Create a group that refers to both objects passed as parameters.

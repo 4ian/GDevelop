@@ -1405,7 +1405,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
         .setType('number');
       eventsFunction
         .getParameters()
-        .addNewParameter('MyParamObject')
+        .addNewParameter('MyParamObject1')
         .setType('object');
       eventsFunction
         .getParameters()
@@ -1574,7 +1574,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
         .setType('number');
       eventsFunction
         .getParameters()
-        .addNewParameter('MyParamObject')
+        .addNewParameter('MyParamObject1')
         .setType('object');
       eventsFunction
         .getParameters()
@@ -1589,7 +1589,8 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       const runCompiledEvents = generateCompiledEventsForEventsFunction(
         gd,
         project,
-        eventsFunction
+        eventsFunction,
+        true
       );
 
       eventsFunction.delete();

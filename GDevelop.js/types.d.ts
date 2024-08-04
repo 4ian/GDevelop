@@ -1340,7 +1340,7 @@ export class ExpressionMetadata extends AbstractFunctionMetadata {
   isRelevantForCustomObjectEvents(): boolean;
   getParameter(id: number): ParameterMetadata;
   getParametersCount(): number;
-  getParameters(): VectorParameterMetadata;
+  getParameters(): ParameterMetadataContainer;
   setHidden(): ExpressionMetadata;
   setPrivate(): ExpressionMetadata;
   setRelevantForLayoutEventsOnly(): ExpressionMetadata;
@@ -1448,16 +1448,18 @@ export class ValueTypeMetadata extends EmscriptenObject {
   unserializeFrom(element: SerializerElement): void;
 }
 
-export class VectorParameterMetadata extends EmscriptenObject {
-  constructor();
-  push_back(parameterMetadata: ParameterMetadata): void;
-  size(): number;
-  at(index: number): ParameterMetadata;
-  set(index: number, parameterMetadata: ParameterMetadata): void;
-  removeFromVectorParameterMetadata(index: number): void;
-  insertIntoVectorParameterMetadata(index: number, parameterMetadata: ParameterMetadata): void;
-  swapInVectorParameterMetadata(oldIndex: number, newIndex: number): void;
-  clear(): void;
+export class ParameterMetadataContainer extends EmscriptenObject {
+  insertNewParameter(name: string, pos: number): ParameterMetadata;
+  insertParameter(parameterMetadata: ParameterMetadata, pos: number): ParameterMetadata;
+  hasParameterNamed(name: string): boolean;
+  getParameter(name: string): ParameterMetadata;
+  getParameterAt(pos: number): ParameterMetadata;
+  removeParameter(name: string): void;
+  moveParameter(oldIndex: number, newIndex: number): void;
+  getParametersCount(): number;
+  getParameterPosition(parameterMetadata: ParameterMetadata): number;
+  clearParameters(): void;
+  addNewParameter(name: string): ParameterMetadata;
 }
 
 export class ParameterMetadataTools extends EmscriptenObject {
@@ -2068,20 +2070,6 @@ export class EventsFunction extends EmscriptenObject {
   getObjectGroups(): ObjectGroupsContainer;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
-}
-
-export class ParameterMetadataContainer extends EmscriptenObject {
-  insertNewParameter(name: string, pos: number): ParameterMetadata;
-  insertParameter(parameterMetadata: ParameterMetadata, pos: number): ParameterMetadata;
-  hasParameterNamed(name: string): boolean;
-  getParameter(name: string): ParameterMetadata;
-  getParameterAt(pos: number): ParameterMetadata;
-  removeParameter(name: string): void;
-  moveParameter(oldIndex: number, newIndex: number): void;
-  getParametersCount(): number;
-  getParameterPosition(parameterMetadata: ParameterMetadata): number;
-  clearParameters(): void;
-  addNewParameter(name: string): ParameterMetadata;
 }
 
 export class EventsFunctionsContainer extends EmscriptenObject {
@@ -2853,12 +2841,6 @@ export function isDefaultBehavior(layout: ObjectsContainer, objectOrGroupName: s
 export function getTypeOfBehaviorInObjectOrGroup(layout: ObjectsContainer, objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): string;
 
 export function getBehaviorNamesInObjectOrGroup(layout: ObjectsContainer, objectOrGroupName: string, behaviorType: string, searchInGroups: boolean): VectorString;
-
-export function removeFromVectorParameterMetadata(index: number): void;
-
-export function insertIntoVectorParameterMetadata(index: number, parameterMetadata: ParameterMetadata): void;
-
-export function swapInVectorParameterMetadata(oldIndex: number, newIndex: number): void;
 
 export function removeFromVectorPolygon2d(index: number): void;
 

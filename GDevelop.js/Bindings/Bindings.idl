@@ -1617,7 +1617,7 @@ interface ExpressionMetadata {
     boolean IsRelevantForCustomObjectEvents();
     [Ref] ParameterMetadata GetParameter(unsigned long id);
     unsigned long GetParametersCount();
-    [Const, Ref] VectorParameterMetadata GetParameters();
+    [Const, Ref] ParameterMetadataContainer GetParameters();
 
     [Ref] ExpressionMetadata SetHidden();
     [Ref] ExpressionMetadata SetPrivate();
@@ -1755,17 +1755,18 @@ interface ValueTypeMetadata {
     void UnserializeFrom([Const, Ref] SerializerElement element);
 };
 
-interface VectorParameterMetadata {
-    void VectorParameterMetadata();
-
-    void push_back([Const, Ref] ParameterMetadata parameterMetadata);
-    unsigned long size();
-    [Ref] ParameterMetadata at(unsigned long index);
-    void WRAPPED_set(unsigned long index, [Const, Ref] ParameterMetadata parameterMetadata);
-    void FREE_removeFromVectorParameterMetadata(unsigned long index);
-    void FREE_insertIntoVectorParameterMetadata(unsigned long index, [Const, Ref] ParameterMetadata parameterMetadata);
-    void FREE_swapInVectorParameterMetadata(unsigned long oldIndex, unsigned long newIndex);
-    void clear();
+interface ParameterMetadataContainer {
+    [Ref] ParameterMetadata InsertNewParameter([Const] DOMString name, unsigned long pos);
+    [Ref] ParameterMetadata InsertParameter([Const, Ref] ParameterMetadata parameterMetadata, unsigned long pos);
+    boolean HasParameterNamed([Const] DOMString name);
+    [Ref] ParameterMetadata GetParameter([Const] DOMString name);
+    [Ref] ParameterMetadata GetParameterAt(unsigned long pos);
+    void RemoveParameter([Const] DOMString name);
+    void MoveParameter(unsigned long oldIndex, unsigned long newIndex);
+    unsigned long GetParametersCount();
+    unsigned long GetParameterPosition([Const, Ref] ParameterMetadata parameterMetadata);
+    void ClearParameters();
+    [Ref] ParameterMetadata AddNewParameter([Const] DOMString name);
 };
 
 interface ParameterMetadataTools {
@@ -2857,20 +2858,6 @@ interface EventsFunction {
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
-};
-
-interface ParameterMetadataContainer {
-    [Ref] ParameterMetadata InsertNewParameter([Const] DOMString name, unsigned long pos);
-    [Ref] ParameterMetadata InsertParameter([Const, Ref] ParameterMetadata parameterMetadata, unsigned long pos);
-    boolean HasParameterNamed([Const] DOMString name);
-    [Ref] ParameterMetadata GetParameter([Const] DOMString name);
-    [Ref] ParameterMetadata GetParameterAt(unsigned long pos);
-    void RemoveParameter([Const] DOMString name);
-    void MoveParameter(unsigned long oldIndex, unsigned long newIndex);
-    unsigned long GetParametersCount();
-    unsigned long GetParameterPosition([Const, Ref] ParameterMetadata parameterMetadata);
-    void ClearParameters();
-    [Ref] ParameterMetadata AddNewParameter([Const] DOMString name);
 };
 
 enum EventsFunctionsContainer_FunctionOwner {

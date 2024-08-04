@@ -390,26 +390,6 @@ void moveVector2fInVector(std::vector<gd::Vector2f> &vec,
   vec.insert(vec.begin() + newIndex, std::move(vector2f));
 }
 
-void removeFromVectorParameterMetadata(std::vector<gd::ParameterMetadata> &vec,
-                                       size_t pos) {
-  vec.erase(vec.begin() + pos);
-}
-
-void insertIntoVectorParameterMetadata(
-    std::vector<gd::ParameterMetadata> &vec,
-    size_t pos,
-    const ParameterMetadata &parameterMetadata) {
-  vec.insert(vec.begin() + pos, parameterMetadata);
-}
-
-void swapInVectorParameterMetadata(std::vector<gd::ParameterMetadata> &vec,
-                                   size_t oldIndex,
-                                   size_t newIndex) {
-  if (oldIndex > vec.size() || newIndex > vec.size()) return;
-
-  std::swap(vec[oldIndex], vec[newIndex]);
-}
-
 // Implement a conversion from std::set<gd::String> to std::vector<gd::String>
 // as there is no easy way to properly expose iterators :/
 std::vector<gd::String> toNewVectorString(const std::set<gd::String> &set) {
@@ -445,7 +425,6 @@ typedef std::vector<Point> VectorPoint;
 typedef std::vector<Polygon2d> VectorPolygon2d;
 typedef std::vector<gd::Vector2f> VectorVector2f;
 typedef std::vector<EventsSearchResult> VectorEventsSearchResult;
-typedef std::vector<gd::ParameterMetadata> VectorParameterMetadata;
 typedef std::vector<gd::DependencyMetadata> VectorDependencyMetadata;
 typedef std::vector<gd::EventsFunction> VectorEventsFunction;
 typedef gd::Object gdObject;  // To avoid clashing javascript Object in glue.js

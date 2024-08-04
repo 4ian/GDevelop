@@ -7,13 +7,12 @@ export const enumerateParametersUsableInExpressions = (
   eventsFunction: gdEventsFunction,
   allowedParameterTypes: string[]
 ): Array<gdParameterMetadata> => {
-  const parameters = eventsFunction.getParametersForEvents(eventsFunctionsContainer);
-  return mapFor(
-    0,
-    parameters.getParametersCount(),
-    i => {
-      const parameterMetadata = parameters.getParameterAt(i);
-      return !parameterMetadata.isCodeOnly() &&
+  const parameters = eventsFunction.getParametersForEvents(
+    eventsFunctionsContainer
+  );
+  return mapFor(0, parameters.getParametersCount(), i => {
+    const parameterMetadata = parameters.getParameterAt(i);
+    return !parameterMetadata.isCodeOnly() &&
       !gd.ParameterMetadata.isObject(parameterMetadata.getType()) &&
       !gd.ParameterMetadata.isBehavior(parameterMetadata.getType()) &&
       (allowedParameterTypes.length === 0 ||
@@ -22,8 +21,7 @@ export const enumerateParametersUsableInExpressions = (
             parameterMetadata.getType()
           )
         ))
-        ? parameterMetadata
-        : null;
-    }   
-  ).filter(Boolean);
+      ? parameterMetadata
+      : null;
+  }).filter(Boolean);
 };

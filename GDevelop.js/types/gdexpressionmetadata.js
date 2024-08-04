@@ -15,7 +15,7 @@ declare class gdExpressionMetadata extends gdAbstractFunctionMetadata {
   isRelevantForCustomObjectEvents(): boolean;
   getParameter(id: number): gdParameterMetadata;
   getParametersCount(): number;
-  getParameters(): gdVectorParameterMetadata;
+  getParameters(): gdParameterMetadataContainer;
   setHidden(): gdExpressionMetadata;
   setPrivate(): gdExpressionMetadata;
   setRelevantForLayoutEventsOnly(): gdExpressionMetadata;

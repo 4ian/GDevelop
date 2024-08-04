@@ -67,7 +67,10 @@ export const getLastObjectParameterObjectType = (
     parameters,
     parameterIndex
   );
-  if (objectParameterIndex < 0 || objectParameterIndex >= parameters.getParametersCount()) {
+  if (
+    objectParameterIndex < 0 ||
+    objectParameterIndex >= parameters.getParametersCount()
+  ) {
     return '';
   }
 

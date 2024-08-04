@@ -1,7 +1,7 @@
 // @flow
 import { type ExpressionAutocompletion } from '../ExpressionAutocompletion';
 import { type EnumeratedExpressionMetadata } from '../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
-import { mapVector } from '../Utils/MapFor';
+import { mapFor } from '../Utils/MapFor';
 
 const makeNewFakeExtension = (gd: libGDevelop) => {
   const extension = new gd.PlatformExtension();
@@ -26,9 +26,11 @@ const makeFakeEnumeratedExpressionMetadata = (
   fullGroupName: expressionMetadata.getGroup(),
   iconFilename: expressionMetadata.getSmallIconFilename(),
   metadata: expressionMetadata,
-  parameters: mapVector(
-    expressionMetadata.getParameters(),
-    parameterMetadata => parameterMetadata
+  parameters: mapFor(
+    0,
+    expressionMetadata.getParameters().getParametersCount(),
+    parameterIndex =>
+      expressionMetadata.getParameters().getParameterAt(parameterIndex)
   ),
   scope: { extension },
   isPrivate: false,

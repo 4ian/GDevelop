@@ -430,11 +430,11 @@ gd::String ExpressionCodeGenerator::GenerateParametersCodes(
   size_t nonCodeOnlyParameterIndex = 0;
   gd::String parametersCode;
   for (std::size_t i = initialParameterIndex;
-       i < expressionMetadata.parameters.size();
+       i < expressionMetadata.GetParameters().GetParametersCount();
        ++i) {
     if (i != initialParameterIndex) parametersCode += ", ";
 
-    auto& parameterMetadata = expressionMetadata.parameters[i];
+    auto& parameterMetadata = expressionMetadata.GetParameters().GetParameter(i);
     if (!parameterMetadata.IsCodeOnly()) {
       if (nonCodeOnlyParameterIndex < parameters.size()) {
         auto objectName = gd::ExpressionVariableOwnerFinder::GetObjectName(codeGenerator.GetPlatform(),

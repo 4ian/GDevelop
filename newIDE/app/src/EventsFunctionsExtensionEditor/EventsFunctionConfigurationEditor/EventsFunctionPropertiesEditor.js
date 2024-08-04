@@ -67,7 +67,7 @@ export const getSentenceErrorText = (
     eventsFunction.getParameters().getParametersCount(),
     index => {
       const parameter = eventsFunction.getParameters().getParameterAt(index);
-      
+
       if (parameter.getValueTypeMetadata().isBehavior()) {
         // Behaviors are usually not shown in sentences.
         return null;

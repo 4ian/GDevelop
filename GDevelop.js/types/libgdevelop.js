@@ -145,7 +145,7 @@ declare class libGDevelop {
   DependencyMetadata: Class<gdDependencyMetadata>;
   ParameterMetadata: Class<gdParameterMetadata>;
   ValueTypeMetadata: Class<gdValueTypeMetadata>;
-  VectorParameterMetadata: Class<gdVectorParameterMetadata>;
+  ParameterMetadataContainer: Class<gdParameterMetadataContainer>;
   ParameterMetadataTools: Class<gdParameterMetadataTools>;
   ObjectMetadata: Class<gdObjectMetadata>;
   QuickCustomization_Visibility: Class<QuickCustomization_Visibility>;
@@ -205,7 +205,6 @@ declare class libGDevelop {
   ExpressionParser2: Class<gdExpressionParser2>;
   EventsFunction_FunctionType: Class<EventsFunction_FunctionType>;
   EventsFunction: Class<gdEventsFunction>;
-  ParameterMetadataContainer: Class<gdParameterMetadataContainer>;
   EventsFunctionsContainer_FunctionOwner: Class<EventsFunctionsContainer_FunctionOwner>;
   EventsFunctionsContainer: Class<gdEventsFunctionsContainer>;
   AbstractEventsBasedEntity: Class<gdAbstractEventsBasedEntity>;

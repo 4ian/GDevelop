@@ -187,10 +187,10 @@ void ParameterMetadataTools::IterateOverParametersWithIndex(
 
   size_t parameterIndex = 0;
   for (size_t metadataIndex = (isObjectFunction ? 1 : 0);
-       metadataIndex < metadata.parameters.size() &&
+       metadataIndex < metadata.GetParameters().GetParametersCount() &&
        parameterIndex < node.parameters.size();
        ++metadataIndex) {
-    auto &parameterMetadata = metadata.parameters[metadataIndex];
+    auto &parameterMetadata = metadata.GetParameters().GetParameter(metadataIndex);
     if (parameterMetadata.IsCodeOnly()) {
       continue;
     }

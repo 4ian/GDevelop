@@ -236,6 +236,31 @@ namespace gdjs {
       }
     }
 
+    _reloadModel(
+      runtimeObject: Model3DRuntimeObject,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
+      objectData: Model3DObjectData
+    ) {
+      this._originalModel = instanceContainer
+        .getGame()
+        .getModel3DManager()
+        .getModel(runtimeObject._modelResourceName);
+
+      const rotationX = objectData.content.rotationX || 0;
+      const rotationY = objectData.content.rotationY || 0;
+      const rotationZ = objectData.content.rotationZ || 0;
+      const keepAspectRatio = objectData.content.keepAspectRatio;
+      this._updateModel(
+        rotationX,
+        rotationY,
+        rotationZ,
+        runtimeObject._getOriginalWidth(),
+        runtimeObject._getOriginalHeight(),
+        runtimeObject._getOriginalDepth(),
+        keepAspectRatio
+      );
+    }
+
     _updateModel(
       rotationX: float,
       rotationY: float,

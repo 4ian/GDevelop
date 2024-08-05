@@ -139,6 +139,11 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                 assetShortHeader
               )
             );
+            const assetsListInterface = assetsList.current;
+            if (assetsListInterface) {
+              assetsListInterface.scrollToPosition(0);
+              assetsListInterface.setPageBreakIndex(0);
+            }
           }
           assetSwappedObjectPtr.current = assetSwappedObject.ptr;
         } else if (shopNavigationState.isAssetSwappingHistory) {

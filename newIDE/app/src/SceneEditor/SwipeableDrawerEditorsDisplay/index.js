@@ -316,6 +316,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                         )
                       }
                       onObjectCreated={props.onObjectCreated}
+                      onObjectEdited={props.onObjectEdited}
                       onObjectFolderOrObjectWithContextSelected={
                         props.onObjectFolderOrObjectWithContextSelected
                       }

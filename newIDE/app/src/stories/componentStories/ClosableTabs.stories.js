@@ -278,6 +278,7 @@ export const WithObjectsList = () => (
                     cb
                   ) => cb(true)}
                   onObjectCreated={() => {}}
+                  onObjectEdited={() => {}}
                   onObjectFolderOrObjectWithContextSelected={() => {}}
                   hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
                   canInstallPrivateAsset={() => false}

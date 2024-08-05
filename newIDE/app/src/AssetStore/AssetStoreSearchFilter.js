@@ -322,10 +322,7 @@ export class AssetSwappingAssetStoreSearchFilter
     if (!this.isEnabled) {
       return 1;
     }
-    if (
-      this.other === searchItem ||
-      this.objectType !== searchItem.objectType
-    ) {
+    if (this.objectType !== searchItem.objectType) {
       return 0;
     }
 

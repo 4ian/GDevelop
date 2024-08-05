@@ -16,47 +16,25 @@ import {
   installPublicAsset,
   checkRequiredExtensionsUpdateForAssets,
 } from './InstallAsset';
-import {
-  type Asset,
-  type AssetShortHeader,
-  getPublicAsset,
-  isPrivateAsset,
-} from '../Utils/GDevelopServices/Asset';
-import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
+import { isPrivateAsset } from '../Utils/GDevelopServices/Asset';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import Window from '../Utils/Window';
 import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { enumerateAssetStoreIds } from './EnumerateAssetStoreIds';
-import PromisePool from '@supercharge/promise-pool';
 import { getAssetShortHeadersToDisplay } from './AssetsList';
 import ErrorBoundary from '../UI/ErrorBoundary';
-import type { ObjectFolderOrObjectWithContext } from '../ObjectsList/EnumerateObjectFolderOrObject';
 import LoaderModal from '../UI/LoaderModal';
 import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
+import {
+  useFetchAssets,
+  useExtensionUpdateAlertDialog,
+} from './NewObjectDialog';
 
 const isDev = Window.isDev();
-
-export const useExtensionUpdateAlertDialog = () => {
-  const { showConfirmation } = useAlertDialog();
-  return async (
-    outOfDateExtensionShortHeaders: Array<ExtensionShortHeader>
-  ): Promise<boolean> => {
-    return await showConfirmation({
-      title: t`Extension update`,
-      message: t`Before installing this asset, it's strongly recommended to update these extensions${'\n\n - ' +
-        outOfDateExtensionShortHeaders
-          .map(extension => extension.fullName)
-          .join('\n\n - ') +
-        '\n\n'}Do you want to update it now ?`,
-      confirmButtonLabel: t`Update the extension`,
-      dismissButtonLabel: t`Skip the update`,
-    });
-  };
-};
 
 const mergeAnimations = (
   objectsAnimations: Array<{ name: string }>,
@@ -86,40 +64,40 @@ const mergeAnimations = (
   return animations;
 };
 
-export const useFetchAssets = () => {
-  const { environment } = React.useContext(AssetStoreContext);
+const swapAsset = (
+  project: gdProject,
+  object: gdObject,
+  assetObject: gdObject
+) => {
+  const serializedAssetObject = serializeToJSObject(assetObject);
+  const serializedObject = serializeToJSObject(object);
+  if (object.getType() === 'Sprite') {
+    serializedObject.animations = mergeAnimations(
+      serializedObject.animations,
+      serializedAssetObject.animations
+    );
+  } else if (object.getType() === 'Scene3D::Model3DObject') {
+    const animations = (serializedObject.animations = mergeAnimations(
+      serializedObject.content.animations,
+      serializedAssetObject.content.animations
+    ));
 
-  const { fetchPrivateAsset } = React.useContext(
-    PrivateAssetsAuthorizationContext
-  );
+    const objectVolume =
+      serializedObject.content.width *
+      serializedObject.content.height *
+      serializedObject.content.depth;
+    const assetVolume =
+      serializedAssetObject.content.width *
+      serializedAssetObject.content.height *
+      serializedAssetObject.content.depth;
 
-  return async (
-    assetShortHeaders: Array<AssetShortHeader>
-  ): Promise<Array<Asset>> => {
-    const fetchedAssets = await PromisePool.withConcurrency(6)
-      .for(assetShortHeaders)
-      .process<Asset>(async assetShortHeader => {
-        const asset = isPrivateAsset(assetShortHeader)
-          ? await fetchPrivateAsset(assetShortHeader, {
-              environment,
-            })
-          : await getPublicAsset(assetShortHeader, { environment });
-        if (!asset) {
-          throw new Error(
-            'Unable to install the asset because it could not be fetched.'
-          );
-        }
-        return asset;
-      });
-    if (fetchedAssets.errors.length) {
-      throw new Error(
-        'Error(s) while installing assets. The first error is: ' +
-          fetchedAssets.errors[0].message
-      );
-    }
-    const assets = fetchedAssets.results;
-    return assets;
-  };
+    serializedObject.content = serializedAssetObject.content;
+    serializedObject.content.animation = animations;
+    serializedObject.content.width *= objectVolume / assetVolume;
+    serializedObject.content.height *= objectVolume / assetVolume;
+    serializedObject.content.depth *= objectVolume / assetVolume;
+  }
+  unserializeFromJSObject(object, serializedObject, 'unserializeFrom', project);
 };
 
 type Props = {|
@@ -130,10 +108,8 @@ type Props = {|
   object: gdObject,
   resourceManagementProps: ResourceManagementProps,
   onClose: () => void,
-  onCreateNewObject: (type: string) => void,
-  onObjectsAddedFromAssets: (Array<gdObject>) => void,
+  onObjectsConfigurationSwapped: () => void,
   canInstallPrivateAsset: () => boolean,
-  targetObjectFolderOrObjectWithContext?: ?ObjectFolderOrObjectWithContext,
 |};
 
 function AssetSwappingDialog({
@@ -144,10 +120,8 @@ function AssetSwappingDialog({
   object,
   resourceManagementProps,
   onClose,
-  onCreateNewObject,
-  onObjectsAddedFromAssets,
+  onObjectsConfigurationSwapped,
   canInstallPrivateAsset,
-  targetObjectFolderOrObjectWithContext,
 }: Props) {
   const {
     assetShortHeadersSearchResults,
@@ -230,21 +204,13 @@ function AssetSwappingDialog({
               asset,
               project,
               objectsContainer,
-              targetObjectFolderOrObject:
-                targetObjectFolderOrObjectWithContext &&
-                !targetObjectFolderOrObjectWithContext.global
-                  ? targetObjectFolderOrObjectWithContext.objectFolderOrObject
-                  : null,
+              targetObjectFolderOrObject: null,
             })
           : await installPublicAsset({
               asset,
               project,
               objectsContainer,
-              targetObjectFolderOrObject:
-                targetObjectFolderOrObjectWithContext &&
-                !targetObjectFolderOrObjectWithContext.global
-                  ? targetObjectFolderOrObjectWithContext.objectFolderOrObject
-                  : null,
+              targetObjectFolderOrObject: null,
             });
         if (!installOutput) {
           throw new Error('Unable to install private Asset.');
@@ -260,47 +226,13 @@ function AssetSwappingDialog({
         });
 
         if (installOutput.createdObjects.length > 0) {
-          const assetObject = installOutput.createdObjects[0];
-          const serializedAssetObject = serializeToJSObject(assetObject);
-          const serializedObject = serializeToJSObject(object);
-          if (object.getType() === 'Sprite') {
-            serializedObject.animations = mergeAnimations(
-              serializedObject.animations,
-              serializedAssetObject.animations
-            );
-          } else if (object.getType() === 'Scene3D::Model3DObject') {
-            const animations = (serializedObject.animations = mergeAnimations(
-              serializedObject.content.animations,
-              serializedAssetObject.content.animations
-            ));
-
-            const objectVolume =
-              serializedObject.content.width *
-              serializedObject.content.height *
-              serializedObject.content.depth;
-            const assetVolume =
-              serializedAssetObject.content.width *
-              serializedAssetObject.content.height *
-              serializedAssetObject.content.depth;
-
-            serializedObject.content = serializedAssetObject.content;
-            serializedObject.content.animation = animations;
-            serializedObject.content.width *= objectVolume / assetVolume;
-            serializedObject.content.height *= objectVolume / assetVolume;
-            serializedObject.content.depth *= objectVolume / assetVolume;
-          }
-          unserializeFromJSObject(
-            object,
-            serializedObject,
-            'unserializeFrom',
-            project
-          );
+          swapAsset(project, object, installOutput.createdObjects[0]);
         }
         for (const createdObject of installOutput.createdObjects) {
           objectsContainer.removeObject(createdObject.getName());
         }
 
-        onObjectsAddedFromAssets(installOutput.createdObjects);
+        onObjectsConfigurationSwapped();
 
         await resourceManagementProps.onFetchNewlyAddedResources();
         setIsAssetBeingInstalled(false);
@@ -324,9 +256,8 @@ function AssetSwappingDialog({
       eventsFunctionsExtensionsState,
       installPrivateAsset,
       objectsContainer,
-      targetObjectFolderOrObjectWithContext,
       openedAssetPack,
-      onObjectsAddedFromAssets,
+      onObjectsConfigurationSwapped,
       resourceManagementProps,
       canInstallPrivateAsset,
       showAlert,
@@ -438,7 +369,7 @@ function AssetSwappingDialog({
                 }}
                 project={project}
                 objectsContainer={objectsContainer}
-                onObjectsAddedFromAssets={onObjectsAddedFromAssets}
+                onObjectsAddedFromAssets={onObjectsConfigurationSwapped}
                 canInstallPrivateAsset={canInstallPrivateAsset}
                 resourceManagementProps={resourceManagementProps}
               />

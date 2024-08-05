@@ -216,6 +216,7 @@ type Props = {|
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
   onExportAssets: () => void,
   onObjectCreated: gdObject => void,
+  onObjectEdited: gdObject => void,
   onObjectFolderOrObjectWithContextSelected: (
     ?ObjectFolderOrObjectWithContext
   ) => void,
@@ -253,6 +254,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       onEditObject,
       onExportAssets,
       onObjectCreated,
+      onObjectEdited,
       onObjectFolderOrObjectWithContextSelected,
       onObjectPasted,
       getValidatedObjectOrGroupName,
@@ -1714,8 +1716,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         {objectAssetSwappingDialogOpen && (
           <AssetSwappingDialog
             onClose={() => setObjectAssetSwappingDialogOpen(null)}
-            onCreateNewObject={() => {}}
-            onObjectsAddedFromAssets={() => {}}
+            onObjectsConfigurationSwapped={() => {
+              onObjectEdited(objectAssetSwappingDialogOpen.object);
+              setObjectAssetSwappingDialogOpen(null);
+            }}
             project={project}
             layout={layout}
             eventsBasedObject={eventsBasedObject}
@@ -1723,7 +1727,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             object={objectAssetSwappingDialogOpen.object}
             resourceManagementProps={resourceManagementProps}
             canInstallPrivateAsset={canInstallPrivateAsset}
-            targetObjectFolderOrObjectWithContext={null}
           />
         )}
       </Background>

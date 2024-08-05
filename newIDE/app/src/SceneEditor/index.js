@@ -838,6 +838,12 @@ export default class SceneEditor extends React.Component<Props, State> {
     this._addInstanceForNewObject(object.getName());
   };
 
+  _onObjectEdited = (object: gdObject) => {
+    this.reloadResourcesFor(object);
+    if (this.props.unsavedChanges)
+      this.props.unsavedChanges.triggerUnsavedChanges();
+  };
+
   _onRemoveLayer = (layerName: string, done: boolean => void) => {
     const getNewState = (doRemove: boolean) => {
       const newState: {| layerRemoved: null, selectedLayer?: string |} = {
@@ -1838,6 +1844,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                   this._onRenameObjectFolderOrObjectWithContextFinish
                 }
                 onObjectCreated={this._onObjectCreated}
+                onObjectEdited={this._onObjectEdited}
                 onObjectFolderOrObjectWithContextSelected={
                   this._onObjectFolderOrObjectWithContextSelected
                 }

@@ -63,7 +63,8 @@ namespace gdjs {
    */
   export class Model3DRuntimeObject
     extends gdjs.RuntimeObject3D
-    implements gdjs.Animatable {
+    implements gdjs.Animatable
+  {
     _renderer: gdjs.Model3DRuntimeObjectRenderer;
 
     _modelResourceName: string;
@@ -119,14 +120,19 @@ namespace gdjs {
         objectData.content.materialType
       );
 
-      this.onChangeModelResourceName(objectData);
+      this.onModelChanged(objectData);
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
     }
 
-    private onChangeModelResourceName(objectData) {
-      this._renderer._reloadModel(this, this._runtimeScene, objectData);
+    /**
+     * To be called after the renderer loaded a Model resource:
+     * - After the renderer was instantiated
+     * - After reloading the model
+     */
+    private onModelChanged(objectData) {
+      this._updateModel(objectData);
       if (this._animations.length > 0) {
         this._renderer.playAnimation(
           this._animations[0].source,
@@ -153,8 +159,7 @@ namespace gdjs {
         oldObjectData.content.modelResourceName !==
         newObjectData.content.modelResourceName
       ) {
-        this._modelResourceName = newObjectData.content.modelResourceName;
-        this.onChangeModelResourceName(newObjectData);
+        this._reloadModel(newObjectData);
       } else if (
         oldObjectData.content.width !== newObjectData.content.width ||
         oldObjectData.content.height !== newObjectData.content.height ||
@@ -229,6 +234,12 @@ namespace gdjs {
           networkSyncData.ap ? this.pauseAnimation() : this.resumeAnimation();
         }
       }
+    }
+
+    _reloadModel(objectData: Model3DObjectData) {
+      this._modelResourceName = objectData.content.modelResourceName;
+      this._renderer._reloadModel(this, this._runtimeScene);
+      this.onModelChanged(objectData);
     }
 
     _updateModel(objectData: Model3DObjectData) {

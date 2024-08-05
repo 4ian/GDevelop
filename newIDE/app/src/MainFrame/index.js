@@ -190,6 +190,7 @@ import useSaveReminder from './UseSaveReminder';
 import { useMultiplayerLobbyConfigurator } from './UseMultiplayerLobbyConfigurator';
 import { useAuthenticatedPlayer } from './UseAuthenticatedPlayer';
 import ListIcon from '../UI/ListIcon';
+import { QuickCustomizationDialog } from '../QuickCustomization/QuickCustomizationDialog';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -1141,9 +1142,11 @@ const MainFrame = (props: Props) => {
     }) => {
       setNewProjectSetupDialogOpen(false);
       closeExampleStoreDialog({ deselectExampleAndGameTemplate: true });
-      findLeaderboardsToReplace(project, oldProjectId);
-      configureMultiplayerLobbiesIfNeeded(project, oldProjectId);
-      options && options.openAllScenes
+      if (!options.skipAnyUserInteraction) {
+        findLeaderboardsToReplace(project, oldProjectId);
+        configureMultiplayerLobbiesIfNeeded(project, oldProjectId);
+      }
+      options.openAllScenes
         ? openAllScenes({
             currentProject: project,
             editorTabs,
@@ -3455,6 +3458,7 @@ const MainFrame = (props: Props) => {
                     onCloseProject: () => askToCloseProject(),
                     onOpenExampleStore: openExampleStoreDialog,
                     onSelectExampleShortHeader: onSelectExampleShortHeader,
+                    onCreateProjectFromExample: createProjectFromExample,
                     onPreviewPrivateGameTemplateListingData: privateGameTemplateListingData =>
                       onSelectPrivateGameTemplate({
                         privateGameTemplateListingData,
@@ -3765,6 +3769,14 @@ const MainFrame = (props: Props) => {
         <DiagnosticReportDialog
           wholeProjectDiagnosticReport={currentProject.getWholeProjectDiagnosticReport()}
           onClose={() => setDiagnosticReportDialogOpen(false)}
+        />
+      )}
+
+      {currentProject && (
+        <QuickCustomizationDialog
+          project={currentProject}
+          resourceManagementProps={resourceManagementProps}
+          onLaunchPreview={hotReloadPreviewButtonProps.launchProjectDataOnlyPreview}
         />
       )}
       <CustomDragLayer />

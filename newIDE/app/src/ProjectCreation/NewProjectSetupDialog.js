@@ -68,6 +68,7 @@ export type NewProjectSetup = {|
   orientation?: 'landscape' | 'portrait' | 'default',
   optimizeForPixelArt?: boolean,
   allowPlayersToLogIn?: boolean,
+  skipAnyUserInteraction?: boolean,
 |};
 
 type Props = {|

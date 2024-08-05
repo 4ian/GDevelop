@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 import { Trans } from '@lingui/macro';
 import { makeStyles } from '@material-ui/styles';
 import GridList from '@material-ui/core/GridList';
@@ -37,6 +38,10 @@ import { PrivateTutorialViewDialog } from '../../../../AssetStore/PrivateTutoria
 import { EarnBadges } from './EarnBadges';
 import FlatButton from '../../../../UI/FlatButton';
 import InAppTutorialContext from '../../../../InAppTutorial/InAppTutorialContext';
+import { QuickCustomizationGameTiles } from '../../../../QuickCustomization/QuickCustomizationGameTiles';
+import { type NewProjectSetup } from '../../../../ProjectCreation/NewProjectSetupDialog';
+import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
+import UrlStorageProvider from '../../../../ProjectsStorage/UrlStorageProvider';
 
 const styles = {
   textTutorialContent: {
@@ -182,6 +187,11 @@ type Props = {|
   onStartSurvey: null | (() => void),
   hasFilledSurveyAlready: boolean,
   onOpenProfile: () => void,
+  onCreateProjectFromExample: (
+    exampleShortHeader: ExampleShortHeader,
+    newProjectSetup: NewProjectSetup,
+    i18n: I18nType
+  ) => Promise<void>,
 |};
 
 const RecommendationList = ({
@@ -191,6 +201,7 @@ const RecommendationList = ({
   onStartSurvey,
   hasFilledSurveyAlready,
   onOpenProfile,
+  onCreateProjectFromExample,
 }: Props) => {
   const {
     recommendations,
@@ -274,6 +285,33 @@ const RecommendationList = ({
               />
             </SectionRow>
           );
+
+        if (true /*TODO */) {
+          items.push(
+            <SectionRow key="customize-and-publish">
+              <Text size="section-title" noMargin>
+                <Trans>Customize a game and publish it in 1 minute</Trans>
+              </Text>
+
+              <QuickCustomizationGameTiles
+                maxCount={4}
+                onSelectExampleShortHeader={exampleShortHeader => {
+                  const newProjectSetup: NewProjectSetup = {
+                    // TODO: check on local app if it works.
+                    storageProvider: UrlStorageProvider,
+                    saveAsLocation: null,
+                    skipAnyUserInteraction: true,
+                  };
+                  onCreateProjectFromExample(
+                    exampleShortHeader,
+                    newProjectSetup,
+                    i18n
+                  );
+                }}
+              />
+            </SectionRow>
+          );
+        }
 
         if (guidedLessonsRecommendation) {
           const displayTextAfterGuidedLessons = guidedLessonsIds

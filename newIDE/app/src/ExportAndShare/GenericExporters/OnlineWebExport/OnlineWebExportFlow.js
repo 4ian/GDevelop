@@ -70,6 +70,7 @@ const OnlineWebExportFlow = ({
         />
       </ResponsiveLineStackLayout>
     ) : (
+      // TODO: simplify this and below.
       <Line justifyContent="center">
         <RaisedButton
           label={<Trans>Generate new link</Trans>}

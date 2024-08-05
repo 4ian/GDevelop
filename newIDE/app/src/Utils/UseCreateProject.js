@@ -39,7 +39,7 @@ type Props = {|
     project: gdProject,
     editorTabs: EditorTabsState,
     oldProjectId: string,
-    options?: { openAllScenes: boolean },
+    options: { openAllScenes: boolean, skipAnyUserInteraction: boolean },
   |}) => Promise<void>,
   onError: () => void,
   onSuccessOrError: () => void,
@@ -124,6 +124,7 @@ const useCreateProject = ({
         } else if (newProjectSource.fileMetadata && sourceStorageProvider) {
           state = await openFromFileMetadata(newProjectSource.fileMetadata);
         }
+        console.log("loadFromProject done");
 
         if (!state) {
           throw new Error(
@@ -166,6 +167,7 @@ const useCreateProject = ({
             );
           }
         }
+        console.log("register game done");
 
         const destinationStorageProviderOperations = getStorageProviderOperations(
           newProjectSetup.storageProvider
@@ -216,6 +218,7 @@ const useCreateProject = ({
             }
           }
         }
+        console.log("save as done");
 
         // We were able to load and then save the project. We can now close the dialog,
         // open the project editors and check if leaderboards must be replaced.
@@ -223,8 +226,12 @@ const useCreateProject = ({
           project: currentProject,
           editorTabs,
           oldProjectId,
-          options,
+          options: {
+            openAllScenes: !!options && options.openAllScenes,
+            skipAnyUserInteraction: !!newProjectSetup.skipAnyUserInteraction,
+          },
         });
+        console.log("after creating project done");
       } catch (rawError) {
         const { getWriteErrorMessage } = getStorageProviderOperations();
         const errorMessage = getWriteErrorMessage

@@ -1,5 +1,7 @@
 // @flow
 import * as React from 'react';
+import { type I18n as I18nType } from '@lingui/core';
+import { type NewProjectSetup } from '../../ProjectCreation/NewProjectSetupDialog';
 import { type UnsavedChanges } from '../UnsavedChangesContext';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import type { StorageProvider } from '../../ProjectsStorage';
@@ -105,6 +107,11 @@ export type RenderEditorContainerProps = {|
 
   // Project creation
   onOpenNewProjectSetupDialog: () => void,
+  onCreateProjectFromExample: (
+    exampleShortHeader: ExampleShortHeader,
+    newProjectSetup: NewProjectSetup,
+    i18n: I18nType
+  ) => Promise<void>,
 
   // Project save
   onSave: () => Promise<void>,

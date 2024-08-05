@@ -1,7 +1,5 @@
 // @flow
-
 import React, { Component } from 'react';
-import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import { t, Trans } from '@lingui/macro';
 import { sendExportLaunched } from '../../Utils/Analytics/EventSender';
@@ -55,6 +53,7 @@ type State = {|
 |};
 
 type Props = {|
+  i18n: I18nType,
   project: gdProject,
   onSaveProject: () => Promise<void>,
   isSavingProject: boolean,
@@ -68,6 +67,7 @@ type Props = {|
   gameAvailabilityError: ?GameAvailabilityError,
   builds: ?Array<Build>,
   onRefreshBuilds: () => Promise<void>,
+  shouldAutomaticallyStartExport?: boolean,
 |};
 
 const getIncrementedVersionNumber = (project: gdProject) => {
@@ -111,7 +111,6 @@ export default class ExportLauncher extends Component<Props, State> {
   _candidateBumpedVersionNumber = '';
   buildsWatcher = new BuildsWatcher();
   launchWholeExport: ({|
-    i18n: I18nType,
     payWithCredits?: boolean,
   |}) => Promise<void>;
 
@@ -119,6 +118,12 @@ export default class ExportLauncher extends Component<Props, State> {
     // Fetch limits when the export launcher is opened, to ensure we display the
     // latest limits.
     this.props.authenticatedUser.onRefreshLimits();
+  }
+
+  componentDidMount() {
+    if (this.props.shouldAutomaticallyStartExport) {
+      this.launchWholeExport({ payWithCredits: false });
+    }
   }
 
   componentWillUnmount() {
@@ -191,7 +196,7 @@ export default class ExportLauncher extends Component<Props, State> {
     });
   };
 
-  tryUpdateAuthors = async () => {
+  _tryUpdateAuthors = async () => {
     const profile = this.props.authenticatedUser.profile;
     if (profile) {
       const authorAcls = getAclsFromUserIds(
@@ -212,7 +217,7 @@ export default class ExportLauncher extends Component<Props, State> {
     }
   };
 
-  registerGameIfNot = async () => {
+  _registerGameIfNot = async () => {
     const profile = this.props.authenticatedUser.profile;
     const getAuthorizationHeader = this.props.authenticatedUser
       .getAuthorizationHeader;
@@ -239,7 +244,7 @@ export default class ExportLauncher extends Component<Props, State> {
             templateSlug,
           });
           // We don't await for the authors update, as it is not required for publishing.
-          this.tryUpdateAuthors();
+          this._tryUpdateAuthors();
           this.props.onRefreshGame();
         }
       }
@@ -247,13 +252,12 @@ export default class ExportLauncher extends Component<Props, State> {
   };
 
   _launchWholeExport = async ({
-    i18n,
     payWithCredits,
   }: {|
-    i18n: I18nType,
     payWithCredits?: boolean,
   |}): Promise<void> => {
     const {
+      i18n,
       project,
       exportPipeline,
       eventsFunctionsExtensionsState,
@@ -317,7 +321,9 @@ export default class ExportLauncher extends Component<Props, State> {
     try {
       setStep('register');
       // We await for this call, allowing to link the build to the game just registered.
-      await this.registerGameIfNot();
+      await this._registerGameIfNot();
+
+      // TODO: extra step for leaderboards and stuff.
     } catch (registerError) {
       // But if it fails, we don't prevent building the game.
       console.warn('Error while registering the game.');
@@ -458,6 +464,7 @@ export default class ExportLauncher extends Component<Props, State> {
       exportState,
     } = this.state;
     const {
+      i18n,
       project,
       authenticatedUser,
       exportPipeline,
@@ -503,11 +510,6 @@ export default class ExportLauncher extends Component<Props, State> {
       return exportPipeline.canLaunchBuild(exportState, errored, exportStep);
     };
 
-    if (!builds && authenticatedUser.authenticated) {
-      // Still loading
-      return <PlaceholderLoader />;
-    }
-
     const isExporting = !!exportStep && exportStep !== 'done';
     const isBuildRunning = !!build && build.status === 'pending';
     const isExportingOrWaitingForBuild = isExporting || isBuildRunning;
@@ -520,159 +522,153 @@ export default class ExportLauncher extends Component<Props, State> {
     const hasSomeBuildsRunning = hasBuildsCurrentlyRunning();
 
     return (
-      <I18n>
-        {({ i18n }) => (
-          <Column noMargin expand justifyContent="center">
-            {!isUsingOnlineBuildNonAuthenticated && (
-              <Column noMargin>
-                {!!exportPipeline.onlineBuildType &&
-                  gameAvailabilityError &&
-                  gameAvailabilityError === 'not-owned' && (
-                    <AlertMessage kind="warning">
-                      <Trans>
-                        The project currently opened is registered online but
-                        you don't have access to it. A link or file will be
-                        created but the game will not be registered.
-                      </Trans>
-                    </AlertMessage>
-                  )}
-                {!!exportPipeline.packageNameWarningType &&
-                  project.getPackageName().indexOf('com.example') !== -1 && (
-                    <Line>
-                      <DismissableAlertMessage
-                        identifier="project-should-have-unique-package-name"
-                        kind="warning"
-                      >
-                        {i18n._(
-                          exportPipeline.packageNameWarningType === 'mobile'
-                            ? t`The package name begins with com.example, make sure you
+      <Column noMargin expand justifyContent="center">
+        {!isUsingOnlineBuildNonAuthenticated && (
+          <Column noMargin>
+            {!!exportPipeline.onlineBuildType &&
+              gameAvailabilityError &&
+              gameAvailabilityError === 'not-owned' && (
+                <AlertMessage kind="warning">
+                  <Trans>
+                    The project currently opened is registered online but you
+                    don't have access to it. A link or file will be created but
+                    the game will not be registered.
+                  </Trans>
+                </AlertMessage>
+              )}
+            {!!exportPipeline.packageNameWarningType &&
+              project.getPackageName().indexOf('com.example') !== -1 && (
+                <Line>
+                  <DismissableAlertMessage
+                    identifier="project-should-have-unique-package-name"
+                    kind="warning"
+                  >
+                    {i18n._(
+                      exportPipeline.packageNameWarningType === 'mobile'
+                        ? t`The package name begins with com.example, make sure you
                     replace it with an unique one to be able to publish your
                     game on app stores.`
-                            : t`The package name begins with
+                        : t`The package name begins with
                     com.example, make sure you replace it with an unique one,
                     else installing your game might overwrite other games.`
-                        )}
-                      </DismissableAlertMessage>
-                    </Line>
-                  )}
-                {exportPipeline.renderTutorial &&
-                  exportPipeline.renderTutorial()}
-              </Column>
-            )}
-            <Column expand justifyContent="center">
-              {!isUsingOnlineBuildNonAuthenticated && (
-                <Line alignItems="center" justifyContent="center">
-                  {exportPipeline.renderHeader({
-                    project,
-                    authenticatedUser,
-                    exportState,
-                    updateExportState: this._updateExportState,
-                    isExporting: isExportingOrWaitingForBuild,
-                    exportStep,
-                    build,
-                    quota: buildQuota,
-                  })}
+                    )}
+                  </DismissableAlertMessage>
                 </Line>
               )}
-              {!isUsingOnlineBuildNonAuthenticated &&
-                isOnlineBuildIncludedInSubscription &&
-                exportPipeline.shouldSuggestBumpingVersionNumber &&
-                exportPipeline.shouldSuggestBumpingVersionNumber() &&
-                !isExportAndBuildCompleteOrErrored && (
-                  <Line noMargin>
-                    <Toggle
-                      labelPosition="right"
-                      toggled={this.state.shouldBumpVersionNumber}
-                      label={
-                        <Trans>
-                          Increase version number to{' '}
-                          {this._candidateBumpedVersionNumber}
-                        </Trans>
-                      }
-                      onToggle={(e, toggled) => {
-                        this.setState({
-                          shouldBumpVersionNumber: toggled,
-                        });
-                      }}
-                      disabled={isExportingOrWaitingForBuild}
-                    />
-                  </Line>
-                )}
-              {!!exportPipeline.limitedBuilds &&
-                authenticatedUser.authenticated &&
-                !isExportAndBuildCompleteOrErrored && (
-                  <Line>
-                    <Column noMargin expand>
-                      <CurrentUsageDisplayer
-                        subscription={authenticatedUser.subscription}
-                        quota={buildQuota}
-                        usagePrice={buildCreditPrice}
-                        onChangeSubscription={this.props.onChangeSubscription}
-                        onStartBuildWithCredits={() => {
-                          this._launchWholeExport({
-                            i18n,
-                            payWithCredits: true,
-                          });
-                        }}
-                        hidePurchaseWithCredits={isExportingOrWaitingForBuild}
-                      />
-                    </Column>
-                  </Line>
-                )}
-              {!!exportPipeline.limitedBuilds &&
-                authenticatedUser.authenticated &&
-                !build &&
-                hasSomeBuildsRunning && (
-                  <AlertMessage kind="info">
-                    <Trans>
-                      You have a build currently running, you can see its
-                      progress via the exports button at the bottom of this
-                      dialog.
-                    </Trans>
-                  </AlertMessage>
-                )}
-              {isUsingOnlineBuildNonAuthenticated && (
-                <CreateProfile
-                  onOpenLoginDialog={authenticatedUser.onOpenLoginDialog}
-                  onOpenCreateAccountDialog={
-                    authenticatedUser.onOpenCreateAccountDialog
-                  }
-                  message={
-                    <Trans>
-                      Create an account or login first to export your game using
-                      online services.
-                    </Trans>
-                  }
-                  justifyContent="center"
-                />
-              )}
-              {!isUsingOnlineBuildNonAuthenticated &&
-                exportPipeline.renderExportFlow({
-                  project,
-                  game,
-                  builds,
-                  disabled: !canLaunchBuild(authenticatedUser),
-                  launchExport: async () => this.launchWholeExport({ i18n }),
-                  build,
-                  errored,
-                  exportStep,
-                  isSavingProject,
-                  onSaveProject,
-                  isExporting,
-                  stepCurrentProgress,
-                  stepMaxProgress,
-                  onRefreshGame,
-                })}
-              {doneFooterOpen &&
-                exportPipeline.renderDoneFooter &&
-                exportPipeline.renderDoneFooter({
-                  compressionOutput,
-                  exportState,
-                })}
-            </Column>
+            {exportPipeline.renderTutorial && exportPipeline.renderTutorial()}
           </Column>
         )}
-      </I18n>
+        <Column expand justifyContent="center">
+          {!isUsingOnlineBuildNonAuthenticated && (
+            <Line alignItems="center" justifyContent="center">
+              {exportPipeline.renderHeader({
+                project,
+                authenticatedUser,
+                exportState,
+                updateExportState: this._updateExportState,
+                isExporting: isExportingOrWaitingForBuild,
+                exportStep,
+                build,
+                quota: buildQuota,
+              })}
+            </Line>
+          )}
+          {!isUsingOnlineBuildNonAuthenticated &&
+            isOnlineBuildIncludedInSubscription &&
+            exportPipeline.shouldSuggestBumpingVersionNumber &&
+            exportPipeline.shouldSuggestBumpingVersionNumber() &&
+            !isExportAndBuildCompleteOrErrored && (
+              <Line noMargin>
+                <Toggle
+                  labelPosition="right"
+                  toggled={this.state.shouldBumpVersionNumber}
+                  label={
+                    <Trans>
+                      Increase version number to{' '}
+                      {this._candidateBumpedVersionNumber}
+                    </Trans>
+                  }
+                  onToggle={(e, toggled) => {
+                    this.setState({
+                      shouldBumpVersionNumber: toggled,
+                    });
+                  }}
+                  disabled={isExportingOrWaitingForBuild}
+                />
+              </Line>
+            )}
+          {!!exportPipeline.limitedBuilds &&
+            authenticatedUser.authenticated &&
+            !isExportAndBuildCompleteOrErrored && (
+              <Line>
+                <Column noMargin expand>
+                  <CurrentUsageDisplayer
+                    subscription={authenticatedUser.subscription}
+                    quota={buildQuota}
+                    usagePrice={buildCreditPrice}
+                    onChangeSubscription={this.props.onChangeSubscription}
+                    onStartBuildWithCredits={() => {
+                      this._launchWholeExport({
+                        payWithCredits: true,
+                      });
+                    }}
+                    hidePurchaseWithCredits={isExportingOrWaitingForBuild}
+                  />
+                </Column>
+              </Line>
+            )}
+          {!!exportPipeline.limitedBuilds &&
+            authenticatedUser.authenticated &&
+            !build &&
+            hasSomeBuildsRunning && (
+              <AlertMessage kind="info">
+                <Trans>
+                  You have a build currently running, you can see its progress
+                  via the exports button at the bottom of this dialog.
+                </Trans>
+              </AlertMessage>
+            )}
+          {isUsingOnlineBuildNonAuthenticated && (
+            <CreateProfile
+              onOpenLoginDialog={authenticatedUser.onOpenLoginDialog}
+              onOpenCreateAccountDialog={
+                authenticatedUser.onOpenCreateAccountDialog
+              }
+              message={
+                <Trans>
+                  Create an account or login first to export your game using
+                  online services.
+                </Trans>
+              }
+              justifyContent="center"
+            />
+          )}
+          {!isUsingOnlineBuildNonAuthenticated &&
+            exportPipeline.renderExportFlow({
+              project,
+              game,
+              builds,
+              disabled: !canLaunchBuild(authenticatedUser),
+              launchExport: async () =>
+                this.launchWholeExport({ payWithCredits: false }),
+              build,
+              errored,
+              exportStep,
+              isSavingProject,
+              onSaveProject,
+              isExporting,
+              stepCurrentProgress,
+              stepMaxProgress,
+              onRefreshGame,
+            })}
+          {doneFooterOpen &&
+            exportPipeline.renderDoneFooter &&
+            exportPipeline.renderDoneFooter({
+              compressionOutput,
+              exportState,
+            })}
+        </Column>
+      </Column>
     );
   }
 }

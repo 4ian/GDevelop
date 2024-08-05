@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 import Text from '../../../../UI/Text';
 import {
   ColumnStackLayout,
@@ -40,6 +41,8 @@ import { type SubscriptionPlanWithPricingSystems } from '../../../../Utils/GDeve
 import Checkbox from '../../../../UI/Checkbox';
 import { getGetStartedSectionViewCount } from '../../../../Utils/Analytics/LocalStats';
 import { sendUserSurveyCompleted } from '../../../../Utils/Analytics/EventSender';
+import { type NewProjectSetup } from '../../../../ProjectCreation/NewProjectSetupDialog';
+import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 
 const ONE_WEEK = 7 * 24 * 3600 * 1000;
 const THRESHOLD_BEFORE_ALLOWING_TO_HIDE_GET_STARTED_SECTION = 15;
@@ -91,6 +94,11 @@ type Props = {|
   selectInAppTutorial: (tutorialId: string) => void,
   subscriptionPlansWithPricingSystems: ?(SubscriptionPlanWithPricingSystems[]),
   onOpenProfile: () => void,
+  onCreateProjectFromExample: (
+    exampleShortHeader: ExampleShortHeader,
+    newProjectSetup: NewProjectSetup,
+    i18n: I18nType
+  ) => Promise<void>,
 |};
 
 const GetStartedSection = ({
@@ -99,6 +107,7 @@ const GetStartedSection = ({
   onUserSurveyHidden,
   subscriptionPlansWithPricingSystems,
   onOpenProfile,
+  onCreateProjectFromExample,
 }: Props) => {
   const isFillingOutSurvey = hasStartedUserSurvey();
   const isOnline = useOnlineStatus();
@@ -655,6 +664,7 @@ const GetStartedSection = ({
                 : null
             }
             hasFilledSurveyAlready={profile ? !!profile.survey : false}
+            onCreateProjectFromExample={onCreateProjectFromExample}
           />
         </SectionContainer>
       </>

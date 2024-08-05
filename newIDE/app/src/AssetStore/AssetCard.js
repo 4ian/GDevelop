@@ -2,36 +2,17 @@
 import * as React from 'react';
 import {
   type AssetShortHeader,
-  isPixelArt,
-  isPrivateAsset,
 } from '../Utils/GDevelopServices/Asset';
-import { getPixelatedImageRendering } from '../Utils/CssHelpers';
 import Text from '../UI/Text';
-import { CorsAwareImage } from '../UI/CorsAwareImage';
 import CheckeredBackground from '../ResourcesList/CheckeredBackground';
-import AuthorizedAssetImage from './PrivateAssets/AuthorizedAssetImage';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
+import { AssetPreviewImage } from './AssetPreviewImage';
 
-const paddingSize = 10;
 const styles = {
   previewContainer: {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  previewImage: {
-    position: 'relative',
-    objectFit: 'contain',
-    verticalAlign: 'middle',
-    pointerEvents: 'none',
-  },
-  previewImagePixelated: {
-    width: '100%',
-    imageRendering: getPixelatedImageRendering(),
-    padding: 15,
-  },
-  icon: {
-    color: '#fff',
   },
   cardContainer: {
     overflow: 'hidden',
@@ -62,35 +43,11 @@ type Props = {|
 |};
 
 export const AssetCard = ({ id, assetShortHeader, size }: Props) => {
-  const previewImageUrl = assetShortHeader.previewImageUrls[0];
-  const isPrivate = isPrivateAsset(assetShortHeader);
-  const style = {
-    maxWidth: 128 - 2 * paddingSize,
-    maxHeight: 128 - 2 * paddingSize,
-    ...styles.previewImage,
-    ...(isPixelArt(assetShortHeader)
-      ? styles.previewImagePixelated
-      : undefined),
-  };
   return (
     <div id={id} style={{ ...styles.cardContainer, width: size, height: size }}>
       <div style={{ ...styles.previewContainer, width: size, height: size }}>
         <CheckeredBackground />
-        {isPrivate ? (
-          <AuthorizedAssetImage
-            key={previewImageUrl}
-            style={style}
-            url={previewImageUrl}
-            alt={assetShortHeader.name}
-          />
-        ) : (
-          <CorsAwareImage
-            key={previewImageUrl}
-            style={style}
-            src={previewImageUrl}
-            alt={assetShortHeader.name}
-          />
-        )}
+        <AssetPreviewImage assetShortHeader={assetShortHeader} maxSize={128} />
       </div>
       <div
         style={{

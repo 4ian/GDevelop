@@ -39,6 +39,7 @@ import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import { type GameAvailabilityError } from '../../GameDashboard/GameRegistration';
+import { I18n } from '@lingui/react/cjs/react.production.min';
 
 const styles = {
   buttonBase: {
@@ -576,21 +577,26 @@ const PublishHome = ({
         </ColumnStackLayout>
       )}
       {chosenSection && chosenSubSection && selectedExporter && (
-        <ExportLauncher
-          authenticatedUser={authenticatedUser}
-          eventsFunctionsExtensionsState={eventsFunctionsExtensionsState}
-          exportPipeline={selectedExporter.exportPipeline}
-          project={project}
-          onSaveProject={onSaveProject}
-          isSavingProject={isSavingProject}
-          onRefreshGame={onRefreshGame}
-          onChangeSubscription={onChangeSubscription}
-          setIsNavigationDisabled={setIsNavigationDisabled}
-          game={game}
-          gameAvailabilityError={gameAvailabilityError}
-          builds={builds}
-          onRefreshBuilds={refreshBuilds}
-        />
+        <I18n>
+          {({ i18n }) => (
+            <ExportLauncher
+              i18n={i18n}
+              authenticatedUser={authenticatedUser}
+              eventsFunctionsExtensionsState={eventsFunctionsExtensionsState}
+              exportPipeline={selectedExporter.exportPipeline}
+              project={project}
+              onSaveProject={onSaveProject}
+              isSavingProject={isSavingProject}
+              onRefreshGame={onRefreshGame}
+              onChangeSubscription={onChangeSubscription}
+              setIsNavigationDisabled={setIsNavigationDisabled}
+              game={game}
+              gameAvailabilityError={gameAvailabilityError}
+              builds={builds}
+              onRefreshBuilds={refreshBuilds}
+            />
+          )}
+        </I18n>
       )}
     </ColumnStackLayout>
   );

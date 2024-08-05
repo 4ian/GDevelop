@@ -118,6 +118,11 @@ type Props = {|
 
   // Project creation
   onOpenNewProjectSetupDialog: () => void,
+  onCreateProjectFromExample: (
+    exampleShortHeader: ExampleShortHeader,
+    newProjectSetup: NewProjectSetup,
+    i18n: I18nType
+  ) => Promise<void>,
 
   // Project save
   onSave: () => Promise<void>,
@@ -150,6 +155,7 @@ export const HomePage = React.memo<Props>(
         onOpenProjectManager,
         onOpenLanguageDialog,
         onOpenProfile,
+        onCreateProjectFromExample,
         setToolbar,
         selectInAppTutorial,
         onOpenPreferences,
@@ -473,6 +479,7 @@ export const HomePage = React.memo<Props>(
                         subscriptionPlansWithPricingSystems
                       }
                       onOpenProfile={onOpenProfile}
+                      onCreateProjectFromExample={onCreateProjectFromExample}
                     />
                   )}
                   {activeTab === 'build' && (
@@ -612,6 +619,7 @@ export const renderHomePageContainer = (
     onOpenProjectManager={props.onOpenProjectManager}
     onOpenLanguageDialog={props.onOpenLanguageDialog}
     onOpenProfile={props.onOpenProfile}
+    onCreateProjectFromExample={props.onCreateProjectFromExample}
     selectInAppTutorial={props.selectInAppTutorial}
     onOpenPreferences={props.onOpenPreferences}
     onOpenAbout={props.onOpenAbout}

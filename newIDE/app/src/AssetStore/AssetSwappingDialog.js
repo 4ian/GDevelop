@@ -90,12 +90,13 @@ const swapAsset = (
       serializedAssetObject.content.width *
       serializedAssetObject.content.height *
       serializedAssetObject.content.depth;
+    const ratio = Math.pow(objectVolume / assetVolume, 1/3);
 
     serializedObject.content = serializedAssetObject.content;
     serializedObject.content.animation = animations;
-    serializedObject.content.width *= objectVolume / assetVolume;
-    serializedObject.content.height *= objectVolume / assetVolume;
-    serializedObject.content.depth *= objectVolume / assetVolume;
+    serializedObject.content.width *= ratio;
+    serializedObject.content.height *= ratio;
+    serializedObject.content.depth *= ratio;
   }
   unserializeFromJSObject(object, serializedObject, 'unserializeFrom', project);
 };

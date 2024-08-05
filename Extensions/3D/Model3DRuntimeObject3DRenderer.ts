@@ -236,6 +236,20 @@ namespace gdjs {
       }
     }
 
+    /**
+     * `_updateModel` should always be called after this method.
+     * Ideally, use `Model3DRuntimeObject#_reloadModel` instead.
+     */
+    _reloadModel(
+      runtimeObject: Model3DRuntimeObject,
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ) {
+      this._originalModel = instanceContainer
+        .getGame()
+        .getModel3DManager()
+        .getModel(runtimeObject._modelResourceName);
+    }
+
     _updateModel(
       rotationX: float,
       rotationY: float,

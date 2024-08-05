@@ -396,6 +396,7 @@ export class AssetSwappingAssetStoreSearchFilter
     const otherHasAnimatedState = other.maxFramesCount > 1;
     const otherHasSeveralState = other.animationsCount > 1;
     if (
+      (otherHasAnimatedState || otherHasSeveralState) &&
       hasAnimatedState === otherHasAnimatedState &&
       hasSeveralState === otherHasSeveralState
     ) {

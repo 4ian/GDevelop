@@ -129,6 +129,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
           if (assetSwappedObjectPtr.current !== assetSwappedObject.ptr) {
             shopNavigationState.openAssetSwapping();
             setAssetStoreSearchText('');
+            clearAllAssetStoreFilters();
             const assetShortHeader = assetShortHeadersById
               ? assetShortHeadersById[assetSwappedObject.getAssetStoreId()]
               : null;
@@ -140,20 +141,18 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
             );
           }
           assetSwappedObjectPtr.current = assetSwappedObject.ptr;
-        } else {
-          if (assetSwappedObjectPtr.current !== 0) {
-            shopNavigationState.openHome();
-            assetFiltersState.setAssetSwappingFilter(
-              new AssetSwappingAssetStoreSearchFilter()
-            );
-          }
-          assetSwappedObjectPtr.current = 0;
+        } else if (shopNavigationState.isAssetSwappingHistory) {
+          shopNavigationState.openHome();
+          assetFiltersState.setAssetSwappingFilter(
+            new AssetSwappingAssetStoreSearchFilter()
+          );
         }
       },
       [
         assetFiltersState,
         assetShortHeadersById,
         assetSwappedObject,
+        clearAllAssetStoreFilters,
         setAssetStoreSearchText,
         shopNavigationState,
       ]

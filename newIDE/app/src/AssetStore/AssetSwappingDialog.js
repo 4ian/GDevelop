@@ -351,13 +351,7 @@ function AssetSwappingDialog({
       key="add-asset"
       primary={!isAssetAddedToScene}
       label={
-        isAssetBeingInstalled ? (
-          <Trans>Adding...</Trans>
-        ) : isAssetAddedToScene ? (
-          <Trans>Swap</Trans>
-        ) : (
-          <Trans>Get and swap</Trans>
-        )
+        isAssetBeingInstalled ? <Trans>Adding...</Trans> : <Trans>Swap</Trans>
       }
       onClick={async () => {
         onInstallAsset(openedAssetShortHeader);

@@ -171,15 +171,6 @@ namespace gdjs {
         this._updateModel(newObjectData);
       }
       if (
-        oldObjectData.content.materialType !==
-        newObjectData.content.materialType
-      ) {
-        this._materialType = this._convertMaterialType(
-          newObjectData.content.materialType
-        );
-        this._updateModel(newObjectData);
-      }
-      if (
         oldObjectData.content.originLocation !==
         newObjectData.content.originLocation
       ) {

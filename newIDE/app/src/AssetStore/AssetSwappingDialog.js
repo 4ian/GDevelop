@@ -77,11 +77,6 @@ const swapAsset = (
       serializedAssetObject.animations
     );
   } else if (object.getType() === 'Scene3D::Model3DObject') {
-    const animations = (serializedObject.animations = mergeAnimations(
-      serializedObject.content.animations,
-      serializedAssetObject.content.animations
-    ));
-
     const objectVolume =
       serializedObject.content.width *
       serializedObject.content.height *
@@ -90,13 +85,21 @@ const swapAsset = (
       serializedAssetObject.content.width *
       serializedAssetObject.content.height *
       serializedAssetObject.content.depth;
-    const ratio = Math.pow(objectVolume / assetVolume, 1/3);
+    const sizeRatio = Math.pow(objectVolume / assetVolume, 1 / 3);
 
-    serializedObject.content = serializedAssetObject.content;
-    serializedObject.content.animation = animations;
-    serializedObject.content.width *= ratio;
-    serializedObject.content.height *= ratio;
-    serializedObject.content.depth *= ratio;
+    serializedObject.content = {
+      ...serializedAssetObject.content,
+      animation: mergeAnimations(
+        serializedObject.content.animations,
+        serializedAssetObject.content.animations
+      ),
+      width: serializedAssetObject.content.width * sizeRatio,
+      height: serializedAssetObject.content.height * sizeRatio,
+      depth: serializedAssetObject.content.depth * sizeRatio,
+      // Keep the origin and center as they may be important for the game to work.
+      originLocation: serializedObject.content.originLocation,
+      centerLocation: serializedObject.content.centerLocation,
+    };
   }
   unserializeFromJSObject(object, serializedObject, 'unserializeFrom', project);
 };

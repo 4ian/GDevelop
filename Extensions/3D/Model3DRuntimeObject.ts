@@ -63,8 +63,7 @@ namespace gdjs {
    */
   export class Model3DRuntimeObject
     extends gdjs.RuntimeObject3D
-    implements gdjs.Animatable
-  {
+    implements gdjs.Animatable {
     _renderer: gdjs.Model3DRuntimeObjectRenderer;
 
     _modelResourceName: string;

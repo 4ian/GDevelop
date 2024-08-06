@@ -632,9 +632,9 @@ export const AssetStoreStateProvider = ({
       getAssetShortHeaderFromId,
     }),
     [
-      hidePremiumProducts,
       assetShortHeadersSearchResults,
       publicAssetPacksSearchResults,
+      hidePremiumProducts,
       privateAssetPackListingDatasSearchResults,
       fetchAssetsAndFilters,
       filters,
@@ -643,7 +643,6 @@ export const AssetStoreStateProvider = ({
       authors,
       licenses,
       environment,
-      setEnvironment,
       error,
       shopNavigationState,
       currentPage,
@@ -652,7 +651,7 @@ export const AssetStoreStateProvider = ({
       assetPackFiltersState,
       clearAllFilters,
       getAssetShortHeaderFromId,
-      setInitialPackUserFriendlySlug,
+      assetShortHeadersById,
     ]
   );
 

@@ -625,6 +625,9 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
               }
               value={searchText}
               onChange={(newValue: string) => {
+                if (searchText === newValue) {
+                  return;
+                }
                 setSearchText(newValue);
                 if (isOnSearchResultPage) {
                   // An existing search is already being done: just move to the

@@ -16,6 +16,9 @@ import {
   extensionObjectsRootFolderId,
 } from '.';
 import Add from '../UI/CustomSvgIcons/Add';
+import Window from '../Utils/Window';
+
+const isDev = Window.isDev();
 
 const EVENTS_BASED_OBJECT_CLIPBOARD_KIND = 'Events Based Object';
 
@@ -143,7 +146,7 @@ export class EventsBasedObjectTreeViewItemContent
 
   buildMenuTemplate(i18n: I18nType, index: number) {
     return [
-      {
+      isDev && {
         label: i18n._(t`Open visual editor`),
         click: () =>
           this.props.onOpenCustomObjectEditor(this.eventsBasedObject),
@@ -184,7 +187,7 @@ export class EventsBasedObjectTreeViewItemContent
         click: () => this.paste(),
         accelerator: 'CmdOrCtrl+V',
       },
-    ];
+    ].filter(Boolean);
   }
 
   renderRightComponent(i18n: I18nType): ?React.Node {

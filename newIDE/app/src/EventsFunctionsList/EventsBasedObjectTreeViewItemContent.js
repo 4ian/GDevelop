@@ -146,11 +146,13 @@ export class EventsBasedObjectTreeViewItemContent
 
   buildMenuTemplate(i18n: I18nType, index: number) {
     return [
-      isDev ? {
-        label: i18n._(t`Open visual editor`),
-        click: () =>
-          this.props.onOpenCustomObjectEditor(this.eventsBasedObject),
-      } : null,
+      isDev
+        ? {
+            label: i18n._(t`Open visual editor`),
+            click: () =>
+              this.props.onOpenCustomObjectEditor(this.eventsBasedObject),
+          }
+        : null,
       {
         label: i18n._(t`Add a function`),
         click: () => this.addFunctionAtSelection(),
@@ -187,7 +189,7 @@ export class EventsBasedObjectTreeViewItemContent
         click: () => this.paste(),
         accelerator: 'CmdOrCtrl+V',
       },
-    ];
+    ].filter(Boolean);
   }
 
   renderRightComponent(i18n: I18nType): ?React.Node {

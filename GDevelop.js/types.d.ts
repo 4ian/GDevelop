@@ -664,6 +664,7 @@ export class ObjectConfiguration extends EmscriptenObject {
   constructor();
   clone(): UniquePtrObjectConfiguration;
   getType(): string;
+  setType(typeName: string): void;
   getProperties(): MapStringPropertyDescriptor;
   updateProperty(name: string, value: string): boolean;
   getInitialInstanceProperties(instance: InitialInstance): MapStringPropertyDescriptor;

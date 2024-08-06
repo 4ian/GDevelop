@@ -3,6 +3,7 @@ declare class gdObjectConfiguration {
   constructor(): void;
   clone(): gdUniquePtrObjectConfiguration;
   getType(): string;
+  setType(typeName: string): void;
   getProperties(): gdMapStringPropertyDescriptor;
   updateProperty(name: string, value: string): boolean;
   getInitialInstanceProperties(instance: gdInitialInstance): gdMapStringPropertyDescriptor;

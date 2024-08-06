@@ -55,6 +55,7 @@ import { capitalize } from 'lodash';
 import PrivateGameTemplateInformationPage from './PrivateGameTemplates/PrivateGameTemplateInformationPage';
 import { PrivateGameTemplateStoreContext } from './PrivateGameTemplates/PrivateGameTemplateStoreContext';
 import { AssetSwappingAssetStoreSearchFilter } from './AssetStoreSearchFilter';
+import { delay } from '../Utils/Delay';
 
 type Props = {|
   hideGameTemplates?: boolean, // TODO: if we add more options, use an array instead.
@@ -119,7 +120,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       setSearchText: setAssetStoreSearchText,
       clearAllFilters: clearAllAssetStoreFilters,
       assetFiltersState,
-      assetShortHeadersById,
+      getAssetShortHeaderFromId,
     } = React.useContext(AssetStoreContext);
 
     const assetSwappedObjectPtr = React.useRef<number | null>(null);
@@ -130,9 +131,9 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
             shopNavigationState.openAssetSwapping();
             setAssetStoreSearchText('');
             clearAllAssetStoreFilters();
-            const assetShortHeader = assetShortHeadersById
-              ? assetShortHeadersById[assetSwappedObject.getAssetStoreId()]
-              : null;
+            const assetShortHeader = getAssetShortHeaderFromId(
+              assetSwappedObject.getAssetStoreId()
+            );
             assetFiltersState.setAssetSwappingFilter(
               new AssetSwappingAssetStoreSearchFilter(
                 assetSwappedObject,
@@ -155,9 +156,9 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       },
       [
         assetFiltersState,
-        assetShortHeadersById,
         assetSwappedObject,
         clearAllAssetStoreFilters,
+        getAssetShortHeaderFromId,
         setAssetStoreSearchText,
         shopNavigationState,
       ]
@@ -676,9 +677,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                         if (isUpdatingSearchtext) {
                           // Updating the search is not instant, so we cannot apply the scroll position
                           // right away. We force a wait as there's no easy way to know when results are completely updated.
-                          await new Promise(resolve =>
-                            setTimeout(resolve, 500)
-                          );
+                          await delay(500);
                           setScrollUpdateIsNeeded(page);
                           applyBackScrollPosition(page); // We apply it manually, because the layout effect won't be called again.
                         } else {

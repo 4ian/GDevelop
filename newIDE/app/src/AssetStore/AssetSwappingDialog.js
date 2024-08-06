@@ -26,83 +26,12 @@ import { getAssetShortHeadersToDisplay } from './AssetsList';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import LoaderModal from '../UI/LoaderModal';
 import {
-  serializeToJSObject,
-  unserializeFromJSObject,
-} from '../Utils/Serializer';
-import {
   useFetchAssets,
   useExtensionUpdateAlertDialog,
 } from './NewObjectDialog';
+import { swapAsset } from './AssetSwapper';
 
 const isDev = Window.isDev();
-
-const mergeAnimations = (
-  objectsAnimations: Array<{ name: string }>,
-  assetAnimations: Array<{ name: string }>
-) => {
-  const animations = [];
-  // Ensure the object don't loose any animation.
-  for (const objectAnimation of objectsAnimations) {
-    const assetAnimation = assetAnimations.find(
-      assetAnimation => assetAnimation.name === objectAnimation.name
-    ) || {
-      ...assetAnimations[0],
-      name: objectAnimation.name,
-    };
-    animations.push(assetAnimation);
-  }
-  // Add extra animations from the asset.
-  for (const assetAnimation of assetAnimations) {
-    if (
-      !objectsAnimations.some(
-        objectAnimation => objectAnimation.name === assetAnimation.name
-      )
-    ) {
-      animations.push(assetAnimation);
-    }
-  }
-  return animations;
-};
-
-const swapAsset = (
-  project: gdProject,
-  object: gdObject,
-  assetObject: gdObject
-) => {
-  const serializedAssetObject = serializeToJSObject(assetObject);
-  const serializedObject = serializeToJSObject(object);
-  if (object.getType() === 'Sprite') {
-    serializedObject.animations = mergeAnimations(
-      serializedObject.animations,
-      serializedAssetObject.animations
-    );
-  } else if (object.getType() === 'Scene3D::Model3DObject') {
-    const objectVolume =
-      serializedObject.content.width *
-      serializedObject.content.height *
-      serializedObject.content.depth;
-    const assetVolume =
-      serializedAssetObject.content.width *
-      serializedAssetObject.content.height *
-      serializedAssetObject.content.depth;
-    const sizeRatio = Math.pow(objectVolume / assetVolume, 1 / 3);
-
-    serializedObject.content = {
-      ...serializedAssetObject.content,
-      animation: mergeAnimations(
-        serializedObject.content.animations,
-        serializedAssetObject.content.animations
-      ),
-      width: serializedAssetObject.content.width * sizeRatio,
-      height: serializedAssetObject.content.height * sizeRatio,
-      depth: serializedAssetObject.content.depth * sizeRatio,
-      // Keep the origin and center as they may be important for the game to work.
-      originLocation: serializedObject.content.originLocation,
-      centerLocation: serializedObject.content.centerLocation,
-    };
-  }
-  unserializeFromJSObject(object, serializedObject, 'unserializeFrom', project);
-};
 
 type Props = {|
   project: gdProject,
@@ -292,7 +221,7 @@ function AssetSwappingDialog({
         onInstallAsset(openedAssetShortHeader);
       }}
       disabled={isAssetBeingInstalled}
-      id="add-asset-button"
+      id="swap-asset-button"
     />
   ) : isDev ? (
     <RaisedButton
@@ -351,7 +280,7 @@ function AssetSwappingDialog({
             open
             flexBody
             fullHeight
-            id="new-object-dialog"
+            id="asset-swapping-dialog"
           >
             <AssetStore
               ref={assetStore}

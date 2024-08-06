@@ -129,9 +129,9 @@ export class AnimatedAssetStoreSearchFilter
 
   getPertinence(searchItem: AssetShortHeader): number {
     const hasAnimatedState = searchItem.maxFramesCount > 1;
-    const hasSeveralState = searchItem.animationsCount > 1;
+    const hasSeveralStates = searchItem.animationsCount > 1;
     return (!this.mustBeAnimated || hasAnimatedState) &&
-      (!this.mustHaveSeveralState || hasSeveralState)
+      (!this.mustHaveSeveralState || hasSeveralStates)
       ? 1
       : 0;
   }
@@ -286,7 +286,7 @@ export class AssetSwappingAssetStoreSearchFilter
   implements SearchFilter<AssetShortHeader> {
   isEnabled: boolean;
   objectType: string;
-  hasSeveralState: boolean;
+  hasSeveralStates: boolean;
   other: AssetShortHeader | null;
   tags: Array<string>;
 
@@ -299,9 +299,10 @@ export class AssetSwappingAssetStoreSearchFilter
       this.objectType = assetShortHeader
         ? assetShortHeader.objectType
         : toAssetStoreType(object.getType());
-      this.hasSeveralState = object.getConfiguration().getAnimationsCount() > 0;
+      this.hasSeveralStates =
+        object.getConfiguration().getAnimationsCount() > 0;
       this.other = assetShortHeader;
-      // The asset pack tag is not relevent.
+      // The asset pack tag (which is the first tag) is not relevant.
       this.tags = assetShortHeader
         ? assetShortHeader.tags
             .slice(1)
@@ -310,7 +311,7 @@ export class AssetSwappingAssetStoreSearchFilter
     } else {
       this.isEnabled = false;
       this.objectType = '';
-      this.hasSeveralState = false;
+      this.hasSeveralStates = false;
       this.other = null;
       this.tags = [];
     }
@@ -330,8 +331,8 @@ export class AssetSwappingAssetStoreSearchFilter
 
     const { other } = this;
     if (!other) {
-      const hasSeveralState = searchItem.animationsCount > 1;
-      if (this.hasSeveralState && !hasSeveralState) {
+      const hasSeveralStates = searchItem.animationsCount > 1;
+      if (this.hasSeveralStates && !hasSeveralStates) {
         similitude *= 0.8;
       }
 
@@ -389,13 +390,13 @@ export class AssetSwappingAssetStoreSearchFilter
     }
 
     const hasAnimatedState = searchItem.maxFramesCount > 1;
-    const hasSeveralState = searchItem.animationsCount > 1;
+    const hasSeveralStates = searchItem.animationsCount > 1;
     const otherHasAnimatedState = other.maxFramesCount > 1;
     const otherHasSeveralState = other.animationsCount > 1;
     if (
       (otherHasAnimatedState || otherHasSeveralState) &&
       hasAnimatedState === otherHasAnimatedState &&
-      hasSeveralState === otherHasSeveralState
+      hasSeveralStates === otherHasSeveralState
     ) {
       // There is not a lot of animated assets in the store.
       // This ensures they are shown.
@@ -428,12 +429,12 @@ export class SimilarAssetStoreSearchFilter
 
     {
       const hasAnimatedState = searchItem.maxFramesCount > 1;
-      const hasSeveralState = searchItem.animationsCount > 1;
+      const hasSeveralStates = searchItem.animationsCount > 1;
       const otherHasAnimatedState = this.other.maxFramesCount > 1;
       const otherHasSeveralState = this.other.animationsCount > 1;
       if (
         hasAnimatedState !== otherHasAnimatedState ||
-        hasSeveralState !== otherHasSeveralState
+        hasSeveralStates !== otherHasSeveralState
       ) {
         return 0;
       }

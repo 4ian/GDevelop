@@ -92,9 +92,7 @@ type AssetStoreState = {|
     searchFilters: Array<SearchFilter<AssetShortHeader>>
   ) => ?Array<AssetShortHeader>,
   setInitialPackUserFriendlySlug: (initialPackUserFriendlySlug: string) => void,
-  assetShortHeadersById: ?{
-    [string]: AssetShortHeader,
-  },
+  getAssetShortHeaderFromId: (id: string) => AssetShortHeader | null,
 |};
 
 export const initialAssetStoreState: AssetStoreState = {
@@ -162,7 +160,7 @@ export const initialAssetStoreState: AssetStoreState = {
   useSearchItem: (searchText, chosenCategory, chosenFilters, searchFilters) =>
     null,
   setInitialPackUserFriendlySlug: (initialPackUserFriendlySlug: string) => {},
-  assetShortHeadersById: null,
+  getAssetShortHeaderFromId: (id: string) => null,
 };
 
 export const AssetStoreContext = React.createContext<AssetStoreState>(
@@ -198,6 +196,11 @@ export const AssetStoreStateProvider = ({
   const [assetShortHeadersById, setAssetShortHeadersById] = React.useState<?{
     [string]: AssetShortHeader,
   }>(null);
+  const getAssetShortHeaderFromId = React.useCallback(
+    (id: string): AssetShortHeader | null =>
+      (assetShortHeadersById && assetShortHeadersById[id]) || null,
+    [assetShortHeadersById]
+  );
   const [
     publicAssetShortHeaders,
     setPublicAssetShortHeaders,
@@ -626,7 +629,7 @@ export const AssetStoreStateProvider = ({
           searchFilters
         ),
       setInitialPackUserFriendlySlug,
-      assetShortHeadersById,
+      getAssetShortHeaderFromId,
     }),
     [
       hidePremiumProducts,
@@ -648,7 +651,7 @@ export const AssetStoreStateProvider = ({
       assetFiltersState,
       assetPackFiltersState,
       clearAllFilters,
-      assetShortHeadersById,
+      getAssetShortHeaderFromId,
       setInitialPackUserFriendlySlug,
     ]
   );

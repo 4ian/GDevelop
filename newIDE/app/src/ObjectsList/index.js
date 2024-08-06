@@ -51,6 +51,7 @@ import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import { getInsertionParentAndPositionFromSelection } from '../Utils/ObjectFolders';
+import { canSwapAssetOfObject } from '../AssetStore/AssetSwapper';
 
 const gd: libGDevelop = global.gd;
 const sceneObjectsRootFolderId = 'scene-objects';
@@ -441,11 +442,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     const swapObjectAsset = React.useCallback((object: gdObject) => {
       setObjectAssetSwappingDialogOpen({ object });
-    }, []);
-
-    const canSwapAssetOfObject = React.useCallback((object: gdObject) => {
-      const type = object.getType();
-      return type === 'Scene3D::Model3DObject' || type === 'Sprite';
     }, []);
 
     const onAddNewObject = React.useCallback(
@@ -1498,7 +1494,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           },
           { type: 'separator' },
           {
-            label: i18n._(t`Swap asset`),
+            label: i18n._(t`Swap assets`),
             click: () => swapObjectAsset(object),
             enabled: canSwapAssetOfObject(object),
           },
@@ -1550,7 +1546,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         objectsContainer,
         initialInstances,
         project,
-        canSwapAssetOfObject,
         canSetAsGlobalObject,
         onSelectAllInstancesOfObjectInLayout,
         onExportAssets,

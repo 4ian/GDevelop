@@ -475,6 +475,8 @@ class MockedChildRenderedInstance implements ChildRenderedInstance {
   _pixiObject: { height: number };
   defaultWidth: number;
   defaultHeight: number;
+  originX: number;
+  originY: number;
   heightAfterUpdate: ?number;
 
   constructor(
@@ -487,6 +489,9 @@ class MockedChildRenderedInstance implements ChildRenderedInstance {
     this._pixiObject = { height: 0 };
     this.defaultWidth = defaultWidth;
     this.defaultHeight = defaultHeight;
+    // TODO Add tests with custom origin.
+    this.originX = 0;
+    this.originY = 0;
     this.heightAfterUpdate = heightAfterUpdate;
   }
 
@@ -496,6 +501,14 @@ class MockedChildRenderedInstance implements ChildRenderedInstance {
 
   getDefaultHeight(): number {
     return this.defaultHeight;
+  }
+
+  getOriginX(): number {
+    return this.originX;
+  }
+
+  getOriginY(): number {
+    return this.originY;
   }
 
   update(): void {

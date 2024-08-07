@@ -141,6 +141,70 @@ describe('swapAsset (Sprite)', () => {
 
     project.delete();
   });
+
+  test('can keep the object points', () => {
+    const {
+      project,
+      object,
+      assetObject,
+      objectConfiguration,
+      assetConfiguration,
+    } = makeNewTestProject();
+
+    addAnimation(objectConfiguration, 'Idle', 'ObjectIdle');
+    const frame = objectConfiguration
+      .getAnimations()
+      .getAnimation(0)
+      .getDirection(0)
+      .getSprite(0);
+
+    const origin = frame.getOrigin();
+    origin.setXY(8, 16);
+
+    frame.setDefaultCenterPoint(false);
+    const center = frame.getCenter();
+    center.setXY(24, 32);
+
+    const customPoint = new gd.Point('');
+    customPoint.setName('CustomPointA');
+    customPoint.setXY(40, 48);
+    frame.addPoint(customPoint);
+
+    customPoint.setName('CustomPointB');
+    customPoint.setXY(56, 64);
+    frame.addPoint(customPoint);
+    customPoint.delete();
+
+    addAnimation(assetConfiguration, 'Idle', 'AssetIdle');
+
+    swapAsset(project, object, assetObject);
+
+    const objectNewConfiguration = gd.asSpriteConfiguration(
+      object.getConfiguration()
+    );
+    const newFrame = objectNewConfiguration
+      .getAnimations()
+      .getAnimation(0)
+      .getDirection(0)
+      .getSprite(0);
+
+    expect(newFrame.getOrigin().getX()).toEqual(8);
+    expect(newFrame.getOrigin().getY()).toEqual(16);
+
+    expect(!newFrame.isDefaultCenterPoint());
+    expect(newFrame.getCenter().getX()).toEqual(24);
+    expect(newFrame.getCenter().getY()).toEqual(32);
+
+    expect(newFrame.hasPoint('CustomPointA'));
+    expect(newFrame.getPoint('CustomPointA').getX()).toEqual(40);
+    expect(newFrame.getPoint('CustomPointA').getY()).toEqual(48);
+
+    expect(newFrame.hasPoint('CustomPointB'));
+    expect(newFrame.getPoint('CustomPointB').getX()).toEqual(56);
+    expect(newFrame.getPoint('CustomPointB').getY()).toEqual(64);
+
+    project.delete();
+  });
 });
 
 describe('swapAsset (Model)', () => {

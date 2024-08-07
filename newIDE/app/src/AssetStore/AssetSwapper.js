@@ -127,8 +127,13 @@ const mergeSpriteAnimation = (
     directions: [
       {
         ...assetDirection,
-        sprites: objectDirection.sprites.map((frame, frameIndex) =>
-          mergeSpriteFrame(frame, assetDirection.sprites[frameIndex])
+        sprites: assetDirection.sprites.map((frame, frameIndex) =>
+          mergeSpriteFrame(
+            frameIndex < objectDirection.sprites.length
+              ? objectDirection.sprites[frameIndex]
+              : objectDirection.sprites[0],
+            frame
+          )
         ),
       },
     ],

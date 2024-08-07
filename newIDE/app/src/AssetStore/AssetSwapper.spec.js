@@ -205,6 +205,56 @@ describe('swapAsset (Sprite)', () => {
 
     project.delete();
   });
+
+  test('can keep the object points when the object has less frames than the asset', () => {
+    const {
+      project,
+      object,
+      assetObject,
+      objectConfiguration,
+      assetConfiguration,
+    } = makeNewTestProject();
+
+    // The object only has 1 frame in the Idle animation.
+    addAnimation(objectConfiguration, 'Idle', 'ObjectIdle');
+    objectConfiguration
+      .getAnimations()
+      .getAnimation(0)
+      .getDirection(0)
+      .getSprite(0)
+      .getOrigin()
+      .setXY(8, 16);
+
+    // The asset has a 2nd frame in the Idle animation.
+    addAnimation(assetConfiguration, 'Idle', 'AssetIdle');
+    const frame2 = new gd.Sprite();
+    frame2.setImageName('AssetIdle2');
+    assetConfiguration
+      .getAnimations()
+      .getAnimation(0)
+      .getDirection(0)
+      .addSprite(frame2);
+
+    swapAsset(project, object, assetObject);
+
+    const objectNewConfiguration = gd.asSpriteConfiguration(
+      object.getConfiguration()
+    );
+    const newDirection = objectNewConfiguration
+      .getAnimations()
+      .getAnimation(0)
+      .getDirection(0);
+    const frame0 = newDirection.getSprite(0);
+    const frame1 = newDirection.getSprite(0);
+
+    expect(frame0.getOrigin().getX()).toEqual(8);
+    expect(frame0.getOrigin().getY()).toEqual(16);
+    // It defaults to the points from the 1st frame.
+    expect(frame1.getOrigin().getX()).toEqual(8);
+    expect(frame1.getOrigin().getY()).toEqual(16);
+
+    project.delete();
+  });
 });
 
 describe('swapAsset (Model)', () => {

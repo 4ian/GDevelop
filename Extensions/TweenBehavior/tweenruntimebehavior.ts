@@ -4,6 +4,23 @@ Copyright (c) 2010-2023 Florian Rival (Florian.Rival@gmail.com)
  */
 namespace gdjs {
   const logger = new gdjs.Logger('Tween');
+
+  interface TweenData {
+    progress: number;
+    value: number;
+    isPlaying: boolean;
+    hasFinished: boolean;
+  }
+  export type TweenManagerSyncData = Record<string, TweenData>;
+
+  interface TweenNetworkSyncDataType {
+    tweens: TweenManagerSyncData;
+  }
+
+  export interface TweenNetworkSyncData extends BehaviorNetworkSyncData {
+    props: TweenNetworkSyncDataType;
+  }
+
   interface IColorable extends gdjs.RuntimeObject {
     setColor(color: string): void;
     getColor(): string;
@@ -82,6 +99,21 @@ namespace gdjs {
     ): boolean {
       // Nothing to update.
       return true;
+    }
+
+    getNetworkSyncData(): TweenNetworkSyncData {
+      return {
+        ...super.getNetworkSyncData(),
+        props: {
+          tweens: this._tweens.getNetworkSyncData(),
+        },
+      };
+    }
+
+    updateFromNetworkSyncData(networkSyncData: TweenNetworkSyncData) {
+      super.updateFromNetworkSyncData(networkSyncData);
+
+      this._tweens.updateFromNetworkSyncData(networkSyncData.props.tweens);
     }
 
     doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer): void {

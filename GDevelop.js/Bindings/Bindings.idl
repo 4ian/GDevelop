@@ -3329,6 +3329,8 @@ interface SpriteObject {
 
     void SetUpdateIfNotVisible(boolean updateIfNotVisible);
     boolean GetUpdateIfNotVisible();
+    void SetPreScale(double value);
+    double GetPreScale();
 };
 SpriteObject implements ObjectConfiguration;
 

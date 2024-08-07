@@ -4,6 +4,8 @@ declare class gdSpriteObject extends gdObjectConfiguration {
   getAnimations(): gdSpriteAnimationList;
   setUpdateIfNotVisible(updateIfNotVisible: boolean): void;
   getUpdateIfNotVisible(): boolean;
+  setPreScale(value: number): void;
+  getPreScale(): number;
   delete(): void;
   ptr: number;
 };

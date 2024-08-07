@@ -2463,6 +2463,8 @@ export class SpriteObject extends ObjectConfiguration {
   getAnimations(): SpriteAnimationList;
   setUpdateIfNotVisible(updateIfNotVisible: boolean): void;
   getUpdateIfNotVisible(): boolean;
+  setPreScale(value: number): void;
+  getPreScale(): number;
 }
 
 export class Model3DAnimation extends EmscriptenObject {

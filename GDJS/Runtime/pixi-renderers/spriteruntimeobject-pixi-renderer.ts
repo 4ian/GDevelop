@@ -58,6 +58,8 @@ namespace gdjs {
     _updatePIXISprite() {
       const animationFrame = this._object._animator.getCurrentFrame();
       if (animationFrame !== null) {
+        const scaleX = this._object._scaleX * this._object._preScale;
+        const scaleY = this._object._scaleY * this._object._preScale;
         this._sprite.anchor.x =
           animationFrame.center.x / this._sprite.texture.frame.width;
         this._sprite.anchor.y =
@@ -65,17 +67,17 @@ namespace gdjs {
         this._sprite.position.x =
           this._object.x +
           (animationFrame.center.x - animationFrame.origin.x) *
-            Math.abs(this._object._scaleX);
+            Math.abs(scaleX);
         this._sprite.position.y =
           this._object.y +
           (animationFrame.center.y - animationFrame.origin.y) *
-            Math.abs(this._object._scaleY);
+            Math.abs(scaleY);
         this._sprite.rotation = gdjs.toRad(this._object.angle);
         this._sprite.visible = !this._object.hidden;
         this._sprite.blendMode = this._object._blendMode;
         this._sprite.alpha = this._object.opacity / 255;
-        this._sprite.scale.x = this._object._scaleX;
-        this._sprite.scale.y = this._object._scaleY;
+        this._sprite.scale.x = scaleX;
+        this._sprite.scale.y = scaleY;
         this._cachedWidth = Math.abs(this._sprite.width);
         this._cachedHeight = Math.abs(this._sprite.height);
       } else {
@@ -115,7 +117,7 @@ namespace gdjs {
       this._sprite.position.x =
         this._object.x +
         (animationFrame.center.x - animationFrame.origin.x) *
-          Math.abs(this._object._scaleX);
+          Math.abs(this._object._scaleX * this._object._preScale);
     }
 
     updateY(): void {
@@ -125,7 +127,7 @@ namespace gdjs {
       this._sprite.position.y =
         this._object.y +
         (animationFrame.center.y - animationFrame.origin.y) *
-          Math.abs(this._object._scaleY);
+          Math.abs(this._object._scaleY * this._object._preScale);
     }
 
     updateAngle(): void {

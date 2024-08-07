@@ -95,7 +95,7 @@ export type PublicAssetPacks = {|
   starterPacks: Array<PublicAssetPack>,
 |};
 
-type PrivateAssetPackAssetType =
+export type PrivateAssetPackAssetType =
   | 'font'
   | 'audio'
   | 'sprite'
@@ -103,7 +103,8 @@ type PrivateAssetPackAssetType =
   | 'tiled'
   | 'partial'
   | 'particleEmitter'
-  | 'Scene3D::Model3DObject';
+  | 'model3d'
+  | 'simpleTileMap';
 
 export type PrivateAssetPackContent = { [PrivateAssetPackAssetType]: number };
 

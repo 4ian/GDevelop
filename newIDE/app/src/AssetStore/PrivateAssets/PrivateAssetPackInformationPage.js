@@ -8,9 +8,11 @@ import {
   type PrivateGameTemplateListingData,
   getCalloutToGetSubscriptionOrClaimAssetPack,
 } from '../../Utils/GDevelopServices/Shop';
+import type { MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import {
   getPrivateAssetPack,
   type PrivateAssetPack,
+  type PrivateAssetPackAssetType,
 } from '../../Utils/GDevelopServices/Asset';
 import Text from '../../UI/Text';
 import { t, Trans } from '@lingui/macro';
@@ -80,22 +82,26 @@ const getPackColumns = (windowSize: WindowSizeType, isLandscape: boolean) => {
   }
 };
 
-const sortedContentType = [
+const sortedContentType: PrivateAssetPackAssetType[] = [
   'sprite',
   '9patch',
   'tiled',
+  'model3d',
+  'simpleTileMap',
   'particleEmitter',
   'font',
   'audio',
-  'Scene3D::Model3DObject',
   'partial',
 ];
 
-const contentTypeToMessageDescriptor = {
+const contentTypeToMessageDescriptor: {
+  [PrivateAssetPackAssetType]: MessageDescriptor,
+} = {
   sprite: t`Sprites`,
   '9patch': t`Panel sprites`,
   tiled: t`Tiled sprites`,
-  'Scene3D::Model3DObject': t`3D model`,
+  model3d: t`3D models`,
+  simpleTileMap: t`Tilemaps`,
   particleEmitter: t`Particle emitters`,
   font: t`Fonts`,
   audio: t`Audios`,

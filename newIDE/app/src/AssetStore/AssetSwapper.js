@@ -76,25 +76,39 @@ export const canSwapAssetOfObject = (object: gdObject) => {
 };
 
 const mergeAnimations = function<A: { name: string }>(
-  objectsAnimations: Array<A>,
+  project: gdProject,
+  PixiResourcesLoader: any,
+  objectAnimations: Array<A>,
   assetAnimations: Array<A>,
-  mergeAnimation: (objectsAnimation: A, assetAnimation: A) => A
+  mergeAnimation: (
+    project: gdProject,
+    PixiResourcesLoader: any,
+    objectsAnimation: A,
+    assetAnimation: A
+  ) => A
 ) {
   const animations = [];
   // Ensure the object don't loose any animation.
-  for (const objectAnimation of objectsAnimations) {
+  for (const objectAnimation of objectAnimations) {
     const assetAnimation = assetAnimations.find(
       assetAnimation => assetAnimation.name === objectAnimation.name
     ) || {
       ...assetAnimations[0],
       name: objectAnimation.name,
     };
-    animations.push(mergeAnimation(objectAnimation, assetAnimation));
+    animations.push(
+      mergeAnimation(
+        project,
+        PixiResourcesLoader,
+        objectAnimation,
+        assetAnimation
+      )
+    );
   }
   // Add extra animations from the asset.
   for (const assetAnimation of assetAnimations) {
     if (
-      !objectsAnimations.some(
+      !objectAnimations.some(
         objectAnimation => objectAnimation.name === assetAnimation.name
       )
     ) {
@@ -104,19 +118,46 @@ const mergeAnimations = function<A: { name: string }>(
   return animations;
 };
 
-const mergeSpriteFrame = (
-  objectsAnimation: SpriteFrameData,
-  assetAnimation: SpriteFrameData
-): SpriteFrameData => {
+const scalePoint = function<P: { x: number, y: number }>(
+  point: P,
+  scaleX: number,
+  scaleY: number
+): P {
   return {
-    ...assetAnimation,
-    originPoint: objectsAnimation.originPoint,
-    centerPoint: objectsAnimation.centerPoint,
-    points: objectsAnimation.points,
+    ...point,
+    x: point.x * scaleX,
+    y: point.y * scaleY,
+  };
+};
+
+const mergeSpriteFrame = (
+  project: gdProject,
+  PixiResourcesLoader: any,
+  objectFrame: SpriteFrameData,
+  assetFrame: SpriteFrameData
+): SpriteFrameData => {
+  const objectImage = PixiResourcesLoader.getPIXITexture(
+    project,
+    objectFrame.image
+  );
+  const assetImage = PixiResourcesLoader.getPIXITexture(
+    project,
+    assetFrame.image
+  );
+  const areImagesValid = objectImage.valid && assetImage.valid;
+  const scaleX = areImagesValid ? objectImage.width / assetImage.width : 1;
+  const scaleY = areImagesValid ? objectImage.height / assetImage.height : 1;
+  return {
+    ...assetFrame,
+    originPoint: scalePoint(objectFrame.originPoint, scaleX, scaleY),
+    centerPoint: scalePoint(objectFrame.centerPoint, scaleX, scaleY),
+    points: objectFrame.points.map(point => scalePoint(point, scaleX, scaleY)),
   };
 };
 
 const mergeSpriteAnimation = (
+  project: gdProject,
+  PixiResourcesLoader: any,
   objectAnimation: SpriteAnimationData,
   assetAnimation: SpriteAnimationData
 ): SpriteAnimationData => {
@@ -129,9 +170,9 @@ const mergeSpriteAnimation = (
         ...assetDirection,
         sprites: assetDirection.sprites.map((frame, frameIndex) =>
           mergeSpriteFrame(
-            frameIndex < objectDirection.sprites.length
-              ? objectDirection.sprites[frameIndex]
-              : objectDirection.sprites[0],
+            project,
+            PixiResourcesLoader,
+            objectDirection.sprites[0],
             frame
           )
         ),
@@ -141,30 +182,43 @@ const mergeSpriteAnimation = (
 };
 
 const mergeSpriteAnimations = (
+  project: gdProject,
+  PixiResourcesLoader: any,
   objectAnimations: Array<SpriteAnimationData>,
   assetAnimations: Array<SpriteAnimationData>
 ) =>
   mergeAnimations<SpriteAnimationData>(
+    project,
+    PixiResourcesLoader,
     objectAnimations,
     assetAnimations,
     mergeSpriteAnimation
   );
 
-const mergeModel3DAnimation = (objectsAnimation, assetAnimation) =>
-  assetAnimation;
+const mergeModel3DAnimation = (
+  project: gdProject,
+  PixiResourcesLoader: any,
+  objectsAnimation,
+  assetAnimation
+) => assetAnimation;
 
 const mergeModel3DAnimations = (
-  objectsAnimations: Array<{ name: string }>,
+  project: gdProject,
+  PixiResourcesLoader: any,
+  objectAnimations: Array<{ name: string }>,
   assetAnimations: Array<{ name: string }>
 ) =>
   mergeAnimations<{ name: string }>(
-    objectsAnimations,
+    project,
+    PixiResourcesLoader,
+    objectAnimations,
     assetAnimations,
     mergeModel3DAnimation
   );
 
 export const swapAsset = (
   project: gdProject,
+  PixiResourcesLoader: any,
   object: gdObject,
   assetObject: gdObject
 ) => {
@@ -173,6 +227,8 @@ export const swapAsset = (
 
   if (object.getType() === 'Sprite') {
     serializedObject.animations = mergeSpriteAnimations(
+      project,
+      PixiResourcesLoader,
       serializedObject.animations,
       serializedAssetObject.animations
     );
@@ -190,6 +246,8 @@ export const swapAsset = (
     serializedObject.content = {
       ...serializedAssetObject.content,
       animations: mergeModel3DAnimations(
+        project,
+        PixiResourcesLoader,
         serializedObject.content.animations,
         serializedAssetObject.content.animations
       ),

@@ -3,6 +3,19 @@ import { swapAsset } from './AssetSwapper';
 
 const gd: libGDevelop = global.gd;
 
+const PixiResourcesLoaderMock = {
+  getPIXITexture: (project: gdProject, resourceName: string) => {
+    switch (resourceName) {
+      case 'AssetIdle':
+        return { valid: true, width: 100, height: 240 };
+      case 'ObjectIdle':
+        return { valid: true, width: 50, height: 120 };
+      default:
+        return { valid: false, width: 0, height: 0 };
+    }
+  },
+};
+
 describe('swapAsset (Sprite)', () => {
   const makeNewTestProject = (): {|
     project: gdProject,
@@ -88,7 +101,7 @@ describe('swapAsset (Sprite)', () => {
     addAnimation(assetConfiguration, 'Run', 'AssetRun');
     addAnimation(assetConfiguration, 'Fire', 'AssetFire');
 
-    swapAsset(project, object, assetObject);
+    swapAsset(project, PixiResourcesLoaderMock, object, assetObject);
 
     const objectNewConfiguration = gd.asSpriteConfiguration(
       object.getConfiguration()
@@ -123,7 +136,7 @@ describe('swapAsset (Sprite)', () => {
   test('can keep the object name', () => {
     const { project, object, assetObject } = makeNewTestProject();
 
-    swapAsset(project, object, assetObject);
+    swapAsset(project, PixiResourcesLoaderMock, object, assetObject);
 
     expect(object.getName()).toEqual('Object');
 
@@ -135,7 +148,7 @@ describe('swapAsset (Sprite)', () => {
 
     object.getVariables().insertNew('MyVariable', 0);
 
-    swapAsset(project, object, assetObject);
+    swapAsset(project, PixiResourcesLoaderMock, object, assetObject);
 
     expect(object.getVariables().has('MyVariable'));
 
@@ -177,7 +190,7 @@ describe('swapAsset (Sprite)', () => {
 
     addAnimation(assetConfiguration, 'Idle', 'AssetIdle');
 
-    swapAsset(project, object, assetObject);
+    swapAsset(project, PixiResourcesLoaderMock, object, assetObject);
 
     const objectNewConfiguration = gd.asSpriteConfiguration(
       object.getConfiguration()
@@ -188,20 +201,22 @@ describe('swapAsset (Sprite)', () => {
       .getDirection(0)
       .getSprite(0);
 
-    expect(newFrame.getOrigin().getX()).toEqual(8);
-    expect(newFrame.getOrigin().getY()).toEqual(16);
+    // The coordinates are divided by 2 according to the images dimensions
+    // given by PixiResourcesLoaderMock.
+    expect(newFrame.getOrigin().getX()).toEqual(4);
+    expect(newFrame.getOrigin().getY()).toEqual(8);
 
     expect(!newFrame.isDefaultCenterPoint());
-    expect(newFrame.getCenter().getX()).toEqual(24);
-    expect(newFrame.getCenter().getY()).toEqual(32);
+    expect(newFrame.getCenter().getX()).toEqual(12);
+    expect(newFrame.getCenter().getY()).toEqual(16);
 
     expect(newFrame.hasPoint('CustomPointA'));
-    expect(newFrame.getPoint('CustomPointA').getX()).toEqual(40);
-    expect(newFrame.getPoint('CustomPointA').getY()).toEqual(48);
+    expect(newFrame.getPoint('CustomPointA').getX()).toEqual(20);
+    expect(newFrame.getPoint('CustomPointA').getY()).toEqual(24);
 
     expect(newFrame.hasPoint('CustomPointB'));
-    expect(newFrame.getPoint('CustomPointB').getX()).toEqual(56);
-    expect(newFrame.getPoint('CustomPointB').getY()).toEqual(64);
+    expect(newFrame.getPoint('CustomPointB').getX()).toEqual(28);
+    expect(newFrame.getPoint('CustomPointB').getY()).toEqual(32);
 
     project.delete();
   });
@@ -235,7 +250,7 @@ describe('swapAsset (Sprite)', () => {
       .getDirection(0)
       .addSprite(frame2);
 
-    swapAsset(project, object, assetObject);
+    swapAsset(project, PixiResourcesLoaderMock, object, assetObject);
 
     const objectNewConfiguration = gd.asSpriteConfiguration(
       object.getConfiguration()
@@ -247,11 +262,15 @@ describe('swapAsset (Sprite)', () => {
     const frame0 = newDirection.getSprite(0);
     const frame1 = newDirection.getSprite(0);
 
-    expect(frame0.getOrigin().getX()).toEqual(8);
-    expect(frame0.getOrigin().getY()).toEqual(16);
-    // It defaults to the points from the 1st frame.
-    expect(frame1.getOrigin().getX()).toEqual(8);
-    expect(frame1.getOrigin().getY()).toEqual(16);
+    // The coordinates are divided by 2 according to the images dimensions
+    // given by PixiResourcesLoaderMock.
+    expect(frame0.getOrigin().getX()).toEqual(4);
+    expect(frame0.getOrigin().getY()).toEqual(8);
+    // The points from the 1st frame is used for every frame because points
+    // defined frame by frame will likely become irrelevant with the new asset
+    // animations.
+    expect(frame1.getOrigin().getX()).toEqual(4);
+    expect(frame1.getOrigin().getY()).toEqual(8);
 
     project.delete();
   });
@@ -332,7 +351,7 @@ describe('swapAsset (Model)', () => {
     addAnimation(assetConfiguration, 'Run', 'AssetRun');
     addAnimation(assetConfiguration, 'Fire', 'AssetFire');
 
-    swapAsset(project, object, assetObject);
+    swapAsset(project, PixiResourcesLoaderMock, object, assetObject);
 
     const objectNewConfiguration = gd.asModel3DConfiguration(
       object.getConfiguration()
@@ -390,7 +409,7 @@ describe('swapAsset (Model)', () => {
     assetConfiguration.updateProperty('height', '25');
     assetConfiguration.updateProperty('depth', '50');
 
-    swapAsset(project, object, assetObject);
+    swapAsset(project, PixiResourcesLoaderMock, object, assetObject);
 
     const objectNewConfiguration = gd.asModel3DConfiguration(
       object.getConfiguration()
@@ -418,7 +437,7 @@ describe('swapAsset (Model)', () => {
     assetConfiguration.updateProperty('originLocation', 'ModelOrigin');
     assetConfiguration.updateProperty('centerLocation', 'ModelCenter');
 
-    swapAsset(project, object, assetObject);
+    swapAsset(project, PixiResourcesLoaderMock, object, assetObject);
 
     const objectNewConfiguration = gd.asModel3DConfiguration(
       object.getConfiguration()

@@ -30,6 +30,7 @@ import {
   useExtensionUpdateAlertDialog,
 } from './NewObjectDialog';
 import { swapAsset } from './AssetSwapper';
+import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 
 const isDev = Window.isDev();
 
@@ -159,7 +160,12 @@ function AssetSwappingDialog({
         });
 
         if (installOutput.createdObjects.length > 0) {
-          swapAsset(project, object, installOutput.createdObjects[0]);
+          swapAsset(
+            project,
+            PixiResourcesLoader,
+            object,
+            installOutput.createdObjects[0]
+          );
         }
         for (const createdObject of installOutput.createdObjects) {
           objectsContainer.removeObject(createdObject.getName());

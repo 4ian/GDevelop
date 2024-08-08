@@ -44,6 +44,7 @@ const AsyncSemiControlledTextField = ({
       return;
     }
     if (cleanedNewValue === value) {
+      onCancel();
       return;
     }
     setIsLoading(true);

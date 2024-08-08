@@ -6,7 +6,7 @@ import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
 } from './BaseEditor';
-import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 
 export class EventsEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?EventsSheetInterface;

@@ -25,7 +25,7 @@ import { EventsFunctionParametersEditor } from '../../EventsFunctionsExtensionEd
 import { EventsFunctionPropertiesEditor } from '../../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/EventsFunctionPropertiesEditor';
 import HelpButton from '../../UI/HelpButton';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
-import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
+import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 const gd: libGDevelop = global.gd;
 
 type Props = {|

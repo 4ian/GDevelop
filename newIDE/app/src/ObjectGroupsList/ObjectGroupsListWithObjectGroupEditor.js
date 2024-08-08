@@ -4,7 +4,7 @@ import ObjectGroupsList, { type ObjectGroupsListInterface } from '.';
 import ObjectGroupEditorDialog from '../ObjectGroupEditor/ObjectGroupEditorDialog';
 import { type GroupWithContext } from '../ObjectsList/EnumerateObjects';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
-import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
 type Props = {|
   project: gdProject,

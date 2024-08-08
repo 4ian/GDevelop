@@ -14,7 +14,7 @@ import HelpButton from '../UI/HelpButton';
 import { getVariablePathFromNodeId } from './VariableToTreeNodeHandling';
 import { Tabs } from '../UI/Tabs';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
-import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { insertInVariablesContainer } from '../Utils/VariablesUtils';
 import { getRootVariableName } from '../EventsSheet/ParameterFields/VariableField';
 import { getNodeIdFromVariableName } from './VariableToTreeNodeHandling';

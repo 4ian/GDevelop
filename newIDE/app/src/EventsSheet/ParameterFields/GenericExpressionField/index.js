@@ -48,7 +48,7 @@ import {
   shouldValidate,
 } from '../../../UI/KeyboardShortcuts/InteractionKeys';
 import Paper from '../../../UI/Paper';
-import { ProjectScopedContainersAccessor } from '../../../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../../../InstructionOrExpression/EventsScope';
 
 const gd: libGDevelop = global.gd;
 

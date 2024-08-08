@@ -25,7 +25,7 @@ import {
   registerOnResourceExternallyChangedCallback,
   unregisterOnResourceExternallyChangedCallback,
 } from '../ResourcesWatcher';
-import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 
 const styles = {
   container: {

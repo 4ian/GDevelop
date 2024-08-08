@@ -8,7 +8,7 @@ import { useSerializableObjectCancelableEditor } from '../Utils/SerializableObje
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { Tabs } from '../UI/Tabs';
 import { Column, Line } from '../UI/Grid';
-import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessage';
 import VariablesList from '../VariablesList/VariablesList';
 import HelpButton from '../UI/HelpButton';

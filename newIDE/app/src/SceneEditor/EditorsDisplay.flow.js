@@ -17,7 +17,7 @@ import { type EditorId } from '.';
 import Rectangle from '../Utils/Rectangle';
 import ViewPosition from '../InstancesEditor/ViewPosition';
 import { type ObjectFolderOrObjectWithContext } from '../ObjectsList/EnumerateObjectFolderOrObject';
-import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { type TileMapTileSelection } from '../InstancesEditor/TileSetVisualizer';
 
 export type SceneEditorsDisplayProps = {|

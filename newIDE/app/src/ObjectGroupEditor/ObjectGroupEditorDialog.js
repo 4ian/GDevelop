@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import NewObjectGroupEditorDialog from './NewObjectGroupEditorDialog';
 import EditedObjectGroupEditorDialog, {
   type ObjectGroupEditorTab,

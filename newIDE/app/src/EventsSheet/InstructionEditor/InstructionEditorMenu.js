@@ -13,14 +13,14 @@ import InstructionOrObjectSelector, {
   type TabName,
 } from './InstructionOrObjectSelector';
 import InstructionOrExpressionSelector from './InstructionOrExpressionSelector';
-import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
+import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 import { SelectColumns } from '../../UI/Responsive/SelectColumns';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { setupInstructionParameters } from '../../InstructionOrExpression/SetupInstructionParameters';
 import TextButton from '../../UI/TextButton';
 import Paste from '../../UI/CustomSvgIcons/Paste';
 import { Column, Line } from '../../UI/Grid';
-import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 
 const styles = {
   fullHeightSelector: {

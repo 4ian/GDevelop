@@ -10,7 +10,7 @@ import {
   unregisterOnResourceExternallyChangedCallback,
 } from '../ResourcesWatcher';
 import SceneEditor from '../../SceneEditor';
-import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 
 const gd: libGDevelop = global.gd;
 

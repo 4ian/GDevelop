@@ -1,8 +1,8 @@
 // @flow
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
-import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
+import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
-import { type ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
+import { type ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 
 export type ParameterRenderingServiceType = {
   components: any,

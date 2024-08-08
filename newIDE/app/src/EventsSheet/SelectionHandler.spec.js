@@ -18,7 +18,7 @@ import {
   getLastSelectedInstructionContext,
 } from './SelectionHandler';
 import { makeTestProject } from '../fixtures/TestProject';
-import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
 const gd: libGDevelop = global.gd;
 

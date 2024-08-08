@@ -23,7 +23,7 @@ import { type EventRendererProps } from './EventRenderer';
 import ConditionsActionsColumns from '../ConditionsActionsColumns';
 import { Trans } from '@lingui/macro';
 import { shouldActivate } from '../../../UI/KeyboardShortcuts/InteractionKeys';
-import { ProjectScopedContainersAccessor } from '../../../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../../../InstructionOrExpression/EventsScope';
 
 const gd: libGDevelop = global.gd;
 

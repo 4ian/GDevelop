@@ -195,7 +195,11 @@ const evaluatePreScale = (
     assetShortHeader
   );
   const objectPreScale = serializedObject.preScale || 1;
-  return objectPreScale / Math.sqrt(scaleX * scaleY);
+  const assetPreScale = objectPreScale / Math.sqrt(scaleX * scaleY);
+  return assetPreScale > 0.5 &&
+    Math.abs(Math.round(assetPreScale) - assetPreScale) < 0.001
+    ? Math.round(assetPreScale)
+    : assetPreScale;
 };
 
 const scalePoint = function<P: { x: number, y: number }>(

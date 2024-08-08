@@ -65,6 +65,9 @@ describe('swapAsset (Sprite)', () => {
 
     const objectAnimations = objectConfiguration.getAnimations();
     objectAnimations.addAnimation(animation);
+
+    sprite.delete();
+    animation.delete();
   };
 
   const getAnimationNameAndResource = (
@@ -249,6 +252,7 @@ describe('swapAsset (Sprite)', () => {
       .getAnimation(0)
       .getDirection(0)
       .addSprite(frame2);
+    frame2.delete();
 
     swapAsset(project, PixiResourcesLoaderMock, object, assetObject);
 

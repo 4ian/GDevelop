@@ -364,6 +364,7 @@ export const swapAsset = (
       originLocation: serializedObject.content.originLocation,
       centerLocation: serializedObject.content.centerLocation,
     };
+    serializedObject.assetStoreId = serializedAssetObject.assetStoreId;
   }
   unserializeFromJSObject(object, serializedObject, 'unserializeFrom', project);
 };

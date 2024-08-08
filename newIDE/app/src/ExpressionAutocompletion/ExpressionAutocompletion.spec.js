@@ -3,7 +3,7 @@ import {
   getAutocompletionsFromDescriptions,
   insertAutocompletionInExpression,
 } from '.';
-import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
 const gd: libGDevelop = global.gd;
 

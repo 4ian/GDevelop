@@ -27,7 +27,7 @@ import {
   makeSchema,
   reorderInstanceSchemaForCustomProperties,
 } from './CompactPropertiesSchema';
-import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import TileSetVisualizer, {
   type TileMapTileSelection,
 } from '../TileSetVisualizer';

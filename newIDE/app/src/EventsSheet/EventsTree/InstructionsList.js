@@ -20,7 +20,7 @@ import { useLongTouch } from '../../Utils/UseLongTouch';
 import {
   type EventsScope,
   ProjectScopedContainersAccessor,
-} from '../../InstructionOrExpression/EventsScope.flow';
+} from '../../InstructionOrExpression/EventsScope';
 
 const styles = {
   addButton: {

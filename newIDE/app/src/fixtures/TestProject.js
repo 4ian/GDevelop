@@ -1,5 +1,5 @@
 // @flow
-import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
 /*::
 export type TestProject = {|

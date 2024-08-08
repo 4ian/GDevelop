@@ -6,10 +6,10 @@ import {
   type ParameterContext,
   type VariableDeclarationContext,
 } from '../../SelectionHandler';
-import { type EventsScope } from '../../../InstructionOrExpression/EventsScope.flow';
+import { type EventsScope } from '../../../InstructionOrExpression/EventsScope';
 import { type ScreenType } from '../../../UI/Responsive/ScreenTypeMeasurer';
 import { type WindowSizeType } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
-import { ProjectScopedContainersAccessor } from '../../../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../../../InstructionOrExpression/EventsScope';
 
 export type EventRendererProps = {
   project: gdProject,

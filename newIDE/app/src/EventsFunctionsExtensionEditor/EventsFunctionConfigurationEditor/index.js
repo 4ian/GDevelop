@@ -12,7 +12,7 @@ import { type GroupWithContext } from '../../ObjectsList/EnumerateObjects';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
 import newNameGenerator from '../../Utils/NewNameGenerator';
 import { type ExtensionItemConfigurationAttribute } from '../../EventsFunctionsExtensionEditor';
-import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 
 const gd: libGDevelop = global.gd;
 

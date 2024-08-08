@@ -12,7 +12,7 @@ import { Column, Line } from '../UI/Grid';
 import VariablesList from './VariablesList';
 import HelpButton from '../UI/HelpButton';
 import { getVariablePathFromNodeId } from './VariableToTreeNodeHandling';
-import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { insertInVariablesContainer } from '../Utils/VariablesUtils';
 import { getRootVariableName } from '../EventsSheet/ParameterFields/VariableField';
 import { getNodeIdFromVariableName } from './VariableToTreeNodeHandling';

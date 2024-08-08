@@ -5,7 +5,7 @@ import FlatButton from '../UI/FlatButton';
 import ObjectGroupEditor from '.';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import useForceUpdate from '../Utils/UseForceUpdate';
-import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import { ColumnStackLayout } from '../UI/Layout';
 import Checkbox from '../UI/Checkbox';

@@ -80,7 +80,7 @@ import Text from '../UI/Text';
 import { MultilineVariableEditorDialog } from './MultilineVariableEditorDialog';
 import { MarkdownText } from '../UI/MarkdownText';
 import Paper from '../UI/Paper';
-import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
 const gd: libGDevelop = global.gd;
 

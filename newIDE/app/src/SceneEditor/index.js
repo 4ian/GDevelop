@@ -73,7 +73,7 @@ import {
   unregisterOnResourceExternallyChangedCallback,
 } from '../MainFrame/ResourcesWatcher';
 import { unserializeFromJSObject } from '../Utils/Serializer';
-import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { type TileMapTileSelection } from '../InstancesEditor/TileSetVisualizer';
 
 const gd: libGDevelop = global.gd;

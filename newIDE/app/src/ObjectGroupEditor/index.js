@@ -11,7 +11,7 @@ import getObjectByName from '../Utils/GetObjectByName';
 import Paper from '../UI/Paper';
 import { ColumnStackLayout } from '../UI/Layout';
 import AlertMessage from '../UI/AlertMessage';
-import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
 const styles = {
   objectSelector: { position: 'sticky', bottom: 0 },

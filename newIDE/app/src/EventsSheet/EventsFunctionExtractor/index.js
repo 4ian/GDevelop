@@ -6,7 +6,7 @@ import getObjectGroupByName from '../../Utils/GetObjectGroupByName';
 import {
   ProjectScopedContainersAccessor,
   type EventsScope,
-} from '../../InstructionOrExpression/EventsScope.flow';
+} from '../../InstructionOrExpression/EventsScope';
 const gd: libGDevelop = global.gd;
 
 /**

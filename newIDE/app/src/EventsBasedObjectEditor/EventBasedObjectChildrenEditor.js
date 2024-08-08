@@ -16,7 +16,7 @@ import {
   type ObjectFolderOrObjectWithContext,
 } from '../ObjectsList/EnumerateObjectFolderOrObject';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
-import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
 const gd: libGDevelop = global.gd;
 

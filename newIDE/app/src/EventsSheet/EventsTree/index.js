@@ -27,7 +27,7 @@ import {
   type ParameterContext,
   type VariableDeclarationContext,
 } from '../SelectionHandler';
-import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
+import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 import getObjectByName from '../../Utils/GetObjectByName';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
 import { type ScreenType } from '../../UI/Responsive/ScreenTypeMeasurer';
@@ -52,7 +52,7 @@ import { dataObjectToProps } from '../../Utils/HTMLDataset';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { useLongTouch } from '../../Utils/UseLongTouch';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
-import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 
 const gd: libGDevelop = global.gd;
 

@@ -8,7 +8,7 @@ import EventBasedObjectChildrenEditor from './EventBasedObjectChildrenEditor';
 import Background from '../UI/Background';
 import { Column, Line } from '../UI/Grid';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
-import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
 type TabName = 'configuration' | 'properties' | 'children';
 

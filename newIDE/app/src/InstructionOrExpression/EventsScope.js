@@ -1,5 +1,4 @@
 // @flow
-const gd: libGDevelop = global.gd;
 
 // Instruction or expression can be private (see IsPrivate, SetPrivate).
 // Their visibility will change according to the scope (i.e: if we're
@@ -46,6 +45,8 @@ export class ProjectScopedContainersAccessor {
       eventsBasedObject,
       eventsFunction,
     } = this._scope;
+    const gd: libGDevelop = global.gd;
+
     if (layout) {
       projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
         project,

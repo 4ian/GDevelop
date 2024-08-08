@@ -261,7 +261,6 @@ export class ColorAssetStoreSearchFilter
   }
 }
 
-// TODO
 const toAssetStoreType = (type: string) => {
   return type === 'Sprite' ? 'sprite' : type;
 };

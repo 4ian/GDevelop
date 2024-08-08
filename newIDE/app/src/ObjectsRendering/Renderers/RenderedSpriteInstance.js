@@ -53,6 +53,9 @@ export default class RenderedSpriteInstance extends RenderedInstance {
     super.onRemovedFromScene();
     // Keep textures because they are shared by all sprites.
     this._pixiObject.destroy(false);
+    // Avoid to use _pixiObject after destroy is called.
+    // It can happen when onRemovedFromScene and update cross each other.
+    this._pixiObject = null;
   }
 
   /**
@@ -86,6 +89,11 @@ export default class RenderedSpriteInstance extends RenderedInstance {
   }
 
   updatePIXISprite(): void {
+    // Avoid to use _pixiObject after destroy is called.
+    // It can happen when onRemovedFromScene and update cross each other.
+    if (!this._pixiObject) {
+      return;
+    }
     const objectTextureFrame = this._pixiObject.texture.frame;
     // In case the texture is not loaded yet, we don't want to crash.
     if (!objectTextureFrame) return;
@@ -151,6 +159,11 @@ export default class RenderedSpriteInstance extends RenderedInstance {
   }
 
   updatePIXITextureAndSprite(): void {
+    // Avoid to use _pixiObject after destroy is called.
+    // It can happen when onRemovedFromScene and update cross each other.
+    if (!this._pixiObject) {
+      return;
+    }
     this.updateSprite();
     const sprite = this._sprite;
     if (!sprite) return;

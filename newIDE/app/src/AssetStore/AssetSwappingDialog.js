@@ -164,7 +164,8 @@ function AssetSwappingDialog({
             project,
             PixiResourcesLoader,
             object,
-            installOutput.createdObjects[0]
+            installOutput.createdObjects[0],
+            assetShortHeader
           );
         }
         for (const createdObject of installOutput.createdObjects) {

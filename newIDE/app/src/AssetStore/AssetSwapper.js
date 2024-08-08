@@ -3,6 +3,7 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
+import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 
 /** Represents a point in a coordinate system. */
 type SpritePoint = {
@@ -128,46 +129,56 @@ const mergeAnimations = function<A: { name: string }>(
   return animations;
 };
 
+const getSpriteObjectDefaultDimensions = (
+  project: gdProject,
+  PixiResourcesLoader: any,
+  spriteConfiguration: SpriteObjectDataType
+) => {
+  if (spriteConfiguration.animations.length === 0) {
+    return null;
+  }
+  const direction = spriteConfiguration.animations[0].directions[0];
+  if (direction.sprites.length === 0) {
+    return null;
+  }
+  const image = PixiResourcesLoader.getPIXITexture(
+    project,
+    direction.sprites[0].image
+  );
+  if (!image.valid) {
+    return null;
+  }
+  const preScale = spriteConfiguration.preScale || 1;
+  return { width: image.width * preScale, height: image.height * preScale };
+};
+
 const evaluatePreScale = (
   project: gdProject,
   PixiResourcesLoader: any,
   serializedObject: SpriteObjectDataType,
-  serializedAssetObject: SpriteObjectDataType
+  serializedAssetObject: SpriteObjectDataType,
+  assetShortHeader?: ?AssetShortHeader
 ) => {
-  if (
-    serializedObject.animations.length === 0 ||
-    serializedAssetObject.animations.length === 0
-  ) {
-    return 1;
-  }
-  const objectDirection = serializedObject.animations[0].directions[0];
-  const assetDirection = serializedAssetObject.animations[0].directions[0];
-  if (
-    objectDirection.sprites.length === 0 ||
-    assetDirection.sprites.length === 0
-  ) {
-    return 1;
-  }
-  const objectFrame = objectDirection.sprites[0];
-  const assetFrame = assetDirection.sprites[0];
-
-  const objectImage = PixiResourcesLoader.getPIXITexture(
+  const objectDimensions = getSpriteObjectDefaultDimensions(
     project,
-    objectFrame.image
+    PixiResourcesLoader,
+    serializedObject
   );
-  const assetImage = PixiResourcesLoader.getPIXITexture(
-    project,
-    assetFrame.image
-  );
-  if (!objectImage.valid || !assetImage.valid) {
-    // TODO Use the asset header dimension instead because 
-    // this will likely be the case when the asset has just been downloaded.
+  // The asset header is used because the Pixi texture will likely be invalid
+  // when the asset has just been downloaded.
+  const assetDimensions = assetShortHeader
+    ? { width: assetShortHeader.width, height: assetShortHeader.height }
+    : getSpriteObjectDefaultDimensions(
+        project,
+        PixiResourcesLoader,
+        serializedAssetObject
+      );
+  if (!objectDimensions || !assetDimensions) {
     return 1;
   }
-  const scaleX = objectImage.width / assetImage.width;
-  const scaleY = objectImage.height / assetImage.height;
-  const objectPreScale = serializedObject.preScale || 1;
-  return Math.sqrt(scaleX * scaleY) * objectPreScale;
+  const scaleX = objectDimensions.width / assetDimensions.width;
+  const scaleY = objectDimensions.height / assetDimensions.height;
+  return Math.sqrt(scaleX * scaleY);
 };
 
 const scalePoint = function<P: { x: number, y: number }>(
@@ -272,7 +283,8 @@ export const swapAsset = (
   project: gdProject,
   PixiResourcesLoader: any,
   object: gdObject,
-  assetObject: gdObject
+  assetObject: gdObject,
+  assetShortHeader?: ?AssetShortHeader
 ) => {
   const serializedObject = serializeToJSObject(object);
   const serializedAssetObject = serializeToJSObject(assetObject);
@@ -282,7 +294,8 @@ export const swapAsset = (
       project,
       PixiResourcesLoader,
       serializedObject,
-      serializedAssetObject
+      serializedAssetObject,
+      assetShortHeader
     );
     serializedObject.animations = mergeSpriteAnimations(
       project,

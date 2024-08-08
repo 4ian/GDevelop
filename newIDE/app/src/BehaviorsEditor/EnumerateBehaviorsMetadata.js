@@ -18,7 +18,7 @@ export type EnumeratedBehaviorMetadata = {|
 export const enumerateBehaviorsMetadata = (
   platform: gdPlatform,
   project: gdProject,
-  eventsFunctionsExtension: gdEventsFunctionsExtension | null
+  eventsFunctionsExtension: ?gdEventsFunctionsExtension
 ): Array<EnumeratedBehaviorMetadata> => {
   const extensionsList = platform.getAllPlatformExtensions();
 

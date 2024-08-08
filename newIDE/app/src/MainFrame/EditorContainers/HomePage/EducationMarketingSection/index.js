@@ -4,10 +4,8 @@ import * as React from 'react';
 import SectionContainer, { SectionRow } from '../SectionContainer';
 import { Trans } from '@lingui/macro';
 import Text from '../../../../UI/Text';
-import { CardWidget } from '../CardWidget';
 import {
   ColumnStackLayout,
-  LineStackLayout,
   ResponsiveLineStackLayout,
 } from '../../../../UI/Layout';
 import RaisedButton from '../../../../UI/RaisedButton';
@@ -15,7 +13,7 @@ import { SubscriptionSuggestionContext } from '../../../../Profile/Subscription/
 import Form from '../../../../UI/Form';
 import TextField from '../../../../UI/TextField';
 import { emailRegex } from '../../../../Profile/ForgotPasswordDialog';
-import { Column, Line, Spacer } from '../../../../UI/Grid';
+import { Line, Spacer } from '../../../../UI/Grid';
 import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import type { EducationFormStatus, EducationForm } from '../UseEducationForm';
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
@@ -25,6 +23,7 @@ import ShinyCrown from '../../../../UI/CustomSvgIcons/ShinyCrown';
 import Education from '../../../../Profile/Subscription/Icons/Education';
 import Window from '../../../../Utils/Window';
 import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
+import Paper from '../../../../UI/Paper';
 
 const styles = {
   banner: {
@@ -38,10 +37,10 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
   },
-  educationIcon: { width: 100, height: 100 },
-  postersImage: { height: 260, aspectRatio: '1.15' },
-  mobilePostersImage: { width: '100%' },
-  rightPartContainer: { flex: 2, maxWidth: 500, display: 'flex' },
+  educationIcon: { width: 40, height: 40 },
+  paper: { padding: '16px 32px', flex: 1 },
+  mobilePaper: { padding: '16px 16px', flex: 1 },
+  formContainer: { flex: 1, display: 'flex', alignSelf: 'stretch' },
   mobileFooter: {
     // Leave space below form
     height: 150,
@@ -56,8 +55,8 @@ const styles = {
 };
 
 const blockTitle = (
-  <Text size="block-title" noMargin>
-    <Trans>Get a free sample in your email</Trans>
+  <Text size="sub-title" noMargin>
+    <Trans>Get a sample in your email</Trans>
   </Text>
 );
 
@@ -146,7 +145,7 @@ const EducationMarketingSection = ({
     >
       <ColumnStackLayout noMargin expand>
         {blockTitle}
-        <LineStackLayout noMargin>
+        <ResponsiveLineStackLayout noMargin noColumnMargin>
           <TextField
             value={form.firstName}
             floatingLabelText={<Trans>First name</Trans>}
@@ -179,7 +178,7 @@ const EducationMarketingSection = ({
               });
             }}
           />
-        </LineStackLayout>
+        </ResponsiveLineStackLayout>
         <TextField
           required
           value={form.email}
@@ -218,30 +217,28 @@ const EducationMarketingSection = ({
   );
 
   return (
-    <SectionContainer title={<Trans>Classrooms</Trans>}>
+    <SectionContainer title={<Trans>GDevelop for education</Trans>}>
       <SectionRow>
-        <CardWidget size="banner">
-          <div style={styles.banner}>
-            <ResponsiveLineStackLayout noColumnMargin alignItems="center">
-              <Column noMargin alignItems="center">
-                <Education style={styles.educationIcon} />
-              </Column>
-              <ColumnStackLayout
-                expand
-                alignItems={isMobile ? 'stretch' : 'flex-start'}
-              >
-                <Text size="block-title" noMargin>
-                  <Trans>Purchase the Education subscription</Trans>
-                </Text>
-                <Text noMargin align="left">
-                  <Trans>
-                    The Education subscription gives access to GDevelop's Game
-                    Development curriculum. Co-created with teachers and
-                    institutions, it’s a ready-to-use, proven way to implement
-                    STEM in your classroom.
-                  </Trans>
-                </Text>
-                <Spacer />
+        <ResponsiveLineStackLayout noColumnMargin>
+          <Paper
+            background="dark"
+            variant="outlined"
+            style={isMobile ? styles.mobilePaper : styles.paper}
+          >
+            <ColumnStackLayout alignItems="flex-start" expand noMargin>
+              <Education style={styles.educationIcon} />
+              <Text size="title" noMargin>
+                <Trans>Purchase the Education subscription</Trans>
+              </Text>
+              <Text>
+                <Trans>
+                  The Education subscription gives access to GDevelop's Game
+                  Development curriculum. Co-created with teachers and
+                  institutions, it’s a ready-to-use, proven way to implement
+                  STEM in your classroom.
+                </Trans>
+              </Text>
+              <div style={{ alignSelf: isMobile ? 'stretch' : 'flex-start' }}>
                 <ResponsiveLineStackLayout noColumnMargin noMargin>
                   <div style={styles.buttonContainer}>
                     <FlatButton
@@ -270,53 +267,54 @@ const EducationMarketingSection = ({
                     />
                   </div>
                 </ResponsiveLineStackLayout>
-              </ColumnStackLayout>
-            </ResponsiveLineStackLayout>
-          </div>
-        </CardWidget>
-      </SectionRow>
-      <SectionRow>
-        <div
-          style={{
-            ...styles.freeTag,
-            color: gdevelopTheme.statusIndicator.success,
-            borderColor: gdevelopTheme.statusIndicator.success,
-          }}
-        >
-          <Text noMargin color="inherit">
-            <Trans>Free</Trans>
-          </Text>
-        </div>
-        <Text size="section-title">
-          <Trans>Get our teaching resources</Trans>
-        </Text>
-        <Text>
-          <Trans>
-            We’ll send to your email:
-            <li>An extract of our ready-to-teach Curriculum</li>
-            <li>
-              A poster with GDevelop's core concepts to use in your classroom
-            </li>
-            <li>“Game Development as an Educational wonder” PDF</li>
-          </Trans>
-        </Text>
-        <ResponsiveLineStackLayout noColumnMargin useLargeSpacer>
-          <img
-            src="res/education-posters.png"
-            alt="GDevelop education posters preview"
-            style={isMobile ? styles.mobilePostersImage : styles.postersImage}
-          />
-          <div style={styles.rightPartContainer}>
-            {formStatus === 'login'
-              ? renderLogin()
-              : formStatus === 'sending'
-              ? renderLoader()
-              : formStatus === 'error'
-              ? renderError()
-              : formStatus === 'success'
-              ? renderSuccess()
-              : renderForm()}
-          </div>
+              </div>
+            </ColumnStackLayout>
+          </Paper>
+          <Spacer />
+          <Paper
+            background="dark"
+            variant="outlined"
+            style={isMobile ? styles.mobilePaper : styles.paper}
+          >
+            <ColumnStackLayout alignItems="flex-start" noMargin>
+              <div
+                style={{
+                  ...styles.freeTag,
+                  color: gdevelopTheme.statusIndicator.success,
+                  borderColor: gdevelopTheme.statusIndicator.success,
+                }}
+              >
+                <Text noMargin color="inherit">
+                  <Trans>Free</Trans>
+                </Text>
+              </div>
+              <Text size="title" noMargin>
+                <Trans>Get our teaching resources</Trans>
+              </Text>
+              <Text>
+                <Trans>
+                  Receive a copy of GDevelop’s teaching resources:
+                  <li>Extract of our ready-to-teach Curriculum</li>
+                  <li>
+                    Poster with GDevelop's core concepts to use in your
+                    classroom
+                  </li>
+                  <li>“Game Development as an Educational wonder” PDF</li>
+                </Trans>
+              </Text>
+              <div style={styles.formContainer}>
+                {formStatus === 'login'
+                  ? renderLogin()
+                  : formStatus === 'sending'
+                  ? renderLoader()
+                  : formStatus === 'error'
+                  ? renderError()
+                  : formStatus === 'success'
+                  ? renderSuccess()
+                  : renderForm()}
+              </div>
+            </ColumnStackLayout>
+          </Paper>
         </ResponsiveLineStackLayout>
       </SectionRow>
       {isMobile && <div style={styles.mobileFooter} />}

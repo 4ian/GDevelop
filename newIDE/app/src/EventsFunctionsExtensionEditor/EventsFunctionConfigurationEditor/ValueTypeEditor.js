@@ -14,7 +14,7 @@ import useForceUpdate from '../../Utils/UseForceUpdate';
 
 type Props = {|
   project: gdProject,
-  eventsFunctionsExtension: ?gdEventsFunctionsExtension,
+  eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   valueTypeMetadata: gdValueTypeMetadata,
   onTypeUpdated: () => void,
   disabled?: boolean,

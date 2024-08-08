@@ -1,5 +1,9 @@
 // @flow
-const gd: libGDevelop = global.gd;
+
+// The way `gd` is usually used cannot be used because `ProjectScopedContainersAccessor`
+// is used in `makeTestProject` right after GDevelopJS initialization. Doing so makes
+// the storybook crash.
+// const gd: libGDevelop = global.gd;
 
 // Instruction or expression can be private (see IsPrivate, SetPrivate).
 // Their visibility will change according to the scope (i.e: if we're
@@ -47,7 +51,7 @@ export class ProjectScopedContainersAccessor {
       eventsFunction,
     } = this._scope;
     if (layout) {
-      projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
+      projectScopedContainers = global.gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
         project,
         layout
       );
@@ -57,7 +61,7 @@ export class ProjectScopedContainersAccessor {
           throw new Error('Extension scope used without any ObjectsContainer');
         }
         if (eventsBasedBehavior) {
-          projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForBehaviorEventsFunction(
+          projectScopedContainers = global.gd.ProjectScopedContainers.makeNewProjectScopedContainersForBehaviorEventsFunction(
             project,
             eventsFunctionsExtension,
             eventsBasedBehavior,
@@ -65,7 +69,7 @@ export class ProjectScopedContainersAccessor {
             this._parameterObjectsContainer
           );
         } else if (eventsBasedObject) {
-          projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForObjectEventsFunction(
+          projectScopedContainers = global.gd.ProjectScopedContainers.makeNewProjectScopedContainersForObjectEventsFunction(
             project,
             eventsFunctionsExtension,
             eventsBasedObject,
@@ -73,7 +77,7 @@ export class ProjectScopedContainersAccessor {
             this._parameterObjectsContainer
           );
         } else {
-          projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForFreeEventsFunction(
+          projectScopedContainers = global.gd.ProjectScopedContainers.makeNewProjectScopedContainersForFreeEventsFunction(
             project,
             eventsFunctionsExtension,
             eventsFunction,
@@ -84,25 +88,25 @@ export class ProjectScopedContainersAccessor {
         if (!this._parameterObjectsContainer) {
           throw new Error('Extension scope used without any ObjectsContainer');
         }
-        projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForEventsBasedObject(
+        projectScopedContainers = global.gd.ProjectScopedContainers.makeNewProjectScopedContainersForEventsBasedObject(
           project,
           eventsFunctionsExtension,
           eventsBasedObject,
           this._parameterObjectsContainer
         );
       } else {
-        projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForEventsFunctionsExtension(
+        projectScopedContainers = global.gd.ProjectScopedContainers.makeNewProjectScopedContainersForEventsFunctionsExtension(
           project,
           eventsFunctionsExtension
         );
       }
     } else {
-      projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForProject(
+      projectScopedContainers = global.gd.ProjectScopedContainers.makeNewProjectScopedContainersForProject(
         project
       );
     }
     for (const event of this._eventPath) {
-      projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersWithLocalVariables(
+      projectScopedContainers = global.gd.ProjectScopedContainers.makeNewProjectScopedContainersWithLocalVariables(
         projectScopedContainers,
         event
       );

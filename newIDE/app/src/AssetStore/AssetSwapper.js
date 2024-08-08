@@ -70,6 +70,16 @@ type SpriteAnimationData = {
   directions: Array<SpriteDirectionData>,
 };
 
+/** Represents the data of a {@link gdjs.SpriteRuntimeObject}. */
+export type SpriteObjectDataType = {
+  /** Update the object even if he is not visible?. */
+  updateIfNotVisible: boolean,
+  /** The scale applied to object to evaluate the default dimensions */
+  preScale: number,
+  /** The list of {@link SpriteAnimationData} representing {@link gdjs.SpriteAnimation} instances. */
+  animations: Array<SpriteAnimationData>,
+};
+
 export const canSwapAssetOfObject = (object: gdObject) => {
   const type = object.getType();
   return type === 'Scene3D::Model3DObject' || type === 'Sprite';
@@ -116,6 +126,48 @@ const mergeAnimations = function<A: { name: string }>(
     }
   }
   return animations;
+};
+
+const evaluatePreScale = (
+  project: gdProject,
+  PixiResourcesLoader: any,
+  serializedObject: SpriteObjectDataType,
+  serializedAssetObject: SpriteObjectDataType
+) => {
+  if (
+    serializedObject.animations.length === 0 ||
+    serializedAssetObject.animations.length === 0
+  ) {
+    return 1;
+  }
+  const objectDirection = serializedObject.animations[0].directions[0];
+  const assetDirection = serializedAssetObject.animations[0].directions[0];
+  if (
+    objectDirection.sprites.length === 0 ||
+    assetDirection.sprites.length === 0
+  ) {
+    return 1;
+  }
+  const objectFrame = objectDirection.sprites[0];
+  const assetFrame = assetDirection.sprites[0];
+
+  const objectImage = PixiResourcesLoader.getPIXITexture(
+    project,
+    objectFrame.image
+  );
+  const assetImage = PixiResourcesLoader.getPIXITexture(
+    project,
+    assetFrame.image
+  );
+  if (!objectImage.valid || !assetImage.valid) {
+    // TODO Use the asset header dimension instead because 
+    // this will likely be the case when the asset has just been downloaded.
+    return 1;
+  }
+  const scaleX = objectImage.width / assetImage.width;
+  const scaleY = objectImage.height / assetImage.height;
+  const objectPreScale = serializedObject.preScale || 1;
+  return Math.sqrt(scaleX * scaleY) * objectPreScale;
 };
 
 const scalePoint = function<P: { x: number, y: number }>(
@@ -226,6 +278,12 @@ export const swapAsset = (
   const serializedAssetObject = serializeToJSObject(assetObject);
 
   if (object.getType() === 'Sprite') {
+    serializedObject.preScale = evaluatePreScale(
+      project,
+      PixiResourcesLoader,
+      serializedObject,
+      serializedAssetObject
+    );
     serializedObject.animations = mergeSpriteAnimations(
       project,
       PixiResourcesLoader,

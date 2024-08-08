@@ -245,14 +245,14 @@ export default function SpriteEditor({
                 />
                 <SemiControlledTextField
                   fullWidth
-                  value={spriteConfiguration.getPreScale()}
+                  value={spriteConfiguration.getPreScale().toString(10)}
                   floatingLabelText={
                     <Trans>
                       Scaling factor to apply to the default dimensions
                     </Trans>
                   }
                   onChange={value => {
-                    spriteConfiguration.setPreScale(value);
+                    spriteConfiguration.setPreScale(parseFloat(value) || 0);
 
                     forceUpdate();
                     if (onObjectUpdated) onObjectUpdated();

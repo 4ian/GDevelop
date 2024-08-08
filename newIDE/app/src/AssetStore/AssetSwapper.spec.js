@@ -6,9 +6,9 @@ const gd: libGDevelop = global.gd;
 const PixiResourcesLoaderMock = {
   getPIXITexture: (project: gdProject, resourceName: string) => {
     switch (resourceName) {
-      case 'AssetIdle':
+      case 'Frame100x240':
         return { valid: true, width: 100, height: 240 };
-      case 'ObjectIdle':
+      case 'Frame50x120':
         return { valid: true, width: 50, height: 120 };
       default:
         return { valid: false, width: 0, height: 0 };
@@ -164,7 +164,7 @@ describe('swapAsset (Sprite)', () => {
       assetConfiguration,
     } = makeNewTestProject();
 
-    addAnimation(objectConfiguration, 'Idle', 'ObjectIdle');
+    addAnimation(objectConfiguration, 'Idle', 'Frame50x120');
     const frame = objectConfiguration
       .getAnimations()
       .getAnimation(0)
@@ -188,7 +188,7 @@ describe('swapAsset (Sprite)', () => {
     frame.addPoint(customPoint);
     customPoint.delete();
 
-    addAnimation(assetConfiguration, 'Idle', 'AssetIdle');
+    addAnimation(assetConfiguration, 'Idle', 'Frame100x240');
 
     swapAsset(project, PixiResourcesLoaderMock, object, assetObject);
 
@@ -231,7 +231,7 @@ describe('swapAsset (Sprite)', () => {
     } = makeNewTestProject();
 
     // The object only has 1 frame in the Idle animation.
-    addAnimation(objectConfiguration, 'Idle', 'ObjectIdle');
+    addAnimation(objectConfiguration, 'Idle', 'Frame50x120');
     objectConfiguration
       .getAnimations()
       .getAnimation(0)
@@ -241,7 +241,7 @@ describe('swapAsset (Sprite)', () => {
       .setXY(8, 16);
 
     // The asset has a 2nd frame in the Idle animation.
-    addAnimation(assetConfiguration, 'Idle', 'AssetIdle');
+    addAnimation(assetConfiguration, 'Idle', 'Frame100x240');
     const frame2 = new gd.Sprite();
     frame2.setImageName('AssetIdle2');
     assetConfiguration
@@ -271,6 +271,100 @@ describe('swapAsset (Sprite)', () => {
     // animations.
     expect(frame1.getOrigin().getX()).toEqual(4);
     expect(frame1.getOrigin().getY()).toEqual(8);
+
+    project.delete();
+  });
+
+  test('can keep the object default size similar (smaller asset)', () => {
+    const {
+      project,
+      object,
+      assetObject,
+      objectConfiguration,
+      assetConfiguration,
+    } = makeNewTestProject();
+
+    addAnimation(objectConfiguration, 'Idle', 'Frame100x240');
+    addAnimation(assetConfiguration, 'Idle', 'Frame50x120');
+
+    swapAsset(project, PixiResourcesLoaderMock, object, assetObject);
+
+    const objectNewConfiguration = gd.asSpriteConfiguration(
+      object.getConfiguration()
+    );
+
+    expect(objectNewConfiguration.getPreScale()).toEqual(2);
+
+    project.delete();
+  });
+
+  test('can keep the object default size similar (bigger asset)', () => {
+    const {
+      project,
+      object,
+      assetObject,
+      objectConfiguration,
+      assetConfiguration,
+    } = makeNewTestProject();
+
+    addAnimation(objectConfiguration, 'Idle', 'Frame50x120');
+    addAnimation(assetConfiguration, 'Idle', 'Frame100x240');
+
+    swapAsset(project, PixiResourcesLoaderMock, object, assetObject);
+
+    const objectNewConfiguration = gd.asSpriteConfiguration(
+      object.getConfiguration()
+    );
+
+    expect(objectNewConfiguration.getPreScale()).toEqual(0.5);
+
+    project.delete();
+  });
+
+  test('can keep the object default size similar (smaller asset and object already up-scaled)', () => {
+    const {
+      project,
+      object,
+      assetObject,
+      objectConfiguration,
+      assetConfiguration,
+    } = makeNewTestProject();
+
+    gd.asSpriteConfiguration(object.getConfiguration()).setPreScale(2);
+    addAnimation(objectConfiguration, 'Idle', 'Frame100x240');
+    addAnimation(assetConfiguration, 'Idle', 'Frame50x120');
+
+    swapAsset(project, PixiResourcesLoaderMock, object, assetObject);
+
+    const objectNewConfiguration = gd.asSpriteConfiguration(
+      object.getConfiguration()
+    );
+
+    expect(objectNewConfiguration.getPreScale()).toEqual(4);
+
+    project.delete();
+  });
+
+  test('can keep the object default size similar (bigger asset, but object already up-scaled)', () => {
+    const {
+      project,
+      object,
+      assetObject,
+      objectConfiguration,
+      assetConfiguration,
+    } = makeNewTestProject();
+
+    gd.asSpriteConfiguration(object.getConfiguration()).setPreScale(2);
+    addAnimation(objectConfiguration, 'Idle', 'Frame50x120');
+    addAnimation(assetConfiguration, 'Idle', 'Frame100x240');
+
+    swapAsset(project, PixiResourcesLoaderMock, object, assetObject);
+
+    const objectNewConfiguration = gd.asSpriteConfiguration(
+      object.getConfiguration()
+    );
+
+    expect(objectNewConfiguration.getPreScale()).toEqual(1);
 
     project.delete();
   });

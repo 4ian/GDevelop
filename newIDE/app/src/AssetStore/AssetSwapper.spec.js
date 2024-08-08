@@ -201,22 +201,22 @@ describe('swapAsset (Sprite)', () => {
       .getDirection(0)
       .getSprite(0);
 
-    // The coordinates are divided by 2 according to the images dimensions
+    // The coordinates are multiplied by 2 according to the images dimensions
     // given by PixiResourcesLoaderMock.
-    expect(newFrame.getOrigin().getX()).toEqual(4);
-    expect(newFrame.getOrigin().getY()).toEqual(8);
+    expect(newFrame.getOrigin().getX()).toEqual(16);
+    expect(newFrame.getOrigin().getY()).toEqual(32);
 
     expect(!newFrame.isDefaultCenterPoint());
-    expect(newFrame.getCenter().getX()).toEqual(12);
-    expect(newFrame.getCenter().getY()).toEqual(16);
+    expect(newFrame.getCenter().getX()).toEqual(48);
+    expect(newFrame.getCenter().getY()).toEqual(64);
 
     expect(newFrame.hasPoint('CustomPointA'));
-    expect(newFrame.getPoint('CustomPointA').getX()).toEqual(20);
-    expect(newFrame.getPoint('CustomPointA').getY()).toEqual(24);
+    expect(newFrame.getPoint('CustomPointA').getX()).toEqual(80);
+    expect(newFrame.getPoint('CustomPointA').getY()).toEqual(96);
 
     expect(newFrame.hasPoint('CustomPointB'));
-    expect(newFrame.getPoint('CustomPointB').getX()).toEqual(28);
-    expect(newFrame.getPoint('CustomPointB').getY()).toEqual(32);
+    expect(newFrame.getPoint('CustomPointB').getX()).toEqual(112);
+    expect(newFrame.getPoint('CustomPointB').getY()).toEqual(128);
 
     project.delete();
   });
@@ -262,15 +262,15 @@ describe('swapAsset (Sprite)', () => {
     const frame0 = newDirection.getSprite(0);
     const frame1 = newDirection.getSprite(0);
 
-    // The coordinates are divided by 2 according to the images dimensions
+    // The coordinates are multiplied by 2 according to the images dimensions
     // given by PixiResourcesLoaderMock.
-    expect(frame0.getOrigin().getX()).toEqual(4);
-    expect(frame0.getOrigin().getY()).toEqual(8);
+    expect(frame0.getOrigin().getX()).toEqual(16);
+    expect(frame0.getOrigin().getY()).toEqual(32);
     // The points from the 1st frame is used for every frame because points
     // defined frame by frame will likely become irrelevant with the new asset
     // animations.
-    expect(frame1.getOrigin().getX()).toEqual(4);
-    expect(frame1.getOrigin().getY()).toEqual(8);
+    expect(frame1.getOrigin().getX()).toEqual(16);
+    expect(frame1.getOrigin().getY()).toEqual(32);
 
     project.delete();
   });

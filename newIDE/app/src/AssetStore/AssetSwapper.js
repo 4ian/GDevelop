@@ -129,7 +129,7 @@ const mergeAnimations = function<A: { name: string }>(
   return animations;
 };
 
-const getSpriteObjectDefaultDimensions = (
+const getFirstFrameDimension = (
   project: gdProject,
   PixiResourcesLoader: any,
   spriteConfiguration: SpriteObjectDataType
@@ -148,8 +148,36 @@ const getSpriteObjectDefaultDimensions = (
   if (!image.valid) {
     return null;
   }
-  const preScale = spriteConfiguration.preScale || 1;
-  return { width: image.width * preScale, height: image.height * preScale };
+  return { width: image.width, height: image.height };
+};
+
+const evaluateImageScale = (
+  project: gdProject,
+  PixiResourcesLoader: any,
+  serializedObject: SpriteObjectDataType,
+  serializedAssetObject: SpriteObjectDataType,
+  assetShortHeader?: ?AssetShortHeader
+) => {
+  const objectDimensions = getFirstFrameDimension(
+    project,
+    PixiResourcesLoader,
+    serializedObject
+  );
+  // The asset header is used because the Pixi texture will likely be invalid
+  // when the asset has just been downloaded.
+  const assetDimensions = assetShortHeader
+    ? { width: assetShortHeader.width, height: assetShortHeader.height }
+    : getFirstFrameDimension(
+        project,
+        PixiResourcesLoader,
+        serializedAssetObject
+      );
+  if (!objectDimensions || !assetDimensions) {
+    return { scaleX: 1, scaleY: 1 };
+  }
+  const scaleX = assetDimensions.width / objectDimensions.width;
+  const scaleY = assetDimensions.height / objectDimensions.height;
+  return { scaleX, scaleY };
 };
 
 const evaluatePreScale = (
@@ -159,26 +187,15 @@ const evaluatePreScale = (
   serializedAssetObject: SpriteObjectDataType,
   assetShortHeader?: ?AssetShortHeader
 ) => {
-  const objectDimensions = getSpriteObjectDefaultDimensions(
+  const { scaleX, scaleY } = evaluateImageScale(
     project,
     PixiResourcesLoader,
-    serializedObject
+    serializedObject,
+    serializedAssetObject,
+    assetShortHeader
   );
-  // The asset header is used because the Pixi texture will likely be invalid
-  // when the asset has just been downloaded.
-  const assetDimensions = assetShortHeader
-    ? { width: assetShortHeader.width, height: assetShortHeader.height }
-    : getSpriteObjectDefaultDimensions(
-        project,
-        PixiResourcesLoader,
-        serializedAssetObject
-      );
-  if (!objectDimensions || !assetDimensions) {
-    return 1;
-  }
-  const scaleX = objectDimensions.width / assetDimensions.width;
-  const scaleY = objectDimensions.height / assetDimensions.height;
-  return Math.sqrt(scaleX * scaleY);
+  const objectPreScale = serializedObject.preScale || 1;
+  return objectPreScale / Math.sqrt(scaleX * scaleY);
 };
 
 const scalePoint = function<P: { x: number, y: number }>(
@@ -197,19 +214,10 @@ const mergeSpriteFrame = (
   project: gdProject,
   PixiResourcesLoader: any,
   objectFrame: SpriteFrameData,
-  assetFrame: SpriteFrameData
+  assetFrame: SpriteFrameData,
+  scaleX: number,
+  scaleY: number
 ): SpriteFrameData => {
-  const objectImage = PixiResourcesLoader.getPIXITexture(
-    project,
-    objectFrame.image
-  );
-  const assetImage = PixiResourcesLoader.getPIXITexture(
-    project,
-    assetFrame.image
-  );
-  const areImagesValid = objectImage.valid && assetImage.valid;
-  const scaleX = areImagesValid ? objectImage.width / assetImage.width : 1;
-  const scaleY = areImagesValid ? objectImage.height / assetImage.height : 1;
   return {
     ...assetFrame,
     originPoint: scalePoint(objectFrame.originPoint, scaleX, scaleY),
@@ -222,7 +230,9 @@ const mergeSpriteAnimation = (
   project: gdProject,
   PixiResourcesLoader: any,
   objectAnimation: SpriteAnimationData,
-  assetAnimation: SpriteAnimationData
+  assetAnimation: SpriteAnimationData,
+  scaleX: number,
+  scaleY: number
 ): SpriteAnimationData => {
   const objectDirection = objectAnimation.directions[0];
   const assetDirection = assetAnimation.directions[0];
@@ -236,7 +246,9 @@ const mergeSpriteAnimation = (
             project,
             PixiResourcesLoader,
             objectDirection.sprites[0],
-            frame
+            frame,
+            scaleX,
+            scaleY
           )
         ),
       },
@@ -248,14 +260,24 @@ const mergeSpriteAnimations = (
   project: gdProject,
   PixiResourcesLoader: any,
   objectAnimations: Array<SpriteAnimationData>,
-  assetAnimations: Array<SpriteAnimationData>
+  assetAnimations: Array<SpriteAnimationData>,
+  scaleX: number,
+  scaleY: number
 ) =>
   mergeAnimations<SpriteAnimationData>(
     project,
     PixiResourcesLoader,
     objectAnimations,
     assetAnimations,
-    mergeSpriteAnimation
+    (project, PixiResourcesLoader, objectAnimation, assetAnimation) =>
+      mergeSpriteAnimation(
+        project,
+        PixiResourcesLoader,
+        objectAnimation,
+        assetAnimation,
+        scaleX,
+        scaleY
+      )
   );
 
 const mergeModel3DAnimation = (
@@ -297,11 +319,20 @@ export const swapAsset = (
       serializedAssetObject,
       assetShortHeader
     );
+    const { scaleX, scaleY } = evaluateImageScale(
+      project,
+      PixiResourcesLoader,
+      serializedObject,
+      serializedAssetObject,
+      assetShortHeader
+    );
     serializedObject.animations = mergeSpriteAnimations(
       project,
       PixiResourcesLoader,
       serializedObject.animations,
-      serializedAssetObject.animations
+      serializedAssetObject.animations,
+      scaleX,
+      scaleY
     );
   } else if (object.getType() === 'Scene3D::Model3DObject') {
     const objectVolume =

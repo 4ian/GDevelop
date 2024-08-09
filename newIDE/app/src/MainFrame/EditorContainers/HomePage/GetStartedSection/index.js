@@ -99,6 +99,7 @@ type Props = {|
     newProjectSetup: NewProjectSetup,
     i18n: I18nType
   ) => Promise<void>,
+  askToCloseProject: () => Promise<boolean>,
 |};
 
 const GetStartedSection = ({
@@ -108,6 +109,7 @@ const GetStartedSection = ({
   subscriptionPlansWithPricingSystems,
   onOpenProfile,
   onCreateProjectFromExample,
+  askToCloseProject,
 }: Props) => {
   const isFillingOutSurvey = hasStartedUserSurvey();
   const isOnline = useOnlineStatus();
@@ -665,6 +667,7 @@ const GetStartedSection = ({
             }
             hasFilledSurveyAlready={profile ? !!profile.survey : false}
             onCreateProjectFromExample={onCreateProjectFromExample}
+            askToCloseProject={askToCloseProject}
           />
         </SectionContainer>
       </>

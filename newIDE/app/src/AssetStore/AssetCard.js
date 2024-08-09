@@ -1,8 +1,6 @@
 // @flow
 import * as React from 'react';
-import {
-  type AssetShortHeader,
-} from '../Utils/GDevelopServices/Asset';
+import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 import Text from '../UI/Text';
 import CheckeredBackground from '../ResourcesList/CheckeredBackground';
 import { textEllipsisStyle } from '../UI/TextEllipsis';

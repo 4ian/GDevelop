@@ -36,7 +36,6 @@ import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServic
 import { type EventsFunctionsExtensionsState } from '../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import inc from 'semver/functions/inc';
 import Toggle from '../../UI/Toggle';
-import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import AlertMessage from '../../UI/AlertMessage';
 import { type GameAvailabilityError } from '../../GameDashboard/GameRegistration';
 
@@ -324,6 +323,9 @@ export default class ExportLauncher extends Component<Props, State> {
       await this._registerGameIfNot();
 
       // TODO: extra step for leaderboards and stuff.
+      // Something like:
+      // findLeaderboardsToReplace(project, oldProjectId);
+      // configureMultiplayerLobbiesIfNeeded(project, oldProjectId);
     } catch (registerError) {
       // But if it fails, we don't prevent building the game.
       console.warn('Error while registering the game.');

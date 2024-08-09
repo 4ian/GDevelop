@@ -1710,9 +1710,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         )}
         {objectAssetSwappingDialogOpen && (
           <AssetSwappingDialog
-            onClose={({swappingDone}) => {
+            onClose={({ swappingDone }) => {
               setObjectAssetSwappingDialogOpen(null);
-              if (swappingDone) onObjectEdited(objectAssetSwappingDialogOpen.object);
+              if (swappingDone)
+                onObjectEdited(objectAssetSwappingDialogOpen.object);
             }}
             project={project}
             layout={layout}

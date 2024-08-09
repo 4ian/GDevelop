@@ -40,14 +40,10 @@ function AssetSwappingDialog({
   onClose,
   canInstallPrivateAsset,
 }: Props) {
-  const {
-    shopNavigationState,
-    environment,
-    setEnvironment,
-  } = React.useContext(AssetStoreContext);
-  const {
-    openedAssetShortHeader,
-  } = shopNavigationState.getCurrentPage();
+  const { shopNavigationState, environment, setEnvironment } = React.useContext(
+    AssetStoreContext
+  );
+  const { openedAssetShortHeader } = shopNavigationState.getCurrentPage();
   // Avoid memoizing the result of enumerateAssetStoreIds, as it does not get updated
   // when adding assets.
   const existingAssetStoreIds = enumerateAssetStoreIds(
@@ -95,13 +91,20 @@ function AssetSwappingDialog({
       setIsAssetBeingInstalled(false);
       onClose({ swappingDone: true });
     },
-    [installAsset, project, object, objectsContainer, openedAssetShortHeader, onClose]
+    [
+      installAsset,
+      project,
+      object,
+      objectsContainer,
+      openedAssetShortHeader,
+      onClose,
+    ]
   );
 
   const mainAction = openedAssetShortHeader ? (
     <RaisedButton
       key="add-asset"
-      primary={!isAssetAddedToScene}
+      primary
       label={
         isAssetBeingInstalled ? <Trans>Adding...</Trans> : <Trans>Swap</Trans>
       }

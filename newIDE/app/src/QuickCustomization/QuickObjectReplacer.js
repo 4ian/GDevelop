@@ -16,10 +16,10 @@ type Props = {|
 |};
 
 const styles = {
-  container: {
+  objectsContainer: {
     display: 'flex',
     flexWrap: 'wrap',
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
     alignItems: 'center',
     gap: 8,
   },
@@ -78,34 +78,49 @@ export const QuickObjectReplacer = ({
   if (project.getLayoutsCount() === 0) return null;
   const layout = project.getLayoutAt(0);
 
-
   return (
     <ColumnStackLayout noMargin expand>
-      {enumerateObjectFolderOrObjects(layout.getObjects().getRootFolder()).map(
-        ({ folderName, objects }) => {
-          return (
-            <ColumnStackLayout noMargin expand>
-              <Text noMargin size={'sub-title'}>
-                {folderName}
+      {mapFor(0, project.getLayoutsCount(), i => {
+        const layout = project.getLayoutAt(i);
+        const folderObjects = enumerateObjectFolderOrObjects(
+          layout.getObjects().getRootFolder()
+        );
+
+        if (!folderObjects.length) return null;
+
+        return (
+          <ColumnStackLayout noMargin expand>
+            {project.getLayoutsCount() > 1 && (
+              <Text noMargin size={'block-title'}>
+                {layout.getName()}
               </Text>
-              <div style={styles.container}>
-                {objects.map(object => (
-                  <ColumnStackLayout noMargin>
-                    <ObjectPreview object={object} project={project} />
-                    <FlatButton
-                      primary
-                      label={<Trans>Replace</Trans>}
-                      onClick={() => {
-                        setSelectedObjectToSwap(object);
-                      }}
-                    />
-                  </ColumnStackLayout>
-                ))}
-              </div>
-            </ColumnStackLayout>
-          );
-        }
-      )}
+            )}
+            {folderObjects.map(({ folderName, objects }) => {
+              return (
+                <ColumnStackLayout noMargin expand>
+                  <Text noMargin size={'sub-title'}>
+                    {folderName}
+                  </Text>
+                  <div style={styles.objectsContainer}>
+                    {objects.map(object => (
+                      <ColumnStackLayout noMargin>
+                        <ObjectPreview object={object} project={project} />
+                        <FlatButton
+                          primary
+                          label={<Trans>Replace</Trans>}
+                          onClick={() => {
+                            setSelectedObjectToSwap(object);
+                          }}
+                        />
+                      </ColumnStackLayout>
+                    ))}
+                  </div>
+                </ColumnStackLayout>
+              );
+            })}
+          </ColumnStackLayout>
+        );
+      })}
       {selectedObjectToSwap && (
         <AssetSwappingDialog
           project={project}

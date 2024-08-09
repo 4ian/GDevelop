@@ -39,7 +39,7 @@ import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import { type GameAvailabilityError } from '../../GameDashboard/GameRegistration';
-import { I18n } from '@lingui/react/cjs/react.production.min';
+import { I18n } from '@lingui/react';
 
 const styles = {
   buttonBase: {

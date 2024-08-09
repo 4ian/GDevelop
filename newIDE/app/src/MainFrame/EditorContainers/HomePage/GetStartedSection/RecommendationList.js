@@ -192,6 +192,7 @@ type Props = {|
     newProjectSetup: NewProjectSetup,
     i18n: I18nType
   ) => Promise<void>,
+  askToCloseProject: () => Promise<boolean>,
 |};
 
 const RecommendationList = ({
@@ -202,6 +203,7 @@ const RecommendationList = ({
   hasFilledSurveyAlready,
   onOpenProfile,
   onCreateProjectFromExample,
+  askToCloseProject,
 }: Props) => {
   const {
     recommendations,
@@ -295,12 +297,16 @@ const RecommendationList = ({
 
               <QuickCustomizationGameTiles
                 maxCount={4}
-                onSelectExampleShortHeader={exampleShortHeader => {
+                onSelectExampleShortHeader={async exampleShortHeader => {
+                  const projectIsClosed = await askToCloseProject();
+                  if (!projectIsClosed) {
+                    return;
+                  }
+
                   const newProjectSetup: NewProjectSetup = {
-                    // TODO: check on local app if it works.
                     storageProvider: UrlStorageProvider,
                     saveAsLocation: null,
-                    skipAnyUserInteraction: true,
+                    openQuickCustomizationDialog: true,
                   };
                   onCreateProjectFromExample(
                     exampleShortHeader,

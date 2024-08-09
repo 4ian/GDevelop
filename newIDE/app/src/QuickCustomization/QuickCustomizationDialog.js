@@ -9,19 +9,28 @@ import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import Paper from '../UI/Paper';
+import { type Exporter } from '../ExportAndShare/ShareDialog';
 
 type Props = {|
   project: gdProject,
   resourceManagementProps: ResourceManagementProps,
   onLaunchPreview: () => Promise<void>,
+  onClose: () => void,
+  onlineWebExporter: Exporter,
+  onSaveProject: () => Promise<void>,
+  isSavingProject: boolean,
 |};
 
 export const QuickCustomizationDialog = ({
   project,
   resourceManagementProps,
   onLaunchPreview,
+  onClose,
+  onlineWebExporter,
+  onSaveProject,
+  isSavingProject,
 }: Props) => {
-  const quickCustomizationState = useQuickCustomizationState();
+  const quickCustomizationState = useQuickCustomizationState({ onClose });
   const { windowSize } = useResponsiveWindowSize();
 
   const isMediumOrSmaller = windowSize === 'small' || windowSize === 'medium';
@@ -36,6 +45,9 @@ export const QuickCustomizationDialog = ({
     resourceManagementProps,
     onLaunchPreview,
     quickCustomizationState,
+    onlineWebExporter,
+    onSaveProject,
+    isSavingProject,
   });
 
   return (
@@ -50,16 +62,20 @@ export const QuickCustomizationDialog = ({
       maxWidth="lg"
       fullHeight
       actions={[
-        <FlatButton
-          label={<Trans>Previous</Trans>}
-          onClick={quickCustomizationState.goToPreviousStep}
-          disabled={
-            !quickCustomizationState.canGoToPreviousStep ||
-            quickCustomizationState.isNavigationDisabled
-          }
-        />,
+        quickCustomizationState.canGoToPreviousStep ? (
+          <FlatButton
+            key="previous"
+            label={<Trans>Back</Trans>}
+            onClick={quickCustomizationState.goToPreviousStep}
+            disabled={
+              !quickCustomizationState.canGoToPreviousStep ||
+              quickCustomizationState.isNavigationDisabled
+            }
+          />
+        ) : null,
         <DialogPrimaryButton
-          label={<Trans>Next</Trans>}
+          key="next"
+          label={quickCustomizationState.nextLabel}
           primary
           onClick={quickCustomizationState.goToNextStep}
           disabled={
@@ -67,6 +83,17 @@ export const QuickCustomizationDialog = ({
             quickCustomizationState.isNavigationDisabled
           }
         />,
+      ]}
+      secondaryActions={[
+        quickCustomizationState.showCloseButton ? (
+          <FlatButton
+            key="close"
+            label={<Trans>Close</Trans>}
+            primary={false}
+            onClick={onClose}
+            disabled={quickCustomizationState.isNavigationDisabled}
+          />
+        ) : null,
       ]}
     >
       <ColumnStackLayout noMargin expand>

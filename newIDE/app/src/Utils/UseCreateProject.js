@@ -39,7 +39,7 @@ type Props = {|
     project: gdProject,
     editorTabs: EditorTabsState,
     oldProjectId: string,
-    options: { openAllScenes: boolean, skipAnyUserInteraction: boolean },
+    options: { openAllScenes: boolean, openQuickCustomizationDialog: boolean },
   |}) => Promise<void>,
   onError: () => void,
   onSuccessOrError: () => void,
@@ -124,7 +124,6 @@ const useCreateProject = ({
         } else if (newProjectSource.fileMetadata && sourceStorageProvider) {
           state = await openFromFileMetadata(newProjectSource.fileMetadata);
         }
-        console.log("loadFromProject done");
 
         if (!state) {
           throw new Error(
@@ -143,10 +142,16 @@ const useCreateProject = ({
           currentProject.setTemplateSlug(newProjectSource.templateSlug);
         }
 
-        if (authenticatedUser.profile) {
-          // if the user is connected, try to register the game to avoid
+        if (
+          authenticatedUser.profile &&
+          !newProjectSetup.openQuickCustomizationDialog
+        ) {
+          // If the user is connected, try to register the game to avoid
           // any gdevelop services to ask the user to register the game.
           // (for instance, leaderboards, player authentication, ...)
+          //
+          // Skip this if quick customization is requested, as this will be done later
+          // at publishing time.
           try {
             await registerGame(
               authenticatedUser.getAuthorizationHeader,
@@ -167,7 +172,6 @@ const useCreateProject = ({
             );
           }
         }
-        console.log("register game done");
 
         const destinationStorageProviderOperations = getStorageProviderOperations(
           newProjectSetup.storageProvider
@@ -218,7 +222,6 @@ const useCreateProject = ({
             }
           }
         }
-        console.log("save as done");
 
         // We were able to load and then save the project. We can now close the dialog,
         // open the project editors and check if leaderboards must be replaced.
@@ -228,10 +231,9 @@ const useCreateProject = ({
           oldProjectId,
           options: {
             openAllScenes: !!options && options.openAllScenes,
-            skipAnyUserInteraction: !!newProjectSetup.skipAnyUserInteraction,
+            openQuickCustomizationDialog: !!newProjectSetup.openQuickCustomizationDialog,
           },
         });
-        console.log("after creating project done");
       } catch (rawError) {
         const { getWriteErrorMessage } = getStorageProviderOperations();
         const errorMessage = getWriteErrorMessage

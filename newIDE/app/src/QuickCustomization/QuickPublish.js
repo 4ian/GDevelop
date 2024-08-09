@@ -3,10 +3,6 @@ import * as React from 'react';
 import { Trans, t } from '@lingui/macro';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import ExportLauncher from '../ExportAndShare/ShareDialog/ExportLauncher';
-import {
-  // TODO: pass it as prop
-  browserOnlineWebExporter,
-} from '../ExportAndShare/BrowserExporters';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { getGame, type Game } from '../Utils/GDevelopServices/Game';
 import { type GameAvailabilityError } from '../GameDashboard/GameRegistration';
@@ -14,21 +10,27 @@ import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { getBuilds, type Build } from '../Utils/GDevelopServices/Build';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 import { ColumnStackLayout } from '../UI/Layout';
-import Text from '../UI/Text';
 import { LargeSpacer } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
-import { I18n } from '@lingui/react/cjs/react.production.min';
+import { I18n } from '@lingui/react';
+import { type Exporter } from '../ExportAndShare/ShareDialog';
 
 type Props = {|
   project: gdProject,
   setIsNavigationDisabled: (isNavigationDisabled: boolean) => void,
   shouldAutomaticallyStartExport: boolean,
+  onlineWebExporter: Exporter,
+  onSaveProject: () => Promise<void>,
+  isSavingProject: boolean,
 |};
 
 export const QuickPublish = ({
   project,
   setIsNavigationDisabled,
   shouldAutomaticallyStartExport,
+  onlineWebExporter,
+  onSaveProject,
+  isSavingProject,
 }: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const {
@@ -127,16 +129,14 @@ export const QuickPublish = ({
             <ExportLauncher
               i18n={i18n}
               project={project}
-              onSaveProject={async () => {
-                /*TODO*/
-              }}
-              isSavingProject={false /*TODO*/}
+              onSaveProject={onSaveProject}
+              isSavingProject={isSavingProject}
               onChangeSubscription={() => {
-                /*TODO*/
+                // Nothing to do.
               }}
               authenticatedUser={authenticatedUser}
               eventsFunctionsExtensionsState={eventsFunctionsExtensionsState}
-              exportPipeline={browserOnlineWebExporter.exportPipeline}
+              exportPipeline={onlineWebExporter.exportPipeline}
               setIsNavigationDisabled={setIsNavigationDisabled}
               onRefreshGame={loadGame}
               game={game}

@@ -8,6 +8,7 @@ import Text from '../UI/Text';
 import FlatButton from '../UI/FlatButton';
 import { Trans } from '@lingui/macro';
 import PreviewIcon from '../UI/CustomSvgIcons/Preview';
+import { type Exporter } from '../ExportAndShare/ShareDialog';
 
 type Step = 'replace-objects' | 'publish';
 
@@ -20,9 +21,15 @@ export type QuickCustomizationState = {|
   goToPreviousStep: () => void,
   canGoToPreviousStep: boolean,
   setIsNavigationDisabled: boolean => void,
+  nextLabel: React.Node,
+  showCloseButton: boolean,
 |};
 
-export const useQuickCustomizationState = (): QuickCustomizationState => {
+export const useQuickCustomizationState = ({
+  onClose,
+}: {
+  onClose: () => void,
+}): QuickCustomizationState => {
   const [step, setStep] = React.useState<Step>('replace-objects');
   const [isNavigationDisabled, setIsNavigationDisabled] = React.useState(false);
   const [
@@ -34,12 +41,18 @@ export const useQuickCustomizationState = (): QuickCustomizationState => {
     isNavigationDisabled,
     shouldAutomaticallyStartExport,
     step,
-    goToNextStep: React.useCallback(() => {
-      setStep(step =>
-        step === 'replace-objects' ? 'publish' : 'replace-objects'
-      );
-    }, []),
-    canGoToNextStep: step === 'replace-objects',
+    goToNextStep: React.useCallback(
+      () => {
+        if (step === 'publish') {
+          onClose();
+          return;
+        }
+
+        setStep(step === 'replace-objects' ? 'publish' : 'replace-objects');
+      },
+      [step, onClose]
+    ),
+    canGoToNextStep: true,
     goToPreviousStep: React.useCallback(() => {
       setStep(step => {
         if (step === 'publish') {
@@ -48,8 +61,15 @@ export const useQuickCustomizationState = (): QuickCustomizationState => {
         return step === 'publish' ? 'replace-objects' : 'publish';
       });
     }, []),
+    nextLabel:
+      step === 'publish' ? (
+        <Trans>Finish</Trans>
+      ) : step === 'replace-objects' ? (
+        <Trans>Next: Try & Publish</Trans>
+      ) : null,
     canGoToPreviousStep: step === 'publish',
     setIsNavigationDisabled,
+    showCloseButton: step !== 'publish',
   };
 };
 
@@ -58,6 +78,9 @@ type Props = {|
   resourceManagementProps: ResourceManagementProps,
   quickCustomizationState: QuickCustomizationState,
   onLaunchPreview: () => Promise<void>,
+  onlineWebExporter: Exporter,
+  onSaveProject: () => Promise<void>,
+  isSavingProject: boolean,
 |};
 
 export const renderQuickCustomization = ({
@@ -65,6 +88,9 @@ export const renderQuickCustomization = ({
   resourceManagementProps,
   quickCustomizationState,
   onLaunchPreview,
+  onlineWebExporter,
+  onSaveProject,
+  isSavingProject,
 }: Props) => {
   return {
     title:
@@ -115,6 +141,7 @@ export const renderQuickCustomization = ({
           />
         ) : quickCustomizationState.step === 'publish' ? (
           <QuickPublish
+            onlineWebExporter={onlineWebExporter}
             project={project}
             setIsNavigationDisabled={
               quickCustomizationState.setIsNavigationDisabled
@@ -122,6 +149,8 @@ export const renderQuickCustomization = ({
             shouldAutomaticallyStartExport={
               quickCustomizationState.shouldAutomaticallyStartExport
             }
+            onSaveProject={onSaveProject}
+            isSavingProject={isSavingProject}
           />
         ) : null}
       </>

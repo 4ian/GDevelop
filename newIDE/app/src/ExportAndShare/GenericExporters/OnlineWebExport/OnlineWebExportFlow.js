@@ -43,51 +43,42 @@ const OnlineWebExportFlow = ({
 
   const isExportPending = exportStep !== '' && exportStep !== 'done';
 
-  const Buttons = isExportPending ? null : hasGameExistingBuilds ? (
+  const Buttons = isExportPending ? null : hasGameExistingBuilds &&
     isPublishedOnGdgames ? (
-      <ResponsiveLineStackLayout justifyContent="center">
-        <FlatButton
-          label={<Trans>Generate new link</Trans>}
-          primary
-          id={`launch-export-${exportPipelineName}-web-button`}
-          onClick={async () => {
-            setAutomaticallyOpenGameProperties(false);
-            await launchExport();
-          }}
-          disabled={disabled}
-        />
-        <RaisedButton
-          label={<Trans>Update my current page</Trans>}
-          primary
-          id={`launch-export-and-publish-${exportPipelineName}-web-button`}
-          onClick={async () => {
-            await launchExport();
-            // Set to true after the export is done, so that the game properties
-            // are automatically opened only when the build is finished.
-            setAutomaticallyOpenGameProperties(true);
-          }}
-          disabled={disabled}
-        />
-      </ResponsiveLineStackLayout>
-    ) : (
-      // TODO: simplify this and below.
-      <Line justifyContent="center">
-        <RaisedButton
-          label={<Trans>Generate new link</Trans>}
-          primary
-          id={`launch-export-${exportPipelineName}-web-button`}
-          onClick={async () => {
-            setAutomaticallyOpenGameProperties(false);
-            await launchExport();
-          }}
-          disabled={disabled}
-        />
-      </Line>
-    )
+    <ResponsiveLineStackLayout justifyContent="center">
+      <FlatButton
+        label={<Trans>Generate new link</Trans>}
+        primary
+        id={`launch-export-${exportPipelineName}-web-button`}
+        onClick={async () => {
+          setAutomaticallyOpenGameProperties(false);
+          await launchExport();
+        }}
+        disabled={disabled}
+      />
+      <RaisedButton
+        label={<Trans>Update my current page</Trans>}
+        primary
+        id={`launch-export-and-publish-${exportPipelineName}-web-button`}
+        onClick={async () => {
+          await launchExport();
+          // Set to true after the export is done, so that the game properties
+          // are automatically opened only when the build is finished.
+          setAutomaticallyOpenGameProperties(true);
+        }}
+        disabled={disabled}
+      />
+    </ResponsiveLineStackLayout>
   ) : (
     <Line justifyContent="center">
       <RaisedButton
-        label={<Trans>Generate link</Trans>}
+        label={
+          hasGameExistingBuilds ? (
+            <Trans>Generate new link</Trans>
+          ) : (
+            <Trans>Generate link</Trans>
+          )
+        }
         primary
         id={`launch-export-${exportPipelineName}-web-button`}
         onClick={async () => {

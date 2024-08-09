@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 import { Trans } from '@lingui/macro';
 import { type RenderEditorContainerPropsWithRef } from '../BaseEditor';
 import {
@@ -48,6 +49,7 @@ import { getHelpLink } from '../../../Utils/HelpLink';
 import { canUseClassroomFeature } from '../../../Utils/GDevelopServices/Usage';
 import EducationMarketingSection from './EducationMarketingSection';
 import useEducationForm from './UseEducationForm';
+import { type NewProjectSetup } from '../../../ProjectCreation/NewProjectSetupDialog';
 
 const gamesDashboardWikiArticle = getHelpLink('/interface/games-dashboard/');
 const isShopRequested = (routeArguments: RouteArguments): boolean =>
@@ -108,6 +110,7 @@ type Props = {|
     privateGameTemplateListingData: PrivateGameTemplateListingData
   ) => void,
   onOpenProjectManager: () => void,
+  askToCloseProject: () => Promise<boolean>,
 
   // Other dialogs opening:
   onOpenLanguageDialog: () => void,
@@ -166,6 +169,7 @@ export const HomePage = React.memo<Props>(
         canSave,
         resourceManagementProps,
         canInstallPrivateAsset,
+        askToCloseProject,
       }: Props,
       ref
     ) => {
@@ -480,6 +484,7 @@ export const HomePage = React.memo<Props>(
                       }
                       onOpenProfile={onOpenProfile}
                       onCreateProjectFromExample={onCreateProjectFromExample}
+                      askToCloseProject={askToCloseProject}
                     />
                   )}
                   {activeTab === 'build' && (
@@ -620,6 +625,7 @@ export const renderHomePageContainer = (
     onOpenLanguageDialog={props.onOpenLanguageDialog}
     onOpenProfile={props.onOpenProfile}
     onCreateProjectFromExample={props.onCreateProjectFromExample}
+    askToCloseProject={props.askToCloseProject}
     selectInAppTutorial={props.selectInAppTutorial}
     onOpenPreferences={props.onOpenPreferences}
     onOpenAbout={props.onOpenAbout}

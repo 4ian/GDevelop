@@ -72,11 +72,11 @@ type SpriteAnimationData = {
 };
 
 /** Represents the data of a {@link gdjs.SpriteRuntimeObject}. */
-export type SpriteObjectDataType = {
+type SpriteObjectDataType = {
   /** Update the object even if he is not visible?. */
   updateIfNotVisible: boolean,
   /** The scale applied to object to evaluate the default dimensions */
-  preScale: number,
+  preScale?: number,
   /** The list of {@link SpriteAnimationData} representing {@link gdjs.SpriteAnimation} instances. */
   animations: Array<SpriteAnimationData>,
 };

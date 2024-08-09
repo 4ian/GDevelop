@@ -664,6 +664,7 @@ export class ObjectConfiguration extends EmscriptenObject {
   constructor();
   clone(): UniquePtrObjectConfiguration;
   getType(): string;
+  setType(typeName: string): void;
   getProperties(): MapStringPropertyDescriptor;
   updateProperty(name: string, value: string): boolean;
   getInitialInstanceProperties(instance: InitialInstance): MapStringPropertyDescriptor;
@@ -671,6 +672,7 @@ export class ObjectConfiguration extends EmscriptenObject {
   exposeResources(worker: ArbitraryResourceWorker): void;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
+  getAnimationsCount(): number;
 }
 
 export class UniquePtrObjectConfiguration extends EmscriptenObject {
@@ -2461,6 +2463,8 @@ export class SpriteObject extends ObjectConfiguration {
   getAnimations(): SpriteAnimationList;
   setUpdateIfNotVisible(updateIfNotVisible: boolean): void;
   getUpdateIfNotVisible(): boolean;
+  setPreScale(value: number): void;
+  getPreScale(): number;
 }
 
 export class Model3DAnimation extends EmscriptenObject {

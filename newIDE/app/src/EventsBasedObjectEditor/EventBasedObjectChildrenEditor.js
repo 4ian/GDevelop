@@ -230,7 +230,6 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 project={project}
                 eventsBasedObject={eventsBasedObject}
                 unsavedChanges={this.props.unsavedChanges}
-                // $FlowFixMe gdObjectsContainer should be a member of gdEventsBasedObject instead of a base class.
                 objectsContainer={eventsBasedObject.getObjects()}
                 globalObjectsContainer={null}
                 layout={null}
@@ -255,6 +254,8 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 }
                 // Nothing special to do.
                 onObjectCreated={() => {}}
+                // Nothing special to do.
+                onObjectEdited={() => {}}
                 onObjectFolderOrObjectWithContextSelected={
                   this._onObjectFolderOrObjectWithContextSelected
                 }

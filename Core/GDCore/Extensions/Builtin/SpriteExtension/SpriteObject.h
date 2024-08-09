@@ -82,6 +82,23 @@ class GD_CORE_API SpriteObject : public gd::ObjectConfiguration {
    */
   bool GetUpdateIfNotVisible() const { return updateIfNotVisible; }
 
+  /**
+   * \brief Return the scale applied to object to evaluate the default dimensions.
+   */
+  double GetPreScale() { return preScale; }
+
+  /**
+   * \brief Set the scale applied to object to evaluate the default dimensions.
+   * 
+   * Its value must be strictly positive.
+   */
+  void SetPreScale(double preScale_) {
+    if (preScale_ <= 0) {
+      return;
+    }
+    preScale = preScale_;
+  }
+
  private:
   void DoUnserializeFrom(gd::Project& project,
                          const gd::SerializerElement& element) override;
@@ -92,6 +109,7 @@ class GD_CORE_API SpriteObject : public gd::ObjectConfiguration {
   bool updateIfNotVisible;  ///< If set to true, ask the game engine to play
                             ///< object animation even if hidden or far from
                             ///< the screen.
+  double preScale;
 };
 
 }  // namespace gd

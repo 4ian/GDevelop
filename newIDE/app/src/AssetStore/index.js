@@ -54,6 +54,8 @@ import Text from '../UI/Text';
 import { capitalize } from 'lodash';
 import PrivateGameTemplateInformationPage from './PrivateGameTemplates/PrivateGameTemplateInformationPage';
 import { PrivateGameTemplateStoreContext } from './PrivateGameTemplates/PrivateGameTemplateStoreContext';
+import { AssetSwappingAssetStoreSearchFilter } from './AssetStoreSearchFilter';
+import { delay } from '../Utils/Delay';
 
 type Props = {|
   hideGameTemplates?: boolean, // TODO: if we add more options, use an array instead.
@@ -62,6 +64,7 @@ type Props = {|
     privateGameTemplateListingData: PrivateGameTemplateListingData
   ) => void,
   onOpenProfile?: () => void,
+  assetSwappedObject?: ?gdObject,
 |};
 
 export type AssetStoreInterface = {|
@@ -100,6 +103,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       displayPromotions,
       onOpenPrivateGameTemplateListingData,
       onOpenProfile,
+      assetSwappedObject,
     }: Props,
     ref
   ) => {
@@ -115,7 +119,51 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       searchText,
       setSearchText: setAssetStoreSearchText,
       clearAllFilters: clearAllAssetStoreFilters,
+      assetFiltersState,
+      getAssetShortHeaderFromId,
     } = React.useContext(AssetStoreContext);
+
+    const assetSwappedObjectPtr = React.useRef<number | null>(null);
+    React.useEffect(
+      () => {
+        if (assetSwappedObject) {
+          if (assetSwappedObjectPtr.current !== assetSwappedObject.ptr) {
+            shopNavigationState.openAssetSwapping();
+            setAssetStoreSearchText('');
+            clearAllAssetStoreFilters();
+            const assetShortHeader = getAssetShortHeaderFromId(
+              assetSwappedObject.getAssetStoreId()
+            );
+            assetFiltersState.setAssetSwappingFilter(
+              new AssetSwappingAssetStoreSearchFilter(
+                assetSwappedObject,
+                assetShortHeader
+              )
+            );
+            const assetsListInterface = assetsList.current;
+            if (assetsListInterface) {
+              assetsListInterface.scrollToPosition(0);
+              assetsListInterface.setPageBreakIndex(0);
+            }
+          }
+          assetSwappedObjectPtr.current = assetSwappedObject.ptr;
+        } else if (shopNavigationState.isAssetSwappingHistory) {
+          shopNavigationState.openHome();
+          assetFiltersState.setAssetSwappingFilter(
+            new AssetSwappingAssetStoreSearchFilter()
+          );
+        }
+      },
+      [
+        assetFiltersState,
+        assetSwappedObject,
+        clearAllAssetStoreFilters,
+        getAssetShortHeaderFromId,
+        setAssetStoreSearchText,
+        shopNavigationState,
+      ]
+    );
+
     const {
       privateGameTemplateListingDatas,
       error: privateGameTemplateStoreError,
@@ -559,7 +607,9 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
             tooltip={t`Back to discover`}
             onClick={() => {
               setSearchText('');
-              const page = shopNavigationState.openHome();
+              const page = assetSwappedObject
+                ? shopNavigationState.openAssetSwapping()
+                : shopNavigationState.openHome();
               setScrollUpdateIsNeeded(page);
               clearAllAssetStoreFilters();
               setIsFiltersPanelOpen(false);
@@ -575,6 +625,9 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
               }
               value={searchText}
               onChange={(newValue: string) => {
+                if (searchText === newValue) {
+                  return;
+                }
                 setSearchText(newValue);
                 if (isOnSearchResultPage) {
                   // An existing search is already being done: just move to the
@@ -614,27 +667,29 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
           <Line justifyContent="space-between" noMargin alignItems="center">
             {(!isOnHomePage || !!openedShopCategory) && (
               <>
-                <Column expand alignItems="flex-start" noMargin>
-                  <TextButton
-                    icon={<ChevronArrowLeft />}
-                    label={<Trans>Back</Trans>}
-                    onClick={async () => {
-                      const page = shopNavigationState.backToPreviousPage();
-                      const isUpdatingSearchtext = reApplySearchTextIfNeeded(
-                        page
-                      );
-                      if (isUpdatingSearchtext) {
-                        // Updating the search is not instant, so we cannot apply the scroll position
-                        // right away. We force a wait as there's no easy way to know when results are completely updated.
-                        await new Promise(resolve => setTimeout(resolve, 500));
-                        setScrollUpdateIsNeeded(page);
-                        applyBackScrollPosition(page); // We apply it manually, because the layout effect won't be called again.
-                      } else {
-                        setScrollUpdateIsNeeded(page);
-                      }
-                    }}
-                  />
-                </Column>
+                {shopNavigationState.isRootPage ? null : (
+                  <Column expand alignItems="flex-start" noMargin>
+                    <TextButton
+                      icon={<ChevronArrowLeft />}
+                      label={<Trans>Back</Trans>}
+                      onClick={async () => {
+                        const page = shopNavigationState.backToPreviousPage();
+                        const isUpdatingSearchtext = reApplySearchTextIfNeeded(
+                          page
+                        );
+                        if (isUpdatingSearchtext) {
+                          // Updating the search is not instant, so we cannot apply the scroll position
+                          // right away. We force a wait as there's no easy way to know when results are completely updated.
+                          await delay(500);
+                          setScrollUpdateIsNeeded(page);
+                          applyBackScrollPosition(page); // We apply it manually, because the layout effect won't be called again.
+                        } else {
+                          setScrollUpdateIsNeeded(page);
+                        }
+                      }}
+                    />
+                  </Column>
+                )}
                 {(openedAssetPack ||
                   openedPrivateAssetPackListingData ||
                   filtersState.chosenCategory) && (
@@ -711,12 +766,18 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
             )
           ) : isOnSearchResultPage ? (
             <AssetsList
-              publicAssetPacks={publicAssetPacksSearchResults}
+              publicAssetPacks={
+                assetSwappedObject ? [] : publicAssetPacksSearchResults
+              }
               privateAssetPackListingDatas={
-                privateAssetPackListingDatasSearchResults
+                assetSwappedObject
+                  ? []
+                  : privateAssetPackListingDatasSearchResults
               }
               privateGameTemplateListingDatas={
-                privateGameTemplateListingDatasSearchResults
+                assetSwappedObject
+                  ? []
+                  : privateGameTemplateListingDatasSearchResults
               }
               assetShortHeaders={assetShortHeadersSearchResults}
               ref={assetsList}
@@ -783,7 +844,9 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                     </Line>
                   </Column>
                   <Line justifyContent="space-between" alignItems="center">
-                    <AssetStoreFilterPanel />
+                    <AssetStoreFilterPanel
+                      assetSwappedObject={assetSwappedObject}
+                    />
                   </Line>
                 </Column>
               </ScrollView>

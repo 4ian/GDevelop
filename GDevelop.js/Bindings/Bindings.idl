@@ -785,6 +785,8 @@ interface ObjectConfiguration {
     [Value] UniquePtrObjectConfiguration Clone();
 
     [Const, Ref] DOMString GetType();
+    // SetType must only be used by tests.
+    void SetType([Const] DOMString typeName);
 
     [Value] MapStringPropertyDescriptor GetProperties();
     boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
@@ -800,6 +802,8 @@ interface ObjectConfiguration {
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
+
+    unsigned long GetAnimationsCount();
 };
 
 interface UniquePtrObjectConfiguration {
@@ -3325,6 +3329,8 @@ interface SpriteObject {
 
     void SetUpdateIfNotVisible(boolean updateIfNotVisible);
     boolean GetUpdateIfNotVisible();
+    void SetPreScale(double value);
+    double GetPreScale();
 };
 SpriteObject implements ObjectConfiguration;
 

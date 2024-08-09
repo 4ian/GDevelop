@@ -379,6 +379,7 @@ const MosaicEditorsDisplay = React.forwardRef<
                 props.getValidatedObjectOrGroupName(newName, global, i18n)
               }
               onObjectCreated={props.onObjectCreated}
+              onObjectEdited={props.onObjectEdited}
               onObjectFolderOrObjectWithContextSelected={
                 props.onObjectFolderOrObjectWithContextSelected
               }

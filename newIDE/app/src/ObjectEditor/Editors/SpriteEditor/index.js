@@ -13,7 +13,10 @@ import PointsEditor from './PointsEditor';
 import CollisionMasksEditor from './CollisionMasksEditor';
 import { type EditorProps } from '../EditorProps.flow';
 import { Column } from '../../../UI/Grid';
-import { ResponsiveLineStackLayout } from '../../../UI/Layout';
+import {
+  ResponsiveLineStackLayout,
+  ColumnStackLayout,
+} from '../../../UI/Layout';
 import ScrollView, { type ScrollViewInterface } from '../../../UI/ScrollView';
 import Checkbox from '../../../UI/Checkbox';
 import useForceUpdate from '../../../Utils/UseForceUpdate';
@@ -27,6 +30,7 @@ import {
   getFirstAnimationFrame,
   setCollisionMaskOnAllFrames,
 } from './Utils/SpriteObjectHelper';
+import SemiControlledTextField from '../../../UI/SemiControlledTextField';
 
 const gd: libGDevelop = global.gd;
 
@@ -223,7 +227,7 @@ export default function SpriteEditor({
               onRequestClose={() => setAdvancedOptionsOpen(false)}
               open
             >
-              <Column noMargin>
+              <ColumnStackLayout noMargin>
                 <Checkbox
                   label={
                     <Trans>
@@ -239,7 +243,23 @@ export default function SpriteEditor({
                     if (onObjectUpdated) onObjectUpdated();
                   }}
                 />
-              </Column>
+                <SemiControlledTextField
+                  fullWidth
+                  value={spriteConfiguration.getPreScale().toString(10)}
+                  floatingLabelText={
+                    <Trans>
+                      Scaling factor to apply to the default dimensions
+                    </Trans>
+                  }
+                  onChange={value => {
+                    spriteConfiguration.setPreScale(parseFloat(value) || 0);
+
+                    forceUpdate();
+                    if (onObjectUpdated) onObjectUpdated();
+                  }}
+                  type="number"
+                />
+              </ColumnStackLayout>
             </Dialog>
           )}
           {pointsEditorOpen && (

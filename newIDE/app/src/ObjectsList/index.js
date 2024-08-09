@@ -9,6 +9,7 @@ import { AutoSizer } from 'react-virtualized';
 import Background from '../UI/Background';
 import SearchBar from '../UI/SearchBar';
 import NewObjectDialog from '../AssetStore/NewObjectDialog';
+import AssetSwappingDialog from '../AssetStore/AssetSwappingDialog';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
 import Window from '../Utils/Window';
@@ -50,6 +51,7 @@ import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import { getInsertionParentAndPositionFromSelection } from '../Utils/ObjectFolders';
+import { canSwapAssetOfObject } from '../AssetStore/AssetSwapper';
 
 const gd: libGDevelop = global.gd;
 const sceneObjectsRootFolderId = 'scene-objects';
@@ -215,6 +217,7 @@ type Props = {|
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
   onExportAssets: () => void,
   onObjectCreated: gdObject => void,
+  onObjectEdited: gdObject => void,
   onObjectFolderOrObjectWithContextSelected: (
     ?ObjectFolderOrObjectWithContext
   ) => void,
@@ -252,6 +255,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       onEditObject,
       onExportAssets,
       onObjectCreated,
+      onObjectEdited,
       onObjectFolderOrObjectWithContextSelected,
       onObjectPasted,
       getValidatedObjectOrGroupName,
@@ -296,6 +300,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         setNewObjectDialogOpen(null);
       },
     }));
+
+    const [
+      objectAssetSwappingDialogOpen,
+      setObjectAssetSwappingDialogOpen,
+    ] = React.useState<{ object: gdObject } | null>(null);
 
     // Initialize keyboard shortcuts as empty.
     // onDelete, onDuplicate and onRename callbacks are set in an effect because it applies
@@ -430,6 +439,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       },
       [onObjectCreated, objectsContainer]
     );
+
+    const swapObjectAsset = React.useCallback((object: gdObject) => {
+      setObjectAssetSwappingDialogOpen({ object });
+    }, []);
 
     const onAddNewObject = React.useCallback(
       (item: ObjectFolderOrObjectWithContext | null) => {
@@ -1480,6 +1493,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             ),
           },
           { type: 'separator' },
+          {
+            label: i18n._(t`Swap assets`),
+            click: () => swapObjectAsset(object),
+            enabled: canSwapAssetOfObject(object),
+          },
+          { type: 'separator' },
           globalObjectsContainer && {
             label: i18n._(t`Set as global object`),
             enabled: !isObjectFolderOrObjectWithContextGlobal(item),
@@ -1541,6 +1560,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         cutObjectFolderOrObjectWithContext,
         duplicateObjectFolderOrObjectWithContext,
         onEditObject,
+        swapObjectAsset,
         selectObjectFolderOrObjectWithContext,
         setAsGlobalObject,
         onAddObjectInstance,
@@ -1686,6 +1706,22 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             resourceManagementProps={resourceManagementProps}
             canInstallPrivateAsset={canInstallPrivateAsset}
             targetObjectFolderOrObjectWithContext={newObjectDialogOpen.from}
+          />
+        )}
+        {objectAssetSwappingDialogOpen && (
+          <AssetSwappingDialog
+            onClose={() => setObjectAssetSwappingDialogOpen(null)}
+            onObjectsConfigurationSwapped={() => {
+              onObjectEdited(objectAssetSwappingDialogOpen.object);
+              setObjectAssetSwappingDialogOpen(null);
+            }}
+            project={project}
+            layout={layout}
+            eventsBasedObject={eventsBasedObject}
+            objectsContainer={objectsContainer}
+            object={objectAssetSwappingDialogOpen.object}
+            resourceManagementProps={resourceManagementProps}
+            canInstallPrivateAsset={canInstallPrivateAsset}
           />
         )}
       </Background>

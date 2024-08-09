@@ -3,6 +3,7 @@ declare class gdObjectConfiguration {
   constructor(): void;
   clone(): gdUniquePtrObjectConfiguration;
   getType(): string;
+  setType(typeName: string): void;
   getProperties(): gdMapStringPropertyDescriptor;
   updateProperty(name: string, value: string): boolean;
   getInitialInstanceProperties(instance: gdInitialInstance): gdMapStringPropertyDescriptor;
@@ -10,6 +11,7 @@ declare class gdObjectConfiguration {
   exposeResources(worker: gdArbitraryResourceWorker): void;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(project: gdProject, element: gdSerializerElement): void;
+  getAnimationsCount(): number;
   delete(): void;
   ptr: number;
 };

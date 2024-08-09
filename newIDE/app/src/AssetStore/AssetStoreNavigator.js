@@ -27,8 +27,11 @@ export type AssetStorePageState = {|
 
 export type NavigationState = {|
   getCurrentPage: () => AssetStorePageState,
+  isRootPage: boolean,
+  isAssetSwappingHistory: boolean,
   backToPreviousPage: () => AssetStorePageState,
   openHome: () => AssetStorePageState,
+  openAssetSwapping: () => AssetStorePageState,
   clearHistory: () => void,
   clearPreviousPageFromHistory: () => void,
   openSearchResultPage: () => void,
@@ -118,6 +121,8 @@ export const useShopNavigation = (): NavigationState => {
   return React.useMemo(
     () => ({
       getCurrentPage: () => previousPages[previousPages.length - 1],
+      isRootPage: previousPages.length <= 1,
+      isAssetSwappingHistory: previousPages[0] !== assetStoreHomePageState,
       backToPreviousPage: () => {
         if (previousPages.length > 1) {
           const newPreviousPages = previousPages.slice(
@@ -135,6 +140,11 @@ export const useShopNavigation = (): NavigationState => {
       openHome: () => {
         setHistory({ previousPages: [assetStoreHomePageState] });
         return assetStoreHomePageState;
+      },
+      openAssetSwapping: () => {
+        const assetSwappingState = { ...searchPageState };
+        setHistory({ previousPages: [assetSwappingState] });
+        return assetSwappingState;
       },
       clearHistory: () => {
         setHistory(previousHistory => {

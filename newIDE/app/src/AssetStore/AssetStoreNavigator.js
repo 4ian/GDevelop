@@ -122,7 +122,7 @@ export const useShopNavigation = (): NavigationState => {
     () => ({
       getCurrentPage: () => previousPages[previousPages.length - 1],
       isRootPage: previousPages.length <= 1,
-      isAssetSwappingHistory: previousPages[0] !== assetStoreHomePageState,
+      isAssetSwappingHistory: !isHomePage(previousPages[0]),
       backToPreviousPage: () => {
         if (previousPages.length > 1) {
           const newPreviousPages = previousPages.slice(

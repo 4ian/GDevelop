@@ -59,6 +59,30 @@ namespace gdjs {
   const exponentialInterpolation =
     gdjs.evtTools.common.exponentialInterpolation;
 
+  class ObjectTweenAwaiterTask extends gdjs.ObjectBoundTask {
+    manager: gdjs.evtTools.tween.TweenManager;
+    identifier: string;
+
+    constructor(
+      objectInstance: gdjs.RuntimeObject,
+      manager: gdjs.evtTools.tween.TweenManager,
+      identifier: string
+    ) {
+      super(objectInstance);
+      this.manager = manager;
+      this.identifier = identifier;
+    }
+
+    shouldResolve() {
+      return this.manager.hasFinished(this.identifier);
+    }
+
+    onObjectDeleted(): void {
+      //@ts-ignore - We destroy the task to avoid leaking memory/allow tween memory to be reclaimed as soon as possible.
+      this.manager = null;
+    }
+  }
+
   export class TweenRuntimeBehavior extends gdjs.RuntimeBehavior {
     private _tweens = new gdjs.evtTools.tween.TweenManager();
     private _isActive: boolean = true;
@@ -1847,6 +1871,17 @@ namespace gdjs {
      */
     removeTween(identifier: string) {
       this._tweens.removeTween(identifier);
+    }
+
+    /**
+     * Creates a task that resolves when a tween finishes.
+     * @param identifier The tween to await.
+     * @returns An async task awaiting the tween end.
+     */
+    awaitTween(identifier: string): gdjs.AsyncTask {
+      return this._tweens.exists(identifier)
+        ? new ObjectTweenAwaiterTask(this.owner, this._tweens, identifier)
+        : new gdjs.ResolveTask();
     }
 
     /**

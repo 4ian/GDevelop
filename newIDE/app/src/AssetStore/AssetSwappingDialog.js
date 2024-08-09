@@ -7,29 +7,15 @@ import FlatButton from '../UI/FlatButton';
 import HelpButton from '../UI/HelpButton';
 import { AssetStore, type AssetStoreInterface } from '.';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
-import { sendAssetAddedToProject } from '../Utils/Analytics/EventSender';
 import RaisedButton from '../UI/RaisedButton';
 import { AssetStoreContext } from './AssetStoreContext';
 import AssetPackInstallDialog from './AssetPackInstallDialog';
-import {
-  installRequiredExtensions,
-  installPublicAsset,
-  checkRequiredExtensionsUpdateForAssets,
-} from './InstallAsset';
-import { isPrivateAsset } from '../Utils/GDevelopServices/Asset';
-import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import Window from '../Utils/Window';
-import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
-import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { enumerateAssetStoreIds } from './EnumerateAssetStoreIds';
 import { getAssetShortHeadersToDisplay } from './AssetsList';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import LoaderModal from '../UI/LoaderModal';
-import {
-  useFetchAssets,
-  useExtensionUpdateAlertDialog,
-  useProjectNeedToBeSavedAlertDialog,
-} from './NewObjectDialog';
+import { useInstallAsset } from './NewObjectDialog';
 import { swapAsset } from './AssetSwapper';
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 
@@ -83,123 +69,45 @@ function AssetSwappingDialog({
     isAssetBeingInstalled,
     setIsAssetBeingInstalled,
   ] = React.useState<boolean>(false);
-  const eventsFunctionsExtensionsState = React.useContext(
-    EventsFunctionsExtensionsContext
-  );
   const isAssetAddedToScene =
     openedAssetShortHeader &&
     existingAssetStoreIds.has(openedAssetShortHeader.id);
-  const { installPrivateAsset } = React.useContext(
-    PrivateAssetsAuthorizationContext
-  );
-  const { showAlert } = useAlertDialog();
-
-  const fetchAssets = useFetchAssets();
-  const showExtensionUpdateConfirmation = useExtensionUpdateAlertDialog();
-  const showProjectNeedToBeSaved = useProjectNeedToBeSavedAlertDialog(
-    canInstallPrivateAsset
-  );
+  const installAsset = useInstallAsset({
+    project,
+    objectsContainer,
+    resourceManagementProps,
+    canInstallPrivateAsset,
+    onObjectsAddedFromAssets: onObjectsConfigurationSwapped,
+  });
 
   const onInstallAsset = React.useCallback(
     async (assetShortHeader): Promise<boolean> => {
       if (!assetShortHeader) return false;
+
       setIsAssetBeingInstalled(true);
-      try {
-        if (await showProjectNeedToBeSaved(assetShortHeader)) {
-          setIsAssetBeingInstalled(false);
-          return false;
-        }
-
-        const assets = await fetchAssets([assetShortHeader]);
-        const asset = assets[0];
-        const requiredExtensionInstallation = await checkRequiredExtensionsUpdateForAssets(
-          {
-            assets,
-            project,
-          }
-        );
-        const shouldUpdateExtension =
-          requiredExtensionInstallation.outOfDateExtensionShortHeaders.length >
-            0 &&
-          (await showExtensionUpdateConfirmation(
-            requiredExtensionInstallation.outOfDateExtensionShortHeaders
-          ));
-        await installRequiredExtensions({
-          requiredExtensionInstallation,
-          shouldUpdateExtension,
-          eventsFunctionsExtensionsState,
-          project,
-        });
-        const isPrivate = isPrivateAsset(assetShortHeader);
-        const installOutput = isPrivate
-          ? await installPrivateAsset({
-              asset,
-              project,
-              objectsContainer,
-              targetObjectFolderOrObject: null,
-            })
-          : await installPublicAsset({
-              asset,
-              project,
-              objectsContainer,
-              targetObjectFolderOrObject: null,
-            });
-        if (!installOutput) {
-          throw new Error('Unable to install private Asset.');
-        }
-        sendAssetAddedToProject({
-          id: assetShortHeader.id,
-          name: assetShortHeader.name,
-          assetPackName: openedAssetPack ? openedAssetPack.name : null,
-          assetPackTag: openedAssetPack ? openedAssetPack.tag : null,
-          assetPackId:
-            openedAssetPack && openedAssetPack.id ? openedAssetPack.id : null,
-          assetPackKind: isPrivate ? 'private' : 'public',
-        });
-
-        if (installOutput.createdObjects.length > 0) {
-          swapAsset(
-            project,
-            PixiResourcesLoader,
-            object,
-            installOutput.createdObjects[0],
-            assetShortHeader
-          );
-        }
-        for (const createdObject of installOutput.createdObjects) {
-          objectsContainer.removeObject(createdObject.getName());
-        }
-
-        onObjectsConfigurationSwapped();
-
-        await resourceManagementProps.onFetchNewlyAddedResources();
-        setIsAssetBeingInstalled(false);
-        return true;
-      } catch (error) {
-        console.error('Error while installing the asset:', error);
-        showAlert({
-          title: t`Could not install the asset`,
-          message: t`There was an error while installing the asset "${
-            assetShortHeader.name
-          }". Verify your internet connection or try again later.`,
-        });
+      const installAssetOutput = await installAsset(assetShortHeader);
+      if (!installAssetOutput) {
         setIsAssetBeingInstalled(false);
         return false;
       }
+
+      if (installAssetOutput.createdObjects.length > 0) {
+        swapAsset(
+          project,
+          PixiResourcesLoader,
+          object,
+          installAssetOutput.createdObjects[0],
+          assetShortHeader
+        );
+      }
+      for (const createdObject of installAssetOutput.createdObjects) {
+        objectsContainer.removeObject(createdObject.getName());
+      }
+
+      setIsAssetBeingInstalled(false);
+      return true;
     },
-    [
-      fetchAssets,
-      project,
-      showExtensionUpdateConfirmation,
-      eventsFunctionsExtensionsState,
-      installPrivateAsset,
-      objectsContainer,
-      openedAssetPack,
-      onObjectsConfigurationSwapped,
-      resourceManagementProps,
-      showAlert,
-      object,
-    ]
+    [installAsset, project, object, objectsContainer]
   );
 
   const displayedAssetShortHeaders = React.useMemo(

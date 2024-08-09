@@ -19,6 +19,7 @@ import {
   installPublicAsset,
   checkRequiredExtensionsUpdate,
   checkRequiredExtensionsUpdateForAssets,
+  type InstallAssetOutput,
 } from './InstallAsset';
 import {
   type Asset,
@@ -118,6 +119,115 @@ export const useFetchAssets = () => {
   };
 };
 
+export const useInstallAsset = ({
+  project,
+  objectsContainer,
+  targetObjectFolderOrObjectWithContext,
+  resourceManagementProps,
+  canInstallPrivateAsset,
+  onObjectsAddedFromAssets,
+}: {|
+  project: gdProject,
+  objectsContainer: gdObjectsContainer,
+  targetObjectFolderOrObjectWithContext?: ?ObjectFolderOrObjectWithContext,
+  resourceManagementProps: ResourceManagementProps,
+  canInstallPrivateAsset: () => boolean,
+  onObjectsAddedFromAssets: (Array<gdObject>) => void,
+|}) => {
+  const { shopNavigationState } = React.useContext(AssetStoreContext);
+  const { openedAssetPack } = shopNavigationState.getCurrentPage();
+  const eventsFunctionsExtensionsState = React.useContext(
+    EventsFunctionsExtensionsContext
+  );
+  const { installPrivateAsset } = React.useContext(
+    PrivateAssetsAuthorizationContext
+  );
+  const { showAlert } = useAlertDialog();
+  const fetchAssets = useFetchAssets();
+  const showExtensionUpdateConfirmation = useExtensionUpdateAlertDialog();
+  const showProjectNeedToBeSaved = useProjectNeedToBeSavedAlertDialog(
+    canInstallPrivateAsset
+  );
+
+  return async (
+    assetShortHeader: AssetShortHeader
+  ): Promise<InstallAssetOutput | null> => {
+    try {
+      if (await showProjectNeedToBeSaved(assetShortHeader)) {
+        return null;
+      }
+      const assets = await fetchAssets([assetShortHeader]);
+      const asset = assets[0];
+      const requiredExtensionInstallation = await checkRequiredExtensionsUpdateForAssets(
+        {
+          assets,
+          project,
+        }
+      );
+      const shouldUpdateExtension =
+        requiredExtensionInstallation.outOfDateExtensionShortHeaders.length >
+          0 &&
+        (await showExtensionUpdateConfirmation(
+          requiredExtensionInstallation.outOfDateExtensionShortHeaders
+        ));
+      await installRequiredExtensions({
+        requiredExtensionInstallation,
+        shouldUpdateExtension,
+        eventsFunctionsExtensionsState,
+        project,
+      });
+      const isPrivate = isPrivateAsset(assetShortHeader);
+      const installOutput = isPrivate
+        ? await installPrivateAsset({
+            asset,
+            project,
+            objectsContainer,
+            targetObjectFolderOrObject:
+              targetObjectFolderOrObjectWithContext &&
+              !targetObjectFolderOrObjectWithContext.global
+                ? targetObjectFolderOrObjectWithContext.objectFolderOrObject
+                : null,
+          })
+        : await installPublicAsset({
+            asset,
+            project,
+            objectsContainer,
+            targetObjectFolderOrObject:
+              targetObjectFolderOrObjectWithContext &&
+              !targetObjectFolderOrObjectWithContext.global
+                ? targetObjectFolderOrObjectWithContext.objectFolderOrObject
+                : null,
+          });
+      if (!installOutput) {
+        throw new Error('Unable to install private Asset.');
+      }
+      sendAssetAddedToProject({
+        id: assetShortHeader.id,
+        name: assetShortHeader.name,
+        assetPackName: openedAssetPack ? openedAssetPack.name : null,
+        assetPackTag: openedAssetPack ? openedAssetPack.tag : null,
+        assetPackId:
+          openedAssetPack && openedAssetPack.id ? openedAssetPack.id : null,
+        assetPackKind: isPrivate ? 'private' : 'public',
+      });
+
+      onObjectsAddedFromAssets(installOutput.createdObjects);
+
+      await resourceManagementProps.onFetchNewlyAddedResources();
+      return installOutput;
+    } catch (error) {
+      console.error('Error while installing the asset:', error);
+      showAlert({
+        title: t`Could not install the asset`,
+        message: t`There was an error while installing the asset "${
+          assetShortHeader.name
+        }". Verify your internet connection or try again later.`,
+      });
+      return null;
+    }
+  };
+};
+
 type Props = {|
   project: gdProject,
   layout: ?gdLayout,
@@ -192,113 +302,27 @@ function NewObjectDialog({
   const isAssetAddedToScene =
     openedAssetShortHeader &&
     existingAssetStoreIds.has(openedAssetShortHeader.id);
-  const { installPrivateAsset } = React.useContext(
-    PrivateAssetsAuthorizationContext
-  );
   const { showAlert } = useAlertDialog();
 
-  const fetchAssets = useFetchAssets();
   const showExtensionUpdateConfirmation = useExtensionUpdateAlertDialog();
-  const showProjectNeedToBeSaved = useProjectNeedToBeSavedAlertDialog(
-    canInstallPrivateAsset
-  );
+  const installAsset = useInstallAsset({
+    project,
+    objectsContainer,
+    resourceManagementProps,
+    canInstallPrivateAsset,
+    onObjectsAddedFromAssets,
+  });
 
   const onInstallAsset = React.useCallback(
     async (assetShortHeader): Promise<boolean> => {
       if (!assetShortHeader) return false;
+
       setIsAssetBeingInstalled(true);
-
-      try {
-        if (await showProjectNeedToBeSaved(assetShortHeader)) {
-          setIsAssetBeingInstalled(false);
-          return false;
-        }
-        const assets = await fetchAssets([assetShortHeader]);
-        const asset = assets[0];
-        const requiredExtensionInstallation = await checkRequiredExtensionsUpdateForAssets(
-          {
-            assets,
-            project,
-          }
-        );
-        const shouldUpdateExtension =
-          requiredExtensionInstallation.outOfDateExtensionShortHeaders.length >
-            0 &&
-          (await showExtensionUpdateConfirmation(
-            requiredExtensionInstallation.outOfDateExtensionShortHeaders
-          ));
-        await installRequiredExtensions({
-          requiredExtensionInstallation,
-          shouldUpdateExtension,
-          eventsFunctionsExtensionsState,
-          project,
-        });
-        const isPrivate = isPrivateAsset(assetShortHeader);
-        const installOutput = isPrivate
-          ? await installPrivateAsset({
-              asset,
-              project,
-              objectsContainer,
-              targetObjectFolderOrObject:
-                targetObjectFolderOrObjectWithContext &&
-                !targetObjectFolderOrObjectWithContext.global
-                  ? targetObjectFolderOrObjectWithContext.objectFolderOrObject
-                  : null,
-            })
-          : await installPublicAsset({
-              asset,
-              project,
-              objectsContainer,
-              targetObjectFolderOrObject:
-                targetObjectFolderOrObjectWithContext &&
-                !targetObjectFolderOrObjectWithContext.global
-                  ? targetObjectFolderOrObjectWithContext.objectFolderOrObject
-                  : null,
-            });
-        if (!installOutput) {
-          throw new Error('Unable to install private Asset.');
-        }
-        sendAssetAddedToProject({
-          id: assetShortHeader.id,
-          name: assetShortHeader.name,
-          assetPackName: openedAssetPack ? openedAssetPack.name : null,
-          assetPackTag: openedAssetPack ? openedAssetPack.tag : null,
-          assetPackId:
-            openedAssetPack && openedAssetPack.id ? openedAssetPack.id : null,
-          assetPackKind: isPrivate ? 'private' : 'public',
-        });
-
-        onObjectsAddedFromAssets(installOutput.createdObjects);
-
-        await resourceManagementProps.onFetchNewlyAddedResources();
-        setIsAssetBeingInstalled(false);
-        return true;
-      } catch (error) {
-        console.error('Error while installing the asset:', error);
-        showAlert({
-          title: t`Could not install the asset`,
-          message: t`There was an error while installing the asset "${
-            assetShortHeader.name
-          }". Verify your internet connection or try again later.`,
-        });
-        setIsAssetBeingInstalled(false);
-        return false;
-      }
+      const installAssetOutput = await installAsset(assetShortHeader);
+      setIsAssetBeingInstalled(false);
+      return !!installAssetOutput;
     },
-    [
-      showProjectNeedToBeSaved,
-      fetchAssets,
-      project,
-      showExtensionUpdateConfirmation,
-      eventsFunctionsExtensionsState,
-      installPrivateAsset,
-      objectsContainer,
-      targetObjectFolderOrObjectWithContext,
-      openedAssetPack,
-      onObjectsAddedFromAssets,
-      resourceManagementProps,
-      showAlert,
-    ]
+    [installAsset]
   );
 
   const onInstallEmptyCustomObject = React.useCallback(

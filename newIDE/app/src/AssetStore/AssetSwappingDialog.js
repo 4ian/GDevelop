@@ -28,6 +28,7 @@ import LoaderModal from '../UI/LoaderModal';
 import {
   useFetchAssets,
   useExtensionUpdateAlertDialog,
+  useProjectNeedToBeSavedAlertDialog,
 } from './NewObjectDialog';
 import { swapAsset } from './AssetSwapper';
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
@@ -95,24 +96,20 @@ function AssetSwappingDialog({
 
   const fetchAssets = useFetchAssets();
   const showExtensionUpdateConfirmation = useExtensionUpdateAlertDialog();
+  const showProjectNeedToBeSaved = useProjectNeedToBeSavedAlertDialog(
+    canInstallPrivateAsset
+  );
 
   const onInstallAsset = React.useCallback(
     async (assetShortHeader): Promise<boolean> => {
       if (!assetShortHeader) return false;
       setIsAssetBeingInstalled(true);
       try {
-        const isPrivate = isPrivateAsset(assetShortHeader);
-        if (isPrivate) {
-          const canUserInstallPrivateAsset = await canInstallPrivateAsset();
-          if (!canUserInstallPrivateAsset) {
-            await showAlert({
-              title: t`Save your project`,
-              message: t`You need to save this project as a cloud project to install this asset. Please save your project and try again.`,
-            });
-            setIsAssetBeingInstalled(false);
-            return false;
-          }
+        if (await showProjectNeedToBeSaved(assetShortHeader)) {
+          setIsAssetBeingInstalled(false);
+          return false;
         }
+
         const assets = await fetchAssets([assetShortHeader]);
         const asset = assets[0];
         const requiredExtensionInstallation = await checkRequiredExtensionsUpdateForAssets(
@@ -133,6 +130,7 @@ function AssetSwappingDialog({
           eventsFunctionsExtensionsState,
           project,
         });
+        const isPrivate = isPrivateAsset(assetShortHeader);
         const installOutput = isPrivate
           ? await installPrivateAsset({
               asset,
@@ -199,7 +197,6 @@ function AssetSwappingDialog({
       openedAssetPack,
       onObjectsConfigurationSwapped,
       resourceManagementProps,
-      canInstallPrivateAsset,
       showAlert,
       object,
     ]

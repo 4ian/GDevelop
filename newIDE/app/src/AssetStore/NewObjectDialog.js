@@ -62,6 +62,26 @@ export const useExtensionUpdateAlertDialog = () => {
   };
 };
 
+export const useProjectNeedToBeSavedAlertDialog = (
+  canInstallPrivateAsset: () => boolean
+) => {
+  const { showAlert } = useAlertDialog();
+  return async (assetShortHeader: AssetShortHeader): Promise<boolean> => {
+    const isPrivate = isPrivateAsset(assetShortHeader);
+    if (isPrivate) {
+      const canUserInstallPrivateAsset = await canInstallPrivateAsset();
+      if (!canUserInstallPrivateAsset) {
+        await showAlert({
+          title: t`Save your project`,
+          message: t`You need to save this project as a cloud project to install this asset. Please save your project and try again.`,
+        });
+        return true;
+      }
+    }
+    return false;
+  };
+};
+
 export const useFetchAssets = () => {
   const { environment } = React.useContext(AssetStoreContext);
 
@@ -179,23 +199,19 @@ function NewObjectDialog({
 
   const fetchAssets = useFetchAssets();
   const showExtensionUpdateConfirmation = useExtensionUpdateAlertDialog();
+  const showProjectNeedToBeSaved = useProjectNeedToBeSavedAlertDialog(
+    canInstallPrivateAsset
+  );
 
   const onInstallAsset = React.useCallback(
     async (assetShortHeader): Promise<boolean> => {
       if (!assetShortHeader) return false;
       setIsAssetBeingInstalled(true);
+
       try {
-        const isPrivate = isPrivateAsset(assetShortHeader);
-        if (isPrivate) {
-          const canUserInstallPrivateAsset = await canInstallPrivateAsset();
-          if (!canUserInstallPrivateAsset) {
-            await showAlert({
-              title: t`Save your project`,
-              message: t`You need to save this project as a cloud project to install this asset. Please save your project and try again.`,
-            });
-            setIsAssetBeingInstalled(false);
-            return false;
-          }
+        if (await showProjectNeedToBeSaved(assetShortHeader)) {
+          setIsAssetBeingInstalled(false);
+          return false;
         }
         const assets = await fetchAssets([assetShortHeader]);
         const asset = assets[0];
@@ -217,6 +233,7 @@ function NewObjectDialog({
           eventsFunctionsExtensionsState,
           project,
         });
+        const isPrivate = isPrivateAsset(assetShortHeader);
         const installOutput = isPrivate
           ? await installPrivateAsset({
               asset,
@@ -269,18 +286,18 @@ function NewObjectDialog({
       }
     },
     [
+      showProjectNeedToBeSaved,
       fetchAssets,
       project,
       showExtensionUpdateConfirmation,
-      installPrivateAsset,
       eventsFunctionsExtensionsState,
+      installPrivateAsset,
       objectsContainer,
-      openedAssetPack,
-      resourceManagementProps,
-      canInstallPrivateAsset,
-      showAlert,
-      onObjectsAddedFromAssets,
       targetObjectFolderOrObjectWithContext,
+      openedAssetPack,
+      onObjectsAddedFromAssets,
+      resourceManagementProps,
+      showAlert,
     ]
   );
 

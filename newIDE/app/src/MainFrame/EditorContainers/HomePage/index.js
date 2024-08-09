@@ -132,7 +132,6 @@ type Props = {|
   canSave: boolean,
 
   resourceManagementProps: ResourceManagementProps,
-  canInstallPrivateAsset: () => boolean,
 |};
 
 type HomePageEditorInterface = {|
@@ -168,7 +167,6 @@ export const HomePage = React.memo<Props>(
         onSave,
         canSave,
         resourceManagementProps,
-        canInstallPrivateAsset,
         askToCloseProject,
       }: Props,
       ref
@@ -520,7 +518,6 @@ export const HomePage = React.memo<Props>(
                     <StoreSection
                       project={project}
                       resourceManagementProps={resourceManagementProps}
-                      canInstallPrivateAsset={canInstallPrivateAsset}
                       onOpenPrivateGameTemplateListingData={
                         onOpenPrivateGameTemplateListingData
                       }
@@ -635,6 +632,5 @@ export const renderHomePageContainer = (
     onSave={props.onSave}
     canSave={props.canSave}
     resourceManagementProps={props.resourceManagementProps}
-    canInstallPrivateAsset={props.canInstallPrivateAsset}
   />
 );

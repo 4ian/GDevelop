@@ -124,13 +124,11 @@ export const useInstallAsset = ({
   objectsContainer,
   targetObjectFolderOrObjectWithContext,
   resourceManagementProps,
-  canInstallPrivateAsset,
 }: {|
   project: gdProject,
   objectsContainer: gdObjectsContainer,
   targetObjectFolderOrObjectWithContext?: ?ObjectFolderOrObjectWithContext,
   resourceManagementProps: ResourceManagementProps,
-  canInstallPrivateAsset: () => boolean,
 |}) => {
   const { shopNavigationState } = React.useContext(AssetStoreContext);
   const { openedAssetPack } = shopNavigationState.getCurrentPage();
@@ -144,7 +142,7 @@ export const useInstallAsset = ({
   const fetchAssets = useFetchAssets();
   const showExtensionUpdateConfirmation = useExtensionUpdateAlertDialog();
   const showProjectNeedToBeSaved = useProjectNeedToBeSavedAlertDialog(
-    canInstallPrivateAsset
+    resourceManagementProps.canInstallPrivateAsset
   );
 
   return async (
@@ -233,7 +231,6 @@ type Props = {|
   onClose: () => void,
   onCreateNewObject: (type: string) => void,
   onObjectsAddedFromAssets: (Array<gdObject>) => void,
-  canInstallPrivateAsset: () => boolean,
   targetObjectFolderOrObjectWithContext?: ?ObjectFolderOrObjectWithContext,
 |};
 
@@ -246,7 +243,6 @@ function NewObjectDialog({
   onClose,
   onCreateNewObject,
   onObjectsAddedFromAssets,
-  canInstallPrivateAsset,
   targetObjectFolderOrObjectWithContext,
 }: Props) {
   const { isMobile } = useResponsiveWindowSize();
@@ -305,7 +301,6 @@ function NewObjectDialog({
     project,
     objectsContainer,
     resourceManagementProps,
-    canInstallPrivateAsset,
   });
 
   const onInstallAsset = React.useCallback(
@@ -575,7 +570,6 @@ function NewObjectDialog({
                 }}
                 project={project}
                 objectsContainer={objectsContainer}
-                canInstallPrivateAsset={canInstallPrivateAsset}
                 resourceManagementProps={resourceManagementProps}
               />
             )}

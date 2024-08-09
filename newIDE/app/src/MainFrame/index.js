@@ -3224,6 +3224,7 @@ const MainFrame = (props: Props) => {
       getStorageProvider,
       onFetchNewlyAddedResources,
       getStorageProviderResourceOperations,
+      canInstallPrivateAsset,
     }),
     [
       resourceSources,
@@ -3232,6 +3233,7 @@ const MainFrame = (props: Props) => {
       getStorageProvider,
       onFetchNewlyAddedResources,
       getStorageProviderResourceOperations,
+      canInstallPrivateAsset,
     ]
   );
 
@@ -3459,7 +3461,6 @@ const MainFrame = (props: Props) => {
                     canOpen: !!props.storageProviders.filter(
                       ({ hiddenInOpenDialog }) => !hiddenInOpenDialog
                     ).length,
-                    canInstallPrivateAsset,
                     onChooseProject: () => openOpenFromStorageProviderDialog(),
                     onOpenRecentFile: openFromFileMetadataWithStorageProvider,
                     onOpenNewProjectSetupDialog: () => {

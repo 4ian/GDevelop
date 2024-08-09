@@ -115,7 +115,8 @@ const WrappedHomePage = ({
               onOpenPreferences={() => action('open preferences')()}
               onOpenAbout={() => action('open about')()}
               resourceManagementProps={fakeResourceManagementProps}
-              canInstallPrivateAsset={() => true}
+              onCreateProjectFromExample={action('onCreateProjectFromExample')}
+              askToCloseProject={async () => true}
             />
           </TutorialStateProvider>
         </ExampleStoreStateProvider>

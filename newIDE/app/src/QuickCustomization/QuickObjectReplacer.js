@@ -132,9 +132,6 @@ export const QuickObjectReplacer = ({
           onClose={() => {
             setSelectedObjectToSwap(null);
           }}
-          canInstallPrivateAsset={
-            () => false /* TODO: move to resourceManagementProps. */
-          }
         />
       )}
     </ColumnStackLayout>

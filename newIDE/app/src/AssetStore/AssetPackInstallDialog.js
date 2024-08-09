@@ -49,7 +49,6 @@ type Props = {|
   project: gdProject,
   objectsContainer: ?gdObjectsContainer,
   resourceManagementProps: ResourceManagementProps,
-  canInstallPrivateAsset: () => boolean,
 |};
 
 const AssetPackInstallDialog = ({
@@ -60,7 +59,6 @@ const AssetPackInstallDialog = ({
   onAssetsAdded,
   project,
   objectsContainer,
-  canInstallPrivateAsset,
   resourceManagementProps,
 }: Props) => {
   const missingAssetShortHeaders = assetShortHeaders.filter(
@@ -85,8 +83,8 @@ const AssetPackInstallDialog = ({
     [assetShortHeaders]
   );
   const canUserInstallPrivateAsset = React.useMemo(
-    () => canInstallPrivateAsset(),
-    [canInstallPrivateAsset]
+    () => resourceManagementProps.canInstallPrivateAsset(),
+    [resourceManagementProps]
   );
 
   const eventsFunctionsExtensionsState = React.useContext(

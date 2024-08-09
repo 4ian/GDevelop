@@ -241,6 +241,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                   getStorageProvider: () => emptyStorageProvider,
                   onFetchNewlyAddedResources: async () => {},
                   getStorageProviderResourceOperations: () => null,
+                  canInstallPrivateAsset: () => false,
                 }}
                 selectedObjectFolderOrObjectsWithContext={
                   selectedObjectFolderOrObjectsWithContext
@@ -274,7 +275,6 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                   launchProjectDataOnlyPreview: async () => {},
                   launchProjectWithLoadingScreenPreview: async () => {},
                 }}
-                canInstallPrivateAsset={() => false}
                 canSetAsGlobalObject={false}
               />
             </Line>
@@ -297,6 +297,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                   getStorageProvider: () => emptyStorageProvider,
                   onFetchNewlyAddedResources: async () => {},
                   getStorageProviderResourceOperations: () => null,
+                  canInstallPrivateAsset: () => false,
                 }}
                 onComputeAllVariableNames={() => {
                   return [];

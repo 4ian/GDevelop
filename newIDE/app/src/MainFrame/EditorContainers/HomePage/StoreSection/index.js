@@ -16,7 +16,6 @@ import { getAssetShortHeadersToDisplay } from '../../../../AssetStore/AssetsList
 type Props = {|
   project: ?gdProject,
   resourceManagementProps: ResourceManagementProps,
-  canInstallPrivateAsset: () => boolean,
   onOpenPrivateGameTemplateListingData: (
     privateGameTemplateListingData: PrivateGameTemplateListingData
   ) => void,
@@ -26,7 +25,6 @@ type Props = {|
 const StoreSection = ({
   project,
   resourceManagementProps,
-  canInstallPrivateAsset,
   onOpenPrivateGameTemplateListingData,
   onOpenProfile,
 }: Props) => {
@@ -133,7 +131,6 @@ const StoreSection = ({
             }}
             project={project}
             objectsContainer={null}
-            canInstallPrivateAsset={canInstallPrivateAsset}
             resourceManagementProps={resourceManagementProps}
           />
         )}

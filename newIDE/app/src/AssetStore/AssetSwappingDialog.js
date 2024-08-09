@@ -27,7 +27,6 @@ type Props = {|
   object: gdObject,
   resourceManagementProps: ResourceManagementProps,
   onClose: ({ swappingDone: boolean }) => void,
-  canInstallPrivateAsset: () => boolean,
 |};
 
 function AssetSwappingDialog({
@@ -38,7 +37,6 @@ function AssetSwappingDialog({
   object,
   resourceManagementProps,
   onClose,
-  canInstallPrivateAsset,
 }: Props) {
   const { shopNavigationState, environment, setEnvironment } = React.useContext(
     AssetStoreContext
@@ -54,14 +52,10 @@ function AssetSwappingDialog({
     isAssetBeingInstalled,
     setIsAssetBeingInstalled,
   ] = React.useState<boolean>(false);
-  const isAssetAddedToScene =
-    openedAssetShortHeader &&
-    existingAssetStoreIds.has(openedAssetShortHeader.id);
   const installAsset = useInstallAsset({
     project,
     objectsContainer,
     resourceManagementProps,
-    canInstallPrivateAsset,
   });
 
   const onInstallOpenedAsset = React.useCallback(

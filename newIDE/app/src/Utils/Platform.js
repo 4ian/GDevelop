@@ -5,7 +5,7 @@ const process = optionalRequire('process');
 
 let _isWindows = false;
 if (remote) {
-  _isWindows = remote.require('electron-is').windows();
+  _isWindows = remote.process.platform === 'win32';
 }
 const _isMacLike =
   typeof navigator !== 'undefined' &&

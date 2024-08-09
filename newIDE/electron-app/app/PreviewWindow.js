@@ -4,7 +4,7 @@ const {
   shell,
   screen,
 } = require('electron');
-const isDev = require('electron-is').dev();
+const isDev = require('electron-is-dev');
 const { load } = require('./Utils/UrlLoader');
 
 // Keep a global reference of the window object, if you don't, the window will

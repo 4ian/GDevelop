@@ -1,6 +1,6 @@
 const electron = require('electron');
 const BrowserWindow = electron.BrowserWindow; // Module to create native browser window.
-const isDev = require('electron-is').dev();
+const isDev = require('electron-is-dev');
 const ipcMain = electron.ipcMain;
 const { load } = require('./Utils/UrlLoader');
 

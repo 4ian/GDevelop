@@ -48,7 +48,6 @@ type Props = {|
   onAssetsAdded: () => void,
   project: gdProject,
   objectsContainer: ?gdObjectsContainer,
-  onObjectsAddedFromAssets: (objects: Array<gdObject>) => void,
   resourceManagementProps: ResourceManagementProps,
   canInstallPrivateAsset: () => boolean,
 |};
@@ -61,7 +60,6 @@ const AssetPackInstallDialog = ({
   onAssetsAdded,
   project,
   objectsContainer,
-  onObjectsAddedFromAssets,
   canInstallPrivateAsset,
   resourceManagementProps,
 }: Props) => {
@@ -172,7 +170,7 @@ const AssetPackInstallDialog = ({
         });
 
         // Use a pool to avoid installing an unbounded amount of assets at the same time.
-        const { results, errors } = await PromisePool.withConcurrency(6)
+        const { errors } = await PromisePool.withConcurrency(6)
           .for(assets)
           .process<InstallAssetOutput>(async asset => {
             const installOutput = isPrivateAsset(asset)
@@ -201,10 +199,6 @@ const AssetPackInstallDialog = ({
           );
         }
 
-        onObjectsAddedFromAssets(
-          results.map(installOutput => installOutput.createdObjects).flat()
-        );
-
         await resourceManagementProps.onFetchNewlyAddedResources();
 
         setAreAssetsBeingInstalled(false);
@@ -225,7 +219,6 @@ const AssetPackInstallDialog = ({
       project,
       showExtensionUpdateConfirmation,
       eventsFunctionsExtensionsState,
-      onObjectsAddedFromAssets,
       resourceManagementProps,
       onAssetsAdded,
       installPrivateAsset,

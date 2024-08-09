@@ -133,7 +133,6 @@ const StoreSection = ({
             }}
             project={project}
             objectsContainer={null}
-            onObjectsAddedFromAssets={() => {}}
             canInstallPrivateAsset={canInstallPrivateAsset}
             resourceManagementProps={resourceManagementProps}
           />

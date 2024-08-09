@@ -39,7 +39,7 @@ type Props = {|
     project: gdProject,
     editorTabs: EditorTabsState,
     oldProjectId: string,
-    options?: { openAllScenes: boolean },
+    options: { openAllScenes: boolean, openQuickCustomizationDialog: boolean },
   |}) => Promise<void>,
   onError: () => void,
   onSuccessOrError: () => void,
@@ -142,10 +142,16 @@ const useCreateProject = ({
           currentProject.setTemplateSlug(newProjectSource.templateSlug);
         }
 
-        if (authenticatedUser.profile) {
-          // if the user is connected, try to register the game to avoid
+        if (
+          authenticatedUser.profile &&
+          !newProjectSetup.openQuickCustomizationDialog
+        ) {
+          // If the user is connected, try to register the game to avoid
           // any gdevelop services to ask the user to register the game.
           // (for instance, leaderboards, player authentication, ...)
+          //
+          // Skip this if quick customization is requested, as this will be done later
+          // at publishing time.
           try {
             await registerGame(
               authenticatedUser.getAuthorizationHeader,
@@ -223,7 +229,10 @@ const useCreateProject = ({
           project: currentProject,
           editorTabs,
           oldProjectId,
-          options,
+          options: {
+            openAllScenes: !!options && options.openAllScenes,
+            openQuickCustomizationDialog: !!newProjectSetup.openQuickCustomizationDialog,
+          },
         });
       } catch (rawError) {
         const { getWriteErrorMessage } = getStorageProviderOperations();

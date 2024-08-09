@@ -80,7 +80,7 @@ function ConfirmDialog(props: Props) {
             open={props.open}
             actions={dialogActions}
             maxWidth={props.maxWidth || 'xs'}
-            noMobileFullScreen
+            fullscreen="never-even-on-mobile"
             onRequestClose={props.onDismiss}
             onApply={props.onConfirm}
           >

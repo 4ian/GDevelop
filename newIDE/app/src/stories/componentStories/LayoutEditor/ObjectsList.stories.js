@@ -46,7 +46,6 @@ export const Default = () => (
         ) => cb(true)}
         onObjectFolderOrObjectWithContextSelected={() => {}}
         hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
-        canInstallPrivateAsset={() => false}
       />
     </div>
   </DragAndDropContextProvider>
@@ -79,7 +78,6 @@ export const WithSerializedObjectView = () => (
           ) => cb(true)}
           onObjectFolderOrObjectWithContextSelected={() => {}}
           hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
-          canInstallPrivateAsset={() => false}
         />
       </div>
     </SerializedObjectDisplay>

@@ -20,7 +20,7 @@ export const MultilineVariableEditorDialog = ({
       open
       title={null}
       flexColumnBody
-      noMobileFullScreen
+      fullscreen="never-even-on-mobile"
       actions={[
         <DialogPrimaryButton
           key="ok"

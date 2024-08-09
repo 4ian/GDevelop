@@ -281,7 +281,6 @@ export const WithObjectsList = () => (
                   onObjectEdited={() => {}}
                   onObjectFolderOrObjectWithContextSelected={() => {}}
                   hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-                  canInstallPrivateAsset={() => false}
                 />
               </TabContentContainer>
             }

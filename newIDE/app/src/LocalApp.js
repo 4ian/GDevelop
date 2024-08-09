@@ -94,6 +94,7 @@ export const create = (authentication: Authentication) => {
                   initialTab={props.initialTab}
                 />
               )}
+              quickPublishOnlineWebExporter={localOnlineWebExporter}
               renderGDJSDevelopmentWatcher={
                 isDev ? () => <LocalGDJSDevelopmentWatcher /> : null
               }

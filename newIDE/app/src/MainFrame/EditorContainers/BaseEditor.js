@@ -1,5 +1,7 @@
 // @flow
 import * as React from 'react';
+import { type I18n as I18nType } from '@lingui/core';
+import { type NewProjectSetup } from '../../ProjectCreation/NewProjectSetupDialog';
 import { type UnsavedChanges } from '../UnsavedChangesContext';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import type { StorageProvider } from '../../ProjectsStorage';
@@ -79,7 +81,7 @@ export type RenderEditorContainerProps = {|
   onChooseProject: () => void,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => Promise<void>,
   onOpenProjectManager: () => void,
-  onCloseProject: () => Promise<boolean>,
+  askToCloseProject: () => Promise<boolean>,
 
   // Other dialogs opening:
   onOpenExampleStore: () => void,
@@ -101,10 +103,14 @@ export type RenderEditorContainerProps = {|
     newName: string,
     cb: (boolean) => void
   ) => void,
-  canInstallPrivateAsset: () => boolean,
 
   // Project creation
   onOpenNewProjectSetupDialog: () => void,
+  onCreateProjectFromExample: (
+    exampleShortHeader: ExampleShortHeader,
+    newProjectSetup: NewProjectSetup,
+    i18n: I18nType
+  ) => Promise<void>,
 
   // Project save
   onSave: () => Promise<void>,

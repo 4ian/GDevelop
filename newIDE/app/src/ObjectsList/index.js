@@ -209,7 +209,6 @@ type Props = {|
     cb: (boolean) => void
   ) => void,
   selectedObjectFolderOrObjectsWithContext: Array<ObjectFolderOrObjectWithContext>,
-  canInstallPrivateAsset: () => boolean,
 
   beforeSetAsGlobalObject?: (groupName: string) => boolean,
   canSetAsGlobalObject?: boolean,
@@ -247,7 +246,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       onDeleteObjects,
       onRenameObjectFolderOrObjectWithContextFinish,
       selectedObjectFolderOrObjectsWithContext,
-      canInstallPrivateAsset,
 
       beforeSetAsGlobalObject,
       canSetAsGlobalObject,
@@ -1704,16 +1702,15 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             eventsBasedObject={eventsBasedObject}
             objectsContainer={objectsContainer}
             resourceManagementProps={resourceManagementProps}
-            canInstallPrivateAsset={canInstallPrivateAsset}
             targetObjectFolderOrObjectWithContext={newObjectDialogOpen.from}
           />
         )}
         {objectAssetSwappingDialogOpen && (
           <AssetSwappingDialog
-            onClose={() => setObjectAssetSwappingDialogOpen(null)}
-            onObjectsConfigurationSwapped={() => {
-              onObjectEdited(objectAssetSwappingDialogOpen.object);
+            onClose={({ swappingDone }) => {
               setObjectAssetSwappingDialogOpen(null);
+              if (swappingDone)
+                onObjectEdited(objectAssetSwappingDialogOpen.object);
             }}
             project={project}
             layout={layout}
@@ -1721,7 +1718,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             objectsContainer={objectsContainer}
             object={objectAssetSwappingDialogOpen.object}
             resourceManagementProps={resourceManagementProps}
-            canInstallPrivateAsset={canInstallPrivateAsset}
           />
         )}
       </Background>

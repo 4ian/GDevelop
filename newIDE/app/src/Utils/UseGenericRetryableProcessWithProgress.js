@@ -70,7 +70,7 @@ export const GenericRetryableProcessWithProgressDialog = ({
         ) : null,
       ]}
       cannotBeDismissed={!hasErrors}
-      noMobileFullScreen={!hasErrors}
+      fullscreen="never-even-on-mobile"
       open
       maxWidth="sm"
     >

@@ -23,7 +23,7 @@ function AlertDialog(props: Props) {
         <Dialog
           title={i18n._(props.title)}
           open={props.open}
-          noMobileFullScreen
+          fullscreen="never-even-on-mobile"
           actions={[
             <FlatButton
               key="dismiss"

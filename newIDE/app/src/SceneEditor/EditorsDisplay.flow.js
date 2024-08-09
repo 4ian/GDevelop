@@ -100,8 +100,6 @@ export type SceneEditorsDisplayProps = {|
   tileMapTileSelection: ?TileMapTileSelection,
   onSelectTileMapTile: (?TileMapTileSelection) => void,
 
-  canInstallPrivateAsset: () => boolean,
-
   instancesEditorSettings: InstancesEditorSettings,
   onInstancesEditorSettingsMutated: InstancesEditorSettings => void,
 

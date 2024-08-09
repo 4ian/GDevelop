@@ -86,6 +86,7 @@ export const create = (authentication: Authentication) => {
                   initialTab={props.initialTab}
                 />
               )}
+              quickPublishOnlineWebExporter={browserOnlineWebExporter}
               storageProviders={storageProviders}
               resourceMover={BrowserResourceMover}
               resourceFetcher={BrowserResourceFetcher}

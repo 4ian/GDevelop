@@ -119,7 +119,6 @@ type Props = {|
   resourceManagementProps: ResourceManagementProps,
   isActive: boolean,
   unsavedChanges?: ?UnsavedChanges,
-  canInstallPrivateAsset: () => boolean,
   openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
   onExtractAsExternalLayout?: (name: string) => void,
 
@@ -1848,7 +1847,6 @@ export default class SceneEditor extends React.Component<Props, State> {
                 onObjectFolderOrObjectWithContextSelected={
                   this._onObjectFolderOrObjectWithContextSelected
                 }
-                canInstallPrivateAsset={this.props.canInstallPrivateAsset}
                 historyHandler={{
                   undo: this.undo,
                   redo: this.redo,

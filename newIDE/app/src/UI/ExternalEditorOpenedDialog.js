@@ -17,7 +17,7 @@ export const ExternalEditorOpenedDialog = ({
     <Dialog
       title={<Trans>An external editor is opened.</Trans>}
       cannotBeDismissed
-      noMobileFullScreen
+      fullscreen="never-even-on-mobile"
       open
       maxWidth="sm"
       id="external-editor-opened-dialog"

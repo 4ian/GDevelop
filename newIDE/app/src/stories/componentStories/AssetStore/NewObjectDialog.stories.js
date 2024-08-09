@@ -31,7 +31,6 @@ export const Default = () => {
             onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
             objectsContainer={testProject.testLayout.getObjects()}
             resourceManagementProps={fakeResourceManagementProps}
-            canInstallPrivateAsset={() => false}
           />
         )}
       </I18n>

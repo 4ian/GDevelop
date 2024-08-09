@@ -61,6 +61,7 @@ import { type RenderEditorContainerPropsWithRef } from './EditorContainers/BaseE
 import ErrorBoundary, {
   getEditorErrorBoundaryProps,
 } from '../UI/ErrorBoundary';
+import { type Exporter } from '../ExportAndShare/ShareDialog';
 import ResourcesLoader from '../ResourcesLoader/index';
 import {
   type PreviewLauncherInterface,
@@ -190,6 +191,7 @@ import useSaveReminder from './UseSaveReminder';
 import { useMultiplayerLobbyConfigurator } from './UseMultiplayerLobbyConfigurator';
 import { useAuthenticatedPlayer } from './UseAuthenticatedPlayer';
 import ListIcon from '../UI/ListIcon';
+import { QuickCustomizationDialog } from '../QuickCustomization/QuickCustomizationDialog';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -308,6 +310,7 @@ export type Props = {|
   extensionsLoader?: JsExtensionsLoader,
   initialFileMetadataToOpen: ?FileMetadata,
   initialExampleSlugToOpen: ?string,
+  quickPublishOnlineWebExporter: Exporter,
   i18n: I18n,
 |};
 
@@ -471,6 +474,10 @@ const MainFrame = (props: Props) => {
     fileMetadataOpeningMessage,
     setFileMetadataOpeningMessage,
   ] = React.useState<?MessageDescriptor>(null);
+  const [
+    isQuickCustomizationDialogOpen,
+    setIsQuickCustomizationDialogOpen,
+  ] = React.useState<boolean>(false);
 
   const { getAuthenticatedPlayerForPreview } = useAuthenticatedPlayer();
 
@@ -501,6 +508,7 @@ const MainFrame = (props: Props) => {
     i18n,
     renderGDJSDevelopmentWatcher,
     renderMainMenu,
+    quickPublishOnlineWebExporter,
   } = props;
 
   const {
@@ -1141,9 +1149,15 @@ const MainFrame = (props: Props) => {
     }) => {
       setNewProjectSetupDialogOpen(false);
       closeExampleStoreDialog({ deselectExampleAndGameTemplate: true });
-      findLeaderboardsToReplace(project, oldProjectId);
-      configureMultiplayerLobbiesIfNeeded(project, oldProjectId);
-      options && options.openAllScenes
+      if (options.openQuickCustomizationDialog) {
+        setIsQuickCustomizationDialogOpen(true);
+      } else {
+        // Replace leaderboards and configure multiplayer lobbies if needed.
+        // In the case of quick customization, this will be done later.
+        findLeaderboardsToReplace(project, oldProjectId);
+        configureMultiplayerLobbiesIfNeeded(project, oldProjectId);
+      }
+      options.openAllScenes
         ? openAllScenes({
             currentProject: project,
             editorTabs,
@@ -3210,6 +3224,7 @@ const MainFrame = (props: Props) => {
       getStorageProvider,
       onFetchNewlyAddedResources,
       getStorageProviderResourceOperations,
+      canInstallPrivateAsset,
     }),
     [
       resourceSources,
@@ -3218,6 +3233,7 @@ const MainFrame = (props: Props) => {
       getStorageProvider,
       onFetchNewlyAddedResources,
       getStorageProviderResourceOperations,
+      canInstallPrivateAsset,
     ]
   );
 
@@ -3445,16 +3461,16 @@ const MainFrame = (props: Props) => {
                     canOpen: !!props.storageProviders.filter(
                       ({ hiddenInOpenDialog }) => !hiddenInOpenDialog
                     ).length,
-                    canInstallPrivateAsset,
                     onChooseProject: () => openOpenFromStorageProviderDialog(),
                     onOpenRecentFile: openFromFileMetadataWithStorageProvider,
                     onOpenNewProjectSetupDialog: () => {
                       setNewProjectSetupDialogOpen(true);
                     },
                     onOpenProjectManager: () => openProjectManager(true),
-                    onCloseProject: () => askToCloseProject(),
+                    askToCloseProject,
                     onOpenExampleStore: openExampleStoreDialog,
                     onSelectExampleShortHeader: onSelectExampleShortHeader,
+                    onCreateProjectFromExample: createProjectFromExample,
                     onPreviewPrivateGameTemplateListingData: privateGameTemplateListingData =>
                       onSelectPrivateGameTemplate({
                         privateGameTemplateListingData,
@@ -3765,6 +3781,20 @@ const MainFrame = (props: Props) => {
         <DiagnosticReportDialog
           wholeProjectDiagnosticReport={currentProject.getWholeProjectDiagnosticReport()}
           onClose={() => setDiagnosticReportDialogOpen(false)}
+        />
+      )}
+
+      {isQuickCustomizationDialogOpen && currentProject && (
+        <QuickCustomizationDialog
+          project={currentProject}
+          resourceManagementProps={resourceManagementProps}
+          onLaunchPreview={
+            hotReloadPreviewButtonProps.launchProjectDataOnlyPreview
+          }
+          onClose={() => setIsQuickCustomizationDialogOpen(false)}
+          onlineWebExporter={quickPublishOnlineWebExporter}
+          onSaveProject={saveProject}
+          isSavingProject={isSavingProject}
         />
       )}
       <CustomDragLayer />

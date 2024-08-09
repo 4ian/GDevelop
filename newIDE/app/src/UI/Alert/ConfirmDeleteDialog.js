@@ -95,7 +95,7 @@ function ConfirmDeleteDialog(props: Props) {
               disabled={!canConfirm}
             />,
           ]}
-          noMobileFullScreen
+          fullscreen="never-even-on-mobile"
         >
           <Text size="body" style={{ userSelect: 'text' }}>
             {i18n._(props.message)}

@@ -32,6 +32,8 @@ export const Default = () => (
         }
         onStartSurvey={null}
         hasFilledSurveyAlready={false}
+        askToCloseProject={async () => true}
+        onCreateProjectFromExample={action('onCreateProjectFromExample')}
       />
     </TutorialStateProvider>
   </PreferencesContext.Provider>
@@ -49,6 +51,8 @@ export const WithGitHubStarAlreadyMade = () => (
         }
         onStartSurvey={action('onStartSurvey')}
         hasFilledSurveyAlready={false}
+        askToCloseProject={async () => true}
+        onCreateProjectFromExample={action('onCreateProjectFromExample')}
       />
     </TutorialStateProvider>
   </PreferencesContext.Provider>
@@ -66,6 +70,8 @@ export const WithSurvey = () => (
         }
         onStartSurvey={action('onStartSurvey')}
         hasFilledSurveyAlready={false}
+        askToCloseProject={async () => true}
+        onCreateProjectFromExample={action('onCreateProjectFromExample')}
       />
     </TutorialStateProvider>
   </PreferencesContext.Provider>
@@ -83,6 +89,8 @@ export const WithSurveyAlreadyFilled = () => (
         }
         onStartSurvey={action('onStartSurvey')}
         hasFilledSurveyAlready={true}
+        askToCloseProject={async () => true}
+        onCreateProjectFromExample={action('onCreateProjectFromExample')}
       />
     </TutorialStateProvider>
   </PreferencesContext.Provider>

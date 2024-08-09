@@ -298,12 +298,12 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
 }
 
 gd::String EventsCodeGenerator::GenerateEventsFunctionParameterDeclarationsList(
-    const vector<gd::ParameterMetadata>& parameters,
+    const gd::ParameterMetadataContainer& parameters,
     int firstParameterIndex,
     bool addsSceneParameter) {
   gd::String declaration = addsSceneParameter ? "runtimeScene" : "";
-  for (size_t i = 0; i < parameters.size(); ++i) {
-    const auto& parameter = parameters[i];
+  for (size_t i = 0; i < parameters.GetParametersCount(); ++i) {
+    const auto& parameter = parameters.GetParameter(i);
     if (i < firstParameterIndex) {
       // By convention, the first two arguments of a behavior events function
       // are the object and the behavior, which are not passed to the called
@@ -475,7 +475,8 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
 
   gd::String argumentsGetters;
 
-  for (const auto& parameter : parameters) {
+  for (const auto& parameterPtr : parameters.GetInternalVector()) {
+    const auto& parameter = *parameterPtr;
     if (parameter.GetName().empty()) continue;
 
     gd::String parameterMangledName =
@@ -722,10 +723,10 @@ gd::String EventsCodeGenerator::GenerateFreeCondition(
 
   // Add logical not if needed
   bool conditionAlreadyTakeCareOfInversion = false;
-  for (std::size_t i = 0; i < instrInfos.parameters.size();
+  for (std::size_t i = 0; i < instrInfos.parameters.GetParametersCount();
        ++i)  // Some conditions already have a "conditionInverted" parameter
   {
-    if (instrInfos.parameters[i].GetType() == "conditionInverted")
+    if (instrInfos.parameters.GetParameter(i).GetType() == "conditionInverted")
       conditionAlreadyTakeCareOfInversion = true;
   }
   if (!conditionAlreadyTakeCareOfInversion && conditionInverted)

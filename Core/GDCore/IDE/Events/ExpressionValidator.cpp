@@ -36,13 +36,15 @@ namespace {
  * (by convention, 1 for object functions and 2 for behavior functions).
  */
 size_t GetMinimumParametersNumber(
-    const std::vector<gd::ParameterMetadata>& parameters,
+    const gd::ParameterMetadataContainer& parameters,
     size_t initialParameterIndex) {
   size_t nb = 0;
-  for (std::size_t i = initialParameterIndex; i < parameters.size(); ++i) {
-    if (!parameters[i].IsOptional() && !parameters[i].codeOnly) nb++;
+  for (std::size_t i = initialParameterIndex;
+       i < parameters.GetParametersCount(); ++i) {
+    if (!parameters.GetParameter(i).IsOptional() &&
+        !parameters.GetParameter(i).IsCodeOnly())
+      nb++;
   }
-
   return nb;
 }
 
@@ -51,13 +53,14 @@ size_t GetMinimumParametersNumber(
  * (by convention, 1 for object functions and 2 for behavior functions).
  */
 size_t GetMaximumParametersNumber(
-    const std::vector<gd::ParameterMetadata>& parameters,
+    const gd::ParameterMetadataContainer& parameters,
     size_t initialParameterIndex) {
   size_t nb = 0;
-  for (std::size_t i = initialParameterIndex; i < parameters.size(); ++i) {
-    if (!parameters[i].codeOnly) nb++;
+  for (std::size_t i = initialParameterIndex;
+       i < parameters.GetParametersCount(); ++i) {
+    if (!parameters.GetParameter(i).IsCodeOnly())
+      nb++;
   }
-
   return nb;
 }
 
@@ -322,11 +325,11 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(
 
   // Validate parameters count
   size_t minParametersCount = GetMinimumParametersNumber(
-      metadata.parameters,
+      metadata.GetParameters(),
       ExpressionParser2::WrittenParametersFirstIndex(function.objectName,
                                                      function.behaviorName));
   size_t maxParametersCount = GetMaximumParametersNumber(
-      metadata.parameters,
+      metadata.GetParameters(),
       ExpressionParser2::WrittenParametersFirstIndex(function.objectName,
                                                      function.behaviorName));
   if (function.parameters.size() < minParametersCount ||
@@ -366,11 +369,11 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(
   for (int parameterIndex = 0; parameterIndex < function.parameters.size();
        parameterIndex++) {
     auto& parameter = function.parameters[parameterIndex];
-    while (metadata.GetParameters()[metadataIndex].IsCodeOnly()) {
+    while (metadata.GetParameters().GetParameter(metadataIndex).IsCodeOnly()) {
       // The sizes are already checked above.
       metadataIndex++;
     }
-    auto& parameterMetadata = metadata.GetParameters()[metadataIndex];
+    auto& parameterMetadata = metadata.GetParameters().GetParameter(metadataIndex);
 
     if (!parameterMetadata.IsOptional() ||
         dynamic_cast<EmptyNode*>(parameter.get()) == nullptr) {

@@ -62,9 +62,12 @@ export const getSentenceErrorText = (
   const param0isImplicit =
     (eventsBasedBehavior || eventsBasedObject) &&
     type === gd.EventsFunction.ExpressionAndCondition;
-  const missingParameters = mapVector(
-    eventsFunction.getParameters(),
-    (parameter, index) => {
+  const missingParameters = mapFor(
+    0,
+    eventsFunction.getParameters().getParametersCount(),
+    index => {
+      const parameter = eventsFunction.getParameters().getParameterAt(index);
+
       if (parameter.getValueTypeMetadata().isBehavior()) {
         // Behaviors are usually not shown in sentences.
         return null;
@@ -80,7 +83,7 @@ export const getSentenceErrorText = (
     }
   ).filter(Boolean);
 
-  const parametersLength = eventsFunction.getParameters().size();
+  const parametersLength = eventsFunction.getParameters().getParametersCount();
   const paramsMatches = sentence.matchAll(/_PARAM(\d+)_/g);
   const nonExpectedParameters = [];
   for (const paramsMatch of paramsMatches) {

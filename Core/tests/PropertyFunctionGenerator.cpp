@@ -79,7 +79,7 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
               "angle of the trajectory direction.");
       REQUIRE(getter.GetSentence() == "the movement angle");
       // Object and behavior parameters are added automatically.
-      REQUIRE(getter.GetParameters().size() == 0);
+      REQUIRE(getter.GetParameters().GetParametersCount() == 0);
 
       REQUIRE(getter.GetEvents().GetEventsCount() == 1);
       REQUIRE(getter.GetEvents().GetEvent(0).GetType() ==
@@ -106,7 +106,7 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
       REQUIRE(setter.GetDescription() == "");
       REQUIRE(setter.GetSentence() == "");
       // Object and behavior parameters are added automatically.
-      REQUIRE(setter.GetParameters().size() == 0);
+      REQUIRE(setter.GetParameters().GetParametersCount() == 0);
 
       REQUIRE(setter.GetEvents().GetEventsCount() == 1);
       REQUIRE(setter.GetEvents().GetEvent(0).GetType() ==
@@ -195,7 +195,7 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
               "this behavior only.");
       REQUIRE(getter.GetSentence() == "_PARAM0_ rotate object");
       // Object and behavior parameters are added automatically.
-      REQUIRE(getter.GetParameters().size() == 0);
+      REQUIRE(getter.GetParameters().GetParametersCount() == 0);
 
       REQUIRE(getter.GetEvents().GetEventsCount() == 1);
       REQUIRE(getter.GetEvents().GetEvent(0).GetType() ==
@@ -232,16 +232,16 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
       REQUIRE(setter.GetSentence() == "_PARAM0_ rotate object: _PARAM2_");
       // To generate the value parameter, object and behavior parameters has to
       // be declared too.
-      REQUIRE(setter.GetParameters().size() == 3);
-      auto &objectParameter = setter.GetParameters().at(0);
+      REQUIRE(setter.GetParameters().GetParametersCount() == 3);
+      auto &objectParameter = setter.GetParameters().GetParameter(0);
       REQUIRE(objectParameter.GetName() == "Object");
       REQUIRE(objectParameter.GetType() == "object");
-      auto &behaviorParameter = setter.GetParameters().at(1);
+      auto &behaviorParameter = setter.GetParameters().GetParameter(1);
       REQUIRE(behaviorParameter.GetName() == "Behavior");
       REQUIRE(behaviorParameter.GetType() == "behavior");
       REQUIRE(behaviorParameter.GetExtraInfo() ==
               "MyEventsExtension::MyEventsBasedBehavior");
-      auto &valueParameter = setter.GetParameters().at(2);
+      auto &valueParameter = setter.GetParameters().GetParameter(2);
       REQUIRE(valueParameter.GetName() == "Value");
       REQUIRE(valueParameter.GetType() == "yesorno");
 
@@ -329,7 +329,7 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
               "angle of the trajectory direction.");
       REQUIRE(getter.GetSentence() == "the movement angle");
       // Object parameter is added automatically.
-      REQUIRE(getter.GetParameters().size() == 0);
+      REQUIRE(getter.GetParameters().GetParametersCount() == 0);
 
       REQUIRE(getter.GetEvents().GetEventsCount() == 1);
       REQUIRE(getter.GetEvents().GetEvent(0).GetType() ==
@@ -356,7 +356,7 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
       REQUIRE(setter.GetDescription() == "");
       REQUIRE(setter.GetSentence() == "");
       // Object parameter is added automatically.
-      REQUIRE(setter.GetParameters().size() == 0);
+      REQUIRE(setter.GetParameters().GetParametersCount() == 0);
 
       REQUIRE(setter.GetEvents().GetEventsCount() == 1);
       REQUIRE(setter.GetEvents().GetEvent(0).GetType() ==
@@ -443,7 +443,7 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
               "this object.");
       REQUIRE(getter.GetSentence() == "_PARAM0_ rotate object");
       // The Object parameter is added automatically.
-      REQUIRE(getter.GetParameters().size() == 0);
+      REQUIRE(getter.GetParameters().GetParametersCount() == 0);
 
       REQUIRE(getter.GetEvents().GetEventsCount() == 1);
       REQUIRE(getter.GetEvents().GetEvent(0).GetType() ==
@@ -478,13 +478,13 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
       REQUIRE(setter.GetSentence() == "_PARAM0_ rotate object: _PARAM1_");
       // To generate the value parameter, the object parameter has to
       // be declared too.
-      REQUIRE(setter.GetParameters().size() == 2);
-      auto &objectParameter = setter.GetParameters().at(0);
+      REQUIRE(setter.GetParameters().GetParametersCount() == 2);
+      auto &objectParameter = setter.GetParameters().GetParameter(0);
       REQUIRE(objectParameter.GetName() == "Object");
       REQUIRE(objectParameter.GetType() == "object");
       REQUIRE(objectParameter.GetExtraInfo() ==
               "MyEventsExtension::MyEventsBasedObject");
-      auto &valueParameter = setter.GetParameters().at(1);
+      auto &valueParameter = setter.GetParameters().GetParameter(1);
       REQUIRE(valueParameter.GetName() == "Value");
       REQUIRE(valueParameter.GetType() == "yesorno");
 

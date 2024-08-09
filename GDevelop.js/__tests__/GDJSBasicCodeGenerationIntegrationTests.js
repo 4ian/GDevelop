@@ -523,14 +523,14 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
       .unserializeFrom(project, eventsSerializerElement);
 
     // Add an object parameter to the function:
-    const objectParameter = new gd.ParameterMetadata();
-    objectParameter.setType('object');
-    objectParameter.setName('MyObjectA');
-    eventsFunction.getParameters().push_back(objectParameter);
-    objectParameter.setType('object');
-    objectParameter.setName('MyObjectB');
-    eventsFunction.getParameters().push_back(objectParameter);
-    objectParameter.delete();
+    eventsFunction
+      .getParameters()
+      .insertNewParameter('MyObjectA', 0)
+      .setType('object');
+    eventsFunction
+      .getParameters()
+      .insertNewParameter('MyObjectB', 1)
+      .setType('object');
 
     const runCompiledEvents = generateCompiledEventsForEventsFunction(
       gd,
@@ -607,17 +607,18 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     group.addObject('ObjectParam1');
     group.addObject('ObjectParam2');
 
-    const objectParameter = new gd.ParameterMetadata();
-    objectParameter.setType('object');
-    objectParameter.setName('ObjectParam1');
-    eventsFunction.getParameters().push_back(objectParameter);
-    objectParameter.setType('object');
-    objectParameter.setName('ObjectParam2');
-    eventsFunction.getParameters().push_back(objectParameter);
-    objectParameter.setType('object');
-    objectParameter.setName('ObjectParam3');
-    eventsFunction.getParameters().push_back(objectParameter);
-    objectParameter.delete();
+    eventsFunction
+      .getParameters()
+      .insertNewParameter('ObjectParam1', 0)
+      .setType('object');
+    eventsFunction
+      .getParameters()
+      .insertNewParameter('ObjectParam2', 1)
+      .setType('object');
+    eventsFunction
+      .getParameters()
+      .insertNewParameter('ObjectParam3', 2)
+      .setType('object');
 
     const runCompiledEvents = generateCompiledEventsForEventsFunction(
       gd,

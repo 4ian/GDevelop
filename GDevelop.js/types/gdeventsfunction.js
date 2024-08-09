@@ -31,8 +31,8 @@ declare class gdEventsFunction {
   setFunctionType(type: EventsFunction_FunctionType): gdEventsFunction;
   getFunctionType(): EventsFunction_FunctionType;
   getEvents(): gdEventsList;
-  getParameters(): gdVectorParameterMetadata;
-  getParametersForEvents(functionsContainer: gdEventsFunctionsContainer): gdVectorParameterMetadata;
+  getParameters(): gdParameterMetadataContainer;
+  getParametersForEvents(functionsContainer: gdEventsFunctionsContainer): gdParameterMetadataContainer;
   getObjectGroups(): gdObjectGroupsContainer;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(project: gdProject, element: gdSerializerElement): void;

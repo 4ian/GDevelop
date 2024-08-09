@@ -15,6 +15,7 @@ class ObjectsContainer;
 class ObjectsContainersList;
 class ParameterMetadata;
 class Expression;
+class ParameterMetadataContainer;
 struct FunctionCallNode;
 struct ExpressionNode;
 }  // namespace gd
@@ -24,20 +25,20 @@ class GD_CORE_API ParameterMetadataTools {
  public:
   static void ParametersToObjectsContainer(
       const gd::Project& project,
-      const std::vector<gd::ParameterMetadata>& parameters,
+      const ParameterMetadataContainer& parameters,
       gd::ObjectsContainer& outputObjectsContainer);
 
   static void ForEachParameterMatchingSearch(
-      const std::vector<const std::vector<gd::ParameterMetadata>*>& parametersVectorsList,
+      const std::vector<const ParameterMetadataContainer*>& parametersVectorsList,
       const gd::String& search,
       std::function<void(const gd::ParameterMetadata&)> cb);
 
   static bool Has(
-      const std::vector<const std::vector<gd::ParameterMetadata>*>& parametersVectorsList,
+      const std::vector<const ParameterMetadataContainer*>& parametersVectorsList,
       const gd::String& parameterName);
 
   static const gd::ParameterMetadata& Get(
-      const std::vector<const std::vector<gd::ParameterMetadata>*>& parametersVectorsList,
+      const std::vector<const ParameterMetadataContainer*>& parametersVectorsList,
       const gd::String& parameterName);
 
   /**
@@ -47,7 +48,7 @@ class GD_CORE_API ParameterMetadataTools {
    */
   static void IterateOverParameters(
       const std::vector<gd::Expression>& parameters,
-      const std::vector<gd::ParameterMetadata>& parametersMetadata,
+      const ParameterMetadataContainer& parametersMetadata,
       std::function<void(const gd::ParameterMetadata& parameterMetadata,
                          const gd::Expression& parameterValue,
                          const gd::String& lastObjectName)> fn);
@@ -59,7 +60,7 @@ class GD_CORE_API ParameterMetadataTools {
    */
   static void IterateOverParametersWithIndex(
       const std::vector<gd::Expression>& parameters,
-      const std::vector<gd::ParameterMetadata>& parametersMetadata,
+      const ParameterMetadataContainer& parametersMetadata,
       std::function<void(const gd::ParameterMetadata& parameterMetadata,
                          const gd::Expression& parameterValue,
                          size_t parameterIndex,
@@ -84,7 +85,7 @@ class GD_CORE_API ParameterMetadataTools {
    * it's linked to.
    */
   static size_t GetObjectParameterIndexFor(
-      const std::vector<gd::ParameterMetadata>& parametersMetadata,
+      const ParameterMetadataContainer& parametersMetadata,
       size_t parameterIndex);
 
 private:

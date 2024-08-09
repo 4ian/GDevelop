@@ -3,14 +3,13 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#if defined(GD_IDE_ONLY)
-#ifndef GDCORE_EVENTSFUNCTION_H
-#define GDCORE_EVENTSFUNCTION_H
+#pragma once
 
 #include <vector>
 
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
+#include "GDCore/Project/ParameterMetadataContainer.h"
 #include "GDCore/String.h"
 #include "GDCore/Extensions/Metadata/ValueTypeMetadata.h"
 // TODO: In theory (for separation of concerns between Project and
@@ -241,7 +240,7 @@ class GD_CORE_API EventsFunction {
    * to the generated function, like "runtimeScene" and "eventsFunctionContext".
    * This should be transparent to the user.
    */
-  const std::vector<gd::ParameterMetadata>& GetParametersForEvents(
+  const gd::ParameterMetadataContainer& GetParametersForEvents(
       const gd::EventsFunctionsContainer& functionsContainer) const;
 
   /**
@@ -254,14 +253,14 @@ class GD_CORE_API EventsFunction {
    * to the generated function, like "runtimeScene" and "eventsFunctionContext".
    * This should be transparent to the user.
    */
-  const std::vector<gd::ParameterMetadata>& GetParameters() const {
+  const ParameterMetadataContainer& GetParameters() const {
     return parameters;
   };
 
   /**
    * \brief Return the parameters.
    */
-  std::vector<gd::ParameterMetadata>& GetParameters() { return parameters; };
+  ParameterMetadataContainer& GetParameters() { return parameters; };
 
   /**
    * \brief Return a reference to the object groups that can be used in the
@@ -300,14 +299,11 @@ class GD_CORE_API EventsFunction {
   gd::ValueTypeMetadata expressionType;
   gd::EventsList events;
   FunctionType functionType;
-  std::vector<gd::ParameterMetadata> parameters;
-  mutable std::vector<gd::ParameterMetadata> actionWithOperationParameters;
+  ParameterMetadataContainer parameters;
+  mutable gd::ParameterMetadataContainer actionWithOperationParameters;
   gd::ObjectGroupsContainer objectGroups;
   bool isPrivate = false;
   bool isAsync = false;
 };
 
 }  // namespace gd
-
-#endif  // GDCORE_EVENTSFUNCTION_H
-#endif

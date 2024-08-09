@@ -454,11 +454,12 @@ const gd::ParameterMetadata* MetadataProvider::GetFunctionCallParameterMetadata(
       // TODO use a badMetadata instead of a nullptr?
       const gd::ParameterMetadata* parameterMetadata = nullptr;
       while (metadataParameterIndex <
-             metadata.parameters.size()) {
-        if (!metadata.parameters[metadataParameterIndex]
+             metadata.GetParameters().GetParametersCount()) {
+        if (!metadata.GetParameters().GetParameter(metadataParameterIndex)
                  .IsCodeOnly()) {
           if (visibleParameterIndex == parameterIndex) {
-            parameterMetadata = &metadata.parameters[metadataParameterIndex];
+            parameterMetadata =
+                &metadata.GetParameters().GetParameter(metadataParameterIndex);
           }
           visibleParameterIndex++;
         }

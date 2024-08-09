@@ -19,17 +19,12 @@ describe('gd.ExpressionCompletionFinder', function () {
       );
     }
     const expression = expressionWithCaret.replace('|', '');
-    const parameters = new gd.VectorParameterMetadata();
-    const parameter1 = new gd.ParameterMetadata();
-    parameter1.setType('string');
-    parameter1.setName('MyParameter1');
-    const parameter2 = new gd.ParameterMetadata();
-    parameter2.setType('number');
-    parameter2.setName('MyParameter2');
-    parameters.push_back(parameter1);
-    parameters.push_back(parameter2);
-    parameter1.delete();
-    parameter2.delete();
+    const eventsFunction = new gd.EventsFunction();
+    const parameters = eventsFunction.getParameters();
+    parameters.insertNewParameter('MyParameter1', 0)
+      .setType('string');
+    parameters.insertNewParameter('MyParameter2', 1)
+      .setType('number');
 
     const parser = new gd.ExpressionParser2();
     const expressionNode = parser.parseExpression(expression).get();
@@ -56,7 +51,7 @@ describe('gd.ExpressionCompletionFinder', function () {
     }
 
     parser.delete();
-    parameters.delete();
+    eventsFunction.delete();
     return completionDescriptionAsStrings;
   }
 

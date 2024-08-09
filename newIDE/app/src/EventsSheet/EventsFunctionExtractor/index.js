@@ -90,17 +90,16 @@ export const setupFunctionFromEvents = ({
 
   // Create parameters for these objects (or these groups without any object directly referenced)
   const parameters = eventsFunction.getParameters();
-  parameters.clear();
+  parameters.clearParameters();
   [...parameterGroupNames, ...parameterObjectNames].forEach(objectName => {
-    const newParameter = new gd.ParameterMetadata();
-    newParameter.setType('objectList');
-    newParameter.setName(objectName);
-    newParameter.setExtraInfo(
-      projectScopedContainers
-        .getObjectsContainersList()
-        .getTypeOfObject(objectName)
-    );
-    parameters.push_back(newParameter);
+    parameters
+      .addNewParameter(objectName)
+      .setType('objectList')
+      .setExtraInfo(
+        projectScopedContainers
+          .getObjectsContainersList()
+          .getTypeOfObject(objectName)
+      );
 
     const behaviorNames: Array<string> = eventsContext
       .getBehaviorNamesOfObjectOrGroup(objectName)
@@ -108,15 +107,15 @@ export const setupFunctionFromEvents = ({
       .toJSArray();
 
     behaviorNames.forEach(behaviorName => {
-      const newParameter = new gd.ParameterMetadata();
-      newParameter.setType('behavior');
-      newParameter.setName(behaviorName);
-      newParameter.setExtraInfo(
-        projectScopedContainers
-          .getObjectsContainersList()
-          .getTypeOfBehavior(behaviorName, false)
-      );
-      parameters.push_back(newParameter);
+      parameters
+        .addNewParameter(behaviorName)
+        .setType('behavior')
+        .setName(behaviorName)
+        .setExtraInfo(
+          projectScopedContainers
+            .getObjectsContainersList()
+            .getTypeOfBehavior(behaviorName, false)
+        );
     });
   });
 
@@ -146,17 +145,19 @@ export const createNewInstructionForEventsFunction = (
 
   action.setType(getFreeEventsFunctionType(extensionName, eventsFunction));
   action.setParametersCount(
-    eventsFunction.getParameters().size() +
+    eventsFunction.getParameters().getParametersCount() +
       runtimeSceneParameterCount +
       contextParameterCount
   );
 
-  mapVector(eventsFunction.getParameters(), (parameterMetadata, index) => {
+  const parameters = eventsFunction.getParameters();
+  for (let index = 0; index < parameters.getParametersCount(); index++) {
+    const parameterMetadata = parameters.getParameterAt(index);
     action.setParameter(
       runtimeSceneParameterCount + index,
       parameterMetadata.getName()
     );
-  });
+  }
 
   return action;
 };
@@ -236,5 +237,5 @@ export const canCreateEventsFunction = (
 export const functionHasLotsOfParameters = (
   eventsFunction: gdEventsFunction
 ) => {
-  return eventsFunction.getParameters().size() > 7;
+  return eventsFunction.getParameters().getParametersCount() > 7;
 };

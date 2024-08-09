@@ -15,18 +15,14 @@ describe('EventsFunctionPropertiesEditor', () => {
       eventsFunction.setSentence(
         'This is using _PARAM3_ (which is unexpected) and _PARAM2_ but forgot the first parameter and mistakenly used _PARAM0_.'
       );
-      {
-        const newParameter = new gd.ParameterMetadata();
-        newParameter.setType('expression');
-        eventsFunction.getParameters().push_back(newParameter);
-        newParameter.delete();
-      }
-      {
-        const newParameter = new gd.ParameterMetadata();
-        newParameter.setType('string');
-        eventsFunction.getParameters().push_back(newParameter);
-        newParameter.delete();
-      }
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('', 0)
+        .setType('expression');
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('', 1)
+        .setType('string');
 
       const errorText = getSentenceErrorText(
         makeFakeI18n(),
@@ -46,18 +42,14 @@ describe('EventsFunctionPropertiesEditor', () => {
       eventsFunction.setSentence(
         'This is using _PARAM2_ (which is unexpected) and _PARAM1_ but forgot the first parameter.'
       );
-      {
-        const newParameter = new gd.ParameterMetadata();
-        newParameter.setType('expression');
-        eventsFunction.getParameters().push_back(newParameter);
-        newParameter.delete();
-      }
-      {
-        const newParameter = new gd.ParameterMetadata();
-        newParameter.setType('string');
-        eventsFunction.getParameters().push_back(newParameter);
-        newParameter.delete();
-      }
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('', 0)
+        .setType('expression');
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('', 1)
+        .setType('string');
 
       const errorText = getSentenceErrorText(
         makeFakeI18n(),

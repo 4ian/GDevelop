@@ -5,7 +5,7 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { Column, Line, Spacer } from '../../UI/Grid';
-import { mapVector } from '../../Utils/MapFor';
+import { mapFor } from '../../Utils/MapFor';
 import RaisedButton from '../../UI/RaisedButton';
 import IconButton from '../../UI/IconButton';
 import EmptyMessage from '../../UI/EmptyMessage';
@@ -87,17 +87,10 @@ export const EventsFunctionParametersEditor = ({
   const addParameterAt = React.useCallback(
     (index: number) => {
       const parameters = eventsFunction.getParameters();
-      const existingParameterNames = mapVector(parameters, parameterMetadata =>
-        parameterMetadata.getName()
-      );
-      const newParameter = new gd.ParameterMetadata();
-      newParameter.setType('objectList');
       const newName = newNameGenerator('Parameter', name =>
-        existingParameterNames.includes(name)
+        parameters.hasParameterNamed(name)
       );
-      newParameter.setName(newName);
-      parameters.insertIntoVectorParameterMetadata(index, newParameter);
-      newParameter.delete();
+      parameters.insertNewParameter(newName, index).setType('objectList');
       forceUpdate();
       onParametersUpdated();
     },
@@ -107,7 +100,7 @@ export const EventsFunctionParametersEditor = ({
   const addParameter = React.useCallback(
     () => {
       const parameters = eventsFunction.getParameters();
-      addParameterAt(parameters.size());
+      addParameterAt(parameters.getParametersCount());
     },
     [addParameterAt, eventsFunction]
   );
@@ -115,8 +108,7 @@ export const EventsFunctionParametersEditor = ({
   const removeParameter = React.useCallback(
     (index: number) => {
       const parameters = eventsFunction.getParameters();
-
-      gd.removeFromVectorParameterMetadata(parameters, index);
+      parameters.removeParameter(parameters.getParameterAt(index).getName());
       forceUpdate();
       onParametersUpdated();
     },
@@ -137,7 +129,7 @@ export const EventsFunctionParametersEditor = ({
   const removeLongDescription = React.useCallback(
     (index: number) => {
       const parameters = eventsFunction.getParameters();
-      const parameter = parameters.at(index);
+      const parameter = parameters.getParameterAt(index);
 
       // Reset the long description and hide the field
       parameter.setLongDescription('');
@@ -162,7 +154,7 @@ export const EventsFunctionParametersEditor = ({
             newIndex,
             isDone => {
               if (!isDone) return;
-              gd.swapInVectorParameterMetadata(parameters, oldIndex, newIndex);
+              parameters.moveParameter(oldIndex, newIndex);
               forceUpdate();
               onParametersUpdated();
             }
@@ -176,7 +168,7 @@ export const EventsFunctionParametersEditor = ({
             newIndex,
             isDone => {
               if (!isDone) return;
-              gd.swapInVectorParameterMetadata(parameters, oldIndex, newIndex);
+              parameters.moveParameter(oldIndex, newIndex);
               forceUpdate();
               onParametersUpdated();
             }
@@ -189,7 +181,7 @@ export const EventsFunctionParametersEditor = ({
             newIndex,
             isDone => {
               if (!isDone) return;
-              gd.swapInVectorParameterMetadata(parameters, oldIndex, newIndex);
+              parameters.moveParameter(oldIndex, newIndex);
               forceUpdate();
               onParametersUpdated();
             }
@@ -320,138 +312,146 @@ export const EventsFunctionParametersEditor = ({
         <Column noMargin expand>
           <Line noMargin>
             <div style={styles.parametersContainer}>
-              {mapVector(
-                parameters,
-                (parameter: gdParameterMetadata, i: number) => (
-                  <React.Fragment key={i}>
-                    <MiniToolbar noPadding>
-                      <MiniToolbarText firstChild>
-                        <Trans>Parameter #{i + parametersIndexOffset}:</Trans>
-                      </MiniToolbarText>
-                      <Column expand noMargin>
-                        <SemiControlledTextField
-                          commitOnBlur
-                          margin="none"
-                          translatableHintText={t`Enter the parameter name (mandatory)`}
-                          value={parameter.getName()}
-                          onChange={text => {
-                            parameter.setName(gd.Project.getSafeName(text));
-                            forceUpdate();
-                            onParametersUpdated();
-                          }}
-                          disabled={isParameterDisabled(i)}
-                          fullWidth
-                        />
-                      </Column>
-                      <ElementWithMenu
-                        element={
-                          <IconButton>
-                            <ThreeDotsMenu />
-                          </IconButton>
-                        }
-                        buildMenuTemplate={(i18n: I18nType) => [
-                          {
-                            label: i18n._(t`Delete`),
-                            enabled: !isParameterDisabled(i),
-                            click: () => removeParameter(i),
-                          },
-                          {
-                            label: i18n._(t`Add a parameter below`),
-                            enabled: !isParameterDisabled(i),
-                            click: () => addParameterAt(i + 1),
-                          },
-                          { type: 'separator' },
-                          {
-                            label: i18n._(t`Add a Long Description`),
-                            enabled: !isParameterDisabled(i),
-                            visible: !isParameterLongDescriptionShown(
-                              parameter,
-                              i
-                            ),
-                            click: () => addLongDescription(i),
-                          },
-                          {
-                            label: i18n._(t`Remove the Long Description`),
-                            enabled: !isParameterDisabled(i),
-                            visible: isParameterLongDescriptionShown(
-                              parameter,
-                              i
-                            ),
-                            click: () => removeLongDescription(i),
-                          },
-                          {
-                            label: i18n._(t`Move up`),
-                            click: () => moveParameters(i, i - 1),
-                            enabled:
-                              !isParameterDisabled(i) &&
-                              i - 1 >= 0 &&
-                              !isParameterDisabled(i - 1),
-                          },
-                          {
-                            label: i18n._(t`Move down`),
-                            click: () => moveParameters(i, i + 1),
-                            enabled:
-                              !isParameterDisabled(i) &&
-                              i + 1 < parameters.size() &&
-                              !isParameterDisabled(i + 1),
-                          },
-                        ]}
-                      />
-                    </MiniToolbar>
-                    <Line>
-                      <ColumnStackLayout expand noMargin>
-                        <ValueTypeEditor
-                          project={project}
-                          eventsFunctionsExtension={eventsFunctionsExtension}
-                          valueTypeMetadata={parameter.getValueTypeMetadata()}
-                          disabled={isParameterDisabled(i)}
-                          isTypeSelectorShown={isParameterTypeShown(i)}
-                          onTypeUpdated={() => onParametersUpdated()}
-                          getLastObjectParameterObjectType={() =>
-                            getLastObjectParameterObjectType(parameters, i)
+              {mapFor(
+                0,
+                eventsFunction.getParameters().getParametersCount(),
+                i => {
+                  const parameter = eventsFunction
+                    .getParameters()
+                    .getParameterAt(i);
+                  return (
+                    <React.Fragment key={i}>
+                      <MiniToolbar noPadding>
+                        <MiniToolbarText firstChild>
+                          <Trans>Parameter #{i + parametersIndexOffset}:</Trans>
+                        </MiniToolbarText>
+                        <Column expand noMargin>
+                          <SemiControlledTextField
+                            commitOnBlur
+                            margin="none"
+                            translatableHintText={t`Enter the parameter name (mandatory)`}
+                            value={parameter.getName()}
+                            onChange={text => {
+                              parameter.setName(gd.Project.getSafeName(text));
+                              forceUpdate();
+                              onParametersUpdated();
+                            }}
+                            disabled={isParameterDisabled(i)}
+                            fullWidth
+                          />
+                        </Column>
+                        <ElementWithMenu
+                          element={
+                            <IconButton>
+                              <ThreeDotsMenu />
+                            </IconButton>
                           }
+                          buildMenuTemplate={(i18n: I18nType) => [
+                            {
+                              label: i18n._(t`Delete`),
+                              enabled: !isParameterDisabled(i),
+                              click: () => removeParameter(i),
+                            },
+                            {
+                              label: i18n._(t`Add a parameter below`),
+                              enabled: !isParameterDisabled(i),
+                              click: () => addParameterAt(i + 1),
+                            },
+                            { type: 'separator' },
+                            {
+                              label: i18n._(t`Add a Long Description`),
+                              enabled: !isParameterDisabled(i),
+                              visible: !isParameterLongDescriptionShown(
+                                parameter,
+                                i
+                              ),
+                              click: () => addLongDescription(i),
+                            },
+                            {
+                              label: i18n._(t`Remove the Long Description`),
+                              enabled: !isParameterDisabled(i),
+                              visible: isParameterLongDescriptionShown(
+                                parameter,
+                                i
+                              ),
+                              click: () => removeLongDescription(i),
+                            },
+                            {
+                              label: i18n._(t`Move up`),
+                              click: () => moveParameters(i, i - 1),
+                              enabled:
+                                !isParameterDisabled(i) &&
+                                i - 1 >= 0 &&
+                                !isParameterDisabled(i - 1),
+                            },
+                            {
+                              label: i18n._(t`Move down`),
+                              click: () => moveParameters(i, i + 1),
+                              enabled:
+                                !isParameterDisabled(i) &&
+                                i + 1 < parameters.getParametersCount() &&
+                                !isParameterDisabled(i + 1),
+                            },
+                          ]}
                         />
-                        {isParameterDescriptionShown(i) && (
-                          <SemiControlledTextField
-                            commitOnBlur
-                            floatingLabelText={<Trans>Label</Trans>}
-                            floatingLabelFixed
-                            value={parameter.getDescription()}
-                            onChange={text => {
-                              parameter.setDescription(text);
-                              forceUpdate();
-                            }}
-                            fullWidth
-                            disabled={
-                              /* When parameter are freezed, long description (if shown) can always be changed */
-                              isParameterDisabled(i) && !freezeParameters
+                      </MiniToolbar>
+                      <Line>
+                        <ColumnStackLayout expand noMargin>
+                          <ValueTypeEditor
+                            project={project}
+                            eventsFunctionsExtension={eventsFunctionsExtension}
+                            valueTypeMetadata={parameter.getValueTypeMetadata()}
+                            disabled={isParameterDisabled(i)}
+                            isTypeSelectorShown={isParameterTypeShown(i)}
+                            onTypeUpdated={() => onParametersUpdated()}
+                            getLastObjectParameterObjectType={() =>
+                              getLastObjectParameterObjectType(parameters, i)
                             }
                           />
-                        )}
-                        {isParameterLongDescriptionShown(parameter, i) && (
-                          <SemiControlledTextField
-                            commitOnBlur
-                            floatingLabelText={<Trans>Long description</Trans>}
-                            floatingLabelFixed
-                            value={parameter.getLongDescription()}
-                            onChange={text => {
-                              parameter.setLongDescription(text);
-                              forceUpdate();
-                            }}
-                            multiline
-                            fullWidth
-                            disabled={
-                              /* When parameter are freezed, long description (if shown) can always be changed */
-                              isParameterDisabled(i) && !freezeParameters
-                            }
-                          />
-                        )}
-                      </ColumnStackLayout>
-                    </Line>
-                  </React.Fragment>
-                )
+                          {isParameterDescriptionShown(i) && (
+                            <SemiControlledTextField
+                              commitOnBlur
+                              floatingLabelText={<Trans>Label</Trans>}
+                              floatingLabelFixed
+                              value={parameter.getDescription()}
+                              onChange={text => {
+                                parameter.setDescription(text);
+                                forceUpdate();
+                              }}
+                              fullWidth
+                              disabled={
+                                /* When parameter are freezed, long description (if shown) can always be changed */
+                                isParameterDisabled(i) && !freezeParameters
+                              }
+                            />
+                          )}
+                          {isParameterLongDescriptionShown(parameter, i) && (
+                            <SemiControlledTextField
+                              commitOnBlur
+                              floatingLabelText={
+                                <Trans>Long description</Trans>
+                              }
+                              floatingLabelFixed
+                              value={parameter.getLongDescription()}
+                              onChange={text => {
+                                parameter.setLongDescription(text);
+                                forceUpdate();
+                              }}
+                              multiline
+                              fullWidth
+                              disabled={
+                                /* When parameter are freezed, long description (if shown) can always be changed */
+                                isParameterDisabled(i) && !freezeParameters
+                              }
+                            />
+                          )}
+                        </ColumnStackLayout>
+                      </Line>
+                    </React.Fragment>
+                  );
+                }
               )}
-              {parameters.size() === 0 ? (
+              {parameters.getParametersCount() === 0 ? (
                 <EmptyMessage>
                   <Trans>No parameters for this function.</Trans>
                 </EmptyMessage>

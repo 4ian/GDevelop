@@ -193,8 +193,9 @@ class GD_CORE_API ExpressionMetadata : public gd::AbstractFunctionMetadata {
    * \see AddParameter
    */
   ExpressionMetadata &SetDefaultValue(const gd::String &defaultValue) override {
-    if (!parameters.empty())
-      parameters.back().SetDefaultValue(defaultValue);
+    if (parameters.GetParametersCount() > 0) {
+      parameters.GetInternalVector().back()->SetDefaultValue(defaultValue);
+    }
     return *this;
   };
 
@@ -206,8 +207,9 @@ class GD_CORE_API ExpressionMetadata : public gd::AbstractFunctionMetadata {
    */
   ExpressionMetadata &
   SetParameterLongDescription(const gd::String &longDescription) override {
-    if (!parameters.empty())
-      parameters.back().SetLongDescription(longDescription);
+    if (parameters.GetParametersCount() > 0) {
+      parameters.GetInternalVector().back()->SetLongDescription(longDescription);
+    }
     return *this;
   };
 
@@ -220,7 +222,9 @@ class GD_CORE_API ExpressionMetadata : public gd::AbstractFunctionMetadata {
    */
   ExpressionMetadata &SetParameterExtraInfo(
       const gd::String &extraInfo) override {
-    if (!parameters.empty()) parameters.back().SetExtraInfo(extraInfo);
+    if (parameters.GetParametersCount() > 0) {
+      parameters.GetInternalVector().back()->SetExtraInfo(extraInfo);
+    }
     return *this;
   }
 
@@ -248,19 +252,16 @@ class GD_CORE_API ExpressionMetadata : public gd::AbstractFunctionMetadata {
   const gd::String& GetGroup() const { return group; }
   const gd::String& GetSmallIconFilename() const { return smallIconFilename; }
   const gd::ParameterMetadata& GetParameter(std::size_t id) const {
-    return parameters[id];
+    return parameters.GetParameter(id);
   };
   gd::ParameterMetadata& GetParameter(std::size_t id) {
-    return parameters[id];
+    return parameters.GetParameter(id);
   };
-  std::size_t GetParametersCount() const { return parameters.size(); };
-  const std::vector<gd::ParameterMetadata>& GetParameters() const {
+  std::size_t GetParametersCount() const { return parameters.GetParametersCount(); };
+  const gd::ParameterMetadataContainer& GetParameters() const {
     return parameters;
   };
 
-  std::vector<gd::ParameterMetadata> parameters;
-
-  
   /**
    * \brief Set the function name which will be used when generating the code.
    * \param functionName the name of the function to call
@@ -368,6 +369,8 @@ class GD_CORE_API ExpressionMetadata : public gd::AbstractFunctionMetadata {
   bool isPrivate;
   gd::String requiredBaseObjectCapability;
   gd::String relevantContext;
+
+  gd::ParameterMetadataContainer parameters;
 };
 
 }  // namespace gd

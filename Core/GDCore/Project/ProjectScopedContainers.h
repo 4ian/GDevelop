@@ -13,6 +13,7 @@ class ObjectsContainersList;
 class VariablesContainersList;
 class PropertiesContainersList;
 class NamedPropertyDescriptor;
+class ParameterMetadataContainer;
 class BaseEvent;
 class EventsFunctionsExtension;
 class EventsFunction;
@@ -131,7 +132,7 @@ class ProjectScopedContainers {
   }
 
   ProjectScopedContainers &AddParameters(
-      const std::vector<gd::ParameterMetadata> &parameters) {
+      const ParameterMetadataContainer &parameters) {
     parametersVectorsList.push_back(&parameters);
 
     return *this;
@@ -224,7 +225,7 @@ class ProjectScopedContainers {
     return propertiesContainersList;
   };
 
-  const std::vector<const std::vector<gd::ParameterMetadata> *> &GetParametersVectorsList() const {
+  const std::vector<const ParameterMetadataContainer *> &GetParametersVectorsList() const {
     return parametersVectorsList;
   };
 
@@ -236,7 +237,7 @@ class ProjectScopedContainers {
   gd::ObjectsContainersList objectsContainersList;
   gd::VariablesContainersList variablesContainersList;
   gd::PropertiesContainersList propertiesContainersList;
-  std::vector<const std::vector<gd::ParameterMetadata> *> parametersVectorsList;
+  std::vector<const ParameterMetadataContainer *> parametersVectorsList;
 };
 
 }  // namespace gd

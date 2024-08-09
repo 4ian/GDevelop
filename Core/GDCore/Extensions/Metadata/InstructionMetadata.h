@@ -14,6 +14,7 @@
 #include <memory>
 
 #include "GDCore/Events/Instruction.h"
+#include "GDCore/Project/ParameterMetadataContainer.h"
 #include "GDCore/String.h"
 #include "ParameterMetadata.h"
 #include "ParameterOptions.h"
@@ -61,12 +62,12 @@ class GD_CORE_API InstructionMetadata : public gd::AbstractFunctionMetadata {
   const gd::String &GetDescription() const { return description; }
   const gd::String &GetSentence() const { return sentence; }
   const gd::String &GetGroup() const { return group; }
-  ParameterMetadata &GetParameter(size_t i) { return parameters[i]; }
+  ParameterMetadata &GetParameter(size_t i) { return parameters.GetParameter(i); }
   const ParameterMetadata &GetParameter(size_t i) const {
-    return parameters[i];
+    return parameters.GetParameter(i);
   }
-  size_t GetParametersCount() const { return parameters.size(); }
-  const std::vector<ParameterMetadata> &GetParameters() const {
+  size_t GetParametersCount() const { return parameters.GetParametersCount(); }
+  const ParameterMetadataContainer &GetParameters() const {
     return parameters;
   }
   const gd::String &GetIconFilename() const { return iconFilename; }
@@ -256,7 +257,9 @@ class GD_CORE_API InstructionMetadata : public gd::AbstractFunctionMetadata {
    * \see AddParameter
    */
   InstructionMetadata &SetDefaultValue(const gd::String &defaultValue_) override {
-    if (!parameters.empty()) parameters.back().SetDefaultValue(defaultValue_);
+    if (parameters.GetParametersCount() > 0) {
+      parameters.GetInternalVector().back()->SetDefaultValue(defaultValue_);
+    }
     return *this;
   };
 
@@ -268,8 +271,9 @@ class GD_CORE_API InstructionMetadata : public gd::AbstractFunctionMetadata {
    */
   InstructionMetadata &SetParameterLongDescription(
       const gd::String &longDescription) override {
-    if (!parameters.empty())
-      parameters.back().SetLongDescription(longDescription);
+    if (parameters.GetParametersCount() > 0) {
+      parameters.GetInternalVector().back()->SetLongDescription(longDescription);
+    }
     return *this;
   }
 
@@ -281,7 +285,9 @@ class GD_CORE_API InstructionMetadata : public gd::AbstractFunctionMetadata {
    * \see AddParameter
    */
   InstructionMetadata &SetParameterExtraInfo(const gd::String &extraInfo) override {
-    if (!parameters.empty()) parameters.back().SetExtraInfo(extraInfo);
+    if (parameters.GetParametersCount() > 0) {
+      parameters.GetInternalVector().back()->SetExtraInfo(extraInfo);
+    }
     return *this;
   }
 
@@ -560,7 +566,7 @@ class GD_CORE_API InstructionMetadata : public gd::AbstractFunctionMetadata {
    */
   InstructionMetadata &GetCodeExtraInformation() { return *this; }
 
-  std::vector<ParameterMetadata> parameters;
+  ParameterMetadataContainer parameters;
 
  private:
   gd::String fullname;

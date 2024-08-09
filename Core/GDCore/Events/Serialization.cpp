@@ -182,10 +182,10 @@ void EventsListSerialization::UpdateInstructionsFromGD2x(
     // Common updates for some parameters
     const std::vector<gd::Expression>& parameters = instr.GetParameters();
     for (std::size_t j = 0;
-         j < parameters.size() && j < metadata.parameters.size();
+         j < parameters.size() && j < metadata.parameters.GetParametersCount();
          ++j) {
-      if (metadata.parameters[j].GetType() == "relationalOperator" ||
-          metadata.parameters[j].GetType() == "operator") {
+      if (metadata.parameters.GetParameter(j).GetType() == "relationalOperator" ||
+          metadata.parameters.GetParameter(j).GetType() == "operator") {
         if (j == parameters.size() - 1) {
           std::cout << "ERROR: No more parameters after a [relational]operator "
                        "when trying to update an instruction from GD2.x";

@@ -1157,7 +1157,7 @@ const MainFrame = (props: Props) => {
         findLeaderboardsToReplace(project, oldProjectId);
         configureMultiplayerLobbiesIfNeeded(project, oldProjectId);
       }
-      options.openAllScenes
+      options.openAllScenes || options.openQuickCustomizationDialog
         ? openAllScenes({
             currentProject: project,
             editorTabs,

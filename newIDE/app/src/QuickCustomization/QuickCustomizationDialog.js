@@ -75,13 +75,10 @@ export const QuickCustomizationDialog = ({
         ) : null,
         <DialogPrimaryButton
           key="next"
-          label={quickCustomizationState.nextLabel}
+          label={quickCustomizationState.step.nextLabel}
           primary
           onClick={quickCustomizationState.goToNextStep}
-          disabled={
-            !quickCustomizationState.canGoToNextStep ||
-            quickCustomizationState.isNavigationDisabled
-          }
+          disabled={quickCustomizationState.isNavigationDisabled}
         />,
       ]}
       secondaryActions={[

@@ -12,7 +12,6 @@ import { Trans } from '@lingui/macro';
 type Props = {|
   project: gdProject,
   resourceManagementProps: ResourceManagementProps,
-  onLaunchPreview: () => Promise<void>,
 |};
 
 const styles = {
@@ -71,12 +70,8 @@ const enumerateObjectFolderOrObjects = (
 export const QuickObjectReplacer = ({
   project,
   resourceManagementProps,
-  onLaunchPreview,
 }: Props) => {
   const [selectedObjectToSwap, setSelectedObjectToSwap] = React.useState(null);
-
-  if (project.getLayoutsCount() === 0) return null;
-  const layout = project.getLayoutAt(0);
 
   return (
     <ColumnStackLayout noMargin expand>
@@ -109,7 +104,7 @@ export const QuickObjectReplacer = ({
                           primary
                           label={<Trans>Replace</Trans>}
                           onClick={() => {
-                            setSelectedObjectToSwap(object);
+                            setSelectedObjectToSwap({ object, layout });
                           }}
                         />
                       </ColumnStackLayout>
@@ -124,10 +119,10 @@ export const QuickObjectReplacer = ({
       {selectedObjectToSwap && (
         <AssetSwappingDialog
           project={project}
-          layout={layout}
+          layout={selectedObjectToSwap.layout}
           eventsBasedObject={null}
-          objectsContainer={layout.getObjects()}
-          object={selectedObjectToSwap}
+          objectsContainer={selectedObjectToSwap.layout.getObjects()}
+          object={selectedObjectToSwap.object}
           resourceManagementProps={resourceManagementProps}
           onClose={() => {
             setSelectedObjectToSwap(null);

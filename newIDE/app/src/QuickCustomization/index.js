@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { QuickObjectReplacer } from './QuickObjectReplacer';
+import { QuickBehaviorsTweaker } from './QuickBehaviorsTweaker';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { QuickPublish } from './QuickPublish';
 import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
@@ -9,19 +10,46 @@ import FlatButton from '../UI/FlatButton';
 import { Trans } from '@lingui/macro';
 import PreviewIcon from '../UI/CustomSvgIcons/Preview';
 import { type Exporter } from '../ExportAndShare/ShareDialog';
+import { mapFor } from '../Utils/MapFor';
+import { canSwapAssetOfObject } from '../AssetStore/AssetSwapper';
 
-type Step = 'replace-objects' | 'publish';
+type StepName = 'replace-objects' | 'tweak-behaviors' | 'publish';
+type Step = {|
+  name: StepName,
+  canPreview: boolean,
+  title: React.Node,
+  nextLabel: React.Node,
+|};
+
+const steps: Array<Step> = [
+  {
+    name: 'replace-objects',
+    canPreview: true,
+    title: <Trans>Personalize your game objects art</Trans>,
+    nextLabel: <Trans>Next: Tweak Gameplay</Trans>,
+  },
+  {
+    name: 'tweak-behaviors',
+    canPreview: true,
+    title: <Trans>Tweak gameplay</Trans>,
+    nextLabel: <Trans>Next: Try & Publish</Trans>,
+  },
+  {
+    name: 'publish',
+    canPreview: false,
+    title: <Trans>Publish and try your game</Trans>,
+    nextLabel: <Trans>Finish</Trans>,
+  },
+];
 
 export type QuickCustomizationState = {|
   isNavigationDisabled: boolean,
   shouldAutomaticallyStartExport: boolean,
   step: Step,
   goToNextStep: () => void,
-  canGoToNextStep: boolean,
   goToPreviousStep: () => void,
   canGoToPreviousStep: boolean,
   setIsNavigationDisabled: boolean => void,
-  nextLabel: React.Node,
   showCloseButton: boolean,
 |};
 
@@ -30,12 +58,14 @@ export const useQuickCustomizationState = ({
 }: {
   onClose: () => void,
 }): QuickCustomizationState => {
-  const [step, setStep] = React.useState<Step>('replace-objects');
+  const [stepIndex, setStepIndex] = React.useState(0);
   const [isNavigationDisabled, setIsNavigationDisabled] = React.useState(false);
   const [
     shouldAutomaticallyStartExport,
     setShouldAutomaticallyStartExport,
   ] = React.useState(true);
+
+  const step = steps[stepIndex];
 
   return {
     isNavigationDisabled,
@@ -43,34 +73,68 @@ export const useQuickCustomizationState = ({
     step,
     goToNextStep: React.useCallback(
       () => {
-        if (step === 'publish') {
+        if (stepIndex === steps.length - 1) {
           onClose();
           return;
         }
 
-        setStep(step === 'replace-objects' ? 'publish' : 'replace-objects');
+        setStepIndex(stepIndex + 1);
       },
-      [step, onClose]
+      [stepIndex, onClose]
     ),
-    canGoToNextStep: true,
-    goToPreviousStep: React.useCallback(() => {
-      setStep(step => {
-        if (step === 'publish') {
+    goToPreviousStep: React.useCallback(
+      () => {
+        if (step.name === 'publish') {
           setShouldAutomaticallyStartExport(false);
         }
-        return step === 'publish' ? 'replace-objects' : 'publish';
-      });
-    }, []),
-    nextLabel:
-      step === 'publish' ? (
-        <Trans>Finish</Trans>
-      ) : step === 'replace-objects' ? (
-        <Trans>Next: Try & Publish</Trans>
-      ) : null,
-    canGoToPreviousStep: step === 'publish',
+        if (stepIndex !== 0) {
+          setStepIndex(stepIndex - 1);
+        }
+      },
+      [step, stepIndex]
+    ),
+    canGoToPreviousStep: stepIndex !== 0,
     setIsNavigationDisabled,
     showCloseButton: step !== 'publish',
   };
+};
+
+export const enumerateObjectFolderOrObjects = (
+  objectFolderOrObject: gdObjectFolderOrObject,
+  depth: number = 0
+): Array<{ folderName: string, objects: Array<gdObject> }> => {
+  const orderedFolderNames: Array<string> = [''];
+  const folderObjects: { [key: string]: Array<gdObject> } = {
+    '': [],
+  };
+
+  mapFor(0, objectFolderOrObject.getChildrenCount(), i => {
+    const child = objectFolderOrObject.getChildAt(i);
+
+    if (child.isFolder()) {
+      const folderName = child.getFolderName();
+      const currentFolderObjects: Array<gdObject> = (folderObjects[folderName] =
+        folderObjects[folderName] || []);
+      orderedFolderNames.push(folderName);
+
+      enumerateObjectFolderOrObjects(child, depth + 1).forEach(
+        ({ folderName, objects }) => {
+          currentFolderObjects.push.apply(currentFolderObjects, objects);
+        }
+      );
+    } else {
+      const object = child.getObject();
+      if (canSwapAssetOfObject(object))
+        folderObjects[''].push(child.getObject());
+    }
+  });
+
+  return orderedFolderNames
+    .map(folderName => ({
+      folderName,
+      objects: folderObjects[folderName],
+    }))
+    .filter(folder => folder.objects.length > 0);
 };
 
 type Props = {|
@@ -93,15 +157,26 @@ export const renderQuickCustomization = ({
   isSavingProject,
 }: Props) => {
   return {
-    title:
-      quickCustomizationState.step === 'replace-objects' ? (
-        <Trans>Personalize your game objects art</Trans>
-      ) : quickCustomizationState.step === 'publish' ? (
-        <Trans>Publish and try your game</Trans>
-      ) : null,
-    titleRightContent:
-      quickCustomizationState.step === 'replace-objects' ? (
-        <LineStackLayout noMargin alignItems="center">
+    title: quickCustomizationState.step.title,
+    titleRightContent: quickCustomizationState.step.canPreview ? (
+      <LineStackLayout noMargin alignItems="center">
+        <Text noMargin size={'body-small'}>
+          Preview your game
+        </Text>
+        <FlatButton
+          label={<Trans>Preview</Trans>}
+          onClick={onLaunchPreview}
+          leftIcon={<PreviewIcon />}
+        />
+      </LineStackLayout>
+    ) : null,
+    titleTopContent: quickCustomizationState.step.canPreview ? (
+      <ColumnStackLayout>
+        <LineStackLayout
+          justifyContent="space-between"
+          alignItems="center"
+          expand
+        >
           <Text noMargin size={'body-small'}>
             Preview your game
           </Text>
@@ -111,35 +186,21 @@ export const renderQuickCustomization = ({
             leftIcon={<PreviewIcon />}
           />
         </LineStackLayout>
-      ) : null,
-    titleTopContent:
-      quickCustomizationState.step === 'replace-objects' ? (
-        <ColumnStackLayout>
-          <LineStackLayout
-            justifyContent="space-between"
-            alignItems="center"
-            expand
-          >
-            <Text noMargin size={'body-small'}>
-              Preview your game
-            </Text>
-            <FlatButton
-              label={<Trans>Preview</Trans>}
-              onClick={onLaunchPreview}
-              leftIcon={<PreviewIcon />}
-            />
-          </LineStackLayout>
-        </ColumnStackLayout>
-      ) : null,
+      </ColumnStackLayout>
+    ) : null,
     content: (
       <>
-        {quickCustomizationState.step === 'replace-objects' ? (
+        {quickCustomizationState.step.name === 'replace-objects' ? (
           <QuickObjectReplacer
             project={project}
             resourceManagementProps={resourceManagementProps}
-            onLaunchPreview={onLaunchPreview}
           />
-        ) : quickCustomizationState.step === 'publish' ? (
+        ) : quickCustomizationState.step.name === 'tweak-behaviors' ? (
+          <QuickBehaviorsTweaker
+            project={project}
+            resourceManagementProps={resourceManagementProps}
+          />
+        ) : quickCustomizationState.step.name === 'publish' ? (
           <QuickPublish
             onlineWebExporter={onlineWebExporter}
             project={project}

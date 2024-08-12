@@ -296,7 +296,7 @@ const RecommendationList = ({
               </Text>
 
               <QuickCustomizationGameTiles
-                maxCount={4}
+                maxCount={6}
                 onSelectExampleShortHeader={async exampleShortHeader => {
                   const projectIsClosed = await askToCloseProject();
                   if (!projectIsClosed) {
@@ -314,6 +314,26 @@ const RecommendationList = ({
                     i18n
                   );
                 }}
+              />
+            </SectionRow>
+          );
+        }
+
+        if (
+          !limits ||
+          !limits.capabilities.classrooms ||
+          !limits.capabilities.classrooms.hidePlayTab
+        ) {
+          items.push(
+            <SectionRow key="earn-badges">
+              <Text size="section-title" noMargin>
+                <Trans>Earn badges and credits</Trans>
+              </Text>
+              <Spacer />
+              <EarnBadges
+                achievements={achievements}
+                badges={badges}
+                onOpenProfile={onOpenProfile}
               />
             </SectionRow>
           );
@@ -351,26 +371,6 @@ const RecommendationList = ({
                   </Trans>
                 </Text>
               )}
-            </SectionRow>
-          );
-        }
-
-        if (
-          !limits ||
-          !limits.capabilities.classrooms ||
-          !limits.capabilities.classrooms.hidePlayTab
-        ) {
-          items.push(
-            <SectionRow key="earn-badges">
-              <Text size="section-title" noMargin>
-                <Trans>Earn badges and credits</Trans>
-              </Text>
-              <Spacer />
-              <EarnBadges
-                achievements={achievements}
-                badges={badges}
-                onOpenProfile={onOpenProfile}
-              />
             </SectionRow>
           );
         }

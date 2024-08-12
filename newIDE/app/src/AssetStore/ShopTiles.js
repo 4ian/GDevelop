@@ -15,7 +15,6 @@ import GridListTile from '@material-ui/core/GridListTile';
 import createStyles from '@material-ui/core/styles/createStyles';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
-import Paper from '../UI/Paper';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
 import { Column, Line } from '../UI/Grid';
@@ -28,6 +27,7 @@ import FlatButton from '../UI/FlatButton';
 import RaisedButton from '../UI/RaisedButton';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
+import Skeleton from '@material-ui/lab/Skeleton';
 
 const styles = {
   priceTagContainer: {
@@ -38,11 +38,23 @@ const styles = {
   },
   previewImage: {
     width: '100%',
+    display: 'block',
+    objectFit: 'cover',
+    borderRadius: 8,
+    border: '1px solid lightgrey',
+    boxSizing: 'border-box', // Take border in account for sizing to avoid cumulative layout shift.
     // Prevent cumulative layout shift by enforcing
     // the 16:9 ratio.
     aspectRatio: '16 / 9',
-    objectFit: 'cover',
+    transition: 'opacity 0.3s ease-in-out',
     position: 'relative',
+  },
+  dataLoadingSkeleton: {
+    // Display a skeleton with the same aspect and border as the images:
+    borderRadius: 8,
+    border: '1px solid lightgrey',
+    boxSizing: 'border-box', // Take border in account for sizing to avoid cumulative layout shift.
+    aspectRatio: '16 / 9',
   },
   thumbnailContainer: {
     position: 'relative',
@@ -100,12 +112,10 @@ const styles = {
 
 const useStylesForGridListItem = makeStyles(theme =>
   createStyles({
-    root: {
-      '&:focus': {
-        outline: `1px solid ${theme.palette.primary.light}`,
-      },
+    tile: {
+      transition: 'transform 0.3s ease-in-out',
       '&:hover': {
-        outline: `1px solid ${theme.palette.primary.light}`,
+        transform: 'scale(1.02)',
       },
     },
   })
@@ -205,11 +215,9 @@ export const PublicAssetPackTile = ({
       style={style}
       onClick={onSelect}
     >
-      <Paper
+      <div
         id={`asset-pack-${assetPack.tag.replace(/\s/g, '-')}`}
-        elevation={2}
         style={styles.paper}
-        background="light"
       >
         <CorsAwareImage
           key={assetPack.name}
@@ -230,7 +238,7 @@ export const PublicAssetPackTile = ({
             </Text>
           </Line>
         </Column>
-      </Paper>
+      </div>
     </GridListTile>
   );
 };
@@ -260,7 +268,7 @@ export const PrivateAssetPackTile = ({
       style={style}
       onClick={onSelect}
     >
-      <Paper elevation={2} style={styles.paper} background="light">
+      <div style={styles.paper}>
         <div style={styles.thumbnailContainer}>
           <CorsAwareImage
             key={assetPackListingData.name}
@@ -298,7 +306,7 @@ export const PrivateAssetPackTile = ({
             </Text>
           </Line>
         </Column>
-      </Paper>
+      </div>
     </GridListTile>
   );
 };
@@ -432,7 +440,7 @@ export const CategoryTile = ({
       style={style}
       onClick={onSelect}
     >
-      <Paper id={id} elevation={2} style={styles.paper} background="light">
+      <div id={id} style={styles.paper}>
         <CorsAwareImage
           style={{
             ...styles.previewImage,
@@ -448,7 +456,7 @@ export const CategoryTile = ({
             </Text>
           </Line>
         </Column>
-      </Paper>
+      </div>
     </GridListTile>
   );
 };
@@ -478,7 +486,7 @@ export const PrivateGameTemplateTile = ({
       style={style}
       onClick={onSelect}
     >
-      <Paper elevation={2} style={styles.paper} background="light">
+      <div style={styles.paper}>
         <CorsAwareImage
           key={privateGameTemplateListingData.name}
           style={styles.previewImage}
@@ -501,7 +509,7 @@ export const PrivateGameTemplateTile = ({
             </Text>
           </Line>
         </Column>
-      </Paper>
+      </div>
     </GridListTile>
   );
 };
@@ -511,7 +519,7 @@ export const ExampleTile = ({
   onSelect,
   style,
 }: {|
-  exampleShortHeader: ExampleShortHeader,
+  exampleShortHeader: ExampleShortHeader | null,
   onSelect: () => void,
   /** Props needed so that GridList component can adjust tile size */
   style?: any,
@@ -529,25 +537,41 @@ export const ExampleTile = ({
       style={style}
       onClick={onSelect}
     >
-      <Paper elevation={2} style={styles.paper} background="light">
-        <CorsAwareImage
-          key={exampleShortHeader.name}
-          style={styles.previewImage}
-          src={
-            exampleShortHeader.previewImageUrls
-              ? exampleShortHeader.previewImageUrls[0]
-              : ''
-          }
-          alt={`Preview image of example ${exampleShortHeader.name}`}
-        />
+      <div style={styles.paper}>
+        {exampleShortHeader ? (
+          <CorsAwareImage
+            key={exampleShortHeader.name}
+            style={styles.previewImage}
+            src={
+              exampleShortHeader.previewImageUrls
+                ? exampleShortHeader.previewImageUrls[0]
+                : ''
+            }
+            alt={`Preview image of example ${exampleShortHeader.name}`}
+          />
+        ) : (
+          <Skeleton
+            variant="rect"
+            width="100%"
+            height="100%"
+            style={styles.dataLoadingSkeleton}
+          />
+        )}
         <Column>
           <Line justifyContent="flex-start" noMargin>
-            <Text style={styles.packTitle} size="body2">
-              {exampleShortHeader.name}
+            <Text
+              style={styles.packTitle}
+              size="body2"
+              hidden={!exampleShortHeader}
+            >
+              {exampleShortHeader
+                ? exampleShortHeader.name
+                : // Use some placeholder text to avoid layout shift while loading content.
+                  'Abcdef123'}
             </Text>
           </Line>
         </Column>
-      </Paper>
+      </div>
     </GridListTile>
   );
 };

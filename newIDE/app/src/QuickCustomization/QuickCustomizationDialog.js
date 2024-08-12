@@ -19,6 +19,7 @@ type Props = {|
   onlineWebExporter: Exporter,
   onSaveProject: () => Promise<void>,
   isSavingProject: boolean,
+  canClose: boolean,
 |};
 
 export const QuickCustomizationDialog = ({
@@ -29,6 +30,7 @@ export const QuickCustomizationDialog = ({
   onlineWebExporter,
   onSaveProject,
   isSavingProject,
+  canClose,
 }: Props) => {
   const quickCustomizationState = useQuickCustomizationState({ onClose });
   const { windowSize } = useResponsiveWindowSize();
@@ -82,7 +84,8 @@ export const QuickCustomizationDialog = ({
         />,
       ]}
       secondaryActions={[
-        quickCustomizationState.showCloseButton ? (
+        quickCustomizationState.step.shouldHideCloseButton ||
+        !canClose ? null : (
           <FlatButton
             key="close"
             label={<Trans>Close</Trans>}
@@ -90,7 +93,7 @@ export const QuickCustomizationDialog = ({
             onClick={onClose}
             disabled={quickCustomizationState.isNavigationDisabled}
           />
-        ) : null,
+        ),
       ]}
     >
       <ColumnStackLayout noMargin expand>

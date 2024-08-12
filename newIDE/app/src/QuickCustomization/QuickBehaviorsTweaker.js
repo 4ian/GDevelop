@@ -104,6 +104,66 @@ export const QuickBehaviorsTweaker = ({
 
         if (!folderObjects.length) return null;
 
+        const objectEditorsPerFolderNodes = folderObjects
+          .map(({ folderName, objects }) => {
+            const behaviorPropertiesEditorsNodes = objects
+              .map(object => {
+                const behaviorNamesToTweak = getObjectBehaviorNamesToTweak(
+                  object
+                );
+                if (!behaviorNamesToTweak.length) {
+                  return null;
+                }
+
+                return (
+                  <ResponsiveLineStackLayout noMargin expand>
+                    <ObjectPreview object={object} project={project} />
+                    <ColumnStackLayout noMargin expand noOverflowParent>
+                      {behaviorNamesToTweak.map(behaviorName => {
+                        const behavior = object.getBehavior(behaviorName);
+
+                        return (
+                          <QuickBehaviorPropertiesEditor
+                            project={project}
+                            behavior={behavior}
+                            object={object}
+                            onBehaviorUpdated={() => {}}
+                            resourceManagementProps={resourceManagementProps}
+                          />
+                        );
+                      })}
+                    </ColumnStackLayout>
+                  </ResponsiveLineStackLayout>
+                );
+              })
+              .filter(Boolean);
+
+            if (!behaviorPropertiesEditorsNodes.length) {
+              return null;
+            }
+
+            return (
+              <ColumnStackLayout noMargin expand noOverflowParent>
+                <Text noMargin size={'sub-title'}>
+                  {folderName}
+                </Text>
+                <ColumnStackLayout
+                  noMargin
+                  expand
+                  noOverflowParent
+                  useLargeSpacer
+                >
+                  {behaviorPropertiesEditorsNodes}
+                </ColumnStackLayout>
+              </ColumnStackLayout>
+            );
+          })
+          .filter(Boolean);
+
+        if (!objectEditorsPerFolderNodes.length) {
+          return null;
+        }
+
         return (
           <ColumnStackLayout noMargin expand noOverflowParent>
             {project.getLayoutsCount() > 1 && (
@@ -111,49 +171,10 @@ export const QuickBehaviorsTweaker = ({
                 {layout.getName()}
               </Text>
             )}
-            {folderObjects.map(({ folderName, objects }) => {
-              return (
-                <ColumnStackLayout noMargin expand noOverflowParent>
-                  <Text noMargin size={'sub-title'}>
-                    {folderName}
-                  </Text>
-                  {objects.map(object => {
-                    const behaviorNamesToTweak = getObjectBehaviorNamesToTweak(
-                      object
-                    );
-                    if (!behaviorNamesToTweak.length) {
-                      return null;
-                    }
-
-                    return (
-                      <ResponsiveLineStackLayout noMargin expand>
-                        <ObjectPreview object={object} project={project} />
-                        <ColumnStackLayout noMargin expand noOverflowParent>
-                          {behaviorNamesToTweak.map(behaviorName => {
-                            const behavior = object.getBehavior(behaviorName);
-
-                            return (
-                              <QuickBehaviorPropertiesEditor
-                                project={project}
-                                behavior={behavior}
-                                object={object}
-                                onBehaviorUpdated={() => {}}
-                                resourceManagementProps={
-                                  resourceManagementProps
-                                }
-                              />
-                            );
-                          })}
-                        </ColumnStackLayout>
-                      </ResponsiveLineStackLayout>
-                    );
-                  })}
-                </ColumnStackLayout>
-              );
-            })}
+            {objectEditorsPerFolderNodes}
           </ColumnStackLayout>
         );
-      })}
+      }).filter(Boolean)}
     </ColumnStackLayout>
   );
 };

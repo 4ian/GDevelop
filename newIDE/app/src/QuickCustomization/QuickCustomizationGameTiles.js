@@ -59,7 +59,7 @@ export const QuickCustomizationGameTiles = ({
       cellHeight="auto"
       spacing={styles.cellSpacing}
     >
-      {displayedExampleShortHeaders // TODO: display skeletons using "maxCount"
+      {displayedExampleShortHeaders
         ? displayedExampleShortHeaders.map(exampleShortHeader => (
             <ExampleTile
               exampleShortHeader={exampleShortHeader}
@@ -69,7 +69,15 @@ export const QuickCustomizationGameTiles = ({
               key={exampleShortHeader.name}
             />
           ))
-        : null}
+        : new Array(maxCount)
+            .fill(0)
+            .map((_, index) => (
+              <ExampleTile
+                exampleShortHeader={null}
+                onSelect={() => {}}
+                key={`skeleton-${index}`}
+              />
+            ))}
     </GridList>
   );
 };

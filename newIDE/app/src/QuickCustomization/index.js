@@ -21,6 +21,7 @@ type Step = {|
   canPreview: boolean,
   title: React.Node,
   nextLabel: React.Node,
+  shouldHideCloseButton?: boolean,
 |};
 
 const steps: Array<Step> = [
@@ -41,6 +42,7 @@ const steps: Array<Step> = [
     canPreview: false,
     title: <Trans>Publish and try your game</Trans>,
     nextLabel: <Trans>Finish</Trans>,
+    shouldHideCloseButton: true,
   },
 ];
 
@@ -52,7 +54,6 @@ export type QuickCustomizationState = {|
   goToPreviousStep: () => void,
   canGoToPreviousStep: boolean,
   setIsNavigationDisabled: boolean => void,
-  showCloseButton: boolean,
 |};
 
 export const useQuickCustomizationState = ({
@@ -97,7 +98,6 @@ export const useQuickCustomizationState = ({
     ),
     canGoToPreviousStep: stepIndex !== 0,
     setIsNavigationDisabled,
-    showCloseButton: step !== 'publish',
   };
 };
 
@@ -113,8 +113,7 @@ export const enumerateObjectFolderOrObjects = (
   mapFor(0, objectFolderOrObject.getChildrenCount(), i => {
     const child = objectFolderOrObject.getChildAt(i);
     if (
-      child.getQuickCustomizationVisibility() ===
-      gd.QuickCustomization.Hidden
+      child.getQuickCustomizationVisibility() === gd.QuickCustomization.Hidden
     ) {
       return;
     }

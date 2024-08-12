@@ -3654,7 +3654,9 @@ const MainFrame = (props: Props) => {
             openPreferencesDialog(false);
             if (options.languageDidChange) _languageDidChange();
           }}
-          onOpenQuickCustomizationDialog={() => setIsQuickCustomizationDialogOpen(true)}
+          onOpenQuickCustomizationDialog={() =>
+            setIsQuickCustomizationDialogOpen(true)
+          }
         />
       )}
       {languageDialogOpen && (
@@ -3796,6 +3798,7 @@ const MainFrame = (props: Props) => {
           onlineWebExporter={quickPublishOnlineWebExporter}
           onSaveProject={saveProject}
           isSavingProject={isSavingProject}
+          canClose={true}
         />
       )}
       <CustomDragLayer />

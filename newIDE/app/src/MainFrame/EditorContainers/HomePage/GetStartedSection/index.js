@@ -3,11 +3,7 @@ import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import Text from '../../../../UI/Text';
-import {
-  ColumnStackLayout,
-  LineStackLayout,
-  ResponsiveLineStackLayout,
-} from '../../../../UI/Layout';
+import { ColumnStackLayout, LineStackLayout } from '../../../../UI/Layout';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import { useOnlineStatus } from '../../../../Utils/OnlineStatus';
 import TreeLeaves from '../../../../UI/CustomSvgIcons/TreeLeaves';
@@ -627,27 +623,11 @@ const GetStartedSection = ({
     );
   }
 
-  const renderSubtitle = () => (
-    <ResponsiveLineStackLayout
-      justifyContent="flex-end"
-      alignItems="center"
-      noColumnMargin
-      noMargin
-    >
-      <Checkbox
-        label={<Trans>Don't show this screen on next startup</Trans>}
-        checked={!preferences.showGetStartedSectionByDefault}
-        onCheck={(e, checked) => setShowGetStartedSectionByDefault(!checked)}
-      />
-    </ResponsiveLineStackLayout>
-  );
-
   if (step === 'recommendations') {
     return (
       <>
         <SectionContainer
           title={<Trans>Start making games</Trans>}
-          renderSubtitle={renderSubtitle}
           flexBody
           showUrgentAnnouncements={shouldDisplayAnnouncements}
         >
@@ -669,6 +649,16 @@ const GetStartedSection = ({
             onCreateProjectFromExample={onCreateProjectFromExample}
             askToCloseProject={askToCloseProject}
           />
+          <Line justifyContent="center" alignItems="center">
+            <Checkbox
+              label={<Trans>Don't show this screen on next startup</Trans>}
+              checked={!preferences.showGetStartedSectionByDefault}
+              onCheck={(e, checked) =>
+                setShowGetStartedSectionByDefault(!checked)
+              }
+            />
+          </Line>
+          <LargeSpacer />
         </SectionContainer>
       </>
     );

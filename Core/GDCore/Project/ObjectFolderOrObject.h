@@ -10,6 +10,7 @@
 
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/String.h"
+#include "GDCore/Project/QuickCustomization.h"
 
 namespace gd {
 class Project;
@@ -166,6 +167,11 @@ class GD_CORE_API ObjectFolderOrObject {
       gd::ObjectFolderOrObject& newParentFolder,
       std::size_t newPosition);
 
+  QuickCustomization::Visibility GetQuickCustomizationVisibility() const { return quickCustomizationVisibility; }
+  void SetQuickCustomizationVisibility(QuickCustomization::Visibility visibility) {
+    quickCustomizationVisibility = visibility;
+  }
+
   /** \name Saving and loading
    * Members functions related to saving and loading the objects of the class.
    */
@@ -188,6 +194,7 @@ class GD_CORE_API ObjectFolderOrObject {
 
   gd::ObjectFolderOrObject*
       parent;  // nullptr if root folder, points to the parent folder otherwise.
+  QuickCustomization::Visibility quickCustomizationVisibility;
 
   // Representing an object:
   gd::Object* object;  // nullptr if folderName is set.

@@ -3654,6 +3654,7 @@ const MainFrame = (props: Props) => {
             openPreferencesDialog(false);
             if (options.languageDidChange) _languageDidChange();
           }}
+          onOpenQuickCustomizationDialog={() => setIsQuickCustomizationDialogOpen(true)}
         />
       )}
       {languageDialogOpen && (

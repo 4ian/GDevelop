@@ -13,6 +13,8 @@ import { type Exporter } from '../ExportAndShare/ShareDialog';
 import { mapFor } from '../Utils/MapFor';
 import { canSwapAssetOfObject } from '../AssetStore/AssetSwapper';
 
+const gd: libGDevelop = global.gd;
+
 type StepName = 'replace-objects' | 'tweak-behaviors' | 'publish';
 type Step = {|
   name: StepName,
@@ -110,6 +112,12 @@ export const enumerateObjectFolderOrObjects = (
 
   mapFor(0, objectFolderOrObject.getChildrenCount(), i => {
     const child = objectFolderOrObject.getChildAt(i);
+    if (
+      child.getQuickCustomizationVisibility() ===
+      gd.QuickCustomization.Hidden
+    ) {
+      return;
+    }
 
     if (child.isFolder()) {
       const folderName = child.getFolderName();

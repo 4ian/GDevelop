@@ -19,13 +19,13 @@ namespace gd {
 ObjectFolderOrObject ObjectFolderOrObject::badObjectFolderOrObject;
 
 ObjectFolderOrObject::ObjectFolderOrObject()
-    : folderName("__NULL"), object(nullptr) {}
+    : folderName("__NULL"), object(nullptr), quickCustomizationVisibility(QuickCustomization::Visibility::Default) {}
 ObjectFolderOrObject::ObjectFolderOrObject(gd::String folderName_,
                                            ObjectFolderOrObject* parent_)
-    : folderName(folderName_), parent(parent_), object(nullptr) {}
+    : folderName(folderName_), parent(parent_), object(nullptr), quickCustomizationVisibility(QuickCustomization::Visibility::Default) {}
 ObjectFolderOrObject::ObjectFolderOrObject(gd::Object* object_,
                                            ObjectFolderOrObject* parent_)
-    : object(object_), parent(parent_) {}
+    : object(object_), parent(parent_), quickCustomizationVisibility(QuickCustomization::Visibility::Default) {}
 ObjectFolderOrObject::~ObjectFolderOrObject() {}
 
 bool ObjectFolderOrObject::HasObjectNamed(const gd::String& name) {
@@ -206,6 +206,12 @@ void ObjectFolderOrObject::SerializeTo(SerializerElement& element) const {
   } else {
     element.SetAttribute("objectName", GetObject().GetName());
   }
+
+  if (quickCustomizationVisibility != QuickCustomization::Visibility::Default) {
+    element.SetStringAttribute(
+        "quickCustomizationVisibility",
+        QuickCustomization::Visibility::Visible ? "visible" : "hidden");
+  }
 }
 
 void ObjectFolderOrObject::UnserializeFrom(
@@ -242,6 +248,15 @@ void ObjectFolderOrObject::UnserializeFrom(
                    " not found in objects container.");
       object = nullptr;
     }
+  }
+
+  if (element.HasAttribute("quickCustomizationVisibility")) {
+    quickCustomizationVisibility =
+        element.GetStringAttribute("quickCustomizationVisibility") == "visible"
+            ? QuickCustomization::Visibility::Visible
+            : QuickCustomization::Visibility::Hidden;
+  } else {
+    quickCustomizationVisibility = QuickCustomization::Visibility::Default;
   }
 };
 

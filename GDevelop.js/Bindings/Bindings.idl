@@ -462,6 +462,9 @@ interface ObjectFolderOrObject {
     void MoveChild(unsigned long oldIndex, unsigned long newIndex);
     void RemoveFolderChild([Const, Ref] ObjectFolderOrObject childToRemove);
     boolean IsADescendantOf([Const, Ref] ObjectFolderOrObject otherObjectFolderOrObject);
+
+    QuickCustomization_Visibility GetQuickCustomizationVisibility();
+    void SetQuickCustomizationVisibility(QuickCustomization_Visibility visibility);
 };
 
 interface ObjectsContainer {

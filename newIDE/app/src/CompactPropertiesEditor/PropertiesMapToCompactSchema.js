@@ -302,7 +302,12 @@ const propertiesMapToSchema = (
     newValue: string
   ) => void,
   object: ?gdObject,
-  visibility: 'All' | 'Basic' | 'Advanced' | 'Deprecated' | 'Basic-Quick' = 'All'
+  visibility:
+    | 'All'
+    | 'Basic'
+    | 'Advanced'
+    | 'Deprecated'
+    | 'Basic-Quick' = 'All'
 ): Schema => {
   const propertyNames = properties.keys();
   // Aggregate field by groups to be able to build field groups with a title.

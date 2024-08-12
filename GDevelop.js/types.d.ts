@@ -447,6 +447,8 @@ export class ObjectFolderOrObject extends EmscriptenObject {
   moveChild(oldIndex: number, newIndex: number): void;
   removeFolderChild(childToRemove: ObjectFolderOrObject): void;
   isADescendantOf(otherObjectFolderOrObject: ObjectFolderOrObject): boolean;
+  getQuickCustomizationVisibility(): QuickCustomization_Visibility;
+  setQuickCustomizationVisibility(visibility: QuickCustomization_Visibility): void;
 }
 
 export class ObjectsContainer extends EmscriptenObject {

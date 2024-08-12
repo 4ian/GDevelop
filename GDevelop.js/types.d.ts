@@ -5,15 +5,15 @@ declare class EmscriptenObject {
   /** The object's index in the WASM memory, and thus its unique identifier. */
   ptr: number;
 
-  /** 
-   * Call this to free the object's underlying memory. It may not be used afterwards. 
-   * 
-   * **Call with care** - if the object owns some other objects, those will also be destroyed, 
-   * or if this object is owned by another object that does not expect it to be externally deleted 
+  /**
+   * Call this to free the object's underlying memory. It may not be used afterwards.
+   *
+   * **Call with care** - if the object owns some other objects, those will also be destroyed,
+   * or if this object is owned by another object that does not expect it to be externally deleted
    * (e.g. it is a child of a map), objects will be put in an invalid state that will most likely
    * crash the app.
-   * 
-   * If the object is owned by your code, you should still call this method when adequate, as 
+   *
+   * If the object is owned by your code, you should still call this method when adequate, as
    * otherwise the memory will never be freed, causing a memory leak, which is to be avoided.
    */
   delete(): void;
@@ -44,6 +44,12 @@ export enum ObjectsContainersList_VariableExistence {
   Exists = 1,
   GroupIsEmpty = 2,
   ExistsOnlyOnSomeObjectsOfTheGroup = 3,
+}
+
+export enum QuickCustomization_Visibility {
+  Default = 0,
+  Visible = 1,
+  Hidden = 2,
 }
 
 export enum ProjectDiagnostic_ErrorType {
@@ -894,6 +900,8 @@ export class PropertyDescriptor extends EmscriptenObject {
   isAdvanced(): boolean;
   getMeasurementUnit(): MeasurementUnit;
   setMeasurementUnit(measurementUnit: MeasurementUnit): PropertyDescriptor;
+  getQuickCustomizationVisibility(): QuickCustomization_Visibility;
+  setQuickCustomizationVisibility(visibility: QuickCustomization_Visibility): PropertyDescriptor;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(element: SerializerElement): void;
   serializeValuesTo(element: SerializerElement): void;
@@ -1486,6 +1494,9 @@ export class ObjectMetadata extends EmscriptenObject {
   isRenderedIn3D(): boolean;
 }
 
+export class QuickCustomization extends EmscriptenObject {
+}
+
 export class BehaviorMetadata extends EmscriptenObject {
   getName(): string;
   getFullName(): string;
@@ -1520,6 +1531,8 @@ export class BehaviorMetadata extends EmscriptenObject {
   setPrivate(): BehaviorMetadata;
   isHidden(): boolean;
   setHidden(): BehaviorMetadata;
+  getQuickCustomizationVisibility(): QuickCustomization_Visibility;
+  setQuickCustomizationVisibility(visibility: QuickCustomization_Visibility): BehaviorMetadata;
   get(): Behavior;
   getSharedDataInstance(): BehaviorsSharedData;
   getProperties(): MapStringPropertyDescriptor;
@@ -2084,6 +2097,8 @@ export class EventsBasedBehavior extends AbstractEventsBasedEntity {
   getObjectType(): string;
   setPrivate(isPrivate: boolean): EventsBasedBehavior;
   isPrivate(): boolean;
+  setQuickCustomizationVisibility(visibility: QuickCustomization_Visibility): EventsBasedBehavior;
+  getQuickCustomizationVisibility(): QuickCustomization_Visibility;
   getSharedPropertyDescriptors(): PropertiesContainer;
   static getPropertyActionName(propertyName: string): string;
   static getPropertyConditionName(propertyName: string): string;
@@ -2888,9 +2903,9 @@ export const Object: typeof gdObject;
 export const initializePlatforms: typeof ProjectHelper.initializePlatforms;
 
 /**
- * Returns the pointer in WASM memory to an object. It is a number that uniquely 
+ * Returns the pointer in WASM memory to an object. It is a number that uniquely
  * represents that instance of the object.
- * 
+ *
  * @see {@link wrapPointer} to convert a pointer back to an object.
  */
 export function getPointer(object: EmscriptenObject): number;
@@ -2902,15 +2917,15 @@ type ClassConstructor<T> = {
 /**
  * Wraps a pointer with a wrapper class, allowing to use the object located at the
  * pointer's destination as an instance of that class.
- * 
+ *
  * @see {@link getPointer} to get a pointer from an object.
  */
 export function wrapPointer<T extends EmscriptenObject>(ptr: number, objectClass: ClassConstructor<T>): T;
 
 /**
  * Casts an object to another class type.
- * 
- * **Careful** - this is not a conversion function. 
+ *
+ * **Careful** - this is not a conversion function.
  * This only changes the class type and functions exposed, not the underlying memory.
  * Only cast to another class if you are certain that the underlying memory is of that type!
  */
@@ -2921,23 +2936,23 @@ export function castObject<T extends EmscriptenObject>(object: EmscriptenObject,
  * A reference to the object itself is not trustworthy, since there may be multiple
  * wrapper objects (which allow to call C++ function on C++ memory) for a single
  * pointer ("real object").
- * 
+ *
  * This function must be therefore used to check for referential equality instead of
  * JavaScript's standard equality operators when handling Emscripten objects.
  */
 export function compare<T extends EmscriptenObject>(object1: T, object2: T): boolean;
 
-/** 
- * Call this to free the object's underlying memory. It may not be used afterwards. 
- * 
- * **Call with care** - if the object owns some other objects, those will also be destroyed, 
- * or if this object is owned by another object that does not expect it to be externally deleted 
+/**
+ * Call this to free the object's underlying memory. It may not be used afterwards.
+ *
+ * **Call with care** - if the object owns some other objects, those will also be destroyed,
+ * or if this object is owned by another object that does not expect it to be externally deleted
  * (e.g. it is a child of a map), objects will be put in an invalid state that will most likely
  * crash the app.
- * 
- * If the object is owned by your code, you should still call this method when adequate, as 
+ *
+ * If the object is owned by your code, you should still call this method when adequate, as
  * otherwise the memory will never be freed, causing a memory leak, which is to be avoided.
- * 
+ *
  * The alias {@link EmscriptenObject.delete} is recommended instead, for readability.
  */
 export function destroy(object: EmscriptenObject): void;

@@ -7,8 +7,10 @@ import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import Text from '../UI/Text';
 import { enumerateObjectFolderOrObjects } from '.';
 import CompactPropertiesEditor from '../CompactPropertiesEditor';
-import propertiesMapToSchema from '../PropertiesEditor/PropertiesMapToSchema';
+import propertiesMapToSchema from '../CompactPropertiesEditor/PropertiesMapToCompactSchema';
 import { Column } from '../UI/Grid';
+
+const gd: libGDevelop = global.gd;
 
 const QuickBehaviorPropertiesEditor = ({
   project,
@@ -32,7 +34,7 @@ const QuickBehaviorPropertiesEditor = ({
           behavior.updateProperty(name, value);
         },
         object,
-        'Basic'
+        'Basic-Quick'
       ),
     [behavior, object]
   );
@@ -62,6 +64,20 @@ const getObjectBehaviorNamesToTweak = (object: gdObject) => {
           .getProperties()
           .keys()
           .size() === 0
+      ) {
+        return false;
+      }
+
+      const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+        gd.JsPlatform.get(),
+        behavior.getTypeName()
+      );
+      if (gd.MetadataProvider.isBadBehaviorMetadata(behaviorMetadata)) {
+        return false;
+      }
+      if (
+        behaviorMetadata.getQuickCustomizationVisibility() ===
+        gd.QuickCustomization.Hidden
       ) {
         return false;
       }
@@ -116,17 +132,6 @@ export const QuickBehaviorsTweaker = ({
                         <Column noMargin>
                           {behaviorNamesToTweak.map(behaviorName => {
                             const behavior = object.getBehavior(behaviorName);
-                            if (behavior.isDefaultBehavior()) {
-                              return null;
-                            }
-                            if (
-                              behavior
-                                .getProperties()
-                                .keys()
-                                .size() === 0
-                            ) {
-                              return null;
-                            }
 
                             return (
                               <Column noMargin expand>

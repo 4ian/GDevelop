@@ -148,6 +148,8 @@ declare class libGDevelop {
   VectorParameterMetadata: Class<gdVectorParameterMetadata>;
   ParameterMetadataTools: Class<gdParameterMetadataTools>;
   ObjectMetadata: Class<gdObjectMetadata>;
+  QuickCustomization_Visibility: Class<QuickCustomization_Visibility>;
+  QuickCustomization: Class<gdQuickCustomization>;
   BehaviorMetadata: Class<gdBehaviorMetadata>;
   EffectMetadata: Class<gdEffectMetadata>;
   EventMetadata: Class<gdEventMetadata>;

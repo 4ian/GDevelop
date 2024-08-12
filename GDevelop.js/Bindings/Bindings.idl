@@ -1082,6 +1082,9 @@ interface PropertyDescriptor {
     [Const, Ref] MeasurementUnit GetMeasurementUnit();
     [Ref] PropertyDescriptor SetMeasurementUnit([Const, Ref] MeasurementUnit measurementUnit);
 
+    QuickCustomization_Visibility GetQuickCustomizationVisibility();
+    [Ref] PropertyDescriptor SetQuickCustomizationVisibility(QuickCustomization_Visibility visibility);
+
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
     void SerializeValuesTo([Ref] SerializerElement element);
@@ -1860,6 +1863,16 @@ interface ObjectMetadata {
     boolean IsRenderedIn3D();
 };
 
+enum QuickCustomization_Visibility {
+    "QuickCustomization::Default",
+    "QuickCustomization::Visible",
+    "QuickCustomization::Hidden",
+};
+
+interface QuickCustomization {
+    // Nothing, it's just a container for the visibility enum.
+};
+
 interface BehaviorMetadata {
     [Const, Ref] DOMString GetName();
     [Const, Ref] DOMString GetFullName();
@@ -1964,6 +1977,9 @@ interface BehaviorMetadata {
 
     boolean IsHidden();
     [Ref] BehaviorMetadata SetHidden();
+
+    QuickCustomization_Visibility GetQuickCustomizationVisibility();
+    [Ref] BehaviorMetadata SetQuickCustomizationVisibility(QuickCustomization_Visibility visibility);
 
     [Ref] Behavior Get();
     BehaviorsSharedData GetSharedDataInstance();
@@ -2874,6 +2890,8 @@ interface EventsBasedBehavior {
     [Const, Ref] DOMString GetObjectType();
     [Ref] EventsBasedBehavior SetPrivate(boolean isPrivate);
     boolean IsPrivate();
+    [Ref] EventsBasedBehavior SetQuickCustomizationVisibility(QuickCustomization_Visibility visibility);
+    QuickCustomization_Visibility GetQuickCustomizationVisibility();
 
     [Ref] PropertiesContainer GetSharedPropertyDescriptors();
 

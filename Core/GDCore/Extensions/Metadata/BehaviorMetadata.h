@@ -12,6 +12,7 @@
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/String.h"
+#include "GDCore/Project/QuickCustomization.h"
 namespace gd {
 class Behavior;
 class BehaviorsSharedData;
@@ -41,10 +42,10 @@ class GD_CORE_API BehaviorMetadata : public InstructionOrExpressionContainerMeta
       const gd::String& className_,
       std::shared_ptr<gd::Behavior> instance,
       std::shared_ptr<gd::BehaviorsSharedData> sharedDatasInstance);
-      
+
   /**
    * \brief Construct a behavior metadata, without "blueprint" behavior.
-   * 
+   *
    * \note This is used by events based behaviors.
    */
   BehaviorMetadata(
@@ -297,9 +298,18 @@ class GD_CORE_API BehaviorMetadata : public InstructionOrExpressionContainerMeta
     return *this;
   }
 
+  QuickCustomization::Visibility GetQuickCustomizationVisibility() const {
+    return quickCustomizationVisibility;
+  }
+
+  BehaviorMetadata &SetQuickCustomizationVisibility(QuickCustomization::Visibility visibility) {
+    quickCustomizationVisibility = visibility;
+    return *this;
+  }
+
   /**
    * \brief Return the associated gd::Behavior, handling behavior contents.
-   * 
+   *
    * \note Returns a dumb Behavior for events based behaviors as CustomBehavior
    * are using EventBasedBehavior.
    */
@@ -317,7 +327,7 @@ class GD_CORE_API BehaviorMetadata : public InstructionOrExpressionContainerMeta
   /**
    * \brief Return the associated gd::BehaviorsSharedData, handling behavior
    * shared data, if any (nullptr if none).
-   * 
+   *
    * \note Returns nullptr for events based behaviors as they don't declare
    * shared data yet.
    */
@@ -374,6 +384,7 @@ class GD_CORE_API BehaviorMetadata : public InstructionOrExpressionContainerMeta
   mutable std::vector<gd::String> requiredBehaviors;
   bool isPrivate = false;
   bool isHidden = false;
+  QuickCustomization::Visibility quickCustomizationVisibility;
 
   // TODO: Nitpicking: convert these to std::unique_ptr to clarify ownership.
   std::shared_ptr<gd::Behavior> instance;

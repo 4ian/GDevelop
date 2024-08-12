@@ -38,6 +38,13 @@ void PropertyDescriptor::SerializeTo(SerializerElement& element) const {
   if (advanced) {
     element.AddChild("advanced").SetBoolValue(advanced);
   }
+  if (quickCustomizationVisibility != QuickCustomization::Visibility::Default) {
+    element.AddChild("quickCustomizationVisibility")
+        .SetStringValue(quickCustomizationVisibility ==
+                                QuickCustomization::Visibility::Visible
+                            ? "visible"
+                            : "hidden");
+  }
 }
 
 void PropertyDescriptor::UnserializeFrom(const SerializerElement& element) {
@@ -67,11 +74,21 @@ void PropertyDescriptor::UnserializeFrom(const SerializerElement& element) {
                ? element.GetChild("hidden").GetBoolValue()
                : false;
   deprecated = element.HasChild("deprecated")
-               ? element.GetChild("deprecated").GetBoolValue()
-               : false;
+                   ? element.GetChild("deprecated").GetBoolValue()
+                   : false;
   advanced = element.HasChild("advanced")
-               ? element.GetChild("advanced").GetBoolValue()
-               : false;
+                 ? element.GetChild("advanced").GetBoolValue()
+                 : false;
+
+  if (element.HasChild("quickCustomizationVisibility")) {
+    quickCustomizationVisibility =
+        element.GetChild("quickCustomizationVisibility").GetStringValue() ==
+                "visible"
+            ? QuickCustomization::Visibility::Visible
+            : QuickCustomization::Visibility::Hidden;
+  } else {
+    quickCustomizationVisibility = QuickCustomization::Visibility::Default;
+  }
 }
 
 void PropertyDescriptor::SerializeValuesTo(SerializerElement& element) const {

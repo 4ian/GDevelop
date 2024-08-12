@@ -67,6 +67,7 @@ type Props = {|
   builds: ?Array<Build>,
   onRefreshBuilds: () => Promise<void>,
   shouldAutomaticallyStartExport?: boolean,
+  uiMode?: 'minimal',
 |};
 
 const getIncrementedVersionNumber = (project: gdProject) => {
@@ -476,6 +477,7 @@ export default class ExportLauncher extends Component<Props, State> {
       game,
       gameAvailabilityError,
       onRefreshGame,
+      uiMode,
     } = this.props;
     if (!project) return null;
     const buildQuota = getBuildQuota(
@@ -572,6 +574,7 @@ export default class ExportLauncher extends Component<Props, State> {
                 exportStep,
                 build,
                 quota: buildQuota,
+                uiMode: uiMode || 'full',
               })}
             </Line>
           )}
@@ -662,6 +665,7 @@ export default class ExportLauncher extends Component<Props, State> {
               stepCurrentProgress,
               stepMaxProgress,
               onRefreshGame,
+              uiMode: uiMode || 'full',
             })}
           {doneFooterOpen &&
             exportPipeline.renderDoneFooter &&

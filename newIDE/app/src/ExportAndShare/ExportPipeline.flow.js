@@ -23,6 +23,7 @@ export type HeaderProps<ExportState> = {|
   build: ?Build,
   exportStep: BuildStep,
   quota: ?Quota,
+  uiMode: 'minimal' | 'full',
 |};
 
 export type ExportFlowProps = {|
@@ -40,6 +41,7 @@ export type ExportFlowProps = {|
   stepMaxProgress: number,
   stepCurrentProgress: number,
   onRefreshGame: () => Promise<void>,
+  uiMode: 'minimal' | 'full',
 |};
 
 /**

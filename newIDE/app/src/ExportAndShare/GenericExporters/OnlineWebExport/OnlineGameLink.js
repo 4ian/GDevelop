@@ -368,9 +368,9 @@ const OnlineGameLink = ({
                   </Line>
                   <Text>
                     {automaticallyOpenGameProperties ? (
-                      <Trans>Loading your game...</Trans>
+                      <Trans>Loading the game...</Trans>
                     ) : (
-                      <Trans>Loading your link...</Trans>
+                      <Trans>Loading the game link...</Trans>
                     )}
                   </Text>
                 </ColumnStackLayout>

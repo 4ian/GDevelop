@@ -47,7 +47,7 @@ const OnlineWebExportFlow = ({
     isPublishedOnGdgames ? (
     <ResponsiveLineStackLayout justifyContent="center">
       <FlatButton
-        label={<Trans>Generate new link</Trans>}
+        label={<Trans>Generate a new link</Trans>}
         primary
         id={`launch-export-${exportPipelineName}-web-button`}
         onClick={async () => {
@@ -57,7 +57,7 @@ const OnlineWebExportFlow = ({
         disabled={disabled}
       />
       <RaisedButton
-        label={<Trans>Update my current page</Trans>}
+        label={<Trans>Update the game page</Trans>}
         primary
         id={`launch-export-and-publish-${exportPipelineName}-web-button`}
         onClick={async () => {
@@ -74,7 +74,7 @@ const OnlineWebExportFlow = ({
       <RaisedButton
         label={
           hasGameExistingBuilds ? (
-            <Trans>Generate new link</Trans>
+            <Trans>Generate a new link</Trans>
           ) : (
             <Trans>Generate link</Trans>
           )

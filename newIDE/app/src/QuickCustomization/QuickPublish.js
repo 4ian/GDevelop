@@ -10,10 +10,17 @@ import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { getBuilds, type Build } from '../Utils/GDevelopServices/Build';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 import { ColumnStackLayout } from '../UI/Layout';
-import { LargeSpacer } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
 import { I18n } from '@lingui/react';
 import { type Exporter } from '../ExportAndShare/ShareDialog';
+import Text from '../UI/Text';
+
+const styles = {
+  illustrationImage: {
+    width: 100,
+    aspectRatio: '117 / 162',
+  },
+};
 
 type Props = {|
   project: gdProject,
@@ -120,9 +127,12 @@ export const QuickPublish = ({
   );
 
   return (
-    <ColumnStackLayout noMargin>
-      <LargeSpacer />
-      <LargeSpacer />
+    <ColumnStackLayout noMargin expand alignItems="center">
+      <img
+        alt="Publish your game with GDevelop"
+        src="res/quick_publish.svg"
+        style={styles.illustrationImage}
+      />
       {profile ? (
         <I18n>
           {({ i18n }) => (
@@ -144,11 +154,17 @@ export const QuickPublish = ({
               builds={builds}
               onRefreshBuilds={refreshBuilds}
               shouldAutomaticallyStartExport={shouldAutomaticallyStartExport}
+              uiMode="minimal"
             />
           )}
         </I18n>
       ) : (
         <ColumnStackLayout noMargin>
+          <Text size="body" align="center">
+            <Trans>
+              Create a GDevelop account to share your game in a few seconds.
+            </Trans>
+          </Text>
           <RaisedButton
             primary
             label={<Trans>Create an account</Trans>}

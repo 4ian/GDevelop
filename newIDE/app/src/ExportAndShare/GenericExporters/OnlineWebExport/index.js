@@ -14,7 +14,13 @@ const styles = {
   },
 };
 
-const ExplanationHeader = () => {
+type ExplanationHeaderProps = {|
+  uiMode: 'minimal' | 'full',
+|};
+
+const ExplanationHeader = ({ uiMode }: ExplanationHeaderProps) => {
+  if (uiMode === 'minimal') return null;
+
   return (
     <Column noMargin>
       <Line alignItems="center" justifyContent="center">

@@ -623,6 +623,7 @@ module.exports = {
         tweenBehavior,
         new gd.BehaviorsSharedData()
       )
+      .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
       .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
       .addIncludeFile('Extensions/TweenBehavior/tweenruntimebehavior.js');
 

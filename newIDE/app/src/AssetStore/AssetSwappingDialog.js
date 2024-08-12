@@ -10,7 +10,6 @@ import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import RaisedButton from '../UI/RaisedButton';
 import { AssetStoreContext } from './AssetStoreContext';
 import Window from '../Utils/Window';
-import { enumerateAssetStoreIds } from './EnumerateAssetStoreIds';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import LoaderModal from '../UI/LoaderModal';
 import { useInstallAsset } from './NewObjectDialog';
@@ -42,12 +41,7 @@ function AssetSwappingDialog({
     AssetStoreContext
   );
   const { openedAssetShortHeader } = shopNavigationState.getCurrentPage();
-  // Avoid memoizing the result of enumerateAssetStoreIds, as it does not get updated
-  // when adding assets.
-  const existingAssetStoreIds = enumerateAssetStoreIds(
-    project,
-    objectsContainer
-  );
+
   const [
     isAssetBeingInstalled,
     setIsAssetBeingInstalled,

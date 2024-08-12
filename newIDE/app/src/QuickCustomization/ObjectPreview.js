@@ -23,6 +23,7 @@ const styles = {
     overflow: 'hidden',
     position: 'relative',
     borderRadius: 8,
+    flexShrink: 0,
   },
   titleContainer: {
     position: 'absolute',

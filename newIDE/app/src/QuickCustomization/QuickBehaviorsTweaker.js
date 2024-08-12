@@ -8,7 +8,6 @@ import Text from '../UI/Text';
 import { enumerateObjectFolderOrObjects } from '.';
 import CompactPropertiesEditor from '../CompactPropertiesEditor';
 import propertiesMapToSchema from '../CompactPropertiesEditor/PropertiesMapToCompactSchema';
-import { Column } from '../UI/Grid';
 
 const gd: libGDevelop = global.gd;
 
@@ -106,7 +105,7 @@ export const QuickBehaviorsTweaker = ({
         if (!folderObjects.length) return null;
 
         return (
-          <ColumnStackLayout noMargin expand>
+          <ColumnStackLayout noMargin expand noOverflowParent>
             {project.getLayoutsCount() > 1 && (
               <Text noMargin size={'block-title'}>
                 {layout.getName()}
@@ -114,7 +113,7 @@ export const QuickBehaviorsTweaker = ({
             )}
             {folderObjects.map(({ folderName, objects }) => {
               return (
-                <ColumnStackLayout noMargin expand>
+                <ColumnStackLayout noMargin expand noOverflowParent>
                   <Text noMargin size={'sub-title'}>
                     {folderName}
                   </Text>
@@ -129,25 +128,23 @@ export const QuickBehaviorsTweaker = ({
                     return (
                       <ResponsiveLineStackLayout noMargin expand>
                         <ObjectPreview object={object} project={project} />
-                        <Column noMargin>
+                        <ColumnStackLayout noMargin expand noOverflowParent>
                           {behaviorNamesToTweak.map(behaviorName => {
                             const behavior = object.getBehavior(behaviorName);
 
                             return (
-                              <Column noMargin expand>
-                                <QuickBehaviorPropertiesEditor
-                                  project={project}
-                                  behavior={behavior}
-                                  object={object}
-                                  onBehaviorUpdated={() => {}}
-                                  resourceManagementProps={
-                                    resourceManagementProps
-                                  }
-                                />
-                              </Column>
+                              <QuickBehaviorPropertiesEditor
+                                project={project}
+                                behavior={behavior}
+                                object={object}
+                                onBehaviorUpdated={() => {}}
+                                resourceManagementProps={
+                                  resourceManagementProps
+                                }
+                              />
                             );
                           })}
-                        </Column>
+                        </ColumnStackLayout>
                       </ResponsiveLineStackLayout>
                     );
                   })}

@@ -59,7 +59,7 @@ export const QuickCustomizationDialog = ({
           <Paper background="dark">{titleTopContent}</Paper>
         ) : null
       }
-      maxWidth="lg"
+      maxWidth="md"
       fullHeight
       actions={[
         quickCustomizationState.canGoToPreviousStep ? (

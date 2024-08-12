@@ -997,6 +997,7 @@ module.exports = {
         multiplayerObjectBehavior,
         sharedData
       )
+      .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
       .setIncludeFile('Extensions/Multiplayer/peer.js')
       .addIncludeFile('Extensions/Multiplayer/peerJsHelper.js')
       .addIncludeFile(

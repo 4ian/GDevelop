@@ -7,19 +7,15 @@ import AlertMessage from '../UI/AlertMessage';
 import PlaceholderError from '../UI/PlaceholderError';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import RaisedButton from '../UI/RaisedButton';
-import {
-  type Game,
-  getGame,
-  registerGame,
-  updateGame,
-} from '../Utils/GDevelopServices/Game';
-import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
+import { updateGame } from '../Utils/GDevelopServices/Game';
 import Text from '../UI/Text';
 import { Column, Line } from '../UI/Grid';
 import Toggle from '../UI/Toggle';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { ColumnStackLayout } from '../UI/Layout';
 import MarketingPlansDialog from '../MarketingPlans/MarketingPlansDialog';
+import { useGameManager } from '../Utils/UseGameAndBuildsManager';
+import RightLoader from '../UI/RightLoader';
 
 export type GameRegistrationProps = {|
   project: ?gdProject,
@@ -45,12 +41,15 @@ export const GameRegistration = ({
     onAcceptGameStatsEmail,
   } = React.useContext(AuthenticatedUserContext);
   const { showAlert } = useAlertDialog();
-  const [error, setError] = React.useState<Error | null>(null);
-  const [
+  const {
+    game,
+    setGame,
     gameAvailabilityError,
-    setGameAvailabilityError,
-  ] = React.useState<?GameAvailabilityError>(null);
-  const [game, setGame] = React.useState<Game | null>(null);
+    refreshGame,
+    registerGameIfNeeded,
+  } = useGameManager({
+    project,
+  });
   const [registrationInProgress, setRegistrationInProgress] = React.useState(
     false
   );
@@ -67,59 +66,11 @@ export const GameRegistration = ({
     setMarketingPlansDialogOpen,
   ] = React.useState(false);
 
-  const loadGame = React.useCallback(
-    async () => {
-      if (!profile || !project) return;
-
-      const { id } = profile;
-      setError(null);
-      try {
-        const game = await getGame(
-          getAuthorizationHeader,
-          id,
-          project.getProjectUuid()
-        );
-        setGameAvailabilityError(null);
-        setGame(game);
-      } catch (error) {
-        console.error(
-          `Unable to get the game ${project.getProjectUuid()}`,
-          error
-        );
-        const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
-          error
-        );
-        if (extractedStatusAndCode) {
-          if (extractedStatusAndCode.status === 403) {
-            setGameAvailabilityError('not-owned');
-            return;
-          } else if (extractedStatusAndCode.status === 404) {
-            setGameAvailabilityError('not-found');
-            return;
-          }
-          setGameAvailabilityError('unexpected');
-        }
-
-        setError(error);
-      }
-    },
-    [project, getAuthorizationHeader, profile]
-  );
-
   const onRegisterGame = React.useCallback(
     async () => {
-      if (!profile || !project) return;
-
-      const { id } = profile;
       setRegistrationInProgress(true);
       try {
-        await registerGame(getAuthorizationHeader, id, {
-          gameId: project.getProjectUuid(),
-          authorName: project.getAuthor() || 'Unspecified publisher',
-          gameName: project.getName() || 'Untitled game',
-          templateSlug: project.getTemplateSlug(),
-        });
-        loadGame();
+        await registerGameIfNeeded();
         if (onGameRegistered) onGameRegistered();
       } catch (error) {
         console.error('Unable to register the game', error);
@@ -130,14 +81,7 @@ export const GameRegistration = ({
       }
       setRegistrationInProgress(false);
     },
-    [
-      getAuthorizationHeader,
-      profile,
-      project,
-      loadGame,
-      onGameRegistered,
-      showAlert,
-    ]
+    [registerGameIfNeeded, onGameRegistered, showAlert]
   );
 
   const onToggleGameStatsEmail = React.useCallback(
@@ -183,16 +127,7 @@ export const GameRegistration = ({
       }
       setToggleGameCommentsInProgress(false);
     },
-    [profile, game, getAuthorizationHeader, showAlert]
-  );
-
-  React.useEffect(
-    () => {
-      if (!game) {
-        loadGame();
-      }
-    },
-    [loadGame, game]
+    [profile, game, setGame, getAuthorizationHeader, showAlert]
   );
 
   if (!project) {
@@ -227,9 +162,7 @@ export const GameRegistration = ({
         </Trans>
       </AlertMessage>
     );
-  }
-
-  if (gameAvailabilityError === 'not-owned') {
+  } else if (gameAvailabilityError === 'not-owned') {
     return (
       <AlertMessage kind="error">
         <Trans>
@@ -239,26 +172,16 @@ export const GameRegistration = ({
         </Trans>
       </AlertMessage>
     );
-  }
-
-  if (error) {
+  } else if (gameAvailabilityError === 'unexpected') {
     return (
-      <PlaceholderError
-        onRetry={() => {
-          loadGame();
-        }}
-      >
+      <PlaceholderError onRetry={refreshGame}>
         <Trans>Can't check if the game is registered online.</Trans>{' '}
         <Trans>Verify your internet connection or try again later.</Trans>
       </PlaceholderError>
     );
   }
 
-  if (!game && !hideLoader) {
-    return <PlaceholderLoader />;
-  }
-
-  if (game && suggestAdditionalActions) {
+  if (suggestAdditionalActions) {
     return (
       <>
         <ColumnStackLayout noMargin expand>
@@ -266,7 +189,7 @@ export const GameRegistration = ({
             <Text size="block-title">
               <Trans>Taking your game further</Trans>
             </Text>
-            <Column>
+            <Column noMargin>
               <Toggle
                 onToggle={() =>
                   onToggleGameStatsEmail(!profile.getGameStatsEmail)
@@ -279,15 +202,17 @@ export const GameRegistration = ({
                 disabled={toggleGameStatsEmailInProgress}
               />
               <Toggle
-                onToggle={() => onToggleGameComments(!game.acceptsGameComments)}
-                toggled={!!game.acceptsGameComments}
+                onToggle={() =>
+                  onToggleGameComments(!(game && game.acceptsGameComments))
+                }
+                toggled={!!(game && game.acceptsGameComments)}
                 labelPosition="right"
                 label={<Trans>Open game for player feedback</Trans>}
-                disabled={toggleGameCommentsInProgress}
+                disabled={!game || toggleGameCommentsInProgress}
               />
             </Column>
           </Column>
-          <Column>
+          <Column noMargin>
             <Text size="sub-title">
               <Trans>Promoting your game to the community</Trans>
             </Text>
@@ -298,15 +223,18 @@ export const GameRegistration = ({
               </Trans>
             </Text>
             <Line>
-              <RaisedButton
-                label={<Trans>See marketing packs</Trans>}
-                primary
-                onClick={() => setMarketingPlansDialogOpen(true)}
-              />
+              <RightLoader isLoading={!game}>
+                <RaisedButton
+                  label={<Trans>See marketing packs</Trans>}
+                  primary
+                  onClick={() => setMarketingPlansDialogOpen(true)}
+                  disabled={!game}
+                />
+              </RightLoader>
             </Line>
           </Column>
         </ColumnStackLayout>
-        {marketingPlansDialogOpen && (
+        {marketingPlansDialogOpen && game && (
           <MarketingPlansDialog
             game={game}
             onClose={() => setMarketingPlansDialogOpen(false)}
@@ -314,6 +242,10 @@ export const GameRegistration = ({
         )}
       </>
     );
+  }
+
+  if (!game && !hideLoader) {
+    return <PlaceholderLoader />;
   }
 
   return null; // Hide the component if the game is registered.

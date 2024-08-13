@@ -9,7 +9,7 @@ import RaisedButton from '../UI/RaisedButton';
 import { I18n } from '@lingui/react';
 import { type Exporter } from '../ExportAndShare/ShareDialog';
 import Text from '../UI/Text';
-import { type GameAndBuilds } from '../Utils/UseGameAndBuilds';
+import { type GameAndBuildsManager } from '../Utils/UseGameAndBuildsManager';
 
 const styles = {
   illustrationImage: {
@@ -20,7 +20,7 @@ const styles = {
 
 type Props = {|
   project: gdProject,
-  gameAndBuilds: GameAndBuilds,
+  gameAndBuildsManager: GameAndBuildsManager,
   setIsNavigationDisabled: (isNavigationDisabled: boolean) => void,
   shouldAutomaticallyStartExport: boolean,
   onlineWebExporter: Exporter,
@@ -30,7 +30,7 @@ type Props = {|
 
 export const QuickPublish = ({
   project,
-  gameAndBuilds,
+  gameAndBuildsManager,
   setIsNavigationDisabled,
   shouldAutomaticallyStartExport,
   onlineWebExporter,
@@ -38,10 +38,7 @@ export const QuickPublish = ({
   isSavingProject,
 }: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const {
-    profile,
-    onOpenCreateAccountDialog,
-  } = authenticatedUser;
+  const { profile, onOpenCreateAccountDialog } = authenticatedUser;
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
   );
@@ -68,7 +65,7 @@ export const QuickPublish = ({
               eventsFunctionsExtensionsState={eventsFunctionsExtensionsState}
               exportPipeline={onlineWebExporter.exportPipeline}
               setIsNavigationDisabled={setIsNavigationDisabled}
-              gameAndBuilds={gameAndBuilds}
+              gameAndBuildsManager={gameAndBuildsManager}
               shouldAutomaticallyStartExport={shouldAutomaticallyStartExport}
               uiMode="minimal"
             />

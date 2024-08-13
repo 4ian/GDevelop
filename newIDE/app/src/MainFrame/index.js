@@ -424,7 +424,7 @@ const MainFrame = (props: Props) => {
     renderOpenConfirmDialog,
   } = useOpenConfirmDialog();
   const {
-    findLeaderboardsToReplace,
+    openLeaderboardReplacerDialogIfNeeded,
     renderLeaderboardReplacerDialog,
   } = useLeaderboardReplacer();
   const {
@@ -475,9 +475,9 @@ const MainFrame = (props: Props) => {
     setFileMetadataOpeningMessage,
   ] = React.useState<?MessageDescriptor>(null);
   const [
-    isQuickCustomizationDialogOpen,
-    setIsQuickCustomizationDialogOpen,
-  ] = React.useState<boolean>(false);
+    quickCustomizationDialogOpenedFromGameId,
+    setQuickCustomizationDialogOpenedFromGameId,
+  ] = React.useState<?string>(null);
 
   const { getAuthenticatedPlayerForPreview } = useAuthenticatedPlayer();
 
@@ -1150,11 +1150,11 @@ const MainFrame = (props: Props) => {
       setNewProjectSetupDialogOpen(false);
       closeExampleStoreDialog({ deselectExampleAndGameTemplate: true });
       if (options.openQuickCustomizationDialog) {
-        setIsQuickCustomizationDialogOpen(true);
+        setQuickCustomizationDialogOpenedFromGameId(oldProjectId);
       } else {
         // Replace leaderboards and configure multiplayer lobbies if needed.
         // In the case of quick customization, this will be done later.
-        findLeaderboardsToReplace(project, oldProjectId);
+        openLeaderboardReplacerDialogIfNeeded(project, oldProjectId);
         configureMultiplayerLobbiesIfNeeded(project, oldProjectId);
       }
       options.openAllScenes || options.openQuickCustomizationDialog
@@ -3655,7 +3655,9 @@ const MainFrame = (props: Props) => {
             if (options.languageDidChange) _languageDidChange();
           }}
           onOpenQuickCustomizationDialog={() =>
-            setIsQuickCustomizationDialogOpen(true)
+            setQuickCustomizationDialogOpenedFromGameId(
+              'fake-source-game-id-for-testing'
+            )
           }
         />
       )}
@@ -3787,18 +3789,19 @@ const MainFrame = (props: Props) => {
         />
       )}
 
-      {isQuickCustomizationDialogOpen && currentProject && (
+      {quickCustomizationDialogOpenedFromGameId && currentProject && (
         <QuickCustomizationDialog
           project={currentProject}
           resourceManagementProps={resourceManagementProps}
           onLaunchPreview={
             hotReloadPreviewButtonProps.launchProjectDataOnlyPreview
           }
-          onClose={() => setIsQuickCustomizationDialogOpen(false)}
+          onClose={() => setQuickCustomizationDialogOpenedFromGameId(null)}
           onlineWebExporter={quickPublishOnlineWebExporter}
           onSaveProject={saveProject}
           isSavingProject={isSavingProject}
           canClose={true}
+          sourceGameId={quickCustomizationDialogOpenedFromGameId}
         />
       )}
       <CustomDragLayer />

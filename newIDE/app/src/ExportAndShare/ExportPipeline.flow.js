@@ -4,7 +4,7 @@ import { type Build, type BuildType } from '../Utils/GDevelopServices/Build';
 import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
 import { type BuildStep } from './Builds/BuildStepsProgress';
 import { type Quota } from '../Utils/GDevelopServices/Usage';
-import { type GameAndBuilds } from '../Utils/UseGameAndBuilds';
+import { type GameAndBuildsManager } from '../Utils/UseGameAndBuildsManager';
 
 export type ExportPipelineContext<ExportState> = {|
   project: gdProject,
@@ -28,7 +28,7 @@ export type HeaderProps<ExportState> = {|
 
 export type ExportFlowProps = {|
   project: gdProject,
-  gameAndBuilds: GameAndBuilds,
+  gameAndBuildsManager: GameAndBuildsManager,
   build: ?Build,
   onSaveProject: () => Promise<void>,
   isSavingProject: boolean,

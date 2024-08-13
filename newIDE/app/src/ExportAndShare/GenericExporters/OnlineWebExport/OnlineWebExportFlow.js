@@ -18,7 +18,7 @@ type OnlineWebExportFlowProps = {|
 
 const OnlineWebExportFlow = ({
   project,
-  gameAndBuilds,
+  gameAndBuildsManager,
   build,
   onSaveProject,
   isSavingProject,
@@ -29,7 +29,7 @@ const OnlineWebExportFlow = ({
   exportPipelineName,
   isExporting,
 }: OnlineWebExportFlowProps) => {
-  const { game, builds, refreshGame } = gameAndBuilds;
+  const { game, builds, refreshGame } = gameAndBuildsManager;
   const hasGameExistingBuilds =
     game && builds
       ? !!builds.filter(build => build.gameId === game.id).length

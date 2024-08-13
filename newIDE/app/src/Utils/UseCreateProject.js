@@ -32,6 +32,7 @@ import {
   type PrivateGameTemplateListingData,
 } from './GDevelopServices/Shop';
 import { createPrivateGameTemplateUrl } from './GDevelopServices/Asset';
+import { getDefaultRegisterGamePropertiesFromProject } from './UseGameAndBuildsManager';
 
 type Props = {|
   beforeCreatingProject: () => void,
@@ -156,13 +157,9 @@ const useCreateProject = ({
             await registerGame(
               authenticatedUser.getAuthorizationHeader,
               authenticatedUser.profile.id,
-              {
-                gameId: currentProject.getProjectUuid(),
-                authorName:
-                  currentProject.getAuthor() || 'Unspecified publisher',
-                gameName: currentProject.getName() || 'Untitled game',
-                templateSlug: currentProject.getTemplateSlug(),
-              }
+              getDefaultRegisterGamePropertiesFromProject({
+                project: currentProject,
+              })
             );
           } catch (error) {
             // Do not prevent the user from opening the game if the registration failed.

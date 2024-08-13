@@ -11,10 +11,10 @@ import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext'
 import { fakeBrowserOnlineWebExportPipeline } from '../../../fixtures/TestExporters';
 import { type Exporter } from '../../../ExportAndShare/ShareDialog';
 import {
-  fakeEmptyGameAndBuilds,
-  fakeGameAndBuilds,
-  fakeNotOwnedGameAndBuilds,
-} from '../../../fixtures/GDevelopServicesTestData/FakeGameAndBuilds';
+  fakeEmptyGameAndBuildsManager,
+  fakeGameAndBuildsManager,
+  fakeNotOwnedGameAndBuildsManager,
+} from '../../../fixtures/GDevelopServicesTestData/FakeGameAndBuildsManager';
 
 export default {
   title: 'QuickCustomization/QuickPublish',
@@ -35,7 +35,7 @@ export const NotAuthenticated = () => {
     <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
       <QuickPublish
         project={testProject.project}
-        gameAndBuilds={fakeEmptyGameAndBuilds}
+        gameAndBuildsManager={fakeEmptyGameAndBuildsManager}
         isSavingProject={false}
         onSaveProject={async () => {}}
         onlineWebExporter={onlineWebExporter}
@@ -51,7 +51,7 @@ export const Authenticated = () => {
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <QuickPublish
         project={testProject.project}
-        gameAndBuilds={fakeEmptyGameAndBuilds}
+        gameAndBuildsManager={fakeEmptyGameAndBuildsManager}
         isSavingProject={false}
         onSaveProject={async () => {}}
         onlineWebExporter={onlineWebExporter}
@@ -67,7 +67,7 @@ export const AuthenticatedExistingGame = () => {
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <QuickPublish
         project={testProject.project}
-        gameAndBuilds={fakeGameAndBuilds}
+        gameAndBuildsManager={fakeGameAndBuildsManager}
         isSavingProject={false}
         onSaveProject={async () => {}}
         onlineWebExporter={onlineWebExporter}
@@ -83,7 +83,7 @@ export const AuthenticatedNotOwnedGame = () => {
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <QuickPublish
         project={testProject.project}
-        gameAndBuilds={fakeNotOwnedGameAndBuilds}
+        gameAndBuildsManager={fakeNotOwnedGameAndBuildsManager}
         isSavingProject={false}
         onSaveProject={async () => {}}
         onlineWebExporter={onlineWebExporter}

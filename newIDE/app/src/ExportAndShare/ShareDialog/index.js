@@ -17,7 +17,7 @@ import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import { type FileMetadata, type StorageProvider } from '../../ProjectsStorage';
 import { useOnlineStatus } from '../../Utils/OnlineStatus';
 import ErrorBoundary from '../../UI/ErrorBoundary';
-import { useGameAndBuilds } from '../../Utils/UseGameAndBuilds';
+import { useGameAndBuildsManager } from '../../Utils/UseGameAndBuildsManager';
 
 export type ShareTab = 'invite' | 'publish';
 export type ExporterSection = 'browser' | 'desktop' | 'android' | 'ios';
@@ -152,15 +152,15 @@ const ShareDialog = ({
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { showAlert } = useAlertDialog();
 
-  const gameAndBuilds = useGameAndBuilds({ project });
+  const gameAndBuildsManager = useGameAndBuildsManager({ project });
 
   const openBuildDialog = () => {
-    if (!gameAndBuilds.game) {
+    if (!gameAndBuildsManager.game) {
       const title = t`Cannot see the exports`;
       const message =
-        gameAndBuilds.gameAvailabilityError === 'not-found'
+        gameAndBuildsManager.gameAvailabilityError === 'not-found'
           ? t`Register or publish your game first to see its exports.`
-          : gameAndBuilds.gameAvailabilityError === 'not-owned'
+          : gameAndBuildsManager.gameAvailabilityError === 'not-owned'
           ? t`You are not the owner of this game, ask the owner to add you as an owner to see its exports.`
           : t`Either this game is not registered or you are not its owner, so you cannot see its builds.`;
 
@@ -277,7 +277,7 @@ const ShareDialog = ({
       {currentTab === 'publish' && (
         <PublishHome
           project={project}
-          gameAndBuilds={gameAndBuilds}
+          gameAndBuildsManager={gameAndBuildsManager}
           onSaveProject={onSaveProject}
           isSavingProject={isSavingProject}
           onChangeSubscription={onChangeSubscription}
@@ -292,13 +292,13 @@ const ShareDialog = ({
           showOnlineWebExporterOnly={showOnlineWebExporterOnly}
         />
       )}
-      {gameAndBuilds.game && (
+      {gameAndBuildsManager.game && (
         <BuildsDialog
           open={buildsDialogOpen}
           onClose={() => setBuildsDialogOpen(false)}
           authenticatedUser={authenticatedUser}
-          game={gameAndBuilds.game}
-          onGameUpdated={gameAndBuilds.setGame}
+          game={gameAndBuildsManager.game}
+          onGameUpdated={gameAndBuildsManager.setGame}
         />
       )}
     </Dialog>

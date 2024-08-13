@@ -15,7 +15,10 @@ import GDevelopJsInitializerDecorator, {
 import { fakeBrowserOnlineWebExportPipeline } from '../../../../fixtures/TestExporters';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import { fakeStartupAuthenticatedUser } from '../../../../fixtures/GDevelopServicesTestData';
-import { fakeEmptyGameAndBuilds, fakeNotOwnedGameAndBuilds } from '../../../../fixtures/GDevelopServicesTestData/FakeGameAndBuilds';
+import {
+  fakeEmptyGameAndBuildsManager,
+  fakeNotOwnedGameAndBuildsManager,
+} from '../../../../fixtures/GDevelopServicesTestData/FakeGameAndBuildsManager';
 
 export default {
   title: 'Share/PublishHome',
@@ -45,7 +48,7 @@ export const Default = () => {
       project={testProject.project}
       onSaveProject={action('onSaveProject')}
       isSavingProject={false}
-      gameAndBuilds={fakeEmptyGameAndBuilds}
+      gameAndBuildsManager={fakeEmptyGameAndBuildsManager}
       onChangeSubscription={action('onChangeSubscription')}
       isNavigationDisabled={false}
       setIsNavigationDisabled={action('setIsNavigationDisabled')}
@@ -73,7 +76,7 @@ export const OnlineWebExporterSelected = () => {
         project={testProject.project}
         onSaveProject={action('onSaveProject')}
         isSavingProject={false}
-        gameAndBuilds={fakeEmptyGameAndBuilds}
+        gameAndBuildsManager={fakeEmptyGameAndBuildsManager}
         onChangeSubscription={action('onChangeSubscription')}
         isNavigationDisabled={false}
         setIsNavigationDisabled={action('setIsNavigationDisabled')}
@@ -102,7 +105,7 @@ export const OnlineWebExporterSelectedForGameNotOwned = () => {
         project={testProject.project}
         onSaveProject={action('onSaveProject')}
         isSavingProject={false}
-        gameAndBuilds={fakeNotOwnedGameAndBuilds}
+        gameAndBuildsManager={fakeNotOwnedGameAndBuildsManager}
         onChangeSubscription={action('onChangeSubscription')}
         isNavigationDisabled={false}
         setIsNavigationDisabled={action('setIsNavigationDisabled')}
@@ -131,7 +134,7 @@ export const OnlyOnlineWebExporter = () => {
         project={testProject.project}
         onSaveProject={action('onSaveProject')}
         isSavingProject={false}
-        gameAndBuilds={fakeEmptyGameAndBuilds}
+        gameAndBuildsManager={fakeEmptyGameAndBuildsManager}
         onChangeSubscription={action('onChangeSubscription')}
         isNavigationDisabled={false}
         setIsNavigationDisabled={action('setIsNavigationDisabled')}

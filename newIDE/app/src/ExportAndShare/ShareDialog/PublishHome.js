@@ -35,7 +35,7 @@ import Android from '../../UI/CustomSvgIcons/Android';
 import { isNativeMobileApp } from '../../Utils/Platform';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
-import { type GameAndBuilds } from '../../Utils/UseGameAndBuilds';
+import { type GameAndBuildsManager } from '../../Utils/UseGameAndBuildsManager';
 import { I18n } from '@lingui/react';
 
 const styles = {
@@ -265,7 +265,7 @@ type PublishHomeProps = {|
   project: gdProject,
   onSaveProject: () => Promise<void>,
   isSavingProject: boolean,
-  gameAndBuilds: GameAndBuilds,
+  gameAndBuildsManager: GameAndBuildsManager,
   onChangeSubscription: () => void,
   isNavigationDisabled: boolean,
   setIsNavigationDisabled: (isNavigationDisabled: boolean) => void,
@@ -282,7 +282,7 @@ const PublishHome = ({
   project,
   onSaveProject,
   isSavingProject,
-  gameAndBuilds,
+  gameAndBuildsManager,
   onChangeSubscription,
   isNavigationDisabled,
   setIsNavigationDisabled,
@@ -305,7 +305,6 @@ const PublishHome = ({
     hasSkippedSubSectionSelection,
     setHasSkippedSubSectionSelection,
   ] = React.useState<boolean>(false);
-
 
   const onBack = () => {
     if (chosenSubSection) {
@@ -553,7 +552,7 @@ const PublishHome = ({
               project={project}
               onSaveProject={onSaveProject}
               isSavingProject={isSavingProject}
-              gameAndBuilds={gameAndBuilds}
+              gameAndBuildsManager={gameAndBuildsManager}
               onChangeSubscription={onChangeSubscription}
               setIsNavigationDisabled={setIsNavigationDisabled}
             />

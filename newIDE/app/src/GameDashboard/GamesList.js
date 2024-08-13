@@ -24,6 +24,7 @@ import { Column, Line } from '../UI/Grid';
 import Text from '../UI/Text';
 import Paper from '../UI/Paper';
 import BackgroundText from '../UI/BackgroundText';
+import { getDefaultRegisterGamePropertiesFromProject } from '../Utils/UseGameAndBuildsManager';
 
 const pageSize = 10;
 
@@ -106,12 +107,11 @@ const GamesList = ({ project, games, onRefreshGames, onOpenGameId }: Props) => {
       const { id } = profile;
       try {
         setIsGameRegistering(true);
-        await registerGame(getAuthorizationHeader, id, {
-          gameId: project.getProjectUuid(),
-          authorName: project.getAuthor() || 'Unspecified publisher',
-          gameName: project.getName() || 'Untitled game',
-          templateSlug: project.getTemplateSlug(),
-        });
+        await registerGame(
+          getAuthorizationHeader,
+          id,
+          getDefaultRegisterGamePropertiesFromProject({ project })
+        );
         await onRefreshGames();
       } catch (error) {
         console.error('Unable to register the game.', error);

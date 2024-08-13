@@ -7,17 +7,19 @@ import {
   pendingCordovaBuild,
   pendingElectronBuild,
 } from '.';
+import { type GameAndBuildsManager } from '../../Utils/UseGameAndBuildsManager';
 
-export const fakeEmptyGameAndBuilds = {
+export const fakeEmptyGameAndBuildsManager: GameAndBuildsManager = {
   game: null,
   setGame: () => {},
   refreshGame: async () => {},
   gameAvailabilityError: null,
   builds: null,
   refreshBuilds: async () => {},
+  registerGameIfNeeded: async () => {},
 };
 
-export const fakeGameAndBuilds = {
+export const fakeGameAndBuildsManager: GameAndBuildsManager = {
   game: fakeGame,
   setGame: () => {},
   refreshGame: async () => {},
@@ -30,22 +32,25 @@ export const fakeGameAndBuilds = {
     completeWebBuild,
   ],
   refreshBuilds: async () => {},
+  registerGameIfNeeded: async () => {},
 };
 
-export const fakeNotOwnedGameAndBuilds = {
+export const fakeNotOwnedGameAndBuildsManager: GameAndBuildsManager = {
   game: null,
   setGame: () => {},
   refreshGame: async () => {},
   gameAvailabilityError: 'not-owned',
   builds: null,
   refreshBuilds: async () => {},
+  registerGameIfNeeded: async () => {},
 };
 
-export const fakeUnexpectedErrorGameAndBuilds = {
+export const fakeUnexpectedErrorGameAndBuildsManager: GameAndBuildsManager = {
   game: null,
   setGame: () => {},
   refreshGame: async () => {},
   gameAvailabilityError: 'unexpected',
   builds: null,
   refreshBuilds: async () => {},
+  registerGameIfNeeded: async () => {},
 };

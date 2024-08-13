@@ -10,7 +10,6 @@ import PublishHome from './PublishHome';
 import { type ExportPipeline } from '../ExportPipeline.flow';
 import { Tabs } from '../../UI/Tabs';
 import InviteHome from './InviteHome';
-import { getGame, type Game } from '../../Utils/GDevelopServices/Game';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import TextButton from '../../UI/TextButton';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
@@ -18,8 +17,7 @@ import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import { type FileMetadata, type StorageProvider } from '../../ProjectsStorage';
 import { useOnlineStatus } from '../../Utils/OnlineStatus';
 import ErrorBoundary from '../../UI/ErrorBoundary';
-import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
-import { type GameAvailabilityError } from '../../GameDashboard/GameRegistration';
+import { useGameAndBuilds } from '../../Utils/UseGameAndBuilds';
 
 export type ShareTab = 'invite' | 'publish';
 export type ExporterSection = 'browser' | 'desktop' | 'android' | 'ios';
@@ -150,22 +148,19 @@ const ShareDialog = ({
     isNavigationDisabled,
     setIsNavigationDisabled,
   ] = React.useState<boolean>(false);
-  const [game, setGame] = React.useState<?Game>(null);
-  const [
-    gameAvailabilityError,
-    setGameAvailabilityError,
-  ] = React.useState<?GameAvailabilityError>(null);
+
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const { profile, getAuthorizationHeader } = authenticatedUser;
   const { showAlert } = useAlertDialog();
 
+  const gameAndBuilds = useGameAndBuilds({ project });
+
   const openBuildDialog = () => {
-    if (!game) {
+    if (!gameAndBuilds.game) {
       const title = t`Cannot see the exports`;
       const message =
-        gameAvailabilityError === 'not-found'
+        gameAndBuilds.gameAvailabilityError === 'not-found'
           ? t`Register or publish your game first to see its exports.`
-          : gameAvailabilityError === 'not-owned'
+          : gameAndBuilds.gameAvailabilityError === 'not-owned'
           ? t`You are not the owner of this game, ask the owner to add you as an owner to see its exports.`
           : t`Either this game is not registered or you are not its owner, so you cannot see its builds.`;
 
@@ -177,48 +172,6 @@ const ShareDialog = ({
     }
     setBuildsDialogOpen(true);
   };
-
-  const loadGame = React.useCallback(
-    async () => {
-      if (!profile || !project) return;
-
-      const { id } = profile;
-      try {
-        setGameAvailabilityError(null);
-        const game = await getGame(
-          getAuthorizationHeader,
-          id,
-          project.getProjectUuid()
-        );
-        setGame(game);
-      } catch (error) {
-        console.error('Unable to load the game', error);
-        const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
-          error
-        );
-        if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {
-          setGameAvailabilityError('not-found');
-          return;
-        }
-        if (extractedStatusAndCode && extractedStatusAndCode.status === 403) {
-          setGameAvailabilityError('not-owned');
-          return;
-        }
-        setGameAvailabilityError('unexpected');
-      }
-    },
-    [project, getAuthorizationHeader, profile]
-  );
-
-  React.useEffect(
-    () => {
-      // Load game only once.
-      if (!game) {
-        loadGame();
-      }
-    },
-    [loadGame, game]
-  );
 
   const exporters = React.useMemo(
     () => [
@@ -324,9 +277,9 @@ const ShareDialog = ({
       {currentTab === 'publish' && (
         <PublishHome
           project={project}
+          gameAndBuilds={gameAndBuilds}
           onSaveProject={onSaveProject}
           isSavingProject={isSavingProject}
-          onRefreshGame={loadGame}
           onChangeSubscription={onChangeSubscription}
           isNavigationDisabled={isNavigationDisabled}
           setIsNavigationDisabled={setIsNavigationDisabled}
@@ -335,19 +288,17 @@ const ShareDialog = ({
           onChooseSubSection={setChosenExporterSubSection}
           chosenSection={chosenExporterSection}
           chosenSubSection={chosenExporterSubSection}
-          game={game}
-          gameAvailabilityError={gameAvailabilityError}
           allExportersRequireOnline={allExportersRequireOnline}
           showOnlineWebExporterOnly={showOnlineWebExporterOnly}
         />
       )}
-      {game && (
+      {gameAndBuilds.game && (
         <BuildsDialog
           open={buildsDialogOpen}
           onClose={() => setBuildsDialogOpen(false)}
           authenticatedUser={authenticatedUser}
-          game={game}
-          onGameUpdated={setGame}
+          game={gameAndBuilds.game}
+          onGameUpdated={gameAndBuilds.setGame}
         />
       )}
     </Dialog>

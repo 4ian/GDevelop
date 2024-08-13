@@ -15,6 +15,7 @@ import GDevelopJsInitializerDecorator, {
 import { fakeBrowserOnlineWebExportPipeline } from '../../../../fixtures/TestExporters';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import { fakeStartupAuthenticatedUser } from '../../../../fixtures/GDevelopServicesTestData';
+import { fakeEmptyGameAndBuilds, fakeNotOwnedGameAndBuilds } from '../../../../fixtures/GDevelopServicesTestData/FakeGameAndBuilds';
 
 export default {
   title: 'Share/PublishHome',
@@ -44,7 +45,7 @@ export const Default = () => {
       project={testProject.project}
       onSaveProject={action('onSaveProject')}
       isSavingProject={false}
-      onRefreshGame={action('onRefreshGame')}
+      gameAndBuilds={fakeEmptyGameAndBuilds}
       onChangeSubscription={action('onChangeSubscription')}
       isNavigationDisabled={false}
       setIsNavigationDisabled={action('setIsNavigationDisabled')}
@@ -53,8 +54,6 @@ export const Default = () => {
       onChooseSubSection={setChosenExporterSubSection}
       chosenSection={chosenExporterSection}
       chosenSubSection={chosenExporterSubSection}
-      game={null}
-      gameAvailabilityError={null}
     />
   );
 };
@@ -74,7 +73,7 @@ export const OnlineWebExporterSelected = () => {
         project={testProject.project}
         onSaveProject={action('onSaveProject')}
         isSavingProject={false}
-        onRefreshGame={action('onRefreshGame')}
+        gameAndBuilds={fakeEmptyGameAndBuilds}
         onChangeSubscription={action('onChangeSubscription')}
         isNavigationDisabled={false}
         setIsNavigationDisabled={action('setIsNavigationDisabled')}
@@ -83,8 +82,6 @@ export const OnlineWebExporterSelected = () => {
         onChooseSubSection={setChosenExporterSubSection}
         chosenSection={chosenExporterSection}
         chosenSubSection={chosenExporterSubSection}
-        game={null}
-        gameAvailabilityError={null}
       />
     </AuthenticatedUserContext.Provider>
   );
@@ -105,7 +102,7 @@ export const OnlineWebExporterSelectedForGameNotOwned = () => {
         project={testProject.project}
         onSaveProject={action('onSaveProject')}
         isSavingProject={false}
-        onRefreshGame={action('onRefreshGame')}
+        gameAndBuilds={fakeNotOwnedGameAndBuilds}
         onChangeSubscription={action('onChangeSubscription')}
         isNavigationDisabled={false}
         setIsNavigationDisabled={action('setIsNavigationDisabled')}
@@ -114,8 +111,6 @@ export const OnlineWebExporterSelectedForGameNotOwned = () => {
         onChooseSubSection={setChosenExporterSubSection}
         chosenSection={chosenExporterSection}
         chosenSubSection={chosenExporterSubSection}
-        game={null}
-        gameAvailabilityError="not-owned"
       />
     </AuthenticatedUserContext.Provider>
   );
@@ -136,7 +131,7 @@ export const OnlyOnlineWebExporter = () => {
         project={testProject.project}
         onSaveProject={action('onSaveProject')}
         isSavingProject={false}
-        onRefreshGame={action('onRefreshGame')}
+        gameAndBuilds={fakeEmptyGameAndBuilds}
         onChangeSubscription={action('onChangeSubscription')}
         isNavigationDisabled={false}
         setIsNavigationDisabled={action('setIsNavigationDisabled')}
@@ -145,8 +140,6 @@ export const OnlyOnlineWebExporter = () => {
         onChooseSubSection={setChosenExporterSubSection}
         chosenSection={chosenExporterSection}
         chosenSubSection={chosenExporterSubSection}
-        game={null}
-        gameAvailabilityError={null}
         showOnlineWebExporterOnly
       />
     </AuthenticatedUserContext.Provider>

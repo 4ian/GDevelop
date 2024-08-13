@@ -12,6 +12,7 @@ import PreviewIcon from '../UI/CustomSvgIcons/Preview';
 import { type Exporter } from '../ExportAndShare/ShareDialog';
 import { mapFor } from '../Utils/MapFor';
 import { canSwapAssetOfObject } from '../AssetStore/AssetSwapper';
+import { type GameAndBuilds } from '../Utils/UseGameAndBuilds';
 
 const gd: libGDevelop = global.gd;
 
@@ -146,6 +147,7 @@ export const enumerateObjectFolderOrObjects = (
 
 type Props = {|
   project: gdProject,
+  gameAndBuilds: GameAndBuilds,
   resourceManagementProps: ResourceManagementProps,
   quickCustomizationState: QuickCustomizationState,
   onLaunchPreview: () => Promise<void>,
@@ -156,6 +158,7 @@ type Props = {|
 
 export const renderQuickCustomization = ({
   project,
+  gameAndBuilds,
   resourceManagementProps,
   quickCustomizationState,
   onLaunchPreview,
@@ -211,6 +214,7 @@ export const renderQuickCustomization = ({
           <QuickPublish
             onlineWebExporter={onlineWebExporter}
             project={project}
+            gameAndBuilds={gameAndBuilds}
             setIsNavigationDisabled={
               quickCustomizationState.setIsNavigationDisabled
             }

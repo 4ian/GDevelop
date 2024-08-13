@@ -22,7 +22,6 @@ import { type BuildStep } from '../Builds/BuildStepsProgress';
 import {
   registerGame,
   getGame,
-  type Game,
   setGameUserAcls,
   getAclsFromUserIds,
 } from '../../Utils/GDevelopServices/Game';
@@ -37,7 +36,7 @@ import { type EventsFunctionsExtensionsState } from '../../EventsFunctionsExtens
 import inc from 'semver/functions/inc';
 import Toggle from '../../UI/Toggle';
 import AlertMessage from '../../UI/AlertMessage';
-import { type GameAvailabilityError } from '../../GameDashboard/GameRegistration';
+import { type GameAndBuilds } from '../../Utils/UseGameAndBuilds';
 
 type State = {|
   exportStep: BuildStep,
@@ -56,16 +55,12 @@ type Props = {|
   project: gdProject,
   onSaveProject: () => Promise<void>,
   isSavingProject: boolean,
+  gameAndBuilds: GameAndBuilds,
   onChangeSubscription: () => void,
   authenticatedUser: AuthenticatedUser,
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
   exportPipeline: ExportPipeline<any, any, any, any, any>,
   setIsNavigationDisabled: (isNavigationDisabled: boolean) => void,
-  onRefreshGame: () => Promise<void>,
-  game: ?Game,
-  gameAvailabilityError: ?GameAvailabilityError,
-  builds: ?Array<Build>,
-  onRefreshBuilds: () => Promise<void>,
   shouldAutomaticallyStartExport?: boolean,
   uiMode?: 'minimal',
 |};
@@ -189,7 +184,7 @@ export default class ExportLauncher extends Component<Props, State> {
           setTimeout(() => {
             this.setState({ build });
             authenticatedUser.onRefreshLimits();
-            this.props.onRefreshBuilds();
+            this.props.gameAndBuilds.refreshBuilds();
           }, 3000);
         }
       },
@@ -217,6 +212,7 @@ export default class ExportLauncher extends Component<Props, State> {
     }
   };
 
+  // TODO: move
   _registerGameIfNot = async () => {
     const profile = this.props.authenticatedUser.profile;
     const getAuthorizationHeader = this.props.authenticatedUser
@@ -245,7 +241,7 @@ export default class ExportLauncher extends Component<Props, State> {
           });
           // We don't await for the authors update, as it is not required for publishing.
           this._tryUpdateAuthors();
-          this.props.onRefreshGame();
+          this.props.gameAndBuilds.refreshGame();
         }
       }
     }
@@ -433,9 +429,9 @@ export default class ExportLauncher extends Component<Props, State> {
         });
 
         // When the build is started, update the game because the build may be linked to it.
-        this.props.onRefreshGame();
+        this.props.gameAndBuilds.refreshGame();
         // Also refresh the builds list, as the new build will be considered as a pending build.
-        this.props.onRefreshBuilds();
+        this.props.gameAndBuilds.refreshBuilds();
       }
       setStep('done');
       this.setState({
@@ -473,10 +469,7 @@ export default class ExportLauncher extends Component<Props, State> {
       exportPipeline,
       onSaveProject,
       isSavingProject,
-      builds,
-      game,
-      gameAvailabilityError,
-      onRefreshGame,
+      gameAndBuilds,
       uiMode,
     } = this.props;
     if (!project) return null;
@@ -490,11 +483,11 @@ export default class ExportLauncher extends Component<Props, State> {
     );
 
     const hasBuildsCurrentlyRunning = () => {
-      if (!builds) return false;
+      if (!gameAndBuilds.builds) return false;
 
       // We check pending builds that are not more than 10 minutes old,
       // to avoid counting builds that may be stuck.
-      return !!builds.filter(
+      return !!gameAndBuilds.builds.filter(
         build =>
           build.status === 'pending' &&
           build.type === exportPipeline.onlineBuildType &&
@@ -530,8 +523,8 @@ export default class ExportLauncher extends Component<Props, State> {
         {!isUsingOnlineBuildNonAuthenticated && (
           <Column noMargin>
             {!!exportPipeline.onlineBuildType &&
-              gameAvailabilityError &&
-              gameAvailabilityError === 'not-owned' && (
+              gameAndBuilds.gameAvailabilityError &&
+              gameAndBuilds.gameAvailabilityError === 'not-owned' && (
                 <AlertMessage kind="warning">
                   <Trans>
                     The project currently opened is registered online but you
@@ -651,8 +644,7 @@ export default class ExportLauncher extends Component<Props, State> {
           {!isUsingOnlineBuildNonAuthenticated &&
             exportPipeline.renderExportFlow({
               project,
-              game,
-              builds,
+              gameAndBuilds,
               disabled: !canLaunchBuild(authenticatedUser),
               launchExport: async () =>
                 this.launchWholeExport({ payWithCredits: false }),
@@ -664,7 +656,6 @@ export default class ExportLauncher extends Component<Props, State> {
               isExporting,
               stepCurrentProgress,
               stepMaxProgress,
-              onRefreshGame,
               uiMode: uiMode || 'full',
             })}
           {doneFooterOpen &&

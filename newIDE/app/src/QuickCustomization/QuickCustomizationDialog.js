@@ -10,6 +10,7 @@ import Text from '../UI/Text';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import Paper from '../UI/Paper';
 import { type Exporter } from '../ExportAndShare/ShareDialog';
+import { useGameAndBuilds } from '../Utils/UseGameAndBuilds';
 
 type Props = {|
   project: gdProject,
@@ -32,6 +33,7 @@ export const QuickCustomizationDialog = ({
   isSavingProject,
   canClose,
 }: Props) => {
+  const gameAndBuilds = useGameAndBuilds({ project });
   const quickCustomizationState = useQuickCustomizationState({ onClose });
   const { windowSize } = useResponsiveWindowSize();
 
@@ -44,6 +46,7 @@ export const QuickCustomizationDialog = ({
     content,
   } = renderQuickCustomization({
     project,
+    gameAndBuilds,
     resourceManagementProps,
     onLaunchPreview,
     quickCustomizationState,

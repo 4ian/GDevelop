@@ -1,5 +1,5 @@
 // @flow
-import { Trans, t } from '@lingui/macro';
+import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import Chrome from '../../UI/CustomSvgIcons/Chrome';
 import Apple from '../../UI/CustomSvgIcons/Apple';
@@ -29,16 +29,13 @@ import Facebook from '../../UI/CustomSvgIcons/Facebook';
 import GdGames from '../../UI/CustomSvgIcons/GdGames';
 import ItchIo from '../../UI/CustomSvgIcons/ItchIo';
 import CloudDownload from '../../UI/CustomSvgIcons/CloudDownload';
-import { type Game } from '../../Utils/GDevelopServices/Game';
-import { getBuilds, type Build } from '../../Utils/GDevelopServices/Build';
 import Wrench from '../../UI/CustomSvgIcons/Wrench';
 import EventsFunctionsExtensionsContext from '../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import Android from '../../UI/CustomSvgIcons/Android';
 import { isNativeMobileApp } from '../../Utils/Platform';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
-import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
-import { type GameAvailabilityError } from '../../GameDashboard/GameRegistration';
+import { type GameAndBuilds } from '../../Utils/UseGameAndBuilds';
 import { I18n } from '@lingui/react';
 
 const styles = {
@@ -268,7 +265,7 @@ type PublishHomeProps = {|
   project: gdProject,
   onSaveProject: () => Promise<void>,
   isSavingProject: boolean,
-  onRefreshGame: () => Promise<void>,
+  gameAndBuilds: GameAndBuilds,
   onChangeSubscription: () => void,
   isNavigationDisabled: boolean,
   setIsNavigationDisabled: (isNavigationDisabled: boolean) => void,
@@ -277,8 +274,6 @@ type PublishHomeProps = {|
   onChooseSubSection: (subSection: ?ExporterSubSection) => void,
   chosenSection: ?ExporterSection,
   chosenSubSection: ?ExporterSubSection,
-  game: ?Game,
-  gameAvailabilityError: ?GameAvailabilityError,
   allExportersRequireOnline?: boolean,
   showOnlineWebExporterOnly?: boolean,
 |};
@@ -287,24 +282,22 @@ const PublishHome = ({
   project,
   onSaveProject,
   isSavingProject,
+  gameAndBuilds,
   onChangeSubscription,
   isNavigationDisabled,
   setIsNavigationDisabled,
-  onRefreshGame,
   selectedExporter,
   onChooseSection,
   onChooseSubSection,
   chosenSection,
   chosenSubSection,
-  game,
-  gameAvailabilityError,
   allExportersRequireOnline,
   showOnlineWebExporterOnly,
 }: PublishHomeProps) => {
   const { isMobile } = useResponsiveWindowSize();
   const isOnline = useOnlineStatus();
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const { profile, getAuthorizationHeader } = authenticatedUser;
+
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
   );
@@ -312,9 +305,7 @@ const PublishHome = ({
     hasSkippedSubSectionSelection,
     setHasSkippedSubSectionSelection,
   ] = React.useState<boolean>(false);
-  const [builds, setBuilds] = React.useState<?Array<Build>>(null);
 
-  const { showAlert } = useAlertDialog();
 
   const onBack = () => {
     if (chosenSubSection) {
@@ -329,31 +320,6 @@ const PublishHome = ({
       onChooseSection(null);
     }
   };
-
-  const refreshBuilds = React.useCallback(
-    async () => {
-      if (!profile) return;
-
-      try {
-        const userBuilds = await getBuilds(getAuthorizationHeader, profile.id);
-        setBuilds(userBuilds);
-      } catch (error) {
-        console.error('Error while loading builds:', error);
-        showAlert({
-          title: t`Error while loading builds`,
-          message: t`An error occurred while loading your builds. Verify your internet connection and try again.`,
-        });
-      }
-    },
-    [profile, getAuthorizationHeader, showAlert]
-  );
-
-  React.useEffect(
-    () => {
-      refreshBuilds();
-    },
-    [refreshBuilds]
-  );
 
   const shouldShowBackButton = !!(chosenSection || chosenSubSection);
 
@@ -587,13 +553,9 @@ const PublishHome = ({
               project={project}
               onSaveProject={onSaveProject}
               isSavingProject={isSavingProject}
-              onRefreshGame={onRefreshGame}
+              gameAndBuilds={gameAndBuilds}
               onChangeSubscription={onChangeSubscription}
               setIsNavigationDisabled={setIsNavigationDisabled}
-              game={game}
-              gameAvailabilityError={gameAvailabilityError}
-              builds={builds}
-              onRefreshBuilds={refreshBuilds}
             />
           )}
         </I18n>

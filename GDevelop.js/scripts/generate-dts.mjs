@@ -72,6 +72,14 @@ const castFunctions = {
   ImageResource: { inputType: 'Resource', returnType: 'ImageResource' },
 };
 
+const extraClassAttributes = {
+  QuickCustomization: [
+    'static Default = 0;',
+    'static Visible = 1;',
+    'static Hidden = 2;',
+  ]
+}
+
 const PrimitiveTypes = new Map([
   ['DOMString', 'string'],
   ['long', 'number'],
@@ -331,6 +339,8 @@ for (const [
       inheritedClass ? inheritedClass : 'EmscriptenObject'
     } {${methods.length ? '\n  ' + methods.join('\n  ') : ''}${
       attributes.length ? '\n  ' + attributes.join('\n  ') : ''
+    }${
+      (extraClassAttributes[interfaceName] || []).join('\n  ')
     }
 }`
   );

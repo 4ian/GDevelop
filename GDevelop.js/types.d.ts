@@ -1496,7 +1496,9 @@ export class ObjectMetadata extends EmscriptenObject {
   isRenderedIn3D(): boolean;
 }
 
-export class QuickCustomization extends EmscriptenObject {
+export class QuickCustomization extends EmscriptenObject {static Default = 0;
+  static Visible = 1;
+  static Hidden = 2;
 }
 
 export class BehaviorMetadata extends EmscriptenObject {

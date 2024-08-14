@@ -5,12 +5,13 @@ import { ExampleTile } from '../AssetStore/ShopTiles';
 import { GridList } from '@material-ui/core';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
+import { type QuickCustomizationRecommendation } from '../Utils/GDevelopServices/User';
 
 type Props = {|
   onSelectExampleShortHeader: (
     exampleShortHeader: ExampleShortHeader
   ) => Promise<void>,
-  maxCount: number,
+  quickCustomizationRecommendation: QuickCustomizationRecommendation,
 |};
 
 const styles = {
@@ -22,18 +23,9 @@ const styles = {
   cellSpacing: 2,
 };
 
-const featuredExampleSlugs = [
-  '3d-car-coin-hunt',
-  'tappy-plane',
-  'plinko',
-  'multiplayer-jump-game',
-  '3d-lane-runner',
-  'run-dino-run',
-];
-
 export const QuickCustomizationGameTiles = ({
   onSelectExampleShortHeader,
-  maxCount,
+  quickCustomizationRecommendation,
 }: Props) => {
   const { exampleShortHeaders } = React.useContext(ExampleStoreContext);
   const { windowSize } = useResponsiveWindowSize();
@@ -41,15 +33,19 @@ export const QuickCustomizationGameTiles = ({
   const displayedExampleShortHeaders = React.useMemo(
     () =>
       exampleShortHeaders
-        ? featuredExampleSlugs
-            .map(slug => {
+        ? quickCustomizationRecommendation.list
+            .map(({ type, exampleSlug }) => {
+              if (type !== 'example') {
+                return null;
+              }
+
               return exampleShortHeaders.find(
-                exampleShortHeader => exampleShortHeader.slug === slug
+                exampleShortHeader => exampleShortHeader.slug === exampleSlug
               );
             })
             .filter(Boolean)
         : null,
-    [exampleShortHeaders]
+    [exampleShortHeaders, quickCustomizationRecommendation.list]
   );
 
   return (
@@ -69,7 +65,7 @@ export const QuickCustomizationGameTiles = ({
               key={exampleShortHeader.name}
             />
           ))
-        : new Array(maxCount)
+        : new Array(quickCustomizationRecommendation.list.length)
             .fill(0)
             .map((_, index) => (
               <ExampleTile

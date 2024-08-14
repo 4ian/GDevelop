@@ -93,25 +93,33 @@ export type UserSurvey = {|
  * Official tutorial registered in the tutorial database.
  * Can be a youtube video, wiki page or blog article.
  */
-export type GDevelopTutorialRecommendation = {|
+export type GDevelopTutorialRecommendation = {
   type: 'gdevelop-tutorial',
   /**
    * Id of the tutorial in the database.
    */
   id: string,
-|};
-export type PlanRecommendation = {|
+};
+export type PlanRecommendation = {
   type: 'plan',
   id: 'silver' | 'gold' | 'startup' | 'business' | 'education',
-|};
-export type GuidedLessonsRecommendation = {|
+};
+export type GuidedLessonsRecommendation = {
   type: 'guided-lessons',
-  lessonsIds?: string[],
-|};
+  lessonsIds: string[],
+};
+export type QuickCustomizationRecommendation = {
+  type: 'quick-customization',
+  list: Array<{
+    type: 'example',
+    exampleSlug: string,
+  }>,
+};
 export type Recommendation =
   | GDevelopTutorialRecommendation
   | GuidedLessonsRecommendation
-  | PlanRecommendation;
+  | PlanRecommendation
+  | QuickCustomizationRecommendation;
 
 export type UserPublicProfile = {|
   id: string,

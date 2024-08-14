@@ -258,6 +258,11 @@ const RecommendationList = ({
     recommendation => recommendation.type === 'plan'
   );
 
+  // $FlowIgnore
+  const quickCustomizationRecommendation: ?QuickCustomizationRecommendation = recommendations.find(
+    recommendation => recommendation.type === 'quick-customization'
+  );
+
   const getInAppTutorialPartProgress = ({
     tutorialId,
   }: {
@@ -288,15 +293,17 @@ const RecommendationList = ({
             </SectionRow>
           );
 
-        if (true /*TODO */) {
+        if (quickCustomizationRecommendation) {
           items.push(
             <SectionRow key="customize-and-publish">
               <Text size="section-title" noMargin>
                 <Trans>Customize a game and publish it in 1 minute</Trans>
               </Text>
-
+              <Spacer />
               <QuickCustomizationGameTiles
-                maxCount={6}
+                quickCustomizationRecommendation={
+                  quickCustomizationRecommendation
+                }
                 onSelectExampleShortHeader={async exampleShortHeader => {
                   const projectIsClosed = await askToCloseProject();
                   if (!projectIsClosed) {

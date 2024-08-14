@@ -112,9 +112,9 @@ const useCreateProject = ({
       newProjectSetup: NewProjectSetup,
       options?: { openAllScenes: boolean }
     ) => {
-      if (!newProjectSource) return; // New project creation aborted.
-
       try {
+        if (!newProjectSource) return; // New project creation aborted.
+
         let state: ?State;
         const sourceStorageProvider = newProjectSource.storageProvider;
         const sourceStorageProviderOperations = sourceStorageProvider

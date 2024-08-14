@@ -107,7 +107,7 @@ const BadgeItem = ({
                   <Trans>
                     {(achievement &&
                       selectMessageByLocale(i18n, achievement.nameByLocale)) ||
-                      ''}
+                      '-'}
                   </Trans>
                 </b>
               </Text>
@@ -118,7 +118,7 @@ const BadgeItem = ({
                       i18n,
                       achievement.shortDescriptionByLocale
                     )) ||
-                    ''}
+                    '-'}
                 </Trans>
               </Text>
               <Text size="body" noMargin>

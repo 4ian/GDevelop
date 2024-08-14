@@ -3237,7 +3237,7 @@ const MainFrame = (props: Props) => {
     ]
   );
 
-  const showLoader = isLoadingProject || previewLoading;
+  const showLoader = isProjectOpening || isLoadingProject || previewLoading;
   const shortcutMap = useShortcutMap();
   const buildMainMenuProps = {
     i18n: i18n,

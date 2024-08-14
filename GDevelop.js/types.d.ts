@@ -222,9 +222,6 @@ export class VersionWrapper extends EmscriptenObject {
   static revision(): number;
   static fullString(): string;
   static status(): string;
-  static year(): string;
-  static month(): string;
-  static date(): string;
 }
 
 export class Platform extends EmscriptenObject {

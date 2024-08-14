@@ -182,9 +182,6 @@ interface VersionWrapper {
 
     [Const, Value] DOMString STATIC_FullString();
     [Const, Value] DOMString STATIC_Status();
-    [Const, Value] DOMString STATIC_Year();
-    [Const, Value] DOMString STATIC_Month();
-    [Const, Value] DOMString STATIC_Date();
 };
 
 interface Platform {

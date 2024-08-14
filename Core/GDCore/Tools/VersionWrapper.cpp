@@ -24,15 +24,6 @@ int VersionWrapper::Revision() {
              : 0;
 }
 gd::String VersionWrapper::FullString() { return GD_VERSION_STRING; }
-gd::String VersionWrapper::Date() {
-  return gd::String(GD_DATE_STRING).substr(4, 2);
-}
-gd::String VersionWrapper::Month() {
-  return gd::String(GD_DATE_STRING).substr(0, 3);
-}
-gd::String VersionWrapper::Year() {
-  return gd::String(GD_DATE_STRING).substr(7, 4);
-}
 gd::String VersionWrapper::Status() {
   return Revision() == 0 ? "Release" : "Dev";
 }

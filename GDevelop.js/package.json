@@ -13,8 +13,8 @@
     "port"
   ],
   "scripts": {
-    "build": "node scripts/sync-versions.js && grunt build",
-    "build-with-MinGW": "node scripts/sync-versions.js && grunt build --use-MinGW",
+    "build": "grunt build",
+    "build-with-MinGW": "grunt build --use-MinGW",
     "clean": "grunt clean",
     "test": "jest"
   },

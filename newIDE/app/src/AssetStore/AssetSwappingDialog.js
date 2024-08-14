@@ -131,9 +131,6 @@ function AssetSwappingDialog({
         <>
           <Dialog
             title={<Trans>Swap {object.getName()} with another asset</Trans>}
-            secondaryActions={[
-              <HelpButton helpPagePath="/objects" key="help" />,
-            ]}
             actions={[
               <FlatButton
                 key="close"

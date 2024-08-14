@@ -113,6 +113,7 @@ export type QuickCustomizationRecommendation = {
   list: Array<{
     type: 'example',
     exampleSlug: string,
+    thumbnailTitleByLocale: MessageByLocale,
   }>,
 };
 export type Recommendation =

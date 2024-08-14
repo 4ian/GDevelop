@@ -518,11 +518,13 @@ export const ExampleTile = ({
   exampleShortHeader,
   onSelect,
   style,
+  customTitle,
 }: {|
   exampleShortHeader: ExampleShortHeader | null,
   onSelect: () => void,
   /** Props needed so that GridList component can adjust tile size */
   style?: any,
+  customTitle?: string,
 |}) => {
   const classesForGridListItem = useStylesForGridListItem();
   return (
@@ -564,7 +566,9 @@ export const ExampleTile = ({
               size="body2"
               hidden={!exampleShortHeader}
             >
-              {exampleShortHeader
+              {customTitle
+                ? customTitle
+                : exampleShortHeader
                 ? exampleShortHeader.name
                 : // Use some placeholder text to avoid layout shift while loading content.
                   'Abcdef123'}

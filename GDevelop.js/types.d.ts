@@ -729,6 +729,10 @@ export class ObjectJsImplementation extends ObjectConfiguration {
 
 export class CustomObjectConfiguration extends ObjectConfiguration {
   clone(): UniquePtrObjectConfiguration;
+  isForcedToOverrideEventsBasedObjectChildrenConfiguration(): boolean;
+  isMarkedAsOverridingEventsBasedObjectChildrenConfiguration(): boolean;
+  setMarkedAsOverridingEventsBasedObjectChildrenConfiguration(isOverridingEventsBasedObjectChildrenConfiguration: boolean): void;
+  clearChildrenConfiguration(): void;
   getChildObjectConfiguration(objectName: string): ObjectConfiguration;
   getProperties(): MapStringPropertyDescriptor;
   updateProperty(name: string, value: string): boolean;

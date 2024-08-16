@@ -42,8 +42,13 @@ import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMea
 import Add from '../../UI/CustomSvgIcons/Add';
 import Dialog from '../../UI/Dialog';
 import HelpButton from '../../UI/HelpButton';
+import RestoreIcon from '../../UI/CustomSvgIcons/Restore';
 
 const gd: libGDevelop = global.gd;
+
+const styles = {
+  icon: { width: 16, height: 16 },
+};
 
 type Props = EditorProps;
 
@@ -195,10 +200,15 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                   {eventBasedObject &&
                     (!customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration() &&
                     !customObjectConfiguration.isMarkedAsOverridingEventsBasedObjectChildrenConfiguration() ? (
-                      <Line>
-                        <Column expand noMargin alignItems="center">
+                      <Line alignItems="center">
+                        <Column expand noMargin>
+                          <Text size="block-title">Children objects</Text>
+                        </Column>
+                        <Column alignItems="right">
                           <FlatButton
-                            label={<Trans>Show children configuration</Trans>}
+                            label={
+                              <Trans>Override children configuration</Trans>
+                            }
                             onClick={() => {
                               customObjectConfiguration.setMarkedAsOverridingEventsBasedObjectChildrenConfiguration(
                                 true
@@ -211,9 +221,13 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                     ) : (
                       <>
                         {!customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration() && (
-                          <Line>
-                            <Column expand noMargin alignItems="center">
+                          <Line alignItems="center">
+                            <Column expand noMargin>
+                              <Text size="block-title">Children objects</Text>
+                            </Column>
+                            <Column alignItems="right">
                               <FlatButton
+                                leftIcon={<RestoreIcon style={styles.icon} />}
                                 label={
                                   <Trans>
                                     Reset and hide children configuration

@@ -39,6 +39,7 @@ import { EmptyPlaceholder } from '../UI/EmptyPlaceholder';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import SearchBar from '../UI/SearchBar';
 import { renderQuickCustomizationMenuItems } from '../QuickCustomization/QuickCustomizationMenuItems';
+import ResourceTypeSelectField from '../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/ResourceTypeSelectField';
 
 const gd: libGDevelop = global.gd;
 
@@ -73,6 +74,16 @@ export const usePropertyOverridingAlertDialog = () => {
       dismissButtonLabel: t`Omit`,
     });
   };
+};
+
+const setExtraInfoString = (
+  property: gdNamedPropertyDescriptor,
+  value: string
+) => {
+  const vectorString = new gd.VectorString();
+  vectorString.push_back(value);
+  property.setExtraInfo(vectorString);
+  vectorString.delete();
 };
 
 type Props = {|
@@ -657,6 +668,12 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                             if (value === 'Behavior') {
                                               property.setHidden(false);
                                             }
+                                            if (value === 'Resource') {
+                                              setExtraInfoString(
+                                                property,
+                                                'json'
+                                              );
+                                            }
                                             forceUpdate();
                                             onPropertiesUpdated &&
                                               onPropertiesUpdated();
@@ -687,6 +704,11 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                             key="property-type-color"
                                             value="Color"
                                             label={t`Color (text)`}
+                                          />
+                                          <SelectOption
+                                            key="property-type-resource"
+                                            value="Resource"
+                                            label={t`Resource (JavaScript only)`}
                                           />
                                           {!isSceneProperties && (
                                             <SelectOption
@@ -839,6 +861,25 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                               onPropertiesUpdated &&
                                                 onPropertiesUpdated();
                                             }}
+                                          />
+                                        )}
+                                        {property.getType() === 'Resource' && (
+                                          <ResourceTypeSelectField
+                                            value={
+                                              property.getExtraInfo().size() > 0
+                                                ? property.getExtraInfo().at(0)
+                                                : ''
+                                            }
+                                            onChange={(e, i, value) => {
+                                              setExtraInfoString(
+                                                property,
+                                                value
+                                              );
+                                              forceUpdate();
+                                              onPropertiesUpdated &&
+                                                onPropertiesUpdated();
+                                            }}
+                                            fullWidth
                                           />
                                         )}
                                         {property.getType() === 'Choice' && (

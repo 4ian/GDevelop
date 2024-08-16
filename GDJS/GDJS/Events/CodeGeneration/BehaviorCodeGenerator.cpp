@@ -421,7 +421,8 @@ gd::String BehaviorCodeGenerator::GenerateUpdatePropertyFromNetworkSyncDataCode(
 gd::String BehaviorCodeGenerator::GeneratePropertyValueCode(
     const gd::PropertyDescriptor& property) {
   if (property.GetType() == "String" || property.GetType() == "Choice" ||
-      property.GetType() == "Color" || property.GetType() == "Behavior") {
+      property.GetType() == "Color" || property.GetType() == "Behavior" ||
+      property.GetType() == "Resource") {
     return EventsCodeGenerator::ConvertToStringExplicit(property.GetValue());
   } else if (property.GetType() == "Number") {
     return "Number(" +

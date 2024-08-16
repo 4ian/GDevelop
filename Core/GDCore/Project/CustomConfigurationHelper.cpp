@@ -26,7 +26,7 @@ void CustomConfigurationHelper::InitializeContent(
 
     if (propertyType == "String" || propertyType == "Choice" ||
         propertyType == "Color" || propertyType == "Behavior" ||
-        propertyType == "resource") {
+        propertyType == "Resource") {
       element.SetStringValue(property->GetValue());
     } else if (propertyType == "Number") {
       element.SetDoubleValue(property->GetValue().To<double>());
@@ -53,7 +53,7 @@ std::map<gd::String, gd::PropertyDescriptor> CustomConfigurationHelper::GetPrope
     if (configurationContent.HasChild(propertyName)) {
       if (propertyType == "String" || propertyType == "Choice" ||
           propertyType == "Color" || propertyType == "Behavior" ||
-          propertyType == "resource") {
+          propertyType == "Resource") {
         newProperty.SetValue(
             configurationContent.GetChild(propertyName).GetStringValue());
       } else if (propertyType == "Number") {
@@ -89,7 +89,7 @@ bool CustomConfigurationHelper::UpdateProperty(
 
   if (propertyType == "String" || propertyType == "Choice" ||
       propertyType == "Color" || propertyType == "Behavior" ||
-      propertyType == "resource") {
+      propertyType == "Resource") {
     element.SetStringValue(newValue);
   } else if (propertyType == "Number") {
     element.SetDoubleValue(newValue.To<double>());

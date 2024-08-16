@@ -51,9 +51,12 @@ export const QuickCustomizationDialog = ({
     [quickCustomizationState]
   );
 
-  const onTryAnotherGame = React.useCallback(() => {
-    onClose({ tryAnotherGame: true });
-  }, [onClose]);
+  const onTryAnotherGame = React.useCallback(
+    () => {
+      onClose({ tryAnotherGame: true });
+    },
+    [onClose]
+  );
 
   const {
     title,

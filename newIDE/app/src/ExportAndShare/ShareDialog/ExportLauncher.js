@@ -363,7 +363,8 @@ export default class ExportLauncher extends Component<Props, State> {
         });
         showErrorBox({
           message:
-            getErrorMessage(i18n, this.state.exportStep) + (error.message ? `\n\n${error.message}` : ''),
+            getErrorMessage(i18n, this.state.exportStep) +
+            (error.message ? `\n\n${error.message}` : ''),
           rawError: {
             exportStep: this.state.exportStep,
             rawError: error,

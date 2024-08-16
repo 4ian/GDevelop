@@ -9,7 +9,10 @@ import {
   fakeSilverAuthenticatedUser,
 } from '../../../fixtures/GDevelopServicesTestData';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
-import { fakeBrowserOnlineWebExportPipeline, fakeErroringBrowserOnlineWebExportPipeline } from '../../../fixtures/TestExporters';
+import {
+  fakeBrowserOnlineWebExportPipeline,
+  fakeErroringBrowserOnlineWebExportPipeline,
+} from '../../../fixtures/TestExporters';
 import { type Exporter } from '../../../ExportAndShare/ShareDialog';
 import {
   fakeEmptyGameAndBuildsManager,

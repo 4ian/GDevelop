@@ -3796,7 +3796,7 @@ const MainFrame = (props: Props) => {
           onLaunchPreview={
             hotReloadPreviewButtonProps.launchProjectDataOnlyPreview
           }
-          onClose={(options) => {
+          onClose={options => {
             setQuickCustomizationDialogOpenedFromGameId(null);
             if (options && options.tryAnotherGame) {
               // Close the project so the user is back at where they can chose a game to customize

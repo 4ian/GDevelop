@@ -4,7 +4,6 @@ import { I18n } from '@lingui/react';
 import * as React from 'react';
 import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
-import HelpButton from '../UI/HelpButton';
 import { AssetStore, type AssetStoreInterface } from '.';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import RaisedButton from '../UI/RaisedButton';

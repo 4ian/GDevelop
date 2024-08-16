@@ -55,8 +55,11 @@ type Props = {|
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
   exportPipeline: ExportPipeline<any, any, any, any, any>,
   setIsNavigationDisabled: (isNavigationDisabled: boolean) => void,
-  shouldAutomaticallyStartExport?: boolean,
   uiMode?: 'minimal',
+
+  onExportLaunched?: () => void,
+  onExportSucceeded?: () => void,
+  onExportErrored?: () => void,
 |};
 
 const getIncrementedVersionNumber = (project: gdProject) => {
@@ -78,6 +81,35 @@ const getBuildCreditPrice = (
   authenticatedUser.limits && onlineBuildType
     ? authenticatedUser.limits.credits.prices[onlineBuildType]
     : null;
+
+const getErrorMessage = (i18n: I18nType, exportStep: BuildStep) => {
+  switch (exportStep) {
+    case 'export':
+      return i18n._(t`Error while exporting the game.`);
+    case 'resources-download':
+      return i18n._(
+        t`Error while downloading the game resources. Check your internet connection and that all resources of the game are valid in the Resources editor.`
+      );
+    case 'compress':
+      return i18n._(t`Error while compressing the game.`);
+    case 'upload':
+      return i18n._(
+        t`Error while uploading the game. Check your internet connection or try again later.`
+      );
+    case 'waiting-for-build':
+      return i18n._(
+        t`Error while building the game. Check the logs of the build for more details.`
+      );
+    case 'build':
+      return i18n._(
+        t`Error while building of the game. Check the logs of the build for more details.`
+      );
+    default:
+      return i18n._(
+        t`Error while building the game. Try again later. Your internet connection may be slow or one of your resources may be corrupted.`
+      );
+  }
+};
 
 /**
  * A generic UI to launch, monitor the progress and get the result
@@ -107,12 +139,6 @@ export default class ExportLauncher extends Component<Props, State> {
     // Fetch limits when the export launcher is opened, to ensure we display the
     // latest limits.
     this.props.authenticatedUser.onRefreshLimits();
-  }
-
-  componentDidMount() {
-    if (this.props.shouldAutomaticallyStartExport) {
-      this.launchWholeExport({ payWithCredits: false });
-    }
   }
 
   componentWillUnmount() {
@@ -205,53 +231,9 @@ export default class ExportLauncher extends Component<Props, State> {
     )
       return;
 
-    const getErrorMessage = () => {
-      switch (this.state.exportStep) {
-        case 'export':
-          return i18n._(t`Error while exporting the game.`);
-        case 'resources-download':
-          return i18n._(
-            t`Error while downloading the game resources. Check your internet connection and that all resources of the game are valid in the Resources editor.`
-          );
-        case 'compress':
-          return i18n._(t`Error while compressing the game.`);
-        case 'upload':
-          return i18n._(
-            t`Error while uploading the game. Check your internet connection or try again later.`
-          );
-        case 'waiting-for-build':
-          return i18n._(
-            t`Error while building the game. Check the logs of the build for more details.`
-          );
-        case 'build':
-          return i18n._(
-            t`Error while building of the game. Check the logs of the build for more details.`
-          );
-        default:
-          return i18n._(
-            t`Error while building the game. Try again later. Your internet connection may be slow or one of your resources may be corrupted.`
-          );
-      }
-    };
-
-    const handleError = (err: Error) => {
-      if (!this.state.errored) {
-        this.setState({
-          errored: true,
-        });
-        showErrorBox({
-          message:
-            getErrorMessage() + (err.message ? `\n\n${err.message}` : ''),
-          rawError: {
-            exportStep: this.state.exportStep,
-            rawError: err,
-          },
-          errorId: 'export-error',
-        });
-      }
-    };
-
     const setStep = (step: BuildStep) => this.setState({ exportStep: step });
+
+    if (this.props.onExportLaunched) this.props.onExportLaunched();
 
     try {
       setStep('register');
@@ -372,9 +354,24 @@ export default class ExportLauncher extends Component<Props, State> {
         compressionOutput,
         doneFooterOpen: true,
       });
+      if (this.props.onExportSucceeded) this.props.onExportSucceeded();
     } catch (error) {
       console.error('An error happened during export:', error);
-      handleError(error);
+      if (!this.state.errored) {
+        this.setState({
+          errored: true,
+        });
+        showErrorBox({
+          message:
+            getErrorMessage(i18n, this.state.exportStep) + (error.message ? `\n\n${error.message}` : ''),
+          rawError: {
+            exportStep: this.state.exportStep,
+            rawError: error,
+          },
+          errorId: 'export-error',
+        });
+      }
+      if (this.props.onExportErrored) this.props.onExportErrored();
     }
   };
 

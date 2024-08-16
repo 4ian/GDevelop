@@ -137,3 +137,19 @@ export const fakeBrowserOnlineWebExportPipeline: ExportPipeline<
     return completeWebBuild;
   },
 };
+
+export const fakeErroringBrowserOnlineWebExportPipeline: ExportPipeline<
+  ExportState,
+  PreparedExporter,
+  ExportOutput,
+  ResourcesDownloadOutput,
+  CompressionOutput
+> = {
+  ...fakeBrowserOnlineWebExportPipeline,
+  launchResourcesDownload: async (
+    context: ExportPipelineContext<ExportState>,
+    { textFiles, urlFiles }: ExportOutput
+  ): Promise<ResourcesDownloadOutput> => {
+    throw new Error('Error while downloading the game resources.');
+  },
+};

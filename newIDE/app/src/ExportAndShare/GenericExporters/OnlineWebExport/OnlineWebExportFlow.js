@@ -2,13 +2,10 @@
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import { type ExportFlowProps } from '../../ExportPipeline.flow';
-import {
-  ColumnStackLayout,
-  ResponsiveLineStackLayout,
-} from '../../../UI/Layout';
+import { ResponsiveLineStackLayout } from '../../../UI/Layout';
 import FlatButton from '../../../UI/FlatButton';
 import RaisedButton from '../../../UI/RaisedButton';
-import { Line } from '../../../UI/Grid';
+import { Column } from '../../../UI/Grid';
 import OnlineGameLink from './OnlineGameLink';
 
 type OnlineWebExportFlowProps = {|
@@ -28,6 +25,7 @@ const OnlineWebExportFlow = ({
   launchExport,
   exportPipelineName,
   isExporting,
+  uiMode,
 }: OnlineWebExportFlowProps) => {
   const { game, builds, refreshGame } = gameAndBuildsManager;
   const hasGameExistingBuilds =
@@ -40,37 +38,41 @@ const OnlineWebExportFlow = ({
     setAutomaticallyOpenGameProperties,
   ] = React.useState(false);
 
-  const isExportPending = exportStep !== '' && exportStep !== 'done';
+  // Only show the buttons when the export is not started or when it's done.
+  const shouldShowButtons =
+    uiMode === 'minimal'
+      ? exportStep === ''
+      : exportStep === '' || exportStep === 'done';
 
-  const Buttons = isExportPending ? null : hasGameExistingBuilds &&
-    isPublishedOnGdgames ? (
-    <ResponsiveLineStackLayout justifyContent="center">
-      <FlatButton
-        label={<Trans>Generate a new link</Trans>}
-        primary
-        id={`launch-export-${exportPipelineName}-web-button`}
-        onClick={async () => {
-          setAutomaticallyOpenGameProperties(false);
-          await launchExport();
-        }}
-        disabled={disabled}
-      />
+  const exportButtons =
+    hasGameExistingBuilds && isPublishedOnGdgames ? (
+      <ResponsiveLineStackLayout justifyContent="stretch" noMargin>
+        <RaisedButton
+          label={<Trans>Update the game page</Trans>}
+          primary
+          id={`launch-export-and-publish-${exportPipelineName}-web-button`}
+          onClick={async () => {
+            await launchExport();
+            // Set to true after the export is done, so that the game properties
+            // are automatically opened only when the build is finished.
+            setAutomaticallyOpenGameProperties(true);
+          }}
+          disabled={disabled}
+        />
+        <FlatButton
+          label={<Trans>Generate a new link</Trans>}
+          primary
+          id={`launch-export-${exportPipelineName}-web-button`}
+          onClick={async () => {
+            setAutomaticallyOpenGameProperties(false);
+            await launchExport();
+          }}
+          disabled={disabled}
+        />
+      </ResponsiveLineStackLayout>
+    ) : (
       <RaisedButton
-        label={<Trans>Update the game page</Trans>}
-        primary
-        id={`launch-export-and-publish-${exportPipelineName}-web-button`}
-        onClick={async () => {
-          await launchExport();
-          // Set to true after the export is done, so that the game properties
-          // are automatically opened only when the build is finished.
-          setAutomaticallyOpenGameProperties(true);
-        }}
-        disabled={disabled}
-      />
-    </ResponsiveLineStackLayout>
-  ) : (
-    <Line justifyContent="center">
-      <RaisedButton
+        fullWidth
         label={
           hasGameExistingBuilds ? (
             <Trans>Generate a new link</Trans>
@@ -86,12 +88,11 @@ const OnlineWebExportFlow = ({
         }}
         disabled={disabled}
       />
-    </Line>
-  );
+    );
 
   return (
-    <ColumnStackLayout noMargin>
-      {Buttons}
+    <Column noMargin>
+      {shouldShowButtons ? exportButtons : null}
       <OnlineGameLink
         build={build}
         project={project}
@@ -103,7 +104,7 @@ const OnlineWebExportFlow = ({
         onRefreshGame={refreshGame}
         game={game}
       />
-    </ColumnStackLayout>
+    </Column>
   );
 };
 

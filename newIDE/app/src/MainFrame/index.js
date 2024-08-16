@@ -3796,7 +3796,15 @@ const MainFrame = (props: Props) => {
           onLaunchPreview={
             hotReloadPreviewButtonProps.launchProjectDataOnlyPreview
           }
-          onClose={() => setQuickCustomizationDialogOpenedFromGameId(null)}
+          onClose={(options) => {
+            setQuickCustomizationDialogOpenedFromGameId(null);
+            if (options && options.tryAnotherGame) {
+              // Close the project so the user is back at where they can chose a game to customize
+              // which is probably the home page.
+              closeProject();
+              openHomePage();
+            }
+          }}
           onlineWebExporter={quickPublishOnlineWebExporter}
           onSaveProject={saveProject}
           isSavingProject={isSavingProject}

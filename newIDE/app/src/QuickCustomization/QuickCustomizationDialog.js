@@ -16,7 +16,7 @@ type Props = {|
   project: gdProject,
   resourceManagementProps: ResourceManagementProps,
   onLaunchPreview: () => Promise<void>,
-  onClose: () => void,
+  onClose: (?{| tryAnotherGame: boolean |}) => void,
   onlineWebExporter: Exporter,
   onSaveProject: () => Promise<void>,
   isSavingProject: boolean,
@@ -44,6 +44,17 @@ export const QuickCustomizationDialog = ({
 
   const isMediumOrSmaller = windowSize === 'small' || windowSize === 'medium';
 
+  const onContinueQuickCustomization = React.useCallback(
+    () => {
+      quickCustomizationState.goToPreviousStep();
+    },
+    [quickCustomizationState]
+  );
+
+  const onTryAnotherGame = React.useCallback(() => {
+    onClose({ tryAnotherGame: true });
+  }, [onClose]);
+
   const {
     title,
     titleRightContent,
@@ -58,6 +69,9 @@ export const QuickCustomizationDialog = ({
     onlineWebExporter,
     onSaveProject,
     isSavingProject,
+    onClose,
+    onContinueQuickCustomization,
+    onTryAnotherGame,
   });
 
   return (
@@ -71,28 +85,32 @@ export const QuickCustomizationDialog = ({
       }
       maxWidth="md"
       fullHeight
-      actions={[
-        quickCustomizationState.canGoToPreviousStep ? (
-          <FlatButton
-            key="previous"
-            label={<Trans>Back</Trans>}
-            onClick={quickCustomizationState.goToPreviousStep}
-            disabled={
-              !quickCustomizationState.canGoToPreviousStep ||
-              quickCustomizationState.isNavigationDisabled
-            }
-          />
-        ) : null,
-        <DialogPrimaryButton
-          key="next"
-          label={quickCustomizationState.step.nextLabel}
-          primary
-          onClick={quickCustomizationState.goToNextStep}
-          disabled={quickCustomizationState.isNavigationDisabled}
-        />,
-      ]}
+      actions={
+        !quickCustomizationState.step.shouldHideNavigationButtons
+          ? [
+              quickCustomizationState.canGoToPreviousStep ? (
+                <FlatButton
+                  key="previous"
+                  label={<Trans>Back</Trans>}
+                  onClick={quickCustomizationState.goToPreviousStep}
+                  disabled={
+                    !quickCustomizationState.canGoToPreviousStep ||
+                    quickCustomizationState.isNavigationDisabled
+                  }
+                />
+              ) : null,
+              <DialogPrimaryButton
+                key="next"
+                label={quickCustomizationState.step.nextLabel}
+                primary
+                onClick={quickCustomizationState.goToNextStep}
+                disabled={quickCustomizationState.isNavigationDisabled}
+              />,
+            ]
+          : undefined
+      }
       secondaryActions={[
-        quickCustomizationState.step.shouldHideCloseButton ||
+        quickCustomizationState.step.shouldHideNavigationButtons ||
         !canClose ? null : (
           <FlatButton
             key="close"

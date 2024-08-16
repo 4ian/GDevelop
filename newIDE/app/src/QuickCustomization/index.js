@@ -22,7 +22,7 @@ type Step = {|
   canPreview: boolean,
   title: React.Node,
   nextLabel: React.Node,
-  shouldHideCloseButton?: boolean,
+  shouldHideNavigationButtons?: boolean,
 |};
 
 const steps: Array<Step> = [
@@ -43,7 +43,7 @@ const steps: Array<Step> = [
     canPreview: false,
     title: <Trans>Publish and try your game</Trans>,
     nextLabel: <Trans>Finish</Trans>,
-    shouldHideCloseButton: true,
+    shouldHideNavigationButtons: true,
   },
 ];
 
@@ -154,6 +154,10 @@ type Props = {|
   onlineWebExporter: Exporter,
   onSaveProject: () => Promise<void>,
   isSavingProject: boolean,
+
+  onClose: () => void,
+  onContinueQuickCustomization: () => void,
+  onTryAnotherGame: () => void,
 |};
 
 export const renderQuickCustomization = ({
@@ -165,6 +169,10 @@ export const renderQuickCustomization = ({
   onlineWebExporter,
   onSaveProject,
   isSavingProject,
+
+  onClose,
+  onContinueQuickCustomization,
+  onTryAnotherGame,
 }: Props) => {
   return {
     title: quickCustomizationState.step.title,
@@ -223,6 +231,9 @@ export const renderQuickCustomization = ({
             }
             onSaveProject={onSaveProject}
             isSavingProject={isSavingProject}
+            onClose={onClose}
+            onContinueQuickCustomization={onContinueQuickCustomization}
+            onTryAnotherGame={onTryAnotherGame}
           />
         ) : null}
       </>

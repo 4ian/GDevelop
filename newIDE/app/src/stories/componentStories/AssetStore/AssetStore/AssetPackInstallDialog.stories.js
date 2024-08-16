@@ -15,11 +15,10 @@ import {
 import { AssetStoreStateProvider } from '../../../../AssetStore/AssetStoreContext';
 import { testProject } from '../../../GDevelopJsInitializerDecorator';
 import PrivateAssetsAuthorizationContext from '../../../../AssetStore/PrivateAssets/PrivateAssetsAuthorizationContext';
-import LocalEventsFunctionsExtensionWriter from '../../../../EventsFunctionsExtensionsLoader/Storage/LocalEventsFunctionsExtensionWriter';
-import LocalEventsFunctionsExtensionOpener from '../../../../EventsFunctionsExtensionsLoader/Storage/LocalEventsFunctionsExtensionOpener';
 import EventsFunctionsExtensionsContext from '../../../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import fakeResourceManagementProps from '../../../FakeResourceManagement';
 import { useShopNavigation } from '../../../../AssetStore/AssetStoreNavigator';
+import { fakeEventsFunctionsExtensionsState } from '../../../FakeEventsFunctionsExtensionsContext';
 
 export default {
   title: 'AssetStore/AssetStore/AssetPackInstallDialog',
@@ -76,24 +75,11 @@ const mockFailedApiDataForPublicAsset1 = [
   },
 ];
 
-const fakeEventsFunctionsExtensionsContext = {
-  loadProjectEventsFunctionsExtensions: async project => {},
-  unloadProjectEventsFunctionsExtensions: project => {},
-  unloadProjectEventsFunctionsExtension: (project, extensionName) => {},
-  reloadProjectEventsFunctionsExtensions: async project => {},
-  reloadProjectEventsFunctionsExtensionMetadata: (project, extension) => {},
-  getEventsFunctionsExtensionWriter: () => LocalEventsFunctionsExtensionWriter,
-  getEventsFunctionsExtensionOpener: () => LocalEventsFunctionsExtensionOpener,
-  ensureLoadFinished: async () => {},
-  getIncludeFileHashs: () => ({}),
-  eventsFunctionsExtensionsError: null,
-};
-
 const Wrapper = ({ children }: { children: React.Node }) => {
   const navigationState = useShopNavigation();
   return (
     <EventsFunctionsExtensionsContext.Provider
-      value={fakeEventsFunctionsExtensionsContext}
+      value={fakeEventsFunctionsExtensionsState}
     >
       <AssetStoreStateProvider shopNavigationState={navigationState}>
         {children}

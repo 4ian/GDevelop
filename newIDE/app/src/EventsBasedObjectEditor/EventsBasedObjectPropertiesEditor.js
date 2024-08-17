@@ -207,14 +207,14 @@ export default function EventsBasedObjectPropertiesEditor({
     [searchText, triggerSearch]
   );
 
-  const addProperty = React.useCallback(
-    () => {
+  const addPropertyAt = React.useCallback(
+    (index: number) => {
       const properties = eventsBasedObject.getPropertyDescriptors();
 
       const newName = newNameGenerator('Property', name =>
         properties.has(name)
       );
-      const property = properties.insertNew(newName, properties.getCount());
+      const property = properties.insertNew(newName, index);
       property.setType('Number');
       forceUpdate();
       onPropertiesUpdated && onPropertiesUpdated();
@@ -222,6 +222,14 @@ export default function EventsBasedObjectPropertiesEditor({
       setSearchText('');
     },
     [eventsBasedObject, forceUpdate, onPropertiesUpdated]
+  );
+
+  const addProperty = React.useCallback(
+    () => {
+      const properties = eventsBasedObject.getPropertyDescriptors();
+      addPropertyAt(properties.getCount());
+    },
+    [addPropertyAt, eventsBasedObject]
   );
 
   const removeProperty = React.useCallback(
@@ -603,6 +611,12 @@ export default function EventsBasedObjectPropertiesEditor({
                                       </IconButton>
                                     }
                                     buildMenuTemplate={(i18n: I18nType) => [
+                                      {
+                                        label: i18n._(
+                                          t`Add a property below`
+                                        ),
+                                        click: () => addPropertyAt(i + 1),
+                                      },
                                       {
                                         label: i18n._(t`Delete`),
                                         click: () =>

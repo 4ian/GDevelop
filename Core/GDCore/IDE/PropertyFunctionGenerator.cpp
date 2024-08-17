@@ -153,8 +153,7 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
             extension.GetName(), eventsBasedEntity.GetName());
         objectParameter.SetExtraInfo(objectFullType);
       }
-      setter.GetParameters().InsertParameter(
-          objectParameter, setter.GetParameters().GetParametersCount());
+      setter.GetParameters().AddParameter(objectParameter);
       if (isBehavior) {
         gd::ParameterMetadata behaviorParameter;
         gd::String behaviorFullType =
@@ -164,8 +163,7 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
             .SetName("Behavior")
             .SetDescription("Behavior")
             .SetExtraInfo(behaviorFullType);
-        setter.GetParameters().InsertParameter(
-            behaviorParameter, setter.GetParameters().GetParametersCount());
+        setter.GetParameters().AddParameter(behaviorParameter);
       }
       gd::ParameterMetadata valueParameter;
       valueParameter.SetType("yesorno")
@@ -173,8 +171,7 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
           .SetDescription(capitalizedName)
           .SetOptional(true)
           .SetDefaultValue("yes");
-      setter.GetParameters().InsertParameter(
-          valueParameter, setter.GetParameters().GetParametersCount());
+      setter.GetParameters().AddParameter(valueParameter);
     } else {
       setter.SetFunctionType(gd::EventsFunction::ActionWithOperator);
       setter.SetGetterName(getterName);

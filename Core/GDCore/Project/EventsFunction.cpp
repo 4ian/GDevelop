@@ -40,20 +40,17 @@ const gd::ParameterMetadataContainer &EventsFunction::GetParametersForEvents(
   for (size_t i = 0; i < expressionValueParameterIndex &&
                      i < expressionParameters.GetParametersCount();
        i++) {
-    actionWithOperationParameters.InsertParameter(
-        expressionParameters.GetParameter(i),
-        actionWithOperationParameters.GetParametersCount());
+    actionWithOperationParameters.AddParameter(
+        expressionParameters.GetParameter(i));
   }
   gd::ParameterMetadata parameterMetadata;
   parameterMetadata.SetName("Value").SetValueTypeMetadata(
       expression.expressionType);
-  actionWithOperationParameters.InsertParameter(
-      parameterMetadata, actionWithOperationParameters.GetParametersCount());
+  actionWithOperationParameters.AddParameter(parameterMetadata);
   for (size_t i = expressionValueParameterIndex;
        i < expressionParameters.GetParametersCount(); i++) {
-    actionWithOperationParameters.InsertParameter(
-        expressionParameters.GetParameter(i),
-        actionWithOperationParameters.GetParametersCount());
+    actionWithOperationParameters.AddParameter(
+        expressionParameters.GetParameter(i));
   }
 
   return actionWithOperationParameters;

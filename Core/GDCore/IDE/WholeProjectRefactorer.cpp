@@ -104,7 +104,7 @@ void WholeProjectRefactorer::EnsureBehaviorEventsFunctionsProperParameters(
     auto &parameters = eventsFunction->GetParameters();
     while (parameters.GetParametersCount() < 2) {
       gd::ParameterMetadata newParameter;
-      parameters.InsertParameter(newParameter, 0);
+      parameters.AddParameter(newParameter);
     }
 
     parameters.GetParameter(0)
@@ -129,7 +129,7 @@ void WholeProjectRefactorer::EnsureObjectEventsFunctionsProperParameters(
     auto &parameters = eventsFunction->GetParameters();
     while (parameters.GetParametersCount() < 1) {
       gd::ParameterMetadata newParameter;
-      parameters.InsertParameter(newParameter, 0);
+      parameters.AddParameter(newParameter);
     }
 
     parameters.GetParameter(0)

@@ -433,8 +433,8 @@ module.exports = {
           .getChild('worldScale')
           .setDoubleValue(
             Math.sqrt(
-              sharedContent.getChild('scaleX').getDoubleValue().toString(10) *
-                sharedContent.getChild('scaleY').getDoubleValue().toString(10)
+              sharedContent.getChild('scaleX').getDoubleValue() *
+                sharedContent.getChild('scaleY').getDoubleValue()
             )
           );
       }

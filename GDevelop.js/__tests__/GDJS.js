@@ -126,7 +126,6 @@ describe('libGD.js - GDJS related tests', function () {
 
 </widget>`
       );
-      console.dir(fs.writeToFile.mock.calls);
       expect(fs.writeToFile).toHaveBeenCalledWith(
         '/fake-export-dir/package.json',
         `

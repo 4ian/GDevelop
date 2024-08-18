@@ -17,6 +17,8 @@ import { Line } from '../UI/Grid';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import Checkbox from '../UI/Checkbox';
 import { type ExtensionItemConfigurationAttribute } from '../EventsFunctionsExtensionEditor';
+import SelectField from '../UI/SelectField';
+import SelectOption from '../UI/SelectOption';
 
 const gd: libGDevelop = global.gd;
 
@@ -138,6 +140,32 @@ export default function EventsBasedBehaviorEditor({
               </Trans>
             </AlertMessage>
           )}
+          <SelectField
+            floatingLabelText={
+              <Trans>Visibility in quick customization dialog</Trans>
+            }
+            value={eventsBasedBehavior.getQuickCustomizationVisibility()}
+            onChange={(e, i, valueString: string) => {
+              // $FlowFixMe
+              const value: QuickCustomization_Visibility = valueString;
+              eventsBasedBehavior.setQuickCustomizationVisibility(value);
+              onChange();
+            }}
+            fullWidth
+          >
+            <SelectOption
+              value={gd.QuickCustomization.Default}
+              label={t`Default (visible)`}
+            />
+            <SelectOption
+              value={gd.QuickCustomization.Visible}
+              label={t`Always visible`}
+            />
+            <SelectOption
+              value={gd.QuickCustomization.Hidden}
+              label={t`Hidden`}
+            />
+          </SelectField>
           <Checkbox
             label={<Trans>Private</Trans>}
             checked={eventsBasedBehavior.isPrivate()}

@@ -61,6 +61,7 @@ import { type RenderEditorContainerPropsWithRef } from './EditorContainers/BaseE
 import ErrorBoundary, {
   getEditorErrorBoundaryProps,
 } from '../UI/ErrorBoundary';
+import { type Exporter } from '../ExportAndShare/ShareDialog';
 import ResourcesLoader from '../ResourcesLoader/index';
 import {
   type PreviewLauncherInterface,
@@ -190,6 +191,7 @@ import useSaveReminder from './UseSaveReminder';
 import { useMultiplayerLobbyConfigurator } from './UseMultiplayerLobbyConfigurator';
 import { useAuthenticatedPlayer } from './UseAuthenticatedPlayer';
 import ListIcon from '../UI/ListIcon';
+import { QuickCustomizationDialog } from '../QuickCustomization/QuickCustomizationDialog';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -308,6 +310,7 @@ export type Props = {|
   extensionsLoader?: JsExtensionsLoader,
   initialFileMetadataToOpen: ?FileMetadata,
   initialExampleSlugToOpen: ?string,
+  quickPublishOnlineWebExporter: Exporter,
   i18n: I18n,
 |};
 
@@ -421,7 +424,7 @@ const MainFrame = (props: Props) => {
     renderOpenConfirmDialog,
   } = useOpenConfirmDialog();
   const {
-    findLeaderboardsToReplace,
+    openLeaderboardReplacerDialogIfNeeded,
     renderLeaderboardReplacerDialog,
   } = useLeaderboardReplacer();
   const {
@@ -471,6 +474,10 @@ const MainFrame = (props: Props) => {
     fileMetadataOpeningMessage,
     setFileMetadataOpeningMessage,
   ] = React.useState<?MessageDescriptor>(null);
+  const [
+    quickCustomizationDialogOpenedFromGameId,
+    setQuickCustomizationDialogOpenedFromGameId,
+  ] = React.useState<?string>(null);
 
   const { getAuthenticatedPlayerForPreview } = useAuthenticatedPlayer();
 
@@ -501,6 +508,7 @@ const MainFrame = (props: Props) => {
     i18n,
     renderGDJSDevelopmentWatcher,
     renderMainMenu,
+    quickPublishOnlineWebExporter,
   } = props;
 
   const {
@@ -1141,9 +1149,15 @@ const MainFrame = (props: Props) => {
     }) => {
       setNewProjectSetupDialogOpen(false);
       closeExampleStoreDialog({ deselectExampleAndGameTemplate: true });
-      findLeaderboardsToReplace(project, oldProjectId);
-      configureMultiplayerLobbiesIfNeeded(project, oldProjectId);
-      options && options.openAllScenes
+      if (options.openQuickCustomizationDialog) {
+        setQuickCustomizationDialogOpenedFromGameId(oldProjectId);
+      } else {
+        // Replace leaderboards and configure multiplayer lobbies if needed.
+        // In the case of quick customization, this will be done later.
+        openLeaderboardReplacerDialogIfNeeded(project, oldProjectId);
+        configureMultiplayerLobbiesIfNeeded(project, oldProjectId);
+      }
+      options.openAllScenes || options.openQuickCustomizationDialog
         ? openAllScenes({
             currentProject: project,
             editorTabs,
@@ -3210,6 +3224,7 @@ const MainFrame = (props: Props) => {
       getStorageProvider,
       onFetchNewlyAddedResources,
       getStorageProviderResourceOperations,
+      canInstallPrivateAsset,
     }),
     [
       resourceSources,
@@ -3218,10 +3233,11 @@ const MainFrame = (props: Props) => {
       getStorageProvider,
       onFetchNewlyAddedResources,
       getStorageProviderResourceOperations,
+      canInstallPrivateAsset,
     ]
   );
 
-  const showLoader = isLoadingProject || previewLoading;
+  const showLoader = isProjectOpening || isLoadingProject || previewLoading;
   const shortcutMap = useShortcutMap();
   const buildMainMenuProps = {
     i18n: i18n,
@@ -3445,16 +3461,16 @@ const MainFrame = (props: Props) => {
                     canOpen: !!props.storageProviders.filter(
                       ({ hiddenInOpenDialog }) => !hiddenInOpenDialog
                     ).length,
-                    canInstallPrivateAsset,
                     onChooseProject: () => openOpenFromStorageProviderDialog(),
                     onOpenRecentFile: openFromFileMetadataWithStorageProvider,
                     onOpenNewProjectSetupDialog: () => {
                       setNewProjectSetupDialogOpen(true);
                     },
                     onOpenProjectManager: () => openProjectManager(true),
-                    onCloseProject: () => askToCloseProject(),
+                    askToCloseProject,
                     onOpenExampleStore: openExampleStoreDialog,
                     onSelectExampleShortHeader: onSelectExampleShortHeader,
+                    onCreateProjectFromExample: createProjectFromExample,
                     onPreviewPrivateGameTemplateListingData: privateGameTemplateListingData =>
                       onSelectPrivateGameTemplate({
                         privateGameTemplateListingData,
@@ -3638,6 +3654,11 @@ const MainFrame = (props: Props) => {
             openPreferencesDialog(false);
             if (options.languageDidChange) _languageDidChange();
           }}
+          onOpenQuickCustomizationDialog={() =>
+            setQuickCustomizationDialogOpenedFromGameId(
+              'fake-source-game-id-for-testing'
+            )
+          }
         />
       )}
       {languageDialogOpen && (
@@ -3765,6 +3786,30 @@ const MainFrame = (props: Props) => {
         <DiagnosticReportDialog
           wholeProjectDiagnosticReport={currentProject.getWholeProjectDiagnosticReport()}
           onClose={() => setDiagnosticReportDialogOpen(false)}
+        />
+      )}
+
+      {quickCustomizationDialogOpenedFromGameId && currentProject && (
+        <QuickCustomizationDialog
+          project={currentProject}
+          resourceManagementProps={resourceManagementProps}
+          onLaunchPreview={
+            hotReloadPreviewButtonProps.launchProjectDataOnlyPreview
+          }
+          onClose={options => {
+            setQuickCustomizationDialogOpenedFromGameId(null);
+            if (options && options.tryAnotherGame) {
+              // Close the project so the user is back at where they can chose a game to customize
+              // which is probably the home page.
+              closeProject();
+              openHomePage();
+            }
+          }}
+          onlineWebExporter={quickPublishOnlineWebExporter}
+          onSaveProject={saveProject}
+          isSavingProject={isSavingProject}
+          canClose={true}
+          sourceGameId={quickCustomizationDialogOpenedFromGameId}
         />
       )}
       <CustomDragLayer />

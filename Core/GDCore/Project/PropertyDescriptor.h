@@ -9,6 +9,7 @@
 
 #include "GDCore/String.h"
 #include "GDCore/Project/MeasurementUnit.h"
+#include "GDCore/Project/QuickCustomization.h"
 
 namespace gd {
 class SerializerElement;
@@ -32,14 +33,16 @@ class GD_CORE_API PropertyDescriptor {
   PropertyDescriptor(gd::String propertyValue)
       : currentValue(propertyValue), type("string"), label(""), hidden(false),
         deprecated(false), advanced(false),
-        measurementUnit(gd::MeasurementUnit::GetUndefined()) {}
+        measurementUnit(gd::MeasurementUnit::GetUndefined()),
+        quickCustomizationVisibility(QuickCustomization::Visibility::Default) {}
 
   /**
    * \brief Empty constructor creating an empty property to be displayed.
    */
   PropertyDescriptor()
       : hidden(false), deprecated(false), advanced(false),
-        measurementUnit(gd::MeasurementUnit::GetUndefined()){};
+        measurementUnit(gd::MeasurementUnit::GetUndefined()),
+        quickCustomizationVisibility(QuickCustomization::Visibility::Default){};
 
   /**
    * \brief Destructor
@@ -109,7 +112,7 @@ class GD_CORE_API PropertyDescriptor {
     extraInformation.push_back(info);
     return *this;
   }
-  
+
   /**
    * \brief Change the unit of measurement of the property value.
    */
@@ -128,7 +131,7 @@ class GD_CORE_API PropertyDescriptor {
   const std::vector<gd::String>& GetExtraInfo() const {
     return extraInformation;
   }
-  
+
   std::vector<gd::String>& GetExtraInfo() {
     return extraInformation;
   }
@@ -172,6 +175,13 @@ class GD_CORE_API PropertyDescriptor {
    */
   bool IsAdvanced() const { return advanced; }
 
+  QuickCustomization::Visibility GetQuickCustomizationVisibility() const { return quickCustomizationVisibility; }
+
+  PropertyDescriptor& SetQuickCustomizationVisibility(QuickCustomization::Visibility visibility) {
+    quickCustomizationVisibility = visibility;
+    return *this;
+  }
+
   /** \name Serialization
    */
   ///@{
@@ -212,6 +222,7 @@ class GD_CORE_API PropertyDescriptor {
   bool deprecated;
   bool advanced;
   gd::MeasurementUnit measurementUnit; //< The unit of measurement of the property vale.
+  QuickCustomization::Visibility quickCustomizationVisibility;
 };
 
 }  // namespace gd

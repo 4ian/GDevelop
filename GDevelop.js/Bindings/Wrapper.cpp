@@ -89,6 +89,7 @@
 #include <GDCore/Project/Variable.h>
 #include <GDCore/Project/VariablesContainer.h>
 #include <GDCore/Project/VariablesContainersList.h>
+#include <GDCore/Project/QuickCustomization.h>
 #include <GDCore/Serialization/Serializer.h>
 #include <GDCore/Serialization/SerializerElement.h>
 #include <GDCore/IDE/ObjectAssetSerializer.h>
@@ -479,6 +480,8 @@ typedef std::shared_ptr<SerializerElement> SharedPtrSerializerElement;
 typedef std::vector<UnfilledRequiredBehaviorPropertyProblem>
     VectorUnfilledRequiredBehaviorPropertyProblem;
 typedef std::vector<const gd::ObjectFolderOrObject*> VectorObjectFolderOrObject;
+typedef QuickCustomization::Visibility
+    QuickCustomization_Visibility;
 
 typedef ExtensionAndMetadata<BehaviorMetadata> ExtensionAndBehaviorMetadata;
 typedef ExtensionAndMetadata<ObjectMetadata> ExtensionAndObjectMetadata;

@@ -101,7 +101,8 @@ gd::BehaviorMetadata &MetadataDeclarationHelper::DeclareBehaviorMetadata(
                   eventsBasedBehavior.GetName(), project,
                   PlatformExtension::GetBehaviorFullType(
                       extension.GetName(), eventsBasedBehavior.GetName())))
-          .SetObjectType(eventsBasedBehavior.GetObjectType());
+          .SetObjectType(eventsBasedBehavior.GetObjectType())
+          .SetQuickCustomizationVisibility(eventsBasedBehavior.GetQuickCustomizationVisibility());
 
   if (eventsBasedBehavior.IsPrivate())
     behaviorMetadata.SetPrivate();

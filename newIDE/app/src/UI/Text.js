@@ -35,6 +35,8 @@ type Props = {|
   displayInlineAsSpan?: boolean,
   /** To use list item */
   displayAsListItem?: boolean,
+  /** Hide the text - but keep its layouting on screen. Perfect for avoiding layout shift while loading content. */
+  hidden?: boolean,
   /** A limited set of styling is supported. */
   style?: {|
     // Margins
@@ -121,6 +123,7 @@ const Text = React.forwardRef<Props, Interface>(
       displayInlineAsSpan,
       displayAsListItem,
       tooltip,
+      hidden,
       ...otherProps // Used by possible parent element (such as Tooltip) to pass down props.
     },
     ref
@@ -146,6 +149,7 @@ const Text = React.forwardRef<Props, Interface>(
         marginBottom: noMargin ? 0 : 6,
         userSelect: allowSelection ? 'text' : undefined,
         cursor: allowSelection ? 'text' : undefined,
+        visibility: hidden ? 'hidden' : undefined,
       }}
       align={align || 'inherit'}
       {...otherProps}

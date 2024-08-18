@@ -28,6 +28,21 @@ let currentlyRunningInAppTutorial = null;
 export const setCurrentlyRunningInAppTutorial = (tutorial: string | null) =>
   (currentlyRunningInAppTutorial = tutorial);
 
+const makeCanSendEvent = (options: {| minimumTimeBetweenEvents: number |}) => {
+  const lastSentEventTimestamps = {};
+  return (eventName: string) => {
+    const now = Date.now();
+    if (lastSentEventTimestamps[eventName]) {
+      const timeSinceLastEvent = now - lastSentEventTimestamps[eventName];
+      if (timeSinceLastEvent < options.minimumTimeBetweenEvents) {
+        return false;
+      }
+    }
+    lastSentEventTimestamps[eventName] = now;
+    return true;
+  };
+};
+
 /**
  * Used to send an event to the analytics.
  * This function will retry to send the event if the analytics service is not ready.
@@ -416,7 +431,15 @@ export const sendCancelSubscriptionToChange = (metadata: {|
   recordEvent('cancel-subscription-to-change', metadata);
 };
 
+const canSendExternalEditorOpened = makeCanSendEvent({
+  minimumTimeBetweenEvents: 1000 * 60 * 60, // 3 hours (basically, once per "session")
+});
+
 export const sendExternalEditorOpened = (editorName: string) => {
+  if (!canSendExternalEditorOpened(editorName)) {
+    return;
+  }
+
   recordEvent('open_external_editor', { editorName });
 };
 
@@ -453,6 +476,23 @@ export const sendEventsExtractedAsFunction = (metadata: {|
     | 'external-events-editor',
 |}) => {
   recordEvent('events-extracted-as-function', metadata);
+};
+
+const canSendQuickCustomizationProgress = makeCanSendEvent({
+  // Send only one event per step every minute, to avoid sending too many events.
+  minimumTimeBetweenEvents: 1000 * 60 * 1,
+});
+
+export const sendQuickCustomizationProgress = (metadata: {|
+  stepName: string,
+  sourceGameId: string,
+  projectName: string,
+|}) => {
+  if (!canSendQuickCustomizationProgress(metadata.stepName)) {
+    return;
+  }
+
+  recordEvent('quick-customization-progress', metadata);
 };
 
 export const sendSocialFollowUpdated = (

@@ -66,7 +66,7 @@ export const localOnlineWebExportPipeline: ExportPipeline<
   isNavigationDisabled: (exportStep, errored) =>
     !errored && !['', 'done'].includes(exportStep),
 
-  renderHeader: () => <ExplanationHeader />,
+  renderHeader: ({ uiMode }) => <ExplanationHeader uiMode={uiMode} />,
 
   renderExportFlow: (props: ExportFlowProps) => (
     <OnlineWebExportFlow {...props} exportPipelineName={exportPipelineName} />

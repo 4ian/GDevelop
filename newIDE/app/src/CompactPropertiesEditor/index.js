@@ -364,7 +364,7 @@ const CompactPropertiesEditor = ({
       if (field.name === 'PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS') return null; // This special property was used in GDevelop 4 IDE to ask for a Edit button to be shown, ignore it.
 
       if (field.valueType === 'boolean') {
-        return 'TODO';
+        return null; // TODO
         // const { setValue } = field;
         // const description = getFieldDescription(field);
         // return (
@@ -462,7 +462,7 @@ const CompactPropertiesEditor = ({
           );
         }
       } else if (field.valueType === 'color') {
-        return 'TODO';
+        return null; // TODO
         // const { setValue } = field;
         // return (
         //   <Column key={field.name} expand noMargin>
@@ -502,7 +502,7 @@ const CompactPropertiesEditor = ({
           </IconButton>
         );
       } else if (field.valueType === 'textarea') {
-        return 'TODO';
+        return null; // TODO
         // const { setValue } = field;
         // return (
         //   <SemiControlledTextField
@@ -521,7 +521,7 @@ const CompactPropertiesEditor = ({
         //   />
         // );
       } else if (field.valueType === 'resource') {
-        return 'TODO';
+        return null; // TODO
       } else {
         const {
           // TODO: Still support onEditButtonClick & onEditButtonBuildMenuTemplate ?

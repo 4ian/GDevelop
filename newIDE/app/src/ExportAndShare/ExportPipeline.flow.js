@@ -1,10 +1,10 @@
 // @flow
 import * as React from 'react';
 import { type Build, type BuildType } from '../Utils/GDevelopServices/Build';
-import { type Game } from '../Utils/GDevelopServices/Game';
 import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
 import { type BuildStep } from './Builds/BuildStepsProgress';
 import { type Quota } from '../Utils/GDevelopServices/Usage';
+import { type GameAndBuildsManager } from '../Utils/UseGameAndBuildsManager';
 
 export type ExportPipelineContext<ExportState> = {|
   project: gdProject,
@@ -23,12 +23,12 @@ export type HeaderProps<ExportState> = {|
   build: ?Build,
   exportStep: BuildStep,
   quota: ?Quota,
+  uiMode: 'minimal' | 'full',
 |};
 
 export type ExportFlowProps = {|
   project: gdProject,
-  game: ?Game,
-  builds: ?Array<Build>,
+  gameAndBuildsManager: GameAndBuildsManager,
   build: ?Build,
   onSaveProject: () => Promise<void>,
   isSavingProject: boolean,
@@ -39,7 +39,7 @@ export type ExportFlowProps = {|
   isExporting: boolean,
   stepMaxProgress: number,
   stepCurrentProgress: number,
-  onRefreshGame: () => Promise<void>,
+  uiMode: 'minimal' | 'full',
 |};
 
 /**

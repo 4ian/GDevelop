@@ -38,6 +38,7 @@ import ResponsiveFlatButton from '../UI/ResponsiveFlatButton';
 import { EmptyPlaceholder } from '../UI/EmptyPlaceholder';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import SearchBar from '../UI/SearchBar';
+import { renderQuickCustomizationMenuItems } from '../QuickCustomization/QuickCustomizationMenuItems';
 
 const gd: libGDevelop = global.gd;
 
@@ -627,6 +628,18 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                             property
                                           ),
                                         },
+                                        ...renderQuickCustomizationMenuItems({
+                                          i18n,
+                                          visibility: property.getQuickCustomizationVisibility(),
+                                          onChangeVisibility: visibility => {
+                                            property.setQuickCustomizationVisibility(
+                                              visibility
+                                            );
+                                            forceUpdate();
+                                            onPropertiesUpdated &&
+                                              onPropertiesUpdated();
+                                          },
+                                        }),
                                       ]}
                                     />
                                     <Spacer />

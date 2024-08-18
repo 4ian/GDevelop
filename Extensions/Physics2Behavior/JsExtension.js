@@ -182,6 +182,7 @@ module.exports = {
         .setValue(behaviorContent.getChild('bodyType').getStringValue())
         .setType('Choice')
         .setLabel('Type')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
         .addExtraInfo('Static')
         .addExtraInfo('Dynamic')
         .addExtraInfo('Kinematic');
@@ -190,6 +191,7 @@ module.exports = {
         .setValue(
           behaviorContent.getChild('bullet').getBoolValue() ? 'true' : 'false'
         )
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
         .setType('Boolean')
         .setLabel('Bullet');
       behaviorProperties
@@ -199,6 +201,7 @@ module.exports = {
             ? 'true'
             : 'false'
         )
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
         .setType('Boolean')
         .setLabel('Fixed Rotation');
       behaviorProperties
@@ -206,6 +209,7 @@ module.exports = {
         .setValue(
           behaviorContent.getChild('canSleep').getBoolValue() ? 'true' : 'false'
         )
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
         .setType('Boolean')
         .setLabel('Can Sleep');
       behaviorProperties
@@ -213,6 +217,7 @@ module.exports = {
         .setValue(behaviorContent.getChild('shape').getStringValue())
         .setType('Choice')
         .setLabel('Shape')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
         .addExtraInfo('Box')
         .addExtraInfo('Circle')
         .addExtraInfo('Edge')
@@ -227,7 +232,8 @@ module.exports = {
         )
         .setType('Number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-        .setLabel('Shape Dimension A');
+        .setLabel('Shape Dimension A')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
       behaviorProperties
         .getOrCreate('shapeDimensionB')
         .setValue(
@@ -238,7 +244,8 @@ module.exports = {
         )
         .setType('Number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-        .setLabel('Shape Dimension B');
+        .setLabel('Shape Dimension B')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
       behaviorProperties
         .getOrCreate('shapeOffsetX')
         .setValue(
@@ -246,7 +253,8 @@ module.exports = {
         )
         .setType('Number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-        .setLabel('Shape Offset X');
+        .setLabel('Shape Offset X')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
       behaviorProperties
         .getOrCreate('shapeOffsetY')
         .setValue(
@@ -254,7 +262,8 @@ module.exports = {
         )
         .setType('Number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-        .setLabel('Shape Offset Y');
+        .setLabel('Shape Offset Y')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
       behaviorProperties
         .getOrCreate('polygonOrigin')
         .setValue(
@@ -266,7 +275,8 @@ module.exports = {
         .setLabel('Polygon Origin')
         .addExtraInfo('Center')
         .addExtraInfo('Origin')
-        .addExtraInfo('TopLeft');
+        .addExtraInfo('TopLeft')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
       behaviorProperties
         .getOrCreate('vertices')
         .setValue(
@@ -274,7 +284,8 @@ module.exports = {
             ? gd.Serializer.toJSON(behaviorContent.getChild('vertices'))
             : '[]'
         )
-        .setLabel('Vertices');
+        .setLabel('Vertices')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
       behaviorProperties
         .getOrCreate('density')
         .setValue(
@@ -315,24 +326,28 @@ module.exports = {
             .toString(10)
         )
         .setType('Number')
-        .setLabel('Angular Damping');
+        .setLabel('Angular Damping')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
       behaviorProperties
         .getOrCreate('gravityScale')
         .setValue(
           behaviorContent.getChild('gravityScale').getDoubleValue().toString(10)
         )
         .setType('Number')
-        .setLabel('Gravity Scale');
+        .setLabel('Gravity Scale')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
       behaviorProperties
         .getOrCreate('layers')
         .setValue(behaviorContent.getChild('layers').getIntValue().toString(10))
         .setType('Number')
-        .setLabel('Layers');
+        .setLabel('Layers')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
       behaviorProperties
         .getOrCreate('masks')
         .setValue(behaviorContent.getChild('masks').getIntValue().toString(10))
         .setType('Number')
-        .setLabel('Masks');
+        .setLabel('Masks')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
 
       return behaviorProperties;
     };

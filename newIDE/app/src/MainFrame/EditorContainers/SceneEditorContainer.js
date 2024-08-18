@@ -97,7 +97,6 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
       <SceneEditor
         setToolbar={this.props.setToolbar}
         resourceManagementProps={this.props.resourceManagementProps}
-        canInstallPrivateAsset={this.props.canInstallPrivateAsset}
         unsavedChanges={this.props.unsavedChanges}
         ref={editor => (this.editor = editor)}
         project={project}

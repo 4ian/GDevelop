@@ -68,6 +68,7 @@ export type NewProjectSetup = {|
   orientation?: 'landscape' | 'portrait' | 'default',
   optimizeForPixelArt?: boolean,
   allowPlayersToLogIn?: boolean,
+  openQuickCustomizationDialog?: boolean,
 |};
 
 type Props = {|
@@ -422,15 +423,13 @@ const NewProjectSetupDialog = ({
               label={<Trans>Cancel</Trans>}
               onClick={onClose}
             />,
-            <LeftLoader isLoading={isLoading} key="create">
-              <DialogPrimaryButton
-                primary
-                disabled={shouldNotAllowCreatingProject}
-                label={<Trans>Create project</Trans>}
-                onClick={() => onValidate(i18n)}
-                id="create-project-button"
-              />
-            </LeftLoader>,
+            <DialogPrimaryButton
+              primary
+              disabled={shouldNotAllowCreatingProject || isLoading}
+              label={<Trans>Create project</Trans>}
+              onClick={() => onValidate(i18n)}
+              id="create-project-button"
+            />,
           ]}
           cannotBeDismissed={isLoading}
           onRequestClose={onClose}

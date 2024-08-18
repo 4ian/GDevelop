@@ -16,7 +16,7 @@ import RaisedButton from '../../../../UI/RaisedButton';
 import Window from '../../../../Utils/Window';
 import Coin from '../../../../Credits/Icons/Coin';
 import { selectMessageByLocale } from '../../../../Utils/i18n/MessageByLocale';
-import { I18n } from '@lingui/react/cjs/react.production.min';
+import { I18n } from '@lingui/react';
 import CreditsStatusBanner from '../../../../Credits/CreditsStatusBanner';
 
 type Props = {|
@@ -107,7 +107,7 @@ const BadgeItem = ({
                   <Trans>
                     {(achievement &&
                       selectMessageByLocale(i18n, achievement.nameByLocale)) ||
-                      ''}
+                      '-'}
                   </Trans>
                 </b>
               </Text>
@@ -118,7 +118,7 @@ const BadgeItem = ({
                       i18n,
                       achievement.shortDescriptionByLocale
                     )) ||
-                    ''}
+                    '-'}
                 </Trans>
               </Text>
               <Text size="body" noMargin>

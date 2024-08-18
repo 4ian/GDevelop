@@ -124,15 +124,11 @@ export const useInstallAsset = ({
   objectsContainer,
   targetObjectFolderOrObjectWithContext,
   resourceManagementProps,
-  canInstallPrivateAsset,
-  onObjectsAddedFromAssets,
 }: {|
   project: gdProject,
   objectsContainer: gdObjectsContainer,
   targetObjectFolderOrObjectWithContext?: ?ObjectFolderOrObjectWithContext,
   resourceManagementProps: ResourceManagementProps,
-  canInstallPrivateAsset: () => boolean,
-  onObjectsAddedFromAssets: (Array<gdObject>) => void,
 |}) => {
   const { shopNavigationState } = React.useContext(AssetStoreContext);
   const { openedAssetPack } = shopNavigationState.getCurrentPage();
@@ -146,7 +142,7 @@ export const useInstallAsset = ({
   const fetchAssets = useFetchAssets();
   const showExtensionUpdateConfirmation = useExtensionUpdateAlertDialog();
   const showProjectNeedToBeSaved = useProjectNeedToBeSavedAlertDialog(
-    canInstallPrivateAsset
+    resourceManagementProps.canInstallPrivateAsset
   );
 
   return async (
@@ -211,8 +207,6 @@ export const useInstallAsset = ({
         assetPackKind: isPrivate ? 'private' : 'public',
       });
 
-      onObjectsAddedFromAssets(installOutput.createdObjects);
-
       await resourceManagementProps.onFetchNewlyAddedResources();
       return installOutput;
     } catch (error) {
@@ -237,7 +231,6 @@ type Props = {|
   onClose: () => void,
   onCreateNewObject: (type: string) => void,
   onObjectsAddedFromAssets: (Array<gdObject>) => void,
-  canInstallPrivateAsset: () => boolean,
   targetObjectFolderOrObjectWithContext?: ?ObjectFolderOrObjectWithContext,
 |};
 
@@ -250,7 +243,6 @@ function NewObjectDialog({
   onClose,
   onCreateNewObject,
   onObjectsAddedFromAssets,
-  canInstallPrivateAsset,
   targetObjectFolderOrObjectWithContext,
 }: Props) {
   const { isMobile } = useResponsiveWindowSize();
@@ -309,8 +301,6 @@ function NewObjectDialog({
     project,
     objectsContainer,
     resourceManagementProps,
-    canInstallPrivateAsset,
-    onObjectsAddedFromAssets,
   });
 
   const onInstallAsset = React.useCallback(
@@ -320,9 +310,11 @@ function NewObjectDialog({
       setIsAssetBeingInstalled(true);
       const installAssetOutput = await installAsset(assetShortHeader);
       setIsAssetBeingInstalled(false);
+      if (installAssetOutput)
+        onObjectsAddedFromAssets(installAssetOutput.createdObjects);
       return !!installAssetOutput;
     },
-    [installAsset]
+    [installAsset, onObjectsAddedFromAssets]
   );
 
   const onInstallEmptyCustomObject = React.useCallback(
@@ -578,8 +570,6 @@ function NewObjectDialog({
                 }}
                 project={project}
                 objectsContainer={objectsContainer}
-                onObjectsAddedFromAssets={onObjectsAddedFromAssets}
-                canInstallPrivateAsset={canInstallPrivateAsset}
                 resourceManagementProps={resourceManagementProps}
               />
             )}

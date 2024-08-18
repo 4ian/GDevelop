@@ -2712,7 +2712,13 @@ storiesOf('ProjectPropertiesDialog/LoadingScreenEditor', module)
 storiesOf('PreferencesDialog', module).add('default', () => (
   <I18n>
     {({ i18n }) => (
-      <PreferencesDialog i18n={i18n} onClose={action('onClose')} />
+      <PreferencesDialog
+        i18n={i18n}
+        onClose={action('onClose')}
+        onOpenQuickCustomizationDialog={action(
+          'onOpenQuickCustomizationDialog'
+        )}
+      />
     )}
   </I18n>
 ));

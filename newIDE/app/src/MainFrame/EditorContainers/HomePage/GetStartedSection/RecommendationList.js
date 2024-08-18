@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 import { Trans } from '@lingui/macro';
 import { makeStyles } from '@material-ui/styles';
 import GridList from '@material-ui/core/GridList';
@@ -37,6 +38,10 @@ import { PrivateTutorialViewDialog } from '../../../../AssetStore/PrivateTutoria
 import { EarnBadges } from './EarnBadges';
 import FlatButton from '../../../../UI/FlatButton';
 import InAppTutorialContext from '../../../../InAppTutorial/InAppTutorialContext';
+import { QuickCustomizationGameTiles } from '../../../../QuickCustomization/QuickCustomizationGameTiles';
+import { type NewProjectSetup } from '../../../../ProjectCreation/NewProjectSetupDialog';
+import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
+import UrlStorageProvider from '../../../../ProjectsStorage/UrlStorageProvider';
 
 const styles = {
   textTutorialContent: {
@@ -182,6 +187,12 @@ type Props = {|
   onStartSurvey: null | (() => void),
   hasFilledSurveyAlready: boolean,
   onOpenProfile: () => void,
+  onCreateProjectFromExample: (
+    exampleShortHeader: ExampleShortHeader,
+    newProjectSetup: NewProjectSetup,
+    i18n: I18nType
+  ) => Promise<void>,
+  askToCloseProject: () => Promise<boolean>,
 |};
 
 const RecommendationList = ({
@@ -191,6 +202,8 @@ const RecommendationList = ({
   onStartSurvey,
   hasFilledSurveyAlready,
   onOpenProfile,
+  onCreateProjectFromExample,
+  askToCloseProject,
 }: Props) => {
   const {
     recommendations,
@@ -245,6 +258,11 @@ const RecommendationList = ({
     recommendation => recommendation.type === 'plan'
   );
 
+  // $FlowIgnore
+  const quickCustomizationRecommendation: ?QuickCustomizationRecommendation = recommendations.find(
+    recommendation => recommendation.type === 'quick-customization'
+  );
+
   const getInAppTutorialPartProgress = ({
     tutorialId,
   }: {
@@ -274,6 +292,59 @@ const RecommendationList = ({
               />
             </SectionRow>
           );
+
+        if (quickCustomizationRecommendation) {
+          items.push(
+            <SectionRow key="customize-and-publish">
+              <Text size="section-title" noMargin>
+                <Trans>Customize a game and publish it in 1 minute</Trans>
+              </Text>
+              <Spacer />
+              <QuickCustomizationGameTiles
+                quickCustomizationRecommendation={
+                  quickCustomizationRecommendation
+                }
+                onSelectExampleShortHeader={async exampleShortHeader => {
+                  const projectIsClosed = await askToCloseProject();
+                  if (!projectIsClosed) {
+                    return;
+                  }
+
+                  const newProjectSetup: NewProjectSetup = {
+                    storageProvider: UrlStorageProvider,
+                    saveAsLocation: null,
+                    openQuickCustomizationDialog: true,
+                  };
+                  onCreateProjectFromExample(
+                    exampleShortHeader,
+                    newProjectSetup,
+                    i18n
+                  );
+                }}
+              />
+            </SectionRow>
+          );
+        }
+
+        if (
+          !limits ||
+          !limits.capabilities.classrooms ||
+          !limits.capabilities.classrooms.hidePlayTab
+        ) {
+          items.push(
+            <SectionRow key="earn-badges">
+              <Text size="section-title" noMargin>
+                <Trans>Earn badges and credits</Trans>
+              </Text>
+              <Spacer />
+              <EarnBadges
+                achievements={achievements}
+                badges={badges}
+                onOpenProfile={onOpenProfile}
+              />
+            </SectionRow>
+          );
+        }
 
         if (guidedLessonsRecommendation) {
           const displayTextAfterGuidedLessons = guidedLessonsIds
@@ -307,26 +378,6 @@ const RecommendationList = ({
                   </Trans>
                 </Text>
               )}
-            </SectionRow>
-          );
-        }
-
-        if (
-          !limits ||
-          !limits.capabilities.classrooms ||
-          !limits.capabilities.classrooms.hidePlayTab
-        ) {
-          items.push(
-            <SectionRow key="earn-badges">
-              <Text size="section-title" noMargin>
-                <Trans>Earn badges and credits</Trans>
-              </Text>
-              <Spacer />
-              <EarnBadges
-                achievements={achievements}
-                badges={badges}
-                onOpenProfile={onOpenProfile}
-              />
             </SectionRow>
           );
         }

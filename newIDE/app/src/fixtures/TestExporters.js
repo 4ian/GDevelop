@@ -61,7 +61,7 @@ export const fakeBrowserOnlineWebExportPipeline: ExportPipeline<
   isNavigationDisabled: (exportStep, errored) =>
     !errored && !['', 'done'].includes(exportStep),
 
-  renderHeader: () => <ExplanationHeader />,
+  renderHeader: ({ uiMode }) => <ExplanationHeader uiMode={uiMode} />,
 
   renderExportFlow: (props: ExportFlowProps) => (
     <OnlineWebExportFlow {...props} exportPipelineName={exportPipelineName} />
@@ -135,5 +135,21 @@ export const fakeBrowserOnlineWebExportPipeline: ExportPipeline<
     await delay(1000);
 
     return completeWebBuild;
+  },
+};
+
+export const fakeErroringBrowserOnlineWebExportPipeline: ExportPipeline<
+  ExportState,
+  PreparedExporter,
+  ExportOutput,
+  ResourcesDownloadOutput,
+  CompressionOutput
+> = {
+  ...fakeBrowserOnlineWebExportPipeline,
+  launchResourcesDownload: async (
+    context: ExportPipelineContext<ExportState>,
+    { textFiles, urlFiles }: ExportOutput
+  ): Promise<ResourcesDownloadOutput> => {
+    throw new Error('Error while downloading the game resources.');
   },
 };

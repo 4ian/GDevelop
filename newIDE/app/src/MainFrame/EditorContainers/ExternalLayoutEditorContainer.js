@@ -225,7 +225,6 @@ export class ExternalLayoutEditorContainer extends React.Component<
             onOpenEvents={this.props.onOpenEvents}
             onOpenMoreSettings={this.openExternalPropertiesDialog}
             isActive={isActive}
-            canInstallPrivateAsset={this.props.canInstallPrivateAsset}
             openBehaviorEvents={this.props.openBehaviorEvents}
             onExtractAsExternalLayout={this.props.onExtractAsExternalLayout}
           />

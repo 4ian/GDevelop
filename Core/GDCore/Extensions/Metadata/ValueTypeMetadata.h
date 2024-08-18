@@ -210,8 +210,8 @@ class GD_CORE_API ValueTypeMetadata {
              parameterType == "scenevar";
     } else if (type == "resource") {
       return parameterType == "fontResource" ||
-             parameterType == "soundfile" ||
-             parameterType == "musicfile" ||
+             parameterType == "audioResource" ||
+             parameterType == "videoResource" ||
              parameterType == "bitmapFontResource" ||
              parameterType == "imageResource" ||
              parameterType == "jsonResource" ||
@@ -219,7 +219,10 @@ class GD_CORE_API ValueTypeMetadata {
              parameterType == "tilesetResource" ||
              parameterType == "model3DResource" ||
              parameterType == "atlasResource" ||
-             parameterType == "spineResource";
+             parameterType == "spineResource" ||
+             // Deprecated, old parameter types:
+             parameterType == "soundfile" ||
+             parameterType == "musicfile";
     }
     return false;
   }

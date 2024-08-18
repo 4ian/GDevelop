@@ -26,8 +26,8 @@ const ExplanationHeader = ({ uiMode }: ExplanationHeaderProps) => {
       <Line alignItems="center" justifyContent="center">
         <Text align="center">
           <Trans>
-            Generate a unique link, playable from any computer or mobile phone's
-            browser.
+            Publishing to gd.games - GDevelop gaming platform - is free. Games
+            can be played from any device.
           </Trans>
         </Text>
       </Line>

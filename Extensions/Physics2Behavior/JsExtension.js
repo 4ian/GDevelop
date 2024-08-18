@@ -326,7 +326,8 @@ module.exports = {
             .toString(10)
         )
         .setType('Number')
-        .setLabel('Angular Damping');
+        .setLabel('Angular Damping')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
       behaviorProperties
         .getOrCreate('gravityScale')
         .setValue(

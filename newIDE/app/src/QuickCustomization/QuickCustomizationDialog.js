@@ -11,6 +11,7 @@ import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasur
 import Paper from '../UI/Paper';
 import { type Exporter } from '../ExportAndShare/ShareDialog';
 import { useGameAndBuildsManager } from '../Utils/UseGameAndBuildsManager';
+import { sendQuickCustomizationProgress } from '../Utils/Analytics/EventSender';
 
 type Props = {|
   project: gdProject,
@@ -76,6 +77,18 @@ export const QuickCustomizationDialog = ({
     onContinueQuickCustomization,
     onTryAnotherGame,
   });
+
+  const name = project.getName();
+  React.useEffect(
+    () => {
+      sendQuickCustomizationProgress({
+        stepName: quickCustomizationState.step.name,
+        sourceGameId,
+        projectName: name,
+      });
+    },
+    [quickCustomizationState.step.name, sourceGameId, name]
+  );
 
   return (
     <Dialog

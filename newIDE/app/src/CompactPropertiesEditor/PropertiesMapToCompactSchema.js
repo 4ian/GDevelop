@@ -273,12 +273,25 @@ const isPropertyVisible = (
     return !property.isAdvanced() && !property.isDeprecated();
   }
   if (visibility === 'Basic-Quick') {
-    return (
-      !property.isAdvanced() &&
-      !property.isDeprecated() &&
-      property.getQuickCustomizationVisibility() !==
-        gd.QuickCustomization.Hidden
-    );
+    // "Basic":
+    if (property.isDeprecated()) return false;
+    if (property.isAdvanced()) return false;
+
+    // Honor visibility if set:
+    if (
+      property.getQuickCustomizationVisibility() ===
+      gd.QuickCustomization.Hidden
+    )
+      return false;
+    if (
+      property.getQuickCustomizationVisibility() ===
+      gd.QuickCustomization.Visible
+    )
+      return true;
+
+    // Otherwise, hide some properties that we know are complex.
+    const propertyType = property.getType();
+    if (propertyType === 'Behavior') return false; // Hide "required behaviors".
   }
   return true;
 };

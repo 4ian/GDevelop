@@ -21,12 +21,14 @@ import {
 
 export const getDefaultRegisterGamePropertiesFromProject = ({
   project,
+  isRemix,
 }: {|
   project: gdProject,
+  isRemix?: boolean,
 |}) => ({
   gameId: project.getProjectUuid(),
   authorName: project.getAuthor() || 'Unspecified publisher',
-  gameName: project.getName() || 'Untitled game',
+  gameName: project.getName() + (isRemix ? ' Remix' : '') || 'Untitled game',
   templateSlug: project.getTemplateSlug(),
 });
 

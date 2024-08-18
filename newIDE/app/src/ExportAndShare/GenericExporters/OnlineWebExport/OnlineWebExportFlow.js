@@ -46,7 +46,10 @@ const OnlineWebExportFlow = ({
 
   const exportButtons =
     hasGameExistingBuilds && isPublishedOnGdgames ? (
-      <ResponsiveLineStackLayout justifyContent="stretch" noMargin>
+      <ResponsiveLineStackLayout
+        justifyContent={uiMode === 'minimal' ? 'stretch' : 'center'}
+        noMargin
+      >
         <RaisedButton
           label={<Trans>Update the game page</Trans>}
           primary

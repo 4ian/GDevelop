@@ -64,7 +64,6 @@ gd::ExpressionMetadata& ExpressionMetadata::AddParameter(
 
 gd::ExpressionMetadata &ExpressionMetadata::AddCodeOnlyParameter(
     const gd::String &type, const gd::String &supplementaryInformation) {
-  gd::ParameterMetadata info;
   parameters.AddNewParameter("").SetType(type).SetCodeOnly().SetExtraInfo(
       supplementaryInformation);
   return *this;

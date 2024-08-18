@@ -19,13 +19,20 @@ namespace gd {
 ObjectFolderOrObject ObjectFolderOrObject::badObjectFolderOrObject;
 
 ObjectFolderOrObject::ObjectFolderOrObject()
-    : folderName("__NULL"), object(nullptr), quickCustomizationVisibility(QuickCustomization::Visibility::Default) {}
+    : folderName("__NULL"),
+      object(nullptr),
+      quickCustomizationVisibility(QuickCustomization::Visibility::Default) {}
 ObjectFolderOrObject::ObjectFolderOrObject(gd::String folderName_,
                                            ObjectFolderOrObject* parent_)
-    : folderName(folderName_), parent(parent_), object(nullptr), quickCustomizationVisibility(QuickCustomization::Visibility::Default) {}
+    : folderName(folderName_),
+      parent(parent_),
+      object(nullptr),
+      quickCustomizationVisibility(QuickCustomization::Visibility::Default) {}
 ObjectFolderOrObject::ObjectFolderOrObject(gd::Object* object_,
                                            ObjectFolderOrObject* parent_)
-    : object(object_), parent(parent_), quickCustomizationVisibility(QuickCustomization::Visibility::Default) {}
+    : object(object_),
+      parent(parent_),
+      quickCustomizationVisibility(QuickCustomization::Visibility::Default) {}
 ObjectFolderOrObject::~ObjectFolderOrObject() {}
 
 bool ObjectFolderOrObject::HasObjectNamed(const gd::String& name) {
@@ -66,7 +73,8 @@ ObjectFolderOrObject& ObjectFolderOrObject::GetChildAt(std::size_t index) {
   if (index >= children.size()) return badObjectFolderOrObject;
   return *children[index];
 }
-const ObjectFolderOrObject& ObjectFolderOrObject::GetChildAt(std::size_t index) const {
+const ObjectFolderOrObject& ObjectFolderOrObject::GetChildAt(
+    std::size_t index) const {
   if (index >= children.size()) return badObjectFolderOrObject;
   return *children[index];
 }
@@ -210,7 +218,9 @@ void ObjectFolderOrObject::SerializeTo(SerializerElement& element) const {
   if (quickCustomizationVisibility != QuickCustomization::Visibility::Default) {
     element.SetStringAttribute(
         "quickCustomizationVisibility",
-        QuickCustomization::Visibility::Visible ? "visible" : "hidden");
+        quickCustomizationVisibility == QuickCustomization::Visibility::Visible
+            ? "visible"
+            : "hidden");
   }
 }
 

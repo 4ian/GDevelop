@@ -52,6 +52,7 @@ import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasur
 import ErrorBoundary from '../UI/ErrorBoundary';
 import { getInsertionParentAndPositionFromSelection } from '../Utils/ObjectFolders';
 import { canSwapAssetOfObject } from '../AssetStore/AssetSwapper';
+import { renderQuickCustomizationMenuItems } from '../QuickCustomization/QuickCustomizationMenuItems';
 
 const gd: libGDevelop = global.gd;
 const sceneObjectsRootFolderId = 'scene-objects';
@@ -1392,6 +1393,16 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                 })
               ),
             },
+            ...renderQuickCustomizationMenuItems({
+              i18n,
+              visibility: objectFolderOrObject.getQuickCustomizationVisibility(),
+              onChangeVisibility: visibility => {
+                objectFolderOrObject.setQuickCustomizationVisibility(
+                  visibility
+                );
+                forceUpdate();
+              },
+            }),
             { type: 'separator' },
             {
               label: i18n._(t`Add a new object`),
@@ -1562,6 +1573,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         selectObjectFolderOrObjectWithContext,
         setAsGlobalObject,
         onAddObjectInstance,
+        forceUpdate,
       ]
     );
 

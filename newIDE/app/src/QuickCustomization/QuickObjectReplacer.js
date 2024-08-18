@@ -8,6 +8,7 @@ import AssetSwappingDialog from '../AssetStore/AssetSwappingDialog';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import Text from '../UI/Text';
 import { Trans } from '@lingui/macro';
+import { enumerateObjectFolderOrObjects } from '.';
 
 type Props = {|
   project: gdProject,
@@ -22,49 +23,6 @@ const styles = {
     alignItems: 'center',
     gap: 8,
   },
-};
-
-const canSwapAssetOfObject = (object: gdObject) => {
-  const type = object.getType();
-  return type === 'Scene3D::Model3DObject' || type === 'Sprite';
-};
-
-const enumerateObjectFolderOrObjects = (
-  objectFolderOrObject: gdObjectFolderOrObject,
-  depth: number = 0
-): Array<{ folderName: string, objects: Array<gdObject> }> => {
-  const orderedFolderNames: Array<string> = [''];
-  const folderObjects: { [key: string]: Array<gdObject> } = {
-    '': [],
-  };
-
-  mapFor(0, objectFolderOrObject.getChildrenCount(), i => {
-    const child = objectFolderOrObject.getChildAt(i);
-
-    if (child.isFolder()) {
-      const folderName = child.getFolderName();
-      const currentFolderObjects: Array<gdObject> = (folderObjects[folderName] =
-        folderObjects[folderName] || []);
-      orderedFolderNames.push(folderName);
-
-      enumerateObjectFolderOrObjects(child, depth + 1).forEach(
-        ({ folderName, objects }) => {
-          currentFolderObjects.push.apply(currentFolderObjects, objects);
-        }
-      );
-    } else {
-      const object = child.getObject();
-      if (canSwapAssetOfObject(object))
-        folderObjects[''].push(child.getObject());
-    }
-  });
-
-  return orderedFolderNames
-    .map(folderName => ({
-      folderName,
-      objects: folderObjects[folderName],
-    }))
-    .filter(folder => folder.objects.length > 0);
 };
 
 export const QuickObjectReplacer = ({

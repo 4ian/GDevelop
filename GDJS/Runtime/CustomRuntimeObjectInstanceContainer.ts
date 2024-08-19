@@ -77,9 +77,11 @@ namespace gdjs {
         if (customObjectData.childrenContent) {
           this.registerObject({
             ...childObjectData,
+            // The custom object overrides its events-based object configuration.
             ...customObjectData.childrenContent[childObjectData.name],
           });
         } else {
+          // The custom object follows its events-based object configuration.
           this.registerObject(childObjectData);
         }
       }

@@ -20,7 +20,6 @@ import {
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderError from '../UI/PlaceholderError';
 import { LineStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
-import { CorsAwareImage } from '../UI/CorsAwareImage';
 import { AssetStoreContext } from './AssetStoreContext';
 import Window from '../Utils/Window';
 import SelectField from '../UI/SelectField';
@@ -33,17 +32,17 @@ import { SimilarAssetStoreSearchFilter } from './AssetStoreSearchFilter';
 import EmptyMessage from '../UI/EmptyMessage';
 import Link from '../UI/Link';
 import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
-import AuthorizedAssetImage from './PrivateAssets/AuthorizedAssetImage';
 import { MarkdownText } from '../UI/MarkdownText';
 import Paper from '../UI/Paper';
 import {
   getUserPublicProfilesByIds,
   type UserPublicProfile,
 } from '../Utils/GDevelopServices/User';
-import { getPixelatedImageRendering } from '../Utils/CssHelpers';
 import ArrowRight from '../UI/CustomSvgIcons/ArrowRight';
 import ArrowLeft from '../UI/CustomSvgIcons/ArrowLeft';
 import PublicProfileDialog from '../Profile/PublicProfileDialog';
+import Skeleton from '@material-ui/lab/Skeleton';
+import { AssetPreviewImage } from './AssetPreviewImage';
 
 const FIXED_HEIGHT = 250;
 const FIXED_WIDTH = 300;
@@ -61,17 +60,6 @@ const styles = {
   chip: {
     marginBottom: 2,
     marginRight: 2,
-  },
-  previewImage: {
-    position: 'relative',
-    maxWidth: '100%',
-    maxHeight: '100%',
-    verticalAlign: 'middle',
-    pointerEvents: 'none',
-    // Compromise between having a preview of the asset slightly more zoomed
-    // compared to the search results and a not too zoomed image for small
-    // smooth assets that could give a sense of bad quality.
-    flex: 0.6,
   },
   arrowContainer: {
     padding: 6,
@@ -164,15 +152,6 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
         scrollViewElement.scrollToPosition(y);
       },
     }));
-
-    const getImagePreviewStyle = (assetShortHeader: Asset) => {
-      return {
-        ...styles.previewImage,
-        imageRendering: isPixelArt(assetShortHeader)
-          ? getPixelatedImageRendering()
-          : undefined,
-      };
-    };
 
     const loadAsset = React.useCallback(
       () => {
@@ -309,85 +288,55 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                 <Text size="block-title" displayInlineAsSpan>
                   {assetShortHeader.name}
                 </Text>
-                {!areAuthorsLoading && (
-                  <LineStackLayout noMargin>
-                    <Text size="body">
-                      <Trans>by</Trans>
-                    </Text>
-                    {!!assetAuthors &&
-                      assetAuthors.map(author => (
-                        <Text size="body" key={author.name}>
+                <LineStackLayout noMargin alignItems="center">
+                  <Text size="body">
+                    <Trans>by</Trans>
+                  </Text>
+                  {areAuthorsLoading && (
+                    <Skeleton variant="rect" height={18} width={100} />
+                  )}
+                  {!!assetAuthors &&
+                    assetAuthors.map(author => (
+                      <Text size="body" key={author.name}>
+                        <Link
+                          key={author.name}
+                          href={author.website}
+                          onClick={() => Window.openExternalURL(author.website)}
+                        >
+                          {author.name}
+                        </Link>
+                      </Text>
+                    ))}
+                  {!!authorPublicProfiles.length &&
+                    authorPublicProfiles.map(userPublicProfile => {
+                      const username =
+                        userPublicProfile.username || 'GDevelop user';
+                      return (
+                        <Text size="body" key={userPublicProfile.id}>
                           <Link
-                            key={author.name}
-                            href={author.website}
+                            key={userPublicProfile.id}
+                            href="#"
                             onClick={() =>
-                              Window.openExternalURL(author.website)
+                              setSelectedAuthorPublicProfile(userPublicProfile)
                             }
                           >
-                            {author.name}
+                            {username}
                           </Link>
                         </Text>
-                      ))}
-                    {!!authorPublicProfiles.length &&
-                      authorPublicProfiles.map(userPublicProfile => {
-                        const username =
-                          userPublicProfile.username || 'GDevelop user';
-                        return (
-                          <Text size="body" key={userPublicProfile.id}>
-                            <Link
-                              key={userPublicProfile.id}
-                              href="#"
-                              onClick={() =>
-                                setSelectedAuthorPublicProfile(
-                                  userPublicProfile
-                                )
-                              }
-                            >
-                              {username}
-                            </Link>
-                          </Text>
-                        );
-                      })}
-                  </LineStackLayout>
-                )}
+                      );
+                    })}
+                </LineStackLayout>
               </LineStackLayout>
-              <Line alignItems="center">
-                <div style={{ flexWrap: 'wrap' }}>
-                  {assetShortHeader.tags.slice(0, 5).map((tag, index) => (
-                    <React.Fragment key={tag}>
-                      {index !== 0 && <Spacer />}
-                      <Chip
-                        size="small"
-                        style={styles.chip}
-                        label={makeFirstLetterUppercase(tag)}
-                        onClick={() => {
-                          onTagSelection(tag);
-                        }}
-                      />
-                    </React.Fragment>
-                  ))}
-                  {assetShortHeader.tags.length > 5 && (
-                    <>
-                      <Spacer />
-                      <Chip
-                        size="small"
-                        style={styles.chip}
-                        label={
-                          <Trans>
-                            + {assetShortHeader.tags.length - 5} tag(s)
-                          </Trans>
-                        }
-                      />
-                    </>
-                  )}
-                </div>
-              </Line>
             </Column>
           </Line>
           <ResponsiveLineStackLayout noMargin>
-            <Column>
-              {asset ? (
-                <>
+            <Column alignItems="center" justifyContent="center">
+              {assetShortHeader.objectType !== 'sprite' ? (
+                <div style={styles.previewBackground}>
+                  <AssetPreviewImage assetShortHeader={assetShortHeader} />
+                </div>
+              ) : asset ? (
+                <div style={styles.previewBackground}>
                   {asset.objectType === 'sprite' &&
                   animationResources &&
                   typeof selectedAnimationName === 'string' && // Animation name can be empty string.
@@ -412,24 +361,7 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                         isAssetPrivate={isAssetPrivate}
                       />
                     )}
-                  {asset.objectType !== 'sprite' && (
-                    <div style={styles.previewBackground}>
-                      {isAssetPrivate ? (
-                        <AuthorizedAssetImage
-                          style={getImagePreviewStyle(asset)}
-                          url={asset.previewImageUrls[0]}
-                          alt={asset.name}
-                        />
-                      ) : (
-                        <CorsAwareImage
-                          style={getImagePreviewStyle(asset)}
-                          src={asset.previewImageUrls[0]}
-                          alt={asset.name}
-                        />
-                      )}
-                    </div>
-                  )}
-                </>
+                </div>
               ) : (
                 <div style={styles.previewBackground}>
                   <PlaceholderLoader />
@@ -510,30 +442,7 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                 )}
             </Column>
             <Column expand>
-              {asset ? (
-                <React.Fragment>
-                  <Text size="body">
-                    {!!assetLicense && (
-                      <Trans>
-                        Type of License:{' '}
-                        {
-                          <Link
-                            href={assetLicense.website}
-                            onClick={() =>
-                              Window.openExternalURL(assetLicense.website)
-                            }
-                          >
-                            {assetLicense.name}
-                          </Link>
-                        }
-                      </Trans>
-                    )}
-                  </Text>
-                  <Text size="body" displayInlineAsSpan>
-                    <MarkdownText source={asset.description} allowParagraphs />
-                  </Text>
-                </React.Fragment>
-              ) : error ? (
+              {error ? (
                 <PlaceholderError onRetry={loadAsset}>
                   <Trans>
                     Error while loading the asset. Verify your internet
@@ -541,38 +450,96 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                   </Trans>
                 </PlaceholderError>
               ) : (
-                <PlaceholderLoader />
+                <React.Fragment>
+                  <Text size="body">
+                    <Trans>
+                      Type of License:{' '}
+                      {assetLicense ? (
+                        <Link
+                          href={assetLicense.website}
+                          onClick={() =>
+                            Window.openExternalURL(assetLicense.website)
+                          }
+                        >
+                          {assetLicense.name}
+                        </Link>
+                      ) : (
+                        '-'
+                      )}
+                    </Trans>
+                  </Text>
+                  <Text size="body" displayInlineAsSpan hidden={!asset}>
+                    <MarkdownText
+                      source={
+                        asset
+                          ? asset.description
+                          : assetShortHeader.shortDescription
+                      }
+                      allowParagraphs
+                    />
+                  </Text>
+                  <Line alignItems="center">
+                    <div style={{ flexWrap: 'wrap' }}>
+                      {assetShortHeader.tags.slice(0, 5).map((tag, index) => (
+                        <React.Fragment key={tag}>
+                          {index !== 0 && <Spacer />}
+                          <Chip
+                            size="small"
+                            style={styles.chip}
+                            label={makeFirstLetterUppercase(tag)}
+                            onClick={() => {
+                              onTagSelection(tag);
+                            }}
+                          />
+                        </React.Fragment>
+                      ))}
+                      {assetShortHeader.tags.length > 5 && (
+                        <>
+                          <Spacer />
+                          <Chip
+                            size="small"
+                            style={styles.chip}
+                            label={
+                              <Trans>
+                                + {assetShortHeader.tags.length - 5} tag(s)
+                              </Trans>
+                            }
+                          />
+                        </>
+                      )}
+                    </div>
+                  </Line>
+                </React.Fragment>
               )}
             </Column>
           </ResponsiveLineStackLayout>
-          {asset && (
-            <Column expand>
-              <Spacer />
-              <Line noMargin>
-                <Text size="block-title" displayInlineAsSpan>
-                  <Trans>You might like</Trans>
-                </Text>
-              </Line>
-              <Line expand noMargin justifyContent="center">
-                <AssetsList
-                  assetShortHeaders={truncatedSearchResults}
-                  onOpenDetails={assetShortHeader => {
-                    setAsset(null);
-                    onOpenDetails(assetShortHeader);
-                  }}
-                  noScroll
-                  noResultsPlaceHolder={
-                    <Line alignItems="flex-start">
-                      <EmptyMessage>
-                        <Trans>No similar asset was found.</Trans>
-                      </EmptyMessage>
-                    </Line>
-                  }
-                  error={filterError}
-                />
-              </Line>
-            </Column>
-          )}
+
+          <Column expand>
+            <Spacer />
+            <Line noMargin>
+              <Text size="block-title" displayInlineAsSpan>
+                <Trans>You might like</Trans>
+              </Text>
+            </Line>
+            <Line expand noMargin justifyContent="center">
+              <AssetsList
+                assetShortHeaders={truncatedSearchResults}
+                onOpenDetails={assetShortHeader => {
+                  setAsset(null);
+                  onOpenDetails(assetShortHeader);
+                }}
+                noScroll
+                noResultsPlaceHolder={
+                  <Line alignItems="flex-start">
+                    <EmptyMessage>
+                      <Trans>No similar asset was found.</Trans>
+                    </EmptyMessage>
+                  </Line>
+                }
+                error={filterError}
+              />
+            </Line>
+          </Column>
           {selectedAuthorPublicProfile && (
             <PublicProfileDialog
               userId={selectedAuthorPublicProfile.id}

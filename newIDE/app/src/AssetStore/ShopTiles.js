@@ -126,11 +126,13 @@ export const AssetCardTile = ({
   onOpenDetails,
   size,
   margin,
+  hideShortDescription,
 }: {|
   assetShortHeader: AssetShortHeader,
   onOpenDetails: () => void,
   size: number,
   margin?: number,
+  hideShortDescription?: boolean,
 |}) => {
   const classesForGridListItem = useStylesForGridListItem();
 
@@ -152,6 +154,7 @@ export const AssetCardTile = ({
         id={`asset-card-${assetShortHeader.name.replace(/\s/g, '-')}`}
         assetShortHeader={assetShortHeader}
         size={size}
+        hideShortDescription={hideShortDescription}
       />
     </GridListTile>
   );

@@ -26,15 +26,15 @@ const styles = {
 
 type Props = {|
   assetShortHeader: AssetShortHeader,
-  maxSize: number,
+  maxSize?: number,
 |};
 
 export const AssetPreviewImage = ({ assetShortHeader, maxSize }: Props) => {
   const previewImageUrl = assetShortHeader.previewImageUrls[0];
   const isPrivate = isPrivateAsset(assetShortHeader);
   const style = {
-    maxWidth: maxSize - 2 * paddingSize,
-    maxHeight: maxSize - 2 * paddingSize,
+    maxWidth: maxSize ? maxSize - 2 * paddingSize : '100%',
+    maxHeight: maxSize ? maxSize - 2 * paddingSize : '100%',
     ...styles.previewImage,
     ...(isPixelArt(assetShortHeader)
       ? styles.previewImagePixelated

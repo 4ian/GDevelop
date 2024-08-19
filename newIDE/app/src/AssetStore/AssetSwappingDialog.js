@@ -133,7 +133,7 @@ function AssetSwappingDialog({
             actions={[
               <FlatButton
                 key="close"
-                label={<Trans>Close</Trans>}
+                label={<Trans>Back</Trans>}
                 primary={false}
                 onClick={handleClose}
                 id="close-button"

@@ -790,6 +790,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
               onGoBackToFolderIndex={goBackToFolderIndex}
               currentPage={shopNavigationState.getCurrentPage()}
               hideGameTemplates={hideGameTemplates}
+              hideDetails={!!assetSwappedObject}
             />
           ) : openedAssetShortHeader ? (
             <AssetDetails

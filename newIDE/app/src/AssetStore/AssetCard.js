@@ -38,9 +38,18 @@ type Props = {|
   id?: string,
   size: number,
   assetShortHeader: AssetShortHeader,
+  hideShortDescription?: boolean,
 |};
 
-export const AssetCard = ({ id, assetShortHeader, size }: Props) => {
+export const AssetCard = ({
+  id,
+  assetShortHeader,
+  size,
+  hideShortDescription,
+}: Props) => {
+  const displayShortDescription =
+    !hideShortDescription && !!assetShortHeader.shortDescription;
+
   return (
     <div id={id} style={{ ...styles.cardContainer, width: size, height: size }}>
       <div style={{ ...styles.previewContainer, width: size, height: size }}>
@@ -50,13 +59,13 @@ export const AssetCard = ({ id, assetShortHeader, size }: Props) => {
       <div
         style={{
           ...styles.titleContainer,
-          height: assetShortHeader.shortDescription ? 40 : 20,
+          height: displayShortDescription ? 40 : 20,
         }}
       >
         <Text noMargin style={styles.title} color="inherit">
           {assetShortHeader.name}
         </Text>
-        {assetShortHeader.shortDescription && (
+        {displayShortDescription && (
           <Text noMargin style={styles.title} size="body2" color="inherit">
             {assetShortHeader.shortDescription}
           </Text>

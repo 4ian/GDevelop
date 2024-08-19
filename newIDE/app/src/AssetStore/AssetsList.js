@@ -254,6 +254,7 @@ type Props = {|
   // then currentPage is null.
   currentPage?: AssetStorePageState,
   hideGameTemplates?: boolean,
+  hideDetails?: boolean,
 |};
 
 const AssetsList = React.forwardRef<Props, AssetsListInterface>(
@@ -273,6 +274,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
       noScroll,
       currentPage,
       hideGameTemplates,
+      hideDetails,
     }: Props,
     ref
   ) => {
@@ -483,6 +485,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
             size={getAssetSize(windowSize)}
             key={assetShortHeader.id}
             margin={cellSpacing / 2}
+            hideShortDescription={!!hideDetails}
           />
         ));
       },
@@ -494,6 +497,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
         pageBreakIndex,
         windowSize,
         onOpenDetails,
+        hideDetails,
       ]
     );
 

@@ -59,6 +59,7 @@ const styles = {
     display: 'flex',
     flex: 1,
     alignItems: 'center',
+    padding: '8px 0px',
   },
 };
 
@@ -498,7 +499,7 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                         </Column>
                                       </span>
                                     )}
-                                    <ResponsiveLineStackLayout expand>
+                                    <ResponsiveLineStackLayout expand noMargin>
                                       <Line noMargin expand alignItems="center">
                                         <SemiControlledTextField
                                           margin="none"
@@ -533,6 +534,7 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                         justifyContent="flex-end"
                                       >
                                         <SelectField
+                                          margin="none"
                                           value={
                                             property.isHidden()
                                               ? 'Hidden'
@@ -588,7 +590,7 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                     </ResponsiveLineStackLayout>
                                     <ElementWithMenu
                                       element={
-                                        <IconButton>
+                                        <IconButton size="small">
                                           <ThreeDotsMenu />
                                         </IconButton>
                                       }

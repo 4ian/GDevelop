@@ -57,6 +57,7 @@ const styles = {
     display: 'flex',
     flex: 1,
     alignItems: 'center',
+    padding: '8px 0px',
   },
 };
 
@@ -217,6 +218,7 @@ export default function EventsBasedObjectPropertiesEditor({
       property.setType('Number');
       forceUpdate();
       onPropertiesUpdated && onPropertiesUpdated();
+      setJustAddedPropertyName(newName)
       setSearchText('');
     },
     [eventsBasedObject, forceUpdate, onPropertiesUpdated]
@@ -447,7 +449,6 @@ export default function EventsBasedObjectPropertiesEditor({
           {properties.getCount() > 0 ? (
             <React.Fragment>
               <ScrollView ref={scrollView}>
-                <Line>
                   <Column noMargin expand>
                     {mapVector(
                       properties,
@@ -508,7 +509,7 @@ export default function EventsBasedObjectPropertiesEditor({
                                         </Column>
                                       </span>
                                     )}
-                                    <ResponsiveLineStackLayout expand>
+                                    <ResponsiveLineStackLayout expand noMargin>
                                       <Line noMargin expand alignItems="center">
                                         <SemiControlledTextField
                                           margin="none"
@@ -543,6 +544,7 @@ export default function EventsBasedObjectPropertiesEditor({
                                         justifyContent="flex-end"
                                       >
                                         <SelectField
+                                          margin="none"
                                           value={
                                             property.isHidden()
                                               ? 'Hidden'
@@ -598,7 +600,7 @@ export default function EventsBasedObjectPropertiesEditor({
                                     </ResponsiveLineStackLayout>
                                     <ElementWithMenu
                                       element={
-                                        <IconButton>
+                                        <IconButton size="small">
                                           <ThreeDotsMenu />
                                         </IconButton>
                                       }
@@ -927,7 +929,6 @@ export default function EventsBasedObjectPropertiesEditor({
                       }
                     )}
                   </Column>
-                </Line>
               </ScrollView>
               <Column>
                 <Line noMargin>

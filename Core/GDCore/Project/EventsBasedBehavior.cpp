@@ -42,7 +42,7 @@ void EventsBasedBehavior::UnserializeFrom(gd::Project& project,
   isPrivate = element.GetBoolAttribute("private");
   sharedPropertyDescriptors.UnserializeElementsFrom(
       "propertyDescriptor", element.GetChild("sharedPropertyDescriptors"));
-  if (element.HasAttribute("quickCustomizationVisibility")) {
+  if (element.HasChild("quickCustomizationVisibility")) {
     quickCustomizationVisibility =
         element.GetStringAttribute("quickCustomizationVisibility") == "visible"
             ? QuickCustomization::Visibility::Visible

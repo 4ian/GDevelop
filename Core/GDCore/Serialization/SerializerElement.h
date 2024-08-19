@@ -323,6 +323,7 @@ class GD_CORE_API SerializerElement {
                             gd::String deprecatedName = "") const;
 
   /**
+   * \deprecated Use HasChild instead. This should be removed from the codebase.
    * \brief Return true if the specified attribute exists.
    * \param name The name of the attribute to find.
    */

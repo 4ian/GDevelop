@@ -260,7 +260,7 @@ void ObjectFolderOrObject::UnserializeFrom(
     }
   }
 
-  if (element.HasAttribute("quickCustomizationVisibility")) {
+  if (element.HasChild("quickCustomizationVisibility")) {
     quickCustomizationVisibility =
         element.GetStringAttribute("quickCustomizationVisibility") == "visible"
             ? QuickCustomization::Visibility::Visible

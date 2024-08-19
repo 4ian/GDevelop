@@ -12,6 +12,7 @@ import Paper from '../UI/Paper';
 import { type Exporter } from '../ExportAndShare/ShareDialog';
 import { useGameAndBuildsManager } from '../Utils/UseGameAndBuildsManager';
 import { sendQuickCustomizationProgress } from '../Utils/Analytics/EventSender';
+import ScrollView from '../UI/ScrollView';
 
 type Props = {|
   project: gdProject,
@@ -137,20 +138,23 @@ export const QuickCustomizationDialog = ({
           />
         ),
       ]}
+      flexBody
     >
-      <ColumnStackLayout noMargin expand>
-        <LineStackLayout
-          noMargin
-          alignItems="center"
-          justifyContent="space-between"
-        >
-          <Text noMargin size={'title'}>
-            {title}
-          </Text>
-          {!isMediumOrSmaller ? titleRightContent : null}
-        </LineStackLayout>
-        {content}
-      </ColumnStackLayout>
+      <ScrollView key={quickCustomizationState.step.name}>
+        <ColumnStackLayout noMargin expand>
+          <LineStackLayout
+            noMargin
+            alignItems="center"
+            justifyContent="space-between"
+          >
+            <Text noMargin size={'title'}>
+              {title}
+            </Text>
+            {!isMediumOrSmaller ? titleRightContent : null}
+          </LineStackLayout>
+          {content}
+        </ColumnStackLayout>
+      </ScrollView>
     </Dialog>
   );
 };

@@ -10,7 +10,6 @@ import {
   getExample,
 } from '../../Utils/GDevelopServices/Example';
 import { isCompatibleWithAsset } from '../../Utils/GDevelopServices/Asset';
-import LeftLoader from '../../UI/LeftLoader';
 import PlaceholderError from '../../UI/PlaceholderError';
 import { MarkdownText } from '../../UI/MarkdownText';
 import Text from '../../UI/Text';

@@ -18,7 +18,6 @@ import SelectOption from '../UI/SelectOption';
 import CreateProfile from '../Profile/CreateProfile';
 import Paper from '../UI/Paper';
 import { Column, Line } from '../UI/Grid';
-import LeftLoader from '../UI/LeftLoader';
 import {
   checkIfHasTooManyCloudProjects,
   MaxProjectCountAlertMessage,

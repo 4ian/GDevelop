@@ -1450,7 +1450,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                     nextIcon: <Tune />,
                     nextLabel: <Trans>Parameters</Trans>,
                     nextEditor: 'parameters',
-                    previousEditor: () => 'functions-list',
+                    previousEditor: () => {
+                      this._selectEventsFunction(null, null, null);
+                      return 'functions-list';
+                    },
                   },
                   parameters: {
                     nextIcon: <Mark />,

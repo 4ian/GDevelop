@@ -600,9 +600,7 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                     }
                                     buildMenuTemplate={(i18n: I18nType) => [
                                       {
-                                        label: i18n._(
-                                          t`Add a property below`
-                                        ),
+                                        label: i18n._(t`Add a property below`),
                                         click: () => addPropertyAt(i + 1),
                                       },
                                       {

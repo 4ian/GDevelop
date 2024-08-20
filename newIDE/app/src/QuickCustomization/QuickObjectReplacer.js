@@ -2,13 +2,15 @@
 import * as React from 'react';
 import { ObjectPreview } from './ObjectPreview';
 import { mapFor } from '../Utils/MapFor';
-import { ColumnStackLayout } from '../UI/Layout';
+import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import FlatButton from '../UI/FlatButton';
 import AssetSwappingDialog from '../AssetStore/AssetSwappingDialog';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import Text from '../UI/Text';
 import { Trans } from '@lingui/macro';
 import { enumerateObjectFolderOrObjects } from '.';
+import { CalloutCard } from '../UI/CalloutCard';
+import { LargeSpacer } from '../UI/Grid';
 
 type Props = {|
   project: gdProject,
@@ -74,6 +76,30 @@ export const QuickObjectReplacer = ({
           </ColumnStackLayout>
         );
       })}
+      <LargeSpacer />
+      <CalloutCard
+        renderImage={style => (
+          <img
+            src="res/quick_customization/replace_objects.svg"
+            style={style}
+            alt=""
+          />
+        )}
+      >
+        <ResponsiveLineStackLayout noMargin expand alignItems="stretch">
+          <ColumnStackLayout alignItems="flex-start" expand noMargin>
+            <Text noMargin size="block-title">
+              <Trans>Objects are everything in your game</Trans>
+            </Text>
+            <Text noMargin size="body">
+              <Trans>
+                Each character, player, obstacle, background, item, etc. is an
+                object. Objects are the building blocks of your game.
+              </Trans>
+            </Text>
+          </ColumnStackLayout>
+        </ResponsiveLineStackLayout>
+      </CalloutCard>
       {selectedObjectToSwap && (
         <AssetSwappingDialog
           project={project}

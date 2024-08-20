@@ -73,7 +73,7 @@ export const QuickPublish = ({
       <Spacer />
       <img
         alt="Publish your game with GDevelop"
-        src="res/quick_publish.svg"
+        src="res/quick_customization/quick_publish.svg"
         className={classNames({
           [classes.illustrationImage]: true,
           [classes.animatedRocket]: exportState === 'started',

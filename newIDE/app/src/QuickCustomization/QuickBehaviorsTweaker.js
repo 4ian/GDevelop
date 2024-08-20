@@ -8,6 +8,9 @@ import Text from '../UI/Text';
 import { enumerateObjectFolderOrObjects } from '.';
 import CompactPropertiesEditor from '../CompactPropertiesEditor';
 import propertiesMapToSchema from '../CompactPropertiesEditor/PropertiesMapToCompactSchema';
+import { Trans } from '@lingui/macro';
+import { CalloutCard } from '../UI/CalloutCard';
+import { LargeSpacer } from '../UI/Grid';
 
 const gd: libGDevelop = global.gd;
 
@@ -175,6 +178,30 @@ export const QuickBehaviorsTweaker = ({
           </ColumnStackLayout>
         );
       }).filter(Boolean)}
+      <LargeSpacer />
+      <CalloutCard
+        renderImage={style => (
+          <img
+            src="res/quick_customization/tweak_gameplay.svg"
+            style={style}
+            alt=""
+          />
+        )}
+      >
+        <ResponsiveLineStackLayout noMargin expand alignItems="stretch">
+          <ColumnStackLayout alignItems="flex-start" expand noMargin>
+            <Text noMargin size="block-title">
+              <Trans>Making a fun game with behaviors</Trans>
+            </Text>
+            <Text noMargin size="body">
+              <Trans>
+                Behaviors are attached to objects and make them alive. The rules
+                of the game can be created using behaviors and events.
+              </Trans>
+            </Text>
+          </ColumnStackLayout>
+        </ResponsiveLineStackLayout>
+      </CalloutCard>
     </ColumnStackLayout>
   );
 };

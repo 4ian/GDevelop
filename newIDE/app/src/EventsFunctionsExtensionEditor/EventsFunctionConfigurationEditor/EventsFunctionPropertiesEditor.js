@@ -9,7 +9,7 @@ import * as React from 'react';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
-import { mapVector, mapFor } from '../../Utils/MapFor';
+import { mapFor } from '../../Utils/MapFor';
 import HelpButton from '../../UI/HelpButton';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import EmptyMessage from '../../UI/EmptyMessage';

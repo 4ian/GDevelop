@@ -213,6 +213,9 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                               customObjectConfiguration.setMarkedAsOverridingEventsBasedObjectChildrenConfiguration(
                                 true
                               );
+                              if (onObjectUpdated) {
+                                onObjectUpdated();
+                              }
                               forceUpdate();
                             }}
                           />
@@ -238,6 +241,9 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                                     false
                                   );
                                   customObjectConfiguration.clearChildrenConfiguration();
+                                  if (onObjectUpdated) {
+                                    onObjectUpdated();
+                                  }
                                   forceUpdate();
                                 }}
                               />
@@ -332,6 +338,8 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                                             ' ' +
                                             childObject.getName()
                                           }
+                                          onObjectUpdated={onObjectUpdated}
+                                          unsavedChanges={unsavedChanges}
                                         />
                                       </Column>
                                     </Line>

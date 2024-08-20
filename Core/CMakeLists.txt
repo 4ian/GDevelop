@@ -11,6 +11,11 @@ set(CMAKE_CXX_USE_RESPONSE_FILE_FOR_INCLUDES 1)
 set(GDCORE_include_dir ${GD_base_dir}/Core PARENT_SCOPE)
 set(GDCORE_lib_dir ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME} PARENT_SCOPE)
 
+# Create VersionPriv.h - only useful for testing.
+if (NOT EMSCRIPTEN)
+	file(WRITE "${GD_base_dir}/Core/GDCore/Tools/VersionPriv.h" "#define GD_VERSION_STRING \"0.0.0-0\"")
+endif()
+
 # Dependencies on external libraries:
 #
 

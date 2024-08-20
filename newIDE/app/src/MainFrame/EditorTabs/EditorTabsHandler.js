@@ -109,6 +109,8 @@ export const getEditorTabMetadata = (
         ? 'layout events'
         : editorTab.editorRef instanceof EventsFunctionsExtensionEditorContainer
         ? 'events functions extension'
+        : editorTab.editorRef instanceof CustomObjectEditorContainer
+        ? 'custom object'
         : editorTab.editorRef instanceof DebuggerEditorContainer
         ? 'debugger'
         : 'start page',

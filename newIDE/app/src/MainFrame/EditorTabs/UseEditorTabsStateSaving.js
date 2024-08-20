@@ -47,6 +47,9 @@ const projectHasItem = ({
       return project.hasExternalLayoutNamed(name);
     case 'external events':
       return project.hasExternalEventsNamed(name);
+    case 'custom object':
+      console.log('hasEventsBasedObject: ' + name);
+      return project.hasEventsBasedObject(name);
     default:
       return false;
   }

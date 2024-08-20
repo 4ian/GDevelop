@@ -576,7 +576,7 @@ const MainFrame = (props: Props) => {
           : kind === 'layout events'
           ? name + ` ${i18n._(t`(Events)`)}`
           : kind === 'custom object'
-          ? name.split('.')[1] + ` ${i18n._(t`(Object)`)}`
+          ? name.split('::')[1] + ` ${i18n._(t`(Object)`)}`
           : name;
       const tabOptions =
         kind === 'layout'
@@ -596,15 +596,17 @@ const MainFrame = (props: Props) => {
         : kind;
 
       let customIconUrl = '';
-      if (
-        (kind === 'events functions extension' || kind === 'custom object') &&
-        project &&
-        project.hasEventsFunctionsExtensionNamed(name)
-      ) {
-        const eventsFunctionsExtension = project.getEventsFunctionsExtension(
-          name
-        );
-        customIconUrl = eventsFunctionsExtension.getIconUrl();
+      if (kind === 'events functions extension' || kind === 'custom object') {
+        const extensionName = name.split('::')[0];
+        if (
+          project &&
+          project.hasEventsFunctionsExtensionNamed(extensionName)
+        ) {
+          const eventsFunctionsExtension = project.getEventsFunctionsExtension(
+            extensionName
+          );
+          customIconUrl = eventsFunctionsExtension.getIconUrl();
+        }
       }
       const icon =
         kind === 'start page' ? (
@@ -621,7 +623,8 @@ const MainFrame = (props: Props) => {
           <ExternalEventsIcon />
         ) : kind === 'external layout' ? (
           <ExternalLayoutIcon />
-        ) : kind === 'events functions extension' ? (
+        ) : kind === 'events functions extension' ||
+          kind === 'custom object' ? (
           <ExtensionIcon />
         ) : null;
 
@@ -1941,7 +1944,7 @@ const MainFrame = (props: Props) => {
               kind: 'custom object',
               name:
                 eventsFunctionsExtension.getName() +
-                '.' +
+                '::' +
                 eventsBasedObject.getName(),
               project: currentProject,
             }),

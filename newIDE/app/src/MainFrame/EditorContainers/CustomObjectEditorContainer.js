@@ -104,7 +104,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
   getEventsFunctionsExtension(): ?gdEventsFunctionsExtension {
     const { project, projectItemName } = this.props;
     if (!project || !projectItemName) return null;
-    const extensionName = projectItemName.split('.')[0]; //TODO
+    const extensionName = projectItemName.split('::')[0]; //TODO
 
     if (!project.hasEventsFunctionsExtensionNamed(extensionName)) {
       return null;
@@ -119,7 +119,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     const extension = this.getEventsFunctionsExtension();
     if (!extension) return null;
 
-    const eventsBasedObjectName = projectItemName.split('.')[1];
+    const eventsBasedObjectName = projectItemName.split('::')[1];
 
     if (!extension.getEventsBasedObjects().has(eventsBasedObjectName)) {
       return null;

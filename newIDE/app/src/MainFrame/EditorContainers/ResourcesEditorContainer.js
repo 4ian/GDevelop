@@ -32,6 +32,10 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
     // No updates to be done.
   }
 
+  onEventsBasedObjectChildrenEdited() {
+    // No thing to be done.
+  }
+
   componentDidUpdate(prevProps: RenderEditorContainerProps) {
     if (
       this.editor &&

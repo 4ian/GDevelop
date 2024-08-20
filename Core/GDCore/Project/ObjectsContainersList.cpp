@@ -589,4 +589,13 @@ std::vector<gd::String> ObjectsContainersList::GetAnimationNamesOfObject(
   return animationNames;
 }
 
+const gd::ObjectsContainer &
+ObjectsContainersList::GetObjectsContainer(std::size_t index) const {
+  return *objectsContainers[index];
+}
+
+std::size_t ObjectsContainersList::GetObjectsContainersCount() const {
+  return objectsContainers.size();
+}
+
 }  // namespace gd

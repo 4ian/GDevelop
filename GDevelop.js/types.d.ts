@@ -599,6 +599,8 @@ export class ObjectsContainersList extends EmscriptenObject {
   getTypeOfBehaviorInObjectOrGroup(objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): string;
   hasObjectOrGroupNamed(name: string): boolean;
   hasObjectOrGroupWithVariableNamed(objectName: string, variableName: string): ObjectsContainersList_VariableExistence;
+  getObjectsContainer(index: number): ObjectsContainer;
+  getObjectsContainersCount(): number;
 }
 
 export class ProjectScopedContainers extends EmscriptenObject {

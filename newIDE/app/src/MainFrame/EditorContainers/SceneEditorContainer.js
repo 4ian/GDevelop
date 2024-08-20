@@ -54,6 +54,14 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
     }
   }
 
+  onEventsBasedObjectChildrenEdited() {
+    const { editor } = this;
+    if (editor) {
+      editor.forceUpdateObjectsList();
+      editor.forceUpdateCustomObjectRenderedInstances();
+    }
+  }
+
   getLayout(): ?gdLayout {
     const { project, projectItemName } = this.props;
     if (
@@ -122,6 +130,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
         openBehaviorEvents={this.props.openBehaviorEvents}
         onExtractAsExternalLayout={this.props.onExtractAsExternalLayout}
+        onObjectEdited={() => {}}
       />
     );
   }

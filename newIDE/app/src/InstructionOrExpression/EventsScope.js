@@ -119,4 +119,27 @@ export class ProjectScopedContainersAccessor {
       [...this._eventPath, event]
     );
   }
+
+  forEachObject(func: (object: gdObject) => void): void {
+    const objectsContainersList = this.get().getObjectsContainersList();
+    for (
+      let containerIndex = 0;
+      containerIndex < objectsContainersList.getObjectsContainersCount();
+      containerIndex++
+    ) {
+      const objectsContainer = objectsContainersList.getObjectsContainer(
+        containerIndex
+      );
+
+      for (
+        let objectIndex = 0;
+        objectIndex < objectsContainer.getObjectsCount();
+        objectIndex++
+      ) {
+        const object = objectsContainer.getObjectAt(objectIndex);
+
+        func(object);
+      }
+    }
+  }
 }

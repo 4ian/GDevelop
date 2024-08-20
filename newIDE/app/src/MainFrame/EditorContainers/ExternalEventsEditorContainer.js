@@ -81,6 +81,10 @@ export class ExternalEventsEditorContainer extends React.Component<
     // No updates to be done.
   }
 
+  onEventsBasedObjectChildrenEdited() {
+    // No thing to be done.
+  }
+
   getExternalEvents(): ?gdExternalEvents {
     const { project, projectItemName } = this.props;
     if (!project || !projectItemName) return null;

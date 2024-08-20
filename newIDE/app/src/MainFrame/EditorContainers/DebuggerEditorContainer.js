@@ -48,6 +48,10 @@ export class DebuggerEditorContainer extends React.Component<
     // No updates to be done.
   }
 
+  onEventsBasedObjectChildrenEdited() {
+    // No thing to be done.
+  }
+
   // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.
   UNSAFE_componentWillReceiveProps() {
     this._checkUserHasSubscription();

@@ -90,6 +90,14 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     }
   }
 
+  onEventsBasedObjectChildrenEdited() {
+    const { editor } = this;
+    if (editor) {
+      editor.forceUpdateObjectsList();
+      editor.forceUpdateCustomObjectRenderedInstances();
+    }
+  }
+
   saveUiSettings = () => {
     // const layout = this.getCustomObject();
     // const editor = this.editor;
@@ -177,6 +185,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
           isActive={isActive}
           hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
           openBehaviorEvents={this.props.openBehaviorEvents}
+          onObjectEdited={this.props.onEventsBasedObjectChildrenEdited}
         />
       </div>
     );

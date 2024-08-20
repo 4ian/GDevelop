@@ -173,6 +173,16 @@ class GD_CORE_API ObjectsContainersList {
       std::function<void(const gd::String& variableName,
                          const gd::Variable& variable)> fn) const;
 
+  /**
+   * \brief Return a the objects container at position \a index.
+   */
+  const gd::ObjectsContainer &GetObjectsContainer(std::size_t index) const;
+
+  /**
+   * \brief Return the number of objects containers.
+   */
+  std::size_t GetObjectsContainersCount() const;
+
   /** Do not use - should be private but accessible to let Emscripten create a
    * temporary. */
   ObjectsContainersList(){};

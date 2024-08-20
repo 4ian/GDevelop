@@ -110,6 +110,10 @@ export class ExternalLayoutEditorContainer extends React.Component<
     }
   }
 
+  onEventsBasedObjectChildrenEdited() {
+    // No thing to be done.
+  }
+
   getExternalLayout(): ?gdExternalLayout {
     const { project, projectItemName } = this.props;
     if (!project || !projectItemName) return null;
@@ -227,6 +231,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
             isActive={isActive}
             openBehaviorEvents={this.props.openBehaviorEvents}
             onExtractAsExternalLayout={this.props.onExtractAsExternalLayout}
+            onObjectEdited={() => {}}
           />
         )}
         {!layout && (

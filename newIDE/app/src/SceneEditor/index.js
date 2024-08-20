@@ -114,6 +114,7 @@ type Props = {|
   onEditObject?: ?(object: gdObject) => void,
   onOpenMoreSettings?: ?() => void,
   onOpenEvents: (sceneName: string) => void,
+  onObjectEdited: () => void,
 
   setToolbar: (?React.Node) => void,
   resourceManagementProps: ResourceManagementProps,
@@ -1709,6 +1710,36 @@ export default class SceneEditor extends React.Component<Props, State> {
       this.editorDisplay.forceUpdateInstancesPropertiesEditor();
   };
 
+  forceUpdateCustomObjectRenderedInstances = () => {
+    const { project, projectScopedContainersAccessor } = this.props;
+
+    const resourcesInUse = new gd.ResourcesInUseHelper(
+      project.getResourcesManager()
+    );
+    projectScopedContainersAccessor.forEachObject(object => {
+      if (project.hasEventsBasedObject(object.getType())) {
+        object.getConfiguration().exposeResources(resourcesInUse);
+      }
+    });
+    const objectResourceNames = resourcesInUse
+      .getAllImages()
+      .toNewVectorString()
+      .toJSArray();
+    resourcesInUse.delete();
+
+    PixiResourcesLoader.loadTextures(project, objectResourceNames).then(() => {
+      const { editorDisplay } = this;
+      if (!editorDisplay) {
+        return;
+      }
+      projectScopedContainersAccessor.forEachObject(object => {
+        editorDisplay.instancesHandlers.resetInstanceRenderersFor(
+          object.getName()
+        );
+      });
+    });
+  };
+
   reloadResourcesFor = (object: gdObject) => {
     const { project } = this.props;
 
@@ -1947,6 +1978,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                         }}
                         onApply={() => {
                           if (editedObjectWithContext) {
+                            this.props.onObjectEdited();
                             this.reloadResourcesFor(
                               editedObjectWithContext.object
                             );

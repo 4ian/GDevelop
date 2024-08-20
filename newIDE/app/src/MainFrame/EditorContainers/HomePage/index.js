@@ -134,10 +134,11 @@ type Props = {|
   resourceManagementProps: ResourceManagementProps,
 |};
 
-type HomePageEditorInterface = {|
+export type HomePageEditorInterface = {|
   getProject: () => void,
   updateToolbar: () => void,
   forceUpdateEditor: () => void,
+  onEventsBasedObjectChildrenEdited: () => void,
 |};
 
 export const HomePage = React.memo<Props>(
@@ -411,10 +412,15 @@ export const HomePage = React.memo<Props>(
         // No updates to be done
       }, []);
 
+      const onEventsBasedObjectChildrenEdited = React.useCallback(() => {
+        // No thing to be done
+      }, []);
+
       React.useImperativeHandle(ref, () => ({
         getProject,
         updateToolbar,
         forceUpdateEditor,
+        onEventsBasedObjectChildrenEdited,
       }));
 
       const onUserSurveyStarted = React.useCallback(() => {

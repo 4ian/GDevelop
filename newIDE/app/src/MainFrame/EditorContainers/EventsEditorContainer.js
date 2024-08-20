@@ -44,6 +44,10 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
     // No updates to be done.
   }
 
+  onEventsBasedObjectChildrenEdited() {
+    // No thing to be done.
+  }
+
   getLayout(): ?gdLayout {
     const { project, projectItemName } = this.props;
     if (

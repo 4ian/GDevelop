@@ -2025,6 +2025,16 @@ const MainFrame = (props: Props) => {
     openExternalLayout(name);
   };
 
+  const onEventsBasedObjectChildrenEdited = () => {
+    const { editorTabs } = state;
+    for (const editor of editorTabs.editors) {
+      const { editorRef } = editor;
+      if (editorRef) {
+        editorRef.onEventsBasedObjectChildrenEdited();
+      }
+    }
+  };
+
   const _onProjectItemModified = () => {
     triggerUnsavedChanges();
     forceUpdate();
@@ -3529,6 +3539,7 @@ const MainFrame = (props: Props) => {
                     },
                     openBehaviorEvents: openBehaviorEvents,
                     onExtractAsExternalLayout: onExtractAsExternalLayout,
+                    onEventsBasedObjectChildrenEdited: onEventsBasedObjectChildrenEdited,
                   })}
                 </ErrorBoundary>
               </CommandsContextScopedProvider>

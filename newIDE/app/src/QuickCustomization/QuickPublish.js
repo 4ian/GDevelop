@@ -13,13 +13,8 @@ import { type GameAndBuildsManager } from '../Utils/UseGameAndBuildsManager';
 import FlatButton from '../UI/FlatButton';
 import { Spacer } from '../UI/Grid';
 import TextButton from '../UI/TextButton';
-
-const styles = {
-  illustrationImage: {
-    width: 100,
-    aspectRatio: '117 / 162',
-  },
-};
+import classes from './QuickPublish.module.css';
+import classNames from 'classnames';
 
 type Props = {|
   project: gdProject,
@@ -79,7 +74,10 @@ export const QuickPublish = ({
       <img
         alt="Publish your game with GDevelop"
         src="res/quick_publish.svg"
-        style={styles.illustrationImage}
+        className={classNames({
+          [classes.illustrationImage]: true,
+          [classes.animatedRocket]: exportState === 'started',
+        })}
       />
       {profile ? (
         <I18n>

@@ -145,6 +145,7 @@ const styles = {
     margin: '0 2px', // Remove the default margin of the grid but keep the horizontal padding for focus outline.
     // Remove the scroll capability of the grid, the scroll view handles it.
     overflow: 'unset',
+    justifyContent: 'center',
   },
   scrollView: {
     display: 'flex',

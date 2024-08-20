@@ -1,6 +1,5 @@
 // @flow
 import { unserializeFromJSObject } from '../../Utils/Serializer';
-import { mapVector } from '../../Utils/MapFor';
 import { getFreeEventsFunctionType } from '../../EventsFunctionsExtensionsLoader';
 import getObjectGroupByName from '../../Utils/GetObjectGroupByName';
 import {

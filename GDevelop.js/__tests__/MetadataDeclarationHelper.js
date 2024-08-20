@@ -1691,10 +1691,10 @@ describe('MetadataDeclarationHelper', () => {
     eventFunction.setDescription('');
     eventFunction.setSentence('');
 
-    const parameter = new gd.ParameterMetadata();
-    parameter.setType('number');
-    parameter.setName("Parameter");
-    eventFunction.getParameters().push_back(parameter);
+    eventFunction
+      .getParameters()
+      .addNewParameter('Parameter')
+      .setType('number');
 
     const metadataDeclarationHelper = new gd.MetadataDeclarationHelper();
     metadataDeclarationHelper.generateFreeFunctionMetadata(
@@ -1732,10 +1732,10 @@ describe('MetadataDeclarationHelper', () => {
     eventFunction.setDescription('');
     eventFunction.setSentence('');
 
-    const parameter = new gd.ParameterMetadata();
-    parameter.setType('number');
-    parameter.setName("Parameter");
-    eventFunction.getParameters().push_back(parameter);
+    eventFunction
+      .getParameters()
+      .addNewParameter('Parameter')
+      .setType('number');
 
     const metadataDeclarationHelper = new gd.MetadataDeclarationHelper();
     metadataDeclarationHelper.generateFreeFunctionMetadata(
@@ -1770,10 +1770,10 @@ describe('MetadataDeclarationHelper', () => {
     eventFunction.setDescription('');
     eventFunction.setSentence('');
     
-    const parameter = new gd.ParameterMetadata();
-    parameter.setType('number');
-    parameter.setName("Parameter");
-    eventFunction.getParameters().push_back(parameter);
+    eventFunction
+      .getParameters()
+      .addNewParameter('Parameter')
+      .setType('number');
 
     const metadataDeclarationHelper = new gd.MetadataDeclarationHelper();
     metadataDeclarationHelper.generateFreeFunctionMetadata(
@@ -1814,10 +1814,10 @@ describe('MetadataDeclarationHelper', () => {
     getter.setDescription('');
     getter.setSentence('');
     
-    const parameter = new gd.ParameterMetadata();
-    parameter.setType('number');
-    parameter.setName("Parameter");
-    getter.getParameters().push_back(parameter);
+    getter
+      .getParameters()
+      .addNewParameter('Parameter')
+      .setType('number');
 
     const eventFunction = eventExtension.insertNewEventsFunction('SetValue', 0);
     eventFunction.setFunctionType(gd.EventsFunction.ActionWithOperator);
@@ -1865,10 +1865,10 @@ describe('MetadataDeclarationHelper', () => {
       eventExtension,
       eventBehavior
     );
-    const parameter = new gd.ParameterMetadata();
-    parameter.setType('number');
-    parameter.setName("Parameter");
-    eventFunction.getParameters().push_back(parameter);
+    eventFunction
+      .getParameters()
+      .addNewParameter('Parameter')
+      .setType('number');
 
     const behaviorMethodMangledNames = new gd.MapStringString();
     gd.MetadataDeclarationHelper.generateBehaviorMetadata(
@@ -1924,10 +1924,10 @@ describe('MetadataDeclarationHelper', () => {
       eventExtension,
       eventBehavior
     );
-    const parameter = new gd.ParameterMetadata();
-    parameter.setType('number');
-    parameter.setName("Parameter");
-    eventFunction.getParameters().push_back(parameter);
+    eventFunction
+      .getParameters()
+      .addNewParameter('Parameter')
+      .setType('number');
 
     const behaviorMethodMangledNames = new gd.MapStringString();
     gd.MetadataDeclarationHelper.generateBehaviorMetadata(
@@ -1983,10 +1983,10 @@ describe('MetadataDeclarationHelper', () => {
       eventExtension,
       eventBehavior
     );
-    const parameter = new gd.ParameterMetadata();
-    parameter.setType('number');
-    parameter.setName("Parameter");
-    eventFunction.getParameters().push_back(parameter);
+    eventFunction
+      .getParameters()
+      .addNewParameter('Parameter')
+      .setType('number');
 
     const behaviorMethodMangledNames = new gd.MapStringString();
     gd.MetadataDeclarationHelper.generateBehaviorMetadata(
@@ -2054,10 +2054,10 @@ describe('MetadataDeclarationHelper', () => {
       eventExtension,
       eventBehavior
     );
-    const parameter = new gd.ParameterMetadata();
-    parameter.setType('number');
-    parameter.setName("Parameter");
-    getter.getParameters().push_back(parameter);
+    getter
+      .getParameters()
+      .addNewParameter('Parameter')
+      .setType('number');
 
     const behaviorMethodMangledNames = new gd.MapStringString();
     gd.MetadataDeclarationHelper.generateBehaviorMetadata(
@@ -2111,10 +2111,10 @@ describe('MetadataDeclarationHelper', () => {
       eventExtension,
       eventObject
     );
-    const parameter = new gd.ParameterMetadata();
-    parameter.setType('number');
-    parameter.setName("Parameter");
-    eventFunction.getParameters().push_back(parameter);
+    eventFunction
+      .getParameters()
+      .addNewParameter('Parameter')
+      .setType('number');
 
     const objectMethodMangledNames = new gd.MapStringString();
     gd.MetadataDeclarationHelper.generateObjectMetadata(
@@ -2165,10 +2165,10 @@ describe('MetadataDeclarationHelper', () => {
       eventExtension,
       eventObject
     );
-    const parameter = new gd.ParameterMetadata();
-    parameter.setType('number');
-    parameter.setName("Parameter");
-    eventFunction.getParameters().push_back(parameter);
+    eventFunction
+      .getParameters()
+      .addNewParameter('Parameter')
+      .setType('number');
 
     const objectMethodMangledNames = new gd.MapStringString();
     gd.MetadataDeclarationHelper.generateObjectMetadata(
@@ -2222,10 +2222,10 @@ describe('MetadataDeclarationHelper', () => {
       eventExtension,
       eventObject
     );
-    const parameter = new gd.ParameterMetadata();
-    parameter.setType('number');
-    parameter.setName("Parameter");
-    eventFunction.getParameters().push_back(parameter);
+    eventFunction
+      .getParameters()
+      .addNewParameter('Parameter')
+      .setType('number');
 
     const objectMethodMangledNames = new gd.MapStringString();
     gd.MetadataDeclarationHelper.generateObjectMetadata(
@@ -2289,10 +2289,10 @@ describe('MetadataDeclarationHelper', () => {
       eventExtension,
       eventObject
     );
-    const parameter = new gd.ParameterMetadata();
-    parameter.setType('number');
-    parameter.setName("Parameter");
-    getter.getParameters().push_back(parameter);
+    getter
+      .getParameters()
+      .addNewParameter('Parameter')
+      .setType('number');
 
     const objectMethodMangledNames = new gd.MapStringString();
     gd.MetadataDeclarationHelper.generateObjectMetadata(

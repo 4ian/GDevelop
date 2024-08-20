@@ -86,9 +86,11 @@ class GD_CORE_API IdentifierFinderExpressionNodeWorker
     }
 
     size_t parameterIndex = 0;
-    for (size_t metadataIndex = (isObjectFunction ? 1 : 0); metadataIndex < metadata.parameters.size()
-      && parameterIndex < node.parameters.size(); ++metadataIndex) {
-      auto& parameterMetadata = metadata.parameters[metadataIndex];
+    for (size_t metadataIndex = (isObjectFunction ? 1 : 0);
+         metadataIndex < metadata.GetParameters().GetParametersCount() &&
+         parameterIndex < node.parameters.size();
+         ++metadataIndex) {
+      auto& parameterMetadata = metadata.GetParameters().GetParameter(metadataIndex);
       if (parameterMetadata.IsCodeOnly()) {
         continue;
       }
@@ -144,10 +146,10 @@ class GD_CORE_API IdentifierFinderEventWorker
                               platform, instruction.GetType())
                         : MetadataProvider::GetActionMetadata(
                               platform, instruction.GetType());
-      for (std::size_t pNb = 0; pNb < instrInfos.parameters.size(); ++pNb) {
+      for (std::size_t pNb = 0; pNb < instrInfos.parameters.GetParametersCount(); ++pNb) {
         // The parameter has the searched type...
-      if (instrInfos.parameters[pNb].GetType() == "identifier"
-       && instrInfos.parameters[pNb].GetExtraInfo() == identifierType) {
+      if (instrInfos.parameters.GetParameter(pNb).GetType() == "identifier"
+       && instrInfos.parameters.GetParameter(pNb).GetExtraInfo() == identifierType) {
           //...remember the value of the parameter.
           if (objectName.empty() || lastObjectParameter == objectName) {
             results.insert(instruction.GetParameter(pNb).GetPlainString());
@@ -155,9 +157,9 @@ class GD_CORE_API IdentifierFinderEventWorker
         }
         // Search in expressions
         else if (ParameterMetadata::IsExpression(
-                    "number", instrInfos.parameters[pNb].GetType()) ||
+                    "number", instrInfos.parameters.GetParameter(pNb).GetType()) ||
                 ParameterMetadata::IsExpression(
-                    "string", instrInfos.parameters[pNb].GetType())) {
+                    "string", instrInfos.parameters.GetParameter(pNb).GetType())) {
           auto node = instruction.GetParameter(pNb).GetRootNode();
 
           IdentifierFinderExpressionNodeWorker searcher(
@@ -170,7 +172,7 @@ class GD_CORE_API IdentifierFinderEventWorker
         }
         // Remember the value of the last "object" parameter.
         else if (gd::ParameterMetadata::IsObject(
-                    instrInfos.parameters[pNb].GetType())) {
+                    instrInfos.parameters.GetParameter(pNb).GetType())) {
           lastObjectParameter =
               instruction.GetParameter(pNb).GetPlainString();
         }

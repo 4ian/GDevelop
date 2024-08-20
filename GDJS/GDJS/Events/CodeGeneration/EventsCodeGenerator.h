@@ -24,6 +24,7 @@ class InstructionMetadata;
 class ExpressionCodeGenerationInformation;
 class EventsCodeGenerationContext;
 class ProjectScopedContainers;
+class ParameterMetadataContainer;
 }  // namespace gd
 
 namespace gdjs {
@@ -391,7 +392,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    * parentEventsFunctionContext as the last parameter.
    */
   gd::String GenerateEventsFunctionParameterDeclarationsList(
-      const std::vector<gd::ParameterMetadata>& parameters,
+      const gd::ParameterMetadataContainer& parameters,
       int firstParameterIndex,
       bool addsSceneParameter);
 

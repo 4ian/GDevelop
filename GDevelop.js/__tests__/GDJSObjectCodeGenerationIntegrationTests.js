@@ -54,11 +54,10 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
         .getEvents()
         .unserializeFrom(project, eventsSerializerElement);
 
-      const objectParameter = new gd.ParameterMetadata();
-      objectParameter.setType('object');
-      objectParameter.setName('MyParamObject');
-      eventsFunction.getParameters().push_back(objectParameter);
-      objectParameter.delete();
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('MyParamObject', 0)
+        .setType('object');
 
       const runCompiledEvents = generateCompiledEventsForEventsFunction(
         gd,
@@ -227,11 +226,10 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
         .getEvents()
         .unserializeFrom(project, eventsSerializerElement);
 
-      const objectParameter = new gd.ParameterMetadata();
-      objectParameter.setType('object');
-      objectParameter.setName('MyParamObject');
-      eventsFunction.getParameters().push_back(objectParameter);
-      objectParameter.delete();
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('MyParamObject', 0)
+        .setType('object');
 
       const runCompiledEvents = generateCompiledEventsForEventsFunction(
         gd,
@@ -333,11 +331,10 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
         .getEvents()
         .unserializeFrom(project, eventsSerializerElement);
 
-      const objectParameter = new gd.ParameterMetadata();
-      objectParameter.setType('object');
-      objectParameter.setName('MyParamObject');
-      eventsFunction.getParameters().push_back(objectParameter);
-      objectParameter.delete();
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('MyParamObject', 0)
+        .setType('object');
 
       const runCompiledEvents = generateCompiledEventsForEventsFunction(
         gd,
@@ -478,14 +475,14 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
       group.addObject('ObjectParam1');
       group.addObject('ObjectParam2');
 
-      const objectParameter = new gd.ParameterMetadata();
-      objectParameter.setType('object');
-      objectParameter.setName('ObjectParam1');
-      eventsFunction.getParameters().push_back(objectParameter);
-      objectParameter.setType('object');
-      objectParameter.setName('ObjectParam2');
-      eventsFunction.getParameters().push_back(objectParameter);
-      objectParameter.delete();
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('ObjectParam1', 0)
+        .setType('object');
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('ObjectParam2', 1)
+        .setType('object');
 
       const runCompiledEvents = generateCompiledEventsForEventsFunction(
         gd,
@@ -627,11 +624,10 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
         .getEvents()
         .unserializeFrom(project, eventsSerializerElement);
 
-      const objectParameter = new gd.ParameterMetadata();
-      objectParameter.setType('object');
-      objectParameter.setName('MyParamObject');
-      eventsFunction.getParameters().push_back(objectParameter);
-      objectParameter.delete();
+      eventsFunction
+        .getParameters()
+        .insertNewParameter('MyParamObject', 0)
+        .setType('object');
 
       const runCompiledEvents = generateCompiledEventsForEventsFunction(
         gd,

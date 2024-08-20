@@ -212,12 +212,12 @@ export default function EventsBasedBehaviorPropertiesEditor({
     [searchText, triggerSearch]
   );
 
-  const addProperty = React.useCallback(
-    () => {
+  const addPropertyAt = React.useCallback(
+    (index: number) => {
       const newName = newNameGenerator('Property', name =>
         properties.has(name)
       );
-      const property = properties.insertNew(newName, properties.getCount());
+      const property = properties.insertNew(newName, index);
       property.setType('Number');
       forceUpdate();
       onPropertiesUpdated && onPropertiesUpdated();
@@ -225,6 +225,13 @@ export default function EventsBasedBehaviorPropertiesEditor({
       setSearchText('');
     },
     [forceUpdate, onPropertiesUpdated, properties]
+  );
+
+  const addProperty = React.useCallback(
+    () => {
+      addPropertyAt(properties.getCount());
+    },
+    [addPropertyAt, properties]
   );
 
   const removeProperty = React.useCallback(
@@ -592,6 +599,10 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                       </IconButton>
                                     }
                                     buildMenuTemplate={(i18n: I18nType) => [
+                                      {
+                                        label: i18n._(t`Add a property below`),
+                                        click: () => addPropertyAt(i + 1),
+                                      },
                                       {
                                         label: i18n._(t`Delete`),
                                         click: () =>

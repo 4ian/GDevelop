@@ -712,7 +712,7 @@ interface ProjectScopedContainers {
         [Const, Ref] PropertiesContainer propertiesContainer);
 
   [Ref] ProjectScopedContainers AddParameters(
-        [Const, Ref] VectorParameterMetadata parameters);
+        [Const, Ref] ParameterMetadataContainer parameters);
 
   [Const, Ref] ObjectsContainersList GetObjectsContainersList();
   [Const, Ref] VariablesContainersList GetVariablesContainersList();
@@ -1542,7 +1542,7 @@ interface InstructionMetadata {
     boolean CanHaveSubInstructions();
     [Ref] ParameterMetadata GetParameter(unsigned long index);
     unsigned long GetParametersCount();
-    [Const, Ref] VectorParameterMetadata GetParameters();
+    [Const, Ref] ParameterMetadataContainer GetParameters();
     long GetUsageComplexity();
     boolean IsHidden();
     boolean IsPrivate();
@@ -1617,7 +1617,7 @@ interface ExpressionMetadata {
     boolean IsRelevantForCustomObjectEvents();
     [Ref] ParameterMetadata GetParameter(unsigned long id);
     unsigned long GetParametersCount();
-    [Const, Ref] VectorParameterMetadata GetParameters();
+    [Const, Ref] ParameterMetadataContainer GetParameters();
 
     [Ref] ExpressionMetadata SetHidden();
     [Ref] ExpressionMetadata SetPrivate();
@@ -1755,22 +1755,28 @@ interface ValueTypeMetadata {
     void UnserializeFrom([Const, Ref] SerializerElement element);
 };
 
-interface VectorParameterMetadata {
-    void VectorParameterMetadata();
-
-    void push_back([Const, Ref] ParameterMetadata parameterMetadata);
-    unsigned long size();
-    [Ref] ParameterMetadata at(unsigned long index);
-    void WRAPPED_set(unsigned long index, [Const, Ref] ParameterMetadata parameterMetadata);
-    void FREE_removeFromVectorParameterMetadata(unsigned long index);
-    void FREE_insertIntoVectorParameterMetadata(unsigned long index, [Const, Ref] ParameterMetadata parameterMetadata);
-    void FREE_swapInVectorParameterMetadata(unsigned long oldIndex, unsigned long newIndex);
-    void clear();
+interface ParameterMetadataContainer {
+    [Ref] ParameterMetadata InsertNewParameter([Const] DOMString name, unsigned long pos);
+    [Ref] ParameterMetadata InsertParameter([Const, Ref] ParameterMetadata parameterMetadata, unsigned long pos);
+    boolean HasParameterNamed([Const] DOMString name);
+    [Ref] ParameterMetadata GetParameter([Const] DOMString name);
+    [Ref] ParameterMetadata GetParameterAt(unsigned long pos);
+    void RemoveParameter([Const] DOMString name);
+    void MoveParameter(unsigned long oldIndex, unsigned long newIndex);
+    unsigned long GetParametersCount();
+    unsigned long GetParameterPosition([Const, Ref] ParameterMetadata parameterMetadata);
+    void ClearParameters();
+    [Ref] ParameterMetadata AddNewParameter([Const] DOMString name);
 };
 
 interface ParameterMetadataTools {
-    void STATIC_ParametersToObjectsContainer([Ref] Project project, [Const, Ref] VectorParameterMetadata parameters, [Ref] ObjectsContainer outputObjectsContainer);
-    unsigned long STATIC_GetObjectParameterIndexFor([Const, Ref] VectorParameterMetadata parameters, unsigned long parameterIndex);
+    void STATIC_ParametersToObjectsContainer(
+        [Ref] Project project,
+        [Const, Ref] ParameterMetadataContainer parameters,
+        [Ref] ObjectsContainer outputObjectsContainer);
+    unsigned long STATIC_GetObjectParameterIndexFor(
+        [Const, Ref] ParameterMetadataContainer parameters,
+        unsigned long parameterIndex);
 };
 
 interface ObjectMetadata {
@@ -2846,8 +2852,8 @@ interface EventsFunction {
     EventsFunction_FunctionType GetFunctionType();
 
     [Ref] EventsList GetEvents();
-    [Ref] VectorParameterMetadata GetParameters();
-    [Const, Ref] VectorParameterMetadata GetParametersForEvents([Const, Ref] EventsFunctionsContainer functionsContainer);
+    [Ref] ParameterMetadataContainer GetParameters();
+    [Const, Ref] ParameterMetadataContainer GetParametersForEvents([Const, Ref] EventsFunctionsContainer functionsContainer);
     [Ref] ObjectGroupsContainer GetObjectGroups();
 
     void SerializeTo([Ref] SerializerElement element);

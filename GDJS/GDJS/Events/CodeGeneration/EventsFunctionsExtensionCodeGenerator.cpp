@@ -57,7 +57,7 @@ gd::String EventsFunctionsExtensionCodeGenerator::
         const gd::EventsFunction& eventsFunction,
         const gd::String& codeNamespace) {
   const gd::String& eventsFunctionName = eventsFunction.GetName();
-  if (!eventsFunction.GetParameters().empty()) {
+  if (eventsFunction.GetParameters().GetParametersCount() > 0) {
     gd::LogError("The events function named \"" + eventsFunctionName +
                  "\" is an extension lifecycle but has parameters "
                  "(should not have any). Not generating lifecycle "

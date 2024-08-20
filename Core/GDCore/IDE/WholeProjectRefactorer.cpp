@@ -102,17 +102,17 @@ void WholeProjectRefactorer::EnsureBehaviorEventsFunctionsProperParameters(
   for (auto &eventsFunction :
        eventsBasedBehavior.GetEventsFunctions().GetInternalVector()) {
     auto &parameters = eventsFunction->GetParameters();
-    while (parameters.size() < 2) {
+    while (parameters.GetParametersCount() < 2) {
       gd::ParameterMetadata newParameter;
-      parameters.push_back(newParameter);
+      parameters.AddParameter(newParameter);
     }
 
-    parameters[0]
+    parameters.GetParameter(0)
         .SetType("object")
         .SetName(behaviorObjectParameterName)
         .SetDescription("Object")
         .SetExtraInfo(eventsBasedBehavior.GetObjectType());
-    parameters[1]
+    parameters.GetParameter(1)
         .SetType("behavior")
         .SetName("Behavior")
         .SetDescription("Behavior")
@@ -127,12 +127,12 @@ void WholeProjectRefactorer::EnsureObjectEventsFunctionsProperParameters(
   for (auto &eventsFunction :
        eventsBasedObject.GetEventsFunctions().GetInternalVector()) {
     auto &parameters = eventsFunction->GetParameters();
-    while (parameters.size() < 1) {
+    while (parameters.GetParametersCount() < 1) {
       gd::ParameterMetadata newParameter;
-      parameters.push_back(newParameter);
+      parameters.AddParameter(newParameter);
     }
 
-    parameters[0]
+    parameters.GetParameter(0)
         .SetType("object")
         .SetName(parentObjectParameterName)
         .SetDescription("Object")

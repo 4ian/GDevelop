@@ -196,25 +196,21 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
           </ScrollView>
         ) : null}
         {this.state.currentTab === 'parameters' ? (
-          <ScrollView>
-            <Line>
-              <EventsFunctionParametersEditor
-                project={project}
-                eventsFunction={eventsFunction}
-                eventsBasedBehavior={eventsBasedBehavior}
-                eventsBasedObject={eventsBasedObject}
-                eventsFunctionsContainer={eventsFunctionsContainer}
-                eventsFunctionsExtension={eventsFunctionsExtension}
-                onParametersUpdated={onParametersOrGroupsUpdated}
-                helpPagePath={helpPagePath}
-                freezeParameters={freezeParameters}
-                onMoveFreeEventsParameter={onMoveFreeEventsParameter}
-                onMoveBehaviorEventsParameter={onMoveBehaviorEventsParameter}
-                onMoveObjectEventsParameter={onMoveObjectEventsParameter}
-                key={eventsFunction ? eventsFunction.ptr : null}
-              />
-            </Line>
-          </ScrollView>
+          <EventsFunctionParametersEditor
+            project={project}
+            eventsFunction={eventsFunction}
+            eventsBasedBehavior={eventsBasedBehavior}
+            eventsBasedObject={eventsBasedObject}
+            eventsFunctionsContainer={eventsFunctionsContainer}
+            eventsFunctionsExtension={eventsFunctionsExtension}
+            onParametersUpdated={onParametersOrGroupsUpdated}
+            helpPagePath={helpPagePath}
+            freezeParameters={freezeParameters}
+            onMoveFreeEventsParameter={onMoveFreeEventsParameter}
+            onMoveBehaviorEventsParameter={onMoveBehaviorEventsParameter}
+            onMoveObjectEventsParameter={onMoveObjectEventsParameter}
+            key={eventsFunction ? eventsFunction.ptr : null}
+          />
         ) : null}
         {this.state.currentTab === 'groups' ? (
           <ObjectGroupsListWithObjectGroupEditor

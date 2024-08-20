@@ -145,7 +145,7 @@ declare class libGDevelop {
   DependencyMetadata: Class<gdDependencyMetadata>;
   ParameterMetadata: Class<gdParameterMetadata>;
   ValueTypeMetadata: Class<gdValueTypeMetadata>;
-  VectorParameterMetadata: Class<gdVectorParameterMetadata>;
+  ParameterMetadataContainer: Class<gdParameterMetadataContainer>;
   ParameterMetadataTools: Class<gdParameterMetadataTools>;
   ObjectMetadata: Class<gdObjectMetadata>;
   QuickCustomization_Visibility: Class<QuickCustomization_Visibility>;

@@ -16,41 +16,41 @@ EventsFunction::EventsFunction() : functionType(Action) {
   expressionType.SetName("expression");
 }
 
-const std::vector<gd::ParameterMetadata>& EventsFunction::GetParametersForEvents(
-    const gd::EventsFunctionsContainer& functionsContainer) const {
+const gd::ParameterMetadataContainer &EventsFunction::GetParametersForEvents(
+    const gd::EventsFunctionsContainer &functionsContainer) const {
   if (functionType != FunctionType::ActionWithOperator) {
     // For most function types, the parameters are specified in the function.
     return parameters;
   }
   // For ActionWithOperator, the parameters are auto generated.
-  actionWithOperationParameters.clear();
+  actionWithOperationParameters.ClearParameters();
   if (!functionsContainer.HasEventsFunctionNamed(getterName)) {
     return actionWithOperationParameters;
   }
-  const auto& expression = functionsContainer.GetEventsFunction(getterName);
-  const auto& expressionParameters = expression.parameters;
+  const auto &expression = functionsContainer.GetEventsFunction(getterName);
+  const auto &expressionParameters = expression.parameters;
   const auto functionsSource = functionsContainer.GetOwner();
   const int expressionValueParameterIndex =
-      functionsSource == gd::EventsFunctionsContainer::FunctionOwner::Behavior ?
-      2 : 
-      functionsSource == gd::EventsFunctionsContainer::FunctionOwner::Object ?
-      1 :
-      0;
-  
-  for (size_t i = 0;
-       i < expressionValueParameterIndex && i < expressionParameters.size();
-       i++)
-  {
-    actionWithOperationParameters.push_back(expressionParameters[i]);
+      functionsSource == gd::EventsFunctionsContainer::FunctionOwner::Behavior
+          ? 2
+      : functionsSource == gd::EventsFunctionsContainer::FunctionOwner::Object
+          ? 1
+          : 0;
+
+  for (size_t i = 0; i < expressionValueParameterIndex &&
+                     i < expressionParameters.GetParametersCount();
+       i++) {
+    actionWithOperationParameters.AddParameter(
+        expressionParameters.GetParameter(i));
   }
   gd::ParameterMetadata parameterMetadata;
-  parameterMetadata.SetName("Value").SetValueTypeMetadata(expression.expressionType);
-  actionWithOperationParameters.push_back(parameterMetadata);
+  parameterMetadata.SetName("Value").SetValueTypeMetadata(
+      expression.expressionType);
+  actionWithOperationParameters.AddParameter(parameterMetadata);
   for (size_t i = expressionValueParameterIndex;
-       i < expressionParameters.size();
-       i++)
-  {
-    actionWithOperationParameters.push_back(expressionParameters[i]);
+       i < expressionParameters.GetParametersCount(); i++) {
+    actionWithOperationParameters.AddParameter(
+        expressionParameters.GetParameter(i));
   }
 
   return actionWithOperationParameters;
@@ -101,10 +101,7 @@ void EventsFunction::SerializeTo(SerializerElement& element) const {
     expressionType.SerializeTo(element.AddChild("expressionType"));
   }
   gd::SerializerElement& parametersElement = element.AddChild("parameters");
-  parametersElement.ConsiderAsArrayOf("parameter");
-  for (const auto& parameter : parameters) {
-    parameter.SerializeTo(parametersElement.AddChild("parameter"));
-  }
+  parameters.SerializeParametersTo(parametersElement);
 
   objectGroups.SerializeTo(element.AddChild("objectGroups"));
 }
@@ -146,15 +143,9 @@ void EventsFunction::UnserializeFrom(gd::Project& project,
   else
     functionType = Action;
 
-  const gd::SerializerElement& parametersElement =
+  const gd::SerializerElement &parametersElement =
       element.GetChild("parameters");
-  parameters.clear();
-  parametersElement.ConsiderAsArrayOf("parameter");
-  for (std::size_t i = 0; i < parametersElement.GetChildrenCount(); ++i) {
-    ParameterMetadata parameter;
-    parameter.UnserializeFrom(parametersElement.GetChild(i));
-    parameters.push_back(parameter);
-  }
+  parameters.UnserializeParametersFrom(parametersElement);
 
   objectGroups.UnserializeFrom(element.GetChild("objectGroups"));
 }

@@ -151,7 +151,7 @@ bool ExpressionsRenamer::DoVisitInstruction(gd::Instruction& instruction,
                              : gd::MetadataProvider::GetActionMetadata(
                                    platform, instruction.GetType());
 
-  for (std::size_t pNb = 0; pNb < metadata.parameters.size() &&
+  for (std::size_t pNb = 0; pNb < metadata.parameters.GetParametersCount() &&
                             pNb < instruction.GetParametersCount();
        ++pNb) {
     const gd::Expression& expression = instruction.GetParameter(pNb);

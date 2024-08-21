@@ -1750,6 +1750,8 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     PixiResourcesLoader.loadTextures(project, objectResourceNames).then(() => {
       // This callback is executed even if there is no images to load.
+      // Images need to be loaded first because instance renderers use the
+      // image dimensions to evaluate theirs. It may cause flickering otherwise.
       if (this.editorDisplay) {
         this.editorDisplay.instancesHandlers.resetInstanceRenderersFor(
           object.getName()

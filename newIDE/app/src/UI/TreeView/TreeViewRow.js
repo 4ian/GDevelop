@@ -104,9 +104,7 @@ const SemiControlledRowInput = ({
   );
 };
 
-const memoized = memoizeOne((initialValue, getContainerYPosition) =>
-  getContainerYPosition()
-);
+const memoized = memoizeOne((initialValue, callback) => callback());
 
 type Props<Item> = {|
   index: number,

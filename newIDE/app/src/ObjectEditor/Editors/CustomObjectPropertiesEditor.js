@@ -213,6 +213,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                               customObjectConfiguration.setMarkedAsOverridingEventsBasedObjectChildrenConfiguration(
                                 true
                               );
+                              customObjectConfiguration.clearChildrenConfiguration();
                               if (onObjectUpdated) {
                                 onObjectUpdated();
                               }

@@ -75,7 +75,6 @@ const OnlineWebExportFlow = ({
       </ResponsiveLineStackLayout>
     ) : (
       <RaisedButton
-        fullWidth
         label={
           hasGameExistingBuilds ? (
             <Trans>Generate a new link</Trans>
@@ -94,7 +93,10 @@ const OnlineWebExportFlow = ({
     );
 
   return (
-    <Column noMargin>
+    <Column
+      noMargin
+      alignItems={uiMode === 'minimal' ? 'stretch' : 'center'}
+    >
       {shouldShowButtons ? exportButtons : null}
       <OnlineGameLink
         build={build}

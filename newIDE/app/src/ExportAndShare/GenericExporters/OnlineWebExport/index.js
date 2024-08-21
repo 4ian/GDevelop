@@ -26,8 +26,8 @@ const ExplanationHeader = ({ uiMode }: ExplanationHeaderProps) => {
       <Line alignItems="center" justifyContent="center">
         <Text align="center">
           <Trans>
-            Publishing to gd.games - GDevelop gaming platform - is free. Games
-            can be played from any device.
+            Publishing to gd.games, the GDevelop gaming platform. Games can be
+            played from any device.
           </Trans>
         </Text>
       </Line>

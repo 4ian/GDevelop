@@ -80,6 +80,7 @@ gd::ObjectConfiguration &CustomObjectConfiguration::GetChildObjectConfiguration(
   auto &childObject = eventsBasedObject->GetObjects().GetObject(objectName);
 
   if (!IsOverridingEventsBasedObjectChildrenConfiguration()) {
+    childObjectConfigurations.erase(objectName);
     childObjectConfigurations.insert(
         std::make_pair(objectName, childObject.GetConfiguration().Clone()));
     return *(childObjectConfigurations[objectName]);

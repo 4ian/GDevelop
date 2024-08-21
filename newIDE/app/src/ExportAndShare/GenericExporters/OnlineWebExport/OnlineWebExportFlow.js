@@ -93,10 +93,7 @@ const OnlineWebExportFlow = ({
     );
 
   return (
-    <Column
-      noMargin
-      alignItems={uiMode === 'minimal' ? 'stretch' : 'center'}
-    >
+    <Column noMargin alignItems={uiMode === 'minimal' ? 'stretch' : 'center'}>
       {shouldShowButtons ? exportButtons : null}
       <OnlineGameLink
         build={build}

@@ -94,6 +94,8 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     const { editor } = this;
     if (editor) {
       editor.forceUpdateObjectsList();
+      // Update every custom objects because some custom objects may include
+      // the one actually edited.
       editor.forceUpdateCustomObjectRenderedInstances();
     }
   }

@@ -13,6 +13,7 @@ import {
 } from '../../ProjectsStorage';
 import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
 import { type PrivateGameTemplateListingData } from '../../Utils/GDevelopServices/Shop';
+import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 
 export type EditorContainerExtraProps = {|
   // Events function extension editor
@@ -119,6 +120,10 @@ export type RenderEditorContainerProps = {|
   // Object editing
   openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
   onEventsBasedObjectChildrenEdited: () => void,
+  onSceneObjectEdited: (
+    scene: gdLayout,
+    objectWithContext: ObjectWithContext
+  ) => void,
 
   onExtractAsExternalLayout: (name: string) => void,
 |};

@@ -10,6 +10,7 @@ import {
 import SubscriptionChecker, {
   type SubscriptionCheckerInterface,
 } from '../../Profile/Subscription/SubscriptionChecker';
+import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 
 type State = {|
   subscriptionChecked: boolean,
@@ -49,6 +50,10 @@ export class DebuggerEditorContainer extends React.Component<
   }
 
   onEventsBasedObjectChildrenEdited() {
+    // No thing to be done.
+  }
+
+  onSceneObjectEdited(scene: gdLayout, objectWithContext: ObjectWithContext) {
     // No thing to be done.
   }
 

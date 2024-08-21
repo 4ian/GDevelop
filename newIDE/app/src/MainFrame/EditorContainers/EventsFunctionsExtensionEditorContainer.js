@@ -5,6 +5,7 @@ import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
 } from './BaseEditor';
+import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 
 const styles = {
   container: {
@@ -38,6 +39,10 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
   }
 
   onEventsBasedObjectChildrenEdited() {
+    // No thing to be done.
+  }
+
+  onSceneObjectEdited(scene: gdLayout, objectWithContext: ObjectWithContext) {
     // No thing to be done.
   }
 

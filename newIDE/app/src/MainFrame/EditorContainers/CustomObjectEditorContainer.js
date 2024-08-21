@@ -11,6 +11,7 @@ import {
 } from '../ResourcesWatcher';
 import SceneEditor from '../../SceneEditor';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
+import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 
 const gd: libGDevelop = global.gd;
 
@@ -93,11 +94,14 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
   onEventsBasedObjectChildrenEdited() {
     const { editor } = this;
     if (editor) {
-      editor.forceUpdateObjectsList();
       // Update every custom objects because some custom objects may include
       // the one actually edited.
       editor.forceUpdateCustomObjectRenderedInstances();
     }
+  }
+
+  onSceneObjectEdited(scene: gdLayout, objectWithContext: ObjectWithContext) {
+    // No thing to be done.
   }
 
   saveUiSettings = () => {

@@ -11,6 +11,7 @@ import {
   type RenderEditorContainerPropsWithRef,
 } from './BaseEditor';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
+import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 
 export class SceneEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?SceneEditor;
@@ -57,10 +58,25 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
   onEventsBasedObjectChildrenEdited() {
     const { editor } = this;
     if (editor) {
-      editor.forceUpdateObjectsList();
       // Update every custom objects because some custom objects may include
       // the one actually edited.
       editor.forceUpdateCustomObjectRenderedInstances();
+    }
+  }
+
+  onSceneObjectEdited(scene: gdLayout, objectWithContext: ObjectWithContext) {
+    const layout = this.getLayout();
+    if (!layout) {
+      return;
+    }
+    if (layout !== scene && !objectWithContext.global) {
+      return;
+    }
+    const { editor } = this;
+    if (editor) {
+      // Update every custom objects because some custom objects may include
+      // the one actually edited.
+      editor.forceUpdateRenderedInstancesOfObject(objectWithContext.object);
     }
   }
 
@@ -132,7 +148,9 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
         openBehaviorEvents={this.props.openBehaviorEvents}
         onExtractAsExternalLayout={this.props.onExtractAsExternalLayout}
-        onObjectEdited={() => {}}
+        onObjectEdited={objectWithContext =>
+          this.props.onSceneObjectEdited(layout, objectWithContext)
+        }
       />
     );
   }

@@ -22,6 +22,7 @@ import {
   unregisterOnResourceExternallyChangedCallback,
 } from '../ResourcesWatcher';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
+import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 
 const styles = {
   container: {
@@ -82,6 +83,10 @@ export class ExternalEventsEditorContainer extends React.Component<
   }
 
   onEventsBasedObjectChildrenEdited() {
+    // No thing to be done.
+  }
+
+  onSceneObjectEdited(scene: gdLayout, objectWithContext: ObjectWithContext) {
     // No thing to be done.
   }
 

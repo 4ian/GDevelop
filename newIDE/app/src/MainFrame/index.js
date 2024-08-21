@@ -192,6 +192,7 @@ import { useMultiplayerLobbyConfigurator } from './UseMultiplayerLobbyConfigurat
 import { useAuthenticatedPlayer } from './UseAuthenticatedPlayer';
 import ListIcon from '../UI/ListIcon';
 import { QuickCustomizationDialog } from '../QuickCustomization/QuickCustomizationDialog';
+import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -2035,6 +2036,19 @@ const MainFrame = (props: Props) => {
     }
   };
 
+  const onSceneObjectEdited = (
+    scene: gdLayout,
+    objectWithContext: ObjectWithContext
+  ) => {
+    const { editorTabs } = state;
+    for (const editor of editorTabs.editors) {
+      const { editorRef } = editor;
+      if (editorRef) {
+        editorRef.onSceneObjectEdited(scene, objectWithContext);
+      }
+    }
+  };
+
   const _onProjectItemModified = () => {
     triggerUnsavedChanges();
     forceUpdate();
@@ -3540,6 +3554,7 @@ const MainFrame = (props: Props) => {
                     openBehaviorEvents: openBehaviorEvents,
                     onExtractAsExternalLayout: onExtractAsExternalLayout,
                     onEventsBasedObjectChildrenEdited: onEventsBasedObjectChildrenEdited,
+                    onSceneObjectEdited: onSceneObjectEdited,
                   })}
                 </ErrorBoundary>
               </CommandsContextScopedProvider>

@@ -1,8 +1,5 @@
 // @flow
 import { Trans, t } from '@lingui/macro';
-import { I18n } from '@lingui/react';
-import Avatar from '@material-ui/core/Avatar';
-import { getGravatarUrl } from '../../UI/GravatarUrl';
 import * as React from 'react';
 import { ColumnStackLayout } from '../../UI/Layout';
 import RaisedButton from '../../UI/RaisedButton';
@@ -27,70 +24,15 @@ import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
 import LeftLoader from '../../UI/LeftLoader';
 import TextField from '../../UI/TextField';
-import IconButton from '../../UI/IconButton';
-import Trash from '../../UI/CustomSvgIcons/Trash';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 import Form from '../../UI/Form';
 import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
+import UserLine from '../../UI/User/UserLine';
+import { getTranslatableLevel } from '../../Utils/AclUtils';
 
 export const emailRegex = /^(.+)@(.+)$/;
-
-const getTranslatableLevel = (level: Level) => {
-  switch (level) {
-    case 'owner':
-      return t`Owner`;
-    case 'writer':
-      return t`Read & Write`;
-    case 'reader':
-      return t`Read only`;
-    default:
-      return level;
-  }
-};
-
-const UserLine = ({
-  username,
-  email,
-  level,
-  onDelete,
-  disabled,
-}: {|
-  username: ?string,
-  email: string,
-  level: ?Level,
-  onDelete?: () => void,
-  disabled?: boolean,
-|}) => (
-  <I18n>
-    {({ i18n }) => (
-      <Line justifyContent="space-between">
-        <Line noMargin expand>
-          <Avatar src={getGravatarUrl(email, { size: 40 })} />
-          <Column expand justifyContent="flex-end">
-            {username && <Text noMargin>{username}</Text>}
-            <Text noMargin color="secondary">
-              {email}
-            </Text>
-          </Column>
-        </Line>
-        <Column>
-          {!!level && (
-            <Text color="secondary">{i18n._(getTranslatableLevel(level))}</Text>
-          )}
-        </Column>
-        {onDelete && (
-          <Column noMargin>
-            <IconButton size="small" onClick={onDelete} disabled={disabled}>
-              <Trash />
-            </IconButton>
-          </Column>
-        )}
-      </Line>
-    )}
-  </I18n>
-);
 
 const getEmailErrorText = (addError: ?string) => {
   switch (addError) {

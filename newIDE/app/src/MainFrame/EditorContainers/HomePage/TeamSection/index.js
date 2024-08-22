@@ -45,6 +45,7 @@ import { type MenuItemTemplate } from '../../../../UI/Menu/Menu.flow';
 import { EducationCard } from '../LearnSection/EducationCard';
 import UserSVG from '../../../../UI/CustomSvgIcons/User';
 import { copyTextToClipboard } from '../../../../Utils/Clipboard';
+import ManageEducationAccountDialog from './ManageEducationAccountDialog';
 
 const PADDING = 16;
 
@@ -316,192 +317,206 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
     );
 
     return (
-      <SectionContainer
-        title={<Trans>Classrooms</Trans>}
-        titleAction={
-          isMobile ? null : (
-            <FlatButton
-              primary
-              disabled={isLoadingMembers}
-              label={<Trans>Refresh dashboard</Trans>}
-              onClick={onRefreshTeamMembers}
-              leftIcon={<Refresh fontSize="small" />}
-            />
-          )
-        }
-        titleAdornment={
-          isMobile ? (
-            <FlatButton
-              primary
-              disabled={isLoadingMembers}
-              label={<Trans>Refresh</Trans>}
-              onClick={onRefreshTeamMembers}
-              leftIcon={<Refresh fontSize="small" />}
-            />
-          ) : (
-            manageSeatsInsert
-          )
-        }
-      >
-        <SectionRow>
-          {isMobile ? (
-            <>
-              {manageSeatsInsert}
-              <Spacer />
-            </>
-          ) : null}
-          <EducationCard onSeeResources={onOpenTeachingResources} />
-          <Spacer />
-          {membersNotInAGroupToDisplay && (
-            <Paper background="medium" style={styles.lobbyContainer}>
-              <Line noMargin>
-                <ColumnStackLayout noMargin expand>
-                  <Text size="section-title" noMargin>
-                    <Trans>Lobby</Trans>
-                  </Text>
-                  <List style={styles.list}>
-                    {membersNotInAGroupToDisplay.members
-                      .sort(sortMembersByNameOrEmail)
-                      .map(member => (
-                        <TeamMemberRow
-                          isTemporary={false}
-                          key={member.id}
-                          onOpenContextMenu={openContextMenu}
-                          member={member}
-                          onListUserProjects={() => listUserProjects(member)}
-                          onDrag={setDraggedUser}
-                        />
-                      ))}
-                  </List>
-                </ColumnStackLayout>
-              </Line>
-            </Paper>
-          )}
-          <div style={styles.roomsContainer}>
-            <Line justifyContent="space-between" alignItems="center">
-              <Text size="section-title" noMargin>
-                <Trans>Rooms</Trans>
-              </Text>
-              <RaisedButton
+      <>
+        <SectionContainer
+          title={<Trans>Classrooms</Trans>}
+          titleAction={
+            isMobile ? null : (
+              <FlatButton
                 primary
-                label={
-                  isMobile ? (
-                    <Trans>Create</Trans>
-                  ) : (
-                    <Trans>Create a new room</Trans>
-                  )
-                }
-                icon={<Add fontSize="small" />}
-                onClick={() => setShowNewGroupNameField(true)}
+                disabled={isLoadingMembers}
+                label={<Trans>Refresh dashboard</Trans>}
+                onClick={onRefreshTeamMembers}
+                leftIcon={<Refresh fontSize="small" />}
               />
-            </Line>
-            {showNewGroupNameField && (
-              <Line>
-                <NewTeamGroupNameField
-                  onValidateGroupName={onCreateGroup}
-                  onDismiss={() => setShowNewGroupNameField(false)}
+            )
+          }
+          titleAdornment={
+            isMobile ? (
+              <FlatButton
+                primary
+                disabled={isLoadingMembers}
+                label={<Trans>Refresh</Trans>}
+                onClick={onRefreshTeamMembers}
+                leftIcon={<Refresh fontSize="small" />}
+              />
+            ) : (
+              manageSeatsInsert
+            )
+          }
+        >
+          <SectionRow>
+            {isMobile ? (
+              <>
+                {manageSeatsInsert}
+                <Spacer />
+              </>
+            ) : null}
+            <EducationCard onSeeResources={onOpenTeachingResources} />
+            <Spacer />
+            {membersNotInAGroupToDisplay && (
+              <Paper background="medium" style={styles.lobbyContainer}>
+                <Line noMargin>
+                  <ColumnStackLayout noMargin expand>
+                    <Text size="section-title" noMargin>
+                      <Trans>Lobby</Trans>
+                    </Text>
+                    <List style={styles.list}>
+                      {membersNotInAGroupToDisplay.members
+                        .sort(sortMembersByNameOrEmail)
+                        .map(member => (
+                          <TeamMemberRow
+                            isTemporary={false}
+                            key={member.id}
+                            onOpenContextMenu={openContextMenu}
+                            member={member}
+                            onListUserProjects={() => listUserProjects(member)}
+                            onDrag={setDraggedUser}
+                          />
+                        ))}
+                    </List>
+                  </ColumnStackLayout>
+                </Line>
+              </Paper>
+            )}
+            <div style={styles.roomsContainer}>
+              <Line justifyContent="space-between" alignItems="center">
+                <Text size="section-title" noMargin>
+                  <Trans>Rooms</Trans>
+                </Text>
+                <RaisedButton
+                  primary
+                  label={
+                    isMobile ? (
+                      <Trans>Create</Trans>
+                    ) : (
+                      <Trans>Create a new room</Trans>
+                    )
+                  }
+                  icon={<Add fontSize="small" />}
+                  onClick={() => setShowNewGroupNameField(true)}
                 />
               </Line>
-            )}
-            <ColumnStackLayout noMargin>
-              {groupsAndMembers.length > 0 ? (
-                groupsAndMembers.map(({ group, members }) => {
-                  const membersToDisplay = [...members];
-                  if (!!movingUsers && movingUsers.groupId === group.id) {
-                    movingUsers.users.forEach(movingUser => {
-                      if (
-                        !members.some(member => member.id === movingUser.id)
-                      ) {
-                        membersToDisplay.push(movingUser);
-                      }
-                    });
-                  }
+              {showNewGroupNameField && (
+                <Line>
+                  <NewTeamGroupNameField
+                    onValidateGroupName={onCreateGroup}
+                    onDismiss={() => setShowNewGroupNameField(false)}
+                  />
+                </Line>
+              )}
+              <ColumnStackLayout noMargin>
+                {groupsAndMembers.length > 0 ? (
+                  groupsAndMembers.map(({ group, members }) => {
+                    const membersToDisplay = [...members];
+                    if (!!movingUsers && movingUsers.groupId === group.id) {
+                      movingUsers.users.forEach(movingUser => {
+                        if (
+                          !members.some(member => member.id === movingUser.id)
+                        ) {
+                          membersToDisplay.push(movingUser);
+                        }
+                      });
+                    }
 
-                  return (
-                    <DropTarget
-                      canDrop={() => true}
-                      drop={() => {
-                        const droppedUser = draggedUserRef.current;
-                        if (!droppedUser) return;
-                        changeUserGroup(droppedUser, group);
-                        draggedUserRef.current = null;
-                      }}
-                      key={group.id}
-                    >
-                      {({ connectDropTarget, isOver }) =>
-                        connectDropTarget(
-                          <div
-                            style={
-                              isOver
-                                ? {
-                                    backgroundColor:
-                                      gdevelopTheme.paper.backgroundColor.light,
-                                    outline: `2px dashed ${
-                                      gdevelopTheme.dropIndicator.canDrop
-                                    }`,
-                                  }
-                                : undefined
-                            }
-                          >
-                            <Line noMargin>
-                              <Column noMargin expand>
-                                <Column noMargin>
-                                  <TeamGroupNameField
-                                    group={group}
-                                    onFinishEditingGroupName={onChangeGroupName}
-                                    allowDelete={membersToDisplay.length === 0}
-                                    onDeleteGroup={onDeleteGroup}
-                                  />
-                                </Column>
-                                <List style={styles.list}>
-                                  {membersToDisplay
-                                    .sort(sortMembersByNameOrEmail)
-                                    .map(member => {
-                                      const isTemporary =
-                                        !!movingUsers &&
-                                        movingUsers.users.some(
-                                          user => user.id === member.id
+                    return (
+                      <DropTarget
+                        canDrop={() => true}
+                        drop={() => {
+                          const droppedUser = draggedUserRef.current;
+                          if (!droppedUser) return;
+                          changeUserGroup(droppedUser, group);
+                          draggedUserRef.current = null;
+                        }}
+                        key={group.id}
+                      >
+                        {({ connectDropTarget, isOver }) =>
+                          connectDropTarget(
+                            <div
+                              style={
+                                isOver
+                                  ? {
+                                      backgroundColor:
+                                        gdevelopTheme.paper.backgroundColor
+                                          .light,
+                                      outline: `2px dashed ${
+                                        gdevelopTheme.dropIndicator.canDrop
+                                      }`,
+                                    }
+                                  : undefined
+                              }
+                            >
+                              <Line noMargin>
+                                <Column noMargin expand>
+                                  <Column noMargin>
+                                    <TeamGroupNameField
+                                      group={group}
+                                      onFinishEditingGroupName={
+                                        onChangeGroupName
+                                      }
+                                      allowDelete={
+                                        membersToDisplay.length === 0
+                                      }
+                                      onDeleteGroup={onDeleteGroup}
+                                    />
+                                  </Column>
+                                  <List style={styles.list}>
+                                    {membersToDisplay
+                                      .sort(sortMembersByNameOrEmail)
+                                      .map(member => {
+                                        const isTemporary =
+                                          !!movingUsers &&
+                                          movingUsers.users.some(
+                                            user => user.id === member.id
+                                          );
+                                        return (
+                                          <TeamMemberRow
+                                            isTemporary={isTemporary}
+                                            key={
+                                              member.id +
+                                              (isTemporary ? '_temp' : '')
+                                            }
+                                            member={member}
+                                            onOpenContextMenu={openContextMenu}
+                                            onListUserProjects={() =>
+                                              listUserProjects(member)
+                                            }
+                                            onDrag={setDraggedUser}
+                                          />
                                         );
-                                      return (
-                                        <TeamMemberRow
-                                          isTemporary={isTemporary}
-                                          key={
-                                            member.id +
-                                            (isTemporary ? '_temp' : '')
-                                          }
-                                          member={member}
-                                          onOpenContextMenu={openContextMenu}
-                                          onListUserProjects={() =>
-                                            listUserProjects(member)
-                                          }
-                                          onDrag={setDraggedUser}
-                                        />
-                                      );
-                                    })}
-                                </List>
-                              </Column>
-                            </Line>
-                          </div>
-                        )
-                      }
-                    </DropTarget>
-                  );
-                })
-              ) : !showNewGroupNameField ? (
-                <EmptyMessage>
-                  <Trans>Create a room and drag and drop members in it.</Trans>
-                </EmptyMessage>
-              ) : null}
-            </ColumnStackLayout>
-          </div>
-        </SectionRow>
-        <ContextMenu
-          ref={contextMenu}
-          buildMenuTemplate={(_i18n, { member }) =>
-            buildContextMenu(_i18n, member)
-          }
-        />
-      </SectionContainer>
+                                      })}
+                                  </List>
+                                </Column>
+                              </Line>
+                            </div>
+                          )
+                        }
+                      </DropTarget>
+                    );
+                  })
+                ) : !showNewGroupNameField ? (
+                  <EmptyMessage>
+                    <Trans>
+                      Create a room and drag and drop members in it.
+                    </Trans>
+                  </EmptyMessage>
+                ) : null}
+              </ColumnStackLayout>
+            </div>
+          </SectionRow>
+          <ContextMenu
+            ref={contextMenu}
+            buildMenuTemplate={(_i18n, { member }) =>
+              buildContextMenu(_i18n, member)
+            }
+          />
+        </SectionContainer>
+        {manageSeatsDialogOpen && (
+          <ManageEducationAccountDialog
+            onClose={() => setManageSeatsDialogOpen(false)}
+          />
+        )}
+      </>
     );
   }
 );

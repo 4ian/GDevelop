@@ -1099,10 +1099,10 @@ const VariablesList = (props: Props) => {
         case 'InsideTopLevel':
           draggedIndex = props.variablesContainer.getPosition(draggedName);
           targetIndex = props.variablesContainer.getPosition(targetName);
-          props.variablesContainer.move(
-            draggedIndex,
-            targetIndex > draggedIndex ? targetIndex - 1 : targetIndex
-          );
+          correctedTargetIndex =
+            (targetIndex > draggedIndex ? targetIndex - 1 : targetIndex) +
+            (where === 'after' ? 1 : 0);
+          props.variablesContainer.move(draggedIndex, correctedTargetIndex);
           break;
         case 'TopLevelToStructure':
           newName = newNameGenerator(

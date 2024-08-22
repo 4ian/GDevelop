@@ -35,7 +35,7 @@ import { ColumnStackLayout, LineStackLayout } from '../../../../UI/Layout';
 import Paper from '../../../../UI/Paper';
 import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import RaisedButton from '../../../../UI/RaisedButton';
-import { groupMembersByGroupId } from './Utils';
+import { groupMembersByGroupId, sortGroupsWithMembers } from './Utils';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import ContextMenu, {
   type ContextMenuInterface,
@@ -272,10 +272,7 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
             ),
           }
         : membersNotInAGroup;
-    const groupsAndMembers = Object.keys(membersByGroupId)
-      .map(id => (id === 'NONE' ? null : membersByGroupId[id]))
-      .filter(Boolean)
-      .sort((a, b) => a.group.name.localeCompare(b.group.name));
+    const groupsWithMembers = sortGroupsWithMembers(membersByGroupId);
 
     const availableSeats =
       team && members && admins
@@ -406,8 +403,8 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
                 </Line>
               )}
               <ColumnStackLayout noMargin>
-                {groupsAndMembers.length > 0 ? (
-                  groupsAndMembers.map(({ group, members }) => {
+                {groupsWithMembers.length > 0 ? (
+                  groupsWithMembers.map(({ group, members }) => {
                     const membersToDisplay = [...members];
                     if (!!movingUsers && movingUsers.groupId === group.id) {
                       movingUsers.users.forEach(movingUser => {

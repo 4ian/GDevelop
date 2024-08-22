@@ -141,7 +141,13 @@ export type UsernameAvailability = {|
   isAvailable: boolean,
 |};
 
-export type User = Profile;
+export type User = {|
+  ...Profile,
+  /**
+   * Present only if requested when admin user is listing members of teams.
+   */
+  +password?: ?string,
+|};
 
 export type Team = {| id: string, createdAt: number, seats: number |};
 export type TeamGroup = {| id: string, name: string |};
@@ -211,7 +217,12 @@ export const listTeamMembers = async (
   const authorizationHeader = await getAuthorizationHeader();
   const response = await client.get(`/user`, {
     headers: { Authorization: authorizationHeader },
-    params: { userId, teamId, memberType: 'basic' },
+    params: {
+      userId,
+      teamId,
+      memberType: 'basic',
+      include: 'decryptedPassword',
+    },
   });
   return response.data;
 };

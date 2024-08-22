@@ -16,6 +16,8 @@ import TextField from '../../../../UI/TextField';
 import { emailRegex } from '../../../../Utils/EmailUtils';
 import RaisedButton from '../../../../UI/RaisedButton';
 import Add from '../../../../UI/CustomSvgIcons/Add';
+import { groupMembersByGroupId, sortGroupsWithMembers } from './Utils';
+import { Column, Line } from '../../../../UI/Grid';
 
 type AddTeacherError =
   | 'no-seats-available'
@@ -120,7 +122,25 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
     onRefreshMembers,
   } = React.useContext(TeamContext);
 
-  if (!admins || !members || !team || !groups) return null;
+  const membersByGroupId = groupMembersByGroupId({
+    groups,
+    members,
+    memberships,
+  });
+
+  if (
+    !admins ||
+    !members ||
+    !team ||
+    !groups ||
+    !memberships ||
+    !membersByGroupId
+  )
+    return null;
+
+  const membersInLobby = membersByGroupId['NONE'];
+
+  const groupsWithMembers = sortGroupsWithMembers(membersByGroupId);
 
   return (
     <>
@@ -154,6 +174,17 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
         <Text size="sub-title">
           <Trans>Student accounts</Trans>
         </Text>
+        <Column>
+          {groupsWithMembers.length > 0
+            ? groupsWithMembers.map(({ group, members }) => {
+                return (
+                  <Line noMargin>
+                    <Text size="sub-title">{group.name}</Text>
+                  </Line>
+                );
+              })
+            : 'Hello'}
+        </Column>
       </Dialog>
       {addTeacherDialogOpen && (
         <AddTeacherDialog onClose={() => setAddTeacherDialogOpen(false)} />

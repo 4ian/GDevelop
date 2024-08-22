@@ -51,3 +51,11 @@ export const groupMembersByGroupId = ({
   });
   return membersByGroupId;
 };
+
+export const sortGroupsWithMembers = (groupWithMembersByGroupId: {
+  [groupId: string]: GroupWithMembers,
+}): GroupWithMembers[] =>
+  Object.keys(groupWithMembersByGroupId)
+    .map(id => (id === 'NONE' ? null : groupWithMembersByGroupId[id]))
+    .filter(Boolean)
+    .sort((a, b) => a.group.name.localeCompare(b.group.name));

@@ -31,7 +31,7 @@ import FlatButton from '../../../../UI/FlatButton';
 import Add from '../../../../UI/CustomSvgIcons/Add';
 import TeamMemberProjectsView from './TeamMemberProjectsView';
 import Refresh from '../../../../UI/CustomSvgIcons/Refresh';
-import { ColumnStackLayout } from '../../../../UI/Layout';
+import { ColumnStackLayout, LineStackLayout } from '../../../../UI/Layout';
 import Paper from '../../../../UI/Paper';
 import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import RaisedButton from '../../../../UI/RaisedButton';
@@ -43,6 +43,7 @@ import ContextMenu, {
 import type { ClientCoordinates } from '../../../../Utils/UseLongTouch';
 import { type MenuItemTemplate } from '../../../../UI/Menu/Menu.flow';
 import { EducationCard } from '../LearnSection/EducationCard';
+import UserSVG from '../../../../UI/CustomSvgIcons/User';
 
 const PADDING = 16;
 
@@ -50,7 +51,13 @@ const styles = {
   list: { padding: 0 },
   lobbyContainer: { padding: PADDING },
   roomsContainer: { paddingRight: PADDING },
-  titleAdornmentContainer: { paddingRight: PADDING },
+  manageSeatsInsertContainer: {
+    padding: 16,
+    display: 'flex',
+    alignItems: 'center',
+    border: '1px solid white',
+    borderRadius: 8,
+  },
 };
 
 const sortMembersByNameOrEmail = (a: User, b: User) => {
@@ -96,6 +103,10 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
       onRefreshMembers,
     } = React.useContext(TeamContext);
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
+    const [
+      manageSeatsDialogOpen,
+      setManageSeatsDialogOpen,
+    ] = React.useState<boolean>(false);
     const forceUpdate = useForceUpdate();
     const { isMobile } = useResponsiveWindowSize();
     const contextMenu = React.useRef<?ContextMenuInterface>(null);
@@ -260,28 +271,80 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
       .filter(Boolean)
       .sort((a, b) => a.group.name.localeCompare(b.group.name));
 
+    const availableSeats =
+      team && members && admins
+        ? team.seats - members.length - admins.length
+        : 0;
+
+    const manageSeatsInsert = (
+      <div
+        style={{
+          ...styles.manageSeatsInsertContainer,
+          border: `1px solid ${gdevelopTheme.dialog.separator}`,
+        }}
+      >
+        <LineStackLayout
+          alignItems="center"
+          noMargin
+          useLargeSpacer
+          expand
+          justifyContent="space-between"
+        >
+          <Line noMargin alignItems="center">
+            <Text noMargin style={{ opacity: 0.7 }} displayInlineAsSpan>
+              <Trans>Seats available: </Trans>
+            </Text>
+            <Text noMargin displayInlineAsSpan>
+              <b>&nbsp;{availableSeats}</b>
+            </Text>
+          </Line>
+          <RaisedButton
+            primary
+            label={
+              isMobile ? <Trans>Manage</Trans> : <Trans>Manage seats</Trans>
+            }
+            icon={<UserSVG fontSize="small" />}
+            onClick={() => setManageSeatsDialogOpen(true)}
+          />
+        </LineStackLayout>
+      </div>
+    );
+
     return (
       <SectionContainer
         title={<Trans>Classrooms</Trans>}
-        titleAdornment={
-          <div style={styles.titleAdornmentContainer}>
+        titleAction={
+          isMobile ? null : (
             <FlatButton
               primary
               disabled={isLoadingMembers}
-              label={
-                isMobile ? (
-                  <Trans>Refresh</Trans>
-                ) : (
-                  <Trans>Refresh dashboard</Trans>
-                )
-              }
+              label={<Trans>Refresh dashboard</Trans>}
               onClick={onRefreshTeamMembers}
               leftIcon={<Refresh fontSize="small" />}
             />
-          </div>
+          )
+        }
+        titleAdornment={
+          isMobile ? (
+            <FlatButton
+              primary
+              disabled={isLoadingMembers}
+              label={<Trans>Refresh</Trans>}
+              onClick={onRefreshTeamMembers}
+              leftIcon={<Refresh fontSize="small" />}
+            />
+          ) : (
+            manageSeatsInsert
+          )
         }
       >
         <SectionRow>
+          {isMobile ? (
+            <>
+              {manageSeatsInsert}
+              <Spacer />
+            </>
+          ) : null}
           <EducationCard onSeeResources={onOpenTeachingResources} />
           <Spacer />
           {membersNotInAGroupToDisplay && (
@@ -308,31 +371,6 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
                 </ColumnStackLayout>
               </Line>
             </Paper>
-          )}
-          {team && members && admins && (
-            <Column noMargin>
-              <Text noMargin>
-                <Trans>Your team has {team.seats} seats:</Trans>
-              </Text>
-              <li>
-                <Text displayInlineAsSpan noMargin>
-                  <Trans>{members.length} students</Trans>
-                </Text>
-              </li>
-              <li>
-                <Text displayInlineAsSpan noMargin>
-                  <Trans>{admins.length} admins (one is you)</Trans>
-                </Text>
-              </li>
-              <li>
-                <Text displayInlineAsSpan noMargin>
-                  <Trans>
-                    {team.seats - members.length - admins.length} available
-                    seats
-                  </Trans>
-                </Text>
-              </li>
-            </Column>
           )}
           <div style={styles.roomsContainer}>
             <Line justifyContent="space-between" alignItems="center">

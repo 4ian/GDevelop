@@ -6,7 +6,7 @@ import memoizeOne from 'memoize-one';
 import classes from './TreeView.module.css';
 import ContextMenu, { type ContextMenuInterface } from '../Menu/ContextMenu';
 import { useResponsiveWindowSize } from '../Responsive/ResponsiveWindowMeasurer';
-import TreeViewRow from './TreeViewRow';
+import TreeViewRow, { TREE_VIEW_ROW_HEIGHT } from './TreeViewRow';
 import { makeDragSourceAndDropTarget } from '../DragAndDrop/DragSourceAndDropTarget';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import useForceUpdate from '../../Utils/UseForceUpdate';
@@ -709,7 +709,7 @@ const TreeView = <Item: ItemBaseAttributes>(
         <FixedSizeList
           height={height}
           itemCount={flattenedData.length}
-          itemSize={32}
+          itemSize={TREE_VIEW_ROW_HEIGHT}
           width={typeof width === 'number' ? width : '100%'}
           itemKey={index => flattenedData[index].id}
           // Flow does not seem to accept the generic used in FixedSizeList

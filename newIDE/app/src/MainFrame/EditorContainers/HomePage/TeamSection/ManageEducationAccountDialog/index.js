@@ -2,6 +2,8 @@
 
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
+import Grid from '@material-ui/core/Grid';
+import GridList from '@material-ui/core/GridList';
 import Divider from '@material-ui/core/Divider';
 import TeamContext from '../../../../../Profile/Team/TeamContext';
 import Dialog, { DialogPrimaryButton } from '../../../../../UI/Dialog';
@@ -18,6 +20,7 @@ import RaisedButton from '../../../../../UI/RaisedButton';
 import Add from '../../../../../UI/CustomSvgIcons/Add';
 import { groupMembersByGroupId, sortGroupsWithMembers } from '../Utils';
 import { Column, Line } from '../../../../../UI/Grid';
+import ManageStudentRow from './ManageStudentRow';
 
 type AddTeacherError =
   | 'no-seats-available'
@@ -109,6 +112,7 @@ type Props = {|
 
 const ManageEducationAccountDialog = ({ onClose }: Props) => {
   const { profile } = React.useContext(AuthenticatedUserContext);
+  const [selectedUserIds, setSelectedUserIds] = React.useState<string[]>([]);
   const [
     addTeacherDialogOpen,
     setAddTeacherDialogOpen,
@@ -138,9 +142,12 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
   )
     return null;
 
-  const membersInLobby = membersByGroupId['NONE'];
-
-  const groupsWithMembers = sortGroupsWithMembers(membersByGroupId);
+  const groupsWithMembers = [
+    membersByGroupId['NONE']
+      ? { group: null, members: membersByGroupId['NONE'].members }
+      : null,
+    ...sortGroupsWithMembers(membersByGroupId),
+  ].filter(Boolean);
 
   return (
     <>
@@ -175,12 +182,59 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
           <Trans>Student accounts</Trans>
         </Text>
         <Column>
+          <GridList cols={2} cellHeight={'auto'}>
+            <Grid item xs={5}>
+              <Text style={{ opacity: 0.7 }}>
+                <Trans>Student</Trans>
+              </Text>
+            </Grid>
+            <Grid item xs={7}>
+              <Text style={{ opacity: 0.7 }}>
+                <Trans>Password</Trans>
+              </Text>
+            </Grid>
+          </GridList>
           {groupsWithMembers.length > 0
             ? groupsWithMembers.map(({ group, members }) => {
                 return (
-                  <Line noMargin>
-                    <Text size="sub-title">{group.name}</Text>
-                  </Line>
+                  <>
+                    <Line noMargin>
+                      <Text size="sub-title">{group ? group.name : <Trans>Lobby</Trans>}</Text>
+                    </Line>
+                    <Column>
+                      <GridList cols={2} cellHeight={'auto'}>
+                        {members.map(member => {
+                          return (
+                            <ManageStudentRow
+                              member={member}
+                              key={member.id}
+                              isSelected={selectedUserIds.includes(member.id)}
+                              onSelect={selected => {
+                                const memberIndexInArray = selectedUserIds.indexOf(
+                                  member.id
+                                );
+                                if (selected) {
+                                  if (memberIndexInArray === -1) {
+                                    setSelectedUserIds([
+                                      ...selectedUserIds,
+                                      member.id,
+                                    ]);
+                                  }
+                                  return;
+                                } else {
+                                  const newArray = [...selectedUserIds];
+                                  if (memberIndexInArray >= 0) {
+                                    newArray.splice(memberIndexInArray, 1);
+                                    setSelectedUserIds(newArray);
+                                  }
+                                }
+                              }}
+                            />
+                          );
+                        })}
+                      </GridList>
+                    </Column>
+                  </>
                 );
               })
             : 'Hello'}

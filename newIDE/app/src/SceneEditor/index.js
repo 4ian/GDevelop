@@ -1722,7 +1722,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     resourcesInUse.delete();
 
     PixiResourcesLoader.loadTextures(project, objectResourceNames).then(() => {
-      // This callback is executed even if there is no images to load.
+      // This callback is executed even if there is no image to load.
       const { editorDisplay } = this;
       if (editorDisplay) {
         projectScopedContainersAccessor.forEachObject(object => {
@@ -1749,7 +1749,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     resourcesInUse.delete();
 
     PixiResourcesLoader.loadTextures(project, objectResourceNames).then(() => {
-      // This callback is executed even if there is no images to load.
+      // This callback is executed even if there is no image to load.
       // Images need to be loaded first because instance renderers use the
       // image dimensions to evaluate theirs. It may cause flickering otherwise.
       if (this.editorDisplay) {

@@ -2026,28 +2026,29 @@ const MainFrame = (props: Props) => {
     openExternalLayout(name);
   };
 
-  const onEventsBasedObjectChildrenEdited = () => {
-    const { editorTabs } = state;
-    for (const editor of editorTabs.editors) {
-      const { editorRef } = editor;
-      if (editorRef) {
-        editorRef.onEventsBasedObjectChildrenEdited();
+  const onEventsBasedObjectChildrenEdited = React.useCallback(
+    () => {
+      for (const editor of state.editorTabs.editors) {
+        const { editorRef } = editor;
+        if (editorRef) {
+          editorRef.onEventsBasedObjectChildrenEdited();
+        }
       }
-    }
-  };
+    },
+    [state.editorTabs]
+  );
 
-  const onSceneObjectEdited = (
-    scene: gdLayout,
-    objectWithContext: ObjectWithContext
-  ) => {
-    const { editorTabs } = state;
-    for (const editor of editorTabs.editors) {
-      const { editorRef } = editor;
-      if (editorRef) {
-        editorRef.onSceneObjectEdited(scene, objectWithContext);
+  const onSceneObjectEdited = React.useCallback(
+    () => (scene: gdLayout, objectWithContext: ObjectWithContext) => {
+      for (const editor of state.editorTabs.editors) {
+        const { editorRef } = editor;
+        if (editorRef) {
+          editorRef.onSceneObjectEdited(scene, objectWithContext);
+        }
       }
-    }
-  };
+    },
+    [state.editorTabs]
+  );
 
   const _onProjectItemModified = () => {
     triggerUnsavedChanges();

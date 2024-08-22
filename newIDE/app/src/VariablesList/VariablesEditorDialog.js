@@ -235,6 +235,9 @@ const VariablesEditorDialog = ({
           <HotReloadPreviewButton
             key="hot-reload-preview-button"
             {...hotReloadPreviewButtonProps}
+            // Code generation is required because the code access to variables
+            // with a number identifier that may change.
+            isCodeGenerationRequired
           />
         ) : null,
         helpPagePath ? (

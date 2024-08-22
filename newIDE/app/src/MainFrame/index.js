@@ -1686,6 +1686,8 @@ const MainFrame = (props: Props) => {
         launchPreview({ fullLoadingScreen: true }),
       launchProjectDataOnlyPreview: () =>
         launchPreview({ hotReload: true, projectDataOnlyExport: true }),
+      launchProjectCodeAndDataPreview: () =>
+        launchPreview({ hotReload: true, projectDataOnlyExport: false }),
     }),
     [hasPreviewsRunning, launchPreview]
   );

@@ -40,7 +40,7 @@ describe('gdjs.HotReloader._hotReloadVariablesContainer', () => {
   /**
    * When `current` is not set `oldInit` is used instead.
    * It's as if the hot-reload happened before any variable has been changed by events.
-   * @param {{oldInit: RootVariableData[], current?: RootVariableData[], newInit: RootVariableData[]}
+   * @param {{oldInit: RootVariableData[], current?: RootVariableData[], newInit: RootVariableData[]}}
    * @returns {gdjs.VariablesContainer}
    */
   const hotReloadVariablesContainer = ({ oldInit, current, newInit }) => {

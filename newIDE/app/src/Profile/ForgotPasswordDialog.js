@@ -10,8 +10,7 @@ import { type ForgotPasswordForm } from '../Utils/GDevelopServices/Authenticatio
 import LeftLoader from '../UI/LeftLoader';
 import Text from '../UI/Text';
 import Form from '../UI/Form';
-
-export const emailRegex = /^(.+)@(.+)$/;
+import { emailRegex } from '../Utils/EmailUtils';
 
 type Props = {|
   onClose: () => void,

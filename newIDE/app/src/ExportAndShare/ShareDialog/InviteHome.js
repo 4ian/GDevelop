@@ -31,8 +31,7 @@ import Form from '../../UI/Form';
 import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
 import UserLine from '../../UI/User/UserLine';
 import { getTranslatableLevel } from '../../Utils/AclUtils';
-
-export const emailRegex = /^(.+)@(.+)$/;
+import { emailRegex } from '../../Utils/EmailUtils';
 
 const getEmailErrorText = (addError: ?string) => {
   switch (addError) {

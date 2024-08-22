@@ -35,7 +35,7 @@ import { ColumnStackLayout, LineStackLayout } from '../../../../UI/Layout';
 import Paper from '../../../../UI/Paper';
 import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import RaisedButton from '../../../../UI/RaisedButton';
-import { groupMembersByGroupId } from './utils';
+import { groupMembersByGroupId } from './Utils';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import ContextMenu, {
   type ContextMenuInterface,

@@ -3,21 +3,21 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import Divider from '@material-ui/core/Divider';
-import TeamContext from '../../../../Profile/Team/TeamContext';
-import Dialog, { DialogPrimaryButton } from '../../../../UI/Dialog';
-import Text from '../../../../UI/Text';
-import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
-import UserLine from '../../../../UI/User/UserLine';
-import FlatButton from '../../../../UI/FlatButton';
-import LeftLoader from '../../../../UI/LeftLoader';
-import Form from '../../../../UI/Form';
-import { ColumnStackLayout } from '../../../../UI/Layout';
-import TextField from '../../../../UI/TextField';
-import { emailRegex } from '../../../../Utils/EmailUtils';
-import RaisedButton from '../../../../UI/RaisedButton';
-import Add from '../../../../UI/CustomSvgIcons/Add';
-import { groupMembersByGroupId, sortGroupsWithMembers } from './Utils';
-import { Column, Line } from '../../../../UI/Grid';
+import TeamContext from '../../../../../Profile/Team/TeamContext';
+import Dialog, { DialogPrimaryButton } from '../../../../../UI/Dialog';
+import Text from '../../../../../UI/Text';
+import AuthenticatedUserContext from '../../../../../Profile/AuthenticatedUserContext';
+import UserLine from '../../../../../UI/User/UserLine';
+import FlatButton from '../../../../../UI/FlatButton';
+import LeftLoader from '../../../../../UI/LeftLoader';
+import Form from '../../../../../UI/Form';
+import { ColumnStackLayout } from '../../../../../UI/Layout';
+import TextField from '../../../../../UI/TextField';
+import { emailRegex } from '../../../../../Utils/EmailUtils';
+import RaisedButton from '../../../../../UI/RaisedButton';
+import Add from '../../../../../UI/CustomSvgIcons/Add';
+import { groupMembersByGroupId, sortGroupsWithMembers } from '../Utils';
+import { Column, Line } from '../../../../../UI/Grid';
 
 type AddTeacherError =
   | 'no-seats-available'

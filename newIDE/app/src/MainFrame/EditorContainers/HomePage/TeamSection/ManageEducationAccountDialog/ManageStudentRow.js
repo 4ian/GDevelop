@@ -1,10 +1,10 @@
 // @flow
 
 import * as React from 'react';
+import { Trans } from '@lingui/macro';
 import Grid from '@material-ui/core/Grid';
 import { type User } from '../../../../../Utils/GDevelopServices/User';
 import Text from '../../../../../UI/Text';
-import { Trans } from '@lingui/macro';
 import { LineStackLayout } from '../../../../../UI/Layout';
 import Checkbox from '../../../../../UI/Checkbox';
 import CheckboxUnchecked from '../../../../../UI/CustomSvgIcons/CheckboxUnchecked';
@@ -18,9 +18,18 @@ type Props = {|
   member: User,
   isSelected: boolean,
   onSelect: (selected: boolean) => void,
+  onChangePassword: ({|
+    userId: string,
+    newPassword: string,
+  |}) => Promise<void>,
 |};
 
-const ManageStudentRow = ({ member, isSelected, onSelect }: Props) => {
+const ManageStudentRow = ({
+  member,
+  isSelected,
+  onSelect,
+  onChangePassword,
+}: Props) => {
   const [isEditingPassword, setIsEditingPassword] = React.useState<boolean>(
     false
   );
@@ -29,14 +38,22 @@ const ManageStudentRow = ({ member, isSelected, onSelect }: Props) => {
     setPasswordEditionError,
   ] = React.useState<React.Node>(null);
 
-  const onEditPassword = React.useCallback(async newPassword => {
-    if (newPassword.length < 8) {
-      setPasswordEditionError(
-        <Trans>Password must be at least 8 characters long.</Trans>
-      );
-      return;
-    }
-  }, []);
+  const onEditPassword = React.useCallback(
+    async (newPassword: string) => {
+      if (member.password && newPassword === member.password) {
+        setIsEditingPassword(false);
+        return;
+      }
+      if (newPassword.length < 8) {
+        setPasswordEditionError(
+          <Trans>Password must be at least 8 characters long.</Trans>
+        );
+        return;
+      }
+      await onChangePassword({ userId: member.id, newPassword });
+    },
+    [member.password, member.id, onChangePassword]
+  );
 
   return (
     <>

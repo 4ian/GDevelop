@@ -21,6 +21,7 @@ import Add from '../../../../../UI/CustomSvgIcons/Add';
 import { groupMembersByGroupId, sortGroupsWithMembers } from '../Utils';
 import { Column, Line } from '../../../../../UI/Grid';
 import ManageStudentRow from './ManageStudentRow';
+import { changeTeamMemberPassword } from '../../../../../Utils/GDevelopServices/User';
 
 type AddTeacherError =
   | 'no-seats-available'
@@ -111,7 +112,9 @@ type Props = {|
 |};
 
 const ManageEducationAccountDialog = ({ onClose }: Props) => {
-  const { profile } = React.useContext(AuthenticatedUserContext);
+  const { profile, getAuthorizationHeader } = React.useContext(
+    AuthenticatedUserContext
+  );
   const [selectedUserIds, setSelectedUserIds] = React.useState<string[]>([]);
   const [
     addTeacherDialogOpen,
@@ -126,6 +129,24 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
     onRefreshMembers,
   } = React.useContext(TeamContext);
 
+  const onChangeMemberPassword = React.useCallback(
+    async ({
+      userId,
+      newPassword,
+    }: {|
+      userId: string,
+      newPassword: string,
+    |}) => {
+      if (!profile) return;
+      await changeTeamMemberPassword(getAuthorizationHeader, {
+        adminUserId: profile.id,
+        userId,
+        newPassword,
+      });
+    },
+    [getAuthorizationHeader, profile]
+  );
+
   const membersByGroupId = groupMembersByGroupId({
     groups,
     members,
@@ -139,9 +160,9 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
     !groups ||
     !memberships ||
     !membersByGroupId
-  )
+  ) {
     return null;
-
+  }
   const groupsWithMembers = [
     membersByGroupId['NONE']
       ? { group: null, members: membersByGroupId['NONE'].members }
@@ -199,7 +220,9 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
                 return (
                   <>
                     <Line noMargin>
-                      <Text size="sub-title">{group ? group.name : <Trans>Lobby</Trans>}</Text>
+                      <Text size="sub-title">
+                        {group ? group.name : <Trans>Lobby</Trans>}
+                      </Text>
                     </Line>
                     <Column>
                       <GridList cols={2} cellHeight={'auto'}>
@@ -208,6 +231,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
                             <ManageStudentRow
                               member={member}
                               key={member.id}
+                              onChangePassword={onChangeMemberPassword}
                               isSelected={selectedUserIds.includes(member.id)}
                               onSelect={selected => {
                                 const memberIndexInArray = selectedUserIds.indexOf(

@@ -372,6 +372,32 @@ export const getUserPublicProfile = async (
   return response.data;
 };
 
+export const changeTeamMemberPassword = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+    adminUserId,
+    newPassword,
+  }: {
+    userId: string,
+    adminUserId: string,
+    newPassword: string,
+  }
+) => {
+  const authorizationHeader = await getAuthorizationHeader();
+  await client.post(
+    `/user/action/change-password`,
+    {
+      userId,
+      newPassword,
+    },
+    {
+      headers: { Authorization: authorizationHeader },
+      params: { userId: adminUserId },
+    }
+  );
+};
+
 export const getUsernameAvailability = async (
   username: string
 ): Promise<UsernameAvailability> => {

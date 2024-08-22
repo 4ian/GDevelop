@@ -455,6 +455,7 @@ namespace gdjs {
           variablesContainer.remove(oldVariableData.name);
         }
       });
+      variablesContainer.rebuildIndexFrom(newVariablesData);
     }
 
     _hotReloadStructureVariable(

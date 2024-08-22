@@ -273,6 +273,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 hotReloadPreviewButtonProps={{
                   hasPreviewsRunning: false,
                   launchProjectDataOnlyPreview: async () => {},
+                  launchProjectCodeAndDataPreview: async () => {},
                   launchProjectWithLoadingScreenPreview: async () => {},
                 }}
                 canSetAsGlobalObject={false}
@@ -330,6 +331,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 hotReloadPreviewButtonProps={{
                   hasPreviewsRunning: false,
                   launchProjectDataOnlyPreview: async () => {},
+                  launchProjectCodeAndDataPreview: async () => {},
                   launchProjectWithLoadingScreenPreview: async () => {},
                 }}
                 onUpdateBehaviorsSharedData={() =>

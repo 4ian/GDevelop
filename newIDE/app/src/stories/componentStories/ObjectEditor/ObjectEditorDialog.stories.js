@@ -38,6 +38,7 @@ export const CustomObject = () => (
       hotReloadPreviewButtonProps={{
         hasPreviewsRunning: false,
         launchProjectDataOnlyPreview: () => action('Hot-reload'),
+        launchProjectCodeAndDataPreview: action('Hot-reload with code'),
         launchProjectWithLoadingScreenPreview: () => action('Reload'),
       }}
       openBehaviorEvents={() => action('Open behavior events')}
@@ -68,6 +69,7 @@ export const StandardObject = () => (
       hotReloadPreviewButtonProps={{
         hasPreviewsRunning: false,
         launchProjectDataOnlyPreview: () => action('Hot-reload'),
+        launchProjectCodeAndDataPreview: action('Hot-reload with code'),
         launchProjectWithLoadingScreenPreview: () => action('Reload'),
       }}
       openBehaviorEvents={() => action('Open behavior events')}

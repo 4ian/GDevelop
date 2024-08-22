@@ -195,6 +195,7 @@ export const LongLabels = () => (
 const hotReloadPreviewButtonProps: HotReloadPreviewButtonProps = {
   hasPreviewsRunning: false,
   launchProjectDataOnlyPreview: action('launchProjectDataOnlyPreview'),
+  launchProjectCodeAndDataPreview: action('launchProjectCodeAndDataPreview'),
   launchProjectWithLoadingScreenPreview: action(
     'launchProjectWithLoadingScreenPreview'
   ),

@@ -240,7 +240,8 @@ const VariableRow = React.memo<VariableRowProps>(
 
     const getContainerYPosition = React.useCallback(() => {
       if (containerRef.current) {
-        return containerRef.current.getBoundingClientRect().top;
+        const containerRect = containerRef.current.getBoundingClientRect();
+        return { y: containerRect.top, height: containerRect.height };
       }
     }, []);
 
@@ -265,7 +266,11 @@ const VariableRow = React.memo<VariableRowProps>(
               getContainerYPosition
             );
             if (containerYPosition) {
-              setWhereToDrop(y - containerYPosition <= 18 ? 'before' : 'after');
+              setWhereToDrop(
+                y - containerYPosition.y <= containerYPosition.height / 2
+                  ? 'before'
+                  : 'after'
+              );
             }
           }}
         >
@@ -449,7 +454,7 @@ const VariableRow = React.memo<VariableRowProps>(
                                 hasLineBreaks
                               }
                               hint={
-                                hasMixedValues ? i18n._('Mixed values') : ''
+                                hasMixedValues ? i18n._(t`Mixed values`) : ''
                               }
                               onChange={onChangeValue}
                               value={

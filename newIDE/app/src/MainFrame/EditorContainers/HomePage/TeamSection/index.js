@@ -44,6 +44,7 @@ import type { ClientCoordinates } from '../../../../Utils/UseLongTouch';
 import { type MenuItemTemplate } from '../../../../UI/Menu/Menu.flow';
 import { EducationCard } from '../LearnSection/EducationCard';
 import UserSVG from '../../../../UI/CustomSvgIcons/User';
+import { copyTextToClipboard } from '../../../../Utils/Clipboard';
 
 const PADDING = 16;
 
@@ -204,6 +205,10 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
         {
           label: i18n._(t`See projects`),
           click: () => listUserProjects(member),
+        },
+        {
+          label: i18n._(t`Copy email address`),
+          click: () => copyTextToClipboard(member.email),
         },
       ];
     };

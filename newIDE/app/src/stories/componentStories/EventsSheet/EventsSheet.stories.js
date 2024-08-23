@@ -8,6 +8,7 @@ import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropConte
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 import fakeResourceManagementProps from '../../FakeResourceManagement';
+import fakeHotReloadPreviewButtonProps from '../../FakeHotReloadPreviewButtonProps';
 
 export default {
   title: 'EventsSheet/EventsSheet',
@@ -35,6 +36,7 @@ export const DefaultNoScope = () => (
         onCreateEventsFunction={action('create events function')}
         onBeginCreateEventsFunction={action('begin create events function')}
         isActive={true}
+        hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
       />
     </FixedHeightFlexContainer>
   </DragAndDropContextProvider>
@@ -64,6 +66,7 @@ export const EmptyNoScope = () => (
         onCreateEventsFunction={action('create events function')}
         onBeginCreateEventsFunction={action('begin create events function')}
         isActive={true}
+        hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
       />
     </FixedHeightFlexContainer>
   </DragAndDropContextProvider>

@@ -172,6 +172,7 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
               eventsBasedObject
             );
           }}
+          hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
         />
       </div>
     );

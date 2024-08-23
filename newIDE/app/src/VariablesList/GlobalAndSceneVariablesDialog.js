@@ -11,7 +11,7 @@ type Props = {|
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   onApply: (selectedVariableName: string | null) => void,
   onCancel: () => void,
-  hotReloadPreviewButtonProps?: ?HotReloadPreviewButtonProps,
+  hotReloadPreviewButtonProps: HotReloadPreviewButtonProps | null,
   isGlobalTabInitiallyOpen?: boolean,
   initiallySelectedVariableName?: string,
   shouldCreateInitiallySelectedVariable?: boolean,

@@ -91,6 +91,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             shouldCreateInitiallySelectedVariable={
               editorOpen.shouldCreate || false
             }
+            hotReloadPreviewButtonProps={null}
           />
         )}
       </React.Fragment>

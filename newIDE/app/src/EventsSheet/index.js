@@ -115,6 +115,7 @@ import {
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import LocalVariablesDialog from '../VariablesList/LocalVariablesDialog';
 import GlobalAndSceneVariablesDialog from '../VariablesList/GlobalAndSceneVariablesDialog';
+import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 
 const gd: libGDevelop = global.gd;
 
@@ -149,6 +150,7 @@ type Props = {|
   onBeginCreateEventsFunction: () => void,
   unsavedChanges?: ?UnsavedChanges,
   isActive: boolean,
+  hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
 |};
 
 type ComponentProps = {|
@@ -1832,6 +1834,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       resourceManagementProps,
       onCreateEventsFunction,
       tutorials,
+      hotReloadPreviewButtonProps,
     } = this.props;
     if (!project) return null;
 
@@ -2156,6 +2159,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             open
             onCancel={() => this.editLayoutVariables(false)}
             onApply={() => this.editLayoutVariables(false)}
+            hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
           />
         )}
         {this.state.textEditedEvent && (

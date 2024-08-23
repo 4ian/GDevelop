@@ -13,7 +13,7 @@ type Props = {|
   variablesContainer: gdVariablesContainer,
   onApply: (selectedVariableName: string | null) => void,
   onCancel: () => void,
-  hotReloadPreviewButtonProps?: ?HotReloadPreviewButtonProps,
+  hotReloadPreviewButtonProps: HotReloadPreviewButtonProps | null,
   /**
    * If set to true, a deleted variable won't trigger a confirmation asking if the
    * project must be refactored to delete any reference to it.

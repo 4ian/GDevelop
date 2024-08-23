@@ -73,6 +73,7 @@ namespace gdjs {
     private _localTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
     private _localInverseTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
     private _isLocalTransformationDirty: boolean = true;
+    _type: string;
 
     /**
      * @param parent The container the object belongs to
@@ -83,6 +84,7 @@ namespace gdjs {
       objectData: ObjectData & CustomObjectConfiguration
     ) {
       super(parent, objectData);
+      this._type = objectData.type;
       this._instanceContainer = new gdjs.CustomRuntimeObjectInstanceContainer(
         parent,
         this
@@ -226,6 +228,10 @@ namespace gdjs {
       | gdjs.CustomRuntimeObject2DRenderer
       | gdjs.CustomRuntimeObject3DRenderer {
       return this._renderer;
+    }
+
+    getChildrenContainer(): gdjs.RuntimeInstanceContainer {
+      return this._instanceContainer;
     }
 
     onChildrenLocationChanged() {

@@ -82,6 +82,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             preventRefactoringToDeleteInstructions
             initiallySelectedVariableName={editorOpen.variableName}
             shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
+            hotReloadPreviewButtonProps={null}
           />
         )}
       </React.Fragment>

@@ -86,6 +86,16 @@ namespace gdjs {
       }
     }
 
+    rebuildIndexFrom(data: VariableData[]) {
+      this._variablesArray.length = 0;
+      for (const variableData of data) {
+        if (variableData.name) {
+          const variable = this._variables.get(variableData.name);
+          this._variablesArray.push(variable);
+        }
+      }
+    }
+
     /**
      * Declare a new variable.
      * This should only be used by generated code.
@@ -441,6 +451,9 @@ namespace gdjs {
       },
       getVariableNameInContainerByLoopingThroughAllVariables: function () {
         return '';
+      },
+      rebuildIndexFrom: function () {
+        return;
       },
     };
 

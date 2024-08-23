@@ -2640,6 +2640,7 @@ storiesOf('HotReloadPreviewButton', module)
     <HotReloadPreviewButton
       hasPreviewsRunning={false}
       launchProjectDataOnlyPreview={async () => {}}
+      launchProjectCodeAndDataPreview={async () => {}}
       launchProjectWithLoadingScreenPreview={async () => {}}
     />
   ))
@@ -2647,6 +2648,7 @@ storiesOf('HotReloadPreviewButton', module)
     <HotReloadPreviewButton
       hasPreviewsRunning={true}
       launchProjectDataOnlyPreview={async () => {}}
+      launchProjectCodeAndDataPreview={async () => {}}
       launchProjectWithLoadingScreenPreview={async () => {}}
     />
   ));

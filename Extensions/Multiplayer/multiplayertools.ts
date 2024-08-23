@@ -5,7 +5,6 @@ namespace gdjs {
     lobbyId: string;
     gameId: string;
     peerId: string;
-    previousHostPeerId: string;
     playerId: string;
     ping: number;
     createdAt: number;
@@ -1044,9 +1043,7 @@ namespace gdjs {
         };
         let changeHostUrl = `${rootApi}/play/game/${_lobbyChangeHostRequest.gameId}/public-lobby/${_lobbyChangeHostRequest.lobbyId}/lobby-change-host-request`;
         headers['Authorization'] = `player-game-token ${playerToken}`;
-        changeHostUrl += `?playerId=${playerId}&previousHostPeerId=${
-          _lobbyChangeHostRequest.previousHostPeerId
-        }&peerId=${gdjs.multiplayerPeerJsHelper.getCurrentId()}`;
+        changeHostUrl += `?playerId=${playerId}&peerId=${gdjs.multiplayerPeerJsHelper.getCurrentId()}`;
         const response = await fetch(changeHostUrl, {
           method: 'GET',
           headers,

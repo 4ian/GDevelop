@@ -398,11 +398,12 @@ namespace gdjs {
     export const displayErrorNotification = function (
       runtimeScene: gdjs.RuntimeScene
     ) {
-      showNotification(
+      showNotification({
         runtimeScene,
-        'An error occurred while displaying the game lobbies, please try again.',
-        'error'
-      );
+        content:
+          'An error occurred while displaying the game lobbies, please try again.',
+        type: 'error',
+      });
     };
 
     /**
@@ -412,7 +413,11 @@ namespace gdjs {
       runtimeScene: gdjs.RuntimeScene,
       playerName: string
     ) {
-      showNotification(runtimeScene, `${playerName} left.`, 'warning');
+      showNotification({
+        runtimeScene,
+        content: `${playerName} left.`,
+        type: 'warning',
+      });
     };
 
     /**
@@ -422,7 +427,11 @@ namespace gdjs {
       runtimeScene: gdjs.RuntimeScene,
       playerName: string
     ) {
-      showNotification(runtimeScene, `${playerName} joined.`, 'success');
+      showNotification({
+        runtimeScene,
+        content: `${playerName} joined.`,
+        type: 'success',
+      });
     };
 
     /**
@@ -431,11 +440,48 @@ namespace gdjs {
     export const displayConnectionErrorNotification = function (
       runtimeScene: gdjs.RuntimeScene
     ) {
-      showNotification(
+      showNotification({
         runtimeScene,
-        'Could not connect to other players.',
-        'error'
-      );
+        content: 'Could not connect to other players.',
+        type: 'error',
+      });
+    };
+
+    /**
+     * Create, display, and hide a notification when a player leaves the game.
+     */
+    export const displayHostMigrationNotification = function (
+      runtimeScene: gdjs.RuntimeScene
+    ) {
+      showNotification({
+        runtimeScene,
+        content: `Migrating host...`,
+        type: 'warning',
+        id: 'migrating-host',
+        persist: true,
+      });
+    };
+
+    export const showHostMigrationFinishedNotification = function (
+      runtimeScene: gdjs.RuntimeScene
+    ) {
+      removeNotificationAndShiftOthers('migrating-host');
+      showNotification({
+        runtimeScene,
+        content: `Host migrated!`,
+        type: 'success',
+      });
+    };
+
+    export const showHostMigrationFailedNotification = function (
+      runtimeScene: gdjs.RuntimeScene
+    ) {
+      removeNotificationAndShiftOthers('migrating-host');
+      showNotification({
+        runtimeScene,
+        content: `Host migration failed.`,
+        type: 'error',
+      });
     };
 
     const removeNotificationAndShiftOthers = function (
@@ -443,7 +489,9 @@ namespace gdjs {
     ) {
       const notification = document.getElementById(notificationContainerId);
       if (!notification) {
-        logger.error('Notification not found.');
+        logger.warn(
+          `Notification ${notificationContainerId} not found. skipping`
+        );
         return;
       }
       const index = notificationContainerIds.indexOf(notificationContainerId);
@@ -452,8 +500,8 @@ namespace gdjs {
       }
       notification.remove();
 
-      // Shift the other notifications up.
-      for (let i = 0; i < notificationContainerIds.length; i++) {
+      // Shift the notifications that are below the one that was removed up.
+      for (let i = index; i < notificationContainerIds.length; i++) {
         const notification = document.getElementById(
           notificationContainerIds[i]
         );
@@ -468,11 +516,19 @@ namespace gdjs {
     /**
      * Helper to show a notification to the user, that disappears automatically.
      */
-    export const showNotification = function (
-      runtimeScene: gdjs.RuntimeScene,
-      content: string,
-      type: 'success' | 'warning' | 'error'
-    ) {
+    export const showNotification = function ({
+      runtimeScene,
+      content,
+      type,
+      id,
+      persist,
+    }: {
+      runtimeScene: gdjs.RuntimeScene;
+      content: string;
+      type: 'success' | 'warning' | 'error';
+      id?: string;
+      persist?: boolean;
+    }) {
       // When we show a notification, we add it below the other ones.
       // We also remove the oldest one if there are too many > 5.
       if (notificationContainerIds.length > 5) {
@@ -486,7 +542,8 @@ namespace gdjs {
       }
 
       // We generate a random ID for the notification, so they can stack.
-      const id = `notification-${Math.random().toString(36).substring(7)}`;
+      const notificationId =
+        id || `notification-${Math.random().toString(36).substring(7)}`;
 
       const domContainer = runtimeScene
         .getGame()
@@ -498,7 +555,7 @@ namespace gdjs {
       }
       const divContainer = document.createElement('div');
 
-      divContainer.id = id;
+      divContainer.id = notificationId;
       divContainer.style.position = 'absolute';
       divContainer.style.pointerEvents = 'all';
       divContainer.style.backgroundColor =
@@ -544,10 +601,14 @@ namespace gdjs {
 
       divContainer.appendChild(loggedText);
       domContainer.appendChild(divContainer);
-      notificationContainerIds.push(id);
+      notificationContainerIds.push(notificationId);
+
+      if (persist) {
+        return;
+      }
 
       const animationTime = 700;
-      const notificationTime = 5000;
+      const notificationTime = 3000;
       setTimeout(() => {
         try {
           divContainer.animate(
@@ -566,7 +627,7 @@ namespace gdjs {
       }, notificationTime);
       // Use timeout because onanimationend listener does not work.
       setTimeout(() => {
-        removeNotificationAndShiftOthers(id);
+        removeNotificationAndShiftOthers(notificationId);
       }, notificationTime + animationTime);
     };
 

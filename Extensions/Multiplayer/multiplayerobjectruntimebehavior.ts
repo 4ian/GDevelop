@@ -413,7 +413,10 @@ namespace gdjs {
 
       // For destruction of objects, we allow the host to destroy the object even if it is not the owner.
       // This is particularly helpful when a player disconnects, so the host can destroy the object they were owning.
-      if (!this._isOwnerAsPlayerOrHost() && !gdjs.multiplayer.isPlayerHost()) {
+      if (
+        !this._isOwnerAsPlayerOrHost() &&
+        !gdjs.multiplayer.isCurrentPlayerHost()
+      ) {
         return;
       }
 

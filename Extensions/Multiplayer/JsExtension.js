@@ -422,13 +422,13 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .setFunctionName('gdjs.multiplayer.isPlayerHost');
+      .setFunctionName('gdjs.multiplayer.isCurrentPlayerHost');
 
     extension
       .addCondition(
         'HasAnyPlayerLeft',
         _('Any player has left'),
-        _('Check if any player has left the lobby.'),
+        _('Check if any player has left the lobby game.'),
         _('Any player has left'),
         _('Lobbies'),
         'JsPlatform/Extensions/multiplayer.svg',
@@ -453,7 +453,7 @@ module.exports = {
       .addCondition(
         'HasPlayerLeft',
         _('Player has left'),
-        _('Check if the player has left the lobby.'),
+        _('Check if the player has left the lobby game.'),
         _('Player _PARAM0_ has left'),
         _('Lobbies'),
         'JsPlatform/Extensions/multiplayer.svg',
@@ -478,7 +478,7 @@ module.exports = {
     extension
       .addExpression(
         'LastLeftPlayerNumber',
-        _('Last left player number'),
+        _('Player number that just left'),
         _('Returns the number of the player that has just left the lobby.'),
         _('Lobbies'),
         'JsPlatform/Extensions/multiplayer.svg'
@@ -554,8 +554,10 @@ module.exports = {
     extension
       .addExpression(
         'LastJoinedPlayerNumber',
-        _('Last joined player number'),
-        _('Returns the number of the player that has just joined the lobby.'),
+        _('Player number that just joined'),
+        _(
+          'Returns the player number of the player that has just joined the lobby.'
+        ),
         _('Lobbies'),
         'JsPlatform/Extensions/multiplayer.svg'
       )
@@ -575,6 +577,33 @@ module.exports = {
       .setFunctionName(
         'gdjs.multiplayerMessageManager.getLatestPlayerWhoJustJoined'
       );
+
+    extension
+      .addCondition(
+        'IsMigratingHost',
+        _('Host is migrating'),
+        _(
+          'Check if the host is migrating, in order to adapt the game state (like pausing the game).'
+        ),
+        _('Host is migrating'),
+        _('Lobbies'),
+        'JsPlatform/Extensions/multiplayer.svg',
+        'JsPlatform/Extensions/multiplayer.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Multiplayer/peer.js')
+      .addIncludeFile('Extensions/Multiplayer/peerJsHelper.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
+      .setFunctionName('gdjs.multiplayerMessageManager.isMigratingHost');
 
     extension
       .addStrExpression(

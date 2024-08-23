@@ -80,10 +80,14 @@ gd::ObjectConfiguration &CustomObjectConfiguration::GetChildObjectConfiguration(
   auto &childObject = eventsBasedObject->GetObjects().GetObject(objectName);
 
   if (!IsOverridingEventsBasedObjectChildrenConfiguration()) {
-    childObjectConfigurations.erase(objectName);
-    childObjectConfigurations.insert(
-        std::make_pair(objectName, childObject.GetConfiguration().Clone()));
-    return *(childObjectConfigurations[objectName]);
+    // It should be fine because the editor doesn't allow to edit values when
+    // the default values from the events-based object is used.
+    //
+    // Resource refactor operations may modify it but they will do the same
+    // thing on the custom object as the event-based object children so it
+    // shouldn't have side effect.
+    return const_cast<gd::ObjectConfiguration &>(
+        childObject.GetConfiguration());
   }
 
   auto configurationPosition = childObjectConfigurations.find(objectName);
@@ -94,40 +98,6 @@ gd::ObjectConfiguration &CustomObjectConfiguration::GetChildObjectConfiguration(
     return *(childObjectConfigurations[objectName]);
   }
   else {
-    auto &pair = *configurationPosition;
-    auto &configuration = pair.second;
-    return *configuration;
-  }
-}
-
-const gd::ObjectConfiguration &
-CustomObjectConfiguration::GetChildObjectConfiguration(
-    const gd::String &objectName) const {
-  const auto *eventsBasedObject = GetEventsBasedObject();
-  if (!eventsBasedObject) {
-    return badObjectConfiguration;
-  }
-
-  if (!eventsBasedObject->GetObjects().HasObjectNamed(objectName)) {
-    gd::LogError(
-        "Tried to get the configuration of a child-object:" + objectName +
-        " that doesn't exist in the event-based object: " + GetType());
-    return badObjectConfiguration;
-  }
-
-  auto &childObject = eventsBasedObject->GetObjects().GetObject(objectName);
-
-  if (!IsOverridingEventsBasedObjectChildrenConfiguration()) {
-    // Avoid to clone as it's constant.
-    return childObject.GetConfiguration();
-  }
-
-  auto configurationPosition = childObjectConfigurations.find(objectName);
-  if (configurationPosition == childObjectConfigurations.end()) {
-    childObjectConfigurations.insert(
-        std::make_pair(objectName, childObject.GetConfiguration().Clone()));
-    return *(childObjectConfigurations[objectName]);
-  } else {
     auto &pair = *configurationPosition;
     auto &configuration = pair.second;
     return *configuration;

@@ -82,9 +82,6 @@ class CustomObjectConfiguration : public gd::ObjectConfiguration {
   gd::ObjectConfiguration &
   GetChildObjectConfiguration(const gd::String &objectName);
 
-  const gd::ObjectConfiguration &
-  GetChildObjectConfiguration(const gd::String &objectName) const;
-
   std::size_t GetAnimationsCount() const override;
 
   const gd::String &GetAnimationName(size_t index) const override;

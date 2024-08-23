@@ -4,10 +4,25 @@ Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
  */
 
 namespace gdjs {
+  const enum HorizontalAnchor {
+    None = 0,
+    WindowLeft,
+    WindowRight,
+    Proportional,
+    WindowCenter,
+  }
+  const enum VerticalAnchor {
+    None = 0,
+    WindowTop,
+    WindowBottom,
+    Proportional,
+    WindowCenter,
+  }
+
   export class AnchorRuntimeBehavior extends gdjs.RuntimeBehavior {
     _relativeToOriginalWindowSize: any;
-    _leftEdgeAnchor: any;
-    _rightEdgeAnchor: any;
+    _leftEdgeAnchor: HorizontalAnchor;
+    _rightEdgeAnchor: HorizontalAnchor;
     _topEdgeAnchor: any;
     _bottomEdgeAnchor: any;
     _invalidDistances: boolean = true;
@@ -92,49 +107,28 @@ namespace gdjs {
           workingPoint
         );
 
-        //Left edge
-        if (
-          this._leftEdgeAnchor ===
-          AnchorRuntimeBehavior.HorizontalAnchor.WINDOW_LEFT
-        ) {
+        // Left edge
+        if (this._leftEdgeAnchor === HorizontalAnchor.WindowLeft) {
           this._leftEdgeDistance = topLeftPixel[0];
-        } else {
-          if (
-            this._leftEdgeAnchor ===
-            AnchorRuntimeBehavior.HorizontalAnchor.WINDOW_RIGHT
-          ) {
-            this._leftEdgeDistance = rendererWidth - topLeftPixel[0];
-          } else {
-            if (
-              this._leftEdgeAnchor ===
-              AnchorRuntimeBehavior.HorizontalAnchor.PROPORTIONAL
-            ) {
-              this._leftEdgeDistance = topLeftPixel[0] / rendererWidth;
-            }
-          }
+        } else if (this._leftEdgeAnchor === HorizontalAnchor.WindowRight) {
+          this._leftEdgeDistance = topLeftPixel[0] - rendererWidth;
+        } else if (this._leftEdgeAnchor === HorizontalAnchor.Proportional) {
+          this._leftEdgeDistance = topLeftPixel[0] / rendererWidth;
+        } else if (this._leftEdgeAnchor === HorizontalAnchor.WindowCenter) {
+          this._leftEdgeDistance = topLeftPixel[0] - rendererWidth / 2;
         }
 
-        //Top edge
-        if (
-          this._topEdgeAnchor ===
-          AnchorRuntimeBehavior.VerticalAnchor.WINDOW_TOP
-        ) {
+        // Top edge
+        if (this._topEdgeAnchor === VerticalAnchor.WindowTop) {
           this._topEdgeDistance = topLeftPixel[1];
-        } else {
-          if (
-            this._topEdgeAnchor ===
-            AnchorRuntimeBehavior.VerticalAnchor.WINDOW_BOTTOM
-          ) {
-            this._topEdgeDistance = rendererHeight - topLeftPixel[1];
-          } else {
-            if (
-              this._topEdgeAnchor ===
-              AnchorRuntimeBehavior.VerticalAnchor.PROPORTIONAL
-            ) {
-              this._topEdgeDistance = topLeftPixel[1] / rendererHeight;
-            }
-          }
+        } else if (this._topEdgeAnchor === VerticalAnchor.WindowBottom) {
+          this._topEdgeDistance = topLeftPixel[1] - rendererHeight;
+        } else if (this._topEdgeAnchor === VerticalAnchor.Proportional) {
+          this._topEdgeDistance = topLeftPixel[1] / rendererHeight;
+        } else if (this._topEdgeAnchor === VerticalAnchor.WindowCenter) {
+          this._topEdgeDistance = topLeftPixel[1] - rendererHeight / 2;
         }
+
         // It's fine to reuse workingPoint as topLeftPixel is no longer used.
         const bottomRightPixel = layer.convertCoords(
           this.owner.getDrawableX() + this.owner.getWidth(),
@@ -143,49 +137,28 @@ namespace gdjs {
           workingPoint
         );
 
-        //Right edge
-        if (
-          this._rightEdgeAnchor ===
-          AnchorRuntimeBehavior.HorizontalAnchor.WINDOW_LEFT
-        ) {
+        // Right edge
+        if (this._rightEdgeAnchor === HorizontalAnchor.WindowLeft) {
           this._rightEdgeDistance = bottomRightPixel[0];
-        } else {
-          if (
-            this._rightEdgeAnchor ===
-            AnchorRuntimeBehavior.HorizontalAnchor.WINDOW_RIGHT
-          ) {
-            this._rightEdgeDistance = rendererWidth - bottomRightPixel[0];
-          } else {
-            if (
-              this._rightEdgeAnchor ===
-              AnchorRuntimeBehavior.HorizontalAnchor.PROPORTIONAL
-            ) {
-              this._rightEdgeDistance = bottomRightPixel[0] / rendererWidth;
-            }
-          }
+        } else if (this._rightEdgeAnchor === HorizontalAnchor.WindowRight) {
+          this._rightEdgeDistance = bottomRightPixel[0] - rendererWidth;
+        } else if (this._rightEdgeAnchor === HorizontalAnchor.Proportional) {
+          this._rightEdgeDistance = bottomRightPixel[0] / rendererWidth;
+        } else if (this._rightEdgeAnchor === HorizontalAnchor.WindowCenter) {
+          this._rightEdgeDistance = bottomRightPixel[0] - rendererWidth / 2;
         }
 
-        //Bottom edge
-        if (
-          this._bottomEdgeAnchor ===
-          AnchorRuntimeBehavior.VerticalAnchor.WINDOW_TOP
-        ) {
+        // Bottom edge
+        if (this._bottomEdgeAnchor === VerticalAnchor.WindowTop) {
           this._bottomEdgeDistance = bottomRightPixel[1];
-        } else {
-          if (
-            this._bottomEdgeAnchor ===
-            AnchorRuntimeBehavior.VerticalAnchor.WINDOW_BOTTOM
-          ) {
-            this._bottomEdgeDistance = rendererHeight - bottomRightPixel[1];
-          } else {
-            if (
-              this._bottomEdgeAnchor ===
-              AnchorRuntimeBehavior.VerticalAnchor.PROPORTIONAL
-            ) {
-              this._bottomEdgeDistance = bottomRightPixel[1] / rendererHeight;
-            }
-          }
+        } else if (this._bottomEdgeAnchor === VerticalAnchor.WindowBottom) {
+          this._bottomEdgeDistance = bottomRightPixel[1] - rendererHeight;
+        } else if (this._bottomEdgeAnchor === VerticalAnchor.Proportional) {
+          this._bottomEdgeDistance = bottomRightPixel[1] / rendererHeight;
+        } else if (this._bottomEdgeAnchor === VerticalAnchor.WindowCenter) {
+          this._bottomEdgeDistance = bottomRightPixel[1] - rendererHeight / 2;
         }
+
         this._invalidDistances = false;
       } else {
         //Move and resize the object if needed
@@ -194,93 +167,50 @@ namespace gdjs {
         let rightPixel = 0;
         let bottomPixel = 0;
 
-        //Left edge
-        if (
-          this._leftEdgeAnchor ===
-          AnchorRuntimeBehavior.HorizontalAnchor.WINDOW_LEFT
-        ) {
+        // Left edge
+        if (this._leftEdgeAnchor === HorizontalAnchor.WindowLeft) {
           leftPixel = this._leftEdgeDistance;
-        } else {
-          if (
-            this._leftEdgeAnchor ===
-            AnchorRuntimeBehavior.HorizontalAnchor.WINDOW_RIGHT
-          ) {
-            leftPixel = rendererWidth - this._leftEdgeDistance;
-          } else {
-            if (
-              this._leftEdgeAnchor ===
-              AnchorRuntimeBehavior.HorizontalAnchor.PROPORTIONAL
-            ) {
-              leftPixel = this._leftEdgeDistance * rendererWidth;
-            }
-          }
+        } else if (this._leftEdgeAnchor === HorizontalAnchor.WindowRight) {
+          leftPixel = rendererWidth + this._leftEdgeDistance;
+        } else if (this._leftEdgeAnchor === HorizontalAnchor.Proportional) {
+          leftPixel = this._leftEdgeDistance * rendererWidth;
+        } else if (this._leftEdgeAnchor === HorizontalAnchor.WindowCenter) {
+          leftPixel = rendererWidth / 2 + this._leftEdgeDistance;
         }
 
-        //Top edge
-        if (
-          this._topEdgeAnchor ===
-          AnchorRuntimeBehavior.VerticalAnchor.WINDOW_TOP
-        ) {
+        // Top edge
+        if (this._topEdgeAnchor === VerticalAnchor.WindowTop) {
           topPixel = this._topEdgeDistance;
-        } else {
-          if (
-            this._topEdgeAnchor ===
-            AnchorRuntimeBehavior.VerticalAnchor.WINDOW_BOTTOM
-          ) {
-            topPixel = rendererHeight - this._topEdgeDistance;
-          } else {
-            if (
-              this._topEdgeAnchor ===
-              AnchorRuntimeBehavior.VerticalAnchor.PROPORTIONAL
-            ) {
-              topPixel = this._topEdgeDistance * rendererHeight;
-            }
-          }
+        } else if (this._topEdgeAnchor === VerticalAnchor.WindowBottom) {
+          topPixel = rendererHeight + this._topEdgeDistance;
+        } else if (this._topEdgeAnchor === VerticalAnchor.Proportional) {
+          topPixel = this._topEdgeDistance * rendererHeight;
+        } else if (this._topEdgeAnchor === VerticalAnchor.WindowCenter) {
+          topPixel = rendererHeight / 2 + this._topEdgeDistance;
         }
 
-        //Right edge
-        if (
-          this._rightEdgeAnchor ===
-          AnchorRuntimeBehavior.HorizontalAnchor.WINDOW_LEFT
-        ) {
+        // Right edge
+        if (this._rightEdgeAnchor === HorizontalAnchor.WindowLeft) {
           rightPixel = this._rightEdgeDistance;
-        } else {
-          if (
-            this._rightEdgeAnchor ===
-            AnchorRuntimeBehavior.HorizontalAnchor.WINDOW_RIGHT
-          ) {
-            rightPixel = rendererWidth - this._rightEdgeDistance;
-          } else {
-            if (
-              this._rightEdgeAnchor ===
-              AnchorRuntimeBehavior.HorizontalAnchor.PROPORTIONAL
-            ) {
-              rightPixel = this._rightEdgeDistance * rendererWidth;
-            }
-          }
+        } else if (this._rightEdgeAnchor === HorizontalAnchor.WindowRight) {
+          rightPixel = rendererWidth + this._rightEdgeDistance;
+        } else if (this._rightEdgeAnchor === HorizontalAnchor.Proportional) {
+          rightPixel = this._rightEdgeDistance * rendererWidth;
+        } else if (this._rightEdgeAnchor === HorizontalAnchor.WindowCenter) {
+          rightPixel = rendererWidth / 2 + this._rightEdgeDistance;
         }
 
-        //Bottom edge
-        if (
-          this._bottomEdgeAnchor ===
-          AnchorRuntimeBehavior.VerticalAnchor.WINDOW_TOP
-        ) {
+        // Bottom edge
+        if (this._bottomEdgeAnchor === VerticalAnchor.WindowTop) {
           bottomPixel = this._bottomEdgeDistance;
-        } else {
-          if (
-            this._bottomEdgeAnchor ===
-            AnchorRuntimeBehavior.VerticalAnchor.WINDOW_BOTTOM
-          ) {
-            bottomPixel = rendererHeight - this._bottomEdgeDistance;
-          } else {
-            if (
-              this._bottomEdgeAnchor ===
-              AnchorRuntimeBehavior.VerticalAnchor.PROPORTIONAL
-            ) {
-              bottomPixel = this._bottomEdgeDistance * rendererHeight;
-            }
-          }
+        } else if (this._bottomEdgeAnchor === VerticalAnchor.WindowBottom) {
+          bottomPixel = rendererHeight + this._bottomEdgeDistance;
+        } else if (this._bottomEdgeAnchor === VerticalAnchor.Proportional) {
+          bottomPixel = this._bottomEdgeDistance * rendererHeight;
+        } else if (this._bottomEdgeAnchor === VerticalAnchor.WindowCenter) {
+          bottomPixel = rendererHeight / 2 + this._bottomEdgeDistance;
         }
+
         // It's fine to reuse workingPoint as topLeftPixel is no longer used.
         const topLeftCoord = layer.convertInverseCoords(
           leftPixel,
@@ -303,27 +233,18 @@ namespace gdjs {
         // Compatibility with GD <= 5.0.133
         if (this._useLegacyBottomAndRightAnchors) {
           //Move and resize the object according to the anchors
-          if (
-            this._rightEdgeAnchor !==
-            AnchorRuntimeBehavior.HorizontalAnchor.NONE
-          ) {
+          if (this._rightEdgeAnchor !== HorizontalAnchor.None) {
             this.owner.setWidth(right - left);
           }
-          if (
-            this._bottomEdgeAnchor !== AnchorRuntimeBehavior.VerticalAnchor.NONE
-          ) {
+          if (this._bottomEdgeAnchor !== VerticalAnchor.None) {
             this.owner.setHeight(bottom - top);
           }
-          if (
-            this._leftEdgeAnchor !== AnchorRuntimeBehavior.HorizontalAnchor.NONE
-          ) {
+          if (this._leftEdgeAnchor !== HorizontalAnchor.None) {
             this.owner.setX(
               left + this.owner.getX() - this.owner.getDrawableX()
             );
           }
-          if (
-            this._topEdgeAnchor !== AnchorRuntimeBehavior.VerticalAnchor.NONE
-          ) {
+          if (this._topEdgeAnchor !== VerticalAnchor.None) {
             this.owner.setY(
               top + this.owner.getY() - this.owner.getDrawableY()
             );
@@ -333,25 +254,18 @@ namespace gdjs {
         else {
           // Resize if right and left anchors are set
           if (
-            this._rightEdgeAnchor !==
-              AnchorRuntimeBehavior.HorizontalAnchor.NONE &&
-            this._leftEdgeAnchor !== AnchorRuntimeBehavior.HorizontalAnchor.NONE
+            this._rightEdgeAnchor !== HorizontalAnchor.None &&
+            this._leftEdgeAnchor !== HorizontalAnchor.None
           ) {
             this.owner.setWidth(right - left);
             this.owner.setX(left);
           } else {
-            if (
-              this._leftEdgeAnchor !==
-              AnchorRuntimeBehavior.HorizontalAnchor.NONE
-            ) {
+            if (this._leftEdgeAnchor !== HorizontalAnchor.None) {
               this.owner.setX(
                 left + this.owner.getX() - this.owner.getDrawableX()
               );
             }
-            if (
-              this._rightEdgeAnchor !==
-              AnchorRuntimeBehavior.HorizontalAnchor.NONE
-            ) {
+            if (this._rightEdgeAnchor !== HorizontalAnchor.None) {
               this.owner.setX(
                 right +
                   this.owner.getX() -
@@ -362,24 +276,18 @@ namespace gdjs {
           }
           // Resize if top and bottom anchors are set
           if (
-            this._bottomEdgeAnchor !==
-              AnchorRuntimeBehavior.VerticalAnchor.NONE &&
-            this._topEdgeAnchor !== AnchorRuntimeBehavior.VerticalAnchor.NONE
+            this._bottomEdgeAnchor !== VerticalAnchor.None &&
+            this._topEdgeAnchor !== VerticalAnchor.None
           ) {
             this.owner.setHeight(bottom - top);
             this.owner.setY(top);
           } else {
-            if (
-              this._topEdgeAnchor !== AnchorRuntimeBehavior.VerticalAnchor.NONE
-            ) {
+            if (this._topEdgeAnchor !== VerticalAnchor.None) {
               this.owner.setY(
                 top + this.owner.getY() - this.owner.getDrawableY()
               );
             }
-            if (
-              this._bottomEdgeAnchor !==
-              AnchorRuntimeBehavior.VerticalAnchor.NONE
-            ) {
+            if (this._bottomEdgeAnchor !== VerticalAnchor.None) {
               this.owner.setY(
                 bottom +
                   this.owner.getY() -
@@ -393,19 +301,6 @@ namespace gdjs {
     }
 
     doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
-
-    static HorizontalAnchor = {
-      NONE: 0,
-      WINDOW_LEFT: 1,
-      WINDOW_RIGHT: 2,
-      PROPORTIONAL: 3,
-    };
-    static VerticalAnchor = {
-      NONE: 0,
-      WINDOW_TOP: 1,
-      WINDOW_BOTTOM: 2,
-      PROPORTIONAL: 3,
-    };
   }
   gdjs.registerBehavior(
     'AnchorBehavior::AnchorBehavior',

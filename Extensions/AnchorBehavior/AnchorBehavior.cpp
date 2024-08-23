@@ -25,7 +25,6 @@ void AnchorBehavior::InitializeContent(gd::SerializerElement& content) {
   content.SetAttribute("useLegacyBottomAndRightAnchors", false);
 }
 
-#if defined(GD_IDE_ONLY)
 namespace {
 gd::String GetAnchorAsString(AnchorBehavior::HorizontalAnchor anchor) {
   if (anchor == AnchorBehavior::ANCHOR_HORIZONTAL_WINDOW_LEFT)
@@ -34,6 +33,8 @@ gd::String GetAnchorAsString(AnchorBehavior::HorizontalAnchor anchor) {
     return _("Window right");
   else if (anchor == AnchorBehavior::ANCHOR_HORIZONTAL_PROPORTIONAL)
     return _("Proportional");
+  else if (anchor == AnchorBehavior::ANCHOR_HORIZONTAL_WINDOW_CENTER)
+    return _("Window center");
   else
     return _("No anchor");
 }
@@ -45,6 +46,8 @@ gd::String GetAnchorAsString(AnchorBehavior::VerticalAnchor anchor) {
     return _("Window bottom");
   else if (anchor == AnchorBehavior::ANCHOR_VERTICAL_PROPORTIONAL)
     return _("Proportional");
+  else if (anchor == AnchorBehavior::ANCHOR_VERTICAL_WINDOW_CENTER)
+    return _("Window center");
   else
     return _("No anchor");
 }
@@ -69,6 +72,7 @@ std::map<gd::String, gd::PropertyDescriptor> AnchorBehavior::GetProperties(
       .SetType("Choice")
       .AddExtraInfo(_("No anchor"))
       .AddExtraInfo(_("Window left"))
+      .AddExtraInfo(_("Window center"))
       .AddExtraInfo(_("Window right"))
       .AddExtraInfo(_("Proportional"))
       .SetDescription(_("Anchor the left edge of the object on X axis."));
@@ -79,6 +83,7 @@ std::map<gd::String, gd::PropertyDescriptor> AnchorBehavior::GetProperties(
       .SetType("Choice")
       .AddExtraInfo(_("No anchor"))
       .AddExtraInfo(_("Window left"))
+      .AddExtraInfo(_("Window center"))
       .AddExtraInfo(_("Window right"))
       .AddExtraInfo(_("Proportional"))
       .SetDescription(_("Anchor the right edge of the object on X axis."));
@@ -89,6 +94,7 @@ std::map<gd::String, gd::PropertyDescriptor> AnchorBehavior::GetProperties(
       .SetType("Choice")
       .AddExtraInfo(_("No anchor"))
       .AddExtraInfo(_("Window top"))
+      .AddExtraInfo(_("Window center"))
       .AddExtraInfo(_("Window bottom"))
       .AddExtraInfo(_("Proportional"))
       .SetDescription(_("Anchor the top edge of the object on Y axis."));
@@ -99,6 +105,7 @@ std::map<gd::String, gd::PropertyDescriptor> AnchorBehavior::GetProperties(
       .SetType("Choice")
       .AddExtraInfo(_("No anchor"))
       .AddExtraInfo(_("Window top"))
+      .AddExtraInfo(_("Window center"))
       .AddExtraInfo(_("Window bottom"))
       .AddExtraInfo(_("Proportional"))
       .SetDescription(_("Anchor the bottom edge of the object on Y axis."));
@@ -127,6 +134,8 @@ AnchorBehavior::HorizontalAnchor GetHorizontalAnchorFromString(
     return AnchorBehavior::ANCHOR_HORIZONTAL_WINDOW_RIGHT;
   else if (value == _("Proportional"))
     return AnchorBehavior::ANCHOR_HORIZONTAL_PROPORTIONAL;
+  else if (value == _("Window center"))
+    return AnchorBehavior::ANCHOR_HORIZONTAL_WINDOW_CENTER;
   else
     return AnchorBehavior::ANCHOR_HORIZONTAL_NONE;
 }
@@ -139,6 +148,8 @@ AnchorBehavior::VerticalAnchor GetVerticalAnchorFromString(
     return AnchorBehavior::ANCHOR_VERTICAL_WINDOW_BOTTOM;
   else if (value == _("Proportional"))
     return AnchorBehavior::ANCHOR_VERTICAL_PROPORTIONAL;
+  else if (value == _("Window center"))
+    return AnchorBehavior::ANCHOR_VERTICAL_WINDOW_CENTER;
   else
     return AnchorBehavior::ANCHOR_VERTICAL_NONE;
 }
@@ -172,4 +183,3 @@ bool AnchorBehavior::UpdateProperty(gd::SerializerElement& behaviorContent,
 
   return true;
 }
-#endif

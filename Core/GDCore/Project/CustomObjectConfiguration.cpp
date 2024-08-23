@@ -84,8 +84,8 @@ gd::ObjectConfiguration &CustomObjectConfiguration::GetChildObjectConfiguration(
     // the default values from the events-based object is used.
     //
     // Resource refactor operations may modify it but they will do the same
-    // thing on the custom object as the event-based object children so it
-    // shouldn't have side effect.
+    // thing on the custom object as on the event-based object children so it
+    // shouldn't have any side effect.
     return const_cast<gd::ObjectConfiguration &>(
         childObject.GetConfiguration());
   }

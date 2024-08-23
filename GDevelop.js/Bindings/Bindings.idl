@@ -662,8 +662,10 @@ interface ObjectsContainersList {
   [Value] VectorString GetAnimationNamesOfObject([Const] DOMString name);
   [Const, Value] DOMString GetTypeOfBehaviorInObjectOrGroup([Const] DOMString objectOrGroupName, [Const] DOMString behaviorName, boolean searchInGroups);
   boolean HasObjectOrGroupNamed([Const] DOMString name);
-
   ObjectsContainersList_VariableExistence HasObjectOrGroupWithVariableNamed([Const] DOMString objectName, [Const] DOMString variableName);
+
+  [Const, Ref] ObjectsContainer GetObjectsContainer(unsigned long index);
+  unsigned long GetObjectsContainersCount();
 };
 
 interface ProjectScopedContainers {
@@ -875,6 +877,12 @@ interface ObjectJsImplementation {
 interface CustomObjectConfiguration {
     [Value] UniquePtrObjectConfiguration Clone();
 
+    boolean IsForcedToOverrideEventsBasedObjectChildrenConfiguration();
+    boolean IsMarkedAsOverridingEventsBasedObjectChildrenConfiguration();
+    void SetMarkedAsOverridingEventsBasedObjectChildrenConfiguration(
+        boolean isOverridingEventsBasedObjectChildrenConfiguration);
+
+    void ClearChildrenConfiguration();
     [Ref] ObjectConfiguration GetChildObjectConfiguration([Const] DOMString objectName);
 
     [Value] MapStringPropertyDescriptor GetProperties();

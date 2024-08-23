@@ -5,6 +5,7 @@ import {
   type RenderEditorContainerPropsWithRef,
 } from './BaseEditor';
 import ResourcesEditor from '../../ResourcesEditor';
+import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 
 export class ResourcesEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?ResourcesEditor;
@@ -30,6 +31,14 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
 
   forceUpdateEditor() {
     // No updates to be done.
+  }
+
+  onEventsBasedObjectChildrenEdited() {
+    // No thing to be done.
+  }
+
+  onSceneObjectEdited(scene: gdLayout, objectWithContext: ObjectWithContext) {
+    // No thing to be done.
   }
 
   componentDidUpdate(prevProps: RenderEditorContainerProps) {

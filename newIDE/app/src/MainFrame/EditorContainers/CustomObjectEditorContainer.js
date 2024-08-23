@@ -11,6 +11,7 @@ import {
 } from '../ResourcesWatcher';
 import SceneEditor from '../../SceneEditor';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
+import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 
 const gd: libGDevelop = global.gd;
 
@@ -90,6 +91,19 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     }
   }
 
+  onEventsBasedObjectChildrenEdited() {
+    const { editor } = this;
+    if (editor) {
+      // Update every custom object because some custom objects may include
+      // the one actually edited.
+      editor.forceUpdateCustomObjectRenderedInstances();
+    }
+  }
+
+  onSceneObjectEdited(scene: gdLayout, objectWithContext: ObjectWithContext) {
+    // No thing to be done.
+  }
+
   saveUiSettings = () => {
     // const layout = this.getCustomObject();
     // const editor = this.editor;
@@ -104,7 +118,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
   getEventsFunctionsExtension(): ?gdEventsFunctionsExtension {
     const { project, projectItemName } = this.props;
     if (!project || !projectItemName) return null;
-    const extensionName = projectItemName.split('.')[0]; //TODO
+    const extensionName = projectItemName.split('::')[0]; //TODO
 
     if (!project.hasEventsFunctionsExtensionNamed(extensionName)) {
       return null;
@@ -119,7 +133,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     const extension = this.getEventsFunctionsExtension();
     if (!extension) return null;
 
-    const eventsBasedObjectName = projectItemName.split('.')[1];
+    const eventsBasedObjectName = projectItemName.split('::')[1];
 
     if (!extension.getEventsBasedObjects().has(eventsBasedObjectName)) {
       return null;
@@ -177,6 +191,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
           isActive={isActive}
           hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
           openBehaviorEvents={this.props.openBehaviorEvents}
+          onObjectEdited={this.props.onEventsBasedObjectChildrenEdited}
         />
       </div>
     );

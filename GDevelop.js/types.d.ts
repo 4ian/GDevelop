@@ -599,6 +599,8 @@ export class ObjectsContainersList extends EmscriptenObject {
   getTypeOfBehaviorInObjectOrGroup(objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): string;
   hasObjectOrGroupNamed(name: string): boolean;
   hasObjectOrGroupWithVariableNamed(objectName: string, variableName: string): ObjectsContainersList_VariableExistence;
+  getObjectsContainer(index: number): ObjectsContainer;
+  getObjectsContainersCount(): number;
 }
 
 export class ProjectScopedContainers extends EmscriptenObject {
@@ -729,6 +731,10 @@ export class ObjectJsImplementation extends ObjectConfiguration {
 
 export class CustomObjectConfiguration extends ObjectConfiguration {
   clone(): UniquePtrObjectConfiguration;
+  isForcedToOverrideEventsBasedObjectChildrenConfiguration(): boolean;
+  isMarkedAsOverridingEventsBasedObjectChildrenConfiguration(): boolean;
+  setMarkedAsOverridingEventsBasedObjectChildrenConfiguration(isOverridingEventsBasedObjectChildrenConfiguration: boolean): void;
+  clearChildrenConfiguration(): void;
   getChildObjectConfiguration(objectName: string): ObjectConfiguration;
   getProperties(): MapStringPropertyDescriptor;
   updateProperty(name: string, value: string): boolean;

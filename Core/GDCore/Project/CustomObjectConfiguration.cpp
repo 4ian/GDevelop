@@ -21,6 +21,9 @@ void CustomObjectConfiguration::Init(const gd::CustomObjectConfiguration& object
   project = objectConfiguration.project;
   objectContent = objectConfiguration.objectContent;
   animations = objectConfiguration.animations;
+  isMarkedAsOverridingEventsBasedObjectChildrenConfiguration =
+      objectConfiguration
+          .isMarkedAsOverridingEventsBasedObjectChildrenConfiguration;
 
   // There is no default copy for a map of unique_ptr like childObjectConfigurations.
   childObjectConfigurations.clear();
@@ -42,6 +45,26 @@ const gd::EventsBasedObject* CustomObjectConfiguration::GetEventsBasedObject() c
   return &project->GetEventsBasedObject(GetType());
 }
 
+bool CustomObjectConfiguration::
+    IsForcedToOverrideEventsBasedObjectChildrenConfiguration() const {
+  const auto *eventsBasedObject = GetEventsBasedObject();
+  if (!eventsBasedObject) {
+    // True is safer because nothing will be lost when serializing.
+    return true;
+  }
+  return eventsBasedObject->GetInitialInstances().GetInstancesCount() == 0;
+}
+
+bool CustomObjectConfiguration::
+    IsOverridingEventsBasedObjectChildrenConfiguration() const {
+  return isMarkedAsOverridingEventsBasedObjectChildrenConfiguration ||
+         IsForcedToOverrideEventsBasedObjectChildrenConfiguration();
+}
+
+void CustomObjectConfiguration::ClearChildrenConfiguration() {
+  childObjectConfigurations.clear();
+}
+
 gd::ObjectConfiguration &CustomObjectConfiguration::GetChildObjectConfiguration(const gd::String &objectName) {
   const auto *eventsBasedObject = GetEventsBasedObject();
   if (!eventsBasedObject) {
@@ -55,6 +78,14 @@ gd::ObjectConfiguration &CustomObjectConfiguration::GetChildObjectConfiguration(
   }
 
   auto &childObject = eventsBasedObject->GetObjects().GetObject(objectName);
+
+  if (!IsOverridingEventsBasedObjectChildrenConfiguration()) {
+    childObjectConfigurations.erase(objectName);
+    childObjectConfigurations.insert(
+        std::make_pair(objectName, childObject.GetConfiguration().Clone()));
+    return *(childObjectConfigurations[objectName]);
+  }
+
   auto configurationPosition = childObjectConfigurations.find(objectName);
   if (configurationPosition == childObjectConfigurations.end()) {
     childObjectConfigurations.insert(std::make_pair(
@@ -67,7 +98,41 @@ gd::ObjectConfiguration &CustomObjectConfiguration::GetChildObjectConfiguration(
     auto &configuration = pair.second;
     return *configuration;
   }
- }
+}
+
+const gd::ObjectConfiguration &
+CustomObjectConfiguration::GetChildObjectConfiguration(
+    const gd::String &objectName) const {
+  const auto *eventsBasedObject = GetEventsBasedObject();
+  if (!eventsBasedObject) {
+    return badObjectConfiguration;
+  }
+
+  if (!eventsBasedObject->GetObjects().HasObjectNamed(objectName)) {
+    gd::LogError(
+        "Tried to get the configuration of a child-object:" + objectName +
+        " that doesn't exist in the event-based object: " + GetType());
+    return badObjectConfiguration;
+  }
+
+  auto &childObject = eventsBasedObject->GetObjects().GetObject(objectName);
+
+  if (!IsOverridingEventsBasedObjectChildrenConfiguration()) {
+    // Avoid to clone as it's constant.
+    return childObject.GetConfiguration();
+  }
+
+  auto configurationPosition = childObjectConfigurations.find(objectName);
+  if (configurationPosition == childObjectConfigurations.end()) {
+    childObjectConfigurations.insert(
+        std::make_pair(objectName, childObject.GetConfiguration().Clone()));
+    return *(childObjectConfigurations[objectName]);
+  } else {
+    auto &pair = *configurationPosition;
+    auto &configuration = pair.second;
+    return *configuration;
+  }
+}
 
 std::map<gd::String, gd::PropertyDescriptor> CustomObjectConfiguration::GetProperties() const {
     auto objectProperties = std::map<gd::String, gd::PropertyDescriptor>();
@@ -128,12 +193,14 @@ void CustomObjectConfiguration::DoSerializeTo(SerializerElement& element) const 
     animations.SerializeTo(animatableElement);
   }
 
-  auto &childrenContentElement = element.AddChild("childrenContent");
-  for (auto &pair : childObjectConfigurations) {
-    auto &childName = pair.first;
-    auto &childConfiguration = pair.second;
-    auto &childElement = childrenContentElement.AddChild(childName);
-    childConfiguration->SerializeTo(childElement);
+  if (IsOverridingEventsBasedObjectChildrenConfiguration()) {
+    auto &childrenContentElement = element.AddChild("childrenContent");
+    for (auto &pair : childObjectConfigurations) {
+      auto &childName = pair.first;
+      auto &childConfiguration = pair.second;
+      auto &childElement = childrenContentElement.AddChild(childName);
+      childConfiguration->SerializeTo(childElement);
+    }
   }
 
   const auto *eventsBasedObject = GetEventsBasedObject();
@@ -159,12 +226,16 @@ void CustomObjectConfiguration::DoUnserializeFrom(Project& project,
     animations.UnserializeFrom(animatableElement);
   }
 
-  auto &childrenContentElement = element.GetChild("childrenContent");
-  for (auto &pair : childrenContentElement.GetAllChildren()) {
-    auto &childName = pair.first;
-    auto &childElement = pair.second;
-    auto &childConfiguration = GetChildObjectConfiguration(childName);
-    childConfiguration.UnserializeFrom(project, *childElement);
+  isMarkedAsOverridingEventsBasedObjectChildrenConfiguration =
+      element.HasChild("childrenContent");
+  if (isMarkedAsOverridingEventsBasedObjectChildrenConfiguration) {
+    auto &childrenContentElement = element.GetChild("childrenContent");
+    for (auto &pair : childrenContentElement.GetAllChildren()) {
+      auto &childName = pair.first;
+      auto &childElement = pair.second;
+      auto &childConfiguration = GetChildObjectConfiguration(childName);
+      childConfiguration.UnserializeFrom(project, *childElement);
+    }
   }
 }
 

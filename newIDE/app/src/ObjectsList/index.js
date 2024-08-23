@@ -217,7 +217,7 @@ type Props = {|
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
   onExportAssets: () => void,
   onObjectCreated: gdObject => void,
-  onObjectEdited: gdObject => void,
+  onObjectEdited: ObjectWithContext => void,
   onObjectFolderOrObjectWithContextSelected: (
     ?ObjectFolderOrObjectWithContext
   ) => void,
@@ -303,7 +303,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     const [
       objectAssetSwappingDialogOpen,
       setObjectAssetSwappingDialogOpen,
-    ] = React.useState<{ object: gdObject } | null>(null);
+    ] = React.useState<{ objectWithContext: ObjectWithContext } | null>(null);
 
     // Initialize keyboard shortcuts as empty.
     // onDelete, onDuplicate and onRename callbacks are set in an effect because it applies
@@ -439,9 +439,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       [onObjectCreated, objectsContainer]
     );
 
-    const swapObjectAsset = React.useCallback((object: gdObject) => {
-      setObjectAssetSwappingDialogOpen({ object });
-    }, []);
+    const swapObjectAsset = React.useCallback(
+      (objectWithContext: ObjectWithContext) => {
+        setObjectAssetSwappingDialogOpen({ objectWithContext });
+      },
+      []
+    );
 
     const onAddNewObject = React.useCallback(
       (item: ObjectFolderOrObjectWithContext | null) => {
@@ -1504,7 +1507,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           { type: 'separator' },
           {
             label: i18n._(t`Swap assets`),
-            click: () => swapObjectAsset(object),
+            click: () => swapObjectAsset({ object, global }),
             enabled: canSwapAssetOfObject(object),
           },
           { type: 'separator' },
@@ -1722,13 +1725,13 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             onClose={({ swappingDone }) => {
               setObjectAssetSwappingDialogOpen(null);
               if (swappingDone)
-                onObjectEdited(objectAssetSwappingDialogOpen.object);
+                onObjectEdited(objectAssetSwappingDialogOpen.objectWithContext);
             }}
             project={project}
             layout={layout}
             eventsBasedObject={eventsBasedObject}
             objectsContainer={objectsContainer}
-            object={objectAssetSwappingDialogOpen.object}
+            object={objectAssetSwappingDialogOpen.objectWithContext.object}
             resourceManagementProps={resourceManagementProps}
           />
         )}

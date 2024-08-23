@@ -42,8 +42,13 @@ import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMea
 import Add from '../../UI/CustomSvgIcons/Add';
 import Dialog from '../../UI/Dialog';
 import HelpButton from '../../UI/HelpButton';
+import RestoreIcon from '../../UI/CustomSvgIcons/Restore';
 
 const gd: libGDevelop = global.gd;
+
+const styles = {
+  icon: { width: 16, height: 16 },
+};
 
 type Props = EditorProps;
 
@@ -193,99 +198,160 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                     resourceManagementProps={resourceManagementProps}
                   />
                   {eventBasedObject &&
-                    mapFor(
-                      0,
-                      eventBasedObject.getObjects().getObjectsCount(),
-                      i => {
-                        const childObject = eventBasedObject
-                          .getObjects()
-                          .getObjectAt(i);
-                        const childObjectConfiguration = customObjectConfiguration.getChildObjectConfiguration(
-                          childObject.getName()
-                        );
-                        const editorConfiguration = ObjectsEditorService.getEditorConfiguration(
-                          project,
-                          childObjectConfiguration.getType()
-                        );
-                        const EditorComponent = editorConfiguration.component;
+                    (!customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration() &&
+                    !customObjectConfiguration.isMarkedAsOverridingEventsBasedObjectChildrenConfiguration() ? (
+                      <Line alignItems="center">
+                        <Column expand noMargin>
+                          <Text size="block-title">Children objects</Text>
+                        </Column>
+                        <Column alignItems="right">
+                          <FlatButton
+                            label={
+                              <Trans>Override children configuration</Trans>
+                            }
+                            onClick={() => {
+                              customObjectConfiguration.setMarkedAsOverridingEventsBasedObjectChildrenConfiguration(
+                                true
+                              );
+                              customObjectConfiguration.clearChildrenConfiguration();
+                              if (onObjectUpdated) {
+                                onObjectUpdated();
+                              }
+                              forceUpdate();
+                            }}
+                          />
+                        </Column>
+                      </Line>
+                    ) : (
+                      <>
+                        {!customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration() && (
+                          <Line alignItems="center">
+                            <Column expand noMargin>
+                              <Text size="block-title">Children objects</Text>
+                            </Column>
+                            <Column alignItems="right">
+                              <FlatButton
+                                leftIcon={<RestoreIcon style={styles.icon} />}
+                                label={
+                                  <Trans>
+                                    Reset and hide children configuration
+                                  </Trans>
+                                }
+                                onClick={() => {
+                                  customObjectConfiguration.setMarkedAsOverridingEventsBasedObjectChildrenConfiguration(
+                                    false
+                                  );
+                                  customObjectConfiguration.clearChildrenConfiguration();
+                                  if (onObjectUpdated) {
+                                    onObjectUpdated();
+                                  }
+                                  forceUpdate();
+                                }}
+                              />
+                            </Column>
+                          </Line>
+                        )}
+                        {mapFor(
+                          0,
+                          eventBasedObject.getObjects().getObjectsCount(),
+                          i => {
+                            const childObject = eventBasedObject
+                              .getObjects()
+                              .getObjectAt(i);
+                            const childObjectConfiguration = customObjectConfiguration.getChildObjectConfiguration(
+                              childObject.getName()
+                            );
+                            const editorConfiguration = ObjectsEditorService.getEditorConfiguration(
+                              project,
+                              childObjectConfiguration.getType()
+                            );
+                            const EditorComponent =
+                              editorConfiguration.component;
 
-                        const objectMetadata = gd.MetadataProvider.getObjectMetadata(
-                          gd.JsPlatform.get(),
-                          childObjectConfiguration.getType()
-                        );
-                        const iconUrl = objectMetadata.getIconFilename();
-                        const tutorialIds = getObjectTutorialIds(
-                          childObjectConfiguration.getType()
-                        );
-                        const enabledTutorialIds = tutorialIds.filter(
-                          tutorialId => !values.hiddenTutorialHints[tutorialId]
-                        );
-                        // TODO EBO: Add a protection against infinite loops in case
-                        // of object cycles (thought it should be forbidden).
-                        return (
-                          <Accordion
-                            key={childObject.getName()}
-                            defaultExpanded
-                          >
-                            <AccordionHeader>
-                              {iconUrl ? (
-                                <IconContainer
-                                  src={iconUrl}
-                                  alt={childObject.getName()}
-                                  size={20}
-                                />
-                              ) : null}
-                              <Column expand>
-                                <Text size="block-title">
-                                  {childObject.getName()}
-                                </Text>
-                              </Column>
-                            </AccordionHeader>
-                            <AccordionBody>
-                              <Column expand noMargin noOverflowParent>
-                                {enabledTutorialIds.length ? (
-                                  <Line>
-                                    <ColumnStackLayout expand>
-                                      {tutorialIds.map(tutorialId => (
-                                        <DismissableTutorialMessage
-                                          key={tutorialId}
-                                          tutorialId={tutorialId}
-                                        />
-                                      ))}
-                                    </ColumnStackLayout>
-                                  </Line>
-                                ) : null}
-                                <Line noMargin>
-                                  <Column expand>
-                                    <EditorComponent
-                                      isChildObject
-                                      objectConfiguration={
-                                        childObjectConfiguration
-                                      }
-                                      project={project}
-                                      layout={layout}
-                                      eventsFunctionsExtension={
-                                        eventsFunctionsExtension
-                                      }
-                                      eventsBasedObject={eventsBasedObject}
-                                      resourceManagementProps={
-                                        resourceManagementProps
-                                      }
-                                      onSizeUpdated={
-                                        forceUpdate /*Force update to ensure dialog is properly positioned*/
-                                      }
-                                      objectName={
-                                        objectName + ' ' + childObject.getName()
-                                      }
+                            const objectMetadata = gd.MetadataProvider.getObjectMetadata(
+                              gd.JsPlatform.get(),
+                              childObjectConfiguration.getType()
+                            );
+                            const iconUrl = objectMetadata.getIconFilename();
+                            const tutorialIds = getObjectTutorialIds(
+                              childObjectConfiguration.getType()
+                            );
+                            const enabledTutorialIds = tutorialIds.filter(
+                              tutorialId =>
+                                !values.hiddenTutorialHints[tutorialId]
+                            );
+                            // TODO EBO: Add a protection against infinite loops in case
+                            // of object cycles (thought it should be forbidden).
+                            return (
+                              <Accordion
+                                key={childObject.getName()}
+                                defaultExpanded
+                              >
+                                <AccordionHeader>
+                                  {iconUrl ? (
+                                    <IconContainer
+                                      src={iconUrl}
+                                      alt={childObject.getName()}
+                                      size={20}
                                     />
+                                  ) : null}
+                                  <Column expand>
+                                    <Text size="block-title">
+                                      {childObject.getName()}
+                                    </Text>
                                   </Column>
-                                </Line>
-                              </Column>
-                            </AccordionBody>
-                          </Accordion>
-                        );
-                      }
-                    )}
+                                </AccordionHeader>
+                                <AccordionBody>
+                                  <Column expand noMargin noOverflowParent>
+                                    {enabledTutorialIds.length ? (
+                                      <Line>
+                                        <ColumnStackLayout expand>
+                                          {tutorialIds.map(tutorialId => (
+                                            <DismissableTutorialMessage
+                                              key={tutorialId}
+                                              tutorialId={tutorialId}
+                                            />
+                                          ))}
+                                        </ColumnStackLayout>
+                                      </Line>
+                                    ) : null}
+                                    <Line noMargin>
+                                      <Column expand>
+                                        <EditorComponent
+                                          isChildObject
+                                          objectConfiguration={
+                                            childObjectConfiguration
+                                          }
+                                          project={project}
+                                          layout={layout}
+                                          eventsFunctionsExtension={
+                                            eventsFunctionsExtension
+                                          }
+                                          eventsBasedObject={eventsBasedObject}
+                                          resourceManagementProps={
+                                            resourceManagementProps
+                                          }
+                                          onSizeUpdated={
+                                            forceUpdate /*Force update to ensure dialog is properly positioned*/
+                                          }
+                                          objectName={
+                                            objectName +
+                                            ' ' +
+                                            childObject.getName()
+                                          }
+                                          onObjectUpdated={onObjectUpdated}
+                                          unsavedChanges={unsavedChanges}
+                                        />
+                                      </Column>
+                                    </Line>
+                                  </Column>
+                                </AccordionBody>
+                              </Accordion>
+                            );
+                          }
+                        )}
+                      </>
+                    ))}
                   {eventBasedObject && eventBasedObject.isAnimatable() && (
                     <Column expand>
                       <Text size="block-title">

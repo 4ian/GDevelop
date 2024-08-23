@@ -74,10 +74,16 @@ namespace gdjs {
         ++i
       ) {
         const childObjectData = eventsBasedObjectData.objects[i];
-        this.registerObject({
-          ...childObjectData,
-          ...customObjectData.childrenContent[childObjectData.name],
-        });
+        if (customObjectData.childrenContent) {
+          this.registerObject({
+            ...childObjectData,
+            // The custom object overrides its events-based object configuration.
+            ...customObjectData.childrenContent[childObjectData.name],
+          });
+        } else {
+          // The custom object follows its events-based object configuration.
+          this.registerObject(childObjectData);
+        }
       }
 
       if (customObjectData.layers.length > 0) {

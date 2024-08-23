@@ -8,6 +8,7 @@ import { ExternalEventsEditorContainer } from '../EditorContainers/ExternalEvent
 import { ExternalLayoutEditorContainer } from '../EditorContainers/ExternalLayoutEditorContainer';
 import { ResourcesEditorContainer } from '../EditorContainers/ResourcesEditorContainer';
 import { SceneEditorContainer } from '../EditorContainers/SceneEditorContainer';
+import { type HomePageEditorInterface } from '../EditorContainers/HomePage';
 import {
   type RenderEditorContainerPropsWithRef,
   type EditorContainerExtraProps,
@@ -23,7 +24,8 @@ type EditorRef =
   | ExternalEventsEditorContainer
   | ExternalLayoutEditorContainer
   | ResourcesEditorContainer
-  | SceneEditorContainer;
+  | SceneEditorContainer
+  | HomePageEditorInterface;
 
 type TabOptions = {| data?: HTMLDataset |};
 
@@ -109,6 +111,8 @@ export const getEditorTabMetadata = (
         ? 'layout events'
         : editorTab.editorRef instanceof EventsFunctionsExtensionEditorContainer
         ? 'events functions extension'
+        : editorTab.editorRef instanceof CustomObjectEditorContainer
+        ? 'custom object'
         : editorTab.editorRef instanceof DebuggerEditorContainer
         ? 'debugger'
         : 'start page',

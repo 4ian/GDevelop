@@ -26,6 +26,7 @@ import {
   unregisterOnResourceExternallyChangedCallback,
 } from '../ResourcesWatcher';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
+import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 
 const styles = {
   container: {
@@ -107,6 +108,33 @@ export class ExternalLayoutEditorContainer extends React.Component<
       editor.forceUpdateObjectsList();
       editor.forceUpdateObjectGroupsList();
       editor.forceUpdateLayersList();
+    }
+  }
+
+  onEventsBasedObjectChildrenEdited() {
+    const { editor } = this;
+    if (editor) {
+      // Update every custom object because some custom objects may include
+      // the one actually edited.
+      editor.forceUpdateCustomObjectRenderedInstances();
+    }
+  }
+
+  onSceneObjectEdited(scene: gdLayout, objectWithContext: ObjectWithContext) {
+    const { editor } = this;
+    const externalLayout = this.getExternalLayout();
+    if (!externalLayout) {
+      return;
+    }
+    if (
+      externalLayout.getAssociatedLayout() !== scene.getName() &&
+      !objectWithContext.global
+    ) {
+      return;
+    }
+    if (editor) {
+      // Update instances of the object as it was modified in an editor.
+      editor.forceUpdateRenderedInstancesOfObject(objectWithContext.object);
     }
   }
 
@@ -227,6 +255,9 @@ export class ExternalLayoutEditorContainer extends React.Component<
             isActive={isActive}
             openBehaviorEvents={this.props.openBehaviorEvents}
             onExtractAsExternalLayout={this.props.onExtractAsExternalLayout}
+            onObjectEdited={objectWithContext =>
+              this.props.onSceneObjectEdited(layout, objectWithContext)
+            }
           />
         )}
         {!layout && (

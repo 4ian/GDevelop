@@ -114,6 +114,7 @@ type Props = {|
   onEditObject?: ?(object: gdObject) => void,
   onOpenMoreSettings?: ?() => void,
   onOpenEvents: (sceneName: string) => void,
+  onObjectEdited: (objectWithContext: ObjectWithContext) => void,
 
   setToolbar: (?React.Node) => void,
   resourceManagementProps: ResourceManagementProps,
@@ -835,12 +836,6 @@ export default class SceneEditor extends React.Component<Props, State> {
       this.props.unsavedChanges.triggerUnsavedChanges();
 
     this._addInstanceForNewObject(object.getName());
-  };
-
-  _onObjectEdited = (object: gdObject) => {
-    this.reloadResourcesFor(object);
-    if (this.props.unsavedChanges)
-      this.props.unsavedChanges.triggerUnsavedChanges();
   };
 
   _onRemoveLayer = (layerName: string, done: boolean => void) => {
@@ -1709,7 +1704,38 @@ export default class SceneEditor extends React.Component<Props, State> {
       this.editorDisplay.forceUpdateInstancesPropertiesEditor();
   };
 
-  reloadResourcesFor = (object: gdObject) => {
+  forceUpdateCustomObjectRenderedInstances = () => {
+    const { project, projectScopedContainersAccessor } = this.props;
+
+    const resourcesInUse = new gd.ResourcesInUseHelper(
+      project.getResourcesManager()
+    );
+    projectScopedContainersAccessor.forEachObject(object => {
+      if (project.hasEventsBasedObject(object.getType())) {
+        object.getConfiguration().exposeResources(resourcesInUse);
+      }
+    });
+    const objectResourceNames = resourcesInUse
+      .getAllImages()
+      .toNewVectorString()
+      .toJSArray();
+    resourcesInUse.delete();
+
+    PixiResourcesLoader.loadTextures(project, objectResourceNames).then(() => {
+      // This callback is executed even if there is no image to load.
+      const { editorDisplay } = this;
+      if (editorDisplay) {
+        projectScopedContainersAccessor.forEachObject(object => {
+          editorDisplay.instancesHandlers.resetInstanceRenderersFor(
+            object.getName()
+          );
+        });
+      }
+      this.forceUpdateObjectsList();
+    });
+  };
+
+  forceUpdateRenderedInstancesOfObject = (object: gdObject) => {
     const { project } = this.props;
 
     const resourcesInUse = new gd.ResourcesInUseHelper(
@@ -1723,11 +1749,40 @@ export default class SceneEditor extends React.Component<Props, State> {
     resourcesInUse.delete();
 
     PixiResourcesLoader.loadTextures(project, objectResourceNames).then(() => {
-      if (this.editorDisplay)
+      // This callback is executed even if there is no image to load.
+      // Images need to be loaded first because instance renderers use the
+      // image dimensions to evaluate theirs. It may cause flickering otherwise.
+      if (this.editorDisplay) {
         this.editorDisplay.instancesHandlers.resetInstanceRenderersFor(
           object.getName()
         );
+      }
+      this.forceUpdateObjectsList();
     });
+  };
+
+  _onObjectEdited = (objectWithContext: ObjectWithContext) => {
+    const { project, layout } = this.props;
+    // It triggers forceUpdateRenderedInstancesOfObject on this editor too.
+    this.props.onObjectEdited(objectWithContext);
+    if (layout) {
+      if (objectWithContext.global) {
+        gd.WholeProjectRefactorer.behaviorsAddedToGlobalObject(
+          project,
+          objectWithContext.object.getName()
+        );
+      } else {
+        // TODO EBO Add same refactor for event-based objects
+        gd.WholeProjectRefactorer.behaviorsAddedToObjectInScene(
+          project,
+          layout,
+          objectWithContext.object.getName()
+        );
+      }
+    }
+    this.updateBehaviorsSharedData();
+    if (this.props.unsavedChanges)
+      this.props.unsavedChanges.triggerUnsavedChanges();
   };
 
   render() {
@@ -1929,9 +1984,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                         }}
                         onCancel={() => {
                           if (editedObjectWithContext) {
-                            this.reloadResourcesFor(
-                              editedObjectWithContext.object
-                            );
+                            // Object changes are reverted but not the
+                            // resources modified with an external editor.
+                            this.props.onObjectEdited(editedObjectWithContext);
                           }
                           this.editObject(null);
                         }}
@@ -1947,31 +2002,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                         }}
                         onApply={() => {
                           if (editedObjectWithContext) {
-                            this.reloadResourcesFor(
-                              editedObjectWithContext.object
-                            );
-                            if (layout) {
-                              if (editedObjectWithContext.global) {
-                                gd.WholeProjectRefactorer.behaviorsAddedToGlobalObject(
-                                  project,
-                                  editedObjectWithContext.object.getName()
-                                );
-                              } else {
-                                // TODO EBO Add same refactor for event-based objects
-                                gd.WholeProjectRefactorer.behaviorsAddedToObjectInScene(
-                                  project,
-                                  layout,
-                                  editedObjectWithContext.object.getName()
-                                );
-                              }
-                            }
+                            this._onObjectEdited(editedObjectWithContext);
                           }
                           this.editObject(null);
-                          this.updateBehaviorsSharedData();
-                          this.forceUpdateObjectsList();
-
-                          if (this.props.unsavedChanges)
-                            this.props.unsavedChanges.triggerUnsavedChanges();
                         }}
                         hotReloadPreviewButtonProps={
                           this.props.hotReloadPreviewButtonProps

@@ -10,6 +10,7 @@ import {
 import SubscriptionChecker, {
   type SubscriptionCheckerInterface,
 } from '../../Profile/Subscription/SubscriptionChecker';
+import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 
 type State = {|
   subscriptionChecked: boolean,
@@ -46,6 +47,14 @@ export class DebuggerEditorContainer extends React.Component<
 
   forceUpdateEditor() {
     // No updates to be done.
+  }
+
+  onEventsBasedObjectChildrenEdited() {
+    // No thing to be done.
+  }
+
+  onSceneObjectEdited(scene: gdLayout, objectWithContext: ObjectWithContext) {
+    // No thing to be done.
   }
 
   // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.

@@ -50,6 +50,7 @@ import { canUseClassroomFeature } from '../../../Utils/GDevelopServices/Usage';
 import EducationMarketingSection from './EducationMarketingSection';
 import useEducationForm from './UseEducationForm';
 import { type NewProjectSetup } from '../../../ProjectCreation/NewProjectSetupDialog';
+import { type ObjectWithContext } from '../../../ObjectsList/EnumerateObjects';
 
 const gamesDashboardWikiArticle = getHelpLink('/interface/games-dashboard/');
 const isShopRequested = (routeArguments: RouteArguments): boolean =>
@@ -134,10 +135,15 @@ type Props = {|
   resourceManagementProps: ResourceManagementProps,
 |};
 
-type HomePageEditorInterface = {|
+export type HomePageEditorInterface = {|
   getProject: () => void,
   updateToolbar: () => void,
   forceUpdateEditor: () => void,
+  onEventsBasedObjectChildrenEdited: () => void,
+  onSceneObjectEdited: (
+    scene: gdLayout,
+    objectWithContext: ObjectWithContext
+  ) => void,
 |};
 
 export const HomePage = React.memo<Props>(
@@ -411,10 +417,23 @@ export const HomePage = React.memo<Props>(
         // No updates to be done
       }, []);
 
+      const onEventsBasedObjectChildrenEdited = React.useCallback(() => {
+        // No thing to be done
+      }, []);
+
+      const onSceneObjectEdited = React.useCallback(
+        (scene: gdLayout, objectWithContext: ObjectWithContext) => {
+          // No thing to be done
+        },
+        []
+      );
+
       React.useImperativeHandle(ref, () => ({
         getProject,
         updateToolbar,
         forceUpdateEditor,
+        onEventsBasedObjectChildrenEdited,
+        onSceneObjectEdited,
       }));
 
       const onUserSurveyStarted = React.useCallback(() => {

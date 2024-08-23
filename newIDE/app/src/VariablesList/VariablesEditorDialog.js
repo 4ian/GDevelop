@@ -49,7 +49,7 @@ type Props = {|
   shouldCreateInitiallySelectedVariable?: boolean,
 
   project: gdProject,
-  hotReloadPreviewButtonProps?: ?HotReloadPreviewButtonProps,
+  hotReloadPreviewButtonProps: HotReloadPreviewButtonProps | null,
 
   helpPagePath: ?string,
   id?: string,

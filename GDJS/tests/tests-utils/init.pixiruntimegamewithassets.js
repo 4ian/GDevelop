@@ -104,11 +104,13 @@ gdjs.getPixiRuntimeGameWithAssets = () => {
               {
                 name: 'MySprite',
                 type: 'Sprite',
-                updateIfNotVisible: false,
                 variables: [],
                 behaviors: [],
-                animations: [],
                 effects: [],
+                // @ts-ignore This is the object configuration.
+                updateIfNotVisible: false,
+                // @ts-ignore This is the object configuration.
+                animations: [],
               },
             ],
           },

@@ -53,6 +53,7 @@ const LocalVariablesDialog = ({
       shouldCreateInitiallySelectedVariable={
         shouldCreateInitiallySelectedVariable
       }
+      hotReloadPreviewButtonProps={null}
     />
   );
 };

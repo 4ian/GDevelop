@@ -42,6 +42,7 @@ import Mark from '../UI/CustomSvgIcons/Mark';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import GlobalAndSceneVariablesDialog from '../VariablesList/GlobalAndSceneVariablesDialog';
+import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 
 const gd: libGDevelop = global.gd;
 
@@ -75,6 +76,7 @@ type Props = {|
   initiallyFocusedObjectName: ?string,
   unsavedChanges?: ?UnsavedChanges,
   onOpenCustomObjectEditor: gdEventsBasedObject => void,
+  hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
 |};
 
 type State = {|
@@ -1313,6 +1315,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 settingsIcon={extensionEditIconReactNode}
                 unsavedChanges={this.props.unsavedChanges}
                 isActive={true}
+                hotReloadPreviewButtonProps={
+                  this.props.hotReloadPreviewButtonProps
+                }
               />
             </Background>
           ) : selectedEventsBasedBehavior ? (
@@ -1527,6 +1532,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             open
             onCancel={() => this._editVariables(null)}
             onApply={() => this._editVariables(null)}
+            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
           />
         )}
         {objectMethodSelectorDialogOpen && selectedEventsBasedObject && (

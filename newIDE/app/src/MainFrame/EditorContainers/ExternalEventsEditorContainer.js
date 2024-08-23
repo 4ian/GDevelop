@@ -190,6 +190,7 @@ export class ExternalEventsEditorContainer extends React.Component<
             settingsIcon={editSceneIconReactNode}
             onOpenExternalEvents={this.props.onOpenExternalEvents}
             isActive={this.props.isActive}
+            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
           />
         )}
         {!layout && (

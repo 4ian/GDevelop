@@ -14,6 +14,7 @@ import PreferencesContext, {
   type Preferences,
 } from '../../../MainFrame/Preferences/PreferencesContext';
 import fakeResourceManagementProps from '../../FakeResourceManagement';
+import fakeHotReloadPreviewButtonProps from '../../FakeHotReloadPreviewButtonProps';
 
 export default {
   title: 'EventsFunctionsExtensionEditor/index',
@@ -34,6 +35,7 @@ export const Default = () => (
         initiallyFocusedObjectName={null}
         onCreateEventsFunction={action('on create events function')}
         onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
+        hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
       />
     </FixedHeightFlexContainer>
   </DragAndDropContextProvider>
@@ -62,6 +64,7 @@ export const WithObjectEditor = () => {
             initiallyFocusedObjectName={null}
             onCreateEventsFunction={action('on create events function')}
             onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
+            hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
           />
         </FixedHeightFlexContainer>
       </DragAndDropContextProvider>

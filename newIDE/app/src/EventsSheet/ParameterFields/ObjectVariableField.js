@@ -201,6 +201,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             initiallySelectedVariableName={editorOpen.variableName}
             shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
             onComputeAllVariableNames={onComputeAllVariableNames}
+            hotReloadPreviewButtonProps={null}
           />
         )}
         {editorOpen && project && objectGroup && (

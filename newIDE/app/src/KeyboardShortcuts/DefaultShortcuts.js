@@ -53,7 +53,7 @@ const defaultShortcuts: ShortcutMap = {
   ADD_STANDARD_EVENT: 'Shift+KeyA',
   ADD_SUBEVENT: 'Shift+KeyD',
   ADD_LOCAL_VARIABLE: 'Shift+KeyL',
-  ADD_COMMENT_EVENT: '',
+  ADD_COMMENT_EVENT: 'Shift+KeyC',
   TOGGLE_EVENT_DISABLED: 'KeyD',
   TOGGLE_CONDITION_INVERTED: 'KeyJ',
   CHOOSE_AND_ADD_EVENT: 'Shift+KeyW',

@@ -2039,7 +2039,7 @@ const MainFrame = (props: Props) => {
   );
 
   const onSceneObjectEdited = React.useCallback(
-    () => (scene: gdLayout, objectWithContext: ObjectWithContext) => {
+    (scene: gdLayout, objectWithContext: ObjectWithContext) => {
       for (const editor of state.editorTabs.editors) {
         const { editorRef } = editor;
         if (editorRef) {

@@ -414,7 +414,7 @@ const getKeepRatioField = ({
   getNextValue: (currentValue: boolean) => !currentValue,
 });
 
-export const makeSchema = ({
+export const makeInstanceSchema = ({
   is3DInstance,
   i18n,
   forceUpdate,

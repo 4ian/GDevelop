@@ -47,6 +47,7 @@ type ErrorBoundaryScope =
   | 'profile'
   | 'scene-editor'
   | 'scene-editor-instance-properties'
+  | 'scene-editor-object-properties'
   | 'scene-editor-objects-list'
   | 'scene-editor-object-groups-list'
   | 'scene-editor-canvas'

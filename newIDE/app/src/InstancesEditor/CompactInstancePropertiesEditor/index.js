@@ -3,8 +3,6 @@ import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 
-import Paper from '../../UI/Paper';
-import EmptyMessage from '../../UI/EmptyMessage';
 import CompactPropertiesEditor, {
   Separator,
 } from '../../CompactPropertiesEditor';
@@ -24,21 +22,15 @@ import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import ErrorBoundary from '../../UI/ErrorBoundary';
 import {
-  makeSchema,
+  makeInstanceSchema,
   reorderInstanceSchemaForCustomProperties,
-} from './CompactPropertiesSchema';
+} from './CompactInstancePropertiesSchema';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import TileSetVisualizer, {
   type TileMapTileSelection,
 } from '../TileSetVisualizer';
 
 export const styles = {
-  paper: {
-    display: 'flex',
-    flex: 1,
-    minWidth: 0,
-    flexDirection: 'column',
-  },
   icon: {
     fontSize: 18,
   },
@@ -66,11 +58,7 @@ type Props = {|
   onSelectTileMapTile: (?TileMapTileSelection) => void,
 |};
 
-export type CompactInstancePropertiesEditorInterface = {|
-  forceUpdate: () => void,
-|};
-
-const CompactInstancePropertiesEditor = ({
+export const CompactInstancePropertiesEditor = ({
   instances,
   i18n,
   project,
@@ -92,7 +80,7 @@ const CompactInstancePropertiesEditor = ({
 
   const schemaFor2D: Schema = React.useMemo(
     () =>
-      makeSchema({
+      makeInstanceSchema({
         i18n,
         is3DInstance: false,
         onGetInstanceSize,
@@ -105,7 +93,7 @@ const CompactInstancePropertiesEditor = ({
 
   const schemaFor3D: Schema = React.useMemo(
     () =>
-      makeSchema({
+      makeInstanceSchema({
         i18n,
         is3DInstance: true,
         onGetInstanceSize,
@@ -303,29 +291,3 @@ const CompactInstancePropertiesEditor = ({
     </ErrorBoundary>
   );
 };
-
-const CompactInstancePropertiesEditorContainer = React.forwardRef<
-  Props,
-  CompactInstancePropertiesEditorInterface
->((props, ref) => {
-  const forceUpdate = useForceUpdate();
-  React.useImperativeHandle(ref, () => ({
-    forceUpdate,
-  }));
-
-  return (
-    <Paper background="dark" square style={styles.paper}>
-      {!props.instances || !props.instances.length ? (
-        <EmptyMessage>
-          <Trans>
-            Click on an instance in the scene to display its properties
-          </Trans>
-        </EmptyMessage>
-      ) : (
-        <CompactInstancePropertiesEditor {...props} />
-      )}
-    </Paper>
-  );
-});
-
-export default CompactInstancePropertiesEditorContainer;

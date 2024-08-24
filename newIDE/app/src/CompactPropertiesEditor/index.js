@@ -27,6 +27,7 @@ import VerticallyCenterWithBar from '../UI/VerticallyCenterWithBar';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
 import CompactPropertiesEditorRowField from './CompactPropertiesEditorRowField';
+import { CompactToggleField } from '../UI/CompactToggleField';
 
 // An "instance" here is the objects for which properties are shown
 export type Instance = Object; // This could be improved using generics.
@@ -364,33 +365,23 @@ const CompactPropertiesEditor = ({
       if (field.name === 'PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS') return null; // This special property was used in GDevelop 4 IDE to ask for a Edit button to be shown, ignore it.
 
       if (field.valueType === 'boolean') {
-        return null; // TODO
-        // const { setValue } = field;
-        // const description = getFieldDescription(field);
-        // return (
-        //   <InlineCheckbox
-        //     label={
-        //       !description ? (
-        //         getFieldLabel({ instances, field })
-        //       ) : (
-        //         <React.Fragment>
-        //           <Line noMargin>{getFieldLabel({ instances, field })}</Line>
-        //           <FormHelperText style={{ display: 'inline' }}>
-        //             <MarkdownText source={description} />
-        //           </FormHelperText>
-        //         </React.Fragment>
-        //       )
-        //     }
-        //     key={field.name}
-        //     id={field.name}
-        //     checked={getFieldValue({ instances, field })}
-        //     onCheck={(event, newValue) => {
-        //       instances.forEach(i => setValue(i, !!newValue));
-        //       _onInstancesModified(instances);
-        //     }}
-        //     disabled={getDisabled({ instances, field })}
-        //   />
-        // );
+        const { setValue } = field;
+
+        return (
+          <CompactToggleField
+            label={getFieldLabel({ instances, field })}
+            markdownDescription={getFieldDescription(field)}
+            key={field.name}
+            id={field.name}
+            checked={getFieldValue({ instances, field })}
+            onCheck={newValue => {
+              instances.forEach(i => setValue(i, newValue));
+              _onInstancesModified(instances);
+            }}
+            disabled={getDisabled({ instances, field })}
+            fullWidth
+          />
+        );
       } else if (field.valueType === 'number') {
         const { setValue, onClickEndAdornment } = field;
         // TODO: Support end adornment
@@ -591,15 +582,13 @@ const CompactPropertiesEditor = ({
           />
         ));
 
+      let compactSelectField;
       if (field.valueType === 'number') {
         const { setValue } = field;
-        return (
+        compactSelectField = (
           <CompactSelectField
             value={getFieldValue({ instances, field })}
-            key={field.name}
             id={field.name}
-            // floatingLabelText={getFieldLabel({ instances, field })}
-            // helperMarkdownText={getFieldDescription(field)}
             onChange={(newValue: string) => {
               instances.forEach(i => setValue(i, parseFloat(newValue) || 0));
               _onInstancesModified(instances);
@@ -611,17 +600,14 @@ const CompactPropertiesEditor = ({
         );
       } else if (field.valueType === 'string') {
         const { setValue } = field;
-        return (
+        compactSelectField = (
           <CompactSelectField
             value={getFieldValue({
               instances,
               field,
               defaultValue: '(Multiple values)',
             })}
-            key={field.name}
             id={field.name}
-            // floatingLabelText={getFieldLabel({ instances, field })}
-            // helperMarkdownText={getFieldDescription(field)}
             onChange={(newValue: string) => {
               instances.forEach(i => setValue(i, newValue || ''));
               _onInstancesModified(instances);
@@ -634,8 +620,20 @@ const CompactPropertiesEditor = ({
           </CompactSelectField>
         );
       }
+
+      if (!compactSelectField) return null;
+      if (field.renderLeftIcon || field.hideLabel) return compactSelectField;
+
+      return (
+        <CompactPropertiesEditorRowField
+          key={field.name}
+          label={getFieldLabel({ instances, field })}
+          markdownDescription={getFieldDescription(field)}
+          field={compactSelectField}
+        />
+      );
     },
-    [instances, _onInstancesModified]
+    [instances, _onInstancesModified, getFieldDescription]
   );
 
   const renderButton = React.useCallback(
@@ -828,37 +826,22 @@ const CompactPropertiesEditor = ({
         }
         return null;
       } else if (field.children) {
-        if (field.type === 'row') {
-          const contentView = (
-            <React.Fragment key={field.name}>
-              <CompactPropertiesEditor
-                project={project}
-                resourceManagementProps={resourceManagementProps}
-                schema={field.children}
-                instances={instances}
-                mode="row"
-                unsavedChanges={unsavedChanges}
-                onInstancesModified={onInstancesModified}
-                preventWrap={field.preventWrap}
-                removeSpacers={field.removeSpacers}
-              />
-            </React.Fragment>
-          );
-          if (field.title) {
-            return [
-              <Separator key={field.name + '-separator'} />,
-              <Text key={field.name + '-title'} size="sub-title" noMargin>
-                {field.title}
-              </Text>,
-              contentView,
-            ];
-          }
-          return contentView;
-        }
-
-        return (
-          <div key={field.name} style={styles.container}>
-            <React.Fragment key={field.name}>
+        const contentView =
+          field.type === 'row' ? (
+            <CompactPropertiesEditor
+              key={field.name}
+              project={project}
+              resourceManagementProps={resourceManagementProps}
+              schema={field.children}
+              instances={instances}
+              mode="row"
+              unsavedChanges={unsavedChanges}
+              onInstancesModified={onInstancesModified}
+              preventWrap={field.preventWrap}
+              removeSpacers={field.removeSpacers}
+            />
+          ) : (
+            <div key={field.name} style={styles.container}>
               <CompactPropertiesEditor
                 project={project}
                 resourceManagementProps={resourceManagementProps}
@@ -870,9 +853,19 @@ const CompactPropertiesEditor = ({
                 preventWrap={field.preventWrap}
                 removeSpacers={field.removeSpacers}
               />
-            </React.Fragment>
-          </div>
-        );
+            </div>
+          );
+
+        if (field.title) {
+          return [
+            <Separator key={field.name + '-separator'} />,
+            <Text key={field.name + '-title'} size="sub-title" noMargin>
+              {field.title}
+            </Text>,
+            contentView,
+          ];
+        }
+        return contentView;
       } else if (field.valueType === 'resource') {
         return renderResourceField(field);
       } else {

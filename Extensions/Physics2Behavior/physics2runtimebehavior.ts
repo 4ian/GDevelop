@@ -1572,7 +1572,6 @@ namespace gdjs {
       body.SetAngularVelocity(gdjs.toRad(angularVelocity));
     }
 
-    /** @deprecate Use `applyForceInPixels` instead */
     applyForce(
       forceX: float,
       forceY: float,
@@ -1600,37 +1599,6 @@ namespace gdjs {
       );
     }
 
-    applyForceInPixels(
-      forceX: float,
-      forceY: float,
-      positionX: float,
-      positionY: float
-    ): void {
-      // If there is no body, set a new one
-      if (this._body === null) {
-        if (!this.createBody()) return;
-      }
-      const body = this._body!;
-
-      // Wake up the object
-      body.SetAwake(true);
-
-      // Apply the force
-      body.ApplyForce(
-        this.b2Vec2(
-          forceX * this._sharedData.worldInvScale,
-          forceY * this._sharedData.worldInvScale
-        ),
-        this.b2Vec2Sec(
-          positionX * this._sharedData.worldInvScale,
-          positionY * this._sharedData.worldInvScale
-        ),
-        // TODO Should let Box2d awake the object itself.
-        false
-      );
-    }
-
-    /** @deprecate Use `applyPolarForceInPixel` instead */
     applyPolarForce(
       angle: float,
       length: float,
@@ -1659,36 +1627,6 @@ namespace gdjs {
       );
     }
 
-    applyPolarForceInPixels(
-      angle: float,
-      length: float,
-      positionX: float,
-      positionY: float
-    ): void {
-      // If there is no body, set a new one
-      if (this._body === null) {
-        if (!this.createBody()) return;
-      }
-      const body = this._body!;
-
-      // Wake up the object
-      body.SetAwake(true);
-
-      // Apply the force
-      angle = gdjs.toRad(angle);
-      length *= this._sharedData.worldInvScale;
-      body.ApplyForce(
-        this.b2Vec2(length * Math.cos(angle), length * Math.sin(angle)),
-        this.b2Vec2Sec(
-          positionX * this._sharedData.worldInvScale,
-          positionY * this._sharedData.worldInvScale
-        ),
-        // TODO Should let Box2d awake the object itself.
-        false
-      );
-    }
-
-    /** @deprecate Use `applyForceTowardPositionInPixels` instead */
     applyForceTowardPosition(
       length: float,
       towardX: float,
@@ -1722,41 +1660,6 @@ namespace gdjs {
       );
     }
 
-    applyForceTowardPositionInPixels(
-      length: float,
-      towardX: float,
-      towardY: float,
-      positionX: float,
-      positionY: float
-    ): void {
-      // If there is no body, set a new one
-      if (this._body === null) {
-        if (!this.createBody()) return;
-      }
-      const body = this._body!;
-
-      // Wake up the object
-      body.SetAwake(true);
-
-      // TODO Optimize this using a unit vector instead of trigonometry.
-      // Apply the force
-      const angle = Math.atan2(
-        towardY * this._sharedData.worldInvScale - body.GetPosition().get_y(),
-        towardX * this._sharedData.worldInvScale - body.GetPosition().get_x()
-      );
-      length *= this._sharedData.worldInvScale;
-      body.ApplyForce(
-        this.b2Vec2(length * Math.cos(angle), length * Math.sin(angle)),
-        this.b2Vec2Sec(
-          positionX * this._sharedData.worldInvScale,
-          positionY * this._sharedData.worldInvScale
-        ),
-        // TODO Should let Box2d awake the object itself.
-        false
-      );
-    }
-
-    /** @deprecate Use `applyImpulseInPixels` instead */
     applyImpulse(
       impulseX: float,
       impulseY: float,
@@ -1784,37 +1687,6 @@ namespace gdjs {
       );
     }
 
-    applyImpulseInPixels(
-      impulseX: float,
-      impulseY: float,
-      positionX: float,
-      positionY: float
-    ): void {
-      // If there is no body, set a new one
-      if (this._body === null) {
-        if (!this.createBody()) return;
-      }
-      const body = this._body!;
-
-      // Wake up the object
-      body.SetAwake(true);
-
-      // Apply the impulse
-      body.ApplyLinearImpulse(
-        this.b2Vec2(
-          impulseX * this._sharedData.worldInvScale,
-          impulseY * this._sharedData.worldInvScale
-        ),
-        this.b2Vec2Sec(
-          positionX * this._sharedData.worldInvScale,
-          positionY * this._sharedData.worldInvScale
-        ),
-        // TODO Should let Box2d awake the object itself.
-        false
-      );
-    }
-
-    /** @deprecate Use `applyPolarImpulseInPixels` instead */
     applyPolarImpulse(
       angle: float,
       length: float,
@@ -1843,36 +1715,6 @@ namespace gdjs {
       );
     }
 
-    applyPolarImpulseInPixels(
-      angle: float,
-      length: float,
-      positionX: float,
-      positionY: float
-    ): void {
-      // If there is no body, set a new one
-      if (this._body === null) {
-        if (!this.createBody()) return;
-      }
-      const body = this._body!;
-
-      // Wake up the object
-      body.SetAwake(true);
-
-      // Apply the impulse
-      angle = gdjs.toRad(angle);
-      length *= this._sharedData.worldInvScale;
-      body.ApplyLinearImpulse(
-        this.b2Vec2(length * Math.cos(angle), length * Math.sin(angle)),
-        this.b2Vec2Sec(
-          positionX * this._sharedData.worldInvScale,
-          positionY * this._sharedData.worldInvScale
-        ),
-        // TODO Should let Box2d awake the object itself.
-        false
-      );
-    }
-
-    /** @deprecate Use `applyImpulseTowardPositionInPixels` instead */
     applyImpulseTowardPosition(
       length: float,
       towardX: float,
@@ -1906,41 +1748,6 @@ namespace gdjs {
       );
     }
 
-    applyImpulseTowardPositionInPixels(
-      length: float,
-      towardX: float,
-      towardY: float,
-      positionX: float,
-      positionY: float
-    ): void {
-      // If there is no body, set a new one
-      if (this._body === null) {
-        if (!this.createBody()) return;
-      }
-      const body = this._body!;
-
-      // Wake up the object
-      body.SetAwake(true);
-
-      // TODO Optimize this using a unit vector instead of trigonometry.
-      // Apply the impulse
-      const angle = Math.atan2(
-        towardY * this._sharedData.worldInvScale - body.GetPosition().get_y(),
-        towardX * this._sharedData.worldInvScale - body.GetPosition().get_x()
-      );
-      length *= this._sharedData.worldInvScale;
-      body.ApplyLinearImpulse(
-        this.b2Vec2(length * Math.cos(angle), length * Math.sin(angle)),
-        this.b2Vec2Sec(
-          positionX * this._sharedData.worldInvScale,
-          positionY * this._sharedData.worldInvScale
-        ),
-        // TODO Should let Box2d awake the object itself.
-        false
-      );
-    }
-
-    /** @deprecate Use `applyTorqueInPixels` instead */
     applyTorque(torque: float): void {
       // If there is no body, set a new one
       if (this._body === null) {
@@ -1959,27 +1766,6 @@ namespace gdjs {
       );
     }
 
-    applyTorqueInPixels(torque: float): void {
-      // If there is no body, set a new one
-      if (this._body === null) {
-        if (!this.createBody()) return;
-      }
-      const body = this._body!;
-
-      // Wake up the object
-      body.SetAwake(true);
-
-      // Apply the torque
-      body.ApplyTorque(
-        torque *
-          this._sharedData.worldInvScale *
-          this._sharedData.worldInvScale,
-        // TODO Should let Box2d awake the object itself.
-        false
-      );
-    }
-
-    /** @deprecate Use `applyAngularImpulseInPixels` instead */
     applyAngularImpulse(angularImpulse: float): void {
       // If there is no body, set a new one
       if (this._body === null) {
@@ -1998,26 +1784,6 @@ namespace gdjs {
       );
     }
 
-    applyAngularImpulseInPixels(angularImpulse: float): void {
-      // If there is no body, set a new one
-      if (this._body === null) {
-        if (!this.createBody()) return;
-      }
-      const body = this._body!;
-
-      // Wake up the object
-      body.SetAwake(true);
-
-      // Apply the angular impulse
-      body.ApplyAngularImpulse(
-        angularImpulse *
-          this._sharedData.worldInvScale *
-          this._sharedData.worldInvScale,
-        // TODO Should let Box2d awake the object itself.
-        false
-      );
-    }
-
     getMass(): float {
       // If there is no body, set a new one
       if (this._body === null) {
@@ -2031,7 +1797,6 @@ namespace gdjs {
       return body.GetMass();
     }
 
-    /** @deprecate Use `getInertiaInPixel` instead */
     getInertia(): float {
       // If there is no body, set a new one
       if (this._body === null) {
@@ -2043,23 +1808,6 @@ namespace gdjs {
       body.SetAwake(true);
 
       return body.GetInertia();
-    }
-
-    getInertiaInPixels(): float {
-      // If there is no body, set a new one
-      if (this._body === null) {
-        if (!this.createBody()) return 0;
-      }
-      const body = this._body!;
-
-      // Wake up the object
-      body.SetAwake(true);
-
-      return (
-        body.GetInertia() *
-        this._sharedData.worldScale *
-        this._sharedData.worldScale
-      );
     }
 
     getMassCenterX(): float {

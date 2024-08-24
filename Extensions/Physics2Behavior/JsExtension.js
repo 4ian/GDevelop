@@ -480,6 +480,19 @@ module.exports = {
 
     // Global
     aut
+      .addExpression(
+        'WorldScale',
+        _('World scale'),
+        _('Return the world scale.'),
+        _('Global'),
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
+      .getCodeExtraInformation()
+      .setFunctionName('getWorldScale');
+
+    aut
       .addCondition(
         'GravityX',
         _('World gravity on X axis'),
@@ -1790,7 +1803,9 @@ module.exports = {
       .addExpression(
         'Inertia',
         _('Inertia'),
-        _('Return the rotational inertia of the object (in kilograms · meters²)'),
+        _(
+          'Return the rotational inertia of the object (in kilograms · meters²)'
+        ),
         '',
         'res/physics32.png'
       )

@@ -1013,6 +1013,10 @@ namespace gdjs {
       }
     }
 
+    getWorldScale(): float {
+      return this._sharedData.worldScale;
+    }
+
     getGravityX(): float {
       return this._sharedData.gravityX;
     }

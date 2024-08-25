@@ -8,7 +8,7 @@ import { I18n } from '@lingui/react';
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 
 import paperDecorator from '../../PaperDecorator';
-import CompactInstancePropertiesEditor from '../../../InstancesEditor/CompactInstancePropertiesEditor';
+import { CompactInstancePropertiesEditor } from '../../../InstancesEditor/CompactInstancePropertiesEditor';
 import SerializedObjectDisplay from '../../SerializedObjectDisplay';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
 
@@ -36,7 +36,7 @@ export const InstanceSprite2d = () => (
             instances={[testProject.testSpriteObjectInstance]}
             editInstanceVariables={action('edit instance variables')}
             onGetInstanceSize={() => [100, 101, 102]}
-            onEditObjectByName={action('edit object')}
+            editObjectInPropertiesPanel={action('edit object')}
             tileMapTileSelection={null}
             onSelectTileMapTile={() => {}}
           />
@@ -64,7 +64,7 @@ export const InstanceCube3d = () => (
             instances={[testProject.testLayoutInstance2]}
             editInstanceVariables={action('edit instance variables')}
             onGetInstanceSize={() => [100, 101, 102]}
-            onEditObjectByName={action('edit object')}
+            editObjectInPropertiesPanel={action('edit object')}
             tileMapTileSelection={null}
             onSelectTileMapTile={() => {}}
           />
@@ -92,7 +92,7 @@ export const InstanceTextInput = () => (
             instances={[testProject.testLayoutInstance3]}
             editInstanceVariables={action('edit instance variables')}
             onGetInstanceSize={() => [120, 40, 0]}
-            onEditObjectByName={action('edit object')}
+            editObjectInPropertiesPanel={action('edit object')}
             tileMapTileSelection={null}
             onSelectTileMapTile={() => {}}
           />

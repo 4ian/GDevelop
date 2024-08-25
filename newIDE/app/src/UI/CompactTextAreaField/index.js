@@ -50,23 +50,8 @@ export const CompactTextAreaField = ({
   disabled,
   errored,
   placeholder,
-  onBlur,
-  onFocus,
 }: CompactTextFieldProps) => {
   const idToUse = React.useRef<string>(id || makeTimestampedId());
-
-  const onBlurInput = React.useCallback(
-    event => {
-      if (onBlur) onBlur(event);
-    },
-    [onBlur]
-  );
-  const onFocusInput = React.useCallback(
-    event => {
-      if (onFocus) onFocus(event);
-    },
-    [onFocus]
-  );
 
   const title = !markdownDescription
     ? label
@@ -114,8 +99,6 @@ export const CompactTextAreaField = ({
           value={value === null ? '' : value}
           onChange={e => onChange(e.currentTarget.value)}
           placeholder={placeholder}
-          onBlur={onBlurInput}
-          onFocus={onFocusInput}
           rows={3}
         />
       </div>

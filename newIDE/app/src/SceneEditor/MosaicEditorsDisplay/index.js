@@ -28,7 +28,10 @@ import {
   type SceneEditorsDisplayProps,
   type SceneEditorsDisplayInterface,
 } from '../EditorsDisplay.flow';
-import { InstanceOrObjectPropertiesEditorContainer, type InstanceOrObjectPropertiesEditorInterface } from '../../SceneEditor/InstanceOrObjectPropertiesEditorContainer';
+import {
+  InstanceOrObjectPropertiesEditorContainer,
+  type InstanceOrObjectPropertiesEditorInterface,
+} from '../../SceneEditor/InstanceOrObjectPropertiesEditorContainer';
 
 const initialMosaicEditorNodes = {
   direction: 'row',
@@ -223,22 +226,17 @@ const MosaicEditorsDisplay = React.forwardRef<
       forceUpdateInstancesList();
       forceUpdatePropertiesEditor();
     },
-    [
-      forceUpdateInstancesList,
-      forceUpdatePropertiesEditor,
-      onSelectInstances,
-    ]
+    [forceUpdateInstancesList, forceUpdatePropertiesEditor, onSelectInstances]
   );
 
-  const selectedObjects = props.selectedObjectFolderOrObjectsWithContext.map(
-    objectFolderOrObjectWithContext => {
+  const selectedObjects = props.selectedObjectFolderOrObjectsWithContext
+    .map(objectFolderOrObjectWithContext => {
       const { objectFolderOrObject } = objectFolderOrObjectWithContext;
       if (!objectFolderOrObject) return null; // Protect ourselves from an unexpected null value.
       if (objectFolderOrObject.isFolder()) return null;
       return objectFolderOrObject.getObject();
-    }
-  )
-  .filter(Boolean);
+    })
+    .filter(Boolean);
 
   const selectedObjectNames = selectedObjects.map(object => object.getName());
 

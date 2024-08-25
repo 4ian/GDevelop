@@ -28,7 +28,10 @@ import {
   type SceneEditorsDisplayProps,
 } from '../EditorsDisplay.flow';
 import ErrorBoundary from '../../UI/ErrorBoundary';
-import { InstanceOrObjectPropertiesEditorContainer, type InstanceOrObjectPropertiesEditorInterface } from '../InstanceOrObjectPropertiesEditorContainer';
+import {
+  InstanceOrObjectPropertiesEditorContainer,
+  type InstanceOrObjectPropertiesEditorInterface,
+} from '../InstanceOrObjectPropertiesEditorContainer';
 
 export const swipeableDrawerContainerId = 'swipeable-drawer-container';
 
@@ -211,22 +214,17 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
       forceUpdateInstancesList();
       forceUpdatePropertiesEditor();
     },
-    [
-      forceUpdateInstancesList,
-      forceUpdatePropertiesEditor,
-      onSelectInstances,
-    ]
+    [forceUpdateInstancesList, forceUpdatePropertiesEditor, onSelectInstances]
   );
 
-  const selectedObjects = props.selectedObjectFolderOrObjectsWithContext.map(
-    objectFolderOrObjectWithContext => {
+  const selectedObjects = props.selectedObjectFolderOrObjectsWithContext
+    .map(objectFolderOrObjectWithContext => {
       const { objectFolderOrObject } = objectFolderOrObjectWithContext;
       if (!objectFolderOrObject) return null; // Protect ourselves from an unexpected null value.
       if (objectFolderOrObject.isFolder()) return null;
       return objectFolderOrObject.getObject();
-    }
-  )
-  .filter(Boolean);
+    })
+    .filter(Boolean);
 
   const selectedObjectNames = selectedObjects.map(object => object.getName());
 
@@ -358,7 +356,9 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                       objects={selectedObjects}
                       instances={selectedInstances}
                       editInstanceVariables={props.editInstanceVariables}
-                      editObjectInPropertiesPanel={props.editObjectInPropertiesPanel}
+                      editObjectInPropertiesPanel={
+                        props.editObjectInPropertiesPanel
+                      }
                       onEditObject={props.onEditObject}
                       onInstancesModified={forceUpdateInstancesList}
                       onGetInstanceSize={getInstanceSize}

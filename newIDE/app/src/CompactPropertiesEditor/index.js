@@ -29,6 +29,8 @@ import { textEllipsisStyle } from '../UI/TextEllipsis';
 import CompactPropertiesEditorRowField from './CompactPropertiesEditorRowField';
 import { CompactToggleField } from '../UI/CompactToggleField';
 import { CompactTextAreaField } from '../UI/CompactTextAreaField';
+import { CompactColorField } from '../UI/CompactColorField';
+import { rgbOrHexToRGBString } from '../Utils/ColorTransformer';
 
 // An "instance" here is the objects for which properties are shown
 export type Instance = Object; // This could be improved using generics.
@@ -425,35 +427,32 @@ const CompactPropertiesEditor = ({
               key={key}
               label={getFieldLabel({ instances, field })}
               markdownDescription={getFieldDescription(field)}
-              field={
-                <CompactSemiControlledNumberField
-                  {...otherCommonProps}
-                />
-              }
+              field={<CompactSemiControlledNumberField {...otherCommonProps} />}
             />
           );
         }
       } else if (field.valueType === 'color') {
-        return null; // TODO
-        // const { setValue } = field;
-        // return (
-        //   <Column key={field.name} expand noMargin>
-        //     <ColorField
-        //       id={field.name}
-        //       floatingLabelText={getFieldLabel({ instances, field })}
-        //       helperMarkdownText={getFieldDescription(field)}
-        //       disableAlpha
-        //       fullWidth
-        //       color={getFieldValue({ instances, field })}
-        //       onChange={color => {
-        //         const rgbString =
-        //           color.length === 0 ? '' : rgbOrHexToRGBString(color);
-        //         instances.forEach(i => setValue(i, rgbString));
-        //         _onInstancesModified(instances);
-        //       }}
-        //     />
-        //   </Column>
-        // );
+        const { setValue } = field;
+        return (
+          <CompactPropertiesEditorRowField
+            key={field.name}
+            label={getFieldLabel({ instances, field })}
+            markdownDescription={getFieldDescription(field)}
+            field={
+              <CompactColorField
+                id={field.name}
+                disableAlpha
+                color={getFieldValue({ instances, field })}
+                onChange={color => {
+                  const rgbString =
+                    color.length === 0 ? '' : rgbOrHexToRGBString(color);
+                  instances.forEach(i => setValue(i, rgbString));
+                  _onInstancesModified(instances);
+                }}
+              />
+            }
+          />
+        );
       } else if (field.valueType === 'enumIcon') {
         const value = getFieldValue({ instances, field });
         return (

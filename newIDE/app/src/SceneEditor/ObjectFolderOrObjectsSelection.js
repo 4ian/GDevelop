@@ -31,3 +31,43 @@ export const cleanNonExistingObjectFolderOrObjectWithContexts = (
       )
   );
 };
+
+export const getObjectFolderOrObjectWithContextFromObjectName = (
+  globalObjectsContainer: ?gdObjectsContainer,
+  objectsContainer: gdObjectsContainer,
+  objectName: string
+): ObjectFolderOrObjectWithContext | null => {
+  let foundObjectFolderObjectWithContext = null;
+  if (globalObjectsContainer)
+    mapVector(
+      globalObjectsContainer.getAllObjectFolderOrObjects(),
+      objectFolderOrObject => {
+        if (
+          !objectFolderOrObject.isFolder() &&
+          objectFolderOrObject.getObject().getName() === objectName
+        ) {
+          foundObjectFolderObjectWithContext = {
+            objectFolderOrObject,
+            global: true,
+          };
+        }
+      }
+    );
+  if (objectsContainer)
+    mapVector(
+      objectsContainer.getAllObjectFolderOrObjects(),
+      objectFolderOrObject => {
+        if (
+          !objectFolderOrObject.isFolder() &&
+          objectFolderOrObject.getObject().getName() === objectName
+        ) {
+          foundObjectFolderObjectWithContext = {
+            objectFolderOrObject,
+            global: false,
+          };
+        }
+      }
+    );
+
+  return foundObjectFolderObjectWithContext;
+};

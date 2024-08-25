@@ -30,6 +30,7 @@ export type SceneEditorsDisplayProps = {|
   objectsContainer: gdObjectsContainer,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   initialInstances: gdInitialInstancesContainer,
+  lastSelectionType: 'instance' | 'object',
   instancesSelection: InstancesSelection,
   selectedLayer: string,
   onSelectInstances: (
@@ -39,6 +40,7 @@ export type SceneEditorsDisplayProps = {|
   ) => void,
   editInstanceVariables: (instance: ?gdInitialInstance) => void,
   editObjectByName: (objectName: string, initialTab?: ObjectEditorTab) => void,
+  editObjectInPropertiesPanel: (objectName: string) => void,
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
   selectedObjectFolderOrObjectsWithContext: ObjectFolderOrObjectWithContext[],
   onSelectLayer: (layerName: string) => void,

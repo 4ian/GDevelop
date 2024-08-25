@@ -17,6 +17,7 @@ import ScrollView from '../../UI/ScrollView';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
 import VariablesList, {
   type HistoryHandler,
+  type VariablesListInterface,
 } from '../../VariablesList/VariablesList';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 import useForceUpdate from '../../Utils/UseForceUpdate';
@@ -29,6 +30,7 @@ import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/E
 import TileSetVisualizer, {
   type TileMapTileSelection,
 } from '../TileSetVisualizer';
+import Add from '../../UI/CustomSvgIcons/Add';
 
 export const styles = {
   icon: {
@@ -47,7 +49,7 @@ type Props = {|
   layersContainer: gdLayersContainer,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   instances: Array<gdInitialInstance>,
-  onEditObjectByName: string => void,
+  editObjectInPropertiesPanel: string => void,
   onInstancesModified?: (Array<gdInitialInstance>) => void,
   onGetInstanceSize: gdInitialInstance => [number, number, number],
   editInstanceVariables: gdInitialInstance => void,
@@ -68,7 +70,7 @@ export const CompactInstancePropertiesEditor = ({
   layersContainer,
   unsavedChanges,
   historyHandler,
-  onEditObjectByName,
+  editObjectInPropertiesPanel,
   onGetInstanceSize,
   editInstanceVariables,
   onInstancesModified,
@@ -77,6 +79,7 @@ export const CompactInstancePropertiesEditor = ({
   onSelectTileMapTile,
 }: Props) => {
   const forceUpdate = useForceUpdate();
+  const variablesListRef = React.useRef<?VariablesListInterface>(null);
 
   const schemaFor2D: Schema = React.useMemo(
     () =>
@@ -84,11 +87,17 @@ export const CompactInstancePropertiesEditor = ({
         i18n,
         is3DInstance: false,
         onGetInstanceSize,
-        onEditObjectByName,
+        onEditObject: editObjectInPropertiesPanel,
         layersContainer,
         forceUpdate,
       }),
-    [i18n, onGetInstanceSize, onEditObjectByName, layersContainer, forceUpdate]
+    [
+      i18n,
+      onGetInstanceSize,
+      editObjectInPropertiesPanel,
+      layersContainer,
+      forceUpdate,
+    ]
   );
 
   const schemaFor3D: Schema = React.useMemo(
@@ -97,11 +106,17 @@ export const CompactInstancePropertiesEditor = ({
         i18n,
         is3DInstance: true,
         onGetInstanceSize,
-        onEditObjectByName,
+        onEditObject: editObjectInPropertiesPanel,
         layersContainer,
         forceUpdate,
       }),
-    [i18n, onGetInstanceSize, onEditObjectByName, layersContainer, forceUpdate]
+    [
+      i18n,
+      onGetInstanceSize,
+      editObjectInPropertiesPanel,
+      layersContainer,
+      forceUpdate,
+    ]
   );
 
   const instance = instances[0];
@@ -252,17 +267,30 @@ export const CompactInstancePropertiesEditor = ({
                   <Text size="sub-title" noMargin>
                     <Trans>Instance Variables</Trans>
                   </Text>
-                  <IconButton
-                    size="small"
-                    onClick={() => {
-                      editInstanceVariables(instance);
-                    }}
-                  >
-                    <ShareExternal style={styles.icon} />
-                  </IconButton>
+                  <Line alignItems="center" noMargin>
+                    <IconButton
+                      size="small"
+                      onClick={() => {
+                        editInstanceVariables(instance);
+                      }}
+                    >
+                      <ShareExternal style={styles.icon} />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      onClick={
+                        variablesListRef.current
+                          ? variablesListRef.current.addVariable
+                          : undefined
+                      }
+                    >
+                      <Add style={styles.icon} />
+                    </IconButton>
+                  </Line>
                 </Line>
               </Column>
               <VariablesList
+                ref={variablesListRef}
                 projectScopedContainersAccessor={
                   projectScopedContainersAccessor
                 }

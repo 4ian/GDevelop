@@ -21,11 +21,11 @@ class GD_EXTENSION_API TextObject : public gd::ObjectConfiguration {
  public:
   TextObject();
   virtual ~TextObject();
-  virtual std::unique_ptr<gd::ObjectConfiguration> Clone() const {
+  virtual std::unique_ptr<gd::ObjectConfiguration> Clone() const override {
     return gd::make_unique<TextObject>(*this);
   }
 
-  virtual void ExposeResources(gd::ArbitraryResourceWorker& worker);
+  virtual void ExposeResources(gd::ArbitraryResourceWorker& worker) override;
 
   virtual std::map<gd::String, gd::PropertyDescriptor>GetProperties() const override;
 
@@ -108,8 +108,8 @@ class GD_EXTENSION_API TextObject : public gd::ObjectConfiguration {
 
  private:
   virtual void DoUnserializeFrom(gd::Project& project,
-                                 const gd::SerializerElement& element);
-  virtual void DoSerializeTo(gd::SerializerElement& element) const;
+                                 const gd::SerializerElement& element) override;
+  virtual void DoSerializeTo(gd::SerializerElement& element) const override;
 
   gd::String text;
   double characterSize;

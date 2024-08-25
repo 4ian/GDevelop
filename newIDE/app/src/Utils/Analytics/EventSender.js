@@ -50,7 +50,7 @@ const makeCanSendEvent = (options: {| minimumTimeBetweenEvents: number |}) => {
 const recordEvent = (name: string, metadata?: { [string]: any }) => {
   if (isDev) {
     // Uncomment to inspect analytics in development.
-    // console.log(`Should have sent analytics event "${name}"`, metadata);
+    console.log(`Should have sent analytics event "${name}"`, metadata);
     return;
   }
 

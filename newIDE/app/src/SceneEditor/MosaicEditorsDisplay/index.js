@@ -79,9 +79,11 @@ const MosaicEditorsDisplay = React.forwardRef<
 >((props, ref) => {
   const {
     project,
+    resourceManagementProps,
     layout,
     eventsFunctionsExtension,
     eventsBasedObject,
+    updateBehaviorsSharedData,
     layersContainer,
     globalObjectsContainer,
     objectsContainer,
@@ -240,8 +242,6 @@ const MosaicEditorsDisplay = React.forwardRef<
 
   const selectedObjectNames = selectedObjects.map(object => object.getName());
 
-  // const latestSelection = // come from props?
-
   const editors = {
     properties: {
       type: 'secondary',
@@ -252,7 +252,10 @@ const MosaicEditorsDisplay = React.forwardRef<
             <InstanceOrObjectPropertiesEditorContainer
               i18n={i18n}
               project={project}
+              resourceManagementProps={resourceManagementProps}
               layout={layout}
+              eventsFunctionsExtension={eventsFunctionsExtension}
+              onUpdateBehaviorsSharedData={updateBehaviorsSharedData}
               objectsContainer={objectsContainer}
               globalObjectsContainer={globalObjectsContainer}
               layersContainer={layersContainer}
@@ -260,7 +263,7 @@ const MosaicEditorsDisplay = React.forwardRef<
               instances={selectedInstances}
               objects={selectedObjects}
               editInstanceVariables={props.editInstanceVariables}
-              onEditObjectByName={props.editObjectByName}
+              editObjectInPropertiesPanel={props.editObjectInPropertiesPanel}
               onEditObject={props.onEditObject}
               onInstancesModified={forceUpdateInstancesList}
               onGetInstanceSize={getInstanceSize}
@@ -269,6 +272,7 @@ const MosaicEditorsDisplay = React.forwardRef<
               historyHandler={props.historyHandler}
               tileMapTileSelection={props.tileMapTileSelection}
               onSelectTileMapTile={props.onSelectTileMapTile}
+              lastSelectionType={props.lastSelectionType}
             />
           )}
         </I18n>

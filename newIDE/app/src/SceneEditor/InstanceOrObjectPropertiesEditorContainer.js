@@ -12,6 +12,7 @@ import { type HistoryHandler } from '../VariablesList/VariablesList';
 import { type TileMapTileSelection } from '../InstancesEditor/TileSetVisualizer';
 import { CompactObjectPropertiesEditor } from '../ObjectEditor/CompactObjectPropertiesEditor';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
+import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 
 export const styles = {
   paper: {
@@ -24,7 +25,9 @@ export const styles = {
 
 type Props = {|
   project: gdProject,
+  resourceManagementProps: ResourceManagementProps,
   layout?: ?gdLayout,
+  eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   objectsContainer: gdObjectsContainer,
   globalObjectsContainer: gdObjectsContainer | null,
   layersContainer: gdLayersContainer,
@@ -32,14 +35,16 @@ type Props = {|
   unsavedChanges?: ?UnsavedChanges,
   i18n: I18nType,
   historyHandler?: HistoryHandler,
+  lastSelectionType: 'instance' | 'object',
 
   // For objects:
   objects: Array<gdObject>,
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
+  onUpdateBehaviorsSharedData: () => void,
 
   // For instances:
   instances: Array<gdInitialInstance>,
-  onEditObjectByName: string => void,
+  editObjectInPropertiesPanel: (objectName: string) => void,
   onInstancesModified?: (Array<gdInitialInstance>) => void,
   onGetInstanceSize: gdInitialInstance => [number, number, number],
   editInstanceVariables: gdInitialInstance => void,
@@ -61,13 +66,18 @@ export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
   }));
 
   const {
+    lastSelectionType,
+
     // For objects:
     objects,
     onEditObject,
+    resourceManagementProps,
+    eventsFunctionsExtension,
+    onUpdateBehaviorsSharedData,
 
     // For instances:
     instances,
-    onEditObjectByName,
+    editObjectInPropertiesPanel,
     onInstancesModified,
     onGetInstanceSize,
     editInstanceVariables,
@@ -78,10 +88,10 @@ export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
 
   return (
     <Paper background="dark" square style={styles.paper}>
-      {!!instances.length ? (
+      {!!instances.length && lastSelectionType === 'instance' ? (
         <CompactInstancePropertiesEditor
           instances={instances}
-          onEditObjectByName={onEditObjectByName}
+          editObjectInPropertiesPanel={editObjectInPropertiesPanel}
           onInstancesModified={onInstancesModified}
           onGetInstanceSize={onGetInstanceSize}
           editInstanceVariables={editInstanceVariables}
@@ -89,10 +99,13 @@ export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
           onSelectTileMapTile={onSelectTileMapTile}
           {...commonProps}
         />
-      ) : !!objects.length ? (
+      ) : !!objects.length && lastSelectionType === 'object' ? (
         <CompactObjectPropertiesEditor
           objects={objects}
           onEditObject={onEditObject}
+          resourceManagementProps={resourceManagementProps}
+          eventsFunctionsExtension={eventsFunctionsExtension}
+          onUpdateBehaviorsSharedData={onUpdateBehaviorsSharedData}
           {...commonProps}
         />
       ) : (

@@ -67,7 +67,10 @@ import {
   type ObjectFolderOrObjectWithContext,
 } from '../ObjectsList/EnumerateObjectFolderOrObject';
 import uniq from 'lodash/uniq';
-import { cleanNonExistingObjectFolderOrObjectWithContexts } from './ObjectFolderOrObjectsSelection';
+import {
+  cleanNonExistingObjectFolderOrObjectWithContexts,
+  getObjectFolderOrObjectWithContextFromObjectName,
+} from './ObjectFolderOrObjectsSelection';
 import {
   registerOnResourceExternallyChangedCallback,
   unregisterOnResourceExternallyChangedCallback,
@@ -158,6 +161,8 @@ type State = {|
   selectedLayer: string,
 
   tileMapTileSelection: ?TileMapTileSelection,
+
+  lastSelectionType: 'instance' | 'object',
 |};
 
 type CopyCutPasteOptions = {|
@@ -212,6 +217,8 @@ export default class SceneEditor extends React.Component<Props, State> {
       selectedObjectFolderOrObjectsWithContext: [],
       selectedLayer: BASE_LAYER_NAME,
       invisibleLayerOnWhichInstancesHaveJustBeenAdded: null,
+
+      lastSelectionType: 'instance',
     };
   }
 
@@ -496,6 +503,22 @@ export default class SceneEditor extends React.Component<Props, State> {
       this.editObject(globalObjectsContainer.getObject(objectName), initialTab);
   };
 
+  editObjectInPropertiesPanel = (objectName: string) => {
+    const objectFolderOrObjectWithContext = getObjectFolderOrObjectWithContextFromObjectName(
+      this.props.globalObjectsContainer,
+      this.props.objectsContainer,
+      objectName
+    );
+    if (!objectFolderOrObjectWithContext) return;
+
+    this.setState({
+      selectedObjectFolderOrObjectsWithContext: [
+        objectFolderOrObjectWithContext,
+      ],
+      lastSelectionType: 'object',
+    });
+  };
+
   _editObjectGroup = (group: ?gdObjectGroup) => {
     this.setState({ editedGroup: group, isCreatingNewGroup: false });
   };
@@ -580,6 +603,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     this.setState(
       {
+        lastSelectionType: 'object',
         selectedObjectFolderOrObjectsWithContext,
       },
       () => {
@@ -683,7 +707,10 @@ export default class SceneEditor extends React.Component<Props, State> {
   _onInstancesSelected = (instances: Array<gdInitialInstance>) => {
     if (instances.length === 0) {
       this.setState(
-        { selectedObjectFolderOrObjectsWithContext: [] },
+        {
+          lastSelectionType: 'instance',
+          selectedObjectFolderOrObjectsWithContext: [],
+        },
         this.updateToolbar
       );
       return;
@@ -699,6 +726,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     ) {
       this.setState(
         {
+          lastSelectionType: 'instance',
           selectedObjectFolderOrObjectsWithContext: [
             {
               objectFolderOrObject: globalObjectsContainer
@@ -713,6 +741,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     } else if (objectsContainer.hasObjectNamed(objectName)) {
       this.setState(
         {
+          lastSelectionType: 'instance',
           selectedObjectFolderOrObjectsWithContext: [
             {
               objectFolderOrObject: objectsContainer
@@ -800,6 +829,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
       viewControls.centerViewOnLastInstance(instances, offset);
     }
+    this.setState({ lastSelectionType: 'instance' });
     this.updateToolbar();
   };
 
@@ -1704,8 +1734,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   forceUpdatePropertiesEditor = () => {
-    if (this.editorDisplay)
-      this.editorDisplay.forceUpdatePropertiesEditor();
+    if (this.editorDisplay) this.editorDisplay.forceUpdatePropertiesEditor();
   };
 
   reloadResourcesFor = (object: gdObject) => {
@@ -1816,6 +1845,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 editLayerEffects={this.editLayerEffects}
                 editInstanceVariables={this.editInstanceVariables}
                 editObjectByName={this.editObjectByName}
+                editObjectInPropertiesPanel={this.editObjectInPropertiesPanel}
                 selectedObjectFolderOrObjectsWithContext={
                   selectedObjectFolderOrObjectsWithContext
                 }
@@ -1897,6 +1927,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 }
                 isActive={isActive}
                 onOpenedEditorsChanged={this.updateToolbar}
+                lastSelectionType={this.state.lastSelectionType}
               />
               <I18n>
                 {({ i18n }) => (

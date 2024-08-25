@@ -4,6 +4,7 @@ import * as React from 'react';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
 import VariablesList, {
   type HistoryHandler,
+  type VariablesListInterface,
 } from '../../VariablesList/VariablesList';
 import { type ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import ErrorBoundary from '../../UI/ErrorBoundary';
@@ -13,13 +14,25 @@ import CompactPropertiesEditor, {
   Separator,
 } from '../../CompactPropertiesEditor';
 import Text from '../../UI/Text';
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import IconButton from '../../UI/IconButton';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
 import propertiesMapToSchema from '../../CompactPropertiesEditor/PropertiesMapToCompactSchema';
 import { type ObjectEditorTab } from '../../ObjectEditor/ObjectEditorDialog';
-import { makeObjectSchema } from './CompactObjectPropertiesSchema';
+import { CompactBehaviorPropertiesEditor } from './CompactBehaviorPropertiesEditor';
+import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
+import Paper from '../../UI/Paper';
+import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
+import { IconContainer } from '../../UI/IconContainer';
+import Remove from '../../UI/CustomSvgIcons/Remove';
+import useForceUpdate from '../../Utils/UseForceUpdate';
+import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
+import ChevronArrowBottom from '../../UI/CustomSvgIcons/ChevronArrowBottom';
+import Add from '../../UI/CustomSvgIcons/Add';
+import { useManageObjectBehaviors } from '../../BehaviorsEditor';
+import Object3d from '../../UI/CustomSvgIcons/Object3d';
+import Object2d from '../../UI/CustomSvgIcons/Object2d';
 
 const gd: libGDevelop = global.gd;
 
@@ -32,7 +45,10 @@ export const styles = {
 
 type Props = {|
   project: gdProject,
+  resourceManagementProps: ResourceManagementProps,
   layout?: ?gdLayout,
+  eventsFunctionsExtension: gdEventsFunctionsExtension | null,
+  onUpdateBehaviorsSharedData: () => void,
   objectsContainer: gdObjectsContainer,
   globalObjectsContainer: gdObjectsContainer | null,
   layersContainer: gdLayersContainer,
@@ -47,7 +63,10 @@ type Props = {|
 
 export const CompactObjectPropertiesEditor = ({
   project,
+  resourceManagementProps,
   layout,
+  eventsFunctionsExtension,
+  onUpdateBehaviorsSharedData,
   objectsContainer,
   globalObjectsContainer,
   layersContainer,
@@ -58,18 +77,18 @@ export const CompactObjectPropertiesEditor = ({
   objects,
   onEditObject,
 }: Props) => {
-  const object = objects.length ? objects[0] : null;
-  const objectConfiguration = object ? object.getConfiguration() : null;
+  const forceUpdate = useForceUpdate();
+  const variablesListRef = React.useRef<?VariablesListInterface>(null);
+  const object = objects[0];
+  const objectConfiguration = object.getConfiguration();
 
   // Don't use a memo for this because metadata from custom objects are built
   // from event-based object when extensions are refreshed after an extension
   // installation.
-  const objectMetadata = object
-    ? gd.MetadataProvider.getObjectMetadata(
-        project.getCurrentPlatform(),
-        object.getType()
-      )
-    : null;
+  const objectMetadata = gd.MetadataProvider.getObjectMetadata(
+    project.getCurrentPlatform(),
+    object.getType()
+  );
   const is3DObject = !!objectMetadata && objectMetadata.isRenderedIn3D();
 
   // TODO: Workaround a bad design of ObjectJsImplementation. When getProperties
@@ -77,28 +96,45 @@ export const CompactObjectPropertiesEditor = ({
   // see ObjectJsImplementation C++ implementation). If called directly here from JS,
   // the arguments will be mismatched. To workaround this, always cast the object to
   // a base gdObject to ensure C++ methods are called.
-  const objectConfigurationAsGd = objectConfiguration
-    ? gd.castObject(objectConfiguration, gd.ObjectConfiguration)
-    : null;
+  const objectConfigurationAsGd = gd.castObject(
+    objectConfiguration,
+    gd.ObjectConfiguration
+  );
 
   const schema = React.useMemo(
     () => {
-      if (!objectConfigurationAsGd) return null;
       const properties = objectConfigurationAsGd.getProperties();
-
-      console.log('compuing properties schema');
       const schema = propertiesMapToSchema(
         properties,
-        ({object, objectConfiguration}) => objectConfiguration.getProperties(),
-        ({object, objectConfiguration}, name, value) => objectConfiguration.updateProperty(name, value)
+        ({ object, objectConfiguration }) =>
+          objectConfiguration.getProperties(),
+        ({ object, objectConfiguration }, name, value) =>
+          objectConfiguration.updateProperty(name, value)
       );
 
-      return [...makeObjectSchema({ i18n, is3DObject }), ...schema];
+      return schema;
     },
-    [objectConfigurationAsGd, is3DObject, i18n]
+    [objectConfigurationAsGd]
   );
 
-  if (!object || !schema) return null;
+  const {
+    openNewBehaviorDialog,
+    newBehaviorDialog,
+    removeBehavior,
+  } = useManageObjectBehaviors({
+    project,
+    object,
+    eventsFunctionsExtension,
+    onUpdate: forceUpdate,
+    onBehaviorsUpdated: forceUpdate,
+    onUpdateBehaviorsSharedData,
+  });
+
+  const allVisibleBehaviors = object
+    .getAllBehaviorNames()
+    .toJSArray()
+    .map(behaviorName => object.getBehavior(behaviorName))
+    .filter(behavior => !behavior.isDefaultBehavior());
 
   return (
     <ErrorBoundary
@@ -110,51 +146,165 @@ export const CompactObjectPropertiesEditor = ({
         style={styles.scrollView}
         key={objects.map((instance: gdObject) => '' + instance.ptr).join(';')}
       >
-        <Column expand noMargin id="object-properties-editor">
-          <Column>
+        <Column expand noMargin id="object-properties-editor" noOverflowParent>
+          <ColumnStackLayout noOverflowParent>
+            <LineStackLayout
+              noMargin
+              alignItems="center"
+              justifyContent="space-between"
+            >
+              <LineStackLayout noMargin alignItems="center">
+                {is3DObject ? (
+                  <Object3d style={styles.icon} />
+                ) : (
+                  <Object2d style={styles.icon} />
+                )}
+                <Text size="body" noMargin>
+                  <Trans>Object - {object.getName()}</Trans>
+                </Text>
+              </LineStackLayout>
+              <IconButton
+                size="small"
+                onClick={() => {
+                  onEditObject(object);
+                }}
+              >
+                <ShareExternal style={styles.icon} />
+              </IconButton>
+            </LineStackLayout>
             <CompactPropertiesEditor
+              project={project}
+              resourceManagementProps={resourceManagementProps}
               unsavedChanges={unsavedChanges}
               schema={schema}
-              instances={[{object, objectConfiguration: objectConfigurationAsGd}]}
+              instances={[
+                { object, objectConfiguration: objectConfigurationAsGd },
+              ]}
               onInstancesModified={() => {
                 /* TODO */
               }}
             />
             <Spacer />
-          </Column>
+          </ColumnStackLayout>
           <Column>
             <Separator />
             <Line alignItems="center" justifyContent="space-between">
               <Text size="sub-title" noMargin>
                 <Trans>Behaviors</Trans>
               </Text>
-              <IconButton
-                size="small"
-                onClick={() => {
-                  onEditObject(object, 'behaviors');
-                }}
-              >
-                <ShareExternal style={styles.icon} />
-              </IconButton>
+              <Line alignItems="center">
+                <IconButton
+                  size="small"
+                  onClick={() => {
+                    onEditObject(object, 'behaviors');
+                  }}
+                >
+                  <ShareExternal style={styles.icon} />
+                </IconButton>
+                <IconButton size="small" onClick={openNewBehaviorDialog}>
+                  <Add style={styles.icon} />
+                </IconButton>
+              </Line>
             </Line>
           </Column>
+          <ColumnStackLayout>
+            {allVisibleBehaviors.map(behavior => {
+              const behaviorTypeName = behavior.getTypeName();
+              const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+                gd.JsPlatform.get(),
+                behaviorTypeName
+              );
+
+              const iconUrl = behaviorMetadata.getIconFilename();
+
+              return (
+                <Paper background="medium" key={behavior.getName()}>
+                  <Line expand>
+                    <ColumnStackLayout expand noOverflowParent>
+                      <LineStackLayout noMargin justifyContent="space-between">
+                        <Line noMargin alignItems="center">
+                          <IconButton
+                            onClick={() => {
+                              behavior.setFolded(!behavior.isFolded());
+                              forceUpdate();
+                            }}
+                            size="small"
+                          >
+                            {behavior.isFolded() ? (
+                              <ChevronArrowRight style={styles.icon} />
+                            ) : (
+                              <ChevronArrowBottom style={styles.icon} />
+                            )}
+                          </IconButton>
+
+                          {iconUrl ? (
+                            <IconContainer
+                              src={iconUrl}
+                              alt={behaviorMetadata.getFullName()}
+                              size={16}
+                            />
+                          ) : null}
+                          <Spacer />
+                          <Text noMargin size="body">
+                            {behavior.getName()}
+                          </Text>
+                        </Line>
+
+                        <IconButton
+                          tooltip={t`Remove behavior`}
+                          onClick={() => {
+                            removeBehavior(behavior.getName());
+                          }}
+                          size="small"
+                        >
+                          <Remove style={styles.icon} />
+                        </IconButton>
+                      </LineStackLayout>
+                      {!behavior.isFolded() && (
+                        <CompactBehaviorPropertiesEditor
+                          project={project}
+                          behavior={behavior}
+                          object={object}
+                          onBehaviorUpdated={() => {}}
+                          resourceManagementProps={resourceManagementProps}
+                        />
+                      )}
+                    </ColumnStackLayout>
+                  </Line>
+                </Paper>
+              );
+            })}
+          </ColumnStackLayout>
           <Column>
             <Separator />
             <Line alignItems="center" justifyContent="space-between">
               <Text size="sub-title" noMargin>
                 <Trans>Object Variables</Trans>
               </Text>
-              <IconButton
-                size="small"
-                onClick={() => {
-                  onEditObject(object, 'variables');
-                }}
-              >
-                <ShareExternal style={styles.icon} />
-              </IconButton>
+              <Line alignItems="center">
+                <IconButton
+                  size="small"
+                  onClick={() => {
+                    onEditObject(object, 'variables');
+                  }}
+                >
+                  <ShareExternal style={styles.icon} />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  onClick={
+                    variablesListRef.current
+                      ? variablesListRef.current.addVariable
+                      : undefined
+                  }
+                >
+                  <Add style={styles.icon} />
+                </IconButton>
+              </Line>
             </Line>
           </Column>
           <VariablesList
+            ref={variablesListRef}
             projectScopedContainersAccessor={projectScopedContainersAccessor}
             directlyStoreValueChangesWhileEditing
             variablesContainer={object.getVariables()}
@@ -196,6 +346,7 @@ export const CompactObjectPropertiesEditor = ({
             </Column>
           )}
       </ScrollView>
+      {newBehaviorDialog}
     </ErrorBoundary>
   );
 };

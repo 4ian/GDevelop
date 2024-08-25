@@ -55,9 +55,11 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
 >((props, ref) => {
   const {
     project,
+    resourceManagementProps,
     layout,
     eventsFunctionsExtension,
     eventsBasedObject,
+    updateBehaviorsSharedData,
     layersContainer,
     globalObjectsContainer,
     objectsContainer,
@@ -343,7 +345,10 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                     <InstanceOrObjectPropertiesEditorContainer
                       i18n={i18n}
                       project={project}
+                      resourceManagementProps={resourceManagementProps}
                       layout={layout}
+                      eventsFunctionsExtension={eventsFunctionsExtension}
+                      onUpdateBehaviorsSharedData={updateBehaviorsSharedData}
                       objectsContainer={objectsContainer}
                       globalObjectsContainer={globalObjectsContainer}
                       layersContainer={layersContainer}
@@ -353,7 +358,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                       objects={selectedObjects}
                       instances={selectedInstances}
                       editInstanceVariables={props.editInstanceVariables}
-                      onEditObjectByName={props.editObjectByName}
+                      editObjectInPropertiesPanel={props.editObjectInPropertiesPanel}
                       onEditObject={props.onEditObject}
                       onInstancesModified={forceUpdateInstancesList}
                       onGetInstanceSize={getInstanceSize}
@@ -362,6 +367,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                       historyHandler={props.historyHandler}
                       tileMapTileSelection={props.tileMapTileSelection}
                       onSelectTileMapTile={props.onSelectTileMapTile}
+                      lastSelectionType={props.lastSelectionType}
                     />
                   )}
                 </I18n>

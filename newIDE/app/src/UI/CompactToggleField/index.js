@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import Tooltip from '@material-ui/core/Tooltip';
-import { LineStackLayout } from '../../UI/Layout';
 import Text from '../../UI/Text';
 import { MarkdownText } from '../../UI/MarkdownText';
 import { tooltipEnterDelay } from '../../UI/Tooltip';

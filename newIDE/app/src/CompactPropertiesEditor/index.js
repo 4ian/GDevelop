@@ -28,6 +28,7 @@ import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
 import CompactPropertiesEditorRowField from './CompactPropertiesEditorRowField';
 import { CompactToggleField } from '../UI/CompactToggleField';
+import { CompactTextAreaField } from '../UI/CompactTextAreaField';
 
 // An "instance" here is the objects for which properties are shown
 export type Instance = Object; // This could be improved using generics.
@@ -384,8 +385,6 @@ const CompactPropertiesEditor = ({
         );
       } else if (field.valueType === 'number') {
         const { setValue, onClickEndAdornment } = field;
-        // TODO: Support end adornment
-        // const endAdornment = getEndAdornment && getEndAdornment(instances[0]);
 
         const commonProps = {
           key: field.name,
@@ -417,15 +416,6 @@ const CompactPropertiesEditor = ({
               useLeftIconAsNumberControl
               renderLeftIcon={field.renderLeftIcon}
               leftIconTooltip={getFieldLabel({ instances, field })}
-              // endAdornment={
-              //   endAdornment && (
-              //     <Tooltip title={endAdornment.tooltipContent}>
-              //       <InputAdornment position="end">
-              //         {endAdornment.label}
-              //       </InputAdornment>
-              //     </Tooltip>
-              //   )
-              // }
             />
           );
         } else {
@@ -438,15 +428,6 @@ const CompactPropertiesEditor = ({
               field={
                 <CompactSemiControlledNumberField
                   {...otherCommonProps}
-                  // endAdornment={
-                  //   endAdornment && (
-                  //     <Tooltip title={endAdornment.tooltipContent}>
-                  //       <InputAdornment position="end">
-                  //         {endAdornment.label}
-                  //       </InputAdornment>
-                  //     </Tooltip>
-                  //   )
-                  // }
                 />
               }
             />
@@ -493,24 +474,20 @@ const CompactPropertiesEditor = ({
           </IconButton>
         );
       } else if (field.valueType === 'textarea') {
-        return null; // TODO
-        // const { setValue } = field;
-        // return (
-        //   <SemiControlledTextField
-        //     key={field.name}
-        //     id={field.name}
-        //     onChange={text => {
-        //       instances.forEach(i => setValue(i, text || ''));
-        //       _onInstancesModified(instances);
-        //     }}
-        //     value={getFieldValue({ instances, field })}
-        //     floatingLabelText={getFieldLabel({ instances, field })}
-        //     floatingLabelFixed
-        //     helperMarkdownText={getFieldDescription(field)}
-        //     multiline
-        //     style={styles.field}
-        //   />
-        // );
+        const { setValue } = field;
+        return (
+          <CompactTextAreaField
+            key={field.name}
+            id={field.name}
+            onChange={text => {
+              instances.forEach(i => setValue(i, text || ''));
+              _onInstancesModified(instances);
+            }}
+            value={getFieldValue({ instances, field })}
+            label={getFieldLabel({ instances, field })}
+            markdownDescription={getFieldDescription(field)}
+          />
+        );
       } else if (field.valueType === 'resource') {
         return null; // TODO
       } else {

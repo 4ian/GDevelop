@@ -15,6 +15,8 @@ namespace gdjs {
     lvy: number | undefined;
     av: number | undefined;
     aw: boolean | undefined;
+    layers: number;
+    masks: number;
   }
 
   export interface Physics2NetworkSyncData extends BehaviorNetworkSyncData {
@@ -513,6 +515,8 @@ namespace gdjs {
         ...super.getNetworkSyncData(),
         props: {
           ...bodyProps,
+          layers: this.layers,
+          masks: this.masks,
         },
       };
     }
@@ -555,6 +559,14 @@ namespace gdjs {
         if (this._body) {
           this._body.SetAwake(behaviorSpecificProps.aw);
         }
+      }
+
+      if (behaviorSpecificProps.layers !== undefined) {
+        this.layers = behaviorSpecificProps.layers;
+      }
+
+      if (behaviorSpecificProps.masks !== undefined) {
+        this.masks = behaviorSpecificProps.masks;
       }
     }
 

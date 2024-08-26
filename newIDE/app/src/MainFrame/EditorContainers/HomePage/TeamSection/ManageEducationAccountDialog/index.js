@@ -30,6 +30,16 @@ import Collapse from '@material-ui/core/Collapse';
 import { IconButton } from '@material-ui/core';
 import ChevronArrowTop from '../../../../../UI/CustomSvgIcons/ChevronArrowTop';
 import ChevronArrowBottom from '../../../../../UI/CustomSvgIcons/ChevronArrowBottom';
+import Paper from '../../../../../UI/Paper';
+import Checkbox from '../../../../../UI/Checkbox';
+import CheckboxUnchecked from '../../../../../UI/CustomSvgIcons/CheckboxUnchecked';
+import CheckboxChecked from '../../../../../UI/CustomSvgIcons/CheckboxChecked';
+
+const styles = {
+  selectedMembersControlsContainer: {
+    padding: 8,
+  },
+};
 
 type AddTeacherError =
   | 'no-seats-available'
@@ -211,6 +221,9 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
 
   const availableSeats =
     team && members && admins ? team.seats - members.length - admins.length : 0;
+  const areAllActiveUsersSelected = members
+    .filter(member => !member.deactivatedAt)
+    .every(member => selectedUserIds.includes(member.id));
 
   return (
     <>
@@ -285,6 +298,35 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
               />
             </LineStackLayout>
           </LineStackLayout>
+          <Paper
+            style={styles.selectedMembersControlsContainer}
+            background="light"
+          >
+            <Line justifyContent="space-between" noMargin alignItems="center">
+              <LineStackLayout alignItems="center" noMargin>
+                <Checkbox
+                  style={{ margin: 0 }}
+                  checked={areAllActiveUsersSelected}
+                  onCheck={(e, checked) => {
+                    if (checked) {
+                      setSelectedUserIds(
+                        members
+                          .filter(member => !member.deactivatedAt)
+                          .map(member => member.id)
+                      );
+                    } else {
+                      setSelectedUserIds([]);
+                    }
+                  }}
+                  uncheckedIcon={<CheckboxUnchecked />}
+                  checkedIcon={<CheckboxChecked />}
+                />
+                <Text noMargin>
+                  <Trans>Select all active</Trans>
+                </Text>
+              </LineStackLayout>
+            </Line>
+          </Paper>
           <Column>
             <GridList cols={2} cellHeight={'auto'}>
               <Grid item xs={5}>

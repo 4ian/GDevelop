@@ -8,7 +8,10 @@ import { makeStyles } from '@material-ui/core/styles';
 type Props = {|
   children: React.Node,
   href: string,
-  onClick: () => void | Promise<void>,
+  /**
+   * Should be defined if not using Link to open email client with mailto href.
+   */
+  onClick?: () => void | Promise<void>,
   disabled?: boolean,
 |};
 
@@ -27,23 +30,25 @@ const useLinkStyles = (theme: GDevelopTheme, disabled: boolean) =>
     },
   })();
 
-const Link = (props: Props) => {
+const Link = ({ onClick, href, children, disabled }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const linkStyles = useLinkStyles(gdevelopTheme, !!props.disabled);
-  const onClick = (event: MouseEvent) => {
-    event.preventDefault(); // Avoid triggering the href (avoids a warning on mobile in case of unsaved changes).
-    if (!props.disabled) {
-      props.onClick();
-    }
-  };
+  const linkStyles = useLinkStyles(gdevelopTheme, !!disabled);
+  const onClickLink = onClick
+    ? (event: MouseEvent) => {
+        event.preventDefault(); // Avoid triggering the href (avoids a warning on mobile in case of unsaved changes).
+        if (!disabled) {
+          onClick();
+        }
+      }
+    : undefined;
   return (
     <MuiLink
       color="secondary"
-      href={props.href}
-      onClick={onClick}
+      href={href}
+      onClick={onClickLink}
       classes={linkStyles}
     >
-      {props.children}
+      {children}
     </MuiLink>
   );
 };

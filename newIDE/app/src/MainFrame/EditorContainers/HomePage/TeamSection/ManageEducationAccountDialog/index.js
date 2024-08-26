@@ -22,6 +22,8 @@ import { groupMembersByGroupId, sortGroupsWithMembers } from '../Utils';
 import { Column, Line } from '../../../../../UI/Grid';
 import ManageStudentRow from './ManageStudentRow';
 import { changeTeamMemberPassword } from '../../../../../Utils/GDevelopServices/User';
+import AlertMessage from '../../../../../UI/AlertMessage';
+import Link from '../../../../../UI/Link';
 
 type AddTeacherError =
   | 'no-seats-available'
@@ -143,7 +145,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
         userId,
         newPassword,
       });
-      await onRefreshMembers()
+      await onRefreshMembers();
     },
     [getAuthorizationHeader, profile, onRefreshMembers]
   );
@@ -171,6 +173,9 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
     ...sortGroupsWithMembers(membersByGroupId),
   ].filter(Boolean);
 
+  const availableSeats =
+    team && members && admins ? team.seats - members.length - admins.length : 0;
+
   return (
     <>
       <Dialog
@@ -180,91 +185,108 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
         open
         onRequestClose={onClose}
       >
-        <Text size="sub-title">
-          <Trans>Teacher accounts</Trans>
-        </Text>
-        {admins &&
-          admins.map(adminUser => (
-            <UserLine
-              key={adminUser.id}
-              username={adminUser.username}
-              email={adminUser.email}
-              level={null}
-              onDelete={null}
-              disabled={profile && adminUser.id === profile.id}
+        <ColumnStackLayout noMargin>
+          {availableSeats === 0 && (
+            <AlertMessage kind="info">
+              <Trans>
+                You’ve reached the maximum amount of available seats.{' '}
+                <Link href="mailto:education@gdevelop.io">
+                  Increase the number of seats
+                </Link>{' '}
+                on your subscription to invite more students and collaborators.
+              </Trans>
+            </AlertMessage>
+          )}
+          <Text size="sub-title" noMargin>
+            <Trans>Teacher accounts</Trans>
+          </Text>
+          <Column noMargin>
+            {admins &&
+              admins.map(adminUser => (
+                <UserLine
+                  key={adminUser.id}
+                  username={adminUser.username}
+                  email={adminUser.email}
+                  level={null}
+                  onDelete={null}
+                  disabled={profile && adminUser.id === profile.id}
+                />
+              ))}
+          </Column>
+          <Line noMargin>
+            <RaisedButton
+              primary
+              icon={<Add fontSize="small" />}
+              label={<Trans>Add teacher</Trans>}
+              onClick={() => setAddTeacherDialogOpen(true)}
             />
-          ))}
-        <RaisedButton
-          primary
-          icon={<Add fontSize="small" />}
-          label={<Trans>Add teacher</Trans>}
-          onClick={() => setAddTeacherDialogOpen(true)}
-        />
-        <Divider />
-        <Text size="sub-title">
-          <Trans>Student accounts</Trans>
-        </Text>
-        <Column>
-          <GridList cols={2} cellHeight={'auto'}>
-            <Grid item xs={5}>
-              <Text style={{ opacity: 0.7 }}>
-                <Trans>Student</Trans>
-              </Text>
-            </Grid>
-            <Grid item xs={7}>
-              <Text style={{ opacity: 0.7 }}>
-                <Trans>Password</Trans>
-              </Text>
-            </Grid>
-          </GridList>
-          {groupsWithMembers.length > 0
-            ? groupsWithMembers.map(({ group, members }) => {
-                return (
-                  <React.Fragment key={group ? group.id : 'lobby'}>
-                    <Line noMargin>
-                      <Text size="sub-title">
-                        {group ? group.name : <Trans>Lobby</Trans>}
-                      </Text>
-                    </Line>
-                    <Column>
-                      <GridList cols={2} cellHeight={'auto'}>
-                        {members.map(member => {
-                          return (
-                            <ManageStudentRow
-                              member={member}
-                              key={member.id}
-                              onChangePassword={onChangeMemberPassword}
-                              isSelected={selectedUserIds.includes(member.id)}
-                              onSelect={selected => {
-                                const memberIndexInArray = selectedUserIds.indexOf(
-                                  member.id
-                                );
-                                if (selected) {
-                                  if (memberIndexInArray === -1) {
-                                    setSelectedUserIds([
-                                      ...selectedUserIds,
-                                      member.id,
-                                    ]);
+          </Line>
+          <Divider />
+          <Text size="sub-title" noMargin>
+            <Trans>Student accounts</Trans>
+          </Text>
+          <Column>
+            <GridList cols={2} cellHeight={'auto'}>
+              <Grid item xs={5}>
+                <Text style={{ opacity: 0.7 }}>
+                  <Trans>Student</Trans>
+                </Text>
+              </Grid>
+              <Grid item xs={7}>
+                <Text style={{ opacity: 0.7 }}>
+                  <Trans>Password</Trans>
+                </Text>
+              </Grid>
+            </GridList>
+            {groupsWithMembers.length > 0
+              ? groupsWithMembers.map(({ group, members }) => {
+                  return (
+                    <React.Fragment key={group ? group.id : 'lobby'}>
+                      <Line noMargin>
+                        <Text size="sub-title">
+                          {group ? group.name : <Trans>Lobby</Trans>}
+                        </Text>
+                      </Line>
+                      <Column>
+                        <GridList cols={2} cellHeight={'auto'}>
+                          {members.map(member => {
+                            return (
+                              <ManageStudentRow
+                                member={member}
+                                key={member.id}
+                                onChangePassword={onChangeMemberPassword}
+                                isSelected={selectedUserIds.includes(member.id)}
+                                onSelect={selected => {
+                                  const memberIndexInArray = selectedUserIds.indexOf(
+                                    member.id
+                                  );
+                                  if (selected) {
+                                    if (memberIndexInArray === -1) {
+                                      setSelectedUserIds([
+                                        ...selectedUserIds,
+                                        member.id,
+                                      ]);
+                                    }
+                                    return;
+                                  } else {
+                                    const newArray = [...selectedUserIds];
+                                    if (memberIndexInArray >= 0) {
+                                      newArray.splice(memberIndexInArray, 1);
+                                      setSelectedUserIds(newArray);
+                                    }
                                   }
-                                  return;
-                                } else {
-                                  const newArray = [...selectedUserIds];
-                                  if (memberIndexInArray >= 0) {
-                                    newArray.splice(memberIndexInArray, 1);
-                                    setSelectedUserIds(newArray);
-                                  }
-                                }
-                              }}
-                            />
-                          );
-                        })}
-                      </GridList>
-                    </Column>
-                  </React.Fragment>
-                );
-              })
-            : 'Hello'}
-        </Column>
+                                }}
+                              />
+                            );
+                          })}
+                        </GridList>
+                      </Column>
+                    </React.Fragment>
+                  );
+                })
+              : 'Hello'}
+          </Column>
+        </ColumnStackLayout>
       </Dialog>
       {addTeacherDialogOpen && (
         <AddTeacherDialog onClose={() => setAddTeacherDialogOpen(false)} />

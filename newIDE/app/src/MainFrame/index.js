@@ -2972,6 +2972,8 @@ const MainFrame = (props: Props) => {
   const setElectronUpdateStatus = (updateStatus: ElectronUpdateStatus) => {
     setState(state => ({ ...state, updateStatus }));
 
+    // TODO: use i18n to translate title and body in notification.
+    // Also, find a way to use preferences to know if user deactivated auto-update.
     const notificationTitle = getElectronUpdateNotificationTitle(updateStatus);
     const notificationBody = getElectronUpdateNotificationBody(updateStatus);
     if (notificationTitle) {

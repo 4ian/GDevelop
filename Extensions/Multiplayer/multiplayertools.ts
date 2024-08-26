@@ -27,9 +27,9 @@ namespace gdjs {
     const DEFAULT_LOBBY_HEARTBEAT_INTERVAL = 30000;
     const DEFAULT_COUNTDOWN_SECONDS_TO_START = 5;
 
-    const DEFAULT_OBJECT_MAX_SYNC_RATE = 30;
+    export const DEFAULT_OBJECT_MAX_SYNC_RATE = 30;
     // The number of times per second an object should be synchronized if it keeps changing.
-    let _objectMaxSyncRate = DEFAULT_OBJECT_MAX_SYNC_RATE;
+    export let _objectMaxSyncRate = DEFAULT_OBJECT_MAX_SYNC_RATE;
 
     // Save if we are on dev environment so we don't need to use the runtimeGame every time.
     let isUsingGDevelopDevelopmentEnvironment = false;

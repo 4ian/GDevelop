@@ -52,7 +52,7 @@ module.exports = {
       .setType('number');
     adjustmentProperties
       .getOrCreate('saturation')
-      .setValue('2')
+      .setValue('1')
       .setLabel(_('Saturation (between 0 and 5)'))
       .setType('number');
     adjustmentProperties
@@ -77,7 +77,7 @@ module.exports = {
       .setType('number');
     adjustmentProperties
       .getOrCreate('blue')
-      .setValue('0.6')
+      .setValue('1')
       .setLabel(_('Blue (between 0 and 5)'))
       .setType('number');
     adjustmentProperties

@@ -313,9 +313,14 @@ describe('Multiplayer', () => {
     /**
      * Helper to fast forward a bit of time in players games, so that heartbeats
      * are sent and all players are aware of each other.
-     * @param {{ playerNumber: number, peerId: string}[]} players
+     * @param {{ playerNumber: number, peerId: string, isHost?: boolean }[]} players
      */
     const initiateGameWithPlayers = (players) => {
+      // Find the host.
+      const host = players.find((player) => player.isHost);
+      if (!host)
+        throw new Error('No host defined in players, cannot initiate game.');
+
       // Create the instances of the MultiplayerMessageManager and MultiplayerVariablesManager
       // for each player.
       for (const player of players) {
@@ -325,6 +330,9 @@ describe('Multiplayer', () => {
         peerMultiplayerVariablesManager[
           player.peerId
         ] = gdjs.makeMultiplayerVariablesManager();
+
+        // Define the host for everyone.
+        gdjs.multiplayer.hostPeerId = host.peerId;
       }
 
       // Use a scene to simulate the game loop moving forward.
@@ -415,7 +423,7 @@ describe('Multiplayer', () => {
         initiateGameWithPlayers,
       } = createMultiplayerManagersMock();
       const allConnectedPlayers = [
-        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 1, peerId: 'player-1', isHost: true },
         { playerNumber: 2, peerId: 'player-2' },
       ];
       initiateGameWithPlayers(allConnectedPlayers);
@@ -611,7 +619,7 @@ describe('Multiplayer', () => {
       } = createMultiplayerManagersMock();
 
       const allConnectedPlayers = [
-        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 1, peerId: 'player-1', isHost: true },
         { playerNumber: 2, peerId: 'player-2' },
       ];
       initiateGameWithPlayers(allConnectedPlayers);
@@ -697,7 +705,7 @@ describe('Multiplayer', () => {
       } = createMultiplayerManagersMock();
 
       const allConnectedPlayers = [
-        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 1, peerId: 'player-1', isHost: true },
         { playerNumber: 2, peerId: 'player-2' },
         { playerNumber: 3, peerId: 'player-3' },
       ];
@@ -834,7 +842,7 @@ describe('Multiplayer', () => {
       } = createMultiplayerManagersMock();
 
       const allConnectedPlayers = [
-        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 1, peerId: 'player-1', isHost: true },
         { playerNumber: 2, peerId: 'player-2' },
         { playerNumber: 3, peerId: 'player-3' },
       ];
@@ -1030,7 +1038,7 @@ describe('Multiplayer', () => {
       } = createMultiplayerManagersMock();
 
       const allConnectedPlayers = [
-        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 1, peerId: 'player-1', isHost: true },
         { playerNumber: 2, peerId: 'player-2' },
       ];
       initiateGameWithPlayers(allConnectedPlayers);
@@ -1157,7 +1165,7 @@ describe('Multiplayer', () => {
       } = createMultiplayerManagersMock();
 
       const allConnectedPlayers = [
-        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 1, peerId: 'player-1', isHost: true },
         { playerNumber: 2, peerId: 'player-2' },
         { playerNumber: 3, peerId: 'player-3' },
       ];
@@ -1358,7 +1366,7 @@ describe('Multiplayer', () => {
       } = createMultiplayerManagersMock();
 
       const allConnectedPlayers = [
-        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 1, peerId: 'player-1', isHost: true },
         { playerNumber: 2, peerId: 'player-2' },
         { playerNumber: 3, peerId: 'player-3' },
       ];
@@ -1630,7 +1638,7 @@ describe('Multiplayer', () => {
       } = createMultiplayerManagersMock();
 
       const allConnectedPlayers = [
-        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 1, peerId: 'player-1', isHost: true },
         { playerNumber: 2, peerId: 'player-2' },
         { playerNumber: 3, peerId: 'player-3' },
       ];
@@ -1840,7 +1848,7 @@ describe('Multiplayer', () => {
       } = createMultiplayerManagersMock();
 
       const allConnectedPlayers = [
-        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 1, peerId: 'player-1', isHost: true },
         { playerNumber: 2, peerId: 'player-2' },
         { playerNumber: 3, peerId: 'player-3' },
       ];
@@ -1899,7 +1907,7 @@ describe('Multiplayer', () => {
       } = createMultiplayerManagersMock();
 
       const allConnectedPlayers = [
-        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 1, peerId: 'player-1', isHost: true },
         { playerNumber: 2, peerId: 'player-2' },
       ];
       initiateGameWithPlayers(allConnectedPlayers);
@@ -1941,7 +1949,7 @@ describe('Multiplayer', () => {
       } = createMultiplayerManagersMock();
 
       const allConnectedPlayers = [
-        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 1, peerId: 'player-1', isHost: true },
         { playerNumber: 2, peerId: 'player-2' },
         { playerNumber: 3, peerId: 'player-3' },
       ];
@@ -2200,7 +2208,7 @@ describe('Multiplayer', () => {
       } = createMultiplayerManagersMock();
 
       const allConnectedPlayers = [
-        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 1, peerId: 'player-1', isHost: true },
         { playerNumber: 2, peerId: 'player-2' },
       ];
       initiateGameWithPlayers(allConnectedPlayers);
@@ -2363,7 +2371,7 @@ describe('Multiplayer', () => {
       } = createMultiplayerManagersMock();
 
       const allConnectedPlayers = [
-        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 1, peerId: 'player-1', isHost: true },
         { playerNumber: 2, peerId: 'player-2' },
       ];
       initiateGameWithPlayers(allConnectedPlayers);
@@ -2448,7 +2456,7 @@ describe('Multiplayer', () => {
       } = createMultiplayerManagersMock();
 
       const allConnectedPlayers = [
-        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 1, peerId: 'player-1', isHost: true },
         { playerNumber: 2, peerId: 'player-2' },
       ];
       initiateGameWithPlayers(allConnectedPlayers);
@@ -2580,7 +2588,7 @@ describe('Multiplayer', () => {
       } = createMultiplayerManagersMock();
 
       const allConnectedPlayers = [
-        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 1, peerId: 'player-1', isHost: true },
         { playerNumber: 2, peerId: 'player-2' },
       ];
       initiateGameWithPlayers(allConnectedPlayers);
@@ -2674,7 +2682,7 @@ describe('Multiplayer', () => {
       } = createMultiplayerManagersMock();
 
       const allConnectedPlayers = [
-        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 1, peerId: 'player-1', isHost: true },
         { playerNumber: 2, peerId: 'player-2' },
         { playerNumber: 3, peerId: 'player-3' },
       ];
@@ -2683,7 +2691,7 @@ describe('Multiplayer', () => {
 
       // Player 2 leaves.
       const newConnectedPlayers = [
-        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 1, peerId: 'player-1', isHost: true },
         { playerNumber: 3, peerId: 'player-3' },
       ];
       // Host sees the player 2 leaving.
@@ -2710,7 +2718,7 @@ describe('Multiplayer', () => {
       } = createMultiplayerManagersMock();
 
       const allConnectedPlayers = [
-        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 1, peerId: 'player-1', isHost: true },
         { playerNumber: 3, peerId: 'player-3' },
       ];
       initiateGameWithPlayers(allConnectedPlayers);
@@ -2721,7 +2729,7 @@ describe('Multiplayer', () => {
 
       // Player 2 joins.
       const newConnectedPlayers = [
-        { playerNumber: 1, peerId: 'player-1' },
+        { playerNumber: 1, peerId: 'player-1', isHost: true },
         { playerNumber: 2, peerId: 'player-2' },
         { playerNumber: 3, peerId: 'player-3' },
       ];

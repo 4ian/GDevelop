@@ -1087,7 +1087,7 @@ describe('Multiplayer', () => {
           'MySpriteObject'
         )[0];
 
-        p1SpriteObjectBehavior._objectMaxTickRate = Infinity;
+        p1SpriteObjectBehavior._objectMaxSyncRate = Infinity;
         p1SpriteObject.setX(242);
         p1SpriteObject.setY(243);
         p1RuntimeScene.renderAndStep(1000 / 60);
@@ -1243,7 +1243,7 @@ describe('Multiplayer', () => {
           'MySpriteObject'
         )[0];
 
-        p2SpriteObjectBehavior._objectMaxTickRate = Infinity;
+        p2SpriteObjectBehavior._objectMaxSyncRate = Infinity;
         p2SpriteObject.setX(242);
         p2SpriteObject.setY(243);
         p2RuntimeScene.renderAndStep(1000 / 60);
@@ -2145,7 +2145,7 @@ describe('Multiplayer', () => {
           p2RuntimeScene,
           'MySpriteObject'
         )[0];
-        p2SpriteMultiplayerObjectBehavior._objectMaxTickRate = Infinity;
+        p2SpriteMultiplayerObjectBehavior._objectMaxSyncRate = Infinity;
         p2SpriteObject.setX(242);
         p2SpriteObject.setY(243);
         p2RuntimeScene.renderAndStep(1000 / 60);

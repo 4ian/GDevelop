@@ -24,48 +24,46 @@ namespace gdjs {
     actionOnPlayerDisconnect: string;
 
     // The last time the object has been synchronized.
-    // This is to avoid synchronizing the object too often, see _objectMaxTickRate.
+    // This is to avoid synchronizing the object too often, see _objectMaxSyncRate.
     _lastObjectSyncTimestamp: number = 0;
-    // The number of times per second the object should be synchronized if it keeps changing.
-    _objectMaxTickRate: number = 60;
 
     // The last time the basic object info has been synchronized.
     _lastBasicObjectSyncTimestamp: number = 0;
     // The number of times per second the object basic info should be synchronized when it doesn't change.
-    _objectBasicInfoTickRate: number = 5;
+    _objectBasicInfoSyncRate: number = 5;
     // The last data sent to synchronize the basic info of the object.
     _lastSentBasicObjectSyncData: BasicObjectNetworkSyncData | undefined;
     // When we know that the basic info of the object has been updated, we can force sending them
-    // on the max tickrate for a number of times to ensure they are received, without the need of an acknowledgment.
+    // on the max SyncRate for a number of times to ensure they are received, without the need of an acknowledgment.
     _numberOfForcedBasicObjectUpdates: number = 0;
 
     // The last time the variables have been synchronized.
     _lastVariablesSyncTimestamp: number = 0;
     // The number of times per second the variables should be synchronized.
-    _variablesTickRate: number = 1;
+    _variablesSyncRate: number = 1;
     // The last data sent to synchronize the variables.
     _lastSentVariableSyncData: VariableNetworkSyncData[] | undefined;
     // When we know that the variables have been updated, we can force sending them
-    // on the same tickrate as the object update for a number of times
+    // on the same syncRate as the object update for a number of times
     // to ensure they are received, without the need of an acknowledgment.
     _numberOfForcedVariablesUpdates: number = 0;
 
     // The last time the effects have been synchronized.
     _lastEffectsSyncTimestamp: number = 0;
     // The number of times per second the effects should be synchronized.
-    _effectsTickRate: number = 1;
+    _effectsSyncRate: number = 1;
     // The last data sent to synchronize the effects.
     _lastSentEffectSyncData:
       | { [effectName: string]: EffectNetworkSyncData }
       | undefined;
     // When we know that the effects have been updated, we can force sending them
-    // on the same tickrate as the object update for a number of times
+    // on the same syncRate as the object update for a number of times
     // to ensure they are received, without the need of an acknowledgment.
     _numberOfForcedEffectsUpdates: number = 0;
 
     // To avoid seeing too many logs.
     _lastLogTimestamp: number = 0;
-    _logTickRate: number = 1;
+    _logSyncRate: number = 1;
     // Clock to be incremented every time we send a message, to ensure they are ordered
     // and old messages are ignored.
     _clock: number = 0;
@@ -131,35 +129,35 @@ namespace gdjs {
     }
 
     private _hasObjectBeenSyncedWithinMaxRate() {
+      const objectMaxSyncRate = gdjs.multiplayer.getObjectsSynchronizationRate();
       return (
-        getTimeNow() - this._lastObjectSyncTimestamp <
-        1000 / this._objectMaxTickRate
+        getTimeNow() - this._lastObjectSyncTimestamp < 1000 / objectMaxSyncRate
       );
     }
 
     private _hasObjectBasicInfoBeenSyncedRecently() {
       return (
         getTimeNow() - this._lastBasicObjectSyncTimestamp <
-        1000 / this._objectBasicInfoTickRate
+        1000 / this._objectBasicInfoSyncRate
       );
     }
 
     private _haveVariablesBeenSyncedRecently() {
       return (
         getTimeNow() - this._lastVariablesSyncTimestamp <
-        1000 / this._variablesTickRate
+        1000 / this._variablesSyncRate
       );
     }
 
     private _haveEffectsBeenSyncedRecently() {
       return (
         getTimeNow() - this._lastEffectsSyncTimestamp <
-        1000 / this._effectsTickRate
+        1000 / this._effectsSyncRate
       );
     }
 
     // private _logToConsoleWithThrottle(message: string) {
-    //   if (getTimeNow() - this._lastLogTimestamp > 1000 / this._logTickRate) {
+    //   if (getTimeNow() - this._lastLogTimestamp > 1000 / this._logSyncRate) {
     //     logger.info(message);
     //     this._lastLogTimestamp = getTimeNow();
     //   }

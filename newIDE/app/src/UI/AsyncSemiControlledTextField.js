@@ -90,6 +90,11 @@ const AsyncSemiControlledTextField = ({
           cancel();
         }
       }}
+      onKeyDown={event => {
+        if (shouldCloseOrCancel(event)) {
+          event.stopPropagation();
+        }
+      }}
       endAdornment={
         <>
           <IconButton

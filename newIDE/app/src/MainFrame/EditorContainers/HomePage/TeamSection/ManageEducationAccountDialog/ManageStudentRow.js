@@ -48,9 +48,10 @@ const ManageStudentRow = ({
         setPasswordEditionError(
           <Trans>Password must be at least 8 characters long.</Trans>
         );
-        return;
+        throw new Error('Password validation error');
       }
       await onChangePassword({ userId: member.id, newPassword });
+      setIsEditingPassword(false);
     },
     [member.password, member.id, onChangePassword]
   );
@@ -69,11 +70,13 @@ const ManageStudentRow = ({
             checkedIcon={<CheckboxChecked />}
           />
           {member.username && (
-            <Text>
+            <Text allowSelection>
               <b>{member.username}</b>
             </Text>
           )}
-          <Text style={{ opacity: 0.7 }}>{member.email}</Text>
+          <Text style={{ opacity: 0.7 }} allowSelection>
+            {member.email}
+          </Text>
         </LineStackLayout>
       </Grid>
       <Grid item xs={7} style={{ display: 'flex', alignItems: 'center' }}>
@@ -81,6 +84,7 @@ const ManageStudentRow = ({
           <Line>
             <AsyncSemiControlledTextField
               margin="none"
+              autoFocus="desktop"
               value={member.password || ''}
               callback={onEditPassword}
               callbackErrorText={passwordEditionError}
@@ -90,7 +94,7 @@ const ManageStudentRow = ({
           </Line>
         ) : (
           <LineStackLayout alignItems="center">
-            <Text noMargin style={{ opacity: 0.7 }}>
+            <Text noMargin style={{ opacity: 0.7 }} allowSelection>
               {member.password || (
                 <i>
                   <Trans>Not stored</Trans>

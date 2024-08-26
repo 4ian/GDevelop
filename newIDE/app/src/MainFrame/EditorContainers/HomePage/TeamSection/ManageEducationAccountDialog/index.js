@@ -143,8 +143,9 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
         userId,
         newPassword,
       });
+      await onRefreshMembers()
     },
-    [getAuthorizationHeader, profile]
+    [getAuthorizationHeader, profile, onRefreshMembers]
   );
 
   const membersByGroupId = groupMembersByGroupId({
@@ -185,6 +186,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
         {admins &&
           admins.map(adminUser => (
             <UserLine
+              key={adminUser.id}
               username={adminUser.username}
               email={adminUser.email}
               level={null}
@@ -218,7 +220,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
           {groupsWithMembers.length > 0
             ? groupsWithMembers.map(({ group, members }) => {
                 return (
-                  <>
+                  <React.Fragment key={group ? group.id : 'lobby'}>
                     <Line noMargin>
                       <Text size="sub-title">
                         {group ? group.name : <Trans>Lobby</Trans>}
@@ -258,7 +260,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
                         })}
                       </GridList>
                     </Column>
-                  </>
+                  </React.Fragment>
                 );
               })
             : 'Hello'}

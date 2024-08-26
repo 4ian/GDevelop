@@ -1,6 +1,7 @@
 // @flow
 import { mapFor } from '../Utils/MapFor';
 import { type Schema } from '../PropertiesEditor';
+import { type Schema as CompactSchema } from '../CompactPropertiesEditor';
 import { type ResourceKind } from '../ResourcesList/ResourceSource';
 import flatten from 'lodash/flatten';
 
@@ -11,6 +12,7 @@ export type EnumeratedEffectMetadata = {|
   fullName: string,
   description: string,
   parametersSchema: Schema,
+  parametersCompactSchema: CompactSchema,
   isMarkedAsNotWorkingForObjects: boolean,
   isMarkedAsOnlyWorkingFor2D: boolean,
   isMarkedAsOnlyWorkingFor3D: boolean,
@@ -139,6 +141,8 @@ export const enumerateEffectsMetadata = (
             isMarkedAsOnlyWorkingFor2D: effectMetadata.isMarkedAsOnlyWorkingFor2D(),
             isMarkedAsOnlyWorkingFor3D: effectMetadata.isMarkedAsOnlyWorkingFor3D(),
             parametersSchema,
+            // TODO
+            parametersCompactSchema: parametersSchema,
           };
         });
     })

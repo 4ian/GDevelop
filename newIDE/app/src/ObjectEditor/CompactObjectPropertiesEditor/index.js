@@ -33,6 +33,14 @@ import Add from '../../UI/CustomSvgIcons/Add';
 import { useManageObjectBehaviors } from '../../BehaviorsEditor';
 import Object3d from '../../UI/CustomSvgIcons/Object3d';
 import Object2d from '../../UI/CustomSvgIcons/Object2d';
+import { CompactEffectPropertiesEditor } from '../../EffectsList/CompactEffectPropertiesEditor';
+import { mapFor } from '../../Utils/MapFor';
+import {
+  getEnumeratedEffectMetadata,
+  useManageEffects,
+} from '../../EffectsList';
+import CompactSelectField from '../../UI/CompactSelectField';
+import SelectOption from '../../UI/SelectOption';
 
 const gd: libGDevelop = global.gd;
 
@@ -136,6 +144,22 @@ export const CompactObjectPropertiesEditor = ({
     .map(behaviorName => object.getBehavior(behaviorName))
     .filter(behavior => !behavior.isDefaultBehavior());
 
+  const effectsContainer = object.getEffects();
+
+  const {
+    allEffectMetadata,
+    all2DEffectMetadata,
+    addEffect,
+    removeEffect,
+    chooseEffectType,
+  } = useManageEffects({
+    effectsContainer,
+    project,
+    onEffectsUpdated: forceUpdate,
+    onUpdate: forceUpdate,
+    target: 'object',
+  });
+
   return (
     <ErrorBoundary
       componentTitle={<Trans>Object properties</Trans>}
@@ -218,6 +242,7 @@ export const CompactObjectPropertiesEditor = ({
               const iconUrl = behaviorMetadata.getIconFilename();
 
               return (
+                // TODO: factor this paper container?
                 <Paper background="medium" key={behavior.getName()}>
                   <Line expand>
                     <ColumnStackLayout expand noOverflowParent>
@@ -328,22 +353,115 @@ export const CompactObjectPropertiesEditor = ({
           objectMetadata.hasDefaultBehavior(
             'EffectCapability::EffectBehavior'
           ) && (
-            <Column>
-              <Separator />
-              <Line alignItems="center" justifyContent="space-between">
-                <Text size="sub-title" noMargin>
-                  <Trans>Effects</Trans>
-                </Text>
-                <IconButton
-                  size="small"
-                  onClick={() => {
-                    onEditObject(object, 'effects');
-                  }}
-                >
-                  <ShareExternal style={styles.icon} />
-                </IconButton>
-              </Line>
-            </Column>
+            <>
+              <Column>
+                <Separator />
+                <Line alignItems="center" justifyContent="space-between">
+                  <Text size="sub-title" noMargin>
+                    <Trans>Effects</Trans>
+                  </Text>
+                  <Line alignItems="center">
+                    <IconButton
+                      size="small"
+                      onClick={() => {
+                        onEditObject(object, 'effects');
+                      }}
+                    >
+                      <ShareExternal style={styles.icon} />
+                    </IconButton>
+                    <IconButton size="small" onClick={() => addEffect(false)}>
+                      <Add style={styles.icon} />
+                    </IconButton>
+                  </Line>
+                </Line>
+              </Column>
+              <ColumnStackLayout>
+                {mapFor(
+                  0,
+                  effectsContainer.getEffectsCount(),
+                  (index: number) => {
+                    const effect: gdEffect = effectsContainer.getEffectAt(
+                      index
+                    );
+                    const effectType = effect.getEffectType();
+                    const effectMetadata = getEnumeratedEffectMetadata(
+                      allEffectMetadata,
+                      effectType
+                    );
+
+                    return (
+                      // TODO: factor this paper container?
+                      <Paper background="medium" key={effect.getName()}>
+                        <Line expand>
+                          <ColumnStackLayout expand noOverflowParent>
+                            <LineStackLayout
+                              noMargin
+                              justifyContent="space-between"
+                            >
+                              <Line noMargin alignItems="center">
+                                <IconButton
+                                  onClick={() => {
+                                    // TODO
+                                    // effect.setFolded(!effect.isFolded());
+                                    forceUpdate();
+                                  }}
+                                  size="small"
+                                >
+                                  {/*effect.isFolded()*/ true ? (
+                                    <ChevronArrowRight style={styles.icon} />
+                                  ) : (
+                                    <ChevronArrowBottom style={styles.icon} />
+                                  )}
+                                </IconButton>
+                                <Spacer />
+                                <Text noMargin size="body">
+                                  {effect.getName()}
+                                </Text>
+                              </Line>
+
+                              <IconButton
+                                tooltip={t`Remove effect`}
+                                onClick={() => {
+                                  removeEffect(effect);
+                                }}
+                                size="small"
+                              >
+                                <Remove style={styles.icon} />
+                              </IconButton>
+                            </LineStackLayout>
+                            <CompactSelectField
+                              value={effectType}
+                              onChange={type => chooseEffectType(effect, type)}
+                            >
+                              {all2DEffectMetadata.map(effectMetadata => (
+                                <SelectOption
+                                  key={effectMetadata.type}
+                                  value={effectMetadata.type}
+                                  label={effectMetadata.fullName}
+                                  disabled={
+                                    effectMetadata.isMarkedAsNotWorkingForObjects
+                                  }
+                                />
+                              ))}
+                            </CompactSelectField>
+                            {/*!effect.isFolded()*/ true && (
+                              <CompactEffectPropertiesEditor
+                                project={project}
+                                effect={effect}
+                                effectMetadata={effectMetadata}
+                                resourceManagementProps={
+                                  resourceManagementProps
+                                }
+                              />
+                            )}
+                          </ColumnStackLayout>
+                        </Line>
+                      </Paper>
+                    );
+                  }
+                )}
+              </ColumnStackLayout>
+            </>
           )}
       </ScrollView>
       {newBehaviorDialog}

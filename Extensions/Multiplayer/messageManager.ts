@@ -145,7 +145,7 @@ namespace gdjs {
     } = {};
 
     // The number of times per second the scene data should be synchronized.
-    const sceneSyncDataTickRate = 1;
+    const sceneSyncDataSyncRate = 1;
     let lastSceneSyncTimestamp = 0;
     let lastSentSceneSyncData: LayoutNetworkSyncData | null = null;
     let numberOfForcedSceneUpdates = 0;
@@ -154,7 +154,7 @@ namespace gdjs {
     >();
 
     // The number of times per second the game data should be synchronized.
-    const gameSyncDataTickRate = 1;
+    const gameSyncDataSyncRate = 1;
     let lastGameSyncTimestamp = 0;
     let lastSentGameSyncData: GameNetworkSyncData | null = null;
     let numberOfForcedGameUpdates = 0;
@@ -164,7 +164,7 @@ namespace gdjs {
 
     // Send heartbeat messages from host to players, ensuring their connection is still alive,
     // measure the ping, and send other useful info.
-    const heartbeatTickRate = 1;
+    const heartbeatSyncRate = 1;
     let lastHeartbeatTimestamp = 0;
     let _playersLastRoundTripTimes: {
       [playerNumber: number]: number[];
@@ -1650,7 +1650,7 @@ namespace gdjs {
 
     const hasSceneBeenSyncedRecently = () => {
       return (
-        getTimeNow() - lastSceneSyncTimestamp < 1000 / sceneSyncDataTickRate
+        getTimeNow() - lastSceneSyncTimestamp < 1000 / sceneSyncDataSyncRate
       );
     };
 
@@ -1814,7 +1814,7 @@ namespace gdjs {
     };
 
     const hasGameBeenSyncedRecently = () => {
-      return getTimeNow() - lastGameSyncTimestamp < 1000 / gameSyncDataTickRate;
+      return getTimeNow() - lastGameSyncTimestamp < 1000 / gameSyncDataSyncRate;
     };
 
     const handleUpdateGameMessagesToSend = (
@@ -1977,7 +1977,7 @@ namespace gdjs {
     const hasSentHeartbeatRecently = () => {
       return (
         !!lastHeartbeatTimestamp &&
-        getTimeNow() - lastHeartbeatTimestamp < 1000 / heartbeatTickRate
+        getTimeNow() - lastHeartbeatTimestamp < 1000 / heartbeatSyncRate
       );
     };
     const handleHeartbeatsToSend = () => {

@@ -370,6 +370,36 @@ module.exports = {
       );
 
     extension
+      .addExpressionAndConditionAndAction(
+        'number',
+        'ObjectsSynchronizationRate',
+        _('Objects synchronization rate'),
+        _(
+          'objects synchronization rate (between 1 and 60, default is 30 times per second)'
+        ),
+        _('objects synchronization rate'),
+        _('Advanced'),
+        'JsPlatform/Extensions/multiplayer.svg'
+      )
+      .useStandardParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(_('Sync rate'))
+      )
+      .setIncludeFile('Extensions/Multiplayer/peer.js')
+      .addIncludeFile('Extensions/Multiplayer/peerJsHelper.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
+      .setFunctionName('gdjs.multiplayer.setObjectsSynchronizationRate')
+      .setGetter('gdjs.multiplayer.getObjectsSynchronizationRate');
+
+    extension
       .addCondition(
         'IsPlayerHost',
         _('Player is host'),

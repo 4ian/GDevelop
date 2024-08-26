@@ -395,12 +395,16 @@ describe('Multiplayer', () => {
     gdjs.multiplayer.disableMultiplayerForTesting = false;
     gdjs.multiplayer._isLobbyGameRunning = true;
     gdjs.multiplayer._isReadyToSendOrReceiveGameUpdateMessages = true;
+    // Sync as fast as possible for tests.
+    gdjs.multiplayer._objectMaxSyncRate = Infinity;
   });
   afterEach(() => {
     gdjs.multiplayerPeerJsHelper = _originalP2pIfAny;
     gdjs.multiplayer.disableMultiplayerForTesting = true;
     gdjs.multiplayer._isLobbyGameRunning = false;
     gdjs.multiplayer._isReadyToSendOrReceiveGameUpdateMessages = false;
+    gdjs.multiplayer._objectMaxSyncRate =
+      gdjs.multiplayer.DEFAULT_OBJECT_MAX_SYNC_RATE;
   });
 
   describe('Single scene tests', () => {
@@ -1081,13 +1085,11 @@ describe('Multiplayer', () => {
 
         const {
           object: p1SpriteObject,
-          behavior: p1SpriteObjectBehavior,
         } = getObjectAndMultiplayerBehaviorsFromScene(
           p1RuntimeScene,
           'MySpriteObject'
         )[0];
 
-        p1SpriteObjectBehavior._objectMaxTickRate = Infinity;
         p1SpriteObject.setX(242);
         p1SpriteObject.setY(243);
         p1RuntimeScene.renderAndStep(1000 / 60);
@@ -1237,13 +1239,11 @@ describe('Multiplayer', () => {
 
         const {
           object: p2SpriteObject,
-          behavior: p2SpriteObjectBehavior,
         } = getObjectAndMultiplayerBehaviorsFromScene(
           p2RuntimeScene,
           'MySpriteObject'
         )[0];
 
-        p2SpriteObjectBehavior._objectMaxTickRate = Infinity;
         p2SpriteObject.setX(242);
         p2SpriteObject.setY(243);
         p2RuntimeScene.renderAndStep(1000 / 60);
@@ -2140,12 +2140,10 @@ describe('Multiplayer', () => {
 
         const {
           object: p2SpriteObject,
-          behavior: p2SpriteMultiplayerObjectBehavior,
         } = getObjectAndMultiplayerBehaviorsFromScene(
           p2RuntimeScene,
           'MySpriteObject'
         )[0];
-        p2SpriteMultiplayerObjectBehavior._objectMaxTickRate = Infinity;
         p2SpriteObject.setX(242);
         p2SpriteObject.setY(243);
         p2RuntimeScene.renderAndStep(1000 / 60);

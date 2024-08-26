@@ -27,6 +27,10 @@ namespace gdjs {
     const DEFAULT_LOBBY_HEARTBEAT_INTERVAL = 30000;
     const DEFAULT_COUNTDOWN_SECONDS_TO_START = 5;
 
+    export const DEFAULT_OBJECT_MAX_SYNC_RATE = 30;
+    // The number of times per second an object should be synchronized if it keeps changing.
+    export let _objectMaxSyncRate = DEFAULT_OBJECT_MAX_SYNC_RATE;
+
     // Save if we are on dev environment so we don't need to use the runtimeGame every time.
     let isUsingGDevelopDevelopmentEnvironment = false;
 
@@ -160,6 +164,19 @@ namespace gdjs {
 
       return url.toString();
     };
+
+    export const setObjectsSynchronizationRate = (rate: number) => {
+      if (rate < 1 || rate > 60) {
+        logger.warn(
+          `Invalid rate ${rate} for object synchronization. Defaulting to ${DEFAULT_OBJECT_MAX_SYNC_RATE}.`
+        );
+        _objectMaxSyncRate = DEFAULT_OBJECT_MAX_SYNC_RATE;
+      } else {
+        _objectMaxSyncRate = rate;
+      }
+    };
+
+    export const getObjectsSynchronizationRate = () => _objectMaxSyncRate;
 
     /**
      * Returns true if the game has just started,

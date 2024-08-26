@@ -1,7 +1,7 @@
 // @flow
 
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import Grid from '@material-ui/core/Grid';
 import { type User } from '../../../../../Utils/GDevelopServices/User';
 import Text from '../../../../../UI/Text';
@@ -101,7 +101,11 @@ const ManageStudentRow = ({
                 </i>
               )}
             </Text>
-            <IconButton size="small" onClick={() => setIsEditingPassword(true)}>
+            <IconButton
+              size="small"
+              onClick={() => setIsEditingPassword(true)}
+              tooltip={t`Define custom password`}
+            >
               <Key fontSize="small" />
             </IconButton>
           </LineStackLayout>

@@ -93,7 +93,7 @@ const initialMembers: Array<User> = [
   {
     id: 'user8',
     email: 'user8@mail.com',
-    username: 'Browser',
+    username: 'Bowser',
     deactivatedAt: 1355209080,
   },
 ];

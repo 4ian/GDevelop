@@ -1,10 +1,11 @@
 // @flow
 
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import Grid from '@material-ui/core/Grid';
 import GridList from '@material-ui/core/GridList';
 import Divider from '@material-ui/core/Divider';
+import Collapse from '@material-ui/core/Collapse';
 import TeamContext from '../../../../../Profile/Team/TeamContext';
 import Dialog, { DialogPrimaryButton } from '../../../../../UI/Dialog';
 import Text from '../../../../../UI/Text';
@@ -21,19 +22,24 @@ import Add from '../../../../../UI/CustomSvgIcons/Add';
 import { groupMembersByGroupId, sortGroupsWithMembers } from '../Utils';
 import { Column, Line } from '../../../../../UI/Grid';
 import ManageStudentRow from './ManageStudentRow';
-import { changeTeamMemberPassword } from '../../../../../Utils/GDevelopServices/User';
+import {
+  activateTeamMembers,
+  changeTeamMemberPassword,
+} from '../../../../../Utils/GDevelopServices/User';
 import AlertMessage from '../../../../../UI/AlertMessage';
 import Link from '../../../../../UI/Link';
 import TeamAvailableSeats from '../TeamAvailableSeats';
 import { copyTextToClipboard } from '../../../../../Utils/Clipboard';
-import Collapse from '@material-ui/core/Collapse';
-import { IconButton } from '@material-ui/core';
 import ChevronArrowTop from '../../../../../UI/CustomSvgIcons/ChevronArrowTop';
 import ChevronArrowBottom from '../../../../../UI/CustomSvgIcons/ChevronArrowBottom';
 import Paper from '../../../../../UI/Paper';
 import Checkbox from '../../../../../UI/Checkbox';
 import CheckboxUnchecked from '../../../../../UI/CustomSvgIcons/CheckboxUnchecked';
 import CheckboxChecked from '../../../../../UI/CustomSvgIcons/CheckboxChecked';
+import Archive from '../../../../../UI/CustomSvgIcons/Archive';
+import Recycle from '../../../../../UI/CustomSvgIcons/Recycle';
+import IconButton from '../../../../../UI/IconButton';
+import { extractGDevelopApiErrorStatusAndCode } from '../../../../../Utils/GDevelopServices/Errors';
 
 const styles = {
   selectedMembersControlsContainer: {
@@ -134,6 +140,9 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
     AuthenticatedUserContext
   );
   const [selectedUserIds, setSelectedUserIds] = React.useState<string[]>([]);
+  const [batchControlError, setBatchControlError] = React.useState<React.Node>(
+    null
+  );
   const [
     addTeacherDialogOpen,
     setAddTeacherDialogOpen,
@@ -192,6 +201,69 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
     [selectedUserIds, members]
   );
 
+  const onActivateMembers = React.useCallback(
+    async (activate: boolean) => {
+      if (!profile || !team || selectedUserIds.length === 0) return;
+      setBatchControlError(null);
+
+      try {
+        await activateTeamMembers(getAuthorizationHeader, {
+          adminUserId: profile.id,
+          userIds: selectedUserIds,
+          teamId: team.id,
+          activate,
+        });
+        await onRefreshMembers();
+      } catch (error) {
+        const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+          error
+        );
+        let errorMessage: React.Node = null;
+        if (extractedStatusAndCode) {
+          if (extractedStatusAndCode.code === 'user-activation/team-full') {
+            errorMessage = (
+              <Trans>
+                You don't have enough available seats to restore those accounts.
+              </Trans>
+            );
+          } else if (
+            extractedStatusAndCode.code ===
+            'user-activation/user-deactivated-recently'
+          ) {
+            // TODO: Read delay in response.
+            errorMessage = (
+              <Trans>
+                You have to wait 15 days before you can reactivate an archived
+                account.
+              </Trans>
+            );
+          } else if (
+            extractedStatusAndCode.code ===
+            'user-activation/member-outside-of-team'
+          ) {
+            errorMessage = (
+              <Trans>
+                You don't have enough rights to manage those accounts.
+              </Trans>
+            );
+          }
+        }
+        if (!errorMessage) {
+          errorMessage = (
+            <>
+              <Trans>An unknown error happened.</Trans>{' '}
+              <Trans>
+                Please check your internet connection or try again later.
+              </Trans>
+            </>
+          );
+        }
+        setBatchControlError(errorMessage);
+      }
+    },
+    [getAuthorizationHeader, profile, onRefreshMembers, team, selectedUserIds]
+  );
+
   const groupedMembers = groupMembersByGroupId({
     groups,
     members,
@@ -224,6 +296,15 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
   const areAllActiveUsersSelected = members
     .filter(member => !member.deactivatedAt)
     .every(member => selectedUserIds.includes(member.id));
+  const selectedMembers = members.filter(member =>
+    selectedUserIds.includes(member.id)
+  );
+  const isAtLeastOneSelectedUserActive = selectedMembers.some(
+    member => !member.deactivatedAt
+  );
+  const isAtLeastOneSelectedUserArchived = selectedMembers.some(
+    member => !!member.deactivatedAt
+  );
 
   return (
     <>
@@ -302,30 +383,59 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
             style={styles.selectedMembersControlsContainer}
             background="light"
           >
-            <Line justifyContent="space-between" noMargin alignItems="center">
-              <LineStackLayout alignItems="center" noMargin>
-                <Checkbox
-                  style={{ margin: 0 }}
-                  checked={areAllActiveUsersSelected}
-                  onCheck={(e, checked) => {
-                    if (checked) {
-                      setSelectedUserIds(
-                        members
-                          .filter(member => !member.deactivatedAt)
-                          .map(member => member.id)
-                      );
-                    } else {
-                      setSelectedUserIds([]);
+            <ColumnStackLayout noMargin>
+              <Line justifyContent="space-between" noMargin alignItems="center">
+                <LineStackLayout alignItems="center" noMargin>
+                  <Checkbox
+                    style={{ margin: 0 }}
+                    checked={areAllActiveUsersSelected}
+                    onCheck={(e, checked) => {
+                      if (checked) {
+                        setSelectedUserIds(
+                          members
+                            .filter(member => !member.deactivatedAt)
+                            .map(member => member.id)
+                        );
+                      } else {
+                        setSelectedUserIds([]);
+                      }
+                    }}
+                    uncheckedIcon={<CheckboxUnchecked />}
+                    checkedIcon={<CheckboxChecked />}
+                  />
+                  <Text noMargin>
+                    <Trans>Select all active</Trans>
+                  </Text>
+                </LineStackLayout>
+                <LineStackLayout noMargin alignItems="center">
+                  <IconButton
+                    size="small"
+                    tooltip={t`Archive accounts`}
+                    disabled={
+                      selectedUserIds.length === 0 ||
+                      isAtLeastOneSelectedUserArchived
                     }
-                  }}
-                  uncheckedIcon={<CheckboxUnchecked />}
-                  checkedIcon={<CheckboxChecked />}
-                />
-                <Text noMargin>
-                  <Trans>Select all active</Trans>
-                </Text>
-              </LineStackLayout>
-            </Line>
+                    onClick={() => onActivateMembers(false)}
+                  >
+                    <Archive />
+                  </IconButton>
+                  <IconButton
+                    size="small"
+                    tooltip={t`Restore accounts`}
+                    disabled={
+                      selectedUserIds.length === 0 ||
+                      isAtLeastOneSelectedUserActive
+                    }
+                    onClick={() => onActivateMembers(true)}
+                  >
+                    <Recycle />
+                  </IconButton>
+                </LineStackLayout>
+              </Line>
+              {batchControlError && (
+                <AlertMessage kind="error">{batchControlError}</AlertMessage>
+              )}
+            </ColumnStackLayout>
           </Paper>
           <Column>
             <GridList cols={2} cellHeight={'auto'}>

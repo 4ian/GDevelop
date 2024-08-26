@@ -378,11 +378,11 @@ export const changeTeamMemberPassword = async (
     userId,
     adminUserId,
     newPassword,
-  }: {
+  }: {|
     userId: string,
     adminUserId: string,
     newPassword: string,
-  }
+  |}
 ) => {
   const authorizationHeader = await getAuthorizationHeader();
   await client.post(
@@ -394,6 +394,35 @@ export const changeTeamMemberPassword = async (
     {
       headers: { Authorization: authorizationHeader },
       params: { userId: adminUserId },
+    }
+  );
+};
+
+export const activateTeamMembers = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userIds,
+    teamId,
+    adminUserId,
+    activate,
+  }: {|
+    userIds: string[],
+    teamId: string,
+    adminUserId: string,
+    activate: boolean,
+  |}
+) => {
+  const authorizationHeader = await getAuthorizationHeader();
+  await client.post(
+    `/user/action/activate-users`,
+    {
+      userIds,
+      teamId,
+      activate,
+    },
+    {
+      params: { userId: adminUserId },
+      headers: { Authorization: authorizationHeader },
     }
   );
 };

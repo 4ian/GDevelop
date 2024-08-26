@@ -394,16 +394,15 @@ module.exports = {
         return true;
       }
 
-      if (propertyName === 'scaleX') {
+      if (propertyName === 'worldScale') {
         const newValueAsNumber = parseInt(newValue, 10);
         if (newValueAsNumber !== newValueAsNumber) return false;
+        if (!sharedContent.hasChild('worldScale')) {
+          sharedContent.addChild('worldScale');
+        }
+        sharedContent.getChild('worldScale').setDoubleValue(newValueAsNumber);
+        // Set deprecated properties for compatibility with 5.4.209-
         sharedContent.getChild('scaleX').setDoubleValue(newValueAsNumber);
-        return true;
-      }
-
-      if (propertyName === 'scaleY') {
-        const newValueAsNumber = parseInt(newValue, 10);
-        if (newValueAsNumber !== newValueAsNumber) return false;
         sharedContent.getChild('scaleY').setDoubleValue(newValueAsNumber);
         return true;
       }
@@ -427,16 +426,22 @@ module.exports = {
         )
         .setType('Number')
         .setMeasurementUnit(gd.MeasurementUnit.getNewton());
+
+      if (!sharedContent.hasChild('worldScale')) {
+        sharedContent.addChild('worldScale');
+        sharedContent
+          .getChild('worldScale')
+          .setDoubleValue(
+            Math.sqrt(
+              sharedContent.getChild('scaleX').getDoubleValue() *
+                sharedContent.getChild('scaleY').getDoubleValue()
+            )
+          );
+      }
       sharedProperties
-        .getOrCreate('scaleX')
+        .getOrCreate('worldScale')
         .setValue(
-          sharedContent.getChild('scaleX').getDoubleValue().toString(10)
-        )
-        .setType('Number');
-      sharedProperties
-        .getOrCreate('scaleY')
-        .setValue(
-          sharedContent.getChild('scaleY').getDoubleValue().toString(10)
+          sharedContent.getChild('worldScale').getDoubleValue().toString(10)
         )
         .setType('Number');
 
@@ -445,6 +450,8 @@ module.exports = {
     sharedData.initializeContent = function (behaviorContent) {
       behaviorContent.addChild('gravityX').setDoubleValue(0);
       behaviorContent.addChild('gravityY').setDoubleValue(9.8);
+      behaviorContent.addChild('worldScale').setDoubleValue(100);
+      // Set deprecated properties for compatibility with 5.4.209-
       behaviorContent.addChild('scaleX').setDoubleValue(100);
       behaviorContent.addChild('scaleY').setDoubleValue(100);
     };
@@ -472,6 +479,19 @@ module.exports = {
       );
 
     // Global
+    aut
+      .addExpression(
+        'WorldScale',
+        _('World scale'),
+        _('Return the world scale.'),
+        _('Global'),
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
+      .getCodeExtraInformation()
+      .setFunctionName('getWorldScale');
+
     aut
       .addCondition(
         'GravityX',
@@ -1757,7 +1777,7 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('expression', _('Angular impulse (N·m·s'))
+      .addParameter('expression', _('Angular impulse (N·m·s)'))
       .setParameterLongDescription(
         _(
           'An impulse is like a rotation speed addition but depends on the mass.'
@@ -1784,7 +1804,7 @@ module.exports = {
         'Inertia',
         _('Inertia'),
         _(
-          'Return the rotational inertia of the object (in kilograms * meters * meters)'
+          'Return the rotational inertia of the object (in kilograms · meters²)'
         ),
         '',
         'res/physics32.png'

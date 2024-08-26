@@ -22,6 +22,61 @@ namespace gdjs {
       ? window.performance.now.bind(window.performance)
       : Date.now;
 
+  const fetchAsPlayer = async ({
+    relativeUrl,
+    method,
+    body,
+    dev,
+  }: {
+    relativeUrl: string;
+    method: 'GET' | 'POST';
+    body?: string;
+    dev: boolean;
+  }) => {
+    const playerId = gdjs.playerAuthentication.getUserId();
+    const playerToken = gdjs.playerAuthentication.getUserToken();
+    if (!playerId || !playerToken) {
+      logger.warn('Cannot fetch as a player if the player is not connected.');
+      throw new Error(
+        'Cannot fetch as a player if the player is not connected.'
+      );
+    }
+
+    const rootApi = dev
+      ? 'https://api-dev.gdevelop.io'
+      : 'https://api.gdevelop.io';
+    const url = new URL(`${rootApi}${relativeUrl}`);
+    url.searchParams.set('playerId', playerId);
+    const formattedUrl = url.toString();
+
+    const headers = {
+      'Content-Type': 'application/json',
+      Authorization: `player-game-token ${playerToken}`,
+    };
+    const response = await fetch(formattedUrl, {
+      method,
+      headers,
+      body,
+    });
+    if (!response.ok) {
+      throw new Error(
+        `Error while fetching as a player: ${response.status} ${response.statusText}`
+      );
+    }
+
+    // Response can either be 'OK' or a JSON object. Get the content before trying to parse it.
+    const responseText = await response.text();
+    if (responseText === 'OK') {
+      return;
+    }
+
+    try {
+      return JSON.parse(responseText);
+    } catch (error) {
+      throw new Error(`Error while parsing the response: ${error}`);
+    }
+  };
+
   export namespace multiplayer {
     /** Set to true in testing to avoid relying on the multiplayer extension. */
     export let disableMultiplayerForTesting = false;
@@ -534,9 +589,9 @@ namespace gdjs {
         }
       };
       _websocket.onclose = () => {
-        logger.info(
-          'Disconnected from the lobby. Either manually or game started.'
-        );
+        if (!_isLobbyGameRunning) {
+          logger.info('Disconnected from the lobby.');
+        }
 
         _connectionId = null;
         _websocket = null;
@@ -733,43 +788,34 @@ namespace gdjs {
 
     const sendHeartbeatToBackend = async function () {
       const gameId = gdjs.projectData.properties.projectUuid;
-      const playerId = gdjs.playerAuthentication.getUserId();
-      const playerToken = gdjs.playerAuthentication.getUserToken();
-
-      if (!gameId || !playerId || !playerToken || !_lobbyId) {
+      if (!gameId || !_lobbyId) {
         logger.error(
-          'Cannot keep the lobby playing without the game ID or player ID.'
+          'Cannot keep the lobby playing without the game ID or lobby ID.'
         );
         return;
       }
 
-      const rootApi = isUsingGDevelopDevelopmentEnvironment
-        ? 'https://api-dev.gdevelop.io'
-        : 'https://api.gdevelop.io';
-      const headers = {
-        'Content-Type': 'application/json',
-      };
-      let heartbeatUrl = `${rootApi}/play/game/${gameId}/public-lobby/${_lobbyId}/action/heartbeat`;
-      headers['Authorization'] = `player-game-token ${playerToken}`;
-      heartbeatUrl += `?playerId=${playerId}`;
+      const heartbeatRelativeUrl = `/play/game/${gameId}/public-lobby/${_lobbyId}/action/heartbeat`;
       const players = gdjs.multiplayerMessageManager.getConnectedPlayers();
       try {
-        await fetch(heartbeatUrl, {
+        await fetchAsPlayer({
+          relativeUrl: heartbeatRelativeUrl,
           method: 'POST',
-          headers,
           body: JSON.stringify({
             players,
           }),
+          dev: isUsingGDevelopDevelopmentEnvironment,
         });
       } catch (error) {
         logger.error('Error while sending heartbeat, retrying:', error);
         try {
-          await fetch(heartbeatUrl, {
+          await fetchAsPlayer({
+            relativeUrl: heartbeatRelativeUrl,
             method: 'POST',
-            headers,
             body: JSON.stringify({
               players,
             }),
+            dev: isUsingGDevelopDevelopmentEnvironment,
           });
         } catch (error) {
           logger.error(
@@ -1025,41 +1071,18 @@ namespace gdjs {
 
       // Refresh the request to get the latest information.
       try {
-        const playerId = gdjs.playerAuthentication.getUserId();
-        const playerToken = gdjs.playerAuthentication.getUserToken();
+        const changeHostRelativeUrl = `/play/game/${
+          _lobbyChangeHostRequest.gameId
+        }/public-lobby/${
+          _lobbyChangeHostRequest.lobbyId
+        }/lobby-change-host-request?peerId=${gdjs.multiplayerPeerJsHelper.getCurrentId()}`;
 
-        if (!playerId || !playerToken) {
-          logger.error(
-            'Cannot refresh the lobby host change request without the player auth info.'
-          );
-          return;
-        }
-
-        const rootApi = isUsingGDevelopDevelopmentEnvironment
-          ? 'https://api-dev.gdevelop.io'
-          : 'https://api.gdevelop.io';
-        const headers = {
-          'Content-Type': 'application/json',
-        };
-        let changeHostUrl = `${rootApi}/play/game/${_lobbyChangeHostRequest.gameId}/public-lobby/${_lobbyChangeHostRequest.lobbyId}/lobby-change-host-request`;
-        headers['Authorization'] = `player-game-token ${playerToken}`;
-        changeHostUrl += `?playerId=${playerId}&peerId=${gdjs.multiplayerPeerJsHelper.getCurrentId()}`;
-        const response = await fetch(changeHostUrl, {
+        const lobbyChangeHostRequest = await fetchAsPlayer({
+          relativeUrl: changeHostRelativeUrl,
           method: 'GET',
-          headers,
+          dev: isUsingGDevelopDevelopmentEnvironment,
         });
-
-        if (!response.ok) {
-          throw new Error(
-            `Failed to retrieve the lobby change host request: ${response.status} ${response.statusText}`
-          );
-        }
-
-        const lobbyChangeHostRequest = await response.json();
         _lobbyChangeHostRequest = lobbyChangeHostRequest;
-        if (!_lobbyChangeHostRequest) {
-          throw new Error('No lobby change host request received.');
-        }
       } catch (error) {
         logger.error(
           'Error while trying to retrieve the lobby change host request:',
@@ -1068,6 +1091,10 @@ namespace gdjs {
         handleLobbyGameEnded();
         clearChangeHostRequestData(runtimeScene);
         return;
+      }
+
+      if (!_lobbyChangeHostRequest) {
+        throw new Error('No lobby change host request received.');
       }
 
       const newHostPeerId = _lobbyChangeHostRequest.newHostPeerId;
@@ -1241,31 +1268,21 @@ namespace gdjs {
       }
 
       const gameId = gdjs.projectData.properties.projectUuid;
-      const playerId = gdjs.playerAuthentication.getUserId();
-      const playerToken = gdjs.playerAuthentication.getUserToken();
 
-      if (!gameId || !playerId || !playerToken || !_lobbyId) {
+      if (!gameId || !_lobbyId) {
         logger.error(
-          'Cannot ask for a host change without the game ID or player ID.'
+          'Cannot ask for a host change without the game ID or lobby ID.'
         );
         return;
       }
 
-      const rootApi = isUsingGDevelopDevelopmentEnvironment
-        ? 'https://api-dev.gdevelop.io'
-        : 'https://api.gdevelop.io';
-      const headers = {
-        'Content-Type': 'application/json',
-      };
-      let changeHostUrl = `${rootApi}/play/game/${gameId}/public-lobby/${_lobbyId}/lobby-change-host-request`;
-      headers['Authorization'] = `player-game-token ${playerToken}`;
-      changeHostUrl += `?playerId=${playerId}`;
       try {
         _isChangingHost = true;
         gdjs.multiplayerComponents.displayHostMigrationNotification(
           runtimeScene
         );
 
+        const changeHostRelativeUrl = `/play/game/${gameId}/public-lobby/${_lobbyId}/lobby-change-host-request`;
         const playersInfo = gdjs.multiplayerMessageManager.getPlayersInfo();
         const playersInfoForHostChange = Object.keys(playersInfo).map(
           (playerNumber) => {
@@ -1276,22 +1293,17 @@ namespace gdjs {
             };
           }
         );
-        const response = await fetch(changeHostUrl, {
+        const body = JSON.stringify({
+          playersInfo: playersInfoForHostChange,
+          peerId: gdjs.multiplayerPeerJsHelper.getCurrentId(),
+        });
+        const lobbyChangeHostRequest = await fetchAsPlayer({
+          relativeUrl: changeHostRelativeUrl,
           method: 'POST',
-          headers,
-          body: JSON.stringify({
-            playersInfo: playersInfoForHostChange,
-            peerId: gdjs.multiplayerPeerJsHelper.getCurrentId(),
-          }),
+          body,
+          dev: isUsingGDevelopDevelopmentEnvironment,
         });
 
-        if (!response.ok) {
-          throw new Error(
-            `Failed to ask for a host change: ${response.status} ${response.statusText}`
-          );
-        }
-
-        const lobbyChangeHostRequest = await response.json();
         _lobbyChangeHostRequest = lobbyChangeHostRequest;
         _lobbyChangeHostRequestInitiatedAt = getTimeNow();
 
@@ -1327,28 +1339,18 @@ namespace gdjs {
 
       // Also call backend to end the game.
       const gameId = gdjs.projectData.properties.projectUuid;
-      const playerId = gdjs.playerAuthentication.getUserId();
-      const playerToken = gdjs.playerAuthentication.getUserToken();
-
-      if (!gameId || !playerId || !playerToken || !_lobbyId) {
-        logger.error('Cannot end the lobby without the game ID or player ID.');
+      if (!gameId || !_lobbyId) {
+        logger.error('Cannot end the lobby without the game ID or lobby ID.');
         return;
       }
 
-      const rootApi = isUsingGDevelopDevelopmentEnvironment
-        ? 'https://api-dev.gdevelop.io'
-        : 'https://api.gdevelop.io';
-      const headers = {
-        'Content-Type': 'application/json',
-      };
-      let endGameUrl = `${rootApi}/play/game/${gameId}/public-lobby/${_lobbyId}/action/end`;
-      headers['Authorization'] = `player-game-token ${playerToken}`;
-      endGameUrl += `?playerId=${playerId}`;
+      const endGameRelativeUrl = `/play/game/${gameId}/public-lobby/${_lobbyId}/action/end`;
       try {
-        await fetch(endGameUrl, {
+        await fetchAsPlayer({
+          relativeUrl: endGameRelativeUrl,
           method: 'POST',
-          headers,
           body: JSON.stringify({}),
+          dev: isUsingGDevelopDevelopmentEnvironment,
         });
       } catch (error) {
         logger.error('Error while ending the game:', error);

@@ -13,7 +13,7 @@ import UserLine from '../../../../../UI/User/UserLine';
 import FlatButton from '../../../../../UI/FlatButton';
 import LeftLoader from '../../../../../UI/LeftLoader';
 import Form from '../../../../../UI/Form';
-import { ColumnStackLayout } from '../../../../../UI/Layout';
+import { ColumnStackLayout, LineStackLayout } from '../../../../../UI/Layout';
 import TextField from '../../../../../UI/TextField';
 import { emailRegex } from '../../../../../Utils/EmailUtils';
 import RaisedButton from '../../../../../UI/RaisedButton';
@@ -24,6 +24,8 @@ import ManageStudentRow from './ManageStudentRow';
 import { changeTeamMemberPassword } from '../../../../../Utils/GDevelopServices/User';
 import AlertMessage from '../../../../../UI/AlertMessage';
 import Link from '../../../../../UI/Link';
+import TeamAvailableSeats from '../TeamAvailableSeats';
+import { copyTextToClipboard } from '../../../../../Utils/Clipboard';
 
 type AddTeacherError =
   | 'no-seats-available'
@@ -150,6 +152,28 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
     [getAuthorizationHeader, profile, onRefreshMembers]
   );
 
+  const onCopyActiveCredentials = React.useCallback(
+    () => {
+      if (!members) return;
+      let content = 'Username,Email,Password';
+      let membersToConsider = [];
+      if (selectedUserIds.length === 0) {
+        membersToConsider = members;
+      } else {
+        membersToConsider = members.filter(member =>
+          selectedUserIds.includes(member.id)
+        );
+      }
+      membersToConsider.forEach(member => {
+        content += `\n${member.username || ''},${
+          member.email
+        },${member.password || ''}`;
+      });
+      copyTextToClipboard(content);
+    },
+    [selectedUserIds, members]
+  );
+
   const membersByGroupId = groupMembersByGroupId({
     groups,
     members,
@@ -222,9 +246,27 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
             />
           </Line>
           <Divider />
-          <Text size="sub-title" noMargin>
-            <Trans>Student accounts</Trans>
-          </Text>
+          <LineStackLayout
+            noMargin
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Text size="sub-title" noMargin>
+              <Trans>Student accounts</Trans>
+            </Text>
+            <LineStackLayout noMargin alignItems="center">
+              <TeamAvailableSeats
+                team={team}
+                members={members}
+                admins={admins}
+              />
+              <RaisedButton
+                primary
+                label={<Trans>Copy active credentials</Trans>}
+                onClick={onCopyActiveCredentials}
+              />
+            </LineStackLayout>
+          </LineStackLayout>
           <Column>
             <GridList cols={2} cellHeight={'auto'}>
               <Grid item xs={5}>

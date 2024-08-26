@@ -46,6 +46,7 @@ import { EducationCard } from '../LearnSection/EducationCard';
 import UserSVG from '../../../../UI/CustomSvgIcons/User';
 import { copyTextToClipboard } from '../../../../Utils/Clipboard';
 import ManageEducationAccountDialog from './ManageEducationAccountDialog';
+import TeamAvailableSeats from './TeamAvailableSeats';
 
 const PADDING = 16;
 
@@ -274,11 +275,6 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
         : membersNotInAGroup;
     const groupsWithMembers = sortGroupsWithMembers(membersByGroupId);
 
-    const availableSeats =
-      team && members && admins
-        ? team.seats - members.length - admins.length
-        : 0;
-
     const manageSeatsInsert = (
       <div
         style={{
@@ -293,14 +289,7 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
           expand
           justifyContent="space-between"
         >
-          <Line noMargin alignItems="center">
-            <Text noMargin style={{ opacity: 0.7 }} displayInlineAsSpan>
-              <Trans>Seats available: </Trans>
-            </Text>
-            <Text noMargin displayInlineAsSpan>
-              <b>&nbsp;{availableSeats}</b>
-            </Text>
-          </Line>
+          <TeamAvailableSeats team={team} members={members} admins={admins} />
           <RaisedButton
             primary
             label={

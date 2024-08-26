@@ -50,6 +50,7 @@ const initialMembers: Array<User> = [
     id: 'user1',
     email: 'user1@hotmail.com',
     username: null,
+    password: 'blue-chair-34',
   },
   // $FlowIgnore - the whole user object is not needed for this component
   {
@@ -68,6 +69,7 @@ const initialMembers: Array<User> = [
     id: 'user4',
     email: 'user4@live.com',
     username: 'Peach',
+    password: 'mario-help',
   },
   // $FlowIgnore - the whole user object is not needed for this component
   {

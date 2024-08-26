@@ -224,12 +224,12 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
       []
     );
 
-    const membersByGroupId = groupMembersByGroupId({
+    const groupedMembers = groupMembersByGroupId({
       groups,
       members,
       memberships,
     });
-    if (!membersByGroupId) {
+    if (!groupedMembers) {
       return (
         <>
           <SectionContainer title={<Trans>Team</Trans>}>
@@ -244,6 +244,7 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
         </>
       );
     }
+    const { active: membersByGroupId } = groupedMembers;
 
     if (selectedUser) {
       return (

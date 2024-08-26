@@ -1,11 +1,18 @@
 // @flow
 import { groupMembersByGroupId } from './utils';
 
-const getDefaultUser = ({ id }: { id: string }) => ({
+const getDefaultUser = ({
+  id,
+  deactivatedAt,
+}: {
+  id: string,
+  deactivatedAt?: number,
+}) => ({
   id,
   appLanguage: 'en',
   createdAt: 16798698390,
   updatedAt: 16798698391,
+  deactivatedAt,
   description: null,
   username: null,
   donateLink: null,
@@ -50,11 +57,14 @@ describe('groupMembersByGroupId', () => {
         ],
       })
     ).toEqual({
-      NONE: { group: { id: 'none', name: 'none' }, members: [user1, user2] },
+      active: {
+        NONE: { group: { id: 'none', name: 'none' }, members: [user1, user2] },
+      },
+      inactive: [],
     });
   });
 
-  test('All members are returned in their groups and the ones without a group are put in the NONE group', () => {
+  test('All active members are returned in their groups and the ones without a group are put in the NONE group', () => {
     const user1 = getDefaultUser({ id: 'user-id-1' });
     const user2 = getDefaultUser({ id: 'user-id-2' });
     const user3 = getDefaultUser({ id: 'user-id-3' });
@@ -75,9 +85,41 @@ describe('groupMembersByGroupId', () => {
         ],
       })
     ).toEqual({
-      NONE: { group: { id: 'none', name: 'none' }, members: [user1, user4] },
-      [group1.id]: { group: group1, members: [user3] },
-      [group2.id]: { group: group2, members: [user2, user5] },
+      active: {
+        NONE: { group: { id: 'none', name: 'none' }, members: [user1, user4] },
+        [group1.id]: { group: group1, members: [user3] },
+        [group2.id]: { group: group2, members: [user2, user5] },
+      },
+      inactive: [],
+    });
+  });
+
+  test('All inactive members are returned in the right list', () => {
+    const user1 = getDefaultUser({ id: 'user-id-1', deactivatedAt: 13566654 });
+    const user2 = getDefaultUser({ id: 'user-id-2', deactivatedAt: 13566654 });
+    const user3 = getDefaultUser({ id: 'user-id-3', deactivatedAt: 13566654 });
+    const user4 = getDefaultUser({ id: 'user-id-4', deactivatedAt: 13566654 });
+    const user5 = getDefaultUser({ id: 'user-id-5', deactivatedAt: 13566654 });
+    const group1 = getDefaultGroup({ id: 'group-1' });
+    const group2 = getDefaultGroup({ id: 'group-2' });
+    expect(
+      groupMembersByGroupId({
+        groups: [group1, group2],
+        members: [user1, user2, user3, user4, user5],
+        memberships: [
+          getDefaultMembership({ userId: 'user-id-1', groups: null }),
+          getDefaultMembership({ userId: 'user-id-2', groups: null }),
+          getDefaultMembership({ userId: 'user-id-3', groups: null }),
+          getDefaultMembership({ userId: 'user-id-4', groups: null }),
+          getDefaultMembership({ userId: 'user-id-5', groups: null }),
+        ],
+      })
+    ).toEqual({
+      active: {
+        [group1.id]: { group: group1, members: [] },
+        [group2.id]: { group: group2, members: [] },
+      },
+      inactive: [user1, user2, user3, user4, user5],
     });
   });
 
@@ -85,7 +127,7 @@ describe('groupMembersByGroupId', () => {
     const user1 = getDefaultUser({ id: 'user-id-1' });
     const user2 = getDefaultUser({ id: 'user-id-2' });
     const user3 = getDefaultUser({ id: 'user-id-3' });
-    const user4 = getDefaultUser({ id: 'user-id-4' });
+    const user4 = getDefaultUser({ id: 'user-id-4', deactivatedAt: 145543 });
     const user5 = getDefaultUser({ id: 'user-id-5' });
     const group1 = getDefaultGroup({ id: 'group-1' });
     const group2 = getDefaultGroup({ id: 'group-2' });
@@ -102,9 +144,11 @@ describe('groupMembersByGroupId', () => {
         ],
       })
     ).toEqual({
-      NONE: { group: { id: 'none', name: 'none' }, members: [user4] },
-      [group1.id]: { group: group1, members: [user1, user2, user3, user5] },
-      [group2.id]: { group: group2, members: [] },
+      active: {
+        [group1.id]: { group: group1, members: [user1, user2, user3, user5] },
+        [group2.id]: { group: group2, members: [] },
+      },
+      inactive: [user4],
     });
   });
 });

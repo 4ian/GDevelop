@@ -26,6 +26,10 @@ import AlertMessage from '../../../../../UI/AlertMessage';
 import Link from '../../../../../UI/Link';
 import TeamAvailableSeats from '../TeamAvailableSeats';
 import { copyTextToClipboard } from '../../../../../Utils/Clipboard';
+import Collapse from '@material-ui/core/Collapse';
+import { IconButton } from '@material-ui/core';
+import ChevronArrowTop from '../../../../../UI/CustomSvgIcons/ChevronArrowTop';
+import ChevronArrowBottom from '../../../../../UI/CustomSvgIcons/ChevronArrowBottom';
 
 type AddTeacherError =
   | 'no-seats-available'
@@ -124,6 +128,10 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
     addTeacherDialogOpen,
     setAddTeacherDialogOpen,
   ] = React.useState<boolean>(false);
+  const [
+    isArchivedAccountsSectionOpen,
+    setIsArchivedAccountsSectionOpen,
+  ] = React.useState<boolean>(false);
   const {
     groups,
     team,
@@ -158,7 +166,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
       let content = 'Username,Email,Password';
       let membersToConsider = [];
       if (selectedUserIds.length === 0) {
-        membersToConsider = members;
+        membersToConsider = members.filter(member => !member.deactivatedAt);
       } else {
         membersToConsider = members.filter(member =>
           selectedUserIds.includes(member.id)
@@ -174,7 +182,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
     [selectedUserIds, members]
   );
 
-  const membersByGroupId = groupMembersByGroupId({
+  const groupedMembers = groupMembersByGroupId({
     groups,
     members,
     memberships,
@@ -186,10 +194,14 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
     !team ||
     !groups ||
     !memberships ||
-    !membersByGroupId
+    !groupedMembers
   ) {
     return null;
   }
+  const {
+    active: membersByGroupId,
+    inactive: archivedMembers,
+  } = groupedMembers;
   const groupsWithMembers = [
     membersByGroupId['NONE']
       ? { group: null, members: membersByGroupId['NONE'].members }
@@ -262,7 +274,13 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
               />
               <RaisedButton
                 primary
-                label={<Trans>Copy active credentials</Trans>}
+                label={
+                  selectedUserIds.length === 0 ? (
+                    <Trans>Copy active credentials</Trans>
+                  ) : (
+                    <Trans>Copy {selectedUserIds.length} credentials</Trans>
+                  )
+                }
                 onClick={onCopyActiveCredentials}
               />
             </LineStackLayout>
@@ -286,7 +304,11 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
                     <React.Fragment key={group ? group.id : 'lobby'}>
                       <Line noMargin>
                         <Text size="sub-title">
-                          {group ? group.name : <Trans>Lobby</Trans>}
+                          {group ? (
+                            <Trans>Room: {group.name}</Trans>
+                          ) : (
+                            <Trans>Lobby</Trans>
+                          )}
                         </Text>
                       </Line>
                       <Column>
@@ -327,6 +349,75 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
                   );
                 })
               : 'Hello'}
+            {archivedMembers.length > 0 && (
+              <React.Fragment key={'archived'}>
+                <Line noMargin>
+                  {isArchivedAccountsSectionOpen ? (
+                    <IconButton
+                      size="small"
+                      edge="end"
+                      aria-label="collapse"
+                      onClick={() => setIsArchivedAccountsSectionOpen(false)}
+                    >
+                      <ChevronArrowTop />
+                    </IconButton>
+                  ) : (
+                    <IconButton
+                      size="small"
+                      edge="end"
+                      aria-label="expand"
+                      onClick={() => setIsArchivedAccountsSectionOpen(true)}
+                    >
+                      <ChevronArrowBottom />
+                    </IconButton>
+                  )}
+                  <Text size="sub-title">
+                    <Trans>Archived accounts</Trans>
+                  </Text>
+                </Line>
+                <Column>
+                  <Collapse
+                    in={isArchivedAccountsSectionOpen}
+                    timeout="auto"
+                    unmountOnExit
+                  >
+                    <GridList cols={2} cellHeight={'auto'}>
+                      {archivedMembers.map(member => {
+                        return (
+                          <ManageStudentRow
+                            member={member}
+                            key={member.id}
+                            isArchived
+                            onChangePassword={onChangeMemberPassword}
+                            isSelected={selectedUserIds.includes(member.id)}
+                            onSelect={selected => {
+                              const memberIndexInArray = selectedUserIds.indexOf(
+                                member.id
+                              );
+                              if (selected) {
+                                if (memberIndexInArray === -1) {
+                                  setSelectedUserIds([
+                                    ...selectedUserIds,
+                                    member.id,
+                                  ]);
+                                }
+                                return;
+                              } else {
+                                const newArray = [...selectedUserIds];
+                                if (memberIndexInArray >= 0) {
+                                  newArray.splice(memberIndexInArray, 1);
+                                  setSelectedUserIds(newArray);
+                                }
+                              }
+                            }}
+                          />
+                        );
+                      })}
+                    </GridList>
+                  </Collapse>
+                </Column>
+              </React.Fragment>
+            )}
           </Column>
         </ColumnStackLayout>
       </Dialog>

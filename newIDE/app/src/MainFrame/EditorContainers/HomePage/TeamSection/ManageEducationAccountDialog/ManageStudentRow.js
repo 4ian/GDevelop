@@ -17,6 +17,7 @@ import { Line } from '../../../../../UI/Grid';
 type Props = {|
   member: User,
   isSelected: boolean,
+  isArchived?: boolean,
   onSelect: (selected: boolean) => void,
   onChangePassword: ({|
     userId: string,
@@ -27,6 +28,7 @@ type Props = {|
 const ManageStudentRow = ({
   member,
   isSelected,
+  isArchived,
   onSelect,
   onChangePassword,
 }: Props) => {
@@ -70,7 +72,10 @@ const ManageStudentRow = ({
             checkedIcon={<CheckboxChecked />}
           />
           {member.username && (
-            <Text allowSelection>
+            <Text
+              allowSelection
+              style={isArchived ? { opacity: 0.6 } : undefined}
+            >
               <b>{member.username}</b>
             </Text>
           )}
@@ -94,20 +99,26 @@ const ManageStudentRow = ({
           </Line>
         ) : (
           <LineStackLayout alignItems="center">
-            <Text noMargin style={{ opacity: 0.7 }} allowSelection>
+            <Text
+              noMargin
+              style={{ opacity: isArchived ? 0.55 : 0.7 }}
+              allowSelection
+            >
               {member.password || (
                 <i>
                   <Trans>Not stored</Trans>
                 </i>
               )}
             </Text>
-            <IconButton
-              size="small"
-              onClick={() => setIsEditingPassword(true)}
-              tooltip={t`Define custom password`}
-            >
-              <Key fontSize="small" />
-            </IconButton>
+            {!isArchived && (
+              <IconButton
+                size="small"
+                onClick={() => setIsEditingPassword(true)}
+                tooltip={t`Define custom password`}
+              >
+                <Key fontSize="small" />
+              </IconButton>
+            )}
           </LineStackLayout>
         )}
       </Grid>

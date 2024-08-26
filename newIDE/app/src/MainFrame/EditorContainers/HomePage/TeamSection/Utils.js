@@ -15,14 +15,22 @@ export const groupMembersByGroupId = ({
   groups: ?(TeamGroup[]),
   members: ?(User[]),
   memberships: ?(TeamMembership[]),
-|}): ?{ [groupId: string]: GroupWithMembers } => {
+|}): ?{|
+  active: { [groupId: string]: GroupWithMembers },
+  inactive: User[],
+|} => {
   if (!(groups && members && memberships)) return null;
   const membersByGroupId = {};
+  const deactivatedMembers = [];
   members.forEach(member => {
     const membership = memberships.find(
       membership => membership.userId === member.id
     );
     if (!membership) return;
+    if (member.deactivatedAt) {
+      deactivatedMembers.push(member);
+      return;
+    }
     const memberGroups = membership.groups;
     if (!memberGroups) {
       const itemWithoutGroup = membersByGroupId['NONE'];
@@ -49,7 +57,7 @@ export const groupMembersByGroupId = ({
       membersByGroupId[group.id] = { group, members: [] };
     }
   });
-  return membersByGroupId;
+  return { active: membersByGroupId, inactive: deactivatedMembers };
 };
 
 export const sortGroupsWithMembers = (groupWithMembersByGroupId: {

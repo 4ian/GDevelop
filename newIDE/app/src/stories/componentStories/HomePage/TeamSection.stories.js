@@ -32,7 +32,7 @@ export default {
 const team: Team = {
   id: 'teamId',
   createdAt: 160,
-  seats: 8,
+  seats: 9,
 };
 
 const initialAdmins: Array<User> = [
@@ -89,6 +89,13 @@ const initialMembers: Array<User> = [
     email: 'user7@mail.ru',
     username: 'Bayonetta',
   },
+  // $FlowIgnore - the whole user object is not needed for this component
+  {
+    id: 'user8',
+    email: 'user8@mail.com',
+    username: 'Browser',
+    deactivatedAt: 1355209080,
+  },
 ];
 
 const initialGroups = [
@@ -136,6 +143,12 @@ const initialMemberships: Array<TeamMembership> = [
     userId: 'user7',
     teamId: 'teamId',
     createdAt: 1659389384,
+    groups: null,
+  },
+  {
+    userId: 'user8',
+    teamId: 'teamId',
+    createdAt: 1659389388,
     groups: null,
   },
 ];

@@ -22,10 +22,6 @@ import Add from '../../../../../UI/CustomSvgIcons/Add';
 import { groupMembersByGroupId, sortGroupsWithMembers } from '../Utils';
 import { Column, Line } from '../../../../../UI/Grid';
 import ManageStudentRow from './ManageStudentRow';
-import {
-  activateTeamMembers,
-  changeTeamMemberPassword,
-} from '../../../../../Utils/GDevelopServices/User';
 import AlertMessage from '../../../../../UI/AlertMessage';
 import Link from '../../../../../UI/Link';
 import TeamAvailableSeats from '../TeamAvailableSeats';
@@ -137,9 +133,7 @@ type Props = {|
 |};
 
 const ManageEducationAccountDialog = ({ onClose }: Props) => {
-  const { profile, getAuthorizationHeader } = React.useContext(
-    AuthenticatedUserContext
-  );
+  const { profile } = React.useContext(AuthenticatedUserContext);
   const [selectedUserIds, setSelectedUserIds] = React.useState<string[]>([]);
   const [isCreatingMembers, setIsCreatingMembers] = React.useState<boolean>(
     false
@@ -164,9 +158,11 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
     onRefreshMembers,
     getAvailableSeats,
     onCreateMembers,
+    onChangeMemberPassword,
+    onActivateMembers,
   } = React.useContext(TeamContext);
 
-  const onChangeMemberPassword = React.useCallback(
+  const onChangeTeamMemberPassword = React.useCallback(
     async ({
       userId,
       newPassword,
@@ -174,15 +170,10 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
       userId: string,
       newPassword: string,
     |}) => {
-      if (!profile) return;
-      await changeTeamMemberPassword(getAuthorizationHeader, {
-        adminUserId: profile.id,
-        userId,
-        newPassword,
-      });
+      await onChangeMemberPassword(userId, newPassword);
       await onRefreshMembers();
     },
-    [getAuthorizationHeader, profile, onRefreshMembers]
+    [onRefreshMembers, onChangeMemberPassword]
   );
 
   const onCopyActiveCredentials = React.useCallback(
@@ -227,18 +218,13 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
     [onCreateMembers, onRefreshMembers, availableSeats, isCreatingMembers]
   );
 
-  const onActivateMembers = React.useCallback(
+  const onActivateTeamMembers = React.useCallback(
     async (activate: boolean) => {
-      if (!profile || !team || selectedUserIds.length === 0) return;
+      if (selectedUserIds.length === 0) return;
       setBatchControlError(null);
 
       try {
-        await activateTeamMembers(getAuthorizationHeader, {
-          adminUserId: profile.id,
-          userIds: selectedUserIds,
-          teamId: team.id,
-          activate,
-        });
+        await onActivateMembers(selectedUserIds, activate);
         await onRefreshMembers();
       } catch (error) {
         const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
@@ -287,7 +273,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
         setBatchControlError(errorMessage);
       }
     },
-    [getAuthorizationHeader, profile, onRefreshMembers, team, selectedUserIds]
+    [onActivateMembers, onRefreshMembers, selectedUserIds]
   );
 
   const groupedMembers = groupMembersByGroupId({
@@ -461,7 +447,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
                           selectedUserIds.length === 0 ||
                           isAtLeastOneSelectedUserArchived
                         }
-                        onClick={() => onActivateMembers(false)}
+                        onClick={() => onActivateTeamMembers(false)}
                       >
                         <Archive />
                       </IconButton>
@@ -472,7 +458,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
                           selectedUserIds.length === 0 ||
                           isAtLeastOneSelectedUserActive
                         }
-                        onClick={() => onActivateMembers(true)}
+                        onClick={() => onActivateTeamMembers(true)}
                       >
                         <Recycle />
                       </IconButton>
@@ -533,7 +519,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
                               <ManageStudentRow
                                 member={member}
                                 key={member.id}
-                                onChangePassword={onChangeMemberPassword}
+                                onChangePassword={onChangeTeamMemberPassword}
                                 isSelected={selectedUserIds.includes(member.id)}
                                 onSelect={selected => {
                                   const memberIndexInArray = selectedUserIds.indexOf(
@@ -604,7 +590,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
                                 member={member}
                                 key={member.id}
                                 isArchived
-                                onChangePassword={onChangeMemberPassword}
+                                onChangePassword={onChangeTeamMemberPassword}
                                 isSelected={selectedUserIds.includes(member.id)}
                                 onSelect={selected => {
                                   const memberIndexInArray = selectedUserIds.indexOf(

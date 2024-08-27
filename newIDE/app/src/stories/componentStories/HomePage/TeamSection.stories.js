@@ -338,6 +338,18 @@ const MockTeamProvider = ({
     }
   };
 
+  const changeMemberPassword = async (userId: string, newPassword: string) => {
+    if (!members) return;
+    const newMembers = [...members];
+    const memberIndex = newMembers.findIndex(member => member.id === userId);
+    if (memberIndex === -1) return;
+    newMembers.splice(memberIndex, 1, {
+      ...newMembers[memberIndex],
+      password: newPassword,
+    });
+    setMembers(newMembers);
+  };
+
   return (
     <DragAndDropContextProvider>
       <AuthenticatedUserContext.Provider
@@ -358,6 +370,8 @@ const MockTeamProvider = ({
             onRefreshMembers: refreshMembers,
             onCreateMembers: createMembers,
             getAvailableSeats,
+            onActivateMembers: action('activateMembers'),
+            onChangeMemberPassword: changeMemberPassword,
           }}
         >
           {children}

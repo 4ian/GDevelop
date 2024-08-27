@@ -24,6 +24,11 @@ export type TeamState = {|
   onRefreshMembers: () => Promise<void>,
   getAvailableSeats: () => number | null,
   onCreateMembers: (quantity: number) => Promise<void>,
+  onActivateMembers: (userIds: string[], activate: boolean) => Promise<void>,
+  onChangeMemberPassword: (
+    userId: string,
+    newPassword: string
+  ) => Promise<void>,
 |};
 
 export const initialTeamState = {
@@ -40,6 +45,8 @@ export const initialTeamState = {
   onRefreshMembers: async () => {},
   getAvailableSeats: () => null,
   onCreateMembers: async () => {},
+  onActivateMembers: async () => {},
+  onChangeMemberPassword: async () => {},
 };
 
 const TeamContext = React.createContext<TeamState>(initialTeamState);

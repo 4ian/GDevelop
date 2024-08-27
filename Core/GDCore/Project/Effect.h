@@ -21,8 +21,8 @@ namespace gd {
  */
 class GD_CORE_API Effect {
  public:
-  Effect(){};
-  virtual ~Effect(){};
+  Effect() : folded(false) {};
+  virtual ~Effect() {};
 
   void SetName(const gd::String& name_) { name = name_; }
   const gd::String& GetName() const { return name; }
@@ -31,6 +31,9 @@ class GD_CORE_API Effect {
     effectType = effectType_;
   }
   const gd::String& GetEffectType() const { return effectType; }
+
+  void SetFolded(bool fold = true) { folded = fold; }
+  bool IsFolded() const { return folded; }
 
   void SetDoubleParameter(const gd::String& name, double value) {
     doubleParameters[name] = value;
@@ -85,6 +88,7 @@ class GD_CORE_API Effect {
   void UnserializeFrom(const SerializerElement& element);
 
  private:
+  bool folded;
   gd::String name;        ///< The name of the layer.
   gd::String effectType;  ///< The name of the effect to apply.
   std::map<gd::String, double> doubleParameters; ///< Values of parameters being doubles, keyed by names.

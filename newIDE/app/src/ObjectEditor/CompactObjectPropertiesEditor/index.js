@@ -401,13 +401,12 @@ export const CompactObjectPropertiesEditor = ({
                               <Line noMargin alignItems="center">
                                 <IconButton
                                   onClick={() => {
-                                    // TODO
-                                    // effect.setFolded(!effect.isFolded());
+                                    effect.setFolded(!effect.isFolded());
                                     forceUpdate();
                                   }}
                                   size="small"
                                 >
-                                  {/*effect.isFolded()*/ true ? (
+                                  {effect.isFolded() ? (
                                     <ChevronArrowRight style={styles.icon} />
                                   ) : (
                                     <ChevronArrowBottom style={styles.icon} />
@@ -429,22 +428,26 @@ export const CompactObjectPropertiesEditor = ({
                                 <Remove style={styles.icon} />
                               </IconButton>
                             </LineStackLayout>
-                            <CompactSelectField
-                              value={effectType}
-                              onChange={type => chooseEffectType(effect, type)}
-                            >
-                              {all2DEffectMetadata.map(effectMetadata => (
-                                <SelectOption
-                                  key={effectMetadata.type}
-                                  value={effectMetadata.type}
-                                  label={effectMetadata.fullName}
-                                  disabled={
-                                    effectMetadata.isMarkedAsNotWorkingForObjects
-                                  }
-                                />
-                              ))}
-                            </CompactSelectField>
-                            {/*!effect.isFolded()*/ true && (
+                            {!effect.isFolded() && (
+                              <CompactSelectField
+                                value={effectType}
+                                onChange={type =>
+                                  chooseEffectType(effect, type)
+                                }
+                              >
+                                {all2DEffectMetadata.map(effectMetadata => (
+                                  <SelectOption
+                                    key={effectMetadata.type}
+                                    value={effectMetadata.type}
+                                    label={effectMetadata.fullName}
+                                    disabled={
+                                      effectMetadata.isMarkedAsNotWorkingForObjects
+                                    }
+                                  />
+                                ))}
+                              </CompactSelectField>
+                            )}
+                            {!effect.isFolded() && (
                               <CompactEffectPropertiesEditor
                                 project={project}
                                 effect={effect}

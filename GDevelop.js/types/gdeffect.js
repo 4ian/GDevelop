@@ -5,6 +5,8 @@ declare class gdEffect {
   getName(): string;
   setEffectType(effectType_: string): void;
   getEffectType(): string;
+  setFolded(val: boolean): void;
+  isFolded(): boolean;
   setDoubleParameter(name: string, value: number): void;
   getDoubleParameter(name: string): number;
   setStringParameter(name: string, value: string): void;

@@ -479,7 +479,9 @@ module.exports = {
       .addExpression(
         'LastLeftPlayerNumber',
         _('Player number that just left'),
-        _('Returns the number of the player that has just left the lobby.'),
+        _(
+          'Returns the player number of the player that has just left the lobby.'
+        ),
         _('Lobbies'),
         'JsPlatform/Extensions/multiplayer.svg'
       )

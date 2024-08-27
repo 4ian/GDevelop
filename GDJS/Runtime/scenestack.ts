@@ -212,7 +212,8 @@ namespace gdjs {
       syncOptions: GetNetworkSyncDataOptions
     ): SceneStackNetworkSyncData | null {
       const syncedPlayerNumber = syncOptions.playerNumber;
-      if (syncedPlayerNumber !== undefined && syncedPlayerNumber !== 1) {
+      const isHost = syncOptions.isHost;
+      if (syncedPlayerNumber !== undefined && !isHost) {
         // If we are getting sync data of a specific player,
         // and they are not the host, we don't sync the scene stack.
         return null;

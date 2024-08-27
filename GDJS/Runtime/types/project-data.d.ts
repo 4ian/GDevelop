@@ -39,7 +39,10 @@ declare type ObjectData = {
   effects: Array<EffectData>;
 };
 
-declare type GetNetworkSyncDataOptions = { playerNumber?: number };
+declare type GetNetworkSyncDataOptions = {
+  playerNumber?: number;
+  isHost?: boolean;
+};
 
 /** Object containing basic properties for all objects synchronizing over the network. */
 declare type BasicObjectNetworkSyncData = {

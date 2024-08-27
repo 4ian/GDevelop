@@ -234,6 +234,7 @@ namespace gdjs {
       syncOptions: GetNetworkSyncDataOptions
     ): VariableNetworkSyncData[] {
       const syncedPlayerNumber = syncOptions.playerNumber;
+      const isHost = syncOptions.isHost;
       const networkSyncData: VariableNetworkSyncData[] = [];
       const variableNames = [];
       this._variables.keys(variableNames);
@@ -247,10 +248,10 @@ namespace gdjs {
           variableOwner === null ||
           // Getting sync data for a specific player:
           (syncedPlayerNumber !== undefined &&
-            // Owned by host but we are not player 1.
+            // Variable is owned by host but this player number is not the host.
             variableOwner === 0 &&
-            syncedPlayerNumber !== 1) ||
-          // Owned by a player but we are not this player.
+            !isHost) ||
+          // Variable is owned by a player but not getting sync data for this player number.
           (variableOwner !== 0 && syncedPlayerNumber !== variableOwner)
         ) {
           // In those cases, the variable should not be synchronized.

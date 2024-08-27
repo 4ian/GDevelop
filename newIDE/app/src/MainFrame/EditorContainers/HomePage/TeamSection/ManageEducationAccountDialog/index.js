@@ -40,6 +40,7 @@ import Archive from '../../../../../UI/CustomSvgIcons/Archive';
 import Recycle from '../../../../../UI/CustomSvgIcons/Recycle';
 import IconButton from '../../../../../UI/IconButton';
 import { extractGDevelopApiErrorStatusAndCode } from '../../../../../Utils/GDevelopServices/Errors';
+import StudentCreationCard from '../StudentCreationCard';
 
 const styles = {
   selectedMembersControlsContainer: {
@@ -140,6 +141,9 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
     AuthenticatedUserContext
   );
   const [selectedUserIds, setSelectedUserIds] = React.useState<string[]>([]);
+  const [isCreatingMembers, setIsCreatingMembers] = React.useState<boolean>(
+    false
+  );
   const [batchControlError, setBatchControlError] = React.useState<React.Node>(
     null
   );
@@ -159,6 +163,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
     memberships,
     onRefreshMembers,
     getAvailableSeats,
+    onCreateMembers,
   } = React.useContext(TeamContext);
 
   const onChangeMemberPassword = React.useCallback(
@@ -200,6 +205,21 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
       copyTextToClipboard(content);
     },
     [selectedUserIds, members]
+  );
+
+  const onCreateTeamMembers = React.useCallback(
+    async (quantity: number) => {
+      setIsCreatingMembers(true);
+      try {
+        await onCreateMembers(quantity);
+        await onRefreshMembers();
+      } catch (error) {
+        console.error(`An error occurred when creating members: `, error);
+      } finally {
+        setIsCreatingMembers(false);
+      }
+    },
+    [onCreateMembers, onRefreshMembers]
   );
 
   const onActivateMembers = React.useCallback(
@@ -293,9 +313,10 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
   ].filter(Boolean);
 
   const availableSeats = getAvailableSeats();
-  const areAllActiveUsersSelected = members
-    .filter(member => !member.deactivatedAt)
-    .every(member => selectedUserIds.includes(member.id));
+  const activeMembers = members.filter(member => !member.deactivatedAt);
+  const areAllActiveMembersSelected = activeMembers.every(member =>
+    selectedUserIds.includes(member.id)
+  );
   const selectedMembers = members.filter(member =>
     selectedUserIds.includes(member.id)
   );
@@ -305,6 +326,8 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
   const isAtLeastOneSelectedUserArchived = selectedMembers.some(
     member => !!member.deactivatedAt
   );
+  const hasNoTeamMembers = members.length === 0;
+  const hasNoActiveTeamMembers = activeMembers.length === 0;
 
   return (
     <>
@@ -368,6 +391,9 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
               />
               <RaisedButton
                 primary
+                disabled={
+                  hasNoActiveTeamMembers && selectedUserIds.length === 0
+                }
                 label={
                   selectedUserIds.length === 0 ? (
                     <Trans>Copy active credentials</Trans>
@@ -379,79 +405,96 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
               />
             </LineStackLayout>
           </LineStackLayout>
-          <Paper
-            style={styles.selectedMembersControlsContainer}
-            background="light"
-          >
+          {hasNoTeamMembers && typeof availableSeats === 'number' && (
+            <StudentCreationCard
+              availableSeats={availableSeats}
+              isCreatingMembers={isCreatingMembers}
+              onCreateStudentAccounts={onCreateTeamMembers}
+            />
+          )}
+          {(!hasNoTeamMembers || !hasNoActiveTeamMembers) && (
             <ColumnStackLayout noMargin>
-              <Line justifyContent="space-between" noMargin alignItems="center">
-                <LineStackLayout alignItems="center" noMargin>
-                  <Checkbox
-                    style={{ margin: 0 }}
-                    checked={areAllActiveUsersSelected}
-                    onCheck={(e, checked) => {
-                      if (checked) {
-                        setSelectedUserIds(
-                          members
-                            .filter(member => !member.deactivatedAt)
-                            .map(member => member.id)
-                        );
-                      } else {
-                        setSelectedUserIds([]);
-                      }
-                    }}
-                    uncheckedIcon={<CheckboxUnchecked />}
-                    checkedIcon={<CheckboxChecked />}
-                  />
-                  <Text noMargin>
-                    <Trans>Select all active</Trans>
-                  </Text>
-                </LineStackLayout>
-                <LineStackLayout noMargin alignItems="center">
-                  <IconButton
-                    size="small"
-                    tooltip={t`Archive accounts`}
-                    disabled={
-                      selectedUserIds.length === 0 ||
-                      isAtLeastOneSelectedUserArchived
-                    }
-                    onClick={() => onActivateMembers(false)}
+              <Paper
+                style={styles.selectedMembersControlsContainer}
+                background="light"
+              >
+                <ColumnStackLayout noMargin>
+                  <Line
+                    justifyContent="space-between"
+                    noMargin
+                    alignItems="center"
                   >
-                    <Archive />
-                  </IconButton>
-                  <IconButton
-                    size="small"
-                    tooltip={t`Restore accounts`}
-                    disabled={
-                      selectedUserIds.length === 0 ||
-                      isAtLeastOneSelectedUserActive
-                    }
-                    onClick={() => onActivateMembers(true)}
-                  >
-                    <Recycle />
-                  </IconButton>
-                </LineStackLayout>
-              </Line>
-              {batchControlError && (
-                <AlertMessage kind="error">{batchControlError}</AlertMessage>
-              )}
-            </ColumnStackLayout>
-          </Paper>
-          <Column>
-            <GridList cols={2} cellHeight={'auto'}>
-              <Grid item xs={5}>
-                <Text style={{ opacity: 0.7 }}>
-                  <Trans>Student</Trans>
-                </Text>
-              </Grid>
-              <Grid item xs={7}>
-                <Text style={{ opacity: 0.7 }}>
-                  <Trans>Password</Trans>
-                </Text>
-              </Grid>
-            </GridList>
-            {groupsWithMembers.length > 0
-              ? groupsWithMembers.map(({ group, members }) => {
+                    <LineStackLayout alignItems="center" noMargin>
+                      <Checkbox
+                        style={{ margin: 0 }}
+                        checked={
+                          areAllActiveMembersSelected &&
+                          selectedUserIds.length > 0
+                        }
+                        onCheck={(e, checked) => {
+                          if (checked) {
+                            setSelectedUserIds(
+                              members
+                                .filter(member => !member.deactivatedAt)
+                                .map(member => member.id)
+                            );
+                          } else {
+                            setSelectedUserIds([]);
+                          }
+                        }}
+                        uncheckedIcon={<CheckboxUnchecked />}
+                        checkedIcon={<CheckboxChecked />}
+                      />
+                      <Text noMargin>
+                        <Trans>Select all active</Trans>
+                      </Text>
+                    </LineStackLayout>
+                    <LineStackLayout noMargin alignItems="center">
+                      <IconButton
+                        size="small"
+                        tooltip={t`Archive accounts`}
+                        disabled={
+                          selectedUserIds.length === 0 ||
+                          isAtLeastOneSelectedUserArchived
+                        }
+                        onClick={() => onActivateMembers(false)}
+                      >
+                        <Archive />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        tooltip={t`Restore accounts`}
+                        disabled={
+                          selectedUserIds.length === 0 ||
+                          isAtLeastOneSelectedUserActive
+                        }
+                        onClick={() => onActivateMembers(true)}
+                      >
+                        <Recycle />
+                      </IconButton>
+                    </LineStackLayout>
+                  </Line>
+                  {batchControlError && (
+                    <AlertMessage kind="error">
+                      {batchControlError}
+                    </AlertMessage>
+                  )}
+                </ColumnStackLayout>
+              </Paper>
+              <Column>
+                <GridList cols={2} cellHeight={'auto'}>
+                  <Grid item xs={5}>
+                    <Text style={{ opacity: 0.7 }}>
+                      <Trans>Student</Trans>
+                    </Text>
+                  </Grid>
+                  <Grid item xs={7}>
+                    <Text style={{ opacity: 0.7 }}>
+                      <Trans>Password</Trans>
+                    </Text>
+                  </Grid>
+                </GridList>
+                {groupsWithMembers.map(({ group, members }) => {
                   return (
                     <React.Fragment key={group ? group.id : 'lobby'}>
                       <Line noMargin>
@@ -499,78 +542,81 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
                       </Column>
                     </React.Fragment>
                   );
-                })
-              : 'Hello'}
-            {archivedMembers.length > 0 && (
-              <React.Fragment key={'archived'}>
-                <Line noMargin>
-                  {isArchivedAccountsSectionOpen ? (
-                    <IconButton
-                      size="small"
-                      edge="end"
-                      aria-label="collapse"
-                      onClick={() => setIsArchivedAccountsSectionOpen(false)}
-                    >
-                      <ChevronArrowTop />
-                    </IconButton>
-                  ) : (
-                    <IconButton
-                      size="small"
-                      edge="end"
-                      aria-label="expand"
-                      onClick={() => setIsArchivedAccountsSectionOpen(true)}
-                    >
-                      <ChevronArrowBottom />
-                    </IconButton>
-                  )}
-                  <Text size="sub-title">
-                    <Trans>Archived accounts</Trans>
-                  </Text>
-                </Line>
-                <Column>
-                  <Collapse
-                    in={isArchivedAccountsSectionOpen}
-                    timeout="auto"
-                    unmountOnExit
-                  >
-                    <GridList cols={2} cellHeight={'auto'}>
-                      {archivedMembers.map(member => {
-                        return (
-                          <ManageStudentRow
-                            member={member}
-                            key={member.id}
-                            isArchived
-                            onChangePassword={onChangeMemberPassword}
-                            isSelected={selectedUserIds.includes(member.id)}
-                            onSelect={selected => {
-                              const memberIndexInArray = selectedUserIds.indexOf(
-                                member.id
-                              );
-                              if (selected) {
-                                if (memberIndexInArray === -1) {
-                                  setSelectedUserIds([
-                                    ...selectedUserIds,
-                                    member.id,
-                                  ]);
-                                }
-                                return;
-                              } else {
-                                const newArray = [...selectedUserIds];
-                                if (memberIndexInArray >= 0) {
-                                  newArray.splice(memberIndexInArray, 1);
-                                  setSelectedUserIds(newArray);
-                                }
-                              }
-                            }}
-                          />
-                        );
-                      })}
-                    </GridList>
-                  </Collapse>
-                </Column>
-              </React.Fragment>
-            )}
-          </Column>
+                })}
+                {archivedMembers.length > 0 && (
+                  <React.Fragment key={'archived'}>
+                    <Line noMargin>
+                      {isArchivedAccountsSectionOpen ? (
+                        <IconButton
+                          size="small"
+                          edge="end"
+                          aria-label="collapse"
+                          onClick={() =>
+                            setIsArchivedAccountsSectionOpen(false)
+                          }
+                        >
+                          <ChevronArrowTop />
+                        </IconButton>
+                      ) : (
+                        <IconButton
+                          size="small"
+                          edge="end"
+                          aria-label="expand"
+                          onClick={() => setIsArchivedAccountsSectionOpen(true)}
+                        >
+                          <ChevronArrowBottom />
+                        </IconButton>
+                      )}
+                      <Text size="sub-title">
+                        <Trans>Archived accounts</Trans>
+                      </Text>
+                    </Line>
+                    <Column>
+                      <Collapse
+                        in={isArchivedAccountsSectionOpen}
+                        timeout="auto"
+                        unmountOnExit
+                      >
+                        <GridList cols={2} cellHeight={'auto'}>
+                          {archivedMembers.map(member => {
+                            return (
+                              <ManageStudentRow
+                                member={member}
+                                key={member.id}
+                                isArchived
+                                onChangePassword={onChangeMemberPassword}
+                                isSelected={selectedUserIds.includes(member.id)}
+                                onSelect={selected => {
+                                  const memberIndexInArray = selectedUserIds.indexOf(
+                                    member.id
+                                  );
+                                  if (selected) {
+                                    if (memberIndexInArray === -1) {
+                                      setSelectedUserIds([
+                                        ...selectedUserIds,
+                                        member.id,
+                                      ]);
+                                    }
+                                    return;
+                                  } else {
+                                    const newArray = [...selectedUserIds];
+                                    if (memberIndexInArray >= 0) {
+                                      newArray.splice(memberIndexInArray, 1);
+                                      setSelectedUserIds(newArray);
+                                    }
+                                  }
+                                }}
+                              />
+                            );
+                          })}
+                        </GridList>
+                      </Collapse>
+                    </Column>
+                  </React.Fragment>
+                )}
+              </Column>
+            </ColumnStackLayout>
+          )}
         </ColumnStackLayout>
       </Dialog>
       {addTeacherDialogOpen && (

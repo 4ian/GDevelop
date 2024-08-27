@@ -158,27 +158,47 @@ const MockTeamProvider = ({
   loading,
   noGroups,
   noMembers,
+  noActiveMembers,
 }: {|
   children: React.Node,
   loading: boolean,
   noGroups?: boolean,
   noMembers?: boolean,
+  noActiveMembers?: boolean,
 |}) => {
   const [nameChangeTryCount, setNameChangeTryCount] = React.useState<number>(0);
   const [userChangeTryCount, setUserChangeTryCount] = React.useState<number>(0);
   const [members, setMembers] = React.useState<?(User[])>(
-    noMembers ? [] : initialMembers
-  );
-  const [memberships, setMemberships] = React.useState<Array<TeamMembership>>(
     noMembers
       ? []
-      : noGroups
-      ? initialMemberships.map(membership => ({
+      : noActiveMembers
+      ? initialMembers.filter(member => !!member.deactivatedAt)
+      : initialMembers
+  );
+  const [memberships, setMemberships] = React.useState<Array<TeamMembership>>(
+    () => {
+      const membershipsToConsider = noMembers
+        ? []
+        : noActiveMembers
+        ? initialMembers
+            .filter(member => !!member.deactivatedAt)
+            .map(inactiveMember =>
+              initialMemberships.find(
+                membership => membership.userId === inactiveMember.id
+              )
+            )
+            .filter(Boolean)
+        : initialMemberships;
+      if (noGroups) {
+        return membershipsToConsider.map(membership => ({
           userId: membership.userId,
           teamId: membership.teamId,
           createdAt: membership.createdAt,
-        }))
-      : initialMemberships
+        }));
+      } else {
+        return membershipsToConsider;
+      }
+    }
   );
   const [groups, setGroups] = React.useState<Array<TeamGroup>>(
     noGroups ? [] : initialGroups
@@ -358,6 +378,20 @@ export const WithNoGroupsYet = () => (
 
 export const WithNoStudentsYet = () => (
   <MockTeamProvider loading={false} noGroups noMembers>
+    <FixedHeightFlexContainer height={600}>
+      <TeamSection
+        project={testProject.project}
+        currentFileMetadata={null}
+        onOpenRecentFile={action('onOpenRecentFile')}
+        storageProviders={[CloudStorageProvider]}
+        onOpenTeachingResources={action('onOpenTeachingResources')}
+      />
+    </FixedHeightFlexContainer>
+  </MockTeamProvider>
+);
+
+export const WithArchivedStudentsOnly = () => (
+  <MockTeamProvider loading={false} noGroups noActiveMembers>
     <FixedHeightFlexContainer height={600}>
       <TeamSection
         project={testProject.project}

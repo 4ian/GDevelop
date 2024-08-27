@@ -324,7 +324,7 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
       </div>
     );
 
-    const hasNoStudents = members
+    const hasNoActiveTeamMembers = members
       ? members.filter(member => !member.deactivatedAt).length === 0
       : false;
     const availableSeats = getAvailableSeats();
@@ -367,14 +367,15 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
             ) : null}
             <EducationCard onSeeResources={onOpenTeachingResources} />
             <Spacer />
-            {(membersNotInAGroupToDisplay || hasNoStudents) && (
+            {(membersNotInAGroupToDisplay || hasNoActiveTeamMembers) && (
               <Paper background="medium" style={styles.lobbyContainer}>
                 <Line noMargin>
                   <ColumnStackLayout noMargin expand>
                     <Text size="section-title" noMargin>
                       <Trans>Lobby</Trans>
                     </Text>
-                    {hasNoStudents && typeof availableSeats === 'number' ? (
+                    {hasNoActiveTeamMembers &&
+                    typeof availableSeats === 'number' ? (
                       <StudentCreationCard
                         availableSeats={availableSeats}
                         onCreateStudentAccounts={onCreateTeamMembers}

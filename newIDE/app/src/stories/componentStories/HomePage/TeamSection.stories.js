@@ -31,7 +31,7 @@ export default {
 const random = (min: number, range: number) =>
   Math.floor(Math.random() * range + min);
 
-const team: Team = {
+const initialTeam: Team = {
   id: 'teamId',
   createdAt: 160,
   seats: 9,
@@ -161,13 +161,16 @@ const MockTeamProvider = ({
   noGroups,
   noMembers,
   noActiveMembers,
+  teamSize,
 }: {|
   children: React.Node,
   loading: boolean,
   noGroups?: boolean,
   noMembers?: boolean,
   noActiveMembers?: boolean,
+  teamSize?: number,
 |}) => {
+  const team = { ...initialTeam, seats: teamSize || initialTeam.seats };
   const [nameChangeTryCount, setNameChangeTryCount] = React.useState<number>(0);
   const [userChangeTryCount, setUserChangeTryCount] = React.useState<number>(0);
   const [members, setMembers] = React.useState<?(User[])>(
@@ -382,7 +385,7 @@ const MockTeamProvider = ({
 };
 
 export const Default = () => (
-  <MockTeamProvider loading={false}>
+  <MockTeamProvider loading={false} teamSize={12}>
     <FixedHeightFlexContainer height={600}>
       <TeamSection
         project={testProject.project}

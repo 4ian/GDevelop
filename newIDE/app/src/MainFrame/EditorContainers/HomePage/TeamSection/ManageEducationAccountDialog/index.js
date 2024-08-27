@@ -14,7 +14,11 @@ import UserLine from '../../../../../UI/User/UserLine';
 import FlatButton from '../../../../../UI/FlatButton';
 import LeftLoader from '../../../../../UI/LeftLoader';
 import Form from '../../../../../UI/Form';
-import { ColumnStackLayout, LineStackLayout } from '../../../../../UI/Layout';
+import {
+  ColumnStackLayout,
+  LineStackLayout,
+  ResponsiveLineStackLayout,
+} from '../../../../../UI/Layout';
 import TextField from '../../../../../UI/TextField';
 import { emailRegex } from '../../../../../Utils/EmailUtils';
 import RaisedButton from '../../../../../UI/RaisedButton';
@@ -37,10 +41,18 @@ import Recycle from '../../../../../UI/CustomSvgIcons/Recycle';
 import IconButton from '../../../../../UI/IconButton';
 import { extractGDevelopApiErrorStatusAndCode } from '../../../../../Utils/GDevelopServices/Errors';
 import StudentCreationCard from '../StudentCreationCard';
+import CircularProgress from '../../../../../UI/CircularProgress';
+import { useResponsiveWindowSize } from '../../../../../UI/Responsive/ResponsiveWindowMeasurer';
+import Copy from '../../../../../UI/CustomSvgIcons/Copy';
 
 const styles = {
   selectedMembersControlsContainer: {
     padding: 8,
+  },
+  selectedMembersControlsContainerMobile: {
+    padding: 8,
+    marginTop: 12,
+    marginBottom: 12,
   },
 };
 
@@ -138,6 +150,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
   const [isCreatingMembers, setIsCreatingMembers] = React.useState<boolean>(
     false
   );
+  const { isMobile } = useResponsiveWindowSize();
   const [batchControlError, setBatchControlError] = React.useState<React.Node>(
     null
   );
@@ -365,7 +378,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
             />
           </Line>
           <Divider />
-          <LineStackLayout
+          <ResponsiveLineStackLayout
             noMargin
             justifyContent="space-between"
             alignItems="center"
@@ -373,28 +386,55 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
             <Text size="sub-title" noMargin>
               <Trans>Student accounts</Trans>
             </Text>
-            <LineStackLayout noMargin alignItems="center">
+            <ResponsiveLineStackLayout noMargin alignItems="center">
               <TeamAvailableSeats
                 team={team}
                 members={members}
                 admins={admins}
               />
-              <RaisedButton
-                primary
-                disabled={
-                  hasNoActiveTeamMembers && selectedUserIds.length === 0
-                }
-                label={
-                  selectedUserIds.length === 0 ? (
-                    <Trans>Copy active credentials</Trans>
-                  ) : (
-                    <Trans>Copy {selectedUserIds.length} credentials</Trans>
-                  )
-                }
-                onClick={onCopyActiveCredentials}
-              />
-            </LineStackLayout>
-          </LineStackLayout>
+              <LineStackLayout noMargin>
+                {isMobile && (
+                  <Line expand noMargin>
+                    <RaisedButton
+                      primary
+                      fullWidth
+                      label={<Trans>Add student</Trans>}
+                      icon={
+                        isCreatingMembers ? (
+                          <CircularProgress size={10} />
+                        ) : (
+                          <Add fontSize="small" />
+                        )
+                      }
+                      onClick={() => onCreateTeamMembers(1)}
+                      disabled={
+                        isCreatingMembers ||
+                        (availableSeats !== null && availableSeats <= 0)
+                      }
+                    />
+                  </Line>
+                )}
+                <Line expand noMargin>
+                  <RaisedButton
+                    primary
+                    icon={<Copy fontSize="small" />}
+                    disabled={
+                      hasNoActiveTeamMembers && selectedUserIds.length === 0
+                    }
+                    fullWidth
+                    label={
+                      selectedUserIds.length === 0 ? (
+                        <Trans>Copy active credentials</Trans>
+                      ) : (
+                        <Trans>Copy {selectedUserIds.length} credentials</Trans>
+                      )
+                    }
+                    onClick={onCopyActiveCredentials}
+                  />
+                </Line>
+              </LineStackLayout>
+            </ResponsiveLineStackLayout>
+          </ResponsiveLineStackLayout>
           {hasNoTeamMembers && availableSeats !== null && (
             <StudentCreationCard
               availableSeats={availableSeats}
@@ -405,7 +445,11 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
           {(!hasNoTeamMembers || !hasNoActiveTeamMembers) && (
             <ColumnStackLayout noMargin>
               <Paper
-                style={styles.selectedMembersControlsContainer}
+                style={
+                  isMobile
+                    ? styles.selectedMembersControlsContainerMobile
+                    : styles.selectedMembersControlsContainer
+                }
                 background="light"
               >
                 <ColumnStackLayout noMargin>
@@ -472,34 +516,40 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
                 </ColumnStackLayout>
               </Paper>
               <Column>
-                <GridList cols={2} cellHeight={'auto'}>
-                  <Grid item xs={5}>
-                    <Text style={{ opacity: 0.7 }}>
-                      <Trans>Student</Trans>
-                    </Text>
-                  </Grid>
-                  <Grid item xs={4}>
-                    <Text style={{ opacity: 0.7 }}>
-                      <Trans>Password</Trans>
-                    </Text>
-                  </Grid>
-                  <Grid item xs={3}>
-                    <Line noMargin justifyContent="flex-end">
-                      <LeftLoader isLoading={isCreatingMembers}>
+                {!isMobile && (
+                  <GridList cols={2} cellHeight={'auto'}>
+                    <Grid item xs={5}>
+                      <Text style={{ opacity: 0.7 }}>
+                        <Trans>Student</Trans>
+                      </Text>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <Text style={{ opacity: 0.7 }}>
+                        <Trans>Password</Trans>
+                      </Text>
+                    </Grid>
+                    <Grid item xs={3}>
+                      <Line noMargin justifyContent="flex-end">
                         <RaisedButton
                           primary
                           label={<Trans>Add student</Trans>}
-                          icon={<Add fontSize="small" />}
+                          icon={
+                            isCreatingMembers ? (
+                              <CircularProgress size={10} />
+                            ) : (
+                              <Add fontSize="small" />
+                            )
+                          }
                           onClick={() => onCreateTeamMembers(1)}
                           disabled={
                             isCreatingMembers ||
                             (availableSeats !== null && availableSeats <= 0)
                           }
                         />
-                      </LeftLoader>
-                    </Line>
-                  </Grid>
-                </GridList>
+                      </Line>
+                    </Grid>
+                  </GridList>
+                )}
                 {groupsWithMembers.map(({ group, members }) => {
                   return (
                     <React.Fragment key={group ? group.id : 'lobby'}>
@@ -513,7 +563,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
                         </Text>
                       </Line>
                       <Column>
-                        <GridList cols={2} cellHeight={'auto'}>
+                        <GridList cols={isMobile ? 3 : 2} cellHeight={'auto'}>
                           {members.map(member => {
                             return (
                               <ManageStudentRow

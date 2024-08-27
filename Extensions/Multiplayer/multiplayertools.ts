@@ -93,6 +93,7 @@ namespace gdjs {
     let _lobbyId: string | null = null;
     let _connectionId: string | null = null;
 
+    let _shouldEndLobbyWhenHostLeaves = false;
     let _lobbyChangeHostRequest: LobbyChangeHostRequest | null = null;
     let _lobbyChangeHostRequestInitiatedAt: number | null = null;
     let _isChangingHost = false;
@@ -333,6 +334,16 @@ namespace gdjs {
     export const isMigratingHost = (): boolean => {
       return !!_isChangingHost;
     };
+
+    /**
+     * If this is set, instead of migrating the host, the lobby will end when the host leaves.
+     */
+    export const endLobbyWhenHostLeaves = (enable: boolean) => {
+      _shouldEndLobbyWhenHostLeaves = enable;
+    };
+
+    export const shouldEndLobbyWhenHostLeaves = () =>
+      _shouldEndLobbyWhenHostLeaves;
 
     /**
      * Returns the player username at the given number in the lobby.

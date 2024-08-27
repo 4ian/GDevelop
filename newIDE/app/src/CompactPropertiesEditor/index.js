@@ -31,6 +31,7 @@ import { CompactToggleField } from '../UI/CompactToggleField';
 import { CompactTextAreaField } from '../UI/CompactTextAreaField';
 import { CompactColorField } from '../UI/CompactColorField';
 import { rgbOrHexToRGBString } from '../Utils/ColorTransformer';
+import { CompactResourceSelectorWithThumbnail } from '../ResourcesList/CompactResourceSelectorWithThumbnail';
 
 // An "instance" here is the objects for which properties are shown
 export type Instance = Object; // This could be improved using generics.
@@ -366,7 +367,7 @@ const CompactPropertiesEditor = ({
   );
 
   const renderInputField = React.useCallback(
-    (field: ValueField) => {
+    (field: PrimitiveValueField) => {
       if (field.name === 'PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS') return null; // This special property was used in GDevelop 4 IDE to ask for a Edit button to be shown, ignore it.
 
       if (field.valueType === 'boolean') {
@@ -489,8 +490,6 @@ const CompactPropertiesEditor = ({
             markdownDescription={getFieldDescription(field)}
           />
         );
-      } else if (field.valueType === 'resource') {
-        return null; // TODO
       } else {
         const {
           // TODO: Still support onEditButtonClick & onEditButtonBuildMenuTemplate ?
@@ -662,7 +661,7 @@ const CompactPropertiesEditor = ({
 
     const { setValue } = field;
     return (
-      <ResourceSelectorWithThumbnail
+      <CompactResourceSelectorWithThumbnail
         key={field.name}
         project={project}
         resourceManagementProps={resourceManagementProps}
@@ -677,8 +676,8 @@ const CompactPropertiesEditor = ({
           instances.forEach(i => setValue(i, newValue));
           _onInstancesModified(instances);
         }}
-        floatingLabelText={getFieldLabel({ instances, field })}
-        helperMarkdownText={getFieldDescription(field)}
+        label={getFieldLabel({ instances, field })}
+        markdownDescription={getFieldDescription(field)}
       />
     );
   };

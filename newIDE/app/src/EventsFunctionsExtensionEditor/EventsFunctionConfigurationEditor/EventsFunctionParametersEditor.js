@@ -182,6 +182,7 @@ export const EventsFunctionParametersEditor = ({
       parameters.insertNewParameter(newName, index).setType('objectList');
       forceUpdate();
       onParametersUpdated();
+      setJustAddedParameterName(newName);
     },
     [eventsFunction, forceUpdate, onParametersUpdated]
   );
@@ -550,8 +551,8 @@ export const EventsFunctionParametersEditor = ({
                               draggedParameter.current = parameter;
                               return {};
                             }}
-                            canDrag={() => true}
-                            canDrop={() => true}
+                            canDrag={() => !isParameterDisabled(i)}
+                            canDrop={() => !isParameterDisabled(i)}
                             drop={() => {
                               moveParameterBefore(parameter);
                             }}
@@ -581,7 +582,9 @@ export const EventsFunctionParametersEditor = ({
                                     {connectDragSource(
                                       <span>
                                         <Column>
-                                          <DragHandleIcon />
+                                          <DragHandleIcon
+                                            disabled={isParameterDisabled(i)}
+                                          />
                                         </Column>
                                       </span>
                                     )}
@@ -629,7 +632,7 @@ export const EventsFunctionParametersEditor = ({
                                           label: i18n._(
                                             t`Add a parameter below`
                                           ),
-                                          enabled: !isParameterDisabled(i),
+                                          enabled: !isParameterDisabled(i + 1),
                                           click: () => addParameterAt(i + 1),
                                         },
                                         {

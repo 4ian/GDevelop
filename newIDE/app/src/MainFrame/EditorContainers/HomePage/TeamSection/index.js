@@ -205,8 +205,18 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
       [onChangeUserGroup]
     );
 
+    const availableSeats = getAvailableSeats();
+
     const onCreateTeamMembers = React.useCallback(
       async (quantity: number) => {
+        if (
+          !availableSeats ||
+          quantity > availableSeats ||
+          quantity <= 0 ||
+          isCreatingMembers
+        ) {
+          return;
+        }
         setIsCreatingMembers(true);
         try {
           await onCreateMembers(quantity);
@@ -217,7 +227,7 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
           setIsCreatingMembers(false);
         }
       },
-      [onCreateMembers, onRefreshTeamMembers]
+      [onCreateMembers, onRefreshTeamMembers, availableSeats, isCreatingMembers]
     );
 
     const buildContextMenu = (
@@ -327,7 +337,6 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
     const hasNoActiveTeamMembers = members
       ? members.filter(member => !member.deactivatedAt).length === 0
       : false;
-    const availableSeats = getAvailableSeats();
 
     return (
       <>
@@ -374,8 +383,7 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
                     <Text size="section-title" noMargin>
                       <Trans>Lobby</Trans>
                     </Text>
-                    {hasNoActiveTeamMembers &&
-                    typeof availableSeats === 'number' ? (
+                    {hasNoActiveTeamMembers && availableSeats !== null ? (
                       <StudentCreationCard
                         availableSeats={availableSeats}
                         onCreateStudentAccounts={onCreateTeamMembers}

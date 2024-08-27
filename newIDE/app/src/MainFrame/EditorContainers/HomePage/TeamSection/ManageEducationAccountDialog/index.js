@@ -207,8 +207,13 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
     [selectedUserIds, members]
   );
 
+  const availableSeats = getAvailableSeats();
+
   const onCreateTeamMembers = React.useCallback(
     async (quantity: number) => {
+      if (!availableSeats || quantity > availableSeats || isCreatingMembers) {
+        return;
+      }
       setIsCreatingMembers(true);
       try {
         await onCreateMembers(quantity);
@@ -219,7 +224,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
         setIsCreatingMembers(false);
       }
     },
-    [onCreateMembers, onRefreshMembers]
+    [onCreateMembers, onRefreshMembers, availableSeats, isCreatingMembers]
   );
 
   const onActivateMembers = React.useCallback(
@@ -312,7 +317,6 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
     ...sortGroupsWithMembers(membersByGroupId),
   ].filter(Boolean);
 
-  const availableSeats = getAvailableSeats();
   const activeMembers = members.filter(member => !member.deactivatedAt);
   const areAllActiveMembersSelected = activeMembers.every(member =>
     selectedUserIds.includes(member.id)
@@ -405,7 +409,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
               />
             </LineStackLayout>
           </LineStackLayout>
-          {hasNoTeamMembers && typeof availableSeats === 'number' && (
+          {hasNoTeamMembers && availableSeats !== null && (
             <StudentCreationCard
               availableSeats={availableSeats}
               isCreatingMembers={isCreatingMembers}
@@ -488,10 +492,26 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
                       <Trans>Student</Trans>
                     </Text>
                   </Grid>
-                  <Grid item xs={7}>
+                  <Grid item xs={4}>
                     <Text style={{ opacity: 0.7 }}>
                       <Trans>Password</Trans>
                     </Text>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <Line noMargin justifyContent="flex-end">
+                      <LeftLoader isLoading={isCreatingMembers}>
+                        <RaisedButton
+                          primary
+                          label={<Trans>Add student</Trans>}
+                          icon={<Add fontSize="small" />}
+                          onClick={() => onCreateTeamMembers(1)}
+                          disabled={
+                            isCreatingMembers ||
+                            (availableSeats !== null && availableSeats <= 0)
+                          }
+                        />
+                      </LeftLoader>
+                    </Line>
                   </Grid>
                 </GridList>
                 {groupsWithMembers.map(({ group, members }) => {

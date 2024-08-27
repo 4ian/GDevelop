@@ -20,7 +20,6 @@ import CloudStorageProvider from '../../../ProjectsStorage/CloudStorageProvider'
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import { fakeAuthenticatedUserWithEducationPlan } from '../../../fixtures/GDevelopServicesTestData';
 import { delay } from '../../../Utils/Delay';
-import random from 'lodash/random';
 import sample from 'lodash/sample';
 
 export default {
@@ -28,6 +27,9 @@ export default {
   component: TeamSection,
   decorators: [paperDecorator],
 };
+
+const random = (min: number, range: number) =>
+  Math.floor(Math.random() * range + min);
 
 const team: Team = {
   id: 'teamId',
@@ -211,22 +213,14 @@ const MockTeamProvider = ({
     return [
       {
         id: 'cloudProject1',
-        name: `${user.username || user.email}_project_${random(
-          0,
-          10000,
-          false
-        )}`,
+        name: `${user.username || user.email}_project_${random(0, 10000)}`,
         lastModifiedAt: '2021-11-20T11:59:50.417Z',
         createdAt: '2021-11-18T10:19:50.417Z',
         updatedAt: '2021-11-18T10:19:50.417Z',
       },
       {
         id: 'cloudProject2',
-        name: `${user.username || user.email}_project_${random(
-          0,
-          10000,
-          false
-        )}`,
+        name: `${user.username || user.email}_project_${random(0, 10000)}`,
         lastModifiedAt: '2022-02-20T11:59:50.417Z',
         createdAt: '2022-01-08T10:19:50.417Z',
         updatedAt: '2022-01-08T10:19:50.417Z',
@@ -295,13 +289,14 @@ const MockTeamProvider = ({
       if (!members) return members;
       const chosenMemberIndex = Math.floor(Math.random() * members.length);
       const newMembers = [...members];
+      // Simulate a username being set while refreshing members.
       newMembers[chosenMemberIndex] = {
         ...newMembers[chosenMemberIndex],
         username:
           Math.random() > 0.5
             ? null
             : sample(['donatello', 'rafaelo', 'leonardo', 'michelangelo']) +
-              random(0, 1000, false),
+              random(0, 1000),
       };
       return newMembers;
     });
@@ -309,14 +304,38 @@ const MockTeamProvider = ({
 
   const createMembers = async () => {
     await delay(2000);
-    setMembers(initialMembers);
-    setMemberships(
-      initialMemberships.map(membership => ({
-        userId: membership.userId,
-        teamId: membership.teamId,
-        createdAt: membership.createdAt,
-      }))
-    );
+    if (members && members.length < 2) {
+      // No accounts created, we create a bunch of them
+      setMembers(initialMembers);
+      setMemberships(
+        initialMemberships.map(membership => ({
+          userId: membership.userId,
+          teamId: membership.teamId,
+          createdAt: membership.createdAt,
+        }))
+      );
+    } else {
+      if (!members) return;
+      // We create the accounts one by one (batch creation won't work, only single addition button)
+      const newMembers = [...members];
+      const newUserId = `user${random(1000, 1000)}`;
+      // $FlowIgnore - the whole user object is not needed for this component
+      const newUser: User = {
+        id: newUserId,
+        email: `${newUserId}@naver.com`,
+        username: null,
+      };
+      newMembers.push(newUser);
+      const newMemberships = [...memberships];
+      newMemberships.push({
+        userId: newUser.id,
+        teamId: 'teamId',
+        createdAt: Date.now(),
+        groups: null,
+      });
+      setMemberships(newMemberships);
+      setMembers(newMembers);
+    }
   };
 
   return (

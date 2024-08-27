@@ -22,7 +22,7 @@ export type TeamState = {|
   onDeleteGroup: (group: TeamGroup) => Promise<void>,
   onCreateGroup: (attributes: {| name: string |}) => Promise<void>,
   onRefreshMembers: () => Promise<void>,
-  getAvailableSeats: () => ?number,
+  getAvailableSeats: () => number | null,
   onCreateMembers: (quantity: number) => Promise<void>,
 |};
 

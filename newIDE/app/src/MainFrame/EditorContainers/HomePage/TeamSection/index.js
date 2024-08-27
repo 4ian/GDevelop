@@ -47,6 +47,7 @@ import UserSVG from '../../../../UI/CustomSvgIcons/User';
 import { copyTextToClipboard } from '../../../../Utils/Clipboard';
 import ManageEducationAccountDialog from './ManageEducationAccountDialog';
 import TeamAvailableSeats from './TeamAvailableSeats';
+import StudentCreationCard from './StudentCreationCard';
 
 const PADDING = 16;
 
@@ -104,6 +105,8 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
       onDeleteGroup,
       onCreateGroup,
       onRefreshMembers,
+      getAvailableSeats,
+      onCreateMembers,
     } = React.useContext(TeamContext);
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const [
@@ -133,6 +136,9 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
       setShowNewGroupNameField,
     ] = React.useState<boolean>(false);
     const [isLoadingMembers, setIsLoadingMembers] = React.useState<boolean>(
+      false
+    );
+    const [isCreatingMembers, setIsCreatingMembers] = React.useState<boolean>(
       false
     );
     const [movingUsers, setMovingUsers] = React.useState<?{|
@@ -197,6 +203,21 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
         }
       },
       [onChangeUserGroup]
+    );
+
+    const onCreateTeamMembers = React.useCallback(
+      async (quantity: number) => {
+        setIsCreatingMembers(true);
+        try {
+          await onCreateMembers(quantity);
+          await onRefreshTeamMembers();
+        } catch (error) {
+          console.error(`An error occurred when creating members: `, error);
+        } finally {
+          setIsCreatingMembers(false);
+        }
+      },
+      [onCreateMembers, onRefreshTeamMembers]
     );
 
     const buildContextMenu = (
@@ -303,6 +324,11 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
       </div>
     );
 
+    const hasNoStudents = members
+      ? members.filter(member => !member.deactivatedAt).length === 0
+      : false;
+    const availableSeats = getAvailableSeats();
+
     return (
       <>
         <SectionContainer
@@ -341,27 +367,37 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
             ) : null}
             <EducationCard onSeeResources={onOpenTeachingResources} />
             <Spacer />
-            {membersNotInAGroupToDisplay && (
+            {(membersNotInAGroupToDisplay || hasNoStudents) && (
               <Paper background="medium" style={styles.lobbyContainer}>
                 <Line noMargin>
                   <ColumnStackLayout noMargin expand>
                     <Text size="section-title" noMargin>
                       <Trans>Lobby</Trans>
                     </Text>
-                    <List style={styles.list}>
-                      {membersNotInAGroupToDisplay.members
-                        .sort(sortMembersByNameOrEmail)
-                        .map(member => (
-                          <TeamMemberRow
-                            isTemporary={false}
-                            key={member.id}
-                            onOpenContextMenu={openContextMenu}
-                            member={member}
-                            onListUserProjects={() => listUserProjects(member)}
-                            onDrag={setDraggedUser}
-                          />
-                        ))}
-                    </List>
+                    {hasNoStudents && typeof availableSeats === 'number' ? (
+                      <StudentCreationCard
+                        availableSeats={availableSeats}
+                        onCreateStudentAccounts={onCreateTeamMembers}
+                        isCreatingMembers={isCreatingMembers}
+                      />
+                    ) : (
+                      <List style={styles.list}>
+                        {membersNotInAGroupToDisplay.members
+                          .sort(sortMembersByNameOrEmail)
+                          .map(member => (
+                            <TeamMemberRow
+                              isTemporary={false}
+                              key={member.id}
+                              onOpenContextMenu={openContextMenu}
+                              member={member}
+                              onListUserProjects={() =>
+                                listUserProjects(member)
+                              }
+                              onDrag={setDraggedUser}
+                            />
+                          ))}
+                      </List>
+                    )}
                   </ColumnStackLayout>
                 </Line>
               </Paper>

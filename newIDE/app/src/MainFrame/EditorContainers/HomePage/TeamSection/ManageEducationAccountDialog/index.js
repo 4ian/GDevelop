@@ -158,6 +158,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
     members,
     memberships,
     onRefreshMembers,
+    getAvailableSeats,
   } = React.useContext(TeamContext);
 
   const onChangeMemberPassword = React.useCallback(
@@ -291,8 +292,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
     ...sortGroupsWithMembers(membersByGroupId),
   ].filter(Boolean);
 
-  const availableSeats =
-    team && members && admins ? team.seats - members.length - admins.length : 0;
+  const availableSeats = getAvailableSeats();
   const areAllActiveUsersSelected = members
     .filter(member => !member.deactivatedAt)
     .every(member => selectedUserIds.includes(member.id));

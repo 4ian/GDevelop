@@ -16,6 +16,7 @@ import {
   deleteGroup,
   createGroup,
   listTeamAdmins,
+  createTeamMembers,
 } from '../../Utils/GDevelopServices/User';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import { listOtherUserCloudProjects } from '../../Utils/GDevelopServices/Project';
@@ -101,6 +102,18 @@ const TeamProvider = ({ children }: Props) => {
         team.id
       );
       setAdmins(teamAdmins);
+    },
+    [team, getAuthorizationHeader, profile]
+  );
+
+  const onCreateMembers = React.useCallback(
+    async quantity => {
+      if (!team || !profile) return;
+      await createTeamMembers(getAuthorizationHeader, {
+        teamId: team.id,
+        quantity,
+        adminUserId: profile.id,
+      });
     },
     [team, getAuthorizationHeader, profile]
   );
@@ -234,6 +247,14 @@ const TeamProvider = ({ children }: Props) => {
     [fetchMembers, fetchMemberships]
   );
 
+  const getAvailableSeats = React.useCallback(
+    () =>
+      team && members && admins
+        ? team.seats - members.length - admins.length
+        : null,
+    [team, members, admins]
+  );
+
   return (
     <TeamContext.Provider
       value={{
@@ -248,6 +269,8 @@ const TeamProvider = ({ children }: Props) => {
         onDeleteGroup,
         onCreateGroup,
         onRefreshMembers,
+        getAvailableSeats,
+        onCreateMembers,
       }}
     >
       {children}

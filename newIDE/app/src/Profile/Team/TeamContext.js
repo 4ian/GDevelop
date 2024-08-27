@@ -22,6 +22,8 @@ export type TeamState = {|
   onDeleteGroup: (group: TeamGroup) => Promise<void>,
   onCreateGroup: (attributes: {| name: string |}) => Promise<void>,
   onRefreshMembers: () => Promise<void>,
+  getAvailableSeats: () => ?number,
+  onCreateMembers: (quantity: number) => Promise<void>,
 |};
 
 export const initialTeamState = {
@@ -36,6 +38,8 @@ export const initialTeamState = {
   onDeleteGroup: async () => {},
   onCreateGroup: async () => {},
   onRefreshMembers: async () => {},
+  getAvailableSeats: () => null,
+  onCreateMembers: async () => {},
 };
 
 const TeamContext = React.createContext<TeamState>(initialTeamState);

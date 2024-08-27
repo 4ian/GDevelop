@@ -157,16 +157,22 @@ const MockTeamProvider = ({
   children,
   loading,
   noGroups,
+  noMembers,
 }: {|
   children: React.Node,
   loading: boolean,
   noGroups?: boolean,
+  noMembers?: boolean,
 |}) => {
   const [nameChangeTryCount, setNameChangeTryCount] = React.useState<number>(0);
   const [userChangeTryCount, setUserChangeTryCount] = React.useState<number>(0);
-  const [members, setMembers] = React.useState<?(User[])>(initialMembers);
+  const [members, setMembers] = React.useState<?(User[])>(
+    noMembers ? [] : initialMembers
+  );
   const [memberships, setMemberships] = React.useState<Array<TeamMembership>>(
-    noGroups
+    noMembers
+      ? []
+      : noGroups
       ? initialMemberships.map(membership => ({
           userId: membership.userId,
           teamId: membership.teamId,
@@ -255,6 +261,14 @@ const MockTeamProvider = ({
     setGroups([...groups, newGroup]);
   };
 
+  const getAvailableSeats = () =>
+    team && members
+      ? team.seats -
+        members.length -
+        // 1 admin.
+        1
+      : null;
+
   const refreshMembers = async () => {
     await delay(800);
     setMembers(members => {
@@ -271,6 +285,18 @@ const MockTeamProvider = ({
       };
       return newMembers;
     });
+  };
+
+  const createMembers = async () => {
+    await delay(2000);
+    setMembers(initialMembers);
+    setMemberships(
+      initialMemberships.map(membership => ({
+        userId: membership.userId,
+        teamId: membership.teamId,
+        createdAt: membership.createdAt,
+      }))
+    );
   };
 
   return (
@@ -291,6 +317,8 @@ const MockTeamProvider = ({
             onDeleteGroup: deleteGroup,
             onCreateGroup: createGroup,
             onRefreshMembers: refreshMembers,
+            onCreateMembers: createMembers,
+            getAvailableSeats,
           }}
         >
           {children}
@@ -316,6 +344,20 @@ export const Default = () => (
 
 export const WithNoGroupsYet = () => (
   <MockTeamProvider loading={false} noGroups>
+    <FixedHeightFlexContainer height={600}>
+      <TeamSection
+        project={testProject.project}
+        currentFileMetadata={null}
+        onOpenRecentFile={action('onOpenRecentFile')}
+        storageProviders={[CloudStorageProvider]}
+        onOpenTeachingResources={action('onOpenTeachingResources')}
+      />
+    </FixedHeightFlexContainer>
+  </MockTeamProvider>
+);
+
+export const WithNoStudentsYet = () => (
+  <MockTeamProvider loading={false} noGroups noMembers>
     <FixedHeightFlexContainer height={600}>
       <TeamSection
         project={testProject.project}

@@ -427,6 +427,31 @@ export const activateTeamMembers = async (
   );
 };
 
+export const createTeamMembers = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    quantity,
+    teamId,
+    adminUserId,
+  }: {|
+    quantity: number,
+    teamId: string,
+    adminUserId: string,
+  |}
+) => {
+  const authorizationHeader = await getAuthorizationHeader();
+  await client.post(
+    `/team/${teamId}/action/batch-create-users`,
+    {
+      quantity,
+    },
+    {
+      params: { userId: adminUserId },
+      headers: { Authorization: authorizationHeader },
+    }
+  );
+};
+
 export const getUsernameAvailability = async (
   username: string
 ): Promise<UsernameAvailability> => {

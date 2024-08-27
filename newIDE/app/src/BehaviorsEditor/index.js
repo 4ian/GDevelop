@@ -549,7 +549,7 @@ export const useManageObjectBehaviors = ({
 
   const newBehaviorDialog = newBehaviorDialogOpen && (
     <NewBehaviorDialog
-      open={newBehaviorDialogOpen}
+      open
       objectType={object.getType()}
       objectBehaviorsTypes={listObjectBehaviorsTypes(object)}
       onClose={() => setNewBehaviorDialogOpen(false)}
@@ -777,9 +777,9 @@ const BehaviorsEditor = (props: Props) => {
               </LineStackLayout>
             </LineStackLayout>
           </Column>
-          {newBehaviorDialog}
         </React.Fragment>
       )}
+      {newBehaviorDialog}
     </Column>
   );
 };

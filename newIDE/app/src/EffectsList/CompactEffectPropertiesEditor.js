@@ -21,7 +21,7 @@ export const CompactEffectPropertiesEditor = ({
   return (
     <CompactPropertiesEditor
       project={project}
-      schema={effectMetadata.parametersCompactSchema}
+      schema={effectMetadata.parametersSchema}
       instances={[effect]}
       resourceManagementProps={resourceManagementProps}
     />

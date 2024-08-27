@@ -54,7 +54,7 @@ export type PrimitiveValueField =
       valueType: 'number',
       getValue: Instance => number,
       setValue: (instance: Instance, newValue: number) => void,
-      // TODO: support this attribute.
+      /** Only supported on non compact property editors. */
       getEndAdornment?: Instance => {|
         label: string,
         tooltipContent: React.Node,
@@ -73,6 +73,7 @@ export type PrimitiveValueField =
         label: string,
         labelIsUserDefined?: boolean,
       |}>,
+      isHiddenWhenThereOnlyOneChoice?: boolean,
       getEndAdornmentIcon?: Instance => ?(className: string) => React.Node,
       onClickEndAdornment?: Instance => void,
       renderLeftIcon?: (className?: string) => React.Node,
@@ -85,6 +86,7 @@ export type PrimitiveValueField =
       ...ValueFieldCommonProperties,
     |}
   | {|
+      /** Only supported on compact property editors. */
       valueType: 'enumIcon',
       renderIcon: (value: any) => React.Node,
       getValue: Instance => any,
@@ -107,7 +109,7 @@ export type PrimitiveValueField =
     |};
 
 // "Resource" fields are showing a resource selector.
-type ResourceField = {|
+export type ResourceField = {|
   valueType: 'resource',
   resourceKind: ResourceKind,
   fallbackResourceKind?: ResourceKind,
@@ -117,7 +119,7 @@ type ResourceField = {|
   ...ValueFieldCommonProperties,
 |};
 
-type Title = {|
+export type Title = {|
   name: string,
   title: string,
   renderLeftIcon: (className?: string) => React.Node,
@@ -139,7 +141,7 @@ type VerticalCenterWithBar = {|
   child: PrimitiveValueField,
 |};
 
-type ActionButton = {|
+export type ActionButton = {|
   label: string,
   disabled: 'onValuesDifferent',
   getValue: Instance => string,

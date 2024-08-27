@@ -384,7 +384,7 @@ type UseManageEffectsState = {|
   all2DEffectMetadata: Array<EnumeratedEffectMetadata>,
   all3DEffectMetadata: Array<EnumeratedEffectMetadata>,
   draggedEffect: {| current: ?gdEffect |},
-  addEffect: (boolean) => void,
+  addEffect: boolean => void,
   chooseEffectType: (effect: gdEffect, newEffectType: string) => void,
   copyAllEffects: () => void,
   copyEffect: (effect: gdEffect) => void,

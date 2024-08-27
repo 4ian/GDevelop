@@ -1,6 +1,5 @@
 // @flow
 import { Trans } from '@lingui/macro';
-import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import InlineCheckbox from '../UI/InlineCheckbox';
@@ -13,11 +12,7 @@ import { MarkdownText } from '../UI/MarkdownText';
 import { rgbOrHexToRGBString } from '../Utils/ColorTransformer';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import InputAdornment from '@material-ui/core/InputAdornment';
-import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
-import {
-  type ResourceKind,
-  type ResourceManagementProps,
-} from '../ResourcesList/ResourceSource';
+import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import {
   TextFieldWithButtonLayout,
   ResponsiveLineStackLayout,
@@ -27,114 +22,33 @@ import RaisedButton from '../UI/RaisedButton';
 import UnsavedChangesContext, {
   type UnsavedChanges,
 } from '../MainFrame/UnsavedChangesContext';
-import { Column, Line, Spacer } from '../UI/Grid';
+import { Column, Line } from '../UI/Grid';
 import Text from '../UI/Text';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import Tooltip from '@material-ui/core/Tooltip';
 import Edit from '../UI/CustomSvgIcons/Edit';
+import {
+  type Schema,
+  type ValueField,
+  type ActionButton,
+  type SectionTitle,
+  type ResourceField,
+} from '../CompactPropertiesEditor';
+
+// Re-export the types.
+export type {
+  Schema,
+  ValueField,
+  ActionButton,
+  SectionTitle,
+  ResourceField,
+  Field,
+} from '../CompactPropertiesEditor';
 
 // An "instance" here is the objects for which properties are shown
 export type Instance = Object; // This could be improved using generics.
 export type Instances = Array<Instance>;
-
-// "Value" fields are fields displayed in the properties.
-export type ValueFieldCommonProperties = {|
-  name: string,
-  getLabel?: Instance => string,
-  getDescription?: Instance => string,
-  getExtraDescription?: Instance => string,
-  disabled?: boolean | ((instances: Array<gdInitialInstance>) => boolean),
-  onEditButtonBuildMenuTemplate?: (i18n: I18nType) => Array<MenuItemTemplate>,
-  onEditButtonClick?: () => void,
-|};
-
-// "Primitive" value fields are "simple" fields.
-export type PrimitiveValueField =
-  | {|
-      valueType: 'number',
-      getValue: Instance => number,
-      setValue: (instance: Instance, newValue: number) => void,
-      getEndAdornment?: Instance => {|
-        label: string,
-        tooltipContent: React.Node,
-      |},
-      ...ValueFieldCommonProperties,
-    |}
-  | {|
-      valueType: 'string',
-      getValue: Instance => string,
-      setValue: (instance: Instance, newValue: string) => void,
-      getChoices?: ?() => Array<{|
-        value: string,
-        label: string,
-        labelIsUserDefined?: boolean,
-      |}>,
-      isHiddenWhenThereOnlyOneChoice?: boolean,
-      ...ValueFieldCommonProperties,
-    |}
-  | {|
-      valueType: 'boolean',
-      getValue: Instance => boolean,
-      setValue: (instance: Instance, newValue: boolean) => void,
-      ...ValueFieldCommonProperties,
-    |}
-  | {|
-      valueType: 'color',
-      getValue: Instance => string,
-      setValue: (instance: Instance, newValue: string) => void,
-      ...ValueFieldCommonProperties,
-    |}
-  | {|
-      valueType: 'textarea',
-      getValue: Instance => string,
-      setValue: (instance: Instance, newValue: string) => void,
-      ...ValueFieldCommonProperties,
-    |};
-
-// "Resource" fields are showing a resource selector.
-type ResourceField = {|
-  valueType: 'resource',
-  resourceKind: ResourceKind,
-  fallbackResourceKind?: ResourceKind,
-  getValue: Instance => string,
-  setValue: (instance: Instance, newValue: string) => void,
-  ...ValueFieldCommonProperties,
-|};
-
-type SectionTitle = {|
-  name: string,
-  getValue?: Instance => string,
-  nonFieldType: 'sectionTitle',
-  defaultValue?: string,
-|};
-
-type ActionButton = {|
-  label: string,
-  disabled: 'onValuesDifferent',
-  getValue: Instance => string,
-  nonFieldType: 'button',
-  onClick: (instance: Instance) => void,
-|};
-
-// A value field is a primitive or a resource.
-export type ValueField = PrimitiveValueField | ResourceField;
-
-// A field can be a primitive, a resource or a list of fields
-export type Field =
-  | PrimitiveValueField
-  | ResourceField
-  | SectionTitle
-  | ActionButton
-  | {|
-      name: string,
-      type: 'row' | 'column',
-      title?: ?string,
-      children: Array<Field>,
-    |};
-
-// The schema is the tree of all fields.
-export type Schema = Array<Field>;
 
 type Props = {|
   onInstancesModified?: Instances => void,
@@ -583,43 +497,13 @@ const PropertiesEditor = ({
           <ColumnStackLayout noMargin>{fields}</ColumnStackLayout>
         );
 
-  const renderSectionTitle = React.useCallback(
-    (field: SectionTitle) => {
-      const { getValue } = field;
-
-      let additionalText = null;
-
-      if (getValue) {
-        let selectedInstancesValue = getFieldValue({
-          instances,
-          field,
-          defaultValue: field.defaultValue || 'Multiple Values',
-        });
-        if (!!selectedInstancesValue) additionalText = selectedInstancesValue;
-      }
-
-      if (!!additionalText) {
-        return (
-          <Line alignItems="baseline" key={`section-title-${field.name}`}>
-            <Text displayInlineAsSpan>{field.name}</Text>
-            <Spacer />
-            <Text
-              allowSelection
-              displayInlineAsSpan
-              size="body2"
-            >{`- ${additionalText}`}</Text>
-          </Line>
-        );
-      }
-
-      return (
-        <Line key={`section-title-${field.name}`}>
-          <Text displayInlineAsSpan>{field.name}</Text>
-        </Line>
-      );
-    },
-    [instances]
-  );
+  const renderSectionTitle = React.useCallback((field: SectionTitle) => {
+    return (
+      <Line key={`section-title-${field.name}`}>
+        <Text displayInlineAsSpan>{field.name}</Text>
+      </Line>
+    );
+  }, []);
 
   return renderContainer(
     schema.map(field => {

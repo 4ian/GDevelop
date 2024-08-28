@@ -278,7 +278,7 @@ module.exports = {
 
     // Properties expressions/conditions/actions:
 
-    // Deprecated
+    // Deprecated, see TextContainerCapability
     object
       .addExpressionAndConditionAndAction(
         'string',
@@ -298,6 +298,7 @@ module.exports = {
       .setFunctionName('setText')
       .setGetter('getText');
 
+    // Deprecated, see TextContainerCapability
     object
       .addStrExpression(
         'Text',
@@ -306,6 +307,7 @@ module.exports = {
         '',
         'res/conditions/text24_black.png'
       )
+      .setHidden()
       .addParameter('object', _('Text input'), 'TextInputObject', false)
       .setFunctionName('getText');
 

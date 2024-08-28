@@ -19,8 +19,11 @@ import Checkbox from '../UI/Checkbox';
 import { type ExtensionItemConfigurationAttribute } from '../EventsFunctionsExtensionEditor';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
+import Window from '../Utils/Window';
 
 const gd: libGDevelop = global.gd;
+
+const isDev = Window.isDev();
 
 type Props = {|
   project: gdProject,
@@ -140,32 +143,34 @@ export default function EventsBasedBehaviorEditor({
               </Trans>
             </AlertMessage>
           )}
-          <SelectField
-            floatingLabelText={
-              <Trans>Visibility in quick customization dialog</Trans>
-            }
-            value={eventsBasedBehavior.getQuickCustomizationVisibility()}
-            onChange={(e, i, valueString: string) => {
-              // $FlowFixMe
-              const value: QuickCustomization_Visibility = valueString;
-              eventsBasedBehavior.setQuickCustomizationVisibility(value);
-              onChange();
-            }}
-            fullWidth
-          >
-            <SelectOption
-              value={gd.QuickCustomization.Default}
-              label={t`Default (visible)`}
-            />
-            <SelectOption
-              value={gd.QuickCustomization.Visible}
-              label={t`Always visible`}
-            />
-            <SelectOption
-              value={gd.QuickCustomization.Hidden}
-              label={t`Hidden`}
-            />
-          </SelectField>
+          {isDev && (
+            <SelectField
+              floatingLabelText={
+                <Trans>Visibility in quick customization dialog</Trans>
+              }
+              value={eventsBasedBehavior.getQuickCustomizationVisibility()}
+              onChange={(e, i, valueString: string) => {
+                // $FlowFixMe
+                const value: QuickCustomization_Visibility = valueString;
+                eventsBasedBehavior.setQuickCustomizationVisibility(value);
+                onChange();
+              }}
+              fullWidth
+            >
+              <SelectOption
+                value={gd.QuickCustomization.Default}
+                label={t`Default (visible)`}
+              />
+              <SelectOption
+                value={gd.QuickCustomization.Visible}
+                label={t`Always visible`}
+              />
+              <SelectOption
+                value={gd.QuickCustomization.Hidden}
+                label={t`Hidden`}
+              />
+            </SelectField>
+          )}
           <Checkbox
             label={<Trans>Private</Trans>}
             checked={eventsBasedBehavior.isPrivate()}

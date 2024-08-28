@@ -24,7 +24,7 @@ import { emailRegex } from '../../../../../Utils/EmailUtils';
 import RaisedButton from '../../../../../UI/RaisedButton';
 import Add from '../../../../../UI/CustomSvgIcons/Add';
 import { groupMembersByGroupId, sortGroupsWithMembers } from '../Utils';
-import { Column, Line } from '../../../../../UI/Grid';
+import { Column, Line, Spacer } from '../../../../../UI/Grid';
 import ManageStudentRow from './ManageStudentRow';
 import AlertMessage from '../../../../../UI/AlertMessage';
 import Link from '../../../../../UI/Link';
@@ -44,6 +44,7 @@ import StudentCreationCard from '../StudentCreationCard';
 import CircularProgress from '../../../../../UI/CircularProgress';
 import { useResponsiveWindowSize } from '../../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import Copy from '../../../../../UI/CustomSvgIcons/Copy';
+import Education from '../../../../../Profile/Subscription/Icons/Education';
 
 const styles = {
   selectedMembersControlsContainer: {
@@ -526,6 +527,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
           <Line noMargin>
             <RaisedButton
               primary
+              disabled={availableSeats !== null && availableSeats <= 0}
               icon={<Add fontSize="small" />}
               label={<Trans>Add teacher</Trans>}
               onClick={() => setAddTeacherDialogOpen(true)}
@@ -540,54 +542,37 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
             <Text size="sub-title" noMargin>
               <Trans>Student accounts</Trans>
             </Text>
-            <ResponsiveLineStackLayout noMargin alignItems="center">
+            <LineStackLayout noMargin alignItems="center">
               <TeamAvailableSeats
                 team={team}
                 members={members}
                 admins={admins}
               />
-              <LineStackLayout noMargin>
-                {isMobile && (
-                  <Line expand noMargin>
-                    <RaisedButton
-                      primary
-                      fullWidth
-                      label={<Trans>Add student</Trans>}
-                      icon={
-                        isCreatingMembers ? (
-                          <CircularProgress size={10} />
-                        ) : (
-                          <Add fontSize="small" />
-                        )
-                      }
-                      onClick={() => onCreateTeamMembers(1)}
-                      disabled={
-                        isCreatingMembers ||
-                        (availableSeats !== null && availableSeats <= 0)
-                      }
-                    />
-                  </Line>
-                )}
-                <Line expand noMargin>
+              <Line expand noMargin justifyContent="flex-end">
+                {availableSeats !== null && availableSeats <= 0 ? (
+                  <FlatButton
+                    primary
+                    label={<Trans>Purchase seats</Trans>}
+                    leftIcon={<Education fontSize="small" />}
+                    // Find a way to open email
+                  />
+                ) : (
                   <RaisedButton
                     primary
-                    icon={<Copy fontSize="small" />}
-                    disabled={
-                      hasNoActiveTeamMembers && selectedUserIds.length === 0
-                    }
-                    fullWidth
-                    label={
-                      selectedUserIds.length === 0 ? (
-                        <Trans>Copy active credentials</Trans>
+                    label={<Trans>Add student</Trans>}
+                    icon={
+                      isCreatingMembers ? (
+                        <CircularProgress size={10} />
                       ) : (
-                        <Trans>Copy {selectedUserIds.length} credentials</Trans>
+                        <Add fontSize="small" />
                       )
                     }
-                    onClick={onCopyActiveCredentials}
+                    onClick={() => onCreateTeamMembers(1)}
+                    disabled={isCreatingMembers}
                   />
-                </Line>
-              </LineStackLayout>
-            </ResponsiveLineStackLayout>
+                )}
+              </Line>
+            </LineStackLayout>
           </ResponsiveLineStackLayout>
           {hasNoTeamMembers && availableSeats !== null && (
             <StudentCreationCard
@@ -660,6 +645,20 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
                       >
                         <Recycle />
                       </IconButton>
+                      <IconButton
+                        size="small"
+                        tooltip={
+                          selectedUserIds.length === 0
+                            ? t`Copy active credentials`
+                            : t`Copy ${selectedUserIds.length} credentials`
+                        }
+                        disabled={
+                          hasNoActiveTeamMembers && selectedUserIds.length === 0
+                        }
+                        onClick={onCopyActiveCredentials}
+                      >
+                        <Copy />
+                      </IconButton>
                     </LineStackLayout>
                   </Line>
                   {batchControlError && (
@@ -677,36 +676,17 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
                         <Trans>Student</Trans>
                       </Text>
                     </Grid>
-                    <Grid item xs={4}>
+                    <Grid item xs={7}>
                       <Text style={{ opacity: 0.7 }}>
                         <Trans>Password</Trans>
                       </Text>
                     </Grid>
-                    <Grid item xs={3}>
-                      <Line noMargin justifyContent="flex-end">
-                        <RaisedButton
-                          primary
-                          label={<Trans>Add student</Trans>}
-                          icon={
-                            isCreatingMembers ? (
-                              <CircularProgress size={10} />
-                            ) : (
-                              <Add fontSize="small" />
-                            )
-                          }
-                          onClick={() => onCreateTeamMembers(1)}
-                          disabled={
-                            isCreatingMembers ||
-                            (availableSeats !== null && availableSeats <= 0)
-                          }
-                        />
-                      </Line>
-                    </Grid>
                   </GridList>
                 )}
-                {groupsWithMembers.map(({ group, members }) => {
+                {groupsWithMembers.map(({ group, members }, index) => {
                   return (
                     <React.Fragment key={group ? group.id : 'lobby'}>
+                      {index > 0 && <Spacer />}
                       <Line noMargin>
                         <Text size="sub-title">
                           {group ? (
@@ -755,6 +735,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
                 })}
                 {archivedMembers.length > 0 && (
                   <React.Fragment key={'archived'}>
+                    <Spacer />
                     <Line noMargin>
                       {isArchivedAccountsSectionOpen ? (
                         <IconButton

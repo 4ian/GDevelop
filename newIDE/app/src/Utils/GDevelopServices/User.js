@@ -452,6 +452,34 @@ export const createTeamMembers = async (
   );
 };
 
+export const setUserAsAdmin = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    email,
+    activate,
+    teamId,
+    adminUserId,
+  }: {|
+    email: string,
+    activate: boolean,
+    teamId: string,
+    adminUserId: string,
+  |}
+) => {
+  const authorizationHeader = await getAuthorizationHeader();
+  await client.post(
+    `/team/${teamId}/action/setAdmin`,
+    {
+      email,
+      activate,
+    },
+    {
+      params: { userId: adminUserId },
+      headers: { Authorization: authorizationHeader },
+    }
+  );
+};
+
 export const getUsernameAvailability = async (
   username: string
 ): Promise<UsernameAvailability> => {

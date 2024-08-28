@@ -22,9 +22,11 @@ export type TeamState = {|
   onDeleteGroup: (group: TeamGroup) => Promise<void>,
   onCreateGroup: (attributes: {| name: string |}) => Promise<void>,
   onRefreshMembers: () => Promise<void>,
+  onRefreshAdmins: () => Promise<void>,
   getAvailableSeats: () => number | null,
   onCreateMembers: (quantity: number) => Promise<void>,
   onActivateMembers: (userIds: string[], activate: boolean) => Promise<void>,
+  onSetAdmin: (email: string, activate: boolean) => Promise<void>,
   onChangeMemberPassword: (
     userId: string,
     newPassword: string
@@ -46,6 +48,8 @@ export const initialTeamState = {
   getAvailableSeats: () => null,
   onCreateMembers: async () => {},
   onActivateMembers: async () => {},
+  onRefreshAdmins: async () => {},
+  onSetAdmin: async () => {},
   onChangeMemberPassword: async () => {},
 };
 

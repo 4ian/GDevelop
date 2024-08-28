@@ -19,6 +19,7 @@ import {
   createTeamMembers,
   changeTeamMemberPassword,
   activateTeamMembers,
+  setUserAsAdmin,
 } from '../../Utils/GDevelopServices/User';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import { listOtherUserCloudProjects } from '../../Utils/GDevelopServices/Project';
@@ -243,6 +244,19 @@ const TeamProvider = ({ children }: Props) => {
     [getAuthorizationHeader, profile]
   );
 
+  const onSetAdmin = React.useCallback(
+    async (email: string, activate: boolean) => {
+      if (!team || !profile) return;
+      await setUserAsAdmin(getAuthorizationHeader, {
+        teamId: team.id,
+        email,
+        activate,
+        adminUserId: profile.id,
+      });
+    },
+    [team, getAuthorizationHeader, profile]
+  );
+
   const onDeleteGroup = React.useCallback(
     async (group: TeamGroup) => {
       if (!profile || !team) return;
@@ -275,6 +289,19 @@ const TeamProvider = ({ children }: Props) => {
     [fetchMembers, fetchMemberships]
   );
 
+  const onRefreshAdmins = React.useCallback(
+    async () => {
+      if (!profile || !team) return;
+      const teamAdmins = await listTeamAdmins(
+        getAuthorizationHeader,
+        profile.id,
+        team.id
+      );
+      setAdmins(teamAdmins);
+    },
+    [team, getAuthorizationHeader, profile]
+  );
+
   const getAvailableSeats = React.useCallback(
     () =>
       team && members && admins
@@ -297,10 +324,12 @@ const TeamProvider = ({ children }: Props) => {
         onDeleteGroup,
         onCreateGroup,
         onRefreshMembers,
+        onRefreshAdmins,
         getAvailableSeats,
         onCreateMembers,
         onChangeMemberPassword,
         onActivateMembers,
+        onSetAdmin,
       }}
     >
       {children}

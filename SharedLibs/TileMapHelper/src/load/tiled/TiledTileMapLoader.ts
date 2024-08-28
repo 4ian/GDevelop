@@ -85,7 +85,8 @@ export namespace TiledTileMapLoader {
                 ];
               }
               if (polygon) {
-                tileDefinition.addHitBox(tag, polygon);
+                // TODO Check if the polygon cover the whole tile.
+                tileDefinition.addHitBox(tag, polygon, false);
               }
             }
           } else if (tileClass) {
@@ -96,7 +97,7 @@ export namespace TiledTileMapLoader {
               [tiledTileMap.tilewidth, tiledTileMap.tileheight],
               [tiledTileMap.tilewidth, 0],
             ];
-            tileDefinition.addHitBox(tileClass, polygon);
+            tileDefinition.addHitBox(tileClass, polygon, true);
           }
           definitions.set(
             getTileIdFromTiledGUI(firstGid + tile.id),
@@ -117,7 +118,7 @@ export namespace TiledTileMapLoader {
       tiledTileMap.tileheight,
       tiledTileMap.width,
       tiledTileMap.height,
-      definitions,
+      definitions
     );
 
     for (const tiledLayer of tiledTileMap.layers) {

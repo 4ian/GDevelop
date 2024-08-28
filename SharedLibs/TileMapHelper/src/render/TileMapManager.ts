@@ -131,14 +131,11 @@ export class TileMapManager {
     // TODO: Is it useful to cache the tilemap since it belongs to an instance?
     // const key = `${objectName}|${tileSize}|${tileSetColumnCount}|${tileSetRowCount}`;
 
-    const editableTileMap = EditableTileMap.from(
-      tileMapAsJsObject,
-      {
-        tileSize,
-        tileSetColumnCount,
-        tileSetRowCount,
-      },
-    );
+    const editableTileMap = EditableTileMap.from(tileMapAsJsObject, {
+      tileSize,
+      tileSetColumnCount,
+      tileSetRowCount,
+    });
     callback(editableTileMap);
   }
 

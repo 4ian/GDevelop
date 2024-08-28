@@ -714,9 +714,10 @@ namespace gdjs {
           return this.hitBoxes;
         }
 
-        const layerTransformation = this.layer.tileMap.getTransformation();
-        const width = this.layer.tileMap.getTileWidth();
-        const height = this.layer.tileMap.getTileHeight();
+        const tileMap = this.layer.tileMap;
+        const layerTransformation = tileMap.getTransformation();
+        const width = tileMap.getTileWidth();
+        const height = tileMap.getTileHeight();
 
         const tileTransformation =
           TransformedCollisionTile.workingTransformation;
@@ -733,14 +734,87 @@ namespace gdjs {
         }
         tileTransformation.preConcatenate(layerTransformation);
 
-        // The tile map can't change at runtime so the existing arrays can be
-        // reused safely.
+        const hasFullHitBox =
+          definitionHitboxes.length === 1 && definition.hasFullHitBox(tag);
+        if (hasFullHitBox) {
+          const isLeftFull = this._hasNeighborFullHitBox(-1, 0);
+          const isRightFull = this._hasNeighborFullHitBox(1, 0);
+          const isTopFull = this._hasNeighborFullHitBox(0, -1);
+          const isBottomFull = this._hasNeighborFullHitBox(0, 1);
+
+          let hitBoxesCount = 0;
+          if (isLeftFull || isRightFull) {
+            let minX = isLeftFull ? -width : 0;
+            let maxX = isRightFull ? 2 * width : width;
+            TransformedCollisionTile.setRectangle(
+              this.hitBoxes[0],
+              minX,
+              0,
+              maxX,
+              height
+            );
+            hitBoxesCount++;
+          }
+          if (isTopFull || isBottomFull) {
+            let minY = isTopFull ? -height : 0;
+            let maxY = isBottomFull ? 2 * height : height;
+            if (this.hitBoxes.length < hitBoxesCount + 1) {
+              // TODO Avoid to allocate a Polygon
+              this.hitBoxes[1] = gdjs.Polygon.createRectangle(0, 0);
+            }
+            TransformedCollisionTile.setRectangle(
+              this.hitBoxes[hitBoxesCount],
+              0,
+              minY,
+              width,
+              maxY
+            );
+            hitBoxesCount++;
+            if (hitBoxesCount === 2) {
+              console.log('2nd polygon!');
+              console.log(this.hitBoxes);
+            }
+          }
+          if (hitBoxesCount === 0) {
+            TransformedCollisionTile.setRectangle(
+              this.hitBoxes[0],
+              0,
+              0,
+              width,
+              height
+            );
+            hitBoxesCount++;
+          }
+          this.hitBoxes.length;
+        } else {
+          // The tile map can't change at runtime so the existing arrays can be
+          // reused safely.
+          for (
+            let polygonIndex = 0;
+            polygonIndex < definitionHitboxes.length;
+            polygonIndex++
+          ) {
+            const defPolygon = definitionHitboxes[polygonIndex];
+            const polygon = this.hitBoxes[polygonIndex];
+
+            for (
+              let vertexIndex = 0;
+              vertexIndex < polygon.vertices.length;
+              vertexIndex++
+            ) {
+              const defVertex = defPolygon[vertexIndex];
+              const vertex = polygon.vertices[vertexIndex];
+
+              vertex[0] = defVertex[0];
+              vertex[1] = defVertex[1];
+            }
+          }
+        }
         for (
           let polygonIndex = 0;
           polygonIndex < this.hitBoxes.length;
           polygonIndex++
         ) {
-          const defPolygon = definitionHitboxes[polygonIndex];
           const polygon = this.hitBoxes[polygonIndex];
 
           for (
@@ -748,14 +822,41 @@ namespace gdjs {
             vertexIndex < polygon.vertices.length;
             vertexIndex++
           ) {
-            const defVertex = defPolygon[vertexIndex];
             const vertex = polygon.vertices[vertexIndex];
 
-            tileTransformation.transform(defVertex, vertex);
+            tileTransformation.transform(vertex, vertex);
           }
         }
         this._setHitboxesUpToDate();
         return this.hitBoxes;
+      }
+
+      private _hasNeighborFullHitBox(deltaX: integer, deltaY: integer) {
+        const sourceLayer = this.layer._source;
+        const tileId = sourceLayer.getTileId(this.x + deltaX, this.y + deltaY);
+        const tileDefinition =
+          tileId && this.layer.tileMap.getTileDefinition(tileId);
+        return (
+          tileDefinition && tileDefinition.hasFullHitBox(this.layer.tileMap.tag)
+        );
+      }
+
+      private static setRectangle(
+        polygon: gdjs.Polygon,
+        minX: float,
+        minY: float,
+        maxX: float,
+        maxY: float
+      ) {
+        const vertices = polygon.vertices;
+        vertices[0][0] = minX;
+        vertices[0][1] = minY;
+        vertices[1][0] = maxX;
+        vertices[1][1] = minY;
+        vertices[2][0] = maxX;
+        vertices[2][1] = maxY;
+        vertices[3][0] = minX;
+        vertices[3][1] = maxY;
       }
     }
   }

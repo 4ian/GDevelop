@@ -231,12 +231,16 @@ namespace gdjs {
               );
               return;
             }
-            tileDefinition.addHitBox(this._hitBoxTag, [
-              [0, 0],
-              [0, tileMap.getTileHeight()],
-              [tileMap.getTileWidth(), tileMap.getTileHeight()],
-              [tileMap.getTileWidth(), 0],
-            ]);
+            tileDefinition.addHitBox(
+              this._hitBoxTag,
+              [
+                [0, 0],
+                [0, tileMap.getTileHeight()],
+                [tileMap.getTileWidth(), tileMap.getTileHeight()],
+                [tileMap.getTileWidth(), 0],
+              ],
+              true
+            );
           });
 
           this._tileMapManager.getOrLoadSimpleTileMapTextureCache(

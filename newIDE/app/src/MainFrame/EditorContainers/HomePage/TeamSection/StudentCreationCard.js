@@ -57,7 +57,7 @@ const StudentCreationCard = ({
           <Trans>Start by creating their accounts</Trans>
         </Text>
         {isCreatingMembers ? (
-          <LineStackLayout noMargin alignItems="center">
+          <LineStackLayout alignItems="center">
             <CircularProgress size={10} />
             <Text style={{ opacity: 0.7 }} noMargin>
               <Trans>Generating your student’s accounts...</Trans>

@@ -40,7 +40,9 @@ const initialTeam: Team = {
 const initialAdmins: Array<User> = [
   // $FlowIgnore - the whole user object is not needed for this component
   {
-    id: 'user0',
+    id: fakeAuthenticatedUserWithEducationPlan.profile
+      ? fakeAuthenticatedUserWithEducationPlan.profile.id
+      : 'user0',
     email: 'user0@teacher.com',
     username: 'Teacher',
   },
@@ -280,11 +282,8 @@ const MockTeamProvider = ({
   };
 
   const getAvailableSeats = () =>
-    team && members
-      ? team.seats -
-        members.length -
-        // 1 admin.
-        1
+    team && members && admins
+      ? team.seats - members.length - admins.length
       : null;
 
   const setAdmin = async (email: string, activate: boolean) => {

@@ -707,6 +707,11 @@ namespace gdjs {
         const mergedObjectConfiguration = {
           ...eventsBasedObjectData,
           ...objectData,
+          // ObjectData doesn't have an `objects` attribute.
+          // This is a small optimization to avoid to create an
+          // InstanceContainerData for each instance to hot-reload their inner
+          // scene (see `_hotReloadRuntimeInstanceContainer` call from
+          // `_hotReloadRuntimeSceneInstances`).
           objects: mergedChildObjectDataList,
           childrenContent: mergedChildObjectDataList,
         };
@@ -1383,6 +1388,7 @@ namespace gdjs {
         const oldObjectData = oldObjectsMap.get(runtimeObject.getName());
         const newObjectData = newObjectsMap.get(runtimeObject.getName());
         if (!runtimeObject || !oldObjectData || !newObjectData) {
+          // New objects or deleted objects can't have instances to hot-reload.
           continue;
         }
         const oldInstance = groupedOldInstances[persistentUuid];

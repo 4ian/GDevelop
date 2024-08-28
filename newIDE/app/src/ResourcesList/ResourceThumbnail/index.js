@@ -14,6 +14,7 @@ type Props = {|
   selected?: boolean,
   onSelect?: boolean => void,
   onContextMenu?: (number, number) => void,
+  size?: number,
 |};
 
 export const resourcesKindsWithThumbnail = ['image'];
@@ -31,6 +32,7 @@ const ResourceThumbnail = ({
   selected,
   onSelect,
   onContextMenu,
+  size,
 }: Props) => {
   switch (resourceKind) {
     case 'image':
@@ -44,6 +46,7 @@ const ResourceThumbnail = ({
           selected={selected}
           onSelect={onSelect}
           onContextMenu={onContextMenu}
+          size={size || 100}
         />
       );
     default:

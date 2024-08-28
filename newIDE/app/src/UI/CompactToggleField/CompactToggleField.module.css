@@ -14,6 +14,7 @@
   display: inline-block;
   width: 32px;
   height: 16px;
+  flex-shrink: 0;
 }
 
 .checkbox {

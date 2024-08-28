@@ -27,9 +27,11 @@ class GD_EXTENSION_API TextObject : public gd::ObjectConfiguration {
 
   virtual void ExposeResources(gd::ArbitraryResourceWorker& worker) override;
 
-  virtual std::map<gd::String, gd::PropertyDescriptor>GetProperties() const override;
+  virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties()
+      const override;
 
-  virtual bool UpdateProperty(const gd::String &name, const gd::String &value) override;
+  virtual bool UpdateProperty(const gd::String& name,
+                              const gd::String& value) override;
 
   /** \brief Change the text.
    */

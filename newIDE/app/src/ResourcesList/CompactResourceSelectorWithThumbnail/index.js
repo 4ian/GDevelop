@@ -7,7 +7,9 @@ import {
   type ResourceKind,
   type ResourceSource,
 } from '../ResourceSource';
-import ResourceThumbnail from '../ResourceThumbnail';
+import ResourceThumbnail, {
+  resourcesKindsWithThumbnail,
+} from '../ResourceThumbnail';
 import { LineStackLayout } from '../../UI/Layout';
 import { type ResourceExternalEditor } from '../ResourceExternalEditor';
 import IconButton from '../../UI/IconButton';
@@ -20,6 +22,8 @@ import useResourcesChangedWatcher from '../UseResourcesChangedWatcher';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import useForceUpdate from '../../Utils/UseForceUpdate';
+import classes from './CompactResourceSelectorWithThumbnail.module.css';
+import classNames from 'classnames';
 
 const styles = {
   icon: {
@@ -54,6 +58,8 @@ export const CompactResourceSelectorWithThumbnail = ({
 }: Props) => {
   const resourcesLoader = ResourcesLoader;
   const forceUpdate = useForceUpdate();
+  const displayThumbnail = resourcesKindsWithThumbnail.includes(resourceKind);
+
   // TODO: move in a hook?
   const { showConfirmation } = useAlertDialog();
   const abortControllerRef = React.useRef<?AbortController>(null);
@@ -222,13 +228,30 @@ export const CompactResourceSelectorWithThumbnail = ({
 
   return (
     <LineStackLayout noMargin expand>
-      <ResourceThumbnail
-        resourceName={resourceName}
-        resourcesLoader={ResourcesLoader}
-        project={project}
-        resourceKind={resourceKind}
-      />
-      <input type="text" value={resourceName} />
+      {displayThumbnail && (
+        <ResourceThumbnail
+          resourceName={resourceName}
+          resourcesLoader={ResourcesLoader}
+          project={project}
+          resourceKind={resourceKind}
+          size={24}
+        />
+      )}
+      <div
+        className={classNames({
+          [classes.container]: true,
+          [classes.disabled]: false,
+          [classes.errored]: false,
+        })}
+      >
+        <div
+          className={classNames({
+            [classes.compactResourceSelector]: true,
+          })}
+        >
+          <input type="text" value={resourceName} />
+        </div>
+      </div>
       <ElementWithMenu
         element={
           <IconButton size="small" onClick={() => {}}>

@@ -549,12 +549,20 @@ module.exports = {
         this._pixiObject.alpha = opacity / 255;
 
         const color = properties.get('color').getValue();
-        this._pixiObject.textStyles.default.fill = objectsRenderingService.rgbOrHexToHexNumber(
+        const newColor = objectsRenderingService.rgbOrHexToHexNumber(
           color
         );
+        if (newColor !== this._pixiObject.textStyles.default.fill) {
+          this._pixiObject.textStyles.default.fill = newColor;
+          this._pixiObject.dirty = true;
+        }
 
         const fontSize = properties.get('fontSize').getValue();
-        this._pixiObject.textStyles.default.fontSize = `${fontSize}px`;
+        const newDefaultFontsize = `${fontSize}px`;
+        if (newDefaultFontsize !== this._pixiObject.textStyles.default.fontSize) {
+          this._pixiObject.textStyles.default.fontSize = `${fontSize}px`;
+          this._pixiObject.dirty = true;
+        }
 
         const fontResourceName = properties.get('fontFamily').getValue();
 

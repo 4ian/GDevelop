@@ -115,12 +115,12 @@ std::map<gd::String, gd::PropertyDescriptor> AnchorBehavior::GetProperties(
           "Stretch object when anchoring right or bottom edge (deprecated, "
           "it's recommended to leave this unchecked and anchor both sides if "
           "you want Sprite to stretch instead.)"))
-      .SetGroup(_("Deprecated options (advanced)"))
       .SetValue(behaviorContent.GetBoolAttribute(
                     "useLegacyBottomAndRightAnchors", true)
                     ? "true"
                     : "false")
-      .SetType("Boolean");
+      .SetType("Boolean")
+      .SetDeprecated(true);
 
   return properties;
 }

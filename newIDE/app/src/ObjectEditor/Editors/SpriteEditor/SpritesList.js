@@ -79,6 +79,7 @@ const SortableSpriteThumbnail = SortableElement(
       resourcesLoader={resourcesLoader}
       project={project}
       style={isFirst ? {} : styles.thumbnailExtraStyle}
+      size={100}
     />
   )
 );
@@ -123,6 +124,7 @@ const SortableList = SortableContainer(
                 resourceName={sprite.getImageName()}
                 resourcesLoader={resourcesLoader}
                 project={project}
+                size={100}
               />
             );
           }),
@@ -132,6 +134,7 @@ const SortableList = SortableContainer(
               project={project}
               resourceName=""
               resourcesLoader={resourcesLoader}
+              size={100}
             />
           ),
         ]}

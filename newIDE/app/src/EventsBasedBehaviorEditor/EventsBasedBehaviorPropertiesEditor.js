@@ -539,6 +539,10 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                     >
                                       <SelectField
                                         margin="none"
+                                        disabled={
+                                          property.getType() === 'Behavior' &&
+                                          !property.isHidden()
+                                        }
                                         value={
                                           property.isHidden()
                                             ? 'Hidden'

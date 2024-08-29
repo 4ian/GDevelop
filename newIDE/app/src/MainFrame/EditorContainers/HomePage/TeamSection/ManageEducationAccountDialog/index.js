@@ -151,7 +151,6 @@ const AddTeacherDialog = ({ onClose, onAddTeacher }: AddTeacherDialogProps) => {
         if (!extractedStatusAndCode) {
           setAddError('unexpected');
         } else {
-          console.log(extractedStatusAndCode);
           let error;
           if (extractedStatusAndCode.status === 404) {
             error = 'user-not-found';
@@ -194,7 +193,7 @@ const AddTeacherDialog = ({ onClose, onAddTeacher }: AddTeacherDialogProps) => {
 
   return (
     <Dialog
-      title="Add a collaborator"
+      title={<Trans>Add a teacher</Trans>}
       actions={[
         <FlatButton
           label={<Trans>Back</Trans>}
@@ -366,7 +365,6 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
         if (!extractedStatusAndCode) {
           setRemoveAdminError('unexpected');
         } else {
-          console.log(extractedStatusAndCode);
           let error;
           if (extractedStatusAndCode.status === 404) {
             error = 'user-not-found';

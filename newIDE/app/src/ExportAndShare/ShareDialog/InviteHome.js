@@ -390,7 +390,7 @@ const InviteHome = ({ cloudProjectId }: Props) => {
       </ColumnStackLayout>
       {showCollaboratorAddDialog && (
         <Dialog
-          title="Add a collaborator"
+          title={<Trans>Add a collaborator</Trans>}
           actions={[
             <FlatButton
               label={<Trans>Back</Trans>}

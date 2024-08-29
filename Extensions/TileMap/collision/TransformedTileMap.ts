@@ -764,12 +764,11 @@ namespace gdjs {
           if (isLeftFull || isRightFull) {
             let minX = isLeftFull ? -width : 0;
             let maxX = isRightFull ? 2 * width : width;
-            if (this.hitBoxes.length === 0) {
-              // TODO Avoid to allocate a Polygon
-              this.hitBoxes[0] = gdjs.Polygon.createRectangle(0, 0);
+            if (hitBoxesCount >= this.hitBoxes.length) {
+              this.hitBoxes[hitBoxesCount] = gdjs.Polygon.createRectangle(0, 0);
             }
             TransformedCollisionTile.setRectangle(
-              this.hitBoxes[0],
+              this.hitBoxes[hitBoxesCount],
               minX,
               0,
               maxX,
@@ -780,8 +779,7 @@ namespace gdjs {
           if (isTopFull || isBottomFull) {
             let minY = isTopFull ? -height : 0;
             let maxY = isBottomFull ? 2 * height : height;
-            if (this.hitBoxes.length < hitBoxesCount + 1) {
-              // TODO Avoid to allocate a Polygon
+            if (hitBoxesCount >= this.hitBoxes.length) {
               this.hitBoxes[hitBoxesCount] = gdjs.Polygon.createRectangle(0, 0);
             }
             TransformedCollisionTile.setRectangle(
@@ -795,7 +793,6 @@ namespace gdjs {
           }
           if (hitBoxesCount === 0) {
             if (this.hitBoxes.length === 0) {
-              // TODO Avoid to allocate a Polygon
               this.hitBoxes[0] = gdjs.Polygon.createRectangle(0, 0);
             }
             TransformedCollisionTile.setRectangle(
@@ -809,17 +806,17 @@ namespace gdjs {
           }
           this.hitBoxes.length = hitBoxesCount;
         } else {
-          if (this.hitBoxes.length === 0) {
-            // This can't happen in practice as only the simple tile map can be
-            // modify and it only contains full hit boxes.
-            this.hitBoxes[0] = gdjs.Polygon.createRectangle(0, 0);
-          }
           for (
             let polygonIndex = 0;
             polygonIndex < definitionHitboxes.length;
             polygonIndex++
           ) {
             const defPolygon = definitionHitboxes[polygonIndex];
+            if (polygonIndex >= this.hitBoxes.length) {
+              // This can't happen in practice as only the simple tile map can be
+              // modify and it only contains full hit boxes.
+              this.hitBoxes[polygonIndex] = gdjs.Polygon.createRectangle(0, 0);
+            }
             const polygon = this.hitBoxes[polygonIndex];
 
             for (

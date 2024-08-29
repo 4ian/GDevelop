@@ -149,7 +149,7 @@ namespace gdjs {
           newObjectData.animatable || []
         );
       }
-      return this._instanceContainer.updateFrom(oldObjectData, newObjectData);
+      return true;
     }
 
     extraInitializationFromInitialInstance(initialInstanceData: InstanceData) {

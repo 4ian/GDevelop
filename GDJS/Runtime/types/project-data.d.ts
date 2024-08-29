@@ -217,6 +217,7 @@ declare interface BehaviorSharedData {
 
 declare interface ExternalLayoutData {
   name: string;
+  associatedLayout: string;
   instances: InstanceData[];
 }
 

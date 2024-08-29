@@ -733,7 +733,6 @@ namespace gdjs {
         const definition = this.getDefinition();
         if (!definition) {
           this._setHitboxesUpToDate();
-          // It should already be []
           this.hitBoxes.length = 0;
           return this.hitBoxes;
         }
@@ -741,30 +740,17 @@ namespace gdjs {
         const definitionHitboxes = definition.getHitBoxes(tag);
         if (!definitionHitboxes) {
           this._setHitboxesUpToDate();
-          // It should already be []
           this.hitBoxes.length = 0;
           return this.hitBoxes;
         }
 
         const tileMap = this.layer.tileMap;
-        const layerTransformation = tileMap.getTransformation();
         const width = tileMap.getTileWidth();
         const height = tileMap.getTileHeight();
 
-        const tileTransformation =
-          TransformedCollisionTile.workingTransformation;
-        tileTransformation.setToTranslation(width * this.x, height * this.y);
-        if (this.layer.isFlippedHorizontally(this.x, this.y)) {
-          tileTransformation.flipX(width / 2);
-        }
-        if (this.layer.isFlippedVertically(this.x, this.y)) {
-          tileTransformation.flipY(height / 2);
-        }
-        if (this.layer.isFlippedDiagonally(this.x, this.y)) {
-          tileTransformation.flipX(width / 2);
-          tileTransformation.rotateAround(Math.PI / 2, width / 2, height / 2);
-        }
-        tileTransformation.preConcatenate(layerTransformation);
+        // Extend the hit boxes.
+        // It avoids small objects to be pushed side way into a wall when they
+        // should be pop out of the wall.
 
         const hasFullHitBox =
           definitionHitboxes.length === 1 && definition.hasFullHitBox(tag);
@@ -823,8 +809,11 @@ namespace gdjs {
           }
           this.hitBoxes.length = hitBoxesCount;
         } else {
-          // The tile map can't change at runtime so the existing arrays can be
-          // reused safely.
+          if (this.hitBoxes.length === 0) {
+            // This can't happen in practice as only the simple tile map can be
+            // modify and it only contains full hit boxes.
+            this.hitBoxes[0] = gdjs.Polygon.createRectangle(0, 0);
+          }
           for (
             let polygonIndex = 0;
             polygonIndex < definitionHitboxes.length;
@@ -846,6 +835,23 @@ namespace gdjs {
             }
           }
         }
+
+        // Transform the hit boxes.
+
+        const tileTransformation =
+          TransformedCollisionTile.workingTransformation;
+        tileTransformation.setToTranslation(width * this.x, height * this.y);
+        if (this.layer.isFlippedHorizontally(this.x, this.y)) {
+          tileTransformation.flipX(width / 2);
+        }
+        if (this.layer.isFlippedVertically(this.x, this.y)) {
+          tileTransformation.flipY(height / 2);
+        }
+        if (this.layer.isFlippedDiagonally(this.x, this.y)) {
+          tileTransformation.flipX(width / 2);
+          tileTransformation.rotateAround(Math.PI / 2, width / 2, height / 2);
+        }
+        tileTransformation.preConcatenate(tileMap.getTransformation());
         for (
           let polygonIndex = 0;
           polygonIndex < this.hitBoxes.length;

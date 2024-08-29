@@ -2,7 +2,7 @@ import { float, integer } from '../../model/CommonTypes';
 /**
  * Tiled JSON format (https://github.com/mapeditor/tiled/blob/master/docs/reference/json-map-format.rst).
  */
-export type TiledTileMap = {
+export declare type TiledTileMap = {
   /** Hex-formatted color (#RRGGBB or #AARRGGBB) (optional) */
   backgroundcolor?: string;
   /** The compression level to use for tile layer data (defaults to -1, which means to use the algorithm default) */
@@ -44,7 +44,7 @@ export type TiledTileMap = {
   /** Number of tile columns */
   width: integer;
 };
-export type TiledLayer = {
+export declare type TiledLayer = {
   /** Array of {@link TiledChunk} (optional). `tilelayer` only. */
   chunks?: Array<TiledChunk>;
   /** `zlib`, `gzip`, `zstd` (since Tiled 1.3) or empty (default). `tilelayer` only. */
@@ -98,7 +98,7 @@ export type TiledLayer = {
   /** Vertical layer offset in tiles. Always 0. */
   y: integer;
 };
-export type TiledChunk = {
+export declare type TiledChunk = {
   /** Array of `unsigned` `integer` (GIDs) or base64-encoded data */
   data: Array<integer> | string;
   /** Height in tiles */
@@ -110,7 +110,7 @@ export type TiledChunk = {
   /** Y coordinate in tiles */
   y: integer;
 };
-export type TiledObject = {
+export declare type TiledObject = {
   /** The class of the object (was saved as class in 1.9, optional) */
   type?: string;
   /** The class of the object (used only in 1.9, optional) */
@@ -148,7 +148,7 @@ export type TiledObject = {
   /** Y coordinate in pixels */
   y: float;
 };
-export type TiledText = {
+export declare type TiledText = {
   /** Whether to use a bold font (default: `false`) */
   bold: boolean;
   /** Hex-formatted color (#RRGGBB or #AARRGGBB) (default: `#000000`) */
@@ -174,7 +174,7 @@ export type TiledText = {
   /** Whether the text is wrapped within the object bounds (default: `false`) */
   wrap: boolean;
 };
-export type TiledTileset = {
+export declare type TiledTileset = {
   /** Hex-formatted color (#RRGGBB or #AARRGGBB) (optional) */
   backgroundcolor?: string;
   /** The number of tile columns in the tileset */
@@ -226,7 +226,7 @@ export type TiledTileset = {
   /** Array of {@link TiledWangSet} (since 1.1.5) */
   wangsets?: Array<TiledWangSet>;
 };
-export type TiledGrid = {
+export declare type TiledGrid = {
   /** Cell height of tile grid */
   height: integer;
   /** `orthogonal` (default) or `isometric` */
@@ -234,13 +234,13 @@ export type TiledGrid = {
   /** Cell width of tile grid */
   width: integer;
 };
-export type TileOffset = {
+export declare type TileOffset = {
   /** Horizontal offset in pixels */
   x: integer;
   /** Vertical offset in pixels (positive is down) */
   y: integer;
 };
-export type TiledTransformations = {
+export declare type TiledTransformations = {
   /** Tiles can be flipped horizontally */
   hflip: boolean;
   /** Tiles can be flipped vertically */
@@ -250,7 +250,7 @@ export type TiledTransformations = {
   /** Whether untransformed tiles remain preferred, otherwise transformed tiles are used to produce more variations */
   preferuntransformed: boolean;
 };
-export type TiledTileDefinition = {
+export declare type TiledTileDefinition = {
   /** Array of {@link TiledTiles} */
   animation?: Array<TiledTileDefinition>;
   /** The class of the object (was saved as class in 1.9, optional) */
@@ -274,13 +274,13 @@ export type TiledTileDefinition = {
   /** Index of terrain for each corner of tile (optional) */
   terrain?: Array<integer>;
 };
-export type TiledFrame = {
+export declare type TiledFrame = {
   /** Frame duration in milliseconds */
   duration: integer;
   /** Local tile ID representing this frame */
   tileid: integer;
 };
-export type TiledTerrain = {
+export declare type TiledTerrain = {
   /** Name of terrain */
   name: string;
   /** Array of {@link TiledProperty} */
@@ -288,7 +288,7 @@ export type TiledTerrain = {
   /** Local ID of tile representing terrain */
   tile: integer;
 };
-export type TiledWangSet = {
+export declare type TiledWangSet = {
   /** Array of {@link TiledWangColor} */
   colors: Array<TiledWangColor>;
   /** Name of the Wang set */
@@ -300,7 +300,7 @@ export type TiledWangSet = {
   /** Array of {@link TiledWangTile} */
   wangtiles: Array<TiledWangTile>;
 };
-export type TiledWangColor = {
+export declare type TiledWangColor = {
   /** Hex-formatted color (#RRGGBB or #AARRGGBB) */
   color: string;
   /** Name of the Wang color */
@@ -312,13 +312,13 @@ export type TiledWangColor = {
   /** Local ID of tile representing the Wang color */
   tile: integer;
 };
-export type TiledWangTile = {
+export declare type TiledWangTile = {
   /** Local ID of tile */
   tileid: integer;
   /** Array of Wang color indexes (`uchar[8]`) */
   wangid: Array<integer>;
 };
-export type TiledObjectTemplate = {
+export declare type TiledObjectTemplate = {
   /** `template` */
   type: string;
   /** External tileset used by the template (optional) */
@@ -326,7 +326,7 @@ export type TiledObjectTemplate = {
   /** The object instantiated by this template */
   object: Object;
 };
-export type TiledProperty = {
+export declare type TiledProperty = {
   /** Name of the property */
   name: string;
   /** type of the property (`string` (default), `integer`, `float`, `boolean`, `color` or `file` (since 0.16, with `color` and `file` added in 0.17)) */
@@ -334,7 +334,7 @@ export type TiledProperty = {
   /** Value of the property */
   value: string | number;
 };
-export type TiledPoint = {
+export declare type TiledPoint = {
   /** X coordinate in pixels */
   x: float;
   /** Y coordinate in pixels */

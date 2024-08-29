@@ -10,7 +10,8 @@ namespace gdjs {
     private _object:
       | gdjs.TileMapRuntimeObject
       | gdjs.SimpleTileMapRuntimeObject;
-    private _tileMap: TileMapHelper.EditableTileMap | null = null;
+    // TODO Move this attribute in the object as it's a model.
+    _tileMap: TileMapHelper.EditableTileMap | null = null;
 
     private _pixiObject: PIXI.tilemap.CompositeTilemap;
 
@@ -177,18 +178,6 @@ namespace gdjs {
      * @param x The layer column.
      * @param y The layer row.
      * @param layerIndex The layer index.
-     * @param tileId The tile's id.
-     */
-    setTileId(x: integer, y: integer, layerIndex: integer, tileId: number) {
-      const tileMap = this._tileMap;
-      if (!tileMap) return;
-      return tileMap.setTile(x, y, layerIndex, tileId);
-    }
-
-    /**
-     * @param x The layer column.
-     * @param y The layer row.
-     * @param layerIndex The layer index.
      * @param flip true if the tile should be flipped.
      */
     flipTileOnY(x: integer, y: integer, layerIndex: integer, flip: boolean) {
@@ -229,17 +218,6 @@ namespace gdjs {
       const tileMap = this._tileMap;
       if (!tileMap) return false;
       return tileMap.isTileFlippedOnY(x, y, layerIndex);
-    }
-
-    /**
-     * @param x The layer column.
-     * @param y The layer row.
-     * @param layerIndex The layer index.
-     */
-    removeTile(x: integer, y: integer, layerIndex: integer) {
-      const tileMap = this._tileMap;
-      if (!tileMap) return;
-      return tileMap.removeTile(x, y, layerIndex);
     }
 
     /**

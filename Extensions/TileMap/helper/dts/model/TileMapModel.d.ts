@@ -431,8 +431,13 @@ export declare class TileDefinition {
    * Add a polygon for the collision layer
    * @param tag The tag to allow collision layer filtering.
    * @param polygon The polygon to use for collisions.
+   * @param hasFullHitBox Set to `true` when the hitBox cover the whole tile.
    */
-  addHitBox(tag: string, polygon: PolygonVertices): void;
+  addHitBox(
+    tag: string,
+    polygon: PolygonVertices,
+    hasFullHitBox: boolean
+  ): void;
   /**
    * This property is used by {@link TransformedCollisionTileMap}
    * to make collision classes.
@@ -446,6 +451,12 @@ export declare class TileDefinition {
    * @returns The hit boxes for this tile.
    */
   getHitBoxes(tag: string): PolygonVertices[] | undefined;
+  /**
+   * Return `true` if the hit-box cover the whole tile.
+   * @param tag  The tag to allow collision layer filtering.
+   * @returns `true` if the hit-box cover the whole tile.
+   */
+  hasFullHitBox(tag: string): boolean;
   /**
    * Animated tiles have a limitation:
    * they are only able to use frames arranged horizontally one next

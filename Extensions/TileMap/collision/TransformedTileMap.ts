@@ -96,6 +96,16 @@ namespace gdjs {
           (this._transformationUpToDateCount + 1) % Number.MAX_SAFE_INTEGER;
       }
 
+      invalidateTile(layerIndex: integer, x: integer, y: integer) {
+        const layer = this.getLayer(layerIndex);
+        if (layer) {
+          const tile = layer.get(x, y);
+          if (tile) {
+            tile.invalidate();
+          }
+        }
+      }
+
       /**
        * @returns The tile map width in pixels.
        */
@@ -690,6 +700,28 @@ namespace gdjs {
         this.affineTransformationUpToDateCount = this.layer.tileMap._transformationUpToDateCount;
       }
 
+      invalidate() {
+        this.affineTransformationUpToDateCount = -1;
+        // Also invalidate neighbors because their hit boxes may need to be
+        // extended differently.
+        let neighbor = this.layer.get(this.x - 1, this.y);
+        if (neighbor) {
+          neighbor.affineTransformationUpToDateCount = -1;
+        }
+        neighbor = this.layer.get(this.x + 1, this.y);
+        if (neighbor) {
+          neighbor.affineTransformationUpToDateCount = -1;
+        }
+        neighbor = this.layer.get(this.x, this.y - 1);
+        if (neighbor) {
+          neighbor.affineTransformationUpToDateCount = -1;
+        }
+        neighbor = this.layer.get(this.x, this.y + 1);
+        if (neighbor) {
+          neighbor.affineTransformationUpToDateCount = -1;
+        }
+      }
+
       /**
        * @returns The hitboxes of this tile in the scene basis.
        */
@@ -701,7 +733,6 @@ namespace gdjs {
         const definition = this.getDefinition();
         if (!definition) {
           this._setHitboxesUpToDate();
-          // It should already be []
           this.hitBoxes.length = 0;
           return this.hitBoxes;
         }
@@ -709,14 +740,100 @@ namespace gdjs {
         const definitionHitboxes = definition.getHitBoxes(tag);
         if (!definitionHitboxes) {
           this._setHitboxesUpToDate();
-          // It should already be []
           this.hitBoxes.length = 0;
           return this.hitBoxes;
         }
 
-        const layerTransformation = this.layer.tileMap.getTransformation();
-        const width = this.layer.tileMap.getTileWidth();
-        const height = this.layer.tileMap.getTileHeight();
+        const tileMap = this.layer.tileMap;
+        const width = tileMap.getTileWidth();
+        const height = tileMap.getTileHeight();
+
+        // Extend the hit boxes.
+        // It avoids small objects to be pushed side way into a wall when they
+        // should be pop out of the wall.
+
+        const hasFullHitBox =
+          definitionHitboxes.length === 1 && definition.hasFullHitBox(tag);
+        if (hasFullHitBox) {
+          const isLeftFull = this._hasNeighborFullHitBox(-1, 0);
+          const isRightFull = this._hasNeighborFullHitBox(1, 0);
+          const isTopFull = this._hasNeighborFullHitBox(0, -1);
+          const isBottomFull = this._hasNeighborFullHitBox(0, 1);
+
+          let hitBoxesCount = 0;
+          if (isLeftFull || isRightFull) {
+            let minX = isLeftFull ? -width : 0;
+            let maxX = isRightFull ? 2 * width : width;
+            if (hitBoxesCount >= this.hitBoxes.length) {
+              this.hitBoxes[hitBoxesCount] = gdjs.Polygon.createRectangle(0, 0);
+            }
+            TransformedCollisionTile.setRectangle(
+              this.hitBoxes[hitBoxesCount],
+              minX,
+              0,
+              maxX,
+              height
+            );
+            hitBoxesCount++;
+          }
+          if (isTopFull || isBottomFull) {
+            let minY = isTopFull ? -height : 0;
+            let maxY = isBottomFull ? 2 * height : height;
+            if (hitBoxesCount >= this.hitBoxes.length) {
+              this.hitBoxes[hitBoxesCount] = gdjs.Polygon.createRectangle(0, 0);
+            }
+            TransformedCollisionTile.setRectangle(
+              this.hitBoxes[hitBoxesCount],
+              0,
+              minY,
+              width,
+              maxY
+            );
+            hitBoxesCount++;
+          }
+          if (hitBoxesCount === 0) {
+            if (this.hitBoxes.length === 0) {
+              this.hitBoxes[0] = gdjs.Polygon.createRectangle(0, 0);
+            }
+            TransformedCollisionTile.setRectangle(
+              this.hitBoxes[0],
+              0,
+              0,
+              width,
+              height
+            );
+            hitBoxesCount++;
+          }
+          this.hitBoxes.length = hitBoxesCount;
+        } else {
+          for (
+            let polygonIndex = 0;
+            polygonIndex < definitionHitboxes.length;
+            polygonIndex++
+          ) {
+            const defPolygon = definitionHitboxes[polygonIndex];
+            if (polygonIndex >= this.hitBoxes.length) {
+              // This can't happen in practice as only the simple tile map can be
+              // modify and it only contains full hit boxes.
+              this.hitBoxes[polygonIndex] = gdjs.Polygon.createRectangle(0, 0);
+            }
+            const polygon = this.hitBoxes[polygonIndex];
+
+            for (
+              let vertexIndex = 0;
+              vertexIndex < polygon.vertices.length;
+              vertexIndex++
+            ) {
+              const defVertex = defPolygon[vertexIndex];
+              const vertex = polygon.vertices[vertexIndex];
+
+              vertex[0] = defVertex[0];
+              vertex[1] = defVertex[1];
+            }
+          }
+        }
+
+        // Transform the hit boxes.
 
         const tileTransformation =
           TransformedCollisionTile.workingTransformation;
@@ -731,16 +848,12 @@ namespace gdjs {
           tileTransformation.flipX(width / 2);
           tileTransformation.rotateAround(Math.PI / 2, width / 2, height / 2);
         }
-        tileTransformation.preConcatenate(layerTransformation);
-
-        // The tile map can't change at runtime so the existing arrays can be
-        // reused safely.
+        tileTransformation.preConcatenate(tileMap.getTransformation());
         for (
           let polygonIndex = 0;
           polygonIndex < this.hitBoxes.length;
           polygonIndex++
         ) {
-          const defPolygon = definitionHitboxes[polygonIndex];
           const polygon = this.hitBoxes[polygonIndex];
 
           for (
@@ -748,14 +861,41 @@ namespace gdjs {
             vertexIndex < polygon.vertices.length;
             vertexIndex++
           ) {
-            const defVertex = defPolygon[vertexIndex];
             const vertex = polygon.vertices[vertexIndex];
 
-            tileTransformation.transform(defVertex, vertex);
+            tileTransformation.transform(vertex, vertex);
           }
         }
         this._setHitboxesUpToDate();
         return this.hitBoxes;
+      }
+
+      private _hasNeighborFullHitBox(deltaX: integer, deltaY: integer) {
+        const sourceLayer = this.layer._source;
+        const tileId = sourceLayer.getTileId(this.x + deltaX, this.y + deltaY);
+        const tileDefinition =
+          tileId && this.layer.tileMap.getTileDefinition(tileId);
+        return (
+          tileDefinition && tileDefinition.hasFullHitBox(this.layer.tileMap.tag)
+        );
+      }
+
+      private static setRectangle(
+        polygon: gdjs.Polygon,
+        minX: float,
+        minY: float,
+        maxX: float,
+        maxY: float
+      ) {
+        const vertices = polygon.vertices;
+        vertices[0][0] = minX;
+        vertices[0][1] = minY;
+        vertices[1][0] = maxX;
+        vertices[1][1] = minY;
+        vertices[2][0] = maxX;
+        vertices[2][1] = maxY;
+        vertices[3][0] = minX;
+        vertices[3][1] = maxY;
       }
     }
   }

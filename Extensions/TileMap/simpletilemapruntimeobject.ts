@@ -231,12 +231,16 @@ namespace gdjs {
               );
               return;
             }
-            tileDefinition.addHitBox(this._hitBoxTag, [
-              [0, 0],
-              [0, tileMap.getTileHeight()],
-              [tileMap.getTileWidth(), tileMap.getTileHeight()],
-              [tileMap.getTileWidth(), 0],
-            ]);
+            tileDefinition.addHitBox(
+              this._hitBoxTag,
+              [
+                [0, 0],
+                [0, tileMap.getTileHeight()],
+                [tileMap.getTileWidth(), tileMap.getTileHeight()],
+                [tileMap.getTileWidth(), 0],
+              ],
+              true
+            );
           });
 
           this._tileMapManager.getOrLoadSimpleTileMapTextureCache(
@@ -624,7 +628,38 @@ namespace gdjs {
       columnIndex: integer,
       rowIndex: integer
     ) {
-      this._renderer.setTileId(columnIndex, rowIndex, 0, tileId);
+      const tileMap = this._renderer._tileMap;
+      if (!tileMap) {
+        return;
+      }
+      const layer = tileMap.getTileLayer(this._layerIndex);
+      if (!layer) {
+        return;
+      }
+      const oldTileId = layer.getTileId(columnIndex, rowIndex);
+      if (tileId === oldTileId) {
+        return;
+      }
+      layer.setTile(columnIndex, rowIndex, tileId);
+
+      if (this._collisionTileMap) {
+        const oldTileDefinition =
+          oldTileId !== undefined && tileMap.getTileDefinition(oldTileId);
+        const newTileDefinition = tileMap.getTileDefinition(tileId);
+        const hadFullHitBox =
+          !!oldTileDefinition &&
+          oldTileDefinition.hasFullHitBox(this._hitBoxTag);
+        const haveFullHitBox =
+          !!newTileDefinition &&
+          newTileDefinition.hasFullHitBox(this._hitBoxTag);
+        if (hadFullHitBox !== haveFullHitBox) {
+          this._collisionTileMap.invalidateTile(
+            this._layerIndex,
+            columnIndex,
+            rowIndex
+          );
+        }
+      }
       this._isTileMapDirty = true;
       this.invalidateHitboxes();
     }
@@ -702,7 +737,26 @@ namespace gdjs {
     }
 
     removeTileAtGridCoordinates(columnIndex: integer, rowIndex: integer) {
-      this._renderer.removeTile(columnIndex, rowIndex, 0);
+      const tileMap = this._renderer._tileMap;
+      if (!tileMap) {
+        return;
+      }
+      const layer = tileMap.getTileLayer(this._layerIndex);
+      if (!layer) {
+        return;
+      }
+      const oldTileId = layer.getTileId(columnIndex, rowIndex);
+      if (oldTileId === undefined) {
+        return;
+      }
+      layer.removeTile(columnIndex, rowIndex);
+      if (this._collisionTileMap) {
+        this._collisionTileMap.invalidateTile(
+          this._layerIndex,
+          columnIndex,
+          rowIndex
+        );
+      }
       this._isTileMapDirty = true;
       this.invalidateHitboxes();
     }

@@ -21,6 +21,7 @@ import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext'
 import { fakeAuthenticatedUserWithEducationPlan } from '../../../fixtures/GDevelopServicesTestData';
 import { delay } from '../../../Utils/Delay';
 import sample from 'lodash/sample';
+import Text from '../../../UI/Text';
 
 export default {
   title: 'HomePage/TeamSection',
@@ -289,6 +290,15 @@ const MockTeamProvider = ({
   const setAdmin = async (email: string, activate: boolean) => {
     await delay(1000);
     if (!admins || !members) return;
+    if (email === 'sub@user.com') {
+      const error = new Error('SetAdminError');
+      // $FlowIgnore
+      error.response = {
+        status: 400,
+        data: { code: 'team-admin-creation/user-has-subscription' },
+      };
+      throw error;
+    }
     if (email === initialAdmins[0].email) {
       const error = new Error('SetAdminError');
       // $FlowIgnore
@@ -450,6 +460,10 @@ const MockTeamProvider = ({
             onSetAdmin: setAdmin,
           }}
         >
+          <Text allowSelection>
+            Story note: To test trying to add admin that already has a
+            subscription, enter email `sub@user.com`
+          </Text>
           {children}
         </TeamContext.Provider>
       </AuthenticatedUserContext.Provider>

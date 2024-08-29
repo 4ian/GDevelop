@@ -21,6 +21,7 @@ import { type ClientCoordinates } from '../../../../Utils/UseLongTouch';
 import { copyTextToClipboard } from '../../../../Utils/Clipboard';
 import Copy from '../../../../UI/CustomSvgIcons/Copy';
 import Check from '../../../../UI/CustomSvgIcons/Check';
+import { delay } from '../../../../Utils/Delay';
 
 const styles = {
   listItem: {
@@ -50,20 +51,17 @@ const TeamMemberRow = ({
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const iconRestoreTimeout = React.useRef<?TimeoutID>(null);
   const [emailCopySuccess, setEmailCopySuccess] = React.useState<boolean>(
     false
   );
 
   React.useEffect(
     () => {
-      if (emailCopySuccess) {
-        if (iconRestoreTimeout.current)
-          clearTimeout(iconRestoreTimeout.current);
-        iconRestoreTimeout.current = setTimeout(() => {
-          setEmailCopySuccess(false);
-        }, 2000);
-      }
+      (async () => {
+        if (!emailCopySuccess) return;
+        await delay(2000);
+        setEmailCopySuccess(false);
+      })();
     },
     [emailCopySuccess]
   );

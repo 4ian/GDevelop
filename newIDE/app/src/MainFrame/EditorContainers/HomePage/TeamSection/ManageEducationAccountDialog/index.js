@@ -47,6 +47,8 @@ import Copy from '../../../../../UI/CustomSvgIcons/Copy';
 import Education from '../../../../../Profile/Subscription/Icons/Education';
 import Window from '../../../../../Utils/Window';
 import useAlertDialog from '../../../../../UI/Alert/useAlertDialog';
+import { delay } from '../../../../../Utils/Delay';
+import Check from '../../../../../UI/CustomSvgIcons/Check';
 
 const styles = {
   selectedMembersControlsContainer: {
@@ -269,6 +271,10 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
     false
   );
   const [
+    credentialsCopySuccess,
+    setCredentialsCopySuccess,
+  ] = React.useState<boolean>(false);
+  const [
     adminEmailBeingRemoved,
     setAdminEmailBeingRemoved,
   ] = React.useState<?string>(null);
@@ -304,6 +310,17 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
     onRefreshAdmins,
   } = React.useContext(TeamContext);
 
+  React.useEffect(
+    () => {
+      (async () => {
+        if (!credentialsCopySuccess) return;
+        await delay(2000);
+        setCredentialsCopySuccess(false);
+      })();
+    },
+    [credentialsCopySuccess]
+  );
+
   const onChangeTeamMemberPassword = React.useCallback(
     async ({
       userId,
@@ -336,6 +353,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
         },${member.password || ''}`;
       });
       copyTextToClipboard(content);
+      setCredentialsCopySuccess(true);
     },
     [selectedUserIds, members]
   );
@@ -731,7 +749,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
                         }
                         onClick={onCopyActiveCredentials}
                       >
-                        <Copy />
+                        {credentialsCopySuccess ? <Check /> : <Copy />}
                       </IconButton>
                     </LineStackLayout>
                   </Line>

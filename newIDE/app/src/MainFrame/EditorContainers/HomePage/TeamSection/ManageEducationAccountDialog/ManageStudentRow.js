@@ -16,6 +16,13 @@ import { Line } from '../../../../../UI/Grid';
 import { useResponsiveWindowSize } from '../../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import { textEllipsisStyle } from '../../../../../UI/TextEllipsis';
 
+const primaryTextArchivedOpacity = 0.6;
+const primaryTextPlaceholderOpacity = 0.7;
+const primaryTextPlaceholderArchivedOpacity = 0.6;
+const secondaryTextOpacity = 0.6;
+const tertiaryTextOpacity = 0.7;
+const tertiaryTextArchivedOpacity = 0.55;
+
 const styles = {
   cell: { display: 'flex', alignItems: 'center' },
   mobileCell: {
@@ -89,7 +96,7 @@ const ManageStudentRow = ({
           allowSelection
           style={{
             ...textEllipsisStyle,
-            opacity: isArchived ? 0.6 : undefined,
+            opacity: isArchived ? primaryTextArchivedOpacity : undefined,
           }}
         >
           <b>{member.username}</b>
@@ -98,7 +105,9 @@ const ManageStudentRow = ({
         <Text
           style={{
             ...textEllipsisStyle,
-            opacity: isArchived ? 0.6 : 0.7,
+            opacity: isArchived
+              ? primaryTextPlaceholderArchivedOpacity
+              : primaryTextPlaceholderOpacity,
             // For italic characters not to be cut.
             paddingRight: 1,
           }}
@@ -115,7 +124,7 @@ const ManageStudentRow = ({
     <Text
       style={{
         ...textEllipsisStyle,
-        opacity: 0.7,
+        opacity: secondaryTextOpacity,
       }}
       allowSelection
       noMargin
@@ -151,7 +160,7 @@ const ManageStudentRow = ({
         noMargin
         style={{
           ...textEllipsisStyle,
-          opacity: isArchived ? 0.55 : 0.7,
+          opacity: isArchived ? tertiaryTextArchivedOpacity : tertiaryTextOpacity,
           // For italic characters not to be cut.
           paddingRight: 1,
         }}

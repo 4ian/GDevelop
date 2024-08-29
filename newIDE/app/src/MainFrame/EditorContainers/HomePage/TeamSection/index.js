@@ -59,7 +59,7 @@ const styles = {
     padding: 16,
     display: 'flex',
     alignItems: 'center',
-    border: '1px solid white',
+    border: '1px solid',
     borderRadius: 8,
   },
 };

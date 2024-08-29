@@ -23,6 +23,8 @@ const styles = {
     alignItems: 'center',
     paddingRight: 4,
   },
+  passwordTextFieldContainer: { height: 21 },
+  passwordTextField: { fontSize: 14 },
 };
 
 type Props = {|
@@ -124,21 +126,24 @@ const ManageStudentRow = ({
 
   const passwordCell = isEditingPassword ? (
     <Line>
-      <AsyncSemiControlledTextField
-        margin="none"
-        autoFocus="desktop"
-        value={member.password || ''}
-        callback={onEditPassword}
-        errorText={passwordEditionError}
-        callbackErrorText={
-          <Trans>
-            An error occurred while changing the password. Please try again
-            later.
-          </Trans>
-        }
-        emptyErrorText={<Trans>Password cannot be empty</Trans>}
-        onCancel={() => setIsEditingPassword(false)}
-      />
+      <div style={styles.passwordTextFieldContainer}>
+        <AsyncSemiControlledTextField
+          margin="none"
+          autoFocus="desktop"
+          value={member.password || ''}
+          callback={onEditPassword}
+          errorText={passwordEditionError}
+          callbackErrorText={
+            <Trans>
+              An error occurred while changing the password. Please try again
+              later.
+            </Trans>
+          }
+          emptyErrorText={<Trans>Password cannot be empty</Trans>}
+          onCancel={() => setIsEditingPassword(false)}
+          style={styles.passwordTextField}
+        />
+      </div>
     </Line>
   ) : (
     <LineStackLayout alignItems="center">

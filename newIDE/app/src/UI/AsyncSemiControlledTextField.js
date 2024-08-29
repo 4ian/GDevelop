@@ -1,7 +1,7 @@
 // @flow
 
 import * as React from 'react';
-import TextField from './TextField';
+import TextField, { type TextFieldStyleProps } from './TextField';
 import {
   shouldCloseOrCancel,
   shouldValidate,
@@ -24,6 +24,7 @@ type Props = {|
   maxLength?: number,
   margin?: 'none' | 'dense',
   translatableHintText?: MessageDescriptor,
+  style?: TextFieldStyleProps,
 |};
 
 const AsyncSemiControlledTextField = ({

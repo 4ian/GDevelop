@@ -316,12 +316,7 @@ namespace gdjs {
      * Set up a banner that can then be displayed by calling `showBanner`.
      * If a banner is already set up, it will be hidden and replaced by the new one.
      */
-    export const setupBanner = async (
-      androidAdUnitId,
-      iosAdUnitId,
-      atTop,
-      hasOffset
-    ) => {
+    export const setupBanner = async (androidAdUnitId, iosAdUnitId, atTop) => {
       if (!(await checkIfAdMobIsAvailable())) return;
       const adUnitId = getAdUnitId(androidAdUnitId, iosAdUnitId, 'banner');
       if (!adUnitId) return;

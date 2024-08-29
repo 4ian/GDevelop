@@ -45,6 +45,7 @@ import CircularProgress from '../../../../../UI/CircularProgress';
 import { useResponsiveWindowSize } from '../../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import Copy from '../../../../../UI/CustomSvgIcons/Copy';
 import Education from '../../../../../Profile/Subscription/Icons/Education';
+import Window from '../../../../../Utils/Window';
 
 const styles = {
   selectedMembersControlsContainer: {
@@ -120,6 +121,9 @@ const removeErrorToText = {
     </Trans>
   ),
 };
+
+const purchaseSeatsMailToLink =
+  'mailto:education@gdevelop.io?subject=Purchase%20Education%20plan%20seats';
 
 type AddTeacherDialogProps = {|
   onClose: () => void,
@@ -506,7 +510,12 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
             <AlertMessage kind="info">
               <Trans>
                 You’ve reached the maximum amount of available seats.{' '}
-                <Link href="mailto:education@gdevelop.io">
+                <Link
+                  href={purchaseSeatsMailToLink}
+                  onClick={() =>
+                    Window.openExternalURL(purchaseSeatsMailToLink)
+                  }
+                >
                   Increase the number of seats
                 </Link>{' '}
                 on your subscription to invite more students and collaborators.
@@ -568,7 +577,9 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
                     primary
                     label={<Trans>Purchase seats</Trans>}
                     leftIcon={<Education fontSize="small" />}
-                    // Find a way to open email
+                    onClick={() =>
+                      Window.openExternalURL(purchaseSeatsMailToLink)
+                    }
                   />
                 ) : (
                   <RaisedButton

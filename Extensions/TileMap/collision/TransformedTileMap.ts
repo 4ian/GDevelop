@@ -96,6 +96,16 @@ namespace gdjs {
           (this._transformationUpToDateCount + 1) % Number.MAX_SAFE_INTEGER;
       }
 
+      invalidateTile(layerIndex: integer, x: integer, y: integer) {
+        const layer = this.getLayer(layerIndex);
+        if (layer) {
+          const tile = layer.get(x, y);
+          if (tile) {
+            tile.invalidate();
+          }
+        }
+      }
+
       /**
        * @returns The tile map width in pixels.
        */
@@ -690,6 +700,28 @@ namespace gdjs {
         this.affineTransformationUpToDateCount = this.layer.tileMap._transformationUpToDateCount;
       }
 
+      invalidate() {
+        this.affineTransformationUpToDateCount = -1;
+        // Also invalidate neighbors because their hit boxes may need to be
+        // extended differently.
+        let neighbor = this.layer.get(this.x - 1, this.y);
+        if (neighbor) {
+          neighbor.affineTransformationUpToDateCount = -1;
+        }
+        neighbor = this.layer.get(this.x + 1, this.y);
+        if (neighbor) {
+          neighbor.affineTransformationUpToDateCount = -1;
+        }
+        neighbor = this.layer.get(this.x, this.y - 1);
+        if (neighbor) {
+          neighbor.affineTransformationUpToDateCount = -1;
+        }
+        neighbor = this.layer.get(this.x, this.y + 1);
+        if (neighbor) {
+          neighbor.affineTransformationUpToDateCount = -1;
+        }
+      }
+
       /**
        * @returns The hitboxes of this tile in the scene basis.
        */
@@ -746,6 +778,10 @@ namespace gdjs {
           if (isLeftFull || isRightFull) {
             let minX = isLeftFull ? -width : 0;
             let maxX = isRightFull ? 2 * width : width;
+            if (this.hitBoxes.length === 0) {
+              // TODO Avoid to allocate a Polygon
+              this.hitBoxes[0] = gdjs.Polygon.createRectangle(0, 0);
+            }
             TransformedCollisionTile.setRectangle(
               this.hitBoxes[0],
               minX,
@@ -760,7 +796,7 @@ namespace gdjs {
             let maxY = isBottomFull ? 2 * height : height;
             if (this.hitBoxes.length < hitBoxesCount + 1) {
               // TODO Avoid to allocate a Polygon
-              this.hitBoxes[1] = gdjs.Polygon.createRectangle(0, 0);
+              this.hitBoxes[hitBoxesCount] = gdjs.Polygon.createRectangle(0, 0);
             }
             TransformedCollisionTile.setRectangle(
               this.hitBoxes[hitBoxesCount],
@@ -770,12 +806,12 @@ namespace gdjs {
               maxY
             );
             hitBoxesCount++;
-            if (hitBoxesCount === 2) {
-              console.log('2nd polygon!');
-              console.log(this.hitBoxes);
-            }
           }
           if (hitBoxesCount === 0) {
+            if (this.hitBoxes.length === 0) {
+              // TODO Avoid to allocate a Polygon
+              this.hitBoxes[0] = gdjs.Polygon.createRectangle(0, 0);
+            }
             TransformedCollisionTile.setRectangle(
               this.hitBoxes[0],
               0,
@@ -785,7 +821,7 @@ namespace gdjs {
             );
             hitBoxesCount++;
           }
-          this.hitBoxes.length;
+          this.hitBoxes.length = hitBoxesCount;
         } else {
           // The tile map can't change at runtime so the existing arrays can be
           // reused safely.

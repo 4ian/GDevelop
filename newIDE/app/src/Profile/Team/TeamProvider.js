@@ -305,7 +305,9 @@ const TeamProvider = ({ children }: Props) => {
   const getAvailableSeats = React.useCallback(
     () =>
       team && members && admins
-        ? team.seats - members.length - admins.length
+        ? team.seats -
+          members.filter(member => !member.deactivatedAt).length -
+          admins.length
         : null,
     [team, members, admins]
   );

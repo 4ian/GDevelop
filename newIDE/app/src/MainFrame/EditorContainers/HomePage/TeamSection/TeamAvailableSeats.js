@@ -4,18 +4,11 @@ import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import { Line } from '../../../../UI/Grid';
 import Text from '../../../../UI/Text';
-import { type Team } from '../../../../Utils/GDevelopServices/User';
-import { type User } from '../../../../Utils/GDevelopServices/User';
+import TeamContext from '../../../../Profile/Team/TeamContext';
 
-type Props = {|
-  team?: ?Team,
-  members?: ?Array<User>,
-  admins?: ?Array<User>,
-|};
-
-const TeamAvailableSeats = ({ team, members, admins }: Props) => {
-  if (!(team && members && admins)) return null;
-  const availableSeats = team.seats - members.length - admins.length;
+const TeamAvailableSeats = () => {
+  const { getAvailableSeats } = React.useContext(TeamContext);
+  const availableSeats = getAvailableSeats();
 
   return (
     <Line noMargin alignItems="center">

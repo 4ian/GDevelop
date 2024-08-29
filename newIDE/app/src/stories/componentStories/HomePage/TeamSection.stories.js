@@ -285,7 +285,9 @@ const MockTeamProvider = ({
 
   const getAvailableSeats = () =>
     team && members && admins
-      ? team.seats - members.length - admins.length
+      ? team.seats -
+        members.filter(member => !member.deactivatedAt).length -
+        admins.length
       : null;
 
   const setAdmin = async (email: string, activate: boolean) => {

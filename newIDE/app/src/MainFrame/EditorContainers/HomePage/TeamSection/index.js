@@ -95,8 +95,6 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
   ) => {
     const {
       groups,
-      team,
-      admins,
       members,
       memberships,
       onChangeGroupName,
@@ -105,6 +103,7 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
       onDeleteGroup,
       onCreateGroup,
       onRefreshMembers,
+      onRefreshAdmins,
       getAvailableSeats,
       onCreateMembers,
     } = React.useContext(TeamContext);
@@ -171,6 +170,7 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
         setIsLoadingMembers(true);
         try {
           await onRefreshMembers();
+          await onRefreshAdmins();
         } catch (error) {
           console.error(
             'An error occurred when refreshing team members:',
@@ -180,7 +180,7 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
           setIsLoadingMembers(false);
         }
       },
-      [onRefreshMembers]
+      [onRefreshMembers, onRefreshAdmins]
     );
 
     const changeUserGroup = React.useCallback(
@@ -321,7 +321,7 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
           expand
           justifyContent="space-between"
         >
-          <TeamAvailableSeats team={team} members={members} admins={admins} />
+          <TeamAvailableSeats />
           <RaisedButton
             primary
             label={

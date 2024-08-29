@@ -3,7 +3,7 @@ import SvgIcon from '@material-ui/core/SvgIcon';
 
 export default React.memo(props => (
   <SvgIcon {...props} width="16" height="16" viewBox="0 0 16 16" fill="none">
-    <g clip-path="url(#clip0_703_137)">
+    <g clipPath="url(#clip0_703_137)">
       <path
         d="M7.99984 0.166626C8.27598 0.166626 8.49984 0.390484 8.49984 0.666626V1.33329C8.49984 1.60944 8.27598 1.83329 7.99984 1.83329C7.7237 1.83329 7.49984 1.60944 7.49984 1.33329V0.666626C7.49984 0.390484 7.7237 0.166626 7.99984 0.166626Z"
         fill="currentColor"

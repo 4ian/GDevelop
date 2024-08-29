@@ -262,6 +262,12 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
   const [isCreatingMembers, setIsCreatingMembers] = React.useState<boolean>(
     false
   );
+  const [isArchivingAccounts, setIsArchivingAccounts] = React.useState<boolean>(
+    false
+  );
+  const [isRestoringAccounts, setIsRestoringAccounts] = React.useState<boolean>(
+    false
+  );
   const [
     adminEmailBeingRemoved,
     setAdminEmailBeingRemoved,
@@ -295,6 +301,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
     onChangeMemberPassword,
     onActivateMembers,
     onSetAdmin,
+    onRefreshAdmins,
   } = React.useContext(TeamContext);
 
   const onChangeTeamMemberPassword = React.useCallback(
@@ -359,6 +366,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
       setRemoveAdminError(null);
       try {
         await onSetAdmin(email, false);
+        await onRefreshAdmins();
       } catch (error) {
         console.error(error);
         const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
@@ -390,7 +398,15 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
         setAdminEmailBeingRemoved(null);
       }
     },
-    [onSetAdmin]
+    [onSetAdmin, onRefreshAdmins]
+  );
+
+  const onSetUserAsAdmin = React.useCallback(
+    async (email: string) => {
+      await onSetAdmin(email, true);
+      await onRefreshAdmins();
+    },
+    [onSetAdmin, onRefreshAdmins]
   );
 
   const onActivateTeamMembers = React.useCallback(
@@ -409,6 +425,11 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
             maxWidth: 'xs',
           });
           if (!confirm) return;
+        }
+        if (activate) {
+          setIsRestoringAccounts(true);
+        } else {
+          setIsArchivingAccounts(true);
         }
         await onActivateMembers(selectedUserIds, activate);
         if (!activate) {
@@ -464,6 +485,12 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
           );
         }
         setBatchControlError(errorMessage);
+      } finally {
+        if (activate) {
+          setIsRestoringAccounts(false);
+        } else {
+          setIsArchivingAccounts(false);
+        }
       }
     },
     [onActivateMembers, onRefreshMembers, selectedUserIds, showConfirmation]
@@ -582,11 +609,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
               <Trans>Student accounts</Trans>
             </Text>
             <LineStackLayout noMargin alignItems="center">
-              <TeamAvailableSeats
-                team={team}
-                members={members}
-                admins={admins}
-              />
+              <TeamAvailableSeats />
               <Line expand noMargin justifyContent="flex-end">
                 {availableSeats !== null && availableSeats <= 0 ? (
                   <FlatButton
@@ -669,22 +692,32 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
                         tooltip={t`Archive accounts`}
                         disabled={
                           selectedUserIds.length === 0 ||
-                          isAtLeastOneSelectedUserArchived
+                          isAtLeastOneSelectedUserArchived ||
+                          isArchivingAccounts
                         }
                         onClick={() => onActivateTeamMembers(false)}
                       >
-                        <Archive />
+                        {isArchivingAccounts ? (
+                          <CircularProgress size={22} />
+                        ) : (
+                          <Archive />
+                        )}
                       </IconButton>
                       <IconButton
                         size="small"
                         tooltip={t`Restore accounts`}
                         disabled={
                           selectedUserIds.length === 0 ||
-                          isAtLeastOneSelectedUserActive
+                          isAtLeastOneSelectedUserActive ||
+                          isRestoringAccounts
                         }
                         onClick={() => onActivateTeamMembers(true)}
                       >
-                        <Recycle />
+                        {isRestoringAccounts ? (
+                          <CircularProgress size={22} />
+                        ) : (
+                          <Recycle />
+                        )}
                       </IconButton>
                       <IconButton
                         size="small"
@@ -854,7 +887,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
       {addTeacherDialogOpen && (
         <AddTeacherDialog
           onClose={() => setAddTeacherDialogOpen(false)}
-          onAddTeacher={(email: string) => onSetAdmin(email, true)}
+          onAddTeacher={onSetUserAsAdmin}
         />
       )}
     </>

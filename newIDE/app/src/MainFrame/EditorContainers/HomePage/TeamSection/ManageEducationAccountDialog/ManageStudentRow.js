@@ -58,11 +58,12 @@ const ManageStudentRow = ({
         setIsEditingPassword(false);
         return;
       }
-      if (newPassword.length < 8) {
+      setPasswordEditionError(null);
+      if (newPassword.length < 8 || newPassword.length > 30) {
         setPasswordEditionError(
-          <Trans>Password must be at least 8 characters long.</Trans>
+          <Trans>Your password must be between 8 and 30 characters long.</Trans>
         );
-        throw new Error('Password validation error');
+        return;
       }
       await onChangePassword({ userId: member.id, newPassword });
       setIsEditingPassword(false);
@@ -128,7 +129,13 @@ const ManageStudentRow = ({
         autoFocus="desktop"
         value={member.password || ''}
         callback={onEditPassword}
-        callbackErrorText={passwordEditionError}
+        errorText={passwordEditionError}
+        callbackErrorText={
+          <Trans>
+            An error occurred while changing the password. Please try again
+            later.
+          </Trans>
+        }
         emptyErrorText={<Trans>Password cannot be empty</Trans>}
         onCancel={() => setIsEditingPassword(false)}
       />

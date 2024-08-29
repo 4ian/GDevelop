@@ -468,7 +468,7 @@ export const setUserAsAdmin = async (
 ) => {
   const authorizationHeader = await getAuthorizationHeader();
   await client.post(
-    `/team/${teamId}/action/setAdmin`,
+    `/team/${teamId}/action/set-admin`,
     {
       email,
       activate,

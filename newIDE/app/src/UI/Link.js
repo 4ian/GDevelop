@@ -30,7 +30,7 @@ const useLinkStyles = (theme: GDevelopTheme, disabled: boolean) =>
 const Link = (props: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const linkStyles = useLinkStyles(gdevelopTheme, !!props.disabled);
-  const onClickLink = (event: MouseEvent) => {
+  const onClick = (event: MouseEvent) => {
     event.preventDefault(); // Avoid triggering the href (avoids a warning on mobile in case of unsaved changes).
     if (!props.disabled) {
       props.onClick();
@@ -40,7 +40,7 @@ const Link = (props: Props) => {
     <MuiLink
       color="secondary"
       href={props.href}
-      onClick={onClickLink}
+      onClick={onClick}
       classes={linkStyles}
     >
       {props.children}

@@ -401,11 +401,13 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
             extractedStatusAndCode.code ===
             'user-activation/user-deactivated-recently'
           ) {
-            // TODO: Read delay in response.
             errorMessage = (
               <Trans>
-                You have to wait 15 days before you can reactivate an archived
-                account.
+                You have to wait
+                {extractedStatusAndCode.data
+                  ? extractedStatusAndCode.data.daysToWait
+                  : 15}
+                days before you can reactivate an archived account.
               </Trans>
             );
           } else if (

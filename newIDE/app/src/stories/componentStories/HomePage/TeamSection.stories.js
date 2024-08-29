@@ -22,6 +22,7 @@ import { fakeAuthenticatedUserWithEducationPlan } from '../../../fixtures/GDevel
 import { delay } from '../../../Utils/Delay';
 import sample from 'lodash/sample';
 import Text from '../../../UI/Text';
+import AlertProvider from '../../../UI/Alert/AlertProvider';
 
 export default {
   title: 'HomePage/TeamSection',
@@ -435,39 +436,41 @@ const MockTeamProvider = ({
   };
 
   return (
-    <DragAndDropContextProvider>
-      <AuthenticatedUserContext.Provider
-        value={fakeAuthenticatedUserWithEducationPlan}
-      >
-        <TeamContext.Provider
-          value={{
-            team: loading ? null : team,
-            members: loading ? null : members,
-            groups: loading ? null : groups,
-            admins: loading ? null : admins,
-            memberships: loading ? null : memberships,
-            onChangeGroupName: changeGroupName,
-            onChangeUserGroup: changeUserGroup,
-            onListUserProjects: listUserProjects,
-            onDeleteGroup: deleteGroup,
-            onCreateGroup: createGroup,
-            onRefreshMembers: refreshMembers,
-            onRefreshAdmins: refreshAdmins,
-            onCreateMembers: createMembers,
-            getAvailableSeats,
-            onActivateMembers: action('activateMembers'),
-            onChangeMemberPassword: changeMemberPassword,
-            onSetAdmin: setAdmin,
-          }}
+    <AlertProvider>
+      <DragAndDropContextProvider>
+        <AuthenticatedUserContext.Provider
+          value={fakeAuthenticatedUserWithEducationPlan}
         >
-          <Text allowSelection>
-            Story note: To test trying to add admin that already has a
-            subscription, enter email `sub@user.com`
-          </Text>
-          {children}
-        </TeamContext.Provider>
-      </AuthenticatedUserContext.Provider>
-    </DragAndDropContextProvider>
+          <TeamContext.Provider
+            value={{
+              team: loading ? null : team,
+              members: loading ? null : members,
+              groups: loading ? null : groups,
+              admins: loading ? null : admins,
+              memberships: loading ? null : memberships,
+              onChangeGroupName: changeGroupName,
+              onChangeUserGroup: changeUserGroup,
+              onListUserProjects: listUserProjects,
+              onDeleteGroup: deleteGroup,
+              onCreateGroup: createGroup,
+              onRefreshMembers: refreshMembers,
+              onRefreshAdmins: refreshAdmins,
+              onCreateMembers: createMembers,
+              getAvailableSeats,
+              onActivateMembers: action('activateMembers'),
+              onChangeMemberPassword: changeMemberPassword,
+              onSetAdmin: setAdmin,
+            }}
+          >
+            <Text allowSelection>
+              Story note: To test trying to add admin that already has a
+              subscription, enter email `sub@user.com`
+            </Text>
+            {children}
+          </TeamContext.Provider>
+        </AuthenticatedUserContext.Provider>
+      </DragAndDropContextProvider>
+    </AlertProvider>
   );
 };
 

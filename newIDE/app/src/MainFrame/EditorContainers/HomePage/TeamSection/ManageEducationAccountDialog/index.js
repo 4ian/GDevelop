@@ -46,6 +46,7 @@ import { useResponsiveWindowSize } from '../../../../../UI/Responsive/Responsive
 import Copy from '../../../../../UI/CustomSvgIcons/Copy';
 import Education from '../../../../../Profile/Subscription/Icons/Education';
 import Window from '../../../../../Utils/Window';
+import useAlertDialog from '../../../../../UI/Alert/useAlertDialog';
 
 const styles = {
   selectedMembersControlsContainer: {
@@ -269,6 +270,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
     removeAdminError,
     setRemoveAdminError,
   ] = React.useState<?RemoveTeacherError>(null);
+  const { showConfirmation } = useAlertDialog();
   const { isMobile } = useResponsiveWindowSize();
   const [batchControlError, setBatchControlError] = React.useState<React.Node>(
     null
@@ -397,7 +399,23 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
       setBatchControlError(null);
 
       try {
+        if (!activate) {
+          const confirm = await showConfirmation({
+            title: t`Archive ${selectedUserIds.length} accounts?`,
+            confirmButtonLabel: t`Archive ${selectedUserIds.length} accounts`,
+            dismissButtonLabel: t`Cancel`,
+            message: t`Projects in disabled accounts will not be deleted. All disabled accounts can be reactivated after 15 days.`,
+            level: 'info',
+            maxWidth: 'xs',
+          });
+          if (!confirm) return;
+        }
         await onActivateMembers(selectedUserIds, activate);
+        if (!activate) {
+          // If accounts are archived, they might disappear under the collapsed section
+          // "Archived accounts" so we unselect them to avoid any mistake around user selection.
+          setSelectedUserIds([]);
+        }
         await onRefreshMembers();
       } catch (error) {
         const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
@@ -448,7 +466,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
         setBatchControlError(errorMessage);
       }
     },
-    [onActivateMembers, onRefreshMembers, selectedUserIds]
+    [onActivateMembers, onRefreshMembers, selectedUserIds, showConfirmation]
   );
 
   const groupedMembers = groupMembersByGroupId({

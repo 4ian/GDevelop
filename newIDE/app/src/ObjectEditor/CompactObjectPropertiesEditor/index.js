@@ -41,6 +41,7 @@ import {
 } from '../../EffectsList';
 import CompactSelectField from '../../UI/CompactSelectField';
 import SelectOption from '../../UI/SelectOption';
+import { ChildObjectPropertiesEditor } from './ChildObjectPropertiesEditor';
 
 const gd: libGDevelop = global.gd;
 
@@ -50,6 +51,51 @@ export const styles = {
   },
   scrollView: { paddingTop: marginsSize },
 };
+
+const CollapsibleSubPanel = ({
+  renderContent,
+  isFolded,
+  toggleFolded,
+  title,
+  onRemove,
+}: {|
+  renderContent: () => React.Node,
+  isFolded: boolean,
+  toggleFolded: () => void,
+  title: React.Node,
+  onRemove?: () => void,
+|}) => (
+  <Paper background="medium">
+    <Line expand>
+      <ColumnStackLayout expand noOverflowParent>
+        <LineStackLayout noMargin justifyContent="space-between">
+          <Line noMargin alignItems="center">
+            <IconButton onClick={toggleFolded} size="small">
+              {isFolded ? (
+                <ChevronArrowRight style={styles.icon} />
+              ) : (
+                <ChevronArrowBottom style={styles.icon} />
+              )}
+            </IconButton>
+
+            {title}
+          </Line>
+
+          {onRemove ? (
+            <IconButton
+              tooltip={t`Remove behavior`}
+              onClick={onRemove}
+              size="small"
+            >
+              <Remove style={styles.icon} />
+            </IconButton>
+          ) : null}
+        </LineStackLayout>
+        {isFolded ? null : renderContent()}
+      </ColumnStackLayout>
+    </Line>
+  </Paper>
+);
 
 type Props = {|
   project: gdProject,
@@ -109,6 +155,7 @@ export const CompactObjectPropertiesEditor = ({
     gd.ObjectConfiguration
   );
 
+  // Properties:
   const schema = React.useMemo(
     () => {
       const properties = objectConfigurationAsGd.getProperties();
@@ -125,6 +172,7 @@ export const CompactObjectPropertiesEditor = ({
     [objectConfigurationAsGd]
   );
 
+  // Behaviors:
   const {
     openNewBehaviorDialog,
     newBehaviorDialog,
@@ -144,8 +192,8 @@ export const CompactObjectPropertiesEditor = ({
     .map(behaviorName => object.getBehavior(behaviorName))
     .filter(behavior => !behavior.isDefaultBehavior());
 
+  // Effects:
   const effectsContainer = object.getEffects();
-
   const {
     allEffectMetadata,
     all2DEffectMetadata,
@@ -159,6 +207,21 @@ export const CompactObjectPropertiesEditor = ({
     onUpdate: forceUpdate,
     target: 'object',
   });
+
+  // Events based object children:
+  const eventsBasedObject = project.hasEventsBasedObject(
+    objectConfiguration.getType()
+  )
+    ? project.getEventsBasedObject(objectConfiguration.getType())
+    : null;
+  const customObjectConfiguration = eventsBasedObject
+    ? gd.asCustomObjectConfiguration(objectConfiguration)
+    : null;
+
+  const shouldDisplayEventsBasedObjectChildren =
+    customObjectConfiguration &&
+    (customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration() ||
+      customObjectConfiguration.isMarkedAsOverridingEventsBasedObjectChildrenConfiguration());
 
   return (
     <ErrorBoundary
@@ -208,6 +271,36 @@ export const CompactObjectPropertiesEditor = ({
                 /* TODO */
               }}
             />
+            {eventsBasedObject &&
+              customObjectConfiguration &&
+              shouldDisplayEventsBasedObjectChildren &&
+              mapFor(0, eventsBasedObject.getObjects().getObjectsCount(), i => {
+                const childObject = eventsBasedObject
+                  .getObjects()
+                  .getObjectAt(i);
+                return (
+                  <CollapsibleSubPanel
+                    renderContent={() => (
+                      <ChildObjectPropertiesEditor
+                        key={i}
+                        project={project}
+                        resourceManagementProps={resourceManagementProps}
+                        unsavedChanges={unsavedChanges}
+                        eventsBasedObject={eventsBasedObject}
+                        customObjectConfiguration={customObjectConfiguration}
+                        childObject={childObject}
+                      />
+                    )}
+                    isFolded={false}
+                    toggleFolded={() => {}}
+                    title={
+                      <Text noMargin size="body">
+                        {childObject.getName()}
+                      </Text>
+                    }
+                  />
+                );
+              })}
             <Spacer />
           </ColumnStackLayout>
           <Column>
@@ -242,61 +335,40 @@ export const CompactObjectPropertiesEditor = ({
               const iconUrl = behaviorMetadata.getIconFilename();
 
               return (
-                // TODO: factor this paper container?
-                <Paper background="medium" key={behavior.getName()}>
-                  <Line expand>
-                    <ColumnStackLayout expand noOverflowParent>
-                      <LineStackLayout noMargin justifyContent="space-between">
-                        <Line noMargin alignItems="center">
-                          <IconButton
-                            onClick={() => {
-                              behavior.setFolded(!behavior.isFolded());
-                              forceUpdate();
-                            }}
-                            size="small"
-                          >
-                            {behavior.isFolded() ? (
-                              <ChevronArrowRight style={styles.icon} />
-                            ) : (
-                              <ChevronArrowBottom style={styles.icon} />
-                            )}
-                          </IconButton>
-
-                          {iconUrl ? (
-                            <IconContainer
-                              src={iconUrl}
-                              alt={behaviorMetadata.getFullName()}
-                              size={16}
-                            />
-                          ) : null}
-                          <Spacer />
-                          <Text noMargin size="body">
-                            {behavior.getName()}
-                          </Text>
-                        </Line>
-
-                        <IconButton
-                          tooltip={t`Remove behavior`}
-                          onClick={() => {
-                            removeBehavior(behavior.getName());
-                          }}
-                          size="small"
-                        >
-                          <Remove style={styles.icon} />
-                        </IconButton>
-                      </LineStackLayout>
-                      {!behavior.isFolded() && (
-                        <CompactBehaviorPropertiesEditor
-                          project={project}
-                          behavior={behavior}
-                          object={object}
-                          onBehaviorUpdated={() => {}}
-                          resourceManagementProps={resourceManagementProps}
+                <CollapsibleSubPanel
+                  renderContent={() => (
+                    <CompactBehaviorPropertiesEditor
+                      project={project}
+                      behavior={behavior}
+                      object={object}
+                      onBehaviorUpdated={() => {}}
+                      resourceManagementProps={resourceManagementProps}
+                    />
+                  )}
+                  isFolded={!behavior.isFolded()}
+                  toggleFolded={() => {
+                    behavior.setFolded(!behavior.isFolded());
+                    forceUpdate();
+                  }}
+                  title={
+                    <>
+                      {iconUrl ? (
+                        <IconContainer
+                          src={iconUrl}
+                          alt={behaviorMetadata.getFullName()}
+                          size={16}
                         />
-                      )}
-                    </ColumnStackLayout>
-                  </Line>
-                </Paper>
+                      ) : null}
+                      <Spacer />
+                      <Text noMargin size="body">
+                        {behavior.getName()}
+                      </Text>
+                    </>
+                  }
+                  onRemove={() => {
+                    removeBehavior(behavior.getName());
+                  }}
+                />
               );
             })}
           </ColumnStackLayout>
@@ -390,76 +462,46 @@ export const CompactObjectPropertiesEditor = ({
                     );
 
                     return (
-                      // TODO: factor this paper container?
-                      <Paper background="medium" key={effect.getName()}>
-                        <Line expand>
+                      <CollapsibleSubPanel
+                        renderContent={() => (
                           <ColumnStackLayout expand noOverflowParent>
-                            <LineStackLayout
-                              noMargin
-                              justifyContent="space-between"
+                            <CompactSelectField
+                              value={effectType}
+                              onChange={type => chooseEffectType(effect, type)}
                             >
-                              <Line noMargin alignItems="center">
-                                <IconButton
-                                  onClick={() => {
-                                    effect.setFolded(!effect.isFolded());
-                                    forceUpdate();
-                                  }}
-                                  size="small"
-                                >
-                                  {effect.isFolded() ? (
-                                    <ChevronArrowRight style={styles.icon} />
-                                  ) : (
-                                    <ChevronArrowBottom style={styles.icon} />
-                                  )}
-                                </IconButton>
-                                <Spacer />
-                                <Text noMargin size="body">
-                                  {effect.getName()}
-                                </Text>
-                              </Line>
-
-                              <IconButton
-                                tooltip={t`Remove effect`}
-                                onClick={() => {
-                                  removeEffect(effect);
-                                }}
-                                size="small"
-                              >
-                                <Remove style={styles.icon} />
-                              </IconButton>
-                            </LineStackLayout>
-                            {!effect.isFolded() && (
-                              <CompactSelectField
-                                value={effectType}
-                                onChange={type =>
-                                  chooseEffectType(effect, type)
-                                }
-                              >
-                                {all2DEffectMetadata.map(effectMetadata => (
-                                  <SelectOption
-                                    key={effectMetadata.type}
-                                    value={effectMetadata.type}
-                                    label={effectMetadata.fullName}
-                                    disabled={
-                                      effectMetadata.isMarkedAsNotWorkingForObjects
-                                    }
-                                  />
-                                ))}
-                              </CompactSelectField>
-                            )}
-                            {!effect.isFolded() && (
-                              <CompactEffectPropertiesEditor
-                                project={project}
-                                effect={effect}
-                                effectMetadata={effectMetadata}
-                                resourceManagementProps={
-                                  resourceManagementProps
-                                }
-                              />
-                            )}
+                              {all2DEffectMetadata.map(effectMetadata => (
+                                <SelectOption
+                                  key={effectMetadata.type}
+                                  value={effectMetadata.type}
+                                  label={effectMetadata.fullName}
+                                  disabled={
+                                    effectMetadata.isMarkedAsNotWorkingForObjects
+                                  }
+                                />
+                              ))}
+                            </CompactSelectField>
+                            <CompactEffectPropertiesEditor
+                              project={project}
+                              effect={effect}
+                              effectMetadata={effectMetadata}
+                              resourceManagementProps={resourceManagementProps}
+                            />
                           </ColumnStackLayout>
-                        </Line>
-                      </Paper>
+                        )}
+                        isFolded={!effect.isFolded()}
+                        toggleFolded={() => {
+                          effect.setFolded(!effect.isFolded());
+                          forceUpdate();
+                        }}
+                        title={
+                          <Text noMargin size="body">
+                            {effect.getName()}
+                          </Text>
+                        }
+                        onRemove={() => {
+                          removeEffect(effect);
+                        }}
+                      />
                     );
                   }
                 )}

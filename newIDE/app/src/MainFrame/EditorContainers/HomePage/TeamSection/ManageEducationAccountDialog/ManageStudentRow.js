@@ -30,8 +30,12 @@ const styles = {
     alignItems: 'center',
     paddingRight: 4,
   },
-  passwordTextFieldContainer: { height: 21 },
-  passwordTextField: { fontSize: 14 },
+  passwordTextFieldContainer: {
+    height: 21, // Avoid layout shifts
+  },
+  passwordTextField: {
+    fontSize: 14, // Avoid font changes when editing password.
+  },
 };
 
 type Props = {|
@@ -160,7 +164,9 @@ const ManageStudentRow = ({
         noMargin
         style={{
           ...textEllipsisStyle,
-          opacity: isArchived ? tertiaryTextArchivedOpacity : tertiaryTextOpacity,
+          opacity: isArchived
+            ? tertiaryTextArchivedOpacity
+            : tertiaryTextOpacity,
           // For italic characters not to be cut.
           paddingRight: 1,
         }}

@@ -7,6 +7,9 @@ export type ClipboardKind = string;
 
 let internalClipboard = '';
 
+export const copyTextToClipboard = (text: string) =>
+  navigator.clipboard.writeText(text);
+
 const mangleClipboardKind = (kind: ClipboardKind): string => {
   // Mangle the name with GDevelop specific strings and random
   // characters so that the probability that something that is not

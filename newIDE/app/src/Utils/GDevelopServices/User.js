@@ -141,7 +141,13 @@ export type UsernameAvailability = {|
   isAvailable: boolean,
 |};
 
-export type User = Profile;
+export type User = {|
+  ...Profile,
+  /**
+   * Present only if requested when admin user is listing members of teams.
+   */
+  +password?: ?string,
+|};
 
 export type Team = {| id: string, createdAt: number, seats: number |};
 export type TeamGroup = {| id: string, name: string |};
@@ -211,7 +217,25 @@ export const listTeamMembers = async (
   const authorizationHeader = await getAuthorizationHeader();
   const response = await client.get(`/user`, {
     headers: { Authorization: authorizationHeader },
-    params: { userId, teamId, memberType: 'basic' },
+    params: {
+      userId,
+      teamId,
+      memberType: 'basic',
+      include: 'decryptedPassword',
+    },
+  });
+  return response.data;
+};
+
+export const listTeamAdmins = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  teamId: string
+): Promise<Array<User>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await client.get(`/user`, {
+    headers: { Authorization: authorizationHeader },
+    params: { userId, teamId, memberType: 'admin' },
   });
   return response.data;
 };
@@ -346,6 +370,114 @@ export const getUserPublicProfile = async (
   const response = await client.get(`/user-public-profile/${id}`);
 
   return response.data;
+};
+
+export const changeTeamMemberPassword = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+    adminUserId,
+    newPassword,
+  }: {|
+    userId: string,
+    adminUserId: string,
+    newPassword: string,
+  |}
+) => {
+  const authorizationHeader = await getAuthorizationHeader();
+  await client.post(
+    `/user/action/change-password`,
+    {
+      userId,
+      newPassword,
+    },
+    {
+      headers: { Authorization: authorizationHeader },
+      params: { userId: adminUserId },
+    }
+  );
+};
+
+export const activateTeamMembers = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userIds,
+    teamId,
+    adminUserId,
+    activate,
+  }: {|
+    userIds: string[],
+    teamId: string,
+    adminUserId: string,
+    activate: boolean,
+  |}
+) => {
+  const authorizationHeader = await getAuthorizationHeader();
+  await client.post(
+    `/user/action/activate-users`,
+    {
+      userIds,
+      teamId,
+      activate,
+    },
+    {
+      params: { userId: adminUserId },
+      headers: { Authorization: authorizationHeader },
+    }
+  );
+};
+
+export const createTeamMembers = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    quantity,
+    teamId,
+    adminUserId,
+  }: {|
+    quantity: number,
+    teamId: string,
+    adminUserId: string,
+  |}
+) => {
+  const authorizationHeader = await getAuthorizationHeader();
+  await client.post(
+    `/team/${teamId}/action/batch-create-users`,
+    {
+      quantity,
+    },
+    {
+      params: { userId: adminUserId },
+      headers: { Authorization: authorizationHeader },
+    }
+  );
+};
+
+export const setUserAsAdmin = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    email,
+    activate,
+    teamId,
+    adminUserId,
+  }: {|
+    email: string,
+    activate: boolean,
+    teamId: string,
+    adminUserId: string,
+  |}
+) => {
+  const authorizationHeader = await getAuthorizationHeader();
+  await client.post(
+    `/team/${teamId}/action/set-admin`,
+    {
+      email,
+      activate,
+    },
+    {
+      params: { userId: adminUserId },
+      headers: { Authorization: authorizationHeader },
+    }
+  );
 };
 
 export const getUsernameAvailability = async (

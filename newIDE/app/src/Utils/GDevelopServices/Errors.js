@@ -4,6 +4,7 @@ import { type $AxiosError } from 'axios';
 export type ExtractedErrorStatusAndCode = {|
   status: number,
   code: ?string,
+  data?: ?Object,
 |};
 
 /**
@@ -32,6 +33,12 @@ export const extractGDevelopApiErrorStatusAndCode = (
         error.response.data &&
         typeof error.response.data.code === 'string'
           ? error.response.data.code
+          : null,
+      data:
+        typeof error.response.data === 'object' &&
+        error.response.data &&
+        typeof error.response.data.data === 'object'
+          ? error.response.data.data
           : null,
     };
   }

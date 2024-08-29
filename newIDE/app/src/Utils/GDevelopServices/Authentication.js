@@ -24,6 +24,7 @@ export type Profile = {|
   description: ?string,
   updatedAt: number,
   createdAt: number,
+  deactivatedAt?: number,
   getGameStatsEmail: boolean,
   getNewsletterEmail: boolean,
   appLanguage: ?string,

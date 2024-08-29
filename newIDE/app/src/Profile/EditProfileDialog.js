@@ -371,7 +371,9 @@ const EditProfileDialog = ({
   };
 
   const isStudentAccount =
-    !!subscription && !!subscription.benefitsFromEducationPlan;
+    !!subscription &&
+    !!subscription.benefitsFromEducationPlan &&
+    !subscription.isTeacher;
   const hideSocials =
     !!limits &&
     !!limits.capabilities.classrooms &&

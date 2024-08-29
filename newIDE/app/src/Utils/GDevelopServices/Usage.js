@@ -46,6 +46,7 @@ export type Subscription = {|
   redemptionCodeValidUntil?: number | null,
 
   benefitsFromEducationPlan?: boolean,
+  isTeacher?: boolean,
 |};
 
 /**
@@ -412,6 +413,12 @@ export const hasSubscriptionBeenManuallyAdded = (
   subscription: ?Subscription
 ): boolean => {
   return !!subscription && subscription.pricingSystemId === 'MANUALLY_ADDED';
+};
+
+export const isSubscriptionComingFromTeam = (
+  subscription: ?Subscription
+): boolean => {
+  return !!subscription && subscription.pricingSystemId === 'TEAM_MEMBER';
 };
 
 export const hasValidSubscriptionPlan = (subscription: ?Subscription) => {

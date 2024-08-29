@@ -51,6 +51,7 @@ type Props = {|
   children: React.Node,
   title: React.Node,
   titleAdornment?: React.Node,
+  titleAction?: React.Node,
   subtitleText?: React.Node,
   renderSubtitle?: () => React.Node,
   backAction?: () => void,
@@ -64,6 +65,7 @@ const SectionContainer = ({
   children,
   title,
   titleAdornment,
+  titleAction,
   subtitleText,
   renderSubtitle,
   backAction,
@@ -115,9 +117,12 @@ const SectionContainer = ({
                 alignItems="center"
                 justifyContent="space-between"
               >
-                <Text size="bold-title" noMargin style={styles.title}>
-                  {title}
-                </Text>
+                <LineStackLayout noMargin alignItems="center">
+                  <Text size="bold-title" noMargin style={styles.title}>
+                    {title}
+                  </Text>
+                  {titleAction}
+                </LineStackLayout>
                 {titleAdornment && <Column noMargin>{titleAdornment}</Column>}
               </LineStackLayout>
               {subtitleText && (

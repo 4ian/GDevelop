@@ -1,7 +1,7 @@
 // @flow
 
 import * as React from 'react';
-import TextField from './TextField';
+import TextField, { type TextFieldStyleProps } from './TextField';
 import {
   shouldCloseOrCancel,
   shouldValidate,
@@ -15,6 +15,7 @@ type Props = {|
   value: string,
   callback: (newValue: string) => Promise<void>,
   callbackErrorText: React.Node,
+  errorText?: React.Node,
   emptyErrorText?: React.Node,
   onCancel: () => void,
 
@@ -23,24 +24,28 @@ type Props = {|
   maxLength?: number,
   margin?: 'none' | 'dense',
   translatableHintText?: MessageDescriptor,
+  style?: TextFieldStyleProps,
 |};
 
 const AsyncSemiControlledTextField = ({
   value,
   callback,
   callbackErrorText,
+  errorText,
   emptyErrorText,
   onCancel,
   ...textFieldProps
 }: Props) => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
-  const [errorText, setErrorText] = React.useState<?React.Node>(null);
+  const [internalErrorText, setInternalErrorText] = React.useState<?React.Node>(
+    null
+  );
   const [newValue, setNewValue] = React.useState<string>(value);
 
   const onFinishEditingValue = async () => {
     const cleanedNewValue = newValue.trim();
     if (emptyErrorText && !cleanedNewValue) {
-      setErrorText(emptyErrorText);
+      setInternalErrorText(emptyErrorText);
       return;
     }
     if (cleanedNewValue === value) {
@@ -52,7 +57,7 @@ const AsyncSemiControlledTextField = ({
       await callback(cleanedNewValue);
     } catch (error) {
       console.error(error);
-      setErrorText(callbackErrorText);
+      setInternalErrorText(callbackErrorText);
     } finally {
       setIsLoading(false);
     }
@@ -61,7 +66,7 @@ const AsyncSemiControlledTextField = ({
   const onChangeValue = React.useCallback(
     (e, _value) => {
       if (errorText) {
-        setErrorText(null);
+        setInternalErrorText(null);
       }
       setNewValue(_value);
     },
@@ -76,18 +81,25 @@ const AsyncSemiControlledTextField = ({
     [value, onCancel]
   );
 
+  const errorTextToDisplay = errorText || internalErrorText;
+
   return (
     <TextField
       value={newValue}
       disabled={isLoading}
       onChange={onChangeValue}
-      errorText={errorText}
+      errorText={errorTextToDisplay}
       onKeyUp={event => {
         if (shouldValidate(event)) {
           onFinishEditingValue();
         } else if (shouldCloseOrCancel(event)) {
           event.stopPropagation();
           cancel();
+        }
+      }}
+      onKeyDown={event => {
+        if (shouldCloseOrCancel(event)) {
+          event.stopPropagation();
         }
       }}
       endAdornment={

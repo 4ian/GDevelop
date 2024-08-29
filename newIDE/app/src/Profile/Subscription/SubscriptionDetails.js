@@ -10,6 +10,7 @@ import {
   hasSubscriptionBeenManuallyAdded,
   getSubscriptionPlanPricingSystem,
   canPriceBeFoundInGDevelopPrices,
+  isSubscriptionComingFromTeam,
 } from '../../Utils/GDevelopServices/Usage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import RaisedButton from '../../UI/RaisedButton';
@@ -291,6 +292,7 @@ const SubscriptionDetails = ({
               actions={[
                 !redemptionCodeExpirationDate &&
                 !hasMobileAppStoreSubscriptionPlan(subscription) &&
+                !isSubscriptionComingFromTeam(subscription) &&
                 !hasSubscriptionBeenManuallyAdded(subscription) ? (
                   <FlatButton
                     key="manage-payments"
@@ -304,17 +306,19 @@ const SubscriptionDetails = ({
                     disabled={isManageSubscriptionLoading}
                   />
                 ) : null,
-                <RaisedButton
-                  key="manage-subscription"
-                  label={<Trans>Manage subscription</Trans>}
-                  primary
-                  onClick={() =>
-                    openSubscriptionDialog({
-                      analyticsMetadata: { reason: 'Consult profile' },
-                    })
-                  }
-                  disabled={isManageSubscriptionLoading}
-                />,
+                !isSubscriptionComingFromTeam(subscription) ? (
+                  <RaisedButton
+                    key="manage-subscription"
+                    label={<Trans>Manage subscription</Trans>}
+                    primary
+                    onClick={() =>
+                      openSubscriptionDialog({
+                        analyticsMetadata: { reason: 'Consult profile' },
+                      })
+                    }
+                    disabled={isManageSubscriptionLoading}
+                  />
+                ) : null,
               ].filter(Boolean)}
               isHighlighted
               background="medium"

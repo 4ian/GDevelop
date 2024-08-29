@@ -12,7 +12,6 @@ import RaisedButton from '../../../../UI/RaisedButton';
 import { SubscriptionSuggestionContext } from '../../../../Profile/Subscription/SubscriptionSuggestionContext';
 import Form from '../../../../UI/Form';
 import TextField from '../../../../UI/TextField';
-import { emailRegex } from '../../../../Profile/ForgotPasswordDialog';
 import { Line, Spacer } from '../../../../UI/Grid';
 import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import type { EducationFormStatus, EducationForm } from '../UseEducationForm';
@@ -24,6 +23,7 @@ import Education from '../../../../Profile/Subscription/Icons/Education';
 import Window from '../../../../Utils/Window';
 import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
 import Paper from '../../../../UI/Paper';
+import { emailRegex } from '../../../../Utils/EmailUtils';
 
 const styles = {
   banner: {

@@ -12,6 +12,7 @@ export type TeamState = {|
   team: ?Team,
   groups: ?Array<TeamGroup>,
   members: ?Array<User>,
+  admins: ?Array<User>,
   memberships: ?Array<TeamMembership>,
   onChangeGroupName: (group: TeamGroup, newName: string) => Promise<void>,
   onChangeUserGroup: (user: User, group: TeamGroup) => Promise<void>,
@@ -21,12 +22,22 @@ export type TeamState = {|
   onDeleteGroup: (group: TeamGroup) => Promise<void>,
   onCreateGroup: (attributes: {| name: string |}) => Promise<void>,
   onRefreshMembers: () => Promise<void>,
+  onRefreshAdmins: () => Promise<void>,
+  getAvailableSeats: () => number | null,
+  onCreateMembers: (quantity: number) => Promise<void>,
+  onActivateMembers: (userIds: string[], activate: boolean) => Promise<void>,
+  onSetAdmin: (email: string, activate: boolean) => Promise<void>,
+  onChangeMemberPassword: (
+    userId: string,
+    newPassword: string
+  ) => Promise<void>,
 |};
 
 export const initialTeamState = {
   team: null,
   groups: null,
   members: null,
+  admins: null,
   memberships: null,
   onChangeGroupName: async () => {},
   onChangeUserGroup: async () => {},
@@ -34,6 +45,12 @@ export const initialTeamState = {
   onDeleteGroup: async () => {},
   onCreateGroup: async () => {},
   onRefreshMembers: async () => {},
+  getAvailableSeats: () => null,
+  onCreateMembers: async () => {},
+  onActivateMembers: async () => {},
+  onRefreshAdmins: async () => {},
+  onSetAdmin: async () => {},
+  onChangeMemberPassword: async () => {},
 };
 
 const TeamContext = React.createContext<TeamState>(initialTeamState);

@@ -131,7 +131,12 @@ const ProfileDialog = ({ open, onClose }: Props) => {
     authenticatedUser.authenticated && authenticatedUser.profile;
   const isStudentAccount =
     !!authenticatedUser.subscription &&
-    !!authenticatedUser.subscription.benefitsFromEducationPlan;
+    !!authenticatedUser.subscription.benefitsFromEducationPlan &&
+    !authenticatedUser.subscription.isTeacher;
+  const isTeacherAccount =
+    !!authenticatedUser.subscription &&
+    !!authenticatedUser.subscription.benefitsFromEducationPlan &&
+    !!authenticatedUser.subscription.isTeacher;
 
   return (
     <Dialog
@@ -187,7 +192,7 @@ const ProfileDialog = ({ open, onClose }: Props) => {
             ) : (
               <PlaceholderLoader />
             )}
-            {!isStudentAccount && (
+            {!isStudentAccount && !isTeacherAccount && (
               <Column noMargin>
                 <Line alignItems="center">
                   <Column noMargin>

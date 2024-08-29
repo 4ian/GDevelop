@@ -25,30 +25,52 @@ describe('Errors', () => {
     expect(
       // $FlowExpectedError - faking error objects to test the function resilience.
       extractGDevelopApiErrorStatusAndCode({ response: { status: 400 } })
-    ).toEqual({ status: 400, code: null });
+    ).toEqual({ status: 400, code: null, data: null });
     expect(
       // $FlowExpectedError - faking error objects to test the function resilience.
       extractGDevelopApiErrorStatusAndCode({
         response: { status: 400, data: null },
       })
-    ).toEqual({ status: 400, code: null });
+    ).toEqual({ status: 400, code: null, data: null });
     expect(
       // $FlowExpectedError - faking error objects to test the function resilience.
       extractGDevelopApiErrorStatusAndCode({
         response: { status: 400, data: {} },
       })
-    ).toEqual({ status: 400, code: null });
+    ).toEqual({ status: 400, code: null, data: null });
     expect(
       // $FlowExpectedError - faking error objects to test the function resilience.
       extractGDevelopApiErrorStatusAndCode({
         response: { status: 400, data: { code: 0xbad } },
       })
-    ).toEqual({ status: 400, code: null });
+    ).toEqual({ status: 400, code: null, data: null });
     expect(
       // $FlowExpectedError - faking error objects to test the function resilience.
       extractGDevelopApiErrorStatusAndCode({
         response: { status: 400, data: { code: 'code/of-the-error' } },
       })
-    ).toEqual({ status: 400, code: 'code/of-the-error' });
+    ).toEqual({ status: 400, code: 'code/of-the-error', data: null });
+    expect(
+      // $FlowExpectedError - faking error objects to test the function resilience.
+      extractGDevelopApiErrorStatusAndCode({
+        response: {
+          status: 400,
+          data: { code: 'code/of-the-error', data: 'errorData' },
+        },
+      })
+    ).toEqual({ status: 400, code: 'code/of-the-error', data: null });
+    expect(
+      // $FlowExpectedError - faking error objects to test the function resilience.
+      extractGDevelopApiErrorStatusAndCode({
+        response: {
+          status: 400,
+          data: { code: 'code/of-the-error', data: { any: 'objet' } },
+        },
+      })
+    ).toEqual({
+      status: 400,
+      code: 'code/of-the-error',
+      data: { any: 'objet' },
+    });
   });
 });

@@ -1,5 +1,5 @@
 // @flow
-import { groupMembersByGroupId } from './utils';
+import { groupMembersByGroupId } from './Utils';
 
 const getDefaultUser = ({
   id,

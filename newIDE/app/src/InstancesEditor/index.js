@@ -514,6 +514,7 @@ export default class InstancesEditor extends Component<Props> {
       getTileMapTileSelection: this.getTileMapTileSelection,
       viewPosition: this.viewPosition,
       onClick: this._onInterceptClick,
+      onPanMove: this._onPanMove,
     });
     this.highlightedInstance = new HighlightedInstance({
       instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),

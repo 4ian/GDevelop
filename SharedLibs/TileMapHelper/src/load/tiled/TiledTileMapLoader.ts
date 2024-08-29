@@ -51,6 +51,7 @@ export namespace TiledTileMapLoader {
                 continue;
               }
               let polygon: PolygonVertices | null = null;
+              let hasFullHitBox = false;
               if (object.polygon) {
                 const angle = (object.rotation * Math.PI) / 180;
                 let cos = Math.cos(angle);
@@ -67,6 +68,7 @@ export namespace TiledTileMapLoader {
                   object.y + point.x * sin + point.y * cos,
                 ]);
                 //TODO check that polygons are convex or split them?
+                // TODO Set hasFullHitBox to true if the polygon covers the whole tile.
               }
               // TODO handle ellipses by creating a polygon?
               // Make an object property for the number of vertices or always create 8 ones?
@@ -83,10 +85,14 @@ export namespace TiledTileMapLoader {
                   [object.x + object.width, object.y + object.height],
                   [object.x + object.width, object.y],
                 ];
+                hasFullHitBox =
+                  object.x === 0 &&
+                  object.y === 0 &&
+                  object.width === tiledTileMap.tilewidth &&
+                  object.height === tiledTileMap.tileheight;
               }
               if (polygon) {
-                // TODO Check if the polygon cover the whole tile.
-                tileDefinition.addHitBox(tag, polygon, false);
+                tileDefinition.addHitBox(tag, polygon, hasFullHitBox);
               }
             }
           } else if (tileClass) {

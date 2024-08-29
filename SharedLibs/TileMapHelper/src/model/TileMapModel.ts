@@ -1088,9 +1088,10 @@ export class TileDefinition {
   ): void {
     let taggedHitBox = this.taggedHitBoxes.find((hitbox) => hitbox.tag === tag);
     if (!taggedHitBox) {
-      taggedHitBox = { tag, polygons: [], hasFullHitBox: hasFullHitBox };
+      taggedHitBox = { tag, polygons: [], hasFullHitBox: false };
       this.taggedHitBoxes.push(taggedHitBox);
     }
+    taggedHitBox.hasFullHitBox ||= hasFullHitBox;
     taggedHitBox.polygons.push(polygon);
   }
 

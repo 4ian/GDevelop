@@ -4,7 +4,6 @@ import * as React from 'react';
 import EventsBasedObjectEditor from './index';
 import { Tabs } from '../UI/Tabs';
 import EventsBasedObjectPropertiesEditor from './EventsBasedObjectPropertiesEditor';
-import EventBasedObjectChildrenEditor from './EventBasedObjectChildrenEditor';
 import Background from '../UI/Background';
 import { Column, Line } from '../UI/Grid';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
@@ -61,10 +60,6 @@ export default function EventsBasedObjectEditorPanel({
                   value: 'properties',
                   label: <Trans>Properties</Trans>,
                 },
-                {
-                  value: 'children',
-                  label: <Trans>Children</Trans>,
-                },
               ]}
             />
           </Column>
@@ -84,14 +79,6 @@ export default function EventsBasedObjectEditorPanel({
             onRenameProperty={onRenameProperty}
             onPropertiesUpdated={onPropertiesUpdated}
             onEventsFunctionsAdded={onEventsFunctionsAdded}
-          />
-        )}
-        {currentTab === 'children' && (
-          <EventBasedObjectChildrenEditor
-            project={project}
-            eventsFunctionsExtension={eventsFunctionsExtension}
-            eventsBasedObject={eventsBasedObject}
-            projectScopedContainersAccessor={projectScopedContainersAccessor}
           />
         )}
       </Column>

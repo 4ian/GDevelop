@@ -514,6 +514,7 @@ export default class InstancesEditor extends Component<Props> {
       getTileMapTileSelection: this.getTileMapTileSelection,
       viewPosition: this.viewPosition,
       onClick: this._onInterceptClick,
+      onPanMove: this._onPanMove,
     });
     this.highlightedInstance = new HighlightedInstance({
       instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
@@ -900,15 +901,11 @@ export default class InstancesEditor extends Component<Props> {
             );
           }
         });
-
-        this.props.onInstancesResized([selectedInstance]);
       } else if (tileMapTileSelection.kind === 'erase') {
         tileMapGridCoordinates.forEach(({ x: gridX, y: gridY }) => {
           editableTileMap.removeTile(gridX, gridY, 0);
         });
         shouldTrimAfterOperations = true;
-
-        this.props.onInstancesResized([selectedInstance]);
       } else {
         return;
       }
@@ -951,6 +948,7 @@ export default class InstancesEditor extends Component<Props> {
         'tilemap',
         JSON.stringify(editableTileMap.toJSObject())
       );
+      this.props.onInstancesResized([selectedInstance]);
     }
   };
 

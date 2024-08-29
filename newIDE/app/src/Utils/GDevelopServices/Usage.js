@@ -189,6 +189,14 @@ export type SubscriptionPlanWithPricingSystems = {|
   pricingSystems: SubscriptionPlanPricingSystem[],
 |};
 
+export interface UserEarningsBalance {
+  userId: string;
+  amountInMilliUSDs: number;
+  amountInCredits: number;
+  minAmountToCashoutInMilliUSDs: number;
+  updatedAt: number;
+}
+
 export const EDUCATION_PLAN_MIN_SEATS = 5;
 export const EDUCATION_PLAN_MAX_SEATS = 300;
 export const apiClient = axios.create({
@@ -266,6 +274,58 @@ export const getUserUsages = async (
     },
   });
   return response.data;
+};
+
+export const getUserEarningsBalance = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string
+): Promise<UserEarningsBalance> => {
+  const authorizationHeader = await getAuthorizationHeader();
+
+  const response = await axios.get(
+    `${GDevelopUsageApi.baseUrl}/user-earnings-balance`,
+    {
+      params: {
+        userId,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
+  const userEarningsBalances = response.data;
+  if (!Array.isArray(userEarningsBalances)) {
+    throw new Error('Invalid response from the user earnings API');
+  }
+
+  if (userEarningsBalances.length === 0) {
+    throw new Error('No user earnings balance found');
+  }
+
+  return userEarningsBalances[0];
+};
+
+export const cashOutUserEarnings = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  type: 'cash' | 'credits'
+): Promise<void> => {
+  const authorizationHeader = await getAuthorizationHeader();
+
+  await axios.post(
+    `${GDevelopUsageApi.baseUrl}/user-earnings-balance/action/cash-out`,
+    {
+      type,
+    },
+    {
+      params: {
+        userId,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
 };
 
 export const getUserLimits = async (

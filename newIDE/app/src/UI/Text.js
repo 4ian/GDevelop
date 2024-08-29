@@ -62,6 +62,9 @@ type Props = {|
     // Allow to set maxHeight to limit number of lines displayed
     lineHeight?: string,
     maxHeight?: number,
+
+    // Allow to prevent numbers from changing size when they change
+    fontVariantNumeric?: 'tabular-nums',
   |},
   tooltip?: string,
 |};

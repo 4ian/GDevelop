@@ -43,6 +43,7 @@ const Card = ({
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <MUICard
+      elevation={0}
       style={{
         opacity: disabled ? 0.5 : 1,
         backgroundColor:
@@ -56,21 +57,22 @@ const Card = ({
             }
           : {}),
       }}
-      variant="outlined"
     >
       <Column expand noMargin>
-        <Line justifyContent="space-between" expand>
-          <div
-            style={{
-              ...styles.headerContainer,
-              paddingLeft: isMobile ? 8 : 24,
-              paddingRight: cardCornerAction ? (isMobile ? 8 : 24) : 0,
-            }}
-          >
-            {header}
-          </div>
-          <Column>{cardCornerAction}</Column>
-        </Line>
+        {header && (
+          <Line justifyContent="space-between" expand>
+            <div
+              style={{
+                ...styles.headerContainer,
+                paddingLeft: isMobile ? 8 : 24,
+                paddingRight: cardCornerAction ? (isMobile ? 8 : 24) : 0,
+              }}
+            >
+              {header}
+            </div>
+            <Column>{cardCornerAction}</Column>
+          </Line>
+        )}
         <CardContent
           style={{
             ...styles.cardContent,

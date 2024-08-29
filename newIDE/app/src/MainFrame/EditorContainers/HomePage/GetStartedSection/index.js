@@ -649,15 +649,17 @@ const GetStartedSection = ({
             onCreateProjectFromExample={onCreateProjectFromExample}
             askToCloseProject={askToCloseProject}
           />
-          <Line justifyContent="center" alignItems="center">
-            <Checkbox
-              label={<Trans>Don't show this screen on next startup</Trans>}
-              checked={!preferences.showGetStartedSectionByDefault}
-              onCheck={(e, checked) =>
-                setShowGetStartedSectionByDefault(!checked)
-              }
-            />
-          </Line>
+          {authenticatedUser.recommendations && (
+            <Line justifyContent="center" alignItems="center">
+              <Checkbox
+                label={<Trans>Don't show this screen on next startup</Trans>}
+                checked={!preferences.showGetStartedSectionByDefault}
+                onCheck={(e, checked) =>
+                  setShowGetStartedSectionByDefault(!checked)
+                }
+              />
+            </Line>
+          )}
           <LargeSpacer />
         </SectionContainer>
       </>

@@ -36,6 +36,250 @@ describe('gdjs.HotReloader.deepEqual', () => {
   });
 });
 
+describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
+  /**
+   * Create and return a minimum working game.
+   * @internal
+   * @param {{layouts?: LayoutData[], eventsBasedObjects?: EventsBasedObjectData, resources?: ResourcesData, propertiesOverrides?: Partial<ProjectPropertiesData>}=} settings
+   * @returns {ProjectData}
+   */
+  const createProjectData = (settings) => {
+    const project = gdjs.createProjectData(settings);
+    project.eventsFunctionsExtensions.push({
+      name: 'MyExtension',
+      eventsBasedObjects: settings.eventsBasedObjects || [],
+      globalVariables: [],
+      sceneVariables: [],
+    });
+    return project;
+  };
+
+  const defaultInstance = {
+    persistentUuid: '',
+    layer: '',
+    locked: false,
+    name: 'MyObject',
+    x: 0,
+    y: 0,
+    angle: 0,
+    zOrder: 0,
+    customSize: false,
+    width: 0,
+    height: 0,
+    numberProperties: [],
+    stringProperties: [],
+    initialVariables: [],
+  };
+
+  const defaultChildInstance = {
+    persistentUuid: '',
+    layer: '',
+    locked: false,
+    name: 'MyChildObject',
+    x: 0,
+    y: 0,
+    angle: 0,
+    zOrder: 0,
+    customSize: false,
+    width: 0,
+    height: 0,
+    numberProperties: [],
+    stringProperties: [],
+    initialVariables: [],
+  };
+
+  const defaultCustomObject = {
+    type: 'MyExtension::MyCustomObject',
+    name: 'MyCustomObject',
+    behaviors: [],
+    effects: [],
+    content: {},
+  };
+
+  const baseLayer = {
+    name: '',
+    visibility: true,
+    cameras: [],
+    effects: [],
+    ambientLightColorR: 127,
+    ambientLightColorB: 127,
+    ambientLightColorG: 127,
+    isLightingLayer: false,
+    followBaseLayerCamera: false,
+  };
+
+  /**
+   * Create and return a minimum working scene data.
+   * @internal
+   * @param {{instances?: Partial<InstanceData>[], objects?: ObjectData[]}=} settings
+   * @returns {LayoutData}
+   */
+  const createSceneData = ({ instances, objects }) => {
+    return {
+      layers: [baseLayer],
+      variables: [],
+      r: 0,
+      v: 0,
+      b: 0,
+      mangledName: 'Scene1',
+      name: 'Scene1',
+      stopSoundsOnStartup: false,
+      title: '',
+      behaviorsSharedData: [],
+      objects: objects || [
+        {
+          type: 'Sprite',
+          name: 'MyObject',
+          behaviors: [],
+          effects: [],
+          // @ts-expect-error
+          animations: [],
+          updateIfNotVisible: false,
+        },
+      ],
+      instances: instances
+        ? instances.map((instance) => ({ ...defaultInstance, ...instance }))
+        : [],
+      usedResources: [],
+    };
+  };
+
+  /**
+   * Create and return a minimum working scene data.
+   * @internal
+   * @param {{name: string, instances?: Partial<InstanceData>[], objects?: ObjectData[]}=} settings
+   * @returns {LayoutData}
+   */
+  const createEventsBasedObjectData = ({ name, instances, objects }) => {
+    return {
+      name,
+      variables: [],
+      instances: instances
+        ? instances.map((instance) => ({
+            ...defaultChildInstance,
+            ...instance,
+          }))
+        : [],
+      objects: objects || [
+        {
+          type: 'Sprite',
+          name: 'MyChildObject',
+          behaviors: [],
+          effects: [],
+          // @ts-expect-error
+          animations: [],
+          updateIfNotVisible: false,
+        },
+      ],
+      layers: [baseLayer],
+    };
+  };
+
+  it('can move instances of a scene at hot-reload', async () => {
+    const oldProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [
+            { persistentUuid: '1', x: 111, y: 123 },
+            { persistentUuid: '2', x: 222, y: 234 },
+          ],
+        }),
+      ],
+    });
+    const runtimeGame = new gdjs.RuntimeGame(oldProjectData);
+    const hotReloader = new gdjs.HotReloader(runtimeGame);
+    runtimeGame.areSceneAssetsReady = (sceneName) => true;
+    runtimeGame._sceneStack.push('Scene1');
+    const scene = runtimeGame.getSceneStack().getCurrentScene();
+
+    const newProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [
+            { persistentUuid: '1', x: 555, y: 678 },
+            { persistentUuid: '2', x: 222, y: 234 },
+          ],
+        }),
+      ],
+    });
+
+    await hotReloader._hotReloadRuntimeGame(
+      oldProjectData,
+      newProjectData,
+      [],
+      runtimeGame
+    );
+
+    const instances = scene.getInstancesOf('MyObject');
+    expect(instances.length).to.be(2);
+    expect(instances[0].getX()).to.be(555);
+    expect(instances[0].getY()).to.be(678);
+    expect(instances[1].getX()).to.be(222);
+    expect(instances[1].getY()).to.be(234);
+  });
+
+  it('can move instances in a custom object at hot-reload', async () => {
+    const oldProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1', name: 'MyCustomObject' }],
+          objects: [defaultCustomObject],
+        }),
+      ],
+      eventsBasedObjects: [
+        createEventsBasedObjectData({
+          name: 'MyCustomObject',
+          instances: [
+            { persistentUuid: '11', x: 111, y: 123 },
+            { persistentUuid: '12', x: 222, y: 234 },
+          ],
+        }),
+      ],
+    });
+    const runtimeGame = new gdjs.RuntimeGame(oldProjectData);
+    const hotReloader = new gdjs.HotReloader(runtimeGame);
+    runtimeGame.areSceneAssetsReady = (sceneName) => true;
+    runtimeGame._sceneStack.push('Scene1');
+    const scene = runtimeGame.getSceneStack().getCurrentScene();
+
+    const newProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1', name: 'MyCustomObject' }],
+          objects: [defaultCustomObject],
+        }),
+      ],
+      eventsBasedObjects: [
+        createEventsBasedObjectData({
+          name: 'MyCustomObject',
+          instances: [
+            { persistentUuid: '11', x: 555, y: 678 },
+            { persistentUuid: '12', x: 222, y: 234 },
+          ],
+        }),
+      ],
+    });
+
+    await hotReloader._hotReloadRuntimeGame(
+      oldProjectData,
+      newProjectData,
+      [],
+      runtimeGame
+    );
+
+    const sceneInstances = scene.getInstancesOf('MyCustomObject');
+    expect(sceneInstances.length).to.be(1);
+    const instances = sceneInstances[0]
+      .getChildrenContainer()
+      .getInstancesOf('MyChildObject');
+    expect(instances.length).to.be(2);
+    expect(instances[0].getX()).to.be(555);
+    expect(instances[0].getY()).to.be(678);
+    expect(instances[1].getX()).to.be(222);
+    expect(instances[1].getY()).to.be(234);
+  });
+});
+
 describe('gdjs.HotReloader._hotReloadVariablesContainer', () => {
   /**
    * When `current` is not set `oldInit` is used instead.

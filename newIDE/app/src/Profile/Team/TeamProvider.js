@@ -112,9 +112,15 @@ const TeamProvider = ({ children }: Props) => {
   const onCreateMembers = React.useCallback(
     async quantity => {
       if (!team || !profile) return;
-      await createTeamMembers(getAuthorizationHeader, {
+      const createdUsers = await createTeamMembers(getAuthorizationHeader, {
         teamId: team.id,
         quantity,
+        adminUserId: profile.id,
+      });
+      await activateTeamMembers(getAuthorizationHeader, {
+        teamId: team.id,
+        activate: true,
+        userIds: createdUsers.map(user => user.uid),
         adminUserId: profile.id,
       });
     },

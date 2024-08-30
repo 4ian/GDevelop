@@ -18,6 +18,12 @@ import { type MessageByLocale } from '../i18n/MessageByLocale';
 import { type Badge } from './Badge';
 import { type Profile } from './Authentication';
 
+export type BatchCreationResultUser = {|
+  email: string,
+  password: string,
+  uid: string,
+|};
+
 export type CommunityLinkType =
   | 'personalWebsiteLink'
   | 'personalWebsite2Link'
@@ -438,9 +444,9 @@ export const createTeamMembers = async (
     teamId: string,
     adminUserId: string,
   |}
-) => {
+): Promise<BatchCreationResultUser[]> => {
   const authorizationHeader = await getAuthorizationHeader();
-  await client.post(
+  const response = await client.post(
     `/team/${teamId}/action/batch-create-users`,
     {
       quantity,
@@ -450,6 +456,7 @@ export const createTeamMembers = async (
       headers: { Authorization: authorizationHeader },
     }
   );
+  return response.data;
 };
 
 export const setUserAsAdmin = async (

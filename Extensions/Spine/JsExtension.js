@@ -73,6 +73,42 @@ module.exports = {
       .setFunctionName('setAnimationMixingDuration')
       .setGetter('getAnimationMixingDuration');
 
+    object
+      .addExpressionAndCondition(
+        'number',
+        'PointAttachmentX',
+        _('Point attachment x'),
+        _('x position of spine point attachment'),
+        _(
+          'x position of spine _PARAM1_ point attachment for _PARAM2_ slot (use "" if names are the same)'
+        ),
+        _('Animations and images'),
+        'JsPlatform/Extensions/spine.svg'
+      )
+      .addParameter('object', _('Spine'), 'SpineObject')
+      .addParameter('string', _('Slot name'))
+      .addParameter('string', _('Attachment name'))
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .setFunctionName('getPointAttachmentX');
+
+    object
+      .addExpressionAndCondition(
+        'number',
+        'PointAttachmentY',
+        _('Point attachment y'),
+        _('y position of spine point attachment'),
+        _(
+          'y position of spine _PARAM1_ point attachment for _PARAM2_ slot (use "" if names are the same)'
+        ),
+        _('Animations and images'),
+        'JsPlatform/Extensions/spine.svg'
+      )
+      .addParameter('object', _('Spine'), 'SpineObject')
+      .addParameter('string', _('Slot name'))
+      .addParameter('string', _('Attachment name'))
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .setFunctionName('getPointAttachmentY');
+
     return extension;
   },
 

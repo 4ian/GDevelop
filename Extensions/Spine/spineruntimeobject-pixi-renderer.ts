@@ -197,8 +197,11 @@ namespace gdjs {
 
     getPointAttachmentPosition(
       attachmentName: string,
-      slotName: string
+      slotName?: string
     ): pixi_spine.Vector2 {
+      if (!slotName) {
+        slotName = attachmentName;
+      }
       if (!isSpine(this._rendererObject)) {
         return new pixi_spine.Vector2(
           this._rendererObject.x,

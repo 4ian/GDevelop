@@ -500,12 +500,12 @@ namespace gdjs {
       this._isPausedFrameDirty = true;
     }
 
-    getPointAttachmentX(attachmentName: string, slotName: string): number {
+    getPointAttachmentX(attachmentName: string, slotName?: string): number {
       return this._renderer.getPointAttachmentPosition(attachmentName, slotName)
         .x;
     }
 
-    getPointAttachmentY(attachmentName: string, slotName: string): number {
+    getPointAttachmentY(attachmentName: string, slotName?: string): number {
       return this._renderer.getPointAttachmentPosition(attachmentName, slotName)
         .y;
     }

@@ -27,6 +27,7 @@ const StudentCreationCard = ({
   const [quantity, setQuantity] = React.useState<string>(
     availableSeats.toString()
   );
+  const [creationError, setCreationError] = React.useState<React.Node>(null);
   const { isMobile } = useResponsiveWindowSize();
   const quantityAsNumber = parseInt(quantity, 10);
 
@@ -36,9 +37,26 @@ const StudentCreationCard = ({
         !quantityAsNumber ||
         quantityAsNumber > availableSeats ||
         quantityAsNumber <= 0
-      )
+      ) {
         return;
-      await onCreateStudentAccounts(quantityAsNumber);
+      }
+      setCreationError(null);
+      try {
+        await onCreateStudentAccounts(quantityAsNumber);
+      } catch (error) {
+        console.error(
+          'An error occurred while batch creating member accounts:',
+          error
+        );
+        setCreationError(
+          <>
+            <Trans>An error occurred while creating the accounts.</Trans>{' '}
+            <Trans>
+              Please check your internet connection or try again later.
+            </Trans>
+          </>
+        );
+      }
     },
     [quantityAsNumber, onCreateStudentAccounts, availableSeats]
   );
@@ -71,6 +89,7 @@ const StudentCreationCard = ({
               value={quantity}
               onChange={(e, newQuantity) => setQuantity(newQuantity)}
               translatableHintText={t`Number of students`}
+              errorText={creationError}
             />
             <RaisedButton
               primary

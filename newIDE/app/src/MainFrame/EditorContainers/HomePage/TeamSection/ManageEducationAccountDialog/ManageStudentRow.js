@@ -78,8 +78,23 @@ const ManageStudentRow = ({
         );
         return;
       }
-      await onChangePassword({ userId: member.id, newPassword });
-      setIsEditingPassword(false);
+      try {
+        await onChangePassword({ userId: member.id, newPassword });
+        setIsEditingPassword(false);
+      } catch (error) {
+        console.error(
+          'An error occurred while changing member password',
+          error
+        );
+        setPasswordEditionError(
+          <>
+            <Trans>An error occurred.</Trans>{' '}
+            <Trans>
+              Please check your internet connection or try again later.
+            </Trans>
+          </>
+        );
+      }
     },
     [member.password, member.id, onChangePassword]
   );

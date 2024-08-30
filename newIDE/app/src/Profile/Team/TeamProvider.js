@@ -112,11 +112,28 @@ const TeamProvider = ({ children }: Props) => {
   const onCreateMembers = React.useCallback(
     async quantity => {
       if (!team || !profile) return;
-      await createTeamMembers(getAuthorizationHeader, {
-        teamId: team.id,
-        quantity,
-        adminUserId: profile.id,
-      });
+      try {
+        const createdUsers = await createTeamMembers(getAuthorizationHeader, {
+          teamId: team.id,
+          quantity,
+          adminUserId: profile.id,
+        });
+        try {
+          await activateTeamMembers(getAuthorizationHeader, {
+            teamId: team.id,
+            activate: true,
+            userIds: createdUsers.map(user => user.uid),
+            adminUserId: profile.id,
+          });
+        } catch (error) {
+          console.error(
+            'An error occurred while activating newly created members',
+            error
+          );
+        }
+      } catch (error) {
+        console.error('An error occurred while creating team members:', error);
+      }
     },
     [team, getAuthorizationHeader, profile]
   );
@@ -124,11 +141,15 @@ const TeamProvider = ({ children }: Props) => {
   const onChangeMemberPassword = React.useCallback(
     async (userId: string, newPassword: string) => {
       if (!profile) return;
-      await changeTeamMemberPassword(getAuthorizationHeader, {
-        adminUserId: profile.id,
-        userId,
-        newPassword,
-      });
+      try {
+        await changeTeamMemberPassword(getAuthorizationHeader, {
+          adminUserId: profile.id,
+          userId,
+          newPassword,
+        });
+      } catch (error) {
+        console.error('An error occurred while changing password:', error);
+      }
     },
     [getAuthorizationHeader, profile]
   );

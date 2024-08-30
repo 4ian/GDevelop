@@ -223,6 +223,7 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
           await onRefreshTeamMembers();
         } catch (error) {
           console.error(`An error occurred when creating members: `, error);
+          throw error;
         } finally {
           setIsCreatingMembers(false);
         }

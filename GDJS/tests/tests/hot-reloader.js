@@ -109,6 +109,50 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
   };
 
   /**
+   * Create and return a minimum working sprite object data.
+   * @internal
+   * @param {{name: string, image: string}=} settings
+   * @returns {gdjs.SpriteObjectData}
+   */
+  const createSpriteData = ({ name, image }) => {
+    return {
+      type: 'Sprite',
+      name,
+      behaviors: [],
+      variables:[],
+      effects: [],
+      animations: [
+        {
+          name: 'animation',
+          directions: [
+            {
+              sprites: [
+                {
+                  originPoint: { name: 'Origin', x: 0, y: 0 },
+                  centerPoint: {
+                    name: 'Center',
+                    x: 0,
+                    y: 0,
+                    automatic: true,
+                  },
+                  points: [],
+                  hasCustomCollisionMask: false,
+                  customCollisionMask: [],
+                  image,
+                },
+              ],
+              timeBetweenFrames: 0,
+              looping: false,
+            },
+          ],
+          useMultipleDirections: false,
+        },
+      ],
+      updateIfNotVisible: false,
+    };
+  };
+
+  /**
    * Create and return a minimum working scene data.
    * @internal
    * @param {{instances?: Partial<InstanceData>[], objects?: ObjectData[]}=} settings
@@ -127,15 +171,7 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
       title: '',
       behaviorsSharedData: [],
       objects: objects || [
-        {
-          type: 'Sprite',
-          name: 'MyObject',
-          behaviors: [],
-          effects: [],
-          // @ts-expect-error
-          animations: [],
-          updateIfNotVisible: false,
-        },
+        createSpriteData({ name: 'MyObject', image: 'ResourceA' }),
       ],
       instances: instances
         ? instances.map((instance) => ({ ...defaultInstance, ...instance }))
@@ -161,15 +197,7 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
           }))
         : [],
       objects: objects || [
-        {
-          type: 'Sprite',
-          name: 'MyChildObject',
-          behaviors: [],
-          effects: [],
-          // @ts-expect-error
-          animations: [],
-          updateIfNotVisible: false,
-        },
+        createSpriteData({ name: 'MyChildObject', image: 'ResourceA' }),
       ],
       layers: [baseLayer],
     };
@@ -218,7 +246,44 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
     expect(instances[1].getY()).to.be(234);
   });
 
-  it('can move instances in a custom object at hot-reload', async () => {
+  it('can change the image of a sprite object of a scene at hot-reload', async () => {
+    const oldProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1' }, { persistentUuid: '2' }],
+          objects: [createSpriteData({name: 'MyObject', image: 'ResourceA'})],
+        }),
+      ],
+    });
+    const runtimeGame = new gdjs.RuntimeGame(oldProjectData);
+    const hotReloader = new gdjs.HotReloader(runtimeGame);
+    runtimeGame.areSceneAssetsReady = (sceneName) => true;
+    runtimeGame._sceneStack.push('Scene1');
+    const scene = runtimeGame.getSceneStack().getCurrentScene();
+
+    const newProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1' }, { persistentUuid: '2' }],
+          objects: [createSpriteData({name: 'MyObject', image: 'ResourceB'})],
+        }),
+      ],
+    });
+
+    await hotReloader._hotReloadRuntimeGame(
+      oldProjectData,
+      newProjectData,
+      [],
+      runtimeGame
+    );
+
+    const instances = scene.getInstancesOf('MyObject');
+    expect(instances.length).to.be(2);
+    expect(instances[0]._animator.getCurrentFrame().image).to.be('ResourceB');
+    expect(instances[1]._animator.getCurrentFrame().image).to.be('ResourceB');
+  });
+
+  it('can move instances inside a custom object at hot-reload', async () => {
     const oldProjectData = createProjectData({
       layouts: [
         createSceneData({

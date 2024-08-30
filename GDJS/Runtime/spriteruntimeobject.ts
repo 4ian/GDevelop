@@ -109,6 +109,7 @@ namespace gdjs {
         newObjectData.animations
       );
       this._updateIfNotVisible = !!newObjectData.updateIfNotVisible;
+      this._updateAnimationFrame();
       this.invalidateHitboxes();
       return true;
     }

@@ -123,6 +123,9 @@ namespace gdjs {
       frameData: SpriteFrameData,
       textureManager: gdjs.AnimationFrameTextureManager<T>
     ) {
+      this.image = frameData.image;
+      this.texture = textureManager.getAnimationFrameTexture(this.image);
+
       this.points.clear();
       for (let i = 0, len = frameData.points.length; i < len; ++i) {
         const ptData = frameData.points[i];

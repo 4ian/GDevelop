@@ -1,5 +1,5 @@
 // @ts-check
-describe.only('gdjs.AnchorRuntimeBehavior', function () {
+describe('gdjs.AnchorRuntimeBehavior', function () {
   const runtimeGame = gdjs.getPixiRuntimeGame({
     propertiesOverrides: { windowHeight: 1000, windowWidth: 1000 },
   });

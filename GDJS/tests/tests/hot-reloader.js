@@ -40,20 +40,21 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
   /**
    * Create and return a minimum working game.
    * @internal
-   * @param {{layouts?: LayoutData[], eventsBasedObjects?: EventsBasedObjectData, resources?: ResourcesData, propertiesOverrides?: Partial<ProjectPropertiesData>}=} settings
+   * @param {{layouts?: LayoutData[], eventsBasedObjects?: EventsBasedObjectData[], resources?: ResourcesData, propertiesOverrides?: Partial<ProjectPropertiesData>}} data
    * @returns {ProjectData}
    */
-  const createProjectData = (settings) => {
-    const project = gdjs.createProjectData(settings);
+  const createProjectData = (data) => {
+    const project = gdjs.createProjectData(data);
     project.eventsFunctionsExtensions.push({
       name: 'MyExtension',
-      eventsBasedObjects: settings.eventsBasedObjects || [],
+      eventsBasedObjects: data.eventsBasedObjects || [],
       globalVariables: [],
       sceneVariables: [],
     });
     return project;
   };
 
+  /** @type {InstanceData} */
   const defaultInstance = {
     persistentUuid: '',
     layer: '',
@@ -71,6 +72,7 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
     initialVariables: [],
   };
 
+  /** @type {InstanceData} */
   const defaultChildInstance = {
     persistentUuid: '',
     layer: '',
@@ -88,14 +90,18 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
     initialVariables: [],
   };
 
+  /** @type {ObjectData & gdjs.CustomObjectConfiguration} */
   const defaultCustomObject = {
     type: 'MyExtension::MyCustomObject',
     name: 'MyCustomObject',
     behaviors: [],
+    variables: [],
     effects: [],
     content: {},
+    childrenContent: {},
   };
 
+  /** @type {LayerData} */
   const baseLayer = {
     name: '',
     visibility: true,
@@ -111,7 +117,7 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
   /**
    * Create and return a minimum working sprite object data.
    * @internal
-   * @param {{name: string, image: string}=} settings
+   * @param {{name: string, image: string}} data
    * @returns {gdjs.SpriteObjectData}
    */
   const createSpriteData = ({ name, image }) => {
@@ -119,7 +125,7 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
       type: 'Sprite',
       name,
       behaviors: [],
-      variables:[],
+      variables: [],
       effects: [],
       animations: [
         {
@@ -155,7 +161,7 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
   /**
    * Create and return a minimum working scene data.
    * @internal
-   * @param {{instances?: Partial<InstanceData>[], objects?: ObjectData[]}=} settings
+   * @param {{instances?: Partial<InstanceData>[], objects?: ObjectData[]}} data
    * @returns {LayoutData}
    */
   const createSceneData = ({ instances, objects }) => {
@@ -183,8 +189,8 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
   /**
    * Create and return a minimum working scene data.
    * @internal
-   * @param {{name: string, instances?: Partial<InstanceData>[], objects?: ObjectData[]}=} settings
-   * @returns {LayoutData}
+   * @param {{name: string, instances?: Partial<InstanceData>[], objects?: ObjectData[]}} data
+   * @returns {EventsBasedObjectData}
    */
   const createEventsBasedObjectData = ({ name, instances, objects }) => {
     return {
@@ -200,7 +206,27 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
         createSpriteData({ name: 'MyChildObject', image: 'ResourceA' }),
       ],
       layers: [baseLayer],
+      areaMinX: 0,
+      areaMinY: 0,
+      areaMinZ: 0,
+      areaMaxX: 0,
+      areaMaxY: 0,
+      areaMaxZ: 0,
+      defaultSize: null,
     };
+  };
+
+  /**
+   * @internal
+   * @param {gdjs.RuntimeObject} instance
+   * @returns {string | null}
+   */
+  const getSpriteImage = (instance) => {
+    /** @type gdjs.SpriteRuntimeObject */
+    // @ts-ignore
+    const sprite = instance;
+    const currentFrame = sprite._animator.getCurrentFrame();
+    return currentFrame ? currentFrame.image : null;
   };
 
   it('can move instances of a scene at hot-reload', async () => {
@@ -218,6 +244,8 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
     const hotReloader = new gdjs.HotReloader(runtimeGame);
     runtimeGame.areSceneAssetsReady = (sceneName) => true;
     runtimeGame._sceneStack.push('Scene1');
+    /** @type gdjs.RuntimeScene */
+    //@ts-ignore
     const scene = runtimeGame.getSceneStack().getCurrentScene();
 
     const newProjectData = createProjectData({
@@ -251,7 +279,7 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
       layouts: [
         createSceneData({
           instances: [{ persistentUuid: '1' }, { persistentUuid: '2' }],
-          objects: [createSpriteData({name: 'MyObject', image: 'ResourceA'})],
+          objects: [createSpriteData({ name: 'MyObject', image: 'ResourceA' })],
         }),
       ],
     });
@@ -259,13 +287,15 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
     const hotReloader = new gdjs.HotReloader(runtimeGame);
     runtimeGame.areSceneAssetsReady = (sceneName) => true;
     runtimeGame._sceneStack.push('Scene1');
+    /** @type gdjs.RuntimeScene */
+    //@ts-ignore
     const scene = runtimeGame.getSceneStack().getCurrentScene();
 
     const newProjectData = createProjectData({
       layouts: [
         createSceneData({
           instances: [{ persistentUuid: '1' }, { persistentUuid: '2' }],
-          objects: [createSpriteData({name: 'MyObject', image: 'ResourceB'})],
+          objects: [createSpriteData({ name: 'MyObject', image: 'ResourceB' })],
         }),
       ],
     });
@@ -279,8 +309,8 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
 
     const instances = scene.getInstancesOf('MyObject');
     expect(instances.length).to.be(2);
-    expect(instances[0]._animator.getCurrentFrame().image).to.be('ResourceB');
-    expect(instances[1]._animator.getCurrentFrame().image).to.be('ResourceB');
+    expect(getSpriteImage(instances[0])).to.be('ResourceB');
+    expect(getSpriteImage(instances[1])).to.be('ResourceB');
   });
 
   it('can move instances inside a custom object at hot-reload', async () => {
@@ -305,6 +335,8 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
     const hotReloader = new gdjs.HotReloader(runtimeGame);
     runtimeGame.areSceneAssetsReady = (sceneName) => true;
     runtimeGame._sceneStack.push('Scene1');
+    /** @type gdjs.RuntimeScene */
+    //@ts-ignore
     const scene = runtimeGame.getSceneStack().getCurrentScene();
 
     const newProjectData = createProjectData({
@@ -334,7 +366,10 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
 
     const sceneInstances = scene.getInstancesOf('MyCustomObject');
     expect(sceneInstances.length).to.be(1);
-    const instances = sceneInstances[0]
+    /** @type gdjs.CustomRuntimeObject */
+    // @ts-ignore
+    const customObject = sceneInstances[0];
+    const instances = customObject
       .getChildrenContainer()
       .getInstancesOf('MyChildObject');
     expect(instances.length).to.be(2);

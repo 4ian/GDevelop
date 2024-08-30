@@ -11,6 +11,15 @@ import ImageTileGrid from '../../../../UI/ImageTileGrid';
 import { type WindowSizeType } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import { PrivateTutorialViewDialog } from '../../../../AssetStore/PrivateTutorials/PrivateTutorialViewDialog';
+import EducationCurriculumLesson from './EducationCurriculumLesson';
+
+const styles = {
+  educationCurriculumTutorialContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 24,
+  },
+};
 
 const getColumnsFromWindowSize = (windowSize: WindowSizeType) => {
   switch (windowSize) {
@@ -54,17 +63,30 @@ const TutorialsCategoryPage = ({ category, tutorials, onBack }: Props) => {
           backAction={onBack}
         >
           <SectionRow>
-            <ImageTileGrid
-              items={filteredTutorials.map(tutorial =>
-                formatTutorialToImageTileComponent({
-                  i18n,
-                  limits,
-                  tutorial,
-                  onSelectTutorial: setSelectedTutorial,
-                })
-              )}
-              getColumnsFromWindowSize={getColumnsFromWindowSize}
-            />
+            {category === 'education-curriculum' ? (
+              <div style={styles.educationCurriculumTutorialContainer}>
+                {filteredTutorials.map(tutorial => (
+                  <EducationCurriculumLesson
+                    i18n={i18n}
+                    limits={limits}
+                    tutorial={tutorial}
+                    onSelectTutorial={setSelectedTutorial}
+                  />
+                ))}
+              </div>
+            ) : (
+              <ImageTileGrid
+                items={filteredTutorials.map(tutorial =>
+                  formatTutorialToImageTileComponent({
+                    i18n,
+                    limits,
+                    tutorial,
+                    onSelectTutorial: setSelectedTutorial,
+                  })
+                )}
+                getColumnsFromWindowSize={getColumnsFromWindowSize}
+              />
+            )}
           </SectionRow>
           {selectedTutorial && (
             <PrivateTutorialViewDialog

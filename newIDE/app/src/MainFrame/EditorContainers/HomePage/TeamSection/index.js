@@ -375,7 +375,7 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
                 <Spacer />
               </>
             ) : null}
-            <EducationCard onSeeResources={onOpenTeachingResources} />
+            <EducationCard onSeeResources={onOpenTeachingResources} unlocked />
             <Spacer />
             {(membersNotInAGroupToDisplay || hasNoActiveTeamMembers) && (
               <Paper background="medium" style={styles.lobbyContainer}>

@@ -86,8 +86,8 @@ module.exports = {
         'JsPlatform/Extensions/spine.svg'
       )
       .addParameter('object', _('Spine'), 'SpineObject')
-      .addParameter('string', _('Slot name'))
       .addParameter('string', _('Attachment name'))
+      .addParameter('string', _('Slot name (use "" if names are the same)'))
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('getPointAttachmentX');
 
@@ -104,8 +104,8 @@ module.exports = {
         'JsPlatform/Extensions/spine.svg'
       )
       .addParameter('object', _('Spine'), 'SpineObject')
-      .addParameter('string', _('Slot name'))
       .addParameter('string', _('Attachment name'))
+      .addParameter('string', _('Slot name (use "" if names are the same)'))
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('getPointAttachmentY');
 

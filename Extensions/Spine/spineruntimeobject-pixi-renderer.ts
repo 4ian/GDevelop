@@ -3,7 +3,7 @@ namespace gdjs {
     obj instanceof pixi_spine.Spine;
 
   // See https://github.com/pixijs/spine/issues/562
-  // IPointAttachment is not declared and exported but its implementation does exist and it is using in runtime
+  // IPointAttachment is not declared and exported but its implementation does exist and it is used in runtime
   interface IPointAttachment extends pixi_spine.IVertexAttachment {
     computeWorldPosition(
       bone: pixi_spine.IBone,

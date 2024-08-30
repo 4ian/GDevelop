@@ -2,6 +2,8 @@ namespace gdjs {
   const isSpine = (obj: any): obj is pixi_spine.Spine =>
     obj instanceof pixi_spine.Spine;
 
+  // See https://github.com/pixijs/spine/issues/562
+  // IPointAttachment is not declared and exported but its implementation does exist and it is using in runtime
   interface IPointAttachment extends pixi_spine.IVertexAttachment {
     computeWorldPosition(
       bone: pixi_spine.IBone,

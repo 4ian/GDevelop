@@ -67,7 +67,7 @@ namespace gdjs {
       this._animations = objectData.content.animations;
       this._originalScale = objectData.content.scale;
       this.spineResourceName = objectData.content.spineResourceName;
-      this._animationMixingDuration = 0.1;
+      this._animationMixingDuration = 0;
       this._renderer = new gdjs.SpineRuntimeObjectRenderer(
         this,
         instanceContainer
@@ -498,6 +498,16 @@ namespace gdjs {
       }
       this._renderer.setAnimationElapsedTime(time);
       this._isPausedFrameDirty = true;
+    }
+
+    getPointAttachmentX(attachmentName: string, slotName?: string): number {
+      return this._renderer.getPointAttachmentPosition(attachmentName, slotName)
+        .x;
+    }
+
+    getPointAttachmentY(attachmentName: string, slotName?: string): number {
+      return this._renderer.getPointAttachmentPosition(attachmentName, slotName)
+        .y;
     }
 
     getAnimationDuration(): number {

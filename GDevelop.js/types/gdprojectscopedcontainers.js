@@ -9,7 +9,7 @@ declare class gdProjectScopedContainers {
   static makeNewProjectScopedContainersForEventsBasedObject(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedObject: gdEventsBasedObject, outputObjectsContainer: gdObjectsContainer): gdProjectScopedContainers;
   static makeNewProjectScopedContainersWithLocalVariables(projectScopedContainers: gdProjectScopedContainers, event: gdBaseEvent): gdProjectScopedContainers;
   addPropertiesContainer(propertiesContainer: gdPropertiesContainer): gdProjectScopedContainers;
-  addParameters(parameters: gdVectorParameterMetadata): gdProjectScopedContainers;
+  addParameters(parameters: gdParameterMetadataContainer): gdProjectScopedContainers;
   getObjectsContainersList(): gdObjectsContainersList;
   getVariablesContainersList(): gdVariablesContainersList;
   delete(): void;

@@ -1,5 +1,7 @@
 // @flow
 import * as React from 'react';
+import { type I18n as I18nType } from '@lingui/core';
+import { type NewProjectSetup } from '../../ProjectCreation/NewProjectSetupDialog';
 import { type UnsavedChanges } from '../UnsavedChangesContext';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import type { StorageProvider } from '../../ProjectsStorage';
@@ -11,6 +13,7 @@ import {
 } from '../../ProjectsStorage';
 import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
 import { type PrivateGameTemplateListingData } from '../../Utils/GDevelopServices/Shop';
+import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 
 export type EditorContainerExtraProps = {|
   // Events function extension editor
@@ -79,7 +82,7 @@ export type RenderEditorContainerProps = {|
   onChooseProject: () => void,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => Promise<void>,
   onOpenProjectManager: () => void,
-  onCloseProject: () => Promise<boolean>,
+  askToCloseProject: () => Promise<boolean>,
 
   // Other dialogs opening:
   onOpenExampleStore: () => void,
@@ -101,10 +104,14 @@ export type RenderEditorContainerProps = {|
     newName: string,
     cb: (boolean) => void
   ) => void,
-  canInstallPrivateAsset: () => boolean,
 
   // Project creation
   onOpenNewProjectSetupDialog: () => void,
+  onCreateProjectFromExample: (
+    exampleShortHeader: ExampleShortHeader,
+    newProjectSetup: NewProjectSetup,
+    i18n: I18nType
+  ) => Promise<void>,
 
   // Project save
   onSave: () => Promise<void>,
@@ -112,6 +119,11 @@ export type RenderEditorContainerProps = {|
 
   // Object editing
   openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
+  onEventsBasedObjectChildrenEdited: () => void,
+  onSceneObjectEdited: (
+    scene: gdLayout,
+    objectWithContext: ObjectWithContext
+  ) => void,
 
   onExtractAsExternalLayout: (name: string) => void,
 |};

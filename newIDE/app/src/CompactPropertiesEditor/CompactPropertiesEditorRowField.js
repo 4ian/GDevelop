@@ -29,7 +29,7 @@ const CompactPropertiesEditorRowField = (props: Props) => {
     ? props.label
     : [props.label, ' - ', <MarkdownText source={props.markdownDescription} />];
   return (
-    <LineStackLayout noMargin alignItems="center">
+    <LineStackLayout noMargin alignItems="center" expand>
       <div style={styles.leftColumn}>
         <Tooltip
           title={title}

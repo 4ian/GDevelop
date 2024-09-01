@@ -26,7 +26,7 @@ void CustomConfigurationHelper::InitializeContent(
 
     if (propertyType == "String" || propertyType == "Choice" ||
         propertyType == "Color" || propertyType == "Behavior" ||
-        propertyType == "resource") {
+        propertyType == "Resource") {
       element.SetStringValue(property->GetValue());
     } else if (propertyType == "Number") {
       element.SetDoubleValue(property->GetValue().To<double>());
@@ -39,21 +39,21 @@ void CustomConfigurationHelper::InitializeContent(
 std::map<gd::String, gd::PropertyDescriptor> CustomConfigurationHelper::GetProperties(
     const gd::PropertiesContainer &properties,
     const gd::SerializerElement &configurationContent) {
-  auto behaviorProperties = std::map<gd::String, gd::PropertyDescriptor>();
+  auto objectProperties = std::map<gd::String, gd::PropertyDescriptor>();
 
   for (auto &property : properties.GetInternalVector()) {
     const auto &propertyName = property->GetName();
     const auto &propertyType = property->GetType();
 
     // Copy the property
-    behaviorProperties[propertyName] = *property;
+    objectProperties[propertyName] = *property;
 
-    auto &newProperty = behaviorProperties[propertyName];
+    auto &newProperty = objectProperties[propertyName];
 
     if (configurationContent.HasChild(propertyName)) {
       if (propertyType == "String" || propertyType == "Choice" ||
           propertyType == "Color" || propertyType == "Behavior" ||
-          propertyType == "resource") {
+          propertyType == "Resource") {
         newProperty.SetValue(
             configurationContent.GetChild(propertyName).GetStringValue());
       } else if (propertyType == "Number") {
@@ -71,7 +71,7 @@ std::map<gd::String, gd::PropertyDescriptor> CustomConfigurationHelper::GetPrope
     }
   }
 
-  return behaviorProperties;
+  return objectProperties;
 }
 
 bool CustomConfigurationHelper::UpdateProperty(
@@ -89,7 +89,7 @@ bool CustomConfigurationHelper::UpdateProperty(
 
   if (propertyType == "String" || propertyType == "Choice" ||
       propertyType == "Color" || propertyType == "Behavior" ||
-      propertyType == "resource") {
+      propertyType == "Resource") {
     element.SetStringValue(newValue);
   } else if (propertyType == "Number") {
     element.SetDoubleValue(newValue.To<double>());

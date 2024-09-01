@@ -5,7 +5,6 @@ import * as React from 'react';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import ContextMenu, { type ContextMenuInterface } from './Menu/ContextMenu';
 import { useLongTouch } from '../Utils/UseLongTouch';
-import { Spacer } from './Grid';
 import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 import { dataObjectToProps, type HTMLDataset } from '../Utils/HTMLDataset';
 import Cross from './CustomSvgIcons/Cross';
@@ -26,11 +25,17 @@ const styles = {
     whiteSpace: 'nowrap',
     fontSize: '15px', // Same as in Mosaic.css (for mosaic-window-title)
   },
+  tabIcon: {
+    marginLeft: 4,
+    marginRight: 4,
+    display: 'flex',
+  },
   tabLabelAndIcon: {
     display: 'flex',
     alignItems: 'center',
     marginLeft: 10,
-    marginRight: 10,
+    // 12 instead of 10 to even the perceived margin of the home tab (the only not-closable tab).
+    marginRight: 12,
   },
   closeButton: {
     marginRight: 5,
@@ -230,11 +235,21 @@ export function ClosableTab({
               height: gdevelopTheme.closableTabs.height,
               color: textColor,
               fontFamily: gdevelopTheme.closableTabs.fontFamily,
-              marginRight: closable ? 0 : 10,
+              marginLeft:
+                icon || renderCustomIcon
+                  ? closable
+                    ? 0
+                    : styles.tabLabelAndIcon.marginLeft -
+                      styles.tabIcon.marginRight
+                  : styles.tabLabelAndIcon.marginLeft,
+              marginRight: closable ? 0 : styles.tabLabelAndIcon.marginRight,
             }}
           >
-            {renderCustomIcon ? renderCustomIcon(brightness) : icon}
-            {(icon || renderCustomIcon) && label ? <Spacer /> : null}
+            {icon || renderCustomIcon ? (
+              <span style={styles.tabIcon}>
+                {renderCustomIcon ? renderCustomIcon(brightness) : icon}
+              </span>
+            ) : null}
             {label && <span style={styles.tabLabel}>{label}</span>}
           </span>
         </ButtonBase>

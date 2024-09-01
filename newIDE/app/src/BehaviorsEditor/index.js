@@ -269,7 +269,7 @@ const BehaviorConfigurationEditor = React.forwardRef<
 
 type Props = {|
   project: gdProject,
-  eventsFunctionsExtension?: gdEventsFunctionsExtension,
+  eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   object: gdObject,
   onUpdateBehaviorsSharedData: () => void,
   onSizeUpdated?: ?() => void,

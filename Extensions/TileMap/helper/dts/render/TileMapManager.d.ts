@@ -1,6 +1,7 @@
 import { EditableTileMap } from '../model/TileMapModel';
 import { TileTextureCache } from './TileTextureCache';
 import { TileMapFileContent } from '../load/TileMapFileContent';
+import { EditableTileMapAsJsObject } from '../model/CommonTypes';
 /**
  * A holder to share tile maps across the 2 extension objects.
  *
@@ -43,6 +44,14 @@ export declare class TileMapManager {
     pako: any,
     callback: (tileMap: EditableTileMap | null) => void
   ): void;
+  getOrLoadSimpleTileMap(
+    tileMapAsJsObject: EditableTileMapAsJsObject,
+    objectName: string,
+    tileSize: number,
+    tileSetColumnCount: number,
+    tileSetRowCount: number,
+    callback: (tileMap: EditableTileMap) => void
+  ): void;
   /**
    * @param loadTileMap The method that loads the Tiled JSON file in memory.
    * @param getTexture The method that loads the atlas image file in memory.
@@ -63,6 +72,22 @@ export declare class TileMapManager {
     tileMapJsonResourceName: string,
     tileSetJsonResourceName: string,
     levelIndex: number,
+    callback: (textureCache: TileTextureCache | null) => void
+  ): void;
+  /**
+   * @param getTexture The method that loads the atlas image file in memory.
+   * @param atlasImageResourceName The resource name of the atlas image.
+   * @param tileSize
+   * @param columnCount
+   * @param rowCount
+   * @param callback A function called when the tiles textures are split.
+   */
+  getOrLoadSimpleTileMapTextureCache(
+    getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>,
+    atlasImageResourceName: string,
+    tileSize: number,
+    columnCount: number,
+    rowCount: number,
     callback: (textureCache: TileTextureCache | null) => void
   ): void;
   clearCaches(): void;

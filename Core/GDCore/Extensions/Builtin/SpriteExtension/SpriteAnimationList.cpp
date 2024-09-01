@@ -116,6 +116,13 @@ void SpriteAnimationList::ExposeResources(gd::ArbitraryResourceWorker& worker) {
   }
 }
 
+bool SpriteAnimationList::HasAnimationNamed(const gd::String &name) const {
+  return !name.empty() && (find_if(animations.begin(), animations.end(),
+                                   [&name](const Animation &animation) {
+                                     return animation.GetName() == name;
+                                   }) != animations.end());
+}
+
 const Animation& SpriteAnimationList::GetAnimation(std::size_t nb) const {
   if (nb >= animations.size()) return badAnimation;
 

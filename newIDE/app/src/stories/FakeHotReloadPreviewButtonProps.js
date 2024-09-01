@@ -8,6 +8,7 @@ import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewB
 const fakeHotReloadPreviewButtonProps: HotReloadPreviewButtonProps = {
   hasPreviewsRunning: false,
   launchProjectDataOnlyPreview: action('launchProjectDataOnlyPreview'),
+  launchProjectCodeAndDataPreview: action('launchProjectCodeAndDataPreview'),
   launchProjectWithLoadingScreenPreview: action(
     'launchProjectWithLoadingScreenPreview'
   ),

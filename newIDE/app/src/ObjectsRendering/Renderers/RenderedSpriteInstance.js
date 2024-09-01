@@ -17,6 +17,7 @@ export default class RenderedSpriteInstance extends RenderedInstance {
   _originY: number;
   _sprite: ?gdSprite = null;
   _shouldNotRotate: boolean = false;
+  _preScale = 1;
 
   constructor(
     project: gdProject,
@@ -52,6 +53,9 @@ export default class RenderedSpriteInstance extends RenderedInstance {
     super.onRemovedFromScene();
     // Keep textures because they are shared by all sprites.
     this._pixiObject.destroy(false);
+    // Avoid to use _pixiObject after destroy is called.
+    // It can happen when onRemovedFromScene and update cross each other.
+    this._pixiObject = null;
   }
 
   /**
@@ -85,6 +89,11 @@ export default class RenderedSpriteInstance extends RenderedInstance {
   }
 
   updatePIXISprite(): void {
+    // Avoid to use _pixiObject after destroy is called.
+    // It can happen when onRemovedFromScene and update cross each other.
+    if (!this._pixiObject) {
+      return;
+    }
     const objectTextureFrame = this._pixiObject.texture.frame;
     // In case the texture is not loaded yet, we don't want to crash.
     if (!objectTextureFrame) return;
@@ -100,8 +109,8 @@ export default class RenderedSpriteInstance extends RenderedInstance {
       this._pixiObject.scale.y =
         this.getCustomHeight() / objectTextureFrame.height;
     } else {
-      this._pixiObject.scale.x = 1;
-      this._pixiObject.scale.y = 1;
+      this._pixiObject.scale.x = this._preScale;
+      this._pixiObject.scale.y = this._preScale;
     }
     this._pixiObject.position.x =
       this._instance.getX() +
@@ -118,6 +127,7 @@ export default class RenderedSpriteInstance extends RenderedInstance {
     const spriteConfiguration = gd.asSpriteConfiguration(
       this._associatedObjectConfiguration
     );
+    this._preScale = spriteConfiguration.getPreScale();
     const animations = spriteConfiguration.getAnimations();
     if (animations.hasNoAnimations()) return false;
 
@@ -149,6 +159,11 @@ export default class RenderedSpriteInstance extends RenderedInstance {
   }
 
   updatePIXITextureAndSprite(): void {
+    // Avoid to use _pixiObject after destroy is called.
+    // It can happen when onRemovedFromScene and update cross each other.
+    if (!this._pixiObject) {
+      return;
+    }
     this.updateSprite();
     const sprite = this._sprite;
     if (!sprite) return;
@@ -207,7 +222,7 @@ export default class RenderedSpriteInstance extends RenderedInstance {
     // In case the texture is not loaded yet, we don't want to crash.
     if (!objectTextureFrame) return 32;
 
-    return Math.abs(objectTextureFrame.width);
+    return Math.abs(objectTextureFrame.width) * this._preScale;
   }
 
   getDefaultHeight(): number {
@@ -215,7 +230,7 @@ export default class RenderedSpriteInstance extends RenderedInstance {
     // In case the texture is not loaded yet, we don't want to crash.
     if (!objectTextureFrame) return 32;
 
-    return Math.abs(objectTextureFrame.height);
+    return Math.abs(objectTextureFrame.height) * this._preScale;
   }
 
   getCenterX(): number {

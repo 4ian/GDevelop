@@ -2,7 +2,7 @@
 import * as PIXI from 'pixi.js-legacy';
 
 type Props = {
-  getLastCursorSceneCoordinates: () => [number, number],
+  getLastCursorSceneCoordinates: () => [number, number] | null,
   width: number,
   height: number,
 };
@@ -10,7 +10,7 @@ type Props = {
 export default class StatusBar {
   _width: number;
   _height: number;
-  _getLastCursorSceneCoordinates: () => [number, number];
+  _getLastCursorSceneCoordinates: () => [number, number] | null;
   _statusBarContainer: PIXI.Container;
   _statusBarBackground: PIXI.Graphics;
   _statusBarText: PIXI.Text;
@@ -51,7 +51,9 @@ export default class StatusBar {
       this._height - textPadding - statusBarPadding - this._statusBarText.height
     );
 
-    const [x, y] = this._getLastCursorSceneCoordinates();
+    const lastCursorSceneCoordinates = this._getLastCursorSceneCoordinates();
+    if (!lastCursorSceneCoordinates) return;
+    const [x, y] = lastCursorSceneCoordinates;
     this._statusBarText.text = `${x.toFixed(0)};${y.toFixed(0)}`;
     this._statusBarText.position.x = textXPosition;
     this._statusBarText.position.y = textYPosition;

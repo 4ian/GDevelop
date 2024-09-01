@@ -26,6 +26,7 @@ import {
   LicenseAssetStoreSearchFilter,
   DimensionAssetStoreSearchFilter,
   AssetPackTypeStoreSearchFilter,
+  AssetSwappingAssetStoreSearchFilter,
 } from './AssetStoreSearchFilter';
 import {
   type NavigationState,
@@ -55,6 +56,8 @@ export type AssetFiltersState = {|
   setColorFilter: ColorAssetStoreSearchFilter => void,
   licenseFilter: LicenseAssetStoreSearchFilter,
   setLicenseFilter: LicenseAssetStoreSearchFilter => void,
+  assetSwappingFilter: AssetSwappingAssetStoreSearchFilter,
+  setAssetSwappingFilter: AssetSwappingAssetStoreSearchFilter => void,
 |};
 
 export type AssetPackFiltersState = {|
@@ -89,6 +92,7 @@ type AssetStoreState = {|
     searchFilters: Array<SearchFilter<AssetShortHeader>>
   ) => ?Array<AssetShortHeader>,
   setInitialPackUserFriendlySlug: (initialPackUserFriendlySlug: string) => void,
+  getAssetShortHeaderFromId: (id: string) => AssetShortHeader | null,
 |};
 
 export const initialAssetStoreState: AssetStoreState = {
@@ -119,6 +123,8 @@ export const initialAssetStoreState: AssetStoreState = {
     setColorFilter: filter => {},
     licenseFilter: new LicenseAssetStoreSearchFilter(),
     setLicenseFilter: filter => {},
+    assetSwappingFilter: new AssetSwappingAssetStoreSearchFilter(),
+    setAssetSwappingFilter: filter => {},
   },
   assetPackFiltersState: {
     typeFilter: new AssetPackTypeStoreSearchFilter({}),
@@ -127,8 +133,11 @@ export const initialAssetStoreState: AssetStoreState = {
   clearAllFilters: () => {},
   shopNavigationState: {
     getCurrentPage: () => assetStoreHomePageState,
+    isRootPage: true,
+    isAssetSwappingHistory: false,
     backToPreviousPage: () => assetStoreHomePageState,
     openHome: () => assetStoreHomePageState,
+    openAssetSwapping: () => assetStoreHomePageState,
     clearHistory: () => {},
     clearPreviousPageFromHistory: () => {},
     openSearchResultPage: () => {},
@@ -151,6 +160,7 @@ export const initialAssetStoreState: AssetStoreState = {
   useSearchItem: (searchText, chosenCategory, chosenFilters, searchFilters) =>
     null,
   setInitialPackUserFriendlySlug: (initialPackUserFriendlySlug: string) => {},
+  getAssetShortHeaderFromId: (id: string) => null,
 };
 
 export const AssetStoreContext = React.createContext<AssetStoreState>(
@@ -186,13 +196,20 @@ export const AssetStoreStateProvider = ({
   const [assetShortHeadersById, setAssetShortHeadersById] = React.useState<?{
     [string]: AssetShortHeader,
   }>(null);
+  const getAssetShortHeaderFromId = React.useCallback(
+    (id: string): AssetShortHeader | null =>
+      (assetShortHeadersById && assetShortHeadersById[id]) || null,
+    [assetShortHeadersById]
+  );
   const [
     publicAssetShortHeaders,
     setPublicAssetShortHeaders,
   ] = React.useState<?Array<AssetShortHeader>>(null);
-  const { receivedAssetShortHeaders, receivedAssetPacks } = React.useContext(
-    AuthenticatedUserContext
-  );
+  const {
+    receivedAssetShortHeaders,
+    receivedAssetPacks,
+    limits,
+  } = React.useContext(AuthenticatedUserContext);
   const [filters, setFilters] = React.useState<?Filters>(null);
   const [
     publicAssetPacks,
@@ -251,6 +268,12 @@ export const AssetStoreStateProvider = ({
   ] = React.useState<LicenseAssetStoreSearchFilter>(
     new LicenseAssetStoreSearchFilter()
   );
+  const [
+    assetSwappingFilter,
+    setAssetSwappingFilter,
+  ] = React.useState<AssetSwappingAssetStoreSearchFilter>(
+    new AssetSwappingAssetStoreSearchFilter()
+  );
   // When one of the filter change, we need to rebuild the array
   // for the search.
   const assetSearchFilters = React.useMemo<
@@ -263,6 +286,7 @@ export const AssetStoreStateProvider = ({
       objectTypeFilter,
       colorFilter,
       licenseFilter,
+      assetSwappingFilter,
     ],
     [
       animatedFilter,
@@ -271,6 +295,7 @@ export const AssetStoreStateProvider = ({
       objectTypeFilter,
       colorFilter,
       licenseFilter,
+      assetSwappingFilter,
     ]
   );
 
@@ -283,6 +308,10 @@ export const AssetStoreStateProvider = ({
   const assetPackSearchFilters = React.useMemo<
     Array<SearchFilter<PublicAssetPack | PrivateAssetPackListingData>>
   >(() => [assetPackTypeFilter], [assetPackTypeFilter]);
+  const hidePremiumProducts =
+    !!limits &&
+    !!limits.capabilities.classrooms &&
+    limits.capabilities.classrooms.hidePremiumProducts;
 
   const fetchAssetsAndFilters = React.useCallback(
     () => {
@@ -453,6 +482,7 @@ export const AssetStoreStateProvider = ({
         return null;
       }
       const privateAssetPackListingDatasById = {};
+      if (hidePremiumProducts) return privateAssetPackListingDatasById;
       privateAssetPackListingDatas.forEach(privateAssetPackListingData => {
         const id = privateAssetPackListingData.id;
         if (privateAssetPackListingDatasById[id]) {
@@ -462,7 +492,7 @@ export const AssetStoreStateProvider = ({
       });
       return privateAssetPackListingDatasById;
     },
-    [privateAssetPackListingDatas]
+    [privateAssetPackListingDatas, hidePremiumProducts]
   );
 
   const currentPage = shopNavigationState.getCurrentPage();
@@ -510,6 +540,8 @@ export const AssetStoreStateProvider = ({
       setColorFilter,
       licenseFilter,
       setLicenseFilter,
+      assetSwappingFilter,
+      setAssetSwappingFilter,
     }),
     [
       animatedFilter,
@@ -524,6 +556,8 @@ export const AssetStoreStateProvider = ({
       setColorFilter,
       licenseFilter,
       setLicenseFilter,
+      assetSwappingFilter,
+      setAssetSwappingFilter,
     ]
   );
 
@@ -550,6 +584,7 @@ export const AssetStoreStateProvider = ({
       assetPackFiltersState.setTypeFilter(
         new AssetPackTypeStoreSearchFilter({})
       );
+      // Keep assetSwappingFilter as its not a user filter.
     },
     [assetFiltersState, assetPackFiltersState]
   );
@@ -558,11 +593,15 @@ export const AssetStoreStateProvider = ({
     () => ({
       assetShortHeadersSearchResults,
       publicAssetPacksSearchResults,
-      privateAssetPackListingDatasSearchResults,
+      privateAssetPackListingDatasSearchResults: hidePremiumProducts
+        ? []
+        : privateAssetPackListingDatasSearchResults,
       fetchAssetsAndFilters,
       filters,
       publicAssetPacks,
-      privateAssetPackListingDatas,
+      privateAssetPackListingDatas: hidePremiumProducts
+        ? []
+        : privateAssetPackListingDatas,
       authors,
       licenses,
       environment,
@@ -590,10 +629,12 @@ export const AssetStoreStateProvider = ({
           searchFilters
         ),
       setInitialPackUserFriendlySlug,
+      getAssetShortHeaderFromId,
     }),
     [
       assetShortHeadersSearchResults,
       publicAssetPacksSearchResults,
+      hidePremiumProducts,
       privateAssetPackListingDatasSearchResults,
       fetchAssetsAndFilters,
       filters,
@@ -602,7 +643,6 @@ export const AssetStoreStateProvider = ({
       authors,
       licenses,
       environment,
-      setEnvironment,
       error,
       shopNavigationState,
       currentPage,
@@ -610,8 +650,8 @@ export const AssetStoreStateProvider = ({
       assetFiltersState,
       assetPackFiltersState,
       clearAllFilters,
+      getAssetShortHeaderFromId,
       assetShortHeadersById,
-      setInitialPackUserFriendlySlug,
     ]
   );
 

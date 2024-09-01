@@ -118,6 +118,19 @@ namespace gdjs {
       this._materialType = this._convertMaterialType(
         objectData.content.materialType
       );
+
+      this.onModelChanged(objectData);
+
+      // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
+      this.onCreated();
+    }
+
+    /**
+     * To be called after the renderer loaded a Model resource:
+     * - After the renderer was instantiated
+     * - After reloading the model
+     */
+    private onModelChanged(objectData) {
       this._updateModel(objectData);
       if (this._animations.length > 0) {
         this._renderer.playAnimation(
@@ -125,9 +138,6 @@ namespace gdjs {
           this._animations[0].loop
         );
       }
-
-      // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
-      this.onCreated();
     }
 
     updateFromObjectData(
@@ -135,18 +145,7 @@ namespace gdjs {
       newObjectData: Model3DObjectData
     ): boolean {
       super.updateFromObjectData(oldObjectData, newObjectData);
-      if (
-        oldObjectData.content.width !== newObjectData.content.width ||
-        oldObjectData.content.height !== newObjectData.content.height ||
-        oldObjectData.content.depth !== newObjectData.content.depth ||
-        oldObjectData.content.rotationX !== newObjectData.content.rotationX ||
-        oldObjectData.content.rotationY !== newObjectData.content.rotationY ||
-        oldObjectData.content.rotationZ !== newObjectData.content.rotationZ ||
-        oldObjectData.content.keepAspectRatio !==
-          newObjectData.content.keepAspectRatio
-      ) {
-        this._updateModel(newObjectData);
-      }
+
       if (
         oldObjectData.content.materialType !==
         newObjectData.content.materialType
@@ -154,6 +153,24 @@ namespace gdjs {
         this._materialType = this._convertMaterialType(
           newObjectData.content.materialType
         );
+      }
+      if (
+        oldObjectData.content.modelResourceName !==
+        newObjectData.content.modelResourceName
+      ) {
+        this._reloadModel(newObjectData);
+      } else if (
+        oldObjectData.content.width !== newObjectData.content.width ||
+        oldObjectData.content.height !== newObjectData.content.height ||
+        oldObjectData.content.depth !== newObjectData.content.depth ||
+        oldObjectData.content.rotationX !== newObjectData.content.rotationX ||
+        oldObjectData.content.rotationY !== newObjectData.content.rotationY ||
+        oldObjectData.content.rotationZ !== newObjectData.content.rotationZ ||
+        oldObjectData.content.keepAspectRatio !==
+          newObjectData.content.keepAspectRatio ||
+        oldObjectData.content.materialType !==
+          newObjectData.content.materialType
+      ) {
         this._updateModel(newObjectData);
       }
       if (
@@ -216,6 +233,12 @@ namespace gdjs {
           networkSyncData.ap ? this.pauseAnimation() : this.resumeAnimation();
         }
       }
+    }
+
+    _reloadModel(objectData: Model3DObjectData) {
+      this._modelResourceName = objectData.content.modelResourceName;
+      this._renderer._reloadModel(this, this._runtimeScene);
+      this.onModelChanged(objectData);
     }
 
     _updateModel(objectData: Model3DObjectData) {

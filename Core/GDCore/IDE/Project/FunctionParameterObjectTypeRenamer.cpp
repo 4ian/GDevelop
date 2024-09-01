@@ -15,10 +15,10 @@ namespace gd {
 
 void FunctionParameterObjectTypeRenamer::DoVisitEventsFunction(
     gd::EventsFunction &eventsFunction) {
-  for (auto &&parameter : eventsFunction.GetParameters()) {
-    if (gd::ParameterMetadata::IsObject(parameter.GetType()) &&
-        parameter.GetExtraInfo() == oldObjectType) {
-      parameter.SetExtraInfo(newObjectType);
+  for (auto &&parameter : eventsFunction.GetParameters().GetInternalVector()) {
+    if (gd::ParameterMetadata::IsObject(parameter->GetType()) &&
+        parameter->GetExtraInfo() == oldObjectType) {
+      parameter->SetExtraInfo(newObjectType);
     }
   }
 }

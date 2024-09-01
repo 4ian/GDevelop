@@ -86,6 +86,12 @@ describe(`gdjs.PlatformerObjectRuntimeBehavior.findHighestFloorAndMoveOnTop`, fu
     return platform;
   };
 
+  /**
+   * @param {gdjs.PlatformerObjectRuntimeBehavior} characterBehavior
+   * @param {gdjs.PlatformRuntimeBehavior} platformBehavior
+   * @param {float} upwardDeltaY
+   * @param {float} downwardDeltaY
+   */
   const checkMoveOn = (
     characterBehavior,
     platformBehavior,
@@ -97,9 +103,15 @@ describe(`gdjs.PlatformerObjectRuntimeBehavior.findHighestFloorAndMoveOnTop`, fu
       upwardDeltaY,
       downwardDeltaY
     );
-    expect(result.highestGround).to.be(platformBehavior);
+    expect(result.highestGroundPlatform).to.be(platformBehavior);
   };
 
+  /**
+   * @param {gdjs.PlatformerObjectRuntimeBehavior} characterBehavior
+   * @param {gdjs.PlatformRuntimeBehavior} platformBehavior
+   * @param {float} upwardDeltaY
+   * @param {float} downwardDeltaY
+   */
   const checkNoFloor = (
     characterBehavior,
     platformBehavior,
@@ -112,11 +124,17 @@ describe(`gdjs.PlatformerObjectRuntimeBehavior.findHighestFloorAndMoveOnTop`, fu
       upwardDeltaY,
       downwardDeltaY
     );
-    expect(result.highestGround).to.be(null);
+    expect(result.highestGroundPlatform).to.be(null);
     expect(result.isCollidingAnyPlatform).to.be(false);
     expect(characterBehavior.owner.getY()).to.be(oldY);
   };
 
+  /**
+   * @param {gdjs.PlatformerObjectRuntimeBehavior} characterBehavior
+   * @param {gdjs.PlatformRuntimeBehavior} platformBehavior
+   * @param {float} upwardDeltaY
+   * @param {float} downwardDeltaY
+   */
   const checkObstacle = (
     characterBehavior,
     platformBehavior,
@@ -129,7 +147,7 @@ describe(`gdjs.PlatformerObjectRuntimeBehavior.findHighestFloorAndMoveOnTop`, fu
       upwardDeltaY,
       downwardDeltaY
     );
-    expect(result.highestGround).to.be(null);
+    expect(result.highestGroundPlatform).to.be(null);
     expect(result.isCollidingAnyPlatform).to.be(true);
     expect(characterBehavior.owner.getY()).to.be(oldY);
   };
@@ -293,11 +311,13 @@ describe(`gdjs.PlatformerObjectRuntimeBehavior.findHighestFloorAndMoveOnTop`, fu
         describe(description, function () {
           const runtimeScene = makeTestRuntimeScene();
           const character = addCharacter(runtimeScene);
+          /** @type gdjs.PlatformerObjectRuntimeBehavior */
           const behavior = character.getBehavior('auto1');
 
           const platform = addPlatform(runtimeScene, mask);
           platform.setCustomWidthAndHeight(300, 300);
           platform.setPosition(position[0], position[1]);
+          /** @type gdjs.PlatformRuntimeBehavior */
           const platformBehavior = platform.getBehavior('Platform');
           const platformObstaclesManager = gdjs.PlatformObjectsManager.getManager(
             runtimeScene
@@ -365,11 +385,13 @@ describe(`gdjs.PlatformerObjectRuntimeBehavior.findHighestFloorAndMoveOnTop`, fu
         describe(description, function () {
           const runtimeScene = makeTestRuntimeScene();
           const character = addCharacter(runtimeScene);
+          /** @type gdjs.PlatformerObjectRuntimeBehavior */
           const behavior = character.getBehavior('auto1');
 
           const platform = addPlatform(runtimeScene, mask);
           platform.setCustomWidthAndHeight(300, 300);
           platform.setPosition(position[0], position[1]);
+          /** @type gdjs.PlatformRuntimeBehavior */
           const platformBehavior = platform.getBehavior('Platform');
           const platformObstaclesManager = gdjs.PlatformObjectsManager.getManager(
             runtimeScene

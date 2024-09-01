@@ -69,7 +69,7 @@ function YesNoCancelDialog(props: Props) {
             />,
           ]}
           maxWidth="xs"
-          noMobileFullScreen
+          fullscreen="never-even-on-mobile"
           onRequestClose={props.onClickCancel}
           onApply={props.onClickYes}
         >

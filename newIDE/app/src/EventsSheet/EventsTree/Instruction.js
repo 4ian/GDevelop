@@ -41,7 +41,7 @@ import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import {
   type EventsScope,
   ProjectScopedContainersAccessor,
-} from '../../InstructionOrExpression/EventsScope.flow';
+} from '../../InstructionOrExpression/EventsScope';
 import { enumerateParametersUsableInExpressions } from '../ParameterFields/EnumerateFunctionParameters';
 import { getFunctionNameFromType } from '../../EventsFunctionsExtensionsLoader';
 import { ExtensionStoreContext } from '../../AssetStore/ExtensionStore/ExtensionStoreContext';

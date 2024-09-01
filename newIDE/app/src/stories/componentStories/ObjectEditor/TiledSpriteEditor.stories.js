@@ -22,6 +22,8 @@ export const Default = () => (
       objectConfiguration={testProject.tiledSpriteObjectConfiguration}
       project={testProject.project}
       layout={testProject.testLayout}
+      eventsFunctionsExtension={null}
+      eventsBasedObject={null}
       resourceManagementProps={fakeResourceManagementProps}
       onSizeUpdated={() => {}}
       // It would be used for refactoring but this kind of object has none.

@@ -14,7 +14,7 @@ import { type EnumeratedInstructionOrExpressionMetadata } from '../../../Instruc
 import { Column, Line } from '../../../UI/Grid';
 import ObjectsRenderingService from '../../../ObjectsRendering/ObjectsRenderingService';
 import Paper from '../../../UI/Paper';
-import { mapVector } from '../../../Utils/MapFor';
+import { mapFor } from '../../../Utils/MapFor';
 import { Trans } from '@lingui/macro';
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
 import { getVariableTypeToIcon } from '../../../VariablesList/VariableTypeSelector';
@@ -166,21 +166,28 @@ const ExpressionDocumentation = ({
       <Text style={defaultTextStyle} size="body2">
         {expressionMetadata.getDescription()}
       </Text>
-      {mapVector(
-        expressionMetadata.getParameters(),
-        (parameter, parameterIndex) =>
-          isParameterVisible(expressionMetadata, parameterIndex) && (
-            <Text style={defaultTextStyle} size="body2" key={parameterIndex}>
-              <i>
-                {i18n._(
-                  parameterRenderingService.getUserFriendlyTypeName(
-                    parameter.getType()
-                  )
-                )}
-              </i>
-              {' － ' + parameter.getDescription()}
-            </Text>
-          )
+      {mapFor(
+        0,
+        expressionMetadata.getParameters().getParametersCount(),
+        parameterIndex => {
+          const parameter = expressionMetadata
+            .getParameters()
+            .getParameterAt(parameterIndex);
+          return (
+            isParameterVisible(expressionMetadata, parameterIndex) && (
+              <Text style={defaultTextStyle} size="body2" key={parameterIndex}>
+                <i>
+                  {i18n._(
+                    parameterRenderingService.getUserFriendlyTypeName(
+                      parameter.getType()
+                    )
+                  )}
+                </i>
+                {' － ' + parameter.getDescription()}
+              </Text>
+            )
+          );
+        }
       )}
     </Column>
   );

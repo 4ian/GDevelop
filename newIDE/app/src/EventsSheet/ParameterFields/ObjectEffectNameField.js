@@ -42,6 +42,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       expression,
       parameterIndex,
     } = props;
+    const { layout, eventsFunctionsExtension, eventsBasedObject } = scope;
 
     // We don't memo/callback this, as we want to recompute it every time something changes.
     // Because of the function getLastObjectParameterValue.
@@ -59,7 +60,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
       const object = getObjectByName(
         project.getObjects(),
-        scope.layout ? scope.layout.getObjects() : null,
+        layout ? layout.getObjects() : null,
         objectOrGroupName
       );
       if (object) {
@@ -67,7 +68,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       }
       const group = getObjectGroupByName(
         project.getObjects(),
-        scope.layout ? scope.layout.getObjects() : null,
+        layout ? layout.getObjects() : null,
         objectOrGroupName
       );
       if (group) {
@@ -76,7 +77,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           objectName => {
             const object = getObjectByName(
               project.getObjects(),
-              scope.layout ? scope.layout.getObjects() : null,
+              layout ? layout.getObjects() : null,
               objectName
             );
             if (!object) {
@@ -97,10 +98,11 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       effectName => `"${effectName}"` === props.value
     );
 
+    const canAutocomplete = !eventsFunctionsExtension || eventsBasedObject;
+
     // If the current value is not in the list, display an expression field.
     const [isExpressionField, setIsExpressionField] = React.useState(
-      (!!props.value && !isCurrentValueInEffectNamesList) ||
-        props.scope.eventsFunctionsExtension
+      (!!props.value && !isCurrentValueInEffectNamesList) || !canAutocomplete
     );
 
     const switchFieldType = () => {
@@ -170,25 +172,27 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           )
         }
         renderButton={style =>
-          props.scope.eventsFunctionsExtension ? null : isExpressionField ? (
-            <FlatButton
-              id="switch-expression-select"
-              leftIcon={<TypeCursorSelect />}
-              style={style}
-              primary
-              label={<Trans>Select an effect</Trans>}
-              onClick={switchFieldType}
-            />
-          ) : (
-            <RaisedButton
-              id="switch-expression-select"
-              icon={<Functions />}
-              style={style}
-              primary
-              label={<Trans>Use an expression</Trans>}
-              onClick={switchFieldType}
-            />
-          )
+          canAutocomplete ? (
+            isExpressionField ? (
+              <FlatButton
+                id="switch-expression-select"
+                leftIcon={<TypeCursorSelect />}
+                style={style}
+                primary
+                label={<Trans>Select an effect</Trans>}
+                onClick={switchFieldType}
+              />
+            ) : (
+              <RaisedButton
+                id="switch-expression-select"
+                icon={<Functions />}
+                style={style}
+                primary
+                label={<Trans>Use an expression</Trans>}
+                onClick={switchFieldType}
+              />
+            )
+          ) : null
         }
       />
     );

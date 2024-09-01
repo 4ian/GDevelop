@@ -24,18 +24,23 @@
 namespace gd {
 
 SpriteObject::SpriteObject()
-    : updateIfNotVisible(false) {}
+    : updateIfNotVisible(false),
+      preScale(1) {}
 
 SpriteObject::~SpriteObject(){};
 
 void SpriteObject::DoUnserializeFrom(gd::Project& project,
                                      const gd::SerializerElement& element) {
   updateIfNotVisible = element.GetBoolAttribute("updateIfNotVisible", true);
+  preScale = element.GetDoubleAttribute("preScale", 1);
   animations.UnserializeFrom(element);
 }
 
 void SpriteObject::DoSerializeTo(gd::SerializerElement& element) const {
   element.SetAttribute("updateIfNotVisible", updateIfNotVisible);
+  if (preScale != 1) {
+    element.SetAttribute("preScale", preScale);
+  }
   animations.SerializeTo(element);
 }
 
@@ -85,6 +90,19 @@ bool SpriteObject::UpdateInitialInstanceProperty(
   }
 
   return true;
+}
+
+size_t SpriteObject::GetAnimationsCount() const {
+  return animations.GetAnimationsCount();
+}
+
+const gd::String &SpriteObject::GetAnimationName(size_t index) const {
+  return animations.GetAnimation(index).GetName();
+}
+
+bool SpriteObject::HasAnimationNamed(
+    const gd::String &name) const {
+  return animations.HasAnimationNamed(name);
 }
 
 const SpriteAnimationList& SpriteObject::GetAnimations() const {

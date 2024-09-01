@@ -4,7 +4,6 @@ import * as React from 'react';
 import { I18n } from '@lingui/react';
 
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
-import AlertMessage from '../../UI/AlertMessage';
 import InlineCheckbox from '../../UI/InlineCheckbox';
 import { ColumnStackLayout } from '../../UI/Layout';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
@@ -32,13 +31,6 @@ const GameMonetization = ({ game, onGameUpdated }: Props) => {
       {({ i18n }) => (
         <ColumnStackLayout noMargin>
           <Text size="sub-title">Ads</Text>
-          <AlertMessage kind="info">
-            <Trans>
-              In the future, games that generate enough revenue will be able to
-              opt-in into "revenue share", so that as a creator you can start
-              earning from your game sessions.
-            </Trans>
-          </AlertMessage>
           <InlineCheckbox
             checked={
               pendingDisplayAdsOnGamePage !== null
@@ -80,9 +72,9 @@ const GameMonetization = ({ game, onGameUpdated }: Props) => {
             }
             tooltipOrHelperText={
               <Trans>
-                This is recommended as this allows to maintain free publishing
-                on gd.games and allow to analyze if you could benefit from
-                revenue sharing.
+                This is recommended as this allows you to earn money from your
+                games. If you disable this, your game will not show any
+                advertisement.
               </Trans>
             }
           />

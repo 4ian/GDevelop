@@ -21,6 +21,7 @@ import AuthenticatedUserContext, {
 import { duplicateLeaderboard } from '../Utils/GDevelopServices/Play';
 import { registerGame } from '../Utils/GDevelopServices/Game';
 import { toNewGdMapStringString } from '../Utils/MapStringString';
+import { getDefaultRegisterGamePropertiesFromProject } from '../Utils/UseGameAndBuildsManager';
 
 const gd: libGDevelop = global.gd;
 
@@ -182,10 +183,10 @@ export const LeaderboardReplacerProgressDialog = ({
 type RetryOrAbandonCallback = () => void;
 
 type UseLeaderboardReplacerOutput = {|
-  /**
-   * Launch search through the whole project for leaderboard ids to replace.
-   */
-  findLeaderboardsToReplace: (project: gdProject, sourceGameId: string) => void,
+  openLeaderboardReplacerDialogIfNeeded: (
+    project: gdProject,
+    sourceGameId: string
+  ) => void,
 
   /**
    * Render, if needed, the dialog that will show the progress of leaderboard replacement.
@@ -199,12 +200,136 @@ type ErroredLeaderboard = {
 };
 
 /**
+ * Launch the replacement of leaderboards, if needed.
+ * First, register game, then copy leaderboards in database, and finally
+ * replace them in events.
+ */
+export const replaceLeaderboardsInProject = async ({
+  authenticatedUser,
+  project,
+  sourceGameId,
+  leaderboardsToReplace,
+  setProgress,
+}: {|
+  authenticatedUser: AuthenticatedUser,
+  project: gdProject,
+  sourceGameId: string,
+  leaderboardsToReplace: Array<string>,
+  setProgress: (percent: number | ((percent: number) => number)) => void,
+|}) => {
+  const { getAuthorizationHeader, profile } = authenticatedUser;
+  if (!leaderboardsToReplace || !project || !sourceGameId) {
+    throw new Error('No leaderboards found in events sheet.');
+  }
+  if (!profile) {
+    throw new Error('User is not connected.');
+  }
+
+  // Number of leaderboards to replace + game registration + leaderboard replace in events sheet.
+  const totalSteps = leaderboardsToReplace.length + 2;
+  const progressStep = (1 / totalSteps) * 100;
+
+  const replacedLeaderboardsMap = {};
+
+  setProgress(0);
+
+  // Register game. The error will silently be caught if the game already exists,
+  // but user will be able to retry if it doesn't because leaderboards copy will
+  // fail.
+  try {
+    await registerGame(
+      getAuthorizationHeader,
+      profile.id,
+      getDefaultRegisterGamePropertiesFromProject({ project })
+    );
+  } catch (error) {
+    console.error(
+      'Could not register game before leaderboard replacement: ',
+      error
+    );
+  }
+  setProgress(progressStep);
+
+  const duplicateLeaderboardAndStepProgress = async (
+    authenticatedUser: AuthenticatedUser,
+    leaderboardId: string
+  ): Promise<?ErroredLeaderboard> => {
+    try {
+      const duplicatedLeaderboard = await duplicateLeaderboard(
+        authenticatedUser,
+        project.getProjectUuid(),
+        {
+          sourceGameId: sourceGameId,
+          sourceLeaderboardId: leaderboardId.replace(/"/g, ''),
+        }
+      );
+      replacedLeaderboardsMap[leaderboardId] = `"${duplicatedLeaderboard.id}"`;
+      setProgress(previousProgress => previousProgress + progressStep);
+      return null;
+    } catch (error) {
+      console.error(`Could not duplicate leaderboard ${leaderboardId}`, error);
+      setProgress(previousProgress => previousProgress + progressStep);
+      return {
+        leaderboardId,
+        error: error,
+      };
+    }
+  };
+
+  // Duplicate leaderboards.
+  const responseLeaderboardsWithErrors = await Promise.all(
+    Array.from(leaderboardsToReplace).map(async leaderboardId =>
+      duplicateLeaderboardAndStepProgress(authenticatedUser, leaderboardId)
+    )
+  );
+  const leaderboardsWithErrors = responseLeaderboardsWithErrors.filter(Boolean);
+
+  // Replace leaderboards in events.
+  if (Object.keys(replacedLeaderboardsMap).length) {
+    const renamedLeaderboardsMap = toNewGdMapStringString(
+      replacedLeaderboardsMap
+    );
+    const eventsLeaderboardReplacer = new gd.EventsLeaderboardsRenamer(
+      project,
+      renamedLeaderboardsMap
+    );
+    renamedLeaderboardsMap.delete();
+
+    gd.ProjectBrowserHelper.exposeProjectEvents(
+      project,
+      // $FlowIgnore - eventsLeaderboardReplacer inherits from ArbitraryEventsWorker
+      eventsLeaderboardReplacer
+    );
+    eventsLeaderboardReplacer.delete();
+  }
+  setProgress(100);
+
+  return {
+    leaderboardsWithErrors,
+  };
+};
+
+export const findLeaderboardsToReplaceInProject = ({
+  project,
+}: {|
+  project: gdProject,
+|}) => {
+  const leaderboardsLister = new gd.EventsLeaderboardsLister(project);
+  // $FlowIgnore - leaderboardsLister inherits from ArbitraryEventsWorker
+  gd.ProjectBrowserHelper.exposeProjectEvents(project, leaderboardsLister);
+  const leaderboardIds = leaderboardsLister.getLeaderboardIds();
+  const leaderboardIdsArray = leaderboardIds.toNewVectorString().toJSArray();
+  leaderboardsLister.delete();
+  return leaderboardIdsArray;
+};
+
+/**
  * Hook allowing to find and duplicate leaderboards in a project, useful after
  * opening a project from an example.
  */
 export const useLeaderboardReplacer = (): UseLeaderboardReplacerOutput => {
   const [project, setProject] = React.useState<gdProject | null>(null);
-  const [gameId, setGameId] = React.useState<string | null>(null);
+  const [sourceGameId, setSourceGameId] = React.useState<string | null>(null);
   const [shouldReplace, setShouldReplace] = React.useState(false);
   const [
     leaderboardsToReplace,
@@ -223,111 +348,25 @@ export const useLeaderboardReplacer = (): UseLeaderboardReplacerOutput => {
     null
   );
 
-  /**
-   * Launch the replacement of leaderboards, if needed.
-   * First, register game, then copy leaderboards in database, and finally
-   * replace them in events.
-   */
   const ensureLeaderboardsAreReplaced = React.useCallback(
     async () => {
-      const { getAuthorizationHeader, profile } = authenticatedUser;
-      if (!leaderboardsToReplace || !project || !gameId) {
-        throw new Error('No leaderboards found in events sheet.');
-      }
-      if (!profile) {
-        throw new Error('User is not connected.');
+      if (!leaderboardsToReplace || !project || !sourceGameId) {
+        return;
       }
 
-      // Number of leaderboards to replace + game registration + leaderboard replace in events sheet.
-      const totalSteps = leaderboardsToReplace.length + 2;
-      const progressStep = (1 / totalSteps) * 100;
-
-      const replacedLeaderboardsMap = {};
-
-      setProgress(0);
       setOnRetry(null);
       setOnAbandon(null);
       setErroredLeaderboards([]);
 
-      // Register game. The error will silently be caught if the game already exists,
-      // but user will be able to retry if it doesn't because leaderboards copy will
-      // fail.
-      try {
-        await registerGame(getAuthorizationHeader, profile.id, {
-          gameId: project.getProjectUuid(),
-          authorName: project.getAuthor() || 'Unspecified publisher',
-          gameName: project.getName() || 'Untitled game',
-          templateSlug: project.getTemplateSlug(),
-        });
-      } catch (error) {
-        console.error(
-          'Could not register game before leaderboard replacement: ',
-          error
-        );
-      }
-      setProgress(progressStep);
+      const { leaderboardsWithErrors } = await replaceLeaderboardsInProject({
+        authenticatedUser,
+        project,
+        sourceGameId,
+        leaderboardsToReplace,
+        setProgress,
+      });
 
-      const duplicateLeaderboardAndStepProgress = async (
-        authenticatedUser: AuthenticatedUser,
-        leaderboardId: string
-      ): Promise<?ErroredLeaderboard> => {
-        try {
-          const duplicatedLeaderboard = await duplicateLeaderboard(
-            authenticatedUser,
-            project.getProjectUuid(),
-            {
-              sourceGameId: gameId,
-              sourceLeaderboardId: leaderboardId.replace(/"/g, ''),
-            }
-          );
-          replacedLeaderboardsMap[leaderboardId] = `"${
-            duplicatedLeaderboard.id
-          }"`;
-          setProgress(previousProgress => previousProgress + progressStep);
-          return null;
-        } catch (error) {
-          console.error(
-            `Could not duplicate leaderboard ${leaderboardId}`,
-            error
-          );
-          setProgress(previousProgress => previousProgress + progressStep);
-          return {
-            leaderboardId,
-            error: error,
-          };
-        }
-      };
-
-      // Duplicate leaderboards.
-      const responseLeaderboardsWithErrors = await Promise.all(
-        Array.from(leaderboardsToReplace).map(async leaderboardId =>
-          duplicateLeaderboardAndStepProgress(authenticatedUser, leaderboardId)
-        )
-      );
-      const leaderboardsWithErrors = responseLeaderboardsWithErrors.filter(
-        Boolean
-      );
       setErroredLeaderboards(leaderboardsWithErrors);
-
-      // Replace leaderboards in events.
-      if (Object.keys(replacedLeaderboardsMap).length) {
-        const renamedLeaderboardsMap = toNewGdMapStringString(
-          replacedLeaderboardsMap
-        );
-        const eventsLeaderboardReplacer = new gd.EventsLeaderboardsRenamer(
-          project,
-          renamedLeaderboardsMap
-        );
-        renamedLeaderboardsMap.delete();
-
-        gd.ProjectBrowserHelper.exposeProjectEvents(
-          project,
-          // $FlowIgnore - eventsLeaderboardReplacer inherits from ArbitraryEventsWorker
-          eventsLeaderboardReplacer
-        );
-        eventsLeaderboardReplacer.delete();
-      }
-      setProgress(100);
 
       if (leaderboardsWithErrors.length === 0) {
         // No error happened: finish normally, closing the dialog.
@@ -365,23 +404,27 @@ export const useLeaderboardReplacer = (): UseLeaderboardReplacerOutput => {
         );
       });
     },
-    [authenticatedUser, gameId, leaderboardsToReplace, project]
+    [
+      authenticatedUser,
+      project,
+      sourceGameId,
+      leaderboardsToReplace,
+      setProgress,
+      setErroredLeaderboards,
+      setOnRetry,
+      setOnAbandon,
+      setShouldReplace,
+    ]
   );
 
   /**
    * Return a set of leaderboard ids found in the project.
    */
-  const findLeaderboardsToReplace = React.useCallback(
+  const openLeaderboardReplacerDialogIfNeeded = React.useCallback(
     (project: gdProject, sourceGameId: string) => {
       setProject(project);
-      setGameId(sourceGameId);
-
-      const leaderboardsLister = new gd.EventsLeaderboardsLister(project);
-      // $FlowIgnore - leaderboardsLister inherits from ArbitraryEventsWorker
-      gd.ProjectBrowserHelper.exposeProjectEvents(project, leaderboardsLister);
-      const leaderboardIds = leaderboardsLister.getLeaderboardIds();
-      setLeaderboardsToReplace(leaderboardIds.toNewVectorString().toJSArray());
-      leaderboardsLister.delete();
+      setSourceGameId(sourceGameId);
+      setLeaderboardsToReplace(findLeaderboardsToReplaceInProject({ project }));
     },
     []
   );
@@ -389,7 +432,7 @@ export const useLeaderboardReplacer = (): UseLeaderboardReplacerOutput => {
   const renderLeaderboardReplacerDialog = () => {
     if (!leaderboardsToReplace || !leaderboardsToReplace.length) return null;
 
-    return gameId &&
+    return sourceGameId &&
       project &&
       shouldReplace &&
       authenticatedUser.authenticated ? (
@@ -412,7 +455,7 @@ export const useLeaderboardReplacer = (): UseLeaderboardReplacerOutput => {
   };
 
   return {
-    findLeaderboardsToReplace,
+    openLeaderboardReplacerDialogIfNeeded,
     renderLeaderboardReplacerDialog,
   };
 };

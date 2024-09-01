@@ -195,6 +195,7 @@ export const LongLabels = () => (
 const hotReloadPreviewButtonProps: HotReloadPreviewButtonProps = {
   hasPreviewsRunning: false,
   launchProjectDataOnlyPreview: action('launchProjectDataOnlyPreview'),
+  launchProjectCodeAndDataPreview: action('launchProjectCodeAndDataPreview'),
   launchProjectWithLoadingScreenPreview: action(
     'launchProjectWithLoadingScreenPreview'
   ),
@@ -278,9 +279,9 @@ export const WithObjectsList = () => (
                     cb
                   ) => cb(true)}
                   onObjectCreated={() => {}}
+                  onObjectEdited={() => {}}
                   onObjectFolderOrObjectWithContextSelected={() => {}}
                   hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-                  canInstallPrivateAsset={() => false}
                 />
               </TabContentContainer>
             }

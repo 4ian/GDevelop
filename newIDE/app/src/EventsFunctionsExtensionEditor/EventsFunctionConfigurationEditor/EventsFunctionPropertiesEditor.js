@@ -9,7 +9,7 @@ import * as React from 'react';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
-import { mapVector, mapFor } from '../../Utils/MapFor';
+import { mapFor } from '../../Utils/MapFor';
 import HelpButton from '../../UI/HelpButton';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import EmptyMessage from '../../UI/EmptyMessage';
@@ -29,9 +29,10 @@ const gd: libGDevelop = global.gd;
 type Props = {|
   project: gdProject,
   eventsFunction: gdEventsFunction,
-  eventsBasedBehavior: ?gdEventsBasedBehavior,
-  eventsBasedObject: ?gdEventsBasedObject,
-  eventsFunctionsContainer: ?gdEventsFunctionsContainer,
+  eventsBasedBehavior: gdEventsBasedBehavior | null,
+  eventsBasedObject: gdEventsBasedObject | null,
+  eventsFunctionsContainer: gdEventsFunctionsContainer | null,
+  eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   helpPagePath?: string,
   onConfigurationUpdated?: (?ExtensionItemConfigurationAttribute) => void,
   renderConfigurationHeader?: () => React.Node,
@@ -61,9 +62,12 @@ export const getSentenceErrorText = (
   const param0isImplicit =
     (eventsBasedBehavior || eventsBasedObject) &&
     type === gd.EventsFunction.ExpressionAndCondition;
-  const missingParameters = mapVector(
-    eventsFunction.getParameters(),
-    (parameter, index) => {
+  const missingParameters = mapFor(
+    0,
+    eventsFunction.getParameters().getParametersCount(),
+    index => {
+      const parameter = eventsFunction.getParameters().getParameterAt(index);
+
       if (parameter.getValueTypeMetadata().isBehavior()) {
         // Behaviors are usually not shown in sentences.
         return null;
@@ -79,7 +83,7 @@ export const getSentenceErrorText = (
     }
   ).filter(Boolean);
 
-  const parametersLength = eventsFunction.getParameters().size();
+  const parametersLength = eventsFunction.getParameters().getParametersCount();
   const paramsMatches = sentence.matchAll(/_PARAM(\d+)_/g);
   const nonExpectedParameters = [];
   for (const paramsMatch of paramsMatches) {
@@ -143,6 +147,7 @@ const getDescriptionHintText = (
 
 export const EventsFunctionPropertiesEditor = ({
   project,
+  eventsFunctionsExtension,
   eventsFunction,
   freezeEventsFunctionType,
   onConfigurationUpdated,
@@ -500,6 +505,7 @@ export const EventsFunctionPropertiesEditor = ({
                     <ValueTypeEditor
                       isExpressionType
                       project={project}
+                      eventsFunctionsExtension={eventsFunctionsExtension}
                       valueTypeMetadata={eventsFunction.getExpressionType()}
                       isTypeSelectorShown={true}
                       onTypeUpdated={() => {

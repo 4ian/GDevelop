@@ -32,6 +32,7 @@ import {
   type PrivateGameTemplateListingData,
 } from './GDevelopServices/Shop';
 import { createPrivateGameTemplateUrl } from './GDevelopServices/Asset';
+import { getDefaultRegisterGamePropertiesFromProject } from './UseGameAndBuildsManager';
 
 type Props = {|
   beforeCreatingProject: () => void,
@@ -39,7 +40,7 @@ type Props = {|
     project: gdProject,
     editorTabs: EditorTabsState,
     oldProjectId: string,
-    options?: { openAllScenes: boolean },
+    options: { openAllScenes: boolean, openQuickCustomizationDialog: boolean },
   |}) => Promise<void>,
   onError: () => void,
   onSuccessOrError: () => void,
@@ -111,9 +112,9 @@ const useCreateProject = ({
       newProjectSetup: NewProjectSetup,
       options?: { openAllScenes: boolean }
     ) => {
-      if (!newProjectSource) return; // New project creation aborted.
-
       try {
+        if (!newProjectSource) return; // New project creation aborted.
+
         let state: ?State;
         const sourceStorageProvider = newProjectSource.storageProvider;
         const sourceStorageProviderOperations = sourceStorageProvider
@@ -142,21 +143,23 @@ const useCreateProject = ({
           currentProject.setTemplateSlug(newProjectSource.templateSlug);
         }
 
-        if (authenticatedUser.profile) {
-          // if the user is connected, try to register the game to avoid
+        if (
+          authenticatedUser.profile &&
+          !newProjectSetup.openQuickCustomizationDialog
+        ) {
+          // If the user is connected, try to register the game to avoid
           // any gdevelop services to ask the user to register the game.
           // (for instance, leaderboards, player authentication, ...)
+          //
+          // Skip this if quick customization is requested, as this will be done later
+          // at publishing time.
           try {
             await registerGame(
               authenticatedUser.getAuthorizationHeader,
               authenticatedUser.profile.id,
-              {
-                gameId: currentProject.getProjectUuid(),
-                authorName:
-                  currentProject.getAuthor() || 'Unspecified publisher',
-                gameName: currentProject.getName() || 'Untitled game',
-                templateSlug: currentProject.getTemplateSlug(),
-              }
+              getDefaultRegisterGamePropertiesFromProject({
+                project: currentProject,
+              })
             );
           } catch (error) {
             // Do not prevent the user from opening the game if the registration failed.
@@ -223,7 +226,10 @@ const useCreateProject = ({
           project: currentProject,
           editorTabs,
           oldProjectId,
-          options,
+          options: {
+            openAllScenes: !!options && options.openAllScenes,
+            openQuickCustomizationDialog: !!newProjectSetup.openQuickCustomizationDialog,
+          },
         });
       } catch (rawError) {
         const { getWriteErrorMessage } = getStorageProviderOperations();

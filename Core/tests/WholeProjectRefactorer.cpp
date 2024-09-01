@@ -867,26 +867,22 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
     auto &behaviorEventsFunctions = eventsBasedBehavior.GetEventsFunctions();
     auto &behaviorAction = behaviorEventsFunctions.InsertNewEventsFunction(
         "MyBehaviorEventsFunction", 0);
-    behaviorAction.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("Object")
-            .SetType("object")
-            .SetExtraInfo("MyEventsExtension::MyEventsBasedObject"));
-    behaviorAction.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("Behavior")
-            .SetType("behavior")
-            .SetExtraInfo("MyEventsExtension::MyEventsBasedBehavior"));
-    behaviorAction.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("ObjectWithMyBehavior")
-            .SetType("object")
-            .SetExtraInfo("MyEventsExtension::MyEventsBasedObject"));
-    behaviorAction.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("OtherBehavior")
-            .SetType("behavior")
-            .SetExtraInfo("MyEventsExtension::MyEventsBasedBehavior"));
+    behaviorAction.GetParameters()
+        .InsertNewParameter("Object", 0)
+        .SetType("object")
+        .SetExtraInfo("MyEventsExtension::MyEventsBasedObject");
+    behaviorAction.GetParameters()
+        .InsertNewParameter("Behavior", 1)
+        .SetType("behavior")
+        .SetExtraInfo("MyEventsExtension::MyEventsBasedBehavior");
+    behaviorAction.GetParameters()
+        .InsertNewParameter("ObjectWithMyBehavior", 2)
+        .SetType("object")
+        .SetExtraInfo("MyEventsExtension::MyEventsBasedObject");
+    behaviorAction.GetParameters()
+        .InsertNewParameter("OtherBehavior", 3)
+        .SetType("behavior")
+        .SetExtraInfo("MyEventsExtension::MyEventsBasedBehavior");
     auto &group = behaviorAction.GetObjectGroups().InsertNew("GroupWithMyBehavior");
     group.AddObject("ObjectWithMyBehavior");
 
@@ -894,36 +890,32 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
         behaviorEventsFunctions
             .InsertNewEventsFunction("MyBehaviorEventsFunctionExpression", 1)
             .SetFunctionType(gd::EventsFunction::Expression);
-    behaviorExpression.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("Object")
-            .SetType("object")
-            .SetExtraInfo("MyEventsExtension::MyEventsBasedObject"));
-    behaviorExpression.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("Behavior")
-            .SetType("behavior")
-            .SetExtraInfo("MyEventsExtension::MyEventsBasedBehavior"));
+    behaviorExpression.GetParameters()
+        .InsertNewParameter("Object", 0)
+        .SetType("object")
+        .SetExtraInfo("MyEventsExtension::MyEventsBasedObject");
+    behaviorExpression.GetParameters()
+        .InsertNewParameter("Behavior", 1)
+        .SetType("behavior")
+        .SetExtraInfo("MyEventsExtension::MyEventsBasedBehavior");
 
     auto &behaviorExpressionAndCondition =
         behaviorEventsFunctions
             .InsertNewEventsFunction("MyBehaviorEventsFunctionExpressionAndCondition", 2)
             .SetFunctionType(gd::EventsFunction::ExpressionAndCondition);
-    behaviorExpressionAndCondition.GetParameters().push_back(
-        gd::ParameterMetadata().SetName("Object").SetType("object"));
-    behaviorExpressionAndCondition.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("Behavior")
-            .SetType("behavior")
-            .SetExtraInfo("MyExtension::MyEventsBasedBehavior"));
-    behaviorExpressionAndCondition.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("Value1")
-            .SetType("expression"));
-    behaviorExpressionAndCondition.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("Value2")
-            .SetType("expression"));
+    behaviorExpressionAndCondition.GetParameters()
+        .InsertNewParameter("Object", 0)
+        .SetType("object");
+    behaviorExpressionAndCondition.GetParameters()
+        .InsertNewParameter("Behavior", 1)
+        .SetType("behavior")
+        .SetExtraInfo("MyExtension::MyEventsBasedBehavior");
+    behaviorExpressionAndCondition.GetParameters()
+        .InsertNewParameter("Value1", 2)
+        .SetType("expression");
+    behaviorExpressionAndCondition.GetParameters()
+        .InsertNewParameter("Value2", 3)
+        .SetType("expression");
 
     behaviorEventsFunctions
         .InsertNewEventsFunction("MyBehaviorEventsFunctionActionWithOperator", 2)
@@ -956,46 +948,41 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
     auto &objectEventsFunctions = eventsBasedObject.GetEventsFunctions();
     auto &objectAction = objectEventsFunctions.InsertNewEventsFunction(
         "MyObjectEventsFunction", 0);
-    objectAction.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("Object")
-            .SetType("object")
-            .SetExtraInfo("MyEventsExtension::MyEventsBasedObject"));
-    objectAction.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("OtherObject")
-            .SetType("object")
-            .SetExtraInfo("MyEventsExtension::MyEventsBasedObject"));
-    objectAction.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("OtherBehavior")
-            .SetType("behavior")
-            .SetExtraInfo("MyEventsExtension::MyEventsBasedBehavior"));
+    objectAction.GetParameters()
+        .InsertNewParameter("Object", 0)
+        .SetType("object")
+        .SetExtraInfo("MyEventsExtension::MyEventsBasedObject");
+    objectAction.GetParameters()
+        .InsertNewParameter("OtherObject", 1)
+        .SetType("object")
+        .SetExtraInfo("MyEventsExtension::MyEventsBasedObject");
+    objectAction.GetParameters()
+        .InsertNewParameter("OtherBehavior", 2)
+        .SetType("behavior")
+        .SetExtraInfo("MyEventsExtension::MyEventsBasedBehavior");
 
     auto &objectExpression =
         objectEventsFunctions
             .InsertNewEventsFunction("MyObjectEventsFunctionExpression", 1)
             .SetFunctionType(gd::EventsFunction::Expression);
-    objectExpression.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("Object")
+    objectExpression.GetParameters().InsertNewParameter("Object", 0)
             .SetType("object")
-            .SetExtraInfo("MyEventsExtension::MyEventsBasedObject"));
+            .SetExtraInfo("MyEventsExtension::MyEventsBasedObject");
 
     auto &objectExpressionAndCondition =
         objectEventsFunctions
-            .InsertNewEventsFunction("MyObjectEventsFunctionExpressionAndCondition", 2)
+            .InsertNewEventsFunction(
+                "MyObjectEventsFunctionExpressionAndCondition", 2)
             .SetFunctionType(gd::EventsFunction::ExpressionAndCondition);
-    objectExpressionAndCondition.GetParameters().push_back(
-        gd::ParameterMetadata().SetName("Object").SetType("object"));
-    objectExpressionAndCondition.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("Value1")
-            .SetType("expression"));
-    objectExpressionAndCondition.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("Value2")
-            .SetType("expression"));
+    objectExpressionAndCondition.GetParameters()
+        .InsertNewParameter("Object", 0)
+        .SetType("object");
+    objectExpressionAndCondition.GetParameters()
+        .InsertNewParameter("Value1", 1)
+        .SetType("expression");
+    objectExpressionAndCondition.GetParameters()
+        .InsertNewParameter("Value2", 2)
+        .SetType("expression");
 
     objectEventsFunctions
         .InsertNewEventsFunction("MyObjectEventsFunctionActionWithOperator", 2)
@@ -1022,32 +1009,27 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
     auto &behaviorEventsFunctions = eventsBasedBehavior.GetEventsFunctions();
     auto &behaviorAction = behaviorEventsFunctions.InsertNewEventsFunction(
         "MyBehaviorEventsFunction", 0);
-    behaviorAction.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("Object")
-            .SetType("object")
-            .SetExtraInfo("MyEventsExtension::MyEventsBasedObject"));
-    behaviorAction.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("Behavior")
-            .SetType("behavior")
-            .SetExtraInfo("MyEventsExtension::MyEventsBasedBehavior"));
+    behaviorAction.GetParameters()
+        .InsertNewParameter("Object", 0)
+        .SetType("object")
+        .SetExtraInfo("MyEventsExtension::MyEventsBasedObject");
+    behaviorAction.GetParameters()
+        .InsertNewParameter("Behavior", 1)
+        .SetType("behavior")
+        .SetExtraInfo("MyEventsExtension::MyEventsBasedBehavior");
     // Define the same objects as in the layout to be consistent with events.
-    behaviorAction.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("ObjectWithMyBehavior")
-            .SetType("object")
-            .SetExtraInfo("MyExtension::Sprite"));
-    behaviorAction.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("MyBehavior")
-            .SetType("behavior")
-            .SetExtraInfo("MyEventsExtension::MyEventsBasedBehavior"));
-    behaviorAction.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("MyCustomObject")
-            .SetType("object")
-            .SetExtraInfo("MyEventsExtension::MyEventsBasedObject"));
+    behaviorAction.GetParameters()
+        .InsertNewParameter("ObjectWithMyBehavior", 2)
+        .SetType("object")
+        .SetExtraInfo("MyExtension::Sprite");
+    behaviorAction.GetParameters()
+        .InsertNewParameter("MyBehavior", 3)
+        .SetType("behavior")
+        .SetExtraInfo("MyEventsExtension::MyEventsBasedBehavior");
+    behaviorAction.GetParameters()
+        .InsertNewParameter("MyCustomObject", 4)
+        .SetType("object")
+        .SetExtraInfo("MyEventsExtension::MyEventsBasedObject");
   }
 
   // Add an other events based object that uses previously defined events based
@@ -1062,11 +1044,10 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
     auto &objectEventsFunctions = eventsBasedObject.GetEventsFunctions();
     auto &objectAction = objectEventsFunctions.InsertNewEventsFunction(
         "MyObjectEventsFunction", 0);
-    objectAction.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("Object")
-            .SetType("object")
-            .SetExtraInfo("MyEventsExtension::MyOtherEventsBasedObject"));
+    objectAction.GetParameters()
+        .InsertNewParameter("Object", 0)
+        .SetType("object")
+        .SetExtraInfo("MyEventsExtension::MyOtherEventsBasedObject");
 
     // Add a child-object with the same names the one from the scene
     // to be able to use the same events list.
@@ -1091,39 +1072,33 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
   {
     auto &action =
         eventsExtension.InsertNewEventsFunction("MyEventsFunction", 0);
-    action.GetParameters().push_back(gd::ParameterMetadata()
-                                         .SetName("currentScene")
-                                         .SetType("")
-                                         .SetCodeOnly(true));
-    action.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("Object")
-            .SetType("object")
-            .SetExtraInfo("MyEventsExtension::MyEventsBasedObject"));
-    action.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("Behavior")
-            .SetType("behavior")
-            .SetExtraInfo("MyEventsExtension::MyEventsBasedBehavior"));
+    action.GetParameters()
+        .InsertNewParameter("currentScene", 0)
+        .SetType("")
+        .SetCodeOnly(true);
+    action.GetParameters()
+        .InsertNewParameter("Object", 1)
+        .SetType("object")
+        .SetExtraInfo("MyEventsExtension::MyEventsBasedObject");
+    action.GetParameters()
+        .InsertNewParameter("Behavior", 2)
+        .SetType("behavior")
+        .SetExtraInfo("MyEventsExtension::MyEventsBasedBehavior");
 
     auto &expression =
         eventsExtension.InsertNewEventsFunction("MyEventsFunctionExpression", 1)
             .SetFunctionType(gd::EventsFunction::Expression);
-    expression.GetParameters().push_back(gd::ParameterMetadata()
-                                             .SetName("currentScene")
-                                             .SetType("")
-                                             .SetCodeOnly(true));
+    expression.GetParameters()
+        .InsertNewParameter("currentScene", 0)
+        .SetType("")
+        .SetCodeOnly(true);
 
     auto &freeExpressionAndCondition = eventsExtension.InsertNewEventsFunction("MyEventsFunctionExpressionAndCondition", 2)
         .SetFunctionType(gd::EventsFunction::ExpressionAndCondition);
-    freeExpressionAndCondition.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("Value1")
-            .SetType("expression"));
-    freeExpressionAndCondition.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("Value2")
-            .SetType("expression"));
+    freeExpressionAndCondition.GetParameters().InsertNewParameter("Value1", 0)
+            .SetType("expression");
+    freeExpressionAndCondition.GetParameters().InsertNewParameter("Value2", 1)
+            .SetType("expression");
 
     eventsExtension.InsertNewEventsFunction("MyEventsFunctionActionWithOperator", 2)
         .SetFunctionType(gd::EventsFunction::ActionWithOperator)
@@ -1137,21 +1112,18 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
     auto &action =
         eventsExtension.InsertNewEventsFunction("MyOtherEventsFunction", 0);
     // Define the same objects as in the layout to be consistent with events.
-    action.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("ObjectWithMyBehavior")
-            .SetType("object")
-            .SetExtraInfo("MyExtension::Sprite"));
-    action.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("MyBehavior")
-            .SetType("behavior")
-            .SetExtraInfo("MyEventsExtension::MyEventsBasedBehavior"));
-    action.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("MyCustomObject")
-            .SetType("object")
-            .SetExtraInfo("MyEventsExtension::MyEventsBasedObject"));
+    action.GetParameters()
+        .InsertNewParameter("ObjectWithMyBehavior", 0)
+        .SetType("object")
+        .SetExtraInfo("MyExtension::Sprite");
+    action.GetParameters()
+        .InsertNewParameter("MyBehavior", 1)
+        .SetType("behavior")
+        .SetExtraInfo("MyEventsExtension::MyEventsBasedBehavior");
+    action.GetParameters()
+        .InsertNewParameter("MyCustomObject", 2)
+        .SetType("object")
+        .SetExtraInfo("MyEventsExtension::MyEventsBasedObject");
     auto &group = action.GetObjectGroups().InsertNew("GroupWithMyBehavior");
     group.AddObject("ObjectWithMyBehavior");
   }
@@ -1228,7 +1200,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       layout1.GetObjects().InsertNewObject(
           project, "MyExtension::Sprite", "Object2", 0);
 
-      gd::WholeProjectRefactorer::ObjectRemovedInLayout(project, layout1,
+      gd::WholeProjectRefactorer::ObjectRemovedInScene(project, layout1,
                                                         "Object1");
       gd::WholeProjectRefactorer::GlobalObjectRemoved(project, "GlobalObject1");
       REQUIRE(layout1.GetObjects().GetObjectGroups()[0].Find(
@@ -1262,7 +1234,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       layout1.GetInitialInstances().InsertInitialInstance(instance2);
       layout1.GetInitialInstances().InsertInitialInstance(instance3);
 
-      gd::WholeProjectRefactorer::ObjectRemovedInLayout(
+      gd::WholeProjectRefactorer::ObjectRemovedInScene(
           project, layout1, "Object1");
       gd::WholeProjectRefactorer::GlobalObjectRemoved(
           project, "GlobalObject1");
@@ -1306,7 +1278,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       externalLayout2.GetInitialInstances().InsertInitialInstance(instance2);
       externalLayout2.GetInitialInstances().InsertInitialInstance(instance3);
 
-      gd::WholeProjectRefactorer::ObjectRemovedInLayout(
+      gd::WholeProjectRefactorer::ObjectRemovedInScene(
           project, layout1, "Object1");
       gd::WholeProjectRefactorer::GlobalObjectRemoved(
           project, "GlobalObject1");
@@ -1344,7 +1316,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       layout1.GetObjects().InsertNewObject(
           project, "MyExtension::Sprite", "Object2", 0);
 
-      gd::WholeProjectRefactorer::ObjectOrGroupRenamedInLayout(
+      gd::WholeProjectRefactorer::ObjectOrGroupRenamedInScene(
           project, layout1, "Object1", "Object3", /* isObjectGroup =*/false);
       gd::WholeProjectRefactorer::GlobalObjectOrGroupRenamed(
           project, "GlobalObject1", "GlobalObject3", /* isObjectGroup =*/false);
@@ -1381,7 +1353,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       layout1.GetInitialInstances().InsertInitialInstance(instance2);
       layout1.GetInitialInstances().InsertInitialInstance(instance3);
 
-      gd::WholeProjectRefactorer::ObjectOrGroupRenamedInLayout(
+      gd::WholeProjectRefactorer::ObjectOrGroupRenamedInScene(
           project, layout1, "Object1", "Object3", /* isObjectGroup =*/false);
       gd::WholeProjectRefactorer::GlobalObjectOrGroupRenamed(
           project, "GlobalObject1", "GlobalObject3", /* isObjectGroup =*/false);
@@ -1427,7 +1399,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       externalLayout2.GetInitialInstances().InsertInitialInstance(instance2);
       externalLayout2.GetInitialInstances().InsertInitialInstance(instance3);
 
-      gd::WholeProjectRefactorer::ObjectOrGroupRenamedInLayout(
+      gd::WholeProjectRefactorer::ObjectOrGroupRenamedInScene(
           project, layout1, "Object1", "Object3", /* isObjectGroup =*/false);
       gd::WholeProjectRefactorer::GlobalObjectOrGroupRenamed(
           project, "GlobalObject1", "GlobalObject3", /* isObjectGroup =*/false);
@@ -1462,7 +1434,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       auto &layout = project.GetLayout("Scene");
 
       // Trigger the refactoring after the renaming of an object
-      gd::WholeProjectRefactorer::ObjectOrGroupRenamedInLayout(
+      gd::WholeProjectRefactorer::ObjectOrGroupRenamedInScene(
           project, layout, "ObjectWithMyBehavior",
           "RenamedObjectWithMyBehavior",
           /* isObjectGroup=*/false);
@@ -1490,7 +1462,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       auto &layout = project.GetLayout("Scene");
 
       // Trigger the refactoring after the renaming of a group
-      gd::WholeProjectRefactorer::ObjectOrGroupRenamedInLayout(
+      gd::WholeProjectRefactorer::ObjectOrGroupRenamedInScene(
           project, layout, "GroupWithMyBehavior", "RenamedGroupWithMyBehavior",
           /* isObjectGroup=*/true);
 
@@ -1534,7 +1506,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
 
     // Attach the behavior to the object.
     object.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
-    gd::WholeProjectRefactorer::BehaviorsAddedToObjectInLayout(project, scene,
+    gd::WholeProjectRefactorer::BehaviorsAddedToObjectInScene(project, scene,
                                                                "Object");
 
     // The behavior parameter is now filled.
@@ -2071,9 +2043,9 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     auto &myEventsFunction =
         project.GetEventsFunctionsExtension("MyEventsExtension")
             .GetEventsFunction("MyEventsFunction");
-    REQUIRE(myEventsFunction.GetParameters().at(1).GetExtraInfo() ==
+    REQUIRE(myEventsFunction.GetParameters().GetParameter(1).GetExtraInfo() ==
             "MyRenamedExtension::MyEventsBasedObject");
-    REQUIRE(myEventsFunction.GetParameters().at(2).GetExtraInfo() ==
+    REQUIRE(myEventsFunction.GetParameters().GetParameter(2).GetExtraInfo() ==
             "MyRenamedExtension::MyEventsBasedBehavior");
 
     // Behavior function
@@ -2084,9 +2056,12 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
               .Get("MyEventsBasedBehavior")
               .GetEventsFunctions()
               .GetEventsFunction("MyBehaviorEventsFunction");
-      REQUIRE(myBehaviorEventsFunction.GetParameters().at(2).GetExtraInfo() ==
-              "MyRenamedExtension::MyEventsBasedObject");
-      REQUIRE(myBehaviorEventsFunction.GetParameters().at(3).GetExtraInfo() ==
+      REQUIRE(myBehaviorEventsFunction.GetParameters()
+                  .GetParameter(2)
+                  .GetExtraInfo() == "MyRenamedExtension::MyEventsBasedObject");
+      REQUIRE(myBehaviorEventsFunction.GetParameters()
+                  .GetParameter(3)
+                  .GetExtraInfo() ==
               "MyRenamedExtension::MyEventsBasedBehavior");
     }
 
@@ -2098,9 +2073,12 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
               .Get("MyEventsBasedObject")
               .GetEventsFunctions()
               .GetEventsFunction("MyObjectEventsFunction");
-      REQUIRE(myBehaviorEventsFunction.GetParameters().at(1).GetExtraInfo() ==
-              "MyRenamedExtension::MyEventsBasedObject");
-      REQUIRE(myBehaviorEventsFunction.GetParameters().at(2).GetExtraInfo() ==
+      REQUIRE(myBehaviorEventsFunction.GetParameters()
+                  .GetParameter(1)
+                  .GetExtraInfo() == "MyRenamedExtension::MyEventsBasedObject");
+      REQUIRE(myBehaviorEventsFunction.GetParameters()
+                  .GetParameter(2)
+                  .GetExtraInfo() ==
               "MyRenamedExtension::MyEventsBasedBehavior");
     }
   }
@@ -2343,7 +2321,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     auto &myEventsFunction =
         project.GetEventsFunctionsExtension("MyEventsExtension")
             .GetEventsFunction("MyEventsFunction");
-    REQUIRE(myEventsFunction.GetParameters().at(2).GetExtraInfo() ==
+    REQUIRE(myEventsFunction.GetParameters().GetParameter(2).GetExtraInfo() ==
             "MyEventsExtension::MyRenamedEventsBasedBehavior");
 
     // Behavior function
@@ -2354,7 +2332,9 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
               .Get("MyEventsBasedBehavior")
               .GetEventsFunctions()
               .GetEventsFunction("MyBehaviorEventsFunction");
-      REQUIRE(myBehaviorEventsFunction.GetParameters().at(3).GetExtraInfo() ==
+      REQUIRE(myBehaviorEventsFunction.GetParameters()
+                  .GetParameter(3)
+                  .GetExtraInfo() ==
               "MyEventsExtension::MyRenamedEventsBasedBehavior");
     }
 
@@ -2366,7 +2346,9 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
               .Get("MyEventsBasedObject")
               .GetEventsFunctions()
               .GetEventsFunction("MyObjectEventsFunction");
-      REQUIRE(myBehaviorEventsFunction.GetParameters().at(2).GetExtraInfo() ==
+      REQUIRE(myBehaviorEventsFunction.GetParameters()
+                  .GetParameter(2)
+                  .GetExtraInfo() ==
               "MyEventsExtension::MyRenamedEventsBasedBehavior");
     }
   }
@@ -2449,7 +2431,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     auto &myEventsFunction =
         project.GetEventsFunctionsExtension("MyEventsExtension")
             .GetEventsFunction("MyEventsFunction");
-    REQUIRE(myEventsFunction.GetParameters().at(1).GetExtraInfo() ==
+    REQUIRE(myEventsFunction.GetParameters().GetParameter(1).GetExtraInfo() ==
             "MyEventsExtension::MyRenamedEventsBasedObject");
 
     // Behavior function
@@ -2460,7 +2442,9 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
               .Get("MyEventsBasedBehavior")
               .GetEventsFunctions()
               .GetEventsFunction("MyBehaviorEventsFunction");
-      REQUIRE(myBehaviorEventsFunction.GetParameters().at(2).GetExtraInfo() ==
+      REQUIRE(myBehaviorEventsFunction.GetParameters()
+                  .GetParameter(2)
+                  .GetExtraInfo() ==
               "MyEventsExtension::MyRenamedEventsBasedObject");
     }
 
@@ -2472,7 +2456,9 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
               .Get("MyEventsBasedObject")
               .GetEventsFunctions()
               .GetEventsFunction("MyObjectEventsFunction");
-      REQUIRE(myBehaviorEventsFunction.GetParameters().at(1).GetExtraInfo() ==
+      REQUIRE(myBehaviorEventsFunction.GetParameters()
+                  .GetParameter(1)
+                  .GetExtraInfo() ==
               "MyEventsExtension::MyRenamedEventsBasedObject");
     }
   }
@@ -3584,7 +3570,7 @@ CreateExpressionWithLayerParameter(gd::Project &project,
 } // namespace
 
 TEST_CASE("RenameLayer", "[common]") {
-  SECTION("Can update layer names in events") {
+  SECTION("Can update layer names in scene events") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
@@ -3616,7 +3602,7 @@ TEST_CASE("RenameLayer", "[common]") {
     auto &otherExternalExpression = CreateExpressionWithLayerParameter(
         project, otherExternalEvents.GetEvents(), "My layer");
 
-    gd::WholeProjectRefactorer::RenameLayer(project, layout, "My layer",
+    gd::WholeProjectRefactorer::RenameLayerInScene(project, layout, "My layer",
                                             "My renamed layer");
 
     REQUIRE(layoutAction.GetParameter(3).GetPlainString() ==
@@ -3644,6 +3630,38 @@ TEST_CASE("RenameLayer", "[common]") {
             "MyExtension::CameraCenterX(\"My layer\")");
   }
 
+  SECTION("Can update layer names in event-based object events") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &eventsExtension =
+        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+    auto &eventsBasedObject = eventsExtension.GetEventsBasedObjects().InsertNew(
+        "MyEventsBasedObject", 0);
+    auto &eventsFunction =
+        eventsBasedObject.GetEventsFunctions().InsertNewEventsFunction(
+            "MyEventsFunction", 0);
+    gd::WholeProjectRefactorer::EnsureObjectEventsFunctionsProperParameters(
+        eventsExtension, eventsBasedObject);
+
+    auto &action =
+        CreateActionWithLayerParameter(project, eventsFunction.GetEvents());
+
+    auto &expression = CreateExpressionWithLayerParameter(
+        project, eventsFunction.GetEvents(), "My layer");
+
+    gd::WholeProjectRefactorer::RenameLayerInEventsBasedObject(
+        project, eventsExtension, eventsBasedObject, "My layer",
+        "My renamed layer");
+
+    REQUIRE(action.GetParameter(3).GetPlainString() == "\"My renamed layer\"");
+
+    REQUIRE(expression.GetParameter(0).GetPlainString() ==
+            "MyExtension::CameraCenterX(\"My renamed layer\") + "
+            "MyExtension::CameraCenterX(\"My renamed layer\")");
+  }
+
   SECTION("Can update layer names in expressions with a smaller name") {
     gd::Project project;
     gd::Platform platform;
@@ -3654,7 +3672,7 @@ TEST_CASE("RenameLayer", "[common]") {
     auto &layoutExpression =
         CreateExpressionWithLayerParameter(project, layout.GetEvents(), "My layer");
 
-    gd::WholeProjectRefactorer::RenameLayer(project, layout, "My layer",
+    gd::WholeProjectRefactorer::RenameLayerInScene(project, layout, "My layer",
                                             "layerA");
 
     REQUIRE(layoutExpression.GetParameter(0).GetPlainString() ==
@@ -3662,7 +3680,7 @@ TEST_CASE("RenameLayer", "[common]") {
             "MyExtension::CameraCenterX(\"layerA\")");
   }
 
-  SECTION("Renaming a layer also moves the instances on this layer and of the associated external layouts") {
+  SECTION("Renaming a layer also moves the instances on this layer in its scene and associated external layouts") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
@@ -3713,7 +3731,7 @@ TEST_CASE("RenameLayer", "[common]") {
     REQUIRE(otherInitialInstance1.GetLayer() == "My layer");
     REQUIRE(otherExternalInitialInstance1.GetLayer() == "My layer");
 
-    gd::WholeProjectRefactorer::RenameLayer(project, layout, "My layer", "My new layer");
+    gd::WholeProjectRefactorer::RenameLayerInScene(project, layout, "My layer", "My new layer");
 
     // Instances on the renamed layer are moved to the new layer.
     REQUIRE(initialInstance1.GetLayer() == "My new layer");
@@ -3728,6 +3746,46 @@ TEST_CASE("RenameLayer", "[common]") {
     REQUIRE(otherExternalInitialInstance1.GetLayer() == "My layer");
   }
 
+  SECTION("Renaming a layer also moves the instances on this layer in its "
+          "event-based object") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &eventsExtension =
+        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+    auto &eventsBasedObject = eventsExtension.GetEventsBasedObjects().InsertNew(
+        "MyEventsBasedObject", 0);
+    auto &eventsFunction =
+        eventsBasedObject.GetEventsFunctions().InsertNewEventsFunction(
+            "MyEventsFunction", 0);
+    gd::WholeProjectRefactorer::EnsureObjectEventsFunctionsProperParameters(
+        eventsExtension, eventsBasedObject);
+
+    eventsBasedObject.GetLayers().InsertNewLayer("My layer", 0);
+
+    auto &initialInstances = eventsBasedObject.GetInitialInstances();
+    auto &initialInstance1 = initialInstances.InsertNewInitialInstance();
+    initialInstance1.SetLayer("My layer");
+    auto &initialInstance2 = initialInstances.InsertNewInitialInstance();
+    initialInstance2.SetLayer("My layer");
+    auto &initialInstance3 = initialInstances.InsertNewInitialInstance();
+    initialInstance3.SetLayer("");
+
+    REQUIRE(initialInstance1.GetLayer() == "My layer");
+    REQUIRE(initialInstance2.GetLayer() == "My layer");
+    REQUIRE(initialInstance3.GetLayer() == "");
+
+    gd::WholeProjectRefactorer::RenameLayerInEventsBasedObject(
+        project, eventsExtension, eventsBasedObject, "My layer",
+        "My new layer");
+
+    // Instances on the renamed layer are moved to the new layer.
+    REQUIRE(initialInstance1.GetLayer() == "My new layer");
+    REQUIRE(initialInstance2.GetLayer() == "My new layer");
+    REQUIRE(initialInstance3.GetLayer() == "");
+  }
+
   SECTION("Can rename a layer when a layer parameter is empty") {
     gd::Project project;
     gd::Platform platform;
@@ -3738,7 +3796,7 @@ TEST_CASE("RenameLayer", "[common]") {
     auto &layoutAction =
         CreateActionWithEmptyLayerParameter(project, layout.GetEvents());
 
-    gd::WholeProjectRefactorer::RenameLayer(project, layout, "My layer",
+    gd::WholeProjectRefactorer::RenameLayerInScene(project, layout, "My layer",
                                             "layerA");
 
     REQUIRE(layoutAction.GetParameter(0).GetPlainString() == "");
@@ -3754,7 +3812,7 @@ TEST_CASE("RenameLayer", "[common]") {
     auto &layoutExpression =
         CreateExpressionWithLayerParameter(project, layout.GetEvents(), "My layer");
 
-    gd::WholeProjectRefactorer::RenameLayer(project, layout, "My layer",
+    gd::WholeProjectRefactorer::RenameLayerInScene(project, layout, "My layer",
                                             "");
 
     REQUIRE(layoutExpression.GetParameter(0).GetPlainString() ==
@@ -3772,7 +3830,7 @@ TEST_CASE("RenameLayer", "[common]") {
     auto &layoutExpression =
         CreateExpressionWithLayerParameter(project, layout.GetEvents(), "");
 
-    gd::WholeProjectRefactorer::RenameLayer(project, layout, "", "My layer");
+    gd::WholeProjectRefactorer::RenameLayerInScene(project, layout, "", "My layer");
 
     REQUIRE(layoutExpression.GetParameter(0).GetPlainString() ==
             "MyExtension::CameraCenterX(\"\") + "
@@ -3813,7 +3871,7 @@ CreateExpressionWithAnimationParameter(gd::Project &project,
 } // namespace
 
 TEST_CASE("RenameObjectAnimation", "[common]") {
-  SECTION("Can update object animation names in event") {
+  SECTION("Can update object animation names in scene events") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
@@ -3855,7 +3913,7 @@ TEST_CASE("RenameObjectAnimation", "[common]") {
     auto &wrongObjectExpression =
         CreateExpressionWithAnimationParameter(project, layout.GetEvents(), "MySprite2");
 
-    gd::WholeProjectRefactorer::RenameObjectAnimation(project, layout, object, "My animation",
+    gd::WholeProjectRefactorer::RenameObjectAnimationInScene(project, layout, object, "My animation",
                                             "My renamed animation");
 
     REQUIRE(layoutAction.GetParameter(1).GetPlainString() ==
@@ -3883,6 +3941,53 @@ TEST_CASE("RenameObjectAnimation", "[common]") {
     REQUIRE(otherExternalExpression.GetParameter(0).GetPlainString() ==
             "MySprite.AnimationFrameCount(\"My animation\") + "
             "MySprite.AnimationFrameCount(\"My animation\")");
+    REQUIRE(wrongObjectExpression.GetParameter(0).GetPlainString() ==
+            "MySprite2.AnimationFrameCount(\"My animation\") + "
+            "MySprite2.AnimationFrameCount(\"My animation\")");
+  }
+
+  SECTION("Can update object animation names in events-based object events") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &eventsExtension =
+        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+    auto &eventsBasedObject = eventsExtension.GetEventsBasedObjects().InsertNew(
+        "MyEventsBasedObject", 0);
+    auto &eventsFunction =
+        eventsBasedObject.GetEventsFunctions().InsertNewEventsFunction(
+            "MyEventsFunction", 0);
+    gd::WholeProjectRefactorer::EnsureObjectEventsFunctionsProperParameters(
+        eventsExtension, eventsBasedObject);
+
+    auto &object = eventsBasedObject.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MySprite", 0);
+    eventsBasedObject.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MySprite2", 1);
+
+    auto &action = CreateActionWithAnimationParameter(
+        project, eventsFunction.GetEvents(), "MySprite");
+    auto &wrongObjectAction = CreateActionWithAnimationParameter(
+        project, eventsFunction.GetEvents(), "MySprite2");
+
+    auto &expression = CreateExpressionWithAnimationParameter(
+        project, eventsFunction.GetEvents(), "MySprite");
+    auto &wrongObjectExpression = CreateExpressionWithAnimationParameter(
+        project, eventsFunction.GetEvents(), "MySprite2");
+
+    gd::WholeProjectRefactorer::RenameObjectAnimationInEventsBasedObject(
+        project, eventsExtension, eventsBasedObject, object, "My animation",
+        "My renamed animation");
+
+    REQUIRE(action.GetParameter(1).GetPlainString() ==
+            "\"My renamed animation\"");
+    REQUIRE(wrongObjectAction.GetParameter(1).GetPlainString() ==
+            "\"My animation\"");
+
+    REQUIRE(expression.GetParameter(0).GetPlainString() ==
+            "MySprite.AnimationFrameCount(\"My renamed animation\") + "
+            "MySprite.AnimationFrameCount(\"My renamed animation\")");
     REQUIRE(wrongObjectExpression.GetParameter(0).GetPlainString() ==
             "MySprite2.AnimationFrameCount(\"My animation\") + "
             "MySprite2.AnimationFrameCount(\"My animation\")");
@@ -3922,7 +4027,7 @@ CreateExpressionWithLayerEffectParameter(gd::Project &project,
 } // namespace
 
 TEST_CASE("RenameLayerEffect", "[common]") {
-  SECTION("Can update layer effect names in event") {
+  SECTION("Can update layer effect names in scene events") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
@@ -3966,7 +4071,7 @@ TEST_CASE("RenameLayerEffect", "[common]") {
     auto &wrongLayerExpression =
         CreateExpressionWithLayerEffectParameter(project, layout.GetEvents(), "My layer 2");
 
-    gd::WholeProjectRefactorer::RenameLayerEffect(project, layout, layer, "My effect",
+    gd::WholeProjectRefactorer::RenameLayerEffectInScene(project, layout, layer, "My effect",
                                             "My renamed effect");
 
     REQUIRE(layoutAction.GetParameter(2).GetPlainString() ==
@@ -3998,10 +4103,61 @@ TEST_CASE("RenameLayerEffect", "[common]") {
             "MyExtension::LayerEffectParameter(\"My layer 2\", \"My effect\") + "
             "MyExtension::LayerEffectParameter(\"My layer 2\", \"My effect\")");
   }
+
+  SECTION("Can update layer effect names in events-based object events") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &eventsExtension =
+        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+    auto &eventsBasedObject = eventsExtension.GetEventsBasedObjects().InsertNew(
+        "MyEventsBasedObject", 0);
+    auto &eventsFunction =
+        eventsBasedObject.GetEventsFunctions().InsertNewEventsFunction(
+            "MyEventsFunction", 0);
+    gd::WholeProjectRefactorer::EnsureObjectEventsFunctionsProperParameters(
+        eventsExtension, eventsBasedObject);
+
+    eventsBasedObject.GetLayers().InsertNewLayer("My layer", 0);
+    auto &layer = eventsBasedObject.GetLayers().GetLayer("My layer");
+    auto &object = eventsBasedObject.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MySprite", 0);
+    eventsBasedObject.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MySprite2", 1);
+
+    auto &action = CreateActionWithLayerEffectParameter(
+        project, eventsFunction.GetEvents(), "My layer");
+    auto &wrongLayerAction = CreateActionWithLayerEffectParameter(
+        project, eventsFunction.GetEvents(), "My layer 2");
+
+    auto &expression = CreateExpressionWithLayerEffectParameter(
+        project, eventsFunction.GetEvents(), "My layer");
+    auto &wrongLayerExpression = CreateExpressionWithLayerEffectParameter(
+        project, eventsFunction.GetEvents(), "My layer 2");
+
+    gd::WholeProjectRefactorer::RenameLayerEffectInEventsBasedObject(
+        project, eventsExtension, eventsBasedObject, layer, "My effect",
+        "My renamed effect");
+
+    REQUIRE(action.GetParameter(2).GetPlainString() == "\"My renamed effect\"");
+    REQUIRE(wrongLayerAction.GetParameter(2).GetPlainString() ==
+            "\"My effect\"");
+
+    REQUIRE(expression.GetParameter(0).GetPlainString() ==
+            "MyExtension::LayerEffectParameter(\"My layer\", \"My renamed "
+            "effect\") + "
+            "MyExtension::LayerEffectParameter(\"My layer\", \"My renamed "
+            "effect\")");
+    REQUIRE(
+        wrongLayerExpression.GetParameter(0).GetPlainString() ==
+        "MyExtension::LayerEffectParameter(\"My layer 2\", \"My effect\") + "
+        "MyExtension::LayerEffectParameter(\"My layer 2\", \"My effect\")");
+  }
 }
 
 TEST_CASE("RemoveLayer", "[common]") {
-  SECTION("Can remove instances from a layer (in a scene and their associated external layouts)") {
+  SECTION("Can remove instances from a layer (in a scene and its associated external layouts)") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
@@ -4086,7 +4242,7 @@ TEST_CASE("RemoveLayer", "[common]") {
 }
 
 TEST_CASE("MergeLayers", "[common]") {
-  SECTION("Can merge instances from a layer into another layer (in a scene and their associated external layouts)") {
+  SECTION("Can merge instances from a layer into another layer (in a scene and its associated external layouts)") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);

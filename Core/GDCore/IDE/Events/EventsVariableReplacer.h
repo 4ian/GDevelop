@@ -35,13 +35,24 @@ class GD_CORE_API EventsVariableReplacer
  public:
   EventsVariableReplacer(
       const gd::Platform &platform_,
-      const gd::VariablesContainer &targetVariablesContainer_,
       const VariablesRenamingChangesetNode &variablesRenamingChangesetRoot_,
-      const std::unordered_set<gd::String> &removedVariableNames_)
+      const std::unordered_set<gd::String> &removedVariableNames_,
+      const gd::VariablesContainer &targetVariablesContainer_)
       : platform(platform_),
-        targetVariablesContainer(targetVariablesContainer_),
         variablesRenamingChangesetRoot(variablesRenamingChangesetRoot_),
-        removedVariableNames(removedVariableNames_) {};
+        removedVariableNames(removedVariableNames_),
+        targetVariablesContainer(targetVariablesContainer_),
+        targetGroupName("") {};
+  EventsVariableReplacer(
+      const gd::Platform &platform_,
+      const VariablesRenamingChangesetNode &variablesRenamingChangesetRoot_,
+      const std::unordered_set<gd::String> &removedVariableNames_,
+      const gd::String &targetGroupName_)
+      : platform(platform_),
+        variablesRenamingChangesetRoot(variablesRenamingChangesetRoot_),
+        removedVariableNames(removedVariableNames_),
+        targetVariablesContainer(nullVariablesContainer),
+        targetGroupName(targetGroupName_) {};
   virtual ~EventsVariableReplacer();
 
  private:
@@ -55,9 +66,16 @@ class GD_CORE_API EventsVariableReplacer
 
   const gd::Platform &platform;
   const gd::VariablesContainer &targetVariablesContainer;
-  gd::String objectName;
+  /**
+   * Groups don't have VariablesContainer, so `targetVariablesContainer` will be
+   * pointing to `nullVariablesContainer` and the group name is use instead to
+   * check which variable accesses to modify in expressions.
+   */
+  const gd::String targetGroupName;
   const VariablesRenamingChangesetNode &variablesRenamingChangesetRoot;
   const std::unordered_set<gd::String> &removedVariableNames;
+
+  static VariablesContainer nullVariablesContainer;
 };
 
 }  // namespace gd

@@ -15,7 +15,7 @@ import InstructionOrObjectSelector, {
 } from './InstructionOrObjectSelector';
 import InstructionOrExpressionSelector from './InstructionOrExpressionSelector';
 import HelpButton from '../../UI/HelpButton';
-import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
+import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 import { SelectColumns } from '../../UI/Responsive/SelectColumns';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import {
@@ -33,7 +33,7 @@ import ExtensionsSearchDialog from '../../AssetStore/ExtensionStore/ExtensionsSe
 import { sendBehaviorAdded } from '../../Utils/Analytics/EventSender';
 import { useShouldAutofocusInput } from '../../UI/Responsive/ScreenTypeMeasurer';
 import ErrorBoundary from '../../UI/ErrorBoundary';
-import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 
 const styles = {
   fullHeightSelector: {
@@ -427,7 +427,7 @@ const InstructionEditorDialog = ({
       {newBehaviorDialogOpen && chosenObject && (
         <NewBehaviorDialog
           project={project}
-          eventsFunctionsExtension={scope.eventsFunctionsExtension}
+          eventsFunctionsExtension={scope.eventsFunctionsExtension || null}
           open={newBehaviorDialogOpen}
           objectType={chosenObject.getType()}
           objectBehaviorsTypes={listObjectBehaviorsTypes(chosenObject)}

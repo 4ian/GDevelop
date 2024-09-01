@@ -72,12 +72,12 @@ public:
       gd::String lastObjectParameter = "";
       const gd::InstructionMetadata &instrInfos =
           MetadataProvider::GetActionMetadata(platform, instruction.GetType());
-      for (std::size_t pNb = 0; pNb < instrInfos.parameters.size(); ++pNb) {
+      for (std::size_t pNb = 0; pNb < instrInfos.parameters.GetParametersCount(); ++pNb) {
 
         if (ParameterMetadata::IsExpression(
-                "number", instrInfos.parameters[pNb].GetType()) ||
+                "number", instrInfos.parameters.GetParameter(pNb).GetType()) ||
             ParameterMetadata::IsExpression(
-                "string", instrInfos.parameters[pNb].GetType())) {
+                "string", instrInfos.parameters.GetParameter(pNb).GetType())) {
           auto node = instruction.GetParameter(pNb).GetRootNode();
           node->Visit(*this);
         }

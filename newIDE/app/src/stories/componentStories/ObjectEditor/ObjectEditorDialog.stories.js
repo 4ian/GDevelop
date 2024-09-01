@@ -29,6 +29,8 @@ export const CustomObject = () => (
       getValidatedObjectOrGroupName={newName => newName}
       project={testProject.project}
       layout={testProject.testLayout}
+      eventsFunctionsExtension={null}
+      eventsBasedObject={null}
       resourceManagementProps={fakeResourceManagementProps}
       onComputeAllVariableNames={() => []}
       onUpdateBehaviorsSharedData={() => {}}
@@ -36,6 +38,7 @@ export const CustomObject = () => (
       hotReloadPreviewButtonProps={{
         hasPreviewsRunning: false,
         launchProjectDataOnlyPreview: () => action('Hot-reload'),
+        launchProjectCodeAndDataPreview: action('Hot-reload with code'),
         launchProjectWithLoadingScreenPreview: () => action('Reload'),
       }}
       openBehaviorEvents={() => action('Open behavior events')}
@@ -57,6 +60,8 @@ export const StandardObject = () => (
       getValidatedObjectOrGroupName={newName => newName}
       project={testProject.project}
       layout={testProject.testLayout}
+      eventsFunctionsExtension={null}
+      eventsBasedObject={null}
       resourceManagementProps={fakeResourceManagementProps}
       onComputeAllVariableNames={() => []}
       onUpdateBehaviorsSharedData={() => {}}
@@ -64,6 +69,7 @@ export const StandardObject = () => (
       hotReloadPreviewButtonProps={{
         hasPreviewsRunning: false,
         launchProjectDataOnlyPreview: () => action('Hot-reload'),
+        launchProjectCodeAndDataPreview: action('Hot-reload with code'),
         launchProjectWithLoadingScreenPreview: () => action('Reload'),
       }}
       openBehaviorEvents={() => action('Open behavior events')}

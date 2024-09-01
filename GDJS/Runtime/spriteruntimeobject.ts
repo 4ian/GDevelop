@@ -8,6 +8,8 @@ namespace gdjs {
   export type SpriteObjectDataType = {
     /** Update the object even if he is not visible?. */
     updateIfNotVisible: boolean;
+    /** The scale applied to object to evaluate the default dimensions */
+    preScale?: float;
     /** The list of {@link SpriteAnimationData} representing {@link gdjs.SpriteAnimation} instances. */
     animations: Array<SpriteAnimationData>;
   };
@@ -46,6 +48,7 @@ namespace gdjs {
     _flippedY: boolean = false;
     opacity: float = 255;
     _updateIfNotVisible: boolean;
+    _preScale: float = 1;
 
     _renderer: gdjs.SpriteRuntimeObjectRenderer;
     _animationFrameDirty = true;
@@ -60,6 +63,7 @@ namespace gdjs {
     ) {
       super(instanceContainer, spriteObjectData);
       this._updateIfNotVisible = !!spriteObjectData.updateIfNotVisible;
+      this._preScale = spriteObjectData.preScale || 1;
       this._renderer = new gdjs.SpriteRuntimeObjectRenderer(
         this,
         instanceContainer
@@ -87,6 +91,7 @@ namespace gdjs {
       this._flippedY = false;
       this.opacity = 255;
       this._updateIfNotVisible = !!spriteObjectData.updateIfNotVisible;
+      this._preScale = spriteObjectData.preScale || 1;
       this._renderer.reinitialize(this, instanceContainer);
       this._updateAnimationFrame();
 
@@ -98,6 +103,7 @@ namespace gdjs {
       oldObjectData: SpriteObjectData,
       newObjectData: SpriteObjectData
     ): boolean {
+      this._preScale = newObjectData.preScale || 1;
       this._animator.updateFromObjectData(
         oldObjectData.animations,
         newObjectData.animations
@@ -534,8 +540,8 @@ namespace gdjs {
       }
 
       //Scale
-      const absScaleX = Math.abs(this._scaleX);
-      const absScaleY = Math.abs(this._scaleY);
+      const absScaleX = Math.abs(this._scaleX * this._preScale);
+      const absScaleY = Math.abs(this._scaleY * this._preScale);
       x *= absScaleX;
       y *= absScaleY;
       cx *= absScaleX;
@@ -566,7 +572,7 @@ namespace gdjs {
       if (animationFrame === null) {
         return this.x;
       }
-      const absScaleX = Math.abs(this._scaleX);
+      const absScaleX = Math.abs(this._scaleX * this._preScale);
       if (!this._flippedX) {
         return this.x - animationFrame.origin.x * absScaleX;
       } else {
@@ -589,7 +595,7 @@ namespace gdjs {
       if (animationFrame === null) {
         return this.y;
       }
-      const absScaleY = Math.abs(this._scaleY);
+      const absScaleY = Math.abs(this._scaleY * this._preScale);
       if (!this._flippedY) {
         return this.y - animationFrame.origin.y * absScaleY;
       } else {
@@ -614,11 +620,13 @@ namespace gdjs {
       }
       if (!this._flippedX) {
         //Just need to multiply by the scale as it is the center.
-        return animationFrame.center.x * Math.abs(this._scaleX);
+        return (
+          animationFrame.center.x * Math.abs(this._scaleX * this._preScale)
+        );
       } else {
         return (
           (this._renderer.getUnscaledWidth() - animationFrame.center.x) *
-          Math.abs(this._scaleX)
+          Math.abs(this._scaleX * this._preScale)
         );
       }
     }
@@ -634,11 +642,13 @@ namespace gdjs {
       }
       if (!this._flippedY) {
         //Just need to multiply by the scale as it is the center.
-        return animationFrame.center.y * Math.abs(this._scaleY);
+        return (
+          animationFrame.center.y * Math.abs(this._scaleY * this._preScale)
+        );
       } else {
         return (
           (this._renderer.getUnscaledHeight() - animationFrame.center.y) *
-          Math.abs(this._scaleY)
+          Math.abs(this._scaleY * this._preScale)
         );
       }
     }

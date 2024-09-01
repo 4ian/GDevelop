@@ -208,7 +208,10 @@ namespace gdjs {
     };
 
     const handleChangeVariableOwnerMessagesToSend = function () {
-      if (!gdjs.multiplayer.isLobbyGameRunning()) {
+      if (
+        !gdjs.multiplayer.isLobbyGameRunning() ||
+        !gdjs.multiplayer.isReadyToSendOrReceiveGameUpdateMessages()
+      ) {
         return;
       }
 

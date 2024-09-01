@@ -18,6 +18,10 @@ import ThreeDotsMenu from '../../../../UI/CustomSvgIcons/ThreeDotsMenu';
 import ChevronArrowRight from '../../../../UI/CustomSvgIcons/ChevronArrowRight';
 import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
 import { type ClientCoordinates } from '../../../../Utils/UseLongTouch';
+import { copyTextToClipboard } from '../../../../Utils/Clipboard';
+import Copy from '../../../../UI/CustomSvgIcons/Copy';
+import Check from '../../../../UI/CustomSvgIcons/Check';
+import { delay } from '../../../../Utils/Delay';
 
 const styles = {
   listItem: {
@@ -25,6 +29,7 @@ const styles = {
     borderRadius: 8,
     overflowWrap: 'anywhere', // Ensure everything is wrapped on small devices.
   },
+  copyIconContainer: { opacity: 0.7, display: 'flex' },
 };
 
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget<{}>('team-groups');
@@ -46,6 +51,20 @@ const TeamMemberRow = ({
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const [emailCopySuccess, setEmailCopySuccess] = React.useState<boolean>(
+    false
+  );
+
+  React.useEffect(
+    () => {
+      (async () => {
+        if (!emailCopySuccess) return;
+        await delay(2000);
+        setEmailCopySuccess(false);
+      })();
+    },
+    [emailCopySuccess]
+  );
 
   return (
     <DragSourceAndDropTarget
@@ -106,6 +125,21 @@ const TeamMemberRow = ({
                         <Text allowSelection noMargin color="secondary">
                           {member.email}
                         </Text>
+                        <IconButton
+                          size="small"
+                          onClick={() => {
+                            setEmailCopySuccess(true);
+                            copyTextToClipboard(member.email);
+                          }}
+                        >
+                          {emailCopySuccess ? (
+                            <Check fontSize="small" />
+                          ) : (
+                            <div style={styles.copyIconContainer}>
+                              <Copy fontSize="small" />
+                            </div>
+                          )}
+                        </IconButton>
                       </LineStackLayout>
                     )}
                   </div>

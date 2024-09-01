@@ -1,6 +1,7 @@
 import {
   EditableTileMap,
   EditableTileMapLayer,
+  EditableTileMapAsJsObject,
   PixiTileMapHelper,
   TileDefinition,
   TileMapFileContent,
@@ -14,6 +15,7 @@ declare global {
     export {
       EditableTileMap,
       EditableTileMapLayer,
+      EditableTileMapAsJsObject,
       PixiTileMapHelper,
       TileDefinition,
       TileMapFileContent,

@@ -14,14 +14,20 @@ const styles = {
   },
 };
 
-const ExplanationHeader = () => {
+type ExplanationHeaderProps = {|
+  uiMode: 'minimal' | 'full',
+|};
+
+const ExplanationHeader = ({ uiMode }: ExplanationHeaderProps) => {
+  if (uiMode === 'minimal') return null;
+
   return (
     <Column noMargin>
       <Line alignItems="center" justifyContent="center">
         <Text align="center">
           <Trans>
-            Generate a unique link, playable from any computer or mobile phone's
-            browser.
+            Publishing to gd.games, the GDevelop gaming platform. Games can be
+            played from any device.
           </Trans>
         </Text>
       </Line>

@@ -18,7 +18,6 @@ import SelectOption from '../UI/SelectOption';
 import CreateProfile from '../Profile/CreateProfile';
 import Paper from '../UI/Paper';
 import { Column, Line } from '../UI/Grid';
-import LeftLoader from '../UI/LeftLoader';
 import {
   checkIfHasTooManyCloudProjects,
   MaxProjectCountAlertMessage,
@@ -53,6 +52,7 @@ import { I18n } from '@lingui/react';
 import GetSubscriptionCard from '../Profile/Subscription/GetSubscriptionCard';
 import { type PrivateGameTemplateListingData } from '../Utils/GDevelopServices/Shop';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
+import { CLOUD_PROJECT_NAME_MAX_LENGTH } from '../Utils/GDevelopServices/Project';
 
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
@@ -67,6 +67,7 @@ export type NewProjectSetup = {|
   orientation?: 'landscape' | 'portrait' | 'default',
   optimizeForPixelArt?: boolean,
   allowPlayersToLogIn?: boolean,
+  openQuickCustomizationDialog?: boolean,
 |};
 
 type Props = {|
@@ -108,11 +109,12 @@ const NewProjectSetupDialog = ({
   authenticatedUser,
 }: Props): React.Node => {
   const generateProjectName = () =>
-    selectedExampleShortHeader
+    (selectedExampleShortHeader
       ? `${generateName()} (${selectedExampleShortHeader.name})`
       : selectedPrivateGameTemplateListingData
       ? `${generateName()} (${selectedPrivateGameTemplateListingData.name})`
-      : generateName();
+      : generateName()
+    ).slice(0, CLOUD_PROJECT_NAME_MAX_LENGTH);
 
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
@@ -420,15 +422,13 @@ const NewProjectSetupDialog = ({
               label={<Trans>Cancel</Trans>}
               onClick={onClose}
             />,
-            <LeftLoader isLoading={isLoading} key="create">
-              <DialogPrimaryButton
-                primary
-                disabled={shouldNotAllowCreatingProject}
-                label={<Trans>Create project</Trans>}
-                onClick={() => onValidate(i18n)}
-                id="create-project-button"
-              />
-            </LeftLoader>,
+            <DialogPrimaryButton
+              primary
+              disabled={shouldNotAllowCreatingProject || isLoading}
+              label={<Trans>Create project</Trans>}
+              onClick={() => onValidate(i18n)}
+              id="create-project-button"
+            />,
           ]}
           cannotBeDismissed={isLoading}
           onRequestClose={onClose}
@@ -464,7 +464,7 @@ const NewProjectSetupDialog = ({
                 </IconButton>
               }
               autoFocus="desktop"
-              maxLength={100}
+              maxLength={CLOUD_PROJECT_NAME_MAX_LENGTH}
             />
             <SelectField
               fullWidth

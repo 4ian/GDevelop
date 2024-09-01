@@ -20,10 +20,12 @@ import {
 import IconButton from '../UI/IconButton';
 import ChevronArrowLeft from '../UI/CustomSvgIcons/ChevronArrowLeft';
 import ChevronArrowRight from '../UI/CustomSvgIcons/ChevronArrowRight';
-import { Column, Line } from '../UI/Grid';
+import { Column, Line, Spacer } from '../UI/Grid';
 import Text from '../UI/Text';
 import Paper from '../UI/Paper';
 import BackgroundText from '../UI/BackgroundText';
+import { getDefaultRegisterGamePropertiesFromProject } from '../Utils/UseGameAndBuildsManager';
+import UserEarnings from './Monetization/UserEarnings';
 
 const pageSize = 10;
 
@@ -106,12 +108,11 @@ const GamesList = ({ project, games, onRefreshGames, onOpenGameId }: Props) => {
       const { id } = profile;
       try {
         setIsGameRegistering(true);
-        await registerGame(getAuthorizationHeader, id, {
-          gameId: project.getProjectUuid(),
-          authorName: project.getAuthor() || 'Unspecified publisher',
-          gameName: project.getName() || 'Untitled game',
-          templateSlug: project.getTemplateSlug(),
-        });
+        await registerGame(
+          getAuthorizationHeader,
+          id,
+          getDefaultRegisterGamePropertiesFromProject({ project })
+        );
         await onRefreshGames();
       } catch (error) {
         console.error('Unable to register the game.', error);
@@ -220,13 +221,13 @@ const GamesList = ({ project, games, onRefreshGames, onOpenGameId }: Props) => {
 
   return (
     <ColumnStackLayout noMargin>
-      {!isGameRegistering && (
-        <GameRegistration
-          project={project}
-          hideLoader
-          onGameRegistered={onRefreshGames}
-        />
-      )}
+      <UserEarnings />
+      <Spacer />
+      <Line noMargin>
+        <Text size="section-title" noMargin>
+          <Trans>Published games</Trans>
+        </Text>
+      </Line>
       <Line noMargin alignItems="center">
         <Column noMargin expand>
           <SearchBar
@@ -257,7 +258,13 @@ const GamesList = ({ project, games, onRefreshGames, onOpenGameId }: Props) => {
           <ChevronArrowRight />
         </IconButton>
       </Line>
-
+      {!isGameRegistering && (
+        <GameRegistration
+          project={project}
+          hideLoader
+          onGameRegistered={onRefreshGames}
+        />
+      )}
       {displayedGames.length > 0 ? (
         displayedGames.map(game => (
           <GameCard

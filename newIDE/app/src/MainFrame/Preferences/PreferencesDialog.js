@@ -33,9 +33,14 @@ const electron = optionalRequire('electron');
 type Props = {|
   i18n: I18n,
   onClose: (options: {| languageDidChange: boolean |}) => void,
+  onOpenQuickCustomizationDialog: () => void,
 |};
 
-const PreferencesDialog = ({ i18n, onClose }: Props) => {
+const PreferencesDialog = ({
+  i18n,
+  onClose,
+  onOpenQuickCustomizationDialog,
+}: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const [currentTab, setCurrentTab] = React.useState('preferences');
   const [languageDidChange, setLanguageDidChange] = React.useState<boolean>(
@@ -524,6 +529,11 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
                     them (dev only)
                   </Trans>
                 }
+              />
+              <FlatButton
+                fullWidth
+                onClick={onOpenQuickCustomizationDialog}
+                label={<Trans>Open quick customization</Trans>}
               />
             </>
           )}

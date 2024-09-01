@@ -327,15 +327,14 @@ gd::String ObjectCodeGenerator::GenerateUpdatePropertyFromObjectDataCode(
 
 gd::String ObjectCodeGenerator::GeneratePropertyValueCode(
     const gd::PropertyDescriptor& property) {
-  if (property.GetType() == "String" ||
-      property.GetType() == "Choice" ||
-      property.GetType() == "Color") {
+  if (property.GetType() == "String" || property.GetType() == "Choice" ||
+      property.GetType() == "Color" || property.GetType() == "Resource") {
     return EventsCodeGenerator::ConvertToStringExplicit(property.GetValue());
   } else if (property.GetType() == "Number") {
     return "Number(" +
            EventsCodeGenerator::ConvertToStringExplicit(property.GetValue()) +
            ") || 0";
-  } else if (property.GetType() == "Boolean") {  // TODO: Check if working
+  } else if (property.GetType() == "Boolean") { // TODO: Check if working
     return property.GetValue() == "true" ? "true" : "false";
   }
 

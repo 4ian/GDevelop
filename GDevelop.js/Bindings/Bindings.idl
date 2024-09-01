@@ -182,9 +182,6 @@ interface VersionWrapper {
 
     [Const, Value] DOMString STATIC_FullString();
     [Const, Value] DOMString STATIC_Status();
-    [Const, Value] DOMString STATIC_Year();
-    [Const, Value] DOMString STATIC_Month();
-    [Const, Value] DOMString STATIC_Date();
 };
 
 interface Platform {
@@ -226,6 +223,7 @@ interface PairStringVariable {
 
 enum Variable_Type {
     "Variable::Unknown",
+    "Variable::MixedTypes",
     "Variable::String",
     "Variable::Number",
     "Variable::Boolean",
@@ -264,6 +262,7 @@ interface Variable {
     double GetValue();
     void SetBool([Const] boolean val);
     boolean GetBool();
+    boolean HasMixedValues();
     void SetFolded(boolean val);
     boolean IsFolded();
 
@@ -350,6 +349,16 @@ interface ObjectGroup {
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
+};
+
+interface GroupVariableHelper {
+    [Value] VariablesContainer STATIC_MergeVariableContainers(
+        [Const, Ref] ObjectsContainersList objectsContainersList,
+        [Const, Ref] ObjectGroup objectGroup);
+    void STATIC_FillAnyVariableBetweenObjects(
+        [Ref] ObjectsContainer globalObjectsContainer,
+        [Ref] ObjectsContainer objectsContainer,
+        [Const, Ref] ObjectGroup objectGroup);
 };
 
 interface ObjectGroupsContainer {
@@ -453,6 +462,9 @@ interface ObjectFolderOrObject {
     void MoveChild(unsigned long oldIndex, unsigned long newIndex);
     void RemoveFolderChild([Const, Ref] ObjectFolderOrObject childToRemove);
     boolean IsADescendantOf([Const, Ref] ObjectFolderOrObject otherObjectFolderOrObject);
+
+    QuickCustomization_Visibility GetQuickCustomizationVisibility();
+    void SetQuickCustomizationVisibility(QuickCustomization_Visibility visibility);
 };
 
 interface ObjectsContainer {
@@ -647,10 +659,13 @@ interface ObjectsContainersList {
   [Const, Value] DOMString GetTypeOfObject([Const] DOMString objectName);
   [Const, Value] DOMString GetTypeOfBehavior([Const] DOMString name, boolean searchInGroups);
   [Value] VectorString GetBehaviorsOfObject([Const] DOMString name, boolean searchInGroups);
+  [Value] VectorString GetAnimationNamesOfObject([Const] DOMString name);
   [Const, Value] DOMString GetTypeOfBehaviorInObjectOrGroup([Const] DOMString objectOrGroupName, [Const] DOMString behaviorName, boolean searchInGroups);
   boolean HasObjectOrGroupNamed([Const] DOMString name);
-
   ObjectsContainersList_VariableExistence HasObjectOrGroupWithVariableNamed([Const] DOMString objectName, [Const] DOMString variableName);
+
+  [Const, Ref] ObjectsContainer GetObjectsContainer(unsigned long index);
+  unsigned long GetObjectsContainersCount();
 };
 
 interface ProjectScopedContainers {
@@ -699,7 +714,7 @@ interface ProjectScopedContainers {
         [Const, Ref] PropertiesContainer propertiesContainer);
 
   [Ref] ProjectScopedContainers AddParameters(
-        [Const, Ref] VectorParameterMetadata parameters);
+        [Const, Ref] ParameterMetadataContainer parameters);
 
   [Const, Ref] ObjectsContainersList GetObjectsContainersList();
   [Const, Ref] VariablesContainersList GetVariablesContainersList();
@@ -772,6 +787,8 @@ interface ObjectConfiguration {
     [Value] UniquePtrObjectConfiguration Clone();
 
     [Const, Ref] DOMString GetType();
+    // SetType must only be used by tests.
+    void SetType([Const] DOMString typeName);
 
     [Value] MapStringPropertyDescriptor GetProperties();
     boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
@@ -787,6 +804,8 @@ interface ObjectConfiguration {
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
+
+    unsigned long GetAnimationsCount();
 };
 
 interface UniquePtrObjectConfiguration {
@@ -858,6 +877,12 @@ interface ObjectJsImplementation {
 interface CustomObjectConfiguration {
     [Value] UniquePtrObjectConfiguration Clone();
 
+    boolean IsForcedToOverrideEventsBasedObjectChildrenConfiguration();
+    boolean IsMarkedAsOverridingEventsBasedObjectChildrenConfiguration();
+    void SetMarkedAsOverridingEventsBasedObjectChildrenConfiguration(
+        boolean isOverridingEventsBasedObjectChildrenConfiguration);
+
+    void ClearChildrenConfiguration();
     [Ref] ObjectConfiguration GetChildObjectConfiguration([Const] DOMString objectName);
 
     [Value] MapStringPropertyDescriptor GetProperties();
@@ -1067,6 +1092,9 @@ interface PropertyDescriptor {
     boolean IsAdvanced();
     [Const, Ref] MeasurementUnit GetMeasurementUnit();
     [Ref] PropertyDescriptor SetMeasurementUnit([Const, Ref] MeasurementUnit measurementUnit);
+
+    QuickCustomization_Visibility GetQuickCustomizationVisibility();
+    [Ref] PropertyDescriptor SetQuickCustomizationVisibility(QuickCustomization_Visibility visibility);
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
@@ -1522,7 +1550,7 @@ interface InstructionMetadata {
     boolean CanHaveSubInstructions();
     [Ref] ParameterMetadata GetParameter(unsigned long index);
     unsigned long GetParametersCount();
-    [Const, Ref] VectorParameterMetadata GetParameters();
+    [Const, Ref] ParameterMetadataContainer GetParameters();
     long GetUsageComplexity();
     boolean IsHidden();
     boolean IsPrivate();
@@ -1597,7 +1625,7 @@ interface ExpressionMetadata {
     boolean IsRelevantForCustomObjectEvents();
     [Ref] ParameterMetadata GetParameter(unsigned long id);
     unsigned long GetParametersCount();
-    [Const, Ref] VectorParameterMetadata GetParameters();
+    [Const, Ref] ParameterMetadataContainer GetParameters();
 
     [Ref] ExpressionMetadata SetHidden();
     [Ref] ExpressionMetadata SetPrivate();
@@ -1735,22 +1763,28 @@ interface ValueTypeMetadata {
     void UnserializeFrom([Const, Ref] SerializerElement element);
 };
 
-interface VectorParameterMetadata {
-    void VectorParameterMetadata();
-
-    void push_back([Const, Ref] ParameterMetadata parameterMetadata);
-    unsigned long size();
-    [Ref] ParameterMetadata at(unsigned long index);
-    void WRAPPED_set(unsigned long index, [Const, Ref] ParameterMetadata parameterMetadata);
-    void FREE_removeFromVectorParameterMetadata(unsigned long index);
-    void FREE_insertIntoVectorParameterMetadata(unsigned long index, [Const, Ref] ParameterMetadata parameterMetadata);
-    void FREE_swapInVectorParameterMetadata(unsigned long oldIndex, unsigned long newIndex);
-    void clear();
+interface ParameterMetadataContainer {
+    [Ref] ParameterMetadata InsertNewParameter([Const] DOMString name, unsigned long pos);
+    [Ref] ParameterMetadata InsertParameter([Const, Ref] ParameterMetadata parameterMetadata, unsigned long pos);
+    boolean HasParameterNamed([Const] DOMString name);
+    [Ref] ParameterMetadata GetParameter([Const] DOMString name);
+    [Ref] ParameterMetadata GetParameterAt(unsigned long pos);
+    void RemoveParameter([Const] DOMString name);
+    void MoveParameter(unsigned long oldIndex, unsigned long newIndex);
+    unsigned long GetParametersCount();
+    unsigned long GetParameterPosition([Const, Ref] ParameterMetadata parameterMetadata);
+    void ClearParameters();
+    [Ref] ParameterMetadata AddNewParameter([Const] DOMString name);
 };
 
 interface ParameterMetadataTools {
-    void STATIC_ParametersToObjectsContainer([Ref] Project project, [Const, Ref] VectorParameterMetadata parameters, [Ref] ObjectsContainer outputObjectsContainer);
-    unsigned long STATIC_GetObjectParameterIndexFor([Const, Ref] VectorParameterMetadata parameters, unsigned long parameterIndex);
+    void STATIC_ParametersToObjectsContainer(
+        [Ref] Project project,
+        [Const, Ref] ParameterMetadataContainer parameters,
+        [Ref] ObjectsContainer outputObjectsContainer);
+    unsigned long STATIC_GetObjectParameterIndexFor(
+        [Const, Ref] ParameterMetadataContainer parameters,
+        unsigned long parameterIndex);
 };
 
 interface ObjectMetadata {
@@ -1844,6 +1878,16 @@ interface ObjectMetadata {
 
     [Ref] ObjectMetadata MarkAsRenderedIn3D();
     boolean IsRenderedIn3D();
+};
+
+enum QuickCustomization_Visibility {
+    "QuickCustomization::Default",
+    "QuickCustomization::Visible",
+    "QuickCustomization::Hidden",
+};
+
+interface QuickCustomization {
+    // Nothing, it's just a container for the visibility enum.
 };
 
 interface BehaviorMetadata {
@@ -1950,6 +1994,9 @@ interface BehaviorMetadata {
 
     boolean IsHidden();
     [Ref] BehaviorMetadata SetHidden();
+
+    QuickCustomization_Visibility GetQuickCustomizationVisibility();
+    [Ref] BehaviorMetadata SetQuickCustomizationVisibility(QuickCustomization_Visibility visibility);
 
     [Ref] Behavior Get();
     BehaviorsSharedData GetSharedDataInstance();
@@ -2346,6 +2393,14 @@ interface WholeProjectRefactorer {
       [Ref] VariablesContainer newVariablesContainer,
       [Const, Ref] VariablesChangeset changeset,
       [Const, Ref] SerializerElement originalSerializedVariables);
+    void STATIC_ApplyRefactoringForGroupVariablesContainer(
+      [Ref] Project project,
+      [Ref] ObjectsContainer globalObjectsContainer,
+      [Ref] ObjectsContainer objectsContainer,
+      [Const, Ref] VariablesContainer groupVariablesContainer,
+      [Const, Ref] ObjectGroup objectGroup,
+      [Const, Ref] VariablesChangeset changeset,
+      [Const, Ref] SerializerElement originalSerializedVariables);
     void STATIC_RenameEventsFunctionsExtension(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
@@ -2433,43 +2488,82 @@ interface WholeProjectRefactorer {
       [Ref] Project project,
       [Const] DOMString oldName,
       [Const] DOMString newName);
-    void STATIC_RenameLayer(
+    void STATIC_RenameLayerInScene(
       [Ref] Project project,
-      [Ref] Layout layout,
+      [Ref] Layout scene,
       [Const] DOMString oldName,
       [Const] DOMString newName);
-    void STATIC_RenameLayerEffect(
+    void STATIC_RenameLayerInEventsBasedObject(
       [Ref] Project project,
-      [Ref] Layout layout,
+      [Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Ref] EventsBasedObject eventsBasedObject,
+      [Const] DOMString oldName,
+      [Const] DOMString newName);
+    void STATIC_RenameLayerEffectInScene(
+      [Ref] Project project,
+      [Ref] Layout scene,
       [Ref] Layer layer,
       [Const] DOMString oldName,
       [Const] DOMString newName);
-    void STATIC_RenameObjectAnimation(
+    void STATIC_RenameLayerEffectInEventsBasedObject(
       [Ref] Project project,
-      [Ref] Layout layout,
+      [Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Ref] EventsBasedObject eventsBasedObject,
+      [Ref] Layer layer,
+      [Const] DOMString oldName,
+      [Const] DOMString newName);
+    void STATIC_RenameObjectAnimationInScene(
+      [Ref] Project project,
+      [Ref] Layout scene,
       [Ref] gdObject gdObject,
       [Const] DOMString oldName,
       [Const] DOMString newName);
-    void STATIC_RenameObjectPoint(
+    void STATIC_RenameObjectAnimationInEventsBasedObject(
       [Ref] Project project,
-      [Ref] Layout layout,
+      [Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Ref] EventsBasedObject eventsBasedObject,
       [Ref] gdObject gdObject,
       [Const] DOMString oldName,
       [Const] DOMString newName);
-    void STATIC_RenameObjectEffect(
+    void STATIC_RenameObjectPointInScene(
       [Ref] Project project,
-      [Ref] Layout layout,
+      [Ref] Layout scene,
       [Ref] gdObject gdObject,
       [Const] DOMString oldName,
       [Const] DOMString newName);
-    void STATIC_ObjectOrGroupRenamedInLayout([Ref] Project project, [Ref] Layout layout, [Const] DOMString oldName, [Const] DOMString newName, boolean isObjectGroup);
-    void STATIC_ObjectRemovedInLayout(
+    void STATIC_RenameObjectPointInEventsBasedObject(
+      [Ref] Project project,
+      [Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Ref] EventsBasedObject eventsBasedObject,
+      [Ref] gdObject gdObject,
+      [Const] DOMString oldName,
+      [Const] DOMString newName);
+    void STATIC_RenameObjectEffectInScene(
+      [Ref] Project project,
+      [Ref] Layout scene,
+      [Ref] gdObject gdObject,
+      [Const] DOMString oldName,
+      [Const] DOMString newName);
+    void STATIC_RenameObjectEffectInEventsBasedObject(
+      [Ref] Project project,
+      [Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Ref] EventsBasedObject eventsBasedObject,
+      [Ref] gdObject gdObject,
+      [Const] DOMString oldName,
+      [Const] DOMString newName);
+    void STATIC_ObjectOrGroupRenamedInScene(
         [Ref] Project project,
-        [Ref] Layout layout,
+        [Ref] Layout scene,
+        [Const] DOMString oldName,
+        [Const] DOMString newName,
+        boolean isObjectGroup);
+    void STATIC_ObjectRemovedInScene(
+        [Ref] Project project,
+        [Ref] Layout scene,
         [Const] DOMString objectName);
-    void STATIC_BehaviorsAddedToObjectInLayout(
+    void STATIC_BehaviorsAddedToObjectInScene(
         [Ref] Project project,
-        [Ref] Layout layout,
+        [Ref] Layout scene,
         [Const] DOMString objectName);
     void STATIC_ObjectOrGroupRenamedInEventsFunction(
         [Ref] Project project,
@@ -2766,8 +2860,8 @@ interface EventsFunction {
     EventsFunction_FunctionType GetFunctionType();
 
     [Ref] EventsList GetEvents();
-    [Ref] VectorParameterMetadata GetParameters();
-    [Const, Ref] VectorParameterMetadata GetParametersForEvents([Const, Ref] EventsFunctionsContainer functionsContainer);
+    [Ref] ParameterMetadataContainer GetParameters();
+    [Const, Ref] ParameterMetadataContainer GetParametersForEvents([Const, Ref] EventsFunctionsContainer functionsContainer);
     [Ref] ObjectGroupsContainer GetObjectGroups();
 
     void SerializeTo([Ref] SerializerElement element);
@@ -2813,6 +2907,8 @@ interface EventsBasedBehavior {
     [Const, Ref] DOMString GetObjectType();
     [Ref] EventsBasedBehavior SetPrivate(boolean isPrivate);
     boolean IsPrivate();
+    [Ref] EventsBasedBehavior SetQuickCustomizationVisibility(QuickCustomization_Visibility visibility);
+    QuickCustomization_Visibility GetQuickCustomizationVisibility();
 
     [Ref] PropertiesContainer GetSharedPropertyDescriptors();
 
@@ -3265,6 +3361,8 @@ interface SpriteObject {
 
     void SetUpdateIfNotVisible(boolean updateIfNotVisible);
     boolean GetUpdateIfNotVisible();
+    void SetPreScale(double value);
+    double GetPreScale();
 };
 SpriteObject implements ObjectConfiguration;
 

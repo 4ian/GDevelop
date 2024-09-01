@@ -27,7 +27,10 @@ import {
   makeSchema,
   reorderInstanceSchemaForCustomProperties,
 } from './CompactPropertiesSchema';
-import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
+import TileSetVisualizer, {
+  type TileMapTileSelection,
+} from '../TileSetVisualizer';
 
 export const styles = {
   paper: {
@@ -59,6 +62,8 @@ type Props = {|
   unsavedChanges?: ?UnsavedChanges,
   i18n: I18nType,
   historyHandler?: HistoryHandler,
+  tileMapTileSelection: ?TileMapTileSelection,
+  onSelectTileMapTile: (?TileMapTileSelection) => void,
 |};
 
 export type CompactInstancePropertiesEditorInterface = {|
@@ -80,6 +85,8 @@ const CompactInstancePropertiesEditor = ({
   editInstanceVariables,
   onInstancesModified,
   projectScopedContainersAccessor,
+  tileMapTileSelection,
+  onSelectTileMapTile,
 }: Props) => {
   const forceUpdate = useForceUpdate();
 
@@ -179,6 +186,31 @@ const CompactInstancePropertiesEditor = ({
     ]
   );
 
+  const shouldDisplayTileSetVisualizer =
+    !!object && object.getType() === 'TileMap::SimpleTileMap';
+
+  React.useEffect(
+    () => {
+      if (!shouldDisplayTileSetVisualizer) {
+        // Reset tile map tile selection if tile set visualizer should
+        // not be displayed (an instance that is not a tile map is selected).
+        onSelectTileMapTile(null);
+      }
+      // Reset tile map tile selection if the component is unmounted
+      // (Useful when component is unmounted on an Undo user command).
+      return () => onSelectTileMapTile(null);
+    },
+    [shouldDisplayTileSetVisualizer, onSelectTileMapTile]
+  );
+
+  React.useEffect(
+    () => {
+      onSelectTileMapTile(null);
+    },
+    // Reset tile map tile selection if instance changes.
+    [instance.ptr, onSelectTileMapTile]
+  );
+
   if (!object || !instance || !instanceSchema) return null;
 
   return (
@@ -201,11 +233,32 @@ const CompactInstancePropertiesEditor = ({
               instances={instances}
               onInstancesModified={onInstancesModified}
             />
+            <Spacer />
           </Column>
+          {shouldDisplayTileSetVisualizer && (
+            <>
+              <Column>
+                <Separator />
+                <Line alignItems="center" justifyContent="space-between">
+                  <Text size="sub-title" noMargin>
+                    <Trans>Tilemap painter</Trans>
+                  </Text>
+                </Line>
+                <TileSetVisualizer
+                  project={project}
+                  objectConfiguration={object.getConfiguration()}
+                  tileMapTileSelection={tileMapTileSelection}
+                  onSelectTileMapTile={onSelectTileMapTile}
+                  showPaintingToolbar
+                  allowMultipleSelection={false}
+                  interactive
+                />
+              </Column>
+            </>
+          )}
           {object && shouldDisplayVariablesList ? (
             <>
               <Column>
-                <Spacer />
                 <Separator />
                 <Line alignItems="center" justifyContent="space-between">
                   <Text size="sub-title" noMargin>

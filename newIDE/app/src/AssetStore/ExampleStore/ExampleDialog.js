@@ -10,7 +10,6 @@ import {
   getExample,
 } from '../../Utils/GDevelopServices/Example';
 import { isCompatibleWithAsset } from '../../Utils/GDevelopServices/Asset';
-import LeftLoader from '../../UI/LeftLoader';
 import PlaceholderError from '../../UI/PlaceholderError';
 import { MarkdownText } from '../../UI/MarkdownText';
 import Text from '../../UI/Text';
@@ -99,31 +98,25 @@ export function ExampleDialog({
           onClick={onClose}
           disabled={isOpening}
         />,
-        <LeftLoader isLoading={isOpening} key="open">
-          <RaisedButtonWithSplitMenu
-            label={
-              !isCompatible ? (
-                <Trans>Not compatible</Trans>
-              ) : (
-                <Trans>Open</Trans>
-              )
-            }
-            primary
-            onClick={onOpenExample}
-            disabled={!canOpenExample}
-            buildMenuTemplate={i18n => [
-              {
-                label: electron
-                  ? i18n._(t`Open in the web-app`)
-                  : i18n._(t`Open in a new tab`),
-                disabled: !example,
-                click: () => {
-                  if (example) openExampleInWebApp(example);
-                },
+        <RaisedButtonWithSplitMenu
+          label={
+            !isCompatible ? <Trans>Not compatible</Trans> : <Trans>Open</Trans>
+          }
+          primary
+          onClick={onOpenExample}
+          disabled={!canOpenExample || isOpening}
+          buildMenuTemplate={i18n => [
+            {
+              label: electron
+                ? i18n._(t`Open in the web-app`)
+                : i18n._(t`Open in a new tab`),
+              disabled: !example,
+              click: () => {
+                if (example) openExampleInWebApp(example);
               },
-            ]}
-          />
-        </LeftLoader>,
+            },
+          ]}
+        />,
       ]}
       open
       cannotBeDismissed={isOpening}

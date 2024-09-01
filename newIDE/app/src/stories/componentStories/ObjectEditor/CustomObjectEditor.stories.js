@@ -22,6 +22,8 @@ export const ButtonObject = () => (
       objectConfiguration={testProject.customObject.getConfiguration()}
       project={testProject.project}
       layout={testProject.testLayout}
+      eventsFunctionsExtension={null}
+      eventsBasedObject={null}
       resourceManagementProps={fakeResourceManagementProps}
       onSizeUpdated={() => {}}
       object={testProject.customObject}

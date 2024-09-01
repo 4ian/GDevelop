@@ -20,7 +20,7 @@ export const getElectronUpdateNotificationTitle = (
   updateStatus: ElectronUpdateStatus
 ) => {
   if (updateStatus.status === 'update-available')
-    return <Trans>A new update is available!</Trans>;
+    return 'A new update is available!';
 
   return '';
 };
@@ -29,12 +29,7 @@ export const getElectronUpdateNotificationBody = (
   updateStatus: ElectronUpdateStatus
 ) => {
   if (updateStatus.status === 'update-available')
-    return (
-      <Trans>
-        It will be downloaded and installed automatically (unless you
-        deactivated this in preferences)
-      </Trans>
-    );
+    return 'It will be downloaded and installed automatically (unless you deactivated this in preferences)';
 
   return '';
 };
@@ -59,7 +54,8 @@ export const getElectronUpdateStatusLabel = (status: string) => {
 };
 
 export const getElectronUpdateButtonLabel = (status: string) => {
-  if (status === 'update-available') return 'Update GDevelop to latest version';
+  if (status === 'update-available')
+    return <Trans>Update GDevelop to latest version</Trans>;
   return <Trans>Check again for new updates</Trans>;
 };
 

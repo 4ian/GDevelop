@@ -220,7 +220,11 @@ const ColorFilter = ({
   );
 };
 
-export const AssetStoreFilterPanel = () => {
+export const AssetStoreFilterPanel = ({
+  assetSwappedObject,
+}: {
+  assetSwappedObject?: ?gdObject,
+}) => {
   const {
     assetFiltersState,
     assetPackFiltersState,
@@ -236,37 +240,39 @@ export const AssetStoreFilterPanel = () => {
   );
   return (
     <Column noMargin>
-      <MultipleChoiceFilter
-        filterKey="PackType"
-        title={<Trans>Pack type</Trans>}
-        choices={[
-          { label: t`Free`, value: 'free' },
-          { label: t`Premium`, value: 'premium' },
-          { label: t`Owned`, value: 'owned' },
-        ]}
-        isChoiceChecked={choice =>
-          (choice === 'free' && assetPackFiltersState.typeFilter.isFree) ||
-          (choice === 'premium' &&
-            assetPackFiltersState.typeFilter.isPremium) ||
-          (choice === 'owned' && assetPackFiltersState.typeFilter.isOwned)
-        }
-        setChoiceChecked={(choice, checked) => {
-          const typeFilter = assetPackFiltersState.typeFilter;
-          const isFree = choice === 'free' ? checked : typeFilter.isFree;
-          const isPremium =
-            choice === 'premium' ? checked : typeFilter.isPremium;
-          const isOwned = choice === 'owned' ? checked : typeFilter.isOwned;
-          assetPackFiltersState.setTypeFilter(
-            new AssetPackTypeStoreSearchFilter({
-              isFree,
-              isPremium,
-              isOwned,
-              receivedAssetPacks,
-            })
-          );
-          onChoiceChange();
-        }}
-      />
+      {assetSwappedObject ? null : (
+        <MultipleChoiceFilter
+          filterKey="PackType"
+          title={<Trans>Pack type</Trans>}
+          choices={[
+            { label: t`Free`, value: 'free' },
+            { label: t`Premium`, value: 'premium' },
+            { label: t`Owned`, value: 'owned' },
+          ]}
+          isChoiceChecked={choice =>
+            (choice === 'free' && assetPackFiltersState.typeFilter.isFree) ||
+            (choice === 'premium' &&
+              assetPackFiltersState.typeFilter.isPremium) ||
+            (choice === 'owned' && assetPackFiltersState.typeFilter.isOwned)
+          }
+          setChoiceChecked={(choice, checked) => {
+            const typeFilter = assetPackFiltersState.typeFilter;
+            const isFree = choice === 'free' ? checked : typeFilter.isFree;
+            const isPremium =
+              choice === 'premium' ? checked : typeFilter.isPremium;
+            const isOwned = choice === 'owned' ? checked : typeFilter.isOwned;
+            assetPackFiltersState.setTypeFilter(
+              new AssetPackTypeStoreSearchFilter({
+                isFree,
+                isPremium,
+                isOwned,
+                receivedAssetPacks,
+              })
+            );
+            onChoiceChange();
+          }}
+        />
+      )}
       <MultipleChoiceFilter
         filterKey="Animation"
         title={<Trans>Animation</Trans>}
@@ -329,23 +335,25 @@ export const AssetStoreFilterPanel = () => {
           onChoiceChange();
         }}
       />
-      <SetFilter
-        filterKey="ObjectType"
-        title={<Trans>Type of objects</Trans>}
-        choices={[
-          { label: t`Sprite`, value: 'sprite' },
-          { label: t`Tiled sprite`, value: 'tiled' },
-          { label: t`Panel sprite`, value: '9patch' },
-          { label: t`3D model`, value: 'Scene3D::Model3DObject' },
-        ]}
-        values={assetFiltersState.objectTypeFilter.objectTypes}
-        setValues={values => {
-          assetFiltersState.setObjectTypeFilter(
-            new ObjectTypeAssetStoreSearchFilter(values)
-          );
-          onChoiceChange();
-        }}
-      />
+      {assetSwappedObject ? null : (
+        <SetFilter
+          filterKey="ObjectType"
+          title={<Trans>Type of objects</Trans>}
+          choices={[
+            { label: t`Sprite`, value: 'sprite' },
+            { label: t`Tiled sprite`, value: 'tiled' },
+            { label: t`Panel sprite`, value: '9patch' },
+            { label: t`3D model`, value: 'Scene3D::Model3DObject' },
+          ]}
+          values={assetFiltersState.objectTypeFilter.objectTypes}
+          setValues={values => {
+            assetFiltersState.setObjectTypeFilter(
+              new ObjectTypeAssetStoreSearchFilter(values)
+            );
+            onChoiceChange();
+          }}
+        />
+      )}
       <ColorFilter
         filterKey="Color"
         title={<Trans>Color</Trans>}

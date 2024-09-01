@@ -4,14 +4,14 @@ import { Trans } from '@lingui/macro';
 import VariablesEditorDialog from './VariablesEditorDialog';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
-import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
 type Props = {|
   open: boolean,
   project: gdProject,
   onApply: (selectedVariableName: string | null) => void,
   onCancel: () => void,
-  hotReloadPreviewButtonProps?: ?HotReloadPreviewButtonProps,
+  hotReloadPreviewButtonProps: HotReloadPreviewButtonProps | null,
   /**
    * If set to true, a deleted variable won't trigger a confirmation asking if the
    * project must be refactored to delete any reference to it.

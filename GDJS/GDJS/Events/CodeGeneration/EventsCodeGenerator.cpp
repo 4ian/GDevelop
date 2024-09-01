@@ -298,12 +298,12 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
 }
 
 gd::String EventsCodeGenerator::GenerateEventsFunctionParameterDeclarationsList(
-    const vector<gd::ParameterMetadata>& parameters,
+    const gd::ParameterMetadataContainer& parameters,
     int firstParameterIndex,
     bool addsSceneParameter) {
   gd::String declaration = addsSceneParameter ? "runtimeScene" : "";
-  for (size_t i = 0; i < parameters.size(); ++i) {
-    const auto& parameter = parameters[i];
+  for (size_t i = 0; i < parameters.GetParametersCount(); ++i) {
+    const auto& parameter = parameters.GetParameter(i);
     if (i < firstParameterIndex) {
       // By convention, the first two arguments of a behavior events function
       // are the object and the behavior, which are not passed to the called
@@ -475,7 +475,8 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
 
   gd::String argumentsGetters;
 
-  for (const auto& parameter : parameters) {
+  for (const auto& parameterPtr : parameters.GetInternalVector()) {
+    const auto& parameter = *parameterPtr;
     if (parameter.GetName().empty()) continue;
 
     gd::String parameterMangledName =
@@ -722,10 +723,10 @@ gd::String EventsCodeGenerator::GenerateFreeCondition(
 
   // Add logical not if needed
   bool conditionAlreadyTakeCareOfInversion = false;
-  for (std::size_t i = 0; i < instrInfos.parameters.size();
+  for (std::size_t i = 0; i < instrInfos.parameters.GetParametersCount();
        ++i)  // Some conditions already have a "conditionInverted" parameter
   {
-    if (instrInfos.parameters[i].GetType() == "conditionInverted")
+    if (instrInfos.parameters.GetParameter(i).GetType() == "conditionInverted")
       conditionAlreadyTakeCareOfInversion = true;
   }
   if (!conditionAlreadyTakeCareOfInversion && conditionInverted)
@@ -871,8 +872,13 @@ gd::String EventsCodeGenerator::GenerateObjectAction(
   // Create call
   gd::String call;
   if (instrInfos.codeExtraInformation.type == "number" ||
-      instrInfos.codeExtraInformation.type == "string" || 
-      instrInfos.codeExtraInformation.type == "boolean") {
+      instrInfos.codeExtraInformation.type == "string" ||
+      // Boolean actions declared with addExpressionAndConditionAndAction uses
+      // MutatorAndOrAccessor even though they don't declare an operator parameter.
+      // Boolean operators are only used with SetMutators or SetCustomCodeGenerator.
+      (instrInfos.codeExtraInformation.type == "boolean" &&
+       instrInfos.codeExtraInformation.accessType ==
+           gd::InstructionMetadata::ExtraInformation::AccessType::Mutators)) {
     if (instrInfos.codeExtraInformation.accessType ==
         gd::InstructionMetadata::ExtraInformation::MutatorAndOrAccessor)
       call = GenerateOperatorCall(
@@ -932,9 +938,14 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
 
   // Create call
   gd::String call;
-  if ((instrInfos.codeExtraInformation.type == "number" ||
-       instrInfos.codeExtraInformation.type == "string" || 
-      instrInfos.codeExtraInformation.type == "boolean")) {
+  if (instrInfos.codeExtraInformation.type == "number" ||
+      instrInfos.codeExtraInformation.type == "string" ||
+      // Boolean actions declared with addExpressionAndConditionAndAction uses
+      // MutatorAndOrAccessor even though they don't declare an operator parameter.
+      // Boolean operators are only used with SetMutators or SetCustomCodeGenerator.
+      (instrInfos.codeExtraInformation.type == "boolean" &&
+       instrInfos.codeExtraInformation.accessType ==
+           gd::InstructionMetadata::ExtraInformation::AccessType::Mutators)) {
     if (instrInfos.codeExtraInformation.accessType ==
         gd::InstructionMetadata::ExtraInformation::MutatorAndOrAccessor)
       call = GenerateOperatorCall(

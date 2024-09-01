@@ -15,10 +15,10 @@ namespace gd {
 
 void FunctionParameterBehaviorTypeRenamer::DoVisitEventsFunction(
     gd::EventsFunction &eventsFunction) {
-  for (auto &&parameter : eventsFunction.GetParameters()) {
-    if (gd::ParameterMetadata::IsBehavior(parameter.GetType()) &&
-        parameter.GetExtraInfo() == oldBehaviorType) {
-      parameter.SetExtraInfo(newBehaviorType);
+  for (auto &&parameter : eventsFunction.GetParameters().GetInternalVector()) {
+    if (gd::ParameterMetadata::IsBehavior(parameter->GetType()) &&
+        parameter->GetExtraInfo() == oldBehaviorType) {
+      parameter->SetExtraInfo(newBehaviorType);
     }
   }
 }

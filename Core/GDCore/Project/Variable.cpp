@@ -30,6 +30,8 @@ gd::String Variable::TypeAsString(Type t) {
       return "structure";
     case Type::Array:
       return "array";
+    case Type::MixedTypes:
+      return "mixed";
     default:
       return "error-type";
   }
@@ -46,6 +48,8 @@ Variable::Type Variable::StringAsType(const gd::String& str) {
     return Type::Structure;
   else if (str == "array")
     return Type::Array;
+  else if (str == "mixed")
+    return Type::MixedTypes;
 
   // Default to number
   return Type::Number;
@@ -56,6 +60,7 @@ bool Variable::IsPrimitive(const Type type) {
 }
 
 void Variable::CastTo(const Type newType) {
+  hasMixedValues = false;
   if (newType == Type::Number)
     SetValue(GetValue());
   else if (newType == Type::String)
@@ -85,6 +90,9 @@ void Variable::CastTo(const Type newType) {
     type = Type::Array;
     // Free now unused memory
     children.clear();
+  } else if (newType == Type::MixedTypes) {
+    type = Type::MixedTypes;
+    hasMixedValues = true;
   }
 }
 
@@ -142,6 +150,7 @@ Variable& Variable::GetChild(const gd::String& name) {
   if (it != children.end()) return *it->second;
 
   type = Type::Structure;
+  hasMixedValues = false;
   children[name] = std::make_shared<gd::Variable>();
   return *children[name];
 }
@@ -202,6 +211,7 @@ Variable& Variable::PushNew() {
   const size_t count = GetChildrenCount();
   auto& variable = GetAtIndex(count);
   if (type == Type::Array && count > 0) {
+    hasMixedValues = false;
     const auto childType = GetAtIndex(count - 1).type;
     variable.type = childType;
     if (childType == Type::Number) {
@@ -224,6 +234,7 @@ void Variable::RemoveAtIndex(const size_t index) {
 
 bool Variable::InsertAtIndex(const gd::Variable& variable, const size_t index) {
   if (type != Type::Array) return false;
+  hasMixedValues = false;
   auto newVariable = std::make_shared<gd::Variable>(variable);
   if (index < childrenArray.size()) {
     childrenArray.insert(childrenArray.begin() + index, newVariable);
@@ -238,6 +249,7 @@ bool Variable::InsertChild(const gd::String& name,
   if (type != Type::Structure || HasChild(name)) {
     return false;
   }
+  hasMixedValues = false;
   children[name] = std::make_shared<gd::Variable>(variable);
   return true;
 };
@@ -269,6 +281,9 @@ void Variable::SerializeTo(SerializerElement& element) const {
     for (auto child : childrenArray) {
       child->SerializeTo(childrenElement.AddChild("variable"));
     }
+  }
+  if (hasMixedValues) {
+    element.SetBoolAttribute("hasMixedValues", true);
   }
 }
 
@@ -312,6 +327,9 @@ void Variable::UnserializeFrom(const SerializerElement& element) {
       } else if (type == Type::Array)
         PushNew().UnserializeFrom(childElement);
     }
+  }
+  if (element.GetBoolAttribute("hasMixedValues", false)) {
+    MarkAsMixedValues();
   }
 }
 
@@ -384,7 +402,8 @@ Variable::Variable(const Variable& other)
       folded(other.folded),
       boolVal(other.boolVal),
       type(other.type),
-      persistentUuid(other.persistentUuid) {
+      persistentUuid(other.persistentUuid),
+      hasMixedValues(other.hasMixedValues) {
   CopyChildren(other);
 }
 
@@ -396,6 +415,7 @@ Variable& Variable::operator=(const Variable& other) {
     boolVal = other.boolVal;
     type = other.type;
     persistentUuid = other.persistentUuid;
+    hasMixedValues = other.hasMixedValues;
     CopyChildren(other);
   }
 
@@ -411,4 +431,61 @@ void Variable::CopyChildren(const gd::Variable& other) {
     childrenArray.push_back(std::make_shared<gd::Variable>(*child.get()));
   }
 }
+
+bool Variable::operator==(const gd::Variable &variable) const {
+  if (type != variable.type || hasMixedValues || variable.hasMixedValues) {
+    return false;
+  }
+  if (type == Variable::Type::Number) {
+    return value == variable.value;
+  }
+  if (type == Variable::Type::String) {
+    return str == variable.str;
+  }
+  if (type == Variable::Type::Boolean) {
+    return boolVal == variable.boolVal;
+  }
+  if (type == Variable::Type::Structure) {
+    if (children.size() != variable.children.size()) {
+      return false;
+    }
+    for (auto &pair : children) {
+      const gd::String &name = pair.first;
+      const auto &child = pair.second;
+
+      auto it = variable.children.find(name);
+      if (it == variable.children.end()) {
+        return false;
+      }
+      auto &otherChild = it->second;
+      if (*child != *otherChild) {
+        return false;
+      }
+    }
+    return true;
+  }
+  if (type == Variable::Type::Array) {
+    if (childrenArray.size() != variable.childrenArray.size()) {
+      return false;
+    }
+    for (int i = 0; i < childrenArray.size(); ++i) {
+      if (*childrenArray[i] != *variable.childrenArray[i]) {
+        return false;
+      }
+    }
+    return true;
+  }
+  // MixedTypes variables can't equal another variable.
+  return false;
+}
+
+bool Variable::operator!=(const gd::Variable &variable) const {
+  return !(*this == variable);
+}
+
+void Variable::MarkAsMixedValues() {
+  hasMixedValues = true;
+  ClearChildren();
+}
+
 }  // namespace gd

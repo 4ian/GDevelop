@@ -42,6 +42,18 @@ import {
   getWheelStepZoomFactor,
 } from '../Utils/ZoomUtils';
 import Background from './Background';
+import TileMapPaintingPreview, {
+  getTileSet,
+  getTilesGridCoordinatesFromPointerSceneCoordinates,
+  updateSceneToTileMapTransformation,
+} from './TileMapPaintingPreview';
+import {
+  getTileIdFromGridCoordinates,
+  type TileMapTileSelection,
+} from './TileSetVisualizer';
+import ClickInterceptor from './ClickInterceptor';
+import getObjectByName from '../Utils/GetObjectByName';
+import { AffineTransformation } from '../Utils/AffineTransformation';
 const gd: libGDevelop = global.gd;
 
 export const instancesEditorId = 'instances-editor-canvas';
@@ -96,6 +108,8 @@ export type InstancesEditorPropsWithoutSizeAndScroll = {|
   ) => void,
   pauseRendering: boolean,
   instancesEditorShortcutsCallbacks: InstancesEditorShortcutsCallbacks,
+  tileMapTileSelection: ?TileMapTileSelection,
+  onSelectTileMapTile: (?TileMapTileSelection) => void,
 |};
 
 type Props = {|
@@ -112,8 +126,8 @@ type Props = {|
 export default class InstancesEditor extends Component<Props> {
   lastContextMenuX = 0;
   lastContextMenuY = 0;
-  lastCursorX = 0;
-  lastCursorY = 0;
+  lastCursorX: number | null = null;
+  lastCursorY: number | null = null;
   fpsLimiter = new FpsLimiter({ maxFps: 60, idleFps: 10 });
   canvasArea: ?HTMLDivElement;
   pixiRenderer: PIXI.Renderer;
@@ -124,6 +138,8 @@ export default class InstancesEditor extends Component<Props> {
   _instancesAdder: InstancesAdder;
   selectionRectangle: SelectionRectangle;
   selectedInstances: SelectedInstances;
+  tileMapPaintingPreview: TileMapPaintingPreview;
+  clickInterceptor: ClickInterceptor;
   highlightedInstance: HighlightedInstance;
   instancesResizer: InstancesResizer;
   instancesRotator: InstancesRotator;
@@ -174,6 +190,7 @@ export default class InstancesEditor extends Component<Props> {
     this.keyboardShortcuts = new KeyboardShortcuts({
       shortcutCallbacks: {
         onMove: this.moveSelection,
+        onEscape: this.onPressEscape,
         ...this.props.instancesEditorShortcutsCallbacks,
       },
     });
@@ -410,6 +427,14 @@ export default class InstancesEditor extends Component<Props> {
         this.highlightedInstance.getPixiObject()
       );
     }
+    if (this.tileMapPaintingPreview) {
+      this.uiPixiContainer.removeChild(
+        this.tileMapPaintingPreview.getPixiObject()
+      );
+    }
+    if (this.clickInterceptor) {
+      this.uiPixiContainer.removeChild(this.clickInterceptor.getPixiObject());
+    }
     if (this.selectedInstances) {
       this.uiPixiContainer.removeChild(
         this.selectedInstances.getPixiContainer()
@@ -470,10 +495,26 @@ export default class InstancesEditor extends Component<Props> {
       onRotateEnd: this._onRotateEnd,
       instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
       toCanvasCoordinates: this.viewPosition.toCanvasCoordinates,
+      getFillColor: this.getSelectedInstancesObjectFillColor,
       screenType: this.props.screenType,
       keyboardShortcuts: this.keyboardShortcuts,
       onPanMove: this._onPanMove,
       onPanEnd: this._onPanEnd,
+    });
+    this.tileMapPaintingPreview = new TileMapPaintingPreview({
+      instancesSelection: this.props.instancesSelection,
+      project: props.project,
+      layout: props.layout,
+      getTileMapTileSelection: this.getTileMapTileSelection,
+      getRendererOfInstance: this.getRendererOfInstance,
+      getCoordinatesToRender: this.getCoordinatesToRenderTileMapPreview,
+      viewPosition: this.viewPosition,
+    });
+    this.clickInterceptor = new ClickInterceptor({
+      getTileMapTileSelection: this.getTileMapTileSelection,
+      viewPosition: this.viewPosition,
+      onClick: this._onInterceptClick,
+      onPanMove: this._onPanMove,
     });
     this.highlightedInstance = new HighlightedInstance({
       instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
@@ -515,6 +556,8 @@ export default class InstancesEditor extends Component<Props> {
     this.uiPixiContainer.addChild(this.selectedInstances.getPixiContainer());
     this.uiPixiContainer.addChild(this.highlightedInstance.getPixiObject());
     this.uiPixiContainer.addChild(this.statusBar.getPixiObject());
+    this.uiPixiContainer.addChild(this.tileMapPaintingPreview.getPixiObject());
+    this.uiPixiContainer.addChild(this.clickInterceptor.getPixiObject());
 
     this.background = new Background({
       width: this.props.width,
@@ -649,14 +692,27 @@ export default class InstancesEditor extends Component<Props> {
    */
   zoomOnCursorBy(value: number) {
     const beforeZoomCursorPosition = this.getLastCursorSceneCoordinates();
+    if (!beforeZoomCursorPosition) return;
     this.setZoomFactor(this.getZoomFactor() * value);
     const afterZoomCursorPosition = this.getLastCursorSceneCoordinates();
+    if (!afterZoomCursorPosition) return;
     // Compensate for the cursor change in position
     this.scrollBy(
       beforeZoomCursorPosition[0] - afterZoomCursorPosition[0],
       beforeZoomCursorPosition[1] - afterZoomCursorPosition[1]
     );
   }
+
+  getTileMapTileSelection = () => {
+    return this.props.tileMapTileSelection;
+  };
+
+  getSelectedInstancesObjectFillColor = (
+    isLocked: boolean
+  ): {| color: number, alpha: number |} => {
+    if (this.props.tileMapTileSelection) return { color: 0xfff, alpha: 0 };
+    return { color: isLocked ? 0xbc5753 : 0x6868e8, alpha: 1 };
+  };
 
   getZoomFactor = () => {
     return this.props.instancesEditorSettings.zoomFactor;
@@ -701,6 +757,206 @@ export default class InstancesEditor extends Component<Props> {
   _onMouseMove = (x: number, y: number) => {
     this.lastCursorX = x;
     this.lastCursorY = y;
+  };
+
+  _onInterceptClick = (sceneCoordinates: Array<{| x: number, y: number |}>) => {
+    const {
+      tileMapTileSelection,
+      instancesSelection,
+      project,
+      layout,
+    } = this.props;
+    if (!tileMapTileSelection) {
+      return;
+    }
+    const selectedInstances = instancesSelection.getSelectedInstances();
+    if (selectedInstances.length !== 1) return;
+    const selectedInstance = selectedInstances[0];
+    const object = getObjectByName(
+      project.getObjects(),
+      layout ? layout.getObjects() : null,
+      selectedInstance.getObjectName()
+    );
+    if (!object) return;
+    const renderedInstance = this.getRendererOfInstance(selectedInstance);
+    if (
+      object.getType() === 'TileMap::SimpleTileMap' &&
+      renderedInstance &&
+      // $FlowFixMe - We are confident the renderedInstance is an instance of RenderedSimpleTileMapInstance.
+      !!renderedInstance.getEditableTileMap
+    ) {
+      // $FlowFixMe
+      const editableTileMap = renderedInstance.getEditableTileMap();
+      if (!editableTileMap) {
+        console.error(
+          `Could not find the editable tile map for instance of object ${selectedInstance.getObjectName()}`
+        );
+        return;
+      }
+      const sceneToTileMapTransformation = new AffineTransformation();
+      const tileMapToSceneTransformation = new AffineTransformation();
+      const scales = updateSceneToTileMapTransformation(
+        selectedInstance,
+        // $FlowFixMe
+        renderedInstance,
+        sceneToTileMapTransformation,
+        tileMapToSceneTransformation
+      );
+      if (!scales) return;
+      const { scaleX, scaleY } = scales;
+      const tileSet = getTileSet(object);
+      const tileMapGridCoordinates = getTilesGridCoordinatesFromPointerSceneCoordinates(
+        {
+          coordinates: sceneCoordinates,
+          tileSize: tileSet.tileSize,
+          sceneToTileMapTransformation,
+        }
+      );
+
+      let shouldTrimAfterOperations = false;
+
+      if (tileMapTileSelection.kind === 'single') {
+        shouldTrimAfterOperations = editableTileMap.isEmpty();
+        // TODO: Optimize list execution to make sure the most important size changing operations are done first.
+        let cumulatedUnshiftedRows = 0,
+          cumulatedUnshiftedColumns = 0;
+        const tileId = getTileIdFromGridCoordinates({
+          columnCount: tileSet.columnCount,
+          ...tileMapTileSelection.coordinates,
+        });
+
+        const tileDefinition = editableTileMap.getTileDefinition(tileId);
+        if (!tileDefinition) return;
+
+        const layer = editableTileMap.getTileLayer(0);
+        if (!layer) return;
+
+        tileMapGridCoordinates.forEach(({ x: gridX, y: gridY }) => {
+          // If rows or columns have been unshifted in the previous tile setting operations,
+          // we have to take them into account for the current coordinates.
+          const x = gridX + cumulatedUnshiftedColumns;
+          const y = gridY + cumulatedUnshiftedRows;
+          const rowsToAppend = Math.max(
+            0,
+            y - (editableTileMap.getDimensionY() - 1)
+          );
+          const columnsToAppend = Math.max(
+            0,
+            x - (editableTileMap.getDimensionX() - 1)
+          );
+          const rowsToUnshift = Math.abs(Math.min(0, y));
+          const columnsToUnshift = Math.abs(Math.min(0, x));
+          if (
+            rowsToAppend > 0 ||
+            columnsToAppend > 0 ||
+            rowsToUnshift > 0 ||
+            columnsToUnshift > 0
+          ) {
+            editableTileMap.increaseDimensions(
+              columnsToAppend,
+              columnsToUnshift,
+              rowsToAppend,
+              rowsToUnshift
+            );
+          }
+          const newX = x + columnsToUnshift;
+          const newY = y + rowsToUnshift;
+
+          editableTileMap.setTile(newX, newY, 0, tileId);
+          editableTileMap.flipTileOnX(
+            newX,
+            newY,
+            0,
+            tileMapTileSelection.flipHorizontally
+          );
+          editableTileMap.flipTileOnY(
+            newX,
+            newY,
+            0,
+            tileMapTileSelection.flipVertically
+          );
+
+          cumulatedUnshiftedRows += rowsToUnshift;
+          cumulatedUnshiftedColumns += columnsToUnshift;
+          // The instance angle is not considered when moving the instance after
+          // rows/columns were added/removed because the instance position does not
+          // include the rotation transformation. Otherwise, we could have used
+          // tileMapToSceneTransformation to get the new position.
+          selectedInstance.setX(
+            selectedInstance.getX() -
+              columnsToUnshift * (tileSet.tileSize * scaleX)
+          );
+          selectedInstance.setY(
+            selectedInstance.getY() -
+              rowsToUnshift * (tileSet.tileSize * scaleY)
+          );
+          if (selectedInstance.hasCustomSize()) {
+            selectedInstance.setCustomWidth(
+              selectedInstance.getCustomWidth() +
+                tileSet.tileSize * scaleX * (columnsToAppend + columnsToUnshift)
+            );
+            selectedInstance.setCustomHeight(
+              selectedInstance.getCustomHeight() +
+                tileSet.tileSize * scaleY * (rowsToAppend + rowsToUnshift)
+            );
+          }
+        });
+      } else if (tileMapTileSelection.kind === 'erase') {
+        tileMapGridCoordinates.forEach(({ x: gridX, y: gridY }) => {
+          editableTileMap.removeTile(gridX, gridY, 0);
+        });
+        shouldTrimAfterOperations = true;
+      } else {
+        return;
+      }
+
+      if (shouldTrimAfterOperations) {
+        const trimData = editableTileMap.trimEmptyColumnsAndRowToFitLayer(0);
+        if (trimData) {
+          const {
+            shiftedRows,
+            shiftedColumns,
+            poppedRows,
+            poppedColumns,
+          } = trimData;
+          // The instance angle is not considered when moving the instance after
+          // rows/columns were added/removed because the instance position does not
+          // include the rotation transformation. Otherwise, we could have used
+          // tileMapToSceneTransformation to get the new position.
+          selectedInstance.setX(
+            selectedInstance.getX() +
+              shiftedColumns * (tileSet.tileSize * scaleX)
+          );
+          selectedInstance.setY(
+            selectedInstance.getY() + shiftedRows * (tileSet.tileSize * scaleY)
+          );
+          if (selectedInstance.hasCustomSize()) {
+            selectedInstance.setCustomWidth(
+              selectedInstance.getCustomWidth() -
+                tileSet.tileSize * scaleX * (poppedColumns + shiftedColumns)
+            );
+            selectedInstance.setCustomHeight(
+              selectedInstance.getCustomHeight() -
+                tileSet.tileSize * scaleY * (poppedRows + shiftedRows)
+            );
+          }
+        }
+      }
+      // $FlowIgnore
+      renderedInstance.updatePixiTileMap();
+      selectedInstance.setRawStringProperty(
+        'tilemap',
+        JSON.stringify(editableTileMap.toJSObject())
+      );
+      this.props.onInstancesResized([selectedInstance]);
+    }
+  };
+
+  getRendererOfInstance = (instance: gdInitialInstance) => {
+    return this.instancesRenderer.getRendererOfInstance(
+      instance.getLayer(),
+      instance
+    );
   };
 
   _onDownBackground = (x: number, y: number, event?: PointerEvent) => {
@@ -1068,6 +1324,14 @@ export default class InstancesEditor extends Component<Props> {
     this.onInstancesMovedDebounced(unlockedSelectedInstances);
   };
 
+  onPressEscape = () => {
+    if (this.clickInterceptor && this.clickInterceptor.isIntercepting()) {
+      this.clickInterceptor.cancelClickInterception();
+    } else if (this.props.tileMapTileSelection) {
+      this.props.onSelectTileMapTile(null);
+    }
+  };
+
   scrollBy(x: number, y: number) {
     this.fpsLimiter.notifyInteractionHappened();
     this.viewPosition.scrollBy(x, y);
@@ -1202,11 +1466,24 @@ export default class InstancesEditor extends Component<Props> {
     );
   };
 
-  getLastCursorSceneCoordinates = () => {
+  getLastCursorSceneCoordinates = (): [number, number] | null => {
+    if (this.lastCursorX === null || this.lastCursorY === null) return null;
     return this.viewPosition.toSceneCoordinates(
       this.lastCursorX,
       this.lastCursorY
     );
+  };
+
+  getCoordinatesToRenderTileMapPreview = () => {
+    const clickInterceptorPointerPathCoordinates = this.clickInterceptor.getPointerPathCoordinates();
+    if (clickInterceptorPointerPathCoordinates) {
+      return clickInterceptorPointerPathCoordinates;
+    }
+    const lastCursorSceneCoordinates = this.getLastCursorSceneCoordinates();
+    if (!lastCursorSceneCoordinates) return [];
+    return [
+      { x: lastCursorSceneCoordinates[0], y: lastCursorSceneCoordinates[1] },
+    ];
   };
 
   getViewPosition = (): ?ViewPosition => {
@@ -1226,6 +1503,8 @@ export default class InstancesEditor extends Component<Props> {
       this.canvasCursor.render();
       this.grid.render();
       this.highlightedInstance.render();
+      this.tileMapPaintingPreview.render();
+      this.clickInterceptor.render();
       this.selectedInstances.render();
       this.selectionRectangle.render();
       this.windowBorder.render();

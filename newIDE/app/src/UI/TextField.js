@@ -11,6 +11,15 @@ import { MarkdownText } from './MarkdownText';
 import { useShouldAutofocusInput } from './Responsive/ScreenTypeMeasurer';
 import { dataObjectToProps, type HTMLDataset } from '../Utils/HTMLDataset';
 
+export type TextFieldStyleProps = {|
+  fontSize?: 12 | 14 | 18 | '1.3em' | 'inherit', // 'inherit' should only be used on an event sheet where font size is adapted to zoom.
+  fontStyle?: 'normal' | 'italic',
+  width?: number | '30%' | '70%' | '100%',
+  flex?: 1,
+  top?: number,
+  padding?: number,
+|};
+
 type ValueProps =
   // Support "text", "password" and "email" type:
   // "email" type is used to display appropriate keyboard on mobile.
@@ -101,14 +110,7 @@ type Props = {|
   // Styling:
   margin?: 'none' | 'dense',
   fullWidth?: boolean,
-  style?: {|
-    fontSize?: 12 | 14 | 18 | '1.3em' | 'inherit', // 'inherit' should only be used on an event sheet where font size is adapted to zoom.
-    fontStyle?: 'normal' | 'italic',
-    width?: number | '30%' | '70%' | '100%',
-    flex?: 1,
-    top?: number,
-    padding?: number,
-  |},
+  style?: TextFieldStyleProps,
   inputStyle?: {|
     // Allow to customize color (replace by color prop?) // TO VERIFY
     color?: string,

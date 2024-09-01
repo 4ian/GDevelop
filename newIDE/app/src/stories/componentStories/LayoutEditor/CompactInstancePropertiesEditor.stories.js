@@ -37,6 +37,8 @@ export const InstanceSprite2d = () => (
             editInstanceVariables={action('edit instance variables')}
             onGetInstanceSize={() => [100, 101, 102]}
             onEditObjectByName={action('edit object')}
+            tileMapTileSelection={null}
+            onSelectTileMapTile={() => {}}
           />
         </SerializedObjectDisplay>
       )}
@@ -63,6 +65,8 @@ export const InstanceCube3d = () => (
             editInstanceVariables={action('edit instance variables')}
             onGetInstanceSize={() => [100, 101, 102]}
             onEditObjectByName={action('edit object')}
+            tileMapTileSelection={null}
+            onSelectTileMapTile={() => {}}
           />
         </SerializedObjectDisplay>
       )}
@@ -89,6 +93,8 @@ export const InstanceTextInput = () => (
             editInstanceVariables={action('edit instance variables')}
             onGetInstanceSize={() => [120, 40, 0]}
             onEditObjectByName={action('edit object')}
+            tileMapTileSelection={null}
+            onSelectTileMapTile={() => {}}
           />
         </SerializedObjectDisplay>
       )}

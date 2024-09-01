@@ -101,7 +101,8 @@ gd::BehaviorMetadata &MetadataDeclarationHelper::DeclareBehaviorMetadata(
                   eventsBasedBehavior.GetName(), project,
                   PlatformExtension::GetBehaviorFullType(
                       extension.GetName(), eventsBasedBehavior.GetName())))
-          .SetObjectType(eventsBasedBehavior.GetObjectType());
+          .SetObjectType(eventsBasedBehavior.GetObjectType())
+          .SetQuickCustomizationVisibility(eventsBasedBehavior.GetQuickCustomizationVisibility());
 
   if (eventsBasedBehavior.IsPrivate())
     behaviorMetadata.SetPrivate();
@@ -454,17 +455,17 @@ gd::String MetadataDeclarationHelper::GetDefaultSentence(
     const int parameterIndexOffset) {
   gd::String defaultSentence = GetFullName(eventsFunction);
   auto &parameters = eventsFunction.GetParameters();
-  if (parameters.size() == 0) {
+  if (parameters.GetParametersCount() == 0) {
     return defaultSentence;
   }
   defaultSentence += " (";
   for (size_t parameterIndex = firstParameterIndex;
-       parameterIndex < parameters.size(); parameterIndex++) {
-    auto &parameter = parameters.at(parameterIndex);
+       parameterIndex < parameters.GetParametersCount(); parameterIndex++) {
+    auto &parameter = parameters.GetParameter(parameterIndex);
     defaultSentence += parameter.GetName() + ": _PARAM" +
                        gd::String::From(parameterIndex + parameterIndexOffset) +
                        "_";
-    if (parameterIndex < parameters.size() - 1) {
+    if (parameterIndex < parameters.GetParametersCount() - 1) {
       defaultSentence += ", ";
     }
   }
@@ -1360,13 +1361,13 @@ void MetadataDeclarationHelper::DeclareEventsFunctionParameters(
                          .GetParameters();
 
   for (size_t i = 0;
-       i < userDefinedFirstParameterIndex && i < parameters.size(); i++) {
-    const gd::ParameterMetadata &parameter = parameters.at(i);
+       i < userDefinedFirstParameterIndex && i < parameters.GetParametersCount(); i++) {
+    const gd::ParameterMetadata &parameter = parameters.GetParameter(i);
     AddParameter(expression, parameter);
   }
 
-  for (size_t i = userDefinedFirstParameterIndex; i < parameters.size(); i++) {
-    const gd::ParameterMetadata &parameter = parameters.at(i);
+  for (size_t i = userDefinedFirstParameterIndex; i < parameters.GetParametersCount(); i++) {
+    const gd::ParameterMetadata &parameter = parameters.GetParameter(i);
     AddParameter(expression, parameter);
   }
 
@@ -1399,8 +1400,8 @@ void MetadataDeclarationHelper::DeclareEventsFunctionParameters(
                          .GetParameters();
 
   for (size_t i = 0;
-       i < userDefinedFirstParameterIndex && i < parameters.size(); i++) {
-    const gd::ParameterMetadata &parameter = parameters.at(i);
+       i < userDefinedFirstParameterIndex && i < parameters.GetParametersCount(); i++) {
+    const gd::ParameterMetadata &parameter = parameters.GetParameter(i);
     AddParameter(instruction, parameter);
   }
 
@@ -1420,8 +1421,8 @@ void MetadataDeclarationHelper::DeclareEventsFunctionParameters(
     }
   }
 
-  for (size_t i = userDefinedFirstParameterIndex; i < parameters.size(); i++) {
-    const gd::ParameterMetadata &parameter = parameters.at(i);
+  for (size_t i = userDefinedFirstParameterIndex; i < parameters.GetParametersCount(); i++) {
+    const gd::ParameterMetadata &parameter = parameters.GetParameter(i);
     AddParameter(instruction, parameter);
   }
 
@@ -1449,8 +1450,8 @@ void MetadataDeclarationHelper::DeclareEventsFunctionParameters(
   auto &parameters = eventsFunction.GetParameters();
 
   for (size_t i = 0;
-       i < userDefinedFirstParameterIndex && i < parameters.size(); i++) {
-    const gd::ParameterMetadata &parameter = parameters.at(i);
+       i < userDefinedFirstParameterIndex && i < parameters.GetParametersCount(); i++) {
+    const gd::ParameterMetadata &parameter = parameters.GetParameter(i);
     AddParameter(multipleInstructionMetadata, parameter);
   }
 
@@ -1463,8 +1464,8 @@ void MetadataDeclarationHelper::DeclareEventsFunctionParameters(
         eventsFunction.GetExpressionType().GetName(), options);
   }
 
-  for (size_t i = userDefinedFirstParameterIndex; i < parameters.size(); i++) {
-    const gd::ParameterMetadata &parameter = parameters.at(i);
+  for (size_t i = userDefinedFirstParameterIndex; i < parameters.GetParametersCount(); i++) {
+    const gd::ParameterMetadata &parameter = parameters.GetParameter(i);
     AddParameter(multipleInstructionMetadata, parameter);
   }
 

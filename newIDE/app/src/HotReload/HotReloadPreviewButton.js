@@ -11,11 +11,15 @@ export type HotReloadPreviewButtonProps = {|
   hasPreviewsRunning: boolean,
   launchProjectDataOnlyPreview: () => Promise<void>,
   launchProjectWithLoadingScreenPreview: () => Promise<void>,
+  launchProjectCodeAndDataPreview: () => Promise<void>,
+  isCodeGenerationRequired?: boolean,
 |};
 
 export default function HotReloadPreviewButton({
   launchProjectDataOnlyPreview,
+  launchProjectCodeAndDataPreview,
   hasPreviewsRunning,
+  isCodeGenerationRequired,
 }: HotReloadPreviewButtonProps) {
   const { isMobile } = useResponsiveWindowSize();
   const icon = hasPreviewsRunning ? <UpdateIcon /> : <PreviewIcon />;
@@ -24,16 +28,15 @@ export default function HotReloadPreviewButton({
   ) : (
     <Trans>Run a preview</Trans>
   );
+  const launchProjectPreview = isCodeGenerationRequired
+    ? launchProjectCodeAndDataPreview
+    : launchProjectDataOnlyPreview;
 
   // Hide the text on mobile, to avoid taking too much space.
   return !isMobile ? (
-    <FlatButton
-      leftIcon={icon}
-      label={label}
-      onClick={launchProjectDataOnlyPreview}
-    />
+    <FlatButton leftIcon={icon} label={label} onClick={launchProjectPreview} />
   ) : (
-    <IconButton onClick={launchProjectDataOnlyPreview} size="small">
+    <IconButton onClick={launchProjectPreview} size="small">
       {icon}
     </IconButton>
   );

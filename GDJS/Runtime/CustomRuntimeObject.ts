@@ -73,6 +73,7 @@ namespace gdjs {
     private _localTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
     private _localInverseTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
     private _isLocalTransformationDirty: boolean = true;
+    _type: string;
 
     /**
      * @param parent The container the object belongs to
@@ -83,6 +84,7 @@ namespace gdjs {
       objectData: ObjectData & CustomObjectConfiguration
     ) {
       super(parent, objectData);
+      this._type = objectData.type;
       this._instanceContainer = new gdjs.CustomRuntimeObjectInstanceContainer(
         parent,
         this
@@ -147,7 +149,7 @@ namespace gdjs {
           newObjectData.animatable || []
         );
       }
-      return this._instanceContainer.updateFrom(oldObjectData, newObjectData);
+      return true;
     }
 
     extraInitializationFromInitialInstance(initialInstanceData: InstanceData) {
@@ -226,6 +228,10 @@ namespace gdjs {
       | gdjs.CustomRuntimeObject2DRenderer
       | gdjs.CustomRuntimeObject3DRenderer {
       return this._renderer;
+    }
+
+    getChildrenContainer(): gdjs.RuntimeInstanceContainer {
+      return this._instanceContainer;
     }
 
     onChildrenLocationChanged() {
@@ -395,9 +401,10 @@ namespace gdjs {
       let minX = 0;
       if (this._forcedDefaultSize) {
         minX = this._forcedDefaultSize.min[0];
-      }
-      if (this._isUntransformedHitBoxesDirty) {
-        this._updateUntransformedHitBoxes();
+      } else {
+        if (this._isUntransformedHitBoxesDirty) {
+          this._updateUntransformedHitBoxes();
+        }
         minX = this._unrotatedAABB.min[0];
       }
       const absScaleX = this.getScaleX();
@@ -416,9 +423,10 @@ namespace gdjs {
       let minY = 0;
       if (this._forcedDefaultSize) {
         minY = this._forcedDefaultSize.min[1];
-      }
-      if (this._isUntransformedHitBoxesDirty) {
-        this._updateUntransformedHitBoxes();
+      } else {
+        if (this._isUntransformedHitBoxesDirty) {
+          this._updateUntransformedHitBoxes();
+        }
         minY = this._unrotatedAABB.min[1];
       }
       const absScaleY = this.getScaleY();

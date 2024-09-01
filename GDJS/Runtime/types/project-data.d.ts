@@ -39,7 +39,10 @@ declare type ObjectData = {
   effects: Array<EffectData>;
 };
 
-declare type GetNetworkSyncDataOptions = { playerNumber?: number };
+declare type GetNetworkSyncDataOptions = {
+  playerNumber?: number;
+  isHost?: boolean;
+};
 
 /** Object containing basic properties for all objects synchronizing over the network. */
 declare type BasicObjectNetworkSyncData = {
@@ -149,7 +152,14 @@ declare interface GdVersionData {
   revision: number;
 }
 
-declare interface LayoutData {
+declare interface InstanceContainerData {
+  variables: RootVariableData[];
+  instances: InstanceData[];
+  objects: ObjectData[];
+  layers: LayerData[];
+}
+
+declare interface LayoutData extends InstanceContainerData {
   r: number;
   v: number;
   b: number;
@@ -157,10 +167,6 @@ declare interface LayoutData {
   name: string;
   stopSoundsOnStartup: boolean;
   title: string;
-  variables: RootVariableData[];
-  instances: InstanceData[];
-  objects: ObjectData[];
-  layers: LayerData[];
   behaviorsSharedData: BehaviorSharedData[];
   usedResources: ResourceReference[];
 }
@@ -200,9 +206,8 @@ declare interface SceneAndExtensionsData {
   usedExtensionsWithVariablesData: EventsFunctionsExtensionData[];
 }
 
-declare interface EventsBasedObjectData {
+declare interface EventsBasedObjectData extends InstanceContainerData {
   name: string;
-  objects: Array<ObjectData & any>;
 }
 
 declare interface BehaviorSharedData {
@@ -212,6 +217,7 @@ declare interface BehaviorSharedData {
 
 declare interface ExternalLayoutData {
   name: string;
+  associatedLayout: string;
   instances: InstanceData[];
 }
 

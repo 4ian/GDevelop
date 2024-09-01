@@ -182,6 +182,7 @@ module.exports = {
         .setValue(behaviorContent.getChild('bodyType').getStringValue())
         .setType('Choice')
         .setLabel('Type')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
         .addExtraInfo('Static')
         .addExtraInfo('Dynamic')
         .addExtraInfo('Kinematic');
@@ -190,6 +191,7 @@ module.exports = {
         .setValue(
           behaviorContent.getChild('bullet').getBoolValue() ? 'true' : 'false'
         )
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
         .setType('Boolean')
         .setLabel('Bullet');
       behaviorProperties
@@ -199,6 +201,7 @@ module.exports = {
             ? 'true'
             : 'false'
         )
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
         .setType('Boolean')
         .setLabel('Fixed Rotation');
       behaviorProperties
@@ -206,6 +209,7 @@ module.exports = {
         .setValue(
           behaviorContent.getChild('canSleep').getBoolValue() ? 'true' : 'false'
         )
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
         .setType('Boolean')
         .setLabel('Can Sleep');
       behaviorProperties
@@ -213,6 +217,7 @@ module.exports = {
         .setValue(behaviorContent.getChild('shape').getStringValue())
         .setType('Choice')
         .setLabel('Shape')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
         .addExtraInfo('Box')
         .addExtraInfo('Circle')
         .addExtraInfo('Edge')
@@ -227,7 +232,8 @@ module.exports = {
         )
         .setType('Number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-        .setLabel('Shape Dimension A');
+        .setLabel('Shape Dimension A')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
       behaviorProperties
         .getOrCreate('shapeDimensionB')
         .setValue(
@@ -238,7 +244,8 @@ module.exports = {
         )
         .setType('Number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-        .setLabel('Shape Dimension B');
+        .setLabel('Shape Dimension B')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
       behaviorProperties
         .getOrCreate('shapeOffsetX')
         .setValue(
@@ -246,7 +253,8 @@ module.exports = {
         )
         .setType('Number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-        .setLabel('Shape Offset X');
+        .setLabel('Shape Offset X')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
       behaviorProperties
         .getOrCreate('shapeOffsetY')
         .setValue(
@@ -254,7 +262,8 @@ module.exports = {
         )
         .setType('Number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-        .setLabel('Shape Offset Y');
+        .setLabel('Shape Offset Y')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
       behaviorProperties
         .getOrCreate('polygonOrigin')
         .setValue(
@@ -266,7 +275,8 @@ module.exports = {
         .setLabel('Polygon Origin')
         .addExtraInfo('Center')
         .addExtraInfo('Origin')
-        .addExtraInfo('TopLeft');
+        .addExtraInfo('TopLeft')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
       behaviorProperties
         .getOrCreate('vertices')
         .setValue(
@@ -274,7 +284,8 @@ module.exports = {
             ? gd.Serializer.toJSON(behaviorContent.getChild('vertices'))
             : '[]'
         )
-        .setLabel('Vertices');
+        .setLabel('Vertices')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
       behaviorProperties
         .getOrCreate('density')
         .setValue(
@@ -315,24 +326,28 @@ module.exports = {
             .toString(10)
         )
         .setType('Number')
-        .setLabel('Angular Damping');
+        .setLabel('Angular Damping')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
       behaviorProperties
         .getOrCreate('gravityScale')
         .setValue(
           behaviorContent.getChild('gravityScale').getDoubleValue().toString(10)
         )
         .setType('Number')
-        .setLabel('Gravity Scale');
+        .setLabel('Gravity Scale')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
       behaviorProperties
         .getOrCreate('layers')
         .setValue(behaviorContent.getChild('layers').getIntValue().toString(10))
         .setType('Number')
-        .setLabel('Layers');
+        .setLabel('Layers')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
       behaviorProperties
         .getOrCreate('masks')
         .setValue(behaviorContent.getChild('masks').getIntValue().toString(10))
         .setType('Number')
-        .setLabel('Masks');
+        .setLabel('Masks')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
 
       return behaviorProperties;
     };
@@ -379,16 +394,15 @@ module.exports = {
         return true;
       }
 
-      if (propertyName === 'scaleX') {
+      if (propertyName === 'worldScale') {
         const newValueAsNumber = parseInt(newValue, 10);
         if (newValueAsNumber !== newValueAsNumber) return false;
+        if (!sharedContent.hasChild('worldScale')) {
+          sharedContent.addChild('worldScale');
+        }
+        sharedContent.getChild('worldScale').setDoubleValue(newValueAsNumber);
+        // Set deprecated properties for compatibility with 5.4.209-
         sharedContent.getChild('scaleX').setDoubleValue(newValueAsNumber);
-        return true;
-      }
-
-      if (propertyName === 'scaleY') {
-        const newValueAsNumber = parseInt(newValue, 10);
-        if (newValueAsNumber !== newValueAsNumber) return false;
         sharedContent.getChild('scaleY').setDoubleValue(newValueAsNumber);
         return true;
       }
@@ -412,16 +426,22 @@ module.exports = {
         )
         .setType('Number')
         .setMeasurementUnit(gd.MeasurementUnit.getNewton());
+
+      if (!sharedContent.hasChild('worldScale')) {
+        sharedContent.addChild('worldScale');
+        sharedContent
+          .getChild('worldScale')
+          .setDoubleValue(
+            Math.sqrt(
+              sharedContent.getChild('scaleX').getDoubleValue() *
+                sharedContent.getChild('scaleY').getDoubleValue()
+            )
+          );
+      }
       sharedProperties
-        .getOrCreate('scaleX')
+        .getOrCreate('worldScale')
         .setValue(
-          sharedContent.getChild('scaleX').getDoubleValue().toString(10)
-        )
-        .setType('Number');
-      sharedProperties
-        .getOrCreate('scaleY')
-        .setValue(
-          sharedContent.getChild('scaleY').getDoubleValue().toString(10)
+          sharedContent.getChild('worldScale').getDoubleValue().toString(10)
         )
         .setType('Number');
 
@@ -430,6 +450,8 @@ module.exports = {
     sharedData.initializeContent = function (behaviorContent) {
       behaviorContent.addChild('gravityX').setDoubleValue(0);
       behaviorContent.addChild('gravityY').setDoubleValue(9.8);
+      behaviorContent.addChild('worldScale').setDoubleValue(100);
+      // Set deprecated properties for compatibility with 5.4.209-
       behaviorContent.addChild('scaleX').setDoubleValue(100);
       behaviorContent.addChild('scaleY').setDoubleValue(100);
     };
@@ -457,6 +479,19 @@ module.exports = {
       );
 
     // Global
+    aut
+      .addExpression(
+        'WorldScale',
+        _('World scale'),
+        _('Return the world scale.'),
+        _('Global'),
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
+      .getCodeExtraInformation()
+      .setFunctionName('getWorldScale');
+
     aut
       .addCondition(
         'GravityX',
@@ -1395,6 +1430,7 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('getLinearVelocityLength');
 
+    // Deprecated
     aut
       .addCondition(
         'LinearVelocityAngle',
@@ -1413,8 +1449,26 @@ module.exports = {
           _('Angle to compare to (in degrees)')
         )
       )
+      .setHidden()
       .getCodeExtraInformation()
       .setFunctionName('getLinearVelocityAngle');
+
+    aut
+      .addScopedCondition(
+        'IsLinearVelocityAngleAround',
+        _('Linear velocity angle'),
+        _('Compare the linear velocity angle of the object.'),
+        _('Angle of movement of _PARAM0_ is _PARAM2_ ± _PARAM3_°'),
+        _('Velocity'),
+        'res/physics32.png',
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
+      .addParameter('expression', _('Angle (in degrees)'))
+      .addParameter('expression', _('Tolerance (in degrees)'))
+      .getCodeExtraInformation()
+      .setFunctionName('isLinearVelocityAngleAround');
 
     aut
       .addAction(
@@ -1723,7 +1777,7 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('expression', _('Angular impulse (N·m·s'))
+      .addParameter('expression', _('Angular impulse (N·m·s)'))
       .setParameterLongDescription(
         _(
           'An impulse is like a rotation speed addition but depends on the mass.'
@@ -1750,7 +1804,7 @@ module.exports = {
         'Inertia',
         _('Inertia'),
         _(
-          'Return the rotational inertia of the object (in kilograms * meters * meters)'
+          'Return the rotational inertia of the object (in kilograms · meters²)'
         ),
         '',
         'res/physics32.png'

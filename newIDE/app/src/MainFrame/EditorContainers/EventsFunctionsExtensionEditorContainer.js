@@ -5,6 +5,7 @@ import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
 } from './BaseEditor';
+import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 
 const styles = {
   container: {
@@ -35,6 +36,14 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
 
   forceUpdateEditor() {
     // No updates to be done.
+  }
+
+  onEventsBasedObjectChildrenEdited() {
+    // No thing to be done.
+  }
+
+  onSceneObjectEdited(scene: gdLayout, objectWithContext: ObjectWithContext) {
+    // No thing to be done.
   }
 
   shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
@@ -163,6 +172,7 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
               eventsBasedObject
             );
           }}
+          hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
         />
       </div>
     );

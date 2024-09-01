@@ -1,5 +1,4 @@
 // @flow
-const gd: libGDevelop = global.gd;
 
 // Instruction or expression can be private (see IsPrivate, SetPrivate).
 // Their visibility will change according to the scope (i.e: if we're
@@ -46,6 +45,8 @@ export class ProjectScopedContainersAccessor {
       eventsBasedObject,
       eventsFunction,
     } = this._scope;
+    const gd: libGDevelop = global.gd;
+
     if (layout) {
       projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
         project,
@@ -117,5 +118,28 @@ export class ProjectScopedContainersAccessor {
       this._parameterObjectsContainer,
       [...this._eventPath, event]
     );
+  }
+
+  forEachObject(func: (object: gdObject) => void): void {
+    const objectsContainersList = this.get().getObjectsContainersList();
+    for (
+      let containerIndex = 0;
+      containerIndex < objectsContainersList.getObjectsContainersCount();
+      containerIndex++
+    ) {
+      const objectsContainer = objectsContainersList.getObjectsContainer(
+        containerIndex
+      );
+
+      for (
+        let objectIndex = 0;
+        objectIndex < objectsContainer.getObjectsCount();
+        objectIndex++
+      ) {
+        const object = objectsContainer.getObjectAt(objectIndex);
+
+        func(object);
+      }
+    }
   }
 }

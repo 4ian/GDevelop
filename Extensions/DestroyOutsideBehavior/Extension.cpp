@@ -34,7 +34,8 @@ void DeclareDestroyOutsideBehaviorExtension(gd::PlatformExtension& extension) {
                             "CppPlatform/Extensions/destroyoutsideicon.png",
                             "DestroyOutsideBehavior",
                             std::make_shared<DestroyOutsideBehavior>(),
-                            std::shared_ptr<gd::BehaviorsSharedData>());
+                            std::shared_ptr<gd::BehaviorsSharedData>())
+                            .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
 
   aut.AddCondition("ExtraBorder",
                    _("Additional border"),

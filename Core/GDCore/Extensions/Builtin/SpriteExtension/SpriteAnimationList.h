@@ -52,6 +52,11 @@ class GD_CORE_API SpriteAnimationList {
   std::size_t GetAnimationsCount() const { return animations.size(); };
 
   /**
+   * \brief Return true if an animation exists for a given name.
+   */
+  bool HasAnimationNamed(const gd::String &name) const;
+
+  /**
    * \brief Add an animation at the end of the existing ones.
    */
   void AddAnimation(const Animation& animation);

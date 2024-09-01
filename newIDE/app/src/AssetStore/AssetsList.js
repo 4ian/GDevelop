@@ -145,6 +145,7 @@ const styles = {
     margin: '0 2px', // Remove the default margin of the grid but keep the horizontal padding for focus outline.
     // Remove the scroll capability of the grid, the scroll view handles it.
     overflow: 'unset',
+    justifyContent: 'center',
   },
   scrollView: {
     display: 'flex',
@@ -224,6 +225,7 @@ const PageBreakNavigation = ({
 export type AssetsListInterface = {|
   getScrollPosition: () => number,
   scrollToPosition: (y: number) => void,
+  setPageBreakIndex: (index: number) => void,
 |};
 
 type Props = {|
@@ -253,6 +255,7 @@ type Props = {|
   // then currentPage is null.
   currentPage?: AssetStorePageState,
   hideGameTemplates?: boolean,
+  hideDetails?: boolean,
 |};
 
 const AssetsList = React.forwardRef<Props, AssetsListInterface>(
@@ -272,6 +275,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
       noScroll,
       currentPage,
       hideGameTemplates,
+      hideDetails,
     }: Props,
     ref
   ) => {
@@ -306,6 +310,9 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
       isNavigatingInsideFolder,
       setIsNavigatingInsideFolder,
     ] = React.useState<boolean>(false);
+    const [pageBreakIndex, setPageBreakIndex] = React.useState<number>(
+      (currentPage && currentPage.pageBreakIndex) || 0
+    );
     const { openedAssetPack, selectedFolders } = React.useMemo(
       () => {
         if (!currentPage) {
@@ -332,6 +339,9 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
         if (!scrollViewElement) return;
 
         scrollViewElement.scrollToPosition(y);
+      },
+      setPageBreakIndex: (index: number) => {
+        setPageBreakIndex(0);
       },
     }));
 
@@ -458,10 +468,6 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
       [allPrivateAssetPackListingDatas, openedAssetPack]
     );
 
-    const [pageBreakIndex, setPageBreakIndex] = React.useState<number>(
-      (currentPage && currentPage.pageBreakIndex) || 0
-    );
-
     const assetTiles = React.useMemo(
       () => {
         // Loading
@@ -480,6 +486,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
             size={getAssetSize(windowSize)}
             key={assetShortHeader.id}
             margin={cellSpacing / 2}
+            hideShortDescription={!!hideDetails}
           />
         ));
       },
@@ -491,6 +498,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
         pageBreakIndex,
         windowSize,
         onOpenDetails,
+        hideDetails,
       ]
     );
 

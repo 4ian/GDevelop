@@ -80,14 +80,17 @@ export type AnimationListInterface = {|
 
 type AnimationListProps = {|
   project: gdProject,
-  // TODO EBO : Layout and EventBasedObject should have a common interface to
-  // browse their events. It would allow to refactor the events when an
-  // animation is renamed for instance.
   /**
    * The layout is used to adapt events when an identifier is renamed
    * (for instance, an object animation or a layer name).
    */
   layout: gdLayout | null,
+  eventsFunctionsExtension: gdEventsFunctionsExtension | null,
+  /**
+   * The event-based object is used to adapt events when an identifier is
+   * renamed (for instance, an object animation or a layer name).
+   */
+  eventsBasedObject: gdEventsBasedObject | null,
   /**
    * The edited object. It can be undefined for sub-ObjectConfiguration of
    * custom object. There is no event to refactor in this case.
@@ -117,6 +120,8 @@ const AnimationList = React.forwardRef<
       animations,
       project,
       layout,
+      eventsFunctionsExtension,
+      eventsBasedObject,
       object,
       objectName,
       resourceManagementProps,
@@ -355,27 +360,39 @@ const AnimationList = React.forwardRef<
         }
 
         animation.setName(newName);
-        // TODO EBO Refactor event-based object events when an animation is renamed.
-        if (layout && object) {
-          gd.WholeProjectRefactorer.renameObjectAnimation(
-            project,
-            layout,
-            object,
-            currentName,
-            newName
-          );
+        if (object) {
+          if (layout) {
+            gd.WholeProjectRefactorer.renameObjectAnimationInScene(
+              project,
+              layout,
+              object,
+              currentName,
+              newName
+            );
+          } else if (eventsFunctionsExtension && eventsBasedObject) {
+            gd.WholeProjectRefactorer.renameObjectAnimationInEventsBasedObject(
+              project,
+              eventsFunctionsExtension,
+              eventsBasedObject,
+              object,
+              currentName,
+              newName
+            );
+          }
         }
         forceUpdate();
         if (onObjectUpdated) onObjectUpdated();
       },
       [
-        forceUpdate,
-        layout,
-        nameErrors,
-        object,
-        onObjectUpdated,
-        project,
         animations,
+        layout,
+        object,
+        eventsFunctionsExtension,
+        eventsBasedObject,
+        forceUpdate,
+        onObjectUpdated,
+        nameErrors,
+        project,
       ]
     );
 

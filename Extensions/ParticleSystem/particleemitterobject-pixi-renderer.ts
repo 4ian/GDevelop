@@ -340,7 +340,7 @@ namespace gdjs {
     setAdditiveRendering(enabled: boolean): void {
       // Access private members of the behavior to apply changes right away.
       const behavior: any = this.emitter.getBehavior('blendMode');
-      behavior.blendMode = enabled ? 'ADD' : 'NORMAL';
+      behavior.value = enabled ? 'ADD' : 'NORMAL';
     }
 
     setAlpha(alpha1: number, alpha2: number): void {

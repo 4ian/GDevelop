@@ -6,9 +6,6 @@ declare class gdVersionWrapper {
   static revision(): number;
   static fullString(): string;
   static status(): string;
-  static year(): string;
-  static month(): string;
-  static date(): string;
   delete(): void;
   ptr: number;
 };

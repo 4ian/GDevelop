@@ -14,6 +14,7 @@
 #include "GDCore/Tools/Log.h"
 
 namespace gd {
+gd::String ObjectConfiguration::badAnimationName;
 
 ObjectConfiguration::~ObjectConfiguration() {}
 

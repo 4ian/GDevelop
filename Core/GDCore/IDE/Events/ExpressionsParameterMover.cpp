@@ -144,10 +144,10 @@ bool ExpressionsParameterMover::DoVisitInstruction(gd::Instruction& instruction,
                              : gd::MetadataProvider::GetActionMetadata(
                                    platform, instruction.GetType());
 
-  for (std::size_t pNb = 0; pNb < metadata.parameters.size() &&
+  for (std::size_t pNb = 0; pNb < metadata.parameters.GetParametersCount() &&
                             pNb < instruction.GetParametersCount();
        ++pNb) {
-    const gd::String& type = metadata.parameters[pNb].GetType();
+    const gd::String& type = metadata.parameters.GetParameter(pNb).GetType();
     const gd::Expression& expression = instruction.GetParameter(pNb);
 
     auto node = expression.GetRootNode();

@@ -35,6 +35,7 @@ export const Default = () => (
         onExportAssets={action('On export assets')}
         onAddObjectInstance={action('On add instance to the scene')}
         onObjectCreated={action('On object created')}
+        onObjectEdited={action('On object edited')}
         selectedObjectFolderOrObjectsWithContext={[]}
         getValidatedObjectOrGroupName={newName => newName}
         onDeleteObjects={(objectsWithContext, cb) => cb(true)}
@@ -45,7 +46,6 @@ export const Default = () => (
         ) => cb(true)}
         onObjectFolderOrObjectWithContextSelected={() => {}}
         hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
-        canInstallPrivateAsset={() => false}
       />
     </div>
   </DragAndDropContextProvider>
@@ -67,6 +67,7 @@ export const WithSerializedObjectView = () => (
           onExportAssets={action('On export assets')}
           onAddObjectInstance={action('On add instance to the scene')}
           onObjectCreated={action('On object created')}
+          onObjectEdited={action('On object edited')}
           selectedObjectFolderOrObjectsWithContext={[]}
           getValidatedObjectOrGroupName={newName => newName}
           onDeleteObjects={(objectsWithContext, cb) => cb(true)}
@@ -77,7 +78,6 @@ export const WithSerializedObjectView = () => (
           ) => cb(true)}
           onObjectFolderOrObjectWithContextSelected={() => {}}
           hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
-          canInstallPrivateAsset={() => false}
         />
       </div>
     </SerializedObjectDisplay>

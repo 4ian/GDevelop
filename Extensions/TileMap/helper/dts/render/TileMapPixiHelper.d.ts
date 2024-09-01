@@ -6,7 +6,7 @@ export declare namespace PixiTileMapHelper {
   /**
    * Split an atlas image into Pixi textures.
    *
-   * @param tiledMap A tile map exported from Tiled.
+   * @param tiledMap A tile map exported from Tiled or LDtk.
    * @param levelIndex The level of the tile map to load from.
    * @param atlasTexture The texture containing the whole tile set.
    * @param getTexture A getter to load a texture. Used if atlasTexture is not specified.
@@ -18,6 +18,21 @@ export declare namespace PixiTileMapHelper {
     atlasTexture: PIXI.BaseTexture<PIXI.Resource> | null,
     getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>
   ): TileTextureCache | null;
+  /**
+   * Split an atlas image into Pixi textures.
+   *
+   * @param atlasTexture The texture containing the whole tile set.
+   * @param columnCount The number of columns.
+   * @param rowCount The number of rows.
+   * @param tileSize The squared tile size.
+   * @returns A textures cache.
+   */
+  function parseSimpleTileMapAtlas(
+    atlasTexture: PIXI.BaseTexture<PIXI.Resource>,
+    columnCount: number,
+    rowCount: number,
+    tileSize: number
+  ): TileTextureCache;
   /**
    * Re-renders the tile map whenever its rendering settings have been changed
    *

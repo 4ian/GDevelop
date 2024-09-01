@@ -2592,6 +2592,7 @@ storiesOf('BehaviorTypeSelector', module)
   .add('default, for a base object', () => (
     <BehaviorTypeSelector
       project={testProject.project}
+      eventsFunctionsExtension={null}
       value={''}
       onChange={action('change')}
       objectType=""
@@ -2600,6 +2601,7 @@ storiesOf('BehaviorTypeSelector', module)
   .add('with a non existing behavior selected, for a base object', () => (
     <BehaviorTypeSelector
       project={testProject.project}
+      eventsFunctionsExtension={null}
       value={'MyCustomExtension::BehaviorThatIsNotYetLoaded'}
       onChange={action('change')}
       objectType=""
@@ -2608,6 +2610,7 @@ storiesOf('BehaviorTypeSelector', module)
   .add('default, for a text object', () => (
     <BehaviorTypeSelector
       project={testProject.project}
+      eventsFunctionsExtension={null}
       value={''}
       onChange={action('change')}
       objectType="TextObject::Text"
@@ -2637,6 +2640,7 @@ storiesOf('HotReloadPreviewButton', module)
     <HotReloadPreviewButton
       hasPreviewsRunning={false}
       launchProjectDataOnlyPreview={async () => {}}
+      launchProjectCodeAndDataPreview={async () => {}}
       launchProjectWithLoadingScreenPreview={async () => {}}
     />
   ))
@@ -2644,6 +2648,7 @@ storiesOf('HotReloadPreviewButton', module)
     <HotReloadPreviewButton
       hasPreviewsRunning={true}
       launchProjectDataOnlyPreview={async () => {}}
+      launchProjectCodeAndDataPreview={async () => {}}
       launchProjectWithLoadingScreenPreview={async () => {}}
     />
   ));
@@ -2709,7 +2714,13 @@ storiesOf('ProjectPropertiesDialog/LoadingScreenEditor', module)
 storiesOf('PreferencesDialog', module).add('default', () => (
   <I18n>
     {({ i18n }) => (
-      <PreferencesDialog i18n={i18n} onClose={action('onClose')} />
+      <PreferencesDialog
+        i18n={i18n}
+        onClose={action('onClose')}
+        onOpenQuickCustomizationDialog={action(
+          'onOpenQuickCustomizationDialog'
+        )}
+      />
     )}
   </I18n>
 ));

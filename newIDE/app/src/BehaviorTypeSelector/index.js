@@ -14,7 +14,7 @@ type Props = {|
   value: string,
   onChange: string => void,
   disabled?: boolean,
-  eventsFunctionsExtension?: gdEventsFunctionsExtension,
+  eventsFunctionsExtension: gdEventsFunctionsExtension | null,
 |};
 type State = {|
   behaviorMetadata: Array<EnumeratedBehaviorMetadata>,

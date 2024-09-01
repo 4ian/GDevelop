@@ -4,8 +4,8 @@
  * reserved. This project is released under the MIT License.
  */
 
-#ifndef PARAMETER_METADATA_H
-#define PARAMETER_METADATA_H
+#pragma once
+
 #include <map>
 #include <memory>
 
@@ -28,6 +28,12 @@ class GD_CORE_API ParameterMetadata {
  public:
   ParameterMetadata();
   virtual ~ParameterMetadata(){};
+
+  /**
+   * \brief Return a pointer to a new ParameterMetadata constructed from
+   * this one.
+   */
+  ParameterMetadata* Clone() const { return new ParameterMetadata(*this); };
 
   /**
    * \brief Return the metadata of the parameter type.
@@ -248,5 +254,3 @@ class GD_CORE_API ParameterMetadata {
 };
 
 }  // namespace gd
-
-#endif  // PARAMETER_METADATA_H

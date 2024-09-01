@@ -2,6 +2,7 @@
 declare class gdWholeProjectRefactorer {
   static computeChangesetForVariablesContainer(oldSerializedVariablesContainer: gdSerializerElement, newVariablesContainer: gdVariablesContainer): gdVariablesChangeset;
   static applyRefactoringForVariablesContainer(project: gdProject, newVariablesContainer: gdVariablesContainer, changeset: gdVariablesChangeset, originalSerializedVariables: gdSerializerElement): void;
+  static applyRefactoringForGroupVariablesContainer(project: gdProject, globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, groupVariablesContainer: gdVariablesContainer, objectGroup: gdObjectGroup, changeset: gdVariablesChangeset, originalSerializedVariables: gdSerializerElement): void;
   static renameEventsFunctionsExtension(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, oldName: string, newName: string): void;
   static updateExtensionNameInEventsBasedBehavior(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedBehavior: gdEventsBasedBehavior, sourceExtensionName: string): void;
   static renameEventsFunction(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, oldName: string, newName: string): void;
@@ -18,14 +19,19 @@ declare class gdWholeProjectRefactorer {
   static renameLayout(project: gdProject, oldName: string, newName: string): void;
   static renameExternalLayout(project: gdProject, oldName: string, newName: string): void;
   static renameExternalEvents(project: gdProject, oldName: string, newName: string): void;
-  static renameLayer(project: gdProject, layout: gdLayout, oldName: string, newName: string): void;
-  static renameLayerEffect(project: gdProject, layout: gdLayout, layer: gdLayer, oldName: string, newName: string): void;
-  static renameObjectAnimation(project: gdProject, layout: gdLayout, gdObject: gdObject, oldName: string, newName: string): void;
-  static renameObjectPoint(project: gdProject, layout: gdLayout, gdObject: gdObject, oldName: string, newName: string): void;
-  static renameObjectEffect(project: gdProject, layout: gdLayout, gdObject: gdObject, oldName: string, newName: string): void;
-  static objectOrGroupRenamedInLayout(project: gdProject, layout: gdLayout, oldName: string, newName: string, isObjectGroup: boolean): void;
-  static objectRemovedInLayout(project: gdProject, layout: gdLayout, objectName: string): void;
-  static behaviorsAddedToObjectInLayout(project: gdProject, layout: gdLayout, objectName: string): void;
+  static renameLayerInScene(project: gdProject, scene: gdLayout, oldName: string, newName: string): void;
+  static renameLayerInEventsBasedObject(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedObject: gdEventsBasedObject, oldName: string, newName: string): void;
+  static renameLayerEffectInScene(project: gdProject, scene: gdLayout, layer: gdLayer, oldName: string, newName: string): void;
+  static renameLayerEffectInEventsBasedObject(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedObject: gdEventsBasedObject, layer: gdLayer, oldName: string, newName: string): void;
+  static renameObjectAnimationInScene(project: gdProject, scene: gdLayout, gdObject: gdObject, oldName: string, newName: string): void;
+  static renameObjectAnimationInEventsBasedObject(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedObject: gdEventsBasedObject, gdObject: gdObject, oldName: string, newName: string): void;
+  static renameObjectPointInScene(project: gdProject, scene: gdLayout, gdObject: gdObject, oldName: string, newName: string): void;
+  static renameObjectPointInEventsBasedObject(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedObject: gdEventsBasedObject, gdObject: gdObject, oldName: string, newName: string): void;
+  static renameObjectEffectInScene(project: gdProject, scene: gdLayout, gdObject: gdObject, oldName: string, newName: string): void;
+  static renameObjectEffectInEventsBasedObject(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedObject: gdEventsBasedObject, gdObject: gdObject, oldName: string, newName: string): void;
+  static objectOrGroupRenamedInScene(project: gdProject, scene: gdLayout, oldName: string, newName: string, isObjectGroup: boolean): void;
+  static objectRemovedInScene(project: gdProject, scene: gdLayout, objectName: string): void;
+  static behaviorsAddedToObjectInScene(project: gdProject, scene: gdLayout, objectName: string): void;
   static objectOrGroupRenamedInEventsFunction(project: gdProject, projectScopedContainers: gdProjectScopedContainers, eventsFunction: gdEventsFunction, oldName: string, newName: string, isObjectGroup: boolean): void;
   static objectRemovedInEventsFunction(project: gdProject, eventsFunction: gdEventsFunction, objectName: string): void;
   static objectOrGroupRenamedInEventsBasedObject(project: gdProject, projectScopedContainers: gdProjectScopedContainers, eventsBasedObject: gdEventsBasedObject, oldName: string, newName: string, isObjectGroup: boolean): void;

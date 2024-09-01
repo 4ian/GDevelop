@@ -1,4 +1,10 @@
-import { PolygonVertices, integer, float } from './CommonTypes';
+import {
+  PolygonVertices,
+  integer,
+  float,
+  EditableTileMapAsJsObject,
+  EditableTileMapLayerAsJsObject,
+} from './CommonTypes';
 /**
  * A tile map model.
  *
@@ -22,11 +28,15 @@ export declare class EditableTileMap {
   /**
    * The number of tile columns in the map.
    */
-  private readonly dimX;
+  private dimX;
   /**
    * The number of tile rows in the map.
    */
-  private readonly dimY;
+  private dimY;
+  /**
+   * True if is allowed to set a tile out of the tile map's bounds.
+   * Useful when editing the tile map easily.
+   */
   /**
    * @param tileWidth The width of a tile.
    * @param tileHeight The height of a tile.
@@ -41,6 +51,27 @@ export declare class EditableTileMap {
     dimY: integer,
     tileSet: Map<integer, TileDefinition>
   );
+  /**
+   * Loads EditableTileMap from serialized data.
+   * Uses object configuration as the source of truth as the serialized data
+   * might contain expired data (if the tile set configuration has changed and
+   * the serialized data was not updated).
+   * @param editableTileMapAsJsObject Serialized editable tile map object
+   * @param objectConfiguration
+   */
+  static from(
+    editableTileMapAsJsObject: EditableTileMapAsJsObject,
+    {
+      tileSize,
+      tileSetColumnCount,
+      tileSetRowCount,
+    }: {
+      tileSize: number;
+      tileSetColumnCount: number;
+      tileSetRowCount: number;
+    }
+  ): EditableTileMap;
+  toJSObject(): Object;
   /**
    * @returns The tile map width in pixels.
    */
@@ -66,6 +97,28 @@ export declare class EditableTileMap {
    */
   getDimensionY(): integer;
   /**
+   * Changes the number of columns in the tile map by adding/removing
+   * columns at the end.
+   * @param dim The number of tile columns in the map.
+   */
+  setDimensionX(dim: integer): void;
+  /**
+   * Increases dimensions of the tile map by adding columns and rows
+   * at the start and/or at the end of the grid.
+   */
+  increaseDimensions(
+    columnsToAppend: number,
+    columnsToUnshift: number,
+    rowsToAppend: number,
+    rowsToUnshift: number
+  ): void;
+  /**
+   * Changes the number of row in the tile map by adding/removing
+   * rows at the end.
+   * @param dim The number of tile rows in the map.
+   */
+  setDimensionY(dim: integer): void;
+  /**
    * @param tileId The tile identifier
    * @returns The tile definition form the tile set.
    */
@@ -78,7 +131,12 @@ export declare class EditableTileMap {
    * @param id The identifier of the new layer.
    * @returns The new layer.
    */
-  addTileLayer(id: integer): EditableTileMapLayer;
+  addNewTileLayer(id: integer): EditableTileMapLayer;
+  /**
+   * @param layer the new layer to set.
+   */
+  addTileLayer(layer: EditableTileMapLayer): void;
+  getTileLayer(id: integer): EditableTileMapLayer | null;
   /**
    * @param id The identifier of the new layer.
    * @returns The new layer.
@@ -108,6 +166,27 @@ export declare class EditableTileMap {
    * @param resourceName The name of the resource
    */
   setBackgroundResourceName(resourceName: string): void;
+  /**
+   * Returns true if all layers contain no defined tiled.
+   */
+  isEmpty(): boolean;
+  getTileId(x: integer, y: integer, layerId: integer): integer;
+  setTile(x: integer, y: integer, layerId: integer, tileId: number): void;
+  flipTileOnY(x: integer, y: integer, layerId: integer, flip: boolean): void;
+  flipTileOnX(x: integer, y: integer, layerId: integer, flip: boolean): void;
+  isTileFlippedOnX(x: integer, y: integer, layerId: integer): boolean;
+  isTileFlippedOnY(x: integer, y: integer, layerId: integer): boolean;
+  removeTile(x: integer, y: integer, layerId: integer): void;
+  trimEmptyColumnsAndRowToFitLayer(
+    layerId: integer
+  ):
+    | {
+        poppedRows: number;
+        poppedColumns: number;
+        shiftedRows: number;
+        shiftedColumns: number;
+      }
+    | undefined;
 }
 /**
  * A tile map layer.
@@ -128,10 +207,12 @@ declare abstract class AbstractEditableLayer {
    */
   constructor(tileMap: EditableTileMap, id: integer);
   setVisible(visible: boolean): void;
+  toJSObject(): Object;
   /**
    * @returns true if the layer is visible.
    */
   isVisible(): boolean;
+  isEmpty(): boolean;
 }
 /**
  * A layer where tiles are placed with pixel coordinates.
@@ -144,6 +225,7 @@ export declare class EditableObjectLayer extends AbstractEditableLayer {
    */
   constructor(tileMap: EditableTileMap, id: integer);
   add(object: TileObject): void;
+  isEmpty(): boolean;
 }
 /**
  * A tile that is placed with pixel coordinates.
@@ -191,13 +273,20 @@ export declare class TileObject {
  * A tile map layer with tile organized in grid.
  */
 export declare class EditableTileMapLayer extends AbstractEditableLayer {
-  private readonly _tiles;
+  private _tiles;
   private _alpha;
   /**
    * @param tileMap The layer tile map.
    * @param id The layer identifier.
    */
   constructor(tileMap: EditableTileMap, id: integer);
+  buildEmptyLayer(dimensionX: number, dimensionY: number): void;
+  static from(
+    editableTileMapLayerAsJsObject: EditableTileMapLayerAsJsObject,
+    tileMap: EditableTileMap,
+    isTileIdValid: (tileId: number) => boolean
+  ): EditableTileMapLayer;
+  toJSObject(): Object;
   /**
    * The opacity (between 0-1) of the layer
    */
@@ -206,12 +295,37 @@ export declare class EditableTileMapLayer extends AbstractEditableLayer {
    * @param alpha The opacity between 0-1
    */
   setAlpha(alpha: float): void;
+  isEmpty(): boolean;
+  reduceDimensions(
+    columnsToPop: number,
+    columnsToShift: number,
+    rowsToPop: number,
+    rowsToShift: number
+  ): void;
+  increaseDimensions(
+    columnsToAppend: number,
+    columnsToUnshift: number,
+    rowsToAppend: number,
+    rowsToUnshift: number
+  ): void;
   /**
    * @param x The layer column.
    * @param y The layer row.
    * @param tileId The tile.
    */
   setTile(x: integer, y: integer, tileId: integer): void;
+  /**
+   * @param x The layer column.
+   * @param y The layer row.
+   * @param tileGID The tile GID.
+   */
+  setTileGID(x: integer, y: integer, tileGID: integer): void;
+  getTrimmingData(): {
+    rowsToShift: number;
+    columnsToShift: number;
+    rowsToPop: number;
+    columnsToPop: number;
+  };
   /**
    * @param x The layer column.
    * @param y The layer row.
@@ -317,8 +431,13 @@ export declare class TileDefinition {
    * Add a polygon for the collision layer
    * @param tag The tag to allow collision layer filtering.
    * @param polygon The polygon to use for collisions.
+   * @param hasFullHitBox Set to `true` when the hitBox cover the whole tile.
    */
-  addHitBox(tag: string, polygon: PolygonVertices): void;
+  addHitBox(
+    tag: string,
+    polygon: PolygonVertices,
+    hasFullHitBox: boolean
+  ): void;
   /**
    * This property is used by {@link TransformedCollisionTileMap}
    * to make collision classes.
@@ -332,6 +451,12 @@ export declare class TileDefinition {
    * @returns The hit boxes for this tile.
    */
   getHitBoxes(tag: string): PolygonVertices[] | undefined;
+  /**
+   * Return `true` if the hit-box cover the whole tile.
+   * @param tag  The tag to allow collision layer filtering.
+   * @returns `true` if the hit-box cover the whole tile.
+   */
+  hasFullHitBox(tag: string): boolean;
   /**
    * Animated tiles have a limitation:
    * they are only able to use frames arranged horizontally one next

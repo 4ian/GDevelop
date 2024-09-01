@@ -71,6 +71,7 @@ declare class libGDevelop {
   VariablesContainer: Class<gdVariablesContainer>;
   VariablesContainersList: Class<gdVariablesContainersList>;
   ObjectGroup: Class<gdObjectGroup>;
+  GroupVariableHelper: Class<gdGroupVariableHelper>;
   ObjectGroupsContainer: Class<gdObjectGroupsContainer>;
   PlatformSpecificAssets: Class<gdPlatformSpecificAssets>;
   LoadingScreen: Class<gdLoadingScreen>;
@@ -144,9 +145,11 @@ declare class libGDevelop {
   DependencyMetadata: Class<gdDependencyMetadata>;
   ParameterMetadata: Class<gdParameterMetadata>;
   ValueTypeMetadata: Class<gdValueTypeMetadata>;
-  VectorParameterMetadata: Class<gdVectorParameterMetadata>;
+  ParameterMetadataContainer: Class<gdParameterMetadataContainer>;
   ParameterMetadataTools: Class<gdParameterMetadataTools>;
   ObjectMetadata: Class<gdObjectMetadata>;
+  QuickCustomization_Visibility: Class<QuickCustomization_Visibility>;
+  QuickCustomization: Class<gdQuickCustomization>;
   BehaviorMetadata: Class<gdBehaviorMetadata>;
   EffectMetadata: Class<gdEffectMetadata>;
   EventMetadata: Class<gdEventMetadata>;

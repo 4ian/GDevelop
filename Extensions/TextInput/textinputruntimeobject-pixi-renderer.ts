@@ -106,7 +106,9 @@ namespace gdjs {
     }
 
     onSceneResumed() {
-      this._createElement();
+      // The input must have been destroyed when the scene was paused,
+      // in case it still exists, skip recreation.
+      if (!this._input) this._createElement();
     }
 
     onDestroy() {

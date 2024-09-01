@@ -31,6 +31,8 @@
 
 namespace gd {
 
+VariablesContainer EventsVariableInstructionTypeSwitcher::nullVariablesContainer;
+
 bool EventsVariableInstructionTypeSwitcher::DoVisitInstruction(gd::Instruction& instruction,
                                                 bool isCondition) {
   const auto& metadata = isCondition
@@ -82,7 +84,8 @@ bool EventsVariableInstructionTypeSwitcher::DoVisitInstruction(gd::Instruction& 
         // Every occurrence of the variable or its children are checked.
         // Ensuring that a child is actually the one with a type change would
         // take more time.
-        if (variablesContainer == &targetVariablesContainer) {
+        if (variablesContainer == &targetVariablesContainer ||
+            lastObjectName == groupName) {
           if (typeChangedVariableNames.find(variableName) !=
               typeChangedVariableNames.end()) {
             gd::VariableInstructionSwitcher::

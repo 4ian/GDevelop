@@ -463,11 +463,15 @@ class GD_CORE_API ExpressionCompletionFinder
           MetadataProvider::GetFunctionCallMetadata(
               platform, objectsContainersList, *functionCall);
 
-      const gd::ParameterMetadata* parameterMetadata = nullptr;
-      while (metadataParameterIndex < metadata.parameters.size()) {
-        if (!metadata.parameters[metadataParameterIndex].IsCodeOnly()) {
+      const gd::ParameterMetadata *parameterMetadata = nullptr;
+      while (metadataParameterIndex <
+             metadata.GetParameters().GetParametersCount()) {
+        if (!metadata.GetParameters()
+                 .GetParameter(metadataParameterIndex)
+                 .IsCodeOnly()) {
           if (visibleParameterIndex == parameterIndex) {
-            parameterMetadata = &metadata.parameters[metadataParameterIndex];
+            parameterMetadata =
+                &metadata.GetParameters().GetParameter(metadataParameterIndex);
           }
           visibleParameterIndex++;
         }

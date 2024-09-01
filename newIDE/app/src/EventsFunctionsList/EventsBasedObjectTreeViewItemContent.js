@@ -19,6 +19,10 @@ import Add from '../UI/CustomSvgIcons/Add';
 
 const EVENTS_BASED_OBJECT_CLIPBOARD_KIND = 'Events Based Object';
 
+export type EventsBasedObjectCreationParameters = {|
+  isRenderedIn3D: boolean,
+|};
+
 export type EventsBasedObjectCallbacks = {|
   onSelectEventsBasedObject: (eventsBasedObject: ?gdEventsBasedObject) => void,
   onDeleteEventsBasedObject: (
@@ -29,6 +33,9 @@ export type EventsBasedObjectCallbacks = {|
     eventsBasedObject: gdEventsBasedObject,
     newName: string,
     cb: (boolean) => void
+  ) => void,
+  onAddEventsBasedObject: (
+    (parameters: ?EventsBasedObjectCreationParameters) => void
   ) => void,
   onEventsBasedObjectRenamed: (eventsBasedObject: gdEventsBasedObject) => void,
   onOpenCustomObjectEditor: (eventsBasedObject: gdEventsBasedObject) => void,
@@ -177,7 +184,7 @@ export class EventsBasedObjectTreeViewItemContent
         click: () => this.paste(),
         accelerator: 'CmdOrCtrl+V',
       },
-    ];
+    ].filter(Boolean);
   }
 
   renderRightComponent(i18n: I18nType): ?React.Node {

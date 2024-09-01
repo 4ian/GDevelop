@@ -25,7 +25,7 @@ import { EventsFunctionParametersEditor } from '../../EventsFunctionsExtensionEd
 import { EventsFunctionPropertiesEditor } from '../../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/EventsFunctionPropertiesEditor';
 import HelpButton from '../../UI/HelpButton';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
-import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
+import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 const gd: libGDevelop = global.gd;
 
 type Props = {|
@@ -294,6 +294,7 @@ export default class EventsFunctionExtractorDialog extends React.Component<
             eventsBasedBehavior={null}
             eventsBasedObject={null}
             eventsFunctionsContainer={null}
+            eventsFunctionsExtension={null}
             onConfigurationUpdated={() => {
               // Force re-running logic to see if Create button is disabled.
               this.forceUpdate();
@@ -307,6 +308,7 @@ export default class EventsFunctionExtractorDialog extends React.Component<
             eventsBasedBehavior={null}
             eventsBasedObject={null}
             eventsFunctionsContainer={null}
+            eventsFunctionsExtension={null}
             onParametersUpdated={() => {
               // Force the dialog to adapt its size
               this.forceUpdate();

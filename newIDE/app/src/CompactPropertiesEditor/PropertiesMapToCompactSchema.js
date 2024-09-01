@@ -6,6 +6,8 @@ import { type ResourceKind } from '../ResourcesList/ResourceSource';
 import { type Field } from '.';
 import MeasurementUnitDocumentation from '../PropertiesEditor/MeasurementUnitDocumentation';
 
+const gd: libGDevelop = global.gd;
+
 const createField = (
   name: string,
   property: gdPropertyDescriptor,
@@ -249,7 +251,7 @@ const uncapitalize = str => {
 const isPropertyVisible = (
   properties: gdMapStringPropertyDescriptor,
   name: string,
-  visibility: 'All' | 'Basic' | 'Advanced' | 'Deprecated'
+  visibility: 'All' | 'Basic' | 'Advanced' | 'Deprecated' | 'Basic-Quick'
 ): boolean => {
   if (!properties.has(name)) {
     return false;
@@ -269,6 +271,27 @@ const isPropertyVisible = (
   }
   if (visibility === 'Basic') {
     return !property.isAdvanced() && !property.isDeprecated();
+  }
+  if (visibility === 'Basic-Quick') {
+    // "Basic":
+    if (property.isDeprecated()) return false;
+    if (property.isAdvanced()) return false;
+
+    // Honor visibility if set:
+    if (
+      property.getQuickCustomizationVisibility() ===
+      gd.QuickCustomization.Hidden
+    )
+      return false;
+    if (
+      property.getQuickCustomizationVisibility() ===
+      gd.QuickCustomization.Visible
+    )
+      return true;
+
+    // Otherwise, hide some properties that we know are complex.
+    const propertyType = property.getType();
+    if (propertyType === 'Behavior') return false; // Hide "required behaviors".
   }
   return true;
 };
@@ -292,7 +315,12 @@ const propertiesMapToSchema = (
     newValue: string
   ) => void,
   object: ?gdObject,
-  visibility: 'All' | 'Basic' | 'Advanced' | 'Deprecated' = 'All'
+  visibility:
+    | 'All'
+    | 'Basic'
+    | 'Advanced'
+    | 'Deprecated'
+    | 'Basic-Quick' = 'All'
 ): Schema => {
   const propertyNames = properties.keys();
   // Aggregate field by groups to be able to build field groups with a title.

@@ -58,6 +58,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
   const {
     project,
     layout,
+    eventsFunctionsExtension,
     eventsBasedObject,
     layersContainer,
     globalObjectsContainer,
@@ -117,6 +118,13 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
   const forceUpdateObjectGroupsList = React.useCallback(() => {
     if (objectGroupsListRef.current) objectGroupsListRef.current.forceUpdate();
   }, []);
+  const scrollObjectGroupsListToObjectGroup = React.useCallback(
+    (objectGroup: gdObjectGroup) => {
+      if (objectGroupsListRef.current)
+        objectGroupsListRef.current.scrollToObjectGroup(objectGroup);
+    },
+    []
+  );
   const forceUpdateLayersList = React.useCallback(() => {
     if (layersListRef.current) layersListRef.current.forceUpdate();
   }, []);
@@ -136,15 +144,6 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
     },
     [selectedEditorId, drawerOpeningState]
   );
-  const renameObjectFolderOrObjectWithContext = React.useCallback(
-    objectWithContext => {
-      if (objectsListRef.current)
-        objectsListRef.current.renameObjectFolderOrObjectWithContext(
-          objectWithContext
-        );
-    },
-    []
-  );
 
   const startSceneRendering = React.useCallback((start: boolean) => {
     const editor = editorRef.current;
@@ -163,12 +162,12 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
       forceUpdateInstancesPropertiesEditor,
       forceUpdateObjectsList,
       forceUpdateObjectGroupsList,
+      scrollObjectGroupsListToObjectGroup,
       forceUpdateLayersList,
       openNewObjectDialog,
       toggleEditorView: halfOpenOrCloseDrawerOnEditor,
       isEditorVisible,
       startSceneRendering,
-      renameObjectFolderOrObjectWithContext,
       viewControls: {
         zoomBy: editor ? editor.zoomBy : noop,
         setZoomFactor: editor ? editor.setZoomFactor : noop,
@@ -270,6 +269,8 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
               }
               pauseRendering={!props.isActive}
               showObjectInstancesIn3D={values.use3DEditor}
+              tileMapTileSelection={props.tileMapTileSelection}
+              onSelectTileMapTile={props.onSelectTileMapTile}
             />
           </ErrorBoundary>
           <div style={styles.bottomContainer} id={swipeableDrawerContainerId}>
@@ -301,7 +302,6 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                       selectedObjectFolderOrObjectsWithContext={
                         props.selectedObjectFolderOrObjectsWithContext
                       }
-                      canInstallPrivateAsset={props.canInstallPrivateAsset}
                       onEditObject={props.onEditObject}
                       onExportAssets={props.onExportAssets}
                       onDeleteObjects={(objectWithContext, cb) =>
@@ -315,6 +315,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                         )
                       }
                       onObjectCreated={props.onObjectCreated}
+                      onObjectEdited={props.onObjectEdited}
                       onObjectFolderOrObjectWithContextSelected={
                         props.onObjectFolderOrObjectWithContextSelected
                       }
@@ -358,6 +359,8 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                       ref={instancesPropertiesEditorRef}
                       unsavedChanges={props.unsavedChanges}
                       historyHandler={props.historyHandler}
+                      tileMapTileSelection={props.tileMapTileSelection}
+                      onSelectTileMapTile={props.onSelectTileMapTile}
                     />
                   )}
                 </I18n>
@@ -372,6 +375,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                         globalObjectsContainer.getObjectGroups()
                       }
                       objectGroups={objectsContainer.getObjectGroups()}
+                      onCreateGroup={props.onCreateObjectGroup}
                       onEditGroup={props.onEditObjectGroup}
                       onDeleteGroup={props.onDeleteObjectGroup}
                       onRenameGroup={props.onRenameObjectGroup}
@@ -408,6 +412,8 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                 <LayersList
                   project={project}
                   layout={layout}
+                  eventsFunctionsExtension={eventsFunctionsExtension}
+                  eventsBasedObject={eventsBasedObject}
                   selectedLayer={selectedLayer}
                   onSelectLayer={props.onSelectLayer}
                   onEditLayerEffects={props.editLayerEffects}

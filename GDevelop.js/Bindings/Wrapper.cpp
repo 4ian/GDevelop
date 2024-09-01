@@ -47,6 +47,7 @@
 #include <GDCore/IDE/Events/TextFormatting.h>
 #include <GDCore/IDE/Events/UsedExtensionsFinder.h>
 #include <GDCore/IDE/EventsFunctionTools.h>
+#include <GDCore/IDE/GroupVariableHelper.h>
 #include <GDCore/IDE/Project/ArbitraryResourceWorker.h>
 #include <GDCore/IDE/Project/ArbitraryObjectsWorker.h>
 #include <GDCore/IDE/Project/ObjectsUsingResourceCollector.h>
@@ -88,6 +89,7 @@
 #include <GDCore/Project/Variable.h>
 #include <GDCore/Project/VariablesContainer.h>
 #include <GDCore/Project/VariablesContainersList.h>
+#include <GDCore/Project/QuickCustomization.h>
 #include <GDCore/Serialization/Serializer.h>
 #include <GDCore/Serialization/SerializerElement.h>
 #include <GDCore/IDE/ObjectAssetSerializer.h>
@@ -388,26 +390,6 @@ void moveVector2fInVector(std::vector<gd::Vector2f> &vec,
   vec.insert(vec.begin() + newIndex, std::move(vector2f));
 }
 
-void removeFromVectorParameterMetadata(std::vector<gd::ParameterMetadata> &vec,
-                                       size_t pos) {
-  vec.erase(vec.begin() + pos);
-}
-
-void insertIntoVectorParameterMetadata(
-    std::vector<gd::ParameterMetadata> &vec,
-    size_t pos,
-    const ParameterMetadata &parameterMetadata) {
-  vec.insert(vec.begin() + pos, parameterMetadata);
-}
-
-void swapInVectorParameterMetadata(std::vector<gd::ParameterMetadata> &vec,
-                                   size_t oldIndex,
-                                   size_t newIndex) {
-  if (oldIndex > vec.size() || newIndex > vec.size()) return;
-
-  std::swap(vec[oldIndex], vec[newIndex]);
-}
-
 // Implement a conversion from std::set<gd::String> to std::vector<gd::String>
 // as there is no easy way to properly expose iterators :/
 std::vector<gd::String> toNewVectorString(const std::set<gd::String> &set) {
@@ -443,7 +425,6 @@ typedef std::vector<Point> VectorPoint;
 typedef std::vector<Polygon2d> VectorPolygon2d;
 typedef std::vector<gd::Vector2f> VectorVector2f;
 typedef std::vector<EventsSearchResult> VectorEventsSearchResult;
-typedef std::vector<gd::ParameterMetadata> VectorParameterMetadata;
 typedef std::vector<gd::DependencyMetadata> VectorDependencyMetadata;
 typedef std::vector<gd::EventsFunction> VectorEventsFunction;
 typedef gd::Object gdObject;  // To avoid clashing javascript Object in glue.js
@@ -478,6 +459,8 @@ typedef std::shared_ptr<SerializerElement> SharedPtrSerializerElement;
 typedef std::vector<UnfilledRequiredBehaviorPropertyProblem>
     VectorUnfilledRequiredBehaviorPropertyProblem;
 typedef std::vector<const gd::ObjectFolderOrObject*> VectorObjectFolderOrObject;
+typedef QuickCustomization::Visibility
+    QuickCustomization_Visibility;
 
 typedef ExtensionAndMetadata<BehaviorMetadata> ExtensionAndBehaviorMetadata;
 typedef ExtensionAndMetadata<ObjectMetadata> ExtensionAndObjectMetadata;
@@ -646,9 +629,9 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_Year Year
 #define STATIC_Month Month
 #define STATIC_Date Date
-#define STATIC_ObjectOrGroupRenamedInLayout ObjectOrGroupRenamedInLayout
-#define STATIC_ObjectRemovedInLayout ObjectRemovedInLayout
-#define STATIC_BehaviorsAddedToObjectInLayout BehaviorsAddedToObjectInLayout
+#define STATIC_ObjectOrGroupRenamedInScene ObjectOrGroupRenamedInScene
+#define STATIC_ObjectRemovedInScene ObjectRemovedInScene
+#define STATIC_BehaviorsAddedToObjectInScene BehaviorsAddedToObjectInScene
 #define STATIC_ObjectRemovedInEventsFunction \
   ObjectRemovedInEventsFunction
 #define STATIC_ObjectOrGroupRenamedInEventsFunction \
@@ -723,8 +706,12 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_GetBehaviorFullType GetBehaviorFullType
 #define STATIC_ApplyRefactoringForVariablesContainer \
   ApplyRefactoringForVariablesContainer
+#define STATIC_ApplyRefactoringForGroupVariablesContainer \
+  ApplyRefactoringForGroupVariablesContainer
 #define STATIC_ComputeChangesetForVariablesContainer \
   ComputeChangesetForVariablesContainer
+#define STATIC_MergeVariableContainers MergeVariableContainers
+#define STATIC_FillAnyVariableBetweenObjects FillAnyVariableBetweenObjects
 #define STATIC_RenameEventsFunctionsExtension RenameEventsFunctionsExtension
 #define STATIC_UpdateExtensionNameInEventsBasedBehavior \
   UpdateExtensionNameInEventsBasedBehavior
@@ -746,11 +733,16 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_RenameLayout RenameLayout
 #define STATIC_RenameExternalLayout RenameExternalLayout
 #define STATIC_RenameExternalEvents RenameExternalEvents
-#define STATIC_RenameLayer RenameLayer
-#define STATIC_RenameLayerEffect RenameLayerEffect
-#define STATIC_RenameObjectAnimation RenameObjectAnimation
-#define STATIC_RenameObjectPoint RenameObjectPoint
-#define STATIC_RenameObjectEffect RenameObjectEffect
+#define STATIC_RenameLayerInScene RenameLayerInScene
+#define STATIC_RenameLayerEffectInScene RenameLayerEffectInScene
+#define STATIC_RenameObjectAnimationInScene RenameObjectAnimationInScene
+#define STATIC_RenameObjectPointInScene RenameObjectPointInScene
+#define STATIC_RenameObjectEffectInScene RenameObjectEffectInScene
+#define STATIC_RenameLayerInEventsBasedObject RenameLayerInEventsBasedObject
+#define STATIC_RenameLayerEffectInEventsBasedObject RenameLayerEffectInEventsBasedObject
+#define STATIC_RenameObjectAnimationInEventsBasedObject RenameObjectAnimationInEventsBasedObject
+#define STATIC_RenameObjectPointInEventsBasedObject RenameObjectPointInEventsBasedObject
+#define STATIC_RenameObjectEffectInEventsBasedObject RenameObjectEffectInEventsBasedObject
 
 #define STATIC_GetBehaviorPropertyGetterName GetBehaviorPropertyGetterName
 #define STATIC_GetBehaviorPropertySetterName GetBehaviorPropertySetterName
@@ -830,6 +822,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define RemoveAt Remove
 #define GetEventsFunctionAt GetEventsFunction
 #define GetEffectAt GetEffect
+#define GetParameterAt GetParameter
 
 // We don't use prefix in .idl file to workaround a webidl_binder.py bug
 // that can't find in its list of interfaces a class which has a prefix.

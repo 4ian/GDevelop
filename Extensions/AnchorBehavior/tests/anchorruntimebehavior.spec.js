@@ -96,6 +96,22 @@ describe('gdjs.AnchorRuntimeBehavior', function () {
         expect(object.getWidth()).to.equal(10);
       });
     });
+    ['rightEdgeAnchor', 'leftEdgeAnchor'].forEach((objectEdge) => {
+      it(`anchors the ${objectEdge} edge of object to window center (fixed)`, function () {
+        const object = createObject({ [objectEdge]: 4 });
+        runtimeGame.setGameResolutionSize(1000, 1000);
+        object.setPosition(500, 500);
+
+        runtimeScene.renderAndStep(1000 / 60);
+
+        runtimeGame.setGameResolutionSize(2000, 2000);
+
+        runtimeScene.renderAndStep(1000 / 60);
+        expect(object.getX()).to.equal(1000);
+        expect(object.getY()).to.equal(500);
+        expect(object.getWidth()).to.equal(10);
+      });
+    });
 
     it('anchors the right and left edge of object (fixed)', function () {
       const object = createObject({ leftEdgeAnchor: 1, rightEdgeAnchor: 2 });
@@ -158,6 +174,22 @@ describe('gdjs.AnchorRuntimeBehavior', function () {
 
         expect(object.getX()).to.equal(500);
         expect(object.getY()).to.equal(1500);
+        expect(object.getWidth()).to.equal(10);
+      });
+    });
+    ['topEdgeAnchor', 'bottomEdgeAnchor'].forEach((objectEdge) => {
+      it(`anchors the ${objectEdge} edge of object to window center (fixed)`, function () {
+        const object = createObject({ [objectEdge]: 4 });
+        runtimeGame.setGameResolutionSize(1000, 1000);
+        object.setPosition(500, 500);
+
+        runtimeScene.renderAndStep(1000 / 60);
+
+        runtimeGame.setGameResolutionSize(2000, 2000);
+        runtimeScene.renderAndStep(1000 / 60);
+
+        expect(object.getX()).to.equal(500);
+        expect(object.getY()).to.equal(1000);
         expect(object.getWidth()).to.equal(10);
       });
     });

@@ -38,7 +38,7 @@ import GlobalVariableIcon from '../../UI/CustomSvgIcons/GlobalVariable';
 import SceneVariableIcon from '../../UI/CustomSvgIcons/SceneVariable';
 import ObjectVariableIcon from '../../UI/CustomSvgIcons/ObjectVariable';
 import LocalVariableIcon from '../../UI/CustomSvgIcons/LocalVariable';
-import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import Link from '../../UI/Link';
 import Add from '../../UI/CustomSvgIcons/Add';
 

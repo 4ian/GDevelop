@@ -82,6 +82,7 @@ const MosaicEditorsDisplay = React.forwardRef<
   const {
     project,
     layout,
+    eventsFunctionsExtension,
     eventsBasedObject,
     layersContainer,
     globalObjectsContainer,
@@ -121,6 +122,13 @@ const MosaicEditorsDisplay = React.forwardRef<
   const forceUpdateObjectGroupsList = React.useCallback(() => {
     if (objectGroupsListRef.current) objectGroupsListRef.current.forceUpdate();
   }, []);
+  const scrollObjectGroupsListToObjectGroup = React.useCallback(
+    (objectGroup: gdObjectGroup) => {
+      if (objectGroupsListRef.current)
+        objectGroupsListRef.current.scrollToObjectGroup(objectGroup);
+    },
+    []
+  );
   const forceUpdateLayersList = React.useCallback(() => {
     if (layersListRef.current) layersListRef.current.forceUpdate();
   }, []);
@@ -148,15 +156,6 @@ const MosaicEditorsDisplay = React.forwardRef<
     if (!editorMosaicRef.current) return false;
     return editorMosaicRef.current.getOpenedEditorNames().includes(editorId);
   }, []);
-  const renameObjectFolderOrObjectWithContext = React.useCallback(
-    objectWithContext => {
-      if (objectsListRef.current)
-        objectsListRef.current.renameObjectFolderOrObjectWithContext(
-          objectWithContext
-        );
-    },
-    []
-  );
 
   const startSceneRendering = React.useCallback((start: boolean) => {
     const editor = editorRef.current;
@@ -174,12 +173,12 @@ const MosaicEditorsDisplay = React.forwardRef<
       forceUpdateInstancesPropertiesEditor,
       forceUpdateObjectsList,
       forceUpdateObjectGroupsList,
+      scrollObjectGroupsListToObjectGroup,
       forceUpdateLayersList,
       openNewObjectDialog,
       toggleEditorView,
       isEditorVisible,
       startSceneRendering,
-      renameObjectFolderOrObjectWithContext,
       viewControls: {
         zoomBy: editor ? editor.zoomBy : noop,
         setZoomFactor: editor ? editor.setZoomFactor : noop,
@@ -264,6 +263,8 @@ const MosaicEditorsDisplay = React.forwardRef<
               ref={instancesPropertiesEditorRef}
               unsavedChanges={props.unsavedChanges}
               historyHandler={props.historyHandler}
+              tileMapTileSelection={props.tileMapTileSelection}
+              onSelectTileMapTile={props.onSelectTileMapTile}
             />
           )}
         </I18n>
@@ -276,6 +277,8 @@ const MosaicEditorsDisplay = React.forwardRef<
         <LayersList
           project={project}
           layout={layout}
+          eventsFunctionsExtension={eventsFunctionsExtension}
+          eventsBasedObject={eventsBasedObject}
           selectedLayer={selectedLayer}
           onSelectLayer={props.onSelectLayer}
           onEditLayerEffects={props.editLayerEffects}
@@ -337,6 +340,8 @@ const MosaicEditorsDisplay = React.forwardRef<
             editorRef.current = editor;
           }}
           pauseRendering={!props.isActive}
+          tileMapTileSelection={props.tileMapTileSelection}
+          onSelectTileMapTile={props.onSelectTileMapTile}
         />
       ),
     },
@@ -364,7 +369,6 @@ const MosaicEditorsDisplay = React.forwardRef<
               selectedObjectFolderOrObjectsWithContext={
                 props.selectedObjectFolderOrObjectsWithContext
               }
-              canInstallPrivateAsset={props.canInstallPrivateAsset}
               onEditObject={props.onEditObject}
               onExportAssets={props.onExportAssets}
               onDeleteObjects={(objectWithContext, cb) =>
@@ -374,6 +378,7 @@ const MosaicEditorsDisplay = React.forwardRef<
                 props.getValidatedObjectOrGroupName(newName, global, i18n)
               }
               onObjectCreated={props.onObjectCreated}
+              onObjectEdited={props.onObjectEdited}
               onObjectFolderOrObjectWithContextSelected={
                 props.onObjectFolderOrObjectWithContextSelected
               }
@@ -406,6 +411,7 @@ const MosaicEditorsDisplay = React.forwardRef<
                 globalObjectsContainer.getObjectGroups()
               }
               objectGroups={objectsContainer.getObjectGroups()}
+              onCreateGroup={props.onCreateObjectGroup}
               onEditGroup={props.onEditObjectGroup}
               onDeleteGroup={props.onDeleteObjectGroup}
               onRenameGroup={props.onRenameObjectGroup}

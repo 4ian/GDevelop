@@ -4,8 +4,8 @@
  * reserved. This project is released under the MIT License.
  */
 
-#ifndef GDCORE_VARIABLE_H
-#define GDCORE_VARIABLE_H
+#pragma once
+
 #include <cmath>
 #include <map>
 #include <memory>
@@ -31,6 +31,8 @@ class GD_CORE_API Variable {
   static gd::Variable badVariable;
   enum Type {
     Unknown,
+    /** Used when objects of a group have different types for a variable. */
+    MixedTypes,
     
     // Primitive types
     String,
@@ -50,7 +52,7 @@ class GD_CORE_API Variable {
   /**
    * \brief Default constructor creating a variable with 0 as value.
    */
-  Variable() : value(0), type(Type::Number){};
+  Variable() : value(0), type(Type::Number), hasMixedValues(false) {};
   Variable(const Variable&);
   virtual ~Variable(){};
 
@@ -87,6 +89,7 @@ class GD_CORE_API Variable {
   void SetString(const gd::String& newStr) {
     str = newStr;
     type = Type::String;
+    hasMixedValues = false;
   }
 
   /**
@@ -102,6 +105,7 @@ class GD_CORE_API Variable {
     // NaN values are not supported by GDevelop nor the serializer.
     if (std::isnan(value)) value = 0.0;
     type = Type::Number;
+    hasMixedValues = false;
   }
 
   /**
@@ -115,7 +119,22 @@ class GD_CORE_API Variable {
   void SetBool(bool val) {
     boolVal = val;
     type = Type::Boolean;
+    hasMixedValues = false;
   }
+
+  /**
+   * \brief Return true when objects of a group have different values for a
+   * variable.
+   */
+  bool HasMixedValues() const {
+    return hasMixedValues;
+  }
+
+  /**
+   * \brief Return true when objects of a group have different values for a
+   * variable.
+   */
+  void MarkAsMixedValues();
 
   // Operators are overloaded to allow accessing to variable using a simple
   // int-like semantic.
@@ -167,6 +186,9 @@ class GD_CORE_API Variable {
 
   bool operator==(const bool val) const { return GetBool() == val; };
   bool operator!=(const bool val) const { return GetBool() != val; };
+
+  bool operator==(const gd::Variable& variable) const;
+  bool operator!=(const gd::Variable& variable) const;
 
   ///@}
 
@@ -376,6 +398,7 @@ class GD_CORE_API Variable {
   mutable gd::String str;
   mutable double value;
   mutable bool boolVal;
+  mutable bool hasMixedValues;
   mutable std::map<gd::String, std::shared_ptr<Variable>>
       children;  ///< Children, when the variable is considered as a structure.
   mutable std::vector<std::shared_ptr<Variable>>
@@ -392,5 +415,3 @@ class GD_CORE_API Variable {
 };
 
 }  // namespace gd
-
-#endif  // GDCORE_VARIABLE_H

@@ -2,13 +2,10 @@
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import { type ExportFlowProps } from '../../ExportPipeline.flow';
-import {
-  ColumnStackLayout,
-  ResponsiveLineStackLayout,
-} from '../../../UI/Layout';
+import { ResponsiveLineStackLayout } from '../../../UI/Layout';
 import FlatButton from '../../../UI/FlatButton';
 import RaisedButton from '../../../UI/RaisedButton';
-import { Line } from '../../../UI/Grid';
+import { Column } from '../../../UI/Grid';
 import OnlineGameLink from './OnlineGameLink';
 
 type OnlineWebExportFlowProps = {|
@@ -18,8 +15,7 @@ type OnlineWebExportFlowProps = {|
 
 const OnlineWebExportFlow = ({
   project,
-  game,
-  builds,
+  gameAndBuildsManager,
   build,
   onSaveProject,
   isSavingProject,
@@ -29,8 +25,9 @@ const OnlineWebExportFlow = ({
   launchExport,
   exportPipelineName,
   isExporting,
-  onRefreshGame,
+  uiMode,
 }: OnlineWebExportFlowProps) => {
+  const { game, builds, refreshGame } = gameAndBuildsManager;
   const hasGameExistingBuilds =
     game && builds
       ? !!builds.filter(build => build.gameId === game.id).length
@@ -41,23 +38,20 @@ const OnlineWebExportFlow = ({
     setAutomaticallyOpenGameProperties,
   ] = React.useState(false);
 
-  const isExportPending = exportStep !== '' && exportStep !== 'done';
+  // Only show the buttons when the export is not started or when it's done.
+  const shouldShowButtons =
+    uiMode === 'minimal'
+      ? exportStep === ''
+      : exportStep === '' || exportStep === 'done';
 
-  const Buttons = isExportPending ? null : hasGameExistingBuilds ? (
-    isPublishedOnGdgames ? (
-      <ResponsiveLineStackLayout justifyContent="center">
-        <FlatButton
-          label={<Trans>Generate new link</Trans>}
-          primary
-          id={`launch-export-${exportPipelineName}-web-button`}
-          onClick={async () => {
-            setAutomaticallyOpenGameProperties(false);
-            await launchExport();
-          }}
-          disabled={disabled}
-        />
+  const exportButtons =
+    hasGameExistingBuilds && isPublishedOnGdgames ? (
+      <ResponsiveLineStackLayout
+        justifyContent={uiMode === 'minimal' ? 'stretch' : 'center'}
+        noMargin
+      >
         <RaisedButton
-          label={<Trans>Update my current page</Trans>}
+          label={<Trans>Update the game page</Trans>}
           primary
           id={`launch-export-and-publish-${exportPipelineName}-web-button`}
           onClick={async () => {
@@ -68,11 +62,8 @@ const OnlineWebExportFlow = ({
           }}
           disabled={disabled}
         />
-      </ResponsiveLineStackLayout>
-    ) : (
-      <Line justifyContent="center">
-        <RaisedButton
-          label={<Trans>Generate new link</Trans>}
+        <FlatButton
+          label={<Trans>Generate a new link</Trans>}
           primary
           id={`launch-export-${exportPipelineName}-web-button`}
           onClick={async () => {
@@ -81,12 +72,16 @@ const OnlineWebExportFlow = ({
           }}
           disabled={disabled}
         />
-      </Line>
-    )
-  ) : (
-    <Line justifyContent="center">
+      </ResponsiveLineStackLayout>
+    ) : (
       <RaisedButton
-        label={<Trans>Generate link</Trans>}
+        label={
+          hasGameExistingBuilds ? (
+            <Trans>Generate a new link</Trans>
+          ) : (
+            <Trans>Generate link</Trans>
+          )
+        }
         primary
         id={`launch-export-${exportPipelineName}-web-button`}
         onClick={async () => {
@@ -95,12 +90,11 @@ const OnlineWebExportFlow = ({
         }}
         disabled={disabled}
       />
-    </Line>
-  );
+    );
 
   return (
-    <ColumnStackLayout noMargin>
-      {Buttons}
+    <Column noMargin alignItems={uiMode === 'minimal' ? 'stretch' : 'center'}>
+      {shouldShowButtons ? exportButtons : null}
       <OnlineGameLink
         build={build}
         project={project}
@@ -109,10 +103,10 @@ const OnlineWebExportFlow = ({
         errored={errored}
         exportStep={exportStep}
         automaticallyOpenGameProperties={automaticallyOpenGameProperties}
-        onRefreshGame={onRefreshGame}
+        onRefreshGame={refreshGame}
         game={game}
       />
-    </ColumnStackLayout>
+    </Column>
   );
 };
 

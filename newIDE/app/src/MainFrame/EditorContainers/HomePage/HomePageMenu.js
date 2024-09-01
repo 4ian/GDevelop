@@ -18,7 +18,7 @@ import GDevelopGLogo from '../../../UI/CustomSvgIcons/GDevelopGLogo';
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
 import HomePageMenuBar from './HomePageMenuBar';
 import {
-  canUseClassroomFeature,
+  shouldHideClassroomTab,
   type Limits,
 } from '../../../Utils/GDevelopServices/Usage';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
@@ -143,19 +143,29 @@ export const getTabsToDisplay = ({
       limits.capabilities.classrooms &&
       limits.capabilities.classrooms.hidePlayTab
     );
+  const displayCommunityTab =
+    !limits ||
+    !(
+      limits.capabilities.classrooms &&
+      limits.capabilities.classrooms.hideCommunityTab
+    );
+  const displayShopTab =
+    !limits ||
+    !(
+      limits.capabilities.classrooms &&
+      limits.capabilities.classrooms.hidePremiumProducts
+    );
   const tabs = [
     'get-started',
     'build',
-    canUseClassroomFeature(limits)
+    !shouldHideClassroomTab(limits) && !isNativeMobileApp()
       ? 'team-view'
-      : isNativeMobileApp()
-      ? null
-      : 'team-view',
+      : null,
     'manage',
-    'shop',
+    displayShopTab ? 'shop' : null,
     'learn',
     displayPlayTab ? 'play' : null,
-    'community',
+    displayCommunityTab ? 'community' : null,
   ].filter(Boolean);
   return tabs.map(tab => homePageMenuTabs[tab]);
 };

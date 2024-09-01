@@ -61,6 +61,7 @@ export const ImageWithMultipleExternalEditors = () => (
         },
       ],
       getStorageProviderResourceOperations: () => null,
+      canInstallPrivateAsset: () => false,
     }}
     initialResourceName=""
     onChange={action('on change')}

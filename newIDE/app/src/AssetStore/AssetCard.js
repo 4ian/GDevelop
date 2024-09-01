@@ -1,37 +1,16 @@
 // @flow
 import * as React from 'react';
-import {
-  type AssetShortHeader,
-  isPixelArt,
-  isPrivateAsset,
-} from '../Utils/GDevelopServices/Asset';
-import { getPixelatedImageRendering } from '../Utils/CssHelpers';
+import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 import Text from '../UI/Text';
-import { CorsAwareImage } from '../UI/CorsAwareImage';
 import CheckeredBackground from '../ResourcesList/CheckeredBackground';
-import AuthorizedAssetImage from './PrivateAssets/AuthorizedAssetImage';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
+import { AssetPreviewImage } from './AssetPreviewImage';
 
-const paddingSize = 10;
 const styles = {
   previewContainer: {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  previewImage: {
-    position: 'relative',
-    objectFit: 'contain',
-    verticalAlign: 'middle',
-    pointerEvents: 'none',
-  },
-  previewImagePixelated: {
-    width: '100%',
-    imageRendering: getPixelatedImageRendering(),
-    padding: 15,
-  },
-  icon: {
-    color: '#fff',
   },
   cardContainer: {
     overflow: 'hidden',
@@ -59,49 +38,34 @@ type Props = {|
   id?: string,
   size: number,
   assetShortHeader: AssetShortHeader,
+  hideShortDescription?: boolean,
 |};
 
-export const AssetCard = ({ id, assetShortHeader, size }: Props) => {
-  const previewImageUrl = assetShortHeader.previewImageUrls[0];
-  const isPrivate = isPrivateAsset(assetShortHeader);
-  const style = {
-    maxWidth: 128 - 2 * paddingSize,
-    maxHeight: 128 - 2 * paddingSize,
-    ...styles.previewImage,
-    ...(isPixelArt(assetShortHeader)
-      ? styles.previewImagePixelated
-      : undefined),
-  };
+export const AssetCard = ({
+  id,
+  assetShortHeader,
+  size,
+  hideShortDescription,
+}: Props) => {
+  const displayShortDescription =
+    !hideShortDescription && !!assetShortHeader.shortDescription;
+
   return (
     <div id={id} style={{ ...styles.cardContainer, width: size, height: size }}>
       <div style={{ ...styles.previewContainer, width: size, height: size }}>
         <CheckeredBackground />
-        {isPrivate ? (
-          <AuthorizedAssetImage
-            key={previewImageUrl}
-            style={style}
-            url={previewImageUrl}
-            alt={assetShortHeader.name}
-          />
-        ) : (
-          <CorsAwareImage
-            key={previewImageUrl}
-            style={style}
-            src={previewImageUrl}
-            alt={assetShortHeader.name}
-          />
-        )}
+        <AssetPreviewImage assetShortHeader={assetShortHeader} maxSize={128} />
       </div>
       <div
         style={{
           ...styles.titleContainer,
-          height: assetShortHeader.shortDescription ? 40 : 20,
+          height: displayShortDescription ? 40 : 20,
         }}
       >
         <Text noMargin style={styles.title} color="inherit">
           {assetShortHeader.name}
         </Text>
-        {assetShortHeader.shortDescription && (
+        {displayShortDescription && (
           <Text noMargin style={styles.title} size="body2" color="inherit">
             {assetShortHeader.shortDescription}
           </Text>

@@ -51,6 +51,7 @@ export namespace TiledTileMapLoader {
                 continue;
               }
               let polygon: PolygonVertices | null = null;
+              let hasFullHitBox = false;
               if (object.polygon) {
                 const angle = (object.rotation * Math.PI) / 180;
                 let cos = Math.cos(angle);
@@ -67,6 +68,7 @@ export namespace TiledTileMapLoader {
                   object.y + point.x * sin + point.y * cos,
                 ]);
                 //TODO check that polygons are convex or split them?
+                // TODO Set hasFullHitBox to true if the polygon covers the whole tile.
               }
               // TODO handle ellipses by creating a polygon?
               // Make an object property for the number of vertices or always create 8 ones?
@@ -83,9 +85,14 @@ export namespace TiledTileMapLoader {
                   [object.x + object.width, object.y + object.height],
                   [object.x + object.width, object.y],
                 ];
+                hasFullHitBox =
+                  object.x === 0 &&
+                  object.y === 0 &&
+                  object.width === tiledTileMap.tilewidth &&
+                  object.height === tiledTileMap.tileheight;
               }
               if (polygon) {
-                tileDefinition.addHitBox(tag, polygon);
+                tileDefinition.addHitBox(tag, polygon, hasFullHitBox);
               }
             }
           } else if (tileClass) {
@@ -96,7 +103,7 @@ export namespace TiledTileMapLoader {
               [tiledTileMap.tilewidth, tiledTileMap.tileheight],
               [tiledTileMap.tilewidth, 0],
             ];
-            tileDefinition.addHitBox(tileClass, polygon);
+            tileDefinition.addHitBox(tileClass, polygon, true);
           }
           definitions.set(
             getTileIdFromTiledGUI(firstGid + tile.id),
@@ -156,7 +163,7 @@ export namespace TiledTileMapLoader {
           layerData = tiledLayer.data as integer[];
         }
         if (layerData) {
-          const collisionTileLayer = collisionTileMap.addTileLayer(
+          const collisionTileLayer = collisionTileMap.addNewTileLayer(
             tiledLayer.id
           );
           collisionTileLayer.setAlpha(tiledLayer.opacity);

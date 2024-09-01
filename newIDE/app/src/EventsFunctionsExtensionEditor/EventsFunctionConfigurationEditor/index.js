@@ -12,7 +12,7 @@ import { type GroupWithContext } from '../../ObjectsList/EnumerateObjects';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
 import newNameGenerator from '../../Utils/NewNameGenerator';
 import { type ExtensionItemConfigurationAttribute } from '../../EventsFunctionsExtensionEditor';
-import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 
 const gd: libGDevelop = global.gd;
 
@@ -21,9 +21,10 @@ type Props = {|
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   objectsContainer: gdObjectsContainer,
   eventsFunction: gdEventsFunction,
-  eventsBasedBehavior: ?gdEventsBasedBehavior,
-  eventsBasedObject: ?gdEventsBasedObject,
+  eventsBasedBehavior: gdEventsBasedBehavior | null,
+  eventsBasedObject: gdEventsBasedObject | null,
   eventsFunctionsContainer: gdEventsFunctionsContainer,
+  eventsFunctionsExtension: gdEventsFunctionsExtension,
   onParametersOrGroupsUpdated: () => void,
   helpPagePath?: string,
   onConfigurationUpdated?: (?ExtensionItemConfigurationAttribute) => void,
@@ -132,6 +133,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
   render() {
     const {
       project,
+      projectScopedContainersAccessor,
       objectsContainer,
       eventsFunction,
       eventsBasedBehavior,
@@ -147,6 +149,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
       onMoveObjectEventsParameter,
       getFunctionGroupNames,
       eventsFunctionsContainer,
+      eventsFunctionsExtension,
     } = this.props;
 
     return (
@@ -182,6 +185,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                 eventsBasedBehavior={eventsBasedBehavior}
                 eventsBasedObject={eventsBasedObject}
                 eventsFunctionsContainer={eventsFunctionsContainer}
+                eventsFunctionsExtension={eventsFunctionsExtension}
                 helpPagePath={helpPagePath}
                 onConfigurationUpdated={onConfigurationUpdated}
                 renderConfigurationHeader={renderConfigurationHeader}
@@ -192,28 +196,26 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
           </ScrollView>
         ) : null}
         {this.state.currentTab === 'parameters' ? (
-          <ScrollView>
-            <Line>
-              <EventsFunctionParametersEditor
-                project={project}
-                eventsFunction={eventsFunction}
-                eventsBasedBehavior={eventsBasedBehavior}
-                eventsBasedObject={eventsBasedObject}
-                eventsFunctionsContainer={eventsFunctionsContainer}
-                onParametersUpdated={onParametersOrGroupsUpdated}
-                helpPagePath={helpPagePath}
-                freezeParameters={freezeParameters}
-                onMoveFreeEventsParameter={onMoveFreeEventsParameter}
-                onMoveBehaviorEventsParameter={onMoveBehaviorEventsParameter}
-                onMoveObjectEventsParameter={onMoveObjectEventsParameter}
-                key={eventsFunction ? eventsFunction.ptr : null}
-              />
-            </Line>
-          </ScrollView>
+          <EventsFunctionParametersEditor
+            project={project}
+            eventsFunction={eventsFunction}
+            eventsBasedBehavior={eventsBasedBehavior}
+            eventsBasedObject={eventsBasedObject}
+            eventsFunctionsContainer={eventsFunctionsContainer}
+            eventsFunctionsExtension={eventsFunctionsExtension}
+            onParametersUpdated={onParametersOrGroupsUpdated}
+            helpPagePath={helpPagePath}
+            freezeParameters={freezeParameters}
+            onMoveFreeEventsParameter={onMoveFreeEventsParameter}
+            onMoveBehaviorEventsParameter={onMoveBehaviorEventsParameter}
+            onMoveObjectEventsParameter={onMoveObjectEventsParameter}
+            key={eventsFunction ? eventsFunction.ptr : null}
+          />
         ) : null}
         {this.state.currentTab === 'groups' ? (
           <ObjectGroupsListWithObjectGroupEditor
             project={project}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
             globalObjectsContainer={null}
             objectsContainer={objectsContainer}
             globalObjectGroups={null}

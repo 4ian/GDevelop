@@ -126,7 +126,6 @@ describe('libGD.js - GDJS related tests', function () {
 
 </widget>`
       );
-      console.dir(fs.writeToFile.mock.calls);
       expect(fs.writeToFile).toHaveBeenCalledWith(
         '/fake-export-dir/package.json',
         `
@@ -410,27 +409,24 @@ describe('libGD.js - GDJS related tests', function () {
 
       // Create a function accepting 4 parameters:
       const parameters = eventsFunction.getParameters();
-      const parameter1 = new gd.ParameterMetadata();
-      parameter1.setType('objectList');
-      parameter1.setName('MyObject');
-      parameter1.setDescription('The first object to be used');
-      const parameter2 = new gd.ParameterMetadata();
-      parameter2.setType('expression');
-      parameter2.setName('MyNumber');
-      parameter2.setDescription('Some number');
-      const parameter3 = new gd.ParameterMetadata();
-      parameter3.setType('objectList');
-      parameter3.setName('MySprite');
-      parameter3.setDescription('The second object to be used, a sprite');
-      parameter3.setExtraInfo('Sprite');
-      const parameter4 = new gd.ParameterMetadata();
-      parameter4.setType('string');
-      parameter4.setName('MyString');
-      parameter4.setDescription('Some string');
-      parameters.push_back(parameter1);
-      parameters.push_back(parameter2);
-      parameters.push_back(parameter3);
-      parameters.push_back(parameter4);
+      parameters
+        .insertNewParameter('MyObject', 0)
+        .setType('objectList')
+        .setDescription('The first object to be used');
+      parameters
+        .insertNewParameter('MyNumber', 1)
+        .setType('expression')
+        .setDescription('Some number');
+      parameters
+        .insertNewParameter('MySprite', 2)
+        .setType('objectList')
+        .setDescription('The second object to be used, a sprite')
+        .setExtraInfo('Sprite');
+      parameters
+        .insertNewParameter('MyString', 3)
+        .setType('string')
+        .setDescription('Some string')
+        .setExtraInfo('Sprite');
 
       // Create a repeat event with...
       const eventsList = eventsFunction.getEvents();
@@ -539,17 +535,15 @@ describe('libGD.js - GDJS related tests', function () {
 
       // Create a function accepting 2 parameters:
       const parameters = eventsFunction.getParameters();
-      const parameter1 = new gd.ParameterMetadata();
-      parameter1.setType('objectList');
-      parameter1.setName('MyObject');
-      parameter1.setDescription('The first object to be used');
-      const parameter2 = new gd.ParameterMetadata();
-      parameter2.setType('objectList');
-      parameter2.setName('MySprite');
-      parameter2.setDescription('The second object to be used, a sprite');
-      parameter2.setExtraInfo('Sprite');
-      parameters.push_back(parameter1);
-      parameters.push_back(parameter2);
+      parameters
+        .insertNewParameter('MyObject', 0)
+        .setType('objectList')
+        .setDescription('The first object to be used');
+      parameters
+        .insertNewParameter('MySprite', 1)
+        .setType('objectList')
+        .setDescription('The second object to be used, a sprite')
+        .setExtraInfo('Sprite');
 
       // And with a group:
       const group = eventsFunction.getObjectGroups().insertNew('MyGroup', 0);

@@ -1,7 +1,7 @@
 //@flow
 import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { type ParameterValues } from './ExpressionParametersEditorDialog';
-import { mapVector } from '../../../Utils/MapFor';
+import { mapFor } from '../../../Utils/MapFor';
 
 const filterOutCodeOnlyParameters = (
   array: Array<string>,
@@ -57,9 +57,11 @@ const filterVisibleParameters = (
 export const getVisibleParameterTypes = (
   expressionMetadata: EnumeratedInstructionOrExpressionMetadata
 ): Array<string> => {
-  const parameterTypes: Array<string> = mapVector(
-    expressionMetadata.metadata.getParameters(),
-    parameterMetadata => parameterMetadata.getType()
+  const parameters = expressionMetadata.metadata.getParameters();
+  const parameterTypes: Array<string> = mapFor(
+    0,
+    parameters.getParametersCount(),
+    i => parameters.getParameterAt(i).getType()
   );
 
   if (expressionMetadata.scope.objectMetadata) {

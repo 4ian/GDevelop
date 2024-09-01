@@ -33,6 +33,8 @@ declare class gdBehaviorMetadata {
   setPrivate(): gdBehaviorMetadata;
   isHidden(): boolean;
   setHidden(): gdBehaviorMetadata;
+  getQuickCustomizationVisibility(): QuickCustomization_Visibility;
+  setQuickCustomizationVisibility(visibility: QuickCustomization_Visibility): gdBehaviorMetadata;
   get(): gdBehavior;
   getSharedDataInstance(): gdBehaviorsSharedData;
   getProperties(): gdMapStringPropertyDescriptor;

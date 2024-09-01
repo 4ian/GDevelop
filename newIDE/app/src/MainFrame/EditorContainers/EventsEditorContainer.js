@@ -6,7 +6,8 @@ import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
 } from './BaseEditor';
-import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
+import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 
 export class EventsEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?EventsSheetInterface;
@@ -42,6 +43,14 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
 
   forceUpdateEditor() {
     // No updates to be done.
+  }
+
+  onEventsBasedObjectChildrenEdited() {
+    // No thing to be done.
+  }
+
+  onSceneObjectEdited(scene: gdLayout, objectWithContext: ObjectWithContext) {
+    // No thing to be done.
   }
 
   getLayout(): ?gdLayout {
@@ -105,6 +114,7 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
         events={layout.getEvents()}
         onOpenExternalEvents={this.props.onOpenExternalEvents}
         isActive={this.props.isActive}
+        hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
       />
     );
   }

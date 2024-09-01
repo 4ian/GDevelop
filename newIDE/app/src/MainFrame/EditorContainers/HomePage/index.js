@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 import { Trans } from '@lingui/macro';
 import { type RenderEditorContainerPropsWithRef } from '../BaseEditor';
 import {
@@ -48,6 +49,8 @@ import { getHelpLink } from '../../../Utils/HelpLink';
 import { canUseClassroomFeature } from '../../../Utils/GDevelopServices/Usage';
 import EducationMarketingSection from './EducationMarketingSection';
 import useEducationForm from './UseEducationForm';
+import { type NewProjectSetup } from '../../../ProjectCreation/NewProjectSetupDialog';
+import { type ObjectWithContext } from '../../../ObjectsList/EnumerateObjects';
 
 const gamesDashboardWikiArticle = getHelpLink('/interface/games-dashboard/');
 const isShopRequested = (routeArguments: RouteArguments): boolean =>
@@ -108,6 +111,7 @@ type Props = {|
     privateGameTemplateListingData: PrivateGameTemplateListingData
   ) => void,
   onOpenProjectManager: () => void,
+  askToCloseProject: () => Promise<boolean>,
 
   // Other dialogs opening:
   onOpenLanguageDialog: () => void,
@@ -118,19 +122,28 @@ type Props = {|
 
   // Project creation
   onOpenNewProjectSetupDialog: () => void,
+  onCreateProjectFromExample: (
+    exampleShortHeader: ExampleShortHeader,
+    newProjectSetup: NewProjectSetup,
+    i18n: I18nType
+  ) => Promise<void>,
 
   // Project save
   onSave: () => Promise<void>,
   canSave: boolean,
 
   resourceManagementProps: ResourceManagementProps,
-  canInstallPrivateAsset: () => boolean,
 |};
 
-type HomePageEditorInterface = {|
+export type HomePageEditorInterface = {|
   getProject: () => void,
   updateToolbar: () => void,
   forceUpdateEditor: () => void,
+  onEventsBasedObjectChildrenEdited: () => void,
+  onSceneObjectEdited: (
+    scene: gdLayout,
+    objectWithContext: ObjectWithContext
+  ) => void,
 |};
 
 export const HomePage = React.memo<Props>(
@@ -150,6 +163,7 @@ export const HomePage = React.memo<Props>(
         onOpenProjectManager,
         onOpenLanguageDialog,
         onOpenProfile,
+        onCreateProjectFromExample,
         setToolbar,
         selectInAppTutorial,
         onOpenPreferences,
@@ -159,7 +173,7 @@ export const HomePage = React.memo<Props>(
         onSave,
         canSave,
         resourceManagementProps,
-        canInstallPrivateAsset,
+        askToCloseProject,
       }: Props,
       ref
     ) => {
@@ -403,10 +417,23 @@ export const HomePage = React.memo<Props>(
         // No updates to be done
       }, []);
 
+      const onEventsBasedObjectChildrenEdited = React.useCallback(() => {
+        // No thing to be done
+      }, []);
+
+      const onSceneObjectEdited = React.useCallback(
+        (scene: gdLayout, objectWithContext: ObjectWithContext) => {
+          // No thing to be done
+        },
+        []
+      );
+
       React.useImperativeHandle(ref, () => ({
         getProject,
         updateToolbar,
         forceUpdateEditor,
+        onEventsBasedObjectChildrenEdited,
+        onSceneObjectEdited,
       }));
 
       const onUserSurveyStarted = React.useCallback(() => {
@@ -473,6 +500,8 @@ export const HomePage = React.memo<Props>(
                         subscriptionPlansWithPricingSystems
                       }
                       onOpenProfile={onOpenProfile}
+                      onCreateProjectFromExample={onCreateProjectFromExample}
+                      askToCloseProject={askToCloseProject}
                     />
                   )}
                   {activeTab === 'build' && (
@@ -508,7 +537,6 @@ export const HomePage = React.memo<Props>(
                     <StoreSection
                       project={project}
                       resourceManagementProps={resourceManagementProps}
-                      canInstallPrivateAsset={canInstallPrivateAsset}
                       onOpenPrivateGameTemplateListingData={
                         onOpenPrivateGameTemplateListingData
                       }
@@ -612,6 +640,8 @@ export const renderHomePageContainer = (
     onOpenProjectManager={props.onOpenProjectManager}
     onOpenLanguageDialog={props.onOpenLanguageDialog}
     onOpenProfile={props.onOpenProfile}
+    onCreateProjectFromExample={props.onCreateProjectFromExample}
+    askToCloseProject={props.askToCloseProject}
     selectInAppTutorial={props.selectInAppTutorial}
     onOpenPreferences={props.onOpenPreferences}
     onOpenAbout={props.onOpenAbout}
@@ -621,6 +651,5 @@ export const renderHomePageContainer = (
     onSave={props.onSave}
     canSave={props.canSave}
     resourceManagementProps={props.resourceManagementProps}
-    canInstallPrivateAsset={props.canInstallPrivateAsset}
   />
 );

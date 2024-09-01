@@ -1,0 +1,20 @@
+.illustrationImage {
+  width: 100px;
+  aspect-ratio: 117 / 162;
+}
+
+.animatedRocket {
+  animation: animatedRocket ease-in-out 1.2s infinite;
+}
+
+@keyframes animatedRocket {
+    0% { transform: rotate(0deg); }
+    15% { transform: rotate(4deg); }
+    25% { transform: rotate(5deg); }
+    35% { transform: rotate(4deg); }
+    50% { transform: rotate(0deg); }
+    65% { transform: rotate(-4deg); }
+    75% { transform: rotate(-5deg); }
+    85% { transform: rotate(-4deg); }
+    100% { transform: rotate(0deg); }
+}

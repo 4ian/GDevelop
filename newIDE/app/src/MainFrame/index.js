@@ -6,6 +6,8 @@ import Snackbar from '@material-ui/core/Snackbar';
 import HomeIcon from '../UI/CustomSvgIcons/Home';
 import DebuggerIcon from '../UI/CustomSvgIcons/Debug';
 import ProjectResourcesIcon from '../UI/CustomSvgIcons/ProjectResources';
+import SceneIcon from '../UI/CustomSvgIcons/Scene';
+import EventsIcon from '../UI/CustomSvgIcons/Events';
 import ExternalEventsIcon from '../UI/CustomSvgIcons/ExternalEvents';
 import ExternalLayoutIcon from '../UI/CustomSvgIcons/ExternalLayout';
 import ExtensionIcon from '../UI/CustomSvgIcons/Extension';
@@ -59,6 +61,7 @@ import { type RenderEditorContainerPropsWithRef } from './EditorContainers/BaseE
 import ErrorBoundary, {
   getEditorErrorBoundaryProps,
 } from '../UI/ErrorBoundary';
+import { type Exporter } from '../ExportAndShare/ShareDialog';
 import ResourcesLoader from '../ResourcesLoader/index';
 import {
   type PreviewLauncherInterface,
@@ -188,6 +191,8 @@ import useSaveReminder from './UseSaveReminder';
 import { useMultiplayerLobbyConfigurator } from './UseMultiplayerLobbyConfigurator';
 import { useAuthenticatedPlayer } from './UseAuthenticatedPlayer';
 import ListIcon from '../UI/ListIcon';
+import { QuickCustomizationDialog } from '../QuickCustomization/QuickCustomizationDialog';
+import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -306,6 +311,7 @@ export type Props = {|
   extensionsLoader?: JsExtensionsLoader,
   initialFileMetadataToOpen: ?FileMetadata,
   initialExampleSlugToOpen: ?string,
+  quickPublishOnlineWebExporter: Exporter,
   i18n: I18n,
 |};
 
@@ -419,7 +425,7 @@ const MainFrame = (props: Props) => {
     renderOpenConfirmDialog,
   } = useOpenConfirmDialog();
   const {
-    findLeaderboardsToReplace,
+    openLeaderboardReplacerDialogIfNeeded,
     renderLeaderboardReplacerDialog,
   } = useLeaderboardReplacer();
   const {
@@ -469,6 +475,10 @@ const MainFrame = (props: Props) => {
     fileMetadataOpeningMessage,
     setFileMetadataOpeningMessage,
   ] = React.useState<?MessageDescriptor>(null);
+  const [
+    quickCustomizationDialogOpenedFromGameId,
+    setQuickCustomizationDialogOpenedFromGameId,
+  ] = React.useState<?string>(null);
 
   const { getAuthenticatedPlayerForPreview } = useAuthenticatedPlayer();
 
@@ -499,6 +509,7 @@ const MainFrame = (props: Props) => {
     i18n,
     renderGDJSDevelopmentWatcher,
     renderMainMenu,
+    quickPublishOnlineWebExporter,
   } = props;
 
   const {
@@ -566,7 +577,7 @@ const MainFrame = (props: Props) => {
           : kind === 'layout events'
           ? name + ` ${i18n._(t`(Events)`)}`
           : kind === 'custom object'
-          ? name.split('.')[1] + ` ${i18n._(t`(Object)`)}`
+          ? name.split('::')[1] + ` ${i18n._(t`(Object)`)}`
           : name;
       const tabOptions =
         kind === 'layout'
@@ -586,15 +597,17 @@ const MainFrame = (props: Props) => {
         : kind;
 
       let customIconUrl = '';
-      if (
-        (kind === 'events functions extension' || kind === 'custom object') &&
-        project &&
-        project.hasEventsFunctionsExtensionNamed(name)
-      ) {
-        const eventsFunctionsExtension = project.getEventsFunctionsExtension(
-          name
-        );
-        customIconUrl = eventsFunctionsExtension.getIconUrl();
+      if (kind === 'events functions extension' || kind === 'custom object') {
+        const extensionName = name.split('::')[0];
+        if (
+          project &&
+          project.hasEventsFunctionsExtensionNamed(extensionName)
+        ) {
+          const eventsFunctionsExtension = project.getEventsFunctionsExtension(
+            extensionName
+          );
+          customIconUrl = eventsFunctionsExtension.getIconUrl();
+        }
       }
       const icon =
         kind === 'start page' ? (
@@ -603,11 +616,16 @@ const MainFrame = (props: Props) => {
           <DebuggerIcon />
         ) : kind === 'resources' ? (
           <ProjectResourcesIcon />
+        ) : kind === 'layout' ? (
+          <SceneIcon />
+        ) : kind === 'layout events' ? (
+          <EventsIcon />
         ) : kind === 'external events' ? (
           <ExternalEventsIcon />
         ) : kind === 'external layout' ? (
           <ExternalLayoutIcon />
-        ) : kind === 'events functions extension' ? (
+        ) : kind === 'events functions extension' ||
+          kind === 'custom object' ? (
           <ExtensionIcon />
         ) : null;
 
@@ -1135,9 +1153,15 @@ const MainFrame = (props: Props) => {
     }) => {
       setNewProjectSetupDialogOpen(false);
       closeExampleStoreDialog({ deselectExampleAndGameTemplate: true });
-      findLeaderboardsToReplace(project, oldProjectId);
-      configureMultiplayerLobbiesIfNeeded(project, oldProjectId);
-      options && options.openAllScenes
+      if (options.openQuickCustomizationDialog) {
+        setQuickCustomizationDialogOpenedFromGameId(oldProjectId);
+      } else {
+        // Replace leaderboards and configure multiplayer lobbies if needed.
+        // In the case of quick customization, this will be done later.
+        openLeaderboardReplacerDialogIfNeeded(project, oldProjectId);
+        configureMultiplayerLobbiesIfNeeded(project, oldProjectId);
+      }
+      options.openAllScenes || options.openQuickCustomizationDialog
         ? openAllScenes({
             currentProject: project,
             editorTabs,
@@ -1666,6 +1690,8 @@ const MainFrame = (props: Props) => {
         launchPreview({ fullLoadingScreen: true }),
       launchProjectDataOnlyPreview: () =>
         launchPreview({ hotReload: true, projectDataOnlyExport: true }),
+      launchProjectCodeAndDataPreview: () =>
+        launchPreview({ hotReload: true, projectDataOnlyExport: false }),
     }),
     [hasPreviewsRunning, launchPreview]
   );
@@ -1921,7 +1947,7 @@ const MainFrame = (props: Props) => {
               kind: 'custom object',
               name:
                 eventsFunctionsExtension.getName() +
-                '.' +
+                '::' +
                 eventsBasedObject.getName(),
               project: currentProject,
             }),
@@ -2001,6 +2027,30 @@ const MainFrame = (props: Props) => {
   const onExtractAsExternalLayout = (name: string) => {
     openExternalLayout(name);
   };
+
+  const onEventsBasedObjectChildrenEdited = React.useCallback(
+    () => {
+      for (const editor of state.editorTabs.editors) {
+        const { editorRef } = editor;
+        if (editorRef) {
+          editorRef.onEventsBasedObjectChildrenEdited();
+        }
+      }
+    },
+    [state.editorTabs]
+  );
+
+  const onSceneObjectEdited = React.useCallback(
+    (scene: gdLayout, objectWithContext: ObjectWithContext) => {
+      for (const editor of state.editorTabs.editors) {
+        const { editorRef } = editor;
+        if (editorRef) {
+          editorRef.onSceneObjectEdited(scene, objectWithContext);
+        }
+      }
+    },
+    [state.editorTabs]
+  );
 
   const _onProjectItemModified = () => {
     triggerUnsavedChanges();
@@ -2922,6 +2972,8 @@ const MainFrame = (props: Props) => {
   const setElectronUpdateStatus = (updateStatus: ElectronUpdateStatus) => {
     setState(state => ({ ...state, updateStatus }));
 
+    // TODO: use i18n to translate title and body in notification.
+    // Also, find a way to use preferences to know if user deactivated auto-update.
     const notificationTitle = getElectronUpdateNotificationTitle(updateStatus);
     const notificationBody = getElectronUpdateNotificationBody(updateStatus);
     if (notificationTitle) {
@@ -3204,6 +3256,7 @@ const MainFrame = (props: Props) => {
       getStorageProvider,
       onFetchNewlyAddedResources,
       getStorageProviderResourceOperations,
+      canInstallPrivateAsset,
     }),
     [
       resourceSources,
@@ -3212,10 +3265,11 @@ const MainFrame = (props: Props) => {
       getStorageProvider,
       onFetchNewlyAddedResources,
       getStorageProviderResourceOperations,
+      canInstallPrivateAsset,
     ]
   );
 
-  const showLoader = isLoadingProject || previewLoading;
+  const showLoader = isProjectOpening || isLoadingProject || previewLoading;
   const shortcutMap = useShortcutMap();
   const buildMainMenuProps = {
     i18n: i18n,
@@ -3439,16 +3493,16 @@ const MainFrame = (props: Props) => {
                     canOpen: !!props.storageProviders.filter(
                       ({ hiddenInOpenDialog }) => !hiddenInOpenDialog
                     ).length,
-                    canInstallPrivateAsset,
                     onChooseProject: () => openOpenFromStorageProviderDialog(),
                     onOpenRecentFile: openFromFileMetadataWithStorageProvider,
                     onOpenNewProjectSetupDialog: () => {
                       setNewProjectSetupDialogOpen(true);
                     },
                     onOpenProjectManager: () => openProjectManager(true),
-                    onCloseProject: () => askToCloseProject(),
+                    askToCloseProject,
                     onOpenExampleStore: openExampleStoreDialog,
                     onSelectExampleShortHeader: onSelectExampleShortHeader,
+                    onCreateProjectFromExample: createProjectFromExample,
                     onPreviewPrivateGameTemplateListingData: privateGameTemplateListingData =>
                       onSelectPrivateGameTemplate({
                         privateGameTemplateListingData,
@@ -3504,6 +3558,8 @@ const MainFrame = (props: Props) => {
                     },
                     openBehaviorEvents: openBehaviorEvents,
                     onExtractAsExternalLayout: onExtractAsExternalLayout,
+                    onEventsBasedObjectChildrenEdited: onEventsBasedObjectChildrenEdited,
+                    onSceneObjectEdited: onSceneObjectEdited,
                   })}
                 </ErrorBoundary>
               </CommandsContextScopedProvider>
@@ -3632,6 +3688,11 @@ const MainFrame = (props: Props) => {
             openPreferencesDialog(false);
             if (options.languageDidChange) _languageDidChange();
           }}
+          onOpenQuickCustomizationDialog={() =>
+            setQuickCustomizationDialogOpenedFromGameId(
+              'fake-source-game-id-for-testing'
+            )
+          }
         />
       )}
       {languageDialogOpen && (
@@ -3759,6 +3820,30 @@ const MainFrame = (props: Props) => {
         <DiagnosticReportDialog
           wholeProjectDiagnosticReport={currentProject.getWholeProjectDiagnosticReport()}
           onClose={() => setDiagnosticReportDialogOpen(false)}
+        />
+      )}
+
+      {quickCustomizationDialogOpenedFromGameId && currentProject && (
+        <QuickCustomizationDialog
+          project={currentProject}
+          resourceManagementProps={resourceManagementProps}
+          onLaunchPreview={
+            hotReloadPreviewButtonProps.launchProjectDataOnlyPreview
+          }
+          onClose={options => {
+            setQuickCustomizationDialogOpenedFromGameId(null);
+            if (options && options.tryAnotherGame) {
+              // Close the project so the user is back at where they can chose a game to customize
+              // which is probably the home page.
+              closeProject();
+              openHomePage();
+            }
+          }}
+          onlineWebExporter={quickPublishOnlineWebExporter}
+          onSaveProject={saveProject}
+          isSavingProject={isSavingProject}
+          canClose={true}
+          sourceGameId={quickCustomizationDialogOpenedFromGameId}
         />
       )}
       <CustomDragLayer />

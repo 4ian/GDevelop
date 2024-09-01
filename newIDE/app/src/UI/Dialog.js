@@ -217,7 +217,7 @@ type DialogProps = {|
   maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | false,
   minHeight?: 'sm' | 'lg',
   fullHeight?: boolean,
-  noMobileFullScreen?: boolean,
+  fullscreen?: 'never-even-on-mobile' | 'always-even-on-desktop',
 
   id?: ?string,
 |};
@@ -246,7 +246,7 @@ const Dialog = ({
   id,
   cannotBeDismissed,
   exceptionallyStillAllowRenderingInstancesEditors,
-  noMobileFullScreen,
+  fullscreen,
 }: DialogProps) => {
   const preferences = React.useContext(PreferencesContext);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -255,7 +255,12 @@ const Dialog = ({
   const hasActions =
     (actions && actions.filter(Boolean).length > 0) ||
     (secondaryActions && secondaryActions.filter(Boolean).length > 0);
-  const isFullScreen = isMobile && !noMobileFullScreen;
+  const isFullScreen =
+    fullscreen === 'never-even-on-mobile'
+      ? false
+      : fullscreen === 'always-even-on-desktop'
+      ? true
+      : isMobile;
 
   const classesForDangerousDialog = useDangerousStylesForDialog(dangerLevel);
   const classesForDialogContent = useStylesForDialogContent();

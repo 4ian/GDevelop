@@ -18,6 +18,12 @@ import { type MessageByLocale } from '../i18n/MessageByLocale';
 import { type Badge } from './Badge';
 import { type Profile } from './Authentication';
 
+export type BatchCreationResultUser = {|
+  email: string,
+  password: string,
+  uid: string,
+|};
+
 export type CommunityLinkType =
   | 'personalWebsiteLink'
   | 'personalWebsite2Link'
@@ -93,25 +99,34 @@ export type UserSurvey = {|
  * Official tutorial registered in the tutorial database.
  * Can be a youtube video, wiki page or blog article.
  */
-export type GDevelopTutorialRecommendation = {|
+export type GDevelopTutorialRecommendation = {
   type: 'gdevelop-tutorial',
   /**
    * Id of the tutorial in the database.
    */
   id: string,
-|};
-export type PlanRecommendation = {|
+};
+export type PlanRecommendation = {
   type: 'plan',
   id: 'silver' | 'gold' | 'startup' | 'business' | 'education',
-|};
-export type GuidedLessonsRecommendation = {|
+};
+export type GuidedLessonsRecommendation = {
   type: 'guided-lessons',
-  lessonsIds?: string[],
-|};
+  lessonsIds: string[],
+};
+export type QuickCustomizationRecommendation = {
+  type: 'quick-customization',
+  list: Array<{
+    type: 'example',
+    exampleSlug: string,
+    thumbnailTitleByLocale: MessageByLocale,
+  }>,
+};
 export type Recommendation =
   | GDevelopTutorialRecommendation
   | GuidedLessonsRecommendation
-  | PlanRecommendation;
+  | PlanRecommendation
+  | QuickCustomizationRecommendation;
 
 export type UserPublicProfile = {|
   id: string,
@@ -132,7 +147,13 @@ export type UsernameAvailability = {|
   isAvailable: boolean,
 |};
 
-export type User = Profile;
+export type User = {|
+  ...Profile,
+  /**
+   * Present only if requested when admin user is listing members of teams.
+   */
+  +password?: ?string,
+|};
 
 export type Team = {| id: string, createdAt: number, seats: number |};
 export type TeamGroup = {| id: string, name: string |};
@@ -202,7 +223,25 @@ export const listTeamMembers = async (
   const authorizationHeader = await getAuthorizationHeader();
   const response = await client.get(`/user`, {
     headers: { Authorization: authorizationHeader },
-    params: { userId, teamId, memberType: 'basic' },
+    params: {
+      userId,
+      teamId,
+      memberType: 'basic',
+      include: 'decryptedPassword',
+    },
+  });
+  return response.data;
+};
+
+export const listTeamAdmins = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  teamId: string
+): Promise<Array<User>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await client.get(`/user`, {
+    headers: { Authorization: authorizationHeader },
+    params: { userId, teamId, memberType: 'admin' },
   });
   return response.data;
 };
@@ -337,6 +376,115 @@ export const getUserPublicProfile = async (
   const response = await client.get(`/user-public-profile/${id}`);
 
   return response.data;
+};
+
+export const changeTeamMemberPassword = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+    adminUserId,
+    newPassword,
+  }: {|
+    userId: string,
+    adminUserId: string,
+    newPassword: string,
+  |}
+) => {
+  const authorizationHeader = await getAuthorizationHeader();
+  await client.post(
+    `/user/action/change-password`,
+    {
+      userId,
+      newPassword,
+    },
+    {
+      headers: { Authorization: authorizationHeader },
+      params: { userId: adminUserId },
+    }
+  );
+};
+
+export const activateTeamMembers = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userIds,
+    teamId,
+    adminUserId,
+    activate,
+  }: {|
+    userIds: string[],
+    teamId: string,
+    adminUserId: string,
+    activate: boolean,
+  |}
+) => {
+  const authorizationHeader = await getAuthorizationHeader();
+  await client.post(
+    `/user/action/activate-users`,
+    {
+      userIds,
+      teamId,
+      activate,
+    },
+    {
+      params: { userId: adminUserId },
+      headers: { Authorization: authorizationHeader },
+    }
+  );
+};
+
+export const createTeamMembers = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    quantity,
+    teamId,
+    adminUserId,
+  }: {|
+    quantity: number,
+    teamId: string,
+    adminUserId: string,
+  |}
+): Promise<BatchCreationResultUser[]> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await client.post(
+    `/team/${teamId}/action/batch-create-users`,
+    {
+      quantity,
+    },
+    {
+      params: { userId: adminUserId },
+      headers: { Authorization: authorizationHeader },
+    }
+  );
+  return response.data;
+};
+
+export const setUserAsAdmin = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    email,
+    activate,
+    teamId,
+    adminUserId,
+  }: {|
+    email: string,
+    activate: boolean,
+    teamId: string,
+    adminUserId: string,
+  |}
+) => {
+  const authorizationHeader = await getAuthorizationHeader();
+  await client.post(
+    `/team/${teamId}/action/set-admin`,
+    {
+      email,
+      activate,
+    },
+    {
+      params: { userId: adminUserId },
+      headers: { Authorization: authorizationHeader },
+    }
+  );
 };
 
 export const getUsernameAvailability = async (

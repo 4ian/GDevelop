@@ -80,6 +80,7 @@ type Props = {|
   onRetry?: () => void,
   onOpenChangeEmailDialog?: () => void,
   onOpenEditProfileDialog?: () => void,
+  hideSocials?: boolean,
 |};
 
 const ProfileDetails = ({
@@ -90,6 +91,7 @@ const ProfileDetails = ({
   onRetry,
   onOpenChangeEmailDialog,
   onOpenEditProfileDialog,
+  hideSocials,
 }: Props) => {
   const email = profile ? profile.email : null;
   const donateLink = profile ? profile.donateLink : null;
@@ -208,52 +210,54 @@ const ProfileDetails = ({
                 <Text>{email}</Text>
               </Column>
             )}
-            <Column noMargin>
-              <LineStackLayout noMargin alignItems="center">
-                <Text noMargin size="body-small">
-                  <Trans>Discord username</Trans>
-                </Text>
-                {canUserBenefitFromDiscordRole && !!discordUsername && (
-                  <IconButton
-                    onClick={onSyncDiscordUsername}
-                    disabled={discordUsernameSyncStatus !== null}
-                    tooltip={t`Sync your role on GDevelop's Discord server`}
-                    size="small"
-                  >
-                    {discordUsernameSyncStatus === 'success' ? (
-                      <Check fontSize="small" />
+            {!hideSocials && (
+              <Column noMargin>
+                <LineStackLayout noMargin alignItems="center">
+                  <Text noMargin size="body-small">
+                    <Trans>Discord username</Trans>
+                  </Text>
+                  {canUserBenefitFromDiscordRole && !!discordUsername && (
+                    <IconButton
+                      onClick={onSyncDiscordUsername}
+                      disabled={discordUsernameSyncStatus !== null}
+                      tooltip={t`Sync your role on GDevelop's Discord server`}
+                      size="small"
+                    >
+                      {discordUsernameSyncStatus === 'success' ? (
+                        <Check fontSize="small" />
+                      ) : (
+                        <Refresh fontSize="small" />
+                      )}
+                    </IconButton>
+                  )}
+                </LineStackLayout>
+                <Text color={!discordUsername ? 'secondary' : 'primary'}>
+                  {!discordUsername ? (
+                    !canUserBenefitFromDiscordRole ? (
+                      <MarkdownText
+                        translatableSource={t`No discord username defined. Add it and get a Gold, Pro or Education subscription to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop).`}
+                      />
                     ) : (
-                      <Refresh fontSize="small" />
-                    )}
-                  </IconButton>
-                )}
-              </LineStackLayout>
-              <Text color={!discordUsername ? 'secondary' : 'primary'}>
-                {!discordUsername ? (
-                  !canUserBenefitFromDiscordRole ? (
-                    <MarkdownText
-                      translatableSource={t`No discord username defined. Add it and get a Gold, Pro or Education subscription to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop).`}
-                    />
+                      <MarkdownText
+                        translatableSource={t`No discord username defined. Add it to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop).`}
+                      />
+                    )
                   ) : (
-                    <MarkdownText
-                      translatableSource={t`No discord username defined. Add it to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop).`}
-                    />
-                  )
-                ) : (
-                  <>
-                    {discordUsername}
-                    {!canUserBenefitFromDiscordRole && (
-                      <>
-                        {' - '}
-                        <MarkdownText
-                          translatableSource={t`Get a Gold or Pro subscription to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop).`}
-                        />
-                      </>
-                    )}
-                  </>
-                )}
-              </Text>
-            </Column>
+                    <>
+                      {discordUsername}
+                      {!canUserBenefitFromDiscordRole && (
+                        <>
+                          {' - '}
+                          <MarkdownText
+                            translatableSource={t`Get a Gold or Pro subscription to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop).`}
+                          />
+                        </>
+                      )}
+                    </>
+                  )}
+                </Text>
+              </Column>
+            )}
             <Column noMargin>
               <Text noMargin size="body-small">
                 <Trans>Bio</Trans>
@@ -262,107 +266,110 @@ const ProfileDetails = ({
                 {profile.description || <Trans>No bio defined.</Trans>}
               </Text>
             </Column>
-            <ColumnStackLayout noMargin>
-              <Text noMargin size="body-small">
-                <Trans>Socials</Trans>
-              </Text>
-              <CommunityLinksLines
-                communityLinks={[
-                  {
-                    text: !githubUsername ? (
-                      <MarkdownText
-                        translatableSource={communityLinksConfig.githubUsername.getRewardMessage(
-                          false,
-                          githubStarAchievement &&
-                            githubStarAchievement.rewardValueInCredits
-                            ? githubStarAchievement.rewardValueInCredits.toString()
-                            : '-'
-                        )}
-                      />
-                    ) : (
-                      githubUsername
-                    ),
-                    isNotFilled: !githubUsername,
-                    icon: communityLinksConfig.githubUsername.icon,
-                  },
-                  {
-                    text: !twitterUsername ? (
-                      <MarkdownText
-                        translatableSource={communityLinksConfig.twitterUsername.getRewardMessage(
-                          false,
-                          twitterFollowAchievement &&
-                            twitterFollowAchievement.rewardValueInCredits
-                            ? twitterFollowAchievement.rewardValueInCredits.toString()
-                            : '-'
-                        )}
-                      />
-                    ) : (
-                      twitterUsername
-                    ),
-                    isNotFilled: !twitterUsername,
-                    icon: communityLinksConfig.twitterUsername.icon,
-                  },
-                  {
-                    text: !tiktokUsername ? (
-                      <MarkdownText
-                        translatableSource={communityLinksConfig.tiktokUsername.getRewardMessage(
-                          false,
-                          tiktokFollowAchievement &&
-                            tiktokFollowAchievement.rewardValueInCredits
-                            ? tiktokFollowAchievement.rewardValueInCredits.toString()
-                            : '-'
-                        )}
-                      />
-                    ) : (
-                      tiktokUsername
-                    ),
-                    isNotFilled: !tiktokUsername,
-                    icon: communityLinksConfig.tiktokUsername.icon,
-                  },
-                  {
-                    text: personalWebsiteLink,
-                    icon: communityLinksConfig.personalWebsiteLink.icon,
-                  },
-                  {
-                    text: personalWebsite2Link,
-                    icon: communityLinksConfig.personalWebsite2Link.icon,
-                  },
-                  {
-                    text: facebookUsername,
-                    icon: communityLinksConfig.facebookUsername.icon,
-                  },
-                  {
-                    text: youtubeUsername,
-                    icon: communityLinksConfig.youtubeUsername.icon,
-                  },
-                  {
-                    text: instagramUsername,
-                    icon: communityLinksConfig.instagramUsername.icon,
-                  },
-                  {
-                    text: redditUsername,
-                    icon: communityLinksConfig.redditUsername.icon,
-                  },
-                  {
-                    text: snapchatUsername,
-                    icon: communityLinksConfig.snapchatUsername.icon,
-                  },
-                  {
-                    text: discordServerLink,
-                    icon: communityLinksConfig.discordServerLink.icon,
-                  },
-                ]}
-              />
-            </ColumnStackLayout>
-            <Column noMargin>
-              <Text noMargin size="body-small">
-                <Trans>Donate link</Trans>
-              </Text>
-              <Text color={!donateLink ? 'secondary' : 'primary'}>
-                {donateLink || <Trans>No link defined.</Trans>}
-              </Text>
-            </Column>
-
+            {!hideSocials && (
+              <>
+                <ColumnStackLayout noMargin>
+                  <Text noMargin size="body-small">
+                    <Trans>Socials</Trans>
+                  </Text>
+                  <CommunityLinksLines
+                    communityLinks={[
+                      {
+                        text: !githubUsername ? (
+                          <MarkdownText
+                            translatableSource={communityLinksConfig.githubUsername.getRewardMessage(
+                              false,
+                              githubStarAchievement &&
+                                githubStarAchievement.rewardValueInCredits
+                                ? githubStarAchievement.rewardValueInCredits.toString()
+                                : '-'
+                            )}
+                          />
+                        ) : (
+                          githubUsername
+                        ),
+                        isNotFilled: !githubUsername,
+                        icon: communityLinksConfig.githubUsername.icon,
+                      },
+                      {
+                        text: !twitterUsername ? (
+                          <MarkdownText
+                            translatableSource={communityLinksConfig.twitterUsername.getRewardMessage(
+                              false,
+                              twitterFollowAchievement &&
+                                twitterFollowAchievement.rewardValueInCredits
+                                ? twitterFollowAchievement.rewardValueInCredits.toString()
+                                : '-'
+                            )}
+                          />
+                        ) : (
+                          twitterUsername
+                        ),
+                        isNotFilled: !twitterUsername,
+                        icon: communityLinksConfig.twitterUsername.icon,
+                      },
+                      {
+                        text: !tiktokUsername ? (
+                          <MarkdownText
+                            translatableSource={communityLinksConfig.tiktokUsername.getRewardMessage(
+                              false,
+                              tiktokFollowAchievement &&
+                                tiktokFollowAchievement.rewardValueInCredits
+                                ? tiktokFollowAchievement.rewardValueInCredits.toString()
+                                : '-'
+                            )}
+                          />
+                        ) : (
+                          tiktokUsername
+                        ),
+                        isNotFilled: !tiktokUsername,
+                        icon: communityLinksConfig.tiktokUsername.icon,
+                      },
+                      {
+                        text: personalWebsiteLink,
+                        icon: communityLinksConfig.personalWebsiteLink.icon,
+                      },
+                      {
+                        text: personalWebsite2Link,
+                        icon: communityLinksConfig.personalWebsite2Link.icon,
+                      },
+                      {
+                        text: facebookUsername,
+                        icon: communityLinksConfig.facebookUsername.icon,
+                      },
+                      {
+                        text: youtubeUsername,
+                        icon: communityLinksConfig.youtubeUsername.icon,
+                      },
+                      {
+                        text: instagramUsername,
+                        icon: communityLinksConfig.instagramUsername.icon,
+                      },
+                      {
+                        text: redditUsername,
+                        icon: communityLinksConfig.redditUsername.icon,
+                      },
+                      {
+                        text: snapchatUsername,
+                        icon: communityLinksConfig.snapchatUsername.icon,
+                      },
+                      {
+                        text: discordServerLink,
+                        icon: communityLinksConfig.discordServerLink.icon,
+                      },
+                    ]}
+                  />
+                </ColumnStackLayout>
+                <Column noMargin>
+                  <Text noMargin size="body-small">
+                    <Trans>Donate link</Trans>
+                  </Text>
+                  <Text color={!donateLink ? 'secondary' : 'primary'}>
+                    {donateLink || <Trans>No link defined.</Trans>}
+                  </Text>
+                </Column>
+              </>
+            )}
             <ResponsiveLineStackLayout justifyContent="flex-start" noMargin>
               <RaisedButton
                 label={<Trans>Edit my profile</Trans>}

@@ -16,6 +16,7 @@ import EventsFunctionsListWithErrorBoundary, {
   type EventsFunctionsListInterface,
 } from '../EventsFunctionsList';
 import { type EventsFunctionCreationParameters } from '../EventsFunctionsList/EventsFunctionTreeViewItemContent';
+import { type EventsBasedObjectCreationParameters } from '../EventsFunctionsList/EventsBasedObjectTreeViewItemContent';
 import Background from '../UI/Background';
 import OptionsEditorDialog from './OptionsEditorDialog';
 import EventsBasedBehaviorEditorPanel from '../EventsBasedBehaviorEditor/EventsBasedBehaviorEditorPanel';
@@ -24,6 +25,7 @@ import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import BehaviorMethodSelectorDialog from './BehaviorMethodSelectorDialog';
 import ObjectMethodSelectorDialog from './ObjectMethodSelectorDialog';
 import ExtensionFunctionSelectorDialog from './ExtensionFunctionSelectorDialog';
+import EventsBasedObjectSelectorDialog from './EventsBasedObjectSelectorDialog';
 import { ResponsiveWindowMeasurer } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import EditorNavigator, {
   type EditorNavigatorInterface,
@@ -38,8 +40,9 @@ import ExtensionEditIcon from '../UI/CustomSvgIcons/ExtensionEdit';
 import Tune from '../UI/CustomSvgIcons/Tune';
 import Mark from '../UI/CustomSvgIcons/Mark';
 import newNameGenerator from '../Utils/NewNameGenerator';
-import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import GlobalAndSceneVariablesDialog from '../VariablesList/GlobalAndSceneVariablesDialog';
+import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 
 const gd: libGDevelop = global.gd;
 
@@ -73,6 +76,7 @@ type Props = {|
   initiallyFocusedObjectName: ?string,
   unsavedChanges?: ?UnsavedChanges,
   onOpenCustomObjectEditor: gdEventsBasedObject => void,
+  hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
 |};
 
 type State = {|
@@ -85,9 +89,13 @@ type State = {|
   behaviorMethodSelectorDialogOpen: boolean,
   objectMethodSelectorDialogOpen: boolean,
   extensionFunctionSelectorDialogOpen: boolean,
+  eventsBasedObjectSelectorDialogOpen: boolean,
   variablesEditorOpen: { isGlobalTabInitiallyOpen: boolean } | null,
   onAddEventsFunctionCb: ?(
     parameters: ?EventsFunctionCreationParameters
+  ) => void,
+  onAddEventsBasedObjectCb: ?(
+    parameters: ?EventsBasedObjectCreationParameters
   ) => void,
 |};
 
@@ -121,8 +129,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     behaviorMethodSelectorDialogOpen: false,
     objectMethodSelectorDialogOpen: false,
     extensionFunctionSelectorDialogOpen: false,
+    eventsBasedObjectSelectorDialogOpen: false,
     variablesEditorOpen: null,
     onAddEventsFunctionCb: null,
+    onAddEventsBasedObjectCb: null,
   };
   editor: ?EventsSheetInterface;
   eventsFunctionList: ?EventsFunctionsListInterface;
@@ -772,6 +782,32 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     );
   };
 
+  _onCloseEventsBasedObjectSelectorDialog = (
+    parameters: ?EventsBasedObjectCreationParameters
+  ) => {
+    const { onAddEventsBasedObjectCb } = this.state;
+    this.setState(
+      {
+        eventsBasedObjectSelectorDialogOpen: false,
+        onAddEventsBasedObjectCb: null,
+      },
+      () => {
+        if (onAddEventsBasedObjectCb) onAddEventsBasedObjectCb(parameters);
+      }
+    );
+  };
+
+  _onAddEventsBasedObject = (
+    onAddEventsBasedObjectCb: (
+      parameters: ?EventsBasedObjectCreationParameters
+    ) => void
+  ) => {
+    this.setState({
+      eventsBasedObjectSelectorDialogOpen: true,
+      onAddEventsBasedObjectCb,
+    });
+  };
+
   _onAddEventsFunction = (
     eventsBasedBehavior: ?gdEventsBasedBehavior,
     eventsBasedObject: ?gdEventsBasedObject,
@@ -1156,6 +1192,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       behaviorMethodSelectorDialogOpen,
       objectMethodSelectorDialogOpen,
       extensionFunctionSelectorDialogOpen,
+      eventsBasedObjectSelectorDialogOpen,
       variablesEditorOpen,
     } = this.state;
 
@@ -1197,6 +1234,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                         selectedEventsBasedEntity.getEventsFunctions()) ||
                       eventsFunctionsExtension
                     }
+                    eventsFunctionsExtension={eventsFunctionsExtension}
                     objectsContainer={this._objectsContainer}
                     onConfigurationUpdated={this._onConfigurationUpdated}
                     helpPagePath={
@@ -1277,6 +1315,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 settingsIcon={extensionEditIconReactNode}
                 unsavedChanges={this.props.unsavedChanges}
                 isActive={true}
+                hotReloadPreviewButtonProps={
+                  this.props.hotReloadPreviewButtonProps
+                }
               />
             </Background>
           ) : selectedEventsBasedBehavior ? (
@@ -1384,6 +1425,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   i18n
                 )}
                 onEventsBasedObjectRenamed={this._onEventsBasedObjectRenamed}
+                onAddEventsBasedObject={this._onAddEventsBasedObject}
                 onSelectExtensionProperties={() => this._editOptions(true)}
                 onSelectExtensionGlobalVariables={() =>
                   this._editVariables({ isGlobalTabInitiallyOpen: true })
@@ -1413,7 +1455,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                     nextIcon: <Tune />,
                     nextLabel: <Trans>Parameters</Trans>,
                     nextEditor: 'parameters',
-                    previousEditor: () => 'functions-list',
+                    previousEditor: () => {
+                      this._selectEventsFunction(null, null, null);
+                      return 'functions-list';
+                    },
                   },
                   parameters: {
                     nextIcon: <Mark />,
@@ -1487,6 +1532,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             open
             onCancel={() => this._editVariables(null)}
             onApply={() => this._editVariables(null)}
+            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
           />
         )}
         {objectMethodSelectorDialogOpen && selectedEventsBasedObject && (
@@ -1513,6 +1559,14 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             onCancel={() => this._onCloseExtensionFunctionSelectorDialog(null)}
             onChoose={parameters =>
               this._onCloseExtensionFunctionSelectorDialog(parameters)
+            }
+          />
+        )}
+        {eventsBasedObjectSelectorDialogOpen && (
+          <EventsBasedObjectSelectorDialog
+            onCancel={() => this._onCloseEventsBasedObjectSelectorDialog(null)}
+            onChoose={parameters =>
+              this._onCloseEventsBasedObjectSelectorDialog(parameters)
             }
           />
         )}

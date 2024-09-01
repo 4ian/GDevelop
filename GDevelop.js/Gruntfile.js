@@ -128,6 +128,14 @@ module.exports = function (grunt) {
           },
         },
       },
+      syncVersions: {
+        command: 'node scripts/sync-versions.js',
+        options: {
+          execOptions: {
+            cwd: __dirname,
+          },
+        },
+      }
     },
     clean: {
       options: { force: true },
@@ -154,6 +162,7 @@ module.exports = function (grunt) {
     'shell:make',
   ]);
   grunt.registerTask('build', [
+    'shell:syncVersions',
     'build:raw',
     'shell:copyToNewIDE',
     'shell:generateFlowTypes',

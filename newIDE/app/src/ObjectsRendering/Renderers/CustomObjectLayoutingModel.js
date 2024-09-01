@@ -561,6 +561,8 @@ export interface ChildRenderedInstance {
   _pixiObject: { height: number };
   getDefaultWidth(): number;
   getDefaultHeight(): number;
+  getOriginX(): number;
+  getOriginY(): number;
   update(): void;
 }
 
@@ -591,6 +593,9 @@ export const applyChildLayouts = <T: ChildRenderedInstance>(
     const childInstance = parent.childrenInstances[index];
     const childLayout = parent.childrenLayouts[index];
 
+    const childOriginX = renderedInstance.getOriginX();
+    const childOriginY = renderedInstance.getOriginY();
+
     if (childLayout.horizontalLayout.anchorOrigin == null) {
       const childMinX =
         childLayout.horizontalLayout.minSideAbsoluteMargin ||
@@ -601,7 +606,7 @@ export const applyChildLayouts = <T: ChildRenderedInstance>(
           (childLayout.horizontalLayout.maxSideProportionalMargin || 0) *
             width);
 
-      childInstance.x = childMinX;
+      childInstance.x = childMinX + childOriginX;
       childInstance.setCustomWidth(childMaxX - childMinX);
     } else {
       const anchorOrigin = childLayout.horizontalLayout.anchorOrigin || 0;
@@ -622,10 +627,12 @@ export const applyChildLayouts = <T: ChildRenderedInstance>(
         : renderedInstance.getDefaultWidth();
 
       childInstance.x =
-        targetInstance.getX() +
+        targetInstance.getX() -
+        targetRenderedInstance.getOriginX() +
         (childLayout.horizontalLayout.anchorDelta || 0) +
         anchorTarget * targetInstanceWidth -
-        anchorOrigin * width;
+        anchorOrigin * width +
+        childOriginX;
       childInstance.setCustomWidth(width);
     }
 
@@ -638,7 +645,7 @@ export const applyChildLayouts = <T: ChildRenderedInstance>(
         (childLayout.verticalLayout.maxSideAbsoluteMargin ||
           (childLayout.verticalLayout.maxSideProportionalMargin || 0) * height);
 
-      childInstance.y = childMinY;
+      childInstance.y = childMinY + childOriginY;
       const expectedHeight = childMaxY - childMinY;
       childInstance.setCustomHeight(childMaxY - childMinY);
 
@@ -667,10 +674,12 @@ export const applyChildLayouts = <T: ChildRenderedInstance>(
         : renderedInstance.getDefaultHeight();
 
       childInstance.y =
-        targetInstance.getY() +
+        targetInstance.getY() -
+        targetRenderedInstance.getOriginY() +
         (childLayout.verticalLayout.anchorDelta || 0) +
         anchorTarget * targetInstanceHeight -
-        anchorOrigin * height;
+        anchorOrigin * height +
+        childOriginY;
       childInstance.setCustomHeight(height);
     }
 

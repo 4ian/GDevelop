@@ -892,22 +892,28 @@ void CommonInstructionsExtension::GenerateLocalVariableInitializationCode(
     code += variableCodeName + ".setString(" +
             EventsCodeGenerator::ConvertToStringExplicit(variable.GetString()) +
             ");\n";
-  } else if (variable.GetType() == gd::Variable::Structure ||
-             variable.GetType() == gd::Variable::Array) {
+  } else if (variable.GetType() == gd::Variable::Structure) {
     const auto &childrenNames = variable.GetAllChildrenNames();
-    for (const auto& childName : variable.GetAllChildrenNames()) {
+    for (const auto &childName : variable.GetAllChildrenNames()) {
       auto &child = variable.GetChild(childName);
 
       code += "{\n";
       GenerateLocalVariableInitializationCode(child, code, depth + 1);
       auto childCodeName = "variable" + gd::String::From(depth + 1);
       code += variableCodeName + ".addChild(" +
-              EventsCodeGenerator::ConvertToStringExplicit(childName) +
-              ", " + childCodeName + ");\n";
+              EventsCodeGenerator::ConvertToStringExplicit(childName) + ", " +
+              childCodeName + ");\n";
       code += "}\n";
     }
-    if (variable.GetType() == gd::Variable::Array) {
-      code += variableCodeName + ".castTo('array');\n";
+  } else if (variable.GetType() == gd::Variable::Array) {
+    for (std::size_t i = 0; i < variable.GetChildrenCount(); i++) {
+      auto &child = variable.GetAtIndex(i);
+
+      code += "{\n";
+      GenerateLocalVariableInitializationCode(child, code, depth + 1);
+      auto childCodeName = "variable" + gd::String::From(depth + 1);
+      code += variableCodeName + "._pushVariable(" + childCodeName + ");\n";
+      code += "}\n";
     }
   }
 }

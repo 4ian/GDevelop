@@ -129,6 +129,14 @@ const ProfileDialog = ({ open, onClose }: Props) => {
 
   const isConnected =
     authenticatedUser.authenticated && authenticatedUser.profile;
+  const isStudentAccount =
+    !!authenticatedUser.subscription &&
+    !!authenticatedUser.subscription.benefitsFromEducationPlan &&
+    !authenticatedUser.subscription.isTeacher;
+  const isTeacherAccount =
+    !!authenticatedUser.subscription &&
+    !!authenticatedUser.subscription.benefitsFromEducationPlan &&
+    !!authenticatedUser.subscription.isTeacher;
 
   return (
     <Dialog
@@ -172,7 +180,7 @@ const ProfileDialog = ({ open, onClose }: Props) => {
                 authenticatedUser.onOpenChangeEmailDialog
               }
             />
-            {subscriptionPlansWithPricingSystems ? (
+            {isStudentAccount ? null : subscriptionPlansWithPricingSystems ? (
               <SubscriptionDetails
                 subscription={authenticatedUser.subscription}
                 subscriptionPlansWithPricingSystems={
@@ -184,33 +192,37 @@ const ProfileDialog = ({ open, onClose }: Props) => {
             ) : (
               <PlaceholderLoader />
             )}
-            <Column noMargin>
-              <Line alignItems="center">
-                <Column noMargin>
-                  <Text size="block-title">
-                    <Trans>GDevelop credits</Trans>
-                  </Text>
-                  <Text size="body" noMargin>
-                    <Trans>
-                      Get perks and cloud benefits when getting closer to your
-                      game launch.{' '}
-                      <Link
-                        href="https://wiki.gdevelop.io/gdevelop5/interface/profile/credits"
-                        onClick={() =>
-                          Window.openExternalURL(
-                            'https://wiki.gdevelop.io/gdevelop5/interface/profile/credits'
-                          )
-                        }
-                      >
-                        Learn more
-                      </Link>
-                    </Trans>
-                  </Text>
-                </Column>
-              </Line>
-              <CreditsStatusBanner displayPurchaseAction />
-            </Column>
-            <ContributionsDetails userId={authenticatedUser.profile.id} />
+            {!isStudentAccount && !isTeacherAccount && (
+              <Column noMargin>
+                <Line alignItems="center">
+                  <Column noMargin>
+                    <Text size="block-title">
+                      <Trans>GDevelop credits</Trans>
+                    </Text>
+                    <Text size="body" noMargin>
+                      <Trans>
+                        Get perks and cloud benefits when getting closer to your
+                        game launch.{' '}
+                        <Link
+                          href="https://wiki.gdevelop.io/gdevelop5/interface/profile/credits"
+                          onClick={() =>
+                            Window.openExternalURL(
+                              'https://wiki.gdevelop.io/gdevelop5/interface/profile/credits'
+                            )
+                          }
+                        >
+                          Learn more
+                        </Link>
+                      </Trans>
+                    </Text>
+                  </Column>
+                </Line>
+                <CreditsStatusBanner displayPurchaseAction />
+              </Column>
+            )}
+            {!isStudentAccount && (
+              <ContributionsDetails userId={authenticatedUser.profile.id} />
+            )}
             {isConnected && (
               <div ref={userAchievementsContainerRef}>
                 <UserAchievements

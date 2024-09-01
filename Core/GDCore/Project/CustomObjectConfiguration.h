@@ -30,7 +30,7 @@ namespace gd {
 class CustomObjectConfiguration : public gd::ObjectConfiguration {
  public:
   CustomObjectConfiguration(const Project& project_, const String& type_)
-      : project(&project_) {
+      : project(&project_), isMarkedAsOverridingEventsBasedObjectChildrenConfiguration(false) {
     SetType(type_);
   }
   std::unique_ptr<gd::ObjectConfiguration> Clone() const override;
@@ -65,7 +65,28 @@ class CustomObjectConfiguration : public gd::ObjectConfiguration {
 
   void ExposeResources(gd::ArbitraryResourceWorker& worker) override;
 
-  gd::ObjectConfiguration &GetChildObjectConfiguration(const gd::String& objectName);
+  bool IsForcedToOverrideEventsBasedObjectChildrenConfiguration() const;
+
+  bool IsMarkedAsOverridingEventsBasedObjectChildrenConfiguration() const {
+    return isMarkedAsOverridingEventsBasedObjectChildrenConfiguration;
+  }
+
+  void SetMarkedAsOverridingEventsBasedObjectChildrenConfiguration(
+      bool isOverridingEventsBasedObjectChildrenConfiguration_) {
+    isMarkedAsOverridingEventsBasedObjectChildrenConfiguration =
+        isOverridingEventsBasedObjectChildrenConfiguration_;
+  }
+
+  void ClearChildrenConfiguration();
+
+  gd::ObjectConfiguration &
+  GetChildObjectConfiguration(const gd::String &objectName);
+
+  std::size_t GetAnimationsCount() const override;
+
+  const gd::String &GetAnimationName(size_t index) const override;
+
+  bool HasAnimationNamed(const gd::String &animationName) const override;
 
   /**
    * \brief Return the animation configuration for Animatable custom objects.
@@ -84,10 +105,14 @@ protected:
  private:
   const gd::EventsBasedObject* GetEventsBasedObject() const;
 
+  bool IsOverridingEventsBasedObjectChildrenConfiguration() const;
+
   const Project* project; ///< The project is used to get the
                           ///< EventBasedObject from the fullType.
   gd::SerializerElement objectContent;
-  std::map<gd::String, std::unique_ptr<gd::ObjectConfiguration>> childObjectConfigurations;
+  
+  bool isMarkedAsOverridingEventsBasedObjectChildrenConfiguration;
+  mutable std::map<gd::String, std::unique_ptr<gd::ObjectConfiguration>> childObjectConfigurations;
 
   static gd::ObjectConfiguration badObjectConfiguration;
 

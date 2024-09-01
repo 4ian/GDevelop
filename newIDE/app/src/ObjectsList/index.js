@@ -9,6 +9,7 @@ import { AutoSizer } from 'react-virtualized';
 import Background from '../UI/Background';
 import SearchBar from '../UI/SearchBar';
 import NewObjectDialog from '../AssetStore/NewObjectDialog';
+import AssetSwappingDialog from '../AssetStore/AssetSwappingDialog';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
 import Window from '../Utils/Window';
@@ -27,9 +28,6 @@ import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewB
 import { getInstanceCountInLayoutForObject } from '../Utils/Layout';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
-import { getShortcutDisplayName } from '../KeyboardShortcuts';
-import defaultShortcuts from '../KeyboardShortcuts/DefaultShortcuts';
-import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { Column, Line } from '../UI/Grid';
 import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
 import Add from '../UI/CustomSvgIcons/Add';
@@ -53,6 +51,8 @@ import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import { getInsertionParentAndPositionFromSelection } from '../Utils/ObjectFolders';
+import { canSwapAssetOfObject } from '../AssetStore/AssetSwapper';
+import { renderQuickCustomizationMenuItems } from '../QuickCustomization/QuickCustomizationMenuItems';
 
 const gd: libGDevelop = global.gd;
 const sceneObjectsRootFolderId = 'scene-objects';
@@ -105,8 +105,9 @@ const objectTypeToDefaultName = {
   'BBText::BBText': 'NewBBText',
   'BitmapText::BitmapTextObject': 'NewBitmapText',
   'TextEntryObject::TextEntry': 'NewTextEntry',
-  'TileMap::TileMap': 'NewTileMap',
-  'TileMap::CollisionMask': 'NewTileMapMask',
+  'TileMap::SimpleTileMap': 'NewTileMap',
+  'TileMap::TileMap': 'NewExternalTileMap',
+  'TileMap::CollisionMask': 'NewExternalTileMapMask',
   'MyDummyExtension::DummyObject': 'NewDummyObject',
   'Lighting::LightObject': 'NewLight',
   'TextInput::TextInputObject': 'NewTextInput',
@@ -188,7 +189,6 @@ export type ObjectsListInterface = {|
   forceUpdateList: () => void,
   openNewObjectDialog: () => void,
   closeNewObjectDialog: () => void,
-  renameObjectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext => void,
 |};
 
 type Props = {|
@@ -210,7 +210,6 @@ type Props = {|
     cb: (boolean) => void
   ) => void,
   selectedObjectFolderOrObjectsWithContext: Array<ObjectFolderOrObjectWithContext>,
-  canInstallPrivateAsset: () => boolean,
 
   beforeSetAsGlobalObject?: (groupName: string) => boolean,
   canSetAsGlobalObject?: boolean,
@@ -218,6 +217,7 @@ type Props = {|
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
   onExportAssets: () => void,
   onObjectCreated: gdObject => void,
+  onObjectEdited: ObjectWithContext => void,
   onObjectFolderOrObjectWithContextSelected: (
     ?ObjectFolderOrObjectWithContext
   ) => void,
@@ -247,7 +247,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       onDeleteObjects,
       onRenameObjectFolderOrObjectWithContextFinish,
       selectedObjectFolderOrObjectsWithContext,
-      canInstallPrivateAsset,
 
       beforeSetAsGlobalObject,
       canSetAsGlobalObject,
@@ -255,6 +254,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       onEditObject,
       onExportAssets,
       onObjectCreated,
+      onObjectEdited,
       onObjectFolderOrObjectWithContextSelected,
       onObjectPasted,
       getValidatedObjectOrGroupName,
@@ -266,10 +266,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     }: Props,
     ref
   ) => {
-    const preferences = React.useContext(PreferencesContext);
     const { currentlyRunningInAppTutorial } = React.useContext(
       InAppTutorialContext
     );
+    const [searchText, setSearchText] = React.useState('');
     const { showDeleteConfirmation } = useAlertDialog();
     const treeViewRef = React.useRef<?TreeViewInterface<TreeViewItem>>(null);
     const forceUpdate = useForceUpdate();
@@ -298,13 +298,22 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       closeNewObjectDialog: () => {
         setNewObjectDialogOpen(null);
       },
-      renameObjectFolderOrObjectWithContext: objectFolderOrObjectWithContext => {
-        if (treeViewRef.current)
-          treeViewRef.current.renameItem(objectFolderOrObjectWithContext);
-      },
     }));
 
-    const [searchText, setSearchText] = React.useState('');
+    const [
+      objectAssetSwappingDialogOpen,
+      setObjectAssetSwappingDialogOpen,
+    ] = React.useState<{ objectWithContext: ObjectWithContext } | null>(null);
+
+    // Initialize keyboard shortcuts as empty.
+    // onDelete, onDuplicate and onRename callbacks are set in an effect because it applies
+    // to the selected item (that is a props). As it is stored in a ref, the keyboard shortcut
+    // instance does not update with selectedObjectFolderOrObjectsWithContext changes.
+    const keyboardShortcutsRef = React.useRef<KeyboardShortcuts>(
+      new KeyboardShortcuts({
+        shortcutCallbacks: {},
+      })
+    );
 
     const addObject = React.useCallback(
       (objectType: string) => {
@@ -430,6 +439,13 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       [onObjectCreated, objectsContainer]
     );
 
+    const swapObjectAsset = React.useCallback(
+      (objectWithContext: ObjectWithContext) => {
+        setObjectAssetSwappingDialogOpen({ objectWithContext });
+      },
+      []
+    );
+
     const onAddNewObject = React.useCallback(
       (item: ObjectFolderOrObjectWithContext | null) => {
         setNewObjectDialogOpen({ from: item });
@@ -542,31 +558,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         globalObjectsContainer,
         objectsContainer,
         onObjectModified,
-      ]
-    );
-
-    // Initialize keyboard shortcuts as empty.
-    // onDelete callback is set outside because it deletes the selected
-    // item (that is a props). As it is stored in a ref, the keyboard shortcut
-    // instance does not update with selectedObjectFolderOrObjectsWithContext changes.
-    const keyboardShortcutsRef = React.useRef<KeyboardShortcuts>(
-      new KeyboardShortcuts({
-        shortcutCallbacks: {},
-      })
-    );
-    React.useEffect(
-      () => {
-        if (keyboardShortcutsRef.current) {
-          keyboardShortcutsRef.current.setShortcutCallback('onDelete', () => {
-            deleteObjectFolderOrObjectWithContext(
-              selectedObjectFolderOrObjectsWithContext[0]
-            );
-          });
-        }
-      },
-      [
-        selectedObjectFolderOrObjectsWithContext,
-        deleteObjectFolderOrObjectWithContext,
       ]
     );
 
@@ -720,7 +711,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       [isMobile]
     );
 
-    const duplicateObject = React.useCallback(
+    const duplicateObjectFolderOrObjectWithContext = React.useCallback(
       (
         objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
         duplicateInScene?: boolean
@@ -761,6 +752,35 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         editName,
         forceUpdateList,
         selectObjectFolderOrObjectWithContext,
+      ]
+    );
+
+    React.useEffect(
+      () => {
+        if (keyboardShortcutsRef.current) {
+          keyboardShortcutsRef.current.setShortcutCallback('onDelete', () => {
+            deleteObjectFolderOrObjectWithContext(
+              selectedObjectFolderOrObjectsWithContext[0]
+            );
+          });
+          keyboardShortcutsRef.current.setShortcutCallback(
+            'onDuplicate',
+            () => {
+              duplicateObjectFolderOrObjectWithContext(
+                selectedObjectFolderOrObjectsWithContext[0]
+              );
+            }
+          );
+          keyboardShortcutsRef.current.setShortcutCallback('onRename', () => {
+            editName(selectedObjectFolderOrObjectsWithContext[0]);
+          });
+        }
+      },
+      [
+        selectedObjectFolderOrObjectsWithContext,
+        deleteObjectFolderOrObjectWithContext,
+        duplicateObjectFolderOrObjectWithContext,
+        editName,
       ]
     );
 
@@ -1355,10 +1375,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             {
               label: i18n._(t`Rename`),
               click: () => editName(item),
-              accelerator: getShortcutDisplayName(
-                preferences.values.userShortcutMap['RENAME_SCENE_OBJECT'] ||
-                  defaultShortcuts.RENAME_SCENE_OBJECT
-              ),
+              accelerator: 'F2',
             },
             {
               label: i18n._(t`Delete`),
@@ -1379,6 +1396,16 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                 })
               ),
             },
+            ...renderQuickCustomizationMenuItems({
+              i18n,
+              visibility: objectFolderOrObject.getQuickCustomizationVisibility(),
+              onChangeVisibility: visibility => {
+                objectFolderOrObject.setQuickCustomizationVisibility(
+                  visibility
+                );
+                forceUpdate();
+              },
+            }),
             { type: 'separator' },
             {
               label: i18n._(t`Add a new object`),
@@ -1444,15 +1471,13 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           },
           {
             label: i18n._(t`Duplicate`),
-            click: () => duplicateObject(item),
+            click: () => duplicateObjectFolderOrObjectWithContext(item),
+            accelerator: 'CmdOrCtrl+D',
           },
           {
             label: i18n._(t`Rename`),
             click: () => editName(item),
-            accelerator: getShortcutDisplayName(
-              preferences.values.userShortcutMap['RENAME_SCENE_OBJECT'] ||
-                defaultShortcuts.RENAME_SCENE_OBJECT
-            ),
+            accelerator: 'F2',
           },
           {
             label: i18n._(t`Delete`),
@@ -1478,6 +1503,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             enabled: objectMetadata.hasDefaultBehavior(
               'EffectCapability::EffectBehavior'
             ),
+          },
+          { type: 'separator' },
+          {
+            label: i18n._(t`Swap assets`),
+            click: () => swapObjectAsset({ object, global }),
+            enabled: canSwapAssetOfObject(object),
           },
           { type: 'separator' },
           globalObjectsContainer && {
@@ -1527,7 +1558,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         objectsContainer,
         initialInstances,
         project,
-        preferences.values.userShortcutMap,
         canSetAsGlobalObject,
         onSelectAllInstancesOfObjectInLayout,
         onExportAssets,
@@ -1540,11 +1570,13 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         selectedObjectFolderOrObjectsWithContext,
         copyObjectFolderOrObjectWithContext,
         cutObjectFolderOrObjectWithContext,
-        duplicateObject,
+        duplicateObjectFolderOrObjectWithContext,
         onEditObject,
+        swapObjectAsset,
         selectObjectFolderOrObjectWithContext,
         setAsGlobalObject,
         onAddObjectInstance,
+        forceUpdate,
       ]
     );
 
@@ -1685,8 +1717,22 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             eventsBasedObject={eventsBasedObject}
             objectsContainer={objectsContainer}
             resourceManagementProps={resourceManagementProps}
-            canInstallPrivateAsset={canInstallPrivateAsset}
             targetObjectFolderOrObjectWithContext={newObjectDialogOpen.from}
+          />
+        )}
+        {objectAssetSwappingDialogOpen && (
+          <AssetSwappingDialog
+            onClose={({ swappingDone }) => {
+              setObjectAssetSwappingDialogOpen(null);
+              if (swappingDone)
+                onObjectEdited(objectAssetSwappingDialogOpen.objectWithContext);
+            }}
+            project={project}
+            layout={layout}
+            eventsBasedObject={eventsBasedObject}
+            objectsContainer={objectsContainer}
+            object={objectAssetSwappingDialogOpen.objectWithContext.object}
+            resourceManagementProps={resourceManagementProps}
           />
         )}
       </Background>

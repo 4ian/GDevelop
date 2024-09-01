@@ -24,48 +24,46 @@ namespace gdjs {
     actionOnPlayerDisconnect: string;
 
     // The last time the object has been synchronized.
-    // This is to avoid synchronizing the object too often, see _objectMaxTickRate.
+    // This is to avoid synchronizing the object too often, see _objectMaxSyncRate.
     _lastObjectSyncTimestamp: number = 0;
-    // The number of times per second the object should be synchronized if it keeps changing.
-    _objectMaxTickRate: number = 60;
 
     // The last time the basic object info has been synchronized.
     _lastBasicObjectSyncTimestamp: number = 0;
     // The number of times per second the object basic info should be synchronized when it doesn't change.
-    _objectBasicInfoTickRate: number = 5;
+    _objectBasicInfoSyncRate: number = 5;
     // The last data sent to synchronize the basic info of the object.
     _lastSentBasicObjectSyncData: BasicObjectNetworkSyncData | undefined;
     // When we know that the basic info of the object has been updated, we can force sending them
-    // on the max tickrate for a number of times to ensure they are received, without the need of an acknowledgment.
+    // on the max SyncRate for a number of times to ensure they are received, without the need of an acknowledgment.
     _numberOfForcedBasicObjectUpdates: number = 0;
 
     // The last time the variables have been synchronized.
     _lastVariablesSyncTimestamp: number = 0;
     // The number of times per second the variables should be synchronized.
-    _variablesTickRate: number = 1;
+    _variablesSyncRate: number = 1;
     // The last data sent to synchronize the variables.
     _lastSentVariableSyncData: VariableNetworkSyncData[] | undefined;
     // When we know that the variables have been updated, we can force sending them
-    // on the same tickrate as the object update for a number of times
+    // on the same syncRate as the object update for a number of times
     // to ensure they are received, without the need of an acknowledgment.
     _numberOfForcedVariablesUpdates: number = 0;
 
     // The last time the effects have been synchronized.
     _lastEffectsSyncTimestamp: number = 0;
     // The number of times per second the effects should be synchronized.
-    _effectsTickRate: number = 1;
+    _effectsSyncRate: number = 1;
     // The last data sent to synchronize the effects.
     _lastSentEffectSyncData:
       | { [effectName: string]: EffectNetworkSyncData }
       | undefined;
     // When we know that the effects have been updated, we can force sending them
-    // on the same tickrate as the object update for a number of times
+    // on the same syncRate as the object update for a number of times
     // to ensure they are received, without the need of an acknowledgment.
     _numberOfForcedEffectsUpdates: number = 0;
 
     // To avoid seeing too many logs.
     _lastLogTimestamp: number = 0;
-    _logTickRate: number = 1;
+    _logSyncRate: number = 1;
     // Clock to be incremented every time we send a message, to ensure they are ordered
     // and old messages are ignored.
     _clock: number = 0;
@@ -92,9 +90,14 @@ namespace gdjs {
       // To handle this case and avoid having an object not synchronized, we set a timeout to destroy the object
       // if it has not been assigned a networkId after a short delay.
       this._destroyInstanceTimeoutId = setTimeout(() => {
-        if (!owner.networkId && gdjs.multiplayer.isLobbyGameRunning()) {
+        const sceneNetworkId = this.owner.getRuntimeScene().networkId;
+        if (
+          !owner.networkId &&
+          gdjs.multiplayer.isLobbyGameRunning() &&
+          sceneNetworkId
+        ) {
           debugLogger.info(
-            `Lobby game is running and object ${owner.getName()} has not been assigned a networkId after a short delay, destroying it.`
+            `Lobby game is running on a synced scene and object ${owner.getName()} has not been assigned a networkId after a short delay, destroying it.`
           );
           owner.deleteFromScene(instanceContainer);
         }
@@ -126,35 +129,35 @@ namespace gdjs {
     }
 
     private _hasObjectBeenSyncedWithinMaxRate() {
+      const objectMaxSyncRate = gdjs.multiplayer.getObjectsSynchronizationRate();
       return (
-        getTimeNow() - this._lastObjectSyncTimestamp <
-        1000 / this._objectMaxTickRate
+        getTimeNow() - this._lastObjectSyncTimestamp < 1000 / objectMaxSyncRate
       );
     }
 
     private _hasObjectBasicInfoBeenSyncedRecently() {
       return (
         getTimeNow() - this._lastBasicObjectSyncTimestamp <
-        1000 / this._objectBasicInfoTickRate
+        1000 / this._objectBasicInfoSyncRate
       );
     }
 
     private _haveVariablesBeenSyncedRecently() {
       return (
         getTimeNow() - this._lastVariablesSyncTimestamp <
-        1000 / this._variablesTickRate
+        1000 / this._variablesSyncRate
       );
     }
 
     private _haveEffectsBeenSyncedRecently() {
       return (
         getTimeNow() - this._lastEffectsSyncTimestamp <
-        1000 / this._effectsTickRate
+        1000 / this._effectsSyncRate
       );
     }
 
     // private _logToConsoleWithThrottle(message: string) {
-    //   if (getTimeNow() - this._lastLogTimestamp > 1000 / this._logTickRate) {
+    //   if (getTimeNow() - this._lastLogTimestamp > 1000 / this._logSyncRate) {
     //     logger.info(message);
     //     this._lastLogTimestamp = getTimeNow();
     //   }
@@ -162,12 +165,9 @@ namespace gdjs {
 
     private _getOrCreateInstanceNetworkId() {
       if (!this.owner.networkId) {
-        // no ID for this object, let's generate one so it can be identified by other players.
-        // Either use the persistentUuid if it exists, or generate a new one.
+        // No ID for this object, let's generate one so it can be identified by other players.
         // Keep it short to avoid sending too much data.
-        const newID = this.owner.persistentUuid
-          ? this.owner.persistentUuid.substring(0, 8)
-          : gdjs.makeUuid().substring(0, 8);
+        const newID = gdjs.makeUuid().substring(0, 8);
         this.owner.networkId = newID;
       }
 
@@ -250,7 +250,8 @@ namespace gdjs {
         return;
       }
 
-      // If game is running and object belong to a player that is not connected, destroy the object.
+      // If game is running and the object belongs to a player who is not connected, destroy the object.
+      // As the game may create objects before the lobby game starts, we don't want to destroy them if it's not running.
       if (
         this.playerNumber !== 0 && // Host is always connected.
         !gdjs.multiplayerMessageManager.isPlayerConnected(this.playerNumber)
@@ -405,15 +406,17 @@ namespace gdjs {
         this._destroyInstanceTimeoutId = null;
       }
 
-      // If the lobby game is not running, do not try to destroy the object,
-      // as the game may create objects before the lobby game starts, and we don't want to destroy them.
+      // If the lobby game is not running, no need to send a message to destroy the object.
       if (!gdjs.multiplayer.isLobbyGameRunning()) {
         return;
       }
 
       // For destruction of objects, we allow the host to destroy the object even if it is not the owner.
       // This is particularly helpful when a player disconnects, so the host can destroy the object they were owning.
-      if (!this._isOwnerAsPlayerOrHost() && !gdjs.multiplayer.isPlayerHost()) {
+      if (
+        !this._isOwnerAsPlayerOrHost() &&
+        !gdjs.multiplayer.isCurrentPlayerHost()
+      ) {
         return;
       }
 

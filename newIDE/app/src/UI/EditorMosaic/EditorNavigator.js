@@ -16,6 +16,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     flex: 1,
+    minHeight: 0,
   },
 };
 

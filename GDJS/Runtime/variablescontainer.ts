@@ -86,6 +86,16 @@ namespace gdjs {
       }
     }
 
+    rebuildIndexFrom(data: VariableData[]) {
+      this._variablesArray.length = 0;
+      for (const variableData of data) {
+        if (variableData.name) {
+          const variable = this._variables.get(variableData.name);
+          this._variablesArray.push(variable);
+        }
+      }
+    }
+
     /**
      * Declare a new variable.
      * This should only be used by generated code.
@@ -224,6 +234,7 @@ namespace gdjs {
       syncOptions: GetNetworkSyncDataOptions
     ): VariableNetworkSyncData[] {
       const syncedPlayerNumber = syncOptions.playerNumber;
+      const isHost = syncOptions.isHost;
       const networkSyncData: VariableNetworkSyncData[] = [];
       const variableNames = [];
       this._variables.keys(variableNames);
@@ -237,10 +248,10 @@ namespace gdjs {
           variableOwner === null ||
           // Getting sync data for a specific player:
           (syncedPlayerNumber !== undefined &&
-            // Owned by host but we are not player 1.
+            // Variable is owned by host but this player number is not the host.
             variableOwner === 0 &&
-            syncedPlayerNumber !== 1) ||
-          // Owned by a player but we are not this player.
+            !isHost) ||
+          // Variable is owned by a player but not getting sync data for this player number.
           (variableOwner !== 0 && syncedPlayerNumber !== variableOwner)
         ) {
           // In those cases, the variable should not be synchronized.
@@ -442,6 +453,9 @@ namespace gdjs {
       getVariableNameInContainerByLoopingThroughAllVariables: function () {
         return '';
       },
+      rebuildIndexFrom: function () {
+        return;
+      },
     };
 
     /**
@@ -521,6 +535,7 @@ namespace gdjs {
         return [];
       },
       pushVariableCopy: () => {},
+      _pushVariable: () => {},
       pushValue: () => {},
       removeAtIndex: function () {
         return;

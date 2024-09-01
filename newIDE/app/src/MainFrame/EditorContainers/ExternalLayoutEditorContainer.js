@@ -25,7 +25,8 @@ import {
   registerOnResourceExternallyChangedCallback,
   unregisterOnResourceExternallyChangedCallback,
 } from '../ResourcesWatcher';
-import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
+import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 
 const styles = {
   container: {
@@ -107,6 +108,33 @@ export class ExternalLayoutEditorContainer extends React.Component<
       editor.forceUpdateObjectsList();
       editor.forceUpdateObjectGroupsList();
       editor.forceUpdateLayersList();
+    }
+  }
+
+  onEventsBasedObjectChildrenEdited() {
+    const { editor } = this;
+    if (editor) {
+      // Update every custom object because some custom objects may include
+      // the one actually edited.
+      editor.forceUpdateCustomObjectRenderedInstances();
+    }
+  }
+
+  onSceneObjectEdited(scene: gdLayout, objectWithContext: ObjectWithContext) {
+    const { editor } = this;
+    const externalLayout = this.getExternalLayout();
+    if (!externalLayout) {
+      return;
+    }
+    if (
+      externalLayout.getAssociatedLayout() !== scene.getName() &&
+      !objectWithContext.global
+    ) {
+      return;
+    }
+    if (editor) {
+      // Update instances of the object as it was modified in an editor.
+      editor.forceUpdateRenderedInstancesOfObject(objectWithContext.object);
     }
   }
 
@@ -205,6 +233,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
             project={project}
             projectScopedContainersAccessor={projectScopedContainersAccessor}
             layout={layout}
+            eventsFunctionsExtension={null}
             eventsBasedObject={null}
             globalObjectsContainer={project.getObjects()}
             objectsContainer={layout.getObjects()}
@@ -224,9 +253,11 @@ export class ExternalLayoutEditorContainer extends React.Component<
             onOpenEvents={this.props.onOpenEvents}
             onOpenMoreSettings={this.openExternalPropertiesDialog}
             isActive={isActive}
-            canInstallPrivateAsset={this.props.canInstallPrivateAsset}
             openBehaviorEvents={this.props.openBehaviorEvents}
             onExtractAsExternalLayout={this.props.onExtractAsExternalLayout}
+            onObjectEdited={objectWithContext =>
+              this.props.onSceneObjectEdited(layout, objectWithContext)
+            }
           />
         )}
         {!layout && (

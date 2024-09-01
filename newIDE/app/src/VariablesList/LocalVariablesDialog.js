@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import VariablesEditorDialog from './VariablesEditorDialog';
-import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
 type Props = {|
   open: boolean,
@@ -53,6 +53,7 @@ const LocalVariablesDialog = ({
       shouldCreateInitiallySelectedVariable={
         shouldCreateInitiallySelectedVariable
       }
+      hotReloadPreviewButtonProps={null}
     />
   );
 };

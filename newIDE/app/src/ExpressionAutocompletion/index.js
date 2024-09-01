@@ -2,7 +2,7 @@
 import { type I18n as I18nType } from '@lingui/core';
 import { mapFor, mapVector } from '../Utils/MapFor';
 import flatten from 'lodash/flatten';
-import { type EventsScope } from '../InstructionOrExpression/EventsScope.flow';
+import { type EventsScope } from '../InstructionOrExpression/EventsScope';
 import {
   enumerateFreeExpressions,
   filterExpressions,
@@ -19,7 +19,7 @@ import getObjectByName from '../Utils/GetObjectByName';
 import { getAllPointNames } from '../ObjectEditor/Editors/SpriteEditor/Utils/SpriteObjectHelper';
 import { enumerateParametersUsableInExpressions } from '../EventsSheet/ParameterFields/EnumerateFunctionParameters';
 import { filterStringListWithPrefix } from '../Utils/ListFiltering';
-import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
 const gd: libGDevelop = global.gd;
 
@@ -376,7 +376,9 @@ const getAutocompletionsForBehavior = function(
   expressionAutocompletionContext: ExpressionAutocompletionContext,
   completionDescription: gdExpressionCompletionDescription
 ): Array<ExpressionAutocompletion> {
-  const prefix: string = completionDescription.getPrefix();
+  const lowerCasePrefix: string = completionDescription
+    .getPrefix()
+    .toLowerCase();
   const isExact: boolean = completionDescription.isExact();
   const objectName: string = completionDescription.getObjectName();
   const projectScopedContainers = expressionAutocompletionContext.projectScopedContainersAccessor.get();
@@ -385,7 +387,9 @@ const getAutocompletionsForBehavior = function(
     .getObjectsContainersList()
     .getBehaviorsOfObject(objectName, true)
     .toJSArray()
-    .filter(behaviorName => behaviorName.indexOf(prefix) !== -1)
+    .filter(behaviorName =>
+      behaviorName.toLowerCase().includes(lowerCasePrefix)
+    )
     .map(behaviorName => {
       const behaviorType = projectScopedContainers
         .getObjectsContainersList()

@@ -13,8 +13,8 @@ import LeftLoader from '../UI/LeftLoader';
 import { ColumnStackLayout } from '../UI/Layout';
 import TextField from '../UI/TextField';
 import { getEmailErrorText } from './CreateAccountDialog';
-import { emailRegex } from './ForgotPasswordDialog';
 import Form from '../UI/Form';
+import { emailRegex } from '../Utils/EmailUtils';
 
 type Props = {|
   firebaseUser: FirebaseUser,

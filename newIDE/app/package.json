@@ -24,7 +24,7 @@
     "flow-bin": "0.131.0",
     "flow-coverage-report": "^0.4.0",
     "folder-hash": "^3.0.0",
-    "iso-639-1": "^2.0.3",
+    "iso-639-1": "^3.1.2",
     "minimist": "1.2.5",
     "patch-package": "^6.4.7",
     "prettier": "1.15.3",
@@ -151,6 +151,13 @@
               "message": "Don't import anything from prop-types - use Flow/TypeScript types instead."
             }
           ]
+        }
+      ],
+      "no-restricted-syntax": [
+        "error",
+        {
+          "selector": "MemberExpression[object.property.name='constructor'][property.name='name']",
+          "message": "'constructor.name' is not reliable (can become 'E', 'P' and etc.) in production build."
         }
       ]
     },

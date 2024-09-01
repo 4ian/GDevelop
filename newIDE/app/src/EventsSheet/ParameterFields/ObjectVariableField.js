@@ -7,6 +7,7 @@ import VariableField, {
   type VariableDialogOpeningProps,
 } from './VariableField';
 import ObjectVariablesDialog from '../../VariablesList/ObjectVariablesDialog';
+import ObjectGroupVariablesDialog from '../../VariablesList/ObjectGroupVariablesDialog';
 import {
   type ParameterFieldProps,
   type ParameterFieldInterface,
@@ -18,6 +19,7 @@ import getObjectGroupByName from '../../Utils/GetObjectGroupByName';
 import ObjectVariableIcon from '../../UI/CustomSvgIcons/ObjectVariable';
 import { enumerateVariables } from './EnumerateVariables';
 import { intersectionBy } from 'lodash';
+import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
 
 const gd: libGDevelop = global.gd;
 
@@ -94,6 +96,13 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       expression,
       parameterIndex,
     });
+    const objectGroup = objectName
+      ? getObjectGroupByName(
+          globalObjectsContainer,
+          objectsContainer,
+          objectName
+        )
+      : null;
 
     const { layout } = scope;
     const variablesContainers = React.useMemo<Array<gdVariablesContainer>>(
@@ -132,6 +141,20 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       [onChange, onInstructionTypeChanged, value]
     );
 
+    const onComputeAllVariableNames = React.useCallback(
+      () => {
+        if (!project || !layout || !objectName) return [];
+
+        return EventsRootVariablesFinder.findAllObjectVariables(
+          project.getCurrentPlatform(),
+          project,
+          layout, // TODO: Handle this for custom objects?
+          objectName
+        );
+      },
+      [layout, objectName, project]
+    );
+
     return (
       <React.Fragment>
         <VariableField
@@ -153,8 +176,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           onRequestClose={props.onRequestClose}
           onApply={props.onApply}
           ref={field}
-          // There is no variable editor for groups.
-          onOpenDialog={variablesContainers.length === 1 ? setEditorOpen : null}
+          onOpenDialog={setEditorOpen}
           globalObjectsContainer={props.globalObjectsContainer}
           objectsContainer={props.objectsContainer}
           projectScopedContainersAccessor={projectScopedContainersAccessor}
@@ -166,10 +188,9 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           }
           onInstructionTypeChanged={onInstructionTypeChanged}
         />
-        {editorOpen && project && (
+        {editorOpen && project && !objectGroup && (
           <ObjectVariablesDialog
             project={project}
-            layout={layout}
             projectScopedContainersAccessor={projectScopedContainersAccessor}
             objectName={objectName}
             variablesContainer={variablesContainers[0]}
@@ -179,6 +200,23 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             preventRefactoringToDeleteInstructions
             initiallySelectedVariableName={editorOpen.variableName}
             shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
+            onComputeAllVariableNames={onComputeAllVariableNames}
+            hotReloadPreviewButtonProps={null}
+          />
+        )}
+        {editorOpen && project && objectGroup && (
+          <ObjectGroupVariablesDialog
+            project={project}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
+            globalObjectsContainer={globalObjectsContainer}
+            objectsContainer={objectsContainer}
+            objectGroup={objectGroup}
+            onCancel={() => setEditorOpen(null)}
+            onApply={onVariableEditorApply}
+            open
+            initiallySelectedVariableName={editorOpen.variableName}
+            shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
+            onComputeAllVariableNames={onComputeAllVariableNames}
           />
         )}
       </React.Fragment>

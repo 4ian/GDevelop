@@ -254,6 +254,11 @@ namespace gdjs {
       connection.on('close', () => {
         _onDisconnect(connection.peer);
       });
+      connection.on('iceStateChanged', (state) => {
+        if (state === 'disconnected') {
+          _onDisconnect(connection.peer);
+        }
+      });
 
       // Regularly check for disconnection as the built in way is not reliable.
       (function disconnectChecker() {
@@ -428,7 +433,7 @@ namespace gdjs {
     export const isReady = () => ready;
 
     /**
-     * Return any disconnected peers.
+     * Return peers that have disconnected in the frame.
      */
     export const getJustDisconnectedPeers = () => justDisconnectedPeers;
 

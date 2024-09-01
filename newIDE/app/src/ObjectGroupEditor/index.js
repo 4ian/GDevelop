@@ -11,7 +11,7 @@ import getObjectByName from '../Utils/GetObjectByName';
 import Paper from '../UI/Paper';
 import { ColumnStackLayout } from '../UI/Layout';
 import AlertMessage from '../UI/AlertMessage';
-const gd: libGDevelop = global.gd;
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
 const styles = {
   objectSelector: { position: 'sticky', bottom: 0 },
@@ -19,51 +19,45 @@ const styles = {
 
 type Props = {|
   project: ?gdProject,
-  group: gdObjectGroup,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
+  groupObjectNames: Array<string>,
   onSizeUpdated?: () => void,
   onObjectGroupUpdated?: () => void,
+  onObjectAdded: (objectName: string) => void,
+  onObjectRemoved: (objectName: string) => void,
 |};
 
 const ObjectGroupEditor = ({
   project,
-  group,
+  projectScopedContainersAccessor,
   globalObjectsContainer,
   objectsContainer,
-  onSizeUpdated,
-  onObjectGroupUpdated,
+  groupObjectNames,
+  onObjectAdded,
+  onObjectRemoved,
 }: Props) => {
   const [objectName, setObjectName] = React.useState<string>('');
-  const objectsInGroup = group.getAllObjectsNames().toJSArray();
 
-  const removeObject = (objectName: string) => {
-    group.removeObject(objectName);
-
-    if (onSizeUpdated) onSizeUpdated();
-    if (onObjectGroupUpdated) onObjectGroupUpdated();
-  };
-
-  const addObject = (objectName: string) => {
-    group.addObject(objectName);
-    setObjectName('');
-    if (onSizeUpdated) onSizeUpdated();
-    if (onObjectGroupUpdated) onObjectGroupUpdated();
-  };
+  const addObject = React.useCallback(
+    (objectName: string) => {
+      onObjectAdded(objectName);
+      setObjectName('');
+    },
+    [onObjectAdded]
+  );
 
   const renderExplanation = () => {
     let type = undefined;
-    if (objectsInGroup.length === 0) {
+    if (groupObjectNames.length === 0) {
       return null;
     }
-    objectsInGroup.forEach(objectName => {
-      // TODO Use ProjectScopedContainers to get the object type
-      const objectType = gd.getTypeOfObject(
-        globalObjectsContainer || objectsContainer,
-        objectsContainer,
-        objectName,
-        false
-      );
+    groupObjectNames.forEach(objectName => {
+      const objectType = projectScopedContainersAccessor
+        .get()
+        .getObjectsContainersList()
+        .getTypeOfObject(objectName);
       if (type === undefined || objectType === type) type = objectType;
       else type = '';
     });
@@ -101,35 +95,32 @@ const ObjectGroupEditor = ({
     <ColumnStackLayout noMargin>
       {renderExplanation()}
       <List>
-        {group
-          .getAllObjectsNames()
-          .toJSArray()
-          .map(objectName => {
-            let object = getObjectByName(
-              globalObjectsContainer,
-              objectsContainer,
-              objectName
-            );
-            const icon =
-              project && object ? (
-                <ListIcon
-                  iconSize={24}
-                  src={ObjectsRenderingService.getThumbnail(
-                    project,
-                    object.getConfiguration()
-                  )}
-                />
-              ) : null;
-            return (
-              <ListItem
-                key={objectName}
-                primaryText={objectName}
-                displayRemoveButton
-                onRemove={() => removeObject(objectName)}
-                leftIcon={icon}
+        {groupObjectNames.map(objectName => {
+          let object = getObjectByName(
+            globalObjectsContainer,
+            objectsContainer,
+            objectName
+          );
+          const icon =
+            project && object ? (
+              <ListIcon
+                iconSize={24}
+                src={ObjectsRenderingService.getThumbnail(
+                  project,
+                  object.getConfiguration()
+                )}
               />
-            );
-          })}
+            ) : null;
+          return (
+            <ListItem
+              key={objectName}
+              primaryText={objectName}
+              displayRemoveButton
+              onRemove={() => onObjectRemoved(objectName)}
+              leftIcon={icon}
+            />
+          );
+        })}
       </List>
       <Paper style={styles.objectSelector} background="medium">
         <Column noMargin>
@@ -138,7 +129,7 @@ const ObjectGroupEditor = ({
             globalObjectsContainer={globalObjectsContainer}
             objectsContainer={objectsContainer}
             value={objectName}
-            excludedObjectOrGroupNames={objectsInGroup}
+            excludedObjectOrGroupNames={groupObjectNames}
             onChange={setObjectName}
             onChoose={addObject}
             openOnFocus

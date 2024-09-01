@@ -30,5 +30,6 @@ void DeclareAnchorBehaviorExtension(gd::PlatformExtension& extension) {
       "CppPlatform/Extensions/AnchorIcon.png",
       "AnchorBehavior",
       std::make_shared<AnchorBehavior>(),
-      std::make_shared<gd::BehaviorsSharedData>());
+      std::make_shared<gd::BehaviorsSharedData>())
+      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
 }

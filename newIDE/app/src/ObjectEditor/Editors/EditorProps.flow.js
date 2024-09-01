@@ -18,6 +18,8 @@ export type EditorProps = {|
    * (for instance, an object animation or a layer name).
    */
   layout: gdLayout | null,
+  eventsFunctionsExtension: gdEventsFunctionsExtension | null,
+  eventsBasedObject: gdEventsBasedObject | null,
   /**
    * The edited object. It can be undefined for sub-ObjectConfiguration of
    * custom object. There is no event to refactor in this case.

@@ -40,7 +40,6 @@ const defaultShortcuts: ShortcutMap = {
   OPEN_PROPERTIES_PANEL: 'KeyP',
   TOGGLE_INSTANCES_PANEL: 'KeyI',
   TOGGLE_LAYERS_PANEL: 'KeyL',
-  RENAME_SCENE_OBJECT: 'F2',
   TOGGLE_WINDOW_MASK: 'KeyM',
   TOGGLE_GRID: 'Alt+KeyG',
   OPEN_SETUP_GRID: 'CmdOrCtrl+Shift+KeyG',

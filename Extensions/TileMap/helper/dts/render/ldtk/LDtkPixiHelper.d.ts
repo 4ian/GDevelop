@@ -1,7 +1,9 @@
 import { TileTextureCache } from '../TileTextureCache';
 import { LDtkTileMap } from '../../load/ldtk/LDtkFormat';
-type Texture = PIXI.BaseTexture<PIXI.Resource>;
-type TextureLoader = (textureName: string) => PIXI.BaseTexture<PIXI.Resource>;
+declare type Texture = PIXI.BaseTexture<PIXI.Resource>;
+declare type TextureLoader = (
+  textureName: string
+) => PIXI.BaseTexture<PIXI.Resource>;
 export declare namespace LDtkPixiHelper {
   /**
    * Split an atlas image into Pixi textures.

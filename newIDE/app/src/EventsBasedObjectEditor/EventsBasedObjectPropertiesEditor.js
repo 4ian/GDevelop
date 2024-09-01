@@ -36,6 +36,8 @@ import PasteIcon from '../UI/CustomSvgIcons/Clipboard';
 import ResponsiveFlatButton from '../UI/ResponsiveFlatButton';
 import { EmptyPlaceholder } from '../UI/EmptyPlaceholder';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
+import SearchBar from '../UI/SearchBar';
+import ResourceTypeSelectField from '../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/ResourceTypeSelectField';
 
 const gd: libGDevelop = global.gd;
 
@@ -55,6 +57,7 @@ const styles = {
     display: 'flex',
     flex: 1,
     alignItems: 'center',
+    padding: '8px 0px',
   },
 };
 
@@ -70,6 +73,16 @@ export const usePropertyOverridingAlertDialog = () => {
       dismissButtonLabel: t`Omit`,
     });
   };
+};
+
+const setExtraInfoString = (
+  property: gdNamedPropertyDescriptor,
+  value: string
+) => {
+  const vectorString = new gd.VectorString();
+  vectorString.push_back(value);
+  property.setExtraInfo(vectorString);
+  vectorString.delete();
 };
 
 type Props = {|
@@ -149,19 +162,74 @@ export default function EventsBasedObjectPropertiesEditor({
 
   const forceUpdate = useForceUpdate();
 
-  const addProperty = React.useCallback(
+  const [searchText, setSearchText] = React.useState<string>('');
+  const [
+    searchMatchingPropertyNames,
+    setSearchMatchingPropertyNames,
+  ] = React.useState<Array<string>>([]);
+
+  const triggerSearch = React.useCallback(
     () => {
+      const properties = eventsBasedObject.getPropertyDescriptors();
+      const matchingPropertyNames = mapVector(
+        properties,
+        (property: gdNamedPropertyDescriptor, i: number) => {
+          const lowerCaseSearchText = searchText.toLowerCase();
+          return property
+            .getName()
+            .toLowerCase()
+            .includes(lowerCaseSearchText) ||
+            property
+              .getLabel()
+              .toLowerCase()
+              .includes(lowerCaseSearchText) ||
+            property
+              .getGroup()
+              .toLowerCase()
+              .includes(lowerCaseSearchText)
+            ? property.getName()
+            : null;
+        }
+      ).filter(Boolean);
+      setSearchMatchingPropertyNames(matchingPropertyNames);
+    },
+    [eventsBasedObject, searchText]
+  );
+
+  React.useEffect(
+    () => {
+      if (searchText) {
+        triggerSearch();
+      } else {
+        setSearchMatchingPropertyNames([]);
+      }
+    },
+    [searchText, triggerSearch]
+  );
+
+  const addPropertyAt = React.useCallback(
+    (index: number) => {
       const properties = eventsBasedObject.getPropertyDescriptors();
 
       const newName = newNameGenerator('Property', name =>
         properties.has(name)
       );
-      const property = properties.insertNew(newName, properties.getCount());
+      const property = properties.insertNew(newName, index);
       property.setType('Number');
       forceUpdate();
       onPropertiesUpdated && onPropertiesUpdated();
+      setJustAddedPropertyName(newName);
+      setSearchText('');
     },
     [eventsBasedObject, forceUpdate, onPropertiesUpdated]
+  );
+
+  const addProperty = React.useCallback(
+    () => {
+      const properties = eventsBasedObject.getPropertyDescriptors();
+      addPropertyAt(properties.getCount());
+    },
+    [addPropertyAt, eventsBasedObject]
   );
 
   const removeProperty = React.useCallback(
@@ -251,6 +319,7 @@ export default function EventsBasedObjectPropertiesEditor({
         }
       }
 
+      setSearchText('');
       forceUpdate();
       if (firstAddedPropertyName) {
         setJustAddedPropertyName(firstAddedPropertyName);
@@ -388,212 +457,337 @@ export default function EventsBasedObjectPropertiesEditor({
           {properties.getCount() > 0 ? (
             <React.Fragment>
               <ScrollView ref={scrollView}>
-                <Line>
-                  <Column noMargin expand>
-                    {mapVector(
-                      properties,
-                      (property: gdNamedPropertyDescriptor, i: number) => {
-                        const propertyRef =
-                          justAddedPropertyName === property.getName()
-                            ? justAddedPropertyElement
-                            : null;
+                <Column noMargin expand>
+                  {mapVector(
+                    properties,
+                    (property: gdNamedPropertyDescriptor, i: number) => {
+                      const propertyRef =
+                        justAddedPropertyName === property.getName()
+                          ? justAddedPropertyElement
+                          : null;
 
-                        return (
-                          <DragSourceAndDropTarget
-                            key={property.ptr}
-                            beginDrag={() => {
-                              draggedProperty.current = property;
-                              return {};
-                            }}
-                            canDrag={() => true}
-                            canDrop={() => true}
-                            drop={() => {
-                              movePropertyBefore(property);
-                            }}
-                          >
-                            {({
-                              connectDragSource,
-                              connectDropTarget,
-                              isOver,
-                              canDrop,
-                            }) =>
-                              connectDropTarget(
+                      if (
+                        searchText &&
+                        !searchMatchingPropertyNames.includes(
+                          property.getName()
+                        )
+                      ) {
+                        return null;
+                      }
+
+                      return (
+                        <DragSourceAndDropTarget
+                          key={property.ptr}
+                          beginDrag={() => {
+                            draggedProperty.current = property;
+                            return {};
+                          }}
+                          canDrag={() => true}
+                          canDrop={() => true}
+                          drop={() => {
+                            movePropertyBefore(property);
+                          }}
+                        >
+                          {({
+                            connectDragSource,
+                            connectDropTarget,
+                            isOver,
+                            canDrop,
+                          }) =>
+                            connectDropTarget(
+                              <div
+                                key={property.ptr}
+                                style={styles.rowContainer}
+                              >
+                                {isOver && <DropIndicator canDrop={canDrop} />}
                                 <div
-                                  key={property.ptr}
-                                  style={styles.rowContainer}
+                                  ref={propertyRef}
+                                  style={{
+                                    ...styles.rowContent,
+                                    backgroundColor:
+                                      gdevelopTheme.list.itemsBackgroundColor,
+                                  }}
                                 >
-                                  {isOver && (
-                                    <DropIndicator canDrop={canDrop} />
+                                  {connectDragSource(
+                                    <span>
+                                      <Column>
+                                        <DragHandleIcon />
+                                      </Column>
+                                    </span>
                                   )}
-                                  <div
-                                    ref={propertyRef}
-                                    style={{
-                                      ...styles.rowContent,
-                                      backgroundColor:
-                                        gdevelopTheme.list.itemsBackgroundColor,
-                                    }}
-                                  >
-                                    {connectDragSource(
-                                      <span>
-                                        <Column>
-                                          <DragHandleIcon />
-                                        </Column>
-                                      </span>
-                                    )}
-                                    <ResponsiveLineStackLayout expand>
-                                      <Line noMargin expand alignItems="center">
-                                        <SemiControlledTextField
-                                          margin="none"
-                                          commitOnBlur
-                                          translatableHintText={t`Enter the property name`}
-                                          value={property.getName()}
-                                          onChange={newName => {
-                                            if (newName === property.getName())
-                                              return;
+                                  <ResponsiveLineStackLayout expand noMargin>
+                                    <Line noMargin expand alignItems="center">
+                                      <SemiControlledTextField
+                                        margin="none"
+                                        commitOnBlur
+                                        translatableHintText={t`Enter the property name`}
+                                        value={property.getName()}
+                                        onChange={newName => {
+                                          if (newName === property.getName())
+                                            return;
 
-                                            const validatedNewName = getValidatedPropertyName(
-                                              i18n,
-                                              properties,
-                                              newName
-                                            );
-                                            onRenameProperty(
-                                              property.getName(),
-                                              validatedNewName
-                                            );
-                                            property.setName(validatedNewName);
+                                          const validatedNewName = getValidatedPropertyName(
+                                            i18n,
+                                            properties,
+                                            newName
+                                          );
+                                          onRenameProperty(
+                                            property.getName(),
+                                            validatedNewName
+                                          );
+                                          property.setName(validatedNewName);
 
-                                            forceUpdate();
-                                            onPropertiesUpdated &&
-                                              onPropertiesUpdated();
-                                          }}
-                                          fullWidth
-                                        />
-                                      </Line>
-                                      <Line
-                                        noMargin
-                                        alignItems="center"
-                                        justifyContent="flex-end"
-                                      >
-                                        <SelectField
-                                          value={
-                                            property.isHidden()
-                                              ? 'Hidden'
-                                              : property.isDeprecated()
-                                              ? 'Deprecated'
-                                              : property.isAdvanced()
-                                              ? 'Advanced'
-                                              : 'Visible'
+                                          forceUpdate();
+                                          onPropertiesUpdated &&
+                                            onPropertiesUpdated();
+                                        }}
+                                        fullWidth
+                                      />
+                                    </Line>
+                                    <Line
+                                      noMargin
+                                      alignItems="center"
+                                      justifyContent="flex-end"
+                                    >
+                                      <SelectField
+                                        margin="none"
+                                        value={
+                                          property.isHidden()
+                                            ? 'Hidden'
+                                            : property.isDeprecated()
+                                            ? 'Deprecated'
+                                            : property.isAdvanced()
+                                            ? 'Advanced'
+                                            : 'Visible'
+                                        }
+                                        onChange={(e, i, value: string) => {
+                                          if (value === 'Hidden') {
+                                            setHidden(property, true);
+                                            setDeprecated(property, false);
+                                            setAdvanced(property, false);
+                                          } else if (value === 'Deprecated') {
+                                            setHidden(property, false);
+                                            setDeprecated(property, true);
+                                            setAdvanced(property, false);
+                                          } else if (value === 'Advanced') {
+                                            setHidden(property, false);
+                                            setDeprecated(property, false);
+                                            setAdvanced(property, true);
+                                          } else if (value === 'Visible') {
+                                            setHidden(property, false);
+                                            setDeprecated(property, false);
+                                            setAdvanced(property, false);
                                           }
-                                          onChange={(e, i, value: string) => {
-                                            if (value === 'Hidden') {
-                                              setHidden(property, true);
-                                              setDeprecated(property, false);
-                                              setAdvanced(property, false);
-                                            } else if (value === 'Deprecated') {
-                                              setHidden(property, false);
-                                              setDeprecated(property, true);
-                                              setAdvanced(property, false);
-                                            } else if (value === 'Advanced') {
-                                              setHidden(property, false);
-                                              setDeprecated(property, false);
-                                              setAdvanced(property, true);
-                                            } else if (value === 'Visible') {
-                                              setHidden(property, false);
-                                              setDeprecated(property, false);
-                                              setAdvanced(property, false);
-                                            }
-                                          }}
-                                          fullWidth
-                                        >
-                                          <SelectOption
-                                            key="visibility-visible"
-                                            value="Visible"
-                                            label={t`Visible in editor`}
-                                          />
-                                          <SelectOption
-                                            key="visibility-advanced"
-                                            value="Advanced"
-                                            label={t`Advanced`}
-                                          />
-                                          <SelectOption
-                                            key="visibility-deprecated"
-                                            value="Deprecated"
-                                            label={t`Deprecated`}
-                                          />
-                                          <SelectOption
-                                            key="visibility-hidden"
-                                            value="Hidden"
-                                            label={t`Hidden`}
-                                          />
-                                        </SelectField>
-                                      </Line>
-                                    </ResponsiveLineStackLayout>
-                                    <ElementWithMenu
-                                      element={
-                                        <IconButton>
-                                          <ThreeDotsMenu />
-                                        </IconButton>
-                                      }
-                                      buildMenuTemplate={(i18n: I18nType) => [
-                                        {
-                                          label: i18n._(t`Delete`),
-                                          click: () =>
-                                            removeProperty(property.getName()),
-                                        },
-                                        {
-                                          label: i18n._(t`Copy`),
-                                          click: () => copyProperty(property),
-                                        },
-                                        {
-                                          label: i18n._(t`Paste`),
-                                          click: () =>
-                                            pastePropertiesBefore(property),
-                                          enabled: isClipboardContainingProperties,
-                                        },
-                                        { type: 'separator' },
-                                        {
-                                          label: i18n._(t`Move up`),
-                                          click: () => moveProperty(i, i - 1),
-                                          enabled: i - 1 >= 0,
-                                        },
-                                        {
-                                          label: i18n._(t`Move down`),
-                                          click: () => moveProperty(i, i + 1),
-                                          enabled:
-                                            i + 1 < properties.getCount(),
-                                        },
-                                        {
-                                          label: i18n._(
-                                            t`Generate expression and action`
-                                          ),
-                                          click: () => {
-                                            gd.PropertyFunctionGenerator.generateObjectGetterAndSetter(
-                                              project,
-                                              extension,
-                                              eventsBasedObject,
-                                              property
-                                            );
-                                            onEventsFunctionsAdded();
-                                          },
-                                          enabled: gd.PropertyFunctionGenerator.canGenerateGetterAndSetter(
+                                        }}
+                                        fullWidth
+                                      >
+                                        <SelectOption
+                                          key="visibility-visible"
+                                          value="Visible"
+                                          label={t`Visible in editor`}
+                                        />
+                                        <SelectOption
+                                          key="visibility-advanced"
+                                          value="Advanced"
+                                          label={t`Advanced`}
+                                        />
+                                        <SelectOption
+                                          key="visibility-deprecated"
+                                          value="Deprecated"
+                                          label={t`Deprecated`}
+                                        />
+                                        <SelectOption
+                                          key="visibility-hidden"
+                                          value="Hidden"
+                                          label={t`Hidden`}
+                                        />
+                                      </SelectField>
+                                    </Line>
+                                  </ResponsiveLineStackLayout>
+                                  <ElementWithMenu
+                                    element={
+                                      <IconButton size="small">
+                                        <ThreeDotsMenu />
+                                      </IconButton>
+                                    }
+                                    buildMenuTemplate={(i18n: I18nType) => [
+                                      {
+                                        label: i18n._(t`Add a property below`),
+                                        click: () => addPropertyAt(i + 1),
+                                      },
+                                      {
+                                        label: i18n._(t`Delete`),
+                                        click: () =>
+                                          removeProperty(property.getName()),
+                                      },
+                                      {
+                                        label: i18n._(t`Copy`),
+                                        click: () => copyProperty(property),
+                                      },
+                                      {
+                                        label: i18n._(t`Paste`),
+                                        click: () =>
+                                          pastePropertiesBefore(property),
+                                        enabled: isClipboardContainingProperties,
+                                      },
+                                      { type: 'separator' },
+                                      {
+                                        label: i18n._(t`Move up`),
+                                        click: () => moveProperty(i, i - 1),
+                                        enabled: i - 1 >= 0,
+                                      },
+                                      {
+                                        label: i18n._(t`Move down`),
+                                        click: () => moveProperty(i, i + 1),
+                                        enabled: i + 1 < properties.getCount(),
+                                      },
+                                      {
+                                        label: i18n._(
+                                          t`Generate expression and action`
+                                        ),
+                                        click: () => {
+                                          gd.PropertyFunctionGenerator.generateObjectGetterAndSetter(
+                                            project,
+                                            extension,
                                             eventsBasedObject,
                                             property
-                                          ),
+                                          );
+                                          onEventsFunctionsAdded();
                                         },
-                                      ]}
-                                    />
-                                    <Spacer />
-                                  </div>
-                                  <Line expand>
-                                    <ColumnStackLayout expand>
-                                      <ResponsiveLineStackLayout noMargin>
+                                        enabled: gd.PropertyFunctionGenerator.canGenerateGetterAndSetter(
+                                          eventsBasedObject,
+                                          property
+                                        ),
+                                      },
+                                    ]}
+                                  />
+                                  <Spacer />
+                                </div>
+                                <Line expand>
+                                  <ColumnStackLayout expand>
+                                    <ResponsiveLineStackLayout noMargin>
+                                      <SelectField
+                                        floatingLabelText={<Trans>Type</Trans>}
+                                        value={property.getType()}
+                                        onChange={(e, i, value: string) => {
+                                          property.setType(value);
+                                          if (value === 'Resource') {
+                                            setExtraInfoString(
+                                              property,
+                                              'json'
+                                            );
+                                          }
+                                          forceUpdate();
+                                          onPropertiesUpdated &&
+                                            onPropertiesUpdated();
+                                        }}
+                                        fullWidth
+                                      >
+                                        <SelectOption
+                                          value="Number"
+                                          label={t`Number`}
+                                        />
+                                        <SelectOption
+                                          value="String"
+                                          label={t`String`}
+                                        />
+                                        <SelectOption
+                                          value="Boolean"
+                                          label={t`Boolean (checkbox)`}
+                                        />
+                                        <SelectOption
+                                          value="Choice"
+                                          label={t`String from a list of options (text)`}
+                                        />
+                                        <SelectOption
+                                          value="Color"
+                                          label={t`Color (text)`}
+                                        />
+                                        <SelectOption
+                                          key="property-type-resource"
+                                          value="Resource"
+                                          label={t`Resource (JavaScript only)`}
+                                        />
+                                      </SelectField>
+                                      {property.getType() === 'Number' && (
                                         <SelectField
                                           floatingLabelText={
-                                            <Trans>Type</Trans>
+                                            <Trans>Measurement unit</Trans>
                                           }
-                                          value={property.getType()}
+                                          value={property
+                                            .getMeasurementUnit()
+                                            .getName()}
                                           onChange={(e, i, value: string) => {
-                                            property.setType(value);
+                                            property.setMeasurementUnit(
+                                              gd.MeasurementUnit.getDefaultMeasurementUnitByName(
+                                                value
+                                              )
+                                            );
+                                            forceUpdate();
+                                            onPropertiesUpdated &&
+                                              onPropertiesUpdated();
+                                          }}
+                                          fullWidth
+                                        >
+                                          {mapFor(
+                                            0,
+                                            gd.MeasurementUnit.getDefaultMeasurementUnitsCount(),
+                                            i => {
+                                              const measurementUnit = gd.MeasurementUnit.getDefaultMeasurementUnitAtIndex(
+                                                i
+                                              );
+                                              const unitShortLabel = getMeasurementUnitShortLabel(
+                                                measurementUnit
+                                              );
+                                              const label =
+                                                measurementUnit.getLabel() +
+                                                (unitShortLabel.length > 0
+                                                  ? ' — ' + unitShortLabel
+                                                  : '');
+                                              return (
+                                                <SelectOption
+                                                  value={measurementUnit.getName()}
+                                                  label={label}
+                                                />
+                                              );
+                                            }
+                                          )}
+                                        </SelectField>
+                                      )}
+                                      {(property.getType() === 'String' ||
+                                        property.getType() === 'Number') && (
+                                        <SemiControlledTextField
+                                          commitOnBlur
+                                          floatingLabelText={
+                                            <Trans>Default value</Trans>
+                                          }
+                                          hintText={
+                                            property.getType() === 'Number'
+                                              ? '123'
+                                              : 'ABC'
+                                          }
+                                          value={property.getValue()}
+                                          onChange={newValue => {
+                                            property.setValue(newValue);
+                                            forceUpdate();
+                                            onPropertiesUpdated &&
+                                              onPropertiesUpdated();
+                                          }}
+                                          fullWidth
+                                        />
+                                      )}
+                                      {property.getType() === 'Boolean' && (
+                                        <SelectField
+                                          floatingLabelText={
+                                            <Trans>Default value</Trans>
+                                          }
+                                          value={
+                                            property.getValue() === 'true'
+                                              ? 'true'
+                                              : 'false'
+                                          }
+                                          onChange={(e, i, value) => {
+                                            property.setValue(value);
                                             forceUpdate();
                                             onPropertiesUpdated &&
                                               onPropertiesUpdated();
@@ -601,235 +795,142 @@ export default function EventsBasedObjectPropertiesEditor({
                                           fullWidth
                                         >
                                           <SelectOption
-                                            value="Number"
-                                            label={t`Number`}
+                                            value="true"
+                                            label={t`True (checked)`}
                                           />
                                           <SelectOption
-                                            value="String"
-                                            label={t`String`}
-                                          />
-                                          <SelectOption
-                                            value="Boolean"
-                                            label={t`Boolean (checkbox)`}
-                                          />
-                                          <SelectOption
-                                            value="Choice"
-                                            label={t`String from a list of options (text)`}
-                                          />
-                                          <SelectOption
-                                            value="Color"
-                                            label={t`Color (text)`}
+                                            value="false"
+                                            label={t`False (not checked)`}
                                           />
                                         </SelectField>
-                                        {property.getType() === 'Number' && (
-                                          <SelectField
-                                            floatingLabelText={
-                                              <Trans>Measurement unit</Trans>
-                                            }
-                                            value={property
-                                              .getMeasurementUnit()
-                                              .getName()}
-                                            onChange={(e, i, value: string) => {
-                                              property.setMeasurementUnit(
-                                                gd.MeasurementUnit.getDefaultMeasurementUnitByName(
-                                                  value
-                                                )
-                                              );
-                                              forceUpdate();
-                                              onPropertiesUpdated &&
-                                                onPropertiesUpdated();
-                                            }}
-                                            fullWidth
-                                          >
-                                            {mapFor(
-                                              0,
-                                              gd.MeasurementUnit.getDefaultMeasurementUnitsCount(),
-                                              i => {
-                                                const measurementUnit = gd.MeasurementUnit.getDefaultMeasurementUnitAtIndex(
-                                                  i
-                                                );
-                                                const unitShortLabel = getMeasurementUnitShortLabel(
-                                                  measurementUnit
-                                                );
-                                                const label =
-                                                  measurementUnit.getLabel() +
-                                                  (unitShortLabel.length > 0
-                                                    ? ' — ' + unitShortLabel
-                                                    : '');
-                                                return (
-                                                  <SelectOption
-                                                    value={measurementUnit.getName()}
-                                                    label={label}
-                                                  />
-                                                );
-                                              }
-                                            )}
-                                          </SelectField>
-                                        )}
-                                        {(property.getType() === 'String' ||
-                                          property.getType() === 'Number') && (
-                                          <SemiControlledTextField
-                                            commitOnBlur
-                                            floatingLabelText={
-                                              <Trans>Default value</Trans>
-                                            }
-                                            hintText={
-                                              property.getType() === 'Number'
-                                                ? '123'
-                                                : 'ABC'
-                                            }
-                                            value={property.getValue()}
-                                            onChange={newValue => {
-                                              property.setValue(newValue);
-                                              forceUpdate();
-                                              onPropertiesUpdated &&
-                                                onPropertiesUpdated();
-                                            }}
-                                            fullWidth
-                                          />
-                                        )}
-                                        {property.getType() === 'Boolean' && (
-                                          <SelectField
-                                            floatingLabelText={
-                                              <Trans>Default value</Trans>
-                                            }
-                                            value={
-                                              property.getValue() === 'true'
-                                                ? 'true'
-                                                : 'false'
-                                            }
-                                            onChange={(e, i, value) => {
-                                              property.setValue(value);
-                                              forceUpdate();
-                                              onPropertiesUpdated &&
-                                                onPropertiesUpdated();
-                                            }}
-                                            fullWidth
-                                          >
-                                            <SelectOption
-                                              value="true"
-                                              label={t`True (checked)`}
-                                            />
-                                            <SelectOption
-                                              value="false"
-                                              label={t`False (not checked)`}
-                                            />
-                                          </SelectField>
-                                        )}
-                                        {property.getType() === 'Color' && (
-                                          <ColorField
-                                            floatingLabelText={
-                                              <Trans>Color</Trans>
-                                            }
-                                            disableAlpha
-                                            fullWidth
-                                            color={property.getValue()}
-                                            onChange={color => {
-                                              property.setValue(color);
-                                              forceUpdate();
-                                              onPropertiesUpdated &&
-                                                onPropertiesUpdated();
-                                            }}
-                                          />
-                                        )}
-                                        {property.getType() === 'Choice' && (
-                                          <SelectField
-                                            floatingLabelText={
-                                              <Trans>Default value</Trans>
-                                            }
-                                            value={property.getValue()}
-                                            onChange={(e, i, value) => {
-                                              property.setValue(value);
-                                              forceUpdate();
-                                              onPropertiesUpdated &&
-                                                onPropertiesUpdated();
-                                            }}
-                                            fullWidth
-                                          >
-                                            {getExtraInfoArray(property).map(
-                                              (choice, index) => (
-                                                <SelectOption
-                                                  key={index}
-                                                  value={choice}
-                                                  label={choice}
-                                                />
-                                              )
-                                            )}
-                                          </SelectField>
-                                        )}
-                                      </ResponsiveLineStackLayout>
-                                      {property.getType() === 'Choice' && (
-                                        <StringArrayEditor
-                                          extraInfo={getExtraInfoArray(
-                                            property
-                                          )}
-                                          setExtraInfo={setChoiceExtraInfo(
-                                            property
-                                          )}
-                                        />
                                       )}
-                                      <ResponsiveLineStackLayout noMargin>
-                                        <SemiControlledTextField
-                                          commitOnBlur
+                                      {property.getType() === 'Color' && (
+                                        <ColorField
                                           floatingLabelText={
-                                            <Trans>Short label</Trans>
+                                            <Trans>Color</Trans>
                                           }
-                                          translatableHintText={t`Make the purpose of the property easy to understand`}
-                                          floatingLabelFixed
-                                          value={property.getLabel()}
-                                          onChange={text => {
-                                            property.setLabel(text);
-                                            forceUpdate();
-                                          }}
+                                          disableAlpha
                                           fullWidth
-                                        />
-                                        <SemiControlledAutoComplete
-                                          floatingLabelText={
-                                            <Trans>Group name</Trans>
-                                          }
-                                          hintText={t`Leave it empty to use the default group`}
-                                          fullWidth
-                                          value={property.getGroup()}
-                                          onChange={text => {
-                                            property.setGroup(text);
+                                          color={property.getValue()}
+                                          onChange={color => {
+                                            property.setValue(color);
                                             forceUpdate();
                                             onPropertiesUpdated &&
                                               onPropertiesUpdated();
                                           }}
-                                          dataSource={getPropertyGroupNames().map(
-                                            name => ({
-                                              text: name,
-                                              value: name,
-                                            })
-                                          )}
-                                          openOnFocus={true}
                                         />
-                                      </ResponsiveLineStackLayout>
+                                      )}
+                                      {property.getType() === 'Choice' && (
+                                        <SelectField
+                                          floatingLabelText={
+                                            <Trans>Default value</Trans>
+                                          }
+                                          value={property.getValue()}
+                                          onChange={(e, i, value) => {
+                                            property.setValue(value);
+                                            forceUpdate();
+                                            onPropertiesUpdated &&
+                                              onPropertiesUpdated();
+                                          }}
+                                          fullWidth
+                                        >
+                                          {getExtraInfoArray(property).map(
+                                            (choice, index) => (
+                                              <SelectOption
+                                                key={index}
+                                                value={choice}
+                                                label={choice}
+                                              />
+                                            )
+                                          )}
+                                        </SelectField>
+                                      )}
+                                      {property.getType() === 'Resource' && (
+                                        <ResourceTypeSelectField
+                                          value={
+                                            property.getExtraInfo().size() > 0
+                                              ? property.getExtraInfo().at(0)
+                                              : ''
+                                          }
+                                          onChange={(e, i, value) => {
+                                            setExtraInfoString(property, value);
+                                            forceUpdate();
+                                            onPropertiesUpdated &&
+                                              onPropertiesUpdated();
+                                          }}
+                                          fullWidth
+                                        />
+                                      )}
+                                    </ResponsiveLineStackLayout>
+                                    {property.getType() === 'Choice' && (
+                                      <StringArrayEditor
+                                        extraInfo={getExtraInfoArray(property)}
+                                        setExtraInfo={setChoiceExtraInfo(
+                                          property
+                                        )}
+                                      />
+                                    )}
+                                    <ResponsiveLineStackLayout noMargin>
                                       <SemiControlledTextField
                                         commitOnBlur
                                         floatingLabelText={
-                                          <Trans>Description</Trans>
+                                          <Trans>Short label</Trans>
                                         }
-                                        translatableHintText={t`Optionally, explain the purpose of the property in more details`}
+                                        translatableHintText={t`Make the purpose of the property easy to understand`}
                                         floatingLabelFixed
-                                        value={property.getDescription()}
+                                        value={property.getLabel()}
                                         onChange={text => {
-                                          property.setDescription(text);
+                                          property.setLabel(text);
                                           forceUpdate();
                                         }}
                                         fullWidth
                                       />
-                                    </ColumnStackLayout>
-                                  </Line>
-                                </div>
-                              )
-                            }
-                          </DragSourceAndDropTarget>
-                        );
-                      }
-                    )}
-                  </Column>
-                </Line>
+                                      <SemiControlledAutoComplete
+                                        floatingLabelText={
+                                          <Trans>Group name</Trans>
+                                        }
+                                        hintText={t`Leave it empty to use the default group`}
+                                        fullWidth
+                                        value={property.getGroup()}
+                                        onChange={text => {
+                                          property.setGroup(text);
+                                          forceUpdate();
+                                          onPropertiesUpdated &&
+                                            onPropertiesUpdated();
+                                        }}
+                                        dataSource={getPropertyGroupNames().map(
+                                          name => ({
+                                            text: name,
+                                            value: name,
+                                          })
+                                        )}
+                                        openOnFocus={true}
+                                      />
+                                    </ResponsiveLineStackLayout>
+                                    <SemiControlledTextField
+                                      commitOnBlur
+                                      floatingLabelText={
+                                        <Trans>Description</Trans>
+                                      }
+                                      translatableHintText={t`Optionally, explain the purpose of the property in more details`}
+                                      floatingLabelFixed
+                                      value={property.getDescription()}
+                                      onChange={text => {
+                                        property.setDescription(text);
+                                        forceUpdate();
+                                      }}
+                                      fullWidth
+                                    />
+                                  </ColumnStackLayout>
+                                </Line>
+                              </div>
+                            )
+                          }
+                        </DragSourceAndDropTarget>
+                      );
+                    }
+                  )}
+                </Column>
               </ScrollView>
               <Column>
                 <Line noMargin>
@@ -842,6 +943,12 @@ export default function EventsBasedObjectPropertiesEditor({
                         pastePropertiesAtTheEnd();
                       }}
                       disabled={!isClipboardContainingProperties}
+                    />
+                    <SearchBar
+                      value={searchText}
+                      onRequestSearch={() => {}}
+                      onChange={text => setSearchText(text)}
+                      placeholder={t`Search properties`}
                     />
                   </LineStackLayout>
                   <LineStackLayout justifyContent="flex-end" expand>

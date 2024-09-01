@@ -11,7 +11,7 @@ declare class gdInstructionMetadata extends gdAbstractFunctionMetadata {
   canHaveSubInstructions(): boolean;
   getParameter(index: number): gdParameterMetadata;
   getParametersCount(): number;
-  getParameters(): gdVectorParameterMetadata;
+  getParameters(): gdParameterMetadataContainer;
   getUsageComplexity(): number;
   isHidden(): boolean;
   isPrivate(): boolean;

@@ -70,6 +70,7 @@ export type PrimitiveValueField =
         label: string,
         labelIsUserDefined?: boolean,
       |}>,
+      isHiddenWhenThereOnlyOneChoice?: boolean,
       ...ValueFieldCommonProperties,
     |}
   | {|
@@ -450,16 +451,19 @@ const PropertiesEditor = ({
     (field: ValueField) => {
       if (!field.getChoices || !field.getValue) return;
 
-      const children = field
-        .getChoices()
-        .map(({ value, label, labelIsUserDefined }) => (
-          <SelectOption
-            key={value}
-            value={value}
-            label={label}
-            shouldNotTranslate={labelIsUserDefined}
-          />
-        ));
+      const choices = field.getChoices();
+      if (choices.length < 2 && field.isHiddenWhenThereOnlyOneChoice) {
+        return;
+      }
+
+      const children = choices.map(({ value, label, labelIsUserDefined }) => (
+        <SelectOption
+          key={value}
+          value={value}
+          label={label}
+          shouldNotTranslate={labelIsUserDefined}
+        />
+      ));
 
       if (field.valueType === 'number') {
         const { setValue } = field;

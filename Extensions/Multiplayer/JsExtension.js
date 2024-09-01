@@ -370,6 +370,36 @@ module.exports = {
       );
 
     extension
+      .addExpressionAndConditionAndAction(
+        'number',
+        'ObjectsSynchronizationRate',
+        _('Objects synchronization rate'),
+        _(
+          'objects synchronization rate (between 1 and 60, default is 30 times per second)'
+        ),
+        _('objects synchronization rate'),
+        _('Advanced'),
+        'JsPlatform/Extensions/multiplayer.svg'
+      )
+      .useStandardParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(_('Sync rate'))
+      )
+      .setIncludeFile('Extensions/Multiplayer/peer.js')
+      .addIncludeFile('Extensions/Multiplayer/peerJsHelper.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
+      .setFunctionName('gdjs.multiplayer.setObjectsSynchronizationRate')
+      .setGetter('gdjs.multiplayer.getObjectsSynchronizationRate');
+
+    extension
       .addCondition(
         'IsPlayerHost',
         _('Player is host'),
@@ -392,13 +422,13 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .setFunctionName('gdjs.multiplayer.isPlayerHost');
+      .setFunctionName('gdjs.multiplayer.isCurrentPlayerHost');
 
     extension
       .addCondition(
         'HasAnyPlayerLeft',
         _('Any player has left'),
-        _('Check if any player has left the lobby.'),
+        _('Check if any player has left the lobby game.'),
         _('Any player has left'),
         _('Lobbies'),
         'JsPlatform/Extensions/multiplayer.svg',
@@ -417,13 +447,13 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .setFunctionName('gdjs.multiplayerMessageManager.hasAnyPlayerLeft');
+      .setFunctionName('gdjs.multiplayerMessageManager.hasAnyPlayerJustLeft');
 
     extension
       .addCondition(
         'HasPlayerLeft',
         _('Player has left'),
-        _('Check if the player has left the lobby.'),
+        _('Check if the player has left the lobby game.'),
         _('Player _PARAM0_ has left'),
         _('Lobbies'),
         'JsPlatform/Extensions/multiplayer.svg',
@@ -443,7 +473,167 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .setFunctionName('gdjs.multiplayerMessageManager.hasPlayerLeft');
+      .setFunctionName('gdjs.multiplayerMessageManager.hasPlayerJustLeft');
+
+    extension
+      .addExpression(
+        'LastLeftPlayerNumber',
+        _('Player number that just left'),
+        _(
+          'Returns the player number of the player that has just left the lobby.'
+        ),
+        _('Lobbies'),
+        'JsPlatform/Extensions/multiplayer.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Multiplayer/peer.js')
+      .addIncludeFile('Extensions/Multiplayer/peerJsHelper.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
+      .setFunctionName(
+        'gdjs.multiplayerMessageManager.getLatestPlayerWhoJustLeft'
+      );
+
+    extension
+      .addCondition(
+        'HasAnyPlayerJoined',
+        _('Any player has joined'),
+        _('Check if any player has joined the lobby.'),
+        _('Any player has joined'),
+        _('Lobbies'),
+        'JsPlatform/Extensions/multiplayer.svg',
+        'JsPlatform/Extensions/multiplayer.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Multiplayer/peer.js')
+      .addIncludeFile('Extensions/Multiplayer/peerJsHelper.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
+      .setFunctionName('gdjs.multiplayerMessageManager.hasAnyPlayerJustJoined');
+
+    extension
+      .addCondition(
+        'HasPlayerJoined',
+        _('Player has joined'),
+        _('Check if the player has joined the lobby.'),
+        _('Player _PARAM0_ has joined'),
+        _('Lobbies'),
+        'JsPlatform/Extensions/multiplayer.svg',
+        'JsPlatform/Extensions/multiplayer.svg'
+      )
+      .getCodeExtraInformation()
+      .addParameter('number', _('Player number'), '', false)
+      .setIncludeFile('Extensions/Multiplayer/peer.js')
+      .addIncludeFile('Extensions/Multiplayer/peerJsHelper.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
+      .setFunctionName('gdjs.multiplayerMessageManager.hasPlayerJustJoined');
+
+    extension
+      .addExpression(
+        'LastJoinedPlayerNumber',
+        _('Player number that just joined'),
+        _(
+          'Returns the player number of the player that has just joined the lobby.'
+        ),
+        _('Lobbies'),
+        'JsPlatform/Extensions/multiplayer.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Multiplayer/peer.js')
+      .addIncludeFile('Extensions/Multiplayer/peerJsHelper.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
+      .setFunctionName(
+        'gdjs.multiplayerMessageManager.getLatestPlayerWhoJustJoined'
+      );
+
+    extension
+      .addCondition(
+        'IsMigratingHost',
+        _('Host is migrating'),
+        _(
+          'Check if the host is migrating, in order to adapt the game state (like pausing the game).'
+        ),
+        _('Host is migrating'),
+        _('Lobbies'),
+        'JsPlatform/Extensions/multiplayer.svg',
+        'JsPlatform/Extensions/multiplayer.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Multiplayer/peer.js')
+      .addIncludeFile('Extensions/Multiplayer/peerJsHelper.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
+      .setFunctionName('gdjs.multiplayer.isMigratingHost');
+
+    extension
+      .addAction(
+        'EndLobbyWhenHostLeaves',
+        _('Configure lobby game to end when host leaves'),
+        _(
+          'Configure the lobby game to end when the host leaves. This will trigger the "Lobby game has just ended" condition. (Default behavior is to migrate the host)'
+        ),
+        _('Configure lobby game to end when host leaves'),
+        _('Advanced'),
+        'JsPlatform/Extensions/multiplayer.svg',
+        'JsPlatform/Extensions/multiplayer.svg'
+      )
+      .addParameter('yesorno', _('End lobby game when host leaves'), '', false)
+      .setHelpPath('/all-features/multiplayer')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Multiplayer/peer.js')
+      .addIncludeFile('Extensions/Multiplayer/peerJsHelper.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
+      .setFunctionName('gdjs.multiplayer.endLobbyWhenHostLeaves');
 
     extension
       .addStrExpression(
@@ -519,6 +709,37 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('gdjs.multiplayer.getPlayersInLobbyCount');
+
+    extension
+      .addCondition(
+        'IsPlayerConnected',
+        _('Player is connected'),
+        _('Check if the specified player is connected to the lobby.'),
+        _('Player _PARAM0_ is connected'),
+        _('Lobbies'),
+        'JsPlatform/Extensions/multiplayer.svg',
+        'JsPlatform/Extensions/multiplayer.svg'
+      )
+      .addParameter(
+        'number',
+        _('The position of the player in the lobby (1, 2, ...)'),
+        '',
+        false
+      )
+      .setHelpPath('/all-features/multiplayer')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Multiplayer/peer.js')
+      .addIncludeFile('Extensions/Multiplayer/peerJsHelper.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
+      .setFunctionName('gdjs.multiplayer.isPlayerConnected');
 
     extension
       .addExpressionAndCondition(
@@ -865,6 +1086,7 @@ module.exports = {
         multiplayerObjectBehavior,
         sharedData
       )
+      .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
       .setIncludeFile('Extensions/Multiplayer/peer.js')
       .addIncludeFile('Extensions/Multiplayer/peerJsHelper.js')
       .addIncludeFile(

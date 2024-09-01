@@ -11,9 +11,11 @@ import BehaviorTypeSelector from '../../BehaviorTypeSelector';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import StringArrayEditor from '../../StringArrayEditor';
 import useForceUpdate from '../../Utils/UseForceUpdate';
+import ResourceTypeSelectField from './ResourceTypeSelectField';
 
 type Props = {|
   project: gdProject,
+  eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   valueTypeMetadata: gdValueTypeMetadata,
   onTypeUpdated: () => void,
   disabled?: boolean,
@@ -42,8 +44,15 @@ const getIdentifierName = (scopedIdentifier: string) =>
     ? scopedIdentifier.substring('object'.length)
     : scopedIdentifier.substring('scene'.length);
 
+const convertTypeToSelectorValue = (value: string) =>
+  value.endsWith('Resource') ? 'jsonResource' : value;
+
+const convertParameterTypeToPropertyType = (value: string) =>
+  value.substring(0, value.length - 'Resource'.length);
+
 export default function ValueTypeEditor({
   project,
+  eventsFunctionsExtension,
   valueTypeMetadata,
   disabled,
   isTypeSelectorShown,
@@ -61,7 +70,7 @@ export default function ValueTypeEditor({
             {isTypeSelectorShown && (
               <SelectField
                 floatingLabelText={<Trans>Type</Trans>}
-                value={valueTypeMetadata.getName()}
+                value={convertTypeToSelectorValue(valueTypeMetadata.getName())}
                 onChange={(e, i, value: string) => {
                   valueTypeMetadata.setName(value);
                   valueTypeMetadata.setOptional(false);
@@ -146,32 +155,8 @@ export default function ValueTypeEditor({
                 )}
                 {!isExpressionType && (
                   <SelectOption
-                    value="imageResource"
-                    label={t`Image resource (JavaScript only)`}
-                  />
-                )}
-                {!isExpressionType && (
-                  <SelectOption
-                    value="audioResource"
-                    label={t`Audio resource (JavaScript only)`}
-                  />
-                )}
-                {!isExpressionType && (
-                  <SelectOption
                     value="jsonResource"
-                    label={t`JSON resource (JavaScript only)`}
-                  />
-                )}
-                {!isExpressionType && (
-                  <SelectOption
-                    value="fontResource"
-                    label={t`Font resource (JavaScript only)`}
-                  />
-                )}
-                {!isExpressionType && (
-                  <SelectOption
-                    value="bitmapFontResource"
-                    label={t`Bitmap font resource (JavaScript only)`}
+                    label={t`Resource (JavaScript only)`}
                   />
                 )}
               </SelectField>
@@ -191,6 +176,7 @@ export default function ValueTypeEditor({
             {valueTypeMetadata.isBehavior() && (
               <BehaviorTypeSelector
                 project={project}
+                eventsFunctionsExtension={eventsFunctionsExtension}
                 objectType={getLastObjectParameterObjectType()}
                 value={valueTypeMetadata.getExtraInfo()}
                 onChange={(value: string) => {
@@ -268,6 +254,19 @@ export default function ValueTypeEditor({
                     valueTypeMetadata.getExtraInfo()
                   );
                   valueTypeMetadata.setExtraInfo(scope + value);
+                  forceUpdate();
+                  onTypeUpdated();
+                }}
+                fullWidth
+              />
+            )}
+            {valueTypeMetadata.getName().endsWith('Resource') && (
+              <ResourceTypeSelectField
+                value={convertParameterTypeToPropertyType(
+                  valueTypeMetadata.getName()
+                )}
+                onChange={(e, i, value) => {
+                  valueTypeMetadata.setName(value + 'Resource');
                   forceUpdate();
                   onTypeUpdated();
                 }}

@@ -15,6 +15,8 @@ namespace gdjs {
     lvy: number | undefined;
     av: number | undefined;
     aw: boolean | undefined;
+    layers: number;
+    masks: number;
   }
 
   export interface Physics2NetworkSyncData extends BehaviorNetworkSyncData {
@@ -23,9 +25,15 @@ namespace gdjs {
   export class Physics2SharedData {
     gravityX: float;
     gravityY: float;
+    worldScale: float;
+    worldInvScale: float;
+    /** @deprecated Use `worldScale` instead */
     scaleX: float;
+    /** @deprecated Use `worldScale` instead */
     scaleY: float;
+    /** @deprecated Use `worldInvScale` instead */
     invScaleX: float;
+    /** @deprecated Use `worldInvScale` instead */
     invScaleY: float;
     timeStep: float;
     frameTime: float = 0;
@@ -52,10 +60,13 @@ namespace gdjs {
       this._registeredBehaviors = new Set();
       this.gravityX = sharedData.gravityX;
       this.gravityY = sharedData.gravityY;
-      this.scaleX = sharedData.scaleX === 0 ? 100 : sharedData.scaleX;
-      this.scaleY = sharedData.scaleY === 0 ? 100 : sharedData.scaleY;
+      this.scaleX = sharedData.scaleX || 100;
+      this.scaleY = sharedData.scaleY || 100;
       this.invScaleX = 1 / this.scaleX;
       this.invScaleY = 1 / this.scaleY;
+      this.worldScale =
+        sharedData.worldScale || Math.sqrt(this.scaleX * this.scaleY);
+      this.worldInvScale = 1 / this.worldScale;
       this.timeStep = 1 / 60;
       this.world = new Box2D.b2World(
         new Box2D.b2Vec2(this.gravityX, this.gravityY)
@@ -513,6 +524,8 @@ namespace gdjs {
         ...super.getNetworkSyncData(),
         props: {
           ...bodyProps,
+          layers: this.layers,
+          masks: this.masks,
         },
       };
     }
@@ -555,6 +568,14 @@ namespace gdjs {
         if (this._body) {
           this._body.SetAwake(behaviorSpecificProps.aw);
         }
+      }
+
+      if (behaviorSpecificProps.layers !== undefined) {
+        this.layers = behaviorSpecificProps.layers;
+      }
+
+      if (behaviorSpecificProps.masks !== undefined) {
+        this.masks = behaviorSpecificProps.masks;
       }
     }
 
@@ -642,10 +663,10 @@ namespace gdjs {
     createShape(): Box2D.b2FixtureDef {
       // Get the scaled offset
       const offsetX = this.shapeOffsetX
-        ? this.shapeOffsetX * this.shapeScale * this._sharedData.invScaleX
+        ? this.shapeOffsetX * this.shapeScale * this._sharedData.worldInvScale
         : 0;
       const offsetY = this.shapeOffsetY
-        ? this.shapeOffsetY * this.shapeScale * this._sharedData.invScaleY
+        ? this.shapeOffsetY * this.shapeScale * this._sharedData.worldInvScale
         : 0;
 
       // Generate the base shape
@@ -657,12 +678,14 @@ namespace gdjs {
         // Average radius from width and height
         if (this.shapeDimensionA > 0) {
           shape.set_m_radius(
-            this.shapeDimensionA * this.shapeScale * this._sharedData.invScaleX
+            this.shapeDimensionA *
+              this.shapeScale *
+              this._sharedData.worldInvScale
           );
         } else {
           const radius =
-            (this.owner.getWidth() * this._sharedData.invScaleX +
-              this.owner.getHeight() * this._sharedData.invScaleY) /
+            (this.owner.getWidth() * this._sharedData.worldInvScale +
+              this.owner.getHeight() * this._sharedData.worldInvScale) /
             4;
           shape.set_m_radius(radius > 0 ? radius : 1);
         }
@@ -680,10 +703,10 @@ namespace gdjs {
           ) {
             let width =
               (this.owner.getWidth() > 0 ? this.owner.getWidth() : 1) *
-              this._sharedData.invScaleX;
+              this._sharedData.worldInvScale;
             let height =
               (this.owner.getHeight() > 0 ? this.owner.getHeight() : 1) *
-              this._sharedData.invScaleY;
+              this._sharedData.worldInvScale;
 
             // Set the shape box
             shape.SetAsBox(
@@ -728,12 +751,12 @@ namespace gdjs {
               Box2D.HEAPF32[(this._verticesBuffer + offset) >> 2] =
                 (this.polygon.vertices[i][0] * this.shapeScale +
                   originOffsetX) *
-                  this._sharedData.invScaleX +
+                  this._sharedData.worldInvScale +
                 offsetX;
               Box2D.HEAPF32[(this._verticesBuffer + (offset + 4)) >> 2] =
                 (this.polygon.vertices[i][1] * this.shapeScale +
                   originOffsetY) *
-                  this._sharedData.invScaleY +
+                  this._sharedData.worldInvScale +
                 offsetY;
               offset += 8;
             }
@@ -755,10 +778,10 @@ namespace gdjs {
                 ? this.shapeDimensionA * this.shapeScale
                 : this.owner.getWidth() > 0
                 ? this.owner.getWidth()
-                : 1) * this._sharedData.invScaleX;
+                : 1) * this._sharedData.worldInvScale;
             let height =
               this.owner.getHeight() > 0
-                ? this.owner.getHeight() * this._sharedData.invScaleY
+                ? this.owner.getHeight() * this._sharedData.worldInvScale
                 : 0;
 
             // Angle from custom dimension, otherwise is 0
@@ -787,13 +810,13 @@ namespace gdjs {
                 ? this.shapeDimensionA * this.shapeScale
                 : this.owner.getWidth() > 0
                 ? this.owner.getWidth()
-                : 1) * this._sharedData.invScaleX;
+                : 1) * this._sharedData.worldInvScale;
             let height =
               (this.shapeDimensionB > 0
                 ? this.shapeDimensionB * this.shapeScale
                 : this.owner.getHeight() > 0
                 ? this.owner.getHeight()
-                : 1) * this._sharedData.invScaleY;
+                : 1) * this._sharedData.worldInvScale;
 
             // Set the shape box, the offset must be added here too
             shape.SetAsBox(
@@ -878,9 +901,9 @@ namespace gdjs {
       bodyDef.set_position(
         this.b2Vec2(
           (this.owner.getDrawableX() + this.owner.getWidth() / 2) *
-            this._sharedData.invScaleX,
+            this._sharedData.worldInvScale,
           (this.owner.getDrawableY() + this.owner.getHeight() / 2) *
-            this._sharedData.invScaleY
+            this._sharedData.worldInvScale
         )
       );
       bodyDef.set_angle(gdjs.toRad(this.owner.getAngle()));
@@ -934,13 +957,13 @@ namespace gdjs {
       // don't do anything (but still run the physics simulation - this is independent).
       if (this._body !== null) {
         this.owner.setX(
-          this._body.GetPosition().get_x() * this._sharedData.scaleX -
+          this._body.GetPosition().get_x() * this._sharedData.worldScale -
             this.owner.getWidth() / 2 +
             this.owner.getX() -
             this.owner.getDrawableX()
         );
         this.owner.setY(
-          this._body.GetPosition().get_y() * this._sharedData.scaleY -
+          this._body.GetPosition().get_y() * this._sharedData.worldScale -
             this.owner.getHeight() / 2 +
             this.owner.getY() -
             this.owner.getDrawableY()
@@ -993,13 +1016,17 @@ namespace gdjs {
       ) {
         const pos = this.b2Vec2(
           (this.owner.getDrawableX() + this.owner.getWidth() / 2) *
-            this._sharedData.invScaleX,
+            this._sharedData.worldInvScale,
           (this.owner.getDrawableY() + this.owner.getHeight() / 2) *
-            this._sharedData.invScaleY
+            this._sharedData.worldInvScale
         );
         body.SetTransform(pos, gdjs.toRad(this.owner.getAngle()));
         body.SetAwake(true);
       }
+    }
+
+    getWorldScale(): float {
+      return this._sharedData.worldScale;
     }
 
     getGravityX(): float {
@@ -1435,7 +1462,7 @@ namespace gdjs {
       const body = this._body!;
 
       // Get the linear velocity on X
-      return body.GetLinearVelocity().get_x() * this._sharedData.scaleX;
+      return body.GetLinearVelocity().get_x() * this._sharedData.worldScale;
     }
 
     setLinearVelocityX(linearVelocityX: float): void {
@@ -1448,7 +1475,7 @@ namespace gdjs {
       // Set the linear velocity on X
       body.SetLinearVelocity(
         this.b2Vec2(
-          linearVelocityX * this._sharedData.invScaleX,
+          linearVelocityX * this._sharedData.worldInvScale,
           body.GetLinearVelocity().get_y()
         )
       );
@@ -1462,7 +1489,7 @@ namespace gdjs {
       const body = this._body!;
 
       // Get the linear velocity on Y
-      return body.GetLinearVelocity().get_y() * this._sharedData.scaleY;
+      return body.GetLinearVelocity().get_y() * this._sharedData.worldScale;
     }
 
     setLinearVelocityY(linearVelocityY: float): void {
@@ -1476,7 +1503,7 @@ namespace gdjs {
       body.SetLinearVelocity(
         this.b2Vec2(
           body.GetLinearVelocity().get_x(),
-          linearVelocityY * this._sharedData.invScaleY
+          linearVelocityY * this._sharedData.worldInvScale
         )
       );
     }
@@ -1490,8 +1517,8 @@ namespace gdjs {
 
       // Get the linear velocity length
       return this.b2Vec2(
-        body.GetLinearVelocity().get_x() * this._sharedData.scaleX,
-        body.GetLinearVelocity().get_y() * this._sharedData.scaleY
+        body.GetLinearVelocity().get_x() * this._sharedData.worldScale,
+        body.GetLinearVelocity().get_y() * this._sharedData.worldScale
       ).Length();
     }
 
@@ -1505,8 +1532,8 @@ namespace gdjs {
       // Get the linear velocity angle
       return gdjs.toDegrees(
         Math.atan2(
-          body.GetLinearVelocity().get_y() * this._sharedData.scaleY,
-          body.GetLinearVelocity().get_x() * this._sharedData.scaleX
+          body.GetLinearVelocity().get_y() * this._sharedData.worldScale,
+          body.GetLinearVelocity().get_x() * this._sharedData.worldScale
         )
       );
     }
@@ -1522,9 +1549,20 @@ namespace gdjs {
       angle = gdjs.toRad(angle);
       body.SetLinearVelocity(
         this.b2Vec2(
-          linearVelocity * Math.cos(angle) * this._sharedData.invScaleX,
-          linearVelocity * Math.sin(angle) * this._sharedData.invScaleY
+          linearVelocity * Math.cos(angle) * this._sharedData.worldInvScale,
+          linearVelocity * Math.sin(angle) * this._sharedData.worldInvScale
         )
+      );
+    }
+
+    isLinearVelocityAngleAround(degreeAngle: float, tolerance: float) {
+      return (
+        Math.abs(
+          gdjs.evtTools.common.angleDifference(
+            this.getLinearVelocityAngle(),
+            degreeAngle
+          )
+        ) <= tolerance
       );
     }
 
@@ -1569,8 +1607,8 @@ namespace gdjs {
       body.ApplyForce(
         this.b2Vec2(forceX, forceY),
         this.b2Vec2Sec(
-          positionX * this._sharedData.invScaleX,
-          positionY * this._sharedData.invScaleY
+          positionX * this._sharedData.worldInvScale,
+          positionY * this._sharedData.worldInvScale
         ),
         // TODO Should let Box2d awake the object itself.
         false
@@ -1597,8 +1635,8 @@ namespace gdjs {
       body.ApplyForce(
         this.b2Vec2(length * Math.cos(angle), length * Math.sin(angle)),
         this.b2Vec2Sec(
-          positionX * this._sharedData.invScaleX,
-          positionY * this._sharedData.invScaleY
+          positionX * this._sharedData.worldInvScale,
+          positionY * this._sharedData.worldInvScale
         ),
         // TODO Should let Box2d awake the object itself.
         false
@@ -1621,16 +1659,17 @@ namespace gdjs {
       // Wake up the object
       body.SetAwake(true);
 
+      // TODO Optimize this using a unit vector instead of trigonometry.
       // Apply the force
       const angle = Math.atan2(
-        towardY * this._sharedData.invScaleY - body.GetPosition().get_y(),
-        towardX * this._sharedData.invScaleX - body.GetPosition().get_x()
+        towardY * this._sharedData.worldInvScale - body.GetPosition().get_y(),
+        towardX * this._sharedData.worldInvScale - body.GetPosition().get_x()
       );
       body.ApplyForce(
         this.b2Vec2(length * Math.cos(angle), length * Math.sin(angle)),
         this.b2Vec2Sec(
-          positionX * this._sharedData.invScaleX,
-          positionY * this._sharedData.invScaleY
+          positionX * this._sharedData.worldInvScale,
+          positionY * this._sharedData.worldInvScale
         ),
         // TODO Should let Box2d awake the object itself.
         false
@@ -1656,8 +1695,8 @@ namespace gdjs {
       body.ApplyLinearImpulse(
         this.b2Vec2(impulseX, impulseY),
         this.b2Vec2Sec(
-          positionX * this._sharedData.invScaleX,
-          positionY * this._sharedData.invScaleY
+          positionX * this._sharedData.worldInvScale,
+          positionY * this._sharedData.worldInvScale
         ),
         // TODO Should let Box2d awake the object itself.
         false
@@ -1684,8 +1723,8 @@ namespace gdjs {
       body.ApplyLinearImpulse(
         this.b2Vec2(length * Math.cos(angle), length * Math.sin(angle)),
         this.b2Vec2Sec(
-          positionX * this._sharedData.invScaleX,
-          positionY * this._sharedData.invScaleY
+          positionX * this._sharedData.worldInvScale,
+          positionY * this._sharedData.worldInvScale
         ),
         // TODO Should let Box2d awake the object itself.
         false
@@ -1708,16 +1747,17 @@ namespace gdjs {
       // Wake up the object
       body.SetAwake(true);
 
+      // TODO Optimize this using a unit vector instead of trigonometry.
       // Apply the impulse
       const angle = Math.atan2(
-        towardY * this._sharedData.invScaleY - body.GetPosition().get_y(),
-        towardX * this._sharedData.invScaleX - body.GetPosition().get_x()
+        towardY * this._sharedData.worldInvScale - body.GetPosition().get_y(),
+        towardX * this._sharedData.worldInvScale - body.GetPosition().get_x()
       );
       body.ApplyLinearImpulse(
         this.b2Vec2(length * Math.cos(angle), length * Math.sin(angle)),
         this.b2Vec2Sec(
-          positionX * this._sharedData.invScaleX,
-          positionY * this._sharedData.invScaleY
+          positionX * this._sharedData.worldInvScale,
+          positionY * this._sharedData.worldInvScale
         ),
         // TODO Should let Box2d awake the object itself.
         false
@@ -1794,7 +1834,7 @@ namespace gdjs {
       const body = this._body!;
 
       // Get the mass center on X
-      return body.GetWorldCenter().get_x() * this._sharedData.scaleX;
+      return body.GetWorldCenter().get_x() * this._sharedData.worldScale;
     }
 
     getMassCenterY(): float {
@@ -1805,7 +1845,7 @@ namespace gdjs {
       const body = this._body!;
 
       // Get the mass center on Y
-      return body.GetWorldCenter().get_y() * this._sharedData.scaleY;
+      return body.GetWorldCenter().get_y() * this._sharedData.worldScale;
     }
 
     // Joints
@@ -1972,8 +2012,8 @@ namespace gdjs {
       jointDef.set_localAnchorA(
         body.GetLocalPoint(
           this.b2Vec2(
-            x1 * this._sharedData.invScaleX,
-            y1 * this._sharedData.invScaleY
+            x1 * this._sharedData.worldInvScale,
+            y1 * this._sharedData.worldInvScale
           )
         )
       );
@@ -1981,17 +2021,17 @@ namespace gdjs {
       jointDef.set_localAnchorB(
         otherBody.GetLocalPoint(
           this.b2Vec2(
-            x2 * this._sharedData.invScaleX,
-            y2 * this._sharedData.invScaleY
+            x2 * this._sharedData.worldInvScale,
+            y2 * this._sharedData.worldInvScale
           )
         )
       );
       jointDef.set_length(
         length > 0
-          ? length * this._sharedData.invScaleX
+          ? length * this._sharedData.worldInvScale
           : this.b2Vec2(
-              (x2 - x1) * this._sharedData.invScaleX,
-              (y2 - y1) * this._sharedData.invScaleY
+              (x2 - x1) * this._sharedData.worldInvScale,
+              (y2 - y1) * this._sharedData.worldInvScale
             ).Length()
       );
       jointDef.set_frequencyHz(frequency >= 0 ? frequency : 0);
@@ -2020,7 +2060,7 @@ namespace gdjs {
       }
 
       // Get the joint length
-      return joint.GetLength() * this._sharedData.scaleX;
+      return joint.GetLength() * this._sharedData.worldScale;
     }
 
     setDistanceJointLength(jointId: integer | string, length: float): void {
@@ -2038,7 +2078,7 @@ namespace gdjs {
       }
 
       // Set the joint length
-      joint.SetLength(length * this._sharedData.invScaleX);
+      joint.SetLength(length * this._sharedData.worldInvScale);
 
       // Awake the bodies
       joint.GetBodyA().SetAwake(true);
@@ -2137,8 +2177,8 @@ namespace gdjs {
       jointDef.set_localAnchorA(
         this._sharedData.staticBody.GetLocalPoint(
           this.b2Vec2(
-            x * this._sharedData.invScaleX,
-            y * this._sharedData.invScaleY
+            x * this._sharedData.worldInvScale,
+            y * this._sharedData.worldInvScale
           )
         )
       );
@@ -2146,8 +2186,8 @@ namespace gdjs {
       jointDef.set_localAnchorB(
         body.GetLocalPoint(
           this.b2Vec2(
-            x * this._sharedData.invScaleX,
-            y * this._sharedData.invScaleY
+            x * this._sharedData.worldInvScale,
+            y * this._sharedData.worldInvScale
           )
         )
       );
@@ -2222,8 +2262,8 @@ namespace gdjs {
       jointDef.set_localAnchorA(
         body.GetLocalPoint(
           this.b2Vec2(
-            x1 * this._sharedData.invScaleX,
-            y1 * this._sharedData.invScaleY
+            x1 * this._sharedData.worldInvScale,
+            y1 * this._sharedData.worldInvScale
           )
         )
       );
@@ -2231,8 +2271,8 @@ namespace gdjs {
       jointDef.set_localAnchorB(
         otherBody.GetLocalPoint(
           this.b2Vec2(
-            x2 * this._sharedData.invScaleX,
-            y2 * this._sharedData.invScaleY
+            x2 * this._sharedData.worldInvScale,
+            y2 * this._sharedData.worldInvScale
           )
         )
       );
@@ -2523,8 +2563,8 @@ namespace gdjs {
       jointDef.set_localAnchorA(
         body.GetLocalPoint(
           this.b2Vec2(
-            x1 * this._sharedData.invScaleX,
-            y1 * this._sharedData.invScaleY
+            x1 * this._sharedData.worldInvScale,
+            y1 * this._sharedData.worldInvScale
           )
         )
       );
@@ -2532,8 +2572,8 @@ namespace gdjs {
       jointDef.set_localAnchorB(
         otherBody.GetLocalPoint(
           this.b2Vec2(
-            x2 * this._sharedData.invScaleX,
-            y2 * this._sharedData.invScaleY
+            x2 * this._sharedData.worldInvScale,
+            y2 * this._sharedData.worldInvScale
           )
         )
       );
@@ -2553,13 +2593,17 @@ namespace gdjs {
 
       // The translation range must include zero
       jointDef.set_lowerTranslation(
-        lowerTranslation < 0 ? lowerTranslation * this._sharedData.invScaleX : 0
+        lowerTranslation < 0
+          ? lowerTranslation * this._sharedData.worldInvScale
+          : 0
       );
       jointDef.set_upperTranslation(
-        upperTranslation > 0 ? upperTranslation * this._sharedData.invScaleX : 0
+        upperTranslation > 0
+          ? upperTranslation * this._sharedData.worldInvScale
+          : 0
       );
       jointDef.set_enableMotor(enableMotor);
-      jointDef.set_motorSpeed(motorSpeed * this._sharedData.invScaleX);
+      jointDef.set_motorSpeed(motorSpeed * this._sharedData.worldInvScale);
       jointDef.set_maxMotorForce(maxMotorForce);
       jointDef.set_collideConnected(collideConnected);
 
@@ -2622,7 +2666,7 @@ namespace gdjs {
       }
 
       // Get the joint current translation
-      return joint.GetJointTranslation() * this._sharedData.scaleX;
+      return joint.GetJointTranslation() * this._sharedData.worldScale;
     }
 
     getPrismaticJointSpeed(jointId: integer | string): float {
@@ -2637,7 +2681,7 @@ namespace gdjs {
       }
 
       // Get the joint speed
-      return joint.GetJointSpeed() * this._sharedData.scaleX;
+      return joint.GetJointSpeed() * this._sharedData.worldScale;
     }
 
     isPrismaticJointLimitsEnabled(jointId: integer | string): boolean {
@@ -2685,7 +2729,7 @@ namespace gdjs {
       }
 
       // Get the joint lower limit
-      return joint.GetLowerLimit() * this._sharedData.scaleX;
+      return joint.GetLowerLimit() * this._sharedData.worldScale;
     }
 
     getPrismaticJointMaxTranslation(jointId: integer | string): float {
@@ -2700,7 +2744,7 @@ namespace gdjs {
       }
 
       // Get the joint upper angle
-      return joint.GetUpperLimit() * this._sharedData.scaleX;
+      return joint.GetUpperLimit() * this._sharedData.worldScale;
     }
 
     setPrismaticJointLimits(
@@ -2731,8 +2775,8 @@ namespace gdjs {
 
       // Set the joint limits
       joint.SetLimits(
-        lowerTranslation * this._sharedData.invScaleX,
-        upperTranslation * this._sharedData.invScaleX
+        lowerTranslation * this._sharedData.worldInvScale,
+        upperTranslation * this._sharedData.worldInvScale
       );
     }
 
@@ -2781,7 +2825,7 @@ namespace gdjs {
       }
 
       // Get the joint motor speed
-      return joint.GetMotorSpeed() * this._sharedData.scaleX;
+      return joint.GetMotorSpeed() * this._sharedData.worldScale;
     }
 
     setPrismaticJointMotorSpeed(jointId: integer | string, speed): void {
@@ -2796,7 +2840,7 @@ namespace gdjs {
       }
 
       // Set the joint motor speed
-      joint.SetMotorSpeed(speed * this._sharedData.invScaleX);
+      joint.SetMotorSpeed(speed * this._sharedData.worldInvScale);
     }
 
     getPrismaticJointMaxMotorForce(jointId: integer | string): float {
@@ -2893,8 +2937,8 @@ namespace gdjs {
       jointDef.set_localAnchorA(
         body.GetLocalPoint(
           this.b2Vec2(
-            x1 * this._sharedData.invScaleX,
-            y1 * this._sharedData.invScaleY
+            x1 * this._sharedData.worldInvScale,
+            y1 * this._sharedData.worldInvScale
           )
         )
       );
@@ -2902,37 +2946,37 @@ namespace gdjs {
       jointDef.set_localAnchorB(
         otherBody.GetLocalPoint(
           this.b2Vec2(
-            x2 * this._sharedData.invScaleX,
-            y2 * this._sharedData.invScaleY
+            x2 * this._sharedData.worldInvScale,
+            y2 * this._sharedData.worldInvScale
           )
         )
       );
       jointDef.set_groundAnchorA(
         this.b2Vec2(
-          groundX1 * this._sharedData.invScaleX,
-          groundY1 * this._sharedData.invScaleY
+          groundX1 * this._sharedData.worldInvScale,
+          groundY1 * this._sharedData.worldInvScale
         )
       );
       jointDef.set_groundAnchorB(
         this.b2Vec2(
-          groundX2 * this._sharedData.invScaleX,
-          groundY2 * this._sharedData.invScaleY
+          groundX2 * this._sharedData.worldInvScale,
+          groundY2 * this._sharedData.worldInvScale
         )
       );
       jointDef.set_lengthA(
         lengthA > 0
-          ? lengthA * this._sharedData.invScaleX
+          ? lengthA * this._sharedData.worldInvScale
           : this.b2Vec2(
-              (groundX1 - x1) * this._sharedData.invScaleX,
-              (groundY1 - y1) * this._sharedData.invScaleY
+              (groundX1 - x1) * this._sharedData.worldInvScale,
+              (groundY1 - y1) * this._sharedData.worldInvScale
             ).Length()
       );
       jointDef.set_lengthB(
         lengthB > 0
-          ? lengthB * this._sharedData.invScaleX
+          ? lengthB * this._sharedData.worldInvScale
           : this.b2Vec2(
-              (groundX2 - x2) * this._sharedData.invScaleX,
-              (groundY2 - y2) * this._sharedData.invScaleY
+              (groundX2 - x2) * this._sharedData.worldInvScale,
+              (groundY2 - y2) * this._sharedData.worldInvScale
             ).Length()
       );
       jointDef.set_ratio(ratio > 0 ? ratio : 1);
@@ -2960,7 +3004,7 @@ namespace gdjs {
       }
 
       // Get the joint ground anchor
-      return joint.GetGroundAnchorA().get_x() * this._sharedData.scaleX;
+      return joint.GetGroundAnchorA().get_x() * this._sharedData.worldScale;
     }
 
     getPulleyJointFirstGroundAnchorY(jointId: integer | string): float {
@@ -2973,7 +3017,7 @@ namespace gdjs {
       }
 
       // Get the joint ground anchor
-      return joint.GetGroundAnchorA().get_y() * this._sharedData.scaleY;
+      return joint.GetGroundAnchorA().get_y() * this._sharedData.worldScale;
     }
 
     getPulleyJointSecondGroundAnchorX(jointId: integer | string): float {
@@ -2986,7 +3030,7 @@ namespace gdjs {
       }
 
       // Get the joint ground anchor
-      return joint.GetGroundAnchorB().get_x() * this._sharedData.scaleX;
+      return joint.GetGroundAnchorB().get_x() * this._sharedData.worldScale;
     }
 
     getPulleyJointSecondGroundAnchorY(jointId: integer | string): float {
@@ -2999,7 +3043,7 @@ namespace gdjs {
       }
 
       // Get the joint ground anchor
-      return joint.GetGroundAnchorB().get_y() * this._sharedData.scaleY;
+      return joint.GetGroundAnchorB().get_y() * this._sharedData.worldScale;
     }
 
     getPulleyJointFirstLength(jointId: integer | string): float {
@@ -3012,7 +3056,7 @@ namespace gdjs {
       }
 
       // Get the joint length
-      return joint.GetCurrentLengthA() * this._sharedData.scaleX;
+      return joint.GetCurrentLengthA() * this._sharedData.worldScale;
     }
 
     getPulleyJointSecondLength(jointId: integer | string): float {
@@ -3025,7 +3069,7 @@ namespace gdjs {
       }
 
       // Get the joint length
-      return joint.GetCurrentLengthB() * this._sharedData.scaleX;
+      return joint.GetCurrentLengthB() * this._sharedData.worldScale;
     }
 
     getPulleyJointRatio(jointId: integer | string): float {
@@ -3177,8 +3221,8 @@ namespace gdjs {
       jointDef.set_bodyB(body);
       jointDef.set_target(
         this.b2Vec2(
-          targetX * this._sharedData.invScaleX,
-          targetY * this._sharedData.invScaleY
+          targetX * this._sharedData.worldInvScale,
+          targetY * this._sharedData.worldInvScale
         )
       );
       jointDef.set_maxForce(maxForce >= 0 ? maxForce : 0);
@@ -3206,7 +3250,7 @@ namespace gdjs {
       }
 
       // Get the joint target X
-      return joint.GetTarget().get_x() * this._sharedData.scaleX;
+      return joint.GetTarget().get_x() * this._sharedData.worldScale;
     }
 
     getMouseJointTargetY(jointId: integer | string): float {
@@ -3218,7 +3262,7 @@ namespace gdjs {
       }
 
       // Get the joint target Y
-      return joint.GetTarget().get_y() * this._sharedData.scaleY;
+      return joint.GetTarget().get_y() * this._sharedData.worldScale;
     }
 
     setMouseJointTarget(
@@ -3236,8 +3280,8 @@ namespace gdjs {
       // Set the joint target
       joint.SetTarget(
         this.b2Vec2(
-          targetX * this._sharedData.invScaleX,
-          targetY * this._sharedData.invScaleY
+          targetX * this._sharedData.worldInvScale,
+          targetY * this._sharedData.worldInvScale
         )
       );
 
@@ -3375,8 +3419,8 @@ namespace gdjs {
       jointDef.set_localAnchorA(
         body.GetLocalPoint(
           this.b2Vec2(
-            x1 * this._sharedData.invScaleX,
-            y1 * this._sharedData.invScaleY
+            x1 * this._sharedData.worldInvScale,
+            y1 * this._sharedData.worldInvScale
           )
         )
       );
@@ -3384,8 +3428,8 @@ namespace gdjs {
       jointDef.set_localAnchorB(
         otherBody.GetLocalPoint(
           this.b2Vec2(
-            x2 * this._sharedData.invScaleX,
-            y2 * this._sharedData.invScaleY
+            x2 * this._sharedData.worldInvScale,
+            y2 * this._sharedData.worldInvScale
           )
         )
       );
@@ -3440,7 +3484,7 @@ namespace gdjs {
       }
 
       // Get the joint current translation
-      return joint.GetJointTranslation() * this._sharedData.scaleX;
+      return joint.GetJointTranslation() * this._sharedData.worldScale;
     }
 
     getWheelJointSpeed(jointId: integer | string): float {
@@ -3657,8 +3701,8 @@ namespace gdjs {
       jointDef.set_localAnchorA(
         body.GetLocalPoint(
           this.b2Vec2(
-            x1 * this._sharedData.invScaleX,
-            y1 * this._sharedData.invScaleY
+            x1 * this._sharedData.worldInvScale,
+            y1 * this._sharedData.worldInvScale
           )
         )
       );
@@ -3666,8 +3710,8 @@ namespace gdjs {
       jointDef.set_localAnchorB(
         otherBody.GetLocalPoint(
           this.b2Vec2(
-            x2 * this._sharedData.invScaleX,
-            y2 * this._sharedData.invScaleY
+            x2 * this._sharedData.worldInvScale,
+            y2 * this._sharedData.worldInvScale
           )
         )
       );
@@ -3806,8 +3850,8 @@ namespace gdjs {
       jointDef.set_localAnchorA(
         body.GetLocalPoint(
           this.b2Vec2(
-            x1 * this._sharedData.invScaleX,
-            y1 * this._sharedData.invScaleY
+            x1 * this._sharedData.worldInvScale,
+            y1 * this._sharedData.worldInvScale
           )
         )
       );
@@ -3815,17 +3859,17 @@ namespace gdjs {
       jointDef.set_localAnchorB(
         otherBody.GetLocalPoint(
           this.b2Vec2(
-            x2 * this._sharedData.invScaleX,
-            y2 * this._sharedData.invScaleY
+            x2 * this._sharedData.worldInvScale,
+            y2 * this._sharedData.worldInvScale
           )
         )
       );
       jointDef.set_maxLength(
         maxLength > 0
-          ? maxLength * this._sharedData.invScaleX
+          ? maxLength * this._sharedData.worldInvScale
           : this.b2Vec2(
-              (x2 - x1) * this._sharedData.invScaleX,
-              (y2 - y1) * this._sharedData.invScaleY
+              (x2 - x1) * this._sharedData.worldInvScale,
+              (y2 - y1) * this._sharedData.worldInvScale
             ).Length()
       );
       jointDef.set_collideConnected(collideConnected);
@@ -3852,7 +3896,7 @@ namespace gdjs {
       }
 
       // Get the joint maximum length
-      return joint.GetMaxLength() * this._sharedData.scaleX;
+      return joint.GetMaxLength() * this._sharedData.worldScale;
     }
 
     setRopeJointMaxLength(jointId: integer | string, maxLength: float): void {
@@ -3870,7 +3914,7 @@ namespace gdjs {
       }
 
       // Set the joint maximum length
-      joint.SetMaxLength(maxLength * this._sharedData.invScaleX);
+      joint.SetMaxLength(maxLength * this._sharedData.worldInvScale);
 
       // Awake the bodies
       joint.GetBodyA().SetAwake(true);
@@ -3916,8 +3960,8 @@ namespace gdjs {
       jointDef.set_localAnchorA(
         body.GetLocalPoint(
           this.b2Vec2(
-            x1 * this._sharedData.invScaleX,
-            y1 * this._sharedData.invScaleY
+            x1 * this._sharedData.worldInvScale,
+            y1 * this._sharedData.worldInvScale
           )
         )
       );
@@ -3925,8 +3969,8 @@ namespace gdjs {
       jointDef.set_localAnchorB(
         otherBody.GetLocalPoint(
           this.b2Vec2(
-            x2 * this._sharedData.invScaleX,
-            y2 * this._sharedData.invScaleY
+            x2 * this._sharedData.worldInvScale,
+            y2 * this._sharedData.worldInvScale
           )
         )
       );
@@ -4050,8 +4094,8 @@ namespace gdjs {
       jointDef.set_bodyB(otherBody);
       jointDef.set_linearOffset(
         this.b2Vec2(
-          offsetX * this._sharedData.invScaleX,
-          offsetY * this._sharedData.invScaleY
+          offsetX * this._sharedData.worldInvScale,
+          offsetY * this._sharedData.worldInvScale
         )
       );
       jointDef.set_angularOffset(gdjs.toRad(offsetAngle));
@@ -4084,7 +4128,7 @@ namespace gdjs {
       }
 
       // Get the joint offset
-      return joint.GetLinearOffset().get_x() * this._sharedData.scaleX;
+      return joint.GetLinearOffset().get_x() * this._sharedData.worldScale;
     }
 
     getMotorJointOffsetY(jointId: integer | string): float {
@@ -4097,7 +4141,7 @@ namespace gdjs {
       }
 
       // Get the joint offset
-      return joint.GetLinearOffset().get_y() * this._sharedData.scaleY;
+      return joint.GetLinearOffset().get_y() * this._sharedData.worldScale;
     }
 
     setMotorJointOffset(
@@ -4116,8 +4160,8 @@ namespace gdjs {
       // Set the joint offset
       joint.SetLinearOffset(
         this.b2Vec2(
-          offsetX * this._sharedData.invScaleX,
-          offsetY * this._sharedData.invScaleY
+          offsetX * this._sharedData.worldInvScale,
+          offsetY * this._sharedData.worldInvScale
         )
       );
     }

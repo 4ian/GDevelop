@@ -252,6 +252,13 @@ class Variable {
     this._childrenArray.push(variable.clone());
     return this;
   }
+  
+  /**
+   * @param {Variable} variable
+   */
+  _pushVariable(variable) {
+    this._childrenArray.push(variable);
+  }
 
   /**
    *

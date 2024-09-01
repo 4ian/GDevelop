@@ -32,6 +32,8 @@
 
 namespace gd {
 
+VariablesContainer EventsVariableReplacer::nullVariablesContainer;
+
 /**
  * \brief Go through the nodes and rename variables,
  * or signal if the instruction must be renamed if a removed variable is used.
@@ -44,22 +46,26 @@ class GD_CORE_API ExpressionVariableReplacer
   ExpressionVariableReplacer(
       const gd::Platform& platform_,
       const gd::ProjectScopedContainers& projectScopedContainers_,
-      const gd::VariablesContainer& targetVariablesContainer_,
       const VariablesRenamingChangesetNode& variablesRenamingChangesetRoot_,
-      const std::unordered_set<gd::String>& removedVariableNames_)
+      const std::unordered_set<gd::String>& removedVariableNames_,
+      const gd::VariablesContainer& targetVariablesContainer_,
+      const gd::String &groupName_,
+      const gd::String &forcedInitialObjectName)
       : hasDoneRenaming(false),
         removedVariableUsed(false),
         platform(platform_),
         projectScopedContainers(projectScopedContainers_),
-        forcedInitialVariablesContainer(nullptr),
-        targetVariablesContainer(targetVariablesContainer_),
+        forcedVariablesContainer(nullptr),
+        forcedObjectName(forcedInitialObjectName),
         variablesRenamingChangesetRoot(variablesRenamingChangesetRoot_),
-        removedVariableNames(removedVariableNames_){};
+        removedVariableNames(removedVariableNames_),
+        targetVariablesContainer(targetVariablesContainer_),
+        targetGroupName(groupName_){};
   virtual ~ExpressionVariableReplacer(){};
 
   void SetForcedInitialVariablesContainer(
       const gd::VariablesContainer* forcedInitialVariablesContainer_) {
-    forcedInitialVariablesContainer = forcedInitialVariablesContainer_;
+    forcedVariablesContainer = forcedInitialVariablesContainer_;
   }
 
   bool HasDoneRenaming() const { return hasDoneRenaming; }
@@ -82,12 +88,13 @@ class GD_CORE_API ExpressionVariableReplacer
     // The node represents a variable or an object name on which a variable
     // will be accessed.
 
-    if (forcedInitialVariablesContainer) {
+    if (forcedVariablesContainer) {
       const gd::String oldVariableName = node.name;
       PushVariablesRenamingChangesetRoot();
       // A scope was forced. Honor it: it means this node represents a variable
       // of the forced variables container.
-      if (forcedInitialVariablesContainer == &targetVariablesContainer) {
+      if (forcedVariablesContainer == &targetVariablesContainer ||
+          IsTargetingObjectGroup(forcedObjectName)) {
         RenameOrRemoveVariableOfTargetVariableContainer(node.name);
       }
 
@@ -150,7 +157,8 @@ class GD_CORE_API ExpressionVariableReplacer
       // This is always true because MatchIdentifierWithName is used to get
       // objectNameToUseForVariableAccessor.
       if (objectsContainersList.HasObjectOrGroupVariablesContainer(
-              objectNameToUseForVariableAccessor, targetVariablesContainer)) {
+              objectNameToUseForVariableAccessor, targetVariablesContainer) ||
+          IsTargetingObjectGroup(objectNameToUseForVariableAccessor)) {
         objectNameToUseForVariableAccessor = "";
         // The node represents an object variable, and this object variables are
         // the target. Do the replacement or removals:
@@ -197,10 +205,11 @@ class GD_CORE_API ExpressionVariableReplacer
     // (and if it's a variable reference or a value does not have any importance
     // here).
 
-    if (forcedInitialVariablesContainer) {
+    if (forcedVariablesContainer) {
       // A scope was forced. Honor it: it means this node represents a variable
       // of the forced variables container.
-      if (forcedInitialVariablesContainer == &targetVariablesContainer) {
+      if (forcedVariablesContainer == &targetVariablesContainer ||
+          IsTargetingObjectGroup(forcedObjectName)) {
         renameVariableAndChild();
       }
       return;
@@ -213,7 +222,8 @@ class GD_CORE_API ExpressionVariableReplacer
         [&]() {
           // This represents an object.
           if (objectsContainersList.HasObjectOrGroupVariablesContainer(
-                  node.identifierName, targetVariablesContainer)) {
+                  node.identifierName, targetVariablesContainer) ||
+              IsTargetingObjectGroup(node.identifierName)) {
             // The node represents an object variable, and this object variables
             // are the target. Do the replacement or removals:
             PushVariablesRenamingChangesetRoot();
@@ -261,31 +271,33 @@ class GD_CORE_API ExpressionVariableReplacer
       // force the "scope" at which starts the evalution of variables.
       if (parameterMetadata && parameterMetadata->GetValueTypeMetadata()
                                    .IsLegacyPreScopedVariable()) {
-        const gd::VariablesContainer* oldForcedInitialVariablesContainer =
-            forcedInitialVariablesContainer;
+        const gd::VariablesContainer *oldForcedVariablesContainer =
+            forcedVariablesContainer;
+        const gd::String &oldForcedObjectName = forcedObjectName;
 
-        forcedInitialVariablesContainer = nullptr;
+        forcedVariablesContainer = nullptr;
+        forcedObjectName = "";
         if (parameterMetadata->GetType() == "globalvar") {
-          forcedInitialVariablesContainer =
+          forcedVariablesContainer =
               projectScopedContainers.GetVariablesContainersList()
                   .GetTopMostVariablesContainer();
         } else if (parameterMetadata->GetType() == "scenevar") {
-          forcedInitialVariablesContainer =
+          forcedVariablesContainer =
               projectScopedContainers.GetVariablesContainersList()
                   .GetBottomMostVariablesContainer();
         } else if (parameterMetadata->GetType() == "objectvar") {
           auto objectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
-              platform,
-              projectScopedContainers.GetObjectsContainersList(),
-              node.objectName,
-              *node.parameters[parameterIndex].get());
-          forcedInitialVariablesContainer =
+              platform, projectScopedContainers.GetObjectsContainersList(),
+              node.objectName, *node.parameters[parameterIndex].get());
+          forcedVariablesContainer =
               projectScopedContainers.GetObjectsContainersList()
                   .GetObjectOrGroupVariablesContainer(objectName);
+          forcedObjectName = objectName;
         }
 
         node.parameters[parameterIndex]->Visit(*this);
-        forcedInitialVariablesContainer = oldForcedInitialVariablesContainer;
+        forcedVariablesContainer = oldForcedVariablesContainer;
+        forcedObjectName = oldForcedObjectName;
       } else {
         // For any other parameter, there is no special treatment being needed.
         node.parameters[parameterIndex]->Visit(*this);
@@ -297,6 +309,10 @@ class GD_CORE_API ExpressionVariableReplacer
  private:
   bool hasDoneRenaming;
   bool removedVariableUsed;
+
+  bool IsTargetingObjectGroup(const gd::String &objectGroupName) {
+    return !targetGroupName.empty() && objectGroupName == targetGroupName;
+  }
 
   bool RenameOrRemoveVariableOfTargetVariableContainer(
       gd::String& variableName) {
@@ -382,10 +398,17 @@ class GD_CORE_API ExpressionVariableReplacer
   // Scope:
   const gd::Platform& platform;
   const gd::ProjectScopedContainers& projectScopedContainers;
-  const gd::VariablesContainer* forcedInitialVariablesContainer;
+  const gd::VariablesContainer* forcedVariablesContainer;
+  gd::String forcedObjectName;
 
   // Renaming or removing to do:
   const gd::VariablesContainer& targetVariablesContainer;
+  /**
+   * Groups don't have VariablesContainer, so `targetVariablesContainer` will be
+   * pointing to `nullVariablesContainer` and the group name is use instead to
+   * check which variable accesses to modify in expressions.
+   */
+  const gd::String& targetGroupName;
   const VariablesRenamingChangesetNode &variablesRenamingChangesetRoot;
   const std::unordered_set<gd::String>& removedVariableNames;
 
@@ -397,7 +420,7 @@ const gd::VariablesContainer*
 EventsVariableReplacer::FindForcedVariablesContainerIfAny(
     const gd::String& type, const gd::String& lastObjectName) {
   // Handle legacy pre-scoped variable parameters: in this case, we
-  // force the "scope" at which starts the evalution of variables.
+  // force the "scope" at which starts the evaluation of variables.
   if (type == "objectvar") {
     return GetProjectScopedContainers()
         .GetObjectsContainersList()
@@ -442,9 +465,11 @@ bool EventsVariableReplacer::DoVisitInstruction(gd::Instruction& instruction,
         if (node) {
           ExpressionVariableReplacer renamer(platform,
                                              GetProjectScopedContainers(),
-                                             targetVariablesContainer,
                                              variablesRenamingChangesetRoot,
-                                             removedVariableNames);
+                                             removedVariableNames,
+                                             targetVariablesContainer,
+                                             targetGroupName,
+                                             type == "objectvar" ? lastObjectName : "");
           renamer.SetForcedInitialVariablesContainer(
               FindForcedVariablesContainerIfAny(type, lastObjectName));
           node->Visit(renamer);
@@ -474,9 +499,11 @@ bool EventsVariableReplacer::DoVisitEventExpression(
   if (node) {
     ExpressionVariableReplacer renamer(platform,
                                        GetProjectScopedContainers(),
-                                       targetVariablesContainer,
                                        variablesRenamingChangesetRoot,
-                                       removedVariableNames);
+                                       removedVariableNames,
+                                       targetVariablesContainer,
+                                       targetGroupName,
+                                       "");
     renamer.SetForcedInitialVariablesContainer(
         FindForcedVariablesContainerIfAny(type, ""));
     node->Visit(renamer);

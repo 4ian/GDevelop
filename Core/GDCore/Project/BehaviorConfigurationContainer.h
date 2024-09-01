@@ -9,6 +9,7 @@
 #include <map>
 #include <memory>
 #include "GDCore/Serialization/Serializer.h"
+#include "GDCore/Project/QuickCustomization.h"
 #include "GDCore/String.h"
 
 namespace gd {
@@ -31,10 +32,10 @@ namespace gd {
  */
 class GD_CORE_API BehaviorConfigurationContainer {
  public:
-  BehaviorConfigurationContainer() : folded(false){};
+  BehaviorConfigurationContainer() : folded(false), quickCustomizationVisibility(QuickCustomization::Visibility::Default){};
   BehaviorConfigurationContainer(const gd::String& name_,
                                  const gd::String& type_)
-      : name(name_), type(type_), folded(false){};
+      : name(name_), type(type_), folded(false), quickCustomizationVisibility(QuickCustomization::Visibility::Default){};
   virtual ~BehaviorConfigurationContainer();
   virtual BehaviorConfigurationContainer* Clone() const { return new BehaviorConfigurationContainer(*this); }
 
@@ -114,6 +115,13 @@ class GD_CORE_API BehaviorConfigurationContainer {
    */
   bool IsFolded() const { return folded; }
 
+  void SetQuickCustomizationVisibility(QuickCustomization::Visibility visibility) {
+    quickCustomizationVisibility = visibility;
+  }
+
+  QuickCustomization::Visibility GetQuickCustomizationVisibility() const {
+    return quickCustomizationVisibility;
+  }
 
 protected:
   /**
@@ -160,6 +168,7 @@ protected:
 
   gd::SerializerElement content;  // Storage for the behavior properties
   bool folded;
+  QuickCustomization::Visibility quickCustomizationVisibility;
 };
 
 }  // namespace gd

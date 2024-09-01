@@ -15,6 +15,11 @@ import {
   updateUserGroup,
   deleteGroup,
   createGroup,
+  listTeamAdmins,
+  createTeamMembers,
+  changeTeamMemberPassword,
+  activateTeamMembers,
+  setUserAsAdmin,
 } from '../../Utils/GDevelopServices/User';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import { listOtherUserCloudProjects } from '../../Utils/GDevelopServices/Project';
@@ -31,6 +36,7 @@ const TeamProvider = ({ children }: Props) => {
   const [groups, setGroups] = React.useState<?(TeamGroup[])>(null);
   const [team, setTeam] = React.useState<?Team>(null);
   const [members, setMembers] = React.useState<?(User[])>(null);
+  const [admins, setAdmins] = React.useState<?(User[])>(null);
   const [memberships, setMemberships] = React.useState<?(TeamMembership[])>(
     null
   );
@@ -93,8 +99,73 @@ const TeamProvider = ({ children }: Props) => {
         team.id
       );
       setMembers(teamMembers);
+      const teamAdmins = await listTeamAdmins(
+        getAuthorizationHeader,
+        profile.id,
+        team.id
+      );
+      setAdmins(teamAdmins);
     },
     [team, getAuthorizationHeader, profile]
+  );
+
+  const onCreateMembers = React.useCallback(
+    async quantity => {
+      if (!team || !profile) return;
+      try {
+        const createdUsers = await createTeamMembers(getAuthorizationHeader, {
+          teamId: team.id,
+          quantity,
+          adminUserId: profile.id,
+        });
+        try {
+          await activateTeamMembers(getAuthorizationHeader, {
+            teamId: team.id,
+            activate: true,
+            userIds: createdUsers.map(user => user.uid),
+            adminUserId: profile.id,
+          });
+        } catch (error) {
+          console.error(
+            'An error occurred while activating newly created members',
+            error
+          );
+        }
+      } catch (error) {
+        console.error('An error occurred while creating team members:', error);
+      }
+    },
+    [team, getAuthorizationHeader, profile]
+  );
+
+  const onChangeMemberPassword = React.useCallback(
+    async (userId: string, newPassword: string) => {
+      if (!profile) return;
+      try {
+        await changeTeamMemberPassword(getAuthorizationHeader, {
+          adminUserId: profile.id,
+          userId,
+          newPassword,
+        });
+      } catch (error) {
+        console.error('An error occurred while changing password:', error);
+      }
+    },
+    [getAuthorizationHeader, profile]
+  );
+
+  const onActivateMembers = React.useCallback(
+    async (userIds: string[], activate: boolean) => {
+      if (!profile || !team || userIds.length === 0) return;
+
+      await activateTeamMembers(getAuthorizationHeader, {
+        adminUserId: profile.id,
+        userIds,
+        teamId: team.id,
+        activate,
+      });
+    },
+    [getAuthorizationHeader, profile, team]
   );
 
   React.useEffect(
@@ -194,6 +265,19 @@ const TeamProvider = ({ children }: Props) => {
     [getAuthorizationHeader, profile]
   );
 
+  const onSetAdmin = React.useCallback(
+    async (email: string, activate: boolean) => {
+      if (!team || !profile) return;
+      await setUserAsAdmin(getAuthorizationHeader, {
+        teamId: team.id,
+        email,
+        activate,
+        adminUserId: profile.id,
+      });
+    },
+    [team, getAuthorizationHeader, profile]
+  );
+
   const onDeleteGroup = React.useCallback(
     async (group: TeamGroup) => {
       if (!profile || !team) return;
@@ -226,11 +310,35 @@ const TeamProvider = ({ children }: Props) => {
     [fetchMembers, fetchMemberships]
   );
 
+  const onRefreshAdmins = React.useCallback(
+    async () => {
+      if (!profile || !team) return;
+      const teamAdmins = await listTeamAdmins(
+        getAuthorizationHeader,
+        profile.id,
+        team.id
+      );
+      setAdmins(teamAdmins);
+    },
+    [team, getAuthorizationHeader, profile]
+  );
+
+  const getAvailableSeats = React.useCallback(
+    () =>
+      team && members && admins
+        ? team.seats -
+          members.filter(member => !member.deactivatedAt).length -
+          admins.length
+        : null,
+    [team, members, admins]
+  );
+
   return (
     <TeamContext.Provider
       value={{
         team,
         groups,
+        admins,
         members,
         memberships,
         onChangeGroupName,
@@ -239,6 +347,12 @@ const TeamProvider = ({ children }: Props) => {
         onDeleteGroup,
         onCreateGroup,
         onRefreshMembers,
+        onRefreshAdmins,
+        getAvailableSeats,
+        onCreateMembers,
+        onChangeMemberPassword,
+        onActivateMembers,
+        onSetAdmin,
       }}
     >
       {children}

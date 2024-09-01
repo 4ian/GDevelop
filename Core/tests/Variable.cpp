@@ -91,4 +91,49 @@ TEST_CASE("Variable", "[common][variables]") {
             "Hello second copied World");
     REQUIRE(variable3.GetChild("Child2").GetValue() == 44);
   }
+  SECTION("Can find identical number variables") {
+    gd::Variable variable;
+    variable.SetValue(123);
+
+    gd::Variable otherVariable;
+    otherVariable.SetValue(123);
+
+    REQUIRE(variable == otherVariable);
+  }
+  SECTION("Can find different number variables") {
+    gd::Variable variable;
+    variable.SetValue(123);
+
+    gd::Variable otherVariable;
+    otherVariable.SetValue(456);
+
+    REQUIRE(variable != otherVariable);
+  }
+  SECTION("Can find identical structure variables") {
+    gd::Variable variable;
+    variable.GetChild("MyChild").SetValue(123);
+
+    gd::Variable otherVariable;
+    otherVariable.GetChild("MyChild").SetValue(123);
+
+    REQUIRE(variable == otherVariable);
+  }
+  SECTION("Can find structure with different child value") {
+    gd::Variable variable;
+    variable.GetChild("MyChild").SetValue(123);
+
+    gd::Variable otherVariable;
+    otherVariable.GetChild("MyChild").SetValue(456);
+
+    REQUIRE(variable != otherVariable);
+  }
+  SECTION("Can find structure with different child name") {
+    gd::Variable variable;
+    variable.GetChild("MyChild").SetValue(123);
+
+    gd::Variable otherVariable;
+    otherVariable.GetChild("MyOtherChild").SetValue(123);
+
+    REQUIRE(variable != otherVariable);
+  }
 }

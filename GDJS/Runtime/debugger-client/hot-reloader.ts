@@ -41,6 +41,17 @@ namespace gdjs {
       }, {});
     }
 
+    static indexByName<E extends { name: string | null }>(
+      objectsWithName: E[]
+    ): Map<string, E> {
+      return objectsWithName.reduce(function (objectsMap, object) {
+        if (object.name) {
+          objectsMap.set(object.name, object);
+        }
+        return objectsMap;
+      }, new Map<string, E>());
+    }
+
     _canReloadScriptFile(srcFilename: string): boolean {
       function endsWith(str: string, suffix: string): boolean {
         const suffixPosition = str.indexOf(suffix);
@@ -193,19 +204,22 @@ namespace gdjs {
             if (errorTarget instanceof HTMLScriptElement) {
               this._logs.push({
                 kind: 'fatal',
-                message: 'Unable to reload script:' + errorTarget.src,
+                message: 'Unable to reload script: ' + errorTarget.src,
               });
             } else {
               this._logs.push({
                 kind: 'fatal',
                 message:
-                  'Unexpected error happened while hot-reloading:' +
+                  'Unexpected error happened while hot-reloading: ' +
                   error.message,
               });
             }
           })
           .then(() => {
-            logger.info('Hot reload finished with logs:', this._logs);
+            logger.info(
+              'Hot reload finished with logs:',
+              this._logs.map((log) => '\n' + log.kind + ': ' + log.message)
+            );
             this._runtimeGame.pause(false);
             return this._logs;
           });
@@ -338,28 +352,90 @@ namespace gdjs {
         runtimeGame.getVariables()
       );
 
+      // Update extension's global variables.
+      for (const newExtensionData of newProjectData.eventsFunctionsExtensions) {
+        const oldExtensionData = oldProjectData.eventsFunctionsExtensions.find(
+          (oldExtensionData) => oldExtensionData.name === newExtensionData.name
+        );
+
+        const oldGlobalVariables = oldExtensionData
+          ? oldExtensionData.globalVariables
+          : [];
+        const newGlobalVariables = newExtensionData.globalVariables;
+
+        if (oldGlobalVariables.length > 0 || newGlobalVariables.length > 0) {
+          const currentVariables = runtimeGame.getVariablesForExtension(
+            newExtensionData.name
+          );
+          if (currentVariables) {
+            this._hotReloadVariablesContainer(
+              oldGlobalVariables,
+              newGlobalVariables,
+              currentVariables
+            );
+          } else {
+            runtimeGame._variablesByExtensionName.set(
+              newExtensionData.name,
+              new gdjs.VariablesContainer(newGlobalVariables)
+            );
+          }
+        }
+      }
+
+      const oldlayoutDataMap = HotReloader.indexByName(oldProjectData.layouts);
+      const newlayoutDataMap = HotReloader.indexByName(newProjectData.layouts);
+
       // Reload runtime scenes
       sceneStack._stack.forEach((runtimeScene) => {
-        const oldLayoutData = oldProjectData.layouts.filter(
-          (layoutData) => layoutData.name === runtimeScene.getName()
-        )[0];
-        const newLayoutData = newProjectData.layouts.filter(
-          (layoutData) => layoutData.name === runtimeScene.getName()
-        )[0];
+        const oldLayoutData = oldlayoutDataMap.get(runtimeScene.getName());
+        const newLayoutData = newlayoutDataMap.get(runtimeScene.getName());
         if (oldLayoutData && newLayoutData) {
           this._hotReloadRuntimeScene(
+            oldProjectData,
+            newProjectData,
             oldLayoutData,
             newLayoutData,
             changedRuntimeBehaviors,
             runtimeScene
           );
+
+          // Update extension's scene variables.
+          for (const newExtensionData of newProjectData.eventsFunctionsExtensions) {
+            const oldExtensionData = oldProjectData.eventsFunctionsExtensions.find(
+              (oldExtensionData) =>
+                oldExtensionData.name === newExtensionData.name
+            );
+
+            const oldSceneVariables = oldExtensionData
+              ? oldExtensionData.sceneVariables
+              : [];
+            const newSceneVariables = newExtensionData.sceneVariables;
+
+            if (oldSceneVariables.length > 0 || newSceneVariables.length > 0) {
+              const currentVariables = runtimeScene.getVariablesForExtension(
+                newExtensionData.name
+              );
+              if (currentVariables) {
+                this._hotReloadVariablesContainer(
+                  oldSceneVariables,
+                  newSceneVariables,
+                  currentVariables
+                );
+              } else {
+                runtimeScene._variablesByExtensionName.set(
+                  newExtensionData.name,
+                  new gdjs.VariablesContainer(newSceneVariables)
+                );
+              }
+            }
+          }
         } else {
           // A scene was removed. Not hot-reloading this.
           this._logs.push({
             kind: 'error',
             message:
               'Scene ' +
-              oldLayoutData.name +
+              (oldLayoutData && oldLayoutData.name) +
               ' was removed. A fresh preview should be launched.',
           });
         }
@@ -377,8 +453,20 @@ namespace gdjs {
           // hot-reload all the scenes.
           !HotReloader.deepEqual(oldExternalLayoutData, newExternalLayoutData)
         ) {
+          const oldLayoutData = oldlayoutDataMap.get(
+            oldExternalLayoutData.associatedLayout
+          );
+          const newLayoutData = newlayoutDataMap.get(
+            newExternalLayoutData.associatedLayout
+          );
+
           sceneStack._stack.forEach((runtimeScene) => {
             this._hotReloadRuntimeSceneInstances(
+              oldProjectData,
+              newProjectData,
+              changedRuntimeBehaviors,
+              oldLayoutData ? oldLayoutData.objects : [],
+              newLayoutData ? newLayoutData.objects : [],
               oldExternalLayoutData.instances,
               newExternalLayoutData.instances,
               runtimeScene
@@ -455,6 +543,7 @@ namespace gdjs {
           variablesContainer.remove(oldVariableData.name);
         }
       });
+      variablesContainer.rebuildIndexFrom(newVariablesData);
     }
 
     _hotReloadStructureVariable(
@@ -535,6 +624,8 @@ namespace gdjs {
     }
 
     _hotReloadRuntimeScene(
+      oldProjectData: ProjectData,
+      newProjectData: ProjectData,
       oldLayoutData: LayoutData,
       newLayoutData: LayoutData,
       changedRuntimeBehaviors: ChangedRuntimeBehavior[],
@@ -562,25 +653,12 @@ namespace gdjs {
         runtimeScene
       );
 
-      // Re-instantiate any gdjs.RuntimeBehavior that was changed.
-      this._reinstantiateRuntimeSceneRuntimeBehaviors(
+      this._hotReloadRuntimeInstanceContainer(
+        oldProjectData,
+        newProjectData,
+        oldLayoutData,
+        newLayoutData,
         changedRuntimeBehaviors,
-        newLayoutData.objects,
-        runtimeScene
-      );
-      this._hotReloadRuntimeSceneObjects(
-        oldLayoutData.objects,
-        newLayoutData.objects,
-        runtimeScene
-      );
-      this._hotReloadRuntimeSceneInstances(
-        oldLayoutData.instances,
-        newLayoutData.instances,
-        runtimeScene
-      );
-      this._hotReloadRuntimeSceneLayers(
-        oldLayoutData.layers,
-        newLayoutData.layers,
         runtimeScene
       );
 
@@ -589,6 +667,101 @@ namespace gdjs {
       // if they have not changed, it's still fine to call this, it will be basically a
       // no-op.
       runtimeScene.setEventsGeneratedCodeFunction(newLayoutData);
+    }
+
+    static resolveCustomObjectConfigurations(
+      projectData: ProjectData,
+      objectDatas: ObjectData[]
+    ): ObjectData[] {
+      return objectDatas.map((objectData) => {
+        const [extensionName, eventsBasedObjectName] = objectData.type.split(
+          '::'
+        );
+
+        const extensionData = projectData.eventsFunctionsExtensions.find(
+          (extension) => extension.name === extensionName
+        );
+        if (!extensionData) {
+          return objectData;
+        }
+
+        const eventsBasedObjectData =
+          extensionData &&
+          extensionData.eventsBasedObjects.find(
+            (object) => object.name === eventsBasedObjectName
+          );
+        if (!eventsBasedObjectData) {
+          return objectData;
+        }
+
+        const customObjectConfiguration = objectData as ObjectData &
+          CustomObjectConfiguration;
+
+        const mergedChildObjectDataList = customObjectConfiguration.childrenContent
+          ? eventsBasedObjectData.objects.map((objectData) => ({
+              ...objectData,
+              ...customObjectConfiguration.childrenContent[objectData.name],
+            }))
+          : eventsBasedObjectData.objects;
+
+        const mergedObjectConfiguration = {
+          ...eventsBasedObjectData,
+          ...objectData,
+          // ObjectData doesn't have an `objects` attribute.
+          // This is a small optimization to avoid to create an
+          // InstanceContainerData for each instance to hot-reload their inner
+          // scene (see `_hotReloadRuntimeInstanceContainer` call from
+          // `_hotReloadRuntimeSceneInstances`).
+          objects: mergedChildObjectDataList,
+          childrenContent: mergedChildObjectDataList,
+        };
+        return mergedObjectConfiguration;
+      });
+    }
+
+    _hotReloadRuntimeInstanceContainer(
+      oldProjectData: ProjectData,
+      newProjectData: ProjectData,
+      oldLayoutData: InstanceContainerData,
+      newLayoutData: InstanceContainerData,
+      changedRuntimeBehaviors: ChangedRuntimeBehavior[],
+      runtimeInstanceContainer: gdjs.RuntimeInstanceContainer
+    ): void {
+      const oldObjectDataList = HotReloader.resolveCustomObjectConfigurations(
+        oldProjectData,
+        oldLayoutData.objects
+      );
+      const newObjectDataList = HotReloader.resolveCustomObjectConfigurations(
+        newProjectData,
+        newLayoutData.objects
+      );
+
+      // Re-instantiate any gdjs.RuntimeBehavior that was changed.
+      this._reinstantiateRuntimeSceneRuntimeBehaviors(
+        changedRuntimeBehaviors,
+        newObjectDataList,
+        runtimeInstanceContainer
+      );
+      this._hotReloadRuntimeSceneObjects(
+        oldObjectDataList,
+        newObjectDataList,
+        runtimeInstanceContainer
+      );
+      this._hotReloadRuntimeSceneInstances(
+        oldProjectData,
+        newProjectData,
+        changedRuntimeBehaviors,
+        oldObjectDataList,
+        newObjectDataList,
+        oldLayoutData.instances,
+        newLayoutData.instances,
+        runtimeInstanceContainer
+      );
+      this._hotReloadRuntimeSceneLayers(
+        oldLayoutData.layers,
+        newLayoutData.layers,
+        runtimeInstanceContainer
+      );
     }
 
     _hotReloadRuntimeSceneBehaviorsSharedData(
@@ -637,12 +810,12 @@ namespace gdjs {
     _reinstantiateRuntimeSceneRuntimeBehaviors(
       changedRuntimeBehaviors: ChangedRuntimeBehavior[],
       newObjects: ObjectData[],
-      runtimeScene: gdjs.RuntimeScene
+      runtimeInstanceContainer: gdjs.RuntimeInstanceContainer
     ): void {
       newObjects.forEach((newObjectData) => {
         const objectName = newObjectData.name;
         const newBehaviors = newObjectData.behaviors;
-        const runtimeObjects = runtimeScene.getObjects(objectName)!;
+        const runtimeObjects = runtimeInstanceContainer.getObjects(objectName)!;
         changedRuntimeBehaviors.forEach((changedRuntimeBehavior) => {
           const behaviorTypeName = changedRuntimeBehavior.behaviorTypeName;
 
@@ -727,7 +900,7 @@ namespace gdjs {
     _hotReloadRuntimeSceneObjects(
       oldObjects: ObjectData[],
       newObjects: ObjectData[],
-      runtimeScene: gdjs.RuntimeScene
+      runtimeInstanceContainer: gdjs.RuntimeInstanceContainer
     ): void {
       oldObjects.forEach((oldObjectData) => {
         const name = oldObjectData.name;
@@ -742,13 +915,13 @@ namespace gdjs {
         // its name (it's not expected to change).
         if (!newObjectData || oldObjectData.type !== newObjectData.type) {
           // Object was removed or object type was changed (considered as a removal of the old object)
-          runtimeScene.unregisterObject(name);
+          runtimeInstanceContainer.unregisterObject(name);
         } else {
-          if (runtimeScene.isObjectRegistered(name)) {
+          if (runtimeInstanceContainer.isObjectRegistered(name)) {
             this._hotReloadRuntimeSceneObject(
               oldObjectData,
               newObjectData,
-              runtimeScene
+              runtimeInstanceContainer
             );
           }
         }
@@ -760,10 +933,10 @@ namespace gdjs {
         )[0];
         if (
           (!oldObjectData || oldObjectData.type !== newObjectData.type) &&
-          !runtimeScene.isObjectRegistered(name)
+          !runtimeInstanceContainer.isObjectRegistered(name)
         ) {
           // Object was added or object type was changed (considered as adding the new object)
-          runtimeScene.registerObject(newObjectData);
+          runtimeInstanceContainer.registerObject(newObjectData);
         }
       });
     }
@@ -771,7 +944,7 @@ namespace gdjs {
     _hotReloadRuntimeSceneObject(
       oldObjectData: ObjectData,
       newObjectData: ObjectData,
-      runtimeScene: gdjs.RuntimeScene
+      runtimeInstanceContainer: gdjs.RuntimeInstanceContainer
     ): void {
       let hotReloadSucceeded = true;
       if (!HotReloader.deepEqual(oldObjectData, newObjectData)) {
@@ -784,10 +957,12 @@ namespace gdjs {
         });
 
         // Register the updated object data, used for new instances.
-        runtimeScene.updateObject(newObjectData);
+        runtimeInstanceContainer.updateObject(newObjectData);
 
         // Update existing instances
-        const runtimeObjects = runtimeScene.getObjects(newObjectData.name)!;
+        const runtimeObjects = runtimeInstanceContainer.getObjects(
+          newObjectData.name
+        )!;
 
         // Update instances state
         runtimeObjects.forEach((runtimeObject) => {
@@ -1005,7 +1180,7 @@ namespace gdjs {
     _hotReloadRuntimeSceneLayers(
       oldLayers: LayerData[],
       newLayers: LayerData[],
-      runtimeScene: gdjs.RuntimeScene
+      runtimeInstanceContainer: gdjs.RuntimeInstanceContainer
     ): void {
       oldLayers.forEach((oldLayerData) => {
         const name = oldLayerData.name;
@@ -1014,10 +1189,10 @@ namespace gdjs {
         )[0];
         if (!newLayerData) {
           // Layer was removed
-          runtimeScene.removeLayer(name);
+          runtimeInstanceContainer.removeLayer(name);
         } else {
-          if (runtimeScene.hasLayer(name)) {
-            const layer = runtimeScene.getLayer(name);
+          if (runtimeInstanceContainer.hasLayer(name)) {
+            const layer = runtimeInstanceContainer.getLayer(name);
             this._hotReloadRuntimeLayer(oldLayerData, newLayerData, layer);
           }
         }
@@ -1027,13 +1202,13 @@ namespace gdjs {
         const oldLayerData = oldLayers.filter(
           (layerData) => layerData.name === name
         )[0];
-        if (!oldLayerData && !runtimeScene.hasLayer(name)) {
+        if (!oldLayerData && !runtimeInstanceContainer.hasLayer(name)) {
           // Layer was added
-          runtimeScene.addLayer(newLayerData);
+          runtimeInstanceContainer.addLayer(newLayerData);
         }
       });
       newLayers.forEach((newLayerData, index) => {
-        runtimeScene.setLayerIndex(newLayerData.name, index);
+        runtimeInstanceContainer.setLayerIndex(newLayerData.name, index);
       });
     }
 
@@ -1168,11 +1343,16 @@ namespace gdjs {
     }
 
     _hotReloadRuntimeSceneInstances(
+      oldProjectData: ProjectData,
+      newProjectData: ProjectData,
+      changedRuntimeBehaviors: ChangedRuntimeBehavior[],
+      oldObjects: ObjectData[],
+      newObjects: ObjectData[],
       oldInstances: InstanceData[],
       newInstances: InstanceData[],
-      runtimeScene: gdjs.RuntimeScene
+      runtimeInstanceContainer: gdjs.RuntimeInstanceContainer
     ): void {
-      const runtimeObjects = runtimeScene.getAdhocListOfAllInstances();
+      const runtimeObjects = runtimeInstanceContainer.getAdhocListOfAllInstances();
       const groupedOldInstances: {
         [key: number]: InstanceData;
       } = HotReloader.groupByPersistentUuid(oldInstances);
@@ -1182,30 +1362,73 @@ namespace gdjs {
       const groupedRuntimeObjects: {
         [key: number]: gdjs.RuntimeObject;
       } = HotReloader.groupByPersistentUuid(runtimeObjects);
-      for (let persistentUuid in groupedOldInstances) {
+
+      const oldObjectsMap = HotReloader.indexByName(oldObjects);
+      const newObjectsMap = HotReloader.indexByName(newObjects);
+
+      for (const persistentUuid in groupedOldInstances) {
         const oldInstance = groupedOldInstances[persistentUuid];
         const newInstance = groupedNewInstances[persistentUuid];
         const runtimeObject = groupedRuntimeObjects[persistentUuid];
+
         if (
           oldInstance &&
           (!newInstance || oldInstance.name !== newInstance.name)
         ) {
           // Instance was deleted (or object name changed, in which case it will be re-created later)
           if (runtimeObject) {
-            runtimeObject.deleteFromScene(runtimeScene);
+            runtimeObject.deleteFromScene(runtimeInstanceContainer);
           }
         } else {
-          if (oldInstance && newInstance && runtimeObject) {
-            // Instance was not deleted nor created, maybe modified (or not):
-            this._hotReloadRuntimeInstance(
-              oldInstance,
-              newInstance,
-              runtimeObject
-            );
-          }
         }
       }
-      for (let persistentUuid in groupedNewInstances) {
+
+      for (const persistentUuid in groupedRuntimeObjects) {
+        const runtimeObject = groupedRuntimeObjects[persistentUuid];
+        const oldObjectData = oldObjectsMap.get(runtimeObject.getName());
+        const newObjectData = newObjectsMap.get(runtimeObject.getName());
+        if (!runtimeObject || !oldObjectData || !newObjectData) {
+          // New objects or deleted objects can't have instances to hot-reload.
+          continue;
+        }
+        const oldInstance = groupedOldInstances[persistentUuid];
+        const newInstance = groupedNewInstances[persistentUuid];
+        if (oldInstance && newInstance) {
+          // Instance was not deleted nor created, maybe modified (or not):
+          this._hotReloadRuntimeInstance(
+            oldProjectData,
+            newProjectData,
+            changedRuntimeBehaviors,
+            oldObjectData,
+            newObjectData,
+            oldInstance,
+            newInstance,
+            runtimeObject
+          );
+        } else if (runtimeObject instanceof gdjs.CustomRuntimeObject) {
+          const childrenInstanceContainer = runtimeObject.getChildrenContainer();
+
+          // The `objects` attribute is already resolved by `resolveCustomObjectConfigurations()`.
+          const oldCustomObjectData = oldObjectData as ObjectData &
+            CustomObjectConfiguration &
+            InstanceContainerData;
+          const newCustomObjectData = newObjectData as ObjectData &
+            CustomObjectConfiguration &
+            InstanceContainerData;
+
+          // Reload the content of custom objects that were created at runtime.
+          this._hotReloadRuntimeInstanceContainer(
+            oldProjectData,
+            newProjectData,
+            oldCustomObjectData,
+            newCustomObjectData,
+            changedRuntimeBehaviors,
+            childrenInstanceContainer
+          );
+        }
+      }
+
+      for (const persistentUuid in groupedNewInstances) {
         const oldInstance = groupedOldInstances[persistentUuid];
         const newInstance = groupedNewInstances[persistentUuid];
         const runtimeObject = groupedRuntimeObjects[persistentUuid];
@@ -1216,7 +1439,7 @@ namespace gdjs {
         ) {
           // Instance was created (or object name changed, in which case it was destroyed previously)
           // and we verified that runtimeObject does not exist.
-          runtimeScene.createObjectsFrom(
+          runtimeInstanceContainer.createObjectsFrom(
             [newInstance],
             0,
             0,
@@ -1229,6 +1452,11 @@ namespace gdjs {
     }
 
     _hotReloadRuntimeInstance(
+      oldProjectData: ProjectData,
+      newProjectData: ProjectData,
+      changedRuntimeBehaviors: ChangedRuntimeBehavior[],
+      oldObjectData: ObjectData,
+      newObjectData: ObjectData,
       oldInstance: InstanceData,
       newInstance: InstanceData,
       runtimeObject: gdjs.RuntimeObject
@@ -1325,6 +1553,26 @@ namespace gdjs {
           // `extraInitializationFromInitialInstance`.
           sizeChanged = true;
         }
+      }
+      if (runtimeObject instanceof gdjs.CustomRuntimeObject) {
+        const childrenInstanceContainer = runtimeObject.getChildrenContainer();
+
+        // The `objects` attribute is already resolved by `resolveCustomObjectConfigurations()`.
+        const oldCustomObjectData = oldObjectData as ObjectData &
+          CustomObjectConfiguration &
+          InstanceContainerData;
+        const newCustomObjectData = newObjectData as ObjectData &
+          CustomObjectConfiguration &
+          InstanceContainerData;
+
+        this._hotReloadRuntimeInstanceContainer(
+          oldProjectData,
+          newProjectData,
+          oldCustomObjectData,
+          newCustomObjectData,
+          changedRuntimeBehaviors,
+          childrenInstanceContainer
+        );
       }
 
       // Update variables

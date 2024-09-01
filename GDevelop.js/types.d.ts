@@ -5,15 +5,15 @@ declare class EmscriptenObject {
   /** The object's index in the WASM memory, and thus its unique identifier. */
   ptr: number;
 
-  /** 
-   * Call this to free the object's underlying memory. It may not be used afterwards. 
-   * 
-   * **Call with care** - if the object owns some other objects, those will also be destroyed, 
-   * or if this object is owned by another object that does not expect it to be externally deleted 
+  /**
+   * Call this to free the object's underlying memory. It may not be used afterwards.
+   *
+   * **Call with care** - if the object owns some other objects, those will also be destroyed,
+   * or if this object is owned by another object that does not expect it to be externally deleted
    * (e.g. it is a child of a map), objects will be put in an invalid state that will most likely
    * crash the app.
-   * 
-   * If the object is owned by your code, you should still call this method when adequate, as 
+   *
+   * If the object is owned by your code, you should still call this method when adequate, as
    * otherwise the memory will never be freed, causing a memory leak, which is to be avoided.
    */
   delete(): void;
@@ -21,11 +21,12 @@ declare class EmscriptenObject {
 
 export enum Variable_Type {
   Unknown = 0,
-  String = 1,
-  Number = 2,
-  Boolean = 3,
-  Structure = 4,
-  Array = 5,
+  MixedTypes = 1,
+  String = 2,
+  Number = 3,
+  Boolean = 4,
+  Structure = 5,
+  Array = 6,
 }
 
 export enum VariablesContainer_SourceType {
@@ -43,6 +44,12 @@ export enum ObjectsContainersList_VariableExistence {
   Exists = 1,
   GroupIsEmpty = 2,
   ExistsOnlyOnSomeObjectsOfTheGroup = 3,
+}
+
+export enum QuickCustomization_Visibility {
+  Default = 0,
+  Visible = 1,
+  Hidden = 2,
 }
 
 export enum ProjectDiagnostic_ErrorType {
@@ -221,9 +228,6 @@ export class VersionWrapper extends EmscriptenObject {
   static revision(): number;
   static fullString(): string;
   static status(): string;
-  static year(): string;
-  static month(): string;
-  static date(): string;
 }
 
 export class Platform extends EmscriptenObject {
@@ -279,6 +283,7 @@ export class Variable extends EmscriptenObject {
   getValue(): number;
   setBool(val: boolean): void;
   getBool(): boolean;
+  hasMixedValues(): boolean;
   setFolded(val: boolean): void;
   isFolded(): boolean;
   getChildrenCount(): number;
@@ -344,6 +349,11 @@ export class ObjectGroup extends EmscriptenObject {
   getAllObjectsNames(): VectorString;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(element: SerializerElement): void;
+}
+
+export class GroupVariableHelper extends EmscriptenObject {
+  static mergeVariableContainers(objectsContainersList: ObjectsContainersList, objectGroup: ObjectGroup): VariablesContainer;
+  static fillAnyVariableBetweenObjects(globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, objectGroup: ObjectGroup): void;
 }
 
 export class ObjectGroupsContainer extends EmscriptenObject {
@@ -437,6 +447,8 @@ export class ObjectFolderOrObject extends EmscriptenObject {
   moveChild(oldIndex: number, newIndex: number): void;
   removeFolderChild(childToRemove: ObjectFolderOrObject): void;
   isADescendantOf(otherObjectFolderOrObject: ObjectFolderOrObject): boolean;
+  getQuickCustomizationVisibility(): QuickCustomization_Visibility;
+  setQuickCustomizationVisibility(visibility: QuickCustomization_Visibility): void;
 }
 
 export class ObjectsContainer extends EmscriptenObject {
@@ -583,9 +595,12 @@ export class ObjectsContainersList extends EmscriptenObject {
   getTypeOfObject(objectName: string): string;
   getTypeOfBehavior(name: string, searchInGroups: boolean): string;
   getBehaviorsOfObject(name: string, searchInGroups: boolean): VectorString;
+  getAnimationNamesOfObject(name: string): VectorString;
   getTypeOfBehaviorInObjectOrGroup(objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): string;
   hasObjectOrGroupNamed(name: string): boolean;
   hasObjectOrGroupWithVariableNamed(objectName: string, variableName: string): ObjectsContainersList_VariableExistence;
+  getObjectsContainer(index: number): ObjectsContainer;
+  getObjectsContainersCount(): number;
 }
 
 export class ProjectScopedContainers extends EmscriptenObject {
@@ -598,7 +613,7 @@ export class ProjectScopedContainers extends EmscriptenObject {
   static makeNewProjectScopedContainersForEventsBasedObject(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, outputObjectsContainer: ObjectsContainer): ProjectScopedContainers;
   static makeNewProjectScopedContainersWithLocalVariables(projectScopedContainers: ProjectScopedContainers, event: BaseEvent): ProjectScopedContainers;
   addPropertiesContainer(propertiesContainer: PropertiesContainer): ProjectScopedContainers;
-  addParameters(parameters: VectorParameterMetadata): ProjectScopedContainers;
+  addParameters(parameters: ParameterMetadataContainer): ProjectScopedContainers;
   getObjectsContainersList(): ObjectsContainersList;
   getVariablesContainersList(): VariablesContainersList;
 }
@@ -656,6 +671,7 @@ export class ObjectConfiguration extends EmscriptenObject {
   constructor();
   clone(): UniquePtrObjectConfiguration;
   getType(): string;
+  setType(typeName: string): void;
   getProperties(): MapStringPropertyDescriptor;
   updateProperty(name: string, value: string): boolean;
   getInitialInstanceProperties(instance: InitialInstance): MapStringPropertyDescriptor;
@@ -663,6 +679,7 @@ export class ObjectConfiguration extends EmscriptenObject {
   exposeResources(worker: ArbitraryResourceWorker): void;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
+  getAnimationsCount(): number;
 }
 
 export class UniquePtrObjectConfiguration extends EmscriptenObject {
@@ -714,6 +731,10 @@ export class ObjectJsImplementation extends ObjectConfiguration {
 
 export class CustomObjectConfiguration extends ObjectConfiguration {
   clone(): UniquePtrObjectConfiguration;
+  isForcedToOverrideEventsBasedObjectChildrenConfiguration(): boolean;
+  isMarkedAsOverridingEventsBasedObjectChildrenConfiguration(): boolean;
+  setMarkedAsOverridingEventsBasedObjectChildrenConfiguration(isOverridingEventsBasedObjectChildrenConfiguration: boolean): void;
+  clearChildrenConfiguration(): void;
   getChildObjectConfiguration(objectName: string): ObjectConfiguration;
   getProperties(): MapStringPropertyDescriptor;
   updateProperty(name: string, value: string): boolean;
@@ -887,6 +908,8 @@ export class PropertyDescriptor extends EmscriptenObject {
   isAdvanced(): boolean;
   getMeasurementUnit(): MeasurementUnit;
   setMeasurementUnit(measurementUnit: MeasurementUnit): PropertyDescriptor;
+  getQuickCustomizationVisibility(): QuickCustomization_Visibility;
+  setQuickCustomizationVisibility(visibility: QuickCustomization_Visibility): PropertyDescriptor;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(element: SerializerElement): void;
   serializeValuesTo(element: SerializerElement): void;
@@ -1266,7 +1289,7 @@ export class InstructionMetadata extends AbstractFunctionMetadata {
   canHaveSubInstructions(): boolean;
   getParameter(index: number): ParameterMetadata;
   getParametersCount(): number;
-  getParameters(): VectorParameterMetadata;
+  getParameters(): ParameterMetadataContainer;
   getUsageComplexity(): number;
   isHidden(): boolean;
   isPrivate(): boolean;
@@ -1323,7 +1346,7 @@ export class ExpressionMetadata extends AbstractFunctionMetadata {
   isRelevantForCustomObjectEvents(): boolean;
   getParameter(id: number): ParameterMetadata;
   getParametersCount(): number;
-  getParameters(): VectorParameterMetadata;
+  getParameters(): ParameterMetadataContainer;
   setHidden(): ExpressionMetadata;
   setPrivate(): ExpressionMetadata;
   setRelevantForLayoutEventsOnly(): ExpressionMetadata;
@@ -1431,21 +1454,23 @@ export class ValueTypeMetadata extends EmscriptenObject {
   unserializeFrom(element: SerializerElement): void;
 }
 
-export class VectorParameterMetadata extends EmscriptenObject {
-  constructor();
-  push_back(parameterMetadata: ParameterMetadata): void;
-  size(): number;
-  at(index: number): ParameterMetadata;
-  set(index: number, parameterMetadata: ParameterMetadata): void;
-  removeFromVectorParameterMetadata(index: number): void;
-  insertIntoVectorParameterMetadata(index: number, parameterMetadata: ParameterMetadata): void;
-  swapInVectorParameterMetadata(oldIndex: number, newIndex: number): void;
-  clear(): void;
+export class ParameterMetadataContainer extends EmscriptenObject {
+  insertNewParameter(name: string, pos: number): ParameterMetadata;
+  insertParameter(parameterMetadata: ParameterMetadata, pos: number): ParameterMetadata;
+  hasParameterNamed(name: string): boolean;
+  getParameter(name: string): ParameterMetadata;
+  getParameterAt(pos: number): ParameterMetadata;
+  removeParameter(name: string): void;
+  moveParameter(oldIndex: number, newIndex: number): void;
+  getParametersCount(): number;
+  getParameterPosition(parameterMetadata: ParameterMetadata): number;
+  clearParameters(): void;
+  addNewParameter(name: string): ParameterMetadata;
 }
 
 export class ParameterMetadataTools extends EmscriptenObject {
-  static parametersToObjectsContainer(project: Project, parameters: VectorParameterMetadata, outputObjectsContainer: ObjectsContainer): void;
-  static getObjectParameterIndexFor(parameters: VectorParameterMetadata, parameterIndex: number): number;
+  static parametersToObjectsContainer(project: Project, parameters: ParameterMetadataContainer, outputObjectsContainer: ObjectsContainer): void;
+  static getObjectParameterIndexFor(parameters: ParameterMetadataContainer, parameterIndex: number): number;
 }
 
 export class ObjectMetadata extends EmscriptenObject {
@@ -1477,6 +1502,11 @@ export class ObjectMetadata extends EmscriptenObject {
   isHidden(): boolean;
   markAsRenderedIn3D(): ObjectMetadata;
   isRenderedIn3D(): boolean;
+}
+
+export class QuickCustomization extends EmscriptenObject {static Default = 0;
+  static Visible = 1;
+  static Hidden = 2;
 }
 
 export class BehaviorMetadata extends EmscriptenObject {
@@ -1513,6 +1543,8 @@ export class BehaviorMetadata extends EmscriptenObject {
   setPrivate(): BehaviorMetadata;
   isHidden(): boolean;
   setHidden(): BehaviorMetadata;
+  getQuickCustomizationVisibility(): QuickCustomization_Visibility;
+  setQuickCustomizationVisibility(visibility: QuickCustomization_Visibility): BehaviorMetadata;
   get(): Behavior;
   getSharedDataInstance(): BehaviorsSharedData;
   getProperties(): MapStringPropertyDescriptor;
@@ -1794,6 +1826,7 @@ export class VariablesChangeset extends EmscriptenObject {
 export class WholeProjectRefactorer extends EmscriptenObject {
   static computeChangesetForVariablesContainer(oldSerializedVariablesContainer: SerializerElement, newVariablesContainer: VariablesContainer): VariablesChangeset;
   static applyRefactoringForVariablesContainer(project: Project, newVariablesContainer: VariablesContainer, changeset: VariablesChangeset, originalSerializedVariables: SerializerElement): void;
+  static applyRefactoringForGroupVariablesContainer(project: Project, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, groupVariablesContainer: VariablesContainer, objectGroup: ObjectGroup, changeset: VariablesChangeset, originalSerializedVariables: SerializerElement): void;
   static renameEventsFunctionsExtension(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, oldName: string, newName: string): void;
   static updateExtensionNameInEventsBasedBehavior(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, sourceExtensionName: string): void;
   static renameEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, oldName: string, newName: string): void;
@@ -1810,14 +1843,19 @@ export class WholeProjectRefactorer extends EmscriptenObject {
   static renameLayout(project: Project, oldName: string, newName: string): void;
   static renameExternalLayout(project: Project, oldName: string, newName: string): void;
   static renameExternalEvents(project: Project, oldName: string, newName: string): void;
-  static renameLayer(project: Project, layout: Layout, oldName: string, newName: string): void;
-  static renameLayerEffect(project: Project, layout: Layout, layer: Layer, oldName: string, newName: string): void;
-  static renameObjectAnimation(project: Project, layout: Layout, gdObject: gdObject, oldName: string, newName: string): void;
-  static renameObjectPoint(project: Project, layout: Layout, gdObject: gdObject, oldName: string, newName: string): void;
-  static renameObjectEffect(project: Project, layout: Layout, gdObject: gdObject, oldName: string, newName: string): void;
-  static objectOrGroupRenamedInLayout(project: Project, layout: Layout, oldName: string, newName: string, isObjectGroup: boolean): void;
-  static objectRemovedInLayout(project: Project, layout: Layout, objectName: string): void;
-  static behaviorsAddedToObjectInLayout(project: Project, layout: Layout, objectName: string): void;
+  static renameLayerInScene(project: Project, scene: Layout, oldName: string, newName: string): void;
+  static renameLayerInEventsBasedObject(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, oldName: string, newName: string): void;
+  static renameLayerEffectInScene(project: Project, scene: Layout, layer: Layer, oldName: string, newName: string): void;
+  static renameLayerEffectInEventsBasedObject(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, layer: Layer, oldName: string, newName: string): void;
+  static renameObjectAnimationInScene(project: Project, scene: Layout, gdObject: gdObject, oldName: string, newName: string): void;
+  static renameObjectAnimationInEventsBasedObject(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, gdObject: gdObject, oldName: string, newName: string): void;
+  static renameObjectPointInScene(project: Project, scene: Layout, gdObject: gdObject, oldName: string, newName: string): void;
+  static renameObjectPointInEventsBasedObject(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, gdObject: gdObject, oldName: string, newName: string): void;
+  static renameObjectEffectInScene(project: Project, scene: Layout, gdObject: gdObject, oldName: string, newName: string): void;
+  static renameObjectEffectInEventsBasedObject(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, gdObject: gdObject, oldName: string, newName: string): void;
+  static objectOrGroupRenamedInScene(project: Project, scene: Layout, oldName: string, newName: string, isObjectGroup: boolean): void;
+  static objectRemovedInScene(project: Project, scene: Layout, objectName: string): void;
+  static behaviorsAddedToObjectInScene(project: Project, scene: Layout, objectName: string): void;
   static objectOrGroupRenamedInEventsFunction(project: Project, projectScopedContainers: ProjectScopedContainers, eventsFunction: EventsFunction, oldName: string, newName: string, isObjectGroup: boolean): void;
   static objectRemovedInEventsFunction(project: Project, eventsFunction: EventsFunction, objectName: string): void;
   static objectOrGroupRenamedInEventsBasedObject(project: Project, projectScopedContainers: ProjectScopedContainers, eventsBasedObject: EventsBasedObject, oldName: string, newName: string, isObjectGroup: boolean): void;
@@ -2033,8 +2071,8 @@ export class EventsFunction extends EmscriptenObject {
   setFunctionType(type: EventsFunction_FunctionType): EventsFunction;
   getFunctionType(): EventsFunction_FunctionType;
   getEvents(): EventsList;
-  getParameters(): VectorParameterMetadata;
-  getParametersForEvents(functionsContainer: EventsFunctionsContainer): VectorParameterMetadata;
+  getParameters(): ParameterMetadataContainer;
+  getParametersForEvents(functionsContainer: EventsFunctionsContainer): ParameterMetadataContainer;
   getObjectGroups(): ObjectGroupsContainer;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
@@ -2071,6 +2109,8 @@ export class EventsBasedBehavior extends AbstractEventsBasedEntity {
   getObjectType(): string;
   setPrivate(isPrivate: boolean): EventsBasedBehavior;
   isPrivate(): boolean;
+  setQuickCustomizationVisibility(visibility: QuickCustomization_Visibility): EventsBasedBehavior;
+  getQuickCustomizationVisibility(): QuickCustomization_Visibility;
   getSharedPropertyDescriptors(): PropertiesContainer;
   static getPropertyActionName(propertyName: string): string;
   static getPropertyConditionName(propertyName: string): string;
@@ -2447,6 +2487,8 @@ export class SpriteObject extends ObjectConfiguration {
   getAnimations(): SpriteAnimationList;
   setUpdateIfNotVisible(updateIfNotVisible: boolean): void;
   getUpdateIfNotVisible(): boolean;
+  setPreScale(value: number): void;
+  getPreScale(): number;
 }
 
 export class Model3DAnimation extends EmscriptenObject {
@@ -2806,12 +2848,6 @@ export function getTypeOfBehaviorInObjectOrGroup(layout: ObjectsContainer, objec
 
 export function getBehaviorNamesInObjectOrGroup(layout: ObjectsContainer, objectOrGroupName: string, behaviorType: string, searchInGroups: boolean): VectorString;
 
-export function removeFromVectorParameterMetadata(index: number): void;
-
-export function insertIntoVectorParameterMetadata(index: number, parameterMetadata: ParameterMetadata): void;
-
-export function swapInVectorParameterMetadata(oldIndex: number, newIndex: number): void;
-
 export function removeFromVectorPolygon2d(index: number): void;
 
 export function removeFromVectorVector2f(index: number): void;
@@ -2873,9 +2909,9 @@ export const Object: typeof gdObject;
 export const initializePlatforms: typeof ProjectHelper.initializePlatforms;
 
 /**
- * Returns the pointer in WASM memory to an object. It is a number that uniquely 
+ * Returns the pointer in WASM memory to an object. It is a number that uniquely
  * represents that instance of the object.
- * 
+ *
  * @see {@link wrapPointer} to convert a pointer back to an object.
  */
 export function getPointer(object: EmscriptenObject): number;
@@ -2887,15 +2923,15 @@ type ClassConstructor<T> = {
 /**
  * Wraps a pointer with a wrapper class, allowing to use the object located at the
  * pointer's destination as an instance of that class.
- * 
+ *
  * @see {@link getPointer} to get a pointer from an object.
  */
 export function wrapPointer<T extends EmscriptenObject>(ptr: number, objectClass: ClassConstructor<T>): T;
 
 /**
  * Casts an object to another class type.
- * 
- * **Careful** - this is not a conversion function. 
+ *
+ * **Careful** - this is not a conversion function.
  * This only changes the class type and functions exposed, not the underlying memory.
  * Only cast to another class if you are certain that the underlying memory is of that type!
  */
@@ -2906,23 +2942,23 @@ export function castObject<T extends EmscriptenObject>(object: EmscriptenObject,
  * A reference to the object itself is not trustworthy, since there may be multiple
  * wrapper objects (which allow to call C++ function on C++ memory) for a single
  * pointer ("real object").
- * 
+ *
  * This function must be therefore used to check for referential equality instead of
  * JavaScript's standard equality operators when handling Emscripten objects.
  */
 export function compare<T extends EmscriptenObject>(object1: T, object2: T): boolean;
 
-/** 
- * Call this to free the object's underlying memory. It may not be used afterwards. 
- * 
- * **Call with care** - if the object owns some other objects, those will also be destroyed, 
- * or if this object is owned by another object that does not expect it to be externally deleted 
+/**
+ * Call this to free the object's underlying memory. It may not be used afterwards.
+ *
+ * **Call with care** - if the object owns some other objects, those will also be destroyed,
+ * or if this object is owned by another object that does not expect it to be externally deleted
  * (e.g. it is a child of a map), objects will be put in an invalid state that will most likely
  * crash the app.
- * 
- * If the object is owned by your code, you should still call this method when adequate, as 
+ *
+ * If the object is owned by your code, you should still call this method when adequate, as
  * otherwise the memory will never be freed, causing a memory leak, which is to be avoided.
- * 
+ *
  * The alias {@link EmscriptenObject.delete} is recommended instead, for readability.
  */
 export function destroy(object: EmscriptenObject): void;

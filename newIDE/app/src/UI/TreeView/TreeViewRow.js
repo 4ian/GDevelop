@@ -26,6 +26,8 @@ const stopPropagation = e => e.stopPropagation();
 
 const DELAY_BEFORE_OPENING_FOLDER_ON_DRAG_HOVER = 800;
 const DELAY_BEFORE_OPENING_CONTEXT_MENU_ON_MOBILE = 1000;
+export const TREE_VIEW_ROW_HEIGHT = 32;
+const COLLAPSABLE_LINE_SIDE_DROP_ZONE_HEIGHT = 6;
 
 const onInputKeyDown = (event: KeyboardEvent) => {
   if (navigationKeys.includes(event.key)) {
@@ -104,9 +106,7 @@ const SemiControlledRowInput = ({
   );
 };
 
-const memoized = memoizeOne((initialValue, getContainerYPosition) =>
-  getContainerYPosition()
-);
+const memoized = memoizeOne((initialValue, callback) => callback());
 
 type Props<Item> = {|
   index: number,
@@ -292,9 +292,12 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
             if (displayAsFolder) {
               if (node.collapsed) {
                 setWhereToDrop(
-                  y - containerYPosition <= 6
+                  y - containerYPosition <=
+                    COLLAPSABLE_LINE_SIDE_DROP_ZONE_HEIGHT
                     ? 'before'
-                    : y - containerYPosition <= 26
+                    : y - containerYPosition <=
+                      TREE_VIEW_ROW_HEIGHT +
+                        COLLAPSABLE_LINE_SIDE_DROP_ZONE_HEIGHT
                     ? 'inside'
                     : 'after'
                 );
@@ -304,11 +307,18 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                 // although dropping the element after would put it below the last
                 // displayed child of the folder).
                 setWhereToDrop(
-                  y - containerYPosition <= 6 ? 'before' : 'inside'
+                  y - containerYPosition <=
+                    COLLAPSABLE_LINE_SIDE_DROP_ZONE_HEIGHT
+                    ? 'before'
+                    : 'inside'
                 );
               }
             } else {
-              setWhereToDrop(y - containerYPosition <= 16 ? 'before' : 'after');
+              setWhereToDrop(
+                y - containerYPosition <= TREE_VIEW_ROW_HEIGHT / 2
+                  ? 'before'
+                  : 'after'
+              );
             }
           }
         }}

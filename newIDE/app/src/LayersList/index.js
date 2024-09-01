@@ -27,6 +27,8 @@ const DropTarget = makeDropTarget('layers-list');
 type LayersListBodyProps = {|
   project: gdProject,
   layout: gdLayout | null,
+  eventsFunctionsExtension: gdEventsFunctionsExtension | null,
+  eventsBasedObject: gdEventsBasedObject | null,
   layersContainer: gdLayersContainer,
   selectedLayer: string,
   onSelectLayer: string => void,
@@ -47,25 +49,27 @@ const getEffectsCount = (platform: gdPlatform, layer: gdLayer) => {
     : effectsContainer.getEffectsCount();
 };
 
-const LayersListBody = (props: LayersListBodyProps) => {
+const LayersListBody = ({
+  project,
+  layout,
+  eventsFunctionsExtension,
+  eventsBasedObject,
+  layersContainer,
+  onEditEffects,
+  onEdit,
+  width,
+  onLayerRenamed,
+  onRemoveLayer,
+  unsavedChanges,
+  selectedLayer,
+  onSelectLayer,
+}: LayersListBodyProps) => {
   const forceUpdate = useForceUpdate();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const [nameErrors, setNameErrors] = React.useState<{
     [key: string]: React.Node,
   }>({});
   const draggedLayerIndexRef = React.useRef<number | null>(null);
-
-  const {
-    project,
-    layout,
-    layersContainer,
-    onEditEffects,
-    onEdit,
-    width,
-    onLayerRenamed,
-    onRemoveLayer,
-    unsavedChanges,
-  } = props;
 
   const onLayerModified = React.useCallback(
     () => {
@@ -102,8 +106,8 @@ const LayersListBody = (props: LayersListBodyProps) => {
         key={`layer-${layer.ptr}`}
         id={`layer-${i}`}
         layer={layer}
-        isSelected={props.selectedLayer === layerName}
-        onSelect={() => props.onSelectLayer(layerName)}
+        isSelected={selectedLayer === layerName}
+        onSelect={() => onSelectLayer(layerName)}
         nameError={nameErrors[layerName]}
         effectsCount={getEffectsCount(project.getCurrentPlatform(), layer)}
         onEditEffects={() => onEditEffects(layer)}
@@ -129,14 +133,20 @@ const LayersListBody = (props: LayersListBodyProps) => {
           } else {
             layersContainer.getLayer(layerName).setName(newName);
             if (layout) {
-              gd.WholeProjectRefactorer.renameLayer(
+              gd.WholeProjectRefactorer.renameLayerInScene(
                 project,
                 layout,
                 layerName,
                 newName
               );
-            } else {
-              // TODO EBO: refactoring for custom objects.
+            } else if (eventsFunctionsExtension && eventsBasedObject) {
+              gd.WholeProjectRefactorer.renameLayerInEventsBasedObject(
+                project,
+                eventsFunctionsExtension,
+                eventsBasedObject,
+                layerName,
+                newName
+              );
             }
             onLayerRenamed();
             onLayerModified();
@@ -204,6 +214,8 @@ type Props = {|
   selectedLayer: string,
   onSelectLayer: string => void,
   layout: gdLayout | null,
+  eventsFunctionsExtension: gdEventsFunctionsExtension | null,
+  eventsBasedObject: gdEventsBasedObject | null,
   layersContainer: gdLayersContainer,
   onEditLayerEffects: (layer: ?gdLayer) => void,
   onEditLayer: (layer: ?gdLayer) => void,
@@ -231,6 +243,7 @@ const hasLightingLayer = (layersContainer: gdLayersContainer) => {
 
 const LayersList = React.forwardRef<Props, LayersListInterface>(
   (props, ref) => {
+    const { eventsFunctionsExtension, eventsBasedObject } = props;
     const forceUpdate = useForceUpdate();
 
     React.useImperativeHandle(ref, () => ({
@@ -288,6 +301,8 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
                 onSelectLayer={props.onSelectLayer}
                 project={props.project}
                 layout={props.layout}
+                eventsFunctionsExtension={eventsFunctionsExtension}
+                eventsBasedObject={eventsBasedObject}
                 layersContainer={props.layersContainer}
                 onEditEffects={props.onEditLayerEffects}
                 onEdit={props.onEditLayer}

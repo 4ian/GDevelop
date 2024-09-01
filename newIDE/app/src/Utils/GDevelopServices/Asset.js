@@ -95,15 +95,16 @@ export type PublicAssetPacks = {|
   starterPacks: Array<PublicAssetPack>,
 |};
 
-type PrivateAssetPackAssetType =
+export type PrivateAssetPackAssetType =
   | 'font'
   | 'audio'
   | 'sprite'
   | '9patch'
   | 'tiled'
   | 'partial'
-  | 'particleEmitter'
-  | 'Scene3D::Model3DObject';
+  | 'Scene3D::Model3DObject'
+  | 'TileMap::SimpleTileMap'
+  | 'ParticleSystem::ParticleEmitter';
 
 export type PrivateAssetPackContent = { [PrivateAssetPackAssetType]: number };
 

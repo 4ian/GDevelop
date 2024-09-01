@@ -34,7 +34,65 @@ namespace gdjs {
       this.cache.add(key);
       this.keys.push(key);
     }
+
+    clear = () => {
+      this.cache.clear();
+      this.keys = [];
+    };
   }
+
+  class SavedSyncDataUpdates<T> {
+    private _updates: T[] = [];
+
+    store(update: T) {
+      this._updates.push(update);
+      if (this._updates.length > 10) {
+        this._updates.shift();
+      }
+    }
+
+    getUpdates() {
+      return this._updates;
+    }
+
+    remove(update: T) {
+      const index = this._updates.indexOf(update);
+      if (index !== -1) {
+        this._updates.splice(index, 1);
+      }
+    }
+
+    clear() {
+      this._updates = [];
+    }
+  }
+
+  /**
+   * Helper function to clone an object without reassigning the target object.
+   * It's mainly helpful for tests, where multiple instances of the MultiplayerMessageManager are created,
+   * and prevents keeping references to the same object.
+   */
+  const cloneObjectWithoutOverwriting = ({
+    target,
+    source,
+  }: {
+    target: Object;
+    source: Object;
+  }) => {
+    // Add the new properties.
+    for (const key in source) {
+      if (source.hasOwnProperty(key) && !target.hasOwnProperty(key)) {
+        target[key] = source[key];
+      }
+    }
+
+    // Remove the properties that are not in the source.
+    for (const key in target) {
+      if (target.hasOwnProperty(key) && !source.hasOwnProperty(key)) {
+        delete target[key];
+      }
+    }
+  };
 
   export type MultiplayerMessageManager = ReturnType<
     typeof makeMultiplayerMessageManager
@@ -87,28 +145,43 @@ namespace gdjs {
     } = {};
 
     // The number of times per second the scene data should be synchronized.
-    const sceneSyncDataTickRate = 1;
+    const sceneSyncDataSyncRate = 1;
     let lastSceneSyncTimestamp = 0;
     let lastSentSceneSyncData: LayoutNetworkSyncData | null = null;
     let numberOfForcedSceneUpdates = 0;
+    let lastReceivedSceneSyncDataUpdates = new SavedSyncDataUpdates<
+      LayoutNetworkSyncData
+    >();
 
     // The number of times per second the game data should be synchronized.
-    const gameSyncDataTickRate = 1;
+    const gameSyncDataSyncRate = 1;
     let lastGameSyncTimestamp = 0;
     let lastSentGameSyncData: GameNetworkSyncData | null = null;
     let numberOfForcedGameUpdates = 0;
+    let lastReceivedGameSyncDataUpdates = new SavedSyncDataUpdates<
+      GameNetworkSyncData
+    >();
 
-    // Send heartbeat messages to host to ensure the connection is still alive.
-    const heartbeatTickRate = 1;
-    let lastHeartbeatTimestamp = 0;
-    let _playersLastHeartbeatInfo: {
-      [playerNumber: number]: {
-        lastRoundTripTimes: number[];
-      };
+    // Send heartbeat messages from host to players, ensuring their connection is still alive,
+    // measure the ping, and send other useful info.
+    const heartbeatSyncRate = 1;
+    let lastHeartbeatSentTimestamp = 0;
+    let _playersLastRoundTripTimes: {
+      [playerNumber: number]: number[];
     } = {};
     let _peerIdToPlayerNumber: { [peerId: string]: number } = {};
-    let _playersPings: { [playerNumber: number]: number } = { 1: 0 };
+    let _playersInfo: {
+      [playerNumber: number]: {
+        ping: number;
+        playerId: string;
+        username: string;
+      };
+    } = {};
     let _playerNumbersWhoJustLeft: number[] = [];
+    let _playerNumbersWhoJustJoined: number[] = [];
+    let _temporaryPlayerNumberToUsername: {
+      [playerNumber: number]: string;
+    } = {};
 
     const addExpectedMessageAcknowledgement = ({
       originalMessageName,
@@ -155,11 +228,6 @@ namespace gdjs {
           messageRetryTime: messageRetryTime || defaultMessageRetryTime,
         };
       });
-    };
-
-    const clearExpectedMessageAcknowledgements = () => {
-      expectedMessageAcknowledgements = {};
-      _lastClockReceivedByInstanceByScene = {};
     };
 
     const getLastClockReceivedForInstanceOnScene = ({
@@ -290,27 +358,6 @@ namespace gdjs {
           (instance) => instance.networkId === instanceNetworkId
         ) || null;
 
-      if (!instance) {
-        debugLogger.info(
-          `instance ${objectName} ${instanceNetworkId} not found with network ID, trying to find it with persistent UUID.`
-        );
-        instance =
-          instances.find(
-            (instance) =>
-              // For objects created from the start, the network ID is not set yet.
-              instance.persistentUuid &&
-              instance.persistentUuid.substring(0, 8) === instanceNetworkId
-          ) || null;
-
-        if (instance) {
-          debugLogger.info(
-            `instance ${objectName} ${instanceNetworkId} found with persistent UUID. Assigning network ID.`
-          );
-          // Set the network ID, as it was not set yet.
-          instance.networkId = instanceNetworkId;
-        }
-      }
-
       // If we know the position of the object, we can try to find the closest instance not synchronized yet.
       if (!instance && instanceX !== undefined && instanceY !== undefined) {
         debugLogger.info(
@@ -411,6 +458,12 @@ namespace gdjs {
     const handleChangeInstanceOwnerMessagesReceived = (
       runtimeScene: gdjs.RuntimeScene
     ) => {
+      if (!gdjs.multiplayer.isReadyToSendOrReceiveGameUpdateMessages()) {
+        // Change owner messages do not need to be saved for later use, as the game will automatically change the owner of
+        // the instance when receiving an update message with a different owner.
+        return;
+      }
+
       const p2pMessagesMap = gdjs.multiplayerPeerJsHelper.getAllMessagesMap();
       const messageNamesArray = Array.from(p2pMessagesMap.keys());
 
@@ -478,7 +531,10 @@ namespace gdjs {
             currentPlayerObjectOwnership === previousOwner ||
             // the object is already owned by the new owner. (may have been changed by another player faster)
             currentPlayerObjectOwnership === newOwner;
-          if (gdjs.multiplayer.isPlayerHost() && !ownershipChangeIsCoherent) {
+          if (
+            gdjs.multiplayer.isCurrentPlayerHost() &&
+            !ownershipChangeIsCoherent
+          ) {
             // We received an ownership change message for an object which is in an unexpected state.
             // There may be some lag, and multiple ownership changes may have been sent by the other players.
             // As the host, let's not change the ownership and let the player revert it.
@@ -507,7 +563,7 @@ namespace gdjs {
           // If we are the host,
           // so we need to relay the ownership change to others,
           // and expect an acknowledgment from them.
-          if (gdjs.multiplayer.isPlayerHost()) {
+          if (gdjs.multiplayer.isCurrentPlayerHost()) {
             const connectedPeerIds = gdjs.multiplayerPeerJsHelper.getAllPeers();
             // We don't need to send the message to the player who sent the ownership change message.
             const otherPeerIds = connectedPeerIds.filter(
@@ -563,6 +619,12 @@ namespace gdjs {
     const handleUpdateInstanceMessagesReceived = (
       runtimeScene: gdjs.RuntimeScene
     ) => {
+      if (!gdjs.multiplayer.isReadyToSendOrReceiveGameUpdateMessages()) {
+        // Update instance messages do not need to be saved for later use, as the updates are sent pretty often,
+        // a new one will be received very quickly.
+        return;
+      }
+
       const p2pMessagesMap = gdjs.multiplayerPeerJsHelper.getAllMessagesMap();
       const messageNamesArray = Array.from(p2pMessagesMap.keys());
 
@@ -679,7 +741,7 @@ namespace gdjs {
 
           // If we are are the host,
           // we need to relay the position to others except the player who sent the update message.
-          if (gdjs.multiplayer.isPlayerHost()) {
+          if (gdjs.multiplayer.isCurrentPlayerHost()) {
             const connectedPeerIds = gdjs.multiplayerPeerJsHelper.getAllPeers();
             const otherPeerIds = connectedPeerIds.filter(
               (peerId) => peerId !== messageSender
@@ -732,6 +794,12 @@ namespace gdjs {
     const handleChangeVariableOwnerMessagesReceived = (
       runtimeScene: gdjs.RuntimeScene
     ) => {
+      if (!gdjs.multiplayer.isReadyToSendOrReceiveGameUpdateMessages()) {
+        // Change owner messages do not need to be saved for later use, as the game will automatically change the owner of
+        // the variable when receiving an update message with a different owner.
+        return;
+      }
+
       const p2pMessagesMap = gdjs.multiplayerPeerJsHelper.getAllMessagesMap();
       const messageNamesArray = Array.from(p2pMessagesMap.keys());
 
@@ -798,7 +866,10 @@ namespace gdjs {
             currentPlayerVariableOwnership === previousOwner ||
             // the variable is already owned by the new owner. (may have been changed by another player faster)
             currentPlayerVariableOwnership === newOwner;
-          if (gdjs.multiplayer.isPlayerHost() && !ownershipChangeIsCoherent) {
+          if (
+            gdjs.multiplayer.isCurrentPlayerHost() &&
+            !ownershipChangeIsCoherent
+          ) {
             // We received an ownership change message for a variable which is in an unexpected state.
             // There may be some lag, and multiple ownership changes may have been sent by the other players.
             // As the host, let's not change the ownership and let the player revert it.
@@ -827,7 +898,7 @@ namespace gdjs {
           // If we are the host,
           // we need to relay the ownership change to others,
           // and expect an acknowledgment from them.
-          if (gdjs.multiplayer.isPlayerHost()) {
+          if (gdjs.multiplayer.isCurrentPlayerHost()) {
             const connectedPeerIds = gdjs.multiplayerPeerJsHelper.getAllPeers();
             // We don't need to send the message to the player who sent the ownership change message.
             const otherPeerIds = connectedPeerIds.filter(
@@ -884,6 +955,12 @@ namespace gdjs {
     };
 
     const handleAcknowledgeMessagesReceived = () => {
+      if (!gdjs.multiplayer.isReadyToSendOrReceiveGameUpdateMessages()) {
+        // Acknowledgment messages are mainly a response for ownership change, destruction, and custom messages,
+        // which are not sent when the game is not ready.
+        return;
+      }
+
       const p2pMessagesMap = gdjs.multiplayerPeerJsHelper.getAllMessagesMap();
       const messageNamesArray = Array.from(p2pMessagesMap.keys());
       // When we receive acknowledgement messages, save it in the extension, to avoid sending the message again.
@@ -958,6 +1035,12 @@ namespace gdjs {
     const resendClearOrCancelAcknowledgedMessages = (
       runtimeScene: gdjs.RuntimeScene
     ) => {
+      if (!gdjs.multiplayer.isReadyToSendOrReceiveGameUpdateMessages()) {
+        // Acknowledgment messages are mainly a response for ownership change, destruction, and custom messages,
+        // which are not sent when the game is not ready.
+        return;
+      }
+
       // When all acknowledgments are received for an message, we can clear the message from our
       // list of expected acknowledgments.
       const expectedMessageNames = Object.keys(expectedMessageAcknowledgements);
@@ -1179,6 +1262,12 @@ namespace gdjs {
     const handleDestroyInstanceMessagesReceived = (
       runtimeScene: gdjs.RuntimeScene
     ) => {
+      if (!gdjs.multiplayer.isReadyToSendOrReceiveGameUpdateMessages()) {
+        // Destroy messages do not need to be saved for later use, as the game will automatically destroy
+        // the instance if it does not receive an update message from it. So we return early.
+        return;
+      }
+
       const p2pMessagesMap = gdjs.multiplayerPeerJsHelper.getAllMessagesMap();
       const messageNamesArray = Array.from(p2pMessagesMap.keys());
       const destroyInstanceMessageNames = messageNamesArray.filter(
@@ -1253,7 +1342,7 @@ namespace gdjs {
 
           // If we are the host, we need to relay the destruction to others.
           // And expect an acknowledgment from everyone else as well.
-          if (gdjs.multiplayer.isPlayerHost()) {
+          if (gdjs.multiplayer.isCurrentPlayerHost()) {
             const connectedPeerIds = gdjs.multiplayerPeerJsHelper.getAllPeers();
             // We don't need to send the message to the player who sent the destroy message.
             const otherPeerIds = connectedPeerIds.filter(
@@ -1346,7 +1435,7 @@ namespace gdjs {
 
       // If we are the host, we can consider this messaged as received
       // and add it to the list of custom messages to process on top of the messages received.
-      if (gdjs.multiplayer.isPlayerHost()) {
+      if (gdjs.multiplayer.isCurrentPlayerHost()) {
         const messagesList = gdjs.multiplayerPeerJsHelper.getOrCreateMessagesList(
           messageName
         );
@@ -1453,6 +1542,11 @@ namespace gdjs {
     };
 
     const handleCustomMessagesReceived = (): void => {
+      if (!gdjs.multiplayer.isReadyToSendOrReceiveGameUpdateMessages()) {
+        // Assume that the custom messages are not worth saving for later use.
+        return;
+      }
+
       const p2pMessagesMap = gdjs.multiplayerPeerJsHelper.getAllMessagesMap();
       const messageNamesArray = Array.from(p2pMessagesMap.keys());
       const customMessageNames = messageNamesArray.filter((messageName) =>
@@ -1504,7 +1598,7 @@ namespace gdjs {
 
           // If we are the host,
           // so we need to relay the message to others.
-          if (gdjs.multiplayer.isPlayerHost()) {
+          if (gdjs.multiplayer.isCurrentPlayerHost()) {
             // In the case of custom messages, we relay the message to all players, including the sender.
             // This allows the sender to process it the same way others would, when they receive the event.
             const connectedPeerIds = gdjs.multiplayerPeerJsHelper.getAllPeers();
@@ -1562,15 +1656,21 @@ namespace gdjs {
 
     const hasSceneBeenSyncedRecently = () => {
       return (
-        getTimeNow() - lastSceneSyncTimestamp < 1000 / sceneSyncDataTickRate
+        getTimeNow() - lastSceneSyncTimestamp < 1000 / sceneSyncDataSyncRate
       );
     };
 
     const handleUpdateSceneMessagesToSend = (
       runtimeScene: gdjs.RuntimeScene
     ): void => {
+      if (!gdjs.multiplayer.isReadyToSendOrReceiveGameUpdateMessages()) {
+        // Don't send messages if the multiplayer is not ready.
+        return;
+      }
+
       const sceneNetworkSyncData = runtimeScene.getNetworkSyncData({
         playerNumber: gdjs.multiplayer.getCurrentPlayerNumber(),
+        isHost: gdjs.multiplayer.isCurrentPlayerHost(),
       });
       if (!sceneNetworkSyncData) {
         return;
@@ -1622,19 +1722,29 @@ namespace gdjs {
           const messageSender = message.getSender();
           const sceneNetworkId = messageData.id;
 
-          if (sceneNetworkId !== runtimeScene.networkId) {
+          if (gdjs.multiplayer.isReadyToSendOrReceiveGameUpdateMessages()) {
+            if (sceneNetworkId !== runtimeScene.networkId) {
+              debugLogger.info(
+                `Received update of scene ${sceneNetworkId}, but we are on ${runtimeScene.networkId}. Skipping.`
+              );
+              // The scene is not the current scene.
+              return;
+            }
+
+            runtimeScene.updateFromNetworkSyncData(messageData);
+          } else {
+            // If the game is not ready to receive game update messages, we need to save the data for later use.
+            // This can happen when joining a game that is already running.
             debugLogger.info(
-              `Received update of scene ${sceneNetworkId}, but we are on ${runtimeScene.networkId}. Skipping.`
+              `Saving scene ${sceneNetworkId} update message for later use.`
             );
-            // The scene is not the current scene.
+            lastReceivedSceneSyncDataUpdates.store(messageData);
             return;
           }
 
-          runtimeScene.updateFromNetworkSyncData(messageData);
-
           // If we are are the host,
           // we need to relay the scene update to others except the player who sent the update message.
-          if (gdjs.multiplayer.isPlayerHost()) {
+          if (gdjs.multiplayer.isCurrentPlayerHost()) {
             const connectedPeerIds = gdjs.multiplayerPeerJsHelper.getAllPeers();
             // We don't need to send the message to the player who sent the update message.
             const otherPeerIds = connectedPeerIds.filter(
@@ -1711,14 +1821,20 @@ namespace gdjs {
     };
 
     const hasGameBeenSyncedRecently = () => {
-      return getTimeNow() - lastGameSyncTimestamp < 1000 / gameSyncDataTickRate;
+      return getTimeNow() - lastGameSyncTimestamp < 1000 / gameSyncDataSyncRate;
     };
 
     const handleUpdateGameMessagesToSend = (
       runtimeScene: gdjs.RuntimeScene
     ): void => {
+      if (!gdjs.multiplayer.isReadyToSendOrReceiveGameUpdateMessages()) {
+        // Don't send messages if the multiplayer is not ready.
+        return;
+      }
+
       const gameNetworkSyncData = runtimeScene.getGame().getNetworkSyncData({
         playerNumber: gdjs.multiplayer.getCurrentPlayerNumber(),
+        isHost: gdjs.multiplayer.isCurrentPlayerHost(),
       });
       if (!gameNetworkSyncData) {
         return;
@@ -1768,11 +1884,19 @@ namespace gdjs {
         messages.forEach((message) => {
           const messageData = message.getData();
           const messageSender = message.getSender();
-          runtimeScene.getGame().updateFromNetworkSyncData(messageData);
+          if (gdjs.multiplayer.isReadyToSendOrReceiveGameUpdateMessages()) {
+            runtimeScene.getGame().updateFromNetworkSyncData(messageData);
+          } else {
+            // If the game is not ready to receive game update messages, we need to save the data for later use.
+            // This can happen when joining a game that is already running.
+            debugLogger.info(`Saving game update message for later use.`);
+            lastReceivedGameSyncDataUpdates.store(messageData);
+            return;
+          }
 
           // If we are are the host,
           // we need to relay the game update to others except the player who sent the update message.
-          if (gdjs.multiplayer.isPlayerHost()) {
+          if (gdjs.multiplayer.isCurrentPlayerHost()) {
             const connectedPeerIds = gdjs.multiplayerPeerJsHelper.getAllPeers();
             // We don't need to send the message to the player who sent the update message.
             const otherPeerIds = connectedPeerIds.filter(
@@ -1785,23 +1909,60 @@ namespace gdjs {
       });
     };
 
+    const handleSavedUpdateMessages = (runtimeScene: gdjs.RuntimeScene) => {
+      // Reapply the game saved updates.
+      lastReceivedGameSyncDataUpdates.getUpdates().forEach((messageData) => {
+        debugLogger.info(`Reapplying saved update of game.`);
+        runtimeScene.getGame().updateFromNetworkSyncData(messageData);
+      });
+      // Game updates are always applied properly, so we can clear them.
+      lastReceivedGameSyncDataUpdates.clear();
+
+      // Then reapply the scene saved updates.
+      lastReceivedSceneSyncDataUpdates.getUpdates().forEach((messageData) => {
+        const sceneNetworkId = messageData.id;
+
+        if (sceneNetworkId !== runtimeScene.networkId) {
+          debugLogger.info(
+            `Trying to apply saved update of scene ${sceneNetworkId}, but we are on ${runtimeScene.networkId}. Skipping.`
+          );
+          // The scene is not the current scene.
+          return;
+        }
+
+        debugLogger.info(`Reapplying saved update of scene ${sceneNetworkId}.`);
+
+        runtimeScene.updateFromNetworkSyncData(messageData);
+        // We only remove the message if it was successfully applied, so it can be reapplied later,
+        // in case we were not on the right scene.
+        lastReceivedSceneSyncDataUpdates.remove(messageData);
+      });
+    };
+
     const heartbeatMessageNamePrefix = '#heartbeat';
     const heartbeastMessageRegex = /#heartbeat#(.+)/;
     const createHeartbeatMessage = (): {
       messageName: string;
       messageData: any;
     } => {
-      const playersPings = {
-        1: 0, // Player 1 is the host, so we don't need to compute the ping.
+      // If we create the heartbeat meassage, we are the host,
+      // Ensure our player number is correctly set when the first heartbeat is sent.
+      _playersInfo[gdjs.multiplayer.getCurrentPlayerNumber()] = {
+        ping: 0, // we are the host, so we don't need to compute the ping.
+        playerId: gdjs.playerAuthentication.getUserId(),
+        username: gdjs.playerAuthentication.getUsername(),
       };
-      for (const playerNumber in _playersLastHeartbeatInfo) {
-        playersPings[playerNumber] = getPlayerPing(parseInt(playerNumber, 10));
+      for (const playerNumber in _playersInfo) {
+        _playersInfo[playerNumber] = {
+          ..._playersInfo[playerNumber],
+          ping: getPlayerPing(parseInt(playerNumber, 10)),
+        };
       }
       return {
         messageName: `${heartbeatMessageNamePrefix}#${gdjs.multiplayer.getCurrentPlayerNumber()}`,
         messageData: {
           now: getTimeNow(), // we send the current time to compute the ping.
-          playersPings,
+          playersInfo: _playersInfo,
         },
       };
     };
@@ -1817,17 +1978,22 @@ namespace gdjs {
         messageName: `${heartbeatMessageNamePrefix}#${gdjs.multiplayer.getCurrentPlayerNumber()}`,
         messageData: {
           sentAt: heartbeatSentAt,
+          playerId: gdjs.playerAuthentication.getUserId(),
+          username: gdjs.playerAuthentication.getUsername(),
         },
       };
     };
     const hasSentHeartbeatRecently = () => {
-      return getTimeNow() - lastHeartbeatTimestamp < 1000 / heartbeatTickRate;
+      return (
+        !!lastHeartbeatSentTimestamp &&
+        getTimeNow() - lastHeartbeatSentTimestamp < 1000 / heartbeatSyncRate
+      );
     };
     const handleHeartbeatsToSend = () => {
       // Only host sends heartbeats to all players regularly:
       // - it allows them to send a heartbeat back immediately so that the host can compute the ping.
       // - it allows to pass along the pings of all players to all players.
-      if (!gdjs.multiplayer.isPlayerHost()) {
+      if (!gdjs.multiplayer.isCurrentPlayerHost()) {
         return;
       }
 
@@ -1840,7 +2006,7 @@ namespace gdjs {
       const { messageName, messageData } = createHeartbeatMessage();
       sendDataTo(connectedPeerIds, messageName, messageData);
 
-      lastHeartbeatTimestamp = getTimeNow();
+      lastHeartbeatSentTimestamp = getTimeNow();
     };
 
     const handleHeartbeatsReceived = () => {
@@ -1865,10 +2031,53 @@ namespace gdjs {
           // Ensure we know who is who.
           _peerIdToPlayerNumber[messageSender] = playerNumber;
 
-          // If we are not the host, save what the host told us about the pings and respond
-          // with a heartbeat immediately.
-          if (!gdjs.multiplayer.isPlayerHost()) {
-            _playersPings = messageData.playersPings;
+          // If we are not the host, save what the host told us about the other players info
+          // and respond with a heartbeat immediately, informing the host of our playerId and username.
+          if (!gdjs.multiplayer.isCurrentPlayerHost()) {
+            const currentPlayerNumber = gdjs.multiplayer.getCurrentPlayerNumber();
+            const currentlyKnownPlayerNumbers = Object.keys(
+              _playersInfo
+            ).map((playerNumber) => parseInt(playerNumber, 10));
+            const receivedPlayerNumbers = Object.keys(
+              messageData.playersInfo
+            ).map((playerNumber) => parseInt(playerNumber, 10));
+            const currentlyKnownPingForCurrentUser =
+              _playersInfo[currentPlayerNumber] &&
+              _playersInfo[currentPlayerNumber].ping;
+            // If there are no players info yet, we're probably just connecting.
+            // This can happen when joining a game that is already running.
+            // Do not handle this case to avoid displaying too many notifications.
+            if (!!currentlyKnownPlayerNumbers.length) {
+              // Look at the players info received to know if there are new players who just connected.
+              const newPlayerNumbers = receivedPlayerNumbers.filter(
+                (playerNumber) =>
+                  !currentlyKnownPlayerNumbers.includes(playerNumber) &&
+                  playerNumber !== currentPlayerNumber // Do not consider ourselves as a new player.
+              );
+              _playerNumbersWhoJustJoined.push(...newPlayerNumbers);
+              // Or players who have disconnected.
+              const playerNumbersWhoHaveDisconnected = currentlyKnownPlayerNumbers.filter(
+                (playerNumber) => !receivedPlayerNumbers.includes(playerNumber)
+              );
+              _playerNumbersWhoJustLeft.push(
+                ...playerNumbersWhoHaveDisconnected
+              );
+              for (const playerNumber of playerNumbersWhoHaveDisconnected) {
+                // Temporarily save the username in another variable to be used for the notification,
+                // as we're deleting its playerInfo just after.
+                _temporaryPlayerNumberToUsername[
+                  playerNumber
+                ] = getPlayerUsername(playerNumber);
+              }
+            }
+
+            // Save the players info received from the host.
+            // Avoid overwriting the whole object as it can mess up tests that rely on the object reference.
+            cloneObjectWithoutOverwriting({
+              source: messageData.playersInfo,
+              target: _playersInfo,
+            });
+
             const {
               messageName: answerMessageName,
               messageData: answerMessageData,
@@ -1876,27 +2085,44 @@ namespace gdjs {
               heartbeatSentAt: messageData.now, // We send back the time we received, so that the host can compute the ping.
             });
             sendDataTo([messageSender], answerMessageName, answerMessageData);
+            // We have received a heartbeat from the host, informing us of our ping,
+            // so we can consider the connection as working.
+            if (
+              _playersInfo[currentPlayerNumber] !== undefined &&
+              _playersInfo[currentPlayerNumber].ping !== undefined
+            ) {
+              gdjs.multiplayer.markConnectionAsConnected();
+              if (currentlyKnownPingForCurrentUser === undefined) {
+                // We just connected, let's add ourselves to the list of players who just connected,
+                // for the notification and the events.
+                _playerNumbersWhoJustJoined.push(currentPlayerNumber);
+              }
+            }
+
             return;
           }
 
-          // If we are the host, compute the pings based on:
+          // If we are the host.
+
+          // If this is a new player, we're about to send them their ping, so we can consider them connected.
+          if (!_playersInfo[playerNumber]) {
+            _playerNumbersWhoJustJoined.push(playerNumber);
+          }
+
+          // compute the pings based on:
           // - the time we received the heartbeat.
           // - the time the heartbeat was sent.
           const now = getTimeNow();
           const heartbeatSentAt = messageData.sentAt;
           const roundTripTime = Math.round(now - heartbeatSentAt);
-          const playerLastHeartbeatInfo =
-            _playersLastHeartbeatInfo[playerNumber] || {};
           const playerLastRoundTripTimes =
-            playerLastHeartbeatInfo.lastRoundTripTimes || [];
+            _playersLastRoundTripTimes[playerNumber] || [];
           playerLastRoundTripTimes.push(roundTripTime);
           if (playerLastRoundTripTimes.length > 5) {
             // Keep only the last 5 RTT to compute the average.
             playerLastRoundTripTimes.shift();
           }
-          _playersLastHeartbeatInfo[playerNumber] = {
-            lastRoundTripTimes: playerLastRoundTripTimes,
-          };
+          _playersLastRoundTripTimes[playerNumber] = playerLastRoundTripTimes;
 
           let sum = 0;
           for (const lastRoundTripTime of playerLastRoundTripTimes) {
@@ -1905,19 +2131,38 @@ namespace gdjs {
           const averagePing = Math.round(
             sum / playerLastRoundTripTimes.length / 2 // Divide by 2 to get the one way ping.
           );
-          _playersPings[playerNumber] = averagePing;
+          _playersInfo[playerNumber] = {
+            ping: averagePing,
+            playerId: messageData.playerId,
+            username: messageData.username,
+          };
+
+          // If there are new players, let's resend a heartbeat right away so that everyone is aware of them
+          // on approximately the same frame.
+          if (_playerNumbersWhoJustJoined.length) {
+            const connectedPeerIds = gdjs.multiplayerPeerJsHelper.getAllPeers();
+            const { messageName, messageData } = createHeartbeatMessage();
+            sendDataTo(connectedPeerIds, messageName, messageData);
+            lastHeartbeatSentTimestamp = getTimeNow();
+          }
         });
       });
     };
 
+    const hasReceivedHeartbeatFromPlayer = (playerNumber: number) => {
+      // Consider that a player has sent a heartbeat if we have been able to calculate
+      // at least one round trip time for them.
+      const playerLastRoundTripTimes =
+        _playersLastRoundTripTimes[playerNumber] || [];
+      return playerLastRoundTripTimes.length > 0;
+    };
+
     const getPlayerPing = (playerNumber: number) => {
-      if (playerNumber < 1) {
-        // Player 1 is the host, so we don't need to compute the ping.
-        // Any negative number is invalid.
+      const playerInfo = _playersInfo[playerNumber];
+      if (!playerInfo) {
         return 0;
       }
-
-      return _playersPings[playerNumber] || 0;
+      return playerInfo.ping || 0;
     };
 
     const getCurrentPlayerPing = () => {
@@ -1925,39 +2170,77 @@ namespace gdjs {
       return getPlayerPing(currentPlayerNumber);
     };
 
-    const markPlayerAsDisconnected = (playerNumber: number) => {
+    const markPlayerAsDisconnected = ({
+      runtimeScene,
+      playerNumber,
+      peerId,
+    }: {
+      runtimeScene: gdjs.RuntimeScene;
+      playerNumber: number;
+      peerId?: string;
+    }) => {
       logger.info(`Marking player ${playerNumber} as disconnected.`);
       _playerNumbersWhoJustLeft.push(playerNumber);
+      // Temporarily save the username in another variable to be used for the notification,
+      // as we're deleting its playerInfo just after.
+      _temporaryPlayerNumberToUsername[playerNumber] = getPlayerUsername(
+        playerNumber
+      );
+      clearPlayerTempData(playerNumber);
 
-      // If Player 1 has disconnected, just end the game.
-      if (playerNumber === 1) {
-        logger.info('Host has disconnected, ending the game.');
-        _playersLastHeartbeatInfo = {};
-        _playersPings = {};
-        gdjs.multiplayer.handleLobbyGameEnded();
-        return;
+      // If Host has disconnected, either switch host or stop the game.
+      if (peerId && peerId === gdjs.multiplayer.hostPeerId) {
+        const shouldEndLobbyGame = gdjs.multiplayer.shouldEndLobbyWhenHostLeaves();
+        if (shouldEndLobbyGame) {
+          logger.info('Host has disconnected, ending the game.');
+
+          clearAllMessagesTempData();
+          gdjs.multiplayer.handleLobbyGameEnded();
+        } else {
+          logger.info('Host has disconnected, switching host.');
+
+          gdjs.multiplayer.handleHostDisconnected({ runtimeScene });
+          return;
+        }
       }
 
-      // Remove the player from the list of players.
-      // This will cause the next hearbeat to not include this player
-      // and the others will consider them as disconnected.
-      delete _playersLastHeartbeatInfo[playerNumber];
-      delete _playersPings[playerNumber];
+      // If we are the host, send a heartbeat right away so that everyone is aware of the disconnection
+      // on approximately the same frame.
+      if (gdjs.multiplayer.isCurrentPlayerHost()) {
+        const connectedPeerIds = gdjs.multiplayerPeerJsHelper.getAllPeers();
+        const { messageName, messageData } = createHeartbeatMessage();
+        sendDataTo(connectedPeerIds, messageName, messageData);
+        lastHeartbeatSentTimestamp = getTimeNow();
+      }
     };
 
-    const handleDisconnectedPeers = (runtimeScene: RuntimeScene) => {
+    const getPlayerUsername = (playerNumber: number) => {
+      return (
+        (_playersInfo[playerNumber] || {}).username ||
+        _temporaryPlayerNumberToUsername[playerNumber] ||
+        `Player ${playerNumber}`
+      );
+    };
+
+    const getPlayerId = (playerNumber: number) => {
+      return (_playersInfo[playerNumber] || {}).playerId || '';
+    };
+
+    const handleJustDisconnectedPeers = (runtimeScene: RuntimeScene) => {
       // If the game is not running, we don't need to handle disconnected peers.
       if (!gdjs.multiplayer.isLobbyGameRunning()) {
         return;
       }
 
-      // Players can disconnect if the P2P connection disconnects
-      // or if we don't receive heartbeats for a while.
-      const disconnectedPlayerNumbers: number[] = [];
+      // We rely on the p2p helper to know who has disconnected.
+      const justDisconnectedPlayers: {
+        playerNumber: number;
+        peerId: string;
+      }[] = [];
 
-      const disconnectedPeers = gdjs.multiplayerPeerJsHelper.getJustDisconnectedPeers();
-      if (disconnectedPeers.length) {
-        for (const disconnectedPeer of disconnectedPeers) {
+      const justDisconnectedPeers = gdjs.multiplayerPeerJsHelper.getJustDisconnectedPeers();
+      if (justDisconnectedPeers.length) {
+        for (const disconnectedPeer of justDisconnectedPeers) {
           const disconnectedPlayerNumber =
             _peerIdToPlayerNumber[disconnectedPeer];
           if (!disconnectedPlayerNumber) {
@@ -1965,14 +2248,17 @@ namespace gdjs {
             return;
           }
           logger.info(`Player ${disconnectedPlayerNumber} has disconnected.`);
-          disconnectedPlayerNumbers.push(disconnectedPlayerNumber);
+          justDisconnectedPlayers.push({
+            playerNumber: disconnectedPlayerNumber,
+            peerId: disconnectedPeer,
+          });
         }
       }
 
-      for (const playerNumber of disconnectedPlayerNumbers) {
+      for (const { playerNumber, peerId } of justDisconnectedPlayers) {
         // When a player disconnects, as the host, we look at all the instances
         // they own and decide what to do with them.
-        if (gdjs.multiplayer.isPlayerHost()) {
+        if (gdjs.multiplayer.isCurrentPlayerHost()) {
           const instances = runtimeScene.getAdhocListOfAllInstances();
           for (const instance of instances) {
             const behavior = instance.getBehavior(
@@ -1996,33 +2282,68 @@ namespace gdjs {
           }
         }
 
-        markPlayerAsDisconnected(playerNumber);
+        markPlayerAsDisconnected({ runtimeScene, playerNumber, peerId });
       }
     };
 
-    const clearDisconnectedPeers = () => {
-      _playerNumbersWhoJustLeft = [];
-    };
-
-    const hasAnyPlayerLeft = () => {
+    const hasAnyPlayerJustLeft = (): boolean => {
       return _playerNumbersWhoJustLeft.length > 0;
     };
-
-    const hasPlayerLeft = (playerNumber: number) => {
+    const hasPlayerJustLeft = (playerNumber: number): boolean => {
       return _playerNumbersWhoJustLeft.includes(playerNumber);
     };
-
-    const getDisconnectedPlayers = () => {
+    const getPlayersWhoJustLeft = (): number[] => {
       return _playerNumbersWhoJustLeft;
     };
-
-    const getNumberOfConnectedPlayers = () => {
-      // Look at the player pings as a way to know how many players are in the lobby.
-      return Object.keys(_playersPings).length;
+    const getLatestPlayerWhoJustLeft = (): number => {
+      return _playerNumbersWhoJustLeft[0] || 0;
+    };
+    const removePlayerWhoJustLeft = (): void => {
+      // Avoid using shift for test purposes, as it modifies the reference.
+      const playerNumberWhoLeft = _playerNumbersWhoJustLeft[0];
+      if (playerNumberWhoLeft !== undefined) {
+        _playerNumbersWhoJustLeft = _playerNumbersWhoJustLeft.slice(1);
+        delete _temporaryPlayerNumberToUsername[playerNumberWhoLeft];
+      }
     };
 
+    const hasAnyPlayerJustJoined = () => {
+      return _playerNumbersWhoJustJoined.length > 0;
+    };
+    const hasPlayerJustJoined = (playerNumber: number): boolean => {
+      return _playerNumbersWhoJustJoined.includes(playerNumber);
+    };
+    const getPlayersWhoJustJoined = () => {
+      return _playerNumbersWhoJustJoined;
+    };
+    const getLatestPlayerWhoJustJoined = (): number => {
+      return _playerNumbersWhoJustJoined[0] || 0;
+    };
+    const removePlayerWhoJustJoined = (): void => {
+      // Avoid using shift for test purposes, as it modifies the reference.
+      const playerNumberWhoJoined = _playerNumbersWhoJustJoined[0];
+      if (playerNumberWhoJoined !== undefined) {
+        _playerNumbersWhoJustJoined = _playerNumbersWhoJustJoined.slice(1);
+      }
+    };
+
+    const getConnectedPlayers = () => {
+      return Object.keys(_playersInfo).map((playerNumber) => ({
+        playerNumber: parseInt(playerNumber, 10),
+        playerId: _playersInfo[playerNumber].playerId,
+      }));
+    };
+    const getNumberOfConnectedPlayers = () => {
+      // Look at the player info as a way to know how many players are in the lobby.
+      // This object is updated when heartbeats are sent and received.
+      return Object.keys(_playersInfo).length;
+    };
     const isPlayerConnected = (playerNumber: number) => {
-      return _playersPings[playerNumber] !== undefined;
+      return _playersInfo[playerNumber] !== undefined;
+    };
+
+    const getPlayersInfo = () => {
+      return _playersInfo;
     };
 
     const endGameMessageName = '#endGame';
@@ -2037,7 +2358,7 @@ namespace gdjs {
     };
     const sendEndGameMessage = () => {
       // Only the host can end the game.
-      if (!gdjs.multiplayer.isPlayerHost()) {
+      if (!gdjs.multiplayer.isCurrentPlayerHost()) {
         return;
       }
 
@@ -2049,8 +2370,8 @@ namespace gdjs {
       sendDataTo(connectedPeerIds, messageName, messageData);
     };
 
-    const handleEndGameMessages = () => {
-      if (gdjs.multiplayer.isPlayerHost()) {
+    const handleEndGameMessagesReceived = () => {
+      if (gdjs.multiplayer.isCurrentPlayerHost()) {
         // Only other players need to react to the end game message.
         return;
       }
@@ -2066,20 +2387,78 @@ namespace gdjs {
 
       // If the message is received more than 1 time, we just ignore it and end the game.
 
-      _playersLastHeartbeatInfo = {};
-      _playersPings = {};
+      clearAllMessagesTempData();
       gdjs.multiplayer.handleLobbyGameEnded();
     };
 
-    const updatePlayersPingsForTests = (playersPings) => {
-      _playersPings = playersPings;
+    const resumeGameMessageName = '#resumeGame';
+    const createResumeGameMessage = (): {
+      messageName: string;
+      messageData: any;
+    } => {
+      return {
+        messageName: resumeGameMessageName,
+        messageData: {},
+      };
+    };
+    const sendResumeGameMessage = () => {
+      // Only the host can inform others that the game is resuming.
+      if (!gdjs.multiplayer.isCurrentPlayerHost()) {
+        return;
+      }
+
+      debugLogger.info(`Sending resumeGame message.`);
+
+      const connectedPeerIds = gdjs.multiplayerPeerJsHelper.getAllPeers();
+      const { messageName, messageData } = createResumeGameMessage();
+      sendDataTo(connectedPeerIds, messageName, messageData);
+    };
+
+    const handleResumeGameMessagesReceived = (
+      runtimeScene: gdjs.RuntimeScene
+    ) => {
+      if (gdjs.multiplayer.isCurrentPlayerHost()) {
+        // Only other players need to react to resume game message.
+        return;
+      }
+
+      const p2pMessagesMap = gdjs.multiplayerPeerJsHelper.getAllMessagesMap();
+      const resumeGameMessagesList = p2pMessagesMap.get(resumeGameMessageName);
+      if (!resumeGameMessagesList) {
+        return; // No resume game message received.
+      }
+      const messages = resumeGameMessagesList.getMessages();
+      if (!messages.length) return; // No messages to process.
+
+      logger.info(`Received resumeGame message.`);
+
+      gdjs.multiplayer.resumeGame(runtimeScene);
+    };
+
+    const clearAllMessagesTempData = () => {
+      _playersLastRoundTripTimes = {};
+      _playersInfo = {};
+      lastReceivedGameSyncDataUpdates.clear();
+      lastReceivedSceneSyncDataUpdates.clear();
+      processedCustomMessagesCache.clear();
+      _playerNumbersWhoJustLeft = [];
+      _playerNumbersWhoJustJoined = [];
+      expectedMessageAcknowledgements = {};
+      _lastClockReceivedByInstanceByScene = {};
+    };
+
+    const clearPlayerTempData = (playerNumber: number) => {
+      // Remove the player from the list of players.
+      // This will cause the next hearbeat to not include this player
+      // and the others will consider them as disconnected.
+      delete _playersLastRoundTripTimes[playerNumber];
+      delete _playersInfo[playerNumber];
     };
 
     return {
       sendDataTo,
       // Acks.
       addExpectedMessageAcknowledgement,
-      clearExpectedMessageAcknowledgements,
       handleAcknowledgeMessagesReceived,
       resendClearOrCancelAcknowledgedMessages,
       // Instance ownership.
@@ -2113,23 +2492,42 @@ namespace gdjs {
       createUpdateGameMessage,
       handleUpdateGameMessagesToSend,
       handleUpdateGameMessagesReceived,
+      handleSavedUpdateMessages,
       // Heartbeats.
       handleHeartbeatsToSend,
       handleHeartbeatsReceived,
-      // Connection/Disonnection.
+      hasReceivedHeartbeatFromPlayer,
+      // Pings & usernames.
       getPlayerPing,
       getCurrentPlayerPing,
-      updatePlayersPingsForTests,
-      handleDisconnectedPeers,
-      clearDisconnectedPeers,
-      hasAnyPlayerLeft,
-      hasPlayerLeft,
-      getDisconnectedPlayers,
+      getPlayerUsername,
+      getPlayerId,
+      // Connected players.
+      handleJustDisconnectedPeers,
+      getConnectedPlayers,
       getNumberOfConnectedPlayers,
       isPlayerConnected,
+      getPlayersInfo,
+      // Leaving players.
+      hasAnyPlayerJustLeft,
+      hasPlayerJustLeft,
+      getPlayersWhoJustLeft,
+      getLatestPlayerWhoJustLeft,
+      removePlayerWhoJustLeft,
+      markPlayerAsDisconnected,
+      // Joining players.
+      hasAnyPlayerJustJoined,
+      hasPlayerJustJoined,
+      getPlayersWhoJustJoined,
+      getLatestPlayerWhoJustJoined,
+      removePlayerWhoJustJoined,
       // End game.
       sendEndGameMessage,
-      handleEndGameMessages,
+      handleEndGameMessagesReceived,
+      clearAllMessagesTempData,
+      // Resume game after migration.
+      sendResumeGameMessage,
+      handleResumeGameMessagesReceived,
     };
   };
 

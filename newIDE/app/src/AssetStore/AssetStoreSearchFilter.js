@@ -129,9 +129,9 @@ export class AnimatedAssetStoreSearchFilter
 
   getPertinence(searchItem: AssetShortHeader): number {
     const hasAnimatedState = searchItem.maxFramesCount > 1;
-    const hasSeveralState = searchItem.animationsCount > 1;
+    const hasSeveralStates = searchItem.animationsCount > 1;
     return (!this.mustBeAnimated || hasAnimatedState) &&
-      (!this.mustHaveSeveralState || hasSeveralState)
+      (!this.mustHaveSeveralState || hasSeveralStates)
       ? 1
       : 0;
   }
@@ -261,6 +261,155 @@ export class ColorAssetStoreSearchFilter
   }
 }
 
+const toAssetStoreType = (type: string) => {
+  return type === 'Sprite' ? 'sprite' : type;
+};
+
+// Thematic tags are noise for asset swapping as changing the theme may be what
+// users are looking for.
+const ignoredThematicTags = new Set([
+  'top-down',
+  'isometric',
+  'side view',
+  'pixel art',
+  'pirate',
+  'space',
+  'sea',
+  'city',
+  'medieval',
+  'nature',
+  'forest',
+]);
+
+export class AssetSwappingAssetStoreSearchFilter
+  implements SearchFilter<AssetShortHeader> {
+  isEnabled: boolean;
+  objectType: string;
+  hasSeveralStates: boolean;
+  other: AssetShortHeader | null;
+  tags: Array<string>;
+
+  constructor(
+    object: gdObject | null = null,
+    assetShortHeader: AssetShortHeader | null = null
+  ) {
+    if (object) {
+      this.isEnabled = true;
+      this.objectType = assetShortHeader
+        ? assetShortHeader.objectType
+        : toAssetStoreType(object.getType());
+      this.hasSeveralStates =
+        object.getConfiguration().getAnimationsCount() > 0;
+      this.other = assetShortHeader;
+      // The asset pack tag (which is the first tag) is not relevant.
+      this.tags = assetShortHeader
+        ? assetShortHeader.tags
+            .slice(1)
+            .filter(tags => !ignoredThematicTags.has(tags))
+        : [];
+    } else {
+      this.isEnabled = false;
+      this.objectType = '';
+      this.hasSeveralStates = false;
+      this.other = null;
+      this.tags = [];
+    }
+  }
+
+  getPertinence(searchItem: AssetShortHeader): number {
+    // As the sort is done with a dichotomy, items with similitude under 0.5
+    // are not sorted at all.
+    if (!this.isEnabled) {
+      return 1;
+    }
+    if (this.objectType !== searchItem.objectType) {
+      return 0;
+    }
+
+    let similitude = 1;
+
+    const { other } = this;
+    if (!other) {
+      const hasSeveralStates = searchItem.animationsCount > 1;
+      if (this.hasSeveralStates && !hasSeveralStates) {
+        similitude *= 0.8;
+      }
+
+      return similitude;
+    }
+
+    {
+      const isTopDown = searchItem.tags.includes('top-down');
+      const isIsometric = searchItem.tags.includes('isometric');
+      const isSideView = searchItem.tags.includes('side view');
+
+      const otherIsTopDown = other.tags.includes('top-down');
+      const otherIsIsometric = other.tags.includes('isometric');
+      const otherIsSideView = other.tags.includes('side view');
+
+      const areCompatible =
+        (isTopDown && otherIsTopDown) ||
+        (isIsometric && otherIsIsometric) ||
+        (isSideView && otherIsSideView) ||
+        (!isTopDown &&
+          !isIsometric &&
+          !isSideView &&
+          !otherIsTopDown &&
+          !otherIsIsometric &&
+          !otherIsSideView);
+      if (!areCompatible) {
+        similitude *= 0.8;
+      }
+    }
+
+    if (this.tags.length > 0) {
+      const sharedTagsCount = this.tags.reduce(
+        (accumulator, currentValue) =>
+          accumulator + (searchItem.tags.includes(currentValue) ? 1 : 0),
+        0
+      );
+      similitude *= 0.8 + (0.2 * sharedTagsCount) / this.tags.length;
+    }
+
+    {
+      const surface = searchItem.width * searchItem.height;
+      const otherSurface = other.width * other.height;
+      const smallestSurface = Math.min(surface, otherSurface);
+      const greatestSurface = Math.max(surface, otherSurface);
+
+      similitude *= 0.95 + (0.05 * smallestSurface) / greatestSurface;
+    }
+    {
+      const ratio = searchItem.width / searchItem.height;
+      const otherRatio = other.width / other.height;
+      const smallestRatio = Math.min(ratio, otherRatio);
+      const greatestRatio = Math.max(ratio, otherRatio);
+
+      similitude *= 0.95 + (0.05 * smallestRatio) / greatestRatio;
+    }
+
+    const hasAnimatedState = searchItem.maxFramesCount > 1;
+    const hasSeveralStates = searchItem.animationsCount > 1;
+    const otherHasAnimatedState = other.maxFramesCount > 1;
+    const otherHasSeveralState = other.animationsCount > 1;
+    if (
+      (otherHasAnimatedState || otherHasSeveralState) &&
+      hasAnimatedState === otherHasAnimatedState &&
+      hasSeveralStates === otherHasSeveralState
+    ) {
+      // There is not a lot of animated assets in the store.
+      // This ensures they are shown.
+      similitude = 0.76 + 0.24 * ((Math.max(0.5, similitude) - 0.5) * 2);
+    }
+
+    return similitude;
+  }
+
+  hasFilters(): boolean {
+    return true;
+  }
+}
+
 export class SimilarAssetStoreSearchFilter
   implements SearchFilter<AssetShortHeader> {
   other: AssetShortHeader;
@@ -279,12 +428,12 @@ export class SimilarAssetStoreSearchFilter
 
     {
       const hasAnimatedState = searchItem.maxFramesCount > 1;
-      const hasSeveralState = searchItem.animationsCount > 1;
+      const hasSeveralStates = searchItem.animationsCount > 1;
       const otherHasAnimatedState = this.other.maxFramesCount > 1;
       const otherHasSeveralState = this.other.animationsCount > 1;
       if (
         hasAnimatedState !== otherHasAnimatedState ||
-        hasSeveralState !== otherHasSeveralState
+        hasSeveralStates !== otherHasSeveralState
       ) {
         return 0;
       }

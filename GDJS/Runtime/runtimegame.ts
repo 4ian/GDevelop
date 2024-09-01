@@ -189,6 +189,7 @@ namespace gdjs {
           );
         }
       }
+      this._eventsBasedObjectDatas = new Map<String, EventsBasedObjectData>();
       this._data = data;
       this._updateSceneAndExtensionsData();
 
@@ -250,18 +251,6 @@ namespace gdjs {
         }
       }
 
-      this._eventsBasedObjectDatas = new Map<String, EventsBasedObjectData>();
-      if (this._data.eventsFunctionsExtensions) {
-        for (const extension of this._data.eventsFunctionsExtensions) {
-          for (const eventsBasedObject of extension.eventsBasedObjects) {
-            this._eventsBasedObjectDatas.set(
-              extension.name + '::' + eventsBasedObject.name,
-              eventsBasedObject
-            );
-          }
-        }
-      }
-
       if (this.isUsingGDevelopDevelopmentEnvironment()) {
         logger.info(
           'This game will run on the development version of GDevelop APIs.'
@@ -292,6 +281,18 @@ namespace gdjs {
         sceneData,
         usedExtensionsWithVariablesData,
       }));
+
+      this._eventsBasedObjectDatas.clear();
+      if (this._data.eventsFunctionsExtensions) {
+        for (const extension of this._data.eventsFunctionsExtensions) {
+          for (const eventsBasedObject of extension.eventsBasedObjects) {
+            this._eventsBasedObjectDatas.set(
+              extension.name + '::' + eventsBasedObject.name,
+              eventsBasedObject
+            );
+          }
+        }
+      }
     }
 
     /**

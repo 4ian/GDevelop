@@ -79,9 +79,7 @@ module.exports = {
         'PointAttachmentX',
         _('Point attachment x'),
         _('x position of spine point attachment'),
-        _(
-          'x position of spine _PARAM1_ point attachment for _PARAM2_ slot (use "" if names are the same)'
-        ),
+        _('x position of spine _PARAM1_ point attachment for _PARAM2_ slot'),
         _('Animations and images'),
         'JsPlatform/Extensions/spine.svg'
       )
@@ -97,9 +95,7 @@ module.exports = {
         'PointAttachmentY',
         _('Point attachment y'),
         _('y position of spine point attachment'),
-        _(
-          'y position of spine _PARAM1_ point attachment for _PARAM2_ slot (use "" if names are the same)'
-        ),
+        _('y position of spine _PARAM1_ point attachment for _PARAM2_ slot'),
         _('Animations and images'),
         'JsPlatform/Extensions/spine.svg'
       )

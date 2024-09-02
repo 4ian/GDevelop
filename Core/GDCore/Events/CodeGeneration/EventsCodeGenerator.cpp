@@ -77,11 +77,11 @@ gd::String EventsCodeGenerator::GenerateRelationalOperatorCall(
 
 /**
  * @brief Generate a relational operation
- * 
+ *
  * @param relationalOperator the operator
  * @param lhs the left hand operand
  * @param rhs the right hand operand
- * @return gd::String 
+ * @return gd::String
  */
 gd::String EventsCodeGenerator::GenerateRelationalOperation(
     const gd::String& relationalOperator,
@@ -828,7 +828,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
              metadata.GetType() == "spineResource" ||
              // Deprecated, old parameter names:
              metadata.GetType() == "password" || metadata.GetType() == "musicfile" ||
-             metadata.GetType() == "soundfile" || metadata.GetType() == "police") {
+             metadata.GetType() == "soundfile") {
     argOutput = "\"" + ConvertToString(parameter.GetPlainString()) + "\"";
   } else if (metadata.GetType() == "mouse") {
     argOutput = "\"" + ConvertToString(parameter.GetPlainString()) + "\"";
@@ -1007,7 +1007,7 @@ gd::String EventsCodeGenerator::GenerateEventsListCode(
 
     output += "\n" + scopeBegin + "\n" + declarationsCode + "\n" +
               eventCoreCode + "\n" + scopeEnd + "\n";
-    
+
     if (event.HasVariables()) {
       GetProjectScopedContainers().GetVariablesContainersList().Pop();
     }

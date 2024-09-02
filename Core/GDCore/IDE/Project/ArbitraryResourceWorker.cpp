@@ -225,9 +225,7 @@ bool ResourceWorkerInEventsWorker::DoVisitInstruction(gd::Instruction& instructi
                             size_t parameterIndex,
                             const gd::String& lastObjectName) {
         const String& parameterValue = parameterExpression.GetPlainString();
-        if (parameterMetadata.GetType() ==
-                "police" ||  // Should be renamed fontResource
-            parameterMetadata.GetType() == "fontResource") {
+        if (parameterMetadata.GetType() == "fontResource") {
           gd::String updatedParameterValue = parameterValue;
           worker.ExposeFont(updatedParameterValue);
           instruction.SetParameter(parameterIndex, updatedParameterValue);

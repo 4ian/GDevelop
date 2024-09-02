@@ -107,7 +107,7 @@
     "description": "Define a parameter in a GDevelop extension definition.",
     "prefix": "gdparam",
     "body": [
-      ".addParameter('${1|string,expression,object,behavior,yesorno,stringWithSelector,scenevar,globalvar,objectvar,objectList,objectListWithoutPicking,color,key,sceneName,file,layer,relationalOperator,operator,trueorfalse,musicfile,soundfile,police,mouse,passwordjoyaxis,camera,objectPtr,forceMultiplier|}', '${2:Parameter description}', '${3:Optional parameter data}', /*parameterIsOptional=*/${4|false,true|})"
+      ".addParameter('${1|string,expression,object,behavior,yesorno,stringWithSelector,scenevar,globalvar,objectvar,objectList,objectListWithoutPicking,color,key,sceneName,file,layer,relationalOperator,operator,trueorfalse,musicfile,soundfile,mouse,passwordjoyaxis,camera,objectPtr,forceMultiplier|}', '${2:Parameter description}', '${3:Optional parameter data}', /*parameterIsOptional=*/${4|false,true|})"
     ]
   },
   "Add code only parameter": {

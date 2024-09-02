@@ -528,7 +528,7 @@ protected:
   parameter -> string
    * - operator : Used to update a value using a setter and a getter -> string
    * - key, mouse, objectvar, scenevar, globalvar, password, musicfile,
-  soundfile, police -> string
+  soundfile -> string
    * - trueorfalse, yesorno -> boolean ( See GenerateTrue/GenerateFalse ).
    *
    * <br><br>
@@ -849,7 +849,7 @@ protected:
       instructionUniqueIds;  ///< The unique ids generated for instructions.
   size_t eventsListNextUniqueId;  ///< The next identifier to use for an events
                                   ///< list function name.
-  
+
   gd::DiagnosticReport* diagnosticReport;
 };
 

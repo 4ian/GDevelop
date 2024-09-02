@@ -142,6 +142,17 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
     ]
   );
 
+  const enableNewMaximumValuesCalculation = React.useCallback(
+    (enable: boolean) => {
+      // When calling editor.scrollTo, the editor ends up calling `setAndAdjust`
+      // that recomputes x/yMax and x/yMin, increasing the mouseToPositionRatio.
+      // If a thumb is kept at one of its extreme position, it can enter a loop and
+      // increase the position exponentially (See https://github.com/4ian/GDevelop/issues/6686).
+      computeNewMaximumValues.current = enable;
+    },
+    []
+  );
+
   // When the mouse is moving after dragging the thumb:
   // - calculate the distance scrolled
   // - update the thumb position with the value
@@ -203,7 +214,7 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
   const makeMouseUpXThumbHandler = React.useCallback(
     mouseMoveHandler =>
       function mouseUpHandler(e: MouseEvent) {
-        computeNewMaximumValues.current = true;
+        enableNewMaximumValuesCalculation(true);
         isDragging.current = false;
         if (
           e.target !== xScrollbarTrack.current &&
@@ -214,12 +225,12 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
         document.removeEventListener('mousemove', mouseMoveHandler);
         document.removeEventListener('mouseup', mouseUpHandler);
       },
-    [hideScrollbarsAfterDelay]
+    [hideScrollbarsAfterDelay, enableNewMaximumValuesCalculation]
   );
   const makeMouseUpYThumbHandler = React.useCallback(
     mouseMoveHandler =>
       function mouseUpHandler(e: MouseEvent) {
-        computeNewMaximumValues.current = true;
+        enableNewMaximumValuesCalculation(true);
         isDragging.current = false;
         if (
           e.target !== yScrollbarTrack.current &&
@@ -230,7 +241,7 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
         document.removeEventListener('mousemove', mouseMoveHandler);
         document.removeEventListener('mouseup', mouseUpHandler);
       },
-    [hideScrollbarsAfterDelay]
+    [hideScrollbarsAfterDelay, enableNewMaximumValuesCalculation]
   );
 
   // When the user clicks on the thumbs, we register new events:
@@ -246,18 +257,19 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
         initialDragPosition,
         xValue.current
       );
-      // When calling editor.scrollTo, the editor ends up calling `setAndAdjust`
-      // that recomputes x/yMax and x/yMin, increasing the mouseToPositionRatio.
-      // If a thumb is kept at one of its extreme position, it can enter a loop and
-      // increase the position exponentially (See https://github.com/4ian/GDevelop/issues/6686).
-      computeNewMaximumValues.current = false;
+
+      enableNewMaximumValuesCalculation(false);
 
       const mouseUpHandler = makeMouseUpXThumbHandler(mouseMoveHandler);
 
       document.addEventListener('mousemove', mouseMoveHandler);
       document.addEventListener('mouseup', mouseUpHandler);
     },
-    [makeMouseMoveXHandler, makeMouseUpXThumbHandler]
+    [
+      makeMouseMoveXHandler,
+      makeMouseUpXThumbHandler,
+      enableNewMaximumValuesCalculation,
+    ]
   );
   const mouseDownYThumbHandler = React.useCallback(
     (e: MouseEvent) => {
@@ -267,18 +279,19 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
         initialDragPosition,
         yValue.current
       );
-      // When calling editor.scrollTo, the editor ends up calling `setAndAdjust`
-      // that recomputes x/yMax and x/yMin, increasing the mouseToPositionRatio.
-      // If a thumb is kept at one of its extreme position, it can enter a loop and
-      // increase the position exponentially (See https://github.com/4ian/GDevelop/issues/6686).
-      computeNewMaximumValues.current = false;
+
+      enableNewMaximumValuesCalculation(false);
 
       const mouseUpHandler = makeMouseUpYThumbHandler(mouseMoveHandler);
 
       document.addEventListener('mousemove', mouseMoveHandler);
       document.addEventListener('mouseup', mouseUpHandler);
     },
-    [makeMouseMoveYHandler, makeMouseUpYThumbHandler]
+    [
+      makeMouseMoveYHandler,
+      makeMouseUpYThumbHandler,
+      enableNewMaximumValuesCalculation,
+    ]
   );
 
   // Add the mouse down events once on mount.

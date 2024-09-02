@@ -161,6 +161,7 @@ module.exports = function (config) {
       './GDJS/tests/tests-utils/init.js',
       './GDJS/tests/tests-utils/init.pixiruntimegamewithassets.js',
       './GDJS/tests/tests-utils/init.pixiruntimegame.js',
+      './GDJS/tests/tests-utils/MockedCustomObject.js',
 
       // Test helpers
       './Extensions/PlatformBehavior/tests/PlatformerTestHelper.js',

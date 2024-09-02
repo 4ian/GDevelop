@@ -4,8 +4,6 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
-  const logger = new gdjs.Logger('CustomRuntimeObject');
-
   /**
    * The instance container of a custom object, containing instances of objects rendered on screen.
    *
@@ -54,17 +52,12 @@ namespace gdjs {
      * @param customObjectData An object containing the container data.
      * @see gdjs.RuntimeGame#getSceneAndExtensionsData
      */
-    loadFrom(customObjectData: ObjectData & CustomObjectConfiguration) {
+    loadFrom(
+      customObjectData: ObjectData & CustomObjectConfiguration,
+      eventsBasedObjectData: EventsBasedObjectData
+    ) {
       if (this._isLoaded) {
         this.onDestroyFromScene(this._parent);
-      }
-
-      const eventsBasedObjectData = this._runtimeScene
-        .getGame()
-        .getEventsBasedObjectData(customObjectData.type);
-      if (!eventsBasedObjectData) {
-        logger.error('loadFrom was called without an events-based object');
-        return;
       }
 
       // Registering objects
@@ -86,10 +79,14 @@ namespace gdjs {
         }
       }
 
-      if (customObjectData.layers.length > 0) {
+      if (eventsBasedObjectData.layers.length > 0) {
         // Load layers
-        for (let i = 0, len = customObjectData.layers.length; i < len; ++i) {
-          this.addLayer(customObjectData.layers[i]);
+        for (
+          let i = 0, len = eventsBasedObjectData.layers.length;
+          i < len;
+          ++i
+        ) {
+          this.addLayer(eventsBasedObjectData.layers[i]);
         }
       } else {
         // Add a default layer
@@ -118,7 +115,7 @@ namespace gdjs {
       }
 
       this.createObjectsFrom(
-        customObjectData.instances,
+        eventsBasedObjectData.instances,
         0,
         0,
         0,

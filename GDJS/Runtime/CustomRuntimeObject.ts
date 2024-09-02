@@ -4,6 +4,8 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  const logger = new gdjs.Logger('CustomRuntimeObject');
+
   export type ObjectConfiguration = {
     content: any;
   };
@@ -11,24 +13,6 @@ namespace gdjs {
   export type CustomObjectConfiguration = ObjectConfiguration & {
     animatable?: SpriteAnimationData[];
     childrenContent: { [objectName: string]: ObjectConfiguration & any };
-    instances: InstanceData[];
-    layers: LayerData[];
-    // The flat representation of defaultSize.
-    areaMinX: float;
-    areaMinY: float;
-    areaMinZ: float;
-    areaMaxX: float;
-    areaMaxY: float;
-    areaMaxZ: float;
-    /**
-     * A value shared by every object instances.
-     *
-     * @see gdjs.CustomRuntimeObject._forcedDefaultSize
-     **/
-    defaultSize: {
-      min: [float, float, float];
-      max: [float, float, float];
-    } | null;
   };
 
   /**
@@ -91,11 +75,26 @@ namespace gdjs {
       );
       this._renderer = this._createRender();
 
-      this._createDefaultSizeIfNeeded(objectData);
-      this._instanceContainer.loadFrom(objectData);
+      this._initializeFromObjectData(objectData);
 
       // The generated code calls onCreated at the constructor end
       // and onCreated calls its super implementation at its end.
+    }
+
+    private _initializeFromObjectData(
+      objectData: ObjectData & CustomObjectConfiguration
+    ) {
+      const eventsBasedObjectData = this._runtimeScene
+        .getGame()
+        .getEventsBasedObjectData(objectData.type);
+      if (!eventsBasedObjectData) {
+        logger.error(
+          `A CustomRuntimeObject was initialized (or re-initialized) from object data referring to an non existing events based object data with type "${objectData.type}".`
+        );
+        return;
+      }
+      this._createDefaultSizeIfNeeded(eventsBasedObjectData);
+      this._instanceContainer.loadFrom(objectData, eventsBasedObjectData);
     }
 
     protected abstract _createRender():
@@ -106,8 +105,7 @@ namespace gdjs {
     reinitialize(objectData: ObjectData & CustomObjectConfiguration) {
       super.reinitialize(objectData);
 
-      this._createDefaultSizeIfNeeded(objectData);
-      this._instanceContainer.loadFrom(objectData);
+      this._initializeFromObjectData(objectData);
       this._reinitializeRenderer();
 
       // The generated code calls the onCreated super implementation at the end.
@@ -118,23 +116,25 @@ namespace gdjs {
      * Initialize `defaultSize` if it doesn't exist.
      * `defaultSize` is shared by every instance to save memory.
      */
-    private _createDefaultSizeIfNeeded(objectData: CustomObjectConfiguration) {
-      if (objectData.instances.length > 0) {
-        if (!objectData.defaultSize) {
-          objectData.defaultSize = {
+    private _createDefaultSizeIfNeeded(
+      eventsBasedObjectData: EventsBasedObjectData
+    ) {
+      if (eventsBasedObjectData.instances.length > 0) {
+        if (!eventsBasedObjectData.defaultSize) {
+          eventsBasedObjectData.defaultSize = {
             min: [
-              objectData.areaMinX,
-              objectData.areaMinY,
-              objectData.areaMinZ,
+              eventsBasedObjectData.areaMinX,
+              eventsBasedObjectData.areaMinY,
+              eventsBasedObjectData.areaMinZ,
             ],
             max: [
-              objectData.areaMaxX,
-              objectData.areaMaxY,
-              objectData.areaMaxZ,
+              eventsBasedObjectData.areaMaxX,
+              eventsBasedObjectData.areaMaxY,
+              eventsBasedObjectData.areaMaxZ,
             ],
           };
         }
-        this._forcedDefaultSize = objectData.defaultSize;
+        this._forcedDefaultSize = eventsBasedObjectData.defaultSize;
       }
     }
 

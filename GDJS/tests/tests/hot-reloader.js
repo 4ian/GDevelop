@@ -36,6 +36,424 @@ describe('gdjs.HotReloader.deepEqual', () => {
   });
 });
 
+describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
+  /**
+   * Create and return a minimum working game.
+   * @internal
+   * @param {{layouts?: LayoutData[], eventsBasedObjects?: EventsBasedObjectData[], resources?: ResourcesData, propertiesOverrides?: Partial<ProjectPropertiesData>}} data
+   * @returns {ProjectData}
+   */
+  const createProjectData = (data) => {
+    const project = gdjs.createProjectData(data);
+    project.eventsFunctionsExtensions.push({
+      name: 'MyExtension',
+      eventsBasedObjects: data.eventsBasedObjects || [],
+      globalVariables: [],
+      sceneVariables: [],
+    });
+    return project;
+  };
+
+  /** @type {InstanceData} */
+  const defaultInstance = {
+    persistentUuid: '',
+    layer: '',
+    locked: false,
+    name: 'MyObject',
+    x: 0,
+    y: 0,
+    angle: 0,
+    zOrder: 0,
+    customSize: false,
+    width: 0,
+    height: 0,
+    numberProperties: [],
+    stringProperties: [],
+    initialVariables: [],
+  };
+
+  /** @type {InstanceData} */
+  const defaultChildInstance = {
+    persistentUuid: '',
+    layer: '',
+    locked: false,
+    name: 'MyChildObject',
+    x: 0,
+    y: 0,
+    angle: 0,
+    zOrder: 0,
+    customSize: false,
+    width: 0,
+    height: 0,
+    numberProperties: [],
+    stringProperties: [],
+    initialVariables: [],
+  };
+
+  /** @type {ObjectData & gdjs.CustomObjectConfiguration} */
+  const defaultCustomObject = {
+    type: 'MyExtension::MyCustomObject',
+    name: 'MyCustomObject',
+    behaviors: [],
+    variables: [],
+    effects: [],
+    content: {},
+    childrenContent: {},
+  };
+
+  /** @type {LayerData} */
+  const baseLayer = {
+    name: '',
+    visibility: true,
+    cameras: [],
+    effects: [],
+    ambientLightColorR: 127,
+    ambientLightColorB: 127,
+    ambientLightColorG: 127,
+    isLightingLayer: false,
+    followBaseLayerCamera: false,
+  };
+
+  /**
+   * Create and return a minimum working sprite object data.
+   * @internal
+   * @param {{name: string, image: string}} data
+   * @returns {gdjs.SpriteObjectData}
+   */
+  const createSpriteData = ({ name, image }) => {
+    return {
+      type: 'Sprite',
+      name,
+      behaviors: [],
+      variables: [],
+      effects: [],
+      animations: [
+        {
+          name: 'animation',
+          directions: [
+            {
+              sprites: [
+                {
+                  originPoint: { name: 'Origin', x: 0, y: 0 },
+                  centerPoint: {
+                    name: 'Center',
+                    x: 0,
+                    y: 0,
+                    automatic: true,
+                  },
+                  points: [],
+                  hasCustomCollisionMask: false,
+                  customCollisionMask: [],
+                  image,
+                },
+              ],
+              timeBetweenFrames: 0,
+              looping: false,
+            },
+          ],
+          useMultipleDirections: false,
+        },
+      ],
+      updateIfNotVisible: false,
+    };
+  };
+
+  /**
+   * Create and return a minimum working scene data.
+   * @internal
+   * @param {{instances?: Partial<InstanceData>[], objects?: ObjectData[]}} data
+   * @returns {LayoutData}
+   */
+  const createSceneData = ({ instances, objects }) => {
+    return {
+      layers: [baseLayer],
+      variables: [],
+      r: 0,
+      v: 0,
+      b: 0,
+      mangledName: 'Scene1',
+      name: 'Scene1',
+      stopSoundsOnStartup: false,
+      title: '',
+      behaviorsSharedData: [],
+      objects: objects || [
+        createSpriteData({ name: 'MyObject', image: 'ResourceA' }),
+      ],
+      instances: instances
+        ? instances.map((instance) => ({ ...defaultInstance, ...instance }))
+        : [],
+      usedResources: [],
+    };
+  };
+
+  /**
+   * Create and return a minimum working events-based object data.
+   * @internal
+   * @param {{name: string, instances?: Partial<InstanceData>[], objects?: ObjectData[]}} data
+   * @returns {EventsBasedObjectData}
+   */
+  const createEventsBasedObjectData = ({ name, instances, objects }) => {
+    return {
+      name,
+      variables: [],
+      instances: instances
+        ? instances.map((instance) => ({
+            ...defaultChildInstance,
+            ...instance,
+          }))
+        : [],
+      objects: objects || [
+        createSpriteData({ name: 'MyChildObject', image: 'ResourceA' }),
+      ],
+      layers: [baseLayer],
+      areaMinX: 0,
+      areaMinY: 0,
+      areaMinZ: 0,
+      areaMaxX: 0,
+      areaMaxY: 0,
+      areaMaxZ: 0,
+      defaultSize: null,
+    };
+  };
+
+  /**
+   * @internal
+   * @param {gdjs.RuntimeObject} instance
+   * @returns {string | null}
+   */
+  const getSpriteCurrentFrameImage = (instance) => {
+    if (!(instance instanceof gdjs.SpriteRuntimeObject)) {
+      throw new Error("Couldn't instantiate a sprite for testing.");
+    }
+    const currentFrame = instance._animator.getCurrentFrame();
+    return currentFrame ? currentFrame.image : null;
+  };
+
+  it('can move instances of a scene at hot-reload', async () => {
+    const oldProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [
+            { persistentUuid: '1', x: 111, y: 123 },
+            { persistentUuid: '2', x: 222, y: 234 },
+          ],
+        }),
+      ],
+    });
+    const runtimeGame = new gdjs.RuntimeGame(oldProjectData);
+    const hotReloader = new gdjs.HotReloader(runtimeGame);
+    await runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
+      'Scene1',
+      () => {}
+    );
+    runtimeGame._sceneStack.push('Scene1');
+    const scene = runtimeGame.getSceneStack().getCurrentScene();
+    if (!scene) throw new Error("Couldn't set a current scene for testing.");
+
+    const newProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [
+            { persistentUuid: '1', x: 555, y: 678 },
+            { persistentUuid: '2', x: 222, y: 234 },
+          ],
+        }),
+      ],
+    });
+
+    await hotReloader._hotReloadRuntimeGame(
+      oldProjectData,
+      newProjectData,
+      [],
+      runtimeGame
+    );
+
+    const instances = scene.getInstancesOf('MyObject');
+    expect(instances.length).to.be(2);
+    expect(instances[0].getX()).to.be(555);
+    expect(instances[0].getY()).to.be(678);
+    expect(instances[1].getX()).to.be(222);
+    expect(instances[1].getY()).to.be(234);
+  });
+
+  it('can change the image of a sprite object of a scene at hot-reload', async () => {
+    const oldProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1' }, { persistentUuid: '2' }],
+          objects: [createSpriteData({ name: 'MyObject', image: 'ResourceA' })],
+        }),
+      ],
+    });
+    const runtimeGame = new gdjs.RuntimeGame(oldProjectData);
+    const hotReloader = new gdjs.HotReloader(runtimeGame);
+    await runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
+      'Scene1',
+      () => {}
+    );
+    runtimeGame._sceneStack.push('Scene1');
+    const scene = runtimeGame.getSceneStack().getCurrentScene();
+    if (!scene) throw new Error("Couldn't set a current scene for testing.");
+
+    const newProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1' }, { persistentUuid: '2' }],
+          objects: [createSpriteData({ name: 'MyObject', image: 'ResourceB' })],
+        }),
+      ],
+    });
+
+    await hotReloader._hotReloadRuntimeGame(
+      oldProjectData,
+      newProjectData,
+      [],
+      runtimeGame
+    );
+
+    const instances = scene.getInstancesOf('MyObject');
+    expect(instances.length).to.be(2);
+    expect(getSpriteCurrentFrameImage(instances[0])).to.be('ResourceB');
+    expect(getSpriteCurrentFrameImage(instances[1])).to.be('ResourceB');
+  });
+
+  it('can move instances inside a custom object at hot-reload', async () => {
+    const oldProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1', name: 'MyCustomObject' }],
+          objects: [defaultCustomObject],
+        }),
+      ],
+      eventsBasedObjects: [
+        createEventsBasedObjectData({
+          name: 'MyCustomObject',
+          instances: [
+            { persistentUuid: '11', x: 111, y: 123 },
+            { persistentUuid: '12', x: 222, y: 234 },
+          ],
+        }),
+      ],
+    });
+    const runtimeGame = new gdjs.RuntimeGame(oldProjectData);
+    const hotReloader = new gdjs.HotReloader(runtimeGame);
+    await runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
+      'Scene1',
+      () => {}
+    );
+    runtimeGame._sceneStack.push('Scene1');
+    const scene = runtimeGame.getSceneStack().getCurrentScene();
+    if (!scene) throw new Error("Couldn't set a current scene for testing.");
+
+    const newProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1', name: 'MyCustomObject' }],
+          objects: [defaultCustomObject],
+        }),
+      ],
+      eventsBasedObjects: [
+        createEventsBasedObjectData({
+          name: 'MyCustomObject',
+          instances: [
+            { persistentUuid: '11', x: 555, y: 678 },
+            { persistentUuid: '12', x: 222, y: 234 },
+          ],
+        }),
+      ],
+    });
+
+    await hotReloader._hotReloadRuntimeGame(
+      oldProjectData,
+      newProjectData,
+      [],
+      runtimeGame
+    );
+
+    const sceneInstances = scene.getInstancesOf('MyCustomObject');
+    expect(sceneInstances.length).to.be(1);
+    const customObject = sceneInstances[0];
+    if (!(customObject instanceof gdjs.CustomRuntimeObject)) {
+      throw new Error("Couldn't instantiate a custom object for testing.");
+    }
+    const instances = customObject
+      .getChildrenContainer()
+      .getInstancesOf('MyChildObject');
+    expect(instances.length).to.be(2);
+    expect(instances[0].getX()).to.be(555);
+    expect(instances[0].getY()).to.be(678);
+    expect(instances[1].getX()).to.be(222);
+    expect(instances[1].getY()).to.be(234);
+  });
+
+  it('can change the image of a sprite object inside a custom object at hot-reload', async () => {
+    const oldProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1', name: 'MyCustomObject' }],
+          objects: [defaultCustomObject],
+        }),
+      ],
+      eventsBasedObjects: [
+        createEventsBasedObjectData({
+          name: 'MyCustomObject',
+          instances: [{ persistentUuid: '11' }, { persistentUuid: '12' }],
+          objects: [
+            createSpriteData({ name: 'MyChildObject', image: 'ResourceA' }),
+          ],
+        }),
+      ],
+    });
+    const runtimeGame = new gdjs.RuntimeGame(oldProjectData);
+    const hotReloader = new gdjs.HotReloader(runtimeGame);
+    await runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
+      'Scene1',
+      () => {}
+    );
+    runtimeGame._sceneStack.push('Scene1');
+    const scene = runtimeGame.getSceneStack().getCurrentScene();
+    if (!scene) throw new Error("Couldn't set a current scene for testing.");
+
+    const newProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1', name: 'MyCustomObject' }],
+          objects: [defaultCustomObject],
+        }),
+      ],
+      eventsBasedObjects: [
+        createEventsBasedObjectData({
+          name: 'MyCustomObject',
+          instances: [{ persistentUuid: '11' }, { persistentUuid: '12' }],
+          objects: [
+            createSpriteData({ name: 'MyChildObject', image: 'ResourceB' }),
+          ],
+        }),
+      ],
+    });
+
+    await hotReloader._hotReloadRuntimeGame(
+      oldProjectData,
+      newProjectData,
+      [],
+      runtimeGame
+    );
+
+    const sceneInstances = scene.getInstancesOf('MyCustomObject');
+    expect(sceneInstances.length).to.be(1);
+    const customObject = sceneInstances[0];
+    if (!(customObject instanceof gdjs.CustomRuntimeObject)) {
+      throw new Error("Couldn't instantiate a custom object for testing.");
+    }
+    const instances = customObject
+      .getChildrenContainer()
+      .getInstancesOf('MyChildObject');
+    expect(instances.length).to.be(2);
+    expect(getSpriteCurrentFrameImage(instances[0])).to.be('ResourceB');
+    expect(getSpriteCurrentFrameImage(instances[1])).to.be('ResourceB');
+  });
+});
+
 describe('gdjs.HotReloader._hotReloadVariablesContainer', () => {
   /**
    * When `current` is not set `oldInit` is used instead.

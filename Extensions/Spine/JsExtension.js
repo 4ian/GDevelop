@@ -77,7 +77,7 @@ module.exports = {
       .addExpressionAndCondition(
         'number',
         'PointAttachmentX',
-        _('Point attachment x'),
+        _('Point attachment X position'),
         _('x position of spine point attachment'),
         _('x position of spine _PARAM1_ point attachment for _PARAM2_ slot'),
         _('Animations and images'),
@@ -93,7 +93,7 @@ module.exports = {
       .addExpressionAndCondition(
         'number',
         'PointAttachmentY',
-        _('Point attachment y'),
+        _('Point attachment Y position'),
         _('y position of spine point attachment'),
         _('y position of spine _PARAM1_ point attachment for _PARAM2_ slot'),
         _('Animations and images'),

@@ -44,11 +44,13 @@ export const updateSceneToTileMapTransformation = (
 
   // Rotation
   const angleInRadians = (instance.getAngle() * Math.PI) / 180;
-  tileMapToSceneTransformation.rotateAround(
-    angleInRadians,
-    renderedInstance.getCenterX(),
-    renderedInstance.getCenterY()
-  );
+  if (angleInRadians) {
+    tileMapToSceneTransformation.rotateAround(
+      angleInRadians,
+      renderedInstance.getCenterX(),
+      renderedInstance.getCenterY()
+    );
+  }
 
   // Scale
   tileMapToSceneTransformation.scale(absScaleX, absScaleY);
@@ -59,26 +61,17 @@ export const updateSceneToTileMapTransformation = (
 };
 
 export const getTileSet = (object: gdObject) => {
+  const objectConfigurationProperties = object
+    .getConfiguration()
+    .getProperties();
   const columnCount = parseFloat(
-    object
-      .getConfiguration()
-      .getProperties()
-      .get('columnCount')
-      .getValue()
+    objectConfigurationProperties.get('columnCount').getValue()
   );
   const rowCount = parseFloat(
-    object
-      .getConfiguration()
-      .getProperties()
-      .get('rowCount')
-      .getValue()
+    objectConfigurationProperties.get('rowCount').getValue()
   );
   const tileSize = parseFloat(
-    object
-      .getConfiguration()
-      .getProperties()
-      .get('tileSize')
-      .getValue()
+    objectConfigurationProperties.get('tileSize').getValue()
   );
   return { rowCount, columnCount, tileSize };
 };

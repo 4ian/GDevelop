@@ -12,6 +12,7 @@ type Props = {|
   getTileMapTileSelection: () => ?TileMapTileSelection,
   onPanMove: (deltaX: number, deltaY: number, x: number, y: number) => void,
   onClick: (scenePathCoordinates: Array<Coordinates>) => void,
+  onInterceptPointerMove: () => void,
 |};
 
 class ClickInterceptor {
@@ -20,6 +21,7 @@ class ClickInterceptor {
   onPanMove: (deltaX: number, deltaY: number, x: number, y: number) => void;
   onClick: (scenePathCoordinates: Array<Coordinates>) => void;
   pointerPathCoordinates: ?Array<Coordinates>;
+  onInterceptPointerMove: () => void;
   _shouldCancelClick: boolean = false;
   _isIntercepting: boolean = false;
   _touchingPointerIds: Set<number> = new Set();
@@ -33,10 +35,12 @@ class ClickInterceptor {
     getTileMapTileSelection,
     onClick,
     onPanMove,
+    onInterceptPointerMove,
   }: Props) {
     this.viewPosition = viewPosition;
     this.onClick = onClick;
     this.onPanMove = onPanMove;
+    this.onInterceptPointerMove = onInterceptPointerMove;
     this.getTileMapTileSelection = getTileMapTileSelection;
     this.interceptingSprite = new PIXI.Sprite();
     panable(this.interceptingSprite);
@@ -138,6 +142,7 @@ class ClickInterceptor {
 
   _interceptPointerMove(deviceX: number, deviceY: number) {
     if (this._shouldCancelClick || this._cancelUntilNoMoreTouches) return;
+    this.onInterceptPointerMove();
     const pointerPathCoordinates = this.pointerPathCoordinates;
     if (!pointerPathCoordinates) return;
 

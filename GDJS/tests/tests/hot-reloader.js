@@ -378,6 +378,66 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
     expect(instances[1].getX()).to.be(222);
     expect(instances[1].getY()).to.be(234);
   });
+
+  it('can change the image of a sprite object inside a custom object at hot-reload', async () => {
+    const oldProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1', name: 'MyCustomObject' }],
+          objects: [defaultCustomObject],
+        }),
+      ],
+      eventsBasedObjects: [
+        createEventsBasedObjectData({
+          name: 'MyCustomObject',
+          instances: [{ persistentUuid: '11' }, { persistentUuid: '12' }],
+          objects: [createSpriteData({ name: 'MyChildObject', image: 'ResourceA' })],
+        }),
+      ],
+    });
+    const runtimeGame = new gdjs.RuntimeGame(oldProjectData);
+    const hotReloader = new gdjs.HotReloader(runtimeGame);
+    runtimeGame.areSceneAssetsReady = (sceneName) => true;
+    runtimeGame._sceneStack.push('Scene1');
+    /** @type gdjs.RuntimeScene */
+    //@ts-ignore
+    const scene = runtimeGame.getSceneStack().getCurrentScene();
+  
+    const newProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1', name: 'MyCustomObject' }],
+          objects: [defaultCustomObject],
+        }),
+      ],
+      eventsBasedObjects: [
+        createEventsBasedObjectData({
+          name: 'MyCustomObject',
+          instances: [{ persistentUuid: '11' }, { persistentUuid: '12' }],
+          objects: [createSpriteData({ name: 'MyChildObject', image: 'ResourceB' })],
+        }),
+      ],
+    });
+  
+    await hotReloader._hotReloadRuntimeGame(
+      oldProjectData,
+      newProjectData,
+      [],
+      runtimeGame
+    );
+  
+    const sceneInstances = scene.getInstancesOf('MyCustomObject');
+    expect(sceneInstances.length).to.be(1);
+    /** @type gdjs.CustomRuntimeObject */
+    // @ts-ignore
+    const customObject = sceneInstances[0];
+    const instances = customObject
+      .getChildrenContainer()
+      .getInstancesOf('MyChildObject');
+    expect(instances.length).to.be(2);
+    expect(getSpriteImage(instances[0])).to.be('ResourceB');
+    expect(getSpriteImage(instances[1])).to.be('ResourceB');
+  });
 });
 
 describe('gdjs.HotReloader._hotReloadVariablesContainer', () => {

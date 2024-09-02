@@ -123,7 +123,7 @@ const homePageMenuTabs: { [tab: string]: HomePageMenuTab } = {
     ),
   },
   'team-view': {
-    label: <Trans>Classrooms</Trans>,
+    label: <Trans>Teach</Trans>,
     tab: 'team-view',
     id: 'team-view-tab',
     getIcon: ({ color, fontSize }) => (

@@ -3720,6 +3720,7 @@ interface PreviewExportOptions {
     void PreviewExportOptions([Ref] Project project, [Const] DOMString outputPath);
     [Ref] PreviewExportOptions UseWebsocketDebuggerClientWithServerAddress([Const] DOMString address, [Const] DOMString port);
     [Ref] PreviewExportOptions UseWindowMessageDebuggerClient();
+    [Ref] PreviewExportOptions UseMinimalDebuggerClient();
     [Ref] PreviewExportOptions SetLayoutName([Const] DOMString layoutName);
     [Ref] PreviewExportOptions SetFallbackAuthor([Const] DOMString id, [Const] DOMString username);
     [Ref] PreviewExportOptions SetAuthenticatedPlayer([Const] DOMString playerId, [Const] DOMString playerUsername, [Const] DOMString playerToken);
@@ -3733,6 +3734,11 @@ interface PreviewExportOptions {
     [Ref] PreviewExportOptions SetElectronRemoteRequirePath([Const] DOMString electronRemoteRequirePath);
     [Ref] PreviewExportOptions SetGDevelopResourceToken([Const] DOMString gdevelopResourceToken);
     [Ref] PreviewExportOptions SetAllowAuthenticationUsingIframeForPreview(boolean enable);
+    [Ref] PreviewExportOptions SetCrashReportUploadLevel([Const] DOMString crashReportUploadLevel);
+    [Ref] PreviewExportOptions SetPreviewContext([Const] DOMString previewContext);
+    [Ref] PreviewExportOptions SetGDevelopVersionWithHash([Const] DOMString gdevelopVersionWithHash);
+    [Ref] PreviewExportOptions SetProjectTemplateSlug([Const] DOMString projectTemplateSlug);
+    [Ref] PreviewExportOptions SetSourceGameId([Const] DOMString sourceGameId);
 };
 
 [Prefix="gdjs::"]

@@ -81,6 +81,7 @@ const PreferencesDialog = ({
     setWatchProjectFolderFilesForLocalProjects,
     setDisplaySaveReminder,
     setFetchPlayerTokenForPreviewAutomatically,
+    setPreviewCrashReportUploadLevel,
   } = React.useContext(PreferencesContext);
 
   const initialUse3DEditor = React.useRef<boolean>(values.use3DEditor);
@@ -426,6 +427,18 @@ const PreferencesDialog = ({
             labelPosition="right"
             label={
               <Trans>Automatically open the diagnostic report at preview</Trans>
+            }
+          />
+          <Toggle
+            onToggle={(e, check) =>
+              setPreviewCrashReportUploadLevel(
+                check ? 'exclude-javascript-code-events' : 'none'
+              )
+            }
+            toggled={values.previewCrashReportUploadLevel !== 'none'}
+            labelPosition="right"
+            label={
+              <Trans>Send crash reports during previews to GDevelop</Trans>
             }
           />
           <Toggle

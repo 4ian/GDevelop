@@ -208,6 +208,10 @@ namespace gdjs {
       return this._wasFirstSceneLoaded;
     }
 
+    getAllSceneNames(): Array<string> {
+      return this._stack.map((scene) => scene.getName());
+    }
+
     getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): SceneStackNetworkSyncData | null {

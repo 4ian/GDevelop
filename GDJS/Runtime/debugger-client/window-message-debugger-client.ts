@@ -8,9 +8,6 @@ namespace gdjs {
   export class WindowMessageDebuggerClient extends gdjs.AbstractDebuggerClient {
     _opener: Window | null = null;
 
-    /**
-     * @param path - The path of the property to modify, starting from the RuntimeGame.
-     */
     constructor(runtimeGame: RuntimeGame) {
       super(runtimeGame);
 

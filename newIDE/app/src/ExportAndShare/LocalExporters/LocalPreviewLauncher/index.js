@@ -8,7 +8,10 @@ import { timeFunction } from '../../../Utils/TimeFunction';
 import { findGDJS } from '../../../GameEngineFinder/LocalGDJSFinder';
 import LocalNetworkPreviewDialog from './LocalNetworkPreviewDialog';
 import assignIn from 'lodash/assignIn';
-import { type PreviewOptions } from '../../PreviewLauncher.flow';
+import {
+  type PreviewOptions,
+  type PreviewLauncherProps,
+} from '../../PreviewLauncher.flow';
 import SubscriptionChecker, {
   type SubscriptionCheckerInterface,
 } from '../../../Profile/Subscription/SubscriptionChecker';
@@ -17,15 +20,11 @@ import {
   localPreviewDebuggerServer,
 } from './LocalPreviewDebuggerServer';
 import Window from '../../../Utils/Window';
+import { getIDEVersionWithHash } from '../../../Version';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 const gd: libGDevelop = global.gd;
-
-type Props = {|
-  getIncludeFileHashs: () => { [string]: number },
-  onExport?: () => void,
-|};
 
 type State = {|
   networkPreviewDialogOpen: boolean,
@@ -47,7 +46,7 @@ type State = {|
 |};
 
 export default class LocalPreviewLauncher extends React.Component<
-  Props,
+  PreviewLauncherProps,
   State
 > {
   canDoNetworkPreview = () => true;
@@ -249,6 +248,17 @@ export default class LocalPreviewLauncher extends React.Component<
             previewExportOptions.setFullLoadingScreen(
               previewOptions.fullLoadingScreen
             );
+            previewExportOptions.setGDevelopVersionWithHash(
+              getIDEVersionWithHash()
+            );
+            previewExportOptions.setCrashReportUploadLevel(
+              this.props.crashReportUploadLevel
+            );
+            previewExportOptions.setPreviewContext(this.props.previewContext);
+            previewExportOptions.setProjectTemplateSlug(
+              project.getTemplateSlug()
+            );
+            previewExportOptions.setSourceGameId(this.props.sourceGameId);
 
             if (previewOptions.fallbackAuthor) {
               previewExportOptions.setFallbackAuthor(

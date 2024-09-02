@@ -4,7 +4,10 @@ import BrowserPreviewErrorDialog from './BrowserPreviewErrorDialog';
 import BrowserS3FileSystem from '../BrowserS3FileSystem';
 import { findGDJS } from '../../../GameEngineFinder/BrowserS3GDJSFinder';
 import assignIn from 'lodash/assignIn';
-import { type PreviewOptions } from '../../PreviewLauncher.flow';
+import {
+  type PreviewOptions,
+  type PreviewLauncherProps,
+} from '../../PreviewLauncher.flow';
 import { getBaseUrl } from '../../../Utils/GDevelopServices/Preview';
 import { makeTimestampedId } from '../../../Utils/TimestampedId';
 import {
@@ -16,15 +19,11 @@ import Window from '../../../Utils/Window';
 import { displayBlackLoadingScreenOrThrow } from '../../../Utils/BrowserExternalWindowUtils';
 import { getGDevelopResourceJwtToken } from '../../../Utils/GDevelopServices/Project';
 import { isNativeMobileApp } from '../../../Utils/Platform';
+import { getIDEVersionWithHash } from '../../../Version';
 const gd: libGDevelop = global.gd;
 
 type State = {|
   error: ?Error,
-|};
-
-type Props = {|
-  getIncludeFileHashs: () => { [string]: number },
-  onExport?: () => void,
 |};
 
 let nextPreviewWindowId = 0;
@@ -60,7 +59,7 @@ export const immediatelyOpenNewPreviewWindow = (
 };
 
 export default class BrowserS3PreviewLauncher extends React.Component<
-  Props,
+  PreviewLauncherProps,
   State
 > {
   canDoNetworkPreview = () => false;
@@ -163,7 +162,11 @@ export default class BrowserS3PreviewLauncher extends React.Component<
         previewExportOptions.setExternalLayoutName(externalLayout.getName());
       }
 
-      previewExportOptions.useWindowMessageDebuggerClient();
+      if (isNativeMobileApp()) {
+        previewExportOptions.useMinimalDebuggerClient();
+      } else {
+        previewExportOptions.useWindowMessageDebuggerClient();
+      }
 
       // Scripts generated from extensions keep the same URL even after being modified.
       // Use a cache bursting parameter to force the browser to reload them.
@@ -174,6 +177,13 @@ export default class BrowserS3PreviewLauncher extends React.Component<
       );
 
       previewExportOptions.setNativeMobileApp(isNativeMobileApp());
+      previewExportOptions.setGDevelopVersionWithHash(getIDEVersionWithHash());
+      previewExportOptions.setCrashReportUploadLevel(
+        this.props.crashReportUploadLevel
+      );
+      previewExportOptions.setPreviewContext(this.props.previewContext);
+      previewExportOptions.setProjectTemplateSlug(project.getTemplateSlug());
+      previewExportOptions.setSourceGameId(this.props.sourceGameId);
 
       if (previewOptions.fallbackAuthor) {
         previewExportOptions.setFallbackAuthor(

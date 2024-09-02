@@ -151,7 +151,7 @@ namespace gdjs {
         // The object can free all its resource directly...
         object.onDestroyed();
       }
-      // ...as its container cache is also destroy.
+      // ...as its container cache `_instancesRemoved` is also destroy.
       this._destroy();
 
       this._isLoaded = false;

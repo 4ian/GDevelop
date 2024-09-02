@@ -148,8 +148,10 @@ namespace gdjs {
       for (let i = 0, len = allInstancesList.length; i < len; ++i) {
         const object = allInstancesList[i];
         object.onDeletedFromScene(this);
+        // The object can free all its resource directly...
+        object.onDestroyed();
       }
-
+      // ...as its container cache is also destroy.
       this._destroy();
 
       this._isLoaded = false;

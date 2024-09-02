@@ -45,7 +45,6 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
   const xScrollbarThumb = React.useRef<?HTMLDivElement>(null);
   const yScrollbarTrack = React.useRef<?HTMLDivElement>(null);
   const yScrollbarThumb = React.useRef<?HTMLDivElement>(null);
-  const computeNewMaximumValues = React.useRef<boolean>(true);
 
   const showScrollbars = React.useRef<boolean>(false);
   const timeoutHidingScrollbarsId = React.useRef<?TimeoutID>(null);
@@ -142,16 +141,15 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
     ]
   );
 
-  const enableNewMaximumValuesCalculation = React.useCallback(
-    (enable: boolean) => {
-      // When calling editor.scrollTo, the editor ends up calling `setAndAdjust`
-      // that recomputes x/yMax and x/yMin, increasing the mouseToPositionRatio.
-      // If a thumb is kept at one of its extreme position, it can enter a loop and
-      // increase the position exponentially (See https://github.com/4ian/GDevelop/issues/6686).
-      computeNewMaximumValues.current = enable;
-    },
-    []
-  );
+  const shouldComputeNewMaximumValues = React.useCallback(() => {
+    // In the mouse move handlers, when calling editor.scrollTo,
+    // the editor ends up calling `setAndAdjust` that recomputes x/yMax and x/yMin,
+    // increasing the mouseToPositionRatio.
+    // If a thumb is kept dragged at one of its extreme position, it can enter a loop and
+    // increase the position exponentially (See https://github.com/4ian/GDevelop/issues/6686).
+
+    return !isDragging.current;
+  }, []);
 
   // When the mouse is moving after dragging the thumb:
   // - calculate the distance scrolled
@@ -214,7 +212,6 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
   const makeMouseUpXThumbHandler = React.useCallback(
     mouseMoveHandler =>
       function mouseUpHandler(e: MouseEvent) {
-        enableNewMaximumValuesCalculation(true);
         isDragging.current = false;
         if (
           e.target !== xScrollbarTrack.current &&
@@ -225,12 +222,11 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
         document.removeEventListener('mousemove', mouseMoveHandler);
         document.removeEventListener('mouseup', mouseUpHandler);
       },
-    [hideScrollbarsAfterDelay, enableNewMaximumValuesCalculation]
+    [hideScrollbarsAfterDelay]
   );
   const makeMouseUpYThumbHandler = React.useCallback(
     mouseMoveHandler =>
       function mouseUpHandler(e: MouseEvent) {
-        enableNewMaximumValuesCalculation(true);
         isDragging.current = false;
         if (
           e.target !== yScrollbarTrack.current &&
@@ -241,7 +237,7 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
         document.removeEventListener('mousemove', mouseMoveHandler);
         document.removeEventListener('mouseup', mouseUpHandler);
       },
-    [hideScrollbarsAfterDelay, enableNewMaximumValuesCalculation]
+    [hideScrollbarsAfterDelay]
   );
 
   // When the user clicks on the thumbs, we register new events:
@@ -258,18 +254,12 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
         xValue.current
       );
 
-      enableNewMaximumValuesCalculation(false);
-
       const mouseUpHandler = makeMouseUpXThumbHandler(mouseMoveHandler);
 
       document.addEventListener('mousemove', mouseMoveHandler);
       document.addEventListener('mouseup', mouseUpHandler);
     },
-    [
-      makeMouseMoveXHandler,
-      makeMouseUpXThumbHandler,
-      enableNewMaximumValuesCalculation,
-    ]
+    [makeMouseMoveXHandler, makeMouseUpXThumbHandler]
   );
   const mouseDownYThumbHandler = React.useCallback(
     (e: MouseEvent) => {
@@ -280,18 +270,12 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
         yValue.current
       );
 
-      enableNewMaximumValuesCalculation(false);
-
       const mouseUpHandler = makeMouseUpYThumbHandler(mouseMoveHandler);
 
       document.addEventListener('mousemove', mouseMoveHandler);
       document.addEventListener('mouseup', mouseUpHandler);
     },
-    [
-      makeMouseMoveYHandler,
-      makeMouseUpYThumbHandler,
-      enableNewMaximumValuesCalculation,
-    ]
+    [makeMouseMoveYHandler, makeMouseUpYThumbHandler]
   );
 
   // Add the mouse down events once on mount.
@@ -335,7 +319,7 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
       newWidth: number,
       newHeight: number,
     |}) => {
-      if (computeNewMaximumValues.current) {
+      if (shouldComputeNewMaximumValues()) {
         xMax.current = Math.max(Math.abs(newXValue) + 100, xMax.current);
         yMax.current = Math.max(Math.abs(newYValue) + 100, yMax.current);
         xMin.current = -xMax.current;
@@ -351,7 +335,11 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
       hideScrollbarsAfterDelayDebounced();
       forceUpdate();
     },
-    [forceUpdate, hideScrollbarsAfterDelayDebounced]
+    [
+      forceUpdate,
+      hideScrollbarsAfterDelayDebounced,
+      shouldComputeNewMaximumValues,
+    ]
   );
 
   const handleViewPositionChange = React.useCallback(

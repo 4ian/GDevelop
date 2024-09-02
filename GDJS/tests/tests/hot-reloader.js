@@ -222,10 +222,10 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
    * @returns {string | null}
    */
   const getSpriteImage = (instance) => {
-    /** @type gdjs.SpriteRuntimeObject */
-    // @ts-ignore
-    const sprite = instance;
-    const currentFrame = sprite._animator.getCurrentFrame();
+    if (!(instance instanceof gdjs.SpriteRuntimeObject)) {
+      throw new Error("Couldn't instantiate a sprite for testing.");
+    }
+    const currentFrame = instance._animator.getCurrentFrame();
     return currentFrame ? currentFrame.image : null;
   };
 
@@ -244,9 +244,8 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
     const hotReloader = new gdjs.HotReloader(runtimeGame);
     runtimeGame.areSceneAssetsReady = (sceneName) => true;
     runtimeGame._sceneStack.push('Scene1');
-    /** @type gdjs.RuntimeScene */
-    //@ts-ignore
     const scene = runtimeGame.getSceneStack().getCurrentScene();
+    if (!scene) throw new Error("Couldn't set a current scene for testing.");
 
     const newProjectData = createProjectData({
       layouts: [
@@ -287,9 +286,8 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
     const hotReloader = new gdjs.HotReloader(runtimeGame);
     runtimeGame.areSceneAssetsReady = (sceneName) => true;
     runtimeGame._sceneStack.push('Scene1');
-    /** @type gdjs.RuntimeScene */
-    //@ts-ignore
     const scene = runtimeGame.getSceneStack().getCurrentScene();
+    if (!scene) throw new Error("Couldn't set a current scene for testing.");
 
     const newProjectData = createProjectData({
       layouts: [
@@ -335,9 +333,8 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
     const hotReloader = new gdjs.HotReloader(runtimeGame);
     runtimeGame.areSceneAssetsReady = (sceneName) => true;
     runtimeGame._sceneStack.push('Scene1');
-    /** @type gdjs.RuntimeScene */
-    //@ts-ignore
     const scene = runtimeGame.getSceneStack().getCurrentScene();
+    if (!scene) throw new Error("Couldn't set a current scene for testing.");
 
     const newProjectData = createProjectData({
       layouts: [
@@ -366,9 +363,10 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
 
     const sceneInstances = scene.getInstancesOf('MyCustomObject');
     expect(sceneInstances.length).to.be(1);
-    /** @type gdjs.CustomRuntimeObject */
-    // @ts-ignore
     const customObject = sceneInstances[0];
+    if (!(customObject instanceof gdjs.CustomRuntimeObject)) {
+      throw new Error("Couldn't instantiate a custom object for testing.");
+    }
     const instances = customObject
       .getChildrenContainer()
       .getInstancesOf('MyChildObject');
@@ -391,7 +389,9 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
         createEventsBasedObjectData({
           name: 'MyCustomObject',
           instances: [{ persistentUuid: '11' }, { persistentUuid: '12' }],
-          objects: [createSpriteData({ name: 'MyChildObject', image: 'ResourceA' })],
+          objects: [
+            createSpriteData({ name: 'MyChildObject', image: 'ResourceA' }),
+          ],
         }),
       ],
     });
@@ -399,10 +399,9 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
     const hotReloader = new gdjs.HotReloader(runtimeGame);
     runtimeGame.areSceneAssetsReady = (sceneName) => true;
     runtimeGame._sceneStack.push('Scene1');
-    /** @type gdjs.RuntimeScene */
-    //@ts-ignore
     const scene = runtimeGame.getSceneStack().getCurrentScene();
-  
+    if (!scene) throw new Error("Couldn't set a current scene for testing.");
+
     const newProjectData = createProjectData({
       layouts: [
         createSceneData({
@@ -414,23 +413,26 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
         createEventsBasedObjectData({
           name: 'MyCustomObject',
           instances: [{ persistentUuid: '11' }, { persistentUuid: '12' }],
-          objects: [createSpriteData({ name: 'MyChildObject', image: 'ResourceB' })],
+          objects: [
+            createSpriteData({ name: 'MyChildObject', image: 'ResourceB' }),
+          ],
         }),
       ],
     });
-  
+
     await hotReloader._hotReloadRuntimeGame(
       oldProjectData,
       newProjectData,
       [],
       runtimeGame
     );
-  
+
     const sceneInstances = scene.getInstancesOf('MyCustomObject');
     expect(sceneInstances.length).to.be(1);
-    /** @type gdjs.CustomRuntimeObject */
-    // @ts-ignore
     const customObject = sceneInstances[0];
+    if (!(customObject instanceof gdjs.CustomRuntimeObject)) {
+      throw new Error("Couldn't instantiate a custom object for testing.");
+    }
     const instances = customObject
       .getChildrenContainer()
       .getInstancesOf('MyChildObject');

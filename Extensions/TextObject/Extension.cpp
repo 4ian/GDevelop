@@ -49,7 +49,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                 "res/actions/font.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .AddParameter("police", _("Font"))
+      .AddParameter("fontResource", _("Font resource name"))
       .SetFunctionName("ChangeFont");
 
   obj.AddAction(

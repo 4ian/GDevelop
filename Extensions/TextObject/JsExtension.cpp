@@ -38,6 +38,9 @@ class TextObjectJsExtension : public gd::PlatformExtension {
     GetAllExpressionsForObject("TextObject::Text")["FontSize"]
         .SetFunctionName("getCharacterSize");
 
+    GetAllActionsForObject("TextObject::Text")["TextObject::Font"]
+        .SetFunctionName("setFontName");
+
     GetAllActionsForObject("TextObject::Text")["TextObject::SetBold"]
         .SetFunctionName("setBold");
     GetAllConditionsForObject("TextObject::Text")["TextObject::IsBold"]
@@ -188,8 +191,6 @@ class TextObjectJsExtension : public gd::PlatformExtension {
         .SetFunctionName("setShadow");
 
     // Unimplemented actions and conditions:
-    GetAllActionsForObject("TextObject::Text")["TextObject::Font"]
-        .SetFunctionName("");
     GetAllActionsForObject("TextObject::Text")["TextObject::SetUnderlined"]
         .SetFunctionName("");
     GetAllConditionsForObject("TextObject::Text")["TextObject::IsUnderlined"]

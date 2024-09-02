@@ -103,7 +103,6 @@ const components = {
   atlasResource: AtlasResourceField,
   spineResource: SpineResourceField,
   color: ColorExpressionField,
-  police: DefaultField, //TODO
   forceMultiplier: ForceMultiplierField,
   sceneName: SceneNameField,
   layerEffectName: LayerEffectNameField,

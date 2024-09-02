@@ -1,7 +1,8 @@
 // @flow
 import React from 'react';
-import ViewPosition from './ViewPosition';
+import { Trans } from '@lingui/macro';
 import throttle from 'lodash/throttle';
+import ViewPosition from './ViewPosition';
 import InstancesEditor, {
   type InstancesEditorPropsWithoutSizeAndScroll,
 } from './index';
@@ -13,7 +14,6 @@ import Rectangle from '../Utils/Rectangle';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { useIsMounted } from '../Utils/UseIsMounted';
 import ErrorBoundary from '../UI/ErrorBoundary';
-import { Trans } from '@lingui/macro';
 
 const SCROLLBAR_DETECTION_WIDTH = 50;
 // Those scrollbar dimensions should be the same as in the CSS file Scrollbar.css
@@ -45,6 +45,7 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
   const xScrollbarThumb = React.useRef<?HTMLDivElement>(null);
   const yScrollbarTrack = React.useRef<?HTMLDivElement>(null);
   const yScrollbarThumb = React.useRef<?HTMLDivElement>(null);
+  const computeNewMaximumValues = React.useRef<boolean>(true);
 
   const showScrollbars = React.useRef<boolean>(false);
   const timeoutHidingScrollbarsId = React.useRef<?TimeoutID>(null);
@@ -202,6 +203,7 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
   const makeMouseUpXThumbHandler = React.useCallback(
     mouseMoveHandler =>
       function mouseUpHandler(e: MouseEvent) {
+        computeNewMaximumValues.current = true;
         isDragging.current = false;
         if (
           e.target !== xScrollbarTrack.current &&
@@ -217,6 +219,7 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
   const makeMouseUpYThumbHandler = React.useCallback(
     mouseMoveHandler =>
       function mouseUpHandler(e: MouseEvent) {
+        computeNewMaximumValues.current = true;
         isDragging.current = false;
         if (
           e.target !== yScrollbarTrack.current &&
@@ -239,11 +242,16 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
     (e: MouseEvent) => {
       isDragging.current = true;
       const initialDragPosition = e.clientX;
-      // xStartScrollValue.current = xValue.current;
       const mouseMoveHandler = makeMouseMoveXHandler(
         initialDragPosition,
         xValue.current
       );
+      // When calling editor.scrollTo, the editor ends up calling `setAndAdjust`
+      // that recomputes x/yMax and x/yMin, increasing the mouseToPositionRatio.
+      // If a thumb is kept at one of its extreme position, it can enter a loop and
+      // increase the position exponentially (See https://github.com/4ian/GDevelop/issues/6686).
+      computeNewMaximumValues.current = false;
+
       const mouseUpHandler = makeMouseUpXThumbHandler(mouseMoveHandler);
 
       document.addEventListener('mousemove', mouseMoveHandler);
@@ -259,6 +267,12 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
         initialDragPosition,
         yValue.current
       );
+      // When calling editor.scrollTo, the editor ends up calling `setAndAdjust`
+      // that recomputes x/yMax and x/yMin, increasing the mouseToPositionRatio.
+      // If a thumb is kept at one of its extreme position, it can enter a loop and
+      // increase the position exponentially (See https://github.com/4ian/GDevelop/issues/6686).
+      computeNewMaximumValues.current = false;
+
       const mouseUpHandler = makeMouseUpYThumbHandler(mouseMoveHandler);
 
       document.addEventListener('mousemove', mouseMoveHandler);
@@ -302,16 +316,18 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
       newYValue,
       newWidth,
       newHeight,
-    }: {
+    }: {|
       newXValue: number,
       newYValue: number,
       newWidth: number,
       newHeight: number,
-    }) => {
-      xMax.current = Math.max(Math.abs(newXValue) + 100, xMax.current);
-      yMax.current = Math.max(Math.abs(newYValue) + 100, yMax.current);
-      xMin.current = -xMax.current;
-      yMin.current = -yMax.current;
+    |}) => {
+      if (computeNewMaximumValues.current) {
+        xMax.current = Math.max(Math.abs(newXValue) + 100, xMax.current);
+        yMax.current = Math.max(Math.abs(newYValue) + 100, yMax.current);
+        xMin.current = -xMax.current;
+        yMin.current = -yMax.current;
+      }
       xValue.current = newXValue;
       yValue.current = newYValue;
       canvasWidth.current = newWidth;

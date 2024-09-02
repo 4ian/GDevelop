@@ -88,7 +88,9 @@ namespace gdjs {
         .getGame()
         .getEventsBasedObjectData(objectData.type);
       if (!eventsBasedObjectData) {
-        logger.error('loadFrom was called without an events-based object');
+        logger.error(
+          `A CustomRuntimeObject was initialized (or re-initialized) from object data referring to an non existing events based object data with type "${objectData.type}".`
+        );
         return;
       }
       this._createDefaultSizeIfNeeded(eventsBasedObjectData);

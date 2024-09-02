@@ -515,6 +515,9 @@ export default class InstancesEditor extends Component<Props> {
       viewPosition: this.viewPosition,
       onClick: this._onInterceptClick,
       onPanMove: this._onPanMove,
+      onInterceptPointerMove: () => {
+        this.fpsLimiter.notifyInteractionHappened();
+      },
     });
     this.highlightedInstance = new HighlightedInstance({
       instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),

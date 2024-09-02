@@ -103,7 +103,7 @@ const components = {
   atlasResource: AtlasResourceField,
   spineResource: SpineResourceField,
   color: ColorExpressionField,
-  police: DefaultField, //TODO
+  police: DefaultField, // TODO: Remove since fontResource is used now instead.
   forceMultiplier: ForceMultiplierField,
   sceneName: SceneNameField,
   layerEffectName: LayerEffectNameField,

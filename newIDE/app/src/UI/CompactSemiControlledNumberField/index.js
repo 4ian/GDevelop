@@ -43,9 +43,26 @@ const CompactSemiControlledNumberField = ({
   );
 
   const onChangeValue = React.useCallback(
-    (newValueAsString: string, reason: 'keyInput' | 'iconControl' | 'blur') => {
+    (
+      newValueAsString: string,
+      reason: 'keyInput' | 'iconControl' | 'blur' | 'userValidation'
+    ) => {
       const newValueAsFloat = parseFloat(newValueAsString);
-      if (reason === 'keyInput' || reason === 'blur') {
+      if (reason === 'iconControl') {
+        const isNewValueAsFloatValid = !Number.isNaN(newValueAsFloat);
+
+        if (isNewValueAsFloatValid) {
+          onChange(newValueAsFloat);
+        }
+        setTemporaryValue(newValueAsString);
+        return;
+      }
+
+      if (
+        reason === 'keyInput' ||
+        reason === 'blur' ||
+        reason === 'userValidation'
+      ) {
         const isValueWithLeadingSign = /[+-]\s*\d+/.test(newValueAsString);
         // parseFloat correctly parses '12+' as '12' so we need to check
         // for math characters ourselves.
@@ -54,12 +71,13 @@ const CompactSemiControlledNumberField = ({
           !Number.isNaN(newValueAsFloat) &&
           (!containsMathCharacters ||
             (containsMathCharacters && isValueWithLeadingSign));
-
+        let updateTemporaryValueWithCalculatedValue = false;
         let newValue: number | null = null;
-        if (reason === 'blur') {
+        if (reason === 'userValidation' || reason === 'blur') {
           // Do not try to parse input at each input change.
           try {
             newValue = calculate(newValueAsString.toLowerCase());
+            updateTemporaryValueWithCalculatedValue = true;
           } catch (error) {
             console.warn(`Error computing ${newValueAsString}:`, error);
           }
@@ -71,14 +89,12 @@ const CompactSemiControlledNumberField = ({
         if (newValue && (reason === 'blur' || !commitOnBlur)) {
           onChange(newValue);
         }
-      } else if (reason === 'iconControl') {
-        const isNewValueAsFloatValid = !Number.isNaN(newValueAsFloat);
-
-        if (isNewValueAsFloatValid) {
-          onChange(newValueAsFloat);
-        }
+        setTemporaryValue(
+          updateTemporaryValueWithCalculatedValue && newValue
+            ? newValue.toString()
+            : newValueAsString
+        );
       }
-      setTemporaryValue(newValueAsString);
     },
     [commitOnBlur, onChange]
   );
@@ -96,7 +112,7 @@ const CompactSemiControlledNumberField = ({
         }}
         onKeyDown={event => {
           if (shouldValidate(event)) {
-            onChangeValue(temporaryValue.toLowerCase(), 'keyInput');
+            onChangeValue(temporaryValue.toLowerCase(), 'userValidation');
           }
         }}
         onKeyUp={event => {

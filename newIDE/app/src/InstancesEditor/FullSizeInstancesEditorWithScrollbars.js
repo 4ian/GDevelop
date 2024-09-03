@@ -1,7 +1,8 @@
 // @flow
 import React from 'react';
-import ViewPosition from './ViewPosition';
+import { Trans } from '@lingui/macro';
 import throttle from 'lodash/throttle';
+import ViewPosition from './ViewPosition';
 import InstancesEditor, {
   type InstancesEditorPropsWithoutSizeAndScroll,
 } from './index';
@@ -13,7 +14,6 @@ import Rectangle from '../Utils/Rectangle';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { useIsMounted } from '../Utils/UseIsMounted';
 import ErrorBoundary from '../UI/ErrorBoundary';
-import { Trans } from '@lingui/macro';
 
 const SCROLLBAR_DETECTION_WIDTH = 50;
 // Those scrollbar dimensions should be the same as in the CSS file Scrollbar.css
@@ -141,6 +141,16 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
     ]
   );
 
+  const shouldComputeNewMaximumValues = React.useCallback(() => {
+    // In the mouse move handlers, when calling editor.scrollTo,
+    // the editor ends up calling `setAndAdjust` that recomputes x/yMax and x/yMin,
+    // increasing the mouseToPositionRatio.
+    // If a thumb is kept dragged at one of its extreme position, it can enter a loop and
+    // increase the position exponentially (See https://github.com/4ian/GDevelop/issues/6686).
+
+    return !isDragging.current;
+  }, []);
+
   // When the mouse is moving after dragging the thumb:
   // - calculate the distance scrolled
   // - update the thumb position with the value
@@ -239,11 +249,11 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
     (e: MouseEvent) => {
       isDragging.current = true;
       const initialDragPosition = e.clientX;
-      // xStartScrollValue.current = xValue.current;
       const mouseMoveHandler = makeMouseMoveXHandler(
         initialDragPosition,
         xValue.current
       );
+
       const mouseUpHandler = makeMouseUpXThumbHandler(mouseMoveHandler);
 
       document.addEventListener('mousemove', mouseMoveHandler);
@@ -259,6 +269,7 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
         initialDragPosition,
         yValue.current
       );
+
       const mouseUpHandler = makeMouseUpYThumbHandler(mouseMoveHandler);
 
       document.addEventListener('mousemove', mouseMoveHandler);
@@ -302,16 +313,18 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
       newYValue,
       newWidth,
       newHeight,
-    }: {
+    }: {|
       newXValue: number,
       newYValue: number,
       newWidth: number,
       newHeight: number,
-    }) => {
-      xMax.current = Math.max(Math.abs(newXValue) + 100, xMax.current);
-      yMax.current = Math.max(Math.abs(newYValue) + 100, yMax.current);
-      xMin.current = -xMax.current;
-      yMin.current = -yMax.current;
+    |}) => {
+      if (shouldComputeNewMaximumValues()) {
+        xMax.current = Math.max(Math.abs(newXValue) + 100, xMax.current);
+        yMax.current = Math.max(Math.abs(newYValue) + 100, yMax.current);
+        xMin.current = -xMax.current;
+        yMin.current = -yMax.current;
+      }
       xValue.current = newXValue;
       yValue.current = newYValue;
       canvasWidth.current = newWidth;
@@ -322,7 +335,11 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
       hideScrollbarsAfterDelayDebounced();
       forceUpdate();
     },
-    [forceUpdate, hideScrollbarsAfterDelayDebounced]
+    [
+      forceUpdate,
+      hideScrollbarsAfterDelayDebounced,
+      shouldComputeNewMaximumValues,
+    ]
   );
 
   const handleViewPositionChange = React.useCallback(

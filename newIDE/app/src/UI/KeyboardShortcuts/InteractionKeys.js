@@ -66,3 +66,12 @@ export const shouldFocusNextField = (event: SupportedEvent) => {
 export const shouldFocusPreviousField = (event: SupportedEvent) => {
   return event.key === 'Tab' && event.shiftKey;
 };
+
+/**
+ * Check if the user asked navigate to another field.
+ * Note that in most case, this should be automatically handled by the browser
+ * (or material-ui), and using this should not be needed.
+ */
+export const shouldFocusAnotherField = (event: SupportedEvent) => {
+  return event.key === 'Tab';
+};

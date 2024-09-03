@@ -301,6 +301,14 @@ describe('MathExpressionParser', () => {
     );
   });
 
+  test.skip('calculate() failing test cases', () => {
+    // TODO: The parser does not handle well `-` operator when in front of function.
+    // See https://gist.github.com/tkrotoff/b0b1d39da340f5fc6c5e2a79a8b6cec0?permalink_comment_id=5176448#gistcomment-5176448.
+    // If the issue is fixed in the gist, put those tests in the test suite.
+    expect(calculate('toDeg(-pi())')).toEqual(-180);
+    expect(calculate('min(-12, -max(13, 0))')).toEqual(-13);
+  });
+
   test('calculate()', () => {
     // https://en.wikipedia.org/wiki/Shunting_yard_algorithm#Detailed_examples
     expect(calculate('3 + 4 * 2 / (1 - 5) ^ 2 ^ 3')).toEqual(

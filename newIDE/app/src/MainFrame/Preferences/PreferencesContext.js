@@ -228,6 +228,7 @@ export type PreferencesValues = {|
   displaySaveReminder: {| activated: boolean |}, // Store as object in case we need to add options.
   editorStateByProject: { [string]: { editorTabs: EditorTabsPersistedState } },
   fetchPlayerTokenForPreviewAutomatically: boolean,
+  previewCrashReportUploadLevel: string,
 |};
 
 /**
@@ -326,6 +327,7 @@ export type Preferences = {|
     editorState?: {| editorTabs: EditorTabsPersistedState |}
   ) => void,
   setFetchPlayerTokenForPreviewAutomatically: (enabled: boolean) => void,
+  setPreviewCrashReportUploadLevel: (level: string) => void,
 |};
 
 export const initialPreferences = {
@@ -380,6 +382,7 @@ export const initialPreferences = {
     displaySaveReminder: { activated: true },
     editorStateByProject: {},
     fetchPlayerTokenForPreviewAutomatically: true,
+    previewCrashReportUploadLevel: 'exclude-javascript-code-events',
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -450,6 +453,7 @@ export const initialPreferences = {
   getEditorStateForProject: projectId => {},
   setEditorStateForProject: (projectId, editorState) => {},
   setFetchPlayerTokenForPreviewAutomatically: (enabled: boolean) => {},
+  setPreviewCrashReportUploadLevel: (level: string) => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

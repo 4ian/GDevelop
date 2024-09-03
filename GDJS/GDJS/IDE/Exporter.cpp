@@ -101,6 +101,7 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
         usedExtensionsResult.Has3DObjects(),
         /*includeWebsocketDebuggerClient=*/false,
         /*includeWindowMessageDebuggerClient=*/false,
+        /*includeMinimalDebuggerClient=*/false,
         exportedProject.GetLoadingScreen().GetGDevelopLogoStyle(),
         includesFiles);
 

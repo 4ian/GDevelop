@@ -8,9 +8,6 @@ namespace gdjs {
   export class WebsocketDebuggerClient extends gdjs.AbstractDebuggerClient {
     _ws: WebSocket | null;
 
-    /**
-     * @param path - The path of the property to modify, starting from the RuntimeGame.
-     */
     constructor(runtimeGame: RuntimeGame) {
       super(runtimeGame);
       this._ws = null;

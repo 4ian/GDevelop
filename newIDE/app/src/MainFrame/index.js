@@ -3605,6 +3605,13 @@ const MainFrame = (props: Props) => {
       {!!renderPreviewLauncher &&
         renderPreviewLauncher(
           {
+            crashReportUploadLevel:
+              preferences.values.previewCrashReportUploadLevel ||
+              'exclude-javascript-code-events',
+            previewContext: quickCustomizationDialogOpenedFromGameId
+              ? 'preview-quick-customization'
+              : 'preview',
+            sourceGameId: quickCustomizationDialogOpenedFromGameId || '',
             getIncludeFileHashs:
               eventsFunctionsExtensionsContext.getIncludeFileHashs,
             onExport: () => openShareDialog('publish'),

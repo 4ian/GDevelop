@@ -3,6 +3,7 @@ declare class gdPreviewExportOptions {
   constructor(project: gdProject, outputPath: string): void;
   useWebsocketDebuggerClientWithServerAddress(address: string, port: string): gdPreviewExportOptions;
   useWindowMessageDebuggerClient(): gdPreviewExportOptions;
+  useMinimalDebuggerClient(): gdPreviewExportOptions;
   setLayoutName(layoutName: string): gdPreviewExportOptions;
   setFallbackAuthor(id: string, username: string): gdPreviewExportOptions;
   setAuthenticatedPlayer(playerId: string, playerUsername: string, playerToken: string): gdPreviewExportOptions;
@@ -16,6 +17,11 @@ declare class gdPreviewExportOptions {
   setElectronRemoteRequirePath(electronRemoteRequirePath: string): gdPreviewExportOptions;
   setGDevelopResourceToken(gdevelopResourceToken: string): gdPreviewExportOptions;
   setAllowAuthenticationUsingIframeForPreview(enable: boolean): gdPreviewExportOptions;
+  setCrashReportUploadLevel(crashReportUploadLevel: string): gdPreviewExportOptions;
+  setPreviewContext(previewContext: string): gdPreviewExportOptions;
+  setGDevelopVersionWithHash(gdevelopVersionWithHash: string): gdPreviewExportOptions;
+  setProjectTemplateSlug(projectTemplateSlug: string): gdPreviewExportOptions;
+  setSourceGameId(sourceGameId: string): gdPreviewExportOptions;
   delete(): void;
   ptr: number;
 };

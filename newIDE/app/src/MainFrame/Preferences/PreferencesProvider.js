@@ -196,6 +196,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setFetchPlayerTokenForPreviewAutomatically: this._setFetchPlayerTokenForPreviewAutomatically.bind(
       this
     ),
+    setPreviewCrashReportUploadLevel: this._setPreviewCrashReportUploadLevel.bind(
+      this
+    ),
   };
 
   componentDidMount() {
@@ -992,6 +995,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           fetchPlayerTokenForPreviewAutomatically: newValue,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setPreviewCrashReportUploadLevel(newValue: string) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          previewCrashReportUploadLevel: newValue,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

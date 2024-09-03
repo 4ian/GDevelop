@@ -88,6 +88,69 @@ namespace gdjs {
     );
   };
 
+  /** Replacer function for JSON.stringify to convert Error objects into plain objects that can be logged. */
+  const errorReplacer = (_, value: any) => {
+    if (value instanceof Error) {
+      // See https://stackoverflow.com/questions/18391212/is-it-not-possible-to-stringify-an-error-using-json-stringify
+      const errorObject = {};
+      Object.getOwnPropertyNames(value).forEach((prop) => {
+        errorObject[prop] = value[prop];
+      });
+
+      return errorObject;
+    }
+    // Return the value unchanged if it's not an Error object.
+    return value;
+  };
+
+  const buildGameCrashReport = (
+    exception: Error,
+    runtimeGame: gdjs.RuntimeGame
+  ) => {
+    const sceneNames = runtimeGame.getSceneStack().getAllSceneNames();
+    const currentScene = runtimeGame.getSceneStack().getCurrentScene();
+    return {
+      type: 'javascript-uncaught-exception',
+      exception,
+      platformInfo: runtimeGame.getPlatformInfo(),
+      playerId: runtimeGame.getPlayerId(),
+      sessionId: runtimeGame.getSessionId(),
+      isPreview: runtimeGame.isPreview(),
+      gdevelop: {
+        previewContext: runtimeGame.getAdditionalOptions().previewContext,
+        isNativeMobileApp: runtimeGame.getAdditionalOptions().nativeMobileApp,
+        versionWithHash: runtimeGame.getAdditionalOptions()
+          .gdevelopVersionWithHash,
+        environment: runtimeGame.getAdditionalOptions().environment,
+      },
+      game: {
+        gameId: gdjs.projectData.properties.projectUuid,
+        name: runtimeGame.getGameData().properties.name || '',
+        packageName: runtimeGame.getGameData().properties.packageName || '',
+        version: runtimeGame.getGameData().properties.version || '',
+        location: window.location.href,
+        projectTemplateSlug: runtimeGame.getAdditionalOptions()
+          .projectTemplateSlug,
+        sourceGameId: runtimeGame.getAdditionalOptions().sourceGameId,
+      },
+      gameState: {
+        sceneNames,
+        isWebGLSupported: runtimeGame.getRenderer().isWebGLSupported(),
+        hasPixiRenderer: !!runtimeGame.getRenderer().getPIXIRenderer(),
+        hasThreeRenderer: !!runtimeGame.getRenderer().getThreeRenderer(),
+        resourcesTotalCount: runtimeGame.getGameData().resources.resources
+          .length,
+        antialiasingMode: runtimeGame.getAntialiasingMode(),
+        isAntialisingEnabledOnMobile: runtimeGame.isAntialisingEnabledOnMobile(),
+        scriptFiles: runtimeGame.getAdditionalOptions().scriptFiles,
+        currentSceneTimeFromStart: currentScene
+          ? currentScene.getTimeManager().getTimeFromStart()
+          : null,
+        gdjsKeys: Object.keys(gdjs).slice(0, 1000),
+      },
+    };
+  };
+
   /**
    * The base class describing a debugger client, that can be used to inspect
    * a runtime game (dump its state) or alter it.
@@ -97,6 +160,8 @@ namespace gdjs {
     _hotReloader: gdjs.HotReloader;
     _originalConsole = originalConsole;
     _inGameDebugger: gdjs.InGameDebugger;
+
+    _hasLoggedUncaughtException = false;
 
     constructor(runtimeGame: RuntimeGame) {
       this._runtimegame = runtimeGame;
@@ -213,10 +278,68 @@ namespace gdjs {
      */
     protected abstract _sendMessage(message: string): void;
 
+    static isErrorComingFromJavaScriptCode(exception: Error | null): boolean {
+      if (!exception || !exception.stack) return false;
+
+      return exception.stack.includes('GDJSInlineCode');
+    }
+
+    async _reportCrash(exception: Error) {
+      const gameCrashReport = buildGameCrashReport(
+        exception,
+        this._runtimegame
+      );
+
+      // Let a debugger server know about the crash.
+      this._sendMessage(
+        circularSafeStringify(
+          {
+            command: 'game.crashed',
+            payload: gameCrashReport,
+          },
+          errorReplacer
+        )
+      );
+
+      // Send the report to the APIs, if allowed.
+      if (
+        !this._runtimegame.getAdditionalOptions().crashReportUploadLevel ||
+        this._runtimegame.getAdditionalOptions().crashReportUploadLevel ===
+          'none' ||
+        (this._runtimegame.getAdditionalOptions().crashReportUploadLevel ===
+          'exclude-javascript-code-events' &&
+          AbstractDebuggerClient.isErrorComingFromJavaScriptCode(exception))
+      ) {
+        return;
+      }
+
+      const rootApi = this._runtimegame.isUsingGDevelopDevelopmentEnvironment()
+        ? 'https://api-dev.gdevelop.io'
+        : 'https://api.gdevelop.io';
+      const baseUrl = `${rootApi}/analytics`;
+
+      try {
+        await fetch(`${baseUrl}/game-crash-report`, {
+          body: circularSafeStringify(gameCrashReport, errorReplacer),
+          method: 'POST',
+        });
+      } catch (error) {
+        logger.error('Error while sending the crash report:', error);
+      }
+    }
+
     onUncaughtException(exception: Error): void {
       logger.error('Uncaught exception: ' + exception);
 
       this._inGameDebugger.setUncaughtException(exception);
+
+      if (!this._hasLoggedUncaughtException) {
+        // Only log an uncaught exception once, to avoid spamming the debugger server
+        // in case of an exception at each frame.
+        this._hasLoggedUncaughtException = true;
+
+        this._reportCrash(exception);
+      }
     }
 
     /**

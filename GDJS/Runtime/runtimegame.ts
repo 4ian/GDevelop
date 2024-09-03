@@ -72,7 +72,7 @@ namespace gdjs {
     electronRemoteRequirePath?: string;
 
     /**
-     * the token to use by the game engine when requiring any resource stored on
+     * The token to use by the game engine when requiring any resource stored on
      * GDevelop Cloud buckets. Note that this is only useful during previews.
      */
     gdevelopResourceToken?: string;
@@ -84,6 +84,21 @@ namespace gdjs {
      * window is a genuine one. It's only to be used in trusted contexts.
      */
     allowAuthenticationUsingIframeForPreview?: boolean;
+
+    /** If set, the game will send crash reports to GDevelop APIs. */
+    crashReportUploadLevel?: 'all' | 'exclude-javascript-code-events' | 'none';
+
+    /** Arbitrary string explaining in which context the game is being played. */
+    previewContext?: string;
+
+    /** The GDevelop version used to build the game. */
+    gdevelopVersionWithHash?: string;
+
+    /** The template slug that was used to create the project. */
+    projectTemplateSlug?: string;
+
+    /** The source game id that was used to create the project. */
+    sourceGameId?: string;
 
     /**
      * If set, this data is used to authenticate automatically when launching the game.

@@ -79,14 +79,6 @@ namespace gdjs {
     },
   };
 
-  const isErrorComingFromJavaScriptCode = (
-    exception: Error | null
-  ): boolean => {
-    if (!exception || !exception.stack) return false;
-
-    return exception.stack.includes('GDJSInlineCode');
-  };
-
   /**
    * Displays uncaught exceptions on top of the game.
    * Could be reworked in the future to support a minimal debugger inside the game.
@@ -120,7 +112,7 @@ namespace gdjs {
       }
 
       if (this._uncaughtException) {
-        const errorIsInJs = isErrorComingFromJavaScriptCode(
+        const errorIsInJs = gdjs.AbstractDebuggerClient.isErrorComingFromJavaScriptCode(
           this._uncaughtException
         );
         this._uncaughtExceptionElement = (

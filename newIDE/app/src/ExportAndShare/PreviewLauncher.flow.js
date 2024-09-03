@@ -22,6 +22,9 @@ export type PreviewOptions = {|
 
 /** The props that PreviewLauncher must support */
 export type PreviewLauncherProps = {|
+  crashReportUploadLevel: string,
+  previewContext: string,
+  sourceGameId: string,
   getIncludeFileHashs: () => { [string]: number },
   onExport: () => void,
 |};

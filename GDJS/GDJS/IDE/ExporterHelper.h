@@ -37,6 +37,7 @@ struct PreviewExportOptions {
       : project(project_),
         exportPath(exportPath_),
         useWindowMessageDebuggerClient(false),
+        useMinimalDebuggerClient(false),
         nativeMobileApp(false),
         projectDataOnlyExport(false),
         fullLoadingScreen(false),
@@ -90,6 +91,14 @@ struct PreviewExportOptions {
    */
   PreviewExportOptions &UseWindowMessageDebuggerClient() {
     useWindowMessageDebuggerClient = true;
+    return *this;
+  }
+
+  /**
+   * \brief Set that the game should have a minimal debugger client.
+   */
+  PreviewExportOptions &UseMinimalDebuggerClient() {
+    useMinimalDebuggerClient = true;
     return *this;
   }
 
@@ -203,11 +212,56 @@ struct PreviewExportOptions {
     return *this;
   }
 
+  /**
+   * \brief Set the level of crash reports to be sent to GDevelop APIs.
+   */
+  PreviewExportOptions &SetCrashReportUploadLevel(
+      const gd::String& crashReportUploadLevel_) {
+    crashReportUploadLevel = crashReportUploadLevel_;
+    return *this;
+  }
+
+  /**
+   * \brief Set the context of the preview.
+   */
+  PreviewExportOptions &SetPreviewContext(
+      const gd::String& previewContext_) {
+    previewContext = previewContext_;
+    return *this;
+  }
+
+  /**
+   * \brief Set the GDevelop version so the game is aware of it.
+   */
+  PreviewExportOptions &SetGDevelopVersionWithHash(
+      const gd::String& gdevelopVersionWithHash_) {
+    gdevelopVersionWithHash = gdevelopVersionWithHash_;
+    return *this;
+  }
+
+  /**
+   * \brief Set the template slug that was used to create the project.
+   */
+  PreviewExportOptions &SetProjectTemplateSlug(
+      const gd::String& projectTemplateSlug_) {
+    projectTemplateSlug = projectTemplateSlug_;
+    return *this;
+  }
+
+  /**
+   * \brief Set the source game id that was used to create the project.
+   */
+  PreviewExportOptions &SetSourceGameId(const gd::String& sourceGameId_) {
+    sourceGameId = sourceGameId_;
+    return *this;
+  }
+
   gd::Project &project;
   gd::String exportPath;
   gd::String websocketDebuggerServerAddress;
   gd::String websocketDebuggerServerPort;
   bool useWindowMessageDebuggerClient;
+  bool useMinimalDebuggerClient;
   gd::String layoutName;
   gd::String externalLayoutName;
   gd::String fallbackAuthorUsername;
@@ -224,6 +278,11 @@ struct PreviewExportOptions {
   gd::String electronRemoteRequirePath;
   gd::String gdevelopResourceToken;
   bool allowAuthenticationUsingIframeForPreview;
+  gd::String crashReportUploadLevel;
+  gd::String previewContext;
+  gd::String gdevelopVersionWithHash;
+  gd::String projectTemplateSlug;
+  gd::String sourceGameId;
 };
 
 /**
@@ -326,6 +385,7 @@ class ExporterHelper {
                       bool pixiInThreeRenderers,
                       bool includeWebsocketDebuggerClient,
                       bool includeWindowMessageDebuggerClient,
+                      bool includeMinimalDebuggerClient,
                       gd::String gdevelopLogoStyle,
                       std::vector<gd::String> &includesFiles);
 

@@ -96,7 +96,7 @@ static gd::String CleanProjectName(gd::String projectName) {
 ExporterHelper::ExporterHelper(gd::AbstractFileSystem &fileSystem,
                                gd::String gdjsRoot_,
                                gd::String codeOutputDir_)
-    : fs(fileSystem), gdjsRoot(gdjsRoot_), codeOutputDir(codeOutputDir_){};
+    : fs(fileSystem), gdjsRoot(gdjsRoot_), codeOutputDir(codeOutputDir_) {};
 
 bool ExporterHelper::ExportProjectForPixiPreview(
     const PreviewExportOptions &options) {
@@ -154,6 +154,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
                  !options.websocketDebuggerServerAddress.empty(),
                  /*includeWindowMessageDebuggerClient=*/
                  options.useWindowMessageDebuggerClient,
+                 /*includeMinimalDebuggerClient=*/
+                 options.useMinimalDebuggerClient,
                  immutableProject.GetLoadingScreen().GetGDevelopLogoStyle(),
                  includesFiles);
 
@@ -247,6 +249,24 @@ bool ExporterHelper::ExportProjectForPixiPreview(
     runtimeGameOptions.AddChild("playerId").SetStringValue(options.playerId);
     runtimeGameOptions.AddChild("playerToken")
         .SetStringValue(options.playerToken);
+  }
+  if (!options.crashReportUploadLevel.empty()) {
+    runtimeGameOptions.AddChild("crashReportUploadLevel")
+        .SetStringValue(options.crashReportUploadLevel);
+  }
+  if (!options.previewContext.empty()) {
+    runtimeGameOptions.AddChild("previewContext")
+        .SetStringValue(options.previewContext);
+  }
+  runtimeGameOptions.AddChild("gdevelopVersionWithHash")
+      .SetStringValue(options.gdevelopVersionWithHash);
+  if (!options.projectTemplateSlug.empty()) {
+    runtimeGameOptions.AddChild("projectTemplateSlug")
+        .SetStringValue(options.projectTemplateSlug);
+  }
+  if (!options.sourceGameId.empty()) {
+    runtimeGameOptions.AddChild("sourceGameId")
+        .SetStringValue(options.sourceGameId);
   }
 
   // Pass in the options the list of scripts files - useful for hot-reloading.
@@ -735,6 +755,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
                                     bool pixiInThreeRenderers,
                                     bool includeWebsocketDebuggerClient,
                                     bool includeWindowMessageDebuggerClient,
+                                    bool includeMinimalDebuggerClient,
                                     gd::String gdevelopLogoStyle,
                                     std::vector<gd::String> &includesFiles) {
   // First, do not forget common includes (they must be included before events
@@ -808,6 +829,9 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   if (includeWindowMessageDebuggerClient) {
     InsertUnique(includesFiles,
                  "debugger-client/window-message-debugger-client.js");
+  }
+  if (includeMinimalDebuggerClient) {
+    InsertUnique(includesFiles, "debugger-client/minimal-debugger-client.js");
   }
 
   if (pixiInThreeRenderers) {

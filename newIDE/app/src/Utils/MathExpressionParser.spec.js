@@ -344,7 +344,6 @@ describe('MathExpressionParser', () => {
     expect(calculate('min(-0, 1)')).toEqual(-0);
     expect(calculate('max(-0, -1)')).toEqual(-0);
     expect(calculate('sin(-0)')).toEqual(-0);
-    //expect(Math.cos(Math.PI / 2)).toEqual(0);
     expect(calculate('tan(-0)')).toEqual(-0);
     expect(calculate('log(1)')).toEqual(0); // No need for -0 hack
 
@@ -429,6 +428,27 @@ describe('MathExpressionParser', () => {
     expect(calculate('exp(log(1))')).toEqual(1);
     expect(calculate('log(exp(1))')).toEqual(1);
     expect(calculate('-log(exp(1))')).toEqual(-1);
+
+    // Pi
+    const precision = 1e-8;
+    expect(calculate('sin(pi())') < precision).toBe(true);
+    expect(calculate('cos(pi())')).toEqual(-1);
+    expect(
+      Math.abs(calculate('toDeg(-3.141592653589793)') + 180) < precision
+    ).toBe(true);
+    expect(calculate('toRad(-180)')).toEqual(-Math.PI);
+    expect(Math.abs(calculate('sin(pi()/6)') - 0.5) < precision).toBe(true);
+    expect(Math.abs(calculate('cos(pi()/3)') - 0.5) < precision).toBe(true);
+
+    // Angle unit conversion functions
+    expect(calculate('toDeg(0)')).toEqual(0);
+    expect(calculate('toRad(0)')).toEqual(0);
+    expect(calculate('toRad(90)')).toEqual(Math.PI / 2);
+    expect(calculate('toRad(45)')).toEqual(Math.PI / 4);
+    expect(calculate('toRad(180)')).toEqual(Math.PI);
+    expect(calculate('toRad(-180)')).toEqual(-Math.PI);
+    expect(calculate('toDeg(pi())')).toEqual(180);
+    expect(calculate('toDeg(sin(pi()))') < precision).toBe(true);
 
     // Consecutive operators
     expect(calculate('1++2')).toEqual(3);

@@ -69,9 +69,9 @@ const operators: {
     arity: 2,
   },
 };
-export const operatorsKeys: string[] = Object.keys(operators);
+const operatorsKeys: string[] = Object.keys(operators);
 
-export const functions: {
+const functions: {
   [operator: string]: MathFunction,
 } = {
   min: {
@@ -87,8 +87,11 @@ export const functions: {
   tan: { func: x => `${minus0Hack(Math.tan(Number(x)))}`, arity: 1 },
   exp: { func: x => `${Math.exp(Number(x))}`, arity: 1 },
   log: { func: x => `${Math.log(Number(x))}`, arity: 1 }, // No need for -0 hack
+  pi: { func: () => `${Math.PI}`, arity: 0 },
+  toDeg: { func: x => `${(Number(x) * 180) / Math.PI}`, arity: 1 },
+  toRad: { func: x => `${(Number(x) * Math.PI) / 180}`, arity: 1 },
 };
-export const functionsKeys: string[] = Object.keys(functions);
+const functionsKeys: string[] = Object.keys(functions);
 
 const top = (stack: string[]): string | typeof undefined =>
   stack[stack.length - 1];

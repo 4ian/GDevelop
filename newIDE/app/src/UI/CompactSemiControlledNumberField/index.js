@@ -46,7 +46,7 @@ const CompactSemiControlledNumberField = ({
     (newValueAsString: string, reason: 'keyInput' | 'iconControl') => {
       // parseFloat correctly parses '12+' as '12' so we need to check
       // for math characters ourselves.
-      const containsMathCharacters = /[+-/*^()]/.test(newValueAsString);
+      const containsMathCharacters = /[+-/*^()%]/.test(newValueAsString);
       const newValueAsFloat = parseFloat(newValueAsString);
       const isNewValueAsFloatValid =
         !containsMathCharacters && !Number.isNaN(newValueAsFloat);

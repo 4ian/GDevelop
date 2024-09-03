@@ -85,6 +85,7 @@ export const functions: {
   sin: { func: x => `${minus0Hack(Math.sin(Number(x)))}`, arity: 1 },
   cos: { func: x => `${minus0Hack(Math.cos(Number(x)))}`, arity: 1 },
   tan: { func: x => `${minus0Hack(Math.tan(Number(x)))}`, arity: 1 },
+  exp: { func: x => `${Math.exp(Number(x))}`, arity: 1 },
   log: { func: x => `${Math.log(Number(x))}`, arity: 1 }, // No need for -0 hack
 };
 export const functionsKeys: string[] = Object.keys(functions);

@@ -18,7 +18,7 @@ type ValueProps =
   | {|
       type: 'number',
       value: ?number, // null value corresponds to an empty input.
-      onChange: (newValue: number, reason: 'keyInput' | 'iconControl') => void,
+      onChange: (newValue: string, reason: 'keyInput' | 'iconControl') => void,
     |};
 
 type OtherProps = {|

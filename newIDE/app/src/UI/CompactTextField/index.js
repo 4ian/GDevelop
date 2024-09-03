@@ -13,7 +13,7 @@ type ValueProps =
   | {|
       type?: 'text',
       value: string,
-      onChange: (newValue: string, reason: 'keyInput') => void,
+      onChange: (newValue: string, reason: 'keyInput' | 'iconControl') => void,
     |}
   | {|
       type: 'number',
@@ -83,10 +83,8 @@ const CompactTextField = React.forwardRef<
     const idToUse = React.useRef<string>(id || makeTimestampedId());
     const inputRef = React.useRef<?HTMLInputElement>(null);
     const controlProps = useClickDragAsControl({
-      // $FlowExpectedError - Click drag controls should not be used if value type is not number.
-      onChange: value => onChange(value, 'iconControl'),
-      // $FlowExpectedError
-      onGetInitialValue: () => value,
+      onChange: (value: number) => onChange(value.toString(), 'iconControl'),
+      onGetInitialValue: () => parseFloat(value),
     });
 
     const onBlurInput = React.useCallback(

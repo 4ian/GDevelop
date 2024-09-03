@@ -44,22 +44,28 @@ const CompactSemiControlledNumberField = ({
 
   const onChangeValue = React.useCallback(
     (newValueAsString: string, reason: 'keyInput' | 'iconControl') => {
-      // parseFloat correctly parses '12+' as '12' so we need to check
-      // for math characters ourselves.
-      const containsMathCharacters = /[+-/*^()%]/.test(newValueAsString);
       const newValueAsFloat = parseFloat(newValueAsString);
-      const isNewValueAsFloatValid =
-        !containsMathCharacters && !Number.isNaN(newValueAsFloat);
-      if (isNewValueAsFloatValid) {
-        setTemporaryValue(newValueAsString);
-        if (reason === 'keyInput') {
-          if (!commitOnBlur) onChange(newValueAsFloat);
-        } else {
+      if (reason === 'keyInput') {
+        const isValueWithLeadingSign = /[+-]\s*\d+/.test(newValueAsString);
+        // parseFloat correctly parses '12+' as '12' so we need to check
+        // for math characters ourselves.
+        const containsMathCharacters = /[+-/*^()%]/.test(newValueAsString);
+        const isNewValueAsFloatValid =
+          !Number.isNaN(newValueAsFloat) &&
+          (!containsMathCharacters ||
+            (containsMathCharacters && isValueWithLeadingSign));
+
+        if (isNewValueAsFloatValid && !commitOnBlur) {
           onChange(newValueAsFloat);
         }
-      } else {
-        setTemporaryValue(newValueAsString);
+      } else if (reason === 'iconControl') {
+        const isNewValueAsFloatValid = !Number.isNaN(newValueAsFloat);
+
+        if (isNewValueAsFloatValid) {
+          onChange(newValueAsFloat);
+        }
       }
+      setTemporaryValue(newValueAsString);
     },
     [commitOnBlur, onChange]
   );

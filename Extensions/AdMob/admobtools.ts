@@ -333,6 +333,7 @@ namespace gdjs {
         adUnitId,
         position: atTop ? 'top' : 'bottom',
         size: bannerRequestedAdSizeType,
+        offset: 0,
       });
 
       banner.on('load', () => {

@@ -26,8 +26,8 @@ export const Default = () => {
   const [value4, setValue4] = React.useState<string>('');
   const [value5, setValue5] = React.useState<string>('');
   const [value8, setValue8] = React.useState<string>('');
-  const [value6, setValue6] = React.useState<number>(0);
-  const [value7, setValue7] = React.useState<number>(0);
+  const [value6, setValue6] = React.useState<?number>(0);
+  const [value7, setValue7] = React.useState<?number>(0);
   return (
     <ElementHighlighterProvider
       elements={[
@@ -83,7 +83,7 @@ export const Default = () => {
           type="number"
           value={value6}
           onChange={valueAsString => {
-            if (!valueAsString) setValue6(valueAsString);
+            if (!valueAsString) setValue6(null);
             else setValue6(parseFloat(valueAsString) || 0);
           }}
           renderLeftIcon={className => <Angle className={className} />}
@@ -95,7 +95,7 @@ export const Default = () => {
           type="number"
           value={value7}
           onChange={valueAsString => {
-            if (!valueAsString) setValue7(valueAsString);
+            if (!valueAsString) setValue7(null);
             else setValue7(parseFloat(valueAsString) || 0);
           }}
           renderLeftIcon={className => <Angle className={className} />}

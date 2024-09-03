@@ -13,12 +13,12 @@ type ValueProps =
   | {|
       type?: 'text',
       value: string,
-      onChange: (newValue: string, reason: 'keyInput') => void,
+      onChange: (newValue: string, reason: 'keyInput' | 'iconControl') => void,
     |}
   | {|
       type: 'number',
       value: ?number, // null value corresponds to an empty input.
-      onChange: (newValue: number, reason: 'keyInput' | 'iconControl') => void,
+      onChange: (newValue: string, reason: 'keyInput' | 'iconControl') => void,
     |};
 
 type OtherProps = {|
@@ -35,6 +35,10 @@ type OtherProps = {|
   }) => void,
 |};
 
+export type CompactTextFieldInterface = {|
+  blur: () => void,
+|};
+
 export type CompactTextFieldProps = {|
   ...ValueProps,
   ...OtherProps,
@@ -47,117 +51,138 @@ export type CompactTextFieldProps = {|
   useLeftIconAsNumberControl?: boolean,
   renderEndAdornmentOnHover?: (className: string) => React.Node,
   onClickEndAdornment?: () => void,
+  onKeyDown?: KeyboardEvent => void,
+  onKeyUp?: KeyboardEvent => void,
 |};
 
-const CompactTextField = ({
-  type,
-  value,
-  onChange,
-  id,
-  disabled,
-  errored,
-  placeholder,
-  renderLeftIcon,
-  leftIconTooltip,
-  useLeftIconAsNumberControl,
-  renderEndAdornmentOnHover,
-  onClickEndAdornment,
-  onBlur,
-  onFocus,
-}: CompactTextFieldProps) => {
-  const idToUse = React.useRef<string>(id || makeTimestampedId());
-  const controlProps = useClickDragAsControl({
-    // $FlowExpectedError - Click drag controls should not be used if value type is not number.
-    onChange: value => onChange(value, 'iconControl'),
-    // $FlowExpectedError
-    onGetInitialValue: () => value,
-  });
-
-  const onBlurInput = React.useCallback(
-    event => {
-      if (onBlur) onBlur(event);
+const CompactTextField = React.forwardRef<
+  CompactTextFieldProps,
+  CompactTextFieldInterface
+>(
+  (
+    {
+      type,
+      value,
+      onChange,
+      id,
+      disabled,
+      errored,
+      placeholder,
+      renderLeftIcon,
+      leftIconTooltip,
+      useLeftIconAsNumberControl,
+      renderEndAdornmentOnHover,
+      onClickEndAdornment,
+      onBlur,
+      onFocus,
+      onKeyDown,
+      onKeyUp,
     },
-    [onBlur]
-  );
-  const onFocusInput = React.useCallback(
-    event => {
-      if (onFocus) onFocus(event);
-    },
-    [onFocus]
-  );
+    ref
+  ) => {
+    const idToUse = React.useRef<string>(id || makeTimestampedId());
+    const inputRef = React.useRef<?HTMLInputElement>(null);
+    const controlProps = useClickDragAsControl({
+      onChange: (value: number) => onChange(value.toString(), 'iconControl'),
+      onGetInitialValue: () => parseFloat(value),
+    });
 
-  return (
-    <div
-      className={classNames({
-        [classes.container]: true,
-        [classes.disabled]: disabled,
-        [classes.errored]: errored,
-      })}
-    >
-      {renderLeftIcon && leftIconTooltip && (
-        <Tooltip
-          title={leftIconTooltip}
-          enterDelay={tooltipEnterDelay}
-          placement="bottom"
-          PopperProps={{
-            modifiers: {
-              offset: {
-                enabled: true,
-                /**
-                 * It does not seem possible to get the tooltip closer to the anchor
-                 * when positioned on top. So it is positioned on bottom with a negative offset.
-                 */
-                offset: '0,-20',
-              },
-            },
-          }}
-        >
-          <div
-            className={classNames({
-              [classes.leftIconContainer]: true,
-              [classes.control]: !!useLeftIconAsNumberControl,
-            })}
-            {...(useLeftIconAsNumberControl ? controlProps : {})}
-          >
-            <label htmlFor={idToUse.current} className={classes.label}>
-              {renderLeftIcon(classes.leftIcon)}
-            </label>
-          </div>
-        </Tooltip>
-      )}
+    const onBlurInput = React.useCallback(
+      event => {
+        if (onBlur) onBlur(event);
+      },
+      [onBlur]
+    );
+    const onFocusInput = React.useCallback(
+      event => {
+        if (onFocus) onFocus(event);
+      },
+      [onFocus]
+    );
+
+    React.useImperativeHandle(ref, () => ({
+      blur: () => {
+        if (inputRef.current) inputRef.current.blur();
+      },
+    }));
+
+    return (
       <div
         className={classNames({
-          [classes.compactTextField]: true,
-          [classes.withEndAdornment]: !!renderEndAdornmentOnHover,
+          [classes.container]: true,
+          [classes.disabled]: disabled,
+          [classes.errored]: errored,
         })}
       >
-        <input
-          id={idToUse.current}
-          type={type || 'text'}
-          disabled={disabled}
-          value={
-            value === null
-              ? ''
-              : typeof value === 'number'
-              ? toFixedWithoutTrailingZeros(value, 2)
-              : value
-          }
-          onChange={e => onChange(e.currentTarget.value, 'keyInput')}
-          placeholder={placeholder}
-          onBlur={onBlurInput}
-          onFocus={onFocusInput}
-        />
-        {renderEndAdornmentOnHover && (
-          <button
-            onClick={onClickEndAdornment}
-            className={classes.endAdornmentButton}
+        {renderLeftIcon && leftIconTooltip && (
+          <Tooltip
+            title={leftIconTooltip}
+            enterDelay={tooltipEnterDelay}
+            placement="bottom"
+            PopperProps={{
+              modifiers: {
+                offset: {
+                  enabled: true,
+                  /**
+                   * It does not seem possible to get the tooltip closer to the anchor
+                   * when positioned on top. So it is positioned on bottom with a negative offset.
+                   */
+                  offset: '0,-20',
+                },
+              },
+            }}
           >
-            {renderEndAdornmentOnHover(classes.endAdornmentIcon)}
-          </button>
+            <div
+              className={classNames({
+                [classes.leftIconContainer]: true,
+                [classes.control]: !!useLeftIconAsNumberControl,
+              })}
+              {...(useLeftIconAsNumberControl ? controlProps : {})}
+            >
+              <label htmlFor={idToUse.current} className={classes.label}>
+                {renderLeftIcon(classes.leftIcon)}
+              </label>
+            </div>
+          </Tooltip>
         )}
+        <div
+          className={classNames({
+            [classes.compactTextField]: true,
+            [classes.withEndAdornment]: !!renderEndAdornmentOnHover,
+          })}
+        >
+          <input
+            id={idToUse.current}
+            // Type cannot be set to number in order to benefit from the mathematical parsing.
+            type={'text'}
+            ref={inputRef}
+            disabled={disabled}
+            value={
+              value === null
+                ? ''
+                : typeof value === 'number'
+                ? toFixedWithoutTrailingZeros(value, 2)
+                : value
+            }
+            onChange={e => onChange(e.currentTarget.value, 'keyInput')}
+            placeholder={placeholder}
+            onBlur={onBlurInput}
+            onFocus={onFocusInput}
+            onKeyDown={onKeyDown}
+            onKeyUp={onKeyUp}
+          />
+          {renderEndAdornmentOnHover && (
+            <button
+              onClick={onClickEndAdornment}
+              className={classes.endAdornmentButton}
+            >
+              {renderEndAdornmentOnHover(classes.endAdornmentIcon)}
+            </button>
+          )}
+        </div>
       </div>
-    </div>
-  );
-};
+    );
+  }
+);
 
 export default CompactTextField;

@@ -184,7 +184,6 @@ const defineTileMap = function (extension, _, gd) {
       objectTileMap
     )
     .setCategoryFullName(_('Advanced'))
-    .addDefaultBehavior('EffectCapability::EffectBehavior')
     .addDefaultBehavior('ResizableCapability::ResizableBehavior')
     .addDefaultBehavior('ScalableCapability::ScalableBehavior')
     .addDefaultBehavior('OpacityCapability::OpacityBehavior')
@@ -721,7 +720,6 @@ const defineSimpleTileMap = function (extension, _, gd) {
       objectSimpleTileMap
     )
     .setCategoryFullName(_('General'))
-    .addDefaultBehavior('EffectCapability::EffectBehavior')
     .addDefaultBehavior('ResizableCapability::ResizableBehavior')
     .addDefaultBehavior('ScalableCapability::ScalableBehavior')
     .addDefaultBehavior('OpacityCapability::OpacityBehavior')
@@ -1240,7 +1238,6 @@ const defineCollisionMask = function (extension, _, gd) {
       collisionMaskObject
     )
     .setCategoryFullName(_('Advanced'))
-    .addDefaultBehavior('EffectCapability::EffectBehavior')
     .addDefaultBehavior('ResizableCapability::ResizableBehavior')
     .addDefaultBehavior('ScalableCapability::ScalableBehavior')
     .setIncludeFile('Extensions/TileMap/tilemapcollisionmaskruntimeobject.js')

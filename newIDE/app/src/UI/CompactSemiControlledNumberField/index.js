@@ -7,7 +7,6 @@ import CompactTextField, {
 import classes from './CompactSemiControlledNumberField.module.css';
 import {
   shouldCloseOrCancel,
-  shouldFocusAnotherField,
   shouldValidate,
 } from '../KeyboardShortcuts/InteractionKeys';
 import { calculate } from '../../Utils/MathExpressionParser';
@@ -37,15 +36,16 @@ const CompactSemiControlledNumberField = ({
   ...otherProps
 }: Props) => {
   const textFieldRef = React.useRef<?CompactTextFieldInterface>(null);
+  const cancelEditionRef = React.useRef<boolean>(false);
   const [focused, setFocused] = React.useState<boolean>(false);
   const [temporaryValue, setTemporaryValue] = React.useState<string>(
     value.toString()
   );
 
   const onChangeValue = React.useCallback(
-    (newValueAsString: string, reason: 'keyInput' | 'iconControl') => {
+    (newValueAsString: string, reason: 'keyInput' | 'iconControl' | 'blur') => {
       const newValueAsFloat = parseFloat(newValueAsString);
-      if (reason === 'keyInput') {
+      if (reason === 'keyInput' || reason === 'blur') {
         const isValueWithLeadingSign = /[+-]\s*\d+/.test(newValueAsString);
         // parseFloat correctly parses '12+' as '12' so we need to check
         // for math characters ourselves.
@@ -55,8 +55,21 @@ const CompactSemiControlledNumberField = ({
           (!containsMathCharacters ||
             (containsMathCharacters && isValueWithLeadingSign));
 
-        if (isNewValueAsFloatValid && !commitOnBlur) {
-          onChange(newValueAsFloat);
+        let newValue: number | null = null;
+        if (reason === 'blur') {
+          // Do not try to parse input at each input change.
+          try {
+            newValue = calculate(newValueAsString.toLowerCase());
+          } catch (error) {
+            console.warn(`Error computing ${newValueAsString}:`, error);
+          }
+        }
+        if (newValue === null && isNewValueAsFloatValid) {
+          newValue = newValueAsFloat;
+        }
+
+        if (newValue && (reason === 'blur' || !commitOnBlur)) {
+          onChange(newValue);
         }
       } else if (reason === 'iconControl') {
         const isNewValueAsFloatValid = !Number.isNaN(newValueAsFloat);
@@ -82,30 +95,22 @@ const CompactSemiControlledNumberField = ({
           setTemporaryValue(value.toString());
         }}
         onKeyDown={event => {
-          if (shouldValidate(event) || shouldFocusAnotherField(event)) {
-            try {
-              const calculatedValue = calculate(temporaryValue.toLowerCase());
-              onChange(calculatedValue);
-              setTemporaryValue(calculatedValue.toString());
-            } catch (error) {
-              console.warn(`Error computing ${temporaryValue}:`, error);
-              setTemporaryValue(value.toString());
-            }
+          if (shouldValidate(event)) {
+            onChangeValue(temporaryValue.toLowerCase(), 'keyInput');
           }
         }}
         onKeyUp={event => {
-          if (shouldCloseOrCancel(event) && textFieldRef.current) {
-            textFieldRef.current.blur();
+          const { current: textField } = textFieldRef;
+          if (shouldCloseOrCancel(event) && textField) {
+            cancelEditionRef.current = true;
+            textField.blur();
           }
         }}
         onBlur={event => {
-          const newValue = parseFloat(event.currentTarget.value);
-          const isNewValueValid = !Number.isNaN(newValue);
-          if (isNewValueValid && newValue !== value) {
-            onChange(newValue);
-          }
+          if (!cancelEditionRef.current) onChangeValue(temporaryValue, 'blur');
           setFocused(false);
           setTemporaryValue('');
+          cancelEditionRef.current = false;
         }}
         {...otherProps}
       />

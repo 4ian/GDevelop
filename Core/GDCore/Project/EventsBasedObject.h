@@ -101,9 +101,33 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
   /**
    * \brief Declare a TextContainer capability.
    */
-  EventsBasedObject& MarkAsTextContainer(bool isTextContainer_) {
+  EventsBasedObject &MarkAsTextContainer(bool isTextContainer_) {
     isTextContainer = isTextContainer_;
     return *this;
+  }
+
+  /**
+   * \brief Declare that the parent scale will always be 1 and children will
+   * adapt there size. This is removing the ScalableCapability.
+   */
+  EventsBasedObject &
+  MarkAsInnerAreaExpandingWithParent(bool isInnerAreaExpandingWithParent_) {
+    isInnerAreaFollowingParentSize = isInnerAreaExpandingWithParent_;
+    return *this;
+  }
+
+  /**
+   * \brief Return true if objects handle size changes on their own and
+   * don't have the ScalableCapability.
+   *
+   * When the parent dimensions change:
+   * - if `false`, the object is stretch proportionally while children local
+   *   positions stay the same.
+   * - if `true`, the children local positions need to be adapted by events
+   *   to follow their parent size.
+   */
+  bool IsInnerAreaFollowingParentSize() const {
+    return isInnerAreaFollowingParentSize;
   }
 
   /**
@@ -279,6 +303,7 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
   bool isRenderedIn3D;
   bool isAnimatable;
   bool isTextContainer;
+  bool isInnerAreaFollowingParentSize;
   gd::InitialInstancesContainer initialInstances;
   gd::LayersContainer layers;
   gd::ObjectsContainer objectsContainer;

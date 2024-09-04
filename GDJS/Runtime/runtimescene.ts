@@ -605,6 +605,38 @@ namespace gdjs {
       return this;
     }
 
+    getUnrotatedViewportMinX(): float {
+      return 0;
+    }
+
+    getUnrotatedViewportMinY(): float {
+      return 0;
+    }
+
+    getUnrotatedViewportMaxX(): float {
+      return this._cachedGameResolutionWidth;
+    }
+
+    getUnrotatedViewportMaxY(): float {
+      return this._cachedGameResolutionHeight;
+    }
+
+    getInitialUnrotatedViewportMinX(): float {
+      return 0;
+    }
+
+    getInitialUnrotatedViewportMinY(): float {
+      return 0;
+    }
+
+    getInitialUnrotatedViewportMaxX(): float {
+      return this.getGame().getOriginalWidth();
+    }
+
+    getInitialUnrotatedViewportMaxY(): float {
+      return this.getGame().getOriginalHeight();
+    }
+
     getViewportWidth(): float {
       return this._cachedGameResolutionWidth;
     }

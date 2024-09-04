@@ -304,8 +304,15 @@ namespace gdjs {
      */
     setDepth(depth: float): void {
       const unscaledDepth = this.getUnscaledDepth();
-      if (unscaledDepth !== 0) {
-        this.setScaleZ(depth / unscaledDepth);
+      if (unscaledDepth === 0) {
+        return;
+      }
+      const scaleZ = depth / unscaledDepth;
+      if (this._innerArea && this._isInnerAreaFollowingParentSize) {
+        this._innerArea.min[2] *= scaleZ;
+        this._innerArea.max[2] *= scaleZ;
+      } else {
+        this.setScaleZ(scaleZ);
       }
     }
 
@@ -325,6 +332,10 @@ namespace gdjs {
      * @param newScale The new scale (must be greater than 0).
      */
     setScaleZ(newScale: number): void {
+      if (this._innerArea && this._isInnerAreaFollowingParentSize) {
+        // The scale is always 1;
+        return;
+      }
       if (newScale < 0) {
         newScale = 0;
       }

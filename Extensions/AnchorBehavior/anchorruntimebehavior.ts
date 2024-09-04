@@ -89,14 +89,25 @@ namespace gdjs {
         gdjs.AnchorRuntimeBehavior.prototype.doStepPreEvents
       ) as FloatPoint;
       // TODO EBO Make it work with event based objects or hide this behavior for them.
-      const game = instanceContainer.getGame();
-      let rendererWidth = game.getGameResolutionWidth();
-      let rendererHeight = game.getGameResolutionHeight();
+      let parentMinX = instanceContainer.getUnrotatedViewportMinX();
+      let parentMinY = instanceContainer.getUnrotatedViewportMinY();
+      let parentMaxX = instanceContainer.getUnrotatedViewportMaxX();
+      let parentMaxY = instanceContainer.getUnrotatedViewportMaxY();
+      let parentCenterX = (parentMaxX + parentMinX) / 2;
+      let parentCenterY = (parentMaxY + parentMinY) / 2;
+      let parentWidth = parentMaxX - parentMinX;
+      let parentHeight = parentMaxY - parentMinY;
       const layer = instanceContainer.getLayer(this.owner.getLayer());
       if (this._invalidDistances) {
         if (this._relativeToOriginalWindowSize) {
-          rendererWidth = game.getOriginalWidth();
-          rendererHeight = game.getOriginalHeight();
+          parentMinX = instanceContainer.getInitialUnrotatedViewportMinX();
+          parentMinY = instanceContainer.getInitialUnrotatedViewportMinY();
+          parentMaxX = instanceContainer.getInitialUnrotatedViewportMaxX();
+          parentMaxY = instanceContainer.getInitialUnrotatedViewportMaxY();
+          parentCenterX = (parentMaxX + parentMinX) / 2;
+          parentCenterY = (parentMaxY + parentMinY) / 2;
+          parentWidth = parentMaxX - parentMinX;
+          parentHeight = parentMaxY - parentMinY;
         }
 
         //Calculate the distances from the window's bounds.
@@ -109,24 +120,24 @@ namespace gdjs {
 
         // Left edge
         if (this._leftEdgeAnchor === HorizontalAnchor.WindowLeft) {
-          this._leftEdgeDistance = topLeftPixel[0];
+          this._leftEdgeDistance = topLeftPixel[0] - parentMinX;
         } else if (this._leftEdgeAnchor === HorizontalAnchor.WindowRight) {
-          this._leftEdgeDistance = topLeftPixel[0] - rendererWidth;
+          this._leftEdgeDistance = topLeftPixel[0] - parentMaxX;
         } else if (this._leftEdgeAnchor === HorizontalAnchor.Proportional) {
-          this._leftEdgeDistance = topLeftPixel[0] / rendererWidth;
+          this._leftEdgeDistance = (topLeftPixel[0] - parentMinX) / parentWidth;
         } else if (this._leftEdgeAnchor === HorizontalAnchor.WindowCenter) {
-          this._leftEdgeDistance = topLeftPixel[0] - rendererWidth / 2;
+          this._leftEdgeDistance = topLeftPixel[0] - parentCenterX;
         }
 
         // Top edge
         if (this._topEdgeAnchor === VerticalAnchor.WindowTop) {
-          this._topEdgeDistance = topLeftPixel[1];
+          this._topEdgeDistance = topLeftPixel[1] - parentMinY;
         } else if (this._topEdgeAnchor === VerticalAnchor.WindowBottom) {
-          this._topEdgeDistance = topLeftPixel[1] - rendererHeight;
+          this._topEdgeDistance = topLeftPixel[1] - parentMaxY;
         } else if (this._topEdgeAnchor === VerticalAnchor.Proportional) {
-          this._topEdgeDistance = topLeftPixel[1] / rendererHeight;
+          this._topEdgeDistance = (topLeftPixel[1] - parentMinY) / parentHeight;
         } else if (this._topEdgeAnchor === VerticalAnchor.WindowCenter) {
-          this._topEdgeDistance = topLeftPixel[1] - rendererHeight / 2;
+          this._topEdgeDistance = topLeftPixel[1] - parentCenterY;
         }
 
         // It's fine to reuse workingPoint as topLeftPixel is no longer used.
@@ -139,24 +150,26 @@ namespace gdjs {
 
         // Right edge
         if (this._rightEdgeAnchor === HorizontalAnchor.WindowLeft) {
-          this._rightEdgeDistance = bottomRightPixel[0];
+          this._rightEdgeDistance = bottomRightPixel[0] - parentMinX;
         } else if (this._rightEdgeAnchor === HorizontalAnchor.WindowRight) {
-          this._rightEdgeDistance = bottomRightPixel[0] - rendererWidth;
+          this._rightEdgeDistance = bottomRightPixel[0] - parentMaxX;
         } else if (this._rightEdgeAnchor === HorizontalAnchor.Proportional) {
-          this._rightEdgeDistance = bottomRightPixel[0] / rendererWidth;
+          this._rightEdgeDistance =
+            (bottomRightPixel[0] - parentMinX) / parentWidth;
         } else if (this._rightEdgeAnchor === HorizontalAnchor.WindowCenter) {
-          this._rightEdgeDistance = bottomRightPixel[0] - rendererWidth / 2;
+          this._rightEdgeDistance = bottomRightPixel[0] - parentCenterX;
         }
 
         // Bottom edge
         if (this._bottomEdgeAnchor === VerticalAnchor.WindowTop) {
-          this._bottomEdgeDistance = bottomRightPixel[1];
+          this._bottomEdgeDistance = bottomRightPixel[1] - parentMinY;
         } else if (this._bottomEdgeAnchor === VerticalAnchor.WindowBottom) {
-          this._bottomEdgeDistance = bottomRightPixel[1] - rendererHeight;
+          this._bottomEdgeDistance = bottomRightPixel[1] - parentMaxY;
         } else if (this._bottomEdgeAnchor === VerticalAnchor.Proportional) {
-          this._bottomEdgeDistance = bottomRightPixel[1] / rendererHeight;
+          this._bottomEdgeDistance =
+            (bottomRightPixel[1] - parentMinY) / parentHeight;
         } else if (this._bottomEdgeAnchor === VerticalAnchor.WindowCenter) {
-          this._bottomEdgeDistance = bottomRightPixel[1] - rendererHeight / 2;
+          this._bottomEdgeDistance = bottomRightPixel[1] - parentCenterY;
         }
 
         this._invalidDistances = false;
@@ -169,46 +182,46 @@ namespace gdjs {
 
         // Left edge
         if (this._leftEdgeAnchor === HorizontalAnchor.WindowLeft) {
-          leftPixel = this._leftEdgeDistance;
+          leftPixel = parentMinX + this._leftEdgeDistance;
         } else if (this._leftEdgeAnchor === HorizontalAnchor.WindowRight) {
-          leftPixel = rendererWidth + this._leftEdgeDistance;
+          leftPixel = parentMaxX + this._leftEdgeDistance;
         } else if (this._leftEdgeAnchor === HorizontalAnchor.Proportional) {
-          leftPixel = this._leftEdgeDistance * rendererWidth;
+          leftPixel = parentMinX + this._leftEdgeDistance * parentWidth;
         } else if (this._leftEdgeAnchor === HorizontalAnchor.WindowCenter) {
-          leftPixel = rendererWidth / 2 + this._leftEdgeDistance;
+          leftPixel = parentCenterX + this._leftEdgeDistance;
         }
 
         // Top edge
         if (this._topEdgeAnchor === VerticalAnchor.WindowTop) {
-          topPixel = this._topEdgeDistance;
+          topPixel = parentMinY + this._topEdgeDistance;
         } else if (this._topEdgeAnchor === VerticalAnchor.WindowBottom) {
-          topPixel = rendererHeight + this._topEdgeDistance;
+          topPixel = parentMaxY + this._topEdgeDistance;
         } else if (this._topEdgeAnchor === VerticalAnchor.Proportional) {
-          topPixel = this._topEdgeDistance * rendererHeight;
+          topPixel = parentMinY + this._topEdgeDistance * parentHeight;
         } else if (this._topEdgeAnchor === VerticalAnchor.WindowCenter) {
-          topPixel = rendererHeight / 2 + this._topEdgeDistance;
+          topPixel = parentCenterY + this._topEdgeDistance;
         }
 
         // Right edge
         if (this._rightEdgeAnchor === HorizontalAnchor.WindowLeft) {
-          rightPixel = this._rightEdgeDistance;
+          rightPixel = parentMinX + this._rightEdgeDistance;
         } else if (this._rightEdgeAnchor === HorizontalAnchor.WindowRight) {
-          rightPixel = rendererWidth + this._rightEdgeDistance;
+          rightPixel = parentMaxX + this._rightEdgeDistance;
         } else if (this._rightEdgeAnchor === HorizontalAnchor.Proportional) {
-          rightPixel = this._rightEdgeDistance * rendererWidth;
+          rightPixel = parentMinX + this._rightEdgeDistance * parentWidth;
         } else if (this._rightEdgeAnchor === HorizontalAnchor.WindowCenter) {
-          rightPixel = rendererWidth / 2 + this._rightEdgeDistance;
+          rightPixel = parentCenterX + this._rightEdgeDistance;
         }
 
         // Bottom edge
         if (this._bottomEdgeAnchor === VerticalAnchor.WindowTop) {
-          bottomPixel = this._bottomEdgeDistance;
+          bottomPixel = parentMinY + this._bottomEdgeDistance;
         } else if (this._bottomEdgeAnchor === VerticalAnchor.WindowBottom) {
-          bottomPixel = rendererHeight + this._bottomEdgeDistance;
+          bottomPixel = parentMaxY + this._bottomEdgeDistance;
         } else if (this._bottomEdgeAnchor === VerticalAnchor.Proportional) {
-          bottomPixel = this._bottomEdgeDistance * rendererHeight;
+          bottomPixel = parentMinY + this._bottomEdgeDistance * parentHeight;
         } else if (this._bottomEdgeAnchor === VerticalAnchor.WindowCenter) {
-          bottomPixel = rendererHeight / 2 + this._bottomEdgeDistance;
+          bottomPixel = parentCenterY + this._bottomEdgeDistance;
         }
 
         // It's fine to reuse workingPoint as topLeftPixel is no longer used.

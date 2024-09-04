@@ -132,7 +132,7 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
           .SetCategoryFullName(extension.GetCategory())
           .AddDefaultBehavior("ResizableCapability::ResizableBehavior")
           .AddDefaultBehavior("FlippableCapability::FlippableBehavior");
-  if (!eventsBasedObject.IsInnerAreaExpandingWithParent()) {
+  if (!eventsBasedObject.IsInnerAreaFollowingParentSize()) {
     objectMetadata
           .AddDefaultBehavior("ScalableCapability::ScalableBehavior");
   }

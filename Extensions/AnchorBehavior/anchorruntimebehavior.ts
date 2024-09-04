@@ -100,10 +100,10 @@ namespace gdjs {
       const layer = instanceContainer.getLayer(this.owner.getLayer());
       if (this._invalidDistances) {
         if (this._relativeToOriginalWindowSize) {
-          parentMinX = instanceContainer.getOriginalViewportMinX();
-          parentMinY = instanceContainer.getOriginalViewportMinY();
-          parentMaxX = instanceContainer.getOriginalViewportMaxX();
-          parentMaxY = instanceContainer.getOriginalViewportMaxY();
+          parentMinX = instanceContainer.getInitialUnrotatedViewportMinX();
+          parentMinY = instanceContainer.getInitialUnrotatedViewportMinY();
+          parentMaxX = instanceContainer.getInitialUnrotatedViewportMaxX();
+          parentMaxY = instanceContainer.getInitialUnrotatedViewportMaxY();
           parentCenterX = (parentMaxX + parentMinX) / 2;
           parentCenterY = (parentMaxY + parentMinY) / 2;
           parentWidth = parentMaxX - parentMinX;

@@ -140,7 +140,7 @@ namespace gdjs {
      * - the initial default dimensions (inner area) set in the editor for a
      * {@link gdjs.CustomRuntimeObject}.
      */
-    abstract getOriginalViewportMinX(): float;
+    abstract getInitialUnrotatedViewportMinX(): float;
 
     /**
      * @return the top bound of:
@@ -148,7 +148,7 @@ namespace gdjs {
      * - the initial default dimensions (inner area) set in the editor for a
      * {@link gdjs.CustomRuntimeObject}.
      */
-    abstract getOriginalViewportMinY(): float;
+    abstract getInitialUnrotatedViewportMinY(): float;
 
     /**
      * @return the right bound of:
@@ -156,7 +156,7 @@ namespace gdjs {
      * - the initial default dimensions (inner area) set in the editor for a
      * {@link gdjs.CustomRuntimeObject}.
      */
-    abstract getOriginalViewportMaxX(): float;
+    abstract getInitialUnrotatedViewportMaxX(): float;
 
     /**
      * @return the bottom bound of:
@@ -164,7 +164,7 @@ namespace gdjs {
      * - the initial default dimensions (inner area) set in the editor for a
      * {@link gdjs.CustomRuntimeObject}.
      */
-    abstract getOriginalViewportMaxY(): float;
+    abstract getInitialUnrotatedViewportMaxY(): float;
 
     /**
      * @return the width of:

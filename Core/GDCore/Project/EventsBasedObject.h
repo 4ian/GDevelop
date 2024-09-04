@@ -112,7 +112,7 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
    */
   EventsBasedObject &
   MarkAsInnerAreaExpandingWithParent(bool isInnerAreaExpandingWithParent_) {
-    isInnerAreaExpandingWithParent = isInnerAreaExpandingWithParent_;
+    isInnerAreaFollowingParentSize = isInnerAreaExpandingWithParent_;
     return *this;
   }
 
@@ -126,8 +126,8 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
    * - if `true`, the children local positions need to be adapted by events
    *   to follow their parent size.
    */
-  bool IsInnerAreaExpandingWithParent() const {
-    return isInnerAreaExpandingWithParent;
+  bool IsInnerAreaFollowingParentSize() const {
+    return isInnerAreaFollowingParentSize;
   }
 
   /**
@@ -303,7 +303,7 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
   bool isRenderedIn3D;
   bool isAnimatable;
   bool isTextContainer;
-  bool isInnerAreaExpandingWithParent;
+  bool isInnerAreaFollowingParentSize;
   gd::InitialInstancesContainer initialInstances;
   gd::LayersContainer layers;
   gd::ObjectsContainer objectsContainer;

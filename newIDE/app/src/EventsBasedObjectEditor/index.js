@@ -118,7 +118,7 @@ export default function EventsBasedObjectEditor({
       />
       <Checkbox
         label={<Trans>Expand inner area with parent</Trans>}
-        checked={eventsBasedObject.isInnerAreaExpandingWithParent()}
+        checked={eventsBasedObject.isInnerAreaFollowingParentSize()}
         onCheck={(e, checked) => {
           eventsBasedObject.markAsInnerAreaExpandingWithParent(checked);
           onChange();

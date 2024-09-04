@@ -2957,7 +2957,7 @@ interface EventsBasedObject {
     [Ref] EventsBasedObject MarkAsTextContainer(boolean isTextContainer);
     boolean IsTextContainer();
     [Ref] EventsBasedObject MarkAsInnerAreaExpandingWithParent(boolean value);
-    boolean IsInnerAreaExpandingWithParent();
+    boolean IsInnerAreaFollowingParentSize();
 
     [Ref] InitialInstancesContainer GetInitialInstances();
     [Ref] LayersContainer GetLayers();

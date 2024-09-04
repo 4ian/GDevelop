@@ -212,8 +212,8 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
       areaMaxX: 0,
       areaMaxY: 0,
       areaMaxZ: 0,
-      _originalInnerArea: null,
-      isInnerAreaExpandingWithParent: false,
+      _initialInnerArea: null,
+      isInnerAreaFollowingParentSize: false,
     };
   };
 

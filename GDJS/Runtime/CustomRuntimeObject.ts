@@ -41,7 +41,7 @@ namespace gdjs {
     private _unrotatedAABB: AABB = { min: [0, 0], max: [0, 0] };
     /**
      * The bounds of the object content before any transformation.
-     * @see gdjs.CustomRuntimeObjectInstanceContainer._originalInnerArea
+     * @see gdjs.CustomRuntimeObjectInstanceContainer._initialInnerArea
      **/
     protected _innerArea: {
       min: [float, float, float];
@@ -54,7 +54,7 @@ namespace gdjs {
      * - if `true`, the children local positions need to be adapted by events
      *   to follow their parent size.
      */
-    protected _isInnerAreaExpandingWithParent = false;
+    protected _isInnerAreaFollowingParentSize = false;
     private _scaleX: float = 1;
     private _scaleY: float = 1;
     private _flippedX: boolean = false;
@@ -100,8 +100,8 @@ namespace gdjs {
         );
         return;
       }
-      this._isInnerAreaExpandingWithParent =
-        eventsBasedObjectData.isInnerAreaExpandingWithParent;
+      this._isInnerAreaFollowingParentSize =
+        eventsBasedObjectData.isInnerAreaFollowingParentSize;
       if (eventsBasedObjectData.instances.length > 0) {
         if (!this._innerArea) {
           this._innerArea = {
@@ -440,7 +440,7 @@ namespace gdjs {
     /**
      * @return the internal left bound of the object according to its children.
      */
-    getUnscaledMinX(): number {
+    getInnerAreaMinX(): number {
       if (this._innerArea) {
         return this._innerArea.min[0];
       }
@@ -453,7 +453,7 @@ namespace gdjs {
     /**
      * @return the internal top bound of the object according to its children.
      */
-    getUnscaledMinY(): number {
+    getInnerAreaMinY(): number {
       if (this._innerArea) {
         return this._innerArea.min[1];
       }
@@ -466,7 +466,7 @@ namespace gdjs {
     /**
      * @return the internal right bound of the object according to its children.
      */
-    getUnscaledMaxX(): number {
+    getInnerAreaMaxX(): number {
       if (this._innerArea) {
         return this._innerArea.max[0];
       }
@@ -479,7 +479,7 @@ namespace gdjs {
     /**
      * @return the internal bottom bound of the object according to its children.
      */
-    getUnscaledMaxY(): number {
+    getInnerAreaMaxY(): number {
       if (this._innerArea) {
         return this._innerArea.max[1];
       }
@@ -601,7 +601,7 @@ namespace gdjs {
         return;
       }
       const scaleX = newWidth / unscaledWidth;
-      if (this._innerArea && this._isInnerAreaExpandingWithParent) {
+      if (this._innerArea && this._isInnerAreaFollowingParentSize) {
         this._innerArea.min[0] *= scaleX;
         this._innerArea.max[0] *= scaleX;
       } else {
@@ -615,7 +615,7 @@ namespace gdjs {
         return;
       }
       const scaleY = newHeight / unscaledHeight;
-      if (this._innerArea && this._isInnerAreaExpandingWithParent) {
+      if (this._innerArea && this._isInnerAreaFollowingParentSize) {
         this._innerArea.min[1] *= scaleY;
         this._innerArea.max[1] *= scaleY;
       } else {
@@ -670,7 +670,7 @@ namespace gdjs {
      * @param newScale The new scale (must be greater than 0).
      */
     setScale(newScale: float): void {
-      if (this._innerArea && this._isInnerAreaExpandingWithParent) {
+      if (this._innerArea && this._isInnerAreaFollowingParentSize) {
         // The scale is always 1;
         return;
       }
@@ -696,7 +696,7 @@ namespace gdjs {
      * @param newScale The new scale (must be greater than 0).
      */
     setScaleX(newScale: float): void {
-      if (this._innerArea && this._isInnerAreaExpandingWithParent) {
+      if (this._innerArea && this._isInnerAreaFollowingParentSize) {
         // The scale is always 1;
         return;
       }
@@ -718,7 +718,7 @@ namespace gdjs {
      * @param newScale The new scale (must be greater than 0).
      */
     setScaleY(newScale: float): void {
-      if (this._innerArea && this._isInnerAreaExpandingWithParent) {
+      if (this._innerArea && this._isInnerAreaFollowingParentSize) {
         // The scale is always 1;
         return;
       }

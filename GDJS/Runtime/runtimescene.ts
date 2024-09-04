@@ -621,19 +621,19 @@ namespace gdjs {
       return this._cachedGameResolutionHeight;
     }
 
-    getOriginalViewportMinX(): float {
+    getInitialUnrotatedViewportMinX(): float {
       return 0;
     }
 
-    getOriginalViewportMinY(): float {
+    getInitialUnrotatedViewportMinY(): float {
       return 0;
     }
 
-    getOriginalViewportMaxX(): float {
+    getInitialUnrotatedViewportMaxX(): float {
       return this.getGame().getOriginalWidth();
     }
 
-    getOriginalViewportMaxY(): float {
+    getInitialUnrotatedViewportMaxY(): float {
       return this.getGame().getOriginalHeight();
     }
 

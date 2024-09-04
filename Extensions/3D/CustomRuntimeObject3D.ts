@@ -308,7 +308,7 @@ namespace gdjs {
         return;
       }
       const scaleZ = depth / unscaledDepth;
-      if (this._innerArea && this._isInnerAreaExpandingWithParent) {
+      if (this._innerArea && this._isInnerAreaFollowingParentSize) {
         this._innerArea.min[2] *= scaleZ;
         this._innerArea.max[2] *= scaleZ;
       } else {
@@ -332,7 +332,7 @@ namespace gdjs {
      * @param newScale The new scale (must be greater than 0).
      */
     setScaleZ(newScale: number): void {
-      if (this._innerArea && this._isInnerAreaExpandingWithParent) {
+      if (this._innerArea && this._isInnerAreaFollowingParentSize) {
         // The scale is always 1;
         return;
       }

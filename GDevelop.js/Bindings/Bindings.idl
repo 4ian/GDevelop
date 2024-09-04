@@ -2956,6 +2956,8 @@ interface EventsBasedObject {
     boolean IsAnimatable();
     [Ref] EventsBasedObject MarkAsTextContainer(boolean isTextContainer);
     boolean IsTextContainer();
+    [Ref] EventsBasedObject MarkAsInnerAreaExpandingWithParent(boolean value);
+    boolean IsInnerAreaExpandingWithParent();
 
     [Ref] InitialInstancesContainer GetInitialInstances();
     [Ref] LayersContainer GetLayers();

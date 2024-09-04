@@ -116,6 +116,14 @@ export default function EventsBasedObjectEditor({
           onChange();
         }}
       />
+      <Checkbox
+        label={<Trans>Expand inner area with parent</Trans>}
+        checked={eventsBasedObject.isInnerAreaExpandingWithParent()}
+        onCheck={(e, checked) => {
+          eventsBasedObject.markAsInnerAreaExpandingWithParent(checked);
+          onChange();
+        }}
+      />
       <Line noMargin justifyContent="center">
         <RaisedButton
           label={<Trans>Open visual editor for the object</Trans>}

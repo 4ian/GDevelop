@@ -103,6 +103,70 @@ namespace gdjs {
     ): FloatPoint;
 
     /**
+     * @return the left bound of:
+     * - the game resolution for a {@link gdjs.RuntimeScene}
+     * - the default dimensions (the AABB of all its children) for a
+     * {@link gdjs.CustomRuntimeObject}.
+     */
+    abstract getUnrotatedViewportMinX(): float;
+
+    /**
+     * @return the top bound of:
+     * - the game resolution for a {@link gdjs.RuntimeScene}
+     * - the default dimensions (the AABB of all its children) for a
+     * {@link gdjs.CustomRuntimeObject}.
+     */
+    abstract getUnrotatedViewportMinY(): float;
+
+    /**
+     * @return the right bound of:
+     * - the game resolution for a {@link gdjs.RuntimeScene}
+     * - the default dimensions (the AABB of all its children) for a
+     * {@link gdjs.CustomRuntimeObject}.
+     */
+    abstract getUnrotatedViewportMaxX(): float;
+
+    /**
+     * @return the bottom bound of:
+     * - the game resolution for a {@link gdjs.RuntimeScene}
+     * - the default dimensions (the AABB of all its children) for a
+     * {@link gdjs.CustomRuntimeObject}.
+     */
+    abstract getUnrotatedViewportMaxY(): float;
+
+    /**
+     * @return the left bound of:
+     * - the initial game resolution for a {@link gdjs.RuntimeScene}
+     * - the initial default dimensions (inner area) set in the editor for a
+     * {@link gdjs.CustomRuntimeObject}.
+     */
+    abstract getOriginalViewportMinX(): float;
+
+    /**
+     * @return the top bound of:
+     * - the initial game resolution for a {@link gdjs.RuntimeScene}
+     * - the initial default dimensions (inner area) set in the editor for a
+     * {@link gdjs.CustomRuntimeObject}.
+     */
+    abstract getOriginalViewportMinY(): float;
+
+    /**
+     * @return the right bound of:
+     * - the initial game resolution for a {@link gdjs.RuntimeScene}
+     * - the initial default dimensions (inner area) set in the editor for a
+     * {@link gdjs.CustomRuntimeObject}.
+     */
+    abstract getOriginalViewportMaxX(): float;
+
+    /**
+     * @return the bottom bound of:
+     * - the initial game resolution for a {@link gdjs.RuntimeScene}
+     * - the initial default dimensions (inner area) set in the editor for a
+     * {@link gdjs.CustomRuntimeObject}.
+     */
+    abstract getOriginalViewportMaxY(): float;
+
+    /**
      * @return the width of:
      * - the game resolution for a {@link gdjs.RuntimeScene}
      * - the default dimensions (the AABB of all its children) for a

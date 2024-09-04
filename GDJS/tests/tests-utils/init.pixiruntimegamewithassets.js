@@ -121,7 +121,7 @@ gdjs.getPixiRuntimeGameWithAssets = () => {
             areaMaxX: 0,
             areaMaxY: 0,
             areaMaxZ: 0,
-            defaultSize: null,
+            _originalInnerArea: null,
           },
         ],
         sceneVariables: [],

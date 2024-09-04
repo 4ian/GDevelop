@@ -37,6 +37,9 @@ void EventsBasedObject::SerializeTo(SerializerElement& element) const {
   if (isTextContainer) {
     element.SetBoolAttribute("isTextContainer", true);
   }
+  if (isInnerAreaExpandingWithParent) {
+    element.SetBoolAttribute("isInnerAreaExpandingWithParent", true);
+  }
   element.SetIntAttribute("areaMinX", areaMinX);
   element.SetIntAttribute("areaMinY", areaMinY);
   element.SetIntAttribute("areaMinZ", areaMinZ);
@@ -59,6 +62,8 @@ void EventsBasedObject::UnserializeFrom(gd::Project& project,
   isRenderedIn3D = element.GetBoolAttribute("is3D", false);
   isAnimatable = element.GetBoolAttribute("isAnimatable", false);
   isTextContainer = element.GetBoolAttribute("isTextContainer", false);
+  isInnerAreaExpandingWithParent =
+      element.GetBoolAttribute("isInnerAreaExpandingWithParent", false);
   areaMinX = element.GetIntAttribute("areaMinX", 0);
   areaMinY = element.GetIntAttribute("areaMinY", 0);
   areaMinZ = element.GetIntAttribute("areaMinZ", 0);

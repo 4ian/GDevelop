@@ -17,6 +17,15 @@ namespace gdjs {
     /** The object that is built with the instances of this container. */
     _customObject: gdjs.CustomRuntimeObject;
     _isLoaded: boolean = false;
+    /**
+     * The default size defined by users in the custom object initial instances editor.
+     *
+     * Don't modify it as it would affect every instance.
+     **/
+    private _originalInnerArea: {
+      min: [float, float, float];
+      max: [float, float, float];
+    } | null = null;
 
     /**
      * @param parent the parent container that contains the object associated
@@ -59,6 +68,8 @@ namespace gdjs {
       if (this._isLoaded) {
         this.onDestroyFromScene(this._parent);
       }
+
+      this._setOriginalInnerArea(eventsBasedObjectData);
 
       // Registering objects
       for (
@@ -127,6 +138,32 @@ namespace gdjs {
       this._setLayerDefaultZOrders();
 
       this._isLoaded = true;
+    }
+
+    /**
+     * Initialize `_originalInnerArea` if it doesn't exist.
+     * `_originalInnerArea` is shared by every instance to save memory.
+     */
+    private _setOriginalInnerArea(
+      eventsBasedObjectData: EventsBasedObjectData
+    ) {
+      if (eventsBasedObjectData.instances.length > 0) {
+        if (!eventsBasedObjectData._originalInnerArea) {
+          eventsBasedObjectData._originalInnerArea = {
+            min: [
+              eventsBasedObjectData.areaMinX,
+              eventsBasedObjectData.areaMinY,
+              eventsBasedObjectData.areaMinZ,
+            ],
+            max: [
+              eventsBasedObjectData.areaMaxX,
+              eventsBasedObjectData.areaMaxY,
+              eventsBasedObjectData.areaMaxZ,
+            ],
+          };
+        }
+        this._originalInnerArea = eventsBasedObjectData._originalInnerArea;
+      }
     }
 
     /**
@@ -249,6 +286,38 @@ namespace gdjs {
 
     getScene() {
       return this._runtimeScene;
+    }
+
+    getUnrotatedViewportMinX(): float {
+      return this._customObject.getUnscaledMinX();
+    }
+
+    getUnrotatedViewportMinY(): float {
+      return this._customObject.getUnscaledMinY();
+    }
+
+    getUnrotatedViewportMaxX(): float {
+      return this._customObject.getUnscaledMaxX();
+    }
+
+    getUnrotatedViewportMaxY(): float {
+      return this._customObject.getUnscaledMaxY();
+    }
+
+    getOriginalViewportMinX(): float {
+      return this._originalInnerArea ? this._originalInnerArea.min[0] : 0;
+    }
+
+    getOriginalViewportMinY(): float {
+      return this._originalInnerArea ? this._originalInnerArea.min[1] : 0;
+    }
+
+    getOriginalViewportMaxX(): float {
+      return this._originalInnerArea ? this._originalInnerArea.max[0] : 0;
+    }
+
+    getOriginalViewportMaxY(): float {
+      return this._originalInnerArea ? this._originalInnerArea.max[1] : 0;
     }
 
     getViewportWidth(): float {

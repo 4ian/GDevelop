@@ -208,6 +208,7 @@ declare interface SceneAndExtensionsData {
 
 declare interface EventsBasedObjectData extends InstanceContainerData {
   name: string;
+  isInnerAreaExpandingWithParent: boolean;
   // The flat representation of defaultSize.
   areaMinX: float;
   areaMinY: float;
@@ -218,9 +219,9 @@ declare interface EventsBasedObjectData extends InstanceContainerData {
   /**
    * A value shared by every object instances.
    *
-   * @see gdjs.CustomRuntimeObject._forcedDefaultSize
+   * @see gdjs.CustomRuntimeObjectInstanceContainer._originalInnerArea
    **/
-  defaultSize: {
+  _originalInnerArea: {
     min: [float, float, float];
     max: [float, float, float];
   } | null;

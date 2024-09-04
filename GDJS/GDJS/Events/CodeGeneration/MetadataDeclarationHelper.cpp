@@ -131,8 +131,11 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
           // PlatformExtension but this line will be removed soon.
           .SetCategoryFullName(extension.GetCategory())
           .AddDefaultBehavior("ResizableCapability::ResizableBehavior")
-          .AddDefaultBehavior("ScalableCapability::ScalableBehavior")
           .AddDefaultBehavior("FlippableCapability::FlippableBehavior");
+  if (!eventsBasedObject.IsInnerAreaExpandingWithParent()) {
+    objectMetadata
+          .AddDefaultBehavior("ScalableCapability::ScalableBehavior");
+  }
   if (eventsBasedObject.IsRenderedIn3D()) {
     objectMetadata
         .MarkAsRenderedIn3D()

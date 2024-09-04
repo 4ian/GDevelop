@@ -302,15 +302,6 @@ module.exports = {
         '',
         false
       )
-      .addParameter(
-        'yesorno',
-        _('Offset? (outside webview otherwise)'),
-        '',
-        false
-      )
-      .setParameterLongDescription(
-        'By setting offset to true, just overlapping the banner on top of the content.\nkeep false for the default setting where the banner pushes the webview, this setting creates a black space around the banner, and can also create borders around your game.'
-      )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/AdMob/admobtools.js')
       .setFunctionName('gdjs.adMob.setupBanner');

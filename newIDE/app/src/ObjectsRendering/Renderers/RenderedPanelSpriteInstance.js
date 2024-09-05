@@ -99,13 +99,13 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
     this._centerSprite = new StretchedSprite(new PIXI.Texture(texture));
     this._borderSprites = [
       new StretchedSprite(new PIXI.Texture(texture)), //Right
-      new PIXI.Sprite(texture), //Top-Right
+      new PIXI.Sprite(new PIXI.Texture(texture)), //Top-Right
       new StretchedSprite(new PIXI.Texture(texture)), //Top
-      new PIXI.Sprite(texture), //Top-Left
+      new PIXI.Sprite(new PIXI.Texture(texture)), //Top-Left
       new StretchedSprite(new PIXI.Texture(texture)), //Left
-      new PIXI.Sprite(texture), //Bottom-Left
+      new PIXI.Sprite(new PIXI.Texture(texture)), //Bottom-Left
       new StretchedSprite(new PIXI.Texture(texture)), //Bottom
-      new PIXI.Sprite(texture), //Bottom-Right
+      new PIXI.Sprite(new PIXI.Texture(texture)), //Bottom-Right
     ];
 
     this._pixiObject.removeChildren();

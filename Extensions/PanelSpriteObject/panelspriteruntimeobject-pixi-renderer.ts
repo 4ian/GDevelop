@@ -32,6 +32,10 @@ namespace gdjs {
       const StretchedSprite = !tiled ? PIXI.Sprite : PIXI.TilingSprite;
       this._spritesContainer = new PIXI.Container();
       this._wrapperContainer = new PIXI.Container();
+
+      // All these textures are going to be replaced in the call to `setTexture`.
+      // But to be safe and preserve the invariant that "these objects own their own
+      // textures", we create a new texture for each sprite.
       this._centerSprite = new StretchedSprite(
         new PIXI.Texture(texture.baseTexture)
       );
@@ -39,21 +43,21 @@ namespace gdjs {
         // Right
         new StretchedSprite(new PIXI.Texture(texture.baseTexture)),
         // Top-Right
-        new PIXI.Sprite(texture),
+        new PIXI.Sprite(new PIXI.Texture(texture.baseTexture)),
         // Top
         new StretchedSprite(new PIXI.Texture(texture.baseTexture)),
         // Top-Left
-        new PIXI.Sprite(texture),
+        new PIXI.Sprite(new PIXI.Texture(texture.baseTexture)),
         // Left
         new StretchedSprite(new PIXI.Texture(texture.baseTexture)),
         // Bottom-Left
-        new PIXI.Sprite(texture),
+        new PIXI.Sprite(new PIXI.Texture(texture.baseTexture)),
         // Bottom
         new StretchedSprite(new PIXI.Texture(texture.baseTexture)),
-        new PIXI.Sprite(texture),
+        // Bottom-Right
+        new PIXI.Sprite(new PIXI.Texture(texture.baseTexture)),
       ];
 
-      //Bottom-Right
       this.setTexture(textureName, instanceContainer);
       this._spritesContainer.removeChildren();
       this._spritesContainer.addChild(this._centerSprite);
@@ -395,7 +399,8 @@ namespace gdjs {
     }
 
     destroy() {
-      // Destroy textures because they are instantiated by this class.
+      // Destroy textures because they are instantiated by this class:
+      // all textures of borderSprites and centerSprite are "owned" by them.
       for (const borderSprite of this._borderSprites) {
         borderSprite.destroy({ texture: true });
       }

@@ -17,6 +17,8 @@ import {
   type SubscriptionPlanPricingSystem,
   type Subscription,
   hasMobileAppStoreSubscriptionPlan,
+  hasSubscriptionBeenManuallyAdded,
+  isSubscriptionComingFromTeam,
 } from '../../Utils/GDevelopServices/Usage';
 import EmptyMessage from '../../UI/EmptyMessage';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
@@ -36,7 +38,7 @@ import { ColumnStackLayout } from '../../UI/Layout';
 import RedemptionCodeIcon from '../../UI/CustomSvgIcons/RedemptionCode';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import RedeemCodeDialog from '../RedeemCodeDialog';
-import PlanCard from './PlanCard';
+import PlanCard, { getPlanIcon } from './PlanCard';
 import LeftLoader from '../../UI/LeftLoader';
 import RaisedButton from '../../UI/RaisedButton';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
@@ -47,9 +49,10 @@ import Link from '../../UI/Link';
 import { selectMessageByLocale } from '../../Utils/i18n/MessageByLocale';
 import uniq from 'lodash/uniq';
 import CancelReasonDialog from './CancelReasonDialog';
-import { Line } from '../../UI/Grid';
+import { Column, Line } from '../../UI/Grid';
 import TwoStatesButton from '../../UI/TwoStatesButton';
 import HotMessage from '../../UI/HotMessage';
+import Paper from '../../UI/Paper';
 
 const styles = {
   descriptionText: {
@@ -92,6 +95,9 @@ const styles = {
     alignItems: 'stretch',
     gap: 8,
     overflowY: 'auto',
+  },
+  currentPlanPaper: {
+    padding: '8px 12px',
   },
 };
 
@@ -382,6 +388,13 @@ export default function SubscriptionDialog({
   const userPricingSystemId = authenticatedUser.subscription
     ? authenticatedUser.subscription.pricingSystemId
     : null;
+  const userSubscriptionPlanWithPricingSystems =
+    userPlanId && subscriptionPlansWithPricingSystems
+      ? subscriptionPlansWithPricingSystems.find(
+          subscriptionPlanWithPricingSystems =>
+            subscriptionPlanWithPricingSystems.id === userPlanId
+        )
+      : null;
 
   const { windowSize, isMobile } = useResponsiveWindowSize();
 
@@ -452,6 +465,54 @@ export default function SubscriptionDialog({
             open={open}
             fixedContent={
               <>
+                {hasValidSubscriptionPlan(authenticatedUser.subscription) &&
+                  userSubscriptionPlanWithPricingSystems && (
+                    <Column noMargin>
+                      <Text>
+                        <Trans>Your plan:</Trans>
+                      </Text>
+                      <Paper
+                        background="medium"
+                        variant="outlined"
+                        style={styles.currentPlanPaper}
+                      >
+                        <Line
+                          justifyContent="space-between"
+                          alignItems="center"
+                          noMargin
+                        >
+                          <Line alignItems="center" noMargin>
+                            {getPlanIcon({
+                              subscriptionPlan: userSubscriptionPlanWithPricingSystems,
+                              logoSize: 20,
+                            })}
+                            <Text size="block-title">
+                              {selectMessageByLocale(
+                                i18n,
+                                userSubscriptionPlanWithPricingSystems.nameByLocale
+                              )}
+                            </Text>
+                          </Line>
+                          {!hasSubscriptionBeenManuallyAdded(
+                            authenticatedUser.subscription
+                          ) &&
+                            !isSubscriptionComingFromTeam(
+                              authenticatedUser.subscription
+                            ) &&
+                            !willCancelAtPeriodEnd &&
+                            userPricingSystemId !== 'REDEMPTION_CODE' && (
+                              <FlatButton
+                                primary
+                                label={<Trans>Cancel subscription</Trans>}
+                                onClick={() =>
+                                  buyUpdateOrCancelPlan(i18n, null)
+                                }
+                              />
+                            )}
+                        </Line>
+                      </Paper>
+                    </Column>
+                  )}
                 <Line justifyContent="space-between" alignItems="center">
                   <Text size="block-title">
                     <Trans>Subscription plans</Trans>

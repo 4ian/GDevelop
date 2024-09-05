@@ -267,6 +267,8 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
       return rect;
     }
 
+    if (this._centerSprite.texture.valid)
+      this._centerSprite.texture.destroy(false);
     this._centerSprite.texture = new PIXI.Texture(
       texture,
       makeInsideTexture(
@@ -284,6 +286,8 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
     );
 
     //Right
+    if (this._borderSprites[0].texture.valid)
+      this._borderSprites[0].texture.destroy(false);
     this._borderSprites[0].texture = new PIXI.Texture(
       texture,
       makeInsideTexture(
@@ -299,6 +303,8 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
     );
 
     //Top-right
+    if (this._borderSprites[1].texture.valid)
+      this._borderSprites[1].texture.destroy(false);
     this._borderSprites[1].texture = new PIXI.Texture(
       texture,
       makeInsideTexture(
@@ -312,6 +318,8 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
     );
 
     //Top
+    if (this._borderSprites[2].texture.valid)
+      this._borderSprites[2].texture.destroy(false);
     this._borderSprites[2].texture = new PIXI.Texture(
       texture,
       makeInsideTexture(
@@ -327,6 +335,8 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
     );
 
     //Top-Left
+    if (this._borderSprites[3].texture.valid)
+      this._borderSprites[3].texture.destroy(false);
     this._borderSprites[3].texture = new PIXI.Texture(
       texture,
       makeInsideTexture(
@@ -340,6 +350,8 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
     );
 
     //Left
+    if (this._borderSprites[4].texture.valid)
+      this._borderSprites[4].texture.destroy(false);
     this._borderSprites[4].texture = new PIXI.Texture(
       texture,
       makeInsideTexture(
@@ -355,6 +367,8 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
     );
 
     //Bottom-Left
+    if (this._borderSprites[5].texture.valid)
+      this._borderSprites[5].texture.destroy(false);
     this._borderSprites[5].texture = new PIXI.Texture(
       texture,
       makeInsideTexture(
@@ -368,6 +382,8 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
     );
 
     //Bottom
+    if (this._borderSprites[6].texture.valid)
+      this._borderSprites[6].texture.destroy(false);
     this._borderSprites[6].texture = new PIXI.Texture(
       texture,
       makeInsideTexture(
@@ -383,6 +399,8 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
     );
 
     //Bottom-Right
+    if (this._borderSprites[7].texture.valid)
+      this._borderSprites[7].texture.destroy(false);
     this._borderSprites[7].texture = new PIXI.Texture(
       texture,
       makeInsideTexture(

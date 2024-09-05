@@ -213,7 +213,6 @@ namespace gdjs {
       this._textureHeight = texture.height;
 
       function makeInsideTexture(rect) {
-        //TODO
         if (rect.width < 0) {
           rect.width = 0;
         }
@@ -240,6 +239,7 @@ namespace gdjs {
         }
         return rect;
       }
+      this._centerSprite.texture.destroy(false);
       this._centerSprite.texture = new PIXI.Texture(
         texture,
         makeInsideTexture(
@@ -253,6 +253,7 @@ namespace gdjs {
       );
 
       //Top, Bottom, Right, Left borders:
+      this._borderSprites[0].texture.destroy(false);
       this._borderSprites[0].texture = new PIXI.Texture(
         texture,
         makeInsideTexture(
@@ -264,6 +265,7 @@ namespace gdjs {
           )
         )
       );
+      this._borderSprites[2].texture.destroy(false);
       this._borderSprites[2].texture = new PIXI.Texture(
         texture,
         makeInsideTexture(
@@ -275,6 +277,7 @@ namespace gdjs {
           )
         )
       );
+      this._borderSprites[4].texture.destroy(false);
       this._borderSprites[4].texture = new PIXI.Texture(
         texture,
         makeInsideTexture(
@@ -286,6 +289,7 @@ namespace gdjs {
           )
         )
       );
+      this._borderSprites[6].texture.destroy(false);
       this._borderSprites[6].texture = new PIXI.Texture(
         texture,
         makeInsideTexture(
@@ -297,6 +301,7 @@ namespace gdjs {
           )
         )
       );
+      this._borderSprites[1].texture.destroy(false);
       this._borderSprites[1].texture = new PIXI.Texture(
         texture,
         makeInsideTexture(
@@ -308,10 +313,12 @@ namespace gdjs {
           )
         )
       );
+      this._borderSprites[3].texture.destroy(false);
       this._borderSprites[3].texture = new PIXI.Texture(
         texture,
         makeInsideTexture(new PIXI.Rectangle(0, 0, obj._lBorder, obj._tBorder))
       );
+      this._borderSprites[5].texture.destroy(false);
       this._borderSprites[5].texture = new PIXI.Texture(
         texture,
         makeInsideTexture(
@@ -323,6 +330,7 @@ namespace gdjs {
           )
         )
       );
+      this._borderSprites[7].texture.destroy(false);
       this._borderSprites[7].texture = new PIXI.Texture(
         texture,
         makeInsideTexture(

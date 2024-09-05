@@ -1,7 +1,6 @@
 // @flow
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
-import ResourceSelectorWithThumbnail from '../ResourcesList/ResourceSelectorWithThumbnail';
 import SelectOption from '../UI/SelectOption';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import {

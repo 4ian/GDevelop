@@ -37,8 +37,7 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
       pixiResourcesLoader
     );
 
-    this.makeObjects();
-    this.updateTexture();
+    this.makeObjectsAndUpdateTextures();
   }
 
   update() {
@@ -52,10 +51,10 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
       this._associatedObjectConfiguration
     );
     if (panelSprite.isTiled() !== this._tiled) {
-      this.makeObjects();
+      this.makeObjectsAndUpdateTextures();
     }
     if (panelSprite.getTexture() !== this._textureName) {
-      this.updateTexture();
+      this.updateTextures();
     }
 
     this.updateAngle();
@@ -79,7 +78,7 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
     }
   }
 
-  makeObjects() {
+  makeObjectsAndUpdateTextures() {
     const panelSprite = gd.asPanelSpriteConfiguration(
       this._associatedObjectConfiguration
     );
@@ -96,6 +95,10 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
       this._pixiObject = new PIXI.Container();
       this._pixiContainer.addChild(this._pixiObject);
     }
+
+    // All these textures are going to be replaced in the call to updateTextures.
+    // But to be safe and preserve the invariant that "these objects own their own
+    // textures", we create a new texture for each sprite.
     this._centerSprite = new StretchedSprite(new PIXI.Texture(texture));
     this._borderSprites = [
       new StretchedSprite(new PIXI.Texture(texture)), //Right
@@ -113,11 +116,14 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
     for (var i = 0; i < this._borderSprites.length; ++i) {
       this._pixiObject.addChild(this._borderSprites[i]);
     }
+
+    this.updateTextures();
   }
 
   onRemovedFromScene(): void {
     super.onRemovedFromScene();
-    // Destroy textures because they are instantiated by this class.
+    // Destroy textures because they are instantiated by this class:
+    // all textures of borderSprites and centerSprite are "owned" by them.
     for (const borderSprite of this._borderSprites) {
       borderSprite.destroy({ texture: true });
     }
@@ -230,7 +236,7 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
     this._pixiObject.cacheAsBitmap = false;
   }
 
-  updateTexture() {
+  updateTextures() {
     const panelSprite = gd.asPanelSpriteConfiguration(
       this._associatedObjectConfiguration
     );
@@ -242,7 +248,7 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
 
     if (!texture.baseTexture.valid) {
       // Post pone texture update if texture is not loaded.
-      texture.once('update', () => this.updateTexture());
+      texture.once('update', () => this.updateTextures());
       return;
     }
 

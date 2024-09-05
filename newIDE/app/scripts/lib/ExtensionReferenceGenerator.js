@@ -1,5 +1,5 @@
 // @ts-check
-const { mapVector } = require('./MapFor');
+const { mapFor } = require('./MapFor');
 const { generateReadMoreLink } = require('./WikiHelpLink');
 
 // Types definitions used in this script:
@@ -261,10 +261,11 @@ const generateExpressionReferenceRowsText = ({
 }) => {
   let parameterRows = [];
   let parameterStrings = [];
-  mapVector(expressionMetadata.getParameters(), (parameterMetadata, index) => {
+  mapFor(0, expressionMetadata.getParameters(), index => {
     if ((!!objectMetadata && index < 1) || (!!behaviorMetadata && index < 2)) {
       return; // Skip the first (or first twos) parameters by convention.
     }
+    const parameterMetadata = expressionMetadata.getParameter(index);
     if (parameterMetadata.isCodeOnly()) return;
 
     const sanitizedDescription = sanitizeExpressionDescription(

@@ -221,9 +221,12 @@ export class TileMapManager {
     this._textureCacheCaches.getOrLoad(
       key,
       (textureCacheLoadingCallback) => {
-        const atlasTexture = atlasImageResourceName
-          ? getTexture(atlasImageResourceName)
-          : null;
+        if (!atlasImageResourceName) {
+          textureCacheLoadingCallback(null);
+          return;
+        }
+
+        const atlasTexture = getTexture(atlasImageResourceName);
         const textureCache = PixiTileMapHelper.parseSimpleTileMapAtlas(
           atlasTexture,
           columnCount,

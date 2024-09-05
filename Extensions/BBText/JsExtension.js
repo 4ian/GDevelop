@@ -549,9 +549,7 @@ module.exports = {
         this._pixiObject.alpha = opacity / 255;
 
         const color = properties.get('color').getValue();
-        const newColor = objectsRenderingService.rgbOrHexToHexNumber(
-          color
-        );
+        const newColor = objectsRenderingService.rgbOrHexToHexNumber(color);
         if (newColor !== this._pixiObject.textStyles.default.fill) {
           this._pixiObject.textStyles.default.fill = newColor;
           this._pixiObject.dirty = true;
@@ -559,7 +557,9 @@ module.exports = {
 
         const fontSize = properties.get('fontSize').getValue();
         const newDefaultFontsize = `${fontSize}px`;
-        if (newDefaultFontsize !== this._pixiObject.textStyles.default.fontSize) {
+        if (
+          newDefaultFontsize !== this._pixiObject.textStyles.default.fontSize
+        ) {
           this._pixiObject.textStyles.default.fontSize = `${fontSize}px`;
           this._pixiObject.dirty = true;
         }

@@ -96,6 +96,9 @@ const styles = {
     gap: 8,
     overflowY: 'auto',
   },
+  currentPlanPaper: {
+    padding: '8px 12px',
+  },
 };
 
 const cancelConfirmationTexts = {
@@ -471,7 +474,7 @@ export default function SubscriptionDialog({
                       <Paper
                         background="medium"
                         variant="outlined"
-                        style={{ padding: '8px 12px' }}
+                        style={styles.currentPlanPaper}
                       >
                         <Line
                           justifyContent="space-between"

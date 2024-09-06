@@ -17,7 +17,7 @@ import ArrowRight from '../../../../UI/CustomSvgIcons/ArrowRight';
 
 type Props = {|
   onSeeResources: () => void,
-  unlocked: boolean,
+  unlocked?: boolean,
 |};
 
 export const EducationCard = ({ onSeeResources, unlocked }: Props) => {

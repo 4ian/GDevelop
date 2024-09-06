@@ -7,7 +7,7 @@ import {
   LayoutedParent,
   ChildRenderedInstance,
   PropertiesContainer,
-} from './CustomObjectLayoutingModel';
+} from './LegacyCustomObjectLayoutingModel';
 import { mapFor } from '../../Utils/MapFor';
 
 const gd: libGDevelop = global.gd;

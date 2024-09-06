@@ -98,6 +98,17 @@ class CustomObjectConfiguration : public gd::ObjectConfiguration {
    */
   SpriteAnimationList& GetAnimations();
 
+  enum EdgeAnchor {
+    NoAnchor = 0,
+    MinEdge = 1,
+    MaxEdge = 2,
+    Proportional = 3,
+    Center = 4,
+  };
+
+  static const gd::CustomObjectConfiguration::EdgeAnchor
+  GetEdgeAnchorFromString(const gd::String &value);
+
 protected:
   void DoSerializeTo(SerializerElement& element) const override;
   void DoUnserializeFrom(Project& project, const SerializerElement& element) override;

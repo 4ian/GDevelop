@@ -461,6 +461,8 @@ typedef std::vector<UnfilledRequiredBehaviorPropertyProblem>
 typedef std::vector<const gd::ObjectFolderOrObject*> VectorObjectFolderOrObject;
 typedef QuickCustomization::Visibility
     QuickCustomization_Visibility;
+typedef CustomObjectConfiguration::EdgeAnchor
+    CustomObjectConfiguration_EdgeAnchor;
 
 typedef ExtensionAndMetadata<BehaviorMetadata> ExtensionAndBehaviorMetadata;
 typedef ExtensionAndMetadata<ObjectMetadata> ExtensionAndObjectMetadata;
@@ -808,6 +810,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_GetDefaultMeasurementUnitAtIndex GetDefaultMeasurementUnitAtIndex
 #define STATIC_GetDefaultMeasurementUnitByName GetDefaultMeasurementUnitByName
 #define STATIC_HasDefaultMeasurementUnitNamed HasDefaultMeasurementUnitNamed
+#define STATIC_GetEdgeAnchorFromString GetEdgeAnchorFromString
 
 // We postfix some methods with "At" as Javascript does not support overloading
 #define GetLayoutAt GetLayout

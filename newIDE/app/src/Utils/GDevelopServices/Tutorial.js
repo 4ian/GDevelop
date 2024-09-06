@@ -34,6 +34,8 @@ export type Tutorial = {|
   isPrivateTutorial?: boolean,
   redeemHintByLocale?: MessageByLocale,
   redeemLinkByLocale?: MessageByLocale,
+  sectionByLocale?: MessageByLocale;
+  tagsByLocale?: MessageByLocale[];
 |};
 
 export const canAccessTutorial = (

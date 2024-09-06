@@ -1,6 +1,8 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
+import { type Limits } from '../../../../Utils/GDevelopServices/Usage';
 import SectionContainer, { SectionRow } from '../SectionContainer';
 import {
   type Tutorial,
@@ -12,6 +14,8 @@ import { type WindowSizeType } from '../../../../UI/Responsive/ResponsiveWindowM
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import { PrivateTutorialViewDialog } from '../../../../AssetStore/PrivateTutorials/PrivateTutorialViewDialog';
 import EducationCurriculumLesson from './EducationCurriculumLesson';
+import { selectMessageByLocale } from '../../../../Utils/i18n/MessageByLocale';
+import Text from '../../../../UI/Text';
 
 const styles = {
   educationCurriculumTutorialContainer: {
@@ -19,6 +23,62 @@ const styles = {
     flexDirection: 'column',
     gap: 24,
   },
+  sectionTitleContainer: { marginBottom: -10 },
+};
+
+type EducationCurriculumProps = {|
+  i18n: I18nType,
+  limits: ?Limits,
+  tutorials: Tutorial[],
+  onSelectTutorial: Tutorial => void,
+|};
+
+const EducationCurriculum = ({
+  i18n,
+  limits,
+  tutorials,
+  onSelectTutorial,
+}: EducationCurriculumProps) => {
+  const listItems: React.Node[] = React.useMemo(
+    () => {
+      const items = [];
+      let currentSection = null;
+      let sectionIndex = 0;
+
+      tutorials.forEach(tutorial => {
+        if (!tutorial.sectionByLocale) return;
+        const section = selectMessageByLocale(i18n, tutorial.sectionByLocale);
+        if (section !== currentSection) {
+          items.push(
+            <div style={styles.sectionTitleContainer}>
+              <Text size="section-title" noMargin key={`section-${section}`}>
+                {section}
+              </Text>
+            </div>
+          );
+          sectionIndex = 0;
+          currentSection = section;
+        }
+        items.push(
+          <EducationCurriculumLesson
+            key={tutorial.id}
+            i18n={i18n}
+            limits={limits}
+            tutorial={tutorial}
+            onSelectTutorial={onSelectTutorial}
+            index={sectionIndex}
+          />
+        );
+        sectionIndex += 1;
+      });
+      return items;
+    },
+    [tutorials, i18n, limits, onSelectTutorial]
+  );
+
+  return (
+    <div style={styles.educationCurriculumTutorialContainer}>{listItems}</div>
+  );
 };
 
 const getColumnsFromWindowSize = (windowSize: WindowSizeType) => {
@@ -64,16 +124,12 @@ const TutorialsCategoryPage = ({ category, tutorials, onBack }: Props) => {
         >
           <SectionRow>
             {category === 'education-curriculum' ? (
-              <div style={styles.educationCurriculumTutorialContainer}>
-                {filteredTutorials.map(tutorial => (
-                  <EducationCurriculumLesson
-                    i18n={i18n}
-                    limits={limits}
-                    tutorial={tutorial}
-                    onSelectTutorial={setSelectedTutorial}
-                  />
-                ))}
-              </div>
+              <EducationCurriculum
+                tutorials={filteredTutorials}
+                onSelectTutorial={setSelectedTutorial}
+                i18n={i18n}
+                limits={limits}
+              />
             ) : (
               <ImageTileGrid
                 items={filteredTutorials.map(tutorial =>

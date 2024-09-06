@@ -36,6 +36,20 @@ export const fakeEducationCurriculumPrivateTutorial: Tutorial = {
     en:
       'https://resources.gdevelop-app.com/tutorials/images/playlists/get-started.png',
   },
+  sectionByLocale: {
+    en: 'Theoretical lessons',
+  },
+  tagsByLocale: [
+    {
+      en: 'GDevelop',
+    },
+    {
+      en: 'Basics',
+    },
+    {
+      en: 'Programming',
+    },
+  ],
 };
 
 export const fakeEducationCurriculumPrivatePdfTutorial: PrivatePdfTutorial = {
@@ -78,6 +92,67 @@ export const fakeTutorials: Array<Tutorial> = [
       en:
         'https://resources.gdevelop-app.com/tutorials/images/playlists/get-started.png',
     },
+    sectionByLocale: {
+      en: 'Theoretical lessons',
+    },
+    tagsByLocale: [
+      {
+        en: 'Enemy AI',
+      },
+      {
+        en: '3D',
+      },
+      {
+        en: 'Single player',
+      },
+    ],
+  },
+  {
+    id: 'education-curriculum-3',
+    isPrivateTutorial: true,
+    redeemHintByLocale: {
+      en: 'For education subscribers/teachers only.',
+    },
+    redeemLinkByLocale: {
+      en: 'https://gdevelop.io/pricing/education',
+    },
+    title: 'Practical education lesson',
+    titleByLocale: {
+      en: 'Practical education lesson',
+    },
+    description:
+      'Teach the basics of GDevelop and game creation to your students.',
+    descriptionByLocale: {
+      en: 'Teach the basics of GDevelop and game creation to your students.',
+    },
+    type: 'pdf-tutorial',
+    category: 'education-curriculum',
+    link:
+      'https://api-dev.gdevelop.io/asset/pdf-tutorial/education-curriculum-2/action/redirect-to-pdf',
+    linkByLocale: {
+      en:
+        'https://api-dev.gdevelop.io/asset/pdf-tutorial/education-curriculum-2/action/redirect-to-pdf',
+    },
+    thumbnailUrl:
+      'https://resources.gdevelop-app.com/tutorials/images/playlists/get-started.png',
+    thumbnailUrlByLocale: {
+      en:
+        'https://resources.gdevelop-app.com/tutorials/images/playlists/get-started.png',
+    },
+    sectionByLocale: {
+      en: 'Practical lessons',
+    },
+    tagsByLocale: [
+      {
+        en: 'Enemy AI',
+      },
+      {
+        en: 'Leaderboards',
+      },
+      {
+        en: 'Projectiles',
+      },
+    ],
   },
   {
     id: 'playlist-get-started',

@@ -3,7 +3,6 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
-import capitalize from 'lodash/capitalize';
 import { type Limits } from '../../../../Utils/GDevelopServices/Usage';
 import {
   type Tutorial,
@@ -89,6 +88,7 @@ type Props = {|
   limits: ?Limits,
   tutorial: Tutorial,
   onSelectTutorial: (tutorial: Tutorial) => void,
+  index: number,
 |};
 
 const EducationCurriculumLesson = ({
@@ -96,20 +96,17 @@ const EducationCurriculumLesson = ({
   tutorial,
   limits,
   onSelectTutorial,
+  index,
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const [isImageLoaded, setIsImageLoaded] = React.useState<boolean>(false);
   const isLocked = limits
     ? !canAccessTutorial(tutorial, limits.capabilities)
-    : false;
+    : true;
 
   const title = (
     <LineStackLayout noMargin alignItems="center">
-      <Chip
-        size="small"
-        color="secondary"
-        label={rankLabel[Math.floor(Math.random() * 9 + 1).toString()]}
-      />
+      <Chip size="small" color="secondary" label={rankLabel[index + 1]} />
       <Text size="block-title" noMargin>
         {selectMessageByLocale(i18n, tutorial.titleByLocale)}
       </Text>
@@ -148,15 +145,19 @@ const EducationCurriculumLesson = ({
           <ColumnStackLayout noMargin expand>
             {!isMobile && title}
             <div style={styles.tagsContainer}>
-              {['Multiplayer', 'Tag', 'Other tag'].map(tag => (
-                <Chip
-                  size="small"
-                  style={styles.chip}
-                  label={capitalize(tag)}
-                  key={tag}
-                  textColor="secondary"
-                />
-              ))}
+              {tutorial.tagsByLocale &&
+                tutorial.tagsByLocale.map(tagByLocale => {
+                  const tag = selectMessageByLocale(i18n, tagByLocale);
+                  return (
+                    <Chip
+                      size="small"
+                      style={styles.chip}
+                      label={tag}
+                      key={tag}
+                      textColor="secondary"
+                    />
+                  );
+                })}
             </div>
             <Text noMargin>
               {selectMessageByLocale(i18n, tutorial.descriptionByLocale)}

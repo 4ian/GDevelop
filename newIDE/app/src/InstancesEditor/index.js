@@ -54,6 +54,10 @@ import {
 import ClickInterceptor from './ClickInterceptor';
 import getObjectByName from '../Utils/GetObjectByName';
 import { AffineTransformation } from '../Utils/AffineTransformation';
+import { ErrorFallbackComponent } from '../UI/ErrorBoundary';
+import { Trans } from '@lingui/macro';
+import { generateUUID } from 'three/src/math/MathUtils';
+
 const gd: libGDevelop = global.gd;
 
 export const instancesEditorId = 'instances-editor-canvas';
@@ -123,7 +127,14 @@ type Props = {|
   showObjectInstancesIn3D: boolean,
 |};
 
-export default class InstancesEditor extends Component<Props> {
+type State = {|
+  renderingError: null | {|
+    error: Error,
+    uniqueErrorId: string,
+  |},
+|};
+
+export default class InstancesEditor extends Component<Props, State> {
   lastContextMenuX = 0;
   lastContextMenuY = 0;
   lastCursorX: number | null = null;
@@ -161,6 +172,10 @@ export default class InstancesEditor extends Component<Props> {
   contextMenuLongTouchTimeoutID: TimeoutID;
   hasCursorMovedSinceItIsDown = false;
   _showObjectInstancesIn3D: boolean = false;
+
+  state = {
+    renderingError: null,
+  };
 
   componentDidMount() {
     // Initialize the PIXI renderer, if possible
@@ -1499,31 +1514,38 @@ export default class InstancesEditor extends Component<Props> {
     if (this._renderingPaused) return;
 
     // Avoid killing the CPU by limiting the rendering calls.
-    if (
-      this.fpsLimiter.shouldUpdate() &&
-      !shouldPreventRenderingInstanceEditors()
-    ) {
-      this.canvasCursor.render();
-      this.grid.render();
-      this.highlightedInstance.render();
-      this.tileMapPaintingPreview.render();
-      this.clickInterceptor.render();
-      this.selectedInstances.render();
-      this.selectionRectangle.render();
-      this.windowBorder.render();
-      this.windowMask.render();
-      this.statusBar.render();
-      this.background.render();
+    try {
+      if (
+        this.fpsLimiter.shouldUpdate() &&
+        !shouldPreventRenderingInstanceEditors()
+      ) {
+        this.canvasCursor.render();
+        this.grid.render();
+        this.highlightedInstance.render();
+        this.tileMapPaintingPreview.render();
+        this.clickInterceptor.render();
+        this.selectedInstances.render();
+        this.selectionRectangle.render();
+        this.windowBorder.render();
+        this.windowMask.render();
+        this.statusBar.render();
+        this.background.render();
 
-      this.instancesRenderer.render(
-        this.pixiRenderer,
-        this.threeRenderer,
-        this.viewPosition,
-        this.uiPixiContainer,
-        this.backgroundPixiContainer
-      );
+        this.instancesRenderer.render(
+          this.pixiRenderer,
+          this.threeRenderer,
+          this.viewPosition,
+          this.uiPixiContainer,
+          this.backgroundPixiContainer
+        );
+      }
+      this.nextFrame = requestAnimationFrame(this._renderScene);
+    } catch (error) {
+      console.error('Exception caught while doing the rendering:', error);
+      this.setState({
+        renderingError: { error, uniqueErrorId: generateUUID() },
+      });
     }
-    this.nextFrame = requestAnimationFrame(this._renderScene);
   };
 
   pauseSceneRendering = () => {
@@ -1557,6 +1579,17 @@ export default class InstancesEditor extends Component<Props> {
 
   render() {
     if (!this.props.project) return null;
+
+    if (this.state.renderingError) {
+      return (
+        <ErrorFallbackComponent
+          error={this.state.renderingError.error}
+          componentTitle={<Trans>Instances editor rendering</Trans>}
+          componentStack="[InstancesEditor rendering]"
+          uniqueErrorId={this.state.renderingError.uniqueErrorId}
+        />
+      );
+    }
 
     return (
       <DropTarget

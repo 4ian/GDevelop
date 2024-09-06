@@ -1616,6 +1616,14 @@ module.exports = {
         // the Tilemap will properly emit events when hovered/clicked.
         // By default, this is not implemented in pixi-tilemap.
         this._pixiObject.containsPoint = (position) => {
+          if (!this._pixiObject) {
+            // Ease debugging by throwing now rather than waiting for an exception later.
+            throw new Error(
+              'containsPoint called on a destroyed PIXI object - this object was not properly removed from the PIXI container.'
+            );
+            return;
+          }
+
           // Turns the world position to the local object coordinates
           const localPosition = new PIXI.Point();
           this._pixiObject.worldTransform.applyInverse(position, localPosition);
@@ -1638,21 +1646,32 @@ module.exports = {
         super.onRemovedFromScene();
         // Keep textures because they are shared by all tile maps.
         this._pixiObject.destroy(false);
+
+        // Not strictly necessary, but helps finding wrong
+        // handling of this._pixiObject in its container.
+        this._pixiObject = null;
       }
 
-      onLoadingError() {
+      _replacePixiObject(newPixiObject) {
+        if (this._pixiObject !== null)
+          this._pixiContainer.removeChild(this._pixiObject);
+        this._pixiObject = newPixiObject;
+        this._pixiContainer.addChild(this._pixiObject);
+      }
+
+      _onLoadingError() {
         this.errorPixiObject =
           this.errorPixiObject ||
           new PIXI.Sprite(this._pixiResourcesLoader.getInvalidPIXITexture());
-        this._pixiContainer.addChild(this.errorPixiObject);
-        this._pixiObject = this.errorPixiObject;
+
+        this._replacePixiObject(this.errorPixiObject);
       }
 
-      onLoadingSuccess() {
+      _onLoadingSuccess() {
         if (this.errorPixiObject) {
-          this._pixiContainer.removeChild(this.errorPixiObject);
+          this._replacePixiObject(this.tileMapPixiObject);
+
           this.errorPixiObject = null;
-          this._pixiObject = this.tileMapPixiObject;
         }
       }
 
@@ -1731,7 +1750,7 @@ module.exports = {
             pako,
             (tileMap) => {
               if (!tileMap) {
-                this.onLoadingError();
+                this._onLoadingError();
                 // _loadTileMapWithCallback already log errors
                 return;
               }
@@ -1750,11 +1769,11 @@ module.exports = {
                 levelIndex,
                 (textureCache) => {
                   if (!textureCache) {
-                    this.onLoadingError();
+                    this._onLoadingError();
                     // getOrLoadTextureCache already log warns and errors.
                     return;
                   }
-                  this.onLoadingSuccess();
+                  this._onLoadingSuccess();
 
                   this.width = tileMap.getWidth();
                   this.height = tileMap.getHeight();
@@ -1920,6 +1939,14 @@ module.exports = {
         // the Tilemap will properly emit events when hovered/clicked.
         // By default, this is not implemented in pixi-tilemap.
         this._pixiObject.containsPoint = (position) => {
+          if (!this._pixiObject) {
+            // Ease debugging by throwing now rather than waiting for an exception later.
+            throw new Error(
+              'containsPoint called on a destroyed PIXI object - this object was not properly removed from the PIXI container.'
+            );
+            return;
+          }
+
           // Turns the world position to the local object coordinates
           const localPosition = new PIXI.Point();
           if (this.tileMapPixiObject.visible) {
@@ -1963,21 +1990,32 @@ module.exports = {
         super.onRemovedFromScene();
         // Keep textures because they are shared by all tile maps.
         this._pixiObject.destroy(false);
+
+        // Not strictly necessary, but helps finding wrong
+        // handling of this._pixiObject in its container.
+        this._pixiObject = null;
       }
 
-      onLoadingError() {
+      _replacePixiObject(newPixiObject) {
+        if (this._pixiObject !== null)
+          this._pixiContainer.removeChild(this._pixiObject);
+        this._pixiObject = newPixiObject;
+        this._pixiContainer.addChild(this._pixiObject);
+      }
+
+      _onLoadingError() {
         this.errorPixiObject =
           this.errorPixiObject ||
           new PIXI.Sprite(this._pixiResourcesLoader.getInvalidPIXITexture());
-        this._pixiContainer.addChild(this.errorPixiObject);
-        this._pixiObject = this.errorPixiObject;
+
+        this._replacePixiObject(this.errorPixiObject);
       }
 
-      onLoadingSuccess() {
+      _onLoadingSuccess() {
         if (this.errorPixiObject) {
-          this._pixiContainer.removeChild(this.errorPixiObject);
+          this._replacePixiObject(this.tileMapPixiObject);
+
           this.errorPixiObject = null;
-          this._pixiObject = this.tileMapPixiObject;
         }
       }
 
@@ -2052,7 +2090,7 @@ module.exports = {
             rowCount,
             (tileMap) => {
               if (!tileMap) {
-                this.onLoadingError();
+                this._onLoadingError();
                 console.error('Could not parse tilemap.');
                 return;
               }
@@ -2073,7 +2111,7 @@ module.exports = {
                   /** @type {TileMapHelper.TileTextureCache | null} */
                   textureCache
                 ) => {
-                  this.onLoadingSuccess();
+                  this._onLoadingSuccess();
                   if (!this._editableTileMap) return;
 
                   this.width = this._editableTileMap.getWidth();
@@ -2145,7 +2183,7 @@ module.exports = {
             /** @type {TileMapHelper.TileTextureCache | null} */
             textureCache
           ) => {
-            this.onLoadingSuccess();
+            this._onLoadingSuccess();
             if (!this._editableTileMap) return;
 
             this.width = this._editableTileMap.getWidth();
@@ -2253,12 +2291,21 @@ module.exports = {
         );
 
         this.tileMapPixiObject = new PIXI.Graphics();
+        this.tileMapPixiObject._0iAmTheTileMapPixiObject = true;
         this._pixiObject = this.tileMapPixiObject;
 
         // Implement `containsPoint` so that we can set `interactive` to true and
         // the Tilemap will properly emit events when hovered/clicked.
         // By default, this is not implemented in pixi-tilemap.
         this._pixiObject.containsPoint = (position) => {
+          if (!this._pixiObject) {
+            // Ease debugging by throwing now rather than waiting for an exception later.
+            throw new Error(
+              'containsPoint called on a destroyed PIXI object - this object was not properly removed from the PIXI container.'
+            );
+            return;
+          }
+
           // Turns the world position to the local object coordinates
           const localPosition = new PIXI.Point();
           this._pixiObject.worldTransform.applyInverse(position, localPosition);
@@ -2281,21 +2328,32 @@ module.exports = {
       onRemovedFromScene() {
         super.onRemovedFromScene();
         this._pixiObject.destroy();
+
+        // Not strictly necessary, but helps finding wrong
+        // handling of this._pixiObject in its container.
+        this._pixiObject = null;
       }
 
-      onLoadingError() {
+      _replacePixiObject(newPixiObject) {
+        if (this._pixiObject !== null)
+          this._pixiContainer.removeChild(this._pixiObject);
+        this._pixiObject = newPixiObject;
+        this._pixiContainer.addChild(this._pixiObject);
+      }
+
+      _onLoadingError() {
         this.errorPixiObject =
           this.errorPixiObject ||
           new PIXI.Sprite(this._pixiResourcesLoader.getInvalidPIXITexture());
-        this._pixiContainer.addChild(this.errorPixiObject);
-        this._pixiObject = this.errorPixiObject;
+
+        this._replacePixiObject(this.errorPixiObject);
       }
 
-      onLoadingSuccess() {
+      _onLoadingSuccess() {
         if (this.errorPixiObject) {
-          this._pixiContainer.removeChild(this.errorPixiObject);
+          this._replacePixiObject(this.tileMapPixiObject);
+
           this.errorPixiObject = null;
-          this._pixiObject = this.tileMapPixiObject;
         }
       }
 
@@ -2363,11 +2421,11 @@ module.exports = {
           pako,
           (tileMap) => {
             if (!tileMap) {
-              this.onLoadingError();
+              this._onLoadingError();
               // _loadTiledMapWithCallback already log errors
               return;
             }
-            this.onLoadingSuccess();
+            this._onLoadingSuccess();
 
             this.width = tileMap.getWidth();
             this.height = tileMap.getHeight();

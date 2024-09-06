@@ -11,16 +11,21 @@ type StretchedSprite = PIXI.Sprite | PIXI.TilingSprite;
  * Renderer for gd.PanelSpriteObject
  *
  * Heavily inspired from the GDJS PIXI renderer for PanelSprite objects.
- * TODO: Find a way to factor GDJS objects and IDE instances renderers.
  */
 export default class RenderedPanelSpriteInstance extends RenderedInstance {
   _centerSprite: StretchedSprite;
   _borderSprites: StretchedSprite[];
+
+  // Cache of the values of the properties of the object, to detect
+  // changes
   _textureName: string;
   _width: number;
   _height: number;
   _tiled: boolean;
-  _wasRendered: boolean;
+  _leftMargin: number;
+  _topMargin: number;
+  _rightMargin: number;
+  _bottomMargin: number;
 
   constructor(
     project: gdProject,
@@ -41,25 +46,30 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
   }
 
   update() {
-    //TODO
-    // if (this._pixiObject.visible && this._wasRendered) {
-    //   this._pixiObject.cacheAsBitmap = true;
-    // }
-    // this._wasRendered = true;
-
     const panelSprite = gd.asPanelSpriteConfiguration(
       this._associatedObjectConfiguration
     );
+
+    // Change in tiling needs PIXI objects to be recreated.
     if (panelSprite.isTiled() !== this._tiled) {
       this.makeObjectsAndUpdateTextures();
     }
-    if (panelSprite.getTexture() !== this._textureName) {
+
+    // Change in texture or margins needs textures to be recreated.
+    if (panelSprite.getTexture() !== this._textureName ||
+      panelSprite.getLeftMargin() !== this._leftMargin ||
+      panelSprite.getTopMargin() !== this._topMargin ||
+      panelSprite.getRightMargin() !== this._rightMargin ||
+      panelSprite.getBottomMargin() !== this._bottomMargin
+    ) {
       this.updateTextures();
     }
 
+    // Change in position/angle is always applied.
     this.updateAngle();
     this.updatePosition();
 
+    // Handle change in size.
     const oldWidth = this._width;
     const oldHeight = this._height;
     if (this._instance.hasCustomSize()) {
@@ -228,7 +238,6 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
       0
     );
 
-    this._wasRendered = true;
     this._pixiObject.cacheAsBitmap = false;
   }
 
@@ -236,12 +245,19 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
     const panelSprite = gd.asPanelSpriteConfiguration(
       this._associatedObjectConfiguration
     );
+
+    // Store the values used for rendering, to detect changes
+    // that would need later to update the texture again.
     this._textureName = panelSprite.getTexture();
+    this._leftMargin = panelSprite.getLeftMargin();
+    this._topMargin = panelSprite.getTopMargin();
+    this._rightMargin = panelSprite.getRightMargin();
+    this._bottomMargin = panelSprite.getBottomMargin();
+
     const texture = PixiResourcesLoader.getPIXITexture(
       this._project,
       this._textureName
     );
-
     if (!texture.baseTexture.valid) {
       // Post pone texture update if texture is not loaded.
       texture.once('update', () => this.updateTextures());

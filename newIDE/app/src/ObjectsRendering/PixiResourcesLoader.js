@@ -44,6 +44,9 @@ let loadedBitmapFonts = {};
 let loadedFontFamilies = {};
 let loadedTextures = {};
 const invalidTexture = PIXI.Texture.from('res/error48.png');
+const loadingTexture = PIXI.Texture.from(
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAAA1BMVEXX19f5cgrAAAAAAXRSTlMz/za5cAAAAApJREFUCNdjQAMAABAAAbSqgB8AAAAASUVORK5CYII='
+);
 let loadedThreeTextures = {};
 let loadedThreeMaterials = {};
 let loadedOrLoading3DModelPromises: ResourcePromise<THREE.THREE_ADDONS.GLTF> = {};
@@ -983,6 +986,10 @@ export default class PixiResourcesLoader {
 
   static getInvalidPIXITexture() {
     return invalidTexture;
+  }
+
+  static getLoadingPIXITexture() {
+    return loadingTexture;
   }
 
   /**

@@ -238,6 +238,10 @@ module.exports = {
      * Renderer for instances of LightObject inside the IDE.
      */
     class RenderedLightObjectInstance extends RenderedInstance {
+      _radius = 0;
+      _color = 0;
+      _radiusGraphics = null;
+
       constructor(
         project,
         instance,
@@ -252,19 +256,6 @@ module.exports = {
           pixiContainer,
           pixiResourcesLoader
         );
-        this._radius = parseFloat(
-          this._associatedObjectConfiguration
-            .getProperties()
-            .get('radius')
-            .getValue()
-        );
-        if (this._radius <= 0) this._radius = 1;
-        const color = objectsRenderingService.rgbOrHexToHexNumber(
-          this._associatedObjectConfiguration
-            .getProperties()
-            .get('color')
-            .getValue()
-        );
 
         // The icon in the middle.
         const lightIconSprite = new PIXI.Sprite(
@@ -274,18 +265,11 @@ module.exports = {
         lightIconSprite.anchor.y = 0.5;
 
         // The circle to show the radius of the light.
-        const radiusBorderWidth = 2;
-        const radiusGraphics = new PIXI.Graphics();
-        radiusGraphics.lineStyle(radiusBorderWidth, color, 0.8);
-        radiusGraphics.drawCircle(
-          0,
-          0,
-          Math.max(1, this._radius - radiusBorderWidth)
-        );
+        this._radiusGraphics = new PIXI.Graphics();
 
         this._pixiObject = new PIXI.Container();
         this._pixiObject.addChild(lightIconSprite);
-        this._pixiObject.addChild(radiusGraphics);
+        this._pixiObject.addChild(this._radiusGraphics);
         this._pixiContainer.addChild(this._pixiObject);
         this.update();
       }
@@ -309,6 +293,42 @@ module.exports = {
       update() {
         this._pixiObject.position.x = this._instance.getX();
         this._pixiObject.position.y = this._instance.getY();
+
+        let radiusGraphicsDirty = false;
+
+        const radius = parseFloat(
+          this._associatedObjectConfiguration
+            .getProperties()
+            .get('radius')
+            .getValue()
+        );
+        if (radius <= 0) radius = 1;
+        if (radius !== this._radius) {
+          this._radius = radius;
+          radiusGraphicsDirty = true;
+        }
+
+        const color = objectsRenderingService.rgbOrHexToHexNumber(
+          this._associatedObjectConfiguration
+            .getProperties()
+            .get('color')
+            .getValue()
+        );
+        if (color !== this._color) {
+          this._color = color;
+          radiusGraphicsDirty = true;
+        }
+
+        if (radiusGraphicsDirty) {
+          const radiusBorderWidth = 2;
+          this._radiusGraphics.clear();
+          this._radiusGraphics.lineStyle(radiusBorderWidth, color, 0.8);
+          this._radiusGraphics.drawCircle(
+            0,
+            0,
+            Math.max(1, this._radius - radiusBorderWidth)
+          );
+        }
       }
 
       /**

@@ -164,18 +164,13 @@ export default class ParticleEmitterEditor extends React.Component<
             floatingLabelText={<Trans>Particles start color</Trans>}
             disableAlpha
             fullWidth
-            color={rgbColorToRGBString({
-              r: particleEmitterConfiguration.getParticleRed1(),
-              g: particleEmitterConfiguration.getParticleGreen1(),
-              b: particleEmitterConfiguration.getParticleBlue1(),
-            })}
+            color={particleEmitterConfiguration.getParticleColor1()}
             onChange={color => {
               const rgbColor = rgbStringAndAlphaToRGBColor(color);
               if (rgbColor) {
-                particleEmitterConfiguration.setParticleRed1(rgbColor.r);
-                particleEmitterConfiguration.setParticleGreen1(rgbColor.g);
-                particleEmitterConfiguration.setParticleBlue1(rgbColor.b);
-
+                particleEmitterConfiguration.setParticleColor1(
+                  rgbColorToRGBString(rgbColor)
+                );
                 this.forceUpdate();
               }
             }}
@@ -199,18 +194,13 @@ export default class ParticleEmitterEditor extends React.Component<
             floatingLabelText={<Trans>Particles end color</Trans>}
             disableAlpha
             fullWidth
-            color={rgbColorToRGBString({
-              r: particleEmitterConfiguration.getParticleRed2(),
-              g: particleEmitterConfiguration.getParticleGreen2(),
-              b: particleEmitterConfiguration.getParticleBlue2(),
-            })}
+            color={particleEmitterConfiguration.getParticleColor2()}
             onChange={color => {
               const rgbColor = rgbStringAndAlphaToRGBColor(color);
               if (rgbColor) {
-                particleEmitterConfiguration.setParticleRed2(rgbColor.r);
-                particleEmitterConfiguration.setParticleGreen2(rgbColor.g);
-                particleEmitterConfiguration.setParticleBlue2(rgbColor.b);
-
+                particleEmitterConfiguration.setParticleColor2(
+                  rgbColorToRGBString(rgbColor)
+                );
                 this.forceUpdate();
               }
             }}

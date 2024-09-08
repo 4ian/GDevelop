@@ -3627,18 +3627,10 @@ interface ParticleEmitterObject {
     void SetParticleLifeTimeMax(double newValue);
     double GetParticleLifeTimeMax();
 
-    void SetParticleRed1(double newValue);
-    double GetParticleRed1();
-    void SetParticleRed2(double newValue);
-    double GetParticleRed2();
-    void SetParticleGreen1(double newValue);
-    double GetParticleGreen1();
-    void SetParticleGreen2(double newValue);
-    double GetParticleGreen2();
-    void SetParticleBlue1(double newValue);
-    double GetParticleBlue1();
-    void SetParticleBlue2(double newValue);
-    double GetParticleBlue2();
+    void SetParticleColor1([Const] DOMString newValue);
+    [Const, Ref] DOMString GetParticleColor1();
+    void SetParticleColor2([Const] DOMString newValue);
+    [Const, Ref] DOMString GetParticleColor2();
     void SetParticleAlpha1(double newValue);
     double GetParticleAlpha1();
     void SetParticleAlpha2(double newValue);

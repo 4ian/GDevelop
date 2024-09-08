@@ -21,12 +21,8 @@ namespace gdjs {
     particleLifeTimeMin: number;
     particleGravityY: number;
     particleGravityX: number;
-    particleRed2: number;
-    particleRed1: number;
-    particleGreen2: number;
-    particleGreen1: number;
-    particleBlue2: number;
-    particleBlue1: number;
+    particleColor2: string;
+    particleColor1: string;
     particleSize2: number;
     particleSize1: number;
     /**
@@ -83,12 +79,8 @@ namespace gdjs {
     gravx: number;
     gravy: number;
     // Color
-    colr1: number;
-    colr2: number;
-    colg1: number;
-    colg2: number;
-    colb1: number;
-    colb2: number;
+    color1: number;
+    color2: number;
     // Size
     size1: number;
     size2: number;
@@ -124,12 +116,8 @@ namespace gdjs {
     lifeTimeMax: float;
     gravityX: number;
     gravityY: number;
-    colorR1: number;
-    colorR2: number;
-    colorG1: number;
-    colorG2: number;
-    colorB1: number;
-    colorB2: number;
+    color1: number;
+    color2: number;
     size1: number;
     size2: number;
     alpha1: number;
@@ -195,12 +183,12 @@ namespace gdjs {
       this.lifeTimeMax = particleObjectData.particleLifeTimeMax;
       this.gravityX = particleObjectData.particleGravityX;
       this.gravityY = particleObjectData.particleGravityY;
-      this.colorR1 = particleObjectData.particleRed1;
-      this.colorR2 = particleObjectData.particleRed2;
-      this.colorG1 = particleObjectData.particleGreen1;
-      this.colorG2 = particleObjectData.particleGreen2;
-      this.colorB1 = particleObjectData.particleBlue1;
-      this.colorB2 = particleObjectData.particleBlue2;
+      this.color1 = gdjs.rgbOrHexStringToNumber(
+        particleObjectData.particleColor1
+      );
+      this.color2 = gdjs.rgbOrHexStringToNumber(
+        particleObjectData.particleColor2
+      );
       this.size1 = particleObjectData.particleSize1;
       this.size2 = particleObjectData.particleSize2;
       this.alpha1 = particleObjectData.particleAlpha1;
@@ -296,23 +284,11 @@ namespace gdjs {
       if (oldObjectData.particleGravityY !== newObjectData.particleGravityY) {
         this.setParticleGravityY(newObjectData.particleGravityY);
       }
-      if (oldObjectData.particleRed1 !== newObjectData.particleRed1) {
-        this.setParticleRed1(newObjectData.particleRed1);
+      if (oldObjectData.particleColor1 !== newObjectData.particleColor1) {
+        this.setParticleColor1(newObjectData.particleColor1);
       }
-      if (oldObjectData.particleRed2 !== newObjectData.particleRed2) {
-        this.setParticleRed2(newObjectData.particleRed2);
-      }
-      if (oldObjectData.particleGreen1 !== newObjectData.particleGreen1) {
-        this.setParticleGreen1(newObjectData.particleGreen1);
-      }
-      if (oldObjectData.particleGreen2 !== newObjectData.particleGreen2) {
-        this.setParticleGreen2(newObjectData.particleGreen2);
-      }
-      if (oldObjectData.particleBlue1 !== newObjectData.particleBlue1) {
-        this.setParticleBlue1(newObjectData.particleBlue1);
-      }
-      if (oldObjectData.particleBlue2 !== newObjectData.particleBlue2) {
-        this.setParticleBlue2(newObjectData.particleBlue2);
+      if (oldObjectData.particleColor2 !== newObjectData.particleColor2) {
+        this.setParticleColor2(newObjectData.particleColor2);
       }
       if (oldObjectData.particleSize1 !== newObjectData.particleSize1) {
         this.setParticleSize1(newObjectData.particleSize1);
@@ -397,12 +373,8 @@ namespace gdjs {
         ltmax: this.lifeTimeMax,
         gravx: this.gravityX,
         gravy: this.gravityY,
-        colr1: this.colorR1,
-        colr2: this.colorR2,
-        colg1: this.colorG1,
-        colg2: this.colorG2,
-        colb1: this.colorB1,
-        colb2: this.colorB2,
+        color1: this.color1,
+        color2: this.color2,
         size1: this.size1,
         size2: this.size2,
         alp1: this.alpha1,
@@ -463,23 +435,11 @@ namespace gdjs {
       if (syncData.gravy !== undefined) {
         this.setParticleGravityY(syncData.gravy);
       }
-      if (syncData.colr1 !== undefined) {
-        this.setParticleRed1(syncData.colr1);
+      if (syncData.color1 !== undefined) {
+        this.setParticleColor1AsNumber(syncData.color1);
       }
-      if (syncData.colr2 !== undefined) {
-        this.setParticleRed2(syncData.colr2);
-      }
-      if (syncData.colg1 !== undefined) {
-        this.setParticleGreen1(syncData.colg1);
-      }
-      if (syncData.colg2 !== undefined) {
-        this.setParticleGreen2(syncData.colg2);
-      }
-      if (syncData.colb1 !== undefined) {
-        this.setParticleBlue1(syncData.colb1);
-      }
-      if (syncData.colb2 !== undefined) {
-        this.setParticleBlue2(syncData.colb2);
+      if (syncData.color2 !== undefined) {
+        this.setParticleColor2AsNumber(syncData.color2);
       }
       if (syncData.size1 !== undefined) {
         this.setParticleSize1(syncData.size1);
@@ -547,14 +507,7 @@ namespace gdjs {
         this._renderer.setGravity(this.gravityX, this.gravityY);
       }
       if (this._colorDirty) {
-        this._renderer.setColor(
-          this.colorR1,
-          this.colorG1,
-          this.colorB1,
-          this.colorR2,
-          this.colorG2,
-          this.colorB2
-        );
+        this._renderer.setColor(this.color1, this.color2);
       }
       if (this._sizeDirty) {
         this._renderer.setSize(this.size1, this.size2);
@@ -820,7 +773,7 @@ namespace gdjs {
     }
 
     getParticleRed1(): number {
-      return this.colorR1;
+      return gdjs.hexNumberToRGBArray(this.color1)[0];
     }
 
     setParticleRed1(red: number): void {
@@ -830,14 +783,14 @@ namespace gdjs {
       if (red > 255) {
         red = 255;
       }
-      if (this.colorR1 !== red) {
-        this._colorDirty = true;
-        this.colorR1 = red;
-      }
+      const existingColor = gdjs.hexNumberToRGBArray(this.color1);
+      this.setParticleColor1AsNumber(
+        gdjs.rgbToHexNumber(red, existingColor[1], existingColor[2])
+      );
     }
 
     getParticleRed2(): number {
-      return this.colorR2;
+      return gdjs.hexNumberToRGBArray(this.color2)[0];
     }
 
     setParticleRed2(red: number): void {
@@ -847,14 +800,14 @@ namespace gdjs {
       if (red > 255) {
         red = 255;
       }
-      if (this.colorR2 !== red) {
-        this._colorDirty = true;
-        this.colorR2 = red;
-      }
+      const existingColor = gdjs.hexNumberToRGBArray(this.color2);
+      this.setParticleColor2AsNumber(
+        gdjs.rgbToHexNumber(red, existingColor[1], existingColor[2])
+      );
     }
 
     getParticleGreen1(): number {
-      return this.colorG1;
+      return gdjs.hexNumberToRGBArray(this.color1)[1];
     }
 
     setParticleGreen1(green: number): void {
@@ -864,14 +817,14 @@ namespace gdjs {
       if (green > 255) {
         green = 255;
       }
-      if (this.colorG1 !== green) {
-        this._colorDirty = true;
-        this.colorG1 = green;
-      }
+      const existingColor = gdjs.hexNumberToRGBArray(this.color1);
+      this.setParticleColor1AsNumber(
+        gdjs.rgbToHexNumber(existingColor[0], green, existingColor[2])
+      );
     }
 
     getParticleGreen2(): number {
-      return this.colorG2;
+      return gdjs.hexNumberToRGBArray(this.color2)[1];
     }
 
     setParticleGreen2(green: number): void {
@@ -881,14 +834,14 @@ namespace gdjs {
       if (green > 255) {
         green = 255;
       }
-      if (this.colorG2 !== green) {
-        this._colorDirty = true;
-        this.colorG2 = green;
-      }
+      const existingColor = gdjs.hexNumberToRGBArray(this.color2);
+      this.setParticleColor2AsNumber(
+        gdjs.rgbToHexNumber(existingColor[0], green, existingColor[2])
+      );
     }
 
     getParticleBlue1(): number {
-      return this.colorB1;
+      return gdjs.hexNumberToRGBArray(this.color1)[2];
     }
 
     setParticleBlue1(blue: number): void {
@@ -898,14 +851,14 @@ namespace gdjs {
       if (blue > 255) {
         blue = 255;
       }
-      if (this.colorB1 !== blue) {
-        this._colorDirty = true;
-        this.colorB1 = blue;
-      }
+      const existingColor = gdjs.hexNumberToRGBArray(this.color1);
+      this.setParticleColor1AsNumber(
+        gdjs.rgbToHexNumber(existingColor[0], existingColor[1], blue)
+      );
     }
 
     getParticleBlue2(): number {
-      return this.colorB2;
+      return gdjs.hexNumberToRGBArray(this.color2)[2];
     }
 
     setParticleBlue2(blue: number): void {
@@ -915,30 +868,34 @@ namespace gdjs {
       if (blue > 255) {
         blue = 255;
       }
-      if (this.colorB2 !== blue) {
-        this._colorDirty = true;
-        this.colorB2 = blue;
-      }
+      const existingColor = gdjs.hexNumberToRGBArray(this.color2);
+      this.setParticleColor2AsNumber(
+        gdjs.rgbToHexNumber(existingColor[0], existingColor[1], blue)
+      );
     }
 
-    setParticleColor1(rgbColor: string): void {
-      const colors = rgbColor.split(';');
-      if (colors.length < 3) {
-        return;
-      }
-      this.setParticleRed1(parseInt(colors[0], 10));
-      this.setParticleGreen1(parseInt(colors[1], 10));
-      this.setParticleBlue1(parseInt(colors[2], 10));
+    setParticleColor1AsNumber(color: number): void {
+      this.color1 = color;
+      this._colorDirty = true;
+      debugger;
     }
 
-    setParticleColor2(rgbColor: string): void {
-      const colors = rgbColor.split(';');
-      if (colors.length < 3) {
-        return;
-      }
-      this.setParticleRed2(parseInt(colors[0], 10));
-      this.setParticleGreen2(parseInt(colors[1], 10));
-      this.setParticleBlue2(parseInt(colors[2], 10));
+    setParticleColor1(rgbOrHexColor: string): void {
+      this.setParticleColor1AsNumber(
+        gdjs.rgbOrHexStringToNumber(rgbOrHexColor)
+      );
+    }
+
+    setParticleColor2AsNumber(color: number): void {
+      this.color2 = color;
+      this._colorDirty = true;
+      debugger;
+    }
+
+    setParticleColor2(rgbOrHexColor: string): void {
+      this.setParticleColor2AsNumber(
+        gdjs.rgbOrHexStringToNumber(rgbOrHexColor)
+      );
     }
 
     getParticleSize1(): float {

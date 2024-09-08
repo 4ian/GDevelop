@@ -146,17 +146,13 @@ namespace gdjs {
                   {
                     time: 0,
                     value: gdjs.rgbToHex(
-                      objectData.particleRed1,
-                      objectData.particleGreen1,
-                      objectData.particleBlue1
+                      ...gdjs.rgbOrHexToRGBColor(objectData.particleColor1)
                     ),
                   },
                   {
                     time: 1,
                     value: gdjs.rgbToHex(
-                      objectData.particleRed2,
-                      objectData.particleGreen2,
-                      objectData.particleBlue2
+                      ...gdjs.rgbOrHexToRGBColor(objectData.particleColor2)
                     ),
                   },
                 ],
@@ -292,31 +288,30 @@ namespace gdjs {
           moveAcceleration.maxStart < 0);
     }
 
-    setColor(
-      r1: number,
-      g1: number,
-      b1: number,
-      r2: number,
-      g2: number,
-      b2: number
-    ): void {
+    setColor(color1: number, color2: number): void {
+      // console.log({color1,color2})
+      // debugger;
       // Access private members of the behavior to apply changes right away.
       const behavior: any = this.emitter.getBehavior('color');
       const first = behavior.list.first;
 
-      const startColor = first.value;
-      startColor.r = r1;
-      startColor.g = g1;
-      startColor.b = b1;
+      {
+        const [r, g, b] = gdjs.hexNumberToRGBArray(color1);
+        first.value.r = r;
+        first.value.g = g;
+        first.value.b = b;
+      }
 
       first.next = first.next || {
         time: 1,
         value: {},
       };
-      const endColor = first.next.value;
-      endColor.r = r2;
-      endColor.g = g2;
-      endColor.b = b2;
+      {
+        const [r, g, b] = gdjs.hexNumberToRGBArray(color2);
+        first.next.value.r = r;
+        first.next.value.g = g;
+        first.next.value.b = b;
+      }
     }
 
     setSize(size1: float, size2: float): void {

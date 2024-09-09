@@ -108,6 +108,28 @@ const CompactTextField = React.forwardRef<
       },
     }));
 
+    // The wheel event is added manually, instead of using the `onWheel` prop,
+    // because by default the `onWheel` is registered as a passive event listener,
+    // which prevents us to use `preventDefault` on the event, which is needed
+    // when we want to avoid the page to scroll when the user is scrolling on the input.
+    React.useEffect(
+      () => {
+        const input = inputRef.current;
+        if (input && onWheel) {
+          input.addEventListener('wheel', onWheel, {
+            passive: false,
+          });
+          return () => {
+            input &&
+              input.removeEventListener('wheel', onWheel, {
+                passive: false,
+              });
+          };
+        }
+      },
+      [onWheel]
+    );
+
     return (
       <div
         className={classNames({
@@ -172,7 +194,6 @@ const CompactTextField = React.forwardRef<
             onFocus={onFocusInput}
             onKeyDown={onKeyDown}
             onKeyUp={onKeyUp}
-            onWheel={onWheel}
           />
           {renderEndAdornmentOnHover && (
             <button

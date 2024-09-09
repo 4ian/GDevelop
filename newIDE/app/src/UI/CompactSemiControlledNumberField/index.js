@@ -45,7 +45,7 @@ const CompactSemiControlledNumberField = ({
   const onChangeValue = React.useCallback(
     (
       newValueAsString: string,
-      reason: 'keyInput' | 'iconControl' | 'blur' | 'userValidation'
+      reason: 'keyInput' | 'wheel' | 'iconControl' | 'blur' | 'userValidation'
     ) => {
       const newValueAsFloat = parseFloat(newValueAsString);
       if (reason === 'iconControl') {
@@ -60,6 +60,7 @@ const CompactSemiControlledNumberField = ({
 
       if (
         reason === 'keyInput' ||
+        reason === 'wheel' ||
         reason === 'blur' ||
         reason === 'userValidation'
       ) {
@@ -126,11 +127,11 @@ const CompactSemiControlledNumberField = ({
         onWheel={event => {
           if (event.deltaY < 0) {
             event.preventDefault();
-            onChangeValue((value + 1).toString(), 'keyInput');
+            onChangeValue((value + 1).toString(), 'wheel');
           }
           if (event.deltaY > 0) {
             event.preventDefault();
-            onChangeValue((value - 1).toString(), 'keyInput');
+            onChangeValue((value - 1).toString(), 'wheel');
           }
         }}
         onKeyUp={event => {

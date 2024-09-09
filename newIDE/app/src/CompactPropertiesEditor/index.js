@@ -43,6 +43,7 @@ export type ValueFieldCommonProperties = {|
   getDescription?: Instance => string,
   hideLabel?: boolean,
   getExtraDescription?: Instance => string,
+  hasImpactOnAllOtherFields?: boolean,
   disabled?: (instances: Array<gdInitialInstance>) => boolean,
   onEditButtonBuildMenuTemplate?: (i18n: I18nType) => Array<MenuItemTemplate>,
   onEditButtonClick?: () => void,
@@ -175,6 +176,7 @@ export type Schema = Array<Field>;
 
 type Props = {|
   onInstancesModified?: Instances => void,
+  onRefreshAllFields: () => void,
   instances: Instances,
   schema: Schema,
   mode?: 'column' | 'row',
@@ -319,6 +321,7 @@ const getFieldLabel = ({
 
 const CompactPropertiesEditor = ({
   onInstancesModified,
+  onRefreshAllFields,
   instances,
   schema,
   mode,
@@ -331,16 +334,25 @@ const CompactPropertiesEditor = ({
 }: Props) => {
   const forceUpdate = useForceUpdate();
 
-  const _onInstancesModified = React.useCallback(
-    (instances: Instances) => {
+  const onFieldChanged = React.useCallback(
+    ({
+      instances,
+      hasImpactOnAllOtherFields,
+    }: {|
+      instances: Instances,
+      hasImpactOnAllOtherFields: ?boolean,
+    |}) => {
       // This properties editor is dealing with fields that are
       // responsible to update their state (see field.setValue).
 
       if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
       if (onInstancesModified) onInstancesModified(instances);
+      if (hasImpactOnAllOtherFields) {
+        if (onRefreshAllFields) onRefreshAllFields();
+      }
       forceUpdate();
     },
-    [unsavedChanges, onInstancesModified, forceUpdate]
+    [unsavedChanges, onInstancesModified, onRefreshAllFields, forceUpdate]
   );
 
   const getFieldDescription = React.useCallback(
@@ -381,7 +393,10 @@ const CompactPropertiesEditor = ({
             checked={getFieldValue({ instances, field })}
             onCheck={newValue => {
               instances.forEach(i => setValue(i, newValue));
-              _onInstancesModified(instances);
+              onFieldChanged({
+                instances,
+                hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
+              });
             }}
             disabled={getDisabled({ instances, field })}
             fullWidth
@@ -402,7 +417,10 @@ const CompactPropertiesEditor = ({
             // So don't update the value, it will be reverted if they leave the field.
             if (isNaN(newValue)) return;
             instances.forEach(i => setValue(i, newValue));
-            _onInstancesModified(instances);
+            onFieldChanged({
+              instances,
+              hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
+            });
           },
           disabled: getDisabled({ instances, field }),
           renderEndAdornmentOnHover:
@@ -410,7 +428,10 @@ const CompactPropertiesEditor = ({
           onClickEndAdornment: () => {
             if (!onClickEndAdornment) return;
             instances.forEach(i => onClickEndAdornment(i));
-            _onInstancesModified(instances);
+            onFieldChanged({
+              instances,
+              hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
+            });
           },
         };
         if (field.renderLeftIcon || field.hideLabel) {
@@ -449,7 +470,10 @@ const CompactPropertiesEditor = ({
                   const rgbString =
                     color.length === 0 ? '' : rgbOrHexToRGBString(color);
                   instances.forEach(i => setValue(i, rgbString));
-                  _onInstancesModified(instances);
+                  onFieldChanged({
+                    instances,
+                    hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
+                  });
                 }}
               />
             }
@@ -468,7 +492,10 @@ const CompactPropertiesEditor = ({
               instances.forEach(i =>
                 field.setValue(i, field.getNextValue(value))
               );
-              _onInstancesModified(instances);
+              onFieldChanged({
+                instances,
+                hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
+              });
             }}
           >
             {field.renderIcon(value)}
@@ -482,7 +509,10 @@ const CompactPropertiesEditor = ({
             id={field.name}
             onChange={text => {
               instances.forEach(i => setValue(i, text || ''));
-              _onInstancesModified(instances);
+              onFieldChanged({
+                instances,
+                hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
+              });
             }}
             value={getFieldValue({ instances, field })}
             label={getFieldLabel({ instances, field })}
@@ -507,7 +537,10 @@ const CompactPropertiesEditor = ({
           }),
           onChange: newValue => {
             instances.forEach(i => setValue(i, newValue || ''));
-            _onInstancesModified(instances);
+            onFieldChanged({
+              instances,
+              hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
+            });
           },
           disabled: getDisabled({ instances, field }),
           renderEndAdornmentOnHover:
@@ -515,7 +548,10 @@ const CompactPropertiesEditor = ({
           onClickEndAdornment: () => {
             if (!onClickEndAdornment) return;
             instances.forEach(i => onClickEndAdornment(i));
-            _onInstancesModified(instances);
+            onFieldChanged({
+              instances,
+              hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
+            });
           },
         };
         if (field.renderLeftIcon || field.hideLabel) {
@@ -540,7 +576,7 @@ const CompactPropertiesEditor = ({
         }
       }
     },
-    [instances, _onInstancesModified, getFieldDescription]
+    [instances, onFieldChanged, getFieldDescription]
   );
 
   const renderSelectField = React.useCallback(
@@ -567,7 +603,10 @@ const CompactPropertiesEditor = ({
             id={field.name}
             onChange={(newValue: string) => {
               instances.forEach(i => setValue(i, parseFloat(newValue) || 0));
-              _onInstancesModified(instances);
+              onFieldChanged({
+                instances,
+                hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
+              });
             }}
             disabled={field.disabled}
           >
@@ -586,7 +625,10 @@ const CompactPropertiesEditor = ({
             id={field.name}
             onChange={(newValue: string) => {
               instances.forEach(i => setValue(i, newValue || ''));
-              _onInstancesModified(instances);
+              onFieldChanged({
+                instances,
+                hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
+              });
             }}
             disabled={getDisabled({ instances, field })}
             renderLeftIcon={field.renderLeftIcon}
@@ -609,7 +651,7 @@ const CompactPropertiesEditor = ({
         />
       );
     },
-    [instances, _onInstancesModified, getFieldDescription]
+    [instances, onFieldChanged, getFieldDescription]
   );
 
   const renderButton = React.useCallback(
@@ -673,7 +715,10 @@ const CompactPropertiesEditor = ({
         })}
         onChange={newValue => {
           instances.forEach(i => setValue(i, newValue));
-          _onInstancesModified(instances);
+          onFieldChanged({
+            instances,
+            hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
+          });
         }}
         label={getFieldLabel({ instances, field })}
         markdownDescription={getFieldDescription(field)}
@@ -813,6 +858,7 @@ const CompactPropertiesEditor = ({
               mode="row"
               unsavedChanges={unsavedChanges}
               onInstancesModified={onInstancesModified}
+              onRefreshAllFields={onRefreshAllFields}
               preventWrap={field.preventWrap}
               removeSpacers={field.removeSpacers}
             />
@@ -826,6 +872,7 @@ const CompactPropertiesEditor = ({
                 mode="column"
                 unsavedChanges={unsavedChanges}
                 onInstancesModified={onInstancesModified}
+                onRefreshAllFields={onRefreshAllFields}
                 preventWrap={field.preventWrap}
                 removeSpacers={field.removeSpacers}
               />

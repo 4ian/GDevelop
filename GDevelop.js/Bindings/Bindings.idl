@@ -1096,6 +1096,9 @@ interface PropertyDescriptor {
     [Const, Ref] MeasurementUnit GetMeasurementUnit();
     [Ref] PropertyDescriptor SetMeasurementUnit([Const, Ref] MeasurementUnit measurementUnit);
 
+    boolean HasImpactOnOtherProperties();
+    [Ref] PropertyDescriptor SetHasImpactOnOtherProperties(boolean enable);
+
     QuickCustomization_Visibility GetQuickCustomizationVisibility();
     [Ref] PropertyDescriptor SetQuickCustomizationVisibility(QuickCustomization_Visibility visibility);
 

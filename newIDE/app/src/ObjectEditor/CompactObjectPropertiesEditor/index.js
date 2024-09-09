@@ -26,7 +26,7 @@ import Paper from '../../UI/Paper';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import { IconContainer } from '../../UI/IconContainer';
 import Remove from '../../UI/CustomSvgIcons/Remove';
-import useForceUpdate from '../../Utils/UseForceUpdate';
+import useForceUpdate, { useForceRecompute } from '../../Utils/UseForceUpdate';
 import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
 import ChevronArrowBottom from '../../UI/CustomSvgIcons/ChevronArrowBottom';
 import Add from '../../UI/CustomSvgIcons/Add';
@@ -132,6 +132,7 @@ export const CompactObjectPropertiesEditor = ({
   onEditObject,
 }: Props) => {
   const forceUpdate = useForceUpdate();
+  const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
   const variablesListRef = React.useRef<?VariablesListInterface>(null);
   const object = objects[0];
   const objectConfiguration = object.getConfiguration();
@@ -169,7 +170,9 @@ export const CompactObjectPropertiesEditor = ({
 
       return schema;
     },
-    [objectConfigurationAsGd]
+    // schemaRecomputeTrigger allows to invalidate the schema when required.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [objectConfigurationAsGd, schemaRecomputeTrigger]
   );
 
   // Behaviors:
@@ -270,6 +273,7 @@ export const CompactObjectPropertiesEditor = ({
               onInstancesModified={() => {
                 /* TODO */
               }}
+              onRefreshAllFields={forceRecomputeSchema}
             />
             {eventsBasedObject &&
               customObjectConfiguration &&
@@ -289,6 +293,7 @@ export const CompactObjectPropertiesEditor = ({
                         eventsBasedObject={eventsBasedObject}
                         customObjectConfiguration={customObjectConfiguration}
                         childObject={childObject}
+                        onRefreshAllFields={forceRecomputeSchema}
                       />
                     )}
                     isFolded={false}

@@ -910,6 +910,8 @@ export class PropertyDescriptor extends EmscriptenObject {
   isAdvanced(): boolean;
   getMeasurementUnit(): MeasurementUnit;
   setMeasurementUnit(measurementUnit: MeasurementUnit): PropertyDescriptor;
+  hasImpactOnOtherProperties(): boolean;
+  setHasImpactOnOtherProperties(enable: boolean): PropertyDescriptor;
   getQuickCustomizationVisibility(): QuickCustomization_Visibility;
   setQuickCustomizationVisibility(visibility: QuickCustomization_Visibility): PropertyDescriptor;
   serializeTo(element: SerializerElement): void;

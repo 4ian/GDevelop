@@ -33,6 +33,7 @@ class GD_CORE_API PropertyDescriptor {
   PropertyDescriptor(gd::String propertyValue)
       : currentValue(propertyValue), type("string"), label(""), hidden(false),
         deprecated(false), advanced(false),
+        hasImpactOnOtherProperties(false),
         measurementUnit(gd::MeasurementUnit::GetUndefined()),
         quickCustomizationVisibility(QuickCustomization::Visibility::Default) {}
 
@@ -41,6 +42,7 @@ class GD_CORE_API PropertyDescriptor {
    */
   PropertyDescriptor()
       : hidden(false), deprecated(false), advanced(false),
+        hasImpactOnOtherProperties(false),
         measurementUnit(gd::MeasurementUnit::GetUndefined()),
         quickCustomizationVisibility(QuickCustomization::Visibility::Default){};
 
@@ -175,6 +177,21 @@ class GD_CORE_API PropertyDescriptor {
    */
   bool IsAdvanced() const { return advanced; }
 
+  /**
+   * \brief Check if the property has impact on other properties - which means a change
+   * must re-render other properties.
+   */
+  bool HasImpactOnOtherProperties() const { return hasImpactOnOtherProperties; }
+
+  /**
+   * \brief Set if the property has impact on other properties - which means a change
+   * must re-render other properties.
+   */
+  PropertyDescriptor& SetHasImpactOnOtherProperties(bool enable) {
+    hasImpactOnOtherProperties = enable;
+    return *this;
+  }
+
   QuickCustomization::Visibility GetQuickCustomizationVisibility() const { return quickCustomizationVisibility; }
 
   PropertyDescriptor& SetQuickCustomizationVisibility(QuickCustomization::Visibility visibility) {
@@ -221,6 +238,7 @@ class GD_CORE_API PropertyDescriptor {
   bool hidden;
   bool deprecated;
   bool advanced;
+  bool hasImpactOnOtherProperties;
   gd::MeasurementUnit measurementUnit; //< The unit of measurement of the property vale.
   QuickCustomization::Visibility quickCustomizationVisibility;
 };

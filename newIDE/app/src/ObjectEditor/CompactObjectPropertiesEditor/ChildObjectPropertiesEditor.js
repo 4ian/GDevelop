@@ -9,6 +9,7 @@ const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
+  onRefreshAllFields: () => void,
   resourceManagementProps: ResourceManagementProps,
   unsavedChanges?: ?UnsavedChanges,
   eventsBasedObject: gdEventsBasedObject,
@@ -18,6 +19,7 @@ type Props = {|
 
 export const ChildObjectPropertiesEditor = ({
   project,
+  onRefreshAllFields,
   resourceManagementProps,
   unsavedChanges,
   eventsBasedObject,
@@ -27,10 +29,6 @@ export const ChildObjectPropertiesEditor = ({
   const childObjectConfiguration = customObjectConfiguration.getChildObjectConfiguration(
     childObject.getName()
   );
-  //   const childObjectMetadata = gd.MetadataProvider.getObjectMetadata(
-  //     gd.JsPlatform.get(),
-  //     childObjectConfiguration.getType()
-  //   );
 
   const childObjectConfigurationAsGd = gd.castObject(
     childObjectConfiguration,
@@ -69,6 +67,7 @@ export const ChildObjectPropertiesEditor = ({
       onInstancesModified={() => {
         /* TODO */
       }}
+      onRefreshAllFields={onRefreshAllFields}
     />
   );
 };

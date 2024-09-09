@@ -10,6 +10,7 @@ import ChevronArrowTop from '../../UI/CustomSvgIcons/ChevronArrowTop';
 import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
 import Text from '../../UI/Text';
 import { Line } from '../../UI/Grid';
+import { useForceRecompute } from '../../Utils/UseForceUpdate';
 
 export const CompactBehaviorPropertiesEditor = ({
   project,
@@ -25,6 +26,7 @@ export const CompactBehaviorPropertiesEditor = ({
   resourceManagementProps: ResourceManagementProps,
 |}) => {
   const [showAdvancedOptions, setShowAdvancedOptions] = React.useState(false);
+  const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
 
   const basicPropertiesSchema = React.useMemo(
     () =>
@@ -37,7 +39,9 @@ export const CompactBehaviorPropertiesEditor = ({
         object,
         'Basic'
       ),
-    [behavior, object]
+    // schemaRecomputeTrigger allows to invalidate the schema when required.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [behavior, object, schemaRecomputeTrigger]
   );
 
   const advancedPropertiesSchema = React.useMemo(
@@ -51,7 +55,9 @@ export const CompactBehaviorPropertiesEditor = ({
         object,
         'Advanced'
       ),
-    [behavior, object]
+    // schemaRecomputeTrigger allows to invalidate the schema when required.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [behavior, object, schemaRecomputeTrigger]
   );
   const hasAdvancedProperties = advancedPropertiesSchema.length > 0;
   const hasSomeProperties =
@@ -73,6 +79,7 @@ export const CompactBehaviorPropertiesEditor = ({
           instances={[behavior]}
           onInstancesModified={onBehaviorUpdated}
           resourceManagementProps={resourceManagementProps}
+          onRefreshAllFields={forceRecomputeSchema}
         />
       )}
       {!showAdvancedOptions && hasAdvancedProperties && (
@@ -93,6 +100,7 @@ export const CompactBehaviorPropertiesEditor = ({
           instances={[behavior]}
           onInstancesModified={onBehaviorUpdated}
           resourceManagementProps={resourceManagementProps}
+          onRefreshAllFields={forceRecomputeSchema}
         />
       )}
       {showAdvancedOptions && hasAdvancedProperties && (

@@ -197,7 +197,8 @@ ParticleEmitterObject::GetProperties() const {
       .AddExtraInfo("Circle")
       .AddExtraInfo("Line")
       .AddExtraInfo("Image")
-      .SetLabel(_("Particle type"));
+      .SetLabel(_("Particle type"))
+      .SetHasImpactOnOtherProperties(true);
 
   if (GetRendererType() == Quad) {
     objectProperties["textureParticleName"]

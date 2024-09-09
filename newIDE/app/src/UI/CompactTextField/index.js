@@ -53,6 +53,7 @@ export type CompactTextFieldProps = {|
   onClickEndAdornment?: () => void,
   onKeyDown?: KeyboardEvent => void,
   onKeyUp?: KeyboardEvent => void,
+  onWheel?: WheelEvent => void,
 |};
 
 const CompactTextField = React.forwardRef<
@@ -77,6 +78,7 @@ const CompactTextField = React.forwardRef<
       onFocus,
       onKeyDown,
       onKeyUp,
+      onWheel,
     },
     ref
   ) => {
@@ -170,6 +172,7 @@ const CompactTextField = React.forwardRef<
             onFocus={onFocusInput}
             onKeyDown={onKeyDown}
             onKeyUp={onKeyUp}
+            onWheel={onWheel}
           />
           {renderEndAdornmentOnHover && (
             <button

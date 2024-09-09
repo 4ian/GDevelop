@@ -114,6 +114,24 @@ const CompactSemiControlledNumberField = ({
           if (shouldValidate(event)) {
             onChangeValue(temporaryValue.toLowerCase(), 'userValidation');
           }
+          if (event.key === 'ArrowDown') {
+            event.preventDefault();
+            onChangeValue((value - 1).toString(), 'keyInput');
+          }
+          if (event.key === 'ArrowUp') {
+            event.preventDefault();
+            onChangeValue((value + 1).toString(), 'keyInput');
+          }
+        }}
+        onWheel={event => {
+          if (event.deltaY < 0) {
+            event.preventDefault();
+            onChangeValue((value + 1).toString(), 'keyInput');
+          }
+          if (event.deltaY > 0) {
+            event.preventDefault();
+            onChangeValue((value - 1).toString(), 'keyInput');
+          }
         }}
         onKeyUp={event => {
           const { current: textField } = textFieldRef;

@@ -258,13 +258,13 @@ ParticleEmitterObject::GetProperties() const {
   objectProperties["particlesStartColor"]
       .SetValue(GetParticleColor1())
       .SetType("color")
-      .SetLabel(_("Particles start color"))
+      .SetLabel(_("Start color"))
       .SetGroup(_("Particles color"));
 
   objectProperties["particlesEndColor"]
       .SetValue(GetParticleColor2())
       .SetType("color")
-      .SetLabel(_("Particles end color"))
+      .SetLabel(_("End color"))
       .SetGroup(_("Particles color"));
 
   objectProperties["particlesStartOpacity"]

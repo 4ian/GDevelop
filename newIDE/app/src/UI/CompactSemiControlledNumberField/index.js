@@ -86,7 +86,7 @@ const CompactSemiControlledNumberField = ({
           newValue = newValueAsFloat;
         }
 
-        if (newValue && (reason === 'blur' || !commitOnBlur)) {
+        if (newValue !== null && (reason === 'blur' || !commitOnBlur)) {
           onChange(newValue);
         }
         setTemporaryValue(

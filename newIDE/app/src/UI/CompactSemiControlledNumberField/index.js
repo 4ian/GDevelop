@@ -174,10 +174,11 @@ const CompactSemiControlledNumberField = ({
           }
         }}
         onWheel={event => {
+          // Going up is negative, going down is positive.
           if (event.deltaY < 0) {
             const newValueAsValidFloat = updateAndReturnValueAsFloatIfValid(
               temporaryValue,
-              -1
+              1
             );
             if (newValueAsValidFloat === null) return;
 
@@ -187,7 +188,7 @@ const CompactSemiControlledNumberField = ({
           if (event.deltaY > 0) {
             const newValueAsValidFloat = updateAndReturnValueAsFloatIfValid(
               temporaryValue,
-              1
+              -1
             );
             if (newValueAsValidFloat === null) return;
 

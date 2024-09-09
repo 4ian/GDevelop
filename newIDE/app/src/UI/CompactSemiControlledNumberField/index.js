@@ -116,22 +116,38 @@ const CompactSemiControlledNumberField = ({
             onChangeValue(temporaryValue.toLowerCase(), 'userValidation');
           }
           if (event.key === 'ArrowDown') {
+            const newValueAsFloat = parseFloat(temporaryValue.toLowerCase());
+            const isNewValueAsFloatValid = !Number.isNaN(newValueAsFloat);
+            if (!isNewValueAsFloatValid) return;
+
             event.preventDefault();
-            onChangeValue((value - 1).toString(), 'keyInput');
+            onChangeValue((newValueAsFloat - 1).toString(), 'keyInput');
           }
           if (event.key === 'ArrowUp') {
+            const newValueAsFloat = parseFloat(temporaryValue.toLowerCase());
+            const isNewValueAsFloatValid = !Number.isNaN(newValueAsFloat);
+            if (!isNewValueAsFloatValid) return;
+
             event.preventDefault();
-            onChangeValue((value + 1).toString(), 'keyInput');
+            onChangeValue((newValueAsFloat + 1).toString(), 'keyInput');
           }
         }}
         onWheel={event => {
           if (event.deltaY < 0) {
+            const newValueAsFloat = parseFloat(temporaryValue.toLowerCase());
+            const isNewValueAsFloatValid = !Number.isNaN(newValueAsFloat);
+            if (!isNewValueAsFloatValid) return;
+
             event.preventDefault();
-            onChangeValue((value + 1).toString(), 'wheel');
+            onChangeValue((newValueAsFloat + 1).toString(), 'wheel');
           }
           if (event.deltaY > 0) {
+            const newValueAsFloat = parseFloat(temporaryValue.toLowerCase());
+            const isNewValueAsFloatValid = !Number.isNaN(newValueAsFloat);
+            if (!isNewValueAsFloatValid) return;
+
             event.preventDefault();
-            onChangeValue((value - 1).toString(), 'wheel');
+            onChangeValue((newValueAsFloat - 1).toString(), 'wheel');
           }
         }}
         onKeyUp={event => {

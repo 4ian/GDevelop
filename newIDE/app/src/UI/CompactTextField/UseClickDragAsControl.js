@@ -44,10 +44,16 @@ const useClickDragAsControl = ({ onChange, onGetInitialValue }: Props) => {
         2;
       const newValue =
         Math.round(clickDragOrigin.current.accumulatedValue) + initialValue;
-      if (newValue !== previouslyChangedValue) {
+      const numberOfDecimalPlaces = (
+        initialValue.toString().split('.')[1] || ''
+      ).length;
+      const newValueWithRightDecimalPlaces = parseFloat(
+        newValue.toFixed(numberOfDecimalPlaces)
+      );
+      if (newValueWithRightDecimalPlaces !== previouslyChangedValue) {
         if (!clickDragOrigin.current) return;
-        clickDragOrigin.current.previouslyChangedValue = newValue;
-        onChange(newValue);
+        clickDragOrigin.current.previouslyChangedValue = newValueWithRightDecimalPlaces;
+        onChange(newValueWithRightDecimalPlaces);
       }
     },
     [onChange]

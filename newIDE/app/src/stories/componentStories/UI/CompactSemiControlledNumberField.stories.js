@@ -179,7 +179,8 @@ export const Default = () => {
           <div>Enter NaN it does not save</div>
           <div>Enter a few formulas like sin(3), 2-3, ... it works</div>
           <div>
-            Ensure you can drag the icon to increment or decrement the value
+            Enter 0.12, then drag the icon to increment or decrement the value
+            and ensure the decimals are kept
           </div>
 
           <CompactSemiControlledNumberField

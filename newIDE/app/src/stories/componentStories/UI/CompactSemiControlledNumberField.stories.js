@@ -8,7 +8,7 @@ import paperDecorator from '../../PaperDecorator';
 import CompactSemiControlledNumberField from '../../../UI/CompactSemiControlledNumberField';
 import { ColumnStackLayout } from '../../../UI/Layout';
 import Angle from '../../../UI/CustomSvgIcons/Angle';
-import { Column } from '../../../UI/Grid';
+import { Column, Spacer } from '../../../UI/Grid';
 import ElementHighlighterProvider from '../../ElementHighlighterProvider';
 import Text from '../../../UI/Text';
 import Restore from '../../../UI/CustomSvgIcons/Restore';
@@ -27,6 +27,8 @@ export const Default = () => {
   const [value4, setValue4] = React.useState<number>(566560);
   const [value5, setValue5] = React.useState<number>(334);
   const [value6, setValue6] = React.useState<number>(334);
+  const [value7, setValue7] = React.useState<number>(1);
+  const [value8, setValue8] = React.useState<number>(1);
 
   return (
     <ElementHighlighterProvider
@@ -38,6 +40,7 @@ export const Default = () => {
     >
       <ColumnStackLayout expand useLargeSpacer>
         <Column noMargin>
+          <Text size="block-title">Without icon</Text>
           <CompactSemiControlledNumberField
             commitOnBlur
             value={value}
@@ -76,7 +79,7 @@ export const Default = () => {
           />
           <div>Disabled field</div>
         </Column>
-
+        <Text size="block-title">With icon</Text>
         <Column noMargin>
           <CompactSemiControlledNumberField
             id="with-icon"
@@ -123,7 +126,7 @@ export const Default = () => {
           />
           <div>Disabled field</div>
         </Column>
-        <Text>With end adornment</Text>
+        <Text size="block-title">With end adornment</Text>
         <Column noMargin>
           <CompactSemiControlledNumberField
             value={value6}
@@ -153,6 +156,53 @@ export const Default = () => {
             onClickEndAdornment={action('onClickEndAdornment')}
           />
           <div>Disabled field</div>
+        </Column>
+        <Text size="block-title">Test specific cases</Text>
+        <Column noMargin>
+          <div>Try entering 2+ - it does not take the + into account</div>
+          <div>Try entering 0 - it works</div>
+          <div>Try entering 0. - it saves as 0</div>
+          <div>Try entering 0.0 - it saves as 0</div>
+          <div>Try entering 0.1 - it saves as 0.1</div>
+          <div>Try entering 0.10 - it saves as 0.1</div>
+          <div>Try entering -0.1 - it saves as -0.1</div>
+          <div>
+            Enter 0.12 and use the up and down arrows, it correctly adds or
+            removes 1, and keeps 0.12 as decimals
+          </div>
+          <div>
+            Enter 0.12 and use the wheel, it does not scroll the page and it
+            correctly adds or removes 1, and keeps 0.12 as decimals
+          </div>
+          <div>Enter Infinity or -Infinity, it does not save</div>
+          <div>Enter 1/0 or -1/0 it does not save</div>
+          <div>Enter NaN it does not save</div>
+          <div>Enter a few formulas like sin(3), 2-3, ... it works</div>
+          <div>
+            Enter 0.12, then drag the icon to increment or decrement the value
+            and ensure the decimals are kept
+          </div>
+
+          <CompactSemiControlledNumberField
+            value={value7}
+            onChange={setValue7}
+            renderLeftIcon={className => <Angle className={className} />}
+            leftIconTooltip={'Angle'}
+            useLeftIconAsNumberControl
+          />
+
+          <div>state value is {value7}</div>
+          <Spacer />
+          <CompactSemiControlledNumberField
+            commitOnBlur
+            value={value8}
+            onChange={setValue8}
+            renderLeftIcon={className => <Angle className={className} />}
+            leftIconTooltip={'Angle'}
+            useLeftIconAsNumberControl
+          />
+
+          <div>commit on blur: state value is {value8}</div>
         </Column>
       </ColumnStackLayout>
     </ElementHighlighterProvider>

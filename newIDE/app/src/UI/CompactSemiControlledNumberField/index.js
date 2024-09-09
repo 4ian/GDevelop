@@ -11,6 +11,30 @@ import {
 } from '../KeyboardShortcuts/InteractionKeys';
 import { calculate } from '../../Utils/MathExpressionParser';
 
+const getValueAsFloatIfValid = (valueAsString: string): number | null => {
+  const valueAsFloat = parseFloat(valueAsString);
+  const isValueAsFloatValid =
+    !Number.isNaN(valueAsFloat) && isFinite(valueAsFloat);
+  return isValueAsFloatValid ? valueAsFloat : null;
+};
+
+const updateAndReturnValueAsFloatIfValid = (
+  valueAsString: string,
+  valueToAddOrSubtract: number
+): number | null => {
+  const validValueAsFloat = getValueAsFloatIfValid(valueAsString);
+  // We round to the same number of decimal places as the input value, to avoid
+  // floating point precision issues.
+  const numberOfDecimalPlaces = (valueAsString.split('.')[1] || '').length;
+  return validValueAsFloat !== null
+    ? parseFloat(
+        (validValueAsFloat + valueToAddOrSubtract).toFixed(
+          numberOfDecimalPlaces
+        )
+      )
+    : null;
+};
+
 type Props = {|
   id?: string,
   value: number,
@@ -47,12 +71,10 @@ const CompactSemiControlledNumberField = ({
       newValueAsString: string,
       reason: 'keyInput' | 'wheel' | 'iconControl' | 'blur' | 'userValidation'
     ) => {
-      const newValueAsFloat = parseFloat(newValueAsString);
+      const newValueAsValidFloat = getValueAsFloatIfValid(newValueAsString);
       if (reason === 'iconControl') {
-        const isNewValueAsFloatValid = !Number.isNaN(newValueAsFloat);
-
-        if (isNewValueAsFloatValid) {
-          onChange(newValueAsFloat);
+        if (newValueAsValidFloat !== null) {
+          onChange(newValueAsValidFloat);
         }
         setTemporaryValue(newValueAsString);
         return;
@@ -68,31 +90,46 @@ const CompactSemiControlledNumberField = ({
         // parseFloat correctly parses '12+' as '12' so we need to check
         // for math characters ourselves.
         const containsMathCharacters = /[+-/*^()%]/.test(newValueAsString);
-        const isNewValueAsFloatValid =
-          !Number.isNaN(newValueAsFloat) &&
+        const isNewValueAsFloatValidOrStartsWithSign =
+          newValueAsValidFloat !== null &&
           (!containsMathCharacters ||
             (containsMathCharacters && isValueWithLeadingSign));
         let updateTemporaryValueWithCalculatedValue = false;
-        let newValue: number | null = null;
+        let newValueAfterCalculation: number | null = null;
         if (reason === 'userValidation' || reason === 'blur') {
           // Do not try to parse input at each input change.
           try {
-            newValue = calculate(newValueAsString.toLowerCase());
+            newValueAfterCalculation = calculate(
+              newValueAsString.toLowerCase()
+            );
+            if (
+              Number.isNaN(newValueAfterCalculation) ||
+              !isFinite(newValueAfterCalculation)
+            ) {
+              newValueAfterCalculation = null;
+            }
             updateTemporaryValueWithCalculatedValue = true;
           } catch (error) {
             console.warn(`Error computing ${newValueAsString}:`, error);
           }
         }
-        if (newValue === null && isNewValueAsFloatValid) {
-          newValue = newValueAsFloat;
+
+        if (
+          newValueAfterCalculation === null &&
+          isNewValueAsFloatValidOrStartsWithSign
+        ) {
+          newValueAfterCalculation = newValueAsValidFloat;
         }
 
-        if (newValue !== null && (reason === 'blur' || !commitOnBlur)) {
-          onChange(newValue);
+        if (
+          newValueAfterCalculation !== null &&
+          (reason === 'blur' || !commitOnBlur)
+        ) {
+          onChange(newValueAfterCalculation);
         }
         setTemporaryValue(
-          updateTemporaryValueWithCalculatedValue && newValue
-            ? newValue.toString()
+          updateTemporaryValueWithCalculatedValue && newValueAfterCalculation
+            ? newValueAfterCalculation.toString()
             : newValueAsString
         );
       }
@@ -116,38 +153,46 @@ const CompactSemiControlledNumberField = ({
             onChangeValue(temporaryValue.toLowerCase(), 'userValidation');
           }
           if (event.key === 'ArrowDown') {
-            const newValueAsFloat = parseFloat(temporaryValue.toLowerCase());
-            const isNewValueAsFloatValid = !Number.isNaN(newValueAsFloat);
-            if (!isNewValueAsFloatValid) return;
+            const newValueAsValidFloat = updateAndReturnValueAsFloatIfValid(
+              temporaryValue,
+              -1
+            );
+            if (newValueAsValidFloat === null) return;
 
             event.preventDefault();
-            onChangeValue((newValueAsFloat - 1).toString(), 'keyInput');
+            onChangeValue(newValueAsValidFloat.toString(), 'keyInput');
           }
           if (event.key === 'ArrowUp') {
-            const newValueAsFloat = parseFloat(temporaryValue.toLowerCase());
-            const isNewValueAsFloatValid = !Number.isNaN(newValueAsFloat);
-            if (!isNewValueAsFloatValid) return;
+            const newValueAsValidFloat = updateAndReturnValueAsFloatIfValid(
+              temporaryValue,
+              1
+            );
+            if (newValueAsValidFloat === null) return;
 
             event.preventDefault();
-            onChangeValue((newValueAsFloat + 1).toString(), 'keyInput');
+            onChangeValue(newValueAsValidFloat.toString(), 'keyInput');
           }
         }}
         onWheel={event => {
           if (event.deltaY < 0) {
-            const newValueAsFloat = parseFloat(temporaryValue.toLowerCase());
-            const isNewValueAsFloatValid = !Number.isNaN(newValueAsFloat);
-            if (!isNewValueAsFloatValid) return;
+            const newValueAsValidFloat = updateAndReturnValueAsFloatIfValid(
+              temporaryValue,
+              -1
+            );
+            if (newValueAsValidFloat === null) return;
 
             event.preventDefault();
-            onChangeValue((newValueAsFloat + 1).toString(), 'wheel');
+            onChangeValue(newValueAsValidFloat.toString(), 'wheel');
           }
           if (event.deltaY > 0) {
-            const newValueAsFloat = parseFloat(temporaryValue.toLowerCase());
-            const isNewValueAsFloatValid = !Number.isNaN(newValueAsFloat);
-            if (!isNewValueAsFloatValid) return;
+            const newValueAsValidFloat = updateAndReturnValueAsFloatIfValid(
+              temporaryValue,
+              1
+            );
+            if (newValueAsValidFloat === null) return;
 
             event.preventDefault();
-            onChangeValue((newValueAsFloat - 1).toString(), 'wheel');
+            onChangeValue(newValueAsValidFloat.toString(), 'wheel');
           }
         }}
         onKeyUp={event => {

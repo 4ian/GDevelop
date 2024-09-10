@@ -88,15 +88,18 @@ const CompactTextField = React.forwardRef<
       onChange: (value: number) => onChange(value.toString(), 'iconControl'),
       onGetInitialValue: () => parseFloat(value),
     });
+    const [isFocused, setIsFocused] = React.useState<boolean>(false);
 
     const onBlurInput = React.useCallback(
       event => {
+        setIsFocused(false);
         if (onBlur) onBlur(event);
       },
       [onBlur]
     );
     const onFocusInput = React.useCallback(
       event => {
+        setIsFocused(true);
         if (onFocus) onFocus(event);
       },
       [onFocus]
@@ -116,18 +119,28 @@ const CompactTextField = React.forwardRef<
       () => {
         const input = inputRef.current;
         if (input && onWheel) {
-          input.addEventListener('wheel', onWheel, {
-            passive: false,
-          });
-          return () => {
-            input &&
-              input.removeEventListener('wheel', onWheel, {
-                passive: false,
-              });
-          };
+          // Do not allow the wheel event to be listened if the input is not focused.
+          // This is to avoid scrolling the input accidentally when the user is scrolling the page.
+          if (isFocused) {
+            input.addEventListener('wheel', onWheel, {
+              passive: false,
+            });
+          } else {
+            input.removeEventListener('wheel', onWheel, {
+              passive: false,
+            });
+          }
         }
+
+        return () => {
+          if (input && onWheel) {
+            input.removeEventListener('wheel', onWheel, {
+              passive: false,
+            });
+          }
+        };
       },
-      [onWheel]
+      [onWheel, isFocused]
     );
 
     return (

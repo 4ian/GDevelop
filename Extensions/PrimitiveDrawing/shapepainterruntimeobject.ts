@@ -42,7 +42,8 @@ namespace gdjs {
    */
   export class ShapePainterRuntimeObject
     extends gdjs.RuntimeObject
-    implements gdjs.Resizable, gdjs.Scalable, gdjs.Flippable {
+    implements gdjs.Resizable, gdjs.Scalable, gdjs.Flippable
+  {
     _scaleX: number = 1;
     _scaleY: number = 1;
     _blendMode: number = 0;
@@ -164,6 +165,19 @@ namespace gdjs {
         this._clearBetweenFrames = newObjectData.clearBetweenFrames;
       }
       return true;
+    }
+
+    /**
+     * Initialize the extra parameters that could be set for an instance.
+     * @param initialInstanceData The extra parameters
+     */
+    extraInitializationFromInitialInstance(initialInstanceData: InstanceData) {
+      if (initialInstanceData.flippedX) {
+        this.flipX(initialInstanceData.flippedX);
+      }
+      if (initialInstanceData.flippedY) {
+        this.flipY(initialInstanceData.flippedY);
+      }
     }
 
     stepBehaviorsPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
@@ -839,8 +853,8 @@ namespace gdjs {
       const centerY = this.getCenterY();
       const vertices = this.hitBoxes[0].vertices;
       if (this._customCollisionMask) {
-        const customCollisionMaskVertices = this._customCollisionMask[0]
-          .vertices;
+        const customCollisionMaskVertices =
+          this._customCollisionMask[0].vertices;
         for (let i = 0; i < 4; i++) {
           const point = this.transformToScene(
             customCollisionMaskVertices[i][0],

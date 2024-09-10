@@ -242,19 +242,21 @@ export default class LayerRenderer {
 
   getUnrotatedInstanceLeft = (instance: gdInitialInstance) => {
     return (
-      instance.getX() -
-      (this.renderedInstances[instance.ptr]
-        ? this.renderedInstances[instance.ptr].getOriginX()
-        : 0)
+      instance.getX() +
+      (instance.isFlippedX() ? 1 : -1) *
+        (this.renderedInstances[instance.ptr]
+          ? this.renderedInstances[instance.ptr].getOriginX()
+          : 0)
     );
   };
 
   getUnrotatedInstanceTop = (instance: gdInitialInstance) => {
     return (
-      instance.getY() -
-      (this.renderedInstances[instance.ptr]
-        ? this.renderedInstances[instance.ptr].getOriginY()
-        : 0)
+      instance.getY() +
+      (instance.isFlippedY() ? 1 : -1) *
+        (this.renderedInstances[instance.ptr]
+          ? this.renderedInstances[instance.ptr].getOriginY()
+          : 0)
     );
   };
 
@@ -342,9 +344,13 @@ export default class LayerRenderer {
 
       if (this.renderedInstances[instance.ptr]) {
         centerX =
-          unrotatedLeft + this.renderedInstances[instance.ptr].getCenterX();
+          unrotatedLeft +
+          (instance.isFlippedX() ? -1 : 1) *
+            this.renderedInstances[instance.ptr].getCenterX();
         centerY =
-          unrotatedTop + this.renderedInstances[instance.ptr].getCenterY();
+          unrotatedTop +
+          (instance.isFlippedY() ? -1 : 1) *
+            this.renderedInstances[instance.ptr].getCenterY();
       }
 
       if (centerX === undefined || centerY === undefined) {

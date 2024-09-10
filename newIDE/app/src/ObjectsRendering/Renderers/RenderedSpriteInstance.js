@@ -118,6 +118,13 @@ export default class RenderedSpriteInstance extends RenderedInstance {
     this._pixiObject.position.y =
       this._instance.getY() +
       (this._centerY - this._originY) * Math.abs(this._pixiObject.scale.y);
+
+    // Do not hide completely an object so it can still be manipulated
+    const alphaForDisplay = Math.max(this._instance.getOpacity() / 255, 0.5);
+    this._pixiObject.alpha = alphaForDisplay;
+
+    if (this._instance.isFlippedX()) this._pixiObject.scale.x *= -1;
+    if (this._instance.isFlippedY()) this._pixiObject.scale.y *= -1;
   }
 
   updateSprite(): boolean {

@@ -40,7 +40,8 @@ namespace gdjs {
    */
   export class VideoRuntimeObject
     extends gdjs.RuntimeObject
-    implements gdjs.OpacityHandler {
+    implements gdjs.OpacityHandler
+  {
     _opacity: float;
     _loop: boolean;
     _volume: float;
@@ -154,6 +155,9 @@ namespace gdjs {
       if (initialInstanceData.customSize) {
         this.setWidth(initialInstanceData.width);
         this.setHeight(initialInstanceData.height);
+      }
+      if (initialInstanceData.opacity !== undefined) {
+        this.setOpacity(initialInstanceData.opacity);
       }
     }
 

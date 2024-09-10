@@ -27,6 +27,7 @@ import VerticallyCenterWithBar from '../UI/VerticallyCenterWithBar';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
 import CompactPropertiesEditorRowField from './CompactPropertiesEditorRowField';
+import CompactToggleButtons from '../UI/CompactToggleButtons';
 
 // An "instance" here is the objects for which properties are shown
 export type Instance = Object; // This could be improved using generics.
@@ -42,6 +43,8 @@ export type ValueFieldCommonProperties = {|
   disabled?: (instances: Array<gdInitialInstance>) => boolean,
   onEditButtonBuildMenuTemplate?: (i18n: I18nType) => Array<MenuItemTemplate>,
   onEditButtonClick?: () => void,
+  formatValueOnFocus?: string => string,
+  formatValueOnBlur?: string => string,
 |};
 
 // "Primitive" value fields are "simple" fields.
@@ -144,6 +147,18 @@ type ActionButton = {|
   onClick: (instance: Instance) => void,
 |};
 
+type ToggleButtons = {|
+  name: string,
+  nonFieldType: 'toggleButtons',
+  buttons: Array<{|
+    name: string,
+    renderIcon: (className?: string) => React.Node,
+    tooltip: React.Node,
+    getValue: Instance => boolean,
+    setValue: (instance: Instance, newValue: boolean) => void,
+  |}>,
+|};
+
 // A value field is a primitive or a resource.
 export type ValueField = PrimitiveValueField | ResourceField;
 
@@ -154,6 +169,7 @@ export type Field =
   | SectionTitle
   | Title
   | ActionButton
+  | ToggleButtons
   | VerticalCenterWithBar
   | {|
       name: string,
@@ -418,6 +434,8 @@ const CompactPropertiesEditor = ({
             instances.forEach(i => onClickEndAdornment(i));
             _onInstancesModified(instances);
           },
+          formatValueOnFocus: field.formatValueOnFocus,
+          formatValueOnBlur: field.formatValueOnBlur,
         };
         if (field.renderLeftIcon || field.hideLabel) {
           return (
@@ -676,6 +694,31 @@ const CompactPropertiesEditor = ({
     [instances]
   );
 
+  const renderToggleButtons = React.useCallback(
+    (field: ToggleButtons) => {
+      const buttons = field.buttons.map(button => {
+        const isToggled = button.getValue(instances[0]);
+        return {
+          id: button.name,
+          renderIcon: button.renderIcon,
+          tooltip: button.tooltip,
+          isActive: isToggled,
+          onClick: () => {
+            button.setValue(instances[0], !isToggled);
+            _onInstancesModified(instances);
+          },
+        };
+      });
+
+      return (
+        <React.Fragment key={`toggle-buttons-${field.name}`}>
+          <CompactToggleButtons id={field.name} buttons={buttons} />
+        </React.Fragment>
+      );
+    },
+    [instances, _onInstancesModified]
+  );
+
   const renderResourceField = (field: ResourceField) => {
     if (!project || !resourceManagementProps) {
       console.error(
@@ -823,6 +866,8 @@ const CompactPropertiesEditor = ({
           return renderSectionTitle(field);
         } else if (field.nonFieldType === 'button') {
           return renderButton(field);
+        } else if (field.nonFieldType === 'toggleButtons') {
+          return renderToggleButtons(field);
         } else if (field.nonFieldType === 'verticalCenterWithBar') {
           return renderVerticalCenterWithBar(field);
         }

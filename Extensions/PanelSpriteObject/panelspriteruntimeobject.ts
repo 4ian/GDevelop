@@ -39,7 +39,8 @@ namespace gdjs {
    */
   export class PanelSpriteRuntimeObject
     extends gdjs.RuntimeObject
-    implements gdjs.Resizable, gdjs.OpacityHandler {
+    implements gdjs.Resizable, gdjs.OpacityHandler
+  {
     _rBorder: integer;
     _lBorder: integer;
     _tBorder: integer;
@@ -171,6 +172,9 @@ namespace gdjs {
       if (initialInstanceData.customSize) {
         this.setWidth(initialInstanceData.width);
         this.setHeight(initialInstanceData.height);
+      }
+      if (initialInstanceData.opacity !== undefined) {
+        this.setOpacity(initialInstanceData.opacity);
       }
     }
 

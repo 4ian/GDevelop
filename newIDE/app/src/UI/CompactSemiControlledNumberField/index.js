@@ -48,6 +48,8 @@ type Props = {|
   useLeftIconAsNumberControl?: boolean,
   renderEndAdornmentOnHover?: (className: string) => React.Node,
   onClickEndAdornment?: () => void,
+  formatValueOnFocus?: string => string,
+  formatValueOnBlur?: string => string,
 
   errorText?: React.Node,
 |};
@@ -57,6 +59,8 @@ const CompactSemiControlledNumberField = ({
   onChange,
   errorText,
   commitOnBlur,
+  formatValueOnFocus,
+  formatValueOnBlur,
   ...otherProps
 }: Props) => {
   const textFieldRef = React.useRef<?CompactTextFieldInterface>(null);
@@ -137,16 +141,23 @@ const CompactSemiControlledNumberField = ({
     [commitOnBlur, onChange]
   );
 
+  const stringValue = formatValueOnBlur
+    ? formatValueOnBlur(value.toString())
+    : value.toString();
+
   return (
     <div className={classes.container}>
       <CompactTextField
         type="text"
         ref={textFieldRef}
-        value={focused ? temporaryValue : value.toString()}
+        value={focused ? temporaryValue : stringValue}
         onChange={onChangeValue}
         onFocus={event => {
           setFocused(true);
-          setTemporaryValue(value.toString());
+          const originalStringValue = formatValueOnFocus
+            ? formatValueOnFocus(stringValue)
+            : stringValue;
+          setTemporaryValue(originalStringValue);
         }}
         onKeyDown={event => {
           if (shouldValidate(event)) {
@@ -204,7 +215,10 @@ const CompactSemiControlledNumberField = ({
           }
         }}
         onBlur={event => {
-          if (!cancelEditionRef.current) onChangeValue(temporaryValue, 'blur');
+          const newValue = formatValueOnBlur
+            ? formatValueOnBlur(temporaryValue)
+            : temporaryValue;
+          if (!cancelEditionRef.current) onChangeValue(newValue, 'blur');
           setFocused(false);
           setTemporaryValue('');
           cancelEditionRef.current = false;

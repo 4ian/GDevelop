@@ -37,7 +37,8 @@ namespace gdjs {
    */
   export class TileMapRuntimeObject
     extends gdjs.RuntimeObject
-    implements gdjs.Resizable, gdjs.Scalable, gdjs.OpacityHandler {
+    implements gdjs.Resizable, gdjs.Scalable, gdjs.OpacityHandler
+  {
     _frameElapsedTime: float = 0;
     _opacity: float;
     _tilemapJsonFile: string;
@@ -62,9 +63,8 @@ namespace gdjs {
       this._levelIndex = objectData.content.levelIndex;
       this._animationSpeedScale = objectData.content.animationSpeedScale;
       this._animationFps = objectData.content.animationFps;
-      this._tileMapManager = gdjs.TileMap.TileMapRuntimeManager.getManager(
-        instanceContainer
-      );
+      this._tileMapManager =
+        gdjs.TileMap.TileMapRuntimeManager.getManager(instanceContainer);
       this._renderer = new gdjs.TileMapRuntimeObjectRenderer(
         this,
         instanceContainer
@@ -203,6 +203,9 @@ namespace gdjs {
         this.setWidth(initialInstanceData.width);
         this.setHeight(initialInstanceData.height);
       }
+      if (initialInstanceData.opacity !== undefined) {
+        this.setOpacity(initialInstanceData.opacity);
+      }
     }
 
     private _updateTileMap(): void {
@@ -222,11 +225,11 @@ namespace gdjs {
                 this._tilemapJsonFile,
                 textureName
               );
-              return (game
+              return game
                 .getImageManager()
-                .getPIXITexture(mappedName) as unknown) as PIXI.BaseTexture<
-                PIXI.Resource
-              >;
+                .getPIXITexture(
+                  mappedName
+                ) as unknown as PIXI.BaseTexture<PIXI.Resource>;
             },
             this._tilemapAtlasImage,
             this._tilemapJsonFile,

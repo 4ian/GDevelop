@@ -39,7 +39,8 @@ namespace gdjs {
       gdjs.Resizable,
       gdjs.Scalable,
       gdjs.Flippable,
-      gdjs.Base3DHandler {
+      gdjs.Base3DHandler
+  {
     /**
      * Position on the Z axis.
      */
@@ -164,8 +165,15 @@ namespace gdjs {
         this.setWidth(initialInstanceData.width);
         this.setHeight(initialInstanceData.height);
       }
-      if (initialInstanceData.depth !== undefined)
+      if (initialInstanceData.depth !== undefined) {
         this.setDepth(initialInstanceData.depth);
+      }
+      if (initialInstanceData.flippedX) {
+        this.flipX(initialInstanceData.flippedX);
+      }
+      if (initialInstanceData.flippedY) {
+        this.flipY(initialInstanceData.flippedY);
+      }
     }
 
     setX(x: float): void {

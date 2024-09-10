@@ -15,7 +15,8 @@ namespace gdjs {
    */
   export class CustomRuntimeObject3D
     extends gdjs.CustomRuntimeObject
-    implements gdjs.Base3DHandler {
+    implements gdjs.Base3DHandler
+  {
     /**
      * Position on the Z axis.
      */
@@ -72,8 +73,15 @@ namespace gdjs {
 
     extraInitializationFromInitialInstance(initialInstanceData: InstanceData) {
       super.extraInitializationFromInitialInstance(initialInstanceData);
-      if (initialInstanceData.depth !== undefined)
+      if (initialInstanceData.depth !== undefined) {
         this.setDepth(initialInstanceData.depth);
+      }
+      if (initialInstanceData.flippedX) {
+        this.flipX(initialInstanceData.flippedX);
+      }
+      if (initialInstanceData.flippedY) {
+        this.flipY(initialInstanceData.flippedY);
+      }
     }
 
     /**

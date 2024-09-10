@@ -43,7 +43,8 @@ namespace gdjs {
    */
   export class BBTextRuntimeObject
     extends gdjs.RuntimeObject
-    implements gdjs.OpacityHandler {
+    implements gdjs.OpacityHandler
+  {
     _opacity: float;
 
     _text: string;
@@ -191,6 +192,9 @@ namespace gdjs {
           // This value is the default wrapping width of the runtime object.
           250
         );
+      }
+      if (initialInstanceData.opacity !== undefined) {
+        this.setOpacity(initialInstanceData.opacity);
       }
     }
 

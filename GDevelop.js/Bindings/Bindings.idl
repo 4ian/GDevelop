@@ -1303,8 +1303,15 @@ interface InitialInstance {
     void SetShouldKeepRatio(boolean keepRatio);
     long GetZOrder();
     void SetZOrder(long zOrder);
+    long GetOpacity();
+    void SetOpacity(long opacity);
     [Const, Ref] DOMString GetLayer();
     void SetLayer([Const] DOMString layer);
+
+    boolean IsFlippedX();
+    void SetFlippedX(boolean flippedX);
+    boolean IsFlippedY();
+    void SetFlippedY(boolean flippedY);
 
     void SetHasCustomSize(boolean enable);
     boolean HasCustomSize();

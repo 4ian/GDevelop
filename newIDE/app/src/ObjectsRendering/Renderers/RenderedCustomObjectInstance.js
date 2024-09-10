@@ -524,6 +524,13 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
       this._pixiObject.scale.x = 1;
       this._pixiObject.scale.y = 1;
     }
+
+    // Do not hide completely an object so it can still be manipulated
+    const alphaForDisplay = Math.max(this._instance.getOpacity() / 255, 0.5);
+    this._pixiObject.alpha = alphaForDisplay;
+
+    if (this._instance.isFlippedX()) this._pixiObject.scale.x *= -1;
+    if (this._instance.isFlippedY()) this._pixiObject.scale.y *= -1;
   }
 
   getDefaultWidth() {

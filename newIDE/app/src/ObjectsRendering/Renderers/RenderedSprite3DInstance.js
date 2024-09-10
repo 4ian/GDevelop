@@ -265,6 +265,9 @@ export default class RenderedSprite3DInstance extends Rendered3DInstance {
     this._pixiObject.position.y =
       this._instance.getY() +
       (this._centerY - this._originY) * Math.abs(this._pixiObject.scale.y);
+
+    if (this._instance.isFlippedX()) this._pixiObject.scale.x *= -1;
+    if (this._instance.isFlippedY()) this._pixiObject.scale.y *= -1;
   }
 
   getOriginX(): number {

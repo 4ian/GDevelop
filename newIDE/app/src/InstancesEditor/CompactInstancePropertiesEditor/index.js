@@ -90,32 +90,6 @@ const CompactInstancePropertiesEditor = ({
 }: Props) => {
   const forceUpdate = useForceUpdate();
 
-  const schemaFor2D: Schema = React.useMemo(
-    () =>
-      makeSchema({
-        i18n,
-        is3DInstance: false,
-        onGetInstanceSize,
-        onEditObjectByName,
-        layersContainer,
-        forceUpdate,
-      }),
-    [i18n, onGetInstanceSize, onEditObjectByName, layersContainer, forceUpdate]
-  );
-
-  const schemaFor3D: Schema = React.useMemo(
-    () =>
-      makeSchema({
-        i18n,
-        is3DInstance: true,
-        onGetInstanceSize,
-        onEditObjectByName,
-        layersContainer,
-        forceUpdate,
-      }),
-    [i18n, onGetInstanceSize, onEditObjectByName, layersContainer, forceUpdate]
-  );
-
   const instance = instances[0];
   /**
    * TODO: multiple instances support for variables list. Expected behavior should be:
@@ -144,10 +118,17 @@ const CompactInstancePropertiesEditor = ({
       );
       if (!object) return { object: undefined, instanceSchema: undefined };
 
-      const is3DInstance = gd.MetadataProvider.getObjectMetadata(
+      const objectMetadata = gd.MetadataProvider.getObjectMetadata(
         project.getCurrentPlatform(),
         object.getType()
-      ).isRenderedIn3D();
+      );
+      const is3DInstance = objectMetadata.isRenderedIn3D();
+      const hasOpacity = objectMetadata.hasDefaultBehavior(
+        'OpacityCapability::OpacityBehavior'
+      );
+      const canBeFlipped = objectMetadata.hasDefaultBehavior(
+        'FlippableCapability::FlippableBehavior'
+      );
       const instanceSchemaForCustomProperties = propertiesMapToSchema(
         properties,
         (instance: gdInitialInstance) =>
@@ -168,11 +149,19 @@ const CompactInstancePropertiesEditor = ({
         instanceSchemaForCustomProperties,
         i18n
       );
+      const instanceSchema = makeSchema({
+        i18n,
+        is3DInstance,
+        hasOpacity,
+        canBeFlipped,
+        onGetInstanceSize,
+        onEditObjectByName,
+        layersContainer,
+        forceUpdate,
+      }).concat(reorderedInstanceSchemaForCustomProperties);
       return {
         object,
-        instanceSchema: is3DInstance
-          ? schemaFor3D.concat(reorderedInstanceSchemaForCustomProperties)
-          : schemaFor2D.concat(reorderedInstanceSchemaForCustomProperties),
+        instanceSchema,
       };
     },
     [
@@ -181,8 +170,10 @@ const CompactInstancePropertiesEditor = ({
       objectsContainer,
       project,
       i18n,
-      schemaFor3D,
-      schemaFor2D,
+      forceUpdate,
+      layersContainer,
+      onGetInstanceSize,
+      onEditObjectByName,
     ]
   );
 

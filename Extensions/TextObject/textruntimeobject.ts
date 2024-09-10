@@ -71,7 +71,8 @@ namespace gdjs {
    */
   export class TextRuntimeObject
     extends gdjs.RuntimeObject
-    implements gdjs.TextContainer, gdjs.OpacityHandler {
+    implements gdjs.TextContainer, gdjs.OpacityHandler
+  {
     _characterSize: number;
     _fontName: string;
     _bold: boolean;
@@ -327,6 +328,9 @@ namespace gdjs {
         this.setWrapping(true);
       } else {
         this.setWrapping(false);
+      }
+      if (initialInstanceData.opacity !== undefined) {
+        this.setOpacity(initialInstanceData.opacity);
       }
     }
 

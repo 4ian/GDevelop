@@ -36,7 +36,8 @@ namespace gdjs {
       gdjs.Resizable,
       gdjs.Scalable,
       gdjs.Animatable,
-      gdjs.OpacityHandler {
+      gdjs.OpacityHandler
+  {
     private _opacity: float = 255;
     private _scaleX: number = 1;
     private _scaleY: number = 1;
@@ -207,6 +208,15 @@ namespace gdjs {
       if (initialInstanceData.customSize) {
         this.setSize(initialInstanceData.width, initialInstanceData.height);
         this.invalidateHitboxes();
+      }
+      if (initialInstanceData.opacity !== undefined) {
+        this.setOpacity(initialInstanceData.opacity);
+      }
+      if (initialInstanceData.flippedX) {
+        this.flipX(initialInstanceData.flippedX);
+      }
+      if (initialInstanceData.flippedY) {
+        this.flipY(initialInstanceData.flippedY);
       }
     }
 

@@ -31,7 +31,8 @@ namespace gdjs {
    */
   export class TiledSpriteRuntimeObject
     extends gdjs.RuntimeObject
-    implements gdjs.Resizable, gdjs.OpacityHandler {
+    implements gdjs.Resizable, gdjs.OpacityHandler
+  {
     _xOffset: float = 0;
     _yOffset: float = 0;
     opacity: float = 255;
@@ -134,6 +135,9 @@ namespace gdjs {
       if (initialInstanceData.customSize) {
         this.setWidth(initialInstanceData.width);
         this.setHeight(initialInstanceData.height);
+      }
+      if (initialInstanceData.opacity !== undefined) {
+        this.setOpacity(initialInstanceData.opacity);
       }
     }
 

@@ -39,8 +39,8 @@ install:
   - cd ..
   # Install Emscripten (for GDevelop.js)
   # Specify the tag for the core repository to avois breaking changes.
-  - git clone --depth 1 --branch 3.1.21 https://github.com/juj/emsdk.git
-  - cd emsdk && ./emsdk install 3.1.21 && ./emsdk activate 3.1.21 && cd ..
+  - git clone --depth 1 --branch 3.1.66 https://github.com/juj/emsdk.git
+  - cd emsdk && ./emsdk install 3.1.66 && ./emsdk activate 3.1.66 && cd ..
   # Install GDevelop.js dependencies
   - cd GDevelop.js && npm install && cd ..
   # Build GDevelop.js

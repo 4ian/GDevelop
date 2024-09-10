@@ -88,18 +88,15 @@ const CompactTextField = React.forwardRef<
       onChange: (value: number) => onChange(value.toString(), 'iconControl'),
       onGetInitialValue: () => parseFloat(value),
     });
-    const [isFocused, setIsFocused] = React.useState<boolean>(false);
 
     const onBlurInput = React.useCallback(
       event => {
-        setIsFocused(false);
         if (onBlur) onBlur(event);
       },
       [onBlur]
     );
     const onFocusInput = React.useCallback(
       event => {
-        setIsFocused(true);
         if (onFocus) onFocus(event);
       },
       [onFocus]
@@ -111,6 +108,17 @@ const CompactTextField = React.forwardRef<
       },
     }));
 
+    const onWheelIfFocused = React.useCallback(
+      (event: WheelEvent) => {
+        if (inputRef.current && inputRef.current === document.activeElement) {
+          if (onWheel) {
+            onWheel(event);
+          }
+        }
+      },
+      [onWheel]
+    );
+
     // The wheel event is added manually, instead of using the `onWheel` prop,
     // because by default the `onWheel` is registered as a passive event listener,
     // which prevents us to use `preventDefault` on the event, which is needed
@@ -118,29 +126,23 @@ const CompactTextField = React.forwardRef<
     React.useEffect(
       () => {
         const input = inputRef.current;
-        if (input && onWheel) {
+        if (input) {
           // Do not allow the wheel event to be listened if the input is not focused.
           // This is to avoid scrolling the input accidentally when the user is scrolling the page.
-          if (isFocused) {
-            input.addEventListener('wheel', onWheel, {
-              passive: false,
-            });
-          } else {
-            input.removeEventListener('wheel', onWheel, {
-              passive: false,
-            });
-          }
+          input.addEventListener('wheel', onWheelIfFocused, {
+            passive: false,
+          });
         }
 
         return () => {
-          if (input && onWheel) {
-            input.removeEventListener('wheel', onWheel, {
+          if (input) {
+            input.removeEventListener('wheel', onWheelIfFocused, {
               passive: false,
             });
           }
         };
       },
-      [onWheel, isFocused]
+      [onWheelIfFocused]
     );
 
     return (

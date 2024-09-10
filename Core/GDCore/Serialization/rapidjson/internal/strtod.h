@@ -1,6 +1,6 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
 // 
-// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
 // in compliance with the License. You may obtain a copy of the License at
@@ -19,6 +19,8 @@
 #include "biginteger.h"
 #include "diyfp.h"
 #include "pow10.h"
+#include <climits>
+#include <limits>
 
 RAPIDJSON_NAMESPACE_BEGIN
 namespace internal {
@@ -126,46 +128,47 @@ inline bool StrtodFast(double d, int p, double* result) {
 }
 
 // Compute an approximation and see if it is within 1/2 ULP
-inline bool StrtodDiyFp(const char* decimals, size_t length, size_t decimalPosition, int exp, double* result) {
+template<typename Ch>
+inline bool StrtodDiyFp(const Ch* decimals, int dLen, int dExp, double* result) {
     uint64_t significand = 0;
-    size_t i = 0;   // 2^64 - 1 = 18446744073709551615, 1844674407370955161 = 0x1999999999999999    
-    for (; i < length; i++) {
+    int i = 0;   // 2^64 - 1 = 18446744073709551615, 1844674407370955161 = 0x1999999999999999    
+    for (; i < dLen; i++) {
         if (significand  >  RAPIDJSON_UINT64_C2(0x19999999, 0x99999999) ||
-            (significand == RAPIDJSON_UINT64_C2(0x19999999, 0x99999999) && decimals[i] > '5'))
+            (significand == RAPIDJSON_UINT64_C2(0x19999999, 0x99999999) && decimals[i] > Ch('5')))
             break;
-        significand = significand * 10u + static_cast<unsigned>(decimals[i] - '0');
+        significand = significand * 10u + static_cast<unsigned>(decimals[i] - Ch('0'));
     }
     
-    if (i < length && decimals[i] >= '5') // Rounding
+    if (i < dLen && decimals[i] >= Ch('5')) // Rounding
         significand++;
 
-    size_t remaining = length - i;
-    const unsigned kUlpShift = 3;
-    const unsigned kUlp = 1 << kUlpShift;
+    int remaining = dLen - i;
+    const int kUlpShift = 3;
+    const int kUlp = 1 << kUlpShift;
     int64_t error = (remaining == 0) ? 0 : kUlp / 2;
 
     DiyFp v(significand, 0);
     v = v.Normalize();
     error <<= -v.e;
 
-    const int dExp = static_cast<int>(decimalPosition) - static_cast<int>(i) + exp;
+    dExp += remaining;
 
     int actualExp;
     DiyFp cachedPower = GetCachedPower10(dExp, &actualExp);
     if (actualExp != dExp) {
         static const DiyFp kPow10[] = {
-            DiyFp(RAPIDJSON_UINT64_C2(0xa0000000, 00000000), -60),  // 10^1
-            DiyFp(RAPIDJSON_UINT64_C2(0xc8000000, 00000000), -57),  // 10^2
-            DiyFp(RAPIDJSON_UINT64_C2(0xfa000000, 00000000), -54),  // 10^3
-            DiyFp(RAPIDJSON_UINT64_C2(0x9c400000, 00000000), -50),  // 10^4
-            DiyFp(RAPIDJSON_UINT64_C2(0xc3500000, 00000000), -47),  // 10^5
-            DiyFp(RAPIDJSON_UINT64_C2(0xf4240000, 00000000), -44),  // 10^6
-            DiyFp(RAPIDJSON_UINT64_C2(0x98968000, 00000000), -40)   // 10^7
+            DiyFp(RAPIDJSON_UINT64_C2(0xa0000000, 0x00000000), -60),  // 10^1
+            DiyFp(RAPIDJSON_UINT64_C2(0xc8000000, 0x00000000), -57),  // 10^2
+            DiyFp(RAPIDJSON_UINT64_C2(0xfa000000, 0x00000000), -54),  // 10^3
+            DiyFp(RAPIDJSON_UINT64_C2(0x9c400000, 0x00000000), -50),  // 10^4
+            DiyFp(RAPIDJSON_UINT64_C2(0xc3500000, 0x00000000), -47),  // 10^5
+            DiyFp(RAPIDJSON_UINT64_C2(0xf4240000, 0x00000000), -44),  // 10^6
+            DiyFp(RAPIDJSON_UINT64_C2(0x98968000, 0x00000000), -40)   // 10^7
         };
-        int  adjustment = dExp - actualExp - 1;
-        RAPIDJSON_ASSERT(adjustment >= 0 && adjustment < 7);
-        v = v * kPow10[adjustment];
-        if (length + static_cast<unsigned>(adjustment)> 19u) // has more digits than decimal digits in 64-bit
+        int adjustment = dExp - actualExp;
+        RAPIDJSON_ASSERT(adjustment >= 1 && adjustment < 8);
+        v = v * kPow10[adjustment - 1];
+        if (dLen + adjustment > 19) // has more digits than decimal digits in 64-bit
             error += kUlp / 2;
     }
 
@@ -177,17 +180,17 @@ inline bool StrtodDiyFp(const char* decimals, size_t length, size_t decimalPosit
     v = v.Normalize();
     error <<= oldExp - v.e;
 
-    const unsigned effectiveSignificandSize = Double::EffectiveSignificandSize(64 + v.e);
-    unsigned precisionSize = 64 - effectiveSignificandSize;
+    const int effectiveSignificandSize = Double::EffectiveSignificandSize(64 + v.e);
+    int precisionSize = 64 - effectiveSignificandSize;
     if (precisionSize + kUlpShift >= 64) {
-        unsigned scaleExp = (precisionSize + kUlpShift) - 63;
+        int scaleExp = (precisionSize + kUlpShift) - 63;
         v.f >>= scaleExp;
         v.e += scaleExp; 
-        error = (error >> scaleExp) + 1 + static_cast<int>(kUlp);
+        error = (error >> scaleExp) + 1 + kUlp;
         precisionSize -= scaleExp;
     }
 
-    DiyFp rounded(v.f >> precisionSize, v.e + static_cast<int>(precisionSize));
+    DiyFp rounded(v.f >> precisionSize, v.e + precisionSize);
     const uint64_t precisionBits = (v.f & ((uint64_t(1) << precisionSize) - 1)) * kUlp;
     const uint64_t halfWay = (uint64_t(1) << (precisionSize - 1)) * kUlp;
     if (precisionBits >= halfWay + static_cast<unsigned>(error)) {
@@ -203,9 +206,10 @@ inline bool StrtodDiyFp(const char* decimals, size_t length, size_t decimalPosit
     return halfWay - static_cast<unsigned>(error) >= precisionBits || precisionBits >= halfWay + static_cast<unsigned>(error);
 }
 
-inline double StrtodBigInteger(double approx, const char* decimals, size_t length, size_t decimalPosition, int exp) {
-    const BigInteger dInt(decimals, length);
-    const int dExp = static_cast<int>(decimalPosition) - static_cast<int>(length) + exp;
+template<typename Ch>
+inline double StrtodBigInteger(double approx, const Ch* decimals, int dLen, int dExp) {
+    RAPIDJSON_ASSERT(dLen >= 0);
+    const BigInteger dInt(decimals, static_cast<unsigned>(dLen));
     Double a(approx);
     int cmp = CheckWithinHalfULP(a.Value(), dInt, dExp);
     if (cmp < 0)
@@ -221,46 +225,66 @@ inline double StrtodBigInteger(double approx, const char* decimals, size_t lengt
         return a.NextPositiveDouble();
 }
 
-inline double StrtodFullPrecision(double d, int p, const char* decimals, size_t length, size_t decimalPosition, int exp) {
+template<typename Ch>
+inline double StrtodFullPrecision(double d, int p, const Ch* decimals, size_t length, size_t decimalPosition, int exp) {
     RAPIDJSON_ASSERT(d >= 0.0);
     RAPIDJSON_ASSERT(length >= 1);
 
-    double result;
+    double result = 0.0;
     if (StrtodFast(d, p, &result))
         return result;
 
+    RAPIDJSON_ASSERT(length <= INT_MAX);
+    int dLen = static_cast<int>(length);
+
+    RAPIDJSON_ASSERT(length >= decimalPosition);
+    RAPIDJSON_ASSERT(length - decimalPosition <= INT_MAX);
+    int dExpAdjust = static_cast<int>(length - decimalPosition);
+
+    RAPIDJSON_ASSERT(exp >= INT_MIN + dExpAdjust);
+    int dExp = exp - dExpAdjust;
+
+    // Make sure length+dExp does not overflow
+    RAPIDJSON_ASSERT(dExp <= INT_MAX - dLen);
+
     // Trim leading zeros
-    while (*decimals == '0' && length > 1) {
-        length--;
+    while (dLen > 0 && *decimals == '0') {
+        dLen--;
         decimals++;
-        decimalPosition--;
     }
 
     // Trim trailing zeros
-    while (decimals[length - 1] == '0' && length > 1) {
-        length--;
-        decimalPosition--;
-        exp++;
+    while (dLen > 0 && decimals[dLen - 1] == '0') {
+        dLen--;
+        dExp++;
+    }
+
+    if (dLen == 0) { // Buffer only contains zeros.
+        return 0.0;
     }
 
     // Trim right-most digits
-    const int kMaxDecimalDigit = 780;
-    if (static_cast<int>(length) > kMaxDecimalDigit) {
-        int delta = (static_cast<int>(length) - kMaxDecimalDigit);
-        exp += delta;
-        decimalPosition -= static_cast<unsigned>(delta);
-        length = kMaxDecimalDigit;
+    const int kMaxDecimalDigit = 767 + 1;
+    if (dLen > kMaxDecimalDigit) {
+        dExp += dLen - kMaxDecimalDigit;
+        dLen = kMaxDecimalDigit;
     }
 
-    // If too small, underflow to zero
-    if (int(length) + exp < -324)
+    // If too small, underflow to zero.
+    // Any x <= 10^-324 is interpreted as zero.
+    if (dLen + dExp <= -324)
         return 0.0;
 
-    if (StrtodDiyFp(decimals, length, decimalPosition, exp, &result))
+    // If too large, overflow to infinity.
+    // Any x >= 10^309 is interpreted as +infinity.
+    if (dLen + dExp > 309)
+        return std::numeric_limits<double>::infinity();
+
+    if (StrtodDiyFp(decimals, dLen, dExp, &result))
         return result;
 
     // Use approximation from StrtodDiyFp and make adjustment with BigInteger comparison
-    return StrtodBigInteger(result, decimals, length, decimalPosition, exp);
+    return StrtodBigInteger(result, decimals, dLen, dExp);
 }
 
 } // namespace internal

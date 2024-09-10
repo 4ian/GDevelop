@@ -1,6 +1,6 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
 // 
-// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
 // in compliance with the License. You may obtain a copy of the License at
@@ -17,7 +17,7 @@
 
 #include "rapidjson.h"
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__clang__)
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(4244) // conversion from 'type1' to 'type2', possible loss of data
 RAPIDJSON_DIAG_OFF(4702)  // unreachable code
@@ -144,9 +144,9 @@ struct UTF8 {
 
     template <typename InputStream>
     static bool Decode(InputStream& is, unsigned* codepoint) {
-#define COPY() c = is.Take(); *codepoint = (*codepoint << 6) | (static_cast<unsigned char>(c) & 0x3Fu)
-#define TRANS(mask) result &= ((GetRange(static_cast<unsigned char>(c)) & mask) != 0)
-#define TAIL() COPY(); TRANS(0x70)
+#define RAPIDJSON_COPY() c = is.Take(); *codepoint = (*codepoint << 6) | (static_cast<unsigned char>(c) & 0x3Fu)
+#define RAPIDJSON_TRANS(mask) result &= ((GetRange(static_cast<unsigned char>(c)) & mask) != 0)
+#define RAPIDJSON_TAIL() RAPIDJSON_COPY(); RAPIDJSON_TRANS(0x70)
         typename InputStream::Ch c = is.Take();
         if (!(c & 0x80)) {
             *codepoint = static_cast<unsigned char>(c);
@@ -157,48 +157,48 @@ struct UTF8 {
         if (type >= 32) {
             *codepoint = 0;
         } else {
-            *codepoint = (0xFF >> type) & static_cast<unsigned char>(c);
+            *codepoint = (0xFFu >> type) & static_cast<unsigned char>(c);
         }
         bool result = true;
         switch (type) {
-        case 2: TAIL(); return result;
-        case 3: TAIL(); TAIL(); return result;
-        case 4: COPY(); TRANS(0x50); TAIL(); return result;
-        case 5: COPY(); TRANS(0x10); TAIL(); TAIL(); return result;
-        case 6: TAIL(); TAIL(); TAIL(); return result;
-        case 10: COPY(); TRANS(0x20); TAIL(); return result;
-        case 11: COPY(); TRANS(0x60); TAIL(); TAIL(); return result;
+        case 2: RAPIDJSON_TAIL(); return result;
+        case 3: RAPIDJSON_TAIL(); RAPIDJSON_TAIL(); return result;
+        case 4: RAPIDJSON_COPY(); RAPIDJSON_TRANS(0x50); RAPIDJSON_TAIL(); return result;
+        case 5: RAPIDJSON_COPY(); RAPIDJSON_TRANS(0x10); RAPIDJSON_TAIL(); RAPIDJSON_TAIL(); return result;
+        case 6: RAPIDJSON_TAIL(); RAPIDJSON_TAIL(); RAPIDJSON_TAIL(); return result;
+        case 10: RAPIDJSON_COPY(); RAPIDJSON_TRANS(0x20); RAPIDJSON_TAIL(); return result;
+        case 11: RAPIDJSON_COPY(); RAPIDJSON_TRANS(0x60); RAPIDJSON_TAIL(); RAPIDJSON_TAIL(); return result;
         default: return false;
         }
-#undef COPY
-#undef TRANS
-#undef TAIL
+#undef RAPIDJSON_COPY
+#undef RAPIDJSON_TRANS
+#undef RAPIDJSON_TAIL
     }
 
     template <typename InputStream, typename OutputStream>
     static bool Validate(InputStream& is, OutputStream& os) {
-#define COPY() os.Put(c = is.Take())
-#define TRANS(mask) result &= ((GetRange(static_cast<unsigned char>(c)) & mask) != 0)
-#define TAIL() COPY(); TRANS(0x70)
+#define RAPIDJSON_COPY() os.Put(c = is.Take())
+#define RAPIDJSON_TRANS(mask) result &= ((GetRange(static_cast<unsigned char>(c)) & mask) != 0)
+#define RAPIDJSON_TAIL() RAPIDJSON_COPY(); RAPIDJSON_TRANS(0x70)
         Ch c;
-        COPY();
+        RAPIDJSON_COPY();
         if (!(c & 0x80))
             return true;
 
         bool result = true;
         switch (GetRange(static_cast<unsigned char>(c))) {
-        case 2: TAIL(); return result;
-        case 3: TAIL(); TAIL(); return result;
-        case 4: COPY(); TRANS(0x50); TAIL(); return result;
-        case 5: COPY(); TRANS(0x10); TAIL(); TAIL(); return result;
-        case 6: TAIL(); TAIL(); TAIL(); return result;
-        case 10: COPY(); TRANS(0x20); TAIL(); return result;
-        case 11: COPY(); TRANS(0x60); TAIL(); TAIL(); return result;
+        case 2: RAPIDJSON_TAIL(); return result;
+        case 3: RAPIDJSON_TAIL(); RAPIDJSON_TAIL(); return result;
+        case 4: RAPIDJSON_COPY(); RAPIDJSON_TRANS(0x50); RAPIDJSON_TAIL(); return result;
+        case 5: RAPIDJSON_COPY(); RAPIDJSON_TRANS(0x10); RAPIDJSON_TAIL(); RAPIDJSON_TAIL(); return result;
+        case 6: RAPIDJSON_TAIL(); RAPIDJSON_TAIL(); RAPIDJSON_TAIL(); return result;
+        case 10: RAPIDJSON_COPY(); RAPIDJSON_TRANS(0x20); RAPIDJSON_TAIL(); return result;
+        case 11: RAPIDJSON_COPY(); RAPIDJSON_TRANS(0x60); RAPIDJSON_TAIL(); RAPIDJSON_TAIL(); return result;
         default: return false;
         }
-#undef COPY
-#undef TRANS
-#undef TAIL
+#undef RAPIDJSON_COPY
+#undef RAPIDJSON_TRANS
+#undef RAPIDJSON_TAIL
     }
 
     static unsigned char GetRange(unsigned char c) {
@@ -283,7 +283,7 @@ struct UTF16 {
             RAPIDJSON_ASSERT(codepoint <= 0x10FFFF);
             unsigned v = codepoint - 0x10000;
             os.Put(static_cast<typename OutputStream::Ch>((v >> 10) | 0xD800));
-            os.Put((v & 0x3FF) | 0xDC00);
+            os.Put(static_cast<typename OutputStream::Ch>((v & 0x3FF) | 0xDC00));
         }
     }
 
@@ -299,7 +299,7 @@ struct UTF16 {
             RAPIDJSON_ASSERT(codepoint <= 0x10FFFF);
             unsigned v = codepoint - 0x10000;
             PutUnsafe(os, static_cast<typename OutputStream::Ch>((v >> 10) | 0xD800));
-            PutUnsafe(os, (v & 0x3FF) | 0xDC00);
+            PutUnsafe(os, static_cast<typename OutputStream::Ch>((v & 0x3FF) | 0xDC00));
         }
     }
 
@@ -384,7 +384,7 @@ struct UTF16BE : UTF16<CharType> {
     static CharType Take(InputByteStream& is) {
         RAPIDJSON_STATIC_ASSERT(sizeof(typename InputByteStream::Ch) == 1);
         unsigned c = static_cast<unsigned>(static_cast<uint8_t>(is.Take())) << 8;
-        c |= static_cast<uint8_t>(is.Take());
+        c |= static_cast<unsigned>(static_cast<uint8_t>(is.Take()));
         return static_cast<CharType>(c);
     }
 
@@ -620,28 +620,28 @@ struct AutoUTF {
 #define RAPIDJSON_ENCODINGS_FUNC(x) UTF8<Ch>::x, UTF16LE<Ch>::x, UTF16BE<Ch>::x, UTF32LE<Ch>::x, UTF32BE<Ch>::x
 
     template<typename OutputStream>
-    RAPIDJSON_FORCEINLINE static void Encode(OutputStream& os, unsigned codepoint) {
+    static RAPIDJSON_FORCEINLINE void Encode(OutputStream& os, unsigned codepoint) {
         typedef void (*EncodeFunc)(OutputStream&, unsigned);
         static const EncodeFunc f[] = { RAPIDJSON_ENCODINGS_FUNC(Encode) };
         (*f[os.GetType()])(os, codepoint);
     }
 
     template<typename OutputStream>
-    RAPIDJSON_FORCEINLINE static void EncodeUnsafe(OutputStream& os, unsigned codepoint) {
+    static RAPIDJSON_FORCEINLINE void EncodeUnsafe(OutputStream& os, unsigned codepoint) {
         typedef void (*EncodeFunc)(OutputStream&, unsigned);
         static const EncodeFunc f[] = { RAPIDJSON_ENCODINGS_FUNC(EncodeUnsafe) };
         (*f[os.GetType()])(os, codepoint);
     }
 
     template <typename InputStream>
-    RAPIDJSON_FORCEINLINE static bool Decode(InputStream& is, unsigned* codepoint) {
+    static RAPIDJSON_FORCEINLINE bool Decode(InputStream& is, unsigned* codepoint) {
         typedef bool (*DecodeFunc)(InputStream&, unsigned*);
         static const DecodeFunc f[] = { RAPIDJSON_ENCODINGS_FUNC(Decode) };
         return (*f[is.GetType()])(is, codepoint);
     }
 
     template <typename InputStream, typename OutputStream>
-    RAPIDJSON_FORCEINLINE static bool Validate(InputStream& is, OutputStream& os) {
+    static RAPIDJSON_FORCEINLINE bool Validate(InputStream& is, OutputStream& os) {
         typedef bool (*ValidateFunc)(InputStream&, OutputStream&);
         static const ValidateFunc f[] = { RAPIDJSON_ENCODINGS_FUNC(Validate) };
         return (*f[is.GetType()])(is, os);
@@ -658,7 +658,7 @@ template<typename SourceEncoding, typename TargetEncoding>
 struct Transcoder {
     //! Take one Unicode codepoint from source encoding, convert it to target encoding and put it to the output stream.
     template<typename InputStream, typename OutputStream>
-    RAPIDJSON_FORCEINLINE static bool Transcode(InputStream& is, OutputStream& os) {
+    static RAPIDJSON_FORCEINLINE bool Transcode(InputStream& is, OutputStream& os) {
         unsigned codepoint;
         if (!SourceEncoding::Decode(is, &codepoint))
             return false;
@@ -667,7 +667,7 @@ struct Transcoder {
     }
 
     template<typename InputStream, typename OutputStream>
-    RAPIDJSON_FORCEINLINE static bool TranscodeUnsafe(InputStream& is, OutputStream& os) {
+    static RAPIDJSON_FORCEINLINE bool TranscodeUnsafe(InputStream& is, OutputStream& os) {
         unsigned codepoint;
         if (!SourceEncoding::Decode(is, &codepoint))
             return false;
@@ -677,7 +677,7 @@ struct Transcoder {
 
     //! Validate one Unicode codepoint from an encoded stream.
     template<typename InputStream, typename OutputStream>
-    RAPIDJSON_FORCEINLINE static bool Validate(InputStream& is, OutputStream& os) {
+    static RAPIDJSON_FORCEINLINE bool Validate(InputStream& is, OutputStream& os) {
         return Transcode(is, os);   // Since source/target encoding is different, must transcode.
     }
 };
@@ -690,26 +690,26 @@ inline void PutUnsafe(Stream& stream, typename Stream::Ch c);
 template<typename Encoding>
 struct Transcoder<Encoding, Encoding> {
     template<typename InputStream, typename OutputStream>
-    RAPIDJSON_FORCEINLINE static bool Transcode(InputStream& is, OutputStream& os) {
+    static RAPIDJSON_FORCEINLINE bool Transcode(InputStream& is, OutputStream& os) {
         os.Put(is.Take());  // Just copy one code unit. This semantic is different from primary template class.
         return true;
     }
     
     template<typename InputStream, typename OutputStream>
-    RAPIDJSON_FORCEINLINE static bool TranscodeUnsafe(InputStream& is, OutputStream& os) {
+    static RAPIDJSON_FORCEINLINE bool TranscodeUnsafe(InputStream& is, OutputStream& os) {
         PutUnsafe(os, is.Take());  // Just copy one code unit. This semantic is different from primary template class.
         return true;
     }
     
     template<typename InputStream, typename OutputStream>
-    RAPIDJSON_FORCEINLINE static bool Validate(InputStream& is, OutputStream& os) {
+    static RAPIDJSON_FORCEINLINE bool Validate(InputStream& is, OutputStream& os) {
         return Encoding::Validate(is, os);  // source/target encoding are the same
     }
 };
 
 RAPIDJSON_NAMESPACE_END
 
-#if defined(__GNUC__) || defined(_MSC_VER)
+#if defined(__GNUC__) || (defined(_MSC_VER) && !defined(__clang__))
 RAPIDJSON_DIAG_POP
 #endif
 

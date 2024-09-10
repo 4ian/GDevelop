@@ -1,0 +1,1 @@
+This is the RapidJSON library as of commit 7c73dd7de7c4f14379b781418c6e947ad464c818 (https://github.com/Tencent/rapidjson/commit/7c73dd7de7c4f14379b781418c6e947ad464c818).

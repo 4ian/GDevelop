@@ -110,10 +110,12 @@ const CompactTextField = React.forwardRef<
 
     const onWheelIfFocused = React.useCallback(
       (event: WheelEvent) => {
-        if (inputRef.current && inputRef.current === document.activeElement) {
-          if (onWheel) {
-            onWheel(event);
-          }
+        if (
+          inputRef.current &&
+          inputRef.current === document.activeElement &&
+          onWheel
+        ) {
+          onWheel(event);
         }
       },
       [onWheel]
@@ -127,8 +129,6 @@ const CompactTextField = React.forwardRef<
       () => {
         const input = inputRef.current;
         if (input) {
-          // Do not allow the wheel event to be listened if the input is not focused.
-          // This is to avoid scrolling the input accidentally when the user is scrolling the page.
           input.addEventListener('wheel', onWheelIfFocused, {
             passive: false,
           });

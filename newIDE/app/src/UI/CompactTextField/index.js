@@ -108,6 +108,19 @@ const CompactTextField = React.forwardRef<
       },
     }));
 
+    const onWheelIfFocused = React.useCallback(
+      (event: WheelEvent) => {
+        if (
+          inputRef.current &&
+          inputRef.current === document.activeElement &&
+          onWheel
+        ) {
+          onWheel(event);
+        }
+      },
+      [onWheel]
+    );
+
     // The wheel event is added manually, instead of using the `onWheel` prop,
     // because by default the `onWheel` is registered as a passive event listener,
     // which prevents us to use `preventDefault` on the event, which is needed
@@ -115,19 +128,21 @@ const CompactTextField = React.forwardRef<
     React.useEffect(
       () => {
         const input = inputRef.current;
-        if (input && onWheel) {
-          input.addEventListener('wheel', onWheel, {
+        if (input) {
+          input.addEventListener('wheel', onWheelIfFocused, {
             passive: false,
           });
-          return () => {
-            input &&
-              input.removeEventListener('wheel', onWheel, {
-                passive: false,
-              });
-          };
         }
+
+        return () => {
+          if (input) {
+            input.removeEventListener('wheel', onWheelIfFocused, {
+              passive: false,
+            });
+          }
+        };
       },
-      [onWheel]
+      [onWheelIfFocused]
     );
 
     return (

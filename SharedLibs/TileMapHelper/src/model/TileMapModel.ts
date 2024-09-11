@@ -86,6 +86,16 @@ export class EditableTileMap {
   ): EditableTileMap {
     const tileSet = new Map<number, TileDefinition>();
 
+    if (
+      !Number.isInteger(tileSetColumnCount) ||
+      tileSetColumnCount <= 0 ||
+      !Number.isInteger(tileSetRowCount) ||
+      tileSetRowCount <= 0
+    ) {
+      throw new Error(
+        `Tilemap object badly configured. Tile size ${tileSize} is not compatible with atlas image dimensions, resulting in having ${tileSetColumnCount} columns and ${tileSetRowCount} rows.`
+      );
+    }
     // TODO: Actually save and load tile set when useful.
     new Array(tileSetColumnCount * tileSetRowCount)
       .fill(0)

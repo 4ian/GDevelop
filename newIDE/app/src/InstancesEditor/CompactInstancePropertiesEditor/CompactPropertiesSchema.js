@@ -439,7 +439,13 @@ const getOpacityField = ({ i18n }: {| i18n: I18nType |}) => ({
   },
 });
 
-const getFlippableButtons = ({ i18n }: {| i18n: I18nType |}) => ({
+const getFlippableButtons = ({
+  i18n,
+  canFlipZ,
+}: {|
+  i18n: I18nType,
+  canFlipZ: boolean,
+|}) => ({
   name: 'Flip',
   nonFieldType: 'toggleButtons',
   buttons: [
@@ -459,13 +465,25 @@ const getFlippableButtons = ({ i18n }: {| i18n: I18nType |}) => ({
       setValue: (instance: gdInitialInstance, newValue: boolean) =>
         instance.setFlippedY(newValue),
     },
-  ],
+    canFlipZ
+      ? {
+          name: 'Flip Z',
+          tooltip: i18n._(t` Flip along Z axis`),
+          renderIcon: className => <FlipVertical className={className} />,
+          getValue: (instance: gdInitialInstance): boolean =>
+            instance.isFlippedZ(),
+          setValue: (instance: gdInitialInstance, newValue: boolean) =>
+            instance.setFlippedZ(newValue),
+        }
+      : null,
+  ].filter(Boolean),
 });
 
 export const makeSchema = ({
   is3DInstance,
   hasOpacity,
-  canBeFlipped,
+  canBeFlippedXY,
+  canBeFlippedZ,
   i18n,
   forceUpdate,
   onEditObjectByName,
@@ -474,7 +492,8 @@ export const makeSchema = ({
 }: {|
   is3DInstance: boolean,
   hasOpacity: boolean,
-  canBeFlipped: boolean,
+  canBeFlippedXY: boolean,
+  canBeFlippedZ: boolean,
   i18n: I18nType,
   forceUpdate: () => void,
   onEditObjectByName: (name: string) => void,
@@ -568,16 +587,20 @@ export const makeSchema = ({
         title: i18n._(t`Rotation`),
         preventWrap: true,
         removeSpacers: true,
-        children: canBeFlipped ? [getFlippableButtons({ i18n })] : [],
+        children: canBeFlippedXY
+          ? [getFlippableButtons({ i18n, canFlipZ: canBeFlippedZ })]
+          : [],
       },
       {
         name: 'Rotation X and Y',
         type: 'row',
         preventWrap: true,
         removeSpacers: true,
-        children: getRotationXAndRotationYFields({ i18n }),
+        children: [
+          ...getRotationXAndRotationYFields({ i18n }),
+          getRotationZField({ i18n }),
+        ],
       },
-      getRotationZField({ i18n }),
     ].filter(Boolean);
   }
 
@@ -646,7 +669,9 @@ export const makeSchema = ({
       title: i18n._(t`Rotation`),
       preventWrap: true,
       removeSpacers: true,
-      children: canBeFlipped ? [getFlippableButtons({ i18n })] : [],
+      children: canBeFlippedXY
+        ? [getFlippableButtons({ i18n, canFlipZ: canBeFlippedZ })]
+        : [],
     },
     {
       name: 'Rotation Z',

@@ -258,6 +258,7 @@ declare interface InstanceData {
 
   flippedX?: boolean;
   flippedY?: boolean;
+  flippedZ?: boolean;
 
   customSize: boolean;
   width: number;

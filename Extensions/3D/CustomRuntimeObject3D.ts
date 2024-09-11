@@ -82,6 +82,9 @@ namespace gdjs {
       if (initialInstanceData.flippedY) {
         this.flipY(initialInstanceData.flippedY);
       }
+      if (initialInstanceData.flippedZ) {
+        this.flipZ(initialInstanceData.flippedZ);
+      }
     }
 
     /**

@@ -1312,6 +1312,8 @@ interface InitialInstance {
     void SetFlippedX(boolean flippedX);
     boolean IsFlippedY();
     void SetFlippedY(boolean flippedY);
+    boolean IsFlippedZ();
+    void SetFlippedZ(boolean flippedZ);
 
     void SetHasCustomSize(boolean enable);
     boolean HasCustomSize();

@@ -126,8 +126,11 @@ const CompactInstancePropertiesEditor = ({
       const hasOpacity = objectMetadata.hasDefaultBehavior(
         'OpacityCapability::OpacityBehavior'
       );
-      const canBeFlipped = objectMetadata.hasDefaultBehavior(
+      const canBeFlippedXY = objectMetadata.hasDefaultBehavior(
         'FlippableCapability::FlippableBehavior'
+      );
+      const canBeFlippedZ = objectMetadata.hasDefaultBehavior(
+        'Scene3D::Base3DBehavior'
       );
       const instanceSchemaForCustomProperties = propertiesMapToSchema(
         properties,
@@ -153,7 +156,8 @@ const CompactInstancePropertiesEditor = ({
         i18n,
         is3DInstance,
         hasOpacity,
-        canBeFlipped,
+        canBeFlippedXY,
+        canBeFlippedZ,
         onGetInstanceSize,
         onEditObjectByName,
         layersContainer,

@@ -697,14 +697,19 @@ const CompactPropertiesEditor = ({
   const renderToggleButtons = React.useCallback(
     (field: ToggleButtons) => {
       const buttons = field.buttons.map(button => {
-        const isToggled = button.getValue(instances[0]);
+        // Button is toggled if all instances have a truthy value for it.
+        const isToggled =
+          instances.filter(instance => button.getValue(instance)).length ===
+          instances.length;
         return {
           id: button.name,
           renderIcon: button.renderIcon,
           tooltip: button.tooltip,
           isActive: isToggled,
           onClick: () => {
-            button.setValue(instances[0], !isToggled);
+            instances.forEach(instance =>
+              button.setValue(instance, !isToggled)
+            );
             _onInstancesModified(instances);
           },
         };

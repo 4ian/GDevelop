@@ -1807,14 +1807,14 @@ module.exports = {
 
       async _loadTileMap(tilemapJsonFile, tilesetJsonFile) {
         try {
-          const tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
-            this._project,
-            tilemapJsonFile
-          );
+          const tileMapJsonData =
+            await this._pixiResourcesLoader.getResourceJsonData(
+              this._project,
+              tilemapJsonFile
+            );
 
-          const tileMap = TilemapHelper.TileMapManager.identify(
-            tileMapJsonData
-          );
+          const tileMap =
+            TilemapHelper.TileMapManager.identify(tileMapJsonData);
 
           if (tileMap.kind === 'tiled') {
             const tilesetJsonData = tilesetJsonFile
@@ -1870,6 +1870,14 @@ module.exports = {
         this._pixiObject.rotation = RenderedInstance.toRad(
           this._instance.getAngle()
         );
+
+        // Update the opacity, if needed.
+        // Do not hide completely an object so it can still be manipulated
+        const alphaForDisplay = Math.max(
+          this._instance.getOpacity() / 255,
+          0.5
+        );
+        this._pixiObject.alpha = alphaForDisplay;
       }
 
       /**
@@ -2249,6 +2257,19 @@ module.exports = {
         objectToChange.rotation = RenderedInstance.toRad(
           this._instance.getAngle()
         );
+
+        // Update the opacity, if needed.
+        // Do not hide completely an object so it can still be manipulated
+        const alphaForDisplay = Math.max(
+          this._instance.getOpacity() / 255,
+          0.5
+        );
+        objectToChange.alpha = alphaForDisplay;
+        if (this._editableTileMap) {
+          for (const layer of this._editableTileMap.getLayers()) {
+            layer.setAlpha(alphaForDisplay);
+          }
+        }
       }
 
       /**
@@ -2450,14 +2471,14 @@ module.exports = {
 
       async _loadTileMap(tilemapJsonFile, tilesetJsonFile) {
         try {
-          const tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
-            this._project,
-            tilemapJsonFile
-          );
+          const tileMapJsonData =
+            await this._pixiResourcesLoader.getResourceJsonData(
+              this._project,
+              tilemapJsonFile
+            );
 
-          const tileMap = TilemapHelper.TileMapManager.identify(
-            tileMapJsonData
-          );
+          const tileMap =
+            TilemapHelper.TileMapManager.identify(tileMapJsonData);
 
           if (tileMap.kind === 'tiled') {
             const tilesetJsonData = tilesetJsonFile

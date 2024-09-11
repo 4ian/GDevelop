@@ -133,7 +133,11 @@ export default class RenderedSprite3DInstance extends Rendered3DInstance {
     threeObject.position.y += this._instance.getY();
     threeObject.position.z += this._instance.getZ();
 
-    threeObject.scale.set(width, height, 1);
+    const scaleX = width * (this._instance.isFlippedX() ? -1 : 1);
+    const scaleY = height * (this._instance.isFlippedY() ? -1 : 1);
+    const scaleZ = 1 * (this._instance.isFlippedZ() ? -1 : 1);
+
+    threeObject.scale.set(scaleX, scaleY, scaleZ);
   }
 
   updateSprite(): boolean {
@@ -265,9 +269,6 @@ export default class RenderedSprite3DInstance extends Rendered3DInstance {
     this._pixiObject.position.y =
       this._instance.getY() +
       (this._centerY - this._originY) * Math.abs(this._pixiObject.scale.y);
-
-    if (this._instance.isFlippedX()) this._pixiObject.scale.x *= -1;
-    if (this._instance.isFlippedY()) this._pixiObject.scale.y *= -1;
   }
 
   getOriginX(): number {

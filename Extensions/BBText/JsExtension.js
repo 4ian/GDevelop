@@ -67,13 +67,6 @@ module.exports = {
         .setGroup(_('Appearance'));
 
       objectProperties
-        .getOrCreate('opacity')
-        .setValue(objectContent.opacity.toString())
-        .setType('number')
-        .setLabel(_('Opacity (0-255)'))
-        .setGroup(_('Appearance'));
-
-      objectProperties
         .getOrCreate('fontSize')
         .setValue(objectContent.fontSize.toString())
         .setType('number')
@@ -116,8 +109,7 @@ module.exports = {
     };
     objectBBText.setRawJSONContent(
       JSON.stringify({
-        text:
-          '[b]bold[/b] [i]italic[/i] [size=15]smaller[/size] [font=times]times[/font] font\n[spacing=12]spaced out[/spacing]\n[outline=yellow]outlined[/outline] [shadow=red]DropShadow[/shadow] ',
+        text: '[b]bold[/b] [i]italic[/i] [size=15]smaller[/size] [font=times]times[/font] font\n[spacing=12]spaced out[/spacing]\n[outline=yellow]outlined[/outline] [shadow=red]DropShadow[/shadow] ',
         opacity: 255,
         fontSize: 20,
         visible: true,
@@ -205,9 +197,10 @@ module.exports = {
           parameterType === 'string' ||
           parameterType === 'stringWithSelector'
         ) {
-          const parameterOptions = gd.ParameterOptions.makeNewOptions().setDescription(
-            property.paramLabel
-          );
+          const parameterOptions =
+            gd.ParameterOptions.makeNewOptions().setDescription(
+              property.paramLabel
+            );
           if (property.options) {
             parameterOptions.setTypeExtraInfo(
               stringifyOptions(property.options)
@@ -257,9 +250,10 @@ module.exports = {
           parameterType === 'number' ||
           parameterType === 'stringWithSelector'
         ) {
-          const parameterOptions = gd.ParameterOptions.makeNewOptions().setDescription(
-            property.paramLabel
-          );
+          const parameterOptions =
+            gd.ParameterOptions.makeNewOptions().setDescription(
+              property.paramLabel
+            );
           if (property.options) {
             parameterOptions.setTypeExtraInfo(
               stringifyOptions(property.options)
@@ -545,13 +539,9 @@ module.exports = {
           this._pixiObject.text = rawText;
         }
 
-        const opacity = +properties.get('opacity').getValue();
-        this._pixiObject.alpha = opacity / 255;
-
         const color = properties.get('color').getValue();
-        this._pixiObject.textStyles.default.fill = objectsRenderingService.rgbOrHexToHexNumber(
-          color
-        );
+        this._pixiObject.textStyles.default.fill =
+          objectsRenderingService.rgbOrHexToHexNumber(color);
 
         const fontSize = properties.get('fontSize').getValue();
         this._pixiObject.textStyles.default.fontSize = `${fontSize}px`;
@@ -607,6 +597,13 @@ module.exports = {
             this._pixiObject.dirty = true;
           }
         }
+
+        // Do not hide completely an object so it can still be manipulated
+        const alphaForDisplay = Math.max(
+          this._instance.getOpacity() / 255,
+          0.5
+        );
+        this._pixiObject.alpha = alphaForDisplay;
       }
 
       /**

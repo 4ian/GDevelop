@@ -31,6 +31,8 @@ declare class gdInitialInstance {
   setFlippedX(flippedX: boolean): void;
   isFlippedY(): boolean;
   setFlippedY(flippedY: boolean): void;
+  isFlippedZ(): boolean;
+  setFlippedZ(flippedZ: boolean): void;
   setHasCustomSize(enable: boolean): void;
   hasCustomSize(): boolean;
   setHasCustomDepth(enable: boolean): void;

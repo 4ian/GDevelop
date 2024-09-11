@@ -2152,9 +2152,10 @@ module.exports = {
       }
 
       static getThumbnail(project, resourcesLoader, objectConfiguration) {
-        const textureResourceName = RenderedCube3DObject2DInstance._getResourceNameToDisplay(
-          objectConfiguration
-        );
+        const textureResourceName =
+          RenderedCube3DObject2DInstance._getResourceNameToDisplay(
+            objectConfiguration
+          );
         if (textureResourceName) {
           return resourcesLoader.getResourceFullUrl(
             project,
@@ -2166,18 +2167,20 @@ module.exports = {
       }
 
       updateTextureIfNeeded() {
-        const textureName = RenderedCube3DObject2DInstance._getResourceNameToDisplay(
-          this._associatedObjectConfiguration
-        );
+        const textureName =
+          RenderedCube3DObject2DInstance._getResourceNameToDisplay(
+            this._associatedObjectConfiguration
+          );
         if (textureName === this._renderedResourceName) return;
 
         this.updateTexture();
       }
 
       updateTexture() {
-        const textureName = RenderedCube3DObject2DInstance._getResourceNameToDisplay(
-          this._associatedObjectConfiguration
-        );
+        const textureName =
+          RenderedCube3DObject2DInstance._getResourceNameToDisplay(
+            this._associatedObjectConfiguration
+          );
 
         if (!textureName) {
           this._renderFallbackObject = true;
@@ -2216,8 +2219,14 @@ module.exports = {
           this._centerY / objectTextureFrame.height;
 
         this._pixiTexturedObject.angle = this._instance.getAngle();
-        this._pixiTexturedObject.scale.x = width / objectTextureFrame.width;
-        this._pixiTexturedObject.scale.y = height / objectTextureFrame.height;
+        const scaleX =
+          (width / objectTextureFrame.width) *
+          (this._instance.isFlippedX() ? -1 : 1);
+        const scaleY =
+          (height / objectTextureFrame.height) *
+          (this._instance.isFlippedY() ? -1 : 1);
+        this._pixiTexturedObject.scale.x = scaleX;
+        this._pixiTexturedObject.scale.y = scaleY;
 
         this._pixiTexturedObject.position.x =
           this._instance.getX() +
@@ -2244,6 +2253,9 @@ module.exports = {
         this._pixiFallbackObject.position.y =
           this._instance.getY() + height / 2;
         this._pixiFallbackObject.angle = this._instance.getAngle();
+
+        if (this._instance.isFlippedX()) this._pixiFallbackObject.scale.x = -1;
+        if (this._instance.isFlippedY()) this._pixiFallbackObject.scale.y = -1;
       }
 
       update() {
@@ -2393,12 +2405,16 @@ module.exports = {
           RenderedInstance.toRad(this._instance.getAngle())
         );
 
+        const scaleX = width * (this._instance.isFlippedX() ? -1 : 1);
+        const scaleY = height * (this._instance.isFlippedY() ? -1 : 1);
+        const scaleZ = depth * (this._instance.isFlippedZ() ? -1 : 1);
+
         if (
-          width !== this._threeObject.scale.width ||
-          height !== this._threeObject.scale.height ||
-          depth !== this._threeObject.scale.depth
+          scaleX !== this._threeObject.scale.width ||
+          scaleY !== this._threeObject.scale.height ||
+          scaleZ !== this._threeObject.scale.depth
         ) {
-          this._threeObject.scale.set(width, height, depth);
+          this._threeObject.scale.set(scaleX, scaleY, scaleZ);
           this.updateTextureUvMapping();
         }
       }
@@ -2433,9 +2449,10 @@ module.exports = {
             continue;
           }
 
-          const shouldRepeatTexture = this._shouldRepeatTextureOnFace[
-            materialIndexToFaceIndex[materialIndex]
-          ];
+          const shouldRepeatTexture =
+            this._shouldRepeatTextureOnFace[
+              materialIndexToFaceIndex[materialIndex]
+            ];
 
           const shouldOrientateFacesTowardsY = this._facesOrientation === 'Y';
 
@@ -2470,16 +2487,13 @@ module.exports = {
                 }
               } else {
                 if (shouldOrientateFacesTowardsY) {
-                  [x, y] = noRepeatTextureVertexIndexToUvMapping[
-                    vertexIndex % 4
-                  ];
+                  [x, y] =
+                    noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
                 } else {
-                  [
-                    x,
-                    y,
-                  ] = noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
-                    vertexIndex % 4
-                  ];
+                  [x, y] =
+                    noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
+                      vertexIndex % 4
+                    ];
                 }
               }
               break;
@@ -2509,16 +2523,13 @@ module.exports = {
                 }
               } else {
                 if (shouldOrientateFacesTowardsY) {
-                  [x, y] = noRepeatTextureVertexIndexToUvMapping[
-                    vertexIndex % 4
-                  ];
+                  [x, y] =
+                    noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
                 } else {
-                  [
-                    x,
-                    y,
-                  ] = noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
-                    vertexIndex % 4
-                  ];
+                  [x, y] =
+                    noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
+                      vertexIndex % 4
+                    ];
                   x = -x;
                   y = -y;
                 }
@@ -3186,12 +3197,16 @@ module.exports = {
           RenderedInstance.toRad(this._instance.getAngle())
         );
 
+        const scaleX = width * (this._instance.isFlippedX() ? -1 : 1);
+        const scaleY = height * (this._instance.isFlippedY() ? -1 : 1);
+        const scaleZ = depth * (this._instance.isFlippedZ() ? -1 : 1);
+
         if (
-          width !== this._threeObject.scale.width ||
-          height !== this._threeObject.scale.height ||
-          depth !== this._threeObject.scale.depth
+          scaleX !== this._threeObject.scale.width ||
+          scaleY !== this._threeObject.scale.height ||
+          scaleZ !== this._threeObject.scale.depth
         ) {
-          this._threeObject.scale.set(width, height, depth);
+          this._threeObject.scale.set(scaleX, scaleY, scaleZ);
         }
       }
 

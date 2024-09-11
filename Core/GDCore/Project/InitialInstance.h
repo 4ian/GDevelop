@@ -154,6 +154,16 @@ class GD_CORE_API InitialInstance {
   void SetFlippedY(bool flippedY_) { flippedY = flippedY_; }
 
   /**
+   * \brief Return true if the instance is flipped on Z axis.
+   */
+  bool IsFlippedZ() const { return flippedZ; }
+
+  /**
+   * \brief Set whether the instance is flipped on Z axis.
+   */
+  void SetFlippedZ(bool flippedZ_) { flippedZ = flippedZ_; }
+
+  /**
    * \brief Get the layer the instance belongs to.
    */
   const gd::String& GetLayer() const { return layer; }
@@ -376,6 +386,7 @@ class GD_CORE_API InitialInstance {
   int opacity;            ///< Instance opacity
   bool flippedX;          ///< True if the instance is flipped on X axis
   bool flippedY;          ///< True if the instance is flipped on Y axis
+  bool flippedZ;          ///< True if the instance is flipped on Z axis
   gd::String layer;       ///< Instance layer
   bool customSize;        ///< True if object has a custom width and height
   bool customDepth;       ///< True if object has a custom depth

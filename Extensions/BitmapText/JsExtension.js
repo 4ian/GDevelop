@@ -60,13 +60,6 @@ module.exports = {
         .setLabel(_('Text'));
 
       objectProperties
-        .getOrCreate('opacity')
-        .setValue(objectContent.opacity.toString())
-        .setType('number')
-        .setLabel(_('Opacity (0-255)'))
-        .setGroup(_('Appearance'));
-
-      objectProperties
         .getOrCreate('align')
         .setValue(objectContent.align)
         .setType('choice')
@@ -117,8 +110,7 @@ module.exports = {
     };
     bitmapTextObject.setRawJSONContent(
       JSON.stringify({
-        text:
-          'This text use the default bitmap font.\nUse a custom Bitmap Font to create your own texts.',
+        text: 'This text use the default bitmap font.\nUse a custom Bitmap Font to create your own texts.',
         opacity: 255,
         scale: 1,
         fontSize: 20,
@@ -673,16 +665,12 @@ module.exports = {
         const rawText = properties.get('text').getValue();
         this._pixiObject.text = rawText;
 
-        const opacity = +properties.get('opacity').getValue();
-        this._pixiObject.alpha = opacity / 255;
-
         const align = properties.get('align').getValue();
         this._pixiObject.align = align;
 
         const color = properties.get('tint').getValue();
-        this._pixiObject.tint = objectsRenderingService.rgbOrHexToHexNumber(
-          color
-        );
+        this._pixiObject.tint =
+          objectsRenderingService.rgbOrHexToHexNumber(color);
 
         const scale = +(properties.get('scale').getValue() || 1);
         this._pixiObject.scale.set(scale);
@@ -739,6 +727,13 @@ module.exports = {
         this._pixiObject.rotation = RenderedInstance.toRad(
           this._instance.getAngle()
         );
+
+        // Do not hide completely an object so it can still be manipulated
+        const alphaForDisplay = Math.max(
+          this._instance.getOpacity() / 255,
+          0.5
+        );
+        this._pixiObject.alpha = alphaForDisplay;
       }
 
       onRemovedFromScene() {

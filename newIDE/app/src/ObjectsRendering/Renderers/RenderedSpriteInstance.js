@@ -242,11 +242,15 @@ export default class RenderedSpriteInstance extends RenderedInstance {
 
   getCenterX(): number {
     if (!this._sprite || !this._pixiObject) return 0;
-    return this._centerX * this._pixiObject.scale.x; // This is equivalent to `this._animationFrame.center.x * Math.abs(this._scaleX)` in the runtime.
+    return (
+      this._centerX * Math.abs(this._pixiObject.scale.x) // This is equivalent to `this._animationFrame.center.x * Math.abs(this._scaleX)` in the runtime.
+    );
   }
 
   getCenterY(): number {
     if (!this._sprite || !this._pixiObject) return 0;
-    return this._centerY * this._pixiObject.scale.y; // This is equivalent to `this._animationFrame.center.y * Math.abs(this._scaleY)` in the runtime.
+    return (
+      this._centerY * Math.abs(this._pixiObject.scale.y) // This is equivalent to `this._animationFrame.center.y * Math.abs(this._scaleY)` in the runtime.
+    );
   }
 }

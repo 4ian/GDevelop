@@ -182,6 +182,17 @@ module.exports = {
           this._instance.getAngle()
         );
 
+        // Do not hide completely an object so it can still be manipulated
+        const alphaForDisplay = Math.max(
+          this._instance.getOpacity() / 255,
+          0.5
+        );
+        this._pixiObject.alpha = alphaForDisplay;
+        const scaleX = this.getScale() * this._instance.isFlippedX() ? -1 : 1;
+        const scaleY = this.getScale() * this._instance.isFlippedY() ? -1 : 1;
+        this._pixiObject.scale.x = scaleX;
+        this._pixiObject.scale.y = scaleY;
+
         this.setAnimation(this._instance.getRawDoubleProperty('animation'));
 
         const width = this.getWidth();

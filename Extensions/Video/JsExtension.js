@@ -63,12 +63,6 @@ module.exports = {
       var objectProperties = new gd.MapStringPropertyDescriptor();
 
       objectProperties
-        .getOrCreate('Opacity')
-        .setValue(objectContent.opacity.toString())
-        .setType('number')
-        .setLabel(_('Video opacity (0-255)'))
-        .setGroup(_('Appearance'));
-      objectProperties
         .getOrCreate('Looped')
         .setValue(objectContent.loop ? 'true' : 'false')
         .setType('boolean')
@@ -620,17 +614,11 @@ module.exports = {
             that._pixiObject.texture.on('error', function () {
               that._pixiObject.texture.off('error', this);
 
-              that._pixiObject.texture = that._pixiResourcesLoader.getInvalidPIXITexture();
+              that._pixiObject.texture =
+                that._pixiResourcesLoader.getInvalidPIXITexture();
             });
           }
         }
-
-        // Update opacity
-        const opacity = +this._associatedObjectConfiguration
-          .getProperties()
-          .get('Opacity')
-          .getValue();
-        this._pixiObject.alpha = opacity / 255;
 
         // Read position and angle from the instance
         this._pixiObject.position.x =
@@ -645,6 +633,13 @@ module.exports = {
           this._pixiObject.width = this.getCustomWidth();
           this._pixiObject.height = this.getCustomHeight();
         }
+
+        // Do not hide completely an object so it can still be manipulated
+        const alphaForDisplay = Math.max(
+          this._instance.getOpacity() / 255,
+          0.5
+        );
+        this._pixiObject.alpha = alphaForDisplay;
       }
 
       /**

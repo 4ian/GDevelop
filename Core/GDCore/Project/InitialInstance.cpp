@@ -31,6 +31,7 @@ InitialInstance::InitialInstance()
       layer(""),
       flippedX(false),
       flippedY(false),
+      flippedZ(false),
       customSize(false),
       customDepth(false),
       width(0),
@@ -64,6 +65,7 @@ void InitialInstance::UnserializeFrom(const SerializerElement& element) {
   SetLayer(element.GetStringAttribute("layer"));
   SetFlippedX(element.GetBoolAttribute("flippedX", false));
   SetFlippedY(element.GetBoolAttribute("flippedY", false));
+  SetFlippedZ(element.GetBoolAttribute("flippedZ", false));
   SetLocked(element.GetBoolAttribute("locked", false));
   SetSealed(element.GetBoolAttribute("sealed", false));
   SetShouldKeepRatio(element.GetBoolAttribute("keepRatio", false));
@@ -122,6 +124,7 @@ void InitialInstance::SerializeTo(SerializerElement& element) const {
   if (GetOpacity() != 255) element.SetAttribute("opacity", GetOpacity());
   if (IsFlippedX()) element.SetAttribute("flippedX", IsFlippedX());
   if (IsFlippedY()) element.SetAttribute("flippedY", IsFlippedY());
+  if (IsFlippedZ()) element.SetAttribute("flippedZ", IsFlippedZ());
   element.SetAttribute("layer", GetLayer());
   element.SetAttribute("angle", GetAngle());
   if (GetRotationX() != 0) element.SetAttribute("rotationX", GetRotationX());

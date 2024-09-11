@@ -10,7 +10,7 @@ namespace gdjs {
     'text area',
   ] as const;
 
-  type SupportedInputType = (typeof supportedInputTypes)[number];
+  type SupportedInputType = typeof supportedInputTypes[number];
 
   const parseInputType = (potentialInputType: string): SupportedInputType => {
     const lowercasedNewInputType = potentialInputType.toLowerCase();
@@ -72,8 +72,7 @@ namespace gdjs {
    */
   export class TextInputRuntimeObject
     extends gdjs.RuntimeObject
-    implements gdjs.TextContainer, gdjs.Resizable, gdjs.OpacityHandler
-  {
+    implements gdjs.TextContainer, gdjs.Resizable, gdjs.OpacityHandler {
     private _string: string;
     private _placeholder: string;
     private opacity: float = 255;

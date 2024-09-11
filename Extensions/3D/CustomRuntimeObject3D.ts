@@ -15,8 +15,7 @@ namespace gdjs {
    */
   export class CustomRuntimeObject3D
     extends gdjs.CustomRuntimeObject
-    implements gdjs.Base3DHandler
-  {
+    implements gdjs.Base3DHandler {
     /**
      * Position on the Z axis.
      */

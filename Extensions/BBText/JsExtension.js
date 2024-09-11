@@ -109,7 +109,8 @@ module.exports = {
     };
     objectBBText.setRawJSONContent(
       JSON.stringify({
-        text: '[b]bold[/b] [i]italic[/i] [size=15]smaller[/size] [font=times]times[/font] font\n[spacing=12]spaced out[/spacing]\n[outline=yellow]outlined[/outline] [shadow=red]DropShadow[/shadow] ',
+        text:
+          '[b]bold[/b] [i]italic[/i] [size=15]smaller[/size] [font=times]times[/font] font\n[spacing=12]spaced out[/spacing]\n[outline=yellow]outlined[/outline] [shadow=red]DropShadow[/shadow] ',
         opacity: 255,
         fontSize: 20,
         visible: true,
@@ -197,10 +198,9 @@ module.exports = {
           parameterType === 'string' ||
           parameterType === 'stringWithSelector'
         ) {
-          const parameterOptions =
-            gd.ParameterOptions.makeNewOptions().setDescription(
-              property.paramLabel
-            );
+          const parameterOptions = gd.ParameterOptions.makeNewOptions().setDescription(
+            property.paramLabel
+          );
           if (property.options) {
             parameterOptions.setTypeExtraInfo(
               stringifyOptions(property.options)
@@ -250,10 +250,9 @@ module.exports = {
           parameterType === 'number' ||
           parameterType === 'stringWithSelector'
         ) {
-          const parameterOptions =
-            gd.ParameterOptions.makeNewOptions().setDescription(
-              property.paramLabel
-            );
+          const parameterOptions = gd.ParameterOptions.makeNewOptions().setDescription(
+            property.paramLabel
+          );
           if (property.options) {
             parameterOptions.setTypeExtraInfo(
               stringifyOptions(property.options)
@@ -540,8 +539,9 @@ module.exports = {
         }
 
         const color = properties.get('color').getValue();
-        this._pixiObject.textStyles.default.fill =
-          objectsRenderingService.rgbOrHexToHexNumber(color);
+        this._pixiObject.textStyles.default.fill = objectsRenderingService.rgbOrHexToHexNumber(
+          color
+        );
 
         const fontSize = properties.get('fontSize').getValue();
         this._pixiObject.textStyles.default.fontSize = `${fontSize}px`;

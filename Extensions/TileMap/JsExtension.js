@@ -1807,14 +1807,14 @@ module.exports = {
 
       async _loadTileMap(tilemapJsonFile, tilesetJsonFile) {
         try {
-          const tileMapJsonData =
-            await this._pixiResourcesLoader.getResourceJsonData(
-              this._project,
-              tilemapJsonFile
-            );
+          const tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
+            this._project,
+            tilemapJsonFile
+          );
 
-          const tileMap =
-            TilemapHelper.TileMapManager.identify(tileMapJsonData);
+          const tileMap = TilemapHelper.TileMapManager.identify(
+            tileMapJsonData
+          );
 
           if (tileMap.kind === 'tiled') {
             const tilesetJsonData = tilesetJsonFile
@@ -2471,14 +2471,14 @@ module.exports = {
 
       async _loadTileMap(tilemapJsonFile, tilesetJsonFile) {
         try {
-          const tileMapJsonData =
-            await this._pixiResourcesLoader.getResourceJsonData(
-              this._project,
-              tilemapJsonFile
-            );
+          const tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
+            this._project,
+            tilemapJsonFile
+          );
 
-          const tileMap =
-            TilemapHelper.TileMapManager.identify(tileMapJsonData);
+          const tileMap = TilemapHelper.TileMapManager.identify(
+            tileMapJsonData
+          );
 
           if (tileMap.kind === 'tiled') {
             const tilesetJsonData = tilesetJsonFile

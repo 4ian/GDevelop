@@ -110,7 +110,8 @@ module.exports = {
     };
     bitmapTextObject.setRawJSONContent(
       JSON.stringify({
-        text: 'This text use the default bitmap font.\nUse a custom Bitmap Font to create your own texts.',
+        text:
+          'This text use the default bitmap font.\nUse a custom Bitmap Font to create your own texts.',
         opacity: 255,
         scale: 1,
         fontSize: 20,
@@ -669,8 +670,9 @@ module.exports = {
         this._pixiObject.align = align;
 
         const color = properties.get('tint').getValue();
-        this._pixiObject.tint =
-          objectsRenderingService.rgbOrHexToHexNumber(color);
+        this._pixiObject.tint = objectsRenderingService.rgbOrHexToHexNumber(
+          color
+        );
 
         const scale = +(properties.get('scale').getValue() || 1);
         this._pixiObject.scale.set(scale);

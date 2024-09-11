@@ -256,6 +256,5 @@ namespace gdjs {
   }
   export const TileMapRuntimeObjectRenderer =
     gdjs.TileMapRuntimeObjectPixiRenderer;
-  export type TileMapRuntimeObjectRenderer =
-    gdjs.TileMapRuntimeObjectPixiRenderer;
+  export type TileMapRuntimeObjectRenderer = gdjs.TileMapRuntimeObjectPixiRenderer;
 }

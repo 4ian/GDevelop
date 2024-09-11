@@ -36,8 +36,7 @@ namespace gdjs {
       gdjs.Resizable,
       gdjs.Scalable,
       gdjs.Animatable,
-      gdjs.OpacityHandler
-  {
+      gdjs.OpacityHandler {
     private _opacity: float = 255;
     private _scaleX: number = 1;
     private _scaleY: number = 1;

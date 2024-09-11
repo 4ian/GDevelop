@@ -188,8 +188,8 @@ module.exports = {
           0.5
         );
         this._pixiObject.alpha = alphaForDisplay;
-        const scaleX = this.getScale() * this._instance.isFlippedX() ? -1 : 1;
-        const scaleY = this.getScale() * this._instance.isFlippedY() ? -1 : 1;
+        const scaleX = this.getScale() * (this._instance.isFlippedX() ? -1 : 1);
+        const scaleY = this.getScale() * (this._instance.isFlippedY() ? -1 : 1);
         this._pixiObject.scale.x = scaleX;
         this._pixiObject.scale.y = scaleY;
 

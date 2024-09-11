@@ -30,7 +30,13 @@ namespace gdjs {
         if (typeof firebaseConfig !== 'object') return;
         if (firebase.apps.length !== 0) await firebase.app().delete();
         firebase.initializeApp(firebaseConfig);
-        for (let func of onAppCreated) func();
+        for (let func of onAppCreated) {
+          try {
+            func();
+          } catch (e) {
+            logger.error('An error occurred while running a callback: ' + e);
+          }
+        }
       };
 
       gdjs.registerFirstRuntimeSceneLoadedCallback(_setupFirebase);

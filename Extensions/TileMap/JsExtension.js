@@ -1611,6 +1611,7 @@ module.exports = {
 
         this.tileMapPixiObject = new Tilemap.CompositeTilemap();
         this._pixiObject = this.tileMapPixiObject;
+        this._editableTileMap = null;
 
         // Implement `containsPoint` so that we can set `interactive` to true and
         // the Tilemap will properly emit events when hovered/clicked.
@@ -1755,6 +1756,8 @@ module.exports = {
                 return;
               }
 
+              this._editableTileMap = tileMap;
+
               /** @type {TileMapHelper.TileTextureCache} */
               manager.getOrLoadTextureCache(
                 this._loadTileMapWithCallback.bind(this),
@@ -1774,12 +1777,13 @@ module.exports = {
                     return;
                   }
                   this._onLoadingSuccess();
+                  if (!this._editableTileMap) return;
 
-                  this.width = tileMap.getWidth();
-                  this.height = tileMap.getHeight();
+                  this.width = this._editableTileMap.getWidth();
+                  this.height = this._editableTileMap.getHeight();
                   TilemapHelper.PixiTileMapHelper.updatePixiTileMap(
                     this.tileMapPixiObject,
-                    tileMap,
+                    this._editableTileMap,
                     textureCache,
                     displayMode,
                     layerIndex
@@ -1798,6 +1802,93 @@ module.exports = {
             loadTileMap();
           });
         }
+      }
+
+      /**
+       * This is called to update the PIXI object on the scene editor, without reloading the tilemap.
+       */
+      updatePixiTileMap() {
+        // Get the tileset resource to use
+        const tilemapAtlasImage = this._associatedObjectConfiguration
+          .getProperties()
+          .get('tilemapAtlasImage')
+          .getValue();
+        const tilemapJsonFile = this._associatedObjectConfiguration
+          .getProperties()
+          .get('tilemapJsonFile')
+          .getValue();
+        const tilesetJsonFile = this._associatedObjectConfiguration
+          .getProperties()
+          .get('tilesetJsonFile')
+          .getValue();
+        const layerIndex = parseInt(
+          this._associatedObjectConfiguration
+            .getProperties()
+            .get('layerIndex')
+            .getValue(),
+          10
+        );
+        const levelIndex = parseInt(
+          this._associatedObjectConfiguration
+            .getProperties()
+            .get('levelIndex')
+            .getValue(),
+          10
+        );
+        const displayMode = this._associatedObjectConfiguration
+          .getProperties()
+          .get('displayMode')
+          .getValue();
+
+        const tilemapResource = this._project
+          .getResourcesManager()
+          .getResource(tilemapJsonFile);
+
+        let metadata = {};
+        try {
+          const tilemapMetadataAsString = tilemapResource.getMetadata();
+          if (tilemapMetadataAsString)
+            metadata = JSON.parse(tilemapMetadataAsString);
+        } catch (error) {
+          console.warn('Malformed metadata in a tilemap object:', error);
+        }
+        const mapping = metadata.embeddedResourcesMapping || {};
+
+        /** @type {TileMapHelper.TileMapManager} */
+        const manager = TilemapHelper.TileMapManager.getManager(this._project);
+
+        /** @type {TileMapHelper.TileTextureCache} */
+        manager.getOrLoadTextureCache(
+          this._loadTileMapWithCallback.bind(this),
+          (textureName) =>
+            this._pixiResourcesLoader.getPIXITexture(
+              this._project,
+              mapping[textureName] || textureName
+            ),
+          tilemapAtlasImage,
+          tilemapJsonFile,
+          tilesetJsonFile,
+          levelIndex,
+          (textureCache) => {
+            if (!textureCache) {
+              this._onLoadingError();
+              // getOrLoadTextureCache already log warns and errors.
+              return;
+            }
+            this._onLoadingSuccess();
+            if (!this._editableTileMap) return;
+
+            this.width = this._editableTileMap.getWidth();
+            this.height = this._editableTileMap.getHeight();
+            TilemapHelper.PixiTileMapHelper.updatePixiTileMap(
+              this.tileMapPixiObject,
+              this._editableTileMap,
+              textureCache,
+              displayMode,
+              layerIndex
+            );
+          }
+        );
       }
 
       // GDJS doesn't use Promise to avoid allocation.
@@ -1877,7 +1968,22 @@ module.exports = {
           this._instance.getOpacity() / 255,
           0.5
         );
-        this._pixiObject.alpha = alphaForDisplay;
+
+        if (
+          this._editableTileMap &&
+          this._pixiObject.alpha !== alphaForDisplay
+        ) {
+          this._pixiObject.alpha = alphaForDisplay;
+          for (const layer of this._editableTileMap.getLayers()) {
+            // Only update layers that are of type TileMapHelper.EditableTileMapLayer.
+            // @ts-ignore - only this type of layer has setAlpha.
+            if (layer.setAlpha) {
+              const editableLayer = /** @type {TileMapHelper.EditableTileMapLayer} */ (layer);
+              editableLayer.setAlpha(alphaForDisplay);
+            }
+          }
+          this.updatePixiTileMap();
+        }
       }
 
       /**
@@ -2147,6 +2253,9 @@ module.exports = {
         }
       }
 
+      /**
+       * This is called to update the PIXI object on the scene editor, without reloading the tilemap.
+       */
       updatePixiTileMap() {
         const atlasImageResourceName = this._associatedObjectConfiguration
           .getProperties()
@@ -2264,11 +2373,18 @@ module.exports = {
           this._instance.getOpacity() / 255,
           0.5
         );
-        objectToChange.alpha = alphaForDisplay;
-        if (this._editableTileMap) {
+
+        if (this._editableTileMap && objectToChange.alpha !== alphaForDisplay) {
+          objectToChange.alpha = alphaForDisplay;
           for (const layer of this._editableTileMap.getLayers()) {
-            layer.setAlpha(alphaForDisplay);
+            // Only update layers that are of type TileMapHelper.EditableTileMapLayer.
+            // @ts-ignore - only this type of layer has setAlpha.
+            if (layer.setAlpha) {
+              const editableLayer = /** @type {TileMapHelper.EditableTileMapLayer} */ (layer);
+              editableLayer.setAlpha(alphaForDisplay);
+            }
           }
+          this.updatePixiTileMap();
         }
       }
 

@@ -43,8 +43,8 @@ export type ValueFieldCommonProperties = {|
   disabled?: (instances: Array<gdInitialInstance>) => boolean,
   onEditButtonBuildMenuTemplate?: (i18n: I18nType) => Array<MenuItemTemplate>,
   onEditButtonClick?: () => void,
-  formatValueOnFocus?: string => string,
-  formatValueOnBlur?: string => string,
+  formatDisplayedValueOnFocus?: string => string,
+  formatDisplayedValueOnBlur?: string => string,
 |};
 
 // "Primitive" value fields are "simple" fields.
@@ -434,8 +434,8 @@ const CompactPropertiesEditor = ({
             instances.forEach(i => onClickEndAdornment(i));
             _onInstancesModified(instances);
           },
-          formatValueOnFocus: field.formatValueOnFocus,
-          formatValueOnBlur: field.formatValueOnBlur,
+          formatDisplayedValueOnFocus: field.formatDisplayedValueOnFocus,
+          formatDisplayedValueOnBlur: field.formatDisplayedValueOnBlur,
         };
         if (field.renderLeftIcon || field.hideLabel) {
           return (

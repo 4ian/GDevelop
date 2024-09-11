@@ -431,10 +431,10 @@ const getOpacityField = ({ i18n }: {| i18n: I18nType |}) => ({
     instance.setOpacity(opacity);
   },
   renderLeftIcon: className => <Opacity className={className} />,
-  formatValueOnBlur: (value: string): string => {
+  formatDisplayedValueOnBlur: (value: string): string => {
     return `${value}%`;
   },
-  formatValueOnFocus: (displayedValue: string): string => {
+  formatDisplayedValueOnFocus: (displayedValue: string): string => {
     return displayedValue.replace('%', '');
   },
 });

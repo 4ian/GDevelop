@@ -30,6 +30,7 @@ import Object2d from '../../UI/CustomSvgIcons/Object2d';
 import RotateX from '../../UI/CustomSvgIcons/RotateX';
 import RotateY from '../../UI/CustomSvgIcons/RotateY';
 import RotateZ from '../../UI/CustomSvgIcons/RotateZ';
+import FlipZ from '../../UI/CustomSvgIcons/FlipZ';
 
 /**
  * Applies ratio to value without intermediary value to avoid precision issues.
@@ -469,7 +470,7 @@ const getFlippableButtons = ({
       ? {
           name: 'Flip Z',
           tooltip: i18n._(t` Flip along Z axis`),
-          renderIcon: className => <FlipVertical className={className} />,
+          renderIcon: className => <FlipZ className={className} />,
           getValue: (instance: gdInitialInstance): boolean =>
             instance.isFlippedZ(),
           setValue: (instance: gdInitialInstance, newValue: boolean) =>

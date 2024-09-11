@@ -361,7 +361,14 @@ namespace gdjs {
         // Use Electron BrowserWindow API
         const browserWindow = remote.getCurrentWindow();
         if (browserWindow) {
-          browserWindow.setContentSize(width, height);
+          try {
+            browserWindow.setContentSize(width, height);
+          } catch (error) {
+            logger.error(
+              `Window size setting to width ${width} and height ${height} failed. See error:`,
+              error
+            );
+          }
         }
       } else {
         logger.warn("Window size can't be changed on this platform.");
@@ -377,13 +384,16 @@ namespace gdjs {
         // Use Electron BrowserWindow API
         const browserWindow = remote.getCurrentWindow();
         if (browserWindow) {
-          browserWindow.center();
+          try {
+            browserWindow.center();
+          } catch (error) {
+            logger.error('Window centering failed. See error:', error);
+          }
         }
       } else {
       }
     }
 
-    // Not supported
     /**
      * De/activate fullscreen for the game.
      */
@@ -398,7 +408,14 @@ namespace gdjs {
           // Use Electron BrowserWindow API
           const browserWindow = remote.getCurrentWindow();
           if (browserWindow) {
-            browserWindow.setFullScreen(this._isFullscreen);
+            try {
+              browserWindow.setFullScreen(this._isFullscreen);
+            } catch (error) {
+              logger.error(
+                `Full screen setting to ${this._isFullscreen} failed. See error:`,
+                error
+              );
+            }
           }
         } else {
           // Use HTML5 Fullscreen API
@@ -874,7 +891,7 @@ namespace gdjs {
     }
 
     /**
-     * Close the game, if applicable
+     * Close the game, if applicable.
      */
     stopGame() {
       // Try to detect the environment to use the most adapted
@@ -883,7 +900,11 @@ namespace gdjs {
       if (remote) {
         const browserWindow = remote.getCurrentWindow();
         if (browserWindow) {
-          browserWindow.close();
+          try {
+            browserWindow.close();
+          } catch (error) {
+            logger.error('Window closing failed. See error:', error);
+          }
         }
       } else {
         if (

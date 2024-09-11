@@ -73,7 +73,8 @@ export const getTileSet = (object: gdObject) => {
   const tileSize = parseFloat(
     objectConfigurationProperties.get('tileSize').getValue()
   );
-  return { rowCount, columnCount, tileSize };
+  const atlasImage = objectConfigurationProperties.get('atlasImage').getValue();
+  return { rowCount, columnCount, tileSize, atlasImage };
 };
 
 /**

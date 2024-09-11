@@ -1,7 +1,7 @@
 // @flow
 
 import * as React from 'react';
-import { t } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 import { Column, Line, Spacer } from '../UI/Grid';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
@@ -15,6 +15,7 @@ import FlipVertical from '../UI/CustomSvgIcons/FlipVertical';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { useLongTouch, type ClientCoordinates } from '../Utils/UseLongTouch';
 import Text from '../UI/Text';
+import EmptyMessage from '../UI/EmptyMessage';
 
 const styles = {
   tilesetAndTooltipsContainer: {
@@ -614,6 +615,8 @@ const TileSetVisualizer = ({
     onPointerMove,
   };
 
+  const isAtlasImageSet = !!atlasResourceName
+
   return (
     <Column noMargin>
       {showPaintingToolbar && (
@@ -641,6 +644,7 @@ const TileSetVisualizer = ({
                       flipVertically: shouldFlipVertically,
                     });
                 }}
+                disabled={!isAtlasImageSet}
               >
                 <Brush style={styles.icon} />
               </IconButton>
@@ -715,7 +719,7 @@ const TileSetVisualizer = ({
         </>
       )}
       <Line justifyContent="stretch" noMargin>
-        {atlasResourceName && (
+        {isAtlasImageSet ? (
           <div
             style={styles.tilesetAndTooltipsContainer}
             ref={tilesetAndTooltipContainerRef}
@@ -809,6 +813,10 @@ const TileSetVisualizer = ({
               </div>
             )}
           </div>
+        ) : (
+          <EmptyMessage>
+            <Trans>No atlas image configured.</Trans>
+          </EmptyMessage>
         )}
       </Line>
     </Column>

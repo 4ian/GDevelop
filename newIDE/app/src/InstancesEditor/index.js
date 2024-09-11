@@ -823,6 +823,10 @@ export default class InstancesEditor extends Component<Props, State> {
       if (!scales) return;
       const { scaleX, scaleY } = scales;
       const tileSet = getTileSet(object);
+      if (!tileSet.atlasImage) {
+        console.warn('Trying to paint on a tilemap without an atlas image.');
+        return;
+      }
       const tileMapGridCoordinates = getTilesGridCoordinatesFromPointerSceneCoordinates(
         {
           coordinates: sceneCoordinates,

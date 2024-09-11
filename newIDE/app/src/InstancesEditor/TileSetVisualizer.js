@@ -615,7 +615,7 @@ const TileSetVisualizer = ({
     onPointerMove,
   };
 
-  const isAtlasImageSet = !!atlasResourceName
+  const isAtlasImageSet = !!atlasResourceName;
 
   return (
     <Column noMargin>

@@ -1905,6 +1905,15 @@ module.exports = {
           padding: 5,
         })
       );
+      _placeholderTextNoAtlasPixiObject = new PIXI.Text(
+        'Set up an atlas image\nin the tilemap object.',
+        new PIXI.TextStyle({
+          fontFamily: 'Arial',
+          fontSize: 16,
+          align: 'center',
+          padding: 5,
+        })
+      );
       _placeholderImagePixiObject = new PIXI.Sprite(
         PIXI.Texture.from(
           'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgAgMAAAAOFJJnAAAADFBMVEUAAAAkMoYsfqH///8FP6xgAAAAAXRSTlMAQObYZgAAAAFiS0dEAxEMTPIAAAAjSURBVBjTpcYxAQAADIMwTGISlTsmoVcCQClzSmvNo2ueGnMajGpBwI5BnwAAAABJRU5ErkJggg=='
@@ -1973,9 +1982,16 @@ module.exports = {
         this._placeholderTextPixiObject.anchor.x = 0.5;
         this._placeholderTextPixiObject.anchor.y = 0.5;
         this._placeholderTextPixiObject.y = 30;
+        this._placeholderTextNoAtlasPixiObject.interactive = true;
+        this._placeholderTextNoAtlasPixiObject.anchor.x = 0.5;
+        this._placeholderTextNoAtlasPixiObject.anchor.y = 0.5;
+        this._placeholderTextNoAtlasPixiObject.y = 30;
         this._placeholderImagePixiObject.y = -30;
         this._placeholderImagePixiObject.x = -16;
         this._placeholderPixiObject.addChild(this._placeholderTextPixiObject);
+        this._placeholderPixiObject.addChild(
+          this._placeholderTextNoAtlasPixiObject
+        );
         this._placeholderPixiObject.addChild(this._placeholderImagePixiObject);
         this._pixiObject.addChild(this._placeholderPixiObject);
         this._pixiContainer.addChild(this._pixiObject);
@@ -2046,6 +2062,8 @@ module.exports = {
           .getProperties()
           .get('atlasImage')
           .getValue();
+        if (!atlasImageResourceName) return;
+
         const tilemapAsJSObject = JSON.parse(
           this._instance.getRawStringProperty('tilemap') || '{}'
         );
@@ -2203,13 +2221,25 @@ module.exports = {
        * This is called to update the PIXI object on the scene editor
        */
       update() {
+        const atlasImageResourceName = this._associatedObjectConfiguration
+          .getProperties()
+          .get('atlasImage')
+          .getValue();
+
         const isTileMapEmpty = this._editableTileMap
           ? this._editableTileMap.isEmpty()
           : false;
         let objectToChange;
-        if (isTileMapEmpty) {
-          this._placeholderPixiObject.visible = true;
+        if (isTileMapEmpty || !atlasImageResourceName) {
           this.tileMapPixiObject.visible = false;
+          this._placeholderPixiObject.visible = true;
+          if (!atlasImageResourceName) {
+            this._placeholderTextNoAtlasPixiObject.visible = true;
+            this._placeholderTextPixiObject.visible = false;
+          } else {
+            this._placeholderTextPixiObject.visible = true;
+            this._placeholderTextNoAtlasPixiObject.visible = false;
+          }
           objectToChange = this._placeholderPixiObject;
         } else {
           this._placeholderPixiObject.visible = false;

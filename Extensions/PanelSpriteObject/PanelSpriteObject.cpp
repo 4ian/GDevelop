@@ -30,6 +30,102 @@ PanelSpriteObject::PanelSpriteObject()
 
 PanelSpriteObject::~PanelSpriteObject() {}
 
+bool PanelSpriteObject::UpdateProperty(const gd::String& propertyName,
+                                const gd::String& newValue) {
+  if (propertyName == "texture") {
+    textureName = newValue;
+    return true;
+  }
+  if (propertyName == "width") {
+    SetWidth(newValue.To<double>());
+    return true;
+  }
+  if (propertyName == "height") {
+    SetHeight(newValue.To<double>());
+    return true;
+  }
+  if (propertyName == "leftMargin") {
+    SetLeftMargin(newValue.To<double>());
+    return true;
+  }
+  if (propertyName == "topMargin") {
+    SetTopMargin(newValue.To<double>());
+    return true;
+  }
+  if (propertyName == "rightMargin") {
+    SetRightMargin(newValue.To<double>());
+    return true;
+  }
+  if (propertyName == "bottomMargin") {
+    SetBottomMargin(newValue.To<double>());
+    return true;
+  }
+  if (propertyName == "tiled") {
+    SetTiled(newValue == "1");
+    return true;
+  }
+
+  return false;
+}
+
+std::map<gd::String, gd::PropertyDescriptor> PanelSpriteObject::GetProperties() const {
+  std::map<gd::String, gd::PropertyDescriptor> objectProperties;
+
+  objectProperties["texture"]
+      .SetValue(textureName)
+      .SetType("resource")
+      .AddExtraInfo("image")
+      .SetLabel(_("Texture"));
+
+  objectProperties["width"]
+      .SetValue(gd::String::From(width))
+      .SetType("number")
+      .SetLabel(_("Width"))
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
+      .SetGroup(_("Default size"));
+
+  objectProperties["height"]
+      .SetValue(gd::String::From(height))
+      .SetType("number")
+      .SetLabel(_("Height"))
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
+      .SetGroup(_("Default size"));
+
+  objectProperties["leftMargin"]
+      .SetValue(gd::String::From(leftMargin))
+      .SetType("number")
+      .SetLabel(_("Left"))
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
+      .SetGroup(_("Margins"));
+
+  objectProperties["topMargin"]
+      .SetValue(gd::String::From(topMargin))
+      .SetType("number")
+      .SetLabel(_("Top"))
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
+      .SetGroup(_("Margins"));
+
+  objectProperties["rightMargin"]
+      .SetValue(gd::String::From(rightMargin))
+      .SetType("number")
+      .SetLabel(_("Right"))
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
+      .SetGroup(_("Margins"));
+
+  objectProperties["bottomMargin"]
+      .SetValue(gd::String::From(bottomMargin))
+      .SetType("number")
+      .SetLabel(_("Bottom"))
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
+      .SetGroup(_("Margins"));
+
+  objectProperties["tiled"]
+      .SetValue(tiled ? "true" : "false")
+      .SetType("boolean")
+      .SetLabel(_("Repeat borders and center textures (instead of stretching them)"));
+
+  return objectProperties;
+}
 void PanelSpriteObject::DoUnserializeFrom(
     gd::Project& project, const gd::SerializerElement& element) {
   textureName = element.GetStringAttribute("texture");

@@ -5,15 +5,15 @@ Copyright (c) 2008-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#include "GDCore/Tools/Localization.h"
+#include "TextObject.h"
+
 #include "GDCore/CommonTools.h"
+#include "GDCore/IDE/AbstractFileSystem.h"
+#include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCore/Project/InitialInstance.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Serialization/SerializerElement.h"
-#include "TextObject.h"
-
-#include "GDCore/IDE/AbstractFileSystem.h"
-#include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
+#include "GDCore/Tools/Localization.h"
 
 using namespace std;
 
@@ -35,18 +35,197 @@ TextObject::TextObject()
       shadowOpacity(127),
       shadowAngle(90),
       shadowDistance(4),
-      shadowBlurRadius(2)
-{
+      shadowBlurRadius(2) {}
+
+TextObject::~TextObject() {};
+
+bool TextObject::UpdateProperty(const gd::String& propertyName,
+                                const gd::String& newValue) {
+  if (propertyName == "text") {
+    text = newValue;
+    return true;
+  }
+  if (propertyName == "characterSize") {
+    characterSize = newValue.To<double>();
+    return true;
+  }
+  if (propertyName == "font") {
+    fontName = newValue;
+    return true;
+  }
+  if (propertyName == "bold") {
+    bold = newValue == "1";
+    return true;
+  }
+  if (propertyName == "italic") {
+    italic = newValue == "1";
+    return true;
+  }
+  if (propertyName == "color") {
+    color = newValue;
+    return true;
+  }
+  if (propertyName == "textAlignment") {
+    textAlignment = newValue;
+    return true;
+  }
+  if (propertyName == "isOutlineEnabled") {
+    isOutlineEnabled = newValue == "1";
+    return true;
+  }
+  if (propertyName == "outlineColor") {
+    outlineColor = newValue;
+    return true;
+  }
+  if (propertyName == "outlineThickness") {
+    outlineThickness = newValue.To<double>();
+    return true;
+  }
+  if (propertyName == "isShadowEnabled") {
+    isShadowEnabled = newValue == "1";
+    return true;
+  }
+  if (propertyName == "shadowColor") {
+    shadowColor = newValue;
+    return true;
+  }
+  if (propertyName == "shadowOpacity") {
+    shadowOpacity = newValue.To<double>();
+    return true;
+  }
+  if (propertyName == "shadowAngle") {
+    shadowAngle = newValue.To<double>();
+    return true;
+  }
+  if (propertyName == "shadowDistance") {
+    shadowDistance = newValue.To<double>();
+    return true;
+  }
+  if (propertyName == "shadowBlurRadius") {
+    shadowBlurRadius = newValue.To<double>();
+    return true;
+  }
+
+  return false;
 }
 
-TextObject::~TextObject(){};
+std::map<gd::String, gd::PropertyDescriptor> TextObject::GetProperties() const {
+  std::map<gd::String, gd::PropertyDescriptor> objectProperties;
+
+  objectProperties["text"]
+      .SetValue(text)
+      .SetType("textarea")
+      .SetLabel(_("Text"));
+
+  objectProperties["characterSize"]
+      .SetValue(gd::String::From(characterSize))
+      .SetType("number")
+      .SetLabel(_("Font size"))
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
+      .SetGroup(_("Font"));
+
+  objectProperties["font"]
+      .SetValue(fontName)
+      .SetType("resource")
+      .AddExtraInfo("font")
+      .SetLabel(_("Font"))
+      .SetGroup(_("Font"));
+
+  objectProperties["bold"]
+      .SetValue(bold ? "true" : "false")
+      .SetType("boolean")
+      .SetLabel(_("Bold"))
+      .SetGroup(_("Font"));
+
+  objectProperties["italic"]
+      .SetValue(italic ? "true" : "false")
+      .SetType("boolean")
+      .SetLabel(_("Italic"))
+      .SetGroup(_("Font"));
+
+  objectProperties["color"]
+      .SetValue(color)
+      .SetType("color")
+      .SetLabel(_("Color"))
+      .SetGroup(_("Font"));
+
+  objectProperties["textAlignment"]
+      .SetValue(textAlignment)
+      .SetType("choice")
+      .AddExtraInfo("left")
+      .AddExtraInfo("center")
+      .AddExtraInfo("right")
+      .SetLabel(_("Alignment, when multiple lines are displayed"))
+      .SetGroup(_("Font"));
+
+  objectProperties["isOutlineEnabled"]
+      .SetValue(isOutlineEnabled ? "true" : "false")
+      .SetType("boolean")
+      .SetLabel(_("Outline"))
+      .SetGroup(_("Outline"));
+
+  objectProperties["outlineColor"]
+      .SetValue(outlineColor)
+      .SetType("color")
+      .SetLabel(_("Outline color"))
+      .SetGroup(_("Outline"));
+
+  objectProperties["outlineThickness"]
+      .SetValue(gd::String::From(outlineThickness))
+      .SetType("number")
+      .SetLabel(_("Outline thickness"))
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
+      .SetGroup(_("Outline"));
+
+  objectProperties["isShadowEnabled"]
+      .SetValue(isShadowEnabled ? "true" : "false")
+      .SetType("boolean")
+      .SetLabel(_("Shadow"))
+      .SetGroup(_("Shadow"));
+
+  objectProperties["shadowColor"]
+      .SetValue(shadowColor)
+      .SetType("color")
+      .SetLabel(_("Shadow color"))
+      .SetGroup(_("Shadow"));
+
+  objectProperties["shadowOpacity"]
+      .SetValue(gd::String::From(shadowOpacity))
+      .SetType("number")
+      .SetLabel(_("Shadow opacity"))
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
+      .SetGroup(_("Shadow"));
+
+  objectProperties["shadowAngle"]
+      .SetValue(gd::String::From(shadowAngle))
+      .SetType("number")
+      .SetLabel(_("Shadow angle"))
+      .SetMeasurementUnit(gd::MeasurementUnit::GetDegreeAngle())
+      .SetGroup(_("Shadow"));
+
+  objectProperties["shadowDistance"]
+      .SetValue(gd::String::From(shadowDistance))
+      .SetType("number")
+      .SetLabel(_("Shadow distance"))
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
+      .SetGroup(_("Shadow"));
+
+  objectProperties["shadowBlurRadius"]
+      .SetValue(gd::String::From(shadowBlurRadius))
+      .SetType("number")
+      .SetLabel(_("Shadow blur radius"))
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
+      .SetGroup(_("Shadow"));
+
+  return objectProperties;
+}
 
 void TextObject::DoUnserializeFrom(gd::Project& project,
                                    const gd::SerializerElement& element) {
   // Compatibility with GD <= 5.3.188
   // end of compatibility code
   bool isLegacy = !element.HasChild("content");
-  auto &content = isLegacy ? element : element.GetChild("content");
+  auto& content = isLegacy ? element : element.GetChild("content");
 
   SetFontName(content.GetChild("font", 0, "Font").GetValue().GetString());
   SetTextAlignment(content.GetChild("textAlignment").GetValue().GetString());
@@ -75,7 +254,7 @@ void TextObject::DoUnserializeFrom(gd::Project& project,
   {
     SetText(content.GetStringAttribute("text"));
     SetColor(content.GetStringAttribute("color", "0;0;0"));
-  
+
     SetOutlineEnabled(content.GetBoolAttribute("isOutlineEnabled", false));
     SetOutlineThickness(content.GetIntAttribute("outlineThickness", 2));
     SetOutlineColor(content.GetStringAttribute("outlineColor", "255;255;255"));
@@ -90,7 +269,8 @@ void TextObject::DoUnserializeFrom(gd::Project& project,
 }
 
 void TextObject::DoSerializeTo(gd::SerializerElement& element) const {
-  // Allow users to rollback to 5.3.188 or older releases without loosing their configuration.
+  // Allow users to rollback to 5.3.188 or older releases without loosing their
+  // configuration.
   // TODO Remove this in a few releases.
   // Compatibility with GD <= 5.3.188
   {
@@ -100,16 +280,20 @@ void TextObject::DoSerializeTo(gd::SerializerElement& element) const {
     element.AddChild("characterSize").SetValue(GetCharacterSize());
     auto colorComponents = GetColor().Split(';');
     element.AddChild("color")
-        .SetAttribute("r", colorComponents.size() == 3 ? colorComponents[0].To<int>() : 0)
-        .SetAttribute("g", colorComponents.size() == 3 ? colorComponents[1].To<int>() : 0)
-        .SetAttribute("b", colorComponents.size() == 3 ? colorComponents[2].To<int>() : 0);
+        .SetAttribute(
+            "r", colorComponents.size() == 3 ? colorComponents[0].To<int>() : 0)
+        .SetAttribute(
+            "g", colorComponents.size() == 3 ? colorComponents[1].To<int>() : 0)
+        .SetAttribute(
+            "b",
+            colorComponents.size() == 3 ? colorComponents[2].To<int>() : 0);
     element.SetAttribute("smoothed", smoothed);
     element.SetAttribute("bold", bold);
     element.SetAttribute("italic", italic);
     element.SetAttribute("underlined", underlined);
   }
   // end of compatibility code
-  
+
   auto& content = element.AddChild("content");
   content.AddChild("text").SetValue(GetText());
   content.AddChild("font").SetValue(GetFontName());
@@ -121,7 +305,7 @@ void TextObject::DoSerializeTo(gd::SerializerElement& element) const {
   content.SetAttribute("bold", bold);
   content.SetAttribute("italic", italic);
   content.SetAttribute("underlined", underlined);
-  
+
   content.SetAttribute("isOutlineEnabled", isOutlineEnabled);
   content.SetAttribute("outlineThickness", outlineThickness);
   content.SetAttribute("outlineColor", outlineColor);
@@ -134,7 +318,6 @@ void TextObject::DoSerializeTo(gd::SerializerElement& element) const {
   content.SetAttribute("shadowBlurRadius", shadowBlurRadius);
 }
 
-void TextObject::ExposeResources(
-    gd::ArbitraryResourceWorker& worker) {
+void TextObject::ExposeResources(gd::ArbitraryResourceWorker& worker) {
   worker.ExposeFont(fontName);
 }

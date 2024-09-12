@@ -981,6 +981,9 @@ interface Effect {
   void SetEffectType([Const] DOMString effectType_);
   [Const, Ref] DOMString GetEffectType();
 
+  void SetFolded(boolean val);
+  boolean IsFolded();
+
   void SetDoubleParameter([Const] DOMString name, double value);
   double GetDoubleParameter([Const] DOMString name);
   void SetStringParameter([Const] DOMString name, [Const] DOMString value);

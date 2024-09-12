@@ -73,7 +73,27 @@ export const getTileSet = (object: gdObject) => {
   const tileSize = parseFloat(
     objectConfigurationProperties.get('tileSize').getValue()
   );
-  return { rowCount, columnCount, tileSize };
+  const atlasImage = objectConfigurationProperties.get('atlasImage').getValue();
+  return { rowCount, columnCount, tileSize, atlasImage };
+};
+
+const isTileSetBadlyConfigured = ({
+  rowCount,
+  columnCount,
+  tileSize,
+  atlasImage,
+}: {|
+  rowCount: number,
+  columnCount: number,
+  tileSize: number,
+  atlasImage: string,
+|}) => {
+  return (
+    !Number.isInteger(columnCount) ||
+    columnCount <= 0 ||
+    !Number.isInteger(rowCount) ||
+    rowCount <= 0
+  );
 };
 
 /**
@@ -235,48 +255,54 @@ class TileMapPaintingPreview {
       associatedObjectName
     );
     if (!object || object.getType() !== 'TileMap::SimpleTileMap') return;
-    const { tileSize } = getTileSet(object);
+    const tileSet = getTileSet(object);
+    const isBadlyConfigured = isTileSetBadlyConfigured(tileSet);
+    const { tileSize } = tileSet;
     let texture;
-    if (tileMapTileSelection.kind === 'single') {
-      const atlasResourceName = object
-        .getConfiguration()
-        .getProperties()
-        .get('atlasImage')
-        .getValue();
-      if (!atlasResourceName) return;
-      const cacheKey = `${atlasResourceName}-${tileSize}-${
-        tileMapTileSelection.coordinates.x
-      }-${tileMapTileSelection.coordinates.y}`;
-      texture = this.cache.get(cacheKey);
-      if (!texture) {
-        const atlasTexture = PixiResourcesLoader.getPIXITexture(
-          this.project,
-          atlasResourceName
-        );
-
-        const rect = new PIXI.Rectangle(
-          tileMapTileSelection.coordinates.x * tileSize,
-          tileMapTileSelection.coordinates.y * tileSize,
-          tileSize,
-          tileSize
-        );
-
-        try {
-          texture = new PIXI.Texture(atlasTexture, rect);
-        } catch (error) {
-          console.error(
-            `Tile could not be extracted from atlas texture:`,
-            error
+    if (isBadlyConfigured) {
+      texture = PixiResourcesLoader.getInvalidPIXITexture();
+    } else {
+      if (tileMapTileSelection.kind === 'single') {
+        const atlasResourceName = object
+          .getConfiguration()
+          .getProperties()
+          .get('atlasImage')
+          .getValue();
+        if (!atlasResourceName) return;
+        const cacheKey = `${atlasResourceName}-${tileSize}-${
+          tileMapTileSelection.coordinates.x
+        }-${tileMapTileSelection.coordinates.y}`;
+        texture = this.cache.get(cacheKey);
+        if (!texture) {
+          const atlasTexture = PixiResourcesLoader.getPIXITexture(
+            this.project,
+            atlasResourceName
           );
-          texture = PixiResourcesLoader.getInvalidPIXITexture();
+
+          const rect = new PIXI.Rectangle(
+            tileMapTileSelection.coordinates.x * tileSize,
+            tileMapTileSelection.coordinates.y * tileSize,
+            tileSize,
+            tileSize
+          );
+
+          try {
+            texture = new PIXI.Texture(atlasTexture, rect);
+          } catch (error) {
+            console.error(
+              `Tile could not be extracted from atlas texture:`,
+              error
+            );
+            texture = PixiResourcesLoader.getInvalidPIXITexture();
+          }
+          this.cache.set(cacheKey, texture);
         }
-        this.cache.set(cacheKey, texture);
+      } else if (tileMapTileSelection.kind === 'erase') {
+        texture = PIXI.Texture.from(
+          'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAARSURBVHgBY7h58+Z/BhgAcQA/VAcVLiw46wAAAABJRU5ErkJggg=='
+        );
+        texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
       }
-    } else if (tileMapTileSelection.kind === 'erase') {
-      texture = PIXI.Texture.from(
-        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAARSURBVHgBY7h58+Z/BhgAcQA/VAcVLiw46wAAAABJRU5ErkJggg=='
-      );
-      texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
     }
 
     const renderedInstance = this.getRendererOfInstance(instance);
@@ -319,7 +345,7 @@ class TileMapPaintingPreview {
     spritesCoordinatesInTileMapGrid.forEach(({ x, y }) => {
       let sprite;
 
-      if (tileMapTileSelection.kind === 'single') {
+      if (tileMapTileSelection.kind === 'single' || isBadlyConfigured) {
         // TODO: Find a way not to regenerate the sprites on each render.
         sprite = new PIXI.Sprite(texture);
         if (tileMapTileSelection.flipHorizontally) {

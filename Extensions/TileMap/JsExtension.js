@@ -1896,8 +1896,10 @@ module.exports = {
      * Renderer for instances of SimpleTileMap inside the IDE.
      */
     class RenderedSimpleTileMapInstance extends RenderedInstance {
+      _getStartedText = 'Select this instance\nto start painting';
+      _noAtlasText = 'Set up an atlas image\nin the tilemap object.';
       _placeholderTextPixiObject = new PIXI.Text(
-        'Select this instance\nto start painting',
+        '',
         new PIXI.TextStyle({
           fontFamily: 'Arial',
           fontSize: 16,
@@ -2046,6 +2048,8 @@ module.exports = {
           .getProperties()
           .get('atlasImage')
           .getValue();
+        if (!atlasImageResourceName) return;
+
         const tilemapAsJSObject = JSON.parse(
           this._instance.getRawStringProperty('tilemap') || '{}'
         );
@@ -2082,51 +2086,56 @@ module.exports = {
           const manager = TilemapHelper.TileMapManager.getManager(
             this._project
           );
-          manager.getOrLoadSimpleTileMap(
-            tilemapAsJSObject,
-            this._objectName,
-            tileSize,
-            columnCount,
-            rowCount,
-            (tileMap) => {
-              if (!tileMap) {
-                this._onLoadingError();
-                console.error('Could not parse tilemap.');
-                return;
-              }
-
-              this._editableTileMap = tileMap;
-
-              manager.getOrLoadSimpleTileMapTextureCache(
-                (textureName) =>
-                  this._pixiResourcesLoader.getPIXITexture(
-                    this._project,
-                    textureName
-                  ),
-                atlasImageResourceName,
-                tileSize,
-                columnCount,
-                rowCount,
-                (
-                  /** @type {TileMapHelper.TileTextureCache | null} */
-                  textureCache
-                ) => {
-                  this._onLoadingSuccess();
-                  if (!this._editableTileMap) return;
-
-                  this.width = this._editableTileMap.getWidth();
-                  this.height = this._editableTileMap.getHeight();
-                  TilemapHelper.PixiTileMapHelper.updatePixiTileMap(
-                    this.tileMapPixiObject,
-                    this._editableTileMap,
-                    textureCache,
-                    'all', // No notion of visibility on simple tile maps.
-                    0 // Only one layer is used on simple tile maps.
-                  );
+          try {
+            manager.getOrLoadSimpleTileMap(
+              tilemapAsJSObject,
+              this._objectName,
+              tileSize,
+              columnCount,
+              rowCount,
+              (tileMap) => {
+                if (!tileMap) {
+                  this._onLoadingError();
+                  console.error('Could not parse tilemap.');
+                  return;
                 }
-              );
-            }
-          );
+
+                this._editableTileMap = tileMap;
+
+                manager.getOrLoadSimpleTileMapTextureCache(
+                  (textureName) =>
+                    this._pixiResourcesLoader.getPIXITexture(
+                      this._project,
+                      textureName
+                    ),
+                  atlasImageResourceName,
+                  tileSize,
+                  columnCount,
+                  rowCount,
+                  (
+                    /** @type {TileMapHelper.TileTextureCache | null} */
+                    textureCache
+                  ) => {
+                    this._onLoadingSuccess();
+                    if (!this._editableTileMap) return;
+
+                    this.width = this._editableTileMap.getWidth();
+                    this.height = this._editableTileMap.getHeight();
+                    TilemapHelper.PixiTileMapHelper.updatePixiTileMap(
+                      this.tileMapPixiObject,
+                      this._editableTileMap,
+                      textureCache,
+                      'all', // No notion of visibility on simple tile maps.
+                      0 // Only one layer is used on simple tile maps.
+                    );
+                  }
+                );
+              }
+            );
+          } catch (error) {
+            this._onLoadingError();
+            console.error('Could not load tilemap:', error);
+          }
         };
 
         if (atlasTexture.valid) {
@@ -2203,13 +2212,21 @@ module.exports = {
        * This is called to update the PIXI object on the scene editor
        */
       update() {
+        const atlasImageResourceName = this._associatedObjectConfiguration
+          .getProperties()
+          .get('atlasImage')
+          .getValue();
+
         const isTileMapEmpty = this._editableTileMap
           ? this._editableTileMap.isEmpty()
           : false;
         let objectToChange;
-        if (isTileMapEmpty) {
-          this._placeholderPixiObject.visible = true;
+        if (isTileMapEmpty || !atlasImageResourceName) {
           this.tileMapPixiObject.visible = false;
+          this._placeholderPixiObject.visible = true;
+          this._placeholderTextPixiObject.text = !atlasImageResourceName
+            ? this._noAtlasText
+            : this._getStartedText;
           objectToChange = this._placeholderPixiObject;
         } else {
           this._placeholderPixiObject.visible = false;

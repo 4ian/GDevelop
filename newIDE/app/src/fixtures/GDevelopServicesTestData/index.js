@@ -1009,6 +1009,7 @@ export const subscriptionPlansWithPricingSystems: SubscriptionPlanWithPricingSys
     pricingSystems: [
       {
         id: 'silver_1month_499EUR',
+        status: 'active',
         planId: 'gdevelop_silver',
         period: 'month',
         periodCount: 1,
@@ -1018,6 +1019,7 @@ export const subscriptionPlansWithPricingSystems: SubscriptionPlanWithPricingSys
       },
       {
         id: 'silver_1year_3599EUR',
+        status: 'active',
         planId: 'gdevelop_silver',
         period: 'year',
         periodCount: 1,
@@ -1382,6 +1384,7 @@ export const subscriptionPlansWithPricingSystems: SubscriptionPlanWithPricingSys
       {
         id: 'gold_1month_999EUR',
         planId: 'gdevelop_gold',
+        status: 'active',
         period: 'month',
         periodCount: 1,
         currency: 'EUR',
@@ -1391,6 +1394,7 @@ export const subscriptionPlansWithPricingSystems: SubscriptionPlanWithPricingSys
       {
         id: 'gold_1year_7199EUR',
         planId: 'gdevelop_gold',
+        status: 'active',
         period: 'year',
         periodCount: 1,
         currency: 'EUR',
@@ -1745,6 +1749,7 @@ export const subscriptionPlansWithPricingSystems: SubscriptionPlanWithPricingSys
       {
         id: 'startup_1month_3000EUR',
         planId: 'gdevelop_startup',
+        status: 'active',
         period: 'month',
         periodCount: 1,
         currency: 'EUR',
@@ -1754,6 +1759,7 @@ export const subscriptionPlansWithPricingSystems: SubscriptionPlanWithPricingSys
       {
         id: 'startup_1year_30900EUR',
         planId: 'gdevelop_startup',
+        status: 'active',
         period: 'year',
         periodCount: 1,
         currency: 'EUR',
@@ -1966,6 +1972,7 @@ export const subscriptionPlansWithPricingSystems: SubscriptionPlanWithPricingSys
       {
         id: 'education_1month_299EUR',
         planId: 'gdevelop_education',
+        status: 'active',
         period: 'month',
         periodCount: 1,
         currency: 'EUR',
@@ -1976,6 +1983,7 @@ export const subscriptionPlansWithPricingSystems: SubscriptionPlanWithPricingSys
       {
         id: 'education_1year_2999EUR',
         planId: 'gdevelop_education',
+        status: 'active',
         period: 'year',
         periodCount: 1,
         currency: 'EUR',
@@ -2139,6 +2147,7 @@ export const subscriptionPlansWithPricingSystems: SubscriptionPlanWithPricingSys
       {
         id: 'indie_1month',
         planId: 'gdevelop_indie',
+        status: 'active',
         period: 'month',
         periodCount: 1,
         currency: 'EUR',
@@ -2305,6 +2314,7 @@ export const subscriptionPlansWithPricingSystems: SubscriptionPlanWithPricingSys
       {
         id: 'pro_1month',
         planId: 'gdevelop_pro',
+        status: 'active',
         period: 'month',
         periodCount: 1,
         currency: 'EUR',

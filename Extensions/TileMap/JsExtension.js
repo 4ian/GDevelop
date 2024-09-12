@@ -1896,17 +1896,10 @@ module.exports = {
      * Renderer for instances of SimpleTileMap inside the IDE.
      */
     class RenderedSimpleTileMapInstance extends RenderedInstance {
+      _getStartedText = 'Select this instance\nto start painting';
+      _noAtlasText = 'Set up an atlas image\nin the tilemap object.';
       _placeholderTextPixiObject = new PIXI.Text(
-        'Select this instance\nto start painting',
-        new PIXI.TextStyle({
-          fontFamily: 'Arial',
-          fontSize: 16,
-          align: 'center',
-          padding: 5,
-        })
-      );
-      _placeholderTextNoAtlasPixiObject = new PIXI.Text(
-        'Set up an atlas image\nin the tilemap object.',
+        '',
         new PIXI.TextStyle({
           fontFamily: 'Arial',
           fontSize: 16,
@@ -1982,16 +1975,9 @@ module.exports = {
         this._placeholderTextPixiObject.anchor.x = 0.5;
         this._placeholderTextPixiObject.anchor.y = 0.5;
         this._placeholderTextPixiObject.y = 30;
-        this._placeholderTextNoAtlasPixiObject.interactive = true;
-        this._placeholderTextNoAtlasPixiObject.anchor.x = 0.5;
-        this._placeholderTextNoAtlasPixiObject.anchor.y = 0.5;
-        this._placeholderTextNoAtlasPixiObject.y = 30;
         this._placeholderImagePixiObject.y = -30;
         this._placeholderImagePixiObject.x = -16;
         this._placeholderPixiObject.addChild(this._placeholderTextPixiObject);
-        this._placeholderPixiObject.addChild(
-          this._placeholderTextNoAtlasPixiObject
-        );
         this._placeholderPixiObject.addChild(this._placeholderImagePixiObject);
         this._pixiObject.addChild(this._placeholderPixiObject);
         this._pixiContainer.addChild(this._pixiObject);
@@ -2100,51 +2086,56 @@ module.exports = {
           const manager = TilemapHelper.TileMapManager.getManager(
             this._project
           );
-          manager.getOrLoadSimpleTileMap(
-            tilemapAsJSObject,
-            this._objectName,
-            tileSize,
-            columnCount,
-            rowCount,
-            (tileMap) => {
-              if (!tileMap) {
-                this._onLoadingError();
-                console.error('Could not parse tilemap.');
-                return;
-              }
-
-              this._editableTileMap = tileMap;
-
-              manager.getOrLoadSimpleTileMapTextureCache(
-                (textureName) =>
-                  this._pixiResourcesLoader.getPIXITexture(
-                    this._project,
-                    textureName
-                  ),
-                atlasImageResourceName,
-                tileSize,
-                columnCount,
-                rowCount,
-                (
-                  /** @type {TileMapHelper.TileTextureCache | null} */
-                  textureCache
-                ) => {
-                  this._onLoadingSuccess();
-                  if (!this._editableTileMap) return;
-
-                  this.width = this._editableTileMap.getWidth();
-                  this.height = this._editableTileMap.getHeight();
-                  TilemapHelper.PixiTileMapHelper.updatePixiTileMap(
-                    this.tileMapPixiObject,
-                    this._editableTileMap,
-                    textureCache,
-                    'all', // No notion of visibility on simple tile maps.
-                    0 // Only one layer is used on simple tile maps.
-                  );
+          try {
+            manager.getOrLoadSimpleTileMap(
+              tilemapAsJSObject,
+              this._objectName,
+              tileSize,
+              columnCount,
+              rowCount,
+              (tileMap) => {
+                if (!tileMap) {
+                  this._onLoadingError();
+                  console.error('Could not parse tilemap.');
+                  return;
                 }
-              );
-            }
-          );
+
+                this._editableTileMap = tileMap;
+
+                manager.getOrLoadSimpleTileMapTextureCache(
+                  (textureName) =>
+                    this._pixiResourcesLoader.getPIXITexture(
+                      this._project,
+                      textureName
+                    ),
+                  atlasImageResourceName,
+                  tileSize,
+                  columnCount,
+                  rowCount,
+                  (
+                    /** @type {TileMapHelper.TileTextureCache | null} */
+                    textureCache
+                  ) => {
+                    this._onLoadingSuccess();
+                    if (!this._editableTileMap) return;
+
+                    this.width = this._editableTileMap.getWidth();
+                    this.height = this._editableTileMap.getHeight();
+                    TilemapHelper.PixiTileMapHelper.updatePixiTileMap(
+                      this.tileMapPixiObject,
+                      this._editableTileMap,
+                      textureCache,
+                      'all', // No notion of visibility on simple tile maps.
+                      0 // Only one layer is used on simple tile maps.
+                    );
+                  }
+                );
+              }
+            );
+          } catch (error) {
+            this._onLoadingError();
+            console.error('Could not load tilemap:', error);
+          }
         };
 
         if (atlasTexture.valid) {
@@ -2233,13 +2224,9 @@ module.exports = {
         if (isTileMapEmpty || !atlasImageResourceName) {
           this.tileMapPixiObject.visible = false;
           this._placeholderPixiObject.visible = true;
-          if (!atlasImageResourceName) {
-            this._placeholderTextNoAtlasPixiObject.visible = true;
-            this._placeholderTextPixiObject.visible = false;
-          } else {
-            this._placeholderTextPixiObject.visible = true;
-            this._placeholderTextNoAtlasPixiObject.visible = false;
-          }
+          this._placeholderTextPixiObject.text = !atlasImageResourceName
+            ? this._noAtlasText
+            : this._getStartedText;
           objectToChange = this._placeholderPixiObject;
         } else {
           this._placeholderPixiObject.visible = false;

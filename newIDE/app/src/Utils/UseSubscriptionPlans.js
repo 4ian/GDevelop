@@ -37,9 +37,18 @@ const mergeSubscriptionPlansWithPrices = (
 export const getAvailableSubscriptionPlansWithPrices = (
   subscriptionPlansWithPricingSystems: SubscriptionPlanWithPricingSystems[]
 ): SubscriptionPlanWithPricingSystems[] => {
-  return subscriptionPlansWithPricingSystems.filter(
+  const nonLegacyPlans = subscriptionPlansWithPricingSystems.filter(
     subscriptionPlanWithPrices => !subscriptionPlanWithPrices.isLegacy
   );
+  const availableSubscriptionPlansWithPrices = nonLegacyPlans.map(
+    planWithPricingSystems => ({
+      ...planWithPricingSystems,
+      pricingSystems: planWithPricingSystems.pricingSystems.filter(
+        pricingSystem => pricingSystem.status === 'active'
+      ),
+    })
+  );
+  return availableSubscriptionPlansWithPrices;
 };
 
 type Props = {| includeLegacy: boolean |};

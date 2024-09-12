@@ -158,6 +158,7 @@ export type SubscriptionPlanPricingSystem = {|
   isPerUser?: true,
   currency: 'EUR' | 'USD',
   region: string,
+  status: 'active' | 'inactive',
   amountInCents: number,
   periodCount: number,
 |};

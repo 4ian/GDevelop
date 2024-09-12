@@ -1,7 +1,7 @@
 // @flow
 import { Trans, t } from '@lingui/macro';
 import * as React from 'react';
-import TextField, { type TextFieldInterface } from '../TextField';
+import TextField from '../TextField';
 import ColorPicker, { type ColorResult } from './ColorPicker';
 import {
   rgbStringAndAlphaToRGBColor,
@@ -48,7 +48,6 @@ const ColorField = ({
   const [alphaValue, setAlphaValue] = React.useState<number>(
     !disableAlpha && alpha !== undefined ? alpha : 1
   );
-  const textFieldRef = React.useRef<?TextFieldInterface>(null);
 
   const handleChange = (newColor: string, newAlpha: number) => {
     setColorValue(newColor);
@@ -91,7 +90,6 @@ const ColorField = ({
         value={colorValue}
         onChange={event => handleChange(event.target.value, alphaValue)}
         onBlur={handleBlur}
-        ref={textFieldRef}
         disabled={disabled}
       />
       {!disableAlpha && (
@@ -106,7 +104,6 @@ const ColorField = ({
             handleChange(colorValue, parseFloat(newAlphaValue))
           }
           onBlur={handleBlur}
-          ref={textFieldRef}
           type="number"
           step={0.1}
           disabled={disabled}

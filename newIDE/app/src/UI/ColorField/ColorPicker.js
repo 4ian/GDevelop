@@ -20,20 +20,21 @@ type Props = {|
   onChangeComplete?: ColorChangeHandler,
   disableAlpha?: boolean,
   disabled?: boolean,
+  size?: 'compact',
 |};
 
 const styles = {
   color: {
-    width: '36px',
-    height: '14px',
+    width: '100%',
+    height: '100%',
     borderRadius: '2px',
     textAlign: 'center',
     fontSize: '10px',
   },
   swatch: {
-    padding: '5px',
+    padding: '2px',
     background: '#fff',
-    borderRadius: '1px',
+    borderRadius: '4px',
     boxShadow: '0 0 0 1px rgba(0,0,0,.1)',
     display: 'inline-block',
     cursor: 'pointer',
@@ -57,6 +58,7 @@ const ColorPicker = ({
   onChangeComplete,
   disableAlpha,
   disabled,
+  size,
 }: Props) => {
   const swatchRef = React.useRef<?HTMLDivElement>(null);
   const [displayColorPicker, setDisplayColorPicker] = React.useState(false);
@@ -80,11 +82,14 @@ const ColorPicker = ({
       };
 
   return (
-    <div style={style}>
+    <>
       <div
         style={{
           ...styles.swatch,
           ...(disabled ? styles.disabled : {}),
+          width: size === 'compact' ? 16 : 38,
+          height: size === 'compact' ? 16 : 18,
+          ...style,
         }}
         onClick={handleClick}
         ref={swatchRef}
@@ -115,7 +120,7 @@ const ColorPicker = ({
           />
         </Popover>
       ) : null}
-    </div>
+    </>
   );
 };
 

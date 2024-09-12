@@ -11,6 +11,7 @@ import propertiesMapToSchema from '../CompactPropertiesEditor/PropertiesMapToCom
 import { Trans } from '@lingui/macro';
 import { CalloutCard } from '../UI/CalloutCard';
 import { LargeSpacer } from '../UI/Grid';
+import { useForceRecompute } from '../Utils/UseForceUpdate';
 
 const gd: libGDevelop = global.gd;
 
@@ -27,6 +28,7 @@ const QuickBehaviorPropertiesEditor = ({
   onBehaviorUpdated: () => void,
   resourceManagementProps: ResourceManagementProps,
 |}) => {
+  const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
   const basicPropertiesSchema = React.useMemo(
     () =>
       propertiesMapToSchema(
@@ -38,7 +40,9 @@ const QuickBehaviorPropertiesEditor = ({
         object,
         'Basic-Quick'
       ),
-    [behavior, object]
+    // schemaRecomputeTrigger allows to invalidate the schema when required.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [behavior, object, schemaRecomputeTrigger]
   );
 
   return (
@@ -48,6 +52,7 @@ const QuickBehaviorPropertiesEditor = ({
       instances={[behavior]}
       onInstancesModified={onBehaviorUpdated}
       resourceManagementProps={resourceManagementProps}
+      onRefreshAllFields={forceRecomputeSchema}
     />
   );
 };

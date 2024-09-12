@@ -45,6 +45,10 @@ export const styles = {
   scrollView: { paddingTop: marginsSize },
 };
 
+const noRefreshOfAllFields = () => {
+  console.warn("An instance tried to refresh all fields, but the editor doesn't support it.");
+};
+
 const gd: libGDevelop = global.gd;
 
 type Props = {|
@@ -227,6 +231,7 @@ const CompactInstancePropertiesEditor = ({
               schema={instanceSchema}
               instances={instances}
               onInstancesModified={onInstancesModified}
+              onRefreshAllFields={noRefreshOfAllFields}
             />
             <Spacer />
           </Column>

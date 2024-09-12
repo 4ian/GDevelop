@@ -11,6 +11,9 @@
   position: relative;
   display: flex;
   flex: 1;
+
+  /* Avoid growing outside of the container. */
+  min-width: 0px;
 }
 
 /* Style dropdown options on Windows */
@@ -69,6 +72,9 @@
   color: inherit;
   flex: 1;
   border-radius: inherit; /* Needed for InAppTutorialElementHighlighter to adapt its border-radius to the input container */
+
+  /* Avoid growing outside of the container. */
+  min-width: 0px;
 }
 
 .compactSelectField select::placeholder {

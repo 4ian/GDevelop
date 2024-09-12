@@ -57,6 +57,7 @@ export const SubscriptionSuggestionProvider = ({
   const { showAlert } = useAlertDialog();
   const { subscriptionPlansWithPricingSystems } = useSubscriptionPlans({
     includeLegacy: true,
+    authenticatedUser,
   });
 
   const closeSubscriptionDialog = () => setAnalyticsMetadata(null);

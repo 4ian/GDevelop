@@ -32,11 +32,12 @@ type Props = {|
 const ProfileDialog = ({ open, onClose }: Props) => {
   const badgesSeenNotificationTimeoutRef = React.useRef<?TimeoutID>(null);
   const badgesSeenNotificationSentRef = React.useRef<boolean>(false);
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { subscriptionPlansWithPricingSystems } = useSubscriptionPlans({
     includeLegacy: true,
+    authenticatedUser,
   });
 
-  const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const isUserLoading = authenticatedUser.loginState !== 'done';
   const userAchievementsContainerRef = React.useRef<?HTMLDivElement>(null);
   const markBadgesAsSeen = React.useCallback(

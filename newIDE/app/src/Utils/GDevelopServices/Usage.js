@@ -220,7 +220,23 @@ export const canPriceBeFoundInGDevelopPrices = (
 
 export const listSubscriptionPlans = async (options: {|
   includeLegacy: boolean,
+  getAuthorizationHeader?: ?() => Promise<string>,
+  userId?: ?string,
 |}): Promise<SubscriptionPlan[]> => {
+  if (options.userId && options.getAuthorizationHeader) {
+    const authorizationHeader = await options.getAuthorizationHeader();
+
+    const response = await apiClient.get('/subscription-plan', {
+      params: {
+        includeLegacy: options.includeLegacy ? 'true' : 'false',
+        userId: options.userId,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    });
+    return response.data;
+  }
   const response = await apiClient.get('/subscription-plan', {
     params: { includeLegacy: options.includeLegacy ? 'true' : 'false' },
   });
@@ -247,13 +263,31 @@ export const getSubscriptionPlanPricingSystem = async (
 export const listSubscriptionPlanPricingSystems = async (options: {|
   subscriptionPlanIds?: ?(string[]),
   includeLegacy: boolean,
+  getAuthorizationHeader?: ?() => Promise<string>,
+  userId?: ?string,
 |}): Promise<SubscriptionPlanPricingSystem[]> => {
-  const params: {| includeLegacy: string, subscriptionPlanIds?: string |} = {
+  const params: {|
+    includeLegacy: string,
+    subscriptionPlanIds?: string,
+    userId?: string,
+  |} = {
     includeLegacy: options.includeLegacy ? 'true' : 'false',
   };
   if (options.subscriptionPlanIds && options.subscriptionPlanIds.length > 0) {
     params.subscriptionPlanIds = options.subscriptionPlanIds.join(',');
   }
+  if (options.userId && options.getAuthorizationHeader) {
+    params.userId = options.userId;
+    const authorizationHeader = await options.getAuthorizationHeader();
+    const response = await apiClient.get('/subscription-plan-pricing-system', {
+      params,
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    });
+    return response.data;
+  }
+
   const response = await apiClient.get('/subscription-plan-pricing-system', {
     params,
   });

@@ -188,10 +188,13 @@ module.exports = {
           0.5
         );
         this._pixiObject.alpha = alphaForDisplay;
-        const scaleX = this.getScale() * (this._instance.isFlippedX() ? -1 : 1);
-        const scaleY = this.getScale() * (this._instance.isFlippedY() ? -1 : 1);
-        this._pixiObject.scale.x = scaleX;
-        this._pixiObject.scale.y = scaleY;
+        // Scale is already handled below, so we just apply the flip here.
+        this._pixiObject.scale.x =
+          Math.abs(this._pixiObject.scale.x) *
+          (this._instance.isFlippedX() ? -1 : 1);
+        this._pixiObject.scale.y =
+          Math.abs(this._pixiObject.scale.y) *
+          (this._instance.isFlippedY() ? -1 : 1);
 
         this.setAnimation(this._instance.getRawDoubleProperty('animation'));
 

@@ -13,6 +13,7 @@ type Props = {|
   object: gdObject,
 |};
 
+const paddingSize = 10;
 const styles = {
   previewContainer: {
     display: 'flex',
@@ -41,6 +42,12 @@ const styles = {
     ...textEllipsisStyle,
     overflowWrap: 'break-word',
   },
+  previewImage: {
+    position: 'relative',
+    objectFit: 'contain',
+    verticalAlign: 'middle',
+    pointerEvents: 'none',
+  },
 };
 
 export const ObjectPreview = ({ project, object }: Props) => {
@@ -65,7 +72,11 @@ export const ObjectPreview = ({ project, object }: Props) => {
               project,
               object.getConfiguration()
             )}
-            style={{ maxWidth: 120, maxHeight: 120 }}
+            style={{
+              ...styles.previewImage,
+              maxWidth: 128 - 2 * paddingSize,
+              maxHeight: 128 - 2 * paddingSize,
+            }}
           />
         )}
       </div>

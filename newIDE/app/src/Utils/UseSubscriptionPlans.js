@@ -8,6 +8,7 @@ import {
   type SubscriptionPlan,
   type SubscriptionPlanPricingSystem,
 } from './GDevelopServices/Usage';
+import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
 
 const mergeSubscriptionPlansWithPrices = (
   subscriptionPlans: SubscriptionPlan[],
@@ -51,28 +52,46 @@ export const getAvailableSubscriptionPlansWithPrices = (
   return availableSubscriptionPlansWithPrices;
 };
 
-type Props = {| includeLegacy: boolean |};
+type Props = {|
+  includeLegacy: boolean,
+  authenticatedUser?: AuthenticatedUser,
+|};
 
 /**
  * Hook to access subscription plans across the app.
  */
-const useSubscriptionPlans = ({ includeLegacy }: Props) => {
+const useSubscriptionPlans = ({ includeLegacy, authenticatedUser }: Props) => {
   const [
     subscriptionPlansWithPricingSystems,
     setSubscriptionPlansWithPrices,
   ] = React.useState<?(SubscriptionPlanWithPricingSystems[])>(null);
+  const userId =
+    authenticatedUser && authenticatedUser.profile
+      ? authenticatedUser.profile.id
+      : null;
+  const getAuthorizationHeader = authenticatedUser
+    ? authenticatedUser.getAuthorizationHeader
+    : null;
 
   const fetchSubscriptionPlansAndPrices = React.useCallback(
     async () => {
       const results = await Promise.all([
-        listSubscriptionPlans({ includeLegacy }),
-        listSubscriptionPlanPricingSystems({ includeLegacy }),
+        listSubscriptionPlans({
+          includeLegacy,
+          getAuthorizationHeader,
+          userId,
+        }),
+        listSubscriptionPlanPricingSystems({
+          includeLegacy,
+          getAuthorizationHeader,
+          userId,
+        }),
       ]);
       setSubscriptionPlansWithPrices(
         mergeSubscriptionPlansWithPrices(results[0], results[1])
       );
     },
-    [includeLegacy]
+    [includeLegacy, getAuthorizationHeader, userId]
   );
 
   React.useEffect(

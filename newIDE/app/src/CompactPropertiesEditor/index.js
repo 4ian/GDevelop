@@ -77,7 +77,7 @@ export type PrimitiveValueField =
         label: string,
         labelIsUserDefined?: boolean,
       |}>,
-      isHiddenWhenThereOnlyOneChoice?: boolean,
+      isHiddenWhenOnlyOneChoice?: boolean,
       getEndAdornmentIcon?: Instance => ?(className: string) => React.Node,
       onClickEndAdornment?: Instance => void,
       renderLeftIcon?: (className?: string) => React.Node,

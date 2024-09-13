@@ -70,7 +70,7 @@ export type PrimitiveValueField =
         label: string,
         labelIsUserDefined?: boolean,
       |}>,
-      isHiddenWhenThereOnlyOneChoice?: boolean,
+      isHiddenWhenOnlyOneChoice?: boolean,
       ...ValueFieldCommonProperties,
     |}
   | {|
@@ -452,7 +452,7 @@ const PropertiesEditor = ({
       if (!field.getChoices || !field.getValue) return;
 
       const choices = field.getChoices();
-      if (choices.length < 2 && field.isHiddenWhenThereOnlyOneChoice) {
+      if (choices.length < 2 && field.isHiddenWhenOnlyOneChoice) {
         return;
       }
 

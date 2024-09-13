@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import classNames from 'classnames';
-import classes from './CompactTextField.module.css';
+import classes from './CompactTextAreaField.module.css';
 import { makeTimestampedId } from '../../Utils/TimestampedId';
 import Tooltip from '@material-ui/core/Tooltip';
 import Text from '../../UI/Text';

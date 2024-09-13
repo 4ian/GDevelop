@@ -406,18 +406,6 @@ class GD_CORE_API Layout {
 };
 
 /**
- * \brief Functor testing layout name.
- * \see gd::Layout
- */
-struct LayoutHasName
-    : public std::binary_function<std::unique_ptr<Layout>, gd::String, bool> {
-  bool operator()(const std::unique_ptr<Layout>& layout,
-                  gd::String name) const {
-    return layout->GetName() == name;
-  }
-};
-
-/**
  * \brief Get the names of all layers from the given layout
  * that are invisible.
  * \see gd::Layout

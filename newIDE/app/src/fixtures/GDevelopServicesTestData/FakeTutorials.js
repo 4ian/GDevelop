@@ -2,6 +2,11 @@
 import { type Tutorial } from '../../Utils/GDevelopServices/Tutorial';
 import { type PrivatePdfTutorial } from '../../Utils/GDevelopServices/Asset';
 
+export const fakeEducationCurriculumPrivatePdfTutorial: PrivatePdfTutorial = {
+  id: 'education-curriculum-1',
+  downloadUrl: 'https://example.com',
+};
+
 export const fakeEducationCurriculumPrivateTutorial: Tutorial = {
   id: 'education-curriculum-1',
   isPrivateTutorial: true,
@@ -12,26 +17,19 @@ export const fakeEducationCurriculumPrivateTutorial: Tutorial = {
   redeemLinkByLocale: {
     en: 'https://gdevelop.io/pricing/education',
   },
-  title: 'Fake education only tutorial',
   titleByLocale: {
     en: 'Fake education only tutorial',
   },
-  description:
-    'Teach the basics of GDevelop and game creation to your students.',
   descriptionByLocale: {
     en: 'Teach the basics of GDevelop and game creation to your students.',
   },
   type: 'pdf-tutorial',
   category: 'education-curriculum',
   duration: 360,
-  link:
-    'https://api-dev.gdevelop.io/asset/pdf-tutorial/education-curriculum-1/action/redirect-to-pdf',
   linkByLocale: {
     en:
       'https://api-dev.gdevelop.io/asset/pdf-tutorial/education-curriculum-1/action/redirect-to-pdf',
   },
-  thumbnailUrl:
-    'https://resources.gdevelop-app.com/tutorials/images/playlists/get-started.png',
   thumbnailUrlByLocale: {
     en:
       'https://resources.gdevelop-app.com/tutorials/images/playlists/get-started.png',
@@ -52,105 +50,162 @@ export const fakeEducationCurriculumPrivateTutorial: Tutorial = {
   ],
 };
 
-export const fakeEducationCurriculumPrivatePdfTutorial: PrivatePdfTutorial = {
-  id: 'education-curriculum-1',
-  downloadUrl: 'https://example.com',
-};
-
 export const fakeTutorials: Array<Tutorial> = [
   fakeEducationCurriculumPrivateTutorial,
   {
-    id: 'education-curriculum-2',
-    isPrivateTutorial: true,
-    redeemHintByLocale: {
-      en: 'For education subscribers/teachers only.',
-    },
-    redeemLinkByLocale: {
-      en: 'https://gdevelop.io/pricing/education',
-    },
-    title: 'Fake education only tutorial',
-    titleByLocale: {
-      en: 'Fake education only tutorial',
-    },
-    description:
-      'Teach the basics of GDevelop and game creation to your students.',
+    id: 'education-curriculum-flappy-cat',
+    titleByLocale: { en: 'Flappy Cat' },
     descriptionByLocale: {
-      en: 'Teach the basics of GDevelop and game creation to your students.',
+      en:
+        "It's time to make your first game! And what a way to learn than by making your own version of this mobile sensation. Tap tap tap, make sure the cat doesn't touch the ground or the walls!",
+    },
+    isPrivateTutorial: true,
+    type: 'pdf-tutorial',
+    category: 'education-curriculum',
+    linkByLocale: {
+      en: 'https://api-dev.gdevelop.io/pdf-tutorial/flappy-cat',
+    },
+    thumbnailUrlByLocale: {
+      en: 'https://resources.gdevelop-app.com/tutorials/images/flappy-cat.jpg',
+    },
+    redeemHintByLocale: {
+      en:
+        'This tutorial is made for education and accessible to teachers and subscribers to the GDevelop Education plan only.',
+    },
+    redeemLinkByLocale: { en: 'https://gdevelop.io/pricing/education' },
+    tagsByLocale: [{ en: 'Single player' }, { en: 'Beginner' }],
+    sectionByLocale: { en: 'Practical lessons' },
+    gameLink: 'https://gd.games/gdevelop/flappy-cat',
+  },
+  {
+    id: 'education-curriculum-angry-pigs',
+    titleByLocale: { en: 'Angry Pigs' },
+    descriptionByLocale: {
+      en:
+        'Use your slingshot and topple the buildings! Those flimsy structures are no match for your angry piggies in this fun recreation of the mobile arcade classic.',
+    },
+    isPrivateTutorial: true,
+    type: 'pdf-tutorial',
+    category: 'education-curriculum',
+    linkByLocale: {
+      en: 'https://api-dev.gdevelop.io/pdf-tutorial/angry-pigs',
+    },
+    thumbnailUrlByLocale: {
+      en: 'https://resources.gdevelop-app.com/tutorials/images/angry-pigs.jpg',
+    },
+    redeemHintByLocale: {
+      en:
+        'This tutorial is made for education and accessible to teachers and subscribers to the GDevelop Education plan only.',
+    },
+    redeemLinkByLocale: { en: 'https://gdevelop.io/pricing/education' },
+    tagsByLocale: [
+      { en: 'Single player' },
+      { en: 'Intermediate' },
+      { en: 'Leaderboards' },
+      { en: 'Physics' },
+    ],
+    sectionByLocale: { en: 'Practical lessons' },
+    availableAt: '2024-11',
+  },
+  {
+    id: 'education-curriculum-gdevelop-team-careers',
+    titleByLocale: {
+      en: 'Careers in Tech: GDevelop team interviews',
+    },
+    descriptionByLocale: {
+      en:
+        'Interviews with people working at GDevelop: software engineers, designers, marketing...',
     },
     type: 'pdf-tutorial',
     category: 'education-curriculum',
-    duration: 360,
-    link:
-      'https://api-dev.gdevelop.io/asset/pdf-tutorial/education-curriculum-2/action/redirect-to-pdf',
     linkByLocale: {
       en:
-        'https://api-dev.gdevelop.io/asset/pdf-tutorial/education-curriculum-2/action/redirect-to-pdf',
+        'https://api.gdevelop.io/pdf-tutorial/education-curriculum-gdevelop-team-careers/action/redirect-to-pdf',
     },
-    thumbnailUrl:
-      'https://resources.gdevelop-app.com/tutorials/images/playlists/get-started.png',
     thumbnailUrlByLocale: {
       en:
-        'https://resources.gdevelop-app.com/tutorials/images/playlists/get-started.png',
+        'https://resources.gdevelop-app.com/tutorials/images/education-curriculum-gdevelop-team-careers.png',
     },
-    sectionByLocale: {
-      en: 'Theoretical lessons',
+    isPrivateTutorial: true,
+    redeemLinkByLocale: {
+      en: 'https://gdevelop.io/pricing/education',
     },
+    redeemHintByLocale: {
+      en:
+        'These interview are for education and accessible to teachers and subscribers to the GDevelop Education plan only.',
+    },
+    sectionByLocale: { en: 'Additional support material' },
     tagsByLocale: [
       {
-        en: 'Enemy AI',
-      },
-      {
-        en: '3D',
-      },
-      {
-        en: 'Single player',
+        en: 'GDevelop',
       },
     ],
   },
   {
-    id: 'education-curriculum-3',
-    isPrivateTutorial: true,
-    redeemHintByLocale: {
-      en: 'For education subscribers/teachers only.',
-    },
-    redeemLinkByLocale: {
-      en: 'https://gdevelop.io/pricing/education',
-    },
-    title: 'Practical education lesson',
+    id: 'education-curriculum-poster-dark-50x70cm',
     titleByLocale: {
-      en: 'Practical education lesson',
+      en: 'GDevelop poster, 50x70 cm (dark)',
     },
-    description:
-      'Teach the basics of GDevelop and game creation to your students.',
     descriptionByLocale: {
-      en: 'Teach the basics of GDevelop and game creation to your students.',
+      en:
+        'A poster (dark version) of GDevelop concepts, perfect for STEM teachers in computer classes or workshops.',
     },
     type: 'pdf-tutorial',
     category: 'education-curriculum',
-    link:
-      'https://api-dev.gdevelop.io/asset/pdf-tutorial/education-curriculum-2/action/redirect-to-pdf',
     linkByLocale: {
       en:
-        'https://api-dev.gdevelop.io/asset/pdf-tutorial/education-curriculum-2/action/redirect-to-pdf',
+        'https://api.gdevelop.io/pdf-tutorial/education-curriculum-poster-dark-50x70cm/action/redirect-to-pdf',
     },
-    thumbnailUrl:
-      'https://resources.gdevelop-app.com/tutorials/images/playlists/get-started.png',
     thumbnailUrlByLocale: {
       en:
-        'https://resources.gdevelop-app.com/tutorials/images/playlists/get-started.png',
+        'https://resources.gdevelop-app.com/tutorials/images/education-curriculum-poster-dark-50x70cm.png',
     },
-    sectionByLocale: {
-      en: 'Practical lessons',
+    isPrivateTutorial: true,
+    redeemLinkByLocale: {
+      en: 'https://gdevelop.io/pricing/education',
     },
+    redeemHintByLocale: {
+      en:
+        'This poster is made for education and accessible to teachers and subscribers to the GDevelop Education plan only.',
+    },
+    sectionByLocale: { en: 'Additional support material' },
     tagsByLocale: [
       {
-        en: 'Enemy AI',
+        en: 'GDevelop',
       },
+    ],
+  },
+  {
+    id: 'education-curriculum-poster-light-50x70cm',
+    titleByLocale: {
+      en: 'GDevelop poster, 50x70 cm (light)',
+    },
+    descriptionByLocale: {
+      en:
+        'A poster (light version) of GDevelop concepts, perfect for STEM teachers in computer classes or workshops.',
+    },
+    type: 'pdf-tutorial',
+    category: 'education-curriculum',
+    linkByLocale: {
+      en:
+        'https://api.gdevelop.io/pdf-tutorial/education-curriculum-poster-light-50x70cm/action/redirect-to-pdf',
+    },
+    thumbnailUrlByLocale: {
+      en:
+        'https://resources.gdevelop-app.com/tutorials/images/education-curriculum-poster-light-50x70cm.png',
+    },
+    isPrivateTutorial: true,
+    redeemLinkByLocale: {
+      en: 'https://gdevelop.io/pricing/education',
+    },
+    redeemHintByLocale: {
+      en:
+        'This poster is made for education and accessible to teachers and subscribers to the GDevelop Education plan only.',
+    },
+    sectionByLocale: { en: 'Additional support material' },
+    tagsByLocale: [
       {
-        en: 'Leaderboards',
-      },
-      {
-        en: 'Projectiles',
+        en: 'GDevelop',
       },
     ],
   },

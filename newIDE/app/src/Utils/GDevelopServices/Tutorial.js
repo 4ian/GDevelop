@@ -36,6 +36,8 @@ export type Tutorial = {|
   redeemLinkByLocale?: MessageByLocale,
   sectionByLocale?: MessageByLocale;
   tagsByLocale?: MessageByLocale[];
+  availableAt?: string,
+  gameLink?: string,
 |};
 
 export const canAccessTutorial = (

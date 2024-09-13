@@ -1,7 +1,7 @@
 // @flow
 
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import { type Limits } from '../../../../Utils/GDevelopServices/Usage';
 import {
@@ -35,7 +35,7 @@ const rankLabel = {
 };
 
 const styles = {
-  container: { maxWidth: 900 },
+  container: { maxWidth: 850 },
   thumbnail: {
     display: 'block', // Display as a block to prevent cumulative layout shift.
     objectFit: 'cover',
@@ -57,6 +57,7 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
+    color: 'white', // Force text/icon color since it's on a dark overlay.
   },
   imageContainer: {
     position: 'relative',
@@ -83,6 +84,12 @@ const LockedOverlay = () => (
   </div>
 );
 
+const UpcomingOverlay = ({ message }: { message: React.Node }) => (
+  <div style={styles.lockedOverlay}>
+    <Text color="inherit">{message}</Text>
+  </div>
+);
+
 type Props = {|
   i18n: I18nType,
   limits: ?Limits,
@@ -103,6 +110,15 @@ const EducationCurriculumLesson = ({
   const isLocked = limits
     ? !canAccessTutorial(tutorial, limits.capabilities)
     : true;
+
+  const isUpcomingMessage = tutorial.availableAt
+    ? i18n._(
+        t`Coming in ${i18n.date(new Date(Date.parse(tutorial.availableAt)), {
+          month: 'long',
+          year: 'numeric',
+        })}`
+      )
+    : null;
 
   const title = (
     <LineStackLayout noMargin alignItems="center">
@@ -139,7 +155,11 @@ const EducationCurriculumLesson = ({
             alt={`Lesson thumbnail`}
             onLoad={() => setIsImageLoaded(true)}
           />
-          {isLocked && <LockedOverlay />}
+          {isLocked ? (
+            <LockedOverlay />
+          ) : isUpcomingMessage ? (
+            <UpcomingOverlay message={isUpcomingMessage} />
+          ) : null}
         </div>
         <ColumnStackLayout justifyContent="space-between" noMargin expand>
           <ColumnStackLayout noMargin expand>

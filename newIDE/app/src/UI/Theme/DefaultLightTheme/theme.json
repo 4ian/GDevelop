@@ -561,6 +561,44 @@
           "value": "rgba(79, 40, 205, 0.16)"
         }
       }
+    },
+    "toggle-field": {
+      "default": {
+        "slider-color": {
+          "value": "#EBEBED",
+          "comment": "Palette/Grey/10"
+        },
+        "background-color": {
+          "value": "#606166",
+          "comment": "Palette/Grey/60"
+        }
+      },
+      "active": {
+        "slider-color": {
+          "value": "#5028cc",
+          "comment": "Palette/Purple/50"
+        },
+        "background-color": {
+          "value": "#9979f1",
+          "comment": "Palette/Purple/30"
+        }
+      },
+      "disabled": {
+        "slider-color": {
+          "value": "#A6A6AB",
+          "comment": "Palette/Grey/40"
+        },
+        "background-color": {
+          "value": "#7F7F85",
+          "comment": "Palette/Grey/50"
+        }
+      },
+      "hover": {
+        "slider-aura-color": {
+          "value": "rgba(197, 197, 201, 0.30)",
+          "comment": "Palette/Grey/30 and alpha"
+        }
+      }
     }
   },
   "input": {

@@ -8,6 +8,7 @@ import CompactSelectField from '../../../UI/CompactSelectField';
 import { ColumnStackLayout } from '../../../UI/Layout';
 import Layers from '../../../UI/CustomSvgIcons/Layers';
 import ElementHighlighterProvider from '../../ElementHighlighterProvider';
+import Text from '../../../UI/Text';
 
 export default {
   title: 'UI Building Blocks/CompactSelectField',
@@ -36,18 +37,22 @@ export const Default = () => {
       ]}
     >
       <ColumnStackLayout expand>
+        <Text size="block-title">Without icon</Text>
         <CompactSelectField value={value} onChange={setValue} id="without-icon">
           {options}
         </CompactSelectField>
+        <Text size="sub-title">Errored</Text>
         <CompactSelectField value={value1} onChange={setValue1} errored>
           {options}
         </CompactSelectField>
+        <Text size="sub-title">With empty option</Text>
         <CompactSelectField value={value2} onChange={setValue2}>
           {[
             <option style={{ display: 'none' }}>Select an option</option>,
             ...options,
           ]}
         </CompactSelectField>
+        <Text size="sub-title">Disabled</Text>
         <CompactSelectField
           disabled
           value={'disabled field'}
@@ -55,6 +60,7 @@ export const Default = () => {
         >
           {options}
         </CompactSelectField>
+        <Text size="block-title">With icon</Text>
         <CompactSelectField
           value={value3}
           onChange={setValue3}
@@ -64,6 +70,7 @@ export const Default = () => {
         >
           {options}
         </CompactSelectField>
+        <Text size="sub-title">errored</Text>
         <CompactSelectField
           value={value4}
           onChange={setValue4}
@@ -73,6 +80,7 @@ export const Default = () => {
         >
           {options}
         </CompactSelectField>
+        <Text size="sub-title">With empty option</Text>
         <CompactSelectField
           value={value5}
           onChange={setValue5}
@@ -84,6 +92,7 @@ export const Default = () => {
             ...options,
           ]}
         </CompactSelectField>
+        <Text size="sub-title">Disabled</Text>
         <CompactSelectField
           disabled
           value={'disabled field'}

@@ -126,7 +126,7 @@ const createField = (
       property.getExtraInfo().size() > 0 ? property.getExtraInfo().at(0) : '';
     return {
       name,
-      isHiddenWhenThereOnlyOneChoice: true,
+      isHiddenWhenOnlyOneChoice: true,
       valueType: 'string',
       getChoices: () => {
         return !object || behaviorType === ''

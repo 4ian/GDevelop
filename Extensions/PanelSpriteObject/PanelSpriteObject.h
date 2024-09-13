@@ -23,12 +23,18 @@ class GD_EXTENSION_API PanelSpriteObject : public gd::ObjectConfiguration {
  public:
   PanelSpriteObject();
   virtual ~PanelSpriteObject();
-  virtual std::unique_ptr<gd::ObjectConfiguration> Clone() const {
+  virtual std::unique_ptr<gd::ObjectConfiguration> Clone() const override {
     return std::unique_ptr<gd::ObjectConfiguration>(
         new PanelSpriteObject(*this));
   }
 
-  virtual void ExposeResources(gd::ArbitraryResourceWorker &worker);
+  virtual void ExposeResources(gd::ArbitraryResourceWorker &worker) override;
+
+  virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties()
+      const override;
+
+  virtual bool UpdateProperty(const gd::String& name,
+                              const gd::String& value) override;
 
   double GetWidth() const { return width; };
   double GetHeight() const { return height; };
@@ -63,14 +69,14 @@ class GD_EXTENSION_API PanelSpriteObject : public gd::ObjectConfiguration {
   };
   const gd::String &GetTexture() const { return textureName; };
 
-  gd::String textureName;  ///< deprecated. Use Get/SetTexture instead.
-
  private:
   virtual void DoUnserializeFrom(gd::Project &project,
-                                 const gd::SerializerElement &element);
+                                 const gd::SerializerElement &element) override;
 #if defined(GD_IDE_ONLY)
-  virtual void DoSerializeTo(gd::SerializerElement &element) const;
+  virtual void DoSerializeTo(gd::SerializerElement &element) const override;
 #endif
+
+  gd::String textureName;
 
   double width;
   double height;

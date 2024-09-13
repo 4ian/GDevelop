@@ -142,6 +142,8 @@ module.exports = function (grunt) {
       build: {
         src: [
           buildPath,
+          'Bindings/glue.cpp',
+          'Bindings/glue.js',
           buildOutputPath + 'libGD.js',
           buildOutputPath + 'libGD.wasm',
         ],

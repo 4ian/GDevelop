@@ -68,6 +68,7 @@ const createField = (
       },
       getLabel,
       getDescription,
+      hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       getEndAdornment,
     };
   } else if (valueType === 'string' || valueType === '') {
@@ -84,6 +85,7 @@ const createField = (
       },
       getLabel,
       getDescription,
+      hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
     };
   } else if (valueType === 'boolean') {
     return {
@@ -101,6 +103,7 @@ const createField = (
       },
       getLabel,
       getDescription,
+      hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
     };
   } else if (valueType === 'choice') {
     // Choice is a "string" (with a selector for the user in the UI)
@@ -122,6 +125,7 @@ const createField = (
       },
       getLabel,
       getDescription,
+      hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
     };
   } else if (valueType === 'behavior') {
     const behaviorType =
@@ -153,6 +157,7 @@ const createField = (
       },
       getLabel,
       getDescription,
+      hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
     };
   } else if (valueType === 'resource') {
     // Resource is a "string" (with a selector in the UI)
@@ -176,6 +181,7 @@ const createField = (
       },
       getLabel,
       getDescription,
+      hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
     };
   } else if (valueType === 'color') {
     return {
@@ -191,6 +197,7 @@ const createField = (
       },
       getLabel,
       getDescription,
+      hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
     };
   } else if (valueType === 'textarea') {
     return {
@@ -206,6 +213,7 @@ const createField = (
       },
       getLabel,
       getDescription,
+      hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
     };
   } else {
     console.error(

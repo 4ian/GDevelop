@@ -22,11 +22,17 @@ class GD_EXTENSION_API TiledSpriteObject : public gd::ObjectConfiguration {
  public:
   TiledSpriteObject();
   virtual ~TiledSpriteObject(){};
-  virtual std::unique_ptr<gd::ObjectConfiguration> Clone() const {
+  virtual std::unique_ptr<gd::ObjectConfiguration> Clone() const override {
     return gd::make_unique<TiledSpriteObject>(*this);
   }
 
-  virtual void ExposeResources(gd::ArbitraryResourceWorker &worker);
+  virtual void ExposeResources(gd::ArbitraryResourceWorker &worker) override;
+
+  virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties()
+      const override;
+
+  virtual bool UpdateProperty(const gd::String& name,
+                              const gd::String& value) override;
 
   virtual double GetWidth() const { return width; };
   virtual double GetHeight() const { return height; };
@@ -39,18 +45,16 @@ class GD_EXTENSION_API TiledSpriteObject : public gd::ObjectConfiguration {
   };
   const gd::String &GetTexture() const { return textureName; };
 
-  gd::String textureName;  ///< deprecated. Use Get/SetTexture instead.
-
  private:
   virtual void DoUnserializeFrom(gd::Project &project,
-                                 const gd::SerializerElement &element);
+                                 const gd::SerializerElement &element) override;
 #if defined(GD_IDE_ONLY)
-  virtual void DoSerializeTo(gd::SerializerElement &element) const;
+  virtual void DoSerializeTo(gd::SerializerElement &element) const override;
 #endif
 
+  gd::String textureName;
   double width;
   double height;
-  bool smooth;
 };
 
 #endif  // TILEDSPRITEOBJECT_H

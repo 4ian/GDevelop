@@ -981,6 +981,9 @@ interface Effect {
   void SetEffectType([Const] DOMString effectType_);
   [Const, Ref] DOMString GetEffectType();
 
+  void SetFolded(boolean val);
+  boolean IsFolded();
+
   void SetDoubleParameter([Const] DOMString name, double value);
   double GetDoubleParameter([Const] DOMString name);
   void SetStringParameter([Const] DOMString name, [Const] DOMString value);
@@ -1092,6 +1095,9 @@ interface PropertyDescriptor {
     boolean IsAdvanced();
     [Const, Ref] MeasurementUnit GetMeasurementUnit();
     [Ref] PropertyDescriptor SetMeasurementUnit([Const, Ref] MeasurementUnit measurementUnit);
+
+    boolean HasImpactOnOtherProperties();
+    [Ref] PropertyDescriptor SetHasImpactOnOtherProperties(boolean enable);
 
     QuickCustomization_Visibility GetQuickCustomizationVisibility();
     [Ref] PropertyDescriptor SetQuickCustomizationVisibility(QuickCustomization_Visibility visibility);

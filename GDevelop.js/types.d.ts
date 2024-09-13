@@ -807,6 +807,8 @@ export class Effect extends EmscriptenObject {
   getName(): string;
   setEffectType(effectType_: string): void;
   getEffectType(): string;
+  setFolded(val: boolean): void;
+  isFolded(): boolean;
   setDoubleParameter(name: string, value: number): void;
   getDoubleParameter(name: string): number;
   setStringParameter(name: string, value: string): void;
@@ -908,6 +910,8 @@ export class PropertyDescriptor extends EmscriptenObject {
   isAdvanced(): boolean;
   getMeasurementUnit(): MeasurementUnit;
   setMeasurementUnit(measurementUnit: MeasurementUnit): PropertyDescriptor;
+  hasImpactOnOtherProperties(): boolean;
+  setHasImpactOnOtherProperties(enable: boolean): PropertyDescriptor;
   getQuickCustomizationVisibility(): QuickCustomization_Visibility;
   setQuickCustomizationVisibility(visibility: QuickCustomization_Visibility): PropertyDescriptor;
   serializeTo(element: SerializerElement): void;

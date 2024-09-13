@@ -7,27 +7,18 @@ import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { useLongTouch } from '../../Utils/UseLongTouch';
 import CheckeredBackground from '../CheckeredBackground';
 
-const SPRITE_SIZE = 100;
-export const thumbnailContainerStyle = {
-  position: 'relative',
-  display: 'inline-block',
-  width: SPRITE_SIZE,
-  height: SPRITE_SIZE,
-  justifyContent: 'center',
-  alignItems: 'center',
-  lineHeight: SPRITE_SIZE + 'px',
-  textAlign: 'center',
-};
-
 const styles = {
   spriteThumbnail: {
-    ...thumbnailContainerStyle,
+    position: 'relative',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlign: 'center',
+    boxSizing: 'border-box',
+    flexShrink: 0,
   },
   spriteThumbnailImage: {
     position: 'relative',
-    maxWidth: SPRITE_SIZE,
-    maxHeight: SPRITE_SIZE,
-    verticalAlign: 'middle',
     pointerEvents: 'none',
   },
   checkboxContainer: {
@@ -49,6 +40,7 @@ type Props = {|
   selected?: boolean,
   onSelect?: (checked: boolean) => void,
   onContextMenu?: (x: number, y: number) => void,
+  size?: number,
 |};
 
 const ImageThumbnail = (props: Props) => {
@@ -72,7 +64,9 @@ const ImageThumbnail = (props: Props) => {
 
   const containerStyle = {
     ...styles.spriteThumbnail,
-    border: `2px solid ${borderColor}`,
+    width: props.size || 100,
+    height: props.size || 100,
+    border: `1px solid ${borderColor}`,
     borderRadius: 4,
     ...props.style,
   };
@@ -89,7 +83,11 @@ const ImageThumbnail = (props: Props) => {
     >
       <CheckeredBackground />
       <CorsAwareImage
-        style={styles.spriteThumbnailImage}
+        style={{
+          ...styles.spriteThumbnailImage,
+          maxWidth: props.size || 100,
+          maxHeight: props.size || 100,
+        }}
         alt={resourceName}
         src={resourcesLoader.getResourceFullUrl(project, resourceName, {})}
       />

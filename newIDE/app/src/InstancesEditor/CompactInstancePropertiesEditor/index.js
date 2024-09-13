@@ -46,7 +46,9 @@ export const styles = {
 };
 
 const noRefreshOfAllFields = () => {
-  console.warn("An instance tried to refresh all fields, but the editor doesn't support it.");
+  console.warn(
+    "An instance tried to refresh all fields, but the editor doesn't support it."
+  );
 };
 
 const gd: libGDevelop = global.gd;

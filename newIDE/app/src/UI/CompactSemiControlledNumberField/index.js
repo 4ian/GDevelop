@@ -48,8 +48,8 @@ type Props = {|
   useLeftIconAsNumberControl?: boolean,
   renderEndAdornmentOnHover?: (className: string) => React.Node,
   onClickEndAdornment?: () => void,
-  formatDisplayedValueOnFocus?: string => string,
-  formatDisplayedValueOnBlur?: string => string,
+  getValueFromDisplayedValue?: string => string,
+  getDisplayedValueFromValue?: string => string,
 
   errorText?: React.Node,
 |};
@@ -59,8 +59,8 @@ const CompactSemiControlledNumberField = ({
   onChange,
   errorText,
   commitOnBlur,
-  formatDisplayedValueOnFocus,
-  formatDisplayedValueOnBlur,
+  getValueFromDisplayedValue,
+  getDisplayedValueFromValue,
   ...otherProps
 }: Props) => {
   const textFieldRef = React.useRef<?CompactTextFieldInterface>(null);
@@ -141,8 +141,8 @@ const CompactSemiControlledNumberField = ({
     [commitOnBlur, onChange]
   );
 
-  const stringValue = formatDisplayedValueOnBlur
-    ? formatDisplayedValueOnBlur(value.toString())
+  const stringValue = getDisplayedValueFromValue
+    ? getDisplayedValueFromValue(value.toString())
     : value.toString();
 
   return (
@@ -154,8 +154,8 @@ const CompactSemiControlledNumberField = ({
         onChange={onChangeValue}
         onFocus={event => {
           setFocused(true);
-          const originalStringValue = formatDisplayedValueOnFocus
-            ? formatDisplayedValueOnFocus(stringValue)
+          const originalStringValue = getValueFromDisplayedValue
+            ? getValueFromDisplayedValue(stringValue)
             : stringValue;
           setTemporaryValue(originalStringValue);
         }}
@@ -215,8 +215,8 @@ const CompactSemiControlledNumberField = ({
           }
         }}
         onBlur={event => {
-          const newValue = formatDisplayedValueOnBlur
-            ? formatDisplayedValueOnBlur(temporaryValue)
+          const newValue = getDisplayedValueFromValue
+            ? getDisplayedValueFromValue(temporaryValue)
             : temporaryValue;
           if (!cancelEditionRef.current) onChangeValue(newValue, 'blur');
           setFocused(false);

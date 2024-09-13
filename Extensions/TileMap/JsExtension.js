@@ -1687,35 +1687,27 @@ module.exports = {
        * This is used to reload the Tilemap
        */
       updateTileMap() {
+        const tilemapObjectProperties = this._associatedObjectConfiguration.getProperties();
+
         // Get the tileset resource to use
-        const tilemapAtlasImage = this._associatedObjectConfiguration
-          .getProperties()
+        const tilemapAtlasImage = tilemapObjectProperties
           .get('tilemapAtlasImage')
           .getValue();
-        const tilemapJsonFile = this._associatedObjectConfiguration
-          .getProperties()
+        const tilemapJsonFile = tilemapObjectProperties
           .get('tilemapJsonFile')
           .getValue();
-        const tilesetJsonFile = this._associatedObjectConfiguration
-          .getProperties()
+        const tilesetJsonFile = tilemapObjectProperties
           .get('tilesetJsonFile')
           .getValue();
         const layerIndex = parseInt(
-          this._associatedObjectConfiguration
-            .getProperties()
-            .get('layerIndex')
-            .getValue(),
+          tilemapObjectProperties.get('layerIndex').getValue(),
           10
         );
         const levelIndex = parseInt(
-          this._associatedObjectConfiguration
-            .getProperties()
-            .get('levelIndex')
-            .getValue(),
+          tilemapObjectProperties.get('levelIndex').getValue(),
           10
         );
-        const displayMode = this._associatedObjectConfiguration
-          .getProperties()
+        const displayMode = tilemapObjectProperties
           .get('displayMode')
           .getValue();
 
@@ -1808,35 +1800,27 @@ module.exports = {
        * This is called to update the PIXI object on the scene editor, without reloading the tilemap.
        */
       updatePixiTileMap() {
+        const tilemapObjectProperties = this._associatedObjectConfiguration.getProperties();
+
         // Get the tileset resource to use
-        const tilemapAtlasImage = this._associatedObjectConfiguration
-          .getProperties()
+        const tilemapAtlasImage = tilemapObjectProperties
           .get('tilemapAtlasImage')
           .getValue();
-        const tilemapJsonFile = this._associatedObjectConfiguration
-          .getProperties()
+        const tilemapJsonFile = tilemapObjectProperties
           .get('tilemapJsonFile')
           .getValue();
-        const tilesetJsonFile = this._associatedObjectConfiguration
-          .getProperties()
+        const tilesetJsonFile = tilemapObjectProperties
           .get('tilesetJsonFile')
           .getValue();
         const layerIndex = parseInt(
-          this._associatedObjectConfiguration
-            .getProperties()
-            .get('layerIndex')
-            .getValue(),
+          tilemapObjectProperties.get('layerIndex').getValue(),
           10
         );
         const levelIndex = parseInt(
-          this._associatedObjectConfiguration
-            .getProperties()
-            .get('levelIndex')
-            .getValue(),
+          tilemapObjectProperties.get('levelIndex').getValue(),
           10
         );
-        const displayMode = this._associatedObjectConfiguration
-          .getProperties()
+        const displayMode = tilemapObjectProperties
           .get('displayMode')
           .getValue();
 
@@ -1982,6 +1966,7 @@ module.exports = {
               editableLayer.setAlpha(alphaForDisplay);
             }
           }
+          // Only update the tilemap if the alpha has changed.
           this.updatePixiTileMap();
         }
       }

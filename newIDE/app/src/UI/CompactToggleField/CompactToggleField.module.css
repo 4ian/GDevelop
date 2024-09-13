@@ -25,32 +25,57 @@
 
 .slider {
   position: absolute;
-  cursor: pointer;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #3a3a3a;
+  background-color: var(--theme-toggle-field-default-background-color);
   transition: 0.2s;
   border-radius: 16px;
 }
-
-.slider:before {
+.handle {
   position: absolute;
   content: '';
   height: 12px;
   width: 12px;
-  left: 2px;
-  bottom: 2px;
-  background-color: white;
+  left: 3px;
+  bottom: 3px;
+  background-color: var(--theme-toggle-field-default-slider-color);
   transition: 0.2s;
   border-radius: 50%;
+  z-index: 2;
+}
+.handleContainer {
+  position: absolute;
+  content: '';
+  height: 18px;
+  width: 18px;
+  left: -1px;
+  bottom: -1px;
+  background-color: none;
+  border-radius: 50%;
+  z-index: 1;
+  transition: 0.2s;
+}
+
+.slider:hover .handleContainer:not(.disabled) {
+  background-color: var(--theme-toggle-field-hover-slider-aura-color);
+}
+
+.handleContainer.checked {
+  transform: translateX(16px);
 }
 
 .slider.checked {
-  background-color: #4c2f8c;
+  background-color: var(--theme-toggle-field-active-background-color);
+}
+.handle.checked {
+  background-color: var(--theme-toggle-field-active-slider-color);
 }
 
-.slider.checked:before {
-  transform: translateX(16px);
+.slider.disabled {
+  background-color: var(--theme-toggle-field-disabled-background-color);
+}
+.handle.disabled {
+  background-color: var(--theme-toggle-field-disabled-slider-color);
 }

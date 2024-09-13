@@ -932,7 +932,7 @@ module.exports = {
             'The top of the image can touch the **top face** (Y) or the **bottom face** (X).'
           )
         )
-        .setGroup(_('Textures'));
+        .setGroup(_('Face orientation'));
 
       objectProperties
         .getOrCreate('leftFaceResourceName')
@@ -2316,68 +2316,73 @@ module.exports = {
         );
 
         const properties = associatedObjectConfiguration.getProperties();
-        this._defaultWidth = parseFloat(properties.get('width').getValue());
-        this._defaultHeight = parseFloat(properties.get('height').getValue());
-        this._defaultDepth = parseFloat(properties.get('depth').getValue());
+        this._defaultWidth = 1;
+        this._defaultHeight = 1;
+        this._defaultDepth = 1;
 
         this._pixiObject = new PIXI.Graphics();
         this._pixiContainer.addChild(this._pixiObject);
 
-        this._faceResourceNames = [
-          properties.get('frontFaceResourceName').getValue(),
-          properties.get('backFaceResourceName').getValue(),
-          properties.get('leftFaceResourceName').getValue(),
-          properties.get('rightFaceResourceName').getValue(),
-          properties.get('topFaceResourceName').getValue(),
-          properties.get('bottomFaceResourceName').getValue(),
-        ];
-        this._faceVisibilities = [
-          properties.get('frontFaceVisible').getValue() === 'true',
-          properties.get('backFaceVisible').getValue() === 'true',
-          properties.get('leftFaceVisible').getValue() === 'true',
-          properties.get('rightFaceVisible').getValue() === 'true',
-          properties.get('topFaceVisible').getValue() === 'true',
-          properties.get('bottomFaceVisible').getValue() === 'true',
-        ];
-        this._shouldRepeatTextureOnFace = [
-          properties.get('frontFaceResourceRepeat').getValue() === 'true',
-          properties.get('backFaceResourceRepeat').getValue() === 'true',
-          properties.get('leftFaceResourceRepeat').getValue() === 'true',
-          properties.get('rightFaceResourceRepeat').getValue() === 'true',
-          properties.get('topFaceResourceRepeat').getValue() === 'true',
-          properties.get('bottomFaceResourceRepeat').getValue() === 'true',
-        ];
-        this._facesOrientation = properties.get('facesOrientation').getValue();
-        this._backFaceUpThroughWhichAxisRotation = properties
-          .get('backFaceUpThroughWhichAxisRotation')
-          .getValue();
-        this._shouldUseTransparentTexture =
-          properties.get('enableTextureTransparency').getValue() === 'true';
+        this._faceResourceNames = ['', '', '', '', '', ''];
+        this._faceVisibilities = [true, true, true, true, true, true];
+        this._shouldRepeatTextureOnFace = [true, true, true, true, true, true];
+        this._facesOrientation = 'Y';
+        this._backFaceUpThroughWhichAxisRotation = 'X';
+        this._shouldUseTransparentTexture = false;
 
         const geometry = new THREE.BoxGeometry(1, 1, 1);
         const materials = [
-          this._getFaceMaterial(project, materialIndexToFaceIndex[0]),
-          this._getFaceMaterial(project, materialIndexToFaceIndex[1]),
-          this._getFaceMaterial(project, materialIndexToFaceIndex[2]),
-          this._getFaceMaterial(project, materialIndexToFaceIndex[3]),
-          this._getFaceMaterial(project, materialIndexToFaceIndex[4]),
-          this._getFaceMaterial(project, materialIndexToFaceIndex[5]),
+          getTransparentMaterial(),
+          getTransparentMaterial(),
+          getTransparentMaterial(),
+          getTransparentMaterial(),
+          getTransparentMaterial(),
+          getTransparentMaterial(),
         ];
         this._threeObject = new THREE.Mesh(geometry, materials);
         this._threeObject.rotation.order = 'ZYX';
-
         this._threeGroup.add(this._threeObject);
+
+        this.updateThreeObject();
       }
 
-      _getFaceMaterial(project, faceIndex) {
-        if (!this._faceVisibilities[faceIndex]) return getTransparentMaterial();
+      _updateThreeObjectMaterials() {
+        const getFaceMaterial = (project, faceIndex) => {
+          if (!this._faceVisibilities[faceIndex])
+            return getTransparentMaterial();
 
-        return this._pixiResourcesLoader.getThreeMaterial(
-          project,
-          this._faceResourceNames[faceIndex],
-          {
-            useTransparentTexture: this._shouldUseTransparentTexture,
-          }
+          return this._pixiResourcesLoader.getThreeMaterial(
+            project,
+            this._faceResourceNames[faceIndex],
+            {
+              useTransparentTexture: this._shouldUseTransparentTexture,
+            }
+          );
+        };
+
+        this._threeObject.material[0] = getFaceMaterial(
+          this._project,
+          materialIndexToFaceIndex[0]
+        );
+        this._threeObject.material[1] = getFaceMaterial(
+          this._project,
+          materialIndexToFaceIndex[1]
+        );
+        this._threeObject.material[2] = getFaceMaterial(
+          this._project,
+          materialIndexToFaceIndex[2]
+        );
+        this._threeObject.material[3] = getFaceMaterial(
+          this._project,
+          materialIndexToFaceIndex[3]
+        );
+        this._threeObject.material[4] = getFaceMaterial(
+          this._project,
+          materialIndexToFaceIndex[4]
+        );
+        this._threeObject.material[5] = getFaceMaterial(
+          this._project,
+          materialIndexToFaceIndex[5]
         );
       }
 
@@ -2386,6 +2391,11 @@ module.exports = {
       }
 
       updateThreeObject() {
+        const properties = this._associatedObjectConfiguration.getProperties();
+        this._defaultWidth = parseFloat(properties.get('width').getValue());
+        this._defaultHeight = parseFloat(properties.get('height').getValue());
+        this._defaultDepth = parseFloat(properties.get('depth').getValue());
+
         const width = this.getWidth();
         const height = this.getHeight();
         const depth = this.getDepth();
@@ -2402,18 +2412,108 @@ module.exports = {
           RenderedInstance.toRad(this._instance.getAngle())
         );
 
+        let materialsDirty = false;
+
+        const shouldUseTransparentTexture =
+          properties.get('enableTextureTransparency').getValue() === 'true';
+        if (this._shouldUseTransparentTexture !== shouldUseTransparentTexture) {
+          this._shouldUseTransparentTexture = shouldUseTransparentTexture;
+          materialsDirty = true;
+        }
+
+        const faceResourceNames = [
+          properties.get('frontFaceResourceName').getValue(),
+          properties.get('backFaceResourceName').getValue(),
+          properties.get('leftFaceResourceName').getValue(),
+          properties.get('rightFaceResourceName').getValue(),
+          properties.get('topFaceResourceName').getValue(),
+          properties.get('bottomFaceResourceName').getValue(),
+        ];
+        if (
+          this._faceResourceNames[0] !== faceResourceNames[0] ||
+          this._faceResourceNames[1] !== faceResourceNames[1] ||
+          this._faceResourceNames[2] !== faceResourceNames[2] ||
+          this._faceResourceNames[3] !== faceResourceNames[3] ||
+          this._faceResourceNames[4] !== faceResourceNames[4] ||
+          this._faceResourceNames[5] !== faceResourceNames[5]
+        ) {
+          this._faceResourceNames = faceResourceNames;
+          materialsDirty = true;
+        }
+
+        const faceVisibilities = [
+          properties.get('frontFaceVisible').getValue() === 'true',
+          properties.get('backFaceVisible').getValue() === 'true',
+          properties.get('leftFaceVisible').getValue() === 'true',
+          properties.get('rightFaceVisible').getValue() === 'true',
+          properties.get('topFaceVisible').getValue() === 'true',
+          properties.get('bottomFaceVisible').getValue() === 'true',
+        ];
+        if (
+          this._faceVisibilities[0] !== faceVisibilities[0] ||
+          this._faceVisibilities[1] !== faceVisibilities[1] ||
+          this._faceVisibilities[2] !== faceVisibilities[2] ||
+          this._faceVisibilities[3] !== faceVisibilities[3] ||
+          this._faceVisibilities[4] !== faceVisibilities[4] ||
+          this._faceVisibilities[5] !== faceVisibilities[5]
+        ) {
+          this._faceVisibilities = faceVisibilities;
+          materialsDirty = true;
+        }
+
+        let uvMappingDirty = false;
+
+        const shouldRepeatTextureOnFace = [
+          properties.get('frontFaceResourceRepeat').getValue() === 'true',
+          properties.get('backFaceResourceRepeat').getValue() === 'true',
+          properties.get('leftFaceResourceRepeat').getValue() === 'true',
+          properties.get('rightFaceResourceRepeat').getValue() === 'true',
+          properties.get('topFaceResourceRepeat').getValue() === 'true',
+          properties.get('bottomFaceResourceRepeat').getValue() === 'true',
+        ];
+        if (
+          this._shouldRepeatTextureOnFace[0] !== shouldRepeatTextureOnFace[0] ||
+          this._shouldRepeatTextureOnFace[1] !== shouldRepeatTextureOnFace[1] ||
+          this._shouldRepeatTextureOnFace[2] !== shouldRepeatTextureOnFace[2] ||
+          this._shouldRepeatTextureOnFace[3] !== shouldRepeatTextureOnFace[3] ||
+          this._shouldRepeatTextureOnFace[4] !== shouldRepeatTextureOnFace[4] ||
+          this._shouldRepeatTextureOnFace[5] !== shouldRepeatTextureOnFace[5]
+        ) {
+          this._shouldRepeatTextureOnFace = shouldRepeatTextureOnFace;
+          uvMappingDirty = true;
+        }
+
+        const backFaceUpThroughWhichAxisRotation = properties
+          .get('backFaceUpThroughWhichAxisRotation')
+          .getValue();
+        if (
+          backFaceUpThroughWhichAxisRotation !==
+          this._backFaceUpThroughWhichAxisRotation
+        ) {
+          this._backFaceUpThroughWhichAxisRotation = backFaceUpThroughWhichAxisRotation;
+          uvMappingDirty = true;
+        }
+
+        const facesOrientation = properties.get('facesOrientation').getValue();
+        if (facesOrientation !== this._facesOrientation) {
+          this._facesOrientation = facesOrientation;
+          uvMappingDirty = true;
+        }
+
         const scaleX = width * (this._instance.isFlippedX() ? -1 : 1);
         const scaleY = height * (this._instance.isFlippedY() ? -1 : 1);
         const scaleZ = depth * (this._instance.isFlippedZ() ? -1 : 1);
-
         if (
           scaleX !== this._threeObject.scale.width ||
           scaleY !== this._threeObject.scale.height ||
           scaleZ !== this._threeObject.scale.depth
         ) {
           this._threeObject.scale.set(scaleX, scaleY, scaleZ);
-          this.updateTextureUvMapping();
+          uvMappingDirty = true;
         }
+
+        if (materialsDirty) this._updateThreeObjectMaterials();
+        if (uvMappingDirty) this._updateTextureUvMapping();
       }
 
       /**
@@ -2422,7 +2522,7 @@ module.exports = {
        * The mesh must be configured with a list of materials in order
        * for the method to work.
        */
-      updateTextureUvMapping() {
+      _updateTextureUvMapping() {
         // @ts-ignore - position is stored as a Float32BufferAttribute
         /** @type {THREE.BufferAttribute} */
         const pos = this._threeObject.geometry.getAttribute('position');

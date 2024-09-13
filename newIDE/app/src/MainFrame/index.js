@@ -1138,6 +1138,7 @@ const MainFrame = (props: Props) => {
     createProjectFromExample,
     createProjectFromPrivateGameTemplate,
     createProjectFromInAppTutorial,
+    createProjectFromTutorial,
     createProjectWithLogin,
     createProjectFromAIGeneration,
   } = useCreateProject({
@@ -2984,6 +2985,34 @@ const MainFrame = (props: Props) => {
     }
   };
 
+  const openTemplateFromTutorial = React.useCallback(
+    async (tutorialId: string) => {
+      const projectIsClosed = await askToCloseProject();
+      if (!projectIsClosed) {
+        return;
+      }
+      try {
+        await createProjectFromTutorial(tutorialId, {
+          storageProvider: emptyStorageProvider,
+          saveAsLocation: null,
+          // Remaining will be set by the template.
+        });
+      } catch (error) {
+        showErrorBox({
+          message: i18n._(
+            t`Unable to create a new project for the tutorial. Try again later.`
+          ),
+          rawError: new Error(
+            `Can't create project from template of tutorial "${tutorialId}"`
+          ),
+          errorId: 'cannot-create-project-from-tutorial-template',
+        });
+        return;
+      }
+    },
+    [askToCloseProject, createProjectFromTutorial, i18n]
+  );
+
   const startSelectedTutorial = React.useCallback(
     async (scenario: 'resume' | 'startOver' | 'start') => {
       if (!selectedInAppTutorialInfo) return;
@@ -3474,6 +3503,7 @@ const MainFrame = (props: Props) => {
                         openSceneEditor: false,
                       });
                     },
+                    onOpenTemplateFromTutorial: openTemplateFromTutorial,
                     previewDebuggerServer,
                     hotReloadPreviewButtonProps,
                     onOpenLayout: name => {

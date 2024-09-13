@@ -31,6 +31,7 @@ type EducationCurriculumProps = {|
   limits: ?Limits,
   tutorials: Tutorial[],
   onSelectTutorial: Tutorial => void,
+  onOpenTemplateFromTutorial: string => Promise<void>,
 |};
 
 const EducationCurriculum = ({
@@ -38,6 +39,7 @@ const EducationCurriculum = ({
   limits,
   tutorials,
   onSelectTutorial,
+  onOpenTemplateFromTutorial,
 }: EducationCurriculumProps) => {
   const listItems: React.Node[] = React.useMemo(
     () => {
@@ -67,13 +69,20 @@ const EducationCurriculum = ({
             tutorial={tutorial}
             onSelectTutorial={onSelectTutorial}
             index={sectionIndex}
+            onOpenTemplateFromTutorial={
+              tutorial.templateUrl
+                ? () => {
+                    onOpenTemplateFromTutorial(tutorial.id);
+                  }
+                : null
+            }
           />
         );
         sectionIndex += 1;
       });
       return items;
     },
-    [tutorials, i18n, limits, onSelectTutorial]
+    [tutorials, i18n, limits, onSelectTutorial, onOpenTemplateFromTutorial]
   );
 
   return (
@@ -100,9 +109,15 @@ type Props = {|
   onBack: () => void,
   tutorials: Array<Tutorial>,
   category: TutorialCategory,
+  onOpenTemplateFromTutorial: string => Promise<void>,
 |};
 
-const TutorialsCategoryPage = ({ category, tutorials, onBack }: Props) => {
+const TutorialsCategoryPage = ({
+  category,
+  tutorials,
+  onBack,
+  onOpenTemplateFromTutorial,
+}: Props) => {
   const { limits } = React.useContext(AuthenticatedUserContext);
   const texts = TUTORIAL_CATEGORY_TEXTS[category];
   const filteredTutorials = tutorials.filter(
@@ -129,6 +144,7 @@ const TutorialsCategoryPage = ({ category, tutorials, onBack }: Props) => {
                 onSelectTutorial={setSelectedTutorial}
                 i18n={i18n}
                 limits={limits}
+                onOpenTemplateFromTutorial={onOpenTemplateFromTutorial}
               />
             ) : (
               <ImageTileGrid

@@ -119,6 +119,7 @@ type Props = {|
   onTabChange: (tab: HomeTab) => void,
   selectInAppTutorial: (tutorialId: string) => void,
   initialCategory: TutorialCategory | null,
+  onOpenTemplateFromTutorial: string => Promise<void>,
 |};
 
 const LearnSection = ({
@@ -126,6 +127,7 @@ const LearnSection = ({
   onTabChange,
   selectInAppTutorial,
   initialCategory,
+  onOpenTemplateFromTutorial,
 }: Props) => {
   const {
     tutorials,
@@ -181,6 +183,7 @@ const LearnSection = ({
       onBack={() => setSelectedCategory(null)}
       category={selectedCategory}
       tutorials={tutorials}
+      onOpenTemplateFromTutorial={onOpenTemplateFromTutorial}
     />
   );
 };

@@ -112,6 +112,7 @@ export type RenderEditorContainerProps = {|
     newProjectSetup: NewProjectSetup,
     i18n: I18nType
   ) => Promise<void>,
+  onOpenTemplateFromTutorial: (tutorialId: string) => Promise<void>,
 
   // Project save
   onSave: () => Promise<void>,

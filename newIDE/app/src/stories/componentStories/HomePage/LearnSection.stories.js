@@ -24,7 +24,9 @@ export default {
 };
 
 export const Default = () => (
-  <AuthenticatedUserContext.Provider value={fakeAuthenticatedUserWithNoSubscription}>
+  <AuthenticatedUserContext.Provider
+    value={fakeAuthenticatedUserWithNoSubscription}
+  >
     <PreferencesContext.Provider value={initialPreferences}>
       <TutorialContext.Provider
         value={{
@@ -38,6 +40,7 @@ export const Default = () => (
           onOpenExampleStore={action('onOpenExampleStore')}
           onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
+          onOpenTemplateFromTutorial={action('onOpenTemplateFromTutorial')}
         />
       </TutorialContext.Provider>
     </PreferencesContext.Provider>
@@ -61,6 +64,7 @@ export const EducationSubscriber = () => (
           onOpenExampleStore={action('onOpenExampleStore')}
           onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
+          onOpenTemplateFromTutorial={action('onOpenTemplateFromTutorial')}
         />
       </TutorialContext.Provider>
     </PreferencesContext.Provider>
@@ -84,6 +88,7 @@ export const EducationTeacher = () => (
           onOpenExampleStore={action('onOpenExampleStore')}
           onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
+          onOpenTemplateFromTutorial={action('onOpenTemplateFromTutorial')}
         />
       </TutorialContext.Provider>
     </PreferencesContext.Provider>
@@ -104,6 +109,7 @@ export const Loading = () => (
         onOpenExampleStore={action('onOpenExampleStore')}
         onTabChange={() => {}}
         selectInAppTutorial={action('selectInAppTutorial')}
+        onOpenTemplateFromTutorial={action('onOpenTemplateFromTutorial')}
       />
     </TutorialContext.Provider>
   </PreferencesContext.Provider>

@@ -127,6 +127,7 @@ type Props = {|
     newProjectSetup: NewProjectSetup,
     i18n: I18nType
   ) => Promise<void>,
+  onOpenTemplateFromTutorial: (tutorialId: string) => Promise<void>,
 
   // Project save
   onSave: () => Promise<void>,
@@ -174,6 +175,7 @@ export const HomePage = React.memo<Props>(
         canSave,
         resourceManagementProps,
         askToCloseProject,
+        onOpenTemplateFromTutorial,
       }: Props,
       ref
     ) => {
@@ -528,6 +530,7 @@ export const HomePage = React.memo<Props>(
                       onOpenExampleStore={onOpenExampleStore}
                       onTabChange={setActiveTab}
                       selectInAppTutorial={selectInAppTutorial}
+                      onOpenTemplateFromTutorial={onOpenTemplateFromTutorial}
                       initialCategory={learnInitialCategory}
                     />
                   )}
@@ -638,6 +641,7 @@ export const renderHomePageContainer = (
     }
     onOpenNewProjectSetupDialog={props.onOpenNewProjectSetupDialog}
     onOpenProjectManager={props.onOpenProjectManager}
+    onOpenTemplateFromTutorial={props.onOpenTemplateFromTutorial}
     onOpenLanguageDialog={props.onOpenLanguageDialog}
     onOpenProfile={props.onOpenProfile}
     onCreateProjectFromExample={props.onCreateProjectFromExample}

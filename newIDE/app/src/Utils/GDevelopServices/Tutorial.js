@@ -34,10 +34,11 @@ export type Tutorial = {|
   isPrivateTutorial?: boolean,
   redeemHintByLocale?: MessageByLocale,
   redeemLinkByLocale?: MessageByLocale,
-  sectionByLocale?: MessageByLocale;
-  tagsByLocale?: MessageByLocale[];
+  sectionByLocale?: MessageByLocale,
+  tagsByLocale?: MessageByLocale[],
   availableAt?: string,
   gameLink?: string,
+  templateUrl?: string,
 |};
 
 export const canAccessTutorial = (

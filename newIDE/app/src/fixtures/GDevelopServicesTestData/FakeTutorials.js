@@ -76,6 +76,8 @@ export const fakeTutorials: Array<Tutorial> = [
     tagsByLocale: [{ en: 'Single player' }, { en: 'Beginner' }],
     sectionByLocale: { en: 'Practical lessons' },
     gameLink: 'https://gd.games/gdevelop/flappy-cat',
+    templateUrl:
+      'https://resources.gdevelop-app.com/tutorials/templates/flappy-cat/game.json',
   },
   {
     id: 'education-curriculum-angry-pigs',

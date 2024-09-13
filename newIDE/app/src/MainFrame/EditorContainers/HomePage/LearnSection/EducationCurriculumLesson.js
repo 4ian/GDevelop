@@ -99,6 +99,7 @@ type Props = {|
   tutorial: Tutorial,
   onSelectTutorial: (tutorial: Tutorial) => void,
   index: number,
+  onOpenTemplateFromTutorial: ?(string) => void,
 |};
 
 const EducationCurriculumLesson = ({
@@ -107,6 +108,7 @@ const EducationCurriculumLesson = ({
   limits,
   onSelectTutorial,
   index,
+  onOpenTemplateFromTutorial,
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const [isImageLoaded, setIsImageLoaded] = React.useState<boolean>(false);
@@ -168,6 +170,14 @@ const EducationCurriculumLesson = ({
         <ColumnStackLayout justifyContent="space-between" noMargin expand>
           <ColumnStackLayout noMargin expand>
             {!isMobile && title}
+            {gameLink && isMobile && !isUpcomingMessage && !isLocked && (
+              <FlatButton
+                primary
+                leftIcon={<Play fontSize="small" />}
+                label={<Trans>Play game</Trans>}
+                onClick={() => Window.openExternalURL(gameLink)}
+              />
+            )}
             <div style={styles.tagsContainer}>
               {tutorial.tagsByLocale &&
                 tutorial.tagsByLocale.map(tagByLocale => {
@@ -192,8 +202,9 @@ const EducationCurriculumLesson = ({
               noMargin
               alignItems="center"
               justifyContent={gameLink ? 'space-between' : 'flex-end'}
+              expand={isMobile}
             >
-              {gameLink && (
+              {gameLink && !isMobile && (
                 <FlatButton
                   primary
                   leftIcon={<Play fontSize="small" />}
@@ -201,12 +212,23 @@ const EducationCurriculumLesson = ({
                   onClick={() => Window.openExternalURL(gameLink)}
                 />
               )}
-              <RaisedButton
-                primary
-                disabled={isLocked}
-                label={<Trans>Open lesson</Trans>}
-                onClick={() => onSelectTutorial(tutorial)}
-              />
+              <LineStackLayout noMargin alignItems="center" expand={isMobile}>
+                {onOpenTemplateFromTutorial && (
+                  <FlatButton
+                    primary
+                    fullWidth={isMobile}
+                    label={<Trans>Open project</Trans>}
+                    onClick={onOpenTemplateFromTutorial}
+                  />
+                )}
+                <RaisedButton
+                  primary
+                  fullWidth={isMobile}
+                  disabled={isLocked}
+                  label={<Trans>Open lesson</Trans>}
+                  onClick={() => onSelectTutorial(tutorial)}
+                />
+              </LineStackLayout>
             </LineStackLayout>
           )}
         </ColumnStackLayout>

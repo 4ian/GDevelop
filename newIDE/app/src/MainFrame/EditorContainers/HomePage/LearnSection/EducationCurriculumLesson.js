@@ -155,6 +155,7 @@ const EducationCurriculumLesson = ({
             style={{
               // Once ready, animate the image display.
               opacity: isImageLoaded ? 1 : 0,
+              filter: isUpcomingMessage ? 'grayscale(1)' : undefined,
               ...styles.thumbnail,
             }}
             src={selectMessageByLocale(i18n, tutorial.thumbnailUrlByLocale)}

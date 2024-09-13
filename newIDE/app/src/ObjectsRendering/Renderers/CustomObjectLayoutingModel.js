@@ -1,6 +1,4 @@
 // @flow
-import { mapFor } from '../../Utils/MapFor';
-
 const gd: libGDevelop = global.gd;
 
 // - The term "object" is used in comments about the layout declaration because
@@ -59,12 +57,16 @@ export interface PropertiesContainer {
  */
 export const getObjectAnchor = (
   eventBasedObject: gdEventsBasedObject,
-  customObjectConfiguration: PropertiesContainer,
   objectName: string
 ): ObjectAnchor => {
   const childObject = eventBasedObject.getObjects().getObject(objectName);
   if (!childObject.hasBehaviorNamed('Anchor')) {
-    return null;
+    return {
+      leftEdgeAnchor: gd.CustomObjectConfiguration.NoAnchor,
+      topEdgeAnchor: gd.CustomObjectConfiguration.NoAnchor,
+      rightEdgeAnchor: gd.CustomObjectConfiguration.NoAnchor,
+      bottomEdgeAnchor: gd.CustomObjectConfiguration.NoAnchor,
+    };
   }
   const properties = childObject.getBehavior('Anchor').getProperties();
   const leftEdgeAnchor = getPropertyValue(properties, 'leftEdgeAnchor');
@@ -295,7 +297,6 @@ export interface LayoutedParent<
   CovariantChildRenderedInstance: ChildRenderedInstance
 > {
   eventBasedObject: gdEventsBasedObject | null;
-  _associatedObjectConfiguration: gdObjectConfiguration;
   getWidth(): number;
   getHeight(): number;
   getRendererOfInstance: (
@@ -312,9 +313,6 @@ export const getLayoutedRenderedInstance = <T: ChildRenderedInstance>(
   if (!eventBasedObject) {
     return null;
   }
-  const customObjectConfiguration = gd.asCustomObjectConfiguration(
-    parent._associatedObjectConfiguration
-  );
 
   const layoutedInstance = parent.getLayoutedInstance(initialInstance);
   const renderedInstance = parent.getRendererOfInstance(
@@ -323,7 +321,6 @@ export const getLayoutedRenderedInstance = <T: ChildRenderedInstance>(
 
   const objectAnchor = getObjectAnchor(
     eventBasedObject,
-    customObjectConfiguration,
     layoutedInstance.getObjectName()
   );
   const leftEdgeAnchor = objectAnchor
@@ -435,7 +432,7 @@ export const getLayoutedRenderedInstance = <T: ChildRenderedInstance>(
   } else {
     const parentInitialCenterY = (parentInitialMaxY + parentInitialMinY) / 2;
 
-    const parentMinY = parentInitialMinY * parentScaleX;
+    const parentMinY = parentInitialMinY * parentScaleY;
     const parentMaxY = parentInitialMaxY * parentScaleY;
     const parentCenterY = (parentMaxY + parentMinY) / 2;
 

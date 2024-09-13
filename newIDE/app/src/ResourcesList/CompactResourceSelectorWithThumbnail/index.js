@@ -256,7 +256,7 @@ export const CompactResourceSelectorWithThumbnail = ({
       </div>
       <ElementWithMenu
         element={
-          <IconButton size="small" onClick={() => {}}>
+          <IconButton size="small">
             <Edit style={styles.icon} />
           </IconButton>
         }

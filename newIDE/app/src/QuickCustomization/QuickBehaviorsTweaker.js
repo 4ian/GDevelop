@@ -30,8 +30,11 @@ const QuickBehaviorPropertiesEditor = ({
 |}) => {
   const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
   const basicPropertiesSchema = React.useMemo(
-    () =>
-      propertiesMapToSchema(
+    () => {
+      if (schemaRecomputeTrigger) {
+        // schemaRecomputeTrigger allows to invalidate the schema when required.
+      }
+      return propertiesMapToSchema(
         behavior.getProperties(),
         behavior => behavior.getProperties(),
         (behavior, name, value) => {
@@ -39,9 +42,8 @@ const QuickBehaviorPropertiesEditor = ({
         },
         object,
         'Basic-Quick'
-      ),
-    // schemaRecomputeTrigger allows to invalidate the schema when required.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+      );
+    },
     [behavior, object, schemaRecomputeTrigger]
   );
 

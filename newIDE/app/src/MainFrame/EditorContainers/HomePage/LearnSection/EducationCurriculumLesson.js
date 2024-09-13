@@ -20,6 +20,9 @@ import Text from '../../../../UI/Text';
 import RaisedButton from '../../../../UI/RaisedButton';
 import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import Chip from '../../../../UI/Chip';
+import Window from '../../../../Utils/Window';
+import FlatButton from '../../../../UI/FlatButton';
+import Play from '../../../../UI/CustomSvgIcons/Play';
 
 const rankLabel = {
   '1': <Trans>1st</Trans>,
@@ -63,7 +66,7 @@ const styles = {
     position: 'relative',
   },
   desktopImageContainer: {
-    maxWidth: 250,
+    maxWidth: 300,
     minWidth: 200,
   },
   mobileImageContainer: {
@@ -119,6 +122,7 @@ const EducationCurriculumLesson = ({
         })}`
       )
     : null;
+  const { gameLink } = tutorial;
 
   const title = (
     <LineStackLayout noMargin alignItems="center">
@@ -183,18 +187,28 @@ const EducationCurriculumLesson = ({
               {selectMessageByLocale(i18n, tutorial.descriptionByLocale)}
             </Text>
           </ColumnStackLayout>
-          <LineStackLayout
-            noMargin
-            alignItems="center"
-            justifyContent="flex-end"
-          >
-            <RaisedButton
-              primary
-              disabled={isLocked}
-              label={<Trans>Open lesson</Trans>}
-              onClick={() => onSelectTutorial(tutorial)}
-            />
-          </LineStackLayout>
+          {!isUpcomingMessage && !isLocked && (
+            <LineStackLayout
+              noMargin
+              alignItems="center"
+              justifyContent={gameLink ? 'space-between' : 'flex-end'}
+            >
+              {gameLink && (
+                <FlatButton
+                  primary
+                  leftIcon={<Play fontSize="small" />}
+                  label={<Trans>Play game</Trans>}
+                  onClick={() => Window.openExternalURL(gameLink)}
+                />
+              )}
+              <RaisedButton
+                primary
+                disabled={isLocked}
+                label={<Trans>Open lesson</Trans>}
+                onClick={() => onSelectTutorial(tutorial)}
+              />
+            </LineStackLayout>
+          )}
         </ColumnStackLayout>
       </ResponsiveLineStackLayout>
     </div>

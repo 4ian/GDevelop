@@ -296,7 +296,7 @@ module.exports = {
 
         let radiusGraphicsDirty = false;
 
-        const radius = parseFloat(
+        let radius = parseFloat(
           this._associatedObjectConfiguration
             .getProperties()
             .get('radius')

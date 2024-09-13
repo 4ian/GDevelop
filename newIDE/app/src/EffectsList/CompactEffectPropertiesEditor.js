@@ -6,7 +6,9 @@ import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import CompactPropertiesEditor from '../CompactPropertiesEditor';
 
 const noRefreshOfAllFields = () => {
-  console.warn("An effect tried to refresh all fields, but the editor doesn't support it.");
+  console.warn(
+    "An effect tried to refresh all fields, but the editor doesn't support it."
+  );
 };
 
 export const CompactEffectPropertiesEditor = ({

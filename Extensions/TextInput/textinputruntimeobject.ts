@@ -254,6 +254,9 @@ namespace gdjs {
         this.setWidth(initialInstanceData.width);
         this.setHeight(initialInstanceData.height);
       }
+      if (initialInstanceData.opacity !== undefined) {
+        this.setOpacity(initialInstanceData.opacity);
+      }
     }
 
     onScenePaused(runtimeScene: gdjs.RuntimeScene): void {

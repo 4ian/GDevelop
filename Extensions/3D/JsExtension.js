@@ -2216,8 +2216,14 @@ module.exports = {
           this._centerY / objectTextureFrame.height;
 
         this._pixiTexturedObject.angle = this._instance.getAngle();
-        this._pixiTexturedObject.scale.x = width / objectTextureFrame.width;
-        this._pixiTexturedObject.scale.y = height / objectTextureFrame.height;
+        const scaleX =
+          (width / objectTextureFrame.width) *
+          (this._instance.isFlippedX() ? -1 : 1);
+        const scaleY =
+          (height / objectTextureFrame.height) *
+          (this._instance.isFlippedY() ? -1 : 1);
+        this._pixiTexturedObject.scale.x = scaleX;
+        this._pixiTexturedObject.scale.y = scaleY;
 
         this._pixiTexturedObject.position.x =
           this._instance.getX() +
@@ -2244,6 +2250,9 @@ module.exports = {
         this._pixiFallbackObject.position.y =
           this._instance.getY() + height / 2;
         this._pixiFallbackObject.angle = this._instance.getAngle();
+
+        if (this._instance.isFlippedX()) this._pixiFallbackObject.scale.x = -1;
+        if (this._instance.isFlippedY()) this._pixiFallbackObject.scale.y = -1;
       }
 
       update() {
@@ -2393,12 +2402,16 @@ module.exports = {
           RenderedInstance.toRad(this._instance.getAngle())
         );
 
+        const scaleX = width * (this._instance.isFlippedX() ? -1 : 1);
+        const scaleY = height * (this._instance.isFlippedY() ? -1 : 1);
+        const scaleZ = depth * (this._instance.isFlippedZ() ? -1 : 1);
+
         if (
-          width !== this._threeObject.scale.width ||
-          height !== this._threeObject.scale.height ||
-          depth !== this._threeObject.scale.depth
+          scaleX !== this._threeObject.scale.width ||
+          scaleY !== this._threeObject.scale.height ||
+          scaleZ !== this._threeObject.scale.depth
         ) {
-          this._threeObject.scale.set(width, height, depth);
+          this._threeObject.scale.set(scaleX, scaleY, scaleZ);
           this.updateTextureUvMapping();
         }
       }
@@ -3186,12 +3199,16 @@ module.exports = {
           RenderedInstance.toRad(this._instance.getAngle())
         );
 
+        const scaleX = width * (this._instance.isFlippedX() ? -1 : 1);
+        const scaleY = height * (this._instance.isFlippedY() ? -1 : 1);
+        const scaleZ = depth * (this._instance.isFlippedZ() ? -1 : 1);
+
         if (
-          width !== this._threeObject.scale.width ||
-          height !== this._threeObject.scale.height ||
-          depth !== this._threeObject.scale.depth
+          scaleX !== this._threeObject.scale.width ||
+          scaleY !== this._threeObject.scale.height ||
+          scaleZ !== this._threeObject.scale.depth
         ) {
-          this._threeObject.scale.set(width, height, depth);
+          this._threeObject.scale.set(scaleX, scaleY, scaleZ);
         }
       }
 

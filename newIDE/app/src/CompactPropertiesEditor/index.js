@@ -26,6 +26,7 @@ import VerticallyCenterWithBar from '../UI/VerticallyCenterWithBar';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
 import CompactPropertiesEditorRowField from './CompactPropertiesEditorRowField';
+import CompactToggleButtons from '../UI/CompactToggleButtons';
 import { CompactToggleField } from '../UI/CompactToggleField';
 import { CompactTextAreaField } from '../UI/CompactTextAreaField';
 import { CompactColorField } from '../UI/CompactColorField';
@@ -47,6 +48,8 @@ export type ValueFieldCommonProperties = {|
   disabled?: (instances: Array<gdInitialInstance>) => boolean,
   onEditButtonBuildMenuTemplate?: (i18n: I18nType) => Array<MenuItemTemplate>,
   onEditButtonClick?: () => void,
+  getValueFromDisplayedValue?: string => string,
+  getDisplayedValueFromValue?: string => string,
 |};
 
 // "Primitive" value fields are "simple" fields.
@@ -74,7 +77,7 @@ export type PrimitiveValueField =
         label: string,
         labelIsUserDefined?: boolean,
       |}>,
-      isHiddenWhenThereOnlyOneChoice?: boolean,
+      isHiddenWhenOnlyOneChoice?: boolean,
       getEndAdornmentIcon?: Instance => ?(className: string) => React.Node,
       onClickEndAdornment?: Instance => void,
       renderLeftIcon?: (className?: string) => React.Node,
@@ -151,6 +154,18 @@ export type ActionButton = {|
   onClick: (instance: Instance) => void,
 |};
 
+type ToggleButtons = {|
+  nonFieldType: 'toggleButtons',
+  buttons: Array<{|
+    name: string,
+    renderIcon: (className?: string) => React.Node,
+    tooltip: React.Node,
+    getValue: Instance => boolean,
+    setValue: (instance: Instance, newValue: boolean) => void,
+  |}>,
+  ...ValueFieldCommonProperties,
+|};
+
 // A value field is a primitive or a resource.
 export type ValueField = PrimitiveValueField | ResourceField;
 
@@ -161,6 +176,7 @@ export type Field =
   | SectionTitle
   | Title
   | ActionButton
+  | ToggleButtons
   | VerticalCenterWithBar
   | {|
       name: string,
@@ -433,6 +449,8 @@ const CompactPropertiesEditor = ({
               hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
             });
           },
+          getValueFromDisplayedValue: field.getValueFromDisplayedValue,
+          getDisplayedValueFromValue: field.getDisplayedValueFromValue,
         };
         if (field.renderLeftIcon || field.hideLabel) {
           return (
@@ -692,6 +710,39 @@ const CompactPropertiesEditor = ({
     [instances]
   );
 
+  const renderToggleButtons = React.useCallback(
+    (field: ToggleButtons) => {
+      const buttons = field.buttons.map(button => {
+        // Button is toggled if all instances have a truthy value for it.
+        const isToggled =
+          instances.filter(instance => button.getValue(instance)).length ===
+          instances.length;
+        return {
+          id: button.name,
+          renderIcon: button.renderIcon,
+          tooltip: button.tooltip,
+          isActive: isToggled,
+          onClick: () => {
+            instances.forEach(instance =>
+              button.setValue(instance, !isToggled)
+            );
+            onFieldChanged({
+              instances,
+              hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
+            });
+          },
+        };
+      });
+
+      return (
+        <React.Fragment key={`toggle-buttons-${field.name}`}>
+          <CompactToggleButtons id={field.name} buttons={buttons} />
+        </React.Fragment>
+      );
+    },
+    [instances, onFieldChanged]
+  );
+
   const renderResourceField = (field: ResourceField) => {
     if (!project || !resourceManagementProps) {
       console.error(
@@ -842,6 +893,8 @@ const CompactPropertiesEditor = ({
           return renderSectionTitle(field);
         } else if (field.nonFieldType === 'button') {
           return renderButton(field);
+        } else if (field.nonFieldType === 'toggleButtons') {
+          return renderToggleButtons(field);
         } else if (field.nonFieldType === 'verticalCenterWithBar') {
           return renderVerticalCenterWithBar(field);
         }

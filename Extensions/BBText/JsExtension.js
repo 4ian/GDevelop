@@ -67,13 +67,6 @@ module.exports = {
         .setGroup(_('Appearance'));
 
       objectProperties
-        .getOrCreate('opacity')
-        .setValue(objectContent.opacity.toString())
-        .setType('number')
-        .setLabel(_('Opacity (0-255)'))
-        .setGroup(_('Appearance'));
-
-      objectProperties
         .getOrCreate('fontSize')
         .setValue(objectContent.fontSize.toString())
         .setType('number')
@@ -545,9 +538,6 @@ module.exports = {
           this._pixiObject.text = rawText;
         }
 
-        const opacity = +properties.get('opacity').getValue();
-        this._pixiObject.alpha = opacity / 255;
-
         const color = properties.get('color').getValue();
         const newColor = objectsRenderingService.rgbOrHexToHexNumber(color);
         if (newColor !== this._pixiObject.textStyles.default.fill) {
@@ -615,6 +605,13 @@ module.exports = {
             this._pixiObject.dirty = true;
           }
         }
+
+        // Do not hide completely an object so it can still be manipulated
+        const alphaForDisplay = Math.max(
+          this._instance.getOpacity() / 255,
+          0.5
+        );
+        this._pixiObject.alpha = alphaForDisplay;
       }
 
       /**

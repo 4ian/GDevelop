@@ -186,10 +186,13 @@ namespace gdjs {
       // 2. Update the renderer so that it updates the tilemap object
       // (used for width and position calculations).
       this._loadInitialTileMap((tileMap: TileMapHelper.EditableTileMap) => {
-        // 3. Set custom dimensions if applicable.
+        // 3. Set custom dimensions & opacity if applicable.
         if (initialInstanceData.customSize) {
           this.setWidth(initialInstanceData.width);
           this.setHeight(initialInstanceData.height);
+        }
+        if (initialInstanceData.opacity !== undefined) {
+          this.setOpacity(initialInstanceData.opacity);
         }
 
         // 4. Update position (calculations based on renderer's dimensions).

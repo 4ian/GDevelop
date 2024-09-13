@@ -80,8 +80,10 @@ namespace gdjs {
         this._object.getY() + this._pixiContainer.pivot.y * Math.abs(scaleY);
 
       this._pixiContainer.rotation = gdjs.toRad(this._object.angle);
-      this._pixiContainer.scale.x = scaleX;
-      this._pixiContainer.scale.y = scaleY;
+      this._pixiContainer.scale.x =
+        scaleX * (this._object.isFlippedX() ? -1 : 1);
+      this._pixiContainer.scale.y =
+        scaleY * (this._object.isFlippedY() ? -1 : 1);
       this._pixiContainer.visible = !this._object.hidden;
       this._pixiContainer.alpha = opacity / 255;
 

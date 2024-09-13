@@ -44,6 +44,10 @@ export default class RenderedParticleEmitterInstance extends RenderedInstance {
   update() {
     this._pixiObject.position.x = this._instance.getX();
     this._pixiObject.position.y = this._instance.getY();
+    // Do not hide completely an object so it can still be manipulated
+    const alphaForDisplay = Math.max(this._instance.getOpacity() / 255, 0.5);
+    this._pixiObject.alpha = alphaForDisplay;
+
     this.updateGraphics();
   }
 

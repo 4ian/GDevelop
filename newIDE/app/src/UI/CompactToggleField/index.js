@@ -43,13 +43,31 @@ export const CompactToggleField = (props: Props) => {
           type="checkbox"
           class={classes.checkbox}
           onChange={() => props.onCheck(!props.checked)}
+          disabled={props.disabled}
         />
         <span
           class={classNames({
             [classes.slider]: true,
             [classes.checked]: props.checked,
+            [classes.disabled]: props.disabled,
           })}
-        />
+        >
+          <span
+            class={classNames({
+              [classes.handleContainer]: true,
+              [classes.checked]: props.checked,
+              [classes.disabled]: props.disabled,
+            })}
+          >
+            <span
+              class={classNames({
+                [classes.handle]: true,
+                [classes.checked]: props.checked,
+                [classes.disabled]: props.disabled,
+              })}
+            />
+          </span>
+        </span>
       </div>
       <Tooltip
         title={title}

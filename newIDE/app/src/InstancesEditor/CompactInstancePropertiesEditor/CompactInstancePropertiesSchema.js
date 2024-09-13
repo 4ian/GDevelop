@@ -15,6 +15,9 @@ import LetterH from '../../UI/CustomSvgIcons/LetterH';
 import LetterW from '../../UI/CustomSvgIcons/LetterW';
 import LetterD from '../../UI/CustomSvgIcons/LetterD';
 import LetterZ from '../../UI/CustomSvgIcons/LetterZ';
+import Opacity from '../../UI/CustomSvgIcons/Opacity';
+import FlipHorizontal from '../../UI/CustomSvgIcons/FlipHorizontal';
+import FlipVertical from '../../UI/CustomSvgIcons/FlipVertical';
 import Instance from '../../UI/CustomSvgIcons/Instance';
 import Link from '../../UI/CustomSvgIcons/Link';
 import Unlink from '../../UI/CustomSvgIcons/Unlink';
@@ -27,6 +30,7 @@ import Object2d from '../../UI/CustomSvgIcons/Object2d';
 import RotateX from '../../UI/CustomSvgIcons/RotateX';
 import RotateY from '../../UI/CustomSvgIcons/RotateY';
 import RotateZ from '../../UI/CustomSvgIcons/RotateZ';
+import FlipZ from '../../UI/CustomSvgIcons/FlipZ';
 
 /**
  * Applies ratio to value without intermediary value to avoid precision issues.
@@ -414,8 +418,73 @@ const getKeepRatioField = ({
   getNextValue: (currentValue: boolean) => !currentValue,
 });
 
-export const makeInstanceSchema = ({
+const getOpacityField = ({ i18n }: {| i18n: I18nType |}) => ({
+  name: 'Opacity',
+  getLabel: () => i18n._(t`Opacity`),
+  valueType: 'number',
+  getValue: (instance: gdInitialInstance) => {
+    const opacity = instance.getOpacity();
+    return Math.round((opacity / 255) * 100);
+  },
+  setValue: (instance: gdInitialInstance, newValue: number) => {
+    const newOpacity = Math.round((newValue / 100) * 255);
+    const opacity = Math.max(0, Math.min(255, newOpacity));
+    instance.setOpacity(opacity);
+  },
+  renderLeftIcon: className => <Opacity className={className} />,
+  getDisplayedValueFromValue: (value: string): string => {
+    return `${value}%`;
+  },
+  getValueFromDisplayedValue: (displayedValue: string): string => {
+    return displayedValue.replace('%', '');
+  },
+});
+
+const getFlippableButtons = ({
+  i18n,
+  canFlipZ,
+}: {|
+  i18n: I18nType,
+  canFlipZ: boolean,
+|}) => ({
+  name: 'Flip',
+  nonFieldType: 'toggleButtons',
+  buttons: [
+    {
+      name: 'Flip horizontal',
+      renderIcon: className => <FlipHorizontal className={className} />,
+      tooltip: i18n._(t`Flip horizontally`),
+      getValue: (instance: gdInitialInstance): boolean => instance.isFlippedX(),
+      setValue: (instance: gdInitialInstance, newValue: boolean) =>
+        instance.setFlippedX(newValue),
+    },
+    {
+      name: 'Flip vertical',
+      tooltip: i18n._(t`Flip vertically`),
+      renderIcon: className => <FlipVertical className={className} />,
+      getValue: (instance: gdInitialInstance): boolean => instance.isFlippedY(),
+      setValue: (instance: gdInitialInstance, newValue: boolean) =>
+        instance.setFlippedY(newValue),
+    },
+    canFlipZ
+      ? {
+          name: 'Flip Z',
+          tooltip: i18n._(t` Flip along Z axis`),
+          renderIcon: className => <FlipZ className={className} />,
+          getValue: (instance: gdInitialInstance): boolean =>
+            instance.isFlippedZ(),
+          setValue: (instance: gdInitialInstance, newValue: boolean) =>
+            instance.setFlippedZ(newValue),
+        }
+      : null,
+  ].filter(Boolean),
+});
+
+export const makeSchema = ({
   is3DInstance,
+  hasOpacity,
+  canBeFlippedXY,
+  canBeFlippedZ,
   i18n,
   forceUpdate,
   onEditObject,
@@ -423,6 +492,9 @@ export const makeInstanceSchema = ({
   layersContainer,
 }: {|
   is3DInstance: boolean,
+  hasOpacity: boolean,
+  canBeFlippedXY: boolean,
+  canBeFlippedZ: boolean,
   i18n: I18nType,
   forceUpdate: () => void,
   onEditObject: (name: string) => void,
@@ -500,6 +572,15 @@ export const makeInstanceSchema = ({
           },
         ],
       },
+      hasOpacity
+        ? {
+            name: 'Opacity',
+            type: 'row',
+            preventWrap: true,
+            removeSpacers: true,
+            children: [getOpacityField({ i18n })],
+          }
+        : null,
       getLayerField({ i18n, layersContainer }),
       {
         name: 'Rotation',
@@ -507,10 +588,21 @@ export const makeInstanceSchema = ({
         title: i18n._(t`Rotation`),
         preventWrap: true,
         removeSpacers: true,
-        children: getRotationXAndRotationYFields({ i18n }),
+        children: canBeFlippedXY
+          ? [getFlippableButtons({ i18n, canFlipZ: canBeFlippedZ })]
+          : [],
       },
-      getRotationZField({ i18n }),
-    ];
+      {
+        name: 'Rotation X and Y',
+        type: 'row',
+        preventWrap: true,
+        removeSpacers: true,
+        children: [
+          ...getRotationXAndRotationYFields({ i18n }),
+          getRotationZField({ i18n }),
+        ],
+      },
+    ].filter(Boolean);
   }
 
   return [
@@ -562,6 +654,15 @@ export const makeInstanceSchema = ({
         },
       ],
     },
+    hasOpacity
+      ? {
+          name: 'Opacity',
+          type: 'row',
+          preventWrap: true,
+          removeSpacers: true,
+          children: [getOpacityField({ i18n })],
+        }
+      : null,
     getLayerField({ i18n, layersContainer }),
     {
       name: 'Rotation',
@@ -569,9 +670,18 @@ export const makeInstanceSchema = ({
       title: i18n._(t`Rotation`),
       preventWrap: true,
       removeSpacers: true,
+      children: canBeFlippedXY
+        ? [getFlippableButtons({ i18n, canFlipZ: canBeFlippedZ })]
+        : [],
+    },
+    {
+      name: 'Rotation Z',
+      type: 'row',
+      preventWrap: true,
+      removeSpacers: true,
       children: [getRotationZField({ i18n })],
     },
-  ];
+  ].filter(Boolean);
 };
 
 export const reorderInstanceSchemaForCustomProperties = (

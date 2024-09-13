@@ -789,6 +789,13 @@ module.exports = {
         );
         this._pixiGraphics.drawRect(0, 0, width, height);
         this._pixiGraphics.endFill();
+
+        // Do not hide completely an object so it can still be manipulated
+        const alphaForDisplay = Math.max(
+          this._instance.getOpacity() / 255,
+          0.5
+        );
+        this._pixiObject.alpha = alphaForDisplay;
       }
 
       getDefaultWidth() {

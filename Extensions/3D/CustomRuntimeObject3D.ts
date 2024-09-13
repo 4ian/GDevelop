@@ -72,8 +72,18 @@ namespace gdjs {
 
     extraInitializationFromInitialInstance(initialInstanceData: InstanceData) {
       super.extraInitializationFromInitialInstance(initialInstanceData);
-      if (initialInstanceData.depth !== undefined)
+      if (initialInstanceData.depth !== undefined) {
         this.setDepth(initialInstanceData.depth);
+      }
+      if (initialInstanceData.flippedX) {
+        this.flipX(initialInstanceData.flippedX);
+      }
+      if (initialInstanceData.flippedY) {
+        this.flipY(initialInstanceData.flippedY);
+      }
+      if (initialInstanceData.flippedZ) {
+        this.flipZ(initialInstanceData.flippedZ);
+      }
     }
 
     /**

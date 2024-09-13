@@ -10,7 +10,7 @@ export default function useForceUpdate() {
 }
 
 export function useForceRecompute() {
-  const [recomputeTrigger, updateState] = React.useState();
+  const [recomputeTrigger, updateState] = React.useState({});
   const forceRecompute = React.useCallback(() => updateState({}), []);
 
   return [recomputeTrigger, forceRecompute];

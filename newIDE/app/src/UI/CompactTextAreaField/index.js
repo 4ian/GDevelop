@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import classNames from 'classnames';
-import classes from './CompactTextField.module.css';
+import classes from './CompactTextAreaField.module.css';
 import { makeTimestampedId } from '../../Utils/TimestampedId';
 import Tooltip from '@material-ui/core/Tooltip';
 import Text from '../../UI/Text';
@@ -19,7 +19,7 @@ const styles = {
   },
 };
 
-export type CompactTextFieldProps = {|
+export type CompactTextAreaFieldProps = {|
   label: string,
   markdownDescription?: ?string,
   value: string,
@@ -50,7 +50,7 @@ export const CompactTextAreaField = ({
   disabled,
   errored,
   placeholder,
-}: CompactTextFieldProps) => {
+}: CompactTextAreaFieldProps) => {
   const idToUse = React.useRef<string>(id || makeTimestampedId());
 
   const title = !markdownDescription

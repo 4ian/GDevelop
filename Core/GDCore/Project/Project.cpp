@@ -264,15 +264,21 @@ bool Project::RemovePlatform(const gd::String& platformName) {
 bool Project::HasLayoutNamed(const gd::String& name) const {
   return (find_if(scenes.begin(),
                   scenes.end(),
-                  bind2nd(gd::LayoutHasName(), name)) != scenes.end());
+                  [&name](const std::unique_ptr<gd::Layout>& layout) {
+                    return layout->GetName() == name;
+                  }) != scenes.end());
 }
 gd::Layout& Project::GetLayout(const gd::String& name) {
   return *(*find_if(
-      scenes.begin(), scenes.end(), bind2nd(gd::LayoutHasName(), name)));
+      scenes.begin(), scenes.end(), [&name](const std::unique_ptr<gd::Layout>& layout) {
+        return layout->GetName() == name;
+      }));
 }
 const gd::Layout& Project::GetLayout(const gd::String& name) const {
   return *(*find_if(
-      scenes.begin(), scenes.end(), bind2nd(gd::LayoutHasName(), name)));
+      scenes.begin(), scenes.end(), [&name](const std::unique_ptr<gd::Layout>& layout) {
+        return layout->GetName() == name;
+      }));
 }
 gd::Layout& Project::GetLayout(std::size_t index) { return *scenes[index]; }
 const gd::Layout& Project::GetLayout(std::size_t index) const {
@@ -317,7 +323,9 @@ gd::Layout& Project::InsertLayout(const gd::Layout& layout,
 
 void Project::RemoveLayout(const gd::String& name) {
   std::vector<std::unique_ptr<gd::Layout> >::iterator scene =
-      find_if(scenes.begin(), scenes.end(), bind2nd(gd::LayoutHasName(), name));
+      find_if(scenes.begin(), scenes.end(), [&name](const std::unique_ptr<gd::Layout>& layout) {
+        return layout->GetName() == name;
+      });
   if (scene == scenes.end()) return;
 
   scenes.erase(scene);
@@ -326,19 +334,24 @@ void Project::RemoveLayout(const gd::String& name) {
 bool Project::HasExternalEventsNamed(const gd::String& name) const {
   return (find_if(externalEvents.begin(),
                   externalEvents.end(),
-                  bind2nd(gd::ExternalEventsHasName(), name)) !=
-          externalEvents.end());
+                  [&name](const std::unique_ptr<gd::ExternalEvents>& externalEvents) {
+                    return externalEvents->GetName() == name;
+                  }) != externalEvents.end());
 }
 gd::ExternalEvents& Project::GetExternalEvents(const gd::String& name) {
   return *(*find_if(externalEvents.begin(),
                     externalEvents.end(),
-                    bind2nd(gd::ExternalEventsHasName(), name)));
+                    [&name](const std::unique_ptr<gd::ExternalEvents>& externalEvents) {
+                      return externalEvents->GetName() == name;
+                    }));
 }
 const gd::ExternalEvents& Project::GetExternalEvents(
     const gd::String& name) const {
   return *(*find_if(externalEvents.begin(),
                     externalEvents.end(),
-                    bind2nd(gd::ExternalEventsHasName(), name)));
+                    [&name](const std::unique_ptr<gd::ExternalEvents>& externalEvents) {
+                      return externalEvents->GetName() == name;
+                    }));
 }
 gd::ExternalEvents& Project::GetExternalEvents(std::size_t index) {
   return *externalEvents[index];
@@ -382,7 +395,9 @@ void Project::RemoveExternalEvents(const gd::String& name) {
   std::vector<std::unique_ptr<gd::ExternalEvents> >::iterator events =
       find_if(externalEvents.begin(),
               externalEvents.end(),
-              bind2nd(gd::ExternalEventsHasName(), name));
+              [&name](const std::unique_ptr<gd::ExternalEvents>& externalEvents) {
+                return externalEvents->GetName() == name;
+              });
   if (events == externalEvents.end()) return;
 
   externalEvents.erase(events);
@@ -448,19 +463,24 @@ void Project::SwapExternalLayouts(std::size_t first, std::size_t second) {
 bool Project::HasExternalLayoutNamed(const gd::String& name) const {
   return (find_if(externalLayouts.begin(),
                   externalLayouts.end(),
-                  bind2nd(gd::ExternalLayoutHasName(), name)) !=
-          externalLayouts.end());
+                  [&name](const std::unique_ptr<gd::ExternalLayout>& externalLayout) {
+                    return externalLayout->GetName() == name;
+                  }) != externalLayouts.end());
 }
 gd::ExternalLayout& Project::GetExternalLayout(const gd::String& name) {
   return *(*find_if(externalLayouts.begin(),
                     externalLayouts.end(),
-                    bind2nd(gd::ExternalLayoutHasName(), name)));
+                    [&name](const std::unique_ptr<gd::ExternalLayout>& externalLayout) {
+                      return externalLayout->GetName() == name;
+                    }));
 }
 const gd::ExternalLayout& Project::GetExternalLayout(
     const gd::String& name) const {
   return *(*find_if(externalLayouts.begin(),
                     externalLayouts.end(),
-                    bind2nd(gd::ExternalLayoutHasName(), name)));
+                    [&name](const std::unique_ptr<gd::ExternalLayout>& externalLayout) {
+                      return externalLayout->GetName() == name;
+                    }));
 }
 gd::ExternalLayout& Project::GetExternalLayout(std::size_t index) {
   return *externalLayouts[index];
@@ -504,7 +524,9 @@ void Project::RemoveExternalLayout(const gd::String& name) {
   std::vector<std::unique_ptr<gd::ExternalLayout> >::iterator externalLayout =
       find_if(externalLayouts.begin(),
               externalLayouts.end(),
-              bind2nd(gd::ExternalLayoutHasName(), name));
+              [&name](const std::unique_ptr<gd::ExternalLayout>& externalLayout) {
+                return externalLayout->GetName() == name;
+              });
   if (externalLayout == externalLayouts.end()) return;
 
   externalLayouts.erase(externalLayout);
@@ -1076,7 +1098,9 @@ bool Project::HasSourceFile(gd::String name, gd::String language) const {
   vector<std::unique_ptr<SourceFile> >::const_iterator sourceFile =
       find_if(externalSourceFiles.begin(),
               externalSourceFiles.end(),
-              bind2nd(gd::ExternalSourceFileHasName(), name));
+              [&name](const std::unique_ptr<SourceFile>& sourceFile) {
+                return sourceFile->GetFileName() == name;
+              });
 
   if (sourceFile == externalSourceFiles.end()) return false;
 
@@ -1086,20 +1110,26 @@ bool Project::HasSourceFile(gd::String name, gd::String language) const {
 gd::SourceFile& Project::GetSourceFile(const gd::String& name) {
   return *(*find_if(externalSourceFiles.begin(),
                     externalSourceFiles.end(),
-                    bind2nd(gd::ExternalSourceFileHasName(), name)));
+                    [&name](const std::unique_ptr<SourceFile>& sourceFile) {
+                      return sourceFile->GetFileName() == name;
+                    }));
 }
 
 const gd::SourceFile& Project::GetSourceFile(const gd::String& name) const {
   return *(*find_if(externalSourceFiles.begin(),
                     externalSourceFiles.end(),
-                    bind2nd(gd::ExternalSourceFileHasName(), name)));
+                    [&name](const std::unique_ptr<SourceFile>& sourceFile) {
+                      return sourceFile->GetFileName() == name;
+                    }));
 }
 
 void Project::RemoveSourceFile(const gd::String& name) {
   std::vector<std::unique_ptr<gd::SourceFile> >::iterator sourceFile =
       find_if(externalSourceFiles.begin(),
               externalSourceFiles.end(),
-              bind2nd(gd::ExternalSourceFileHasName(), name));
+              [&name](const std::unique_ptr<SourceFile>& sourceFile) {
+                return sourceFile->GetFileName() == name;
+              });
   if (sourceFile == externalSourceFiles.end()) return;
 
   externalSourceFiles.erase(sourceFile);

@@ -208,6 +208,15 @@ namespace gdjs {
         this.setSize(initialInstanceData.width, initialInstanceData.height);
         this.invalidateHitboxes();
       }
+      if (initialInstanceData.opacity !== undefined) {
+        this.setOpacity(initialInstanceData.opacity);
+      }
+      if (initialInstanceData.flippedX) {
+        this.flipX(initialInstanceData.flippedX);
+      }
+      if (initialInstanceData.flippedY) {
+        this.flipY(initialInstanceData.flippedY);
+      }
     }
 
     getDrawableX(): number {

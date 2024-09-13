@@ -328,6 +328,9 @@ namespace gdjs {
       } else {
         this.setWrapping(false);
       }
+      if (initialInstanceData.opacity !== undefined) {
+        this.setOpacity(initialInstanceData.opacity);
+      }
     }
 
     /**

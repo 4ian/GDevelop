@@ -24,6 +24,7 @@ import { showErrorBox } from '../../UI/Messages/MessageBox';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import classes from './CompactResourceSelectorWithThumbnail.module.css';
 import classNames from 'classnames';
+import { makeTimestampedId } from '../../Utils/TimestampedId';
 
 const styles = {
   icon: {
@@ -59,6 +60,7 @@ export const CompactResourceSelectorWithThumbnail = ({
   const resourcesLoader = ResourcesLoader;
   const forceUpdate = useForceUpdate();
   const displayThumbnail = resourcesKindsWithThumbnail.includes(resourceKind);
+  const idToUse = React.useRef<string>(id || makeTimestampedId());
 
   // TODO: move in a hook?
   const { showConfirmation } = useAlertDialog();
@@ -227,7 +229,7 @@ export const CompactResourceSelectorWithThumbnail = ({
     );
 
   return (
-    <LineStackLayout noMargin expand>
+    <LineStackLayout noMargin expand id={idToUse.current}>
       {displayThumbnail && (
         <ResourceThumbnail
           resourceName={resourceName}
@@ -254,7 +256,7 @@ export const CompactResourceSelectorWithThumbnail = ({
       </div>
       <ElementWithMenu
         element={
-          <IconButton size="small" onClick={() => {}}>
+          <IconButton size="small">
             <Edit style={styles.icon} />
           </IconButton>
         }
@@ -268,8 +270,8 @@ export const CompactResourceSelectorWithThumbnail = ({
           },
           ...externalEditors.map(externalEditor => ({
             label: resourceName
-              ? i18n._(externalEditor.createDisplayName)
-              : i18n._(externalEditor.editDisplayName),
+              ? i18n._(externalEditor.editDisplayName)
+              : i18n._(externalEditor.createDisplayName),
             click: () => editWith(i18n, externalEditor),
           })),
         ]}

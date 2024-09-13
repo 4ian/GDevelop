@@ -209,6 +209,10 @@ export default class RenderedTextInstance extends RenderedInstance {
     this._pixiObject.rotation = RenderedInstance.toRad(
       this._instance.getAngle()
     );
+
+    // Do not hide completely an object so it can still be manipulated
+    const alphaForDisplay = Math.max(this._instance.getOpacity() / 255, 0.5);
+    this._pixiObject.alpha = alphaForDisplay;
   }
 
   getDefaultWidth() {

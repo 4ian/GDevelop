@@ -87,20 +87,6 @@ class GD_CORE_API SourceFile {
                           ///< SetAssociatedEvent.
 };
 
-//"Tool" Functions
-
-/**
- * Functor testing Source Files name
- */
-struct ExternalSourceFileHasName
-    : public std::
-          binary_function<std::unique_ptr<SourceFile>, gd::String, bool> {
-  bool operator()(const std::unique_ptr<SourceFile>& externalEvents,
-                  gd::String name) const {
-    return externalEvents->GetFileName() == name;
-  }
-};
-
 }  // namespace gd
 
 #endif  // SOURCEFILE_H

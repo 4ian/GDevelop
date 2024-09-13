@@ -23,7 +23,7 @@ import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import ErrorBoundary from '../../UI/ErrorBoundary';
 import {
-  makeInstanceSchema,
+  makeSchema,
   reorderInstanceSchemaForCustomProperties,
 } from './CompactInstancePropertiesSchema';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
@@ -42,7 +42,9 @@ export const styles = {
 };
 
 const noRefreshOfAllFields = () => {
-  console.warn("An instance tried to refresh all fields, but the editor doesn't support it.");
+  console.warn(
+    "An instance tried to refresh all fields, but the editor doesn't support it."
+  );
 };
 
 type Props = {|
@@ -85,44 +87,6 @@ export const CompactInstancePropertiesEditor = ({
   const forceUpdate = useForceUpdate();
   const variablesListRef = React.useRef<?VariablesListInterface>(null);
 
-  const schemaFor2D: Schema = React.useMemo(
-    () =>
-      makeInstanceSchema({
-        i18n,
-        is3DInstance: false,
-        onGetInstanceSize,
-        onEditObject: editObjectInPropertiesPanel,
-        layersContainer,
-        forceUpdate,
-      }),
-    [
-      i18n,
-      onGetInstanceSize,
-      editObjectInPropertiesPanel,
-      layersContainer,
-      forceUpdate,
-    ]
-  );
-
-  const schemaFor3D: Schema = React.useMemo(
-    () =>
-      makeInstanceSchema({
-        i18n,
-        is3DInstance: true,
-        onGetInstanceSize,
-        onEditObject: editObjectInPropertiesPanel,
-        layersContainer,
-        forceUpdate,
-      }),
-    [
-      i18n,
-      onGetInstanceSize,
-      editObjectInPropertiesPanel,
-      layersContainer,
-      forceUpdate,
-    ]
-  );
-
   const instance = instances[0];
   /**
    * TODO: multiple instances support for variables list. Expected behavior should be:
@@ -151,10 +115,20 @@ export const CompactInstancePropertiesEditor = ({
       );
       if (!object) return { object: undefined, instanceSchema: undefined };
 
-      const is3DInstance = gd.MetadataProvider.getObjectMetadata(
+      const objectMetadata = gd.MetadataProvider.getObjectMetadata(
         project.getCurrentPlatform(),
         object.getType()
-      ).isRenderedIn3D();
+      );
+      const is3DInstance = objectMetadata.isRenderedIn3D();
+      const hasOpacity = objectMetadata.hasDefaultBehavior(
+        'OpacityCapability::OpacityBehavior'
+      );
+      const canBeFlippedXY = objectMetadata.hasDefaultBehavior(
+        'FlippableCapability::FlippableBehavior'
+      );
+      const canBeFlippedZ = objectMetadata.hasDefaultBehavior(
+        'Scene3D::Base3DBehavior'
+      );
       const instanceSchemaForCustomProperties = propertiesMapToSchema(
         properties,
         (instance: gdInitialInstance) =>
@@ -175,11 +149,20 @@ export const CompactInstancePropertiesEditor = ({
         instanceSchemaForCustomProperties,
         i18n
       );
+      const instanceSchema = makeSchema({
+        i18n,
+        is3DInstance,
+        hasOpacity,
+        canBeFlippedXY,
+        canBeFlippedZ,
+        onGetInstanceSize,
+        onEditObject: editObjectInPropertiesPanel,
+        layersContainer,
+        forceUpdate,
+      }).concat(reorderedInstanceSchemaForCustomProperties);
       return {
         object,
-        instanceSchema: is3DInstance
-          ? schemaFor3D.concat(reorderedInstanceSchemaForCustomProperties)
-          : schemaFor2D.concat(reorderedInstanceSchemaForCustomProperties),
+        instanceSchema,
       };
     },
     [
@@ -188,8 +171,10 @@ export const CompactInstancePropertiesEditor = ({
       objectsContainer,
       project,
       i18n,
-      schemaFor3D,
-      schemaFor2D,
+      forceUpdate,
+      layersContainer,
+      onGetInstanceSize,
+      editObjectInPropertiesPanel,
     ]
   );
 

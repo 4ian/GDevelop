@@ -29,7 +29,7 @@ class GD_CORE_API InitialInstance {
    * \brief Create an initial instance pointing to no object, at position (0,0).
    */
   InitialInstance();
-  virtual ~InitialInstance(){};
+  virtual ~InitialInstance() {};
 
   /**
    * Must return a pointer to a copy of the object. A such method is needed to
@@ -124,6 +124,46 @@ class GD_CORE_API InitialInstance {
   void SetZOrder(int zOrder_) { zOrder = zOrder_; }
 
   /**
+   * \brief Get Opacity.
+   */
+  int GetOpacity() const { return opacity; }
+
+  /**
+   * \brief Set the opacity of the instance.
+   */
+  void SetOpacity(int opacity_) { opacity = opacity_; }
+
+  /**
+   * \brief Return true if the instance is flipped on X axis.
+   */
+  bool IsFlippedX() const { return flippedX; }
+
+  /**
+   * \brief Set whether the instance is flipped on X axis.
+   */
+  void SetFlippedX(bool flippedX_) { flippedX = flippedX_; }
+
+  /**
+   * \brief Return true if the instance is flipped on Y axis.
+   */
+  bool IsFlippedY() const { return flippedY; }
+
+  /**
+   * \brief Set whether the instance is flipped on Y axis.
+   */
+  void SetFlippedY(bool flippedY_) { flippedY = flippedY_; }
+
+  /**
+   * \brief Return true if the instance is flipped on Z axis.
+   */
+  bool IsFlippedZ() const { return flippedZ; }
+
+  /**
+   * \brief Set whether the instance is flipped on Z axis.
+   */
+  void SetFlippedZ(bool flippedZ_) { flippedZ = flippedZ_; }
+
+  /**
    * \brief Get the layer the instance belongs to.
    */
   const gd::String& GetLayer() const { return layer; }
@@ -134,8 +174,9 @@ class GD_CORE_API InitialInstance {
   void SetLayer(const gd::String& layer_) { layer = layer_; }
 
   /**
-   * \brief Return true if the instance has a width/height which is different from its
-   * object default width/height. This is independent from `HasCustomDepth`.
+   * \brief Return true if the instance has a width/height which is different
+   * from its object default width/height. This is independent from
+   * `HasCustomDepth`.
    *
    * \see gd::Object
    */
@@ -150,15 +191,13 @@ class GD_CORE_API InitialInstance {
   bool HasCustomDepth() const { return customDepth; }
 
   /**
-   * \brief Set whether the instance has a width/height which is different from its
-   * object default width/height or not.
-   * This is independent from `SetHasCustomDepth`.
+   * \brief Set whether the instance has a width/height which is different from
+   * its object default width/height or not. This is independent from
+   * `SetHasCustomDepth`.
    *
    * \see gd::Object
    */
-  void SetHasCustomSize(bool hasCustomSize_) {
-    customSize = hasCustomSize_;
-  }
+  void SetHasCustomSize(bool hasCustomSize_) { customSize = hasCustomSize_; }
 
   /**
    * \brief Set whether the instance has a depth which is different from its
@@ -264,18 +303,19 @@ class GD_CORE_API InitialInstance {
    * \note Common properties ( name, position... ) do not need to be
    * inserted in this map
    */
-  std::map<gd::String, gd::PropertyDescriptor>
-  GetCustomProperties(gd::ObjectsContainer &globalObjectsContainer,
-                      gd::ObjectsContainer &objectsContainer);
+  std::map<gd::String, gd::PropertyDescriptor> GetCustomProperties(
+      gd::ObjectsContainer& globalObjectsContainer,
+      gd::ObjectsContainer& objectsContainer);
 
   /**
    * \brief Update the property called \a name with the new \a value.
    *
    * \return false if the property could not be updated.
    */
-  bool UpdateCustomProperty(const gd::String &name, const gd::String &value,
-                            gd::ObjectsContainer &globalObjectsContainer,
-                            gd::ObjectsContainer &objectsContainer);
+  bool UpdateCustomProperty(const gd::String& name,
+                            const gd::String& value,
+                            gd::ObjectsContainer& globalObjectsContainer,
+                            gd::ObjectsContainer& objectsContainer);
 
   /**
    * \brief Get the value of a double property stored in the instance.
@@ -343,6 +383,10 @@ class GD_CORE_API InitialInstance {
   double rotationX;       ///< Instance angle on X axis (for a 3D object)
   double rotationY;       ///< Instance angle on Y axis (for a 3D object)
   int zOrder;             ///< Instance Z order (for a 2D object)
+  int opacity;            ///< Instance opacity
+  bool flippedX;          ///< True if the instance is flipped on X axis
+  bool flippedY;          ///< True if the instance is flipped on Y axis
+  bool flippedZ;          ///< True if the instance is flipped on Z axis
   gd::String layer;       ///< Instance layer
   bool customSize;        ///< True if object has a custom width and height
   bool customDepth;       ///< True if object has a custom depth
@@ -352,13 +396,13 @@ class GD_CORE_API InitialInstance {
   gd::VariablesContainer initialVariables;  ///< Instance specific variables
   bool locked;                              ///< True if the instance is locked
   bool sealed;                              ///< True if the instance is sealed
-  bool keepRatio;                           ///< True if the instance's dimensions
-                                            ///  should keep the same ratio.
+  bool keepRatio;                     ///< True if the instance's dimensions
+                                      ///  should keep the same ratio.
   mutable gd::String persistentUuid;  ///< A persistent random version 4 UUID,
                                       ///  useful for hot reloading.
 
-  static gd::String*
-      badStringPropertyValue;  ///< Empty string returned by GetRawStringProperty
+  static gd::String* badStringPropertyValue;  ///< Empty string returned by
+                                              ///< GetRawStringProperty
 };
 
 }  // namespace gd

@@ -118,6 +118,13 @@ export default class RenderedSpriteInstance extends RenderedInstance {
     this._pixiObject.position.y =
       this._instance.getY() +
       (this._centerY - this._originY) * Math.abs(this._pixiObject.scale.y);
+
+    // Do not hide completely an object so it can still be manipulated
+    const alphaForDisplay = Math.max(this._instance.getOpacity() / 255, 0.5);
+    this._pixiObject.alpha = alphaForDisplay;
+
+    if (this._instance.isFlippedX()) this._pixiObject.scale.x *= -1;
+    if (this._instance.isFlippedY()) this._pixiObject.scale.y *= -1;
   }
 
   updateSprite(): boolean {
@@ -235,11 +242,15 @@ export default class RenderedSpriteInstance extends RenderedInstance {
 
   getCenterX(): number {
     if (!this._sprite || !this._pixiObject) return 0;
-    return this._centerX * this._pixiObject.scale.x; // This is equivalent to `this._animationFrame.center.x * Math.abs(this._scaleX)` in the runtime.
+    return (
+      this._centerX * Math.abs(this._pixiObject.scale.x) // This is equivalent to `this._animationFrame.center.x * Math.abs(this._scaleX)` in the runtime.
+    );
   }
 
   getCenterY(): number {
     if (!this._sprite || !this._pixiObject) return 0;
-    return this._centerY * this._pixiObject.scale.y; // This is equivalent to `this._animationFrame.center.y * Math.abs(this._scaleY)` in the runtime.
+    return (
+      this._centerY * Math.abs(this._pixiObject.scale.y) // This is equivalent to `this._animationFrame.center.y * Math.abs(this._scaleY)` in the runtime.
+    );
   }
 }

@@ -96,12 +96,10 @@ export const formatTutorialToImageTileComponent = ({
 
       sendTutorialOpened(tutorial.id);
       Window.openExternalURL(
-        selectMessageByLocale(i18n, tutorial.linkByLocale) || tutorial.link
+        selectMessageByLocale(i18n, tutorial.linkByLocale)
       );
     },
-    imageUrl:
-      selectMessageByLocale(i18n, tutorial.thumbnailUrlByLocale) ||
-      tutorial.thumbnailUrl,
+    imageUrl: selectMessageByLocale(i18n, tutorial.thumbnailUrlByLocale),
     overlayText: tutorial.duration
       ? secondsToMinutesAndSeconds(tutorial.duration)
       : '\u{1F4D8}',

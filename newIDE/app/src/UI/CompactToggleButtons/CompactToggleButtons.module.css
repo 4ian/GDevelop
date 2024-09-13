@@ -1,0 +1,42 @@
+.container {
+  display: flex;
+  align-items: center;
+  background-color: var(--theme-text-field-default-background-color);
+  flex: 1;
+}
+
+.compactToggleButton {
+  border-radius: 4px;
+  color: var(--theme-text-default-color);
+  background-color: var(--theme-text-field-default-background-color);
+  transition: box-shadow 0.1s;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-width: 0px;
+  margin: 3px;
+  border: 0;
+}
+
+.separator {
+  background-color: var(--theme-text-field-disabled-color);
+  height: 15px;
+  width: 1px;
+  margin: 0 1px;
+}
+
+/* svg tag is needed to be first priority compared to Material UI Custom SVG icon classes*/
+svg.icon {
+  font-size: 20px;
+  color: var(--theme-text-default-color);
+  transition: color 0.1s linear;
+}
+
+.compactToggleButton.active {
+  background-color: var(--theme-icon-button-selected-background-color);
+}
+.compactToggleButton.active svg.icon {
+  color: var(--theme-icon-button-selected-color);
+}

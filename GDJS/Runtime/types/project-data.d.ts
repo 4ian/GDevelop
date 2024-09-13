@@ -254,6 +254,11 @@ declare interface InstanceData {
   rotationY?: number;
 
   zOrder: number;
+  opacity?: number;
+
+  flippedX?: boolean;
+  flippedY?: boolean;
+  flippedZ?: boolean;
 
   customSize: boolean;
   width: number;

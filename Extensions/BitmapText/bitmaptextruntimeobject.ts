@@ -203,6 +203,9 @@ namespace gdjs {
       if (initialInstanceData.customSize) {
         this.setWrappingWidth(initialInstanceData.width);
       }
+      if (initialInstanceData.opacity !== undefined) {
+        this.setOpacity(initialInstanceData.opacity);
+      }
     }
 
     onDestroyed(): void {

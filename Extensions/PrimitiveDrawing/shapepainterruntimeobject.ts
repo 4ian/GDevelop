@@ -166,6 +166,19 @@ namespace gdjs {
       return true;
     }
 
+    /**
+     * Initialize the extra parameters that could be set for an instance.
+     * @param initialInstanceData The extra parameters
+     */
+    extraInitializationFromInitialInstance(initialInstanceData: InstanceData) {
+      if (initialInstanceData.flippedX) {
+        this.flipX(initialInstanceData.flippedX);
+      }
+      if (initialInstanceData.flippedY) {
+        this.flipY(initialInstanceData.flippedY);
+      }
+    }
+
     stepBehaviorsPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
       //We redefine stepBehaviorsPreEvents just to clear the graphics before running events.
       if (this._clearBetweenFrames) {

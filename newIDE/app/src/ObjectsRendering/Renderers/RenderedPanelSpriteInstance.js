@@ -76,6 +76,10 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
     if (this._width !== oldWidth || this._height !== oldHeight) {
       this.updateWidthHeight();
     }
+
+    // Do not hide completely an object so it can still be manipulated
+    const alphaForDisplay = Math.max(this._instance.getOpacity() / 255, 0.5);
+    this._pixiObject.alpha = alphaForDisplay;
   }
 
   makeObjectsAndUpdateTextures() {

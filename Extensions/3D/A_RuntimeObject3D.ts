@@ -164,8 +164,18 @@ namespace gdjs {
         this.setWidth(initialInstanceData.width);
         this.setHeight(initialInstanceData.height);
       }
-      if (initialInstanceData.depth !== undefined)
+      if (initialInstanceData.depth !== undefined) {
         this.setDepth(initialInstanceData.depth);
+      }
+      if (initialInstanceData.flippedX) {
+        this.flipX(initialInstanceData.flippedX);
+      }
+      if (initialInstanceData.flippedY) {
+        this.flipY(initialInstanceData.flippedY);
+      }
+      if (initialInstanceData.flippedZ) {
+        this.flipZ(initialInstanceData.flippedZ);
+      }
     }
 
     setX(x: float): void {

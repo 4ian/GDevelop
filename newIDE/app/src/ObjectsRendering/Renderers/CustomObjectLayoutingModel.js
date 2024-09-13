@@ -387,6 +387,7 @@ export class ChildInstance {
   x: number;
   y: number;
   z: number;
+  opacity: number;
   _hasCustomSize: boolean;
   _hasCustomDepth: boolean;
   _customWidth: number;
@@ -397,6 +398,7 @@ export class ChildInstance {
     this.x = 0;
     this.y = 0;
     this.z = 0;
+    this.opacity = 255;
     this._customWidth = 0;
     this._customHeight = 0;
     this._customDepth = 0;
@@ -463,6 +465,26 @@ export class ChildInstance {
   }
 
   setZOrder(zOrder: number) {}
+
+  getOpacity() {
+    return this.opacity;
+  }
+
+  setOpacity(opacity: number) {
+    this.opacity = opacity;
+  }
+
+  isFlippedX() {
+    return false;
+  }
+
+  setFlippedX(flippedX: boolean) {}
+
+  isFlippedY() {
+    return false;
+  }
+
+  setFlippedY(flippedY: boolean) {}
 
   getLayer() {
     return '';

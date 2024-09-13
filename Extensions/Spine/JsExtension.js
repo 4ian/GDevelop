@@ -182,6 +182,20 @@ module.exports = {
           this._instance.getAngle()
         );
 
+        // Do not hide completely an object so it can still be manipulated
+        const alphaForDisplay = Math.max(
+          this._instance.getOpacity() / 255,
+          0.5
+        );
+        this._pixiObject.alpha = alphaForDisplay;
+        // Scale is already handled below, so we just apply the flip here.
+        this._pixiObject.scale.x =
+          Math.abs(this._pixiObject.scale.x) *
+          (this._instance.isFlippedX() ? -1 : 1);
+        this._pixiObject.scale.y =
+          Math.abs(this._pixiObject.scale.y) *
+          (this._instance.isFlippedY() ? -1 : 1);
+
         this.setAnimation(this._instance.getRawDoubleProperty('animation'));
 
         const width = this.getWidth();

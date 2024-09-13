@@ -27,7 +27,11 @@ InitialInstance::InitialInstance()
       rotationX(0),
       rotationY(0),
       zOrder(0),
+      opacity(255),
       layer(""),
+      flippedX(false),
+      flippedY(false),
+      flippedZ(false),
       customSize(false),
       customDepth(false),
       width(0),
@@ -57,7 +61,11 @@ void InitialInstance::UnserializeFrom(const SerializerElement& element) {
     SetHasCustomDepth(false);
   }
   SetZOrder(element.GetIntAttribute("zOrder", 0, "plan"));
+  SetOpacity(element.GetIntAttribute("opacity", 255));
   SetLayer(element.GetStringAttribute("layer"));
+  SetFlippedX(element.GetBoolAttribute("flippedX", false));
+  SetFlippedY(element.GetBoolAttribute("flippedY", false));
+  SetFlippedZ(element.GetBoolAttribute("flippedZ", false));
   SetLocked(element.GetBoolAttribute("locked", false));
   SetSealed(element.GetBoolAttribute("sealed", false));
   SetShouldKeepRatio(element.GetBoolAttribute("keepRatio", false));
@@ -113,6 +121,10 @@ void InitialInstance::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("y", GetY());
   if (GetZ() != 0) element.SetAttribute("z", GetZ());
   element.SetAttribute("zOrder", GetZOrder());
+  if (GetOpacity() != 255) element.SetAttribute("opacity", GetOpacity());
+  if (IsFlippedX()) element.SetAttribute("flippedX", IsFlippedX());
+  if (IsFlippedY()) element.SetAttribute("flippedY", IsFlippedY());
+  if (IsFlippedZ()) element.SetAttribute("flippedZ", IsFlippedZ());
   element.SetAttribute("layer", GetLayer());
   element.SetAttribute("angle", GetAngle());
   if (GetRotationX() != 0) element.SetAttribute("rotationX", GetRotationX());
@@ -155,8 +167,8 @@ InitialInstance& InitialInstance::ResetPersistentUuid() {
 
 std::map<gd::String, gd::PropertyDescriptor>
 InitialInstance::GetCustomProperties(
-    gd::ObjectsContainer &globalObjectsContainer,
-    gd::ObjectsContainer &objectsContainer) {
+    gd::ObjectsContainer& globalObjectsContainer,
+    gd::ObjectsContainer& objectsContainer) {
   // Find an object
   if (objectsContainer.HasObjectNamed(GetObjectName()))
     return objectsContainer.GetObject(GetObjectName())
@@ -172,9 +184,10 @@ InitialInstance::GetCustomProperties(
 }
 
 bool InitialInstance::UpdateCustomProperty(
-    const gd::String &name, const gd::String &value,
-    gd::ObjectsContainer &globalObjectsContainer,
-    gd::ObjectsContainer &objectsContainer) {
+    const gd::String& name,
+    const gd::String& value,
+    gd::ObjectsContainer& globalObjectsContainer,
+    gd::ObjectsContainer& objectsContainer) {
   if (objectsContainer.HasObjectNamed(GetObjectName()))
     return objectsContainer.GetObject(GetObjectName())
         .GetConfiguration()

@@ -60,13 +60,6 @@ module.exports = {
         .setLabel(_('Text'));
 
       objectProperties
-        .getOrCreate('opacity')
-        .setValue(objectContent.opacity.toString())
-        .setType('number')
-        .setLabel(_('Opacity (0-255)'))
-        .setGroup(_('Appearance'));
-
-      objectProperties
         .getOrCreate('align')
         .setValue(objectContent.align)
         .setType('choice')
@@ -673,9 +666,6 @@ module.exports = {
         const rawText = properties.get('text').getValue();
         this._pixiObject.text = rawText;
 
-        const opacity = +properties.get('opacity').getValue();
-        this._pixiObject.alpha = opacity / 255;
-
         const align = properties.get('align').getValue();
         this._pixiObject.align = align;
 
@@ -739,6 +729,13 @@ module.exports = {
         this._pixiObject.rotation = RenderedInstance.toRad(
           this._instance.getAngle()
         );
+
+        // Do not hide completely an object so it can still be manipulated
+        const alphaForDisplay = Math.max(
+          this._instance.getOpacity() / 255,
+          0.5
+        );
+        this._pixiObject.alpha = alphaForDisplay;
       }
 
       onRemovedFromScene() {

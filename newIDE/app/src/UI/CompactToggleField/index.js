@@ -32,35 +32,35 @@ export const CompactToggleField = (props: Props) => {
     : [props.label, ' - ', <MarkdownText source={props.markdownDescription} />];
   return (
     <label
-      class={classNames({
+      className={classNames({
         [classes.container]: true,
         [classes.fullWidth]: props.fullWidth,
       })}
       id={props.id}
     >
-      <div class={classes.toggleSwitch}>
+      <div className={classes.toggleSwitch}>
         <input
           type="checkbox"
-          class={classes.checkbox}
+          className={classes.checkbox}
           onChange={() => props.onCheck(!props.checked)}
           disabled={props.disabled}
         />
         <span
-          class={classNames({
+          className={classNames({
             [classes.slider]: true,
             [classes.checked]: props.checked,
             [classes.disabled]: props.disabled,
           })}
         >
           <span
-            class={classNames({
+            className={classNames({
               [classes.handleContainer]: true,
               [classes.checked]: props.checked,
               [classes.disabled]: props.disabled,
             })}
           >
             <span
-              class={classNames({
+              className={classNames({
                 [classes.handle]: true,
                 [classes.checked]: props.checked,
                 [classes.disabled]: props.disabled,

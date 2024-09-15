@@ -2504,9 +2504,9 @@ module.exports = {
         const scaleY = height * (this._instance.isFlippedY() ? -1 : 1);
         const scaleZ = depth * (this._instance.isFlippedZ() ? -1 : 1);
         if (
-          scaleX !== this._threeObject.scale.width ||
-          scaleY !== this._threeObject.scale.height ||
-          scaleZ !== this._threeObject.scale.depth
+          scaleX !== this._threeObject.scale.x ||
+          scaleY !== this._threeObject.scale.y ||
+          scaleZ !== this._threeObject.scale.z
         ) {
           this._threeObject.scale.set(scaleX, scaleY, scaleZ);
           uvMappingDirty = true;
@@ -3023,6 +3023,17 @@ module.exports = {
       }
     }
 
+    const isSamePoint = (point1, point2) => {
+      if (!point1 && !point2) return true;
+      if (point1 && !point2) return false;
+      if (!point1 && point2) return false;
+      return (
+        point1[0] === point2[0] &&
+        point1[1] === point2[1] &&
+        point1[2] === point2[2]
+      );
+    };
+
     const getPointForLocation = (location) => {
       switch (location) {
         case 'ModelOrigin':
@@ -3060,23 +3071,19 @@ module.exports = {
           pixiResourcesLoader
         );
         const properties = associatedObjectConfiguration.getProperties();
-        this._defaultWidth = parseFloat(properties.get('width').getValue());
-        this._defaultHeight = parseFloat(properties.get('height').getValue());
-        this._defaultDepth = parseFloat(properties.get('depth').getValue());
-        const rotationX = parseFloat(properties.get('rotationX').getValue());
-        const rotationY = parseFloat(properties.get('rotationY').getValue());
-        const rotationZ = parseFloat(properties.get('rotationZ').getValue());
-        const keepAspectRatio =
-          properties.get('keepAspectRatio').getValue() === 'true';
-        const modelResourceName = properties
-          .get('modelResourceName')
-          .getValue();
-        this._originPoint = getPointForLocation(
-          properties.get('originLocation').getValue()
-        );
-        this._centerPoint = getPointForLocation(
-          properties.get('centerLocation').getValue()
-        );
+        this._defaultWidth = 1;
+        this._defaultHeight = 1;
+        this._defaultDepth = 1;
+        this._originalWidth = 1;
+        this._originalHeight = 1;
+        this._originalDepth = 1;
+        this._rotationX = 0;
+        this._rotationY = 0;
+        this._rotationZ = 0;
+        this._keepAspectRatio = false;
+
+        this._originPoint = null;
+        this._centerPoint = null;
 
         this._pixiObject = new PIXI.Graphics();
         this._pixiContainer.addChild(this._pixiObject);
@@ -3085,28 +3092,8 @@ module.exports = {
         this._threeObject.rotation.order = 'ZYX';
         this._threeGroup.add(this._threeObject);
 
-        this._pixiResourcesLoader
-          .get3DModel(project, modelResourceName)
-          .then((model3d) => {
-            const clonedModel3D = THREE_ADDONS.SkeletonUtils.clone(
-              model3d.scene
-            );
-            // This group hold the rotation defined by properties.
-            const threeObject = new THREE.Group();
-            threeObject.rotation.order = 'ZYX';
-            threeObject.add(clonedModel3D);
-            this._updateDefaultTransformation(
-              threeObject,
-              rotationX,
-              rotationY,
-              rotationZ,
-              this._defaultWidth,
-              this._defaultHeight,
-              this._defaultDepth,
-              keepAspectRatio
-            );
-            this._threeObject.add(threeObject);
-          });
+        this._threeModelGroup = null;
+        this._clonedModel3D = null;
       }
 
       getOriginX() {
@@ -3147,23 +3134,30 @@ module.exports = {
         return this._centerPoint || this._modelOriginPoint;
       }
 
-      _updateDefaultTransformation(
-        threeObject,
-        rotationX,
-        rotationY,
-        rotationZ,
-        originalWidth,
-        originalHeight,
-        originalDepth,
-        keepAspectRatio
-      ) {
-        threeObject.rotation.set(
-          (rotationX * Math.PI) / 180,
-          (rotationY * Math.PI) / 180,
-          (rotationZ * Math.PI) / 180
+      _updateDefaultTransformation() {
+        if (!this._clonedModel3D) return; // Model is not ready - nothing to do.
+
+        if (this._threeModelGroup) {
+          // Remove any previous container as we will recreate it just below
+          this._threeObject.clear();
+        }
+        // This group hold the rotation defined by properties.
+        // Always restart from a new group to avoid miscomputing bounding boxes/sizes.
+        this._threeModelGroup = new THREE.Group();
+        this._threeModelGroup.rotation.order = 'ZYX';
+        this._threeModelGroup.add(this._clonedModel3D);
+
+        const properties = this._associatedObjectConfiguration.getProperties();
+
+        this._threeModelGroup.rotation.set(
+          (this._rotationX * Math.PI) / 180,
+          (this._rotationY * Math.PI) / 180,
+          (this._rotationZ * Math.PI) / 180
         );
-        threeObject.updateMatrixWorld(true);
-        const boundingBox = new THREE.Box3().setFromObject(threeObject);
+        this._threeModelGroup.updateMatrixWorld(true);
+        const boundingBox = new THREE.Box3().setFromObject(
+          this._threeModelGroup
+        );
 
         const shouldKeepModelOrigin = !this._originPoint;
         if (shouldKeepModelOrigin) {
@@ -3190,7 +3184,7 @@ module.exports = {
         // Center the model.
         const centerPoint = this._centerPoint;
         if (centerPoint) {
-          threeObject.position.set(
+          this._threeModelGroup.position.set(
             -(boundingBox.min.x + modelWidth * centerPoint[0]),
             // The model is flipped on Y axis.
             -(boundingBox.min.y + modelHeight * (1 - centerPoint[1])),
@@ -3199,11 +3193,11 @@ module.exports = {
         }
 
         // Rotate the model.
-        threeObject.scale.set(1, 1, 1);
-        threeObject.rotation.set(
-          (rotationX * Math.PI) / 180,
-          (rotationY * Math.PI) / 180,
-          (rotationZ * Math.PI) / 180
+        this._threeModelGroup.scale.set(1, 1, 1);
+        this._threeModelGroup.rotation.set(
+          (this._rotationX * Math.PI) / 180,
+          (this._rotationY * Math.PI) / 180,
+          (this._rotationZ * Math.PI) / 180
         );
 
         // Stretch the model in a 1x1x1 cube.
@@ -3215,23 +3209,23 @@ module.exports = {
         // Flip on Y because the Y axis is on the opposite side of direct basis.
         // It avoids models to be like a mirror refection.
         scaleMatrix.makeScale(scaleX, -scaleY, scaleZ);
-        threeObject.updateMatrix();
-        threeObject.applyMatrix4(scaleMatrix);
+        this._threeModelGroup.updateMatrix();
+        this._threeModelGroup.applyMatrix4(scaleMatrix);
 
-        if (keepAspectRatio) {
+        if (this._keepAspectRatio) {
           // Reduce the object dimensions to keep aspect ratio.
           const widthRatio =
             modelWidth < epsilon
               ? Number.POSITIVE_INFINITY
-              : originalWidth / modelWidth;
+              : this._originalWidth / modelWidth;
           const heightRatio =
             modelHeight < epsilon
               ? Number.POSITIVE_INFINITY
-              : originalHeight / modelHeight;
+              : this._originalHeight / modelHeight;
           const depthRatio =
             modelDepth < epsilon
               ? Number.POSITIVE_INFINITY
-              : originalDepth / modelDepth;
+              : this._originalDepth / modelDepth;
           const minScaleRatio = Math.min(widthRatio, heightRatio, depthRatio);
           if (!Number.isFinite(minScaleRatio)) {
             this._defaultWidth = modelWidth;
@@ -3239,48 +3233,128 @@ module.exports = {
             this._defaultDepth = modelDepth;
           } else {
             if (widthRatio === minScaleRatio) {
-              this._defaultWidth = originalWidth;
+              this._defaultWidth = this._originalWidth;
               this._defaultHeight = Rendered3DInstance.applyRatio({
                 oldReferenceValue: modelWidth,
-                newReferenceValue: originalWidth,
+                newReferenceValue: this._originalWidth,
                 valueToApplyTo: modelHeight,
               });
               this._defaultDepth = Rendered3DInstance.applyRatio({
                 oldReferenceValue: modelWidth,
-                newReferenceValue: originalWidth,
+                newReferenceValue: this._originalWidth,
                 valueToApplyTo: modelDepth,
               });
             } else if (heightRatio === minScaleRatio) {
               this._defaultWidth = Rendered3DInstance.applyRatio({
                 oldReferenceValue: modelHeight,
-                newReferenceValue: originalHeight,
+                newReferenceValue: this._originalHeight,
                 valueToApplyTo: modelWidth,
               });
 
-              this._defaultHeight = originalHeight;
+              this._defaultHeight = this._originalHeight;
               this._defaultDepth = Rendered3DInstance.applyRatio({
                 oldReferenceValue: modelHeight,
-                newReferenceValue: originalHeight,
+                newReferenceValue: this._originalHeight,
                 valueToApplyTo: modelDepth,
               });
             } else {
               this._defaultWidth = Rendered3DInstance.applyRatio({
                 oldReferenceValue: modelDepth,
-                newReferenceValue: originalDepth,
+                newReferenceValue: this._originalDepth,
                 valueToApplyTo: modelWidth,
               });
               this._defaultHeight = Rendered3DInstance.applyRatio({
                 oldReferenceValue: modelDepth,
-                newReferenceValue: originalDepth,
+                newReferenceValue: this._originalDepth,
                 valueToApplyTo: modelHeight,
               });
-              this._defaultDepth = originalDepth;
+              this._defaultDepth = this._originalDepth;
             }
           }
         }
+
+        this._threeObject.add(this._threeModelGroup);
       }
 
       updateThreeObject() {
+        const properties = this._associatedObjectConfiguration.getProperties();
+
+        let defaultTransformationDirty = false;
+
+        const originalWidth = parseFloat(properties.get('width').getValue());
+        const originalHeight = parseFloat(properties.get('height').getValue());
+        const originalDepth = parseFloat(properties.get('depth').getValue());
+        if (
+          this._originalWidth !== originalWidth ||
+          this._originalHeight !== originalHeight ||
+          this._originalDepth !== originalDepth
+        ) {
+          this._originalWidth = originalWidth;
+          this._originalHeight = originalHeight;
+          this._originalDepth = originalDepth;
+          defaultTransformationDirty = true;
+        }
+
+        const rotationX = parseFloat(properties.get('rotationX').getValue());
+        const rotationY = parseFloat(properties.get('rotationY').getValue());
+        const rotationZ = parseFloat(properties.get('rotationZ').getValue());
+        if (
+          this._rotationX !== rotationX ||
+          this._rotationY !== rotationY ||
+          this._rotationZ !== rotationZ
+        ) {
+          this._rotationX = rotationX;
+          this._rotationY = rotationY;
+          this._rotationZ = rotationZ;
+          defaultTransformationDirty = true;
+        }
+
+        const keepAspectRatio =
+          properties.get('keepAspectRatio').getValue() === 'true';
+        if (this._keepAspectRatio !== keepAspectRatio) {
+          this._keepAspectRatio = keepAspectRatio;
+          defaultTransformationDirty = true;
+        }
+
+        const originPoint = getPointForLocation(
+          properties.get('originLocation').getValue()
+        );
+        if (!isSamePoint(originPoint, this._originPoint)) {
+          this._originPoint = originPoint;
+          defaultTransformationDirty = true;
+        }
+
+        const centerPoint = getPointForLocation(
+          properties.get('centerLocation').getValue()
+        );
+        if (!isSamePoint(centerPoint, this._centerPoint)) {
+          this._centerPoint = centerPoint;
+          defaultTransformationDirty = true;
+        }
+
+        if (defaultTransformationDirty) this._updateDefaultTransformation();
+
+        const modelResourceName = properties
+          .get('modelResourceName')
+          .getValue();
+        if (this._modelResourceName !== modelResourceName) {
+          this._modelResourceName = modelResourceName;
+
+          this._pixiResourcesLoader
+            .get3DModel(this._project, modelResourceName)
+            .then((model3d) => {
+              this._clonedModel3D = THREE_ADDONS.SkeletonUtils.clone(
+                model3d.scene
+              );
+
+              this._updateDefaultTransformation();
+            });
+        }
+
+        this._updateThreeObjectPosition();
+      }
+
+      _updateThreeObjectPosition() {
         const width = this.getWidth();
         const height = this.getHeight();
         const depth = this.getDepth();
@@ -3304,9 +3378,9 @@ module.exports = {
         const scaleZ = depth * (this._instance.isFlippedZ() ? -1 : 1);
 
         if (
-          scaleX !== this._threeObject.scale.width ||
-          scaleY !== this._threeObject.scale.height ||
-          scaleZ !== this._threeObject.scale.depth
+          scaleX !== this._threeObject.scale.x ||
+          scaleY !== this._threeObject.scale.y ||
+          scaleZ !== this._threeObject.scale.z
         ) {
           this._threeObject.scale.set(scaleX, scaleY, scaleZ);
         }

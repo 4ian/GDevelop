@@ -617,6 +617,7 @@ const CompactPropertiesEditor = ({
         const { setValue } = field;
         compactSelectField = (
           <CompactSelectField
+            key={field.name}
             value={getFieldValue({ instances, field })}
             id={field.name}
             onChange={(newValue: string) => {
@@ -635,6 +636,7 @@ const CompactPropertiesEditor = ({
         const { setValue } = field;
         compactSelectField = (
           <CompactSelectField
+            key={field.name}
             value={getFieldValue({
               instances,
               field,

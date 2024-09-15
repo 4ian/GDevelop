@@ -284,6 +284,7 @@ export const CompactObjectPropertiesEditor = ({
                   .getObjectAt(i);
                 return (
                   <CollapsibleSubPanel
+                    key={i}
                     renderContent={() => (
                       <ChildObjectPropertiesEditor
                         key={i}
@@ -341,6 +342,7 @@ export const CompactObjectPropertiesEditor = ({
 
               return (
                 <CollapsibleSubPanel
+                  key={behavior.ptr}
                   renderContent={() => (
                     <CompactBehaviorPropertiesEditor
                       project={project}
@@ -468,6 +470,7 @@ export const CompactObjectPropertiesEditor = ({
 
                     return (
                       <CollapsibleSubPanel
+                        key={effect.ptr}
                         renderContent={() => (
                           <ColumnStackLayout expand noOverflowParent>
                             <CompactSelectField

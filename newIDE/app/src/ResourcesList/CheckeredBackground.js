@@ -2,6 +2,10 @@
 import * as React from 'react';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 
+type Props = {|
+  borderRadius?: number,
+|};
+
 /**
  * Adds a checkered background to the container element.
  * This component is made to be used as background for sprite editors
@@ -18,7 +22,7 @@ import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
  * (or it just doesn't work as expected), ensure that the parent element and
  * at least one of the sibling elements have `position: relative` set.
  */
-const CheckeredBackground = () => {
+const CheckeredBackground = ({ borderRadius }: Props) => {
   const theme = React.useContext(GDevelopThemeContext);
   const backgroundStyle = {
     position: 'absolute',
@@ -26,6 +30,7 @@ const CheckeredBackground = () => {
     left: 0,
     width: '100%',
     height: '100%',
+    borderRadius: borderRadius,
 
     // Apply a theme-defined CSS filter on static checkered background
     background: 'url("res/transparentback.png") repeat',

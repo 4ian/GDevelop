@@ -42,21 +42,16 @@ import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExte
 
 const gd: libGDevelop = global.gd;
 
-const SPRITE_SIZE = 100; //TODO: Factor with Thumbnail
+const SPRITE_SIZE = 100;
 
 const styles = {
   spritesList: {
-    whiteSpace: 'nowrap',
+    display: 'flex',
     overflowY: 'hidden',
     flex: 1,
   },
   thumbnailExtraStyle: {
     marginLeft: 5,
-  },
-  spriteThumbnailImage: {
-    maxWidth: SPRITE_SIZE,
-    maxHeight: SPRITE_SIZE,
-    verticalAlign: 'middle',
   },
 };
 
@@ -79,7 +74,7 @@ const SortableSpriteThumbnail = SortableElement(
       resourcesLoader={resourcesLoader}
       project={project}
       style={isFirst ? {} : styles.thumbnailExtraStyle}
-      size={100}
+      size={SPRITE_SIZE}
     />
   )
 );
@@ -124,7 +119,7 @@ const SortableList = SortableContainer(
                 resourceName={sprite.getImageName()}
                 resourcesLoader={resourcesLoader}
                 project={project}
-                size={100}
+                size={SPRITE_SIZE}
               />
             );
           }),
@@ -134,7 +129,7 @@ const SortableList = SortableContainer(
               project={project}
               resourceName=""
               resourcesLoader={resourcesLoader}
-              size={100}
+              size={SPRITE_SIZE}
             />
           ),
         ]}

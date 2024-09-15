@@ -25,7 +25,7 @@ const styles = {
     textAlign: 'initial',
     position: 'absolute',
     width: 34, // Used to position the checkbox near the right border with a proper margin
-    height: 64,
+    height: 25,
     bottom: 0,
     right: 0,
   },
@@ -81,7 +81,7 @@ const ImageThumbnail = (props: Props) => {
       }}
       {...longTouchForContextMenuProps}
     >
-      <CheckeredBackground />
+      <CheckeredBackground borderRadius={4} />
       <CorsAwareImage
         style={{
           ...styles.spriteThumbnailImage,

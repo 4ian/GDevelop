@@ -166,6 +166,7 @@ module.exports = {
         this._pixiObject.addChild(this._rect);
         this._pixiContainer.addChild(this._pixiObject);
 
+        this._spineResourceName = '';
         this._loadSpine();
       }
 
@@ -174,6 +175,15 @@ module.exports = {
       }
 
       update() {
+        const properties = this._associatedObjectConfiguration.getProperties();
+        const spineResourceName = properties
+          .get('spineResourceName')
+          .getValue();
+        if (this._spineResourceName !== spineResourceName) {
+          this._spineResourceName = spineResourceName;
+          this._loadSpine();
+        }
+
         this._pixiObject.position.set(
           this._instance.getX(),
           this._instance.getY()
@@ -198,10 +208,17 @@ module.exports = {
 
         this.setAnimation(this._instance.getRawDoubleProperty('animation'));
 
+        const scale = Number(properties.get('scale').getValue()) || 1
+
+        const spine = this._spine;
+        if (spine) {
+          const localBounds = spine.getLocalBounds(undefined, true);
+          this._initialWidth = localBounds.width * scale;
+          this._initialHeight = localBounds.height * scale;
+        }
+
         const width = this.getWidth();
         const height = this.getHeight();
-        const { _spine: spine } = this;
-
         if (spine) {
           spine.width = width;
           spine.height = height;
@@ -248,7 +265,7 @@ module.exports = {
        */
       setAnimation(index) {
         const { _spine: spine } = this;
-        const configuration = this._getConfiguration();
+        const configuration = gd.asSpineConfiguration(this._associatedObjectConfiguration);
 
         if (
           !spine ||
@@ -276,8 +293,6 @@ module.exports = {
         spine.state.tracks[0].trackTime = 0;
         spine.update(0);
         spine.autoUpdate = false;
-        this._initialWidth = spine.width * this.getScale();
-        this._initialHeight = spine.height * this.getScale();
       }
 
       /**
@@ -294,41 +309,17 @@ module.exports = {
         return this._initialHeight !== null ? this._initialHeight : 256;
       }
 
-      /**
-       * @returns {number} defined scale
-       */
-      getScale() {
-        return Number(this._getProperties().get('scale').getValue()) || 1;
-      }
-
       onRemovedFromScene() {
         super.onRemovedFromScene();
         this._pixiObject.destroy({ children: true });
       }
 
-      /**
-       * @returns this spine object configuration
-       */
-      _getConfiguration() {
-        return gd.asSpineConfiguration(this._associatedObjectConfiguration);
-      }
-
-      /**
-       * @returns this object properties container
-       */
-      _getProperties() {
-        return this._associatedObjectConfiguration.getProperties();
-      }
-
       _loadSpine() {
-        const properties = this._getProperties();
-        const spineResourceName = properties
-          .get('spineResourceName')
-          .getValue();
-
         this._pixiResourcesLoader
-          .getSpineData(this._project, spineResourceName)
+          .getSpineData(this._project, this._spineResourceName)
           .then((spineDataOrLoadingError) => {
+            if (this._spine) this._pixiObject.removeChild(this._spine)
+
             if (!spineDataOrLoadingError.skeleton) {
               console.error(
                 'Unable to load Spine (' +
@@ -343,13 +334,11 @@ module.exports = {
 
             try {
               this._spine = new PIXI.Spine(spineDataOrLoadingError.skeleton);
+              this._pixiObject.addChild(this._spine);
             } catch (error) {
               console.error('Exception while loading Spine.', error);
               this._spine = null;
-              return;
             }
-            this._pixiObject.addChild(this._spine);
-            this.update();
           });
       }
     }

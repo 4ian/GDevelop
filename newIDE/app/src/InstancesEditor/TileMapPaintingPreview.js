@@ -345,7 +345,7 @@ class TileMapPaintingPreview {
     spritesCoordinatesInTileMapGrid.forEach(({ x, y }) => {
       let sprite;
 
-      if (tileMapTileSelection.kind === 'single' || isBadlyConfigured) {
+      if (tileMapTileSelection.kind === 'single') {
         // TODO: Find a way not to regenerate the sprites on each render.
         sprite = new PIXI.Sprite(texture);
         if (tileMapTileSelection.flipHorizontally) {
@@ -355,6 +355,7 @@ class TileMapPaintingPreview {
           sprite.scale.y *= -1;
         }
       } else {
+        // If the tileset is badly configured, use tiled sprite with the invalid texture.
         sprite = new PIXI.TilingSprite(texture, 2, 2);
         sprite.tileScale.x = this.viewPosition.toCanvasScale(scaleX);
         sprite.tileScale.y = this.viewPosition.toCanvasScale(scaleY);

@@ -28,17 +28,17 @@ namespace gdjs {
       this._runtimeGame = runtimeGame;
     }
 
-    static groupByPersistentUuid<
+    static indexByPersistentUuid<
       ObjectWithPersistentId extends { persistentUuid: string | null }
     >(
       objectsWithPersistentId: ObjectWithPersistentId[]
-    ): Record<string, ObjectWithPersistentId> {
+    ): Map<string, ObjectWithPersistentId> {
       return objectsWithPersistentId.reduce(function (objectsMap, object) {
         if (object.persistentUuid) {
-          objectsMap[object.persistentUuid] = object;
+          objectsMap.set(object.persistentUuid, object);
         }
         return objectsMap;
-      }, {});
+      }, new Map<string, ObjectWithPersistentId>());
     }
 
     static indexByName<E extends { name: string | null }>(
@@ -972,17 +972,8 @@ namespace gdjs {
             hotReloadSucceeded;
         });
 
-        // Don't update the variables, behaviors and effects for each runtime object to avoid
+        // Don't update behaviors and effects for each runtime object to avoid
         // doing the check for differences for every single object.
-
-        // Update variables
-        runtimeObjects.forEach((runtimeObject) => {
-          this._hotReloadVariablesContainer(
-            oldObjectData.variables as Required<VariableData>[],
-            newObjectData.variables as Required<VariableData>[],
-            runtimeObject.getVariables()
-          );
-        });
 
         // Update behaviors
         this._hotReloadRuntimeObjectsBehaviors(
@@ -1353,23 +1344,19 @@ namespace gdjs {
       runtimeInstanceContainer: gdjs.RuntimeInstanceContainer
     ): void {
       const runtimeObjects = runtimeInstanceContainer.getAdhocListOfAllInstances();
-      const groupedOldInstances: {
-        [key: number]: InstanceData;
-      } = HotReloader.groupByPersistentUuid(oldInstances);
-      const groupedNewInstances: {
-        [key: number]: InstanceData;
-      } = HotReloader.groupByPersistentUuid(newInstances);
-      const groupedRuntimeObjects: {
-        [key: number]: gdjs.RuntimeObject;
-      } = HotReloader.groupByPersistentUuid(runtimeObjects);
+      const oldInstanceByUuid = HotReloader.indexByPersistentUuid(oldInstances);
+      const newInstanceByUuid = HotReloader.indexByPersistentUuid(newInstances);
+      const runtimeObjectByUuid = HotReloader.indexByPersistentUuid(
+        runtimeObjects
+      );
 
       const oldObjectsMap = HotReloader.indexByName(oldObjects);
       const newObjectsMap = HotReloader.indexByName(newObjects);
 
-      for (const persistentUuid in groupedOldInstances) {
-        const oldInstance = groupedOldInstances[persistentUuid];
-        const newInstance = groupedNewInstances[persistentUuid];
-        const runtimeObject = groupedRuntimeObjects[persistentUuid];
+      for (const persistentUuid of oldInstanceByUuid.keys()) {
+        const oldInstance = oldInstanceByUuid.get(persistentUuid);
+        const newInstance = newInstanceByUuid.get(persistentUuid);
+        const runtimeObject = runtimeObjectByUuid.get(persistentUuid);
 
         if (
           oldInstance &&
@@ -1383,16 +1370,21 @@ namespace gdjs {
         }
       }
 
-      for (const persistentUuid in groupedRuntimeObjects) {
-        const runtimeObject = groupedRuntimeObjects[persistentUuid];
+      for (const runtimeObject of runtimeObjects) {
         const oldObjectData = oldObjectsMap.get(runtimeObject.getName());
         const newObjectData = newObjectsMap.get(runtimeObject.getName());
         if (!runtimeObject || !oldObjectData || !newObjectData) {
           // New objects or deleted objects can't have instances to hot-reload.
           continue;
         }
-        const oldInstance = groupedOldInstances[persistentUuid];
-        const newInstance = groupedNewInstances[persistentUuid];
+        const oldInstance = oldInstanceByUuid.get(
+          // @ts-ignore Private attribute
+          runtimeObject.persistentUuid
+        );
+        const newInstance = newInstanceByUuid.get(
+          // @ts-ignore Private attribute
+          runtimeObject.persistentUuid
+        );
         if (oldInstance && newInstance) {
           // Instance was not deleted nor created, maybe modified (or not):
           this._hotReloadRuntimeInstance(
@@ -1405,33 +1397,44 @@ namespace gdjs {
             newInstance,
             runtimeObject
           );
-        } else if (runtimeObject instanceof gdjs.CustomRuntimeObject) {
-          const childrenInstanceContainer = runtimeObject.getChildrenContainer();
+        } else {
+          // Reload objects that were created at runtime.
 
-          // The `objects` attribute is already resolved by `resolveCustomObjectConfigurations()`.
-          const oldCustomObjectData = oldObjectData as ObjectData &
-            CustomObjectConfiguration &
-            InstanceContainerData;
-          const newCustomObjectData = newObjectData as ObjectData &
-            CustomObjectConfiguration &
-            InstanceContainerData;
-
-          // Reload the content of custom objects that were created at runtime.
-          this._hotReloadRuntimeInstanceContainer(
-            oldProjectData,
-            newProjectData,
-            oldCustomObjectData,
-            newCustomObjectData,
-            changedRuntimeBehaviors,
-            childrenInstanceContainer
+          // Update variables
+          this._hotReloadVariablesContainer(
+            oldObjectData.variables,
+            newObjectData.variables,
+            runtimeObject.getVariables()
           );
+
+          if (runtimeObject instanceof gdjs.CustomRuntimeObject) {
+            const childrenInstanceContainer = runtimeObject.getChildrenContainer();
+
+            // The `objects` attribute is already resolved by `resolveCustomObjectConfigurations()`.
+            const oldCustomObjectData = oldObjectData as ObjectData &
+              CustomObjectConfiguration &
+              InstanceContainerData;
+            const newCustomObjectData = newObjectData as ObjectData &
+              CustomObjectConfiguration &
+              InstanceContainerData;
+
+            // Reload the content of custom objects that were created at runtime.
+            this._hotReloadRuntimeInstanceContainer(
+              oldProjectData,
+              newProjectData,
+              oldCustomObjectData,
+              newCustomObjectData,
+              changedRuntimeBehaviors,
+              childrenInstanceContainer
+            );
+          }
         }
       }
 
-      for (const persistentUuid in groupedNewInstances) {
-        const oldInstance = groupedOldInstances[persistentUuid];
-        const newInstance = groupedNewInstances[persistentUuid];
-        const runtimeObject = groupedRuntimeObjects[persistentUuid];
+      for (const persistentUuid of newInstanceByUuid.keys()) {
+        const oldInstance = oldInstanceByUuid.get(persistentUuid);
+        const newInstance = newInstanceByUuid.get(persistentUuid);
+        const runtimeObject = runtimeObjectByUuid.get(persistentUuid);
         if (
           newInstance &&
           (!oldInstance || oldInstance.name !== newInstance.name) &&
@@ -1577,8 +1580,14 @@ namespace gdjs {
 
       // Update variables
       this._hotReloadVariablesContainer(
-        oldInstance.initialVariables as Required<VariableData>[],
-        newInstance.initialVariables as Required<VariableData>[],
+        this._mergeObjectVariablesData(
+          oldObjectData.variables,
+          oldInstance.initialVariables
+        ),
+        this._mergeObjectVariablesData(
+          newObjectData.variables,
+          newInstance.initialVariables
+        ),
         runtimeObject.getVariables()
       );
 
@@ -1616,6 +1625,25 @@ namespace gdjs {
         // or updated according to the changes made in the project instance).
         runtimeObject.notifyBehaviorsObjectHotReloaded();
       }
+    }
+
+    _mergeObjectVariablesData(
+      objectVariablesData: RootVariableData[],
+      instanceVariablesData: RootVariableData[]
+    ): RootVariableData[] {
+      if (instanceVariablesData.length === 0) {
+        return objectVariablesData;
+      }
+      const variablesData = [...objectVariablesData];
+      for (const instanceVariableData of instanceVariablesData) {
+        const index = variablesData.indexOf(
+          (variableData) => variableData.name === instanceVariableData.name
+        );
+        if (index >= 0) {
+          variablesData[index] = instanceVariableData;
+        }
+      }
+      return variablesData;
     }
 
     /**

@@ -117,15 +117,15 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
   /**
    * Create and return a minimum working sprite object data.
    * @internal
-   * @param {{name: string, image: string}} data
+   * @param {{name: string, image?: string, variables?: Array<RootVariableData>}} data
    * @returns {gdjs.SpriteObjectData}
    */
-  const createSpriteData = ({ name, image }) => {
+  const createSpriteData = ({ name, image, variables }) => {
     return {
       type: 'Sprite',
       name,
       behaviors: [],
-      variables: [],
+      variables: variables || [],
       effects: [],
       animations: [
         {
@@ -144,7 +144,7 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
                   points: [],
                   hasCustomCollisionMask: false,
                   customCollisionMask: [],
-                  image,
+                  image: image === undefined ? 'MyImageResource' : image,
                 },
               ],
               timeBetweenFrames: 0,
@@ -452,6 +452,174 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
     expect(instances.length).to.be(2);
     expect(getSpriteCurrentFrameImage(instances[0])).to.be('ResourceB');
     expect(getSpriteCurrentFrameImage(instances[1])).to.be('ResourceB');
+  });
+
+  it('can change variable values of initial instances at hot-reload', async () => {
+    const oldProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1' }],
+          objects: [
+            createSpriteData({
+              name: 'MyObject',
+              variables: [
+                {
+                  name: 'MyVariable1',
+                  value: '123',
+                  type: 'number',
+                },
+                {
+                  name: 'MyVariable2',
+                  value: '456',
+                  type: 'number',
+                },
+              ],
+            }),
+          ],
+        }),
+      ],
+    });
+    const runtimeGame = new gdjs.RuntimeGame(oldProjectData);
+    const hotReloader = new gdjs.HotReloader(runtimeGame);
+    await runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
+      'Scene1',
+      () => {}
+    );
+    runtimeGame._sceneStack.push('Scene1');
+    const scene = runtimeGame.getSceneStack().getCurrentScene();
+    if (!scene) throw new Error("Couldn't set a current scene for testing.");
+
+    const instances = scene.getInstancesOf('MyObject');
+    expect(instances.length).to.be(1);
+    const variablesContainer = instances[0].getVariables();
+    // The variable values are changed by events.
+    variablesContainer.get('MyVariable1').setNumber(111);
+    variablesContainer.get('MyVariable2').setNumber(222);
+
+    const newProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1' }],
+          objects: [
+            createSpriteData({
+              name: 'MyObject',
+              variables: [
+                {
+                  name: 'MyVariable1',
+                  value: '123',
+                  type: 'number',
+                },
+                {
+                  name: 'MyVariable2',
+                  value: '789',
+                  type: 'number',
+                },
+              ],
+            }),
+          ],
+        }),
+      ],
+    });
+
+    await hotReloader._hotReloadRuntimeGame(
+      oldProjectData,
+      newProjectData,
+      [],
+      runtimeGame
+    );
+
+    // The current value is kept.
+    expect(variablesContainer.has('MyVariable1')).to.be(true);
+    expect(variablesContainer.get('MyVariable1').getAsNumber()).to.be(111);
+    expect(variablesContainer.getFromIndex(0).getAsNumber()).to.be(111);
+    // The current value is overridden.
+    expect(variablesContainer.has('MyVariable2')).to.be(true);
+    expect(variablesContainer.get('MyVariable2').getAsNumber()).to.be(789);
+    expect(variablesContainer.getFromIndex(1).getAsNumber()).to.be(789);
+  });
+
+  it('can change variable values of instances created at runtime at hot-reload', async () => {
+    const oldProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [],
+          objects: [
+            createSpriteData({
+              name: 'MyObject',
+              variables: [
+                {
+                  name: 'MyVariable1',
+                  value: '123',
+                  type: 'number',
+                },
+                {
+                  name: 'MyVariable2',
+                  value: '456',
+                  type: 'number',
+                },
+              ],
+            }),
+          ],
+        }),
+      ],
+    });
+    const runtimeGame = new gdjs.RuntimeGame(oldProjectData);
+    const hotReloader = new gdjs.HotReloader(runtimeGame);
+    await runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
+      'Scene1',
+      () => {}
+    );
+    runtimeGame._sceneStack.push('Scene1');
+    const scene = runtimeGame.getSceneStack().getCurrentScene();
+    if (!scene) throw new Error("Couldn't set a current scene for testing.");
+
+    const instances = scene.getInstancesOf('MyObject');
+    const instance = scene.createObject('MyObject');
+    const variablesContainer = instance.getVariables();
+    // The variable values are changed by events.
+    variablesContainer.get('MyVariable1').setNumber(111);
+    variablesContainer.get('MyVariable2').setNumber(222);
+
+    const newProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [],
+          objects: [
+            createSpriteData({
+              name: 'MyObject',
+              variables: [
+                {
+                  name: 'MyVariable1',
+                  value: '123',
+                  type: 'number',
+                },
+                {
+                  name: 'MyVariable2',
+                  value: '789',
+                  type: 'number',
+                },
+              ],
+            }),
+          ],
+        }),
+      ],
+    });
+
+    await hotReloader._hotReloadRuntimeGame(
+      oldProjectData,
+      newProjectData,
+      [],
+      runtimeGame
+    );
+
+    // The current value is kept.
+    expect(variablesContainer.has('MyVariable1')).to.be(true);
+    expect(variablesContainer.get('MyVariable1').getAsNumber()).to.be(111);
+    expect(variablesContainer.getFromIndex(0).getAsNumber()).to.be(111);
+    // The current value is overridden.
+    expect(variablesContainer.has('MyVariable2')).to.be(true);
+    expect(variablesContainer.get('MyVariable2').getAsNumber()).to.be(789);
+    expect(variablesContainer.getFromIndex(1).getAsNumber()).to.be(789);
   });
 });
 

@@ -134,45 +134,53 @@ export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
     });
   }
   if (coordinates.length === 2) {
-    const topLeftCornerCoordinatesInTileMap = [0, 0];
-    const bottomRightCornerCoordinatesInTileMap = [0, 0];
-
+    const firstPointCoordinatesInTileMap = [0, 0];
     sceneToTileMapTransformation.transform(
-      [
-        Math.min(coordinates[0].x, coordinates[1].x),
-        Math.min(coordinates[0].y, coordinates[1].y),
-      ],
-      topLeftCornerCoordinatesInTileMap
+      [coordinates[0].x, coordinates[0].y],
+      firstPointCoordinatesInTileMap
     );
-    topLeftCornerCoordinatesInTileMap[0] = Math.floor(
-      topLeftCornerCoordinatesInTileMap[0] / tileSize
-    );
-    topLeftCornerCoordinatesInTileMap[1] = Math.floor(
-      topLeftCornerCoordinatesInTileMap[1] / tileSize
-    );
-
+    const secondPointCoordinatesInTileMap = [0, 0];
     sceneToTileMapTransformation.transform(
-      [
-        Math.max(coordinates[0].x, coordinates[1].x),
-        Math.max(coordinates[0].y, coordinates[1].y),
-      ],
-      bottomRightCornerCoordinatesInTileMap
+      [coordinates[1].x, coordinates[1].y],
+      secondPointCoordinatesInTileMap
     );
-    bottomRightCornerCoordinatesInTileMap[0] = Math.floor(
-      bottomRightCornerCoordinatesInTileMap[0] / tileSize
-    );
-    bottomRightCornerCoordinatesInTileMap[1] = Math.floor(
-      bottomRightCornerCoordinatesInTileMap[1] / tileSize
-    );
+    const topLeftCornerCoordinatesInTileMap = [
+      Math.min(
+        firstPointCoordinatesInTileMap[0],
+        secondPointCoordinatesInTileMap[0]
+      ),
+      Math.min(
+        firstPointCoordinatesInTileMap[1],
+        secondPointCoordinatesInTileMap[1]
+      ),
+    ];
+    const bottomRightCornerCoordinatesInTileMap = [
+      Math.max(
+        firstPointCoordinatesInTileMap[0],
+        secondPointCoordinatesInTileMap[0]
+      ),
+      Math.max(
+        firstPointCoordinatesInTileMap[1],
+        secondPointCoordinatesInTileMap[1]
+      ),
+    ];
+    const topLeftCornerCoordinatesInTileMapGrid = [
+      Math.floor(topLeftCornerCoordinatesInTileMap[0] / tileSize),
+      Math.floor(topLeftCornerCoordinatesInTileMap[1] / tileSize),
+    ];
+    const bottomRightCornerCoordinatesInTileMapGrid = [
+      Math.floor(bottomRightCornerCoordinatesInTileMap[0] / tileSize),
+      Math.floor(bottomRightCornerCoordinatesInTileMap[1] / tileSize),
+    ];
 
     for (
-      let columnIndex = topLeftCornerCoordinatesInTileMap[0];
-      columnIndex <= bottomRightCornerCoordinatesInTileMap[0];
+      let columnIndex = topLeftCornerCoordinatesInTileMapGrid[0];
+      columnIndex <= bottomRightCornerCoordinatesInTileMapGrid[0];
       columnIndex++
     ) {
       for (
-        let rowIndex = topLeftCornerCoordinatesInTileMap[1];
-        rowIndex <= bottomRightCornerCoordinatesInTileMap[1];
+        let rowIndex = topLeftCornerCoordinatesInTileMapGrid[1];
+        rowIndex <= bottomRightCornerCoordinatesInTileMapGrid[1];
         rowIndex++
       ) {
         tilesCoordinatesInTileMapGrid.push({ x: columnIndex, y: rowIndex });

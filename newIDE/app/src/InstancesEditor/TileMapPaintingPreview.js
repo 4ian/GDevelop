@@ -98,7 +98,7 @@ export const isTileSetBadlyConfigured = ({
 
 /**
  * Returns the list of tiles corresponding to the user selection.
- * If only one coordinate is present, only one tile is places at the slot the
+ * If only one coordinate is present, only one tile is placed at the slot the
  * pointer points to.
  * If two coordinates are present, tiles are displayed to form a rectangle with the
  * two coordinates being the top left and bottom right corner of the rectangle.
@@ -339,43 +339,46 @@ class TileMapPaintingPreview {
         sceneToTileMapTransformation: this.sceneToTileMapTransformation,
       }
     );
+    if (spritesCoordinatesInTileMapGrid.length === 0) {
+      console.warn("Could't get coordinates to render in tile map grid.");
+      return;
+    }
 
     const workingPoint = [0, 0];
 
-    spritesCoordinatesInTileMapGrid.forEach(({ x, y }) => {
-      let sprite;
+    const sprite = new PIXI.TilingSprite(texture);
 
-      if (tileMapTileSelection.kind === 'single') {
-        // TODO: Find a way not to regenerate the sprites on each render.
-        sprite = new PIXI.Sprite(texture);
-        if (tileMapTileSelection.flipHorizontally) {
-          sprite.scale.x *= -1;
-        }
-        if (tileMapTileSelection.flipVertically) {
-          sprite.scale.y *= -1;
-        }
-      } else {
-        // If the tileset is badly configured, use tiled sprite with the invalid texture.
-        sprite = new PIXI.TilingSprite(texture, 2, 2);
-        sprite.tileScale.x = this.viewPosition.toCanvasScale(scaleX);
-        sprite.tileScale.y = this.viewPosition.toCanvasScale(scaleY);
-      }
-      sprite.anchor.x = 0.5;
-      sprite.anchor.y = 0.5;
-      sprite.width = spriteWidth;
-      sprite.height = spriteHeight;
+    sprite.tileScale.x =
+      (tileMapTileSelection.flipHorizontally ? -1 : +1) *
+      this.viewPosition.toCanvasScale(scaleX);
+    sprite.tileScale.y =
+      (tileMapTileSelection.flipVertically ? -1 : +1) *
+      this.viewPosition.toCanvasScale(scaleY);
+    sprite.width = spriteWidth;
+    sprite.height = spriteHeight;
 
-      this.tileMapToSceneTransformation.transform(
-        [x * tileSize + tileSize / 2, y * tileSize + tileSize / 2],
-        workingPoint
-      );
+    const allXCoordinates = spritesCoordinatesInTileMapGrid.map(({ x }) => x);
+    const allYCoordinates = spritesCoordinatesInTileMapGrid.map(({ y }) => y);
+    const minX = Math.min(...allXCoordinates);
+    const maxX = Math.max(...allXCoordinates);
+    const minY = Math.min(...allYCoordinates);
+    const maxY = Math.max(...allYCoordinates);
 
-      sprite.x = this.viewPosition.toCanvasScale(workingPoint[0]);
-      sprite.y = this.viewPosition.toCanvasScale(workingPoint[1]);
-      sprite.angle = instance.getAngle();
+    this.tileMapToSceneTransformation.transform(
+      [minX * tileSize, minY * tileSize],
+      workingPoint
+    );
 
-      this.preview.addChild(sprite);
-    });
+    sprite.x = this.viewPosition.toCanvasScale(workingPoint[0]);
+    sprite.y = this.viewPosition.toCanvasScale(workingPoint[1]);
+    sprite.width =
+      (maxX - minX + 1) * this.viewPosition.toCanvasScale(tileSize) * scaleX;
+    sprite.height =
+      (maxY - minY + 1) * this.viewPosition.toCanvasScale(tileSize) * scaleY;
+
+    sprite.angle = instance.getAngle();
+
+    this.preview.addChild(sprite);
 
     const canvasCoordinates = this.viewPosition.toCanvasCoordinates(0, 0);
     this.preview.position.x = canvasCoordinates[0];

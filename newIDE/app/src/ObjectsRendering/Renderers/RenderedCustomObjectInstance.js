@@ -165,10 +165,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
   getLayoutedInstance = (instance: gdInitialInstance): LayoutedInstance => {
     let layoutedInstance = this.layoutedInstances.get(instance.ptr);
     if (!layoutedInstance) {
-      layoutedInstance = new LayoutedInstance(
-        instance.ptr,
-        instance.getObjectName()
-      );
+      layoutedInstance = new LayoutedInstance(instance);
       this.layoutedInstances.set(instance.ptr, layoutedInstance);
     }
     return layoutedInstance;
@@ -398,12 +395,16 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
       this._pixiObject.scale.y = 1;
     }
 
-    // Do not hide completely an object so it can still be manipulated
-    const alphaForDisplay = Math.max(this._instance.getOpacity() / 255, 0.5);
-    this._pixiObject.alpha = alphaForDisplay;
+    // Opacity is not handled by 3D objects.
+    // TODO Transform 3D objects according to their flipping.
+    if (!is3D) {
+      // Do not hide completely an object so it can still be manipulated
+      const alphaForDisplay = Math.max(this._instance.getOpacity() / 255, 0.5);
+      this._pixiObject.alpha = alphaForDisplay;
 
-    if (this._instance.isFlippedX()) this._pixiObject.scale.x *= -1;
-    if (this._instance.isFlippedY()) this._pixiObject.scale.y *= -1;
+      if (this._instance.isFlippedX()) this._pixiObject.scale.x *= -1;
+      if (this._instance.isFlippedY()) this._pixiObject.scale.y *= -1;
+    }
   }
 
   getDefaultWidth() {

@@ -83,8 +83,8 @@ export const getObjectAnchor = (
  * @see gdInitialInstance
  */
 export class LayoutedInstance {
+  instance: gdInitialInstance;
   ptr: number;
-  objectName: string;
   x = 0;
   y = 0;
   z = 0;
@@ -94,9 +94,9 @@ export class LayoutedInstance {
   _customHeight = 0;
   _customDepth = 0;
 
-  constructor(ptr: number, objectName: string) {
-    this.ptr = ptr;
-    this.objectName = objectName;
+  constructor(instance: gdInitialInstance) {
+    this.instance = instance;
+    this.ptr = instance.ptr;
   }
 
   getX() {
@@ -123,12 +123,8 @@ export class LayoutedInstance {
     return 0;
   }
 
-  setObjectName(objectName: string) {
-    this.objectName = objectName;
-  }
-
   getObjectName() {
-    return this.objectName;
+    return this.instance.getObjectName();
   }
 
   setX(x: number) {}
@@ -162,21 +158,19 @@ export class LayoutedInstance {
   setZOrder(zOrder: number) {}
 
   getOpacity() {
-    return this.opacity;
+    return this.instance.getOpacity();
   }
 
-  setOpacity(opacity: number) {
-    this.opacity = opacity;
-  }
+  setOpacity(opacity: number) {}
 
   isFlippedX() {
-    return false;
+    return this.instance.isFlippedX();
   }
 
   setFlippedX(flippedX: boolean) {}
 
   isFlippedY() {
-    return false;
+    return this.instance.isFlippedY();
   }
 
   setFlippedY(flippedY: boolean) {}

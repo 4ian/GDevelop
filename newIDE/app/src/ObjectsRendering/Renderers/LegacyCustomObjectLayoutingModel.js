@@ -470,6 +470,24 @@ export class ChildInstance {
 
   setZOrder(zOrder: number) {}
 
+  getOpacity() {
+    return 255;
+  }
+
+  setOpacity(opacity: number) {}
+
+  isFlippedX() {
+    return false;
+  }
+
+  setFlippedX(flippedX: boolean) {}
+
+  isFlippedY() {
+    return false;
+  }
+
+  setFlippedY(flippedY: boolean) {}
+
   getLayer() {
     return '';
   }

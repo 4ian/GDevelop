@@ -131,6 +131,7 @@ const SimpleTileMapEditor = ({
   const onChangeAtlasImage = React.useCallback(
     () => {
       if (onObjectUpdated) onObjectUpdated();
+      setError(null);
       onSizeUpdated();
       forceUpdate();
     },

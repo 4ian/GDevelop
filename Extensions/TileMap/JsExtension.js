@@ -2338,7 +2338,9 @@ module.exports = {
           ? this._editableTileMap.isEmpty()
           : false;
         let objectToChange;
-        if (isTileMapEmpty || !atlasImageResourceName) {
+        if (this.errorPixiObject) {
+          objectToChange = this.errorPixiObject;
+        } else if (isTileMapEmpty || !atlasImageResourceName) {
           this.tileMapPixiObject.visible = false;
           this._placeholderPixiObject.visible = true;
           this._placeholderTextPixiObject.text = !atlasImageResourceName

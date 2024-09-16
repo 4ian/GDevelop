@@ -25,14 +25,16 @@ export const updateSceneToTileMapTransformation = (
     scaleY = 1;
   if (instance.hasCustomSize()) {
     const editableTileMap = renderedInstance.getEditableTileMap();
-    if (!editableTileMap) {
+    if (editableTileMap) {
+      scaleX = instance.getCustomWidth() / editableTileMap.getWidth();
+      scaleY = instance.getCustomHeight() / editableTileMap.getHeight();
+    } else {
       console.error(
-        `Could not find the editable tile map for instance of object ${instance.getObjectName()}.`
+        `Could not find the editable tile map for instance of object ${instance.getObjectName()}. Make sure the tile map object is correctly configured.`
       );
-      return;
+      // Do not early return on error to make the preview still working to not give
+      // a sense of something broken.
     }
-    scaleX = instance.getCustomWidth() / editableTileMap.getWidth();
-    scaleY = instance.getCustomHeight() / editableTileMap.getHeight();
   }
   const absScaleX = Math.abs(scaleX);
   const absScaleY = Math.abs(scaleY);

@@ -192,6 +192,9 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
           hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
           openBehaviorEvents={this.props.openBehaviorEvents}
           onObjectEdited={this.props.onEventsBasedObjectChildrenEdited}
+          onEventsBasedObjectChildrenEdited={
+            this.props.onEventsBasedObjectChildrenEdited
+          }
         />
       </div>
     );

@@ -463,7 +463,7 @@ const getLayoutedRenderedInstanceFor = (props: {
   const eventBasedObject = extension
     .getEventsBasedObjects()
     .insertNew('MyCustomObject', 0);
-  eventBasedObject.markAsInnerAreaExpandingWithParent(true);
+  eventBasedObject.markAsInnerAreaFollowingParentSize(true);
   eventBasedObject.setAreaMinX(props.innerArea.minX);
   eventBasedObject.setAreaMinY(props.innerArea.minY);
   eventBasedObject.setAreaMaxX(props.innerArea.maxX);

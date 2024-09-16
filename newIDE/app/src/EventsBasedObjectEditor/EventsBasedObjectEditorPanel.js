@@ -20,6 +20,7 @@ type Props = {|
   onEventsFunctionsAdded: () => void,
   onOpenCustomObjectEditor: () => void,
   unsavedChanges?: ?UnsavedChanges,
+  onEventsBasedObjectChildrenEdited: () => void,
 |};
 
 export default function EventsBasedObjectEditorPanel({
@@ -31,6 +32,7 @@ export default function EventsBasedObjectEditorPanel({
   onEventsFunctionsAdded,
   onOpenCustomObjectEditor,
   unsavedChanges,
+  onEventsBasedObjectChildrenEdited,
 }: Props) {
   const [currentTab, setCurrentTab] = React.useState<TabName>('configuration');
 
@@ -69,6 +71,9 @@ export default function EventsBasedObjectEditorPanel({
             eventsBasedObject={eventsBasedObject}
             unsavedChanges={unsavedChanges}
             onOpenCustomObjectEditor={onOpenCustomObjectEditor}
+            onEventsBasedObjectChildrenEdited={
+              onEventsBasedObjectChildrenEdited
+            }
           />
         )}
         {currentTab === 'properties' && (

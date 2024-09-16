@@ -111,7 +111,7 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
    * adapt there size. This is removing the ScalableCapability.
    */
   EventsBasedObject &
-  MarkAsInnerAreaExpandingWithParent(bool isInnerAreaExpandingWithParent_) {
+  MarkAsInnerAreaFollowingParentSize(bool isInnerAreaExpandingWithParent_) {
     isInnerAreaFollowingParentSize = isInnerAreaExpandingWithParent_;
     return *this;
   }

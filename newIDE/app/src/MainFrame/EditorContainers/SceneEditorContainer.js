@@ -150,6 +150,8 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         onObjectEdited={objectWithContext =>
           this.props.onSceneObjectEdited(layout, objectWithContext)
         }
+        // Nothing to do as scenes are not events-based objects.
+        onEventsBasedObjectChildrenEdited={() => {}}
       />
     );
   }

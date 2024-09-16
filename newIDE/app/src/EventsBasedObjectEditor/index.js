@@ -20,12 +20,14 @@ type Props = {|
   eventsBasedObject: gdEventsBasedObject,
   onOpenCustomObjectEditor: () => void,
   unsavedChanges?: ?UnsavedChanges,
+  onEventsBasedObjectChildrenEdited: () => void,
 |};
 
 export default function EventsBasedObjectEditor({
   eventsBasedObject,
   onOpenCustomObjectEditor,
   unsavedChanges,
+  onEventsBasedObjectChildrenEdited,
 }: Props) {
   const forceUpdate = useForceUpdate();
 
@@ -120,8 +122,9 @@ export default function EventsBasedObjectEditor({
         label={<Trans>Expand inner area with parent</Trans>}
         checked={eventsBasedObject.isInnerAreaFollowingParentSize()}
         onCheck={(e, checked) => {
-          eventsBasedObject.markAsInnerAreaExpandingWithParent(checked);
+          eventsBasedObject.markAsInnerAreaFollowingParentSize(checked);
           onChange();
+          onEventsBasedObjectChildrenEdited();
         }}
       />
       <Line noMargin justifyContent="center">

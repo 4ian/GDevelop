@@ -2173,7 +2173,7 @@ export class EventsBasedObject extends AbstractEventsBasedEntity {
   isAnimatable(): boolean;
   markAsTextContainer(isTextContainer: boolean): EventsBasedObject;
   isTextContainer(): boolean;
-  markAsInnerAreaExpandingWithParent(value: boolean): EventsBasedObject;
+  markAsInnerAreaFollowingParentSize(value: boolean): EventsBasedObject;
   isInnerAreaFollowingParentSize(): boolean;
   getInitialInstances(): InitialInstancesContainer;
   getLayers(): LayersContainer;

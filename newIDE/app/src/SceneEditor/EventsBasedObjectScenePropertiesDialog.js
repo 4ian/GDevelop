@@ -15,6 +15,7 @@ type Props = {|
   onApply: () => void,
   onClose: () => void,
   getContentAABB: () => Rectangle | null,
+  onEventsBasedObjectChildrenEdited: () => void,
 |};
 
 const EventsBasedObjectScenePropertiesDialog = ({
@@ -23,6 +24,7 @@ const EventsBasedObjectScenePropertiesDialog = ({
   onApply,
   onClose,
   getContentAABB,
+  onEventsBasedObjectChildrenEdited,
 }: Props) => {
   const [areaMinX, setAreaMinX] = React.useState<number>(
     eventsBasedObject.getAreaMinX()
@@ -45,6 +47,12 @@ const EventsBasedObjectScenePropertiesDialog = ({
   const [isRenderedIn3D, setRenderedIn3D] = React.useState<boolean>(
     eventsBasedObject.isRenderedIn3D()
   );
+  const [
+    isInnerAreaFollowingParentSize,
+    setInnerAreaFollowingParentSize,
+  ] = React.useState<boolean>(
+    eventsBasedObject.isInnerAreaFollowingParentSize()
+  );
 
   const onSubmit = () => {
     if (areaMinX < areaMaxX) {
@@ -59,7 +67,18 @@ const EventsBasedObjectScenePropertiesDialog = ({
       eventsBasedObject.setAreaMinZ(areaMinZ);
       eventsBasedObject.setAreaMaxZ(areaMaxZ);
     }
-    eventsBasedObject.markAsRenderedIn3D(isRenderedIn3D);
+    const wasRenderedIn3D = eventsBasedObject.isRenderedIn3D();
+    if (wasRenderedIn3D !== isRenderedIn3D) {
+      eventsBasedObject.markAsRenderedIn3D(isRenderedIn3D);
+      onEventsBasedObjectChildrenEdited();
+    }
+    const wasInnerAreaFollowingParentSize = eventsBasedObject.isInnerAreaFollowingParentSize();
+    if (wasInnerAreaFollowingParentSize !== isInnerAreaFollowingParentSize) {
+      eventsBasedObject.markAsInnerAreaFollowingParentSize(
+        isInnerAreaFollowingParentSize
+      );
+      onEventsBasedObjectChildrenEdited();
+    }
     onApply();
   };
 
@@ -199,13 +218,16 @@ const EventsBasedObjectScenePropertiesDialog = ({
             }
           />
         </LineStackLayout>
-        <LineStackLayout expand noMargin>
-          <Checkbox
-            label={<Trans>Use 3D rendering</Trans>}
-            checked={isRenderedIn3D}
-            onCheck={(e, checked) => setRenderedIn3D(checked)}
-          />
-        </LineStackLayout>
+        <Checkbox
+          label={<Trans>Use 3D rendering</Trans>}
+          checked={isRenderedIn3D}
+          onCheck={(e, checked) => setRenderedIn3D(checked)}
+        />
+        <Checkbox
+          label={<Trans>Expand inner area with parent</Trans>}
+          checked={isInnerAreaFollowingParentSize}
+          onCheck={(e, checked) => setInnerAreaFollowingParentSize(checked)}
+        />
       </ColumnStackLayout>
     </Dialog>
   );

@@ -77,6 +77,7 @@ type Props = {|
   unsavedChanges?: ?UnsavedChanges,
   onOpenCustomObjectEditor: gdEventsBasedObject => void,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
+  onEventsBasedObjectChildrenEdited: () => void,
 |};
 
 type State = {|
@@ -1371,6 +1372,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
               }}
               onOpenCustomObjectEditor={() =>
                 this.props.onOpenCustomObjectEditor(selectedEventsBasedObject)
+              }
+              onEventsBasedObjectChildrenEdited={
+                this.props.onEventsBasedObjectChildrenEdited
               }
             />
           ) : (

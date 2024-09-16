@@ -77,7 +77,7 @@ export const getTileSet = (object: gdObject) => {
   return { rowCount, columnCount, tileSize, atlasImage };
 };
 
-const isTileSetBadlyConfigured = ({
+export const isTileSetBadlyConfigured = ({
   rowCount,
   columnCount,
   tileSize,

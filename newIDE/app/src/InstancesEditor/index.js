@@ -45,6 +45,7 @@ import Background from './Background';
 import TileMapPaintingPreview, {
   getTileSet,
   getTilesGridCoordinatesFromPointerSceneCoordinates,
+  isTileSetBadlyConfigured,
   updateSceneToTileMapTransformation,
 } from './TileMapPaintingPreview';
 import {
@@ -825,6 +826,12 @@ export default class InstancesEditor extends Component<Props, State> {
       const tileSet = getTileSet(object);
       if (!tileSet.atlasImage) {
         console.warn('Trying to paint on a tilemap without an atlas image.');
+        return;
+      }
+      if (isTileSetBadlyConfigured(tileSet)) {
+        console.warn(
+          'Trying to paint on a tilemap with a badly configured tileset.'
+        );
         return;
       }
       const tileMapGridCoordinates = getTilesGridCoordinatesFromPointerSceneCoordinates(

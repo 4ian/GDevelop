@@ -647,10 +647,7 @@ class MockedParent implements LayoutedParent<MockedChildRenderedInstance> {
   getLayoutedInstance = (instance: gdInitialInstance): LayoutedInstance => {
     let layoutedInstance = this.layoutedInstances.get(instance.ptr);
     if (!layoutedInstance) {
-      layoutedInstance = new LayoutedInstance(
-        instance.ptr,
-        instance.getObjectName()
-      );
+      layoutedInstance = new LayoutedInstance(instance);
       this.layoutedInstances.set(instance.ptr, layoutedInstance);
     }
     return layoutedInstance;

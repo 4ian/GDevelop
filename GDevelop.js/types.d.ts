@@ -2175,6 +2175,8 @@ export class EventsBasedObject extends AbstractEventsBasedEntity {
   isTextContainer(): boolean;
   markAsInnerAreaFollowingParentSize(value: boolean): EventsBasedObject;
   isInnerAreaFollowingParentSize(): boolean;
+  makAsUsingLegacyInstancesRenderer(value: boolean): EventsBasedObject;
+  isUsingLegacyInstancesRenderer(): boolean;
   getInitialInstances(): InitialInstancesContainer;
   getLayers(): LayersContainer;
   getObjects(): ObjectsContainer;

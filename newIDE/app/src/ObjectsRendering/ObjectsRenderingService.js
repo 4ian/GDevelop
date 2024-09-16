@@ -115,9 +115,7 @@ const ObjectsRenderingService = {
             threeGroup,
             PixiResourcesLoader
           );
-        } else if (
-          eventsBasedObject.getInitialInstances().getInstancesCount() === 0
-        ) {
+        } else if (eventsBasedObject.isUsingLegacyInstancesRenderer()) {
           return new LegacyRenderedCustomObjectInstance(
             project,
             instance,

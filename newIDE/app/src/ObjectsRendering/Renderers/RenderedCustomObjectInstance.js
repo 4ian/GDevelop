@@ -281,9 +281,6 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
   }
 
   update() {
-    // TODO For animatable custom objects, change the texture used by the child
-    // according to the current animation.
-
     const { eventBasedObject } = this;
     if (!eventBasedObject) {
       return;

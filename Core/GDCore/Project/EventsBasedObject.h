@@ -131,6 +131,24 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
   }
 
   /**
+   * \brief Declare that custom object are rendered using their child-objects
+   * instead of their child-instances.
+   */
+  EventsBasedObject &
+  MakAsUsingLegacyInstancesRenderer(bool isUsingLegacyInstancesRenderer_) {
+    isUsingLegacyInstancesRenderer = isUsingLegacyInstancesRenderer_;
+    return *this;
+  }
+
+  /**
+   * \brief Return true if custom object are rendered using their child-objects
+   * instead of their child-instances.
+   */
+  bool IsUsingLegacyInstancesRenderer() const {
+    return isUsingLegacyInstancesRenderer;
+  }
+
+  /**
    * \brief Return true if the object needs a TextContainer capability.
    */
   bool IsTextContainer() const { return isTextContainer; }
@@ -304,6 +322,7 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
   bool isAnimatable;
   bool isTextContainer;
   bool isInnerAreaFollowingParentSize;
+  bool isUsingLegacyInstancesRenderer;
   gd::InitialInstancesContainer initialInstances;
   gd::LayersContainer layers;
   gd::ObjectsContainer objectsContainer;

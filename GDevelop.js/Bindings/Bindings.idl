@@ -2983,6 +2983,8 @@ interface EventsBasedObject {
     boolean IsTextContainer();
     [Ref] EventsBasedObject MarkAsInnerAreaFollowingParentSize(boolean value);
     boolean IsInnerAreaFollowingParentSize();
+    [Ref] EventsBasedObject MakAsUsingLegacyInstancesRenderer(boolean value);
+    boolean IsUsingLegacyInstancesRenderer();
 
     [Ref] InitialInstancesContainer GetInitialInstances();
     [Ref] LayersContainer GetLayers();

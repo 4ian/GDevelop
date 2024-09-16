@@ -267,9 +267,6 @@ export default class LegacyRenderedCustomObjectInstance
   }
 
   update() {
-    // TODO For animatable custom objects, change the texture used by the child
-    // according to the current animation.
-
     applyChildLayouts(this);
 
     // The children dimension and position are evaluated according to the

@@ -630,7 +630,12 @@ const defineSimpleTileMap = function (extension, _, gd) {
 
     objectProperties.set(
       'columnCount',
-      new gd.PropertyDescriptor((objectContent.columnCount || 4).toString())
+      new gd.PropertyDescriptor(
+        (typeof objectContent.columnCount === 'undefined'
+          ? 4
+          : objectContent.columnCount
+        ).toString()
+      )
         .setType('number')
         .setLabel(_('Columns'))
         .setDescription(_('Number of columns.'))
@@ -638,7 +643,12 @@ const defineSimpleTileMap = function (extension, _, gd) {
     );
     objectProperties.set(
       'rowCount',
-      new gd.PropertyDescriptor((objectContent.rowCount || 4).toString())
+      new gd.PropertyDescriptor(
+        (typeof objectContent.rowCount === 'undefined'
+          ? 4
+          : objectContent.rowCount
+        ).toString()
+      )
         .setType('number')
         .setLabel(_('Rows'))
         .setDescription(_('Number of rows.'))
@@ -646,7 +656,12 @@ const defineSimpleTileMap = function (extension, _, gd) {
     );
     objectProperties.set(
       'tileSize',
-      new gd.PropertyDescriptor((objectContent.tileSize || 8).toString())
+      new gd.PropertyDescriptor(
+        (typeof objectContent.tileSize === 'undefined'
+          ? 8
+          : objectContent.tileSize
+        ).toString()
+      )
         .setType('number')
         .setLabel(_('Tile size'))
         .setDescription(_('Tile size in pixels.'))

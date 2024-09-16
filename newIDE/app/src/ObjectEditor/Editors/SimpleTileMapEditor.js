@@ -67,12 +67,13 @@ const SimpleTileMapEditor = ({
       |},
       tileSize: number
     ) => {
-      const newRowCount = dimensions.height / tileSize;
-      const newColumnCount = dimensions.width / tileSize;
+      const newRowCount = Math.floor(dimensions.height / tileSize);
+      const newColumnCount = Math.floor(dimensions.width / tileSize);
 
       if (rowCount === newRowCount && columnCount === newColumnCount) {
         return;
       }
+      setError(null);
       objectConfiguration.updateProperty('rowCount', newRowCount.toString());
       objectConfiguration.updateProperty(
         'columnCount',
@@ -92,7 +93,6 @@ const SimpleTileMapEditor = ({
       if (!value) {
         return;
       }
-      setError(null);
       objectConfiguration.updateProperty('tileSize', value.toString());
       if (loadedAtlasImageDimensions) {
         recomputeTileSet(loadedAtlasImageDimensions, value);
@@ -140,17 +140,11 @@ const SimpleTileMapEditor = ({
   React.useEffect(
     () => {
       if (!loadedAtlasImageDimensions) return;
-      const _rowCount = loadedAtlasImageDimensions.height / tileSize;
-      const _columnCount = loadedAtlasImageDimensions.width / tileSize;
-      if (!Number.isInteger(_rowCount) || !Number.isInteger(_columnCount)) {
-        setError(
-          <Trans>
-            The new atlas image size is not compatible with the tile size.
-          </Trans>
-        );
+      if (rowCount <= 0 || columnCount <= 0) {
+        setError(<Trans>The atlas image is smaller than the tile size.</Trans>);
       }
     },
-    [tileSize, loadedAtlasImageDimensions]
+    [rowCount, columnCount, loadedAtlasImageDimensions]
   );
 
   const onAtlasImageLoaded = React.useCallback(

@@ -573,8 +573,10 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
     const scene = runtimeGame.getSceneStack().getCurrentScene();
     if (!scene) throw new Error("Couldn't set a current scene for testing.");
 
-    const instances = scene.getInstancesOf('MyObject');
     const instance = scene.createObject('MyObject');
+    if (!instance) {
+      throw new Error("Couldn't create an object instance for testing.");
+    }
     const variablesContainer = instance.getVariables();
     // The variable values are changed by events.
     variablesContainer.get('MyVariable1').setNumber(111);

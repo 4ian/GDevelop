@@ -218,6 +218,12 @@ namespace gdjs {
       tileMapLoadingCallback: (tileMap: TileMapHelper.EditableTileMap) => void
     ): void {
       if (!this._initialTileMapAsJsObject) return;
+      if (this._columnCount <= 0 || this._rowCount <= 0) {
+        console.error(
+          `Tilemap object ${this.name} is not configured properly.`
+        );
+        return;
+      }
 
       this._tileMapManager.getOrLoadSimpleTileMap(
         this._initialTileMapAsJsObject,

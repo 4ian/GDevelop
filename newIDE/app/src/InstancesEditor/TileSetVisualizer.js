@@ -64,12 +64,12 @@ type TileMapCoordinates = {| x: number, y: number |};
 /**
  * Returns the tile id in a tile set.
  * This id corresponds to the index of the tile if the tile set
- * is flattened so that each column is put right after the previous one.
+ * is flattened so that each row is put right after the previous one.
  * Example:
- *   1 | 4 | 7
- *   2 | 5 | 8
- *   3 | 6 | 9
- * @param argument Object that contains x the horizontal position of the tile, y the vertical position and rowCount the number of rows in the tile set.
+ *   0 | 1 | 2
+ *   3 | 4 | 5
+ *   6 | 7 | 8
+ * @param argument Object that contains x the horizontal position of the tile, y the vertical position and columnCount the number of columns in the tile set.
  * @returns the id of the tile.
  */
 export const getTileIdFromGridCoordinates = ({
@@ -85,12 +85,12 @@ export const getTileIdFromGridCoordinates = ({
 /**
  * Returns the coordinates of a tile in a tile set given its id.
  * This id corresponds to the index of the tile if the tile set
- * is flattened so that each column is put right after the previous one.
+ * is flattened so that each row is put right after the previous one.
  * Example:
- *   1 | 4 | 7
- *   2 | 5 | 8
- *   3 | 6 | 9
- * @param argument Object that contains id the id of the tile and rowCount the number of rows in the tile set.
+ *   0 | 1 | 2
+ *   3 | 4 | 5
+ *   6 | 7 | 8
+ * @param argument Object that contains the id of the tile and columnCount the number of columns in the tile set.
  * @returns the id of the tile.
  */
 export const getGridCoordinatesFromTileId = ({

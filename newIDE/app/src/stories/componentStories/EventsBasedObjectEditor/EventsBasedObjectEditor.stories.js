@@ -1,6 +1,7 @@
 // @flow
 
 import * as React from 'react';
+import { action } from '@storybook/addon-actions';
 
 // Keep first as it creates the `global.gd` object:
 import { testProject } from '../../GDevelopJsInitializerDecorator';
@@ -17,6 +18,9 @@ export default {
 export const Default = () => (
   <EventsBasedObjectEditor
     eventsBasedObject={testProject.testEventsBasedObject}
-    onOpenCustomObjectEditor={() => {}}
+    onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
+    onEventsBasedObjectChildrenEdited={action(
+      'onEventsBasedObjectChildrenEdited'
+    )}
   />
 );

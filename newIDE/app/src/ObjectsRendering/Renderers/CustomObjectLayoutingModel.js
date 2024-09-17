@@ -1,4 +1,5 @@
 // @flow
+const gd: libGDevelop = global.gd;
 
 // - The term "object" is used in comments about the layout declaration because
 //   the layout is done with one instance per object-child and the object name
@@ -6,215 +7,46 @@
 // - The term "instance" is used for the layout calculus because it's actually
 //   instances that are in the scene editor.
 
-type AxisLayout = {
-  /**
-   * The origin of the anchor on the object to place
-   * as a factor of the current object size
-   * (0 for left or top, 1 for right or bottom).
-   */
-  anchorOrigin?: number,
+type Anchor = {
   /**
    * The target of the anchor on the referential object
    * as a factor of the targeted object size
    * (0 for left or top, 1 for right or bottom).
    */
-  anchorTarget?: number,
-  /**
-   * The object name to take as referential.
-   */
-  anchorTargetObject?: string,
+  target: number,
   /**
    * A displacement to add on the anchored object.
    */
-  anchorDelta?: number,
-  /**
-   * Scale proportionally to the target when anchored.
-   */
-  isScaledProportionally?: boolean,
-  /**
-   * The left or top margin in pixels.
-   */
-  minSideAbsoluteMargin?: number,
-  /**
-   * The right or bottom margin in pixels.
-   */
-  maxSideAbsoluteMargin?: number,
-  /**
-   * The left or top margin as a factor of the parent size.
-   */
-  minSideProportionalMargin?: number,
-  /**
-   * The right or bottom margin as a factor of the parent size.
-   */
-  maxSideProportionalMargin?: number,
+  delta: number,
 };
 
 /**
  * Layout description that allows to position the child-objects
  * to follow the size of the parent.
  */
-export type ChildLayout = {
-  /**
-   * Some child-object are optional or only displayed according to the parent state.
-   * For example, for buttons there is a background for each state.
-   */
-  isShown: boolean,
-  horizontalLayout: AxisLayout,
-  verticalLayout: AxisLayout,
-  depthLayout: AxisLayout,
+export type InstanceAnchor = {
+  leftAnchor: Anchor,
+  topAnchor: Anchor,
+  rightAnchor: Anchor,
+  bottomAnchor: Anchor,
 };
 
-/**
- * The keywords to find in the properties to build the ChildLayout.
- */
-const layoutFields = [
-  'Show',
-  'LeftPadding',
-  'TopPadding',
-  'RightPadding',
-  'BottomPadding',
-  'HorizontalAnchorOrigin',
-  'HorizontalAnchorTarget',
-  'VerticalAnchorOrigin',
-  'VerticalAnchorTarget',
-  'AnchorOrigin',
-  'AnchorTarget',
-  'AnchorDeltaX',
-  'AnchorDeltaY',
-  'IsScaledProportionallyOnX',
-  'IsScaledProportionallyOnY',
-  'IsScaledProportionallyOnZ',
-  'IsScaledProportionally',
-];
-
-/**
- * @param positionName Accepted values are: 'left', 'center' or 'right', but
- * also values like 'top-left'.
- * @returns a value between 0 and 1.
- */
-export const getProportionalPositionX = (
-  positionName: string
-): number | null => {
-  const horizontalPositionName = (positionName.includes('-')
-    ? positionName.split('-')[1]
-    : positionName
-  ).toLowerCase();
-  return horizontalPositionName === 'left'
-    ? 0
-    : horizontalPositionName === 'right'
-    ? 1
-    : horizontalPositionName === 'center'
-    ? 0.5
-    : null;
+export type ObjectAnchor = {
+  leftEdgeAnchor: CustomObjectConfiguration_EdgeAnchor,
+  topEdgeAnchor: CustomObjectConfiguration_EdgeAnchor,
+  rightEdgeAnchor: CustomObjectConfiguration_EdgeAnchor,
+  bottomEdgeAnchor: CustomObjectConfiguration_EdgeAnchor,
 };
 
-/**
- * @param positionName Accepted values are: 'top', 'center' or 'bottom', but
- * also values like 'top-left'.
- * @returns a value between 0 and 1.
- */
-export const getProportionalPositionY = (
-  positionName: string
-): number | null => {
-  const verticalPositionName = (positionName.includes('-')
-    ? positionName.split('-')[0]
-    : positionName
-  ).toLowerCase();
-  return verticalPositionName === 'top'
-    ? 0
-    : verticalPositionName === 'bottom'
-    ? 1
-    : verticalPositionName === 'center'
-    ? 0.5
-    : null;
-};
-
-/**
- * @param positionName Accepted values are: 'Zmin', 'center' or 'Zmax', but
- * also values like 'top-left-Zmin'.
- * @returns a value between 0 and 1.
- */
-export const getProportionalPositionZ = (
-  positionName: string
-): number | null => {
-  const verticalPositionName = (positionName.includes('-')
-    ? positionName.split('-')[2] || ''
-    : positionName
-  ).toLowerCase();
-  return verticalPositionName === 'Zmin'
-    ? 0
-    : verticalPositionName === 'Zmax'
-    ? 1
-    : verticalPositionName === 'center'
-    ? 0.5
-    : null;
-};
-
-const getHorizontalAnchorValue = (
-  anchorName: string,
-  properties: gdMapStringPropertyDescriptor
-): number | null => {
-  const proportionalX = getProportionalPositionX(anchorName);
-  return proportionalX !== null
-    ? proportionalX
-    : // Reference to another property to allow to expose a Choice property.
-    properties && properties.has(anchorName)
-    ? getProportionalPositionX(properties.get(anchorName).getValue())
-    : null;
-};
-
-const getVerticalAnchorValue = (
-  anchorName: string,
-  properties: gdMapStringPropertyDescriptor
-): number | null => {
-  const proportionalY = getProportionalPositionY(anchorName);
-  return proportionalY !== null
-    ? proportionalY
-    : // Reference to another property to allow to expose a Choice property.
-    properties && properties.has(anchorName)
-    ? getProportionalPositionY(properties.get(anchorName).getValue())
-    : null;
-};
-
-/**
- * Origin anchors can have smart value to only expose the target anchor property
- * and fill the origin anchor property accordingly.
- */
-const getHorizontalOriginAnchorValue = (
-  anchorName: string,
+const getPropertyValue = (
   properties: gdMapStringPropertyDescriptor,
-  targetAnchorValue: number | null
-): number | null => {
-  const horizontalAnchorName = (anchorName.includes('-')
-    ? anchorName.split('-')[1]
-    : anchorName
-  ).toLowerCase();
-  return horizontalAnchorName === 'same'
-    ? targetAnchorValue
-    : horizontalAnchorName === 'opposite' && targetAnchorValue !== null
-    ? 1 - targetAnchorValue
-    : getHorizontalAnchorValue(horizontalAnchorName, properties);
-};
-
-/**
- * Origin anchors can have smart value to only expose the target anchor property
- * and fill the origin anchor property accordingly.
- */
-const getVerticalOriginAnchorValue = (
-  anchorName: string,
-  properties: gdMapStringPropertyDescriptor,
-  targetAnchorValue: number | null
-): number | null => {
-  const verticalAnchorName = (anchorName.includes('-')
-    ? anchorName.split('-')[0]
-    : anchorName
-  ).toLowerCase();
-  return verticalAnchorName === 'same'
-    ? targetAnchorValue
-    : verticalAnchorName === 'opposite' && targetAnchorValue !== null
-    ? 1 - targetAnchorValue
-    : getVerticalAnchorValue(verticalAnchorName, properties);
-};
+  name: string
+): CustomObjectConfiguration_EdgeAnchor =>
+  properties.has(name)
+    ? gd.CustomObjectConfiguration.getEdgeAnchorFromString(
+        properties.get(name).getValue()
+      )
+    : gd.CustomObjectConfiguration.NoAnchor;
 
 export interface PropertiesContainer {
   getProperties(): gdMapStringPropertyDescriptor;
@@ -223,187 +55,48 @@ export interface PropertiesContainer {
 /**
  * Build the layouts description from the custom object properties.
  */
-export const getLayouts = (
+export const getObjectAnchor = (
   eventBasedObject: gdEventsBasedObject,
-  customObjectConfiguration: PropertiesContainer
-): Map<string, ChildLayout> => {
-  const layouts: Map<string, ChildLayout> = new Map<string, ChildLayout>();
-  const properties = eventBasedObject.getPropertyDescriptors();
-  const instanceProperties = customObjectConfiguration.getProperties();
-
-  for (
-    let propertyIndex = 0;
-    propertyIndex < properties.getCount();
-    propertyIndex++
-  ) {
-    const property = properties.getAt(propertyIndex);
-
-    /**
-     * The list of child-object where the layout is applied
-     */
-    const childNames = property.getExtraInfo();
-    if (!childNames) {
-      continue;
-    }
-
-    // The property types should never be checked because we may introduce
-    // new types to make the layout configuration easier.
-    const name = property.getName();
-    const propertyValueString = instanceProperties.get(name).getValue();
-    const propertyValueBoolean = propertyValueString === 'true';
-    const propertyValueNumber = Number.parseFloat(propertyValueString) || 0;
-    const layoutField = layoutFields.find(field => name.includes(field));
-
-    // AnchorTarget extraInfo is not the list of child-object where the layout is applied
-    // but the child that is the target of the anchor.
-    // The extraInfos from the AnchorOrigin is used to get this child-object list
-    let targetObjectName = '';
-    let horizontalAnchorTarget: number | null = null;
-    let verticalAnchorTarget: number | null = null;
-    if (
-      layoutField === 'HorizontalAnchorOrigin' ||
-      layoutField === 'VerticalAnchorOrigin' ||
-      layoutField === 'AnchorOrigin'
-    ) {
-      const targetPropertyName = name.replace('AnchorOrigin', 'AnchorTarget');
-      if (properties.has(targetPropertyName)) {
-        const targetProperty = properties.get(targetPropertyName);
-        targetObjectName =
-          targetProperty.getExtraInfo().size() > 0
-            ? targetProperty.getExtraInfo().at(0)
-            : '';
-        const anchorTargetStringValue = instanceProperties
-          .get(targetPropertyName)
-          .getValue();
-        const anchorTargetValueNumber =
-          Number.parseFloat(anchorTargetStringValue) || 0;
-        if (
-          layoutField === 'HorizontalAnchorOrigin' ||
-          layoutField === 'AnchorOrigin'
-        ) {
-          horizontalAnchorTarget =
-            getHorizontalAnchorValue(
-              anchorTargetStringValue,
-              instanceProperties
-            ) || anchorTargetValueNumber;
-        }
-        if (
-          layoutField === 'VerticalAnchorOrigin' ||
-          layoutField === 'AnchorOrigin'
-        ) {
-          verticalAnchorTarget =
-            getVerticalAnchorValue(
-              anchorTargetStringValue,
-              instanceProperties
-            ) || anchorTargetValueNumber;
-        }
-      }
-    }
-
-    for (let childIndex = 0; childIndex < childNames.size(); childIndex++) {
-      const childName = childNames.at(childIndex);
-      let layout = layouts.get(childName);
-      if (!layout) {
-        layout = {
-          isShown: true,
-          horizontalLayout: {},
-          verticalLayout: {},
-          depthLayout: {},
-        };
-        layouts.set(childName, layout);
-      }
-      if (layoutField === 'Show') {
-        if (propertyValueString !== 'true') {
-          layout.isShown = false;
-        }
-      } else if (layoutField === 'LeftPadding') {
-        layout.horizontalLayout.minSideAbsoluteMargin = propertyValueNumber;
-      } else if (layoutField === 'RightPadding') {
-        layout.horizontalLayout.maxSideAbsoluteMargin = propertyValueNumber;
-      } else if (layoutField === 'TopPadding') {
-        layout.verticalLayout.minSideAbsoluteMargin = propertyValueNumber;
-      } else if (layoutField === 'BottomPadding') {
-        layout.verticalLayout.maxSideAbsoluteMargin = propertyValueNumber;
-      } else if (layoutField === 'AnchorDeltaX') {
-        layout.horizontalLayout.anchorDelta = propertyValueNumber;
-      } else if (layoutField === 'AnchorDeltaY') {
-        layout.verticalLayout.anchorDelta = propertyValueNumber;
-      } else if (layoutField === 'IsScaledProportionallyOnX') {
-        layout.horizontalLayout.isScaledProportionally = propertyValueBoolean;
-      } else if (layoutField === 'IsScaledProportionallyOnY') {
-        layout.verticalLayout.isScaledProportionally = propertyValueBoolean;
-      } else if (layoutField === 'IsScaledProportionallyOnZ') {
-        layout.depthLayout.isScaledProportionally = propertyValueBoolean;
-      } else if (layoutField === 'IsScaledProportionally') {
-        layout.horizontalLayout.isScaledProportionally = propertyValueBoolean;
-        layout.verticalLayout.isScaledProportionally = propertyValueBoolean;
-        layout.depthLayout.isScaledProportionally = propertyValueBoolean;
-      } else {
-        if (
-          layoutField === 'HorizontalAnchorOrigin' ||
-          layoutField === 'AnchorOrigin'
-        ) {
-          const anchorOrigin =
-            getHorizontalOriginAnchorValue(
-              propertyValueString,
-              instanceProperties,
-              horizontalAnchorTarget
-            ) || propertyValueNumber;
-          if (anchorOrigin !== null) {
-            layout.horizontalLayout.anchorOrigin = anchorOrigin;
-          }
-          if (horizontalAnchorTarget !== null) {
-            layout.horizontalLayout.anchorTarget = horizontalAnchorTarget;
-          }
-          layout.horizontalLayout.anchorTargetObject = targetObjectName;
-        }
-        if (
-          layoutField === 'VerticalAnchorOrigin' ||
-          layoutField === 'AnchorOrigin'
-        ) {
-          const anchorOrigin =
-            getVerticalOriginAnchorValue(
-              propertyValueString,
-              instanceProperties,
-              horizontalAnchorTarget
-            ) || propertyValueNumber;
-          if (anchorOrigin !== null) {
-            layout.verticalLayout.anchorOrigin = anchorOrigin;
-          }
-          if (verticalAnchorTarget !== null) {
-            layout.verticalLayout.anchorTarget = verticalAnchorTarget;
-          }
-          layout.verticalLayout.anchorTargetObject = targetObjectName;
-        }
-      }
-    }
+  objectName: string
+): ObjectAnchor => {
+  const childObject = eventBasedObject.getObjects().getObject(objectName);
+  if (!childObject.hasBehaviorNamed('Anchor')) {
+    return {
+      leftEdgeAnchor: gd.CustomObjectConfiguration.NoAnchor,
+      topEdgeAnchor: gd.CustomObjectConfiguration.NoAnchor,
+      rightEdgeAnchor: gd.CustomObjectConfiguration.NoAnchor,
+      bottomEdgeAnchor: gd.CustomObjectConfiguration.NoAnchor,
+    };
   }
-  return layouts;
+  const properties = childObject.getBehavior('Anchor').getProperties();
+  const leftEdgeAnchor = getPropertyValue(properties, 'leftEdgeAnchor');
+  const topEdgeAnchor = getPropertyValue(properties, 'topEdgeAnchor');
+  const rightEdgeAnchor = getPropertyValue(properties, 'rightEdgeAnchor');
+  const bottomEdgeAnchor = getPropertyValue(properties, 'bottomEdgeAnchor');
+  return { leftEdgeAnchor, topEdgeAnchor, rightEdgeAnchor, bottomEdgeAnchor };
 };
 
-// TODO EBO Make an event-based object instance editor (like the one for the scene)
-// and use real instances instead of this.
-export class ChildInstance {
-  x: number;
-  y: number;
-  z: number;
-  opacity: number;
-  _hasCustomSize: boolean;
-  _hasCustomDepth: boolean;
-  _customWidth: number;
-  _customHeight: number;
-  _customDepth: number;
+/**
+ * A minimal implementation of a fake gdInitialInstance to allow to store
+ * layouting results without actually modifying events-based objects initial
+ * instances.
+ * @see gdInitialInstance
+ */
+export class LayoutedInstance {
+  instance: gdInitialInstance;
+  ptr: number;
+  x = 0;
+  y = 0;
+  z = 0;
+  _hasCustomSize = false;
+  _hasCustomDepth = false;
+  _customWidth = 0;
+  _customHeight = 0;
+  _customDepth = 0;
 
-  constructor() {
-    this.x = 0;
-    this.y = 0;
-    this.z = 0;
-    this.opacity = 255;
-    this._customWidth = 0;
-    this._customHeight = 0;
-    this._customDepth = 0;
-    this._hasCustomSize = false;
-    this._hasCustomDepth = false;
+  constructor(instance: gdInitialInstance) {
+    this.instance = instance;
+    this.ptr = instance.ptr;
   }
 
   getX() {
@@ -430,10 +123,8 @@ export class ChildInstance {
     return 0;
   }
 
-  setObjectName(name: string) {}
-
   getObjectName() {
-    return '';
+    return this.instance.getObjectName();
   }
 
   setX(x: number) {}
@@ -467,21 +158,19 @@ export class ChildInstance {
   setZOrder(zOrder: number) {}
 
   getOpacity() {
-    return this.opacity;
+    return this.instance.getOpacity();
   }
 
-  setOpacity(opacity: number) {
-    this.opacity = opacity;
-  }
+  setOpacity(opacity: number) {}
 
   isFlippedX() {
-    return false;
+    return this.instance.isFlippedX();
   }
 
   setFlippedX(flippedX: boolean) {}
 
   isFlippedY() {
-    return false;
+    return this.instance.isFlippedY();
   }
 
   setFlippedY(flippedY: boolean) {}
@@ -570,6 +259,10 @@ export class ChildInstance {
   unserializeFrom(element: gdSerializerElement) {}
 }
 
+/**
+ * The part of `gdInitialInstance` interface used by the layouting.
+ * @see gdInitialInstance
+ */
 export type InitialInstanceDimension = {
   hasCustomSize(): boolean,
   getCustomWidth(): number,
@@ -578,6 +271,9 @@ export type InitialInstanceDimension = {
   getY(): number,
 };
 
+/**
+ * @see RenderedInstance
+ */
 export interface ChildRenderedInstance {
   +_instance: InitialInstanceDimension;
   _pixiObject: { height: number };
@@ -588,126 +284,208 @@ export interface ChildRenderedInstance {
   update(): void;
 }
 
+/**
+ * @see RenderedCustomObjectInstance
+ */
 export interface LayoutedParent<
   CovariantChildRenderedInstance: ChildRenderedInstance
 > {
-  childrenInstances: ChildInstance[];
-  childrenLayouts: ChildLayout[];
-  childrenRenderedInstances: Array<CovariantChildRenderedInstance>;
-  childrenRenderedInstanceByNames: Map<string, CovariantChildRenderedInstance>;
+  eventBasedObject: gdEventsBasedObject | null;
   getWidth(): number;
   getHeight(): number;
-  getDepth(): number;
+  getRendererOfInstance: (
+    instance: gdInitialInstance
+  ) => CovariantChildRenderedInstance;
+  getLayoutedInstance: (instance: gdInitialInstance) => LayoutedInstance;
 }
 
-export const applyChildLayouts = <T: ChildRenderedInstance>(
-  parent: LayoutedParent<T>
-) => {
-  const width = parent.getWidth();
-  const height = parent.getHeight();
-
-  for (
-    let index = 0;
-    index < parent.childrenRenderedInstances.length;
-    index++
-  ) {
-    const renderedInstance = parent.childrenRenderedInstances[index];
-    const childInstance = parent.childrenInstances[index];
-    const childLayout = parent.childrenLayouts[index];
-
-    const childOriginX = renderedInstance.getOriginX();
-    const childOriginY = renderedInstance.getOriginY();
-
-    if (childLayout.horizontalLayout.anchorOrigin == null) {
-      const childMinX =
-        childLayout.horizontalLayout.minSideAbsoluteMargin ||
-        (childLayout.horizontalLayout.minSideProportionalMargin || 0) * width;
-      const childMaxX =
-        width -
-        (childLayout.horizontalLayout.maxSideAbsoluteMargin ||
-          (childLayout.horizontalLayout.maxSideProportionalMargin || 0) *
-            width);
-
-      childInstance.x = childMinX + childOriginX;
-      childInstance.setCustomWidth(childMaxX - childMinX);
-    } else {
-      const anchorOrigin = childLayout.horizontalLayout.anchorOrigin || 0;
-      const anchorTarget = childLayout.horizontalLayout.anchorTarget || 0;
-
-      const targetRenderedInstance =
-        parent.childrenRenderedInstanceByNames.get(
-          childLayout.horizontalLayout.anchorTargetObject || ''
-        ) || parent.childrenRenderedInstances[0];
-      const targetInstance = targetRenderedInstance._instance;
-      const targetInstanceWidth = targetInstance.hasCustomSize()
-        ? targetInstance.getCustomWidth()
-        : targetRenderedInstance.getDefaultWidth();
-
-      const width = childLayout.horizontalLayout.isScaledProportionally
-        ? (targetInstanceWidth * renderedInstance.getDefaultWidth()) /
-          targetRenderedInstance.getDefaultWidth()
-        : renderedInstance.getDefaultWidth();
-
-      childInstance.x =
-        targetInstance.getX() -
-        targetRenderedInstance.getOriginX() +
-        (childLayout.horizontalLayout.anchorDelta || 0) +
-        anchorTarget * targetInstanceWidth -
-        anchorOrigin * width +
-        childOriginX;
-      childInstance.setCustomWidth(width);
-    }
-
-    if (childLayout.verticalLayout.anchorOrigin == null) {
-      const childMinY =
-        childLayout.verticalLayout.minSideAbsoluteMargin ||
-        (childLayout.verticalLayout.minSideProportionalMargin || 0) * height;
-      const childMaxY =
-        height -
-        (childLayout.verticalLayout.maxSideAbsoluteMargin ||
-          (childLayout.verticalLayout.maxSideProportionalMargin || 0) * height);
-
-      childInstance.y = childMinY + childOriginY;
-      const expectedHeight = childMaxY - childMinY;
-      childInstance.setCustomHeight(childMaxY - childMinY);
-
-      renderedInstance.update();
-      // This ensure objects are centered if their dimensions changed from the
-      // custom ones (preferred ones).
-      // For instance, text object dimensions change according to how the text is wrapped.
-      childInstance.y +=
-        (expectedHeight - renderedInstance._pixiObject.height) / 2;
-    } else {
-      const anchorOrigin = childLayout.verticalLayout.anchorOrigin || 0;
-      const anchorTarget = childLayout.verticalLayout.anchorTarget || 0;
-
-      const targetRenderedInstance =
-        parent.childrenRenderedInstanceByNames.get(
-          childLayout.horizontalLayout.anchorTargetObject || ''
-        ) || parent.childrenRenderedInstances[0];
-      const targetInstance = targetRenderedInstance._instance;
-      const targetInstanceHeight = targetInstance.hasCustomSize()
-        ? targetInstance.getCustomHeight()
-        : targetRenderedInstance.getDefaultHeight();
-
-      const height = childLayout.horizontalLayout.isScaledProportionally
-        ? (targetInstanceHeight * renderedInstance.getDefaultHeight()) /
-          targetRenderedInstance.getDefaultHeight()
-        : renderedInstance.getDefaultHeight();
-
-      childInstance.y =
-        targetInstance.getY() -
-        targetRenderedInstance.getOriginY() +
-        (childLayout.verticalLayout.anchorDelta || 0) +
-        anchorTarget * targetInstanceHeight -
-        anchorOrigin * height +
-        childOriginY;
-      childInstance.setCustomHeight(height);
-    }
-
-    childInstance.z = 0;
-    childInstance.setCustomDepth(parent.getDepth());
-
-    renderedInstance.update();
+export const getLayoutedRenderedInstance = <T: ChildRenderedInstance>(
+  parent: LayoutedParent<T>,
+  initialInstance: gdInitialInstance
+): T | null => {
+  const eventBasedObject = parent.eventBasedObject;
+  if (!eventBasedObject) {
+    return null;
   }
+
+  const layoutedInstance = parent.getLayoutedInstance(initialInstance);
+  const renderedInstance = parent.getRendererOfInstance(
+    ((layoutedInstance: any): gdInitialInstance)
+  );
+
+  const objectAnchor = getObjectAnchor(
+    eventBasedObject,
+    layoutedInstance.getObjectName()
+  );
+  const leftEdgeAnchor = objectAnchor
+    ? objectAnchor.leftEdgeAnchor
+    : gd.CustomObjectConfiguration.NoAnchor;
+  const topEdgeAnchor = objectAnchor
+    ? objectAnchor.topEdgeAnchor
+    : gd.CustomObjectConfiguration.NoAnchor;
+  const rightEdgeAnchor = objectAnchor
+    ? objectAnchor.rightEdgeAnchor
+    : gd.CustomObjectConfiguration.NoAnchor;
+  const bottomEdgeAnchor = objectAnchor
+    ? objectAnchor.bottomEdgeAnchor
+    : gd.CustomObjectConfiguration.NoAnchor;
+
+  const parentInitialMinX = eventBasedObject.getAreaMinX();
+  const parentInitialMinY = eventBasedObject.getAreaMinY();
+  const parentInitialMaxX = eventBasedObject.getAreaMaxX();
+  const parentInitialMaxY = eventBasedObject.getAreaMaxY();
+  const parentInitialWidth = parentInitialMaxX - parentInitialMinX;
+  const parentInitialHeight = parentInitialMaxY - parentInitialMinY;
+
+  const parentWidth = parent.getWidth();
+  const parentHeight = parent.getHeight();
+  const parentScaleX = parentWidth / parentInitialWidth;
+  const parentScaleY = parentHeight / parentInitialHeight;
+
+  const initialInstanceX = initialInstance.getX();
+  const initialInstanceWidth = initialInstance.hasCustomSize()
+    ? initialInstance.getCustomWidth()
+    : renderedInstance.getDefaultWidth();
+
+  if (parentScaleX === 1 || (!leftEdgeAnchor && !rightEdgeAnchor)) {
+    layoutedInstance.x = initialInstanceX;
+    layoutedInstance.setCustomWidth(initialInstanceWidth);
+  } else {
+    const parentInitialCenterX = (parentInitialMaxX + parentInitialMinX) / 2;
+
+    const parentMinX = parentInitialMinX * parentScaleX;
+    const parentMaxX = parentInitialMaxX * parentScaleX;
+    const parentCenterX = (parentMaxX + parentMinX) / 2;
+
+    const initialInstanceOriginX =
+      (renderedInstance.getOriginX() * initialInstanceWidth) /
+      renderedInstance.getDefaultWidth();
+    const initialInstanceMinX = initialInstanceX - initialInstanceOriginX;
+    const initialInstanceMaxX = initialInstanceMinX + initialInstanceWidth;
+
+    let left = initialInstanceMinX;
+    if (leftEdgeAnchor === gd.CustomObjectConfiguration.MinEdge) {
+      left = parentMinX + initialInstanceMinX - parentInitialMinX;
+    } else if (leftEdgeAnchor === gd.CustomObjectConfiguration.MaxEdge) {
+      left = parentMaxX + initialInstanceMinX - parentInitialMaxX;
+    } else if (leftEdgeAnchor === gd.CustomObjectConfiguration.Proportional) {
+      left =
+        parentMinX +
+        ((initialInstanceMinX - parentInitialMinX) / parentInitialWidth) *
+          parentWidth;
+    } else if (leftEdgeAnchor === gd.CustomObjectConfiguration.Center) {
+      left = parentCenterX + initialInstanceMinX - parentInitialCenterX;
+    }
+
+    let right = initialInstanceMaxX;
+    if (rightEdgeAnchor === gd.CustomObjectConfiguration.MinEdge) {
+      right = parentMinX + initialInstanceMaxX - parentInitialMinX;
+    } else if (rightEdgeAnchor === gd.CustomObjectConfiguration.MaxEdge) {
+      right = parentMaxX + initialInstanceMaxX - parentInitialMaxX;
+    } else if (rightEdgeAnchor === gd.CustomObjectConfiguration.Proportional) {
+      right =
+        parentMinX +
+        ((initialInstanceMaxX - parentInitialMinX) / parentInitialWidth) *
+          parentWidth;
+    } else if (rightEdgeAnchor === gd.CustomObjectConfiguration.Center) {
+      right = parentCenterX + initialInstanceMaxX - parentInitialCenterX;
+    }
+
+    let x, width;
+    if (rightEdgeAnchor === gd.CustomObjectConfiguration.NoAnchor) {
+      width = initialInstanceWidth;
+      const originX =
+        (renderedInstance.getOriginX() * width) /
+        renderedInstance.getDefaultWidth();
+      x = left + originX;
+    } else if (leftEdgeAnchor === gd.CustomObjectConfiguration.NoAnchor) {
+      width = initialInstanceWidth;
+      const originX =
+        (renderedInstance.getOriginX() * width) /
+        renderedInstance.getDefaultWidth();
+      x = right - width + originX;
+    } else {
+      width = right - left;
+      const originX =
+        (renderedInstance.getOriginX() * width) /
+        renderedInstance.getDefaultWidth();
+      x = left + originX;
+    }
+    layoutedInstance.x = x;
+    layoutedInstance.setCustomWidth(width);
+  }
+
+  const initialInstanceY = initialInstance.getY();
+  const initialInstanceHeight = initialInstance.hasCustomSize()
+    ? initialInstance.getCustomHeight()
+    : renderedInstance.getDefaultHeight();
+
+  if (parentScaleY === 1 || (!topEdgeAnchor && !bottomEdgeAnchor)) {
+    layoutedInstance.y = initialInstanceY;
+    layoutedInstance.setCustomHeight(initialInstanceHeight);
+  } else {
+    const parentInitialCenterY = (parentInitialMaxY + parentInitialMinY) / 2;
+
+    const parentMinY = parentInitialMinY * parentScaleY;
+    const parentMaxY = parentInitialMaxY * parentScaleY;
+    const parentCenterY = (parentMaxY + parentMinY) / 2;
+
+    const initialInstanceOriginY =
+      (renderedInstance.getOriginY() * initialInstanceHeight) /
+      renderedInstance.getDefaultHeight();
+    const initialInstanceMinY = initialInstanceY - initialInstanceOriginY;
+    const initialInstanceMaxY = initialInstanceMinY + initialInstanceHeight;
+
+    let bottom = initialInstanceMaxY;
+    if (bottomEdgeAnchor === gd.CustomObjectConfiguration.MinEdge) {
+      bottom = parentMinY + initialInstanceMaxY - parentInitialMinY;
+    } else if (bottomEdgeAnchor === gd.CustomObjectConfiguration.MaxEdge) {
+      bottom = parentMaxY + initialInstanceMaxY - parentInitialMaxY;
+    } else if (bottomEdgeAnchor === gd.CustomObjectConfiguration.Proportional) {
+      bottom =
+        parentMinY +
+        ((initialInstanceMaxY - parentInitialMinY) / parentInitialHeight) *
+          parentHeight;
+    } else if (bottomEdgeAnchor === gd.CustomObjectConfiguration.Center) {
+      bottom = parentCenterY + initialInstanceMaxY - parentInitialCenterY;
+    }
+
+    let top = initialInstanceMinY;
+    if (topEdgeAnchor === gd.CustomObjectConfiguration.MinEdge) {
+      top = parentMinY + initialInstanceMinY - parentInitialMinY;
+    } else if (topEdgeAnchor === gd.CustomObjectConfiguration.MaxEdge) {
+      top = parentMaxY + initialInstanceMinY - parentInitialMaxY;
+    } else if (topEdgeAnchor === gd.CustomObjectConfiguration.Proportional) {
+      top =
+        parentMinY +
+        ((initialInstanceMinY - parentInitialMinY) / parentInitialHeight) *
+          parentHeight;
+    } else if (topEdgeAnchor === gd.CustomObjectConfiguration.Center) {
+      top = parentCenterY + initialInstanceMinY - parentInitialCenterY;
+    }
+
+    let y, height;
+    if (bottomEdgeAnchor === gd.CustomObjectConfiguration.NoAnchor) {
+      height = initialInstanceHeight;
+      const originY =
+        (renderedInstance.getOriginY() * height) /
+        renderedInstance.getDefaultHeight();
+      y = top + originY;
+    } else if (topEdgeAnchor === gd.CustomObjectConfiguration.NoAnchor) {
+      height = initialInstanceHeight;
+      const originY =
+        (renderedInstance.getOriginY() * height) /
+        renderedInstance.getDefaultHeight();
+      y = bottom - height + originY;
+    } else {
+      height = bottom - top;
+      const originY =
+        (renderedInstance.getOriginY() * height) /
+        renderedInstance.getDefaultHeight();
+      y = top + originY;
+    }
+    layoutedInstance.y = y;
+    layoutedInstance.setCustomHeight(height);
+  }
+  return renderedInstance;
 };

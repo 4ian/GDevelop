@@ -874,6 +874,14 @@ interface ObjectJsImplementation {
     // void DoUnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 };
 
+enum CustomObjectConfiguration_EdgeAnchor {
+    "CustomObjectConfiguration::NoAnchor",
+    "CustomObjectConfiguration::MinEdge",
+    "CustomObjectConfiguration::MaxEdge",
+    "CustomObjectConfiguration::Proportional",
+    "CustomObjectConfiguration::Center",
+};
+
 interface CustomObjectConfiguration {
     [Value] UniquePtrObjectConfiguration Clone();
 
@@ -896,6 +904,8 @@ interface CustomObjectConfiguration {
         DOMString value);
 
     [Ref] SpriteAnimationList GetAnimations();
+
+    CustomObjectConfiguration_EdgeAnchor STATIC_GetEdgeAnchorFromString([Const] DOMString value);
 };
 CustomObjectConfiguration implements ObjectConfiguration;
 
@@ -2971,8 +2981,10 @@ interface EventsBasedObject {
     boolean IsAnimatable();
     [Ref] EventsBasedObject MarkAsTextContainer(boolean isTextContainer);
     boolean IsTextContainer();
-    [Ref] EventsBasedObject MarkAsInnerAreaExpandingWithParent(boolean value);
+    [Ref] EventsBasedObject MarkAsInnerAreaFollowingParentSize(boolean value);
     boolean IsInnerAreaFollowingParentSize();
+    [Ref] EventsBasedObject MakAsUsingLegacyInstancesRenderer(boolean value);
+    boolean IsUsingLegacyInstancesRenderer();
 
     [Ref] InitialInstancesContainer GetInitialInstances();
     [Ref] LayersContainer GetLayers();

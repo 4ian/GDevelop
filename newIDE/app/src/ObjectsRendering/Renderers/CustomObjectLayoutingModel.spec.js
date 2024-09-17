@@ -1,498 +1,582 @@
 // @flow
 import {
-  getLayouts,
-  applyChildLayouts,
-  type ChildLayout,
-  ChildInstance,
+  getLayoutedRenderedInstance,
+  LayoutedInstance,
   LayoutedParent,
   ChildRenderedInstance,
-  PropertiesContainer,
 } from './CustomObjectLayoutingModel';
-import { mapFor } from '../../Utils/MapFor';
 
 const gd: libGDevelop = global.gd;
 
-describe('getLayouts', () => {
-  it('can fill the parent with a child', () => {
-    const eventBasedObject = createEventBasedObject([]);
-    const customObjectConfiguration = createCustomObjectConfiguration(
-      eventBasedObject,
-      []
-    );
-    const layouts = getLayouts(eventBasedObject, customObjectConfiguration);
-    // A default layout will be set by RenderedCustomObjectInstance constructor
-    // which is not covered by tests.
-    expect(layouts.has('Background')).toBe(false);
+describe('getLayoutedRenderedInstance', () => {
+  it('can fill the parent with a child (with custom size)', () => {
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const layoutedRenderedInstance = getLayoutedRenderedInstanceFor({
+      project,
+      innerArea: {
+        minX: 0,
+        minY: 0,
+        maxX: 100,
+        maxY: 100,
+      },
+      parent: { width: 300, height: 200 },
+      child: { defaultWidth: 64, defaultHeight: 64 },
+      instance: { x: 0, y: 0, customSize: { width: 100, height: 100 } },
+      anchor: {
+        left: gd.CustomObjectConfiguration.MinEdge,
+        top: gd.CustomObjectConfiguration.MinEdge,
+        right: gd.CustomObjectConfiguration.MaxEdge,
+        bottom: gd.CustomObjectConfiguration.MaxEdge,
+      },
+    });
+    const instance = layoutedRenderedInstance._instance;
+    expect(instance.getX()).toBe(0);
+    expect(instance.getY()).toBe(0);
+    expect(instance.hasCustomSize()).toBe(true);
+    expect(instance.getCustomWidth()).toBe(300);
+    expect(instance.getCustomHeight()).toBe(200);
+
+    project.delete();
   });
 
-  it('can fill the parent with an hidden child', () => {
-    const eventBasedObject = createEventBasedObject([
-      { name: 'ShowBackground', extraInfos: ['Background'] },
-    ]);
-    const customObjectConfiguration = createCustomObjectConfiguration(
-      eventBasedObject,
-      [{ name: 'ShowBackground', value: 'false' }]
-    );
-    const layouts = getLayouts(eventBasedObject, customObjectConfiguration);
+  it('can fill the parent with a child (without custom size)', () => {
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const layoutedRenderedInstance = getLayoutedRenderedInstanceFor({
+      project,
+      innerArea: {
+        minX: 0,
+        minY: 0,
+        maxX: 100,
+        maxY: 100,
+      },
+      parent: { width: 300, height: 200 },
+      child: { defaultWidth: 100, defaultHeight: 100 },
+      instance: { x: 0, y: 0, customSize: null },
+      anchor: {
+        left: gd.CustomObjectConfiguration.MinEdge,
+        top: gd.CustomObjectConfiguration.MinEdge,
+        right: gd.CustomObjectConfiguration.MaxEdge,
+        bottom: gd.CustomObjectConfiguration.MaxEdge,
+      },
+    });
+    const instance = layoutedRenderedInstance._instance;
+    expect(instance.getX()).toBe(0);
+    expect(instance.getY()).toBe(0);
+    expect(instance.hasCustomSize()).toBe(true);
+    expect(instance.getCustomWidth()).toBe(300);
+    expect(instance.getCustomHeight()).toBe(200);
 
-    expect(layouts.get('Background')).toStrictEqual({
-      isShown: false,
-      horizontalLayout: {},
-      verticalLayout: {},
-      depthLayout: {},
+    project.delete();
+  });
+
+  it('can fill the parent with a child (with parent custom origin)', () => {
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const layoutedRenderedInstance = getLayoutedRenderedInstanceFor({
+      project,
+      innerArea: {
+        minX: -50,
+        minY: -50,
+        maxX: 50,
+        maxY: 50,
+      },
+      parent: { width: 300, height: 200 },
+      child: { defaultWidth: 64, defaultHeight: 64 },
+      instance: { x: -50, y: -50, customSize: { width: 100, height: 100 } },
+      anchor: {
+        left: gd.CustomObjectConfiguration.MinEdge,
+        top: gd.CustomObjectConfiguration.MinEdge,
+        right: gd.CustomObjectConfiguration.MaxEdge,
+        bottom: gd.CustomObjectConfiguration.MaxEdge,
+      },
+    });
+    const instance = layoutedRenderedInstance._instance;
+    expect(instance.getX()).toBe(-150);
+    expect(instance.getY()).toBe(-100);
+    expect(instance.hasCustomSize()).toBe(true);
+    expect(instance.getCustomWidth()).toBe(300);
+    expect(instance.getCustomHeight()).toBe(200);
+
+    project.delete();
+  });
+
+  it('can fill the parent with a child (with child custom origin)', () => {
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const layoutedRenderedInstance = getLayoutedRenderedInstanceFor({
+      project,
+      innerArea: {
+        minX: 0,
+        minY: 0,
+        maxX: 100,
+        maxY: 100,
+      },
+      parent: { width: 300, height: 200 },
+      child: { defaultWidth: 64, defaultHeight: 64, originX: 32, originY: 32 },
+      instance: { x: 50, y: 50, customSize: { width: 100, height: 100 } },
+      anchor: {
+        left: gd.CustomObjectConfiguration.MinEdge,
+        top: gd.CustomObjectConfiguration.MinEdge,
+        right: gd.CustomObjectConfiguration.MaxEdge,
+        bottom: gd.CustomObjectConfiguration.MaxEdge,
+      },
+    });
+    const instance = layoutedRenderedInstance._instance;
+    expect(instance.getX()).toBe(150);
+    expect(instance.getY()).toBe(100);
+    expect(instance.hasCustomSize()).toBe(true);
+    expect(instance.getCustomWidth()).toBe(300);
+    expect(instance.getCustomHeight()).toBe(200);
+
+    project.delete();
+  });
+
+  it('can fill the parent with a child (proportionally)', () => {
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const layoutedRenderedInstance = getLayoutedRenderedInstanceFor({
+      project,
+      innerArea: {
+        minX: 0,
+        minY: 0,
+        maxX: 100,
+        maxY: 100,
+      },
+      parent: { width: 300, height: 200 },
+      child: { defaultWidth: 64, defaultHeight: 64 },
+      instance: { x: 0, y: 0, customSize: { width: 100, height: 100 } },
+      anchor: {
+        left: gd.CustomObjectConfiguration.Proportional,
+        top: gd.CustomObjectConfiguration.Proportional,
+        right: gd.CustomObjectConfiguration.Proportional,
+        bottom: gd.CustomObjectConfiguration.Proportional,
+      },
+    });
+    const instance = layoutedRenderedInstance._instance;
+    expect(instance.getX()).toBe(0);
+    expect(instance.getY()).toBe(0);
+    expect(instance.hasCustomSize()).toBe(true);
+    expect(instance.getCustomWidth()).toBe(300);
+    expect(instance.getCustomHeight()).toBe(200);
+
+    project.delete();
+  });
+
+  describe('(anchor horizontal edge)', () => {
+    ['right', 'left'].forEach(objectEdge => {
+      it(`anchors the ${objectEdge} edge of object to window left (fixed)`, () => {
+        const project = gd.ProjectHelper.createNewGDJSProject();
+        const layoutedRenderedInstance = getLayoutedRenderedInstanceFor({
+          project,
+          innerArea: {
+            minX: 0,
+            minY: 0,
+            maxX: 1000,
+            maxY: 1000,
+          },
+          parent: { width: 2000, height: 2000 },
+          child: { defaultWidth: 10, defaultHeight: 10 },
+          instance: { x: 500, y: 500, customSize: null },
+          // $FlowIgnore
+          anchor: { [objectEdge]: gd.CustomObjectConfiguration.MinEdge },
+        });
+        const instance = layoutedRenderedInstance._instance;
+        expect(instance.getX()).toBe(500);
+        expect(instance.getY()).toBe(500);
+        expect(instance.hasCustomSize()).toBe(true);
+        expect(instance.getCustomWidth()).toBe(10);
+        expect(instance.getCustomHeight()).toBe(10);
+
+        project.delete();
+      });
+    });
+    ['right', 'left'].forEach(objectEdge => {
+      it(`anchors the ${objectEdge} edge of object to window right (fixed)`, () => {
+        const project = gd.ProjectHelper.createNewGDJSProject();
+        const layoutedRenderedInstance = getLayoutedRenderedInstanceFor({
+          project,
+          innerArea: {
+            minX: 0,
+            minY: 0,
+            maxX: 1000,
+            maxY: 1000,
+          },
+          parent: { width: 2000, height: 2000 },
+          child: { defaultWidth: 10, defaultHeight: 10 },
+          instance: { x: 500, y: 500, customSize: null },
+          // $FlowIgnore
+          anchor: { [objectEdge]: gd.CustomObjectConfiguration.MaxEdge },
+        });
+        const instance = layoutedRenderedInstance._instance;
+        expect(instance.getX()).toBe(1500);
+        expect(instance.getY()).toBe(500);
+        expect(instance.hasCustomSize()).toBe(true);
+        expect(instance.getCustomWidth()).toBe(10);
+        expect(instance.getCustomHeight()).toBe(10);
+
+        project.delete();
+      });
+    });
+    ['right', 'left'].forEach(objectEdge => {
+      it(`anchors the ${objectEdge} edge of object to window center (fixed)`, () => {
+        const project = gd.ProjectHelper.createNewGDJSProject();
+        const layoutedRenderedInstance = getLayoutedRenderedInstanceFor({
+          project,
+          innerArea: {
+            minX: 0,
+            minY: 0,
+            maxX: 1000,
+            maxY: 1000,
+          },
+          parent: { width: 2000, height: 2000 },
+          child: { defaultWidth: 10, defaultHeight: 10 },
+          instance: { x: 500, y: 500, customSize: null },
+          // $FlowIgnore
+          anchor: { [objectEdge]: gd.CustomObjectConfiguration.Center },
+        });
+        const instance = layoutedRenderedInstance._instance;
+        expect(instance.getX()).toBe(1000);
+        expect(instance.getY()).toBe(500);
+        expect(instance.hasCustomSize()).toBe(true);
+        expect(instance.getCustomWidth()).toBe(10);
+        expect(instance.getCustomHeight()).toBe(10);
+
+        project.delete();
+      });
+    });
+
+    it('anchors the right and left edge of object (fixed)', () => {
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      const layoutedRenderedInstance = getLayoutedRenderedInstanceFor({
+        project,
+        innerArea: {
+          minX: 0,
+          minY: 0,
+          maxX: 1000,
+          maxY: 1000,
+        },
+        parent: { width: 2000, height: 2000 },
+        child: { defaultWidth: 10, defaultHeight: 10 },
+        instance: { x: 500, y: 500, customSize: null },
+        anchor: {
+          left: gd.CustomObjectConfiguration.MinEdge,
+          right: gd.CustomObjectConfiguration.MaxEdge,
+        },
+      });
+      const instance = layoutedRenderedInstance._instance;
+      expect(instance.getX()).toBe(500);
+      expect(instance.getY()).toBe(500);
+      expect(instance.hasCustomSize()).toBe(true);
+      expect(instance.getCustomWidth()).toBe(1010);
+      expect(instance.getCustomHeight()).toBe(10);
+
+      project.delete();
+    });
+
+    it('anchors the left edge of object (proportional)', () => {
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      const layoutedRenderedInstance = getLayoutedRenderedInstanceFor({
+        project,
+        innerArea: {
+          minX: 0,
+          minY: 0,
+          maxX: 1000,
+          maxY: 1000,
+        },
+        parent: { width: 2000, height: 2000 },
+        child: { defaultWidth: 10, defaultHeight: 10 },
+        instance: { x: 500, y: 500, customSize: null },
+        anchor: { left: gd.CustomObjectConfiguration.Proportional },
+      });
+      const instance = layoutedRenderedInstance._instance;
+      expect(instance.getX()).toBe(1000);
+      expect(instance.getY()).toBe(500);
+      expect(instance.hasCustomSize()).toBe(true);
+      expect(instance.getCustomWidth()).toBe(10);
+      expect(instance.getCustomHeight()).toBe(10);
+
+      project.delete();
     });
   });
 
-  it('can fill the parent with a child with margins', () => {
-    const eventBasedObject = createEventBasedObject([
-      { name: 'BarLeftPadding', extraInfos: ['PanelBar'] },
-      { name: 'BarRightPadding', extraInfos: ['PanelBar'] },
-      { name: 'BarTopPadding', extraInfos: ['PanelBar'] },
-      { name: 'BarBottomPadding', extraInfos: ['PanelBar'] },
-    ]);
-    const customObjectConfiguration = createCustomObjectConfiguration(
-      eventBasedObject,
-      [
-        { name: 'BarLeftPadding', value: '10' },
-        { name: 'BarRightPadding', value: '20' },
-        { name: 'BarTopPadding', value: '30' },
-        { name: 'BarBottomPadding', value: '40' },
-      ]
-    );
-    const layouts = getLayouts(eventBasedObject, customObjectConfiguration);
+  describe('(anchor vertical edge)', () => {
+    ['top', 'bottom'].forEach(objectEdge => {
+      it(`anchors the ${objectEdge} edge of object to window top (fixed)`, () => {
+        const project = gd.ProjectHelper.createNewGDJSProject();
+        const layoutedRenderedInstance = getLayoutedRenderedInstanceFor({
+          project,
+          innerArea: {
+            minX: 0,
+            minY: 0,
+            maxX: 1000,
+            maxY: 1000,
+          },
+          parent: { width: 2000, height: 2000 },
+          child: { defaultWidth: 10, defaultHeight: 10 },
+          instance: { x: 500, y: 500, customSize: null },
+          // $FlowIgnore
+          anchor: { [objectEdge]: gd.CustomObjectConfiguration.MinEdge },
+        });
+        const instance = layoutedRenderedInstance._instance;
+        expect(instance.getX()).toBe(500);
+        expect(instance.getY()).toBe(500);
+        expect(instance.hasCustomSize()).toBe(true);
+        expect(instance.getCustomWidth()).toBe(10);
+        expect(instance.getCustomHeight()).toBe(10);
 
-    expect(layouts.get('PanelBar')).toStrictEqual({
-      isShown: true,
-      horizontalLayout: {
-        minSideAbsoluteMargin: 10,
-        maxSideAbsoluteMargin: 20,
-      },
-      verticalLayout: { minSideAbsoluteMargin: 30, maxSideAbsoluteMargin: 40 },
-      depthLayout: {},
+        project.delete();
+      });
     });
-  });
+    ['top', 'bottom'].forEach(objectEdge => {
+      it(`anchors the ${objectEdge} edge of object to window bottom (fixed)`, () => {
+        const project = gd.ProjectHelper.createNewGDJSProject();
+        const layoutedRenderedInstance = getLayoutedRenderedInstanceFor({
+          project,
+          innerArea: {
+            minX: 0,
+            minY: 0,
+            maxX: 1000,
+            maxY: 1000,
+          },
+          parent: { width: 2000, height: 2000 },
+          child: { defaultWidth: 10, defaultHeight: 10 },
+          instance: { x: 500, y: 500, customSize: null },
+          // $FlowIgnore
+          anchor: { [objectEdge]: gd.CustomObjectConfiguration.MaxEdge },
+        });
+        const instance = layoutedRenderedInstance._instance;
+        expect(instance.getX()).toBe(500);
+        expect(instance.getY()).toBe(1500);
+        expect(instance.hasCustomSize()).toBe(true);
+        expect(instance.getCustomWidth()).toBe(10);
+        expect(instance.getCustomHeight()).toBe(10);
 
-  it('can fill the parent width with margins while keeping default height', () => {
-    const eventBasedObject = createEventBasedObject([
-      { name: 'BarLeftPadding', extraInfos: ['TiledBar'] },
-      { name: 'BarRightPadding', extraInfos: ['TiledBar'] },
-      // Private properties
-      {
-        name: 'BarVerticalAnchorOrigin',
-        extraInfos: ['TiledBar'],
-        value: 'Center',
-      },
-      {
-        name: 'BarVerticalAnchorTarget',
-        extraInfos: [],
-        value: 'Center',
-      },
-    ]);
-    const customObjectConfiguration = createCustomObjectConfiguration(
-      eventBasedObject,
-      [
-        { name: 'BarLeftPadding', value: '10' },
-        { name: 'BarRightPadding', value: '20' },
-      ]
-    );
-    const layouts = getLayouts(eventBasedObject, customObjectConfiguration);
-
-    expect(layouts.get('TiledBar')).toStrictEqual({
-      isShown: true,
-      horizontalLayout: {
-        minSideAbsoluteMargin: 10,
-        maxSideAbsoluteMargin: 20,
-      },
-      // The anchorTargetObject default on the object in the background.
-      verticalLayout: {
-        anchorOrigin: 0.5,
-        anchorTarget: 0.5,
-        anchorTargetObject: '',
-      },
-      depthLayout: {},
+        project.delete();
+      });
     });
-  });
+    ['top', 'bottom'].forEach(objectEdge => {
+      it(`anchors the ${objectEdge} edge of object to window center (fixed)`, () => {
+        const project = gd.ProjectHelper.createNewGDJSProject();
+        const layoutedRenderedInstance = getLayoutedRenderedInstanceFor({
+          project,
+          innerArea: {
+            minX: 0,
+            minY: 0,
+            maxX: 1000,
+            maxY: 1000,
+          },
+          parent: { width: 2000, height: 2000 },
+          child: { defaultWidth: 10, defaultHeight: 10 },
+          instance: { x: 500, y: 500, customSize: null },
+          // $FlowIgnore
+          anchor: { [objectEdge]: gd.CustomObjectConfiguration.Center },
+        });
+        const instance = layoutedRenderedInstance._instance;
+        expect(instance.getX()).toBe(500);
+        expect(instance.getY()).toBe(1000);
+        expect(instance.hasCustomSize()).toBe(true);
+        expect(instance.getCustomWidth()).toBe(10);
+        expect(instance.getCustomHeight()).toBe(10);
 
-  it('can anchor a child to another child', () => {
-    const eventBasedObject = createEventBasedObject([
-      // Private properties
-      {
-        name: 'ThumbAnchorOrigin',
-        extraInfos: ['Thumb'],
-        value: 'Center-center',
-      },
-      {
-        name: 'ThumbAnchorTarget',
-        extraInfos: ['PanelBar'],
-        value: 'Center-right',
-      },
-    ]);
-    const customObjectConfiguration = createCustomObjectConfiguration(
-      eventBasedObject,
-      []
-    );
-    const layouts = getLayouts(eventBasedObject, customObjectConfiguration);
-
-    expect(layouts.get('Thumb')).toStrictEqual({
-      isShown: true,
-      horizontalLayout: {
-        anchorOrigin: 0.5,
-        anchorTarget: 1,
-        anchorTargetObject: 'PanelBar',
-      },
-      verticalLayout: {
-        anchorOrigin: 0.5,
-        anchorTarget: 0.5,
-        anchorTargetObject: 'PanelBar',
-      },
-      depthLayout: {},
+        project.delete();
+      });
     });
-  });
 
-  it('can anchor a child to another child and be scaled proportionally', () => {
-    const eventBasedObject = createEventBasedObject([
-      // Private properties
-      {
-        name: 'ThumbAnchorOrigin',
-        extraInfos: ['Thumb'],
-        value: 'Center-center',
-      },
-      {
-        name: 'ThumbAnchorTarget',
-        extraInfos: ['Border'],
-        value: 'Center-center',
-      },
-      {
-        name: 'ThumbIsScaledProportionally',
-        extraInfos: ['Thumb'],
-        value: 'true',
-      },
-    ]);
-    const customObjectConfiguration = createCustomObjectConfiguration(
-      eventBasedObject,
-      []
-    );
-    const layouts = getLayouts(eventBasedObject, customObjectConfiguration);
+    it('anchors the top and bottom edge of object (fixed)', () => {
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      const layoutedRenderedInstance = getLayoutedRenderedInstanceFor({
+        project,
+        innerArea: {
+          minX: 0,
+          minY: 0,
+          maxX: 1000,
+          maxY: 1000,
+        },
+        parent: { width: 2000, height: 2000 },
+        child: { defaultWidth: 10, defaultHeight: 10 },
+        instance: { x: 500, y: 500, customSize: null },
+        anchor: {
+          top: gd.CustomObjectConfiguration.MinEdge,
+          bottom: gd.CustomObjectConfiguration.MaxEdge,
+        },
+      });
+      const instance = layoutedRenderedInstance._instance;
+      expect(instance.getX()).toBe(500);
+      expect(instance.getY()).toBe(500);
+      expect(instance.hasCustomSize()).toBe(true);
+      expect(instance.getCustomWidth()).toBe(10);
+      expect(instance.getCustomHeight()).toBe(1010);
 
-    expect(layouts.get('Thumb')).toStrictEqual({
-      isShown: true,
-      horizontalLayout: {
-        anchorOrigin: 0.5,
-        anchorTarget: 0.5,
-        anchorTargetObject: 'Border',
-        isScaledProportionally: true,
-      },
-      verticalLayout: {
-        anchorOrigin: 0.5,
-        anchorTarget: 0.5,
-        anchorTargetObject: 'Border',
-        isScaledProportionally: true,
-      },
-      depthLayout: {
-        isScaledProportionally: true,
-      },
+      project.delete();
+    });
+
+    it('anchors the top edge of object (proportional)', () => {
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      const layoutedRenderedInstance = getLayoutedRenderedInstanceFor({
+        project,
+        innerArea: {
+          minX: 0,
+          minY: 0,
+          maxX: 1000,
+          maxY: 1000,
+        },
+        parent: { width: 2000, height: 2000 },
+        child: { defaultWidth: 10, defaultHeight: 10 },
+        instance: { x: 500, y: 500, customSize: null },
+        anchor: {
+          top: gd.CustomObjectConfiguration.Proportional,
+        },
+      });
+      const instance = layoutedRenderedInstance._instance;
+      expect(instance.getX()).toBe(500);
+      expect(instance.getY()).toBe(1000);
+      expect(instance.hasCustomSize()).toBe(true);
+      expect(instance.getCustomWidth()).toBe(10);
+      expect(instance.getCustomHeight()).toBe(10);
+
+      project.delete();
     });
   });
 });
 
-describe('applyChildLayouts', () => {
-  it('can fill the parent with a child', () => {
-    const parent = new MockedParent(200, 100);
-    // This is the default layout set by RenderedCustomObjectInstance constructor
-    // which is not covered by tests.
-    const background = parent.addChild('Background', {
-      isShown: true,
-      horizontalLayout: {},
-      verticalLayout: {},
-      depthLayout: {},
-    });
-
-    applyChildLayouts(parent);
-
-    expect(background.getX()).toBe(0);
-    expect(background.getY()).toBe(0);
-    expect(background.hasCustomSize()).toBe(true);
-    expect(background.getCustomWidth()).toBe(200);
-    expect(background.getCustomHeight()).toBe(100);
-  });
-
-  it('can fill the parent with an hidden child', () => {
-    const parent = new MockedParent(200, 100);
-    // The child is hidden by RenderedCustomObjectInstance constructor
-    // which is not covered by tests.
-    // The constructor removes the child from its Pixi container.
-    // This test actually doesn't cover more than the previous one.
-    const background = parent.addChild('Background', {
-      isShown: false,
-      horizontalLayout: {},
-      verticalLayout: {},
-      depthLayout: {},
-    });
-
-    applyChildLayouts(parent);
-
-    expect(background.getX()).toBe(0);
-    expect(background.getY()).toBe(0);
-    expect(background.hasCustomSize()).toBe(true);
-    expect(background.getCustomWidth()).toBe(200);
-    expect(background.getCustomHeight()).toBe(100);
-  });
-
-  it('can fill the parent with a child with margins', () => {
-    const parent = new MockedParent(200, 100);
-    const panelBar = parent.addChild('PanelBar', {
-      isShown: true,
-      horizontalLayout: {
-        minSideAbsoluteMargin: 10,
-        maxSideAbsoluteMargin: 20,
-      },
-      verticalLayout: { minSideAbsoluteMargin: 30, maxSideAbsoluteMargin: 40 },
-      depthLayout: {},
-    });
-
-    applyChildLayouts(parent);
-
-    expect(panelBar.getX()).toBe(10);
-    expect(panelBar.getY()).toBe(30);
-    expect(panelBar.hasCustomSize()).toBe(true);
-    expect(panelBar.getCustomWidth()).toBe(200 - 10 - 20);
-    expect(panelBar.getCustomHeight()).toBe(100 - 30 - 40);
-  });
-
-  it('can fill the parent with a text child with margins', () => {
-    const parent = new MockedParent(200, 100);
-    const label = parent.addChild(
-      'Label',
-      {
-        isShown: true,
-        horizontalLayout: {
-          minSideAbsoluteMargin: 10,
-          maxSideAbsoluteMargin: 20,
-        },
-        verticalLayout: {
-          minSideAbsoluteMargin: 30,
-          maxSideAbsoluteMargin: 40,
-        },
-        depthLayout: {},
-      },
-      { heightAfterUpdate: 20 }
-    );
-
-    applyChildLayouts(parent);
-
-    expect(label.getX()).toBe(10);
-    expect(label.getY()).toBe(30 + (100 - 30 - 40 - 20) / 2);
-    expect(label.hasCustomSize()).toBe(true);
-    expect(label.getCustomWidth()).toBe(200 - 10 - 20);
-  });
-
-  it('can fill the parent width with margins while keeping default height', () => {
-    const parent = new MockedParent(200, 100);
-    parent.addChild('Background', {
-      isShown: true,
-      horizontalLayout: {},
-      verticalLayout: {},
-      depthLayout: {},
-    });
-    const tiledBar = parent.addChild(
-      'TiledBar',
-      {
-        isShown: true,
-        horizontalLayout: {
-          minSideAbsoluteMargin: 10,
-          maxSideAbsoluteMargin: 20,
-        },
-        verticalLayout: { anchorOrigin: 0.5, anchorTarget: 0.5 },
-        depthLayout: {},
-      },
-      { defaultWidth: 30, defaultHeight: 40 }
-    );
-
-    applyChildLayouts(parent);
-
-    expect(tiledBar.getX()).toBe(10);
-    expect(tiledBar.getY()).toBe((100 - 40) / 2);
-    expect(tiledBar.hasCustomSize()).toBe(true);
-    expect(tiledBar.getCustomWidth()).toBe(200 - 10 - 20);
-    expect(tiledBar.getCustomHeight()).toBe(40);
-  });
-
-  it('can anchor a child to another child', () => {
-    const parent = new MockedParent(200, 100);
-    parent.addChild('Background', {
-      isShown: true,
-      horizontalLayout: {},
-      verticalLayout: {},
-      depthLayout: {},
-    });
-    parent.addChild('PanelBar', {
-      isShown: true,
-      horizontalLayout: {
-        minSideAbsoluteMargin: 10,
-        maxSideAbsoluteMargin: 20,
-      },
-      verticalLayout: { minSideAbsoluteMargin: 30, maxSideAbsoluteMargin: 40 },
-      depthLayout: {},
-    });
-    const thumb = parent.addChild(
-      'Thumb',
-      {
-        isShown: true,
-        horizontalLayout: {
-          anchorOrigin: 0.5,
-          anchorTarget: 1,
-          anchorTargetObject: 'PanelBar',
-        },
-        verticalLayout: {
-          anchorOrigin: 0.5,
-          anchorTarget: 0.5,
-          anchorTargetObject: 'PanelBar',
-        },
-        depthLayout: {},
-      },
-      { defaultWidth: 50, defaultHeight: 60 }
-    );
-
-    applyChildLayouts(parent);
-
-    expect(thumb.getX()).toBe(200 - 20 - 50 / 2);
-    expect(thumb.getY()).toBe(30 + (100 - 30 - 40) / 2 - 60 / 2);
-    expect(thumb.hasCustomSize()).toBe(true);
-    expect(thumb.getCustomWidth()).toBe(50);
-    expect(thumb.getCustomHeight()).toBe(60);
-  });
-
-  it('can anchor a child to another child and be scaled proportionally', () => {
-    const parent = new MockedParent(200, 100);
-    parent.addChild(
-      'Border',
-      {
-        isShown: true,
-        horizontalLayout: {},
-        verticalLayout: {},
-        depthLayout: {},
-      },
-      { defaultWidth: 25, defaultHeight: 50 }
-    );
-    const thumb = parent.addChild(
-      'Thumb',
-      {
-        isShown: true,
-        horizontalLayout: {
-          anchorOrigin: 0.5,
-          anchorTarget: 0.5,
-          anchorTargetObject: 'Border',
-          isScaledProportionally: true,
-        },
-        verticalLayout: {
-          anchorOrigin: 0.5,
-          anchorTarget: 0.5,
-          anchorTargetObject: 'Border',
-          isScaledProportionally: true,
-        },
-        depthLayout: {},
-      },
-      { defaultWidth: 10, defaultHeight: 15 }
-    );
-
-    applyChildLayouts(parent);
-
-    expect(thumb.hasCustomSize()).toBe(true);
-    expect(thumb.getCustomWidth()).toBe((200 / 25) * 10);
-    expect(thumb.getCustomHeight()).toBe((100 / 50) * 15);
-    expect(thumb.getX()).toBe(((200 / 25) * (25 - 10)) / 2);
-    expect(thumb.getY()).toBe(((100 / 50) * (50 - 15)) / 2);
-  });
-});
-
-type EventBasedObjectProperty = {
-  name: string,
-  value?: string,
-  extraInfos: string[],
-};
-
-const createEventBasedObject = (
-  propertiesData: EventBasedObjectProperty[]
-): gdEventsBasedObject => {
-  const eventBasedObject = new gd.EventsBasedObject();
-  const properties = eventBasedObject.getPropertyDescriptors();
-  propertiesData.forEach((propertyData, index) => {
-    const property = properties.insertNew(propertyData.name, index);
-    if (propertyData.value) {
-      property.setValue(propertyData.value);
-    }
-    propertyData.extraInfos.forEach(extraInfo =>
-      property.addExtraInfo(extraInfo)
-    );
-  });
-  return eventBasedObject;
-};
-
-class MockedCustomObjectConfiguration implements PropertiesContainer {
-  mapStringPropertyDescriptor: gdMapStringPropertyDescriptor;
-
-  constructor() {
-    this.mapStringPropertyDescriptor = new gd.MapStringPropertyDescriptor();
-  }
-
-  getProperties(): gdMapStringPropertyDescriptor {
-    return this.mapStringPropertyDescriptor;
-  }
-}
-
-type CustomObjectPropertyValue = {
-  name: string,
-  value: string,
-};
-
-const createCustomObjectConfiguration = (
-  eventBasedObject: gdEventsBasedObject,
-  propertiesData: CustomObjectPropertyValue[]
-): MockedCustomObjectConfiguration => {
-  const customObjectConfiguration = new MockedCustomObjectConfiguration();
-
-  // Add default values from the event-based object.
-  const instanceProperties = customObjectConfiguration.getProperties();
-  const properties = eventBasedObject.getPropertyDescriptors();
-  mapFor(0, properties.size(), index => {
-    const property = properties.getAt(index);
-    instanceProperties
-      .getOrCreate(property.getName())
-      .setValue(property.getValue());
-  });
-
-  // Add values set by extension users.
-  propertiesData.forEach((propertyData, index) =>
-    instanceProperties
-      .getOrCreate(propertyData.name)
-      .setValue(propertyData.value)
+const getLayoutedRenderedInstanceFor = (props: {
+  project: gdProject,
+  innerArea: {
+    minX: number,
+    minY: number,
+    maxX: number,
+    maxY: number,
+  },
+  parent: { width: number, height: number },
+  child: MockedRenderedInstanceConfiguration,
+  instance: {
+    x: number,
+    y: number,
+    customSize: { width: number, height: number } | null,
+  },
+  anchor: {
+    left?: CustomObjectConfiguration_EdgeAnchor,
+    top?: CustomObjectConfiguration_EdgeAnchor,
+    right?: CustomObjectConfiguration_EdgeAnchor,
+    bottom?: CustomObjectConfiguration_EdgeAnchor,
+  } | null,
+}) => {
+  const project = props.project;
+  const extension = project.insertNewEventsFunctionsExtension('MyExtension', 0);
+  const eventBasedObject = extension
+    .getEventsBasedObjects()
+    .insertNew('MyCustomObject', 0);
+  eventBasedObject.markAsInnerAreaFollowingParentSize(true);
+  eventBasedObject.setAreaMinX(props.innerArea.minX);
+  eventBasedObject.setAreaMinY(props.innerArea.minY);
+  eventBasedObject.setAreaMaxX(props.innerArea.maxX);
+  eventBasedObject.setAreaMaxY(props.innerArea.maxY);
+  const childrenObjects = eventBasedObject.getObjects();
+  const childObject = childrenObjects.insertNewObject(
+    props.project,
+    'Sprite',
+    'Child',
+    0
   );
-  return customObjectConfiguration;
+  const anchorProps = props.anchor;
+  if (anchorProps) {
+    const anchor = childObject.addNewBehavior(
+      project,
+      'AnchorBehavior::AnchorBehavior',
+      'Anchor'
+    );
+    anchor.updateProperty(
+      'leftEdgeAnchor',
+      getHorizontalAnchorFor(anchorProps.left)
+    );
+    anchor.updateProperty(
+      'topEdgeAnchor',
+      getVerticalAnchorFor(anchorProps.top)
+    );
+    anchor.updateProperty(
+      'rightEdgeAnchor',
+      getHorizontalAnchorFor(anchorProps.right)
+    );
+    anchor.updateProperty(
+      'bottomEdgeAnchor',
+      getVerticalAnchorFor(anchorProps.bottom)
+    );
+  }
+  const initialInstances = eventBasedObject.getInitialInstances();
+  const initialInstance = initialInstances.insertNewInitialInstance();
+  initialInstance.setObjectName('Child');
+  initialInstance.setX(props.instance.x);
+  initialInstance.setY(props.instance.y);
+  const customSize = props.instance.customSize;
+  if (customSize) {
+    initialInstance.setHasCustomSize(true);
+    initialInstance.setCustomWidth(customSize.width);
+    initialInstance.setCustomHeight(customSize.height);
+  }
+  const parent = new MockedParent(
+    eventBasedObject,
+    props.parent.width,
+    props.parent.height
+  );
+  parent.registerChild('Child', props.child);
+
+  const layoutedRenderedInstance = getLayoutedRenderedInstance(
+    parent,
+    initialInstance
+  );
+  if (!layoutedRenderedInstance) {
+    throw new Error('No layouted instance returned');
+  }
+  return layoutedRenderedInstance;
 };
+
+const getHorizontalAnchorFor = (
+  anchor: ?CustomObjectConfiguration_EdgeAnchor
+) =>
+  anchor === gd.CustomObjectConfiguration.MinEdge
+    ? 'Window left'
+    : anchor === gd.CustomObjectConfiguration.MaxEdge
+    ? 'Window right'
+    : anchor === gd.CustomObjectConfiguration.Center
+    ? 'Window center'
+    : anchor === gd.CustomObjectConfiguration.Proportional
+    ? 'Proportional'
+    : 'None';
+
+const getVerticalAnchorFor = (anchor: ?CustomObjectConfiguration_EdgeAnchor) =>
+  anchor === gd.CustomObjectConfiguration.MinEdge
+    ? 'Window top'
+    : anchor === gd.CustomObjectConfiguration.MaxEdge
+    ? 'Window bottom'
+    : anchor === gd.CustomObjectConfiguration.Center
+    ? 'Window center'
+    : anchor === gd.CustomObjectConfiguration.Proportional
+    ? 'Proportional'
+    : 'None';
 
 class MockedChildRenderedInstance implements ChildRenderedInstance {
-  _instance: ChildInstance;
+  _instance: gdInitialInstance;
   _pixiObject: { height: number };
   defaultWidth: number;
   defaultHeight: number;
   originX: number;
   originY: number;
+  // TODO use this attribute to simulate TextObject children.
   heightAfterUpdate: ?number;
 
   constructor(
-    childInstance: ChildInstance,
-    defaultWidth: number,
-    defaultHeight: number,
-    heightAfterUpdate: ?number
+    childInstance: gdInitialInstance,
+    {
+      defaultWidth,
+      defaultHeight,
+      originX,
+      originY,
+    }: MockedRenderedInstanceConfiguration
   ) {
     this._instance = childInstance;
     this._pixiObject = { height: 0 };
     this.defaultWidth = defaultWidth;
     this.defaultHeight = defaultHeight;
-    // TODO Add tests with custom origin.
-    this.originX = 0;
-    this.originY = 0;
-    this.heightAfterUpdate = heightAfterUpdate;
+    this.originX = originX || 0;
+    this.originY = originY || 0;
+    this.heightAfterUpdate = defaultHeight;
   }
 
   getDefaultWidth(): number {
@@ -520,24 +604,32 @@ class MockedChildRenderedInstance implements ChildRenderedInstance {
   }
 }
 
+type MockedRenderedInstanceConfiguration = {|
+  defaultWidth: number,
+  defaultHeight: number,
+  originX?: number,
+  originY?: number,
+|};
+
 class MockedParent implements LayoutedParent<MockedChildRenderedInstance> {
+  eventBasedObject: gdEventsBasedObject | null;
   width: number;
   height: number;
-  childrenInstances: ChildInstance[];
-  childrenLayouts: ChildLayout[];
-  childrenRenderedInstances: Array<MockedChildRenderedInstance>;
-  childrenRenderedInstanceByNames: Map<string, MockedChildRenderedInstance>;
+  renderedInstances = new Map<number, MockedChildRenderedInstance>();
+  layoutedInstances = new Map<number, LayoutedInstance>();
+  mockedRenderedInstanceConfigurations = new Map<
+    string,
+    MockedRenderedInstanceConfiguration
+  >();
 
-  constructor(width: number, height: number) {
+  constructor(
+    eventBasedObject: gdEventsBasedObject,
+    width: number,
+    height: number
+  ) {
+    this.eventBasedObject = eventBasedObject;
     this.width = width;
     this.height = height;
-    this.childrenInstances = [];
-    this.childrenLayouts = [];
-    this.childrenRenderedInstances = [];
-    this.childrenRenderedInstanceByNames = new Map<
-      string,
-      MockedChildRenderedInstance
-    >();
   }
 
   getWidth() {
@@ -552,28 +644,39 @@ class MockedParent implements LayoutedParent<MockedChildRenderedInstance> {
     return 0;
   }
 
-  addChild(
+  getLayoutedInstance = (instance: gdInitialInstance): LayoutedInstance => {
+    let layoutedInstance = this.layoutedInstances.get(instance.ptr);
+    if (!layoutedInstance) {
+      layoutedInstance = new LayoutedInstance(instance);
+      this.layoutedInstances.set(instance.ptr, layoutedInstance);
+    }
+    return layoutedInstance;
+  };
+
+  getRendererOfInstance = (
+    instance: gdInitialInstance
+  ): MockedChildRenderedInstance => {
+    let renderedInstance = this.renderedInstances.get(instance.ptr);
+    if (!renderedInstance) {
+      const configuration = this.mockedRenderedInstanceConfigurations.get(
+        instance.getObjectName()
+      );
+      if (!configuration) {
+        throw new Error('Unregisted child: ' + instance.getObjectName());
+      }
+      renderedInstance = new MockedChildRenderedInstance(
+        instance,
+        configuration
+      );
+      this.renderedInstances.set(instance.ptr, renderedInstance);
+    }
+    return renderedInstance;
+  };
+
+  registerChild(
     name: string,
-    layout: ChildLayout,
-    size?: {|
-      defaultWidth?: number,
-      defaultHeight?: number,
-      heightAfterUpdate?: number,
-    |}
+    configuration: MockedRenderedInstanceConfiguration
   ) {
-    const childInstance = new ChildInstance();
-    const childRenderedInstance = new MockedChildRenderedInstance(
-      childInstance,
-      size ? size.defaultWidth || 0 : 0,
-      size ? size.defaultHeight || 0 : 0,
-      size && size.heightAfterUpdate
-    );
-
-    this.childrenLayouts.push(layout);
-    this.childrenInstances.push(childInstance);
-    this.childrenRenderedInstances.push(childRenderedInstance);
-    this.childrenRenderedInstanceByNames.set(name, childRenderedInstance);
-
-    return childInstance;
+    this.mockedRenderedInstanceConfigurations.set(name, configuration);
   }
 }

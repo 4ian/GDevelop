@@ -46,6 +46,14 @@ export enum ObjectsContainersList_VariableExistence {
   ExistsOnlyOnSomeObjectsOfTheGroup = 3,
 }
 
+export enum CustomObjectConfiguration_EdgeAnchor {
+  NoAnchor = 0,
+  MinEdge = 1,
+  MaxEdge = 2,
+  Proportional = 3,
+  Center = 4,
+}
+
 export enum QuickCustomization_Visibility {
   Default = 0,
   Visible = 1,
@@ -741,6 +749,7 @@ export class CustomObjectConfiguration extends ObjectConfiguration {
   getInitialInstanceProperties(instance: InitialInstance): MapStringPropertyDescriptor;
   updateInitialInstanceProperty(instance: InitialInstance, name: string, value: string): boolean;
   getAnimations(): SpriteAnimationList;
+  static getEdgeAnchorFromString(value: string): CustomObjectConfiguration_EdgeAnchor;
 }
 
 export class Layout extends EmscriptenObject {
@@ -2164,8 +2173,10 @@ export class EventsBasedObject extends AbstractEventsBasedEntity {
   isAnimatable(): boolean;
   markAsTextContainer(isTextContainer: boolean): EventsBasedObject;
   isTextContainer(): boolean;
-  markAsInnerAreaExpandingWithParent(value: boolean): EventsBasedObject;
+  markAsInnerAreaFollowingParentSize(value: boolean): EventsBasedObject;
   isInnerAreaFollowingParentSize(): boolean;
+  makAsUsingLegacyInstancesRenderer(value: boolean): EventsBasedObject;
+  isUsingLegacyInstancesRenderer(): boolean;
   getInitialInstances(): InitialInstancesContainer;
   getLayers(): LayersContainer;
   getObjects(): ObjectsContainer;

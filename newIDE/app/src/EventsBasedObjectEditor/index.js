@@ -13,19 +13,24 @@ import HelpButton from '../UI/HelpButton';
 import { Line } from '../UI/Grid';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import RaisedButton from '../UI/RaisedButton';
+import Window from '../Utils/Window';
 
 const gd: libGDevelop = global.gd;
+
+const isDev = Window.isDev();
 
 type Props = {|
   eventsBasedObject: gdEventsBasedObject,
   onOpenCustomObjectEditor: () => void,
   unsavedChanges?: ?UnsavedChanges,
+  onEventsBasedObjectChildrenEdited: () => void,
 |};
 
 export default function EventsBasedObjectEditor({
   eventsBasedObject,
   onOpenCustomObjectEditor,
   unsavedChanges,
+  onEventsBasedObjectChildrenEdited,
 }: Props) {
   const forceUpdate = useForceUpdate();
 
@@ -120,10 +125,22 @@ export default function EventsBasedObjectEditor({
         label={<Trans>Expand inner area with parent</Trans>}
         checked={eventsBasedObject.isInnerAreaFollowingParentSize()}
         onCheck={(e, checked) => {
-          eventsBasedObject.markAsInnerAreaExpandingWithParent(checked);
+          eventsBasedObject.markAsInnerAreaFollowingParentSize(checked);
           onChange();
+          onEventsBasedObjectChildrenEdited();
         }}
       />
+      {isDev && (
+        <Checkbox
+          label={<Trans>Use legacy renderer</Trans>}
+          checked={eventsBasedObject.isUsingLegacyInstancesRenderer()}
+          onCheck={(e, checked) => {
+            eventsBasedObject.makAsUsingLegacyInstancesRenderer(checked);
+            onChange();
+            onEventsBasedObjectChildrenEdited();
+          }}
+        />
+      )}
       <Line noMargin justifyContent="center">
         <RaisedButton
           label={<Trans>Open visual editor for the object</Trans>}

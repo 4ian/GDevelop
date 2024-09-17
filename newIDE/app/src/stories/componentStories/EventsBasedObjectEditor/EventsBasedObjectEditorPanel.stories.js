@@ -26,6 +26,9 @@ export const Default = () => (
       onRenameProperty={action('property rename')}
       onEventsFunctionsAdded={action('functions added')}
       onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
+      onEventsBasedObjectChildrenEdited={action(
+        'onEventsBasedObjectChildrenEdited'
+      )}
     />
   </DragAndDropContextProvider>
 );

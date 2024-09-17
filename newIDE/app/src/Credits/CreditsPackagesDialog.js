@@ -115,6 +115,15 @@ const CreditsPackagesDialog = ({
     [creditsPackageListingDatas, isMediumScreen]
   );
 
+  const getCreditPackageIndex = (creditsPackage: CreditsPackageListingData) => {
+    return creditsPackageListingDatas
+      ? creditsPackageListingDatas.findIndex(
+          creditsPackageListingData =>
+            creditsPackageListingData.id === creditsPackage.id
+        )
+      : 0;
+  };
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -168,7 +177,7 @@ const CreditsPackagesDialog = ({
                     key={`line-${lineIndex}`}
                   >
                     {creditsPackageListingDatasArray.map(
-                      (creditsPackageListingData, index) => {
+                      creditsPackageListingData => {
                         const {
                           id,
                           name,
@@ -194,7 +203,11 @@ const CreditsPackagesDialog = ({
                             >
                               <div style={styles.titleContainer}>
                                 <div style={styles.iconContainer}>
-                                  {getIconFromIndex(index)}
+                                  {getIconFromIndex(
+                                    getCreditPackageIndex(
+                                      creditsPackageListingData
+                                    )
+                                  )}
                                 </div>
                                 <LineStackLayout
                                   justifyContent="space-between"

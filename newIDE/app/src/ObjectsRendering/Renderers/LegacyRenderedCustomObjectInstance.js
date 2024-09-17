@@ -269,6 +269,7 @@ export default class LegacyRenderedCustomObjectInstance
   update() {
     applyChildLayouts(this);
 
+    // This allows a 3D custom object to use a 2D rendering in the editor.
     const firstInstance = this.childrenRenderedInstances[0];
     let is3D = !!firstInstance && firstInstance instanceof Rendered3DInstance;
 

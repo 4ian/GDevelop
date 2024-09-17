@@ -618,6 +618,7 @@ const CompactPropertiesEditor = ({
         compactSelectField = (
           <CompactSelectField
             value={getFieldValue({ instances, field })}
+            key={field.name}
             id={field.name}
             onChange={(newValue: string) => {
               instances.forEach(i => setValue(i, parseFloat(newValue) || 0));
@@ -640,6 +641,7 @@ const CompactPropertiesEditor = ({
               field,
               defaultValue: '(Multiple values)',
             })}
+            key={field.name}
             id={field.name}
             onChange={(newValue: string) => {
               instances.forEach(i => setValue(i, newValue || ''));

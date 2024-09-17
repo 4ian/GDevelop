@@ -16,6 +16,7 @@ import useForceUpdate from '../Utils/UseForceUpdate';
 import { useLongTouch, type ClientCoordinates } from '../Utils/UseLongTouch';
 import Text from '../UI/Text';
 import EmptyMessage from '../UI/EmptyMessage';
+import { isTileSetBadlyConfigured } from './TileMapPaintingPreview';
 
 const styles = {
   tilesetAndTooltipsContainer: {
@@ -251,18 +252,22 @@ const TileSetVisualizer = ({
     x: number,
     y: number,
   |}>(null);
+  const objectConfigurationProperties = objectConfiguration.getProperties();
   const columnCount = parseFloat(
-    objectConfiguration
-      .getProperties()
-      .get('columnCount')
-      .getValue()
+    objectConfigurationProperties.get('columnCount').getValue()
   );
   const rowCount = parseFloat(
-    objectConfiguration
-      .getProperties()
-      .get('rowCount')
-      .getValue()
+    objectConfigurationProperties.get('rowCount').getValue()
   );
+  const tileSize = parseFloat(
+    objectConfigurationProperties.get('tileSize').getValue()
+  );
+  const isBadlyConfigured = isTileSetBadlyConfigured({
+    atlasImage: '',
+    columnCount,
+    rowCount,
+    tileSize,
+  });
   const [clickStartCoordinates, setClickStartCoordinates] = React.useState<?{|
     x: number,
     y: number,
@@ -294,12 +299,23 @@ const TileSetVisualizer = ({
   const imageWidth = imageElement
     ? parseFloat(getComputedStyle(imageElement).width.replace('px', ''))
     : 0;
-  const displayedTileSize = imageWidth ? imageWidth / columnCount : null;
+  const imageNaturalWidth = imageElement ? imageElement.naturalWidth : 1;
+  const displayedTileSize =
+    imageWidth && imageNaturalWidth
+      ? (imageWidth / imageNaturalWidth) * tileSize
+      : null;
+
+  const _onAtlasImageLoaded = React.useCallback(
+    e => {
+      if (onAtlasImageLoaded) onAtlasImageLoaded(e, atlasResourceName);
+    },
+    [onAtlasImageLoaded, atlasResourceName]
+  );
 
   const displayTileIdTooltip = React.useCallback(
     (e: ClientCoordinates) => {
       setShouldCancelClick(true);
-      if (!displayedTileSize) return;
+      if (!displayedTileSize || isBadlyConfigured) return;
 
       const imageCoordinates = getImageCoordinatesFromPointerEvent(e);
       if (!imageCoordinates) return;
@@ -320,7 +336,7 @@ const TileSetVisualizer = ({
         label: getTileIdFromGridCoordinates({ x, y, columnCount }).toString(),
       });
     },
-    [displayedTileSize, columnCount, rowCount]
+    [displayedTileSize, columnCount, rowCount, isBadlyConfigured]
   );
 
   const longTouchProps = useLongTouch(displayTileIdTooltip);
@@ -334,21 +350,26 @@ const TileSetVisualizer = ({
     [forceUpdate]
   );
 
-  const onPointerDown = React.useCallback((event: PointerEvent) => {
-    if (event.pointerType === 'touch') {
-      setTouchStartCoordinates({ x: event.pageX, y: event.pageY });
-    }
-    const imageCoordinates = getImageCoordinatesFromPointerEvent(event);
-    if (!imageCoordinates) return;
-    setClickStartCoordinates({
-      x: imageCoordinates.mouseX,
-      y: imageCoordinates.mouseY,
-    });
-  }, []);
+  const onPointerDown = React.useCallback(
+    (event: PointerEvent) => {
+      if (isBadlyConfigured) return;
+      if (event.pointerType === 'touch') {
+        setTouchStartCoordinates({ x: event.pageX, y: event.pageY });
+      }
+      const imageCoordinates = getImageCoordinatesFromPointerEvent(event);
+      if (!imageCoordinates) return;
+      setClickStartCoordinates({
+        x: imageCoordinates.mouseX,
+        y: imageCoordinates.mouseY,
+      });
+    },
+    [isBadlyConfigured]
+  );
 
   const onPointerMove = React.useCallback(
     (event: PointerEvent) => {
       if (
+        isBadlyConfigured ||
         !clickStartCoordinates ||
         !displayedTileSize ||
         !allowMultipleSelection ||
@@ -386,6 +407,7 @@ const TileSetVisualizer = ({
       });
     },
     [
+      isBadlyConfigured,
       displayedTileSize,
       columnCount,
       rowCount,
@@ -397,7 +419,7 @@ const TileSetVisualizer = ({
   const onPointerUp = React.useCallback(
     (event: PointerEvent) => {
       try {
-        if (!displayedTileSize) return;
+        if (!displayedTileSize || isBadlyConfigured) return;
         if (shouldCancelClick) {
           setShouldCancelClick(false);
           return;
@@ -503,6 +525,7 @@ const TileSetVisualizer = ({
       }
     },
     [
+      isBadlyConfigured,
       displayedTileSize,
       columnCount,
       rowCount,
@@ -741,10 +764,7 @@ const TileSetVisualizer = ({
                   atlasResourceName,
                   {}
                 )}
-                onLoad={e => {
-                  if (onAtlasImageLoaded)
-                    onAtlasImageLoaded(e, atlasResourceName);
-                }}
+                onLoad={_onAtlasImageLoaded}
               />
 
               {interactive && hoveredTile && displayedTileSize && (

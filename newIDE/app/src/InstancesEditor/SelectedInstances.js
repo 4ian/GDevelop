@@ -18,6 +18,7 @@ import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 type Props = {|
   instancesSelection: InstancesSelection,
   instanceMeasurer: InstanceMeasurer,
+  shouldDisplayHandles: () => boolean,
   onResize: (
     deltaX: number,
     deltaY: number,
@@ -72,6 +73,7 @@ const resizeGrabbingIconNames = {
 export default class SelectedInstances {
   instancesSelection: InstancesSelection;
   instanceMeasurer: InstanceMeasurer;
+  shouldDisplayHandles: () => boolean;
   onResize: (
     deltaX: number,
     deltaY: number,
@@ -105,6 +107,7 @@ export default class SelectedInstances {
   constructor({
     instancesSelection,
     instanceMeasurer,
+    shouldDisplayHandles,
     onResize,
     onResizeEnd,
     onRotate,
@@ -118,6 +121,7 @@ export default class SelectedInstances {
   }: Props) {
     this.instanceMeasurer = instanceMeasurer;
     this.onResize = onResize;
+    this.shouldDisplayHandles = shouldDisplayHandles;
     this.onResizeEnd = onResizeEnd;
     this.onRotate = onRotate;
     this.onRotateEnd = onRotateEnd;
@@ -303,6 +307,7 @@ export default class SelectedInstances {
       buttonPadding,
       hitAreaPadding,
     } = getButtonSizes(this._screenType);
+    const displayHandle = this.shouldDisplayHandles();
     const selection = this.instancesSelection.getSelectedInstances();
     let x1 = 0;
     let y1 = 0;
@@ -368,7 +373,8 @@ export default class SelectedInstances {
 
     // If there are no unlocked instances, hide the resize buttons.
     const show =
-      selection.filter(instance => !instance.isLocked()).length !== 0;
+      selection.filter(instance => !instance.isLocked()).length !== 0 &&
+      displayHandle;
 
     // Position the resize buttons.
     for (const grabbingLocation of resizeGrabbingLocationValues) {

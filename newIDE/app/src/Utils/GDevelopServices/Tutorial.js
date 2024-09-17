@@ -61,7 +61,9 @@ export const canAccessTutorial = (
 
 export const listAllTutorials = (): Promise<Array<Tutorial>> => {
   return axios
-    .get(`${GDevelopAssetApi.baseUrl}/tutorial`)
+    .get(`${GDevelopAssetApi.baseUrl}/tutorial`, {
+      params: { include: 'upcoming' },
+    })
     .then(response => response.data);
 };
 

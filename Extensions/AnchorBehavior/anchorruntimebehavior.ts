@@ -272,9 +272,11 @@ namespace gdjs {
           ) {
             const width = right - left;
             this.owner.setX(
-              left +
-                ((this.owner.getX() - this.owner.getDrawableX()) * width) /
-                  this.owner.getWidth()
+              this.owner.getX() === this.owner.getDrawableX()
+                ? left
+                : left +
+                    ((this.owner.getX() - this.owner.getDrawableX()) * width) /
+                      this.owner.getWidth()
             );
             this.owner.setWidth(width);
           } else {
@@ -299,9 +301,11 @@ namespace gdjs {
           ) {
             const height = bottom - top;
             this.owner.setY(
-              top +
-                ((this.owner.getY() - this.owner.getDrawableY()) * height) /
-                  this.owner.getHeight()
+              this.owner.getY() === this.owner.getDrawableY()
+                ? top
+                : top +
+                    ((this.owner.getY() - this.owner.getDrawableY()) * height) /
+                      this.owner.getHeight()
             );
             this.owner.setHeight(height);
           } else {

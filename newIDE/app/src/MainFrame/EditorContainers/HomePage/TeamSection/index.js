@@ -55,6 +55,7 @@ const styles = {
   list: { padding: 0 },
   lobbyContainer: { padding: PADDING },
   roomsContainer: { paddingRight: PADDING },
+  educationCardContainer: { marginTop: 12 },
   manageSeatsInsertContainer: {
     padding: 16,
     display: 'flex',
@@ -342,32 +343,51 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
     return (
       <>
         <SectionContainer
-          title={<Trans>Classrooms</Trans>}
-          titleAction={
-            isMobile ? null : (
-              <FlatButton
-                primary
-                disabled={isLoadingMembers}
-                label={<Trans>Refresh dashboard</Trans>}
-                onClick={onRefreshTeamMembers}
-                leftIcon={<Refresh fontSize="small" />}
+          title={<Trans>Teach</Trans>}
+          renderSubtitle={() => (
+            <div style={styles.educationCardContainer}>
+              <EducationCard
+                onSeeResources={onOpenTeachingResources}
+                unlocked
               />
-            )
-          }
-          titleAdornment={
-            isMobile ? (
-              <FlatButton
-                primary
-                disabled={isLoadingMembers}
-                label={<Trans>Refresh</Trans>}
-                onClick={onRefreshTeamMembers}
-                leftIcon={<Refresh fontSize="small" />}
-              />
-            ) : (
-              manageSeatsInsert
-            )
-          }
+            </div>
+          )}
         >
+          <SectionRow>
+            <LineStackLayout
+              noMargin
+              alignItems="center"
+              justifyContent="space-between"
+            >
+              <LineStackLayout noMargin alignItems="center" useLargeSpacer>
+                <Text size="title" noMargin>
+                  <Trans>Classrooms</Trans>
+                </Text>
+                {!isMobile && (
+                  <FlatButton
+                    primary
+                    disabled={isLoadingMembers}
+                    label={<Trans>Refresh dashboard</Trans>}
+                    onClick={onRefreshTeamMembers}
+                    leftIcon={<Refresh fontSize="small" />}
+                  />
+                )}
+              </LineStackLayout>
+              <Column noMargin>
+                {isMobile ? (
+                  <FlatButton
+                    primary
+                    disabled={isLoadingMembers}
+                    label={<Trans>Refresh</Trans>}
+                    onClick={onRefreshTeamMembers}
+                    leftIcon={<Refresh fontSize="small" />}
+                  />
+                ) : (
+                  manageSeatsInsert
+                )}
+              </Column>
+            </LineStackLayout>
+          </SectionRow>
           <SectionRow>
             {isMobile ? (
               <>
@@ -375,7 +395,6 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
                 <Spacer />
               </>
             ) : null}
-            <EducationCard onSeeResources={onOpenTeachingResources} />
             <Spacer />
             {(membersNotInAGroupToDisplay || hasNoActiveTeamMembers) && (
               <Paper background="medium" style={styles.lobbyContainer}>

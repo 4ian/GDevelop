@@ -19,17 +19,12 @@ export default {
 const eventsTreeTutorials: Array<Tutorial> = [
   {
     id: 'intro-event-system',
-    title: 'Event system',
     titleByLocale: { en: 'Event system' },
-    description: 'Description 1',
     descriptionByLocale: { en: 'Description 1' },
-    thumbnailUrl:
-      'https://raw.githubusercontent.com/4ian/GDevelop/master/Core/docs/images/gdlogo.png',
     thumbnailUrlByLocale: {
       en:
         'https://raw.githubusercontent.com/4ian/GDevelop/master/Core/docs/images/gdlogo.png',
     },
-    link: 'https://example.com/tutorial.html',
     linkByLocale: { en: 'https://example.com/tutorial.html' },
     type: 'video',
     category: 'game-mechanic',

@@ -42,6 +42,7 @@ import { QuickCustomizationGameTiles } from '../../../../QuickCustomization/Quic
 import { type NewProjectSetup } from '../../../../ProjectCreation/NewProjectSetupDialog';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import UrlStorageProvider from '../../../../ProjectsStorage/UrlStorageProvider';
+import { selectMessageByLocale } from '../../../../Utils/i18n/MessageByLocale';
 
 const styles = {
   textTutorialContent: {
@@ -133,9 +134,10 @@ const isPlanRecommendationRelevant = (
 
 type TextTutorialsRowProps = {|
   tutorials: Array<Tutorial>,
+  i18n: I18nType,
 |};
 
-const TextTutorialsRow = ({ tutorials }: TextTutorialsRowProps) => {
+const TextTutorialsRow = ({ tutorials, i18n }: TextTutorialsRowProps) => {
   const classes = useStyles();
   const { isLandscape, windowSize } = useResponsiveWindowSize();
 
@@ -159,16 +161,20 @@ const TextTutorialsRow = ({ tutorials }: TextTutorialsRowProps) => {
         {tutorials.map(tutorial => (
           <GridListTile key={tutorial.id} classes={{ tile: classes.tile }}>
             <CardWidget
-              onClick={() => Window.openExternalURL(tutorial.link)}
+              onClick={() =>
+                Window.openExternalURL(
+                  selectMessageByLocale(i18n, tutorial.linkByLocale)
+                )
+              }
               size="large"
             >
               <div style={styles.textTutorialContent}>
                 <ColumnStackLayout expand justifyContent="center" useFullHeight>
                   <Text noMargin size="block-title">
-                    {tutorial.title}
+                    {selectMessageByLocale(i18n, tutorial.titleByLocale)}
                   </Text>
                   <Text noMargin size="body" color="secondary">
-                    {tutorial.description}
+                    {selectMessageByLocale(i18n, tutorial.descriptionByLocale)}
                   </Text>
                 </ColumnStackLayout>
               </div>
@@ -426,7 +432,10 @@ const RecommendationList = ({
         if (recommendedTextTutorials.length) {
           items.push(
             <SectionRow key="texts">
-              <TextTutorialsRow tutorials={recommendedTextTutorials} />
+              <TextTutorialsRow
+                tutorials={recommendedTextTutorials}
+                i18n={i18n}
+              />
             </SectionRow>
           );
         }

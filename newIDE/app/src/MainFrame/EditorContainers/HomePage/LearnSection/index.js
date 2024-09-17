@@ -96,12 +96,10 @@ export const formatTutorialToImageTileComponent = ({
 
       sendTutorialOpened(tutorial.id);
       Window.openExternalURL(
-        selectMessageByLocale(i18n, tutorial.linkByLocale) || tutorial.link
+        selectMessageByLocale(i18n, tutorial.linkByLocale)
       );
     },
-    imageUrl:
-      selectMessageByLocale(i18n, tutorial.thumbnailUrlByLocale) ||
-      tutorial.thumbnailUrl,
+    imageUrl: selectMessageByLocale(i18n, tutorial.thumbnailUrlByLocale),
     overlayText: tutorial.duration
       ? secondsToMinutesAndSeconds(tutorial.duration)
       : '\u{1F4D8}',
@@ -121,6 +119,7 @@ type Props = {|
   onTabChange: (tab: HomeTab) => void,
   selectInAppTutorial: (tutorialId: string) => void,
   initialCategory: TutorialCategory | null,
+  onOpenTemplateFromTutorial: string => Promise<void>,
 |};
 
 const LearnSection = ({
@@ -128,6 +127,7 @@ const LearnSection = ({
   onTabChange,
   selectInAppTutorial,
   initialCategory,
+  onOpenTemplateFromTutorial,
 }: Props) => {
   const {
     tutorials,
@@ -183,6 +183,7 @@ const LearnSection = ({
       onBack={() => setSelectedCategory(null)}
       category={selectedCategory}
       tutorials={tutorials}
+      onOpenTemplateFromTutorial={onOpenTemplateFromTutorial}
     />
   );
 };

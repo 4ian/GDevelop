@@ -16,24 +16,29 @@ export type TutorialCategory =
 export type Tutorial = {|
   id: string,
   /** Deprecated - see `titleByLocale`. */
-  title: string,
+  title?: string,
   titleByLocale: MessageByLocale,
   /** Deprecated - see `descriptionByLocale`. */
-  description: string,
+  description?: string,
   descriptionByLocale: MessageByLocale,
   type: 'video' | 'text' | 'pdf-tutorial',
   category: TutorialCategory,
   duration?: number,
   /** Deprecated - see `linkByLocale`. */
-  link: string,
+  link?: string,
   linkByLocale: MessageByLocale,
   /** Deprecated - see `thumbnailUrlByLocale`. */
-  thumbnailUrl: string,
+  thumbnailUrl?: string,
   thumbnailUrlByLocale: MessageByLocale,
 
   isPrivateTutorial?: boolean,
   redeemHintByLocale?: MessageByLocale,
   redeemLinkByLocale?: MessageByLocale,
+  sectionByLocale?: MessageByLocale,
+  tagsByLocale?: MessageByLocale[],
+  availableAt?: string,
+  gameLink?: string,
+  templateUrl?: string,
 |};
 
 export const canAccessTutorial = (
@@ -56,7 +61,9 @@ export const canAccessTutorial = (
 
 export const listAllTutorials = (): Promise<Array<Tutorial>> => {
   return axios
-    .get(`${GDevelopAssetApi.baseUrl}/tutorial`)
+    .get(`${GDevelopAssetApi.baseUrl}/tutorial`, {
+      params: { include: 'upcoming' },
+    })
     .then(response => response.data);
 };
 

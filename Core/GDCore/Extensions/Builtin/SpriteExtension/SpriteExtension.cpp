@@ -33,6 +33,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                                      "most elements of a game."),
                                    "CppPlatform/Extensions/spriteicon.png")
           .SetCategoryFullName(_("General"))
+          .SetOpenFullEditorLabel(_("Edit animations"))
           .AddDefaultBehavior("EffectCapability::EffectBehavior")
           .AddDefaultBehavior("ResizableCapability::ResizableBehavior")
           .AddDefaultBehavior("ScalableCapability::ScalableBehavior")

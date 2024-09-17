@@ -720,6 +720,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       objectSimpleTileMap
     )
     .setCategoryFullName(_('General'))
+    .setOpenFullEditorLabel(_('Edit tileset and collisions'))
     .addDefaultBehavior('ResizableCapability::ResizableBehavior')
     .addDefaultBehavior('ScalableCapability::ScalableBehavior')
     .addDefaultBehavior('OpacityCapability::OpacityBehavior')

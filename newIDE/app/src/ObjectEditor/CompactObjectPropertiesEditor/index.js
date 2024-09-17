@@ -42,6 +42,7 @@ import {
 import CompactSelectField from '../../UI/CompactSelectField';
 import SelectOption from '../../UI/SelectOption';
 import { ChildObjectPropertiesEditor } from './ChildObjectPropertiesEditor';
+import { getSchemaWithOpenFullEditorButton } from './CompactObjectPropertiesSchema';
 
 const gd: libGDevelop = global.gd;
 
@@ -145,6 +146,9 @@ export const CompactObjectPropertiesEditor = ({
     object.getType()
   );
   const is3DObject = !!objectMetadata && objectMetadata.isRenderedIn3D();
+  const fullEditorLabel = objectMetadata
+    ? objectMetadata.getOpenFullEditorLabel()
+    : null;
 
   // TODO: Workaround a bad design of ObjectJsImplementation. When getProperties
   // and associated methods are redefined in JS, they have different arguments (
@@ -159,6 +163,10 @@ export const CompactObjectPropertiesEditor = ({
   // Properties:
   const schema = React.useMemo(
     () => {
+      if (schemaRecomputeTrigger) {
+        // schemaRecomputeTrigger allows to invalidate the schema when required.
+      }
+
       const properties = objectConfigurationAsGd.getProperties();
       const schema = propertiesMapToSchema(
         properties,
@@ -168,11 +176,20 @@ export const CompactObjectPropertiesEditor = ({
           objectConfiguration.updateProperty(name, value)
       );
 
-      return schema;
+      return getSchemaWithOpenFullEditorButton({
+        schema,
+        fullEditorLabel,
+        object,
+        onEditObject,
+      });
     },
-    // schemaRecomputeTrigger allows to invalidate the schema when required.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [objectConfigurationAsGd, schemaRecomputeTrigger]
+    [
+      objectConfigurationAsGd,
+      schemaRecomputeTrigger,
+      fullEditorLabel,
+      object,
+      onEditObject,
+    ]
   );
 
   // Behaviors:
@@ -307,7 +324,6 @@ export const CompactObjectPropertiesEditor = ({
                   />
                 );
               })}
-            <Spacer />
           </ColumnStackLayout>
           <Column>
             <Separator />

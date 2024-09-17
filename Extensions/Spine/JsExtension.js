@@ -54,7 +54,8 @@ module.exports = {
       .addIncludeFile('Extensions/Spine/pixi-spine/pixi-spine.js')
       .addIncludeFile('Extensions/Spine/managers/pixi-spine-atlas-manager.js')
       .addIncludeFile('Extensions/Spine/managers/pixi-spine-manager.js')
-      .setCategoryFullName(_('Advanced'));
+      .setCategoryFullName(_('Advanced'))
+      .setOpenFullEditorLabel(_('Edit animations'));
 
     object
       .addExpressionAndConditionAndAction(
@@ -208,7 +209,7 @@ module.exports = {
 
         this.setAnimation(this._instance.getRawDoubleProperty('animation'));
 
-        const scale = Number(properties.get('scale').getValue()) || 1
+        const scale = Number(properties.get('scale').getValue()) || 1;
 
         const spine = this._spine;
         if (spine) {
@@ -265,7 +266,9 @@ module.exports = {
        */
       setAnimation(index) {
         const { _spine: spine } = this;
-        const configuration = gd.asSpineConfiguration(this._associatedObjectConfiguration);
+        const configuration = gd.asSpineConfiguration(
+          this._associatedObjectConfiguration
+        );
 
         if (
           !spine ||
@@ -318,7 +321,7 @@ module.exports = {
         this._pixiResourcesLoader
           .getSpineData(this._project, this._spineResourceName)
           .then((spineDataOrLoadingError) => {
-            if (this._spine) this._pixiObject.removeChild(this._spine)
+            if (this._spine) this._pixiObject.removeChild(this._spine);
 
             if (!spineDataOrLoadingError.skeleton) {
               console.error(

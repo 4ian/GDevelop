@@ -151,6 +151,7 @@ export type ActionButton = {|
   getValue: Instance => string,
   nonFieldType: 'button',
   getIcon?: ({| fontSize: string |}) => React.Node,
+  showRightIcon?: boolean,
   onClick: (instance: Instance) => void,
 |};
 
@@ -687,26 +688,31 @@ const CompactPropertiesEditor = ({
           }) === DIFFERENT_VALUES;
       }
       return (
-        <React.Fragment key={`button-${field.label}`}>
-          <FlatButton
-            fullWidth
-            primary
-            leftIcon={
-              field.getIcon ? (
-                field.getIcon({ fontSize: 'small' })
-              ) : (
-                <Edit fontSize="small" />
-              )
-            }
-            disabled={disabled}
-            label={field.label}
-            onClick={() => {
-              if (!instances[0]) return;
-              field.onClick(instances[0]);
-            }}
-          />
-          <Spacer />
-        </React.Fragment>
+        <FlatButton
+          key={`button-${field.label}`}
+          fullWidth
+          primary
+          leftIcon={
+            field.showRightIcon ? null : field.getIcon ? (
+              field.getIcon({ fontSize: 'small' })
+            ) : (
+              <Edit fontSize="small" />
+            )
+          }
+          rightIcon={
+            !field.showRightIcon ? null : field.getIcon ? (
+              field.getIcon({ fontSize: 'small' })
+            ) : (
+              <Edit fontSize="small" />
+            )
+          }
+          disabled={disabled}
+          label={field.label}
+          onClick={() => {
+            if (!instances[0]) return;
+            field.onClick(instances[0]);
+          }}
+        />
       );
     },
     [instances]

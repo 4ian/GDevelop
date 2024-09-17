@@ -1893,6 +1893,9 @@ interface ObjectMetadata {
 
     [Ref] ObjectMetadata MarkAsRenderedIn3D();
     boolean IsRenderedIn3D();
+
+    [Ref] ObjectMetadata SetOpenFullEditorLabel([Const] DOMString label);
+    [Const, Ref] DOMString GetOpenFullEditorLabel();
 };
 
 enum QuickCustomization_Visibility {

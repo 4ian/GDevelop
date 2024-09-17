@@ -47,19 +47,11 @@ void SpriteObject::DoSerializeTo(gd::SerializerElement& element) const {
 std::map<gd::String, gd::PropertyDescriptor> SpriteObject::GetProperties()
     const {
   std::map<gd::String, gd::PropertyDescriptor> properties;
-  properties[_("Animate even if hidden or far from the screen")]
-      .SetValue(updateIfNotVisible ? "true" : "false")
-      .SetType("Boolean");
-  properties["PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS"].SetValue("");
-
   return properties;
 }
 
 bool SpriteObject::UpdateProperty(const gd::String& name,
                                   const gd::String& value) {
-  if (name == _("Animate even if hidden or far from the screen"))
-    updateIfNotVisible = value == "1";
-
   return true;
 }
 

@@ -1514,6 +1514,8 @@ export class ObjectMetadata extends EmscriptenObject {
   isHidden(): boolean;
   markAsRenderedIn3D(): ObjectMetadata;
   isRenderedIn3D(): boolean;
+  setOpenFullEditorLabel(label: string): ObjectMetadata;
+  getOpenFullEditorLabel(): string;
 }
 
 export class QuickCustomization extends EmscriptenObject {static Default = 0;

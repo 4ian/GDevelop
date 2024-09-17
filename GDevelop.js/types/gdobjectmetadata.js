@@ -28,6 +28,8 @@ declare class gdObjectMetadata {
   isHidden(): boolean;
   markAsRenderedIn3D(): gdObjectMetadata;
   isRenderedIn3D(): boolean;
+  setOpenFullEditorLabel(label: string): gdObjectMetadata;
+  getOpenFullEditorLabel(): string;
   delete(): void;
   ptr: number;
 };

@@ -488,6 +488,12 @@ export class ChildInstance {
 
   setFlippedY(flippedY: boolean) {}
 
+  isFlippedZ() {
+    return false;
+  }
+
+  setFlippedZ(flippedY: boolean) {}
+
   getLayer() {
     return '';
   }

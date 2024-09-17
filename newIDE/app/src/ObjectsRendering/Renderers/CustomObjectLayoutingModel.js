@@ -175,6 +175,12 @@ export class LayoutedInstance {
 
   setFlippedY(flippedY: boolean) {}
 
+  isFlippedZ() {
+    return this.instance.isFlippedZ();
+  }
+
+  setFlippedZ(flippedY: boolean) {}
+
   getLayer() {
     return '';
   }

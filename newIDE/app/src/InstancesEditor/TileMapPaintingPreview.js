@@ -367,12 +367,16 @@ class TileMapPaintingPreview {
     sprite.width = spriteWidth;
     sprite.height = spriteHeight;
 
-    const allXCoordinates = spritesCoordinatesInTileMapGrid.map(({ x }) => x);
-    const allYCoordinates = spritesCoordinatesInTileMapGrid.map(({ y }) => y);
-    const minX = Math.min(...allXCoordinates);
-    const maxX = Math.max(...allXCoordinates);
-    const minY = Math.min(...allYCoordinates);
-    const maxY = Math.max(...allYCoordinates);
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+    for (const { x, y } of spritesCoordinatesInTileMapGrid) {
+      if (x < minX) minX = x;
+      if (y < minY) minY = y;
+      if (x > maxX) maxX = x;
+      if (y > maxY) maxY = y;
+    }
 
     this.tileMapToSceneTransformation.transform(
       [minX * tileSize, minY * tileSize],

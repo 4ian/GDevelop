@@ -41,6 +41,7 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
   },
+  desktopRightContainer: { minWidth: 350 },
   educationIcon: { width: 40, height: 40 },
   disabledSection: { opacity: 0.6 },
   desktopFooter: { height: 200 },
@@ -317,7 +318,7 @@ const EducationMarketingSection = ({
                 {!isMobile && <div style={styles.desktopFooter} />}
               </ColumnStackLayout>
               <Spacer />
-              <div>
+              <div style={!isMobile ? styles.desktopRightContainer : undefined}>
                 <Paper
                   background="dark"
                   variant="outlined"

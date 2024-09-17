@@ -301,6 +301,9 @@ export default class LegacyRenderedCustomObjectInstance
       this._instance.getAngle()
     );
 
+    this._pixiObject.scale.x = 1;
+    this._pixiObject.scale.y = 1;
+
     // Opacity is not handled by 3D objects.
     // TODO Transform 3D objects according to their flipping.
     if (!this._isRenderedIn3D) {

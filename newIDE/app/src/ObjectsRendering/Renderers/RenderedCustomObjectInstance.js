@@ -387,7 +387,6 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
       this._pixiObject.rotation = RenderedInstance.toRad(
         this._instance.getAngle()
       );
-
       this._pixiObject.scale.x = 1;
       this._pixiObject.scale.y = 1;
     }

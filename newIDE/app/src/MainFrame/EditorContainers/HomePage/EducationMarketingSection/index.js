@@ -262,7 +262,13 @@ const EducationMarketingSection = ({
                   <ColumnStackLayout alignItems="flex-start" expand noMargin>
                     <Education style={styles.educationIcon} />
                     <Text size="title" noMargin>
-                      <Trans>Purchase the Education subscription</Trans>
+                      {isMobile ? (
+                        <Trans>Purchase the Education subscription</Trans>
+                      ) : (
+                        <Trans>
+                          New lesson every month with the Education subscription
+                        </Trans>
+                      )}
                     </Text>
                     <Text>
                       <Trans>

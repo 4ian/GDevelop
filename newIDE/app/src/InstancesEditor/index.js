@@ -505,6 +505,7 @@ export default class InstancesEditor extends Component<Props, State> {
     });
     this.selectedInstances = new SelectedInstances({
       instancesSelection: this.props.instancesSelection,
+      shouldDisplayHandles: this.shouldDisplayClickableHandles,
       onResize: this._onResize,
       onResizeEnd: this._onResizeEnd,
       onRotate: this._onRotate,
@@ -732,6 +733,8 @@ export default class InstancesEditor extends Component<Props, State> {
     if (this.props.tileMapTileSelection) return { color: 0xfff, alpha: 0 };
     return { color: isLocked ? 0xbc5753 : 0x6868e8, alpha: 1 };
   };
+
+  shouldDisplayClickableHandles = () => !this.props.tileMapTileSelection;
 
   getZoomFactor = () => {
     return this.props.instancesEditorSettings.zoomFactor;

@@ -34,7 +34,7 @@ type EducationCurriculumProps = {|
   onOpenTemplateFromTutorial: string => Promise<void>,
 |};
 
-const EducationCurriculum = ({
+export const EducationCurriculum = ({
   i18n,
   limits,
   tutorials,

@@ -269,6 +269,10 @@ export default class LegacyRenderedCustomObjectInstance
   update() {
     applyChildLayouts(this);
 
+    // This allows a 3D custom object to use a 2D rendering in the editor.
+    const firstInstance = this.childrenRenderedInstances[0];
+    let is3D = !!firstInstance && firstInstance instanceof Rendered3DInstance;
+
     // The children dimension and position are evaluated according to the
     // layout. The object pixels are not stretched. The object is rendered in
     // its current dimension. This is why the scale is always set to 1.
@@ -280,7 +284,7 @@ export default class LegacyRenderedCustomObjectInstance
     const centerZ = this.getCenterZ();
 
     const threeObject = this._threeObject;
-    if (threeObject && this._isRenderedIn3D) {
+    if (threeObject && is3D) {
       threeObject.rotation.set(
         RenderedInstance.toRad(this._instance.getRotationX()),
         RenderedInstance.toRad(this._instance.getRotationY()),
@@ -306,7 +310,7 @@ export default class LegacyRenderedCustomObjectInstance
 
     // Opacity is not handled by 3D objects.
     // TODO Transform 3D objects according to their flipping.
-    if (!this._isRenderedIn3D) {
+    if (!is3D) {
       // Do not hide completely an object so it can still be manipulated
       const alphaForDisplay = Math.max(this._instance.getOpacity() / 255, 0.5);
       this._pixiObject.alpha = alphaForDisplay;

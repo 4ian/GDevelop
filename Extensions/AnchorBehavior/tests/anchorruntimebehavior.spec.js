@@ -83,7 +83,7 @@ describe('gdjs.AnchorRuntimeBehavior', function () {
           leftEdgeAnchor: 0,
           topEdgeAnchor: 0,
           bottomEdgeAnchor: 0,
-          relativeToOriginalWindowSize: true,
+          relativeToOriginalWindowSize: false,
           useLegacyBottomAndRightAnchors: false,
           ...behaviorProperties,
         },
@@ -246,22 +246,24 @@ describe('gdjs.AnchorRuntimeBehavior', function () {
     });
 
     it('can fill the screen with an object (with custom origin)', function () {
+      setGameResolutionSizeAndStep(1000, 500);
+
       const object = createSpriteWithOriginAtCenter({
         leftEdgeAnchor: 1,
         topEdgeAnchor: 1,
         rightEdgeAnchor: 2,
         bottomEdgeAnchor: 2,
       });
-      object.setCustomWidthAndHeight(1000, 1000);
-      object.setPosition(500, 500);
+      object.setCustomWidthAndHeight(1000, 500);
+      object.setPosition(500, 250);
       runtimeScene.renderAndStep(1000 / 60);
 
-      setGameResolutionSizeAndStep(2000, 2000);
+      setGameResolutionSizeAndStep(2000, 3000);
 
       expect(object.getX()).to.equal(1000);
-      expect(object.getY()).to.equal(1000);
+      expect(object.getY()).to.equal(1500);
       expect(object.getWidth()).to.equal(2000);
-      expect(object.getHeight()).to.equal(2000);
+      expect(object.getHeight()).to.equal(3000);
     });
   });
 });

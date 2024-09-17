@@ -301,6 +301,9 @@ export default class LegacyRenderedCustomObjectInstance
       this._instance.getAngle()
     );
 
+    this._pixiObject.scale.x = 1;
+    this._pixiObject.scale.y = 1;
+
     // Opacity is not handled by 3D objects.
     // TODO Transform 3D objects according to their flipping.
     if (!this._isRenderedIn3D) {
@@ -308,8 +311,12 @@ export default class LegacyRenderedCustomObjectInstance
       const alphaForDisplay = Math.max(this._instance.getOpacity() / 255, 0.5);
       this._pixiObject.alpha = alphaForDisplay;
 
-      if (this._instance.isFlippedX()) this._pixiObject.scale.x *= -1;
-      if (this._instance.isFlippedY()) this._pixiObject.scale.y *= -1;
+      this._pixiObject.scale.x =
+        Math.abs(this._pixiObject.scale.x) *
+        (this._instance.isFlippedX() ? -1 : 1);
+      this._pixiObject.scale.y =
+        Math.abs(this._pixiObject.scale.y) *
+        (this._instance.isFlippedY() ? -1 : 1);
     }
   }
 

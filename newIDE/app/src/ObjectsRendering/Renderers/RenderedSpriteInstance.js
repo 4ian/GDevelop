@@ -123,8 +123,12 @@ export default class RenderedSpriteInstance extends RenderedInstance {
     const alphaForDisplay = Math.max(this._instance.getOpacity() / 255, 0.5);
     this._pixiObject.alpha = alphaForDisplay;
 
-    if (this._instance.isFlippedX()) this._pixiObject.scale.x *= -1;
-    if (this._instance.isFlippedY()) this._pixiObject.scale.y *= -1;
+    this._pixiObject.scale.x =
+      Math.abs(this._pixiObject.scale.x) *
+      (this._instance.isFlippedX() ? -1 : 1);
+    this._pixiObject.scale.y =
+      Math.abs(this._pixiObject.scale.y) *
+      (this._instance.isFlippedY() ? -1 : 1);
   }
 
   updateSprite(): boolean {
@@ -215,13 +219,13 @@ export default class RenderedSpriteInstance extends RenderedInstance {
   getOriginX(): number {
     if (!this._sprite || !this._pixiObject) return 0;
 
-    return this._sprite.getOrigin().getX() * this._pixiObject.scale.x;
+    return this._sprite.getOrigin().getX() * Math.abs(this._pixiObject.scale.x);
   }
 
   getOriginY(): number {
     if (!this._sprite || !this._pixiObject) return 0;
 
-    return this._sprite.getOrigin().getY() * this._pixiObject.scale.y;
+    return this._sprite.getOrigin().getY() * Math.abs(this._pixiObject.scale.y);
   }
 
   getDefaultWidth(): number {

@@ -62,6 +62,14 @@
     return this._customHeight;
   }
 
+  setWidth(width) {
+    this._customWidth = width;
+  }
+
+  setHeight(height) {
+    return this._customHeight = height;
+  }
+
   getCenterX() {
     if (this._customCenterX === null) return super.getCenterX();
     return this._customCenterX;

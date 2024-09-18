@@ -15,8 +15,10 @@ declare class gdEventsBasedObject extends gdAbstractEventsBasedEntity {
   isAnimatable(): boolean;
   markAsTextContainer(isTextContainer: boolean): gdEventsBasedObject;
   isTextContainer(): boolean;
-  markAsInnerAreaExpandingWithParent(value: boolean): gdEventsBasedObject;
+  markAsInnerAreaFollowingParentSize(value: boolean): gdEventsBasedObject;
   isInnerAreaFollowingParentSize(): boolean;
+  makAsUsingLegacyInstancesRenderer(value: boolean): gdEventsBasedObject;
+  isUsingLegacyInstancesRenderer(): boolean;
   getInitialInstances(): gdInitialInstancesContainer;
   getLayers(): gdLayersContainer;
   getObjects(): gdObjectsContainer;

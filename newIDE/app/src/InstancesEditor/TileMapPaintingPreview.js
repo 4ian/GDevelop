@@ -25,14 +25,16 @@ export const updateSceneToTileMapTransformation = (
     scaleY = 1;
   if (instance.hasCustomSize()) {
     const editableTileMap = renderedInstance.getEditableTileMap();
-    if (!editableTileMap) {
+    if (editableTileMap) {
+      scaleX = instance.getCustomWidth() / editableTileMap.getWidth();
+      scaleY = instance.getCustomHeight() / editableTileMap.getHeight();
+    } else {
       console.error(
-        `Could not find the editable tile map for instance of object ${instance.getObjectName()}.`
+        `Could not find the editable tile map for instance of object ${instance.getObjectName()}. Make sure the tile map object is correctly configured.`
       );
-      return;
+      // Do not early return on error to make the preview still working to not give
+      // a sense of something broken.
     }
-    scaleX = instance.getCustomWidth() / editableTileMap.getWidth();
-    scaleY = instance.getCustomHeight() / editableTileMap.getHeight();
   }
   const absScaleX = Math.abs(scaleX);
   const absScaleY = Math.abs(scaleY);
@@ -77,7 +79,7 @@ export const getTileSet = (object: gdObject) => {
   return { rowCount, columnCount, tileSize, atlasImage };
 };
 
-const isTileSetBadlyConfigured = ({
+export const isTileSetBadlyConfigured = ({
   rowCount,
   columnCount,
   tileSize,
@@ -98,7 +100,7 @@ const isTileSetBadlyConfigured = ({
 
 /**
  * Returns the list of tiles corresponding to the user selection.
- * If only one coordinate is present, only one tile is places at the slot the
+ * If only one coordinate is present, only one tile is placed at the slot the
  * pointer points to.
  * If two coordinates are present, tiles are displayed to form a rectangle with the
  * two coordinates being the top left and bottom right corner of the rectangle.
@@ -134,45 +136,53 @@ export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
     });
   }
   if (coordinates.length === 2) {
-    const topLeftCornerCoordinatesInTileMap = [0, 0];
-    const bottomRightCornerCoordinatesInTileMap = [0, 0];
-
+    const firstPointCoordinatesInTileMap = [0, 0];
     sceneToTileMapTransformation.transform(
-      [
-        Math.min(coordinates[0].x, coordinates[1].x),
-        Math.min(coordinates[0].y, coordinates[1].y),
-      ],
-      topLeftCornerCoordinatesInTileMap
+      [coordinates[0].x, coordinates[0].y],
+      firstPointCoordinatesInTileMap
     );
-    topLeftCornerCoordinatesInTileMap[0] = Math.floor(
-      topLeftCornerCoordinatesInTileMap[0] / tileSize
-    );
-    topLeftCornerCoordinatesInTileMap[1] = Math.floor(
-      topLeftCornerCoordinatesInTileMap[1] / tileSize
-    );
-
+    const secondPointCoordinatesInTileMap = [0, 0];
     sceneToTileMapTransformation.transform(
-      [
-        Math.max(coordinates[0].x, coordinates[1].x),
-        Math.max(coordinates[0].y, coordinates[1].y),
-      ],
-      bottomRightCornerCoordinatesInTileMap
+      [coordinates[1].x, coordinates[1].y],
+      secondPointCoordinatesInTileMap
     );
-    bottomRightCornerCoordinatesInTileMap[0] = Math.floor(
-      bottomRightCornerCoordinatesInTileMap[0] / tileSize
-    );
-    bottomRightCornerCoordinatesInTileMap[1] = Math.floor(
-      bottomRightCornerCoordinatesInTileMap[1] / tileSize
-    );
+    const topLeftCornerCoordinatesInTileMap = [
+      Math.min(
+        firstPointCoordinatesInTileMap[0],
+        secondPointCoordinatesInTileMap[0]
+      ),
+      Math.min(
+        firstPointCoordinatesInTileMap[1],
+        secondPointCoordinatesInTileMap[1]
+      ),
+    ];
+    const bottomRightCornerCoordinatesInTileMap = [
+      Math.max(
+        firstPointCoordinatesInTileMap[0],
+        secondPointCoordinatesInTileMap[0]
+      ),
+      Math.max(
+        firstPointCoordinatesInTileMap[1],
+        secondPointCoordinatesInTileMap[1]
+      ),
+    ];
+    const topLeftCornerCoordinatesInTileMapGrid = [
+      Math.floor(topLeftCornerCoordinatesInTileMap[0] / tileSize),
+      Math.floor(topLeftCornerCoordinatesInTileMap[1] / tileSize),
+    ];
+    const bottomRightCornerCoordinatesInTileMapGrid = [
+      Math.floor(bottomRightCornerCoordinatesInTileMap[0] / tileSize),
+      Math.floor(bottomRightCornerCoordinatesInTileMap[1] / tileSize),
+    ];
 
     for (
-      let columnIndex = topLeftCornerCoordinatesInTileMap[0];
-      columnIndex <= bottomRightCornerCoordinatesInTileMap[0];
+      let columnIndex = topLeftCornerCoordinatesInTileMapGrid[0];
+      columnIndex <= bottomRightCornerCoordinatesInTileMapGrid[0];
       columnIndex++
     ) {
       for (
-        let rowIndex = topLeftCornerCoordinatesInTileMap[1];
-        rowIndex <= bottomRightCornerCoordinatesInTileMap[1];
+        let rowIndex = topLeftCornerCoordinatesInTileMapGrid[1];
+        rowIndex <= bottomRightCornerCoordinatesInTileMapGrid[1];
         rowIndex++
       ) {
         tilesCoordinatesInTileMapGrid.push({ x: columnIndex, y: rowIndex });
@@ -339,42 +349,50 @@ class TileMapPaintingPreview {
         sceneToTileMapTransformation: this.sceneToTileMapTransformation,
       }
     );
+    if (spritesCoordinatesInTileMapGrid.length === 0) {
+      console.warn("Could't get coordinates to render in tile map grid.");
+      return;
+    }
 
     const workingPoint = [0, 0];
 
-    spritesCoordinatesInTileMapGrid.forEach(({ x, y }) => {
-      let sprite;
+    const sprite = new PIXI.TilingSprite(texture);
 
-      if (tileMapTileSelection.kind === 'single' || isBadlyConfigured) {
-        // TODO: Find a way not to regenerate the sprites on each render.
-        sprite = new PIXI.Sprite(texture);
-        if (tileMapTileSelection.flipHorizontally) {
-          sprite.scale.x *= -1;
-        }
-        if (tileMapTileSelection.flipVertically) {
-          sprite.scale.y *= -1;
-        }
-      } else {
-        sprite = new PIXI.TilingSprite(texture, 2, 2);
-        sprite.tileScale.x = this.viewPosition.toCanvasScale(scaleX);
-        sprite.tileScale.y = this.viewPosition.toCanvasScale(scaleY);
-      }
-      sprite.anchor.x = 0.5;
-      sprite.anchor.y = 0.5;
-      sprite.width = spriteWidth;
-      sprite.height = spriteHeight;
+    sprite.tileScale.x =
+      (tileMapTileSelection.flipHorizontally ? -1 : +1) *
+      this.viewPosition.toCanvasScale(scaleX);
+    sprite.tileScale.y =
+      (tileMapTileSelection.flipVertically ? -1 : +1) *
+      this.viewPosition.toCanvasScale(scaleY);
+    sprite.width = spriteWidth;
+    sprite.height = spriteHeight;
 
-      this.tileMapToSceneTransformation.transform(
-        [x * tileSize + tileSize / 2, y * tileSize + tileSize / 2],
-        workingPoint
-      );
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+    for (const { x, y } of spritesCoordinatesInTileMapGrid) {
+      if (x < minX) minX = x;
+      if (y < minY) minY = y;
+      if (x > maxX) maxX = x;
+      if (y > maxY) maxY = y;
+    }
 
-      sprite.x = this.viewPosition.toCanvasScale(workingPoint[0]);
-      sprite.y = this.viewPosition.toCanvasScale(workingPoint[1]);
-      sprite.angle = instance.getAngle();
+    this.tileMapToSceneTransformation.transform(
+      [minX * tileSize, minY * tileSize],
+      workingPoint
+    );
 
-      this.preview.addChild(sprite);
-    });
+    sprite.x = this.viewPosition.toCanvasScale(workingPoint[0]);
+    sprite.y = this.viewPosition.toCanvasScale(workingPoint[1]);
+    sprite.width =
+      (maxX - minX + 1) * this.viewPosition.toCanvasScale(tileSize) * scaleX;
+    sprite.height =
+      (maxY - minY + 1) * this.viewPosition.toCanvasScale(tileSize) * scaleY;
+
+    sprite.angle = instance.getAngle();
+
+    this.preview.addChild(sprite);
 
     const canvasCoordinates = this.viewPosition.toCanvasCoordinates(0, 0);
     this.preview.position.x = canvasCoordinates[0];

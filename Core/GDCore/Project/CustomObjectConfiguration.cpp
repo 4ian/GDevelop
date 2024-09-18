@@ -272,3 +272,16 @@ const SpriteAnimationList& CustomObjectConfiguration::GetAnimations() const {
 SpriteAnimationList& CustomObjectConfiguration::GetAnimations() {
   return animations;
 }
+
+const gd::CustomObjectConfiguration::EdgeAnchor
+CustomObjectConfiguration::GetEdgeAnchorFromString(const gd::String &value) {
+  return (value == _("Window left") || value == _("Window top"))
+             ? gd::CustomObjectConfiguration::EdgeAnchor::MinEdge
+         : (value == _("Window right") || value == _("Window bottom"))
+             ? gd::CustomObjectConfiguration::EdgeAnchor::MaxEdge
+         : value == _("Proportional")
+             ? gd::CustomObjectConfiguration::EdgeAnchor::Proportional
+         : value == _("Window center")
+             ? gd::CustomObjectConfiguration::EdgeAnchor::Center
+             : gd::CustomObjectConfiguration::EdgeAnchor::NoAnchor;
+}

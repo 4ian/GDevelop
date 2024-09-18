@@ -1,6 +1,8 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
+import { type Limits } from '../../../../Utils/GDevelopServices/Usage';
 import SectionContainer, { SectionRow } from '../SectionContainer';
 import {
   type Tutorial,
@@ -11,6 +13,82 @@ import ImageTileGrid from '../../../../UI/ImageTileGrid';
 import { type WindowSizeType } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import { PrivateTutorialViewDialog } from '../../../../AssetStore/PrivateTutorials/PrivateTutorialViewDialog';
+import EducationCurriculumLesson from './EducationCurriculumLesson';
+import { selectMessageByLocale } from '../../../../Utils/i18n/MessageByLocale';
+import Text from '../../../../UI/Text';
+
+const styles = {
+  educationCurriculumTutorialContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 24,
+  },
+  sectionTitleContainer: { marginBottom: -10 },
+};
+
+type EducationCurriculumProps = {|
+  i18n: I18nType,
+  limits: ?Limits,
+  tutorials: Tutorial[],
+  onSelectTutorial: Tutorial => void,
+  onOpenTemplateFromTutorial: string => Promise<void>,
+|};
+
+export const EducationCurriculum = ({
+  i18n,
+  limits,
+  tutorials,
+  onSelectTutorial,
+  onOpenTemplateFromTutorial,
+}: EducationCurriculumProps) => {
+  const listItems: React.Node[] = React.useMemo(
+    () => {
+      const items = [];
+      let currentSection = null;
+      let sectionIndex = 0;
+
+      tutorials.forEach(tutorial => {
+        if (!tutorial.sectionByLocale) return;
+        const section = selectMessageByLocale(i18n, tutorial.sectionByLocale);
+        if (section !== currentSection) {
+          items.push(
+            <div style={styles.sectionTitleContainer}>
+              <Text size="section-title" noMargin key={`section-${section}`}>
+                {section}
+              </Text>
+            </div>
+          );
+          sectionIndex = 0;
+          currentSection = section;
+        }
+        items.push(
+          <EducationCurriculumLesson
+            key={tutorial.id}
+            i18n={i18n}
+            limits={limits}
+            tutorial={tutorial}
+            onSelectTutorial={onSelectTutorial}
+            index={sectionIndex}
+            onOpenTemplateFromTutorial={
+              tutorial.templateUrl
+                ? () => {
+                    onOpenTemplateFromTutorial(tutorial.id);
+                  }
+                : null
+            }
+          />
+        );
+        sectionIndex += 1;
+      });
+      return items;
+    },
+    [tutorials, i18n, limits, onSelectTutorial, onOpenTemplateFromTutorial]
+  );
+
+  return (
+    <div style={styles.educationCurriculumTutorialContainer}>{listItems}</div>
+  );
+};
 
 const getColumnsFromWindowSize = (windowSize: WindowSizeType) => {
   switch (windowSize) {
@@ -31,9 +109,15 @@ type Props = {|
   onBack: () => void,
   tutorials: Array<Tutorial>,
   category: TutorialCategory,
+  onOpenTemplateFromTutorial: string => Promise<void>,
 |};
 
-const TutorialsCategoryPage = ({ category, tutorials, onBack }: Props) => {
+const TutorialsCategoryPage = ({
+  category,
+  tutorials,
+  onBack,
+  onOpenTemplateFromTutorial,
+}: Props) => {
   const { limits } = React.useContext(AuthenticatedUserContext);
   const texts = TUTORIAL_CATEGORY_TEXTS[category];
   const filteredTutorials = tutorials.filter(
@@ -54,17 +138,27 @@ const TutorialsCategoryPage = ({ category, tutorials, onBack }: Props) => {
           backAction={onBack}
         >
           <SectionRow>
-            <ImageTileGrid
-              items={filteredTutorials.map(tutorial =>
-                formatTutorialToImageTileComponent({
-                  i18n,
-                  limits,
-                  tutorial,
-                  onSelectTutorial: setSelectedTutorial,
-                })
-              )}
-              getColumnsFromWindowSize={getColumnsFromWindowSize}
-            />
+            {category === 'education-curriculum' ? (
+              <EducationCurriculum
+                tutorials={filteredTutorials}
+                onSelectTutorial={setSelectedTutorial}
+                i18n={i18n}
+                limits={limits}
+                onOpenTemplateFromTutorial={onOpenTemplateFromTutorial}
+              />
+            ) : (
+              <ImageTileGrid
+                items={filteredTutorials.map(tutorial =>
+                  formatTutorialToImageTileComponent({
+                    i18n,
+                    limits,
+                    tutorial,
+                    onSelectTutorial: setSelectedTutorial,
+                  })
+                )}
+                getColumnsFromWindowSize={getColumnsFromWindowSize}
+              />
+            )}
           </SectionRow>
           {selectedTutorial && (
             <PrivateTutorialViewDialog

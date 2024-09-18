@@ -9,6 +9,7 @@ import RaisedButton from '../UI/RaisedButton';
 import { type Tutorial } from '../Utils/GDevelopServices/Tutorial';
 import Video from '../UI/CustomSvgIcons/Video';
 import Book from '../UI/CustomSvgIcons/Book';
+import { selectMessageByLocale } from '../Utils/i18n/MessageByLocale';
 
 type Props = {|
   tutorial: Tutorial,
@@ -25,7 +26,7 @@ const TutorialMessage = ({ tutorial }: Props) => {
       {({ i18n }) => (
         <AlertMessage
           kind={'info'}
-          children={tutorial.title}
+          children={selectMessageByLocale(i18n, tutorial.titleByLocale)}
           renderLeftIcon={() => (
             <img
               alt=""
@@ -34,7 +35,7 @@ const TutorialMessage = ({ tutorial }: Props) => {
                 borderRadius: 4,
                 aspectRatio: '16 / 9',
               }}
-              src={tutorial.thumbnailUrl}
+              src={selectMessageByLocale(i18n, tutorial.thumbnailUrlByLocale)}
             />
           )}
           renderRightButton={() => (
@@ -48,7 +49,9 @@ const TutorialMessage = ({ tutorial }: Props) => {
                 )
               }
               onClick={() => {
-                Window.openExternalURL(tutorial.link);
+                Window.openExternalURL(
+                  selectMessageByLocale(i18n, tutorial.linkByLocale)
+                );
               }}
             />
           )}

@@ -1,6 +1,7 @@
 // @flow
 
 import * as React from 'react';
+import { I18n } from '@lingui/react';
 import { t, Trans } from '@lingui/macro';
 import Grid from '@material-ui/core/Grid';
 import GridList from '@material-ui/core/GridList';
@@ -49,6 +50,12 @@ import Window from '../../../../../Utils/Window';
 import useAlertDialog from '../../../../../UI/Alert/useAlertDialog';
 import { delay } from '../../../../../Utils/Delay';
 import Check from '../../../../../UI/CustomSvgIcons/Check';
+import useSubscriptionPlans from '../../../../../Utils/UseSubscriptionPlans';
+import { getPlanIcon } from '../../../../../Profile/Subscription/PlanCard';
+import { selectMessageByLocale } from '../../../../../Utils/i18n/MessageByLocale';
+import TextButton from '../../../../../UI/TextButton';
+import Chip from '../../../../../UI/Chip';
+import { SubscriptionSuggestionContext } from '../../../../../Profile/Subscription/SubscriptionSuggestionContext';
 
 const styles = {
   selectedMembersControlsContainer: {
@@ -58,6 +65,9 @@ const styles = {
     padding: 8,
     marginTop: 12,
     marginBottom: 12,
+  },
+  subscriptionPaper: {
+    padding: '8px 16px 8px 8px',
   },
 };
 
@@ -259,7 +269,13 @@ type Props = {|
 |};
 
 const ManageEducationAccountDialog = ({ onClose }: Props) => {
-  const { profile } = React.useContext(AuthenticatedUserContext);
+  const { profile, subscription } = React.useContext(AuthenticatedUserContext);
+  const { openSubscriptionDialog } = React.useContext(
+    SubscriptionSuggestionContext
+  );
+  const { subscriptionPlansWithPricingSystems } = useSubscriptionPlans({
+    includeLegacy: true,
+  });
   const [selectedUserIds, setSelectedUserIds] = React.useState<string[]>([]);
   const [isCreatingMembers, setIsCreatingMembers] = React.useState<boolean>(
     false
@@ -358,7 +374,16 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
     [selectedUserIds, members]
   );
 
+  const isLoading = !subscriptionPlansWithPricingSystems;
+
   const availableSeats = getAvailableSeats();
+  const userSubscriptionPlanWithPricingSystems =
+    subscription && subscription.planId && subscriptionPlansWithPricingSystems
+      ? subscriptionPlansWithPricingSystems.find(
+          subscriptionPlanWithPricingSystems =>
+            subscriptionPlanWithPricingSystems.id === subscription.planId
+        )
+      : null;
 
   const onCreateTeamMembers = React.useCallback(
     async (quantity: number) => {
@@ -558,357 +583,435 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
   const hasNoActiveTeamMembers = activeMembers.length === 0;
 
   return (
-    <>
-      <Dialog
-        title={<Trans>Manage seats</Trans>}
-        flexColumnBody
-        fullHeight
-        open
-        onRequestClose={onClose}
-      >
-        <ColumnStackLayout noMargin>
-          {availableSeats === 0 && (
-            <AlertMessage kind="info">
-              <Trans>
-                You’ve reached the maximum amount of available seats.{' '}
-                <Link
-                  href={purchaseSeatsMailToLink}
-                  onClick={() =>
-                    Window.openExternalURL(purchaseSeatsMailToLink)
-                  }
-                >
-                  Increase the number of seats
-                </Link>{' '}
-                on your subscription to invite more students and collaborators.
-              </Trans>
-            </AlertMessage>
-          )}
-          <Text size="sub-title" noMargin>
-            <Trans>Teacher accounts</Trans>
-          </Text>
-          <Column noMargin>
-            {admins &&
-              admins.map(adminUser => (
-                <UserLine
-                  key={adminUser.id}
-                  username={adminUser.username}
-                  email={adminUser.email}
-                  level={null}
-                  onDelete={() => onRemoveAdmin(adminUser.email)}
-                  disabled={
-                    (profile && adminUser.id === profile.id) ||
-                    (adminEmailBeingRemoved &&
-                      adminEmailBeingRemoved === adminUser.email)
-                  }
-                />
-              ))}
-          </Column>
-          {removeAdminError && (
-            <AlertMessage kind="error">
-              {removeErrorToText[removeAdminError]}
-            </AlertMessage>
-          )}
-          <Line noMargin>
-            <RaisedButton
-              primary
-              disabled={availableSeats !== null && availableSeats <= 0}
-              icon={<Add fontSize="small" />}
-              label={<Trans>Add teacher</Trans>}
-              onClick={() => setAddTeacherDialogOpen(true)}
-            />
-          </Line>
-          <Divider />
-          <ResponsiveLineStackLayout
-            noMargin
-            justifyContent="space-between"
-            alignItems="center"
+    <I18n>
+      {({ i18n }) => (
+        <>
+          <Dialog
+            title={<Trans>Manage seats</Trans>}
+            flexColumnBody
+            fullHeight
+            open
+            onRequestClose={onClose}
           >
-            <Text size="sub-title" noMargin>
-              <Trans>Student accounts</Trans>
-            </Text>
-            <LineStackLayout noMargin alignItems="center">
-              <TeamAvailableSeats />
-              <Line expand noMargin justifyContent="flex-end">
-                {availableSeats !== null && availableSeats <= 0 ? (
-                  <FlatButton
-                    primary
-                    label={<Trans>Purchase seats</Trans>}
-                    leftIcon={<Education fontSize="small" />}
-                    onClick={() =>
-                      Window.openExternalURL(purchaseSeatsMailToLink)
-                    }
-                  />
-                ) : (
+            {isLoading ? (
+              <Column
+                useFullHeight
+                expand
+                justifyContent="center"
+                alignItems="center"
+              >
+                <CircularProgress />
+              </Column>
+            ) : (
+              <ColumnStackLayout noMargin>
+                {userSubscriptionPlanWithPricingSystems && (
+                  <Paper background="light" style={styles.subscriptionPaper}>
+                    <ResponsiveLineStackLayout
+                      alignItems="center"
+                      justifyContent="space-between"
+                      noMargin
+                    >
+                      <LineStackLayout noMargin alignItems="center">
+                        {getPlanIcon({
+                          subscriptionPlan: userSubscriptionPlanWithPricingSystems,
+                          logoSize: 20,
+                        })}
+                        <Text noMargin>
+                          <b>
+                            {selectMessageByLocale(
+                              i18n,
+                              userSubscriptionPlanWithPricingSystems.nameByLocale
+                            ).toUpperCase()}
+                          </b>
+                        </Text>
+                        <Chip label={team.seats} size="small" />
+                        <Text noMargin color="secondary">
+                          <Trans>Seats</Trans>
+                        </Text>
+                      </LineStackLayout>
+                      <TextButton
+                        secondary
+                        label={<Trans>Manage subscription</Trans>}
+                        onClick={() =>
+                          openSubscriptionDialog({
+                            analyticsMetadata: {
+                              reason: 'Manage subscription as teacher',
+                            },
+                            filter: 'education',
+                          })
+                        }
+                      />
+                    </ResponsiveLineStackLayout>
+                  </Paper>
+                )}
+                {availableSeats === 0 && (
+                  <AlertMessage kind="info">
+                    <Trans>
+                      You’ve reached the maximum amount of available seats.{' '}
+                      <Link
+                        href={purchaseSeatsMailToLink}
+                        onClick={() =>
+                          Window.openExternalURL(purchaseSeatsMailToLink)
+                        }
+                      >
+                        Increase the number of seats
+                      </Link>{' '}
+                      on your subscription to invite more students and
+                      collaborators.
+                    </Trans>
+                  </AlertMessage>
+                )}
+                <Text size="sub-title" noMargin>
+                  <Trans>Teacher accounts</Trans>
+                </Text>
+                <Column noMargin>
+                  {admins &&
+                    admins.map(adminUser => (
+                      <UserLine
+                        key={adminUser.id}
+                        username={adminUser.username}
+                        email={adminUser.email}
+                        level={null}
+                        onDelete={() => onRemoveAdmin(adminUser.email)}
+                        disabled={
+                          (profile && adminUser.id === profile.id) ||
+                          (adminEmailBeingRemoved &&
+                            adminEmailBeingRemoved === adminUser.email)
+                        }
+                      />
+                    ))}
+                </Column>
+                {removeAdminError && (
+                  <AlertMessage kind="error">
+                    {removeErrorToText[removeAdminError]}
+                  </AlertMessage>
+                )}
+                <Line noMargin>
                   <RaisedButton
                     primary
-                    label={<Trans>Add student</Trans>}
-                    icon={
-                      isCreatingMembers ? (
-                        <CircularProgress size={10} />
+                    disabled={availableSeats !== null && availableSeats <= 0}
+                    icon={<Add fontSize="small" />}
+                    label={<Trans>Add teacher</Trans>}
+                    onClick={() => setAddTeacherDialogOpen(true)}
+                  />
+                </Line>
+                <Divider />
+                <ResponsiveLineStackLayout
+                  noMargin
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Text size="sub-title" noMargin>
+                    <Trans>Student accounts</Trans>
+                  </Text>
+                  <LineStackLayout noMargin alignItems="center">
+                    <TeamAvailableSeats />
+                    <Line expand noMargin justifyContent="flex-end">
+                      {availableSeats !== null && availableSeats <= 0 ? (
+                        <FlatButton
+                          primary
+                          label={<Trans>Purchase seats</Trans>}
+                          leftIcon={<Education fontSize="small" />}
+                          onClick={() =>
+                            Window.openExternalURL(purchaseSeatsMailToLink)
+                          }
+                        />
                       ) : (
-                        <Add fontSize="small" />
-                      )
-                    }
-                    onClick={() => onCreateTeamMembers(1)}
-                    disabled={isCreatingMembers}
+                        <RaisedButton
+                          primary
+                          label={<Trans>Add student</Trans>}
+                          icon={
+                            isCreatingMembers ? (
+                              <CircularProgress size={10} />
+                            ) : (
+                              <Add fontSize="small" />
+                            )
+                          }
+                          onClick={() => onCreateTeamMembers(1)}
+                          disabled={isCreatingMembers}
+                        />
+                      )}
+                    </Line>
+                  </LineStackLayout>
+                </ResponsiveLineStackLayout>
+                {hasNoTeamMembers && availableSeats !== null && (
+                  <StudentCreationCard
+                    availableSeats={availableSeats}
+                    isCreatingMembers={isCreatingMembers}
+                    onCreateStudentAccounts={onCreateTeamMembers}
                   />
                 )}
-              </Line>
-            </LineStackLayout>
-          </ResponsiveLineStackLayout>
-          {hasNoTeamMembers && availableSeats !== null && (
-            <StudentCreationCard
-              availableSeats={availableSeats}
-              isCreatingMembers={isCreatingMembers}
-              onCreateStudentAccounts={onCreateTeamMembers}
+                {(!hasNoTeamMembers || !hasNoActiveTeamMembers) && (
+                  <ColumnStackLayout noMargin>
+                    <Paper
+                      style={
+                        isMobile
+                          ? styles.selectedMembersControlsContainerMobile
+                          : styles.selectedMembersControlsContainer
+                      }
+                      background="light"
+                    >
+                      <ColumnStackLayout noMargin>
+                        <Line
+                          justifyContent="space-between"
+                          noMargin
+                          alignItems="center"
+                        >
+                          <LineStackLayout alignItems="center" noMargin>
+                            <Checkbox
+                              style={{ margin: 0 }}
+                              checked={
+                                areAllActiveMembersSelected &&
+                                selectedUserIds.length > 0
+                              }
+                              onCheck={(e, checked) => {
+                                if (checked) {
+                                  setSelectedUserIds(
+                                    members
+                                      .filter(member => !member.deactivatedAt)
+                                      .map(member => member.id)
+                                  );
+                                } else {
+                                  setSelectedUserIds([]);
+                                }
+                              }}
+                              uncheckedIcon={<CheckboxUnchecked />}
+                              checkedIcon={<CheckboxChecked />}
+                            />
+                            <Text noMargin>
+                              <Trans>Select all active</Trans>
+                            </Text>
+                          </LineStackLayout>
+                          <LineStackLayout noMargin alignItems="center">
+                            <IconButton
+                              size="small"
+                              tooltip={t`Archive accounts`}
+                              disabled={
+                                selectedUserIds.length === 0 ||
+                                isAtLeastOneSelectedUserArchived ||
+                                isArchivingAccounts
+                              }
+                              onClick={() => onActivateTeamMembers(false)}
+                            >
+                              {isArchivingAccounts ? (
+                                <CircularProgress size={22} />
+                              ) : (
+                                <Archive />
+                              )}
+                            </IconButton>
+                            <IconButton
+                              size="small"
+                              tooltip={t`Restore accounts`}
+                              disabled={
+                                selectedUserIds.length === 0 ||
+                                isAtLeastOneSelectedUserActive ||
+                                isRestoringAccounts
+                              }
+                              onClick={() => onActivateTeamMembers(true)}
+                            >
+                              {isRestoringAccounts ? (
+                                <CircularProgress size={22} />
+                              ) : (
+                                <Recycle />
+                              )}
+                            </IconButton>
+                            <IconButton
+                              size="small"
+                              tooltip={
+                                selectedUserIds.length === 0
+                                  ? t`Copy active credentials`
+                                  : t`Copy ${
+                                      selectedUserIds.length
+                                    } credentials`
+                              }
+                              disabled={
+                                hasNoActiveTeamMembers &&
+                                selectedUserIds.length === 0
+                              }
+                              onClick={onCopyActiveCredentials}
+                            >
+                              {credentialsCopySuccess ? <Check /> : <Copy />}
+                            </IconButton>
+                          </LineStackLayout>
+                        </Line>
+                        {batchControlError && (
+                          <AlertMessage kind="error">
+                            {batchControlError}
+                          </AlertMessage>
+                        )}
+                      </ColumnStackLayout>
+                    </Paper>
+                    <Column>
+                      {!isMobile && (
+                        <GridList cols={2} cellHeight={'auto'}>
+                          <Grid item xs={5}>
+                            <Text style={{ opacity: 0.7 }}>
+                              <Trans>Student</Trans>
+                            </Text>
+                          </Grid>
+                          <Grid item xs={7}>
+                            <Text style={{ opacity: 0.7 }}>
+                              <Trans>Password</Trans>
+                            </Text>
+                          </Grid>
+                        </GridList>
+                      )}
+                      {groupsWithMembers.map(({ group, members }, index) => {
+                        return (
+                          <React.Fragment key={group ? group.id : 'lobby'}>
+                            {index > 0 && <Spacer />}
+                            <Line noMargin>
+                              <Text size="sub-title">
+                                {group ? (
+                                  <Trans>Room: {group.name}</Trans>
+                                ) : (
+                                  <Trans>Lobby</Trans>
+                                )}
+                              </Text>
+                            </Line>
+                            <Column>
+                              <GridList
+                                cols={isMobile ? 3 : 2}
+                                cellHeight={'auto'}
+                              >
+                                {members.map(member => {
+                                  return (
+                                    <ManageStudentRow
+                                      member={member}
+                                      key={member.id}
+                                      onChangePassword={
+                                        onChangeTeamMemberPassword
+                                      }
+                                      isSelected={selectedUserIds.includes(
+                                        member.id
+                                      )}
+                                      onSelect={selected => {
+                                        const memberIndexInArray = selectedUserIds.indexOf(
+                                          member.id
+                                        );
+                                        if (selected) {
+                                          if (memberIndexInArray === -1) {
+                                            setSelectedUserIds([
+                                              ...selectedUserIds,
+                                              member.id,
+                                            ]);
+                                          }
+                                          return;
+                                        } else {
+                                          const newArray = [...selectedUserIds];
+                                          if (memberIndexInArray >= 0) {
+                                            newArray.splice(
+                                              memberIndexInArray,
+                                              1
+                                            );
+                                            setSelectedUserIds(newArray);
+                                          }
+                                        }
+                                      }}
+                                    />
+                                  );
+                                })}
+                              </GridList>
+                            </Column>
+                          </React.Fragment>
+                        );
+                      })}
+                      {archivedMembers.length > 0 && (
+                        <React.Fragment key={'archived'}>
+                          <Spacer />
+                          <Line noMargin>
+                            {isArchivedAccountsSectionOpen ? (
+                              <IconButton
+                                size="small"
+                                edge="end"
+                                aria-label="collapse"
+                                onClick={() =>
+                                  setIsArchivedAccountsSectionOpen(false)
+                                }
+                              >
+                                <ChevronArrowTop />
+                              </IconButton>
+                            ) : (
+                              <IconButton
+                                size="small"
+                                edge="end"
+                                aria-label="expand"
+                                onClick={() =>
+                                  setIsArchivedAccountsSectionOpen(true)
+                                }
+                              >
+                                <ChevronArrowBottom />
+                              </IconButton>
+                            )}
+                            <Text size="sub-title">
+                              <Trans>Archived accounts</Trans>
+                            </Text>
+                          </Line>
+                          <Column>
+                            <Collapse
+                              in={isArchivedAccountsSectionOpen}
+                              timeout="auto"
+                              unmountOnExit
+                            >
+                              <GridList cols={2} cellHeight={'auto'}>
+                                {archivedMembers.map(member => {
+                                  return (
+                                    <ManageStudentRow
+                                      member={member}
+                                      key={member.id}
+                                      isArchived
+                                      onChangePassword={
+                                        onChangeTeamMemberPassword
+                                      }
+                                      isSelected={selectedUserIds.includes(
+                                        member.id
+                                      )}
+                                      onSelect={selected => {
+                                        const memberIndexInArray = selectedUserIds.indexOf(
+                                          member.id
+                                        );
+                                        if (selected) {
+                                          if (memberIndexInArray === -1) {
+                                            setSelectedUserIds([
+                                              ...selectedUserIds,
+                                              member.id,
+                                            ]);
+                                          }
+                                          return;
+                                        } else {
+                                          const newArray = [...selectedUserIds];
+                                          if (memberIndexInArray >= 0) {
+                                            newArray.splice(
+                                              memberIndexInArray,
+                                              1
+                                            );
+                                            setSelectedUserIds(newArray);
+                                          }
+                                        }
+                                      }}
+                                    />
+                                  );
+                                })}
+                              </GridList>
+                            </Collapse>
+                          </Column>
+                        </React.Fragment>
+                      )}
+                    </Column>
+                  </ColumnStackLayout>
+                )}
+              </ColumnStackLayout>
+            )}
+          </Dialog>
+          {addTeacherDialogOpen && (
+            <AddTeacherDialog
+              onClose={() => setAddTeacherDialogOpen(false)}
+              onAddTeacher={onSetUserAsAdmin}
             />
           )}
-          {(!hasNoTeamMembers || !hasNoActiveTeamMembers) && (
-            <ColumnStackLayout noMargin>
-              <Paper
-                style={
-                  isMobile
-                    ? styles.selectedMembersControlsContainerMobile
-                    : styles.selectedMembersControlsContainer
-                }
-                background="light"
-              >
-                <ColumnStackLayout noMargin>
-                  <Line
-                    justifyContent="space-between"
-                    noMargin
-                    alignItems="center"
-                  >
-                    <LineStackLayout alignItems="center" noMargin>
-                      <Checkbox
-                        style={{ margin: 0 }}
-                        checked={
-                          areAllActiveMembersSelected &&
-                          selectedUserIds.length > 0
-                        }
-                        onCheck={(e, checked) => {
-                          if (checked) {
-                            setSelectedUserIds(
-                              members
-                                .filter(member => !member.deactivatedAt)
-                                .map(member => member.id)
-                            );
-                          } else {
-                            setSelectedUserIds([]);
-                          }
-                        }}
-                        uncheckedIcon={<CheckboxUnchecked />}
-                        checkedIcon={<CheckboxChecked />}
-                      />
-                      <Text noMargin>
-                        <Trans>Select all active</Trans>
-                      </Text>
-                    </LineStackLayout>
-                    <LineStackLayout noMargin alignItems="center">
-                      <IconButton
-                        size="small"
-                        tooltip={t`Archive accounts`}
-                        disabled={
-                          selectedUserIds.length === 0 ||
-                          isAtLeastOneSelectedUserArchived ||
-                          isArchivingAccounts
-                        }
-                        onClick={() => onActivateTeamMembers(false)}
-                      >
-                        {isArchivingAccounts ? (
-                          <CircularProgress size={22} />
-                        ) : (
-                          <Archive />
-                        )}
-                      </IconButton>
-                      <IconButton
-                        size="small"
-                        tooltip={t`Restore accounts`}
-                        disabled={
-                          selectedUserIds.length === 0 ||
-                          isAtLeastOneSelectedUserActive ||
-                          isRestoringAccounts
-                        }
-                        onClick={() => onActivateTeamMembers(true)}
-                      >
-                        {isRestoringAccounts ? (
-                          <CircularProgress size={22} />
-                        ) : (
-                          <Recycle />
-                        )}
-                      </IconButton>
-                      <IconButton
-                        size="small"
-                        tooltip={
-                          selectedUserIds.length === 0
-                            ? t`Copy active credentials`
-                            : t`Copy ${selectedUserIds.length} credentials`
-                        }
-                        disabled={
-                          hasNoActiveTeamMembers && selectedUserIds.length === 0
-                        }
-                        onClick={onCopyActiveCredentials}
-                      >
-                        {credentialsCopySuccess ? <Check /> : <Copy />}
-                      </IconButton>
-                    </LineStackLayout>
-                  </Line>
-                  {batchControlError && (
-                    <AlertMessage kind="error">
-                      {batchControlError}
-                    </AlertMessage>
-                  )}
-                </ColumnStackLayout>
-              </Paper>
-              <Column>
-                {!isMobile && (
-                  <GridList cols={2} cellHeight={'auto'}>
-                    <Grid item xs={5}>
-                      <Text style={{ opacity: 0.7 }}>
-                        <Trans>Student</Trans>
-                      </Text>
-                    </Grid>
-                    <Grid item xs={7}>
-                      <Text style={{ opacity: 0.7 }}>
-                        <Trans>Password</Trans>
-                      </Text>
-                    </Grid>
-                  </GridList>
-                )}
-                {groupsWithMembers.map(({ group, members }, index) => {
-                  return (
-                    <React.Fragment key={group ? group.id : 'lobby'}>
-                      {index > 0 && <Spacer />}
-                      <Line noMargin>
-                        <Text size="sub-title">
-                          {group ? (
-                            <Trans>Room: {group.name}</Trans>
-                          ) : (
-                            <Trans>Lobby</Trans>
-                          )}
-                        </Text>
-                      </Line>
-                      <Column>
-                        <GridList cols={isMobile ? 3 : 2} cellHeight={'auto'}>
-                          {members.map(member => {
-                            return (
-                              <ManageStudentRow
-                                member={member}
-                                key={member.id}
-                                onChangePassword={onChangeTeamMemberPassword}
-                                isSelected={selectedUserIds.includes(member.id)}
-                                onSelect={selected => {
-                                  const memberIndexInArray = selectedUserIds.indexOf(
-                                    member.id
-                                  );
-                                  if (selected) {
-                                    if (memberIndexInArray === -1) {
-                                      setSelectedUserIds([
-                                        ...selectedUserIds,
-                                        member.id,
-                                      ]);
-                                    }
-                                    return;
-                                  } else {
-                                    const newArray = [...selectedUserIds];
-                                    if (memberIndexInArray >= 0) {
-                                      newArray.splice(memberIndexInArray, 1);
-                                      setSelectedUserIds(newArray);
-                                    }
-                                  }
-                                }}
-                              />
-                            );
-                          })}
-                        </GridList>
-                      </Column>
-                    </React.Fragment>
-                  );
-                })}
-                {archivedMembers.length > 0 && (
-                  <React.Fragment key={'archived'}>
-                    <Spacer />
-                    <Line noMargin>
-                      {isArchivedAccountsSectionOpen ? (
-                        <IconButton
-                          size="small"
-                          edge="end"
-                          aria-label="collapse"
-                          onClick={() =>
-                            setIsArchivedAccountsSectionOpen(false)
-                          }
-                        >
-                          <ChevronArrowTop />
-                        </IconButton>
-                      ) : (
-                        <IconButton
-                          size="small"
-                          edge="end"
-                          aria-label="expand"
-                          onClick={() => setIsArchivedAccountsSectionOpen(true)}
-                        >
-                          <ChevronArrowBottom />
-                        </IconButton>
-                      )}
-                      <Text size="sub-title">
-                        <Trans>Archived accounts</Trans>
-                      </Text>
-                    </Line>
-                    <Column>
-                      <Collapse
-                        in={isArchivedAccountsSectionOpen}
-                        timeout="auto"
-                        unmountOnExit
-                      >
-                        <GridList cols={2} cellHeight={'auto'}>
-                          {archivedMembers.map(member => {
-                            return (
-                              <ManageStudentRow
-                                member={member}
-                                key={member.id}
-                                isArchived
-                                onChangePassword={onChangeTeamMemberPassword}
-                                isSelected={selectedUserIds.includes(member.id)}
-                                onSelect={selected => {
-                                  const memberIndexInArray = selectedUserIds.indexOf(
-                                    member.id
-                                  );
-                                  if (selected) {
-                                    if (memberIndexInArray === -1) {
-                                      setSelectedUserIds([
-                                        ...selectedUserIds,
-                                        member.id,
-                                      ]);
-                                    }
-                                    return;
-                                  } else {
-                                    const newArray = [...selectedUserIds];
-                                    if (memberIndexInArray >= 0) {
-                                      newArray.splice(memberIndexInArray, 1);
-                                      setSelectedUserIds(newArray);
-                                    }
-                                  }
-                                }}
-                              />
-                            );
-                          })}
-                        </GridList>
-                      </Collapse>
-                    </Column>
-                  </React.Fragment>
-                )}
-              </Column>
-            </ColumnStackLayout>
-          )}
-        </ColumnStackLayout>
-      </Dialog>
-      {addTeacherDialogOpen && (
-        <AddTeacherDialog
-          onClose={() => setAddTeacherDialogOpen(false)}
-          onAddTeacher={onSetUserAsAdmin}
-        />
+        </>
       )}
-    </>
+    </I18n>
   );
 };
 

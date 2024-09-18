@@ -117,6 +117,7 @@ type Props = {|
   onOpenMoreSettings?: ?() => void,
   onOpenEvents: (sceneName: string) => void,
   onObjectEdited: (objectWithContext: ObjectWithContext) => void,
+  onEventsBasedObjectChildrenEdited: () => void,
 
   setToolbar: (?React.Node) => void,
   resourceManagementProps: ResourceManagementProps,
@@ -2178,6 +2179,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                     this.editorDisplay
                       ? this.editorDisplay.instancesHandlers.getContentAABB
                       : () => null
+                  }
+                  onEventsBasedObjectChildrenEdited={
+                    this.props.onEventsBasedObjectChildrenEdited
                   }
                 />
               )}

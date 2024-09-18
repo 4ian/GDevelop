@@ -66,7 +66,7 @@ std::map<gd::String, gd::PropertyDescriptor> AnchorBehavior::GetProperties(
       .SetDescription(_("otherwise, objects are anchored according to the "
                         "window size when the object is created."));
 
-  properties[_("Left edge anchor")]
+  properties["leftEdgeAnchor"]
       .SetValue(GetAnchorAsString(static_cast<HorizontalAnchor>(
           behaviorContent.GetIntAttribute("leftEdgeAnchor"))))
       .SetType("Choice")
@@ -75,9 +75,10 @@ std::map<gd::String, gd::PropertyDescriptor> AnchorBehavior::GetProperties(
       .AddExtraInfo(_("Window center"))
       .AddExtraInfo(_("Window right"))
       .AddExtraInfo(_("Proportional"))
+      .SetLabel(_("Left edge anchor"))
       .SetDescription(_("Anchor the left edge of the object on X axis."));
 
-  properties[_("Right edge anchor")]
+  properties["rightEdgeAnchor"]
       .SetValue(GetAnchorAsString(static_cast<HorizontalAnchor>(
           behaviorContent.GetIntAttribute("rightEdgeAnchor"))))
       .SetType("Choice")
@@ -86,9 +87,10 @@ std::map<gd::String, gd::PropertyDescriptor> AnchorBehavior::GetProperties(
       .AddExtraInfo(_("Window center"))
       .AddExtraInfo(_("Window right"))
       .AddExtraInfo(_("Proportional"))
+      .SetLabel(_("Right edge anchor"))
       .SetDescription(_("Anchor the right edge of the object on X axis."));
 
-  properties[_("Top edge anchor")]
+  properties["topEdgeAnchor"]
       .SetValue(GetAnchorAsString(static_cast<VerticalAnchor>(
           behaviorContent.GetIntAttribute("topEdgeAnchor"))))
       .SetType("Choice")
@@ -97,9 +99,10 @@ std::map<gd::String, gd::PropertyDescriptor> AnchorBehavior::GetProperties(
       .AddExtraInfo(_("Window center"))
       .AddExtraInfo(_("Window bottom"))
       .AddExtraInfo(_("Proportional"))
+      .SetLabel(_("Top edge anchor"))
       .SetDescription(_("Anchor the top edge of the object on Y axis."));
 
-  properties[_("Bottom edge anchor")]
+  properties["bottomEdgeAnchor"]
       .SetValue(GetAnchorAsString(static_cast<VerticalAnchor>(
           behaviorContent.GetIntAttribute("bottomEdgeAnchor"))))
       .SetType("Choice")
@@ -108,9 +111,10 @@ std::map<gd::String, gd::PropertyDescriptor> AnchorBehavior::GetProperties(
       .AddExtraInfo(_("Window center"))
       .AddExtraInfo(_("Window bottom"))
       .AddExtraInfo(_("Proportional"))
+      .SetLabel(_("Bottom edge anchor"))
       .SetDescription(_("Anchor the bottom edge of the object on Y axis."));
 
-  properties[("useLegacyBottomAndRightAnchors")]
+  properties["useLegacyBottomAndRightAnchors"]
       .SetLabel(_(
           "Stretch object when anchoring right or bottom edge (deprecated, "
           "it's recommended to leave this unchecked and anchor both sides if "
@@ -158,20 +162,20 @@ AnchorBehavior::VerticalAnchor GetVerticalAnchorFromString(
 bool AnchorBehavior::UpdateProperty(gd::SerializerElement& behaviorContent,
                                     const gd::String& name,
                                     const gd::String& value) {
-  if (name == _("relativeToOriginalWindowSize"))
+  if (name == "relativeToOriginalWindowSize")
     behaviorContent.SetAttribute("relativeToOriginalWindowSize", value == "1");
-  else if (name == _("Left edge anchor"))
+  else if (name == "leftEdgeAnchor")
     behaviorContent.SetAttribute(
         "leftEdgeAnchor",
         static_cast<int>(GetHorizontalAnchorFromString(value)));
-  else if (name == _("Right edge anchor"))
+  else if (name == "rightEdgeAnchor")
     behaviorContent.SetAttribute(
         "rightEdgeAnchor",
         static_cast<int>(GetHorizontalAnchorFromString(value)));
-  else if (name == _("Top edge anchor"))
+  else if (name == "topEdgeAnchor")
     behaviorContent.SetAttribute(
         "topEdgeAnchor", static_cast<int>(GetVerticalAnchorFromString(value)));
-  else if (name == _("Bottom edge anchor"))
+  else if (name == "bottomEdgeAnchor")
     behaviorContent.SetAttribute(
         "bottomEdgeAnchor",
         static_cast<int>(GetVerticalAnchorFromString(value)));

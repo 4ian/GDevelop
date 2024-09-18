@@ -45,6 +45,7 @@ import Background from './Background';
 import TileMapPaintingPreview, {
   getTileSet,
   getTilesGridCoordinatesFromPointerSceneCoordinates,
+  isTileSetBadlyConfigured,
   updateSceneToTileMapTransformation,
 } from './TileMapPaintingPreview';
 import {
@@ -504,6 +505,7 @@ export default class InstancesEditor extends Component<Props, State> {
     });
     this.selectedInstances = new SelectedInstances({
       instancesSelection: this.props.instancesSelection,
+      shouldDisplayHandles: this.shouldDisplayClickableHandles,
       onResize: this._onResize,
       onResizeEnd: this._onResizeEnd,
       onRotate: this._onRotate,
@@ -732,6 +734,8 @@ export default class InstancesEditor extends Component<Props, State> {
     return { color: isLocked ? 0xbc5753 : 0x6868e8, alpha: 1 };
   };
 
+  shouldDisplayClickableHandles = () => !this.props.tileMapTileSelection;
+
   getZoomFactor = () => {
     return this.props.instancesEditorSettings.zoomFactor;
   };
@@ -825,6 +829,12 @@ export default class InstancesEditor extends Component<Props, State> {
       const tileSet = getTileSet(object);
       if (!tileSet.atlasImage) {
         console.warn('Trying to paint on a tilemap without an atlas image.');
+        return;
+      }
+      if (isTileSetBadlyConfigured(tileSet)) {
+        console.warn(
+          'Trying to paint on a tilemap with a badly configured tileset.'
+        );
         return;
       }
       const tileMapGridCoordinates = getTilesGridCoordinatesFromPointerSceneCoordinates(

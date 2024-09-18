@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import MuiChip from '@material-ui/core/Chip';
-import { makeStyles } from '@material-ui/core';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
 
 const useStyles = makeStyles({
   root: {
@@ -15,6 +15,7 @@ const useStyles = makeStyles({
 type Props = {|
   label?: string | React.Node | void,
   color?: 'default' | 'primary' | 'secondary',
+  textColor?: 'primary' | 'secondary',
   icon?: React.Node,
   size?: 'small' | 'medium',
   variant?: 'default' | 'outlined',
@@ -33,6 +34,7 @@ type ChipInterface = {|
 
 const Chip = React.forwardRef<Props, ChipInterface>((props, ref) => {
   const chipRef = React.useRef<?HTMLDivElement>(null);
+  const muiTheme = useTheme();
   const focus = () => {
     if (chipRef.current) {
       chipRef.current.focus();
@@ -49,7 +51,12 @@ const Chip = React.forwardRef<Props, ChipInterface>((props, ref) => {
       size={props.size}
       variant={props.variant}
       avatar={props.avatar}
-      style={props.style}
+      style={{
+        ...props.style,
+        ...(props.textColor
+          ? { color: muiTheme.palette.text[props.textColor] }
+          : undefined),
+      }}
       onClick={props.onClick}
       onBlur={props.onBlur}
       onFocus={props.onFocus}

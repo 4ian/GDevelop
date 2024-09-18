@@ -173,6 +173,9 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
             );
           }}
           hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
+          onEventsBasedObjectChildrenEdited={
+            this.props.onEventsBasedObjectChildrenEdited
+          }
         />
       </div>
     );

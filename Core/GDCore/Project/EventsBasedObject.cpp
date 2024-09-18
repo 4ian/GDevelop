@@ -17,6 +17,7 @@ EventsBasedObject::EventsBasedObject()
     isAnimatable(false),
     isTextContainer(false),
     isInnerAreaFollowingParentSize(false),
+    isUsingLegacyInstancesRenderer(false),
     areaMinX(0),
     areaMinY(0),
     areaMinZ(0),
@@ -41,6 +42,7 @@ void EventsBasedObject::SerializeTo(SerializerElement& element) const {
   if (isInnerAreaFollowingParentSize) {
     element.SetBoolAttribute("isInnerAreaFollowingParentSize", true);
   }
+  element.SetBoolAttribute("isUsingLegacyInstancesRenderer", isUsingLegacyInstancesRenderer);
   element.SetIntAttribute("areaMinX", areaMinX);
   element.SetIntAttribute("areaMinY", areaMinY);
   element.SetIntAttribute("areaMinZ", areaMinZ);
@@ -88,6 +90,15 @@ void EventsBasedObject::UnserializeFrom(gd::Project& project,
   }
 
   initialInstances.UnserializeFrom(element.GetChild("instances"));
+  if (element.HasAttribute("isUsingLegacyInstancesRenderer")) {
+    isUsingLegacyInstancesRenderer =
+        element.GetBoolAttribute("isUsingLegacyInstancesRenderer", false);
+  }
+  else {
+    // Compatibility with GD <= 5.4.212
+    isUsingLegacyInstancesRenderer = initialInstances.GetInstancesCount() == 0;
+    // end of compatibility code
+  }
 }
 
 }  // namespace gd

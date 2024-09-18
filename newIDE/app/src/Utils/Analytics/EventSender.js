@@ -370,7 +370,8 @@ export type SubscriptionDialogDisplayReason =
   | 'Add collaborators on project'
   | 'Claim asset pack'
   | 'Callout in Classroom tab'
-  | 'Unlock build type';
+  | 'Unlock build type'
+  | 'Manage subscription as teacher';
 
 export const sendSubscriptionDialogShown = (metadata: {|
   reason: SubscriptionDialogDisplayReason,

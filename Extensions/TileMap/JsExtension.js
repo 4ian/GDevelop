@@ -630,7 +630,12 @@ const defineSimpleTileMap = function (extension, _, gd) {
 
     objectProperties.set(
       'columnCount',
-      new gd.PropertyDescriptor((objectContent.columnCount || 4).toString())
+      new gd.PropertyDescriptor(
+        (typeof objectContent.columnCount === 'undefined'
+          ? 4
+          : objectContent.columnCount
+        ).toString()
+      )
         .setType('number')
         .setLabel(_('Columns'))
         .setDescription(_('Number of columns.'))
@@ -638,7 +643,12 @@ const defineSimpleTileMap = function (extension, _, gd) {
     );
     objectProperties.set(
       'rowCount',
-      new gd.PropertyDescriptor((objectContent.rowCount || 4).toString())
+      new gd.PropertyDescriptor(
+        (typeof objectContent.rowCount === 'undefined'
+          ? 4
+          : objectContent.rowCount
+        ).toString()
+      )
         .setType('number')
         .setLabel(_('Rows'))
         .setDescription(_('Number of rows.'))
@@ -646,7 +656,12 @@ const defineSimpleTileMap = function (extension, _, gd) {
     );
     objectProperties.set(
       'tileSize',
-      new gd.PropertyDescriptor((objectContent.tileSize || 8).toString())
+      new gd.PropertyDescriptor(
+        (typeof objectContent.tileSize === 'undefined'
+          ? 8
+          : objectContent.tileSize
+        ).toString()
+      )
         .setType('number')
         .setLabel(_('Tile size'))
         .setDescription(_('Tile size in pixels.'))
@@ -736,7 +751,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
     .addExpression(
       'TilesetColumnCount',
       _('Tileset column count'),
-      _('Get the number of column in the tileset.'),
+      _('Get the number of columns in the tileset.'),
       '',
       'JsPlatform/Extensions/tile_map.svg'
     )
@@ -747,7 +762,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
     .addExpression(
       'TilesetRowCount',
       _('Tileset row count'),
-      _('Get the number of row in the tileset.'),
+      _('Get the number of rows in the tileset.'),
       '',
       'JsPlatform/Extensions/tile_map.svg'
     )
@@ -816,7 +831,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       'TileIdAtPosition',
       _('Tile (at position)'),
       _('the id of the tile at the scene coordinates'),
-      _('the tile id at scene coordinates _PARAM3_ ; _PARAM4_'),
+      _('the tile id in _PARAM0_ at scene coordinates _PARAM3_ ; _PARAM4_'),
       '',
       'JsPlatform/Extensions/tile_map.svg'
     )
@@ -833,7 +848,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       _('Flip tile vertically (at position)'),
       _('Flip tile vertically at scene coordinates.'),
       _(
-        'Flip tile vertically at scene coordinates _PARAM1_ ; _PARAM2_: _PARAM3_'
+        'Flip tile vertically in _PARAM0_ at scene coordinates _PARAM1_ ; _PARAM2_: _PARAM3_'
       ),
       _('Effects'),
       'res/actions/flipY24.png',
@@ -852,7 +867,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       _('Flip tile horizontally (at position)'),
       _('Flip tile horizontally at scene coordinates.'),
       _(
-        'Flip tile horizontally at scene coordinates _PARAM1_ ; _PARAM2_: _PARAM3_'
+        'Flip tile horizontally in _PARAM0_ at scene coordinates _PARAM1_ ; _PARAM2_: _PARAM3_'
       ),
       _('Effects'),
       'res/actions/flipX24.png',
@@ -870,7 +885,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       'RemoveTileAtPosition',
       _('Remove tile (at position)'),
       _('Remove the tile at the scene coordinates.'),
-      _('Remove tile at scene coordinates _PARAM1_ ; _PARAM2_'),
+      _('Remove tile in _PARAM0_ at scene coordinates _PARAM1_ ; _PARAM2_'),
       '',
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
@@ -904,7 +919,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       _('Flip tile vertically (on the grid)'),
       _('Flip tile vertically at grid coordinates.'),
       _(
-        'Flip tile vertically at grid coordinates _PARAM1_ ; _PARAM2_: _PARAM3_'
+        'Flip tile vertically in _PARAM0_ at grid coordinates _PARAM1_ ; _PARAM2_: _PARAM3_'
       ),
       _('Effects'),
       'res/actions/flipY24.png',
@@ -923,7 +938,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       _('Flip tile horizontally (on the grid)'),
       _('Flip tile horizontally at grid coordinates.'),
       _(
-        'Flip tile horizontally at grid coordinates _PARAM1_ ; _PARAM2_: _PARAM3_'
+        'Flip tile horizontally in _PARAM0_ at grid coordinates _PARAM1_ ; _PARAM2_: _PARAM3_'
       ),
       _('Effects'),
       'res/actions/flipX24.png',
@@ -941,7 +956,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       'RemoveTileAtGridCoordinates',
       _('Remove tile (on the grid)'),
       _('Remove the tile at the grid coordinates.'),
-      _('Remove tile at grid coordinates _PARAM1_ ; _PARAM2_'),
+      _('Remove tile in _PARAM0_ at grid coordinates _PARAM1_ ; _PARAM2_'),
       '',
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
@@ -958,7 +973,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       _('Tile flipped horizontally (at position)'),
       _('Check if tile at scene coordinates is flipped horizontally.'),
       _(
-        'The tile at scene coordinates _PARAM1_ ; _PARAM2_ is flipped horizontally'
+        'The tile in _PARAM0_ at scene coordinates _PARAM1_ ; _PARAM2_ is flipped horizontally'
       ),
       _('Effects'),
       'res/actions/flipX24.png',
@@ -976,7 +991,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       _('Tile flipped vertically (at position)'),
       _('Check if tile at scene coordinates is flipped vertically.'),
       _(
-        'The tile at scene coordinates _PARAM1_ ; _PARAM2_ is flipped vertically'
+        'The tile in _PARAM0_ at scene coordinates _PARAM1_ ; _PARAM2_ is flipped vertically'
       ),
       _('Effects'),
       'res/actions/flipY24.png',
@@ -994,7 +1009,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       _('Tile flipped horizontally (on the grid)'),
       _('Check if tile at grid coordinates is flipped horizontally.'),
       _(
-        'The tile at grid coordinates _PARAM1_ ; _PARAM2_ is flipped horizontally'
+        'The tile in _PARAM0_ at grid coordinates _PARAM1_ ; _PARAM2_ is flipped horizontally'
       ),
       _('Effects'),
       'res/actions/flipX24.png',
@@ -1012,7 +1027,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       _('Tile flipped vertically (on the grid)'),
       _('Check if tile at grid coordinates is flipped vertically.'),
       _(
-        'The tile at grid coordinates _PARAM1_ ; _PARAM2_ is flipped vertically'
+        'The tile in _PARAM0_ at grid coordinates _PARAM1_ ; _PARAM2_ is flipped vertically'
       ),
       _('Effects'),
       'res/actions/flipY24.png',
@@ -2324,7 +2339,9 @@ module.exports = {
           ? this._editableTileMap.isEmpty()
           : false;
         let objectToChange;
-        if (isTileMapEmpty || !atlasImageResourceName) {
+        if (this.errorPixiObject) {
+          objectToChange = this.errorPixiObject;
+        } else if (isTileMapEmpty || !atlasImageResourceName) {
           this.tileMapPixiObject.visible = false;
           this._placeholderPixiObject.visible = true;
           this._placeholderTextPixiObject.text = !atlasImageResourceName

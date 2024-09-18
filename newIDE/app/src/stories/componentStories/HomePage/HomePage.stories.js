@@ -108,6 +108,9 @@ const WrappedHomePage = ({
               onOpenNewProjectSetupDialog={() =>
                 action('onOpenNewProjectSetupDialog')()
               }
+              onOpenTemplateFromTutorial={() =>
+                action('onOpenTemplateFromTutorial')()
+              }
               canSave={true}
               onSave={() => action('onSave')()}
               selectInAppTutorial={() => action('select in app tutorial')()}

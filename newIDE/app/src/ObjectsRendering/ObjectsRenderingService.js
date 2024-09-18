@@ -9,6 +9,7 @@ import RenderedShapePainterInstance from './Renderers/RenderedShapePainterInstan
 import RenderedTextEntryInstance from './Renderers/RenderedTextEntryInstance';
 import RenderedParticleEmitterInstance from './Renderers/RenderedParticleEmitterInstance';
 import RenderedCustomObjectInstance from './Renderers/RenderedCustomObjectInstance';
+import LegacyRenderedCustomObjectInstance from './Renderers/LegacyRenderedCustomObjectInstance';
 import RenderedSprite3DInstance from './Renderers/RenderedSprite3DInstance';
 import PixiResourcesLoader from './PixiResourcesLoader';
 import ResourcesLoader from '../ResourcesLoader';
@@ -107,6 +108,15 @@ const ObjectsRenderingService = {
           eventsBasedObject.getObjects().getObjectsCount() === 0
         ) {
           return new RenderedSprite3DInstance(
+            project,
+            instance,
+            associatedObjectConfiguration,
+            pixiContainer,
+            threeGroup,
+            PixiResourcesLoader
+          );
+        } else if (eventsBasedObject.isUsingLegacyInstancesRenderer()) {
+          return new LegacyRenderedCustomObjectInstance(
             project,
             instance,
             associatedObjectConfiguration,

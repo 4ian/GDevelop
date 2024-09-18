@@ -13,31 +13,38 @@ import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext'
 import {
   fakeAuthenticatedTeacherFromEducationPlan,
   fakeAuthenticatedUserWithEducationPlan,
+  fakeAuthenticatedUserWithNoSubscription,
 } from '../../../fixtures/GDevelopServicesTestData';
+import i18nProviderDecorator from '../../I18nProviderDecorator';
 
 export default {
   title: 'HomePage/LearnSection',
   component: LearnSection,
-  decorators: [paperDecorator, inAppTutorialDecorator],
+  decorators: [paperDecorator, inAppTutorialDecorator, i18nProviderDecorator],
 };
 
 export const Default = () => (
-  <PreferencesContext.Provider value={initialPreferences}>
-    <TutorialContext.Provider
-      value={{
-        tutorials: fakeTutorials,
-        fetchTutorials: () => {},
-        error: null,
-      }}
-    >
-      <LearnSection
-        initialCategory={null}
-        onOpenExampleStore={action('onOpenExampleStore')}
-        onTabChange={() => {}}
-        selectInAppTutorial={action('selectInAppTutorial')}
-      />
-    </TutorialContext.Provider>
-  </PreferencesContext.Provider>
+  <AuthenticatedUserContext.Provider
+    value={fakeAuthenticatedUserWithNoSubscription}
+  >
+    <PreferencesContext.Provider value={initialPreferences}>
+      <TutorialContext.Provider
+        value={{
+          tutorials: fakeTutorials,
+          fetchTutorials: () => {},
+          error: null,
+        }}
+      >
+        <LearnSection
+          initialCategory={null}
+          onOpenExampleStore={action('onOpenExampleStore')}
+          onTabChange={() => {}}
+          selectInAppTutorial={action('selectInAppTutorial')}
+          onOpenTemplateFromTutorial={action('onOpenTemplateFromTutorial')}
+        />
+      </TutorialContext.Provider>
+    </PreferencesContext.Provider>
+  </AuthenticatedUserContext.Provider>
 );
 
 export const EducationSubscriber = () => (
@@ -57,6 +64,7 @@ export const EducationSubscriber = () => (
           onOpenExampleStore={action('onOpenExampleStore')}
           onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
+          onOpenTemplateFromTutorial={action('onOpenTemplateFromTutorial')}
         />
       </TutorialContext.Provider>
     </PreferencesContext.Provider>
@@ -80,6 +88,7 @@ export const EducationTeacher = () => (
           onOpenExampleStore={action('onOpenExampleStore')}
           onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
+          onOpenTemplateFromTutorial={action('onOpenTemplateFromTutorial')}
         />
       </TutorialContext.Provider>
     </PreferencesContext.Provider>
@@ -100,6 +109,7 @@ export const Loading = () => (
         onOpenExampleStore={action('onOpenExampleStore')}
         onTabChange={() => {}}
         selectInAppTutorial={action('selectInAppTutorial')}
+        onOpenTemplateFromTutorial={action('onOpenTemplateFromTutorial')}
       />
     </TutorialContext.Provider>
   </PreferencesContext.Provider>

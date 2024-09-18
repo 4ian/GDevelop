@@ -71,7 +71,6 @@ const PreferencesDialog = ({
     setIsAlwaysOnTopInPreview,
     setEventsSheetCancelInlineParameter,
     setShowCommunityExtensions,
-    setShowEventBasedObjectsEditor,
     setShowInAppTutorialDeveloperMode,
     setOpenDiagnosticReportAutomatically,
     setShowDeprecatedInstructionWarning,
@@ -507,16 +506,6 @@ const PreferencesDialog = ({
           <Text size="block-title">
             <Trans>Contributor options</Trans>
           </Text>
-          <Toggle
-            onToggle={(e, check) => setShowEventBasedObjectsEditor(check)}
-            toggled={values.showEventBasedObjectsEditor}
-            labelPosition="right"
-            label={
-              <Trans>
-                Show custom objects in the extension editor (experimental)
-              </Trans>
-            }
-          />
           <Toggle
             onToggle={(e, check) => setShowInAppTutorialDeveloperMode(check)}
             toggled={values.showInAppTutorialDeveloperMode}

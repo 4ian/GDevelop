@@ -111,7 +111,7 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
    * adapt there size. This is removing the ScalableCapability.
    */
   EventsBasedObject &
-  MarkAsInnerAreaExpandingWithParent(bool isInnerAreaExpandingWithParent_) {
+  MarkAsInnerAreaFollowingParentSize(bool isInnerAreaExpandingWithParent_) {
     isInnerAreaFollowingParentSize = isInnerAreaExpandingWithParent_;
     return *this;
   }
@@ -128,6 +128,24 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
    */
   bool IsInnerAreaFollowingParentSize() const {
     return isInnerAreaFollowingParentSize;
+  }
+
+  /**
+   * \brief Declare that custom object are rendered using their child-objects
+   * instead of their child-instances.
+   */
+  EventsBasedObject &
+  MakAsUsingLegacyInstancesRenderer(bool isUsingLegacyInstancesRenderer_) {
+    isUsingLegacyInstancesRenderer = isUsingLegacyInstancesRenderer_;
+    return *this;
+  }
+
+  /**
+   * \brief Return true if custom object are rendered using their child-objects
+   * instead of their child-instances.
+   */
+  bool IsUsingLegacyInstancesRenderer() const {
+    return isUsingLegacyInstancesRenderer;
   }
 
   /**
@@ -304,6 +322,7 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
   bool isAnimatable;
   bool isTextContainer;
   bool isInnerAreaFollowingParentSize;
+  bool isUsingLegacyInstancesRenderer;
   gd::InitialInstancesContainer initialInstances;
   gd::LayersContainer layers;
   gd::ObjectsContainer objectsContainer;

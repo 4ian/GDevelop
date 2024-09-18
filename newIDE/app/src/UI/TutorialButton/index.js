@@ -1,11 +1,13 @@
 // @flow
 import * as React from 'react';
+import { Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 import TextButton from '../TextButton';
 import Window from '../../Utils/Window';
-import { Trans } from '@lingui/macro';
 import { TutorialContext } from '../../Tutorial/TutorialContext';
 import { type Tutorial } from '../../Utils/GDevelopServices/Tutorial';
 import Video from '../CustomSvgIcons/Video';
+import { selectMessageByLocale } from '../../Utils/i18n/MessageByLocale';
 
 type PropsType = {|
   tutorialId: ?string,
@@ -27,16 +29,23 @@ const TutorialButton = (props: PropsType) => {
     return props.renderIfNotFound || null;
   }
   return (
-    <TextButton
-      onClick={() => {
-        if (tutorial.link) {
-          Window.openExternalURL(tutorial.link);
-        }
-      }}
-      target="_blank"
-      label={props.label || <Trans>Tutorial</Trans>}
-      icon={<Video />}
-    />
+    <I18n>
+      {({ i18n }) => (
+        <TextButton
+          onClick={() => {
+            const link =
+              selectMessageByLocale(i18n, tutorial.linkByLocale) ||
+              tutorial.link;
+            if (link) {
+              Window.openExternalURL(link);
+            }
+          }}
+          target="_blank"
+          label={props.label || <Trans>Tutorial</Trans>}
+          icon={<Video />}
+        />
+      )}
+    </I18n>
   );
 };
 

@@ -67,7 +67,7 @@
   }
 
   setHeight(height) {
-    return this._customHeight = height;
+    this._customHeight = height;
   }
 
   getCenterX() {

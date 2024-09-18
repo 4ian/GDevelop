@@ -512,6 +512,7 @@ const TileSetVisualizer = ({
             x: Math.max(startX, x),
             y: Math.max(startY, y),
           };
+          // TODO: Add possibility to unselect tile.
           const newSelection = {
             kind: 'rectangle',
             coordinates: [topLeftCorner, bottomRightCorner],

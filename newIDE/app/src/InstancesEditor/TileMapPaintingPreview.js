@@ -100,6 +100,54 @@ export const isTileSetBadlyConfigured = ({
   );
 };
 
+export const isSelectionASingleTileRectangle = (
+  tileMapTileSelection: TileMapTileSelection
+): boolean => {
+  return (
+    tileMapTileSelection.kind === 'rectangle' &&
+    tileMapTileSelection.coordinates.length === 2 &&
+    tileMapTileSelection.coordinates[0].x ===
+      tileMapTileSelection.coordinates[1].x &&
+    tileMapTileSelection.coordinates[0].y ===
+      tileMapTileSelection.coordinates[1].y
+  );
+};
+
+type Corner = 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight';
+
+const getTileCoordinatesOfCorner = ({
+  corner,
+  topLeftCorner,
+  bottomRightCorner,
+}: {|
+  corner: Corner,
+  topLeftCorner: {| x: number, y: number |},
+  bottomRightCorner: {| x: number, y: number |},
+|}) => {
+  return {
+    x: corner.toLowerCase().includes('left')
+      ? topLeftCorner.x
+      : bottomRightCorner.x,
+    y: corner.toLowerCase().includes('top')
+      ? topLeftCorner.y
+      : bottomRightCorner.y,
+  };
+};
+
+const getCornerFromFlippingInstructions = ({
+  flipHorizontally,
+  flipVertically,
+}: {|
+  flipHorizontally: boolean,
+  flipVertically: boolean,
+|}): Corner => {
+  if (flipHorizontally) {
+    return flipVertically ? 'bottomRight' : 'topRight';
+  } else {
+    return flipVertically ? 'bottomLeft' : 'topLeft';
+  }
+};
+
 /**
  * Returns the list of tiles corresponding to the user selection.
  * If only one coordinate is present, only one tile is placed at the slot the
@@ -108,35 +156,56 @@ export const isTileSetBadlyConfigured = ({
  * two coordinates being the top left and bottom right corner of the rectangle.
  */
 export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
+  tileMapTileSelection,
   coordinates,
   tileSize,
   sceneToTileMapTransformation,
 }: {|
+  tileMapTileSelection: TileMapTileSelection,
   coordinates: Array<{| x: number, y: number |}>,
   tileSize: number,
   sceneToTileMapTransformation: AffineTransformation,
-|}): Array<{| x: number, y: number |}> => {
+|}): {|
+  tileCoordinates?: {| x: number, y: number |},
+  erase?: boolean,
+  topLeftCorner: {| x: number, y: number |},
+  bottomRightCorner: {| x: number, y: number |},
+|}[] => {
   if (coordinates.length === 0) return [];
 
   const tilesCoordinatesInTileMapGrid = [];
-
   if (coordinates.length === 1) {
+    // One coordinate corresponds to the pointer over the canvas.
     const coordinatesInTileMapGrid = [0, 0];
     sceneToTileMapTransformation.transform(
       [coordinates[0].x, coordinates[0].y],
       coordinatesInTileMapGrid
     );
-    coordinatesInTileMapGrid[0] = Math.floor(
-      coordinatesInTileMapGrid[0] / tileSize
-    );
-    coordinatesInTileMapGrid[1] = Math.floor(
-      coordinatesInTileMapGrid[1] / tileSize
-    );
-    tilesCoordinatesInTileMapGrid.push({
-      x: coordinatesInTileMapGrid[0],
-      y: coordinatesInTileMapGrid[1],
-    });
+    const x = Math.floor(coordinatesInTileMapGrid[0] / tileSize);
+    const y = Math.floor(coordinatesInTileMapGrid[1] / tileSize);
+    let tileCoordinates;
+    if (tileMapTileSelection.kind === 'rectangle') {
+      const topLeftCorner = tileMapTileSelection.coordinates[0];
+      const bottomRightCorner = tileMapTileSelection.coordinates[1];
+      tileCoordinates = getTileCoordinatesOfCorner({
+        topLeftCorner,
+        bottomRightCorner,
+        corner: getCornerFromFlippingInstructions({
+          flipHorizontally: tileMapTileSelection.flipHorizontally,
+          flipVertically: tileMapTileSelection.flipVertically,
+        }),
+      });
+    }
+    return [
+      {
+        erase: tileMapTileSelection.kind === 'erase',
+        tileCoordinates,
+        topLeftCorner: { x, y },
+        bottomRightCorner: { x, y },
+      },
+    ];
   }
+
   if (coordinates.length === 2) {
     const firstPointCoordinatesInTileMap = [0, 0];
     sceneToTileMapTransformation.transform(
@@ -176,19 +245,18 @@ export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
       Math.floor(bottomRightCornerCoordinatesInTileMap[0] / tileSize),
       Math.floor(bottomRightCornerCoordinatesInTileMap[1] / tileSize),
     ];
-
-    for (
-      let columnIndex = topLeftCornerCoordinatesInTileMapGrid[0];
-      columnIndex <= bottomRightCornerCoordinatesInTileMapGrid[0];
-      columnIndex++
-    ) {
-      for (
-        let rowIndex = topLeftCornerCoordinatesInTileMapGrid[1];
-        rowIndex <= bottomRightCornerCoordinatesInTileMapGrid[1];
-        rowIndex++
-      ) {
-        tilesCoordinatesInTileMapGrid.push({ x: columnIndex, y: rowIndex });
-      }
+    if (tileMapTileSelection.kind === 'erase') {
+      tilesCoordinatesInTileMapGrid.push({
+        erase: true,
+        topLeftCorner: {
+          x: topLeftCornerCoordinatesInTileMapGrid[0],
+          y: topLeftCornerCoordinatesInTileMapGrid[1],
+        },
+        bottomRightCorner: {
+          x: bottomRightCornerCoordinatesInTileMapGrid[0],
+          y: bottomRightCornerCoordinatesInTileMapGrid[1],
+        },
+      });
     }
   }
   return tilesCoordinatesInTileMapGrid;
@@ -287,7 +355,54 @@ class TileMapPaintingPreview {
     }
   }
 
-  _getTilingSpriteWithSingleTexture({
+  _getTilingSpriteForRectangle({
+    bottomRightCorner,
+    topLeftCorner,
+    texture,
+    scaleX,
+    scaleY,
+    flipHorizontally,
+    flipVertically,
+    tileSize,
+    angle,
+  }: {|
+    bottomRightCorner: {| x: number, y: number |},
+    topLeftCorner: {| x: number, y: number |},
+    scaleX: number,
+    scaleY: number,
+    tileSize: number,
+    flipHorizontally: boolean,
+    flipVertically: boolean,
+    angle: number,
+    texture: PIXI.Texture,
+  |}) {
+    const sprite = new PIXI.TilingSprite(texture);
+    const workingPoint = [0, 0];
+
+    sprite.tileScale.x =
+      (flipHorizontally ? -1 : +1) * this.viewPosition.toCanvasScale(scaleX);
+    sprite.tileScale.y =
+      (flipVertically ? -1 : +1) * this.viewPosition.toCanvasScale(scaleY);
+
+    this.tileMapToSceneTransformation.transform(
+      [topLeftCorner.x * tileSize, topLeftCorner.y * tileSize],
+      workingPoint
+    );
+    const tileSizeInCanvas = this.viewPosition.toCanvasScale(tileSize);
+
+    sprite.x = this.viewPosition.toCanvasScale(workingPoint[0]);
+    sprite.y = this.viewPosition.toCanvasScale(workingPoint[1]);
+    sprite.width =
+      (bottomRightCorner.x - topLeftCorner.x + 1) * tileSizeInCanvas * scaleX;
+    sprite.height =
+      (bottomRightCorner.y - topLeftCorner.y + 1) * tileSizeInCanvas * scaleY;
+
+    sprite.angle = angle;
+
+    return sprite;
+  }
+
+  _getPreviewSprites({
     instance,
     tileSet,
     isBadlyConfigured,
@@ -297,26 +412,7 @@ class TileMapPaintingPreview {
     tileSet: TileSet,
     isBadlyConfigured: boolean,
     tileMapTileSelection: TileMapTileSelection,
-  }): ?PIXI.Sprite {
-    const { tileSize } = tileSet;
-    let texture;
-    if (isBadlyConfigured) {
-      texture = PixiResourcesLoader.getInvalidPIXITexture();
-    } else {
-      if (tileMapTileSelection.kind === 'rectangle') {
-        texture = this._getTextureInAtlas({
-          tileSet,
-          ...tileMapTileSelection.coordinates[0],
-        });
-        if (!texture) return null;
-      } else if (tileMapTileSelection.kind === 'erase') {
-        texture = PIXI.Texture.from(
-          'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAARSURBVHgBY7h58+Z/BhgAcQA/VAcVLiw46wAAAABJRU5ErkJggg=='
-        );
-        texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
-      }
-    }
-
+  }): ?PIXI.Container {
     const renderedInstance = this.getRendererOfInstance(instance);
     if (
       !renderedInstance ||
@@ -340,61 +436,59 @@ class TileMapPaintingPreview {
     const { scaleX, scaleY } = scales;
     const coordinates = this.getCoordinatesToRender();
     if (coordinates.length === 0) return null;
-    const tileSizeInCanvas = this.viewPosition.toCanvasScale(tileSize);
-    const spriteWidth = tileSizeInCanvas * scaleX;
-    const spriteHeight = tileSizeInCanvas * scaleY;
+    const { tileSize } = tileSet;
 
-    const spritesCoordinatesInTileMapGrid = getTilesGridCoordinatesFromPointerSceneCoordinates(
+    const tilesCoordinatesInTileMapGrid = getTilesGridCoordinatesFromPointerSceneCoordinates(
       {
+        tileMapTileSelection,
         coordinates,
         tileSize,
         sceneToTileMapTransformation: this.sceneToTileMapTransformation,
       }
     );
-    if (spritesCoordinatesInTileMapGrid.length === 0) {
+    if (tilesCoordinatesInTileMapGrid.length === 0) {
       console.warn("Could't get coordinates to render in tile map grid.");
       return null;
     }
+    const container = new PIXI.Container();
+    tilesCoordinatesInTileMapGrid.forEach(tilesCoordinates => {
+      const {
+        bottomRightCorner,
+        topLeftCorner,
+        tileCoordinates,
+      } = tilesCoordinates;
+      let texture;
+      if (isBadlyConfigured) {
+        texture = PixiResourcesLoader.getInvalidPIXITexture();
+      } else {
+        if (tileMapTileSelection.kind === 'rectangle' && tileCoordinates) {
+          texture = this._getTextureInAtlas({
+            tileSet,
+            ...tileCoordinates,
+          });
+          if (!texture) return null;
+        } else if (tileMapTileSelection.kind === 'erase') {
+          texture = PIXI.Texture.from(
+            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAARSURBVHgBY7h58+Z/BhgAcQA/VAcVLiw46wAAAABJRU5ErkJggg=='
+          );
+          texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
+        }
+      }
+      const sprite = this._getTilingSpriteForRectangle({
+        bottomRightCorner,
+        topLeftCorner,
+        texture,
+        scaleX,
+        scaleY,
+        flipHorizontally: tileMapTileSelection.flipHorizontally || false,
+        flipVertically: tileMapTileSelection.flipVertically || false,
+        tileSize,
+        angle: instance.getAngle(),
+      });
+      container.addChild(sprite);
+    });
 
-    const workingPoint = [0, 0];
-
-    const sprite = new PIXI.TilingSprite(texture);
-
-    sprite.tileScale.x =
-      (tileMapTileSelection.flipHorizontally ? -1 : +1) *
-      this.viewPosition.toCanvasScale(scaleX);
-    sprite.tileScale.y =
-      (tileMapTileSelection.flipVertically ? -1 : +1) *
-      this.viewPosition.toCanvasScale(scaleY);
-    sprite.width = spriteWidth;
-    sprite.height = spriteHeight;
-
-    let minX = Infinity;
-    let minY = Infinity;
-    let maxX = -Infinity;
-    let maxY = -Infinity;
-    for (const { x, y } of spritesCoordinatesInTileMapGrid) {
-      if (x < minX) minX = x;
-      if (y < minY) minY = y;
-      if (x > maxX) maxX = x;
-      if (y > maxY) maxY = y;
-    }
-
-    this.tileMapToSceneTransformation.transform(
-      [minX * tileSize, minY * tileSize],
-      workingPoint
-    );
-
-    sprite.x = this.viewPosition.toCanvasScale(workingPoint[0]);
-    sprite.y = this.viewPosition.toCanvasScale(workingPoint[1]);
-    sprite.width =
-      (maxX - minX + 1) * this.viewPosition.toCanvasScale(tileSize) * scaleX;
-    sprite.height =
-      (maxY - minY + 1) * this.viewPosition.toCanvasScale(tileSize) * scaleY;
-
-    sprite.angle = instance.getAngle();
-
-    return sprite;
+    return container;
   }
 
   render() {
@@ -418,16 +512,16 @@ class TileMapPaintingPreview {
 
     if (
       isBadlyConfigured ||
-      tileMapTileSelection.kind === 'rectangle' || // TODO: Make sure a single tile is selected.
+      tileMapTileSelection.kind === 'rectangle' ||
       tileMapTileSelection.kind === 'erase'
     ) {
-      const sprite = this._getTilingSpriteWithSingleTexture({
+      const container = this._getPreviewSprites({
         instance,
         tileSet,
         tileMapTileSelection,
         isBadlyConfigured,
       });
-      if (sprite) this.preview.addChild(sprite);
+      if (container) this.preview.addChild(container);
     }
 
     const canvasCoordinates = this.viewPosition.toCanvasCoordinates(0, 0);

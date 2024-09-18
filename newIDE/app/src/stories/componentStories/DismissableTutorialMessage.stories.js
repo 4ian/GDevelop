@@ -11,23 +11,29 @@ import {
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import { TutorialContext } from '../../Tutorial/TutorialContext';
 
-const defaultTutorials = [
+const defaultTutorials: Array<Tutorial> = [
   {
     id: 'tutorial-1',
-    title: 'Tutorial 1',
-    description: 'Description 1',
-    thumbnailUrl:
-      'https://raw.githubusercontent.com/4ian/GDevelop/master/Core/docs/images/gdlogo.png',
-    link: 'https://example.com/tutorial.html',
+    titleByLocale: { en: 'Tutorial 1' },
+    category: 'official-beginner',
+    descriptionByLocale: { en: 'Description 1' },
+    thumbnailUrlByLocale: {
+      en:
+        'https://raw.githubusercontent.com/4ian/GDevelop/master/Core/docs/images/gdlogo.png',
+    },
+    linkByLocale: { en: 'https://example.com/tutorial.html' },
     type: 'video',
   },
   {
     id: 'tutorial-2',
-    title: 'Tutorial 2',
-    description: 'Description 2',
-    thumbnailUrl:
-      'https://raw.githubusercontent.com/4ian/GDevelop/master/Core/docs/images/gdlogo.png',
-    link: 'https://example.com/tutorial.html',
+    titleByLocale: { en: 'Tutorial 2' },
+    category: 'official-beginner',
+    descriptionByLocale: { en: 'Description 2' },
+    thumbnailUrlByLocale: {
+      en:
+        'https://raw.githubusercontent.com/4ian/GDevelop/master/Core/docs/images/gdlogo.png',
+    },
+    linkByLocale: { en: 'https://example.com/tutorial.html' },
     type: 'text',
   },
 ];

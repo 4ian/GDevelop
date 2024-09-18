@@ -16,6 +16,8 @@ declare class gdCustomObjectConfiguration extends gdObjectConfiguration {
   getInitialInstanceProperties(instance: gdInitialInstance): gdMapStringPropertyDescriptor;
   updateInitialInstanceProperty(instance: gdInitialInstance, name: string, value: string): boolean;
   getAnimations(): gdSpriteAnimationList;
+  isChildObjectFolded(childName: string): boolean;
+  setChildObjectFolded(childName: string, folded: boolean): void;
   static getEdgeAnchorFromString(value: string): CustomObjectConfiguration_EdgeAnchor;
   delete(): void;
   ptr: number;

@@ -749,6 +749,8 @@ export class CustomObjectConfiguration extends ObjectConfiguration {
   getInitialInstanceProperties(instance: InitialInstance): MapStringPropertyDescriptor;
   updateInitialInstanceProperty(instance: InitialInstance, name: string, value: string): boolean;
   getAnimations(): SpriteAnimationList;
+  isChildObjectFolded(childName: string): boolean;
+  setChildObjectFolded(childName: string, folded: boolean): void;
   static getEdgeAnchorFromString(value: string): CustomObjectConfiguration_EdgeAnchor;
 }
 

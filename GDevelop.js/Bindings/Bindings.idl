@@ -905,6 +905,9 @@ interface CustomObjectConfiguration {
 
     [Ref] SpriteAnimationList GetAnimations();
 
+    boolean IsChildObjectFolded([Const] DOMString childName);
+    void SetChildObjectFolded([Const] DOMString childName, boolean folded);
+
     CustomObjectConfiguration_EdgeAnchor STATIC_GetEdgeAnchorFromString([Const] DOMString value);
 };
 CustomObjectConfiguration implements ObjectConfiguration;

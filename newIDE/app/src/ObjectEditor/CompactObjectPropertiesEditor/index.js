@@ -135,7 +135,10 @@ export const CompactObjectPropertiesEditor = ({
   onEditObject,
 }: Props) => {
   const forceUpdate = useForceUpdate();
-  const [showObjectAdvancedOptions, setShowObjectAdvancedOptions] = React.useState(false);
+  const [
+    showObjectAdvancedOptions,
+    setShowObjectAdvancedOptions,
+  ] = React.useState(false);
   const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
   const variablesListRef = React.useRef<?VariablesListInterface>(null);
   const object = objects[0];
@@ -216,6 +219,8 @@ export const CompactObjectPropertiesEditor = ({
     [objectConfigurationAsGd, schemaRecomputeTrigger]
   );
   const hasObjectAdvancedProperties = objectAdvancedPropertiesSchema.length > 0;
+  const hasSomeObjectProperties =
+    objectBasicPropertiesSchema.length > 0 || hasObjectAdvancedProperties;
 
   // Behaviors:
   const {
@@ -304,19 +309,26 @@ export const CompactObjectPropertiesEditor = ({
                 <ShareExternal style={styles.icon} />
               </IconButton>
             </LineStackLayout>
-            <CompactPropertiesEditor
-              project={project}
-              resourceManagementProps={resourceManagementProps}
-              unsavedChanges={unsavedChanges}
-              schema={objectBasicPropertiesSchema}
-              instances={[
-                { object, objectConfiguration: objectConfigurationAsGd },
-              ]}
-              onInstancesModified={() => {
-                // TODO: undo/redo?
-              }}
-              onRefreshAllFields={forceRecomputeSchema}
-            />
+            {!hasSomeObjectProperties && (
+              <Text size="body2" align="center" color="secondary">
+                <Trans>This object has no properties.</Trans>
+              </Text>
+            )}
+            {hasSomeObjectProperties && (
+              <CompactPropertiesEditor
+                project={project}
+                resourceManagementProps={resourceManagementProps}
+                unsavedChanges={unsavedChanges}
+                schema={objectBasicPropertiesSchema}
+                instances={[
+                  { object, objectConfiguration: objectConfigurationAsGd },
+                ]}
+                onInstancesModified={() => {
+                  // TODO: undo/redo?
+                }}
+                onRefreshAllFields={forceRecomputeSchema}
+              />
+            )}
             {!showObjectAdvancedOptions && hasObjectAdvancedProperties && (
               <FlatButton
                 fullWidth
@@ -361,6 +373,10 @@ export const CompactObjectPropertiesEditor = ({
                 const childObject = eventsBasedObject
                   .getObjects()
                   .getObjectAt(i);
+                const childObjectName = childObject.getName();
+                const isFolded = customObjectConfiguration.isChildObjectFolded(
+                  childObjectName
+                );
                 return (
                   <CollapsibleSubPanel
                     key={i}
@@ -376,11 +392,17 @@ export const CompactObjectPropertiesEditor = ({
                         onRefreshAllFields={forceRecomputeSchema}
                       />
                     )}
-                    isFolded={false}
-                    toggleFolded={() => {}}
+                    isFolded={isFolded}
+                    toggleFolded={() => {
+                      customObjectConfiguration.setChildObjectFolded(
+                        childObjectName,
+                        !isFolded
+                      );
+                      forceUpdate();
+                    }}
                     title={
                       <Text noMargin size="body">
-                        {childObject.getName()}
+                        {childObjectName}
                       </Text>
                     }
                   />
@@ -409,6 +431,11 @@ export const CompactObjectPropertiesEditor = ({
             </Line>
           </Column>
           <ColumnStackLayout>
+            {!allVisibleBehaviors.length && (
+              <Text size="body2" align="center" color="secondary">
+                <Trans>There are no behaviors on this object.</Trans>
+              </Text>
+            )}
             {allVisibleBehaviors.map(behavior => {
               const behaviorTypeName = behavior.getTypeName();
               const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
@@ -430,7 +457,7 @@ export const CompactObjectPropertiesEditor = ({
                       resourceManagementProps={resourceManagementProps}
                     />
                   )}
-                  isFolded={!behavior.isFolded()}
+                  isFolded={behavior.isFolded()}
                   toggleFolded={() => {
                     behavior.setFolded(!behavior.isFolded());
                     forceUpdate();
@@ -533,6 +560,11 @@ export const CompactObjectPropertiesEditor = ({
                 </Line>
               </Column>
               <ColumnStackLayout>
+                {effectsContainer.getEffectsCount() === 0 && (
+                  <Text size="body2" align="center" color="secondary">
+                    <Trans>There are no effects on this object.</Trans>
+                  </Text>
+                )}
                 {mapFor(
                   0,
                   effectsContainer.getEffectsCount(),
@@ -574,7 +606,7 @@ export const CompactObjectPropertiesEditor = ({
                             />
                           </ColumnStackLayout>
                         )}
-                        isFolded={!effect.isFolded()}
+                        isFolded={effect.isFolded()}
                         toggleFolded={() => {
                           effect.setFolded(!effect.isFolded());
                           forceUpdate();

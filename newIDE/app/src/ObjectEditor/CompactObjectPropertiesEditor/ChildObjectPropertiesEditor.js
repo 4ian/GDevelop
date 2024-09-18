@@ -9,6 +9,7 @@ import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
 import { Trans } from '@lingui/macro';
 import FlatButton from '../../UI/FlatButton';
 import ChevronArrowTop from '../../UI/CustomSvgIcons/ChevronArrowTop';
+import Text from '../../UI/Text';
 
 const gd: libGDevelop = global.gd;
 
@@ -81,25 +82,34 @@ export const ChildObjectPropertiesEditor = ({
     [childObjectConfigurationAsGd]
   );
   const hasObjectAdvancedProperties = objectAdvancedPropertiesSchema.length > 0;
+  const hasSomeObjectProperties =
+    objectBasicPropertiesSchema.length > 0 || hasObjectAdvancedProperties;
 
   return (
     <ColumnStackLayout noMargin noOverflowParent>
-      <CompactPropertiesEditor
-        project={project}
-        resourceManagementProps={resourceManagementProps}
-        unsavedChanges={unsavedChanges}
-        schema={objectBasicPropertiesSchema}
-        instances={[
-          {
-            object: childObject,
-            objectConfiguration: childObjectConfigurationAsGd,
-          },
-        ]}
-        onInstancesModified={() => {
-          // TODO: undo/redo?
-        }}
-        onRefreshAllFields={onRefreshAllFields}
-      />
+      {!hasSomeObjectProperties && (
+        <Text size="body2" align="center" color="secondary">
+          <Trans>This object has no properties.</Trans>
+        </Text>
+      )}
+      {hasSomeObjectProperties && (
+        <CompactPropertiesEditor
+          project={project}
+          resourceManagementProps={resourceManagementProps}
+          unsavedChanges={unsavedChanges}
+          schema={objectBasicPropertiesSchema}
+          instances={[
+            {
+              object: childObject,
+              objectConfiguration: childObjectConfigurationAsGd,
+            },
+          ]}
+          onInstancesModified={() => {
+            // TODO: undo/redo?
+          }}
+          onRefreshAllFields={onRefreshAllFields}
+        />
+      )}
       {!showObjectAdvancedOptions && hasObjectAdvancedProperties && (
         <FlatButton
           fullWidth

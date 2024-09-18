@@ -141,21 +141,21 @@ module.exports = {
         .setValue(objectContent.readOnly ? 'true' : 'false')
         .setType('boolean')
         .setLabel(_('Read only'))
-        .setGroup(_('Field appearance'));
+        .setGroup(_('Field'));
 
       objectProperties
         .getOrCreate('disabled')
         .setValue(objectContent.disabled ? 'true' : 'false')
         .setType('boolean')
         .setLabel(_('Disabled'))
-        .setGroup(_('Field appearance'));
+        .setGroup(_('Field'));
 
       objectProperties
         .getOrCreate('textColor')
         .setValue(objectContent.textColor || '0;0;0')
         .setType('color')
         .setLabel(_('Text color'))
-        .setGroup(_('Field appearance'));
+        .setGroup(_('Font'));
 
       objectProperties
         .getOrCreate('fillColor')
@@ -180,8 +180,8 @@ module.exports = {
         .getOrCreate('borderColor')
         .setValue(objectContent.borderColor || '0;0;0')
         .setType('color')
-        .setLabel(_('Border color'))
-        .setGroup(_('Field appearance'));
+        .setLabel(_('Color'))
+        .setGroup(_('Border appearance'));
 
       objectProperties
         .getOrCreate('borderOpacity')
@@ -192,15 +192,15 @@ module.exports = {
           ).toString()
         )
         .setType('number')
-        .setLabel(_('Border opacity'))
-        .setGroup(_('Field appearance'));
+        .setLabel(_('Opacity'))
+        .setGroup(_('Border appearance'));
 
       objectProperties
         .getOrCreate('borderWidth')
         .setValue((objectContent.borderWidth || 0).toString())
         .setType('number')
-        .setLabel(_('Border width'))
-        .setGroup(_('Field appearance'));
+        .setLabel(_('Width'))
+        .setGroup(_('Border appearance'));
 
       return objectProperties;
     };

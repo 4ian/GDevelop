@@ -152,12 +152,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setShowGetStartedSectionByDefault: this._setShowGetStartedSection.bind(
       this
     ),
-    setShowEventBasedObjectsEditor: this._setShowEventBasedObjectsEditor.bind(
-      this
-    ),
-    getShowEventBasedObjectsEditor: this._getShowEventBasedObjectsEditor.bind(
-      this
-    ),
     setShowInAppTutorialDeveloperMode: this._setShowInAppTutorialDeveloperMode.bind(
       this
     ),
@@ -451,22 +445,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       }),
       () => this._persistValuesToLocalStorage(this.state)
     );
-  }
-
-  _setShowEventBasedObjectsEditor(showEventBasedObjectsEditor: boolean) {
-    this.setState(
-      state => ({
-        values: {
-          ...state.values,
-          showEventBasedObjectsEditor,
-        },
-      }),
-      () => this._persistValuesToLocalStorage(this.state)
-    );
-  }
-
-  _getShowEventBasedObjectsEditor() {
-    return this.state.values.showEventBasedObjectsEditor;
   }
 
   _setShowInAppTutorialDeveloperMode(showInAppTutorialDeveloperMode: boolean) {

@@ -199,6 +199,7 @@ type Props = {|
   mode?: 'column' | 'row',
   preventWrap?: boolean,
   removeSpacers?: boolean,
+  sectionTitleStyle?: 'level1' | 'level2',
 
   // If set, render the "extra" description content from fields
   // (see getExtraDescription).
@@ -235,6 +236,10 @@ const styles = {
     marginTop: marginsSize,
     borderTop: '1px solid black', // Border color is changed in the component.
   },
+  level2Separator: {
+    flex: 1,
+    borderTop: '1px solid black', // Border color is changed in the component.
+  },
 };
 
 export const Separator = () => {
@@ -243,6 +248,18 @@ export const Separator = () => {
     <div
       style={{
         ...styles.separator,
+        borderColor: gdevelopTheme.listItem.separatorColor,
+      }}
+    />
+  );
+};
+
+export const Level2Separator = () => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  return (
+    <div
+      style={{
+        ...styles.level2Separator,
         borderColor: gdevelopTheme.listItem.separatorColor,
       }}
     />
@@ -348,6 +365,7 @@ const CompactPropertiesEditor = ({
   resourceManagementProps,
   preventWrap,
   removeSpacers,
+  sectionTitleStyle,
 }: Props) => {
   const forceUpdate = useForceUpdate();
 
@@ -620,7 +638,6 @@ const CompactPropertiesEditor = ({
           <CompactSelectField
             key={field.name}
             value={getFieldValue({ instances, field })}
-            key={field.name}
             id={field.name}
             onChange={(newValue: string) => {
               instances.forEach(i => setValue(i, parseFloat(newValue) || 0));
@@ -644,7 +661,6 @@ const CompactPropertiesEditor = ({
               field,
               defaultValue: '(Multiple values)',
             })}
-            key={field.name}
             id={field.name}
             onChange={(newValue: string) => {
               instances.forEach(i => setValue(i, newValue || ''));
@@ -883,16 +899,36 @@ const CompactPropertiesEditor = ({
     },
     [instances]
   );
-  const renderSectionTitle = React.useCallback((field: SectionTitle) => {
-    return [
-      <Separator key={field.name + '-separator'} />,
-      <Line key={`section-title-${field.name}`} noMargin>
-        <Text displayInlineAsSpan size="sub-title" noMargin>
-          {field.title}
-        </Text>
-      </Line>,
-    ];
-  }, []);
+  const renderSectionTitle = React.useCallback(
+    (field: { name: string, title: string }) => {
+      return [
+        <Separator key={field.name + '-separator'} />,
+        <Line key={`section-title-${field.name}`} noMargin>
+          <Text displayInlineAsSpan size="sub-title" noMargin>
+            {field.title}
+          </Text>
+        </Line>,
+      ];
+    },
+    []
+  );
+
+  const renderSectionLevel2Title = React.useCallback(
+    (field: { name: string, title: string }) => {
+      return [
+        <Column expand noMargin key={field.name + '-title'}>
+          <Spacer />
+          <LineStackLayout expand noMargin alignItems="center">
+            <Text size="sub-title" noMargin>
+              {field.title}
+            </Text>
+            <Level2Separator key={field.name + '-separator'} />
+          </LineStackLayout>
+        </Column>,
+      ];
+    },
+    []
+  );
 
   return renderContainer(
     schema.map(field => {
@@ -944,10 +980,12 @@ const CompactPropertiesEditor = ({
 
         if (field.title) {
           return [
-            <Separator key={field.name + '-separator'} />,
-            <Text key={field.name + '-title'} size="sub-title" noMargin>
-              {field.title}
-            </Text>,
+            ...(sectionTitleStyle === 'level2'
+              ? renderSectionLevel2Title({
+                  title: field.title,
+                  name: field.name,
+                })
+              : renderSectionTitle({ title: field.title, name: field.name })),
             contentView,
           ];
         }

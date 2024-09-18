@@ -45,6 +45,12 @@ import { ChildObjectPropertiesEditor } from './ChildObjectPropertiesEditor';
 import { getSchemaWithOpenFullEditorButton } from './CompactObjectPropertiesSchema';
 import FlatButton from '../../UI/FlatButton';
 import ChevronArrowTop from '../../UI/CustomSvgIcons/ChevronArrowTop';
+import Help from '../../UI/CustomSvgIcons/Help';
+import { getHelpLink } from '../../Utils/HelpLink';
+import Window from '../../Utils/Window';
+import CompactTextField from '../../UI/CompactTextField';
+import SquaredDoubleChevronArrowDown from '../../UI/CustomSvgIcons/SquaredDoubleChevronArrowDown';
+import SquaredDoubleChevronArrowUp from '../../UI/CustomSvgIcons/SquaredDoubleChevronArrowUp';
 
 const gd: libGDevelop = global.gd;
 
@@ -100,6 +106,61 @@ const CollapsibleSubPanel = ({
   </Paper>
 );
 
+const TopLevelCollapsibleSection = ({
+  title,
+  isFolded,
+  toggleFolded,
+  renderContent,
+  renderContentAsHiddenWhenFolded,
+  onEditInFullEditor,
+  onAdd,
+}: {|
+  title: React.Node,
+  isFolded: boolean,
+  toggleFolded: () => void,
+  renderContent: () => React.Node,
+  renderContentAsHiddenWhenFolded?: boolean,
+  onEditInFullEditor: () => void,
+  onAdd?: () => void,
+|}) => (
+  <>
+    <Column>
+      <Separator />
+      <LineStackLayout alignItems="center" justifyContent="space-between">
+        <LineStackLayout noMargin alignItems="center">
+          <IconButton size="small" onClick={toggleFolded}>
+            {isFolded ? (
+              <SquaredDoubleChevronArrowUp style={styles.icon} />
+            ) : (
+              <SquaredDoubleChevronArrowDown style={styles.icon} />
+            )}
+          </IconButton>
+          <Text size="sub-title" noMargin>
+            {title}
+          </Text>
+        </LineStackLayout>
+        <Line alignItems="center" noMargin>
+          <IconButton size="small" onClick={onEditInFullEditor}>
+            <ShareExternal style={styles.icon} />
+          </IconButton>
+          {onAdd && (
+            <IconButton size="small" onClick={onAdd}>
+              <Add style={styles.icon} />
+            </IconButton>
+          )}
+        </Line>
+      </LineStackLayout>
+    </Column>
+    {isFolded ? (
+      renderContentAsHiddenWhenFolded ? (
+        <div style={{ display: 'none' }}>{renderContent()}</div>
+      ) : null
+    ) : (
+      renderContent()
+    )}
+  </>
+);
+
 type Props = {|
   project: gdProject,
   resourceManagementProps: ResourceManagementProps,
@@ -139,6 +200,10 @@ export const CompactObjectPropertiesEditor = ({
     showObjectAdvancedOptions,
     setShowObjectAdvancedOptions,
   ] = React.useState(false);
+  const [isPropertiesFolded, setIsPropertiesFolded] = React.useState(false);
+  const [isBehaviorsFolded, setIsBehaviorsFolded] = React.useState(false);
+  const [isVariablesFolded, setIsVariablesFolded] = React.useState(false);
+  const [isEffectsFolded, setIsEffectsFolded] = React.useState(false);
   const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
   const variablesListRef = React.useRef<?VariablesListInterface>(null);
   const object = objects[0];
@@ -273,6 +338,8 @@ export const CompactObjectPropertiesEditor = ({
     (customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration() ||
       customObjectConfiguration.isMarkedAsOverridingEventsBasedObjectChildrenConfiguration());
 
+  const helpLink = getHelpLink(objectMetadata.getHelpPath());
+
   return (
     <ErrorBoundary
       componentTitle={<Trans>Object properties</Trans>}
@@ -284,7 +351,7 @@ export const CompactObjectPropertiesEditor = ({
         key={objects.map((instance: gdObject) => '' + instance.ptr).join(';')}
       >
         <Column expand noMargin id="object-properties-editor" noOverflowParent>
-          <ColumnStackLayout noOverflowParent>
+          <ColumnStackLayout expand noOverflowParent>
             <LineStackLayout
               noMargin
               alignItems="center"
@@ -297,335 +364,329 @@ export const CompactObjectPropertiesEditor = ({
                   <Object2d style={styles.icon} />
                 )}
                 <Text size="body" noMargin>
-                  <Trans>Object - {object.getName()}</Trans>
+                  <Trans>{objectMetadata.getFullName()}</Trans>
                 </Text>
-              </LineStackLayout>
-              <IconButton
-                size="small"
-                onClick={() => {
-                  onEditObject(object);
-                }}
-              >
-                <ShareExternal style={styles.icon} />
-              </IconButton>
-            </LineStackLayout>
-            {!hasSomeObjectProperties && (
-              <Text size="body2" align="center" color="secondary">
-                <Trans>This object has no properties.</Trans>
-              </Text>
-            )}
-            {hasSomeObjectProperties && (
-              <CompactPropertiesEditor
-                project={project}
-                resourceManagementProps={resourceManagementProps}
-                unsavedChanges={unsavedChanges}
-                schema={objectBasicPropertiesSchema}
-                instances={[
-                  { object, objectConfiguration: objectConfigurationAsGd },
-                ]}
-                onInstancesModified={() => {
-                  // TODO: undo/redo?
-                }}
-                onRefreshAllFields={forceRecomputeSchema}
-              />
-            )}
-            {!showObjectAdvancedOptions && hasObjectAdvancedProperties && (
-              <FlatButton
-                fullWidth
-                primary
-                leftIcon={<ChevronArrowRight />}
-                label={<Trans>Show more</Trans>}
-                onClick={() => {
-                  setShowObjectAdvancedOptions(true);
-                }}
-              />
-            )}
-            {showObjectAdvancedOptions && hasObjectAdvancedProperties && (
-              <CompactPropertiesEditor
-                project={project}
-                resourceManagementProps={resourceManagementProps}
-                unsavedChanges={unsavedChanges}
-                schema={objectAdvancedPropertiesSchema}
-                instances={[
-                  { object, objectConfiguration: objectConfigurationAsGd },
-                ]}
-                onInstancesModified={() => {
-                  // TODO: undo/redo?
-                }}
-                onRefreshAllFields={forceRecomputeSchema}
-              />
-            )}
-            {showObjectAdvancedOptions && hasObjectAdvancedProperties && (
-              <FlatButton
-                fullWidth
-                primary
-                leftIcon={<ChevronArrowTop />}
-                label={<Trans>Show less</Trans>}
-                onClick={() => {
-                  setShowObjectAdvancedOptions(false);
-                }}
-              />
-            )}
-            {eventsBasedObject &&
-              customObjectConfiguration &&
-              shouldDisplayEventsBasedObjectChildren &&
-              mapFor(0, eventsBasedObject.getObjects().getObjectsCount(), i => {
-                const childObject = eventsBasedObject
-                  .getObjects()
-                  .getObjectAt(i);
-                const childObjectName = childObject.getName();
-                const isFolded = customObjectConfiguration.isChildObjectFolded(
-                  childObjectName
-                );
-                return (
-                  <CollapsibleSubPanel
-                    key={i}
-                    renderContent={() => (
-                      <ChildObjectPropertiesEditor
-                        key={i}
-                        project={project}
-                        resourceManagementProps={resourceManagementProps}
-                        unsavedChanges={unsavedChanges}
-                        eventsBasedObject={eventsBasedObject}
-                        customObjectConfiguration={customObjectConfiguration}
-                        childObject={childObject}
-                        onRefreshAllFields={forceRecomputeSchema}
-                      />
-                    )}
-                    isFolded={isFolded}
-                    toggleFolded={() => {
-                      customObjectConfiguration.setChildObjectFolded(
-                        childObjectName,
-                        !isFolded
-                      );
-                      forceUpdate();
+                {helpLink && (
+                  <IconButton
+                    size="small"
+                    onClick={() => {
+                      Window.openExternalURL(helpLink);
                     }}
-                    title={
-                      <Text noMargin size="body">
-                        {childObjectName}
-                      </Text>
-                    }
-                  />
-                );
-              })}
+                  >
+                    <Help style={styles.icon} />
+                  </IconButton>
+                )}
+              </LineStackLayout>
+            </LineStackLayout>
+            <CompactTextField
+              value={object.getName()}
+              onChange={() => {}}
+              disabled
+            />
           </ColumnStackLayout>
-          <Column>
-            <Separator />
-            <Line alignItems="center" justifyContent="space-between">
-              <Text size="sub-title" noMargin>
-                <Trans>Behaviors</Trans>
-              </Text>
-              <Line alignItems="center" noMargin>
-                <IconButton
-                  size="small"
-                  onClick={() => {
-                    onEditObject(object, 'behaviors');
-                  }}
-                >
-                  <ShareExternal style={styles.icon} />
-                </IconButton>
-                <IconButton size="small" onClick={openNewBehaviorDialog}>
-                  <Add style={styles.icon} />
-                </IconButton>
-              </Line>
-            </Line>
-          </Column>
-          <ColumnStackLayout>
-            {!allVisibleBehaviors.length && (
-              <Text size="body2" align="center" color="secondary">
-                <Trans>There are no behaviors on this object.</Trans>
-              </Text>
-            )}
-            {allVisibleBehaviors.map(behavior => {
-              const behaviorTypeName = behavior.getTypeName();
-              const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
-                gd.JsPlatform.get(),
-                behaviorTypeName
-              );
-
-              const iconUrl = behaviorMetadata.getIconFilename();
-
-              return (
-                <CollapsibleSubPanel
-                  key={behavior.ptr}
-                  renderContent={() => (
-                    <CompactBehaviorPropertiesEditor
-                      project={project}
-                      behavior={behavior}
-                      object={object}
-                      onBehaviorUpdated={() => {}}
-                      resourceManagementProps={resourceManagementProps}
-                    />
-                  )}
-                  isFolded={behavior.isFolded()}
-                  toggleFolded={() => {
-                    behavior.setFolded(!behavior.isFolded());
-                    forceUpdate();
-                  }}
-                  title={
-                    <>
-                      {iconUrl ? (
-                        <IconContainer
-                          src={iconUrl}
-                          alt={behaviorMetadata.getFullName()}
-                          size={16}
-                        />
-                      ) : null}
-                      <Spacer />
-                      <Text noMargin size="body">
-                        {behavior.getName()}
-                      </Text>
-                    </>
-                  }
-                  onRemove={() => {
-                    removeBehavior(behavior.getName());
-                  }}
-                />
-              );
-            })}
-          </ColumnStackLayout>
-          <Column>
-            <Separator />
-            <Line alignItems="center" justifyContent="space-between">
-              <Text size="sub-title" noMargin>
-                <Trans>Object Variables</Trans>
-              </Text>
-              <Line alignItems="center" noMargin>
-                <IconButton
-                  size="small"
-                  onClick={() => {
-                    onEditObject(object, 'variables');
-                  }}
-                >
-                  <ShareExternal style={styles.icon} />
-                </IconButton>
-                <IconButton
-                  size="small"
-                  onClick={
-                    variablesListRef.current
-                      ? variablesListRef.current.addVariable
-                      : undefined
-                  }
-                >
-                  <Add style={styles.icon} />
-                </IconButton>
-              </Line>
-            </Line>
-          </Column>
-          <VariablesList
-            ref={variablesListRef}
-            projectScopedContainersAccessor={projectScopedContainersAccessor}
-            directlyStoreValueChangesWhileEditing
-            variablesContainer={object.getVariables()}
-            areObjectVariables
-            size="small"
-            onComputeAllVariableNames={() =>
-              object && layout
-                ? EventsRootVariablesFinder.findAllObjectVariables(
-                    project.getCurrentPlatform(),
-                    project,
-                    layout,
-                    object.getName()
-                  )
-                : []
-            }
-            historyHandler={historyHandler}
-            toolbarIconStyle={styles.icon}
-          />
-        </Column>
-        {objectMetadata &&
-          objectMetadata.hasDefaultBehavior(
-            'EffectCapability::EffectBehavior'
-          ) && (
-            <>
-              <Column>
-                <Separator />
-                <Line alignItems="center" justifyContent="space-between">
-                  <Text size="sub-title" noMargin>
-                    <Trans>Effects</Trans>
-                  </Text>
-                  <Line alignItems="center" noMargin>
-                    <IconButton
-                      size="small"
-                      onClick={() => {
-                        onEditObject(object, 'effects');
-                      }}
-                    >
-                      <ShareExternal style={styles.icon} />
-                    </IconButton>
-                    <IconButton size="small" onClick={() => addEffect(false)}>
-                      <Add style={styles.icon} />
-                    </IconButton>
-                  </Line>
-                </Line>
-              </Column>
-              <ColumnStackLayout>
-                {effectsContainer.getEffectsCount() === 0 && (
+          <TopLevelCollapsibleSection
+            title={<Trans>Properties</Trans>}
+            isFolded={isPropertiesFolded}
+            toggleFolded={() => setIsPropertiesFolded(!isPropertiesFolded)}
+            onEditInFullEditor={() => onEditObject(object, 'properties')}
+            renderContent={() => (
+              <ColumnStackLayout noOverflowParent>
+                {!hasSomeObjectProperties && (
                   <Text size="body2" align="center" color="secondary">
-                    <Trans>There are no effects on this object.</Trans>
+                    <Trans>This object has no properties.</Trans>
                   </Text>
                 )}
-                {mapFor(
-                  0,
-                  effectsContainer.getEffectsCount(),
-                  (index: number) => {
-                    const effect: gdEffect = effectsContainer.getEffectAt(
-                      index
-                    );
-                    const effectType = effect.getEffectType();
-                    const effectMetadata = getEnumeratedEffectMetadata(
-                      allEffectMetadata,
-                      effectType
-                    );
+                {hasSomeObjectProperties && (
+                  <CompactPropertiesEditor
+                    sectionTitleStyle="level2"
+                    project={project}
+                    resourceManagementProps={resourceManagementProps}
+                    unsavedChanges={unsavedChanges}
+                    schema={objectBasicPropertiesSchema}
+                    instances={[
+                      { object, objectConfiguration: objectConfigurationAsGd },
+                    ]}
+                    onInstancesModified={() => {
+                      // TODO: undo/redo?
+                    }}
+                    onRefreshAllFields={forceRecomputeSchema}
+                  />
+                )}
+                {!showObjectAdvancedOptions && hasObjectAdvancedProperties && (
+                  <FlatButton
+                    fullWidth
+                    primary
+                    leftIcon={<ChevronArrowRight />}
+                    label={<Trans>Show more</Trans>}
+                    onClick={() => {
+                      setShowObjectAdvancedOptions(true);
+                    }}
+                  />
+                )}
+                {showObjectAdvancedOptions && hasObjectAdvancedProperties && (
+                  <CompactPropertiesEditor
+                    sectionTitleStyle="level2"
+                    project={project}
+                    resourceManagementProps={resourceManagementProps}
+                    unsavedChanges={unsavedChanges}
+                    schema={objectAdvancedPropertiesSchema}
+                    instances={[
+                      { object, objectConfiguration: objectConfigurationAsGd },
+                    ]}
+                    onInstancesModified={() => {
+                      // TODO: undo/redo?
+                    }}
+                    onRefreshAllFields={forceRecomputeSchema}
+                  />
+                )}
+                {showObjectAdvancedOptions && hasObjectAdvancedProperties && (
+                  <FlatButton
+                    fullWidth
+                    primary
+                    leftIcon={<ChevronArrowTop />}
+                    label={<Trans>Show less</Trans>}
+                    onClick={() => {
+                      setShowObjectAdvancedOptions(false);
+                    }}
+                  />
+                )}
+                {eventsBasedObject &&
+                  customObjectConfiguration &&
+                  shouldDisplayEventsBasedObjectChildren &&
+                  mapFor(
+                    0,
+                    eventsBasedObject.getObjects().getObjectsCount(),
+                    i => {
+                      const childObject = eventsBasedObject
+                        .getObjects()
+                        .getObjectAt(i);
+                      const childObjectName = childObject.getName();
+                      const isFolded = customObjectConfiguration.isChildObjectFolded(
+                        childObjectName
+                      );
+                      return (
+                        <CollapsibleSubPanel
+                          key={i}
+                          renderContent={() => (
+                            <ChildObjectPropertiesEditor
+                              key={i}
+                              project={project}
+                              resourceManagementProps={resourceManagementProps}
+                              unsavedChanges={unsavedChanges}
+                              eventsBasedObject={eventsBasedObject}
+                              customObjectConfiguration={
+                                customObjectConfiguration
+                              }
+                              childObject={childObject}
+                              onRefreshAllFields={forceRecomputeSchema}
+                            />
+                          )}
+                          isFolded={isFolded}
+                          toggleFolded={() => {
+                            customObjectConfiguration.setChildObjectFolded(
+                              childObjectName,
+                              !isFolded
+                            );
+                            forceUpdate();
+                          }}
+                          title={
+                            <Text noMargin size="body">
+                              {childObjectName}
+                            </Text>
+                          }
+                        />
+                      );
+                    }
+                  )}
+              </ColumnStackLayout>
+            )}
+          />
+          <TopLevelCollapsibleSection
+            title={<Trans>Behaviors</Trans>}
+            isFolded={isBehaviorsFolded}
+            toggleFolded={() => setIsBehaviorsFolded(!isBehaviorsFolded)}
+            onEditInFullEditor={() => onEditObject(object, 'behaviors')}
+            onAdd={openNewBehaviorDialog}
+            renderContent={() => (
+              <ColumnStackLayout>
+                {!allVisibleBehaviors.length && (
+                  <Text size="body2" align="center" color="secondary">
+                    <Trans>There are no behaviors on this object.</Trans>
+                  </Text>
+                )}
+                {allVisibleBehaviors.map(behavior => {
+                  const behaviorTypeName = behavior.getTypeName();
+                  const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+                    gd.JsPlatform.get(),
+                    behaviorTypeName
+                  );
 
-                    return (
-                      <CollapsibleSubPanel
-                        key={effect.ptr}
-                        renderContent={() => (
-                          <ColumnStackLayout expand noOverflowParent>
-                            <CompactSelectField
-                              value={effectType}
-                              onChange={type => chooseEffectType(effect, type)}
-                            >
-                              {all2DEffectMetadata.map(effectMetadata => (
-                                <SelectOption
-                                  key={effectMetadata.type}
-                                  value={effectMetadata.type}
-                                  label={effectMetadata.fullName}
-                                  disabled={
-                                    effectMetadata.isMarkedAsNotWorkingForObjects
+                  const iconUrl = behaviorMetadata.getIconFilename();
+
+                  return (
+                    <CollapsibleSubPanel
+                      key={behavior.ptr}
+                      renderContent={() => (
+                        <CompactBehaviorPropertiesEditor
+                          project={project}
+                          behavior={behavior}
+                          object={object}
+                          onBehaviorUpdated={() => {}}
+                          resourceManagementProps={resourceManagementProps}
+                        />
+                      )}
+                      isFolded={behavior.isFolded()}
+                      toggleFolded={() => {
+                        behavior.setFolded(!behavior.isFolded());
+                        forceUpdate();
+                      }}
+                      title={
+                        <>
+                          {iconUrl ? (
+                            <IconContainer
+                              src={iconUrl}
+                              alt={behaviorMetadata.getFullName()}
+                              size={16}
+                            />
+                          ) : null}
+                          <Spacer />
+                          <Text noMargin size="body">
+                            {behavior.getName()}
+                          </Text>
+                        </>
+                      }
+                      onRemove={() => {
+                        removeBehavior(behavior.getName());
+                      }}
+                    />
+                  );
+                })}
+              </ColumnStackLayout>
+            )}
+          />
+          <TopLevelCollapsibleSection
+            title={<Trans>Object Variables</Trans>}
+            isFolded={isVariablesFolded}
+            toggleFolded={() => setIsVariablesFolded(!isVariablesFolded)}
+            onEditInFullEditor={() => onEditObject(object, 'variables')}
+            onAdd={() => {
+              if (variablesListRef.current) {
+                variablesListRef.current.addVariable();
+              }
+              setIsVariablesFolded(false);
+            }}
+            renderContentAsHiddenWhenFolded={
+              true /* Allows to keep a ref to the variables list for add button to work. */
+            }
+            renderContent={() => (
+              <VariablesList
+                ref={variablesListRef}
+                projectScopedContainersAccessor={
+                  projectScopedContainersAccessor
+                }
+                directlyStoreValueChangesWhileEditing
+                variablesContainer={object.getVariables()}
+                areObjectVariables
+                size="small"
+                onComputeAllVariableNames={() =>
+                  object && layout
+                    ? EventsRootVariablesFinder.findAllObjectVariables(
+                        project.getCurrentPlatform(),
+                        project,
+                        layout,
+                        object.getName()
+                      )
+                    : []
+                }
+                historyHandler={historyHandler}
+                toolbarIconStyle={styles.icon}
+              />
+            )}
+          />
+          {objectMetadata &&
+            objectMetadata.hasDefaultBehavior(
+              'EffectCapability::EffectBehavior'
+            ) && (
+              <TopLevelCollapsibleSection
+                title={<Trans>Effects</Trans>}
+                isFolded={isEffectsFolded}
+                toggleFolded={() => setIsEffectsFolded(!isEffectsFolded)}
+                onEditInFullEditor={() => onEditObject(object, 'effects')}
+                onAdd={() => addEffect(false)}
+                renderContent={() => (
+                  <ColumnStackLayout>
+                    {effectsContainer.getEffectsCount() === 0 && (
+                      <Text size="body2" align="center" color="secondary">
+                        <Trans>There are no effects on this object.</Trans>
+                      </Text>
+                    )}
+                    {mapFor(
+                      0,
+                      effectsContainer.getEffectsCount(),
+                      (index: number) => {
+                        const effect: gdEffect = effectsContainer.getEffectAt(
+                          index
+                        );
+                        const effectType = effect.getEffectType();
+                        const effectMetadata = getEnumeratedEffectMetadata(
+                          allEffectMetadata,
+                          effectType
+                        );
+
+                        return (
+                          <CollapsibleSubPanel
+                            key={effect.ptr}
+                            renderContent={() => (
+                              <ColumnStackLayout expand noOverflowParent>
+                                <CompactSelectField
+                                  value={effectType}
+                                  onChange={type =>
+                                    chooseEffectType(effect, type)
+                                  }
+                                >
+                                  {all2DEffectMetadata.map(effectMetadata => (
+                                    <SelectOption
+                                      key={effectMetadata.type}
+                                      value={effectMetadata.type}
+                                      label={effectMetadata.fullName}
+                                      disabled={
+                                        effectMetadata.isMarkedAsNotWorkingForObjects
+                                      }
+                                    />
+                                  ))}
+                                </CompactSelectField>
+                                <CompactEffectPropertiesEditor
+                                  project={project}
+                                  effect={effect}
+                                  effectMetadata={effectMetadata}
+                                  resourceManagementProps={
+                                    resourceManagementProps
                                   }
                                 />
-                              ))}
-                            </CompactSelectField>
-                            <CompactEffectPropertiesEditor
-                              project={project}
-                              effect={effect}
-                              effectMetadata={effectMetadata}
-                              resourceManagementProps={resourceManagementProps}
-                            />
-                          </ColumnStackLayout>
-                        )}
-                        isFolded={effect.isFolded()}
-                        toggleFolded={() => {
-                          effect.setFolded(!effect.isFolded());
-                          forceUpdate();
-                        }}
-                        title={
-                          <Text noMargin size="body">
-                            {effect.getName()}
-                          </Text>
-                        }
-                        onRemove={() => {
-                          removeEffect(effect);
-                        }}
-                      />
-                    );
-                  }
+                              </ColumnStackLayout>
+                            )}
+                            isFolded={effect.isFolded()}
+                            toggleFolded={() => {
+                              effect.setFolded(!effect.isFolded());
+                              forceUpdate();
+                            }}
+                            title={
+                              <Text noMargin size="body">
+                                {effect.getName()}
+                              </Text>
+                            }
+                            onRemove={() => {
+                              removeEffect(effect);
+                            }}
+                          />
+                        );
+                      }
+                    )}
+                  </ColumnStackLayout>
                 )}
-              </ColumnStackLayout>
-            </>
-          )}
+              />
+            )}
+        </Column>
       </ScrollView>
       {newBehaviorDialog}
     </ErrorBoundary>

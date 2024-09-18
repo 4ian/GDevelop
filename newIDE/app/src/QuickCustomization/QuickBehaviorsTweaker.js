@@ -49,6 +49,7 @@ const QuickBehaviorPropertiesEditor = ({
 
   return (
     <CompactPropertiesEditor
+      sectionTitleStyle="level2"
       project={project}
       schema={basicPropertiesSchema}
       instances={[behavior]}

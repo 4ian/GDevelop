@@ -3574,21 +3574,18 @@ interface ShapePainterObject {
     void SetOutlineSize(double size);
     double GetOutlineSize();
 
+    void SetOutlineColor([Const] DOMString color);
+    [Const, Ref] DOMString GetOutlineColor();
+
     void SetOutlineOpacity(double val);
     double GetOutlineOpacity();
 
-    void SetOutlineColor(unsigned long r, unsigned long g, unsigned long b);
-    unsigned long GetOutlineColorR();
-    unsigned long GetOutlineColorG();
-    unsigned long GetOutlineColorB();
+    void SetFillColor([Const] DOMString color);
+    [Const, Ref] DOMString GetFillColor();
 
     void SetFillOpacity(double val);
     double GetFillOpacity();
 
-    void SetFillColor(unsigned long r,unsigned long g, unsigned long b);
-    unsigned long GetFillColorR();
-    unsigned long GetFillColorG();
-    unsigned long GetFillColorB();
     [Const, Value] DOMString GetAntialiasing();
     void SetAntialiasing([Const] DOMString value);
 

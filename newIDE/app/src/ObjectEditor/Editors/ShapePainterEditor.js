@@ -54,18 +54,12 @@ export default class PanelSpriteEditor extends React.Component<
             floatingLabelText={<Trans>Outline color</Trans>}
             disableAlpha
             fullWidth
-            color={rgbColorToRGBString({
-              r: shapePainterConfiguration.getOutlineColorR(),
-              g: shapePainterConfiguration.getOutlineColorG(),
-              b: shapePainterConfiguration.getOutlineColorB(),
-            })}
+            color={shapePainterConfiguration.getOutlineColor()}
             onChange={color => {
               const rgbColor = rgbStringAndAlphaToRGBColor(color);
               if (rgbColor) {
                 shapePainterConfiguration.setOutlineColor(
-                  rgbColor.r,
-                  rgbColor.g,
-                  rgbColor.b
+                  rgbColorToRGBString(rgbColor)
                 );
 
                 this.forceUpdate();
@@ -104,18 +98,12 @@ export default class PanelSpriteEditor extends React.Component<
             floatingLabelText={<Trans>Fill color</Trans>}
             disableAlpha
             fullWidth
-            color={rgbColorToRGBString({
-              r: shapePainterConfiguration.getFillColorR(),
-              g: shapePainterConfiguration.getFillColorG(),
-              b: shapePainterConfiguration.getFillColorB(),
-            })}
+            color={shapePainterConfiguration.getFillColor()}
             onChange={color => {
               const rgbColor = rgbStringAndAlphaToRGBColor(color);
               if (rgbColor) {
                 shapePainterConfiguration.setFillColor(
-                  rgbColor.r,
-                  rgbColor.g,
-                  rgbColor.b
+                  rgbColorToRGBString(rgbColor)
                 );
 
                 this.forceUpdate();

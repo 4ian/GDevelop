@@ -17,10 +17,10 @@ namespace gdjs {
 
   /** Initial properties for a for {@link gdjs.ShapePainterRuntimeObject}. */
   export type ShapePainterObjectDataType = {
-    /** The color (in RGB format) of the inner part of the painted shape */
-    fillColor: RGBColor;
-    /** The color (in RGB format) of the outline of the painted shape */
-    outlineColor: RGBColor;
+    /** The color of the inner part of the painted shape */
+    fillColor: RGBColor | string;
+    /** The color of the outline of the painted shape */
+    outlineColor: RGBColor | string;
     /** The opacity of the inner part of the painted shape, from 0 to 255 */
     fillOpacity: float;
     /** The opacity of the outline of the painted shape, from 0 to 255 */
@@ -72,22 +72,28 @@ namespace gdjs {
       shapePainterObjectData: ShapePainterObjectData
     ) {
       super(instanceContainer, shapePainterObjectData);
-      this._fillColor = parseInt(
-        gdjs.rgbToHex(
-          shapePainterObjectData.fillColor.r,
-          shapePainterObjectData.fillColor.g,
-          shapePainterObjectData.fillColor.b
-        ),
-        16
-      );
-      this._outlineColor = parseInt(
-        gdjs.rgbToHex(
-          shapePainterObjectData.outlineColor.r,
-          shapePainterObjectData.outlineColor.g,
-          shapePainterObjectData.outlineColor.b
-        ),
-        16
-      );
+      this._fillColor =
+        typeof shapePainterObjectData.fillColor === 'string'
+          ? gdjs.rgbOrHexStringToNumber(shapePainterObjectData.fillColor)
+          : parseInt(
+              gdjs.rgbToHex(
+                shapePainterObjectData.fillColor.r,
+                shapePainterObjectData.fillColor.g,
+                shapePainterObjectData.fillColor.b
+              ),
+              16
+            );
+      this._outlineColor =
+        typeof shapePainterObjectData.outlineColor === 'string'
+          ? gdjs.rgbOrHexStringToNumber(shapePainterObjectData.outlineColor)
+          : parseInt(
+              gdjs.rgbToHex(
+                shapePainterObjectData.outlineColor.r,
+                shapePainterObjectData.outlineColor.g,
+                shapePainterObjectData.outlineColor.b
+              ),
+              16
+            );
       this._fillOpacity = shapePainterObjectData.fillOpacity;
       this._outlineOpacity = shapePainterObjectData.outlineOpacity;
       this._outlineSize = shapePainterObjectData.outlineSize;
@@ -111,10 +117,17 @@ namespace gdjs {
       oldObjectData: ShapePainterObjectData,
       newObjectData: ShapePainterObjectData
     ): boolean {
+      if (typeof newObjectData.fillColor === 'string') {
+        if (oldObjectData.fillColor !== newObjectData.fillColor) {
+          this.setFillColor(newObjectData.fillColor);
+        }
+      }
       if (
-        oldObjectData.fillColor.r !== newObjectData.fillColor.r ||
-        oldObjectData.fillColor.g !== newObjectData.fillColor.g ||
-        oldObjectData.fillColor.b !== newObjectData.fillColor.b
+        typeof oldObjectData.fillColor !== 'string' &&
+        typeof newObjectData.fillColor !== 'string' &&
+        (oldObjectData.fillColor.r !== newObjectData.fillColor.r ||
+          oldObjectData.fillColor.g !== newObjectData.fillColor.g ||
+          oldObjectData.fillColor.b !== newObjectData.fillColor.b)
       ) {
         this.setFillColor(
           '' +
@@ -125,10 +138,17 @@ namespace gdjs {
             newObjectData.fillColor.b
         );
       }
+      if (typeof newObjectData.outlineColor === 'string') {
+        if (oldObjectData.outlineColor !== newObjectData.outlineColor) {
+          this.setOutlineColor(newObjectData.outlineColor);
+        }
+      }
       if (
-        oldObjectData.outlineColor.r !== newObjectData.outlineColor.r ||
-        oldObjectData.outlineColor.g !== newObjectData.outlineColor.g ||
-        oldObjectData.outlineColor.b !== newObjectData.outlineColor.b
+        typeof oldObjectData.outlineColor !== 'string' &&
+        typeof newObjectData.outlineColor !== 'string' &&
+        (oldObjectData.outlineColor.r !== newObjectData.outlineColor.r ||
+          oldObjectData.outlineColor.g !== newObjectData.outlineColor.g ||
+          oldObjectData.outlineColor.b !== newObjectData.outlineColor.b)
       ) {
         this.setOutlineColor(
           '' +
@@ -163,6 +183,10 @@ namespace gdjs {
       ) {
         this._clearBetweenFrames = newObjectData.clearBetweenFrames;
       }
+      if (oldObjectData.antialiasing !== newObjectData.antialiasing) {
+        this.setAntialiasing(newObjectData.antialiasing);
+      }
+
       return true;
     }
 
@@ -450,23 +474,8 @@ namespace gdjs {
       return !this._useAbsoluteCoordinates;
     }
 
-    /**
-     *
-     * @param rgbColor semicolon separated decimal values
-     */
-    setFillColor(rgbColor: string): void {
-      const colors = rgbColor.split(';');
-      if (colors.length < 3) {
-        return;
-      }
-      this._fillColor = parseInt(
-        gdjs.rgbToHex(
-          parseInt(colors[0], 10),
-          parseInt(colors[1], 10),
-          parseInt(colors[2], 10)
-        ),
-        16
-      );
+    setFillColor(color: string): void {
+      this._fillColor = gdjs.rgbOrHexStringToNumber(color);
     }
 
     getFillColorR(): integer {
@@ -479,23 +488,8 @@ namespace gdjs {
       return gdjs.hexNumberToRGB(this._fillColor).b;
     }
 
-    /**
-     *
-     * @param rgbColor semicolon separated decimal values
-     */
     setOutlineColor(rgbColor: string): void {
-      const colors = rgbColor.split(';');
-      if (colors.length < 3) {
-        return;
-      }
-      this._outlineColor = parseInt(
-        gdjs.rgbToHex(
-          parseInt(colors[0], 10),
-          parseInt(colors[1], 10),
-          parseInt(colors[2], 10)
-        ),
-        16
-      );
+      this._outlineColor = gdjs.rgbOrHexStringToNumber(rgbColor);
       this._renderer.updateOutline();
     }
 

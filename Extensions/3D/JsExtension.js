@@ -2323,7 +2323,6 @@ module.exports = {
           pixiResourcesLoader
         );
 
-        const properties = associatedObjectConfiguration.getProperties();
         this._defaultWidth = 1;
         this._defaultHeight = 1;
         this._defaultDepth = 1;
@@ -3078,7 +3077,7 @@ module.exports = {
           threeGroup,
           pixiResourcesLoader
         );
-        const properties = associatedObjectConfiguration.getProperties();
+
         this._defaultWidth = 1;
         this._defaultHeight = 1;
         this._defaultDepth = 1;
@@ -3154,8 +3153,6 @@ module.exports = {
         this._threeModelGroup = new THREE.Group();
         this._threeModelGroup.rotation.order = 'ZYX';
         this._threeModelGroup.add(this._clonedModel3D);
-
-        const properties = this._associatedObjectConfiguration.getProperties();
 
         this._threeModelGroup.rotation.set(
           (this._rotationX * Math.PI) / 180,

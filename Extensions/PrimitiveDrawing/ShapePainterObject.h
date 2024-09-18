@@ -32,35 +32,23 @@ class GD_EXTENSION_API ShapePainterObjectBase {
   void SetOutlineOpacity(double val);
   inline double GetOutlineOpacity() const { return outlineOpacity; };
 
-  void SetOutlineColor(unsigned int r, unsigned int v, unsigned int b);
-  inline unsigned int GetOutlineColorR() const { return outlineColorR; };
-  inline unsigned int GetOutlineColorG() const { return outlineColorG; };
-  inline unsigned int GetOutlineColorB() const { return outlineColorB; };
-
-  /** Used by GD events generated code : Prefer using original SetOutlineColor
-   */
   void SetOutlineColor(const gd::String& color);
+  const gd::String& GetOutlineColor() const { return outlineColor; };
 
   void SetFillOpacity(double val);
   inline double GetFillOpacity() const { return fillOpacity; };
 
-  void SetFillColor(unsigned int r, unsigned int v, unsigned int b);
-  inline unsigned int GetFillColorR() const { return fillColorR; };
-  inline unsigned int GetFillColorG() const { return fillColorG; };
-  inline unsigned int GetFillColorB() const { return fillColorB; };
-
-  /** Used by GD events generated code : Prefer using original SetFillColor
-   */
   void SetFillColor(const gd::String& color);
+  const gd::String& GetFillColor() const { return fillColor; };
 
   inline void SetCoordinatesAbsolute() { absoluteCoordinates = true; }
   inline void SetCoordinatesRelative() { absoluteCoordinates = false; }
-  inline bool AreCoordinatesAbsolute() { return absoluteCoordinates; }
+  inline bool AreCoordinatesAbsolute() const { return absoluteCoordinates; }
 
   inline void SetClearBetweenFrames(bool value) { clearBetweenFrames = value; }
-  inline bool IsClearedBetweenFrames() { return clearBetweenFrames; }
+  inline bool IsClearedBetweenFrames() const { return clearBetweenFrames; }
 
-  inline gd::String GetAntialiasing() { return antialiasing; }
+  inline const gd::String& GetAntialiasing() const { return antialiasing; }
   inline void SetAntialiasing(const gd::String& value) { antialiasing = value; }
 
  protected:
@@ -70,16 +58,12 @@ class GD_EXTENSION_API ShapePainterObjectBase {
 
  private:
   // Fill color
-  unsigned int fillColorR;
-  unsigned int fillColorG;
-  unsigned int fillColorB;
+  gd::String fillColor;
   float fillOpacity;
 
   // Outline
   int outlineSize;
-  unsigned int outlineColorR;
-  unsigned int outlineColorG;
-  unsigned int outlineColorB;
+  gd::String outlineColor;
   float outlineOpacity;
 
   bool absoluteCoordinates;
@@ -97,14 +81,20 @@ class GD_EXTENSION_API ShapePainterObject : public gd::ObjectConfiguration,
  public:
   ShapePainterObject();
   virtual ~ShapePainterObject(){};
-  virtual std::unique_ptr<gd::ObjectConfiguration> Clone() const {
+  virtual std::unique_ptr<gd::ObjectConfiguration> Clone() const override {
     return gd::make_unique<ShapePainterObject>(*this);
   }
 
+  virtual std::map<gd::String, gd::PropertyDescriptor>
+  GetProperties() const override;
+
+  virtual bool UpdateProperty(const gd::String &name,
+                              const gd::String &value) override;
+
  private:
   virtual void DoUnserializeFrom(gd::Project& project,
-                                 const gd::SerializerElement& element);
-  virtual void DoSerializeTo(gd::SerializerElement& element) const;
+                                 const gd::SerializerElement& element) override;
+  virtual void DoSerializeTo(gd::SerializerElement& element) const override;
 };
 
 #endif  // SHAPEPAINTEROBJECT_H

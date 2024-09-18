@@ -27,6 +27,7 @@ TextObject::TextObject()
       underlined(false),
       color("0;0;0"),
       textAlignment("left"),
+      verticalTextAlignment("top"),
       isOutlineEnabled(false),
       outlineThickness(2),
       outlineColor("255;255;255"),
@@ -67,6 +68,10 @@ bool TextObject::UpdateProperty(const gd::String& propertyName,
   }
   if (propertyName == "textAlignment") {
     textAlignment = newValue;
+    return true;
+  }
+  if (propertyName == "verticalTextAlignment") {
+    verticalTextAlignment = newValue;
     return true;
   }
   if (propertyName == "isOutlineEnabled") {
@@ -163,6 +168,15 @@ std::map<gd::String, gd::PropertyDescriptor> TextObject::GetProperties() const {
       .SetGroup(_("Font"))
       .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
 
+  objectProperties["verticalTextAlignment"]
+      .SetValue(verticalTextAlignment)
+      .SetType("choice")
+      .AddExtraInfo("top")
+      .AddExtraInfo("center")
+      .AddExtraInfo("bottom")
+      .SetLabel(_("Vertical alignment, when multiple lines are displayed"))
+      .SetGroup(_("Font"));
+
   objectProperties["isOutlineEnabled"]
       .SetValue(isOutlineEnabled ? "true" : "false")
       .SetType("boolean")
@@ -252,6 +266,7 @@ void TextObject::DoUnserializeFrom(gd::Project& project,
 
   SetFontName(content.GetChild("font", 0, "Font").GetValue().GetString());
   SetTextAlignment(content.GetChild("textAlignment").GetValue().GetString());
+  SetVerticalTextAlignment(content.GetStringAttribute("verticalTextAlignment", "top"));
   SetCharacterSize(content.GetChild("characterSize", 0, "CharacterSize")
                        .GetValue()
                        .GetInt());
@@ -321,6 +336,7 @@ void TextObject::DoSerializeTo(gd::SerializerElement& element) const {
   content.AddChild("text").SetValue(GetText());
   content.AddChild("font").SetValue(GetFontName());
   content.AddChild("textAlignment").SetValue(GetTextAlignment());
+  content.AddChild("verticalTextAlignment").SetValue(GetVerticalTextAlignment());
   content.AddChild("characterSize").SetValue(GetCharacterSize());
   content.AddChild("color").SetValue(GetColor());
 

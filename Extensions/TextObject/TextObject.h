@@ -62,6 +62,11 @@ class GD_EXTENSION_API TextObject : public gd::ObjectConfiguration {
     textAlignment = textAlignment_;
   };
 
+  inline const gd::String& GetVerticalTextAlignment() const { return verticalTextAlignment; };
+  void SetVerticalTextAlignment(const gd::String& verticalTextAlignment_) {
+    verticalTextAlignment = verticalTextAlignment_;
+  };
+
   bool IsBold() const { return bold; };
   void SetBold(bool enable) { bold = enable; };
   bool IsItalic() const { return italic; };
@@ -120,6 +125,7 @@ class GD_EXTENSION_API TextObject : public gd::ObjectConfiguration {
   bool bold, italic, underlined;
   gd::String color;
   gd::String textAlignment;
+  gd::String verticalTextAlignment;
 
   bool isOutlineEnabled;
   double outlineThickness;

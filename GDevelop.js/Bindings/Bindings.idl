@@ -3524,6 +3524,8 @@ interface TextObject {
     [Const, Ref] DOMString GetColor();
     void SetTextAlignment([Const] DOMString textAlignment);
     [Const, Ref] DOMString GetTextAlignment();
+    void SetVerticalTextAlignment([Const] DOMString value);
+    [Const, Ref] DOMString GetVerticalTextAlignment();
 
     void SetOutlineEnabled(boolean enable);
     boolean IsOutlineEnabled();

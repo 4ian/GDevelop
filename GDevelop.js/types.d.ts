@@ -2623,6 +2623,8 @@ export class TextObject extends ObjectConfiguration {
   getColor(): string;
   setTextAlignment(textAlignment: string): void;
   getTextAlignment(): string;
+  setVerticalTextAlignment(value: string): void;
+  getVerticalTextAlignment(): string;
   setOutlineEnabled(enable: boolean): void;
   isOutlineEnabled(): boolean;
   setOutlineThickness(value: number): void;

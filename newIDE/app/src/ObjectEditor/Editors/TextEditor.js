@@ -7,7 +7,11 @@ import Checkbox from '../../UI/Checkbox';
 import { Line, Column } from '../../UI/Grid';
 import ColorPicker from '../../UI/ColorField/ColorPicker';
 import { MiniToolbarText } from '../../UI/MiniToolbar';
-import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
+import {
+  ColumnStackLayout,
+  LineStackLayout,
+  ResponsiveLineStackLayout,
+} from '../../UI/Layout';
 import ResourceSelector from '../../ResourcesList/ResourceSelector';
 import ResourcesLoader from '../../ResourcesLoader';
 import { type EditorProps } from './EditorProps.flow';
@@ -18,6 +22,9 @@ import Tooltip from '@material-ui/core/Tooltip';
 import LeftTextAlignment from '../../UI/CustomSvgIcons/LeftTextAlignment';
 import CenterTextAlignment from '../../UI/CustomSvgIcons/CenterTextAlignment';
 import RightTextAlignment from '../../UI/CustomSvgIcons/RightTextAlignment';
+import TopTextAlignment from '../../UI/CustomSvgIcons/TopTextAlignment';
+import CenterVerticalTextAlignment from '../../UI/CustomSvgIcons/CenterVerticalTextAlignment';
+import BottomTextAlignment from '../../UI/CustomSvgIcons/BottomTextAlignment';
 import Text from '../../UI/Text';
 import {
   rgbColorToRGBString,
@@ -55,6 +62,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
     );
 
     const textAlignment = textObjectConfiguration.getTextAlignment();
+    const verticalTextAlignment = textObjectConfiguration.getVerticalTextAlignment();
 
     return (
       <ColumnStackLayout noMargin>
@@ -94,8 +102,6 @@ export default class TextEditor extends React.Component<EditorProps, void> {
                 this.forceUpdate();
               }}
             />
-          </Line>
-          <Line noMargin alignItems="center">
             <Checkbox
               label={<Trans>Bold</Trans>}
               checked={textObjectConfiguration.isBold()}
@@ -114,6 +120,8 @@ export default class TextEditor extends React.Component<EditorProps, void> {
               }}
               style={styles.checkbox}
             />
+          </Line>
+          <LineStackLayout noMargin alignItems="center">
             <ButtonGroup size="small">
               <Tooltip title={<Trans>Align text on the left</Trans>}>
                 <Button
@@ -154,7 +162,61 @@ export default class TextEditor extends React.Component<EditorProps, void> {
                 </Button>
               </Tooltip>
             </ButtonGroup>
-          </Line>
+            <ButtonGroup size="small">
+              <Tooltip title={<Trans>Align text on the top</Trans>}>
+                <Button
+                  variant={
+                    verticalTextAlignment === 'top' ? 'contained' : 'outlined'
+                  }
+                  color={
+                    verticalTextAlignment === 'top' ? 'secondary' : 'default'
+                  }
+                  onClick={() => {
+                    textObjectConfiguration.setVerticalTextAlignment('top');
+                    this.forceUpdate();
+                  }}
+                >
+                  <TopTextAlignment />
+                </Button>
+              </Tooltip>
+              <Tooltip title={<Trans>Align text on the center</Trans>}>
+                <Button
+                  variant={
+                    verticalTextAlignment === 'center'
+                      ? 'contained'
+                      : 'outlined'
+                  }
+                  color={
+                    verticalTextAlignment === 'center' ? 'secondary' : 'default'
+                  }
+                  onClick={() => {
+                    textObjectConfiguration.setVerticalTextAlignment('center');
+                    this.forceUpdate();
+                  }}
+                >
+                  <CenterVerticalTextAlignment />
+                </Button>
+              </Tooltip>
+              <Tooltip title={<Trans>Align text on the bottom</Trans>}>
+                <Button
+                  variant={
+                    verticalTextAlignment === 'bottom'
+                      ? 'contained'
+                      : 'outlined'
+                  }
+                  color={
+                    verticalTextAlignment === 'bottom' ? 'secondary' : 'default'
+                  }
+                  onClick={() => {
+                    textObjectConfiguration.setVerticalTextAlignment('bottom');
+                    this.forceUpdate();
+                  }}
+                >
+                  <BottomTextAlignment />
+                </Button>
+              </Tooltip>
+            </ButtonGroup>
+          </LineStackLayout>
         </ResponsiveLineStackLayout>
         <ResourceSelector
           project={project}

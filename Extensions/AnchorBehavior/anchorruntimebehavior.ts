@@ -274,12 +274,12 @@ namespace gdjs {
             this.owner.setX(
               this.owner.getX() === this.owner.getDrawableX()
                 ? left
-                // It uses the position of the origin relatively to the object
-                // size to apply it with the new size.
-                // This is the same as doing:
-                // lerp(left, right, (this.owner.getX() - this.owner.getDrawableX() / this.owner.getWidth())
-                // But, the division is done at the end to avoid rounding errors.
-                : left +
+                : // It uses the position of the origin relatively to the object
+                  // size to apply it with the new size.
+                  // This is the same as doing:
+                  // lerp(left, right, (this.owner.getX() - this.owner.getDrawableX() / this.owner.getWidth())
+                  // But, the division is done at the end to avoid rounding errors.
+                  left +
                     ((this.owner.getX() - this.owner.getDrawableX()) * width) /
                       this.owner.getWidth()
             );

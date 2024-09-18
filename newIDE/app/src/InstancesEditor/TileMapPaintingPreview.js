@@ -10,6 +10,13 @@ import Rendered3DInstance from '../ObjectsRendering/Renderers/Rendered3DInstance
 import { type TileMapTileSelection } from './TileSetVisualizer';
 import { AffineTransformation } from '../Utils/AffineTransformation';
 
+type TileSet = {|
+  rowCount: number,
+  columnCount: number,
+  tileSize: number,
+  atlasImage: string,
+|};
+
 export const updateSceneToTileMapTransformation = (
   instance: gdInitialInstance,
   renderedInstance: {
@@ -62,7 +69,7 @@ export const updateSceneToTileMapTransformation = (
   return { scaleX, scaleY };
 };
 
-export const getTileSet = (object: gdObject) => {
+export const getTileSet = (object: gdObject): TileSet => {
   const objectConfigurationProperties = object
     .getConfiguration()
     .getProperties();
@@ -84,12 +91,7 @@ export const isTileSetBadlyConfigured = ({
   columnCount,
   tileSize,
   atlasImage,
-}: {|
-  rowCount: number,
-  columnCount: number,
-  tileSize: number,
-  atlasImage: string,
-|}) => {
+}: TileSet) => {
   return (
     !Number.isInteger(columnCount) ||
     columnCount <= 0 ||
@@ -249,64 +251,64 @@ class TileMapPaintingPreview {
     return this.preview;
   }
 
-  render() {
-    this.preview.removeChildren(0);
-    const tileMapTileSelection = this.getTileMapTileSelection();
-    if (!tileMapTileSelection) {
-      return;
-    }
-    const selection = this.instancesSelection.getSelectedInstances();
-    if (selection.length !== 1) return;
-    const instance = selection[0];
-    const associatedObjectName = instance.getObjectName();
-    const object = getObjectByName(
-      this.project.getObjects(),
-      this.layout ? this.layout.getObjects() : null,
-      associatedObjectName
+  _getTextureInAtlas({
+    tileSet,
+    x,
+    y,
+  }: {
+    tileSet: TileSet,
+    x: number,
+    y: number,
+  }): ?PIXI.Texture {
+    const { atlasImage, tileSize } = tileSet;
+    if (!atlasImage) return;
+    const cacheKey = `${atlasImage}-${tileSize}-${x}-${y}`;
+    const cachedTexture = this.cache.get(cacheKey);
+    if (cachedTexture) return cachedTexture;
+
+    const atlasTexture = PixiResourcesLoader.getPIXITexture(
+      this.project,
+      atlasImage
     );
-    if (!object || object.getType() !== 'TileMap::SimpleTileMap') return;
-    const tileSet = getTileSet(object);
-    const isBadlyConfigured = isTileSetBadlyConfigured(tileSet);
+
+    const rect = new PIXI.Rectangle(
+      x * tileSize,
+      y * tileSize,
+      tileSize,
+      tileSize
+    );
+
+    try {
+      const texture = new PIXI.Texture(atlasTexture, rect);
+      this.cache.set(cacheKey, texture);
+    } catch (error) {
+      console.error(`Tile could not be extracted from atlas texture:`, error);
+      return PixiResourcesLoader.getInvalidPIXITexture();
+    }
+  }
+
+  _getTilingSpriteWithSingleTexture({
+    instance,
+    tileSet,
+    isBadlyConfigured,
+    tileMapTileSelection,
+  }: {
+    instance: gdInitialInstance,
+    tileSet: TileSet,
+    isBadlyConfigured: boolean,
+    tileMapTileSelection: TileMapTileSelection,
+  }) {
     const { tileSize } = tileSet;
     let texture;
     if (isBadlyConfigured) {
       texture = PixiResourcesLoader.getInvalidPIXITexture();
     } else {
       if (tileMapTileSelection.kind === 'single') {
-        const atlasResourceName = object
-          .getConfiguration()
-          .getProperties()
-          .get('atlasImage')
-          .getValue();
-        if (!atlasResourceName) return;
-        const cacheKey = `${atlasResourceName}-${tileSize}-${
-          tileMapTileSelection.coordinates.x
-        }-${tileMapTileSelection.coordinates.y}`;
-        texture = this.cache.get(cacheKey);
-        if (!texture) {
-          const atlasTexture = PixiResourcesLoader.getPIXITexture(
-            this.project,
-            atlasResourceName
-          );
-
-          const rect = new PIXI.Rectangle(
-            tileMapTileSelection.coordinates.x * tileSize,
-            tileMapTileSelection.coordinates.y * tileSize,
-            tileSize,
-            tileSize
-          );
-
-          try {
-            texture = new PIXI.Texture(atlasTexture, rect);
-          } catch (error) {
-            console.error(
-              `Tile could not be extracted from atlas texture:`,
-              error
-            );
-            texture = PixiResourcesLoader.getInvalidPIXITexture();
-          }
-          this.cache.set(cacheKey, texture);
-        }
+        texture = this._getTextureInAtlas({
+          tileSet,
+          ...tileMapTileSelection.coordinates,
+        });
+        if (!texture) return;
       } else if (tileMapTileSelection.kind === 'erase') {
         texture = PIXI.Texture.from(
           'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAARSURBVHgBY7h58+Z/BhgAcQA/VAcVLiw46wAAAABJRU5ErkJggg=='
@@ -392,7 +394,41 @@ class TileMapPaintingPreview {
 
     sprite.angle = instance.getAngle();
 
-    this.preview.addChild(sprite);
+    return sprite;
+  }
+
+  render() {
+    this.preview.removeChildren(0);
+    const tileMapTileSelection = this.getTileMapTileSelection();
+    if (!tileMapTileSelection) {
+      return;
+    }
+    const selection = this.instancesSelection.getSelectedInstances();
+    if (selection.length !== 1) return;
+    const instance = selection[0];
+    const associatedObjectName = instance.getObjectName();
+    const object = getObjectByName(
+      this.project.getObjects(),
+      this.layout ? this.layout.getObjects() : null,
+      associatedObjectName
+    );
+    if (!object || object.getType() !== 'TileMap::SimpleTileMap') return;
+    const tileSet = getTileSet(object);
+    const isBadlyConfigured = isTileSetBadlyConfigured(tileSet);
+
+    if (
+      isBadlyConfigured ||
+      tileMapTileSelection.kind === 'single' ||
+      tileMapTileSelection.kind === 'erase'
+    ) {
+      const sprite = this._getTilingSpriteWithSingleTexture({
+        instance,
+        tileSet,
+        tileMapTileSelection,
+        isBadlyConfigured,
+      });
+      this.preview.addChild(sprite);
+    }
 
     const canvasCoordinates = this.viewPosition.toCanvasCoordinates(0, 0);
     this.preview.position.x = canvasCoordinates[0];

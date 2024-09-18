@@ -70,6 +70,50 @@ describe('gdjs.AnchorRuntimeBehavior', function () {
     return object;
   }
 
+  const createSpriteWithOriginAtCenter = (behaviorProperties) => {
+    const object = new gdjs.TestSpriteRuntimeObject(runtimeScene, {
+      name: 'obj1',
+      type: '',
+      behaviors: [
+        {
+          name: anchorBehaviorName,
+          type: 'AnchorBehavior::AnchorBehavior',
+          // @ts-ignore - properties are not typed
+          rightEdgeAnchor: 0,
+          leftEdgeAnchor: 0,
+          topEdgeAnchor: 0,
+          bottomEdgeAnchor: 0,
+          relativeToOriginalWindowSize: false,
+          useLegacyBottomAndRightAnchors: false,
+          ...behaviorProperties,
+        },
+      ],
+      effects: [],
+      animations: [
+        {
+          name: 'animation',
+          directions: [
+            {
+              sprites: [
+                {
+                  originPoint: { x: 50, y: 50 },
+                  centerPoint: { x: 50, y: 50 },
+                  points: [],
+                  hasCustomCollisionMask: false,
+                  customCollisionMask: [],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+    object.setUnscaledWidthAndHeight(100, 100);
+    object.setCustomWidthAndHeight(10, 10);
+    runtimeScene.addObject(object);
+    return object;
+  };
+
   describe('(anchor horizontal edge)', function () {
     ['rightEdgeAnchor', 'leftEdgeAnchor'].forEach((objectEdge) => {
       it(`anchors the ${objectEdge} edge of object to window left (fixed)`, function () {
@@ -199,6 +243,27 @@ describe('gdjs.AnchorRuntimeBehavior', function () {
       expect(object.getX()).to.equal(500);
       expect(object.getY()).to.equal(1000);
       expect(object.getWidth()).to.equal(10);
+    });
+
+    it('can fill the screen with an object (with custom origin)', function () {
+      setGameResolutionSizeAndStep(1000, 500);
+
+      const object = createSpriteWithOriginAtCenter({
+        leftEdgeAnchor: 1,
+        topEdgeAnchor: 1,
+        rightEdgeAnchor: 2,
+        bottomEdgeAnchor: 2,
+      });
+      object.setCustomWidthAndHeight(1000, 500);
+      object.setPosition(500, 250);
+      runtimeScene.renderAndStep(1000 / 60);
+
+      setGameResolutionSizeAndStep(2000, 3000);
+
+      expect(object.getX()).to.equal(1000);
+      expect(object.getY()).to.equal(1500);
+      expect(object.getWidth()).to.equal(2000);
+      expect(object.getHeight()).to.equal(3000);
     });
   });
 });

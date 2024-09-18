@@ -270,8 +270,15 @@ namespace gdjs {
             this._rightEdgeAnchor !== HorizontalAnchor.None &&
             this._leftEdgeAnchor !== HorizontalAnchor.None
           ) {
-            this.owner.setWidth(right - left);
-            this.owner.setX(left);
+            const width = right - left;
+            this.owner.setX(
+              this.owner.getX() === this.owner.getDrawableX()
+                ? left
+                : left +
+                    ((this.owner.getX() - this.owner.getDrawableX()) * width) /
+                      this.owner.getWidth()
+            );
+            this.owner.setWidth(width);
           } else {
             if (this._leftEdgeAnchor !== HorizontalAnchor.None) {
               this.owner.setX(
@@ -292,8 +299,15 @@ namespace gdjs {
             this._bottomEdgeAnchor !== VerticalAnchor.None &&
             this._topEdgeAnchor !== VerticalAnchor.None
           ) {
-            this.owner.setHeight(bottom - top);
-            this.owner.setY(top);
+            const height = bottom - top;
+            this.owner.setY(
+              this.owner.getY() === this.owner.getDrawableY()
+                ? top
+                : top +
+                    ((this.owner.getY() - this.owner.getDrawableY()) * height) /
+                      this.owner.getHeight()
+            );
+            this.owner.setHeight(height);
           } else {
             if (this._topEdgeAnchor !== VerticalAnchor.None) {
               this.owner.setY(

@@ -257,6 +257,99 @@ export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
           y: bottomRightCornerCoordinatesInTileMapGrid[1],
         },
       });
+    } else if (tileMapTileSelection.kind === 'rectangle') {
+      const selectionTopLeftCorner = tileMapTileSelection.coordinates[0];
+      const selectionBottomRightCorner = tileMapTileSelection.coordinates[1];
+
+      if (isSelectionASingleTileRectangle(tileMapTileSelection)) {
+        const tileCoordinates = getTileCoordinatesOfCorner({
+          topLeftCorner: selectionTopLeftCorner,
+          bottomRightCorner: selectionBottomRightCorner,
+          corner: getCornerFromFlippingInstructions({
+            flipHorizontally: tileMapTileSelection.flipHorizontally,
+            flipVertically: tileMapTileSelection.flipVertically,
+          }),
+        });
+        tilesCoordinatesInTileMapGrid.push({
+          tileCoordinates,
+          topLeftCorner: {
+            x: topLeftCornerCoordinatesInTileMapGrid[0],
+            y: topLeftCornerCoordinatesInTileMapGrid[1],
+          },
+          bottomRightCorner: {
+            x: bottomRightCornerCoordinatesInTileMapGrid[0],
+            y: bottomRightCornerCoordinatesInTileMapGrid[1],
+          },
+        });
+        return tilesCoordinatesInTileMapGrid;
+      }
+
+      for (
+        let x = topLeftCornerCoordinatesInTileMapGrid[0];
+        x <= bottomRightCornerCoordinatesInTileMapGrid[0];
+        x++
+      ) {
+        for (
+          let y = topLeftCornerCoordinatesInTileMapGrid[1];
+          y <= bottomRightCornerCoordinatesInTileMapGrid[1];
+          y++
+        ) {
+          const deltaX = x - topLeftCornerCoordinatesInTileMapGrid[0];
+          const deltaY = y - topLeftCornerCoordinatesInTileMapGrid[1];
+          const invertedDeltaX =
+            bottomRightCornerCoordinatesInTileMapGrid[0] - x;
+          const invertedDeltaY =
+            bottomRightCornerCoordinatesInTileMapGrid[1] - y;
+          if (deltaX === 0 && deltaY === 0) {
+            tilesCoordinatesInTileMapGrid.push({
+              tileCoordinates: selectionTopLeftCorner,
+              topLeftCorner: { x, y },
+              bottomRightCorner: { x, y },
+            });
+            continue;
+          }
+          if (invertedDeltaX === 0 && invertedDeltaY === 0) {
+            tilesCoordinatesInTileMapGrid.push({
+              tileCoordinates: selectionBottomRightCorner,
+              topLeftCorner: { x, y },
+              bottomRightCorner: { x, y },
+            });
+            continue;
+          }
+
+          let tileX, tileY;
+          const selectionWidth =
+            selectionBottomRightCorner.x - selectionTopLeftCorner.x + 1;
+          const selectionHeight =
+            selectionBottomRightCorner.y - selectionTopLeftCorner.y + 1;
+          if (deltaX === 0) {
+            tileX = selectionTopLeftCorner.x;
+          } else if (invertedDeltaX === 0) {
+            tileX = selectionBottomRightCorner.x;
+          } else {
+            tileX =
+              ((deltaX - 1) % (selectionWidth - 2)) +
+              1 +
+              selectionTopLeftCorner.x;
+          }
+          if (deltaY === 0) {
+            tileY = selectionTopLeftCorner.y;
+          } else if (invertedDeltaY === 0) {
+            tileY = selectionBottomRightCorner.y;
+          } else {
+            tileY =
+              ((deltaY - 1) % (selectionHeight - 2)) +
+              1 +
+              selectionTopLeftCorner.y;
+          }
+
+          tilesCoordinatesInTileMapGrid.push({
+            tileCoordinates: { x: tileX, y: tileY },
+            topLeftCorner: { x, y },
+            bottomRightCorner: { x, y },
+          });
+        }
+      }
     }
   }
   return tilesCoordinatesInTileMapGrid;

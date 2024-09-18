@@ -17,3 +17,16 @@ export function rotatePolygon(
     vertices[i][1] = centerY - x * sina + y * cosa;
   }
 }
+
+export function flipPolygon(
+  vertices: Polygon,
+  centerX: number,
+  centerY: number,
+  flipX: boolean,
+  flipY: boolean
+): void {
+  for (let i = 0, len = vertices.length; i < len; ++i) {
+    vertices[i][0] = flipX ? 2 * centerX - vertices[i][0] : vertices[i][0];
+    vertices[i][1] = flipY ? 2 * centerY - vertices[i][1] : vertices[i][1];
+  }
+}

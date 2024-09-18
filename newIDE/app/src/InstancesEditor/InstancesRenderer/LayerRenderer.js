@@ -10,7 +10,11 @@ import * as THREE from 'three';
 import { shouldBeHandledByPinch } from '../PinchHandler';
 import { makeDoubleClickable } from './PixiDoubleClickEvent';
 import Rectangle from '../../Utils/Rectangle'; // TODO (3D): add support for zMin/zMax/depth.
-import { rotatePolygon, type Polygon } from '../../Utils/PolygonHelper';
+import {
+  flipPolygon,
+  rotatePolygon,
+  type Polygon,
+} from '../../Utils/PolygonHelper';
 import Rendered3DInstance from '../../ObjectsRendering/Renderers/Rendered3DInstance';
 const gd: libGDevelop = global.gd;
 
@@ -310,7 +314,9 @@ export default class LayerRenderer {
 
   getInstanceAABB(instance: gdInitialInstance, bounds: Rectangle): Rectangle {
     const angle = (instance.getAngle() * Math.PI) / 180;
-    if (angle === 0) {
+    const isFlippedX = instance.isFlippedX();
+    const isFlippedY = instance.isFlippedY();
+    if (angle === 0 && !isFlippedX && !isFlippedY) {
       return this.getUnrotatedInstanceAABB(instance, bounds);
     }
 
@@ -352,6 +358,7 @@ export default class LayerRenderer {
         centerY = (rotatedRectangle[0][1] + rotatedRectangle[2][1]) / 2;
       }
 
+      flipPolygon(rotatedRectangle, centerX, centerY, isFlippedX, isFlippedY);
       rotatePolygon(rotatedRectangle, centerX, centerY, angle);
     }
 

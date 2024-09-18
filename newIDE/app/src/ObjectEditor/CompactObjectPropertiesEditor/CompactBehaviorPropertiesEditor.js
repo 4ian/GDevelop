@@ -29,8 +29,12 @@ export const CompactBehaviorPropertiesEditor = ({
   const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
 
   const basicPropertiesSchema = React.useMemo(
-    () =>
-      propertiesMapToSchema(
+    () => {
+      if (schemaRecomputeTrigger) {
+        // schemaRecomputeTrigger allows to invalidate the schema when required.
+      }
+
+      return propertiesMapToSchema(
         behavior.getProperties(),
         behavior => behavior.getProperties(),
         (behavior, name, value) => {
@@ -38,15 +42,18 @@ export const CompactBehaviorPropertiesEditor = ({
         },
         object,
         'Basic'
-      ),
-    // schemaRecomputeTrigger allows to invalidate the schema when required.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+      );
+    },
     [behavior, object, schemaRecomputeTrigger]
   );
 
   const advancedPropertiesSchema = React.useMemo(
-    () =>
-      propertiesMapToSchema(
+    () => {
+      if (schemaRecomputeTrigger) {
+        // schemaRecomputeTrigger allows to invalidate the schema when required.
+      }
+
+      return propertiesMapToSchema(
         behavior.getProperties(),
         behavior => behavior.getProperties(),
         (behavior, name, value) => {
@@ -54,9 +61,8 @@ export const CompactBehaviorPropertiesEditor = ({
         },
         object,
         'Advanced'
-      ),
-    // schemaRecomputeTrigger allows to invalidate the schema when required.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+      );
+    },
     [behavior, object, schemaRecomputeTrigger]
   );
   const hasAdvancedProperties = advancedPropertiesSchema.length > 0;

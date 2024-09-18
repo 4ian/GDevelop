@@ -665,6 +665,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
         .setType('number')
         .setLabel(_('Tile size'))
         .setDescription(_('Tile size in pixels.'))
+        .setHidden(true) // Hidden because a full editor is needed to recompute column/row counts
     );
     objectProperties.set(
       'tilesWithHitBox',
@@ -684,6 +685,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
         .addExtraInfo('image')
         .setLabel(_('Atlas image'))
         .setDescription(_('The Atlas image containing the tileset.'))
+        .setHidden(true) // Hidden because a full editor is needed to recompute column/row counts
     );
 
     return objectProperties;

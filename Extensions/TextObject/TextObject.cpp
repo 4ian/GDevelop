@@ -155,67 +155,77 @@ std::map<gd::String, gd::PropertyDescriptor> TextObject::GetProperties() const {
       .AddExtraInfo("left")
       .AddExtraInfo("center")
       .AddExtraInfo("right")
-      .SetLabel(_("Alignment, when multiple lines are displayed"))
+      .SetLabel(_("Alignment"))
+      .SetDescription(_("Alignment of the text when multiple lines are displayed"))
       .SetGroup(_("Font"));
 
   objectProperties["isOutlineEnabled"]
       .SetValue(isOutlineEnabled ? "true" : "false")
       .SetType("boolean")
-      .SetLabel(_("Outline"))
-      .SetGroup(_("Outline"));
+      .SetLabel(_("Show outline"))
+      .SetGroup(_("Outline"))
+      .SetAdvanced();
 
   objectProperties["outlineColor"]
       .SetValue(outlineColor)
       .SetType("color")
-      .SetLabel(_("Outline color"))
-      .SetGroup(_("Outline"));
+      .SetLabel(_("Color"))
+      .SetGroup(_("Outline"))
+      .SetAdvanced();
 
   objectProperties["outlineThickness"]
       .SetValue(gd::String::From(outlineThickness))
       .SetType("number")
-      .SetLabel(_("Outline thickness"))
+      .SetLabel(_("Thickness"))
       .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
-      .SetGroup(_("Outline"));
+      .SetGroup(_("Outline"))
+      .SetAdvanced();
 
   objectProperties["isShadowEnabled"]
       .SetValue(isShadowEnabled ? "true" : "false")
       .SetType("boolean")
-      .SetLabel(_("Shadow"))
-      .SetGroup(_("Shadow"));
+      .SetLabel(_("Show shadow"))
+      .SetGroup(_("Shadow"))
+      .SetAdvanced();
 
   objectProperties["shadowColor"]
       .SetValue(shadowColor)
       .SetType("color")
-      .SetLabel(_("Shadow color"))
-      .SetGroup(_("Shadow"));
+      .SetLabel(_("Color"))
+      .SetGroup(_("Shadow"))
+      .SetAdvanced();
 
   objectProperties["shadowOpacity"]
       .SetValue(gd::String::From(shadowOpacity))
       .SetType("number")
-      .SetLabel(_("Shadow opacity"))
+      .SetLabel(_("Opacity"))
       .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
-      .SetGroup(_("Shadow"));
+      .SetGroup(_("Shadow"))
+      .SetAdvanced();
 
   objectProperties["shadowAngle"]
       .SetValue(gd::String::From(shadowAngle))
       .SetType("number")
-      .SetLabel(_("Shadow angle"))
+      .SetLabel(_("Angle"))
       .SetMeasurementUnit(gd::MeasurementUnit::GetDegreeAngle())
-      .SetGroup(_("Shadow"));
+      .SetGroup(_("Shadow"))
+      .SetAdvanced();
 
   objectProperties["shadowDistance"]
       .SetValue(gd::String::From(shadowDistance))
       .SetType("number")
-      .SetLabel(_("Shadow distance"))
+      .SetLabel(_("Distance"))
       .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
-      .SetGroup(_("Shadow"));
+      .SetGroup(_("Shadow"))
+      .SetAdvanced();
 
   objectProperties["shadowBlurRadius"]
       .SetValue(gd::String::From(shadowBlurRadius))
       .SetType("number")
-      .SetLabel(_("Shadow blur radius"))
+      .SetLabel(_("Blur radius"))
       .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
-      .SetGroup(_("Shadow"));
+      .SetGroup(_("Shadow"))
+      .SetAdvanced();
 
   return objectProperties;
 }

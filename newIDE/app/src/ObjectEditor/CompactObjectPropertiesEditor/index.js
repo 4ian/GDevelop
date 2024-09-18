@@ -43,6 +43,8 @@ import CompactSelectField from '../../UI/CompactSelectField';
 import SelectOption from '../../UI/SelectOption';
 import { ChildObjectPropertiesEditor } from './ChildObjectPropertiesEditor';
 import { getSchemaWithOpenFullEditorButton } from './CompactObjectPropertiesSchema';
+import FlatButton from '../../UI/FlatButton';
+import ChevronArrowTop from '../../UI/CustomSvgIcons/ChevronArrowTop';
 
 const gd: libGDevelop = global.gd;
 
@@ -133,6 +135,7 @@ export const CompactObjectPropertiesEditor = ({
   onEditObject,
 }: Props) => {
   const forceUpdate = useForceUpdate();
+  const [showObjectAdvancedOptions, setShowObjectAdvancedOptions] = React.useState(false);
   const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
   const variablesListRef = React.useRef<?VariablesListInterface>(null);
   const object = objects[0];
@@ -161,23 +164,25 @@ export const CompactObjectPropertiesEditor = ({
   );
 
   // Properties:
-  const schema = React.useMemo(
+  const objectBasicPropertiesSchema = React.useMemo(
     () => {
       if (schemaRecomputeTrigger) {
         // schemaRecomputeTrigger allows to invalidate the schema when required.
       }
 
       const properties = objectConfigurationAsGd.getProperties();
-      const schema = propertiesMapToSchema(
+      const objectBasicPropertiesSchema = propertiesMapToSchema(
         properties,
         ({ object, objectConfiguration }) =>
           objectConfiguration.getProperties(),
         ({ object, objectConfiguration }, name, value) =>
-          objectConfiguration.updateProperty(name, value)
+          objectConfiguration.updateProperty(name, value),
+        null,
+        'Basic'
       );
 
       return getSchemaWithOpenFullEditorButton({
-        schema,
+        schema: objectBasicPropertiesSchema,
         fullEditorLabel,
         object,
         onEditObject,
@@ -191,6 +196,26 @@ export const CompactObjectPropertiesEditor = ({
       onEditObject,
     ]
   );
+  const objectAdvancedPropertiesSchema = React.useMemo(
+    () => {
+      if (schemaRecomputeTrigger) {
+        // schemaRecomputeTrigger allows to invalidate the schema when required.
+      }
+
+      const properties = objectConfigurationAsGd.getProperties();
+      return propertiesMapToSchema(
+        properties,
+        ({ object, objectConfiguration }) =>
+          objectConfiguration.getProperties(),
+        ({ object, objectConfiguration }, name, value) =>
+          objectConfiguration.updateProperty(name, value),
+        null,
+        'Advanced'
+      );
+    },
+    [objectConfigurationAsGd, schemaRecomputeTrigger]
+  );
+  const hasObjectAdvancedProperties = objectAdvancedPropertiesSchema.length > 0;
 
   // Behaviors:
   const {
@@ -283,15 +308,52 @@ export const CompactObjectPropertiesEditor = ({
               project={project}
               resourceManagementProps={resourceManagementProps}
               unsavedChanges={unsavedChanges}
-              schema={schema}
+              schema={objectBasicPropertiesSchema}
               instances={[
                 { object, objectConfiguration: objectConfigurationAsGd },
               ]}
               onInstancesModified={() => {
-                /* TODO */
+                // TODO: undo/redo?
               }}
               onRefreshAllFields={forceRecomputeSchema}
             />
+            {!showObjectAdvancedOptions && hasObjectAdvancedProperties && (
+              <FlatButton
+                fullWidth
+                primary
+                leftIcon={<ChevronArrowRight />}
+                label={<Trans>Show more</Trans>}
+                onClick={() => {
+                  setShowObjectAdvancedOptions(true);
+                }}
+              />
+            )}
+            {showObjectAdvancedOptions && hasObjectAdvancedProperties && (
+              <CompactPropertiesEditor
+                project={project}
+                resourceManagementProps={resourceManagementProps}
+                unsavedChanges={unsavedChanges}
+                schema={objectAdvancedPropertiesSchema}
+                instances={[
+                  { object, objectConfiguration: objectConfigurationAsGd },
+                ]}
+                onInstancesModified={() => {
+                  // TODO: undo/redo?
+                }}
+                onRefreshAllFields={forceRecomputeSchema}
+              />
+            )}
+            {showObjectAdvancedOptions && hasObjectAdvancedProperties && (
+              <FlatButton
+                fullWidth
+                primary
+                leftIcon={<ChevronArrowTop />}
+                label={<Trans>Show less</Trans>}
+                onClick={() => {
+                  setShowObjectAdvancedOptions(false);
+                }}
+              />
+            )}
             {eventsBasedObject &&
               customObjectConfiguration &&
               shouldDisplayEventsBasedObjectChildren &&
@@ -331,7 +393,7 @@ export const CompactObjectPropertiesEditor = ({
               <Text size="sub-title" noMargin>
                 <Trans>Behaviors</Trans>
               </Text>
-              <Line alignItems="center">
+              <Line alignItems="center" noMargin>
                 <IconButton
                   size="small"
                   onClick={() => {
@@ -401,7 +463,7 @@ export const CompactObjectPropertiesEditor = ({
               <Text size="sub-title" noMargin>
                 <Trans>Object Variables</Trans>
               </Text>
-              <Line alignItems="center">
+              <Line alignItems="center" noMargin>
                 <IconButton
                   size="small"
                   onClick={() => {
@@ -455,7 +517,7 @@ export const CompactObjectPropertiesEditor = ({
                   <Text size="sub-title" noMargin>
                     <Trans>Effects</Trans>
                   </Text>
-                  <Line alignItems="center">
+                  <Line alignItems="center" noMargin>
                     <IconButton
                       size="small"
                       onClick={() => {

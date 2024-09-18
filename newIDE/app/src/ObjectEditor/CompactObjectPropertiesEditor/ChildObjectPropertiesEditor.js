@@ -4,6 +4,11 @@ import CompactPropertiesEditor from '../../CompactPropertiesEditor';
 import propertiesMapToSchema from '../../CompactPropertiesEditor/PropertiesMapToCompactSchema';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
+import { ColumnStackLayout } from '../../UI/Layout';
+import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
+import { Trans } from '@lingui/macro';
+import FlatButton from '../../UI/FlatButton';
+import ChevronArrowTop from '../../UI/CustomSvgIcons/ChevronArrowTop';
 
 const gd: libGDevelop = global.gd;
 
@@ -26,6 +31,10 @@ export const ChildObjectPropertiesEditor = ({
   customObjectConfiguration,
   childObject,
 }: Props) => {
+  const [
+    showObjectAdvancedOptions,
+    setShowObjectAdvancedOptions,
+  ] = React.useState(false);
   const childObjectConfiguration = customObjectConfiguration.getChildObjectConfiguration(
     childObject.getName()
   );
@@ -36,7 +45,7 @@ export const ChildObjectPropertiesEditor = ({
   );
 
   // Properties:
-  const schema = React.useMemo(
+  const objectBasicPropertiesSchema = React.useMemo(
     () => {
       const properties = childObjectConfigurationAsGd.getProperties();
       const schema = propertiesMapToSchema(
@@ -44,7 +53,9 @@ export const ChildObjectPropertiesEditor = ({
         ({ object, objectConfiguration }) =>
           objectConfiguration.getProperties(),
         ({ object, objectConfiguration }, name, value) =>
-          objectConfiguration.updateProperty(name, value)
+          objectConfiguration.updateProperty(name, value),
+        null,
+        'Basic'
       );
 
       return schema;
@@ -52,22 +63,83 @@ export const ChildObjectPropertiesEditor = ({
     [childObjectConfigurationAsGd]
   );
 
+  const objectAdvancedPropertiesSchema = React.useMemo(
+    () => {
+      const properties = childObjectConfigurationAsGd.getProperties();
+      const schema = propertiesMapToSchema(
+        properties,
+        ({ object, objectConfiguration }) =>
+          objectConfiguration.getProperties(),
+        ({ object, objectConfiguration }, name, value) =>
+          objectConfiguration.updateProperty(name, value),
+        null,
+        'Advanced'
+      );
+
+      return schema;
+    },
+    [childObjectConfigurationAsGd]
+  );
+  const hasObjectAdvancedProperties = objectAdvancedPropertiesSchema.length > 0;
+
   return (
-    <CompactPropertiesEditor
-      project={project}
-      resourceManagementProps={resourceManagementProps}
-      unsavedChanges={unsavedChanges}
-      schema={schema}
-      instances={[
-        {
-          object: childObject,
-          objectConfiguration: childObjectConfigurationAsGd,
-        },
-      ]}
-      onInstancesModified={() => {
-        /* TODO */
-      }}
-      onRefreshAllFields={onRefreshAllFields}
-    />
+    <ColumnStackLayout noMargin noOverflowParent>
+      <CompactPropertiesEditor
+        project={project}
+        resourceManagementProps={resourceManagementProps}
+        unsavedChanges={unsavedChanges}
+        schema={objectBasicPropertiesSchema}
+        instances={[
+          {
+            object: childObject,
+            objectConfiguration: childObjectConfigurationAsGd,
+          },
+        ]}
+        onInstancesModified={() => {
+          // TODO: undo/redo?
+        }}
+        onRefreshAllFields={onRefreshAllFields}
+      />
+      {!showObjectAdvancedOptions && hasObjectAdvancedProperties && (
+        <FlatButton
+          fullWidth
+          primary
+          leftIcon={<ChevronArrowRight />}
+          label={<Trans>Show more</Trans>}
+          onClick={() => {
+            setShowObjectAdvancedOptions(true);
+          }}
+        />
+      )}
+      {showObjectAdvancedOptions && hasObjectAdvancedProperties && (
+        <CompactPropertiesEditor
+          project={project}
+          resourceManagementProps={resourceManagementProps}
+          unsavedChanges={unsavedChanges}
+          schema={objectAdvancedPropertiesSchema}
+          instances={[
+            {
+              object: childObject,
+              objectConfiguration: childObjectConfigurationAsGd,
+            },
+          ]}
+          onInstancesModified={() => {
+            // TODO: undo/redo?
+          }}
+          onRefreshAllFields={onRefreshAllFields}
+        />
+      )}
+      {showObjectAdvancedOptions && hasObjectAdvancedProperties && (
+        <FlatButton
+          fullWidth
+          primary
+          leftIcon={<ChevronArrowTop />}
+          label={<Trans>Show less</Trans>}
+          onClick={() => {
+            setShowObjectAdvancedOptions(false);
+          }}
+        />
+      )}
+    </ColumnStackLayout>
   );
 };

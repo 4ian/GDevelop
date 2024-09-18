@@ -109,23 +109,26 @@ Model3DObjectConfiguration::GetProperties() const {
   objectProperties["rotationX"]
       .SetValue(gd::String::From(rotationX))
       .SetType("number")
-      .SetLabel(_("Rotation around X axis"))
+      .SetLabel(_("X"))
+      .SetDescription(_("Rotation around X axis"))
       .SetMeasurementUnit(gd::MeasurementUnit::GetDegreeAngle())
-      .SetGroup(_("Default orientation"));
+      .SetGroup(_("Default rotation"));
 
   objectProperties["rotationY"]
       .SetValue(gd::String::From(rotationY))
       .SetType("number")
-      .SetLabel(_("Rotation around Y axis"))
+      .SetLabel(_("Y"))
+      .SetDescription(_("Rotation around Y axis"))
       .SetMeasurementUnit(gd::MeasurementUnit::GetDegreeAngle())
-      .SetGroup(_("Default orientation"));
+      .SetGroup(_("Default rotation"));
 
   objectProperties["rotationZ"]
       .SetValue(gd::String::From(rotationZ))
       .SetType("number")
-      .SetLabel(_("Rotation around Z axis"))
+      .SetLabel(_("Z"))
+      .SetDescription(_("Rotation around Z axis"))
       .SetMeasurementUnit(gd::MeasurementUnit::GetDegreeAngle())
-      .SetGroup(_("Default orientation"));
+      .SetGroup(_("Default rotation"));
 
   objectProperties["modelResourceName"]
       .SetValue(modelResourceName)
@@ -139,7 +142,7 @@ Model3DObjectConfiguration::GetProperties() const {
       .AddExtraInfo("Basic")
       .AddExtraInfo("StandardWithoutMetalness")
       .AddExtraInfo("KeepOriginal")
-      .SetLabel(_("Material modifier"));
+      .SetLabel(_("Material"));
 
   objectProperties["originLocation"]
       .SetValue(originLocation.empty() ? "TopLeft" : originLocation)
@@ -149,7 +152,9 @@ Model3DObjectConfiguration::GetProperties() const {
       .AddExtraInfo("ObjectCenter")
       .AddExtraInfo("BottomCenterZ")
       .AddExtraInfo("BottomCenterY")
-      .SetLabel(_("Origin point"));
+      .SetLabel(_("Origin point"))
+      .SetGroup(_("Points"))
+      .SetAdvanced(true);
 
   objectProperties["centerLocation"]
       .SetValue(centerLocation.empty() ? "ObjectCenter" : centerLocation)
@@ -158,7 +163,9 @@ Model3DObjectConfiguration::GetProperties() const {
       .AddExtraInfo("ObjectCenter")
       .AddExtraInfo("BottomCenterZ")
       .AddExtraInfo("BottomCenterY")
-      .SetLabel(_("Center point"));
+      .SetLabel(_("Center point"))
+      .SetGroup(_("Points"))
+      .SetAdvanced(true);
 
   return objectProperties;
 }

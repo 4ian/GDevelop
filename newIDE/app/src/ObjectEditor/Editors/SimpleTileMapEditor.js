@@ -208,6 +208,7 @@ const SimpleTileMapEditor = ({
               onSelectTileMapTile={onChangeTilesWithHitBox}
               showPaintingToolbar={false}
               allowMultipleSelection
+              allowRectangleSelection={false}
               onAtlasImageLoaded={onAtlasImageLoaded}
               interactive={true}
             />

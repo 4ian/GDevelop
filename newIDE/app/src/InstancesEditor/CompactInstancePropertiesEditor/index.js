@@ -253,6 +253,7 @@ const CompactInstancePropertiesEditor = ({
                   onSelectTileMapTile={onSelectTileMapTile}
                   showPaintingToolbar
                   allowMultipleSelection={false}
+                  allowRectangleSelection
                   interactive
                 />
               </Column>

@@ -847,14 +847,17 @@ export default class InstancesEditor extends Component<Props, State> {
 
       let shouldTrimAfterOperations = false;
 
-      if (tileMapTileSelection.kind === 'single') {
+      if (
+        tileMapTileSelection.kind === 'rectangle'
+        // TODO: Make sure a single tile is selected.
+      ) {
         shouldTrimAfterOperations = editableTileMap.isEmpty();
         // TODO: Optimize list execution to make sure the most important size changing operations are done first.
         let cumulatedUnshiftedRows = 0,
           cumulatedUnshiftedColumns = 0;
         const tileId = getTileIdFromGridCoordinates({
           columnCount: tileSet.columnCount,
-          ...tileMapTileSelection.coordinates,
+          ...tileMapTileSelection.coordinates[0],
         });
 
         const tileDefinition = editableTileMap.getTileDefinition(tileId);

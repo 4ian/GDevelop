@@ -297,18 +297,18 @@ class TileMapPaintingPreview {
     tileSet: TileSet,
     isBadlyConfigured: boolean,
     tileMapTileSelection: TileMapTileSelection,
-  }) {
+  }): ?PIXI.Sprite {
     const { tileSize } = tileSet;
     let texture;
     if (isBadlyConfigured) {
       texture = PixiResourcesLoader.getInvalidPIXITexture();
     } else {
-      if (tileMapTileSelection.kind === 'single') {
+      if (tileMapTileSelection.kind === 'rectangle') {
         texture = this._getTextureInAtlas({
           tileSet,
-          ...tileMapTileSelection.coordinates,
+          ...tileMapTileSelection.coordinates[0],
         });
-        if (!texture) return;
+        if (!texture) return null;
       } else if (tileMapTileSelection.kind === 'erase') {
         texture = PIXI.Texture.from(
           'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAARSURBVHgBY7h58+Z/BhgAcQA/VAcVLiw46wAAAABJRU5ErkJggg=='
@@ -326,7 +326,7 @@ class TileMapPaintingPreview {
       console.error(
         `Instance of ${instance.getObjectName()} seems to not be a RenderedSimpleTileMapInstance (method getEditableTileMap does not exist).`
       );
-      return;
+      return null;
     }
 
     const scales = updateSceneToTileMapTransformation(
@@ -336,10 +336,10 @@ class TileMapPaintingPreview {
       this.sceneToTileMapTransformation,
       this.tileMapToSceneTransformation
     );
-    if (!scales) return;
+    if (!scales) return null;
     const { scaleX, scaleY } = scales;
     const coordinates = this.getCoordinatesToRender();
-    if (coordinates.length === 0) return;
+    if (coordinates.length === 0) return null;
     const tileSizeInCanvas = this.viewPosition.toCanvasScale(tileSize);
     const spriteWidth = tileSizeInCanvas * scaleX;
     const spriteHeight = tileSizeInCanvas * scaleY;
@@ -353,7 +353,7 @@ class TileMapPaintingPreview {
     );
     if (spritesCoordinatesInTileMapGrid.length === 0) {
       console.warn("Could't get coordinates to render in tile map grid.");
-      return;
+      return null;
     }
 
     const workingPoint = [0, 0];
@@ -418,7 +418,7 @@ class TileMapPaintingPreview {
 
     if (
       isBadlyConfigured ||
-      tileMapTileSelection.kind === 'single' ||
+      tileMapTileSelection.kind === 'rectangle' || // TODO: Make sure a single tile is selected.
       tileMapTileSelection.kind === 'erase'
     ) {
       const sprite = this._getTilingSpriteWithSingleTexture({
@@ -427,7 +427,7 @@ class TileMapPaintingPreview {
         tileMapTileSelection,
         isBadlyConfigured,
       });
-      this.preview.addChild(sprite);
+      if (sprite) this.preview.addChild(sprite);
     }
 
     const canvasCoordinates = this.viewPosition.toCanvasCoordinates(0, 0);

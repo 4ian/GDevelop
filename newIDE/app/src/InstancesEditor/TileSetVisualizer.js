@@ -191,14 +191,14 @@ const Tile = ({
 
 export type TileMapTileSelection =
   | {|
-      kind: 'single',
-      coordinates: TileMapCoordinates,
-      flipHorizontally: boolean,
-      flipVertically: boolean,
-    |}
-  | {|
       kind: 'multiple',
       coordinates: TileMapCoordinates[],
+    |}
+  | {|
+      kind: 'rectangle',
+      coordinates: TileMapCoordinates[],
+      flipHorizontally: boolean,
+      flipVertically: boolean,
     |}
   | {|
       kind: 'erase',
@@ -210,6 +210,7 @@ type Props = {|
   tileMapTileSelection: ?TileMapTileSelection,
   onSelectTileMapTile: (?TileMapTileSelection) => void,
   allowMultipleSelection: boolean,
+  allowRectangleSelection: boolean,
   showPaintingToolbar: boolean,
   interactive: boolean,
   onAtlasImageLoaded?: (
@@ -224,6 +225,7 @@ const TileSetVisualizer = ({
   tileMapTileSelection,
   onSelectTileMapTile,
   allowMultipleSelection,
+  allowRectangleSelection,
   showPaintingToolbar,
   interactive,
   onAtlasImageLoaded,
@@ -242,9 +244,9 @@ const TileSetVisualizer = ({
     setShouldFlipHorizontally,
   ] = React.useState<boolean>(false);
   const [
-    lastSelectedTile,
-    setLastSelectedTile,
-  ] = React.useState<?TileMapCoordinates>(null);
+    lastSelection,
+    setLastSelection,
+  ] = React.useState<?TileMapTileSelection>(null);
   const tilesetContainerRef = React.useRef<?HTMLDivElement>(null);
   const tilesetAndTooltipContainerRef = React.useRef<?HTMLDivElement>(null);
   const [tooltipContent, setTooltipContent] = React.useState<?{|
@@ -372,7 +374,7 @@ const TileSetVisualizer = ({
         isBadlyConfigured ||
         !clickStartCoordinates ||
         !displayedTileSize ||
-        !allowMultipleSelection ||
+        (!allowMultipleSelection && !allowRectangleSelection) ||
         event.pointerType === 'touch'
       ) {
         return;
@@ -412,6 +414,7 @@ const TileSetVisualizer = ({
       columnCount,
       rowCount,
       allowMultipleSelection,
+      allowRectangleSelection,
       clickStartCoordinates,
     ]
   );
@@ -448,24 +451,6 @@ const TileSetVisualizer = ({
           rowCount,
           displayedTileSize,
         });
-        if (!allowMultipleSelection) {
-          if (
-            tileMapTileSelection &&
-            tileMapTileSelection.kind === 'single' &&
-            tileMapTileSelection.coordinates.x === x &&
-            tileMapTileSelection.coordinates.y === y
-          ) {
-            onSelectTileMapTile(null);
-          } else {
-            onSelectTileMapTile({
-              kind: 'single',
-              coordinates: { x, y },
-              flipHorizontally: shouldFlipHorizontally,
-              flipVertically: shouldFlipVertically,
-            });
-          }
-          return;
-        }
         if (!clickStartCoordinates) return;
 
         const {
@@ -478,46 +463,63 @@ const TileSetVisualizer = ({
           rowCount,
           displayedTileSize,
         });
-        const newSelection =
-          tileMapTileSelection && tileMapTileSelection.kind === 'multiple'
-            ? { ...tileMapTileSelection }
-            : { kind: 'multiple', coordinates: [] };
-        // Click on a tile.
-        if (
-          (startX === x && startY === y) ||
-          // Do not allow rectangular select on touch device as it conflicts with basic scrolling gestures.
-          isTouchDevice
-        ) {
+        if (allowMultipleSelection) {
+          const newSelection =
+            tileMapTileSelection && tileMapTileSelection.kind === 'multiple'
+              ? { ...tileMapTileSelection }
+              : { kind: 'multiple', coordinates: [] };
           if (
-            tileMapTileSelection &&
-            tileMapTileSelection.kind === 'multiple'
+            (startX === x && startY === y) ||
+            // Do not allow rectangular select on touch device as it conflicts with basic scrolling gestures.
+            isTouchDevice
           ) {
-            addOrRemoveCoordinatesInArray(newSelection.coordinates, {
-              x,
-              y,
-            });
-          }
-        } else {
-          for (
-            let columnIndex = Math.min(startX, x);
-            columnIndex <= Math.max(startX, x);
-            columnIndex++
-          ) {
-            for (
-              let rowIndex = Math.min(startY, y);
-              rowIndex <= Math.max(startY, y);
-              rowIndex++
+            if (
+              tileMapTileSelection &&
+              tileMapTileSelection.kind === 'multiple'
             ) {
-              if (newSelection && newSelection.kind === 'multiple') {
-                addOrRemoveCoordinatesInArray(newSelection.coordinates, {
-                  x: columnIndex,
-                  y: rowIndex,
-                });
+              addOrRemoveCoordinatesInArray(newSelection.coordinates, {
+                x,
+                y,
+              });
+            }
+          } else {
+            for (
+              let columnIndex = Math.min(startX, x);
+              columnIndex <= Math.max(startX, x);
+              columnIndex++
+            ) {
+              for (
+                let rowIndex = Math.min(startY, y);
+                rowIndex <= Math.max(startY, y);
+                rowIndex++
+              ) {
+                if (newSelection && newSelection.kind === 'multiple') {
+                  addOrRemoveCoordinatesInArray(newSelection.coordinates, {
+                    x: columnIndex,
+                    y: rowIndex,
+                  });
+                }
               }
             }
           }
+          onSelectTileMapTile(newSelection);
+        } else if (allowRectangleSelection) {
+          const topLeftCorner = {
+            x: Math.min(startX, x),
+            y: Math.min(startY, y),
+          };
+          const bottomRightCorner = {
+            x: Math.max(startX, x),
+            y: Math.max(startY, y),
+          };
+          const newSelection = {
+            kind: 'rectangle',
+            coordinates: [topLeftCorner, bottomRightCorner],
+            flipHorizontally: shouldFlipHorizontally,
+            flipVertically: shouldFlipVertically,
+          };
+          onSelectTileMapTile(newSelection);
         }
-        onSelectTileMapTile(newSelection);
       } finally {
         setClickStartCoordinates(null);
         setRectangularSelectionTilePreview(null);
@@ -534,6 +536,7 @@ const TileSetVisualizer = ({
       shouldFlipHorizontally,
       shouldFlipVertically,
       allowMultipleSelection,
+      allowRectangleSelection,
       clickStartCoordinates,
       shouldCancelClick,
       touchStartCoordinates,
@@ -542,11 +545,8 @@ const TileSetVisualizer = ({
 
   React.useEffect(
     () => {
-      if (tileMapTileSelection && tileMapTileSelection.kind === 'single') {
-        setLastSelectedTile({
-          x: tileMapTileSelection.coordinates.x,
-          y: tileMapTileSelection.coordinates.y,
-        });
+      if (tileMapTileSelection && tileMapTileSelection.kind === 'rectangle') {
+        setLastSelection(tileMapTileSelection);
       }
     },
     [tileMapTileSelection]
@@ -651,21 +651,23 @@ const TileSetVisualizer = ({
                 tooltip={t`Paint`}
                 selected={
                   !!tileMapTileSelection &&
-                  tileMapTileSelection.kind === 'single'
+                  tileMapTileSelection.kind === 'rectangle'
                 }
                 onClick={e => {
                   if (
                     !!tileMapTileSelection &&
-                    tileMapTileSelection.kind === 'single'
+                    tileMapTileSelection.kind === 'rectangle'
                   )
                     onSelectTileMapTile(null);
                   else
-                    onSelectTileMapTile({
-                      kind: 'single',
-                      coordinates: lastSelectedTile || { x: 0, y: 0 },
-                      flipHorizontally: shouldFlipHorizontally,
-                      flipVertically: shouldFlipVertically,
-                    });
+                    onSelectTileMapTile(
+                      lastSelection || {
+                        kind: 'rectangle',
+                        coordinates: [{ x: 0, y: 0 }, { x: 0, y: 0 }],
+                        flipHorizontally: shouldFlipHorizontally,
+                        flipVertically: shouldFlipVertically,
+                      }
+                    );
                 }}
                 disabled={!isAtlasImageSet}
               >
@@ -676,15 +678,14 @@ const TileSetVisualizer = ({
                 tooltip={t`Horizontal flip`}
                 selected={shouldFlipHorizontally}
                 disabled={
-                  !tileMapTileSelection ||
-                  tileMapTileSelection.kind !== 'single'
+                  !tileMapTileSelection || tileMapTileSelection.kind === 'erase'
                 }
                 onClick={e => {
                   const newShouldFlipHorizontally = !shouldFlipHorizontally;
                   setShouldFlipHorizontally(newShouldFlipHorizontally);
                   if (
                     !!tileMapTileSelection &&
-                    tileMapTileSelection.kind === 'single'
+                    tileMapTileSelection.kind === 'rectangle'
                   ) {
                     onSelectTileMapTile({
                       ...tileMapTileSelection,
@@ -700,15 +701,14 @@ const TileSetVisualizer = ({
                 tooltip={t`Vertical flip`}
                 selected={shouldFlipVertically}
                 disabled={
-                  !tileMapTileSelection ||
-                  tileMapTileSelection.kind !== 'single'
+                  !tileMapTileSelection || tileMapTileSelection.kind === 'erase'
                 }
                 onClick={e => {
                   const newShouldFlipVertically = !shouldFlipVertically;
                   setShouldFlipVertically(newShouldFlipVertically);
                   if (
                     !!tileMapTileSelection &&
-                    tileMapTileSelection.kind === 'single'
+                    tileMapTileSelection.kind === 'rectangle'
                   ) {
                     onSelectTileMapTile({
                       ...tileMapTileSelection,
@@ -776,14 +776,24 @@ const TileSetVisualizer = ({
                 />
               )}
               {tileMapTileSelection &&
-                tileMapTileSelection.kind === 'single' &&
+                tileMapTileSelection.kind === 'rectangle' &&
                 displayedTileSize && (
                   <Tile
                     key={`selected-tile`}
                     highlighted
                     size={displayedTileSize}
-                    x={tileMapTileSelection.coordinates.x}
-                    y={tileMapTileSelection.coordinates.y}
+                    x={tileMapTileSelection.coordinates[0].x}
+                    y={tileMapTileSelection.coordinates[0].y}
+                    width={
+                      tileMapTileSelection.coordinates[1].x -
+                      tileMapTileSelection.coordinates[0].x +
+                      1
+                    }
+                    height={
+                      tileMapTileSelection.coordinates[1].y -
+                      tileMapTileSelection.coordinates[0].y +
+                      1
+                    }
                   />
                 )}
               {tileMapTileSelection &&

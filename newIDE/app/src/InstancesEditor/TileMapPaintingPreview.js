@@ -260,6 +260,10 @@ export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
     } else if (tileMapTileSelection.kind === 'rectangle') {
       const selectionTopLeftCorner = tileMapTileSelection.coordinates[0];
       const selectionBottomRightCorner = tileMapTileSelection.coordinates[1];
+      const selectionWidth =
+        selectionBottomRightCorner.x - selectionTopLeftCorner.x + 1;
+      const selectionHeight =
+        selectionBottomRightCorner.y - selectionTopLeftCorner.y + 1;
 
       if (isSelectionASingleTileRectangle(tileMapTileSelection)) {
         const tileCoordinates = getTileCoordinatesOfCorner({
@@ -318,13 +322,9 @@ export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
           }
 
           let tileX, tileY;
-          const selectionWidth =
-            selectionBottomRightCorner.x - selectionTopLeftCorner.x + 1;
-          const selectionHeight =
-            selectionBottomRightCorner.y - selectionTopLeftCorner.y + 1;
-          if (deltaX === 0) {
+          if (deltaX === 0 || selectionWidth === 1) {
             tileX = selectionTopLeftCorner.x;
-          } else if (invertedDeltaX === 0) {
+          } else if (invertedDeltaX === 0 || selectionWidth === 2) {
             tileX = selectionBottomRightCorner.x;
           } else {
             tileX =
@@ -332,9 +332,9 @@ export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
               1 +
               selectionTopLeftCorner.x;
           }
-          if (deltaY === 0) {
+          if (deltaY === 0 || selectionHeight === 1) {
             tileY = selectionTopLeftCorner.y;
-          } else if (invertedDeltaY === 0) {
+          } else if (invertedDeltaY === 0 || selectionHeight === 2) {
             tileY = selectionBottomRightCorner.y;
           } else {
             tileY =

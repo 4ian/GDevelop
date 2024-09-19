@@ -16,7 +16,7 @@ import useForceUpdate from '../Utils/UseForceUpdate';
 import { useLongTouch, type ClientCoordinates } from '../Utils/UseLongTouch';
 import Text from '../UI/Text';
 import EmptyMessage from '../UI/EmptyMessage';
-import { isTileSetBadlyConfigured } from './TileMapPaintingPreview';
+import { isTileSetBadlyConfigured } from '../Utils/TileMap';
 
 const styles = {
   tilesetAndTooltipsContainer: {

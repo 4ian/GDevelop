@@ -43,9 +43,6 @@ import {
 } from '../Utils/ZoomUtils';
 import Background from './Background';
 import TileMapPaintingPreview, {
-  getTileSet,
-  getTilesGridCoordinatesFromPointerSceneCoordinates,
-  isTileSetBadlyConfigured,
   updateSceneToTileMapTransformation,
 } from './TileMapPaintingPreview';
 import {
@@ -58,6 +55,11 @@ import { AffineTransformation } from '../Utils/AffineTransformation';
 import { ErrorFallbackComponent } from '../UI/ErrorBoundary';
 import { Trans } from '@lingui/macro';
 import { generateUUID } from 'three/src/math/MathUtils';
+import {
+  getTilesGridCoordinatesFromPointerSceneCoordinates,
+  getTileSet,
+  isTileSetBadlyConfigured,
+} from '../Utils/TileMap';
 
 const gd: libGDevelop = global.gd;
 

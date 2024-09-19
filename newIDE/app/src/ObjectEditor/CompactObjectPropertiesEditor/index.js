@@ -112,7 +112,7 @@ const TopLevelCollapsibleSection = ({
   toggleFolded,
   renderContent,
   renderContentAsHiddenWhenFolded,
-  onEditInFullEditor,
+  onOpenFullEditor,
   onAdd,
 }: {|
   title: React.Node,
@@ -120,7 +120,7 @@ const TopLevelCollapsibleSection = ({
   toggleFolded: () => void,
   renderContent: () => React.Node,
   renderContentAsHiddenWhenFolded?: boolean,
-  onEditInFullEditor: () => void,
+  onOpenFullEditor: () => void,
   onAdd?: () => void,
 |}) => (
   <>
@@ -140,7 +140,7 @@ const TopLevelCollapsibleSection = ({
           </Text>
         </LineStackLayout>
         <Line alignItems="center" noMargin>
-          <IconButton size="small" onClick={onEditInFullEditor}>
+          <IconButton size="small" onClick={onOpenFullEditor}>
             <ShareExternal style={styles.icon} />
           </IconButton>
           {onAdd && (
@@ -388,7 +388,7 @@ export const CompactObjectPropertiesEditor = ({
             title={<Trans>Properties</Trans>}
             isFolded={isPropertiesFolded}
             toggleFolded={() => setIsPropertiesFolded(!isPropertiesFolded)}
-            onEditInFullEditor={() => onEditObject(object, 'properties')}
+            onOpenFullEditor={() => onEditObject(object, 'properties')}
             renderContent={() => (
               <ColumnStackLayout noOverflowParent>
                 {!hasSomeObjectProperties && (
@@ -505,7 +505,7 @@ export const CompactObjectPropertiesEditor = ({
             title={<Trans>Behaviors</Trans>}
             isFolded={isBehaviorsFolded}
             toggleFolded={() => setIsBehaviorsFolded(!isBehaviorsFolded)}
-            onEditInFullEditor={() => onEditObject(object, 'behaviors')}
+            onOpenFullEditor={() => onEditObject(object, 'behaviors')}
             onAdd={openNewBehaviorDialog}
             renderContent={() => (
               <ColumnStackLayout>
@@ -529,10 +529,14 @@ export const CompactObjectPropertiesEditor = ({
                       renderContent={() => (
                         <CompactBehaviorPropertiesEditor
                           project={project}
+                          behaviorMetadata={behaviorMetadata}
                           behavior={behavior}
                           object={object}
                           onBehaviorUpdated={() => {}}
                           resourceManagementProps={resourceManagementProps}
+                          onOpenFullEditor={() =>
+                            onEditObject(object, 'behaviors')
+                          }
                         />
                       )}
                       isFolded={behavior.isFolded()}
@@ -568,7 +572,7 @@ export const CompactObjectPropertiesEditor = ({
             title={<Trans>Object Variables</Trans>}
             isFolded={isVariablesFolded}
             toggleFolded={() => setIsVariablesFolded(!isVariablesFolded)}
-            onEditInFullEditor={() => onEditObject(object, 'variables')}
+            onOpenFullEditor={() => onEditObject(object, 'variables')}
             onAdd={() => {
               if (variablesListRef.current) {
                 variablesListRef.current.addVariable();
@@ -611,7 +615,7 @@ export const CompactObjectPropertiesEditor = ({
                 title={<Trans>Effects</Trans>}
                 isFolded={isEffectsFolded}
                 toggleFolded={() => setIsEffectsFolded(!isEffectsFolded)}
-                onEditInFullEditor={() => onEditObject(object, 'effects')}
+                onOpenFullEditor={() => onEditObject(object, 'effects')}
                 onAdd={() => addEffect(false)}
                 renderContent={() => (
                   <ColumnStackLayout>

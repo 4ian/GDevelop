@@ -11,22 +11,66 @@ import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
 import Text from '../../UI/Text';
 import { Line } from '../../UI/Grid';
 import { useForceRecompute } from '../../Utils/UseForceUpdate';
+import { type Schema, type ActionButton } from '../../CompactPropertiesEditor';
+import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
+
+export const getSchemaWithOpenFullEditorButton = ({
+  schema,
+  fullEditorLabel,
+  behavior,
+  onOpenFullEditor,
+}: {|
+  schema: Schema,
+  fullEditorLabel: ?string,
+  behavior: gdBehavior,
+  onOpenFullEditor: () => void,
+|}): Schema => {
+  if (!fullEditorLabel) return schema;
+
+  const actionButton: ActionButton = {
+    label: fullEditorLabel,
+    disabled: 'onValuesDifferent',
+    nonFieldType: 'button',
+    showRightIcon: true,
+    getIcon: style => <ShareExternal style={style} />,
+    getValue: behavior => behavior.getName(),
+    onClick: behavior => onOpenFullEditor(),
+  };
+
+  let added = false;
+  schema.forEach(field => {
+    if (field.children && field.name === '') {
+      field.children.push(actionButton);
+      added = true;
+    }
+  });
+
+  if (!added) schema.push(actionButton);
+
+  return schema;
+};
 
 export const CompactBehaviorPropertiesEditor = ({
   project,
+  behaviorMetadata,
   behavior,
   object,
+  onOpenFullEditor,
   onBehaviorUpdated,
   resourceManagementProps,
 }: {|
   project: gdProject,
+  behaviorMetadata: gdBehaviorMetadata,
   behavior: gdBehavior,
   object: gdObject,
+  onOpenFullEditor: () => void,
   onBehaviorUpdated: () => void,
   resourceManagementProps: ResourceManagementProps,
 |}) => {
   const [showAdvancedOptions, setShowAdvancedOptions] = React.useState(false);
   const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
+
+  const fullEditorLabel = behaviorMetadata.getOpenFullEditorLabel();
 
   const basicPropertiesSchema = React.useMemo(
     () => {
@@ -34,7 +78,7 @@ export const CompactBehaviorPropertiesEditor = ({
         // schemaRecomputeTrigger allows to invalidate the schema when required.
       }
 
-      return propertiesMapToSchema(
+      const schema = propertiesMapToSchema(
         behavior.getProperties(),
         behavior => behavior.getProperties(),
         (behavior, name, value) => {
@@ -43,8 +87,21 @@ export const CompactBehaviorPropertiesEditor = ({
         object,
         'Basic'
       );
+
+      return getSchemaWithOpenFullEditorButton({
+        schema,
+        fullEditorLabel,
+        behavior,
+        onOpenFullEditor,
+      });
     },
-    [behavior, object, schemaRecomputeTrigger]
+    [
+      behavior,
+      object,
+      schemaRecomputeTrigger,
+      fullEditorLabel,
+      onOpenFullEditor,
+    ]
   );
 
   const advancedPropertiesSchema = React.useMemo(

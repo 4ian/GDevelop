@@ -2029,6 +2029,9 @@ interface BehaviorMetadata {
     QuickCustomization_Visibility GetQuickCustomizationVisibility();
     [Ref] BehaviorMetadata SetQuickCustomizationVisibility(QuickCustomization_Visibility visibility);
 
+    [Ref] BehaviorMetadata SetOpenFullEditorLabel([Const] DOMString label);
+    [Const, Ref] DOMString GetOpenFullEditorLabel();
+
     [Ref] Behavior Get();
     BehaviorsSharedData GetSharedDataInstance();
 

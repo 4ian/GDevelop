@@ -620,16 +620,19 @@ const CompactPropertiesEditor = ({
     (field: ValueField) => {
       if (!field.getChoices || !field.getValue) return;
 
-      const children = field
-        .getChoices()
-        .map(({ value, label, labelIsUserDefined }) => (
-          <SelectOption
-            key={value}
-            value={value}
-            label={label}
-            shouldNotTranslate={labelIsUserDefined}
-          />
-        ));
+      const choices = field.getChoices();
+      if (choices.length < 2 && field.isHiddenWhenOnlyOneChoice) {
+        return;
+      }
+
+      const children = choices.map(({ value, label, labelIsUserDefined }) => (
+        <SelectOption
+          key={value}
+          value={value}
+          label={label}
+          shouldNotTranslate={labelIsUserDefined}
+        />
+      ));
 
       let compactSelectField;
       if (field.valueType === 'number') {

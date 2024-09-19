@@ -113,47 +113,45 @@ export const isSelectionASingleTileRectangle = (
   );
 };
 
-type Corner = 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight';
-
-const getTileCoordinatesOfCorner = ({
-  corner,
-  topLeftCorner,
-  bottomRightCorner,
+/**
+ * When flipping is activated, the tile texture should be flipped but
+ * the tiles should be flipped as well in the selection
+ * (the left tiles should be replaced by the right tiles if the horizontal flip
+ * is activated).
+ */
+const getTileCorrespondingToFlippingInstructions = ({
+  tileMapTileSelection,
+  tileCoordinates,
 }: {|
-  corner: Corner,
-  topLeftCorner: {| x: number, y: number |},
-  bottomRightCorner: {| x: number, y: number |},
-|}) => {
-  return {
-    x: corner.toLowerCase().includes('left')
-      ? topLeftCorner.x
-      : bottomRightCorner.x,
-    y: corner.toLowerCase().includes('top')
-      ? topLeftCorner.y
-      : bottomRightCorner.y,
-  };
-};
-
-const getCornerFromFlippingInstructions = ({
-  flipHorizontally,
-  flipVertically,
-}: {|
-  flipHorizontally: boolean,
-  flipVertically: boolean,
-|}): Corner => {
-  if (flipHorizontally) {
-    return flipVertically ? 'bottomRight' : 'topRight';
-  } else {
-    return flipVertically ? 'bottomLeft' : 'topLeft';
+  tileMapTileSelection: TileMapTileSelection,
+  tileCoordinates: {| x: number, y: number |},
+|}): {| x: number, y: number |} => {
+  if (tileMapTileSelection.kind === 'rectangle') {
+    const selectionTopLeftCorner = tileMapTileSelection.coordinates[0];
+    const selectionBottomRightCorner = tileMapTileSelection.coordinates[1];
+    const selectionWidth =
+      selectionBottomRightCorner.x - selectionTopLeftCorner.x + 1;
+    const selectionHeight =
+      selectionBottomRightCorner.y - selectionTopLeftCorner.y + 1;
+    const deltaX = tileCoordinates.x - selectionTopLeftCorner.x;
+    const deltaY = tileCoordinates.y - selectionTopLeftCorner.y;
+    const newX =
+      selectionTopLeftCorner.x +
+      (tileMapTileSelection.flipHorizontally
+        ? selectionWidth - deltaX - 1
+        : deltaX);
+    const newY =
+      selectionTopLeftCorner.y +
+      (tileMapTileSelection.flipVertically
+        ? selectionHeight - deltaY - 1
+        : deltaY);
+    return { x: newX, y: newY };
   }
+  return tileCoordinates;
 };
 
 /**
  * Returns the list of tiles corresponding to the user selection.
- * If only one coordinate is present, only one tile is placed at the slot the
- * pointer points to.
- * If two coordinates are present, tiles are displayed to form a rectangle with the
- * two coordinates being the top left and bottom right corner of the rectangle.
  */
 export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
   tileMapTileSelection,
@@ -186,14 +184,9 @@ export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
     let tileCoordinates;
     if (tileMapTileSelection.kind === 'rectangle') {
       const topLeftCorner = tileMapTileSelection.coordinates[0];
-      const bottomRightCorner = tileMapTileSelection.coordinates[1];
-      tileCoordinates = getTileCoordinatesOfCorner({
-        topLeftCorner,
-        bottomRightCorner,
-        corner: getCornerFromFlippingInstructions({
-          flipHorizontally: tileMapTileSelection.flipHorizontally,
-          flipVertically: tileMapTileSelection.flipVertically,
-        }),
+      tileCoordinates = getTileCorrespondingToFlippingInstructions({
+        tileMapTileSelection,
+        tileCoordinates: topLeftCorner,
       });
     }
     return [
@@ -266,16 +259,11 @@ export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
         selectionBottomRightCorner.y - selectionTopLeftCorner.y + 1;
 
       if (isSelectionASingleTileRectangle(tileMapTileSelection)) {
-        const tileCoordinates = getTileCoordinatesOfCorner({
-          topLeftCorner: selectionTopLeftCorner,
-          bottomRightCorner: selectionBottomRightCorner,
-          corner: getCornerFromFlippingInstructions({
-            flipHorizontally: tileMapTileSelection.flipHorizontally,
-            flipVertically: tileMapTileSelection.flipVertically,
-          }),
-        });
         tilesCoordinatesInTileMapGrid.push({
-          tileCoordinates,
+          tileCoordinates: getTileCorrespondingToFlippingInstructions({
+            tileMapTileSelection,
+            tileCoordinates: selectionTopLeftCorner,
+          }),
           topLeftCorner: {
             x: topLeftCornerCoordinatesInTileMapGrid[0],
             y: topLeftCornerCoordinatesInTileMapGrid[1],
@@ -306,7 +294,10 @@ export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
             bottomRightCornerCoordinatesInTileMapGrid[1] - y;
           if (deltaX === 0 && deltaY === 0) {
             tilesCoordinatesInTileMapGrid.push({
-              tileCoordinates: selectionTopLeftCorner,
+              tileCoordinates: getTileCorrespondingToFlippingInstructions({
+                tileMapTileSelection,
+                tileCoordinates: selectionTopLeftCorner,
+              }),
               topLeftCorner: { x, y },
               bottomRightCorner: { x, y },
             });
@@ -314,7 +305,10 @@ export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
           }
           if (invertedDeltaX === 0 && invertedDeltaY === 0) {
             tilesCoordinatesInTileMapGrid.push({
-              tileCoordinates: selectionBottomRightCorner,
+              tileCoordinates: getTileCorrespondingToFlippingInstructions({
+                tileMapTileSelection,
+                tileCoordinates: selectionBottomRightCorner,
+              }),
               topLeftCorner: { x, y },
               bottomRightCorner: { x, y },
             });
@@ -344,7 +338,10 @@ export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
           }
 
           tilesCoordinatesInTileMapGrid.push({
-            tileCoordinates: { x: tileX, y: tileY },
+            tileCoordinates: getTileCorrespondingToFlippingInstructions({
+              tileMapTileSelection,
+              tileCoordinates: { x: tileX, y: tileY },
+            }),
             topLeftCorner: { x, y },
             bottomRightCorner: { x, y },
           });
@@ -352,6 +349,8 @@ export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
       }
     }
   }
+  // TODO: Optimize tiles by stretching the tiling textures instead of creating new ones
+  // for each coordinate.
   return tilesCoordinatesInTileMapGrid;
 };
 

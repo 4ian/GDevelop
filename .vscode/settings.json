@@ -114,7 +114,8 @@
     "__bits": "cpp",
     "__verbose_abort": "cpp",
     "variant": "cpp",
-    "charconv": "cpp"
+    "charconv": "cpp",
+    "execution": "cpp"
   },
   "files.exclude": {
     "Binaries/*build*": true,

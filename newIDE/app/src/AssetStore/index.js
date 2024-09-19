@@ -600,72 +600,78 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
 
     return (
       <Column expand noMargin useFullHeight noOverflowParent id="asset-store">
-        <LineStackLayout>
-          <IconButton
-            id="home-button"
-            key="back-discover"
-            tooltip={t`Back to discover`}
-            onClick={() => {
-              setSearchText('');
-              const page = assetSwappedObject
-                ? shopNavigationState.openAssetSwapping()
-                : shopNavigationState.openHome();
-              setScrollUpdateIsNeeded(page);
-              clearAllAssetStoreFilters();
-              setIsFiltersPanelOpen(false);
-            }}
-            size="small"
-          >
-            <Home />
-          </IconButton>
-          <Column expand useFullHeight noMargin>
-            <SearchBar
-              placeholder={
-                hideGameTemplates ? t`Search assets` : `Search the shop`
-              }
-              value={searchText}
-              onChange={(newValue: string) => {
-                if (searchText === newValue) {
-                  return;
+        <>
+          <LineStackLayout>
+            {!assetSwappedObject && (
+              <IconButton
+                id="home-button"
+                key="back-discover"
+                tooltip={t`Back to discover`}
+                onClick={() => {
+                  setSearchText('');
+                  const page = assetSwappedObject
+                    ? shopNavigationState.openAssetSwapping()
+                    : shopNavigationState.openHome();
+                  setScrollUpdateIsNeeded(page);
+                  clearAllAssetStoreFilters();
+                  setIsFiltersPanelOpen(false);
+                }}
+                size="small"
+              >
+                <Home />
+              </IconButton>
+            )}
+            <Column expand useFullHeight noMargin>
+              <SearchBar
+                placeholder={
+                  hideGameTemplates ? t`Search assets` : `Search the shop`
                 }
-                setSearchText(newValue);
-                if (isOnSearchResultPage) {
-                  // An existing search is already being done: just move to the
-                  // top search results.
-                  shopNavigationState.openSearchResultPage();
-                  const assetsListInterface = assetsList.current;
-                  if (assetsListInterface) {
-                    assetsListInterface.scrollToPosition(0);
-                    assetsListInterface.setPageBreakIndex(0);
+                value={searchText}
+                onChange={(newValue: string) => {
+                  if (searchText === newValue) {
+                    return;
                   }
-                } else {
-                  // A new search is being initiated: navigate to the search page,
-                  // and clear the history as a new search was launched.
-                  if (!!newValue) {
-                    shopNavigationState.clearHistory();
+                  setSearchText(newValue);
+                  if (isOnSearchResultPage) {
+                    // An existing search is already being done: just move to the
+                    // top search results.
                     shopNavigationState.openSearchResultPage();
-                    openFiltersPanelIfAppropriate();
+                    const assetsListInterface = assetsList.current;
+                    if (assetsListInterface) {
+                      assetsListInterface.scrollToPosition(0);
+                      assetsListInterface.setPageBreakIndex(0);
+                    }
+                  } else {
+                    // A new search is being initiated: navigate to the search page,
+                    // and clear the history as a new search was launched.
+                    if (!!newValue) {
+                      shopNavigationState.clearHistory();
+                      shopNavigationState.openSearchResultPage();
+                      openFiltersPanelIfAppropriate();
+                    }
                   }
-                }
-              }}
-              onRequestSearch={() => {}}
-              ref={searchBar}
-              id="asset-store-search-bar"
-            />
-          </Column>
-          <IconButton
-            onClick={() => setIsFiltersPanelOpen(!isFiltersPanelOpen)}
-            disabled={!canShowFiltersPanel}
-            selected={canShowFiltersPanel && isFiltersPanelOpen}
-            size="small"
-          >
-            <Tune />
-          </IconButton>
-        </LineStackLayout>
-        <Spacer />
+                }}
+                onRequestSearch={() => {}}
+                ref={searchBar}
+                id="asset-store-search-bar"
+              />
+            </Column>
+            {!assetSwappedObject && (
+              <IconButton
+                onClick={() => setIsFiltersPanelOpen(!isFiltersPanelOpen)}
+                disabled={!canShowFiltersPanel}
+                selected={canShowFiltersPanel && isFiltersPanelOpen}
+                size="small"
+              >
+                <Tune />
+              </IconButton>
+            )}
+          </LineStackLayout>
+          <Spacer />
+        </>
         <Column noMargin>
           <Line justifyContent="space-between" noMargin alignItems="center">
-            {(!isOnHomePage || !!openedShopCategory) && (
+            {(!isOnHomePage || !!openedShopCategory) && !assetSwappedObject && (
               <>
                 {shopNavigationState.isRootPage ? null : (
                   <Column expand alignItems="flex-start" noMargin>
@@ -792,7 +798,8 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
               hideGameTemplates={hideGameTemplates}
               hideDetails={!!assetSwappedObject}
             />
-          ) : openedAssetShortHeader ? (
+          ) : // Do not show the asset details if we're swapping an asset.
+          openedAssetShortHeader && !assetSwappedObject ? (
             <AssetDetails
               ref={assetDetails}
               onTagSelection={selectTag}

@@ -2,15 +2,14 @@
 import * as React from 'react';
 import { ObjectPreview } from './ObjectPreview';
 import { mapFor } from '../Utils/MapFor';
-import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
+import { ColumnStackLayout } from '../UI/Layout';
 import FlatButton from '../UI/FlatButton';
 import AssetSwappingDialog from '../AssetStore/AssetSwappingDialog';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import Text from '../UI/Text';
 import { Trans } from '@lingui/macro';
 import { enumerateObjectFolderOrObjects } from '.';
-import { CalloutCard } from '../UI/CalloutCard';
-import { LargeSpacer } from '../UI/Grid';
+import TipCard from './TipCard';
 
 type Props = {|
   project: gdProject,
@@ -35,6 +34,15 @@ export const QuickObjectReplacer = ({
 
   return (
     <ColumnStackLayout noMargin expand>
+      <TipCard
+        title={<Trans>These are objects</Trans>}
+        description={
+          <Trans>
+            Each character, player, obstacle, background, item, etc. is an
+            object. Objects are the building blocks of your game.
+          </Trans>
+        }
+      />
       {mapFor(0, project.getLayoutsCount(), i => {
         const layout = project.getLayoutAt(i);
         const folderObjects = enumerateObjectFolderOrObjects(
@@ -44,7 +52,7 @@ export const QuickObjectReplacer = ({
         if (!folderObjects.length) return null;
 
         return (
-          <ColumnStackLayout noMargin expand>
+          <ColumnStackLayout noMargin key={layout.getName()}>
             {project.getLayoutsCount() > 1 && (
               <Text noMargin size={'block-title'}>
                 {layout.getName()}
@@ -52,13 +60,13 @@ export const QuickObjectReplacer = ({
             )}
             {folderObjects.map(({ folderName, objects }) => {
               return (
-                <ColumnStackLayout noMargin expand>
+                <ColumnStackLayout noMargin key={folderName}>
                   <Text noMargin size={'sub-title'}>
                     {folderName}
                   </Text>
                   <div style={styles.objectsContainer}>
                     {objects.map(object => (
-                      <ColumnStackLayout noMargin>
+                      <ColumnStackLayout noMargin key={object.ptr}>
                         <ObjectPreview object={object} project={project} />
                         <FlatButton
                           primary
@@ -76,30 +84,6 @@ export const QuickObjectReplacer = ({
           </ColumnStackLayout>
         );
       })}
-      <LargeSpacer />
-      <CalloutCard
-        renderImage={style => (
-          <img
-            src="res/quick_customization/replace_objects.svg"
-            style={style}
-            alt=""
-          />
-        )}
-      >
-        <ResponsiveLineStackLayout noMargin expand alignItems="stretch">
-          <ColumnStackLayout alignItems="flex-start" expand noMargin>
-            <Text noMargin size="block-title">
-              <Trans>Objects are everything in your game</Trans>
-            </Text>
-            <Text noMargin size="body">
-              <Trans>
-                Each character, player, obstacle, background, item, etc. is an
-                object. Objects are the building blocks of your game.
-              </Trans>
-            </Text>
-          </ColumnStackLayout>
-        </ResponsiveLineStackLayout>
-      </CalloutCard>
       {selectedObjectToSwap && (
         <AssetSwappingDialog
           project={project}

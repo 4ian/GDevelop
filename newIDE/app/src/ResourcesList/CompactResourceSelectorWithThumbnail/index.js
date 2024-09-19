@@ -36,12 +36,9 @@ type Props = {|
   project: gdProject,
   resourceManagementProps: ResourceManagementProps,
   resourceKind: ResourceKind,
-  fallbackResourceKind?: ResourceKind,
   resourceName: string,
   defaultNewResourceName?: string,
   onChange: string => void,
-  label?: string,
-  markdownDescription?: ?string,
   id?: string,
 |};
 
@@ -52,9 +49,6 @@ export const CompactResourceSelectorWithThumbnail = ({
   resourceName,
   defaultNewResourceName,
   onChange,
-  label,
-  markdownDescription,
-  fallbackResourceKind,
   id,
 }: Props) => {
   const resourcesLoader = ResourcesLoader;

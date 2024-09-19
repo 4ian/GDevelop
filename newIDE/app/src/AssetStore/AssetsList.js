@@ -48,7 +48,6 @@ import Breadcrumbs from '../UI/Breadcrumbs';
 import { getFolderTagsFromAssetShortHeaders } from './TagsHelper';
 import { PrivateGameTemplateStoreContext } from './PrivateGameTemplates/PrivateGameTemplateStoreContext';
 import { type AssetStorePageState } from './AssetStoreNavigator';
-import RaisedButton from '../UI/RaisedButton';
 import FlatButton from '../UI/FlatButton';
 import HelpIcon from '../UI/HelpIcon';
 import { OwnedProductLicense } from './ProductLicense/ProductLicenseOptions';
@@ -202,9 +201,8 @@ const PageBreakNavigation = ({
           }}
           disabled={pageBreakIndex <= 0}
         />
-        <RaisedButton
+        <FlatButton
           key="next-assets"
-          primary
           label={<Trans>Show next assets</Trans>}
           onClick={() => {
             currentPage.pageBreakIndex = (currentPage.pageBreakIndex || 0) + 1;

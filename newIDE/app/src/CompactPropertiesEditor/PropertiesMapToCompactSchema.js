@@ -164,13 +164,10 @@ const createField = (
     const extraInfos = property.getExtraInfo().toJSArray();
     // $FlowFixMe - assume the passed resource kind is always valid.
     const kind: ResourceKind = extraInfos[0] || '';
-    // $FlowFixMe - assume the passed resource kind is always valid.
-    const fallbackKind: ResourceKind = extraInfos[1] || '';
     return {
       name,
       valueType: 'resource',
       resourceKind: kind,
-      fallbackResourceKind: fallbackKind,
       getValue: (instance: Instance): string => {
         return getProperties(instance)
           .get(name)
@@ -256,11 +253,17 @@ const uncapitalize = str => {
  * @param visibility `true` when only deprecated properties must be displayed
  * and `false` when only not deprecated ones must be displayed
  */
-const isPropertyVisible = (
+const isPropertyVisible = ({
+  properties,
+  name,
+  visibility,
+  quickCustomizationVisibilities,
+}: {
   properties: gdMapStringPropertyDescriptor,
   name: string,
-  visibility: 'All' | 'Basic' | 'Advanced' | 'Deprecated' | 'Basic-Quick'
-): boolean => {
+  visibility: 'All' | 'Basic' | 'Advanced' | 'Deprecated' | 'Basic-Quick',
+  quickCustomizationVisibilities?: gdQuickCustomizationVisibilitiesContainer,
+}): boolean => {
   if (!properties.has(name)) {
     return false;
   }
@@ -285,7 +288,7 @@ const isPropertyVisible = (
     if (property.isDeprecated()) return false;
     if (property.isAdvanced()) return false;
 
-    // Honor visibility if set:
+    // Honor visibility if set on the property.
     if (
       property.getQuickCustomizationVisibility() ===
       gd.QuickCustomization.Hidden
@@ -296,6 +299,13 @@ const isPropertyVisible = (
       gd.QuickCustomization.Visible
     )
       return true;
+
+    // Honor visibility if set on the container.
+    if (quickCustomizationVisibilities) {
+      const visibility = quickCustomizationVisibilities.get(name);
+      if (visibility === gd.QuickCustomization.Hidden) return false;
+      if (visibility === gd.QuickCustomization.Visible) return true;
+    }
 
     // Otherwise, hide some properties that we know are complex.
     const propertyType = property.getType();
@@ -314,7 +324,14 @@ const isPropertyVisible = (
  * @param getProperties The function called to read again the properties
  * @param onUpdateProperty The function called to update a property of an object
  */
-const propertiesMapToSchema = (
+const propertiesMapToSchema = ({
+  properties,
+  getProperties,
+  onUpdateProperty,
+  object,
+  visibility = 'All',
+  quickCustomizationVisibilities,
+}: {
   properties: gdMapStringPropertyDescriptor,
   getProperties: (instance: Instance) => any,
   onUpdateProperty: (
@@ -322,14 +339,10 @@ const propertiesMapToSchema = (
     propertyName: string,
     newValue: string
   ) => void,
-  object: ?gdObject,
-  visibility:
-    | 'All'
-    | 'Basic'
-    | 'Advanced'
-    | 'Deprecated'
-    | 'Basic-Quick' = 'All'
-): Schema => {
+  object?: gdObject,
+  visibility?: 'All' | 'Basic' | 'Advanced' | 'Deprecated' | 'Basic-Quick',
+  quickCustomizationVisibilities?: gdQuickCustomizationVisibilitiesContainer,
+}): Schema => {
   const propertyNames = properties.keys();
   // Aggregate field by groups to be able to build field groups with a title.
   const fieldsByGroups = new Map<string, Array<Field>>();
@@ -337,7 +350,14 @@ const propertiesMapToSchema = (
   mapFor(0, propertyNames.size(), i => {
     const name = propertyNames.at(i);
     const property = properties.get(name);
-    if (!isPropertyVisible(properties, name, visibility)) {
+    if (
+      !isPropertyVisible({
+        properties,
+        name,
+        visibility,
+        quickCustomizationVisibilities,
+      })
+    ) {
       return null;
     }
     if (alreadyHandledProperties.has(name)) return null;
@@ -361,7 +381,14 @@ const propertiesMapToSchema = (
             name.replace(keyword, otherKeyword)
           );
           for (const rowPropertyName of rowAllPropertyNames) {
-            if (isPropertyVisible(properties, rowPropertyName, visibility)) {
+            if (
+              isPropertyVisible({
+                properties,
+                name: rowPropertyName,
+                visibility,
+                quickCustomizationVisibilities,
+              })
+            ) {
               rowPropertyNames.push(rowPropertyName);
             }
           }
@@ -372,7 +399,14 @@ const propertiesMapToSchema = (
             name.replace(uncapitalizeKeyword, uncapitalize(otherKeyword))
           );
           for (const rowPropertyName of rowAllPropertyNames) {
-            if (isPropertyVisible(properties, rowPropertyName, visibility)) {
+            if (
+              isPropertyVisible({
+                properties,
+                name: rowPropertyName,
+                visibility,
+                quickCustomizationVisibilities,
+              })
+            ) {
               rowPropertyNames.push(rowPropertyName);
             }
           }

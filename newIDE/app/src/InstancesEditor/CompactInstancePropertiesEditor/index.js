@@ -138,21 +138,21 @@ const CompactInstancePropertiesEditor = ({
       const canBeFlippedZ = objectMetadata.hasDefaultBehavior(
         'Scene3D::Base3DBehavior'
       );
-      const instanceSchemaForCustomProperties = propertiesMapToSchema(
+      const instanceSchemaForCustomProperties = propertiesMapToSchema({
         properties,
-        (instance: gdInitialInstance) =>
+        getProperties: (instance: gdInitialInstance) =>
           instance.getCustomProperties(
             globalObjectsContainer || objectsContainer,
             objectsContainer
           ),
-        (instance: gdInitialInstance, name, value) =>
+        onUpdateProperty: (instance: gdInitialInstance, name, value) =>
           instance.updateCustomProperty(
             name,
             value,
             globalObjectsContainer || objectsContainer,
             objectsContainer
-          )
-      );
+          ),
+      });
 
       const reorderedInstanceSchemaForCustomProperties = reorderInstanceSchemaForCustomProperties(
         instanceSchemaForCustomProperties,

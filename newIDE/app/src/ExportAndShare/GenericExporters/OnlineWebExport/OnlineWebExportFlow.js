@@ -105,6 +105,7 @@ const OnlineWebExportFlow = ({
         automaticallyOpenGameProperties={automaticallyOpenGameProperties}
         onRefreshGame={refreshGame}
         game={game}
+        shouldShowShareDialog={uiMode === 'full'}
       />
     </Column>
   );

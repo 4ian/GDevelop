@@ -44,6 +44,7 @@ import PasteIcon from '../UI/CustomSvgIcons/Clipboard';
 import CopyIcon from '../UI/CustomSvgIcons/Copy';
 import ResponsiveFlatButton from '../UI/ResponsiveFlatButton';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
+import QuickCustomizationPropertiesVisibilityDialog from '../QuickCustomization/QuickCustomizationPropertiesVisibilityDialog';
 
 const gd: libGDevelop = global.gd;
 
@@ -76,6 +77,9 @@ type BehaviorConfigurationEditorProps = {|
   canPasteBehaviors: boolean,
   pasteBehaviors: () => Promise<void>,
   openExtension: (behaviorType: string) => void,
+  openBehaviorPropertiesQuickCustomizationDialog: (
+    behaviorName: string
+  ) => void,
 |};
 
 const BehaviorConfigurationEditor = React.forwardRef<
@@ -95,6 +99,7 @@ const BehaviorConfigurationEditor = React.forwardRef<
       canPasteBehaviors,
       pasteBehaviors,
       openExtension,
+      openBehaviorPropertiesQuickCustomizationDialog,
     },
     ref
   ) => {
@@ -209,6 +214,18 @@ const BehaviorConfigurationEditor = React.forwardRef<
                       },
                     ]
                   : []),
+                ...(!Window.isDev()
+                  ? []
+                  : [
+                      { type: 'separator' },
+                      {
+                        label: i18n._(t`Quick Customization settings`),
+                        click: () =>
+                          openBehaviorPropertiesQuickCustomizationDialog(
+                            behaviorName
+                          ),
+                      },
+                    ]),
               ]}
             />,
           ]}
@@ -310,6 +327,10 @@ const BehaviorsEditor = (props: Props) => {
   const [newBehaviorDialogOpen, setNewBehaviorDialogOpen] = React.useState(
     false
   );
+  const [
+    selectedQuickCustomizationPropertiesBehavior,
+    setSelectedQuickCustomizationPropertiesBehavior,
+  ] = React.useState<?gdBehavior>(null);
 
   const showBehaviorOverridingConfirmation = useBehaviorOverridingAlertDialog();
 
@@ -582,6 +603,16 @@ const BehaviorsEditor = (props: Props) => {
     [openBehaviorEvents, project]
   );
 
+  const openBehaviorPropertiesQuickCustomizationDialog = React.useCallback(
+    (behaviorName: string) => {
+      if (!object.hasBehaviorNamed(behaviorName)) return;
+      const behavior = object.getBehavior(behaviorName);
+
+      setSelectedQuickCustomizationPropertiesBehavior(behavior);
+    },
+    [object]
+  );
+
   const isClipboardContainingBehaviors = Clipboard.has(
     BEHAVIORS_CLIPBOARD_KIND
   );
@@ -636,6 +667,9 @@ const BehaviorsEditor = (props: Props) => {
                   onBehaviorsUpdated={onBehaviorsUpdated}
                   onChangeBehaviorName={onChangeBehaviorName}
                   openExtension={openExtension}
+                  openBehaviorPropertiesQuickCustomizationDialog={
+                    openBehaviorPropertiesQuickCustomizationDialog
+                  }
                   canPasteBehaviors={isClipboardContainingBehaviors}
                   pasteBehaviors={pasteBehaviors}
                   resourceManagementProps={props.resourceManagementProps}
@@ -700,6 +734,18 @@ const BehaviorsEditor = (props: Props) => {
           onChoose={addBehavior}
           project={project}
           eventsFunctionsExtension={eventsFunctionsExtension}
+        />
+      )}
+
+      {!!selectedQuickCustomizationPropertiesBehavior && (
+        <QuickCustomizationPropertiesVisibilityDialog
+          open={!!selectedQuickCustomizationPropertiesBehavior}
+          onClose={() => setSelectedQuickCustomizationPropertiesBehavior(null)}
+          propertyNames={selectedQuickCustomizationPropertiesBehavior
+            .getProperties()
+            .keys()
+            .toJSArray()}
+          propertiesQuickCustomizationVisibilities={selectedQuickCustomizationPropertiesBehavior.getPropertiesQuickCustomizationVisibilities()}
         />
       )}
     </Column>

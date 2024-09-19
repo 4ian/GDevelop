@@ -4,52 +4,51 @@ import { QuickObjectReplacer } from './QuickObjectReplacer';
 import { QuickBehaviorsTweaker } from './QuickBehaviorsTweaker';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { QuickPublish } from './QuickPublish';
-import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
-import Text from '../UI/Text';
-import FlatButton from '../UI/FlatButton';
 import { Trans } from '@lingui/macro';
-import PreviewIcon from '../UI/CustomSvgIcons/Preview';
 import { type Exporter } from '../ExportAndShare/ShareDialog';
 import { mapFor } from '../Utils/MapFor';
 import { canSwapAssetOfObject } from '../AssetStore/AssetSwapper';
 import { type GameAndBuildsManager } from '../Utils/UseGameAndBuildsManager';
+import { QuickTitleTweaker } from './QuickTitleTweaker';
 
 const gd: libGDevelop = global.gd;
 
-type StepName = 'replace-objects' | 'tweak-behaviors' | 'publish';
+type StepName = 'replace-objects' | 'tweak-behaviors' | 'game-logo' | 'publish';
 type Step = {|
   name: StepName,
   canPreview: boolean,
   title: React.Node,
-  nextLabel: React.Node,
-  shouldHideNavigationButtons?: boolean,
+  nextLabel?: React.Node,
 |};
 
 const steps: Array<Step> = [
   {
     name: 'replace-objects',
     canPreview: true,
-    title: <Trans>Personalize your game objects art</Trans>,
+    title: <Trans>Choose your game art</Trans>,
     nextLabel: <Trans>Next: Tweak Gameplay</Trans>,
   },
   {
     name: 'tweak-behaviors',
     canPreview: true,
     title: <Trans>Tweak gameplay</Trans>,
-    nextLabel: <Trans>Next: Try & Publish</Trans>,
+    nextLabel: <Trans>Next: Game logo</Trans>,
+  },
+  {
+    name: 'game-logo',
+    canPreview: true,
+    title: <Trans>Make your game logo</Trans>,
+    nextLabel: <Trans>Next</Trans>,
   },
   {
     name: 'publish',
     canPreview: false,
-    title: <Trans>Publish and try your game</Trans>,
-    nextLabel: <Trans>Finish</Trans>,
-    shouldHideNavigationButtons: true,
+    title: <Trans>Save your game</Trans>,
   },
 ];
 
 export type QuickCustomizationState = {|
   isNavigationDisabled: boolean,
-  shouldAutomaticallyStartExport: boolean,
   step: Step,
   goToNextStep: () => void,
   goToPreviousStep: () => void,
@@ -60,20 +59,15 @@ export type QuickCustomizationState = {|
 export const useQuickCustomizationState = ({
   onClose,
 }: {
-  onClose: () => void,
+  onClose: () => Promise<void>,
 }): QuickCustomizationState => {
   const [stepIndex, setStepIndex] = React.useState(0);
   const [isNavigationDisabled, setIsNavigationDisabled] = React.useState(false);
-  const [
-    shouldAutomaticallyStartExport,
-    setShouldAutomaticallyStartExport,
-  ] = React.useState(true);
 
   const step = steps[stepIndex];
 
   return {
     isNavigationDisabled,
-    shouldAutomaticallyStartExport,
     step,
     goToNextStep: React.useCallback(
       () => {
@@ -88,16 +82,13 @@ export const useQuickCustomizationState = ({
     ),
     goToPreviousStep: React.useCallback(
       () => {
-        if (step.name === 'publish') {
-          setShouldAutomaticallyStartExport(false);
-        }
         if (stepIndex !== 0) {
           setStepIndex(stepIndex - 1);
         }
       },
-      [step, stepIndex]
+      [stepIndex]
     ),
-    canGoToPreviousStep: stepIndex !== 0,
+    canGoToPreviousStep: stepIndex !== 0 && stepIndex !== steps.length - 1,
     setIsNavigationDisabled,
   };
 };
@@ -154,8 +145,7 @@ type Props = {|
   onlineWebExporter: Exporter,
   onSaveProject: () => Promise<void>,
   isSavingProject: boolean,
-
-  onClose: () => void,
+  onClose: () => Promise<void>,
   onContinueQuickCustomization: () => void,
   onTryAnotherGame: () => void,
 |};
@@ -169,43 +159,12 @@ export const renderQuickCustomization = ({
   onlineWebExporter,
   onSaveProject,
   isSavingProject,
-
   onClose,
   onContinueQuickCustomization,
   onTryAnotherGame,
 }: Props) => {
   return {
     title: quickCustomizationState.step.title,
-    titleRightContent: quickCustomizationState.step.canPreview ? (
-      <LineStackLayout noMargin alignItems="center">
-        <Text noMargin size={'body-small'}>
-          Preview your game
-        </Text>
-        <FlatButton
-          label={<Trans>Preview</Trans>}
-          onClick={onLaunchPreview}
-          leftIcon={<PreviewIcon />}
-        />
-      </LineStackLayout>
-    ) : null,
-    titleTopContent: quickCustomizationState.step.canPreview ? (
-      <ColumnStackLayout>
-        <LineStackLayout
-          justifyContent="space-between"
-          alignItems="center"
-          expand
-        >
-          <Text noMargin size={'body-small'}>
-            Preview your game
-          </Text>
-          <FlatButton
-            label={<Trans>Preview</Trans>}
-            onClick={onLaunchPreview}
-            leftIcon={<PreviewIcon />}
-          />
-        </LineStackLayout>
-      </ColumnStackLayout>
-    ) : null,
     content: (
       <>
         {quickCustomizationState.step.name === 'replace-objects' ? (
@@ -218,6 +177,11 @@ export const renderQuickCustomization = ({
             project={project}
             resourceManagementProps={resourceManagementProps}
           />
+        ) : quickCustomizationState.step.name === 'game-logo' ? (
+          <QuickTitleTweaker
+            project={project}
+            resourceManagementProps={resourceManagementProps}
+          />
         ) : quickCustomizationState.step.name === 'publish' ? (
           <QuickPublish
             onlineWebExporter={onlineWebExporter}
@@ -225,9 +189,6 @@ export const renderQuickCustomization = ({
             gameAndBuildsManager={gameAndBuildsManager}
             setIsNavigationDisabled={
               quickCustomizationState.setIsNavigationDisabled
-            }
-            shouldAutomaticallyStartExport={
-              quickCustomizationState.shouldAutomaticallyStartExport
             }
             onSaveProject={onSaveProject}
             isSavingProject={isSavingProject}
@@ -238,5 +199,6 @@ export const renderQuickCustomization = ({
         ) : null}
       </>
     ),
+    showPreview: quickCustomizationState.step.canPreview,
   };
 };

@@ -309,9 +309,11 @@ export default class AuthenticatedUserProvider extends React.Component<
     }
   };
 
-  _fetchUserProfileWithoutThrowingErrors = async () => {
+  _fetchUserProfileWithoutThrowingErrors = async (
+    options: ?{ dontNotifyAboutEmailVerification?: boolean }
+  ) => {
     try {
-      await this._fetchUserProfile();
+      await this._fetchUserProfile(options);
     } catch (error) {
       console.error(
         'Error while fetching the user profile - but ignoring it.',
@@ -320,7 +322,9 @@ export default class AuthenticatedUserProvider extends React.Component<
     }
   };
 
-  _fetchUserProfile = async () => {
+  _fetchUserProfile = async (
+    options: ?{ dontNotifyAboutEmailVerification?: boolean }
+  ) => {
     const { authentication } = this.props;
 
     this.setState(({ authenticatedUser }) => ({
@@ -561,7 +565,9 @@ export default class AuthenticatedUserProvider extends React.Component<
         // We call this function every time the user is fetched, as it will
         // automatically prevent the event to be sent if the user attributes haven't changed.
         identifyUserForAnalytics(this.state.authenticatedUser);
-        this._notifyUserAboutEmailVerification();
+        if (!options || !options.dontNotifyAboutEmailVerification) {
+          this._notifyUserAboutEmailVerification();
+        }
       }
     );
   };
@@ -919,6 +925,8 @@ export default class AuthenticatedUserProvider extends React.Component<
     if (!authentication) return;
 
     this.setState({
+      // This function is used for both account creation & login.
+      createAccountInProgress: true,
       loginInProgress: true,
       apiCallError: null,
       authenticatedUser: {
@@ -956,6 +964,7 @@ export default class AuthenticatedUserProvider extends React.Component<
       }
     }
     this.setState({
+      createAccountInProgress: false,
       loginInProgress: false,
       authenticatedUser: {
         ...this.state.authenticatedUser,
@@ -1083,7 +1092,10 @@ export default class AuthenticatedUserProvider extends React.Component<
         // by the API when fetched.
       }
 
-      await this._fetchUserProfileWithoutThrowingErrors();
+      await this._fetchUserProfileWithoutThrowingErrors({
+        // When creating an account, avoid showing the email verification dialog right away.
+        dontNotifyAboutEmailVerification: true,
+      });
       this.openCreateAccountDialog(false);
       sendSignupDone(form.email);
       const firebaseUser = this.state.authenticatedUser.firebaseUser;

@@ -57,7 +57,6 @@ export const NotAuthenticated = () => {
           onSaveProject={async () => {}}
           onlineWebExporter={onlineWebExporter}
           setIsNavigationDisabled={() => {}}
-          shouldAutomaticallyStartExport={false}
           onClose={action('onClose')}
           onContinueQuickCustomization={action('onContinueQuickCustomization')}
           onTryAnotherGame={action('onTryAnotherGame')}
@@ -80,7 +79,6 @@ export const Authenticated = () => {
           onSaveProject={async () => {}}
           onlineWebExporter={onlineWebExporter}
           setIsNavigationDisabled={() => {}}
-          shouldAutomaticallyStartExport={false}
           onClose={action('onClose')}
           onContinueQuickCustomization={action('onContinueQuickCustomization')}
           onTryAnotherGame={action('onTryAnotherGame')}
@@ -90,30 +88,7 @@ export const Authenticated = () => {
   );
 };
 
-export const AuthenticatedStartsAutomatically = () => {
-  return (
-    <EventsFunctionsExtensionsContext.Provider
-      value={fakeEventsFunctionsExtensionsState}
-    >
-      <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
-        <QuickPublish
-          project={testProject.project}
-          gameAndBuildsManager={fakeEmptyGameAndBuildsManager}
-          isSavingProject={false}
-          onSaveProject={async () => {}}
-          onlineWebExporter={onlineWebExporter}
-          setIsNavigationDisabled={() => {}}
-          shouldAutomaticallyStartExport={true}
-          onClose={action('onClose')}
-          onContinueQuickCustomization={action('onContinueQuickCustomization')}
-          onTryAnotherGame={action('onTryAnotherGame')}
-        />
-      </AuthenticatedUserContext.Provider>
-    </EventsFunctionsExtensionsContext.Provider>
-  );
-};
-
-export const AuthenticatedStartsAutomaticallyAndFails = () => {
+export const AuthenticatedAndFails = () => {
   return (
     <EventsFunctionsExtensionsContext.Provider
       value={fakeEventsFunctionsExtensionsState}
@@ -126,7 +101,6 @@ export const AuthenticatedStartsAutomaticallyAndFails = () => {
           onSaveProject={async () => {}}
           onlineWebExporter={erroringOnlineWebExporter}
           setIsNavigationDisabled={() => {}}
-          shouldAutomaticallyStartExport={true}
           onClose={action('onClose')}
           onContinueQuickCustomization={action('onContinueQuickCustomization')}
           onTryAnotherGame={action('onTryAnotherGame')}
@@ -149,7 +123,6 @@ export const AuthenticatedExistingGame = () => {
           onSaveProject={async () => {}}
           onlineWebExporter={onlineWebExporter}
           setIsNavigationDisabled={() => {}}
-          shouldAutomaticallyStartExport={false}
           onClose={action('onClose')}
           onContinueQuickCustomization={action('onContinueQuickCustomization')}
           onTryAnotherGame={action('onTryAnotherGame')}
@@ -172,7 +145,6 @@ export const AuthenticatedNotOwnedGame = () => {
           onSaveProject={async () => {}}
           onlineWebExporter={onlineWebExporter}
           setIsNavigationDisabled={() => {}}
-          shouldAutomaticallyStartExport={false}
           onClose={action('onClose')}
           onContinueQuickCustomization={action('onContinueQuickCustomization')}
           onTryAnotherGame={action('onTryAnotherGame')}

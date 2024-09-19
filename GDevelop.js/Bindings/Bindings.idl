@@ -750,6 +750,8 @@ interface Behavior {
     void SetFolded(boolean folded);
 
     boolean IsDefaultBehavior();
+
+    [Ref] QuickCustomizationVisibilitiesContainer GetPropertiesQuickCustomizationVisibilities();
 };
 
 [JSImplementation=Behavior]
@@ -771,6 +773,8 @@ interface BehaviorsSharedData {
     [Value] MapStringPropertyDescriptor GetProperties();
     boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
     void InitializeContent();
+
+    [Ref] QuickCustomizationVisibilitiesContainer GetPropertiesQuickCustomizationVisibilities();
 };
 
 [JSImplementation=BehaviorsSharedData]
@@ -1913,6 +1917,11 @@ enum QuickCustomization_Visibility {
 
 interface QuickCustomization {
     // Nothing, it's just a container for the visibility enum.
+};
+
+interface QuickCustomizationVisibilitiesContainer {
+    void Set([Const] DOMString name, QuickCustomization_Visibility visibility);
+    QuickCustomization_Visibility Get([Const] DOMString name);
 };
 
 interface BehaviorMetadata {

@@ -16,7 +16,6 @@ export type TileSet = {|
   atlasImage: string,
 |};
 
-
 const areSameCoordinates = (
   tileA: {| x: number, y: number |},
   tileB: {| x: number, y: number |}
@@ -162,7 +161,6 @@ export const isSelectionASingleTileRectangle = (
       tileMapTileSelection.coordinates[1].y
   );
 };
-
 
 /**
  * When flipping is activated, the tile texture should be flipped but
@@ -409,7 +407,6 @@ export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
   }
   return tilesCoordinatesInTileMapGrid;
 };
-
 
 export const getTileSet = (object: gdObject): TileSet => {
   const objectConfigurationProperties = object

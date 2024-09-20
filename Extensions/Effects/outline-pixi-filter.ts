@@ -41,9 +41,7 @@ namespace gdjs {
       ) {
         const outlineFilter = (filter as unknown) as PIXI.filters.OutlineFilter;
         if (parameterName === 'color') {
-          outlineFilter.color = gdjs.rgbOrHexStringToNumber(
-            value
-          );
+          outlineFilter.color = gdjs.rgbOrHexStringToNumber(value);
         }
       }
       updateColorParameter(

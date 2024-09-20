@@ -301,6 +301,9 @@ export const CompactInstancePropertiesEditor = ({
                 }
                 historyHandler={historyHandler}
                 toolbarIconStyle={styles.icon}
+                compactEmptyPlaceholderText={
+                  <Trans>There are no variables on this instance.</Trans>
+                }
               />
             </>
           ) : null}

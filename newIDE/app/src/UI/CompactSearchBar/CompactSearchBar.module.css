@@ -1,0 +1,92 @@
+.container {
+  display: flex;
+  align-items: center;
+}
+
+.compactSearchBar {
+  border-radius: 4px;
+  color: var(--theme-text-default-color);
+  background-color: var(--theme-text-field-default-background-color);
+  transition: box-shadow 0.1s;
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-width: 0px;
+}
+
+.container.disabled .compactSearchBar {
+  color: var(--theme-text-field-disabled-color);
+}
+
+.container.errored:not(.disabled) .compactSearchBar {
+  border: none;
+  outline: 1px solid var(--theme-text-field-default-error);
+}
+.container.errored:not(.disabled):hover .compactSearchBar {
+  outline: 1px solid var(--theme-text-field-active-error);
+}
+.container.errored:not(.disabled):focus-within .compactSearchBar {
+  outline: 1px solid var(--theme-text-field-active-error);
+}
+
+.compactSearchBar::before {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  content: '';
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.container:not(.disabled):not(.errored):hover .compactSearchBar::before {
+  border-bottom: 1px solid var(--theme-text-field-hover-border-color);
+}
+.container:not(.disabled):not(.errored):focus-within .compactSearchBar::before {
+  border-bottom: 1px solid var(--theme-text-field-active-border-color);
+}
+
+.compactSearchBar input {
+  outline: none;
+  border: none;
+  padding: 2px 8px;
+  padding-left: 22px;
+  background-image: none;
+  background-color: transparent;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  font-size: 14px;
+  line-height: 20px;
+  font-family: var(--gdevelop-modern-font-family);
+  color: inherit;
+  flex: 1;
+  caret-color: var(--theme-text-field-active-caret-color);
+  min-width: 0px;
+  border-radius: inherit; /* Needed for InAppTutorialElementHighlighter to adapt its border-radius to the input container */
+}
+
+.compactSearchBar input::placeholder {
+  color: var(--theme-text-field-placeholder-color);
+}
+
+.searchIconContainer {
+  outline: 0;
+  border: 0;
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  width: 17px;
+  height: 17px;
+  display: flex;
+  padding: 1px;
+  border-radius: 4px;
+  background-color: unset;
+}
+/* svg tag is needed to be first priority compared to Material UI Custom SVG icon classes*/
+svg.searchIcon {
+  font-size: 15px;
+  color: var(--theme-text-field-placeholder-color);
+  transition: color 0.1s linear;
+}

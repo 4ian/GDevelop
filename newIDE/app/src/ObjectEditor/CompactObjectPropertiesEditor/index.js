@@ -604,6 +604,9 @@ export const CompactObjectPropertiesEditor = ({
                 }
                 historyHandler={historyHandler}
                 toolbarIconStyle={styles.icon}
+                compactEmptyPlaceholderText={
+                  <Trans>There are no variables on this object.</Trans>
+                }
               />
             )}
           />

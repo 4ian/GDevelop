@@ -117,8 +117,8 @@ type Props = {|
   helpPagePath?: ?string,
   /** If set to true, it will commit changes to variables on each input change. It can be expensive, but useful when VariablesList can be unmounted at any time. */
   directlyStoreValueChangesWhileEditing?: boolean,
-  /** If set to small, will collapse variable row by default. */
-  size?: 'small',
+  /** If set to compact, will collapse variable row by default and show compact fields. */
+  size?: 'compact',
   onVariablesUpdated?: () => void,
   toolbarIconStyle?: any,
   onSelectedVariableChange?: (Array<string>) => void,
@@ -694,7 +694,7 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
     );
     const isNarrow = React.useMemo(
       () =>
-        props.size === 'small' ||
+        props.size === 'compact' ||
         (containerWidth ? containerWidth < 650 : false),
       [containerWidth, props.size]
     );
@@ -1791,6 +1791,7 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
     const toolbar = (
       <VariablesListToolbar
         isNarrow={isNarrow}
+        isCompact={props.size === 'compact'}
         onCopy={copySelection}
         onPaste={pasteClipboardContent}
         onDelete={deleteSelection}

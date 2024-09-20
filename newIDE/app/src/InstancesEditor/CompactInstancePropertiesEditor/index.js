@@ -288,7 +288,7 @@ export const CompactInstancePropertiesEditor = ({
                 inheritedVariablesContainer={object.getVariables()}
                 variablesContainer={instance.getVariables()}
                 areObjectVariables
-                size="small"
+                size="compact"
                 onComputeAllVariableNames={() =>
                   object && layout
                     ? EventsRootVariablesFinder.findAllObjectVariables(

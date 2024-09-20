@@ -591,7 +591,7 @@ export const CompactObjectPropertiesEditor = ({
                 directlyStoreValueChangesWhileEditing
                 variablesContainer={object.getVariables()}
                 areObjectVariables
-                size="small"
+                size="compact"
                 onComputeAllVariableNames={() =>
                   object && layout
                     ? EventsRootVariablesFinder.findAllObjectVariables(

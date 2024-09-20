@@ -29,6 +29,28 @@ export const Default = () => (
   </DragAndDropContextProvider>
 );
 
+export const Compact = () => (
+  <DragAndDropContextProvider>
+    <FixedHeightFlexContainer height={600}>
+      <VariablesList
+        projectScopedContainersAccessor={
+          testProject.testSceneProjectScopedContainersAccessor
+        }
+        size="compact"
+        variablesContainer={testProject.testLayout.getVariables()}
+        emptyPlaceholderDescription="Variables help you store data"
+        emptyPlaceholderTitle="Variables"
+        helpPagePath="/variables"
+        onComputeAllVariableNames={() => [
+          'VariableFromEventSheet',
+          'VariableFromSomeWhere',
+          'InstanceVariable', // already defined variable in testSpriteObjectInstance
+        ]}
+      />
+    </FixedHeightFlexContainer>
+  </DragAndDropContextProvider>
+);
+
 export const InstanceWithObjectVariables = () => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>

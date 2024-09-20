@@ -759,10 +759,10 @@ namespace gdjs {
     /**
      * Change the tint of the sprite object.
      *
-     * @param rgbColor The color, in RGB format ("128;200;255").
+     * @param rgbOrHexColor The color as a string, in RGB format ("128;200;255") or Hex format.
      */
-    setColor(rgbColor: string): void {
-      this._renderer.setColor(rgbColor);
+    setColor(rgbOrHexColor: string): void {
+      this._renderer.setColor(rgbOrHexColor);
     }
 
     /**

@@ -142,16 +142,8 @@ namespace gdjs {
       this._sprite.visible = !this._object.hidden;
     }
 
-    setColor(rgbColor): void {
-      const colors = rgbColor.split(';');
-      if (colors.length < 3) {
-        return;
-      }
-      this._sprite.tint = gdjs.rgbToHexNumber(
-        parseInt(colors[0], 10),
-        parseInt(colors[1], 10),
-        parseInt(colors[2], 10)
-      );
+    setColor(rgbOrHexColor): void {
+      this._sprite.tint = gdjs.rgbOrHexStringToNumber(rgbOrHexColor);
     }
 
     getColor() {

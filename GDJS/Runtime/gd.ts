@@ -123,7 +123,6 @@ namespace gdjs {
     if (shorthandHexColor) {
       return shorthandHexToRGBColor(shorthandHexColor);
     }
-    console.warn(`Could not use string ${value} as a color.`);
     return [0, 0, 0];
   };
 

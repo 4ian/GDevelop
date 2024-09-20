@@ -922,23 +922,17 @@ namespace gdjs {
     }
 
     setParticleColor1(rgbColor: string): void {
-      const colors = rgbColor.split(';');
-      if (colors.length < 3) {
-        return;
-      }
-      this.setParticleRed1(parseInt(colors[0], 10));
-      this.setParticleGreen1(parseInt(colors[1], 10));
-      this.setParticleBlue1(parseInt(colors[2], 10));
+      const colors = gdjs.rgbOrHexToRGBColor(rgbColor);
+      this.setParticleRed1(colors[0]);
+      this.setParticleGreen1(colors[1]);
+      this.setParticleBlue1(colors[2]);
     }
 
     setParticleColor2(rgbColor: string): void {
-      const colors = rgbColor.split(';');
-      if (colors.length < 3) {
-        return;
-      }
-      this.setParticleRed2(parseInt(colors[0], 10));
-      this.setParticleGreen2(parseInt(colors[1], 10));
-      this.setParticleBlue2(parseInt(colors[2], 10));
+      const colors = gdjs.rgbOrHexToRGBColor(rgbColor);
+      this.setParticleRed2(colors[0]);
+      this.setParticleGreen2(colors[1]);
+      this.setParticleBlue2(colors[2]);
     }
 
     getParticleSize1(): float {

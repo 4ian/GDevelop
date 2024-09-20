@@ -235,7 +235,6 @@ export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
 |}): TileMapTilePatch[] => {
   if (coordinates.length === 0) return [];
 
-  const tilesCoordinatesInTileMapGrid: TileMapTilePatch[] = [];
   if (coordinates.length === 1) {
     // One coordinate corresponds to the pointer over the canvas.
     const coordinatesInTileMapGrid = [0, 0];
@@ -262,6 +261,8 @@ export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
       },
     ];
   }
+
+  const tilesCoordinatesInTileMapGrid: TileMapTilePatch[] = [];
 
   if (coordinates.length === 2) {
     const firstPointCoordinatesInTileMap = [0, 0];
@@ -315,7 +316,8 @@ export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
         },
       });
       return tilesCoordinatesInTileMapGrid;
-    } else if (tileMapTileSelection.kind === 'rectangle') {
+    }
+    if (tileMapTileSelection.kind === 'rectangle') {
       const selectionTopLeftCorner = tileMapTileSelection.coordinates[0];
       const selectionBottomRightCorner = tileMapTileSelection.coordinates[1];
       const selectionWidth =
@@ -412,16 +414,21 @@ export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
           });
         }
       }
+      if (selectionWidth >= 4 && selectionHeight >= 4) {
+        // In this case, each cell in the grid will contain a tile that is different
+        // from all the adjacent ones, so there is no need to optimize the list.
+        return tilesCoordinatesInTileMapGrid;
+      }
+      return optimizeTilesGridCoordinates({
+        tileMapTilePatches: tilesCoordinatesInTileMapGrid,
+        minX: topLeftCornerCoordinatesInTileMapGrid[0],
+        minY: topLeftCornerCoordinatesInTileMapGrid[1],
+        maxX: bottomRightCornerCoordinatesInTileMapGrid[0],
+        maxY: bottomRightCornerCoordinatesInTileMapGrid[1],
+      });
     }
-    return optimizeTilesGridCoordinates({
-      tileMapTilePatches: tilesCoordinatesInTileMapGrid,
-      minX: topLeftCornerCoordinatesInTileMapGrid[0],
-      minY: topLeftCornerCoordinatesInTileMapGrid[1],
-      maxX: bottomRightCornerCoordinatesInTileMapGrid[0],
-      maxY: bottomRightCornerCoordinatesInTileMapGrid[1],
-    });
   }
-  return tilesCoordinatesInTileMapGrid;
+  return [];
 };
 
 export const getTileSet = (object: gdObject): TileSet => {

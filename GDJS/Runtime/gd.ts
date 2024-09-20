@@ -10,6 +10,9 @@
  */
 namespace gdjs {
   const logger = new gdjs.Logger('Engine runtime');
+  const hexStringRegex = /^(#{0,1}[A-Fa-f0-9]{6})$/;
+  const shorthandHexStringRegex = /^(#{0,1}[A-Fa-f0-9]{3})$/;
+  const rgbStringRegex = /^(\d{1,3};\d{1,3};\d{1,3})/;
 
   /**
    * Contains functions used by events (this is a convention only, functions can actually
@@ -61,7 +64,7 @@ namespace gdjs {
   };
 
   /**
-   * Convert a Hex string to an RGB color array [r, g, b], where each component is in the range [0, 255].
+   * Convert a Hex string (#124FE4) to an RGB color array [r, g, b], where each component is in the range [0, 255].
    *
    * @param {string} hex Color hexadecimal
    */
@@ -75,23 +78,53 @@ namespace gdjs {
   };
 
   /**
+   * Convert a shorthand Hex string (#1F4) to an RGB color array [r, g, b], where each component is in the range [0, 255].
+   *
+   * @param {string} hex Color hexadecimal
+   */
+  export const shorthandHexToRGBColor = function (
+    hexString: string
+  ): [number, number, number] {
+    const hexNumber = parseInt(hexString.replace('#', ''), 16);
+    return Number.isFinite(hexNumber)
+      ? [
+          17 * ((hexNumber >> 8) & 0xf),
+          17 * ((hexNumber >> 4) & 0xf),
+          17 * (hexNumber & 0xf),
+        ]
+      : [0, 0, 0];
+  };
+
+  /**
    * Convert a RGB string ("rrr;ggg;bbb") or a Hex string ("#rrggbb") to a RGB color array ([r,g,b] with each component going from 0 to 255).
    * @param value The color as a RGB string or Hex string
    */
   export const rgbOrHexToRGBColor = function (
     value: string
   ): [number, number, number] {
-    const splitValue = value.split(';');
-    // If a RGB string is provided, return the RGB object.
-    if (splitValue.length === 3) {
-      return [
-        parseInt(splitValue[0], 10),
-        parseInt(splitValue[1], 10),
-        parseInt(splitValue[2], 10),
-      ];
+    const rgbColor = extractRGBString(value);
+    if (rgbColor) {
+      const splitValue = rgbColor.split(';');
+      // If a RGB string is provided, return the RGB object.
+      if (splitValue.length === 3) {
+        return [
+          Math.min(255, parseInt(splitValue[0], 10)),
+          Math.min(255, parseInt(splitValue[1], 10)),
+          Math.min(255, parseInt(splitValue[2], 10)),
+        ];
+      }
     }
-    // Otherwise, convert the Hex to RGB.
-    return hexToRGBColor(value);
+
+    const hexColor = extractHexString(value);
+    if (hexColor) {
+      return hexToRGBColor(hexColor);
+    }
+    const shorthandHexColor = extractShorthandHexString(value);
+    if (shorthandHexColor) {
+      return shorthandHexToRGBColor(shorthandHexColor);
+    }
+    console.warn(`Could not use string ${value} as a color.`);
+    return [0, 0, 0];
   };
 
   /**
@@ -144,6 +177,23 @@ namespace gdjs {
       (hexNumber >> 8) & 0xff,
       hexNumber & 0xff,
     ];
+  };
+
+  export const extractHexString = (str: string): string | null => {
+    const matches = str.match(hexStringRegex);
+    if (!matches) return null;
+    return matches[0];
+  };
+  export const extractShorthandHexString = (str: string): string | null => {
+    const matches = str.match(shorthandHexStringRegex);
+    if (!matches) return null;
+    return matches[0];
+  };
+
+  export const extractRGBString = (str: string): string | null => {
+    const matches = str.match(rgbStringRegex);
+    if (!matches) return null;
+    return matches[0];
   };
 
   /**

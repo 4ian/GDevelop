@@ -296,7 +296,6 @@ const Effect = React.forwardRef(
                         </BackgroundText>
                       </Line>
                       <PropertiesEditor
-                        keyPrefix={effect.getEffectType()}
                         instances={[effect]}
                         schema={effectMetadata.parametersSchema}
                         project={project}

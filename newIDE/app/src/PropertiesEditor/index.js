@@ -141,7 +141,6 @@ type Props = {|
   instances: Instances,
   schema: Schema,
   mode?: 'column' | 'row',
-  keyPrefix?: string,
 
   // If set, render the "extra" description content from fields
   // (see getExtraDescription).
@@ -251,7 +250,6 @@ const PropertiesEditor = ({
   unsavedChanges,
   project,
   resourceManagementProps,
-  keyPrefix,
 }: Props) => {
   const forceUpdate = useForceUpdate();
 
@@ -311,7 +309,7 @@ const PropertiesEditor = ({
                 </React.Fragment>
               )
             }
-            key={`${keyPrefix || ''}-${field.name}`}
+            key={field.name}
             id={field.name}
             checked={getFieldValue({ instances, field })}
             onCheck={(event, newValue) => {
@@ -327,7 +325,7 @@ const PropertiesEditor = ({
         return (
           <SemiControlledTextField
             value={getFieldValue({ instances, field })}
-            key={`${keyPrefix || ''}-${field.name}`}
+            key={field.name}
             id={field.name}
             floatingLabelText={getFieldLabel({ instances, field })}
             floatingLabelFixed
@@ -357,7 +355,7 @@ const PropertiesEditor = ({
       } else if (field.valueType === 'color') {
         const { setValue } = field;
         return (
-          <Column key={`${keyPrefix || ''}-${field.name}`} expand noMargin>
+          <Column key={field.name} expand noMargin>
             <ColorField
               id={field.name}
               floatingLabelText={getFieldLabel({ instances, field })}
@@ -378,7 +376,7 @@ const PropertiesEditor = ({
         const { setValue } = field;
         return (
           <SemiControlledTextField
-            key={`${keyPrefix || ''}-${field.name}`}
+            key={field.name}
             id={field.name}
             onChange={text => {
               instances.forEach(i => setValue(i, text || ''));
@@ -400,7 +398,7 @@ const PropertiesEditor = ({
         } = field;
         return (
           <TextFieldWithButtonLayout
-            key={`${keyPrefix || ''}-${field.name}`}
+            key={field.name}
             renderTextField={() => (
               <SemiControlledTextField
                 value={getFieldValue({
@@ -446,7 +444,7 @@ const PropertiesEditor = ({
         );
       }
     },
-    [instances, getFieldDescription, _onInstancesModified, keyPrefix]
+    [instances, getFieldDescription, _onInstancesModified]
   );
 
   const renderSelectField = React.useCallback(
@@ -472,7 +470,7 @@ const PropertiesEditor = ({
         return (
           <SelectField
             value={getFieldValue({ instances, field })}
-            key={`${keyPrefix || ''}-${field.name}`}
+            key={field.name}
             id={field.name}
             floatingLabelText={getFieldLabel({ instances, field })}
             helperMarkdownText={getFieldDescription(field)}
@@ -495,7 +493,7 @@ const PropertiesEditor = ({
               field,
               defaultValue: '(Multiple values)',
             })}
-            key={`${keyPrefix || ''}-${field.name}`}
+            key={field.name}
             id={field.name}
             floatingLabelText={getFieldLabel({ instances, field })}
             helperMarkdownText={getFieldDescription(field)}
@@ -511,7 +509,7 @@ const PropertiesEditor = ({
         );
       }
     },
-    [instances, _onInstancesModified, getFieldDescription, keyPrefix]
+    [instances, _onInstancesModified, getFieldDescription]
   );
 
   const renderButton = React.useCallback(
@@ -554,7 +552,7 @@ const PropertiesEditor = ({
     const { setValue } = field;
     return (
       <ResourceSelectorWithThumbnail
-        key={`${keyPrefix || ''}-${field.name}`}
+        key={field.name}
         project={project}
         resourceManagementProps={resourceManagementProps}
         resourceKind={field.resourceKind}
@@ -635,9 +633,7 @@ const PropertiesEditor = ({
       } else if (field.children) {
         if (field.type === 'row') {
           const contentView = (
-            <UnsavedChangesContext.Consumer
-              key={`${keyPrefix || ''}-${field.name}`}
-            >
+            <UnsavedChangesContext.Consumer key={field.name}>
               {unsavedChanges => (
                 <PropertiesEditor
                   project={project}
@@ -663,11 +659,9 @@ const PropertiesEditor = ({
         }
 
         return (
-          <div key={`${keyPrefix || ''}-${field.name}`}>
+          <div key={field.name}>
             <Subheader>{field.name}</Subheader>
-            <UnsavedChangesContext.Consumer
-              key={`${keyPrefix || ''}-${field.name}`}
-            >
+            <UnsavedChangesContext.Consumer key={field.name}>
               {unsavedChanges => (
                 <PropertiesEditor
                   project={project}

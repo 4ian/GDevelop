@@ -30,7 +30,23 @@ const areSameCoordinates = (
  *   B, D, F, H
  *   given as:
  *   [A, B, C, D, E, F, G, H]
- * - The layout of the tiles rectangle is simple.
+ *
+ * Note: This method won't handle perfectly nested rectangles. For instance, this layout:
+ *   A D D D D D D D D D D D E
+ *   B J J J J J J J J J J J G
+ *   B J J J K K K K K J J J G
+ *   B J J J K K K K K J J J G
+ *   B J J J K K K K K J J J G
+ *   B J J J J J J J J J J J G
+ *   C F F F F F F F F F F F H
+ * might result in something like:
+ *   A ╾ ─ ─ ─ ─ D ─ ─ ─ ─ ╼ E
+ *   ╿ J ╾ ─ ─ ─ J ─ ─ ─ ─ ╼ ╿
+ *   │ ┌ ─ ┐ ┌ ─ ─ ─ ┐ ┌ ─ ┐ │
+ *   B │ J │ │   K   │ │ J │ G
+ *   │ │   │ └ ─ ─ ─ ┘ └ ─ ┘ │
+ *   ╽ └ ─ ┘ ╾ ─ ─ J ─ ─ ─ ╼ ╽
+ *   C ╾ ─ ─ ─ ─ F ─ ─ ─ ─ ╼ H
  */
 export const optimizeTilesGridCoordinates = ({
   tileMapTilePatches,

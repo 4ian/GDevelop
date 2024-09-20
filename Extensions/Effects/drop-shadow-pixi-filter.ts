@@ -66,7 +66,7 @@ namespace gdjs {
       ) {
         const dropShadowFilter = (filter as unknown) as PIXI.filters.DropShadowFilter;
         if (parameterName === 'color') {
-          dropShadowFilter.color = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(
+          dropShadowFilter.color = gdjs.rgbOrHexStringToNumber(
             value
           );
         }

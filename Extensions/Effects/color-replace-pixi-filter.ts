@@ -45,11 +45,11 @@ namespace gdjs {
         const colorReplaceFilter = (filter as unknown) as PIXI.filters.ColorReplaceFilter &
           ColorReplaceFilterExtra;
         if (parameterName === 'originalColor') {
-          colorReplaceFilter.originalColor = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(
+          colorReplaceFilter.originalColor = gdjs.rgbOrHexStringToNumber(
             value
           );
         } else if (parameterName === 'newColor') {
-          colorReplaceFilter.newColor = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(
+          colorReplaceFilter.newColor = gdjs.rgbOrHexStringToNumber(
             value
           );
         }

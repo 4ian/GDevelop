@@ -52,22 +52,6 @@ namespace gdjs {
       _filterCreators[filterName] = filterCreator;
     };
 
-    /**
-     * Convert a string RGB color ("rrr;ggg;bbb") or a hex string (#rrggbb) to a hex number.
-     * @param value The color as a RGB string or hex string
-     */
-    export const rgbOrHexToHexNumber = function (value: string): number {
-      const splitValue = value.split(';');
-      if (splitValue.length === 3) {
-        return gdjs.rgbToHexNumber(
-          parseInt(splitValue[0], 10),
-          parseInt(splitValue[1], 10),
-          parseInt(splitValue[2], 10)
-        );
-      }
-      return parseInt(value.replace('#', '0x'), 16);
-    };
-
     /** A wrapper allowing to create an effect. */
     export interface FilterCreator {
       /** Function to call to create the filter */

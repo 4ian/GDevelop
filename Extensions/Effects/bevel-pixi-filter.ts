@@ -67,12 +67,12 @@ namespace gdjs {
         const bevelFilter = (filter as unknown) as PIXI.filters.BevelFilter &
           BevelFilterExtra;
         if (parameterName === 'lightColor') {
-          bevelFilter.lightColor = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(
+          bevelFilter.lightColor = gdjs.rgbOrHexStringToNumber(
             value
           );
         }
         if (parameterName === 'shadowColor') {
-          bevelFilter.shadowColor = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(
+          bevelFilter.shadowColor = gdjs.rgbOrHexStringToNumber(
             value
           );
         }

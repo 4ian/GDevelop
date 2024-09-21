@@ -2420,6 +2420,7 @@ module.exports = {
         );
 
         let materialsDirty = false;
+        let uvMappingDirty = false;
 
         const shouldUseTransparentTexture =
           properties.get('enableTextureTransparency').getValue() === 'true';
@@ -2466,9 +2467,8 @@ module.exports = {
         ) {
           this._faceVisibilities = faceVisibilities;
           materialsDirty = true;
+          uvMappingDirty = true;
         }
-
-        let uvMappingDirty = false;
 
         const shouldRepeatTextureOnFace = [
           properties.get('frontFaceResourceRepeat').getValue() === 'true',

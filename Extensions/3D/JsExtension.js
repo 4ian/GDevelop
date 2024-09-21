@@ -2353,12 +2353,12 @@ module.exports = {
         this.updateThreeObject();
       }
 
-      _updateThreeObjectMaterials() {
-        const getFaceMaterial = (project, faceIndex) => {
+      async _updateThreeObjectMaterials() {
+        const getFaceMaterial = async (project, faceIndex) => {
           if (!this._faceVisibilities[faceIndex])
             return getTransparentMaterial();
 
-          return this._pixiResourcesLoader.getThreeMaterial(
+          return await this._pixiResourcesLoader.getThreeMaterial(
             project,
             this._faceResourceNames[faceIndex],
             {
@@ -2367,30 +2367,41 @@ module.exports = {
           );
         };
 
-        this._threeObject.material[0] = getFaceMaterial(
-          this._project,
-          materialIndexToFaceIndex[0]
-        );
-        this._threeObject.material[1] = getFaceMaterial(
-          this._project,
-          materialIndexToFaceIndex[1]
-        );
-        this._threeObject.material[2] = getFaceMaterial(
-          this._project,
-          materialIndexToFaceIndex[2]
-        );
-        this._threeObject.material[3] = getFaceMaterial(
-          this._project,
-          materialIndexToFaceIndex[3]
-        );
-        this._threeObject.material[4] = getFaceMaterial(
-          this._project,
-          materialIndexToFaceIndex[4]
-        );
-        this._threeObject.material[5] = getFaceMaterial(
-          this._project,
-          materialIndexToFaceIndex[5]
-        );
+        const materials = await Promise.all([
+          getFaceMaterial(
+            this._project,
+            materialIndexToFaceIndex[0]
+          ),
+          getFaceMaterial(
+            this._project,
+            materialIndexToFaceIndex[1]
+          ),
+          getFaceMaterial(
+            this._project,
+            materialIndexToFaceIndex[2]
+          ),
+          getFaceMaterial(
+            this._project,
+            materialIndexToFaceIndex[3]
+          ),
+          getFaceMaterial(
+            this._project,
+            materialIndexToFaceIndex[4]
+          ),
+          getFaceMaterial(
+            this._project,
+            materialIndexToFaceIndex[5]
+          ),
+        ]);
+
+        this._threeObject.material[0] = materials[0];
+        this._threeObject.material[1] = materials[1];
+        this._threeObject.material[2] = materials[2];
+        this._threeObject.material[3] = materials[3];
+        this._threeObject.material[4] = materials[4];
+        this._threeObject.material[5] = materials[5];
+
+        this._updateTextureUvMapping();
       }
 
       static _getResourceNameToDisplay(objectConfiguration) {

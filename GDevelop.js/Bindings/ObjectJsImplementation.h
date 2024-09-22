@@ -9,8 +9,10 @@
 using namespace gd;
 
 /**
- * \brief A gd::Object that stores its content in JSON and forward the
- * properties related functions to Javascript with Emscripten.
+ * \brief A gd::ObjectConfiguration that wraps a Javascript object:
+ * the content of the object is stored in JavaScript in a "content" property,
+ * allowing both fast access in JavaScript and still ability to access properties
+ * via the usual methods.
  *
  * It also implements "ExposeResources" to expose the properties of type
  * "resource".

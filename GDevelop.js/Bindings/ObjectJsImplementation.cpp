@@ -126,31 +126,40 @@ bool ObjectJsImplementation::UpdateInitialInstanceProperty(
 }
 
 void ObjectJsImplementation::DoSerializeTo(SerializerElement& element) const {
-  gd::String jsonContent = (const char*)EM_ASM_INT(
+  SerializerElement* jsCreatedElement = (SerializerElement*)EM_ASM_INT(
       {
         var self = Module['getCache'](Module['ObjectJsImplementation'])[$0];
         if (!self.content)
           throw '`content` is not defined on a ObjectJsImplementation.';
 
-        return ensureString(JSON.stringify(self.content));
+        var serializerElement = gd.Serializer.fromJSObject(self.content);
+        return getPointer(serializerElement);
       },
       (int)this);
-  element.AddChild("content") = gd::Serializer::FromJSON(jsonContent);
+
+  // We could avoid a copy by using making a function on gd.Serializer that manipulates
+  // directly the SerializerElement passed to it.
+  element.AddChild("content") = *jsCreatedElement;
+  delete jsCreatedElement;
 }
 void ObjectJsImplementation::DoUnserializeFrom(Project& project,
                                                const SerializerElement& element) {
-  gd::String jsonContent = gd::Serializer::ToJSON(element.GetChild("content"));
-
   EM_ASM_INT(
       {
         var self = Module['getCache'](Module['ObjectJsImplementation'])[$0];
         if (!self.content)
           throw '`content` is not defined on a ObjectJsImplementation.';
 
-        self.content = JSON.parse(UTF8ToString($1));
+        var serializerElement = wrapPointer($1, Module['SerializerElement']);
+        if (!serializerElement.isValueUndefined() || serializerElement.consideredAsArray()) {
+          throw new Error('The element passed to ObjectJsImplementation::DoUnserializeFrom is not an object.');
+        }
+
+        // JSON.parse + toJSON is 30% faster than gd.Serializer.toJSObject.
+        self.content = JSON.parse(gd.Serializer.toJSON(serializerElement));
       },
       (int)this,
-      jsonContent.c_str());
+      (int)&element.GetChild("content"));
 }
 
 void ObjectJsImplementation::__destroy__() {  // Useless?

@@ -863,9 +863,6 @@ interface ObjectJsImplementation {
         [Const] DOMString name,
         [Const] DOMString value);
 
-    [Const, Ref] DOMString GetRawJSONContent();
-    [Ref] ObjectJsImplementation SetRawJSONContent([Const] DOMString newContent);
-
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 

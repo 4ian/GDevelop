@@ -68,11 +68,8 @@ module.exports = {
 
     const lightObject = new gd.ObjectJsImplementation();
 
-    lightObject.updateProperty = function (
-      objectContent,
-      propertyName,
-      newValue
-    ) {
+    lightObject.updateProperty = function (propertyName, newValue) {
+      const objectContent = this.content;
       if (propertyName === 'radius') {
         objectContent.radius = parseFloat(newValue);
         return true;
@@ -96,8 +93,9 @@ module.exports = {
       return false;
     };
 
-    lightObject.getProperties = function (objectContent) {
+    lightObject.getProperties = function () {
       const objectProperties = new gd.MapStringPropertyDescriptor();
+      const objectContent = this.content;
 
       objectProperties.set(
         'radius',
@@ -140,17 +138,14 @@ module.exports = {
 
       return objectProperties;
     };
-    lightObject.setRawJSONContent(
-      JSON.stringify({
-        radius: 50,
-        color: '255;255;255',
-        debugMode: false,
-        texture: '',
-      })
-    );
+    lightObject.content = {
+      radius: 50,
+      color: '255;255;255',
+      debugMode: false,
+      texture: '',
+    };
 
     lightObject.updateInitialInstanceProperty = function (
-      objectContent,
       instance,
       propertyName,
       newValue
@@ -158,7 +153,7 @@ module.exports = {
       return false;
     };
 
-    lightObject.getInitialInstanceProperties = function (content, instance) {
+    lightObject.getInitialInstanceProperties = function (instance) {
       const instanceProperties = new gd.MapStringPropertyDescriptor();
 
       return instanceProperties;
@@ -291,17 +286,17 @@ module.exports = {
        * This is called to update the PIXI object on the scene editor
        */
       update() {
+        const object = gd.castObject(
+          this._associatedObjectConfiguration,
+          gd.ObjectJsImplementation
+        );
+
         this._pixiObject.position.x = this._instance.getX();
         this._pixiObject.position.y = this._instance.getY();
 
         let radiusGraphicsDirty = false;
 
-        let radius = parseFloat(
-          this._associatedObjectConfiguration
-            .getProperties()
-            .get('radius')
-            .getValue()
-        );
+        let radius = object.content.radius;
         if (radius <= 0) radius = 1;
         if (radius !== this._radius) {
           this._radius = radius;
@@ -309,10 +304,7 @@ module.exports = {
         }
 
         const color = objectsRenderingService.rgbOrHexToHexNumber(
-          this._associatedObjectConfiguration
-            .getProperties()
-            .get('color')
-            .getValue()
+          object.content.color
         );
         if (color !== this._color) {
           this._color = color;

@@ -731,10 +731,9 @@ export class ObjectJsImplementation extends ObjectConfiguration {
   updateProperty(name: string, value: string): boolean;
   getInitialInstanceProperties(instance: InitialInstance): MapStringPropertyDescriptor;
   updateInitialInstanceProperty(instance: InitialInstance, name: string, value: string): boolean;
-  getRawJSONContent(): string;
-  setRawJSONContent(newContent: string): ObjectJsImplementation;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
+  content: Record<string, any>;
 }
 
 export class CustomObjectConfiguration extends ObjectConfiguration {
@@ -1529,7 +1528,8 @@ export class ObjectMetadata extends EmscriptenObject {
   getOpenFullEditorLabel(): string;
 }
 
-export class QuickCustomization extends EmscriptenObject {static Default = 0;
+export class QuickCustomization extends EmscriptenObject {
+  static Default = 0;
   static Visible = 1;
   static Hidden = 2;
 }

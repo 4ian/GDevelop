@@ -289,16 +289,13 @@ export const makeTestExtensions = (gd: libGDevelop) => {
     const fakeObject = new gd.ObjectJsImplementation();
 
     // $FlowExpectedError
-    fakeObject.updateProperty = function(
-      objectContent,
-      propertyName,
-      newValue
-    ) {
+    fakeObject.updateProperty = function(propertyName, newValue) {
       return false;
     };
     // $FlowExpectedError
-    fakeObject.getProperties = function(objectContent) {
+    fakeObject.getProperties = function() {
       const objectProperties = new gd.MapStringPropertyDescriptor();
+      const objectContent = this.content;
 
       objectProperties
         .getOrCreate('text')
@@ -308,15 +305,13 @@ export const makeTestExtensions = (gd: libGDevelop) => {
 
       return objectProperties;
     };
-    fakeObject.setRawJSONContent(
-      JSON.stringify({
-        text: 'Some text.',
-      })
-    );
+    // $FlowExpectedError
+    fakeObject.content = {
+      text: 'Some text.',
+    };
 
     // $FlowExpectedError
     fakeObject.updateInitialInstanceProperty = function(
-      objectContent,
       instance,
       propertyName,
       newValue
@@ -324,7 +319,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       return false;
     };
     // $FlowExpectedError
-    fakeObject.getInitialInstanceProperties = function(content, instance) {
+    fakeObject.getInitialInstanceProperties = function(instance) {
       var instanceProperties = new gd.MapStringPropertyDescriptor();
       return instanceProperties;
     };
@@ -405,14 +400,15 @@ export const makeTestExtensions = (gd: libGDevelop) => {
 
     const textInputObject = new gd.ObjectJsImplementation();
     // $FlowExpectedError
-    textInputObject.getProperties = function(objectContent) {
+    textInputObject.getProperties = function() {
       const objectProperties = new gd.MapStringPropertyDescriptor();
       return objectProperties;
     };
+    // $FlowExpectedError
+    textInputObject.content = {};
 
     // $FlowExpectedError
     textInputObject.getInitialInstanceProperties = function(
-      content,
       instance,
       project,
       layout
@@ -436,7 +432,6 @@ export const makeTestExtensions = (gd: libGDevelop) => {
 
     // $FlowExpectedError
     textInputObject.updateInitialInstanceProperty = function(
-      objectContent,
       instance,
       propertyName,
       newValue

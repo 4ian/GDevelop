@@ -6,8 +6,6 @@ declare class gdObjectJsImplementation extends gdObjectConfiguration {
   updateProperty(name: string, value: string): boolean;
   getInitialInstanceProperties(instance: gdInitialInstance): gdMapStringPropertyDescriptor;
   updateInitialInstanceProperty(instance: gdInitialInstance, name: string, value: string): boolean;
-  getRawJSONContent(): string;
-  setRawJSONContent(newContent: string): gdObjectJsImplementation;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(project: gdProject, element: gdSerializerElement): void;
   delete(): void;

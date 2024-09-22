@@ -35,72 +35,67 @@ module.exports = {
       .setIcon('JsPlatform/Extensions/videoicon16.png');
 
     var videoObject = new gd.ObjectJsImplementation();
-    videoObject.updateProperty = function (
-      objectContent,
-      propertyName,
-      newValue
-    ) {
+    videoObject.updateProperty = function (propertyName, newValue) {
+      console.log('update', this.content);
       if (propertyName === 'Opacity') {
-        objectContent.opacity = parseFloat(newValue);
+        this.content.opacity = parseFloat(newValue);
         return true;
       }
       if (propertyName === 'Looped') {
-        objectContent.loop = newValue === '1';
+        this.content.loop = newValue === '1';
         return true;
       }
       if (propertyName === 'Volume') {
-        objectContent.volume = parseFloat(newValue);
+        this.content.volume = parseFloat(newValue);
         return true;
       }
       if (propertyName === 'videoResource') {
-        objectContent.videoResource = newValue;
+        this.content.videoResource = newValue;
         return true;
       }
 
       return false;
     };
-    videoObject.getProperties = function (objectContent) {
+    videoObject.getProperties = function () {
       var objectProperties = new gd.MapStringPropertyDescriptor();
+      console.log('getProperties', this.content);
 
       objectProperties
         .getOrCreate('Looped')
-        .setValue(objectContent.loop ? 'true' : 'false')
+        .setValue(this.content.loop ? 'true' : 'false')
         .setType('boolean')
         .setLabel(_('Loop the video'))
         .setGroup(_('Playback settings'));
       objectProperties
         .getOrCreate('Volume')
-        .setValue(objectContent.volume.toString())
+        .setValue(this.content.volume.toString())
         .setType('number')
         .setLabel(_('Video volume (0-100)'))
         .setGroup(_('Playback settings'));
       objectProperties
         .getOrCreate('videoResource')
-        .setValue(objectContent.videoResource)
+        .setValue(this.content.videoResource)
         .setType('resource')
         .addExtraInfo('video')
         .setLabel(_('Video resource'));
 
       return objectProperties;
     };
-    videoObject.setRawJSONContent(
-      JSON.stringify({
-        opacity: 255,
-        loop: false,
-        volume: 100,
-        videoResource: '',
-      })
-    );
+    videoObject.content = {
+      opacity: 255,
+      loop: false,
+      volume: 100,
+      videoResource: '',
+    };
 
     videoObject.updateInitialInstanceProperty = function (
-      objectContent,
       instance,
       propertyName,
       newValue
     ) {
       return false;
     };
-    videoObject.getInitialInstanceProperties = function (content, instance) {
+    videoObject.getInitialInstanceProperties = function (instance) {
       var instanceProperties = new gd.MapStringPropertyDescriptor();
       return instanceProperties;
     };
@@ -583,10 +578,11 @@ module.exports = {
 
       _getVideoTexture() {
         // Get the video resource to use
-        const videoResource = this._associatedObjectConfiguration
-          .getProperties()
-          .get('videoResource')
-          .getValue();
+        const object = gd.castObject(
+          this._associatedObjectConfiguration,
+          gd.ObjectJsImplementation
+        );
+        const videoResource = object.content.videoResource;
 
         // This returns a VideoTexture with autoPlay set to false
         return this._pixiResourcesLoader.getPIXIVideoTexture(
@@ -600,10 +596,12 @@ module.exports = {
        */
       update() {
         // Check if the video resource has changed
-        const videoResource = this._associatedObjectConfiguration
-          .getProperties()
-          .get('videoResource')
-          .getValue();
+        const object = gd.castObject(
+          this._associatedObjectConfiguration,
+          gd.ObjectJsImplementation
+        );
+        const videoResource = object.content.videoResource;
+
         if (videoResource !== this._videoResource) {
           this._videoResource = videoResource;
           this._pixiObject.texture = this._getVideoTexture();

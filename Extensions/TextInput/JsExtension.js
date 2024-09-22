@@ -31,11 +31,8 @@ module.exports = {
       .setIcon('JsPlatform/Extensions/text_input.svg');
 
     const textInputObject = new gd.ObjectJsImplementation();
-    textInputObject.updateProperty = function (
-      objectContent,
-      propertyName,
-      newValue
-    ) {
+    textInputObject.updateProperty = function (propertyName, newValue) {
+      const objectContent = this.content;
       if (propertyName === 'initialValue') {
         objectContent.initialValue = newValue;
         return true;
@@ -85,8 +82,9 @@ module.exports = {
 
       return false;
     };
-    textInputObject.getProperties = function (objectContent) {
+    textInputObject.getProperties = function () {
       const objectProperties = new gd.MapStringPropertyDescriptor();
+      const objectContent = this.content;
 
       objectProperties
         .getOrCreate('initialValue')
@@ -204,26 +202,23 @@ module.exports = {
 
       return objectProperties;
     };
-    textInputObject.setRawJSONContent(
-      JSON.stringify({
-        initialValue: '',
-        placeholder: 'Touch to start typing',
-        fontResourceName: '',
-        fontSize: 20,
-        inputType: 'text',
-        textColor: '0;0;0',
-        fillColor: '255;255;255',
-        fillOpacity: 255,
-        borderColor: '0;0;0',
-        borderOpacity: 255,
-        borderWidth: 1,
-        readOnly: false,
-        disabled: false,
-      })
-    );
+    textInputObject.content = {
+      initialValue: '',
+      placeholder: 'Touch to start typing',
+      fontResourceName: '',
+      fontSize: 20,
+      inputType: 'text',
+      textColor: '0;0;0',
+      fillColor: '255;255;255',
+      fillOpacity: 255,
+      borderColor: '0;0;0',
+      borderOpacity: 255,
+      borderWidth: 1,
+      readOnly: false,
+      disabled: false,
+    };
 
     textInputObject.updateInitialInstanceProperty = function (
-      objectContent,
       instance,
       propertyName,
       newValue
@@ -238,10 +233,7 @@ module.exports = {
 
       return false;
     };
-    textInputObject.getInitialInstanceProperties = function (
-      content,
-      instance
-    ) {
+    textInputObject.getInitialInstanceProperties = function (instance) {
       const instanceProperties = new gd.MapStringPropertyDescriptor();
 
       instanceProperties
@@ -682,18 +674,21 @@ module.exports = {
 
       update() {
         const instance = this._instance;
-        const properties = this._associatedObjectConfiguration.getProperties();
+        const object = gd.castObject(
+          this._associatedObjectConfiguration,
+          gd.ObjectJsImplementation
+        );
 
         const placeholder =
           instance.getRawStringProperty('placeholder') ||
-          properties.get('placeholder').getValue();
+          object.content.placeholder;
         const initialValue =
           instance.getRawStringProperty('initialValue') ||
-          properties.get('initialValue').getValue();
+          object.content.initialValue;
         const hasInitialValue = initialValue !== '';
         this._pixiText.text = hasInitialValue ? initialValue : placeholder;
 
-        const textColor = properties.get('textColor').getValue();
+        const textColor = object.content.textColor;
         const finalTextColor = hasInitialValue
           ? objectsRenderingService.rgbOrHexToHexNumber(textColor)
           : 0x888888;
@@ -703,13 +698,13 @@ module.exports = {
           this._pixiText.dirty = true;
         }
 
-        const fontSize = parseFloat(properties.get('fontSize').getValue());
+        const fontSize = object.content.fontSize;
         if (this._pixiText.style.fontSize !== fontSize) {
           this._pixiText.style.fontSize = fontSize;
           this._pixiText.dirty = true;
         }
 
-        const fontResourceName = properties.get('fontResourceName').getValue();
+        const fontResourceName = object.content.fontResourceName;
         if (this._fontResourceName !== fontResourceName) {
           this._fontResourceName = fontResourceName;
 
@@ -744,8 +739,7 @@ module.exports = {
           this._instance.getAngle()
         );
 
-        const borderWidth =
-          parseFloat(properties.get('borderWidth').getValue()) || 0;
+        const borderWidth = object.content.borderWidth || 0;
 
         // Draw the mask for the text.
         const textOffset = borderWidth + TEXT_MASK_PADDING;
@@ -759,8 +753,7 @@ module.exports = {
         );
         this._pixiTextMask.endFill();
 
-        const isTextArea =
-          properties.get('inputType').getValue() === 'text area';
+        const isTextArea = object.content.inputType === 'text area';
 
         this._pixiText.position.x = textOffset;
         this._pixiText.position.y = isTextArea
@@ -768,14 +761,10 @@ module.exports = {
           : height / 2 - this._pixiText.height / 2;
 
         // Draw the background and border.
-        const fillColor = properties.get('fillColor').getValue();
-        const fillOpacity = parseFloat(
-          properties.get('fillOpacity').getValue()
-        );
-        const borderColor = properties.get('borderColor').getValue();
-        const borderOpacity = parseFloat(
-          properties.get('borderOpacity').getValue()
-        );
+        const fillColor = object.content.fillColor;
+        const fillOpacity = object.content.fillOpacity;
+        const borderColor = object.content.borderColor;
+        const borderOpacity = object.content.borderOpacity;
 
         this._pixiGraphics.clear();
         this._pixiGraphics.lineStyle(

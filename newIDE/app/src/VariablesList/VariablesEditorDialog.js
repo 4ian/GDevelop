@@ -293,8 +293,10 @@ const VariablesEditorDialog = ({
                     actualInitiallySelectedVariableName.current
                   }
                   inheritedVariablesContainer={inheritedVariablesContainer}
-                  emptyPlaceholderTitle={emptyPlaceholderTitle}
-                  emptyPlaceholderDescription={emptyPlaceholderDescription}
+                  emptyPlaceholderTitle={emptyPlaceholderTitle || null}
+                  emptyPlaceholderDescription={
+                    emptyPlaceholderDescription || null
+                  }
                   onComputeAllVariableNames={onComputeAllVariableNames}
                   helpPagePath={helpPagePath}
                   onVariablesUpdated={notifyOfChange}

@@ -287,11 +287,9 @@ module.exports = {
     // Everything that is stored inside the object is in "content" and is automatically
     // saved/loaded to JSON.
     var dummyObject = new gd.ObjectJsImplementation();
-    dummyObject.updateProperty = function (
-      objectContent,
-      propertyName,
-      newValue
-    ) {
+    dummyObject.updateProperty = function (propertyName, newValue) {
+      const objectContent = this.content;
+
       if (propertyName === 'My first property') {
         objectContent.property1 = newValue;
         return true;
@@ -311,8 +309,9 @@ module.exports = {
 
       return false;
     };
-    dummyObject.getProperties = function (objectContent) {
+    dummyObject.getProperties = function () {
       var objectProperties = new gd.MapStringPropertyDescriptor();
+      const objectContent = this.content;
 
       objectProperties
         .getOrCreate('My first property')
@@ -336,17 +335,14 @@ module.exports = {
 
       return objectProperties;
     };
-    dummyObject.setRawJSONContent(
-      JSON.stringify({
-        property1: 'Hello world',
-        property2: true,
-        property3: 123,
-        myImage: '',
-      })
-    );
+    dummyObject.content = {
+      property1: 'Hello world',
+      property2: true,
+      property3: 123,
+      myImage: '',
+    };
 
     dummyObject.updateInitialInstanceProperty = function (
-      objectContent,
       instance,
       propertyName,
       newValue
@@ -362,7 +358,7 @@ module.exports = {
 
       return false;
     };
-    dummyObject.getInitialInstanceProperties = function (content, instance) {
+    dummyObject.getInitialInstanceProperties = function (instance) {
       var instanceProperties = new gd.MapStringPropertyDescriptor();
 
       instanceProperties
@@ -507,12 +503,13 @@ module.exports = {
        * This is called to update the PIXI object on the scene editor
        */
       update() {
+        const object = gd.castObject(
+          this._associatedObjectConfiguration,
+          gd.ObjectJsImplementation
+        );
+
         // Read a property from the object
-        const property1Value = this._associatedObjectConfiguration
-          .getProperties()
-          .get('My first property')
-          .getValue();
-        this._pixiObject.text = property1Value;
+        this._pixiObject.text = object.content.property1;
 
         // Read position and angle from the instance
         this._pixiObject.position.x =

@@ -17,7 +17,7 @@ using namespace gd;
  */
 class ObjectJsImplementation : public gd::ObjectConfiguration {
  public:
-  ObjectJsImplementation() : jsonContent("{}") {}
+  ObjectJsImplementation() {}
   std::unique_ptr<gd::ObjectConfiguration> Clone() const override;
 
   std::map<gd::String, gd::PropertyDescriptor> GetProperties() const override;
@@ -31,16 +31,9 @@ class ObjectJsImplementation : public gd::ObjectConfiguration {
 
   void __destroy__();
 
-  const gd::String& GetRawJSONContent() const { return jsonContent; };
-  ObjectJsImplementation& SetRawJSONContent(const gd::String& newContent) {
-    jsonContent = newContent;
-    return *this;
-  };
-
   void ExposeResources(gd::ArbitraryResourceWorker& worker) override;
 
  protected:
   void DoSerializeTo(SerializerElement& arg0) const override;
   void DoUnserializeFrom(Project& arg0, const SerializerElement& arg1) override;
-  gd::String jsonContent;
 };

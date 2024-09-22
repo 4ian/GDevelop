@@ -140,7 +140,25 @@ public:
   const std::vector<Model3DAnimation> &GetAllAnimations() const {
     return animations;
   }
+  ///@}
 
+  /** \name Getters
+   * Fast access for rendering instances.
+   */
+  ///@{
+  double GetWidth() const { return width; };
+  double GetHeight() const { return height; };
+  double GetDepth() const { return depth; };
+  double GetRotationX() const { return rotationX; };
+  double GetRotationY() const { return rotationY; };
+  double GetRotationZ() const { return rotationZ; };
+
+  const gd::String& GetModelResourceName() const { return modelResourceName; };
+  const gd::String& GetMaterialType() const { return materialType; };
+  const gd::String& GetOriginLocation() const { return originLocation; };
+  const gd::String& GetCenterLocation() const { return centerLocation; };
+
+  bool shouldKeepAspectRatio() const { return keepAspectRatio; };
   ///@}
 
 protected:

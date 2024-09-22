@@ -176,10 +176,12 @@ module.exports = {
       }
 
       update() {
-        const properties = this._associatedObjectConfiguration.getProperties();
-        const spineResourceName = properties
-          .get('spineResourceName')
-          .getValue();
+        const object = gd.castObject(
+          this._associatedObjectConfiguration,
+          gd.SpineObjectConfiguration
+        );
+
+        const spineResourceName = object.getSpineResourceName();
         if (this._spineResourceName !== spineResourceName) {
           this._spineResourceName = spineResourceName;
           this._loadSpine();
@@ -209,7 +211,7 @@ module.exports = {
 
         this.setAnimation(this._instance.getRawDoubleProperty('animation'));
 
-        const scale = Number(properties.get('scale').getValue()) || 1;
+        const scale = object.getScale() || 1;
 
         const spine = this._spine;
         if (spine) {

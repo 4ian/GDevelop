@@ -10,6 +10,8 @@ declare class gdSpineObjectConfiguration extends gdObjectConfiguration {
   hasNoAnimations(): boolean;
   swapAnimations(first: number, second: number): void;
   moveAnimation(oldIndex: number, newIndex: number): void;
+  getScale(): number;
+  getSpineResourceName(): string;
   delete(): void;
   ptr: number;
 };

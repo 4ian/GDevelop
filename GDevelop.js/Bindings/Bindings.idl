@@ -3426,6 +3426,20 @@ interface Model3DObjectConfiguration {
     boolean HasNoAnimations();
     void SwapAnimations(unsigned long first, unsigned long second);
     void MoveAnimation(unsigned long oldIndex, unsigned long newIndex);
+
+    double GetWidth();
+    double GetHeight();
+    double GetDepth();
+    double GetRotationX();
+    double GetRotationY();
+    double GetRotationZ();
+
+    [Const, Ref] DOMString GetModelResourceName();
+    [Const, Ref] DOMString GetMaterialType();
+    [Const, Ref] DOMString GetOriginLocation();
+    [Const, Ref] DOMString GetCenterLocation();
+
+    boolean shouldKeepAspectRatio();
 };
 Model3DObjectConfiguration implements ObjectConfiguration;
 
@@ -3455,6 +3469,9 @@ interface SpineObjectConfiguration {
     boolean HasNoAnimations();
     void SwapAnimations(unsigned long first, unsigned long second);
     void MoveAnimation(unsigned long oldIndex, unsigned long newIndex);
+
+    double GetScale();
+    [Const, Ref] DOMString GetSpineResourceName();
 };
 SpineObjectConfiguration implements ObjectConfiguration;
 

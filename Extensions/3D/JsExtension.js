@@ -2799,24 +2799,22 @@ module.exports = {
           pixiContainer,
           pixiResourcesLoader
         );
-        const properties = associatedObjectConfiguration.getProperties();
-        this._defaultWidth = parseFloat(properties.get('width').getValue());
-        this._defaultHeight = parseFloat(properties.get('height').getValue());
-        this._defaultDepth = parseFloat(properties.get('depth').getValue());
-        const rotationX = parseFloat(properties.get('rotationX').getValue());
-        const rotationY = parseFloat(properties.get('rotationY').getValue());
-        const rotationZ = parseFloat(properties.get('rotationZ').getValue());
-        const keepAspectRatio =
-          properties.get('keepAspectRatio').getValue() === 'true';
-        const modelResourceName = properties
-          .get('modelResourceName')
-          .getValue();
-        this._originPoint = getPointForLocation(
-          properties.get('originLocation').getValue()
+        const object = gd.castObject(
+          this._associatedObjectConfiguration,
+          gd.Model3DObjectConfiguration
         );
-        this._centerPoint = getPointForLocation(
-          properties.get('centerLocation').getValue()
-        );
+
+        this._defaultWidth = object.getWidth();
+        this._defaultHeight = object.getHeight();
+        this._defaultDepth = object.getDepth();
+        const rotationX = object.getRotationX();
+        const rotationY = object.getRotationY();
+        const rotationZ = object.getRotationZ();
+        const keepAspectRatio = object.shouldKeepAspectRatio();
+        const modelResourceName = object.getModelResourceName();
+
+        this._originPoint = getPointForLocation(object.getOriginLocation());
+        this._centerPoint = getPointForLocation(object.getCenterLocation());
 
         // This renderer shows a placeholder for the object:
         this._pixiObject = new PIXI.Graphics();
@@ -3278,13 +3276,16 @@ module.exports = {
       }
 
       updateThreeObject() {
-        const properties = this._associatedObjectConfiguration.getProperties();
+        const object = gd.castObject(
+          this._associatedObjectConfiguration,
+          gd.Model3DObjectConfiguration
+        );
 
         let defaultTransformationDirty = false;
 
-        const originalWidth = parseFloat(properties.get('width').getValue());
-        const originalHeight = parseFloat(properties.get('height').getValue());
-        const originalDepth = parseFloat(properties.get('depth').getValue());
+        const originalWidth = object.getWidth();
+        const originalHeight = object.getHeight();
+        const originalDepth = object.getDepth();
         if (
           this._originalWidth !== originalWidth ||
           this._originalHeight !== originalHeight ||
@@ -3296,9 +3297,9 @@ module.exports = {
           defaultTransformationDirty = true;
         }
 
-        const rotationX = parseFloat(properties.get('rotationX').getValue());
-        const rotationY = parseFloat(properties.get('rotationY').getValue());
-        const rotationZ = parseFloat(properties.get('rotationZ').getValue());
+        const rotationX = object.getRotationX();
+        const rotationY = object.getRotationY();
+        const rotationZ = object.getRotationZ();
         if (
           this._rotationX !== rotationX ||
           this._rotationY !== rotationY ||
@@ -3310,24 +3311,19 @@ module.exports = {
           defaultTransformationDirty = true;
         }
 
-        const keepAspectRatio =
-          properties.get('keepAspectRatio').getValue() === 'true';
+        const keepAspectRatio = object.shouldKeepAspectRatio();
         if (this._keepAspectRatio !== keepAspectRatio) {
           this._keepAspectRatio = keepAspectRatio;
           defaultTransformationDirty = true;
         }
 
-        const originPoint = getPointForLocation(
-          properties.get('originLocation').getValue()
-        );
+        const originPoint = getPointForLocation(object.getOriginLocation());
         if (!isSamePoint(originPoint, this._originPoint)) {
           this._originPoint = originPoint;
           defaultTransformationDirty = true;
         }
 
-        const centerPoint = getPointForLocation(
-          properties.get('centerLocation').getValue()
-        );
+        const centerPoint = getPointForLocation(object.getCenterLocation());
         if (!isSamePoint(centerPoint, this._centerPoint)) {
           this._centerPoint = centerPoint;
           defaultTransformationDirty = true;
@@ -3335,9 +3331,7 @@ module.exports = {
 
         if (defaultTransformationDirty) this._updateDefaultTransformation();
 
-        const modelResourceName = properties
-          .get('modelResourceName')
-          .getValue();
+        const modelResourceName = object.getModelResourceName();
         if (this._modelResourceName !== modelResourceName) {
           this._modelResourceName = modelResourceName;
 

@@ -2543,6 +2543,17 @@ export class Model3DObjectConfiguration extends ObjectConfiguration {
   hasNoAnimations(): boolean;
   swapAnimations(first: number, second: number): void;
   moveAnimation(oldIndex: number, newIndex: number): void;
+  getWidth(): number;
+  getHeight(): number;
+  getDepth(): number;
+  getRotationX(): number;
+  getRotationY(): number;
+  getRotationZ(): number;
+  getModelResourceName(): string;
+  getMaterialType(): string;
+  getOriginLocation(): string;
+  getCenterLocation(): string;
+  shouldKeepAspectRatio(): boolean;
 }
 
 export class SpineAnimation extends EmscriptenObject {
@@ -2566,6 +2577,8 @@ export class SpineObjectConfiguration extends ObjectConfiguration {
   hasNoAnimations(): boolean;
   swapAnimations(first: number, second: number): void;
   moveAnimation(oldIndex: number, newIndex: number): void;
+  getScale(): number;
+  getSpineResourceName(): string;
 }
 
 export class Vector2f extends EmscriptenObject {

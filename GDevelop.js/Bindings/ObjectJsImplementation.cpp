@@ -28,8 +28,9 @@ std::unique_ptr<gd::ObjectConfiguration> ObjectJsImplementation::Clone() const {
         clone['updateInitialInstanceProperty'] =
             self['updateInitialInstanceProperty'];
 
-        // TODO: make a structured clone of the content.
-        clone['content'] = {...self['content']};
+        // Make a clone of the JavaScript object containing the data. If we don't do that, the
+        // content of the object would be shared between the original and the clone.
+        clone['content'] = Module['_deepCloneForObjectJsImplementationContent'](self['content']);
       },
       (int)clone,
       (int)this);

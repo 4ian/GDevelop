@@ -218,6 +218,10 @@ type Props = {|
     e: SyntheticEvent<HTMLImageElement>,
     atlasResourceName: string
   ) => void,
+  /**
+   * Needed to enable scrolling on touch devices when the user is not using
+   * a long touch to make a tile selection on the tile set.
+   */
   onScrollY: number => void,
 |};
 
@@ -401,6 +405,7 @@ const TileSetVisualizer = ({
       if (isTouchDevice) {
         if (!touchStartCoordinates) return;
 
+        // Distinguish between a long touch (to multi select tiles) and a scroll.
         if (isLongTouch) {
           startCoordinates = touchStartCoordinates;
         } else {

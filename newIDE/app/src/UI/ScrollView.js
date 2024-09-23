@@ -75,15 +75,15 @@ export default React.forwardRef<Props, ScrollViewInterface>(
         scrollViewElement.scrollBy(0, deltaY);
       },
       /**
-       * Scroll the view to the target position.
+       * Scroll the view vertically by the offset passed as argument.
        */
-      scrollToPosition: (y: number) => {
+      scrollToPosition: (deltaY: number) => {
         const scrollViewElement = scrollView.current;
         if (!scrollViewElement) return;
 
         const scrollViewYPosition = scrollViewElement.getBoundingClientRect()
           .top;
-        scrollViewElement.scrollTop = y - scrollViewYPosition;
+        scrollViewElement.scrollTop = deltaY - scrollViewYPosition;
       },
       /**
        * Scroll the view to the bottom.

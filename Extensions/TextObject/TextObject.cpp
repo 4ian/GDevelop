@@ -129,19 +129,22 @@ std::map<gd::String, gd::PropertyDescriptor> TextObject::GetProperties() const {
       .SetType("resource")
       .AddExtraInfo("font")
       .SetLabel(_("Font"))
-      .SetGroup(_("Font"));
+      .SetGroup(_("Font"))
+      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
 
   objectProperties["bold"]
       .SetValue(bold ? "true" : "false")
       .SetType("boolean")
       .SetLabel(_("Bold"))
-      .SetGroup(_("Font"));
+      .SetGroup(_("Font"))
+      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
 
   objectProperties["italic"]
       .SetValue(italic ? "true" : "false")
       .SetType("boolean")
       .SetLabel(_("Italic"))
-      .SetGroup(_("Font"));
+      .SetGroup(_("Font"))
+      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
 
   objectProperties["color"]
       .SetValue(color)
@@ -156,66 +159,76 @@ std::map<gd::String, gd::PropertyDescriptor> TextObject::GetProperties() const {
       .AddExtraInfo("center")
       .AddExtraInfo("right")
       .SetLabel(_("Alignment, when multiple lines are displayed"))
-      .SetGroup(_("Font"));
+      .SetGroup(_("Font"))
+      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
 
   objectProperties["isOutlineEnabled"]
       .SetValue(isOutlineEnabled ? "true" : "false")
       .SetType("boolean")
       .SetLabel(_("Outline"))
-      .SetGroup(_("Outline"));
+      .SetGroup(_("Outline"))
+      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
 
   objectProperties["outlineColor"]
       .SetValue(outlineColor)
       .SetType("color")
       .SetLabel(_("Outline color"))
-      .SetGroup(_("Outline"));
+      .SetGroup(_("Outline"))
+      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
 
   objectProperties["outlineThickness"]
       .SetValue(gd::String::From(outlineThickness))
       .SetType("number")
       .SetLabel(_("Outline thickness"))
       .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
-      .SetGroup(_("Outline"));
+      .SetGroup(_("Outline"))
+      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
 
   objectProperties["isShadowEnabled"]
       .SetValue(isShadowEnabled ? "true" : "false")
       .SetType("boolean")
       .SetLabel(_("Shadow"))
-      .SetGroup(_("Shadow"));
+      .SetGroup(_("Shadow"))
+      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
 
   objectProperties["shadowColor"]
       .SetValue(shadowColor)
       .SetType("color")
       .SetLabel(_("Shadow color"))
-      .SetGroup(_("Shadow"));
+      .SetGroup(_("Shadow"))
+      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
 
   objectProperties["shadowOpacity"]
       .SetValue(gd::String::From(shadowOpacity))
       .SetType("number")
       .SetLabel(_("Shadow opacity"))
       .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
-      .SetGroup(_("Shadow"));
+      .SetGroup(_("Shadow"))
+      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
 
   objectProperties["shadowAngle"]
       .SetValue(gd::String::From(shadowAngle))
       .SetType("number")
       .SetLabel(_("Shadow angle"))
       .SetMeasurementUnit(gd::MeasurementUnit::GetDegreeAngle())
-      .SetGroup(_("Shadow"));
+      .SetGroup(_("Shadow"))
+      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
 
   objectProperties["shadowDistance"]
       .SetValue(gd::String::From(shadowDistance))
       .SetType("number")
       .SetLabel(_("Shadow distance"))
       .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
-      .SetGroup(_("Shadow"));
+      .SetGroup(_("Shadow"))
+      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
 
   objectProperties["shadowBlurRadius"]
       .SetValue(gd::String::From(shadowBlurRadius))
       .SetType("number")
       .SetLabel(_("Shadow blur radius"))
       .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
-      .SetGroup(_("Shadow"));
+      .SetGroup(_("Shadow"))
+      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
 
   return objectProperties;
 }

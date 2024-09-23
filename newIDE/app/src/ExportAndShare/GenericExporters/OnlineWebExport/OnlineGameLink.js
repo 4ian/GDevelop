@@ -46,6 +46,7 @@ type OnlineGameLinkProps = {|
   exportStep: BuildStep,
   onRefreshGame: () => Promise<void>,
   automaticallyOpenGameProperties?: boolean,
+  shouldShowShareDialog: boolean,
 |};
 
 const timeForExport = 5; // seconds.
@@ -60,6 +61,7 @@ const OnlineGameLink = ({
   exportStep,
   onRefreshGame,
   automaticallyOpenGameProperties,
+  shouldShowShareDialog,
 }: OnlineGameLinkProps) => {
   const [showCopiedInfoBar, setShowCopiedInfoBar] = React.useState<boolean>(
     false
@@ -177,10 +179,12 @@ const OnlineGameLink = ({
     () => {
       if (exportStep === 'done') {
         setTimeBeforeExportFinished(timeForExport); // reset.
-        setIsShareDialogOpen(true);
+        if (shouldShowShareDialog) {
+          setIsShareDialogOpen(true);
+        }
       }
     },
-    [exportStep, automaticallyOpenGameProperties]
+    [exportStep, automaticallyOpenGameProperties, shouldShowShareDialog]
   );
 
   React.useEffect(

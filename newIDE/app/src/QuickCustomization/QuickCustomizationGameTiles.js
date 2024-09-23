@@ -78,6 +78,7 @@ export const QuickCustomizationGameTiles = ({
                       thumbnailTitleByLocale
                     )}
                     key={exampleShortHeader.name}
+                    useQuickCustomizationThumbnail
                   />
                 )
               )

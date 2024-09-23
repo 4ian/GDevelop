@@ -65,6 +65,7 @@ type Props = {|
   ) => void,
   onOpenProfile?: () => void,
   assetSwappedObject?: ?gdObject,
+  minimalUI?: boolean,
 |};
 
 export type AssetStoreInterface = {|
@@ -104,6 +105,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       onOpenPrivateGameTemplateListingData,
       onOpenProfile,
       assetSwappedObject,
+      minimalUI,
     }: Props,
     ref
   ) => {
@@ -147,11 +149,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
             }
           }
           assetSwappedObjectPtr.current = assetSwappedObject.ptr;
-        } else if (shopNavigationState.isAssetSwappingHistory) {
-          shopNavigationState.openHome();
-          assetFiltersState.setAssetSwappingFilter(
-            new AssetSwappingAssetStoreSearchFilter()
-          );
         }
       },
       [
@@ -600,129 +597,138 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
 
     return (
       <Column expand noMargin useFullHeight noOverflowParent id="asset-store">
-        <LineStackLayout>
-          <IconButton
-            id="home-button"
-            key="back-discover"
-            tooltip={t`Back to discover`}
-            onClick={() => {
-              setSearchText('');
-              const page = assetSwappedObject
-                ? shopNavigationState.openAssetSwapping()
-                : shopNavigationState.openHome();
-              setScrollUpdateIsNeeded(page);
-              clearAllAssetStoreFilters();
-              setIsFiltersPanelOpen(false);
-            }}
-            size="small"
-          >
-            <Home />
-          </IconButton>
-          <Column expand useFullHeight noMargin>
-            <SearchBar
-              placeholder={
-                hideGameTemplates ? t`Search assets` : `Search the shop`
-              }
-              value={searchText}
-              onChange={(newValue: string) => {
-                if (searchText === newValue) {
-                  return;
+        <>
+          <LineStackLayout>
+            {!(assetSwappedObject && minimalUI) && (
+              <IconButton
+                id="home-button"
+                key="back-discover"
+                tooltip={t`Back to discover`}
+                onClick={() => {
+                  setSearchText('');
+                  const page = assetSwappedObject
+                    ? shopNavigationState.openAssetSwapping()
+                    : shopNavigationState.openHome();
+                  setScrollUpdateIsNeeded(page);
+                  clearAllAssetStoreFilters();
+                  setIsFiltersPanelOpen(false);
+                }}
+                size="small"
+              >
+                <Home />
+              </IconButton>
+            )}
+            <Column expand useFullHeight noMargin>
+              <SearchBar
+                placeholder={
+                  hideGameTemplates ? t`Search assets` : `Search the shop`
                 }
-                setSearchText(newValue);
-                if (isOnSearchResultPage) {
-                  // An existing search is already being done: just move to the
-                  // top search results.
-                  shopNavigationState.openSearchResultPage();
-                  const assetsListInterface = assetsList.current;
-                  if (assetsListInterface) {
-                    assetsListInterface.scrollToPosition(0);
-                    assetsListInterface.setPageBreakIndex(0);
+                value={searchText}
+                onChange={(newValue: string) => {
+                  if (searchText === newValue) {
+                    return;
                   }
-                } else {
-                  // A new search is being initiated: navigate to the search page,
-                  // and clear the history as a new search was launched.
-                  if (!!newValue) {
-                    shopNavigationState.clearHistory();
+                  setSearchText(newValue);
+                  if (isOnSearchResultPage) {
+                    // An existing search is already being done: just move to the
+                    // top search results.
                     shopNavigationState.openSearchResultPage();
-                    openFiltersPanelIfAppropriate();
+                    const assetsListInterface = assetsList.current;
+                    if (assetsListInterface) {
+                      assetsListInterface.scrollToPosition(0);
+                      assetsListInterface.setPageBreakIndex(0);
+                    }
+                  } else {
+                    // A new search is being initiated: navigate to the search page,
+                    // and clear the history as a new search was launched.
+                    if (!!newValue) {
+                      shopNavigationState.clearHistory();
+                      shopNavigationState.openSearchResultPage();
+                      openFiltersPanelIfAppropriate();
+                    }
                   }
-                }
-              }}
-              onRequestSearch={() => {}}
-              ref={searchBar}
-              id="asset-store-search-bar"
-            />
-          </Column>
-          <IconButton
-            onClick={() => setIsFiltersPanelOpen(!isFiltersPanelOpen)}
-            disabled={!canShowFiltersPanel}
-            selected={canShowFiltersPanel && isFiltersPanelOpen}
-            size="small"
-          >
-            <Tune />
-          </IconButton>
-        </LineStackLayout>
-        <Spacer />
+                }}
+                onRequestSearch={() => {}}
+                ref={searchBar}
+                id="asset-store-search-bar"
+              />
+            </Column>
+            {!(assetSwappedObject && minimalUI) && (
+              <IconButton
+                onClick={() => setIsFiltersPanelOpen(!isFiltersPanelOpen)}
+                disabled={!canShowFiltersPanel}
+                selected={canShowFiltersPanel && isFiltersPanelOpen}
+                size="small"
+              >
+                <Tune />
+              </IconButton>
+            )}
+          </LineStackLayout>
+          <Spacer />
+        </>
         <Column noMargin>
           <Line justifyContent="space-between" noMargin alignItems="center">
-            {(!isOnHomePage || !!openedShopCategory) && (
-              <>
-                {shopNavigationState.isRootPage ? null : (
-                  <Column expand alignItems="flex-start" noMargin>
-                    <TextButton
-                      icon={<ChevronArrowLeft />}
-                      label={<Trans>Back</Trans>}
-                      onClick={async () => {
-                        const page = shopNavigationState.backToPreviousPage();
-                        const isUpdatingSearchtext = reApplySearchTextIfNeeded(
-                          page
-                        );
-                        if (isUpdatingSearchtext) {
-                          // Updating the search is not instant, so we cannot apply the scroll position
-                          // right away. We force a wait as there's no easy way to know when results are completely updated.
-                          await delay(500);
-                          setScrollUpdateIsNeeded(page);
-                          applyBackScrollPosition(page); // We apply it manually, because the layout effect won't be called again.
-                        } else {
-                          setScrollUpdateIsNeeded(page);
-                        }
-                      }}
-                    />
-                  </Column>
-                )}
-                {(openedAssetPack ||
-                  openedPrivateAssetPackListingData ||
-                  filtersState.chosenCategory) && (
-                  <>
-                    {!openedAssetPack && !openedPrivateAssetPackListingData && (
-                      // Only show the category name if we're not on an asset pack page.
-                      <Column expand alignItems="center">
-                        <Text size="block-title" noMargin>
-                          {filtersState.chosenCategory
-                            ? capitalize(filtersState.chosenCategory.node.name)
-                            : ''}
-                        </Text>
-                      </Column>
-                    )}
-                    <Column
-                      expand
-                      alignItems="flex-end"
-                      noMargin
-                      justifyContent="center"
-                    >
-                      {openedAssetPack &&
-                      openedAssetPack.content &&
-                      doesAssetPackContainAudio(openedAssetPack) &&
-                      !isAssetPackAudioOnly(openedAssetPack) ? (
-                        <PrivateAssetPackAudioFilesDownloadButton
-                          assetPack={openedAssetPack}
-                        />
-                      ) : null}
+            {(!isOnHomePage || !!openedShopCategory) &&
+              !(assetSwappedObject && minimalUI) && (
+                <>
+                  {shopNavigationState.isRootPage ? null : (
+                    <Column expand alignItems="flex-start" noMargin>
+                      <TextButton
+                        icon={<ChevronArrowLeft />}
+                        label={<Trans>Back</Trans>}
+                        onClick={async () => {
+                          const page = shopNavigationState.backToPreviousPage();
+                          const isUpdatingSearchtext = reApplySearchTextIfNeeded(
+                            page
+                          );
+                          if (isUpdatingSearchtext) {
+                            // Updating the search is not instant, so we cannot apply the scroll position
+                            // right away. We force a wait as there's no easy way to know when results are completely updated.
+                            await delay(500);
+                            setScrollUpdateIsNeeded(page);
+                            applyBackScrollPosition(page); // We apply it manually, because the layout effect won't be called again.
+                          } else {
+                            setScrollUpdateIsNeeded(page);
+                          }
+                        }}
+                      />
                     </Column>
-                  </>
-                )}
-              </>
-            )}
+                  )}
+                  {(openedAssetPack ||
+                    openedPrivateAssetPackListingData ||
+                    filtersState.chosenCategory) && (
+                    <>
+                      {!openedAssetPack && !openedPrivateAssetPackListingData && (
+                        // Only show the category name if we're not on an asset pack page.
+                        <Column expand alignItems="center">
+                          <Text size="block-title" noMargin>
+                            {filtersState.chosenCategory
+                              ? capitalize(
+                                  filtersState.chosenCategory.node.name
+                                )
+                              : ''}
+                          </Text>
+                        </Column>
+                      )}
+                      <Column
+                        expand
+                        alignItems="flex-end"
+                        noMargin
+                        justifyContent="center"
+                      >
+                        {openedAssetPack &&
+                        openedAssetPack.content &&
+                        doesAssetPackContainAudio(openedAssetPack) &&
+                        !isAssetPackAudioOnly(openedAssetPack) ? (
+                          <PrivateAssetPackAudioFilesDownloadButton
+                            assetPack={openedAssetPack}
+                          />
+                        ) : null}
+                      </Column>
+                    </>
+                  )}
+                </>
+              )}
           </Line>
         </Column>
         <Line
@@ -790,9 +796,10 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
               onGoBackToFolderIndex={goBackToFolderIndex}
               currentPage={shopNavigationState.getCurrentPage()}
               hideGameTemplates={hideGameTemplates}
-              hideDetails={!!assetSwappedObject}
+              hideDetails={!!assetSwappedObject && !!minimalUI}
             />
-          ) : openedAssetShortHeader ? (
+          ) : // Do not show the asset details if we're swapping an asset.
+          openedAssetShortHeader && !(assetSwappedObject && minimalUI) ? (
             <AssetDetails
               ref={assetDetails}
               onTagSelection={selectTag}

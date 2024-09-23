@@ -134,7 +134,6 @@ export const initialAssetStoreState: AssetStoreState = {
   shopNavigationState: {
     getCurrentPage: () => assetStoreHomePageState,
     isRootPage: true,
-    isAssetSwappingHistory: false,
     backToPreviousPage: () => assetStoreHomePageState,
     openHome: () => assetStoreHomePageState,
     openAssetSwapping: () => assetStoreHomePageState,

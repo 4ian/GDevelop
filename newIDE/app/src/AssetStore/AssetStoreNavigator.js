@@ -28,7 +28,6 @@ export type AssetStorePageState = {|
 export type NavigationState = {|
   getCurrentPage: () => AssetStorePageState,
   isRootPage: boolean,
-  isAssetSwappingHistory: boolean,
   backToPreviousPage: () => AssetStorePageState,
   openHome: () => AssetStorePageState,
   openAssetSwapping: () => AssetStorePageState,
@@ -122,7 +121,6 @@ export const useShopNavigation = (): NavigationState => {
     () => ({
       getCurrentPage: () => previousPages[previousPages.length - 1],
       isRootPage: previousPages.length <= 1,
-      isAssetSwappingHistory: !isHomePage(previousPages[0]),
       backToPreviousPage: () => {
         if (previousPages.length > 1) {
           const newPreviousPages = previousPages.slice(

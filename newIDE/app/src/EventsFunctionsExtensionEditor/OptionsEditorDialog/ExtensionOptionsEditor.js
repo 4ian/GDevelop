@@ -118,7 +118,7 @@ export const ExtensionOptionsEditor = ({
   return (
     <I18n>
       {({ i18n }: { i18n: I18nType }) => (
-        <ColumnStackLayout noMargin>
+        <ColumnStackLayout noMargin expand>
           <TextField
             floatingLabelText={<Trans>Name</Trans>}
             value={eventsFunctionsExtension.getName()}

@@ -135,7 +135,7 @@ type AccordionProps = {|
  */
 export const Accordion = React.forwardRef<AccordionProps, MUIAccordion>(
   (props, ref) => {
-    const { costlyBody, ...otherProps } = props;
+    const { costlyBody, noMargin, ...otherProps } = props;
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
     return (
@@ -147,12 +147,11 @@ export const Accordion = React.forwardRef<AccordionProps, MUIAccordion>(
         style={{
           ...{
             border:
-              !props.noMargin &&
-              `1px solid ${gdevelopTheme.toolbar.separatorColor}`,
+              !noMargin && `1px solid ${gdevelopTheme.toolbar.separatorColor}`,
             backgroundColor: gdevelopTheme.paper.backgroundColor.medium,
             marginLeft: 0,
           },
-          ...(props.noMargin && {
+          ...(noMargin && {
             border: `0px`,
             padding: `0px`,
             margin: `0px`,

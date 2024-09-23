@@ -58,6 +58,8 @@ const isShopRequested = (routeArguments: RouteArguments): boolean =>
   routeArguments['initial-dialog'] === 'store'; // New way of opening the store
 const isGamesDashboardRequested = (routeArguments: RouteArguments): boolean =>
   routeArguments['initial-dialog'] === 'games-dashboard';
+const isBuildRequested = (routeArguments: RouteArguments): boolean =>
+  routeArguments['initial-dialog'] === 'build';
 
 const styles = {
   container: {
@@ -220,10 +222,15 @@ export const HomePage = React.memo<Props>(
       const isGamesDashboardRequestedAtOpening = React.useRef<boolean>(
         isGamesDashboardRequested(routeArguments)
       );
+      const isBuildRequestedAtOpening = React.useRef<boolean>(
+        isBuildRequested(routeArguments)
+      );
       const initialTab = isShopRequestedAtOpening.current
         ? 'shop'
         : isGamesDashboardRequestedAtOpening.current
         ? 'manage'
+        : isBuildRequestedAtOpening.current
+        ? 'build'
         : showGetStartedSectionByDefault
         ? 'get-started'
         : 'build';
@@ -297,6 +304,9 @@ export const HomePage = React.memo<Props>(
             ]);
           } else if (isGamesDashboardRequested(routeArguments)) {
             setActiveTab('manage');
+            removeRouteArguments(['initial-dialog']);
+          } else if (isBuildRequested(routeArguments)) {
+            setActiveTab('build');
             removeRouteArguments(['initial-dialog']);
           }
         },

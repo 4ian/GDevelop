@@ -1,0 +1,5 @@
+.previewLine {
+  border-left: 4px solid var(--theme-message-valid-color);
+  border-radius: 6px;
+}
+

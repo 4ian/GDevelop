@@ -43,25 +43,6 @@ export const Default = () => {
           resourceName="icon128.png"
           onChange={action('on change')}
         />
-        <Text size="sub-title">With label</Text>
-        <CompactResourceSelectorWithThumbnail
-          id="default"
-          resourceKind="image"
-          project={testProject.project}
-          resourceManagementProps={fakeResourceManagementProps}
-          resourceName="icon128.png"
-          onChange={action('on change')}
-          label="Choose an image"
-        />
-        <Text size="sub-title">With description</Text>
-        <CompactResourceSelectorWithThumbnail
-          resourceKind="image"
-          project={testProject.project}
-          resourceManagementProps={fakeResourceManagementProps}
-          resourceName="icon128.png"
-          onChange={action('on change')}
-          markdownDescription="This is a description"
-        />
         <Text size="sub-title">With multiple external editors</Text>
         <CompactResourceSelectorWithThumbnail
           resourceKind="image"

@@ -47,6 +47,7 @@ export const useLongTouch = (
      */
     context?: string,
     delay?: number,
+    doNotCancelOnScroll?: boolean,
   }
 ) => {
   const timeout = React.useRef<?TimeoutID>(null);
@@ -61,8 +62,11 @@ export const useLongTouch = (
     [context]
   );
 
+  const cancelOnScroll = !options || !options.doNotCancelOnScroll
+
   React.useEffect(
     () => {
+      if (!cancelOnScroll) return;
       // Cancel the long touch if scrolling (otherwise we can get a long touch
       // being activated while scroll and maintaining the touch on an element,
       // which is weird for the user that just want to scroll).
@@ -84,7 +88,7 @@ export const useLongTouch = (
         document.removeEventListener('scroll', clear, { capture: true });
       };
     },
-    [clear]
+    [clear, cancelOnScroll]
   );
 
   const start = React.useCallback(

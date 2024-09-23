@@ -27,6 +27,7 @@ export type ScrollViewInterface = {|
     target: ?React$Component<any, any> | ?React.ElementRef<any>
   ) => void,
   scrollToPosition: (number: number) => void,
+  scrollBy: (deltaY: number) => void,
   scrollToBottom: () => void,
 |};
 
@@ -64,6 +65,14 @@ export default React.forwardRef<Props, ScrollViewInterface>(
             'Tried to scroll to something that is not a HTMLElement'
           );
         }
+      },
+      /**
+       * Scroll the view to the target component.
+       */
+      scrollBy: (deltaY: number) => {
+        const scrollViewElement = scrollView.current;
+        if (!scrollViewElement) return;
+        scrollViewElement.scrollBy(0, deltaY);
       },
       /**
        * Scroll the view to the target position.

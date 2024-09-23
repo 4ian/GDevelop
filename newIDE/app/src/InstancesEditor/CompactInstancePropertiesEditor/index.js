@@ -15,7 +15,7 @@ import IconButton from '../../UI/IconButton';
 import { Line, Column, Spacer, marginsSize } from '../../UI/Grid';
 import Text from '../../UI/Text';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
-import ScrollView from '../../UI/ScrollView';
+import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
 import VariablesList, {
   type HistoryHandler,
@@ -95,7 +95,7 @@ const CompactInstancePropertiesEditor = ({
   onSelectTileMapTile,
 }: Props) => {
   const forceUpdate = useForceUpdate();
-
+  const scrollViewRef = React.useRef<?ScrollViewInterface>(null);
   const instance = instances[0];
   /**
    * TODO: multiple instances support for variables list. Expected behavior should be:
@@ -104,6 +104,12 @@ const CompactInstancePropertiesEditor = ({
    * obviously plus instance-wise variables with same name).
    */
   const shouldDisplayVariablesList = instances.length === 1;
+
+  const onScrollY = React.useCallback(deltaY => {
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollBy(deltaY);
+    }
+  }, []);
 
   const { object, instanceSchema } = React.useMemo<{|
     object?: gdObject,
@@ -220,6 +226,7 @@ const CompactInstancePropertiesEditor = ({
       scope="scene-editor-instance-properties"
     >
       <ScrollView
+        ref={scrollViewRef}
         autoHideScrollbar
         style={styles.scrollView}
         key={instances
@@ -253,6 +260,8 @@ const CompactInstancePropertiesEditor = ({
                   onSelectTileMapTile={onSelectTileMapTile}
                   showPaintingToolbar
                   allowMultipleSelection={false}
+                  onScrollY={onScrollY}
+                  allowRectangleSelection
                   interactive
                 />
               </Column>

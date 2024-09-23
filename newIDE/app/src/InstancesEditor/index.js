@@ -43,9 +43,6 @@ import {
 } from '../Utils/ZoomUtils';
 import Background from './Background';
 import TileMapPaintingPreview, {
-  getTileSet,
-  getTilesGridCoordinatesFromPointerSceneCoordinates,
-  isTileSetBadlyConfigured,
   updateSceneToTileMapTransformation,
 } from './TileMapPaintingPreview';
 import {
@@ -58,6 +55,11 @@ import { AffineTransformation } from '../Utils/AffineTransformation';
 import { ErrorFallbackComponent } from '../UI/ErrorBoundary';
 import { Trans } from '@lingui/macro';
 import { generateUUID } from 'three/src/math/MathUtils';
+import {
+  getTilesGridCoordinatesFromPointerSceneCoordinates,
+  getTileSet,
+  isTileSetBadlyConfigured,
+} from '../Utils/TileMap';
 
 const gd: libGDevelop = global.gd;
 
@@ -839,6 +841,7 @@ export default class InstancesEditor extends Component<Props, State> {
       }
       const tileMapGridCoordinates = getTilesGridCoordinatesFromPointerSceneCoordinates(
         {
+          tileMapTileSelection,
           coordinates: sceneCoordinates,
           tileSize: tileSet.tileSize,
           sceneToTileMapTransformation,
@@ -847,96 +850,126 @@ export default class InstancesEditor extends Component<Props, State> {
 
       let shouldTrimAfterOperations = false;
 
-      if (tileMapTileSelection.kind === 'single') {
+      if (tileMapTileSelection.kind === 'rectangle') {
         shouldTrimAfterOperations = editableTileMap.isEmpty();
         // TODO: Optimize list execution to make sure the most important size changing operations are done first.
         let cumulatedUnshiftedRows = 0,
           cumulatedUnshiftedColumns = 0;
-        const tileId = getTileIdFromGridCoordinates({
-          columnCount: tileSet.columnCount,
-          ...tileMapTileSelection.coordinates,
-        });
-
-        const tileDefinition = editableTileMap.getTileDefinition(tileId);
-        if (!tileDefinition) return;
 
         const layer = editableTileMap.getTileLayer(0);
         if (!layer) return;
 
-        tileMapGridCoordinates.forEach(({ x: gridX, y: gridY }) => {
-          // If rows or columns have been unshifted in the previous tile setting operations,
-          // we have to take them into account for the current coordinates.
-          const x = gridX + cumulatedUnshiftedColumns;
-          const y = gridY + cumulatedUnshiftedRows;
-          const rowsToAppend = Math.max(
-            0,
-            y - (editableTileMap.getDimensionY() - 1)
-          );
-          const columnsToAppend = Math.max(
-            0,
-            x - (editableTileMap.getDimensionX() - 1)
-          );
-          const rowsToUnshift = Math.abs(Math.min(0, y));
-          const columnsToUnshift = Math.abs(Math.min(0, x));
-          if (
-            rowsToAppend > 0 ||
-            columnsToAppend > 0 ||
-            rowsToUnshift > 0 ||
-            columnsToUnshift > 0
-          ) {
-            editableTileMap.increaseDimensions(
-              columnsToAppend,
-              columnsToUnshift,
-              rowsToAppend,
-              rowsToUnshift
-            );
-          }
-          const newX = x + columnsToUnshift;
-          const newY = y + rowsToUnshift;
+        tileMapGridCoordinates.forEach(
+          ({ bottomRightCorner, topLeftCorner, tileCoordinates }) => {
+            if (!tileCoordinates) return;
+            const tileId = getTileIdFromGridCoordinates({
+              columnCount: tileSet.columnCount,
+              ...tileCoordinates,
+            });
 
-          editableTileMap.setTile(newX, newY, 0, tileId);
-          editableTileMap.flipTileOnX(
-            newX,
-            newY,
-            0,
-            tileMapTileSelection.flipHorizontally
-          );
-          editableTileMap.flipTileOnY(
-            newX,
-            newY,
-            0,
-            tileMapTileSelection.flipVertically
-          );
+            const tileDefinition = editableTileMap.getTileDefinition(tileId);
+            if (!tileDefinition) return;
 
-          cumulatedUnshiftedRows += rowsToUnshift;
-          cumulatedUnshiftedColumns += columnsToUnshift;
-          // The instance angle is not considered when moving the instance after
-          // rows/columns were added/removed because the instance position does not
-          // include the rotation transformation. Otherwise, we could have used
-          // tileMapToSceneTransformation to get the new position.
-          selectedInstance.setX(
-            selectedInstance.getX() -
-              columnsToUnshift * (tileSet.tileSize * scaleX)
-          );
-          selectedInstance.setY(
-            selectedInstance.getY() -
-              rowsToUnshift * (tileSet.tileSize * scaleY)
-          );
-          if (selectedInstance.hasCustomSize()) {
-            selectedInstance.setCustomWidth(
-              selectedInstance.getCustomWidth() +
-                tileSet.tileSize * scaleX * (columnsToAppend + columnsToUnshift)
-            );
-            selectedInstance.setCustomHeight(
-              selectedInstance.getCustomHeight() +
-                tileSet.tileSize * scaleY * (rowsToAppend + rowsToUnshift)
-            );
+            for (
+              let gridX = topLeftCorner.x;
+              gridX <= bottomRightCorner.x;
+              gridX++
+            ) {
+              for (
+                let gridY = topLeftCorner.y;
+                gridY <= bottomRightCorner.y;
+                gridY++
+              ) {
+                // If rows or columns have been unshifted in the previous tile setting operations,
+                // we have to take them into account for the current coordinates.
+                const x = gridX + cumulatedUnshiftedColumns;
+                const y = gridY + cumulatedUnshiftedRows;
+                const rowsToAppend = Math.max(
+                  0,
+                  y - (editableTileMap.getDimensionY() - 1)
+                );
+                const columnsToAppend = Math.max(
+                  0,
+                  x - (editableTileMap.getDimensionX() - 1)
+                );
+                const rowsToUnshift = Math.abs(Math.min(0, y));
+                const columnsToUnshift = Math.abs(Math.min(0, x));
+                if (
+                  rowsToAppend > 0 ||
+                  columnsToAppend > 0 ||
+                  rowsToUnshift > 0 ||
+                  columnsToUnshift > 0
+                ) {
+                  editableTileMap.increaseDimensions(
+                    columnsToAppend,
+                    columnsToUnshift,
+                    rowsToAppend,
+                    rowsToUnshift
+                  );
+                }
+                const newX = x + columnsToUnshift;
+                const newY = y + rowsToUnshift;
+
+                editableTileMap.setTile(newX, newY, 0, tileId);
+                editableTileMap.flipTileOnX(
+                  newX,
+                  newY,
+                  0,
+                  tileMapTileSelection.flipHorizontally
+                );
+                editableTileMap.flipTileOnY(
+                  newX,
+                  newY,
+                  0,
+                  tileMapTileSelection.flipVertically
+                );
+
+                cumulatedUnshiftedRows += rowsToUnshift;
+                cumulatedUnshiftedColumns += columnsToUnshift;
+                // The instance angle is not considered when moving the instance after
+                // rows/columns were added/removed because the instance position does not
+                // include the rotation transformation. Otherwise, we could have used
+                // tileMapToSceneTransformation to get the new position.
+                selectedInstance.setX(
+                  selectedInstance.getX() -
+                    columnsToUnshift * (tileSet.tileSize * scaleX)
+                );
+                selectedInstance.setY(
+                  selectedInstance.getY() -
+                    rowsToUnshift * (tileSet.tileSize * scaleY)
+                );
+                if (selectedInstance.hasCustomSize()) {
+                  selectedInstance.setCustomWidth(
+                    selectedInstance.getCustomWidth() +
+                      tileSet.tileSize *
+                        scaleX *
+                        (columnsToAppend + columnsToUnshift)
+                  );
+                  selectedInstance.setCustomHeight(
+                    selectedInstance.getCustomHeight() +
+                      tileSet.tileSize * scaleY * (rowsToAppend + rowsToUnshift)
+                  );
+                }
+              }
+            }
           }
-        });
+        );
       } else if (tileMapTileSelection.kind === 'erase') {
-        tileMapGridCoordinates.forEach(({ x: gridX, y: gridY }) => {
-          editableTileMap.removeTile(gridX, gridY, 0);
-        });
+        const { bottomRightCorner, topLeftCorner } = tileMapGridCoordinates[0];
+        for (
+          let gridX = topLeftCorner.x;
+          gridX <= bottomRightCorner.x;
+          gridX++
+        ) {
+          for (
+            let gridY = topLeftCorner.y;
+            gridY <= bottomRightCorner.y;
+            gridY++
+          ) {
+            editableTileMap.removeTile(gridX, gridY, 0);
+          }
+        }
+
         shouldTrimAfterOperations = true;
       } else {
         return;

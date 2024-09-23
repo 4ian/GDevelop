@@ -277,15 +277,11 @@ const TileSetVisualizer = ({
     rowCount,
     tileSize,
   });
-  const [clickStartCoordinates, setClickStartCoordinates] = React.useState<?{|
+  const startCoordinatesRef = React.useRef<?{|
     x: number,
     y: number,
   |}>(null);
-  const [touchStartCoordinates, setTouchStartCoordinates] = React.useState<?{|
-    x: number,
-    y: number,
-  |}>(null);
-  const [isLongTouch, setIsLongTouch] = React.useState<boolean>(false);
+  const isLongTouchRef = React.useRef<boolean>(false);
   const tooltipDisplayTimeoutId = React.useRef<?TimeoutID>(null);
   const [
     rectangularSelectionTilePreview,
@@ -347,7 +343,7 @@ const TileSetVisualizer = ({
 
   const handleLongTouch = React.useCallback(
     (e: ClientCoordinates) => {
-      setIsLongTouch(true);
+      isLongTouchRef.current = true;
       displayTileIdTooltip(e);
     },
     [displayTileIdTooltip]
@@ -369,20 +365,12 @@ const TileSetVisualizer = ({
   const onPointerDown = React.useCallback(
     (event: PointerEvent) => {
       if (isBadlyConfigured) return;
-      if (event.pointerType === 'touch') {
-        const coordinates = getImageCoordinatesFromPointerEvent(event);
-        if (!coordinates) return;
-        setTouchStartCoordinates({
-          x: coordinates.mouseX,
-          y: coordinates.mouseY,
-        });
-      }
-      const imageCoordinates = getImageCoordinatesFromPointerEvent(event);
-      if (!imageCoordinates) return;
-      setClickStartCoordinates({
-        x: imageCoordinates.mouseX,
-        y: imageCoordinates.mouseY,
-      });
+      const coordinates = getImageCoordinatesFromPointerEvent(event);
+      if (!coordinates) return;
+      startCoordinatesRef.current = {
+        x: coordinates.mouseX,
+        y: coordinates.mouseY,
+      };
     },
     [isBadlyConfigured]
   );
@@ -391,30 +379,27 @@ const TileSetVisualizer = ({
     (event: PointerEvent) => {
       if (
         isBadlyConfigured ||
-        !clickStartCoordinates ||
+        !startCoordinatesRef ||
         !displayedTileSize ||
         (!allowMultipleSelection && !allowRectangleSelection)
       ) {
         return;
       }
 
-      let startCoordinates = clickStartCoordinates;
+      const startCoordinates = startCoordinatesRef.current;
+      if (!startCoordinates) return;
 
       const isTouchDevice = event.pointerType === 'touch';
 
       if (isTouchDevice) {
-        if (!touchStartCoordinates) return;
-
         // Distinguish between a long touch (to multi select tiles) and a scroll.
-        if (isLongTouch) {
-          startCoordinates = touchStartCoordinates;
-        } else {
+        if (!isLongTouchRef.current) {
           const coordinates = getImageCoordinatesFromPointerEvent(event);
           if (!coordinates) return;
           if (tilesetContainerRef.current) {
             const deltaY = -event.movementY;
             const deltaX =
-              touchStartCoordinates.x - coordinates.mouseXWithoutScrollLeft;
+              startCoordinates.x - coordinates.mouseXWithoutScrollLeft;
             tilesetContainerRef.current.scrollLeft = deltaX;
             onScrollY(deltaY);
           }
@@ -458,9 +443,6 @@ const TileSetVisualizer = ({
       rowCount,
       allowMultipleSelection,
       allowRectangleSelection,
-      clickStartCoordinates,
-      isLongTouch,
-      touchStartCoordinates,
       onScrollY,
     ]
   );
@@ -471,14 +453,11 @@ const TileSetVisualizer = ({
         if (!displayedTileSize || isBadlyConfigured) return;
 
         const isTouchDevice = event.pointerType === 'touch';
-        let startCoordinates = clickStartCoordinates;
+        const startCoordinates = startCoordinatesRef.current;
+        if (!startCoordinates) return;
 
-        if (isTouchDevice) {
-          if (!isLongTouch || !touchStartCoordinates) {
-            return;
-          } else {
-            startCoordinates = touchStartCoordinates;
-          }
+        if (isTouchDevice && !isLongTouchRef.current) {
+          return;
         }
 
         const imageCoordinates = getImageCoordinatesFromPointerEvent(event);
@@ -571,10 +550,9 @@ const TileSetVisualizer = ({
           }
         }
       } finally {
-        setClickStartCoordinates(null);
+        startCoordinatesRef.current = null;
         setRectangularSelectionTilePreview(null);
-        setTouchStartCoordinates(null);
-        setIsLongTouch(false);
+        isLongTouchRef.current = false;
       }
     },
     [
@@ -588,9 +566,6 @@ const TileSetVisualizer = ({
       shouldFlipVertically,
       allowMultipleSelection,
       allowRectangleSelection,
-      clickStartCoordinates,
-      isLongTouch,
-      touchStartCoordinates,
     ]
   );
 

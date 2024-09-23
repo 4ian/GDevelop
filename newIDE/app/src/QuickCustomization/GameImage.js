@@ -8,7 +8,7 @@ const styles = {
     objectFit: 'contain',
     borderRadius: '16px',
     boxSizing: 'border-box',
-    aspectRatio: 16 / 9,
+    aspectRatio: '16 / 9',
   },
 };
 

@@ -94,8 +94,7 @@ export const useQuickCustomizationState = ({
 };
 
 export const enumerateObjectFolderOrObjects = (
-  objectFolderOrObject: gdObjectFolderOrObject,
-  depth: number = 0
+  objectFolderOrObject: gdObjectFolderOrObject
 ): Array<{ folderName: string, objects: Array<gdObject> }> => {
   const orderedFolderNames: Array<string> = [''];
   const folderObjects: { [key: string]: Array<gdObject> } = {
@@ -116,7 +115,7 @@ export const enumerateObjectFolderOrObjects = (
         folderObjects[folderName] || []);
       orderedFolderNames.push(folderName);
 
-      enumerateObjectFolderOrObjects(child, depth + 1).forEach(
+      enumerateObjectFolderOrObjects(child).forEach(
         ({ folderName, objects }) => {
           currentFolderObjects.push.apply(currentFolderObjects, objects);
         }

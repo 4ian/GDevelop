@@ -4,9 +4,8 @@ import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import CompactPropertiesEditor from '../CompactPropertiesEditor';
 import propertiesMapToSchema from '../CompactPropertiesEditor/PropertiesMapToCompactSchema';
-import { mapFor } from '../Utils/MapFor';
 import { useForceRecompute } from '../Utils/UseForceUpdate';
-import { Column } from '../UI/Grid';
+import { Column, Line } from '../UI/Grid';
 import GameImage from './GameImage';
 import Text from '../UI/Text';
 import { Trans } from '@lingui/macro';
@@ -16,18 +15,23 @@ const gd: libGDevelop = global.gd;
 export const findTitleObject = (
   objectFolderOrObject: gdObjectFolderOrObject
 ): ?gdObject => {
-  let titleObject: ?gdObject = null;
-
-  mapFor(0, objectFolderOrObject.getChildrenCount(), i => {
+  for (let i = 0; i < objectFolderOrObject.getChildrenCount(); i++) {
     const child = objectFolderOrObject.getChildAt(i);
 
-    const object = child.getObject();
-    if (object.getName() === 'Title') {
-      titleObject = child.getObject();
+    if (child.isFolder()) {
+      const foundTitleObject = findTitleObject(child);
+      if (foundTitleObject) {
+        return foundTitleObject;
+      }
+    } else {
+      const object = child.getObject();
+      if (object.getName() === 'Title') {
+        return object;
+      }
     }
-  });
+  }
 
-  return titleObject;
+  return null;
 };
 
 const QuickObjectPropertiesEditor = ({
@@ -156,12 +160,14 @@ export const QuickTitleTweaker = ({
   if (!titleObject || !titleObjectConfiguration) {
     return (
       <Column expand alignItems="center" justifyContent="center">
-        <Text>
-          <Trans>
-            Oops! Looks like this game has no logo set up, you can continue to
-            the next step.
-          </Trans>
-        </Text>
+        <Line>
+          <Text>
+            <Trans>
+              Oops! Looks like this game has no logo set up, you can continue to
+              the next step.
+            </Trans>
+          </Text>
+        </Line>
       </Column>
     );
   }

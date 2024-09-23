@@ -349,7 +349,9 @@ const TileSetVisualizer = ({
     [displayTileIdTooltip]
   );
 
-  const longTouchProps = useLongTouch(handleLongTouch, {doNotCancelOnScroll: true});
+  const longTouchProps = useLongTouch(handleLongTouch, {
+    doNotCancelOnScroll: true,
+  });
 
   React.useEffect(
     () => {
@@ -501,11 +503,7 @@ const TileSetVisualizer = ({
             tileMapTileSelection && tileMapTileSelection.kind === 'multiple'
               ? { ...tileMapTileSelection }
               : { kind: 'multiple', coordinates: [] };
-          if (
-            (startX === x && startY === y) ||
-            // Do not allow rectangular select on touch device as it conflicts with basic scrolling gestures.
-            isTouchDevice
-          ) {
+          if (startX === x && startY === y) {
             if (
               tileMapTileSelection &&
               tileMapTileSelection.kind === 'multiple'
@@ -537,22 +535,35 @@ const TileSetVisualizer = ({
           }
           onSelectTileMapTile(newSelection);
         } else if (allowRectangleSelection) {
-          const topLeftCorner = {
-            x: Math.min(startX, x),
-            y: Math.min(startY, y),
-          };
-          const bottomRightCorner = {
-            x: Math.max(startX, x),
-            y: Math.max(startY, y),
-          };
-          // TODO: Add possibility to unselect tile.
-          const newSelection = {
-            kind: 'rectangle',
-            coordinates: [topLeftCorner, bottomRightCorner],
-            flipHorizontally: shouldFlipHorizontally,
-            flipVertically: shouldFlipVertically,
-          };
-          onSelectTileMapTile(newSelection);
+          const shouldRemoveSelection =
+            tileMapTileSelection &&
+            tileMapTileSelection.kind === 'rectangle' &&
+            startX === x &&
+            startY === y &&
+            x <= tileMapTileSelection.coordinates[1].x &&
+            x >= tileMapTileSelection.coordinates[0].x &&
+            y <= tileMapTileSelection.coordinates[1].y &&
+            y >= tileMapTileSelection.coordinates[0].y;
+          if (shouldRemoveSelection) {
+            // Remove selection when user selects a single tile in the current tile selection.
+            onSelectTileMapTile(null);
+          } else {
+            const topLeftCorner = {
+              x: Math.min(startX, x),
+              y: Math.min(startY, y),
+            };
+            const bottomRightCorner = {
+              x: Math.max(startX, x),
+              y: Math.max(startY, y),
+            };
+            const newSelection = {
+              kind: 'rectangle',
+              coordinates: [topLeftCorner, bottomRightCorner],
+              flipHorizontally: shouldFlipHorizontally,
+              flipVertically: shouldFlipVertically,
+            };
+            onSelectTileMapTile(newSelection);
+          }
         }
       } finally {
         setClickStartCoordinates(null);

@@ -62,7 +62,7 @@ export const useLongTouch = (
     [context]
   );
 
-  const cancelOnScroll = !options || !options.doNotCancelOnScroll
+  const cancelOnScroll = !options || !options.doNotCancelOnScroll;
 
   React.useEffect(
     () => {

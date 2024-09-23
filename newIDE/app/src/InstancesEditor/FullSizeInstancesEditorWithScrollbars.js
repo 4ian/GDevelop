@@ -433,6 +433,7 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
                   }
                 }}
                 showObjectInstancesIn3D={values.use3DEditor}
+                showBasicProfilingCounters={values.showBasicProfilingCounters}
                 {...otherProps}
               />
             </ErrorBoundary>

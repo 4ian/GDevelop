@@ -268,6 +268,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
               }
               pauseRendering={!props.isActive}
               showObjectInstancesIn3D={values.use3DEditor}
+              showBasicProfilingCounters={values.showBasicProfilingCounters}
               tileMapTileSelection={props.tileMapTileSelection}
               onSelectTileMapTile={props.onSelectTileMapTile}
             />

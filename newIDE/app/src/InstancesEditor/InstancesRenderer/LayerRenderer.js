@@ -16,6 +16,12 @@ import {
   type Polygon,
 } from '../../Utils/PolygonHelper';
 import Rendered3DInstance from '../../ObjectsRendering/Renderers/Rendered3DInstance';
+import {
+  type BasicProfilingCounters,
+  increaseInstanceUpdate,
+  makeBasicProfilingCounters,
+  resetBasicProfilingCounters,
+} from './BasicProfilingCounters';
 const gd: libGDevelop = global.gd;
 
 export default class LayerRenderer {
@@ -82,6 +88,8 @@ export default class LayerRenderer {
   _threePlaneMesh: THREE.Mesh | null = null;
 
   _showObjectInstancesIn3D: boolean;
+
+  _basicProfilingCounters = makeBasicProfilingCounters();
 
   constructor({
     project,
@@ -186,7 +194,18 @@ export default class LayerRenderer {
               ? 'auto'
               : 'static';
         }
-        if (isVisible) renderedInstance.update();
+        if (isVisible) {
+          const objectName = instance.getObjectName();
+          const time = performance.now();
+          renderedInstance.update();
+          const duration = performance.now() - time;
+
+          increaseInstanceUpdate(
+            this._basicProfilingCounters,
+            objectName,
+            duration
+          );
+        }
 
         if (renderedInstance instanceof Rendered3DInstance) {
           const threeObject = renderedInstance.getThreeObject();
@@ -555,6 +574,8 @@ export default class LayerRenderer {
   }
 
   render() {
+    resetBasicProfilingCounters(this._basicProfilingCounters);
+
     this._computeViewBounds();
     this.instances.iterateOverInstancesWithZOrdering(
       // $FlowFixMe - gd.castObject is not supporting typings.
@@ -564,6 +585,10 @@ export default class LayerRenderer {
     this._updatePixiObjectsZOrder();
     this._updateVisibility();
     this._destroyUnusedInstanceRenderers();
+  }
+
+  getBasicProfilingCounters(): BasicProfilingCounters {
+    return this._basicProfilingCounters;
   }
 
   /**

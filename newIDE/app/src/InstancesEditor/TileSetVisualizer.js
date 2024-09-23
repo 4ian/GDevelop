@@ -30,6 +30,7 @@ const styles = {
     position: 'relative',
     display: 'flex',
     overflow: 'auto',
+    touchAction: 'none',
   },
   atlasImage: { flex: 1, imageRendering: 'pixelated' },
   icon: { fontSize: 18 },
@@ -217,6 +218,7 @@ type Props = {|
     e: SyntheticEvent<HTMLImageElement>,
     atlasResourceName: string
   ) => void,
+  onScrollY: number => void,
 |};
 
 const TileSetVisualizer = ({
@@ -229,6 +231,7 @@ const TileSetVisualizer = ({
   showPaintingToolbar,
   interactive,
   onAtlasImageLoaded,
+  onScrollY,
 }: Props) => {
   const forceUpdate = useForceUpdate();
   const atlasResourceName = objectConfiguration
@@ -278,9 +281,7 @@ const TileSetVisualizer = ({
     x: number,
     y: number,
   |}>(null);
-  const [shouldCancelClick, setShouldCancelClick] = React.useState<boolean>(
-    false
-  );
+  const [isLongTouch, setIsLongTouch] = React.useState<boolean>(false);
   const tooltipDisplayTimeoutId = React.useRef<?TimeoutID>(null);
   const [
     rectangularSelectionTilePreview,
@@ -316,7 +317,6 @@ const TileSetVisualizer = ({
 
   const displayTileIdTooltip = React.useCallback(
     (e: ClientCoordinates) => {
-      setShouldCancelClick(true);
       if (!displayedTileSize || isBadlyConfigured) return;
 
       const imageCoordinates = getImageCoordinatesFromPointerEvent(e);
@@ -341,7 +341,15 @@ const TileSetVisualizer = ({
     [displayedTileSize, columnCount, rowCount, isBadlyConfigured]
   );
 
-  const longTouchProps = useLongTouch(displayTileIdTooltip);
+  const handleLongTouch = React.useCallback(
+    (e: ClientCoordinates) => {
+      setIsLongTouch(true);
+      displayTileIdTooltip(e);
+    },
+    [displayTileIdTooltip]
+  );
+
+  const longTouchProps = useLongTouch(handleLongTouch, {doNotCancelOnScroll: true});
 
   React.useEffect(
     () => {
@@ -356,7 +364,12 @@ const TileSetVisualizer = ({
     (event: PointerEvent) => {
       if (isBadlyConfigured) return;
       if (event.pointerType === 'touch') {
-        setTouchStartCoordinates({ x: event.pageX, y: event.pageY });
+        const coordinates = getImageCoordinatesFromPointerEvent(event);
+        if (!coordinates) return;
+        setTouchStartCoordinates({
+          x: coordinates.mouseX,
+          y: coordinates.mouseY,
+        });
       }
       const imageCoordinates = getImageCoordinatesFromPointerEvent(event);
       if (!imageCoordinates) return;
@@ -374,10 +387,32 @@ const TileSetVisualizer = ({
         isBadlyConfigured ||
         !clickStartCoordinates ||
         !displayedTileSize ||
-        (!allowMultipleSelection && !allowRectangleSelection) ||
-        event.pointerType === 'touch'
+        (!allowMultipleSelection && !allowRectangleSelection)
       ) {
         return;
+      }
+
+      let startCoordinates = clickStartCoordinates;
+
+      const isTouchDevice = event.pointerType === 'touch';
+
+      if (isTouchDevice) {
+        if (!touchStartCoordinates) return;
+
+        if (isLongTouch) {
+          startCoordinates = touchStartCoordinates;
+        } else {
+          const coordinates = getImageCoordinatesFromPointerEvent(event);
+          if (!coordinates) return;
+          if (tilesetContainerRef.current) {
+            const deltaY = -event.movementY;
+            const deltaX =
+              touchStartCoordinates.x - coordinates.mouseXWithoutScrollLeft;
+            tilesetContainerRef.current.scrollLeft = deltaX;
+            onScrollY(deltaY);
+          }
+          return;
+        }
       }
       const imageCoordinates = getImageCoordinatesFromPointerEvent(event);
       if (!imageCoordinates) return;
@@ -389,10 +424,11 @@ const TileSetVisualizer = ({
         rowCount,
         displayedTileSize,
       });
+
       const { x: startX, y: startY } = getGridCoordinatesFromPointerCoordinates(
         {
-          pointerX: clickStartCoordinates.x,
-          pointerY: clickStartCoordinates.y,
+          pointerX: startCoordinates.x,
+          pointerY: startCoordinates.y,
           columnCount,
           rowCount,
           displayedTileSize,
@@ -416,6 +452,9 @@ const TileSetVisualizer = ({
       allowMultipleSelection,
       allowRectangleSelection,
       clickStartCoordinates,
+      isLongTouch,
+      touchStartCoordinates,
+      onScrollY,
     ]
   );
 
@@ -423,21 +462,15 @@ const TileSetVisualizer = ({
     (event: PointerEvent) => {
       try {
         if (!displayedTileSize || isBadlyConfigured) return;
-        if (shouldCancelClick) {
-          setShouldCancelClick(false);
-          return;
-        }
 
-        let isTouchDevice = false;
+        const isTouchDevice = event.pointerType === 'touch';
+        let startCoordinates = clickStartCoordinates;
 
-        if (event.pointerType === 'touch') {
-          isTouchDevice = true;
-          if (
-            !touchStartCoordinates ||
-            Math.abs(event.pageX - touchStartCoordinates.x) > 30 ||
-            Math.abs(event.pageY - touchStartCoordinates.y) > 30
-          ) {
+        if (isTouchDevice) {
+          if (!isLongTouch || !touchStartCoordinates) {
             return;
+          } else {
+            startCoordinates = touchStartCoordinates;
           }
         }
 
@@ -451,14 +484,14 @@ const TileSetVisualizer = ({
           rowCount,
           displayedTileSize,
         });
-        if (!clickStartCoordinates) return;
+        if (!startCoordinates) return;
 
         const {
           x: startX,
           y: startY,
         } = getGridCoordinatesFromPointerCoordinates({
-          pointerX: clickStartCoordinates.x,
-          pointerY: clickStartCoordinates.y,
+          pointerX: startCoordinates.x,
+          pointerY: startCoordinates.y,
           columnCount,
           rowCount,
           displayedTileSize,
@@ -525,6 +558,7 @@ const TileSetVisualizer = ({
         setClickStartCoordinates(null);
         setRectangularSelectionTilePreview(null);
         setTouchStartCoordinates(null);
+        setIsLongTouch(false);
       }
     },
     [
@@ -539,7 +573,7 @@ const TileSetVisualizer = ({
       allowMultipleSelection,
       allowRectangleSelection,
       clickStartCoordinates,
-      shouldCancelClick,
+      isLongTouch,
       touchStartCoordinates,
     ]
   );

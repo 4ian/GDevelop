@@ -3902,23 +3902,27 @@ const MainFrame = (props: Props) => {
           }}
           onlineWebExporter={quickPublishOnlineWebExporter}
           onSaveProject={async () => {
-            // Automatically save project to the cloud if no provider is set.
+            // Automatically try to save project to the cloud.
             const storageProvider = getStorageProvider();
             if (
-              storageProvider.internalName === 'Empty' ||
-              storageProvider.internalName === 'UrlStorageProvider'
+              !['Empty', 'UrlStorageProvider', 'Cloud'].includes(
+                storageProvider.internalName
+              )
             ) {
-              getStorageProviderOperations(CloudStorageProvider);
-              saveProjectAsWithStorageProvider({
-                requestedStorageProvider: CloudStorageProvider,
-                forcedSavedAsLocation: {
-                  name: currentProject.getName(),
-                },
-              });
-              return;
+              console.error(
+                `Unexpected storage provider ${
+                  storageProvider.internalName
+                } when saving project from quick customization dialog. Saving anyway.`
+              );
             }
 
-            saveProject();
+            saveProjectAsWithStorageProvider({
+              requestedStorageProvider: CloudStorageProvider,
+              forcedSavedAsLocation: {
+                name: currentProject.getName(),
+              },
+            });
+            return;
           }}
           isSavingProject={isSavingProject}
           canClose={true}

@@ -13,12 +13,6 @@ import ScrollView from '../UI/ScrollView';
 import PreviewLine from './PreviewLine';
 import UnsavedChangesContext from '../MainFrame/UnsavedChangesContext';
 
-const styles = {
-  scrollView: {
-    display: 'flex',
-  },
-};
-
 type Props = {|
   project: gdProject,
   resourceManagementProps: ResourceManagementProps,
@@ -140,10 +134,7 @@ export const QuickCustomizationDialog = ({
       cannotBeDismissed={quickCustomizationState.isNavigationDisabled}
     >
       <ColumnStackLayout noMargin expand>
-        <ScrollView
-          key={quickCustomizationState.step.name}
-          style={styles.scrollView}
-        >
+        <ScrollView key={quickCustomizationState.step.name}>
           <ColumnStackLayout noMargin expand>
             {content}
           </ColumnStackLayout>

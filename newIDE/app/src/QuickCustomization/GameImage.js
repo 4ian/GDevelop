@@ -1,7 +1,16 @@
 // @flow
 import * as React from 'react';
-import classes from './GameImage.module.css';
-import classNames from 'classnames';
+
+const styles = {
+  image: {
+    width: '100%',
+    maxHeight: '325px',
+    objectFit: 'contain',
+    borderRadius: '16px',
+    boxSizing: 'border-box',
+    aspectRatio: 16 / 9,
+  },
+};
 
 type Props = {|
   project: gdProject,
@@ -29,9 +38,7 @@ const GameImage = ({ project }: Props) => {
     <img
       alt="Customize your game with GDevelop"
       src={gameThumbnailUrl}
-      className={classNames({
-        [classes.illustrationImage]: true,
-      })}
+      style={styles.image}
     />
   );
 };

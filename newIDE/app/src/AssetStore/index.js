@@ -65,6 +65,7 @@ type Props = {|
   ) => void,
   onOpenProfile?: () => void,
   assetSwappedObject?: ?gdObject,
+  minimalUI?: boolean,
 |};
 
 export type AssetStoreInterface = {|
@@ -104,6 +105,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       onOpenPrivateGameTemplateListingData,
       onOpenProfile,
       assetSwappedObject,
+      minimalUI,
     }: Props,
     ref
   ) => {
@@ -147,11 +149,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
             }
           }
           assetSwappedObjectPtr.current = assetSwappedObject.ptr;
-        } else if (shopNavigationState.isAssetSwappingHistory) {
-          shopNavigationState.openHome();
-          assetFiltersState.setAssetSwappingFilter(
-            new AssetSwappingAssetStoreSearchFilter()
-          );
         }
       },
       [
@@ -602,7 +599,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       <Column expand noMargin useFullHeight noOverflowParent id="asset-store">
         <>
           <LineStackLayout>
-            {!assetSwappedObject && (
+            {!(assetSwappedObject && minimalUI) && (
               <IconButton
                 id="home-button"
                 key="back-discover"
@@ -656,7 +653,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                 id="asset-store-search-bar"
               />
             </Column>
-            {!assetSwappedObject && (
+            {!(assetSwappedObject && minimalUI) && (
               <IconButton
                 onClick={() => setIsFiltersPanelOpen(!isFiltersPanelOpen)}
                 disabled={!canShowFiltersPanel}
@@ -671,64 +668,67 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         </>
         <Column noMargin>
           <Line justifyContent="space-between" noMargin alignItems="center">
-            {(!isOnHomePage || !!openedShopCategory) && !assetSwappedObject && (
-              <>
-                {shopNavigationState.isRootPage ? null : (
-                  <Column expand alignItems="flex-start" noMargin>
-                    <TextButton
-                      icon={<ChevronArrowLeft />}
-                      label={<Trans>Back</Trans>}
-                      onClick={async () => {
-                        const page = shopNavigationState.backToPreviousPage();
-                        const isUpdatingSearchtext = reApplySearchTextIfNeeded(
-                          page
-                        );
-                        if (isUpdatingSearchtext) {
-                          // Updating the search is not instant, so we cannot apply the scroll position
-                          // right away. We force a wait as there's no easy way to know when results are completely updated.
-                          await delay(500);
-                          setScrollUpdateIsNeeded(page);
-                          applyBackScrollPosition(page); // We apply it manually, because the layout effect won't be called again.
-                        } else {
-                          setScrollUpdateIsNeeded(page);
-                        }
-                      }}
-                    />
-                  </Column>
-                )}
-                {(openedAssetPack ||
-                  openedPrivateAssetPackListingData ||
-                  filtersState.chosenCategory) && (
-                  <>
-                    {!openedAssetPack && !openedPrivateAssetPackListingData && (
-                      // Only show the category name if we're not on an asset pack page.
-                      <Column expand alignItems="center">
-                        <Text size="block-title" noMargin>
-                          {filtersState.chosenCategory
-                            ? capitalize(filtersState.chosenCategory.node.name)
-                            : ''}
-                        </Text>
-                      </Column>
-                    )}
-                    <Column
-                      expand
-                      alignItems="flex-end"
-                      noMargin
-                      justifyContent="center"
-                    >
-                      {openedAssetPack &&
-                      openedAssetPack.content &&
-                      doesAssetPackContainAudio(openedAssetPack) &&
-                      !isAssetPackAudioOnly(openedAssetPack) ? (
-                        <PrivateAssetPackAudioFilesDownloadButton
-                          assetPack={openedAssetPack}
-                        />
-                      ) : null}
+            {(!isOnHomePage || !!openedShopCategory) &&
+              !(assetSwappedObject && minimalUI) && (
+                <>
+                  {shopNavigationState.isRootPage ? null : (
+                    <Column expand alignItems="flex-start" noMargin>
+                      <TextButton
+                        icon={<ChevronArrowLeft />}
+                        label={<Trans>Back</Trans>}
+                        onClick={async () => {
+                          const page = shopNavigationState.backToPreviousPage();
+                          const isUpdatingSearchtext = reApplySearchTextIfNeeded(
+                            page
+                          );
+                          if (isUpdatingSearchtext) {
+                            // Updating the search is not instant, so we cannot apply the scroll position
+                            // right away. We force a wait as there's no easy way to know when results are completely updated.
+                            await delay(500);
+                            setScrollUpdateIsNeeded(page);
+                            applyBackScrollPosition(page); // We apply it manually, because the layout effect won't be called again.
+                          } else {
+                            setScrollUpdateIsNeeded(page);
+                          }
+                        }}
+                      />
                     </Column>
-                  </>
-                )}
-              </>
-            )}
+                  )}
+                  {(openedAssetPack ||
+                    openedPrivateAssetPackListingData ||
+                    filtersState.chosenCategory) && (
+                    <>
+                      {!openedAssetPack && !openedPrivateAssetPackListingData && (
+                        // Only show the category name if we're not on an asset pack page.
+                        <Column expand alignItems="center">
+                          <Text size="block-title" noMargin>
+                            {filtersState.chosenCategory
+                              ? capitalize(
+                                  filtersState.chosenCategory.node.name
+                                )
+                              : ''}
+                          </Text>
+                        </Column>
+                      )}
+                      <Column
+                        expand
+                        alignItems="flex-end"
+                        noMargin
+                        justifyContent="center"
+                      >
+                        {openedAssetPack &&
+                        openedAssetPack.content &&
+                        doesAssetPackContainAudio(openedAssetPack) &&
+                        !isAssetPackAudioOnly(openedAssetPack) ? (
+                          <PrivateAssetPackAudioFilesDownloadButton
+                            assetPack={openedAssetPack}
+                          />
+                        ) : null}
+                      </Column>
+                    </>
+                  )}
+                </>
+              )}
           </Line>
         </Column>
         <Line
@@ -796,10 +796,10 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
               onGoBackToFolderIndex={goBackToFolderIndex}
               currentPage={shopNavigationState.getCurrentPage()}
               hideGameTemplates={hideGameTemplates}
-              hideDetails={!!assetSwappedObject}
+              hideDetails={!!assetSwappedObject && !!minimalUI}
             />
           ) : // Do not show the asset details if we're swapping an asset.
-          openedAssetShortHeader && !assetSwappedObject ? (
+          openedAssetShortHeader && !(assetSwappedObject && minimalUI) ? (
             <AssetDetails
               ref={assetDetails}
               onTagSelection={selectTag}

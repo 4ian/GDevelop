@@ -48,6 +48,7 @@ void QuickCustomizationVisibilitiesContainer::SerializeTo(
 
 void QuickCustomizationVisibilitiesContainer::UnserializeFrom(
     const SerializerElement& element) {
+  visibilities.clear();
   for (auto& child : element.GetAllChildren()) {
     visibilities[child.first] =
         QuickCustomization::StringAsVisibility(child.second->GetStringValue());

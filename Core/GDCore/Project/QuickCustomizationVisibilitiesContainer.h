@@ -18,14 +18,8 @@ class QuickCustomizationVisibilitiesContainer {
 
   bool IsEmpty() const;
 
-  /**
-   * \brief Serialize variable container.
-   */
   void SerializeTo(SerializerElement& element) const;
 
-  /**
-   * \brief Unserialize the variable container.
-   */
   void UnserializeFrom(const SerializerElement& element);
 
  private:

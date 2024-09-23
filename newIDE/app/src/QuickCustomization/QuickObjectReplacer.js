@@ -95,6 +95,7 @@ export const QuickObjectReplacer = ({
           onClose={() => {
             setSelectedObjectToSwap(null);
           }}
+          minimalUI
         />
       )}
     </ColumnStackLayout>

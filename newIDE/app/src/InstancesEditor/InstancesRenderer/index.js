@@ -261,7 +261,10 @@ export default class InstancesRenderer {
       layerRenderer.wasUsed = true;
       layerRenderer.getPixiContainer().zOrder = i;
       layerRenderer.render();
-      mergeBasicProfilingCounters(this._basicProfilingCounters, layerRenderer.getBasicProfilingCounters());
+      mergeBasicProfilingCounters(
+        this._basicProfilingCounters,
+        layerRenderer.getBasicProfilingCounters()
+      );
 
       const layerContainer = layerRenderer.getPixiContainer();
       viewPosition.applyTransformationToPixi(layerContainer);
@@ -277,7 +280,10 @@ export default class InstancesRenderer {
         // Render a layer with 2D rendering (PixiJS) only.
         const time = performance.now();
         pixiRenderer.render(layerContainer, { clear: false });
-        increasePixiRenderingTime(this._basicProfilingCounters, performance.now() - time);
+        increasePixiRenderingTime(
+          this._basicProfilingCounters,
+          performance.now() - time
+        );
       } else {
         // Render a layer with 3D rendering, and possibly some 2D rendering too.
         const threeScene = layerRenderer.getThreeScene();
@@ -300,7 +306,10 @@ export default class InstancesRenderer {
             threeRenderer,
             pixiRenderer
           );
-          increasePixiRenderingTime(this._basicProfilingCounters, performance.now() - pixiStartTime);
+          increasePixiRenderingTime(
+            this._basicProfilingCounters,
+            performance.now() - pixiStartTime
+          );
 
           // It's important to reset the internal WebGL state of PixiJS, then Three.js
           // to ensure the 3D rendering is made properly by Three.js
@@ -313,7 +322,10 @@ export default class InstancesRenderer {
 
           const threeStartTime = performance.now();
           threeRenderer.render(threeScene, threeCamera);
-          increaseThreeRenderingTime(this._basicProfilingCounters, performance.now() - threeStartTime);
+          increaseThreeRenderingTime(
+            this._basicProfilingCounters,
+            performance.now() - threeStartTime
+          );
         }
       }
     }
@@ -328,7 +340,10 @@ export default class InstancesRenderer {
 
     const time = performance.now();
     pixiRenderer.render(uiPixiContainer);
-    increasePixiUiRenderingTime(this._basicProfilingCounters, performance.now() - time);
+    increasePixiUiRenderingTime(
+      this._basicProfilingCounters,
+      performance.now() - time
+    );
 
     if (threeRenderer) {
       // It's important to reset the internal WebGL state of PixiJS, then Three.js

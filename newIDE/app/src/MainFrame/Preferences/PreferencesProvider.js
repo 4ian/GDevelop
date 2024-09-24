@@ -169,7 +169,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     ),
     setUse3DEditor: this._setUse3DEditor.bind(this),
     getUse3DEditor: this._getUse3DEditor.bind(this),
-    setShowBasicProfilingCounters: this._setShowBasicProfilingCounters.bind(this),
+    setShowBasicProfilingCounters: this._setShowBasicProfilingCounters.bind(
+      this
+    ),
     saveTutorialProgress: this._saveTutorialProgress.bind(this),
     getTutorialProgress: this._getTutorialProgress.bind(this),
     setNewProjectsDefaultFolder: this._setNewProjectsDefaultFolder.bind(this),

@@ -1586,7 +1586,7 @@ export default class InstancesEditor extends Component<Props, State> {
         this.statusBar.render();
         this.profilerBar.render({
           basicProfilingCounters: this.instancesRenderer.getBasicProfilingCounters(),
-          display: this.props.showBasicProfilingCounters
+          display: this.props.showBasicProfilingCounters,
         });
         this.background.render();
 

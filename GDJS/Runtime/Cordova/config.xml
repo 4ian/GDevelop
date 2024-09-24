@@ -6,6 +6,7 @@
     <content src="index.html" />
     <plugin name="cordova-plugin-whitelist" version="1" />
     <plugin name="cordova-plugin-screen-orientation" version="3.0.2" />
+    <plugin name="cordova-plugin-ionic-webview" version="5.0.1" />
     <access origin="*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />

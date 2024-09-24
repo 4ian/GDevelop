@@ -49,15 +49,14 @@ export const ChildObjectPropertiesEditor = ({
   const objectBasicPropertiesSchema = React.useMemo(
     () => {
       const properties = childObjectConfigurationAsGd.getProperties();
-      const schema = propertiesMapToSchema(
+      const schema = propertiesMapToSchema({
         properties,
-        ({ object, objectConfiguration }) =>
+        getProperties: ({ object, objectConfiguration }) =>
           objectConfiguration.getProperties(),
-        ({ object, objectConfiguration }, name, value) =>
+        onUpdateProperty: ({ object, objectConfiguration }, name, value) =>
           objectConfiguration.updateProperty(name, value),
-        null,
-        'Basic'
-      );
+        visilibility: 'Basic',
+      });
 
       return schema;
     },
@@ -67,15 +66,14 @@ export const ChildObjectPropertiesEditor = ({
   const objectAdvancedPropertiesSchema = React.useMemo(
     () => {
       const properties = childObjectConfigurationAsGd.getProperties();
-      const schema = propertiesMapToSchema(
+      const schema = propertiesMapToSchema({
         properties,
-        ({ object, objectConfiguration }) =>
+        getProperties: ({ object, objectConfiguration }) =>
           objectConfiguration.getProperties(),
-        ({ object, objectConfiguration }, name, value) =>
+        onUpdateProperty: ({ object, objectConfiguration }, name, value) =>
           objectConfiguration.updateProperty(name, value),
-        null,
-        'Advanced'
-      );
+        visilibility: 'Advanced',
+      });
 
       return schema;
     },

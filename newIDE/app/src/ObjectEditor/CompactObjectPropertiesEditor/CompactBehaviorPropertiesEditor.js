@@ -78,15 +78,15 @@ export const CompactBehaviorPropertiesEditor = ({
         // schemaRecomputeTrigger allows to invalidate the schema when required.
       }
 
-      const schema = propertiesMapToSchema(
-        behavior.getProperties(),
-        behavior => behavior.getProperties(),
-        (behavior, name, value) => {
+      const schema = propertiesMapToSchema({
+        properties: behavior.getProperties(),
+        getProperties: behavior => behavior.getProperties(),
+        onUpdateProperty: (behavior, name, value) => {
           behavior.updateProperty(name, value);
         },
         object,
-        'Basic'
-      );
+        visibility: 'Basic',
+      });
 
       return getSchemaWithOpenFullEditorButton({
         schema,
@@ -110,15 +110,15 @@ export const CompactBehaviorPropertiesEditor = ({
         // schemaRecomputeTrigger allows to invalidate the schema when required.
       }
 
-      return propertiesMapToSchema(
-        behavior.getProperties(),
-        behavior => behavior.getProperties(),
-        (behavior, name, value) => {
+      return propertiesMapToSchema({
+        properties: behavior.getProperties(),
+        getProperties: behavior => behavior.getProperties(),
+        onUpdateProperty: (behavior, name, value) => {
           behavior.updateProperty(name, value);
         },
         object,
-        'Advanced'
-      );
+        visilibility: 'Advanced',
+      });
     },
     [behavior, object, schemaRecomputeTrigger]
   );

@@ -194,6 +194,9 @@ void Object::UnserializeFrom(gd::Project& project,
         behavior->UnserializeFrom(behaviorElement);
       }
 
+      bool isFolded = behaviorElement.GetBoolAttribute("isFolded", false);
+      behavior->SetFolded(isFolded);
+
       // Handle Quick Customization info.
       if (behaviorElement.HasChild(
               "propertiesQuickCustomizationVisibilities")) {
@@ -239,8 +242,10 @@ void Object::SerializeTo(SerializerElement& element) const {
     behaviorElement.RemoveChild("type");  // The content can contain type or
                                           // name properties, remove them.
     behaviorElement.RemoveChild("name");
+    behaviorElement.RemoveChild("isFolded");
     behaviorElement.SetAttribute("type", behavior.GetTypeName());
     behaviorElement.SetAttribute("name", behavior.GetName());
+    if (behavior.IsFolded()) behaviorElement.SetAttribute("isFolded", true);
 
     // Handle Quick Customization info.
     behaviorElement.RemoveChild("propertiesQuickCustomizationVisibilities");

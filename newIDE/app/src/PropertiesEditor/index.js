@@ -470,7 +470,6 @@ const PropertiesEditor = ({
         project={project}
         resourceManagementProps={resourceManagementProps}
         resourceKind={field.resourceKind}
-        fallbackResourceKind={field.fallbackResourceKind}
         resourceName={getFieldValue({
           instances,
           field,

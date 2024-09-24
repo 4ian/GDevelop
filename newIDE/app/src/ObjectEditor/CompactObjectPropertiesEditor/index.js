@@ -239,15 +239,14 @@ export const CompactObjectPropertiesEditor = ({
       }
 
       const properties = objectConfigurationAsGd.getProperties();
-      const objectBasicPropertiesSchema = propertiesMapToSchema(
+      const objectBasicPropertiesSchema = propertiesMapToSchema({
         properties,
-        ({ object, objectConfiguration }) =>
+        getProperties: ({ object, objectConfiguration }) =>
           objectConfiguration.getProperties(),
-        ({ object, objectConfiguration }, name, value) =>
+        onUpdateProperty: ({ object, objectConfiguration }, name, value) =>
           objectConfiguration.updateProperty(name, value),
-        null,
-        'Basic'
-      );
+        visibility: 'Basic',
+      });
 
       return getSchemaWithOpenFullEditorButton({
         schema: objectBasicPropertiesSchema,
@@ -271,15 +270,14 @@ export const CompactObjectPropertiesEditor = ({
       }
 
       const properties = objectConfigurationAsGd.getProperties();
-      return propertiesMapToSchema(
+      return propertiesMapToSchema({
         properties,
-        ({ object, objectConfiguration }) =>
+        getProperties: ({ object, objectConfiguration }) =>
           objectConfiguration.getProperties(),
-        ({ object, objectConfiguration }, name, value) =>
+        onUpdateProperty: ({ object, objectConfiguration }, name, value) =>
           objectConfiguration.updateProperty(name, value),
-        null,
-        'Advanced'
-      );
+        visibility: 'Advanced',
+      });
     },
     [objectConfigurationAsGd, schemaRecomputeTrigger]
   );

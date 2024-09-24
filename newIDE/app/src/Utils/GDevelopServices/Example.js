@@ -14,6 +14,7 @@ export type ExampleShortHeader = {|
   authors?: Array<UserPublicProfile>,
   authorIds?: Array<string>,
   previewImageUrls: Array<string>,
+  quickCustomizationImageUrl?: string,
   gdevelopVersion: string,
   codeSizeLevel: string,
   difficultyLevel?: string,

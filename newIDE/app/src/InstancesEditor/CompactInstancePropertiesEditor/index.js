@@ -13,7 +13,7 @@ import IconButton from '../../UI/IconButton';
 import { Line, Column, Spacer, marginsSize } from '../../UI/Grid';
 import Text from '../../UI/Text';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
-import ScrollView from '../../UI/ScrollView';
+import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
 import VariablesList, {
   type HistoryHandler,
@@ -87,6 +87,7 @@ export const CompactInstancePropertiesEditor = ({
   const forceUpdate = useForceUpdate();
   const variablesListRef = React.useRef<?VariablesListInterface>(null);
 
+  const scrollViewRef = React.useRef<?ScrollViewInterface>(null);
   const instance = instances[0];
   /**
    * TODO: multiple instances support for variables list. Expected behavior should be:
@@ -95,6 +96,12 @@ export const CompactInstancePropertiesEditor = ({
    * obviously plus instance-wise variables with same name).
    */
   const shouldDisplayVariablesList = instances.length === 1;
+
+  const onScrollY = React.useCallback(deltaY => {
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollBy(deltaY);
+    }
+  }, []);
 
   const { object, instanceSchema } = React.useMemo<{|
     object?: gdObject,
@@ -129,21 +136,21 @@ export const CompactInstancePropertiesEditor = ({
       const canBeFlippedZ = objectMetadata.hasDefaultBehavior(
         'Scene3D::Base3DBehavior'
       );
-      const instanceSchemaForCustomProperties = propertiesMapToSchema(
+      const instanceSchemaForCustomProperties = propertiesMapToSchema({
         properties,
-        (instance: gdInitialInstance) =>
+        getProperties: (instance: gdInitialInstance) =>
           instance.getCustomProperties(
             globalObjectsContainer || objectsContainer,
             objectsContainer
           ),
-        (instance: gdInitialInstance, name, value) =>
+        onUpdateProperty: (instance: gdInitialInstance, name, value) =>
           instance.updateCustomProperty(
             name,
             value,
             globalObjectsContainer || objectsContainer,
             objectsContainer
-          )
-      );
+          ),
+      });
 
       const reorderedInstanceSchemaForCustomProperties = reorderInstanceSchemaForCustomProperties(
         instanceSchemaForCustomProperties,
@@ -211,6 +218,7 @@ export const CompactInstancePropertiesEditor = ({
       scope="scene-editor-instance-properties"
     >
       <ScrollView
+        ref={scrollViewRef}
         autoHideScrollbar
         style={styles.scrollView}
         key={instances
@@ -244,6 +252,8 @@ export const CompactInstancePropertiesEditor = ({
                   onSelectTileMapTile={onSelectTileMapTile}
                   showPaintingToolbar
                   allowMultipleSelection={false}
+                  onScrollY={onScrollY}
+                  allowRectangleSelection
                   interactive
                 />
               </Column>

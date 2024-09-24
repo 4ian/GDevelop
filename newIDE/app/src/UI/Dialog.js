@@ -218,6 +218,7 @@ type DialogProps = {|
   minHeight?: 'sm' | 'lg',
   fullHeight?: boolean,
   fullscreen?: 'never-even-on-mobile' | 'always-even-on-desktop',
+  actionsFullWidthOnMobile?: boolean,
 
   id?: ?string,
 |};
@@ -247,6 +248,7 @@ const Dialog = ({
   cannotBeDismissed,
   exceptionallyStillAllowRenderingInstancesEditors,
   fullscreen,
+  actionsFullWidthOnMobile,
 }: DialogProps) => {
   const preferences = React.useContext(PreferencesContext);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -269,18 +271,26 @@ const Dialog = ({
     () => (
       <React.Fragment>
         {secondaryActions && (
-          <LineStackLayout key="secondary-actions" noMargin>
+          <LineStackLayout
+            key="secondary-actions"
+            noMargin
+            expand={isMobile && actionsFullWidthOnMobile}
+          >
             {secondaryActions}
           </LineStackLayout>
         )}
         {actions && (
-          <LineStackLayout key="actions" noMargin>
+          <LineStackLayout
+            key="actions"
+            noMargin
+            expand={isMobile && actionsFullWidthOnMobile}
+          >
             {actions}
           </LineStackLayout>
         )}
       </React.Fragment>
     ),
-    [actions, secondaryActions]
+    [actions, secondaryActions, isMobile, actionsFullWidthOnMobile]
   );
 
   const flexStyle = flexColumnBody

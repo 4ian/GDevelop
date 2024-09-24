@@ -151,6 +151,7 @@ declare class libGDevelop {
   ObjectMetadata: Class<gdObjectMetadata>;
   QuickCustomization_Visibility: Class<QuickCustomization_Visibility>;
   QuickCustomization: Class<gdQuickCustomization>;
+  QuickCustomizationVisibilitiesContainer: Class<gdQuickCustomizationVisibilitiesContainer>;
   BehaviorMetadata: Class<gdBehaviorMetadata>;
   EffectMetadata: Class<gdEffectMetadata>;
   EventMetadata: Class<gdEventMetadata>;

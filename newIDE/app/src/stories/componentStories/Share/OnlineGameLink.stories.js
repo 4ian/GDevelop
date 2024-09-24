@@ -50,6 +50,7 @@ export const Export = () => {
         onRefreshGame={action('onRefreshGame')}
         isSavingProject={false}
         project={testProject.project}
+        shouldShowShareDialog
       />
     </AuthenticatedUserContext.Provider>
   );
@@ -66,6 +67,7 @@ export const SavingProject = () => {
         onRefreshGame={action('onRefreshGame')}
         isSavingProject
         project={testProject.project}
+        shouldShowShareDialog
       />
     </AuthenticatedUserContext.Provider>
   );
@@ -82,6 +84,7 @@ export const ResourcesDownload = () => {
         onRefreshGame={action('onRefreshGame')}
         isSavingProject={false}
         project={testProject.project}
+        shouldShowShareDialog
       />
     </AuthenticatedUserContext.Provider>
   );
@@ -98,6 +101,7 @@ export const Compress = () => {
         onRefreshGame={action('onRefreshGame')}
         isSavingProject={false}
         project={testProject.project}
+        shouldShowShareDialog
       />
     </AuthenticatedUserContext.Provider>
   );
@@ -114,6 +118,7 @@ export const Upload = () => {
         onRefreshGame={action('onRefreshGame')}
         isSavingProject={false}
         project={testProject.project}
+        shouldShowShareDialog
       />
     </AuthenticatedUserContext.Provider>
   );
@@ -130,6 +135,7 @@ export const WaitingForBuild = () => {
         onRefreshGame={action('onRefreshGame')}
         isSavingProject={false}
         project={testProject.project}
+        shouldShowShareDialog
       />
     </AuthenticatedUserContext.Provider>
   );
@@ -146,6 +152,7 @@ export const Build = () => {
         onRefreshGame={action('onRefreshGame')}
         isSavingProject={false}
         project={testProject.project}
+        shouldShowShareDialog
       />
     </AuthenticatedUserContext.Provider>
   );
@@ -162,6 +169,7 @@ export const DoneWithPublicBuild = () => {
         onRefreshGame={action('onRefreshGame')}
         isSavingProject={false}
         project={testProject.project}
+        shouldShowShareDialog
       />
     </AuthenticatedUserContext.Provider>
   );
@@ -178,6 +186,7 @@ export const DoneWithPrivateBuild = () => {
         onRefreshGame={action('onRefreshGame')}
         isSavingProject={false}
         project={testProject.project}
+        shouldShowShareDialog
       />
     </AuthenticatedUserContext.Provider>
   );

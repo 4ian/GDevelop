@@ -649,6 +649,7 @@ export class Behavior extends EmscriptenObject {
   isFolded(): boolean;
   setFolded(folded: boolean): void;
   isDefaultBehavior(): boolean;
+  getPropertiesQuickCustomizationVisibilities(): QuickCustomizationVisibilitiesContainer;
 }
 
 export class BehaviorJsImplementation extends Behavior {
@@ -666,6 +667,7 @@ export class BehaviorsSharedData extends EmscriptenObject {
   getProperties(): MapStringPropertyDescriptor;
   updateProperty(name: string, value: string): boolean;
   initializeContent(): void;
+  getPropertiesQuickCustomizationVisibilities(): QuickCustomizationVisibilitiesContainer;
 }
 
 export class BehaviorSharedDataJsImplementation extends BehaviorsSharedData {
@@ -1532,6 +1534,11 @@ export class QuickCustomization extends EmscriptenObject {
   static Default = 0;
   static Visible = 1;
   static Hidden = 2;
+}
+
+export class QuickCustomizationVisibilitiesContainer extends EmscriptenObject {
+  set(name: string, visibility: QuickCustomization_Visibility): void;
+  get(name: string): QuickCustomization_Visibility;
 }
 
 export class BehaviorMetadata extends EmscriptenObject {

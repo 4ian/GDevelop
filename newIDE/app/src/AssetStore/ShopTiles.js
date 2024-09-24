@@ -522,13 +522,24 @@ export const ExampleTile = ({
   onSelect,
   style,
   customTitle,
+  useQuickCustomizationThumbnail,
 }: {|
   exampleShortHeader: ExampleShortHeader | null,
   onSelect: () => void,
   /** Props needed so that GridList component can adjust tile size */
   style?: any,
   customTitle?: string,
+  useQuickCustomizationThumbnail?: boolean,
 |}) => {
+  const thumbnailImgUrl = exampleShortHeader
+    ? useQuickCustomizationThumbnail
+      ? exampleShortHeader.quickCustomizationImageUrl
+        ? exampleShortHeader.quickCustomizationImageUrl
+        : exampleShortHeader.previewImageUrls
+        ? exampleShortHeader.previewImageUrls[0]
+        : ''
+      : ''
+    : '';
   const classesForGridListItem = useStylesForGridListItem();
   return (
     <GridListTile
@@ -547,11 +558,7 @@ export const ExampleTile = ({
           <CorsAwareImage
             key={exampleShortHeader.name}
             style={styles.previewImage}
-            src={
-              exampleShortHeader.previewImageUrls
-                ? exampleShortHeader.previewImageUrls[0]
-                : ''
-            }
+            src={thumbnailImgUrl}
             alt={`Preview image of example ${exampleShortHeader.name}`}
           />
         ) : (

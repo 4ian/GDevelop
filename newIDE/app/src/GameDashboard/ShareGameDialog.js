@@ -14,7 +14,7 @@ import ShareButton from '../UI/ShareDialog/ShareButton';
 
 type Props = {| game: Game, onClose: () => void |};
 
-const ShareDialog = ({ game, onClose }: Props) => {
+const ShareGameDialog = ({ game, onClose }: Props) => {
   const [showAlertMessage, setShowAlertMessage] = React.useState(false);
   const gameUrl = getGameUrl(game);
 
@@ -55,4 +55,4 @@ const ShareDialog = ({ game, onClose }: Props) => {
   );
 };
 
-export default ShareDialog;
+export default ShareGameDialog;

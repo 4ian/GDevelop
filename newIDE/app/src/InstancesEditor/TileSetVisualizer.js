@@ -16,7 +16,7 @@ import useForceUpdate from '../Utils/UseForceUpdate';
 import { useLongTouch, type ClientCoordinates } from '../Utils/UseLongTouch';
 import Text from '../UI/Text';
 import EmptyMessage from '../UI/EmptyMessage';
-import { isTileSetBadlyConfigured } from './TileMapPaintingPreview';
+import { isTileSetBadlyConfigured } from '../Utils/TileMap';
 
 const styles = {
   tilesetAndTooltipsContainer: {
@@ -30,6 +30,7 @@ const styles = {
     position: 'relative',
     display: 'flex',
     overflow: 'auto',
+    touchAction: 'none',
   },
   atlasImage: { flex: 1, imageRendering: 'pixelated' },
   icon: { fontSize: 18 },
@@ -64,12 +65,12 @@ type TileMapCoordinates = {| x: number, y: number |};
 /**
  * Returns the tile id in a tile set.
  * This id corresponds to the index of the tile if the tile set
- * is flattened so that each column is put right after the previous one.
+ * is flattened so that each row is put right after the previous one.
  * Example:
- *   1 | 4 | 7
- *   2 | 5 | 8
- *   3 | 6 | 9
- * @param argument Object that contains x the horizontal position of the tile, y the vertical position and rowCount the number of rows in the tile set.
+ *   0 | 1 | 2
+ *   3 | 4 | 5
+ *   6 | 7 | 8
+ * @param argument Object that contains x the horizontal position of the tile, y the vertical position and columnCount the number of columns in the tile set.
  * @returns the id of the tile.
  */
 export const getTileIdFromGridCoordinates = ({
@@ -85,12 +86,12 @@ export const getTileIdFromGridCoordinates = ({
 /**
  * Returns the coordinates of a tile in a tile set given its id.
  * This id corresponds to the index of the tile if the tile set
- * is flattened so that each column is put right after the previous one.
+ * is flattened so that each row is put right after the previous one.
  * Example:
- *   1 | 4 | 7
- *   2 | 5 | 8
- *   3 | 6 | 9
- * @param argument Object that contains id the id of the tile and rowCount the number of rows in the tile set.
+ *   0 | 1 | 2
+ *   3 | 4 | 5
+ *   6 | 7 | 8
+ * @param argument Object that contains the id of the tile and columnCount the number of columns in the tile set.
  * @returns the id of the tile.
  */
 export const getGridCoordinatesFromTileId = ({
@@ -191,14 +192,14 @@ const Tile = ({
 
 export type TileMapTileSelection =
   | {|
-      kind: 'single',
-      coordinates: TileMapCoordinates,
-      flipHorizontally: boolean,
-      flipVertically: boolean,
-    |}
-  | {|
       kind: 'multiple',
       coordinates: TileMapCoordinates[],
+    |}
+  | {|
+      kind: 'rectangle',
+      coordinates: TileMapCoordinates[],
+      flipHorizontally: boolean,
+      flipVertically: boolean,
     |}
   | {|
       kind: 'erase',
@@ -210,12 +211,18 @@ type Props = {|
   tileMapTileSelection: ?TileMapTileSelection,
   onSelectTileMapTile: (?TileMapTileSelection) => void,
   allowMultipleSelection: boolean,
+  allowRectangleSelection: boolean,
   showPaintingToolbar: boolean,
   interactive: boolean,
   onAtlasImageLoaded?: (
     e: SyntheticEvent<HTMLImageElement>,
     atlasResourceName: string
   ) => void,
+  /**
+   * Needed to enable scrolling on touch devices when the user is not using
+   * a long touch to make a tile selection on the tile set.
+   */
+  onScrollY: number => void,
 |};
 
 const TileSetVisualizer = ({
@@ -224,9 +231,11 @@ const TileSetVisualizer = ({
   tileMapTileSelection,
   onSelectTileMapTile,
   allowMultipleSelection,
+  allowRectangleSelection,
   showPaintingToolbar,
   interactive,
   onAtlasImageLoaded,
+  onScrollY,
 }: Props) => {
   const forceUpdate = useForceUpdate();
   const atlasResourceName = objectConfiguration
@@ -242,9 +251,9 @@ const TileSetVisualizer = ({
     setShouldFlipHorizontally,
   ] = React.useState<boolean>(false);
   const [
-    lastSelectedTile,
-    setLastSelectedTile,
-  ] = React.useState<?TileMapCoordinates>(null);
+    lastSelection,
+    setLastSelection,
+  ] = React.useState<?TileMapTileSelection>(null);
   const tilesetContainerRef = React.useRef<?HTMLDivElement>(null);
   const tilesetAndTooltipContainerRef = React.useRef<?HTMLDivElement>(null);
   const [tooltipContent, setTooltipContent] = React.useState<?{|
@@ -268,17 +277,11 @@ const TileSetVisualizer = ({
     rowCount,
     tileSize,
   });
-  const [clickStartCoordinates, setClickStartCoordinates] = React.useState<?{|
+  const startCoordinatesRef = React.useRef<?{|
     x: number,
     y: number,
   |}>(null);
-  const [touchStartCoordinates, setTouchStartCoordinates] = React.useState<?{|
-    x: number,
-    y: number,
-  |}>(null);
-  const [shouldCancelClick, setShouldCancelClick] = React.useState<boolean>(
-    false
-  );
+  const isLongTouchRef = React.useRef<boolean>(false);
   const tooltipDisplayTimeoutId = React.useRef<?TimeoutID>(null);
   const [
     rectangularSelectionTilePreview,
@@ -314,7 +317,6 @@ const TileSetVisualizer = ({
 
   const displayTileIdTooltip = React.useCallback(
     (e: ClientCoordinates) => {
-      setShouldCancelClick(true);
       if (!displayedTileSize || isBadlyConfigured) return;
 
       const imageCoordinates = getImageCoordinatesFromPointerEvent(e);
@@ -339,7 +341,17 @@ const TileSetVisualizer = ({
     [displayedTileSize, columnCount, rowCount, isBadlyConfigured]
   );
 
-  const longTouchProps = useLongTouch(displayTileIdTooltip);
+  const handleLongTouch = React.useCallback(
+    (e: ClientCoordinates) => {
+      isLongTouchRef.current = true;
+      displayTileIdTooltip(e);
+    },
+    [displayTileIdTooltip]
+  );
+
+  const longTouchProps = useLongTouch(handleLongTouch, {
+    doNotCancelOnScroll: true,
+  });
 
   React.useEffect(
     () => {
@@ -353,15 +365,12 @@ const TileSetVisualizer = ({
   const onPointerDown = React.useCallback(
     (event: PointerEvent) => {
       if (isBadlyConfigured) return;
-      if (event.pointerType === 'touch') {
-        setTouchStartCoordinates({ x: event.pageX, y: event.pageY });
-      }
-      const imageCoordinates = getImageCoordinatesFromPointerEvent(event);
-      if (!imageCoordinates) return;
-      setClickStartCoordinates({
-        x: imageCoordinates.mouseX,
-        y: imageCoordinates.mouseY,
-      });
+      const coordinates = getImageCoordinatesFromPointerEvent(event);
+      if (!coordinates) return;
+      startCoordinatesRef.current = {
+        x: coordinates.mouseX,
+        y: coordinates.mouseY,
+      };
     },
     [isBadlyConfigured]
   );
@@ -370,12 +379,32 @@ const TileSetVisualizer = ({
     (event: PointerEvent) => {
       if (
         isBadlyConfigured ||
-        !clickStartCoordinates ||
+        !startCoordinatesRef ||
         !displayedTileSize ||
-        !allowMultipleSelection ||
-        event.pointerType === 'touch'
+        (!allowMultipleSelection && !allowRectangleSelection)
       ) {
         return;
+      }
+
+      const startCoordinates = startCoordinatesRef.current;
+      if (!startCoordinates) return;
+
+      const isTouchDevice = event.pointerType === 'touch';
+
+      if (isTouchDevice) {
+        // Distinguish between a long touch (to multi select tiles) and a scroll.
+        if (!isLongTouchRef.current) {
+          const coordinates = getImageCoordinatesFromPointerEvent(event);
+          if (!coordinates) return;
+          if (tilesetContainerRef.current) {
+            const deltaY = -event.movementY;
+            const deltaX =
+              startCoordinates.x - coordinates.mouseXWithoutScrollLeft;
+            tilesetContainerRef.current.scrollLeft = deltaX;
+            onScrollY(deltaY);
+          }
+          return;
+        }
       }
       const imageCoordinates = getImageCoordinatesFromPointerEvent(event);
       if (!imageCoordinates) return;
@@ -387,10 +416,11 @@ const TileSetVisualizer = ({
         rowCount,
         displayedTileSize,
       });
+
       const { x: startX, y: startY } = getGridCoordinatesFromPointerCoordinates(
         {
-          pointerX: clickStartCoordinates.x,
-          pointerY: clickStartCoordinates.y,
+          pointerX: startCoordinates.x,
+          pointerY: startCoordinates.y,
           columnCount,
           rowCount,
           displayedTileSize,
@@ -412,7 +442,8 @@ const TileSetVisualizer = ({
       columnCount,
       rowCount,
       allowMultipleSelection,
-      clickStartCoordinates,
+      allowRectangleSelection,
+      onScrollY,
     ]
   );
 
@@ -420,22 +451,13 @@ const TileSetVisualizer = ({
     (event: PointerEvent) => {
       try {
         if (!displayedTileSize || isBadlyConfigured) return;
-        if (shouldCancelClick) {
-          setShouldCancelClick(false);
+
+        const isTouchDevice = event.pointerType === 'touch';
+        const startCoordinates = startCoordinatesRef.current;
+        if (!startCoordinates) return;
+
+        if (isTouchDevice && !isLongTouchRef.current) {
           return;
-        }
-
-        let isTouchDevice = false;
-
-        if (event.pointerType === 'touch') {
-          isTouchDevice = true;
-          if (
-            !touchStartCoordinates ||
-            Math.abs(event.pageX - touchStartCoordinates.x) > 30 ||
-            Math.abs(event.pageY - touchStartCoordinates.y) > 30
-          ) {
-            return;
-          }
         }
 
         const imageCoordinates = getImageCoordinatesFromPointerEvent(event);
@@ -448,80 +470,89 @@ const TileSetVisualizer = ({
           rowCount,
           displayedTileSize,
         });
-        if (!allowMultipleSelection) {
-          if (
-            tileMapTileSelection &&
-            tileMapTileSelection.kind === 'single' &&
-            tileMapTileSelection.coordinates.x === x &&
-            tileMapTileSelection.coordinates.y === y
-          ) {
-            onSelectTileMapTile(null);
-          } else {
-            onSelectTileMapTile({
-              kind: 'single',
-              coordinates: { x, y },
-              flipHorizontally: shouldFlipHorizontally,
-              flipVertically: shouldFlipVertically,
-            });
-          }
-          return;
-        }
-        if (!clickStartCoordinates) return;
+        if (!startCoordinates) return;
 
         const {
           x: startX,
           y: startY,
         } = getGridCoordinatesFromPointerCoordinates({
-          pointerX: clickStartCoordinates.x,
-          pointerY: clickStartCoordinates.y,
+          pointerX: startCoordinates.x,
+          pointerY: startCoordinates.y,
           columnCount,
           rowCount,
           displayedTileSize,
         });
-        const newSelection =
-          tileMapTileSelection && tileMapTileSelection.kind === 'multiple'
-            ? { ...tileMapTileSelection }
-            : { kind: 'multiple', coordinates: [] };
-        // Click on a tile.
-        if (
-          (startX === x && startY === y) ||
-          // Do not allow rectangular select on touch device as it conflicts with basic scrolling gestures.
-          isTouchDevice
-        ) {
-          if (
-            tileMapTileSelection &&
-            tileMapTileSelection.kind === 'multiple'
-          ) {
-            addOrRemoveCoordinatesInArray(newSelection.coordinates, {
-              x,
-              y,
-            });
-          }
-        } else {
-          for (
-            let columnIndex = Math.min(startX, x);
-            columnIndex <= Math.max(startX, x);
-            columnIndex++
-          ) {
-            for (
-              let rowIndex = Math.min(startY, y);
-              rowIndex <= Math.max(startY, y);
-              rowIndex++
+        if (allowMultipleSelection) {
+          const newSelection =
+            tileMapTileSelection && tileMapTileSelection.kind === 'multiple'
+              ? { ...tileMapTileSelection }
+              : { kind: 'multiple', coordinates: [] };
+          if (startX === x && startY === y) {
+            if (
+              tileMapTileSelection &&
+              tileMapTileSelection.kind === 'multiple'
             ) {
-              if (newSelection && newSelection.kind === 'multiple') {
-                addOrRemoveCoordinatesInArray(newSelection.coordinates, {
-                  x: columnIndex,
-                  y: rowIndex,
-                });
+              addOrRemoveCoordinatesInArray(newSelection.coordinates, {
+                x,
+                y,
+              });
+            }
+          } else {
+            for (
+              let columnIndex = Math.min(startX, x);
+              columnIndex <= Math.max(startX, x);
+              columnIndex++
+            ) {
+              for (
+                let rowIndex = Math.min(startY, y);
+                rowIndex <= Math.max(startY, y);
+                rowIndex++
+              ) {
+                if (newSelection && newSelection.kind === 'multiple') {
+                  addOrRemoveCoordinatesInArray(newSelection.coordinates, {
+                    x: columnIndex,
+                    y: rowIndex,
+                  });
+                }
               }
             }
           }
+          onSelectTileMapTile(newSelection);
+        } else if (allowRectangleSelection) {
+          const shouldRemoveSelection =
+            tileMapTileSelection &&
+            tileMapTileSelection.kind === 'rectangle' &&
+            startX === x &&
+            startY === y &&
+            x <= tileMapTileSelection.coordinates[1].x &&
+            x >= tileMapTileSelection.coordinates[0].x &&
+            y <= tileMapTileSelection.coordinates[1].y &&
+            y >= tileMapTileSelection.coordinates[0].y;
+          if (shouldRemoveSelection) {
+            // Remove selection when user selects a single tile in the current tile selection.
+            onSelectTileMapTile(null);
+          } else {
+            const topLeftCorner = {
+              x: Math.min(startX, x),
+              y: Math.min(startY, y),
+            };
+            const bottomRightCorner = {
+              x: Math.max(startX, x),
+              y: Math.max(startY, y),
+            };
+            const newSelection = {
+              kind: 'rectangle',
+              coordinates: [topLeftCorner, bottomRightCorner],
+              flipHorizontally: shouldFlipHorizontally,
+              flipVertically: shouldFlipVertically,
+            };
+            onSelectTileMapTile(newSelection);
+          }
         }
-        onSelectTileMapTile(newSelection);
       } finally {
-        setClickStartCoordinates(null);
+        startCoordinatesRef.current = null;
         setRectangularSelectionTilePreview(null);
-        setTouchStartCoordinates(null);
+        isLongTouchRef.current = false;
       }
     },
     [
@@ -534,19 +565,14 @@ const TileSetVisualizer = ({
       shouldFlipHorizontally,
       shouldFlipVertically,
       allowMultipleSelection,
-      clickStartCoordinates,
-      shouldCancelClick,
-      touchStartCoordinates,
+      allowRectangleSelection,
     ]
   );
 
   React.useEffect(
     () => {
-      if (tileMapTileSelection && tileMapTileSelection.kind === 'single') {
-        setLastSelectedTile({
-          x: tileMapTileSelection.coordinates.x,
-          y: tileMapTileSelection.coordinates.y,
-        });
+      if (tileMapTileSelection && tileMapTileSelection.kind === 'rectangle') {
+        setLastSelection(tileMapTileSelection);
       }
     },
     [tileMapTileSelection]
@@ -651,21 +677,23 @@ const TileSetVisualizer = ({
                 tooltip={t`Paint`}
                 selected={
                   !!tileMapTileSelection &&
-                  tileMapTileSelection.kind === 'single'
+                  tileMapTileSelection.kind === 'rectangle'
                 }
                 onClick={e => {
                   if (
                     !!tileMapTileSelection &&
-                    tileMapTileSelection.kind === 'single'
+                    tileMapTileSelection.kind === 'rectangle'
                   )
                     onSelectTileMapTile(null);
                   else
-                    onSelectTileMapTile({
-                      kind: 'single',
-                      coordinates: lastSelectedTile || { x: 0, y: 0 },
-                      flipHorizontally: shouldFlipHorizontally,
-                      flipVertically: shouldFlipVertically,
-                    });
+                    onSelectTileMapTile(
+                      lastSelection || {
+                        kind: 'rectangle',
+                        coordinates: [{ x: 0, y: 0 }, { x: 0, y: 0 }],
+                        flipHorizontally: shouldFlipHorizontally,
+                        flipVertically: shouldFlipVertically,
+                      }
+                    );
                 }}
                 disabled={!isAtlasImageSet}
               >
@@ -676,15 +704,14 @@ const TileSetVisualizer = ({
                 tooltip={t`Horizontal flip`}
                 selected={shouldFlipHorizontally}
                 disabled={
-                  !tileMapTileSelection ||
-                  tileMapTileSelection.kind !== 'single'
+                  !tileMapTileSelection || tileMapTileSelection.kind === 'erase'
                 }
                 onClick={e => {
                   const newShouldFlipHorizontally = !shouldFlipHorizontally;
                   setShouldFlipHorizontally(newShouldFlipHorizontally);
                   if (
                     !!tileMapTileSelection &&
-                    tileMapTileSelection.kind === 'single'
+                    tileMapTileSelection.kind === 'rectangle'
                   ) {
                     onSelectTileMapTile({
                       ...tileMapTileSelection,
@@ -700,15 +727,14 @@ const TileSetVisualizer = ({
                 tooltip={t`Vertical flip`}
                 selected={shouldFlipVertically}
                 disabled={
-                  !tileMapTileSelection ||
-                  tileMapTileSelection.kind !== 'single'
+                  !tileMapTileSelection || tileMapTileSelection.kind === 'erase'
                 }
                 onClick={e => {
                   const newShouldFlipVertically = !shouldFlipVertically;
                   setShouldFlipVertically(newShouldFlipVertically);
                   if (
                     !!tileMapTileSelection &&
-                    tileMapTileSelection.kind === 'single'
+                    tileMapTileSelection.kind === 'rectangle'
                   ) {
                     onSelectTileMapTile({
                       ...tileMapTileSelection,
@@ -776,14 +802,24 @@ const TileSetVisualizer = ({
                 />
               )}
               {tileMapTileSelection &&
-                tileMapTileSelection.kind === 'single' &&
+                tileMapTileSelection.kind === 'rectangle' &&
                 displayedTileSize && (
                   <Tile
                     key={`selected-tile`}
                     highlighted
                     size={displayedTileSize}
-                    x={tileMapTileSelection.coordinates.x}
-                    y={tileMapTileSelection.coordinates.y}
+                    x={tileMapTileSelection.coordinates[0].x}
+                    y={tileMapTileSelection.coordinates[0].y}
+                    width={
+                      tileMapTileSelection.coordinates[1].x -
+                      tileMapTileSelection.coordinates[0].x +
+                      1
+                    }
+                    height={
+                      tileMapTileSelection.coordinates[1].y -
+                      tileMapTileSelection.coordinates[0].y +
+                      1
+                    }
                   />
                 )}
               {tileMapTileSelection &&

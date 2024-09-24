@@ -73,9 +73,7 @@ namespace gdjs {
           }
           updateStringParameter(parameterName: string, value: string): void {
             if (parameterName === 'color') {
-              this.light.color.setHex(
-                gdjs.PixiFiltersTools.rgbOrHexToHexNumber(value)
-              );
+              this.light.color.setHex(gdjs.rgbOrHexStringToNumber(value));
             }
           }
           updateColorParameter(parameterName: string, value: number): void {

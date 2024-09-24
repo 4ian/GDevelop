@@ -45,13 +45,9 @@ namespace gdjs {
         const colorReplaceFilter = (filter as unknown) as PIXI.filters.ColorReplaceFilter &
           ColorReplaceFilterExtra;
         if (parameterName === 'originalColor') {
-          colorReplaceFilter.originalColor = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(
-            value
-          );
+          colorReplaceFilter.originalColor = gdjs.rgbOrHexStringToNumber(value);
         } else if (parameterName === 'newColor') {
-          colorReplaceFilter.newColor = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(
-            value
-          );
+          colorReplaceFilter.newColor = gdjs.rgbOrHexStringToNumber(value);
         }
       }
       updateColorParameter(

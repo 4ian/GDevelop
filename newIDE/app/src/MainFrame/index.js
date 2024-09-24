@@ -177,6 +177,7 @@ import { emptyStorageProvider } from '../ProjectsStorage/ProjectStorageProviders
 import CustomDragLayer from '../UI/DragAndDrop/CustomDragLayer';
 import CloudProjectRecoveryDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectRecoveryDialog';
 import CloudProjectSaveChoiceDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectSaveChoiceDialog';
+import CloudStorageProvider from '../ProjectsStorage/CloudStorageProvider';
 import useCreateProject from '../Utils/UseCreateProject';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
@@ -193,6 +194,7 @@ import { useAuthenticatedPlayer } from './UseAuthenticatedPlayer';
 import ListIcon from '../UI/ListIcon';
 import { QuickCustomizationDialog } from '../QuickCustomization/QuickCustomizationDialog';
 import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
+import RouterContext from './RouterContext';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -381,6 +383,7 @@ const MainFrame = (props: Props) => {
     newProjectSetupDialogOpen,
     setNewProjectSetupDialogOpen,
   ] = React.useState<boolean>(false);
+  const { navigateToRoute } = React.useContext(RouterContext);
 
   const [isProjectOpening, setIsProjectOpening] = React.useState<boolean>(
     false
@@ -2410,7 +2413,12 @@ const MainFrame = (props: Props) => {
   );
 
   const saveProjectAsWithStorageProvider = React.useCallback(
-    async (requestedStorageProvider?: StorageProvider) => {
+    async (
+      options: ?{|
+        requestedStorageProvider?: StorageProvider,
+        forcedSavedAsLocation?: SaveAsLocation,
+      |}
+    ) => {
       if (!currentProject) return;
 
       saveUiSettings(state.editorTabs);
@@ -2428,6 +2436,8 @@ const MainFrame = (props: Props) => {
       const oldStorageProviderOperations = getStorageProviderOperations();
 
       // Get the methods to save the project using the *new* storage provider.
+      const requestedStorageProvider =
+        options && options.requestedStorageProvider;
       const newStorageProviderOperations = getStorageProviderOperations(
         requestedStorageProvider
       );
@@ -2453,8 +2463,9 @@ const MainFrame = (props: Props) => {
       const storageProviderInternalName = newStorageProvider.internalName;
 
       try {
-        let newSaveAsLocation: ?SaveAsLocation = null;
-        if (onChooseSaveProjectAsLocation) {
+        let newSaveAsLocation: ?SaveAsLocation =
+          options && options.forcedSavedAsLocation;
+        if (onChooseSaveProjectAsLocation && !newSaveAsLocation) {
           const { saveAsLocation } = await onChooseSaveProjectAsLocation({
             project: currentProject,
             fileMetadata: currentFileMetadata,
@@ -2462,19 +2473,19 @@ const MainFrame = (props: Props) => {
           if (!saveAsLocation) {
             return; // Save as was cancelled.
           }
-
-          if (canFileMetadataBeSafelySavedAs && currentFileMetadata) {
-            const canProjectBeSafelySavedAs = await canFileMetadataBeSafelySavedAs(
-              currentFileMetadata,
-              {
-                showAlert,
-                showConfirmation,
-              }
-            );
-
-            if (!canProjectBeSafelySavedAs) return;
-          }
           newSaveAsLocation = saveAsLocation;
+        }
+
+        if (canFileMetadataBeSafelySavedAs && currentFileMetadata) {
+          const canProjectBeSafelySavedAs = await canFileMetadataBeSafelySavedAs(
+            currentFileMetadata,
+            {
+              showAlert,
+              showConfirmation,
+            }
+          );
+
+          if (!canProjectBeSafelySavedAs) return;
         }
 
         const { wasSaved, fileMetadata } = await onSaveProjectAs(
@@ -3766,7 +3777,9 @@ const MainFrame = (props: Props) => {
           storageProviders={props.storageProviders}
           onChooseProvider={storageProvider => {
             openSaveToStorageProviderDialog(false);
-            saveProjectAsWithStorageProvider(storageProvider);
+            saveProjectAsWithStorageProvider({
+              requestedStorageProvider: storageProvider,
+            });
           }}
         />
       )}
@@ -3868,17 +3881,50 @@ const MainFrame = (props: Props) => {
           onLaunchPreview={
             hotReloadPreviewButtonProps.launchProjectDataOnlyPreview
           }
-          onClose={options => {
+          onClose={async options => {
+            if (hasUnsavedChanges) {
+              const response = await showConfirmation({
+                title: t`Leave the customization?`,
+                message: t`Do you want to quit the customization? All your changes will be lost.`,
+                confirmButtonLabel: t`Leave`,
+              });
+
+              if (!response) {
+                return;
+              }
+            }
+
             setQuickCustomizationDialogOpenedFromGameId(null);
-            if (options && options.tryAnotherGame) {
-              // Close the project so the user is back at where they can chose a game to customize
-              // which is probably the home page.
-              closeProject();
-              openHomePage();
+            closeProject();
+            openHomePage();
+            if (!hasUnsavedChanges) {
+              navigateToRoute('build');
             }
           }}
           onlineWebExporter={quickPublishOnlineWebExporter}
-          onSaveProject={saveProject}
+          onSaveProject={async () => {
+            // Automatically try to save project to the cloud.
+            const storageProvider = getStorageProvider();
+            if (
+              !['Empty', 'UrlStorageProvider', 'Cloud'].includes(
+                storageProvider.internalName
+              )
+            ) {
+              console.error(
+                `Unexpected storage provider ${
+                  storageProvider.internalName
+                } when saving project from quick customization dialog. Saving anyway.`
+              );
+            }
+
+            saveProjectAsWithStorageProvider({
+              requestedStorageProvider: CloudStorageProvider,
+              forcedSavedAsLocation: {
+                name: currentProject.getName(),
+              },
+            });
+            return;
+          }}
           isSavingProject={isSavingProject}
           canClose={true}
           sourceGameId={quickCustomizationDialogOpenedFromGameId}

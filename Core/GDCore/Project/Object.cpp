@@ -12,8 +12,9 @@
 #include "GDCore/Project/CustomBehavior.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
-#include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Project/PropertyDescriptor.h"
+#include "GDCore/Project/QuickCustomization.h"
+#include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/Log.h"
 #include "GDCore/Tools/UUID/UUID.h"
 
@@ -27,8 +28,8 @@ Object::Object(const gd::String& name_,
     : name(name_),
       configuration(std::move(configuration_)),
       objectVariables(gd::VariablesContainer::SourceType::Object) {
-      SetType(type_);
-    }
+  SetType(type_);
+}
 
 Object::Object(const gd::String& name_,
                const gd::String& type_,
@@ -36,8 +37,8 @@ Object::Object(const gd::String& name_,
     : name(name_),
       configuration(configuration_),
       objectVariables(gd::VariablesContainer::SourceType::Object) {
-      SetType(type_);
-    }
+  SetType(type_);
+}
 
 void Object::Init(const gd::Object& object) {
   persistentUuid = object.persistentUuid;
@@ -54,9 +55,7 @@ void Object::Init(const gd::Object& object) {
   configuration = object.configuration->Clone();
 }
 
-gd::ObjectConfiguration& Object::GetConfiguration() {
-  return *configuration;
-}
+gd::ObjectConfiguration& Object::GetConfiguration() { return *configuration; }
 
 const gd::ObjectConfiguration& Object::GetConfiguration() const {
   return *configuration;
@@ -77,8 +76,7 @@ bool Object::RenameBehavior(const gd::String& name, const gd::String& newName) {
       behaviors.find(newName) != behaviors.end())
     return false;
 
-  std::unique_ptr<Behavior> aut =
-      std::move(behaviors.find(name)->second);
+  std::unique_ptr<Behavior> aut = std::move(behaviors.find(name)->second);
   behaviors.erase(name);
   behaviors[newName] = std::move(aut);
   behaviors[newName]->SetName(newName);
@@ -99,10 +97,10 @@ bool Object::HasBehaviorNamed(const gd::String& name) const {
 }
 
 gd::Behavior* Object::AddNewBehavior(const gd::Project& project,
-                                            const gd::String& type,
-                                            const gd::String& name) {
-  auto initializeAndAdd =
-      [this, &name](std::unique_ptr<gd::Behavior> behavior) {
+                                     const gd::String& type,
+                                     const gd::String& name) {
+  auto initializeAndAdd = [this,
+                           &name](std::unique_ptr<gd::Behavior> behavior) {
     behavior->InitializeContent();
     this->behaviors[name] = std::move(behavior);
     return this->behaviors[name].get();
@@ -111,18 +109,17 @@ gd::Behavior* Object::AddNewBehavior(const gd::Project& project,
   if (project.HasEventsBasedBehavior(type)) {
     return initializeAndAdd(
         gd::make_unique<CustomBehavior>(name, project, type));
-  }
-  else {
+  } else {
     const gd::BehaviorMetadata& behaviorMetadata =
         gd::MetadataProvider::GetBehaviorMetadata(project.GetCurrentPlatform(),
                                                   type);
     if (gd::MetadataProvider::IsBadBehaviorMetadata(behaviorMetadata)) {
-      gd::LogWarning("Tried to create a behavior with an unknown type: " + type
-                     + " on object " + GetName() + "!");
-    // It's probably an events-based behavior that was removed.
-    // Create a custom behavior to preserve the properties values.
-    return initializeAndAdd(
-        gd::make_unique<CustomBehavior>(name, project, type));
+      gd::LogWarning("Tried to create a behavior with an unknown type: " +
+                     type + " on object " + GetName() + "!");
+      // It's probably an events-based behavior that was removed.
+      // Create a custom behavior to preserve the properties values.
+      return initializeAndAdd(
+          gd::make_unique<CustomBehavior>(name, project, type));
     }
     std::unique_ptr<gd::Behavior> behavior(behaviorMetadata.Get().Clone());
     behavior->SetName(name);
@@ -196,6 +193,20 @@ void Object::UnserializeFrom(gd::Project& project,
       else {
         behavior->UnserializeFrom(behaviorElement);
       }
+
+      // Handle Quick Customization info.
+      if (behaviorElement.HasChild(
+              "propertiesQuickCustomizationVisibilities")) {
+        behavior->GetPropertiesQuickCustomizationVisibilities().UnserializeFrom(
+            behaviorElement.GetChild(
+                "propertiesQuickCustomizationVisibilities"));
+      }
+      if (behaviorElement.HasChild("quickCustomizationVisibility")) {
+        behavior->SetQuickCustomizationVisibility(
+            QuickCustomization::StringAsVisibility(
+                behaviorElement.GetStringAttribute(
+                    "quickCustomizationVisibility")));
+      }
     }
   }
 
@@ -217,8 +228,8 @@ void Object::SerializeTo(SerializerElement& element) const {
   std::vector<gd::String> allBehaviors = GetAllBehaviorNames();
   for (std::size_t i = 0; i < allBehaviors.size(); ++i) {
     const gd::Behavior& behavior = GetBehavior(allBehaviors[i]);
-    // Default behaviors are added at the object creation according to metadata.
-    // They don't need to be serialized.
+    // Default behaviors are added at the object creation according to
+    // metadata. They don't need to be serialized.
     if (behavior.IsDefaultBehavior()) {
       continue;
     }
@@ -230,6 +241,23 @@ void Object::SerializeTo(SerializerElement& element) const {
     behaviorElement.RemoveChild("name");
     behaviorElement.SetAttribute("type", behavior.GetTypeName());
     behaviorElement.SetAttribute("name", behavior.GetName());
+
+    // Handle Quick Customization info.
+    behaviorElement.RemoveChild("propertiesQuickCustomizationVisibilities");
+    const QuickCustomizationVisibilitiesContainer&
+        propertiesQuickCustomizationVisibilities =
+            behavior.GetPropertiesQuickCustomizationVisibilities();
+    if (!propertiesQuickCustomizationVisibilities.IsEmpty()) {
+      propertiesQuickCustomizationVisibilities.SerializeTo(
+          behaviorElement.AddChild("propertiesQuickCustomizationVisibilities"));
+    }
+    const QuickCustomization::Visibility visibility =
+        behavior.GetQuickCustomizationVisibility();
+    if (visibility != QuickCustomization::Visibility::Default) {
+      behaviorElement.SetAttribute(
+          "quickCustomizationVisibility",
+          QuickCustomization::VisibilityAsString(visibility));
+    }
   }
 
   configuration->SerializeTo(element);

@@ -9,9 +9,9 @@ import { enumerateObjectFolderOrObjects } from '.';
 import CompactPropertiesEditor from '../CompactPropertiesEditor';
 import propertiesMapToSchema from '../CompactPropertiesEditor/PropertiesMapToCompactSchema';
 import { Trans } from '@lingui/macro';
-import { CalloutCard } from '../UI/CalloutCard';
-import { LargeSpacer } from '../UI/Grid';
 import { useForceRecompute } from '../Utils/UseForceUpdate';
+import TipCard from './TipCard';
+import { Column } from '../UI/Grid';
 
 const gd: libGDevelop = global.gd;
 
@@ -34,29 +34,32 @@ const QuickBehaviorPropertiesEditor = ({
       if (schemaRecomputeTrigger) {
         // schemaRecomputeTrigger allows to invalidate the schema when required.
       }
-      return propertiesMapToSchema(
-        behavior.getProperties(),
-        behavior => behavior.getProperties(),
-        (behavior, name, value) => {
+      return propertiesMapToSchema({
+        properties: behavior.getProperties(),
+        getProperties: behavior => behavior.getProperties(),
+        onUpdateProperty: (behavior, name, value) => {
           behavior.updateProperty(name, value);
         },
         object,
-        'Basic-Quick'
-      );
+        visibility: 'Basic-Quick',
+        quickCustomizationVisibilities: behavior.getPropertiesQuickCustomizationVisibilities(),
+      });
     },
     [behavior, object, schemaRecomputeTrigger]
   );
 
   return (
-    <CompactPropertiesEditor
-      sectionTitleStyle="level2"
-      project={project}
-      schema={basicPropertiesSchema}
-      instances={[behavior]}
-      onInstancesModified={onBehaviorUpdated}
-      resourceManagementProps={resourceManagementProps}
-      onRefreshAllFields={forceRecomputeSchema}
-    />
+    <Column noMargin>
+      <CompactPropertiesEditor
+        sectionTitleStyle="level2"
+        project={project}
+        schema={basicPropertiesSchema}
+        instances={[behavior]}
+        onInstancesModified={onBehaviorUpdated}
+        resourceManagementProps={resourceManagementProps}
+        onRefreshAllFields={forceRecomputeSchema}
+      />
+    </Column>
   );
 };
 
@@ -107,6 +110,15 @@ export const QuickBehaviorsTweaker = ({
 }: Props) => {
   return (
     <ColumnStackLayout noMargin expand>
+      <TipCard
+        title={<Trans>These are behaviors</Trans>}
+        description={
+          <Trans>
+            Behaviors are attached to objects and make them alive. The rules of
+            the game can be created using behaviors and events.
+          </Trans>
+        }
+      />
       {mapFor(0, project.getLayoutsCount(), i => {
         const layout = project.getLayoutAt(i);
         const folderObjects = enumerateObjectFolderOrObjects(
@@ -127,7 +139,7 @@ export const QuickBehaviorsTweaker = ({
                 }
 
                 return (
-                  <ResponsiveLineStackLayout noMargin expand>
+                  <ResponsiveLineStackLayout noMargin expand key={object.ptr}>
                     <ObjectPreview object={object} project={project} />
                     <ColumnStackLayout noMargin expand noOverflowParent>
                       {behaviorNamesToTweak.map(behaviorName => {
@@ -140,6 +152,7 @@ export const QuickBehaviorsTweaker = ({
                             object={object}
                             onBehaviorUpdated={() => {}}
                             resourceManagementProps={resourceManagementProps}
+                            key={behavior.ptr}
                           />
                         );
                       })}
@@ -154,7 +167,12 @@ export const QuickBehaviorsTweaker = ({
             }
 
             return (
-              <ColumnStackLayout noMargin expand noOverflowParent>
+              <ColumnStackLayout
+                noMargin
+                expand
+                noOverflowParent
+                key={folderName}
+              >
                 <Text noMargin size={'sub-title'}>
                   {folderName}
                 </Text>
@@ -176,7 +194,12 @@ export const QuickBehaviorsTweaker = ({
         }
 
         return (
-          <ColumnStackLayout noMargin expand noOverflowParent>
+          <ColumnStackLayout
+            noMargin
+            expand
+            noOverflowParent
+            key={layout.getName()}
+          >
             {project.getLayoutsCount() > 1 && (
               <Text noMargin size={'block-title'}>
                 {layout.getName()}
@@ -186,30 +209,6 @@ export const QuickBehaviorsTweaker = ({
           </ColumnStackLayout>
         );
       }).filter(Boolean)}
-      <LargeSpacer />
-      <CalloutCard
-        renderImage={style => (
-          <img
-            src="res/quick_customization/tweak_gameplay.svg"
-            style={style}
-            alt=""
-          />
-        )}
-      >
-        <ResponsiveLineStackLayout noMargin expand alignItems="stretch">
-          <ColumnStackLayout alignItems="flex-start" expand noMargin>
-            <Text noMargin size="block-title">
-              <Trans>Making a fun game with behaviors</Trans>
-            </Text>
-            <Text noMargin size="body">
-              <Trans>
-                Behaviors are attached to objects and make them alive. The rules
-                of the game can be created using behaviors and events.
-              </Trans>
-            </Text>
-          </ColumnStackLayout>
-        </ResponsiveLineStackLayout>
-      </CalloutCard>
     </ColumnStackLayout>
   );
 };

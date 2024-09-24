@@ -53,7 +53,7 @@ namespace gdjs {
         const glowFilter = (filter as unknown) as PIXI.filters.GlowFilter &
           GlowFilterExtra;
         if (parameterName === 'color') {
-          glowFilter.color = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(value);
+          glowFilter.color = gdjs.rgbOrHexStringToNumber(value);
         }
       }
       updateColorParameter(

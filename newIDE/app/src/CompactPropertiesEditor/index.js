@@ -116,7 +116,6 @@ export type PrimitiveValueField =
 export type ResourceField = {|
   valueType: 'resource',
   resourceKind: ResourceKind,
-  fallbackResourceKind?: ResourceKind,
   getValue: Instance => string,
   setValue: (instance: Instance, newValue: string) => void,
   renderLeftIcon?: (className?: string) => React.Node,
@@ -231,8 +230,6 @@ const styles = {
   },
   container: { flex: 1, minWidth: 0 },
   separator: {
-    marginRight: -marginsSize,
-    marginLeft: -marginsSize,
     marginTop: marginsSize,
     borderTop: '1px solid black', // Border color is changed in the component.
   },
@@ -420,21 +417,26 @@ const CompactPropertiesEditor = ({
         const { setValue } = field;
 
         return (
-          <CompactToggleField
+          <CompactPropertiesEditorRowField
+            key={field.name}
             label={getFieldLabel({ instances, field })}
             markdownDescription={getFieldDescription(field)}
-            key={field.name}
-            id={field.name}
-            checked={getFieldValue({ instances, field })}
-            onCheck={newValue => {
-              instances.forEach(i => setValue(i, newValue));
-              onFieldChanged({
-                instances,
-                hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
-              });
-            }}
-            disabled={getDisabled({ instances, field })}
-            fullWidth
+            field={
+              <CompactToggleField
+                key={field.name}
+                id={field.name}
+                checked={getFieldValue({ instances, field })}
+                onCheck={newValue => {
+                  instances.forEach(i => setValue(i, newValue));
+                  onFieldChanged({
+                    instances,
+                    hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
+                  });
+                }}
+                disabled={getDisabled({ instances, field })}
+                fullWidth
+              />
+            }
           />
         );
       } else if (field.valueType === 'number') {
@@ -782,26 +784,29 @@ const CompactPropertiesEditor = ({
 
     const { setValue } = field;
     return (
-      <CompactResourceSelectorWithThumbnail
+      <CompactPropertiesEditorRowField
         key={field.name}
-        project={project}
-        resourceManagementProps={resourceManagementProps}
-        resourceKind={field.resourceKind}
-        fallbackResourceKind={field.fallbackResourceKind}
-        resourceName={getFieldValue({
-          instances,
-          field,
-          defaultValue: '(Multiple values)',
-        })}
-        onChange={newValue => {
-          instances.forEach(i => setValue(i, newValue));
-          onFieldChanged({
-            instances,
-            hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
-          });
-        }}
         label={getFieldLabel({ instances, field })}
         markdownDescription={getFieldDescription(field)}
+        field={
+          <CompactResourceSelectorWithThumbnail
+            project={project}
+            resourceManagementProps={resourceManagementProps}
+            resourceKind={field.resourceKind}
+            resourceName={getFieldValue({
+              instances,
+              field,
+              defaultValue: '(Multiple values)',
+            })}
+            onChange={newValue => {
+              instances.forEach(i => setValue(i, newValue));
+              onFieldChanged({
+                instances,
+                hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
+              });
+            }}
+          />
+        }
       />
     );
   };

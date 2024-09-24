@@ -877,7 +877,6 @@ namespace gdjs {
     setParticleColor1AsNumber(color: number): void {
       this.color1 = color;
       this._colorDirty = true;
-      debugger;
     }
 
     setParticleColor1(rgbOrHexColor: string): void {
@@ -889,7 +888,6 @@ namespace gdjs {
     setParticleColor2AsNumber(color: number): void {
       this.color2 = color;
       this._colorDirty = true;
-      debugger;
     }
 
     setParticleColor2(rgbOrHexColor: string): void {

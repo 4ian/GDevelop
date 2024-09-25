@@ -21,9 +21,9 @@ import {
   OBJECT_3D_IN_APP_TUTORIAL_ID,
   KNIGHT_PLATFORMER_IN_APP_TUTORIAL_ID,
   TOP_DOWN_RPG_MOVEMENT_ID,
-  FIRE_A_BULLET,
-  COOP_PLATFORMER,
-  TILEMAP_PLATFORMER,
+  FIRE_A_BULLET_ID,
+  COOP_PLATFORMER_ID,
+  TILEMAP_PLATFORMER_ID,
   guidedLessonsIds,
 } from '../../../../Utils/GDevelopServices/InAppTutorial';
 import MultiplierScore from './Icons/MultiplierScore';
@@ -180,21 +180,21 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
       renderImage: props => <TopDownRPGMovement {...props} />,
     },
     {
-      id: FIRE_A_BULLET,
+      id: FIRE_A_BULLET_ID,
       title: t`Fire a Bullet`,
       description: t`Learn how to fire bullets with the help of a behavior. Get ready for a Star Wars show.`,
       durationInMinutes: 3,
       renderImage: props => <FireABullet {...props} />,
     },
     {
-      id: COOP_PLATFORMER,
+      id: COOP_PLATFORMER_ID,
       title: t`The basics of Multiplayer`,
       description: t`Learn how to use the multiplayer behavior and the ownership system in this co-op platformer.`,
       durationInMinutes: 3,
       renderImage: props => <CoopPlatformer {...props} />,
     },
     {
-      id: TILEMAP_PLATFORMER,
+      id: TILEMAP_PLATFORMER_ID,
       title: t`The basics of Tilemap`,
       description: t`Learn how to use the tilemap object and the event that goes with it.`,
       durationInMinutes: 1,

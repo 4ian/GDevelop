@@ -14,9 +14,9 @@ export const TIMER_IN_APP_TUTORIAL_ID = 'timer';
 export const OBJECT_3D_IN_APP_TUTORIAL_ID = 'object3d';
 export const KNIGHT_PLATFORMER_IN_APP_TUTORIAL_ID = 'knightPlatformer';
 export const TOP_DOWN_RPG_MOVEMENT_ID = 'topDownRPGMovement';
-export const FIRE_A_BULLET = 'fireABullet';
-export const COOP_PLATFORMER = 'coopPlatformer';
-export const TILEMAP_PLATFORMER = 'tilemapPlatformer';
+export const FIRE_A_BULLET_ID = 'fireABullet';
+export const COOP_PLATFORMER_ID = 'coopPlatformer';
+export const TILEMAP_PLATFORMER_ID = 'tilemapPlatformer';
 
 export const guidedLessonsIds = [
   PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
@@ -27,9 +27,9 @@ export const guidedLessonsIds = [
   OBJECT_3D_IN_APP_TUTORIAL_ID,
   KNIGHT_PLATFORMER_IN_APP_TUTORIAL_ID,
   TOP_DOWN_RPG_MOVEMENT_ID,
-  FIRE_A_BULLET,
-  COOP_PLATFORMER,
-  TILEMAP_PLATFORMER,
+  FIRE_A_BULLET_ID,
+  COOP_PLATFORMER_ID,
+  TILEMAP_PLATFORMER_ID,
 ];
 
 export type InAppTutorialShortHeader = {|

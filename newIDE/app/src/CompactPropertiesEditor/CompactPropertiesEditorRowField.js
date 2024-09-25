@@ -9,7 +9,7 @@ import { tooltipEnterDelay } from '../UI/Tooltip';
 
 const styles = {
   leftColumn: { flex: 2, minWidth: 0, maxWidth: 150 },
-  rightColumn: { flex: 3, minWidth: 75 },
+  rightColumn: { flex: 3, minWidth: 25 },
   label: {
     overflow: 'hidden',
     textOverflow: 'ellipsis',

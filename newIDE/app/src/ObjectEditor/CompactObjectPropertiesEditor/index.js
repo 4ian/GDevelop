@@ -51,6 +51,7 @@ import Window from '../../Utils/Window';
 import CompactTextField from '../../UI/CompactTextField';
 import SquaredDoubleChevronArrowDown from '../../UI/CustomSvgIcons/SquaredDoubleChevronArrowDown';
 import SquaredDoubleChevronArrowUp from '../../UI/CustomSvgIcons/SquaredDoubleChevronArrowUp';
+import { textEllipsisStyle } from '../../UI/TextEllipsis';
 
 const gd: libGDevelop = global.gd;
 
@@ -66,12 +67,14 @@ const CollapsibleSubPanel = ({
   isFolded,
   toggleFolded,
   title,
+  titleIcon,
   onRemove,
 }: {|
   renderContent: () => React.Node,
   isFolded: boolean,
   toggleFolded: () => void,
-  title: React.Node,
+  titleIcon?: ?React.Node,
+  title: string,
   onRemove?: () => void,
 |}) => (
   <Paper background="medium">
@@ -87,7 +90,11 @@ const CollapsibleSubPanel = ({
               )}
             </IconButton>
 
-            {title}
+            {titleIcon}
+            {titleIcon && <Spacer />}
+            <Text noMargin size="body" style={textEllipsisStyle}>
+              {title}
+            </Text>
           </Line>
 
           {onRemove ? (
@@ -112,6 +119,7 @@ const TopLevelCollapsibleSection = ({
   toggleFolded,
   renderContent,
   renderContentAsHiddenWhenFolded,
+  noContentMargin,
   onOpenFullEditor,
   onAdd,
 }: {|
@@ -120,12 +128,13 @@ const TopLevelCollapsibleSection = ({
   toggleFolded: () => void,
   renderContent: () => React.Node,
   renderContentAsHiddenWhenFolded?: boolean,
+  noContentMargin?: boolean,
   onOpenFullEditor: () => void,
   onAdd?: () => void,
 |}) => (
   <>
-    <Column>
-      <Separator />
+    <Separator />
+    <Column noOverflowParent>
       <LineStackLayout alignItems="center" justifyContent="space-between">
         <LineStackLayout noMargin alignItems="center">
           <IconButton size="small" onClick={toggleFolded}>
@@ -135,7 +144,7 @@ const TopLevelCollapsibleSection = ({
               <SquaredDoubleChevronArrowDown style={styles.icon} />
             )}
           </IconButton>
-          <Text size="sub-title" noMargin>
+          <Text size="sub-title" noMargin style={textEllipsisStyle}>
             {title}
           </Text>
         </LineStackLayout>
@@ -151,13 +160,15 @@ const TopLevelCollapsibleSection = ({
         </Line>
       </LineStackLayout>
     </Column>
-    {isFolded ? (
-      renderContentAsHiddenWhenFolded ? (
-        <div style={{ display: 'none' }}>{renderContent()}</div>
-      ) : null
-    ) : (
-      renderContent()
-    )}
+    <Column noMargin={noContentMargin}>
+      {isFolded ? (
+        renderContentAsHiddenWhenFolded ? (
+          <div style={{ display: 'none' }}>{renderContent()}</div>
+        ) : null
+      ) : (
+        renderContent()
+      )}
+    </Column>
   </>
 );
 
@@ -388,7 +399,7 @@ export const CompactObjectPropertiesEditor = ({
             toggleFolded={() => setIsPropertiesFolded(!isPropertiesFolded)}
             onOpenFullEditor={() => onEditObject(object, 'properties')}
             renderContent={() => (
-              <ColumnStackLayout noOverflowParent>
+              <ColumnStackLayout noMargin noOverflowParent>
                 {!hasSomeObjectProperties && (
                   <Text size="body2" align="center" color="secondary">
                     <Trans>This object has no properties.</Trans>
@@ -396,7 +407,6 @@ export const CompactObjectPropertiesEditor = ({
                 )}
                 {hasSomeObjectProperties && (
                   <CompactPropertiesEditor
-                    sectionTitleStyle="level2"
                     project={project}
                     resourceManagementProps={resourceManagementProps}
                     unsavedChanges={unsavedChanges}
@@ -423,7 +433,6 @@ export const CompactObjectPropertiesEditor = ({
                 )}
                 {showObjectAdvancedOptions && hasObjectAdvancedProperties && (
                   <CompactPropertiesEditor
-                    sectionTitleStyle="level2"
                     project={project}
                     resourceManagementProps={resourceManagementProps}
                     unsavedChanges={unsavedChanges}
@@ -487,11 +496,7 @@ export const CompactObjectPropertiesEditor = ({
                             );
                             forceUpdate();
                           }}
-                          title={
-                            <Text noMargin size="body">
-                              {childObjectName}
-                            </Text>
-                          }
+                          title={childObjectName}
                         />
                       );
                     }
@@ -506,7 +511,7 @@ export const CompactObjectPropertiesEditor = ({
             onOpenFullEditor={() => onEditObject(object, 'behaviors')}
             onAdd={openNewBehaviorDialog}
             renderContent={() => (
-              <ColumnStackLayout>
+              <ColumnStackLayout noMargin>
                 {!allVisibleBehaviors.length && (
                   <Text size="body2" align="center" color="secondary">
                     <Trans>There are no behaviors on this object.</Trans>
@@ -542,21 +547,16 @@ export const CompactObjectPropertiesEditor = ({
                         behavior.setFolded(!behavior.isFolded());
                         forceUpdate();
                       }}
-                      title={
-                        <>
-                          {iconUrl ? (
-                            <IconContainer
-                              src={iconUrl}
-                              alt={behaviorMetadata.getFullName()}
-                              size={16}
-                            />
-                          ) : null}
-                          <Spacer />
-                          <Text noMargin size="body">
-                            {behavior.getName()}
-                          </Text>
-                        </>
+                      titleIcon={
+                        iconUrl ? (
+                          <IconContainer
+                            src={iconUrl}
+                            alt={behaviorMetadata.getFullName()}
+                            size={16}
+                          />
+                        ) : null
                       }
+                      title={behavior.getName()}
                       onRemove={() => {
                         removeBehavior(behavior.getName());
                       }}
@@ -580,6 +580,7 @@ export const CompactObjectPropertiesEditor = ({
             renderContentAsHiddenWhenFolded={
               true /* Allows to keep a ref to the variables list for add button to work. */
             }
+            noContentMargin
             renderContent={() => (
               <VariablesList
                 ref={variablesListRef}
@@ -675,11 +676,7 @@ export const CompactObjectPropertiesEditor = ({
                               effect.setFolded(!effect.isFolded());
                               forceUpdate();
                             }}
-                            title={
-                              <Text noMargin size="body">
-                                {effect.getName()}
-                              </Text>
-                            }
+                            title={effect.getName()}
                             onRemove={() => {
                               removeEffect(effect);
                             }}

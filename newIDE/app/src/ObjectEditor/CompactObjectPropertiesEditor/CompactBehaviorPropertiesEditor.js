@@ -137,7 +137,6 @@ export const CompactBehaviorPropertiesEditor = ({
       )}
       {hasSomeProperties && (
         <CompactPropertiesEditor
-          sectionTitleStyle="level2"
           project={project}
           schema={basicPropertiesSchema}
           instances={[behavior]}
@@ -159,7 +158,6 @@ export const CompactBehaviorPropertiesEditor = ({
       )}
       {showAdvancedOptions && hasAdvancedProperties && (
         <CompactPropertiesEditor
-          sectionTitleStyle="level2"
           project={project}
           schema={advancedPropertiesSchema}
           instances={[behavior]}

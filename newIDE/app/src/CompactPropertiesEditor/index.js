@@ -198,7 +198,6 @@ type Props = {|
   mode?: 'column' | 'row',
   preventWrap?: boolean,
   removeSpacers?: boolean,
-  sectionTitleStyle?: 'level1' | 'level2',
 
   // If set, render the "extra" description content from fields
   // (see getExtraDescription).
@@ -362,7 +361,6 @@ const CompactPropertiesEditor = ({
   resourceManagementProps,
   preventWrap,
   removeSpacers,
-  sectionTitleStyle,
 }: Props) => {
   const forceUpdate = useForceUpdate();
 
@@ -988,12 +986,10 @@ const CompactPropertiesEditor = ({
 
         if (field.title) {
           return [
-            ...(sectionTitleStyle === 'level2'
-              ? renderSectionLevel2Title({
-                  title: field.title,
-                  name: field.name,
-                })
-              : renderSectionTitle({ title: field.title, name: field.name })),
+            ...renderSectionLevel2Title({
+              title: field.title,
+              name: field.name,
+            }),
             contentView,
           ];
         }

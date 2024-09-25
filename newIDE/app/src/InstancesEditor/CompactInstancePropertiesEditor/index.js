@@ -238,8 +238,8 @@ export const CompactInstancePropertiesEditor = ({
           </Column>
           {shouldDisplayTileSetVisualizer && (
             <>
+              <Separator />
               <Column>
-                <Separator />
                 <Line alignItems="center" justifyContent="space-between">
                   <Text size="sub-title" noMargin>
                     <Trans>Tilemap painter</Trans>
@@ -261,8 +261,8 @@ export const CompactInstancePropertiesEditor = ({
           )}
           {object && shouldDisplayVariablesList ? (
             <>
+              <Separator />
               <Column>
-                <Separator />
                 <Line alignItems="center" justifyContent="space-between">
                   <Text size="sub-title" noMargin>
                     <Trans>Instance Variables</Trans>

@@ -117,7 +117,7 @@ const VariablesListToolbar = React.memo<Props>((props: Props) => {
           )}
         </Line>
       </Column>
-      <Column expand>
+      <Column expand noOverflowParent>
         {props.isCompact ? (
           <CompactSearchBar
             value={props.searchText}

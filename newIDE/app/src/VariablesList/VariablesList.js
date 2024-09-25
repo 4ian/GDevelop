@@ -1843,7 +1843,7 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
                     onKeyDown={keyboardShortcuts.onKeyDown}
                     onKeyUp={keyboardShortcuts.onKeyUp}
                   >
-                    <Column expand useFullHeight noMargin>
+                    <Column expand useFullHeight noOverflowParent noMargin>
                       {toolbar}
                       {props.variablesContainer.count() === 0 &&
                       (!props.inheritedVariablesContainer ||

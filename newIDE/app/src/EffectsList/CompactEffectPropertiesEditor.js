@@ -26,7 +26,6 @@ export const CompactEffectPropertiesEditor = ({
 
   return (
     <CompactPropertiesEditor
-      sectionTitleStyle="level2"
       project={project}
       schema={effectMetadata.parametersSchema}
       instances={[effect]}

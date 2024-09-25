@@ -51,7 +51,6 @@ const QuickBehaviorPropertiesEditor = ({
   return (
     <Column noMargin>
       <CompactPropertiesEditor
-        sectionTitleStyle="level2"
         project={project}
         schema={basicPropertiesSchema}
         instances={[behavior]}

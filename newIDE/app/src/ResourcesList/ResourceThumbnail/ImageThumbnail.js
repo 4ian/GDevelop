@@ -46,6 +46,7 @@ type Props = {|
 const ImageThumbnail = (props: Props) => {
   const { onContextMenu, resourcesLoader, resourceName, project } = props;
   const theme = React.useContext(GDevelopThemeContext);
+  const [error, setError] = React.useState(false);
 
   // Allow a long press to show the context menu
   const longTouchForContextMenuProps = useLongTouch(
@@ -60,6 +61,8 @@ const ImageThumbnail = (props: Props) => {
   const normalBorderColor = theme.imagePreview.borderColor;
   const borderColor = props.selected
     ? theme.palette.secondary
+    : !!error
+    ? theme.message.error
     : normalBorderColor;
 
   const containerStyle = {
@@ -87,9 +90,16 @@ const ImageThumbnail = (props: Props) => {
           ...styles.spriteThumbnailImage,
           maxWidth: props.size || 100,
           maxHeight: props.size || 100,
+          display: error ? 'none' : undefined,
         }}
         alt={resourceName}
         src={resourcesLoader.getResourceFullUrl(project, resourceName, {})}
+        onError={error => {
+          setError(error);
+        }}
+        onLoad={() => {
+          setError(false);
+        }}
       />
       {props.selectable && (
         <div style={styles.checkboxContainer}>

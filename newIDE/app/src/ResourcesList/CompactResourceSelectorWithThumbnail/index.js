@@ -245,7 +245,11 @@ export const CompactResourceSelectorWithThumbnail = ({
             [classes.compactResourceSelector]: true,
           })}
         >
-          <input type="text" value={resourceName} />
+          <input
+            type="text"
+            value={resourceName}
+            onChange={e => onChange(e.currentTarget.value)}
+          />
         </div>
       </div>
       <ElementWithMenu

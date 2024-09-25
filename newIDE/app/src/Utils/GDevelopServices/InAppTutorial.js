@@ -16,6 +16,7 @@ export const KNIGHT_PLATFORMER_IN_APP_TUTORIAL_ID = 'knightPlatformer';
 export const TOP_DOWN_RPG_MOVEMENT_ID = 'topDownRPGMovement';
 export const FIRE_A_BULLET = 'fireABullet';
 export const COOP_PLATFORMER = 'coopPlatformer';
+export const TILEMAP_PLATFORMER = 'tilemapPlatformer';
 
 export const guidedLessonsIds = [
   PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,

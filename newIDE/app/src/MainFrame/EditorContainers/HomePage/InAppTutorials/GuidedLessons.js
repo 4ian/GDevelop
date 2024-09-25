@@ -23,6 +23,7 @@ import {
   TOP_DOWN_RPG_MOVEMENT_ID,
   FIRE_A_BULLET,
   COOP_PLATFORMER,
+  TILEMAP_PLATFORMER,
   guidedLessonsIds,
 } from '../../../../Utils/GDevelopServices/InAppTutorial';
 import MultiplierScore from './Icons/MultiplierScore';
@@ -42,6 +43,7 @@ import Platformer from './Icons/Platformer';
 import TopDownRPGMovement from './Icons/TopDownRPGMovement';
 import FireABullet from './Icons/FireAbullet';
 import CoopPlatformer from './Icons/CoopPlatformer';
+import TilemapPlatformer from './Icons/TilemapPlatformer';
 
 const getColumnsFromWindowSize = (
   windowSize: WindowSizeType,
@@ -190,6 +192,13 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
       description: t`Learn how to use the multiplayer behavior and the ownership system in this co-op platformer.`,
       durationInMinutes: 3,
       renderImage: props => <CoopPlatformer {...props} />,
+    },
+    {
+      id: TILEMAP_PLATFORMER,
+      title: t`The basics of Tilemap`,
+      description: t`Learn how to use the tilemap object and the event that goes with it.`,
+      durationInMinutes: 1,
+      renderImage: props => <TilemapPlatformer {...props} />,
     },
   ].filter(item => displayedGuidedLessonsIds.includes(item.id));
 

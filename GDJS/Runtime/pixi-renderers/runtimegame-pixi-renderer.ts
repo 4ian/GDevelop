@@ -358,17 +358,16 @@ namespace gdjs {
     setWindowSize(width: float, height: float): void {
       const remote = this.getElectronRemote();
       if (remote) {
-        // Use Electron BrowserWindow API
         const browserWindow = remote.getCurrentWindow();
-        if (browserWindow) {
-          try {
+        try {
+          if (browserWindow) {
             browserWindow.setContentSize(width, height);
-          } catch (error) {
-            logger.error(
-              `Window size setting to width ${width} and height ${height} failed. See error:`,
-              error
-            );
           }
+        } catch (error) {
+          logger.error(
+            `Window size setting to width ${width} and height ${height} failed. See error:`,
+            error
+          );
         }
       } else {
         logger.warn("Window size can't be changed on this platform.");
@@ -381,16 +380,16 @@ namespace gdjs {
     centerWindow() {
       const remote = this.getElectronRemote();
       if (remote) {
-        // Use Electron BrowserWindow API
         const browserWindow = remote.getCurrentWindow();
-        if (browserWindow) {
-          try {
+        try {
+          if (browserWindow) {
             browserWindow.center();
-          } catch (error) {
-            logger.error('Window centering failed. See error:', error);
           }
+        } catch (error) {
+          logger.error('Window centering failed. See error:', error);
         }
       } else {
+        logger.warn("Window can't be centered on this platform.");
       }
     }
 
@@ -405,17 +404,16 @@ namespace gdjs {
         this._isFullscreen = !!enable;
         const remote = this.getElectronRemote();
         if (remote) {
-          // Use Electron BrowserWindow API
           const browserWindow = remote.getCurrentWindow();
-          if (browserWindow) {
-            try {
+          try {
+            if (browserWindow) {
               browserWindow.setFullScreen(this._isFullscreen);
-            } catch (error) {
-              logger.error(
-                `Full screen setting to ${this._isFullscreen} failed. See error:`,
-                error
-              );
             }
+          } catch (error) {
+            logger.error(
+              `Full screen setting to ${this._isFullscreen} failed. See error:`,
+              error
+            );
           }
         } else {
           // Use HTML5 Fullscreen API
@@ -468,7 +466,12 @@ namespace gdjs {
     isFullScreen(): boolean {
       const remote = this.getElectronRemote();
       if (remote) {
-        return remote.getCurrentWindow().isFullScreen();
+        try {
+          return remote.getCurrentWindow().isFullScreen();
+        } catch (error) {
+          logger.error(`Full screen detection failed. See error:`, error);
+          return false;
+        }
       }
 
       // Height check is used to detect user triggered full screen (for example F11 shortcut).

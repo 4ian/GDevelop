@@ -29,6 +29,7 @@ export const guidedLessonsIds = [
   TOP_DOWN_RPG_MOVEMENT_ID,
   FIRE_A_BULLET,
   COOP_PLATFORMER,
+  TILEMAP_PLATFORMER,
 ];
 
 export type InAppTutorialShortHeader = {|

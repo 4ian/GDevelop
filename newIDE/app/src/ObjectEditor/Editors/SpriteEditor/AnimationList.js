@@ -42,6 +42,8 @@ import { showErrorBox } from '../../../UI/Messages/MessageBox';
 import { type UnsavedChanges } from '../../../MainFrame/UnsavedChangesContext';
 import { type ResourceManagementProps } from '../../../ResourcesList/ResourceSource';
 import { type ScrollViewInterface } from '../../../UI/ScrollView';
+import ThreeDotsMenu from '../../../UI/CustomSvgIcons/ThreeDotsMenu';
+import ElementWithMenu from '../../../UI/Menu/ElementWithMenu';
 
 const gd: libGDevelop = global.gd;
 
@@ -140,6 +142,10 @@ const AnimationList = React.forwardRef<
     const forceUpdate = useForceUpdate();
     const { isMobile } = useResponsiveWindowSize();
     const { showConfirmation } = useAlertDialog();
+    const animationsCount = animations.getAnimationsCount();
+    const animationsIndices = new Array(animationsCount)
+      .fill(0)
+      .map((_, index) => index);
 
     const [
       justAddedAnimationName,
@@ -187,19 +193,13 @@ const AnimationList = React.forwardRef<
       [animations, forceUpdate]
     );
 
-    const moveAnimation = React.useCallback(
-      (targetIndex: number) => {
-        const draggedIndex = draggedAnimationIndex.current;
-        if (draggedIndex === null) return;
-
+    const moveAnimationToIndex = React.useCallback(
+      (sourceIndex: number, targetIndex: number) => {
         setNameErrors({});
 
-        animations.moveAnimation(
-          draggedIndex,
-          targetIndex > draggedIndex ? targetIndex - 1 : targetIndex
-        );
+        animations.moveAnimation(sourceIndex, targetIndex);
         if (
-          (draggedIndex === 0 || targetIndex === 0) &&
+          (sourceIndex === 0 || targetIndex === 0) &&
           animations.adaptCollisionMaskAutomatically()
         ) {
           // If the first animation is changed and the collision mask is adapted automatically,
@@ -209,6 +209,19 @@ const AnimationList = React.forwardRef<
         forceUpdate();
       },
       [animations, forceUpdate, onCreateMatchingSpriteCollisionMask]
+    );
+
+    const moveAnimation = React.useCallback(
+      (targetIndex: number) => {
+        const draggedIndex = draggedAnimationIndex.current;
+        if (draggedIndex === null) return;
+
+        moveAnimationToIndex(
+          draggedIndex,
+          targetIndex > draggedIndex ? targetIndex - 1 : targetIndex
+        );
+      },
+      [moveAnimationToIndex]
     );
 
     const onSpriteAdded = React.useCallback(
@@ -630,7 +643,7 @@ const AnimationList = React.forwardRef<
       <I18n>
         {({ i18n }) => (
           <>
-            {animations.getAnimationsCount() === 0 &&
+            {animationsCount === 0 &&
             // The event-based object editor gives an empty list.
             imageResourceExternalEditors.length > 0 ? (
               <Column noMargin expand justifyContent="center">
@@ -658,7 +671,7 @@ const AnimationList = React.forwardRef<
               </Column>
             ) : (
               <>
-                {mapFor(0, animations.getAnimationsCount(), animationIndex => {
+                {mapFor(0, animationsCount, animationIndex => {
                   const animation = animations.getAnimation(animationIndex);
                   const animationName = animation.getName();
 
@@ -739,6 +752,39 @@ const AnimationList = React.forwardRef<
                                   >
                                     <Trash />
                                   </IconButton>
+                                  <ElementWithMenu
+                                    key="menu"
+                                    element={
+                                      <IconButton size="small">
+                                        <ThreeDotsMenu />
+                                      </IconButton>
+                                    }
+                                    buildMenuTemplate={(i18n: I18nType) =>
+                                      animationsIndices.map(index => {
+                                        let label;
+                                        if (index === 0) {
+                                          label = t`Move to top`;
+                                        } else if (
+                                          index ===
+                                          animationsCount - 1
+                                        ) {
+                                          label = t`Move to bottom`;
+                                        } else {
+                                          label = t`Move to position ${index}`;
+                                        }
+
+                                        return {
+                                          label: i18n._(label),
+                                          click: () =>
+                                            moveAnimationToIndex(
+                                              animationIndex,
+                                              index
+                                            ),
+                                          enabled: index !== animationIndex,
+                                        };
+                                      })
+                                    }
+                                  />
                                 </Line>
                                 <Spacer />
                               </div>

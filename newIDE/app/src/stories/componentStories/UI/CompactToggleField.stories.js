@@ -24,9 +24,19 @@ export const Default = () => {
     >
       <ColumnStackLayout expand>
         <Text size="sub-title">Default</Text>
-        <CompactToggleField checked={value} onCheck={setValue} id="default" />
+        <CompactToggleField
+          checked={value}
+          onCheck={setValue}
+          id="default"
+          label="Default"
+        />
         <Text size="sub-title">Disabled</Text>
-        <CompactToggleField disabled checked={value2} onCheck={setValue2} />
+        <CompactToggleField
+          disabled
+          checked={value2}
+          onCheck={setValue2}
+          label="Disabled"
+        />
       </ColumnStackLayout>
     </ElementHighlighterProvider>
   );

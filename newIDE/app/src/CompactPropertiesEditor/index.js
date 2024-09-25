@@ -415,26 +415,21 @@ const CompactPropertiesEditor = ({
         const { setValue } = field;
 
         return (
-          <CompactPropertiesEditorRowField
+          <CompactToggleField
             key={field.name}
             label={getFieldLabel({ instances, field })}
             markdownDescription={getFieldDescription(field)}
-            field={
-              <CompactToggleField
-                key={field.name}
-                id={field.name}
-                checked={getFieldValue({ instances, field })}
-                onCheck={newValue => {
-                  instances.forEach(i => setValue(i, newValue));
-                  onFieldChanged({
-                    instances,
-                    hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
-                  });
-                }}
-                disabled={getDisabled({ instances, field })}
-                fullWidth
-              />
-            }
+            id={field.name}
+            checked={getFieldValue({ instances, field })}
+            onCheck={newValue => {
+              instances.forEach(i => setValue(i, newValue));
+              onFieldChanged({
+                instances,
+                hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
+              });
+            }}
+            disabled={getDisabled({ instances, field })}
+            fullWidth
           />
         );
       } else if (field.valueType === 'number') {

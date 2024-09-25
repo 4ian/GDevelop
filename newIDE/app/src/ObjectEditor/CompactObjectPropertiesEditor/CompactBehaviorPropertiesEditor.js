@@ -117,7 +117,7 @@ export const CompactBehaviorPropertiesEditor = ({
           behavior.updateProperty(name, value);
         },
         object,
-        visilibility: 'Advanced',
+        visibility: 'Advanced',
       });
     },
     [behavior, object, schemaRecomputeTrigger]

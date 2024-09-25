@@ -332,7 +332,7 @@ const propertiesMapToSchema = ({
   object,
   visibility = 'All',
   quickCustomizationVisibilities,
-}: {
+}: {|
   properties: gdMapStringPropertyDescriptor,
   getProperties: (instance: Instance) => any,
   onUpdateProperty: (
@@ -343,7 +343,7 @@ const propertiesMapToSchema = ({
   object?: gdObject,
   visibility?: 'All' | 'Basic' | 'Advanced' | 'Deprecated' | 'Basic-Quick',
   quickCustomizationVisibilities?: gdQuickCustomizationVisibilitiesContainer,
-}): Schema => {
+|}): Schema => {
   const propertyNames = properties.keys();
   // Aggregate field by groups to be able to build field groups with a title.
   const fieldsByGroups = new Map<string, Array<Field>>();

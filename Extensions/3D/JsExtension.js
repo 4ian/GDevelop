@@ -908,7 +908,7 @@ module.exports = {
         .setValue(objectContent.frontFaceResourceName || '')
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Front face image'))
+        .setLabel(_('Front face'))
         .setGroup(_('Textures'));
 
       objectProperties
@@ -916,7 +916,7 @@ module.exports = {
         .setValue(objectContent.backFaceResourceName || '')
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Back face image'))
+        .setLabel(_('Back face'))
         .setGroup(_('Textures'));
 
       objectProperties
@@ -939,7 +939,7 @@ module.exports = {
         .setValue(objectContent.leftFaceResourceName || '')
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Left face image'))
+        .setLabel(_('Left face'))
         .setGroup(_('Textures'));
 
       objectProperties
@@ -947,7 +947,7 @@ module.exports = {
         .setValue(objectContent.rightFaceResourceName || '')
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Right face image'))
+        .setLabel(_('Right face'))
         .setGroup(_('Textures'));
 
       objectProperties
@@ -955,7 +955,7 @@ module.exports = {
         .setValue(objectContent.topFaceResourceName || '')
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Top face image'))
+        .setLabel(_('Top face'))
         .setGroup(_('Textures'));
 
       objectProperties
@@ -963,56 +963,56 @@ module.exports = {
         .setValue(objectContent.bottomFaceResourceName || '')
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Bottom face image'))
+        .setLabel(_('Bottom face'))
         .setGroup(_('Textures'));
 
       objectProperties
         .getOrCreate('frontFaceResourceRepeat')
         .setValue(objectContent.frontFaceResourceRepeat ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Tile front face image'))
+        .setLabel(_('Tile'))
         .setGroup(_('Textures'));
 
       objectProperties
         .getOrCreate('backFaceResourceRepeat')
         .setValue(objectContent.backFaceResourceRepeat ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Tile back face image'))
+        .setLabel(_('Tile'))
         .setGroup(_('Textures'));
 
       objectProperties
         .getOrCreate('leftFaceResourceRepeat')
         .setValue(objectContent.leftFaceResourceRepeat ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Tile left face image'))
+        .setLabel(_('Tile'))
         .setGroup(_('Textures'));
 
       objectProperties
         .getOrCreate('rightFaceResourceRepeat')
         .setValue(objectContent.rightFaceResourceRepeat ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Tile right face image'))
+        .setLabel(_('Tile'))
         .setGroup(_('Textures'));
 
       objectProperties
         .getOrCreate('topFaceResourceRepeat')
         .setValue(objectContent.topFaceResourceRepeat ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Tile top face image'))
+        .setLabel(_('Tile'))
         .setGroup(_('Textures'));
 
       objectProperties
         .getOrCreate('bottomFaceResourceRepeat')
         .setValue(objectContent.bottomFaceResourceRepeat ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Tile bottom face image'))
+        .setLabel(_('Tile'))
         .setGroup(_('Textures'));
 
       objectProperties
         .getOrCreate('frontFaceVisible')
         .setValue(objectContent.frontFaceVisible ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Show front face'))
+        .setLabel(_('Front face'))
         .setGroup(_('Face visibility'))
         .setAdvanced(true);
 
@@ -1020,7 +1020,7 @@ module.exports = {
         .getOrCreate('backFaceVisible')
         .setValue(objectContent.backFaceVisible ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Show back face'))
+        .setLabel(_('Back face'))
         .setGroup(_('Face visibility'))
         .setAdvanced(true);
 
@@ -1028,7 +1028,7 @@ module.exports = {
         .getOrCreate('leftFaceVisible')
         .setValue(objectContent.leftFaceVisible ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Show left face'))
+        .setLabel(_('Left face'))
         .setGroup(_('Face visibility'))
         .setAdvanced(true);
 
@@ -1036,7 +1036,7 @@ module.exports = {
         .getOrCreate('rightFaceVisible')
         .setValue(objectContent.rightFaceVisible ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Show right face'))
+        .setLabel(_('Right face'))
         .setGroup(_('Face visibility'))
         .setAdvanced(true);
 
@@ -1044,7 +1044,7 @@ module.exports = {
         .getOrCreate('topFaceVisible')
         .setValue(objectContent.topFaceVisible ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Show top face'))
+        .setLabel(_('Top face'))
         .setGroup(_('Face visibility'))
         .setAdvanced(true);
 
@@ -1052,7 +1052,7 @@ module.exports = {
         .getOrCreate('bottomFaceVisible')
         .setValue(objectContent.bottomFaceVisible ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Show bottom face'))
+        .setLabel(_('Bottom face'))
         .setGroup(_('Face visibility'))
         .setAdvanced(true);
 

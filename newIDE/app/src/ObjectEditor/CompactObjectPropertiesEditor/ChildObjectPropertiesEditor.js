@@ -55,7 +55,7 @@ export const ChildObjectPropertiesEditor = ({
           objectConfiguration.getProperties(),
         onUpdateProperty: ({ object, objectConfiguration }, name, value) =>
           objectConfiguration.updateProperty(name, value),
-        visilibility: 'Basic',
+        visibility: 'Basic',
       });
 
       return schema;
@@ -72,7 +72,7 @@ export const ChildObjectPropertiesEditor = ({
           objectConfiguration.getProperties(),
         onUpdateProperty: ({ object, objectConfiguration }, name, value) =>
           objectConfiguration.updateProperty(name, value),
-        visilibility: 'Advanced',
+        visibility: 'Advanced',
       });
 
       return schema;

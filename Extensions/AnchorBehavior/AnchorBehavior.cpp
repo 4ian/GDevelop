@@ -75,7 +75,7 @@ std::map<gd::String, gd::PropertyDescriptor> AnchorBehavior::GetProperties(
       .AddExtraInfo(_("Window center"))
       .AddExtraInfo(_("Window right"))
       .AddExtraInfo(_("Proportional"))
-      .SetLabel(_("Left edge anchor"))
+      .SetLabel(_("Left edge"))
       .SetDescription(_("Anchor the left edge of the object on X axis."));
 
   properties["rightEdgeAnchor"]
@@ -87,7 +87,7 @@ std::map<gd::String, gd::PropertyDescriptor> AnchorBehavior::GetProperties(
       .AddExtraInfo(_("Window center"))
       .AddExtraInfo(_("Window right"))
       .AddExtraInfo(_("Proportional"))
-      .SetLabel(_("Right edge anchor"))
+      .SetLabel(_("Right edge"))
       .SetDescription(_("Anchor the right edge of the object on X axis."));
 
   properties["topEdgeAnchor"]
@@ -99,7 +99,7 @@ std::map<gd::String, gd::PropertyDescriptor> AnchorBehavior::GetProperties(
       .AddExtraInfo(_("Window center"))
       .AddExtraInfo(_("Window bottom"))
       .AddExtraInfo(_("Proportional"))
-      .SetLabel(_("Top edge anchor"))
+      .SetLabel(_("Top edge"))
       .SetDescription(_("Anchor the top edge of the object on Y axis."));
 
   properties["bottomEdgeAnchor"]
@@ -111,7 +111,7 @@ std::map<gd::String, gd::PropertyDescriptor> AnchorBehavior::GetProperties(
       .AddExtraInfo(_("Window center"))
       .AddExtraInfo(_("Window bottom"))
       .AddExtraInfo(_("Proportional"))
-      .SetLabel(_("Bottom edge anchor"))
+      .SetLabel(_("Bottom edge"))
       .SetDescription(_("Anchor the bottom edge of the object on Y axis."));
 
   properties["useLegacyBottomAndRightAnchors"]

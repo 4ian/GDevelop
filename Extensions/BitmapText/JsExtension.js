@@ -64,7 +64,7 @@ module.exports = {
         .addExtraInfo('left')
         .addExtraInfo('center')
         .addExtraInfo('right')
-        .setLabel(_('Alignment, when multiple lines are displayed'))
+        .setLabel(_('Alignment'))
         .setGroup(_('Appearance'));
 
       objectProperties
@@ -80,7 +80,7 @@ module.exports = {
         .setValue(objectContent.textureAtlasResourceName)
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Bitmap atlas image'))
+        .setLabel(_('Bitmap Atlas'))
         .setGroup(_('Font'));
 
       objectProperties

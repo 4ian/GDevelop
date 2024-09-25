@@ -1768,6 +1768,7 @@ namespace gdjs {
      */
     updateHitBoxes(): void {
       this.hitBoxes = this._defaultHitBoxes;
+      if (this.hitBoxes.length === 0) return;
       const width = this.getWidth();
       const height = this.getHeight();
       const centerX = this.getCenterX();

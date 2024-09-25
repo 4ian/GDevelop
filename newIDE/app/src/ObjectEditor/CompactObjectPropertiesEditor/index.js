@@ -59,7 +59,14 @@ export const styles = {
   icon: {
     fontSize: 18,
   },
-  scrollView: { paddingTop: marginsSize },
+  scrollView: {
+    paddingTop: marginsSize,
+    // In theory, should not be needed (the children should be responsible for not
+    // overflowing the parent). In practice, even when no horizontal scroll is shown
+    // on Chrome, it might happen on Safari. Prevent any scroll to be 100% sure no
+    // scrollbar will be shown.
+    overflowX: 'hidden',
+  },
 };
 
 const CollapsibleSubPanel = ({

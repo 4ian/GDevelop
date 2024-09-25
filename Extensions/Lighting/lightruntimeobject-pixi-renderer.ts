@@ -505,8 +505,9 @@ namespace gdjs {
       closestVertices.sort(
         LightRuntimeObjectPixiRenderer._verticesWithAngleComparator
       );
-      const filteredVerticesResult = [closestVertices[0].vertex];
       const closestVerticesCount = closestVertices.length;
+      if (closestVerticesCount === 0) return [];
+      const filteredVerticesResult = [closestVertices[0].vertex];
       for (let i = 1; i < closestVerticesCount; i++) {
         if (closestVertices[i].angle !== closestVertices[i - 1].angle) {
           filteredVerticesResult.push(closestVertices[i].vertex);

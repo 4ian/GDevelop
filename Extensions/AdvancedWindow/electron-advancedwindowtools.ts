@@ -7,15 +7,18 @@ namespace gdjs {
   export namespace evtTools {
     export namespace advancedWindow {
       const getElectronBrowserWindow = (runtimeScene: gdjs.RuntimeScene) => {
-        const electronRemote = runtimeScene
-          .getGame()
-          .getRenderer()
-          .getElectronRemote();
-        if (electronRemote) {
-          return electronRemote.getCurrentWindow();
+        try {
+          const electronRemote = runtimeScene
+            .getGame()
+            .getRenderer()
+            .getElectronRemote();
+          if (electronRemote) {
+            return electronRemote.getCurrentWindow();
+          }
+          return null;
+        } catch (error) {
+          return null;
         }
-
-        return null;
       };
 
       export const focus = function (

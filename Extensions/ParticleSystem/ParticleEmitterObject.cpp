@@ -301,7 +301,8 @@ ParticleEmitterObject::GetProperties() const {
       .SetValue(gd::String::From(GetTank()))
       .SetType("number")
       .SetLabel(_("Tank"))
-      .SetGroup(_("Particles flow"));
+      .SetGroup(_("Particles flow"))
+      .AddExtraInfo("canBeUnlimitedUsingMinus1");
 
   objectProperties["flow"]
       .SetValue(gd::String::From(GetFlow()))

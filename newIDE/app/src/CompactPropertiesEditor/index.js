@@ -45,6 +45,7 @@ export type ValueFieldCommonProperties = {|
   hideLabel?: boolean,
   getExtraDescription?: Instance => string,
   hasImpactOnAllOtherFields?: boolean,
+  canBeUnlimitedUsingMinus1?: boolean,
   disabled?: (instances: Array<gdInitialInstance>) => boolean,
   onEditButtonBuildMenuTemplate?: (i18n: I18nType) => Array<MenuItemTemplate>,
   onEditButtonClick?: () => void,
@@ -470,6 +471,7 @@ const CompactPropertiesEditor = ({
           return (
             <CompactSemiControlledNumberField
               {...commonProps}
+              canBeUnlimitedUsingMinus1={field.canBeUnlimitedUsingMinus1}
               useLeftIconAsNumberControl
               renderLeftIcon={field.renderLeftIcon}
               leftIconTooltip={getFieldLabel({ instances, field })}
@@ -482,7 +484,12 @@ const CompactPropertiesEditor = ({
               key={key}
               label={getFieldLabel({ instances, field })}
               markdownDescription={getFieldDescription(field)}
-              field={<CompactSemiControlledNumberField {...otherCommonProps} />}
+              field={
+                <CompactSemiControlledNumberField
+                  canBeUnlimitedUsingMinus1={field.canBeUnlimitedUsingMinus1}
+                  {...otherCommonProps}
+                />
+              }
             />
           );
         }

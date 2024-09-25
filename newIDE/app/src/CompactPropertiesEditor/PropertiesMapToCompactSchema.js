@@ -69,6 +69,10 @@ const createField = (
       getLabel,
       getDescription,
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
+      canBeUnlimitedUsingMinus1: property
+        .getExtraInfo()
+        .toJSArray()
+        .includes('canBeUnlimitedUsingMinus1'),
       getEndAdornment,
     };
   } else if (valueType === 'string' || valueType === '') {

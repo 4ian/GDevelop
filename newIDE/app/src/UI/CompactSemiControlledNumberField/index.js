@@ -10,12 +10,21 @@ import {
   shouldValidate,
 } from '../KeyboardShortcuts/InteractionKeys';
 import { calculate } from '../../Utils/MathExpressionParser';
+import IconButton from '../IconButton';
+import Infinite from '../CustomSvgIcons/Infinite';
+import { t } from '@lingui/macro';
 
 const getValueAsFloatIfValid = (valueAsString: string): number | null => {
   const valueAsFloat = parseFloat(valueAsString);
   const isValueAsFloatValid =
     !Number.isNaN(valueAsFloat) && isFinite(valueAsFloat);
   return isValueAsFloatValid ? valueAsFloat : null;
+};
+
+const styles = {
+  icon: {
+    fontSize: 18,
+  },
 };
 
 const updateAndReturnValueAsFloatIfValid = (
@@ -41,6 +50,7 @@ type Props = {|
   onChange: number => void,
   commitOnBlur?: boolean,
   disabled?: boolean,
+  canBeUnlimitedUsingMinus1?: boolean,
   errored?: boolean,
   placeholder?: string,
   renderLeftIcon?: (className: string) => React.Node,
@@ -50,14 +60,13 @@ type Props = {|
   onClickEndAdornment?: () => void,
   getValueFromDisplayedValue?: string => string,
   getDisplayedValueFromValue?: string => string,
-
-  errorText?: React.Node,
 |};
 
 const CompactSemiControlledNumberField = ({
   value,
   onChange,
-  errorText,
+  placeholder,
+  canBeUnlimitedUsingMinus1,
   commitOnBlur,
   getValueFromDisplayedValue,
   getDisplayedValueFromValue,
@@ -145,12 +154,16 @@ const CompactSemiControlledNumberField = ({
     ? getDisplayedValueFromValue(value.toString())
     : value.toString();
 
+  const isUnlimited = canBeUnlimitedUsingMinus1 && value === -1;
+
   return (
     <div className={classes.container}>
       <CompactTextField
         type="text"
         ref={textFieldRef}
-        value={focused ? temporaryValue : stringValue}
+        disabled={isUnlimited}
+        placeholder={isUnlimited ? 'Unlimited' : placeholder}
+        value={isUnlimited ? '' : focused ? temporaryValue : stringValue}
         onChange={onChangeValue}
         onFocus={event => {
           setFocused(true);
@@ -225,7 +238,23 @@ const CompactSemiControlledNumberField = ({
         }}
         {...otherProps}
       />
-      {errorText && <div className={classes.error}>{errorText}</div>}
+      {canBeUnlimitedUsingMinus1 && (
+        <IconButton
+          size="small"
+          onClick={() => {
+            if (isUnlimited) {
+              onChange(0);
+              if (textFieldRef.current) textFieldRef.current.focus();
+            } else {
+              onChange(-1);
+            }
+          }}
+          selected={isUnlimited}
+          tooltip={isUnlimited ? t`Remove unlimited` : t`Set to unlimited`}
+        >
+          <Infinite style={styles.icon} />
+        </IconButton>
+      )}
     </div>
   );
 };

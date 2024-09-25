@@ -37,6 +37,7 @@ type OtherProps = {|
 
 export type CompactTextFieldInterface = {|
   blur: () => void,
+  focus: () => void,
 |};
 
 export type CompactTextFieldProps = {|
@@ -105,6 +106,9 @@ const CompactTextField = React.forwardRef<
     React.useImperativeHandle(ref, () => ({
       blur: () => {
         if (inputRef.current) inputRef.current.blur();
+      },
+      focus: () => {
+        if (inputRef.current) inputRef.current.focus();
       },
     }));
 

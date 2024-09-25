@@ -1,14 +1,7 @@
 .container {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   flex: 1;
   min-width: 0px;
-}
-
-.container .error {
-  font-size: 14px;
-  line-height: 20px;
-  font-family: var(--gdevelop-modern-font-family);
-  color: var(--theme-error-color);
-  padding: 2px 0px;
+  gap: 4px;
 }

@@ -56,7 +56,6 @@ export const Default = () => {
             value={value1}
             onChange={setValue1}
             errored
-            errorText={'This value cannot be used'}
           />
 
           <div>Commits on blur: state value is {value1}</div>
@@ -96,7 +95,6 @@ export const Default = () => {
             value={value4}
             onChange={setValue4}
             errored
-            errorText={'An error occurred.'}
             renderLeftIcon={className => <Angle className={className} />}
             useLeftIconAsNumberControl
             leftIconTooltip={'Angle'}
@@ -156,6 +154,16 @@ export const Default = () => {
             onClickEndAdornment={action('onClickEndAdornment')}
           />
           <div>Disabled field</div>
+        </Column>
+        <Text size="block-title">With infinite button</Text>
+        <Column noMargin>
+          <CompactSemiControlledNumberField
+            value={value7}
+            onChange={setValue7}
+            canBeUnlimitedUsingMinus1
+            onClickEndAdornment={action('onClickEndAdornment')}
+          />
+          <div>State value is {value7}</div>
         </Column>
         <Text size="block-title">Test specific cases</Text>
         <Column noMargin>

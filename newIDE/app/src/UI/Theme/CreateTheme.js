@@ -613,6 +613,24 @@ export function createGdevelopTheme({
           light: styles['ThemeSurfaceAlternateCanvasLightBackgroundColor'],
         },
       },
+      soundPlayer: {
+        playButton: {
+          primary: {
+            borderColor: styles['SoundPlayerPlayButtonPrimaryBorderColor'],
+            backgroundColor:
+              styles['SoundPlayerPlayButtonPrimaryBackgroundColor'],
+            color: styles['SoundPlayerPlayButtonPrimaryColor'],
+          },
+          secondary: {
+            borderColor: styles['SoundPlayerPlayButtonSecondaryBorderColor'],
+            backgroundColor:
+              styles['SoundPlayerPlayButtonSecondaryBackgroundColor'],
+            color: styles['SoundPlayerPlayButtonSecondaryColor'],
+          },
+        },
+        waveColor: styles['SoundPlayerWaveColor'],
+        progressColor: styles['SoundPlayerProgressColor'],
+      },
       notification: { badgeColor: styles['ThemeNotificationBadgeColor'] },
       emptyMessage: {
         shadowColor: styles['ThemeMessageEmptyShadowColor'],

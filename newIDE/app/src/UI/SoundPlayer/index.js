@@ -6,12 +6,14 @@ import { Column, Line } from '../Grid';
 import PlayButton from './PlayButton';
 import Text from '../Text';
 import { formatDuration } from '../../Utils/Duration';
+import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
 
 type Props = {|
   soundSrc: string,
 |};
 
 const SoundPlayer = ({ soundSrc }: Props) => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const [wavesurfer, setWavesurfer] = React.useState(null);
   const [duration, setDuration] = React.useState<?number>(null);
   const [time, setTime] = React.useState<?number>(null);
@@ -39,16 +41,20 @@ const SoundPlayer = ({ soundSrc }: Props) => {
   };
 
   return (
-    <Line>
+    <Line alignItems="center">
       <Column>
-        <PlayButton  isPlaying={isPlaying} onClick={onPlayPause} />
+        <PlayButton primary isPlaying={isPlaying} onClick={onPlayPause} />
       </Column>
       <Column expand>
         <WavesurferPlayer
           url={soundSrc}
-          waveColor="#9979F1"
-          progressColor="#7046EC"
-          height={100}
+          waveColor={gdevelopTheme.soundPlayer.waveColor}
+          progressColor={gdevelopTheme.soundPlayer.progressColor}
+          barWidth={2}
+          barGap={1}
+          barRadius={3}
+          height={'auto'}
+          normalize
           onReady={onReady}
           onTimeupdate={onTimeupdate}
           onLoad={onLoad}

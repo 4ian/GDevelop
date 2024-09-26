@@ -752,13 +752,9 @@ namespace gdjs {
         // It avoids small objects to be pushed side way into a wall when they
         // should be pop out of the wall.
 
-        let applyFlippingTransformations = true;
-
         const hasFullHitBox =
           definitionHitboxes.length === 1 && definition.hasFullHitBox(tag);
         if (hasFullHitBox) {
-          // The hit box is full so it is invariant when flipping it.
-          applyFlippingTransformations = false;
           const isLeftFull = this._hasNeighborFullHitBox(-1, 0);
           const isRightFull = this._hasNeighborFullHitBox(1, 0);
           const isTopFull = this._hasNeighborFullHitBox(0, -1);
@@ -843,11 +839,14 @@ namespace gdjs {
         // TODO: If the tile contains hitboxes that are both extended and not full,
         // this code should be adapted so that the transformation considers the
         // actual width and height of the hitbox (and not the tile).
+        // At the moment, extended hitboxes can only be full and since flipping
+        // transformations don't change a full hitbox, those transformations
+        // are not applied.
 
         const tileTransformation =
           TransformedCollisionTile.workingTransformation;
         tileTransformation.setToTranslation(width * this.x, height * this.y);
-        if (applyFlippingTransformations) {
+        if (!hasFullHitBox) {
           if (this.layer.isFlippedHorizontally(this.x, this.y)) {
             tileTransformation.flipX(width / 2);
           }

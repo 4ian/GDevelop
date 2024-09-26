@@ -134,7 +134,16 @@ const VariablesListToolbar = React.memo<Props>((props: Props) => {
         )}
       </Column>
       <Column noMargin>
-        {props.isNarrow ? null : (
+        {props.isCompact ? null : props.isNarrow ? (
+          <IconButton
+            key="add-variable"
+            tooltip={t`Add variable`}
+            onClick={props.onAdd}
+            size="small"
+          >
+            <Add style={props.iconStyle} />
+          </IconButton>
+        ) : (
           <FlatButton
             primary
             key="add-variable"

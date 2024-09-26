@@ -356,6 +356,11 @@ export const CompactObjectPropertiesEditor = ({
 
   const helpLink = getHelpLink(objectMetadata.getHelpPath());
 
+  const openFullEditor = React.useCallback(
+    () => onEditObject(object, 'properties'),
+    [object, onEditObject]
+  );
+
   return (
     <ErrorBoundary
       componentTitle={<Trans>Object properties</Trans>}
@@ -404,7 +409,7 @@ export const CompactObjectPropertiesEditor = ({
             title={<Trans>Properties</Trans>}
             isFolded={isPropertiesFolded}
             toggleFolded={() => setIsPropertiesFolded(!isPropertiesFolded)}
-            onOpenFullEditor={() => onEditObject(object, 'properties')}
+            onOpenFullEditor={openFullEditor}
             renderContent={() => (
               <ColumnStackLayout noMargin noOverflowParent>
                 {!hasSomeObjectProperties && (
@@ -493,6 +498,7 @@ export const CompactObjectPropertiesEditor = ({
                               }
                               childObject={childObject}
                               onRefreshAllFields={forceRecomputeSchema}
+                              onEditObject={openFullEditor}
                             />
                           )}
                           isFolded={isFolded}

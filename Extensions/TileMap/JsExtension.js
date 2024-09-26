@@ -1638,7 +1638,6 @@ module.exports = {
         this.width = 48;
         this.height = 48;
         this.update();
-        this.updateTileMap();
       }
 
       onRemovedFromScene() {
@@ -1685,18 +1684,12 @@ module.exports = {
        * This is used to reload the Tilemap
        */
       updateTileMap() {
-        const object = gd.castObject(
-          this._associatedObjectConfiguration,
-          gd.ObjectJsImplementation
-        );
-
-        // Get the tileset resource to use
-        const tilemapAtlasImage = object.content.tilemapAtlasImage;
-        const tilemapJsonFile = object.content.tilemapJsonFile;
-        const tilesetJsonFile = object.content.tilesetJsonFile;
-        const layerIndex = object.content.layerIndex;
-        const levelIndex = object.content.levelIndex;
-        const displayMode = object.content.displayMode;
+        const tilemapAtlasImage = this._tilemapAtlasImage;
+        const tilemapJsonFile = this._tilemapJsonFile;
+        const tilesetJsonFile = this._tilesetJsonFile;
+        const layerIndex = this._layerIndex;
+        const levelIndex = this._levelIndex;
+        const displayMode = this._displayMode;
 
         const tilemapResource = this._project
           .getResourcesManager()
@@ -1787,18 +1780,12 @@ module.exports = {
        * This is called to update the PIXI object on the scene editor, without reloading the tilemap.
        */
       updatePixiTileMap() {
-        const object = gd.castObject(
-          this._associatedObjectConfiguration,
-          gd.ObjectJsImplementation
-        );
-
-        // Get the tileset resource to use
-        const tilemapAtlasImage = object.content.tilemapAtlasImage;
-        const tilemapJsonFile = object.content.tilemapJsonFile;
-        const tilesetJsonFile = object.content.tilesetJsonFile;
-        const layerIndex = object.content.layerIndex;
-        const levelIndex = object.content.levelIndex;
-        const displayMode = object.content.displayMode;
+        const tilemapAtlasImage = this._tilemapAtlasImage;
+        const tilemapJsonFile = this._tilemapJsonFile;
+        const tilesetJsonFile = this._tilesetJsonFile;
+        const layerIndex = this._layerIndex;
+        const levelIndex = this._levelIndex;
+        const displayMode = this._displayMode;
 
         const tilemapResource = this._project
           .getResourcesManager()
@@ -1891,6 +1878,35 @@ module.exports = {
        * This is called to update the PIXI object on the scene editor
        */
       update() {
+        const object = gd.castObject(
+          this._associatedObjectConfiguration,
+          gd.ObjectJsImplementation
+        );
+
+        const tilemapAtlasImage = object.content.tilemapAtlasImage;
+        const tilemapJsonFile = object.content.tilemapJsonFile;
+        const tilesetJsonFile = object.content.tilesetJsonFile;
+        const layerIndex = object.content.layerIndex;
+        const levelIndex = object.content.levelIndex;
+        const displayMode = object.content.displayMode;
+
+        if (
+          tilemapAtlasImage !== this._tilemapAtlasImage ||
+          tilemapJsonFile !== this._tilemapJsonFile ||
+          tilesetJsonFile !== this._tilesetJsonFile ||
+          layerIndex !== this._layerIndex ||
+          levelIndex !== this._levelIndex ||
+          displayMode !== this._displayMode
+        ) {
+          this._tilemapAtlasImage = tilemapAtlasImage;
+          this._tilemapJsonFile = tilemapJsonFile;
+          this._tilesetJsonFile = tilesetJsonFile;
+          this._layerIndex = layerIndex;
+          this._levelIndex = levelIndex;
+          this._displayMode = displayMode;
+          this.updateTileMap();
+        }
+
         if (this._instance.hasCustomSize()) {
           this._pixiObject.scale.x = this.getCustomWidth() / this.width;
           this._pixiObject.scale.y = this.getCustomHeight() / this.height;
@@ -2362,6 +2378,15 @@ module.exports = {
      * Renderer for instances of TileMap collision mask inside the IDE.
      */
     class RenderedCollisionMaskInstance extends RenderedInstance {
+      _tilemapJsonFile = '';
+      _tilesetJsonFile = '';
+      _collisionMaskTag = '';
+      _outlineColor = 0xffffff;
+      _fillColor = 0xffffff;
+      _outlineOpacity = 0;
+      _fillOpacity = 0;
+      _outlineSize = 1;
+
       constructor(
         project,
         instance,
@@ -2378,7 +2403,6 @@ module.exports = {
         );
 
         this.tileMapPixiObject = new PIXI.Graphics();
-        this.tileMapPixiObject._0iAmTheTileMapPixiObject = true;
         this._pixiObject = this.tileMapPixiObject;
 
         // Implement `containsPoint` so that we can set `interactive` to true and
@@ -2409,7 +2433,6 @@ module.exports = {
         this.width = 48;
         this.height = 48;
         this.update();
-        this.updateTileMap();
       }
 
       onRemovedFromScene() {
@@ -2455,23 +2478,14 @@ module.exports = {
        * This is used to reload the Tilemap
        */
       updateTileMap() {
-        const object = gd.castObject(
-          this._associatedObjectConfiguration,
-          gd.ObjectJsImplementation
-        );
-
-        const tilemapJsonFile = object.content.tilemapJsonFile;
-        const tilesetJsonFile = object.content.tilesetJsonFile;
-        const collisionMaskTag = object.content.collisionMaskTag;
-        const outlineColor = objectsRenderingService.rgbOrHexToHexNumber(
-          object.content.outlineColor
-        );
-        const fillColor = objectsRenderingService.rgbOrHexToHexNumber(
-          object.content.fillColor
-        );
-        const outlineOpacity = object.content.outlineOpacity / 255;
-        const fillOpacity = object.content.fillOpacity / 255;
-        const outlineSize = 1;
+        const tilemapJsonFile = this._tilemapJsonFile;
+        const tilesetJsonFile = this._tilesetJsonFile;
+        const collisionMaskTag = this._collisionMaskTag;
+        const outlineColor = this._outlineColor;
+        const fillColor = this._fillColor;
+        const outlineOpacity = this._outlineOpacity;
+        const fillOpacity = this._fillOpacity;
+        const outlineSize = this._outlineSize;
 
         /** @type {TileMapHelper.TileMapManager} */
         const manager = TilemapHelper.TileMapManager.getManager(this._project);
@@ -2544,6 +2558,45 @@ module.exports = {
        * This is called to update the PIXI object on the scene editor
        */
       update() {
+        const object = gd.castObject(
+          this._associatedObjectConfiguration,
+          gd.ObjectJsImplementation
+        );
+
+        const tilemapJsonFile = object.content.tilemapJsonFile;
+        const tilesetJsonFile = object.content.tilesetJsonFile;
+        const collisionMaskTag = object.content.collisionMaskTag;
+        const outlineColor = objectsRenderingService.rgbOrHexToHexNumber(
+          object.content.outlineColor
+        );
+        const fillColor = objectsRenderingService.rgbOrHexToHexNumber(
+          object.content.fillColor
+        );
+        const outlineOpacity = object.content.outlineOpacity / 255;
+        const fillOpacity = object.content.fillOpacity / 255;
+        const outlineSize = object.content.outlineSize || 0;
+
+        if (
+          tilemapJsonFile !== this._tilemapJsonFile ||
+          tilesetJsonFile !== this._tilesetJsonFile ||
+          collisionMaskTag !== this._collisionMaskTag ||
+          outlineColor !== this._outlineColor ||
+          fillColor !== this._fillColor ||
+          outlineOpacity !== this._outlineOpacity ||
+          fillOpacity !== this._fillOpacity ||
+          outlineSize !== this._outlineSize
+        ) {
+          this._tilemapJsonFile = tilemapJsonFile;
+          this._tilesetJsonFile = tilesetJsonFile;
+          this._collisionMaskTag = collisionMaskTag;
+          this._outlineColor = outlineColor;
+          this._fillColor = fillColor;
+          this._outlineOpacity = outlineOpacity;
+          this._fillOpacity = fillOpacity;
+          this._outlineSize = outlineSize;
+          this.updateTileMap();
+        }
+
         if (this._instance.hasCustomSize()) {
           this._pixiObject.scale.x = this.getCustomWidth() / this.width;
           this._pixiObject.scale.y = this.getCustomHeight() / this.height;

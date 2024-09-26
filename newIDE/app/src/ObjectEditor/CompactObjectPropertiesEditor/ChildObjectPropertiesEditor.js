@@ -10,6 +10,7 @@ import { Trans } from '@lingui/macro';
 import FlatButton from '../../UI/FlatButton';
 import ChevronArrowTop from '../../UI/CustomSvgIcons/ChevronArrowTop';
 import Text from '../../UI/Text';
+import { getSchemaWithOpenFullEditorButton } from './CompactObjectPropertiesSchema';
 
 const gd: libGDevelop = global.gd;
 
@@ -21,6 +22,7 @@ type Props = {|
   eventsBasedObject: gdEventsBasedObject,
   customObjectConfiguration: gdCustomObjectConfiguration,
   childObject: gdObject,
+  onEditObject: () => void,
 |};
 
 export const ChildObjectPropertiesEditor = ({
@@ -31,11 +33,24 @@ export const ChildObjectPropertiesEditor = ({
   eventsBasedObject,
   customObjectConfiguration,
   childObject,
+  onEditObject,
 }: Props) => {
   const [
     showObjectAdvancedOptions,
     setShowObjectAdvancedOptions,
   ] = React.useState(false);
+
+  // Don't use a memo for this because metadata from custom objects are built
+  // from event-based object when extensions are refreshed after an extension
+  // installation.
+  const objectMetadata = gd.MetadataProvider.getObjectMetadata(
+    project.getCurrentPlatform(),
+    childObject.getType()
+  );
+  const fullEditorLabel = objectMetadata
+    ? objectMetadata.getOpenFullEditorLabel()
+    : null;
+
   const childObjectConfiguration = customObjectConfiguration.getChildObjectConfiguration(
     childObject.getName()
   );
@@ -58,9 +73,14 @@ export const ChildObjectPropertiesEditor = ({
         visibility: 'Basic',
       });
 
-      return schema;
+      return getSchemaWithOpenFullEditorButton({
+        schema,
+        fullEditorLabel,
+        object: childObject,
+        onEditObject,
+      });
     },
-    [childObjectConfigurationAsGd]
+    [childObjectConfigurationAsGd, childObject, fullEditorLabel, onEditObject]
   );
 
   const objectAdvancedPropertiesSchema = React.useMemo(

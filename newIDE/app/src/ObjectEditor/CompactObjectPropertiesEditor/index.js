@@ -52,6 +52,7 @@ import CompactTextField from '../../UI/CompactTextField';
 import SquaredDoubleChevronArrowDown from '../../UI/CustomSvgIcons/SquaredDoubleChevronArrowDown';
 import SquaredDoubleChevronArrowUp from '../../UI/CustomSvgIcons/SquaredDoubleChevronArrowUp';
 import { textEllipsisStyle } from '../../UI/TextEllipsis';
+import Link from '../../UI/Link';
 
 const gd: libGDevelop = global.gd;
 
@@ -68,6 +69,12 @@ export const styles = {
     overflowX: 'hidden',
   },
 };
+
+const behaviorsHelpLink = getHelpLink('/behaviors');
+const effectsHelpLink = getHelpLink('/objects/effects');
+const objectVariablesHelpLink = getHelpLink(
+  '/all-features/variables/object-variables'
+);
 
 const CollapsibleSubPanel = ({
   renderContent,
@@ -527,7 +534,18 @@ export const CompactObjectPropertiesEditor = ({
               <ColumnStackLayout noMargin>
                 {!allVisibleBehaviors.length && (
                   <Text size="body2" align="center" color="secondary">
-                    <Trans>There are no behaviors on this object.</Trans>
+                    <Trans>
+                      There are no{' '}
+                      <Link
+                        href={behaviorsHelpLink}
+                        onClick={() =>
+                          Window.openExternalURL(behaviorsHelpLink)
+                        }
+                      >
+                        behaviors
+                      </Link>{' '}
+                      on this object.
+                    </Trans>
                   </Text>
                 )}
                 {allVisibleBehaviors.map(behavior => {
@@ -617,7 +635,18 @@ export const CompactObjectPropertiesEditor = ({
                 historyHandler={historyHandler}
                 toolbarIconStyle={styles.icon}
                 compactEmptyPlaceholderText={
-                  <Trans>There are no variables on this object.</Trans>
+                  <Trans>
+                    There are no{' '}
+                    <Link
+                      href={objectVariablesHelpLink}
+                      onClick={() =>
+                        Window.openExternalURL(objectVariablesHelpLink)
+                      }
+                    >
+                      variables
+                    </Link>{' '}
+                    on this object.
+                  </Trans>
                 }
               />
             )}
@@ -636,7 +665,18 @@ export const CompactObjectPropertiesEditor = ({
                   <ColumnStackLayout>
                     {effectsContainer.getEffectsCount() === 0 && (
                       <Text size="body2" align="center" color="secondary">
-                        <Trans>There are no effects on this object.</Trans>
+                        <Trans>
+                          There are no{' '}
+                          <Link
+                            href={effectsHelpLink}
+                            onClick={() =>
+                              Window.openExternalURL(effectsHelpLink)
+                            }
+                          >
+                            effects
+                          </Link>{' '}
+                          on this object.
+                        </Trans>
                       </Text>
                     )}
                     {mapFor(

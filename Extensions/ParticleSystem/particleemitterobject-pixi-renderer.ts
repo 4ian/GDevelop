@@ -289,8 +289,6 @@ namespace gdjs {
     }
 
     setColor(color1: number, color2: number): void {
-      // console.log({color1,color2})
-      // debugger;
       // Access private members of the behavior to apply changes right away.
       const behavior: any = this.emitter.getBehavior('color');
       const first = behavior.list.first;

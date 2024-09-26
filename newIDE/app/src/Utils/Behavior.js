@@ -36,7 +36,7 @@ export const addBehaviorToObject = (
     name
   );
 
-  // Show the beahvior properties in the editor by default, when just added.
+  // Show the behavior properties in the editor by default, when just added.
   object.getBehavior(name).setFolded(false);
 
   return true;

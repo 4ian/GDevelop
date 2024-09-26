@@ -68,6 +68,7 @@ export const styles = {
     // scrollbar will be shown.
     overflowX: 'hidden',
   },
+  hiddenContent: { display: 'none' },
 };
 
 const behaviorsHelpLink = getHelpLink('/behaviors');
@@ -177,7 +178,7 @@ const TopLevelCollapsibleSection = ({
     <Column noMargin={noContentMargin}>
       {isFolded ? (
         renderContentAsHiddenWhenFolded ? (
-          <div style={{ display: 'none' }}>{renderContent()}</div>
+          <div style={styles.hiddenContent}>{renderContent()}</div>
         ) : null
       ) : (
         renderContent()

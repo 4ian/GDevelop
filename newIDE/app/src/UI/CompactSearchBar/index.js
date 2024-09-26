@@ -47,7 +47,6 @@ const CompactSearchBar = React.forwardRef<
             </div>
             <input
               id={idToUse.current}
-              // Type cannot be set to number in order to benefit from the mathematical parsing.
               type={'text'}
               disabled={disabled}
               value={value}

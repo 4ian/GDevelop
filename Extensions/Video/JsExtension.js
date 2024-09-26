@@ -36,7 +36,6 @@ module.exports = {
 
     var videoObject = new gd.ObjectJsImplementation();
     videoObject.updateProperty = function (propertyName, newValue) {
-      console.log('update', this.content);
       if (propertyName === 'Opacity') {
         this.content.opacity = parseFloat(newValue);
         return true;
@@ -58,7 +57,6 @@ module.exports = {
     };
     videoObject.getProperties = function () {
       var objectProperties = new gd.MapStringPropertyDescriptor();
-      console.log('getProperties', this.content);
 
       objectProperties
         .getOrCreate('Looped')

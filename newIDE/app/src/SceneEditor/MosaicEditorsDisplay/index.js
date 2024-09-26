@@ -112,7 +112,6 @@ const MosaicEditorsDisplay = React.forwardRef<
   const editorMosaicRef = React.useRef<?EditorMosaicInterface>(null);
   const objectGroupsListRef = React.useRef<?ObjectGroupsListInterface>(null);
 
-  // TODO: rename
   const forceUpdatePropertiesEditor = React.useCallback(() => {
     if (instanceOrObjectPropertiesEditorRef.current)
       instanceOrObjectPropertiesEditorRef.current.forceUpdate();

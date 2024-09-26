@@ -752,9 +752,13 @@ namespace gdjs {
         // It avoids small objects to be pushed side way into a wall when they
         // should be pop out of the wall.
 
+        let applyFlippingTransformations = true;
+
         const hasFullHitBox =
           definitionHitboxes.length === 1 && definition.hasFullHitBox(tag);
         if (hasFullHitBox) {
+          // The hit box is full so it is invariant when flipping it.
+          applyFlippingTransformations = false;
           const isLeftFull = this._hasNeighborFullHitBox(-1, 0);
           const isRightFull = this._hasNeighborFullHitBox(1, 0);
           const isTopFull = this._hasNeighborFullHitBox(0, -1);
@@ -834,19 +838,26 @@ namespace gdjs {
         }
 
         // Transform the hit boxes.
+        // First compute the affine transformation relative to the tile.
+        // Then the transformation is applied to each polygon in the hitboxes.
+        // TODO: If the tile contains hitboxes that are both extended and not full,
+        // this code should be adapted so that the transformation considers the
+        // actual width and height of the hitbox (and not the tile).
 
         const tileTransformation =
           TransformedCollisionTile.workingTransformation;
         tileTransformation.setToTranslation(width * this.x, height * this.y);
-        if (this.layer.isFlippedHorizontally(this.x, this.y)) {
-          tileTransformation.flipX(width / 2);
-        }
-        if (this.layer.isFlippedVertically(this.x, this.y)) {
-          tileTransformation.flipY(height / 2);
-        }
-        if (this.layer.isFlippedDiagonally(this.x, this.y)) {
-          tileTransformation.flipX(width / 2);
-          tileTransformation.rotateAround(Math.PI / 2, width / 2, height / 2);
+        if (applyFlippingTransformations) {
+          if (this.layer.isFlippedHorizontally(this.x, this.y)) {
+            tileTransformation.flipX(width / 2);
+          }
+          if (this.layer.isFlippedVertically(this.x, this.y)) {
+            tileTransformation.flipY(height / 2);
+          }
+          if (this.layer.isFlippedDiagonally(this.x, this.y)) {
+            tileTransformation.flipX(width / 2);
+            tileTransformation.rotateAround(Math.PI / 2, width / 2, height / 2);
+          }
         }
         tileTransformation.preConcatenate(tileMap.getTransformation());
         for (

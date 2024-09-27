@@ -27,6 +27,10 @@ std::unique_ptr<gd::ObjectConfiguration> ObjectJsImplementation::Clone() const {
             self['getInitialInstanceProperties'];
         clone['updateInitialInstanceProperty'] =
             self['updateInitialInstanceProperty'];
+
+        // Make a clone of the JavaScript object containing the data. If we don't do that, the
+        // content of the object would be shared between the original and the clone.
+        clone['content'] = Module['_deepCloneForObjectJsImplementationContent'](self['content']);
       },
       (int)clone,
       (int)this);
@@ -45,15 +49,13 @@ ObjectJsImplementation::GetProperties() const {
         if (!self.hasOwnProperty('getProperties'))
           throw 'getProperties is not defined on a ObjectJsImplementation.';
 
-        var objectContent = JSON.parse(UTF8ToString($1));
-        var newProperties = self['getProperties'](objectContent);
+        var newProperties = self['getProperties']();
         if (!newProperties)
           throw 'getProperties returned nothing in a gd::ObjectJsImplementation.';
 
         return getPointer(newProperties);
       },
-      (int)this,
-      jsonContent.c_str());
+      (int)this);
 
   copiedProperties = *jsCreatedProperties;
   delete jsCreatedProperties;
@@ -61,18 +63,15 @@ ObjectJsImplementation::GetProperties() const {
 }
 bool ObjectJsImplementation::UpdateProperty(const gd::String& arg0,
                                             const gd::String& arg1) {
-  jsonContent = (const char*)EM_ASM_INT(
+  EM_ASM_INT(
       {
         var self = Module['getCache'](Module['ObjectJsImplementation'])[$0];
         if (!self.hasOwnProperty('updateProperty'))
           throw 'updateProperty is not defined on a ObjectJsImplementation.';
-        var objectContent = JSON.parse(UTF8ToString($1));
-        self['updateProperty'](
-            objectContent, UTF8ToString($2), UTF8ToString($3));
-        return ensureString(JSON.stringify(objectContent));
+
+        self['updateProperty'](UTF8ToString($1), UTF8ToString($2));
       },
       (int)this,
-      jsonContent.c_str(),
       arg0.c_str(),
       arg1.c_str());
 
@@ -91,17 +90,14 @@ ObjectJsImplementation::GetInitialInstanceProperties(
         if (!self.hasOwnProperty('getInitialInstanceProperties'))
           throw 'getInitialInstanceProperties is not defined on a ObjectJsImplementation.';
 
-        var objectContent = JSON.parse(UTF8ToString($1));
         var newProperties = self['getInitialInstanceProperties'](
-            objectContent,
-            wrapPointer($2, Module['InitialInstance']));
+            wrapPointer($1, Module['InitialInstance']));
         if (!newProperties)
           throw 'getInitialInstanceProperties returned nothing in a gd::ObjectJsImplementation.';
 
         return getPointer(newProperties);
       },
       (int)this,
-      jsonContent.c_str(),
       (int)&instance);
 
   copiedProperties = *jsCreatedProperties;
@@ -118,26 +114,53 @@ bool ObjectJsImplementation::UpdateInitialInstanceProperty(
         var self = Module['getCache'](Module['ObjectJsImplementation'])[$0];
         if (!self.hasOwnProperty('updateInitialInstanceProperty'))
           throw 'updateInitialInstanceProperty is not defined on a ObjectJsImplementation.';
-        var objectContent = JSON.parse(UTF8ToString($1));
+
         return self['updateInitialInstanceProperty'](
-            objectContent,
-            wrapPointer($2, Module['InitialInstance']),
-            UTF8ToString($3),
-            UTF8ToString($4));
+            wrapPointer($1, Module['InitialInstance']),
+            UTF8ToString($2),
+            UTF8ToString($3));
       },
       (int)this,
-      jsonContent.c_str(),
       (int)&instance,
       name.c_str(),
       value.c_str());
 }
 
 void ObjectJsImplementation::DoSerializeTo(SerializerElement& element) const {
-  element.AddChild("content") = gd::Serializer::FromJSON(jsonContent);
+  SerializerElement* jsCreatedElement = (SerializerElement*)EM_ASM_INT(
+      {
+        var self = Module['getCache'](Module['ObjectJsImplementation'])[$0];
+        if (!self.content)
+          throw '`content` is not defined on a ObjectJsImplementation.';
+
+        var serializerElement = gd.Serializer.fromJSObject(self.content);
+        return getPointer(serializerElement);
+      },
+      (int)this);
+
+  // We could avoid a copy by using making a function on gd.Serializer that manipulates
+  // directly the SerializerElement passed to it.
+  element.AddChild("content") = *jsCreatedElement;
+  delete jsCreatedElement;
 }
 void ObjectJsImplementation::DoUnserializeFrom(Project& project,
                                                const SerializerElement& element) {
-  jsonContent = gd::Serializer::ToJSON(element.GetChild("content"));
+  EM_ASM_INT(
+      {
+        var self = Module['getCache'](Module['ObjectJsImplementation'])[$0];
+        if (!self.content)
+          throw '`content` is not defined on a ObjectJsImplementation.';
+
+        var serializerElement = wrapPointer($1, Module['SerializerElement']);
+        if (!serializerElement.isValueUndefined() || serializerElement.consideredAsArray()) {
+          throw new Error('The element passed to ObjectJsImplementation::DoUnserializeFrom is not an object.');
+        }
+
+        // JSON.parse + toJSON is 30% faster than gd.Serializer.toJSObject.
+        self.content = JSON.parse(gd.Serializer.toJSON(serializerElement));
+      },
+      (int)this,
+      (int)&element.GetChild("content"));
 }
 
 void ObjectJsImplementation::__destroy__() {  // Useless?

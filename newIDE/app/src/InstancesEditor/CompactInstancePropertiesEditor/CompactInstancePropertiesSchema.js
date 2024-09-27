@@ -49,11 +49,11 @@ const applyRatio = ({
 
 const getEditObjectButton = ({
   i18n,
-  onEditObjectByName,
+  onEditObject,
   is3DInstance,
 }: {|
   i18n: I18nType,
-  onEditObjectByName: (name: string) => void,
+  onEditObject: (name: string) => void,
   is3DInstance: boolean,
 |}) => ({
   label: i18n._(t`Edit object`),
@@ -64,7 +64,7 @@ const getEditObjectButton = ({
     : props => <Object2d {...props} />,
   getValue: (instance: gdInitialInstance) => instance.getObjectName(),
   onClick: (instance: gdInitialInstance) =>
-    onEditObjectByName(instance.getObjectName()),
+    onEditObject(instance.getObjectName()),
 });
 
 const getRotationXAndRotationYFields = ({ i18n }: {| i18n: I18nType |}) => [
@@ -487,7 +487,7 @@ export const makeSchema = ({
   canBeFlippedZ,
   i18n,
   forceUpdate,
-  onEditObjectByName,
+  onEditObject,
   onGetInstanceSize,
   layersContainer,
 }: {|
@@ -497,7 +497,7 @@ export const makeSchema = ({
   canBeFlippedZ: boolean,
   i18n: I18nType,
   forceUpdate: () => void,
-  onEditObjectByName: (name: string) => void,
+  onEditObject: (name: string) => void,
   onGetInstanceSize: gdInitialInstance => [number, number, number],
   layersContainer: gdLayersContainer,
 |}): Schema => {
@@ -519,7 +519,7 @@ export const makeSchema = ({
   if (is3DInstance) {
     return [
       getTitleRow({ i18n }),
-      getEditObjectButton({ i18n, onEditObjectByName, is3DInstance }),
+      getEditObjectButton({ i18n, onEditObject, is3DInstance }),
       {
         name: 'Position',
         type: 'row',
@@ -607,7 +607,7 @@ export const makeSchema = ({
 
   return [
     getTitleRow({ i18n }),
-    getEditObjectButton({ i18n, onEditObjectByName, is3DInstance }),
+    getEditObjectButton({ i18n, onEditObject, is3DInstance }),
     {
       name: 'Position',
       type: 'row',

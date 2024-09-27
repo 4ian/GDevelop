@@ -1,6 +1,6 @@
 // @flow
 import { mapFor } from '../Utils/MapFor';
-import { type Schema } from '../PropertiesEditor';
+import { type Schema } from '../CompactPropertiesEditor';
 import { type ResourceKind } from '../ResourcesList/ResourceSource';
 import flatten from 'lodash/flatten';
 

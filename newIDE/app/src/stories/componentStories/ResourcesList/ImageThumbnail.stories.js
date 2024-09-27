@@ -16,6 +16,16 @@ export const Default = () => (
     project={testProject.project}
     resourceName="res/icon128.png"
     resourcesLoader={ResourcesLoader}
+    size={100}
+  />
+);
+
+export const Small = () => (
+  <ImageThumbnail
+    project={testProject.project}
+    resourceName="res/icon128.png"
+    resourcesLoader={ResourcesLoader}
+    size={24}
   />
 );
 
@@ -25,5 +35,6 @@ export const Selectable = () => (
     project={testProject.project}
     resourceName="res/icon128.png"
     resourcesLoader={ResourcesLoader}
+    size={100}
   />
 );

@@ -333,7 +333,7 @@ type Props = {|
   layerRenderingType: string,
 |};
 
-const getEnumeratedEffectMetadata = (
+export const getEnumeratedEffectMetadata = (
   allEffectDescriptions: Array<EnumeratedEffectMetadata>,
   effectType: string
 ): ?EnumeratedEffectMetadata => {
@@ -380,50 +380,47 @@ export const getEffects3DCount = (
   return effect3DCount;
 };
 
-/**
- * Display a list of effects and allow to add/remove/edit them.
- *
- * All available effects are fetched from the project's platform.
- */
-export default function EffectsList(props: Props) {
-  const {
-    effectsContainer,
-    onEffectsUpdated,
-    onEffectsRenamed,
-    project,
-    target,
-  } = props;
-  const scrollView = React.useRef<?ScrollViewInterface>(null);
+type UseManageEffectsState = {|
+  allEffectMetadata: Array<EnumeratedEffectMetadata>,
+  all2DEffectMetadata: Array<EnumeratedEffectMetadata>,
+  all3DEffectMetadata: Array<EnumeratedEffectMetadata>,
+  draggedEffect: {| current: ?gdEffect |},
+  addEffect: boolean => void,
+  chooseEffectType: (effect: gdEffect, newEffectType: string) => void,
+  copyAllEffects: () => void,
+  copyEffect: (effect: gdEffect) => void,
+  duplicatedUniqueEffectMetadata: ?EnumeratedEffectMetadata,
+  isClipboardContainingEffects: boolean,
+  moveEffect: (targetEffect: gdEffect) => void,
+  pasteEffectsAtTheEnd: () => Promise<void>,
+  pasteEffectsBefore: (effect: gdEffect) => Promise<void>,
+  removeEffect: (effect: gdEffect) => void,
+  resetJustAddedEffectName: () => void,
+  justAddedEffectName: ?string,
+|};
+
+export const useManageEffects = ({
+  effectsContainer,
+  project,
+  onEffectsUpdated,
+  onUpdate,
+  target,
+}: {|
+  effectsContainer: gdEffectsContainer,
+  project: gdProject,
+  onEffectsUpdated: () => void,
+  onUpdate: () => void,
+  target: 'object' | 'layer',
+|}): UseManageEffectsState => {
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const [justAddedEffectName, setJustAddedEffectName] = React.useState<?string>(
     null
   );
-  const justAddedEffectElement = React.useRef<?any>(null);
-
-  React.useEffect(
-    () => {
-      if (
-        scrollView.current &&
-        justAddedEffectElement.current &&
-        justAddedEffectName
-      ) {
-        scrollView.current.scrollTo(justAddedEffectElement.current);
-        setJustAddedEffectName(null);
-        justAddedEffectElement.current = null;
-      }
-    },
-    [justAddedEffectName]
-  );
-
   const draggedEffect = React.useRef<?gdEffect>(null);
 
-  const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const [nameErrors, setNameErrors] = React.useState<{ [number]: React.Node }>(
-    {}
-  );
-
   const allEffectMetadata = React.useMemo(
-    () => enumerateEffectsMetadata(props.project),
-    [props.project]
+    () => enumerateEffectsMetadata(project),
+    [project]
   );
 
   const all3DEffectMetadata = React.useMemo(
@@ -452,14 +449,12 @@ export default function EffectsList(props: Props) {
     [allEffectMetadata]
   );
 
-  const all2DEffectMetadata = React.useMemo(
+  const all2DEffectMetadata: Array<EnumeratedEffectMetadata> = React.useMemo(
     () => allEffectMetadata.filter(effect => effect.isMarkedAsOnlyWorkingFor2D),
     [allEffectMetadata]
   );
 
   const showEffectOverridingConfirmation = useEffectOverridingAlertDialog();
-
-  const forceUpdate = useForceUpdate();
 
   const chooseEffectType = React.useCallback(
     (effect: gdEffect, newEffectType: string) => {
@@ -473,10 +468,10 @@ export default function EffectsList(props: Props) {
         setEffectDefaultParameters(effect, effectMetadata.effectMetadata);
       }
 
-      forceUpdate();
+      onUpdate();
       onEffectsUpdated();
     },
-    [allEffectMetadata, forceUpdate, onEffectsUpdated]
+    [allEffectMetadata, onUpdate, onEffectsUpdated]
   );
 
   const _addEffect = React.useCallback(
@@ -495,11 +490,11 @@ export default function EffectsList(props: Props) {
         chooseEffectType(effect, 'Outline');
       }
 
-      forceUpdate();
+      onUpdate();
       onEffectsUpdated();
       setJustAddedEffectName(newName);
     },
-    [chooseEffectType, effectsContainer, forceUpdate, onEffectsUpdated]
+    [chooseEffectType, effectsContainer, onUpdate, onEffectsUpdated]
   );
 
   const addEffect = addCreateBadgePreHookIfNotClaimed(
@@ -511,10 +506,10 @@ export default function EffectsList(props: Props) {
   const removeEffect = React.useCallback(
     (effect: gdEffect) => {
       effectsContainer.removeEffect(effect.getName());
-      forceUpdate();
+      onUpdate();
       onEffectsUpdated();
     },
-    [effectsContainer, forceUpdate, onEffectsUpdated]
+    [effectsContainer, onUpdate, onEffectsUpdated]
   );
 
   const copyEffect = React.useCallback(
@@ -526,9 +521,9 @@ export default function EffectsList(props: Props) {
           serializedEffect: serializeToJSObject(effect),
         },
       ]);
-      forceUpdate();
+      onUpdate();
     },
-    [forceUpdate]
+    [onUpdate]
   );
 
   const copyAllEffects = React.useCallback(
@@ -544,9 +539,9 @@ export default function EffectsList(props: Props) {
           };
         })
       );
-      forceUpdate();
+      onUpdate();
     },
-    [forceUpdate, effectsContainer]
+    [onUpdate, effectsContainer]
   );
 
   const pasteEffects = React.useCallback(
@@ -624,7 +619,7 @@ export default function EffectsList(props: Props) {
         }
       }
 
-      forceUpdate();
+      onUpdate();
       if (firstAddedEffectName) {
         setJustAddedEffectName(firstAddedEffectName);
       } else if (existingNamedEffects.length === 1) {
@@ -635,7 +630,7 @@ export default function EffectsList(props: Props) {
       }
     },
     [
-      forceUpdate,
+      onUpdate,
       project,
       target,
       effectsContainer,
@@ -674,10 +669,10 @@ export default function EffectsList(props: Props) {
         draggedIndex,
         targetIndex > draggedIndex ? targetIndex - 1 : targetIndex
       );
-      forceUpdate();
+      onUpdate();
       onEffectsUpdated();
     },
-    [effectsContainer, forceUpdate, onEffectsUpdated]
+    [effectsContainer, onUpdate, onEffectsUpdated]
   );
 
   const isClipboardContainingEffects = Clipboard.has(EFFECTS_CLIPBOARD_KIND);
@@ -715,6 +710,91 @@ export default function EffectsList(props: Props) {
   );
 
   const duplicatedUniqueEffectMetadata = getDuplicatedUniqueEffectMetadata();
+
+  const resetJustAddedEffectName = React.useCallback(() => {
+    setJustAddedEffectName(null);
+  }, []);
+
+  return {
+    allEffectMetadata,
+    all2DEffectMetadata,
+    all3DEffectMetadata,
+    draggedEffect,
+    addEffect,
+    chooseEffectType,
+    copyAllEffects,
+    copyEffect,
+    duplicatedUniqueEffectMetadata,
+    isClipboardContainingEffects,
+    moveEffect,
+    pasteEffectsAtTheEnd,
+    pasteEffectsBefore,
+    removeEffect,
+    resetJustAddedEffectName,
+    justAddedEffectName,
+  };
+};
+
+/**
+ * Display a list of effects and allow to add/remove/edit them.
+ *
+ * All available effects are fetched from the project's platform.
+ */
+export default function EffectsList(props: Props) {
+  const {
+    effectsContainer,
+    onEffectsUpdated,
+    onEffectsRenamed,
+    project,
+    target,
+  } = props;
+  const scrollView = React.useRef<?ScrollViewInterface>(null);
+  const justAddedEffectElement = React.useRef<?any>(null);
+
+  const forceUpdate = useForceUpdate();
+  const {
+    allEffectMetadata,
+    all2DEffectMetadata,
+    all3DEffectMetadata,
+    addEffect,
+    chooseEffectType,
+    copyAllEffects,
+    copyEffect,
+    duplicatedUniqueEffectMetadata,
+    isClipboardContainingEffects,
+    moveEffect,
+    pasteEffectsAtTheEnd,
+    pasteEffectsBefore,
+    removeEffect,
+    resetJustAddedEffectName,
+    justAddedEffectName,
+    draggedEffect,
+  } = useManageEffects({
+    effectsContainer,
+    project,
+    onEffectsUpdated,
+    onUpdate: forceUpdate,
+    target,
+  });
+
+  React.useEffect(
+    () => {
+      if (
+        scrollView.current &&
+        justAddedEffectElement.current &&
+        justAddedEffectName
+      ) {
+        scrollView.current.scrollTo(justAddedEffectElement.current);
+        resetJustAddedEffectName();
+        justAddedEffectElement.current = null;
+      }
+    },
+    [justAddedEffectName, resetJustAddedEffectName]
+  );
+
+  const [nameErrors, setNameErrors] = React.useState<{ [number]: React.Node }>(
+    {}
+  );
 
   // Count the number of effects to hide titles of empty sections.
   const platform = project.getCurrentPlatform();

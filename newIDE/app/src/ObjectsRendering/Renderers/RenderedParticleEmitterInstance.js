@@ -3,7 +3,7 @@ import RenderedInstance from './RenderedInstance';
 import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
 import ResourcesLoader from '../../ResourcesLoader';
 import * as PIXI from 'pixi.js-legacy';
-import { rgbToHexNumber } from '../../Utils/ColorTransformer';
+import { rgbOrHexToHexNumber } from '../../Utils/ColorTransformer';
 const gd: libGDevelop = global.gd;
 
 /**
@@ -70,11 +70,7 @@ export default class RenderedParticleEmitterInstance extends RenderedInstance {
     this._pixiObject.beginFill(0, 0);
     this._pixiObject.lineStyle(
       3,
-      rgbToHexNumber(
-        particleEmitterConfiguration.getParticleRed2(),
-        particleEmitterConfiguration.getParticleGreen2(),
-        particleEmitterConfiguration.getParticleBlue2()
-      ),
+      rgbOrHexToHexNumber(particleEmitterConfiguration.getParticleColor2()),
       1
     );
     this._pixiObject.moveTo(0, 0);
@@ -91,11 +87,7 @@ export default class RenderedParticleEmitterInstance extends RenderedInstance {
 
     this._pixiObject.lineStyle(0, 0x000000, 1);
     this._pixiObject.beginFill(
-      rgbToHexNumber(
-        particleEmitterConfiguration.getParticleRed1(),
-        particleEmitterConfiguration.getParticleGreen1(),
-        particleEmitterConfiguration.getParticleBlue1()
-      )
+      rgbOrHexToHexNumber(particleEmitterConfiguration.getParticleColor1())
     );
     this._pixiObject.drawCircle(0, 0, 8);
     this._pixiObject.endFill();

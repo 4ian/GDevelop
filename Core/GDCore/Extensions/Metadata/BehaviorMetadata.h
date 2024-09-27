@@ -307,6 +307,15 @@ class GD_CORE_API BehaviorMetadata : public InstructionOrExpressionContainerMeta
     return *this;
   }
 
+  BehaviorMetadata &SetOpenFullEditorLabel(const gd::String& label) {
+    openFullEditorLabel = label;
+    return *this;
+  }
+
+  const gd::String& GetOpenFullEditorLabel() const {
+    return openFullEditorLabel;
+  }
+
   /**
    * \brief Return the associated gd::Behavior, handling behavior contents.
    *
@@ -384,6 +393,7 @@ class GD_CORE_API BehaviorMetadata : public InstructionOrExpressionContainerMeta
   mutable std::vector<gd::String> requiredBehaviors;
   bool isPrivate = false;
   bool isHidden = false;
+  gd::String openFullEditorLabel;
   QuickCustomization::Visibility quickCustomizationVisibility;
 
   // TODO: Nitpicking: convert these to std::unique_ptr to clarify ownership.

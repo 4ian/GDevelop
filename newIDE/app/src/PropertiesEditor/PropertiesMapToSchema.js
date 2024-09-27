@@ -158,13 +158,11 @@ const createField = (
     const extraInfos = property.getExtraInfo().toJSArray();
     // $FlowFixMe - assume the passed resource kind is always valid.
     const kind: ResourceKind = extraInfos[0] || '';
-    // $FlowFixMe - assume the passed resource kind is always valid.
-    const fallbackKind: ResourceKind = extraInfos[1] || '';
+
     return {
       name,
       valueType: 'resource',
       resourceKind: kind,
-      fallbackResourceKind: fallbackKind,
       getValue: (instance: Instance): string => {
         return getProperties(instance)
           .get(name)

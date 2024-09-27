@@ -95,7 +95,6 @@ const SpineEditor = ({
   const forceUpdate = useForceUpdate();
 
   const spineConfiguration = gd.asSpineConfiguration(objectConfiguration);
-  const properties = objectConfiguration.getProperties();
 
   const [nameErrors, setNameErrors] = React.useState<{ [number]: React.Node }>(
     {}
@@ -110,7 +109,7 @@ const SpineEditor = ({
   const [sourceSelectOptions, setSourceSelectOptions] = React.useState<
     Array<Object>
   >([]);
-  const spineResourceName = properties.get('spineResourceName').getValue();
+  const spineResourceName = spineConfiguration.getSpineResourceName();
 
   React.useEffect(
     () => {

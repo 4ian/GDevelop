@@ -30,6 +30,7 @@ export type SceneEditorsDisplayProps = {|
   objectsContainer: gdObjectsContainer,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   initialInstances: gdInitialInstancesContainer,
+  lastSelectionType: 'instance' | 'object',
   instancesSelection: InstancesSelection,
   selectedLayer: string,
   onSelectInstances: (
@@ -39,7 +40,8 @@ export type SceneEditorsDisplayProps = {|
   ) => void,
   editInstanceVariables: (instance: ?gdInitialInstance) => void,
   editObjectByName: (objectName: string, initialTab?: ObjectEditorTab) => void,
-  onEditObject: gdObject => void,
+  editObjectInPropertiesPanel: (objectName: string) => void,
+  onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
   selectedObjectFolderOrObjectsWithContext: ObjectFolderOrObjectWithContext[],
   onSelectLayer: (layerName: string) => void,
   editLayerEffects: (layer: ?gdLayer) => void,
@@ -122,7 +124,7 @@ export type SceneEditorsDisplayProps = {|
 export type SceneEditorsDisplayInterface = {|
   getName: () => 'mosaic' | 'swipeableDrawer',
   forceUpdateInstancesList: () => void,
-  forceUpdateInstancesPropertiesEditor: () => void,
+  forceUpdatePropertiesEditor: () => void,
   forceUpdateObjectsList: () => void,
   forceUpdateObjectGroupsList: () => void,
   scrollObjectGroupsListToObjectGroup: (objectGroup: gdObjectGroup) => void,

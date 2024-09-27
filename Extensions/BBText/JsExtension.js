@@ -34,11 +34,8 @@ module.exports = {
       .setIcon('JsPlatform/Extensions/bbcode32.png');
 
     var objectBBText = new gd.ObjectJsImplementation();
-    objectBBText.updateProperty = function (
-      objectContent,
-      propertyName,
-      newValue
-    ) {
+    objectBBText.updateProperty = function (propertyName, newValue) {
+      const objectContent = this.content;
       if (propertyName in objectContent) {
         if (typeof objectContent[propertyName] === 'boolean')
           objectContent[propertyName] = newValue === '1';
@@ -50,8 +47,9 @@ module.exports = {
 
       return false;
     };
-    objectBBText.getProperties = function (objectContent) {
+    objectBBText.getProperties = function () {
       const objectProperties = new gd.MapStringPropertyDescriptor();
+      const objectContent = this.content;
 
       objectProperties
         .getOrCreate('text')
@@ -107,29 +105,26 @@ module.exports = {
 
       return objectProperties;
     };
-    objectBBText.setRawJSONContent(
-      JSON.stringify({
-        text:
-          '[b]bold[/b] [i]italic[/i] [size=15]smaller[/size] [font=times]times[/font] font\n[spacing=12]spaced out[/spacing]\n[outline=yellow]outlined[/outline] [shadow=red]DropShadow[/shadow] ',
-        opacity: 255,
-        fontSize: 20,
-        visible: true,
-        color: '0;0;0',
-        fontFamily: 'Arial',
-        align: 'left',
-        wordWrap: true,
-      })
-    );
+    objectBBText.content = {
+      text:
+        '[b]bold[/b] [i]italic[/i] [size=15]smaller[/size] [font=times]times[/font] font\n[spacing=12]spaced out[/spacing]\n[outline=yellow]outlined[/outline] [shadow=red]DropShadow[/shadow] ',
+      opacity: 255,
+      fontSize: 20,
+      visible: true,
+      color: '0;0;0',
+      fontFamily: 'Arial',
+      align: 'left',
+      wordWrap: true,
+    };
 
     objectBBText.updateInitialInstanceProperty = function (
-      objectContent,
       instance,
       propertyName,
       newValue
     ) {
       return false;
     };
-    objectBBText.getInitialInstanceProperties = function (content, instance) {
+    objectBBText.getInitialInstanceProperties = function (instance) {
       var instanceProperties = new gd.MapStringPropertyDescriptor();
       return instanceProperties;
     };
@@ -531,22 +526,33 @@ module.exports = {
        * This is called to update the PIXI object on the scene editor
        */
       update() {
-        const properties = this._associatedObjectConfiguration.getProperties();
+        const object = gd.castObject(
+          this._associatedObjectConfiguration,
+          gd.ObjectJsImplementation
+        );
 
-        const rawText = properties.get('text').getValue();
+        const rawText = object.content.text;
         if (rawText !== this._pixiObject.text) {
           this._pixiObject.text = rawText;
         }
 
-        const color = properties.get('color').getValue();
-        this._pixiObject.textStyles.default.fill = objectsRenderingService.rgbOrHexToHexNumber(
-          color
-        );
+        const color = object.content.color;
+        const newColor = objectsRenderingService.rgbOrHexToHexNumber(color);
+        if (newColor !== this._pixiObject.textStyles.default.fill) {
+          this._pixiObject.textStyles.default.fill = newColor;
+          this._pixiObject.dirty = true;
+        }
 
-        const fontSize = properties.get('fontSize').getValue();
-        this._pixiObject.textStyles.default.fontSize = `${fontSize}px`;
+        const fontSize = object.content.fontSize;
+        const newDefaultFontsize = `${fontSize}px`;
+        if (
+          newDefaultFontsize !== this._pixiObject.textStyles.default.fontSize
+        ) {
+          this._pixiObject.textStyles.default.fontSize = `${fontSize}px`;
+          this._pixiObject.dirty = true;
+        }
 
-        const fontResourceName = properties.get('fontFamily').getValue();
+        const fontResourceName = object.content.fontFamily;
 
         if (this._fontResourceName !== fontResourceName) {
           this._fontResourceName = fontResourceName;
@@ -567,13 +573,13 @@ module.exports = {
             });
         }
 
-        const wordWrap = properties.get('wordWrap').getValue() === 'true';
+        const wordWrap = object.content.wordWrap;
         if (wordWrap !== this._pixiObject._style.wordWrap) {
           this._pixiObject._style.wordWrap = wordWrap;
           this._pixiObject.dirty = true;
         }
 
-        const align = properties.get('align').getValue();
+        const align = object.content.align;
         if (align !== this._pixiObject._style.align) {
           this._pixiObject._style.align = align;
           this._pixiObject.dirty = true;

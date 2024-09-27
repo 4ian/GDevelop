@@ -13,9 +13,11 @@ import Paste from '../UI/CustomSvgIcons/Paste';
 import { Column, Line, Spacer } from '../UI/Grid';
 import FlatButton from '../UI/FlatButton';
 import SearchBar from '../UI/SearchBar';
+import CompactSearchBar from '../UI/CompactSearchBar';
 
 type Props = {|
   isNarrow: boolean,
+  isCompact: boolean,
   onCopy: () => void,
   onPaste: () => void,
   onDelete: () => void,
@@ -115,16 +117,24 @@ const VariablesListToolbar = React.memo<Props>((props: Props) => {
           )}
         </Line>
       </Column>
-      <Column expand>
-        <SearchBar
-          value={props.searchText}
-          onRequestSearch={props.onChangeSearchText}
-          onChange={props.onChangeSearchText}
-          placeholder={t`Search variables`}
-        />
+      <Column expand noOverflowParent>
+        {props.isCompact ? (
+          <CompactSearchBar
+            value={props.searchText}
+            onChange={props.onChangeSearchText}
+            placeholder={t`Search variables`}
+          />
+        ) : (
+          <SearchBar
+            value={props.searchText}
+            onRequestSearch={props.onChangeSearchText}
+            onChange={props.onChangeSearchText}
+            placeholder={t`Search variables`}
+          />
+        )}
       </Column>
       <Column noMargin>
-        {props.isNarrow ? (
+        {props.isCompact ? null : props.isNarrow ? (
           <IconButton
             key="add-variable"
             tooltip={t`Add variable`}

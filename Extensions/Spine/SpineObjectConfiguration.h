@@ -65,9 +65,9 @@ public:
   }
 
   virtual void ExposeResources(gd::ArbitraryResourceWorker &worker) override;
-  
+
   virtual std::map<gd::String, gd::PropertyDescriptor>GetProperties() const override;
-  
+
   virtual bool UpdateProperty(const gd::String &name, const gd::String &value) override;
 
   virtual std::map<gd::String, gd::PropertyDescriptor>
@@ -137,6 +137,15 @@ public:
     return animations;
   }
 
+  ///@}
+
+  /** \name Getters
+   * Fast access for rendering instances.
+   */
+  ///@{
+  double GetScale() const { return scale; };
+
+  const gd::String& GetSpineResourceName() const { return spineResourceName; };
   ///@}
 
 protected:

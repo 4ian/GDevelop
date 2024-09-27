@@ -70,28 +70,28 @@ std::map<gd::String, gd::PropertyDescriptor> PathfindingBehavior::GetProperties(
       .SetValue(
           gd::String::From(behaviorContent.GetDoubleAttribute("angleOffset")));
   properties["CellWidth"]
-      .SetLabel(_("Virtual cell width"))
+      .SetLabel(_("Cell width"))
       .SetGroup(_("Virtual Grid"))
       .SetType("Number")
       .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
       .SetValue(
           gd::String::From(behaviorContent.GetDoubleAttribute("cellWidth", 0)));
   properties["CellHeight"]
-      .SetLabel(_("Virtual cell height"))
+      .SetLabel(_("Cell height"))
       .SetGroup(_("Virtual Grid"))
       .SetType("Number")
       .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
       .SetValue(gd::String::From(
           behaviorContent.GetDoubleAttribute("cellHeight", 0)));
   properties["GridOffsetX"]
-      .SetLabel(_("Virtual grid X offset"))
+      .SetLabel(_("X offset"))
       .SetGroup(_("Virtual Grid"))
       .SetType("Number")
       .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
       .SetValue(gd::String::From(
           behaviorContent.GetDoubleAttribute("gridOffsetX", 0)));
   properties["GridOffsetY"]
-      .SetLabel(_("Virtual grid Y offset"))
+      .SetLabel(_("Y offset"))
       .SetGroup(_("Virtual Grid"))
       .SetType("Number")
       .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())

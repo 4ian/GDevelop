@@ -84,15 +84,15 @@ module.exports = {
       const fakeObject = new gd.ObjectJsImplementation();
 
       fakeObject.updateProperty = function (
-        objectContent,
         propertyName,
         newValue
       ) {
         return false;
       };
 
-      fakeObject.getProperties = function (objectContent) {
+      fakeObject.getProperties = function () {
         const objectProperties = new gd.MapStringPropertyDescriptor();
+        const objectContent = this.content;
 
         objectProperties
           .getOrCreate('text')
@@ -102,14 +102,11 @@ module.exports = {
 
         return objectProperties;
       };
-      fakeObject.setRawJSONContent(
-        JSON.stringify({
-          text: 'Some text.',
-        })
-      );
+      fakeObject.content = {
+        text: 'Some text.',
+      };
 
       fakeObject.updateInitialInstanceProperty = function (
-        objectContent,
         instance,
         propertyName,
         newValue
@@ -118,7 +115,6 @@ module.exports = {
       };
 
       fakeObject.getInitialInstanceProperties = function (
-        content,
         instance
       ) {
         var instanceProperties = new gd.MapStringPropertyDescriptor();
@@ -142,21 +138,19 @@ module.exports = {
       const fakeObject = new gd.ObjectJsImplementation();
 
       fakeObject.updateProperty = function (
-        objectContent,
         propertyName,
         newValue
       ) {
         return false;
       };
 
-      fakeObject.getProperties = function (objectContent) {
+      fakeObject.getProperties = function () {
         const objectProperties = new gd.MapStringPropertyDescriptor();
         return objectProperties;
       };
-      fakeObject.setRawJSONContent(JSON.stringify({}));
+      fakeObject.content = {};
 
       fakeObject.updateInitialInstanceProperty = function (
-        objectContent,
         instance,
         propertyName,
         newValue
@@ -165,7 +159,6 @@ module.exports = {
       };
 
       fakeObject.getInitialInstanceProperties = function (
-        content,
         instance
       ) {
         var instanceProperties = new gd.MapStringPropertyDescriptor();

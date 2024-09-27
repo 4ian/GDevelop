@@ -45,6 +45,7 @@ export type ValueFieldCommonProperties = {|
   hideLabel?: boolean,
   getExtraDescription?: Instance => string,
   hasImpactOnAllOtherFields?: boolean,
+  canBeUnlimitedUsingMinus1?: boolean,
   disabled?: (instances: Array<gdInitialInstance>) => boolean,
   onEditButtonBuildMenuTemplate?: (i18n: I18nType) => Array<MenuItemTemplate>,
   onEditButtonClick?: () => void,
@@ -150,6 +151,7 @@ export type ActionButton = {|
   getValue: Instance => string,
   nonFieldType: 'button',
   getIcon?: ({| fontSize: string |}) => React.Node,
+  showRightIcon?: boolean,
   onClick: (instance: Instance) => void,
 |};
 
@@ -231,6 +233,10 @@ const styles = {
     marginTop: marginsSize,
     borderTop: '1px solid black', // Border color is changed in the component.
   },
+  level2Separator: {
+    flex: 1,
+    borderTop: '1px solid black', // Border color is changed in the component.
+  },
 };
 
 export const Separator = () => {
@@ -239,6 +245,18 @@ export const Separator = () => {
     <div
       style={{
         ...styles.separator,
+        borderColor: gdevelopTheme.listItem.separatorColor,
+      }}
+    />
+  );
+};
+
+export const Level2Separator = () => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  return (
+    <div
+      style={{
+        ...styles.level2Separator,
         borderColor: gdevelopTheme.listItem.separatorColor,
       }}
     />
@@ -398,26 +416,21 @@ const CompactPropertiesEditor = ({
         const { setValue } = field;
 
         return (
-          <CompactPropertiesEditorRowField
+          <CompactToggleField
             key={field.name}
             label={getFieldLabel({ instances, field })}
             markdownDescription={getFieldDescription(field)}
-            field={
-              <CompactToggleField
-                key={field.name}
-                id={field.name}
-                checked={getFieldValue({ instances, field })}
-                onCheck={newValue => {
-                  instances.forEach(i => setValue(i, newValue));
-                  onFieldChanged({
-                    instances,
-                    hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
-                  });
-                }}
-                disabled={getDisabled({ instances, field })}
-                fullWidth
-              />
-            }
+            id={field.name}
+            checked={getFieldValue({ instances, field })}
+            onCheck={newValue => {
+              instances.forEach(i => setValue(i, newValue));
+              onFieldChanged({
+                instances,
+                hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
+              });
+            }}
+            disabled={getDisabled({ instances, field })}
+            fullWidth
           />
         );
       } else if (field.valueType === 'number') {
@@ -458,6 +471,7 @@ const CompactPropertiesEditor = ({
           return (
             <CompactSemiControlledNumberField
               {...commonProps}
+              canBeUnlimitedUsingMinus1={field.canBeUnlimitedUsingMinus1}
               useLeftIconAsNumberControl
               renderLeftIcon={field.renderLeftIcon}
               leftIconTooltip={getFieldLabel({ instances, field })}
@@ -470,7 +484,12 @@ const CompactPropertiesEditor = ({
               key={key}
               label={getFieldLabel({ instances, field })}
               markdownDescription={getFieldDescription(field)}
-              field={<CompactSemiControlledNumberField {...otherCommonProps} />}
+              field={
+                <CompactSemiControlledNumberField
+                  canBeUnlimitedUsingMinus1={field.canBeUnlimitedUsingMinus1}
+                  {...otherCommonProps}
+                />
+              }
             />
           );
         }
@@ -603,24 +622,27 @@ const CompactPropertiesEditor = ({
     (field: ValueField) => {
       if (!field.getChoices || !field.getValue) return;
 
-      const children = field
-        .getChoices()
-        .map(({ value, label, labelIsUserDefined }) => (
-          <SelectOption
-            key={value}
-            value={value}
-            label={label}
-            shouldNotTranslate={labelIsUserDefined}
-          />
-        ));
+      const choices = field.getChoices();
+      if (choices.length < 2 && field.isHiddenWhenOnlyOneChoice) {
+        return;
+      }
+
+      const children = choices.map(({ value, label, labelIsUserDefined }) => (
+        <SelectOption
+          key={value}
+          value={value}
+          label={label}
+          shouldNotTranslate={labelIsUserDefined}
+        />
+      ));
 
       let compactSelectField;
       if (field.valueType === 'number') {
         const { setValue } = field;
         compactSelectField = (
           <CompactSelectField
-            value={getFieldValue({ instances, field })}
             key={field.name}
+            value={getFieldValue({ instances, field })}
             id={field.name}
             onChange={(newValue: string) => {
               instances.forEach(i => setValue(i, parseFloat(newValue) || 0));
@@ -638,12 +660,12 @@ const CompactPropertiesEditor = ({
         const { setValue } = field;
         compactSelectField = (
           <CompactSelectField
+            key={field.name}
             value={getFieldValue({
               instances,
               field,
               defaultValue: '(Multiple values)',
             })}
-            key={field.name}
             id={field.name}
             onChange={(newValue: string) => {
               instances.forEach(i => setValue(i, newValue || ''));
@@ -689,26 +711,31 @@ const CompactPropertiesEditor = ({
           }) === DIFFERENT_VALUES;
       }
       return (
-        <React.Fragment key={`button-${field.label}`}>
-          <FlatButton
-            fullWidth
-            primary
-            leftIcon={
-              field.getIcon ? (
-                field.getIcon({ fontSize: 'small' })
-              ) : (
-                <Edit fontSize="small" />
-              )
-            }
-            disabled={disabled}
-            label={field.label}
-            onClick={() => {
-              if (!instances[0]) return;
-              field.onClick(instances[0]);
-            }}
-          />
-          <Spacer />
-        </React.Fragment>
+        <FlatButton
+          key={`button-${field.label}`}
+          fullWidth
+          primary
+          leftIcon={
+            field.showRightIcon ? null : field.getIcon ? (
+              field.getIcon({ fontSize: 'small' })
+            ) : (
+              <Edit fontSize="small" />
+            )
+          }
+          rightIcon={
+            !field.showRightIcon ? null : field.getIcon ? (
+              field.getIcon({ fontSize: 'small' })
+            ) : (
+              <Edit fontSize="small" />
+            )
+          }
+          disabled={disabled}
+          label={field.label}
+          onClick={() => {
+            if (!instances[0]) return;
+            field.onClick(instances[0]);
+          }}
+        />
       );
     },
     [instances]
@@ -880,16 +907,36 @@ const CompactPropertiesEditor = ({
     },
     [instances]
   );
-  const renderSectionTitle = React.useCallback((field: SectionTitle) => {
-    return [
-      <Separator key={field.name + '-separator'} />,
-      <Line key={`section-title-${field.name}`} noMargin>
-        <Text displayInlineAsSpan size="sub-title" noMargin>
-          {field.title}
-        </Text>
-      </Line>,
-    ];
-  }, []);
+  const renderSectionTitle = React.useCallback(
+    (field: { name: string, title: string }) => {
+      return [
+        <Separator key={field.name + '-separator'} />,
+        <Line key={`section-title-${field.name}`} noMargin>
+          <Text displayInlineAsSpan size="sub-title" noMargin>
+            {field.title}
+          </Text>
+        </Line>,
+      ];
+    },
+    []
+  );
+
+  const renderSectionLevel2Title = React.useCallback(
+    (field: { name: string, title: string }) => {
+      return [
+        <Column expand noMargin key={field.name + '-title'}>
+          <Spacer />
+          <LineStackLayout expand noMargin alignItems="center">
+            <Text size="sub-title" noMargin>
+              {field.title}
+            </Text>
+            <Level2Separator key={field.name + '-separator'} />
+          </LineStackLayout>
+        </Column>,
+      ];
+    },
+    []
+  );
 
   return renderContainer(
     schema.map(field => {
@@ -941,10 +988,10 @@ const CompactPropertiesEditor = ({
 
         if (field.title) {
           return [
-            <Separator key={field.name + '-separator'} />,
-            <Text key={field.name + '-title'} size="sub-title" noMargin>
-              {field.title}
-            </Text>,
+            ...renderSectionLevel2Title({
+              title: field.title,
+              name: field.name,
+            }),
             contentView,
           ];
         }

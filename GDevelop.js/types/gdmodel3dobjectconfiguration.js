@@ -10,6 +10,17 @@ declare class gdModel3DObjectConfiguration extends gdObjectConfiguration {
   hasNoAnimations(): boolean;
   swapAnimations(first: number, second: number): void;
   moveAnimation(oldIndex: number, newIndex: number): void;
+  getWidth(): number;
+  getHeight(): number;
+  getDepth(): number;
+  getRotationX(): number;
+  getRotationY(): number;
+  getRotationZ(): number;
+  getModelResourceName(): string;
+  getMaterialType(): string;
+  getOriginLocation(): string;
+  getCenterLocation(): string;
+  shouldKeepAspectRatio(): boolean;
   delete(): void;
   ptr: number;
 };

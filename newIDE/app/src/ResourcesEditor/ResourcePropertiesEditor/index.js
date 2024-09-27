@@ -89,7 +89,7 @@ const ResourcePropertiesEditor = React.forwardRef<
         {
           name: 'Resource name',
           valueType: 'string',
-          disabled: true,
+          disabled: () => true,
           getValue: (resource: gdResource) => resource.getName(),
           setValue: (resource: gdResource, newValue: string) =>
             resource.setName(newValue),

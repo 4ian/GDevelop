@@ -47,8 +47,8 @@ const invalidTexture = PIXI.Texture.from('res/error48.png');
 const loadingTexture = PIXI.Texture.from(
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAAA1BMVEXX19f5cgrAAAAAAXRSTlMz/za5cAAAAApJREFUCNdjQAMAABAAAbSqgB8AAAAASUVORK5CYII='
 );
-let loadedThreeTextures = {};
-let loadedThreeMaterials = {};
+let loadedOrLoadingThreeTextures: ResourcePromise<THREE.Texture> = {};
+let loadedOrLoadingThreeMaterials: ResourcePromise<THREE.Material> = {};
 let loadedOrLoading3DModelPromises: ResourcePromise<THREE.THREE_ADDONS.GLTF> = {};
 let spineAtlasPromises: ResourcePromise<SpineTextureAtlasOrLoadingError> = {};
 let spineDataPromises: ResourcePromise<SpineDataOrLoadingError> = {};
@@ -244,8 +244,8 @@ export default class PixiResourcesLoader {
     loadedBitmapFonts = {};
     loadedFontFamilies = {};
     loadedTextures = {};
-    loadedThreeTextures = {};
-    loadedThreeMaterials = {};
+    loadedOrLoadingThreeTextures = {};
+    loadedOrLoadingThreeMaterials = {};
     loadedOrLoading3DModelPromises = {};
     spineAtlasPromises = {};
     spineDataPromises = {};
@@ -296,9 +296,10 @@ export default class PixiResourcesLoader {
     if (loadedBitmapFonts[resourceName]) {
       delete loadedBitmapFonts[resourceName];
     }
-    if (loadedThreeTextures[resourceName]) {
-      loadedThreeTextures[resourceName].dispose();
-      delete loadedThreeTextures[resourceName];
+    if (loadedOrLoadingThreeTextures[resourceName]) {
+      const threeTexture = await loadedOrLoadingThreeTextures[resourceName];
+      threeTexture.dispose();
+      delete loadedOrLoadingThreeTextures[resourceName];
     }
     if (spineAtlasPromises[resourceName]) {
       await PIXI.Assets.unload(resourceName).catch(async () => {
@@ -328,14 +329,17 @@ export default class PixiResourcesLoader {
       PIXI.Assets.resolver.prefer();
     }
 
-    const matchingMaterials = Object.keys(loadedThreeMaterials).filter(key =>
-      key.startsWith(resourceName)
-    );
-    if (matchingMaterials.length > 0) {
-      matchingMaterials.forEach(key => {
-        loadedThreeMaterials[key].dispose();
-        delete loadedThreeMaterials[key];
-      });
+    const matchingMaterialCacheKeys = Object.keys(
+      loadedOrLoadingThreeMaterials
+    ).filter(key => key.startsWith(resourceName));
+    if (matchingMaterialCacheKeys.length > 0) {
+      await Promise.all(
+        matchingMaterialCacheKeys.map(async key => {
+          const material = await loadedOrLoadingThreeMaterials[key];
+          material.dispose();
+          delete loadedOrLoadingThreeMaterials[key];
+        })
+      );
     }
   }
   /**
@@ -503,12 +507,12 @@ export default class PixiResourcesLoader {
    * @param resourceName The name of the resource
    * @returns The requested texture, or a placeholder if not found.
    */
-  static getThreeTexture(
+  static async getThreeTexture(
     project: gdProject,
     resourceName: string
-  ): THREE.Texture {
-    const loadedThreeTexture = loadedThreeTextures[resourceName];
-    if (loadedThreeTexture) return loadedThreeTexture;
+  ): Promise<THREE.Texture> {
+    const loadedOrLoadingPromise = loadedOrLoadingThreeTextures[resourceName];
+    if (loadedOrLoadingPromise) return loadedOrLoadingPromise;
 
     // Texture is not loaded, load it now from the PixiJS texture.
     // TODO (3D) - optimization: don't load the PixiJS Texture if not used by PixiJS.
@@ -517,6 +521,15 @@ export default class PixiResourcesLoader {
       project,
       resourceName
     );
+
+    if (!pixiTexture.baseTexture.valid) {
+      // Post pone texture update if texture is not loaded.
+      return new Promise(resolve => {
+        pixiTexture.once('update', () =>
+          resolve(this.getThreeTexture(project, resourceName))
+        );
+      });
+    }
 
     // @ts-ignore - source does exist on resource.
     const image = pixiTexture.baseTexture.resource.source;
@@ -537,9 +550,9 @@ export default class PixiResourcesLoader {
     const resource = project.getResourcesManager().getResource(resourceName);
     applyThreeTextureSettings(resource, threeTexture);
 
-    loadedThreeTextures[resourceName] = threeTexture;
-
-    return threeTexture;
+    return (loadedOrLoadingThreeTextures[resourceName] = Promise.resolve(
+      threeTexture
+    ));
   }
 
   /**
@@ -549,23 +562,31 @@ export default class PixiResourcesLoader {
    * @param options Set if the material should be transparent or not.
    * @returns The requested material.
    */
-  static getThreeMaterial(
+  static async getThreeMaterial(
     project: gdProject,
     resourceName: string,
-    { useTransparentTexture }: {| useTransparentTexture: boolean |}
-  ) {
+    {
+      useTransparentTexture,
+    }: {|
+      useTransparentTexture: boolean,
+    |}
+  ): Promise<THREE.Material> {
     const cacheKey = `${resourceName}|transparent:${useTransparentTexture.toString()}`;
-    const loadedThreeMaterial = loadedThreeMaterials[cacheKey];
-    if (loadedThreeMaterial) return loadedThreeMaterial;
+    const loadedOrLoadingPromise = loadedOrLoadingThreeMaterials[cacheKey];
+    if (loadedOrLoadingPromise) return loadedOrLoadingPromise;
 
-    const material = new THREE.MeshBasicMaterial({
-      map: this.getThreeTexture(project, resourceName),
-      side: useTransparentTexture ? THREE.DoubleSide : THREE.FrontSide,
-      transparent: useTransparentTexture,
-    });
+    return (loadedOrLoadingThreeMaterials[cacheKey] = this.getThreeTexture(
+      project,
+      resourceName
+    ).then(texture => {
+      const material = new THREE.MeshBasicMaterial({
+        map: texture,
+        side: useTransparentTexture ? THREE.DoubleSide : THREE.FrontSide,
+        transparent: useTransparentTexture,
+      });
 
-    loadedThreeMaterials[cacheKey] = material;
-    return material;
+      return material;
+    }));
   }
 
   /**

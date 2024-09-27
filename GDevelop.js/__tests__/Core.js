@@ -2105,38 +2105,35 @@ describe('libGD.js', function () {
   describe('gd.ObjectJsImplementation', function () {
     const createSampleObjectJsImplementation = () => {
       let myObject = new gd.ObjectJsImplementation();
-      myObject.updateProperty = function (content, propertyName, newValue) {
+      myObject.updateProperty = function (propertyName, newValue) {
         if (propertyName === 'My first property') {
-          content.property1 = newValue;
+          this.content.property1 = newValue;
           return true;
         }
         if (propertyName === 'My other property') {
-          content.property2 = newValue === '1';
+          this.content.property2 = newValue === '1';
           return true;
         }
 
         return false;
       };
-      myObject.getProperties = function (content) {
+      myObject.getProperties = function () {
         let properties = new gd.MapStringPropertyDescriptor();
 
-        properties.getOrCreate('My first property').setValue(content.property1);
+        properties.getOrCreate('My first property').setValue(this.content.property1);
         properties
           .getOrCreate('My other property')
-          .setValue(content.property2 ? '1' : '0')
+          .setValue(this.content.property2 ? '1' : '0')
           .setType('Boolean');
 
         return properties;
       };
-      myObject.setRawJSONContent(
-        JSON.stringify({
-          property1: 'Initial value 1',
-          property2: true,
-        })
-      );
+      myObject.content = {
+        property1: 'Initial value 1',
+        property2: true,
+      };
 
       myObject.updateInitialInstanceProperty = function (
-        content,
         instance,
         propertyName,
         newValue
@@ -2153,7 +2150,6 @@ describe('libGD.js', function () {
         return false;
       };
       myObject.getInitialInstanceProperties = function (
-        content,
         instance
       ) {
         let properties = new gd.MapStringPropertyDescriptor();
@@ -2169,11 +2165,8 @@ describe('libGD.js', function () {
         return properties;
       };
 
-      // TODO: Workaround a bad design of ObjectJsImplementation. When getProperties
-      // and associated methods are redefined in JS, they have different arguments (
-      // see ObjectJsImplementation C++ implementation). If called directly here from JS,
-      // the arguments will be mismatched. To workaround this, always case the object to
-      // a base gdObject to ensure C++ methods are called.
+      // Cast the object to a base gdObjectConfiguration to ensure C++ methods are called,
+      // and verify they properly call their JS equivalents.
       return gd.castObject(myObject, gd.ObjectConfiguration);
     };
 
@@ -2229,7 +2222,12 @@ describe('libGD.js', function () {
       const object2 = object1.clone().release();
       const object3 = object1.clone().release();
 
+      const object1jsImplementation = gd.castObject(object1, gd.ObjectJsImplementation);
+      const object2jsImplementation = gd.castObject(object2, gd.ObjectJsImplementation);
+      const object3jsImplementation = gd.castObject(object3, gd.ObjectJsImplementation);
+
       {
+        // Check properties can be accessed.
         const propertiesObject1 = object1.getProperties();
         expect(propertiesObject1.has('My first property'));
         expect(
@@ -2240,9 +2238,24 @@ describe('libGD.js', function () {
         expect(
           propertiesObject2.get('My first property').getValue() == 'test1'
         );
+
+        // Check the JavaScript objects are unchanged for now.
+        expect(object1jsImplementation.content).toEqual({
+          property1: 'test1',
+          property2: true,
+        });
+        expect(object2jsImplementation.content).toEqual({
+          property1: 'test1',
+          property2: true,
+        });
+        expect(object3jsImplementation.content).toEqual({
+          property1: 'test1',
+          property2: true,
+        });
       }
 
       {
+        // Check a property can be updated.
         object1.updateProperty('My first property', 'updated value');
         const propertiesObject1 = object1.getProperties();
         expect(propertiesObject1.has('My first property'));
@@ -2255,9 +2268,24 @@ describe('libGD.js', function () {
         expect(
           propertiesObject2.get('My first property').getValue() == 'test1'
         );
+
+        // Check the JavaScript objects are updated.
+        expect(object1jsImplementation.content).toEqual({
+          property1: 'updated value',
+          property2: true,
+        });
+        expect(object2jsImplementation.content).toEqual({
+          property1: 'test1',
+          property2: true,
+        });
+        expect(object3jsImplementation.content).toEqual({
+          property1: 'test1',
+          property2: true,
+        });
       }
 
       {
+        // Check a property from another object can be updated.
         object2.updateProperty('My first property', 'updated value object 2');
         const propertiesObject1 = object1.getProperties();
         expect(propertiesObject1.has('My first property'));
@@ -2276,6 +2304,20 @@ describe('libGD.js', function () {
         expect(
           propertiesObject3.get('My first property').getValue() == 'test1'
         );
+
+        // Check the JavaScript objects are updated.
+        expect(object1jsImplementation.content).toEqual({
+          property1: 'updated value',
+          property2: true,
+        });
+        expect(object2jsImplementation.content).toEqual({
+          property1: 'updated value object 2',
+          property2: true,
+        });
+        expect(object3jsImplementation.content).toEqual({
+          property1: 'test1',
+          property2: true,
+        });
       }
     });
   });

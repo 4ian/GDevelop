@@ -1239,7 +1239,7 @@ storiesOf('PropertiesEditor', module)
         {
           name: 'Object name',
           valueType: 'string',
-          disabled: true,
+          disabled: () => true,
           getValue: instance => 'Disabled field',
           setValue: (instance, newValue) => {},
         },
@@ -1305,7 +1305,7 @@ storiesOf('PropertiesEditor', module)
         {
           name: 'Object name',
           valueType: 'string',
-          disabled: true,
+          disabled: () => true,
           getValue: instance => 'Disabled field',
           setValue: (instance, newValue) => {},
           getDescription: () =>

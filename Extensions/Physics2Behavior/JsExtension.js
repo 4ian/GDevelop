@@ -185,7 +185,12 @@ module.exports = {
         .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
         .addExtraInfo('Static')
         .addExtraInfo('Dynamic')
-        .addExtraInfo('Kinematic');
+        .addExtraInfo('Kinematic')
+        .setDescription(
+          _(
+            "A static object won't move (perfect for obstacles). Dynamic objects can move. Kinematic will move according to forces applied to it only (useful for characters or specific mechanisms)."
+          )
+        );
       behaviorProperties
         .getOrCreate('bullet')
         .setValue(
@@ -193,7 +198,14 @@ module.exports = {
         )
         .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
         .setType('Boolean')
-        .setLabel('Bullet');
+        .setLabel(_('Considered as a bullet'))
+        .setDescription(
+          _(
+            'Useful for fast moving objects which requires a more accurate collision detection.'
+          )
+        )
+        .setGroup(_('Physics body advanced settings'))
+        .setAdvanced(true);
       behaviorProperties
         .getOrCreate('fixedRotation')
         .setValue(
@@ -203,7 +215,13 @@ module.exports = {
         )
         .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
         .setType('Boolean')
-        .setLabel('Fixed Rotation');
+        .setLabel('Fixed Rotation')
+        .setDescription(
+          _(
+            "If enabled, the object won't rotate and will stay at the same angle. Useful for characters for example."
+          )
+        )
+        .setGroup(_('Movement'));
       behaviorProperties
         .getOrCreate('canSleep')
         .setValue(
@@ -211,7 +229,14 @@ module.exports = {
         )
         .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
         .setType('Boolean')
-        .setLabel('Can Sleep');
+        .setLabel(_('Can be put to sleep by the engine'))
+        .setDescription(
+          _(
+            "Allows the physics engine to stop computing interaction with the object when it's not touched. It's recommended to keep this on."
+          )
+        )
+        .setGroup(_('Physics body advanced settings'))
+        .setAdvanced(true);
       behaviorProperties
         .getOrCreate('shape')
         .setValue(behaviorContent.getChild('shape').getStringValue())
@@ -233,7 +258,8 @@ module.exports = {
         .setType('Number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
         .setLabel('Shape Dimension A')
-        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+        .setHidden(true); // Hidden as required to be changed in the full editor.
       behaviorProperties
         .getOrCreate('shapeDimensionB')
         .setValue(
@@ -245,7 +271,8 @@ module.exports = {
         .setType('Number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
         .setLabel('Shape Dimension B')
-        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+        .setHidden(true); // Hidden as required to be changed in the full editor.
       behaviorProperties
         .getOrCreate('shapeOffsetX')
         .setValue(
@@ -254,7 +281,8 @@ module.exports = {
         .setType('Number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
         .setLabel('Shape Offset X')
-        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+        .setHidden(true); // Hidden as required to be changed in the full editor.
       behaviorProperties
         .getOrCreate('shapeOffsetY')
         .setValue(
@@ -263,7 +291,8 @@ module.exports = {
         .setType('Number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
         .setLabel('Shape Offset Y')
-        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+        .setHidden(true); // Hidden as required to be changed in the full editor.
       behaviorProperties
         .getOrCreate('polygonOrigin')
         .setValue(
@@ -276,7 +305,8 @@ module.exports = {
         .addExtraInfo('Center')
         .addExtraInfo('Origin')
         .addExtraInfo('TopLeft')
-        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+        .setHidden(true); // Hidden as required to be changed in the full editor.
       behaviorProperties
         .getOrCreate('vertices')
         .setValue(
@@ -285,28 +315,44 @@ module.exports = {
             : '[]'
         )
         .setLabel('Vertices')
-        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+        .setHidden(true); // Hidden as required to be changed in the full editor.
       behaviorProperties
         .getOrCreate('density')
         .setValue(
           behaviorContent.getChild('density').getDoubleValue().toString(10)
         )
         .setType('Number')
-        .setLabel('Density');
+        .setLabel(_('Density'))
+        .setDescription(
+          _(
+            'Define the weight of the object, according to its size. The biggeer the density, the heavier the object.'
+          )
+        );
       behaviorProperties
         .getOrCreate('friction')
         .setValue(
           behaviorContent.getChild('friction').getDoubleValue().toString(10)
         )
         .setType('Number')
-        .setLabel('Friction');
+        .setLabel(_('Friction'))
+        .setDescription(
+          _(
+            'The friction applied when touching other objects. The higher the value, the more friction.'
+          )
+        );
       behaviorProperties
         .getOrCreate('restitution')
         .setValue(
           behaviorContent.getChild('restitution').getDoubleValue().toString(10)
         )
         .setType('Number')
-        .setLabel('Restitution');
+        .setLabel(_('Restitution'))
+        .setDescription(
+          _(
+            'The "bounciness" of the object. The higher the value, the more other objects will bounce against it.'
+          )
+        );
       behaviorProperties
         .getOrCreate('linearDamping')
         .setValue(
@@ -316,7 +362,9 @@ module.exports = {
             .toString(10)
         )
         .setType('Number')
-        .setLabel('Linear Damping');
+        .setLabel(_('Linear Damping'))
+        .setGroup(_('Movement'));
+
       behaviorProperties
         .getOrCreate('angularDamping')
         .setValue(
@@ -326,8 +374,9 @@ module.exports = {
             .toString(10)
         )
         .setType('Number')
-        .setLabel('Angular Damping')
-        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+        .setLabel(_('Angular Damping'))
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+        .setGroup(_('Movement'));
       behaviorProperties
         .getOrCreate('gravityScale')
         .setValue(
@@ -335,19 +384,23 @@ module.exports = {
         )
         .setType('Number')
         .setLabel('Gravity Scale')
-        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+        .setGroup(_('Gravity'))
+        .setAdvanced(true);
       behaviorProperties
         .getOrCreate('layers')
         .setValue(behaviorContent.getChild('layers').getIntValue().toString(10))
         .setType('Number')
         .setLabel('Layers')
-        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+        .setHidden(true); // Hidden as required to be changed in the full editor.
       behaviorProperties
         .getOrCreate('masks')
         .setValue(behaviorContent.getChild('masks').getIntValue().toString(10))
         .setType('Number')
         .setLabel('Masks')
-        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+        .setHidden(true); // Hidden as required to be changed in the full editor.
 
       return behaviorProperties;
     };
@@ -474,9 +527,8 @@ module.exports = {
       )
       .setIncludeFile('Extensions/Physics2Behavior/physics2runtimebehavior.js')
       .addIncludeFile('Extensions/Physics2Behavior/Box2D_v2.3.1_min.wasm.js')
-      .addRequiredFile(
-        'Extensions/Physics2Behavior/Box2D_v2.3.1_min.wasm.wasm'
-      );
+      .addRequiredFile('Extensions/Physics2Behavior/Box2D_v2.3.1_min.wasm.wasm')
+      .setOpenFullEditorLabel(_('Edit shape and avanced settings'));
 
     // Global
     aut

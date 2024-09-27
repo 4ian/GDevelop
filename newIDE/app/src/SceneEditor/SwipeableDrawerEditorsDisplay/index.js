@@ -28,9 +28,10 @@ import {
   type SceneEditorsDisplayProps,
 } from '../EditorsDisplay.flow';
 import ErrorBoundary from '../../UI/ErrorBoundary';
-import CompactInstancePropertiesEditorContainer, {
-  type CompactInstancePropertiesEditorInterface,
-} from '../../InstancesEditor/CompactInstancePropertiesEditor';
+import {
+  InstanceOrObjectPropertiesEditorContainer,
+  type InstanceOrObjectPropertiesEditorInterface,
+} from '../InstanceOrObjectPropertiesEditorContainer';
 
 export const swipeableDrawerContainerId = 'swipeable-drawer-container';
 
@@ -57,9 +58,11 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
 >((props, ref) => {
   const {
     project,
+    resourceManagementProps,
     layout,
     eventsFunctionsExtension,
     eventsBasedObject,
+    updateBehaviorsSharedData,
     layersContainer,
     globalObjectsContainer,
     objectsContainer,
@@ -72,7 +75,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
   const { values } = React.useContext(PreferencesContext);
   const screenType = useScreenType();
 
-  const instancesPropertiesEditorRef = React.useRef<?CompactInstancePropertiesEditorInterface>(
+  const instanceOrObjectPropertiesEditorRef = React.useRef<?InstanceOrObjectPropertiesEditorInterface>(
     null
   );
   const layersListRef = React.useRef<?LayersListInterface>(null);
@@ -105,9 +108,9 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
     [selectedEditorId, drawerOpeningState]
   );
 
-  const forceUpdateInstancesPropertiesEditor = React.useCallback(() => {
-    if (instancesPropertiesEditorRef.current)
-      instancesPropertiesEditorRef.current.forceUpdate();
+  const forceUpdatePropertiesEditor = React.useCallback(() => {
+    if (instanceOrObjectPropertiesEditorRef.current)
+      instanceOrObjectPropertiesEditorRef.current.forceUpdate();
   }, []);
   const forceUpdateInstancesList = React.useCallback(() => {
     if (instancesListRef.current) instancesListRef.current.forceUpdate();
@@ -159,7 +162,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
     return {
       getName: () => 'swipeableDrawer',
       forceUpdateInstancesList,
-      forceUpdateInstancesPropertiesEditor,
+      forceUpdatePropertiesEditor,
       forceUpdateObjectsList,
       forceUpdateObjectGroupsList,
       scrollObjectGroupsListToObjectGroup,
@@ -209,25 +212,21 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
     (instances: Array<gdInitialInstance>, multiSelect: boolean) => {
       onSelectInstances(instances, multiSelect, 'upperCenter');
       forceUpdateInstancesList();
-      forceUpdateInstancesPropertiesEditor();
+      forceUpdatePropertiesEditor();
     },
-    [
-      forceUpdateInstancesList,
-      forceUpdateInstancesPropertiesEditor,
-      onSelectInstances,
-    ]
+    [forceUpdateInstancesList, forceUpdatePropertiesEditor, onSelectInstances]
   );
 
-  const selectedObjectNames = props.selectedObjectFolderOrObjectsWithContext
+  const selectedObjects = props.selectedObjectFolderOrObjectsWithContext
     .map(objectFolderOrObjectWithContext => {
       const { objectFolderOrObject } = objectFolderOrObjectWithContext;
-
       if (!objectFolderOrObject) return null; // Protect ourselves from an unexpected null value.
-
       if (objectFolderOrObject.isFolder()) return null;
-      return objectFolderOrObject.getObject().getName();
+      return objectFolderOrObject.getObject();
     })
     .filter(Boolean);
+
+  const selectedObjectNames = selectedObjects.map(object => object.getName());
 
   return (
     <FullSizeMeasurer>
@@ -269,6 +268,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
               }
               pauseRendering={!props.isActive}
               showObjectInstancesIn3D={values.use3DEditor}
+              showBasicProfilingCounters={values.showBasicProfilingCounters}
               tileMapTileSelection={props.tileMapTileSelection}
               onSelectTileMapTile={props.onSelectTileMapTile}
             />
@@ -341,26 +341,34 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
               {selectedEditorId === 'properties' && (
                 <I18n>
                   {({ i18n }) => (
-                    <CompactInstancePropertiesEditorContainer
+                    <InstanceOrObjectPropertiesEditorContainer
                       i18n={i18n}
                       project={project}
+                      resourceManagementProps={resourceManagementProps}
                       layout={layout}
+                      eventsFunctionsExtension={eventsFunctionsExtension}
+                      onUpdateBehaviorsSharedData={updateBehaviorsSharedData}
                       objectsContainer={objectsContainer}
                       globalObjectsContainer={globalObjectsContainer}
                       layersContainer={layersContainer}
                       projectScopedContainersAccessor={
                         projectScopedContainersAccessor
                       }
+                      objects={selectedObjects}
                       instances={selectedInstances}
                       editInstanceVariables={props.editInstanceVariables}
-                      onEditObjectByName={props.editObjectByName}
+                      editObjectInPropertiesPanel={
+                        props.editObjectInPropertiesPanel
+                      }
+                      onEditObject={props.onEditObject}
                       onInstancesModified={forceUpdateInstancesList}
                       onGetInstanceSize={getInstanceSize}
-                      ref={instancesPropertiesEditorRef}
+                      ref={instanceOrObjectPropertiesEditorRef}
                       unsavedChanges={props.unsavedChanges}
                       historyHandler={props.historyHandler}
                       tileMapTileSelection={props.tileMapTileSelection}
                       onSelectTileMapTile={props.onSelectTileMapTile}
+                      lastSelectionType={props.lastSelectionType}
                     />
                   )}
                 </I18n>
@@ -420,7 +428,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                   onEditLayer={props.editLayer}
                   onRemoveLayer={props.onRemoveLayer}
                   onLayerRenamed={props.onLayerRenamed}
-                  onCreateLayer={forceUpdateInstancesPropertiesEditor}
+                  onCreateLayer={forceUpdatePropertiesEditor}
                   layersContainer={layersContainer}
                   unsavedChanges={props.unsavedChanges}
                   ref={layersListRef}

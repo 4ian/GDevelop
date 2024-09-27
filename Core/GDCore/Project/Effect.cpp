@@ -12,6 +12,7 @@ namespace gd {
 void Effect::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("name", GetName());
   element.SetAttribute("effectType", GetEffectType());
+  if (IsFolded()) element.SetBoolAttribute("folded", true);
 
   SerializerElement& doubleParametersElement =
       element.AddChild("doubleParameters");
@@ -41,6 +42,7 @@ void Effect::UnserializeFrom(const SerializerElement& element) {
       "effectName"
       // end of compatibility code
       ));
+  SetFolded(element.GetBoolAttribute("folded", false));
 
   doubleParameters.clear();
   const SerializerElement& doubleParametersElement =

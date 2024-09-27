@@ -48,15 +48,9 @@ class GD_EXTENSION_API ParticleEmitterBase {
   void SetParticleGravityAngle(double newAngleInDegree);
   void SetParticleGravityLength(double newLength);
 
-  void SetParticleColor1(const gd::String& color);
-  void SetParticleColor2(const gd::String& color);
+  void SetParticleColor1(const gd::String& color) { particleColor1 = color; };
+  void SetParticleColor2(const gd::String& color) { particleColor2 = color; };
 
-  void SetParticleRed1(double newValue) { particleRed1 = newValue; };
-  void SetParticleRed2(double newValue) { particleRed2 = newValue; };
-  void SetParticleGreen1(double newValue) { particleGreen1 = newValue; };
-  void SetParticleGreen2(double newValue) { particleGreen2 = newValue; };
-  void SetParticleBlue1(double newValue) { particleBlue1 = newValue; };
-  void SetParticleBlue2(double newValue) { particleBlue2 = newValue; };
   void SetParticleAlpha1(double newValue) { particleAlpha1 = newValue; };
   void SetParticleAlpha2(double newValue) { particleAlpha2 = newValue; };
   void SetParticleSize1(double newValue) { particleSize1 = newValue; };
@@ -91,7 +85,7 @@ class GD_EXTENSION_API ParticleEmitterBase {
   void SetDestroyWhenNoParticles(bool enable = true) {
     destroyWhenNoParticles = enable;
   };
-  void SetJumpForwardInTimeOnCreation(double newValue) { 
+  void SetJumpForwardInTimeOnCreation(double newValue) {
     jumpForwardInTimeOnCreation = newValue;
   };
 
@@ -114,12 +108,8 @@ class GD_EXTENSION_API ParticleEmitterBase {
   std::size_t GetMaxParticleNb() const { return maxParticleNb; };
   bool GetDestroyWhenNoParticles() const { return destroyWhenNoParticles; };
 
-  double GetParticleRed1() const { return particleRed1; };
-  double GetParticleRed2() const { return particleRed2; };
-  double GetParticleGreen1() const { return particleGreen1; };
-  double GetParticleGreen2() const { return particleGreen2; };
-  double GetParticleBlue1() const { return particleBlue1; };
-  double GetParticleBlue2() const { return particleBlue2; };
+  const gd::String& GetParticleColor1() const { return particleColor1; };
+  const gd::String& GetParticleColor2() const { return particleColor2; };
   double GetParticleAlpha1() const { return particleAlpha1; };
   double GetParticleAlpha2() const { return particleAlpha2; };
   double GetParticleSize1() const { return particleSize1; };
@@ -146,7 +136,7 @@ class GD_EXTENSION_API ParticleEmitterBase {
   void SetRendererType(RendererType type) { rendererType = type; };
   RendererType GetRendererType() const { return rendererType; };
 
-  bool IsRenderingAdditive() { return additive; };
+  bool IsRenderingAdditive() const { return additive; };
   void SetRenderingAdditive() { additive = true; };
   void SetRenderingAlpha() { additive = false; };
 
@@ -173,8 +163,9 @@ class GD_EXTENSION_API ParticleEmitterBase {
   double zoneRadius;
   double particleGravityX, particleGravityY;
   double particleLifeTimeMin, particleLifeTimeMax;
-  double particleRed1, particleRed2, particleGreen1, particleGreen2,
-      particleBlue1, particleBlue2, particleAlpha1, particleAlpha2;
+  gd::String particleColor1;
+  gd::String particleColor2;
+  double particleAlpha1, particleAlpha2;
   double particleSize1, particleSize2, particleAngle1, particleAngle2;
   double particleAlphaRandomness1, particleAlphaRandomness2;
   double particleSizeRandomness1, particleSizeRandomness2,
@@ -194,16 +185,22 @@ class GD_EXTENSION_API ParticleEmitterObject : public gd::ObjectConfiguration,
  public:
   ParticleEmitterObject();
   virtual ~ParticleEmitterObject(){};
-  virtual std::unique_ptr<gd::ObjectConfiguration> Clone() const {
+  virtual std::unique_ptr<gd::ObjectConfiguration> Clone() const override {
     return gd::make_unique<ParticleEmitterObject>(*this);
   }
 
-  virtual void ExposeResources(gd::ArbitraryResourceWorker& worker);
+  virtual void ExposeResources(gd::ArbitraryResourceWorker& worker) override;
+
+  virtual std::map<gd::String, gd::PropertyDescriptor>
+  GetProperties() const override;
+
+  virtual bool UpdateProperty(const gd::String &name,
+                              const gd::String &value) override;
 
  private:
   virtual void DoUnserializeFrom(gd::Project& project,
-                                 const gd::SerializerElement& element);
-  virtual void DoSerializeTo(gd::SerializerElement& element) const;
+                                 const gd::SerializerElement& element) override;
+  virtual void DoSerializeTo(gd::SerializerElement& element) const override;
 };
 
 #endif  // PARTICLEEMITTEROBJECT_H

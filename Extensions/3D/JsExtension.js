@@ -803,11 +803,8 @@ module.exports = {
     }
 
     const Cube3DObject = new gd.ObjectJsImplementation();
-    Cube3DObject.updateProperty = function (
-      objectContent,
-      propertyName,
-      newValue
-    ) {
+    Cube3DObject.updateProperty = function (propertyName, newValue) {
+      const objectContent = this.content;
       if (
         propertyName === 'width' ||
         propertyName === 'height' ||
@@ -851,8 +848,9 @@ module.exports = {
 
       return false;
     };
-    Cube3DObject.getProperties = function (objectContent) {
+    Cube3DObject.getProperties = function () {
       const objectProperties = new gd.MapStringPropertyDescriptor();
+      const objectContent = this.content;
 
       objectProperties
         .getOrCreate('enableTextureTransparency')
@@ -878,7 +876,8 @@ module.exports = {
             'The top of each image can touch the **top face** (Y) or the **front face** (Z).'
           )
         )
-        .setGroup(_('Face orientation'));
+        .setGroup(_('Face orientation'))
+        .setAdvanced(true);
 
       objectProperties
         .getOrCreate('width')
@@ -909,7 +908,7 @@ module.exports = {
         .setValue(objectContent.frontFaceResourceName || '')
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Front face image'))
+        .setLabel(_('Front face'))
         .setGroup(_('Textures'));
 
       objectProperties
@@ -917,7 +916,7 @@ module.exports = {
         .setValue(objectContent.backFaceResourceName || '')
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Back face image'))
+        .setLabel(_('Back face'))
         .setGroup(_('Textures'));
 
       objectProperties
@@ -932,14 +931,15 @@ module.exports = {
             'The top of the image can touch the **top face** (Y) or the **bottom face** (X).'
           )
         )
-        .setGroup(_('Textures'));
+        .setGroup(_('Face orientation'))
+        .setAdvanced(true);
 
       objectProperties
         .getOrCreate('leftFaceResourceName')
         .setValue(objectContent.leftFaceResourceName || '')
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Left face image'))
+        .setLabel(_('Left face'))
         .setGroup(_('Textures'));
 
       objectProperties
@@ -947,7 +947,7 @@ module.exports = {
         .setValue(objectContent.rightFaceResourceName || '')
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Right face image'))
+        .setLabel(_('Right face'))
         .setGroup(_('Textures'));
 
       objectProperties
@@ -955,7 +955,7 @@ module.exports = {
         .setValue(objectContent.topFaceResourceName || '')
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Top face image'))
+        .setLabel(_('Top face'))
         .setGroup(_('Textures'));
 
       objectProperties
@@ -963,92 +963,98 @@ module.exports = {
         .setValue(objectContent.bottomFaceResourceName || '')
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Bottom face image'))
+        .setLabel(_('Bottom face'))
         .setGroup(_('Textures'));
 
       objectProperties
         .getOrCreate('frontFaceResourceRepeat')
         .setValue(objectContent.frontFaceResourceRepeat ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Tile front face image'))
+        .setLabel(_('Tile'))
         .setGroup(_('Textures'));
 
       objectProperties
         .getOrCreate('backFaceResourceRepeat')
         .setValue(objectContent.backFaceResourceRepeat ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Tile back face image'))
+        .setLabel(_('Tile'))
         .setGroup(_('Textures'));
 
       objectProperties
         .getOrCreate('leftFaceResourceRepeat')
         .setValue(objectContent.leftFaceResourceRepeat ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Tile left face image'))
+        .setLabel(_('Tile'))
         .setGroup(_('Textures'));
 
       objectProperties
         .getOrCreate('rightFaceResourceRepeat')
         .setValue(objectContent.rightFaceResourceRepeat ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Tile right face image'))
+        .setLabel(_('Tile'))
         .setGroup(_('Textures'));
 
       objectProperties
         .getOrCreate('topFaceResourceRepeat')
         .setValue(objectContent.topFaceResourceRepeat ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Tile top face image'))
+        .setLabel(_('Tile'))
         .setGroup(_('Textures'));
 
       objectProperties
         .getOrCreate('bottomFaceResourceRepeat')
         .setValue(objectContent.bottomFaceResourceRepeat ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Tile bottom face image'))
+        .setLabel(_('Tile'))
         .setGroup(_('Textures'));
 
       objectProperties
         .getOrCreate('frontFaceVisible')
         .setValue(objectContent.frontFaceVisible ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Show front face'))
-        .setGroup(_('Face visibility'));
+        .setLabel(_('Front face'))
+        .setGroup(_('Face visibility'))
+        .setAdvanced(true);
 
       objectProperties
         .getOrCreate('backFaceVisible')
         .setValue(objectContent.backFaceVisible ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Show back face'))
-        .setGroup(_('Face visibility'));
+        .setLabel(_('Back face'))
+        .setGroup(_('Face visibility'))
+        .setAdvanced(true);
 
       objectProperties
         .getOrCreate('leftFaceVisible')
         .setValue(objectContent.leftFaceVisible ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Show left face'))
-        .setGroup(_('Face visibility'));
+        .setLabel(_('Left face'))
+        .setGroup(_('Face visibility'))
+        .setAdvanced(true);
 
       objectProperties
         .getOrCreate('rightFaceVisible')
         .setValue(objectContent.rightFaceVisible ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Show right face'))
-        .setGroup(_('Face visibility'));
+        .setLabel(_('Right face'))
+        .setGroup(_('Face visibility'))
+        .setAdvanced(true);
 
       objectProperties
         .getOrCreate('topFaceVisible')
         .setValue(objectContent.topFaceVisible ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Show top face'))
-        .setGroup(_('Face visibility'));
+        .setLabel(_('Top face'))
+        .setGroup(_('Face visibility'))
+        .setAdvanced(true);
 
       objectProperties
         .getOrCreate('bottomFaceVisible')
         .setValue(objectContent.bottomFaceVisible ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Show bottom face'))
-        .setGroup(_('Face visibility'));
+        .setLabel(_('Bottom face'))
+        .setGroup(_('Face visibility'))
+        .setAdvanced(true);
 
       objectProperties
         .getOrCreate('materialType')
@@ -1060,38 +1066,35 @@ module.exports = {
 
       return objectProperties;
     };
-    Cube3DObject.setRawJSONContent(
-      JSON.stringify({
-        width: 100,
-        height: 100,
-        depth: 100,
-        enableTextureTransparency: false,
-        facesOrientation: 'Y',
-        frontFaceResourceName: '',
-        backFaceResourceName: '',
-        backFaceUpThroughWhichAxisRotation: 'X',
-        leftFaceResourceName: '',
-        rightFaceResourceName: '',
-        topFaceResourceName: '',
-        bottomFaceResourceName: '',
-        frontFaceVisible: true,
-        backFaceVisible: false,
-        leftFaceVisible: true,
-        rightFaceVisible: true,
-        topFaceVisible: true,
-        bottomFaceVisible: true,
-        frontFaceResourceRepeat: false,
-        backFaceResourceRepeat: false,
-        leftFaceResourceRepeat: false,
-        rightFaceResourceRepeat: false,
-        topFaceResourceRepeat: false,
-        bottomFaceResourceRepeat: false,
-        materialType: 'Basic',
-      })
-    );
+    Cube3DObject.content = {
+      width: 100,
+      height: 100,
+      depth: 100,
+      enableTextureTransparency: false,
+      facesOrientation: 'Y',
+      frontFaceResourceName: '',
+      backFaceResourceName: '',
+      backFaceUpThroughWhichAxisRotation: 'X',
+      leftFaceResourceName: '',
+      rightFaceResourceName: '',
+      topFaceResourceName: '',
+      bottomFaceResourceName: '',
+      frontFaceVisible: true,
+      backFaceVisible: false,
+      leftFaceVisible: true,
+      rightFaceVisible: true,
+      topFaceVisible: true,
+      bottomFaceVisible: true,
+      frontFaceResourceRepeat: false,
+      backFaceResourceRepeat: false,
+      leftFaceResourceRepeat: false,
+      rightFaceResourceRepeat: false,
+      topFaceResourceRepeat: false,
+      bottomFaceResourceRepeat: false,
+      materialType: 'Basic',
+    };
 
     Cube3DObject.updateInitialInstanceProperty = function (
-      objectContent,
       instance,
       propertyName,
       newValue
@@ -1099,7 +1102,7 @@ module.exports = {
       return false;
     };
 
-    Cube3DObject.getInitialInstanceProperties = function (content, instance) {
+    Cube3DObject.getInitialInstanceProperties = function (instance) {
       const instanceProperties = new gd.MapStringPropertyDescriptor();
       return instanceProperties;
     };
@@ -2060,7 +2063,10 @@ module.exports = {
     };
 
     const getFirstVisibleFaceResourceName = (objectConfiguration) => {
-      const properties = objectConfiguration.getProperties();
+      const object = gd.castObject(
+        objectConfiguration,
+        gd.ObjectJsImplementation
+      );
 
       const orderedFaces = [
         ['frontFaceVisible', 'frontFaceResourceName'],
@@ -2075,10 +2081,8 @@ module.exports = {
         faceVisibleProperty,
         faceResourceNameProperty,
       ] of orderedFaces) {
-        if (properties.get(faceVisibleProperty).getValue() === 'true') {
-          const textureResource = properties
-            .get(faceResourceNameProperty)
-            .getValue();
+        if (object.content[faceVisibleProperty]) {
+          const textureResource = object.content[faceResourceNameProperty];
           if (textureResource) return textureResource;
         }
       }
@@ -2124,10 +2128,14 @@ module.exports = {
         // Name of the resource that is rendered.
         // If no face is visible, this will be null.
         this._renderedResourceName = undefined;
-        const properties = associatedObjectConfiguration.getProperties();
-        this._defaultWidth = parseFloat(properties.get('width').getValue());
-        this._defaultHeight = parseFloat(properties.get('height').getValue());
-        this._defaultDepth = parseFloat(properties.get('depth').getValue());
+
+        const object = gd.castObject(
+          this._associatedObjectConfiguration,
+          gd.ObjectJsImplementation
+        );
+        this._defaultWidth = object.content.width;
+        this._defaultHeight = object.content.height;
+        this._defaultDepth = object.content.depth;
 
         this._pixiObject = new PIXI.Container();
         this._pixiFallbackObject = new PIXI.Graphics();
@@ -2315,70 +2323,67 @@ module.exports = {
           pixiResourcesLoader
         );
 
-        const properties = associatedObjectConfiguration.getProperties();
-        this._defaultWidth = parseFloat(properties.get('width').getValue());
-        this._defaultHeight = parseFloat(properties.get('height').getValue());
-        this._defaultDepth = parseFloat(properties.get('depth').getValue());
+        this._defaultWidth = 1;
+        this._defaultHeight = 1;
+        this._defaultDepth = 1;
 
         this._pixiObject = new PIXI.Graphics();
         this._pixiContainer.addChild(this._pixiObject);
 
-        this._faceResourceNames = [
-          properties.get('frontFaceResourceName').getValue(),
-          properties.get('backFaceResourceName').getValue(),
-          properties.get('leftFaceResourceName').getValue(),
-          properties.get('rightFaceResourceName').getValue(),
-          properties.get('topFaceResourceName').getValue(),
-          properties.get('bottomFaceResourceName').getValue(),
-        ];
-        this._faceVisibilities = [
-          properties.get('frontFaceVisible').getValue() === 'true',
-          properties.get('backFaceVisible').getValue() === 'true',
-          properties.get('leftFaceVisible').getValue() === 'true',
-          properties.get('rightFaceVisible').getValue() === 'true',
-          properties.get('topFaceVisible').getValue() === 'true',
-          properties.get('bottomFaceVisible').getValue() === 'true',
-        ];
-        this._shouldRepeatTextureOnFace = [
-          properties.get('frontFaceResourceRepeat').getValue() === 'true',
-          properties.get('backFaceResourceRepeat').getValue() === 'true',
-          properties.get('leftFaceResourceRepeat').getValue() === 'true',
-          properties.get('rightFaceResourceRepeat').getValue() === 'true',
-          properties.get('topFaceResourceRepeat').getValue() === 'true',
-          properties.get('bottomFaceResourceRepeat').getValue() === 'true',
-        ];
-        this._facesOrientation = properties.get('facesOrientation').getValue();
-        this._backFaceUpThroughWhichAxisRotation = properties
-          .get('backFaceUpThroughWhichAxisRotation')
-          .getValue();
-        this._shouldUseTransparentTexture =
-          properties.get('enableTextureTransparency').getValue() === 'true';
+        this._faceResourceNames = ['', '', '', '', '', ''];
+        this._faceVisibilities = [true, true, true, true, true, true];
+        this._shouldRepeatTextureOnFace = [true, true, true, true, true, true];
+        this._facesOrientation = 'Y';
+        this._backFaceUpThroughWhichAxisRotation = 'X';
+        this._shouldUseTransparentTexture = false;
 
         const geometry = new THREE.BoxGeometry(1, 1, 1);
         const materials = [
-          this._getFaceMaterial(project, materialIndexToFaceIndex[0]),
-          this._getFaceMaterial(project, materialIndexToFaceIndex[1]),
-          this._getFaceMaterial(project, materialIndexToFaceIndex[2]),
-          this._getFaceMaterial(project, materialIndexToFaceIndex[3]),
-          this._getFaceMaterial(project, materialIndexToFaceIndex[4]),
-          this._getFaceMaterial(project, materialIndexToFaceIndex[5]),
+          getTransparentMaterial(),
+          getTransparentMaterial(),
+          getTransparentMaterial(),
+          getTransparentMaterial(),
+          getTransparentMaterial(),
+          getTransparentMaterial(),
         ];
         this._threeObject = new THREE.Mesh(geometry, materials);
         this._threeObject.rotation.order = 'ZYX';
-
         this._threeGroup.add(this._threeObject);
+
+        this.updateThreeObject();
       }
 
-      _getFaceMaterial(project, faceIndex) {
-        if (!this._faceVisibilities[faceIndex]) return getTransparentMaterial();
+      async _updateThreeObjectMaterials() {
+        const getFaceMaterial = async (project, faceIndex) => {
+          if (!this._faceVisibilities[faceIndex])
+            return getTransparentMaterial();
 
-        return this._pixiResourcesLoader.getThreeMaterial(
-          project,
-          this._faceResourceNames[faceIndex],
-          {
-            useTransparentTexture: this._shouldUseTransparentTexture,
-          }
-        );
+          return await this._pixiResourcesLoader.getThreeMaterial(
+            project,
+            this._faceResourceNames[faceIndex],
+            {
+              useTransparentTexture: this._shouldUseTransparentTexture,
+            }
+          );
+        };
+
+        const materials = await Promise.all([
+          getFaceMaterial(this._project, materialIndexToFaceIndex[0]),
+          getFaceMaterial(this._project, materialIndexToFaceIndex[1]),
+          getFaceMaterial(this._project, materialIndexToFaceIndex[2]),
+          getFaceMaterial(this._project, materialIndexToFaceIndex[3]),
+          getFaceMaterial(this._project, materialIndexToFaceIndex[4]),
+          getFaceMaterial(this._project, materialIndexToFaceIndex[5]),
+        ]);
+
+        this._threeObject.material[0] = materials[0];
+        this._threeObject.material[1] = materials[1];
+        this._threeObject.material[2] = materials[2];
+        this._threeObject.material[3] = materials[3];
+        this._threeObject.material[4] = materials[4];
+        this._threeObject.material[5] = materials[5];
+
+        this._updateTextureUvMapping();
       }
 
       static _getResourceNameToDisplay(objectConfiguration) {
@@ -2386,6 +2391,15 @@ module.exports = {
       }
 
       updateThreeObject() {
+        const object = gd.castObject(
+          this._associatedObjectConfiguration,
+          gd.ObjectJsImplementation
+        );
+
+        this._defaultWidth = object.content.width;
+        this._defaultHeight = object.content.height;
+        this._defaultDepth = object.content.depth;
+
         const width = this.getWidth();
         const height = this.getHeight();
         const depth = this.getDepth();
@@ -2402,18 +2416,107 @@ module.exports = {
           RenderedInstance.toRad(this._instance.getAngle())
         );
 
+        let materialsDirty = false;
+        let uvMappingDirty = false;
+
+        const shouldUseTransparentTexture =
+          object.content.enableTextureTransparency;
+        if (this._shouldUseTransparentTexture !== shouldUseTransparentTexture) {
+          this._shouldUseTransparentTexture = shouldUseTransparentTexture;
+          materialsDirty = true;
+        }
+
+        const faceResourceNames = [
+          object.content.frontFaceResourceName,
+          object.content.backFaceResourceName,
+          object.content.leftFaceResourceName,
+          object.content.rightFaceResourceName,
+          object.content.topFaceResourceName,
+          object.content.bottomFaceResourceName,
+        ];
+        if (
+          this._faceResourceNames[0] !== faceResourceNames[0] ||
+          this._faceResourceNames[1] !== faceResourceNames[1] ||
+          this._faceResourceNames[2] !== faceResourceNames[2] ||
+          this._faceResourceNames[3] !== faceResourceNames[3] ||
+          this._faceResourceNames[4] !== faceResourceNames[4] ||
+          this._faceResourceNames[5] !== faceResourceNames[5]
+        ) {
+          this._faceResourceNames = faceResourceNames;
+          materialsDirty = true;
+        }
+
+        const faceVisibilities = [
+          object.content.frontFaceVisible,
+          object.content.backFaceVisible,
+          object.content.leftFaceVisible,
+          object.content.rightFaceVisible,
+          object.content.topFaceVisible,
+          object.content.bottomFaceVisible,
+        ];
+        if (
+          this._faceVisibilities[0] !== faceVisibilities[0] ||
+          this._faceVisibilities[1] !== faceVisibilities[1] ||
+          this._faceVisibilities[2] !== faceVisibilities[2] ||
+          this._faceVisibilities[3] !== faceVisibilities[3] ||
+          this._faceVisibilities[4] !== faceVisibilities[4] ||
+          this._faceVisibilities[5] !== faceVisibilities[5]
+        ) {
+          this._faceVisibilities = faceVisibilities;
+          materialsDirty = true;
+          uvMappingDirty = true;
+        }
+
+        const shouldRepeatTextureOnFace = [
+          object.content.frontFaceResourceRepeat,
+          object.content.backFaceResourceRepeat,
+          object.content.leftFaceResourceRepeat,
+          object.content.rightFaceResourceRepeat,
+          object.content.topFaceResourceRepeat,
+          object.content.bottomFaceResourceRepeat,
+        ];
+        if (
+          this._shouldRepeatTextureOnFace[0] !== shouldRepeatTextureOnFace[0] ||
+          this._shouldRepeatTextureOnFace[1] !== shouldRepeatTextureOnFace[1] ||
+          this._shouldRepeatTextureOnFace[2] !== shouldRepeatTextureOnFace[2] ||
+          this._shouldRepeatTextureOnFace[3] !== shouldRepeatTextureOnFace[3] ||
+          this._shouldRepeatTextureOnFace[4] !== shouldRepeatTextureOnFace[4] ||
+          this._shouldRepeatTextureOnFace[5] !== shouldRepeatTextureOnFace[5]
+        ) {
+          this._shouldRepeatTextureOnFace = shouldRepeatTextureOnFace;
+          uvMappingDirty = true;
+        }
+
+        const backFaceUpThroughWhichAxisRotation =
+          object.content.backFaceUpThroughWhichAxisRotation;
+        if (
+          backFaceUpThroughWhichAxisRotation !==
+          this._backFaceUpThroughWhichAxisRotation
+        ) {
+          this._backFaceUpThroughWhichAxisRotation = backFaceUpThroughWhichAxisRotation;
+          uvMappingDirty = true;
+        }
+
+        const facesOrientation = object.content.facesOrientation;
+        if (facesOrientation !== this._facesOrientation) {
+          this._facesOrientation = facesOrientation;
+          uvMappingDirty = true;
+        }
+
         const scaleX = width * (this._instance.isFlippedX() ? -1 : 1);
         const scaleY = height * (this._instance.isFlippedY() ? -1 : 1);
         const scaleZ = depth * (this._instance.isFlippedZ() ? -1 : 1);
-
         if (
-          scaleX !== this._threeObject.scale.width ||
-          scaleY !== this._threeObject.scale.height ||
-          scaleZ !== this._threeObject.scale.depth
+          scaleX !== this._threeObject.scale.x ||
+          scaleY !== this._threeObject.scale.y ||
+          scaleZ !== this._threeObject.scale.z
         ) {
           this._threeObject.scale.set(scaleX, scaleY, scaleZ);
-          this.updateTextureUvMapping();
+          uvMappingDirty = true;
         }
+
+        if (materialsDirty) this._updateThreeObjectMaterials();
+        if (uvMappingDirty) this._updateTextureUvMapping();
       }
 
       /**
@@ -2422,7 +2525,7 @@ module.exports = {
        * The mesh must be configured with a list of materials in order
        * for the method to work.
        */
-      updateTextureUvMapping() {
+      _updateTextureUvMapping() {
         // @ts-ignore - position is stored as a Float32BufferAttribute
         /** @type {THREE.BufferAttribute} */
         const pos = this._threeObject.geometry.getAttribute('position');
@@ -2696,24 +2799,22 @@ module.exports = {
           pixiContainer,
           pixiResourcesLoader
         );
-        const properties = associatedObjectConfiguration.getProperties();
-        this._defaultWidth = parseFloat(properties.get('width').getValue());
-        this._defaultHeight = parseFloat(properties.get('height').getValue());
-        this._defaultDepth = parseFloat(properties.get('depth').getValue());
-        const rotationX = parseFloat(properties.get('rotationX').getValue());
-        const rotationY = parseFloat(properties.get('rotationY').getValue());
-        const rotationZ = parseFloat(properties.get('rotationZ').getValue());
-        const keepAspectRatio =
-          properties.get('keepAspectRatio').getValue() === 'true';
-        const modelResourceName = properties
-          .get('modelResourceName')
-          .getValue();
-        this._originPoint = getPointForLocation(
-          properties.get('originLocation').getValue()
+        const object = gd.castObject(
+          this._associatedObjectConfiguration,
+          gd.Model3DObjectConfiguration
         );
-        this._centerPoint = getPointForLocation(
-          properties.get('centerLocation').getValue()
-        );
+
+        this._defaultWidth = object.getWidth();
+        this._defaultHeight = object.getHeight();
+        this._defaultDepth = object.getDepth();
+        const rotationX = object.getRotationX();
+        const rotationY = object.getRotationY();
+        const rotationZ = object.getRotationZ();
+        const keepAspectRatio = object.shouldKeepAspectRatio();
+        const modelResourceName = object.getModelResourceName();
+
+        this._originPoint = getPointForLocation(object.getOriginLocation());
+        this._centerPoint = getPointForLocation(object.getCenterLocation());
 
         // This renderer shows a placeholder for the object:
         this._pixiObject = new PIXI.Graphics();
@@ -2923,6 +3024,17 @@ module.exports = {
       }
     }
 
+    const isSamePoint = (point1, point2) => {
+      if (!point1 && !point2) return true;
+      if (point1 && !point2) return false;
+      if (!point1 && point2) return false;
+      return (
+        point1[0] === point2[0] &&
+        point1[1] === point2[1] &&
+        point1[2] === point2[2]
+      );
+    };
+
     const getPointForLocation = (location) => {
       switch (location) {
         case 'ModelOrigin':
@@ -2959,24 +3071,20 @@ module.exports = {
           threeGroup,
           pixiResourcesLoader
         );
-        const properties = associatedObjectConfiguration.getProperties();
-        this._defaultWidth = parseFloat(properties.get('width').getValue());
-        this._defaultHeight = parseFloat(properties.get('height').getValue());
-        this._defaultDepth = parseFloat(properties.get('depth').getValue());
-        const rotationX = parseFloat(properties.get('rotationX').getValue());
-        const rotationY = parseFloat(properties.get('rotationY').getValue());
-        const rotationZ = parseFloat(properties.get('rotationZ').getValue());
-        const keepAspectRatio =
-          properties.get('keepAspectRatio').getValue() === 'true';
-        const modelResourceName = properties
-          .get('modelResourceName')
-          .getValue();
-        this._originPoint = getPointForLocation(
-          properties.get('originLocation').getValue()
-        );
-        this._centerPoint = getPointForLocation(
-          properties.get('centerLocation').getValue()
-        );
+
+        this._defaultWidth = 1;
+        this._defaultHeight = 1;
+        this._defaultDepth = 1;
+        this._originalWidth = 1;
+        this._originalHeight = 1;
+        this._originalDepth = 1;
+        this._rotationX = 0;
+        this._rotationY = 0;
+        this._rotationZ = 0;
+        this._keepAspectRatio = false;
+
+        this._originPoint = null;
+        this._centerPoint = null;
 
         this._pixiObject = new PIXI.Graphics();
         this._pixiContainer.addChild(this._pixiObject);
@@ -2985,28 +3093,8 @@ module.exports = {
         this._threeObject.rotation.order = 'ZYX';
         this._threeGroup.add(this._threeObject);
 
-        this._pixiResourcesLoader
-          .get3DModel(project, modelResourceName)
-          .then((model3d) => {
-            const clonedModel3D = THREE_ADDONS.SkeletonUtils.clone(
-              model3d.scene
-            );
-            // This group hold the rotation defined by properties.
-            const threeObject = new THREE.Group();
-            threeObject.rotation.order = 'ZYX';
-            threeObject.add(clonedModel3D);
-            this._updateDefaultTransformation(
-              threeObject,
-              rotationX,
-              rotationY,
-              rotationZ,
-              this._defaultWidth,
-              this._defaultHeight,
-              this._defaultDepth,
-              keepAspectRatio
-            );
-            this._threeObject.add(threeObject);
-          });
+        this._threeModelGroup = null;
+        this._clonedModel3D = null;
       }
 
       getOriginX() {
@@ -3047,23 +3135,28 @@ module.exports = {
         return this._centerPoint || this._modelOriginPoint;
       }
 
-      _updateDefaultTransformation(
-        threeObject,
-        rotationX,
-        rotationY,
-        rotationZ,
-        originalWidth,
-        originalHeight,
-        originalDepth,
-        keepAspectRatio
-      ) {
-        threeObject.rotation.set(
-          (rotationX * Math.PI) / 180,
-          (rotationY * Math.PI) / 180,
-          (rotationZ * Math.PI) / 180
+      _updateDefaultTransformation() {
+        if (!this._clonedModel3D) return; // Model is not ready - nothing to do.
+
+        if (this._threeModelGroup) {
+          // Remove any previous container as we will recreate it just below
+          this._threeObject.clear();
+        }
+        // This group hold the rotation defined by properties.
+        // Always restart from a new group to avoid miscomputing bounding boxes/sizes.
+        this._threeModelGroup = new THREE.Group();
+        this._threeModelGroup.rotation.order = 'ZYX';
+        this._threeModelGroup.add(this._clonedModel3D);
+
+        this._threeModelGroup.rotation.set(
+          (this._rotationX * Math.PI) / 180,
+          (this._rotationY * Math.PI) / 180,
+          (this._rotationZ * Math.PI) / 180
         );
-        threeObject.updateMatrixWorld(true);
-        const boundingBox = new THREE.Box3().setFromObject(threeObject);
+        this._threeModelGroup.updateMatrixWorld(true);
+        const boundingBox = new THREE.Box3().setFromObject(
+          this._threeModelGroup
+        );
 
         const shouldKeepModelOrigin = !this._originPoint;
         if (shouldKeepModelOrigin) {
@@ -3090,7 +3183,7 @@ module.exports = {
         // Center the model.
         const centerPoint = this._centerPoint;
         if (centerPoint) {
-          threeObject.position.set(
+          this._threeModelGroup.position.set(
             -(boundingBox.min.x + modelWidth * centerPoint[0]),
             // The model is flipped on Y axis.
             -(boundingBox.min.y + modelHeight * (1 - centerPoint[1])),
@@ -3099,11 +3192,11 @@ module.exports = {
         }
 
         // Rotate the model.
-        threeObject.scale.set(1, 1, 1);
-        threeObject.rotation.set(
-          (rotationX * Math.PI) / 180,
-          (rotationY * Math.PI) / 180,
-          (rotationZ * Math.PI) / 180
+        this._threeModelGroup.scale.set(1, 1, 1);
+        this._threeModelGroup.rotation.set(
+          (this._rotationX * Math.PI) / 180,
+          (this._rotationY * Math.PI) / 180,
+          (this._rotationZ * Math.PI) / 180
         );
 
         // Stretch the model in a 1x1x1 cube.
@@ -3115,23 +3208,23 @@ module.exports = {
         // Flip on Y because the Y axis is on the opposite side of direct basis.
         // It avoids models to be like a mirror refection.
         scaleMatrix.makeScale(scaleX, -scaleY, scaleZ);
-        threeObject.updateMatrix();
-        threeObject.applyMatrix4(scaleMatrix);
+        this._threeModelGroup.updateMatrix();
+        this._threeModelGroup.applyMatrix4(scaleMatrix);
 
-        if (keepAspectRatio) {
+        if (this._keepAspectRatio) {
           // Reduce the object dimensions to keep aspect ratio.
           const widthRatio =
             modelWidth < epsilon
               ? Number.POSITIVE_INFINITY
-              : originalWidth / modelWidth;
+              : this._originalWidth / modelWidth;
           const heightRatio =
             modelHeight < epsilon
               ? Number.POSITIVE_INFINITY
-              : originalHeight / modelHeight;
+              : this._originalHeight / modelHeight;
           const depthRatio =
             modelDepth < epsilon
               ? Number.POSITIVE_INFINITY
-              : originalDepth / modelDepth;
+              : this._originalDepth / modelDepth;
           const minScaleRatio = Math.min(widthRatio, heightRatio, depthRatio);
           if (!Number.isFinite(minScaleRatio)) {
             this._defaultWidth = modelWidth;
@@ -3139,48 +3232,124 @@ module.exports = {
             this._defaultDepth = modelDepth;
           } else {
             if (widthRatio === minScaleRatio) {
-              this._defaultWidth = originalWidth;
+              this._defaultWidth = this._originalWidth;
               this._defaultHeight = Rendered3DInstance.applyRatio({
                 oldReferenceValue: modelWidth,
-                newReferenceValue: originalWidth,
+                newReferenceValue: this._originalWidth,
                 valueToApplyTo: modelHeight,
               });
               this._defaultDepth = Rendered3DInstance.applyRatio({
                 oldReferenceValue: modelWidth,
-                newReferenceValue: originalWidth,
+                newReferenceValue: this._originalWidth,
                 valueToApplyTo: modelDepth,
               });
             } else if (heightRatio === minScaleRatio) {
               this._defaultWidth = Rendered3DInstance.applyRatio({
                 oldReferenceValue: modelHeight,
-                newReferenceValue: originalHeight,
+                newReferenceValue: this._originalHeight,
                 valueToApplyTo: modelWidth,
               });
 
-              this._defaultHeight = originalHeight;
+              this._defaultHeight = this._originalHeight;
               this._defaultDepth = Rendered3DInstance.applyRatio({
                 oldReferenceValue: modelHeight,
-                newReferenceValue: originalHeight,
+                newReferenceValue: this._originalHeight,
                 valueToApplyTo: modelDepth,
               });
             } else {
               this._defaultWidth = Rendered3DInstance.applyRatio({
                 oldReferenceValue: modelDepth,
-                newReferenceValue: originalDepth,
+                newReferenceValue: this._originalDepth,
                 valueToApplyTo: modelWidth,
               });
               this._defaultHeight = Rendered3DInstance.applyRatio({
                 oldReferenceValue: modelDepth,
-                newReferenceValue: originalDepth,
+                newReferenceValue: this._originalDepth,
                 valueToApplyTo: modelHeight,
               });
-              this._defaultDepth = originalDepth;
+              this._defaultDepth = this._originalDepth;
             }
           }
         }
+
+        this._threeObject.add(this._threeModelGroup);
       }
 
       updateThreeObject() {
+        const object = gd.castObject(
+          this._associatedObjectConfiguration,
+          gd.Model3DObjectConfiguration
+        );
+
+        let defaultTransformationDirty = false;
+
+        const originalWidth = object.getWidth();
+        const originalHeight = object.getHeight();
+        const originalDepth = object.getDepth();
+        if (
+          this._originalWidth !== originalWidth ||
+          this._originalHeight !== originalHeight ||
+          this._originalDepth !== originalDepth
+        ) {
+          this._originalWidth = originalWidth;
+          this._originalHeight = originalHeight;
+          this._originalDepth = originalDepth;
+          defaultTransformationDirty = true;
+        }
+
+        const rotationX = object.getRotationX();
+        const rotationY = object.getRotationY();
+        const rotationZ = object.getRotationZ();
+        if (
+          this._rotationX !== rotationX ||
+          this._rotationY !== rotationY ||
+          this._rotationZ !== rotationZ
+        ) {
+          this._rotationX = rotationX;
+          this._rotationY = rotationY;
+          this._rotationZ = rotationZ;
+          defaultTransformationDirty = true;
+        }
+
+        const keepAspectRatio = object.shouldKeepAspectRatio();
+        if (this._keepAspectRatio !== keepAspectRatio) {
+          this._keepAspectRatio = keepAspectRatio;
+          defaultTransformationDirty = true;
+        }
+
+        const originPoint = getPointForLocation(object.getOriginLocation());
+        if (!isSamePoint(originPoint, this._originPoint)) {
+          this._originPoint = originPoint;
+          defaultTransformationDirty = true;
+        }
+
+        const centerPoint = getPointForLocation(object.getCenterLocation());
+        if (!isSamePoint(centerPoint, this._centerPoint)) {
+          this._centerPoint = centerPoint;
+          defaultTransformationDirty = true;
+        }
+
+        if (defaultTransformationDirty) this._updateDefaultTransformation();
+
+        const modelResourceName = object.getModelResourceName();
+        if (this._modelResourceName !== modelResourceName) {
+          this._modelResourceName = modelResourceName;
+
+          this._pixiResourcesLoader
+            .get3DModel(this._project, modelResourceName)
+            .then((model3d) => {
+              this._clonedModel3D = THREE_ADDONS.SkeletonUtils.clone(
+                model3d.scene
+              );
+
+              this._updateDefaultTransformation();
+            });
+        }
+
+        this._updateThreeObjectPosition();
+      }
+
+      _updateThreeObjectPosition() {
         const width = this.getWidth();
         const height = this.getHeight();
         const depth = this.getDepth();
@@ -3204,9 +3373,9 @@ module.exports = {
         const scaleZ = depth * (this._instance.isFlippedZ() ? -1 : 1);
 
         if (
-          scaleX !== this._threeObject.scale.width ||
-          scaleY !== this._threeObject.scale.height ||
-          scaleZ !== this._threeObject.scale.depth
+          scaleX !== this._threeObject.scale.x ||
+          scaleY !== this._threeObject.scale.y ||
+          scaleZ !== this._threeObject.scale.z
         ) {
           this._threeObject.scale.set(scaleX, scaleY, scaleZ);
         }

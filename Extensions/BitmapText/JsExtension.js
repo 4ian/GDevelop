@@ -34,11 +34,8 @@ module.exports = {
       .setIcon('JsPlatform/Extensions/bitmapfont32.png');
 
     const bitmapTextObject = new gd.ObjectJsImplementation();
-    bitmapTextObject.updateProperty = function (
-      objectContent,
-      propertyName,
-      newValue
-    ) {
+    bitmapTextObject.updateProperty = function (propertyName, newValue) {
+      const objectContent = this.content;
       if (propertyName in objectContent) {
         if (typeof objectContent[propertyName] === 'boolean')
           objectContent[propertyName] = newValue === '1';
@@ -50,8 +47,9 @@ module.exports = {
 
       return false;
     };
-    bitmapTextObject.getProperties = function (objectContent) {
+    bitmapTextObject.getProperties = function () {
       const objectProperties = new gd.MapStringPropertyDescriptor();
+      const objectContent = this.content;
 
       objectProperties
         .getOrCreate('text')
@@ -66,7 +64,7 @@ module.exports = {
         .addExtraInfo('left')
         .addExtraInfo('center')
         .addExtraInfo('right')
-        .setLabel(_('Alignment, when multiple lines are displayed'))
+        .setLabel(_('Alignment'))
         .setGroup(_('Appearance'));
 
       objectProperties
@@ -82,7 +80,7 @@ module.exports = {
         .setValue(objectContent.textureAtlasResourceName)
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Bitmap atlas image'))
+        .setLabel(_('Bitmap Atlas'))
         .setGroup(_('Font'));
 
       objectProperties
@@ -108,33 +106,27 @@ module.exports = {
 
       return objectProperties;
     };
-    bitmapTextObject.setRawJSONContent(
-      JSON.stringify({
-        text:
-          'This text use the default bitmap font.\nUse a custom Bitmap Font to create your own texts.',
-        opacity: 255,
-        scale: 1,
-        fontSize: 20,
-        tint: '255;255;255',
-        bitmapFontResourceName: '',
-        textureAtlasResourceName: '',
-        align: 'left',
-        wordWrap: true,
-      })
-    );
+    bitmapTextObject.content = {
+      text:
+        'This text use the default bitmap font.\nUse a custom Bitmap Font to create your own texts.',
+      opacity: 255,
+      scale: 1,
+      fontSize: 20,
+      tint: '255;255;255',
+      bitmapFontResourceName: '',
+      textureAtlasResourceName: '',
+      align: 'left',
+      wordWrap: true,
+    };
 
     bitmapTextObject.updateInitialInstanceProperty = function (
-      objectContent,
       instance,
       propertyName,
       newValue
     ) {
       return false;
     };
-    bitmapTextObject.getInitialInstanceProperties = function (
-      content,
-      instance
-    ) {
+    bitmapTextObject.getInitialInstanceProperties = function (instance) {
       var instanceProperties = new gd.MapStringPropertyDescriptor();
       return instanceProperties;
     };
@@ -659,31 +651,31 @@ module.exports = {
       }
 
       update() {
-        const properties = this._associatedObjectConfiguration.getProperties();
+        const object = gd.castObject(
+          this._associatedObjectConfiguration,
+          gd.ObjectJsImplementation
+        );
 
         // Update the rendered text properties (note: Pixi is only
         // applying changes if there were changed).
-        const rawText = properties.get('text').getValue();
+        const rawText = object.content.text;
         this._pixiObject.text = rawText;
 
-        const align = properties.get('align').getValue();
+        const align = object.content.align;
         this._pixiObject.align = align;
 
-        const color = properties.get('tint').getValue();
+        const color = object.content.tint;
         this._pixiObject.tint = objectsRenderingService.rgbOrHexToHexNumber(
           color
         );
 
-        const scale = +(properties.get('scale').getValue() || 1);
+        const scale = object.content.scale;
         this._pixiObject.scale.set(scale);
 
         // Track the changes in font to load the new requested font.
-        const bitmapFontResourceName = properties
-          .get('bitmapFontResourceName')
-          .getValue();
-        const textureAtlasResourceName = properties
-          .get('textureAtlasResourceName')
-          .getValue();
+        const bitmapFontResourceName = object.content.bitmapFontResourceName;
+        const textureAtlasResourceName =
+          object.content.textureAtlasResourceName;
 
         if (
           this._currentBitmapFontResourceName !== bitmapFontResourceName ||
@@ -712,7 +704,7 @@ module.exports = {
         }
 
         // Set up the wrapping width if enabled.
-        const wordWrap = properties.get('wordWrap').getValue() === 'true';
+        const wordWrap = object.content.wordWrap;
         if (wordWrap && this._instance.hasCustomSize()) {
           this._pixiObject.maxWidth =
             this.getCustomWidth() / this._pixiObject.scale.x;

@@ -33,12 +33,8 @@ ParticleEmitterBase::ParticleEmitterBase()
       particleGravityY(0.0f),
       particleLifeTimeMin(0.5f),
       particleLifeTimeMax(2.5f),
-      particleRed1(255.0f),
-      particleRed2(255.0f),
-      particleGreen1(51),
-      particleGreen2(255),
-      particleBlue1(51),
-      particleBlue2(0.0f),
+      particleColor1("255;51;51"),
+      particleColor2("255;255;0"),
       particleAlpha1(204),
       particleAlpha2(0.0f),
       particleSize1(100.0f),
@@ -56,6 +52,341 @@ ParticleEmitterBase::ParticleEmitterBase()
       jumpForwardInTimeOnCreation(0.0f) {}
 
 ParticleEmitterObject::ParticleEmitterObject() {}
+
+bool ParticleEmitterObject::UpdateProperty(const gd::String& propertyName,
+                                           const gd::String& newValue) {
+  if (propertyName == "textureParticleName") {
+    SetParticleTexture(newValue);
+    return true;
+  }
+  if (propertyName == "rendererType") {
+    auto newRendererType = newValue == "Circle" ? Point
+                           : newValue == "Line" ? Line
+                                                : Quad;
+    SetRendererType(newRendererType);
+    if (newRendererType != Quad) {
+      SetParticleTexture("");
+    }
+
+    return true;
+  }
+  if (propertyName == "particlesWidth") {
+    SetRendererParam1(newValue.To<double>());
+    return true;
+  }
+  if (propertyName == "particlesHeight") {
+    SetRendererParam2(newValue.To<double>());
+    return true;
+  }
+  if (propertyName == "lineLength") {
+    SetRendererParam1(newValue.To<double>());
+    return true;
+  }
+  if (propertyName == "lineThickness") {
+    SetRendererParam2(newValue.To<double>());
+    return true;
+  }
+  if (propertyName == "particlesSize") {
+    SetRendererParam1(newValue.To<double>());
+    return true;
+  }
+  if (propertyName == "particlesStartSize") {
+    SetParticleSize1(newValue.To<double>());
+    return true;
+  }
+  if (propertyName == "particlesEndSize") {
+    SetParticleSize2(newValue.To<double>());
+    return true;
+  }
+  if (propertyName == "particlesStartColor") {
+    SetParticleColor1(newValue);
+    return true;
+  }
+  if (propertyName == "particlesEndColor") {
+    SetParticleColor2(newValue);
+    return true;
+  }
+  if (propertyName == "particlesStartOpacity") {
+    SetParticleAlpha1(newValue.To<double>());
+    return true;
+  }
+  if (propertyName == "particlesEndOpacity") {
+    SetParticleAlpha2(newValue.To<double>());
+    return true;
+  }
+  if (propertyName == "additiveRendering") {
+    if (newValue == "1")
+      SetRenderingAdditive();
+    else
+      SetRenderingAlpha();
+    return true;
+  }
+  if (propertyName == "deleteWhenOutOfParticles") {
+    SetDestroyWhenNoParticles(newValue == "1");
+    return true;
+  }
+  if (propertyName == "maxParticlesCount") {
+    SetMaxParticleNb(newValue.To<double>());
+    return true;
+  }
+  if (propertyName == "tank") {
+    SetTank(newValue.To<double>());
+    return true;
+  }
+  if (propertyName == "flow") {
+    SetFlow(newValue.To<double>());
+    return true;
+  }
+  if (propertyName == "emitterForceMin") {
+    SetEmitterForceMin(newValue.To<double>());
+    return true;
+  }
+  if (propertyName == "emitterForceMax") {
+    SetEmitterForceMax(newValue.To<double>());
+    return true;
+  }
+  if (propertyName == "particleRotationSpeedMin") {
+    SetParticleAngle1(newValue.To<double>());
+    return true;
+  }
+  if (propertyName == "particleRotationSpeedMax") {
+    SetParticleAngle2(newValue.To<double>());
+    return true;
+  }
+  if (propertyName == "coneSprayAngle") {
+    SetConeSprayAngle(newValue.To<double>());
+    return true;
+  }
+  if (propertyName == "zoneRadius") {
+    SetZoneRadius(newValue.To<double>());
+    return true;
+  }
+  if (propertyName == "particleGravityX") {
+    SetParticleGravityX(newValue.To<double>());
+    return true;
+  }
+  if (propertyName == "particleGravityY") {
+    SetParticleGravityY(newValue.To<double>());
+    return true;
+  }
+  if (propertyName == "particleLifeTimeMin") {
+    SetParticleLifeTimeMin(newValue.To<double>());
+    return true;
+  }
+  if (propertyName == "particleLifeTimeMax") {
+    SetParticleLifeTimeMax(newValue.To<double>());
+    return true;
+  }
+  if (propertyName == "jumpForwardInTimeOnCreation") {
+    SetJumpForwardInTimeOnCreation(newValue.To<double>());
+    return true;
+  }
+
+  return false;
+}
+
+std::map<gd::String, gd::PropertyDescriptor>
+ParticleEmitterObject::GetProperties() const {
+  std::map<gd::String, gd::PropertyDescriptor> objectProperties;
+
+  objectProperties["rendererType"]
+      .SetValue(GetRendererType() == Point  ? "Circle"
+                : GetRendererType() == Line ? "Line"
+                                            : "Image")
+      .SetType("choice")
+      .AddExtraInfo("Circle")
+      .AddExtraInfo("Line")
+      .AddExtraInfo("Image")
+      .SetLabel(_("Particle type"))
+      .SetHasImpactOnOtherProperties(true);
+
+  if (GetRendererType() == Quad) {
+    objectProperties["textureParticleName"]
+        .SetValue(GetParticleTexture())
+        .SetType("resource")
+        .AddExtraInfo("image")
+        .SetLabel(_("Texture"));
+
+    objectProperties["particlesWidth"]
+        .SetValue(gd::String::From(GetRendererParam1()))
+        .SetType("number")
+        .SetLabel(_("Width"))
+        .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
+        .SetGroup(_("Particles size"));
+
+    objectProperties["particlesHeight"]
+        .SetValue(gd::String::From(GetRendererParam2()))
+        .SetType("number")
+        .SetLabel(_("Height"))
+        .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
+        .SetGroup(_("Particles size"));
+  } else if (GetRendererType() == Line) {
+    objectProperties["lineLength"]
+        .SetValue(gd::String::From(GetRendererParam1()))
+        .SetType("number")
+        .SetLabel(_("Lines length"))
+        .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
+        .SetGroup(_("Particles size"));
+
+    objectProperties["lineThickness"]
+        .SetValue(gd::String::From(GetRendererParam2()))
+        .SetType("number")
+        .SetLabel(_("Lines thickness"))
+        .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
+        .SetGroup(_("Particles size"));
+  } else {
+    objectProperties["particlesSize"]
+        .SetValue(gd::String::From(GetRendererParam1()))
+        .SetType("number")
+        .SetLabel(_("Size"))
+        .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
+        .SetGroup(_("Particles size"));
+  }
+
+  objectProperties["particlesStartSize"]
+      .SetValue(gd::String::From(GetParticleSize1()))
+      .SetType("number")
+      .SetLabel(_("Start size (in percents)"))
+      .SetGroup(_("Particles size"));
+
+  objectProperties["particlesEndSize"]
+      .SetValue(gd::String::From(GetParticleSize2()))
+      .SetType("number")
+      .SetLabel(_("End size (in percents)"))
+      .SetGroup(_("Particles size"));
+
+  objectProperties["particlesStartColor"]
+      .SetValue(GetParticleColor1())
+      .SetType("color")
+      .SetLabel(_("Start color"))
+      .SetGroup(_("Particles color"));
+
+  objectProperties["particlesEndColor"]
+      .SetValue(GetParticleColor2())
+      .SetType("color")
+      .SetLabel(_("End color"))
+      .SetGroup(_("Particles color"));
+
+  objectProperties["particlesStartOpacity"]
+      .SetValue(gd::String::From(GetParticleAlpha1()))
+      .SetType("number")
+      .SetLabel(_("Start opacity (0-255)"))
+      .SetGroup(_("Particles color"));
+
+  objectProperties["particlesEndOpacity"]
+      .SetValue(gd::String::From(GetParticleAlpha2()))
+      .SetType("number")
+      .SetLabel(_("End opacity (0-255)"))
+      .SetGroup(_("Particles color"));
+
+  objectProperties["additiveRendering"]
+      .SetValue(IsRenderingAdditive() ? "true" : "false")
+      .SetType("boolean")
+      .SetLabel(_("Additive rendering"))
+      .SetGroup(_("Particles color"));
+
+  objectProperties["deleteWhenOutOfParticles"]
+      .SetValue(GetDestroyWhenNoParticles() ? "true" : "false")
+      .SetType("boolean")
+      .SetLabel(_("Delete when out of particles"))
+      .SetGroup(_("Particles flow"));
+
+  objectProperties["maxParticlesCount"]
+      .SetValue(gd::String::From(GetMaxParticleNb()))
+      .SetType("number")
+      .SetLabel(_("Max particles count"))
+      .SetGroup(_("Particles flow"));
+
+  objectProperties["tank"]
+      .SetValue(gd::String::From(GetTank()))
+      .SetType("number")
+      .SetLabel(_("Tank"))
+      .SetGroup(_("Particles flow"))
+      .AddExtraInfo("canBeUnlimitedUsingMinus1");
+
+  objectProperties["flow"]
+      .SetValue(gd::String::From(GetFlow()))
+      .SetType("number")
+      .SetLabel(_("Flow"))
+      .SetGroup(_("Particles flow (particles/seconds)"));
+
+  objectProperties["emitterForceMin"]
+      .SetValue(gd::String::From(GetEmitterForceMin()))
+      .SetType("number")
+      .SetLabel(_("Emitter force min"))
+      .SetGroup(_("Particles movement"));
+
+  objectProperties["emitterForceMax"]
+      .SetValue(gd::String::From(GetEmitterForceMax()))
+      .SetType("number")
+      .SetLabel(_("Emitter force max"))
+      .SetGroup(_("Particles movement"));
+
+  objectProperties["particleRotationSpeedMin"]
+      .SetValue(gd::String::From(GetParticleAngle1()))
+      .SetType("number")
+      .SetLabel(_("Minimum rotation speed"))
+      .SetMeasurementUnit(gd::MeasurementUnit::GetDegreeAngle())
+      .SetGroup(_("Particles movement"));
+
+  objectProperties["particleRotationSpeedMax"]
+      .SetValue(gd::String::From(GetParticleAngle2()))
+      .SetType("number")
+      .SetLabel(_("Maximum rotation speed"))
+      .SetMeasurementUnit(gd::MeasurementUnit::GetDegreeAngle())
+      .SetGroup(_("Particles movement"));
+
+  objectProperties["coneSprayAngle"]
+      .SetValue(gd::String::From(GetConeSprayAngle()))
+      .SetType("number")
+      .SetLabel(_("Cone spray angle"))
+      .SetMeasurementUnit(gd::MeasurementUnit::GetDegreeAngle())
+      .SetGroup(_("Particles movement"));
+
+  objectProperties["zoneRadius"]
+      .SetValue(gd::String::From(GetZoneRadius()))
+      .SetType("number")
+      .SetLabel(_("Emitter radius"))
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
+      .SetGroup(_("Particles movement"));
+
+  objectProperties["particleGravityX"]
+      .SetValue(gd::String::From(GetParticleGravityX()))
+      .SetType("number")
+      .SetLabel(_("Gravity X"))
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
+      .SetGroup(_("Particles gravity"));
+
+  objectProperties["particleGravityY"]
+      .SetValue(gd::String::From(GetParticleGravityY()))
+      .SetType("number")
+      .SetLabel(_("Gravity Y"))
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
+      .SetGroup(_("Particles gravity"));
+
+  objectProperties["particleLifeTimeMin"]
+      .SetValue(gd::String::From(GetParticleLifeTimeMin()))
+      .SetType("number")
+      .SetLabel(_("Minimum lifetime"))
+      .SetMeasurementUnit(gd::MeasurementUnit::GetSecond())
+      .SetGroup(_("Particles life time"));
+
+  objectProperties["particleLifeTimeMax"]
+      .SetValue(gd::String::From(GetParticleLifeTimeMax()))
+      .SetType("number")
+      .SetLabel(_("Maximum lifetime"))
+      .SetMeasurementUnit(gd::MeasurementUnit::GetSecond())
+      .SetGroup(_("Particles life time"));
+
+  objectProperties["jumpForwardInTimeOnCreation"]
+      .SetValue(gd::String::From(GetJumpForwardInTimeOnCreation()))
+      .SetType("number")
+      .SetLabel(_("Jump forward in time on creation"))
+      .SetMeasurementUnit(gd::MeasurementUnit::GetSecond())
+      .SetGroup(_("Particles life time"));
+
+  return objectProperties;
+}
 
 void ParticleEmitterObject::DoUnserializeFrom(
     gd::Project& project, const gd::SerializerElement& element) {
@@ -75,12 +406,27 @@ void ParticleEmitterBase::UnserializeParticleEmitterBaseFrom(
   particleGravityY = element.GetDoubleAttribute("particleGravityY");
   particleLifeTimeMin = element.GetDoubleAttribute("particleLifeTimeMin");
   particleLifeTimeMax = element.GetDoubleAttribute("particleLifeTimeMax");
-  particleRed1 = element.GetDoubleAttribute("particleRed1");
-  particleRed2 = element.GetDoubleAttribute("particleRed2");
-  particleGreen1 = element.GetDoubleAttribute("particleGreen1");
-  particleGreen2 = element.GetDoubleAttribute("particleGreen2");
-  particleBlue1 = element.GetDoubleAttribute("particleBlue1");
-  particleBlue2 = element.GetDoubleAttribute("particleBlue2");
+
+  particleColor1 = element.GetStringAttribute("particleColor1");
+  // Compatibility with GD <= 5.4.210
+  if (element.HasChild("particleRed1") && !element.HasChild("particleColor1")) {
+    particleColor1 =
+        element.GetChild("particleRed1").GetValue().GetString() + ";" +
+        element.GetChild("particleGreen1").GetValue().GetString() + ";" +
+        element.GetChild("particleBlue1").GetValue().GetString();
+  }
+  // end of compatibility code
+
+  particleColor2 = element.GetStringAttribute("particleColor2");
+  // Compatibility with GD <= 5.4.210
+  if (element.HasChild("particleRed2") && !element.HasChild("particleColor2")) {
+    particleColor2 =
+        element.GetChild("particleRed2").GetValue().GetString() + ";" +
+        element.GetChild("particleGreen2").GetValue().GetString() + ";" +
+        element.GetChild("particleBlue2").GetValue().GetString();
+  }
+  // end of compatibility code
+
   particleAlpha1 = element.GetDoubleAttribute("particleAlpha1");
   particleAlpha2 = element.GetDoubleAttribute("particleAlpha2");
   rendererParam1 = element.GetDoubleAttribute("rendererParam1");
@@ -106,7 +452,8 @@ void ParticleEmitterBase::UnserializeParticleEmitterBaseFrom(
       element.GetBoolAttribute("destroyWhenNoParticles", false);
   textureParticleName = element.GetStringAttribute("textureParticleName");
   maxParticleNb = element.GetIntAttribute("maxParticleNb", 5000);
-  jumpForwardInTimeOnCreation = element.GetDoubleAttribute("jumpForwardInTimeOnCreation");
+  jumpForwardInTimeOnCreation =
+      element.GetDoubleAttribute("jumpForwardInTimeOnCreation");
 
   {
     gd::String result = element.GetStringAttribute("rendererType");
@@ -137,12 +484,8 @@ void ParticleEmitterBase::SerializeParticleEmitterBaseTo(
   element.SetAttribute("particleGravityY", particleGravityY);
   element.SetAttribute("particleLifeTimeMin", particleLifeTimeMin);
   element.SetAttribute("particleLifeTimeMax", particleLifeTimeMax);
-  element.SetAttribute("particleRed1", particleRed1);
-  element.SetAttribute("particleRed2", particleRed2);
-  element.SetAttribute("particleGreen1", particleGreen1);
-  element.SetAttribute("particleGreen2", particleGreen2);
-  element.SetAttribute("particleBlue1", particleBlue1);
-  element.SetAttribute("particleBlue2", particleBlue2);
+  element.SetAttribute("particleColor1", particleColor1);
+  element.SetAttribute("particleColor2", particleColor2);
   element.SetAttribute("particleAlpha1", particleAlpha1);
   element.SetAttribute("particleAlpha2", particleAlpha2);
   element.SetAttribute("particleSize1", particleSize1);
@@ -161,7 +504,8 @@ void ParticleEmitterBase::SerializeParticleEmitterBaseTo(
   element.SetAttribute("destroyWhenNoParticles", destroyWhenNoParticles);
   element.SetAttribute("textureParticleName", textureParticleName);
   element.SetAttribute("maxParticleNb", (int)maxParticleNb);
-  element.SetAttribute("jumpForwardInTimeOnCreation", jumpForwardInTimeOnCreation);
+  element.SetAttribute("jumpForwardInTimeOnCreation",
+                       jumpForwardInTimeOnCreation);
 
   gd::String rendererTypeStr = "Point";
   if (rendererType == Line)
@@ -169,6 +513,26 @@ void ParticleEmitterBase::SerializeParticleEmitterBaseTo(
   else if (rendererType == Quad)
     rendererTypeStr = "Quad";
   element.SetAttribute("rendererType", rendererTypeStr);
+
+  // Still serialize the old particle color components for compatibility with GDevelop <= 5.4.210.
+  // Remove this in a few releases (or when hex strings are accepted for the color).
+  {
+    auto rgb = particleColor1.Split(';');
+    if (rgb.size() == 3) {
+      element.SetAttribute("particleRed1", rgb[0].To<double>());
+      element.SetAttribute("particleGreen1", rgb[1].To<double>());
+      element.SetAttribute("particleBlue1", rgb[2].To<double>());
+    }
+  }
+  {
+    auto rgb = particleColor2.Split(';');
+    if (rgb.size() == 3) {
+      element.SetAttribute("particleRed2", rgb[0].To<double>());
+      element.SetAttribute("particleGreen2", rgb[1].To<double>());
+      element.SetAttribute("particleBlue2", rgb[2].To<double>());
+    }
+  }
+  // end of compatibility code
 }
 
 ParticleEmitterBase::~ParticleEmitterBase() {}
@@ -227,26 +591,6 @@ double ParticleEmitterBase::GetParticleGravityLength() const {
               GetParticleGravityX() * GetParticleGravityX());
 }
 
-void ParticleEmitterBase::SetParticleColor1(const gd::String& color) {
-  std::vector<gd::String> colors = color.Split(U';');
-
-  if (colors.size() < 3) return;  // Color is incorrect
-
-  SetParticleRed1(colors[0].To<int>());
-  SetParticleGreen1(colors[1].To<int>());
-  SetParticleBlue1(colors[2].To<int>());
-}
-
-void ParticleEmitterBase::SetParticleColor2(const gd::String& color) {
-  std::vector<gd::String> colors = color.Split(U';');
-
-  if (colors.size() < 3) return;  // Color is incorrect
-
-  SetParticleRed2(colors[0].To<int>());
-  SetParticleGreen2(colors[1].To<int>());
-  SetParticleBlue2(colors[2].To<int>());
-}
-
 /**
  * Used by copy constructor and assignment operator.
  * \warning Do not forget to update me if members were changed!
@@ -269,12 +613,8 @@ void ParticleEmitterBase::Init(const ParticleEmitterBase& other) {
   particleGravityY = other.particleGravityY;
   particleLifeTimeMin = other.particleLifeTimeMin;
   particleLifeTimeMax = other.particleLifeTimeMax;
-  particleRed1 = other.particleRed1;
-  particleRed2 = other.particleRed2;
-  particleGreen1 = other.particleGreen1;
-  particleGreen2 = other.particleGreen2;
-  particleBlue1 = other.particleBlue1;
-  particleBlue2 = other.particleBlue2;
+  particleColor1 = other.particleColor1;
+  particleColor2 = other.particleColor2;
   particleAlpha1 = other.particleAlpha1;
   particleAlpha2 = other.particleAlpha2;
   particleSize1 = other.particleSize1;

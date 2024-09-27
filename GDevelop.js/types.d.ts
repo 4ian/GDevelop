@@ -733,10 +733,9 @@ export class ObjectJsImplementation extends ObjectConfiguration {
   updateProperty(name: string, value: string): boolean;
   getInitialInstanceProperties(instance: InitialInstance): MapStringPropertyDescriptor;
   updateInitialInstanceProperty(instance: InitialInstance, name: string, value: string): boolean;
-  getRawJSONContent(): string;
-  setRawJSONContent(newContent: string): ObjectJsImplementation;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
+  content: Record<string, any>;
 }
 
 export class CustomObjectConfiguration extends ObjectConfiguration {
@@ -751,6 +750,8 @@ export class CustomObjectConfiguration extends ObjectConfiguration {
   getInitialInstanceProperties(instance: InitialInstance): MapStringPropertyDescriptor;
   updateInitialInstanceProperty(instance: InitialInstance, name: string, value: string): boolean;
   getAnimations(): SpriteAnimationList;
+  isChildObjectFolded(childName: string): boolean;
+  setChildObjectFolded(childName: string, folded: boolean): void;
   static getEdgeAnchorFromString(value: string): CustomObjectConfiguration_EdgeAnchor;
 }
 
@@ -1525,9 +1526,12 @@ export class ObjectMetadata extends EmscriptenObject {
   isHidden(): boolean;
   markAsRenderedIn3D(): ObjectMetadata;
   isRenderedIn3D(): boolean;
+  setOpenFullEditorLabel(label: string): ObjectMetadata;
+  getOpenFullEditorLabel(): string;
 }
 
-export class QuickCustomization extends EmscriptenObject {static Default = 0;
+export class QuickCustomization extends EmscriptenObject {
+  static Default = 0;
   static Visible = 1;
   static Hidden = 2;
 }
@@ -1573,6 +1577,8 @@ export class BehaviorMetadata extends EmscriptenObject {
   setHidden(): BehaviorMetadata;
   getQuickCustomizationVisibility(): QuickCustomization_Visibility;
   setQuickCustomizationVisibility(visibility: QuickCustomization_Visibility): BehaviorMetadata;
+  setOpenFullEditorLabel(label: string): BehaviorMetadata;
+  getOpenFullEditorLabel(): string;
   get(): Behavior;
   getSharedDataInstance(): BehaviorsSharedData;
   getProperties(): MapStringPropertyDescriptor;
@@ -2544,6 +2550,17 @@ export class Model3DObjectConfiguration extends ObjectConfiguration {
   hasNoAnimations(): boolean;
   swapAnimations(first: number, second: number): void;
   moveAnimation(oldIndex: number, newIndex: number): void;
+  getWidth(): number;
+  getHeight(): number;
+  getDepth(): number;
+  getRotationX(): number;
+  getRotationY(): number;
+  getRotationZ(): number;
+  getModelResourceName(): string;
+  getMaterialType(): string;
+  getOriginLocation(): string;
+  getCenterLocation(): string;
+  shouldKeepAspectRatio(): boolean;
 }
 
 export class SpineAnimation extends EmscriptenObject {
@@ -2567,6 +2584,8 @@ export class SpineObjectConfiguration extends ObjectConfiguration {
   hasNoAnimations(): boolean;
   swapAnimations(first: number, second: number): void;
   moveAnimation(oldIndex: number, newIndex: number): void;
+  getScale(): number;
+  getSpineResourceName(): string;
 }
 
 export class Vector2f extends EmscriptenObject {
@@ -2663,18 +2682,14 @@ export class ShapePainterObject extends ObjectConfiguration {
   isClearedBetweenFrames(): boolean;
   setOutlineSize(size: number): void;
   getOutlineSize(): number;
+  setOutlineColor(color: string): void;
+  getOutlineColor(): string;
   setOutlineOpacity(val: number): void;
   getOutlineOpacity(): number;
-  setOutlineColor(r: number, g: number, b: number): void;
-  getOutlineColorR(): number;
-  getOutlineColorG(): number;
-  getOutlineColorB(): number;
+  setFillColor(color: string): void;
+  getFillColor(): string;
   setFillOpacity(val: number): void;
   getFillOpacity(): number;
-  setFillColor(r: number, g: number, b: number): void;
-  getFillColorR(): number;
-  getFillColorG(): number;
-  getFillColorB(): number;
   getAntialiasing(): string;
   setAntialiasing(value: string): void;
 }
@@ -2724,18 +2739,10 @@ export class ParticleEmitterObject extends ObjectConfiguration {
   getParticleLifeTimeMin(): number;
   setParticleLifeTimeMax(newValue: number): void;
   getParticleLifeTimeMax(): number;
-  setParticleRed1(newValue: number): void;
-  getParticleRed1(): number;
-  setParticleRed2(newValue: number): void;
-  getParticleRed2(): number;
-  setParticleGreen1(newValue: number): void;
-  getParticleGreen1(): number;
-  setParticleGreen2(newValue: number): void;
-  getParticleGreen2(): number;
-  setParticleBlue1(newValue: number): void;
-  getParticleBlue1(): number;
-  setParticleBlue2(newValue: number): void;
-  getParticleBlue2(): number;
+  setParticleColor1(newValue: string): void;
+  getParticleColor1(): string;
+  setParticleColor2(newValue: string): void;
+  getParticleColor2(): string;
   setParticleAlpha1(newValue: number): void;
   getParticleAlpha1(): number;
   setParticleAlpha2(newValue: number): void;

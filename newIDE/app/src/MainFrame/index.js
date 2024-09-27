@@ -1114,6 +1114,7 @@ const MainFrame = (props: Props) => {
         if (error.name === 'CloudProjectReadingError') {
           setCloudProjectFileMetadataToRecover(fileMetadata);
         } else {
+          console.error('Failed to open the project:', error);
           const errorMessage = getOpenErrorMessage
             ? getOpenErrorMessage(error)
             : t`Ensure that you are connected to internet and that the URL used is correct, then try again.`;

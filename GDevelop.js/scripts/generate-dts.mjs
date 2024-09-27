@@ -77,8 +77,9 @@ const extraClassAttributes = {
     'static Default = 0;',
     'static Visible = 1;',
     'static Hidden = 2;',
-  ]
-}
+  ],
+  ObjectJsImplementation: ['content: Record<string, any>;'],
+};
 
 const PrimitiveTypes = new Map([
   ['DOMString', 'string'],
@@ -340,7 +341,9 @@ for (const [
     } {${methods.length ? '\n  ' + methods.join('\n  ') : ''}${
       attributes.length ? '\n  ' + attributes.join('\n  ') : ''
     }${
-      (extraClassAttributes[interfaceName] || []).join('\n  ')
+      extraClassAttributes[interfaceName]
+        ? '\n  ' + extraClassAttributes[interfaceName].join('\n  ')
+        : ''
     }
 }`
   );

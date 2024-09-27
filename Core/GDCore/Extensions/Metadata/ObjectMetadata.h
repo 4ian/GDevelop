@@ -323,6 +323,15 @@ class GD_CORE_API ObjectMetadata : public InstructionOrExpressionContainerMetada
    */
   bool IsRenderedIn3D() const { return isRenderedIn3D; }
 
+  ObjectMetadata &SetOpenFullEditorLabel(const gd::String& label) {
+    openFullEditorLabel = label;
+    return *this;
+  }
+
+  const gd::String& GetOpenFullEditorLabel() const {
+    return openFullEditorLabel;
+  }
+
   std::map<gd::String, gd::InstructionMetadata> conditionsInfos;
   std::map<gd::String, gd::InstructionMetadata> actionsInfos;
   std::map<gd::String, gd::ExpressionMetadata> expressionsInfos;
@@ -344,6 +353,7 @@ class GD_CORE_API ObjectMetadata : public InstructionOrExpressionContainerMetada
   std::set<gd::String> defaultBehaviorTypes;
   bool hidden = false;
   bool isRenderedIn3D = false;
+  gd::String openFullEditorLabel;
 
   std::shared_ptr<gd::ObjectConfiguration>
       blueprintObject;  ///< The "blueprint" object to be copied when a new

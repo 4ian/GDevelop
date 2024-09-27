@@ -867,9 +867,6 @@ interface ObjectJsImplementation {
         [Const] DOMString name,
         [Const] DOMString value);
 
-    [Const, Ref] DOMString GetRawJSONContent();
-    [Ref] ObjectJsImplementation SetRawJSONContent([Const] DOMString newContent);
-
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 
@@ -908,6 +905,9 @@ interface CustomObjectConfiguration {
         DOMString value);
 
     [Ref] SpriteAnimationList GetAnimations();
+
+    boolean IsChildObjectFolded([Const] DOMString childName);
+    void SetChildObjectFolded([Const] DOMString childName, boolean folded);
 
     CustomObjectConfiguration_EdgeAnchor STATIC_GetEdgeAnchorFromString([Const] DOMString value);
 };
@@ -1907,6 +1907,9 @@ interface ObjectMetadata {
 
     [Ref] ObjectMetadata MarkAsRenderedIn3D();
     boolean IsRenderedIn3D();
+
+    [Ref] ObjectMetadata SetOpenFullEditorLabel([Const] DOMString label);
+    [Const, Ref] DOMString GetOpenFullEditorLabel();
 };
 
 enum QuickCustomization_Visibility {
@@ -2031,6 +2034,9 @@ interface BehaviorMetadata {
 
     QuickCustomization_Visibility GetQuickCustomizationVisibility();
     [Ref] BehaviorMetadata SetQuickCustomizationVisibility(QuickCustomization_Visibility visibility);
+
+    [Ref] BehaviorMetadata SetOpenFullEditorLabel([Const] DOMString label);
+    [Const, Ref] DOMString GetOpenFullEditorLabel();
 
     [Ref] Behavior Get();
     BehaviorsSharedData GetSharedDataInstance();
@@ -3429,6 +3435,20 @@ interface Model3DObjectConfiguration {
     boolean HasNoAnimations();
     void SwapAnimations(unsigned long first, unsigned long second);
     void MoveAnimation(unsigned long oldIndex, unsigned long newIndex);
+
+    double GetWidth();
+    double GetHeight();
+    double GetDepth();
+    double GetRotationX();
+    double GetRotationY();
+    double GetRotationZ();
+
+    [Const, Ref] DOMString GetModelResourceName();
+    [Const, Ref] DOMString GetMaterialType();
+    [Const, Ref] DOMString GetOriginLocation();
+    [Const, Ref] DOMString GetCenterLocation();
+
+    boolean shouldKeepAspectRatio();
 };
 Model3DObjectConfiguration implements ObjectConfiguration;
 
@@ -3458,6 +3478,9 @@ interface SpineObjectConfiguration {
     boolean HasNoAnimations();
     void SwapAnimations(unsigned long first, unsigned long second);
     void MoveAnimation(unsigned long oldIndex, unsigned long newIndex);
+
+    double GetScale();
+    [Const, Ref] DOMString GetSpineResourceName();
 };
 SpineObjectConfiguration implements ObjectConfiguration;
 
@@ -3577,21 +3600,18 @@ interface ShapePainterObject {
     void SetOutlineSize(double size);
     double GetOutlineSize();
 
+    void SetOutlineColor([Const] DOMString color);
+    [Const, Ref] DOMString GetOutlineColor();
+
     void SetOutlineOpacity(double val);
     double GetOutlineOpacity();
 
-    void SetOutlineColor(unsigned long r, unsigned long g, unsigned long b);
-    unsigned long GetOutlineColorR();
-    unsigned long GetOutlineColorG();
-    unsigned long GetOutlineColorB();
+    void SetFillColor([Const] DOMString color);
+    [Const, Ref] DOMString GetFillColor();
 
     void SetFillOpacity(double val);
     double GetFillOpacity();
 
-    void SetFillColor(unsigned long r,unsigned long g, unsigned long b);
-    unsigned long GetFillColorR();
-    unsigned long GetFillColorG();
-    unsigned long GetFillColorB();
     [Const, Value] DOMString GetAntialiasing();
     void SetAntialiasing([Const] DOMString value);
 
@@ -3660,18 +3680,10 @@ interface ParticleEmitterObject {
     void SetParticleLifeTimeMax(double newValue);
     double GetParticleLifeTimeMax();
 
-    void SetParticleRed1(double newValue);
-    double GetParticleRed1();
-    void SetParticleRed2(double newValue);
-    double GetParticleRed2();
-    void SetParticleGreen1(double newValue);
-    double GetParticleGreen1();
-    void SetParticleGreen2(double newValue);
-    double GetParticleGreen2();
-    void SetParticleBlue1(double newValue);
-    double GetParticleBlue1();
-    void SetParticleBlue2(double newValue);
-    double GetParticleBlue2();
+    void SetParticleColor1([Const] DOMString newValue);
+    [Const, Ref] DOMString GetParticleColor1();
+    void SetParticleColor2([Const] DOMString newValue);
+    [Const, Ref] DOMString GetParticleColor2();
     void SetParticleAlpha1(double newValue);
     double GetParticleAlpha1();
     void SetParticleAlpha2(double newValue);

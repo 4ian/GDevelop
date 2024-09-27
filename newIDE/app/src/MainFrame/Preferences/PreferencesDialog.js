@@ -75,6 +75,7 @@ const PreferencesDialog = ({
     setOpenDiagnosticReportAutomatically,
     setShowDeprecatedInstructionWarning,
     setUse3DEditor,
+    setShowBasicProfilingCounters,
     setNewProjectsDefaultFolder,
     setUseShortcutToClosePreviewWindow,
     setWatchProjectFolderFilesForLocalProjects,
@@ -447,6 +448,12 @@ const PreferencesDialog = ({
             label={
               <Trans>Show a warning on deprecated actions and conditions</Trans>
             }
+          />
+          <Toggle
+            onToggle={(e, check) => setShowBasicProfilingCounters(check)}
+            toggled={values.showBasicProfilingCounters}
+            labelPosition="right"
+            label={<Trans>Display profiling information in scene editor</Trans>}
           />
           <Toggle
             onToggle={(e, check) => setUse3DEditor(check)}

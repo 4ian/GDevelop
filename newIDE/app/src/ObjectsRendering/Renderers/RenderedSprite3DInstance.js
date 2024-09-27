@@ -7,6 +7,20 @@ import * as THREE from 'three';
 
 const gd: libGDevelop = global.gd;
 
+let transparentMaterial = null;
+const getTransparentMaterial = () => {
+  if (!transparentMaterial)
+    transparentMaterial = new THREE.MeshBasicMaterial({
+      transparent: true,
+      opacity: 0,
+      // Set the alpha test to to ensure the faces behind are rendered
+      // (no "back face culling" that would still be done if alphaTest is not set).
+      alphaTest: 1,
+    });
+
+  return transparentMaterial;
+};
+
 /**
  * Renderer for gd.SpriteObject
  */
@@ -50,15 +64,8 @@ export default class RenderedSprite3DInstance extends Rendered3DInstance {
     this._pixiContainer.addChild(this._pixiObject);
 
     this.updateSprite();
-    const material = this._pixiResourcesLoader.getThreeMaterial(
-      project,
-      this._sprite ? this._sprite.getImageName() : '',
-      {
-        useTransparentTexture: true,
-      }
-    );
     const geometry = new THREE.PlaneGeometry(1, -1);
-    const threeObject = new THREE.Mesh(geometry, material);
+    const threeObject = new THREE.Mesh(geometry, getTransparentMaterial());
     threeObject.rotation.order = 'ZYX';
     this._threeGroup.add(threeObject);
     this._threeObject = threeObject;
@@ -177,11 +184,13 @@ export default class RenderedSprite3DInstance extends Rendered3DInstance {
     return true;
   }
 
-  updateTextureAndSprite(): void {
+  async updateTextureAndSprite(): Promise<void> {
     this.updateSprite();
     const sprite = this._sprite;
     if (!sprite) return;
 
+    // Note that `getPIXITexture` could be refactored to return a promise
+    // to make it nicer to use (no need to use "once('update')" pattern).
     const texture = this._pixiResourcesLoader.getPIXITexture(
       this._project,
       sprite.getImageName()
@@ -196,7 +205,7 @@ export default class RenderedSprite3DInstance extends Rendered3DInstance {
     this._textureWidth = texture.width;
     this._textureHeight = texture.height;
 
-    const material = this._pixiResourcesLoader.getThreeMaterial(
+    const material = await this._pixiResourcesLoader.getThreeMaterial(
       this._project,
       sprite.getImageName(),
       {

@@ -222,6 +222,9 @@ export const CompactResourceSelectorWithThumbnail = ({
         onlyForStorageProvider === storageProvider.internalName
     );
 
+  const isResourceSetButInvalid =
+    resourceName && !project.getResourcesManager().hasResource(resourceName);
+
   return (
     <LineStackLayout noMargin expand id={idToUse.current}>
       {displayThumbnail && (
@@ -237,7 +240,7 @@ export const CompactResourceSelectorWithThumbnail = ({
         className={classNames({
           [classes.container]: true,
           [classes.disabled]: false,
-          [classes.errored]: false,
+          [classes.errored]: isResourceSetButInvalid,
         })}
       >
         <div
@@ -245,7 +248,12 @@ export const CompactResourceSelectorWithThumbnail = ({
             [classes.compactResourceSelector]: true,
           })}
         >
-          <input type="text" value={resourceName} />
+          <input
+            type="text"
+            spellCheck={false}
+            value={resourceName}
+            onChange={e => onChange(e.currentTarget.value)}
+          />
         </div>
       </div>
       <ElementWithMenu

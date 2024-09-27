@@ -23,6 +23,7 @@ import * as THREE from 'three';
 import FpsLimiter from './FpsLimiter';
 import { startPIXITicker, stopPIXITicker } from '../Utils/PIXITicker';
 import StatusBar from './StatusBar';
+import ProfilerBar from './ProfilerBar';
 import CanvasCursor from './CanvasCursor';
 import InstancesAdder from './InstancesAdder';
 import { makeDropTarget } from '../UI/DragAndDrop/DropTarget';
@@ -128,6 +129,7 @@ type Props = {|
   onMouseLeave?: MouseEvent => void,
   screenType: ScreenType,
   showObjectInstancesIn3D: boolean,
+  showBasicProfilingCounters: boolean,
 |};
 
 type State = {|
@@ -161,6 +163,7 @@ export default class InstancesEditor extends Component<Props, State> {
   windowBorder: WindowBorder;
   windowMask: WindowMask;
   statusBar: StatusBar;
+  profilerBar: ProfilerBar;
   uiPixiContainer: PIXI.Container;
   backgroundPixiContainer: PIXI.Container;
   backgroundArea: PIXI.Container;
@@ -480,6 +483,9 @@ export default class InstancesEditor extends Component<Props, State> {
     if (this.background) {
       this.backgroundPixiContainer.removeChild(this.background.getPixiObject());
     }
+    if (this.profilerBar) {
+      this.uiPixiContainer.removeChild(this.profilerBar.getPixiObject());
+    }
 
     this.instancesRenderer = new InstancesRenderer({
       project: props.project,
@@ -570,6 +576,7 @@ export default class InstancesEditor extends Component<Props, State> {
       height: this.props.height,
       getLastCursorSceneCoordinates: this.getLastCursorSceneCoordinates,
     });
+    this.profilerBar = new ProfilerBar();
 
     this.uiPixiContainer.addChild(this.selectionRectangle.getPixiObject());
     this.uiPixiContainer.addChild(this.instancesRenderer.getPixiContainer());
@@ -578,6 +585,7 @@ export default class InstancesEditor extends Component<Props, State> {
     this.uiPixiContainer.addChild(this.selectedInstances.getPixiContainer());
     this.uiPixiContainer.addChild(this.highlightedInstance.getPixiObject());
     this.uiPixiContainer.addChild(this.statusBar.getPixiObject());
+    this.uiPixiContainer.addChild(this.profilerBar.getPixiObject());
     this.uiPixiContainer.addChild(this.tileMapPaintingPreview.getPixiObject());
     this.uiPixiContainer.addChild(this.clickInterceptor.getPixiObject());
 
@@ -1576,6 +1584,10 @@ export default class InstancesEditor extends Component<Props, State> {
         this.windowBorder.render();
         this.windowMask.render();
         this.statusBar.render();
+        this.profilerBar.render({
+          basicProfilingCounters: this.instancesRenderer.getBasicProfilingCounters(),
+          display: this.props.showBasicProfilingCounters,
+        });
         this.background.render();
 
         this.instancesRenderer.render(

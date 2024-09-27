@@ -26,7 +26,7 @@ std::map<gd::String, gd::PropertyDescriptor> DraggableBehavior::GetProperties(
                     ? "true"
                     : "false")
       .SetType("Boolean")
-      .SetLabel(_("Do a precision check against the object's collision mask"))
+      .SetLabel(_("Precise check"))
       .SetDescription(
           _("Use the object (custom) collision mask instead of the bounding "
             "box, making the behavior more precise at the cost of "

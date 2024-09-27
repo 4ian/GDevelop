@@ -150,8 +150,31 @@ export type Resource = {|
   tags: Array<string>,
 |};
 
+export interface ResourceV2CommonProps {
+  url: string;
+  name: string;
+  license: string;
+  tags: Array<string>;
+  authors: Array<string>;
+}
+
+export interface AudioResourceV2 extends ResourceV2CommonProps {
+  type: 'audio';
+  metadata: { duration: number; type: 'music' | 'sound' };
+}
+export interface FontResourceV2 extends ResourceV2CommonProps {
+  type: 'font';
+  metadata: { supportedAlphabets: string[] };
+  previewImageUrl: string;
+}
+
+export type ResourceV2 =
+  | FontResourceV2
+  | AudioResourceV2;
+
 export type AllResources = {|
   resources: Array<Resource>,
+  resourcesV2: Array<ResourceV2>,
   filters: Filters,
 |};
 
@@ -282,35 +305,34 @@ export const getPrivateAssetPackAudioFilesArchiveUrl = (
   return authorizedUrl;
 };
 
-export const listAllResources = ({
+export const listAllResources = async ({
   environment,
 }: {|
   environment: Environment,
 |}): Promise<AllResources> => {
-  return client
-    .get(`/resource`, {
-      params: {
-        environment,
-      },
-    })
-    .then(response => response.data)
-    .then(({ resourcesUrl, filtersUrl }) => {
-      if (!resourcesUrl || !filtersUrl) {
-        throw new Error('Unexpected response from the resource endpoint.');
-      }
-      return Promise.all([
-        client.get(resourcesUrl).then(response => response.data),
-        client.get(filtersUrl).then(response => response.data),
-      ]).then(([resources, filters]) => {
-        if (!resources || !filters) {
-          throw new Error('Unexpected response from the resources endpoints.');
-        }
-        return {
-          resources,
-          filters,
-        };
-      });
-    });
+  const response = await client.get(`/resource`, {
+    params: {
+      environment,
+    },
+  });
+  const { resourcesUrl, resourcesV2Url, filtersUrl } = response.data;
+  if (!resourcesUrl || !filtersUrl) {
+    throw new Error('Unexpected response from the resource endpoint.');
+  }
+  const responses = await Promise.all([
+    client.get(resourcesUrl).then(response => response.data),
+    client.get(resourcesV2Url).then(response => response.data),
+    client.get(filtersUrl).then(response => response.data),
+  ]);
+  const [resources, resourcesV2, filters] = responses;
+  if (!resources || resourcesV2 || !filters) {
+    throw new Error('Unexpected response from the resources endpoints.');
+  }
+  return {
+    resources,
+    resourcesV2,
+    filters,
+  };
 };
 
 export const listAllAuthors = ({

@@ -32,6 +32,9 @@ type EducationCurriculumProps = {|
   tutorials: Tutorial[],
   onSelectTutorial: Tutorial => void,
   onOpenTemplateFromTutorial: string => Promise<void>,
+  isLocked?: boolean,
+  onClickSubscribe?: () => void,
+  renderInterstitialCallout?: (key: string) => React.Node,
 |};
 
 export const EducationCurriculum = ({
@@ -40,6 +43,9 @@ export const EducationCurriculum = ({
   tutorials,
   onSelectTutorial,
   onOpenTemplateFromTutorial,
+  isLocked,
+  onClickSubscribe,
+  renderInterstitialCallout,
 }: EducationCurriculumProps) => {
   const listItems: React.Node[] = React.useMemo(
     () => {
@@ -51,6 +57,11 @@ export const EducationCurriculum = ({
         if (!tutorial.sectionByLocale) return;
         const section = selectMessageByLocale(i18n, tutorial.sectionByLocale);
         if (section !== currentSection) {
+          if (sectionIndex !== 0 && renderInterstitialCallout) {
+            items.push(
+              renderInterstitialCallout(`interstitial-${sectionIndex}`)
+            );
+          }
           items.push(
             <div style={styles.sectionTitleContainer}>
               <Text size="section-title" noMargin key={`section-${section}`}>
@@ -67,6 +78,8 @@ export const EducationCurriculum = ({
             i18n={i18n}
             limits={limits}
             tutorial={tutorial}
+            isLocked={isLocked}
+            onClickSubscribe={onClickSubscribe}
             onSelectTutorial={onSelectTutorial}
             index={sectionIndex}
             onOpenTemplateFromTutorial={
@@ -82,7 +95,16 @@ export const EducationCurriculum = ({
       });
       return items;
     },
-    [tutorials, i18n, limits, onSelectTutorial, onOpenTemplateFromTutorial]
+    [
+      tutorials,
+      i18n,
+      limits,
+      onSelectTutorial,
+      onOpenTemplateFromTutorial,
+      renderInterstitialCallout,
+      isLocked,
+      onClickSubscribe,
+    ]
   );
 
   return (

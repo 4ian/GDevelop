@@ -43,7 +43,6 @@ const styles = {
   },
   desktopRightContainer: { minWidth: 350 },
   educationIcon: { width: 40, height: 40 },
-  disabledSection: { opacity: 0.6 },
   desktopFooter: { height: 200 },
   paper: { padding: '16px 32px', flex: 1 },
   stickyPaper: { padding: '16px 32px', flex: 1, position: 'sticky', top: 0 },
@@ -235,6 +234,70 @@ const EducationMarketingSection = ({
     </Form>
   );
 
+  const onClickSubscribe = React.useCallback(
+    () => {
+      openSubscriptionDialog({
+        filter: 'education',
+        analyticsMetadata: {
+          reason: 'Callout in Classroom tab',
+        },
+      });
+    },
+    [openSubscriptionDialog]
+  );
+
+  const renderCard = (key: string) => (
+    <Paper
+      background="dark"
+      variant="outlined"
+      style={isMobile ? styles.mobilePaper : styles.paper}
+      key={key}
+    >
+      <ColumnStackLayout alignItems="flex-start" expand noMargin>
+        <Education style={styles.educationIcon} />
+        <Text size="title" noMargin>
+          {isMobile ? (
+            <Trans>Purchase the Education subscription</Trans>
+          ) : (
+            <Trans>
+              New lesson every month with the Education subscription
+            </Trans>
+          )}
+        </Text>
+        <Text>
+          <Trans>
+            The Education subscription gives access to GDevelop's Game
+            Development curriculum. Co-created with teachers and institutions,
+            it’s a ready-to-use, proven way to implement STEM in your classroom.
+          </Trans>
+        </Text>
+        <div style={{ alignSelf: isMobile ? 'stretch' : 'flex-start' }}>
+          <ResponsiveLineStackLayout noColumnMargin noMargin>
+            <div style={styles.buttonContainer}>
+              <FlatButton
+                primary
+                fullWidth
+                onClick={() => {
+                  Window.openExternalURL('https://gdevelop.io/education');
+                }}
+                label={<Trans>Learn more</Trans>}
+              />
+            </div>
+            <div style={styles.buttonContainer}>
+              <RaisedButton
+                primary
+                fullWidth
+                icon={<ShinyCrown fontSize="small" />}
+                onClick={onClickSubscribe}
+                label={<Trans>Subscribe to Edu</Trans>}
+              />
+            </div>
+          </ResponsiveLineStackLayout>
+        </div>
+      </ColumnStackLayout>
+    </Paper>
+  );
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -243,85 +306,26 @@ const EducationMarketingSection = ({
             <ResponsiveLineStackLayout noColumnMargin>
               <ColumnStackLayout noMargin>
                 {!isMobile && educationTutorials && (
-                  <div style={styles.disabledSection}>
-                    <EducationCurriculum
-                      i18n={i18n}
-                      limits={limits}
-                      tutorials={educationTutorials}
-                      // In this marketing view, users are not allowed to open tutorials so no need to specify this prop.
-                      onSelectTutorial={() => {}}
-                      // In this marketing view, users are not allowed to open tutorials so no need to specify this prop.
-                      onOpenTemplateFromTutorial={async () => {}}
-                    />
-                  </div>
+                  <EducationCurriculum
+                    i18n={i18n}
+                    limits={limits}
+                    tutorials={educationTutorials}
+                    // In this marketing view, users are not allowed to open tutorials so no need to specify this prop.
+                    onSelectTutorial={() => {}}
+                    // In this marketing view, users are not allowed to open tutorials so no need to specify this prop.
+                    onOpenTemplateFromTutorial={async () => {}}
+                    isLocked
+                    onClickSubscribe={onClickSubscribe}
+                    renderInterstitialCallout={renderCard}
+                  />
                 )}
-                <Paper
-                  background="dark"
-                  variant="outlined"
-                  style={isMobile ? styles.mobilePaper : styles.paper}
-                >
-                  <ColumnStackLayout alignItems="flex-start" expand noMargin>
-                    <Education style={styles.educationIcon} />
-                    <Text size="title" noMargin>
-                      {isMobile ? (
-                        <Trans>Purchase the Education subscription</Trans>
-                      ) : (
-                        <Trans>
-                          New lesson every month with the Education subscription
-                        </Trans>
-                      )}
-                    </Text>
-                    <Text>
-                      <Trans>
-                        The Education subscription gives access to GDevelop's
-                        Game Development curriculum. Co-created with teachers
-                        and institutions, it’s a ready-to-use, proven way to
-                        implement STEM in your classroom.
-                      </Trans>
-                    </Text>
-                    <div
-                      style={{ alignSelf: isMobile ? 'stretch' : 'flex-start' }}
-                    >
-                      <ResponsiveLineStackLayout noColumnMargin noMargin>
-                        <div style={styles.buttonContainer}>
-                          <FlatButton
-                            primary
-                            fullWidth
-                            onClick={() => {
-                              Window.openExternalURL(
-                                'https://gdevelop.io/education'
-                              );
-                            }}
-                            label={<Trans>Learn more</Trans>}
-                          />
-                        </div>
-                        <div style={styles.buttonContainer}>
-                          <RaisedButton
-                            primary
-                            fullWidth
-                            icon={<ShinyCrown fontSize="small" />}
-                            onClick={() => {
-                              openSubscriptionDialog({
-                                filter: 'education',
-                                analyticsMetadata: {
-                                  reason: 'Callout in Classroom tab',
-                                },
-                              });
-                            }}
-                            label={<Trans>Subscribe to Edu</Trans>}
-                          />
-                        </div>
-                      </ResponsiveLineStackLayout>
-                    </div>
-                  </ColumnStackLayout>
-                </Paper>
+                {isMobile && renderCard('callout')}
                 {!isMobile && <div style={styles.desktopFooter} />}
               </ColumnStackLayout>
               <Spacer />
               <div style={!isMobile ? styles.desktopRightContainer : undefined}>
                 <Paper
-                  background="dark"
-                  variant="outlined"
+                  background="medium"
                   style={isMobile ? styles.mobilePaper : styles.stickyPaper}
                 >
                   <ColumnStackLayout alignItems="flex-start" noMargin>

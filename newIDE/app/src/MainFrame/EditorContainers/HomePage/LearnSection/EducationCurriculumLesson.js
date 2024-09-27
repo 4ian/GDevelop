@@ -23,6 +23,7 @@ import Chip from '../../../../UI/Chip';
 import Window from '../../../../Utils/Window';
 import FlatButton from '../../../../UI/FlatButton';
 import Play from '../../../../UI/CustomSvgIcons/Play';
+import ShinyCrown from '../../../../UI/CustomSvgIcons/ShinyCrown';
 
 const rankLabel = {
   '1': <Trans>1st</Trans>,
@@ -52,16 +53,19 @@ const styles = {
     aspectRatio: '16 / 9',
     transition: 'opacity 0.3s ease-in-out',
   },
-  lockerImage: { height: 80, width: 80 },
+  lockerImage: { height: 60, width: 60 },
   lockedOverlay: {
     position: 'absolute',
     background: 'rgba(0, 0, 0, 0.6)',
+    aspectRatio: '16 / 9',
+    borderRadius: 8,
     inset: 0,
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
     color: 'white', // Force text/icon color since it's on a dark overlay.
   },
+  textContainer: { flex: 1 },
   imageContainer: {
     position: 'relative',
   },
@@ -100,6 +104,8 @@ type Props = {|
   onSelectTutorial: (tutorial: Tutorial) => void,
   index: number,
   onOpenTemplateFromTutorial: ?(string) => void,
+  isLocked?: boolean,
+  onClickSubscribe?: () => void,
 |};
 
 const EducationCurriculumLesson = ({
@@ -109,12 +115,14 @@ const EducationCurriculumLesson = ({
   onSelectTutorial,
   index,
   onOpenTemplateFromTutorial,
+  isLocked,
+  onClickSubscribe,
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const [isImageLoaded, setIsImageLoaded] = React.useState<boolean>(false);
-  const isLocked = limits
-    ? !canAccessTutorial(tutorial, limits.capabilities)
-    : true;
+  const isLessonLocked =
+    isLocked ||
+    (limits ? !canAccessTutorial(tutorial, limits.capabilities) : true);
 
   const isUpcomingMessage = tutorial.availableAt
     ? i18n._(
@@ -162,75 +170,95 @@ const EducationCurriculumLesson = ({
             alt={`Lesson thumbnail`}
             onLoad={() => setIsImageLoaded(true)}
           />
-          {isLocked ? (
+          {isLessonLocked ? (
             <LockedOverlay />
           ) : isUpcomingMessage ? (
             <UpcomingOverlay message={isUpcomingMessage} />
           ) : null}
         </div>
-        <ColumnStackLayout justifyContent="space-between" noMargin expand>
-          <ColumnStackLayout noMargin expand>
-            {!isMobile && title}
-            {gameLink && isMobile && !isUpcomingMessage && !isLocked && (
-              <FlatButton
-                primary
-                leftIcon={<Play fontSize="small" />}
-                label={<Trans>Play game</Trans>}
-                onClick={() => Window.openExternalURL(gameLink)}
-              />
-            )}
-            <div style={styles.tagsContainer}>
-              {tutorial.tagsByLocale &&
-                tutorial.tagsByLocale.map(tagByLocale => {
-                  const tag = selectMessageByLocale(i18n, tagByLocale);
-                  return (
-                    <Chip
-                      size="small"
-                      style={styles.chip}
-                      label={tag}
-                      key={tag}
-                      textColor="secondary"
+        <ColumnStackLayout alignItems="flex-start" noMargin expand>
+          <div style={{ ...styles.textContainer, opacity: isLocked ? 0.6 : 1 }}>
+            <ColumnStackLayout justifyContent="space-between" noMargin expand>
+              <ColumnStackLayout noMargin expand>
+                {!isMobile && title}
+                {gameLink &&
+                  isMobile &&
+                  !isUpcomingMessage &&
+                  !isLessonLocked && (
+                    <FlatButton
+                      primary
+                      leftIcon={<Play fontSize="small" />}
+                      label={<Trans>Play game</Trans>}
+                      onClick={() => Window.openExternalURL(gameLink)}
                     />
-                  );
-                })}
-            </div>
-            <Text noMargin>
-              {selectMessageByLocale(i18n, tutorial.descriptionByLocale)}
-            </Text>
-          </ColumnStackLayout>
-          {!isUpcomingMessage && !isLocked && (
-            <LineStackLayout
-              noMargin
-              alignItems="center"
-              justifyContent={gameLink ? 'space-between' : 'flex-end'}
-              expand={isMobile}
-            >
-              {gameLink && !isMobile && (
-                <FlatButton
-                  primary
-                  leftIcon={<Play fontSize="small" />}
-                  label={<Trans>Play game</Trans>}
-                  onClick={() => Window.openExternalURL(gameLink)}
-                />
+                  )}
+                <div style={styles.tagsContainer}>
+                  {tutorial.tagsByLocale &&
+                    tutorial.tagsByLocale.map(tagByLocale => {
+                      const tag = selectMessageByLocale(i18n, tagByLocale);
+                      return (
+                        <Chip
+                          size="small"
+                          style={styles.chip}
+                          label={tag}
+                          key={tag}
+                          textColor="secondary"
+                        />
+                      );
+                    })}
+                </div>
+                <Text noMargin>
+                  {selectMessageByLocale(i18n, tutorial.descriptionByLocale)}
+                </Text>
+              </ColumnStackLayout>
+              {!isUpcomingMessage && !isLessonLocked && (
+                <LineStackLayout
+                  noMargin
+                  alignItems="center"
+                  justifyContent={gameLink ? 'space-between' : 'flex-end'}
+                  expand={isMobile}
+                >
+                  {gameLink && !isMobile && (
+                    <FlatButton
+                      primary
+                      leftIcon={<Play fontSize="small" />}
+                      label={<Trans>Play game</Trans>}
+                      onClick={() => Window.openExternalURL(gameLink)}
+                    />
+                  )}
+                  <LineStackLayout
+                    noMargin
+                    alignItems="center"
+                    expand={isMobile}
+                  >
+                    {onOpenTemplateFromTutorial && (
+                      <FlatButton
+                        primary
+                        fullWidth={isMobile}
+                        label={<Trans>Open project</Trans>}
+                        onClick={onOpenTemplateFromTutorial}
+                      />
+                    )}
+                    <RaisedButton
+                      primary
+                      fullWidth={isMobile}
+                      disabled={isLessonLocked}
+                      label={<Trans>Open lesson</Trans>}
+                      onClick={() => onSelectTutorial(tutorial)}
+                    />
+                  </LineStackLayout>
+                </LineStackLayout>
               )}
-              <LineStackLayout noMargin alignItems="center" expand={isMobile}>
-                {onOpenTemplateFromTutorial && (
-                  <FlatButton
-                    primary
-                    fullWidth={isMobile}
-                    label={<Trans>Open project</Trans>}
-                    onClick={onOpenTemplateFromTutorial}
-                  />
-                )}
-                <RaisedButton
-                  primary
-                  fullWidth={isMobile}
-                  disabled={isLocked}
-                  label={<Trans>Open lesson</Trans>}
-                  onClick={() => onSelectTutorial(tutorial)}
-                />
-              </LineStackLayout>
-            </LineStackLayout>
+            </ColumnStackLayout>
+          </div>
+          {onClickSubscribe && (
+            <RaisedButton
+              primary
+              icon={<ShinyCrown fontSize="small" />}
+              fullWidth={isMobile}
+              label={<Trans>Get lesson with Edu</Trans>}
+              onClick={onClickSubscribe}
+            />
           )}
         </ColumnStackLayout>
       </ResponsiveLineStackLayout>

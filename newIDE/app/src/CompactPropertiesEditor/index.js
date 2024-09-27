@@ -927,7 +927,7 @@ const CompactPropertiesEditor = ({
         <Column expand noMargin key={field.name + '-title'}>
           <Spacer />
           <LineStackLayout expand noMargin alignItems="center">
-            <Text size="sub-title" noMargin>
+            <Text size="body" noMargin>
               {field.title}
             </Text>
             <Level2Separator key={field.name + '-separator'} />

@@ -69,6 +69,13 @@ export const styles = {
     overflowX: 'hidden',
   },
   hiddenContent: { display: 'none' },
+  subPanelContentContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 1,
+    paddingLeft: marginsSize * 3,
+    paddingRight: marginsSize,
+  },
 };
 
 const behaviorsHelpLink = getHelpLink('/behaviors');
@@ -94,7 +101,7 @@ const CollapsibleSubPanel = ({
 |}) => (
   <Paper background="medium">
     <Line expand>
-      <ColumnStackLayout expand noOverflowParent>
+      <ColumnStackLayout noMargin expand noOverflowParent>
         <LineStackLayout noMargin justifyContent="space-between">
           <Line noMargin alignItems="center">
             <IconButton onClick={toggleFolded} size="small">
@@ -113,16 +120,21 @@ const CollapsibleSubPanel = ({
           </Line>
 
           {onRemove ? (
-            <IconButton
-              tooltip={t`Remove behavior`}
-              onClick={onRemove}
-              size="small"
-            >
-              <Remove style={styles.icon} />
-            </IconButton>
+            <Line noMargin>
+              <IconButton
+                tooltip={t`Remove behavior`}
+                onClick={onRemove}
+                size="small"
+              >
+                <Remove style={styles.icon} />
+              </IconButton>
+              <Spacer />
+            </Line>
           ) : null}
         </LineStackLayout>
-        {isFolded ? null : renderContent()}
+        {isFolded ? null : (
+          <div style={styles.subPanelContentContainer}>{renderContent()}</div>
+        )}
       </ColumnStackLayout>
     </Line>
   </Paper>
@@ -663,7 +675,7 @@ export const CompactObjectPropertiesEditor = ({
                 onOpenFullEditor={() => onEditObject(object, 'effects')}
                 onAdd={() => addEffect(false)}
                 renderContent={() => (
-                  <ColumnStackLayout>
+                  <ColumnStackLayout noMargin>
                     {effectsContainer.getEffectsCount() === 0 && (
                       <Text size="body2" align="center" color="secondary">
                         <Trans>
@@ -697,7 +709,11 @@ export const CompactObjectPropertiesEditor = ({
                           <CollapsibleSubPanel
                             key={effect.ptr}
                             renderContent={() => (
-                              <ColumnStackLayout expand noOverflowParent>
+                              <ColumnStackLayout
+                                noMargin
+                                expand
+                                noOverflowParent
+                              >
                                 <CompactSelectField
                                   value={effectType}
                                   onChange={type =>

@@ -221,6 +221,7 @@ export namespace PixiTileMapHelper {
     pixiGraphics: PIXI.Graphics,
     tileMap: EditableTileMap,
     typeFilter: string,
+    layerIndex: integer | null,
     outlineSize: integer,
     outlineColor: integer,
     outlineOpacity: float,
@@ -233,60 +234,86 @@ export namespace PixiTileMapHelper {
     pixiGraphics.lineStyle(outlineSize, outlineColor, outlineOpacity);
     pixiGraphics.drawRect(0, 0, tileMap.getWidth(), tileMap.getHeight());
 
-    for (const layer of tileMap.getLayers()) {
-      const tileWidth = tileMap.getTileWidth();
-      const tileHeight = tileMap.getTileHeight();
+    if (layerIndex) {
+      const tileMapLayer = tileMap.getTileLayer(layerIndex);
+      drawCollisionLayer(
+        pixiGraphics,
+        tileMapLayer,
+        typeFilter,
+        fillColor,
+        fillOpacity
+      );
+    } else {
+      for (const layer of tileMap.getLayers()) {
+        if (layer instanceof EditableTileMapLayer) {
+          drawCollisionLayer(
+            pixiGraphics,
+            layer as EditableTileMapLayer,
+            typeFilter,
+            fillColor,
+            fillOpacity
+          );
+        }
+      }
+    }
+  }
 
-      if (layer instanceof EditableTileMapLayer) {
-        const tileLayer = layer as EditableTileMapLayer;
+  function drawCollisionLayer(
+    pixiGraphics: PIXI.Graphics,
+    tileLayer: EditableTileMapLayer,
+    typeFilter: string,
+    fillColor: integer,
+    fillOpacity: float
+  ): void {
+    const tileMap = tileLayer.tileMap;
+    const tileWidth = tileMap.getTileWidth();
+    const tileHeight = tileMap.getTileHeight();
 
-        for (let y = 0; y < tileLayer.tileMap.getDimensionY(); y++) {
-          for (let x = 0; x < tileLayer.tileMap.getDimensionX(); x++) {
-            const xPos = tileWidth * x;
-            const yPos = tileHeight * y;
+    for (let y = 0; y < tileMap.getDimensionY(); y++) {
+      for (let x = 0; x < tileMap.getDimensionX(); x++) {
+        const xPos = tileWidth * x;
+        const yPos = tileHeight * y;
 
-            const tileId = tileLayer.getTileId(x, y)!;
-            const isFlippedHorizontally = tileLayer.isFlippedHorizontally(x, y);
-            const isFlippedVertically = tileLayer.isFlippedVertically(x, y);
-            const isFlippedDiagonally = tileLayer.isFlippedDiagonally(x, y);
-            const tileDefinition = tileLayer.tileMap.getTileDefinition(tileId);
-            if (!tileDefinition) {
-              continue;
+        const tileId = tileLayer.getTileId(x, y)!;
+        const isFlippedHorizontally = tileLayer.isFlippedHorizontally(x, y);
+        const isFlippedVertically = tileLayer.isFlippedVertically(x, y);
+        const isFlippedDiagonally = tileLayer.isFlippedDiagonally(x, y);
+        const tileDefinition = tileMap.getTileDefinition(tileId);
+        if (!tileDefinition) {
+          continue;
+        }
+        const hitboxes = tileDefinition.getHitBoxes(typeFilter);
+        if (!hitboxes) {
+          continue;
+        }
+        for (const vertices of hitboxes) {
+          if (vertices.length === 0) continue;
+
+          pixiGraphics.beginFill(fillColor, fillOpacity);
+          for (let index = 0; index < vertices.length; index++) {
+            let vertexX = vertices[index][0];
+            let vertexY = vertices[index][1];
+            // It's important to do the diagonal flipping first,
+            // because the other flipping "move" the origin.
+            if (isFlippedDiagonally) {
+              const swap = vertexX;
+              vertexX = vertexY;
+              vertexY = swap;
             }
-            const hitboxes = tileDefinition.getHitBoxes(typeFilter);
-            if (!hitboxes) {
-              continue;
+            if (isFlippedHorizontally) {
+              vertexX = tileWidth - vertexX;
             }
-            for (const vertices of hitboxes) {
-              if (vertices.length === 0) continue;
-
-              pixiGraphics.beginFill(fillColor, fillOpacity);
-              for (let index = 0; index < vertices.length; index++) {
-                let vertexX = vertices[index][0];
-                let vertexY = vertices[index][1];
-                // It's important to do the diagonal flipping first,
-                // because the other flipping "move" the origin.
-                if (isFlippedDiagonally) {
-                  const swap = vertexX;
-                  vertexX = vertexY;
-                  vertexY = swap;
-                }
-                if (isFlippedHorizontally) {
-                  vertexX = tileWidth - vertexX;
-                }
-                if (isFlippedVertically) {
-                  vertexY = tileHeight - vertexY;
-                }
-                if (index === 0) {
-                  pixiGraphics.moveTo(xPos + vertexX, yPos + vertexY);
-                } else {
-                  pixiGraphics.lineTo(xPos + vertexX, yPos + vertexY);
-                }
-              }
-              pixiGraphics.closePath();
-              pixiGraphics.endFill();
+            if (isFlippedVertically) {
+              vertexY = tileHeight - vertexY;
+            }
+            if (index === 0) {
+              pixiGraphics.moveTo(xPos + vertexX, yPos + vertexY);
+            } else {
+              pixiGraphics.lineTo(xPos + vertexX, yPos + vertexY);
             }
           }
+          pixiGraphics.closePath();
+          pixiGraphics.endFill();
         }
       }
     }

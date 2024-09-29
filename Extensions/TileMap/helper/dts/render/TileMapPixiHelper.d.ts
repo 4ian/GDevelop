@@ -60,6 +60,7 @@ export declare namespace PixiTileMapHelper {
     pixiGraphics: PIXI.Graphics,
     tileMap: EditableTileMap,
     typeFilter: string,
+    layerIndex: integer | null,
     outlineSize: integer,
     outlineColor: integer,
     outlineOpacity: float,

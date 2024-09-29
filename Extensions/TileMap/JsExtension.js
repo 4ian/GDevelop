@@ -1081,6 +1081,14 @@ const defineCollisionMask = function (extension, _, gd) {
       objectContent.collisionMaskTag = newValue;
       return true;
     }
+    if (propertyName === 'layerIndex') {
+      objectContent.layerIndex = parseFloat(newValue);
+      return true;
+    }
+    if (propertyName === 'useAllLayers') {
+      objectContent.useAllLayers = newValue === '1';
+      return true;
+    }
     if (propertyName === 'debugMode') {
       objectContent.debugMode = newValue === '1';
       return true;
@@ -1150,6 +1158,28 @@ const defineCollisionMask = function (extension, _, gd) {
         )
     );
     objectProperties.set(
+      'layerIndex',
+      new gd.PropertyDescriptor(objectContent.layerIndex.toString())
+        .setType('number')
+        .setLabel(_('Layer index'))
+        .setGroup(_('Layers'))
+        .setAdvanced(true)
+    );
+    objectProperties.set(
+      'useAllLayers',
+      new gd.PropertyDescriptor(
+        objectContent.useAllLayers ||
+        objectContent.useAllLayers === undefined ||
+        objectContent.useAllLayers === null
+          ? 'true'
+          : 'false'
+      )
+        .setType('boolean')
+        .setLabel(_('Use all layers'))
+        .setGroup(_('Layers'))
+        .setAdvanced(true)
+    );
+    objectProperties.set(
       'debugMode',
       new gd.PropertyDescriptor(objectContent.debugMode ? 'true' : 'false')
         .setType('boolean')
@@ -1207,6 +1237,8 @@ const defineCollisionMask = function (extension, _, gd) {
     tilemapJsonFile: '',
     tilesetJsonFile: '',
     collisionMaskTag: '',
+    layerIndex: 0,
+    useAllLayers: true,
     debugMode: false,
     fillColor: '255;255;255',
     outlineColor: '255;255;255',
@@ -2381,6 +2413,7 @@ module.exports = {
       _tilemapJsonFile = '';
       _tilesetJsonFile = '';
       _collisionMaskTag = '';
+      _layerIndex = null;
       _outlineColor = 0xffffff;
       _fillColor = 0xffffff;
       _outlineOpacity = 0;
@@ -2481,6 +2514,7 @@ module.exports = {
         const tilemapJsonFile = this._tilemapJsonFile;
         const tilesetJsonFile = this._tilesetJsonFile;
         const collisionMaskTag = this._collisionMaskTag;
+        const layerIndex = this._layerIndex;
         const outlineColor = this._outlineColor;
         const fillColor = this._fillColor;
         const outlineOpacity = this._outlineOpacity;
@@ -2509,6 +2543,7 @@ module.exports = {
               this._pixiObject,
               tileMap,
               collisionMaskTag,
+              layerIndex,
               outlineSize,
               outlineColor,
               outlineOpacity,
@@ -2566,6 +2601,8 @@ module.exports = {
         const tilemapJsonFile = object.content.tilemapJsonFile;
         const tilesetJsonFile = object.content.tilesetJsonFile;
         const collisionMaskTag = object.content.collisionMaskTag;
+        const useAllLayers = object.content.useAllLayers;
+        const layerIndex = useAllLayers ? null : object.content.layerIndex;
         const outlineColor = objectsRenderingService.rgbOrHexToHexNumber(
           object.content.outlineColor
         );
@@ -2580,6 +2617,7 @@ module.exports = {
           tilemapJsonFile !== this._tilemapJsonFile ||
           tilesetJsonFile !== this._tilesetJsonFile ||
           collisionMaskTag !== this._collisionMaskTag ||
+          layerIndex !== this._layerIndex ||
           outlineColor !== this._outlineColor ||
           fillColor !== this._fillColor ||
           outlineOpacity !== this._outlineOpacity ||
@@ -2589,6 +2627,7 @@ module.exports = {
           this._tilemapJsonFile = tilemapJsonFile;
           this._tilesetJsonFile = tilesetJsonFile;
           this._collisionMaskTag = collisionMaskTag;
+          this._layerIndex = layerIndex;
           this._outlineColor = outlineColor;
           this._fillColor = fillColor;
           this._outlineOpacity = outlineOpacity;

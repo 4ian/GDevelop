@@ -531,15 +531,21 @@ export const ExampleTile = ({
   customTitle?: string,
   useQuickCustomizationThumbnail?: boolean,
 |}) => {
-  const thumbnailImgUrl = exampleShortHeader
-    ? useQuickCustomizationThumbnail
-      ? exampleShortHeader.quickCustomizationImageUrl
-        ? exampleShortHeader.quickCustomizationImageUrl
-        : exampleShortHeader.previewImageUrls
-        ? exampleShortHeader.previewImageUrls[0]
-        : ''
-      : ''
-    : '';
+  const thumbnailImgUrl = React.useMemo(
+    () => {
+      if (!exampleShortHeader) return '';
+      const firstPreviewUrl = exampleShortHeader.previewImageUrls[0] || '';
+      const quickCustomizationImageUrl =
+        exampleShortHeader.quickCustomizationImageUrl;
+      if (useQuickCustomizationThumbnail && quickCustomizationImageUrl) {
+        return quickCustomizationImageUrl;
+      }
+
+      return firstPreviewUrl;
+    },
+    [exampleShortHeader, useQuickCustomizationThumbnail]
+  );
+
   const classesForGridListItem = useStylesForGridListItem();
   return (
     <GridListTile

@@ -133,7 +133,7 @@ void ObjectJsImplementation::DoSerializeTo(SerializerElement& element) const {
         if (!self.content)
           throw '`content` is not defined on a ObjectJsImplementation.';
 
-        var serializerElement = gd.Serializer.fromJSObject(self.content);
+        var serializerElement = Module['Serializer'].fromJSObject(self.content);
         return getPointer(serializerElement);
       },
       (int)this);
@@ -157,7 +157,7 @@ void ObjectJsImplementation::DoUnserializeFrom(Project& project,
         }
 
         // JSON.parse + toJSON is 30% faster than gd.Serializer.toJSObject.
-        self.content = JSON.parse(gd.Serializer.toJSON(serializerElement));
+        self.content = JSON.parse(Module['Serializer'].toJSON(serializerElement));
       },
       (int)this,
       (int)&element.GetChild("content"));

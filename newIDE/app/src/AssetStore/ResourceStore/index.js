@@ -1,16 +1,14 @@
 // @flow
 import * as React from 'react';
+import { t, Trans } from '@lingui/macro';
 import SearchBar from '../../UI/SearchBar';
 import { Column, Line } from '../../UI/Grid';
 import ScrollView from '../../UI/ScrollView';
 import { type Resource } from '../../Utils/GDevelopServices/Asset';
-import { FiltersChooser } from '../../UI/Search/FiltersChooser';
 import { ResourceStoreContext } from './ResourceStoreContext';
 import { BoxSearchResults } from '../../UI/Search/BoxSearchResults';
 import { ResourceCard } from './ResourceCard';
 import Subheader from '../../UI/Subheader';
-import { CategoryChooser } from '../../UI/Search/CategoryChooser';
-import { t, Trans } from '@lingui/macro';
 import Paper from '../../UI/Paper';
 
 const styles = {
@@ -63,29 +61,6 @@ export const ResourceStore = ({ onChoose, resourceKind }: Props) => {
         }
         noMargin
       >
-        <Column noMargin>
-          <ScrollView>
-            <Paper style={styles.paper} background="medium">
-              <Subheader>
-                <Trans>Categories</Trans>
-              </Subheader>
-              <CategoryChooser
-                allItemsLabel={<Trans>All assets</Trans>}
-                allFilters={filters}
-                filtersState={filtersState}
-                error={error}
-              />
-              <Subheader>
-                <Trans>Filters</Trans>
-              </Subheader>
-              <FiltersChooser
-                allFilters={filters}
-                filtersState={filtersState}
-                error={error}
-              />
-            </Paper>
-          </ScrollView>
-        </Column>
         <BoxSearchResults
           baseSize={128}
           spacing={8}

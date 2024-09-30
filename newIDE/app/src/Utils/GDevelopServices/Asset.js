@@ -325,7 +325,7 @@ export const listAllResources = async ({
     client.get(filtersUrl).then(response => response.data),
   ]);
   const [resources, resourcesV2, filters] = responses;
-  if (!resources || resourcesV2 || !filters) {
+  if (!resources || !resourcesV2 || !filters) {
     throw new Error('Unexpected response from the resources endpoints.');
   }
   return {

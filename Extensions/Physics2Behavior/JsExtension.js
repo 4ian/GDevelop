@@ -528,7 +528,7 @@ module.exports = {
       .setIncludeFile('Extensions/Physics2Behavior/physics2runtimebehavior.js')
       .addIncludeFile('Extensions/Physics2Behavior/Box2D_v2.3.1_min.wasm.js')
       .addRequiredFile('Extensions/Physics2Behavior/Box2D_v2.3.1_min.wasm.wasm')
-      .setOpenFullEditorLabel(_('Edit shape and avanced settings'));
+      .setOpenFullEditorLabel(_('Edit shape and advanced settings'));
 
     // Global
     aut

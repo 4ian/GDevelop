@@ -265,5 +265,26 @@ describe('gdjs.AnchorRuntimeBehavior', function () {
       expect(object.getWidth()).to.equal(2000);
       expect(object.getHeight()).to.equal(3000);
     });
+
+    it('can fill the screen with an object using proportional anchors (with custom origin)', () => {
+      setGameResolutionSizeAndStep(1000, 500);
+
+      const object = createSpriteWithOriginAtCenter({
+        leftEdgeAnchor: 3,
+        topEdgeAnchor: 3,
+        rightEdgeAnchor: 3,
+        bottomEdgeAnchor: 3,
+      });
+      object.setCustomWidthAndHeight(1000, 500);
+      object.setPosition(500, 250);
+      runtimeScene.renderAndStep(1000 / 60);
+
+      setGameResolutionSizeAndStep(2000, 3000);
+
+      expect(object.getX()).to.equal(1000);
+      expect(object.getY()).to.equal(1500);
+      expect(object.getWidth()).to.equal(2000);
+      expect(object.getHeight()).to.equal(3000);
+    });
   });
 });

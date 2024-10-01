@@ -97,6 +97,11 @@ export class LayoutedInstance {
   constructor(instance: gdInitialInstance) {
     this.instance = instance;
     this.ptr = instance.ptr;
+    this._hasCustomSize = instance.hasCustomSize();
+    this._hasCustomDepth = instance.hasCustomDepth();
+    this._customWidth = instance.getCustomWidth();
+    this._customHeight = instance.getCustomHeight();
+    this._customDepth = instance.getCustomWidth();
   }
 
   getX() {
@@ -365,7 +370,7 @@ export const getLayoutedRenderedInstance = <T: ChildRenderedInstance>(
 
     const initialInstanceOriginX =
       (renderedInstance.getOriginX() * initialInstanceWidth) /
-      renderedInstance.getDefaultWidth();
+      Math.max(1, renderedInstance.getWidth());
     const initialInstanceMinX = initialInstanceX - initialInstanceOriginX;
     const initialInstanceMaxX = initialInstanceMinX + initialInstanceWidth;
 
@@ -397,28 +402,23 @@ export const getLayoutedRenderedInstance = <T: ChildRenderedInstance>(
       right = parentCenterX + initialInstanceMaxX - parentInitialCenterX;
     }
 
-    let x, width;
-    if (rightEdgeAnchor === gd.CustomObjectConfiguration.NoAnchor) {
-      width = initialInstanceWidth;
-      const originX =
-        (renderedInstance.getOriginX() * width) /
-        renderedInstance.getDefaultWidth();
-      x = left + originX;
-    } else if (leftEdgeAnchor === gd.CustomObjectConfiguration.NoAnchor) {
-      width = initialInstanceWidth;
-      const originX =
-        (renderedInstance.getOriginX() * width) /
-        renderedInstance.getDefaultWidth();
-      x = right - width + originX;
-    } else {
-      width = right - left;
-      const originX =
-        (renderedInstance.getOriginX() * width) /
-        renderedInstance.getDefaultWidth();
-      x = left + originX;
-    }
-    layoutedInstance.x = x;
+    const width =
+      rightEdgeAnchor === gd.CustomObjectConfiguration.NoAnchor
+        ? initialInstanceWidth
+        : leftEdgeAnchor === gd.CustomObjectConfiguration.NoAnchor
+        ? initialInstanceWidth
+        : right - left;
     layoutedInstance.setCustomWidth(width);
+
+    // The originX according to the new width.
+    const originX = renderedInstance.getOriginX();
+    const x =
+      rightEdgeAnchor === gd.CustomObjectConfiguration.NoAnchor
+        ? left + originX
+        : leftEdgeAnchor === gd.CustomObjectConfiguration.NoAnchor
+        ? right - width + originX
+        : left + originX;
+    layoutedInstance.x = x;
   }
 
   const initialInstanceY = initialInstance.getY();
@@ -438,7 +438,7 @@ export const getLayoutedRenderedInstance = <T: ChildRenderedInstance>(
 
     const initialInstanceOriginY =
       (renderedInstance.getOriginY() * initialInstanceHeight) /
-      renderedInstance.getDefaultHeight();
+      Math.max(1, renderedInstance.getHeight());
     const initialInstanceMinY = initialInstanceY - initialInstanceOriginY;
     const initialInstanceMaxY = initialInstanceMinY + initialInstanceHeight;
 
@@ -470,28 +470,23 @@ export const getLayoutedRenderedInstance = <T: ChildRenderedInstance>(
       top = parentCenterY + initialInstanceMinY - parentInitialCenterY;
     }
 
-    let y, height;
-    if (bottomEdgeAnchor === gd.CustomObjectConfiguration.NoAnchor) {
-      height = initialInstanceHeight;
-      const originY =
-        (renderedInstance.getOriginY() * height) /
-        renderedInstance.getDefaultHeight();
-      y = top + originY;
-    } else if (topEdgeAnchor === gd.CustomObjectConfiguration.NoAnchor) {
-      height = initialInstanceHeight;
-      const originY =
-        (renderedInstance.getOriginY() * height) /
-        renderedInstance.getDefaultHeight();
-      y = bottom - height + originY;
-    } else {
-      height = bottom - top;
-      const originY =
-        (renderedInstance.getOriginY() * height) /
-        renderedInstance.getDefaultHeight();
-      y = top + originY;
-    }
-    layoutedInstance.y = y;
+    const height =
+      bottomEdgeAnchor === gd.CustomObjectConfiguration.NoAnchor
+        ? initialInstanceHeight
+        : topEdgeAnchor === gd.CustomObjectConfiguration.NoAnchor
+        ? initialInstanceHeight
+        : bottom - top;
     layoutedInstance.setCustomHeight(height);
+
+    // The originY according to the new height.
+    const originY = renderedInstance.getOriginY();
+    const y =
+      bottomEdgeAnchor === gd.CustomObjectConfiguration.NoAnchor
+        ? top + originY
+        : topEdgeAnchor === gd.CustomObjectConfiguration.NoAnchor
+        ? bottom - height + originY
+        : top + originY;
+    layoutedInstance.y = y;
   }
   return renderedInstance;
 };

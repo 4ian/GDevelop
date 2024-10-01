@@ -38,7 +38,8 @@ namespace gdjs {
       owner: gdjs.RuntimeObject
     ) {
       super(instanceContainer, behaviorData, owner);
-      this._relativeToOriginalWindowSize = !!behaviorData.relativeToOriginalWindowSize;
+      this._relativeToOriginalWindowSize =
+        !!behaviorData.relativeToOriginalWindowSize;
       this._leftEdgeAnchor = behaviorData.leftEdgeAnchor;
       this._rightEdgeAnchor = behaviorData.rightEdgeAnchor;
       this._topEdgeAnchor = behaviorData.topEdgeAnchor;
@@ -88,7 +89,6 @@ namespace gdjs {
       const workingPoint: FloatPoint = gdjs.staticArray(
         gdjs.AnchorRuntimeBehavior.prototype.doStepPreEvents
       ) as FloatPoint;
-      // TODO EBO Make it work with event based objects or hide this behavior for them.
       let parentMinX = instanceContainer.getUnrotatedViewportMinX();
       let parentMinY = instanceContainer.getUnrotatedViewportMinY();
       let parentMaxX = instanceContainer.getUnrotatedViewportMaxX();
@@ -111,10 +111,11 @@ namespace gdjs {
         }
 
         //Calculate the distances from the window's bounds.
-        const topLeftPixel = layer.convertCoords(
+        const topLeftPixel = this._convertCoords(
+          instanceContainer,
+          layer,
           this.owner.getDrawableX(),
           this.owner.getDrawableY(),
-          0,
           workingPoint
         );
 
@@ -141,10 +142,11 @@ namespace gdjs {
         }
 
         // It's fine to reuse workingPoint as topLeftPixel is no longer used.
-        const bottomRightPixel = layer.convertCoords(
+        const bottomRightPixel = this._convertCoords(
+          instanceContainer,
+          layer,
           this.owner.getDrawableX() + this.owner.getWidth(),
           this.owner.getDrawableY() + this.owner.getHeight(),
-          0,
           workingPoint
         );
 
@@ -225,19 +227,21 @@ namespace gdjs {
         }
 
         // It's fine to reuse workingPoint as topLeftPixel is no longer used.
-        const topLeftCoord = layer.convertInverseCoords(
+        const topLeftCoord = this._convertInverseCoords(
+          instanceContainer,
+          layer,
           leftPixel,
           topPixel,
-          0,
           workingPoint
         );
         const left = topLeftCoord[0];
         const top = topLeftCoord[1];
 
-        const bottomRightCoord = layer.convertInverseCoords(
+        const bottomRightCoord = this._convertInverseCoords(
+          instanceContainer,
+          layer,
           rightPixel,
           bottomPixel,
-          0,
           workingPoint
         );
         const right = bottomRightCoord[0];
@@ -328,6 +332,40 @@ namespace gdjs {
     }
 
     doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
+
+    private _convertCoords(
+      instanceContainer: gdjs.RuntimeInstanceContainer,
+      layer: gdjs.RuntimeLayer,
+      x: float,
+      y: float,
+      result: FloatPoint
+    ) {
+      const isParentACustomObject =
+        instanceContainer !== instanceContainer.getScene();
+      if (isParentACustomObject) {
+        result[0] = x;
+        result[1] = y;
+        return result;
+      }
+      return layer.convertCoords(x, y, 0, result);
+    }
+
+    private _convertInverseCoords(
+      instanceContainer: gdjs.RuntimeInstanceContainer,
+      layer: gdjs.RuntimeLayer,
+      x: float,
+      y: float,
+      result: FloatPoint
+    ) {
+      const isParentACustomObject =
+        instanceContainer !== instanceContainer.getScene();
+      if (isParentACustomObject) {
+        result[0] = x;
+        result[1] = y;
+        return result;
+      }
+      return layer.convertInverseCoords(x, y, 0, result);
+    }
   }
   gdjs.registerBehavior(
     'AnchorBehavior::AnchorBehavior',

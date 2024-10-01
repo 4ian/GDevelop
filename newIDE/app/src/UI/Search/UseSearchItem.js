@@ -6,7 +6,7 @@ import SearchApi from 'js-worker-search';
 import {
   type AssetShortHeader,
   type PublicAssetPack,
-  type Resource,
+  type ResourceV2,
 } from '../../Utils/GDevelopServices/Asset';
 import {
   type PrivateAssetPackListingData,
@@ -16,7 +16,7 @@ import {
 type SearchableItem =
   | AssetShortHeader
   | PublicAssetPack
-  | Resource
+  | ResourceV2
   | PrivateAssetPackListingData
   | PrivateGameTemplateListingData;
 
@@ -25,7 +25,7 @@ export interface SearchFilter<SearchItem> {
   hasFilters(): boolean;
 }
 
-export class TagSearchFilter<SearchItem: AssetShortHeader | Resource>
+export class TagSearchFilter<SearchItem: AssetShortHeader | ResourceV2>
   implements SearchFilter<SearchItem> {
   tags: Set<string>;
 

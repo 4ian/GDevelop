@@ -1,8 +1,8 @@
 // @flow
 import * as React from 'react';
-import { type FiltersState, useFilters } from '../../UI/Search/FiltersChooser';
 import {
-  type Resource,
+  type ResourceV2,
+  type AudioResourceV2,
   type Author,
   type License,
   listAllAuthors,
@@ -12,6 +12,11 @@ import {
 import { type Filters } from '../../Utils/GDevelopServices/Filters';
 import { useSearchItem } from '../../UI/Search/UseSearchItem';
 import { AssetStoreContext } from '../AssetStoreContext';
+import {
+  AudioTypeResourceStoreSearchFilter,
+  DurationResourceStoreSearchFilter,
+} from './ResourceStoreSearchFilter';
+import type { SearchFilter } from '../../UI/Search/UseSearchItem';
 
 const defaultSearchText = '';
 
@@ -19,12 +24,18 @@ type ResourceStoreState = {|
   filters: ?Filters,
   authors: ?Array<Author>,
   licenses: ?Array<License>,
-  searchResults: ?Array<Resource>,
+  searchResults: ?Array<ResourceV2>,
   fetchResourcesAndFilters: () => void,
   error: ?Error,
   searchText: string,
   setSearchText: string => void,
-  filtersState: FiltersState,
+  clearAllFilters: () => void,
+  audioFiltersState: {|
+    durationFilter: DurationResourceStoreSearchFilter,
+    setDurationFilter: DurationResourceStoreSearchFilter => void,
+    audioTypeFilter: AudioTypeResourceStoreSearchFilter,
+    setAudioTypeFilter: AudioTypeResourceStoreSearchFilter => void,
+  |},
 |};
 
 export const ResourceStoreContext = React.createContext<ResourceStoreState>({
@@ -36,12 +47,12 @@ export const ResourceStoreContext = React.createContext<ResourceStoreState>({
   error: null,
   searchText: '',
   setSearchText: () => {},
-  filtersState: {
-    chosenFilters: new Set(),
-    addFilter: () => {},
-    removeFilter: () => {},
-    chosenCategory: null,
-    setChosenCategory: () => {},
+  clearAllFilters: () => {},
+  audioFiltersState: {
+    durationFilter: new DurationResourceStoreSearchFilter(),
+    setDurationFilter: DurationResourceStoreSearchFilter => {},
+    audioTypeFilter: new AudioTypeResourceStoreSearchFilter(),
+    setAudioTypeFilter: AudioTypeResourceStoreSearchFilter => {},
   },
 });
 
@@ -49,7 +60,7 @@ type ResourceStoreStateProviderProps = {|
   children: React.Node,
 |};
 
-const getResourceSearchTerms = (resource: Resource) => {
+const getResourceSearchTerms = (resource: ResourceV2) => {
   return resource.name + '\n' + resource.tags.join(', ');
 };
 
@@ -57,7 +68,7 @@ export const ResourceStoreStateProvider = ({
   children,
 }: ResourceStoreStateProviderProps) => {
   const [resourcesByUrl, setResourcesByUrl] = React.useState<?{
-    [string]: Resource,
+    [string]: ResourceV2,
   }>(null);
   const [filters, setFilters] = React.useState<?Filters>(null);
   const [authors, setAuthors] = React.useState<?Array<Author>>(null);
@@ -66,7 +77,18 @@ export const ResourceStoreStateProvider = ({
   const isLoading = React.useRef<boolean>(false);
 
   const [searchText, setSearchText] = React.useState(defaultSearchText);
-  const filtersState = useFilters();
+  const [
+    durationFilter,
+    setDurationFilter,
+  ] = React.useState<DurationResourceStoreSearchFilter>(
+    new DurationResourceStoreSearchFilter()
+  );
+  const [
+    audioTypeFilter,
+    setAudioTypeFilter,
+  ] = React.useState<AudioTypeResourceStoreSearchFilter>(
+    new AudioTypeResourceStoreSearchFilter()
+  );
 
   const { environment } = React.useContext(AssetStoreContext);
 
@@ -81,7 +103,7 @@ export const ResourceStoreStateProvider = ({
         isLoading.current = true;
 
         try {
-          const { resources, filters } = await listAllResources({
+          const { resourcesV2: resources, filters } = await listAllResources({
             environment,
           });
           const authors = await listAllAuthors({ environment });
@@ -115,18 +137,46 @@ export const ResourceStoreStateProvider = ({
     [resourcesByUrl, isLoading, environment]
   );
 
-  const { chosenCategory, chosenFilters } = filtersState;
-  const searchResults: ?Array<Resource> = useSearchItem(
+  const audioFiltersState = React.useMemo(
+    () => ({
+      durationFilter,
+      setDurationFilter,
+      audioTypeFilter,
+      setAudioTypeFilter,
+    }),
+    [durationFilter, audioTypeFilter]
+  );
+
+  // When one of the filter change, we need to rebuild the array
+  // for the search.
+  const audioResourceFilters = React.useMemo<
+    Array<SearchFilter<AudioResourceV2>>
+  >(() => [audioTypeFilter, durationFilter], [audioTypeFilter, durationFilter]);
+
+  const clearAllFilters = React.useCallback(
+    () => {
+      audioFiltersState.setDurationFilter(
+        new DurationResourceStoreSearchFilter()
+      );
+      audioFiltersState.setAudioTypeFilter(
+        new AudioTypeResourceStoreSearchFilter()
+      );
+    },
+    [audioFiltersState]
+  );
+
+  const audioSearchResults: ?Array<AudioResourceV2> = useSearchItem(
     resourcesByUrl,
     getResourceSearchTerms,
     searchText,
-    chosenCategory,
-    chosenFilters
+    null,
+    null,
+    audioResourceFilters
   );
 
   const resourceStoreState = React.useMemo(
     () => ({
-      searchResults,
+      searchResults: audioSearchResults,
       fetchResourcesAndFilters,
       filters,
       authors,
@@ -134,16 +184,18 @@ export const ResourceStoreStateProvider = ({
       error,
       searchText,
       setSearchText,
-      filtersState,
+      clearAllFilters,
+      audioFiltersState,
     }),
     [
-      searchResults,
+      audioSearchResults,
       error,
       filters,
       authors,
       licenses,
       searchText,
-      filtersState,
+      audioFiltersState,
+      clearAllFilters,
       fetchResourcesAndFilters,
     ]
   );

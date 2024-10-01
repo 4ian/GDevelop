@@ -137,13 +137,15 @@ type RangeFilterProps = {|
   title: ?React.Node,
   min: number,
   max: number,
-  step: number,
+  step: number | null,
   scale: number => number,
   range: [number, number],
   setRange: ([number, number]) => void,
+  valueLabelFormat?: (value: number) => string,
+  marks?: {|value: number, label: React.Node|}[],
 |};
 
-const RangeFilter = ({
+export const RangeFilter = ({
   filterKey,
   title,
   min,
@@ -152,6 +154,8 @@ const RangeFilter = ({
   step,
   range,
   setRange,
+  valueLabelFormat,
+  marks,
 }: RangeFilterProps) => {
   return (
     <I18n>
@@ -169,9 +173,10 @@ const RangeFilter = ({
                   max={max}
                   step={step}
                   scale={scale}
-                  marks={true}
+                  marks={marks || true}
                   valueLabelDisplay="auto"
                   onChange={newValue => setRange(newValue)}
+                  valueLabelFormat={valueLabelFormat}
                 />
               </Line>
             </Column>

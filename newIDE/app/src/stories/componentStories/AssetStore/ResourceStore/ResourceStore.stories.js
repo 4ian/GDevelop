@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import paperDecorator from '../../../PaperDecorator';
+import { getPaperDecorator } from '../../../PaperDecorator';
 import FixedHeightFlexContainer from '../../../FixedHeightFlexContainer';
 import { ResourceStoreStateProvider } from '../../../../AssetStore/ResourceStore/ResourceStoreContext';
 import { ResourceStore } from '../../../../AssetStore/ResourceStore';
@@ -10,11 +10,11 @@ import { ResourceStore } from '../../../../AssetStore/ResourceStore';
 export default {
   title: 'AssetStore/ResourceStore',
   component: ResourceStore,
-  decorators: [paperDecorator],
+  decorators: [getPaperDecorator('medium')],
 };
 
 export const ImageResource = () => (
-  <FixedHeightFlexContainer height={400}>
+  <FixedHeightFlexContainer height={600}>
     <ResourceStoreStateProvider>
       <ResourceStore onChoose={action('onChoose')} resourceKind="image" />
     </ResourceStoreStateProvider>
@@ -22,7 +22,7 @@ export const ImageResource = () => (
 );
 
 export const AudioResource = () => (
-  <FixedHeightFlexContainer height={400}>
+  <FixedHeightFlexContainer height={600}>
     <ResourceStoreStateProvider>
       <ResourceStore onChoose={action('onChoose')} resourceKind="audio" />
     </ResourceStoreStateProvider>
@@ -30,7 +30,7 @@ export const AudioResource = () => (
 );
 
 export const FontResource = () => (
-  <FixedHeightFlexContainer height={400}>
+  <FixedHeightFlexContainer height={600}>
     <ResourceStoreStateProvider>
       <ResourceStore onChoose={action('onChoose')} resourceKind="font" />
     </ResourceStoreStateProvider>
@@ -38,7 +38,7 @@ export const FontResource = () => (
 );
 
 export const SvgResource = () => (
-  <FixedHeightFlexContainer height={400}>
+  <FixedHeightFlexContainer height={600}>
     <ResourceStoreStateProvider>
       <ResourceStore onChoose={action('onChoose')} resourceKind="svg" />
     </ResourceStoreStateProvider>
@@ -46,7 +46,7 @@ export const SvgResource = () => (
 );
 
 export const Model3DResource = () => (
-  <FixedHeightFlexContainer height={400}>
+  <FixedHeightFlexContainer height={600}>
     <ResourceStoreStateProvider>
       <ResourceStore onChoose={action('onChoose')} resourceKind="model3D" />
     </ResourceStoreStateProvider>
@@ -54,7 +54,7 @@ export const Model3DResource = () => (
 );
 
 export const AtlasResource = () => (
-  <FixedHeightFlexContainer height={400}>
+  <FixedHeightFlexContainer height={600}>
     <ResourceStoreStateProvider>
       <ResourceStore onChoose={action('onChoose')} resourceKind="atlas" />
     </ResourceStoreStateProvider>

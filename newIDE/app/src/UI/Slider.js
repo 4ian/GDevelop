@@ -7,10 +7,11 @@ type Props<T> = {|
   value: T,
   min: number,
   max: number,
-  step: number,
+  step: number | null,
   scale?: number => number,
   valueLabelDisplay?: 'auto',
-  marks?: boolean,
+  valueLabelFormat?: (value: number, index: number) => string,
+  marks?: boolean | {|value: number, label: React.Node|}[],
   onChange: (value: T) => void,
 |};
 
@@ -32,6 +33,7 @@ const Slider = <T: number | [number, number]>(props: Props<T>) => {
       color="secondary"
       marks={props.marks}
       valueLabelDisplay={props.valueLabelDisplay}
+      valueLabelFormat={props.valueLabelFormat}
       value={props.value}
       scale={props.scale}
       track={false}

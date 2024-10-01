@@ -290,6 +290,8 @@ export interface ChildRenderedInstance {
   _pixiObject: { height: number };
   getDefaultWidth(): number;
   getDefaultHeight(): number;
+  getWidth(): number;
+  getHeight(): number;
   getOriginX(): number;
   getOriginY(): number;
   update(): void;

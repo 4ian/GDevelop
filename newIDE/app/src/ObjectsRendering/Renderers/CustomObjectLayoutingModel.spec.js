@@ -579,6 +579,18 @@ class MockedChildRenderedInstance implements ChildRenderedInstance {
     this.heightAfterUpdate = defaultHeight;
   }
 
+  getWidth(): number {
+    return this._instance.hasCustomSize()
+      ? this._instance.getCustomWidth()
+      : this.getDefaultWidth();
+  }
+
+  getHeight(): number {
+    return this._instance.hasCustomSize()
+      ? this._instance.getCustomHeight()
+      : this.getDefaultHeight();
+  }
+
   getDefaultWidth(): number {
     return this.defaultWidth;
   }

@@ -174,7 +174,7 @@ std::map<gd::String, gd::PropertyDescriptor> TextObject::GetProperties() const {
       .AddExtraInfo("top")
       .AddExtraInfo("center")
       .AddExtraInfo("bottom")
-      .SetLabel(_("Vertical alignment, when multiple lines are displayed"))
+      .SetLabel(_("Vertical alignment"))
       .SetGroup(_("Font"));
 
   objectProperties["isOutlineEnabled"]

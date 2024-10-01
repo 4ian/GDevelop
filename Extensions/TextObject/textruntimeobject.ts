@@ -83,8 +83,8 @@ namespace gdjs {
     _gradient: Array<Array<integer>> = [];
     _gradientType: string = '';
     opacity: float = 255;
-    _textAlign: string = 'left';
-    _verticalTextAlignment: string = 'top';
+    _textAlign: string;
+    _verticalTextAlignment: string;
     _wrapping: boolean = false;
     // A wrapping of 1 makes games crash on Firefox
     _wrappingWidth: float = 100;
@@ -125,8 +125,8 @@ namespace gdjs {
       this._underlined = content.underlined;
       this._color = gdjs.rgbOrHexToRGBColor(content.color);
       this._str = content.text;
-      this._textAlign = content.textAlignment;
-      this._verticalTextAlignment = content.verticalTextAlignment;
+      this._textAlign = content.textAlignment || 'left';
+      this._verticalTextAlignment = content.verticalTextAlignment || 'top';
 
       this._isOutlineEnabled = content.isOutlineEnabled;
       this._outlineThickness = content.outlineThickness;

@@ -83,7 +83,9 @@ namespace gdjs {
       this._collisionMaskTag = objectData.content.collisionMaskTag;
       this._layerIndex = objectData.content.useAllLayers
         ? null
-        : objectData.content.layerIndex;
+        : Number.isFinite(objectData.content.layerIndex)
+        ? objectData.content.layerIndex
+        : 1;
       this._debugMode = objectData.content.debugMode;
       this._fillColor = gdjs.rgbOrHexStringToNumber(
         objectData.content.fillColor

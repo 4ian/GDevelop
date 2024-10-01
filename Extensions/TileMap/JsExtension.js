@@ -1159,7 +1159,7 @@ const defineCollisionMask = function (extension, _, gd) {
     );
     objectProperties.set(
       'layerIndex',
-      new gd.PropertyDescriptor(objectContent.layerIndex.toString())
+      new gd.PropertyDescriptor((objectContent.layerIndex || 1).toString())
         .setType('number')
         .setLabel(_('Layer index'))
         .setGroup(_('Layers'))
@@ -1187,12 +1187,14 @@ const defineCollisionMask = function (extension, _, gd) {
         .setDescription(
           _('When activated, it displays the hitboxes in the given color.')
         )
+        .setGroup(_('Appearance'))
     );
     objectProperties.set(
       'outlineColor',
       new gd.PropertyDescriptor(objectContent.outlineColor)
         .setType('color')
         .setLabel(_('Outline color'))
+        .setGroup(_('Appearance'))
     );
     objectProperties.set(
       'outlineOpacity',
@@ -1203,6 +1205,7 @@ const defineCollisionMask = function (extension, _, gd) {
       )
         .setType('number')
         .setLabel(_('Outline opacity (0-255)'))
+        .setGroup(_('Appearance'))
     );
     objectProperties.set(
       'outlineSize',
@@ -1213,12 +1216,14 @@ const defineCollisionMask = function (extension, _, gd) {
       )
         .setType('number')
         .setLabel(_('Outline size (in pixels)'))
+        .setGroup(_('Appearance'))
     );
     objectProperties.set(
       'fillColor',
       new gd.PropertyDescriptor(objectContent.fillColor)
         .setType('color')
         .setLabel(_('Fill color'))
+        .setGroup(_('Appearance'))
     );
     objectProperties.set(
       'fillOpacity',
@@ -1229,6 +1234,7 @@ const defineCollisionMask = function (extension, _, gd) {
       )
         .setType('number')
         .setLabel(_('Fill opacity (0-255)'))
+        .setGroup(_('Appearance'))
     );
 
     return objectProperties;
@@ -1237,7 +1243,7 @@ const defineCollisionMask = function (extension, _, gd) {
     tilemapJsonFile: '',
     tilesetJsonFile: '',
     collisionMaskTag: '',
-    layerIndex: 0,
+    layerIndex: 1,
     useAllLayers: true,
     debugMode: false,
     fillColor: '255;255;255',

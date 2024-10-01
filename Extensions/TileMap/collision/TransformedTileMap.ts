@@ -70,18 +70,19 @@ namespace gdjs {
             tileLayer.id,
             new TransformedCollisionTileMapLayer(this, tileLayer)
           );
-        }
-        for (const sourceLayer of tileMap.getLayers()) {
-          // TODO A visitor could be used to avoid a cast.
-          if (!(sourceLayer instanceof TileMapHelper.EditableTileMapLayer)) {
-            // TODO Collision mask for object layers is not handled.
-            continue;
+        } else {
+          for (const sourceLayer of tileMap.getLayers()) {
+            // TODO A visitor could be used to avoid a cast.
+            if (!(sourceLayer instanceof TileMapHelper.EditableTileMapLayer)) {
+              // TODO Collision mask for object layers is not handled.
+              continue;
+            }
+            const tileLayer = sourceLayer as TileMapHelper.EditableTileMapLayer;
+            layers.set(
+              tileLayer.id,
+              new TransformedCollisionTileMapLayer(this, tileLayer)
+            );
           }
-          const tileLayer = sourceLayer as TileMapHelper.EditableTileMapLayer;
-          layers.set(
-            tileLayer.id,
-            new TransformedCollisionTileMapLayer(this, tileLayer)
-          );
         }
       }
 

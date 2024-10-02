@@ -81,11 +81,13 @@ namespace gdjs {
       this._tilemapJsonFile = objectData.content.tilemapJsonFile;
       this._tilesetJsonFile = objectData.content.tilesetJsonFile;
       this._collisionMaskTag = objectData.content.collisionMaskTag;
-      this._layerIndex = objectData.content.useAllLayers
-        ? null
-        : Number.isFinite(objectData.content.layerIndex)
-        ? objectData.content.layerIndex
-        : 1;
+      this._layerIndex =
+        objectData.content.useAllLayers ||
+        objectData.content.useAllLayers === undefined
+          ? null
+          : Number.isFinite(objectData.content.layerIndex)
+          ? objectData.content.layerIndex
+          : 1;
       this._debugMode = objectData.content.debugMode;
       this._fillColor = gdjs.rgbOrHexStringToNumber(
         objectData.content.fillColor

@@ -72,59 +72,68 @@ const durationMarks = DurationResourceStoreSearchFilter.durationMarks.map(
   })
 );
 
-export const ResourceStoreFilterPanel = () => {
+export const ResourceStoreFilterPanel = ({
+  resourceKind,
+}: {
+  resourceKind: 'audio' | 'font',
+}) => {
   const { audioFiltersState, clearAllFilters } = React.useContext(
     ResourceStoreContext
   );
 
   return (
     <Column noMargin expand>
-      <SingleChoiceFilter
-        title={<Trans>Audio type</Trans>}
-        filterKey="AudioType"
-        choices={[
-          { value: '', label: t`All` },
-          { value: 'music', label: t`Music` },
-          { value: 'sound', label: t`Sound` },
-        ]}
-        value={audioFiltersState.audioTypeFilter.type || ''}
-        onChange={newValue =>
-          audioFiltersState.setAudioTypeFilter(
-            new AudioTypeResourceStoreSearchFilter(
-              // $FlowIgnore - We are confident the select only uses value from the options.
-              newValue || null
-            )
-          )
-        }
-      />
-      <RangeFilter
-        filterKey="Duration"
-        title={<Trans>Duration</Trans>}
-        min={durationMarks[0].value}
-        max={durationMarks[durationMarks.length - 1].value}
-        step={null}
-        scale={x => (x ? Math.round(10 ** x) : x)}
-        range={[
-          audioFiltersState.durationFilter.durationMin
-            ? Math.log10(audioFiltersState.durationFilter.durationMin)
-            : audioFiltersState.durationFilter.durationMin,
-          audioFiltersState.durationFilter.durationMax
-            ? Math.log10(audioFiltersState.durationFilter.durationMax)
-            : audioFiltersState.durationFilter.durationMax,
-        ]}
-        setRange={range => {
-          audioFiltersState.setDurationFilter(
-            new DurationResourceStoreSearchFilter(
-              10 ** range[0],
-              10 ** range[1]
-            )
-          );
-        }}
-        valueLabelFormat={value =>
-          formatDuration(value, { noNullDuration: false })
-        }
-        marks={durationMarks}
-      />
+      {resourceKind === 'audio' && (
+        <>
+          <SingleChoiceFilter
+            title={<Trans>Audio type</Trans>}
+            filterKey="AudioType"
+            choices={[
+              { value: '', label: t`All` },
+              { value: 'music', label: t`Music` },
+              { value: 'sound', label: t`Sound` },
+            ]}
+            value={audioFiltersState.audioTypeFilter.type || ''}
+            onChange={newValue =>
+              audioFiltersState.setAudioTypeFilter(
+                new AudioTypeResourceStoreSearchFilter(
+                  // $FlowIgnore - We are confident the select only uses value from the options.
+                  newValue || null
+                )
+              )
+            }
+          />
+          <RangeFilter
+            filterKey="Duration"
+            title={<Trans>Duration</Trans>}
+            min={durationMarks[0].value}
+            max={durationMarks[durationMarks.length - 1].value}
+            step={null}
+            scale={x => (x ? Math.round(10 ** x) : x)}
+            range={[
+              audioFiltersState.durationFilter.durationMin
+                ? Math.log10(audioFiltersState.durationFilter.durationMin)
+                : audioFiltersState.durationFilter.durationMin,
+              audioFiltersState.durationFilter.durationMax
+                ? Math.log10(audioFiltersState.durationFilter.durationMax)
+                : audioFiltersState.durationFilter.durationMax,
+            ]}
+            setRange={range => {
+              audioFiltersState.setDurationFilter(
+                new DurationResourceStoreSearchFilter(
+                  10 ** range[0],
+                  10 ** range[1]
+                )
+              );
+            }}
+            valueLabelFormat={value =>
+              formatDuration(value, { noNullDuration: false })
+            }
+            marks={durationMarks}
+          />
+        </>
+      )}
+      {resourceKind === 'font' && <>Salut</>}
 
       <Line justifyContent="center">
         <FlatButton

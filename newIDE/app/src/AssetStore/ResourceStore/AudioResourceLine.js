@@ -27,7 +27,6 @@ const AudioResourceLine = ({
   isSelected,
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  console.log(gdevelopTheme);
   return (
     <Paper
       background={isSelected ? 'light' : 'medium'}

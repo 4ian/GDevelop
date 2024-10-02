@@ -3,6 +3,7 @@ import * as React from 'react';
 import {
   type ResourceV2,
   type AudioResourceV2,
+  type FontResourceV2,
   type Author,
   type License,
   listAllAuthors,
@@ -30,6 +31,7 @@ type ResourceStoreState = {|
   searchText: string,
   setSearchText: string => void,
   clearAllFilters: () => void,
+  setSearchResourceKind: ('audio' | 'font' ) => void,
   audioFiltersState: {|
     durationFilter: DurationResourceStoreSearchFilter,
     setDurationFilter: DurationResourceStoreSearchFilter => void,
@@ -48,6 +50,7 @@ export const ResourceStoreContext = React.createContext<ResourceStoreState>({
   searchText: '',
   setSearchText: () => {},
   clearAllFilters: () => {},
+  setSearchResourceKind: () => {},
   audioFiltersState: {
     durationFilter: new DurationResourceStoreSearchFilter(),
     setDurationFilter: DurationResourceStoreSearchFilter => {},
@@ -75,6 +78,9 @@ export const ResourceStoreStateProvider = ({
   const [licenses, setLicenses] = React.useState<?Array<License>>(null);
   const [error, setError] = React.useState<?Error>(null);
   const isLoading = React.useRef<boolean>(false);
+  const [searchResourceKind, setSearchResourceKind] = React.useState<
+    'audio' | 'font'
+  >('audio');
 
   const [searchText, setSearchText] = React.useState(defaultSearchText);
   const [
@@ -147,11 +153,16 @@ export const ResourceStoreStateProvider = ({
     [durationFilter, audioTypeFilter]
   );
 
+  const fontFiltersState = React.useMemo(() => ({}), []);
+
   // When one of the filter change, we need to rebuild the array
   // for the search.
   const audioResourceFilters = React.useMemo<
     Array<SearchFilter<AudioResourceV2>>
   >(() => [audioTypeFilter, durationFilter], [audioTypeFilter, durationFilter]);
+  const fontResourceFilters = React.useMemo<
+    Array<SearchFilter<FontResourceV2>>
+  >(() => [], []);
 
   const clearAllFilters = React.useCallback(
     () => {
@@ -174,10 +185,21 @@ export const ResourceStoreStateProvider = ({
     audioResourceFilters
   );
 
+  const fontSearchResults: ?Array<FontResourceV2> = useSearchItem(
+    resourcesByUrl,
+    getResourceSearchTerms,
+    searchText,
+    null,
+    null,
+    fontResourceFilters
+  );
+
   const resourceStoreState = React.useMemo(
     () => ({
-      searchResults: audioSearchResults,
+      searchResults:
+        searchResourceKind === 'audio' ? audioSearchResults : fontSearchResults,
       fetchResourcesAndFilters,
+      setSearchResourceKind,
       filters,
       authors,
       licenses,
@@ -188,6 +210,7 @@ export const ResourceStoreStateProvider = ({
       audioFiltersState,
     }),
     [
+      fontSearchResults,
       audioSearchResults,
       error,
       filters,
@@ -197,6 +220,7 @@ export const ResourceStoreStateProvider = ({
       audioFiltersState,
       clearAllFilters,
       fetchResourcesAndFilters,
+      searchResourceKind,
     ]
   );
 

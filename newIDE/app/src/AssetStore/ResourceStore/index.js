@@ -6,6 +6,7 @@ import { Column, Line } from '../../UI/Grid';
 import {
   type ResourceV2,
   type AudioResourceV2,
+  type FontResourceV2,
 } from '../../Utils/GDevelopServices/Asset';
 import { ResourceStoreContext } from './ResourceStoreContext';
 import AudioResourceLine from './AudioResourceLine';
@@ -19,6 +20,7 @@ import { LineStackLayout } from '../../UI/Layout';
 import IconButton from '../../UI/IconButton';
 import { ResourceStoreFilterPanel } from './ResourceStoreFilterPanel';
 import SoundPlayer, { type SoundPlayerInterface } from '../../UI/SoundPlayer';
+import FontResourceLine from './FontResourceLine';
 
 const AudioResourceStoreRow = ({
   index,
@@ -47,7 +49,33 @@ const AudioResourceStoreRow = ({
   );
 };
 
-type AudioResourceListAndFiltersProps = {|
+const FontResourceStoreRow = ({
+  index,
+  style,
+  data,
+}: {|
+  index: number,
+  style: Object,
+  data: {|
+    items: FontResourceV2[],
+    selectedResource: FontResourceV2,
+    onSelect: FontResourceV2 => void,
+  |},
+|}) => {
+  const resource = data.items[index];
+  if (resource.type !== 'font') return null;
+  return (
+    <div style={style}>
+      <FontResourceLine
+        fontResource={resource}
+        isSelected={data.selectedResource === resource}
+        onSelect={() => data.onSelect(resource)}
+      />
+    </div>
+  );
+};
+
+type ResourceListAndFiltersProps = {|
   searchResults: ?Array<ResourceV2>,
   isFiltersPanelOpen: boolean,
   setIsFiltersPanelOpen: boolean => void,
@@ -57,7 +85,7 @@ const AudioResourceListAndFilters = ({
   searchResults,
   isFiltersPanelOpen,
   setIsFiltersPanelOpen,
-}: AudioResourceListAndFiltersProps) => {
+}: ResourceListAndFiltersProps) => {
   const soundPlayerRef = React.useRef<?SoundPlayerInterface>(null);
   const [
     playingAudioResource,
@@ -116,12 +144,12 @@ const AudioResourceListAndFilters = ({
                 <Line alignItems="center">
                   <Tune />
                   <Subheader>
-                    <Trans>Object filters</Trans>
+                    <Trans>Filters</Trans>
                   </Subheader>
                 </Line>
               </Column>
               <Line justifyContent="space-between" alignItems="center">
-                <ResourceStoreFilterPanel />
+                <ResourceStoreFilterPanel resourceKind="audio" />
               </Line>
             </Column>
           </ScrollView>
@@ -135,9 +163,69 @@ const AudioResourceListAndFilters = ({
     </>
   );
 };
+
+const FontResourceListAndFilters = ({
+  searchResults,
+  isFiltersPanelOpen,
+  setIsFiltersPanelOpen,
+}: ResourceListAndFiltersProps) => {
+  const [
+    selectedFontResource,
+    setSelectedFontResource,
+  ] = React.useState<?FontResourceV2>(null);
+  return (
+    <Line expand>
+      <Column noMargin noOverflowParent expand>
+        <Line noMargin expand>
+          {!!searchResults && (
+            <AutoSizer>
+              {({ height, width }) => (
+                <List
+                  height={height}
+                  width={width}
+                  overscanCount={10}
+                  itemCount={searchResults.length}
+                  itemSize={130}
+                  itemData={{
+                    items: searchResults,
+                    selectedResource: selectedFontResource,
+                    onSelect: setSelectedFontResource,
+                  }}
+                >
+                  {FontResourceStoreRow}
+                </List>
+              )}
+            </AutoSizer>
+          )}
+        </Line>
+      </Column>
+      <ResponsivePaperOrDrawer
+        onClose={() => setIsFiltersPanelOpen(false)}
+        open={isFiltersPanelOpen}
+      >
+        <ScrollView>
+          <Column>
+            <Column noMargin>
+              <Line alignItems="center">
+                <Tune />
+                <Subheader>
+                  <Trans>Filters</Trans>
+                </Subheader>
+              </Line>
+            </Column>
+            <Line justifyContent="space-between" alignItems="center">
+              <ResourceStoreFilterPanel resourceKind="font" />
+            </Line>
+          </Column>
+        </ScrollView>
+      </ResponsivePaperOrDrawer>
+    </Line>
+  );
+};
+
 type Props = {
   onChoose: ResourceV2 => void,
-  resourceKind: string,
+  resourceKind: 'audio' | 'font',
 };
 
 export const ResourceStore = ({ onChoose, resourceKind }: Props) => {
@@ -146,9 +234,16 @@ export const ResourceStore = ({ onChoose, resourceKind }: Props) => {
     fetchResourcesAndFilters,
     searchText,
     setSearchText,
+    setSearchResourceKind,
   } = React.useContext(ResourceStoreContext);
   const [isFiltersPanelOpen, setIsFiltersPanelOpen] = React.useState<boolean>(
     false
+  );
+  React.useEffect(
+    () => {
+      setSearchResourceKind(resourceKind);
+    },
+    [resourceKind, setSearchResourceKind]
   );
 
   React.useEffect(
@@ -183,6 +278,13 @@ export const ResourceStore = ({ onChoose, resourceKind }: Props) => {
       </LineStackLayout>
       {resourceKind === 'audio' && (
         <AudioResourceListAndFilters
+          isFiltersPanelOpen={isFiltersPanelOpen}
+          setIsFiltersPanelOpen={setIsFiltersPanelOpen}
+          searchResults={searchResultsForResourceKind}
+        />
+      )}
+      {resourceKind === 'font' && (
+        <FontResourceListAndFilters
           isFiltersPanelOpen={isFiltersPanelOpen}
           setIsFiltersPanelOpen={setIsFiltersPanelOpen}
           searchResults={searchResultsForResourceKind}

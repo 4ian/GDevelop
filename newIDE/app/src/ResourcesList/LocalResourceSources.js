@@ -7,6 +7,7 @@ import {
   type ResourceSourceComponentProps,
   type ResourceSource,
   allResourceKindsAndMetadata,
+  resourcesKindSupportedByResourceStore,
 } from './ResourceSource';
 import { ResourceStore } from '../AssetStore/ResourceStore';
 import { isPathInProjectFolder, copyAllToProjectFolder } from './ResourceUtils';
@@ -38,6 +39,10 @@ const ResourceStoreChooser = ({
   onChooseResources,
   createNewResource,
 }: ResourceStoreChooserProps) => {
+  const { resourceKind } = options;
+  if (!resourcesKindSupportedByResourceStore.includes(resourceKind)) {
+    return null;
+  }
   return (
     <ResourceStore
       onChoose={resource => {
@@ -49,7 +54,10 @@ const ResourceStoreChooser = ({
 
         onChooseResources([newResource]);
       }}
-      resourceKind={options.resourceKind}
+      resourceKind={
+        // $FlowIgnore - Flow does not understand the check above restricts the resource kind.
+        resourceKind
+      }
     />
   );
 };
@@ -264,20 +272,28 @@ const localResourceSources: Array<ResourceSource> = [
       />
     ),
   })),
-  ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => ({
-    name: `resource-store-${kind}`,
-    displayName: t`Choose from asset store`,
-    displayTab: 'standalone',
-    kind,
-    renderComponent: (props: ResourceSourceComponentProps) => (
-      <ResourceStoreChooser
-        createNewResource={createNewResource}
-        onChooseResources={props.onChooseResources}
-        options={props.options}
-        key={`resource-store-${kind}`}
-      />
-    ),
-  })),
+  ...resourcesKindSupportedByResourceStore
+    .map(kind => {
+      const source = allResourceKindsAndMetadata.find(
+        resourceSource => resourceSource.kind === kind
+      );
+      if (!source) return null;
+      return {
+        name: `resource-store-${kind}`,
+        displayName: t`Choose from asset store`,
+        displayTab: 'standalone',
+        kind,
+        renderComponent: (props: ResourceSourceComponentProps) => (
+          <ResourceStoreChooser
+            createNewResource={source.createNewResource}
+            onChooseResources={props.onChooseResources}
+            options={props.options}
+            key={`resource-store-${kind}`}
+          />
+        ),
+      };
+    })
+    .filter(Boolean),
 ];
 
 export default localResourceSources;

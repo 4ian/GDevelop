@@ -28,6 +28,8 @@ export type ResourceKind =
   | 'atlas'
   | 'spine';
 
+export const resourcesKindSupportedByResourceStore = ['audio', 'font'];
+
 export const allResourceKindsAndMetadata = [
   {
     kind: 'audio',

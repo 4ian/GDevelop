@@ -21,6 +21,8 @@ import {
 } from './ResourceStoreSearchFilter';
 import type { SearchFilter } from '../../UI/Search/UseSearchItem';
 
+export type ResourceKindSupportedByResourceStore = 'audio' | 'font' | 'svg';
+
 const defaultSearchText = '';
 
 type ResourceStoreState = {|
@@ -37,7 +39,7 @@ type ResourceStoreState = {|
   searchText: string,
   setSearchText: string => void,
   clearAllFilters: () => void,
-  setSearchResourceKind: ('audio' | 'font' | 'svg') => void,
+  setSearchResourceKind: (ResourceKindSupportedByResourceStore) => void,
   audioFiltersState: {|
     durationFilter: DurationResourceStoreSearchFilter,
     setDurationFilter: DurationResourceStoreSearchFilter => void,
@@ -98,9 +100,10 @@ export const ResourceStoreStateProvider = ({
   const [licenses, setLicenses] = React.useState<?Array<License>>(null);
   const [error, setError] = React.useState<?Error>(null);
   const isLoading = React.useRef<boolean>(false);
-  const [searchResourceKind, setSearchResourceKind] = React.useState<
-    'audio' | 'font' | 'svg'
-  >('audio');
+  const [
+    searchResourceKind,
+    setSearchResourceKind,
+  ] = React.useState<ResourceKindSupportedByResourceStore>('audio');
 
   const [searchText, setSearchText] = React.useState(defaultSearchText);
   const [

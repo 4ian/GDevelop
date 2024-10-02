@@ -1,6 +1,8 @@
 // @flow
 import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
+import { AutoSizer } from 'react-virtualized';
+import { FixedSizeList as List } from 'react-window';
 import SearchBar from '../../UI/SearchBar';
 import { Column, Line } from '../../UI/Grid';
 import {
@@ -9,10 +11,9 @@ import {
   type FontResourceV2,
   type Resource,
 } from '../../Utils/GDevelopServices/Asset';
+import { type ResourceKindSupportedByResourceStore } from './ResourceStoreContext';
 import { ResourceStoreContext } from './ResourceStoreContext';
 import AudioResourceLine from './AudioResourceLine';
-import { FixedSizeList as List } from 'react-window';
-import { AutoSizer } from 'react-virtualized';
 import { ResponsivePaperOrDrawer } from '../../UI/ResponsivePaperOrDrawer';
 import ScrollView from '../../UI/ScrollView';
 import Tune from '../../UI/CustomSvgIcons/Tune';
@@ -309,7 +310,7 @@ const SvgResourceListAndFilters = ({
 
 type Props = {
   onChoose: ResourceV2 => void,
-  resourceKind: 'audio' | 'font' | 'svg',
+  resourceKind: ResourceKindSupportedByResourceStore,
 };
 
 export const ResourceStore = ({ onChoose, resourceKind }: Props) => {

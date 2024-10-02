@@ -63,6 +63,7 @@ const styles = {
 
 type ImageCardProps = {|
   size: number,
+  isSelected?: boolean,
   resource: Resource,
   onChoose: () => void,
   imageStyle?: {|
@@ -76,11 +77,22 @@ const ImageCard = ({
   resource,
   onChoose,
   size,
+  isSelected,
   imageStyle,
 }: ImageCardProps) => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <ButtonBase onClick={onChoose} focusRipple>
-      <div style={{ ...styles.cardContainer, width: size, height: size }}>
+      <div
+        style={{
+          ...styles.cardContainer,
+          width: size,
+          height: size,
+          outline: isSelected
+            ? `1px solid ${gdevelopTheme.palette.secondary}`
+            : undefined,
+        }}
+      >
         <div style={{ ...styles.previewContainer, width: size, height: size }}>
           <CheckeredBackground />
           <CorsAwareImage
@@ -96,10 +108,10 @@ const ImageCard = ({
           />
         </div>
         <div style={styles.titleContainer}>
-          <Text noMargin style={styles.title}>
+          <Text noMargin style={styles.title} color="inherit">
             {resource.name}
           </Text>
-          <Text noMargin style={styles.title} size="body2">
+          <Text noMargin style={styles.title} color="inherit" size="body2">
             {resource.license}
           </Text>
         </div>
@@ -140,18 +152,32 @@ type Props = {|
   size: number,
   resource: Resource,
   onChoose: () => void,
+  isSelected?: boolean,
 |};
 
-export const ResourceCard = ({ resource, onChoose, size }: Props) => {
+export const ResourceCard = ({
+  resource,
+  onChoose,
+  size,
+  isSelected,
+}: Props) => {
   const resourceKind = resource.type;
   const theme = React.useContext(GDevelopThemeContext);
 
   switch (resourceKind) {
     case 'image':
-      return <ImageCard resource={resource} onChoose={onChoose} size={size} />;
+      return (
+        <ImageCard
+          isSelected={isSelected}
+          resource={resource}
+          onChoose={onChoose}
+          size={size}
+        />
+      );
     case 'svg':
       return (
         <ImageCard
+          isSelected={isSelected}
           resource={resource}
           onChoose={onChoose}
           size={size}

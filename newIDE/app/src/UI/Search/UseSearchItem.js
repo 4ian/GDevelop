@@ -7,6 +7,7 @@ import {
   type AssetShortHeader,
   type PublicAssetPack,
   type ResourceV2,
+  type Resource,
 } from '../../Utils/GDevelopServices/Asset';
 import {
   type PrivateAssetPackListingData,
@@ -17,6 +18,7 @@ type SearchableItem =
   | AssetShortHeader
   | PublicAssetPack
   | ResourceV2
+  | Resource
   | PrivateAssetPackListingData
   | PrivateGameTemplateListingData;
 
@@ -167,6 +169,7 @@ export const filterSearchItems = <SearchItem: SearchableItem>(
         (searchItem.tags &&
           searchItem.tags.some(tag => chosenFilters.has(tag))) ||
         (searchItem.categories &&
+          // $FlowIgnore - Flow seems unable to consider `categories` type.
           searchItem.categories.some(category => chosenFilters.has(category)))
       );
     });

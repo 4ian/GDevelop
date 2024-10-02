@@ -7,6 +7,7 @@ import {
   type ResourceV2,
   type AudioResourceV2,
   type FontResourceV2,
+  type Resource,
 } from '../../Utils/GDevelopServices/Asset';
 import { ResourceStoreContext } from './ResourceStoreContext';
 import AudioResourceLine from './AudioResourceLine';
@@ -21,6 +22,8 @@ import IconButton from '../../UI/IconButton';
 import { ResourceStoreFilterPanel } from './ResourceStoreFilterPanel';
 import SoundPlayer, { type SoundPlayerInterface } from '../../UI/SoundPlayer';
 import FontResourceLine from './FontResourceLine';
+import { BoxSearchResults } from '../../UI/Search/BoxSearchResults';
+import { ResourceCard } from './ResourceCard';
 
 const AudioResourceStoreRow = ({
   index,
@@ -79,6 +82,8 @@ type ResourceListAndFiltersProps = {|
   searchResults: ?Array<ResourceV2>,
   isFiltersPanelOpen: boolean,
   setIsFiltersPanelOpen: boolean => void,
+  error: ?Error,
+  onRetry: () => void,
 |};
 
 const AudioResourceListAndFilters = ({
@@ -223,9 +228,47 @@ const FontResourceListAndFilters = ({
   );
 };
 
+const SvgResourceListAndFilters = ({
+  searchResults,
+  isFiltersPanelOpen,
+  setIsFiltersPanelOpen,
+  error,
+  onRetry,
+}: ResourceListAndFiltersProps) => {
+  const [
+    selectedSvgResource,
+    setSelectedSvgResource,
+  ] = React.useState<?Resource>(null);
+  return (
+    <Line
+      expand
+      overflow={
+        'hidden' /* Somehow required on Chrome/Firefox to avoid children growing (but not on Safari) */
+      }
+      noMargin
+    >
+      <BoxSearchResults
+        baseSize={128}
+        spacing={8}
+        onRetry={onRetry}
+        error={error}
+        searchItems={searchResults}
+        renderSearchItem={(resource, size) => (
+          <ResourceCard
+            size={size}
+            resource={resource}
+            onChoose={() => setSelectedSvgResource(resource)}
+            isSelected={selectedSvgResource === resource}
+          />
+        )}
+      />
+    </Line>
+  );
+};
+
 type Props = {
   onChoose: ResourceV2 => void,
-  resourceKind: 'audio' | 'font',
+  resourceKind: 'audio' | 'font' | 'svg',
 };
 
 export const ResourceStore = ({ onChoose, resourceKind }: Props) => {
@@ -233,6 +276,7 @@ export const ResourceStore = ({ onChoose, resourceKind }: Props) => {
     searchResults,
     fetchResourcesAndFilters,
     searchText,
+    error,
     setSearchText,
     setSearchResourceKind,
   } = React.useContext(ResourceStoreContext);
@@ -268,26 +312,50 @@ export const ResourceStore = ({ onChoose, resourceKind }: Props) => {
             placeholder={t`Search resources`}
           />
         </Column>
-        <IconButton
-          onClick={() => setIsFiltersPanelOpen(!isFiltersPanelOpen)}
-          selected={isFiltersPanelOpen}
-          size="small"
-        >
-          <Tune />
-        </IconButton>
+        {(resourceKind === 'audio' || resourceKind === 'font') && (
+          <IconButton
+            onClick={() => setIsFiltersPanelOpen(!isFiltersPanelOpen)}
+            selected={isFiltersPanelOpen}
+            size="small"
+          >
+            <Tune />
+          </IconButton>
+        )}
       </LineStackLayout>
       {resourceKind === 'audio' && (
         <AudioResourceListAndFilters
+          error={error}
+          onRetry={fetchResourcesAndFilters}
           isFiltersPanelOpen={isFiltersPanelOpen}
           setIsFiltersPanelOpen={setIsFiltersPanelOpen}
-          searchResults={searchResultsForResourceKind}
+          searchResults={
+            // $FlowIgnore - search results should return results for audio resources only.
+            searchResultsForResourceKind
+          }
         />
       )}
       {resourceKind === 'font' && (
         <FontResourceListAndFilters
+          error={error}
+          onRetry={fetchResourcesAndFilters}
           isFiltersPanelOpen={isFiltersPanelOpen}
           setIsFiltersPanelOpen={setIsFiltersPanelOpen}
-          searchResults={searchResultsForResourceKind}
+          searchResults={
+            // $FlowIgnore - search results should return results for font resources only.
+            searchResultsForResourceKind
+          }
+        />
+      )}
+      {resourceKind === 'svg' && (
+        <SvgResourceListAndFilters
+          error={error}
+          onRetry={fetchResourcesAndFilters}
+          isFiltersPanelOpen={false}
+          setIsFiltersPanelOpen={() => {}}
+          searchResults={
+            // $FlowIgnore - search results should return results for svg resources only.
+            searchResultsForResourceKind
+          }
         />
       )}
     </Column>

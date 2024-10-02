@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import {
+  type Resource,
   type ResourceV2,
   type AudioResourceV2,
   type FontResourceV2,
@@ -26,13 +27,17 @@ type ResourceStoreState = {|
   filters: ?Filters,
   authors: ?Array<Author>,
   licenses: ?Array<License>,
-  searchResults: ?Array<ResourceV2>,
+  searchResults: ?(
+    | Array<FontResourceV2>
+    | Array<AudioResourceV2>
+    | Array<Resource>
+  ),
   fetchResourcesAndFilters: () => void,
   error: ?Error,
   searchText: string,
   setSearchText: string => void,
   clearAllFilters: () => void,
-  setSearchResourceKind: ('audio' | 'font') => void,
+  setSearchResourceKind: ('audio' | 'font' | 'svg') => void,
   audioFiltersState: {|
     durationFilter: DurationResourceStoreSearchFilter,
     setDurationFilter: DurationResourceStoreSearchFilter => void,
@@ -72,15 +77,15 @@ type ResourceStoreStateProviderProps = {|
   children: React.Node,
 |};
 
-const getResourceSearchTerms = (resource: ResourceV2) => {
+const getResourceSearchTerms = (resource: ResourceV2 | Resource) => {
   return resource.name + '\n' + resource.tags.join(', ');
 };
 
 export const ResourceStoreStateProvider = ({
   children,
 }: ResourceStoreStateProviderProps) => {
-  const [resourcesByUrl, setResourcesByUrl] = React.useState<?{
-    [string]: ResourceV2,
+  const [svgResourcesByUrl, setSvgResourcesByUrl] = React.useState<?{
+    [string]: Resource,
   }>(null);
   const [fontResourcesByUrl, setFontResourcesByUrl] = React.useState<?{
     [string]: FontResourceV2,
@@ -94,7 +99,7 @@ export const ResourceStoreStateProvider = ({
   const [error, setError] = React.useState<?Error>(null);
   const isLoading = React.useRef<boolean>(false);
   const [searchResourceKind, setSearchResourceKind] = React.useState<
-    'audio' | 'font'
+    'audio' | 'font' | 'svg'
   >('audio');
 
   const [searchText, setSearchText] = React.useState(defaultSearchText);
@@ -123,28 +128,42 @@ export const ResourceStoreStateProvider = ({
     () => {
       // Don't attempt to load again resources and filters if they
       // were loaded already.
-      if (resourcesByUrl || isLoading.current) return;
+      if (
+        svgResourcesByUrl ||
+        fontResourcesByUrl ||
+        audioResourcesByUrl ||
+        isLoading.current
+      )
+        return;
 
       (async () => {
         setError(null);
         isLoading.current = true;
 
         try {
-          const { resourcesV2: resources, filters } = await listAllResources({
+          const {
+            resources: oldResources,
+            resourcesV2: resources,
+            filters,
+          } = await listAllResources({
             environment,
           });
           const authors = await listAllAuthors({ environment });
           const licenses = await listAllLicenses({ environment });
 
-          const resourcesByUrl = {};
+          const svgResourcesByUrl = {};
           const fontResourcesByUrl = {};
           const audioResourcesByUrl = {};
           resources.forEach(resource => {
-            resourcesByUrl[resource.url] = resource;
             if (resource.type === 'font') {
               fontResourcesByUrl[resource.url] = resource;
             } else if (resource.type === 'audio') {
               audioResourcesByUrl[resource.url] = resource;
+            }
+          });
+          oldResources.forEach(resource => {
+            if (resource.type === 'svg') {
+              svgResourcesByUrl[resource.url] = resource;
             }
           });
 
@@ -153,7 +172,7 @@ export const ResourceStoreStateProvider = ({
               resources ? resources.length : 0
             } resources from the asset store.`
           );
-          setResourcesByUrl(resourcesByUrl);
+          setSvgResourcesByUrl(svgResourcesByUrl);
           setFontResourcesByUrl(fontResourcesByUrl);
           setAudioResourcesByUrl(audioResourcesByUrl);
           setFilters(filters);
@@ -170,7 +189,13 @@ export const ResourceStoreStateProvider = ({
         isLoading.current = false;
       })();
     },
-    [resourcesByUrl, isLoading, environment]
+    [
+      svgResourcesByUrl,
+      audioResourcesByUrl,
+      fontResourcesByUrl,
+      isLoading,
+      environment,
+    ]
   );
 
   const audioFiltersState = React.useMemo(
@@ -230,10 +255,22 @@ export const ResourceStoreStateProvider = ({
     fontResourceFilters
   );
 
+  const svgSearchResults: ?Array<Resource> = useSearchItem(
+    svgResourcesByUrl,
+    getResourceSearchTerms,
+    searchText,
+    null,
+    null
+  );
+
   const resourceStoreState = React.useMemo(
     () => ({
       searchResults:
-        searchResourceKind === 'audio' ? audioSearchResults : fontSearchResults,
+        searchResourceKind === 'audio'
+          ? audioSearchResults
+          : searchResourceKind === 'svg'
+          ? svgSearchResults
+          : fontSearchResults,
       fetchResourcesAndFilters,
       setSearchResourceKind,
       filters,
@@ -249,6 +286,7 @@ export const ResourceStoreStateProvider = ({
     [
       fontSearchResults,
       audioSearchResults,
+      svgSearchResults,
       error,
       filters,
       authors,

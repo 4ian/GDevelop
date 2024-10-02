@@ -13,14 +13,6 @@ export default {
   decorators: [getPaperDecorator('medium')],
 };
 
-export const ImageResource = () => (
-  <FixedHeightFlexContainer height={600}>
-    <ResourceStoreStateProvider>
-      <ResourceStore onChoose={action('onChoose')} resourceKind="image" />
-    </ResourceStoreStateProvider>
-  </FixedHeightFlexContainer>
-);
-
 export const AudioResource = () => (
   <FixedHeightFlexContainer height={600}>
     <ResourceStoreStateProvider>
@@ -41,22 +33,6 @@ export const SvgResource = () => (
   <FixedHeightFlexContainer height={600}>
     <ResourceStoreStateProvider>
       <ResourceStore onChoose={action('onChoose')} resourceKind="svg" />
-    </ResourceStoreStateProvider>
-  </FixedHeightFlexContainer>
-);
-
-export const Model3DResource = () => (
-  <FixedHeightFlexContainer height={600}>
-    <ResourceStoreStateProvider>
-      <ResourceStore onChoose={action('onChoose')} resourceKind="model3D" />
-    </ResourceStoreStateProvider>
-  </FixedHeightFlexContainer>
-);
-
-export const AtlasResource = () => (
-  <FixedHeightFlexContainer height={600}>
-    <ResourceStoreStateProvider>
-      <ResourceStore onChoose={action('onChoose')} resourceKind="atlas" />
     </ResourceStoreStateProvider>
   </FixedHeightFlexContainer>
 );

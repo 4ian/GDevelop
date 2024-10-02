@@ -118,6 +118,16 @@ namespace gdjs {
         this._text.anchor.x = 0.5;
       }
       this._text.position.y = this._object.y + this._text.height / 2;
+
+      const alignmentY =
+        this._object._verticalTextAlignment === 'bottom'
+          ? 1
+          : this._object._verticalTextAlignment === 'center'
+          ? 0.5
+          : 0;
+      this._text.position.y =
+        this._object.y + this._text.height * (0.5 - alignmentY);
+      this._text.anchor.y = 0.5;
     }
 
     updateAngle(): void {

@@ -21,6 +21,7 @@ namespace gdjs {
       /** The text of the object */
       text: string;
       textAlignment: string;
+      verticalTextAlignment: string;
 
       isOutlineEnabled: boolean;
       outlineThickness: float;
@@ -82,7 +83,8 @@ namespace gdjs {
     _gradient: Array<Array<integer>> = [];
     _gradientType: string = '';
     opacity: float = 255;
-    _textAlign: string = 'left';
+    _textAlign: string;
+    _verticalTextAlignment: string;
     _wrapping: boolean = false;
     // A wrapping of 1 makes games crash on Firefox
     _wrappingWidth: float = 100;
@@ -123,7 +125,8 @@ namespace gdjs {
       this._underlined = content.underlined;
       this._color = gdjs.rgbOrHexToRGBColor(content.color);
       this._str = content.text;
-      this._textAlign = content.textAlignment;
+      this._textAlign = content.textAlignment || 'left';
+      this._verticalTextAlignment = content.verticalTextAlignment || 'top';
 
       this._isOutlineEnabled = content.isOutlineEnabled;
       this._outlineThickness = content.outlineThickness;
@@ -174,6 +177,11 @@ namespace gdjs {
       }
       if (oldContent.textAlignment !== newContent.textAlignment) {
         this.setTextAlignment(newContent.textAlignment);
+      }
+      if (
+        oldContent.verticalTextAlignment !== newContent.verticalTextAlignment
+      ) {
+        this.setVerticalTextAlignment(newContent.verticalTextAlignment);
       }
       if (oldContent.isOutlineEnabled !== newContent.isOutlineEnabled) {
         this.setOutlineEnabled(newContent.isOutlineEnabled);
@@ -266,6 +274,9 @@ namespace gdjs {
       }
       if (networkSyncData.ta !== undefined) {
         this.setTextAlignment(networkSyncData.ta);
+      }
+      if (networkSyncData.ta !== undefined) {
+        this.setVerticalTextAlignment(networkSyncData.ta);
       }
       if (networkSyncData.wrap !== undefined) {
         this.setWrapping(networkSyncData.wrap);
@@ -595,6 +606,23 @@ namespace gdjs {
     }
 
     /**
+     * Set the text alignment on Y axis for multiline text objects.
+     * @param alignment The text alignment.
+     */
+    setVerticalTextAlignment(alignment: string): void {
+      this._verticalTextAlignment = alignment;
+      this._renderer.updateStyle();
+    }
+
+    /**
+     * Get the text alignment on Y axis of text object.
+     * @return The text alignment.
+     */
+    getVerticalTextAlignment(): string {
+      return this._verticalTextAlignment;
+    }
+
+    /**
      * Set the text alignment for multiline text objects.
      * @param alignment The text alignment.
      */
@@ -654,6 +682,21 @@ namespace gdjs {
         this._renderer.updateStyle();
         this.invalidateHitboxes();
       }
+    }
+
+    setWidth(width: float): void {
+      this.setWrappingWidth(width);
+    }
+
+    getDrawableY(): float {
+      return (
+        this.getY() -
+        (this._verticalTextAlignment === 'center'
+          ? this.getHeight() / 2
+          : this._verticalTextAlignment === 'bottom'
+          ? this.getHeight()
+          : 0)
+      );
     }
 
     /**

@@ -579,6 +579,18 @@ class MockedChildRenderedInstance implements ChildRenderedInstance {
     this.heightAfterUpdate = defaultHeight;
   }
 
+  getWidth(): number {
+    return this._instance.hasCustomSize()
+      ? this._instance.getCustomWidth()
+      : this.getDefaultWidth();
+  }
+
+  getHeight(): number {
+    return this._instance.hasCustomSize()
+      ? this._instance.getCustomHeight()
+      : this.getDefaultHeight();
+  }
+
   getDefaultWidth(): number {
     return this.defaultWidth;
   }
@@ -588,11 +600,11 @@ class MockedChildRenderedInstance implements ChildRenderedInstance {
   }
 
   getOriginX(): number {
-    return this.originX;
+    return (this.originX * this.getWidth()) / this.getDefaultWidth();
   }
 
   getOriginY(): number {
-    return this.originY;
+    return (this.originY * this.getHeight()) / this.getDefaultHeight();
   }
 
   update(): void {

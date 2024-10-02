@@ -20,6 +20,7 @@ export default class RenderedTextInstance extends RenderedInstance {
   _fontFamily: string = '';
   _color: string = '0;0;0';
   _textAlignment: string = 'left';
+  _verticalTextAlignment: string = 'top';
 
   _isOutlineEnabled = false;
   _outlineColor = '255;255;255';
@@ -91,6 +92,8 @@ export default class RenderedTextInstance extends RenderedInstance {
       textObjectConfiguration.isBold() !== this._isBold ||
       textObjectConfiguration.getCharacterSize() !== this._characterSize ||
       textObjectConfiguration.getTextAlignment() !== this._textAlignment ||
+      textObjectConfiguration.getVerticalTextAlignment() !==
+        this._verticalTextAlignment ||
       textObjectConfiguration.getColor() !== this._color ||
       textObjectConfiguration.isOutlineEnabled() !== this._isOutlineEnabled ||
       textObjectConfiguration.getOutlineColor() !== this._outlineColor ||
@@ -110,6 +113,7 @@ export default class RenderedTextInstance extends RenderedInstance {
       this._isBold = textObjectConfiguration.isBold();
       this._characterSize = textObjectConfiguration.getCharacterSize();
       this._textAlignment = textObjectConfiguration.getTextAlignment();
+      this._verticalTextAlignment = textObjectConfiguration.getVerticalTextAlignment();
       this._color = textObjectConfiguration.getColor();
 
       this._isOutlineEnabled = textObjectConfiguration.isOutlineEnabled();
@@ -204,8 +208,16 @@ export default class RenderedTextInstance extends RenderedInstance {
         this._instance.getX() + this._pixiObject.width / 2;
       this._pixiObject.anchor.x = 0.5;
     }
+    const alignmentY =
+      this._verticalTextAlignment === 'bottom'
+        ? 1
+        : this._verticalTextAlignment === 'center'
+        ? 0.5
+        : 0;
     this._pixiObject.position.y =
-      this._instance.getY() + this._pixiObject.height / 2;
+      this._instance.getY() + this._pixiObject.height * (0.5 - alignmentY);
+    this._pixiObject.anchor.y = 0.5;
+
     this._pixiObject.rotation = RenderedInstance.toRad(
       this._instance.getAngle()
     );
@@ -221,5 +233,14 @@ export default class RenderedTextInstance extends RenderedInstance {
 
   getDefaultHeight() {
     return this._pixiObject.height;
+  }
+
+  getOriginY(): number {
+    const height = this.getHeight();
+    return this._verticalTextAlignment === 'bottom'
+      ? height
+      : this._verticalTextAlignment === 'center'
+      ? height / 2
+      : 0;
   }
 }

@@ -135,6 +135,7 @@ describe('gdjs.TweenRuntimeBehavior', () => {
         color: '0;0;0',
         text: '',
         textAlignment: 'left',
+        verticalTextAlignment: 'top',
         isOutlineEnabled: false,
         outlineThickness: 2,
         outlineColor: '255;255;255',

@@ -16,6 +16,7 @@ import { AssetStoreContext } from '../AssetStoreContext';
 import {
   AudioTypeResourceStoreSearchFilter,
   DurationResourceStoreSearchFilter,
+  AlphabetSupportResourceStoreSearchFilter,
 } from './ResourceStoreSearchFilter';
 import type { SearchFilter } from '../../UI/Search/UseSearchItem';
 
@@ -31,12 +32,16 @@ type ResourceStoreState = {|
   searchText: string,
   setSearchText: string => void,
   clearAllFilters: () => void,
-  setSearchResourceKind: ('audio' | 'font' ) => void,
+  setSearchResourceKind: ('audio' | 'font') => void,
   audioFiltersState: {|
     durationFilter: DurationResourceStoreSearchFilter,
     setDurationFilter: DurationResourceStoreSearchFilter => void,
     audioTypeFilter: AudioTypeResourceStoreSearchFilter,
     setAudioTypeFilter: AudioTypeResourceStoreSearchFilter => void,
+  |},
+  fontFiltersState: {|
+    alphabetSupportFilter: AlphabetSupportResourceStoreSearchFilter,
+    setAlphabetSupportFilter: AlphabetSupportResourceStoreSearchFilter => void,
   |},
 |};
 
@@ -57,6 +62,10 @@ export const ResourceStoreContext = React.createContext<ResourceStoreState>({
     audioTypeFilter: new AudioTypeResourceStoreSearchFilter(),
     setAudioTypeFilter: AudioTypeResourceStoreSearchFilter => {},
   },
+  fontFiltersState: {
+    alphabetSupportFilter: new AlphabetSupportResourceStoreSearchFilter(),
+    setAlphabetSupportFilter: () => {},
+  },
 });
 
 type ResourceStoreStateProviderProps = {|
@@ -72,6 +81,12 @@ export const ResourceStoreStateProvider = ({
 }: ResourceStoreStateProviderProps) => {
   const [resourcesByUrl, setResourcesByUrl] = React.useState<?{
     [string]: ResourceV2,
+  }>(null);
+  const [fontResourcesByUrl, setFontResourcesByUrl] = React.useState<?{
+    [string]: FontResourceV2,
+  }>(null);
+  const [audioResourcesByUrl, setAudioResourcesByUrl] = React.useState<?{
+    [string]: AudioResourceV2,
   }>(null);
   const [filters, setFilters] = React.useState<?Filters>(null);
   const [authors, setAuthors] = React.useState<?Array<Author>>(null);
@@ -95,6 +110,12 @@ export const ResourceStoreStateProvider = ({
   ] = React.useState<AudioTypeResourceStoreSearchFilter>(
     new AudioTypeResourceStoreSearchFilter()
   );
+  const [
+    alphabetSupportFilter,
+    setAlphabetSupportFilter,
+  ] = React.useState<AlphabetSupportResourceStoreSearchFilter>(
+    new AlphabetSupportResourceStoreSearchFilter()
+  );
 
   const { environment } = React.useContext(AssetStoreContext);
 
@@ -116,8 +137,15 @@ export const ResourceStoreStateProvider = ({
           const licenses = await listAllLicenses({ environment });
 
           const resourcesByUrl = {};
+          const fontResourcesByUrl = {};
+          const audioResourcesByUrl = {};
           resources.forEach(resource => {
             resourcesByUrl[resource.url] = resource;
+            if (resource.type === 'font') {
+              fontResourcesByUrl[resource.url] = resource;
+            } else if (resource.type === 'audio') {
+              audioResourcesByUrl[resource.url] = resource;
+            }
           });
 
           console.info(
@@ -126,6 +154,8 @@ export const ResourceStoreStateProvider = ({
             } resources from the asset store.`
           );
           setResourcesByUrl(resourcesByUrl);
+          setFontResourcesByUrl(fontResourcesByUrl);
+          setAudioResourcesByUrl(audioResourcesByUrl);
           setFilters(filters);
           setAuthors(authors);
           setLicenses(licenses);
@@ -153,7 +183,10 @@ export const ResourceStoreStateProvider = ({
     [durationFilter, audioTypeFilter]
   );
 
-  const fontFiltersState = React.useMemo(() => ({}), []);
+  const fontFiltersState = React.useMemo(
+    () => ({ alphabetSupportFilter, setAlphabetSupportFilter }),
+    [alphabetSupportFilter]
+  );
 
   // When one of the filter change, we need to rebuild the array
   // for the search.
@@ -162,7 +195,7 @@ export const ResourceStoreStateProvider = ({
   >(() => [audioTypeFilter, durationFilter], [audioTypeFilter, durationFilter]);
   const fontResourceFilters = React.useMemo<
     Array<SearchFilter<FontResourceV2>>
-  >(() => [], []);
+  >(() => [alphabetSupportFilter], [alphabetSupportFilter]);
 
   const clearAllFilters = React.useCallback(
     () => {
@@ -172,12 +205,15 @@ export const ResourceStoreStateProvider = ({
       audioFiltersState.setAudioTypeFilter(
         new AudioTypeResourceStoreSearchFilter()
       );
+      fontFiltersState.setAlphabetSupportFilter(
+        new AlphabetSupportResourceStoreSearchFilter()
+      );
     },
-    [audioFiltersState]
+    [audioFiltersState, fontFiltersState]
   );
 
   const audioSearchResults: ?Array<AudioResourceV2> = useSearchItem(
-    resourcesByUrl,
+    audioResourcesByUrl,
     getResourceSearchTerms,
     searchText,
     null,
@@ -186,7 +222,7 @@ export const ResourceStoreStateProvider = ({
   );
 
   const fontSearchResults: ?Array<FontResourceV2> = useSearchItem(
-    resourcesByUrl,
+    fontResourcesByUrl,
     getResourceSearchTerms,
     searchText,
     null,
@@ -208,6 +244,7 @@ export const ResourceStoreStateProvider = ({
       setSearchText,
       clearAllFilters,
       audioFiltersState,
+      fontFiltersState,
     }),
     [
       fontSearchResults,
@@ -218,6 +255,7 @@ export const ResourceStoreStateProvider = ({
       licenses,
       searchText,
       audioFiltersState,
+      fontFiltersState,
       clearAllFilters,
       fetchResourcesAndFilters,
       searchResourceKind,

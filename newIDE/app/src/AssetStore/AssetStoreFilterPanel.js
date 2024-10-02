@@ -142,7 +142,7 @@ type RangeFilterProps = {|
   range: [number, number],
   setRange: ([number, number]) => void,
   valueLabelFormat?: (value: number) => string,
-  marks?: {|value: number, label: React.Node|}[],
+  marks?: {| value: number, label: React.Node |}[],
 |};
 
 export const RangeFilter = ({
@@ -158,32 +158,28 @@ export const RangeFilter = ({
   marks,
 }: RangeFilterProps) => {
   return (
-    <I18n>
-      {({ i18n }) => (
-        <Accordion key={filterKey} defaultExpanded>
-          <AccordionHeader>
-            <Text displayInlineAsSpan>{title}</Text>
-          </AccordionHeader>
-          <AccordionBody>
-            <Column expand>
-              <Line noMargin>
-                <Slider
-                  value={range}
-                  min={min}
-                  max={max}
-                  step={step}
-                  scale={scale}
-                  marks={marks || true}
-                  valueLabelDisplay="auto"
-                  onChange={newValue => setRange(newValue)}
-                  valueLabelFormat={valueLabelFormat}
-                />
-              </Line>
-            </Column>
-          </AccordionBody>
-        </Accordion>
-      )}
-    </I18n>
+    <Accordion key={filterKey} defaultExpanded>
+      <AccordionHeader>
+        <Text displayInlineAsSpan>{title}</Text>
+      </AccordionHeader>
+      <AccordionBody>
+        <Column expand>
+          <Line noMargin>
+            <Slider
+              value={range}
+              min={min}
+              max={max}
+              step={step}
+              scale={scale}
+              marks={marks || true}
+              valueLabelDisplay="auto"
+              onChange={newValue => setRange(newValue)}
+              valueLabelFormat={valueLabelFormat}
+            />
+          </Line>
+        </Column>
+      </AccordionBody>
+    </Accordion>
   );
 };
 
@@ -201,27 +197,23 @@ const ColorFilter = ({
   setColor,
 }: ColorFilterProps) => {
   return (
-    <I18n>
-      {({ i18n }) => (
-        <Accordion key={filterKey} defaultExpanded>
-          <AccordionHeader>
-            <Text displayInlineAsSpan>{title}</Text>
-          </AccordionHeader>
-          <AccordionBody>
-            <Column expand>
-              <Line noMargin>
-                <HexColorField
-                  disableAlpha
-                  fullWidth
-                  color={color}
-                  onChange={setColor}
-                />
-              </Line>
-            </Column>
-          </AccordionBody>
-        </Accordion>
-      )}
-    </I18n>
+    <Accordion key={filterKey} defaultExpanded>
+      <AccordionHeader>
+        <Text displayInlineAsSpan>{title}</Text>
+      </AccordionHeader>
+      <AccordionBody>
+        <Column expand>
+          <Line noMargin>
+            <HexColorField
+              disableAlpha
+              fullWidth
+              color={color}
+              onChange={setColor}
+            />
+          </Line>
+        </Column>
+      </AccordionBody>
+    </Accordion>
   );
 };
 

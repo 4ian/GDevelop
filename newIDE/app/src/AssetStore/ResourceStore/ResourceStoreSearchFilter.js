@@ -1,6 +1,9 @@
 // @flow
 import { SearchFilter } from '../../UI/Search/UseSearchItem';
-import { type AudioResourceV2 } from '../../Utils/GDevelopServices/Asset';
+import {
+  type AudioResourceV2,
+  type FontResourceV2,
+} from '../../Utils/GDevelopServices/Asset';
 
 export class DurationResourceStoreSearchFilter
   implements SearchFilter<AudioResourceV2> {
@@ -54,5 +57,30 @@ export class AudioTypeResourceStoreSearchFilter
 
   hasFilters(): boolean {
     return this.type !== null;
+  }
+}
+
+export class AlphabetSupportResourceStoreSearchFilter
+  implements SearchFilter<FontResourceV2> {
+  alphabets: string[];
+
+  constructor(alphabets?: string[]) {
+    this.alphabets = alphabets || [];
+  }
+
+  getPertinence(searchItem: FontResourceV2): number {
+    if (this.alphabets.length === 0) return 1;
+    return this.alphabets.every(alphabet =>
+      searchItem.metadata.supportedAlphabets.some(
+        supportedAlphabet =>
+          supportedAlphabet.replace('_limited', '') === alphabet
+      )
+    )
+      ? 1
+      : 0;
+  }
+
+  hasFilters(): boolean {
+    return this.alphabets.length > 0;
   }
 }

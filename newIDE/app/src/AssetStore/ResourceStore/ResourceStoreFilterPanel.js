@@ -5,6 +5,7 @@ import { t, Trans } from '@lingui/macro';
 import {
   DurationResourceStoreSearchFilter,
   AudioTypeResourceStoreSearchFilter,
+  AlphabetSupportResourceStoreSearchFilter,
 } from './ResourceStoreSearchFilter';
 import FlatButton from '../../UI/FlatButton';
 import { Accordion, AccordionHeader, AccordionBody } from '../../UI/Accordion';
@@ -15,8 +16,23 @@ import { formatDuration } from '../../Utils/Duration';
 import Text from '../../UI/Text';
 import CompactSelectField from '../../UI/CompactSelectField';
 import SelectOption from '../../UI/SelectOption';
+import TagChips from '../../UI/TagChips';
+import { languageNames } from '../../Utils/LanguageName';
+
+const languageChoices = [
+  { value: '', label: '', disabled: true },
+  ...Object.keys(languageNames).map(locale => ({
+    value: locale,
+    label: languageNames[locale].languageNativeName,
+  })),
+];
 
 type Choice = {|
+  label: React.Node,
+  value: string,
+  disabled?: boolean,
+|};
+type ValueWithLabel = {|
   label: React.Node,
   value: string,
 |};
@@ -72,14 +88,96 @@ const durationMarks = DurationResourceStoreSearchFilter.durationMarks.map(
   })
 );
 
+type MultipleChoiceWithClosableTagsFilterProps = {|
+  filterKey: string,
+  title: ?React.Node,
+  choices: Choice[],
+  values: ValueWithLabel[],
+  onChange: (newValue: ValueWithLabel[]) => void,
+|};
+
+const MultipleChoiceWithClosableTagsFilter = ({
+  filterKey,
+  title,
+  choices,
+  values,
+  onChange,
+}: MultipleChoiceWithClosableTagsFilterProps) => {
+  const onSelect = (value: string) => {
+    const userChoice = choices.find(choice => choice.value === value);
+    const newValues = [
+      ...values,
+      userChoice
+        ? { label: userChoice.label, value: userChoice.value }
+        : undefined,
+    ].filter(Boolean);
+    onChange(newValues);
+  };
+  const onRemove = (value: string) => {
+    const valueIndex = values.findIndex(
+      valueWithLabel => valueWithLabel.value === value
+    );
+    if (valueIndex >= 0) {
+      const newValues: ValueWithLabel[] = [...values];
+      newValues.splice(valueIndex, 1);
+
+      onChange(newValues);
+    }
+  };
+  return (
+    <Accordion key={filterKey} defaultExpanded>
+      <AccordionHeader>
+        <Text displayInlineAsSpan>{title}</Text>
+      </AccordionHeader>
+      <AccordionBody>
+        <Column expand noMargin>
+          <CompactSelectField value={''} onChange={onSelect}>
+            {choices.map(choice => {
+              if (
+                values.findIndex(
+                  valueWithLabel => valueWithLabel.value === choice.value
+                ) >= 0
+              ) {
+                return (
+                  <SelectOption
+                    key={choice.value}
+                    value={choice.value}
+                    label={
+                      typeof choice.label === 'string'
+                        ? choice.label + ' ✓'
+                        : choice.label
+                    }
+                    disabled
+                  />
+                );
+              }
+              return (
+                <SelectOption
+                  key={choice.value}
+                  value={choice.value}
+                  label={choice.label}
+                />
+              );
+            })}
+          </CompactSelectField>
+          <TagChips tagsWithLabel={values} onRemove={onRemove} />
+        </Column>
+      </AccordionBody>
+    </Accordion>
+  );
+};
+
 export const ResourceStoreFilterPanel = ({
   resourceKind,
 }: {
   resourceKind: 'audio' | 'font',
 }) => {
-  const { audioFiltersState, clearAllFilters } = React.useContext(
-    ResourceStoreContext
-  );
+  const {
+    audioFiltersState,
+    fontFiltersState,
+    clearAllFilters,
+  } = React.useContext(ResourceStoreContext);
+  console.log(fontFiltersState.alphabetSupportFilter.alphabets);
 
   return (
     <Column noMargin expand>
@@ -133,7 +231,26 @@ export const ResourceStoreFilterPanel = ({
           />
         </>
       )}
-      {resourceKind === 'font' && <>Salut</>}
+      {resourceKind === 'font' && (
+        <MultipleChoiceWithClosableTagsFilter
+          filterKey="AlphabetSupport"
+          title={<Trans>Alphabet</Trans>}
+          choices={languageChoices}
+          onChange={newValues =>
+            fontFiltersState.setAlphabetSupportFilter(
+              new AlphabetSupportResourceStoreSearchFilter(
+                newValues.map(value => value.value)
+              )
+            )
+          }
+          values={fontFiltersState.alphabetSupportFilter.alphabets.map(
+            alphabet => ({
+              value: alphabet,
+              label: languageNames[alphabet].languageNativeName,
+            })
+          )}
+        />
+      )}
 
       <Line justifyContent="center">
         <FlatButton

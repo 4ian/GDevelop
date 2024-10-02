@@ -16,6 +16,10 @@ import Text from '../UI/Text';
 import Toggle from '../UI/Toggle';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
+import {
+  type ResourceV2,
+  type Resource,
+} from '../Utils/GDevelopServices/Asset';
 
 type Props = {|
   project: gdProject,
@@ -42,6 +46,10 @@ export const NewResourceDialog = ({
   const storageProvider = React.useMemo(() => getStorageProvider(), [
     getStorageProvider,
   ]);
+  const [selectedResource, setSelectedResource] = React.useState<?(
+    | Resource
+    | ResourceV2
+  )>(null);
   const preferences = React.useContext(PreferencesContext);
   const possibleResourceSources = resourceSources
     .filter(({ kind }) => kind === options.resourceKind)
@@ -130,6 +138,18 @@ export const NewResourceDialog = ({
           primary
           onClick={onClose}
         />,
+        standaloneTabResourceSources.map(source => {
+          if (
+            currentTab !== 'standalone-' + source.name ||
+            !source.renderPrimaryAction
+          )
+            return null;
+
+          return source.renderPrimaryAction({
+            resource: selectedResource,
+            onChooseResources,
+          });
+        }),
       ]}
       secondaryActions={[
         importTabAdvancedResourceSources.length > 0 ? (
@@ -168,6 +188,8 @@ export const NewResourceDialog = ({
           options,
           project,
           fileMetadata,
+          selectedResource,
+          onSelectResource: setSelectedResource,
           getStorageProvider,
           getLastUsedPath: preferences.getLastUsedPath,
           setLastUsedPath: preferences.setLastUsedPath,

@@ -15,38 +15,31 @@ export default {
   decorators: [getPaperDecorator('medium')],
 };
 
-export const AudioResource = () => (
-  <FixedHeightFlexContainer height={600}>
-    <ResourceStoreStateProvider>
-      <ResourceStore onChoose={action('onChoose')} resourceKind="audio" />
-    </ResourceStoreStateProvider>
-  </FixedHeightFlexContainer>
-);
+const ResourceStoreStory = ({ kind }: { kind: 'audio' | 'font' | 'svg' }) => {
+  const [selectedResource, setSelectedResource] = React.useState<any>(null);
+  return (
+    <FixedHeightFlexContainer height={600}>
+      <ResourceStoreStateProvider>
+        <ResourceStore
+          onChoose={action('onChoose')}
+          resourceKind={kind}
+          selectedResource={selectedResource}
+          onSelectResource={setSelectedResource}
+        />
+      </ResourceStoreStateProvider>
+    </FixedHeightFlexContainer>
+  );
+};
 
-export const FontResource = () => (
-  <FixedHeightFlexContainer height={600}>
-    <ResourceStoreStateProvider>
-      <ResourceStore onChoose={action('onChoose')} resourceKind="font" />
-    </ResourceStoreStateProvider>
-  </FixedHeightFlexContainer>
-);
+export const AudioResource = () => <ResourceStoreStory kind="audio" />;
 
-export const SvgResource = () => (
-  <FixedHeightFlexContainer height={600}>
-    <ResourceStoreStateProvider>
-      <ResourceStore onChoose={action('onChoose')} resourceKind="svg" />
-    </ResourceStoreStateProvider>
-  </FixedHeightFlexContainer>
-);
+export const FontResource = () => <ResourceStoreStory kind="font" />;
+
+export const SvgResource = () => <ResourceStoreStory kind="svg" />;
+
 export const FontResourceWithLoadingError = () => {
   const axiosMock = new MockAdapter(assetApiClient, { delayResponse: 500 });
   axiosMock.onAny().reply(500);
 
-  return (
-    <FixedHeightFlexContainer height={600}>
-      <ResourceStoreStateProvider>
-        <ResourceStore onChoose={action('onChoose')} resourceKind="font" />
-      </ResourceStoreStateProvider>
-    </FixedHeightFlexContainer>
-  );
+  return <ResourceStoreStory kind="font" />;
 };

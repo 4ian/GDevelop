@@ -2,13 +2,15 @@
 import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
 import {
-  type ChooseResourceOptions,
   type ChooseResourceProps,
   type ResourceSourceComponentProps,
+  type ResourceStorePrimaryActionProps,
   type ResourceSource,
+  type ResourceStoreChooserProps,
   allResourceKindsAndMetadata,
   resourcesKindSupportedByResourceStore,
 } from './ResourceSource';
+import {} from '../Utils/GDevelopServices/Asset';
 import { ResourceStore } from '../AssetStore/ResourceStore';
 import { isPathInProjectFolder, copyAllToProjectFolder } from './ResourceUtils';
 import optionalRequire from '../Utils/OptionalRequire';
@@ -23,37 +25,26 @@ import {
 import { Line } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
 import { FileToCloudProjectResourceUploader } from './FileToCloudProjectResourceUploader';
+import { DialogPrimaryButton } from '../UI/Dialog';
 
 const remote = optionalRequire('@electron/remote');
 const dialog = remote ? remote.dialog : null;
 const path = optionalRequire('path');
 
-type ResourceStoreChooserProps = {
-  options: ChooseResourceOptions,
-  onChooseResources: (resources: Array<gdResource>) => void,
-  createNewResource: () => gdResource,
-};
-
 const ResourceStoreChooser = ({
   options,
-  onChooseResources,
-  createNewResource,
+  selectedResource,
+  onSelectResource,
 }: ResourceStoreChooserProps) => {
+  if (!onSelectResource) return null;
   const { resourceKind } = options;
   if (!resourcesKindSupportedByResourceStore.includes(resourceKind)) {
     return null;
   }
   return (
     <ResourceStore
-      onChoose={resource => {
-        const chosenResourceUrl = resource.url;
-        const newResource = createNewResource();
-        newResource.setFile(chosenResourceUrl);
-        newResource.setName(path.basename(chosenResourceUrl));
-        newResource.setOrigin('gdevelop-asset-store', chosenResourceUrl);
-
-        onChooseResources([newResource]);
-      }}
+      selectedResource={selectedResource}
+      onSelectResource={onSelectResource}
       resourceKind={
         // $FlowIgnore - Flow does not understand the check above restricts the resource kind.
         resourceKind
@@ -285,10 +276,37 @@ const localResourceSources: Array<ResourceSource> = [
         kind,
         renderComponent: (props: ResourceSourceComponentProps) => (
           <ResourceStoreChooser
-            createNewResource={source.createNewResource}
-            onChooseResources={props.onChooseResources}
+            selectedResource={props.selectedResource}
+            onSelectResource={props.onSelectResource}
             options={props.options}
             key={`resource-store-${kind}`}
+          />
+        ),
+        renderPrimaryAction: ({
+          resource,
+          onChooseResources,
+        }: ResourceStorePrimaryActionProps) => (
+          <DialogPrimaryButton
+            primary
+            key="add-resource"
+            label={
+              kind === 'font' ? (
+                <Trans>Install font</Trans>
+              ) : (
+                <Trans>Add to project</Trans>
+              )
+            }
+            disabled={!resource}
+            onClick={() => {
+              if (!resource) return;
+              const chosenResourceUrl = resource.url;
+              const newResource = source.createNewResource();
+              newResource.setFile(chosenResourceUrl);
+              newResource.setName(path.basename(chosenResourceUrl));
+              newResource.setOrigin('gdevelop-asset-store', chosenResourceUrl);
+
+              onChooseResources([newResource]);
+            }}
           />
         ),
       };

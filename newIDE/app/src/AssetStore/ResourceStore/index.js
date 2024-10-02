@@ -28,6 +28,18 @@ import { ResourceCard } from './ResourceCard';
 import EmptyMessage from '../../UI/EmptyMessage';
 import PlaceholderError from '../../UI/PlaceholderError';
 
+const resourceV2OrNull = (resource: ?(Resource | ResourceV2)): ?ResourceV2 => {
+  if (resource && resource.metadata) return resource;
+  return null;
+};
+const resourceOrNull = (resource: ?(Resource | ResourceV2)): ?Resource => {
+  // Flow does not consider the absence of metadata attribute as a reason
+  // to exclude ResourceV2 from the returned types.
+  // $FlowIgnore
+  if (resource && !resource.metadata) return resource;
+  return null;
+};
+
 const AudioResourceStoreRow = ({
   index,
   style,
@@ -81,8 +93,10 @@ const FontResourceStoreRow = ({
   );
 };
 
-type ResourceListAndFiltersProps = {|
-  searchResults: ?Array<ResourceV2>,
+type ResourceListAndFiltersProps<T> = {|
+  selectedResource?: ?T,
+  onSelectResource: (?T) => void,
+  searchResults: ?Array<T>,
   isFiltersPanelOpen: boolean,
   setIsFiltersPanelOpen: boolean => void,
   error: ?Error,
@@ -95,21 +109,20 @@ const AudioResourceListAndFilters = ({
   setIsFiltersPanelOpen,
   error,
   onRetry,
-}: ResourceListAndFiltersProps) => {
+  selectedResource,
+  onSelectResource,
+}: ResourceListAndFiltersProps<ResourceV2>) => {
   const soundPlayerRef = React.useRef<?SoundPlayerInterface>(null);
-  const [
-    playingAudioResource,
-    setPlayingAudioResource,
-  ] = React.useState<?AudioResourceV2>(null);
 
-  const onClickPlay = React.useCallback((newAudioResource: AudioResourceV2) => {
-    setPlayingAudioResource(audioResource => {
-      if (newAudioResource === audioResource && soundPlayerRef.current) {
+  const onClickPlay = React.useCallback(
+    (newAudioResource: AudioResourceV2) => {
+      if (newAudioResource === selectedResource && soundPlayerRef.current) {
         soundPlayerRef.current.playPause(true);
       }
-      return newAudioResource;
-    });
-  }, []);
+      onSelectResource(newAudioResource);
+    },
+    [onSelectResource, selectedResource]
+  );
 
   const onSoundLoaded = React.useCallback(() => {
     if (soundPlayerRef.current) {
@@ -149,7 +162,7 @@ const AudioResourceListAndFilters = ({
                       itemData={{
                         items: searchResults,
                         onClickPlay,
-                        selectedResource: playingAudioResource,
+                        selectedResource,
                       }}
                     >
                       {AudioResourceStoreRow}
@@ -183,7 +196,7 @@ const AudioResourceListAndFilters = ({
       </Line>
       <SoundPlayer
         ref={soundPlayerRef}
-        soundSrc={playingAudioResource ? playingAudioResource.url : null}
+        soundSrc={selectedResource ? selectedResource.url : null}
         onSoundLoaded={onSoundLoaded}
       />
     </>
@@ -196,11 +209,9 @@ const FontResourceListAndFilters = ({
   setIsFiltersPanelOpen,
   error,
   onRetry,
-}: ResourceListAndFiltersProps) => {
-  const [
-    selectedFontResource,
-    setSelectedFontResource,
-  ] = React.useState<?FontResourceV2>(null);
+  selectedResource,
+  onSelectResource,
+}: ResourceListAndFiltersProps<ResourceV2>) => {
   return (
     <Line expand>
       <Column noMargin noOverflowParent expand>
@@ -234,8 +245,8 @@ const FontResourceListAndFilters = ({
                     itemSize={130}
                     itemData={{
                       items: searchResults,
-                      selectedResource: selectedFontResource,
-                      onSelect: setSelectedFontResource,
+                      selectedResource,
+                      onSelect: onSelectResource,
                     }}
                   >
                     {FontResourceStoreRow}
@@ -276,7 +287,7 @@ const SvgResourceListAndFilters = ({
   setIsFiltersPanelOpen,
   error,
   onRetry,
-}: ResourceListAndFiltersProps) => {
+}: ResourceListAndFiltersProps<Resource>) => {
   const [
     selectedSvgResource,
     setSelectedSvgResource,
@@ -309,11 +320,16 @@ const SvgResourceListAndFilters = ({
 };
 
 type Props = {
-  onChoose: ResourceV2 => void,
+  selectedResource?: ?(ResourceV2 | Resource),
+  onSelectResource: (?(ResourceV2 | Resource)) => void,
   resourceKind: ResourceKindSupportedByResourceStore,
 };
 
-export const ResourceStore = ({ onChoose, resourceKind }: Props) => {
+export const ResourceStore = ({
+  onSelectResource,
+  selectedResource,
+  resourceKind,
+}: Props) => {
   const {
     searchResults,
     fetchResourcesAndFilters,
@@ -367,6 +383,8 @@ export const ResourceStore = ({ onChoose, resourceKind }: Props) => {
       {resourceKind === 'audio' && (
         <AudioResourceListAndFilters
           error={error}
+          selectedResource={resourceV2OrNull(selectedResource)}
+          onSelectResource={onSelectResource}
           onRetry={fetchResourcesAndFilters}
           isFiltersPanelOpen={isFiltersPanelOpen}
           setIsFiltersPanelOpen={setIsFiltersPanelOpen}
@@ -379,6 +397,8 @@ export const ResourceStore = ({ onChoose, resourceKind }: Props) => {
       {resourceKind === 'font' && (
         <FontResourceListAndFilters
           error={error}
+          selectedResource={resourceV2OrNull(selectedResource)}
+          onSelectResource={onSelectResource}
           onRetry={fetchResourcesAndFilters}
           isFiltersPanelOpen={isFiltersPanelOpen}
           setIsFiltersPanelOpen={setIsFiltersPanelOpen}
@@ -391,6 +411,8 @@ export const ResourceStore = ({ onChoose, resourceKind }: Props) => {
       {resourceKind === 'svg' && (
         <SvgResourceListAndFilters
           error={error}
+          selectedResource={resourceOrNull(selectedResource)}
+          onSelectResource={onSelectResource}
           onRetry={fetchResourcesAndFilters}
           isFiltersPanelOpen={false}
           setIsFiltersPanelOpen={() => {}}

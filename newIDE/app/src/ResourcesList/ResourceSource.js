@@ -8,6 +8,10 @@ import {
   type FileMetadata,
   type ResourcesActionsMenuBuilder,
 } from '../ProjectsStorage';
+import {
+  type ResourceV2,
+  type Resource,
+} from '../Utils/GDevelopServices/Asset';
 import { type ResourceExternalEditor } from './ResourceExternalEditor';
 import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
 
@@ -139,7 +143,14 @@ export type ChooseResourceProps = {|
 export type ResourceSourceComponentProps = {|
   ...ChooseResourceProps,
   onChooseResources: (Array<gdResource>) => void,
+  selectedResource?: ?(ResourceV2 | Resource),
+  onSelectResource?: (?(ResourceV2 | Resource)) => void,
 |};
+
+export type ResourceStorePrimaryActionProps = {
+  resource: ?(ResourceV2 | Resource),
+  onChooseResources: (resources: Array<gdResource>) => void,
+};
 
 export type ResourceSource = {
   name: string,
@@ -151,6 +162,7 @@ export type ResourceSource = {
     ChooseResourceProps
   ) => Promise<Array<gdResource>>,
   renderComponent: ResourceSourceComponentProps => React.Node,
+  renderPrimaryAction?: ResourceStorePrimaryActionProps => React.Node,
 };
 
 export type ChooseResourceFunction = (
@@ -165,4 +177,12 @@ export type ResourceManagementProps = {|
   onFetchNewlyAddedResources: OnFetchNewlyAddedResourcesFunction,
   getStorageProviderResourceOperations: () => ?ResourcesActionsMenuBuilder,
   canInstallPrivateAsset: () => boolean,
+|};
+
+export type ResourceStoreChooserProps = {|
+  options: ChooseResourceOptions,
+  selectedResource?: ?(ResourceV2 | Resource),
+  onSelectResource?: (?(ResourceV2 | Resource)) => void,
+  onChooseResources?: (resources: Array<gdResource>) => void,
+  createNewResource?: () => gdResource,
 |};

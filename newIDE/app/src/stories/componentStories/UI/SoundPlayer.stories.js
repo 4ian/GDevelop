@@ -12,5 +12,8 @@ export default {
 };
 
 export const Default = () => (
-  <SoundPlayer soundSrc="https://asset-resources.gdevelop.io/public-resources/Music/Fantasy/47015d883b0004880ab7752e27507f434eb9617a17d9ab14fa543fe64a65fe02_Magical Transition.aac" />
+  <SoundPlayer
+    soundSrc="https://asset-resources.gdevelop.io/public-resources/Music/Fantasy/47015d883b0004880ab7752e27507f434eb9617a17d9ab14fa543fe64a65fe02_Magical Transition.aac"
+    onSoundLoaded={() => console.log('Sound is loaded')}
+  />
 );

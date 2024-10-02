@@ -52,6 +52,7 @@ namespace gdjs {
      * For instance, platforms, jumpthru, ladder, spike, water...
      */
     private _collisionMaskTag: string;
+    private _layerIndex: integer | null;
     private _tileMapManager: gdjs.TileMap.TileMapRuntimeManager;
 
     /**
@@ -80,6 +81,11 @@ namespace gdjs {
       this._tilemapJsonFile = objectData.content.tilemapJsonFile;
       this._tilesetJsonFile = objectData.content.tilesetJsonFile;
       this._collisionMaskTag = objectData.content.collisionMaskTag;
+      this._layerIndex = objectData.content.useAllLayers
+        ? null
+        : Number.isFinite(objectData.content.layerIndex)
+        ? objectData.content.layerIndex
+        : 1;
       this._debugMode = objectData.content.debugMode;
       this._fillColor = gdjs.rgbOrHexStringToNumber(
         objectData.content.fillColor
@@ -108,7 +114,8 @@ namespace gdjs {
       );
       this._collisionTileMap = new gdjs.TileMap.TransformedCollisionTileMap(
         editableTileMap,
-        this._collisionMaskTag
+        this._collisionMaskTag,
+        this._layerIndex
       );
 
       this._renderer = new gdjs.TileMap.TileMapCollisionMaskRenderer(
@@ -178,6 +185,7 @@ namespace gdjs {
       if (oldObjectData.outlineSize !== newObjectData.outlineSize) {
         this.setOutlineSize(newObjectData.outlineSize);
       }
+      // TODO Handle changes to collisionMaskTag, useAllLayers and layerIndex.
       return true;
     }
 
@@ -254,7 +262,8 @@ namespace gdjs {
 
           this._collisionTileMap = new gdjs.TileMap.TransformedCollisionTileMap(
             tileMap,
-            this._collisionMaskTag
+            this._collisionMaskTag,
+            this._layerIndex
           );
           // The tile map polygons always keep the same references.
           // It works because the tilemap is never modified.

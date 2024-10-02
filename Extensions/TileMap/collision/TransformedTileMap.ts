@@ -12,6 +12,7 @@ namespace gdjs {
        */
       private _source: TileMapHelper.EditableTileMap;
       tag: string;
+      private _layerIndex: integer | null;
       private _layers: Map<integer, TransformedCollisionTileMapLayer>;
       // TODO Tiled allows to offset the layers
       /**
@@ -37,9 +38,14 @@ namespace gdjs {
       /**
        * @param source The model that describes the tile map.
        */
-      constructor(source: TileMapHelper.EditableTileMap, tag: string) {
+      constructor(
+        source: TileMapHelper.EditableTileMap,
+        tag: string,
+        layerIndex: number | null = null
+      ) {
         this._source = source;
         this.tag = tag;
+        this._layerIndex = layerIndex;
         this._layers = new Map<integer, TransformedCollisionTileMapLayer>();
         this._buildLayersFromTileMap(source, this._layers);
       }
@@ -55,17 +61,28 @@ namespace gdjs {
         tileMap: TileMapHelper.EditableTileMap,
         layers: Map<integer, TransformedCollisionTileMapLayer>
       ) {
-        for (const sourceLayer of tileMap.getLayers()) {
-          // TODO A visitor could be used to avoid a cast.
-          if (!(sourceLayer instanceof TileMapHelper.EditableTileMapLayer)) {
-            // TODO Collision mask for object layers is not handled.
-            continue;
+        if (this._layerIndex) {
+          const tileLayer = tileMap.getTileLayer(this._layerIndex);
+          if (!tileLayer) {
+            return;
           }
-          const tileLayer = sourceLayer as TileMapHelper.EditableTileMapLayer;
           layers.set(
             tileLayer.id,
             new TransformedCollisionTileMapLayer(this, tileLayer)
           );
+        } else {
+          for (const sourceLayer of tileMap.getLayers()) {
+            // TODO A visitor could be used to avoid a cast.
+            if (!(sourceLayer instanceof TileMapHelper.EditableTileMapLayer)) {
+              // TODO Collision mask for object layers is not handled.
+              continue;
+            }
+            const tileLayer = sourceLayer as TileMapHelper.EditableTileMapLayer;
+            layers.set(
+              tileLayer.id,
+              new TransformedCollisionTileMapLayer(this, tileLayer)
+            );
+          }
         }
       }
 

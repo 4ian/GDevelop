@@ -6,6 +6,8 @@ import { getPaperDecorator } from '../../../PaperDecorator';
 import FixedHeightFlexContainer from '../../../FixedHeightFlexContainer';
 import { ResourceStoreStateProvider } from '../../../../AssetStore/ResourceStore/ResourceStoreContext';
 import { ResourceStore } from '../../../../AssetStore/ResourceStore';
+import MockAdapter from 'axios-mock-adapter';
+import { client as assetApiClient } from '../../../../Utils/GDevelopServices/Asset';
 
 export default {
   title: 'AssetStore/ResourceStore',
@@ -36,3 +38,15 @@ export const SvgResource = () => (
     </ResourceStoreStateProvider>
   </FixedHeightFlexContainer>
 );
+export const FontResourceWithLoadingError = () => {
+  const axiosMock = new MockAdapter(assetApiClient, { delayResponse: 500 });
+  axiosMock.onAny().reply(500);
+
+  return (
+    <FixedHeightFlexContainer height={600}>
+      <ResourceStoreStateProvider>
+        <ResourceStore onChoose={action('onChoose')} resourceKind="font" />
+      </ResourceStoreStateProvider>
+    </FixedHeightFlexContainer>
+  );
+};

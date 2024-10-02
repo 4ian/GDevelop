@@ -24,6 +24,8 @@ import SoundPlayer, { type SoundPlayerInterface } from '../../UI/SoundPlayer';
 import FontResourceLine from './FontResourceLine';
 import { BoxSearchResults } from '../../UI/Search/BoxSearchResults';
 import { ResourceCard } from './ResourceCard';
+import EmptyMessage from '../../UI/EmptyMessage';
+import PlaceholderError from '../../UI/PlaceholderError';
 
 const AudioResourceStoreRow = ({
   index,
@@ -90,6 +92,8 @@ const AudioResourceListAndFilters = ({
   searchResults,
   isFiltersPanelOpen,
   setIsFiltersPanelOpen,
+  error,
+  onRetry,
 }: ResourceListAndFiltersProps) => {
   const soundPlayerRef = React.useRef<?SoundPlayerInterface>(null);
   const [
@@ -117,25 +121,41 @@ const AudioResourceListAndFilters = ({
       <Line expand>
         <Column noMargin noOverflowParent expand>
           <Line noMargin expand>
-            {!!searchResults && (
-              <AutoSizer>
-                {({ height, width }) => (
-                  <List
-                    height={height}
-                    width={width}
-                    overscanCount={10}
-                    itemCount={searchResults.length}
-                    itemSize={66}
-                    itemData={{
-                      items: searchResults,
-                      onClickPlay,
-                      selectedResource: playingAudioResource,
-                    }}
-                  >
-                    {AudioResourceStoreRow}
-                  </List>
-                )}
-              </AutoSizer>
+            {error ? (
+              <PlaceholderError onRetry={onRetry}>
+                <Trans>An error occurred while loading audio resources.</Trans>{' '}
+                <Trans>
+                  Please check your internet connection or try again later.
+                </Trans>
+              </PlaceholderError>
+            ) : (
+              !!searchResults &&
+              (searchResults.length === 0 ? (
+                <EmptyMessage>
+                  <Trans>
+                    Your search and filters did not return any result.
+                  </Trans>
+                </EmptyMessage>
+              ) : (
+                <AutoSizer>
+                  {({ height, width }) => (
+                    <List
+                      height={height}
+                      width={width}
+                      overscanCount={10}
+                      itemCount={searchResults.length}
+                      itemSize={66}
+                      itemData={{
+                        items: searchResults,
+                        onClickPlay,
+                        selectedResource: playingAudioResource,
+                      }}
+                    >
+                      {AudioResourceStoreRow}
+                    </List>
+                  )}
+                </AutoSizer>
+              ))
             )}
           </Line>
         </Column>
@@ -173,6 +193,8 @@ const FontResourceListAndFilters = ({
   searchResults,
   isFiltersPanelOpen,
   setIsFiltersPanelOpen,
+  error,
+  onRetry,
 }: ResourceListAndFiltersProps) => {
   const [
     selectedFontResource,
@@ -182,25 +204,44 @@ const FontResourceListAndFilters = ({
     <Line expand>
       <Column noMargin noOverflowParent expand>
         <Line noMargin expand>
-          {!!searchResults && (
-            <AutoSizer>
-              {({ height, width }) => (
-                <List
-                  height={height}
-                  width={width}
-                  overscanCount={10}
-                  itemCount={searchResults.length}
-                  itemSize={130}
-                  itemData={{
-                    items: searchResults,
-                    selectedResource: selectedFontResource,
-                    onSelect: setSelectedFontResource,
-                  }}
-                >
-                  {FontResourceStoreRow}
-                </List>
-              )}
-            </AutoSizer>
+          {error ? (
+            <PlaceholderError onRetry={onRetry}>
+              <Trans>An error occurred while loading fonts.</Trans>{' '}
+              <Trans>
+                Please check your internet connection or try again later.
+              </Trans>
+            </PlaceholderError>
+          ) : (
+            !!searchResults &&
+            (searchResults.length === 0 ? (
+              <EmptyMessage>
+                <Trans>
+                  Your search and filters did not return any result.
+                  <br />
+                  If you need support for a specific language, please contact
+                  us.
+                </Trans>
+              </EmptyMessage>
+            ) : (
+              <AutoSizer>
+                {({ height, width }) => (
+                  <List
+                    height={height}
+                    width={width}
+                    overscanCount={10}
+                    itemCount={searchResults.length}
+                    itemSize={130}
+                    itemData={{
+                      items: searchResults,
+                      selectedResource: selectedFontResource,
+                      onSelect: setSelectedFontResource,
+                    }}
+                  >
+                    {FontResourceStoreRow}
+                  </List>
+                )}
+              </AutoSizer>
+            ))
           )}
         </Line>
       </Column>

@@ -121,7 +121,7 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::String& newName);
 
   /**
-   * \brief Refactor behavior events after the extension was placed in a new
+   * \brief Refactor behavior events after the behavior was placed in a new
    * extension.
    */
   static void UpdateExtensionNameInEventsBasedBehavior(
@@ -323,6 +323,15 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::EventsFunctionsExtension& eventsFunctionsExtension,
       const gd::String& oldBehaviorName,
       const gd::String& newBehaviorName);
+
+  /**
+   * \brief Refactor behavior events after the behavior was duplicated.
+   */
+  static void UpdateBehaviorNameInEventsBasedBehavior(
+      gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      gd::EventsBasedBehavior &eventsBasedBehavior,
+      const gd::String &sourceBehaviorName);
 
   /**
    * \brief Refactor the project **before** an object is renamed.
@@ -653,6 +662,21 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::String& oldName,
       const gd::String& newName,
       const gd::ProjectBrowser& projectBrowser);
+
+  /**
+   * \brief Refactor the project **before** a behavior is renamed.
+   *
+   * \warning Do the renaming of the specified behavior after calling this.
+   * This is because the behavior is expected to have its old name for the
+   * refactoring.
+   */
+  static void RenameEventsBasedBehavior(
+      gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      const gd::EventsBasedBehavior &eventsBasedBehavior,
+      const gd::String &oldBehaviorName,
+      const gd::String &newBehaviorName,
+      const gd::ProjectBrowser &projectBrowser);
 
   static void FindDependentBehaviorNames(
       const gd::Project& project,

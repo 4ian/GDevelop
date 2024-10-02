@@ -52,7 +52,8 @@ export type EventsBasedBehaviorCallbacks = {|
   ) => void,
   onEventsBasedBehaviorPasted: (
     eventsBasedBehavior: gdEventsBasedBehavior,
-    sourceExtensionName: string
+    sourceExtensionName: string,
+    sourceEventsBasedBehaviorName: string
   ) => void,
 |};
 
@@ -284,16 +285,16 @@ export class EventsBasedBehaviorTreeViewItemContent
     const clipboardContent = Clipboard.get(
       EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND
     );
-    const copiedEventsBasedBehavior = SafeExtractor.extractObjectProperty(
+    const sourceEventsBasedBehavior = SafeExtractor.extractObjectProperty(
       clipboardContent,
       'eventsBasedBehavior'
     );
-    const name = SafeExtractor.extractStringProperty(clipboardContent, 'name');
-    if (!name || !copiedEventsBasedBehavior) return;
+    const sourceEventsBasedBehaviorName = SafeExtractor.extractStringProperty(clipboardContent, 'name');
+    if (!sourceEventsBasedBehaviorName || !sourceEventsBasedBehavior) return;
 
     const { project, eventsBasedBehaviorsList } = this.props;
 
-    const newName = newNameGenerator(name, name =>
+    const newName = newNameGenerator(sourceEventsBasedBehaviorName, name =>
       eventsBasedBehaviorsList.has(name)
     );
 
@@ -304,7 +305,7 @@ export class EventsBasedBehaviorTreeViewItemContent
 
     unserializeFromJSObject(
       newEventsBasedBehavior,
-      copiedEventsBasedBehavior,
+      sourceEventsBasedBehavior,
       'unserializeFrom',
       project
     );
@@ -317,7 +318,8 @@ export class EventsBasedBehaviorTreeViewItemContent
     if (sourceExtensionName) {
       this.props.onEventsBasedBehaviorPasted(
         newEventsBasedBehavior,
-        sourceExtensionName
+        sourceExtensionName,
+        sourceEventsBasedBehaviorName
       );
     }
 

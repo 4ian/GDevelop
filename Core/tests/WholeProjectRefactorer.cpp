@@ -2030,6 +2030,43 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     }
   }
 
+  SECTION("Events-based behavior renamed in instructions scoped to one behavior") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+
+    // A behavior is copied to the same extension.
+    auto &copiedBehavior =
+        eventsExtension.GetEventsBasedBehaviors().InsertNew(
+            "MyDuplicatedEventsBasedBehavior", 0);
+    copiedBehavior.SetFullName("My events based behavior");
+    copiedBehavior.SetDescription("An events based behavior for test");
+    copiedBehavior.SetObjectType("MyEventsExtension::MyEventsBasedObject");
+
+    // Add the copied events.
+    auto &behaviorEventsFunctions = copiedBehavior.GetEventsFunctions();
+    auto &behaviorAction = behaviorEventsFunctions.InsertNewEventsFunction(
+        "MyBehaviorEventsFunction", 0);
+    SetupEvents(behaviorAction.GetEvents());
+
+    gd::WholeProjectRefactorer::UpdateBehaviorNameInEventsBasedBehavior(
+        project, eventsExtension, copiedBehavior, "MyEventsBasedBehavior");
+
+    // Check that events function calls in instructions have been renamed
+    REQUIRE(GetEventFirstActionType(
+                behaviorAction.GetEvents().GetEvent(BehaviorAction)) ==
+            "MyEventsExtension::MyDuplicatedEventsBasedBehavior::MyBehaviorEventsFunction");
+
+    for (auto *eventsList : GetEventsLists(project)) {
+      // Check that events function calls in instructions have NOT been renamed
+      // outside of the copied behavior.
+      REQUIRE(
+          GetEventFirstActionType(eventsList->GetEvent(BehaviorAction)) ==
+          "MyEventsExtension::MyEventsBasedBehavior::MyBehaviorEventsFunction");
+    }
+  }
+
   SECTION("Events extension renamed in parameters") {
     gd::Project project;
     gd::Platform platform;

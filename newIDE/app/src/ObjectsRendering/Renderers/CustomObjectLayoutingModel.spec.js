@@ -600,11 +600,11 @@ class MockedChildRenderedInstance implements ChildRenderedInstance {
   }
 
   getOriginX(): number {
-    return this.originX;
+    return (this.originX * this.getWidth()) / this.getDefaultWidth();
   }
 
   getOriginY(): number {
-    return this.originY;
+    return (this.originY * this.getHeight()) / this.getDefaultHeight();
   }
 
   update(): void {

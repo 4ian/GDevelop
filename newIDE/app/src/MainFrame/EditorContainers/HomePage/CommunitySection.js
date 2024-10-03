@@ -11,6 +11,7 @@ import Reddit from '../../../UI/CustomSvgIcons/Reddit';
 import Twitter from '../../../UI/CustomSvgIcons/Twitter';
 import Facebook from '../../../UI/CustomSvgIcons/Facebook';
 import TikTok from '../../../UI/CustomSvgIcons/TikTok';
+import GitHub from '../../../UI/CustomSvgIcons/GitHub';
 import SectionContainer, { SectionRow } from './SectionContainer';
 import { ListItem } from '../../../UI/List';
 import List from '@material-ui/core/List';
@@ -63,6 +64,11 @@ const communityItems = [
     onClick: () => Window.openExternalURL('https://www.tiktok.com/@gdevelop'),
     icon: <TikTok fontSize="small" color="inherit" />,
     label: <Trans>TikTok</Trans>,
+  },
+  {
+    onClick: () => Window.openExternalURL('https://github.com/4ian/GDevelop'),
+    icon: <GitHub fontSize="small" color="inherit" />,
+    label: <Trans>GitHub</Trans>,
   },
 ];
 

@@ -53,13 +53,28 @@ import { type NewProjectSetup } from '../../../ProjectCreation/NewProjectSetupDi
 import { type ObjectWithContext } from '../../../ObjectsList/EnumerateObjects';
 
 const gamesDashboardWikiArticle = getHelpLink('/interface/games-dashboard/');
-const isShopRequested = (routeArguments: RouteArguments): boolean =>
-  routeArguments['initial-dialog'] === 'asset-store' || // Compatibility with old links
-  routeArguments['initial-dialog'] === 'store'; // New way of opening the store
-const isGamesDashboardRequested = (routeArguments: RouteArguments): boolean =>
-  routeArguments['initial-dialog'] === 'games-dashboard';
-const isBuildRequested = (routeArguments: RouteArguments): boolean =>
-  routeArguments['initial-dialog'] === 'build';
+const getRequestedTab = (routeArguments: RouteArguments): HomeTab | null => {
+  if (
+    routeArguments['initial-dialog'] === 'asset-store' || // Compatibility with old links
+    routeArguments['initial-dialog'] === 'store' // New way of opening the store
+  ) {
+    return 'shop';
+  } else if (routeArguments['initial-dialog'] === 'games-dashboard') {
+    return 'manage';
+  } else if (routeArguments['initial-dialog'] === 'build') {
+    return 'build';
+  } else if (routeArguments['initial-dialog'] === 'education') {
+    return 'team-view';
+  } else if (routeArguments['initial-dialog'] === 'play') {
+    return 'play';
+  } else if (routeArguments['initial-dialog'] === 'community') {
+    return 'community';
+  } else if (routeArguments['initial-dialog'] === 'get-started') {
+    return 'get-started';
+  }
+
+  return null;
+};
 
 const styles = {
   container: {
@@ -216,21 +231,11 @@ export const HomePage = React.memo<Props>(
       const {
         values: { showGetStartedSectionByDefault },
       } = React.useContext(PreferencesContext);
-      const isShopRequestedAtOpening = React.useRef<boolean>(
-        isShopRequested(routeArguments)
+      const tabRequestedAtOpening = React.useRef<HomeTab | null>(
+        getRequestedTab(routeArguments)
       );
-      const isGamesDashboardRequestedAtOpening = React.useRef<boolean>(
-        isGamesDashboardRequested(routeArguments)
-      );
-      const isBuildRequestedAtOpening = React.useRef<boolean>(
-        isBuildRequested(routeArguments)
-      );
-      const initialTab = isShopRequestedAtOpening.current
-        ? 'shop'
-        : isGamesDashboardRequestedAtOpening.current
-        ? 'manage'
-        : isBuildRequestedAtOpening.current
-        ? 'build'
+      const initialTab = tabRequestedAtOpening.current
+        ? tabRequestedAtOpening.current
         : showGetStartedSectionByDefault
         ? 'get-started'
         : 'build';
@@ -286,8 +291,11 @@ export const HomePage = React.memo<Props>(
       // that redirects to the asset store for instance).
       React.useEffect(
         () => {
-          if (isShopRequested(routeArguments)) {
-            setActiveTab('shop');
+          const requestedTab = getRequestedTab(routeArguments);
+          if (!requestedTab) return;
+
+          setActiveTab(requestedTab);
+          if (requestedTab === 'shop') {
             if (routeArguments['asset-pack']) {
               setInitialPackUserFriendlySlug(routeArguments['asset-pack']);
             }
@@ -297,18 +305,10 @@ export const HomePage = React.memo<Props>(
               );
             }
             // Remove the arguments so that the asset store is not opened again.
-            removeRouteArguments([
-              'initial-dialog',
-              'asset-pack',
-              'game-template',
-            ]);
-          } else if (isGamesDashboardRequested(routeArguments)) {
-            setActiveTab('manage');
-            removeRouteArguments(['initial-dialog']);
-          } else if (isBuildRequested(routeArguments)) {
-            setActiveTab('build');
-            removeRouteArguments(['initial-dialog']);
+            removeRouteArguments(['asset-pack', 'game-template']);
           }
+
+          removeRouteArguments(['initial-dialog']);
         },
         [
           routeArguments,

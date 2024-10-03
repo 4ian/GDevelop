@@ -794,24 +794,40 @@
     "play-button": {
       "primary": {
         "border-color": {
-          "value": "#C9B6FC"
+          "value": "#7046EC"
         },
         "background-color": {
-          "value": "#C9B6FC"
+          "value": "#7046EC"
         },
         "color": {
-          "value": "#1D1D26"
+          "value": "#F5F5F7"
+        },
+        "hover": {
+          "background-color": {
+            "value": "#4F28CD"
+          },
+          "border-color": {
+            "value": "#4F28CD"
+          }
         }
       },
       "secondary": {
         "border-color": {
-          "value": "#C9B6FC"
+          "value": "#7046EC"
         },
         "background-color": {
-          "value": "#32323B"
+          "value": "#D9D9DE"
         },
         "color": {
-          "value": "#F5F5F7"
+          "value": "#1D1D26"
+        },
+        "hover": {
+          "background-color": {
+            "value": "#F5F5F7"
+          },
+          "border-color": {
+            "value": "#F5F5F7"
+          }
         }
       }
     },

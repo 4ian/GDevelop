@@ -32,13 +32,20 @@ const PlayButton = (props: Props) => {
         ].borderColor,
       outlineWidth: 2,
       outlineStyle: 'solid',
+      '&:hover': {
+        backgroundColor:
+          gdevelopTheme.soundPlayer.playButton[
+            props.primary ? 'primary' : 'secondary'
+          ].hover.backgroundColor,
+        outlineColor:
+          gdevelopTheme.soundPlayer.playButton[
+            props.primary ? 'primary' : 'secondary'
+          ].hover.borderColor,
+      },
     },
   })();
   return (
-    <IconButton
-      classes={classes}
-      onClick={props.onClick}
-    >
+    <IconButton classes={classes} onClick={props.onClick}>
       {props.isPlaying ? <Pause /> : <Play />}
     </IconButton>
   );

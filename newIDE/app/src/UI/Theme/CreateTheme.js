@@ -619,12 +619,24 @@ export function createGdevelopTheme({
             borderColor: styles['SoundPlayerPlayButtonPrimaryBorderColor'],
             backgroundColor:
               styles['SoundPlayerPlayButtonPrimaryBackgroundColor'],
+            hover: {
+              backgroundColor:
+                styles['SoundPlayerPlayButtonPrimaryHoverBackgroundColor'],
+              borderColor:
+                styles['SoundPlayerPlayButtonPrimaryHoverBorderColor'],
+            },
             color: styles['SoundPlayerPlayButtonPrimaryColor'],
           },
           secondary: {
             borderColor: styles['SoundPlayerPlayButtonSecondaryBorderColor'],
             backgroundColor:
               styles['SoundPlayerPlayButtonSecondaryBackgroundColor'],
+            hover: {
+              backgroundColor:
+                styles['SoundPlayerPlayButtonSecondaryHoverBackgroundColor'],
+              borderColor:
+                styles['SoundPlayerPlayButtonSecondaryHoverBorderColor'],
+            },
             color: styles['SoundPlayerPlayButtonSecondaryColor'],
           },
         },

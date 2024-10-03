@@ -613,6 +613,14 @@
         },
         "color": {
           "value": "#1D1D26"
+        },
+        "hover": {
+          "background-color": {
+            "value": "#F5F5F7"
+          },
+          "border-color": {
+            "value": "#F5F5F7"
+          }
         }
       },
       "secondary": {
@@ -624,6 +632,14 @@
         },
         "color": {
           "value": "#F5F5F7"
+        },
+        "hover": {
+          "background-color": {
+            "value": "#F5F5F7"
+          },
+          "border-color": {
+            "value": "#F5F5F7"
+          }
         }
       }
     },

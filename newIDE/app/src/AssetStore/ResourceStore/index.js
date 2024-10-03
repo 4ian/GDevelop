@@ -102,6 +102,7 @@ const AudioResourceListAndFilters = ({
   onSelectResource,
 }: ResourceListAndFiltersProps<ResourceV2>) => {
   const soundPlayerRef = React.useRef<?SoundPlayerInterface>(null);
+  const listRef = React.useRef<?List>(null);
   const { getAuthorsDisplayLinks } = React.useContext(ResourceStoreContext);
   const selectedResource =
     searchResults && typeof selectedResourceIndex === 'number'
@@ -123,21 +124,27 @@ const AudioResourceListAndFilters = ({
 
   const onSkipForward = React.useCallback(
     () => {
-      onSelectResource(
+      const newIndex =
         typeof selectedResourceIndex === 'number'
           ? selectedResourceIndex + 1
-          : 0
-      );
+          : 0;
+      onSelectResource(newIndex);
+      if (listRef.current) {
+        listRef.current.scrollToItem(newIndex, 'smart');
+      }
     },
     [selectedResourceIndex, onSelectResource]
   );
   const onSkipBack = React.useCallback(
     () => {
-      onSelectResource(
+      const newIndex =
         typeof selectedResourceIndex === 'number'
           ? Math.max(selectedResourceIndex - 1, 0)
-          : 0
-      );
+          : 0;
+      onSelectResource(newIndex);
+      if (listRef.current) {
+        listRef.current.scrollToItem(newIndex, 'smart');
+      }
     },
     [selectedResourceIndex, onSelectResource]
   );
@@ -183,6 +190,7 @@ const AudioResourceListAndFilters = ({
                 <AutoSizer>
                   {({ height, width }) => (
                     <List
+                      ref={listRef}
                       height={height}
                       width={width}
                       overscanCount={10}

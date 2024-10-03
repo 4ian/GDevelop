@@ -138,8 +138,9 @@ export const ResourceStoreStateProvider = ({
     (resource: ResourceV2) => {
       if (!authorsByAuthorName) return resource.authors.join(', ');
       return resource.authors.map((authorName: string) => {
-        const link = authorsByAuthorName[authorName].website;
-        if (link) {
+        const author = authorsByAuthorName[authorName];
+        if (author) {
+          const link = authorsByAuthorName[authorName].website;
           return (
             <Link
               key={authorName}

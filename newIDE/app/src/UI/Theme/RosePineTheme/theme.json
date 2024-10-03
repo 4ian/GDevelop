@@ -719,39 +719,39 @@
     "play-button": {
       "primary": {
         "border-color": {
-          "value": "#C9B6FC"
+          "value": "#c4a7e7"
         },
         "background-color": {
-          "value": "#C9B6FC"
+          "value": "#c4a7e7"
         },
         "color": {
           "value": "#1D1D26"
         },
         "hover": {
           "background-color": {
-            "value": "#F5F5F7"
+            "value": "#c9afe9"
           },
           "border-color": {
-            "value": "#F5F5F7"
+            "value": "#c9afe9"
           }
         }
       },
       "secondary": {
         "border-color": {
-          "value": "#C9B6FC"
+          "value": "#ebbcba"
         },
         "background-color": {
-          "value": "#32323B"
+          "value": "#1f1d2e"
         },
         "color": {
           "value": "#F5F5F7"
         },
         "hover": {
           "background-color": {
-            "value": "#F5F5F7"
+            "value": "#191724"
           },
           "border-color": {
-            "value": "#F5F5F7"
+            "value": "#ebbcba"
           }
         }
       }

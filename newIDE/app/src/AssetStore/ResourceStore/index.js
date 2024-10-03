@@ -28,6 +28,7 @@ import { ResourceCard } from './ResourceCard';
 import EmptyMessage from '../../UI/EmptyMessage';
 import PlaceholderError from '../../UI/PlaceholderError';
 import Paper from '../../UI/Paper';
+import PlaceholderLoader from '../../UI/PlaceholderLoader';
 
 const AudioResourceStoreRow = ({
   index,
@@ -39,6 +40,7 @@ const AudioResourceStoreRow = ({
   data: {|
     items: AudioResourceV2[],
     onClickPlay: number => void,
+    onSelect: number => void,
     selectedResourceIndex: number,
   |},
 |}) => {
@@ -51,6 +53,7 @@ const AudioResourceStoreRow = ({
         isSelected={data.selectedResourceIndex === index}
         isPlaying={false}
         onClickPlay={() => data.onClickPlay(index)}
+        onClickLine={() => data.onSelect(index)}
       />
     </div>
   );
@@ -103,6 +106,7 @@ const AudioResourceListAndFilters = ({
 }: ResourceListAndFiltersProps<ResourceV2>) => {
   const soundPlayerRef = React.useRef<?SoundPlayerInterface>(null);
   const listRef = React.useRef<?List>(null);
+  const shouldPlayAfterResourceSelectionRef = React.useRef<boolean>(false);
   const { getAuthorsDisplayLinks } = React.useContext(ResourceStoreContext);
   const selectedResource =
     searchResults && typeof selectedResourceIndex === 'number'
@@ -117,6 +121,7 @@ const AudioResourceListAndFilters = ({
       ) {
         soundPlayerRef.current.playPause(true);
       }
+      shouldPlayAfterResourceSelectionRef.current = true;
       onSelectResource(newResourceIndex);
     },
     [onSelectResource, selectedResourceIndex]
@@ -150,9 +155,10 @@ const AudioResourceListAndFilters = ({
   );
 
   const onSoundLoaded = React.useCallback(() => {
-    if (soundPlayerRef.current) {
+    if (soundPlayerRef.current && shouldPlayAfterResourceSelectionRef.current) {
       soundPlayerRef.current.playPause(true);
     }
+    shouldPlayAfterResourceSelectionRef.current = false;
   }, []);
 
   let subtitle = null;
@@ -199,6 +205,7 @@ const AudioResourceListAndFilters = ({
                       itemData={{
                         items: searchResults,
                         onClickPlay,
+                        onSelect: onSelectResource,
                         selectedResourceIndex,
                       }}
                     >
@@ -390,15 +397,32 @@ export const ResourceStore = ({
     error,
     setSearchText,
     setSearchResourceKind,
+    fontFiltersState,
+    audioFiltersState,
   } = React.useContext(ResourceStoreContext);
   const [isFiltersPanelOpen, setIsFiltersPanelOpen] = React.useState<boolean>(
-    false
+    () => {
+      if (resourceKind === 'audio') {
+        return (
+          audioFiltersState.durationFilter.hasFilters() ||
+          audioFiltersState.audioTypeFilter.hasFilters()
+        );
+      } else if (resourceKind === 'font') {
+        return fontFiltersState.alphabetSupportFilter.hasFilters();
+      }
+      return false;
+    }
   );
   React.useEffect(
     () => {
+      // When opening resource store, set resource kind to get the right kind of resource in the search results.
       setSearchResourceKind(resourceKind);
+      return () => {
+        // When closing the resource store, reset search text. Otherwise it is shared between resource kinds.
+        setSearchText('');
+      };
     },
-    [resourceKind, setSearchResourceKind]
+    [resourceKind, setSearchResourceKind, setSearchText]
   );
 
   React.useEffect(
@@ -420,7 +444,7 @@ export const ResourceStore = ({
   );
 
   return (
-    <Column expand noMargin>
+    <Column expand noMargin useFullHeight>
       <LineStackLayout>
         <Column expand noMargin>
           <SearchBar
@@ -440,7 +464,9 @@ export const ResourceStore = ({
           </IconButton>
         )}
       </LineStackLayout>
-      {resourceKind === 'audio' && (
+      {!searchResults ? (
+        <PlaceholderLoader />
+      ) : resourceKind === 'audio' ? (
         <AudioResourceListAndFilters
           error={error}
           selectedResourceIndex={selectedResourceIndex}
@@ -453,8 +479,7 @@ export const ResourceStore = ({
             searchResultsForResourceKind
           }
         />
-      )}
-      {resourceKind === 'font' && (
+      ) : resourceKind === 'font' ? (
         <FontResourceListAndFilters
           error={error}
           selectedResourceIndex={selectedResourceIndex}
@@ -467,8 +492,7 @@ export const ResourceStore = ({
             searchResultsForResourceKind
           }
         />
-      )}
-      {resourceKind === 'svg' && (
+      ) : resourceKind === 'svg' ? (
         <SvgResourceListAndFilters
           error={error}
           selectedResourceIndex={selectedResourceIndex}
@@ -481,7 +505,7 @@ export const ResourceStore = ({
             searchResultsForResourceKind
           }
         />
-      )}
+      ) : null}
     </Column>
   );
 };

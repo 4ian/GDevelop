@@ -132,7 +132,7 @@ export const NewResourceDialog = ({
       actions={[
         <FlatButton
           key="close"
-          label={<Trans>Close</Trans>}
+          label={<Trans>Cancel</Trans>}
           primary
           onClick={onClose}
         />,

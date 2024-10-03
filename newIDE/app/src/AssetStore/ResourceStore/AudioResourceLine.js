@@ -14,11 +14,13 @@ import { ResourceStoreContext } from './ResourceStoreContext';
 
 const styles = {
   paper: { display: 'flex', padding: 8, flex: 1 },
+  clickableLine: { flex: 1, maxWidth: '100%' },
 };
 
 type Props = {|
   audioResource: AudioResourceV2,
   onClickPlay: () => void,
+  onClickLine: () => void,
   isPlaying: boolean,
   isSelected: boolean,
 |};
@@ -26,6 +28,7 @@ type Props = {|
 const AudioResourceLine = ({
   audioResource,
   onClickPlay,
+  onClickLine,
   isPlaying,
   isSelected,
 }: Props) => {
@@ -38,35 +41,39 @@ const AudioResourceLine = ({
       style={{ ...styles.paper, borderColor: gdevelopTheme.palette.secondary }}
       variant={isSelected ? 'outlined' : undefined}
     >
-      <LineStackLayout
-        noMargin
-        expand
-        alignItems="center"
-        justifyContent={isMobile ? 'space-between' : 'flex-start'}
-      >
-        <LineStackLayout noMargin alignItems="center">
-          <PlayButton onClick={onClickPlay} isPlaying={isPlaying} />
-          <div style={{ overflow: 'hidden', width: isMobile ? 'unset' : 400 }}>
-            <ColumnStackLayout noMargin>
-              <Text noMargin size="sub-title" style={textEllipsisStyle}>
-                {audioResource.name}
-              </Text>
-              <Text
-                noMargin
-                color="secondary"
-                style={textEllipsisStyle}
-                size="body-small"
-              >
-                {getAuthorsDisplayLinks(audioResource)} -{' '}
-                {audioResource.license.replace(', click for details', '')}
-              </Text>
-            </ColumnStackLayout>
-          </div>
+      <div style={styles.clickableLine} onClick={onClickLine}>
+        <LineStackLayout
+          noMargin
+          expand
+          alignItems="center"
+          justifyContent={isMobile ? 'space-between' : 'flex-start'}
+        >
+          <LineStackLayout noMargin alignItems="center">
+            <PlayButton onClick={onClickPlay} isPlaying={isPlaying} />
+            <div
+              style={{ overflow: 'hidden', width: isMobile ? 'unset' : 400 }}
+            >
+              <ColumnStackLayout noMargin>
+                <Text noMargin size="sub-title" style={textEllipsisStyle}>
+                  {audioResource.name}
+                </Text>
+                <Text
+                  noMargin
+                  color="secondary"
+                  style={textEllipsisStyle}
+                  size="body-small"
+                >
+                  {getAuthorsDisplayLinks(audioResource)} -{' '}
+                  {audioResource.license.replace(', click for details', '')}
+                </Text>
+              </ColumnStackLayout>
+            </div>
+          </LineStackLayout>
+          <Text noMargin size="sub-title" color="secondary">
+            {formatDuration(audioResource.metadata.duration)}
+          </Text>
         </LineStackLayout>
-        <Text noMargin size="sub-title" color="secondary">
-          {formatDuration(audioResource.metadata.duration)}
-        </Text>
-      </LineStackLayout>
+      </div>
     </Paper>
   );
 };

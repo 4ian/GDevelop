@@ -3,15 +3,21 @@
 import * as React from 'react';
 import WavesurferPlayer from './WaveSurfer';
 import { Column, Line } from '../Grid';
+import { LineStackLayout } from '../Layout';
 import PlayButton from './PlayButton';
 import Text from '../Text';
+import IconButton from '../IconButton';
 import { formatDuration } from '../../Utils/Duration';
 import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
 import { useResponsiveWindowSize } from '../Responsive/ResponsiveWindowMeasurer';
+import SkipBack from '../CustomSvgIcons/SkipBack';
+import SkipForward from '../CustomSvgIcons/SkipForward';
 
 type Props = {|
   soundSrc: string | null,
   onSoundLoaded: () => void,
+  onSkipForward: () => void,
+  onSkipBack: () => void,
 |};
 
 export type SoundPlayerInterface = {|
@@ -19,8 +25,9 @@ export type SoundPlayerInterface = {|
 |};
 
 const SoundPlayer = React.forwardRef<Props, SoundPlayerInterface>(
-  ({ soundSrc, onSoundLoaded }, ref) => {
+  ({ soundSrc, onSoundLoaded, onSkipBack, onSkipForward }, ref) => {
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
+    const shouldPlayAfterLoading = React.useRef<boolean>(false);
     const { isMobile } = useResponsiveWindowSize();
     const mobileAudioRef = React.useRef<?Audio>(null);
     const waveSurferRef = React.useRef<?any>(null);
@@ -34,23 +41,43 @@ const SoundPlayer = React.forwardRef<Props, SoundPlayerInterface>(
         setDuration(Math.round(ws.getDuration()));
         setTime(0);
         onSoundLoaded();
+        if (shouldPlayAfterLoading.current) {
+          setIsPlaying(true);
+        }
       },
       [onSoundLoaded]
     );
+
     const onAudioReady = React.useCallback(
       () => {
         if (!mobileAudioRef.current) return;
         setDuration(Math.round(mobileAudioRef.current.duration));
         setTime(0);
         onSoundLoaded();
+        if (shouldPlayAfterLoading.current) {
+          setIsPlaying(true);
+        }
       },
       [onSoundLoaded]
     );
 
+    const skipBack = React.useCallback(
+      () => {
+        shouldPlayAfterLoading.current = isPlaying;
+        onSkipBack();
+      },
+      [isPlaying, onSkipBack]
+    );
+    const skipForward = React.useCallback(
+      () => {
+        shouldPlayAfterLoading.current = isPlaying;
+        onSkipForward();
+      },
+      [isPlaying, onSkipForward]
+    );
+
     const onLoad = React.useCallback(() => {
       setIsPlaying(false);
-      setTime(null);
-      setDuration(null);
     }, []);
 
     React.useEffect(
@@ -101,6 +128,9 @@ const SoundPlayer = React.forwardRef<Props, SoundPlayerInterface>(
       () => {
         if (isMobile) {
           if (soundSrc) {
+            if (mobileAudioRef.current) {
+              mobileAudioRef.current.pause();
+            }
             const audio = new Audio(soundSrc);
             audio.addEventListener('timeupdate', onTimeupdate);
             audio.addEventListener('ended', onFinishPlaying);
@@ -120,11 +150,19 @@ const SoundPlayer = React.forwardRef<Props, SoundPlayerInterface>(
     return (
       <Line alignItems="center">
         <Column>
-          <PlayButton
-            primary
-            isPlaying={isPlaying}
-            onClick={() => onPlayPause()}
-          />
+          <LineStackLayout alignItems="center">
+            <IconButton size="small" onClick={skipBack}>
+              <SkipBack />
+            </IconButton>
+            <PlayButton
+              primary
+              isPlaying={isPlaying}
+              onClick={() => onPlayPause()}
+            />
+            <IconButton size="small" onClick={skipForward}>
+              <SkipForward />
+            </IconButton>
+          </LineStackLayout>
         </Column>
         <Column expand>
           {!isMobile && (

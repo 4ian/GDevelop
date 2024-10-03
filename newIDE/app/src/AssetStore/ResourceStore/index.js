@@ -161,7 +161,7 @@ const AudioResourceListAndFilters = ({
 
   return (
     <>
-      <Line expand>
+      <Line expand noMargin>
         <Column noMargin noOverflowParent expand>
           <Line noMargin expand>
             {error ? (
@@ -260,7 +260,7 @@ const FontResourceListAndFilters = ({
   onSelectResource,
 }: ResourceListAndFiltersProps<ResourceV2>) => {
   return (
-    <Line expand>
+    <Line expand noMargin>
       <Column noMargin noOverflowParent expand>
         <Line noMargin expand>
           {error ? (

@@ -1,7 +1,7 @@
 // @flow
 
 import * as React from 'react';
-import WavesurferPlayer from './WaveSurfer';
+import WaveSurferPlayer from './WaveSurfer';
 import { Column, Line } from '../Grid';
 import { LineStackLayout } from '../Layout';
 import PlayButton from './PlayButton';
@@ -16,8 +16,8 @@ import SkipForward from '../CustomSvgIcons/SkipForward';
 type Props = {|
   soundSrc: string | null,
   onSoundLoaded: () => void,
-  onSkipForward: () => void,
-  onSkipBack: () => void,
+  onSkipForward?: () => void,
+  onSkipBack?: () => void,
 |};
 
 export type SoundPlayerInterface = {|
@@ -38,7 +38,7 @@ const SoundPlayer = React.forwardRef<Props, SoundPlayerInterface>(
     const onWaveSurferReady = React.useCallback(
       ws => {
         waveSurferRef.current = ws;
-        setDuration(Math.round(ws.getDuration()));
+        setDuration(Math.ceil(ws.getDuration()));
         setTime(0);
         onSoundLoaded();
         if (shouldPlayAfterLoading.current) {
@@ -51,7 +51,7 @@ const SoundPlayer = React.forwardRef<Props, SoundPlayerInterface>(
     const onAudioReady = React.useCallback(
       () => {
         if (!mobileAudioRef.current) return;
-        setDuration(Math.round(mobileAudioRef.current.duration));
+        setDuration(Math.ceil(mobileAudioRef.current.duration));
         setTime(0);
         onSoundLoaded();
         if (shouldPlayAfterLoading.current) {
@@ -64,14 +64,14 @@ const SoundPlayer = React.forwardRef<Props, SoundPlayerInterface>(
     const skipBack = React.useCallback(
       () => {
         shouldPlayAfterLoading.current = isPlaying;
-        onSkipBack();
+        if (onSkipBack) onSkipBack();
       },
       [isPlaying, onSkipBack]
     );
     const skipForward = React.useCallback(
       () => {
         shouldPlayAfterLoading.current = isPlaying;
-        onSkipForward();
+        if (onSkipForward) onSkipForward();
       },
       [isPlaying, onSkipForward]
     );
@@ -151,7 +151,7 @@ const SoundPlayer = React.forwardRef<Props, SoundPlayerInterface>(
       <Line alignItems="center">
         <Column>
           <LineStackLayout alignItems="center">
-            <IconButton size="small" onClick={skipBack}>
+            <IconButton size="small" onClick={skipBack} disabled={!onSkipBack}>
               <SkipBack />
             </IconButton>
             <PlayButton
@@ -159,14 +159,18 @@ const SoundPlayer = React.forwardRef<Props, SoundPlayerInterface>(
               isPlaying={isPlaying}
               onClick={() => onPlayPause()}
             />
-            <IconButton size="small" onClick={skipForward}>
+            <IconButton
+              size="small"
+              onClick={skipForward}
+              disabled={!onSkipForward}
+            >
               <SkipForward />
             </IconButton>
           </LineStackLayout>
         </Column>
         <Column expand>
           {!isMobile && (
-            <WavesurferPlayer
+            <WaveSurferPlayer
               url={soundSrc}
               waveColor={gdevelopTheme.soundPlayer.waveColor}
               progressColor={gdevelopTheme.soundPlayer.progressColor}
@@ -184,11 +188,11 @@ const SoundPlayer = React.forwardRef<Props, SoundPlayerInterface>(
         </Column>
         <Column>
           <Line>
-            <Text noMargin>
+            <Text noMargin size="sub-title">
               {typeof time !== 'number' ? '..' : formatDuration(time)}
             </Text>
             &nbsp;
-            <Text noMargin color="secondary">
+            <Text noMargin size="sub-title" color="secondary">
               / {typeof duration !== 'number' ? '..' : formatDuration(duration)}
             </Text>
           </Line>

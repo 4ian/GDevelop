@@ -119,6 +119,27 @@ const AudioResourceListAndFilters = ({
     [onSelectResource, selectedResourceIndex]
   );
 
+  const onSkipForward = React.useCallback(
+    () => {
+      onSelectResource(
+        typeof selectedResourceIndex === 'number'
+          ? selectedResourceIndex + 1
+          : 0
+      );
+    },
+    [selectedResourceIndex, onSelectResource]
+  );
+  const onSkipBack = React.useCallback(
+    () => {
+      onSelectResource(
+        typeof selectedResourceIndex === 'number'
+          ? Math.max(selectedResourceIndex - 1, 0)
+          : 0
+      );
+    },
+    [selectedResourceIndex, onSelectResource]
+  );
+
   const onSoundLoaded = React.useCallback(() => {
     if (soundPlayerRef.current) {
       soundPlayerRef.current.playPause(true);
@@ -193,6 +214,20 @@ const AudioResourceListAndFilters = ({
         ref={soundPlayerRef}
         soundSrc={selectedResource ? selectedResource.url : null}
         onSoundLoaded={onSoundLoaded}
+        onSkipBack={
+          typeof selectedResourceIndex === 'number' &&
+          searchResults &&
+          selectedResourceIndex <= 0
+            ? undefined
+            : onSkipBack
+        }
+        onSkipForward={
+          typeof selectedResourceIndex === 'number' &&
+          searchResults &&
+          selectedResourceIndex >= searchResults.length - 1
+            ? undefined
+            : onSkipForward
+        }
       />
     </>
   );
@@ -351,6 +386,13 @@ export const ResourceStore = ({
   const searchResultsForResourceKind = searchResults
     ? searchResults.filter(resource => resource.type === resourceKind)
     : null;
+
+  React.useEffect(
+    () => {
+      onSelectResource(null);
+    },
+    [searchResults, onSelectResource]
+  );
 
   return (
     <Column expand noMargin>

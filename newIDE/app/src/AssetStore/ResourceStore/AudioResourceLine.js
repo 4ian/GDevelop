@@ -8,6 +8,8 @@ import { formatDuration } from '../../Utils/Duration';
 import Text from '../../UI/Text';
 import Paper from '../../UI/Paper';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
+import { textEllipsisStyle } from '../../UI/TextEllipsis';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 
 const styles = {
   paper: { display: 'flex', padding: 8, flex: 1 },
@@ -26,6 +28,7 @@ const AudioResourceLine = ({
   isPlaying,
   isSelected,
 }: Props) => {
+  const { isMobile } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <Paper
@@ -33,15 +36,35 @@ const AudioResourceLine = ({
       style={{ ...styles.paper, borderColor: gdevelopTheme.palette.secondary }}
       variant={isSelected ? 'outlined' : undefined}
     >
-      <LineStackLayout noMargin expand>
-        <PlayButton onClick={onClickPlay} isPlaying={isPlaying} />
-        <ColumnStackLayout noMargin>
-          <Text noMargin>{audioResource.name}</Text>
-          <Text noMargin color="secondary">
-            {audioResource.authors}
-          </Text>
-        </ColumnStackLayout>
-        <Text noMargin>{formatDuration(audioResource.metadata.duration)}</Text>
+      <LineStackLayout
+        noMargin
+        expand
+        alignItems="center"
+        justifyContent={isMobile ? 'space-between' : 'flex-start'}
+      >
+        <LineStackLayout noMargin alignItems="center">
+          <PlayButton onClick={onClickPlay} isPlaying={isPlaying} />
+          <div
+            style={{ overflow: 'hidden', width: isMobile ? 'unset' : 400 }}
+          >
+            <ColumnStackLayout noMargin>
+              <Text noMargin size="sub-title" style={textEllipsisStyle}>
+                {audioResource.name}
+              </Text>
+              <Text
+                noMargin
+                color="secondary"
+                style={textEllipsisStyle}
+                size="body-small"
+              >
+                {audioResource.authors}
+              </Text>
+            </ColumnStackLayout>
+          </div>
+        </LineStackLayout>
+        <Text noMargin size="sub-title" color="secondary">
+          {formatDuration(audioResource.metadata.duration)}
+        </Text>
       </LineStackLayout>
     </Paper>
   );

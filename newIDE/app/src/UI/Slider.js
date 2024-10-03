@@ -11,7 +11,7 @@ type Props<T> = {|
   scale?: number => number,
   valueLabelDisplay?: 'auto',
   valueLabelFormat?: (value: number, index: number) => string,
-  marks?: boolean | {|value: number, label: React.Node|}[],
+  marks?: boolean | {| value: number, label: React.Node |}[],
   onChange: (value: T) => void,
 |};
 

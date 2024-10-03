@@ -160,7 +160,7 @@ export interface ResourceV2CommonProps {
 
 export interface AudioResourceV2 extends ResourceV2CommonProps {
   type: 'audio';
-  metadata: { duration: number; type: 'music' | 'sound' };
+  metadata: { duration: number, type: 'music' | 'sound' };
 }
 export interface FontResourceV2 extends ResourceV2CommonProps {
   type: 'font';
@@ -168,9 +168,7 @@ export interface FontResourceV2 extends ResourceV2CommonProps {
   previewImageUrl: string;
 }
 
-export type ResourceV2 =
-  | FontResourceV2
-  | AudioResourceV2;
+export type ResourceV2 = FontResourceV2 | AudioResourceV2;
 
 export type AllResources = {|
   resources: Array<Resource>,

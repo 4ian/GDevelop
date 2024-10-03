@@ -1,8 +1,6 @@
 // @flow
 import * as React from 'react';
-import {
-  type TagsTreeNode,
-} from '../../Utils/GDevelopServices/Filters';
+import { type TagsTreeNode } from '../../Utils/GDevelopServices/Filters';
 
 export type ChosenCategory = {|
   node: TagsTreeNode,

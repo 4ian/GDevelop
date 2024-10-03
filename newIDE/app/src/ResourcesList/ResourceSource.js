@@ -143,8 +143,8 @@ export type ChooseResourceProps = {|
 export type ResourceSourceComponentProps = {|
   ...ChooseResourceProps,
   onChooseResources: (Array<gdResource>) => void,
-  selectedResource?: ?(ResourceV2 | Resource),
-  onSelectResource?: (?(ResourceV2 | Resource)) => void,
+  selectedResourceIndex?: ?number,
+  onSelectResource?: (?number) => void,
 |};
 
 export type ResourceStorePrimaryActionProps = {
@@ -181,8 +181,8 @@ export type ResourceManagementProps = {|
 
 export type ResourceStoreChooserProps = {|
   options: ChooseResourceOptions,
-  selectedResource?: ?(ResourceV2 | Resource),
-  onSelectResource?: (?(ResourceV2 | Resource)) => void,
+  selectedResourceIndex?: ?number,
+  onSelectResource?: (?number) => void,
   onChooseResources?: (resources: Array<gdResource>) => void,
   createNewResource?: () => gdResource,
 |};

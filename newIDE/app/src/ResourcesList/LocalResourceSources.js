@@ -33,7 +33,7 @@ const path = optionalRequire('path');
 
 const ResourceStoreChooser = ({
   options,
-  selectedResource,
+  selectedResourceIndex,
   onSelectResource,
 }: ResourceStoreChooserProps) => {
   if (!onSelectResource) return null;
@@ -43,7 +43,7 @@ const ResourceStoreChooser = ({
   }
   return (
     <ResourceStore
-      selectedResource={selectedResource}
+      selectedResourceIndex={selectedResourceIndex}
       onSelectResource={onSelectResource}
       resourceKind={
         // $FlowIgnore - Flow does not understand the check above restricts the resource kind.
@@ -276,7 +276,7 @@ const localResourceSources: Array<ResourceSource> = [
         kind,
         renderComponent: (props: ResourceSourceComponentProps) => (
           <ResourceStoreChooser
-            selectedResource={props.selectedResource}
+            selectedResourceIndex={props.selectedResourceIndex}
             onSelectResource={props.onSelectResource}
             options={props.options}
             key={`resource-store-${kind}`}

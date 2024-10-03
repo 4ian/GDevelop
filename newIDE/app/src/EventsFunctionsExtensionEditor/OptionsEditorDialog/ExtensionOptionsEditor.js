@@ -6,10 +6,6 @@ import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
-import {
-  type Resource,
-  type ResourceV2,
-} from '../../Utils/GDevelopServices/Asset';
 import TextField from '../../UI/TextField';
 import { ColumnStackLayout, TextFieldWithButtonLayout } from '../../UI/Layout';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
@@ -28,6 +24,7 @@ import { useIsMounted } from '../../Utils/UseIsMounted';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { UsersAutocomplete } from '../../Profile/UsersAutocomplete';
 import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
+import { ResourceStoreContext } from '../../AssetStore/ResourceStore/ResourceStoreContext';
 
 const downloadSvgAsBase64 = async (url: string): Promise<string> => {
   try {
@@ -118,14 +115,59 @@ export const ExtensionOptionsEditor = ({
   const forceUpdate = useForceUpdate();
   const [resourceStoreOpen, setResourceStoreOpen] = React.useState(false);
   const isMounted = useIsMounted();
-  const [selectedSvgResource, setSelectedSvgResource] = React.useState<?(
-    | Resource
-    | ResourceV2
-  )>(null);
+  const { searchResults } = React.useContext(ResourceStoreContext);
+  const [
+    selectedSvgResourceIndex,
+    setSelectedSvgResourceIndex,
+  ] = React.useState<?number>(null);
+
+  const onUseIcon = React.useCallback(
+    (i18n: I18nType) => {
+      if (typeof selectedSvgResourceIndex !== 'number') return;
+      const selectedSvgResource = searchResults
+        ? searchResults[selectedSvgResourceIndex]
+        : null;
+      if (!selectedSvgResource) return;
+      setResourceStoreOpen(false);
+      onLoadChange(true);
+      downloadSvgAsBase64(selectedSvgResource.url)
+        .then(
+          base64Svg => {
+            if (!isMounted.current) return;
+
+            eventsFunctionsExtension.setPreviewIconUrl(selectedSvgResource.url);
+            eventsFunctionsExtension.setIconUrl(base64Svg);
+          },
+          rawError => {
+            if (!isMounted.current) return;
+
+            showErrorBox({
+              message: i18n._(
+                t`Unable to download the icon. Verify your internet connection or try again later.`
+              ),
+              rawError,
+              errorId: 'icon-download-error',
+            });
+          }
+        )
+        .then(() => {
+          if (!isMounted.current) return;
+
+          onLoadChange(false);
+        });
+    },
+    [
+      selectedSvgResourceIndex,
+      searchResults,
+      eventsFunctionsExtension,
+      onLoadChange,
+      isMounted,
+    ]
+  );
 
   return (
     <I18n>
-      {({ i18n }: { i18n: I18nType }) => (
+      {({ i18n }) => (
         <ColumnStackLayout noMargin expand>
           <TextField
             floatingLabelText={<Trans>Name</Trans>}
@@ -334,39 +376,9 @@ export const ExtensionOptionsEditor = ({
                 />,
                 <DialogPrimaryButton
                   primary
+                  key="apply"
                   label={<Trans>Use icon</Trans>}
-                  onClick={() => {
-                    if (!selectedSvgResource) return;
-                    setResourceStoreOpen(false);
-                    onLoadChange(true);
-                    downloadSvgAsBase64(selectedSvgResource.url)
-                      .then(
-                        base64Svg => {
-                          if (!isMounted.current) return;
-
-                          eventsFunctionsExtension.setPreviewIconUrl(
-                            selectedSvgResource.url
-                          );
-                          eventsFunctionsExtension.setIconUrl(base64Svg);
-                        },
-                        rawError => {
-                          if (!isMounted.current) return;
-
-                          showErrorBox({
-                            message: i18n._(
-                              t`Unable to download the icon. Verify your internet connection or try again later.`
-                            ),
-                            rawError,
-                            errorId: 'icon-download-error',
-                          });
-                        }
-                      )
-                      .then(() => {
-                        if (!isMounted.current) return;
-
-                        onLoadChange(false);
-                      });
-                  }}
+                  onClick={() => onUseIcon(i18n)}
                 />,
               ]}
               flexColumnBody
@@ -377,8 +389,8 @@ export const ExtensionOptionsEditor = ({
               }}
             >
               <ResourceStore
-                selectedResource={selectedSvgResource}
-                onSelectResource={setSelectedSvgResource}
+                selectedResourceIndex={selectedSvgResourceIndex}
+                onSelectResource={setSelectedSvgResourceIndex}
                 resourceKind={'svg'}
               />
             </Dialog>

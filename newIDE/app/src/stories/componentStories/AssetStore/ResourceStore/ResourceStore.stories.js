@@ -16,15 +16,18 @@ export default {
 };
 
 const ResourceStoreStory = ({ kind }: { kind: 'audio' | 'font' | 'svg' }) => {
-  const [selectedResource, setSelectedResource] = React.useState<any>(null);
+  const [
+    selectedResourceIndex,
+    setSelectedResourceIndex,
+  ] = React.useState<?number>(null);
   return (
     <FixedHeightFlexContainer height={600}>
       <ResourceStoreStateProvider>
         <ResourceStore
           onChoose={action('onChoose')}
           resourceKind={kind}
-          selectedResource={selectedResource}
-          onSelectResource={setSelectedResource}
+          selectedResourceIndex={selectedResourceIndex}
+          onSelectResource={setSelectedResourceIndex}
         />
       </ResourceStoreStateProvider>
     </FixedHeightFlexContainer>

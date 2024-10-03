@@ -28,18 +28,6 @@ import { ResourceCard } from './ResourceCard';
 import EmptyMessage from '../../UI/EmptyMessage';
 import PlaceholderError from '../../UI/PlaceholderError';
 
-const resourceV2OrNull = (resource: ?(Resource | ResourceV2)): ?ResourceV2 => {
-  if (resource && resource.metadata) return resource;
-  return null;
-};
-const resourceOrNull = (resource: ?(Resource | ResourceV2)): ?Resource => {
-  // Flow does not consider the absence of metadata attribute as a reason
-  // to exclude ResourceV2 from the returned types.
-  // $FlowIgnore
-  if (resource && !resource.metadata) return resource;
-  return null;
-};
-
 const AudioResourceStoreRow = ({
   index,
   style,
@@ -49,8 +37,8 @@ const AudioResourceStoreRow = ({
   style: Object,
   data: {|
     items: AudioResourceV2[],
-    onClickPlay: AudioResourceV2 => void,
-    selectedResource: AudioResourceV2,
+    onClickPlay: number => void,
+    selectedResourceIndex: number,
   |},
 |}) => {
   const resource = data.items[index];
@@ -59,9 +47,9 @@ const AudioResourceStoreRow = ({
     <div style={style}>
       <AudioResourceLine
         audioResource={resource}
-        isSelected={data.selectedResource === resource}
+        isSelected={data.selectedResourceIndex === index}
         isPlaying={false}
-        onClickPlay={() => data.onClickPlay(resource)}
+        onClickPlay={() => data.onClickPlay(index)}
       />
     </div>
   );
@@ -76,8 +64,8 @@ const FontResourceStoreRow = ({
   style: Object,
   data: {|
     items: FontResourceV2[],
-    selectedResource: FontResourceV2,
-    onSelect: FontResourceV2 => void,
+    selectedResourceIndex: number,
+    onSelect: number => void,
   |},
 |}) => {
   const resource = data.items[index];
@@ -86,16 +74,16 @@ const FontResourceStoreRow = ({
     <div style={style}>
       <FontResourceLine
         fontResource={resource}
-        isSelected={data.selectedResource === resource}
-        onSelect={() => data.onSelect(resource)}
+        isSelected={data.selectedResourceIndex === index}
+        onSelect={() => data.onSelect(index)}
       />
     </div>
   );
 };
 
 type ResourceListAndFiltersProps<T> = {|
-  selectedResource?: ?T,
-  onSelectResource: (?T) => void,
+  selectedResourceIndex?: ?number,
+  onSelectResource: (?number) => void,
   searchResults: ?Array<T>,
   isFiltersPanelOpen: boolean,
   setIsFiltersPanelOpen: boolean => void,
@@ -109,19 +97,26 @@ const AudioResourceListAndFilters = ({
   setIsFiltersPanelOpen,
   error,
   onRetry,
-  selectedResource,
+  selectedResourceIndex,
   onSelectResource,
 }: ResourceListAndFiltersProps<ResourceV2>) => {
   const soundPlayerRef = React.useRef<?SoundPlayerInterface>(null);
+  const selectedResource =
+    searchResults && typeof selectedResourceIndex === 'number'
+      ? searchResults[selectedResourceIndex]
+      : null;
 
   const onClickPlay = React.useCallback(
-    (newAudioResource: AudioResourceV2) => {
-      if (newAudioResource === selectedResource && soundPlayerRef.current) {
+    (newResourceIndex: number) => {
+      if (
+        newResourceIndex === selectedResourceIndex &&
+        soundPlayerRef.current
+      ) {
         soundPlayerRef.current.playPause(true);
       }
-      onSelectResource(newAudioResource);
+      onSelectResource(newResourceIndex);
     },
-    [onSelectResource, selectedResource]
+    [onSelectResource, selectedResourceIndex]
   );
 
   const onSoundLoaded = React.useCallback(() => {
@@ -162,7 +157,7 @@ const AudioResourceListAndFilters = ({
                       itemData={{
                         items: searchResults,
                         onClickPlay,
-                        selectedResource,
+                        selectedResourceIndex,
                       }}
                     >
                       {AudioResourceStoreRow}
@@ -209,7 +204,7 @@ const FontResourceListAndFilters = ({
   setIsFiltersPanelOpen,
   error,
   onRetry,
-  selectedResource,
+  selectedResourceIndex,
   onSelectResource,
 }: ResourceListAndFiltersProps<ResourceV2>) => {
   return (
@@ -245,7 +240,7 @@ const FontResourceListAndFilters = ({
                     itemSize={130}
                     itemData={{
                       items: searchResults,
-                      selectedResource,
+                      selectedResourceIndex,
                       onSelect: onSelectResource,
                     }}
                   >
@@ -287,11 +282,9 @@ const SvgResourceListAndFilters = ({
   setIsFiltersPanelOpen,
   error,
   onRetry,
+  selectedResourceIndex,
+  onSelectResource,
 }: ResourceListAndFiltersProps<Resource>) => {
-  const [
-    selectedSvgResource,
-    setSelectedSvgResource,
-  ] = React.useState<?Resource>(null);
   return (
     <Line
       expand
@@ -306,12 +299,12 @@ const SvgResourceListAndFilters = ({
         onRetry={onRetry}
         error={error}
         searchItems={searchResults}
-        renderSearchItem={(resource, size) => (
+        renderSearchItem={(resource, size, index) => (
           <ResourceCard
             size={size}
             resource={resource}
-            onChoose={() => setSelectedSvgResource(resource)}
-            isSelected={selectedSvgResource === resource}
+            onChoose={() => onSelectResource(index)}
+            isSelected={selectedResourceIndex === index}
           />
         )}
       />
@@ -320,14 +313,14 @@ const SvgResourceListAndFilters = ({
 };
 
 type Props = {
-  selectedResource?: ?(ResourceV2 | Resource),
-  onSelectResource: (?(ResourceV2 | Resource)) => void,
+  selectedResourceIndex?: ?number,
+  onSelectResource: (?number) => void,
   resourceKind: ResourceKindSupportedByResourceStore,
 };
 
 export const ResourceStore = ({
   onSelectResource,
-  selectedResource,
+  selectedResourceIndex,
   resourceKind,
 }: Props) => {
   const {
@@ -383,7 +376,7 @@ export const ResourceStore = ({
       {resourceKind === 'audio' && (
         <AudioResourceListAndFilters
           error={error}
-          selectedResource={resourceV2OrNull(selectedResource)}
+          selectedResourceIndex={selectedResourceIndex}
           onSelectResource={onSelectResource}
           onRetry={fetchResourcesAndFilters}
           isFiltersPanelOpen={isFiltersPanelOpen}
@@ -397,7 +390,7 @@ export const ResourceStore = ({
       {resourceKind === 'font' && (
         <FontResourceListAndFilters
           error={error}
-          selectedResource={resourceV2OrNull(selectedResource)}
+          selectedResourceIndex={selectedResourceIndex}
           onSelectResource={onSelectResource}
           onRetry={fetchResourcesAndFilters}
           isFiltersPanelOpen={isFiltersPanelOpen}
@@ -411,7 +404,7 @@ export const ResourceStore = ({
       {resourceKind === 'svg' && (
         <SvgResourceListAndFilters
           error={error}
-          selectedResource={resourceOrNull(selectedResource)}
+          selectedResourceIndex={selectedResourceIndex}
           onSelectResource={onSelectResource}
           onRetry={fetchResourcesAndFilters}
           isFiltersPanelOpen={false}

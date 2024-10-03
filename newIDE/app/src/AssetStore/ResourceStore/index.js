@@ -27,6 +27,7 @@ import { BoxSearchResults } from '../../UI/Search/BoxSearchResults';
 import { ResourceCard } from './ResourceCard';
 import EmptyMessage from '../../UI/EmptyMessage';
 import PlaceholderError from '../../UI/PlaceholderError';
+import Paper from '../../UI/Paper';
 
 const AudioResourceStoreRow = ({
   index,
@@ -101,6 +102,7 @@ const AudioResourceListAndFilters = ({
   onSelectResource,
 }: ResourceListAndFiltersProps<ResourceV2>) => {
   const soundPlayerRef = React.useRef<?SoundPlayerInterface>(null);
+  const { getAuthorsDisplayLinks } = React.useContext(ResourceStoreContext);
   const selectedResource =
     searchResults && typeof selectedResourceIndex === 'number'
       ? searchResults[selectedResourceIndex]
@@ -145,6 +147,17 @@ const AudioResourceListAndFilters = ({
       soundPlayerRef.current.playPause(true);
     }
   }, []);
+
+  let subtitle = null;
+  if (selectedResource) {
+    subtitle = [];
+    const authorsDisplayLinks = getAuthorsDisplayLinks(selectedResource);
+    if (authorsDisplayLinks) {
+      subtitle.push(authorsDisplayLinks);
+      subtitle.push(' - ');
+    }
+    subtitle.push(selectedResource.license.replace(', click for details', ''));
+  }
 
   return (
     <>
@@ -210,25 +223,29 @@ const AudioResourceListAndFilters = ({
           </ScrollView>
         </ResponsivePaperOrDrawer>
       </Line>
-      <SoundPlayer
-        ref={soundPlayerRef}
-        soundSrc={selectedResource ? selectedResource.url : null}
-        onSoundLoaded={onSoundLoaded}
-        onSkipBack={
-          typeof selectedResourceIndex === 'number' &&
-          searchResults &&
-          selectedResourceIndex <= 0
-            ? undefined
-            : onSkipBack
-        }
-        onSkipForward={
-          typeof selectedResourceIndex === 'number' &&
-          searchResults &&
-          selectedResourceIndex >= searchResults.length - 1
-            ? undefined
-            : onSkipForward
-        }
-      />
+      <Paper background="dark">
+        <SoundPlayer
+          ref={soundPlayerRef}
+          soundSrc={selectedResource ? selectedResource.url : null}
+          onSoundLoaded={onSoundLoaded}
+          onSkipBack={
+            typeof selectedResourceIndex === 'number' &&
+            searchResults &&
+            selectedResourceIndex <= 0
+              ? undefined
+              : onSkipBack
+          }
+          onSkipForward={
+            typeof selectedResourceIndex === 'number' &&
+            searchResults &&
+            selectedResourceIndex >= searchResults.length - 1
+              ? undefined
+              : onSkipForward
+          }
+          title={selectedResource ? selectedResource.name : null}
+          subtitle={subtitle}
+        />
+      </Paper>
     </>
   );
 };

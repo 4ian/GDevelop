@@ -7,6 +7,7 @@ import Text from '../../UI/Text';
 import Paper from '../../UI/Paper';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
+import { LineStackLayout } from '../../UI/Layout';
 
 const PADDING = 8;
 const BUTTON_BORDER_THICKNESS = 2;
@@ -43,6 +44,8 @@ const styles = {
   },
 };
 
+const fontExtensionRegex = /\.(otf|ttf)$/;
+
 type Props = {|
   fontResource: FontResourceV2,
   isSelected: boolean,
@@ -52,7 +55,7 @@ type Props = {|
 const FontResourceLine = ({ fontResource, isSelected, onSelect }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const fontNameWithoutExtension = fontResource.name.replace(
-    /\.(otf|ttf)$/,
+    fontExtensionRegex,
     ''
   );
   return (
@@ -71,9 +74,14 @@ const FontResourceLine = ({ fontResource, isSelected, onSelect }: Props) => {
         variant={isSelected ? 'outlined' : undefined}
       >
         <div style={styles.container}>
-          <Text noMargin size="sub-title">
-            {fontNameWithoutExtension}
-          </Text>
+          <LineStackLayout noMargin alignItems="center">
+            <Text noMargin size="sub-title">
+              {fontNameWithoutExtension}
+            </Text>
+            <Text noMargin color="secondary">
+              {fontResource.license}
+            </Text>
+          </LineStackLayout>
           <div style={styles.previewContainer}>
             <CorsAwareImage
               style={styles.previewImage}

@@ -10,6 +10,7 @@ import Paper from '../../UI/Paper';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { textEllipsisStyle } from '../../UI/TextEllipsis';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
+import { ResourceStoreContext } from './ResourceStoreContext';
 
 const styles = {
   paper: { display: 'flex', padding: 8, flex: 1 },
@@ -30,6 +31,7 @@ const AudioResourceLine = ({
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const { getAuthorsDisplayLinks } = React.useContext(ResourceStoreContext);
   return (
     <Paper
       background={isSelected ? 'light' : 'medium'}
@@ -44,9 +46,7 @@ const AudioResourceLine = ({
       >
         <LineStackLayout noMargin alignItems="center">
           <PlayButton onClick={onClickPlay} isPlaying={isPlaying} />
-          <div
-            style={{ overflow: 'hidden', width: isMobile ? 'unset' : 400 }}
-          >
+          <div style={{ overflow: 'hidden', width: isMobile ? 'unset' : 400 }}>
             <ColumnStackLayout noMargin>
               <Text noMargin size="sub-title" style={textEllipsisStyle}>
                 {audioResource.name}
@@ -57,7 +57,8 @@ const AudioResourceLine = ({
                 style={textEllipsisStyle}
                 size="body-small"
               >
-                {audioResource.authors}
+                {getAuthorsDisplayLinks(audioResource)} -{' '}
+                {audioResource.license.replace(', click for details', '')}
               </Text>
             </ColumnStackLayout>
           </div>

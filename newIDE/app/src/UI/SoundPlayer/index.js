@@ -3,7 +3,7 @@
 import * as React from 'react';
 import WaveSurferPlayer from './WaveSurfer';
 import { Column, Line } from '../Grid';
-import { LineStackLayout } from '../Layout';
+import { ColumnStackLayout, LineStackLayout } from '../Layout';
 import PlayButton from './PlayButton';
 import Text from '../Text';
 import IconButton from '../IconButton';
@@ -12,9 +12,19 @@ import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
 import { useResponsiveWindowSize } from '../Responsive/ResponsiveWindowMeasurer';
 import SkipBack from '../CustomSvgIcons/SkipBack';
 import SkipForward from '../CustomSvgIcons/SkipForward';
+import { Divider } from '@material-ui/core';
+
+const styles = {
+  waveSurferContainer: {
+    height: 80,
+    width: 'calc(100% - 100px)', //100px is the space taken by the time display + a margin.
+  },
+};
 
 type Props = {|
   soundSrc: string | null,
+  title: string | null,
+  subtitle: React.Node,
   onSoundLoaded: () => void,
   onSkipForward?: () => void,
   onSkipBack?: () => void,
@@ -25,7 +35,10 @@ export type SoundPlayerInterface = {|
 |};
 
 const SoundPlayer = React.forwardRef<Props, SoundPlayerInterface>(
-  ({ soundSrc, onSoundLoaded, onSkipBack, onSkipForward }, ref) => {
+  (
+    { soundSrc, onSoundLoaded, onSkipBack, onSkipForward, title, subtitle },
+    ref
+  ) => {
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const shouldPlayAfterLoading = React.useRef<boolean>(false);
     const { isMobile } = useResponsiveWindowSize();
@@ -148,56 +161,69 @@ const SoundPlayer = React.forwardRef<Props, SoundPlayerInterface>(
     );
 
     return (
-      <Line alignItems="center">
-        <Column>
-          <LineStackLayout alignItems="center">
-            <IconButton size="small" onClick={skipBack} disabled={!onSkipBack}>
-              <SkipBack />
-            </IconButton>
-            <PlayButton
-              primary
-              isPlaying={isPlaying}
-              onClick={() => onPlayPause()}
-            />
-            <IconButton
-              size="small"
-              onClick={skipForward}
-              disabled={!onSkipForward}
-            >
-              <SkipForward />
-            </IconButton>
-          </LineStackLayout>
-        </Column>
-        <Column expand>
-          {!isMobile && (
-            <WaveSurferPlayer
-              url={soundSrc}
-              waveColor={gdevelopTheme.soundPlayer.waveColor}
-              progressColor={gdevelopTheme.soundPlayer.progressColor}
-              barWidth={2}
-              barGap={1}
-              barRadius={3}
-              height={'auto'}
-              normalize
-              onReady={onWaveSurferReady}
-              onTimeupdate={onTimeupdate}
-              onLoad={onLoad}
-              onFinish={onFinishPlaying}
-            />
-          )}
-        </Column>
-        <Column>
-          <Line>
-            <Text noMargin size="sub-title">
-              {typeof time !== 'number' ? '..' : formatDuration(time)}
-            </Text>
-            &nbsp;
-            <Text noMargin size="sub-title" color="secondary">
-              / {typeof duration !== 'number' ? '..' : formatDuration(duration)}
-            </Text>
-          </Line>
-        </Column>
-      </Line>
+      <LineStackLayout alignItems="stretch" noMargin>
+        <LineStackLayout alignItems="center">
+          <IconButton size="small" onClick={skipBack} disabled={!onSkipBack}>
+            <SkipBack />
+          </IconButton>
+          <PlayButton
+            primary
+            isPlaying={isPlaying}
+            onClick={() => onPlayPause()}
+          />
+          <IconButton
+            size="small"
+            onClick={skipForward}
+            disabled={!onSkipForward}
+          >
+            <SkipForward />
+          </IconButton>
+        </LineStackLayout>
+        <Line noMargin>
+          <Divider orientation="vertical" />
+        </Line>
+        <ColumnStackLayout noMargin justifyContent="center">
+          <Text size="sub-title" noMargin>
+            {title || '-'}
+          </Text>
+          <Text size="body-small" noMargin color="secondary">
+            {subtitle || '-'}
+          </Text>
+        </ColumnStackLayout>
+
+        <Line justifyContent="space-between" alignItems="center" expand>
+          <div style={styles.waveSurferContainer}>
+            {!isMobile && (
+              <WaveSurferPlayer
+                url={soundSrc}
+                waveColor={gdevelopTheme.soundPlayer.waveColor}
+                progressColor={gdevelopTheme.soundPlayer.progressColor}
+                barWidth={2}
+                barGap={1}
+                barRadius={3}
+                height={80}
+                normalize
+                onReady={onWaveSurferReady}
+                onTimeupdate={onTimeupdate}
+                onLoad={onLoad}
+                onFinish={onFinishPlaying}
+              />
+            )}
+          </div>
+          <Column justifyContent="center">
+            <Line>
+              <Text noMargin size="sub-title">
+                {typeof time !== 'number' ? '..' : formatDuration(time)}
+              </Text>
+              &nbsp;
+              <Text noMargin size="sub-title" color="secondary">
+                /{' '}
+                {typeof duration !== 'number' ? '..' : formatDuration(duration)}
+              </Text>
+            </Line>
+          </Column>
+        </Line>
+      </LineStackLayout>
     );
   }
 );

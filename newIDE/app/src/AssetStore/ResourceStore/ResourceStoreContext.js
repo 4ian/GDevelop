@@ -20,6 +20,8 @@ import {
   AlphabetSupportResourceStoreSearchFilter,
 } from './ResourceStoreSearchFilter';
 import type { SearchFilter } from '../../UI/Search/UseSearchItem';
+import Link from '../../UI/Link';
+import Window from '../../Utils/Window';
 
 export type ResourceKindSupportedByResourceStore = 'audio' | 'font' | 'svg';
 
@@ -39,7 +41,8 @@ type ResourceStoreState = {|
   searchText: string,
   setSearchText: string => void,
   clearAllFilters: () => void,
-  setSearchResourceKind: (ResourceKindSupportedByResourceStore) => void,
+  setSearchResourceKind: ResourceKindSupportedByResourceStore => void,
+  getAuthorsDisplayLinks: ResourceV2 => React.Node,
   audioFiltersState: {|
     durationFilter: DurationResourceStoreSearchFilter,
     setDurationFilter: DurationResourceStoreSearchFilter => void,
@@ -63,6 +66,7 @@ export const ResourceStoreContext = React.createContext<ResourceStoreState>({
   setSearchText: () => {},
   clearAllFilters: () => {},
   setSearchResourceKind: () => {},
+  getAuthorsDisplayLinks: () => null,
   audioFiltersState: {
     durationFilter: new DurationResourceStoreSearchFilter(),
     setDurationFilter: DurationResourceStoreSearchFilter => {},
@@ -97,6 +101,9 @@ export const ResourceStoreStateProvider = ({
   }>(null);
   const [filters, setFilters] = React.useState<?Filters>(null);
   const [authors, setAuthors] = React.useState<?Array<Author>>(null);
+  const [authorsByAuthorName, setAuthorsByAuthorName] = React.useState<?{
+    [authorName: string]: Author,
+  }>(null);
   const [licenses, setLicenses] = React.useState<?Array<License>>(null);
   const [error, setError] = React.useState<?Error>(null);
   const isLoading = React.useRef<boolean>(false);
@@ -126,6 +133,28 @@ export const ResourceStoreStateProvider = ({
   );
 
   const { environment } = React.useContext(AssetStoreContext);
+
+  const getAuthorsDisplayLinks = React.useCallback(
+    (resource: ResourceV2) => {
+      if (!authorsByAuthorName) return resource.authors.join(', ');
+      return resource.authors.map((authorName: string) => {
+        const link = authorsByAuthorName[authorName].website;
+        if (link) {
+          return (
+            <Link
+              key={authorName}
+              onClick={() => Window.openExternalURL(link)}
+              href={link}
+            >
+              {authorName}
+            </Link>
+          );
+        }
+        return authorName;
+      });
+    },
+    [authorsByAuthorName]
+  );
 
   const fetchResourcesAndFilters = React.useCallback(
     () => {
@@ -169,6 +198,10 @@ export const ResourceStoreStateProvider = ({
               svgResourcesByUrl[resource.url] = resource;
             }
           });
+          const authorsByAuthorName = {};
+          authors.forEach(author => {
+            authorsByAuthorName[author.name] = author;
+          });
 
           console.info(
             `Loaded ${
@@ -180,6 +213,7 @@ export const ResourceStoreStateProvider = ({
           setAudioResourcesByUrl(audioResourcesByUrl);
           setFilters(filters);
           setAuthors(authors);
+          setAuthorsByAuthorName(authorsByAuthorName);
           setLicenses(licenses);
         } catch (error) {
           console.error(
@@ -285,6 +319,7 @@ export const ResourceStoreStateProvider = ({
       clearAllFilters,
       audioFiltersState,
       fontFiltersState,
+      getAuthorsDisplayLinks,
     }),
     [
       fontSearchResults,
@@ -300,6 +335,7 @@ export const ResourceStoreStateProvider = ({
       clearAllFilters,
       fetchResourcesAndFilters,
       searchResourceKind,
+      getAuthorsDisplayLinks,
     ]
   );
 

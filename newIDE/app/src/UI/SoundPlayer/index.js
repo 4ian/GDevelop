@@ -229,7 +229,12 @@ const SoundPlayer = React.forwardRef<Props, SoundPlayerInterface>(
               </Text>
             </div>
 
-            <div style={styles.waveSurferAndTimeContainer}>
+            <div
+              style={{
+                ...styles.waveSurferAndTimeContainer,
+                justifyContent: !soundSrc ? 'flex-end' : 'space-between',
+              }}
+            >
               {!isMobile && (
                 <div style={styles.waveSurferContainer}>
                   <WaveSurferPlayer

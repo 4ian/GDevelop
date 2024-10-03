@@ -834,10 +834,10 @@
         },
         "hover": {
           "background-color": {
-            "value": "#F5F5F7"
+            "value": "#606066"
           },
           "border-color": {
-            "value": "#F5F5F7"
+            "value": "#C9B6FC"
           }
         }
       }

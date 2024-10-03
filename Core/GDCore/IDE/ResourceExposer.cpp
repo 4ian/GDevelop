@@ -6,17 +6,9 @@
 #include "ResourceExposer.h"
 
 #include "GDCore/IDE/Events/ArbitraryEventsWorker.h"
-#include "GDCore/IDE/EventsFunctionTools.h"
-#include "GDCore/IDE/Project/ArbitraryBehaviorSharedDataWorker.h"
-#include "GDCore/IDE/Project/ArbitraryEventBasedBehaviorsWorker.h"
-#include "GDCore/IDE/Project/ArbitraryEventsFunctionsWorker.h"
-#include "GDCore/IDE/Project/ArbitraryObjectsWorker.h"
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCore/IDE/ProjectBrowserHelper.h"
-#include "GDCore/Project/EventsBasedBehavior.h"
-#include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
-#include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/Effect.h"
@@ -24,7 +16,6 @@
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Metadata/EffectMetadata.h"
-#include "GDCore/IDE/Events/UsedExtensionsFinder.h"
 
 namespace gd {
 

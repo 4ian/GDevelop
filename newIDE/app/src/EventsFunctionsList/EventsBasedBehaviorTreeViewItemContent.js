@@ -289,7 +289,10 @@ export class EventsBasedBehaviorTreeViewItemContent
       clipboardContent,
       'eventsBasedBehavior'
     );
-    const sourceEventsBasedBehaviorName = SafeExtractor.extractStringProperty(clipboardContent, 'name');
+    const sourceEventsBasedBehaviorName = SafeExtractor.extractStringProperty(
+      clipboardContent,
+      'name'
+    );
     if (!sourceEventsBasedBehaviorName || !sourceEventsBasedBehavior) return;
 
     const { project, eventsBasedBehaviorsList } = this.props;

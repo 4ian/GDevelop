@@ -25,40 +25,40 @@ class ArbitraryBehaviorSharedDataWorker;
 namespace gd {
 
 /**
- * \brief Expose event-based behavior contents to workers.
+ * \brief Expose event-based object contents to workers.
  */
-class GD_CORE_API EventBasedBehaviorBrowser : public ProjectBrowser {
+class GD_CORE_API EventBasedObjectBrowser : public ProjectBrowser {
 public:
-  EventBasedBehaviorBrowser(
+  EventBasedObjectBrowser(
       const gd::EventsFunctionsExtension &eventsFunctionsExtension_,
-      gd::EventsBasedBehavior &eventsBasedBehavior_)
+      gd::EventsBasedObject &eventsBasedObject_)
       : eventsFunctionsExtension(eventsFunctionsExtension_),
-        eventsBasedBehavior(eventsBasedBehavior_) {}
+        eventsBasedObject(eventsBasedObject_) {}
 
   /**
    * \brief Call the specified worker on all events of the event-based
-   * behavior.
+   * object.
    *
-   * This should be the preferred way to traverse all the events of an event-based behavior.
+   * This should be the preferred way to traverse all the events of an event-based object.
    */
   void ExposeEvents(gd::Project &project,
                     gd::ArbitraryEventsWorker &worker) const override;
 
   /**
    * \brief Call the specified worker on all events of the event-based
-   * behavior.
+   * object.
    *
-   * This should be the preferred way to traverse all the events of an event-based behavior.
+   * This should be the preferred way to traverse all the events of an event-based object.
    */
   void
   ExposeEvents(gd::Project &project, 
                gd::ArbitraryEventsWorkerWithContext &worker) const override;
 
   /**
-   * \brief Call the specified worker on all functions of the event-based behavior
+   * \brief Call the specified worker on all functions of the event-based object
    *
    * This should be the preferred way to traverse all the function signatures
-   * of an event-based behavior.
+   * of an event-based object.
    */
   void ExposeFunctions(gd::Project &project,
                        gd::ArbitraryEventsFunctionsWorker &worker) const override;
@@ -70,11 +70,11 @@ public:
                      gd::ArbitraryObjectsWorker &worker) const override {};
 
   /**
-   * \brief Call the specified worker on the event-based behavior.
+   * @brief Do nothing.
    */
   void ExposeEventBasedBehaviors(
       gd::Project &project,
-      gd::ArbitraryEventBasedBehaviorsWorker &worker) const override;
+      gd::ArbitraryEventBasedBehaviorsWorker &worker) const override {};
 
   /**
    * \brief Do nothing.
@@ -84,7 +84,7 @@ public:
 
 private:
   const gd::EventsFunctionsExtension &eventsFunctionsExtension;
-  gd::EventsBasedBehavior &eventsBasedBehavior;
+  gd::EventsBasedObject &eventsBasedObject;
 };
 
 } // namespace gd

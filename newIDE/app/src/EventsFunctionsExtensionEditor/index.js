@@ -695,7 +695,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   _onEventsBasedBehaviorPasted = (
     eventsBasedBehavior: gdEventsBasedBehavior,
     sourceExtensionName: string,
-    sourceEventsBasedBehaviorName: string,
+    sourceEventsBasedBehaviorName: string
   ) => {
     const { project, eventsFunctionsExtension } = this.props;
     if (eventsFunctionsExtension.getName() !== sourceExtensionName) {
@@ -712,6 +712,30 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         eventsFunctionsExtension,
         eventsBasedBehavior,
         sourceEventsBasedBehaviorName
+      );
+    }
+  };
+
+  _onEventsBasedObjectPasted = (
+    eventsBasedObject: gdEventsBasedObject,
+    sourceExtensionName: string,
+    sourceEventsBasedObjectName: string
+  ) => {
+    const { project, eventsFunctionsExtension } = this.props;
+    if (eventsFunctionsExtension.getName() !== sourceExtensionName) {
+      gd.WholeProjectRefactorer.updateExtensionNameInEventsBasedObject(
+        project,
+        eventsFunctionsExtension,
+        eventsBasedObject,
+        sourceExtensionName
+      );
+    }
+    if (eventsBasedObject.getName() !== sourceEventsBasedObjectName) {
+      gd.WholeProjectRefactorer.updateObjectNameInEventsBasedObject(
+        project,
+        eventsFunctionsExtension,
+        eventsBasedObject,
+        sourceEventsBasedObjectName
       );
     }
   };
@@ -1437,6 +1461,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   i18n
                 )}
                 onEventsBasedObjectRenamed={this._onEventsBasedObjectRenamed}
+                onEventsBasedObjectPasted={this._onEventsBasedObjectPasted}
                 onAddEventsBasedObject={this._onAddEventsBasedObject}
                 onSelectExtensionProperties={() => this._editOptions(true)}
                 onSelectExtensionGlobalVariables={() =>

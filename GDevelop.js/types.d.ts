@@ -1863,6 +1863,7 @@ export class WholeProjectRefactorer extends EmscriptenObject {
   static applyRefactoringForGroupVariablesContainer(project: Project, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, groupVariablesContainer: VariablesContainer, objectGroup: ObjectGroup, changeset: VariablesChangeset, originalSerializedVariables: SerializerElement): void;
   static renameEventsFunctionsExtension(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, oldName: string, newName: string): void;
   static updateExtensionNameInEventsBasedBehavior(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, sourceExtensionName: string): void;
+  static updateExtensionNameInEventsBasedObject(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, sourceExtensionName: string): void;
   static renameEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, oldName: string, newName: string): void;
   static renameBehaviorEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, oldName: string, newName: string): void;
   static renameObjectEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, oldName: string, newName: string): void;
@@ -1875,6 +1876,7 @@ export class WholeProjectRefactorer extends EmscriptenObject {
   static renameEventsBasedBehavior(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, oldName: string, newName: string): void;
   static updateBehaviorNameInEventsBasedBehavior(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, sourceBehaviorName: string): void;
   static renameEventsBasedObject(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, oldName: string, newName: string): void;
+  static updateObjectNameInEventsBasedObject(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, sourceObjectName: string): void;
   static renameLayout(project: Project, oldName: string, newName: string): void;
   static renameExternalLayout(project: Project, oldName: string, newName: string): void;
   static renameExternalEvents(project: Project, oldName: string, newName: string): void;

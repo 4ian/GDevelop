@@ -265,7 +265,7 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
     if (!groupedMembers) {
       return (
         <>
-          <SectionContainer title={<Trans>Team</Trans>}>
+          <SectionContainer>
             <SectionRow>
               <Line>
                 <Column noMargin expand alignItems="center">
@@ -343,7 +343,6 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
     return (
       <>
         <SectionContainer
-          title={<Trans>Teach</Trans>}
           renderSubtitle={() => (
             <div style={styles.educationCardContainer}>
               <EducationCard

@@ -183,10 +183,7 @@ const DesktopDisplay = ({
     });
   }
   return (
-    <SectionContainer
-      title={null} // Let the content handle the title.
-      flexBody
-    >
+    <SectionContainer flexBody>
       <ColumnStackLayout noMargin>
         {questionsPropsToRender.map((props, index) => (
           <UserSurveyQuestion
@@ -245,11 +242,7 @@ const MobileDisplay = ({
   return (
     <I18n>
       {({ i18n }) => (
-        <SectionContainer
-          title={null} // Let the content handle the title.
-          flexBody
-          noScroll
-        >
+        <SectionContainer flexBody noScroll>
           <div
             style={{
               flex: 1,

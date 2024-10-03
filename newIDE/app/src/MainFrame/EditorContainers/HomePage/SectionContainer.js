@@ -49,7 +49,7 @@ const styles = {
 
 type Props = {|
   children: React.Node,
-  title: React.Node,
+  title?: React.Node,
   titleAdornment?: React.Node,
   titleAction?: React.Node,
   subtitleText?: React.Node,

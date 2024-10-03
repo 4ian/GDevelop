@@ -301,7 +301,7 @@ const EducationMarketingSection = ({
   return (
     <I18n>
       {({ i18n }) => (
-        <SectionContainer title={<Trans>GDevelop for education</Trans>}>
+        <SectionContainer>
           <SectionRow>
             <ResponsiveLineStackLayout noColumnMargin>
               <ColumnStackLayout noMargin>

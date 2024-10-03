@@ -95,11 +95,7 @@ const ManageSection = ({
 
   if (openedGame) {
     return (
-      <SectionContainer
-        flexBody
-        title={null} // Use a smaller title below
-        backAction={onBack}
-      >
+      <SectionContainer flexBody backAction={onBack}>
         <Text size="title" allowSelection>
           {openedGame.gameName}
         </Text>
@@ -137,7 +133,7 @@ const ManageSection = ({
   }
 
   return (
-    <SectionContainer flexBody title={<Trans>Manage Games</Trans>}>
+    <SectionContainer>
       <SectionRow expand>
         {!profile ? (
           <Paper

@@ -1992,7 +1992,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     SetupProjectWithDummyPlatform(project, platform);
     auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
 
-    // A behavior is copied from one extension to another.
+    // An events-based behavior is copied from one extension to another.
 
     auto &destinationExtension =
         project.InsertNewEventsFunctionsExtension("DestinationExtension", 0);
@@ -2021,7 +2021,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
 
     for (auto *eventsList : GetEventsLists(project)) {
       // Check that events function calls in instructions have NOT been renamed
-      // outside of the copied behavior.
+      // outside of the copied events-based behavior.
       REQUIRE(
           GetEventFirstActionType(eventsList->GetEvent(FreeFunctionAction)) ==
           "MyEventsExtension::MyEventsFunction");
@@ -2062,7 +2062,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
 
     for (auto *eventsList : GetEventsLists(project)) {
       // Check that events function calls in instructions have NOT been renamed
-      // outside of the copied behavior.
+      // outside of the copied events-based object.
       REQUIRE(
           GetEventFirstActionType(eventsList->GetEvent(FreeFunctionAction)) ==
           "MyEventsExtension::MyEventsFunction");
@@ -2075,7 +2075,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     SetupProjectWithDummyPlatform(project, platform);
     auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
 
-    // A behavior is copied to the same extension.
+    // An events-based behavior is duplicated in the same extension.
     auto &duplicatedBehavior =
         eventsExtension.GetEventsBasedBehaviors().InsertNew(
             "MyDuplicatedEventsBasedBehavior", 0);
@@ -2097,7 +2097,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
 
     for (auto *eventsList : GetEventsLists(project)) {
       // Check that events function calls in instructions have NOT been renamed
-      // outside of the copied behavior.
+      // outside of the duplicated events-based behavior.
       REQUIRE(
           GetEventFirstActionType(eventsList->GetEvent(BehaviorAction)) ==
           "MyEventsExtension::MyEventsBasedBehavior::MyBehaviorEventsFunction");
@@ -2110,7 +2110,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     SetupProjectWithDummyPlatform(project, platform);
     auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
 
-    // A behavior is copied to the same extension.
+    // An events-based object is duplicated in the same extension.
     auto &duplicatedObject =
         eventsExtension.GetEventsBasedObjects().InsertNew(
             "MyDuplicatedEventsBasedObject", 0);
@@ -2131,7 +2131,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
 
     for (auto *eventsList : GetEventsLists(project)) {
       // Check that events function calls in instructions have NOT been renamed
-      // outside of the copied behavior.
+      // outside of the duplicated events-based object.
       REQUIRE(
           GetEventFirstActionType(eventsList->GetEvent(ObjectAction)) ==
           "MyEventsExtension::MyEventsBasedObject::MyObjectEventsFunction");

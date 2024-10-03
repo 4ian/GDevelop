@@ -74,11 +74,7 @@ const StoreSection = ({
   );
 
   return (
-    <SectionContainer
-      title={null /* Give the asset store the full space to display */}
-      flexBody
-      noScroll
-    >
+    <SectionContainer flexBody noScroll>
       <AssetStore
         onOpenPrivateGameTemplateListingData={
           onOpenPrivateGameTemplateListingData

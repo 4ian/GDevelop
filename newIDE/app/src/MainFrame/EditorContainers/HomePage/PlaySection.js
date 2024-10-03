@@ -27,11 +27,7 @@ const PlaySection = () => {
   });
 
   return (
-    <SectionContainer
-      title={<Trans>Play!</Trans>}
-      flexBody
-      subtitleText={<Trans>Explore games made by others</Trans>}
-    >
+    <SectionContainer flexBody>
       <SectionRow expand>
         <iframe
           src={`https://gd.games/embedded/${paletteType}`}

@@ -189,7 +189,7 @@ const MainPage = ({
   ] = React.useState<Tutorial | null>(null);
 
   return (
-    <SectionContainer title={<Trans>Help and guides</Trans>}>
+    <SectionContainer>
       <SectionRow>
         <WikiSearchBar />
       </SectionRow>

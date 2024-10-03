@@ -410,10 +410,7 @@ const BuildSection = ({
 
   const skeletonLineHeight = getProjectLineHeight({ isMobile });
   const pageContent = showAllGameTemplates ? (
-    <SectionContainer
-      title={<Trans>All templates</Trans>}
-      backAction={() => setShowAllGameTemplates(false)}
-    >
+    <SectionContainer backAction={() => setShowAllGameTemplates(false)}>
       <SectionRow>
         <GridList
           cols={columnsCount}
@@ -435,7 +432,6 @@ const BuildSection = ({
     </SectionContainer>
   ) : (
     <SectionContainer
-      title={<Trans>My projects</Trans>}
       showUrgentAnnouncements={shouldDisplayAnnouncements}
       renderFooter={
         limits && hasTooManyCloudProjects

@@ -73,7 +73,7 @@ const CommunitySection = () => {
     announcements && announcements.length > 0;
 
   return (
-    <SectionContainer title={<Trans>Community</Trans>} showUrgentAnnouncements>
+    <SectionContainer showUrgentAnnouncements>
       <SectionRow>
         <ColumnStackLayout noMargin expand>
           {shouldDisplayAnnouncementsTitle && (

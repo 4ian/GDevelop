@@ -7,6 +7,7 @@ import PlayButton from './PlayButton';
 import Text from '../Text';
 import { formatDuration } from '../../Utils/Duration';
 import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
+import { useResponsiveWindowSize } from '../Responsive/ResponsiveWindowMeasurer';
 
 type Props = {|
   soundSrc: string | null,
@@ -20,15 +21,26 @@ export type SoundPlayerInterface = {|
 const SoundPlayer = React.forwardRef<Props, SoundPlayerInterface>(
   ({ soundSrc, onSoundLoaded }, ref) => {
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
+    const { isMobile } = useResponsiveWindowSize();
+    const mobileAudioRef = React.useRef<?Audio>(null);
     const waveSurferRef = React.useRef<?any>(null);
     const [duration, setDuration] = React.useState<?number>(null);
     const [time, setTime] = React.useState<?number>(null);
     const [isPlaying, setIsPlaying] = React.useState(false);
 
-    const onReady = React.useCallback(
+    const onWaveSurferReady = React.useCallback(
       ws => {
         waveSurferRef.current = ws;
         setDuration(Math.round(ws.getDuration()));
+        setTime(0);
+        onSoundLoaded();
+      },
+      [onSoundLoaded]
+    );
+    const onAudioReady = React.useCallback(
+      () => {
+        if (!mobileAudioRef.current) return;
+        setDuration(Math.round(mobileAudioRef.current.duration));
         setTime(0);
         onSoundLoaded();
       },
@@ -43,9 +55,14 @@ const SoundPlayer = React.forwardRef<Props, SoundPlayerInterface>(
 
     React.useEffect(
       () => {
-        if (!waveSurferRef.current) return;
-        if (isPlaying) waveSurferRef.current.play();
-        else waveSurferRef.current.pause();
+        if (!waveSurferRef.current && !mobileAudioRef.current) return;
+        if (isPlaying) {
+          if (waveSurferRef.current) waveSurferRef.current.play();
+          else if (mobileAudioRef.current) mobileAudioRef.current.play();
+        } else {
+          if (waveSurferRef.current) waveSurferRef.current.pause();
+          else if (mobileAudioRef.current) mobileAudioRef.current.pause();
+        }
       },
       [isPlaying]
     );
@@ -67,9 +84,38 @@ const SoundPlayer = React.forwardRef<Props, SoundPlayerInterface>(
     }));
 
     const onTimeupdate = React.useCallback(() => {
-      if (waveSurferRef.current)
-        setTime(waveSurferRef.current.getCurrentTime());
+      setTime(_time => {
+        const playerCurrentTime = mobileAudioRef.current
+          ? mobileAudioRef.current.currentTime
+          : waveSurferRef.current
+          ? waveSurferRef.current.getCurrentTime()
+          : null;
+        if (playerCurrentTime === null || _time === playerCurrentTime) {
+          return _time;
+        }
+        return playerCurrentTime;
+      });
     }, []);
+
+    React.useEffect(
+      () => {
+        if (isMobile) {
+          if (soundSrc) {
+            const audio = new Audio(soundSrc);
+            audio.addEventListener('timeupdate', onTimeupdate);
+            audio.addEventListener('ended', onFinishPlaying);
+            audio.addEventListener('loadstart', onLoad);
+            audio.addEventListener('loadedmetadata', onAudioReady);
+            mobileAudioRef.current = audio;
+          }
+          waveSurferRef.current = null;
+        } else {
+          mobileAudioRef.current = null;
+        }
+        onLoad();
+      },
+      [isMobile, soundSrc, onTimeupdate, onFinishPlaying, onLoad, onAudioReady]
+    );
 
     return (
       <Line alignItems="center">
@@ -81,20 +127,22 @@ const SoundPlayer = React.forwardRef<Props, SoundPlayerInterface>(
           />
         </Column>
         <Column expand>
-          <WavesurferPlayer
-            url={soundSrc}
-            waveColor={gdevelopTheme.soundPlayer.waveColor}
-            progressColor={gdevelopTheme.soundPlayer.progressColor}
-            barWidth={2}
-            barGap={1}
-            barRadius={3}
-            height={'auto'}
-            normalize
-            onReady={onReady}
-            onTimeupdate={onTimeupdate}
-            onLoad={onLoad}
-            onFinish={onFinishPlaying}
-          />
+          {!isMobile && (
+            <WavesurferPlayer
+              url={soundSrc}
+              waveColor={gdevelopTheme.soundPlayer.waveColor}
+              progressColor={gdevelopTheme.soundPlayer.progressColor}
+              barWidth={2}
+              barGap={1}
+              barRadius={3}
+              height={'auto'}
+              normalize
+              onReady={onWaveSurferReady}
+              onTimeupdate={onTimeupdate}
+              onLoad={onLoad}
+              onFinish={onFinishPlaying}
+            />
+          )}
         </Column>
         <Column>
           <Line>

@@ -136,7 +136,7 @@ module.exports = {
       }
 
       if (propertyName === 'linearDamping') {
-        const newValueAsNumber = parseFloat(newValue);
+        const newValueAsNumber = Math.max(0, parseFloat(newValue));
         if (newValueAsNumber !== newValueAsNumber) return false;
         behaviorContent
           .getChild('linearDamping')
@@ -145,7 +145,7 @@ module.exports = {
       }
 
       if (propertyName === 'angularDamping') {
-        const newValueAsNumber = parseFloat(newValue);
+        const newValueAsNumber = Math.max(0, parseFloat(newValue));
         if (newValueAsNumber !== newValueAsNumber) return false;
         behaviorContent
           .getChild('angularDamping')

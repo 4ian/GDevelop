@@ -1,15 +1,6 @@
 // @flow
-import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import capitalize from 'lodash/capitalize';
-import {
-  type Filters,
-  type TagsTreeNode,
-} from '../../Utils/GDevelopServices/Filters';
-import InlineCheckbox from '../InlineCheckbox';
-import { ColumnStackLayout } from '../Layout';
-import PlaceholderLoader from '../PlaceholderLoader';
-import EmptyMessage from '../EmptyMessage';
+import { type TagsTreeNode } from '../../Utils/GDevelopServices/Filters';
 
 export type ChosenCategory = {|
   node: TagsTreeNode,
@@ -70,54 +61,4 @@ export const useFilters = (): FiltersState => {
       setChosenFilters(newChosenFilters);
     },
   };
-};
-
-type Props = {|
-  filtersState: FiltersState,
-  allFilters: ?Filters,
-  error: ?Error,
-|};
-
-export const FiltersChooser = ({ filtersState, allFilters, error }: Props) => {
-  if (!allFilters) {
-    return <PlaceholderLoader />;
-  }
-  if (error) {
-    // Error and retry button shown somewhere else in the UI
-    return null;
-  }
-
-  // Only display the tags that are contained inside the selected category
-  const selectedCategoryTags = filtersState.chosenCategory
-    ? filtersState.chosenCategory.node.allChildrenTags
-    : allFilters.defaultTags;
-
-  return (
-    <ColumnStackLayout>
-      {!selectedCategoryTags ? (
-        <EmptyMessage>
-          <Trans>Choose a category to display filters</Trans>
-        </EmptyMessage>
-      ) : selectedCategoryTags.length ? (
-        selectedCategoryTags.map(tag => (
-          <InlineCheckbox
-            key={tag}
-            label={capitalize(tag)}
-            checked={filtersState.chosenFilters.has(tag)}
-            onCheck={() => {
-              if (filtersState.chosenFilters.has(tag)) {
-                filtersState.removeFilter(tag);
-              } else {
-                filtersState.addFilter(tag);
-              }
-            }}
-          />
-        ))
-      ) : (
-        <EmptyMessage>
-          <Trans>No filters in this category.</Trans>
-        </EmptyMessage>
-      )}
-    </ColumnStackLayout>
-  );
 };

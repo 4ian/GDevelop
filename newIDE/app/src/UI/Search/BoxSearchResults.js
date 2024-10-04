@@ -9,7 +9,11 @@ import EmptyMessage from '../EmptyMessage';
 
 type Props<SearchItem> = {|
   searchItems: ?Array<SearchItem>,
-  renderSearchItem: (item: SearchItem, size: number) => React.Node,
+  renderSearchItem: (
+    item: SearchItem,
+    size: number,
+    index: number
+  ) => React.Node,
   spacing: number,
   error: ?Error,
   onRetry: () => void,
@@ -138,7 +142,11 @@ export const BoxSearchResults = React.forwardRef<
                     }}
                   >
                     {searchItem
-                      ? renderSearchItem(searchItem, columnWidth - spacing)
+                      ? renderSearchItem(
+                          searchItem,
+                          columnWidth - spacing,
+                          indexInList
+                        )
                       : null}
                   </div>
                 );

@@ -2,10 +2,12 @@
 import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
 import {
-  type ChooseResourceOptions,
   type ResourceSourceComponentProps,
+  type ResourceStorePrimaryActionProps,
   type ResourceSource,
+  type ResourceStoreChooserProps,
   allResourceKindsAndMetadata,
+  resourcesKindSupportedByResourceStore,
 } from './ResourceSource';
 import { ResourceStore } from '../AssetStore/ResourceStore';
 import path from 'path-browserify';
@@ -21,35 +23,27 @@ import {
   extractDecodedFilenameWithExtensionFromPublicAssetResourceUrl,
   isPublicAssetResourceUrl,
 } from '../Utils/GDevelopServices/Asset';
-
-type ResourceStoreChooserProps = {
-  options: ChooseResourceOptions,
-  onChooseResources: (resources: Array<gdResource>) => void,
-  createNewResource: () => gdResource,
-};
+import { DialogPrimaryButton } from '../UI/Dialog';
 
 const ResourceStoreChooser = ({
   options,
-  onChooseResources,
-  createNewResource,
+  selectedResourceIndex,
+  onSelectResource,
 }: ResourceStoreChooserProps) => {
+  if (!onSelectResource) return null;
+  const { resourceKind } = options;
+  if (!resourcesKindSupportedByResourceStore.includes(resourceKind)) {
+    return null;
+  }
+
   return (
     <ResourceStore
-      onChoose={resource => {
-        const chosenResourceUrl = resource.url;
-        const newResource = createNewResource();
-        newResource.setFile(chosenResourceUrl);
-        const resourceCleanedName = isPublicAssetResourceUrl(chosenResourceUrl)
-          ? extractDecodedFilenameWithExtensionFromPublicAssetResourceUrl(
-              chosenResourceUrl
-            )
-          : path.basename(chosenResourceUrl);
-        newResource.setName(resourceCleanedName);
-        newResource.setOrigin('gdevelop-asset-store', chosenResourceUrl);
-
-        onChooseResources([newResource]);
-      }}
-      resourceKind={options.resourceKind}
+      selectedResourceIndex={selectedResourceIndex}
+      onSelectResource={onSelectResource}
+      resourceKind={
+        // $FlowIgnore - Flow does not understand the check above restricts the resource kind.
+        resourceKind
+      }
     />
   );
 };
@@ -107,6 +101,7 @@ export const UrlChooser = ({
           renderButton={style => (
             <RaisedButton
               onClick={() => {
+                if (!onChooseResources || !createNewResource) return;
                 const urls = options.multiSelection
                   ? inputValue.split('\n').filter(Boolean)
                   : [inputValue];
@@ -197,20 +192,62 @@ const browserResourceSources: Array<ResourceSource> = [
       />
     ),
   })),
-  ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => ({
-    name: `resource-store-${kind}`,
-    displayName: t`Choose from asset store`,
-    displayTab: 'standalone',
-    kind,
-    renderComponent: (props: ResourceSourceComponentProps) => (
-      <ResourceStoreChooser
-        createNewResource={createNewResource}
-        onChooseResources={props.onChooseResources}
-        options={props.options}
-        key={`resource-store-${kind}`}
-      />
-    ),
-  })),
+  ...resourcesKindSupportedByResourceStore
+    .map(kind => {
+      const source = allResourceKindsAndMetadata.find(
+        resourceSource => resourceSource.kind === kind
+      );
+      if (!source) return null;
+      return {
+        name: `resource-store-${kind}`,
+        displayName: t`Choose from asset store`,
+        displayTab: 'standalone',
+        kind,
+        renderComponent: (props: ResourceSourceComponentProps) => (
+          <ResourceStoreChooser
+            selectedResourceIndex={props.selectedResourceIndex}
+            onSelectResource={props.onSelectResource}
+            options={props.options}
+            key={`resource-store-${kind}`}
+          />
+        ),
+        renderPrimaryAction: ({
+          resource,
+          onChooseResources,
+        }: ResourceStorePrimaryActionProps) => (
+          <DialogPrimaryButton
+            primary
+            key="add-resource"
+            label={
+              kind === 'font' ? (
+                <Trans>Install font</Trans>
+              ) : (
+                <Trans>Add to project</Trans>
+              )
+            }
+            disabled={!resource}
+            onClick={() => {
+              if (!resource) return;
+              const chosenResourceUrl = resource.url;
+              const newResource = source.createNewResource();
+              newResource.setFile(chosenResourceUrl);
+              const resourceCleanedName = isPublicAssetResourceUrl(
+                chosenResourceUrl
+              )
+                ? extractDecodedFilenameWithExtensionFromPublicAssetResourceUrl(
+                    chosenResourceUrl
+                  )
+                : path.basename(chosenResourceUrl);
+              newResource.setName(resourceCleanedName);
+              newResource.setOrigin('gdevelop-asset-store', chosenResourceUrl);
+
+              onChooseResources([newResource]);
+            }}
+          />
+        ),
+      };
+    })
+    .filter(Boolean),
   ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => ({
     name: `url-chooser-${kind}`,
     displayName: t`Use a public URL`,

@@ -1,8 +1,9 @@
 // @flow
-import React from 'react';
+import * as React from 'react';
 import Chip from '../UI/Chip';
 
 type Tags = Array<string>;
+type TagsWithLabel = Array<{| label: string | React.Node, value: string |}>;
 
 const styles = {
   chipContainer: {
@@ -18,11 +19,12 @@ const styles = {
 };
 
 type Props = {|
-  tags: Tags,
+  tags?: Tags,
+  tagsWithLabel?: TagsWithLabel,
   onRemove: string => void,
 |};
 
-const TagChips = ({ tags, onRemove }: Props) => {
+const TagChips = ({ tags, tagsWithLabel, onRemove }: Props) => {
   const [focusedTag, setFocusedTag] = React.useState<?string>(null);
   const tagsRefs = React.useRef([]);
 
@@ -38,6 +40,7 @@ const TagChips = ({ tags, onRemove }: Props) => {
   );
 
   const handleDeleteTag = (tag: string) => event => {
+    if (!tags) return;
     const deletedTagIndex = tags.indexOf(tag);
     tagsRefs.current.splice(deletedTagIndex, 1);
     if (event.nativeEvent instanceof KeyboardEvent) {
@@ -53,26 +56,64 @@ const TagChips = ({ tags, onRemove }: Props) => {
     onRemove(tag);
   };
 
-  if (!tags.length) return null;
+  const handleDeleteTagWithLabel = (tagValue: string) => event => {
+    if (!tagsWithLabel) return;
+    const deletedTagIndex = tagsWithLabel.findIndex(
+      tagWithLabel => tagWithLabel.value === tagValue
+    );
+    tagsRefs.current.splice(deletedTagIndex, 1);
+    if (event.nativeEvent instanceof KeyboardEvent) {
+      const newIndexToFocus = Math.min(
+        tagsRefs.current.length - 1,
+        deletedTagIndex
+      );
+      const newTagToFocus = tagsRefs.current[newIndexToFocus];
+      if (newTagToFocus && newTagToFocus.current) {
+        newTagToFocus.current.focus();
+      }
+    }
+    onRemove(tagValue);
+  };
+
+  if ((!tags || !tags.length) && (!tagsWithLabel || !tagsWithLabel.length))
+    return null;
 
   return (
     <div style={styles.chipContainer}>
-      {tags.map((tag, index) => {
-        const newRef = React.createRef();
-        tagsRefs.current[index] = newRef;
-        return (
-          <Chip
-            key={tag}
-            size="small"
-            style={getChipStyle(tag)}
-            onBlur={() => setFocusedTag(null)}
-            onFocus={() => setFocusedTag(tag)}
-            onDelete={handleDeleteTag(tag)}
-            label={tag}
-            ref={newRef}
-          />
-        );
-      })}
+      {tags &&
+        tags.map((tag, index) => {
+          const newRef = React.createRef();
+          tagsRefs.current[index] = newRef;
+          return (
+            <Chip
+              key={tag}
+              size="small"
+              style={getChipStyle(tag)}
+              onBlur={() => setFocusedTag(null)}
+              onFocus={() => setFocusedTag(tag)}
+              onDelete={handleDeleteTag(tag)}
+              label={tag}
+              ref={newRef}
+            />
+          );
+        })}
+      {tagsWithLabel &&
+        tagsWithLabel.map((tag, index) => {
+          const newRef = React.createRef();
+          tagsRefs.current[index] = newRef;
+          return (
+            <Chip
+              key={tag.value}
+              size="small"
+              style={getChipStyle(tag.value)}
+              onBlur={() => setFocusedTag(null)}
+              onFocus={() => setFocusedTag(tag.value)}
+              onDelete={handleDeleteTagWithLabel(tag.value)}
+              label={tag.label}
+              ref={newRef}
+            />
+          );
+        })}
     </div>
   );
 };

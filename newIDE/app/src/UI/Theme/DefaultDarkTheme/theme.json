@@ -128,16 +128,6 @@
         }
       },
       "canvas": {
-        "events": {
-          "highlighted": {
-            "background-color": {
-              "value": "#5b4c31"
-            },
-            "color": {
-              "value": "#E5C07B"
-            }
-          }
-        },
         "background-color": {
           "value": "#1D1D26",
           "comment": "Palette/Grey/100"
@@ -799,6 +789,54 @@
       "color": {
         "value": "rgb(221, 221, 221)"
       }
+    }
+  },
+  "sound-player": {
+    "play-button": {
+      "primary": {
+        "border-color": {
+          "value": "#C9B6FC"
+        },
+        "background-color": {
+          "value": "#C9B6FC"
+        },
+        "color": {
+          "value": "#1D1D26"
+        },
+        "hover": {
+          "background-color": {
+            "value": "#F5F5F7"
+          },
+          "border-color": {
+            "value": "#F5F5F7"
+          }
+        }
+      },
+      "secondary": {
+        "border-color": {
+          "value": "#C9B6FC"
+        },
+        "background-color": {
+          "value": "#32323B"
+        },
+        "color": {
+          "value": "#F5F5F7"
+        },
+        "hover": {
+          "background-color": {
+            "value": "#606066"
+          },
+          "border-color": {
+            "value": "#C9B6FC"
+          }
+        }
+      }
+    },
+    "wave-color": {
+      "value": "#9979F1"
+    },
+    "progress-color": {
+      "value": "#7046EC"
     }
   },
   "mosaic": {

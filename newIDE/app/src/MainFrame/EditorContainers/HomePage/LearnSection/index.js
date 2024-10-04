@@ -15,12 +15,12 @@ import PlaceholderError from '../../../../UI/PlaceholderError';
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
 import { sendTutorialOpened } from '../../../../Utils/Analytics/EventSender';
 import Window from '../../../../Utils/Window';
-import { secondsToMinutesAndSeconds } from '../../../../Utils/DateDisplay';
 import { type ImageTileComponent } from '../../../../UI/ImageTileGrid';
 import Paper from '../../../../UI/Paper';
 import { selectMessageByLocale } from '../../../../Utils/i18n/MessageByLocale';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import { type Limits } from '../../../../Utils/GDevelopServices/Usage';
+import { formatDuration } from '../../../../Utils/Duration';
 
 export const TUTORIAL_CATEGORY_TEXTS = {
   'full-game': {
@@ -101,7 +101,7 @@ export const formatTutorialToImageTileComponent = ({
     },
     imageUrl: selectMessageByLocale(i18n, tutorial.thumbnailUrlByLocale),
     overlayText: tutorial.duration
-      ? secondsToMinutesAndSeconds(tutorial.duration)
+      ? formatDuration(tutorial.duration)
       : '\u{1F4D8}',
     overlayTextPosition: 'bottomRight',
   };

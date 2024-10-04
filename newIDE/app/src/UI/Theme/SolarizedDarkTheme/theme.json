@@ -716,6 +716,54 @@
       }
     }
   },
+  "sound-player": {
+    "play-button": {
+      "primary": {
+        "border-color": {
+          "value": "#047AA6"
+        },
+        "background-color": {
+          "value": "#047AA6"
+        },
+        "color": {
+          "value": "#FFF"
+        },
+        "hover": {
+          "background-color": {
+            "value": "#3694b7"
+          },
+          "border-color": {
+            "value": "#3694b7"
+          }
+        }
+      },
+      "secondary": {
+        "border-color": {
+          "value": "#2799b9"
+        },
+        "background-color": {
+          "value": "#002B36"
+        },
+        "color": {
+          "value": "#F5F5F7"
+        },
+        "hover": {
+          "background-color": {
+            "value": "#00212B"
+          },
+          "border-color": {
+            "value": "#2799b9"
+          }
+        }
+      }
+    },
+    "wave-color": {
+      "value": "#9979F1"
+    },
+    "progress-color": {
+      "value": "#7046EC"
+    }
+  },
   "mosaic": {
     "title": {
       "color": {

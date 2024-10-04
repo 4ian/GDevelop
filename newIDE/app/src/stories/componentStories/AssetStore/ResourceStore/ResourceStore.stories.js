@@ -2,61 +2,47 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import paperDecorator from '../../../PaperDecorator';
+import { getPaperDecorator } from '../../../PaperDecorator';
 import FixedHeightFlexContainer from '../../../FixedHeightFlexContainer';
 import { ResourceStoreStateProvider } from '../../../../AssetStore/ResourceStore/ResourceStoreContext';
 import { ResourceStore } from '../../../../AssetStore/ResourceStore';
+import MockAdapter from 'axios-mock-adapter';
+import { client as assetApiClient } from '../../../../Utils/GDevelopServices/Asset';
 
 export default {
   title: 'AssetStore/ResourceStore',
   component: ResourceStore,
-  decorators: [paperDecorator],
+  decorators: [getPaperDecorator('medium')],
 };
 
-export const ImageResource = () => (
-  <FixedHeightFlexContainer height={400}>
-    <ResourceStoreStateProvider>
-      <ResourceStore onChoose={action('onChoose')} resourceKind="image" />
-    </ResourceStoreStateProvider>
-  </FixedHeightFlexContainer>
-);
+const ResourceStoreStory = ({ kind }: { kind: 'audio' | 'font' | 'svg' }) => {
+  const [
+    selectedResourceIndex,
+    setSelectedResourceIndex,
+  ] = React.useState<?number>(null);
+  return (
+    <FixedHeightFlexContainer height={600}>
+      <ResourceStoreStateProvider>
+        <ResourceStore
+          onChoose={action('onChoose')}
+          resourceKind={kind}
+          selectedResourceIndex={selectedResourceIndex}
+          onSelectResource={setSelectedResourceIndex}
+        />
+      </ResourceStoreStateProvider>
+    </FixedHeightFlexContainer>
+  );
+};
 
-export const AudioResource = () => (
-  <FixedHeightFlexContainer height={400}>
-    <ResourceStoreStateProvider>
-      <ResourceStore onChoose={action('onChoose')} resourceKind="audio" />
-    </ResourceStoreStateProvider>
-  </FixedHeightFlexContainer>
-);
+export const AudioResource = () => <ResourceStoreStory kind="audio" />;
 
-export const FontResource = () => (
-  <FixedHeightFlexContainer height={400}>
-    <ResourceStoreStateProvider>
-      <ResourceStore onChoose={action('onChoose')} resourceKind="font" />
-    </ResourceStoreStateProvider>
-  </FixedHeightFlexContainer>
-);
+export const FontResource = () => <ResourceStoreStory kind="font" />;
 
-export const SvgResource = () => (
-  <FixedHeightFlexContainer height={400}>
-    <ResourceStoreStateProvider>
-      <ResourceStore onChoose={action('onChoose')} resourceKind="svg" />
-    </ResourceStoreStateProvider>
-  </FixedHeightFlexContainer>
-);
+export const SvgResource = () => <ResourceStoreStory kind="svg" />;
 
-export const Model3DResource = () => (
-  <FixedHeightFlexContainer height={400}>
-    <ResourceStoreStateProvider>
-      <ResourceStore onChoose={action('onChoose')} resourceKind="model3D" />
-    </ResourceStoreStateProvider>
-  </FixedHeightFlexContainer>
-);
+export const FontResourceWithLoadingError = () => {
+  const axiosMock = new MockAdapter(assetApiClient, { delayResponse: 500 });
+  axiosMock.onAny().reply(500);
 
-export const AtlasResource = () => (
-  <FixedHeightFlexContainer height={400}>
-    <ResourceStoreStateProvider>
-      <ResourceStore onChoose={action('onChoose')} resourceKind="atlas" />
-    </ResourceStoreStateProvider>
-  </FixedHeightFlexContainer>
-);
+  return <ResourceStoreStory kind="font" />;
+};

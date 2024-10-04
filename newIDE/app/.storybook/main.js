@@ -17,7 +17,6 @@ module.exports = {
         docs: false,
       },
     },
-    'storybook-addon-mock',
     '@storybook/preset-create-react-app',
   ],
 };

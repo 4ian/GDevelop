@@ -6,6 +6,7 @@ import SearchApi from 'js-worker-search';
 import {
   type AssetShortHeader,
   type PublicAssetPack,
+  type ResourceV2,
   type Resource,
 } from '../../Utils/GDevelopServices/Asset';
 import {
@@ -16,6 +17,7 @@ import {
 type SearchableItem =
   | AssetShortHeader
   | PublicAssetPack
+  | ResourceV2
   | Resource
   | PrivateAssetPackListingData
   | PrivateGameTemplateListingData;
@@ -25,7 +27,7 @@ export interface SearchFilter<SearchItem> {
   hasFilters(): boolean;
 }
 
-export class TagSearchFilter<SearchItem: AssetShortHeader | Resource>
+export class TagSearchFilter<SearchItem: AssetShortHeader | ResourceV2>
   implements SearchFilter<SearchItem> {
   tags: Set<string>;
 
@@ -167,6 +169,7 @@ export const filterSearchItems = <SearchItem: SearchableItem>(
         (searchItem.tags &&
           searchItem.tags.some(tag => chosenFilters.has(tag))) ||
         (searchItem.categories &&
+          // $FlowIgnore - Flow seems unable to consider `categories` type.
           searchItem.categories.some(category => chosenFilters.has(category)))
       );
     });

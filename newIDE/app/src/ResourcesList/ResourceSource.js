@@ -8,6 +8,10 @@ import {
   type FileMetadata,
   type ResourcesActionsMenuBuilder,
 } from '../ProjectsStorage';
+import {
+  type ResourceV2,
+  type Resource,
+} from '../Utils/GDevelopServices/Asset';
 import { type ResourceExternalEditor } from './ResourceExternalEditor';
 import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
 
@@ -27,6 +31,8 @@ export type ResourceKind =
   | 'model3D'
   | 'atlas'
   | 'spine';
+
+export const resourcesKindSupportedByResourceStore = ['audio', 'font'];
 
 export const allResourceKindsAndMetadata = [
   {
@@ -137,7 +143,14 @@ export type ChooseResourceProps = {|
 export type ResourceSourceComponentProps = {|
   ...ChooseResourceProps,
   onChooseResources: (Array<gdResource>) => void,
+  selectedResourceIndex?: ?number,
+  onSelectResource?: (?number) => void,
 |};
+
+export type ResourceStorePrimaryActionProps = {
+  resource: ?(ResourceV2 | Resource),
+  onChooseResources: (resources: Array<gdResource>) => void,
+};
 
 export type ResourceSource = {
   name: string,
@@ -149,6 +162,7 @@ export type ResourceSource = {
     ChooseResourceProps
   ) => Promise<Array<gdResource>>,
   renderComponent: ResourceSourceComponentProps => React.Node,
+  renderPrimaryAction?: ResourceStorePrimaryActionProps => React.Node,
 };
 
 export type ChooseResourceFunction = (
@@ -163,4 +177,12 @@ export type ResourceManagementProps = {|
   onFetchNewlyAddedResources: OnFetchNewlyAddedResourcesFunction,
   getStorageProviderResourceOperations: () => ?ResourcesActionsMenuBuilder,
   canInstallPrivateAsset: () => boolean,
+|};
+
+export type ResourceStoreChooserProps = {|
+  options: ChooseResourceOptions,
+  selectedResourceIndex?: ?number,
+  onSelectResource?: (?number) => void,
+  onChooseResources?: (resources: Array<gdResource>) => void,
+  createNewResource?: () => gdResource,
 |};

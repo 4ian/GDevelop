@@ -400,8 +400,8 @@ namespace gdjs {
       this.density = behaviorData.density;
       this.friction = behaviorData.friction;
       this.restitution = behaviorData.restitution;
-      this.linearDamping = behaviorData.linearDamping;
-      this.angularDamping = behaviorData.angularDamping;
+      this.linearDamping = Math.max(0, behaviorData.linearDamping);
+      this.angularDamping = Math.max(0, behaviorData.angularDamping);
       this.gravityScale = behaviorData.gravityScale;
       this.layers = behaviorData.layers;
       this.masks = behaviorData.masks;
@@ -1312,6 +1312,11 @@ namespace gdjs {
     }
 
     setLinearDamping(linearDamping: float): void {
+      // Non-negative values only
+      if (linearDamping < 0) {
+        linearDamping = 0;
+      }
+
       // Check if there is no modification
       if (this.linearDamping === linearDamping) {
         return;
@@ -1335,6 +1340,11 @@ namespace gdjs {
     }
 
     setAngularDamping(angularDamping: float): void {
+      // Non-negative values only
+      if (angularDamping < 0) {
+        angularDamping = 0;
+      }
+
       // Check if there is no modification
       if (this.angularDamping === angularDamping) {
         return;

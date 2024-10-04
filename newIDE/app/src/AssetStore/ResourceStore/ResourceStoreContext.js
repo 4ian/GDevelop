@@ -162,12 +162,11 @@ export const ResourceStoreStateProvider = ({
       // Don't attempt to load again resources and filters if they
       // were loaded already.
       if (
-        svgResourcesByUrl ||
-        fontResourcesByUrl ||
-        audioResourcesByUrl ||
+        (svgResourcesByUrl && fontResourcesByUrl && audioResourcesByUrl) ||
         isLoading.current
-      )
+      ) {
         return;
+      }
 
       (async () => {
         setError(null);

@@ -1,8 +1,10 @@
 // @flow
 import * as React from 'react';
+import { dataObjectToProps, type HTMLDataset } from '../Utils/HTMLDataset';
 import Paper from './Paper';
 
 type Props = {|
+  data?: HTMLDataset,
   children: React.Node,
   showOnTop?: boolean,
 |};
@@ -10,6 +12,7 @@ type Props = {|
 const PlaceholderMessage = (props: Props) => {
   return (
     <div
+      {...dataObjectToProps(props.data)}
       style={{
         position: 'absolute',
         top: 0,

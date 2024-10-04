@@ -71,6 +71,9 @@ const isThereAnOpenDialogInTheFollowingSiblings = (
   return false;
 };
 
+const isThereAnErrorBoundarySomewhere = () =>
+  !!document.querySelector('[data-error-boundary]');
+
 const getWrongEditorTooltip = (
   i18n: I18nType,
   expectedEditor: {| editor: EditorIdentifier, scene?: string |} | null
@@ -157,8 +160,8 @@ function InAppTutorialStepDisplayer({
   ] = React.useState<?HTMLElement>(null);
   const [elementWithId, setElementWithId] = React.useState<?HTMLElement>(null);
   const [
-    hideBehindOtherDialog,
-    setHideBehindOtherDialog,
+    hideBehindPriorityElement,
+    setHideBehindPriorityElement,
   ] = React.useState<boolean>(false);
   const [assistantImage, setAssistantImage] = React.useState<?HTMLDivElement>(
     null
@@ -187,20 +190,10 @@ function InAppTutorialStepDisplayer({
   );
   useInterval(queryElement, ELEMENT_QUERY_FREQUENCY);
 
-  // Material UI dialogs are displayed at z-index 1300 and out of the root
-  // React element. So the highlighter and the tooltip visibility can only be
-  // tuned via their z index.
-  // When the element to highlight is on a dialog, the highlighter and
-  // the tooltip must be at a similar yet higher z-index. But MUI handles
-  // multiple dialogs by setting the latest opened dialog root html element
-  // below the previous one. So the highlighter and the tooltip will be visible
-  // through the latest dialog. So we have to "manually" hide them when we detect
-  // the element to highlight is both on a dialog and that there's another dialog
-  // opened above it.
-  const hideIfBehindOtherDialog = React.useCallback(
+  const hideIfBehindPriorityElement = React.useCallback(
     () => {
       if (!elementToHighlight) return;
-      setHideBehindOtherDialog(false);
+      setHideBehindPriorityElement(false);
       const rootDialog = getElementToHighlightRootDialog(elementToHighlight);
       if (!rootDialog) {
         // if the element to highlight in not on a dialog, the highlighter
@@ -208,18 +201,33 @@ function InAppTutorialStepDisplayer({
         // behind a dialog if there's one, so no need to force-hide it.
         return;
       }
-      if (isThereAnOpenDialogInTheFollowingSiblings(rootDialog)) {
-        setHideBehindOtherDialog(true);
+      if (
+        // Material UI dialogs are displayed at z-index 1300 and out of the root
+        // React element. So the highlighter and the tooltip visibility can only be
+        // tuned via their z index.
+        // When the element to highlight is on a dialog, the highlighter and
+        // the tooltip must be at a similar yet higher z-index. But MUI handles
+        // multiple dialogs by setting the latest opened dialog root html element
+        // below the previous one. So the highlighter and the tooltip will be visible
+        // through the latest dialog. So we have to "manually" hide them when we detect
+        // the element to highlight is both on a dialog and that there's another dialog
+        // opened above it.
+        isThereAnOpenDialogInTheFollowingSiblings(rootDialog) ||
+        // The tooltip is not displayed if there is an error boundary somewhere to avoid
+        // bothering the user that would be trying to close the error boundary.
+        isThereAnErrorBoundarySomewhere()
+      ) {
+        setHideBehindPriorityElement(true);
       }
     },
     [elementToHighlight]
   );
-  useInterval(hideIfBehindOtherDialog, HIDE_QUERY_FREQUENCY);
+  useInterval(hideIfBehindPriorityElement, HIDE_QUERY_FREQUENCY);
 
   React.useEffect(
     () => {
       setElementToHighlight(null);
-      setHideBehindOtherDialog(false);
+      setHideBehindPriorityElement(false);
     },
     [elementToHighlightId]
   );
@@ -240,7 +248,7 @@ function InAppTutorialStepDisplayer({
     if (
       // hide highlighter if
       (!elementToHighlight && !expectedEditor) || // there's no element to highlight and the user is on the right editor
-      hideBehindOtherDialog // the element to highlight is on a dialog hidden behind another one
+      hideBehindPriorityElement // the element to highlight is on a dialog hidden behind another one
     ) {
       return null;
     }
@@ -312,7 +320,7 @@ function InAppTutorialStepDisplayer({
   );
 
   const renderTooltip = (i18n: I18nType) => {
-    if (tooltip && !expectedEditor) {
+    if (tooltip && !expectedEditor && !hideBehindPriorityElement) {
       const anchorElement = tooltip.standalone
         ? assistantImage
         : elementToHighlight || null;

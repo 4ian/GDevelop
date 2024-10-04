@@ -502,6 +502,16 @@ namespace gdjs {
     }
 
     focus(): void {
+      if (!this.isFocused()) {
+        // If the input was not previously focused, reset input manager because there is
+        // no reason to maintain its state. It avoids bugs where a key is pressed, the text
+        // input is focused and then the input manager does not have access to the keyup event
+        // and considers the key still pressed.
+        this.getInstanceContainer()
+          .getGame()
+          .getInputManager()
+          .clearAllPressedKeys();
+      }
       this._renderer.focus();
     }
   }

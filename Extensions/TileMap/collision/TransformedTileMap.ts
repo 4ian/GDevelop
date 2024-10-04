@@ -851,19 +851,29 @@ namespace gdjs {
         }
 
         // Transform the hit boxes.
+        // First compute the affine transformation relative to the tile.
+        // Then the transformation is applied to each polygon in the hitboxes.
+        // TODO: If the tile contains hitboxes that are both extended and not full,
+        // this code should be adapted so that the transformation considers the
+        // actual width and height of the hitbox (and not the tile).
+        // At the moment, extended hitboxes can only be full and since flipping
+        // transformations don't change a full hitbox, those transformations
+        // are not applied.
 
         const tileTransformation =
           TransformedCollisionTile.workingTransformation;
         tileTransformation.setToTranslation(width * this.x, height * this.y);
-        if (this.layer.isFlippedHorizontally(this.x, this.y)) {
-          tileTransformation.flipX(width / 2);
-        }
-        if (this.layer.isFlippedVertically(this.x, this.y)) {
-          tileTransformation.flipY(height / 2);
-        }
-        if (this.layer.isFlippedDiagonally(this.x, this.y)) {
-          tileTransformation.flipX(width / 2);
-          tileTransformation.rotateAround(Math.PI / 2, width / 2, height / 2);
+        if (!hasFullHitBox) {
+          if (this.layer.isFlippedHorizontally(this.x, this.y)) {
+            tileTransformation.flipX(width / 2);
+          }
+          if (this.layer.isFlippedVertically(this.x, this.y)) {
+            tileTransformation.flipY(height / 2);
+          }
+          if (this.layer.isFlippedDiagonally(this.x, this.y)) {
+            tileTransformation.flipX(width / 2);
+            tileTransformation.rotateAround(Math.PI / 2, width / 2, height / 2);
+          }
         }
         tileTransformation.preConcatenate(tileMap.getTransformation());
         for (

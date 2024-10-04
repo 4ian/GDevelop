@@ -137,6 +137,9 @@ type RangeFilterProps = {|
   title: ?React.Node,
   min: number,
   max: number,
+  /**
+   * Setting step to `null` allows to use marks as the only possible values in the range.
+   */
   step: number | null,
   scale: number => number,
   range: [number, number],

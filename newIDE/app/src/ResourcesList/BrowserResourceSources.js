@@ -42,7 +42,7 @@ const ResourceStoreChooser = ({
       onSelectResource={onSelectResource}
       resourceKind={
         // $FlowIgnore - Flow does not understand the check above restricts the resource kind.
-        options.resourceKind
+        resourceKind
       }
     />
   );

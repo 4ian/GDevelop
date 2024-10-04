@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { I18n } from '@lingui/react';
 import { t, Trans } from '@lingui/macro';
 import {
   DurationResourceStoreSearchFilter,
@@ -53,28 +52,24 @@ const SingleChoiceFilter = ({
   onChange,
 }: SingleChoiceFilterProps) => {
   return (
-    <I18n>
-      {({ i18n }) => (
-        <Accordion key={filterKey} defaultExpanded>
-          <AccordionHeader>
-            <Text displayInlineAsSpan>{title}</Text>
-          </AccordionHeader>
-          <AccordionBody>
-            <Column expand noMargin>
-              <CompactSelectField value={value} onChange={onChange}>
-                {choices.map(choice => (
-                  <SelectOption
-                    key={choice.value}
-                    value={choice.value}
-                    label={choice.label}
-                  />
-                ))}
-              </CompactSelectField>
-            </Column>
-          </AccordionBody>
-        </Accordion>
-      )}
-    </I18n>
+    <Accordion key={filterKey} defaultExpanded>
+      <AccordionHeader>
+        <Text displayInlineAsSpan>{title}</Text>
+      </AccordionHeader>
+      <AccordionBody>
+        <Column expand noMargin>
+          <CompactSelectField value={value} onChange={onChange}>
+            {choices.map(choice => (
+              <SelectOption
+                key={choice.value}
+                value={choice.value}
+                label={choice.label}
+              />
+            ))}
+          </CompactSelectField>
+        </Column>
+      </AccordionBody>
+    </Accordion>
   );
 };
 
@@ -177,7 +172,6 @@ export const ResourceStoreFilterPanel = ({
     fontFiltersState,
     clearAllFilters,
   } = React.useContext(ResourceStoreContext);
-  console.log(fontFiltersState.alphabetSupportFilter.alphabets);
 
   return (
     <Column noMargin expand>

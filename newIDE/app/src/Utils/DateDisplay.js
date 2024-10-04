@@ -107,11 +107,3 @@ export const getRelativeOrAbsoluteDisplayDate = ({
   }
   return date.getFullYear();
 };
-
-export const secondsToMinutesAndSeconds = (seconds: number): string => {
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = seconds % 60;
-  const formattedRemainingSeconds =
-    remainingSeconds < 10 ? `0${remainingSeconds}` : remainingSeconds;
-  return `${minutes}:${formattedRemainingSeconds}`;
-};

@@ -15,32 +15,21 @@ type Props = {|
 
 const PlayButton = (props: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const playButtonTheme =
+    gdevelopTheme.soundPlayer.playButton[
+      props.primary ? 'primary' : 'secondary'
+    ];
 
   const classes = makeStyles({
     root: {
-      color:
-        gdevelopTheme.soundPlayer.playButton[
-          props.primary ? 'primary' : 'secondary'
-        ].color,
-      backgroundColor:
-        gdevelopTheme.soundPlayer.playButton[
-          props.primary ? 'primary' : 'secondary'
-        ].backgroundColor,
-      outlineColor:
-        gdevelopTheme.soundPlayer.playButton[
-          props.primary ? 'primary' : 'secondary'
-        ].borderColor,
+      color: playButtonTheme.color,
+      backgroundColor: playButtonTheme.backgroundColor,
+      outlineColor: playButtonTheme.borderColor,
       outlineWidth: 2,
       outlineStyle: 'solid',
       '&:hover': {
-        backgroundColor:
-          gdevelopTheme.soundPlayer.playButton[
-            props.primary ? 'primary' : 'secondary'
-          ].hover.backgroundColor,
-        outlineColor:
-          gdevelopTheme.soundPlayer.playButton[
-            props.primary ? 'primary' : 'secondary'
-          ].hover.borderColor,
+        backgroundColor: playButtonTheme.hover.backgroundColor,
+        outlineColor: playButtonTheme.hover.borderColor,
       },
     },
   })();

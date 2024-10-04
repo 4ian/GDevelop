@@ -3,6 +3,27 @@ import { type Promotion } from '../Utils/GDevelopServices/Announcement';
 import { type Route, type RouteArguments } from '../MainFrame/RouterContext';
 import Window from '../Utils/Window';
 
+const getRouteNavigationParamsFromLink = (
+  link: string
+): {| route: Route, params: RouteArguments |} | null => {
+  if (link.startsWith('https://editor.gdevelop.io')) {
+    const urlParams = new URLSearchParams(link.replace(/.*\?/, ''));
+    // $FlowFixMe - Assume that the arguments are always valid.
+    const route: ?Route = urlParams.get('initial-dialog');
+    const otherParams = {};
+    urlParams.forEach((value, key) => {
+      if (key !== 'initial-dialog') otherParams[key] = value;
+    });
+    if (route) {
+      return { route, params: otherParams };
+    }
+
+    return null;
+  }
+
+  return null;
+};
+
 export const getOnClick = ({
   promotion,
   navigateToRoute,
@@ -24,7 +45,15 @@ export const getOnClick = ({
 
   const linkUrl = promotion.linkUrl;
   if (linkUrl) {
-    return () => Window.openExternalURL(linkUrl);
+    const routeNavigationParams = getRouteNavigationParamsFromLink(linkUrl);
+
+    return routeNavigationParams
+      ? () =>
+          navigateToRoute(
+            routeNavigationParams.route,
+            routeNavigationParams.params
+          )
+      : () => Window.openExternalURL(linkUrl);
   }
 
   return undefined;

@@ -14,15 +14,17 @@ export type Announcement = {
   buttonLabelByLocale?: MessageByLocale,
 };
 
-export type Promotion = {
-  id: string,
-  imageUrl: string,
-  mobileImageUrl: string,
-  display: 'all' | 'non-native-mobile',
-  type: 'game-template' | 'asset-pack' | 'game',
-  linkUrl?: string,
-  productId?: string,
-};
+export interface Promotion {
+  id: string;
+  imageUrl: string;
+  mobileImageUrl: string;
+  display: 'all' | 'non-native-mobile' | 'native-mobile';
+  type: 'game-template' | 'asset-pack' | 'game' | 'other';
+  linkUrl?: string;
+  productId?: string;
+  fromDate?: number;
+  toDate?: number;
+}
 
 export const listAllAnnouncements = async (): Promise<Array<Announcement>> => {
   const response = await axios.get(

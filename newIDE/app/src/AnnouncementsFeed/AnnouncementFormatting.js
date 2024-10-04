@@ -4,7 +4,7 @@ import { type I18n as I18nType } from '@lingui/core';
 import { type Route, type RouteArguments } from '../MainFrame/RouterContext';
 import { selectMessageByLocale } from '../Utils/i18n/MessageByLocale';
 
-const getAdapatedMessageAndRouteNavigationParams = (
+const getAdaptedMessageAndRouteNavigationParams = (
   message: string
 ): {|
   message: string,
@@ -81,12 +81,12 @@ export const getAnnouncementContent = (
     message: adaptedDesktopMessage,
     routeNavigationParams: desktopRouteNavigationParams,
     isClickableContent: isDesktopClickableContent,
-  } = getAdapatedMessageAndRouteNavigationParams(message);
+  } = getAdaptedMessageAndRouteNavigationParams(message);
   const {
     message: adaptedMobileMessage,
     routeNavigationParams: mobileRouteNavigationParams,
     isClickableContent: isMobileClickableContent,
-  } = getAdapatedMessageAndRouteNavigationParams(mobileMessage);
+  } = getAdaptedMessageAndRouteNavigationParams(mobileMessage);
 
   return {
     title,

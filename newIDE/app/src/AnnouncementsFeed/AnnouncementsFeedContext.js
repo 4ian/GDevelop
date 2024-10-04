@@ -56,14 +56,7 @@ export const AnnouncementsFeedStateProvider = ({
         listAllPromotions(),
       ]);
 
-      // Logic to remove once promotions are displayed to enough users.
-      // For now, we filter out promotions from the announcements.
-      const filteredAnnouncements = fetchedAnnouncements.filter(
-        announcement =>
-          !fetchedPromotions.find(promotion => promotion.id === announcement.id)
-      );
-
-      setAnnouncements(filteredAnnouncements);
+      setAnnouncements(fetchedAnnouncements);
       setPromotions(fetchedPromotions);
     } catch (error) {
       console.error(`Unable to load the announcements from the api:`, error);

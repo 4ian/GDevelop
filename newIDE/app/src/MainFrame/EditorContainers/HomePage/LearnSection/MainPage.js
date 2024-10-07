@@ -27,7 +27,6 @@ import { formatTutorialToImageTileComponent, TUTORIAL_CATEGORY_TEXTS } from '.';
 import GuidedLessons from '../InAppTutorials/GuidedLessons';
 import ChevronArrowRight from '../../../../UI/CustomSvgIcons/ChevronArrowRight';
 import Upload from '../../../../UI/CustomSvgIcons/Upload';
-import WikiSearchBar from '../../../../UI/WikiSearchBar';
 import FlingGame from '../InAppTutorials/FlingGame';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import { type Limits } from '../../../../Utils/GDevelopServices/Usage';
@@ -190,9 +189,6 @@ const MainPage = ({
 
   return (
     <SectionContainer>
-      <SectionRow>
-        <WikiSearchBar />
-      </SectionRow>
       <SectionRow>
         <Line noMargin>
           <GridList

@@ -397,7 +397,7 @@ namespace gdjs {
     }
 
     setAnimationElapsedTime(time: float): void {
-      const hasFrameChanged = this._animator.getAnimationElapsedTime();
+      const hasFrameChanged = this._animator.setAnimationElapsedTime(time);
       if (hasFrameChanged) {
         this._animationFrameDirty = true;
         this.invalidateHitboxes();

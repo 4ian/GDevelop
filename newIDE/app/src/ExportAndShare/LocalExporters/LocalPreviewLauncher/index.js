@@ -333,6 +333,7 @@ export default class LocalPreviewLauncher extends React.Component<
           id="Preview over wifi"
           title={<Trans>Preview over wifi</Trans>}
           mode="try"
+          isNotShownDuringInAppTutorial
         />
         <SubscriptionChecker
           ref={subscriptionChecker =>
@@ -343,6 +344,7 @@ export default class LocalPreviewLauncher extends React.Component<
             <Trans>Live preview (apply changes to the running preview)</Trans>
           }
           mode="try"
+          isNotShownDuringInAppTutorial
         />
         <LocalNetworkPreviewDialog
           open={networkPreviewDialogOpen}

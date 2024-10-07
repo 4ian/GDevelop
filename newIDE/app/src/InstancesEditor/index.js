@@ -1342,7 +1342,8 @@ export default class InstancesEditor extends Component<Props, State> {
       sceneDeltaY,
       grabbingLocation,
       proportional,
-      this.keyboardShortcuts.shouldNotSnapToGrid()
+      this.keyboardShortcuts.shouldNotSnapToGrid(),
+      this.keyboardShortcuts.shouldCenteredResize()
     );
   };
 

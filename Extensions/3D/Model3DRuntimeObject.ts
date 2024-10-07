@@ -376,6 +376,9 @@ namespace gdjs {
 
     setAnimationElapsedTime(time: float): void {
       this._renderer.setAnimationElapsedTime(time);
+      if (!this._animationPaused) {
+        this._renderer.resumeAnimation();
+      }
     }
 
     getAnimationDuration(): float {

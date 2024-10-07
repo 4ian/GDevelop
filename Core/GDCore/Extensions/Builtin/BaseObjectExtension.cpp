@@ -1768,6 +1768,22 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression",
                     _("Angle of tolerance, in degrees (0: minimum tolerance)"))
       .AddCodeOnlyParameter("conditionInverted", "")
+      .SetHidden()
+      .MarkAsAdvanced();
+
+  extension
+      .AddCondition("IsTurnedTowardObject",
+                    _("An object is turned toward another"),
+                    _("Check if an object is turned toward another"),
+                    _("_PARAM0_ is turned towards _PARAM1_ ± _PARAM2_°"),
+                    _("Angle"),
+                    "res/conditions/estTourne24.png",
+                    "res/conditions/estTourne.png")
+      .AddParameter("objectList", _("Name of the object"))
+      .AddParameter("objectList", _("Name of the second object"))
+      .AddParameter("expression",
+                    _("Angle of tolerance, in degrees (0: minimum tolerance)"))
+      .AddCodeOnlyParameter("conditionInverted", "")
       .MarkAsAdvanced();
 
   extension

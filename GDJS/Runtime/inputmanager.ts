@@ -564,6 +564,14 @@ namespace gdjs {
       return this.getMouseWheelDelta() < 0;
     }
 
+    /**
+     * Clears all stored pressed keys without making the keys go through
+     * the release state.
+     */
+    clearAllPressedKeys(): void {
+      this._pressedKeys.clear();
+    }
+
     static _allTouchIds: Array<integer> = [];
   }
 }

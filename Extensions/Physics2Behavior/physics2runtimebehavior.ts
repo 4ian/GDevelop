@@ -1030,7 +1030,7 @@ namespace gdjs {
           Number.isFinite(y) ? y : body.GetPosition().y
         );
         const angle = gdjs.toRad(this.owner.getAngle());
-        body.SetTransform(pos, Number.isFinite(angle) ? x : body.GetAngle());
+        body.SetTransform(pos, Number.isFinite(angle) ? angle : body.GetAngle());
         body.SetAwake(true);
       }
     }

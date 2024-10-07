@@ -733,6 +733,17 @@
           ]
         },
         {
+          "name": "Character2D",
+          "objects": [
+            {
+              "name": "RedHero"
+            },
+            {
+              "name": "Spine"
+            }
+          ]
+        },
+        {
           "name": "AnimationButton",
           "objects": [
             {
@@ -6441,7 +6452,7 @@
                     "value": "OpacityCapability::OpacityBehavior::SetValue"
                   },
                   "parameters": [
-                    "Character",
+                    "Character2D",
                     "Opacity",
                     "=",
                     "OpacitySlider.Value()"
@@ -6717,7 +6728,7 @@
                     "value": "EffectCapability::EffectBehavior::EnableEffect"
                   },
                   "parameters": [
-                    "Character",
+                    "Character2D",
                     "Effect",
                     "\"Effect\"",
                     "yes"
@@ -6744,7 +6755,7 @@
                     "value": "EffectCapability::EffectBehavior::EnableEffect"
                   },
                   "parameters": [
-                    "Character",
+                    "Character2D",
                     "Effect",
                     "\"Effect\"",
                     "no"
@@ -6771,7 +6782,7 @@
                     "value": "EffectCapability::EffectBehavior::SetEffectDoubleParameter"
                   },
                   "parameters": [
-                    "Character",
+                    "Character2D",
                     "Effect",
                     "\"Effect\"",
                     "\"thickness\"",

@@ -8,6 +8,7 @@ import Paper from '../../UI/Paper';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
 import { LineStackLayout } from '../../UI/Layout';
+import { textEllipsisStyle } from '../../UI/TextEllipsis';
 
 const PADDING = 8;
 const BUTTON_BORDER_THICKNESS = 2;
@@ -75,10 +76,20 @@ const FontResourceLine = ({ fontResource, isSelected, onSelect }: Props) => {
       >
         <div style={styles.container}>
           <LineStackLayout noMargin alignItems="center">
-            <Text noMargin size="sub-title">
+            <Text
+              noMargin
+              size="sub-title"
+              align="left"
+              style={textEllipsisStyle}
+            >
               {fontNameWithoutExtension}
             </Text>
-            <Text noMargin color="secondary">
+            <Text
+              noMargin
+              color="secondary"
+              align="left"
+              style={textEllipsisStyle}
+            >
               {fontResource.license}
             </Text>
           </LineStackLayout>

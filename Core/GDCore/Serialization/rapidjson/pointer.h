@@ -1,6 +1,6 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
 // 
-// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
 // in compliance with the License. You may obtain a copy of the License at
@@ -16,14 +16,14 @@
 #define RAPIDJSON_POINTER_H_
 
 #include "document.h"
+#include "uri.h"
 #include "internal/itoa.h"
+#include "error/error.h" // PointerParseErrorCode
 
 #ifdef __clang__
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(switch-enum)
-#endif
-
-#ifdef _MSC_VER
+#elif defined(_MSC_VER)
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(4512) // assignment operator could not be generated
 #endif
@@ -31,19 +31,6 @@ RAPIDJSON_DIAG_OFF(4512) // assignment operator could not be generated
 RAPIDJSON_NAMESPACE_BEGIN
 
 static const SizeType kPointerInvalidIndex = ~SizeType(0);  //!< Represents an invalid index in GenericPointer::Token
-
-//! Error code of parsing.
-/*! \ingroup RAPIDJSON_ERRORS
-    \see GenericPointer::GenericPointer, GenericPointer::GetParseErrorCode
-*/
-enum PointerParseErrorCode {
-    kPointerParseErrorNone = 0,                     //!< The parse is successful
-
-    kPointerParseErrorTokenMustBeginWithSolidus,    //!< A token must begin with a '/'
-    kPointerParseErrorInvalidEscape,                //!< Invalid escape
-    kPointerParseErrorInvalidPercentEncoding,       //!< Invalid percent encoding in URI fragment
-    kPointerParseErrorCharacterMustPercentEncode    //!< A character must percent encoded in URI fragment
-};
 
 ///////////////////////////////////////////////////////////////////////////////
 // GenericPointer
@@ -70,10 +57,10 @@ enum PointerParseErrorCode {
     supplied tokens eliminates these.
 
     GenericPointer depends on GenericDocument and GenericValue.
-    
+
     \tparam ValueType The value type of the DOM tree. E.g. GenericValue<UTF8<> >
     \tparam Allocator The allocator type for allocating memory for internal representation.
-    
+
     \note GenericPointer uses same encoding of ValueType.
     However, Allocator of GenericPointer is independent of Allocator of Value.
 */
@@ -82,8 +69,10 @@ class GenericPointer {
 public:
     typedef typename ValueType::EncodingType EncodingType;  //!< Encoding type from Value
     typedef typename ValueType::Ch Ch;                      //!< Character type from Value
+    typedef GenericUri<ValueType, Allocator> UriType;
 
-    //! A token is the basic units of internal representation.
+
+  //! A token is the basic units of internal representation.
     /*!
         A JSON pointer string representation "/foo/123" is parsed to two tokens: 
         "foo" and 123. 123 will be represented in both numeric form and string form.
@@ -165,7 +154,12 @@ public:
     GenericPointer(const Token* tokens, size_t tokenCount) : allocator_(), ownAllocator_(), nameBuffer_(), tokens_(const_cast<Token*>(tokens)), tokenCount_(tokenCount), parseErrorOffset_(), parseErrorCode_(kPointerParseErrorNone) {}
 
     //! Copy constructor.
-    GenericPointer(const GenericPointer& rhs, Allocator* allocator = 0) : allocator_(allocator), ownAllocator_(), nameBuffer_(), tokens_(), tokenCount_(), parseErrorOffset_(), parseErrorCode_(kPointerParseErrorNone) {
+    GenericPointer(const GenericPointer& rhs) : allocator_(), ownAllocator_(), nameBuffer_(), tokens_(), tokenCount_(), parseErrorOffset_(), parseErrorCode_(kPointerParseErrorNone) {
+        *this = rhs;
+    }
+
+    //! Copy constructor.
+    GenericPointer(const GenericPointer& rhs, Allocator* allocator) : allocator_(allocator), ownAllocator_(), nameBuffer_(), tokens_(), tokenCount_(), parseErrorOffset_(), parseErrorCode_(kPointerParseErrorNone) {
         *this = rhs;
     }
 
@@ -196,6 +190,36 @@ public:
         }
         return *this;
     }
+
+    //! Swap the content of this pointer with an other.
+    /*!
+        \param other The pointer to swap with.
+        \note Constant complexity.
+    */
+    GenericPointer& Swap(GenericPointer& other) RAPIDJSON_NOEXCEPT {
+        internal::Swap(allocator_, other.allocator_);
+        internal::Swap(ownAllocator_, other.ownAllocator_);
+        internal::Swap(nameBuffer_, other.nameBuffer_);
+        internal::Swap(tokens_, other.tokens_);
+        internal::Swap(tokenCount_, other.tokenCount_);
+        internal::Swap(parseErrorOffset_, other.parseErrorOffset_);
+        internal::Swap(parseErrorCode_, other.parseErrorCode_);
+        return *this;
+    }
+
+    //! free-standing swap function helper
+    /*!
+        Helper function to enable support for common swap implementation pattern based on \c std::swap:
+        \code
+        void swap(MyClass& a, MyClass& b) {
+            using std::swap;
+            swap(a.pointer, b.pointer);
+            // ...
+        }
+        \endcode
+        \see Swap()
+     */
+    friend inline void swap(GenericPointer& a, GenericPointer& b) RAPIDJSON_NOEXCEPT { a.Swap(b); }
 
     //@}
 
@@ -240,7 +264,7 @@ public:
     template <typename T>
     RAPIDJSON_DISABLEIF_RETURN((internal::NotExpr<internal::IsSame<typename internal::RemoveConst<T>::Type, Ch> >), (GenericPointer))
     Append(T* name, Allocator* allocator = 0) const {
-        return Append(name, StrLen(name), allocator);
+        return Append(name, internal::StrLen(name), allocator);
     }
 
 #if RAPIDJSON_HAS_STDSTRING
@@ -274,7 +298,7 @@ public:
         else {
             Ch name[21];
             for (size_t i = 0; i <= length; i++)
-                name[i] = buffer[i];
+                name[i] = static_cast<Ch>(buffer[i]);
             Token token = { name, length, index };
             return Append(token, allocator);
         }
@@ -353,6 +377,33 @@ public:
     */
     bool operator!=(const GenericPointer& rhs) const { return !(*this == rhs); }
 
+    //! Less than operator.
+    /*!
+        \note Invalid pointers are always greater than valid ones.
+    */
+    bool operator<(const GenericPointer& rhs) const {
+        if (!IsValid())
+            return false;
+        if (!rhs.IsValid())
+            return true;
+
+        if (tokenCount_ != rhs.tokenCount_)
+            return tokenCount_ < rhs.tokenCount_;
+
+        for (size_t i = 0; i < tokenCount_; i++) {
+            if (tokens_[i].index != rhs.tokens_[i].index)
+                return tokens_[i].index < rhs.tokens_[i].index;
+
+            if (tokens_[i].length != rhs.tokens_[i].length)
+                return tokens_[i].length < rhs.tokens_[i].length;
+
+            if (int cmp = std::memcmp(tokens_[i].name, rhs.tokens_[i].name, sizeof(Ch) * tokens_[i].length))
+                return cmp < 0;
+        }
+
+        return false;
+    }
+
     //@}
 
     //!@name Stringify
@@ -428,10 +479,11 @@ public:
                     v = &((*v)[t->index]);
                 }
                 else {
-                    typename ValueType::MemberIterator m = v->FindMember(GenericStringRef<Ch>(t->name, t->length));
+                    typename ValueType::MemberIterator m = v->FindMember(GenericValue<EncodingType>(GenericStringRef<Ch>(t->name, t->length)));
                     if (m == v->MemberEnd()) {
                         v->AddMember(ValueType(t->name, t->length, allocator).Move(), ValueType().Move(), allocator);
-                        v = &(--v->MemberEnd())->value; // Assumes AddMember() appends at the end
+                        m = v->MemberEnd();
+                        v = &(--m)->value; // Assumes AddMember() appends at the end
                         exist = false;
                     }
                     else
@@ -459,6 +511,70 @@ public:
 
     //@}
 
+    //!@name Compute URI
+    //@{
+
+    //! Compute the in-scope URI for a subtree.
+    //  For use with JSON pointers into JSON schema documents.
+    /*!
+        \param root Root value of a DOM sub-tree to be resolved. It can be any value other than document root.
+        \param rootUri Root URI
+        \param unresolvedTokenIndex If the pointer cannot resolve a token in the pointer, this parameter can obtain the index of unresolved token.
+        \param allocator Allocator for Uris
+        \return Uri if it can be resolved. Otherwise null.
+
+        \note
+        There are only 3 situations when a URI cannot be resolved:
+        1. A value in the path is not an array nor object.
+        2. An object value does not contain the token.
+        3. A token is out of range of an array value.
+
+        Use unresolvedTokenIndex to retrieve the token index.
+    */
+    UriType GetUri(ValueType& root, const UriType& rootUri, size_t* unresolvedTokenIndex = 0, Allocator* allocator = 0) const {
+        static const Ch kIdString[] = { 'i', 'd', '\0' };
+        static const ValueType kIdValue(kIdString, 2);
+        UriType base = UriType(rootUri, allocator);
+        RAPIDJSON_ASSERT(IsValid());
+        ValueType* v = &root;
+        for (const Token *t = tokens_; t != tokens_ + tokenCount_; ++t) {
+            switch (v->GetType()) {
+                case kObjectType:
+                {
+                    // See if we have an id, and if so resolve with the current base
+                    typename ValueType::MemberIterator m = v->FindMember(kIdValue);
+                    if (m != v->MemberEnd() && (m->value).IsString()) {
+                        UriType here = UriType(m->value, allocator).Resolve(base, allocator);
+                        base = here;
+                    }
+                    m = v->FindMember(GenericValue<EncodingType>(GenericStringRef<Ch>(t->name, t->length)));
+                    if (m == v->MemberEnd())
+                        break;
+                    v = &m->value;
+                }
+                  continue;
+                case kArrayType:
+                    if (t->index == kPointerInvalidIndex || t->index >= v->Size())
+                        break;
+                    v = &((*v)[t->index]);
+                    continue;
+                default:
+                    break;
+            }
+
+            // Error: unresolved token
+            if (unresolvedTokenIndex)
+                *unresolvedTokenIndex = static_cast<size_t>(t - tokens_);
+            return UriType(allocator);
+        }
+        return base;
+    }
+
+    UriType GetUri(const ValueType& root, const UriType& rootUri, size_t* unresolvedTokenIndex = 0, Allocator* allocator = 0) const {
+      return GetUri(const_cast<ValueType&>(root), rootUri, unresolvedTokenIndex, allocator);
+    }
+
+
     //!@name Query value
     //@{
 
@@ -483,7 +599,7 @@ public:
             switch (v->GetType()) {
             case kObjectType:
                 {
-                    typename ValueType::MemberIterator m = v->FindMember(GenericStringRef<Ch>(t->name, t->length));
+                    typename ValueType::MemberIterator m = v->FindMember(GenericValue<EncodingType>(GenericStringRef<Ch>(t->name, t->length)));
                     if (m == v->MemberEnd())
                         break;
                     v = &m->value;
@@ -532,14 +648,14 @@ public:
     */
     ValueType& GetWithDefault(ValueType& root, const ValueType& defaultValue, typename ValueType::AllocatorType& allocator) const {
         bool alreadyExist;
-        Value& v = Create(root, allocator, &alreadyExist);
+        ValueType& v = Create(root, allocator, &alreadyExist);
         return alreadyExist ? v : v.CopyFrom(defaultValue, allocator);
     }
 
     //! Query a value in a subtree with default null-terminated string.
     ValueType& GetWithDefault(ValueType& root, const Ch* defaultValue, typename ValueType::AllocatorType& allocator) const {
         bool alreadyExist;
-        Value& v = Create(root, allocator, &alreadyExist);
+        ValueType& v = Create(root, allocator, &alreadyExist);
         return alreadyExist ? v : v.SetString(defaultValue, allocator);
     }
 
@@ -547,7 +663,7 @@ public:
     //! Query a value in a subtree with default std::basic_string.
     ValueType& GetWithDefault(ValueType& root, const std::basic_string<Ch>& defaultValue, typename ValueType::AllocatorType& allocator) const {
         bool alreadyExist;
-        Value& v = Create(root, allocator, &alreadyExist);
+        ValueType& v = Create(root, allocator, &alreadyExist);
         return alreadyExist ? v : v.SetString(defaultValue, allocator);
     }
 #endif
@@ -573,7 +689,7 @@ public:
     ValueType& GetWithDefault(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& document, const Ch* defaultValue) const {
         return GetWithDefault(document, defaultValue, document.GetAllocator());
     }
-    
+
 #if RAPIDJSON_HAS_STDSTRING
     //! Query a value in a document with default std::basic_string.
     template <typename stackAllocator>
@@ -719,7 +835,7 @@ public:
             switch (v->GetType()) {
             case kObjectType:
                 {
-                    typename ValueType::MemberIterator m = v->FindMember(GenericStringRef<Ch>(t->name, t->length));
+                    typename ValueType::MemberIterator m = v->FindMember(GenericValue<EncodingType>(GenericStringRef<Ch>(t->name, t->length)));
                     if (m == v->MemberEnd())
                         return false;
                     v = &m->value;
@@ -758,7 +874,7 @@ private:
     */
     Ch* CopyFromRaw(const GenericPointer& rhs, size_t extraToken = 0, size_t extraNameBufferSize = 0) {
         if (!allocator_) // allocator is independently owned.
-            ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator());
+            ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator)();
 
         size_t nameBufferSize = rhs.tokenCount_; // null terminators for tokens
         for (Token *t = rhs.tokens_; t != rhs.tokens_ + rhs.tokenCount_; ++t)
@@ -774,10 +890,16 @@ private:
             std::memcpy(nameBuffer_, rhs.nameBuffer_, nameBufferSize * sizeof(Ch));
         }
 
-        // Adjust pointers to name buffer
-        std::ptrdiff_t diff = nameBuffer_ - rhs.nameBuffer_;
-        for (Token *t = tokens_; t != tokens_ + rhs.tokenCount_; ++t)
-            t->name += diff;
+        // The names of each token point to a string in the nameBuffer_. The
+        // previous memcpy copied over string pointers into the rhs.nameBuffer_,
+        // but they should point to the strings in the new nameBuffer_.
+        for (size_t i = 0; i < rhs.tokenCount_; ++i) {
+          // The offset between the string address and the name buffer should
+          // still be constant, so we can just get this offset and set each new
+          // token name according the new buffer start + the known offset.
+          std::ptrdiff_t name_offset = rhs.tokens_[i].name - rhs.nameBuffer_;
+          tokens_[i].name = nameBuffer_ + name_offset;
+        }
 
         return nameBuffer_ + nameBufferSize;
     }
@@ -806,7 +928,7 @@ private:
 
         // Create own allocator if user did not supply.
         if (!allocator_)
-            ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator());
+            ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator)();
 
         // Count number of '/' as tokenCount
         tokenCount_ = 0;
@@ -867,7 +989,7 @@ private:
                 }
 
                 i++;
-                
+
                 // Escaping "~0" -> '~', "~1" -> '/'
                 if (c == '~') {
                     if (i < length) {
@@ -1029,8 +1151,8 @@ private:
             unsigned char u = static_cast<unsigned char>(c);
             static const char hexDigits[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
             os_.Put('%');
-            os_.Put(hexDigits[u >> 4]);
-            os_.Put(hexDigits[u & 15]);
+            os_.Put(static_cast<typename OutputStream::Ch>(hexDigits[u >> 4]));
+            os_.Put(static_cast<typename OutputStream::Ch>(hexDigits[u & 15]));
         }
     private:
         OutputStream& os_;
@@ -1347,11 +1469,7 @@ bool EraseValueByPointer(T& root, const CharType(&source)[N]) {
 
 RAPIDJSON_NAMESPACE_END
 
-#ifdef __clang__
-RAPIDJSON_DIAG_POP
-#endif
-
-#ifdef _MSC_VER
+#if defined(__clang__) || defined(_MSC_VER)
 RAPIDJSON_DIAG_POP
 #endif
 

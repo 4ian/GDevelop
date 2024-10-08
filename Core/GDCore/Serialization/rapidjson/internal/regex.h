@@ -1,6 +1,6 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
 // 
-// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
 // in compliance with the License. You may obtain a copy of the License at
@@ -23,17 +23,14 @@
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(padded)
 RAPIDJSON_DIAG_OFF(switch-enum)
-RAPIDJSON_DIAG_OFF(implicit-fallthrough)
+#elif defined(_MSC_VER)
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(4512) // assignment operator could not be generated
 #endif
 
 #ifdef __GNUC__
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
-#endif
-
-#ifdef _MSC_VER
-RAPIDJSON_DIAG_PUSH
-RAPIDJSON_DIAG_OFF(4512) // assignment operator could not be generated
 #endif
 
 #ifndef RAPIDJSON_REGEX_VERBOSE
@@ -44,10 +41,38 @@ RAPIDJSON_NAMESPACE_BEGIN
 namespace internal {
 
 ///////////////////////////////////////////////////////////////////////////////
+// DecodedStream
+
+template <typename SourceStream, typename Encoding>
+class DecodedStream {
+public:
+    DecodedStream(SourceStream& ss) : ss_(ss), codepoint_() { Decode(); }
+    unsigned Peek() { return codepoint_; }
+    unsigned Take() {
+        unsigned c = codepoint_;
+        if (c) // No further decoding when '\0'
+            Decode();
+        return c;
+    }
+
+private:
+    void Decode() {
+        if (!Encoding::Decode(ss_, &codepoint_))
+            codepoint_ = 0;
+    }
+
+    SourceStream& ss_;
+    unsigned codepoint_;
+};
+
+///////////////////////////////////////////////////////////////////////////////
 // GenericRegex
 
 static const SizeType kRegexInvalidState = ~SizeType(0);  //!< Represents an invalid index in GenericRegex::State::out, out1
 static const SizeType kRegexInvalidRange = ~SizeType(0);
+
+template <typename Encoding, typename Allocator>
+class GenericRegexSearch;
 
 //! Regular expression engine with subset of ECMAscript grammar.
 /*!
@@ -84,43 +109,27 @@ static const SizeType kRegexInvalidRange = ~SizeType(0);
 template <typename Encoding, typename Allocator = CrtAllocator>
 class GenericRegex {
 public:
+    typedef Encoding EncodingType;
     typedef typename Encoding::Ch Ch;
+    template <typename, typename> friend class GenericRegexSearch;
 
     GenericRegex(const Ch* source, Allocator* allocator = 0) : 
-        states_(allocator, 256), ranges_(allocator, 256), root_(kRegexInvalidState), stateCount_(), rangeCount_(), 
-        stateSet_(), state0_(allocator, 0), state1_(allocator, 0), anchorBegin_(), anchorEnd_()
+        ownAllocator_(allocator ? 0 : RAPIDJSON_NEW(Allocator)()), allocator_(allocator ? allocator : ownAllocator_), 
+        states_(allocator_, 256), ranges_(allocator_, 256), root_(kRegexInvalidState), stateCount_(), rangeCount_(), 
+        anchorBegin_(), anchorEnd_()
     {
         GenericStringStream<Encoding> ss(source);
-        DecodedStream<GenericStringStream<Encoding> > ds(ss);
+        DecodedStream<GenericStringStream<Encoding>, Encoding> ds(ss);
         Parse(ds);
     }
 
-    ~GenericRegex() {
-        Allocator::Free(stateSet_);
+    ~GenericRegex()
+    {
+        RAPIDJSON_DELETE(ownAllocator_);
     }
 
     bool IsValid() const {
         return root_ != kRegexInvalidState;
-    }
-
-    template <typename InputStream>
-    bool Match(InputStream& is) const {
-        return SearchWithAnchoring(is, true, true);
-    }
-
-    bool Match(const Ch* s) const {
-        GenericStringStream<Encoding> is(s);
-        return Match(is);
-    }
-
-    template <typename InputStream>
-    bool Search(InputStream& is) const {
-        return SearchWithAnchoring(is, anchorBegin_, anchorEnd_);
-    }
-
-    bool Search(const Ch* s) const {
-        GenericStringStream<Encoding> is(s);
-        return Search(is);
     }
 
 private:
@@ -157,28 +166,6 @@ private:
         SizeType minIndex;
     };
 
-    template <typename SourceStream>
-    class DecodedStream {
-    public:
-        DecodedStream(SourceStream& ss) : ss_(ss), codepoint_() { Decode(); }
-        unsigned Peek() { return codepoint_; }
-        unsigned Take() {
-            unsigned c = codepoint_;
-            if (c) // No further decoding when '\0'
-                Decode();
-            return c;
-        }
-
-    private:
-        void Decode() {
-            if (!Encoding::Decode(ss_, &codepoint_))
-                codepoint_ = 0;
-        }
-
-        SourceStream& ss_;
-        unsigned codepoint_;
-    };
-
     State& GetState(SizeType index) {
         RAPIDJSON_ASSERT(index < stateCount_);
         return states_.template Bottom<State>()[index];
@@ -200,11 +187,10 @@ private:
     }
 
     template <typename InputStream>
-    void Parse(DecodedStream<InputStream>& ds) {
-        Allocator allocator;
-        Stack<Allocator> operandStack(&allocator, 256);     // Frag
-        Stack<Allocator> operatorStack(&allocator, 256);    // Operator
-        Stack<Allocator> atomCountStack(&allocator, 256);   // unsigned (Atom per parenthesis)
+    void Parse(DecodedStream<InputStream, Encoding>& ds) {
+        Stack<Allocator> operandStack(allocator_, 256);    // Frag
+        Stack<Allocator> operatorStack(allocator_, 256);   // Operator
+        Stack<Allocator> atomCountStack(allocator_, 256);  // unsigned (Atom per parenthesis)
 
         *atomCountStack.template Push<unsigned>() = 0;
 
@@ -301,6 +287,7 @@ private:
                     if (!CharacterEscape(ds, &codepoint))
                         return; // Unsupported escape character
                     // fall through to default
+                    RAPIDJSON_DELIBERATE_FALLTHROUGH;
 
                 default: // Pattern character
                     PushOperand(operandStack, codepoint);
@@ -326,14 +313,6 @@ private:
             }
             printf("\n");
 #endif
-        }
-
-        // Preallocate buffer for SearchWithAnchoring()
-        RAPIDJSON_ASSERT(stateSet_ == 0);
-        if (stateCount_ > 0) {
-            stateSet_ = static_cast<unsigned*>(states_.GetAllocator().Malloc(GetStateSetSize()));
-            state0_.template Reserve<SizeType>(stateCount_);
-            state1_.template Reserve<SizeType>(stateCount_);
         }
     }
 
@@ -413,8 +392,7 @@ private:
                 }
                 return false;
 
-            default: 
-                RAPIDJSON_ASSERT(op == kOneOrMore);
+            case kOneOrMore:
                 if (operandStack.GetSize() >= sizeof(Frag)) {
                     Frag e = *operandStack.template Pop<Frag>(1);
                     SizeType s = NewState(kRegexInvalidState, e.start, 0);
@@ -422,6 +400,10 @@ private:
                     *operandStack.template Push<Frag>() = Frag(e.start, s, e.minIndex);
                     return true;
                 }
+                return false;
+
+            default: 
+                // syntax error (e.g. unclosed kLeftParenthesis)
                 return false;
         }
     }
@@ -483,7 +465,7 @@ private:
     }
 
     template <typename InputStream>
-    bool ParseUnsigned(DecodedStream<InputStream>& ds, unsigned* u) {
+    bool ParseUnsigned(DecodedStream<InputStream, Encoding>& ds, unsigned* u) {
         unsigned r = 0;
         if (ds.Peek() < '0' || ds.Peek() > '9')
             return false;
@@ -497,7 +479,7 @@ private:
     }
 
     template <typename InputStream>
-    bool ParseRange(DecodedStream<InputStream>& ds, SizeType* range) {
+    bool ParseRange(DecodedStream<InputStream, Encoding>& ds, SizeType* range) {
         bool isBegin = true;
         bool negate = false;
         int step = 0;
@@ -535,6 +517,7 @@ private:
                 else if (!CharacterEscape(ds, &codepoint))
                     return false;
                 // fall through to default
+                RAPIDJSON_DELIBERATE_FALLTHROUGH;
 
             default:
                 switch (step) {
@@ -544,6 +527,7 @@ private:
                         break;
                     }
                     // fall through to step 0 for other characters
+                    RAPIDJSON_DELIBERATE_FALLTHROUGH;
 
                 case 0:
                     {
@@ -575,7 +559,7 @@ private:
     }
 
     template <typename InputStream>
-    bool CharacterEscape(DecodedStream<InputStream>& ds, unsigned* escapedCodepoint) {
+    bool CharacterEscape(DecodedStream<InputStream, Encoding>& ds, unsigned* escapedCodepoint) {
         unsigned codepoint;
         switch (codepoint = ds.Take()) {
             case '^':
@@ -603,72 +587,8 @@ private:
         }
     }
 
-    template <typename InputStream>
-    bool SearchWithAnchoring(InputStream& is, bool anchorBegin, bool anchorEnd) const {
-        RAPIDJSON_ASSERT(IsValid());
-        DecodedStream<InputStream> ds(is);
-
-        state0_.Clear();
-        Stack<Allocator> *current = &state0_, *next = &state1_;
-        const size_t stateSetSize = GetStateSetSize();
-        std::memset(stateSet_, 0, stateSetSize);
-
-        bool matched = AddState(*current, root_);
-        unsigned codepoint;
-        while (!current->Empty() && (codepoint = ds.Take()) != 0) {
-            std::memset(stateSet_, 0, stateSetSize);
-            next->Clear();
-            matched = false;
-            for (const SizeType* s = current->template Bottom<SizeType>(); s != current->template End<SizeType>(); ++s) {
-                const State& sr = GetState(*s);
-                if (sr.codepoint == codepoint ||
-                    sr.codepoint == kAnyCharacterClass || 
-                    (sr.codepoint == kRangeCharacterClass && MatchRange(sr.rangeStart, codepoint)))
-                {
-                    matched = AddState(*next, sr.out) || matched;
-                    if (!anchorEnd && matched)
-                        return true;
-                }
-                if (!anchorBegin)
-                    AddState(*next, root_);
-            }
-            internal::Swap(current, next);
-        }
-
-        return matched;
-    }
-
-    size_t GetStateSetSize() const {
-        return (stateCount_ + 31) / 32 * 4;
-    }
-
-    // Return whether the added states is a match state
-    bool AddState(Stack<Allocator>& l, SizeType index) const {
-        RAPIDJSON_ASSERT(index != kRegexInvalidState);
-
-        const State& s = GetState(index);
-        if (s.out1 != kRegexInvalidState) { // Split
-            bool matched = AddState(l, s.out);
-            return AddState(l, s.out1) || matched;
-        }
-        else if (!(stateSet_[index >> 5] & (1 << (index & 31)))) {
-            stateSet_[index >> 5] |= (1 << (index & 31));
-            *l.template PushUnsafe<SizeType>() = index;
-        }
-        return s.out == kRegexInvalidState; // by using PushUnsafe() above, we can ensure s is not validated due to reallocation.
-    }
-
-    bool MatchRange(SizeType rangeIndex, unsigned codepoint) const {
-        bool yes = (GetRange(rangeIndex).start & kRangeNegationFlag) == 0;
-        while (rangeIndex != kRegexInvalidRange) {
-            const Range& r = GetRange(rangeIndex);
-            if (codepoint >= (r.start & ~kRangeNegationFlag) && codepoint <= r.end)
-                return yes;
-            rangeIndex = r.next;
-        }
-        return !yes;
-    }
-
+    Allocator* ownAllocator_;
+    Allocator* allocator_;
     Stack<Allocator> states_;
     Stack<Allocator> ranges_;
     SizeType root_;
@@ -678,23 +598,141 @@ private:
     static const unsigned kInfinityQuantifier = ~0u;
 
     // For SearchWithAnchoring()
-    uint32_t* stateSet_;        // allocated by states_.GetAllocator()
-    mutable Stack<Allocator> state0_;
-    mutable Stack<Allocator> state1_;
     bool anchorBegin_;
     bool anchorEnd_;
 };
 
+template <typename RegexType, typename Allocator = CrtAllocator>
+class GenericRegexSearch {
+public:
+    typedef typename RegexType::EncodingType Encoding;
+    typedef typename Encoding::Ch Ch;
+
+    GenericRegexSearch(const RegexType& regex, Allocator* allocator = 0) : 
+        regex_(regex), allocator_(allocator), ownAllocator_(0),
+        state0_(allocator, 0), state1_(allocator, 0), stateSet_()
+    {
+        RAPIDJSON_ASSERT(regex_.IsValid());
+        if (!allocator_)
+            ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator)();
+        stateSet_ = static_cast<uint32_t*>(allocator_->Malloc(GetStateSetSize()));
+        state0_.template Reserve<SizeType>(regex_.stateCount_);
+        state1_.template Reserve<SizeType>(regex_.stateCount_);
+    }
+
+    ~GenericRegexSearch() {
+        Allocator::Free(stateSet_);
+        RAPIDJSON_DELETE(ownAllocator_);
+    }
+
+    template <typename InputStream>
+    bool Match(InputStream& is) {
+        return SearchWithAnchoring(is, true, true);
+    }
+
+    bool Match(const Ch* s) {
+        GenericStringStream<Encoding> is(s);
+        return Match(is);
+    }
+
+    template <typename InputStream>
+    bool Search(InputStream& is) {
+        return SearchWithAnchoring(is, regex_.anchorBegin_, regex_.anchorEnd_);
+    }
+
+    bool Search(const Ch* s) {
+        GenericStringStream<Encoding> is(s);
+        return Search(is);
+    }
+
+private:
+    typedef typename RegexType::State State;
+    typedef typename RegexType::Range Range;
+
+    template <typename InputStream>
+    bool SearchWithAnchoring(InputStream& is, bool anchorBegin, bool anchorEnd) {
+        DecodedStream<InputStream, Encoding> ds(is);
+
+        state0_.Clear();
+        Stack<Allocator> *current = &state0_, *next = &state1_;
+        const size_t stateSetSize = GetStateSetSize();
+        std::memset(stateSet_, 0, stateSetSize);
+
+        bool matched = AddState(*current, regex_.root_);
+        unsigned codepoint;
+        while (!current->Empty() && (codepoint = ds.Take()) != 0) {
+            std::memset(stateSet_, 0, stateSetSize);
+            next->Clear();
+            matched = false;
+            for (const SizeType* s = current->template Bottom<SizeType>(); s != current->template End<SizeType>(); ++s) {
+                const State& sr = regex_.GetState(*s);
+                if (sr.codepoint == codepoint ||
+                    sr.codepoint == RegexType::kAnyCharacterClass || 
+                    (sr.codepoint == RegexType::kRangeCharacterClass && MatchRange(sr.rangeStart, codepoint)))
+                {
+                    matched = AddState(*next, sr.out) || matched;
+                    if (!anchorEnd && matched)
+                        return true;
+                }
+                if (!anchorBegin)
+                    AddState(*next, regex_.root_);
+            }
+            internal::Swap(current, next);
+        }
+
+        return matched;
+    }
+
+    size_t GetStateSetSize() const {
+        return (regex_.stateCount_ + 31) / 32 * 4;
+    }
+
+    // Return whether the added states is a match state
+    bool AddState(Stack<Allocator>& l, SizeType index) {
+        RAPIDJSON_ASSERT(index != kRegexInvalidState);
+
+        const State& s = regex_.GetState(index);
+        if (s.out1 != kRegexInvalidState) { // Split
+            bool matched = AddState(l, s.out);
+            return AddState(l, s.out1) || matched;
+        }
+        else if (!(stateSet_[index >> 5] & (1u << (index & 31)))) {
+            stateSet_[index >> 5] |= (1u << (index & 31));
+            *l.template PushUnsafe<SizeType>() = index;
+        }
+        return s.out == kRegexInvalidState; // by using PushUnsafe() above, we can ensure s is not validated due to reallocation.
+    }
+
+    bool MatchRange(SizeType rangeIndex, unsigned codepoint) const {
+        bool yes = (regex_.GetRange(rangeIndex).start & RegexType::kRangeNegationFlag) == 0;
+        while (rangeIndex != kRegexInvalidRange) {
+            const Range& r = regex_.GetRange(rangeIndex);
+            if (codepoint >= (r.start & ~RegexType::kRangeNegationFlag) && codepoint <= r.end)
+                return yes;
+            rangeIndex = r.next;
+        }
+        return !yes;
+    }
+
+    const RegexType& regex_;
+    Allocator* allocator_;
+    Allocator* ownAllocator_;
+    Stack<Allocator> state0_;
+    Stack<Allocator> state1_;
+    uint32_t* stateSet_;
+};
+
 typedef GenericRegex<UTF8<> > Regex;
+typedef GenericRegexSearch<Regex> RegexSearch;
 
 } // namespace internal
 RAPIDJSON_NAMESPACE_END
 
-#ifdef __clang__
+#ifdef __GNUC__
 RAPIDJSON_DIAG_POP
 #endif
 
-#ifdef _MSC_VER
+#if defined(__clang__) || defined(_MSC_VER)
 RAPIDJSON_DIAG_POP
 #endif
 

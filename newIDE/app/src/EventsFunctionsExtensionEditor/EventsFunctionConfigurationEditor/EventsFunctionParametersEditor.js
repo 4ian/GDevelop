@@ -218,6 +218,23 @@ export const EventsFunctionParametersEditor = ({
     [forceUpdate]
   );
 
+  const duplicateParameter = React.useCallback(
+    (parameter: gdParameterMetadata, index: number) => {
+      const parameters = eventsFunction.getParameters();
+      const newName = newNameGenerator(parameter.getName(), name =>
+        parameters.hasParameterNamed(name)
+      );
+
+      const newParameter = parameters.insertNewParameter(newName, index);
+
+      unserializeFromJSObject(newParameter, serializeToJSObject(parameter));
+      newParameter.setName(newName);
+
+      forceUpdate();
+    },
+    [forceUpdate, eventsFunction]
+  );
+
   const pasteParameters = React.useCallback(
     async propertyInsertionIndex => {
       const clipboardContent = Clipboard.get(PARAMETERS_CLIPBOARD_KIND);
@@ -652,6 +669,14 @@ export const EventsFunctionParametersEditor = ({
                                           click: () =>
                                             pasteParametersBefore(parameter),
                                           enabled: isClipboardContainingParameters,
+                                        },
+                                        {
+                                          label: i18n._(t`Duplicate`),
+                                          click: () =>
+                                            duplicateParameter(
+                                              parameter,
+                                              i + 1
+                                            ),
                                         },
                                         { type: 'separator' },
                                         {

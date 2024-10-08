@@ -256,6 +256,23 @@ export default function EventsBasedObjectPropertiesEditor({
     [forceUpdate]
   );
 
+  const duplicateProperty = React.useCallback(
+    (property: gdNamedPropertyDescriptor, index: number) => {
+      const properties = eventsBasedObject.getPropertyDescriptors();
+      const newName = newNameGenerator(property.getName(), name =>
+        properties.has(name)
+      );
+
+      const newProperty = properties.insertNew(newName, index);
+
+      unserializeFromJSObject(newProperty, serializeToJSObject(property));
+      newProperty.setName(newName);
+
+      forceUpdate();
+    },
+    [forceUpdate, eventsBasedObject]
+  );
+
   const pasteProperties = React.useCallback(
     async propertyInsertionIndex => {
       const properties = eventsBasedObject.getPropertyDescriptors();
@@ -629,6 +646,11 @@ export default function EventsBasedObjectPropertiesEditor({
                                         click: () =>
                                           pastePropertiesBefore(property),
                                         enabled: isClipboardContainingProperties,
+                                      },
+                                      {
+                                        label: i18n._(t`Duplicate`),
+                                        click: () =>
+                                          duplicateProperty(property, i + 1),
                                       },
                                       { type: 'separator' },
                                       {

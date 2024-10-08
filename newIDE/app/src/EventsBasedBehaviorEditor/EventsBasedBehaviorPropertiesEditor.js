@@ -256,6 +256,22 @@ export default function EventsBasedBehaviorPropertiesEditor({
     [forceUpdate]
   );
 
+  const duplicateProperty = React.useCallback(
+    (property: gdNamedPropertyDescriptor, index: number) => {
+      const newName = newNameGenerator(property.getName(), name =>
+        properties.has(name)
+      );
+
+      const newProperty = properties.insertNew(newName, index);
+
+      unserializeFromJSObject(newProperty, serializeToJSObject(property));
+      newProperty.setName(newName);
+
+      forceUpdate();
+    },
+    [forceUpdate, properties]
+  );
+
   const pasteProperties = React.useCallback(
     async propertyInsertionIndex => {
       const clipboardContent = Clipboard.get(PROPERTIES_CLIPBOARD_KIND);
@@ -621,6 +637,11 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                         click: () =>
                                           pastePropertiesBefore(property),
                                         enabled: isClipboardContainingProperties,
+                                      },
+                                      {
+                                        label: i18n._(t`Duplicate`),
+                                        click: () =>
+                                          duplicateProperty(property, i + 1),
                                       },
                                       { type: 'separator' },
                                       {

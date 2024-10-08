@@ -182,6 +182,25 @@ describe('gdjs.InputManager', () => {
     inputManager.onTouchEnd(46);
   });
 
+  it('can ignore touches that end then start in the same frame without any exception', () => {
+    inputManager.onTouchEnd(46, 510, 610);
+    inputManager.onTouchStart(46, 470, 320);
+
+    expect(inputTools.hasTouchEnded(runtimeScene, 48)).to.be(false);
+    expect(inputTools.hasAnyTouchOrMouseStarted(runtimeScene)).to.be(false);
+    expect(inputTools.getStartedTouchOrMouseCount(runtimeScene)).to.be(0);
+    expect(inputTools.getStartedTouchOrMouseIdentifier(runtimeScene, 0)).to.be(
+      0
+    );
+    expect(inputTools.getTouchX(runtimeScene, 48)).to.be(0);
+    expect(inputTools.getTouchY(runtimeScene, 48)).to.be(0);
+
+    inputManager.onFrameEnded();
+    expect(inputManager.getAllTouchIdentifiers()).to.have.length(0);
+
+    inputManager.onTouchEnd(46);
+  });
+
   it('should simulate (or not) mouse events from touch events', () => {
     inputManager.touchSimulateMouse();
     expect(inputManager.isMouseButtonPressed(0)).to.be(false);

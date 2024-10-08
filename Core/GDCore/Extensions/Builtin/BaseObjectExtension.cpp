@@ -1775,7 +1775,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddCondition("IsTurnedTowardObject",
                     _("An object is turned toward another"),
                     _("Check if an object is turned toward another"),
-                    _("_PARAM0_ is turned towards _PARAM1_ ± _PARAM2_°"),
+                    _("_PARAM0_ is turned toward _PARAM1_ ± _PARAM2_°"),
                     _("Angle"),
                     "res/conditions/estTourne24.png",
                     "res/conditions/estTourne.png")

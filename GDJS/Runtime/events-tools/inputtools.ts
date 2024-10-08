@@ -517,10 +517,12 @@ namespace gdjs {
         instanceContainer: gdjs.RuntimeInstanceContainer,
         index: integer
       ): integer => {
-        return instanceContainer
-          .getGame()
-          .getInputManager()
-          .getStartedTouchIdentifiers()[index];
+        return (
+          instanceContainer
+            .getGame()
+            .getInputManager()
+            .getStartedTouchIdentifiers()[index] || 0
+        );
       };
 
       export const hasTouchEnded = (

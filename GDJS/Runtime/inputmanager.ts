@@ -390,12 +390,13 @@ namespace gdjs {
      * @returns true if the touch has just ended.
      */
     hasTouchEnded(publicIdentifier: integer): boolean {
-      return (
-        this._endedTouches.includes(publicIdentifier) &&
-        // A touch that end then start in one frame is ignored
-        // because it's probably noise.
-        this._mouseOrTouches.get(publicIdentifier).justEnded
-      );
+      // A touch that end then start in one frame is ignored
+      // because it's probably noise.
+      // See _addTouch
+      if (!this._mouseOrTouches.containsKey(publicIdentifier)) {
+        return false;
+      }
+      return this._mouseOrTouches.get(publicIdentifier).justEnded;
     }
 
     /**

@@ -26,7 +26,7 @@ describe('gdjs', function () {
         expect(gdjs.shorthandHexToRGBColor('F3a')).to.eql([255, 51, 170]);
       });
     });
-    describe.only('RGB strings to RGB components', () => {
+    describe('RGB strings to RGB components', () => {
       it('should convert rgb strings', function () {
         expect(gdjs.rgbOrHexToRGBColor('0;0;0')).to.eql([0, 0, 0]);
         expect(gdjs.rgbOrHexToRGBColor('255;255;255')).to.eql([255, 255, 255]);

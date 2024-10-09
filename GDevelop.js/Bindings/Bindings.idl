@@ -2208,6 +2208,8 @@ interface PlatformExtension {
     [Const, Value] DOMString STATIC_GetNamespaceSeparator();
     [Const, Value] DOMString STATIC_GetBehaviorFullType(
         [Const] DOMString extensionName, [Const] DOMString behaviorName);
+    [Const, Value] DOMString STATIC_GetObjectFullType(
+        [Const] DOMString extensionName, [Const] DOMString objectName);
 };
 
 interface EventsList {

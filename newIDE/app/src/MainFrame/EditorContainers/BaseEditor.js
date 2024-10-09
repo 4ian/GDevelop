@@ -127,6 +127,10 @@ export type RenderEditorContainerProps = {|
   ) => void,
 
   onExtractAsExternalLayout: (name: string) => void,
+  onExtractAsEventBasedObject: (
+    extensionName: string,
+    eventsBasedObjectName: string
+  ) => void,
 |};
 
 export type RenderEditorContainerPropsWithRef = {|

@@ -1501,20 +1501,18 @@ export default class InstancesEditor extends Component<Props, State> {
     this.scrollTo(areaRectangle.centerX(), areaRectangle.centerY());
   };
 
-  zoomToFitSelection = (instances: Array<gdInitialInstance>) => {
-    if (instances.length === 0) return;
-    const [firstInstance, ...otherInstances] = instances;
-    const instanceMeasurer = this.instancesRenderer.getInstanceMeasurer();
-    let selectedInstancesRectangle = instanceMeasurer.getInstanceAABB(
-      firstInstance,
-      new Rectangle()
-    );
-    otherInstances.forEach(instance => {
-      selectedInstancesRectangle.union(
-        instanceMeasurer.getInstanceAABB(instance, new Rectangle())
-      );
-    });
-    this.fitViewToRectangle(selectedInstancesRectangle, { adaptZoom: true });
+  getSelectionAABB = (): Rectangle => {
+    return this.selectedInstances.getSelectionAABB();
+  };
+
+  zoomToFitSelection = () => {
+    const selectedInstancesRectangle = this.selectedInstances.getSelectionAABB();
+    if (
+      selectedInstancesRectangle.width() > 0 &&
+      selectedInstancesRectangle.height() > 0
+    ) {
+      this.fitViewToRectangle(selectedInstancesRectangle, { adaptZoom: true });
+    }
   };
 
   centerViewOnLastInstance = (

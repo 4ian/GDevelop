@@ -2033,6 +2033,30 @@ const MainFrame = (props: Props) => {
     openExternalLayout(name);
   };
 
+  const onExtractAsEventBasedObject = (
+    extensionName: string,
+    eventsBasedObjectName: string
+  ) => {
+    openEventsFunctionsExtension(
+      extensionName,
+      null,
+      null,
+      eventsBasedObjectName
+    );
+    if (!currentProject.hasEventsFunctionsExtensionNamed(extensionName)) {
+      return;
+    }
+    const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
+      extensionName
+    );
+    const eventsBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
+    if (!eventsBasedObjects.has(eventsBasedObjectName)) {
+      return;
+    }
+    const eventsBasedObject = eventsBasedObjects.get(eventsBasedObjectName);
+    openCustomObjectEditor(eventsFunctionsExtension, eventsBasedObject);
+  };
+
   const onEventsBasedObjectChildrenEdited = React.useCallback(
     () => {
       for (const editor of state.editorTabs.editors) {
@@ -3600,6 +3624,7 @@ const MainFrame = (props: Props) => {
                     },
                     openBehaviorEvents: openBehaviorEvents,
                     onExtractAsExternalLayout: onExtractAsExternalLayout,
+                    onExtractAsEventBasedObject: onExtractAsEventBasedObject,
                     onEventsBasedObjectChildrenEdited: onEventsBasedObjectChildrenEdited,
                     onSceneObjectEdited: onSceneObjectEdited,
                   })}

@@ -16,6 +16,7 @@ import SetupGridDialog from './SetupGridDialog';
 import ScenePropertiesDialog from './ScenePropertiesDialog';
 import EventsBasedObjectScenePropertiesDialog from './EventsBasedObjectScenePropertiesDialog';
 import ExtractAsExternalLayoutDialog from './ExtractAsExternalLayoutDialog';
+import ExtractAsCustomObjectDialog from './ExtractAsCustomObjectDialog';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import MosaicEditorsDisplayToolbar from './MosaicEditorsDisplay/Toolbar';
 import SwipeableDrawerEditorsDisplayToolbar from './SwipeableDrawerEditorsDisplay/Toolbar';
@@ -125,6 +126,10 @@ type Props = {|
   unsavedChanges?: ?UnsavedChanges,
   openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
   onExtractAsExternalLayout?: (name: string) => void,
+  onExtractAsEventBasedObject: (
+    extensionName: string,
+    eventsBasedObjectName: string
+  ) => void,
 
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
@@ -148,6 +153,7 @@ type State = {|
   newObjectInstanceSceneCoordinates: ?[number, number],
   invisibleLayerOnWhichInstancesHaveJustBeenAdded: string | null,
   extractAsExternalLayoutDialogOpen: boolean,
+  extractAsCustomObjectDialogOpen: boolean,
 
   editedGroup: gdObjectGroup | null,
   isCreatingNewGroup: boolean,
@@ -200,6 +206,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       editedGroup: null,
       isCreatingNewGroup: false,
       extractAsExternalLayoutDialogOpen: false,
+      extractAsCustomObjectDialogOpen: false,
 
       instancesEditorSettings: props.getInitialInstancesEditorSettings(),
       history: getHistoryInitialState(props.initialInstances, {
@@ -1311,9 +1318,8 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   zoomToFitSelection = () => {
-    const selectedInstances = this.instancesSelection.getSelectedInstances();
     if (this.editorDisplay)
-      this.editorDisplay.viewControls.zoomToFitSelection(selectedInstances);
+      this.editorDisplay.viewControls.zoomToFitSelection();
   };
 
   getContextMenuZoomItems = (i18n: I18nType) => {
@@ -1410,6 +1416,11 @@ export default class SceneEditor extends React.Component<Props, State> {
       this.props.layout && {
         label: i18n._(t`Extract as an external layout`),
         click: () => this.setState({ extractAsExternalLayoutDialogOpen: true }),
+        enabled: hasSelectedInstances,
+      },
+      this.props.layout && {
+        label: i18n._(t`Extract as a custom object`),
+        click: () => this.setState({ extractAsCustomObjectDialogOpen: true }),
         enabled: hasSelectedInstances,
       },
       {
@@ -1682,6 +1693,110 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.setState({ extractAsExternalLayoutDialogOpen: false });
 
     onExtractAsExternalLayout(newName);
+  };
+
+  extractAsCustomObject = (
+    extensionName: string,
+    eventsBasedObjectName: string
+  ) => {
+    const { project, layout, onExtractAsEventBasedObject } = this.props;
+    const { editorDisplay } = this;
+    if (!layout || !onExtractAsEventBasedObject || !editorDisplay) return;
+
+    if (!project.hasEventsFunctionsExtensionNamed(extensionName)) {
+      project.insertNewEventsFunctionsExtension(extensionName, 0);
+    }
+    const eventsBasedObjects = project
+      .getEventsFunctionsExtension(extensionName)
+      .getEventsBasedObjects();
+
+    const selectionAABB = editorDisplay.instancesHandlers.getSelectionAABB();
+    const serializedSelection = this.instancesSelection
+      .getSelectedInstances()
+      .map(instance => serializeToJSObject(instance));
+
+    const eventsBasedObjectNewName = newNameGenerator(
+      eventsBasedObjectName,
+      name => eventsBasedObjects.has(name)
+    );
+    const newEventsBasedObject = eventsBasedObjects.insertNew(
+      eventsBasedObjectNewName,
+      eventsBasedObjects.getCount()
+    );
+    newEventsBasedObject.setAreaMinX(0);
+    newEventsBasedObject.setAreaMinY(0);
+    newEventsBasedObject.setAreaMinZ(0);
+    newEventsBasedObject.setAreaMaxX(selectionAABB.width());
+    newEventsBasedObject.setAreaMaxY(selectionAABB.height());
+    newEventsBasedObject.setAreaMaxZ(selectionAABB.depth());
+
+    const childObjects = newEventsBasedObject.getObjects();
+    const sceneObjects = layout.getObjects();
+
+    let zOrder = 0;
+    let layer = '';
+    for (const serializedInstance of serializedSelection) {
+      const instance = new gd.InitialInstance();
+      unserializeFromJSObject(instance, serializedInstance);
+      layer = instance.getLayer();
+      zOrder = Math.max(zOrder, instance.getZOrder());
+
+      instance.setX(instance.getX() - selectionAABB.left);
+      instance.setY(instance.getY() - selectionAABB.top);
+      instance.setZ(instance.getZ() - selectionAABB.zMin);
+      instance.setLayer('');
+
+      const objectName = instance.getObjectName();
+      if (!childObjects.hasObjectNamed(objectName)) {
+        const object = sceneObjects.getObject(objectName);
+        const serializedObject = serializeToJSObject(object);
+        const childObject = childObjects.insertNewObject(
+          project,
+          object.getType(),
+          objectName,
+          0
+        );
+        unserializeFromJSObject(
+          childObject,
+          serializedObject,
+          'unserializeFrom',
+          project
+        );
+      }
+
+      newEventsBasedObject
+        .getInitialInstances()
+        .insertInitialInstance(instance)
+        .resetPersistentUuid();
+      instance.delete();
+    }
+    const customObjectType = gd.PlatformExtension.getObjectFullType(
+      extensionName,
+      eventsBasedObjectName
+    );
+    sceneObjects.insertNewObject(
+      project,
+      customObjectType,
+      eventsBasedObjectName,
+      0
+    );
+
+    const customObjectInstance = layout
+      .getInitialInstances()
+      .insertNewInitialInstance();
+    customObjectInstance.setObjectName(eventsBasedObjectName);
+    customObjectInstance.setX(selectionAABB.left);
+    customObjectInstance.setY(selectionAABB.top);
+    customObjectInstance.setZ(selectionAABB.zMin);
+    customObjectInstance.setLayer(layer);
+    customObjectInstance.setZOrder(zOrder);
+
+    this.deleteSelection();
+    // TODO Delete the objects if there is no more instance and the option is checked.
+
+    this.setState({ extractAsCustomObjectDialogOpen: false });
+
+    onExtractAsEventBasedObject(extensionName, eventsBasedObjectNewName);
   };
 
   onSelectAllInstancesOfObjectInLayout = (objectName: string) => {
@@ -2213,6 +2328,26 @@ export default class SceneEditor extends React.Component<Props, State> {
                         }
                         onApply={chosenName =>
                           this.extractAsExternalLayout(chosenName)
+                        }
+                      />
+                    )}
+                    {this.state.extractAsCustomObjectDialogOpen && layout && (
+                      <ExtractAsCustomObjectDialog
+                        project={project}
+                        suggestedName={newNameGenerator(
+                          i18n._(t`${layout.getName()} part`),
+                          name => project.hasExternalLayoutNamed(name)
+                        )}
+                        onCancel={() =>
+                          this.setState({
+                            extractAsCustomObjectDialogOpen: false,
+                          })
+                        }
+                        onApply={(extensionName, eventsBasedObjectName) =>
+                          this.extractAsCustomObject(
+                            extensionName,
+                            eventsBasedObjectName
+                          )
                         }
                       />
                     )}

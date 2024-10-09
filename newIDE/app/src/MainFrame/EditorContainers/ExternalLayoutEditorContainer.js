@@ -255,6 +255,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
             isActive={isActive}
             openBehaviorEvents={this.props.openBehaviorEvents}
             onExtractAsExternalLayout={this.props.onExtractAsExternalLayout}
+            onExtractAsEventBasedObject={this.props.onExtractAsEventBasedObject}
             onObjectEdited={objectWithContext =>
               this.props.onSceneObjectEdited(layout, objectWithContext)
             }

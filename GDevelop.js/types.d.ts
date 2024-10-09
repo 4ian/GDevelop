@@ -1670,6 +1670,7 @@ export class PlatformExtension extends EmscriptenObject {
   getAllDependencies(): VectorDependencyMetadata;
   static getNamespaceSeparator(): string;
   static getBehaviorFullType(extensionName: string, behaviorName: string): string;
+  static getObjectFullType(extensionName: string, objectName: string): string;
 }
 
 export class EventsList extends EmscriptenObject {

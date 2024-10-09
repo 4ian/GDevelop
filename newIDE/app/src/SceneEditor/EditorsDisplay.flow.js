@@ -137,7 +137,7 @@ export type SceneEditorsDisplayInterface = {|
     setZoomFactor: (factor: number) => void,
     zoomToInitialPosition: () => void,
     zoomToFitContent: () => void,
-    zoomToFitSelection: (Array<gdInitialInstance>) => void,
+    zoomToFitSelection: () => void,
     centerViewOnLastInstance: (
       Array<gdInitialInstance>,
       offset?: ?[number, number]

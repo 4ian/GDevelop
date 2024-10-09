@@ -246,6 +246,13 @@ namespace gdjs {
 
       this._resources.clear();
       for (const resourceData of resourceDataArray) {
+        if (!resourceData.file) {
+          // Empty string or missing `file` field: not a valid resource, let's entirely ignore it.
+          // Otherwise, this can confuse some loaders that will consider an empty string different
+          // than a file that happen not to fail to load.
+          continue;
+        }
+
         this._resources.set(resourceData.name, resourceData);
       }
     }

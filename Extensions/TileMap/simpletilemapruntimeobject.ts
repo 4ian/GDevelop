@@ -89,6 +89,7 @@ namespace gdjs {
 
     updatePreRender(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       if (this._isTileMapDirty) {
+        let shouldContinue = true;
         this._tileMapManager.getOrLoadSimpleTileMapTextureCache(
           (textureName) => {
             return (this.getInstanceContainer()
@@ -108,8 +109,16 @@ namespace gdjs {
               return;
             }
             this._renderer.refreshPixiTileMap(textureCache);
+          },
+          (error) => {
+            shouldContinue = false;
+            console.error(
+              `Could not load texture cache for atlas ${this._atlasImage} during prerender. The tilemap might be badly configured or an issues happened with the loaded atlas image:`,
+              error
+            );
           }
         );
+        if (!shouldContinue) return;
         if (this._collisionTileMap) {
           const tileMap = this._renderer.getTileMap();
           if (tileMap) this._collisionTileMap.updateFromTileMap(tileMap);
@@ -272,6 +281,12 @@ namespace gdjs {
               }
               this._renderer.updatePixiTileMap(tileMap, textureCache);
               tileMapLoadingCallback(tileMap);
+            },
+            (error) => {
+              console.error(
+                `Could not load texture cache for atlas ${this._atlasImage} during initial loading. The tilemap might be badly configured or an issues happened with the loaded atlas image:`,
+                error
+              );
             }
           );
         }

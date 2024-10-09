@@ -138,16 +138,21 @@ namespace gdjs {
         tileSize: number,
         columnCount: number,
         rowCount: number,
-        callback: (textureCache: TileMapHelper.TileTextureCache | null) => void
+        callback: (textureCache: TileMapHelper.TileTextureCache | null) => void,
+        errorCallback: (error: Error) => void
       ): void {
-        this._manager.getOrLoadSimpleTileMapTextureCache(
-          getTexture,
-          atlasImageResourceName,
-          tileSize,
-          columnCount,
-          rowCount,
-          callback
-        );
+        try {
+          this._manager.getOrLoadSimpleTileMapTextureCache(
+            getTexture,
+            atlasImageResourceName,
+            tileSize,
+            columnCount,
+            rowCount,
+            callback
+          );
+        } catch (error) {
+          errorCallback(error);
+        }
       }
 
       /**

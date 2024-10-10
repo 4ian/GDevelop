@@ -1501,10 +1501,6 @@ export default class InstancesEditor extends Component<Props, State> {
     this.scrollTo(areaRectangle.centerX(), areaRectangle.centerY());
   };
 
-  getSelectionAABB = (): Rectangle => {
-    return this.selectedInstances.getSelectionAABB();
-  };
-
   zoomToFitSelection = () => {
     const selectedInstancesRectangle = this.selectedInstances.getSelectionAABB();
     if (

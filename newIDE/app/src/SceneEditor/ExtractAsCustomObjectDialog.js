@@ -18,7 +18,6 @@ const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
-  suggestedName: string,
   onApply: (
     extensionName: string,
     eventsBasedObjectName: string,
@@ -38,7 +37,6 @@ const canCreateEventsBasedObject = (
 
 export default function ExtractAsCustomObjectDialog({
   project,
-  suggestedName,
   onApply,
   onCancel,
 }: Props) {
@@ -47,7 +45,7 @@ export default function ExtractAsCustomObjectDialog({
   const [
     eventsBasedObjectName,
     setEventsBasedObjectName,
-  ] = React.useState<string>(suggestedName);
+  ] = React.useState<string>('');
   const [
     shouldRemoveSceneObjectWhenNoMoreInstance,
     setShouldRemoveSceneObjectWhenNoMoreInstance,

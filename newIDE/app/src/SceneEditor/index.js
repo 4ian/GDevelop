@@ -2341,10 +2341,6 @@ export default class SceneEditor extends React.Component<Props, State> {
                     {this.state.extractAsCustomObjectDialogOpen && layout && (
                       <ExtractAsCustomObjectDialog
                         project={project}
-                        suggestedName={newNameGenerator(
-                          i18n._(t`${layout.getName()} part`),
-                          name => project.hasExternalLayoutNamed(name)
-                        )}
                         onCancel={() =>
                           this.setState({
                             extractAsCustomObjectDialogOpen: false,

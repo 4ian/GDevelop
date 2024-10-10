@@ -2451,6 +2451,11 @@ interface WholeProjectRefactorer {
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
       [Ref] EventsBasedBehavior eventsBasedBehavior,
       [Const] DOMString sourceExtensionName);
+    void STATIC_UpdateExtensionNameInEventsBasedObject(
+      [Ref] Project project,
+      [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Ref] EventsBasedObject eventsBasedObject,
+      [Const] DOMString sourceExtensionName);
     void STATIC_RenameEventsFunction(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
@@ -2511,11 +2516,21 @@ interface WholeProjectRefactorer {
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
       [Const] DOMString oldName,
       [Const] DOMString newName);
+    void STATIC_UpdateBehaviorNameInEventsBasedBehavior(
+      [Ref] Project project,
+      [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Ref] EventsBasedBehavior eventsBasedBehavior,
+      [Const] DOMString sourceBehaviorName);
     void STATIC_RenameEventsBasedObject(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
       [Const] DOMString oldName,
       [Const] DOMString newName);
+    void STATIC_UpdateObjectNameInEventsBasedObject(
+      [Ref] Project project,
+      [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Ref] EventsBasedObject eventsBasedObject,
+      [Const] DOMString sourceObjectName);
     void STATIC_RenameLayout(
       [Ref] Project project,
       [Const] DOMString oldName,

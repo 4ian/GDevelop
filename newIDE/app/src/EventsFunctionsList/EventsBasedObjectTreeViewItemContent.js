@@ -38,6 +38,11 @@ export type EventsBasedObjectCallbacks = {|
     (parameters: ?EventsBasedObjectCreationParameters) => void
   ) => void,
   onEventsBasedObjectRenamed: (eventsBasedObject: gdEventsBasedObject) => void,
+  onEventsBasedObjectPasted: (
+    eventsBasedObject: gdEventsBasedObject,
+    sourceExtensionName: string,
+    sourceEventsBasedObjectName: string
+  ) => void,
   onOpenCustomObjectEditor: (eventsBasedObject: gdEventsBasedObject) => void,
 |};
 
@@ -239,6 +244,7 @@ export class EventsBasedObjectTreeViewItemContent
     Clipboard.set(EVENTS_BASED_OBJECT_CLIPBOARD_KIND, {
       eventsBasedObject: serializeToJSObject(this.eventsBasedObject),
       name: this.eventsBasedObject.getName(),
+      extensionName: this.props.eventsFunctionsExtension.getName(),
     });
   }
 
@@ -257,12 +263,15 @@ export class EventsBasedObjectTreeViewItemContent
       clipboardContent,
       'eventsBasedObject'
     );
-    const name = SafeExtractor.extractStringProperty(clipboardContent, 'name');
-    if (!name || !copiedEventsBasedObject) return;
+    const sourceEventsBasedObjectName = SafeExtractor.extractStringProperty(
+      clipboardContent,
+      'name'
+    );
+    if (!sourceEventsBasedObjectName || !copiedEventsBasedObject) return;
 
     const { project, eventsBasedObjectsList } = this.props;
 
-    const newName = newNameGenerator(name, name =>
+    const newName = newNameGenerator(sourceEventsBasedObjectName, name =>
       eventsBasedObjectsList.has(name)
     );
 
@@ -278,6 +287,18 @@ export class EventsBasedObjectTreeViewItemContent
       project
     );
     newEventsBasedObject.setName(newName);
+
+    const sourceExtensionName = SafeExtractor.extractStringProperty(
+      clipboardContent,
+      'extensionName'
+    );
+    if (sourceExtensionName) {
+      this.props.onEventsBasedObjectPasted(
+        newEventsBasedObject,
+        sourceExtensionName,
+        sourceEventsBasedObjectName
+      );
+    }
 
     this._onEventsBasedObjectModified();
     this.props.onSelectEventsBasedObject(newEventsBasedObject);

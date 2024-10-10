@@ -27,14 +27,7 @@ class ObjectsContainer;
 class VariablesContainer;
 class EventsBasedBehavior;
 class EventsBasedObject;
-class ArbitraryEventsWorker;
-class ArbitraryObjectsWorker;
-class ArbitraryEventsFunctionsWorker;
-class ArbitraryEventsWorkerWithContext;
-class ArbitraryEventBasedBehaviorsWorker;
-class ArbitraryBehaviorSharedDataWorker;
 class Behavior;
-class BehaviorMetadata;
 class UnfilledRequiredBehaviorPropertyProblem;
 class ProjectBrowser;
 class SerializerElement;
@@ -121,14 +114,24 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::String& newName);
 
   /**
-   * \brief Refactor behavior events after the extension was placed in a new
+   * \brief Refactor behavior events after the behavior has been placed in a new
    * extension.
    */
   static void UpdateExtensionNameInEventsBasedBehavior(
-      gd::Project& project,
-      const gd::EventsFunctionsExtension& eventsFunctionsExtension,
-      gd::EventsBasedBehavior& eventsBasedBehavior,
-      const gd::String& sourceExtensionName);
+      gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      gd::EventsBasedBehavior &eventsBasedBehavior,
+      const gd::String &sourceExtensionName);
+
+  /**
+   * \brief Refactor object events after the object has been placed in a new
+   * extension.
+   */
+  static void UpdateExtensionNameInEventsBasedObject(
+      gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      gd::EventsBasedObject &eventsBasedObject,
+      const gd::String &sourceExtensionName);
 
   /**
    * \brief Refactor the project **before** an events function is renamed.
@@ -325,6 +328,16 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::String& newBehaviorName);
 
   /**
+   * \brief Refactor events-based behavior events after the events-based
+   * behavior has been duplicated.
+   */
+  static void UpdateBehaviorNameInEventsBasedBehavior(
+      gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      gd::EventsBasedBehavior &eventsBasedBehavior,
+      const gd::String &sourceBehaviorName);
+
+  /**
    * \brief Refactor the project **before** an object is renamed.
    *
    * \warning Do the renaming of the specified object after calling this.
@@ -336,6 +349,16 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::EventsFunctionsExtension& eventsFunctionsExtension,
       const gd::String& oldObjectName,
       const gd::String& newObjectName);
+
+  /**
+   * \brief Refactor events-based object events after the events-based object
+   * has been duplicated.
+   */
+  static void UpdateObjectNameInEventsBasedObject(
+      gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      gd::EventsBasedObject &eventsBasedObject,
+      const gd::String &sourceObjectName);
 
   /**
    * \brief Refactor the project after a layout is renamed.
@@ -653,6 +676,35 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::String& oldName,
       const gd::String& newName,
       const gd::ProjectBrowser& projectBrowser);
+
+  /**
+   * \brief Refactor the project **before** a behavior is renamed.
+   *
+   * \warning Do the renaming of the specified behavior after calling this.
+   * This is because the behavior is expected to have its old name for the
+   * refactoring.
+   */
+  static void RenameEventsBasedBehavior(
+      gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      const gd::EventsBasedBehavior &eventsBasedBehavior,
+      const gd::String &oldBehaviorName,
+      const gd::String &newBehaviorName,
+      const gd::ProjectBrowser &projectBrowser);
+
+  /**
+   * \brief Refactor the project **before** an object is renamed.
+   *
+   * \warning Do the renaming of the specified object after calling this.
+   * This is because the object is expected to have its old name for the
+   * refactoring.
+   */
+  static void RenameEventsBasedObject(
+      gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      const gd::EventsBasedObject &eventsBasedObject,
+      const gd::String &oldObjectName, const gd::String &newObjectName,
+      const gd::ProjectBrowser &projectBrowser);
 
   static void FindDependentBehaviorNames(
       const gd::Project& project,

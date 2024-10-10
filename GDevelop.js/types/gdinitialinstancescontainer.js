@@ -9,6 +9,7 @@ declare class gdInitialInstancesContainer {
   removeAllInstancesOnLayer(layer: string): void;
   removeInitialInstancesOfObject(obj: string): void;
   hasInstancesOfObject(objectName: string): boolean;
+  isInstancesCountOfObjectGreaterThan(objectName: string, minInstanceCount: number): boolean;
   someInstancesAreOnLayer(layer: string): boolean;
   renameInstancesOfObject(oldName: string, newName: string): void;
   removeInstance(inst: gdInitialInstance): void;

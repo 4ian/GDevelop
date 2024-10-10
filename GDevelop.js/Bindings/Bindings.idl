@@ -1380,6 +1380,7 @@ interface InitialInstancesContainer {
     void RemoveAllInstancesOnLayer([Const] DOMString layer);
     void RemoveInitialInstancesOfObject([Const] DOMString obj);
     boolean HasInstancesOfObject([Const] DOMString objectName);
+    boolean IsInstancesCountOfObjectGreaterThan([Const] DOMString objectName, unsigned long minInstanceCount);
     boolean SomeInstancesAreOnLayer([Const] DOMString layer);
     void RenameInstancesOfObject([Const] DOMString oldName, [Const] DOMString newName);
     void RemoveInstance([Const, Ref] InitialInstance inst);
@@ -2208,6 +2209,8 @@ interface PlatformExtension {
     [Const, Value] DOMString STATIC_GetNamespaceSeparator();
     [Const, Value] DOMString STATIC_GetBehaviorFullType(
         [Const] DOMString extensionName, [Const] DOMString behaviorName);
+    [Const, Value] DOMString STATIC_GetObjectFullType(
+        [Const] DOMString extensionName, [Const] DOMString objectName);
 };
 
 interface EventsList {

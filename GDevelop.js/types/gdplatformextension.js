@@ -57,6 +57,7 @@ declare class gdPlatformExtension {
   getAllDependencies(): gdVectorDependencyMetadata;
   static getNamespaceSeparator(): string;
   static getBehaviorFullType(extensionName: string, behaviorName: string): string;
+  static getObjectFullType(extensionName: string, objectName: string): string;
   delete(): void;
   ptr: number;
 };

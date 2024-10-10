@@ -1146,6 +1146,7 @@ export class InitialInstancesContainer extends EmscriptenObject {
   removeAllInstancesOnLayer(layer: string): void;
   removeInitialInstancesOfObject(obj: string): void;
   hasInstancesOfObject(objectName: string): boolean;
+  isInstancesCountOfObjectGreaterThan(objectName: string, minInstanceCount: number): boolean;
   someInstancesAreOnLayer(layer: string): boolean;
   renameInstancesOfObject(oldName: string, newName: string): void;
   removeInstance(inst: InitialInstance): void;
@@ -1670,6 +1671,7 @@ export class PlatformExtension extends EmscriptenObject {
   getAllDependencies(): VectorDependencyMetadata;
   static getNamespaceSeparator(): string;
   static getBehaviorFullType(extensionName: string, behaviorName: string): string;
+  static getObjectFullType(extensionName: string, objectName: string): string;
 }
 
 export class EventsList extends EmscriptenObject {

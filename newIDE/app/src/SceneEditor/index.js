@@ -1414,14 +1414,14 @@ export default class SceneEditor extends React.Component<Props, State> {
         },
       },
       { type: 'separator' },
-      this.props.layout && {
-        label: i18n._(t`Extract as an external layout`),
-        click: () => this.setState({ extractAsExternalLayoutDialogOpen: true }),
+      {
+        label: i18n._(t`Extract as a custom object`),
+        click: () => this.setState({ extractAsCustomObjectDialogOpen: true }),
         enabled: hasSelectedInstances,
       },
       this.props.layout && {
-        label: i18n._(t`Extract as a custom object`),
-        click: () => this.setState({ extractAsCustomObjectDialogOpen: true }),
+        label: i18n._(t`Extract as an external layout`),
+        click: () => this.setState({ extractAsExternalLayoutDialogOpen: true }),
         enabled: hasSelectedInstances,
       },
       {
@@ -2262,7 +2262,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                         }
                       />
                     )}
-                    {this.state.extractAsCustomObjectDialogOpen && layout && (
+                    {this.state.extractAsCustomObjectDialogOpen && (
                       <ExtractAsCustomObjectDialog
                         project={project}
                         initialInstances={this.props.initialInstances}

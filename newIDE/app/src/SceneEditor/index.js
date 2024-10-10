@@ -16,7 +16,7 @@ import SetupGridDialog from './SetupGridDialog';
 import ScenePropertiesDialog from './ScenePropertiesDialog';
 import EventsBasedObjectScenePropertiesDialog from './EventsBasedObjectScenePropertiesDialog';
 import ExtractAsExternalLayoutDialog from './ExtractAsExternalLayoutDialog';
-import ExtractAsCustomObjectDialog from './ExtractAsCustomObjectDialog';
+import ExtractAsCustomObjectDialog from './CustomObjectExtractor/ExtractAsCustomObjectDialog';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import MosaicEditorsDisplayToolbar from './MosaicEditorsDisplay/Toolbar';
 import SwipeableDrawerEditorsDisplayToolbar from './SwipeableDrawerEditorsDisplay/Toolbar';
@@ -79,6 +79,7 @@ import {
 import { unserializeFromJSObject } from '../Utils/Serializer';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { type TileMapTileSelection } from '../InstancesEditor/TileSetVisualizer';
+import { extractAsCustomObject } from './CustomObjectExtractor/CustomObjectExtractor';
 
 const gd: libGDevelop = global.gd;
 
@@ -1701,118 +1702,32 @@ export default class SceneEditor extends React.Component<Props, State> {
     chosenEventsBasedObjectName: string,
     shouldRemoveSceneObjectsWhenNoMoreInstance: boolean
   ) => {
-    const { project, layout, onExtractAsEventBasedObject } = this.props;
-    const { editorDisplay } = this;
-    if (!layout || !onExtractAsEventBasedObject || !editorDisplay) return;
-
-    let extensionName = chosenExtensionName;
-    if (
-      isNewExtension ||
-      !project.hasEventsFunctionsExtensionNamed(extensionName)
-    ) {
-      extensionName = newNameGenerator(
-        gd.Project.getSafeName(chosenExtensionName),
-        name => project.hasEventsFunctionsExtensionNamed(name)
-      );
-      project.insertNewEventsFunctionsExtension(extensionName, 0);
-    }
-    const eventsBasedObjects = project
-      .getEventsFunctionsExtension(extensionName)
-      .getEventsBasedObjects();
-
-    const selectionAABB = editorDisplay.instancesHandlers.getSelectionAABB();
-    const serializedSelection = this.instancesSelection
-      .getSelectedInstances()
-      .map(instance => serializeToJSObject(instance));
-
-    const eventsBasedObjectName = newNameGenerator(
-      gd.Project.getSafeName(chosenEventsBasedObjectName),
-      name => eventsBasedObjects.has(name)
-    );
-    const newEventsBasedObject = eventsBasedObjects.insertNew(
-      eventsBasedObjectName,
-      eventsBasedObjects.getCount()
-    );
-    newEventsBasedObject.setAreaMinX(0);
-    newEventsBasedObject.setAreaMinY(0);
-    newEventsBasedObject.setAreaMinZ(0);
-    newEventsBasedObject.setAreaMaxX(selectionAABB.width());
-    newEventsBasedObject.setAreaMaxY(selectionAABB.height());
-    newEventsBasedObject.setAreaMaxZ(selectionAABB.depth());
-
-    const childObjects = newEventsBasedObject.getObjects();
-    const sceneObjects = layout.getObjects();
-
-    let zOrder = 0;
-    let layer = '';
-    for (const serializedInstance of serializedSelection) {
-      const instance = new gd.InitialInstance();
-      unserializeFromJSObject(instance, serializedInstance);
-      layer = instance.getLayer();
-      zOrder = Math.max(zOrder, instance.getZOrder());
-
-      instance.setX(instance.getX() - selectionAABB.left);
-      instance.setY(instance.getY() - selectionAABB.top);
-      instance.setZ(instance.getZ() - selectionAABB.zMin);
-      instance.setLayer('');
-
-      const objectName = instance.getObjectName();
-      if (!childObjects.hasObjectNamed(objectName)) {
-        const object = sceneObjects.getObject(objectName);
-        const serializedObject = serializeToJSObject(object);
-        const childObject = childObjects.insertNewObject(
-          project,
-          object.getType(),
-          objectName,
-          0
-        );
-        unserializeFromJSObject(
-          childObject,
-          serializedObject,
-          'unserializeFrom',
-          project
-        );
-      }
-
-      newEventsBasedObject
-        .getInitialInstances()
-        .insertInitialInstance(instance)
-        .resetPersistentUuid();
-      instance.delete();
-    }
-    const customObjectType = gd.PlatformExtension.getObjectFullType(
-      extensionName,
-      eventsBasedObjectName
-    );
-    sceneObjects.insertNewObject(
+    const {
       project,
-      customObjectType,
-      eventsBasedObjectName,
-      0
+      globalObjectsContainer,
+      objectsContainer,
+      initialInstances,
+      onExtractAsEventBasedObject,
+    } = this.props;
+    const { editorDisplay, deleteSelection, instancesSelection } = this;
+    if (!onExtractAsEventBasedObject || !editorDisplay) return;
+
+    extractAsCustomObject(
+      project,
+      globalObjectsContainer,
+      objectsContainer,
+      initialInstances,
+      chosenExtensionName,
+      isNewExtension,
+      chosenEventsBasedObjectName,
+      shouldRemoveSceneObjectsWhenNoMoreInstance,
+      instancesSelection.getSelectedInstances(),
+      editorDisplay.instancesHandlers.getSelectionAABB(),
+      deleteSelection,
+      onExtractAsEventBasedObject
     );
-
-    const sceneInstances = layout.getInitialInstances();
-    const customObjectInstance = sceneInstances.insertNewInitialInstance();
-    customObjectInstance.setObjectName(eventsBasedObjectName);
-    customObjectInstance.setX(selectionAABB.left);
-    customObjectInstance.setY(selectionAABB.top);
-    customObjectInstance.setZ(selectionAABB.zMin);
-    customObjectInstance.setLayer(layer);
-    customObjectInstance.setZOrder(zOrder);
-
-    this.deleteSelection();
-    if (shouldRemoveSceneObjectsWhenNoMoreInstance) {
-      for (let index = 0; index < childObjects.getObjectsCount(); index++) {
-        const childObjectName = childObjects.getObjectAt(index).getName();
-        if (!sceneInstances.hasInstancesOfObject(childObjectName)) {
-          sceneObjects.removeObject(childObjectName);
-        }
-      }
-    }
 
     this.setState({ extractAsCustomObjectDialogOpen: false });
-
-    onExtractAsEventBasedObject(extensionName, eventsBasedObjectName);
   };
 
   onSelectAllInstancesOfObjectInLayout = (objectName: string) => {

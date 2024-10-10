@@ -5,6 +5,7 @@ import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
 import Text from '../UI/Text';
 import TextField from '../UI/TextField';
+import Checkbox from '../UI/Checkbox';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import HelpButton from '../UI/HelpButton';
@@ -18,7 +19,11 @@ const gd: libGDevelop = global.gd;
 type Props = {|
   project: gdProject,
   suggestedName: string,
-  onApply: (extensionName: string, eventsBasedObjectName: string) => void,
+  onApply: (
+    extensionName: string,
+    eventsBasedObjectName: string,
+    shouldRemoveSceneObjectWhenNoMoreInstance: boolean
+  ) => void,
   onCancel: () => void,
 |};
 
@@ -43,6 +48,10 @@ export default function ExtractAsCustomObjectDialog({
     eventsBasedObjectName,
     setEventsBasedObjectName,
   ] = React.useState<string>(suggestedName);
+  const [
+    shouldRemoveSceneObjectWhenNoMoreInstance,
+    setShouldRemoveSceneObjectWhenNoMoreInstance,
+  ] = React.useState<boolean>(true);
 
   const eventsFunctionsExtensions = React.useMemo(
     () => enumerateEventsFunctionsExtensions(project),
@@ -52,12 +61,22 @@ export default function ExtractAsCustomObjectDialog({
   const apply = React.useCallback(
     () => {
       if (canCreateEventsBasedObject(extensionName, eventsBasedObjectName)) {
-        onApply(extensionName, eventsBasedObjectName);
+        onApply(
+          extensionName,
+          eventsBasedObjectName,
+          shouldRemoveSceneObjectWhenNoMoreInstance
+        );
       } else {
         onCancel();
       }
     },
-    [eventsBasedObjectName, extensionName, onApply, onCancel]
+    [
+      eventsBasedObjectName,
+      extensionName,
+      onApply,
+      onCancel,
+      shouldRemoveSceneObjectWhenNoMoreInstance,
+    ]
   );
 
   return (
@@ -163,6 +182,13 @@ export default function ExtractAsCustomObjectDialog({
           fullWidth
           value={eventsBasedObjectName}
           onChange={(e, value) => setEventsBasedObjectName(value)}
+        />
+        <Checkbox
+          label={<Trans>Remove objects from the scene list</Trans>}
+          checked={shouldRemoveSceneObjectWhenNoMoreInstance}
+          onCheck={(e, checked) =>
+            setShouldRemoveSceneObjectWhenNoMoreInstance(checked)
+          }
         />
       </ColumnStackLayout>
     </Dialog>

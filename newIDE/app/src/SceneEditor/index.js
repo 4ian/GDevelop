@@ -1697,7 +1697,8 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   extractAsCustomObject = (
     extensionName: string,
-    eventsBasedObjectName: string
+    eventsBasedObjectName: string,
+    shouldRemoveSceneObjectWhenNoMoreInstance: boolean
   ) => {
     const { project, layout, onExtractAsEventBasedObject } = this.props;
     const { editorDisplay } = this;
@@ -1781,9 +1782,8 @@ export default class SceneEditor extends React.Component<Props, State> {
       0
     );
 
-    const customObjectInstance = layout
-      .getInitialInstances()
-      .insertNewInitialInstance();
+    const sceneInstances = layout.getInitialInstances();
+    const customObjectInstance = sceneInstances.insertNewInitialInstance();
     customObjectInstance.setObjectName(eventsBasedObjectName);
     customObjectInstance.setX(selectionAABB.left);
     customObjectInstance.setY(selectionAABB.top);
@@ -1792,7 +1792,14 @@ export default class SceneEditor extends React.Component<Props, State> {
     customObjectInstance.setZOrder(zOrder);
 
     this.deleteSelection();
-    // TODO Delete the objects if there is no more instance and the option is checked.
+    if (shouldRemoveSceneObjectWhenNoMoreInstance) {
+      for (let index = 0; index < childObjects.getObjectsCount(); index++) {
+        const childObjectName = childObjects.getObjectAt(index).getName();
+        if (!sceneInstances.hasInstancesOfObject(childObjectName)) {
+          sceneObjects.removeObject(childObjectName);
+        }
+      }
+    }
 
     this.setState({ extractAsCustomObjectDialogOpen: false });
 
@@ -2343,12 +2350,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                             extractAsCustomObjectDialogOpen: false,
                           })
                         }
-                        onApply={(extensionName, eventsBasedObjectName) =>
-                          this.extractAsCustomObject(
-                            extensionName,
-                            eventsBasedObjectName
-                          )
-                        }
+                        onApply={this.extractAsCustomObject}
                       />
                     )}
                     <DismissableInfoBar

@@ -2037,6 +2037,7 @@ const MainFrame = (props: Props) => {
     extensionName: string,
     eventsBasedObjectName: string
   ) => {
+    if (!currentProject) return;
     openEventsFunctionsExtension(
       extensionName,
       null,

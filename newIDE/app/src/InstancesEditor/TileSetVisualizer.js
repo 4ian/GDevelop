@@ -673,6 +673,7 @@ const TileSetVisualizer = ({
           <Line justifyContent="space-between" noMargin>
             <LineStackLayout alignItems="center" noMargin>
               <IconButton
+                id="paintBrush"
                 size="small"
                 tooltip={t`Paint`}
                 selected={
@@ -700,6 +701,7 @@ const TileSetVisualizer = ({
                 <Brush style={styles.icon} />
               </IconButton>
               <IconButton
+                id="horizontalFlip"
                 size="small"
                 tooltip={t`Horizontal flip`}
                 selected={shouldFlipHorizontally}
@@ -723,6 +725,7 @@ const TileSetVisualizer = ({
                 <FlipHorizontal style={styles.icon} />
               </IconButton>
               <IconButton
+                id="verticalFlip"
                 size="small"
                 tooltip={t`Vertical flip`}
                 selected={shouldFlipVertically}
@@ -747,6 +750,7 @@ const TileSetVisualizer = ({
               </IconButton>
             </LineStackLayout>
             <IconButton
+              id="eraseBrush"
               size="small"
               tooltip={t`Erase`}
               selected={

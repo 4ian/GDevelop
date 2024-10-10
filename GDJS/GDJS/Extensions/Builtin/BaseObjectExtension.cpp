@@ -216,6 +216,8 @@ BaseObjectExtension::BaseObjectExtension() {
       "gdjs.evtTools.object.movesTowardTest");
   GetAllConditions()["EstTourne"].SetFunctionName(
       "gdjs.evtTools.object.turnedTowardTest");
+  GetAllConditions()["IsTurnedTowardObject"].SetFunctionName(
+      "gdjs.evtTools.object.isTurnedTowardObject");
   GetAllConditions()["SourisSurObjet"].SetFunctionName(
       "gdjs.evtTools.input.cursorOnObject");
 

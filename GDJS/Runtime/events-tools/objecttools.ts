@@ -292,6 +292,7 @@ namespace gdjs {
         );
       };
 
+      // Deprecated
       export const _turnedToward = function (obj1, obj2, tolerance) {
         let objAngle = Math.atan2(
           obj2.getDrawableY() +
@@ -310,6 +311,7 @@ namespace gdjs {
         );
       };
 
+      // Deprecated
       export const turnedTowardTest = function (
         objectsLists1,
         objectsLists2,
@@ -318,6 +320,36 @@ namespace gdjs {
       ) {
         return gdjs.evtTools.object.twoListsTest(
           gdjs.evtTools.object._turnedToward,
+          objectsLists1,
+          objectsLists2,
+          inverted,
+          tolerance
+        );
+      };
+
+      export const _isTurnedTowardObject = function (
+        obj1: gdjs.RuntimeObject,
+        obj2: gdjs.RuntimeObject,
+        tolerance: float
+      ) {
+        return (
+          Math.abs(
+            gdjs.evtTools.common.angleDifference(
+              obj1.getAngle(),
+              obj1.getAngleToObject(obj2)
+            )
+          ) <= tolerance
+        );
+      };
+
+      export const isTurnedTowardObject = function (
+        objectsLists1: ObjectsLists,
+        objectsLists2: ObjectsLists,
+        tolerance: float,
+        inverted: boolean
+      ) {
+        return gdjs.evtTools.object.twoListsTest(
+          gdjs.evtTools.object._isTurnedTowardObject,
           objectsLists1,
           objectsLists2,
           inverted,

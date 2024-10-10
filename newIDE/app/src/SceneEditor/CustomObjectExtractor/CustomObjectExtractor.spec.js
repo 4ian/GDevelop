@@ -11,6 +11,7 @@ describe('CustomObjectExtractor', () => {
     const { project, testLayout } = makeTestProject(gd);
 
     const initialInstances = testLayout.getInitialInstances();
+    const otherInstancesCount = initialInstances.getInstancesCount();
     const leftInstance = initialInstances.insertNewInitialInstance();
     leftInstance.setObjectName('MySpriteObject');
     leftInstance.setX(200);
@@ -82,5 +83,22 @@ describe('CustomObjectExtractor', () => {
     expect(rightChildInstance.getY()).toBe(0);
     expect(rightChildInstance.getCustomWidth()).toBe(100);
     expect(rightChildInstance.getCustomHeight()).toBe(120);
+
+    expect(testLayout.getObjects().hasObjectNamed('MyCustomObject')).toBe(true);
+    const customObject = testLayout.getObjects().getObject('MyCustomObject');
+    expect(customObject.getType()).toBe('MyExtension::MyCustomObject');
+
+    // The 2 instances were removed and replaced by an instance of the new custom object.
+    expect(initialInstances.getInstancesCount()).toBe(otherInstancesCount + 1);
+
+    const customObjectInstances = getInstancesInLayoutForObject(
+      initialInstances,
+      'MyCustomObject'
+    );
+    expect(customObjectInstances.length).toBe(1);
+    const customObjectInstance = customObjectInstances[0];
+    expect(customObjectInstance.getObjectName()).toBe('MyCustomObject');
+    expect(customObjectInstance.getX()).toBe(200);
+    expect(customObjectInstance.getY()).toBe(500);
   });
 });

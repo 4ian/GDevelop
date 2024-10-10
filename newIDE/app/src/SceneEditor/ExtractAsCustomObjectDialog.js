@@ -11,10 +11,7 @@ import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import HelpButton from '../UI/HelpButton';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
-import SemiControlledTextField from '../UI/SemiControlledTextField';
 import { enumerateEventsFunctionsExtensions } from '../ProjectManager/EnumerateProjectItems';
-
-const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
@@ -22,6 +19,7 @@ type Props = {|
   selectedInstances: Array<gdInitialInstance>,
   onApply: (
     extensionName: string,
+    isNewExtension: boolean,
     eventsBasedObjectName: string,
     shouldRemoveSceneObjectsWhenNoMoreInstance: boolean
   ) => void,
@@ -29,13 +27,6 @@ type Props = {|
 |};
 
 const CREATE_NEW_EXTENSION_PLACEHOLDER = '<create a new extension>';
-
-const canCreateEventsBasedObject = (
-  extensionName: string,
-  eventsBasedObjectName: string
-) =>
-  gd.Project.isNameSafe(extensionName) &&
-  gd.Project.isNameSafe(eventsBasedObjectName);
 
 export default function ExtractAsCustomObjectDialog({
   project,
@@ -90,21 +81,18 @@ export default function ExtractAsCustomObjectDialog({
 
   const apply = React.useCallback(
     () => {
-      if (canCreateEventsBasedObject(extensionName, eventsBasedObjectName)) {
-        onApply(
-          extensionName,
-          eventsBasedObjectName,
-          canRemoveSceneObjects && shouldRemoveSceneObjectsWhenNoMoreInstance
-        );
-      } else {
-        onCancel();
-      }
+      onApply(
+        extensionName,
+        isNewExtension,
+        eventsBasedObjectName,
+        canRemoveSceneObjects && shouldRemoveSceneObjectsWhenNoMoreInstance
+      );
     },
     [
-      eventsBasedObjectName,
-      extensionName,
       onApply,
-      onCancel,
+      extensionName,
+      isNewExtension,
+      eventsBasedObjectName,
       canRemoveSceneObjects,
       shouldRemoveSceneObjectsWhenNoMoreInstance,
     ]
@@ -124,9 +112,6 @@ export default function ExtractAsCustomObjectDialog({
           key="apply"
           label={<Trans>Move instances</Trans>}
           primary={true}
-          disabled={
-            !canCreateEventsBasedObject(extensionName, eventsBasedObjectName)
-          }
           onClick={apply}
         />,
       ]}
@@ -140,7 +125,6 @@ export default function ExtractAsCustomObjectDialog({
       onApply={apply}
       open
       maxWidth="sm"
-      exceptionallyStillAllowRenderingInstancesEditors
     >
       <ColumnStackLayout noMargin>
         <Text>
@@ -183,28 +167,11 @@ export default function ExtractAsCustomObjectDialog({
             />
           </SelectField>
           {isNewExtension ? (
-            <SemiControlledTextField
-              commitOnBlur
-              value={extensionName}
+            <TextField
               floatingLabelText={<Trans>New extension name</Trans>}
-              onChange={(extensionName: string) =>
-                setExtensionName(extensionName)
-              }
               fullWidth
-              errorText={
-                project.hasEventsFunctionsExtensionNamed(extensionName) ? (
-                  <Trans>
-                    This name is already taken by another extension.
-                  </Trans>
-                ) : !gd.Project.isNameSafe(extensionName) ? (
-                  <Trans>
-                    This name is not valid. Only use alphanumeric characters
-                    (0-9, a-z) and underscores.
-                  </Trans>
-                ) : (
-                  undefined
-                )
-              }
+              value={extensionName}
+              onChange={(e, value) => setExtensionName(value)}
             />
           ) : null}
         </ResponsiveLineStackLayout>

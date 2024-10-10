@@ -1696,15 +1696,24 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   extractAsCustomObject = (
-    extensionName: string,
-    eventsBasedObjectName: string,
+    chosenExtensionName: string,
+    isNewExtension: boolean,
+    chosenEventsBasedObjectName: string,
     shouldRemoveSceneObjectsWhenNoMoreInstance: boolean
   ) => {
     const { project, layout, onExtractAsEventBasedObject } = this.props;
     const { editorDisplay } = this;
     if (!layout || !onExtractAsEventBasedObject || !editorDisplay) return;
 
-    if (!project.hasEventsFunctionsExtensionNamed(extensionName)) {
+    let extensionName = chosenExtensionName;
+    if (
+      isNewExtension ||
+      !project.hasEventsFunctionsExtensionNamed(extensionName)
+    ) {
+      extensionName = newNameGenerator(
+        gd.Project.getSafeName(chosenExtensionName),
+        name => project.hasEventsFunctionsExtensionNamed(name)
+      );
       project.insertNewEventsFunctionsExtension(extensionName, 0);
     }
     const eventsBasedObjects = project
@@ -1716,12 +1725,12 @@ export default class SceneEditor extends React.Component<Props, State> {
       .getSelectedInstances()
       .map(instance => serializeToJSObject(instance));
 
-    const eventsBasedObjectNewName = newNameGenerator(
-      eventsBasedObjectName,
+    const eventsBasedObjectName = newNameGenerator(
+      gd.Project.getSafeName(chosenEventsBasedObjectName),
       name => eventsBasedObjects.has(name)
     );
     const newEventsBasedObject = eventsBasedObjects.insertNew(
-      eventsBasedObjectNewName,
+      eventsBasedObjectName,
       eventsBasedObjects.getCount()
     );
     newEventsBasedObject.setAreaMinX(0);
@@ -1803,7 +1812,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     this.setState({ extractAsCustomObjectDialogOpen: false });
 
-    onExtractAsEventBasedObject(extensionName, eventsBasedObjectNewName);
+    onExtractAsEventBasedObject(extensionName, eventsBasedObjectName);
   };
 
   onSelectAllInstancesOfObjectInLayout = (objectName: string) => {

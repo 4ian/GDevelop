@@ -53,7 +53,6 @@ export default function ExtractAsExternalLayoutDialog({
       onApply={apply}
       open
       maxWidth="sm"
-      exceptionallyStillAllowRenderingInstancesEditors
     >
       <ColumnStackLayout noMargin>
         <Text>

@@ -1712,20 +1712,20 @@ export default class SceneEditor extends React.Component<Props, State> {
     const { editorDisplay, deleteSelection, instancesSelection } = this;
     if (!onExtractAsEventBasedObject || !editorDisplay) return;
 
-    extractAsCustomObject(
+    extractAsCustomObject({
       project,
-      globalObjectsContainer,
-      objectsContainer,
+      globalObjects: globalObjectsContainer,
+      sceneObjects: objectsContainer,
       initialInstances,
       chosenExtensionName,
       isNewExtension,
       chosenEventsBasedObjectName,
       shouldRemoveSceneObjectsWhenNoMoreInstance,
-      instancesSelection.getSelectedInstances(),
-      editorDisplay.instancesHandlers.getSelectionAABB(),
+      selectedInstances: instancesSelection.getSelectedInstances(),
+      selectionAABB: editorDisplay.instancesHandlers.getSelectionAABB(),
       deleteSelection,
-      onExtractAsEventBasedObject
-    );
+      onExtractAsEventBasedObject,
+    });
 
     this.setState({ extractAsCustomObjectDialogOpen: false });
   };

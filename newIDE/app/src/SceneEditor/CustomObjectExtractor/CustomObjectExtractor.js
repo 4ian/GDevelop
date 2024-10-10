@@ -7,7 +7,20 @@ import Rectangle from '../../Utils/Rectangle';
 
 const gd: libGDevelop = global.gd;
 
-export const extractAsCustomObject = (
+export const extractAsCustomObject = ({
+  project,
+  globalObjects,
+  sceneObjects,
+  initialInstances,
+  chosenExtensionName,
+  isNewExtension,
+  chosenEventsBasedObjectName,
+  shouldRemoveSceneObjectsWhenNoMoreInstance,
+  selectedInstances,
+  selectionAABB,
+  deleteSelection,
+  onExtractAsEventBasedObject,
+}: {|
   project: gdProject,
   globalObjects: gdObjectsContainer | null,
   sceneObjects: gdObjectsContainer,
@@ -22,8 +35,8 @@ export const extractAsCustomObject = (
   onExtractAsEventBasedObject: (
     extensionName: string,
     eventsBasedObjectName: string
-  ) => void
-) => {
+  ) => void,
+|}) => {
   let extensionName = chosenExtensionName;
   if (
     isNewExtension ||

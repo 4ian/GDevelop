@@ -31,20 +31,23 @@ describe('CustomObjectExtractor', () => {
       initialInstances.removeInstance(rightInstance);
     };
 
-    extractAsCustomObject(
+    extractAsCustomObject({
       project,
-      project.getObjects(),
-      testLayout.getObjects(),
+      globalObjects: project.getObjects(),
+      sceneObjects: testLayout.getObjects(),
       initialInstances,
-      'MyExtension',
-      true,
-      'MyCustomObject',
-      true,
+      chosenExtensionName: 'MyExtension',
+      isNewExtension: true,
+      chosenEventsBasedObjectName: 'MyCustomObject',
+      shouldRemoveSceneObjectsWhenNoMoreInstance: true,
       selectedInstances,
-      new Rectangle(200, 500, 400, 650),
+      selectionAABB: new Rectangle(200, 500, 400, 650),
       deleteSelection,
-      (extensionName: string, eventsBasedObjectName: string) => {}
-    );
+      onExtractAsEventBasedObject: (
+        extensionName: string,
+        eventsBasedObjectName: string
+      ) => {},
+    });
 
     expect(project.hasEventsFunctionsExtensionNamed('MyExtension')).toBe(true);
 

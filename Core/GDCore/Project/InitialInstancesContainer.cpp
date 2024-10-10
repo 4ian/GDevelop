@@ -163,6 +163,20 @@ bool InitialInstancesContainer::HasInstancesOfObject(
                      });
 }
 
+bool InitialInstancesContainer::IsInstancesCountOfObjectGreaterThan(
+    const gd::String &objectName, const std::size_t minInstanceCount) const {
+  std::size_t count = 0;
+  for (const gd::InitialInstance &instance : initialInstances) {
+    if (instance.GetObjectName() == objectName) {
+      count++;
+      if (count > minInstanceCount) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 void InitialInstancesContainer::Create(
     const InitialInstancesContainer& source) {
   try {

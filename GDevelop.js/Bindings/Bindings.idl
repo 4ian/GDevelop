@@ -1380,6 +1380,7 @@ interface InitialInstancesContainer {
     void RemoveAllInstancesOnLayer([Const] DOMString layer);
     void RemoveInitialInstancesOfObject([Const] DOMString obj);
     boolean HasInstancesOfObject([Const] DOMString objectName);
+    boolean IsInstancesCountOfObjectGreaterThan([Const] DOMString objectName, unsigned long minInstanceCount);
     boolean SomeInstancesAreOnLayer([Const] DOMString layer);
     void RenameInstancesOfObject([Const] DOMString oldName, [Const] DOMString newName);
     void RemoveInstance([Const, Ref] InitialInstance inst);

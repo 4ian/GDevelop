@@ -154,6 +154,13 @@ class GD_CORE_API InitialInstancesContainer {
   bool HasInstancesOfObject(const gd::String &objectName) const;
 
   /**
+   * \brief Return true if there is at least N instances of the given object.
+   */
+  bool
+  IsInstancesCountOfObjectGreaterThan(const gd::String &objectName,
+                                      const std::size_t minInstanceCount) const;
+
+  /**
    * \brief Remove all instances
    */
   void Clear();

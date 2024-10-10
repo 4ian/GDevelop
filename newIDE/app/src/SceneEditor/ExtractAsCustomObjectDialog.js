@@ -18,10 +18,12 @@ const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
+  initialInstances: gdInitialInstancesContainer,
+  selectedInstances: Array<gdInitialInstance>,
   onApply: (
     extensionName: string,
     eventsBasedObjectName: string,
-    shouldRemoveSceneObjectWhenNoMoreInstance: boolean
+    shouldRemoveSceneObjectsWhenNoMoreInstance: boolean
   ) => void,
   onCancel: () => void,
 |};
@@ -37,6 +39,8 @@ const canCreateEventsBasedObject = (
 
 export default function ExtractAsCustomObjectDialog({
   project,
+  initialInstances,
+  selectedInstances,
   onApply,
   onCancel,
 }: Props) {
@@ -47,13 +51,41 @@ export default function ExtractAsCustomObjectDialog({
     setEventsBasedObjectName,
   ] = React.useState<string>('');
   const [
-    shouldRemoveSceneObjectWhenNoMoreInstance,
-    setShouldRemoveSceneObjectWhenNoMoreInstance,
+    shouldRemoveSceneObjectsWhenNoMoreInstance,
+    setShouldRemoveSceneObjectsWhenNoMoreInstance,
   ] = React.useState<boolean>(true);
 
   const eventsFunctionsExtensions = React.useMemo(
     () => enumerateEventsFunctionsExtensions(project),
     [project]
+  );
+
+  const canRemoveSceneObjects = React.useMemo(
+    () => {
+      const selectedInstanceCountPerObject = new Map<string, number>();
+      for (const selectedInstance of selectedInstances) {
+        const objectName = selectedInstance.getObjectName();
+        let selectedInstanceCount =
+          selectedInstanceCountPerObject.get(objectName) || 0;
+        selectedInstanceCount++;
+        selectedInstanceCountPerObject.set(objectName, selectedInstanceCount);
+      }
+      for (const [
+        objectName,
+        selectedInstanceCount,
+      ] of selectedInstanceCountPerObject) {
+        if (
+          initialInstances.isInstancesCountOfObjectGreaterThan(
+            objectName,
+            selectedInstanceCount
+          )
+        ) {
+          return false;
+        }
+      }
+      return true;
+    },
+    [initialInstances, selectedInstances]
   );
 
   const apply = React.useCallback(
@@ -62,7 +94,7 @@ export default function ExtractAsCustomObjectDialog({
         onApply(
           extensionName,
           eventsBasedObjectName,
-          shouldRemoveSceneObjectWhenNoMoreInstance
+          canRemoveSceneObjects && shouldRemoveSceneObjectsWhenNoMoreInstance
         );
       } else {
         onCancel();
@@ -73,7 +105,8 @@ export default function ExtractAsCustomObjectDialog({
       extensionName,
       onApply,
       onCancel,
-      shouldRemoveSceneObjectWhenNoMoreInstance,
+      canRemoveSceneObjects,
+      shouldRemoveSceneObjectsWhenNoMoreInstance,
     ]
   );
 
@@ -183,10 +216,13 @@ export default function ExtractAsCustomObjectDialog({
         />
         <Checkbox
           label={<Trans>Remove objects from the scene list</Trans>}
-          checked={shouldRemoveSceneObjectWhenNoMoreInstance}
-          onCheck={(e, checked) =>
-            setShouldRemoveSceneObjectWhenNoMoreInstance(checked)
+          checked={
+            canRemoveSceneObjects && shouldRemoveSceneObjectsWhenNoMoreInstance
           }
+          onCheck={(e, checked) =>
+            setShouldRemoveSceneObjectsWhenNoMoreInstance(checked)
+          }
+          disabled={!canRemoveSceneObjects}
         />
       </ColumnStackLayout>
     </Dialog>

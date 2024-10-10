@@ -1698,7 +1698,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   extractAsCustomObject = (
     extensionName: string,
     eventsBasedObjectName: string,
-    shouldRemoveSceneObjectWhenNoMoreInstance: boolean
+    shouldRemoveSceneObjectsWhenNoMoreInstance: boolean
   ) => {
     const { project, layout, onExtractAsEventBasedObject } = this.props;
     const { editorDisplay } = this;
@@ -1792,7 +1792,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     customObjectInstance.setZOrder(zOrder);
 
     this.deleteSelection();
-    if (shouldRemoveSceneObjectWhenNoMoreInstance) {
+    if (shouldRemoveSceneObjectsWhenNoMoreInstance) {
       for (let index = 0; index < childObjects.getObjectsCount(); index++) {
         const childObjectName = childObjects.getObjectAt(index).getName();
         if (!sceneInstances.hasInstancesOfObject(childObjectName)) {
@@ -2341,6 +2341,8 @@ export default class SceneEditor extends React.Component<Props, State> {
                     {this.state.extractAsCustomObjectDialogOpen && layout && (
                       <ExtractAsCustomObjectDialog
                         project={project}
+                        initialInstances={this.props.initialInstances}
+                        selectedInstances={this.instancesSelection.getSelectedInstances()}
                         onCancel={() =>
                           this.setState({
                             extractAsCustomObjectDialogOpen: false,

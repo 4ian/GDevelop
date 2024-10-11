@@ -148,6 +148,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         openBehaviorEvents={this.props.openBehaviorEvents}
         onExtractAsExternalLayout={this.props.onExtractAsExternalLayout}
         onExtractAsEventBasedObject={this.props.onExtractAsEventBasedObject}
+        onOpenEventBasedObjectEditor={this.props.onOpenEventBasedObjectEditor}
         onObjectEdited={objectWithContext =>
           this.props.onSceneObjectEdited(layout, objectWithContext)
         }

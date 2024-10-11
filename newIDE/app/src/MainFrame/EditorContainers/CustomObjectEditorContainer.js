@@ -196,6 +196,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
             this.props.onEventsBasedObjectChildrenEdited
           }
           onExtractAsEventBasedObject={this.props.onExtractAsEventBasedObject}
+          onOpenEventBasedObjectEditor={this.props.onOpenEventBasedObjectEditor}
         />
       </div>
     );

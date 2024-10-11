@@ -808,6 +808,24 @@ gd::String PlatformExtension::GetObjectFullType(const gd::String &extensionName,
   return extensionName + separator + objectName;
 }
 
+gd::String PlatformExtension::GetExtensionFromFullObjectType(const gd::String& type) {
+  const auto separatorIndex =
+      type.find(PlatformExtension::GetNamespaceSeparator());
+  if (separatorIndex == std::string::npos) {
+    return "";
+  }
+  return type.substr(0, separatorIndex);
+}
+
+gd::String PlatformExtension::GetObjectNameFromFullObjectType(const gd::String& type) {
+  const auto separatorIndex =
+      type.find(PlatformExtension::GetNamespaceSeparator());
+  if (separatorIndex == std::string::npos) {
+    return "";
+  }
+  return type.substr(separatorIndex + 2);
+}
+
 PlatformExtension::PlatformExtension()
     : deprecated(false), category(_("General")) {}
 

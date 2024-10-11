@@ -2211,6 +2211,8 @@ interface PlatformExtension {
         [Const] DOMString extensionName, [Const] DOMString behaviorName);
     [Const, Value] DOMString STATIC_GetObjectFullType(
         [Const] DOMString extensionName, [Const] DOMString objectName);
+    [Const, Value] DOMString STATIC_GetExtensionFromFullObjectType([Const] DOMString type);
+    [Const, Value] DOMString STATIC_GetObjectNameFromFullObjectType([Const] DOMString type);
 };
 
 interface EventsList {

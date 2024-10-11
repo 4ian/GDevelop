@@ -653,6 +653,11 @@ class GD_CORE_API PlatformExtension {
   static gd::String GetObjectFullType(const gd::String &extensionName,
                                       const gd::String &objectName);
 
+
+  static gd::String GetExtensionFromFullObjectType(const gd::String& type);
+
+  static gd::String GetObjectNameFromFullObjectType(const gd::String& type);
+
 private:
   /**
    * Set the namespace (the string all actions/conditions/expressions start

@@ -13,9 +13,15 @@ import HelpButton from '../../UI/HelpButton';
 import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 import { enumerateEventsFunctionsExtensions } from '../../ProjectManager/EnumerateProjectItems';
+import getObjectByName from '../../Utils/GetObjectByName';
+import AlertMessage from '../../UI/AlertMessage';
+
+const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
+  globalObjectsContainer: gdObjectsContainer | null,
+  objectsContainer: gdObjectsContainer,
   initialInstances: gdInitialInstancesContainer,
   selectedInstances: Array<gdInitialInstance>,
   onApply: (
@@ -31,6 +37,8 @@ const CREATE_NEW_EXTENSION_PLACEHOLDER = '<create a new extension>';
 
 export default function ExtractAsCustomObjectDialog({
   project,
+  globalObjectsContainer,
+  objectsContainer,
   initialInstances,
   selectedInstances,
   onApply,
@@ -80,16 +88,50 @@ export default function ExtractAsCustomObjectDialog({
     [initialInstances, selectedInstances]
   );
 
+  const has2DAnd3D = React.useMemo(
+    () => {
+      let has2D = false;
+      let has3D = false;
+      for (const selectedInstance of selectedInstances) {
+        const objectName = selectedInstance.getObjectName();
+        const object = getObjectByName(
+          globalObjectsContainer,
+          objectsContainer,
+          objectName
+        );
+        if (object) {
+          const objectMetadata = gd.MetadataProvider.getObjectMetadata(
+            project.getCurrentPlatform(),
+            object.getType()
+          );
+          has2D = has2D || !objectMetadata.isRenderedIn3D();
+          has3D = has3D || objectMetadata.isRenderedIn3D();
+          if (has2D && has3D) {
+            return true;
+          }
+        }
+      }
+      return false;
+    },
+    [globalObjectsContainer, objectsContainer, project, selectedInstances]
+  );
+
   const apply = React.useCallback(
     (i18n: I18nType) => {
-      onApply(
-        extensionName || i18n._(t`UntitledExtension`),
-        isNewExtension,
-        eventsBasedObjectName || i18n._(t`MyObject`),
-        canRemoveSceneObjects && shouldRemoveSceneObjectsWhenNoMoreInstance
-      );
+      if (has2DAnd3D) {
+        onCancel();
+      } else {
+        onApply(
+          extensionName || i18n._(t`UntitledExtension`),
+          isNewExtension,
+          eventsBasedObjectName || i18n._(t`MyObject`),
+          canRemoveSceneObjects && shouldRemoveSceneObjectsWhenNoMoreInstance
+        );
+      }
     },
     [
+      has2DAnd3D,
+      onCancel,
       onApply,
       extensionName,
       isNewExtension,
@@ -116,6 +158,7 @@ export default function ExtractAsCustomObjectDialog({
               label={<Trans>Move instances</Trans>}
               primary={true}
               onClick={() => apply(i18n)}
+              disabled={has2DAnd3D}
             />,
           ]}
           secondaryActions={[
@@ -135,6 +178,15 @@ export default function ExtractAsCustomObjectDialog({
                 Selected instances will be moved to a new custom object.
               </Trans>
             </Text>
+            {has2DAnd3D ? (
+              <AlertMessage kind="error">
+                <Trans>
+                  Custom objects can't contain both 2D or 3D.
+                  <br />
+                  Please select either 2D instances or 3D instances.
+                </Trans>
+              </AlertMessage>
+            ) : null}
             <ResponsiveLineStackLayout noMargin expand>
               <SelectField
                 floatingLabelText={

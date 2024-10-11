@@ -4,6 +4,7 @@ import { GDevelopUsageApi } from './ApiConfigs';
 import { type MessageDescriptor } from '../i18n/MessageDescriptor.flow';
 import { type MessageByLocale } from '../i18n/MessageByLocale';
 import { extractGDevelopApiErrorStatusAndCode } from './Errors';
+import { isNativeMobileApp } from '../Platform';
 
 export type Usage = {
   id: string,
@@ -370,11 +371,15 @@ export const getUserLimits = async (
   userId: string
 ): Promise<Limits> => {
   const authorizationHeader = await getAuthorizationHeader();
+  const params: {| userId: string, platform?: string |} = {
+    userId,
+  };
+  if (isNativeMobileApp()) {
+    params.platform = 'mobile';
+  }
 
   const response = await apiClient.get('/limits', {
-    params: {
-      userId,
-    },
+    params,
     headers: {
       Authorization: authorizationHeader,
     },

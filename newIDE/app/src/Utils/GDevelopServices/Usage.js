@@ -4,6 +4,7 @@ import { GDevelopUsageApi } from './ApiConfigs';
 import { type MessageDescriptor } from '../i18n/MessageDescriptor.flow';
 import { type MessageByLocale } from '../i18n/MessageByLocale';
 import { extractGDevelopApiErrorStatusAndCode } from './Errors';
+import { isNativeMobileApp } from '../Platform';
 
 export type Usage = {
   id: string,
@@ -88,6 +89,7 @@ export type Capabilities = {|
     maxPlayersPerLobby: number,
     themeCustomizationCapabilities: 'NONE' | 'BASIC' | 'FULL',
   |},
+  versionHistory: {| enabled: boolean |},
 |};
 
 export type UsagePrice = {|
@@ -369,11 +371,15 @@ export const getUserLimits = async (
   userId: string
 ): Promise<Limits> => {
   const authorizationHeader = await getAuthorizationHeader();
+  const params: {| userId: string, platform?: string |} = {
+    userId,
+  };
+  if (isNativeMobileApp()) {
+    params.platform = 'mobile';
+  }
 
   const response = await apiClient.get('/limits', {
-    params: {
-      userId,
-    },
+    params,
     headers: {
       Authorization: authorizationHeader,
     },
@@ -532,17 +538,6 @@ export const getRedirectToCheckoutUrl = ({
   return url.toString();
 };
 
-export const canUseCloudProjectHistory = (
-  subscription: ?Subscription
-): boolean => {
-  if (!subscription) return false;
-  return (
-    ['gdevelop_startup', 'gdevelop_education'].includes(subscription.planId) ||
-    (subscription.planId === 'gdevelop_gold' &&
-      !!subscription.benefitsFromEducationPlan)
-  );
-};
-
 export const redeemCode = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
@@ -595,3 +590,6 @@ export const shouldHideClassroomTab = (limits: ?Limits) =>
   limits.capabilities.classrooms.showClassroomTab
     ? false
     : true;
+
+export const canUseCloudProjectHistory = (limits: ?Limits): boolean =>
+  limits && limits.capabilities.versionHistory.enabled ? true : false;

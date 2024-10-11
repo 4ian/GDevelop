@@ -2378,6 +2378,7 @@ export const limitsForNoSubscriptionUser: Limits = {
       maxPlayersPerLobby: 4,
       themeCustomizationCapabilities: 'NONE',
     },
+    versionHistory: { enabled: false },
   },
   quotas: {
     'cordova-build': {
@@ -2427,6 +2428,7 @@ export const limitsForSilverUser: Limits = {
       maxPlayersPerLobby: 8,
       themeCustomizationCapabilities: 'BASIC',
     },
+    versionHistory: { enabled: false },
   },
   quotas: {
     'cordova-build': {
@@ -2476,6 +2478,7 @@ export const limitsForGoldUser: Limits = {
       maxPlayersPerLobby: 8,
       themeCustomizationCapabilities: 'BASIC',
     },
+    versionHistory: { enabled: false },
   },
   quotas: {
     'cordova-build': {
@@ -2536,6 +2539,7 @@ export const limitsForTeacherUser: Limits = {
       maxPlayersPerLobby: 8,
       themeCustomizationCapabilities: 'BASIC',
     },
+    versionHistory: { enabled: true },
   },
   quotas: {
     'cordova-build': {
@@ -2593,6 +2597,7 @@ export const limitsForStudentUser: Limits = {
       maxPlayersPerLobby: 8,
       themeCustomizationCapabilities: 'BASIC',
     },
+    versionHistory: { enabled: true },
   },
   quotas: {
     'cordova-build': {
@@ -2642,6 +2647,7 @@ export const limitsForStartupUser: Limits = {
       maxPlayersPerLobby: 8,
       themeCustomizationCapabilities: 'FULL',
     },
+    versionHistory: { enabled: true },
   },
   quotas: {
     'cordova-build': {
@@ -2691,6 +2697,7 @@ export const limitsReached: Limits = {
       maxPlayersPerLobby: 8,
       themeCustomizationCapabilities: 'BASIC',
     },
+    versionHistory: { enabled: false },
   },
   quotas: {
     'cordova-build': {
@@ -2740,6 +2747,7 @@ export const limitsForNoSubscriptionUserWithCredits: Limits = {
       maxPlayersPerLobby: 4,
       themeCustomizationCapabilities: 'NONE',
     },
+    versionHistory: { enabled: false },
   },
   quotas: {
     'cordova-build': {

@@ -434,10 +434,10 @@ function NewObjectDialog({
       <RaisedButton
         key="skip-and-create"
         label={
-          !isAssetBeingInstalled ? (
-            <Trans>Skip and create from scratch</Trans>
-          ) : (
+          isAssetBeingInstalled ? (
             <Trans>Adding...</Trans>
+          ) : (
+            <Trans>Skip and create from scratch</Trans>
           )
         }
         primary

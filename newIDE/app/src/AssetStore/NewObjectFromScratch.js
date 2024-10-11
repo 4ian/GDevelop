@@ -144,6 +144,15 @@ const getMergedInstalledWithDefaultEnumeratedObjectMetadataByCategory = ({
       {
         name: 'Scene3D::Model3DObject',
       },
+      {
+        name: 'TileMap::SimpleTileMap',
+        fullName: i18n._(t`Tile map`),
+        description: i18n._(t`Displays a tiled-based map.`),
+        iconFilename: 'JsPlatform/Extensions/tile_map.svg',
+        isRenderedIn3D: false,
+        assetStorePackTag: 'starter tilemaps',
+        requiredExtensions: [],
+      },
       eventsBasedObject && {
         name: 'Sprite3D::Sprite3D',
         fullName: i18n._(t`3D sprite`),

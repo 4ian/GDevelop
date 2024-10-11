@@ -1584,6 +1584,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         editName,
         deleteObjectFolderOrObjectWithContext,
         moveObjectFolderOrObjectToAnotherFolderInSameContainer,
+        forceUpdate,
         onAddNewObject,
         addFolder,
         selectedObjectFolderOrObjectsWithContext,
@@ -1591,11 +1592,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         cutObjectFolderOrObjectWithContext,
         duplicateObjectFolderOrObjectWithContext,
         onEditObject,
+        onOpenEventBasedObjectEditor,
         swapObjectAsset,
         selectObjectFolderOrObjectWithContext,
         setAsGlobalObject,
         onAddObjectInstance,
-        forceUpdate,
       ]
     );
 

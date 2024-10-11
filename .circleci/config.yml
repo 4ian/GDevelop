@@ -13,6 +13,7 @@ orbs:
   aws-cli: circleci/aws-cli@2.0.6
   macos: circleci/macos@2.5.1 # For Rosetta (see below)
   node: circleci/node@5.2.0 # For a recent npm version (see below)
+  win: circleci/windows@5.0.0
 jobs:
   # Build the **entire** app for macOS.
   build-macos:
@@ -174,6 +175,41 @@ jobs:
           name: Deploy to S3 (latest)
           command: aws s3 sync newIDE/electron-app/dist s3://gdevelop-releases/$(git rev-parse --abbrev-ref HEAD)/latest/
 
+  # Build the **entire** app for Windows.
+  build-windows:
+    executor:
+      name: win/default
+      size: large
+
+    steps:
+      - checkout
+      - run:
+          name: Install Node.js
+          command: nvm install 20; nvm use 20
+
+      # TODO: Build GDevelop.js?
+
+      # GDevelop IDE dependencies.
+      - run:
+          name: Install GDevelop IDE dependencies (1)
+          command: cd newIDE\app; npm install; cd ..\electron-app; npm install
+      - run:
+          name: Build the NSIS executable
+          command: cd newIDE\electron-app; node scripts/build.js --win nsis --publish=never
+      - run:
+          name: Build the AppX
+          command: cd newIDE\electron-app; node scripts/build.js --skip-app-build --win appx --publish=never
+      - run:
+          name: Clean artifacts
+          command: Remove-Item -Path "newIDE\electron-app\dist\win-unpacked" -Recurse -Force
+
+      # Upload artifacts (CircleCI)
+      - store_artifacts:
+          path: newIDE/electron-app/dist
+
+      # Upload artifacts (AWS)
+        # TODO
+
   # Build the WebAssembly library only (so that it's cached on a S3 and easy to re-use).
   build-gdevelop_js-wasm-only:
     docker:
@@ -236,6 +272,7 @@ workflows:
   builds:
     jobs:
       - build-gdevelop_js-wasm-only
+      - build-windows #TODO: filter by branch once it's verified to work.
       - build-macos:
           filters:
             branches:

@@ -121,6 +121,7 @@ export const identifyUserForAnalytics = (
   const userPreferences = loadPreferencesFromLocalStorage();
   const appLanguage = userPreferences ? userPreferences.language : undefined;
   const browserLanguage = getBrowserLanguageOrLocale();
+  const programOpeningCount = getProgramOpeningCount();
 
   const userProperties = {
     providerId: firebaseUser ? firebaseUser.providerId : undefined,
@@ -132,7 +133,9 @@ export const identifyUserForAnalytics = (
     versionWithHash: getIDEVersionWithHash(),
     appLanguage,
     browserLanguage,
-    programOpeningCount: getProgramOpeningCount(),
+    programOpeningCount,
+    // Shortcut to see first time users:
+    firstTimeUser: programOpeningCount <= 1,
     themeName: userPreferences ? userPreferences.themeName : 'Unknown',
     ...(isElectronApp ? { usedDesktopApp: true } : { usedWebApp: true }),
     // Additional profile information:

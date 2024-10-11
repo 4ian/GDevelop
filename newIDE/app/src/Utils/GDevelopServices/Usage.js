@@ -88,6 +88,7 @@ export type Capabilities = {|
     maxPlayersPerLobby: number,
     themeCustomizationCapabilities: 'NONE' | 'BASIC' | 'FULL',
   |},
+  versionHistory: {| enabled: boolean |},
 |};
 
 export type UsagePrice = {|
@@ -532,17 +533,6 @@ export const getRedirectToCheckoutUrl = ({
   return url.toString();
 };
 
-export const canUseCloudProjectHistory = (
-  subscription: ?Subscription
-): boolean => {
-  if (!subscription) return false;
-  return (
-    ['gdevelop_startup', 'gdevelop_education'].includes(subscription.planId) ||
-    (subscription.planId === 'gdevelop_gold' &&
-      !!subscription.benefitsFromEducationPlan)
-  );
-};
-
 export const redeemCode = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
@@ -595,3 +585,6 @@ export const shouldHideClassroomTab = (limits: ?Limits) =>
   limits.capabilities.classrooms.showClassroomTab
     ? false
     : true;
+
+export const canUseCloudProjectHistory = (limits: ?Limits): boolean =>
+  limits && limits.capabilities.versionHistory.enabled ? true : false;

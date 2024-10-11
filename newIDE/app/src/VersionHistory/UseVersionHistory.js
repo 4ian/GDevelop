@@ -106,7 +106,7 @@ const useVersionHistory = ({
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const ignoreFileMetadataChangesRef = React.useRef<boolean>(false);
   const freezeWhileLoadingSpecificVersionRef = React.useRef<boolean>(false);
-  const { subscription, getAuthorizationHeader, profile } = authenticatedUser;
+  const { limits, getAuthorizationHeader, profile } = authenticatedUser;
   const storageProvider = getStorageProvider();
   const [state, setState] = React.useState<PaginationState>(
     emptyPaginationState
@@ -122,9 +122,7 @@ const useVersionHistory = ({
   const storageProviderInternalName = storageProvider.internalName;
   const isCloudProject =
     storageProviderInternalName === CloudStorageProvider.internalName;
-  const isUserAllowedToSeeVersionHistory = canUseCloudProjectHistory(
-    subscription
-  );
+  const isUserAllowedToSeeVersionHistory = canUseCloudProjectHistory(limits);
   const [cloudProjectId, setCloudProjectId] = React.useState<?string>(
     getCloudProjectFileMetadataIdentifier(
       storageProviderInternalName,

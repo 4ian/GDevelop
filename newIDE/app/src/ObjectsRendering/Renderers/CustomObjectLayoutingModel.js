@@ -355,6 +355,23 @@ export const getLayoutedRenderedInstance = <T: ChildRenderedInstance>(
   const parentScaleX = parentWidth / parentInitialWidth;
   const parentScaleY = parentHeight / parentInitialHeight;
 
+  // Make sure to give a custom size to the instances only when it's necessary.
+  // Some objects like TextObject may wrap text differently with a custom size.
+  if (
+    (parentScaleX === 1 && parentScaleY === 1) ||
+    (!leftEdgeAnchor && !rightEdgeAnchor && !topEdgeAnchor && !bottomEdgeAnchor)
+  ) {
+    layoutedInstance.x = initialInstance.getX();
+    layoutedInstance.y = initialInstance.getY();
+    if (initialInstance.hasCustomSize()) {
+      layoutedInstance.setCustomWidth(initialInstance.getCustomWidth());
+      layoutedInstance.setCustomHeight(initialInstance.getCustomHeight());
+    } else {
+      layoutedInstance.setHasCustomSize(false);
+    }
+    return renderedInstance;
+  }
+
   const initialInstanceX = initialInstance.getX();
   const initialInstanceWidth = initialInstance.hasCustomSize()
     ? initialInstance.getCustomWidth()

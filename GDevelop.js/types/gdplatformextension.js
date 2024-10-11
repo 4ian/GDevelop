@@ -58,6 +58,8 @@ declare class gdPlatformExtension {
   static getNamespaceSeparator(): string;
   static getBehaviorFullType(extensionName: string, behaviorName: string): string;
   static getObjectFullType(extensionName: string, objectName: string): string;
+  static getExtensionFromFullObjectType(type: string): string;
+  static getObjectNameFromFullObjectType(type: string): string;
   delete(): void;
   ptr: number;
 };

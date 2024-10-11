@@ -1672,6 +1672,8 @@ export class PlatformExtension extends EmscriptenObject {
   static getNamespaceSeparator(): string;
   static getBehaviorFullType(extensionName: string, behaviorName: string): string;
   static getObjectFullType(extensionName: string, objectName: string): string;
+  static getExtensionFromFullObjectType(type: string): string;
+  static getObjectNameFromFullObjectType(type: string): string;
 }
 
 export class EventsList extends EmscriptenObject {

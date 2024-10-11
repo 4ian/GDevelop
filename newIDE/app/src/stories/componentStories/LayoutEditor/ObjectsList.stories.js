@@ -32,6 +32,7 @@ export const Default = () => (
         objectsContainer={testProject.testLayout.getObjects()}
         resourceManagementProps={fakeResourceManagementProps}
         onEditObject={action('On edit object')}
+        onOpenEventBasedObjectEditor={action('On edit children')}
         onExportAssets={action('On export assets')}
         onAddObjectInstance={action('On add instance to the scene')}
         onObjectCreated={action('On object created')}
@@ -64,6 +65,7 @@ export const WithSerializedObjectView = () => (
           objectsContainer={testProject.testLayout.getObjects()}
           resourceManagementProps={fakeResourceManagementProps}
           onEditObject={action('On edit object')}
+          onOpenEventBasedObjectEditor={action('On edit children')}
           onExportAssets={action('On export assets')}
           onAddObjectInstance={action('On add instance to the scene')}
           onObjectCreated={action('On object created')}

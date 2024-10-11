@@ -707,6 +707,8 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_GetNamespaceSeparator GetNamespaceSeparator
 #define STATIC_GetBehaviorFullType GetBehaviorFullType
 #define STATIC_GetObjectFullType GetObjectFullType
+#define STATIC_GetExtensionFromFullObjectType GetExtensionFromFullObjectType
+#define STATIC_GetObjectNameFromFullObjectType GetObjectNameFromFullObjectType
 #define STATIC_ApplyRefactoringForVariablesContainer \
   ApplyRefactoringForVariablesContainer
 #define STATIC_ApplyRefactoringForGroupVariablesContainer \

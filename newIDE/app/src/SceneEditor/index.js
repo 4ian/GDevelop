@@ -2265,6 +2265,10 @@ export default class SceneEditor extends React.Component<Props, State> {
                     {this.state.extractAsCustomObjectDialogOpen && (
                       <ExtractAsCustomObjectDialog
                         project={project}
+                        globalObjectsContainer={
+                          this.props.globalObjectsContainer
+                        }
+                        objectsContainer={this.props.objectsContainer}
                         initialInstances={this.props.initialInstances}
                         selectedInstances={this.instancesSelection.getSelectedInstances()}
                         onCancel={() =>

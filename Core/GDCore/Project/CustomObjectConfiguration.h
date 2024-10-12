@@ -140,12 +140,12 @@ protected:
 
   bool IsOverridingEventsBasedObjectChildrenConfiguration() const;
 
-  const Project* project; ///< The project is used to get the
-                          ///< EventBasedObject from the fullType.
+  const Project* project = nullptr; ///< The project is used to get the
+                                    ///< EventBasedObject from the fullType.
   gd::SerializerElement objectContent;
   std::unordered_set<gd::String> unfoldedChildren;
 
-  bool isMarkedAsOverridingEventsBasedObjectChildrenConfiguration;
+  bool isMarkedAsOverridingEventsBasedObjectChildrenConfiguration = false;
   mutable std::map<gd::String, std::unique_ptr<gd::ObjectConfiguration>> childObjectConfigurations;
 
   static gd::ObjectConfiguration badObjectConfiguration;

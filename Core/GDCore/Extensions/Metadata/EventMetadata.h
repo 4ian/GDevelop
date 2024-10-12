@@ -83,7 +83,7 @@ class GD_CORE_API EventMetadata {
   gd::String group;
 
   std::shared_ptr<gd::BaseEvent> instance;
-  bool hasCustomCodeGenerator;
+  bool hasCustomCodeGenerator = false;
   std::function<gd::String(gd::BaseEvent& event,
                            gd::EventsCodeGenerator& codeGenerator,
                            gd::EventsCodeGenerationContext& context)>

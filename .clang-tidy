@@ -1,0 +1,4 @@
+Checks: 'clang-diagnostic-*,clang-analyzer-*,cppcoreguidelines-*,-cppcoreguidelines-explicit-virtual-functions,-cppcoreguidelines-avoid-const-or-ref-data-members,-cppcoreguidelines-special-member-functions,-cppcoreguidelines-avoid-magic-numbers,-cppcoreguidelines-non-private-member-variables-in-classes,-cppcoreguidelines-owning-memory,-cppcoreguidelines-virtual-class-destructor,-clang-analyzer-optin.performance.Padding,-cppcoreguidelines-narrowing-conversions'
+WarningsAsErrors: 'cppcoreguidelines-pro-type-member-init, clang-analyzer-optin.cplusplus.UninitializedObject'
+HeaderFilterRegex: '.*'
+FormatStyle: none

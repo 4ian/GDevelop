@@ -152,8 +152,8 @@ class GD_CORE_API Resource {
   gd::String metadata;
   gd::String originName;
   gd::String originIdentifier;
-  bool userAdded;  ///< True if the resource was added by the user, and not
-                   ///< automatically by GDevelop.
+  bool userAdded = false;  ///< True if the resource was added by the user, and not
+                           ///< automatically by GDevelop.
 
   static gd::String badStr;
 };

@@ -40,8 +40,7 @@ class Object;
 class ObjectConfiguration;
 }  // namespace gd
 
-typedef std::function<std::unique_ptr<gd::ObjectConfiguration>()>
-    CreateFunPtr;
+typedef std::function<std::unique_ptr<gd::ObjectConfiguration>()> CreateFunPtr;
 
 namespace gd {
 
@@ -51,25 +50,25 @@ namespace gd {
  */
 class GD_CORE_API CompilationInfo {
  public:
-  CompilationInfo() : informationCompleted(false){};
-  virtual ~CompilationInfo(){};
+  CompilationInfo() {};
+  virtual ~CompilationInfo() {};
 
-  bool informationCompleted;
+  bool informationCompleted = false;
 
-  bool runtimeOnly;  ///< True if the extension was compiled for a runtime use
-                     ///< only
+  bool runtimeOnly = false;  ///< True if the extension was compiled for a
+                             ///< runtime use only
 
 #if defined(__GNUC__)
-  int gccMajorVersion;
-  int gccMinorVersion;
-  int gccPatchLevel;
+  int gccMajorVersion = 0;
+  int gccMinorVersion = 0;
+  int gccPatchLevel = 0;
 #endif
 
-  int sfmlMajorVersion;
-  int sfmlMinorVersion;
+  int sfmlMajorVersion = 0;
+  int sfmlMinorVersion = 0;
 
   gd::String gdCoreVersion;
-  int sizeOfpInt;
+  int sizeOfpInt = 0;
 };
 
 struct GD_CORE_API DuplicatedInstructionOptions {
@@ -239,11 +238,12 @@ class GD_CORE_API PlatformExtension {
    * \param instance The "blueprint" object to be copied when a new object is
    asked for.
    */
-  gd::ObjectMetadata& AddObject(const gd::String& name_,
-                                const gd::String& fullname_,
-                                const gd::String& description_,
-                                const gd::String& icon_,
-                                std::shared_ptr<gd::ObjectConfiguration> instance);
+  gd::ObjectMetadata& AddObject(
+      const gd::String& name_,
+      const gd::String& fullname_,
+      const gd::String& description_,
+      const gd::String& icon_,
+      std::shared_ptr<gd::ObjectConfiguration> instance);
 
   /**
    * \brief Declare a new events based object as being part of the extension.
@@ -253,11 +253,10 @@ class GD_CORE_API PlatformExtension {
    * \param description The user friendly description of the object
    * \param icon The icon of the object.
    */
-  gd::ObjectMetadata& AddEventsBasedObject(
-      const gd::String& name_,
-      const gd::String& fullname_,
-      const gd::String& description_,
-      const gd::String& icon_);
+  gd::ObjectMetadata& AddEventsBasedObject(const gd::String& name_,
+                                           const gd::String& fullname_,
+                                           const gd::String& description_,
+                                           const gd::String& icon_);
 
   /**
    * \brief Declare a new behavior as being part of the extension.
@@ -420,8 +419,7 @@ class GD_CORE_API PlatformExtension {
   PlatformExtension& SetTags(const gd::String& csvTags) {
     tags.clear();
     tags = csvTags.Split(',');
-    for (size_t i = 0; i < tags.size(); i++)
-    {
+    for (size_t i = 0; i < tags.size(); i++) {
       tags[i] = tags[i].Trim().LowerCase();
     }
     return *this;
@@ -634,31 +632,30 @@ class GD_CORE_API PlatformExtension {
    */
   static gd::String GetNamespaceSeparator() { return "::"; }
 
-  static gd::String GetEventsFunctionFullType(const gd::String &extensionName,
-                                              const gd::String &functionName);
+  static gd::String GetEventsFunctionFullType(const gd::String& extensionName,
+                                              const gd::String& functionName);
 
-  static gd::String
-  GetBehaviorEventsFunctionFullType(const gd::String &extensionName,
-                                    const gd::String &behaviorName,
-                                    const gd::String &functionName);
+  static gd::String GetBehaviorEventsFunctionFullType(
+      const gd::String& extensionName,
+      const gd::String& behaviorName,
+      const gd::String& functionName);
 
-  static gd::String GetBehaviorFullType(const gd::String &extensionName,
-                                        const gd::String &behaviorName);
+  static gd::String GetBehaviorFullType(const gd::String& extensionName,
+                                        const gd::String& behaviorName);
 
-  static gd::String
-  GetObjectEventsFunctionFullType(const gd::String &extensionName,
-                                  const gd::String &objectName,
-                                  const gd::String &functionName);
+  static gd::String GetObjectEventsFunctionFullType(
+      const gd::String& extensionName,
+      const gd::String& objectName,
+      const gd::String& functionName);
 
-  static gd::String GetObjectFullType(const gd::String &extensionName,
-                                      const gd::String &objectName);
-
+  static gd::String GetObjectFullType(const gd::String& extensionName,
+                                      const gd::String& objectName);
 
   static gd::String GetExtensionFromFullObjectType(const gd::String& type);
 
   static gd::String GetObjectNameFromFullObjectType(const gd::String& type);
 
-private:
+ private:
   /**
    * Set the namespace (the string all actions/conditions/expressions start
    * with).
@@ -673,10 +670,10 @@ private:
   gd::String fullname;      ///< Name displayed to users in the editor.
   gd::String informations;  ///< Description displayed to users in the editor.
   gd::String category;
-  gd::String author;        ///< Author displayed to users in the editor.
-  gd::String license;       ///< License name displayed to users in the editor.
-  bool deprecated;  ///< true if the extension is deprecated and shouldn't be
-                    ///< shown in IDE.
+  gd::String author;   ///< Author displayed to users in the editor.
+  gd::String license;  ///< License name displayed to users in the editor.
+  bool deprecated;     ///< true if the extension is deprecated and shouldn't be
+                       ///< shown in IDE.
   gd::String helpPath;  ///< The relative path to the help for this extension in
                         ///< the documentation.
   gd::String iconUrl;   ///< The URL to the icon to be shown for this extension.

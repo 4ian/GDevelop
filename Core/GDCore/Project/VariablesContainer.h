@@ -187,7 +187,7 @@ class GD_CORE_API VariablesContainer {
   ///@}
 
  private:
-  SourceType sourceType;
+  SourceType sourceType = Unknown;
   std::vector<std::pair<gd::String, std::shared_ptr<gd::Variable>>> variables;
   mutable gd::String persistentUuid;  ///< A persistent random version 4 UUID,
                                       ///< useful for computing changesets.

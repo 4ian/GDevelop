@@ -37,8 +37,7 @@ BehaviorMetadata::BehaviorMetadata(
       className(className_),
       iconFilename(icon24x24),
       instance(instance_),
-      sharedDatasInstance(sharedDatasInstance_),
-      quickCustomizationVisibility(QuickCustomization::Visibility::Default) {
+      sharedDatasInstance(sharedDatasInstance_) {
   SetFullName(gd::String(fullname_));
   SetDescription(gd::String(description_));
   SetDefaultName(gd::String(defaultName_));

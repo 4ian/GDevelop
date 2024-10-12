@@ -191,6 +191,10 @@ jobs:
           command: sudo apt-get update && sudo apt install cmake
 
       - run:
+          name: Install dependencies for clang-tidy v19
+          command: wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh 19 && sudo apt install clang-tidy-19
+
+      - run:
           name: Install Python3 dependencies for Emscripten
           command: sudo apt install python-is-python3 python3-distutils -y
 
@@ -214,6 +218,10 @@ jobs:
           name: Build GDevelop.js
           # Use "--runInBand" as it's faster and avoid deadlocks on CircleCI Linux machines (probably because limited in processes number).
           command: cd GDevelop.js && source ../emsdk/emsdk_env.sh && npm run build && npm test -- --runInBand && cd ..
+
+      - run:
+          name: Run clang-tidy
+          command: cd GDevelop.js && npm run lint
 
       - save_cache:
           paths:

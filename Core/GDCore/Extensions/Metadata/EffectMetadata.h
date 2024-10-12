@@ -185,10 +185,10 @@ class GD_CORE_API EffectMetadata {
   gd::String fullname;
   gd::String description;
   std::vector<gd::String> includeFiles;
-  bool isMarkedAsNotWorkingForObjects;
-  bool isMarkedAsOnlyWorkingFor2D;
-  bool isMarkedAsOnlyWorkingFor3D;
-  bool isMarkedAsUnique;
+  bool isMarkedAsNotWorkingForObjects = false;
+  bool isMarkedAsOnlyWorkingFor2D = false;
+  bool isMarkedAsOnlyWorkingFor3D = false;
+  bool isMarkedAsUnique = false;
   std::map<gd::String, gd::PropertyDescriptor> properties;
 };
 

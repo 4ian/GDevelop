@@ -394,7 +394,7 @@ class GD_CORE_API BehaviorMetadata : public InstructionOrExpressionContainerMeta
   bool isPrivate = false;
   bool isHidden = false;
   gd::String openFullEditorLabel;
-  QuickCustomization::Visibility quickCustomizationVisibility;
+  QuickCustomization::Visibility quickCustomizationVisibility = QuickCustomization::Visibility::Default;
 
   // TODO: Nitpicking: convert these to std::unique_ptr to clarify ownership.
   std::shared_ptr<gd::Behavior> instance;

@@ -68,24 +68,6 @@ class GD_CORE_API ExternalEvents {
   };
 
   /**
-   * Get the latest time of the build.
-   * Used when the IDE found that the external events can be compiled separately
-   * from scene's events.
-   *
-   * \todo This is specific to GD C++ Platform
-   */
-  time_t GetLastChangeTimeStamp() const { return lastChangeTimeStamp; };
-
-  /**
-   * Change the latest time of the build of the external events.
-   *
-   * \todo This is specific to GD C++ Platform
-   */
-  void SetLastChangeTimeStamp(time_t newTimeStamp) {
-    lastChangeTimeStamp = newTimeStamp;
-  };
-
-  /**
    * \brief Get the events.
    */
   virtual const gd::EventsList& GetEvents() const { return events; }
@@ -109,7 +91,6 @@ class GD_CORE_API ExternalEvents {
  private:
   gd::String name;
   gd::String associatedScene;
-  time_t lastChangeTimeStamp;  ///< Time of the last build
   gd::EventsList events;       ///< List of events
 
   /**
@@ -117,19 +98,6 @@ class GD_CORE_API ExternalEvents {
    * Don't forget to update me if members were changed!
    */
   void Init(const ExternalEvents& externalEvents);
-};
-
-/**
- * \brief Functor testing ExternalEvents' name
- */
-struct ExternalEventsHasName
-    : public std::binary_function<std::unique_ptr<gd::ExternalEvents>,
-                                  gd::String,
-                                  bool> {
-  bool operator()(const std::unique_ptr<gd::ExternalEvents>& externalEvents,
-                  gd::String name) const {
-    return externalEvents->GetName() == name;
-  }
 };
 
 }  // namespace gd

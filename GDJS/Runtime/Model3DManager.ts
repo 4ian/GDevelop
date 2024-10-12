@@ -69,6 +69,11 @@ namespace gdjs {
       return resourceKinds;
     }
 
+    clearCache(): void {
+      this._loadedThreeModels.clear();
+      this._downloadedArrayBuffers.clear();
+    }
+
     async processResource(resourceName: string): Promise<void> {
       const resource = this._resourceLoader.getResource(resourceName);
       if (!resource) {

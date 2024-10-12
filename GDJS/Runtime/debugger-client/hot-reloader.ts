@@ -1466,6 +1466,8 @@ namespace gdjs {
     ): void {
       let somethingChanged = false;
 
+      // TODO Refresh resources here.
+
       // Check if default properties changed
       if (oldInstance.x !== newInstance.x) {
         runtimeObject.setX(newInstance.x);

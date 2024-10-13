@@ -36,11 +36,13 @@ describe('libGD.js - GDJS project serialization tests', function () {
 
       checkConfiguration(project);
       project.serializeTo(serializerElement);
+      project.delete();
     }
     {
       const project = gd.ProjectHelper.createNewGDJSProject();
       project.unserializeFrom(serializerElement);
       checkConfiguration(project);
+      project.delete();
     }
     serializerElement.delete();
   });
@@ -74,11 +76,13 @@ describe('libGD.js - GDJS project serialization tests', function () {
 
       checkConfiguration(project);
       project.serializeTo(serializerElement);
+      project.delete();
     }
     {
       const project = gd.ProjectHelper.createNewGDJSProject();
       project.unserializeFrom(serializerElement);
       checkConfiguration(project);
+      project.delete();
     }
     serializerElement.delete();
   });
@@ -112,11 +116,13 @@ describe('libGD.js - GDJS project serialization tests', function () {
 
       checkConfiguration(project);
       project.serializeTo(serializerElement);
+      project.delete();
     }
     {
       const project = gd.ProjectHelper.createNewGDJSProject();
       project.unserializeFrom(serializerElement);
       checkConfiguration(project);
+      project.delete();
     }
     serializerElement.delete();
   });
@@ -146,11 +152,13 @@ describe('libGD.js - GDJS project serialization tests', function () {
 
       checkConfiguration(project);
       project.serializeTo(serializerElement);
+      project.delete();
     }
     {
       const project = gd.ProjectHelper.createNewGDJSProject();
       project.unserializeFrom(serializerElement);
       checkConfiguration(project);
+      project.delete();
     }
     serializerElement.delete();
   });
@@ -184,11 +192,13 @@ describe('libGD.js - GDJS project serialization tests', function () {
 
       checkConfiguration(project);
       project.serializeTo(serializerElement);
+      project.delete();
     }
     {
       const project = gd.ProjectHelper.createNewGDJSProject();
       project.unserializeFrom(serializerElement);
       checkConfiguration(project);
+      project.delete();
     }
     serializerElement.delete();
   });
@@ -208,15 +218,24 @@ describe('libGD.js - GDJS project serialization tests', function () {
     expect(behavior.getProperties().get('MyBehaviorProperty').getValue()).toBe(
       'Initial value 1'
     );
+    project.delete();
   });
 
   it('should keep behavior properties values after a save and reload', function () {
     const checkConfiguration = (project) => {
       const layout = project.getLayout('Scene');
       const object = layout.getObjects().getObject('MyObject');
+      if (!object.hasBehaviorNamed('DummyBehaviorWithSharedData')) {
+        throw new Error('Missing behavior "DummyBehaviorWithSharedData".');
+      }
+
       const behavior = object.getBehavior('DummyBehaviorWithSharedData');
+      const properties = behavior.getProperties();
+      if (!properties.has('MyBehaviorProperty')) {
+        throw new Error('Missing "MyBehaviorProperty" property in the behavior.');
+      }
       expect(
-        behavior.getProperties().get('MyBehaviorProperty').getValue()
+        properties.get('MyBehaviorProperty').getValue()
       ).toBe('123');
     };
 
@@ -236,11 +255,13 @@ describe('libGD.js - GDJS project serialization tests', function () {
 
       checkConfiguration(project);
       project.serializeTo(serializerElement);
+      project.delete();
     }
     {
       const project = gd.ProjectHelper.createNewGDJSProject();
       project.unserializeFrom(serializerElement);
       checkConfiguration(project);
+      project.delete();
     }
     serializerElement.delete();
   });
@@ -264,6 +285,7 @@ describe('libGD.js - GDJS project serialization tests', function () {
     expect(sharedData.getProperties().get('MySharedProperty').getValue()).toBe(
       'Initial shared value 1'
     );
+    project.delete();
   });
 
   it('should keep behavior shared properties values after a save and reload', function () {
@@ -298,11 +320,13 @@ describe('libGD.js - GDJS project serialization tests', function () {
 
       checkConfiguration(project);
       project.serializeTo(serializerElement);
+      project.delete();
     }
     {
       const project = gd.ProjectHelper.createNewGDJSProject();
       project.unserializeFrom(serializerElement);
       checkConfiguration(project);
+      project.delete();
     }
     serializerElement.delete();
   });

@@ -1555,7 +1555,7 @@ describe('libGD.js', function () {
         'LoadingScreenImage'
       );
 
-      const worker = new gd.ResourcesInUseHelper();
+      const worker = new gd.ResourcesInUseHelper(project.getResourcesManager());
       gd.ResourceExposer.exposeWholeProjectResources(project, worker);
       expect(worker.getAllImages().toNewVectorString().toJSArray().length).toBe(
         1
@@ -1566,7 +1566,9 @@ describe('libGD.js', function () {
 
       gd.ProjectResourcesAdder.removeAllUseless(project, 'image');
 
-      const newWorker = new gd.ResourcesInUseHelper();
+      const newWorker = new gd.ResourcesInUseHelper(
+        project.getResourcesManager()
+      );
       gd.ResourceExposer.exposeWholeProjectResources(project, newWorker);
       expect(
         newWorker.getAllImages().toNewVectorString().toJSArray().length
@@ -1614,6 +1616,7 @@ describe('libGD.js', function () {
 
   describe('gd.ResourcesInUseHelper', function () {
     it('should find the images used by objects', function () {
+      const project = gd.ProjectHelper.createNewGDJSProject();
       let sprite1 = new gd.Sprite();
       sprite1.setImageName('Image1');
       let sprite2 = new gd.Sprite();
@@ -1637,7 +1640,9 @@ describe('libGD.js', function () {
       animation2.getDirection(0).addSprite(sprite1);
       spriteObject2.getAnimations().addAnimation(animation2);
 
-      const resourcesInUse = new gd.ResourcesInUseHelper();
+      const resourcesInUse = new gd.ResourcesInUseHelper(
+        project.getResourcesManager()
+      );
 
       {
         spriteObject.exposeResources(resourcesInUse);
@@ -1663,6 +1668,7 @@ describe('libGD.js', function () {
       }
 
       resourcesInUse.delete();
+      project.delete();
 
       spriteObject.delete();
       spriteObject2.delete();
@@ -4674,7 +4680,7 @@ describe('libGD.js', function () {
 
       expect(layout2.getObjects().hasObjectNamed('MyObject')).toBe(true);
       expect(layout2.getObjects().hasObjectNamed('OtherObject')).toBe(true);
-      const rootFolder2 = layout.getObjects().getRootFolder();
+      const rootFolder2 = layout2.getObjects().getRootFolder();
       expect(rootFolder2.hasObjectNamed('MyObject')).toBe(true);
       expect(rootFolder2.hasObjectNamed('OtherObject')).toBe(true);
       expect(rootFolder2.getChildrenCount()).toEqual(3);

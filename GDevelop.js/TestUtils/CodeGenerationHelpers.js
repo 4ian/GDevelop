@@ -149,6 +149,7 @@ function generateCompiledEventsForEventsBasedBehavior(
 function generateCompiledEventsForEventsBasedObject(
   gd,
   project,
+  eventsFunctionsExtension,
   eventsBasedObject,
   gdjs
 ) {
@@ -169,7 +170,7 @@ function generateCompiledEventsForEventsBasedObject(
   }
 
   const code = objectCodeGenerator.generateRuntimeObjectCompleteCode(
-    'MyExtension',
+    eventsFunctionsExtension,
     eventsBasedObject,
     codeNamespace,
     objectMethodMangledNames,
@@ -275,7 +276,13 @@ function generateCompiledEventsForSerializedEventsBasedExtension(
     const obj = objectsLists.getAt(i);
     generatedExtensionModule.objects[
       obj.getName()
-    ] = generateCompiledEventsForEventsBasedObject(gd, project, obj, gdjs);
+    ] = generateCompiledEventsForEventsBasedObject(
+      gd,
+      project,
+      extension,
+      obj,
+      gdjs
+    );
   }
 
   includeFiles.delete();

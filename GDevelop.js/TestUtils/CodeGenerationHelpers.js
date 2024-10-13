@@ -97,6 +97,7 @@ const generatedEventsCodeToJSFunction = (code, gdjs, runtimeScene) => {
 function generateCompiledEventsForEventsBasedBehavior(
   gd,
   project,
+  eventsFunctionsExtension,
   eventsBasedBehavior,
   gdjs
 ) {
@@ -121,7 +122,7 @@ function generateCompiledEventsForEventsBasedBehavior(
   }
 
   const code = behaviorCodeGenerator.generateRuntimeBehaviorCompleteCode(
-    'MyExtension',
+    eventsFunctionsExtension,
     eventsBasedBehavior,
     codeNamespace,
     behaviorMethodMangledNames,
@@ -148,6 +149,7 @@ function generateCompiledEventsForEventsBasedBehavior(
 function generateCompiledEventsForEventsBasedObject(
   gd,
   project,
+  eventsFunctionsExtension,
   eventsBasedObject,
   gdjs
 ) {
@@ -168,7 +170,7 @@ function generateCompiledEventsForEventsBasedObject(
   }
 
   const code = objectCodeGenerator.generateRuntimeObjectCompleteCode(
-    'MyExtension',
+    eventsFunctionsExtension,
     eventsBasedObject,
     codeNamespace,
     objectMethodMangledNames,
@@ -263,6 +265,7 @@ function generateCompiledEventsForSerializedEventsBasedExtension(
     ] = generateCompiledEventsForEventsBasedBehavior(
       gd,
       project,
+      extension,
       behavior,
       gdjs
     );
@@ -273,7 +276,13 @@ function generateCompiledEventsForSerializedEventsBasedExtension(
     const obj = objectsLists.getAt(i);
     generatedExtensionModule.objects[
       obj.getName()
-    ] = generateCompiledEventsForEventsBasedObject(gd, project, obj, gdjs);
+    ] = generateCompiledEventsForEventsBasedObject(
+      gd,
+      project,
+      extension,
+      obj,
+      gdjs
+    );
   }
 
   includeFiles.delete();
@@ -316,9 +325,7 @@ function generateCompiledEventsFromSerializedEvents(
         const parameterType = parameterTypes[parameterName];
 
         const parameters = eventsFunction.getParameters();
-        parameters
-          .addNewParameter(parameterName)
-          .setType(parameterType);
+        parameters.addNewParameter(parameterName).setType(parameterType);
       }
     }
   }
@@ -372,9 +379,7 @@ function generateCompiledEventsFunctionFromSerializedEvents(
         const parameterType = parameterTypes[parameterName];
 
         const parameters = eventsFunction.getParameters();
-        parameters
-          .addNewParameter(parameterName)
-          .setType(parameterType);
+        parameters.addNewParameter(parameterName).setType(parameterType);
       }
     }
   }

@@ -345,14 +345,14 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
         gd::ProjectDiagnostic projectDiagnostic(
             gd::ProjectDiagnostic::ErrorType::UnknownObject, "",
             objectInParameter, "");
-        diagnosticReport->Add(projectDiagnostic);
+        if (diagnosticReport) diagnosticReport->Add(projectDiagnostic);
         return "/* Unknown object - skipped. */";
       } else if (!expectedObjectType.empty() &&
                  actualObjectType != expectedObjectType) {
         gd::ProjectDiagnostic projectDiagnostic(
             gd::ProjectDiagnostic::ErrorType::MismatchedObjectType, "",
             actualObjectType, expectedObjectType, objectInParameter);
-        diagnosticReport->Add(projectDiagnostic);
+        if (diagnosticReport) diagnosticReport->Add(projectDiagnostic);
         return "/* Mismatched object type - skipped. */";
       }
     }
@@ -509,7 +509,7 @@ void EventsCodeGenerator::CheckBehaviorParameters(
             gd::ProjectDiagnostic projectDiagnostic(
                 gd::ProjectDiagnostic::ErrorType::MissingBehavior, "",
                 actualBehaviorType, expectedBehaviorType, lastObjectName);
-            diagnosticReport->Add(projectDiagnostic);
+            if (diagnosticReport) diagnosticReport->Add(projectDiagnostic);
           }
         }
       });
@@ -567,14 +567,14 @@ gd::String EventsCodeGenerator::GenerateActionCode(
         gd::ProjectDiagnostic projectDiagnostic(
             gd::ProjectDiagnostic::ErrorType::UnknownObject, "",
             objectInParameter, "");
-        diagnosticReport->Add(projectDiagnostic);
+        if (diagnosticReport) diagnosticReport->Add(projectDiagnostic);
         return "/* Unknown object - skipped. */";
       } else if (!expectedObjectType.empty() &&
                  actualObjectType != expectedObjectType) {
         gd::ProjectDiagnostic projectDiagnostic(
             gd::ProjectDiagnostic::ErrorType::MismatchedObjectType, "",
             actualObjectType, expectedObjectType, objectInParameter);
-        diagnosticReport->Add(projectDiagnostic);
+        if (diagnosticReport) diagnosticReport->Add(projectDiagnostic);
         return "/* Mismatched object type - skipped. */";
       }
     }

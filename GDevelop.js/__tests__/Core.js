@@ -4695,7 +4695,7 @@ describe('libGD.js', function () {
 
       expect(layout2.getObjects().hasObjectNamed('MyObject')).toBe(true);
       expect(layout2.getObjects().hasObjectNamed('OtherObject')).toBe(true);
-      const rootFolder2 = layout.getObjects().getRootFolder();
+      const rootFolder2 = layout2.getObjects().getRootFolder();
       expect(rootFolder2.hasObjectNamed('MyObject')).toBe(true);
       expect(rootFolder2.hasObjectNamed('OtherObject')).toBe(true);
       expect(rootFolder2.getChildrenCount()).toEqual(3);

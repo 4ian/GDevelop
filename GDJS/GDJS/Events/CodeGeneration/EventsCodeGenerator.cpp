@@ -21,13 +21,13 @@
 #include "GDCore/Project/EventsBasedBehavior.h"
 #include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/EventsFunction.h"
+#include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/PropertiesContainer.h"
-#include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDJS/Events/CodeGeneration/BehaviorCodeGenerator.h"
 #include "GDJS/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDJS/Extensions/JsPlatform.h"
@@ -130,19 +130,27 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
     std::set<gd::String>& includeFiles,
     bool compilationForRuntime) {
   gd::ObjectsContainer parameterObjectsAndGroups;
-  auto projectScopedContainers =
-      gd::ProjectScopedContainers::MakeNewProjectScopedContainersForFreeEventsFunction(
-              project, eventsFunctionsExtension, eventsFunction, parameterObjectsAndGroups);
+  auto projectScopedContainers = gd::ProjectScopedContainers::
+      MakeNewProjectScopedContainersForFreeEventsFunction(
+          project,
+          eventsFunctionsExtension,
+          eventsFunction,
+          parameterObjectsAndGroups);
 
   EventsCodeGenerator codeGenerator(projectScopedContainers);
   codeGenerator.SetCodeNamespace(codeNamespace);
   codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
 
+  gd::DiagnosticReport diagnosticReport;
+  codeGenerator.SetDiagnosticReport(&diagnosticReport);
+
   gd::String output = GenerateEventsListCompleteFunctionCode(
       codeGenerator,
       codeGenerator.GetCodeNamespaceAccessor() + "func",
       codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
-          eventsFunction.GetParametersForEvents(eventsFunctionsExtension), 0, true),
+          eventsFunction.GetParametersForEvents(eventsFunctionsExtension),
+          0,
+          true),
       codeGenerator.GenerateFreeEventsFunctionContext(
           eventsFunctionsExtension,
           eventsFunction,
@@ -150,6 +158,15 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
       eventsFunction.GetEvents(),
       "",
       codeGenerator.GenerateEventsFunctionReturn(eventsFunction));
+
+  // TODO: the editor should pass the diagnostic report and display it to the
+  // user. For now, display it in the console.
+  if (diagnosticReport.Count() > 0) {
+    std::cout << "Diagnostics when generating events function code ("
+              << eventsFunctionsExtension.GetName() << ", "
+              << eventsFunction.GetName() << "):" << std::endl;
+    diagnosticReport.LogAllDiagnostics();
+  }
 
   includeFiles.insert(codeGenerator.GetIncludeFiles().begin(),
                       codeGenerator.GetIncludeFiles().end());
@@ -167,16 +184,21 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
     const gd::String& preludeCode,
     std::set<gd::String>& includeFiles,
     bool compilationForRuntime) {
-
   gd::ObjectsContainer parameterObjectsContainers;
   auto projectScopedContainers = gd::ProjectScopedContainers::
       MakeNewProjectScopedContainersForBehaviorEventsFunction(
-          project, eventsFunctionsExtension, eventsBasedBehavior,
-          eventsFunction, parameterObjectsContainers);
+          project,
+          eventsFunctionsExtension,
+          eventsBasedBehavior,
+          eventsFunction,
+          parameterObjectsContainers);
 
   EventsCodeGenerator codeGenerator(projectScopedContainers);
   codeGenerator.SetCodeNamespace(codeNamespace);
   codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
+
+  gd::DiagnosticReport diagnosticReport;
+  codeGenerator.SetDiagnosticReport(&diagnosticReport);
 
   // Generate the code setting up the context of the function.
   gd::String fullPreludeCode =
@@ -216,6 +238,15 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
       "",
       codeGenerator.GenerateEventsFunctionReturn(eventsFunction));
 
+  // TODO: the editor should pass the diagnostic report and display it to the
+  // user. For now, display it in the console.
+  if (diagnosticReport.Count() > 0) {
+    std::cout << "Diagnostics when generating behavior code ("
+              << eventsBasedBehavior.GetName() << ", "
+              << eventsFunction.GetName() << "):" << std::endl;
+    diagnosticReport.LogAllDiagnostics();
+  }
+
   includeFiles.insert(codeGenerator.GetIncludeFiles().begin(),
                       codeGenerator.GetIncludeFiles().end());
   return output;
@@ -233,16 +264,21 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
     const gd::String& endingCode,
     std::set<gd::String>& includeFiles,
     bool compilationForRuntime) {
-
   gd::ObjectsContainer parameterObjectsContainers;
   auto projectScopedContainers = gd::ProjectScopedContainers::
       MakeNewProjectScopedContainersForObjectEventsFunction(
-          project, eventsFunctionsExtension, eventsBasedObject,
-          eventsFunction, parameterObjectsContainers);
+          project,
+          eventsFunctionsExtension,
+          eventsBasedObject,
+          eventsFunction,
+          parameterObjectsContainers);
 
   EventsCodeGenerator codeGenerator(projectScopedContainers);
   codeGenerator.SetCodeNamespace(codeNamespace);
   codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
+
+  gd::DiagnosticReport diagnosticReport;
+  codeGenerator.SetDiagnosticReport(&diagnosticReport);
 
   // Generate the code setting up the context of the function.
   gd::String fullPreludeCode =
@@ -258,8 +294,7 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
       "var Object = Hashtable.newFrom({Object: thisObjectList});\n";
 
   // Add child-objects
-  for (auto &childObject :
-       eventsBasedObject.GetObjects().GetObjects()) {
+  for (auto& childObject : eventsBasedObject.GetObjects().GetObjects()) {
     // child-object are never picked because they are not parameters.
     const auto& childName = ManObjListName(childObject->GetName());
     fullPreludeCode += "var this" + childName +
@@ -292,6 +327,15 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
       eventsFunction.GetEvents(),
       endingCode,
       codeGenerator.GenerateEventsFunctionReturn(eventsFunction));
+
+  // TODO: the editor should pass the diagnostic report and display it to the
+  // user. For now, display it in the console.
+  if (diagnosticReport.Count() > 0) {
+    std::cout << "Diagnostics when generating object code ("
+              << eventsBasedObject.GetName() << ", " << eventsFunction.GetName()
+              << "):" << std::endl;
+    diagnosticReport.LogAllDiagnostics();
+  }
 
   includeFiles.insert(codeGenerator.GetIncludeFiles().begin(),
                       codeGenerator.GetIncludeFiles().end());
@@ -424,8 +468,7 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionContext(
         ConvertToStringExplicit(thisObjectName) + ": thisObjectList\n";
 
     // Add child-objects
-    for (auto &childObject :
-         eventsBasedObject.GetObjects().GetObjects()) {
+    for (auto& childObject : eventsBasedObject.GetObjects().GetObjects()) {
       const auto& childName = ManObjListName(childObject->GetName());
       // child-object are never picked because they are not parameters.
       objectsGettersMap += ", " +
@@ -458,8 +501,8 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
     const gd::String& thisObjectName,
     const gd::String& thisBehaviorName) {
   const auto& extensionName = eventsFunctionsExtension.GetName();
-  const auto &parameters = eventsFunction.GetParametersForEvents(
-      eventsFunctionsContainer);
+  const auto& parameters =
+      eventsFunction.GetParametersForEvents(eventsFunctionsContainer);
 
   // When running in the context of a function generated from events, we
   // need some indirection to deal with objects, behaviors and parameters in
@@ -514,8 +557,9 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
     }
   }
 
-  const gd::String async =
-      eventsFunction.IsAsync() ? "  task: new gdjs.ManuallyResolvableTask(),\n" : "";
+  const gd::String async = eventsFunction.IsAsync()
+                               ? "  task: new gdjs.ManuallyResolvableTask(),\n"
+                               : "";
 
   return gd::String("var eventsFunctionContext = {\n") +
          // The async task, if there is one
@@ -875,8 +919,9 @@ gd::String EventsCodeGenerator::GenerateObjectAction(
   if (instrInfos.codeExtraInformation.type == "number" ||
       instrInfos.codeExtraInformation.type == "string" ||
       // Boolean actions declared with addExpressionAndConditionAndAction uses
-      // MutatorAndOrAccessor even though they don't declare an operator parameter.
-      // Boolean operators are only used with SetMutators or SetCustomCodeGenerator.
+      // MutatorAndOrAccessor even though they don't declare an operator
+      // parameter. Boolean operators are only used with SetMutators or
+      // SetCustomCodeGenerator.
       (instrInfos.codeExtraInformation.type == "boolean" &&
        instrInfos.codeExtraInformation.accessType ==
            gd::InstructionMetadata::ExtraInformation::AccessType::Mutators)) {
@@ -942,8 +987,9 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
   if (instrInfos.codeExtraInformation.type == "number" ||
       instrInfos.codeExtraInformation.type == "string" ||
       // Boolean actions declared with addExpressionAndConditionAndAction uses
-      // MutatorAndOrAccessor even though they don't declare an operator parameter.
-      // Boolean operators are only used with SetMutators or SetCustomCodeGenerator.
+      // MutatorAndOrAccessor even though they don't declare an operator
+      // parameter. Boolean operators are only used with SetMutators or
+      // SetCustomCodeGenerator.
       (instrInfos.codeExtraInformation.type == "boolean" &&
        instrInfos.codeExtraInformation.accessType ==
            gd::InstructionMetadata::ExtraInformation::AccessType::Mutators)) {
@@ -1311,7 +1357,7 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
   if (scope == ANY_VARIABLE) {
     const auto variablesContainersList =
         GetProjectScopedContainers().GetVariablesContainersList();
-    const auto &variablesContainer =
+    const auto& variablesContainer =
         variablesContainersList.GetVariablesContainerFromVariableName(
             variableName);
     const auto sourceType = variablesContainer.GetSourceType();
@@ -1327,12 +1373,13 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
           variablesContainersList.GetLocalVariablesContainerPosition(
               variablesContainer);
       output = GenerateLocalVariablesStackAccessor() + "[" +
-                gd::String::From(localVariablesIndex) + "]";
+               gd::String::From(localVariablesIndex) + "]";
     } else if (sourceType ==
-                gd::VariablesContainer::SourceType::ExtensionGlobal) {
+               gd::VariablesContainer::SourceType::ExtensionGlobal) {
       variables = &variablesContainer;
       output = "eventsFunctionContext.globalVariablesForExtension";
-    } else if (sourceType == gd::VariablesContainer::SourceType::ExtensionScene) {
+    } else if (sourceType ==
+               gd::VariablesContainer::SourceType::ExtensionScene) {
       variables = &variablesContainer;
       output = "eventsFunctionContext.sceneVariablesForExtension";
     }
@@ -1371,17 +1418,13 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
 
     if (HasProjectAndLayout()) {
       if (GetLayout().GetObjects().HasObjectNamed(
-              objectName)) // We check first layout's objects' list.
-        variables = &GetLayout()
-                         .GetObjects()
-                         .GetObject(objectName)
-                         .GetVariables();
+              objectName))  // We check first layout's objects' list.
+        variables =
+            &GetLayout().GetObjects().GetObject(objectName).GetVariables();
       else if (GetProject().GetObjects().HasObjectNamed(
-                   objectName)) // Then the global objects list.
-        variables = &GetProject()
-                         .GetObjects()
-                         .GetObject(objectName)
-                         .GetVariables();
+                   objectName))  // Then the global objects list.
+        variables =
+            &GetProject().GetObjects().GetObject(objectName).GetVariables();
     }
   }
 

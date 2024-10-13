@@ -3750,7 +3750,8 @@ describe('libGD.js', function () {
           project,
           layout
         ),
-        type
+        type,
+        ''
       );
       expressionNode.visit(expressionValidator);
       if (expectedError2) {

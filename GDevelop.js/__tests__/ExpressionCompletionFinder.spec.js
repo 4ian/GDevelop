@@ -28,15 +28,18 @@ describe('gd.ExpressionCompletionFinder', function () {
 
     const parser = new gd.ExpressionParser2();
     const expressionNode = parser.parseExpression(expression).get();
+
+    const projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
+      project,
+      layout
+    );
+    if (sharedPropertiesContainer) projectScopedContainers.addPropertiesContainer(sharedPropertiesContainer);
+    if (propertiesContainer) projectScopedContainers.addPropertiesContainer(propertiesContainer);
+    projectScopedContainers.addParameters(parameters);
+
     const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
       gd.JsPlatform.get(),
-      gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
-        project,
-        layout
-      )
-        .addPropertiesContainer(sharedPropertiesContainer)
-        .addPropertiesContainer(propertiesContainer)
-        .addParameters(parameters),
+      projectScopedContainers,
       type,
       expressionNode,
       // We're looking for completion for the character just before the caret.
@@ -56,8 +59,8 @@ describe('gd.ExpressionCompletionFinder', function () {
   }
 
   describe('Variable completion tests', () => {
-    beforeAll(() => {
-      project = new gd.ProjectHelper.createNewGDJSProject();
+    beforeEach(() => {
+      project = gd.ProjectHelper.createNewGDJSProject();
       layout = project.insertNewLayout('Scene', 0);
 
       const object = layout
@@ -142,10 +145,15 @@ describe('gd.ExpressionCompletionFinder', function () {
       makeChildrenTestVariables(
         layout.getVariables().insertNew('MyGlobalVariableStructure', 2)
       );
+
+      propertiesContainer = null;
+      sharedPropertiesContainer = null;
     });
 
-    afterAll(() => {
+    afterEach(() => {
       project.delete();
+      propertiesContainer = null;
+      sharedPropertiesContainer = null;
     });
 
     describe('Object variables completion', () => {
@@ -1039,7 +1047,7 @@ describe('gd.ExpressionCompletionFinder', function () {
   });
 
   describe('Various tests', () => {
-    beforeAll(() => {
+    beforeEach(() => {
       project = new gd.ProjectHelper.createNewGDJSProject();
       layout = project.insertNewLayout('Scene', 0);
 
@@ -1083,7 +1091,7 @@ describe('gd.ExpressionCompletionFinder', function () {
       sharedPropertiesContainer.insertNew('UnrelatedProperty2', 1);
     });
 
-    afterAll(() => {
+    afterEach(() => {
       project.delete();
       propertiesContainer.delete();
       sharedPropertiesContainer.delete();

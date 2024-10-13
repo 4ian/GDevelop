@@ -3647,7 +3647,7 @@ describe('libGD.js', function () {
         done();
       };
 
-      const exporter = new gd.Exporter(fs);
+      const exporter = new gd.Exporter(fs, 'fake-gdjs-root');
       const previewExportOptions = new gd.PreviewExportOptions(
         project,
         '/path/for/export/'
@@ -3656,6 +3656,9 @@ describe('libGD.js', function () {
       exporter.exportProjectForPixiPreview(previewExportOptions);
       previewExportOptions.delete();
       exporter.delete();
+
+      project.delete();
+      fs.delete();
     });
   });
 

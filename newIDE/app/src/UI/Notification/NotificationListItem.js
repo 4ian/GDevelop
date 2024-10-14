@@ -8,6 +8,7 @@ import { ListItem } from '../List';
 import { getRelativeOrAbsoluteDisplayDate } from '../../Utils/DateDisplay';
 import CoinOutline from '../CustomSvgIcons/CoinOutline';
 import Annotation from '../CustomSvgIcons/Annotation';
+import Tag from '../CustomSvgIcons/Tag';
 import Gaming from '../CustomSvgIcons/Gaming';
 import Cart from '../CustomSvgIcons/Cart';
 import { shortenString } from '../../Utils/StringHelpers';
@@ -18,6 +19,7 @@ import RouterContext, {
 
 const notificationTypeToIcon = {
   'credits-drop': <CoinOutline />,
+  'free-trial-about-to-expire': <Tag />,
   'one-game-feedback-received': <Annotation />,
   'multiple-game-feedback-received': <Annotation />,
   'claimable-asset-pack': <Cart />,
@@ -67,6 +69,18 @@ const getNotificationPrimaryTextByType = (
       <Trans>
         Your game {notification.data.gameName} received
         {notification.data.count} feedback messages
+      </Trans>
+    );
+  }
+  if (notification.type === 'free-trial-about-to-expire') {
+    return (
+      <Trans>
+        Your free trial will expire in{' '}
+        {Math.max(
+          0,
+          Math.round((notification.data.endDate - Date.now()) / (3600 * 1000))
+        )}{' '}
+        hours.
       </Trans>
     );
   }
@@ -121,7 +135,12 @@ const getNotificationClickCallback = ({
   onCloseNotificationList: () => void,
   onMarkNotificationAsSeen: () => void,
 }): (() => void) | null => {
-  if (notification.type === 'credits-drop') return null;
+  if (
+    notification.type === 'credits-drop' ||
+    notification.type === 'free-trial-about-to-expire'
+  ) {
+    return null;
+  }
   if (
     notification.type === 'one-game-feedback-received' ||
     notification.type === 'multiple-game-feedback-received'

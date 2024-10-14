@@ -13,6 +13,12 @@ type NotificationBaseAttributes = {
   seenAt?: number,
 };
 
+type FreeTrialAboutToExpireNotification = {
+  ...NotificationBaseAttributes,
+  type: 'free-trial-about-to-expire',
+  data: { endDate: number },
+};
+
 type CreditsDropNotification = {
   ...NotificationBaseAttributes,
   type: 'credits-drop',
@@ -80,6 +86,7 @@ type GameSessionsAchievementNotification = {
 
 export type Notification =
   | CreditsDropNotification
+  | FreeTrialAboutToExpireNotification
   | ClaimableAssetPackNotification
   | OneGameFeedbackReceivedNotification
   | MultipleGameFeedbackReceivedNotification

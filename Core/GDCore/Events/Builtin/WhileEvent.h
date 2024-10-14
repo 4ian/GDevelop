@@ -72,8 +72,6 @@ class GD_CORE_API WhileEvent : public gd::BaseEvent {
                               ///< de/activate infinite loop warning when the
                               ///< user create the event
 
-  mutable unsigned int whileConditionsHeight;
-
   int GetConditionsHeight() const;
   int GetActionsHeight() const;
   int GetWhileConditionsHeight() const;

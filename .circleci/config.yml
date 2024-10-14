@@ -176,6 +176,7 @@ jobs:
 
   # Build the WebAssembly library only (so that it's cached on a S3 and easy to re-use).
   build-gdevelop_js-wasm-only:
+    resource_class: medium+ # Compilation time decrease linearly with the number of CPUs, but not linking (so "large" does not speedup total build time).
     docker:
       - image: cimg/node:16.13
 
@@ -232,10 +233,83 @@ jobs:
           name: Deploy to S3 (latest)
           command: aws s3 sync Binaries/embuild/GDevelop.js s3://gdevelop-gdevelop.js/$(git rev-parse --abbrev-ref HEAD)/latest/
 
+  # Build the WebAssembly library with clang-tidy and memory sanitizers.
+  build-gdevelop_js-debug-sanitizers-and-extra-checks:
+    resource_class: xlarge # Total time decrease linearly with the number of CPUs.
+    docker:
+      - image: cimg/node:16.13
+
+    working_directory: ~/GDevelop
+
+    steps:
+      - checkout
+      - aws-cli/setup
+
+      # System dependencies (for Emscripten)
+      - run:
+          name: Install dependencies for Emscripten
+          command: sudo apt-get update && sudo apt install cmake
+
+      - run:
+          name: Install dependencies for clang-tidy v19
+          command: wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh 19 && sudo apt install clang-tidy-19
+
+      - run:
+          name: Install Python3 dependencies for Emscripten
+          command: sudo apt install python-is-python3 python3-distutils -y
+
+      - run:
+          name: Install Emscripten (for GDevelop.js)
+          command: git clone https://github.com/juj/emsdk.git && cd emsdk && ./emsdk install 3.1.21 && ./emsdk activate 3.1.21 && cd ..
+
+      # GDevelop.js dependencies
+      - restore_cache:
+          keys:
+            - gdevelop.js-linux-nodejs-dependencies-{{ checksum "GDevelop.js/package-lock.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - gdevelop.js-linux-nodejs-dependencies-
+
+      - run:
+          name: Install GDevelop.js dependencies and build it
+          command: cd GDevelop.js && npm install && cd ..
+
+      # Build GDevelop.js
+      - run:
+          name: Build GDevelop.js ('debug-sanitizers' variant)
+          command: cd GDevelop.js && source ../emsdk/emsdk_env.sh && npm run build -- --variant=debug-sanitizers
+
+      - run:
+          name: Run clang-tidy
+          command: cd GDevelop.js && npm run lint
+
+      - run:
+          name: Run tests
+          command: cd GDevelop.js && npm run test -- --maxWorkers=4
+
+      # Upload artifacts (CircleCI)
+      - store_artifacts:
+          path: Binaries/embuild/GDevelop.js
+
+      # Upload artifacts (AWS)
+      - run:
+          name: Deploy to S3 (specific commit)
+          command: aws s3 sync Binaries/embuild/GDevelop.js s3://gdevelop-gdevelop.js/$(git rev-parse --abbrev-ref HEAD)/variant/debug-sanitizers/commit/$(git rev-parse HEAD)/
+
 workflows:
-  builds:
+  gdevelop_js-wasm:
     jobs:
       - build-gdevelop_js-wasm-only
+  gdevelop_js-wasm-extra-checks:
+    jobs:
+      - build-gdevelop_js-debug-sanitizers-and-extra-checks:
+          # Extra checks are resource intensive so don't all run them.
+          filters:
+            branches:
+              only:
+                - master
+                - /experimental-build.*/
+  builds:
+    jobs:
       - build-macos:
           filters:
             branches:

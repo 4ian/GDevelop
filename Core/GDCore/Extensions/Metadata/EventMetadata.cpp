@@ -19,7 +19,8 @@ EventMetadata::EventMetadata(const gd::String &name_,
     : fullname(fullname_),
       description(description_),
       group(group_),
-      instance(instance_) {
+      instance(instance_),
+      hasCustomCodeGenerator(false) {
   ClearCodeGenerationAndPreprocessing();
   if (instance) instance->SetType(name_);
 }

@@ -2,6 +2,7 @@
 #define GD_CORE_POLYMORPHICCLONE_H
 
 #include <memory>
+#include <vector>
 
 namespace gd {
 

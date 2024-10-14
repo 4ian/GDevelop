@@ -288,8 +288,8 @@ class GD_CORE_API MetadataProvider {
   static EffectMetadata badEffectMetadata;
   static gd::InstructionMetadata badInstructionMetadata;
   static gd::ExpressionMetadata badExpressionMetadata;
-  int useless;  // Useless member to avoid emscripten "must have a positive
-                // integer typeid pointer" runtime error.
+  int useless = 0;  // Useless member to avoid emscripten "must have a positive
+                    // integer typeid pointer" runtime error.
 };
 
 }  // namespace gd

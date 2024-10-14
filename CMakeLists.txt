@@ -69,12 +69,18 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	# uninitialized variables or other hard to debug bugs.
 	add_compile_options(
 		-Wall
+		-Wextra
+		-Wuninitialized
+		-Wconditional-uninitialized
 		-Wno-unknown-warning-option
 		-Wno-reorder-ctor
 		-Wno-reorder
+		-Wno-unused-parameter
 		-Wno-pessimizing-move
-		-Wno-unused-variable
+		-Wno-unused-variable # Not a good style, but not a risk
 		-Wno-unused-private-field
+		-Wno-ignored-qualifiers # Not a risk
+		-Wno-sign-compare # Not a big risk
 
 		# Make as much warnings considered as errors as possible (only one for now).
 		-Werror=return-stack-address

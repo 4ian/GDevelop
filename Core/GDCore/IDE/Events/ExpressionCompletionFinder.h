@@ -337,19 +337,19 @@ struct GD_CORE_API ExpressionCompletionDescription {
 
  private:
   CompletionKind completionKind;
-  gd::Variable::Type variableType;
-  gd::VariablesContainer::SourceType variableScope;
+  gd::Variable::Type variableType = gd::Variable::Unknown;
+  gd::VariablesContainer::SourceType variableScope = gd::VariablesContainer::Unknown;
   gd::String type;
   gd::String prefix;
   gd::String completion;
-  size_t replacementStartPosition;
-  size_t replacementEndPosition;
+  size_t replacementStartPosition = 0;
+  size_t replacementEndPosition = 0;
   gd::String objectName;
   gd::String behaviorName;
-  bool isExact;
-  bool isLastParameter;
-  const gd::ParameterMetadata* parameterMetadata;
-  const gd::ObjectConfiguration* objectConfiguration;
+  bool isExact = false;
+  bool isLastParameter = false;
+  const gd::ParameterMetadata* parameterMetadata = &badParameterMetadata;
+  const gd::ObjectConfiguration* objectConfiguration = &badObjectConfiguration;
 
   static const gd::ParameterMetadata badParameterMetadata;
   static const gd::ObjectConfiguration badObjectConfiguration;

@@ -4,6 +4,8 @@
  * This project is released under the MIT License.
  */
 
+// NOLINTBEGIN
+
 #ifndef GDCORE_UTF8_STRING_H
 #define GDCORE_UTF8_STRING_H
 
@@ -898,3 +900,5 @@ namespace std
  * In Unicode, uppercasing/lowercasing strings to compare them in a case-insensitive way is not recommended.
  * That's why the function gd::CaseInsensitiveEquiv exists to compare two strings in a case-insensitive way.
  */
+
+// NOLINTEND

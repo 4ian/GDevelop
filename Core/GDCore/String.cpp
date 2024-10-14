@@ -4,6 +4,8 @@
  * This project is released under the MIT License.
  */
 
+// NOLINTBEGIN
+
 #include "GDCore/String.h"
 
 #include <algorithm>
@@ -825,3 +827,5 @@ bool GD_CORE_API CaseInsensitiveEquiv( const String &lhs, const String &rhs, boo
 }
 
 }
+
+// NOLINTEND

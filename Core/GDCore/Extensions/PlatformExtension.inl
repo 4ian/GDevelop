@@ -5,6 +5,8 @@
  * project is released under the MIT License.
  */
 
+// NOLINTBEGIN
+
 #ifndef GDCORE_PLATFORMEXTENSION_INL
 #define GDCORE_PLATFORMEXTENSION_INL
 
@@ -36,3 +38,5 @@ gd::ObjectMetadata& PlatformExtension::AddObject(const gd::String& name,
 }  // namespace gd
 
 #endif
+
+// NOLINTEND

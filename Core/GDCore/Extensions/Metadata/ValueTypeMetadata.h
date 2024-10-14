@@ -111,21 +111,21 @@ class GD_CORE_API ValueTypeMetadata {
    * given type.
    */
   bool IsNumber() const {
-    return gd::ValueTypeMetadata::IsTypeExpression("number", name);
+    return gd::ValueTypeMetadata::IsTypeValue("number", name);
   }
 
   /**
    * \brief Return true if the type is a string.
    */
   bool IsString() const {
-    return gd::ValueTypeMetadata::IsTypeExpression("string", name);
+    return gd::ValueTypeMetadata::IsTypeValue("string", name);
   }
 
   /**
    * \brief Return true if the type is a boolean.
    */
   bool IsBoolean() const {
-    return gd::ValueTypeMetadata::IsTypeExpression("boolean", name);
+    return gd::ValueTypeMetadata::IsTypeValue("boolean", name);
   }
 
   /**
@@ -135,7 +135,7 @@ class GD_CORE_API ValueTypeMetadata {
    * and ExpressionAutocompletion) and in the EventsCodeGenerator.
    */
   bool IsVariable() const {
-    return gd::ValueTypeMetadata::IsTypeExpression("variable", name);
+    return gd::ValueTypeMetadata::GetPrimitiveValueType(name) == "variable";
   }
 
   /**
@@ -175,7 +175,9 @@ class GD_CORE_API ValueTypeMetadata {
   }
 
   /**
-   * \brief Return true if the type is an expression of the given type.
+   * \brief Return true if the type is an expression of the given type from the
+   * caller point of view.
+   *
    * \note If you are adding a new type of parameter, also add it in the IDE (
    * see EventsFunctionParametersEditor, ParameterRenderingService
    * and ExpressionAutocompletion) and in the EventsCodeGenerator.
@@ -186,6 +188,7 @@ class GD_CORE_API ValueTypeMetadata {
       return parameterType == "number" || parameterType == "expression" ||
              parameterType == "camera" || parameterType == "forceMultiplier";
     } else if (type == "string") {
+      // "key" and "mouse" are not mapped her, see GetPrimitiveValueType.
       return parameterType == "string" || parameterType == "layer" ||
              parameterType == "color" || parameterType == "file" ||
              parameterType == "stringWithSelector" ||
@@ -223,6 +226,26 @@ class GD_CORE_API ValueTypeMetadata {
              // Deprecated, old parameter types:
              parameterType == "soundfile" ||
              parameterType == "musicfile";
+    }
+    return false;
+  }
+
+  /**
+   * \brief Return true if the type is a value of the given primitive type from
+   * the function events point of view
+   */
+  static bool IsTypeValue(const gd::String &type,
+                           const gd::String &parameterType) {
+    if (gd::ValueTypeMetadata::IsTypeExpression(type, parameterType)) {
+      return true;
+    }
+    // These 2 parameter types are not strings from the outside of a function as
+    // the generator add quote around a text, but from the events inside of the
+    // function the parameter is a string.
+    //
+    // See EventsCodeGenerator::GenerateParameterCodes
+    if (type == "string") {
+      return parameterType == "key" || parameterType == "mouse";
     }
     return false;
   }

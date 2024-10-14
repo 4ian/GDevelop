@@ -36,8 +36,8 @@ struct GD_CORE_API ExpressionParserLocation {
 
  private:
   bool isValid;
-  size_t startPosition;
-  size_t endPosition;
+  size_t startPosition = 0;
+  size_t endPosition = 0;
 };
 
 /**

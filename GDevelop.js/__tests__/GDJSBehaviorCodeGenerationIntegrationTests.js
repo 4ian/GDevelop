@@ -10,6 +10,7 @@ describe('libGD.js - GDJS Behavior Code Generation integration tests', function 
   it('generates a working empty behavior', function () {
     // Create an empty behavior
     const project = new gd.ProjectHelper.createNewGDJSProject();
+    const eventsFunctionsExtension = new gd.EventsFunctionsExtension();
     const eventsBasedBehavior = new gd.EventsBasedBehavior();
     eventsBasedBehavior.setName('MyBehavior');
     eventsBasedBehavior.setFullName('My descriptive name');
@@ -18,9 +19,11 @@ describe('libGD.js - GDJS Behavior Code Generation integration tests', function 
     const makeCompiledRuntimeBehavior = generateCompiledRuntimeBehaviorMaker(
       gd,
       project,
+      eventsFunctionsExtension,
       eventsBasedBehavior
     );
     eventsBasedBehavior.delete();
+    eventsFunctionsExtension.delete();
     project.delete();
 
     // Instantiate the behavior
@@ -41,6 +44,7 @@ describe('libGD.js - GDJS Behavior Code Generation integration tests', function 
   it('generates a working behavior with doStepPreEvents using "Trigger Once" condition', function () {
     // Create a new behavior with events in doStepPreEvents
     const project = new gd.ProjectHelper.createNewGDJSProject();
+    const eventsFunctionsExtension = new gd.EventsFunctionsExtension();
     const eventsBasedBehavior = new gd.EventsBasedBehavior();
     eventsBasedBehavior.setName('MyBehavior');
     eventsBasedBehavior.setFullName('My descriptive name');
@@ -75,9 +79,11 @@ describe('libGD.js - GDJS Behavior Code Generation integration tests', function 
     const makeCompiledRuntimeBehavior = generateCompiledRuntimeBehaviorMaker(
       gd,
       project,
+      eventsFunctionsExtension,
       eventsBasedBehavior
     );
     eventsBasedBehavior.delete();
+    eventsFunctionsExtension.delete();
     project.delete();
 
     const { gdjs, runtimeScene } = makeMinimalGDJSMock();
@@ -114,6 +120,7 @@ describe('libGD.js - GDJS Behavior Code Generation integration tests', function 
   it('generates working behavior with properties (shared or not, with different types), all used in an expression', function () {
     // Create a new behavior with events in doStepPreEvents
     const project = new gd.ProjectHelper.createNewGDJSProject();
+    const eventsFunctionsExtension = new gd.EventsFunctionsExtension();
     const eventsBasedBehavior = new gd.EventsBasedBehavior();
     eventsBasedBehavior.setName('MyBehavior');
     eventsBasedBehavior.setFullName('My descriptive name');
@@ -175,10 +182,12 @@ describe('libGD.js - GDJS Behavior Code Generation integration tests', function 
     const makeCompiledRuntimeBehavior = generateCompiledRuntimeBehaviorMaker(
       gd,
       project,
+      eventsFunctionsExtension,
       eventsBasedBehavior,
       { logCode: false }
     );
     eventsBasedBehavior.delete();
+    eventsFunctionsExtension.delete();
     project.delete();
 
     const { gdjs, runtimeScene } = makeMinimalGDJSMock();
@@ -220,6 +229,7 @@ describe('libGD.js - GDJS Behavior Code Generation integration tests', function 
 function generateCompiledRuntimeBehaviorMaker(
   gd,
   project,
+  eventsFunctionsExtension,
   eventsBasedBehavior,
   { logCode } = {}
 ) {
@@ -245,7 +255,7 @@ function generateCompiledRuntimeBehaviorMaker(
   }
 
   const code = behaviorCodeGenerator.generateRuntimeBehaviorCompleteCode(
-    'MyExtension',
+    eventsFunctionsExtension,
     eventsBasedBehavior,
     codeNamespace,
     behaviorMethodMangledNames,

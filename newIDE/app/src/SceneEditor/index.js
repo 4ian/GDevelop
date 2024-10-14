@@ -131,6 +131,10 @@ type Props = {|
     extensionName: string,
     eventsBasedObjectName: string
   ) => void,
+  onOpenEventBasedObjectEditor: (
+    extensionName: string,
+    eventsBasedObjectName: string
+  ) => void,
 
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
@@ -1556,6 +1560,20 @@ export default class SceneEditor extends React.Component<Props, State> {
               ),
             }
           : null,
+        object && project.hasEventsBasedObject(object.getType())
+          ? {
+              label: i18n._(t`Edit children`),
+              click: () =>
+                this.props.onOpenEventBasedObjectEditor(
+                  gd.PlatformExtension.getExtensionFromFullObjectType(
+                    object.getType()
+                  ),
+                  gd.PlatformExtension.getObjectNameFromFullObjectType(
+                    object.getType()
+                  )
+                ),
+            }
+          : null,
         { type: 'separator' },
         ...this.getContextMenuLayoutItems(i18n),
       ].filter(Boolean);
@@ -1978,6 +1996,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                 canObjectOrGroupBeGlobal={this.canObjectOrGroupBeGlobal}
                 updateBehaviorsSharedData={this.updateBehaviorsSharedData}
                 onEditObject={this.editObject}
+                onOpenEventBasedObjectEditor={
+                  this.props.onOpenEventBasedObjectEditor
+                }
                 onRenameObjectFolderOrObjectWithContextFinish={
                   this._onRenameObjectFolderOrObjectWithContextFinish
                 }
@@ -2273,6 +2294,10 @@ export default class SceneEditor extends React.Component<Props, State> {
                     {this.state.extractAsCustomObjectDialogOpen && (
                       <ExtractAsCustomObjectDialog
                         project={project}
+                        globalObjectsContainer={
+                          this.props.globalObjectsContainer
+                        }
+                        objectsContainer={this.props.objectsContainer}
                         initialInstances={this.props.initialInstances}
                         selectedInstances={this.instancesSelection.getSelectedInstances()}
                         onCancel={() =>

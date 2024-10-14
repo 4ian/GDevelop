@@ -33,7 +33,7 @@ class GD_CORE_API Variable {
     Unknown,
     /** Used when objects of a group have different types for a variable. */
     MixedTypes,
-    
+
     // Primitive types
     String,
     Number,
@@ -393,11 +393,11 @@ class GD_CORE_API Variable {
    */
   static Type StringAsType(const gd::String& str);
 
-  bool folded;
+  bool folded = false;
   mutable Type type;
   mutable gd::String str;
   mutable double value;
-  mutable bool boolVal;
+  mutable bool boolVal = false;
   mutable bool hasMixedValues;
   mutable std::map<gd::String, std::shared_ptr<Variable>>
       children;  ///< Children, when the variable is considered as a structure.

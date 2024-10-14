@@ -150,9 +150,7 @@ describe('libGD.js', function () {
           .toJSArray()
       ).toEqual([]);
 
-      project
-        .getObjects()
-        .insertNewObject(project, 'Sprite', 'MyObject', 0);
+      project.getObjects().insertNewObject(project, 'Sprite', 'MyObject', 0);
 
       expect(
         gd.UsedExtensionsFinder.scanProject(project)
@@ -228,7 +226,9 @@ describe('libGD.js', function () {
       expect(layout.getObjects().getObjectAt(0).ptr).toBe(object.ptr);
       expect(layout.getObjects().getObjectAt(1).ptr).toBe(object2.ptr);
       expect(layout.getObjects().getObjectAt(0).getType()).toBe('Sprite');
-      expect(layout.getObjects().getObjectAt(1).getType()).toBe('TextObject::Text');
+      expect(layout.getObjects().getObjectAt(1).getType()).toBe(
+        'TextObject::Text'
+      );
     });
 
     afterAll(function () {
@@ -777,7 +777,12 @@ describe('libGD.js', function () {
       expect(initialInstance.hasCustomDepth()).toBe(false);
     });
     it('Sprite object custom properties', function () {
-      initialInstance.updateCustomProperty('animation', '2', project.getObjects(), layout.getObjects());
+      initialInstance.updateCustomProperty(
+        'animation',
+        '2',
+        project.getObjects(),
+        layout.getObjects()
+      );
       expect(
         initialInstance
           .getCustomProperties(project.getObjects(), layout.getObjects())
@@ -1519,9 +1524,9 @@ describe('libGD.js', function () {
       anim1.setDirectionsCount(1);
       anim1.getDirection(0).addSprite(sprite1);
 
-      gd.castObject(obj.getConfiguration(), gd.SpriteObject).getAnimations().addAnimation(
-        anim1
-      );
+      gd.castObject(obj.getConfiguration(), gd.SpriteObject)
+        .getAnimations()
+        .addAnimation(anim1);
 
       {
         let allResources = project.getResourcesManager().getAllResourceNames();
@@ -1550,7 +1555,7 @@ describe('libGD.js', function () {
         'LoadingScreenImage'
       );
 
-      const worker = new gd.ResourcesInUseHelper();
+      const worker = new gd.ResourcesInUseHelper(project.getResourcesManager());
       gd.ResourceExposer.exposeWholeProjectResources(project, worker);
       expect(worker.getAllImages().toNewVectorString().toJSArray().length).toBe(
         1
@@ -1561,7 +1566,9 @@ describe('libGD.js', function () {
 
       gd.ProjectResourcesAdder.removeAllUseless(project, 'image');
 
-      const newWorker = new gd.ResourcesInUseHelper();
+      const newWorker = new gd.ResourcesInUseHelper(
+        project.getResourcesManager()
+      );
       gd.ResourceExposer.exposeWholeProjectResources(project, newWorker);
       expect(
         newWorker.getAllImages().toNewVectorString().toJSArray().length
@@ -1590,14 +1597,17 @@ describe('libGD.js', function () {
       animation.getDirection(0).addSprite(sprite1);
       spriteConfiguration.getAnimations().addAnimation(animation);
 
-      let worker = extend(new gd.ArbitraryResourceWorkerJS(project.getResourcesManager()), {
-        exposeImage: function (image) {
-          expect(image).toBe('Used');
-          done();
+      let worker = extend(
+        new gd.ArbitraryResourceWorkerJS(project.getResourcesManager()),
+        {
+          exposeImage: function (image) {
+            expect(image).toBe('Used');
+            done();
 
-          return image;
-        },
-      });
+            return image;
+          },
+        }
+      );
 
       gd.ResourceExposer.exposeWholeProjectResources(project, worker);
       project.delete();
@@ -1606,6 +1616,7 @@ describe('libGD.js', function () {
 
   describe('gd.ResourcesInUseHelper', function () {
     it('should find the images used by objects', function () {
+      const project = gd.ProjectHelper.createNewGDJSProject();
       let sprite1 = new gd.Sprite();
       sprite1.setImageName('Image1');
       let sprite2 = new gd.Sprite();
@@ -1629,7 +1640,9 @@ describe('libGD.js', function () {
       animation2.getDirection(0).addSprite(sprite1);
       spriteObject2.getAnimations().addAnimation(animation2);
 
-      const resourcesInUse = new gd.ResourcesInUseHelper();
+      const resourcesInUse = new gd.ResourcesInUseHelper(
+        project.getResourcesManager()
+      );
 
       {
         spriteObject.exposeResources(resourcesInUse);
@@ -1655,6 +1668,7 @@ describe('libGD.js', function () {
       }
 
       resourcesInUse.delete();
+      project.delete();
 
       spriteObject.delete();
       spriteObject2.delete();
@@ -1698,7 +1712,10 @@ describe('libGD.js', function () {
       spriteObject2.getAnimations().addAnimation(animation2);
 
       {
-        const objectsCollector = new gd.ObjectsUsingResourceCollector(project.getResourcesManager(), 'Image1');
+        const objectsCollector = new gd.ObjectsUsingResourceCollector(
+          project.getResourcesManager(),
+          'Image1'
+        );
         gd.ProjectBrowserHelper.exposeProjectObjects(project, objectsCollector);
         const objectNames = objectsCollector.getObjectNames().toJSArray();
         objectsCollector.delete();
@@ -1707,7 +1724,10 @@ describe('libGD.js', function () {
         expect(objectNames).toContain('MyObject2');
       }
       {
-        const objectsCollector = new gd.ObjectsUsingResourceCollector(project.getResourcesManager(), 'Image2');
+        const objectsCollector = new gd.ObjectsUsingResourceCollector(
+          project.getResourcesManager(),
+          'Image2'
+        );
         gd.ProjectBrowserHelper.exposeProjectObjects(project, objectsCollector);
         const objectNames = objectsCollector.getObjectNames().toJSArray();
         objectsCollector.delete();
@@ -1715,7 +1735,10 @@ describe('libGD.js', function () {
         expect(objectNames).toContain('MyObject');
       }
       {
-        const objectsCollector = new gd.ObjectsUsingResourceCollector(project.getResourcesManager(), 'Image3');
+        const objectsCollector = new gd.ObjectsUsingResourceCollector(
+          project.getResourcesManager(),
+          'Image3'
+        );
         gd.ProjectBrowserHelper.exposeProjectObjects(project, objectsCollector);
         const objectNames = objectsCollector.getObjectNames().toJSArray();
         objectsCollector.delete();
@@ -2033,9 +2056,14 @@ describe('libGD.js', function () {
     });
 
     it('can have its type retrieved with gd.getTypeOfObject', function () {
-      expect(gd.getTypeOfObject(project.getObjects(), layout.getObjects(), 'TheObject', true)).toBe(
-        'Sprite'
-      );
+      expect(
+        gd.getTypeOfObject(
+          project.getObjects(),
+          layout.getObjects(),
+          'TheObject',
+          true
+        )
+      ).toBe('Sprite');
     });
 
     it('can have behaviors', function () {
@@ -2120,7 +2148,9 @@ describe('libGD.js', function () {
       myObject.getProperties = function () {
         let properties = new gd.MapStringPropertyDescriptor();
 
-        properties.getOrCreate('My first property').setValue(this.content.property1);
+        properties
+          .getOrCreate('My first property')
+          .setValue(this.content.property1);
         properties
           .getOrCreate('My other property')
           .setValue(this.content.property2 ? '1' : '0')
@@ -2149,9 +2179,7 @@ describe('libGD.js', function () {
 
         return false;
       };
-      myObject.getInitialInstanceProperties = function (
-        instance
-      ) {
+      myObject.getInitialInstanceProperties = function (instance) {
         let properties = new gd.MapStringPropertyDescriptor();
 
         properties
@@ -2222,9 +2250,18 @@ describe('libGD.js', function () {
       const object2 = object1.clone().release();
       const object3 = object1.clone().release();
 
-      const object1jsImplementation = gd.castObject(object1, gd.ObjectJsImplementation);
-      const object2jsImplementation = gd.castObject(object2, gd.ObjectJsImplementation);
-      const object3jsImplementation = gd.castObject(object3, gd.ObjectJsImplementation);
+      const object1jsImplementation = gd.castObject(
+        object1,
+        gd.ObjectJsImplementation
+      );
+      const object2jsImplementation = gd.castObject(
+        object2,
+        gd.ObjectJsImplementation
+      );
+      const object3jsImplementation = gd.castObject(
+        object3,
+        gd.ObjectJsImplementation
+      );
 
       {
         // Check properties can be accessed.
@@ -3424,7 +3461,10 @@ describe('libGD.js', function () {
       const fs = makeFakeAbstractFileSystem(gd, {});
 
       // Check that ResourcesMergingHelper can update the filenames
-      const resourcesMergingHelper = new gd.ResourcesMergingHelper(project.getResourcesManager(), fs);
+      const resourcesMergingHelper = new gd.ResourcesMergingHelper(
+        project.getResourcesManager(),
+        fs
+      );
       resourcesMergingHelper.setBaseDirectory('/my/project/');
       gd.ResourceExposer.exposeWholeProjectResources(
         project,
@@ -3647,7 +3687,7 @@ describe('libGD.js', function () {
         done();
       };
 
-      const exporter = new gd.Exporter(fs);
+      const exporter = new gd.Exporter(fs, 'fake-gdjs-root');
       const previewExportOptions = new gd.PreviewExportOptions(
         project,
         '/path/for/export/'
@@ -3656,6 +3696,9 @@ describe('libGD.js', function () {
       exporter.exportProjectForPixiPreview(previewExportOptions);
       previewExportOptions.delete();
       exporter.delete();
+
+      project.delete();
+      fs.delete();
     });
   });
 
@@ -3750,7 +3793,8 @@ describe('libGD.js', function () {
           project,
           layout
         ),
-        type
+        type,
+        ''
       );
       expressionNode.visit(expressionValidator);
       if (expectedError2) {
@@ -4213,7 +4257,7 @@ describe('libGD.js', function () {
         .addNewParameter('')
         .setType('objectList')
         .setExtraInfo('Sprite')
-        .setDescription('This parameter will be skipped, as it has no name')
+        .setDescription('This parameter will be skipped, as it has no name');
       parameters
         .addNewParameter('MyString')
         .setType('string')
@@ -4636,7 +4680,7 @@ describe('libGD.js', function () {
 
       expect(layout2.getObjects().hasObjectNamed('MyObject')).toBe(true);
       expect(layout2.getObjects().hasObjectNamed('OtherObject')).toBe(true);
-      const rootFolder2 = layout.getObjects().getRootFolder();
+      const rootFolder2 = layout2.getObjects().getRootFolder();
       expect(rootFolder2.hasObjectNamed('MyObject')).toBe(true);
       expect(rootFolder2.hasObjectNamed('OtherObject')).toBe(true);
       expect(rootFolder2.getChildrenCount()).toEqual(3);
@@ -4694,7 +4738,7 @@ describe('libGD.js', function () {
 
       expect(layout2.getObjects().hasObjectNamed('MyObject')).toBe(true);
       expect(layout2.getObjects().hasObjectNamed('OtherObject')).toBe(true);
-      const rootFolder2 = layout.getObjects().getRootFolder();
+      const rootFolder2 = layout2.getObjects().getRootFolder();
       expect(rootFolder2.hasObjectNamed('MyObject')).toBe(true);
       expect(rootFolder2.hasObjectNamed('OtherObject')).toBe(true);
       expect(rootFolder2.getChildrenCount()).toEqual(3);

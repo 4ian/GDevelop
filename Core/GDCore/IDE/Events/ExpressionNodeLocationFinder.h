@@ -33,8 +33,10 @@ class GD_CORE_API ExpressionNodeLocationFinder
    * \brief Initialize the finder to search at the specified position.
    */
   ExpressionNodeLocationFinder(size_t searchedPosition_)
-      : searchedPosition(searchedPosition_), foundNode(nullptr){};
-  virtual ~ExpressionNodeLocationFinder(){};
+      : searchedPosition(searchedPosition_),
+        foundNode(nullptr),
+        parentNode(nullptr) {};
+  virtual ~ExpressionNodeLocationFinder() {};
 
   /**
    * \brief Helper function to find the deepest node at the search position, if

@@ -1589,8 +1589,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       const runCompiledEvents = generateCompiledEventsForEventsFunction(
         gd,
         project,
-        eventsFunction,
-        true
+        eventsFunction
       );
 
       eventsFunction.delete();

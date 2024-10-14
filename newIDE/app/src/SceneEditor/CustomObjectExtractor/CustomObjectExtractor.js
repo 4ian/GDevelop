@@ -74,6 +74,7 @@ export const extractAsCustomObject = ({
 
   let zOrder = 0;
   let layer = '';
+  let isRenderedIn3D = null;
   for (const serializedInstance of serializedSelection) {
     const instance = new gd.InitialInstance();
     unserializeFromJSObject(instance, serializedInstance);
@@ -89,6 +90,13 @@ export const extractAsCustomObject = ({
     if (!childObjects.hasObjectNamed(objectName)) {
       const object = getObjectByName(globalObjects, sceneObjects, objectName);
       if (object) {
+        if (isRenderedIn3D === null) {
+          const objectMetadata = gd.MetadataProvider.getObjectMetadata(
+            project.getCurrentPlatform(),
+            object.getType()
+          );
+          isRenderedIn3D = objectMetadata.isRenderedIn3D();
+        }
         const serializedObject = serializeToJSObject(object);
         const childObject = childObjects.insertNewObject(
           project,
@@ -104,6 +112,7 @@ export const extractAsCustomObject = ({
         );
       }
     }
+    newEventsBasedObject.markAsRenderedIn3D(!!isRenderedIn3D);
 
     newEventsBasedObject
       .getInitialInstances()

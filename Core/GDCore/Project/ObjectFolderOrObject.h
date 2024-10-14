@@ -193,7 +193,7 @@ class GD_CORE_API ObjectFolderOrObject {
   static gd::ObjectFolderOrObject badObjectFolderOrObject;
 
   gd::ObjectFolderOrObject*
-      parent;  // nullptr if root folder, points to the parent folder otherwise.
+      parent = nullptr;  // nullptr if root folder, points to the parent folder otherwise.
   QuickCustomization::Visibility quickCustomizationVisibility;
 
   // Representing an object:

@@ -4,6 +4,7 @@
 #include "GDCore/Extensions/Metadata/DependencyMetadata.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Project/Project.h"
+#include "GDCore/Extensions/Platform.h"
 
 namespace gd {
 

@@ -2033,7 +2033,7 @@ const MainFrame = (props: Props) => {
     openExternalLayout(name);
   };
 
-  const onExtractAsEventBasedObject = (
+  const onOpenEventBasedObjectEditor = (
     extensionName: string,
     eventsBasedObjectName: string
   ) => {
@@ -3631,7 +3631,8 @@ const MainFrame = (props: Props) => {
                     },
                     openBehaviorEvents: openBehaviorEvents,
                     onExtractAsExternalLayout: onExtractAsExternalLayout,
-                    onExtractAsEventBasedObject: onExtractAsEventBasedObject,
+                    onExtractAsEventBasedObject: onOpenEventBasedObjectEditor,
+                    onOpenEventBasedObjectEditor: onOpenEventBasedObjectEditor,
                     onEventsBasedObjectChildrenEdited: onEventsBasedObjectChildrenEdited,
                     onSceneObjectEdited: onSceneObjectEdited,
                   })}

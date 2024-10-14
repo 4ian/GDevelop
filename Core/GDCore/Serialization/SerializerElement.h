@@ -456,13 +456,13 @@ class GD_CORE_API SerializerElement {
    */
   void Init(const gd::SerializerElement &other);
 
-  bool valueUndefined;  ///< If true, the element does not have a value.
+  bool valueUndefined = true;  ///< If true, the element does not have a value.
   SerializerValue elementValue;
 
   std::map<gd::String, SerializerValue> attributes;
   std::vector<std::pair<gd::String, std::shared_ptr<SerializerElement> > >
       children;
-  mutable bool isArray;        ///< true if element is considered as an array
+  mutable bool isArray = false;  ///< true if element is considered as an array
   mutable gd::String arrayOf;  ///< The name of the children (was useful for XML
                                ///< parsed elements).
   mutable gd::String deprecatedArrayOf;  ///< Alternate name for children

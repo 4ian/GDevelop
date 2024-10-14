@@ -39,7 +39,7 @@ These are the bindings of GDevelop core classes to WebAssembly+JavaScript. This 
   npm run build # After any C++ changes.
   ```
 
--> ⏱ The linking (last step) of the build can be made a few seconds faster by specifying `-- --dev`.
+  > ⏱ The linking (last step) of the build can be made a few seconds faster, useful for development: `npm run build -- --variant=dev`.
 
 - You can then launch GDevelop 5 that will use your build of GDevelop.js:
 
@@ -57,6 +57,18 @@ More information in [GDevelop 5 README](https://github.com/4ian/GDevelop/blob/ma
 ```bash
 npm test
 ```
+
+### Debugging
+
+You can build the library with various level of debugging and memory checks.
+
+```bash
+npm run build -- --variant=debug # Build with debugging information (useful for stacktraces)
+npm run build -- --variant=debug-assertions # Build with assertions and "SAFE_HEAP=1", useful to find memory bugs.
+npm run build -- --variant=debug-sanitizers # Build with memory sanitizers. Will be very slow.
+```
+
+It's then recommended to run the tests (`npm test`) to check if there are any obvious memory bugs found.
 
 ### About the internal steps of compilation
 

@@ -74,8 +74,8 @@ class GD_CORE_API ExpressionsParameterMover
 
   const gd::Platform &platform;
   gd::String functionName;
-  std::size_t oldIndex;
-  std::size_t newIndex;
+  std::size_t oldIndex = 0;
+  std::size_t newIndex = 0;
   gd::String behaviorType;
   gd::String objectType;
 };

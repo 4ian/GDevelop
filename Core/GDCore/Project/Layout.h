@@ -369,9 +369,9 @@ class GD_CORE_API Layout {
  private:
   gd::String name;         ///< Scene name
   gd::String mangledName;  ///< The scene name mangled by SceneNameMangler
-  unsigned int backgroundColorR;     ///< Background color Red component
-  unsigned int backgroundColorG;     ///< Background color Green component
-  unsigned int backgroundColorB;     ///< Background color Blue component
+  unsigned int backgroundColorR = 0;     ///< Background color Red component
+  unsigned int backgroundColorG = 0;     ///< Background color Green component
+  unsigned int backgroundColorB = 0;     ///< Background color Blue component
   gd::String title;                  ///< Title displayed in the window
   gd::VariablesContainer variables;  ///< Variables list
   gd::ObjectsContainer objectsContainer;
@@ -379,12 +379,12 @@ class GD_CORE_API Layout {
   gd::LayersContainer layers;
   std::map<gd::String, std::unique_ptr<gd::BehaviorsSharedData>>
       behaviorsSharedData;   ///< Initial shared datas of behaviors
-  bool stopSoundsOnStartup;  ///< True to make the scene stop all sounds at
-                             ///< startup.
-  bool standardSortMethod;   ///< True to sort objects using standard sort.
-  bool disableInputWhenNotFocused;  /// If set to true, the input must be
-                                    /// disabled when the window do not have the
-                                    /// focus.
+  bool stopSoundsOnStartup = true;  ///< True to make the scene stop all sounds at
+                                    ///< startup.
+  bool standardSortMethod = true;   ///< True to sort objects using standard sort.
+  bool disableInputWhenNotFocused = true;  /// If set to true, the input must be
+                                           /// disabled when the window do not have the
+                                           /// focus.
   static gd::BehaviorsSharedData
       badBehaviorSharedData;  ///< Null object, returned when
                               ///< GetBehaviorSharedData can not find the

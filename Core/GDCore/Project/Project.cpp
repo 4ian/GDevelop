@@ -71,7 +71,7 @@ Project::Project()
       isPlayableWithKeyboard(false),
       isPlayableWithGamepad(false),
       isPlayableWithMobile(false),
-      currentPlatform(NULL),
+      currentPlatform(nullptr),
       gdMajorVersion(gd::VersionWrapper::Major()),
       gdMinorVersion(gd::VersionWrapper::Minor()),
       gdBuildVersion(gd::VersionWrapper::Build()),

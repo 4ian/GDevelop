@@ -57,7 +57,7 @@ describe('libGD.js - GDJS related tests', function () {
       // Prepare a fake file system
       var fs = makeFakeAbstractFileSystem(gd, {
         '/fake-gdjs-root/Runtime/index.html': fakeIndexHtmlContent,
-        '/fake-gdjs-root/Runtime/Electron/LICENSE.GDevelop.txt': "",
+        '/fake-gdjs-root/Runtime/Electron/LICENSE.GDevelop.txt': '',
       });
 
       // Export and check the content of written files.
@@ -68,32 +68,42 @@ describe('libGD.js - GDJS related tests', function () {
       exporter.delete();
 
       // Check the index.html contains the include files.
-      expect(fs.writeToFile.mock.calls[1][0]).toBe('/fake-export-dir/index.html');
+      expect(fs.writeToFile.mock.calls[1][0]).toBe(
+        '/fake-export-dir/index.html'
+      );
       expect(fs.writeToFile.mock.calls[1][1]).toContain('gd.js');
-      expect(fs.writeToFile.mock.calls[1][1]).toContain('affinetransformation.js');
-      expect(fs.writeToFile.mock.calls[1][1]).toContain('pixi-renderers/runtimescene-pixi-renderer.js');
+      expect(fs.writeToFile.mock.calls[1][1]).toContain(
+        'affinetransformation.js'
+      );
+      expect(fs.writeToFile.mock.calls[1][1]).toContain(
+        'pixi-renderers/runtimescene-pixi-renderer.js'
+      );
       expect(fs.writeToFile.mock.calls[1][1]).toContain('data.js');
 
       // Check the webmanifest was properly generated.
-      expect(fs.writeToFile.mock.calls[2][0]).toBe('/fake-export-dir/manifest.webmanifest');
+      expect(fs.writeToFile.mock.calls[2][0]).toBe(
+        '/fake-export-dir/manifest.webmanifest'
+      );
       expect(() => JSON.parse(fs.writeToFile.mock.calls[2][1])).not.toThrow();
       expect(JSON.parse(fs.writeToFile.mock.calls[2][1])).toEqual({
-        "name": "My great project with spaces and \"quotes\"!",
-        "short_name": "My great project with spaces and \"quotes\"!",
-        "id": "com.example.gamename",
-        "description": "A nice project\nwith line breaks in the description.",
-        "orientation": "landscape",
-        "start_url": "./index.html",
-        "display": "standalone",
-        "background_color": "black",
-        "categories": ["games", "entertainment"],
-        "icons": []
+        name: 'My great project with spaces and "quotes"!',
+        short_name: 'My great project with spaces and "quotes"!',
+        id: 'com.example.gamename',
+        description: 'A nice project\nwith line breaks in the description.',
+        orientation: 'landscape',
+        start_url: './index.html',
+        display: 'standalone',
+        background_color: 'black',
+        categories: ['games', 'entertainment'],
+        icons: [],
       });
     });
     it('properly exports Cordova files', () => {
       // Create a simple project
       const project = gd.ProjectHelper.createNewGDJSProject();
-      project.setName('My great project with spaces and "quotes" and (parentheses)!');
+      project.setName(
+        'My great project with spaces and "quotes" and (parentheses)!'
+      );
       project.setVersion('1.2.3');
 
       // Prepare a fake file system
@@ -101,7 +111,7 @@ describe('libGD.js - GDJS related tests', function () {
         '/fake-gdjs-root/Runtime/Cordova/www/index.html': fakeIndexHtmlContent,
         '/fake-gdjs-root/Runtime/Cordova/config.xml': fakeConfigXmlContent,
         '/fake-gdjs-root/Runtime/Cordova/package.json': fakePackageJsonContent,
-        '/fake-gdjs-root/Runtime/Cordova/www/LICENSE.GDevelop.txt': "",
+        '/fake-gdjs-root/Runtime/Cordova/www/LICENSE.GDevelop.txt': '',
       });
 
       // Export and check the content of written files.
@@ -159,7 +169,7 @@ describe('libGD.js - GDJS related tests', function () {
         '/fake-gdjs-root/Runtime/Cordova/www/index.html': fakeIndexHtmlContent,
         '/fake-gdjs-root/Runtime/Cordova/config.xml': fakeConfigXmlContent,
         '/fake-gdjs-root/Runtime/Cordova/package.json': fakePackageJsonContent,
-        '/fake-gdjs-root/Runtime/Cordova/www/LICENSE.GDevelop.txt': "",
+        '/fake-gdjs-root/Runtime/Cordova/www/LICENSE.GDevelop.txt': '',
       });
 
       // Export and check the content of written files.
@@ -213,21 +223,25 @@ describe('libGD.js - GDJS related tests', function () {
       const condition = new gd.Instruction();
       condition.setType('BuiltinCommonInstructions::Once');
       gd.asRepeatEvent(evt).getConditions().insert(condition, 0);
+      condition.delete();
 
       const layoutCodeGenerator = new gd.LayoutCodeGenerator(project);
+      const diagnosticReport = new gd.DiagnosticReport();
       const code = layoutCodeGenerator.generateLayoutCompleteCode(
         layout,
         new gd.SetString(),
+        diagnosticReport,
         true
       );
+      diagnosticReport.delete();
+      layoutCodeGenerator.delete();
+      project.delete();
 
       // The loop is using a counter somewhere
       expect(code).toMatch('repeatCount');
 
       // Trigger once is used in a condition
       expect(code).toMatch('runtimeScene.getOnceTriggers().triggerOnce');
-
-      condition.delete();
     });
     it('does not generate code for improperly set up actions/conditions', function () {
       const project = gd.ProjectHelper.createNewGDJSProject();
@@ -235,9 +249,7 @@ describe('libGD.js - GDJS related tests', function () {
       const evt = layout
         .getEvents()
         .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
-      layout
-        .getObjects()
-        .insertNewObject(project, 'Sprite', 'MyObject', 0);
+      layout.getObjects().insertNewObject(project, 'Sprite', 'MyObject', 0);
       layout
         .getObjects()
         .insertNewObject(project, 'TextObject::Text', 'MyTextObject', 0);
@@ -251,59 +263,84 @@ describe('libGD.js - GDJS related tests', function () {
         );
 
       // Valid action (to check code generation is done).
-      const action = new gd.Instruction();
-      action.setType('ChangeAnimation');
-      action.setParametersCount(4);
-      action.setParameter(0, 'MyObject');
-      action.setParameter(1, '=');
-      action.setParameter(2, '2');
-      gd.asStandardEvent(evt).getActions().insert(action, 0);
+      {
+        const action = new gd.Instruction();
+        action.setType('ChangeAnimation');
+        action.setParametersCount(4);
+        action.setParameter(0, 'MyObject');
+        action.setParameter(1, '=');
+        action.setParameter(2, '2');
+        gd.asStandardEvent(evt).getActions().insert(action, 0);
+        action.delete();
+      }
 
       // Action with mismatched object type.
-      const mismatchedObjectTypeAction = new gd.Instruction();
-      mismatchedObjectTypeAction.setType('ChangeAnimation');
-      mismatchedObjectTypeAction.setParametersCount(4);
-      mismatchedObjectTypeAction.setParameter(0, 'MyTextObject');
-      mismatchedObjectTypeAction.setParameter(1, '=');
-      mismatchedObjectTypeAction.setParameter(2, '2');
-      gd.asStandardEvent(evt)
-        .getActions()
-        .insert(mismatchedObjectTypeAction, 1);
+      {
+        const mismatchedObjectTypeAction = new gd.Instruction();
+        mismatchedObjectTypeAction.setType('ChangeAnimation');
+        mismatchedObjectTypeAction.setParametersCount(4);
+        mismatchedObjectTypeAction.setParameter(0, 'MyTextObject');
+        mismatchedObjectTypeAction.setParameter(1, '=');
+        mismatchedObjectTypeAction.setParameter(2, '2');
+        gd.asStandardEvent(evt)
+          .getActions()
+          .insert(mismatchedObjectTypeAction, 1);
+        mismatchedObjectTypeAction.delete();
+      }
 
       // Action with an unknown object.
-      const unknownObjectAction = new gd.Instruction();
-      unknownObjectAction.setType('ChangeAnimation');
-      unknownObjectAction.setParametersCount(4);
-      unknownObjectAction.setParameter(0, 'UnknownObject');
-      unknownObjectAction.setParameter(1, '=');
-      unknownObjectAction.setParameter(2, '2');
-      gd.asStandardEvent(evt).getActions().insert(unknownObjectAction, 2);
+      {
+        const unknownObjectAction = new gd.Instruction();
+        unknownObjectAction.setType('ChangeAnimation');
+        unknownObjectAction.setParametersCount(4);
+        unknownObjectAction.setParameter(0, 'UnknownObject');
+        unknownObjectAction.setParameter(1, '=');
+        unknownObjectAction.setParameter(2, '2');
+        gd.asStandardEvent(evt).getActions().insert(unknownObjectAction, 2);
+        unknownObjectAction.delete();
+      }
 
       // Action that is unknown.
-      const unknownAction = new gd.Instruction();
-      unknownAction.setType('UnknownExtension::NotExistingInstruction');
-      unknownAction.setParametersCount(1);
-      unknownAction.setParameter(0, 'Anything');
-      gd.asStandardEvent(evt).getActions().insert(unknownAction, 3);
+      {
+        const unknownAction = new gd.Instruction();
+        unknownAction.setType('UnknownExtension::NotExistingInstruction');
+        unknownAction.setParametersCount(1);
+        unknownAction.setParameter(0, 'Anything');
+        gd.asStandardEvent(evt).getActions().insert(unknownAction, 3);
+        unknownAction.delete();
+      }
 
       // Action for an object not having the required capability.
-      const unsupportedCapabilityAction = new gd.Instruction();
-      unsupportedCapabilityAction.setType('EffectCapability::EffectBehavior::EnableEffect');
-      unsupportedCapabilityAction.setParametersCount(4);
-      unsupportedCapabilityAction.setParameter(0, 'MyFakeObjectWithUnsupportedCapability');
-      unsupportedCapabilityAction.setParameter(1, 'Effect');
-      unsupportedCapabilityAction.setParameter(1, '"MyEffect"');
-      unsupportedCapabilityAction.setParameter(2, 'yes');
-      gd.asStandardEvent(evt)
-        .getActions()
-        .insert(unsupportedCapabilityAction, 4);
+      {
+        const unsupportedCapabilityAction = new gd.Instruction();
+        unsupportedCapabilityAction.setType(
+          'EffectCapability::EffectBehavior::EnableEffect'
+        );
+        unsupportedCapabilityAction.setParametersCount(4);
+        unsupportedCapabilityAction.setParameter(
+          0,
+          'MyFakeObjectWithUnsupportedCapability'
+        );
+        unsupportedCapabilityAction.setParameter(1, 'Effect');
+        unsupportedCapabilityAction.setParameter(1, '"MyEffect"');
+        unsupportedCapabilityAction.setParameter(2, 'yes');
+        gd.asStandardEvent(evt)
+          .getActions()
+          .insert(unsupportedCapabilityAction, 4);
+        unsupportedCapabilityAction.delete();
+      }
 
       const layoutCodeGenerator = new gd.LayoutCodeGenerator(project);
+      const diagnosticReport = new gd.DiagnosticReport();
       const code = layoutCodeGenerator.generateLayoutCompleteCode(
         layout,
         new gd.SetString(),
+        diagnosticReport,
         true
       );
+      diagnosticReport.delete();
+      layoutCodeGenerator.delete();
+      project.delete();
 
       // Animation is set to 2 for MyObject
       expect(code).toMatch(
@@ -320,11 +357,11 @@ describe('libGD.js - GDJS related tests', function () {
       expect(code).toMatch('/* Unknown instruction - skipped. */');
 
       // Check that the action for an object not having the required capability was not generated.
-      expect(code).toEqual(expect.not.stringContaining(
-        'gdjs.SceneCode.GDMyFakeObjectWithUnsupportedCapabilityObjects1[i].getBehavior(\"Effect\")')
+      expect(code).toEqual(
+        expect.not.stringContaining(
+          'gdjs.SceneCode.GDMyFakeObjectWithUnsupportedCapabilityObjects1[i].getBehavior("Effect")'
+        )
       );
-
-      action.delete();
     });
     it('does not generate code for improperly set up action/conditions, with groups', function () {
       const project = gd.ProjectHelper.createNewGDJSProject();
@@ -332,9 +369,7 @@ describe('libGD.js - GDJS related tests', function () {
       const evt = layout
         .getEvents()
         .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
-      layout
-        .getObjects()
-        .insertNewObject(project, 'Sprite', 'MySprite', 0);
+      layout.getObjects().insertNewObject(project, 'Sprite', 'MySprite', 0);
       const obj = layout
         .getObjects()
         .insertNewObject(
@@ -352,31 +387,44 @@ describe('libGD.js - GDJS related tests', function () {
       group.addObject('MyFakeObjectWithUnsupportedCapability');
 
       // Valid action (to check code generation is done).
-      const action = new gd.Instruction();
-      action.setType('ChangeLayer');
-      action.setParametersCount(2);
-      action.setParameter(0, 'MyGroup');
-      action.setParameter(1, '"New layer"');
-      gd.asStandardEvent(evt).getActions().insert(action, 0);
+      {
+        const action = new gd.Instruction();
+        action.setType('ChangeLayer');
+        action.setParametersCount(2);
+        action.setParameter(0, 'MyGroup');
+        action.setParameter(1, '"New layer"');
+        gd.asStandardEvent(evt).getActions().insert(action, 0);
+        action.delete();
+      }
 
       // Action for an object not having the required capability.
-      const unsupportedCapabilityAction = new gd.Instruction();
-      unsupportedCapabilityAction.setType('EffectCapability::EffectBehavior::EnableEffect');
-      unsupportedCapabilityAction.setParametersCount(4);
-      unsupportedCapabilityAction.setParameter(0, 'MyGroup');
-      unsupportedCapabilityAction.setParameter(1, 'Effect');
-      unsupportedCapabilityAction.setParameter(2, '"MyEffect"');
-      unsupportedCapabilityAction.setParameter(3, 'yes');
-      gd.asStandardEvent(evt)
-        .getActions()
-        .insert(unsupportedCapabilityAction, 1);
+      {
+        const unsupportedCapabilityAction = new gd.Instruction();
+        unsupportedCapabilityAction.setType(
+          'EffectCapability::EffectBehavior::EnableEffect'
+        );
+        unsupportedCapabilityAction.setParametersCount(4);
+        unsupportedCapabilityAction.setParameter(0, 'MyGroup');
+        unsupportedCapabilityAction.setParameter(1, 'Effect');
+        unsupportedCapabilityAction.setParameter(2, '"MyEffect"');
+        unsupportedCapabilityAction.setParameter(3, 'yes');
+        gd.asStandardEvent(evt)
+          .getActions()
+          .insert(unsupportedCapabilityAction, 1);
+        unsupportedCapabilityAction.delete();
+      }
 
       const layoutCodeGenerator = new gd.LayoutCodeGenerator(project);
+      const diagnosticReport = new gd.DiagnosticReport();
       const code = layoutCodeGenerator.generateLayoutCompleteCode(
         layout,
         new gd.SetString(),
+        diagnosticReport,
         true
       );
+      diagnosticReport.delete();
+      layoutCodeGenerator.delete();
+      project.delete();
 
       // Layer can be changed for both object instances.
       expect(code).toMatch(
@@ -390,13 +438,13 @@ describe('libGD.js - GDJS related tests', function () {
       // was not generated for this object,
       // but generated for the Sprite supporting this capability.
       expect(code).toMatch(
-        'gdjs.SceneCode.GDMySpriteObjects1[i].getBehavior(\"Effect\").enableEffect(\"MyEffect\", true);'
+        'gdjs.SceneCode.GDMySpriteObjects1[i].getBehavior("Effect").enableEffect("MyEffect", true);'
       );
-      expect(code).toEqual(expect.not.stringContaining(
-        'gdjs.SceneCode.GDMyFakeObjectWithUnsupportedCapabilityObjects1[i].getBehavior(\"Effect\")')
+      expect(code).toEqual(
+        expect.not.stringContaining(
+          'gdjs.SceneCode.GDMyFakeObjectWithUnsupportedCapabilityObjects1[i].getBehavior("Effect")'
+        )
       );
-
-      action.delete();
     });
   });
 
@@ -467,16 +515,16 @@ describe('libGD.js - GDJS related tests', function () {
 
       const namespace = 'gdjs.eventsFunction.myTest';
       const extension = new gd.EventsFunctionsExtension();
-      const eventsFunctionsExtensionCodeGenerator =
-        new gd.EventsFunctionsExtensionCodeGenerator(project);
-      const code =
-        eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
-          extension,
-          eventsFunction,
-          namespace,
-          includeFiles,
-          true
-        );
+      const eventsFunctionsExtensionCodeGenerator = new gd.EventsFunctionsExtensionCodeGenerator(
+        project
+      );
+      const code = eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
+        extension,
+        eventsFunction,
+        namespace,
+        includeFiles,
+        true
+      );
 
       // Check that the function name is properly generated
       expect(code).toMatch(namespace + '.func = function(');
@@ -571,16 +619,16 @@ describe('libGD.js - GDJS related tests', function () {
       gd.asRepeatEvent(evt).getActions().insert(action, 0);
 
       const namespace = 'gdjs.eventsFunction.myTest';
-      const eventsFunctionsExtensionCodeGenerator =
-        new gd.EventsFunctionsExtensionCodeGenerator(project);
-      const code =
-        eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
-          new gd.EventsFunctionsExtension(),
-          eventsFunction,
-          namespace,
-          includeFiles,
-          true
-        );
+      const eventsFunctionsExtensionCodeGenerator = new gd.EventsFunctionsExtensionCodeGenerator(
+        project
+      );
+      const code = eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
+        new gd.EventsFunctionsExtension(),
+        eventsFunction,
+        namespace,
+        includeFiles,
+        true
+      );
 
       // Check that the function name is properly generated
       expect(code).toMatch(namespace + '.func = function(');

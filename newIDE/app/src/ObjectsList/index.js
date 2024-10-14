@@ -215,6 +215,10 @@ type Props = {|
   canSetAsGlobalObject?: boolean,
 
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
+  onOpenEventBasedObjectEditor: (
+    extensionName: string,
+    eventsBasedObjectName: string
+  ) => void,
   onExportAssets: () => void,
   onObjectCreated: gdObject => void,
   onObjectEdited: ObjectWithContext => void,
@@ -252,6 +256,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       canSetAsGlobalObject,
 
       onEditObject,
+      onOpenEventBasedObjectEditor,
       onExportAssets,
       onObjectCreated,
       onObjectEdited,
@@ -1504,6 +1509,20 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               'EffectCapability::EffectBehavior'
             ),
           },
+          project.hasEventsBasedObject(object.getType())
+            ? {
+                label: i18n._(t`Edit children`),
+                click: () =>
+                  onOpenEventBasedObjectEditor(
+                    gd.PlatformExtension.getExtensionFromFullObjectType(
+                      object.getType()
+                    ),
+                    gd.PlatformExtension.getObjectNameFromFullObjectType(
+                      object.getType()
+                    )
+                  ),
+              }
+            : null,
           { type: 'separator' },
           {
             label: i18n._(t`Swap assets`),
@@ -1565,6 +1584,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         editName,
         deleteObjectFolderOrObjectWithContext,
         moveObjectFolderOrObjectToAnotherFolderInSameContainer,
+        forceUpdate,
         onAddNewObject,
         addFolder,
         selectedObjectFolderOrObjectsWithContext,
@@ -1572,11 +1592,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         cutObjectFolderOrObjectWithContext,
         duplicateObjectFolderOrObjectWithContext,
         onEditObject,
+        onOpenEventBasedObjectEditor,
         swapObjectAsset,
         selectObjectFolderOrObjectWithContext,
         setAsGlobalObject,
         onAddObjectInstance,
-        forceUpdate,
       ]
     );
 

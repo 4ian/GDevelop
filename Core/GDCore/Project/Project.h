@@ -990,16 +990,12 @@ class GD_CORE_API Project {
   /**
    * \brief return the objects of the project.
    */
-  gd::ObjectsContainer& GetObjects() {
-    return objectsContainer;
-  }
+  gd::ObjectsContainer& GetObjects() { return objectsContainer; }
 
   /**
    * \brief Return the objects of the project.
    */
-  const gd::ObjectsContainer& GetObjects() const {
-    return objectsContainer;
-  }
+  const gd::ObjectsContainer& GetObjects() const { return objectsContainer; }
   ///@}
 
   /** \name Identifier names
@@ -1080,32 +1076,35 @@ class GD_CORE_API Project {
    */
   void Init(const gd::Project& project);
 
-  gd::String name;            ///< Game name
-  gd::String description;     ///< Game description
-  gd::String version;         ///< Game version number (used for some exports)
-  unsigned int windowWidth;   ///< Window default width
-  unsigned int windowHeight;  ///< Window default height
-  int maxFPS;                 ///< Maximum Frame Per Seconds, -1 for unlimited
-  unsigned int minFPS;  ///< Minimum Frame Per Seconds ( slow down game if FPS
-                        ///< are below this number )
-  bool verticalSync;    ///< If true, must activate vertical synchronization.
+  gd::String name;         ///< Game name
+  gd::String description;  ///< Game description
+  gd::String version;      ///< Game version number (used for some exports)
+  unsigned int windowWidth = 0;   ///< Window default width
+  unsigned int windowHeight = 0;  ///< Window default height
+  int maxFPS = 0;           ///< Maximum Frame Per Seconds, -1 for unlimited
+  unsigned int minFPS = 0;  ///< Minimum Frame Per Seconds ( slow down game if
+                            ///< FPS are below this number )
+  bool verticalSync =
+      false;  ///< If true, must activate vertical synchronization.
   gd::String scaleMode;
-  bool pixelsRounding;  ///< If true, the rendering should stop pixel
-                        ///< interpolation of rendered objects.
-  bool adaptGameResolutionAtRuntime;  ///< Should the game resolution be adapted
-                                      ///< to the window size at runtime
+  bool pixelsRounding = false;  ///< If true, the rendering should stop pixel
+                                ///< interpolation of rendered objects.
+  bool adaptGameResolutionAtRuntime =
+      true;  ///< Should the game resolution be adapted
+             ///< to the window size at runtime
   gd::String
       sizeOnStartupMode;  ///< How to adapt the game size to the screen. Can be
                           ///< "adaptWidth", "adaptHeight" or empty
   gd::String antialiasingMode;
-  bool isAntialisingEnabledOnMobile;
+  bool isAntialisingEnabledOnMobile = false;
   gd::String projectUuid;  ///< UUID useful to identify the game in online
                            ///< services or database that would require it.
-  bool useDeprecatedZeroAsDefaultZOrder;  ///< If true, objects created from
-                                          ///< events will have 0 as Z order,
-                                          ///< instead of the highest Z order
-                                          ///< found on the layer at the scene
-                                          ///< startup.
+  bool useDeprecatedZeroAsDefaultZOrder =
+      false;  ///< If true, objects created from
+              ///< events will have 0 as Z order,
+              ///< instead of the highest Z order
+              ///< found on the layer at the scene
+              ///< startup.
   std::vector<std::unique_ptr<gd::Layout> > scenes;  ///< List of all scenes
   gd::VariablesContainer variables;  ///< Initial global variables
   gd::ObjectsContainer objectsContainer;
@@ -1118,7 +1117,8 @@ class GD_CORE_API Project {
   std::vector<gd::Platform*>
       platforms;  ///< Pointers to the platforms this project supports.
   gd::String firstLayout;
-  bool useExternalSourceFiles;  ///< True if game used external source files.
+  bool useExternalSourceFiles =
+      false;  ///< True if game used external source files.
   std::vector<std::unique_ptr<gd::SourceFile> >
       externalSourceFiles;  ///< List of external source files used.
   gd::String author;        ///< Game author name, for publishing purpose.
@@ -1127,35 +1127,40 @@ class GD_CORE_API Project {
   std::vector<gd::String>
       authorUsernames;  ///< Game author usernames, from GDevelop users DB.
   std::vector<gd::String> categories;  ///< Game categories
-  bool isPlayableWithKeyboard;  ///< The project is playable with a keyboard.
-  bool isPlayableWithGamepad;   ///< The project is playable with a gamepad.
-  bool isPlayableWithMobile;    ///< The project is playable on a mobile.
-  gd::String packageName;       ///< Game package name
+  bool isPlayableWithKeyboard =
+      false;  ///< The project is playable with a keyboard.
+  bool isPlayableWithGamepad =
+      false;  ///< The project is playable with a gamepad.
+  bool isPlayableWithMobile = false;  ///< The project is playable on a mobile.
+  gd::String packageName;             ///< Game package name
   gd::String templateSlug;  ///< The slug of the template from which the game is
                             ///< created.
   gd::String orientation;   ///< Lock game orientation (on mobile devices).
                             ///< "default", "landscape" or "portrait".
-  bool
-      folderProject;  ///< True if folder project, false if single file project.
+  bool folderProject =
+      false;  ///< True if folder project, false if single file project.
   gd::String
       projectFile;  ///< Path to the project file - when editing a local file.
   gd::String latestCompilationDirectory;
-  gd::Platform*
-      currentPlatform;  ///< The platform being used to edit the project.
+  gd::Platform* currentPlatform =
+      nullptr;  ///< The platform being used to edit the project.
   gd::PlatformSpecificAssets platformSpecificAssets;
   gd::LoadingScreen loadingScreen;
   gd::Watermark watermark;
   std::vector<std::unique_ptr<gd::ExternalEvents> >
       externalEvents;  ///< List of all externals events
   ExtensionProperties
-      extensionProperties;              ///< The properties of the extensions.
+      extensionProperties;  ///< The properties of the extensions.
   gd::WholeProjectDiagnosticReport wholeProjectDiagnosticReport;
-  mutable unsigned int gdMajorVersion;  ///< The GD major version used the last
-                                        ///< time the project was saved.
-  mutable unsigned int gdMinorVersion;  ///< The GD minor version used the last
-                                        ///< time the project was saved.
-  mutable unsigned int gdBuildVersion;  ///< The GD build version used the last
-                                        ///< time the project was saved.
+  mutable unsigned int gdMajorVersion =
+      0;  ///< The GD major version used the last
+          ///< time the project was saved.
+  mutable unsigned int gdMinorVersion =
+      0;  ///< The GD minor version used the last
+          ///< time the project was saved.
+  mutable unsigned int gdBuildVersion =
+      0;  ///< The GD build version used the last
+          ///< time the project was saved.
 };
 
 }  // namespace gd

@@ -303,6 +303,9 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                         props.selectedObjectFolderOrObjectsWithContext
                       }
                       onEditObject={props.onEditObject}
+                      onOpenEventBasedObjectEditor={
+                        props.onOpenEventBasedObjectEditor
+                      }
                       onExportAssets={props.onExportAssets}
                       onDeleteObjects={(objectWithContext, cb) =>
                         props.onDeleteObjects(i18n, objectWithContext, cb)

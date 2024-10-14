@@ -4,8 +4,24 @@ module.exports = function (grunt) {
   const fs = require('fs');
   const path = require('path');
   const isWin = /^win/.test(process.platform);
-  const isDev = grunt.option('dev') || false;
   const useMinGW = grunt.option('use-MinGW') || false;
+
+  const possibleVariants = [
+    'dev',
+    'debug',
+    'debug-assertions',
+    'debug-sanitizers',
+  ];
+  const variant = grunt.option('variant') || (grunt.option('dev') ? 'dev' : '');
+
+  if (variant && possibleVariants.indexOf(variant) === -1) {
+    console.error(
+      `Invalid build variant: ${variant}. Possible values are: ${possibleVariants.join(
+        ', '
+      )}.`
+    );
+    process.exit(1);
+  }
 
   const buildOutputPath = '../Binaries/embuild/GDevelop.js/';
   const buildPath = '../Binaries/embuild';
@@ -75,9 +91,7 @@ module.exports = function (grunt) {
             ...cmakeGeneratorArgs,
             '../..',
             // Disable link time optimizations for slightly faster build time.
-            isDev
-              ? '-DDISABLE_EMSCRIPTEN_LINK_OPTIMIZATIONS=TRUE'
-              : '-DDISABLE_EMSCRIPTEN_LINK_OPTIMIZATIONS=FALSE',
+            variant ? '-DGDEVELOPJS_BUILD_VARIANT=' + variant : '',
           ].join(' '),
         options: {
           execOptions: {
@@ -135,7 +149,7 @@ module.exports = function (grunt) {
             cwd: __dirname,
           },
         },
-      }
+      },
     },
     clean: {
       options: { force: true },

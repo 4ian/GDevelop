@@ -176,6 +176,7 @@ jobs:
 
   # Build the WebAssembly library only (so that it's cached on a S3 and easy to re-use).
   build-gdevelop_js-wasm-only:
+    resource_class: medium+
     docker:
       - image: cimg/node:16.13
 
@@ -234,6 +235,7 @@ jobs:
 
   # Build the WebAssembly library with clang-tidy and memory sanitizers.
   build-gdevelop_js-debug-sanitizers-and-extra-checks:
+    resource_class: large
     docker:
       - image: cimg/node:16.13
 
@@ -274,7 +276,6 @@ jobs:
       # Build GDevelop.js
       - run:
           name: Build GDevelop.js ('debug-sanitizers' variant)
-          # Use "--runInBand" as it's faster and avoid deadlocks on CircleCI Linux machines (probably because limited in processes number).
           command: cd GDevelop.js && source ../emsdk/emsdk_env.sh && npm run build -- --variant=debug-sanitizers
 
       - run:
@@ -283,7 +284,8 @@ jobs:
 
       - run:
           name: Run tests
-          command: cd GDevelop.js && npm run test
+          # Use "--runInBand" as it's faster and avoid deadlocks on CircleCI Linux machines (probably because limited in processes number).
+          command: cd GDevelop.js && npm run test -- --runInBand
 
       # Upload artifacts (CircleCI)
       - store_artifacts:

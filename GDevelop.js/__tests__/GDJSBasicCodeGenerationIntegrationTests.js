@@ -27,6 +27,50 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     gd = await initializeGDevelopJs();
   });
 
+  it('does not crash when generating code with diagnostics', function () {
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'ModVarScene' },
+            parameters: [
+              'Counter',
+              '+',
+              '1 + VariableThatDoesNotExist.Test.Test2',
+            ],
+          },
+          {
+            type: { value: 'SetNumberObjectVariable' },
+            parameters: [
+              'NonExistingObject',
+              'NonExistingVariable',
+              '=',
+              '123',
+            ],
+          },
+          {
+            type: { value: 'ModVarScene' },
+            parameters: ['Counter', '+', '3'],
+          },
+        ],
+        events: [],
+      },
+    ]);
+
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      serializerElement
+    );
+
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+    runCompiledEvents(gdjs, runtimeScene, []);
+
+    expect(runtimeScene.getVariables().has('Counter')).toBe(true);
+    expect(runtimeScene.getVariables().get('Counter').getAsNumber()).toBe(3);
+  });
+
   it('does not generate anything for a disabled event and its sub events', function () {
     const serializerElement = gd.Serializer.fromJSObject([
       {
@@ -885,8 +929,11 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     ).toBe(2);
 
     // Simulate a hot reloading by recompiling the function and running it again.
-    const runHotReloadedCompiledEvents =
-      generateCompiledEventsForEventsFunction(gd, project, eventsFunction);
+    const runHotReloadedCompiledEvents = generateCompiledEventsForEventsFunction(
+      gd,
+      project,
+      eventsFunction
+    );
     runHotReloadedCompiledEvents(
       gdjs,
       runtimeScene /*, Don't pass arguments to not run the function. */

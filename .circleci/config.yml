@@ -176,7 +176,7 @@ jobs:
 
   # Build the WebAssembly library only (so that it's cached on a S3 and easy to re-use).
   build-gdevelop_js-wasm-only:
-    resource_class: medium+
+    resource_class: large # Total time decrease linearly with the number of CPUs.
     docker:
       - image: cimg/node:16.13
 
@@ -235,7 +235,7 @@ jobs:
 
   # Build the WebAssembly library with clang-tidy and memory sanitizers.
   build-gdevelop_js-debug-sanitizers-and-extra-checks:
-    resource_class: large
+    resource_class: xlarge # Total time decrease linearly with the number of CPUs.
     docker:
       - image: cimg/node:16.13
 
@@ -284,8 +284,8 @@ jobs:
 
       - run:
           name: Run tests
-          # Use "--runInBand" as it's faster and avoid deadlocks on CircleCI Linux machines (probably because limited in processes number).
-          command: cd GDevelop.js && npm run test -- --runInBand
+          # Limit the number of workers to avoid having too many processes.
+          command: cd GDevelop.js && npm run test -- --maxWorkers=4
 
       # Upload artifacts (CircleCI)
       - store_artifacts:

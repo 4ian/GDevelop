@@ -140,6 +140,8 @@ export default class RenderedTextInstance extends RenderedInstance {
         textObjectConfiguration.getFontName()
       )
         .then(fontFamily => {
+          if (this._wasDestroyed) return;
+
           // Once the font is loaded, we can use the given fontFamily.
           this._fontFamily = fontFamily;
           this._styleFontDirty = true;

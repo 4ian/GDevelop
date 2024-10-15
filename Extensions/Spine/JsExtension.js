@@ -323,6 +323,7 @@ module.exports = {
         this._pixiResourcesLoader
           .getSpineData(this._project, this._spineResourceName)
           .then((spineDataOrLoadingError) => {
+            if (this._wasDestroyed) return;
             if (this._spine) this._pixiObject.removeChild(this._spine);
 
             if (!spineDataOrLoadingError.skeleton) {

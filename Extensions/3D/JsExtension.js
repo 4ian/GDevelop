@@ -2203,6 +2203,8 @@ module.exports = {
           if (!texture.baseTexture.valid) {
             // Post pone texture update if texture is not loaded.
             texture.once('update', () => {
+              if (this._wasDestroyed) return;
+
               this.updateTexture();
               this.updatePIXISprite();
             });
@@ -2375,6 +2377,7 @@ module.exports = {
           getFaceMaterial(this._project, materialIndexToFaceIndex[4]),
           getFaceMaterial(this._project, materialIndexToFaceIndex[5]),
         ]);
+        if (this._wasDestroyed) return;
 
         this._threeObject.material[0] = materials[0];
         this._threeObject.material[1] = materials[1];
@@ -2823,6 +2826,7 @@ module.exports = {
         this._pixiResourcesLoader
           .get3DModel(project, modelResourceName)
           .then((model3d) => {
+            if (this._wasDestroyed) return;
             const clonedModel3D = THREE_ADDONS.SkeletonUtils.clone(
               model3d.scene
             );
@@ -3338,6 +3342,7 @@ module.exports = {
           this._pixiResourcesLoader
             .get3DModel(this._project, modelResourceName)
             .then((model3d) => {
+              if (this._wasDestroyed) return;
               this._clonedModel3D = THREE_ADDONS.SkeletonUtils.clone(
                 model3d.scene
               );

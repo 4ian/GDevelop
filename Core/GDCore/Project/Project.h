@@ -1076,6 +1076,14 @@ class GD_CORE_API Project {
    */
   void Init(const gd::Project& project);
 
+  /**
+   * @brief Get the project extensions names in the order they have to be unserialized.
+   * 
+   * Child-objects need the event-based objects they use to be loaded completely
+   * before they are unserialized.
+   */
+  std::vector<gd::String> GetUnserializingOrderExtensionNames(const gd::SerializerElement &eventsFunctionsExtensionsElement);
+
   gd::String name;         ///< Game name
   gd::String description;  ///< Game description
   gd::String version;      ///< Game version number (used for some exports)

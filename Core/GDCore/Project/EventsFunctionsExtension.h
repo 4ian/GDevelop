@@ -314,6 +314,9 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
     return dependency;
   }
 
+  std::vector<gd::String> GetUnserializingOrderEventsBasedObjectNames(
+    const gd::SerializerElement &eventsBasedObjectsElement);
+
   gd::String version;
   gd::String extensionNamespace;
   gd::String shortDescription;

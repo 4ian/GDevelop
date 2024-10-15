@@ -72,7 +72,7 @@ gd::ObjectConfiguration &CustomObjectConfiguration::GetChildObjectConfiguration(
   }
 
   if (!eventsBasedObject->GetObjects().HasObjectNamed(objectName)) {
-    gd::LogError("Tried to get the configuration of a child-object:" + objectName
+    gd::LogError("Tried to get the configuration of a child-object: " + objectName
                 + " that doesn't exist in the event-based object: " + GetType());
     return badObjectConfiguration;
   }

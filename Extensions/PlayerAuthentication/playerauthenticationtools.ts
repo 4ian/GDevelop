@@ -34,6 +34,7 @@ namespace gdjs {
     let _websocket: WebSocket | null = null;
 
     type AuthenticationWindowStatus = 'logged' | 'errored' | 'dismissed';
+    type AuthenticationWindowOptions = { disableGuestLogin: boolean };
 
     const handleAutomaticGamesPlatformAuthentication = (
       runtimeScene: gdjs.RuntimeScene
@@ -119,19 +120,33 @@ namespace gdjs {
       runtimeGame,
       gameId,
       connectionId,
+      authWindowOptions,
     }: {
       runtimeGame: gdjs.RuntimeGame;
       gameId: string;
       connectionId?: string;
+      authWindowOptions?: AuthenticationWindowOptions;
     }) => {
       // Uncomment to test the case of a failing loading:
       // return 'https://gd.games.wronglink';
 
-      return `https://gd.games/auth?gameId=${gameId}${
-        connectionId ? `&connectionId=${connectionId}` : ''
-      }${
-        runtimeGame.isUsingGDevelopDevelopmentEnvironment() ? '&dev=true' : ''
-      }&allowLoginProviders=true`;
+      const baseUrl = 'https://gd.games';
+      // const baseUrl = 'http://localhost:4000';
+
+      const searchParams = new URLSearchParams();
+      searchParams.set('gameId', gameId);
+      if (connectionId) searchParams.set('connectionId', connectionId);
+      if (runtimeGame.isUsingGDevelopDevelopmentEnvironment()) {
+        searchParams.set('dev', 'true');
+      }
+      searchParams.set('allowLoginProviders', 'true');
+      if (authWindowOptions) {
+        for (const [key, value] of Object.entries(authWindowOptions)) {
+          searchParams.set(key, value.toString());
+        }
+      }
+
+      return `${baseUrl}/auth?${searchParams.toString()}`;
     };
 
     /**
@@ -447,6 +462,7 @@ namespace gdjs {
       onDone?: (status: 'logged' | 'errored' | 'dismissed') => void;
     }) {
       const allowedOrigins = ['https://liluo.io', 'https://gd.games'];
+      // const allowedOrigins = ['localhost:4000'];
 
       // Check origin of message.
       if (checkOrigin && !allowedOrigins.includes(event.origin)) {
@@ -715,7 +731,8 @@ namespace gdjs {
      */
     const openAuthenticationWindowForElectron = (
       runtimeScene: gdjs.RuntimeScene,
-      gameId: string
+      gameId: string,
+      authWindowOptions: AuthenticationWindowOptions
     ) =>
       setupWebsocketForAuthenticationWindow(
         runtimeScene,
@@ -725,6 +742,7 @@ namespace gdjs {
             runtimeGame: runtimeScene.getGame(),
             gameId,
             connectionId,
+            authWindowOptions,
           });
 
           const electron = runtimeScene.getGame().getRenderer().getElectron();
@@ -748,7 +766,8 @@ namespace gdjs {
      */
     const openAuthenticationWindowForCordovaWithWebSocket = (
       runtimeScene: gdjs.RuntimeScene,
-      gameId: string
+      gameId: string,
+      authWindowOptions: AuthenticationWindowOptions
     ) =>
       setupWebsocketForAuthenticationWindow(
         runtimeScene,
@@ -758,6 +777,7 @@ namespace gdjs {
             runtimeGame: runtimeScene.getGame(),
             gameId,
             connectionId,
+            authWindowOptions,
           });
 
           SafariViewController.isAvailable(function (available: boolean) {
@@ -798,13 +818,15 @@ namespace gdjs {
      */
     const openAuthenticationWindowForWeb = (
       runtimeScene: gdjs.RuntimeScene,
-      gameId: string
+      gameId: string,
+      authWindowOptions: AuthenticationWindowOptions
     ) =>
       new Promise<AuthenticationWindowStatus>((resolve) => {
         // If we're on a browser, open a new window.
         const targetUrl = getAuthWindowUrl({
           runtimeGame: runtimeScene.getGame(),
           gameId,
+          authWindowOptions,
         });
 
         // Listen to messages posted by the authentication window, so that we can
@@ -856,7 +878,8 @@ namespace gdjs {
      */
     const openAuthenticationIframeForWeb = (
       runtimeScene: gdjs.RuntimeScene,
-      gameId: string
+      gameId: string,
+      authWindowOptions: AuthenticationWindowOptions
     ) =>
       new Promise<AuthenticationWindowStatus>((resolve) => {
         if (
@@ -873,6 +896,7 @@ namespace gdjs {
         const targetUrl = getAuthWindowUrl({
           runtimeGame: runtimeScene.getGame(),
           gameId,
+          authWindowOptions,
         });
 
         // Listen to messages posted by the authentication window, so that we can
@@ -903,7 +927,10 @@ namespace gdjs {
      * Action to display the authentication window to the user.
      */
     export const openAuthenticationWindow = (
-      runtimeScene: gdjs.RuntimeScene
+      runtimeScene: gdjs.RuntimeScene,
+      authWindowOptions: AuthenticationWindowOptions = {
+        disableGuestLogin: false,
+      }
     ): gdjs.PromiseTask<{ status: 'logged' | 'errored' | 'dismissed' }> =>
       new gdjs.PromiseTask(
         new Promise((resolve) => {
@@ -1000,14 +1027,16 @@ namespace gdjs {
                 // - Desktop game running on Electron.
                 status = await openAuthenticationWindowForElectron(
                   runtimeScene,
-                  _gameId
+                  _gameId,
+                  authWindowOptions
                 );
                 break;
               case 'cordova-websocket':
                 // The game is an iOS app.
                 status = await openAuthenticationWindowForCordovaWithWebSocket(
                   runtimeScene,
-                  _gameId
+                  _gameId,
+                  authWindowOptions
                 );
                 break;
               case 'web-iframe':
@@ -1015,7 +1044,8 @@ namespace gdjs {
                 // - Preview in GDevelop mobile app (iOS only)
                 status = await openAuthenticationIframeForWeb(
                   runtimeScene,
-                  _gameId
+                  _gameId,
+                  authWindowOptions
                 );
                 break;
               case 'web':
@@ -1027,7 +1057,8 @@ namespace gdjs {
                 // - Or a web game accessed via a mobile browser (Android/iOS).
                 status = await openAuthenticationWindowForWeb(
                   runtimeScene,
-                  _gameId
+                  _gameId,
+                  authWindowOptions
                 );
                 break;
             }

@@ -588,7 +588,7 @@ namespace gdjs {
             break;
           case 'openPlayerAuthentication':
             gdjs.playerAuthentication
-              .openAuthenticationWindow(runtimeScene)
+              .openAuthenticationWindow(runtimeScene, event.data.options)
               .promise.then(({ status }) => {
                 if (
                   !_leaderboardViewIframe ||

@@ -124,15 +124,28 @@ export const extractAsCustomObject = ({
     extensionName,
     eventsBasedObjectName
   );
+  const customObjectNameInScene = newNameGenerator(
+    eventsBasedObjectName,
+    tentativeNewName => {
+      if (globalObjects && globalObjects.hasObjectNamed(tentativeNewName)) {
+        return true;
+      }
+      if (sceneObjects.hasObjectNamed(tentativeNewName)) {
+        return true;
+      }
+
+      return false;
+    }
+  );
   sceneObjects.insertNewObject(
     project,
     customObjectType,
-    eventsBasedObjectName,
+    customObjectNameInScene,
     0
   );
 
   const customObjectInstance = initialInstances.insertNewInitialInstance();
-  customObjectInstance.setObjectName(eventsBasedObjectName);
+  customObjectInstance.setObjectName(customObjectNameInScene);
   customObjectInstance.setX(selectionAABB.left);
   customObjectInstance.setY(selectionAABB.top);
   customObjectInstance.setZ(selectionAABB.zMin);

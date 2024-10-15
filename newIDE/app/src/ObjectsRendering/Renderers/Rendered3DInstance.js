@@ -18,6 +18,7 @@ export default class Rendered3DInstance {
   _pixiObject: PIXI.DisplayObject;
   _threeObject: THREE.Object3D | null;
   wasUsed: boolean;
+  _wasDestroyed: boolean;
 
   constructor(
     project: gdProject,
@@ -36,6 +37,7 @@ export default class Rendered3DInstance {
     this._project = project;
     this._pixiResourcesLoader = pixiResourcesLoader;
     this.wasUsed = true; //Used by InstancesRenderer to track rendered instance that are not used anymore.
+    this._wasDestroyed = false;
   }
 
   isRenderedIn3D(): boolean {
@@ -89,6 +91,7 @@ export default class Rendered3DInstance {
    * the default implementation of the method does.
    */
   onRemovedFromScene() {
+    this._wasDestroyed = true;
     if (this._pixiObject !== null)
       this._pixiContainer.removeChild(this._pixiObject);
     if (this._threeObject !== null) this._threeGroup.remove(this._threeObject);

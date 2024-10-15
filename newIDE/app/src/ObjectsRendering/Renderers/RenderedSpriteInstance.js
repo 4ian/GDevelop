@@ -187,7 +187,10 @@ export default class RenderedSpriteInstance extends RenderedInstance {
 
     if (!texture.baseTexture.valid) {
       // Post pone texture update if texture is not loaded.
-      texture.once('update', () => this.updatePIXITextureAndSprite());
+      texture.once('update', () => {
+        if (this._wasDestroyed) return;
+        this.updatePIXITextureAndSprite();
+      });
       return;
     }
 

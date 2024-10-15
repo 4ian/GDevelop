@@ -199,7 +199,10 @@ export default class RenderedSprite3DInstance extends Rendered3DInstance {
 
     if (!texture.baseTexture.valid) {
       // Post pone texture update if texture is not loaded.
-      texture.once('update', () => this.updateTextureAndSprite());
+      texture.once('update', () => {
+        if (this._wasDestroyed) return;
+        this.updateTextureAndSprite();
+      });
       return;
     }
     this._textureWidth = texture.width;
@@ -212,6 +215,7 @@ export default class RenderedSprite3DInstance extends Rendered3DInstance {
         useTransparentTexture: true,
       }
     );
+    if (this._wasDestroyed) return;
     if (this._threeObject) {
       this._threeObject.material = material;
     }

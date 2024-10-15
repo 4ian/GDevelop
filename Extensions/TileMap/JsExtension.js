@@ -1760,6 +1760,7 @@ module.exports = {
             levelIndex,
             pako,
             (tileMap) => {
+              if (this._wasDestroyed) return;
               if (!tileMap) {
                 this._onLoadingError();
                 // _loadTileMapWithCallback already log errors
@@ -1781,6 +1782,7 @@ module.exports = {
                 tilesetJsonFile,
                 levelIndex,
                 (textureCache) => {
+                  if (this._wasDestroyed) return;
                   if (!textureCache) {
                     this._onLoadingError();
                     // getOrLoadTextureCache already log warns and errors.
@@ -1809,6 +1811,7 @@ module.exports = {
         } else {
           // Wait for the atlas image to load.
           atlasTexture.once('update', () => {
+            if (this._wasDestroyed) return;
             loadTileMap();
           });
         }
@@ -1855,6 +1858,7 @@ module.exports = {
           tilesetJsonFile,
           levelIndex,
           (textureCache) => {
+            if (this._wasDestroyed) return;
             if (!textureCache) {
               this._onLoadingError();
               // getOrLoadTextureCache already log warns and errors.
@@ -2208,6 +2212,7 @@ module.exports = {
               columnCount,
               rowCount,
               (tileMap) => {
+                if (this._wasDestroyed) return;
                 if (!tileMap) {
                   this._onLoadingError();
                   console.error('Could not parse tilemap.');
@@ -2230,6 +2235,7 @@ module.exports = {
                     /** @type {TileMapHelper.TileTextureCache | null} */
                     textureCache
                   ) => {
+                    if (this._wasDestroyed) return;
                     this._onLoadingSuccess();
                     if (!this._editableTileMap) return;
 
@@ -2257,6 +2263,7 @@ module.exports = {
         } else {
           // Wait for the atlas image to load.
           atlasTexture.once('update', () => {
+            if (this._wasDestroyed) return;
             loadTileMap();
           });
         }
@@ -2293,6 +2300,7 @@ module.exports = {
             /** @type {TileMapHelper.TileTextureCache | null} */
             textureCache
           ) => {
+            if (this._wasDestroyed) return;
             this._onLoadingSuccess();
             if (!this._editableTileMap) return;
 
@@ -2536,6 +2544,7 @@ module.exports = {
           0, // levelIndex
           pako,
           (tileMap) => {
+            if (this._wasDestroyed) return;
             if (!tileMap) {
               this._onLoadingError();
               // _loadTiledMapWithCallback already log errors

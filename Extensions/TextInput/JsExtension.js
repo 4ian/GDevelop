@@ -711,6 +711,7 @@ module.exports = {
           this._pixiResourcesLoader
             .loadFontFamily(this._project, fontResourceName)
             .then((fontFamily) => {
+              if (this._wasDestroyed) return;
               this._pixiText.style.fontFamily = fontFamily;
               this._pixiText.dirty = true;
             })

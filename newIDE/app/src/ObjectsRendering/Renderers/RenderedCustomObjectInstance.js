@@ -179,6 +179,12 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     for (const [i, renderedInstance] of this.renderedInstances) {
       if (!renderedInstance.wasUsed) {
         renderedInstance.onRemovedFromScene();
+        if (!renderedInstance._wasDestroyed)
+          console.error(
+            'Rendered instance was not marked as destroyed by onRemovedFromScene - verify the implementation.',
+            renderedInstance
+          );
+
         this.renderedInstances.delete(i);
         this.layoutedInstances.delete(i);
       }
@@ -196,6 +202,11 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     // Destroy all instances
     for (const renderedInstance of this.renderedInstances.values()) {
       renderedInstance.onRemovedFromScene();
+      if (!renderedInstance._wasDestroyed)
+        console.error(
+          'Rendered instance (of a custom object) was not marked as destroyed by onRemovedFromScene - verify the implementation.',
+          renderedInstance
+        );
     }
     this.renderedInstances.clear();
     this.layoutedInstances.clear();

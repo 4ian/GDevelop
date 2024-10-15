@@ -697,6 +697,8 @@ module.exports = {
             this._currentBitmapFontResourceName,
             this._currentTextureAtlasResourceName
           ).then((bitmapFont) => {
+            if (this._wasDestroyed) return;
+
             this._pixiObject.fontName = bitmapFont.font;
             this._pixiObject.fontSize = bitmapFont.size;
             this._pixiObject.dirty = true;

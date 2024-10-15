@@ -265,7 +265,10 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
     );
     if (!texture.baseTexture.valid) {
       // Post pone texture update if texture is not loaded.
-      texture.once('update', () => this.updateTextures());
+      texture.once('update', () => {
+        if (this._wasDestroyed) return;
+        this.updateTextures();
+      });
       return;
     }
 

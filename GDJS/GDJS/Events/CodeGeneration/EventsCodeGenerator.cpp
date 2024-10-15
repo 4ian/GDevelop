@@ -204,7 +204,9 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
   gd::String fullPreludeCode =
       preludeCode + "\n" + "var that = this;\n" +
       // runtimeScene is supposed to be always accessible, read
-      // it from the behavior
+      // it from the behavior.
+      // TODO: this should be renamed to "instanceContainer" and have the code generation
+      // adapted for this (rely less on `gdjs.RuntimeScene`, and more on `RuntimeInstanceContainer`).
       "var runtimeScene = this._runtimeScene;\n" +
       // By convention of Behavior Events Function, the object is accessible
       // as a parameter called "Object", and thisObjectList is an array
@@ -284,7 +286,9 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
   gd::String fullPreludeCode =
       preludeCode + "\n" + "var that = this;\n" +
       // runtimeScene is supposed to be always accessible, read
-      // it from the object
+      // it from the object.
+      // TODO: this should be renamed to "instanceContainer" and have the code generation
+      // adapted for this (rely less on `gdjs.RuntimeScene`, and more on `RuntimeInstanceContainer`).
       "var runtimeScene = this._instanceContainer;\n" +
       // By convention of Object Events Function, the object is accessible
       // as a parameter called "Object", and thisObjectList is an array

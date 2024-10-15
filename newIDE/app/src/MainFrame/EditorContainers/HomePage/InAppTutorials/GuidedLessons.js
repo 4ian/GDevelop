@@ -51,7 +51,7 @@ const getColumnsFromWindowSize = (
 ) => {
   switch (windowSize) {
     case 'small':
-      return isLandscape ? 4 : 1;
+      return isLandscape ? 4 : 2;
     case 'medium':
       return 3;
     case 'large':

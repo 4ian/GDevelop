@@ -157,7 +157,7 @@ export const EarnBadges = ({ achievements, badges, onOpenProfile }: Props) => {
           achievementId={'github-star'}
           achievements={achievements}
           badges={badges}
-          buttonLabel={<Trans>Star GDevelop on GitHub</Trans>}
+          buttonLabel={<Trans>Star GDevelop</Trans>}
           linkUrl={'https://github.com/4ian/GDevelop'}
         />
         <BadgeItem

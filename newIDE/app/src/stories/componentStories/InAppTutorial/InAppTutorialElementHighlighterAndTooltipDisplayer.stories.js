@@ -64,7 +64,10 @@ const elementIdToShowQuitButton = {
 
 export const Default = () => {
   const [listItemRef, setListItemRef] = React.useState<any>(null);
-  const [elementToHighlight, setElementToHighlight] = React.useState<any>(null);
+  const [
+    elementToHighlight,
+    setElementToHighlight,
+  ] = React.useState<?HTMLElement>(null);
   const [textFieldValue, setTextFieldValue] = React.useState<string>(
     'Object.Variable'
   );
@@ -90,9 +93,12 @@ export const Default = () => {
   React.useEffect(
     () => {
       if (elementToHighlightId.startsWith('#')) {
-        setElementToHighlight(
-          queryElementOrItsMostVisuallySignificantParent(elementToHighlightId)
+        const {
+          elementToHighlight,
+        } = queryElementOrItsMostVisuallySignificantParent(
+          elementToHighlightId
         );
+        setElementToHighlight(elementToHighlight);
       }
     },
     [elementToHighlightId]

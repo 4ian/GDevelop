@@ -8,8 +8,11 @@ import ArrowTop from '../UI/CustomSvgIcons/ArrowTop';
 import ArrowBottom from '../UI/CustomSvgIcons/ArrowBottom';
 import ArrowLeft from '../UI/CustomSvgIcons/ArrowLeft';
 import ArrowRight from '../UI/CustomSvgIcons/ArrowRight';
+import PointerFinger from '../UI/CustomSvgIcons/PointerFinger';
+import Mouse from '../UI/CustomSvgIcons/Mouse';
 import useIsElementVisibleInScroll from '../Utils/UseIsElementVisibleInScroll';
 import { aboveMaterialUiMaxZIndex } from '../UI/MaterialUISpecificUtil';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 
 type Props = {|
   element: HTMLElement,
@@ -32,9 +35,10 @@ const styles = {
   scrollDirectionArrow: {
     color: '#1D1D26',
     display: 'flex',
+    alignItems: 'center',
     backgroundColor: highlighterPrimaryColor,
     boxShadow: `0 0 12px 2px ${highlighterPrimaryColor}`,
-    padding: 2,
+    padding: '2px 5px 2px 2px',
     borderRadius: 3,
   },
 };
@@ -43,6 +47,7 @@ function InAppTutorialElementHighlighter({ element }: Props) {
   const forceUpdate = useForceUpdate();
   useOnResize(forceUpdate);
   const [showHighlighter, setShowHighlighter] = React.useState<boolean>(true);
+  const { isMobile } = useResponsiveWindowSize();
 
   const scrollParent = getScrollParent(element);
   const scrollParentRectangle = scrollParent
@@ -136,7 +141,7 @@ function InAppTutorialElementHighlighter({ element }: Props) {
           }}
         />
       )}
-      {!showHighlighter && scrollParentRectangle && (
+      {!showHighlighter && Icon && scrollParentRectangle && (
         <div
           id="in-app-tutorial-scroll-indicator"
           style={{
@@ -161,7 +166,12 @@ function InAppTutorialElementHighlighter({ element }: Props) {
           }}
         >
           <div style={styles.scrollDirectionArrow}>
-            {Icon && <Icon fontSize="large" />}
+            {Icon && (
+              <>
+                <Icon fontSize="large" />
+                {isMobile ? <PointerFinger /> : <Mouse />}
+              </>
+            )}
           </div>
         </div>
       )}

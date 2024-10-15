@@ -823,6 +823,11 @@ export default class LayerRenderer {
         const renderedInstance = this.renderedInstances[i];
         if (renderedInstance.getInstance().getObjectName() === objectName) {
           renderedInstance.onRemovedFromScene();
+          if (!renderedInstance._wasDestroyed)
+            console.error(
+              'Rendered instance was not marked as destroyed by onRemovedFromScene - verify the implementation.',
+              renderedInstance
+            );
           delete this.renderedInstances[i];
         }
       }
@@ -840,6 +845,11 @@ export default class LayerRenderer {
         const renderedInstance = this.renderedInstances[i];
         if (!renderedInstance.wasUsed) {
           renderedInstance.onRemovedFromScene();
+          if (!renderedInstance._wasDestroyed)
+            console.error(
+              'Rendered instance was not marked as destroyed by onRemovedFromScene - verify the implementation.',
+              renderedInstance
+            );
           delete this.renderedInstances[i];
         } else renderedInstance.wasUsed = false;
       }

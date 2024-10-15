@@ -78,6 +78,8 @@ namespace gdjs {
      */
     abstract getScene(): gdjs.RuntimeScene;
 
+    abstract getAsyncTasksManager(): gdjs.AsyncTasksManager;
+
     /**
      * Convert a point from the canvas coordinates (for example,
      * the mouse position) to the container coordinates.

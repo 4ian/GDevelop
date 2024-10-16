@@ -304,13 +304,13 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
 
     if (objectsContainersList.getObjectsContainersCount() === 0) {
       throw new Error(
-        'Called enumerateObjectsAndGroups without any object container.'
+        'Called InstructionOrObjectSelector without any object container.'
       );
     }
     // TODO Use a loop instead of looking for 2 object containers.
     if (objectsContainersList.getObjectsContainersCount() > 2) {
       console.error(
-        'Called enumerateObjectsAndGroups with more than 2 object containers.'
+        'Called InstructionOrObjectSelector with more than 2 object containers.'
       );
     }
     const globalObjectsContainer =

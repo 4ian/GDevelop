@@ -12,6 +12,7 @@ import { type AuthenticatedUser } from '../../../../Profile/AuthenticatedUserCon
 type Props = {|
   onUpgrade: () => void,
   limits: Limits,
+  margin?: 'dense',
 |};
 
 export const checkIfHasTooManyCloudProjects = (
@@ -27,7 +28,11 @@ export const checkIfHasTooManyCloudProjects = (
     : false;
 };
 
-export const MaxProjectCountAlertMessage = ({ onUpgrade, limits }: Props) => {
+export const MaxProjectCountAlertMessage = ({
+  onUpgrade,
+  limits,
+  margin,
+}: Props) => {
   const {
     maximumCount,
     canMaximumCountBeIncreased,
@@ -50,7 +55,10 @@ export const MaxProjectCountAlertMessage = ({ onUpgrade, limits }: Props) => {
               : undefined
           }
         >
-          <Text size="block-title">
+          <Text
+            size={margin === 'dense' ? 'sub-title' : 'block-title'}
+            noMargin={margin === 'dense'}
+          >
             {maximumCount === 1 ? (
               <Trans>One project at a time, for now</Trans>
             ) : (
@@ -60,7 +68,7 @@ export const MaxProjectCountAlertMessage = ({ onUpgrade, limits }: Props) => {
               </Trans>
             )}
           </Text>
-          <Text>
+          <Text noMargin={margin === 'dense'}>
             {canMaximumCountBeIncreased ? (
               maximumCount === 1 ? (
                 <Trans>

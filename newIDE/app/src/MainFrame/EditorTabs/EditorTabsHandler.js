@@ -340,14 +340,36 @@ export const closeEventsFunctionsExtensionTabs = (
 ) => {
   return closeTabsExceptIf(state, editorTab => {
     const editor = editorTab.editorRef;
-    if (editor instanceof EventsFunctionsExtensionEditorContainer) {
+    if (
+      editor instanceof EventsFunctionsExtensionEditorContainer ||
+      editor instanceof CustomObjectEditorContainer
+    ) {
       return (
         !editor.getEventsFunctionsExtensionName() ||
         editor.getEventsFunctionsExtensionName() !==
           eventsFunctionsExtensionName
       );
     }
+    return true;
+  });
+};
 
+export const closeCustomObjectTab = (
+  state: EditorTabsState,
+  eventsFunctionsExtensionName: string,
+  eventsBasedObjectName: string
+) => {
+  return closeTabsExceptIf(state, editorTab => {
+    const editor = editorTab.editorRef;
+    if (editor instanceof CustomObjectEditorContainer) {
+      return (
+        (!editor.getEventsFunctionsExtensionName() ||
+          editor.getEventsFunctionsExtensionName() !==
+            eventsFunctionsExtensionName) &&
+        (!editor.getEventsBasedObjectName() ||
+          editor.getEventsBasedObjectName() !== eventsBasedObjectName)
+      );
+    }
     return true;
   });
 };

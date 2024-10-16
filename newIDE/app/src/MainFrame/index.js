@@ -39,6 +39,7 @@ import {
   closeExternalLayoutTabs,
   closeExternalEventsTabs,
   closeEventsFunctionsExtensionTabs,
+  closeCustomObjectTab,
   saveUiSettings,
   type EditorTabsState,
   type EditorTab,
@@ -1474,6 +1475,7 @@ const MainFrame = (props: Props) => {
       oldName
     );
 
+    // TODO Replace the tabs instead on closing them.
     setState(state => ({
       ...state,
       editorTabs: closeEventsFunctionsExtensionTabs(state.editorTabs, oldName),
@@ -1483,6 +1485,22 @@ const MainFrame = (props: Props) => {
       );
       _onProjectItemModified();
     });
+  };
+
+  const onRenamedEventsBasedObject = (
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    oldName: string,
+    newName: string
+  ) => {
+    // TODO Replace the tabs instead on closing them.
+    setState(state => ({
+      ...state,
+      editorTabs: closeCustomObjectTab(
+        state.editorTabs,
+        eventsFunctionsExtension.getName(),
+        oldName
+      ),
+    }));
   };
 
   const setPreviewedLayout = (
@@ -3561,6 +3579,7 @@ const MainFrame = (props: Props) => {
                     onCreateEventsFunction,
                     openInstructionOrExpression,
                     onOpenCustomObjectEditor: openCustomObjectEditor,
+                    onRenamedEventsBasedObject: onRenamedEventsBasedObject,
                     openObjectEvents,
                     unsavedChanges: unsavedChanges,
                     canOpen: !!props.storageProviders.filter(

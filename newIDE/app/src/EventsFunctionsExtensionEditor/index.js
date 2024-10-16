@@ -78,6 +78,11 @@ type Props = {|
   onOpenCustomObjectEditor: gdEventsBasedObject => void,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
   onEventsBasedObjectChildrenEdited: () => void,
+  onRenamedEventsBasedObject: (
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    oldName: string,
+    newName: string
+  ) => void,
 |};
 
 type State = {|
@@ -667,7 +672,12 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     newName: string,
     done: boolean => void
   ) => {
-    const { project, eventsFunctionsExtension } = this.props;
+    const {
+      project,
+      eventsFunctionsExtension,
+      onRenamedEventsBasedObject,
+    } = this.props;
+    const oldName = eventsBasedObject.getName();
     const safeAndUniqueNewName = newNameGenerator(
       gd.Project.getSafeName(newName),
       tentativeNewName => {
@@ -690,6 +700,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     eventsBasedObject.setName(safeAndUniqueNewName);
 
     done(true);
+    onRenamedEventsBasedObject(
+      eventsFunctionsExtension,
+      oldName,
+      safeAndUniqueNewName
+    );
   };
 
   _onEventsBasedBehaviorPasted = (

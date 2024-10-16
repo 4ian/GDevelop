@@ -69,7 +69,7 @@ export const cloudProjectsForIndieUser: Array<CloudProjectWithUserAccessInfo> = 
   },
 ];
 
-const tenCloudProjects: Array<CloudProjectWithUserAccessInfo> = [
+export const tenCloudProjects: Array<CloudProjectWithUserAccessInfo> = [
   {
     id: 'af7a8282-746d-4d3a-8cb8-bb8cd9372141',
     name: 'Worms 2D 1',
@@ -2778,8 +2778,8 @@ export const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   creatingOrLoggingInAccount: false,
   authenticationError: null,
   badges: null,
-  cloudProjects: null,
-  notifications: null,
+  cloudProjects: [],
+  notifications: [],
   recommendations: [
     {
       type: 'gdevelop-tutorial',

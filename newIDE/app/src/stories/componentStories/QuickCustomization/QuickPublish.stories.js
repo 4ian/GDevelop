@@ -7,7 +7,10 @@ import { QuickPublish } from '../../../QuickCustomization/QuickPublish';
 import {
   fakeNotAuthenticatedUser,
   fakeSilverAuthenticatedUser,
+  fakeAuthenticatedUserWithNoSubscriptionAndCredits,
+  tenCloudProjects,
 } from '../../../fixtures/GDevelopServicesTestData';
+import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import {
   fakeBrowserOnlineWebExportPipeline,
@@ -44,11 +47,17 @@ const erroringOnlineWebExporter: Exporter = {
   exportPipeline: fakeErroringBrowserOnlineWebExportPipeline,
 };
 
+const Template = ({ children }: { children: React.Node }) => (
+  <EventsFunctionsExtensionsContext.Provider
+    value={fakeEventsFunctionsExtensionsState}
+  >
+    <FixedHeightFlexContainer height={600}>{children}</FixedHeightFlexContainer>
+  </EventsFunctionsExtensionsContext.Provider>
+);
+
 export const NotAuthenticated = () => {
   return (
-    <EventsFunctionsExtensionsContext.Provider
-      value={fakeEventsFunctionsExtensionsState}
-    >
+    <Template>
       <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
         <QuickPublish
           project={testProject.project}
@@ -62,15 +71,13 @@ export const NotAuthenticated = () => {
           onTryAnotherGame={action('onTryAnotherGame')}
         />
       </AuthenticatedUserContext.Provider>
-    </EventsFunctionsExtensionsContext.Provider>
+    </Template>
   );
 };
 
-export const Authenticated = () => {
+export const AuthenticatedWithAvailableCloudProjectsRoom = () => {
   return (
-    <EventsFunctionsExtensionsContext.Provider
-      value={fakeEventsFunctionsExtensionsState}
-    >
+    <Template>
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
         <QuickPublish
           project={testProject.project}
@@ -84,15 +91,62 @@ export const Authenticated = () => {
           onTryAnotherGame={action('onTryAnotherGame')}
         />
       </AuthenticatedUserContext.Provider>
-    </EventsFunctionsExtensionsContext.Provider>
+    </Template>
+  );
+};
+
+export const AuthenticatedWithTooManyCloudProjects = () => {
+  return (
+    <Template>
+      <AuthenticatedUserContext.Provider
+        value={{
+          ...fakeAuthenticatedUserWithNoSubscriptionAndCredits,
+          cloudProjects: tenCloudProjects,
+        }}
+      >
+        <QuickPublish
+          project={testProject.project}
+          gameAndBuildsManager={fakeEmptyGameAndBuildsManager}
+          isSavingProject={false}
+          onSaveProject={async () => {}}
+          onlineWebExporter={onlineWebExporter}
+          setIsNavigationDisabled={() => {}}
+          onClose={action('onClose')}
+          onContinueQuickCustomization={action('onContinueQuickCustomization')}
+          onTryAnotherGame={action('onTryAnotherGame')}
+        />
+      </AuthenticatedUserContext.Provider>
+    </Template>
+  );
+};
+export const AuthenticatedAndLoadingUserCloudProjects = () => {
+  return (
+    <Template>
+      <AuthenticatedUserContext.Provider
+        value={{
+          ...fakeAuthenticatedUserWithNoSubscriptionAndCredits,
+          cloudProjects: null,
+        }}
+      >
+        <QuickPublish
+          project={testProject.project}
+          gameAndBuildsManager={fakeEmptyGameAndBuildsManager}
+          isSavingProject={false}
+          onSaveProject={async () => {}}
+          onlineWebExporter={onlineWebExporter}
+          setIsNavigationDisabled={() => {}}
+          onClose={action('onClose')}
+          onContinueQuickCustomization={action('onContinueQuickCustomization')}
+          onTryAnotherGame={action('onTryAnotherGame')}
+        />
+      </AuthenticatedUserContext.Provider>
+    </Template>
   );
 };
 
 export const AuthenticatedAndFails = () => {
   return (
-    <EventsFunctionsExtensionsContext.Provider
-      value={fakeEventsFunctionsExtensionsState}
-    >
+    <Template>
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
         <QuickPublish
           project={testProject.project}
@@ -106,15 +160,13 @@ export const AuthenticatedAndFails = () => {
           onTryAnotherGame={action('onTryAnotherGame')}
         />
       </AuthenticatedUserContext.Provider>
-    </EventsFunctionsExtensionsContext.Provider>
+    </Template>
   );
 };
 
 export const AuthenticatedExistingGame = () => {
   return (
-    <EventsFunctionsExtensionsContext.Provider
-      value={fakeEventsFunctionsExtensionsState}
-    >
+    <Template>
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
         <QuickPublish
           project={testProject.project}
@@ -128,15 +180,13 @@ export const AuthenticatedExistingGame = () => {
           onTryAnotherGame={action('onTryAnotherGame')}
         />
       </AuthenticatedUserContext.Provider>
-    </EventsFunctionsExtensionsContext.Provider>
+    </Template>
   );
 };
 
 export const AuthenticatedNotOwnedGame = () => {
   return (
-    <EventsFunctionsExtensionsContext.Provider
-      value={fakeEventsFunctionsExtensionsState}
-    >
+    <Template>
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
         <QuickPublish
           project={testProject.project}
@@ -150,6 +200,6 @@ export const AuthenticatedNotOwnedGame = () => {
           onTryAnotherGame={action('onTryAnotherGame')}
         />
       </AuthenticatedUserContext.Provider>
-    </EventsFunctionsExtensionsContext.Provider>
+    </Template>
   );
 };

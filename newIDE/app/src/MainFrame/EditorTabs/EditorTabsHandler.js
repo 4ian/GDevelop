@@ -354,6 +354,26 @@ export const closeEventsFunctionsExtensionTabs = (
   });
 };
 
+export const closeCustomObjectTab = (
+  state: EditorTabsState,
+  eventsFunctionsExtensionName: string,
+  eventsBasedObjectName: string
+) => {
+  return closeTabsExceptIf(state, editorTab => {
+    const editor = editorTab.editorRef;
+    if (editor instanceof CustomObjectEditorContainer) {
+      return (
+        (!editor.getEventsFunctionsExtensionName() ||
+          editor.getEventsFunctionsExtensionName() !==
+            eventsFunctionsExtensionName) &&
+        (!editor.getEventsBasedObjectName() ||
+          editor.getEventsBasedObjectName() !== eventsBasedObjectName)
+      );
+    }
+    return true;
+  });
+};
+
 export const getEventsFunctionsExtensionEditor = (
   state: EditorTabsState,
   eventsFunctionsExtension: gdEventsFunctionsExtension

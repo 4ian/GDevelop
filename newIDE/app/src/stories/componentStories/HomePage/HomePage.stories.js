@@ -120,6 +120,7 @@ const WrappedHomePage = ({
               resourceManagementProps={fakeResourceManagementProps}
               onCreateProjectFromExample={action('onCreateProjectFromExample')}
               askToCloseProject={async () => true}
+              closeProject={async () => {}}
             />
           </TutorialStateProvider>
         </ExampleStoreStateProvider>

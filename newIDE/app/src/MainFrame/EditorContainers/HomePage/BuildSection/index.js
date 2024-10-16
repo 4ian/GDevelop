@@ -118,6 +118,7 @@ type Props = {|
   onOpenExampleStore: () => void,
   onManageGame: (gameId: string) => void,
   canManageGame: (gameId: string) => boolean,
+  closeProject: () => Promise<void>,
 |};
 
 const locateProjectFile = (file: FileMetadataAndStorageProviderName) => {
@@ -141,10 +142,15 @@ const BuildSection = ({
   onOpenExampleStore,
   onManageGame,
   canManageGame,
+  closeProject,
 }: Props) => {
   const { getRecentProjectFiles } = React.useContext(PreferencesContext);
   const { exampleShortHeaders } = React.useContext(ExampleStoreContext);
-  const { showDeleteConfirmation, showAlert } = useAlertDialog();
+  const {
+    showDeleteConfirmation,
+    showConfirmation,
+    showAlert,
+  } = useAlertDialog();
   const { removeRecentProjectFile } = React.useContext(PreferencesContext);
   const [pendingProject, setPendingProject] = React.useState<?string>(null);
   const [
@@ -236,6 +242,19 @@ const BuildSection = ({
     const projectName = fileMetadata.name;
     if (!projectName) return; // Only cloud projects can be deleted, and all cloud projects have names.
 
+    const isCurrentProjectOpened =
+      !!currentFileMetadata &&
+      currentFileMetadata.fileIdentifier === fileMetadata.fileIdentifier;
+    if (isCurrentProjectOpened) {
+      const result = await showConfirmation({
+        title: t`Project is opened`,
+        message: t`You are about to delete the project ${projectName}, which is currently opened. If you proceed, the project will be closed and you will lose any unsaved changes. Do you want to proceed?`,
+        confirmButtonLabel: t`Continue`,
+      });
+      if (!result) return;
+      await closeProject();
+    }
+
     // Extract word translation to ensure it is not wrongly translated in the sentence.
     const translatedConfirmText = i18n._(t`delete`);
 
@@ -274,9 +293,6 @@ const BuildSection = ({
     file: ?FileMetadataAndStorageProviderName
   ): Array<MenuItemTemplate> => {
     if (!file) return [];
-    const isCurrentProjectOpened =
-      !!currentFileMetadata &&
-      currentFileMetadata.fileIdentifier === file.fileMetadata.fileIdentifier;
 
     const actions = [
       { label: i18n._(t`Open`), click: () => onOpenRecentFile(file) },
@@ -285,7 +301,6 @@ const BuildSection = ({
       actions.push({
         label: i18n._(t`Delete`),
         click: () => onDeleteCloudProject(i18n, file),
-        enabled: !isCurrentProjectOpened,
       });
     } else if (file.storageProviderName === 'LocalFile') {
       actions.push(

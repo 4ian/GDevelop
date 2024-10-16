@@ -9,6 +9,7 @@ import RaisedButton from '../UI/RaisedButton';
 import { I18n } from '@lingui/react';
 import { type Exporter } from '../ExportAndShare/ShareDialog';
 import Text from '../UI/Text';
+import { type Limits } from '../Utils/GDevelopServices/Usage';
 import { type GameAndBuildsManager } from '../Utils/UseGameAndBuildsManager';
 import FlatButton from '../UI/FlatButton';
 import { Column, Line, Spacer } from '../UI/Grid';
@@ -23,6 +24,11 @@ import Trash from '../UI/CustomSvgIcons/Trash';
 import GameImage from './GameImage';
 import ShareLink from '../UI/ShareDialog/ShareLink';
 import { getGameUrl } from '../Utils/GDevelopServices/Game';
+import PlaceholderLoader from '../UI/PlaceholderLoader';
+import { MaxProjectCountAlertMessage } from '../MainFrame/EditorContainers/HomePage/BuildSection/MaxProjectCountAlertMessage';
+import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
+
+const styles = { imageContainer: { maxWidth: 400 } };
 
 type Props = {|
   project: gdProject,
@@ -48,7 +54,15 @@ export const QuickPublish = ({
   onTryAnotherGame,
 }: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const { profile, onOpenCreateAccountDialog } = authenticatedUser;
+  const { openSubscriptionDialog } = React.useContext(
+    SubscriptionSuggestionContext
+  );
+  const {
+    profile,
+    onOpenCreateAccountDialog,
+    limits,
+    cloudProjects,
+  } = authenticatedUser;
   const { game } = gameAndBuildsManager;
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
@@ -66,15 +80,39 @@ export const QuickPublish = ({
     });
   }, []);
 
+  const renderCallout = (limits: Limits) => (
+    <MaxProjectCountAlertMessage
+      limits={limits}
+      onUpgrade={() =>
+        openSubscriptionDialog({
+          analyticsMetadata: {
+            reason: 'Cloud Project limit reached',
+          },
+        })
+      }
+    />
+  );
+
+  const isLoadingCloudProjects = !!profile && !cloudProjects;
+  const isCloudProjectsMaximumReached =
+    !!limits &&
+    !!cloudProjects &&
+    cloudProjects.length >= limits.capabilities.cloudProjects.maximumCount;
+  const shouldSaveAndLaunchExport =
+    !!profile &&
+    exportState === '' &&
+    !isCloudProjectsMaximumReached &&
+    !isLoadingCloudProjects;
+
   React.useEffect(
     () => {
-      if (profile && exportState === '') {
+      if (shouldSaveAndLaunchExport) {
         // Save project & launch export as soon as the user is authenticated (or if they already were)
         onSaveProject();
         launchExport();
       }
     },
-    [profile, launchExport, onSaveProject, exportState]
+    [launchExport, onSaveProject, shouldSaveAndLaunchExport]
   );
 
   const gameUrl = game ? getGameUrl(game) : '';
@@ -87,73 +125,81 @@ export const QuickPublish = ({
       alignItems="center"
       justifyContent="space-between"
     >
-      <ColumnStackLayout>
-        <GameImage project={project} />
+      <ColumnStackLayout alignItems="center">
+        <div style={styles.imageContainer}>
+          <GameImage project={project} />
+        </div>
         <Spacer />
         {profile ? (
-          <I18n>
-            {({ i18n }) => (
-              <ColumnStackLayout noMargin expand alignItems="stretch">
-                <ExportLauncher
-                  ref={exportLauncherRef}
-                  i18n={i18n}
-                  project={project}
-                  onSaveProject={onSaveProject}
-                  isSavingProject={isSavingProject}
-                  onChangeSubscription={() => {
-                    // Nothing to do.
-                  }}
-                  authenticatedUser={authenticatedUser}
-                  eventsFunctionsExtensionsState={
-                    eventsFunctionsExtensionsState
-                  }
-                  exportPipeline={onlineWebExporter.exportPipeline}
-                  setIsNavigationDisabled={setIsNavigationDisabled}
-                  gameAndBuildsManager={gameAndBuildsManager}
-                  uiMode="minimal"
-                  onExportLaunched={() => {
-                    setExportState('started');
-                  }}
-                  onExportErrored={() => {
-                    setExportState('errored');
-                  }}
-                  onExportSucceeded={() => {
-                    setExportState('succeeded');
-                  }}
-                />
-                {exportState === 'succeeded' ? (
-                  <Paper background="light">
-                    <div
-                      className={classNames({
-                        [classes.paperContainer]: true,
-                      })}
-                    >
-                      <ColumnStackLayout>
-                        <Text size="body" align="center">
-                          <Trans>Share your game with your friends!</Trans>
-                        </Text>
-                        {gameUrl && <ShareLink url={gameUrl} />}
-                      </ColumnStackLayout>
-                    </div>
-                  </Paper>
-                ) : exportState === 'errored' ? (
-                  <ColumnStackLayout noMargin>
-                    <Text size="body" align="center">
-                      <Trans>
-                        An error occurred while exporting your game. Verify your
-                        internet connection and try again.
-                      </Trans>
-                    </Text>
-                    <RaisedButton
-                      primary
-                      label={<Trans>Try again</Trans>}
-                      onClick={launchExport}
-                    />
-                  </ColumnStackLayout>
-                ) : null}
-              </ColumnStackLayout>
-            )}
-          </I18n>
+          isLoadingCloudProjects ? (
+            <PlaceholderLoader />
+          ) : isCloudProjectsMaximumReached && limits ? (
+            renderCallout(limits)
+          ) : (
+            <I18n>
+              {({ i18n }) => (
+                <ColumnStackLayout noMargin expand alignItems="stretch">
+                  <ExportLauncher
+                    ref={exportLauncherRef}
+                    i18n={i18n}
+                    project={project}
+                    onSaveProject={onSaveProject}
+                    isSavingProject={isSavingProject}
+                    onChangeSubscription={() => {
+                      // Nothing to do.
+                    }}
+                    authenticatedUser={authenticatedUser}
+                    eventsFunctionsExtensionsState={
+                      eventsFunctionsExtensionsState
+                    }
+                    exportPipeline={onlineWebExporter.exportPipeline}
+                    setIsNavigationDisabled={setIsNavigationDisabled}
+                    gameAndBuildsManager={gameAndBuildsManager}
+                    uiMode="minimal"
+                    onExportLaunched={() => {
+                      setExportState('started');
+                    }}
+                    onExportErrored={() => {
+                      setExportState('errored');
+                    }}
+                    onExportSucceeded={() => {
+                      setExportState('succeeded');
+                    }}
+                  />
+                  {exportState === 'succeeded' ? (
+                    <Paper background="light">
+                      <div
+                        className={classNames({
+                          [classes.paperContainer]: true,
+                        })}
+                      >
+                        <ColumnStackLayout>
+                          <Text size="body" align="center">
+                            <Trans>Share your game with your friends!</Trans>
+                          </Text>
+                          {gameUrl && <ShareLink url={gameUrl} />}
+                        </ColumnStackLayout>
+                      </div>
+                    </Paper>
+                  ) : exportState === 'errored' ? (
+                    <ColumnStackLayout noMargin>
+                      <Text size="body" align="center">
+                        <Trans>
+                          An error occurred while exporting your game. Verify
+                          your internet connection and try again.
+                        </Trans>
+                      </Text>
+                      <RaisedButton
+                        primary
+                        label={<Trans>Try again</Trans>}
+                        onClick={launchExport}
+                      />
+                    </ColumnStackLayout>
+                  ) : null}
+                </ColumnStackLayout>
+              )}
+            </I18n>
+          )
         ) : (
           <Column noMargin>
             <Paper background="light">
@@ -209,13 +255,13 @@ export const QuickPublish = ({
         )}
       </ColumnStackLayout>
 
-      {exportState !== 'started' && (
+      {exportState !== 'started' && !isLoadingCloudProjects && (
         <Line justifyContent="center" alignItems="center">
           <TextButton
             secondary
             onClick={onClose}
             label={
-              hasNotSavedProject ? (
+              hasNotSavedProject || isCloudProjectsMaximumReached ? (
                 <Trans>Leave and lose all changes</Trans>
               ) : (
                 <Trans>Finish and close</Trans>

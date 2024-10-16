@@ -34,6 +34,7 @@ import AuthenticatedUserContext, {
   initialAuthenticatedUser,
   type AuthenticatedUser,
   authenticatedUserLoggedOutAttributes,
+  authenticatedUserPropertiesLoadingState,
 } from './AuthenticatedUserContext';
 import CreateAccountDialog from './CreateAccountDialog';
 import EditProfileDialog from './EditProfileDialog';
@@ -180,7 +181,7 @@ export default class AuthenticatedUserProvider extends React.Component<
         'Fetching user profile as authenticated user found at startup...'
       );
       this._automaticallyUpdateUserProfile = false;
-      await this._fetchUserProfileWithoutThrowingErrors();
+      await this._fetchUserProfileWithoutThrowingErrors({ resetState: true });
       this._automaticallyUpdateUserProfile = true;
     } else {
       console.info('No authenticated user found at startup.');
@@ -310,7 +311,10 @@ export default class AuthenticatedUserProvider extends React.Component<
   };
 
   _fetchUserProfileWithoutThrowingErrors = async (
-    options: ?{ dontNotifyAboutEmailVerification?: boolean }
+    options: ?{
+      dontNotifyAboutEmailVerification?: boolean,
+      resetState?: boolean,
+    }
   ) => {
     try {
       await this._fetchUserProfile(options);
@@ -323,17 +327,35 @@ export default class AuthenticatedUserProvider extends React.Component<
   };
 
   _fetchUserProfile = async (
-    options: ?{ dontNotifyAboutEmailVerification?: boolean }
+    options: ?{
+      dontNotifyAboutEmailVerification?: boolean,
+      /**
+       * By default, fetching the user does not reset their attributes to a null state
+       * to avoid the UI displaying loaders everywhere. This boolean should be set
+       * to true when such a result is expected (during login for instance).
+       */
+      resetState?: boolean,
+    }
   ) => {
     const { authentication } = this.props;
 
-    this.setState(({ authenticatedUser }) => ({
-      authenticatedUser: {
+    this.setState(({ authenticatedUser }) => {
+      let newAuthenticatedUser: AuthenticatedUser = {
         ...authenticatedUser,
         loginState: 'loggingIn',
         cloudProjectsFetchingErrorLabel: null,
-      },
-    }));
+      };
+      if (options && options.resetState) {
+        newAuthenticatedUser = {
+          ...newAuthenticatedUser,
+          ...authenticatedUserPropertiesLoadingState,
+        };
+      }
+
+      return {
+        authenticatedUser: newAuthenticatedUser,
+      };
+    });
 
     // First ensure the Firebase authenticated user is up to date
     // (and let the error propagate if any).
@@ -942,7 +964,7 @@ export default class AuthenticatedUserProvider extends React.Component<
         provider,
         signal: this._abortController.signal,
       });
-      await this._fetchUserProfileWithoutThrowingErrors();
+      await this._fetchUserProfileWithoutThrowingErrors({ resetState: true });
       this.openLoginDialog(false);
       this.openCreateAccountDialog(false);
       this._showLoginSnackbar(this.state.authenticatedUser);
@@ -997,7 +1019,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     this._automaticallyUpdateUserProfile = false;
     try {
       await authentication.login(form);
-      await this._fetchUserProfileWithoutThrowingErrors();
+      await this._fetchUserProfileWithoutThrowingErrors({ resetState: true });
       this.openLoginDialog(false);
       this._showLoginSnackbar(this.state.authenticatedUser);
     } catch (apiCallError) {
@@ -1095,6 +1117,7 @@ export default class AuthenticatedUserProvider extends React.Component<
       await this._fetchUserProfileWithoutThrowingErrors({
         // When creating an account, avoid showing the email verification dialog right away.
         dontNotifyAboutEmailVerification: true,
+        resetState: true,
       });
       this.openCreateAccountDialog(false);
       sendSignupDone(form.email);

@@ -84,25 +84,29 @@ export type AuthenticatedUser = {|
   achievements: ?Array<Achievement>,
 |};
 
+export const authenticatedUserPropertiesLoadingState = {
+  cloudProjects: null,
+  receivedAssetPacks: null,
+  receivedAssetShortHeaders: null,
+  receivedGameTemplates: null,
+  badges: null,
+  notifications: null,
+};
+
 export const initialAuthenticatedUser = {
   authenticated: false,
   firebaseUser: null,
   profile: null,
   loginState: null,
   creatingOrLoggingInAccount: false,
-  badges: null,
-  cloudProjects: null,
   cloudProjectsFetchingErrorLabel: null,
-  receivedAssetPacks: null,
-  receivedAssetShortHeaders: null,
-  receivedGameTemplates: null,
   gameTemplatePurchases: null,
   assetPackPurchases: null,
   recommendations: null,
-  notifications: null,
   subscription: null,
   usages: null,
   limits: null,
+  ...authenticatedUserPropertiesLoadingState,
   authenticationError: null,
   onLogin: async () => {},
   onLoginWithProvider: async () => {},

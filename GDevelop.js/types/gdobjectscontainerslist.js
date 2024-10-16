@@ -14,6 +14,7 @@ declare class gdObjectsContainersList {
   getAnimationNamesOfObject(name: string): gdVectorString;
   getTypeOfBehaviorInObjectOrGroup(objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): string;
   hasObjectOrGroupNamed(name: string): boolean;
+  hasObjectNamed(name: string): boolean;
   hasObjectOrGroupWithVariableNamed(objectName: string, variableName: string): ObjectsContainersList_VariableExistence;
   getObjectsContainer(index: number): gdObjectsContainer;
   getObjectsContainersCount(): number;

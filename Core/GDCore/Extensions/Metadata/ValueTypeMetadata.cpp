@@ -53,20 +53,23 @@ const gd::String &ValueTypeMetadata::GetExpressionPrimitiveValueType(
 
 const gd::String &
 ValueTypeMetadata::GetPrimitiveValueType(const gd::String &parameterType) {
-  if (parameterType == "variable" ||
-      gd::ValueTypeMetadata::IsTypeExpression("variable", parameterType)) {
-    return ValueTypeMetadata::variableType;
+  if (parameterType == "number" ||
+      gd::ValueTypeMetadata::IsTypeValue("number", parameterType)) {
+    return ValueTypeMetadata::numberType;
   }
-  if (parameterType == "boolean" || parameterType == "yesorno" ||
-      parameterType == "trueorfalse") {
-    return ValueTypeMetadata::booleanType;
-  }
-  // These 2 types are not strings from the code generator point of view,
-  // but it is for event-based extensions.
-  if (parameterType == "key" || parameterType == "mouse") {
+  if (parameterType == "string" ||
+      gd::ValueTypeMetadata::IsTypeValue("string", parameterType)) {
     return ValueTypeMetadata::stringType;
   }
-  return GetExpressionPrimitiveValueType(parameterType);
+  if (parameterType == "variable" ||
+      gd::ValueTypeMetadata::IsTypeValue("variable", parameterType)) {
+    return ValueTypeMetadata::variableType;
+  }
+  if (parameterType == "boolean" ||
+      gd::ValueTypeMetadata::IsTypeValue("boolean", parameterType)) {
+    return ValueTypeMetadata::booleanType;
+  }
+  return parameterType;
 }
 
 const gd::String ValueTypeMetadata::numberValueType = "number";

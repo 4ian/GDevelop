@@ -42,7 +42,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
                       const gd::String &extraInfo_ = "")
       : platform(platform_),
         projectScopedContainers(projectScopedContainers_),
-        parentType(StringToType(gd::ParameterMetadata::GetExpressionValueType(rootType_))),
+        parentType(StringToType(gd::ValueTypeMetadata::GetExpressionPrimitiveValueType(rootType_))),
         childType(Type::Unknown),
         forbidsUsageOfBracketsBecauseParentIsObject(false),
         currentParameterExtraInfo(&extraInfo_) {};

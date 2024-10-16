@@ -72,7 +72,7 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
         child(nullptr) {};
 
   const gd::String &GetType() {
-    return gd::ParameterMetadata::GetExpressionValueType(type);
+    return gd::ValueTypeMetadata::GetExpressionPrimitiveValueType(type);
   };
 
   void OnVisitSubExpressionNode(SubExpressionNode& node) override {

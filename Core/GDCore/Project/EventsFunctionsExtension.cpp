@@ -99,8 +99,11 @@ void EventsFunctionsExtension::SerializeTo(SerializerElement& element) const {
 
 void EventsFunctionsExtension::UnserializeFrom(
     gd::Project& project, const SerializerElement& element) {
-      UnserializeExtensionDeclarationFrom(project, element);
-      UnserializeExtensionImplementationFrom(project, element);
+  // Unserialize first the "declaration" (everything but objects content)
+  // so that objects can be then unserialized in proper order (they can depend
+  // on each others)
+  UnserializeExtensionDeclarationFrom(project, element);
+  UnserializeExtensionImplementationFrom(project, element);
 }
 
 void EventsFunctionsExtension::UnserializeExtensionDeclarationFrom(
@@ -206,11 +209,16 @@ EventsFunctionsExtension::GetUnserializingOrderEventsBasedObjectNames(
 
   // Child-objects need the event-based objects they use to be loaded completely
   // before they are unserialized.
+
+  // At the beginning, everything is yet to be loaded.
   std::vector<gd::String> remainingEventsBasedObjectNames(
       eventsBasedObjects.size());
   for (std::size_t i = 0; i < eventsBasedObjects.size(); ++i) {
     remainingEventsBasedObjectNames[i] = eventsBasedObjects.at(i).GetName();
   }
+
+  // Helper allowing to find if an object depends on at least one other object from
+  // the extension that is not loaded yet.
   auto &extensionName = name;
   auto isDependentFromRemainingEventsBasedObjects =
       [&remainingEventsBasedObjectNames,
@@ -226,6 +234,8 @@ EventsFunctionsExtension::GetUnserializingOrderEventsBasedObjectNames(
           gd::String usedExtensionName =
               PlatformExtension::GetExtensionFromFullObjectType(objectType);
           if (usedExtensionName != extensionName) {
+            // The object comes from another extension: the project is already responsible
+            // for loading extensions in the proper order.
             continue;
           }
           gd::String eventsBasedObjectName =
@@ -242,6 +252,8 @@ EventsFunctionsExtension::GetUnserializingOrderEventsBasedObjectNames(
         return false;
       };
 
+  // Find the order of loading so that the objects are loaded when all the objects
+  // they depend on are already loaded.
   std::vector<gd::String> loadOrderEventsBasedObjectNames;
   bool foundAnyEventsBasedObject = true;
   while (foundAnyEventsBasedObject) {

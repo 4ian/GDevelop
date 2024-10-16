@@ -255,14 +255,42 @@ const getAutocompletionsForText = function(
 ): Array<ExpressionAutocompletion> {
   const prefix: string = completionDescription.getPrefix();
   const type: string = completionDescription.getType();
-  const { project, scope } = expressionAutocompletionContext;
+  const {
+    project,
+    scope,
+    projectScopedContainersAccessor,
+  } = expressionAutocompletionContext;
+
+  const objectsContainersList = projectScopedContainersAccessor
+    .get()
+    .getObjectsContainersList();
+
+  if (objectsContainersList.getObjectsContainersCount() === 0) {
+    throw new Error(
+      'Called getAutocompletionsForText without any object container.'
+    );
+  }
+  // TODO Use a loop instead of looking for 2 object containers.
+  if (objectsContainersList.getObjectsContainersCount() > 2) {
+    console.error(
+      'Called getAutocompletionsForText with more than 2 object containers.'
+    );
+  }
+  const globalObjectsContainer =
+    objectsContainersList.getObjectsContainersCount() > 1
+      ? objectsContainersList.getObjectsContainer(0)
+      : null;
+  const objectsContainer = objectsContainersList.getObjectsContainer(
+    objectsContainersList.getObjectsContainersCount() - 1
+  );
 
   let autocompletionTexts: string[] = [];
   if (type === 'layer') {
-    const layout = scope.layout;
-    if (layout) {
-      for (let index = 0; index < layout.getLayersCount(); index++) {
-        autocompletionTexts.push(`"${layout.getLayerAt(index).getName()}"`);
+    const layersOwner = scope.layout || scope.eventsBasedObject;
+    if (layersOwner) {
+      const layers = layersOwner.getLayers();
+      for (let index = 0; index < layers.getLayersCount(); index++) {
+        autocompletionTexts.push(`"${layers.getLayerAt(index).getName()}"`);
       }
     }
   } else if (type === 'sceneName') {
@@ -282,8 +310,8 @@ const getAutocompletionsForText = function(
     }
 
     const object = getObjectByName(
-      project.getObjects(),
-      scope.layout ? scope.layout.getObjects() : null,
+      globalObjectsContainer,
+      objectsContainer,
       objectName
     );
     if (!object) {
@@ -311,8 +339,8 @@ const getAutocompletionsForText = function(
     }
 
     const object = getObjectByName(
-      project.getObjects(),
-      scope.layout ? scope.layout.getObjects() : null,
+      globalObjectsContainer,
+      objectsContainer,
       objectName
     );
     if (!object) {

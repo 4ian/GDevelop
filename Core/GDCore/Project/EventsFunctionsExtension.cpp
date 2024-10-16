@@ -10,6 +10,7 @@
 #include "EventsFunction.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/MakeUnique.h"
+#include "GDCore/Extensions/PlatformExtension.h"
 
 namespace gd {
 
@@ -98,8 +99,11 @@ void EventsFunctionsExtension::SerializeTo(SerializerElement& element) const {
 
 void EventsFunctionsExtension::UnserializeFrom(
     gd::Project& project, const SerializerElement& element) {
-      UnserializeExtensionDeclarationFrom(project, element);
-      UnserializeExtensionImplementationFrom(project, element);
+  // Unserialize first the "declaration" (everything but objects content)
+  // so that objects can be then unserialized in proper order (they can depend
+  // on each others)
+  UnserializeExtensionDeclarationFrom(project, element);
+  UnserializeExtensionImplementationFrom(project, element);
 }
 
 void EventsFunctionsExtension::UnserializeExtensionDeclarationFrom(
@@ -185,11 +189,93 @@ void EventsFunctionsExtension::UnserializeExtensionImplementationFrom(
   eventsBasedBehaviors.UnserializeElementsFrom(
       "eventsBasedBehavior", project, element.GetChild("eventsBasedBehaviors"));
 
-  // It's important to load the objects without erasing them first as each object
-  // might reference other objects, and so need to know if a custom object exists
-  // in the project or not.
-  eventsBasedObjects.ProgressivelyUnserializeElementsFrom(
-      "eventsBasedObject", project, element.GetChild("eventsBasedObjects"));
+  auto &eventsBasedObjectsElement = element.GetChild("eventsBasedObjects");
+  eventsBasedObjectsElement.ConsiderAsArrayOf("eventsBasedObject");
+  for (gd::String &eventsBasedObjectName :
+       GetUnserializingOrderEventsBasedObjectNames(eventsBasedObjectsElement)) {
+    size_t extensionIndex = eventsBasedObjects.GetPosition(
+        eventsBasedObjects.Get(eventsBasedObjectName));
+    const SerializerElement &eventsBasedObjectElement =
+        eventsBasedObjectsElement.GetChild(extensionIndex);
+
+    eventsBasedObjects.at(extensionIndex)
+        .UnserializeFrom(project, eventsBasedObjectElement);
+  }
+}
+
+std::vector<gd::String>
+EventsFunctionsExtension::GetUnserializingOrderEventsBasedObjectNames(
+    const gd::SerializerElement &eventsBasedObjectsElement) {
+
+  // Child-objects need the event-based objects they use to be loaded completely
+  // before they are unserialized.
+
+  // At the beginning, everything is yet to be loaded.
+  std::vector<gd::String> remainingEventsBasedObjectNames(
+      eventsBasedObjects.size());
+  for (std::size_t i = 0; i < eventsBasedObjects.size(); ++i) {
+    remainingEventsBasedObjectNames[i] = eventsBasedObjects.at(i).GetName();
+  }
+
+  // Helper allowing to find if an object depends on at least one other object from
+  // the extension that is not loaded yet.
+  auto &extensionName = name;
+  auto isDependentFromRemainingEventsBasedObjects =
+      [&remainingEventsBasedObjectNames,
+       &extensionName](const gd::SerializerElement &eventsBasedObjectElement) {
+        auto &objectsElement = eventsBasedObjectElement.GetChild("objects");
+        objectsElement.ConsiderAsArrayOf("object");
+
+        for (std::size_t objectIndex = 0;
+             objectIndex < objectsElement.GetChildrenCount(); ++objectIndex) {
+          const gd::String &objectType =
+              objectsElement.GetChild(objectIndex).GetStringAttribute("type");
+
+          gd::String usedExtensionName =
+              PlatformExtension::GetExtensionFromFullObjectType(objectType);
+          if (usedExtensionName != extensionName) {
+            // The object comes from another extension: the project is already responsible
+            // for loading extensions in the proper order.
+            continue;
+          }
+          gd::String eventsBasedObjectName =
+              gd::PlatformExtension::GetObjectNameFromFullObjectType(
+                  objectType);
+
+          if (std::find(remainingEventsBasedObjectNames.begin(),
+                        remainingEventsBasedObjectNames.end(),
+                        eventsBasedObjectName) !=
+              remainingEventsBasedObjectNames.end()) {
+            return true;
+          }
+        }
+        return false;
+      };
+
+  // Find the order of loading so that the objects are loaded when all the objects
+  // they depend on are already loaded.
+  std::vector<gd::String> loadOrderEventsBasedObjectNames;
+  bool foundAnyEventsBasedObject = true;
+  while (foundAnyEventsBasedObject) {
+    foundAnyEventsBasedObject = false;
+    for (std::size_t i = 0; i < remainingEventsBasedObjectNames.size(); ++i) {
+      auto eventsBasedObjectName = remainingEventsBasedObjectNames[i];
+      size_t extensionIndex = eventsBasedObjects.GetPosition(
+          eventsBasedObjects.Get(eventsBasedObjectName));
+      const SerializerElement &eventsBasedObjectElement =
+          eventsBasedObjectsElement.GetChild(extensionIndex);
+
+      if (!isDependentFromRemainingEventsBasedObjects(
+              eventsBasedObjectElement)) {
+        loadOrderEventsBasedObjectNames.push_back(eventsBasedObjectName);
+        remainingEventsBasedObjectNames.erase(
+            remainingEventsBasedObjectNames.begin() + i);
+        i--;
+        foundAnyEventsBasedObject = true;
+      }
+    }
+  }
+  return loadOrderEventsBasedObjectNames;
 }
 
 bool EventsFunctionsExtension::IsExtensionLifecycleEventsFunction(

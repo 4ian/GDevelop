@@ -262,4 +262,134 @@ TEST_CASE("ObjectSerialization", "[common]") {
     auto &behaviorElement = behaviorsElement.GetChild(0);
     REQUIRE(behaviorElement.GetStringAttribute("name") == "MyBehavior");
   }
+
+  // Event-based object dependency cycles are not tested because they are forbidden by the editor.
+  SECTION("Save and load a project with custom object dependencies from different extensions") {
+    gd::Platform platform;
+    gd::Project writtenProject;
+    SetupProjectWithDummyPlatform(writtenProject, platform);
+
+    {
+      // The extension with the dependency is added first to make the
+      // implementation change the order in which extensions are loaded.
+      auto &eventsExtensionWithDependency =
+          writtenProject.InsertNewEventsFunctionsExtension(
+              "MyEventsExtensionWithDependency", 0);
+      auto &eventsExtension = writtenProject.InsertNewEventsFunctionsExtension(
+          "MyEventsExtension", 1);
+      {
+        auto &eventsBasedObject =
+            eventsExtension.GetEventsBasedObjects().InsertNew(
+                "MyEventsBasedObject", 0);
+        auto &childObject = eventsBasedObject.GetObjects().InsertNewObject(
+            writtenProject, "MyExtension::Sprite", "MyChildSprite", 0);
+      }
+      // An event-based object with a custom object child that overrides its
+      // configuration.
+      {
+        auto &eventsBasedObject =
+            eventsExtensionWithDependency.GetEventsBasedObjects().InsertNew(
+                "MyEventsBasedObjectWithDependency", 0);
+        auto &childObject = eventsBasedObject.GetObjects().InsertNewObject(
+            writtenProject, "MyEventsExtension::MyEventsBasedObject",
+            "MyChildCustomObject", 0);
+        auto *customObjectConfiguration =
+            dynamic_cast<gd::CustomObjectConfiguration *>(
+                &childObject.GetConfiguration());
+        auto &spriteConfiguration =
+            customObjectConfiguration->GetChildObjectConfiguration(
+                "MyChildSprite");
+        SetupSpriteConfiguration(spriteConfiguration);
+      }
+    }
+
+    SerializerElement projectElement;
+    writtenProject.SerializeTo(projectElement);
+
+    gd::Project readProject;
+    readProject.AddPlatform(platform);
+    readProject.UnserializeFrom(projectElement);
+
+    REQUIRE(readProject.GetEventsFunctionsExtensionsCount() == 2);
+    auto &eventsExtensionWithDependency =
+        readProject.GetEventsFunctionsExtension(0);
+    REQUIRE(eventsExtensionWithDependency.GetEventsBasedObjects().GetCount() ==
+            1);
+    auto &eventsBasedObject =
+        eventsExtensionWithDependency.GetEventsBasedObjects().Get(0);
+    REQUIRE(eventsBasedObject.GetObjects().GetObjectsCount() == 1);
+    auto &childObject = eventsBasedObject.GetObjects().GetObject(0);
+    REQUIRE(childObject.GetName() == "MyChildCustomObject");
+    REQUIRE(childObject.GetType() == "MyEventsExtension::MyEventsBasedObject");
+    auto *customObjectConfiguration =
+        dynamic_cast<gd::CustomObjectConfiguration *>(
+            &childObject.GetConfiguration());
+    REQUIRE(customObjectConfiguration != nullptr);
+    auto &spriteConfiguration =
+        customObjectConfiguration->GetChildObjectConfiguration("MyChildSprite");
+    CheckSpriteConfiguration(spriteConfiguration);
+  }
+
+  SECTION("Save and load a project with custom object dependencies inside an extension") {
+    gd::Platform platform;
+    gd::Project writtenProject;
+    SetupProjectWithDummyPlatform(writtenProject, platform);
+
+    {
+      auto &eventsExtension = writtenProject.InsertNewEventsFunctionsExtension(
+          "MyEventsExtension", 0);
+      {
+        auto &eventsBasedObject =
+            eventsExtension.GetEventsBasedObjects().InsertNew(
+                "MyEventsBasedObject", 0);
+        auto &childObject = eventsBasedObject.GetObjects().InsertNewObject(
+            writtenProject, "MyExtension::Sprite", "MyChildSprite", 0);
+      }
+      // An event-based object with a custom object child that overrides its
+      // configuration.
+      // The extension with the dependency is added first to make the
+      // implementation change the order in which extensions are loaded.
+      {
+        auto &eventsBasedObject =
+            eventsExtension.GetEventsBasedObjects().InsertNew(
+                "MyEventsBasedObjectWithDependency", 0);
+        auto &childObject = eventsBasedObject.GetObjects().InsertNewObject(
+            writtenProject, "MyEventsExtension::MyEventsBasedObject",
+            "MyChildCustomObject", 0);
+        auto *customObjectConfiguration =
+            dynamic_cast<gd::CustomObjectConfiguration *>(
+                &childObject.GetConfiguration());
+        auto &spriteConfiguration =
+            customObjectConfiguration->GetChildObjectConfiguration(
+                "MyChildSprite");
+        SetupSpriteConfiguration(spriteConfiguration);
+      }
+    }
+
+    SerializerElement projectElement;
+    writtenProject.SerializeTo(projectElement);
+
+    gd::Project readProject;
+    readProject.AddPlatform(platform);
+    readProject.UnserializeFrom(projectElement);
+
+    REQUIRE(readProject.GetEventsFunctionsExtensionsCount() == 1);
+    auto &eventsExtension =
+        readProject.GetEventsFunctionsExtension(0);
+    REQUIRE(eventsExtension.GetEventsBasedObjects().GetCount() ==
+            2);
+    auto &eventsBasedObject =
+        eventsExtension.GetEventsBasedObjects().Get(0);
+    REQUIRE(eventsBasedObject.GetObjects().GetObjectsCount() == 1);
+    auto &childObject = eventsBasedObject.GetObjects().GetObject(0);
+    REQUIRE(childObject.GetName() == "MyChildCustomObject");
+    REQUIRE(childObject.GetType() == "MyEventsExtension::MyEventsBasedObject");
+    auto *customObjectConfiguration =
+        dynamic_cast<gd::CustomObjectConfiguration *>(
+            &childObject.GetConfiguration());
+    REQUIRE(customObjectConfiguration != nullptr);
+    auto &spriteConfiguration =
+        customObjectConfiguration->GetChildObjectConfiguration("MyChildSprite");
+    CheckSpriteConfiguration(spriteConfiguration);
+  }
 }

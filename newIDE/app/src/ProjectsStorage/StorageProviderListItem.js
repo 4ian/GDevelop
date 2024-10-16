@@ -19,6 +19,7 @@ import { t } from '@lingui/macro';
 type Props = {|
   storageProvider: StorageProvider,
   onChooseProvider: (storageProvider: StorageProvider) => void,
+  disabled?: boolean,
 |};
 
 const useListItemStyles = makeStyles(theme => {
@@ -33,6 +34,7 @@ const useListItemStyles = makeStyles(theme => {
 const StorageProviderListItem = ({
   storageProvider,
   onChooseProvider,
+  disabled,
 }: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
 
@@ -41,8 +43,9 @@ const StorageProviderListItem = ({
   const shouldDisplayAuthenticationButtons =
     storageProvider.needUserAuthentication && !authenticatedUser.authenticated;
 
+  const isDisabled = storageProvider.disabled || disabled;
   const isLineClickable =
-    !storageProvider.disabled &&
+    !isDisabled &&
     (!storageProvider.needUserAuthentication ||
       !shouldDisplayAuthenticationButtons);
 
@@ -52,7 +55,7 @@ const StorageProviderListItem = ({
         <ListItem
           classes={classesForListItem}
           key={storageProvider.internalName}
-          disabled={storageProvider.disabled}
+          disabled={isDisabled}
           onClick={
             isLineClickable ? () => onChooseProvider(storageProvider) : null
           }

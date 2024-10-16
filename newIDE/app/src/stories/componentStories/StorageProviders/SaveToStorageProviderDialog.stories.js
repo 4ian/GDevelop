@@ -13,6 +13,7 @@ import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext'
 import {
   fakeNotAuthenticatedUser,
   fakeAuthenticatedUserWithEmailVerified,
+  tenCloudProjects,
 } from '../../../fixtures/GDevelopServicesTestData';
 
 export default {
@@ -35,9 +36,29 @@ export const UserNotAuthenticated = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const UserAuthenticated = () => (
+export const UserAuthenticatedWithEnoughStorage = () => (
   <AuthenticatedUserContext.Provider
     value={fakeAuthenticatedUserWithEmailVerified}
+  >
+    <SaveToStorageProviderDialog
+      storageProviders={[
+        UrlStorageProvider,
+        CloudStorageProvider,
+        GoogleDriveStorageProvider,
+        DownloadFileStorageProvider,
+      ]}
+      onChooseProvider={action('onChooseProvider')}
+      onClose={action('onClose')}
+    />
+  </AuthenticatedUserContext.Provider>
+);
+
+export const UserAuthenticatedWithNotEnoughStorage = () => (
+  <AuthenticatedUserContext.Provider
+    value={{
+      ...fakeAuthenticatedUserWithEmailVerified,
+      cloudProjects: tenCloudProjects,
+    }}
   >
     <SaveToStorageProviderDialog
       storageProviders={[

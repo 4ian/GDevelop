@@ -335,9 +335,6 @@ TEST_CASE("ObjectSerialization", "[common]") {
     gd::Project writtenProject;
     SetupProjectWithDummyPlatform(writtenProject, platform);
 
-
-  std::cout << "TEST START" << std::endl;
-
     {
       auto &eventsExtension = writtenProject.InsertNewEventsFunctionsExtension(
           "MyEventsExtension", 0);

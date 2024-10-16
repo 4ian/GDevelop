@@ -388,9 +388,6 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       }
     };
 
-    console.log('filteredObjectsList');
-    console.log(filteredObjectsList);
-
     return (
       <I18n>
         {({ i18n }) => (

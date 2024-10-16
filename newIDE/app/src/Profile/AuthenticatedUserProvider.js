@@ -34,6 +34,7 @@ import AuthenticatedUserContext, {
   initialAuthenticatedUser,
   type AuthenticatedUser,
   authenticatedUserLoggedOutAttributes,
+  authenticatedUserPropertiesLoadingState,
 } from './AuthenticatedUserContext';
 import CreateAccountDialog from './CreateAccountDialog';
 import EditProfileDialog from './EditProfileDialog';
@@ -328,6 +329,11 @@ export default class AuthenticatedUserProvider extends React.Component<
   _fetchUserProfile = async (
     options: ?{
       dontNotifyAboutEmailVerification?: boolean,
+      /**
+       * By default, fetching the user does not reset their attributes to a null state
+       * to avoid the UI displaying loaders everywhere. This boolean should be set
+       * to true when such a result is expected (during login for instance).
+       */
       resetState?: boolean,
     }
   ) => {
@@ -340,22 +346,9 @@ export default class AuthenticatedUserProvider extends React.Component<
         cloudProjectsFetchingErrorLabel: null,
       };
       if (options && options.resetState) {
-        const {
-          cloudProjects,
-          receivedAssetPacks,
-          receivedAssetShortHeaders,
-          receivedGameTemplates,
-          badges,
-          notifications,
-        } = initialAuthenticatedUser;
         newAuthenticatedUser = {
           ...newAuthenticatedUser,
-          cloudProjects,
-          receivedAssetPacks,
-          receivedAssetShortHeaders,
-          receivedGameTemplates,
-          badges,
-          notifications,
+          ...authenticatedUserPropertiesLoadingState,
         };
       }
 

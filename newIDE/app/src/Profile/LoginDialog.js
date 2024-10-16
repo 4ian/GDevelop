@@ -12,7 +12,7 @@ import {
 import LoginForm from './LoginForm';
 import LeftLoader from '../UI/LeftLoader';
 import Text from '../UI/Text';
-import { ColumnStackLayout } from '../UI/Layout';
+import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
 import { Column } from '../UI/Grid';
 import HelpButton from '../UI/HelpButton';
 import FlatButton from '../UI/FlatButton';
@@ -22,7 +22,7 @@ import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasur
 
 const styles = {
   formContainer: {
-    marginTop: 20,
+    marginTop: 10,
   },
 };
 
@@ -90,18 +90,24 @@ const LoginDialog = ({
       alignItems="center"
     >
       <GDevelopGLogo fontSize="large" />
-      <Text size="title" align="center">
+      <Text noMargin size="section-title" align="center">
         <Trans>Log in to your account</Trans>
       </Text>
       <Column noMargin alignItems="center">
-        <Text size="body2" noMargin>
-          <Trans>Don't have an account yet?</Trans>
-        </Text>
-        <Link href="" onClick={onGoToCreateAccount} disabled={loginInProgress}>
-          <Text size="body2" noMargin color="inherit">
-            <Trans>Create an account</Trans>
+        <LineStackLayout noMargin>
+          <Text size="body2" noMargin>
+            <Trans>Don't have an account yet?</Trans>
           </Text>
-        </Link>
+          <Link
+            href=""
+            onClick={onGoToCreateAccount}
+            disabled={loginInProgress}
+          >
+            <Text size="body2" noMargin color="inherit">
+              <Trans>Create an account</Trans>
+            </Text>
+          </Link>
+        </LineStackLayout>
       </Column>
       <div
         style={{

@@ -51,7 +51,7 @@ const getColumnsFromWindowSize = (
 ) => {
   switch (windowSize) {
     case 'small':
-      return isLandscape ? 4 : 1;
+      return isLandscape ? 4 : 2;
     case 'medium':
       return 3;
     case 'large':
@@ -124,51 +124,9 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
 
   const guidedLessonCards = [
     {
-      id: JOYSTICK_IN_APP_TUTORIAL_ID,
-      title: t`Joystick controls`,
-      description: t`Move a player with a Joystick object and a behavior.`,
-      durationInMinutes: 1,
-      renderImage: props => <Joystick {...props} />,
-    },
-    {
-      id: HEALTH_BAR_IN_APP_TUTORIAL_ID,
-      title: t`Health bar`,
-      description: t`Display the health of the player.`,
-      durationInMinutes: 2,
-      renderImage: props => <HealthBar {...props} />,
-    },
-    {
-      id: OBJECT_3D_IN_APP_TUTORIAL_ID,
-      title: t`3D platforms`,
-      description: t`Use a 3D box object to display platforms in a side-view game.`,
-      durationInMinutes: 2,
-      renderImage: props => <Object3D {...props} />,
-    },
-    {
-      id: CAMERA_PARALLAX_IN_APP_TUTORIAL_ID,
-      title: t`Background and cameras`,
-      description: t`Create a parallax background and use a camera that follows the player.`,
-      durationInMinutes: 2,
-      renderImage: props => <Parallax {...props} />,
-    },
-    {
-      id: TIMER_IN_APP_TUTORIAL_ID,
-      title: t`Track the player score`,
-      description: t`Use a timer to count a score.`,
-      durationInMinutes: 2,
-      renderImage: props => <Timer {...props} />,
-    },
-    {
-      id: PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
-      title: t`Score multiplier`,
-      description: t`Add collectibles that makes the player score increase faster.`,
-      durationInMinutes: 3,
-      renderImage: props => <MultiplierScore {...props} />,
-    },
-    {
       id: KNIGHT_PLATFORMER_IN_APP_TUTORIAL_ID,
       title: t`Platformer`,
-      description: t`Make a basic 2D platformer with a few behaviors.`,
+      description: t`Make a knight jump and run in this platformer game.`,
       durationInMinutes: 1,
       renderImage: props => <Platformer {...props} />,
     },
@@ -182,16 +140,51 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
     {
       id: FIRE_A_BULLET_ID,
       title: t`Fire a Bullet`,
-      description: t`Fire bullets with the help of a behavior. Get ready for a Star Wars show.`,
+      description: t`Fire bullets in this Asteroids game. Get ready for a Star Wars show.`,
       durationInMinutes: 3,
       renderImage: props => <FireABullet {...props} />,
     },
     {
+      id: JOYSTICK_IN_APP_TUTORIAL_ID,
+      title: t`Joystick controls`,
+      description: t`Control your spaceship with a joystick, while avoiding asteroids.`,
+      durationInMinutes: 1,
+      renderImage: props => <Joystick {...props} />,
+    },
+    {
+      id: OBJECT_3D_IN_APP_TUTORIAL_ID,
+      title: t`3D platforms`,
+      description: t`Place 3D platforms in this 2D platformer, creating a path to the end.`,
+      durationInMinutes: 2,
+      renderImage: props => <Object3D {...props} />,
+    },
+    {
       id: COOP_PLATFORMER_ID,
       title: t`Co-op Multiplayer`,
-      description: t`Make a co-op platformer easily with the Multiplayer behavior.`,
+      description: t`Transform this platformer into a co-op game, where two players can play together.`,
       durationInMinutes: 3,
       renderImage: props => <CoopPlatformer {...props} />,
+    },
+    {
+      id: HEALTH_BAR_IN_APP_TUTORIAL_ID,
+      title: t`Health bar`,
+      description: t`Add a health bar to this jumping character, losing health when hitting spikes.`,
+      durationInMinutes: 2,
+      renderImage: props => <HealthBar {...props} />,
+    },
+    {
+      id: CAMERA_PARALLAX_IN_APP_TUTORIAL_ID,
+      title: t`Background and cameras`,
+      description: t`Follow this Castlevania-type chraracter with the camera, while the background scrolls.`,
+      durationInMinutes: 2,
+      renderImage: props => <Parallax {...props} />,
+    },
+    {
+      id: TIMER_IN_APP_TUTORIAL_ID,
+      title: t`Time score`,
+      description: t`Add a time attack mode, where you have to reach the end as fast as possible.`,
+      durationInMinutes: 2,
+      renderImage: props => <Timer {...props} />,
     },
     {
       id: TILEMAP_PLATFORMER_ID,
@@ -199,6 +192,13 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
       description: t`Use a Tilemap to build a level and change it dynamically during the game.`,
       durationInMinutes: 1,
       renderImage: props => <TilemapPlatformer {...props} />,
+    },
+    {
+      id: PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
+      title: t`Score multiplier`,
+      description: t`Transform this Plinko game with collectibles that multiply your score.`,
+      durationInMinutes: 3,
+      renderImage: props => <MultiplierScore {...props} />,
     },
   ].filter(item => displayedGuidedLessonsIds.includes(item.id));
 

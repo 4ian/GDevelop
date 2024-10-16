@@ -26,7 +26,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'stretch',
-    marginTop: 30,
+    marginTop: 10,
   },
   icon: {
     width: 16,

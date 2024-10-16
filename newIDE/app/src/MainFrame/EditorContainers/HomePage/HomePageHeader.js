@@ -16,6 +16,8 @@ import { isNativeMobileApp } from '../../../Utils/Platform';
 import NotificationChip from '../../../UI/User/NotificationChip';
 import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 import SaveProjectIcon from '../../SaveProjectIcon';
+import Mobile from '../../../UI/CustomSvgIcons/Mobile';
+import Desktop from '../../../UI/CustomSvgIcons/Desktop';
 const electron = optionalRequire('electron');
 
 type Props = {|
@@ -69,14 +71,26 @@ export const HomePageHeader = ({
           </Column>
           <Column>
             <LineStackLayout noMargin alignItems="center">
-              {!electron && !isNativeMobileApp() && (
-                <FlatButton
-                  label={<Trans>Get the app</Trans>}
-                  onClick={() =>
-                    Window.openExternalURL('https://gdevelop.io/download')
-                  }
-                />
-              )}
+              {!electron &&
+                !isNativeMobileApp() &&
+                (isMobile ? (
+                  <IconButton
+                    size="small"
+                    onClick={() =>
+                      Window.openExternalURL('https://gdevelop.io/download')
+                    }
+                  >
+                    <Mobile />
+                  </IconButton>
+                ) : (
+                  <FlatButton
+                    label={<Trans>Get the app</Trans>}
+                    onClick={() =>
+                      Window.openExternalURL('https://gdevelop.io/download')
+                    }
+                    leftIcon={<Desktop />}
+                  />
+                ))}
               <UserChip onOpenProfile={onOpenProfile} />
               <NotificationChip />
               {isMobile ? (

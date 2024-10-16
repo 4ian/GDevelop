@@ -28,7 +28,7 @@ const getStyles = ({ isMobile }) => {
   return {
     formContainer: {
       width: isMobile ? '95%' : '60%',
-      marginTop: 20,
+      marginTop: 10,
     },
   };
 };
@@ -193,13 +193,10 @@ const CreateAccountDialog = ({
         alignItems="center"
       >
         <GDevelopGLogo fontSize="large" />
-        <Text size="title" align="center">
+        <Text size="section-title" align="center" noMargin>
           <Trans>Sign up for free!</Trans>
         </Text>
         <Column noMargin alignItems="center">
-          <Text size="body2" noMargin align="center">
-            <Trans>Welcome to GDevelop!</Trans>
-          </Text>
           <LineStackLayout noMargin>
             <Text size="body2" noMargin align="center">
               <Trans>Already a member?</Trans>

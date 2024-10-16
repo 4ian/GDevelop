@@ -3592,6 +3592,7 @@ const MainFrame = (props: Props) => {
                     },
                     onOpenProjectManager: () => openProjectManager(true),
                     askToCloseProject,
+                    closeProject,
                     onOpenExampleStore: openExampleStoreDialog,
                     onSelectExampleShortHeader: onSelectExampleShortHeader,
                     onCreateProjectFromExample: createProjectFromExample,

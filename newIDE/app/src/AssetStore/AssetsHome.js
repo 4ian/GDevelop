@@ -68,8 +68,10 @@ const getShopItemsColumns = (
   }
 };
 
+export const gameTemplatesCategoryId = 'game-template';
+
 export const shopCategories = {
-  'game-template': {
+  [gameTemplatesCategoryId]: {
     title: <Trans>Ready-made games</Trans>,
     imageAlt: 'Premium game templates category',
     imageSource: 'res/shop-categories/Game_Templates.jpeg',

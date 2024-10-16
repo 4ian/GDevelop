@@ -129,6 +129,7 @@ type Props = {|
   ) => void,
   onOpenProjectManager: () => void,
   askToCloseProject: () => Promise<boolean>,
+  closeProject: () => Promise<void>,
 
   // Other dialogs opening:
   onOpenLanguageDialog: () => void,
@@ -192,6 +193,7 @@ export const HomePage = React.memo<Props>(
         canSave,
         resourceManagementProps,
         askToCloseProject,
+        closeProject,
         onOpenTemplateFromTutorial,
       }: Props,
       ref
@@ -533,6 +535,7 @@ export const HomePage = React.memo<Props>(
                       canManageGame={canManageGame}
                       storageProviders={storageProviders}
                       i18n={i18n}
+                      closeProject={closeProject}
                     />
                   )}
                   {activeTab === 'learn' && (
@@ -656,6 +659,7 @@ export const renderHomePageContainer = (
     onOpenProfile={props.onOpenProfile}
     onCreateProjectFromExample={props.onCreateProjectFromExample}
     askToCloseProject={props.askToCloseProject}
+    closeProject={props.closeProject}
     selectInAppTutorial={props.selectInAppTutorial}
     onOpenPreferences={props.onOpenPreferences}
     onOpenAbout={props.onOpenAbout}

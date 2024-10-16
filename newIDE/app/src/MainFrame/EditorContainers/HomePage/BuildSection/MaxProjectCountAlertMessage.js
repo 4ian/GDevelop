@@ -46,11 +46,19 @@ export const MaxProjectCountAlertMessage = ({
           renderRightButton={
             canMaximumCountBeIncreased
               ? () => (
-                  <RaisedButton
-                    primary
-                    label={<Trans>Check our premiums plans</Trans>}
-                    onClick={onUpgrade}
-                  />
+                  <Column noMargin>
+                    <RaisedButton
+                      primary
+                      label={
+                        margin === 'dense' ? (
+                          <Trans>Subscribe</Trans>
+                        ) : (
+                          <Trans>Check our premiums plans</Trans>
+                        )
+                      }
+                      onClick={onUpgrade}
+                    />
+                  </Column>
                 )
               : undefined
           }

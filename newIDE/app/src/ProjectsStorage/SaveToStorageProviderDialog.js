@@ -55,9 +55,8 @@ const SaveToStorageProviderDialog = ({
         {storageProviders
           .filter(storageProvider => !storageProvider.hiddenInSaveDialog)
           .map(storageProvider => (
-            <>
+            <React.Fragment key={storageProvider.internalName}>
               <StorageProviderListItem
-                key={storageProvider.internalName}
                 onChooseProvider={onChooseProvider}
                 storageProvider={storageProvider}
                 disabled={
@@ -80,7 +79,7 @@ const SaveToStorageProviderDialog = ({
                     }
                   />
                 )}
-            </>
+            </React.Fragment>
           ))}
       </List>
     </Dialog>

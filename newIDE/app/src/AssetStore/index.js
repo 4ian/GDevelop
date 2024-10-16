@@ -31,7 +31,11 @@ import { AssetStoreContext } from './AssetStoreContext';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import { useShouldAutofocusInput } from '../UI/Responsive/ScreenTypeMeasurer';
 import Subheader from '../UI/Subheader';
-import { AssetsHome, type AssetsHomeInterface } from './AssetsHome';
+import {
+  AssetsHome,
+  gameTemplatesCategoryId,
+  type AssetsHomeInterface,
+} from './AssetsHome';
 import TextButton from '../UI/TextButton';
 import IconButton from '../UI/IconButton';
 import { AssetDetails, type AssetDetailsInterface } from './AssetDetails';
@@ -177,7 +181,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       openedShopCategory,
       openedPrivateAssetPackListingData,
       openedPrivateGameTemplateListingData,
-      filtersState, // how to have a filtersstate for both store?
+      filtersState,
     } = currentPage;
     const isOnHomePage = isHomePage(currentPage);
     const isOnSearchResultPage = isSearchResultPage(currentPage);
@@ -536,6 +540,26 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         }
       },
       [shouldAutofocusSearchbar]
+    );
+
+    // Ensure we prevent a user being on a game template category or has opened a
+    // game template when the game templates are hidden.
+    React.useEffect(
+      () => {
+        if (
+          hideGameTemplates &&
+          (openedShopCategory === gameTemplatesCategoryId ||
+            openedPrivateGameTemplateListingData)
+        ) {
+          shopNavigationState.openHome();
+        }
+      },
+      [
+        openedShopCategory,
+        openedPrivateGameTemplateListingData,
+        hideGameTemplates,
+        shopNavigationState,
+      ]
     );
 
     const privateAssetPackListingDatasFromSameCreator: ?Array<PrivateAssetPackListingData> = React.useMemo(

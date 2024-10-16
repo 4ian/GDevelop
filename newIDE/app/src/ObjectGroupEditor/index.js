@@ -126,8 +126,7 @@ const ObjectGroupEditor = ({
         <Column noMargin>
           <ObjectSelector
             project={project}
-            globalObjectsContainer={globalObjectsContainer}
-            objectsContainer={objectsContainer}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
             value={objectName}
             excludedObjectOrGroupNames={groupObjectNames}
             onChange={setObjectName}

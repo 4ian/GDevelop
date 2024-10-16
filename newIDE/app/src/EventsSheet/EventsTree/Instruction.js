@@ -215,8 +215,6 @@ const Instruction = (props: Props) => {
     onClick,
     onMoveToInstruction,
     onContextMenu,
-    globalObjectsContainer,
-    objectsContainer,
     id,
     resourcesManager,
     scope,
@@ -348,8 +346,7 @@ const Instruction = (props: Props) => {
                   objectsContainersList.getTypeOfObject(objectOrGroupName) ===
                     parameterMetadata.getExtraInfo()) &&
                 checkHasRequiredBehaviors({
-                  globalObjectsContainer,
-                  objectsContainer,
+                  objectsContainersList,
                   objectName: objectOrGroupName,
                   requiredBehaviorTypes: getAllRequiredBehaviorTypes(
                     platform,

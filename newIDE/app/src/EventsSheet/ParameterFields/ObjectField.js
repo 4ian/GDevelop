@@ -149,8 +149,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         allowedObjectType={allowedObjectType}
         requiredCapabilitiesBehaviorTypes={requiredCapabilitiesBehaviorTypes}
         requiredVisibleBehaviorTypes={requiredVisibleBehaviorTypes}
-        globalObjectsContainer={props.globalObjectsContainer}
-        objectsContainer={props.objectsContainer}
+        projectScopedContainersAccessor={props.projectScopedContainersAccessor}
         floatingLabelText={description}
         helperMarkdownText={longDescription}
         id={

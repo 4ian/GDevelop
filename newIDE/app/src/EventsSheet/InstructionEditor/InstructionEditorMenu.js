@@ -146,11 +146,10 @@ const InstructionEditorMenu = ({
           key="instruction-or-object-selector"
           style={styles.fullHeightSelector}
           project={project}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
           scope={scope}
           currentTab={currentInstructionOrObjectSelectorTab}
           onChangeTab={setCurrentInstructionOrObjectSelectorTab}
-          globalObjectsContainer={globalObjectsContainer}
-          objectsContainer={objectsContainer}
           isCondition={isCondition}
           chosenInstructionType={
             !chosenObjectName ? instructionType : undefined

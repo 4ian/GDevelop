@@ -57,6 +57,7 @@ import {
 } from '../../ObjectsList/EnumerateObjectFolderOrObject';
 import { renderFolderListItem } from './SelectorListItems/FolderListItem';
 import Text from '../../UI/Text';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 
 const gd: libGDevelop = global.gd;
 
@@ -98,8 +99,7 @@ type State = {|
 
 type Props = {|
   project: gdProject,
-  globalObjectsContainer: gdObjectsContainer,
-  objectsContainer: gdObjectsContainer,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   scope: EventsScope,
   currentTab: TabName,
   onChangeTab: TabName => void,
@@ -173,17 +173,44 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       this._scrollView.current.scrollTo(this._selectedItem.current);
     }
     const { allObjectsList, allGroupsList } = enumerateObjectsAndGroups(
-      this.props.globalObjectsContainer,
-      this.props.objectsContainer
+      this.props.projectScopedContainersAccessor
+        .get()
+        .getObjectsContainersList()
+    );
+
+    const objectsContainersList = this.props.projectScopedContainersAccessor
+      .get()
+      .getObjectsContainersList();
+
+    if (objectsContainersList.getObjectsContainersCount() === 0) {
+      throw new Error(
+        'Called enumerateObjectsAndGroups without any object container.'
+      );
+    }
+    // TODO Use a loop instead of looking for 2 object containers.
+    if (objectsContainersList.getObjectsContainersCount() > 2) {
+      console.error(
+        'Called enumerateObjectsAndGroups with more than 2 object containers.'
+      );
+    }
+    const globalObjectsContainer =
+      objectsContainersList.getObjectsContainersCount() > 1
+        ? objectsContainersList.getObjectsContainer(0)
+        : null;
+    const objectsContainer = objectsContainersList.getObjectsContainer(
+      objectsContainersList.getObjectsContainersCount() - 1
     );
 
     const allFolders = [
-      ...enumerateFoldersInContainer(this.props.globalObjectsContainer).map(
-        folderWithPath => ({ ...folderWithPath, global: true })
-      ),
-      ...enumerateFoldersInContainer(this.props.objectsContainer).map(
-        folderWithPath => ({ ...folderWithPath, global: false })
-      ),
+      ...(globalObjectsContainer
+        ? enumerateFoldersInContainer(globalObjectsContainer).map(
+            folderWithPath => ({ ...folderWithPath, global: true })
+          )
+        : []),
+      ...enumerateFoldersInContainer(objectsContainer).map(folderWithPath => ({
+        ...folderWithPath,
+        global: false,
+      })),
     ];
 
     this.instructionSearchApi = new Fuse(this.allInstructionsInfo, {
@@ -259,8 +286,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
   render() {
     const {
       style,
-      globalObjectsContainer,
-      objectsContainer,
+      projectScopedContainersAccessor,
       project,
       chosenInstructionType,
       onChooseInstruction,
@@ -272,6 +298,30 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       onSearchStartOrReset,
       onClickMore,
     } = this.props;
+
+    const objectsContainersList = projectScopedContainersAccessor
+      .get()
+      .getObjectsContainersList();
+
+    if (objectsContainersList.getObjectsContainersCount() === 0) {
+      throw new Error(
+        'Called enumerateObjectsAndGroups without any object container.'
+      );
+    }
+    // TODO Use a loop instead of looking for 2 object containers.
+    if (objectsContainersList.getObjectsContainersCount() > 2) {
+      console.error(
+        'Called enumerateObjectsAndGroups with more than 2 object containers.'
+      );
+    }
+    const globalObjectsContainer =
+      objectsContainersList.getObjectsContainersCount() > 1
+        ? objectsContainersList.getObjectsContainer(0)
+        : null;
+    const objectsContainer = objectsContainersList.getObjectsContainer(
+      objectsContainersList.getObjectsContainersCount() - 1
+    );
+
     const { searchText, searchResults } = this.state;
 
     // If the global objects container is not the project, consider that we're
@@ -279,9 +329,9 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
     const isOutsideLayout = globalObjectsContainer !== project;
 
     const { allObjectsList, allGroupsList } = enumerateObjectsAndGroups(
-      globalObjectsContainer,
-      objectsContainer
+      projectScopedContainersAccessor.get().getObjectsContainersList()
     );
+
     const isSearching = !!searchText;
 
     let filteredObjectsList = [];
@@ -337,6 +387,9 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
         );
       }
     };
+
+    console.log('filteredObjectsList');
+    console.log(filteredObjectsList);
 
     return (
       <I18n>

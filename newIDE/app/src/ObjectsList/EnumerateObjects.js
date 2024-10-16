@@ -208,27 +208,42 @@ export const enumerateGroups = (
 };
 
 export const enumerateObjectsAndGroups = (
-  globalObjectsContainer: gdObjectsContainer | null,
-  objectsContainer: gdObjectsContainer,
+  objectsContainersList: gdObjectsContainersList,
   objectType: ?string = undefined,
   requiredBehaviorTypes?: Array<string> = []
 ) => {
-  // TODO Use ProjectScopedContainers to get object types and behavior names.
+  if (objectsContainersList.getObjectsContainersCount() === 0) {
+    console.error(
+      'Called enumerateObjectsAndGroups without any object container.'
+    );
+    return {
+      allObjectsList: [],
+      allGroupsList: [],
+    };
+  }
+  // TODO Use a loop instead of looking for 2 object containers.
+  if (objectsContainersList.getObjectsContainersCount() > 2) {
+    console.error(
+      'Called enumerateObjectsAndGroups with more than 2 object containers.'
+    );
+  }
+  const globalObjectsContainer =
+    objectsContainersList.getObjectsContainersCount() > 1
+      ? objectsContainersList.getObjectsContainer(0)
+      : null;
+  const objectsContainer = objectsContainersList.getObjectsContainer(
+    objectsContainersList.getObjectsContainersCount() - 1
+  );
+
   const filterObject = (object: gdObject): boolean => {
     return (
       (!objectType ||
-        gd.getTypeOfObject(
-          globalObjectsContainer || objectsContainer,
-          objectsContainer,
-          object.getName(),
-          false
-        ) === objectType) &&
+        objectsContainersList.getTypeOfObject(object.getName()) ===
+          objectType) &&
       requiredBehaviorTypes.every(
         requiredBehaviorType =>
-          gd
+          objectsContainersList
             .getBehaviorNamesInObjectOrGroup(
-              globalObjectsContainer || objectsContainer,
-              objectsContainer,
               object.getName(),
               requiredBehaviorType,
               false
@@ -240,18 +255,12 @@ export const enumerateObjectsAndGroups = (
   const filterGroup = (group: gdObjectGroup): boolean => {
     return (
       (!objectType ||
-        gd.getTypeOfObject(
-          globalObjectsContainer || objectsContainer,
-          objectsContainer,
-          group.getName(),
-          true
-        ) === objectType) &&
+        objectsContainersList.getTypeOfObject(group.getName()) ===
+          objectType) &&
       requiredBehaviorTypes.every(
         behaviorType =>
-          gd
+          objectsContainersList
             .getBehaviorNamesInObjectOrGroup(
-              globalObjectsContainer || objectsContainer,
-              objectsContainer,
               group.getName(),
               behaviorType,
               true

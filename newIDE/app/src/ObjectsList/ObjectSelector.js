@@ -9,19 +9,18 @@ import SemiControlledAutoComplete, {
   type SemiControlledAutoCompleteInterface,
 } from '../UI/SemiControlledAutoComplete';
 import ListIcon from '../UI/ListIcon';
-import getObjectByName from '../Utils/GetObjectByName';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { useShouldAutofocusInput } from '../UI/Responsive/ScreenTypeMeasurer';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
 const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: ?gdProject,
-  globalObjectsContainer: gdObjectsContainer | null,
-  objectsContainer: gdObjectsContainer,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
 
   /** If specified, only this object type should be allowed to be selected. */
   allowedObjectType?: ?string,
@@ -61,24 +60,21 @@ const iconSize = 24;
 
 const getObjectsAndGroupsDataSource = ({
   project,
-  globalObjectsContainer,
-  objectsContainer,
+  objectsContainersList,
   noGroups,
   allowedObjectType,
   requiredCapabilitiesBehaviorTypes,
   excludedObjectOrGroupNames,
 }: {|
   project: ?gdProject,
-  globalObjectsContainer: gdObjectsContainer | null,
-  objectsContainer: gdObjectsContainer,
+  objectsContainersList: gdObjectsContainersList,
   noGroups: ?boolean,
   allowedObjectType: ?string,
   requiredCapabilitiesBehaviorTypes?: Array<string>,
   excludedObjectOrGroupNames: ?Array<string>,
 |}): DataSource => {
   const { allObjectsList, allGroupsList } = enumerateObjectsAndGroups(
-    globalObjectsContainer,
-    objectsContainer,
+    objectsContainersList,
     allowedObjectType || undefined,
     requiredCapabilitiesBehaviorTypes || []
   );
@@ -122,31 +118,26 @@ const getObjectsAndGroupsDataSource = ({
 };
 
 export const checkHasRequiredBehaviors = ({
-  globalObjectsContainer,
-  objectsContainer,
+  objectsContainersList,
   requiredBehaviorTypes,
   objectName,
 }: {|
-  globalObjectsContainer: gdObjectsContainer | null,
-  objectsContainer: gdObjectsContainer,
+  objectsContainersList: gdObjectsContainersList,
   objectName: string,
   requiredBehaviorTypes?: Array<string>,
 |}): boolean =>
   getMissingBehaviors({
-    globalObjectsContainer,
-    objectsContainer,
+    objectsContainersList,
     requiredBehaviorTypes,
     objectName,
   }).length === 0;
 
 const getMissingBehaviors = ({
-  globalObjectsContainer,
-  objectsContainer,
+  objectsContainersList,
   requiredBehaviorTypes,
   objectName,
 }: {|
-  globalObjectsContainer: gdObjectsContainer | null,
-  objectsContainer: gdObjectsContainer,
+  objectsContainersList: gdObjectsContainersList,
   objectName: string,
   requiredBehaviorTypes?: Array<string>,
 |}): Array<string> => {
@@ -154,12 +145,7 @@ const getMissingBehaviors = ({
     return [];
   }
 
-  const object = getObjectByName(
-    globalObjectsContainer,
-    objectsContainer,
-    objectName
-  );
-  if (!object) {
+  if (!objectsContainersList.hasObjectOrGroupNamed(objectName)) {
     // Either the object does not exist or it's a group - not a problem because:
     // - if the object does not exist, we can't know its capabilities, we assume it has all.
     // - a group is assumed to have all the capabilities.
@@ -167,14 +153,8 @@ const getMissingBehaviors = ({
   }
   return requiredBehaviorTypes.filter(
     behaviorType =>
-      gd
-        .getBehaviorNamesInObjectOrGroup(
-          globalObjectsContainer || objectsContainer,
-          objectsContainer,
-          objectName,
-          behaviorType,
-          false
-        )
+      objectsContainersList
+        .getBehaviorNamesInObjectOrGroup(objectName, behaviorType, false)
         .size() === 0
   );
 };
@@ -197,8 +177,7 @@ const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
       onChange,
       onChoose,
       project,
-      globalObjectsContainer,
-      objectsContainer,
+      projectScopedContainersAccessor,
       allowedObjectType,
       noGroups,
       errorTextIfInvalid,
@@ -213,10 +192,13 @@ const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
       ...otherProps
     } = props;
 
+    const objectsContainersList = projectScopedContainersAccessor
+      .get()
+      .getObjectsContainersList();
+
     const objectAndGroups = getObjectsAndGroupsDataSource({
       project,
-      globalObjectsContainer,
-      objectsContainer,
+      objectsContainersList,
       noGroups,
       allowedObjectType,
       requiredCapabilitiesBehaviorTypes,
@@ -229,14 +211,12 @@ const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
       ).length !== 0;
 
     const hasObjectWithRequiredCapability = checkHasRequiredBehaviors({
-      globalObjectsContainer,
-      objectsContainer,
+      objectsContainersList,
       objectName: value,
       requiredBehaviorTypes: requiredCapabilitiesBehaviorTypes,
     });
     const missingVisibleBehaviors = getMissingBehaviors({
-      globalObjectsContainer,
-      objectsContainer,
+      objectsContainersList,
       objectName: value,
       requiredBehaviorTypes: requiredVisibleBehaviorTypes,
     });

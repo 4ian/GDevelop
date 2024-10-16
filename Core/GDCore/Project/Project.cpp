@@ -926,11 +926,20 @@ void Project::UnserializeFrom(const SerializerElement& element) {
 
 std::vector<gd::String> Project::GetUnserializingOrderExtensionNames(
     const gd::SerializerElement &eventsFunctionsExtensionsElement) {
+  
+  // Some extension have custom objects, which have child objects coming from other extension. 
+  // These child objects must be loaded completely before the parent custom obejct can be unserialized.
+  // This implies: an order on the extension unserialization (and no cycles).
+
+  // At the beginning, everything is yet to be loaded.
   std::vector<gd::String> remainingExtensionNames(
       eventsFunctionsExtensions.size());
   for (std::size_t i = 0; i < eventsFunctionsExtensions.size(); ++i) {
     remainingExtensionNames[i] = eventsFunctionsExtensions.at(i)->GetName();
   }
+    
+  // Helper allowing to find if an extension has an object that depends on 
+  // at least one other object from another extension that is not loaded yet.
   auto isDependentFromRemainingExtensions =
       [&remainingExtensionNames](
           const gd::SerializerElement &eventsFunctionsExtensionElement) {
@@ -967,6 +976,8 @@ std::vector<gd::String> Project::GetUnserializingOrderExtensionNames(
         return false;
       };
 
+  // Find the order of loading so that the extensions are loaded when all the other
+  // extensions they depend on are already loaded.
   std::vector<gd::String> loadOrderExtensionNames;
   bool foundAnyExtension = true;
   while (foundAnyExtension) {

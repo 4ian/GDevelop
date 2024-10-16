@@ -329,7 +329,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
     const isOutsideLayout = globalObjectsContainer !== project;
 
     const { allObjectsList, allGroupsList } = enumerateObjectsAndGroups(
-      projectScopedContainersAccessor.get().getObjectsContainersList()
+      objectsContainersList
     );
 
     const isSearching = !!searchText;

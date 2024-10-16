@@ -118,12 +118,24 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
   getEventsFunctionsExtension(): ?gdEventsFunctionsExtension {
     const { project, projectItemName } = this.props;
     if (!project || !projectItemName) return null;
-    const extensionName = projectItemName.split('::')[0]; //TODO
+    const extensionName = gd.PlatformExtension.getExtensionFromFullObjectType(
+      projectItemName
+    );
 
     if (!project.hasEventsFunctionsExtensionNamed(extensionName)) {
       return null;
     }
     return project.getEventsFunctionsExtension(extensionName);
+  }
+
+  getEventsFunctionsExtensionName(): ?string {
+    const { project, projectItemName } = this.props;
+    if (!project || !projectItemName) return null;
+
+    const extensionName = gd.PlatformExtension.getExtensionFromFullObjectType(
+      projectItemName
+    );
+    return extensionName;
   }
 
   getEventsBasedObject(): ?gdEventsBasedObject {
@@ -133,7 +145,9 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     const extension = this.getEventsFunctionsExtension();
     if (!extension) return null;
 
-    const eventsBasedObjectName = projectItemName.split('::')[1];
+    const eventsBasedObjectName = gd.PlatformExtension.getObjectNameFromFullObjectType(
+      projectItemName
+    );
 
     if (!extension.getEventsBasedObjects().has(eventsBasedObjectName)) {
       return null;

@@ -340,14 +340,16 @@ export const closeEventsFunctionsExtensionTabs = (
 ) => {
   return closeTabsExceptIf(state, editorTab => {
     const editor = editorTab.editorRef;
-    if (editor instanceof EventsFunctionsExtensionEditorContainer) {
+    if (
+      editor instanceof EventsFunctionsExtensionEditorContainer ||
+      editor instanceof CustomObjectEditorContainer
+    ) {
       return (
         !editor.getEventsFunctionsExtensionName() ||
         editor.getEventsFunctionsExtensionName() !==
           eventsFunctionsExtensionName
       );
     }
-
     return true;
   });
 };

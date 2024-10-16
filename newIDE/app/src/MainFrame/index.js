@@ -1474,6 +1474,7 @@ const MainFrame = (props: Props) => {
       oldName
     );
 
+    // TODO Replace the tabs instead on closing them.
     setState(state => ({
       ...state,
       editorTabs: closeEventsFunctionsExtensionTabs(state.editorTabs, oldName),

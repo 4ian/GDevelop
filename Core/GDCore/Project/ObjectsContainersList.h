@@ -50,6 +50,11 @@ class GD_CORE_API ObjectsContainersList {
    */
   bool HasObjectOrGroupNamed(const gd::String& name) const;
 
+  /**
+   * \brief Check if the specified object exists ignoring groups.
+   */
+  bool HasObjectNamed(const gd::String& name) const;
+
   enum VariableExistence {
     DoesNotExist,
     Exists,
@@ -200,8 +205,6 @@ class GD_CORE_API ObjectsContainersList {
   ObjectsContainersList(){};
 
  private:
-  bool HasObjectNamed(const gd::String& name) const;
-
   const gd::Object* GetObject(const gd::String& name) const;
 
   bool HasObjectWithVariableNamed(const gd::String& objectName,

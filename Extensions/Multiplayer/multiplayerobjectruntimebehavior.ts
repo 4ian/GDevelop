@@ -120,10 +120,11 @@ namespace gdjs {
 
     private _isOwnerAsPlayerOrHost() {
       const currentPlayerNumber = gdjs.multiplayer.getCurrentPlayerNumber();
+      const isHost = gdjs.multiplayer.isCurrentPlayerHost();
 
       const isOwnerOfObject =
         currentPlayerNumber === this.playerNumber || // Player as owner.
-        (currentPlayerNumber === 1 && this.playerNumber === 0); // Host as owner.
+        (isHost && this.playerNumber === 0); // Host as owner.
 
       return isOwnerOfObject;
     }
@@ -455,8 +456,8 @@ namespace gdjs {
 
       // Before sending the destroy message, we set up the object representing the peers
       // that we need an acknowledgment from.
-      // If we are player 1, we are connected to everyone, so we expect an acknowledgment from everyone.
-      // If we are another player, we are only connected to player 1, so we expect an acknowledgment from player 1.
+      // If we are the host, we are connected to everyone, so we expect an acknowledgment from everyone.
+      // If we are another player, we are only connected to the host, so we expect an acknowledgment from the host.
       // In both cases, this represents the list of peers the current user is connected to.
       const otherPeerIds = gdjs.multiplayerPeerJsHelper.getAllPeers();
       const {
@@ -508,7 +509,7 @@ namespace gdjs {
 
       // Update the ownership locally, so the object can be used immediately.
       // This is a prediction to allow snappy interactions.
-      // If we are player 1 or host, we will have the ownership immediately anyway.
+      // If we are host, we will have the ownership immediately anyway.
       // If we are another player, we will have the ownership as soon as the host acknowledges the change.
       // If the host does not send an acknowledgment, we will revert the ownership.
       const previousObjectPlayerNumber = this.playerNumber;
@@ -564,8 +565,8 @@ namespace gdjs {
       });
       // Before sending the changeOwner message, if we are becoming the new owner,
       // we want to ensure this message is acknowledged, by everyone we're connected to.
-      // If we are player 1, we are connected to everyone, so we expect an acknowledgment from everyone.
-      // If we are another player, we are only connected to player 1, so we expect an acknowledgment from player 1.
+      // If we are the host, we are connected to everyone, so we expect an acknowledgment from everyone.
+      // If we are another player, we are only connected to the host, so we expect an acknowledgment from the host.
       // In both cases, this represents the list of peers the current user is connected to.
       if (newObjectPlayerNumber === currentPlayerNumber) {
         const otherPeerIds = gdjs.multiplayerPeerJsHelper.getAllPeers();
@@ -581,7 +582,7 @@ namespace gdjs {
           expectedMessageName: changeOwnerAcknowledgedMessageName,
           otherPeerIds,
           // If we are not the host, we should revert the ownership if the host does not acknowledge the change.
-          shouldCancelMessageIfTimesOut: currentPlayerNumber !== 1,
+          shouldCancelMessageIfTimesOut: !gdjs.multiplayer.isCurrentPlayerHost(),
         });
       }
 

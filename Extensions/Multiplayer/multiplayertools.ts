@@ -770,6 +770,7 @@ namespace gdjs {
 
       // When the countdown starts, if we are player number 1, we are chosen as the host.
       // We then send the peerId to others so they can connect via P2P.
+      // TODO: this should be sent by the backend, in case the lobby starts without a player 1.
       if (getCurrentPlayerNumber() === 1) {
         sendPeerId();
       }

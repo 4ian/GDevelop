@@ -8,6 +8,9 @@ import { List } from '../UI/List';
 
 import StorageProviderListItem from './StorageProviderListItem';
 import { type StorageProvider } from '.';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import { MaxProjectCountAlertMessage } from '../MainFrame/EditorContainers/HomePage/BuildSection/MaxProjectCountAlertMessage';
+import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
 
 type Props = {|
   storageProviders: Array<StorageProvider>,
@@ -20,6 +23,19 @@ const SaveToStorageProviderDialog = ({
   storageProviders,
   onChooseProvider,
 }: Props) => {
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const { openSubscriptionDialog } = React.useContext(
+    SubscriptionSuggestionContext
+  );
+
+  const { profile, limits, cloudProjects } = authenticatedUser;
+
+  const isLoadingCloudProjects = !!profile && !cloudProjects;
+  const isCloudProjectsMaximumReached =
+    !!limits &&
+    !!cloudProjects &&
+    cloudProjects.length >= limits.capabilities.cloudProjects.maximumCount;
+
   return (
     <Dialog
       title={<Trans>Choose where to save the project to</Trans>}
@@ -39,11 +55,31 @@ const SaveToStorageProviderDialog = ({
         {storageProviders
           .filter(storageProvider => !storageProvider.hiddenInSaveDialog)
           .map(storageProvider => (
-            <StorageProviderListItem
-              key={storageProvider.internalName}
-              onChooseProvider={onChooseProvider}
-              storageProvider={storageProvider}
-            />
+            <React.Fragment key={storageProvider.internalName}>
+              <StorageProviderListItem
+                onChooseProvider={onChooseProvider}
+                storageProvider={storageProvider}
+                disabled={
+                  storageProvider.internalName === 'Cloud' &&
+                  (isCloudProjectsMaximumReached || isLoadingCloudProjects)
+                }
+              />
+              {storageProvider.internalName === 'Cloud' &&
+                isCloudProjectsMaximumReached &&
+                limits && (
+                  <MaxProjectCountAlertMessage
+                    margin="dense"
+                    limits={limits}
+                    onUpgrade={() =>
+                      openSubscriptionDialog({
+                        analyticsMetadata: {
+                          reason: 'Cloud Project limit reached',
+                        },
+                      })
+                    }
+                  />
+                )}
+            </React.Fragment>
           ))}
       </List>
     </Dialog>

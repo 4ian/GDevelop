@@ -51,9 +51,9 @@ export const MaxProjectCountAlertMessage = ({
                       primary
                       label={
                         margin === 'dense' ? (
-                          <Trans>Subscribe</Trans>
+                          <Trans>Upgrade</Trans>
                         ) : (
-                          <Trans>Check our premiums plans</Trans>
+                          <Trans>Upgrade to GDevelop Premium</Trans>
                         )
                       }
                       onClick={onUpgrade}
@@ -68,11 +68,11 @@ export const MaxProjectCountAlertMessage = ({
             noMargin={margin === 'dense'}
           >
             {maximumCount === 1 ? (
-              <Trans>One project at a time, for now</Trans>
+              <Trans>One project at a time — Upgrade for more</Trans>
             ) : (
               <Trans>
                 You've reached your maximum storage of {maximumCount}
-                cloud-based projects
+                cloud projects
               </Trans>
             )}
           </Text>
@@ -80,14 +80,13 @@ export const MaxProjectCountAlertMessage = ({
             {canMaximumCountBeIncreased ? (
               maximumCount === 1 ? (
                 <Trans>
-                  As a free user, you can manage one project at a time. To
-                  create a new project, please delete your current one, or
-                  upgrade to a premium plan to get more projects!
+                  Thanks for trying GDevelop! Unlock more projects, publishing,
+                  multiplayer and much more by upgrading.
                 </Trans>
               ) : (
                 <Trans>
-                  Update to GDevelop Premium to get more storage, leaderboards,
-                  and one-click packagings!
+                  Upgrade to get more cloud projects, publishing, multiplayer
+                  and credits every month with GDevelop Premium.
                 </Trans>
               )
             ) : (

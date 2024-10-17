@@ -757,7 +757,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         sourceEventsBasedObjectName
       );
     }
-    // Some instances may target the pasted event-based object name.
+    // Some custom object instances may target the pasted event-based object name.
     // It can happens when an event-based object is deleted and another one is
     // pasted to replace it.
     this.props.onEventsBasedObjectChildrenEdited();
@@ -793,7 +793,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     if (this.state.selectedEventsFunction) {
       this._updateProjectScopedContainer();
     }
-    // Some instances may target the new event-based object name.
+    // Some custom object instances may target the new event-based object name.
     // It can happens when an event-based object is deleted and another one is
     // renamed to replace it.
     this.props.onEventsBasedObjectChildrenEdited();

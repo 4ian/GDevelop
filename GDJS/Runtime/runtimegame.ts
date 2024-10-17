@@ -929,7 +929,7 @@ namespace gdjs {
         });
         setTimeout(() => {
           this._setupSessionMetrics();
-        }, 10000);
+        }, 4000);
       } catch (e) {
         if (this._debuggerClient) this._debuggerClient.onUncaughtException(e);
 

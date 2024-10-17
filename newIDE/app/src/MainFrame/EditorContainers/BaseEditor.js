@@ -81,6 +81,10 @@ export type RenderEditorContainerProps = {|
     oldName: string,
     newName: string
   ) => void,
+  onDeletedEventsBasedObject: (
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    name: string
+  ) => void,
 
   // Project opening
   canOpen: boolean,

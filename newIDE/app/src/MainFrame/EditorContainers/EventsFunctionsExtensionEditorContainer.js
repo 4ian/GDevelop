@@ -177,6 +177,7 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
             this.props.onEventsBasedObjectChildrenEdited
           }
           onRenamedEventsBasedObject={this.props.onRenamedEventsBasedObject}
+          onDeletedEventsBasedObject={this.props.onDeletedEventsBasedObject}
         />
       </div>
     );

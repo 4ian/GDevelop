@@ -1503,6 +1503,20 @@ const MainFrame = (props: Props) => {
     }));
   };
 
+  const onDeletedEventsBasedObject = (
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    name: string
+  ) => {
+    setState(state => ({
+      ...state,
+      editorTabs: closeCustomObjectTab(
+        state.editorTabs,
+        eventsFunctionsExtension.getName(),
+        name
+      ),
+    }));
+  };
+
   const setPreviewedLayout = (
     previewLayoutName: ?string,
     previewExternalLayoutName?: ?string
@@ -3580,6 +3594,7 @@ const MainFrame = (props: Props) => {
                     openInstructionOrExpression,
                     onOpenCustomObjectEditor: openCustomObjectEditor,
                     onRenamedEventsBasedObject: onRenamedEventsBasedObject,
+                    onDeletedEventsBasedObject: onDeletedEventsBasedObject,
                     openObjectEvents,
                     unsavedChanges: unsavedChanges,
                     canOpen: !!props.storageProviders.filter(

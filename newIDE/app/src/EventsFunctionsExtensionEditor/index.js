@@ -83,6 +83,10 @@ type Props = {|
     oldName: string,
     newName: string
   ) => void,
+  onDeletedEventsBasedObject: (
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    name: string
+  ) => void,
 |};
 
 type State = {|
@@ -813,6 +817,12 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     }
 
     cb(true);
+
+    const { eventsFunctionsExtension, onDeletedEventsBasedObject } = this.props;
+    onDeletedEventsBasedObject(
+      eventsFunctionsExtension,
+      eventsBasedObject.getName()
+    );
   };
 
   _onCloseExtensionFunctionSelectorDialog = (

@@ -338,6 +338,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
       .SetDefaultValue("0");
 
+  // Deprecated
   extension
       .AddCondition(
           "PopStartedTouch",
@@ -354,6 +355,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .AddCodeOnlyParameter("currentScene", "")
       .SetHidden();
 
+  // Deprecated
   extension
       .AddCondition(
           "PopEndedTouch",
@@ -370,6 +372,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .AddCodeOnlyParameter("currentScene", "")
       .SetHidden();
 
+  // Deprecated
   extension
       .AddCondition(
           "HasAnyTouchStarted",

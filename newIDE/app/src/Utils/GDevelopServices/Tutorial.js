@@ -114,6 +114,8 @@ export const getInstructionTutorialIds = (type: string): Array<string> => {
     case 'EcrireFichierTxt':
     case 'LireFichierExp':
     case 'LireFichierTxt':
+    case 'ReadNumberFromStorage':
+    case 'ReadStringFromStorage':
       return ['intermediate-storage'];
     case 'PlatformBehavior::SimulateJumpKey':
       return ['simple-trampoline-platformer'];
@@ -124,6 +126,8 @@ export const getInstructionTutorialIds = (type: string): Array<string> => {
     case 'ToggleObjectVariableAsBoolean':
     case 'ToggleGlobalVariableAsBoolean':
     case 'ToggleSceneVariableAsBoolean':
+    case 'SetBooleanObjectVariable':
+    case 'SetBooleanVariable':
       return ['iIntermediate-toggle-states-with-variable'];
     case 'Scene':
     case 'PushScene':
@@ -133,9 +137,15 @@ export const getInstructionTutorialIds = (type: string): Array<string> => {
     case 'AnimationName':
     case 'ChangeAnimation':
     case 'ChangeAnimationName':
+    case 'AnimatableCapability::AnimatableBehavior::Index':
+    case 'AnimatableCapability::AnimatableBehavior::Name':
+    case 'AnimatableCapability::AnimatableBehavior::SetIndex':
+    case 'AnimatableCapability::AnimatableBehavior::SetName':
       return ['intermediate-changing-animations'];
     case 'PopStartedTouch':
     case 'MouseButtonPressed':
+    case 'HasAnyTouchOrMouseStarted':
+    case 'HasTouchEnded':
       return ['intermediate-touchscreen-controls'];
     default:
       return [];

@@ -128,7 +128,7 @@ export const getInstructionTutorialIds = (type: string): Array<string> => {
     case 'ToggleSceneVariableAsBoolean':
     case 'SetBooleanObjectVariable':
     case 'SetBooleanVariable':
-      return ['iIntermediate-toggle-states-with-variable'];
+      return ['intermediate-toggle-states-with-variable'];
     case 'Scene':
     case 'PushScene':
     case 'PopScene':

@@ -52,12 +52,12 @@ export interface PropertiesContainer {
   getProperties(): gdMapStringPropertyDescriptor;
 }
 
-const defaultAnchor = {
+const getDefaultAnchor = () => ({
   leftEdgeAnchor: gd.CustomObjectConfiguration.NoAnchor,
   topEdgeAnchor: gd.CustomObjectConfiguration.NoAnchor,
   rightEdgeAnchor: gd.CustomObjectConfiguration.NoAnchor,
   bottomEdgeAnchor: gd.CustomObjectConfiguration.NoAnchor,
-};
+});
 
 /**
  * Build the layouts description from the custom object properties.
@@ -68,11 +68,11 @@ export const getObjectAnchor = (
 ): ObjectAnchor => {
   const objects = eventBasedObject.getObjects();
   if (!objects.hasObjectNamed(objectName)) {
-    return defaultAnchor;
+    return getDefaultAnchor();
   }
   const childObject = objects.getObject(objectName);
   if (!childObject.hasBehaviorNamed('Anchor')) {
-    return defaultAnchor;
+    return getDefaultAnchor();
   }
   const properties = childObject.getBehavior('Anchor').getProperties();
   const leftEdgeAnchor = getPropertyValue(properties, 'leftEdgeAnchor');

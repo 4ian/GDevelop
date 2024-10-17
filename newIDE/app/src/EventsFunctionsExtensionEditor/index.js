@@ -757,6 +757,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         sourceEventsBasedObjectName
       );
     }
+    // Some instances may target the pasted event-based object name.
+    // It can happens when an event-based object is deleted and another one is
+    // pasted to replace it.
+    this.props.onEventsBasedObjectChildrenEdited();
   };
 
   _onEventsBasedBehaviorRenamed = () => {
@@ -789,6 +793,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     if (this.state.selectedEventsFunction) {
       this._updateProjectScopedContainer();
     }
+    // Some instances may target the new event-based object name.
+    // It can happens when an event-based object is deleted and another one is
+    // renamed to replace it.
+    this.props.onEventsBasedObjectChildrenEdited();
   };
 
   _onDeleteEventsBasedBehavior = (
@@ -818,11 +826,16 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
 
     cb(true);
 
-    const { eventsFunctionsExtension, onDeletedEventsBasedObject } = this.props;
+    const {
+      eventsFunctionsExtension,
+      onDeletedEventsBasedObject,
+      onEventsBasedObjectChildrenEdited,
+    } = this.props;
     onDeletedEventsBasedObject(
       eventsFunctionsExtension,
       eventsBasedObject.getName()
     );
+    onEventsBasedObjectChildrenEdited();
   };
 
   _onCloseExtensionFunctionSelectorDialog = (

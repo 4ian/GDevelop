@@ -97,7 +97,9 @@ export const QuickPublish = ({
   const isCloudProjectsMaximumReached =
     !!limits &&
     !!cloudProjects &&
-    cloudProjects.length >= limits.capabilities.cloudProjects.maximumCount;
+    limits.capabilities.cloudProjects.maximumCount > 0 &&
+    cloudProjects.filter(cloudProject => !cloudProject.deletedAt).length >=
+      limits.capabilities.cloudProjects.maximumCount;
   const shouldSaveAndLaunchExport =
     !!profile &&
     exportState === '' &&

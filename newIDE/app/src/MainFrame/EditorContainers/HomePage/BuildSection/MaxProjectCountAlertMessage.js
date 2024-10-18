@@ -22,7 +22,9 @@ export const checkIfHasTooManyCloudProjects = (
 
   const { limits, cloudProjects } = authenticatedUser;
 
-  return limits && cloudProjects
+  return limits &&
+    cloudProjects &&
+    limits.capabilities.cloudProjects.maximumCount > 0
     ? cloudProjects.filter(cloudProject => !cloudProject.deletedAt).length >=
         limits.capabilities.cloudProjects.maximumCount
     : false;

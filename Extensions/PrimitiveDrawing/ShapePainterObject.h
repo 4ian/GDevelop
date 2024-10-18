@@ -32,13 +32,13 @@ class GD_EXTENSION_API ShapePainterObjectBase {
   void SetOutlineOpacity(double val);
   inline double GetOutlineOpacity() const { return outlineOpacity; };
 
-  void SetOutlineColor(const gd::String& color);
+  void SetOutlineColor(const gd::String& color) { outlineColor = color; };
   const gd::String& GetOutlineColor() const { return outlineColor; };
 
   void SetFillOpacity(double val);
   inline double GetFillOpacity() const { return fillOpacity; };
 
-  void SetFillColor(const gd::String& color);
+  void SetFillColor(const gd::String& color) { fillColor = color; };
   const gd::String& GetFillColor() const { return fillColor; };
 
   inline void SetCoordinatesAbsolute() { absoluteCoordinates = true; }

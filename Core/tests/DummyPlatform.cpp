@@ -698,6 +698,14 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       .SetDefaultValue("\"\"")
       .AddParameter("layerEffectName", _("Effect name"))
       .AddParameter("layerEffectParameterName", _("Property name"));
+
+  extension
+      ->AddAction("DisplayLeaderboard",
+                  "Display leaderboard",
+                  "Display the specified leaderboard on top of the game.",
+                  "Display leaderboard _PARAM1_",
+                  "Display leaderboard", "", "")
+      .AddParameter("leaderboardId", "Leaderboard", "", false);
   }
 
   {

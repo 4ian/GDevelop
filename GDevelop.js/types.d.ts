@@ -1920,6 +1920,7 @@ export class WholeProjectRefactorer extends EmscriptenObject {
   static removeLayerInEventsBasedObject(eventsBasedObject: EventsBasedObject, layerName: string): void;
   static mergeLayersInEventsBasedObject(eventsBasedObject: EventsBasedObject, originLayerName: string, targetLayerName: string): void;
   static getLayoutAndExternalLayoutLayerInstancesCount(project: Project, layout: Layout, layerName: string): number;
+  static renameLeaderboards(project: Project, leaderboardIdMap: MapStringString): void;
 }
 
 export class EventsBasedObjectDependencyFinder extends EmscriptenObject {
@@ -2333,11 +2334,6 @@ export class ArbitraryObjectsWorker extends EmscriptenObject {
 export class EventsLeaderboardsLister extends EmscriptenObject {
   constructor(project: Project);
   getLeaderboardIds(): SetString;
-  launch(events: EventsList): void;
-}
-
-export class EventsLeaderboardsRenamer extends EmscriptenObject {
-  constructor(project: Project, leaderboardIdMap: MapStringString);
   launch(events: EventsList): void;
 }
 

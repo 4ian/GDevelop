@@ -29,10 +29,20 @@ bool EventsLeaderboardsLister::DoVisitInstruction(gd::Instruction& instruction,
 
   for (int i = 0; i < instruction.GetParametersCount() &&
                   i < instrInfo.GetParametersCount();
-       ++i)
-    if (instrInfo.GetParameter(i).GetType() == "leaderboardId") {
-      leaderboardIds.insert(instruction.GetParameter(i).GetPlainString());
+       ++i) {
+    if (instrInfo.GetParameter(i).GetType() != "leaderboardId") {
+      continue;
     }
+    const gd::String leaderboardIdExpression =
+        instruction.GetParameter(i).GetPlainString();
+    if (leaderboardIdExpression[0] != '"' ||
+        leaderboardIdExpression[leaderboardIdExpression.size() - 1] != '"') {
+      continue;
+    }
+    const gd::String leaderboardId =
+        leaderboardIdExpression.substr(1, leaderboardIdExpression.size() - 2);
+    leaderboardIds.insert(leaderboardId);
+  }
   return false;
 }
 

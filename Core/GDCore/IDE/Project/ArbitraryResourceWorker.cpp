@@ -293,7 +293,7 @@ void ResourceWorkerInObjectsWorker::DoVisitObject(gd::Object &object) {
 };
 
 void ResourceWorkerInObjectsWorker::DoVisitBehavior(gd::Behavior &behavior){
-    // TODO Allow behaviors to expose resources
+  behavior.ExposeResources(worker);
 };
 
 gd::ResourceWorkerInObjectsWorker

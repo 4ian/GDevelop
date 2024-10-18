@@ -34,7 +34,9 @@ import {
   type ActionButton,
   type SectionTitle,
   type ResourceField,
+  type LeaderboardIdField,
 } from '../CompactPropertiesEditor';
+import LeaderboardIdPropertyField from './LeaderboardIdPropertyField';
 
 // Re-export the types.
 export type {
@@ -485,6 +487,32 @@ const PropertiesEditor = ({
     );
   };
 
+  const renderLeaderboardField = (field: LeaderboardIdField) => {
+    if (!project) {
+      return null;
+    }
+
+    const { setValue } = field;
+    return (
+      <LeaderboardIdPropertyField
+        key={field.name}
+        project={project}
+        value={getFieldValue({
+          instances,
+          field,
+          defaultValue: '(Multiple values)', //TODO
+        })}
+        onChange={newValue => {
+          instances.forEach(i => setValue(i, newValue));
+          _onInstancesModified(instances);
+        }}
+        floatingLabelText={getFieldLabel({ instances, field })}
+        helperMarkdownText={getFieldDescription(field)}
+        fieldStyle={styles.field}
+      />
+    );
+  };
+
   const renderContainer =
     mode === 'row'
       ? (fields: React.Node) => (
@@ -561,6 +589,8 @@ const PropertiesEditor = ({
         );
       } else if (field.valueType === 'resource') {
         return renderResourceField(field);
+      } else if (field.valueType === 'leaderboardId') {
+        return renderLeaderboardField(field);
       } else {
         if (field.getChoices && field.getValue) return renderSelectField(field);
         if (field.getValue) return renderInputField(field);

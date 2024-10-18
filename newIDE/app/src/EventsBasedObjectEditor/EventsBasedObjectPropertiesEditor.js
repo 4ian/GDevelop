@@ -726,6 +726,10 @@ export default function EventsBasedObjectPropertiesEditor({
                                           label={t`Color (text)`}
                                         />
                                         <SelectOption
+                                          value="LeaderboardId"
+                                          label={t`Leaderboard (text)`}
+                                        />
+                                        <SelectOption
                                           key="property-type-resource"
                                           value="Resource"
                                           label={t`Resource (JavaScript only)`}

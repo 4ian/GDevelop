@@ -4451,4 +4451,28 @@ TEST_CASE("MergeLayers", "[common]") {
     // Other layers from the same layout are untouched.
     REQUIRE(initialInstances.GetLayerInstancesCount("My other layer") == 1);
   }
+
+  SECTION("Can rename a leaderboard in scene events") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &layout = project.InsertNewLayout("My layout", 0);
+    
+    gd::StandardEvent &event = dynamic_cast<gd::StandardEvent &>(
+        layout.GetEvents().InsertNewEvent(project, "BuiltinCommonInstructions::Standard"));
+
+    gd::Instruction action;
+    action.SetType("MyExtension::DisplayLeaderboard");
+    action.SetParametersCount(1);
+    action.SetParameter(0, gd::Expression("\"12345678-9abc-def0-1234-56789abcdef0\""));
+    event.GetActions().Insert(action);
+
+    std::map<gd::String, gd::String> leaderboardIdMap;
+    leaderboardIdMap["12345678-9abc-def0-1234-56789abcdef0"] = "87654321-9abc-def0-1234-56789abcdef0";
+    gd::WholeProjectRefactorer::RenameLeaderboards(project, leaderboardIdMap);
+
+    REQUIRE(GetEventFirstActionFirstParameterString(layout.GetEvents().GetEvent(0)) ==
+            "\"87654321-9abc-def0-1234-56789abcdef0\"");
+  }
 }

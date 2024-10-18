@@ -123,6 +123,13 @@ export type ResourceField = {|
   ...ValueFieldCommonProperties,
 |};
 
+export type LeaderboardIdField = {|
+  valueType: 'leaderboardId',
+  getValue: Instance => string,
+  setValue: (instance: Instance, newValue: string) => void,
+  ...ValueFieldCommonProperties,
+|};
+
 export type Title = {|
   name: string,
   title: string,
@@ -168,12 +175,16 @@ type ToggleButtons = {|
 |};
 
 // A value field is a primitive or a resource.
-export type ValueField = PrimitiveValueField | ResourceField;
+export type ValueField =
+  | PrimitiveValueField
+  | ResourceField
+  | LeaderboardIdField;
 
 // A field can be a primitive, a resource or a list of fields
 export type Field =
   | PrimitiveValueField
   | ResourceField
+  | LeaderboardIdField
   | SectionTitle
   | Title
   | ActionButton
@@ -998,6 +1009,9 @@ const CompactPropertiesEditor = ({
         return contentView;
       } else if (field.valueType === 'resource') {
         return renderResourceField(field);
+      } else if (field.valueType === 'leaderboardId') {
+        // TODO Make a compact version of LeaderboardIdPropertyField
+        return null;
       } else {
         if (field.getChoices && field.getValue) return renderSelectField(field);
         if (field.getValue) return renderInputField(field);

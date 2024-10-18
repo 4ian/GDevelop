@@ -153,6 +153,22 @@ const createField = (
       getLabel,
       getDescription,
     };
+  } else if (valueType === 'leaderboardid') {
+    // LeaderboardId is a "string" (with a selector in the UI)
+    return {
+      name,
+      valueType: 'leaderboardId',
+      getValue: (instance: Instance): string => {
+        return getProperties(instance)
+          .get(name)
+          .getValue();
+      },
+      setValue: (instance: Instance, newValue: string) => {
+        onUpdateProperty(instance, name, newValue);
+      },
+      getLabel,
+      getDescription,
+    };
   } else if (valueType === 'resource') {
     // Resource is a "string" (with a selector in the UI)
     const extraInfos = property.getExtraInfo().toJSArray();

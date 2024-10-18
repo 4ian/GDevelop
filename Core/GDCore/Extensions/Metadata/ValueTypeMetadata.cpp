@@ -74,9 +74,10 @@ ValueTypeMetadata::GetPrimitiveValueType(const gd::String &parameterType) {
 
 const gd::String ValueTypeMetadata::numberValueType = "number";
 const gd::String ValueTypeMetadata::booleanValueType = "boolean";
+const gd::String ValueTypeMetadata::stringValueType = "string";
 const gd::String ValueTypeMetadata::colorValueType = "color";
 const gd::String ValueTypeMetadata::choiceValueType = "stringWithSelector";
-const gd::String ValueTypeMetadata::stringValueType = "string";
+const gd::String ValueTypeMetadata::leaderboardIdValueType = "leaderboardId";
 
 const gd::String &ValueTypeMetadata::ConvertPropertyTypeToValueType(
     const gd::String &propertyType) {
@@ -88,6 +89,8 @@ const gd::String &ValueTypeMetadata::ConvertPropertyTypeToValueType(
     return colorValueType;
   } else if (propertyType == "Choice") {
     return choiceValueType;
+  } else if (propertyType == "LeaderboardId") {
+    return leaderboardIdValueType;
   }
   // For "String" or default
   return stringValueType;

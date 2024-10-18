@@ -628,6 +628,13 @@ class GD_CORE_API WholeProjectRefactorer {
                                  const gd::String &targetLayerName);
 
   /**
+   * \brief Replace the leaderboard ids in events and object configurations.
+   */
+  static void
+  RenameLeaderboards(gd::Project &project,
+                     const std::map<gd::String, gd::String> &leaderboardIdMap);
+
+  /**
    * \brief Return the number of instances on the layer named \a layerName and
    * all its associated layouts.
    */

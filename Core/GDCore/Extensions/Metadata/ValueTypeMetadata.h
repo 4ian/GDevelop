@@ -301,9 +301,10 @@ class GD_CORE_API ValueTypeMetadata {
 
   static const gd::String numberValueType;
   static const gd::String booleanValueType;
+  static const gd::String stringValueType;
   static const gd::String colorValueType;
   static const gd::String choiceValueType;
-  static const gd::String stringValueType;
+  static const gd::String leaderboardIdValueType;
 };
 
 }  // namespace gd

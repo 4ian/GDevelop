@@ -3,8 +3,7 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDCORE_BEHAVIORCONFIGURATIONCONTAINER_H
-#define GDCORE_BEHAVIORCONFIGURATIONCONTAINER_H
+#pragma once
 
 #include <map>
 #include <memory>
@@ -19,6 +18,7 @@ class PropertyDescriptor;
 class SerializerElement;
 class Project;
 class Layout;
+class ArbitraryResourceWorker;
 }  // namespace gd
 
 namespace gd {
@@ -158,6 +158,18 @@ class GD_CORE_API BehaviorConfigurationContainer {
     return propertiesQuickCustomizationVisibilities;
   }
 
+  /**
+   * \brief Called ( e.g. during compilation ) so as to inventory internal
+   * resources and sometimes update their filename. Implementation example:
+   * \code
+   * worker.ExposeImage(myImage);
+   * worker.ExposeFile(myResourceFile);
+   * \endcode
+   *
+   * \see ArbitraryResourceWorker
+   */
+  void ExposeResources(gd::ArbitraryResourceWorker& worker);
+
  protected:
   /**
    * \brief Called when the IDE wants to know about the custom properties of the
@@ -209,5 +221,3 @@ class GD_CORE_API BehaviorConfigurationContainer {
 };
 
 }  // namespace gd
-
-#endif  // GDCORE_BEHAVIORCONFIGURATIONCONTAINER_H

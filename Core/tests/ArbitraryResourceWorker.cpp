@@ -151,6 +151,37 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
       REQUIRE(worker.images[0] == "res1");
     }
 
+    SECTION("Can find resource usages in behavior configurations") {
+      gd::Platform platform;
+      gd::Project project;
+      SetupProjectWithDummyPlatform(project, platform);
+
+      project.GetResourcesManager().AddResource(
+          "res1", "path/to/file1.png", "image");
+      project.GetResourcesManager().AddResource(
+          "res2", "path/to/file2.png", "image");
+      project.GetResourcesManager().AddResource(
+          "res3", "path/to/file3.png", "image");
+      project.GetResourcesManager().AddResource(
+          "res4", "path/to/file4.png", "audio");
+      ArbitraryResourceWorkerTest worker(project.GetResourcesManager());
+
+      auto &layout = project.InsertNewLayout("Scene", 0);
+      auto &object = layout.GetObjects().InsertNewObject(
+          project, "MyExtension::Sprite", "MyObject", 0);
+      auto *behavior = object.AddNewBehavior(
+          project, "MyExtension::BehaviorWithRequiredBehaviorProperty",
+          "BehaviorWithResource");
+      behavior->UpdateProperty("resourceProperty", "res1");
+
+      worker.files.clear();
+      worker.images.clear();
+      gd::ResourceExposer::ExposeWholeProjectResources(project, worker);
+      REQUIRE(worker.files.size() == 4);
+      REQUIRE(worker.images.size() == 1);
+      REQUIRE(worker.images[0] == "res1");
+    }
+
     SECTION("Can find resource usages in layout events") {
       gd::Platform platform;
       gd::Project project;

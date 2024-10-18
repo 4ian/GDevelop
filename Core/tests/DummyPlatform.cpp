@@ -39,13 +39,23 @@ class BehaviorWithRequiredBehaviorProperty : public gd::Behavior {
             behaviorContent.GetStringAttribute("requiredBehaviorProperty"))
         .SetType("Behavior")
         .AddExtraInfo("MyExtension::MyBehavior");
+    properties["resourceProperty"]
+        .SetLabel("A resource")
+        .SetValue(
+            behaviorContent.GetStringAttribute("resourceProperty"))
+        .SetType("Resource")
+        .AddExtraInfo("image");
     return properties;
   }
   virtual bool UpdateProperty(gd::SerializerElement& behaviorContent,
                               const gd::String& name,
                               const gd::String& value) override {
-    if (name == _("requiredBehaviorProperty")) {
+    if (name == "requiredBehaviorProperty") {
       behaviorContent.SetAttribute("requiredBehaviorProperty", value);
+      return true;
+    }
+    if (name == "resourceProperty") {
+      behaviorContent.SetAttribute("resourceProperty", value);
       return true;
     }
     return false;
@@ -53,6 +63,7 @@ class BehaviorWithRequiredBehaviorProperty : public gd::Behavior {
   virtual void InitializeContent(
       gd::SerializerElement& behaviorContent) override {
     behaviorContent.SetAttribute("requiredBehaviorProperty", "");
+    behaviorContent.SetAttribute("resourceProperty", "");
   }
 };
 

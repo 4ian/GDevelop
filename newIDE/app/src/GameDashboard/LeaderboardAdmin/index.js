@@ -338,7 +338,8 @@ export const LeaderboardAdmin = ({
         if (
           leaderboardLimits &&
           leaderboardLimits.maximumCountPerGame > 0 &&
-          leaderboards.length >= leaderboardLimits.maximumCountPerGame
+          leaderboards.filter(leaderboard => !leaderboard.deletedAt).length >=
+            leaderboardLimits.maximumCountPerGame
         ) {
           setDisplayMaxLeaderboardCountReachedWarning(true);
           return;

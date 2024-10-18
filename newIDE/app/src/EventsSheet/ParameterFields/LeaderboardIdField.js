@@ -31,7 +31,7 @@ const getInlineParameterDisplayValue = (
   return leaderboard ? leaderboard.name : value;
 };
 
-const useFetchLeaderboards = () => {
+export const useFetchLeaderboards = () => {
   const { leaderboards, listLeaderboards } = React.useContext(
     LeaderboardContext
   );

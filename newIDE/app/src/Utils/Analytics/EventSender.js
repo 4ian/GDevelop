@@ -433,7 +433,7 @@ export const sendCancelSubscriptionToChange = (metadata: {|
 };
 
 const canSendExternalEditorOpened = makeCanSendEvent({
-  minimumTimeBetweenEvents: 1000 * 60 * 60, // 3 hours (basically, once per "session")
+  minimumTimeBetweenEvents: 1000 * 60 * 60, // Only once per hour per external editor.
 });
 
 export const sendExternalEditorOpened = (editorName: string) => {
@@ -477,6 +477,51 @@ export const sendEventsExtractedAsFunction = (metadata: {|
     | 'external-events-editor',
 |}) => {
   recordEvent('events-extracted-as-function', metadata);
+};
+
+const canSendPreviewStarted = makeCanSendEvent({
+  minimumTimeBetweenEvents: 1000 * 60 * 15, // Only once every 15 minutes per preview kind (outside quick customization).
+});
+
+const canSendPreviewStartedForQuickCustomization = makeCanSendEvent({
+  minimumTimeBetweenEvents: 1000 * 60 * 1, // Only once every minute per game for quick customization.
+});
+
+export const sendPreviewStarted = (metadata: {|
+  quickCustomizationGameId: string | null,
+  networkPreview: boolean,
+  numberOfWindows: number,
+  hotReload: boolean,
+  projectDataOnlyExport: boolean,
+  fullLoadingScreen: boolean,
+  forceDiagnosticReport: boolean,
+  previewLaunchDuration: number,
+|}) => {
+  if (
+    metadata.quickCustomizationGameId &&
+    !canSendPreviewStartedForQuickCustomization(
+      metadata.quickCustomizationGameId
+    )
+  ) {
+    return;
+  }
+
+  if (
+    !metadata.quickCustomizationGameId &&
+    !canSendPreviewStarted(
+      JSON.stringify({
+        networkPreview: metadata.networkPreview,
+        hotReload: metadata.hotReload,
+        projectDataOnlyExport: metadata.projectDataOnlyExport,
+        fullLoadingScreen: metadata.fullLoadingScreen,
+        forceDiagnosticReport: metadata.forceDiagnosticReport,
+      })
+    )
+  ) {
+    return;
+  }
+
+  recordEvent('preview-started', metadata);
 };
 
 const canSendQuickCustomizationProgress = makeCanSendEvent({

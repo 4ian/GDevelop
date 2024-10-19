@@ -152,6 +152,7 @@ import LeaderboardProvider from '../Leaderboard/LeaderboardProvider';
 import {
   sendInAppTutorialStarted,
   sendEventsExtractedAsFunction,
+  sendPreviewStarted,
 } from '../Utils/Analytics/EventSender';
 import { useLeaderboardReplacer } from '../Leaderboard/UseLeaderboardReplacer';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
@@ -1637,6 +1638,7 @@ const MainFrame = (props: Props) => {
       try {
         await eventsFunctionsExtensionsState.ensureLoadFinished();
 
+        const startTime = Date.now();
         await previewLauncher.launchPreview({
           project: currentProject,
           layout,
@@ -1652,6 +1654,19 @@ const MainFrame = (props: Props) => {
           numberOfWindows: numberOfWindows || 1,
         });
         setPreviewLoading(false);
+
+        sendPreviewStarted({
+          quickCustomizationGameId:
+            quickCustomizationDialogOpenedFromGameId || null,
+          networkPreview: !!networkPreview,
+          hotReload: !!hotReload,
+          projectDataOnlyExport: !!projectDataOnlyExport,
+          fullLoadingScreen: !!fullLoadingScreen,
+          numberOfWindows: numberOfWindows || 1,
+          forceDiagnosticReport: !!forceDiagnosticReport,
+          previewLaunchDuration: Date.now() - startTime,
+        });
+
         if (inAppTutorialOrchestratorRef.current) {
           inAppTutorialOrchestratorRef.current.onPreviewLaunch();
         }
@@ -1688,6 +1703,7 @@ const MainFrame = (props: Props) => {
       preferences.values.openDiagnosticReportAutomatically,
       currentlyRunningInAppTutorial,
       getAuthenticatedPlayerForPreview,
+      quickCustomizationDialogOpenedFromGameId,
     ]
   );
 

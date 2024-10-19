@@ -7,12 +7,13 @@ module.exports = function (grunt) {
   const useMinGW = grunt.option('use-MinGW') || false;
 
   const possibleVariants = [
+    'release',
     'dev',
     'debug',
     'debug-assertions',
     'debug-sanitizers',
   ];
-  const variant = grunt.option('variant') || (grunt.option('dev') ? 'dev' : '');
+  const variant = grunt.option('variant') || (grunt.option('dev') ? 'dev' : 'release');
 
   if (variant && possibleVariants.indexOf(variant) === -1) {
     console.error(

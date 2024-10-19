@@ -49,14 +49,14 @@ export const Default = () => (
       <Text size="block-title">Buttons:</Text>
     </LineStackLayout>
     <LineStackLayout noMargin>
-      <RaisedButton label="Raised button" onClick={action('onClick')()} />
       <RaisedButton
-        icon={<Download />}
-        label="Raised button"
+        label="Primary Raised button"
+        primary
         onClick={action('onClick')()}
       />
       <RaisedButton
         label="Primary Raised button"
+        disabled
         primary
         onClick={action('onClick')()}
       />
@@ -67,16 +67,120 @@ export const Default = () => (
         onClick={action('onClick')()}
       />
       <RaisedButton icon={<Download />} primary onClick={action('onClick')()} />
+    </LineStackLayout>
+    <LineStackLayout noMargin>
+      <RaisedButton
+        size="medium"
+        label="Primary Raised button"
+        primary
+        onClick={action('onClick')()}
+      />
+      <RaisedButton
+        size="medium"
+        label="Primary Raised button"
+        disabled
+        primary
+        onClick={action('onClick')()}
+      />
+      <RaisedButton
+        size="medium"
+        icon={<Download />}
+        label="Primary Raised button"
+        primary
+        onClick={action('onClick')()}
+      />
+      <RaisedButton
+        size="medium"
+        icon={<Download />}
+        primary
+        onClick={action('onClick')()}
+      />
+    </LineStackLayout>
+    <LineStackLayout noMargin>
+      <Text size="block-title">Alternate colors:</Text>
+    </LineStackLayout>
+    <LineStackLayout noMargin>
+      <RaisedButton
+        label="Success Raised button"
+        color="success"
+        onClick={action('onClick')()}
+      />
+      <RaisedButton
+        label="Success Raised button"
+        disabled
+        color="success"
+        onClick={action('onClick')()}
+      />
+      <RaisedButton
+        icon={<Download />}
+        label="Success Raised button"
+        color="success"
+        onClick={action('onClick')()}
+      />
+      <RaisedButton
+        icon={<Download />}
+        color="success"
+        onClick={action('onClick')()}
+      />
+    </LineStackLayout>
+    <LineStackLayout noMargin>
+      <RaisedButton
+        label="Danger Raised button"
+        color="danger"
+        onClick={action('onClick')()}
+      />
+      <RaisedButton
+        label="Danger Raised button"
+        disabled
+        color="danger"
+        onClick={action('onClick')()}
+      />
+      <RaisedButton
+        icon={<Download />}
+        label="Danger Raised button"
+        color="danger"
+        onClick={action('onClick')()}
+      />
+      <RaisedButton
+        icon={<Download />}
+        color="danger"
+        onClick={action('onClick')()}
+      />
+    </LineStackLayout>
+    <LineStackLayout noMargin>
+      <RaisedButton label="Raised button" onClick={action('onClick')()} />
+      <RaisedButton
+        disabled
+        label="Raised button"
+        onClick={action('onClick')()}
+      />
+      <RaisedButton
+        icon={<Download />}
+        label="Raised button"
+        onClick={action('onClick')()}
+      />
       <RaisedButton icon={<Download />} onClick={action('onClick')()} />
     </LineStackLayout>
     <LineStackLayout noMargin>
+      <Text size="block-title">Flat buttons:</Text>
+    </LineStackLayout>
+    <LineStackLayout noMargin>
       <FlatButton label="Flat button" onClick={action('onClick')()} />
+      <FlatButton disabled label="Flat button" onClick={action('onClick')()} />
       <FlatButton
         leftIcon={<Download />}
         label="Flat button"
         onClick={action('onClick')()}
       />
+    </LineStackLayout>
+    <LineStackLayout noMargin>
       <FlatButton
+        label="Primary Flat button"
+        primary
+        onClick={action('onClick')()}
+      />
+      <FlatButton
+        disabled
         label="Primary Flat button"
         primary
         onClick={action('onClick')()}
@@ -87,6 +191,9 @@ export const Default = () => (
         primary
         onClick={action('onClick')()}
       />
+    </LineStackLayout>
+    <LineStackLayout noMargin>
+      <Text size="block-title">Text buttons:</Text>
     </LineStackLayout>
     <LineStackLayout noMargin>
       <TextButton label="Text button" onClick={action('onClick')()} />

@@ -37,7 +37,6 @@ type Props<Item> = {|
   buildMenuTemplate: (Item, index: number) => any,
   onMoveSelectionToItem: (destinationItem: Item) => void,
   canMoveSelectionToItem?: ?(destinationItem: Item) => boolean,
-  scaleUpItemIconWhenSelected?: boolean,
   reactDndType: string,
 |};
 
@@ -75,7 +74,6 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
       getItemId,
       getItemData,
       renderItemLabel,
-      scaleUpItemIconWhenSelected,
     } = this.props;
 
     const nameBeingEdited = renamedItem === item;
@@ -105,7 +103,6 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
         buildMenuTemplate={() => this.props.buildMenuTemplate(item, index)}
         onEdit={onEditItem}
         hideMenuButton={isMobile}
-        scaleUpItemIconWhenSelected={scaleUpItemIconWhenSelected}
       />
     );
   }

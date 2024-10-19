@@ -1,0 +1,19 @@
+button.buttonSuccess {
+    background-color: var(--theme-success-color);
+    color: var(--theme-success-text-contrast-color);
+}
+
+button.buttonSuccess:hover {
+    background-color: var(--theme-success-dark);
+    color: var(--theme-success-text-contrast-color);
+}
+
+button.buttonDanger {
+    background-color: var(--theme-error-color);
+    color: var(--theme-error-text-contrast-color);
+}
+
+button.buttonDanger:hover {
+    background-color: var(--theme-error-dark);
+    color: var(--theme-error-text-contrast-color);
+}

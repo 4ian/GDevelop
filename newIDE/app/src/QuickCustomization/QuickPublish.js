@@ -12,7 +12,7 @@ import Text from '../UI/Text';
 import { type Limits } from '../Utils/GDevelopServices/Usage';
 import { type GameAndBuildsManager } from '../Utils/UseGameAndBuildsManager';
 import FlatButton from '../UI/FlatButton';
-import { Column, Line, Spacer } from '../UI/Grid';
+import { Column, Spacer } from '../UI/Grid';
 import classes from './QuickPublish.module.css';
 import classNames from 'classnames';
 import Paper from '../UI/Paper';
@@ -27,6 +27,7 @@ import { getGameUrl } from '../Utils/GDevelopServices/Game';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import { MaxProjectCountAlertMessage } from '../MainFrame/EditorContainers/HomePage/BuildSection/MaxProjectCountAlertMessage';
 import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
+import ArrowLeft from '../UI/CustomSvgIcons/ArrowLeft';
 
 const styles = { imageContainer: { maxWidth: 400 } };
 
@@ -258,7 +259,7 @@ export const QuickPublish = ({
       </ColumnStackLayout>
 
       {exportState !== 'started' && !isLoadingCloudProjects && (
-        <Line justifyContent="center" alignItems="center">
+        <ColumnStackLayout justifyContent="center" alignItems="center">
           <TextButton
             secondary
             onClick={onClose}
@@ -269,9 +270,19 @@ export const QuickPublish = ({
                 <Trans>Finish and close</Trans>
               )
             }
-            icon={hasNotSavedProject ? <Trash /> : null}
+            icon={
+              hasNotSavedProject || isCloudProjectsMaximumReached ? (
+                <Trash />
+              ) : null
+            }
           />
-        </Line>
+          <TextButton
+            secondary
+            onClick={onContinueQuickCustomization}
+            label={<Trans>Rework the game</Trans>}
+            icon={<ArrowLeft />}
+          />
+        </ColumnStackLayout>
       )}
     </ColumnStackLayout>
   );

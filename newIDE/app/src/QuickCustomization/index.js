@@ -37,7 +37,7 @@ const steps: Array<Step> = [
   {
     name: 'game-logo',
     canPreview: true,
-    title: <Trans>Make your game logo</Trans>,
+    title: <Trans>Make your game title</Trans>,
     nextLabel: <Trans>Next</Trans>,
   },
   {

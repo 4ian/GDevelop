@@ -514,9 +514,10 @@ const BuildSection = ({
             </LineStackLayout>
           </Column>
           <Column noMargin>
-            <LineStackLayout noMargin>
+            <LineStackLayout noMargin alignItems="center">
               <RaisedButton
                 primary
+                size="medium"
                 fullWidth={!canOpen}
                 label={
                   isMobile ? (

@@ -23,7 +23,6 @@ type Props = {|
    * app or a base64 encoded SVG in a data url.
    */
   isGDevelopIcon?: boolean,
-  cssAnimation?: string,
   useExactIconSize?: boolean,
   ...SizeProps,
 |};
@@ -40,7 +39,6 @@ function ListIcon(props: Props) {
     tooltip,
     disabled,
     isGDevelopIcon,
-    cssAnimation,
     useExactIconSize,
     brightness,
   } = props;
@@ -76,7 +74,6 @@ function ListIcon(props: Props) {
     width: useExactIconSize ? iconWidth : undefined,
     height: useExactIconSize ? iconHeight : undefined,
     verticalAlign: 'middle', // Vertical centering
-    animation: cssAnimation,
     filter,
   };
 

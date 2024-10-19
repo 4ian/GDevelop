@@ -6,7 +6,6 @@ import CompactPropertiesEditor from '../CompactPropertiesEditor';
 import propertiesMapToSchema from '../CompactPropertiesEditor/PropertiesMapToCompactSchema';
 import { useForceRecompute } from '../Utils/UseForceUpdate';
 import { Column, Line } from '../UI/Grid';
-import GameImage from './GameImage';
 import Text from '../UI/Text';
 import { Trans } from '@lingui/macro';
 
@@ -72,7 +71,6 @@ const QuickObjectPropertiesEditor = ({
 
   return (
     <ColumnStackLayout>
-      <GameImage project={project} />
       <Column noMargin>
         <CompactPropertiesEditor
           project={project}

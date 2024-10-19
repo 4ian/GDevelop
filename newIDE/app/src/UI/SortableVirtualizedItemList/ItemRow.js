@@ -41,7 +41,6 @@ type Props<Item> = {|
   buildMenuTemplate: () => Array<MenuItemTemplate>,
   onEdit?: ?(Item) => void,
   hideMenuButton: boolean,
-  scaleUpItemIconWhenSelected?: boolean,
 |};
 
 function ItemRow<Item>({
@@ -60,7 +59,6 @@ function ItemRow<Item>({
   buildMenuTemplate,
   onEdit,
   hideMenuButton,
-  scaleUpItemIconWhenSelected,
 }: Props<Item>) {
   const textFieldRef = React.useRef<?TextFieldInterface>(null);
   const shouldDiscardChanges = React.useRef<boolean>(false);
@@ -144,15 +142,7 @@ function ItemRow<Item>({
   };
 
   const leftIcon = getThumbnail ? (
-    <ListIcon
-      iconSize={24}
-      src={getThumbnail()}
-      cssAnimation={
-        scaleUpItemIconWhenSelected && selected
-          ? 'scale-and-jiggle 0.8s forwards'
-          : ''
-      }
-    />
+    <ListIcon iconSize={24} src={getThumbnail()} />
   ) : null;
 
   return (

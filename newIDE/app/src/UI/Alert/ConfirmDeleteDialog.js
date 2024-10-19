@@ -83,6 +83,7 @@ function ConfirmDeleteDialog(props: Props) {
             <DialogPrimaryButton
               key="confirm"
               ref={confirmButtonRef}
+              color="danger"
               label={
                 props.confirmButtonLabel ? (
                   i18n._(props.confirmButtonLabel)

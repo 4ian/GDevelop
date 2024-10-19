@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
-import FlatButton from '../UI/FlatButton';
+import RaisedButton from '../UI/RaisedButton';
 import { LineStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
 import PreviewIcon from '../UI/CustomSvgIcons/Preview';
@@ -40,14 +40,15 @@ const PreviewLine = ({ onLaunchPreview }: Props) => {
               >
                 <PlaySquared htmlColor={gdevelopTheme.message.valid} />
                 <Text noMargin size="body">
-                  <Trans>Preview your game</Trans>
+                  <Trans>Try your game</Trans>
                 </Text>
               </LineStackLayout>
-              <FlatButton
-                primary
+              <RaisedButton
+                color="success"
+                size="medium"
                 label={<Trans>Preview</Trans>}
                 onClick={onLaunchPreview}
-                leftIcon={<PreviewIcon />}
+                icon={<PreviewIcon />}
               />
             </LineStackLayout>
           </Column>

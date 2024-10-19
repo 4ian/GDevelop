@@ -3,12 +3,16 @@ import * as React from 'react';
 import Button from '@material-ui/core/Button';
 import { type ButtonInterface } from './Button';
 import { Spacer } from './Grid';
+import classes from './RaisedButton.module.css';
+import classNames from 'classnames';
 
 // We support a subset of the props supported by Material-UI v0.x RaisedButton
 // They should be self descriptive - refer to Material UI docs otherwise.
 export type RaisedButtonPropsWithoutOnClick = {|
   label?: React.Node,
   primary?: boolean,
+  color?: 'primary' | 'success' | 'danger',
+  size?: 'medium',
   disabled?: boolean,
   keyboardFocused?: boolean,
   fullWidth?: boolean,
@@ -37,6 +41,8 @@ const RaisedButton = React.forwardRef<RaisedButtonProps, ButtonInterface>(
     {
       label,
       primary,
+      color,
+      size,
       icon,
       disabled,
       keyboardFocused,
@@ -54,12 +60,16 @@ const RaisedButton = React.forwardRef<RaisedButtonProps, ButtonInterface>(
     return (
       <Button
         variant="contained"
-        size="small"
+        size={size || 'small'}
         disableElevation
         color={primary ? 'primary' : 'default'}
         autoFocus={keyboardFocused}
         focusRipple={focusRipple}
         disabled={disabled}
+        className={classNames({
+          [classes.buttonSuccess]: color === 'success',
+          [classes.buttonDanger]: color === 'danger',
+        })}
         style={
           style || !label
             ? {

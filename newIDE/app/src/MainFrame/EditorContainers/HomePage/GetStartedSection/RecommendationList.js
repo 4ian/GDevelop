@@ -303,7 +303,7 @@ const RecommendationList = ({
           items.push(
             <SectionRow key="customize-and-publish">
               <Text size="section-title" noMargin>
-                <Trans>Customize a game and publish it in 1 minute</Trans>
+                <Trans>Create your game in 1 minute</Trans>
               </Text>
               <Spacer />
               <QuickCustomizationGameTiles

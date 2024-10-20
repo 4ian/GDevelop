@@ -259,8 +259,8 @@ const BuildSection = ({
     const translatedConfirmText = i18n._(t`delete`);
 
     const deleteAnswer = await showDeleteConfirmation({
-      title: t`Do you really want to permanently delete your project ${projectName}?`,
-      message: t`You’re about to permanently delete your project ${projectName}. You will no longer be able to access it.`,
+      title: t`Permanently delete the project?`,
+      message: t`Project ${projectName} will be deleted. You will no longer be able to access it.`,
       fieldMessage: t`To confirm, type "${translatedConfirmText}"`,
       confirmText: translatedConfirmText,
       confirmButtonLabel: t`Delete project`,

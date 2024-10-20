@@ -133,7 +133,7 @@ const SubMenuItem = ({ item, buildFromTemplate }) => {
   return (
     <React.Fragment>
       <MenuItem
-        dense={electron || !isTouchscreen}
+        dense={!!electron || !isTouchscreen}
         style={styles.menuItemWithSubMenu}
         key={item.label}
         disabled={
@@ -225,7 +225,7 @@ export default class MaterialUIMenuImplementation
         } else if (item.type === 'checkbox') {
           return (
             <MenuItem
-              dense={electron || !isTouchscreen}
+              dense={!!electron || !isTouchscreen}
               key={'checkbox' + item.label}
               checked={
                 // $FlowFixMe - existence should be inferred by Flow.
@@ -278,7 +278,7 @@ export default class MaterialUIMenuImplementation
         } else {
           return (
             <MenuItem
-              dense={electron || !isTouchscreen}
+              dense={!!electron || !isTouchscreen}
               key={'item' + item.label}
               disabled={item.enabled === false}
               onClick={e => {

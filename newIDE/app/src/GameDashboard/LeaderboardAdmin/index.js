@@ -410,10 +410,10 @@ export const LeaderboardAdmin = ({
     const translatedConfirmText = i18n._(t`delete`);
 
     const deleteAnswer = await showDeleteConfirmation({
-      title: t`Do you really want to permanently delete the leaderboard ${
+      title: t`Permanently delete the leaderboard?`,
+      message: t`All the entries of ${
         currentLeaderboard.name
-      }?`,
-      message: t`You’re about to permanently delete this leaderboard and all of its entries. This can't be undone.`,
+      } will be deleted too. This can't be undone.`,
       fieldMessage: t`To confirm, type "${translatedConfirmText}"`,
       confirmText: translatedConfirmText,
       confirmButtonLabel: t`Delete Leaderboard`,

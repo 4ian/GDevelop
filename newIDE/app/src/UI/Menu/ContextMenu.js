@@ -9,14 +9,21 @@ import ElectronMenuImplementation from './ElectronMenuImplementation';
 import MaterialUIMenuImplementation from './MaterialUIMenuImplementation';
 import optionalRequire from '../../Utils/OptionalRequire';
 import useForceUpdate from '../../Utils/UseForceUpdate';
+import { Drawer } from '@material-ui/core';
+import { isMobile } from '../../Utils/Platform';
 const electron = optionalRequire('electron');
 
 export type ContextMenuInterface = {|
   open: (x: number, y: number, options: any) => void,
 |};
 
-type ContextMenuProps = {|
+type ContextMenuWrapperProps = {|
   buildMenuTemplate: (i18n: I18nType, options: any) => Array<MenuItemTemplate>,
+|};
+
+type ContextMenuProps = {|
+  ...ContextMenuWrapperProps,
+  i18n: I18nType,
 |};
 
 const MaterialUIContextMenu = React.forwardRef<
@@ -45,50 +52,74 @@ const MaterialUIContextMenu = React.forwardRef<
     open,
   }));
 
-  return openMenu ? (
-    <I18n>
-      {({ i18n }) => (
-        <Menu
-          open
-          anchorPosition={{
-            left: anchorPosition[0],
-            top: anchorPosition[1],
-          }}
-          anchorReference={'anchorPosition'}
-          onClose={(event, reason) => {
-            if (reason === 'backdropClick') {
-              // Prevent any side effect of a backdrop click that should only
-              // close the context menu.
-              // When used in the ElementWithMenu component, there are cases where
-              // the event propagates to the element on which the menu is set up and
-              // then the event bubbles up, triggering click events on its way up.
-              event.stopPropagation();
-            }
-            setOpenMenu(false);
-          }}
-          TransitionComponent={Fade}
-          {...menuImplementation.getMenuProps()}
-        >
-          {menuImplementation.buildFromTemplate(
-            props.buildMenuTemplate(i18n, buildOptions),
-            forceUpdate
-          )}
-        </Menu>
+  if (!openMenu) {
+    // Don't render the menu when it's not opened, as `buildMenuTemplate` could
+    // be running logic to compute some labels or `enabled` flag values - and might
+    // not be prepared to do that when the menu is not opened.
+    return null;
+  }
+
+  if (isMobile()) {
+    const menuTemplate = props.buildMenuTemplate(props.i18n, buildOptions);
+    if (!menuTemplate.length) {
+      setOpenMenu(false);
+      return null;
+    }
+
+    return (
+      <Drawer
+        anchor={'bottom'}
+        open={true}
+        onClose={() => setOpenMenu(false)}
+        transitionDuration={200}
+        PaperProps={{
+          style: {
+            animation: 'swipe-up-ending 0.2s ease-out',
+            paddingTop: 4,
+            paddingBottom: 8,
+            maxWidth: 600,
+            margin: 'auto',
+            maxHeight: '80vh',
+          },
+        }}
+      >
+        {menuImplementation.buildFromTemplate(menuTemplate, forceUpdate)}
+      </Drawer>
+    );
+  }
+
+  return (
+    <Menu
+      open
+      anchorPosition={{
+        left: anchorPosition[0],
+        top: anchorPosition[1],
+      }}
+      anchorReference={'anchorPosition'}
+      onClose={(event, reason) => {
+        if (reason === 'backdropClick') {
+          // Prevent any side effect of a backdrop click that should only
+          // close the context menu.
+          // When used in the ElementWithMenu component, there are cases where
+          // the event propagates to the element on which the menu is set up and
+          // then the event bubbles up, triggering click events on its way up.
+          event.stopPropagation();
+        }
+        setOpenMenu(false);
+      }}
+      TransitionComponent={Fade}
+      {...menuImplementation.getMenuProps()}
+    >
+      {menuImplementation.buildFromTemplate(
+        props.buildMenuTemplate(props.i18n, buildOptions),
+        forceUpdate
       )}
-    </I18n>
-  ) : // Don't render the menu when it's not opened, as `buildMenuTemplate` could
-  // be running logic to compute some labels or `enabled` flag values - and might
-  // not be prepared to do that when the menu is not opened.
-  null;
+    </Menu>
+  );
 });
 
-type ElectronContextMenuProps = {|
-  ...ContextMenuProps,
-  i18n: I18nType,
-|};
-
 const ElectronContextMenu = React.forwardRef<
-  ElectronContextMenuProps,
+  ContextMenuProps,
   ContextMenuInterface
 >((props, ref) => {
   const menuImplementation = new ElectronMenuImplementation();
@@ -112,25 +143,23 @@ const ElectronContextMenu = React.forwardRef<
   return null;
 });
 
-const ElectronContextMenuWrapper = React.forwardRef<
-  ContextMenuProps,
-  ContextMenuInterface
->((props, ref) => {
-  const electronContextMenu = React.useRef<?ContextMenuInterface>(null);
-  React.useImperativeHandle(ref, () => ({
-    open: (x, y, options) => {
-      if (electronContextMenu.current)
-        electronContextMenu.current.open(x, y, options);
-    },
-  }));
+const ContextMenu = electron ? ElectronContextMenu : MaterialUIContextMenu;
 
-  return (
-    <I18n>
-      {({ i18n }) => (
-        <ElectronContextMenu {...props} i18n={i18n} ref={electronContextMenu} />
-      )}
-    </I18n>
-  );
-});
+export default React.forwardRef<ContextMenuWrapperProps, ContextMenuInterface>(
+  (props, ref) => {
+    const contextMenuRef = React.useRef<?ContextMenuInterface>(null);
+    React.useImperativeHandle(ref, () => ({
+      open: (x, y, options) => {
+        if (contextMenuRef.current) contextMenuRef.current.open(x, y, options);
+      },
+    }));
 
-export default (electron ? ElectronContextMenuWrapper : MaterialUIContextMenu);
+    return (
+      <I18n>
+        {({ i18n }) => (
+          <ContextMenu {...props} i18n={i18n} ref={contextMenuRef} />
+        )}
+      </I18n>
+    );
+  }
+);

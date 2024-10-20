@@ -15,6 +15,9 @@ import {
   type ContextMenuImplementation,
 } from './Menu.flow';
 import ChevronArrowRight from '../CustomSvgIcons/ChevronArrowRight';
+import { useScreenType } from '../Responsive/ScreenTypeMeasurer';
+import optionalRequire from '../../Utils/OptionalRequire';
+const electron = optionalRequire('electron');
 
 const useStyles = makeStyles({
   backdropRootForMouse: {
@@ -123,10 +126,14 @@ const SubMenuItem = ({ item, buildFromTemplate }) => {
     }, 75);
   }
 
+  // This is not a real hook.
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const isTouchscreen = useScreenType() === 'touch';
+
   return (
     <React.Fragment>
       <MenuItem
-        dense
+        dense={!!electron || !isTouchscreen}
         style={styles.menuItemWithSubMenu}
         key={item.label}
         disabled={
@@ -201,6 +208,10 @@ export default class MaterialUIMenuImplementation
     template: Array<MenuItemTemplate>,
     forceUpdate?: () => void
   ) {
+    // This is not a real hook.
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const isTouchscreen = useScreenType() === 'touch';
+
     return template
       .map((item, id) => {
         if (item.visible === false) return null;
@@ -214,7 +225,7 @@ export default class MaterialUIMenuImplementation
         } else if (item.type === 'checkbox') {
           return (
             <MenuItem
-              dense
+              dense={!!electron || !isTouchscreen}
               key={'checkbox' + item.label}
               checked={
                 // $FlowFixMe - existence should be inferred by Flow.
@@ -267,7 +278,7 @@ export default class MaterialUIMenuImplementation
         } else {
           return (
             <MenuItem
-              dense
+              dense={!!electron || !isTouchscreen}
               key={'item' + item.label}
               disabled={item.enabled === false}
               onClick={e => {

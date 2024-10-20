@@ -376,8 +376,7 @@ TEST_CASE("ObjectSerialization", "[common]") {
     REQUIRE(readProject.GetEventsFunctionsExtensionsCount() == 1);
     auto &eventsExtension =
         readProject.GetEventsFunctionsExtension(0);
-    REQUIRE(eventsExtension.GetEventsBasedObjects().GetCount() ==
-            2);
+    REQUIRE(eventsExtension.GetEventsBasedObjects().GetCount() == 2);
     auto &eventsBasedObject =
         eventsExtension.GetEventsBasedObjects().Get(0);
     REQUIRE(eventsBasedObject.GetObjects().GetObjectsCount() == 1);
@@ -391,5 +390,25 @@ TEST_CASE("ObjectSerialization", "[common]") {
     auto &spriteConfiguration =
         customObjectConfiguration->GetChildObjectConfiguration("MyChildSprite");
     CheckSpriteConfiguration(spriteConfiguration);
+  }
+
+  SECTION("Can unserialize over an existing extension without duplicating its event-based objects") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &eventsExtension =
+        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+    {
+      auto &eventsBasedObject =
+          eventsExtension.GetEventsBasedObjects().InsertNew(
+              "MyEventsBasedObject", 0);
+    }
+
+    SerializerElement extensionElement;
+    eventsExtension.SerializeTo(extensionElement);
+    eventsExtension.UnserializeFrom(project, extensionElement);
+
+    REQUIRE(eventsExtension.GetEventsBasedObjects().GetCount() == 1);
   }
 }

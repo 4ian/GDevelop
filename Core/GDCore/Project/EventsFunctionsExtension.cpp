@@ -166,6 +166,7 @@ void EventsFunctionsExtension::UnserializeExtensionDeclarationFrom(
   // As event based objects can contains objects using CustomBehavior and/or
   // CustomObject, this allows them to reference EventBasedBehavior and
   // EventBasedObject respectively.
+  eventsBasedBehaviors.Clear();
   auto &behaviorsElement = element.GetChild("eventsBasedBehaviors");
   behaviorsElement.ConsiderAsArrayOf("eventsBasedBehavior");
   for (std::size_t i = 0; i < behaviorsElement.GetChildrenCount(); ++i) {
@@ -173,6 +174,7 @@ void EventsFunctionsExtension::UnserializeExtensionDeclarationFrom(
         behaviorsElement.GetChild(i).GetStringAttribute("name");
     eventsBasedBehaviors.InsertNew(behaviorName, eventsBasedBehaviors.GetCount());
   }
+  eventsBasedObjects.Clear();
   auto &objectsElement = element.GetChild("eventsBasedObjects");
   objectsElement.ConsiderAsArrayOf("eventsBasedObject");
   for (std::size_t i = 0; i < objectsElement.GetChildrenCount(); ++i) {

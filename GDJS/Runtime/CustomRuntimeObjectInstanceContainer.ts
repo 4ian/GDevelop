@@ -290,7 +290,7 @@ namespace gdjs {
       return this._runtimeScene;
     }
 
-    getOwner() {
+    getOwner(): gdjs.CustomRuntimeObject {
       return this._customObject;
     }
 

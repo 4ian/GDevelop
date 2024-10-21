@@ -140,11 +140,13 @@ namespace gdjs {
             return;
           }
           // TODO Declare an interface to move up in the object tree.
-          if (instanceContainer instanceof gdjs.CustomRuntimeObjectInstanceContainer) {
+          if (
+            instanceContainer instanceof
+            gdjs.CustomRuntimeObjectInstanceContainer
+          ) {
             object = instanceContainer.getOwner();
             instanceContainer = object.getInstanceContainer();
-          }
-          else {
+          } else {
             hasParent = false;
           }
         } while (hasParent);

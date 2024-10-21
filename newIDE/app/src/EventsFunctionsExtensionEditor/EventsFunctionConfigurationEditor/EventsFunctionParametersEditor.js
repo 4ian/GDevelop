@@ -225,14 +225,17 @@ export const EventsFunctionParametersEditor = ({
         parameters.hasParameterNamed(name)
       );
 
-      const newParameter = parameters.insertNewParameter(newName, index);
+      const newParameter = parameters.insertNewParameter(
+        newName,
+        Math.max(firstParameterIndex, index)
+      );
 
       unserializeFromJSObject(newParameter, serializeToJSObject(parameter));
       newParameter.setName(newName);
 
       forceUpdate();
     },
-    [forceUpdate, eventsFunction]
+    [eventsFunction, firstParameterIndex, forceUpdate]
   );
 
   const pasteParameters = React.useCallback(
@@ -278,7 +281,7 @@ export const EventsFunctionParametersEditor = ({
       });
 
       let firstAddedParameterName: string | null = null;
-      let index = propertyInsertionIndex;
+      let index = Math.max(firstParameterIndex, propertyInsertionIndex);
       newNamedParameters.forEach(({ name, serializedParameter }) => {
         const parameter = parameters.insertNewParameter(name, index);
         index++;
@@ -316,6 +319,7 @@ export const EventsFunctionParametersEditor = ({
     },
     [
       eventsFunction,
+      firstParameterIndex,
       forceUpdate,
       isParameterDisabled,
       showParameterOverridingConfirmation,
@@ -549,254 +553,237 @@ export const EventsFunctionParametersEditor = ({
               <ScrollView ref={scrollView}>
                 <Line>
                   <Column noMargin expand>
-                    {mapFor(
-                      0,
-                      eventsFunction.getParameters().getParametersCount(),
-                      i => {
-                        const parameter = eventsFunction
-                          .getParameters()
-                          .getParameterAt(i);
-                        const parameterRef =
-                          justAddedParameterName === parameter.getName()
-                            ? justAddedParameterElement
-                            : null;
+                    {mapFor(0, parameters.getParametersCount(), i => {
+                      const parameter = parameters.getParameterAt(i);
+                      const parameterRef =
+                        justAddedParameterName === parameter.getName()
+                          ? justAddedParameterElement
+                          : null;
 
-                        return (
-                          <DragSourceAndDropTarget
-                            key={parameter.ptr}
-                            beginDrag={() => {
-                              draggedParameter.current = parameter;
-                              return {};
-                            }}
-                            canDrag={() => !isParameterDisabled(i)}
-                            canDrop={() => !isParameterDisabled(i)}
-                            drop={() => {
-                              moveParameterBefore(parameter);
-                            }}
-                          >
-                            {({
-                              connectDragSource,
-                              connectDropTarget,
-                              isOver,
-                              canDrop,
-                            }) =>
-                              connectDropTarget(
+                      return (
+                        <DragSourceAndDropTarget
+                          key={parameter.ptr}
+                          beginDrag={() => {
+                            draggedParameter.current = parameter;
+                            return {};
+                          }}
+                          canDrag={() => !isParameterDisabled(i)}
+                          canDrop={() => !isParameterDisabled(i)}
+                          drop={() => {
+                            moveParameterBefore(parameter);
+                          }}
+                        >
+                          {({
+                            connectDragSource,
+                            connectDropTarget,
+                            isOver,
+                            canDrop,
+                          }) =>
+                            connectDropTarget(
+                              <div
+                                key={parameter.ptr}
+                                style={styles.rowContainer}
+                              >
+                                {isOver && <DropIndicator canDrop={canDrop} />}
                                 <div
-                                  key={parameter.ptr}
-                                  style={styles.rowContainer}
+                                  ref={parameterRef}
+                                  style={{
+                                    ...styles.rowContent,
+                                    backgroundColor:
+                                      gdevelopTheme.list.itemsBackgroundColor,
+                                  }}
                                 >
-                                  {isOver && (
-                                    <DropIndicator canDrop={canDrop} />
-                                  )}
-                                  <div
-                                    ref={parameterRef}
-                                    style={{
-                                      ...styles.rowContent,
-                                      backgroundColor:
-                                        gdevelopTheme.list.itemsBackgroundColor,
-                                    }}
-                                  >
-                                    {connectDragSource(
-                                      <span>
-                                        <Column>
-                                          <DragHandleIcon
-                                            disabled={isParameterDisabled(i)}
-                                          />
-                                        </Column>
-                                      </span>
-                                    )}
-                                    <ResponsiveLineStackLayout expand>
-                                      <LineStackLayout
-                                        noMargin
-                                        expand
-                                        alignItems="center"
-                                      >
-                                        <Text
-                                          style={{
-                                            whiteSpace: 'nowrap',
-                                          }}
-                                        >
-                                          <Trans>
-                                            Parameter #
-                                            {i + parametersIndexOffset}:
-                                          </Trans>
-                                        </Text>
-                                        <SemiControlledTextField
-                                          commitOnBlur
-                                          margin="none"
-                                          translatableHintText={t`Enter the parameter name (mandatory)`}
-                                          value={parameter.getName()}
-                                          onChange={text => {
-                                            parameter.setName(
-                                              gd.Project.getSafeName(text)
-                                            );
-                                            forceUpdate();
-                                            onParametersUpdated();
-                                          }}
+                                  {connectDragSource(
+                                    <span>
+                                      <Column>
+                                        <DragHandleIcon
                                           disabled={isParameterDisabled(i)}
-                                          fullWidth
                                         />
-                                      </LineStackLayout>
-                                    </ResponsiveLineStackLayout>
-                                    <ElementWithMenu
-                                      element={
-                                        <IconButton>
-                                          <ThreeDotsMenu />
-                                        </IconButton>
-                                      }
-                                      buildMenuTemplate={(i18n: I18nType) => [
-                                        {
-                                          label: i18n._(
-                                            t`Add a parameter below`
-                                          ),
-                                          enabled: !isParameterDisabled(i + 1),
-                                          click: () => addParameterAt(i + 1),
-                                        },
-                                        {
-                                          label: i18n._(t`Delete`),
-                                          enabled: !isParameterDisabled(i),
-                                          click: () =>
-                                            removeParameter(
-                                              parameter.getName()
-                                            ),
-                                        },
-                                        {
-                                          label: i18n._(t`Copy`),
-                                          click: () => copyParameter(parameter),
-                                        },
-                                        {
-                                          label: i18n._(t`Paste`),
-                                          click: () =>
-                                            pasteParametersBefore(parameter),
-                                          enabled: isClipboardContainingParameters,
-                                        },
-                                        {
-                                          label: i18n._(t`Duplicate`),
-                                          click: () =>
-                                            duplicateParameter(
-                                              parameter,
-                                              i + 1
-                                            ),
-                                        },
-                                        { type: 'separator' },
-                                        {
-                                          label: i18n._(
-                                            t`Add a Long Description`
-                                          ),
-                                          enabled: !isParameterDisabled(i),
-                                          visible: !isParameterLongDescriptionShown(
-                                            parameter,
-                                            i
-                                          ),
-                                          click: () => addLongDescription(i),
-                                        },
-                                        {
-                                          label: i18n._(
-                                            t`Remove the Long Description`
-                                          ),
-                                          enabled: !isParameterDisabled(i),
-                                          visible: isParameterLongDescriptionShown(
-                                            parameter,
-                                            i
-                                          ),
-                                          click: () => removeLongDescription(i),
-                                        },
-                                        {
-                                          label: i18n._(t`Move up`),
-                                          click: () => moveParameter(i, i - 1),
-                                          enabled:
-                                            !isParameterDisabled(i) &&
-                                            i - 1 >= 0 &&
-                                            !isParameterDisabled(i - 1),
-                                        },
-                                        {
-                                          label: i18n._(t`Move down`),
-                                          click: () => moveParameter(i, i + 1),
-                                          enabled:
-                                            !isParameterDisabled(i) &&
-                                            i + 1 <
-                                              parameters.getParametersCount() &&
-                                            !isParameterDisabled(i + 1),
-                                        },
-                                      ]}
-                                    />
-                                    <Spacer />
-                                  </div>
-                                  <Line>
-                                    <ColumnStackLayout expand>
-                                      <ValueTypeEditor
-                                        project={project}
-                                        eventsFunctionsExtension={
-                                          eventsFunctionsExtension
-                                        }
-                                        valueTypeMetadata={parameter.getValueTypeMetadata()}
+                                      </Column>
+                                    </span>
+                                  )}
+                                  <ResponsiveLineStackLayout expand>
+                                    <LineStackLayout
+                                      noMargin
+                                      expand
+                                      alignItems="center"
+                                    >
+                                      <Text
+                                        style={{
+                                          whiteSpace: 'nowrap',
+                                        }}
+                                      >
+                                        <Trans>
+                                          Parameter #{i + parametersIndexOffset}
+                                          :
+                                        </Trans>
+                                      </Text>
+                                      <SemiControlledTextField
+                                        commitOnBlur
+                                        margin="none"
+                                        translatableHintText={t`Enter the parameter name (mandatory)`}
+                                        value={parameter.getName()}
+                                        onChange={text => {
+                                          parameter.setName(
+                                            gd.Project.getSafeName(text)
+                                          );
+                                          forceUpdate();
+                                          onParametersUpdated();
+                                        }}
                                         disabled={isParameterDisabled(i)}
-                                        isTypeSelectorShown={isParameterTypeShown(
+                                        fullWidth
+                                      />
+                                    </LineStackLayout>
+                                  </ResponsiveLineStackLayout>
+                                  <ElementWithMenu
+                                    element={
+                                      <IconButton>
+                                        <ThreeDotsMenu />
+                                      </IconButton>
+                                    }
+                                    buildMenuTemplate={(i18n: I18nType) => [
+                                      {
+                                        label: i18n._(t`Add a parameter below`),
+                                        enabled: !isParameterDisabled(i + 1),
+                                        click: () => addParameterAt(i + 1),
+                                      },
+                                      {
+                                        label: i18n._(t`Delete`),
+                                        enabled: !isParameterDisabled(i),
+                                        click: () =>
+                                          removeParameter(parameter.getName()),
+                                      },
+                                      {
+                                        label: i18n._(t`Copy`),
+                                        click: () => copyParameter(parameter),
+                                      },
+                                      {
+                                        label: i18n._(t`Paste`),
+                                        click: () =>
+                                          pasteParametersBefore(parameter),
+                                        enabled: isClipboardContainingParameters,
+                                      },
+                                      {
+                                        label: i18n._(t`Duplicate`),
+                                        click: () =>
+                                          duplicateParameter(parameter, i + 1),
+                                      },
+                                      { type: 'separator' },
+                                      {
+                                        label: i18n._(
+                                          t`Add a Long Description`
+                                        ),
+                                        enabled: !isParameterDisabled(i),
+                                        visible: !isParameterLongDescriptionShown(
+                                          parameter,
                                           i
-                                        )}
-                                        onTypeUpdated={() =>
-                                          onParametersUpdated()
-                                        }
-                                        getLastObjectParameterObjectType={() =>
-                                          getLastObjectParameterObjectType(
-                                            parameters,
-                                            i
-                                          )
+                                        ),
+                                        click: () => addLongDescription(i),
+                                      },
+                                      {
+                                        label: i18n._(
+                                          t`Remove the Long Description`
+                                        ),
+                                        enabled: !isParameterDisabled(i),
+                                        visible: isParameterLongDescriptionShown(
+                                          parameter,
+                                          i
+                                        ),
+                                        click: () => removeLongDescription(i),
+                                      },
+                                      {
+                                        label: i18n._(t`Move up`),
+                                        click: () => moveParameter(i, i - 1),
+                                        enabled:
+                                          !isParameterDisabled(i) &&
+                                          i - 1 >= 0 &&
+                                          !isParameterDisabled(i - 1),
+                                      },
+                                      {
+                                        label: i18n._(t`Move down`),
+                                        click: () => moveParameter(i, i + 1),
+                                        enabled:
+                                          !isParameterDisabled(i) &&
+                                          i + 1 <
+                                            parameters.getParametersCount() &&
+                                          !isParameterDisabled(i + 1),
+                                      },
+                                    ]}
+                                  />
+                                  <Spacer />
+                                </div>
+                                <Line>
+                                  <ColumnStackLayout expand>
+                                    <ValueTypeEditor
+                                      project={project}
+                                      eventsFunctionsExtension={
+                                        eventsFunctionsExtension
+                                      }
+                                      valueTypeMetadata={parameter.getValueTypeMetadata()}
+                                      disabled={isParameterDisabled(i)}
+                                      isTypeSelectorShown={isParameterTypeShown(
+                                        i
+                                      )}
+                                      onTypeUpdated={() =>
+                                        onParametersUpdated()
+                                      }
+                                      getLastObjectParameterObjectType={() =>
+                                        getLastObjectParameterObjectType(
+                                          parameters,
+                                          i
+                                        )
+                                      }
+                                    />
+                                    {isParameterDescriptionShown(i) && (
+                                      <SemiControlledTextField
+                                        commitOnBlur
+                                        floatingLabelText={<Trans>Label</Trans>}
+                                        floatingLabelFixed
+                                        value={parameter.getDescription()}
+                                        onChange={text => {
+                                          parameter.setDescription(text);
+                                          forceUpdate();
+                                        }}
+                                        fullWidth
+                                        disabled={
+                                          /* When parameter are freezed, long description (if shown) can always be changed */
+                                          isParameterDisabled(i) &&
+                                          !freezeParameters
                                         }
                                       />
-                                      {isParameterDescriptionShown(i) && (
-                                        <SemiControlledTextField
-                                          commitOnBlur
-                                          floatingLabelText={
-                                            <Trans>Label</Trans>
-                                          }
-                                          floatingLabelFixed
-                                          value={parameter.getDescription()}
-                                          onChange={text => {
-                                            parameter.setDescription(text);
-                                            forceUpdate();
-                                          }}
-                                          fullWidth
-                                          disabled={
-                                            /* When parameter are freezed, long description (if shown) can always be changed */
-                                            isParameterDisabled(i) &&
-                                            !freezeParameters
-                                          }
-                                        />
-                                      )}
-                                      {isParameterLongDescriptionShown(
-                                        parameter,
-                                        i
-                                      ) && (
-                                        <SemiControlledTextField
-                                          commitOnBlur
-                                          floatingLabelText={
-                                            <Trans>Long description</Trans>
-                                          }
-                                          floatingLabelFixed
-                                          value={parameter.getLongDescription()}
-                                          onChange={text => {
-                                            parameter.setLongDescription(text);
-                                            forceUpdate();
-                                          }}
-                                          multiline
-                                          fullWidth
-                                          disabled={
-                                            /* When parameter are freezed, long description (if shown) can always be changed */
-                                            isParameterDisabled(i) &&
-                                            !freezeParameters
-                                          }
-                                        />
-                                      )}
-                                    </ColumnStackLayout>
-                                  </Line>
-                                </div>
-                              )
-                            }
-                          </DragSourceAndDropTarget>
-                        );
-                      }
-                    )}
+                                    )}
+                                    {isParameterLongDescriptionShown(
+                                      parameter,
+                                      i
+                                    ) && (
+                                      <SemiControlledTextField
+                                        commitOnBlur
+                                        floatingLabelText={
+                                          <Trans>Long description</Trans>
+                                        }
+                                        floatingLabelFixed
+                                        value={parameter.getLongDescription()}
+                                        onChange={text => {
+                                          parameter.setLongDescription(text);
+                                          forceUpdate();
+                                        }}
+                                        multiline
+                                        fullWidth
+                                        disabled={
+                                          /* When parameter are freezed, long description (if shown) can always be changed */
+                                          isParameterDisabled(i) &&
+                                          !freezeParameters
+                                        }
+                                      />
+                                    )}
+                                  </ColumnStackLayout>
+                                </Line>
+                              </div>
+                            )
+                          }
+                        </DragSourceAndDropTarget>
+                      );
+                    })}
                   </Column>
                 </Line>
               </ScrollView>

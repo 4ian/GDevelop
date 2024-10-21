@@ -364,8 +364,8 @@ export const getLayoutedRenderedInstance = <T: ChildRenderedInstance>(
   // Make sure to give a custom size to the instances only when it's necessary.
   // Some objects like TextObject may wrap text differently with a custom size.
   if (
-    (parentScaleX === 1 && parentScaleY === 1) ||
-    (!leftEdgeAnchor && !rightEdgeAnchor && !topEdgeAnchor && !bottomEdgeAnchor)
+    (parentScaleX === 1 || (!leftEdgeAnchor && !rightEdgeAnchor)) &&
+    (parentScaleY === 1 || (!topEdgeAnchor && !bottomEdgeAnchor))
   ) {
     layoutedInstance.x = initialInstance.getX();
     layoutedInstance.y = initialInstance.getY();
@@ -381,6 +381,8 @@ export const getLayoutedRenderedInstance = <T: ChildRenderedInstance>(
   const initialInstanceX = initialInstance.getX();
   const initialInstanceWidth = initialInstance.hasCustomSize()
     ? initialInstance.getCustomWidth()
+    // The default width of Text object is dependent of the current wrapping width.
+    // It result in strange behaviors when text objects don't have a custom size.
     : renderedInstance.getDefaultWidth();
 
   if (parentScaleX === 1 || (!leftEdgeAnchor && !rightEdgeAnchor)) {

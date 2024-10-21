@@ -230,10 +230,14 @@ export default class RenderedTextInstance extends RenderedInstance {
   }
 
   getDefaultWidth() {
+    // The default width is dependent of the current wrapping width.
+    // You should avoid to use this value.
     return this._pixiObject.width;
   }
 
   getDefaultHeight() {
+    // The default height is dependent of the current wrapping width.
+    // You should avoid to use this value.
     return this._pixiObject.height;
   }
 

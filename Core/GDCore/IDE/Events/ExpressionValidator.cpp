@@ -169,12 +169,17 @@ bool ExpressionValidator::ValidateObjectVariableOrVariableOrProperty(
         return true; // We found a property, even if the child is not allowed.
       }
 
-      const gd::NamedPropertyDescriptor& property = propertiesContainersList.Get(identifier.identifierName).second;
+      const gd::NamedPropertyDescriptor &property =
+          propertiesContainersList.Get(identifier.identifierName).second;
 
       if (property.GetType() == "Number") {
-       childType = Type::Number;
+        childType = Type::Number;
       } else if (property.GetType() == "Boolean") {
-        // Nothing - we don't know the precise type (this could be used a string or as a number)
+        // Nothing - we don't know the precise type (this could be used a string
+        // or as a number)
+      } else if (property.GetType() == "Behavior") {
+        RaiseTypeError(_("Behaviors can't be used as a value in expressions."),
+                       identifier.identifierNameLocation);
       } else {
         // Assume type is String or equivalent.
         childType = Type::String;

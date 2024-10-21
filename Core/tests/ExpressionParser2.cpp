@@ -1962,6 +1962,25 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     }
   }
 
+  SECTION("Invalid property (required behavior)") {
+    {
+      gd::PropertiesContainer propertiesContainer(gd::EventsFunctionsContainer::Extension);
+
+      auto projectScopedContainersWithProperties = gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+      projectScopedContainersWithProperties.AddPropertiesContainer(propertiesContainer);
+
+      propertiesContainer.InsertNew("MyRequiredBehavior").SetType("Behavior");
+
+      auto node =
+          parser.ParseExpression("\"abc\" + MyRequiredBehavior");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainersWithProperties, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() == "Behaviors can't be used as a value in expressions.");
+    }
+  }
+
   SECTION("Invalid property (unsupported child syntax, 1 level)") {
     {
       gd::PropertiesContainer propertiesContainer(gd::EventsFunctionsContainer::Extension);

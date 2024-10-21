@@ -94,6 +94,7 @@ const components = {
   file: DefaultField, //TODO
   musicfile: AudioResourceField,
   soundfile: AudioResourceField,
+  audioResource: AudioResourceField,
   imageResource: ImageResourceField,
   videoResource: VideoResourceField,
   jsonResource: JsonResourceField,
@@ -154,6 +155,7 @@ const userFriendlyTypeName: { [string]: MessageDescriptor } = {
   key: t`Keyboard key`,
   musicfile: t`Audio resource`,
   soundfile: t`Audio resource`,
+  audioResource: t`Audio resource`,
   imageResource: t`Image resource`,
   videoResource: t`Video resource`,
   bitmapFontResource: t`Bitmap font resource`,

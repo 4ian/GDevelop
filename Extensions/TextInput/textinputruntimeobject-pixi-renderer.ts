@@ -129,10 +129,25 @@ namespace gdjs {
       // Hide the input entirely if the layer is not visible.
       // Because this object is rendered as a DOM element (and not part of the PixiJS
       // scene graph), we have to do this manually.
-      const layer = this._instanceContainer.getLayer(this._object.getLayer());
-      if (!layer.isVisible()) {
-        this._input.style.display = 'none';
-        return;
+      {
+        let instanceContainer = this._instanceContainer;
+        let object: gdjs.RuntimeObject = this._object;
+        let hasParent = true;
+        do {
+          const layer = instanceContainer.getLayer(object.getLayer());
+          if (!layer.isVisible() || !object.isVisible()) {
+            this._input.style.display = 'none';
+            return;
+          }
+          // TODO Declare an interface to move up in the object tree.
+          if (instanceContainer instanceof gdjs.CustomRuntimeObjectInstanceContainer) {
+            object = instanceContainer.getOwner();
+            instanceContainer = object.getInstanceContainer();
+          }
+          else {
+            hasParent = false;
+          }
+        } while (hasParent);
       }
 
       const workingPoint: FloatPoint = gdjs.staticArray(
@@ -141,6 +156,7 @@ namespace gdjs {
 
       const runtimeGame = this._instanceContainer.getGame();
       const runtimeGameRenderer = runtimeGame.getRenderer();
+      const layer = this._instanceContainer.getLayer(this._object.getLayer());
       const topLeftCanvasCoordinates = layer.convertInverseCoords(
         this._object.x,
         this._object.y,

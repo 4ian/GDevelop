@@ -290,6 +290,10 @@ namespace gdjs {
       return this._runtimeScene;
     }
 
+    getOwner() {
+      return this._customObject;
+    }
+
     getAsyncTasksManager(): AsyncTasksManager {
       return this._runtimeScene.getAsyncTasksManager();
     }

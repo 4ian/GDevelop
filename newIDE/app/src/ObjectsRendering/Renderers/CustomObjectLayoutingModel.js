@@ -381,9 +381,9 @@ export const getLayoutedRenderedInstance = <T: ChildRenderedInstance>(
   const initialInstanceX = initialInstance.getX();
   const initialInstanceWidth = initialInstance.hasCustomSize()
     ? initialInstance.getCustomWidth()
-    // The default width of Text object is dependent of the current wrapping width.
-    // It result in strange behaviors when text objects don't have a custom size.
-    : renderedInstance.getDefaultWidth();
+    : // The default width of Text object is dependent of the current wrapping width.
+      // It result in strange behaviors when text objects don't have a custom size.
+      renderedInstance.getDefaultWidth();
 
   if (parentScaleX === 1 || (!leftEdgeAnchor && !rightEdgeAnchor)) {
     layoutedInstance.x = initialInstanceX;

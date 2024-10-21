@@ -52,6 +52,13 @@ export interface PropertiesContainer {
   getProperties(): gdMapStringPropertyDescriptor;
 }
 
+const getDefaultAnchor = () => ({
+  leftEdgeAnchor: gd.CustomObjectConfiguration.NoAnchor,
+  topEdgeAnchor: gd.CustomObjectConfiguration.NoAnchor,
+  rightEdgeAnchor: gd.CustomObjectConfiguration.NoAnchor,
+  bottomEdgeAnchor: gd.CustomObjectConfiguration.NoAnchor,
+});
+
 /**
  * Build the layouts description from the custom object properties.
  */
@@ -59,14 +66,13 @@ export const getObjectAnchor = (
   eventBasedObject: gdEventsBasedObject,
   objectName: string
 ): ObjectAnchor => {
-  const childObject = eventBasedObject.getObjects().getObject(objectName);
+  const objects = eventBasedObject.getObjects();
+  if (!objects.hasObjectNamed(objectName)) {
+    return getDefaultAnchor();
+  }
+  const childObject = objects.getObject(objectName);
   if (!childObject.hasBehaviorNamed('Anchor')) {
-    return {
-      leftEdgeAnchor: gd.CustomObjectConfiguration.NoAnchor,
-      topEdgeAnchor: gd.CustomObjectConfiguration.NoAnchor,
-      rightEdgeAnchor: gd.CustomObjectConfiguration.NoAnchor,
-      bottomEdgeAnchor: gd.CustomObjectConfiguration.NoAnchor,
-    };
+    return getDefaultAnchor();
   }
   const properties = childObject.getBehavior('Anchor').getProperties();
   const leftEdgeAnchor = getPropertyValue(properties, 'leftEdgeAnchor');

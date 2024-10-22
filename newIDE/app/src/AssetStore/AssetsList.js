@@ -75,7 +75,7 @@ const getShopItemsColumns = (
 ) => {
   switch (windowSize) {
     case 'small':
-      return isLandscape ? 3 : 1;
+      return isLandscape ? 3 : 2;
     case 'medium':
       return 2;
     case 'large':

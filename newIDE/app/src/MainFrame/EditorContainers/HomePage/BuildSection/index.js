@@ -72,7 +72,7 @@ const cellSpacing = 2;
 const getItemsColumns = (windowSize: WindowSizeType, isLandscape: boolean) => {
   switch (windowSize) {
     case 'small':
-      return isLandscape ? 4 : 1;
+      return isLandscape ? 4 : 2;
     case 'medium':
       return 3;
     case 'large':
@@ -523,7 +523,7 @@ const BuildSection = ({
                   isMobile ? (
                     <Trans>Create</Trans>
                   ) : (
-                    <Trans>Create a project</Trans>
+                    <Trans>Create from scratch</Trans>
                   )
                 }
                 onClick={onOpenNewProjectSetupDialog}

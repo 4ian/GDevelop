@@ -47,7 +47,7 @@ const getHelpItemsColumnsFromWidth = (
 ) => {
   switch (windowSize) {
     case 'small':
-      return isLandscape ? 4 : 1;
+      return isLandscape ? 4 : 2;
     case 'medium':
       return 3;
     case 'large':
@@ -65,7 +65,7 @@ const getTutorialsColumnsFromWidth = (
 ) => {
   switch (windowSize) {
     case 'small':
-      return isLandscape ? 5 : 1;
+      return isLandscape ? 5 : 2;
     case 'medium':
       return 3;
     case 'large':

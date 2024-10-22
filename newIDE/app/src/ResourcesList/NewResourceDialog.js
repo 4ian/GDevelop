@@ -166,19 +166,21 @@ export const NewResourceDialog = ({
       ]}
       onRequestClose={onClose}
       fixedContent={
-        <Tabs
-          value={currentTab}
-          onChange={setCurrentTab}
-          options={[
-            ...standaloneTabResourceSources.map(({ name, displayName }) => ({
-              label: i18n._(displayName),
-              value: 'standalone-' + name,
-            })),
-            { label: <Trans>Choose a file</Trans>, value: 'import' },
-          ]}
-          // Enforce scroll on very small screens, because the tabs have long names.
-          variant={isMobile ? 'scrollable' : undefined}
-        />
+        standaloneTabResourceSources.length ? (
+          <Tabs
+            value={currentTab}
+            onChange={setCurrentTab}
+            options={[
+              ...standaloneTabResourceSources.map(({ name, displayName }) => ({
+                label: i18n._(displayName),
+                value: 'standalone-' + name,
+              })),
+              { label: <Trans>Choose a file</Trans>, value: 'import' },
+            ]}
+            // Enforce scroll on very small screens, because the tabs have long names.
+            variant={isMobile ? 'scrollable' : undefined}
+          />
+        ) : null
       }
     >
       {standaloneTabResourceSources.map(source => {

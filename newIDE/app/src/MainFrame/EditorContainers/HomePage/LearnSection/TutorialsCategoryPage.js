@@ -115,7 +115,7 @@ export const EducationCurriculum = ({
 const getColumnsFromWindowSize = (windowSize: WindowSizeType) => {
   switch (windowSize) {
     case 'small':
-      return 1;
+      return 2;
     case 'medium':
       return 3;
     case 'large':

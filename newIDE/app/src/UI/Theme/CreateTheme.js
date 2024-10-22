@@ -356,7 +356,6 @@ export const smallScreenMuiOverrides = {
 };
 
 const rtlDirection = { direction: 'rtl' };
-const rtlOrder = { order: 100 };
 
 export const rtlMuiOverrides = {
   MuiTypography: {
@@ -370,9 +369,6 @@ export const rtlMuiOverrides = {
   },
   MuiButton: {
     label: rtlDirection,
-  },
-  MuiSvgIcon: {
-    root: rtlOrder,
   },
   MuiFormControlLabel: {
     root: rtlDirection,

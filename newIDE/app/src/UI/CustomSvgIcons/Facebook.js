@@ -3,16 +3,36 @@ import SvgIcon from '@material-ui/core/SvgIcon';
 
 export default React.memo(props => (
   <SvgIcon
-    width="20"
-    height="20"
-    viewBox="0 0 20 20"
-    fill="none"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
     xmlns="http://www.w3.org/2000/svg"
     {...props}
+    fill="none"
   >
     <path
-      d="M11.3916 18.6667V10.7607H14.1423L14.555 7.67868H11.3916V5.71127C11.3916 4.81923 11.6475 4.21132 12.9754 4.21132L14.6663 4.21065V1.45399C14.3739 1.41735 13.3701 1.33333 12.2018 1.33333C9.76223 1.33333 8.09203 2.76936 8.09203 5.40603V7.67868H5.33301V10.7607H8.09203V18.6667H11.3916Z"
-      fill="currentColor"
+      d="M21 8V16C21 18.7614 18.7614 21 16 21H8C5.23858 21 3 18.7614 3 16V8C3 5.23858 5.23858 3 8 3H16C18.7614 3 21 5.23858 21 8Z"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+    />
+    <path
+      d="M11 21C11 18 11 15 11 12C11 9.8125 11.5 8 15 8"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+    />
+    <path
+      d="M9 13H11H15"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
     />
   </SvgIcon>
 ));

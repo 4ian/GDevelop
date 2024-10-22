@@ -115,7 +115,11 @@ const GameHeader = ({ game }: Props) => {
     />
   );
   const renderLinkAndShareIcons = (url: string) => (
-    <LineStackLayout noMargin justifyContent="space-between">
+    <LineStackLayout
+      noMargin
+      justifyContent="space-between"
+      alignItems="center"
+    >
       <Paper style={styles.linkContainer} background="light">
         <Text noMargin style={textEllipsisStyle}>
           <Link href={url} onClick={() => Window.openExternalURL(url)}>
@@ -154,6 +158,7 @@ const GameHeader = ({ game }: Props) => {
               {renderPublicInfo()}
             </LineStackLayout>
             {gameUrl && renderLinkAndShareIcons(gameUrl)}
+            {renderButtons()}
           </ColumnStackLayout>
         )}
       </I18n>

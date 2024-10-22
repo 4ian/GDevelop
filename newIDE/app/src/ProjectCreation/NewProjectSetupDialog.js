@@ -41,7 +41,6 @@ import ResolutionOptions, {
   defaultCustomHeight,
 } from './ResolutionOptions';
 import Text from '../UI/Text';
-import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import generatePrompt from '../Utils/ProjectPromptGenerator';
 import ProjectGeneratingDialog from './ProjectGeneratingDialog';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
@@ -53,6 +52,7 @@ import GetSubscriptionCard from '../Profile/Subscription/GetSubscriptionCard';
 import { type PrivateGameTemplateListingData } from '../Utils/GDevelopServices/Shop';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 import { CLOUD_PROJECT_NAME_MAX_LENGTH } from '../Utils/GDevelopServices/Project';
+import { Accordion, AccordionBody, AccordionHeader } from '../UI/Accordion';
 
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
@@ -157,8 +157,7 @@ const NewProjectSetupDialog = ({
     false
   );
   const [allowPlayersToLogIn, setAllowPlayersToLogIn] = React.useState<boolean>(
-    // Enable player login by default for new games, unless a tutorial is running or offline.
-    !!currentlyRunningInAppTutorial || !isOnline ? false : true
+    false
   );
   const newProjectsDefaultFolder = app
     ? findEmptyPathInWorkspaceFolder(app, values.newProjectsDefaultFolder || '')
@@ -534,12 +533,6 @@ const NewProjectSetupDialog = ({
               })}
             {isStartingProjectFromScratch && (
               <ColumnStackLayout noMargin expand>
-                <DismissableAlertMessage
-                  kind="info"
-                  identifier="new-generate-project-from-prompt"
-                >
-                  <Trans>NEW! Generate a pre-made AI scene with assets.</Trans>
-                </DismissableAlertMessage>
                 <LineStackLayout
                   expand
                   noMargin
@@ -564,8 +557,8 @@ const NewProjectSetupDialog = ({
                     floatingLabelFixed
                     translatableHintText={
                       !authenticatedUser.authenticated || !isOnline
-                        ? t`Log in to generate a project from a prompt`
-                        : t`Type a prompt yourself or generate a random one`
+                        ? t`Log in to enter a prompt`
+                        : t`Type a prompt or generate one`
                     }
                     endAdornment={
                       <IconButton
@@ -599,30 +592,40 @@ const NewProjectSetupDialog = ({
                       </Line>
                     </GetSubscriptionCard>
                   )}
-                <Text size="sub-title">
-                  <Trans>Advanced File options</Trans>
-                </Text>
-                <Checkbox
-                  checked={optimizeForPixelArt}
-                  label={<Trans>Optimize for Pixel Art</Trans>}
-                  onCheck={(e, checked) => {
-                    setOptimizeForPixelArt(checked);
-                  }}
-                  disabled={isLoading}
-                />
-                <Checkbox
-                  checked={allowPlayersToLogIn}
-                  label={<Trans>Allow players to authenticate in-game</Trans>}
-                  onCheck={(e, checked) => {
-                    setAllowPlayersToLogIn(checked);
-                  }}
-                  disabled={isLoading || !isOnline}
-                  tooltipOrHelperText={
-                    <MarkdownText
-                      translatableSource={t`Learn more about [player authentication](https://wiki.gdevelop.io/gdevelop5/all-features/player-authentication).`}
-                    />
-                  }
-                />
+                <Accordion defaultExpanded={false} noMargin>
+                  <AccordionHeader noMargin>
+                    <Text size="sub-title">
+                      <Trans>Advanced File options</Trans>
+                    </Text>
+                  </AccordionHeader>
+                  <AccordionBody disableGutters>
+                    <Column expand noMargin>
+                      <Checkbox
+                        checked={optimizeForPixelArt}
+                        label={<Trans>Optimize for Pixel Art</Trans>}
+                        onCheck={(e, checked) => {
+                          setOptimizeForPixelArt(checked);
+                        }}
+                        disabled={isLoading}
+                      />
+                      <Checkbox
+                        checked={allowPlayersToLogIn}
+                        label={
+                          <Trans>Allow players to authenticate in-game</Trans>
+                        }
+                        onCheck={(e, checked) => {
+                          setAllowPlayersToLogIn(checked);
+                        }}
+                        disabled={isLoading || !isOnline}
+                        tooltipOrHelperText={
+                          <MarkdownText
+                            translatableSource={t`Learn more about [player authentication](https://wiki.gdevelop.io/gdevelop5/all-features/player-authentication).`}
+                          />
+                        }
+                      />
+                    </Column>
+                  </AccordionBody>
+                </Accordion>
               </ColumnStackLayout>
             )}
             {limits && hasTooManyCloudProjects ? (

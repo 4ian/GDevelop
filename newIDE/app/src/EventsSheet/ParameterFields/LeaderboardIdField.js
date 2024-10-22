@@ -31,7 +31,7 @@ const getInlineParameterDisplayValue = (
   return leaderboard ? leaderboard.name : value;
 };
 
-const useFetchLeaderboards = () => {
+export const useFetchLeaderboards = () => {
   const { leaderboards, listLeaderboards } = React.useContext(
     LeaderboardContext
   );
@@ -161,8 +161,12 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
                     ) => {
                       if (!leaderboards) {
                         if (!isOnline)
-                          return 'Unable to fetch leaderboards as you are offline.';
-                        return 'Your game may not be registered, create one in the leaderboard manager.';
+                          return i18n._(
+                            t`Unable to fetch leaderboards as you are offline.`
+                          );
+                        return i18n._(
+                          t`Your game may not be registered, create one in the leaderboard manager.`
+                        );
                       }
                     }}
                   />

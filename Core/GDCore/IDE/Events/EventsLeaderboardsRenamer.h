@@ -3,8 +3,8 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef EventsLeaderboardsRenamer_H
-#define EventsLeaderboardsRenamer_H
+#pragma once
+
 #include <map>
 #include <memory>
 #include <set>
@@ -42,5 +42,3 @@ class GD_CORE_API EventsLeaderboardsRenamer : public ArbitraryEventsWorker {
 };
 
 }  // namespace gd
-
-#endif  // EventsLeaderboardsRenamer_H

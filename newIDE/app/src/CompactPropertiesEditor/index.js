@@ -32,6 +32,7 @@ import { CompactTextAreaField } from '../UI/CompactTextAreaField';
 import { CompactColorField } from '../UI/CompactColorField';
 import { rgbOrHexToRGBString } from '../Utils/ColorTransformer';
 import { CompactResourceSelectorWithThumbnail } from '../ResourcesList/CompactResourceSelectorWithThumbnail';
+import CompactLeaderboardIdPropertyField from './CompactLeaderboardIdPropertyField';
 
 // An "instance" here is the objects for which properties are shown
 export type Instance = Object; // This could be improved using generics.
@@ -123,6 +124,13 @@ export type ResourceField = {|
   ...ValueFieldCommonProperties,
 |};
 
+export type LeaderboardIdField = {|
+  valueType: 'leaderboardId',
+  getValue: Instance => string,
+  setValue: (instance: Instance, newValue: string) => void,
+  ...ValueFieldCommonProperties,
+|};
+
 export type Title = {|
   name: string,
   title: string,
@@ -168,12 +176,16 @@ type ToggleButtons = {|
 |};
 
 // A value field is a primitive or a resource.
-export type ValueField = PrimitiveValueField | ResourceField;
+export type ValueField =
+  | PrimitiveValueField
+  | ResourceField
+  | LeaderboardIdField;
 
 // A field can be a primitive, a resource or a list of fields
 export type Field =
   | PrimitiveValueField
   | ResourceField
+  | LeaderboardIdField
   | SectionTitle
   | Title
   | ActionButton
@@ -811,6 +823,39 @@ const CompactPropertiesEditor = ({
     );
   };
 
+  const renderLeaderboardIdField = (field: LeaderboardIdField) => {
+    if (!project) {
+      return null;
+    }
+
+    const { setValue } = field;
+    return (
+      <CompactPropertiesEditorRowField
+        key={field.name}
+        label={getFieldLabel({ instances, field })}
+        markdownDescription={getFieldDescription(field)}
+        field={
+          <CompactLeaderboardIdPropertyField
+            key={field.name}
+            project={project}
+            value={getFieldValue({
+              instances,
+              field,
+              defaultValue: '(Multiple values)',
+            })}
+            onChange={newValue => {
+              instances.forEach(i => setValue(i, newValue));
+              onFieldChanged({
+                instances,
+                hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
+              });
+            }}
+          />
+        }
+      />
+    );
+  };
+
   const renderVerticalCenterWithBar = (field: Field) =>
     field.child && field.child.getValue ? (
       <VerticallyCenterWithBar key={field.name}>
@@ -998,6 +1043,8 @@ const CompactPropertiesEditor = ({
         return contentView;
       } else if (field.valueType === 'resource') {
         return renderResourceField(field);
+      } else if (field.valueType === 'leaderboardId') {
+        return renderLeaderboardIdField(field);
       } else {
         if (field.getChoices && field.getValue) return renderSelectField(field);
         if (field.getValue) return renderInputField(field);

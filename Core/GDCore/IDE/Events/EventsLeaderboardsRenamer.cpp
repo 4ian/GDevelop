@@ -19,26 +19,34 @@
 
 namespace gd {
 
-bool EventsLeaderboardsRenamer::DoVisitInstruction(gd::Instruction& instruction,
+bool EventsLeaderboardsRenamer::DoVisitInstruction(gd::Instruction &instruction,
                                                    bool isCondition) {
-  const gd::InstructionMetadata& instrInfo =
-      isCondition ? MetadataProvider::GetConditionMetadata(
-                        project.GetCurrentPlatform(), instruction.GetType())
-                  : MetadataProvider::GetActionMetadata(
-                        project.GetCurrentPlatform(), instruction.GetType());
+  const gd::InstructionMetadata &instrInfo =
+      isCondition
+          ? MetadataProvider::GetConditionMetadata(project.GetCurrentPlatform(),
+                                                   instruction.GetType())
+          : MetadataProvider::GetActionMetadata(project.GetCurrentPlatform(),
+                                                instruction.GetType());
 
   for (int i = 0; i < instruction.GetParametersCount() &&
                   i < instrInfo.GetParametersCount();
        ++i) {
     const gd::ParameterMetadata parameter = instrInfo.GetParameter(i);
 
-    if (parameter.GetType() == "leaderboardId") {
-      const gd::String leaderboardId =
-          instruction.GetParameter(i).GetPlainString();
-
-      if (leaderboardIdMap.find(leaderboardId) != leaderboardIdMap.end()) {
-        instruction.SetParameter(i, leaderboardIdMap[leaderboardId]);
-      }
+    if (parameter.GetType() != "leaderboardId") {
+      continue;
+    }
+    const gd::String leaderboardIdExpression =
+        instruction.GetParameter(i).GetPlainString();
+    if (leaderboardIdExpression[0] != '"' ||
+        leaderboardIdExpression[leaderboardIdExpression.size() - 1] != '"') {
+      continue;
+    }
+    const gd::String leaderboardId =
+        leaderboardIdExpression.substr(1, leaderboardIdExpression.size() - 2);
+    if (leaderboardIdMap.find(leaderboardId) != leaderboardIdMap.end()) {
+      instruction.SetParameter(i,
+                               "\"" + leaderboardIdMap[leaderboardId] + "\"");
     }
   }
   return false;
@@ -46,4 +54,4 @@ bool EventsLeaderboardsRenamer::DoVisitInstruction(gd::Instruction& instruction,
 
 EventsLeaderboardsRenamer::~EventsLeaderboardsRenamer() {}
 
-}  // namespace gd
+} // namespace gd

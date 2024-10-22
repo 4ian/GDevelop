@@ -247,7 +247,7 @@ bool PropertyFunctionGenerator::CanGenerateGetterAndSetter(
     const gd::NamedPropertyDescriptor &property) {
   auto &type = property.GetType();
   if (type != "Boolean" && type != "Number" && type != "String" &&
-      type != "Choice" && type != "Color") {
+      type != "Choice" && type != "Color" && type != "LeaderboardId") {
     return false;
   }
 

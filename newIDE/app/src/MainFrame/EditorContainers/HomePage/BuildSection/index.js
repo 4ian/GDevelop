@@ -449,7 +449,7 @@ const BuildSection = ({
     <SectionContainer
       showUrgentAnnouncements={shouldDisplayAnnouncements}
       renderFooter={
-        limits && hasTooManyCloudProjects
+        !isMobile && limits && hasTooManyCloudProjects
           ? () => (
               <Line>
                 <Column expand>
@@ -618,6 +618,19 @@ const BuildSection = ({
                     }
                   />
                 ))}
+                {isMobile && limits && hasTooManyCloudProjects && (
+                  <MaxProjectCountAlertMessage
+                    margin="dense"
+                    limits={limits}
+                    onUpgrade={() =>
+                      openSubscriptionDialog({
+                        analyticsMetadata: {
+                          reason: 'Cloud Project limit reached',
+                        },
+                      })
+                    }
+                  />
+                )}
               </List>
             </Column>
           </Line>

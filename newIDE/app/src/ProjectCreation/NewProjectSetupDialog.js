@@ -595,7 +595,7 @@ const NewProjectSetupDialog = ({
                 <Accordion defaultExpanded={false} noMargin>
                   <AccordionHeader noMargin>
                     <Text size="sub-title">
-                      <Trans>Advanced File options</Trans>
+                      <Trans>Advanced options</Trans>
                     </Text>
                   </AccordionHeader>
                   <AccordionBody disableGutters>

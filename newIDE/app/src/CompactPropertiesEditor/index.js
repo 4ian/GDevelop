@@ -32,6 +32,7 @@ import { CompactTextAreaField } from '../UI/CompactTextAreaField';
 import { CompactColorField } from '../UI/CompactColorField';
 import { rgbOrHexToRGBString } from '../Utils/ColorTransformer';
 import { CompactResourceSelectorWithThumbnail } from '../ResourcesList/CompactResourceSelectorWithThumbnail';
+import CompactLeaderboardIdPropertyField from './CompactLeaderboardIdPropertyField';
 
 // An "instance" here is the objects for which properties are shown
 export type Instance = Object; // This could be improved using generics.
@@ -822,6 +823,39 @@ const CompactPropertiesEditor = ({
     );
   };
 
+  const renderLeaderboardIdField = (field: LeaderboardIdField) => {
+    if (!project) {
+      return null;
+    }
+
+    const { setValue } = field;
+    return (
+      <CompactPropertiesEditorRowField
+        key={field.name}
+        label={getFieldLabel({ instances, field })}
+        markdownDescription={getFieldDescription(field)}
+        field={
+          <CompactLeaderboardIdPropertyField
+            key={field.name}
+            project={project}
+            value={getFieldValue({
+              instances,
+              field,
+              defaultValue: '(Multiple values)',
+            })}
+            onChange={newValue => {
+              instances.forEach(i => setValue(i, newValue));
+              onFieldChanged({
+                instances,
+                hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
+              });
+            }}
+          />
+        }
+      />
+    );
+  };
+
   const renderVerticalCenterWithBar = (field: Field) =>
     field.child && field.child.getValue ? (
       <VerticallyCenterWithBar key={field.name}>
@@ -1010,8 +1044,7 @@ const CompactPropertiesEditor = ({
       } else if (field.valueType === 'resource') {
         return renderResourceField(field);
       } else if (field.valueType === 'leaderboardId') {
-        // TODO Make a compact version of LeaderboardIdPropertyField
-        return null;
+        return renderLeaderboardIdField(field);
       } else {
         if (field.getChoices && field.getValue) return renderSelectField(field);
         if (field.getValue) return renderInputField(field);

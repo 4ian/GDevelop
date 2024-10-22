@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import { t } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import SelectField, { type SelectFieldInterface } from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
@@ -121,6 +121,18 @@ export default React.forwardRef<Props, LeaderboardIdPropertyFieldInterface>(
                     helperMarkdownText={props.helperMarkdownText}
                     multiline
                     style={props.fieldStyle}
+                    errorText={
+                      leaderboards ? null : isOnline ? (
+                        <Trans>
+                          Your game may not be registered, create one in the
+                          leaderboard manager.
+                        </Trans>
+                      ) : (
+                        <Trans>
+                          Unable to fetch leaderboards as you are offline.
+                        </Trans>
+                      )
+                    }
                   />
                 )
               }

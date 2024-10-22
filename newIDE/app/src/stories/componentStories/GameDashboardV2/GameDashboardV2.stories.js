@@ -4,7 +4,6 @@ import * as React from 'react';
 
 import paperDecorator from '../../PaperDecorator';
 
-import { action } from '@storybook/addon-actions';
 import GameDashboardV2 from '../../../GameDashboardV2';
 
 import { game1 } from '../../../fixtures/GDevelopServicesTestData';

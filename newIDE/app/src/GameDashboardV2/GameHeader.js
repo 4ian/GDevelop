@@ -63,7 +63,7 @@ const GameHeader = ({ game }: Props) => {
       fontSize: 'small',
     };
     return (
-      <ResponsiveLineStackLayout alignItems="center">
+      <ResponsiveLineStackLayout alignItems="center" noColumnMargin>
         <div style={styles.iconAndText}>
           <DiscoverabilityIcon {...iconProps} />
           <Text {...textProps}>
@@ -135,7 +135,7 @@ const GameHeader = ({ game }: Props) => {
   );
 
   const renderButtons = () => (
-    <LineStackLayout>
+    <LineStackLayout noMargin>
       <RaisedButton
         primary
         label={<Trans>Edit details</Trans>}
@@ -151,7 +151,7 @@ const GameHeader = ({ game }: Props) => {
     return (
       <I18n>
         {({ i18n }) => (
-          <ColumnStackLayout>
+          <ColumnStackLayout noMargin>
             {renderTitle(i18n)}
             <LineStackLayout>
               {renderThumbnail()}
@@ -170,7 +170,7 @@ const GameHeader = ({ game }: Props) => {
       {({ i18n }) => (
         <LineStackLayout>
           {renderThumbnail()}
-          <ColumnStackLayout expand>
+          <ColumnStackLayout expand noMargin>
             <LineStackLayout
               noMargin
               justifyContent="space-between"

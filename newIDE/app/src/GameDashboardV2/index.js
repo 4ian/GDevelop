@@ -12,7 +12,7 @@ type Props = {|
 
 const GameDashboardV2 = ({ game }: Props) => {
   return (
-    <ColumnStackLayout>
+    <ColumnStackLayout noMargin>
       <GameHeader game={game} />
     </ColumnStackLayout>
   );

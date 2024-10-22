@@ -68,6 +68,10 @@ export const QuickPublish = ({
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
   );
+  const [
+    numberOfCloudProjectsBeforeSavingCustomizedGame,
+    setNumberOfCloudProjectsBeforeSavingCustomizedGame,
+  ] = React.useState<number | null>(null);
   const [exportState, setExportState] = React.useState<
     '' | 'started' | 'succeeded' | 'errored'
   >('');
@@ -94,12 +98,29 @@ export const QuickPublish = ({
     />
   );
 
+  React.useEffect(
+    () => {
+      if (!cloudProjects) {
+        setNumberOfCloudProjectsBeforeSavingCustomizedGame(null);
+      } else if (numberOfCloudProjectsBeforeSavingCustomizedGame === null) {
+        setNumberOfCloudProjectsBeforeSavingCustomizedGame(
+          cloudProjects.filter(cloudProject => !cloudProject.deletedAt).length
+        );
+      }
+    },
+    // Store the number of cloud projects **before** the user saved this quick-customized
+    // game. Otherwise, they might reach the max number saving it, and the callout would
+    // be displayed instead of the game link.
+    [cloudProjects, numberOfCloudProjectsBeforeSavingCustomizedGame]
+  );
+
   const isLoadingCloudProjects = !!profile && !cloudProjects;
   const isCloudProjectsMaximumReached =
     !!limits &&
     !!cloudProjects &&
     limits.capabilities.cloudProjects.maximumCount > 0 &&
-    cloudProjects.filter(cloudProject => !cloudProject.deletedAt).length >=
+    numberOfCloudProjectsBeforeSavingCustomizedGame !== null &&
+    numberOfCloudProjectsBeforeSavingCustomizedGame >=
       limits.capabilities.cloudProjects.maximumCount;
   const shouldSaveAndLaunchExport =
     !!profile &&

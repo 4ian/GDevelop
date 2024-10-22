@@ -882,6 +882,11 @@ module.exports = {
       )
       .addCodeOnlyParameter('currentScene', '')
       .addParameter('variable', _('Variable'), '', false)
+      .setParameterLongDescription(
+        _(
+          'Only root variables can change ownership. Arrays and structures children are synchronized with their parent.'
+        )
+      )
       .useStandardParameters(
         'number',
         gd.ParameterOptions.makeNewOptions().setDescription(_('Player number'))
@@ -916,6 +921,11 @@ module.exports = {
       )
       .addCodeOnlyParameter('currentScene', '')
       .addParameter('variable', _('Variable'), '', false)
+      .setParameterLongDescription(
+        _(
+          'Only root variables can change ownership. Arrays and structures children are synchronized with their parent.'
+        )
+      )
       .setHelpPath('/all-features/multiplayer')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Multiplayer/peer.js')
@@ -947,6 +957,11 @@ module.exports = {
       )
       .addCodeOnlyParameter('currentScene', '')
       .addParameter('variable', _('Variable'), '', false)
+      .setParameterLongDescription(
+        _(
+          'Only root variables can change ownership. Arrays and structures children are synchronized with their parent.'
+        )
+      )
       .setHelpPath('/all-features/multiplayer')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Multiplayer/peer.js')

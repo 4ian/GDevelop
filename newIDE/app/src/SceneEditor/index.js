@@ -629,17 +629,16 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _createNewObjectAndInstanceUnderCursor = () => {
-    if (!this.editorDisplay) {
+    const { editorDisplay } = this;
+    if (!editorDisplay) {
       return;
     }
 
-    // Remember where to create the instance, when the object will be created
+    // Remember where to create the instance, when the object will be created.
     this.setState({
-      newObjectInstanceSceneCoordinates: this.editorDisplay.viewControls.getLastCursorSceneCoordinates(),
+      newObjectInstanceSceneCoordinates: editorDisplay.viewControls.getLastCursorSceneCoordinates(),
     });
-
-    if (this.editorDisplay) this.editorDisplay.openNewObjectDialog();
-    else this.toggleObjectsList();
+    editorDisplay.openNewObjectDialog();
   };
 
   addInstanceOnTheScene = (

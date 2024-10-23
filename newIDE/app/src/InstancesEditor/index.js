@@ -529,7 +529,8 @@ export default class InstancesEditor extends Component<Props, State> {
     this.tileMapPaintingPreview = new TileMapPaintingPreview({
       instancesSelection: this.props.instancesSelection,
       project: props.project,
-      layout: props.layout,
+      globalObjectsContainer: props.globalObjectsContainer,
+      objectsContainer: props.objectsContainer,
       getTileMapTileSelection: this.getTileMapTileSelection,
       getRendererOfInstance: this.getRendererOfInstance,
       getCoordinatesToRender: this.getCoordinatesToRenderTileMapPreview,
@@ -770,6 +771,7 @@ export default class InstancesEditor extends Component<Props, State> {
     serializedInstances: Array<Object>,
     preventSnapToGrid?: boolean,
     addInstancesInTheForeground?: boolean,
+    doesObjectExistInContext: string => boolean,
   |}): Array<gdInitialInstance> => {
     return this._instancesAdder.addSerializedInstances(options);
   };
@@ -795,8 +797,8 @@ export default class InstancesEditor extends Component<Props, State> {
     const {
       tileMapTileSelection,
       instancesSelection,
-      project,
-      layout,
+      globalObjectsContainer,
+      objectsContainer,
     } = this.props;
     if (!tileMapTileSelection) {
       return;
@@ -805,8 +807,8 @@ export default class InstancesEditor extends Component<Props, State> {
     if (selectedInstances.length !== 1) return;
     const selectedInstance = selectedInstances[0];
     const object = getObjectByName(
-      project.getObjects(),
-      layout ? layout.getObjects() : null,
+      globalObjectsContainer,
+      objectsContainer,
       selectedInstance.getObjectName()
     );
     if (!object) return;

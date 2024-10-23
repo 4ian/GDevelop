@@ -1005,22 +1005,17 @@ export default class SceneEditor extends React.Component<Props, State> {
     const {
       project,
       layout,
-      objectsContainer,
-      globalObjectsContainer,
+      projectScopedContainersAccessor,
     } = this.props;
+
+    const objectsContainersList = projectScopedContainersAccessor
+      .get()
+      .getObjectsContainersList();
 
     const safeAndUniqueNewName = newNameGenerator(
       gd.Project.getSafeName(newName),
       tentativeNewName => {
-        // TODO Use ProjectScopedContainers to check if an object or a group exist.
-        if (
-          objectsContainer.hasObjectNamed(tentativeNewName) ||
-          (!!globalObjectsContainer &&
-            globalObjectsContainer.hasObjectNamed(tentativeNewName)) ||
-          objectsContainer.getObjectGroups().has(tentativeNewName) ||
-          (!!globalObjectsContainer &&
-            globalObjectsContainer.getObjectGroups().has(tentativeNewName))
-        ) {
+        if (objectsContainersList.hasObjectOrGroupNamed(tentativeNewName)) {
           return true;
         }
 
@@ -1631,6 +1626,9 @@ export default class SceneEditor extends React.Component<Props, State> {
         copyReferential: [-2 * MOVEMENT_BIG_DELTA, -2 * MOVEMENT_BIG_DELTA],
         serializedInstances: serializedSelection,
         preventSnapToGrid: true,
+        doesObjectExistInContext:
+          // Instance duplication can only be done in the same scene, so no need to check
+          () => true,
       }
     );
     this._onInstancesAdded(newInstances);
@@ -1675,6 +1673,11 @@ export default class SceneEditor extends React.Component<Props, State> {
         copyReferential: [x, y],
         serializedInstances: instancesContent,
         addInstancesInTheForeground: pasteInTheForeground,
+        doesObjectExistInContext: objectName =>
+          this.props.projectScopedContainersAccessor
+            .get()
+            .getObjectsContainersList()
+            .hasObjectNamed(objectName),
       }
     );
 
@@ -1907,8 +1910,8 @@ export default class SceneEditor extends React.Component<Props, State> {
       : null;
     const variablesEditedAssociatedObject = variablesEditedAssociatedObjectName
       ? getObjectByName(
-          project.getObjects(),
-          layout ? layout.getObjects() : null,
+          this.props.globalObjectsContainer,
+          this.props.objectsContainer,
           variablesEditedAssociatedObjectName
         )
       : null;

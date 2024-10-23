@@ -70,7 +70,8 @@ export const updateSceneToTileMapTransformation = (
 
 type Props = {|
   project: gdProject,
-  layout: gdLayout | null,
+  globalObjectsContainer: gdObjectsContainer | null,
+  objectsContainer: gdObjectsContainer | null,
   instancesSelection: InstancesSelection,
   getCoordinatesToRender: () => {| x: number, y: number |}[],
   getTileMapTileSelection: () => ?TileMapTileSelection,
@@ -83,7 +84,8 @@ type Props = {|
 
 class TileMapPaintingPreview {
   project: gdProject;
-  layout: gdLayout | null;
+  globalObjectsContainer: gdObjectsContainer | null;
+  objectsContainer: gdObjectsContainer | null;
   instancesSelection: InstancesSelection;
   getCoordinatesToRender: () => {| x: number, y: number |}[];
   getTileMapTileSelection: () => ?TileMapTileSelection;
@@ -103,13 +105,15 @@ class TileMapPaintingPreview {
     instancesSelection,
     getCoordinatesToRender,
     project,
-    layout,
+    globalObjectsContainer,
+    objectsContainer,
     getTileMapTileSelection,
     getRendererOfInstance,
     viewPosition,
   }: Props) {
     this.project = project;
-    this.layout = layout;
+    this.globalObjectsContainer = globalObjectsContainer;
+    this.objectsContainer = objectsContainer;
     this.instancesSelection = instancesSelection;
     this.getCoordinatesToRender = getCoordinatesToRender;
     this.getTileMapTileSelection = getTileMapTileSelection;
@@ -308,8 +312,8 @@ class TileMapPaintingPreview {
     const instance = selection[0];
     const associatedObjectName = instance.getObjectName();
     const object = getObjectByName(
-      this.project.getObjects(),
-      this.layout ? this.layout.getObjects() : null,
+      this.globalObjectsContainer,
+      this.objectsContainer,
       associatedObjectName
     );
     if (!object || object.getType() !== 'TileMap::SimpleTileMap') return;

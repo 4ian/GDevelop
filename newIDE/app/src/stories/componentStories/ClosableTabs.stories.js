@@ -266,6 +266,9 @@ export const WithObjectsList = () => (
                   eventsBasedObject={null}
                   globalObjectsContainer={testProject.project.getObjects()}
                   objectsContainer={testProject.testLayout.getObjects()}
+                  projectScopedContainersAccessor={
+                    testProject.testSceneProjectScopedContainersAccessor
+                  }
                   resourceManagementProps={fakeResourceManagementProps}
                   onEditObject={action('On edit object')}
                   onOpenEventBasedObjectEditor={action('On edit children')}

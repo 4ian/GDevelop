@@ -168,6 +168,7 @@ export type SceneEditorsDisplayInterface = {|
       serializedInstances: Array<Object>,
       preventSnapToGrid?: boolean,
       addInstancesInTheForeground?: boolean,
+      doesObjectExistInContext: string => boolean,
     |}) => Array<gdInitialInstance>,
   |},
 |};

@@ -45,7 +45,6 @@ export const Default = () => (
           )}
           onRenameExternalEvents={action('onRenameExternalEvents')}
           onOpenResources={action('onOpenResources')}
-          onOpenPlatformSpecificAssets={action('onOpenPlatformSpecificAssets')}
           eventsFunctionsExtensionsError={null}
           onReloadEventsFunctionsExtensions={action(
             'onReloadEventsFunctionsExtensions'
@@ -88,7 +87,6 @@ export const ErrorsInFunctions = () => (
           )}
           onRenameExternalEvents={action('onRenameExternalEvents')}
           onOpenResources={action('onOpenResources')}
-          onOpenPlatformSpecificAssets={action('onOpenPlatformSpecificAssets')}
           eventsFunctionsExtensionsError={
             new Error('Fake error during code generation')
           }

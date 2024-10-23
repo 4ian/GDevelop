@@ -408,7 +408,6 @@ type Props = {|
   ...ExternalEventsTreeViewItemCallbacks,
   ...ExternalLayoutTreeViewItemCallbacks,
   onOpenResources: () => void,
-  onOpenPlatformSpecificAssets: () => void,
   eventsFunctionsExtensionsError: ?Error,
   onReloadEventsFunctionsExtensions: () => void,
   freezeUpdate: boolean,
@@ -439,7 +438,6 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       onOpenExternalLayout,
       onOpenEventsFunctionsExtension,
       onOpenResources,
-      onOpenPlatformSpecificAssets,
       eventsFunctionsExtensionsError,
       onReloadEventsFunctionsExtensions,
       freezeUpdate,
@@ -496,6 +494,10 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     const openProjectLoadingScreen = React.useCallback(() => {
       setProjectPropertiesDialogOpen(true);
       setProjectPropertiesDialogInitialTab('loading-screen');
+    }, []);
+    const openProjectIcons = React.useCallback(() => {
+      setProjectPropertiesDialogOpen(true);
+      setProjectPropertiesDialogInitialTab('icons');
     }, []);
     const onProjectPropertiesApplied = React.useCallback(
       (options: { newName?: string }) => {
@@ -976,7 +978,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                   new ActionTreeViewItemContent(
                     gameIconsItemId,
                     i18n._(t`Icons`),
-                    onOpenPlatformSpecificAssets,
+                    openProjectIcons,
                     'res/icons_default/picture_black.svg'
                   )
                 ),
@@ -1176,7 +1178,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         externalEventsTreeViewItemProps,
         externalLayoutTreeViewItemProps,
         onOpenGamesDashboardDialog,
-        onOpenPlatformSpecificAssets,
+        openProjectIcons,
         onOpenResources,
         openProjectProperties,
         openProjectVariables,
@@ -1253,7 +1255,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           onOpenProjectLoadingScreen={openProjectLoadingScreen}
           onOpenProjectVariables={openProjectVariables}
           onOpenResourcesDialog={onOpenResources}
-          onOpenPlatformSpecificAssetsDialog={onOpenPlatformSpecificAssets}
+          onOpenPlatformSpecificAssetsDialog={openProjectIcons}
           onOpenSearchExtensionDialog={openSearchExtensionDialog}
         />
         <Column>

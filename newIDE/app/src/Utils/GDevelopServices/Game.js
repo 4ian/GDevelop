@@ -8,6 +8,8 @@ import { type Filters } from './Filters';
 import { type UserPublicProfile } from './User';
 import { t } from '@lingui/macro';
 
+export type GameUploadType = 'game-thumbnail' | 'game-screenshot';
+
 export type CachedGameSlug = {
   username: string,
   gameSlug: string,
@@ -532,6 +534,47 @@ export const getGameCommentQualityRatingsLeaderboards = async (): Promise<
   if (!Array.isArray(response.data)) {
     throw new Error('Invalid response from the game leaderboard API');
   }
+
+  return response.data;
+};
+
+export const createGameResourceSignedUrls = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    gameId,
+    userId,
+    uploadType,
+    files,
+  }: {|
+    gameId: string,
+    userId: string,
+    uploadType: GameUploadType,
+    files: Array<{|
+      contentType: string,
+    |}>,
+  |}
+): Promise<{|
+  signedUrls: Array<{|
+    signedUrl: string,
+    publicUrl: string,
+  |}>,
+|}> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await client.post(
+    `/game/${gameId}/signed-url`,
+    {
+      uploadType,
+      files,
+    },
+    {
+      headers: {
+        Authorization: authorizationHeader,
+      },
+      params: {
+        userId,
+      },
+    }
+  );
 
   return response.data;
 };

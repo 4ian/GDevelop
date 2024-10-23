@@ -3723,8 +3723,6 @@ const MainFrame = (props: Props) => {
       {!!currentProject && platformSpecificAssetsDialogOpen && (
         <PlatformSpecificAssetsDialog
           project={currentProject}
-          open
-          onApply={() => openPlatformSpecificAssetsDialog(false)}
           onClose={() => openPlatformSpecificAssetsDialog(false)}
           resourceManagementProps={resourceManagementProps}
         />

@@ -975,7 +975,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                 new LeafTreeViewItem(
                   new ActionTreeViewItemContent(
                     gameIconsItemId,
-                    i18n._(t`Icons and thumbnail`),
+                    i18n._(t`Icons`),
                     onOpenPlatformSpecificAssets,
                     'res/icons_default/picture_black.svg'
                   )

@@ -14,7 +14,6 @@ import {
   applyPublicPropertiesToProject,
   type PartialGameChange,
 } from '../../../GameDashboard/PublicGamePropertiesDialog';
-import { getWebBuildThumbnailUrl } from '../../../Utils/GDevelopServices/Build';
 import RaisedButtonWithSplitMenu from '../../../UI/RaisedButtonWithSplitMenu';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import LeftLoader from '../../../UI/LeftLoader';
@@ -28,6 +27,8 @@ type Props = {|
   onApply: PartialGameChange => Promise<void>,
   isLoading: boolean,
   i18n: I18nType,
+  onUpdatingGame?: (isGameUpdating: boolean) => void,
+  onGameUpdated?: (game: Game) => void,
 |};
 
 export const OnlineGamePropertiesDialog = ({
@@ -39,6 +40,8 @@ export const OnlineGamePropertiesDialog = ({
   onApply,
   isLoading,
   i18n,
+  onUpdatingGame,
+  onGameUpdated,
 }: Props) => {
   const { profile } = React.useContext(AuthenticatedUserContext);
 
@@ -79,7 +82,6 @@ export const OnlineGamePropertiesDialog = ({
   const [discoverable, setDiscoverable] = React.useState<boolean>(
     !!game.discoverable
   );
-  const thumbnailUrl = getWebBuildThumbnailUrl(project, buildId);
 
   const onPublish = async ({ saveProject }: { saveProject: boolean }) => {
     // First update the project with the new properties.
@@ -166,7 +168,9 @@ export const OnlineGamePropertiesDialog = ({
         discoverable={discoverable}
         setDiscoverable={setDiscoverable}
         displayThumbnail
-        thumbnailUrl={thumbnailUrl}
+        thumbnailUrl={game.thumbnailUrl}
+        onGameUpdated={onGameUpdated}
+        onUpdatingGame={onUpdatingGame}
         disabled={isLoading}
       />
     </Dialog>

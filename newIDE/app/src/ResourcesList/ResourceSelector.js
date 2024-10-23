@@ -56,6 +56,7 @@ type Props = {|
   margin?: 'none' | 'dense',
   style?: {| alignSelf?: 'center' |},
   id?: string,
+  disabled?: boolean,
 |};
 
 export type ResourceSelectorInterface = {| focus: FieldFocusFunction |};
@@ -71,6 +72,7 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
       resourceKind,
       fallbackResourceKind,
       onChange,
+      disabled,
     } = props;
     const forceUpdate = useForceUpdate();
     const autoCompleteRef = React.useRef<?SemiControlledAutoCompleteInterface>(
@@ -392,6 +394,7 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
                   onApply={props.onApply}
                   ref={autoCompleteRef}
                   id={props.id}
+                  disabled={disabled}
                 />
                 {props.canBeReset && (
                   <IconButton size="small" onClick={onResetResourceName}>
@@ -412,6 +415,7 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
                 autoCompleteRef.current && autoCompleteRef.current.focus();
               }}
               primary
+              disabled={disabled}
             />
             {externalEditors.length === 1 && (
               <FlatButton
@@ -422,6 +426,7 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
                     : externalEditors[0].createDisplayName
                 )}
                 onClick={() => editWith(i18n, externalEditors[0])}
+                disabled={disabled}
               />
             )}
             {externalEditors.length > 1 ? (
@@ -443,6 +448,7 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
                     click: () => editWith(i18n, externalEditor),
                   }))
                 }
+                disabled={disabled}
               />
             ) : null}
             {externalEditorOpened && (

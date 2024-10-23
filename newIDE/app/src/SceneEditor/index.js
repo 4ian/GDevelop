@@ -27,7 +27,7 @@ import { ResponsiveWindowMeasurer } from '../UI/Responsive/ResponsiveWindowMeasu
 import DismissableInfoBar from '../UI/Messages/DismissableInfoBar';
 import ContextMenu, { type ContextMenuInterface } from '../UI/Menu/ContextMenu';
 import { shortenString } from '../Utils/StringHelpers';
-import getObjectByName, { hasObjectWithName } from '../Utils/GetObjectByName';
+import getObjectByName from '../Utils/GetObjectByName';
 import UseSceneEditorCommands from './UseSceneEditorCommands';
 import { type InstancesEditorSettings } from '../InstancesEditor/InstancesEditorSettings';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
@@ -1679,11 +1679,10 @@ export default class SceneEditor extends React.Component<Props, State> {
         serializedInstances: instancesContent,
         addInstancesInTheForeground: pasteInTheForeground,
         doesObjectExistInContext: objectName =>
-          hasObjectWithName(
-            this.props.globalObjectsContainer,
-            this.props.objectsContainer,
-            objectName
-          ),
+          this.props.projectScopedContainersAccessor
+            .get()
+            .getObjectsContainersList()
+            .hasObjectNamed(objectName),
       }
     );
 

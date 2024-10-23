@@ -17,6 +17,7 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
@@ -53,7 +54,6 @@ import ErrorBoundary from '../UI/ErrorBoundary';
 import { getInsertionParentAndPositionFromSelection } from '../Utils/ObjectFolders';
 import { canSwapAssetOfObject } from '../AssetStore/AssetSwapper';
 import { renderQuickCustomizationMenuItems } from '../QuickCustomization/QuickCustomizationMenuItems';
-import { hasObjectWithName } from '../Utils/GetObjectByName';
 
 const gd: libGDevelop = global.gd;
 const sceneObjectsRootFolderId = 'scene-objects';
@@ -197,6 +197,7 @@ type Props = {|
   layout: ?gdLayout,
   eventsBasedObject: gdEventsBasedObject | null,
   initialInstances?: gdInitialInstancesContainer,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
   onSelectAllInstancesOfObjectInLayout?: string => void,
@@ -245,6 +246,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       layout,
       eventsBasedObject,
       initialInstances,
+      projectScopedContainersAccessor,
       globalObjectsContainer,
       objectsContainer,
       resourceManagementProps,
@@ -329,7 +331,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               project.getEventsBasedObject(objectType).getName())
           : objectTypeToDefaultName[objectType] || 'NewObject';
         const name = newNameGenerator(defaultName, name =>
-          hasObjectWithName(globalObjectsContainer, objectsContainer, name)
+          projectScopedContainersAccessor
+            .get()
+            .getObjectsContainersList()
+            .hasObjectNamed(name)
         );
 
         let object;
@@ -407,9 +412,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         newObjectDialogOpen,
         onEditObject,
         objectsContainer,
-        globalObjectsContainer,
         onObjectCreated,
         onObjectFolderOrObjectWithContextSelected,
+        projectScopedContainersAccessor,
       ]
     );
 
@@ -605,7 +610,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         const newName = newNameGenerator(
           objectName,
           name =>
-            hasObjectWithName(globalObjectsContainer, objectsContainer, name),
+            projectScopedContainersAccessor
+              .get()
+              .getObjectsContainersList()
+              .hasObjectNamed(name),
           ''
         );
 
@@ -652,7 +660,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
         return { object: newObject, global };
       },
-      [globalObjectsContainer, objectsContainer, project]
+      [objectsContainer, project, projectScopedContainersAccessor]
     );
 
     const paste = React.useCallback(

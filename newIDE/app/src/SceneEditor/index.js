@@ -27,7 +27,7 @@ import { ResponsiveWindowMeasurer } from '../UI/Responsive/ResponsiveWindowMeasu
 import DismissableInfoBar from '../UI/Messages/DismissableInfoBar';
 import ContextMenu, { type ContextMenuInterface } from '../UI/Menu/ContextMenu';
 import { shortenString } from '../Utils/StringHelpers';
-import getObjectByName from '../Utils/GetObjectByName';
+import getObjectByName, { hasObjectWithName } from '../Utils/GetObjectByName';
 import UseSceneEditorCommands from './UseSceneEditorCommands';
 import { type InstancesEditorSettings } from '../InstancesEditor/InstancesEditorSettings';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
@@ -1631,6 +1631,9 @@ export default class SceneEditor extends React.Component<Props, State> {
         copyReferential: [-2 * MOVEMENT_BIG_DELTA, -2 * MOVEMENT_BIG_DELTA],
         serializedInstances: serializedSelection,
         preventSnapToGrid: true,
+        doesObjectExistInContext:
+          // Instance duplication can only be done in the same scene, so no need to check
+          () => true,
       }
     );
     this._onInstancesAdded(newInstances);
@@ -1675,6 +1678,12 @@ export default class SceneEditor extends React.Component<Props, State> {
         copyReferential: [x, y],
         serializedInstances: instancesContent,
         addInstancesInTheForeground: pasteInTheForeground,
+        doesObjectExistInContext: objectName =>
+          hasObjectWithName(
+            this.props.globalObjectsContainer,
+            this.props.objectsContainer,
+            objectName
+          ),
       }
     );
 

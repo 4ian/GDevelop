@@ -771,6 +771,7 @@ export default class InstancesEditor extends Component<Props, State> {
     serializedInstances: Array<Object>,
     preventSnapToGrid?: boolean,
     addInstancesInTheForeground?: boolean,
+    doesObjectExistInContext: string => boolean,
   |}): Array<gdInitialInstance> => {
     return this._instancesAdder.addSerializedInstances(options);
   };

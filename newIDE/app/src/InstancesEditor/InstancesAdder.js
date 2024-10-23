@@ -58,12 +58,14 @@ export default class InstancesAdder {
     serializedInstances,
     preventSnapToGrid = false,
     addInstancesInTheForeground = false,
+    doesObjectExistInContext,
   }: {|
     position: [number, number],
     copyReferential: [number, number],
     serializedInstances: Array<Object>,
     preventSnapToGrid?: boolean,
     addInstancesInTheForeground?: boolean,
+    doesObjectExistInContext: string => boolean,
   |}): Array<gdInitialInstance> => {
     this._zOrderFinder.reset();
     this._instances.iterateOverInstances(this._zOrderFinder);
@@ -71,32 +73,38 @@ export default class InstancesAdder {
 
     let addedInstancesLowestZOrder = null;
 
-    const newInstances = serializedInstances.map(serializedInstance => {
-      const instance = new gd.InitialInstance();
-      unserializeFromJSObject(instance, serializedInstance);
-      const desiredPosition = [
-        instance.getX() - copyReferential[0] + position[0],
-        instance.getY() - copyReferential[1] + position[1],
-      ];
-      const newPos = preventSnapToGrid
-        ? desiredPosition
-        : roundPositionsToGrid(desiredPosition, this._instancesEditorSettings);
-      instance.setX(newPos[0]);
-      instance.setY(newPos[1]);
-      if (addInstancesInTheForeground) {
-        if (
-          addedInstancesLowestZOrder === null ||
-          addedInstancesLowestZOrder > instance.getZOrder()
-        ) {
-          addedInstancesLowestZOrder = instance.getZOrder();
+    const newInstances = serializedInstances
+      .map(serializedInstance => {
+        const instance = new gd.InitialInstance();
+        unserializeFromJSObject(instance, serializedInstance);
+        if (!doesObjectExistInContext(instance.getObjectName())) return null;
+        const desiredPosition = [
+          instance.getX() - copyReferential[0] + position[0],
+          instance.getY() - copyReferential[1] + position[1],
+        ];
+        const newPos = preventSnapToGrid
+          ? desiredPosition
+          : roundPositionsToGrid(
+              desiredPosition,
+              this._instancesEditorSettings
+            );
+        instance.setX(newPos[0]);
+        instance.setY(newPos[1]);
+        if (addInstancesInTheForeground) {
+          if (
+            addedInstancesLowestZOrder === null ||
+            addedInstancesLowestZOrder > instance.getZOrder()
+          ) {
+            addedInstancesLowestZOrder = instance.getZOrder();
+          }
         }
-      }
-      const newInstance = this._instances
-        .insertInitialInstance(instance)
-        .resetPersistentUuid();
-      instance.delete();
-      return newInstance;
-    });
+        const newInstance = this._instances
+          .insertInitialInstance(instance)
+          .resetPersistentUuid();
+        instance.delete();
+        return newInstance;
+      })
+      .filter(Boolean);
 
     if (addInstancesInTheForeground && addedInstancesLowestZOrder !== null) {
       newInstances.forEach(instance => {

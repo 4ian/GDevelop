@@ -187,13 +187,14 @@ export default class RenderedSprite3DInstance extends Rendered3DInstance {
   async updateTextureAndSprite(): Promise<void> {
     this.updateSprite();
     const sprite = this._sprite;
-    if (!sprite) return;
+    // An empty image name will display a place holder.
+    const imageName = sprite ? sprite.getImageName() : '';
 
     // Note that `getPIXITexture` could be refactored to return a promise
     // to make it nicer to use (no need to use "once('update')" pattern).
     const texture = this._pixiResourcesLoader.getPIXITexture(
       this._project,
-      sprite.getImageName()
+      imageName
     );
     this._pixiObject.texture = texture;
 
@@ -210,7 +211,7 @@ export default class RenderedSprite3DInstance extends Rendered3DInstance {
 
     const material = await this._pixiResourcesLoader.getThreeMaterial(
       this._project,
-      sprite.getImageName(),
+      imageName,
       {
         useTransparentTexture: true,
       }
@@ -220,14 +221,14 @@ export default class RenderedSprite3DInstance extends Rendered3DInstance {
       this._threeObject.material = material;
     }
 
-    const origin = sprite.getOrigin();
-    this._originX = origin.getX();
-    this._originY = origin.getY();
+    this._originX = sprite ? sprite.getOrigin().getX() : 0;
+    this._originY = sprite ? sprite.getOrigin().getY() : 0;
 
-    if (sprite.isDefaultCenterPoint()) {
+    const isDefaultCenterPoint = sprite ? sprite.isDefaultCenterPoint() : true;
+    if (isDefaultCenterPoint) {
       this._centerX = this._textureWidth / 2;
       this._centerY = this._textureHeight / 2;
-    } else {
+    } else if (sprite) {
       const center = sprite.getCenter();
       this._centerX = center.getX();
       this._centerY = center.getY();

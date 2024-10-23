@@ -53,6 +53,7 @@ import ErrorBoundary from '../UI/ErrorBoundary';
 import { getInsertionParentAndPositionFromSelection } from '../Utils/ObjectFolders';
 import { canSwapAssetOfObject } from '../AssetStore/AssetSwapper';
 import { renderQuickCustomizationMenuItems } from '../QuickCustomization/QuickCustomizationMenuItems';
+import { hasObjectWithName } from '../Utils/GetObjectByName';
 
 const gd: libGDevelop = global.gd;
 const sceneObjectsRootFolderId = 'scene-objects';
@@ -327,12 +328,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             (project.getEventsBasedObject(objectType).getDefaultName() ||
               project.getEventsBasedObject(objectType).getName())
           : objectTypeToDefaultName[objectType] || 'NewObject';
-        const name = newNameGenerator(
-          defaultName,
-          name =>
-            objectsContainer.hasObjectNamed(name) ||
-            (!!globalObjectsContainer &&
-              globalObjectsContainer.hasObjectNamed(name))
+        const name = newNameGenerator(defaultName, name =>
+          hasObjectWithName(globalObjectsContainer, objectsContainer, name)
         );
 
         let object;
@@ -608,9 +605,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         const newName = newNameGenerator(
           objectName,
           name =>
-            objectsContainer.hasObjectNamed(name) ||
-            (!!globalObjectsContainer &&
-              globalObjectsContainer.hasObjectNamed(name)),
+            hasObjectWithName(globalObjectsContainer, objectsContainer, name),
           ''
         );
 

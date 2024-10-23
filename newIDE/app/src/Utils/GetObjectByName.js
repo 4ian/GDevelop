@@ -15,3 +15,18 @@ export default function getObjectByName(
 
   return null;
 }
+
+export const hasObjectWithName = (
+  globalObjectsContainer: gdObjectsContainer | null,
+  objectsContainer?: ?gdObjectsContainer,
+  objectName: string
+): boolean => {
+  if (objectsContainer && objectsContainer.hasObjectNamed(objectName))
+    return true;
+  else if (
+    globalObjectsContainer &&
+    globalObjectsContainer.hasObjectNamed(objectName)
+  )
+    return true;
+  return false;
+};

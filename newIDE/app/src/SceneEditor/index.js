@@ -1005,22 +1005,17 @@ export default class SceneEditor extends React.Component<Props, State> {
     const {
       project,
       layout,
-      objectsContainer,
-      globalObjectsContainer,
+      projectScopedContainersAccessor,
     } = this.props;
+
+    const objectsContainersList = projectScopedContainersAccessor
+      .get()
+      .getObjectsContainersList();
 
     const safeAndUniqueNewName = newNameGenerator(
       gd.Project.getSafeName(newName),
       tentativeNewName => {
-        // TODO Use ProjectScopedContainers to check if an object or a group exist.
-        if (
-          objectsContainer.hasObjectNamed(tentativeNewName) ||
-          (!!globalObjectsContainer &&
-            globalObjectsContainer.hasObjectNamed(tentativeNewName)) ||
-          objectsContainer.getObjectGroups().has(tentativeNewName) ||
-          (!!globalObjectsContainer &&
-            globalObjectsContainer.getObjectGroups().has(tentativeNewName))
-        ) {
+        if (objectsContainersList.hasObjectOrGroupNamed(tentativeNewName)) {
           return true;
         }
 

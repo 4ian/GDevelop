@@ -1907,8 +1907,8 @@ export default class SceneEditor extends React.Component<Props, State> {
       : null;
     const variablesEditedAssociatedObject = variablesEditedAssociatedObjectName
       ? getObjectByName(
-          project.getObjects(),
-          layout ? layout.getObjects() : null,
+          this.props.globalObjectsContainer,
+          this.props.objectsContainer,
           variablesEditedAssociatedObjectName
         )
       : null;

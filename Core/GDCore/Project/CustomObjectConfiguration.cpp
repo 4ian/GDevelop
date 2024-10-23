@@ -158,7 +158,9 @@ bool CustomObjectConfiguration::UpdateInitialInstanceProperty(
 void CustomObjectConfiguration::DoSerializeTo(SerializerElement& element) const {
   element.AddChild("content") = objectContent;
 
-  if (!animations.HasNoAnimations()) {
+  const auto *eventsBasedObject = GetEventsBasedObject();
+  if (!animations.HasNoAnimations() ||
+      (eventsBasedObject && eventsBasedObject->IsAnimatable())) {
     auto &animatableElement = element.AddChild("animatable");
     animations.SerializeTo(animatableElement);
   }

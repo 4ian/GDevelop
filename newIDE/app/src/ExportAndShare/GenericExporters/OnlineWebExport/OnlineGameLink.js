@@ -266,10 +266,16 @@ const OnlineGameLink = ({
       onClick={() => setIsShareDialogOpen(false)}
     />,
     // Ensure there is a game loaded, meaning the user owns the game.
-    game && buildOrGameUrl && !isBuildPublished && (
+    game && buildOrGameUrl && (
       <DialogPrimaryButton
         key="publish"
-        label={<Trans>Verify and Publish to gd.games</Trans>}
+        label={
+          !isBuildPublished ? (
+            <Trans>Verify and Publish to gd.games</Trans>
+          ) : (
+            <Trans>Update the game details</Trans>
+          )
+        }
         primary
         onClick={() => setIsOnlineGamePropertiesDialogOpen(true)}
       />

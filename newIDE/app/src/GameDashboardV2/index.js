@@ -4,6 +4,11 @@ import * as React from 'react';
 import { type Game } from '../Utils/GDevelopServices/Game';
 import { ColumnStackLayout } from '../UI/Layout';
 import GameHeader from './GameHeader';
+import DashboardWidget from './DashboardWidget';
+import { Trans } from '@lingui/macro';
+import FlatButton from '../UI/FlatButton';
+import ArrowRight from '../UI/CustomSvgIcons/ArrowRight';
+import { Grid } from '@material-ui/core';
 
 type Props = {|
   game: Game,
@@ -11,9 +16,51 @@ type Props = {|
 |};
 
 const GameDashboardV2 = ({ game }: Props) => {
+  const [view, setView] = React.useState<
+    'game' | 'analytics' | 'feedbacks' | 'builds' | 'services'
+  >('game');
+
   return (
     <ColumnStackLayout noMargin>
       <GameHeader game={game} />
+      <Grid container spacing={2}>
+        <DashboardWidget
+          gridSize={2}
+          title={<Trans>Analytics</Trans>}
+          seeMoreButton={
+            <FlatButton
+              label={<Trans>See all</Trans>}
+              rightIcon={<ArrowRight fontSize="small" />}
+              onClick={() => setView('analytics')}
+              primary
+            />
+          }
+        />
+        <DashboardWidget
+          gridSize={1}
+          title={<Trans>Feedbacks</Trans>}
+          seeMoreButton={
+            <FlatButton
+              label={<Trans>See all</Trans>}
+              rightIcon={<ArrowRight fontSize="small" />}
+              onClick={() => setView('feedbacks')}
+              primary
+            />
+          }
+        />
+        <DashboardWidget
+          gridSize={3}
+          title={<Trans>Builds</Trans>}
+          seeMoreButton={
+            <FlatButton
+              label={<Trans>See all</Trans>}
+              rightIcon={<ArrowRight fontSize="small" />}
+              onClick={() => setView('builds')}
+              primary
+            />
+          }
+        />
+      </Grid>
     </ColumnStackLayout>
   );
 };

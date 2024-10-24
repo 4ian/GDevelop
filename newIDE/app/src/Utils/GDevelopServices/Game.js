@@ -561,7 +561,7 @@ export const createGameResourceSignedUrls = async (
 |}> => {
   const authorizationHeader = await getAuthorizationHeader();
   const response = await client.post(
-    `/game/${gameId}/signed-url`,
+    `/game/${gameId}/resource-signed-url`,
     {
       uploadType,
       files,

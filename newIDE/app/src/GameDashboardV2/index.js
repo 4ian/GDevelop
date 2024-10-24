@@ -9,6 +9,7 @@ import { Trans } from '@lingui/macro';
 import FlatButton from '../UI/FlatButton';
 import ArrowRight from '../UI/CustomSvgIcons/ArrowRight';
 import { Grid } from '@material-ui/core';
+import FeedbackWidget from './FeedbackWidget';
 
 type Props = {|
   game: Game,
@@ -36,21 +37,10 @@ const GameDashboardV2 = ({ game }: Props) => {
             />
           }
         />
-        <DashboardWidget
-          gridSize={1}
-          title={<Trans>Feedbacks</Trans>}
-          seeMoreButton={
-            <FlatButton
-              label={<Trans>See all</Trans>}
-              rightIcon={<ArrowRight fontSize="small" />}
-              onClick={() => setView('feedbacks')}
-              primary
-            />
-          }
-        />
+        <FeedbackWidget onSeeAll={() => setView('feedbacks')} />
         <DashboardWidget
           gridSize={3}
-          title={<Trans>Builds</Trans>}
+          title={<Trans>Exports</Trans>}
           seeMoreButton={
             <FlatButton
               label={<Trans>See all</Trans>}

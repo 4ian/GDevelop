@@ -21,8 +21,9 @@ export type GameRegistrationProps = {|
   project: ?gdProject,
   suggestAdditionalActions?: boolean,
   hideLoader?: boolean,
-  hideLogin?: boolean,
   onGameRegistered?: () => void | Promise<void>,
+  customRegistrationMessage?: React.Node,
+  icon?: React.Node,
 |};
 
 export type GameAvailabilityError = 'not-found' | 'not-owned' | 'unexpected';
@@ -32,6 +33,7 @@ export const GameRegistration = ({
   suggestAdditionalActions,
   hideLoader,
   onGameRegistered,
+  customRegistrationMessage,
 }: GameRegistrationProps) => {
   const {
     onOpenLoginDialog,
@@ -139,6 +141,7 @@ export const GameRegistration = ({
       <CreateProfile
         onOpenLoginDialog={onOpenLoginDialog}
         onOpenCreateAccountDialog={onOpenCreateAccountDialog}
+        message={customRegistrationMessage}
       />
     );
   }
@@ -156,10 +159,13 @@ export const GameRegistration = ({
           />
         )}
       >
-        <Trans>
-          The project currently opened is not registered online. Register it now
-          to get access to leaderboards, player accounts, analytics and more!
-        </Trans>
+        {customRegistrationMessage || (
+          <Trans>
+            The project currently opened is not registered online. Register it
+            now to get access to leaderboards, player accounts, analytics and
+            more!
+          </Trans>
+        )}
       </AlertMessage>
     );
   } else if (gameAvailabilityError === 'not-owned') {

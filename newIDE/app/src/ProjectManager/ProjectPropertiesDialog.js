@@ -33,11 +33,18 @@ import PublicGameProperties from '../GameDashboard/PublicGameProperties';
 import PreviewIcon from '../UI/CustomSvgIcons/Preview';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import ErrorBoundary from '../UI/ErrorBoundary';
+import PlatformSpecificAssets, {
+  androidIconSizes,
+  desktopIconSizes,
+  iosIconSizes,
+} from '../PlatformSpecificAssetsEditor/PlatformSpecificAssets';
+
+type ProjectPropertiesTab = 'properties' | 'loading-screen' | 'icons';
 
 type Props = {|
   project: gdProject,
   open: boolean,
-  initialTab: 'properties' | 'loading-screen',
+  initialTab: ProjectPropertiesTab,
   onClose: () => void,
   onApply: (options: { newName?: string }) => Promise<boolean>,
   onPropertiesApplied: (options: { newName?: string }) => void,
@@ -69,9 +76,14 @@ type ProjectProperties = {|
   maxFPS: number,
   isFolderProject: boolean,
   useDeprecatedZeroAsDefaultZOrder: boolean,
+  desktopIconResourceNames: Array<string>,
+  androidIconResourceNames: Array<string>,
+  androidWindowSplashScreenAnimatedIconResourceName: string,
+  iosIconResourceNames: Array<string>,
 |};
 
 const loadPropertiesFromProject = (project: gdProject): ProjectProperties => {
+  const platformSpecificAssets = project.getPlatformSpecificAssets();
   return {
     gameResolutionWidth: project.getGameResolutionWidth(),
     gameResolutionHeight: project.getGameResolutionHeight(),
@@ -93,6 +105,19 @@ const loadPropertiesFromProject = (project: gdProject): ProjectProperties => {
     maxFPS: project.getMaximumFPS(),
     isFolderProject: project.isFolderProject(),
     useDeprecatedZeroAsDefaultZOrder: project.getUseDeprecatedZeroAsDefaultZOrder(),
+    desktopIconResourceNames: desktopIconSizes.map(size =>
+      platformSpecificAssets.get('desktop', `icon-${size}`)
+    ),
+    androidIconResourceNames: androidIconSizes.map(size =>
+      platformSpecificAssets.get('android', `icon-${size}`)
+    ),
+    androidWindowSplashScreenAnimatedIconResourceName: platformSpecificAssets.get(
+      'android',
+      `windowSplashScreenAnimatedIcon`
+    ),
+    iosIconResourceNames: iosIconSizes.map(size =>
+      platformSpecificAssets.get('ios', `icon-${size}`)
+    ),
   };
 };
 
@@ -122,6 +147,10 @@ function applyPropertiesToProject(
     maxFPS,
     isFolderProject,
     useDeprecatedZeroAsDefaultZOrder,
+    desktopIconResourceNames,
+    androidIconResourceNames,
+    androidWindowSplashScreenAnimatedIconResourceName,
+    iosIconResourceNames,
   } = newProperties;
   project.setGameResolutionSize(gameResolutionWidth, gameResolutionHeight);
   project.setAdaptGameResolutionAtRuntime(adaptGameResolutionAtRuntime);
@@ -149,6 +178,25 @@ function applyPropertiesToProject(
   project.setFolderProject(isFolderProject);
   project.setUseDeprecatedZeroAsDefaultZOrder(useDeprecatedZeroAsDefaultZOrder);
 
+  const platformSpecificAssets = project.getPlatformSpecificAssets();
+  desktopIconSizes.forEach((size, index) => {
+    const resourceName = desktopIconResourceNames[index];
+    platformSpecificAssets.set('desktop', `icon-${size}`, resourceName);
+  });
+  androidIconSizes.forEach((size, index) => {
+    const resourceName = androidIconResourceNames[index];
+    platformSpecificAssets.set('android', `icon-${size}`, resourceName);
+  });
+  platformSpecificAssets.set(
+    'android',
+    `windowSplashScreenAnimatedIcon`,
+    androidWindowSplashScreenAnimatedIconResourceName
+  );
+  iosIconSizes.forEach((size, index) => {
+    const resourceName = iosIconResourceNames[index];
+    platformSpecificAssets.set('ios', `icon-${size}`, resourceName);
+  });
+
   return displayProjectErrorsBox(
     i18n,
     getProjectPropertiesErrors(i18n, project)
@@ -157,6 +205,7 @@ function applyPropertiesToProject(
 
 const ProjectPropertiesDialog = (props: Props) => {
   const { project, hotReloadPreviewButtonProps } = props;
+  const platformSpecificAssets = project.getPlatformSpecificAssets();
 
   const initialProperties = React.useMemo(
     () => loadPropertiesFromProject(project),
@@ -211,6 +260,33 @@ const ProjectPropertiesDialog = (props: Props) => {
     useDeprecatedZeroAsDefaultZOrder,
     setUseDeprecatedZeroAsDefaultZOrder,
   ] = React.useState(initialProperties.useDeprecatedZeroAsDefaultZOrder);
+  const [
+    desktopIconResourceNames,
+    setDesktopIconResourceNames,
+  ] = React.useState<Array<string>>(
+    desktopIconSizes.map(size =>
+      platformSpecificAssets.get('desktop', `icon-${size}`)
+    )
+  );
+  const [
+    androidIconResourceNames,
+    setAndroidIconResourceNames,
+  ] = React.useState<Array<string>>(
+    androidIconSizes.map(size =>
+      platformSpecificAssets.get('android', `icon-${size}`)
+    )
+  );
+  const [
+    androidWindowSplashScreenAnimatedIconResourceName,
+    setAndroidWindowSplashScreenAnimatedIconResourceName,
+  ] = React.useState<string>(
+    platformSpecificAssets.get('android', `windowSplashScreenAnimatedIcon`)
+  );
+  const [iosIconResourceNames, setIosIconResourceNames] = React.useState<
+    Array<string>
+  >(
+    iosIconSizes.map(size => platformSpecificAssets.get('ios', `icon-${size}`))
+  );
 
   const { isMobile } = useResponsiveWindowSize();
 
@@ -218,7 +294,7 @@ const ProjectPropertiesDialog = (props: Props) => {
   const defaultVersion = '1.0.0';
 
   const [currentTab, setCurrentTab] = React.useState<
-    'properties' | 'loading-screen'
+    'properties' | 'loading-screen' | 'icons'
   >(props.initialTab);
 
   const {
@@ -267,6 +343,10 @@ const ProjectPropertiesDialog = (props: Props) => {
         maxFPS,
         isFolderProject,
         useDeprecatedZeroAsDefaultZOrder,
+        desktopIconResourceNames,
+        androidIconResourceNames,
+        androidWindowSplashScreenAnimatedIconResourceName,
+        iosIconResourceNames,
       }
     );
 
@@ -332,6 +412,10 @@ const ProjectPropertiesDialog = (props: Props) => {
                   {
                     label: <Trans>Branding and Loading screen</Trans>,
                     value: 'loading-screen',
+                  },
+                  {
+                    label: <Trans>Icons</Trans>,
+                    value: 'icons',
                   },
                 ]}
               />
@@ -750,6 +834,24 @@ const ProjectPropertiesDialog = (props: Props) => {
                 onChangeSubscription={onCancelChanges}
                 project={project}
                 resourceManagementProps={props.resourceManagementProps}
+              />
+            )}
+            {currentTab === 'icons' && (
+              <PlatformSpecificAssets
+                project={project}
+                resourceManagementProps={props.resourceManagementProps}
+                desktopIconResourceNames={desktopIconResourceNames}
+                onDesktopIconResourceNamesChanged={setDesktopIconResourceNames}
+                androidIconResourceNames={androidIconResourceNames}
+                onAndroidIconResourceNamesChanged={setAndroidIconResourceNames}
+                androidWindowSplashScreenAnimatedIconResourceName={
+                  androidWindowSplashScreenAnimatedIconResourceName
+                }
+                onAndroidWindowSplashScreenAnimatedIconResourceNameChanged={
+                  setAndroidWindowSplashScreenAnimatedIconResourceName
+                }
+                iosIconResourceNames={iosIconResourceNames}
+                onIosIconResourceNamesChanged={setIosIconResourceNames}
               />
             )}
           </Dialog>

@@ -68,7 +68,7 @@ export const useGameManager = ({
   ] = React.useState<?GameAvailabilityError>(null);
 
   const refreshGame = React.useCallback(
-    async () => {
+    async (): Promise<void> => {
       if (!profile || !project) return;
 
       const { id } = profile;

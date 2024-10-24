@@ -13,11 +13,11 @@ import {
   getCategoryName,
   getGameCategories,
   type GameCategory,
+  type Game,
 } from '../Utils/GDevelopServices/Game';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { I18n } from '@lingui/react';
 import { Column, Line, Spacer } from '../UI/Grid';
-import BackgroundText from '../UI/BackgroundText';
 import AlertMessage from '../UI/AlertMessage';
 import { GameThumbnail } from './GameThumbnail';
 
@@ -56,6 +56,8 @@ export const cleanUpGameSlug = (gameSlug: string) => {
 type Props = {|
   project: gdProject,
   disabled?: boolean,
+  onGameUpdated?: (game: Game) => void,
+  onUpdatingGame?: (isUpdatingGame: boolean) => void,
   // Properties visible in the project properties and game dialogs.
   setName: string => void,
   name: string,
@@ -117,6 +119,8 @@ export function PublicGameProperties({
   discoverable,
   displayThumbnail,
   thumbnailUrl,
+  onGameUpdated,
+  onUpdatingGame,
 }: Props) {
   const [categoryInput, setCategoryInput] = React.useState('');
   const { profile } = React.useContext(AuthenticatedUserContext);
@@ -154,10 +158,16 @@ export function PublicGameProperties({
           <ResponsiveLineStackLayout noMargin>
             {displayThumbnail && (
               <>
-                <Column noMargin>
+                <Column noMargin alignItems="center">
                   <GameThumbnail
                     gameName={project.getName()}
                     thumbnailUrl={thumbnailUrl}
+                    gameId={project.getProjectUuid()}
+                    project={project}
+                    canUpdateThumbnail
+                    disabled={disabled}
+                    onGameUpdated={onGameUpdated}
+                    onUpdatingGame={onUpdatingGame}
                   />
                 </Column>
                 <Spacer />
@@ -227,16 +237,6 @@ export function PublicGameProperties({
               )}
             </ColumnStackLayout>
           </ResponsiveLineStackLayout>
-          {displayThumbnail && (
-            <Line noMargin>
-              <BackgroundText>
-                <Trans>
-                  To update your thumbnail, go into your Game Settings > Icons
-                  and thumbnail, then create and publish a new build.
-                </Trans>
-              </BackgroundText>
-            </Line>
-          )}
           <SemiControlledTextField
             floatingLabelText={<Trans>Game description</Trans>}
             fullWidth

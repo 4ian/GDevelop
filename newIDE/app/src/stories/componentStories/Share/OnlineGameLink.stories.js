@@ -48,6 +48,7 @@ export const Export = () => {
         exportStep={'export'}
         onSaveProject={action('onSaveProject')}
         onRefreshGame={action('onRefreshGame')}
+        onGameUpdated={action('onGameUpdated')}
         isSavingProject={false}
         project={testProject.project}
         shouldShowShareDialog
@@ -65,6 +66,7 @@ export const SavingProject = () => {
         exportStep={'export'}
         onSaveProject={action('onSaveProject')}
         onRefreshGame={action('onRefreshGame')}
+        onGameUpdated={action('onGameUpdated')}
         isSavingProject
         project={testProject.project}
         shouldShowShareDialog
@@ -82,6 +84,7 @@ export const ResourcesDownload = () => {
         exportStep={'resources-download'}
         onSaveProject={action('onSaveProject')}
         onRefreshGame={action('onRefreshGame')}
+        onGameUpdated={action('onGameUpdated')}
         isSavingProject={false}
         project={testProject.project}
         shouldShowShareDialog
@@ -99,6 +102,7 @@ export const Compress = () => {
         exportStep={'compress'}
         onSaveProject={action('onSaveProject')}
         onRefreshGame={action('onRefreshGame')}
+        onGameUpdated={action('onGameUpdated')}
         isSavingProject={false}
         project={testProject.project}
         shouldShowShareDialog
@@ -116,6 +120,7 @@ export const Upload = () => {
         exportStep={'upload'}
         onSaveProject={action('onSaveProject')}
         onRefreshGame={action('onRefreshGame')}
+        onGameUpdated={action('onGameUpdated')}
         isSavingProject={false}
         project={testProject.project}
         shouldShowShareDialog
@@ -133,6 +138,7 @@ export const WaitingForBuild = () => {
         exportStep={'waiting-for-build'}
         onSaveProject={action('onSaveProject')}
         onRefreshGame={action('onRefreshGame')}
+        onGameUpdated={action('onGameUpdated')}
         isSavingProject={false}
         project={testProject.project}
         shouldShowShareDialog
@@ -150,6 +156,7 @@ export const Build = () => {
         exportStep={'build'}
         onSaveProject={action('onSaveProject')}
         onRefreshGame={action('onRefreshGame')}
+        onGameUpdated={action('onGameUpdated')}
         isSavingProject={false}
         project={testProject.project}
         shouldShowShareDialog
@@ -167,6 +174,7 @@ export const DoneWithPublicBuild = () => {
         exportStep={'done'}
         onSaveProject={action('onSaveProject')}
         onRefreshGame={action('onRefreshGame')}
+        onGameUpdated={action('onGameUpdated')}
         isSavingProject={false}
         project={testProject.project}
         shouldShowShareDialog
@@ -184,6 +192,7 @@ export const DoneWithPrivateBuild = () => {
         exportStep={'done'}
         onSaveProject={action('onSaveProject')}
         onRefreshGame={action('onRefreshGame')}
+        onGameUpdated={action('onGameUpdated')}
         isSavingProject={false}
         project={testProject.project}
         shouldShowShareDialog

@@ -3,7 +3,6 @@ import axios from 'axios';
 import { makeTimestampedId } from '../../Utils/TimestampedId';
 import { GDevelopBuildApi, GDevelopGamesPlatform } from './ApiConfigs';
 import { getSignedUrl } from './Usage';
-import { basename } from 'path-browserify';
 
 export type TargetName =
   | 'winExe'
@@ -148,31 +147,6 @@ export const getBuildArtifactUrl = (
   }
 
   return `https://builds.gdevelop-app.com/${build[keyName]}`;
-};
-
-export const getWebBuildThumbnailUrl = (
-  project: gdProject,
-  buildId: string
-): string => {
-  const resourceManager = project.getResourcesManager();
-  const resourceName = project
-    .getPlatformSpecificAssets()
-    .get('liluo', `thumbnail`);
-  if (!resourceManager.hasResource(resourceName)) {
-    return '';
-  }
-  const path = resourceManager.getResource(resourceName).getFile();
-  const fileName = basename(path);
-  if (!fileName) {
-    return '';
-  }
-  // The exporter put asset files directly in the build folder.
-  // It's not factorized with the exporter because it's a temporary solution.
-  // TODO: Upload the thumbnail separately, so that this URL is not defined by the frontend.
-  const uri = `https://games.gdevelop-app.com/game-${buildId}/${fileName}`;
-  // The backend services encode the file URLs when uploaded, so we need to do the same before saving the value.
-  const encodedUri = encodeURI(uri);
-  return encodedUri;
 };
 
 type UploadOptions = {|

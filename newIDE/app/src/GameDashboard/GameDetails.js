@@ -5,7 +5,7 @@ import type { Limits } from '../Utils/GDevelopServices/Usage';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
-import { Line, Spacer } from '../UI/Grid';
+import { Column, Line, Spacer } from '../UI/Grid';
 import {
   type Game,
   updateGame,
@@ -21,8 +21,6 @@ import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import PlaceholderError from '../UI/PlaceholderError';
-import SelectField from '../UI/SelectField';
-import SelectOption from '../UI/SelectOption';
 import Chip from '@material-ui/core/Chip';
 import Builds from '../ExportAndShare/Builds';
 import AlertMessage from '../UI/AlertMessage';
@@ -50,6 +48,7 @@ import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/
 import CreditsStatusBanner from '../Credits/CreditsStatusBanner';
 import MarketingPlans from '../MarketingPlans/MarketingPlans';
 import MultiplayerAdmin from './MultiplayerAdmin';
+import { GameThumbnail } from './GameThumbnail';
 
 export type GameDetailsTab =
   | 'details'
@@ -190,16 +189,6 @@ const GameDetails = ({
     [analyticsSource]
   );
 
-  const handleGameUpdated = React.useCallback(
-    (game: Game) => {
-      // Set Public Game to null to show the loader.
-      // It will be refetched thanks to loadPublicGame, because Game is updated.
-      setPublicGame(null);
-      onGameUpdated(game);
-    },
-    [onGameUpdated]
-  );
-
   const updateGameFromProject = async (
     partialGameChange: PartialGameChange,
     i18n: I18nType
@@ -289,7 +278,7 @@ const GameDetails = ({
         setIsGameUpdating(false);
         return false;
       }
-      handleGameUpdated(updatedGame);
+      onGameUpdated(updatedGame);
     } catch (error) {
       console.error(
         'Unable to update the game:',
@@ -359,14 +348,14 @@ const GameDetails = ({
             publicWebBuildId: null,
           }
         );
-        handleGameUpdated(updatedGame);
+        onGameUpdated(updatedGame);
       } catch (err) {
         console.error('Unable to update the game', err);
       } finally {
         setIsGameUpdating(false);
       }
     },
-    [game, getAuthorizationHeader, profile, handleGameUpdated]
+    [game, getAuthorizationHeader, profile, onGameUpdated]
   );
 
   const onClickUnregister = React.useCallback(
@@ -439,100 +428,120 @@ const GameDetails = ({
                       </Trans>
                     </AlertMessage>
                   )}
-                  <Line alignItems="center" noMargin>
-                    <Line
-                      expand
-                      justifyContent="flex-start"
-                      alignItems="center"
-                      noMargin
-                    >
-                      {authorUsernames && (
-                        <>
-                          <Text>
-                            <Trans>Authors:</Trans>
-                          </Text>
-                          <Line noMargin>
-                            {authorUsernames.map((username, index) => (
-                              <React.Fragment key={username}>
-                                <Spacer />
-                                <Chip
-                                  size="small"
-                                  icon={
-                                    ownerUsernames &&
-                                    ownerUsernames.includes(username) ? (
-                                      <Crown />
-                                    ) : (
-                                      undefined
-                                    )
-                                  }
-                                  className="notranslate"
-                                  label={username}
-                                  color={index === 0 ? 'primary' : 'default'}
-                                />
-                              </React.Fragment>
-                            ))}
-                          </Line>
-                        </>
-                      )}
-                    </Line>
-                    <Line expand justifyContent="flex-end" noMargin>
-                      <Text>
-                        <Trans>
-                          Created on {i18n.date(game.createdAt * 1000)}
-                        </Trans>
-                      </Text>
-                    </Line>
-                  </Line>
-                  {(publicGame.playWithKeyboard ||
-                    publicGame.playWithGamepad ||
-                    publicGame.playWithMobile ||
-                    publicGame.categories) && (
-                    <Line alignItems="center" noMargin>
-                      <Line
-                        expand
-                        justifyContent="flex-start"
-                        alignItems="center"
-                        noMargin
-                      >
-                        {publicGame.categories &&
-                          !!publicGame.categories.length && (
+                  <ResponsiveLineStackLayout noMargin>
+                    <Column noMargin alignItems="center">
+                      <GameThumbnail
+                        gameName={publicGame.gameName}
+                        thumbnailUrl={publicGame.thumbnailUrl}
+                        gameId={publicGame.id}
+                      />
+                    </Column>
+                    <ColumnStackLayout expand noMargin>
+                      <TextField
+                        value={publicGame.gameName}
+                        readOnly
+                        fullWidth
+                        floatingLabelText={<Trans>Game name</Trans>}
+                        floatingLabelFixed={true}
+                      />
+                      <Line alignItems="center" noMargin>
+                        <Line
+                          expand
+                          justifyContent="flex-start"
+                          alignItems="center"
+                          noMargin
+                        >
+                          {authorUsernames && (
                             <>
                               <Text>
-                                <Trans>Genres:</Trans>
+                                <Trans>Authors:</Trans>
                               </Text>
                               <Line noMargin>
-                                {publicGame.categories.map(
-                                  (category, index) => (
-                                    <React.Fragment key={category}>
-                                      <Spacer />
-                                      <Chip
-                                        size="small"
-                                        label={getCategoryName(category, i18n)}
-                                        color={
-                                          index === 0 ? 'primary' : 'default'
-                                        }
-                                      />
-                                    </React.Fragment>
-                                  )
-                                )}
+                                {authorUsernames.map((username, index) => (
+                                  <React.Fragment key={username}>
+                                    <Spacer />
+                                    <Chip
+                                      size="small"
+                                      icon={
+                                        ownerUsernames &&
+                                        ownerUsernames.includes(username) ? (
+                                          <Crown />
+                                        ) : (
+                                          undefined
+                                        )
+                                      }
+                                      className="notranslate"
+                                      label={username}
+                                      color={
+                                        index === 0 ? 'primary' : 'default'
+                                      }
+                                    />
+                                  </React.Fragment>
+                                ))}
                               </Line>
                             </>
                           )}
+                        </Line>
+                        <Line expand justifyContent="flex-end" noMargin>
+                          <Text>
+                            <Trans>
+                              Created on {i18n.date(game.createdAt * 1000)}
+                            </Trans>
+                          </Text>
+                        </Line>
                       </Line>
-                      <Line expand justifyContent="flex-end" noMargin>
-                        {publicGame.playWithKeyboard && <KeyboardIcon />}
-                        {publicGame.playWithGamepad && <SportsEsportsIcon />}
-                        {publicGame.playWithMobile && <SmartphoneIcon />}
-                      </Line>
-                    </Line>
-                  )}
-                  <TextField
-                    value={publicGame.gameName}
-                    readOnly
-                    fullWidth
-                    floatingLabelText={<Trans>Game name</Trans>}
-                    floatingLabelFixed={true}
-                  />
+                      {(publicGame.playWithKeyboard ||
+                        publicGame.playWithGamepad ||
+                        publicGame.playWithMobile ||
+                        publicGame.categories) && (
+                        <Line alignItems="center" noMargin>
+                          <Line
+                            expand
+                            justifyContent="flex-start"
+                            alignItems="center"
+                            noMargin
+                          >
+                            {publicGame.categories &&
+                              !!publicGame.categories.length && (
+                                <>
+                                  <Text>
+                                    <Trans>Genres:</Trans>
+                                  </Text>
+                                  <Line noMargin>
+                                    {publicGame.categories.map(
+                                      (category, index) => (
+                                        <React.Fragment key={category}>
+                                          <Spacer />
+                                          <Chip
+                                            size="small"
+                                            label={getCategoryName(
+                                              category,
+                                              i18n
+                                            )}
+                                            color={
+                                              index === 0
+                                                ? 'primary'
+                                                : 'default'
+                                            }
+                                          />
+                                        </React.Fragment>
+                                      )
+                                    )}
+                                  </Line>
+                                </>
+                              )}
+                          </Line>
+                          <Line justifyContent="flex-end" noMargin>
+                            {publicGame.playWithKeyboard && <KeyboardIcon />}
+                            {publicGame.playWithGamepad && (
+                              <SportsEsportsIcon />
+                            )}
+                            {publicGame.playWithMobile && <SmartphoneIcon />}
+                          </Line>
+                        </Line>
+                      )}
+                    </ColumnStackLayout>
+                  </ResponsiveLineStackLayout>
                   <TextField
                     value={publicGame.description || ''}
                     readOnly
@@ -543,18 +552,21 @@ const GameDetails = ({
                     multiline
                     rows={5}
                   />
-                  <SelectField
-                    disabled
+                  <TextField
+                    value={
+                      publicGame.orientation === 'default'
+                        ? i18n._('Platform default')
+                        : publicGame.orientation === 'landscape'
+                        ? i18n._('Landscape')
+                        : i18n._('Portrait')
+                    }
+                    readOnly
                     fullWidth
                     floatingLabelText={
                       <Trans>Device orientation (for mobile)</Trans>
                     }
-                    value={publicGame.orientation}
-                  >
-                    <SelectOption value="default" label={t`Platform default`} />
-                    <SelectOption value="landscape" label={t`Landscape`} />
-                    <SelectOption value="portrait" label={t`Portrait`} />
-                  </SelectField>
+                    floatingLabelFixed={true}
+                  />
                   <ResponsiveLineStackLayout noMargin justifyContent="flex-end">
                     <FlatButton
                       onClick={() => onClickUnregister(i18n)}
@@ -607,10 +619,7 @@ const GameDetails = ({
                   <Trans>Marketing Campaigns</Trans>
                 </Text>
                 <MarketingPlans game={game} />
-                <GameMonetization
-                  game={game}
-                  onGameUpdated={handleGameUpdated}
-                />
+                <GameMonetization game={game} onGameUpdated={onGameUpdated} />
               </ColumnStackLayout>
             ) : null}
           </Line>
@@ -630,6 +639,8 @@ const GameDetails = ({
               onClose={() => setIsPublicGamePropertiesDialogOpen(false)}
               isLoading={isGameUpdating}
               i18n={i18n}
+              onUpdatingGame={setIsGameUpdating}
+              onGameUpdated={onGameUpdated}
             />
           )}
         </>

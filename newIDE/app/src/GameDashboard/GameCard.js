@@ -253,6 +253,7 @@ export const GameCard = ({
                 <GameThumbnail
                   gameName={game.gameName}
                   thumbnailUrl={game.thumbnailUrl}
+                  gameId={game.id}
                   background={isCurrentGame ? 'medium' : 'light'}
                 />
               </Column>

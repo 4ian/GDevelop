@@ -7,7 +7,6 @@ import Text from '../../../UI/Text';
 import { Column, Line } from '../../../UI/Grid';
 import {
   getBuildArtifactUrl,
-  getWebBuildThumbnailUrl,
   type Build,
 } from '../../../Utils/GDevelopServices/Build';
 import { type BuildStep } from '../../Builds/BuildStepsProgress';
@@ -45,6 +44,7 @@ type OnlineGameLinkProps = {|
   errored: boolean,
   exportStep: BuildStep,
   onRefreshGame: () => Promise<void>,
+  onGameUpdated: (game: Game) => void,
   automaticallyOpenGameProperties?: boolean,
   shouldShowShareDialog: boolean,
 |};
@@ -60,6 +60,7 @@ const OnlineGameLink = ({
   errored,
   exportStep,
   onRefreshGame,
+  onGameUpdated,
   automaticallyOpenGameProperties,
   shouldShowShareDialog,
 }: OnlineGameLinkProps) => {
@@ -216,7 +217,6 @@ const OnlineGameLink = ({
           playWithMobile: project.isPlayableWithMobile(),
           orientation: project.getOrientation(),
           publicWebBuildId: build.id,
-          thumbnailUrl: getWebBuildThumbnailUrl(project, build.id),
           discoverable: partialGameChange.discoverable,
         });
         // Then set authors and slug in parallel.
@@ -266,10 +266,16 @@ const OnlineGameLink = ({
       onClick={() => setIsShareDialogOpen(false)}
     />,
     // Ensure there is a game loaded, meaning the user owns the game.
-    game && buildOrGameUrl && !isBuildPublished && (
+    game && buildOrGameUrl && (
       <DialogPrimaryButton
         key="publish"
-        label={<Trans>Verify and Publish to gd.games</Trans>}
+        label={
+          !isBuildPublished ? (
+            <Trans>Verify and Publish to gd.games</Trans>
+          ) : (
+            <Trans>Update the game details</Trans>
+          )
+        }
         primary
         onClick={() => setIsOnlineGamePropertiesDialogOpen(true)}
       />
@@ -412,6 +418,8 @@ const OnlineGameLink = ({
               game={game}
               isLoading={isSavingProject || isGameLoading}
               i18n={i18n}
+              onUpdatingGame={setIsGameLoading}
+              onGameUpdated={onGameUpdated}
             />
           )}
         </>

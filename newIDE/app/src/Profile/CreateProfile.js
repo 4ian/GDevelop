@@ -15,12 +15,12 @@ const styles = {
   },
 };
 
-type Props = {
+type Props = {|
   message?: React.Node,
   onOpenLoginDialog: () => void,
   onOpenCreateAccountDialog: () => void,
   justifyContent?: 'center',
-};
+|};
 
 const CreateProfile = ({
   message,

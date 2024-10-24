@@ -27,7 +27,7 @@ const OnlineWebExportFlow = ({
   isExporting,
   uiMode,
 }: OnlineWebExportFlowProps) => {
-  const { game, builds, refreshGame } = gameAndBuildsManager;
+  const { game, builds, refreshGame, setGame } = gameAndBuildsManager;
   const hasGameExistingBuilds =
     game && builds
       ? !!builds.filter(build => build.gameId === game.id).length
@@ -104,6 +104,7 @@ const OnlineWebExportFlow = ({
         exportStep={exportStep}
         automaticallyOpenGameProperties={automaticallyOpenGameProperties}
         onRefreshGame={refreshGame}
+        onGameUpdated={setGame}
         game={game}
         shouldShowShareDialog={uiMode === 'full'}
       />

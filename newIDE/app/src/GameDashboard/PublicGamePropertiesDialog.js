@@ -10,7 +10,7 @@ import {
 } from '../Utils/ProjectErrorsChecker';
 import FlatButton from '../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
-import { type PublicGame } from '../Utils/GDevelopServices/Game';
+import { type PublicGame, type Game } from '../Utils/GDevelopServices/Game';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 /**
@@ -81,6 +81,8 @@ type Props = {|
   onApply: (partialGameChange: PartialGameChange) => Promise<void>,
   isLoading: boolean,
   i18n: I18nType,
+  onUpdatingGame?: (isGameUpdating: boolean) => void,
+  onGameUpdated?: (game: Game) => void,
 |};
 
 export const PublicGamePropertiesDialog = ({
@@ -90,6 +92,8 @@ export const PublicGamePropertiesDialog = ({
   onApply,
   isLoading,
   i18n,
+  onUpdatingGame,
+  onGameUpdated,
 }: Props) => {
   const { profile } = React.useContext(AuthenticatedUserContext);
 
@@ -201,6 +205,9 @@ export const PublicGamePropertiesDialog = ({
         discoverable={discoverable}
         displayThumbnail
         thumbnailUrl={publicGame.thumbnailUrl}
+        onGameUpdated={onGameUpdated}
+        onUpdatingGame={onUpdatingGame}
+        disabled={isLoading}
       />
     </Dialog>
   );

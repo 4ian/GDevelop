@@ -1002,11 +1002,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     global: boolean,
     i18n: I18nType
   ) => {
-    const {
-      project,
-      layout,
-      projectScopedContainersAccessor,
-    } = this.props;
+    const { project, layout, projectScopedContainersAccessor } = this.props;
 
     const objectsContainersList = projectScopedContainersAccessor
       .get()

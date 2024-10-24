@@ -11,7 +11,11 @@ import { useInterval } from '../Utils/UseInterval';
 
 export type UnsavedChangesAmount = 'none' | 'small' | 'significant' | 'risky';
 
-type Props = {| onSave: () => Promise<void>, project: ?gdProject |};
+type Props = {|
+  onSave: () => Promise<void>,
+  project: ?gdProject,
+  isInQuickCustomization: boolean,
+|};
 
 const ONE_MINUTE = 60 * 1000;
 const MINIMUM_CHANGES_FOR_SIGNIFICANT_STATUS = 12;
@@ -43,7 +47,11 @@ export const getUnsavedChangesAmount = (
   }
 };
 
-const useSaveReminder = ({ onSave, project }: Props) => {
+const useSaveReminder = ({
+  onSave,
+  project,
+  isInQuickCustomization,
+}: Props) => {
   const unsavedChanges = React.useContext(UnsavedChangesContext);
   const { currentlyRunningInAppTutorial } = React.useContext(
     InAppTutorialContext
@@ -62,6 +70,7 @@ const useSaveReminder = ({ onSave, project }: Props) => {
 
       if (
         !displaySaveReminderPreference.activated ||
+        isInQuickCustomization ||
         currentlyRunningInAppTutorial ||
         !project
       ) {

@@ -88,6 +88,10 @@ export type SigningCredential =
   | AppleCertificateSigningCredential
   | AppleAuthKeySigningCredential;
 
+export const client = axios.create({
+  baseURL: GDevelopBuildApi.baseUrl,
+});
+
 export const filterAppleCertificateSigningCredentials = (
   signingCredentials: Array<SigningCredential> | null
 ): Array<AppleCertificateSigningCredential> | null => {
@@ -186,7 +190,7 @@ export const buildElectron = (
 ): Promise<Build> => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
-      axios.post(`${GDevelopBuildApi.baseUrl}/build`, null, {
+      client.post(`/build`, null, {
         params: {
           userId,
           key,
@@ -217,7 +221,7 @@ export const buildWeb = (
 ): Promise<Build> => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
-      axios.post(`${GDevelopBuildApi.baseUrl}/build`, null, {
+      client.post(`/build`, null, {
         params: {
           userId,
           key,
@@ -249,8 +253,8 @@ export const buildCordovaAndroid = (
 ): Promise<Build> => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
-      axios.post(
-        `${GDevelopBuildApi.baseUrl}/build`,
+      client.post(
+        `/build`,
         JSON.stringify({
           signing: {
             keystore,
@@ -290,8 +294,8 @@ export const buildCordovaIos = (
 ): Promise<Build> => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
-      axios.post(
-        `${GDevelopBuildApi.baseUrl}/build`,
+      client.post(
+        `/build`,
         {
           signing,
         },
@@ -321,7 +325,7 @@ export const getBuild = (
 ): Promise<Build> => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
-      axios.get(`${GDevelopBuildApi.baseUrl}/build/${buildId}`, {
+      client.get(`/build/${buildId}`, {
         params: {
           userId,
         },
@@ -340,7 +344,7 @@ export const getBuilds = (
 ): Promise<Array<Build>> => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
-      axios.get(`${GDevelopBuildApi.baseUrl}/build`, {
+      client.get(`/build`, {
         params: {
           userId,
           gameId,
@@ -361,8 +365,8 @@ export const updateBuild = (
 ): Promise<Build> => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
-      axios.patch(
-        `${GDevelopBuildApi.baseUrl}/build/${buildId}`,
+      client.patch(
+        `/build/${buildId}`,
         { name, description },
         {
           params: {
@@ -384,7 +388,7 @@ export const deleteBuild = (
 ): Promise<Build> => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
-      axios.delete(`${GDevelopBuildApi.baseUrl}/build/${buildId}`, {
+      client.delete(`/build/${buildId}`, {
         params: {
           userId,
         },
@@ -402,17 +406,14 @@ export const getUserSigningCredentials = async (
 ): Promise<Array<SigningCredential>> => {
   const authorizationHeader = await getAuthorizationHeader();
 
-  const response = await axios.get(
-    `${GDevelopBuildApi.baseUrl}/signing-credential`,
-    {
-      params: {
-        userId,
-      },
-      headers: {
-        Authorization: authorizationHeader,
-      },
-    }
-  );
+  const response = await client.get(`/signing-credential`, {
+    params: {
+      userId,
+    },
+    headers: {
+      Authorization: authorizationHeader,
+    },
+  });
 
   if (!response.data || !Array.isArray(response.data))
     throw new Error('Unexpected data returned by the endpoint.');
@@ -431,8 +432,8 @@ export const signingCredentialApi = {
   ): Promise<{ certificateRequestUuid: string, csrPem: string }> => {
     const authorizationHeader = await getAuthorizationHeader();
 
-    const response = await axios.post(
-      `${GDevelopBuildApi.baseUrl}/signing-credential/action/create-csr`,
+    const response = await client.post(
+      `/signing-credential/action/create-csr`,
       {
         ...options,
       },
@@ -457,7 +458,7 @@ export const signingCredentialApi = {
   ): Promise<{ certificateSerial: string, certificateKind: string }> => {
     const authorizationHeader = await getAuthorizationHeader();
 
-    const response = await axios.post(
+    const response = await client.post(
       `${
         GDevelopBuildApi.baseUrl
       }/signing-credential/action/upload-certificate`,
@@ -487,7 +488,7 @@ export const signingCredentialApi = {
   ): Promise<{ certificateSerial: string }> => {
     const authorizationHeader = await getAuthorizationHeader();
 
-    const response = await axios.post(
+    const response = await client.post(
       `${
         GDevelopBuildApi.baseUrl
       }/signing-credential/action/create-certificate-p12`,
@@ -515,7 +516,7 @@ export const signingCredentialApi = {
   ): Promise<{ uuid: string, name: string, certificatesCount: number }> => {
     const authorizationHeader = await getAuthorizationHeader();
 
-    const response = await axios.post(
+    const response = await client.post(
       `${
         GDevelopBuildApi.baseUrl
       }/signing-credential/action/upload-mobile-provision`,
@@ -546,8 +547,8 @@ export const signingCredentialApi = {
   ): Promise<{}> => {
     const authorizationHeader = await getAuthorizationHeader();
 
-    const response = await axios.post(
-      `${GDevelopBuildApi.baseUrl}/signing-credential/action/upload-auth-key`,
+    const response = await client.post(
+      `/signing-credential/action/upload-auth-key`,
       {
         ...options,
       },
@@ -575,18 +576,15 @@ export const signingCredentialApi = {
   ): Promise<void> => {
     const authorizationHeader = await getAuthorizationHeader();
 
-    const response = await axios.delete(
-      `${GDevelopBuildApi.baseUrl}/signing-credential`,
-      {
-        params: {
-          userId,
-          ...options,
-        },
-        headers: {
-          Authorization: authorizationHeader,
-        },
-      }
-    );
+    const response = await client.delete(`/signing-credential`, {
+      params: {
+        userId,
+        ...options,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    });
 
     return response.data;
   },

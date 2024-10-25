@@ -9,7 +9,7 @@ import DashboardWidget from './DashboardWidget';
 import { Trans } from '@lingui/macro';
 import FlatButton from '../UI/FlatButton';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
-import { Column, Line } from '../UI/Grid';
+import { Column, Line, LargeSpacer } from '../UI/Grid';
 import Text from '../UI/Text';
 import { Divider } from '@material-ui/core';
 import ArrowRight from '../UI/CustomSvgIcons/ArrowRight';
@@ -64,7 +64,9 @@ const ServicesWidget = ({ leaderboards, onSeeAllLeaderboards }: Props) => {
           </Column>
         ) : (
           <Line noMargin>
+            <LargeSpacer />
             <Divider orientation="vertical" />
+            <LargeSpacer />
           </Line>
         )}
         <Column expand noMargin>

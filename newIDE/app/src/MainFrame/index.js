@@ -16,7 +16,6 @@ import ProjectTitlebar from './ProjectTitlebar';
 import PreferencesDialog from './Preferences/PreferencesDialog';
 import AboutDialog from './AboutDialog';
 import ProjectManager from '../ProjectManager';
-import PlatformSpecificAssetsDialog from '../PlatformSpecificAssetsEditor/PlatformSpecificAssetsDialog';
 import LoaderModal from '../UI/LoaderModal';
 import CloseConfirmDialog from '../UI/CloseConfirmDialog';
 import ProfileDialog from '../Profile/ProfileDialog';
@@ -371,10 +370,6 @@ const MainFrame = (props: Props) => {
   const [languageDialogOpen, openLanguageDialog] = React.useState<boolean>(
     false
   );
-  const [
-    platformSpecificAssetsDialogOpen,
-    openPlatformSpecificAssetsDialog,
-  ] = React.useState<boolean>(false);
   const [aboutDialogOpen, openAboutDialog] = React.useState<boolean>(false);
   const [profileDialogOpen, openProfileDialog] = React.useState<boolean>(false);
   const [
@@ -3480,9 +3475,6 @@ const MainFrame = (props: Props) => {
             onRenameEventsFunctionsExtension={renameEventsFunctionsExtension}
             onRenameExternalEvents={renameExternalEvents}
             onOpenResources={openResources}
-            onOpenPlatformSpecificAssets={() =>
-              openPlatformSpecificAssetsDialog(true)
-            }
             eventsFunctionsExtensionsError={eventsFunctionsExtensionsError}
             onReloadEventsFunctionsExtensions={() => {
               if (isProjectClosedSoAvoidReloadingExtensions) {
@@ -3720,15 +3712,6 @@ const MainFrame = (props: Props) => {
           storageProvider: getStorageProvider(),
           initialTab: shareDialogInitialTab,
         })}
-      {!!currentProject && platformSpecificAssetsDialogOpen && (
-        <PlatformSpecificAssetsDialog
-          project={currentProject}
-          open
-          onApply={() => openPlatformSpecificAssetsDialog(false)}
-          onClose={() => openPlatformSpecificAssetsDialog(false)}
-          resourceManagementProps={resourceManagementProps}
-        />
-      )}
       {!!renderPreviewLauncher &&
         renderPreviewLauncher(
           {

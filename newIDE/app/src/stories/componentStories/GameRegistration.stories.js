@@ -35,16 +35,6 @@ export const NotLoggedIn = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const NotLoggedInWithoutLogin = () => (
-  <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
-    <GameRegistration
-      project={testProject.project}
-      onGameRegistered={() => {}}
-      hideLogin
-    />
-  </AuthenticatedUserContext.Provider>
-);
-
 export const NotAuthorized = () => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameRegistration

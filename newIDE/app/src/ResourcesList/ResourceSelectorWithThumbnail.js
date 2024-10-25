@@ -26,6 +26,7 @@ type Props = {|
   helperMarkdownText?: ?string,
   fallbackResourceKind?: ResourceKind,
   id?: string,
+  disabled?: boolean,
 |};
 
 const ResourceSelectorWithThumbnail = ({
@@ -40,6 +41,7 @@ const ResourceSelectorWithThumbnail = ({
   helperMarkdownText,
   fallbackResourceKind,
   id,
+  disabled,
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const itemsAlignment = isMobile ? 'center' : 'flex-end';
@@ -60,6 +62,7 @@ const ResourceSelectorWithThumbnail = ({
       helperMarkdownText={helperMarkdownText}
       fallbackResourceKind={fallbackResourceKind}
       id={id}
+      disabled={disabled}
     />
   );
   if (displayThumbnail) {

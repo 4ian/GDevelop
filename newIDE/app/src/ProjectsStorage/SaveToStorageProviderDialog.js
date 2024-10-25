@@ -9,7 +9,10 @@ import { List } from '../UI/List';
 import StorageProviderListItem from './StorageProviderListItem';
 import { type StorageProvider } from '.';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import { MaxProjectCountAlertMessage } from '../MainFrame/EditorContainers/HomePage/BuildSection/MaxProjectCountAlertMessage';
+import {
+  checkIfHasTooManyCloudProjects,
+  MaxProjectCountAlertMessage,
+} from '../MainFrame/EditorContainers/HomePage/BuildSection/MaxProjectCountAlertMessage';
 import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
 
 type Props = {|
@@ -31,12 +34,9 @@ const SaveToStorageProviderDialog = ({
   const { profile, limits, cloudProjects } = authenticatedUser;
 
   const isLoadingCloudProjects = !!profile && !cloudProjects;
-  const isCloudProjectsMaximumReached =
-    !!limits &&
-    !!cloudProjects &&
-    limits.capabilities.cloudProjects.maximumCount > 0 &&
-    cloudProjects.filter(cloudProject => !cloudProject.deletedAt).length >=
-      limits.capabilities.cloudProjects.maximumCount;
+  const isCloudProjectsMaximumReached = checkIfHasTooManyCloudProjects(
+    authenticatedUser
+  );
 
   return (
     <Dialog

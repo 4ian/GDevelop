@@ -18,12 +18,14 @@ import {
 } from '../../../fixtures/TestExporters';
 import { type Exporter } from '../../../ExportAndShare/ShareDialog';
 import {
-  fakeEmptyGameAndBuildsManager,
   fakeGameAndBuildsManager,
   fakeNotOwnedGameAndBuildsManager,
 } from '../../../fixtures/GDevelopServicesTestData/FakeGameAndBuildsManager';
 import EventsFunctionsExtensionsContext from '../../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { fakeEventsFunctionsExtensionsState } from '../../FakeEventsFunctionsExtensionsContext';
+import { GDevelopGameApi } from '../../../Utils/GDevelopServices/ApiConfigs';
+import { client as gameApiClient } from '../../../Utils/GDevelopServices/Game';
+import MockAdapter from 'axios-mock-adapter';
 
 export default {
   title: 'QuickCustomization/QuickPublish',
@@ -47,13 +49,30 @@ const erroringOnlineWebExporter: Exporter = {
   exportPipeline: fakeErroringBrowserOnlineWebExportPipeline,
 };
 
-const Template = ({ children }: { children: React.Node }) => (
-  <EventsFunctionsExtensionsContext.Provider
-    value={fakeEventsFunctionsExtensionsState}
-  >
-    <FixedHeightFlexContainer height={600}>{children}</FixedHeightFlexContainer>
-  </EventsFunctionsExtensionsContext.Provider>
-);
+const Template = ({ children }: { children: React.Node }) => {
+  const fakeGame = fakeGameAndBuildsManager.game;
+  if (!fakeGame)
+    throw new Error(
+      'Game was expected to be defined in `fakeGameAndBuildsManager`.'
+    );
+
+  const axiosMock = new MockAdapter(gameApiClient, { delayResponse: 500 });
+  axiosMock
+    .onPatch(`${GDevelopGameApi.baseUrl}/game/${fakeGame.id}`)
+    .reply(200, fakeGame)
+    .onAny()
+    .reply(501);
+
+  return (
+    <EventsFunctionsExtensionsContext.Provider
+      value={fakeEventsFunctionsExtensionsState}
+    >
+      <FixedHeightFlexContainer height={600}>
+        {children}
+      </FixedHeightFlexContainer>
+    </EventsFunctionsExtensionsContext.Provider>
+  );
+};
 
 export const NotAuthenticated = () => {
   return (
@@ -61,8 +80,9 @@ export const NotAuthenticated = () => {
       <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
         <QuickPublish
           project={testProject.project}
-          gameAndBuildsManager={fakeEmptyGameAndBuildsManager}
+          gameAndBuildsManager={fakeGameAndBuildsManager}
           isSavingProject={false}
+          isRequiredToSaveAsNewCloudProject={() => true}
           onSaveProject={async () => {}}
           onlineWebExporter={onlineWebExporter}
           setIsNavigationDisabled={() => {}}
@@ -81,8 +101,9 @@ export const AuthenticatedWithAvailableCloudProjectsRoom = () => {
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
         <QuickPublish
           project={testProject.project}
-          gameAndBuildsManager={fakeEmptyGameAndBuildsManager}
+          gameAndBuildsManager={fakeGameAndBuildsManager}
           isSavingProject={false}
+          isRequiredToSaveAsNewCloudProject={() => true}
           onSaveProject={async () => {}}
           onlineWebExporter={onlineWebExporter}
           setIsNavigationDisabled={() => {}}
@@ -101,13 +122,16 @@ export const AuthenticatedWithTooManyCloudProjects = () => {
       <AuthenticatedUserContext.Provider
         value={{
           ...fakeAuthenticatedUserWithNoSubscriptionAndCredits,
+          // We have more projects than the maximum allowed, so we must tell the user
+          // that the project can't be saved yet with their current subscription.
           cloudProjects: tenCloudProjects,
         }}
       >
         <QuickPublish
           project={testProject.project}
-          gameAndBuildsManager={fakeEmptyGameAndBuildsManager}
+          gameAndBuildsManager={fakeGameAndBuildsManager}
           isSavingProject={false}
+          isRequiredToSaveAsNewCloudProject={() => true}
           onSaveProject={async () => {}}
           onlineWebExporter={onlineWebExporter}
           setIsNavigationDisabled={() => {}}
@@ -119,6 +143,39 @@ export const AuthenticatedWithTooManyCloudProjects = () => {
     </Template>
   );
 };
+
+export const AuthenticatedWithCloudProjectsMaximumReachedButSavedAlready = () => {
+  return (
+    <Template>
+      <AuthenticatedUserContext.Provider
+        value={{
+          ...fakeAuthenticatedUserWithNoSubscriptionAndCredits,
+          // We have more projects than the maximum allowed, but the project is already saved
+          // so there are no problems.
+          cloudProjects: tenCloudProjects,
+        }}
+      >
+        <QuickPublish
+          project={testProject.project}
+          gameAndBuildsManager={fakeGameAndBuildsManager}
+          isSavingProject={false}
+          isRequiredToSaveAsNewCloudProject={() =>
+            // Indicates that the project is already saved, there will be
+            // no need to save it as a new cloud project.
+            false
+          }
+          onSaveProject={async () => {}}
+          onlineWebExporter={onlineWebExporter}
+          setIsNavigationDisabled={() => {}}
+          onClose={action('onClose')}
+          onContinueQuickCustomization={action('onContinueQuickCustomization')}
+          onTryAnotherGame={action('onTryAnotherGame')}
+        />
+      </AuthenticatedUserContext.Provider>
+    </Template>
+  );
+};
+
 export const AuthenticatedAndLoadingUserCloudProjects = () => {
   return (
     <Template>
@@ -130,8 +187,9 @@ export const AuthenticatedAndLoadingUserCloudProjects = () => {
       >
         <QuickPublish
           project={testProject.project}
-          gameAndBuildsManager={fakeEmptyGameAndBuildsManager}
+          gameAndBuildsManager={fakeGameAndBuildsManager}
           isSavingProject={false}
+          isRequiredToSaveAsNewCloudProject={() => true}
           onSaveProject={async () => {}}
           onlineWebExporter={onlineWebExporter}
           setIsNavigationDisabled={() => {}}
@@ -150,8 +208,9 @@ export const AuthenticatedAndFails = () => {
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
         <QuickPublish
           project={testProject.project}
-          gameAndBuildsManager={fakeEmptyGameAndBuildsManager}
+          gameAndBuildsManager={fakeGameAndBuildsManager}
           isSavingProject={false}
+          isRequiredToSaveAsNewCloudProject={() => true}
           onSaveProject={async () => {}}
           onlineWebExporter={erroringOnlineWebExporter}
           setIsNavigationDisabled={() => {}}
@@ -172,6 +231,7 @@ export const AuthenticatedExistingGame = () => {
           project={testProject.project}
           gameAndBuildsManager={fakeGameAndBuildsManager}
           isSavingProject={false}
+          isRequiredToSaveAsNewCloudProject={() => true}
           onSaveProject={async () => {}}
           onlineWebExporter={onlineWebExporter}
           setIsNavigationDisabled={() => {}}
@@ -192,6 +252,7 @@ export const AuthenticatedNotOwnedGame = () => {
           project={testProject.project}
           gameAndBuildsManager={fakeNotOwnedGameAndBuildsManager}
           isSavingProject={false}
+          isRequiredToSaveAsNewCloudProject={() => true}
           onSaveProject={async () => {}}
           onlineWebExporter={onlineWebExporter}
           setIsNavigationDisabled={() => {}}

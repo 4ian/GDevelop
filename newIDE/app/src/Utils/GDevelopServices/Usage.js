@@ -320,17 +320,14 @@ export const getUserEarningsBalance = async (
 ): Promise<UserEarningsBalance> => {
   const authorizationHeader = await getAuthorizationHeader();
 
-  const response = await axios.get(
-    `${GDevelopUsageApi.baseUrl}/user-earnings-balance`,
-    {
-      params: {
-        userId,
-      },
-      headers: {
-        Authorization: authorizationHeader,
-      },
-    }
-  );
+  const response = await apiClient.get(`/user-earnings-balance`, {
+    params: {
+      userId,
+    },
+    headers: {
+      Authorization: authorizationHeader,
+    },
+  });
   const userEarningsBalances = response.data;
   if (!Array.isArray(userEarningsBalances)) {
     throw new Error('Invalid response from the user earnings API');
@@ -350,8 +347,8 @@ export const cashOutUserEarnings = async (
 ): Promise<void> => {
   const authorizationHeader = await getAuthorizationHeader();
 
-  await axios.post(
-    `${GDevelopUsageApi.baseUrl}/user-earnings-balance/action/cash-out`,
+  await apiClient.post(
+    `/user-earnings-balance/action/cash-out`,
     {
       type,
     },

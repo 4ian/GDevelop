@@ -10,6 +10,8 @@ import FlatButton from '../UI/FlatButton';
 import ArrowRight from '../UI/CustomSvgIcons/ArrowRight';
 import { Grid } from '@material-ui/core';
 import FeedbackWidget from './FeedbackWidget';
+import { listComments, type Comment } from '../Utils/GDevelopServices/Play';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 type Props = {|
   game: Game,
@@ -17,9 +19,37 @@ type Props = {|
 |};
 
 const GameDashboardV2 = ({ game }: Props) => {
+  const { getAuthorizationHeader, profile } = React.useContext(
+    AuthenticatedUserContext
+  );
   const [view, setView] = React.useState<
     'game' | 'analytics' | 'feedbacks' | 'builds' | 'services'
   >('game');
+  const [feedbacks, setFeedbacks] = React.useState<?Array<Comment>>(null);
+
+  React.useEffect(
+    () => {
+      if (!profile) {
+        setFeedbacks(null);
+        return;
+      }
+
+      const fetchData = async () => {
+        const feedbacks = await listComments(
+          getAuthorizationHeader,
+          profile.id,
+          {
+            gameId: game.id,
+            type: 'FEEDBACK',
+          }
+        );
+        setFeedbacks(feedbacks);
+      };
+
+      fetchData();
+    },
+    [getAuthorizationHeader, profile, game.id]
+  );
 
   return (
     <ColumnStackLayout noMargin>
@@ -37,7 +67,10 @@ const GameDashboardV2 = ({ game }: Props) => {
             />
           }
         />
-        <FeedbackWidget onSeeAll={() => setView('feedbacks')} />
+        <FeedbackWidget
+          onSeeAll={() => setView('feedbacks')}
+          feedbacks={feedbacks}
+        />
         <DashboardWidget
           gridSize={3}
           title={<Trans>Exports</Trans>}

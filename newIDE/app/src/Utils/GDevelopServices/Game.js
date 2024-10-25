@@ -40,8 +40,8 @@ export type PublicGame = {
   categories?: string[],
   userSlug?: string,
   gameSlug?: string,
-  displayAdsOnGamePage: boolean;
-  acceptsGameComments?: boolean;
+  displayAdsOnGamePage: boolean,
+  acceptsGameComments?: boolean,
   discoverable?: boolean,
   donateLink: ?string,
 };

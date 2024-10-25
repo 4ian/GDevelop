@@ -106,21 +106,15 @@ export const client = axios.create({
 });
 
 export const listGameActiveLeaderboards = async (
-  authenticatedUser: AuthenticatedUser,
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
   gameId: string
 ): Promise<?Array<Leaderboard>> => {
-  const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
-  if (!firebaseUser) return;
-
-  const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await client.get(
-    `/game/${gameId}/leaderboard?deleted=false`,
-    {
-      headers: { Authorization: authorizationHeader },
-      params: { userId },
-    }
-  );
+  const response = await client.get(`/game/${gameId}/leaderboard`, {
+    headers: { Authorization: authorizationHeader },
+    params: { userId, deleted: 'false' },
+  });
   return response.data;
 };
 

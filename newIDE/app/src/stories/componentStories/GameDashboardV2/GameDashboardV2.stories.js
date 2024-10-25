@@ -13,8 +13,12 @@ import {
   commentWithNoTextUnprocessed,
   commentProcessed,
   fakeSilverAuthenticatedUser,
+  completeCordovaBuild,
+  completeElectronBuild,
+  completeWebBuild,
 } from '../../../fixtures/GDevelopServicesTestData';
 import { client as playApiAxiosClient } from '../../../Utils/GDevelopServices/Play';
+import { client as buildApiAxiosClient } from '../../../Utils/GDevelopServices/Build';
 
 import MockAdapter from 'axios-mock-adapter';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
@@ -30,6 +34,9 @@ const delayResponse = 400;
 const playServiceMock = new MockAdapter(playApiAxiosClient, {
   delayResponse,
 });
+const buildServiceMock = new MockAdapter(buildApiAxiosClient, {
+  delayResponse,
+});
 
 export const Default = () => {
   playServiceMock
@@ -40,6 +47,14 @@ export const Default = () => {
       commentWithNoTextUnprocessed,
       commentUnprocessed2,
     ])
+    .onAny()
+    .reply(config => {
+      console.error(`Unexpected call to ${config.url} (${config.method})`);
+      return [504, null];
+    });
+  buildServiceMock
+    .onGet(`/build`)
+    .reply(200, [completeCordovaBuild, completeElectronBuild, completeWebBuild])
     .onAny()
     .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);

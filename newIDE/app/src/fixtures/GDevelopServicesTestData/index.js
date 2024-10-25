@@ -4122,7 +4122,7 @@ export const commentUnprocessed2: Comment = {
 };
 
 export const commentWithNoTextUnprocessed: Comment = {
-  id: 'comment-unprocessed-id',
+  id: 'comment-unprocessed-id-no-text',
   type: 'FEEDBACK',
   gameId: 'complete-game-id',
   buildId: 'complete-build-id',

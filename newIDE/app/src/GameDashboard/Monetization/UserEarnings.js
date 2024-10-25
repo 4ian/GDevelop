@@ -26,6 +26,11 @@ const styles = {
   separator: {
     height: 50,
   },
+  buttonContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'stretch',
+  },
 };
 
 type Props = {|
@@ -195,7 +200,7 @@ const UserEarnings = ({ hideTitle, margin }: Props) => {
             >
               {/* Button must be wrapped in a container so that the parent tooltip
                   can display even if the button is disabled. */}
-              <Column noMargin>
+              <div style={styles.buttonContainer}>
                 <RaisedButton
                   icon={<Bank fontSize="small" />}
                   disabled={!canCashout}
@@ -205,7 +210,7 @@ const UserEarnings = ({ hideTitle, margin }: Props) => {
                     setSelectedCashOutType('cash');
                   }}
                 />
-              </Column>
+              </div>
             </Tooltip>
           </ResponsiveLineStackLayout>
           <Spacer />

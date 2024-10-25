@@ -126,7 +126,7 @@ const UserEarnings = ({ hideTitle, margin }: Props) => {
   const content = (
     <ResponsiveLineStackLayout
       expand
-      justifyContent="space-between"
+      justifyContent={hideTitle ? 'stretch' : 'space-between'}
       alignItems="center"
     >
       {!hideTitle && (
@@ -161,7 +161,12 @@ const UserEarnings = ({ hideTitle, margin }: Props) => {
         </LineStackLayout>
       )}
       {!error && (
-        <LineStackLayout noMargin alignItems="center">
+        <LineStackLayout
+          noMargin
+          alignItems="center"
+          justifyContent={hideTitle ? 'center' : 'flex-end'}
+          expand
+        >
           <ResponsiveLineStackLayout alignItems="center">
             <Column noMargin>
               <Text

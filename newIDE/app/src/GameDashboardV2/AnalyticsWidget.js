@@ -23,7 +23,7 @@ const AnalyticsWidget = ({ onSeeAll, gameMetrics }: Props) => {
   const chartData = React.useMemo(() => buildLastWeekChartData(gameMetrics), [
     gameMetrics,
   ]);
-  console.log(chartData);
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -41,11 +41,13 @@ const AnalyticsWidget = ({ onSeeAll, gameMetrics }: Props) => {
           }
         >
           <ResponsiveLineStackLayout expand noColumnMargin noMargin>
-            <Column expand noMargin>
+            <Column expand noMargin useFullHeight>
               <Text size="block-title">
                 <Trans>Earnings</Trans>
               </Text>
-              <UserEarnings hideTitle margin="dense" />
+              <Column expand noMargin useFullHeight justifyContent="center">
+                <UserEarnings hideTitle margin="dense" />
+              </Column>
             </Column>
             <Column expand noMargin>
               <Text size="block-title">

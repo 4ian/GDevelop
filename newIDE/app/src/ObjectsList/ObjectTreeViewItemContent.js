@@ -9,9 +9,7 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
-import {
-  TreeViewItemContent,
-} from '.';
+import { TreeViewItemContent } from '.';
 import { canSwapAssetOfObject } from '../AssetStore/AssetSwapper';
 import { getInstanceCountInLayoutForObject } from '../Utils/Layout';
 import {
@@ -62,10 +60,6 @@ export type ObjectTreeViewItemProps = {|
   swapObjectAsset: (objectWithContext: ObjectWithContext) => void,
   initialInstances?: gdInitialInstancesContainer,
   onObjectModified: (shouldForceUpdateList: boolean) => void,
-  deleteObjectFolderOrObjectWithContext:
-    (
-      objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext
-    ) => Promise<void>,
   onMovedObjectFolderOrObjectToAnotherFolderInSameContainer: (
     objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext
   ) => void,
@@ -74,7 +68,12 @@ export type ObjectTreeViewItemProps = {|
     i18n: I18nType,
     objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
     index?: number,
-    folder?: gdObjectFolderOrObject) => void,
+    folder?: gdObjectFolderOrObject
+  ) => void,
+  showDeleteConfirmation: (options: any) => Promise<boolean>,
+  selectObjectFolderOrObjectWithContext: (
+    objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext
+  ) => void,
   forceUpdate: () => void,
 |};
 
@@ -359,11 +358,10 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
         click: () => {
           // TODO Is this needed?
           //selectObjectFolderOrObjectWithContext(null);
-          setAsGlobalObject(i18n, 
-            {
-              objectFolderOrObject: this.object,
-              global: this.isGlobal,
-            });
+          setAsGlobalObject(i18n, {
+            objectFolderOrObject: this.object,
+            global: this.isGlobal,
+          });
         },
         visible: canSetAsGlobalObject !== false,
       },
@@ -405,7 +403,51 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
   }
 
   delete(): void {
-    this.props.deleteObjectFolderOrObjectWithContext({objectFolderOrObject: this.object, global: this.isGlobal});
+    this._delete();
+  }
+
+  async _delete(): Promise<void> {
+    const {
+      globalObjectsContainer,
+      objectsContainer,
+      onObjectModified,
+      showDeleteConfirmation,
+      onDeleteObjects,
+      selectObjectFolderOrObjectWithContext,
+    } = this.props;
+
+    const answer = await showDeleteConfirmation({
+      title: t`Remove object`,
+      message: t`Are you sure you want to remove this object? This can't be undone.`,
+    });
+    if (!answer) return;
+
+    const objectsToDelete = [this.object.getObject()];
+    const objectsWithContext = objectsToDelete.map(object => ({
+      object,
+      global,
+    }));
+
+    // TODO: Change selectedObjectFolderOrObjectWithContext so that it's easy
+    // to remove an item using keyboard only and to navigate with the arrow
+    // keys right after deleting it.
+    selectObjectFolderOrObjectWithContext(null);
+
+    // It's important to call onDeleteObjects, because the parent might
+    // have to do some refactoring/clean up work before the object is deleted
+    // (typically, the SceneEditor will remove instances referring to the object,
+    // leading to the removal of their renderer - which can keep a reference to
+    // the object).
+    onDeleteObjects(objectsWithContext, doRemove => {
+      if (!doRemove) return;
+      const container = global ? globalObjectsContainer : objectsContainer;
+      if (container) {
+        objectsToDelete.forEach(object => {
+          container.removeObject(object.getName());
+        });
+      }
+      onObjectModified(false);
+    });
   }
 
   moveAt(destinationIndex: number): void {

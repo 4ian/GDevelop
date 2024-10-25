@@ -9,9 +9,7 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
-import {
-  TreeViewItemContent,
-} from '.';
+import { TreeViewItemContent } from '.';
 import {
   enumerateFoldersInContainer,
   enumerateFoldersInFolder,
@@ -25,6 +23,7 @@ import {
   OBJECT_CLIPBOARD_KIND,
 } from './ObjectTreeViewItemContent';
 import { renderQuickCustomizationMenuItems } from '../QuickCustomization/QuickCustomizationMenuItems';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 
 const gd: libGDevelop = global.gd;
 
@@ -35,6 +34,10 @@ export type ObjectFolderTreeViewItemCallbacks = {|
     newName: string,
     cb: (boolean) => void
   ) => void,
+  onDeleteObjects: (
+    objectWithContext: ObjectWithContext[],
+    cb: (boolean) => void
+  ) => void,
 |};
 
 export type ObjectFolderTreeViewItemProps = {|
@@ -43,10 +46,6 @@ export type ObjectFolderTreeViewItemProps = {|
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   onObjectModified: (shouldForceUpdateList: boolean) => void,
-  deleteObjectFolderOrObjectWithContext:
-    (
-      objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext
-    ) => Promise<void>,
   expandFolders: (
     objectFolderOrObjectWithContexts: Array<ObjectFolderOrObjectWithContext>
   ) => void,
@@ -55,8 +54,22 @@ export type ObjectFolderTreeViewItemProps = {|
   onMovedObjectFolderOrObjectToAnotherFolderInSameContainer: (
     objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext
   ) => void,
+  showDeleteConfirmation: (options: any) => Promise<boolean>,
+  selectObjectFolderOrObjectWithContext: (
+    objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext
+  ) => void,
+  forceUpdateList: () => void,
   forceUpdate: () => void,
 |};
+
+export const getObjectFolderTreeViewItemId = (
+  objectFolder: gdObjectFolderOrObject
+): string => {
+  // Use the ptr as id since two folders can have the same name.
+  // If using folder name, this would need for methods when renaming
+  // the folder to keep it open.
+  return `object-folder-${objectFolder.ptr}`;
+};
 
 export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
   objectFolder: gdObjectFolderOrObject;
@@ -195,7 +208,11 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
             if (folder === this.objectFolder.getParent()) return;
             this.objectFolder
               .getParent()
-              .moveObjectFolderOrObjectToAnotherFolder(this.objectFolder, folder, 0);
+              .moveObjectFolderOrObjectToAnotherFolder(
+                this.objectFolder,
+                folder,
+                0
+              );
             onMovedObjectFolderOrObjectToAnotherFolderInSameContainer({
               objectFolderOrObject: folder,
               global: this.isGlobal,
@@ -250,7 +267,74 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
   }
 
   delete(): void {
-    this.props.deleteObjectFolderOrObjectWithContext({objectFolderOrObject: this.objectFolder, global: this.isGlobal});
+    this._delete();
+  }
+
+  async _delete(): Promise<void> {
+    const {
+      globalObjectsContainer,
+      objectsContainer,
+      onObjectModified,
+      forceUpdateList,
+      showDeleteConfirmation,
+      onDeleteObjects,
+      selectObjectFolderOrObjectWithContext,
+    } = this.props;
+
+    const objectsToDelete = enumerateObjectsInFolder(this.objectFolder);
+    if (objectsToDelete.length === 0) {
+      // Folder is empty or contains only empty folders.
+      selectObjectFolderOrObjectWithContext(null);
+      this.objectFolder.getParent().removeFolderChild(this.objectFolder);
+      forceUpdateList();
+      return;
+    }
+
+    let message: MessageDescriptor;
+    let title: MessageDescriptor;
+    if (objectsToDelete.length === 1) {
+      message = t`Are you sure you want to remove this folder and with it the object ${objectsToDelete[0].getName()}? This can't be undone.`;
+      title = t`Remove folder and object`;
+    } else {
+      message = t`Are you sure you want to remove this folder and all its content (objects ${objectsToDelete
+        .map(object => object.getName())
+        .join(', ')})? This can't be undone.`;
+      title = t`Remove folder and objects`;
+    }
+
+    const answer = await showDeleteConfirmation({ message, title });
+    if (!answer) return;
+
+    const objectsWithContext = objectsToDelete.map(object => ({
+      object,
+      global,
+    }));
+
+    // TODO: Change selectedObjectFolderOrObjectWithContext so that it's easy
+    // to remove an item using keyboard only and to navigate with the arrow
+    // keys right after deleting it.
+    selectObjectFolderOrObjectWithContext(null);
+
+    const folderToDelete = this.objectFolder;
+    // It's important to call onDeleteObjects, because the parent might
+    // have to do some refactoring/clean up work before the object is deleted
+    // (typically, the SceneEditor will remove instances referring to the object,
+    // leading to the removal of their renderer - which can keep a reference to
+    // the object).
+    onDeleteObjects(objectsWithContext, doRemove => {
+      if (!doRemove) return;
+      const container = global ? globalObjectsContainer : objectsContainer;
+      if (container) {
+        objectsToDelete.forEach(object => {
+          container.removeObject(object.getName());
+        });
+      }
+
+      folderToDelete.getParent().removeFolderChild(folderToDelete);
+      forceUpdateList();
+
+      onObjectModified(false);
+    });
   }
 
   moveAt(destinationIndex: number): void {
@@ -285,7 +369,7 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
       objectsContainer,
       onObjectPasted,
       expandFolders,
-      onObjectModified
+      onObjectModified,
     } = this.props;
 
     const newObjectWithContext = addSerializedObjectToObjectsContainer({

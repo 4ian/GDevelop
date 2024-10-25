@@ -21,7 +21,6 @@ import {
 import { Column, Line } from '../UI/Grid';
 import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
 import Add from '../UI/CustomSvgIcons/Add';
-import { type EmptyPlaceholder } from '../ObjectsList';
 import TreeView, { type TreeViewInterface } from '../UI/TreeView';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
@@ -46,6 +45,12 @@ type RootFolder = {|
   +label: string,
   +children: GroupWithContextList | Array<EmptyPlaceholder>,
   +isRoot: true,
+  +id: string,
+|};
+
+type EmptyPlaceholder = {|
+  +label: string,
+  +isPlaceholder: true,
   +id: string,
 |};
 

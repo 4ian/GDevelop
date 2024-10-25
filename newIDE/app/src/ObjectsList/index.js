@@ -49,7 +49,10 @@ import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasur
 import ErrorBoundary from '../UI/ErrorBoundary';
 import { getInsertionParentAndPositionFromSelection } from '../Utils/ObjectFolders';
 import { ObjectTreeViewItemContent } from './ObjectTreeViewItemContent';
-import { ObjectFolderTreeViewItemContent } from './ObjectFolderTreeViewItemContent';
+import {
+  ObjectFolderTreeViewItemContent,
+  getObjectFolderTreeViewItemId,
+} from './ObjectFolderTreeViewItemContent';
 
 const sceneObjectsRootFolderId = 'scene-objects';
 const globalObjectsRootFolderId = 'global-objects';
@@ -123,6 +126,39 @@ class PlaceHolderTreeViewItem implements TreeViewItem {
   }
 }
 
+const createTreeViewItem = ({
+  objectFolderOrObject,
+  isGlobal,
+  objectFolderTreeViewItemProps,
+  objectTreeViewItemProps,
+}: {|
+  objectFolderOrObject: gdObjectFolderOrObject,
+  isGlobal: boolean,
+  objectFolderTreeViewItemProps: ObjectFolderTreeViewItemProps,
+  objectTreeViewItemProps: ObjectTreeViewItemProps,
+|}): Array<TreeViewItem> => {
+  if (objectFolderOrObject.isFolder()) {
+    return new ObjectFolderTreeViewItem({
+      objectFolderOrObject: objectFolderOrObject,
+      global: this.global,
+      isRoot: false,
+      content: new ObjectFolderTreeViewItemContent(
+        objectFolderOrObject,
+        isGlobal,
+        this.objectFolderTreeViewItemProps
+      ),
+    });
+  } else {
+    return new LeafTreeViewItem(
+      new ObjectTreeViewItemContent(
+        objectFolderOrObject,
+        isGlobal,
+        this.objectTreeViewItemProps
+      )
+    );
+  }
+};
+
 class ObjectFolderTreeViewItem implements TreeViewItem {
   isRoot: boolean;
   global: boolean;
@@ -165,16 +201,12 @@ class ObjectFolderTreeViewItem implements TreeViewItem {
     }
     return mapFor(0, this.objectFolderOrObject.getChildrenCount(), i => {
       const child = this.objectFolderOrObject.getChildAt(i);
-      if (child.isFolder()) {
-        return new ObjectFolderTreeViewItem({
-          objectFolderOrObject: child,
-          global: this.global,
-          isRoot: false,
-          content: new ObjectFolderTreeViewItemContent(child, this.global, this.objectFolderTreeViewItemProps),
-        });
-      } else {
-        return new LeafTreeViewItem(new ObjectTreeViewItemContent(child, this.global, this.objectTreeViewItemProps));
-      }
+      return createTreeViewItem({
+        objectFolderOrObject: child,
+        isGlobal: this.global,
+        objectFolderTreeViewItemProps: this.objectFolderTreeViewItemProps,
+        objectTreeViewItemProps: this.objectTreeViewItemProps,
+      });
     });
   }
 }
@@ -200,11 +232,11 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
     this.buildMenuTemplateFunction = (i18n: I18nType, index: number) =>
       [
         rightButton
-          ? ({
-                id: rightButton.id,
-                label: rightButton.label,
-                click: rightButton.click,
-              })
+          ? {
+              id: rightButton.id,
+              label: rightButton.label,
+              click: rightButton.click,
+            }
           : null,
         ...(buildMenuTemplateFunction ? buildMenuTemplateFunction() : []),
       ].filter(Boolean);
@@ -499,10 +531,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
           if (treeViewRef.current) {
             treeViewRef.current.openItems([
-              getTreeViewItemId({
-                objectFolderOrObject: parentFolder,
-                global: false,
-              }),
+              getObjectFolderTreeViewItemId(parentFolder),
             ]);
           }
         } else {
@@ -613,144 +642,25 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       [onObjectFolderOrObjectWithContextSelected]
     );
 
-    const deleteObjectFolderOrObjectWithContext = React.useCallback(
-      async (
-        objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext
-      ) => {
-        if (!objectFolderOrObjectWithContext) return;
-        const {
-          objectFolderOrObject,
-          global,
-        } = objectFolderOrObjectWithContext;
-
-        let objectsToDelete: gdObject[];
-        let folderToDelete: ?gdObjectFolderOrObject = null;
-        let message: MessageDescriptor;
-        let title: MessageDescriptor;
-
-        if (objectFolderOrObject.isFolder()) {
-          objectsToDelete = enumerateObjectsInFolder(objectFolderOrObject);
-          if (objectsToDelete.length === 0) {
-            // Folder is empty or contains only empty folders.
-            selectObjectFolderOrObjectWithContext(null);
-            objectFolderOrObject
-              .getParent()
-              .removeFolderChild(objectFolderOrObject);
-            forceUpdateList();
-            return;
-          }
-
-          folderToDelete = objectFolderOrObject;
-          if (objectsToDelete.length === 1) {
-            message = t`Are you sure you want to remove this folder and with it the object ${objectsToDelete[0].getName()}? This can't be undone.`;
-            title = t`Remove folder and object`;
-          } else {
-            message = t`Are you sure you want to remove this folder and all its content (objects ${objectsToDelete
-              .map(object => object.getName())
-              .join(', ')})? This can't be undone.`;
-            title = t`Remove folder and objects`;
-          }
-        } else {
-          objectsToDelete = [objectFolderOrObject.getObject()];
-          message = t`Are you sure you want to remove this object? This can't be undone.`;
-          title = t`Remove object`;
-        }
-
-        const answer = await showDeleteConfirmation({ message, title });
-        if (!answer) return;
-
-        const objectsWithContext = objectsToDelete.map(object => ({
-          object,
-          global,
-        }));
-
-        // TODO: Change selectedObjectFolderOrObjectWithContext so that it's easy
-        // to remove an item using keyboard only and to navigate with the arrow
-        // keys right after deleting it.
-        selectObjectFolderOrObjectWithContext(null);
-
-        // It's important to call onDeleteObjects, because the parent might
-        // have to do some refactoring/clean up work before the object is deleted
-        // (typically, the SceneEditor will remove instances referring to the object,
-        // leading to the removal of their renderer - which can keep a reference to
-        // the object).
-        onDeleteObjects(objectsWithContext, doRemove => {
-          if (!doRemove) return;
-          const container = global ? globalObjectsContainer : objectsContainer;
-          if (container) {
-            objectsToDelete.forEach(object => {
-              container.removeObject(object.getName());
-            });
-          }
-
-          if (folderToDelete) {
-            folderToDelete.getParent().removeFolderChild(folderToDelete);
-            forceUpdateList();
-          }
-
-          onObjectModified(false);
-        });
-      },
-      [
-        showDeleteConfirmation,
-        selectObjectFolderOrObjectWithContext,
-        onDeleteObjects,
-        forceUpdateList,
-        globalObjectsContainer,
-        objectsContainer,
-        onObjectModified,
-      ]
-    );
-
     const editName = React.useCallback(
-      (objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext) => {
-        if (!objectFolderOrObjectWithContext) return;
+      (item: ?TreeViewItem) => {
+        if (!item) return;
         const treeView = treeViewRef.current;
         if (treeView) {
           if (isMobile) {
             // Position item at top of the screen to make sure it will be visible
             // once the keyboard is open.
-            treeView.scrollToItem(objectFolderOrObjectWithContext, 'start');
+            treeView.scrollToItem(item, 'start');
           }
-          treeView.renameItem(objectFolderOrObjectWithContext);
+          treeView.renameItem(item);
         }
       },
       [isMobile]
     );
 
-    React.useEffect(
-      () => {
-        if (keyboardShortcutsRef.current) {
-          keyboardShortcutsRef.current.setShortcutCallback('onDelete', () => {
-            deleteObjectFolderOrObjectWithContext(
-              selectedObjectFolderOrObjectsWithContext[0]
-            );
-          });
-          keyboardShortcutsRef.current.setShortcutCallback(
-            'onDuplicate',
-            () => {
-              duplicateItem(
-                selectedObjectFolderOrObjectsWithContext[0]
-              );
-            }
-          );
-          keyboardShortcutsRef.current.setShortcutCallback('onRename', () => {
-            editName(selectedObjectFolderOrObjectsWithContext[0]);
-          });
-        }
-      },
-      [
-        selectedObjectFolderOrObjectsWithContext,
-        deleteObjectFolderOrObjectWithContext,
-        editName,
-      ]
-    );
-
-    const scrollToItem = (
-      objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext
-    ) => {
+    const scrollToItem = (item: TreeViewItem) => {
       if (treeViewRef.current) {
-        treeViewRef.current.scrollToItem(objectFolderOrObjectWithContext);
+        treeViewRef.current.scrollToItem(item);
       }
     };
 
@@ -884,7 +794,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               global,
             };
             if (treeViewRef.current) {
-              treeViewRef.current.openItems([getTreeViewItemId(items[0])]);
+              treeViewRef.current.openItems([
+                getObjectFolderTreeViewItemId(items[0].objectFolderOrObject),
+              ]);
             }
           } else {
             const parentFolder = selectedObjectFolderOrObject.getParent();
@@ -910,12 +822,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         );
         const itemsToOpen = getFoldersAscendanceWithoutRootFolder(
           newObjectFolderOrObjectWithContext.objectFolderOrObject
-        ).map(folder =>
-          getTreeViewItemId({
-            objectFolderOrObject: folder,
-            global: newObjectFolderOrObjectWithContext.global,
-          })
-        );
+        ).map(folder => getObjectFolderTreeViewItemId(folder));
         itemsToOpen.push(
           newObjectFolderOrObjectWithContext.global
             ? globalObjectsRootFolderId
@@ -935,12 +842,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     );
 
     const onMovedObjectFolderOrObjectToAnotherFolderInSameContainer = React.useCallback(
-      (
-        objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext
-      ) => {
+      (objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext) => {
         const treeView = treeViewRef.current;
         if (treeView) {
-          const closestVisibleParent = getClosestVisibleParent(objectFolderOrObjectWithContext);
+          const closestVisibleParent = getClosestVisibleParent(
+            objectFolderOrObjectWithContext
+          );
           if (closestVisibleParent) {
             treeView.animateItem(closestVisibleParent);
           }
@@ -952,16 +859,21 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     const expandFolders = React.useCallback(
       (
-        objectFolderOrObjectWithContexts: Array<ObjectFolderOrObjectWithContext>,
+        objectFolderOrObjectWithContexts: Array<ObjectFolderOrObjectWithContext>
       ) => {
-      if (treeViewRef.current) {
-        treeViewRef.current.openItems(
-          objectFolderOrObjectWithContexts.map(objectFolderOrObjectWithContext =>
-            getTreeViewItemId(objectFolderOrObjectWithContexts)
-          )
-        );
-      }
-    }, []);
+        if (treeViewRef.current) {
+          treeViewRef.current.openItems(
+            objectFolderOrObjectWithContexts.map(
+              objectFolderOrObjectWithContext =>
+                getObjectFolderTreeViewItemId(
+                  objectFolderOrObjectWithContext.objectFolderOrObject
+                )
+            )
+          );
+        }
+      },
+      []
+    );
 
     const objectTreeViewItemProps = React.useMemo<ObjectTreeViewItemProps>(
       () => ({
@@ -979,11 +891,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         onRenameObjectFolderOrObjectWithContextFinish,
         onObjectModified,
         swapObjectAsset,
-        deleteObjectFolderOrObjectWithContext,
         onMovedObjectFolderOrObjectToAnotherFolderInSameContainer,
         canSetAsGlobalObject,
         setAsGlobalObject,
         getThumbnail,
+        showDeleteConfirmation,
+        selectObjectFolderOrObjectWithContext,
         forceUpdate,
       }),
       [
@@ -1001,11 +914,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         onRenameObjectFolderOrObjectWithContextFinish,
         onObjectModified,
         swapObjectAsset,
-        deleteObjectFolderOrObjectWithContext,
         onMovedObjectFolderOrObjectToAnotherFolderInSameContainer,
         canSetAsGlobalObject,
         setAsGlobalObject,
         getThumbnail,
+        showDeleteConfirmation,
+        selectObjectFolderOrObjectWithContext,
         forceUpdate,
       ]
     );
@@ -1020,9 +934,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         expandFolders,
         addFolder,
         onAddNewObject,
-        deleteObjectFolderOrObjectWithContext,
         onMovedObjectFolderOrObjectToAnotherFolderInSameContainer,
         onRenameObjectFolderOrObjectWithContextFinish,
+        onDeleteObjects,
+        selectObjectFolderOrObjectWithContext,
+        forceUpdateList,
         forceUpdate,
       }),
       [
@@ -1034,9 +950,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         expandFolders,
         addFolder,
         onAddNewObject,
-        deleteObjectFolderOrObjectWithContext,
         onMovedObjectFolderOrObjectToAnotherFolderInSameContainer,
         onRenameObjectFolderOrObjectWithContextFinish,
+        onDeleteObjects,
+        selectObjectFolderOrObjectWithContext,
+        forceUpdateList,
         forceUpdate,
       ]
     );
@@ -1110,7 +1028,55 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         // $FlowFixMe
         return treeViewItems;
       },
-      [globalObjectsRootFolder, objectFolderTreeViewItemProps, objectTreeViewItemProps, objectsRootFolder, onAddNewObject, onExportAssets, selectedObjectFolderOrObjectsWithContext]
+      [
+        globalObjectsRootFolder,
+        objectFolderTreeViewItemProps,
+        objectTreeViewItemProps,
+        objectsRootFolder,
+        onAddNewObject,
+        onExportAssets,
+        selectedObjectFolderOrObjectsWithContext,
+      ]
+    );
+
+    const selectedItems = React.useMemo(
+      () => {
+        return selectedObjectFolderOrObjectsWithContext.map(
+          ({ objectFolderOrObject, global }) => {
+            return createTreeViewItem({
+              objectFolderOrObject,
+              isGlobal: global,
+              objectFolderTreeViewItemProps,
+              objectTreeViewItemProps,
+            });
+          }
+        );
+      },
+      [
+        selectedObjectFolderOrObjectsWithContext,
+        objectFolderTreeViewItemProps,
+        objectTreeViewItemProps,
+      ]
+    );
+
+    React.useEffect(
+      () => {
+        if (keyboardShortcutsRef.current) {
+          keyboardShortcutsRef.current.setShortcutCallback('onDelete', () => {
+            deleteItem(selectedItems[0]);
+          });
+          keyboardShortcutsRef.current.setShortcutCallback(
+            'onDuplicate',
+            () => {
+              duplicateItem(selectedItems[0]);
+            }
+          );
+          keyboardShortcutsRef.current.setShortcutCallback('onRename', () => {
+            editName(selectedItems[0]);
+          });
+        }
+      },
+      [selectedObjectFolderOrObjectsWithContext, editName, selectedItems]
     );
 
     const canMoveSelectionTo = React.useCallback(
@@ -1320,7 +1286,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         selectedObjectFolderOrObjectsWithContext,
       ]
     );
-
 
     // Force List component to be mounted again if project or objectsContainer
     // has been changed. Avoid accessing to invalid objects that could

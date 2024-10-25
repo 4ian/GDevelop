@@ -188,15 +188,19 @@ const UserEarnings = ({ hideTitle, margin }: Props) => {
                 )
               }
             >
-              <RaisedButton
-                icon={<Bank fontSize="small" />}
-                disabled={!canCashout}
-                primary
-                label={<Trans>Cash out</Trans>}
-                onClick={() => {
-                  setSelectedCashOutType('cash');
-                }}
-              />
+              {/* Button must be wrapped in a container so that the parent tooltip
+                  can display even if the button is disabled. */}
+              <Column noMargin>
+                <RaisedButton
+                  icon={<Bank fontSize="small" />}
+                  disabled={!canCashout}
+                  primary
+                  label={<Trans>Cash out</Trans>}
+                  onClick={() => {
+                    setSelectedCashOutType('cash');
+                  }}
+                />
+              </Column>
             </Tooltip>
           </ResponsiveLineStackLayout>
           <Spacer />

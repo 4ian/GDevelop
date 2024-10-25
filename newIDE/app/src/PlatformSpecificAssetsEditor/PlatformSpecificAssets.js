@@ -179,6 +179,8 @@ const PlatformSpecificAssets = ({
       });
       setIsLoading(false);
     } finally {
+      // Revoke the blob URL to free memory.
+      URL.revokeObjectURL(chosenFileAsBlobDataUrl);
       // Reset input value so that if the user selects the same file again,
       // the onChange callback is called.
       if (generateIconFileInputRef.current) {

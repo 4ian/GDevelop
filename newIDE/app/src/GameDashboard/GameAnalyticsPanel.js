@@ -100,12 +100,14 @@ type SessionsChartProps = {|
   i18n: I18nType,
   chartData: ChartData,
   height: number,
+  fontSize?: 'small' | 'medium',
 |};
 
 export const SessionsChart = ({
   i18n,
   chartData,
   height,
+  fontSize,
 }: SessionsChartProps) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const styles = {
@@ -147,11 +149,13 @@ export const SessionsChart = ({
           dataKey="date"
           stroke={gdevelopTheme.chart.textColor}
           style={styles.tickLabel}
+          tick={{ fontSize: fontSize === 'small' ? 12 : 16 }}
         />
         <YAxis
           dataKey="viewersCount"
           stroke={gdevelopTheme.chart.textColor}
           style={styles.tickLabel}
+          tick={{ fontSize: fontSize === 'small' ? 12 : 16 }}
         />
         <Tooltip
           content={props =>

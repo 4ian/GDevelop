@@ -12,6 +12,10 @@ import { Grid } from '@material-ui/core';
 import FeedbackWidget from './FeedbackWidget';
 import { listComments, type Comment } from '../Utils/GDevelopServices/Play';
 import { getBuilds, type Build } from '../Utils/GDevelopServices/Build';
+import {
+  getGameMetricsFrom,
+  type GameMetrics,
+} from '../Utils/GDevelopServices/Analytics';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import Text from '../UI/Text';
 import AnalyticsWidget from './AnalyticsWidget';
@@ -30,6 +34,12 @@ const GameDashboardV2 = ({ game }: Props) => {
   >('game');
   const [feedbacks, setFeedbacks] = React.useState<?Array<Comment>>(null);
   const [builds, setBuilds] = React.useState<?Array<Build>>(null);
+  const [gameRollingMetrics, setGameMetrics] = React.useState<?(GameMetrics[])>(
+    null
+  );
+  const oneWeekAgo = React.useRef<Date>(
+    new Date(new Date().setHours(0, 0, 0, 0) - 7 * 24 * 3600 * 1000)
+  );
 
   React.useEffect(
     () => {
@@ -40,15 +50,22 @@ const GameDashboardV2 = ({ game }: Props) => {
       }
 
       const fetchData = async () => {
-        const [feedbacks, builds] = await Promise.all([
+        const [feedbacks, builds, gameRollingMetrics] = await Promise.all([
           listComments(getAuthorizationHeader, profile.id, {
             gameId: game.id,
             type: 'FEEDBACK',
           }),
           getBuilds(getAuthorizationHeader, profile.id, game.id),
+          getGameMetricsFrom(
+            getAuthorizationHeader,
+            profile.id,
+            game.id,
+            oneWeekAgo.current.toISOString()
+          ),
         ]);
         setFeedbacks(feedbacks);
         setBuilds(builds);
+        setGameMetrics(gameRollingMetrics);
       };
 
       fetchData();
@@ -60,7 +77,10 @@ const GameDashboardV2 = ({ game }: Props) => {
     <ColumnStackLayout noMargin>
       <GameHeader game={game} />
       <Grid container spacing={2}>
-        <AnalyticsWidget onSeeAll={() => setView('analytics')} />
+        <AnalyticsWidget
+          onSeeAll={() => setView('analytics')}
+          gameMetrics={gameRollingMetrics}
+        />
         <FeedbackWidget
           onSeeAll={() => setView('feedbacks')}
           feedbacks={feedbacks}

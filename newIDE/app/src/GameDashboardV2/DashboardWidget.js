@@ -19,7 +19,7 @@ const styles = {
     alignItems: 'stretch',
     minHeight: 0,
   },
-  maxHeight: { maxHeight: 250 },
+  maxHeight: { maxHeight: 300 },
 };
 
 type Props = {|

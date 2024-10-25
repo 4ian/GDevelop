@@ -32,6 +32,7 @@ import {
   InstanceOrObjectPropertiesEditorContainer,
   type InstanceOrObjectPropertiesEditorInterface,
 } from '../../SceneEditor/InstanceOrObjectPropertiesEditorContainer';
+import { useDoNowOrAfterRender } from '../../Utils/UseDoNowOrAfterRender';
 
 const initialMosaicEditorNodes = {
   direction: 'row',
@@ -111,6 +112,9 @@ const MosaicEditorsDisplay = React.forwardRef<
   const objectsListRef = React.useRef<?ObjectsListInterface>(null);
   const editorMosaicRef = React.useRef<?EditorMosaicInterface>(null);
   const objectGroupsListRef = React.useRef<?ObjectGroupsListInterface>(null);
+  const objectsListDoNowOrAfterRender = useDoNowOrAfterRender<?ObjectsListInterface>(
+    objectsListRef
+  );
 
   const forceUpdatePropertiesEditor = React.useCallback(() => {
     if (instanceOrObjectPropertiesEditorRef.current)
@@ -140,11 +144,6 @@ const MosaicEditorsDisplay = React.forwardRef<
 
     return editorRef.current.getInstanceSize(instance);
   }, []);
-  const openNewObjectDialog = React.useCallback(() => {
-    if (!objectsListRef.current) return;
-
-    objectsListRef.current.openNewObjectDialog();
-  }, []);
   const toggleEditorView = React.useCallback((editorId: EditorId) => {
     if (!editorMosaicRef.current) return;
     const config = defaultPanelConfigByEditor[editorId];
@@ -167,6 +166,20 @@ const MosaicEditorsDisplay = React.forwardRef<
     if (start) editor.restartSceneRendering();
     else editor.pauseSceneRendering();
   }, []);
+  const openNewObjectDialog = React.useCallback(
+    () => {
+      if (!isEditorVisible('objects-list')) {
+        // Objects list is not opened. Open it now.
+        toggleEditorView('objects-list');
+      }
+
+      // Open the new object dialog when the objects list is opened.
+      objectsListDoNowOrAfterRender((objectsList: ?ObjectsListInterface) => {
+        if (objectsList) objectsList.openNewObjectDialog();
+      });
+    },
+    [isEditorVisible, toggleEditorView, objectsListDoNowOrAfterRender]
+  );
 
   React.useImperativeHandle(ref, () => {
     const { current: editor } = editorRef;

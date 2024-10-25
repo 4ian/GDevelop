@@ -32,6 +32,7 @@ import {
   InstanceOrObjectPropertiesEditorContainer,
   type InstanceOrObjectPropertiesEditorInterface,
 } from '../InstanceOrObjectPropertiesEditorContainer';
+import { useDoNowOrAfterRender } from '../../Utils/UseDoNowOrAfterRender';
 
 export const swipeableDrawerContainerId = 'swipeable-drawer-container';
 
@@ -83,6 +84,9 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
   const editorRef = React.useRef<?InstancesEditor>(null);
   const objectsListRef = React.useRef<?ObjectsListInterface>(null);
   const objectGroupsListRef = React.useRef<?ObjectGroupsListInterface>(null);
+  const objectsListDoNowOrAfterRender = useDoNowOrAfterRender<?ObjectsListInterface>(
+    objectsListRef
+  );
 
   const [selectedEditorId, setSelectedEditorId] = React.useState<?EditorId>(
     null
@@ -136,16 +140,29 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
 
     return editorRef.current.getInstanceSize(instance);
   }, []);
-  const openNewObjectDialog = React.useCallback(() => {
-    if (!objectsListRef.current) return;
-
-    objectsListRef.current.openNewObjectDialog();
-  }, []);
   const isEditorVisible = React.useCallback(
     (editorId: EditorId) => {
       return editorId === selectedEditorId && drawerOpeningState !== 'closed';
     },
     [selectedEditorId, drawerOpeningState]
+  );
+  const openNewObjectDialog = React.useCallback(
+    () => {
+      if (!isEditorVisible('objects-list')) {
+        // Objects list is not opened. Open it now.
+        halfOpenOrCloseDrawerOnEditor('objects-list');
+      }
+
+      // Open the new object dialog when the objects list is opened.
+      objectsListDoNowOrAfterRender((objectsList: ?ObjectsListInterface) => {
+        if (objectsList) objectsList.openNewObjectDialog();
+      });
+    },
+    [
+      halfOpenOrCloseDrawerOnEditor,
+      isEditorVisible,
+      objectsListDoNowOrAfterRender,
+    ]
   );
 
   const startSceneRendering = React.useCallback((start: boolean) => {

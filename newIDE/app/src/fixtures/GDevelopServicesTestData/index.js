@@ -171,6 +171,14 @@ export const indieUserProfile: Profile = {
   },
 };
 
+export const userEarningsBalance = {
+  userId: 'userId',
+  amountInMilliUSDs: 6730,
+  amountInCredits: 890,
+  minAmountToCashoutInMilliUSDs: 60000,
+  updatedAt: 1515084391000,
+};
+
 export const usagesForIndieUser: Usages = [
   {
     id: '1',

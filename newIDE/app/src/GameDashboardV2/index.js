@@ -14,6 +14,7 @@ import { listComments, type Comment } from '../Utils/GDevelopServices/Play';
 import { getBuilds, type Build } from '../Utils/GDevelopServices/Build';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import Text from '../UI/Text';
+import AnalyticsWidget from './AnalyticsWidget';
 
 type Props = {|
   game: Game,
@@ -59,18 +60,7 @@ const GameDashboardV2 = ({ game }: Props) => {
     <ColumnStackLayout noMargin>
       <GameHeader game={game} />
       <Grid container spacing={2}>
-        <DashboardWidget
-          gridSize={2}
-          title={<Trans>Analytics</Trans>}
-          seeMoreButton={
-            <FlatButton
-              label={<Trans>See all</Trans>}
-              rightIcon={<ArrowRight fontSize="small" />}
-              onClick={() => setView('analytics')}
-              primary
-            />
-          }
-        />
+        <AnalyticsWidget onSeeAll={() => setView('analytics')} />
         <FeedbackWidget
           onSeeAll={() => setView('feedbacks')}
           feedbacks={feedbacks}

@@ -28,7 +28,12 @@ const styles = {
   },
 };
 
-const UserEarnings = () => {
+type Props = {|
+  hideTitle?: boolean,
+  margin?: 'dense',
+|};
+
+const UserEarnings = ({ hideTitle, margin }: Props) => {
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
   );
@@ -118,121 +123,128 @@ const UserEarnings = () => {
     userEarningsBalance &&
     earningsInMilliUsd >= userEarningsBalance.minAmountToCashoutInMilliUSDs;
 
+  const content = (
+    <ResponsiveLineStackLayout
+      expand
+      justifyContent="space-between"
+      alignItems="center"
+    >
+      {!hideTitle && (
+        <Line>
+          <Column>
+            <Text size="section-title">
+              <Trans>Total earnings</Trans>
+            </Text>
+            <BackgroundText>
+              <Link
+                href="https://wiki.gdevelop.io/gdevelop5/monetization/"
+                onClick={() =>
+                  Window.openExternalURL(
+                    'https://wiki.gdevelop.io/gdevelop5/monetization/'
+                  )
+                }
+              >
+                Learn about revenue on gd.games
+              </Link>
+            </BackgroundText>
+          </Column>
+        </Line>
+      )}
+      {error && (
+        <LineStackLayout noMargin alignItems="center">
+          <PlaceholderError onRetry={fetchUserEarningsBalance}>
+            <Trans>
+              Can't load the total earnings. Verify your internet connection or
+              try again later.
+            </Trans>
+          </PlaceholderError>
+        </LineStackLayout>
+      )}
+      {!error && (
+        <LineStackLayout noMargin alignItems="center">
+          <ResponsiveLineStackLayout alignItems="center">
+            <Column noMargin>
+              <Text
+                size={margin === 'dense' ? 'body' : 'section-title'}
+                align="center"
+                noMargin={margin === 'dense'}
+                style={{ fontVariantNumeric: 'tabular-nums' }}
+              >
+                {(earningsInMilliUsd / 1000).toFixed(2)}
+              </Text>
+              <BackgroundText>USD</BackgroundText>
+            </Column>
+            <Spacer />
+            <Tooltip
+              title={
+                !!userEarningsBalance && !canCashout ? (
+                  <Trans>
+                    Collect at least{' '}
+                    {userEarningsBalance.minAmountToCashoutInMilliUSDs / 1000}{' '}
+                    USD to cash out your earnings
+                  </Trans>
+                ) : (
+                  ''
+                )
+              }
+            >
+              <RaisedButton
+                icon={<Bank fontSize="small" />}
+                disabled={!canCashout}
+                primary
+                label={<Trans>Cash out</Trans>}
+                onClick={() => {
+                  setSelectedCashOutType('cash');
+                }}
+              />
+            </Tooltip>
+          </ResponsiveLineStackLayout>
+          <Spacer />
+          <div
+            style={{
+              ...styles.separator,
+              border: `1px solid ${theme.home.separator.color}`,
+            }}
+          />
+          <Spacer />
+          <ResponsiveLineStackLayout alignItems="center">
+            <Column noMargin>
+              <Text
+                size={margin === 'dense' ? 'body' : 'section-title'}
+                align="center"
+                noMargin={margin === 'dense'}
+                style={{ fontVariantNumeric: 'tabular-nums' }}
+              >
+                {earningsInCredits.toFixed(0)}
+              </Text>
+              <BackgroundText>Credits</BackgroundText>
+            </Column>
+            <Spacer />
+
+            <RaisedButton
+              icon={<Coin fontSize="small" />}
+              primary
+              disabled={earningsInCredits === 0}
+              label={<Trans>Credit out</Trans>}
+              onClick={() => {
+                setSelectedCashOutType('credits');
+              }}
+            />
+          </ResponsiveLineStackLayout>
+        </LineStackLayout>
+      )}
+    </ResponsiveLineStackLayout>
+  );
+
   return (
     <>
       <Line>
         <Column noMargin expand>
-          <Card background="medium">
-            <ResponsiveLineStackLayout
-              expand
-              justifyContent="space-between"
-              alignItems="center"
-            >
-              <Line>
-                <Column>
-                  <Text size="section-title">
-                    <Trans>Total earnings</Trans>
-                  </Text>
-                  <BackgroundText>
-                    <Link
-                      href="https://wiki.gdevelop.io/gdevelop5/monetization/"
-                      onClick={() =>
-                        Window.openExternalURL(
-                          'https://wiki.gdevelop.io/gdevelop5/monetization/'
-                        )
-                      }
-                    >
-                      Learn about revenue on gd.games
-                    </Link>
-                  </BackgroundText>
-                </Column>
-              </Line>
-              {error && (
-                <LineStackLayout noMargin alignItems="center">
-                  <PlaceholderError onRetry={fetchUserEarningsBalance}>
-                    <Trans>
-                      Can't load the total earnings. Verify your internet
-                      connection or try again later.
-                    </Trans>
-                  </PlaceholderError>
-                </LineStackLayout>
-              )}
-              {!error && (
-                <LineStackLayout noMargin alignItems="center">
-                  <ResponsiveLineStackLayout alignItems="center">
-                    <Column noMargin>
-                      <Text
-                        size="section-title"
-                        align="center"
-                        style={{ fontVariantNumeric: 'tabular-nums' }}
-                      >
-                        {(earningsInMilliUsd / 1000).toFixed(2)}
-                      </Text>
-                      <BackgroundText>USD</BackgroundText>
-                    </Column>
-                    <Spacer />
-                    <Tooltip
-                      title={
-                        !!userEarningsBalance && !canCashout ? (
-                          <Trans>
-                            Collect at least{' '}
-                            {userEarningsBalance.minAmountToCashoutInMilliUSDs /
-                              1000}{' '}
-                            USD to cash out your earnings
-                          </Trans>
-                        ) : (
-                          ''
-                        )
-                      }
-                    >
-                      <span>
-                        <RaisedButton
-                          icon={<Bank fontSize="small" />}
-                          disabled={!canCashout}
-                          primary
-                          label={<Trans>Cash out</Trans>}
-                          onClick={() => {
-                            setSelectedCashOutType('cash');
-                          }}
-                        />
-                      </span>
-                    </Tooltip>
-                  </ResponsiveLineStackLayout>
-                  <Spacer />
-                  <div
-                    style={{
-                      ...styles.separator,
-                      border: `1px solid ${theme.home.separator.color}`,
-                    }}
-                  />
-                  <Spacer />
-                  <ResponsiveLineStackLayout alignItems="center">
-                    <Column noMargin>
-                      <Text
-                        size="section-title"
-                        align="center"
-                        style={{ fontVariantNumeric: 'tabular-nums' }}
-                      >
-                        {earningsInCredits.toFixed(0)}
-                      </Text>
-                      <BackgroundText>Credits</BackgroundText>
-                    </Column>
-                    <Spacer />
-
-                    <RaisedButton
-                      icon={<Coin fontSize="small" />}
-                      primary
-                      disabled={earningsInCredits === 0}
-                      label={<Trans>Credit out</Trans>}
-                      onClick={() => {
-                        setSelectedCashOutType('credits');
-                      }}
-                    />
-                  </ResponsiveLineStackLayout>
-                </LineStackLayout>
-              )}
-            </ResponsiveLineStackLayout>
-          </Card>
+          {margin === 'dense' ? (
+            content
+          ) : (
+            <Card background="medium">{content}</Card>
+          )}
         </Column>
       </Line>
       {selectedCashOutType && userEarningsBalance && (

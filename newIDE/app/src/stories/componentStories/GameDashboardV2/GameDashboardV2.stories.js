@@ -16,9 +16,11 @@ import {
   completeCordovaBuild,
   completeElectronBuild,
   completeWebBuild,
+  userEarningsBalance,
 } from '../../../fixtures/GDevelopServicesTestData';
 import { client as playApiAxiosClient } from '../../../Utils/GDevelopServices/Play';
 import { client as buildApiAxiosClient } from '../../../Utils/GDevelopServices/Build';
+import { apiClient as usageApiAxiosClient } from '../../../Utils/GDevelopServices/Usage';
 
 import MockAdapter from 'axios-mock-adapter';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
@@ -35,6 +37,9 @@ const playServiceMock = new MockAdapter(playApiAxiosClient, {
   delayResponse,
 });
 const buildServiceMock = new MockAdapter(buildApiAxiosClient, {
+  delayResponse,
+});
+const usageServiceMock = new MockAdapter(usageApiAxiosClient, {
   delayResponse,
 });
 
@@ -55,6 +60,14 @@ export const Default = () => {
   buildServiceMock
     .onGet(`/build`)
     .reply(200, [completeCordovaBuild, completeElectronBuild, completeWebBuild])
+    .onAny()
+    .reply(config => {
+      console.error(`Unexpected call to ${config.url} (${config.method})`);
+      return [504, null];
+    });
+  usageServiceMock
+    .onGet(`/user-earnings-balance`)
+    .reply(200, [userEarningsBalance])
     .onAny()
     .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);

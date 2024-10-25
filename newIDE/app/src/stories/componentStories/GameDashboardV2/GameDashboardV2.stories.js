@@ -96,6 +96,13 @@ export const Default = () => {
       commentWithNoTextUnprocessed,
       commentUnprocessed2,
     ])
+    .onGet(`/game/${game1.id}/lobby-configuration`)
+    .reply(200, {
+      gameId: game1.id,
+      maxPlayers: 6,
+      minPlayers: 2,
+      canJoinAfterStart: true,
+    })
     .onAny()
     .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);

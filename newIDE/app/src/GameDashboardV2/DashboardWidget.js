@@ -5,6 +5,7 @@ import Paper from '../UI/Paper';
 import Text from '../UI/Text';
 import { Column, Line } from '../UI/Grid';
 import { Grid } from '@material-ui/core';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 
 const styles = {
   paper: {
@@ -19,7 +20,7 @@ const styles = {
     alignItems: 'stretch',
     minHeight: 0,
   },
-  maxHeight: { maxHeight: 300, height: '100%' },
+  maxHeightNotWrapped: { maxHeight: 300, height: '100%' },
 };
 
 type Props = {|
@@ -39,13 +40,16 @@ const DashboardWidget = ({
   children,
   withMaxHeight,
 }: Props) => {
+  const { isMobile } = useResponsiveWindowSize();
   return (
     <Grid item sm={4 * gridSize} xs={12}>
       <Paper
         background="medium"
         style={{
           ...styles.paper,
-          ...(withMaxHeight ? styles.maxHeight : undefined),
+          ...(withMaxHeight && !isMobile
+            ? styles.maxHeightNotWrapped
+            : undefined),
         }}
       >
         <div style={styles.content}>

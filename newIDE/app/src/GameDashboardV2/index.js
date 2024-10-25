@@ -10,7 +10,12 @@ import FlatButton from '../UI/FlatButton';
 import ArrowRight from '../UI/CustomSvgIcons/ArrowRight';
 import { Grid } from '@material-ui/core';
 import FeedbackWidget from './FeedbackWidget';
-import { listComments, type Comment } from '../Utils/GDevelopServices/Play';
+import {
+  getLobbyConfiguration,
+  listComments,
+  type Comment,
+  type LobbyConfiguration,
+} from '../Utils/GDevelopServices/Play';
 import { getBuilds, type Build } from '../Utils/GDevelopServices/Build';
 import {
   getGameMetricsFrom,
@@ -19,6 +24,7 @@ import {
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import Text from '../UI/Text';
 import AnalyticsWidget from './AnalyticsWidget';
+import ServicesWidget from './ServicesWidget';
 
 type Props = {|
   game: Game,
@@ -30,13 +36,17 @@ const GameDashboardV2 = ({ game }: Props) => {
     AuthenticatedUserContext
   );
   const [view, setView] = React.useState<
-    'game' | 'analytics' | 'feedbacks' | 'builds' | 'services'
+    'game' | 'analytics' | 'feedbacks' | 'builds' | 'leaderboards'
   >('game');
   const [feedbacks, setFeedbacks] = React.useState<?Array<Comment>>(null);
   const [builds, setBuilds] = React.useState<?Array<Build>>(null);
   const [gameRollingMetrics, setGameMetrics] = React.useState<?(GameMetrics[])>(
     null
   );
+  const [
+    lobbyConfiguration,
+    setLobbyConfiguration,
+  ] = React.useState<?LobbyConfiguration>(null);
   const oneWeekAgo = React.useRef<Date>(
     new Date(new Date().setHours(0, 0, 0, 0) - 7 * 24 * 3600 * 1000)
   );
@@ -50,7 +60,12 @@ const GameDashboardV2 = ({ game }: Props) => {
       }
 
       const fetchData = async () => {
-        const [feedbacks, builds, gameRollingMetrics] = await Promise.all([
+        const [
+          feedbacks,
+          builds,
+          gameRollingMetrics,
+          lobbyConfiguration,
+        ] = await Promise.all([
           listComments(getAuthorizationHeader, profile.id, {
             gameId: game.id,
             type: 'FEEDBACK',
@@ -62,10 +77,14 @@ const GameDashboardV2 = ({ game }: Props) => {
             game.id,
             oneWeekAgo.current.toISOString()
           ),
+          getLobbyConfiguration(getAuthorizationHeader, profile.id, {
+            gameId: game.id,
+          }),
         ]);
         setFeedbacks(feedbacks);
         setBuilds(builds);
         setGameMetrics(gameRollingMetrics);
+        setLobbyConfiguration(lobbyConfiguration);
       };
 
       fetchData();
@@ -84,6 +103,11 @@ const GameDashboardV2 = ({ game }: Props) => {
         <FeedbackWidget
           onSeeAll={() => setView('feedbacks')}
           feedbacks={feedbacks}
+        />
+        <ServicesWidget
+          onSeeAllLeaderboards={() => setView('leaderboards')}
+          leaderboards={null}
+          lobbyConfiguration={lobbyConfiguration}
         />
         <DashboardWidget
           gridSize={3}

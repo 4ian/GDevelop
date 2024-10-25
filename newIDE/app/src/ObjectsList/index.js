@@ -48,7 +48,10 @@ import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import { getInsertionParentAndPositionFromSelection } from '../Utils/ObjectFolders';
-import { ObjectTreeViewItemContent } from './ObjectTreeViewItemContent';
+import {
+  ObjectTreeViewItemContent,
+  getObjectTreeViewItemId,
+} from './ObjectTreeViewItemContent';
 import {
   ObjectFolderTreeViewItemContent,
   getObjectFolderTreeViewItemId,
@@ -92,6 +95,9 @@ export interface TreeViewItemContent {
   cut(): void;
   duplicate(): void;
   moveAt(destinationIndex: number): void;
+  isDescendantOf(treeViewItemContent: TreeViewItemContent): boolean;
+  isSibling(treeViewItemContent: TreeViewItemContent): boolean;
+  isGlobal(): boolean;
 }
 
 interface TreeViewItem {
@@ -292,6 +298,18 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
   duplicate(): void {}
 
   moveAt(destinationIndex: number): void {}
+
+  isDescendantOf(treeViewItemContent: TreeViewItemContent): boolean {
+    return false;
+  }
+
+  isSibling(treeViewItemContent: TreeViewItemContent): boolean {
+    return false;
+  }
+
+  isGlobal(): boolean {
+    return false;
+  }
 }
 
 const getTreeViewItemName = (item: TreeViewItem) => item.content.getName();
@@ -488,6 +506,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       })
     );
 
+    const scrollToItem = React.useCallback((itemId: string) => {
+      if (treeViewRef.current) {
+        treeViewRef.current.scrollToItemFromId(itemId);
+      }
+    }, []);
+
     const addObject = React.useCallback(
       (objectType: string) => {
         const defaultName = project.hasEventsBasedObject(objectType)
@@ -557,7 +581,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         // to simplify the code, we just wait a few ms for a new render
         // to be done.
         setTimeout(() => {
-          scrollToItem(objectFolderOrObjectWithContext);
+          scrollToItem(getObjectTreeViewItemId(object));
         }, 100); // A few ms is enough for a new render to be done.
 
         setNewObjectDialogOpen(null);
@@ -576,6 +600,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         onEditObject,
         objectsContainer,
         globalObjectsContainer,
+        scrollToItem,
         onObjectCreated,
         onObjectFolderOrObjectWithContextSelected,
       ]
@@ -590,23 +615,20 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           treeViewRef.current.openItems([sceneObjectsRootFolderId]);
 
         const lastObject = objects[objects.length - 1];
-        const objectFolderOrObjectWithContext = {
-          // A new object is always added to the scene (layout) by default.
-          objectFolderOrObject: objectsContainer
-            .getRootFolder()
-            .getObjectChild(lastObject.getName()),
-          global: false,
-        };
+        // A new object is always added to the scene (layout) by default.
+        const object = objectsContainer
+          .getRootFolder()
+          .getObjectChild(lastObject.getName());
 
         // Scroll to the new object.
         // Ideally, we'd wait for the list to be updated to scroll, but
         // to simplify the code, we just wait a few ms for a new render
         // to be done.
         setTimeout(() => {
-          scrollToItem(objectFolderOrObjectWithContext);
+          scrollToItem(getObjectTreeViewItemId(object));
         }, 100); // A few ms is enough for a new render to be done.
       },
-      [onObjectCreated, objectsContainer]
+      [objectsContainer, onObjectCreated, scrollToItem]
     );
 
     const swapObjectAsset = React.useCallback(
@@ -643,26 +665,19 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     );
 
     const editName = React.useCallback(
-      (item: ?TreeViewItem) => {
-        if (!item) return;
+      (itemId: string) => {
         const treeView = treeViewRef.current;
         if (treeView) {
           if (isMobile) {
             // Position item at top of the screen to make sure it will be visible
             // once the keyboard is open.
-            treeView.scrollToItem(item, 'start');
+            treeView.scrollToItemFromId(itemId, 'start');
           }
-          treeView.renameItem(item);
+          treeView.renameItemFromId(itemId);
         }
       },
       [isMobile]
     );
-
-    const scrollToItem = (item: TreeViewItem) => {
-      if (treeViewRef.current) {
-        treeViewRef.current.scrollToItem(item);
-      }
-    };
 
     const getClosestVisibleParent = (
       objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext
@@ -764,7 +779,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         // to simplify the code, we just wait a few ms for a new render
         // to be done.
         setTimeout(() => {
-          scrollToItem(newObjectFolderOrObjectWithContext);
+          scrollToItem(getObjectTreeViewItemId(object));
         }, 100); // A few ms is enough for a new render to be done.
       },
       [
@@ -773,6 +788,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         beforeSetAsGlobalObject,
         onObjectModified,
         selectObjectFolderOrObjectWithContext,
+        scrollToItem,
       ]
     );
 
@@ -830,7 +846,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         );
         if (treeViewRef.current) treeViewRef.current.openItems(itemsToOpen);
 
-        editName(newObjectFolderOrObjectWithContext);
+        editName(
+          getObjectFolderTreeViewItemId(
+            newObjectFolderOrObjectWithContext.objectFolderOrObject
+          )
+        );
         forceUpdateList();
       },
       [
@@ -1072,7 +1092,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             }
           );
           keyboardShortcutsRef.current.setShortcutCallback('onRename', () => {
-            editName(selectedItems[0]);
+            editName(selectedItems[0].getId());
           });
         }
       },
@@ -1084,7 +1104,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         if (destinationItem.isRoot) return false;
         if (destinationItem.isPlaceholder) {
           if (
-            destinationItem.id === globalObjectsEmptyPlaceholderId &&
+            destinationItem.content.getId() ===
+              globalObjectsEmptyPlaceholderId &&
             selectedObjectFolderOrObjectsWithContext.length === 1 &&
             !selectedObjectFolderOrObjectsWithContext[0].global
           ) {
@@ -1097,12 +1118,13 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         // Check if at least one element in the selection can be moved.
         if (
           selectedObjectFolderOrObjectsWithContext.every(
-            selectedObject => selectedObject.global === destinationItem.global
+            selectedObject =>
+              selectedObject.global === destinationItem.content.isGlobal()
           )
         ) {
           if (
             selectedObjectFolderOrObjectsWithContext[0] &&
-            destinationItem.objectFolderOrObject.isADescendantOf(
+            destinationItem.content.isDescendantOf(
               selectedObjectFolderOrObjectsWithContext[0].objectFolderOrObject
             )
           ) {
@@ -1114,7 +1136,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           selectedObjectFolderOrObjectsWithContext.every(
             selectedObject => selectedObject.global === false
           ) &&
-          destinationItem.global === true
+          destinationItem.content.isGlobal()
         ) {
           return !selectedObjectFolderOrObjectsWithContext[0].objectFolderOrObject.isFolder();
         }
@@ -1124,48 +1146,48 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       [selectedObjectFolderOrObjectsWithContext]
     );
 
+    // TODO Move this code in TreeViewItemContent.
     const moveSelectionTo = React.useCallback(
       (
         i18n: I18nType,
         destinationItem: TreeViewItem,
         where: 'before' | 'inside' | 'after'
       ) => {
-        if (
-          destinationItem.isRoot ||
-          selectedObjectFolderOrObjectsWithContext.length !== 1
-        )
+        if (destinationItem.isRoot || selectedItems.length !== 1) {
           return;
+        }
+        const selectedItem = selectedItems[0];
+
+        if (destinationItem.content.getId() === selectedItem.content.getId()) {
+          return;
+        }
+
+        const selectedObjectItemContent = selectedItem.content;
+        if (!(selectedObjectItemContent instanceof ObjectTreeViewItemContent)) {
+          return;
+        }
 
         if (destinationItem.isPlaceholder) {
           if (
-            destinationItem.id === globalObjectsEmptyPlaceholderId &&
-            selectedObjectFolderOrObjectsWithContext.length === 1 &&
-            !selectedObjectFolderOrObjectsWithContext[0].global
+            destinationItem.content.getId() ===
+              globalObjectsEmptyPlaceholderId &&
+            selectedItems.length === 1 &&
+            !selectedObjectItemContent.isGlobal()
           ) {
-            const selectedObjectFolderOrObjectWithContext =
-              selectedObjectFolderOrObjectsWithContext[0];
-
             setAsGlobalObject({
               i18n,
-              objectFolderOrObjectWithContext: selectedObjectFolderOrObjectWithContext,
+              objectFolderOrObjectWithContext: {
+                objectFolderOrObject: selectedObjectItemContent.object,
+                global: selectedObjectItemContent.isGlobal(),
+              },
             });
           }
           return;
         }
 
-        const selectedObjectFolderOrObjectWithContext =
-          selectedObjectFolderOrObjectsWithContext[0];
-
         if (
-          destinationItem.objectFolderOrObject ===
-          selectedObjectFolderOrObjectWithContext.objectFolderOrObject
-        ) {
-          return;
-        }
-
-        if (
-          selectedObjectFolderOrObjectWithContext.global === false &&
-          destinationItem.global === true
+          selectedObjectItemContent.isGlobal() === false &&
+          destinationItem.content.isGlobal()
         ) {
           let parent, index;
           if (
@@ -1182,7 +1204,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           }
           setAsGlobalObject({
             i18n,
-            objectFolderOrObjectWithContext: selectedObjectFolderOrObjectWithContext,
+            objectFolderOrObjectWithContext: {
+              objectFolderOrObject: selectedObjectItemContent.object,
+              global: selectedObjectItemContent.isGlobal(),
+            },
             folder: parent,
             index,
           });
@@ -1191,49 +1216,39 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
         // At this point, the move is done from within the same container.
         if (
-          selectedObjectFolderOrObjectWithContext.global ===
-          destinationItem.global
+          selectedItem.content.isGlobal() === destinationItem.content.isGlobal()
         ) {
-          const selectedObjectFolderOrObject =
-            selectedObjectFolderOrObjectWithContext.objectFolderOrObject;
-          const destinationObjectFolderOrObject =
-            destinationItem.objectFolderOrObject;
           let parent;
-
           if (
             where === 'inside' &&
-            destinationObjectFolderOrObject.isFolder()
+            destinationItem.content instanceof ObjectFolderTreeViewItemContent
           ) {
-            parent = destinationObjectFolderOrObject;
-          } else {
-            parent = destinationObjectFolderOrObject.getParent();
+            parent = destinationItem.content.folder;
+          } else if (
+            destinationItem.content instanceof ObjectTreeViewItemContent
+          ) {
+            parent = destinationItem.content.object.getParent();
           }
-          const selectedObjectFolderOrObjectParent = selectedObjectFolderOrObject.getParent();
-          if (parent === selectedObjectFolderOrObjectParent) {
-            const fromIndex = selectedObjectFolderOrObjectParent.getChildPosition(
-              selectedObjectFolderOrObject
-            );
-            let toIndex = selectedObjectFolderOrObjectParent.getChildPosition(
-              destinationObjectFolderOrObject
-            );
+          const selectedObjectFolderOrObjectParent = selectedObjectItemContent.object.getParent();
+          if (destinationItem.content.isSibling(selectedObjectItemContent)) {
+            const fromIndex = selectedObjectItemContent.getIndex();
+            let toIndex = destinationItem.content.getIndex();
             if (toIndex > fromIndex) toIndex -= 1;
             if (where === 'after') toIndex += 1;
             selectedObjectFolderOrObjectParent.moveChild(fromIndex, toIndex);
           } else {
             if (
-              destinationObjectFolderOrObject.isADescendantOf(
-                selectedObjectFolderOrObject
-              )
+              destinationItem.content.isDescendantOf(selectedObjectItemContent)
             ) {
               return;
             }
             const position =
               where === 'inside'
                 ? 0
-                : parent.getChildPosition(destinationObjectFolderOrObject) +
+                : destinationItem.content.getIndex() +
                   (where === 'after' ? 1 : 0);
             selectedObjectFolderOrObjectParent.moveObjectFolderOrObjectToAnotherFolder(
-              selectedObjectFolderOrObject,
+              selectedObjectItemContent.object,
               parent,
               position
             );
@@ -1241,7 +1256,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             if (treeView) {
               const closestVisibleParent = getClosestVisibleParent({
                 objectFolderOrObject: parent,
-                global: destinationItem.global,
+                global: destinationItem.content.isGlobal(),
               });
               if (closestVisibleParent) {
                 treeView.animateItem(closestVisibleParent);
@@ -1253,11 +1268,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         }
         onObjectModified(true);
       },
-      [
-        onObjectModified,
-        selectedObjectFolderOrObjectsWithContext,
-        setAsGlobalObject,
-      ]
+      [onObjectModified, selectedItems, setAsGlobalObject]
     );
 
     /**
@@ -1266,25 +1277,14 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
      */
     const onCollapseItem = React.useCallback(
       (item: TreeViewItem) => {
-        if (
-          !selectedObjectFolderOrObjectsWithContext ||
-          selectedObjectFolderOrObjectsWithContext.length !== 1 ||
-          item.isPlaceholder
-        )
-          return;
-        const { objectFolderOrObject: potentialParent } = item;
-        const {
-          objectFolderOrObject: selectedObjectFolderOrObject,
-        } = selectedObjectFolderOrObjectsWithContext[0];
-        if (!potentialParent || !selectedObjectFolderOrObject) return;
-        if (selectedObjectFolderOrObject.isADescendantOf(potentialParent)) {
+        if (!selectedItems || selectedItems.length !== 1) return;
+        const selectedItem = selectedItems[0];
+        if (!selectedItem) return;
+        if (selectedItem.content.isDescendantOf(item.content)) {
           selectObjectFolderOrObjectWithContext(null);
         }
       },
-      [
-        selectObjectFolderOrObjectWithContext,
-        selectedObjectFolderOrObjectsWithContext,
-      ]
+      [selectObjectFolderOrObjectWithContext, selectedItems]
     );
 
     // Force List component to be mounted again if project or objectsContainer
@@ -1375,7 +1375,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                       getItemDataset={getTreeViewItemDataSet}
                       onEditItem={editItem}
                       onCollapseItem={onCollapseItem}
-                      selectedItems={selectedObjectFolderOrObjectsWithContext}
+                      selectedItems={selectedItems}
                       onSelectItems={items => {
                         if (!items) selectObjectFolderOrObjectWithContext(null);
                         const itemToSelect = items[0];

@@ -24,6 +24,7 @@ import {
 } from './ObjectTreeViewItemContent';
 import { renderQuickCustomizationMenuItems } from '../QuickCustomization/QuickCustomizationMenuItems';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import { ObjectTreeViewItemContent } from './ObjectTreeViewItemContent';
 
 const gd: libGDevelop = global.gd;
 
@@ -73,7 +74,7 @@ export const getObjectFolderTreeViewItemId = (
 
 export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
   objectFolder: gdObjectFolderOrObject;
-  isGlobal: boolean;
+  _isGlobal: boolean;
   props: ObjectFolderTreeViewItemProps;
 
   constructor(
@@ -82,19 +83,38 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
     props: ObjectFolderTreeViewItemProps
   ) {
     this.objectFolder = objectFolder;
-    this.isGlobal = isGlobal;
+    this._isGlobal = isGlobal;
     this.props = props;
   }
+  
+  isDescendantOf(treeViewItemContent: TreeViewItemContent): boolean {
+    if (treeViewItemContent instanceof ObjectFolderTreeViewItemContent) {
+      return this.objectFolder.isADescendantOf(treeViewItemContent.objectFolder);
+    }
+  }
+
+  isSibling(treeViewItemContent: TreeViewItemContent): boolean {
+    // TODO add a common interface to avoid instanceof.
+    if (treeViewItemContent instanceof ObjectTreeViewItemContent) {
+      return this.objectFolder.getParent() === treeViewItemContent.objectFolder.getParent();
+    }
+    else if (treeViewItemContent instanceof ObjectFolderTreeViewItemContent) {
+      return this.objectFolder.getParent() === treeViewItemContent.object.getParent();
+    }
+  }
+
+  getIndex(): number {
+    return this.objectFolder.getParent().getChildPosition(this.objectFolder);
+  }
+
+  isGlobal(): boolean { return this._isGlobal; }
 
   getName(): string | React.Node {
     return this.objectFolder.getFolderName();
   }
 
   getId(): string {
-    // Use the ptr as id since two folders can have the same name.
-    // If using folder name, this would need for methods when renaming
-    // the folder to keep it open.
-    return `object-folder-${this.objectFolder.ptr}`;
+    return getObjectFolderTreeViewItemId(this.folder);
   }
 
   getHtmlId(index: number): ?string {
@@ -121,7 +141,7 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
     }
 
     this.props.onRenameObjectFolderOrObjectWithContextFinish(
-      { objectFolderOrObject: this.objectFolder, global: this.isGlobal },
+      { objectFolderOrObject: this.objectFolder, global: this._isGlobal },
       newName,
       doRename => {
         if (!doRename) return;

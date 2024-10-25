@@ -22,10 +22,20 @@ import {
 } from './EnumerateObjectFolderOrObject';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
+import { ObjectFolderTreeViewItemContent } from './ObjectFolderTreeViewItemContent';
 
 const gd: libGDevelop = global.gd;
 
 export const OBJECT_CLIPBOARD_KIND = 'Object';
+
+export const getObjectTreeViewItemId = (object: gdObject): string => {
+  // Use the ptr to avoid display bugs in the rare case a user set an object
+  // as global although another layout has an object with the same name,
+  // and ignored the warning.
+  return `${this.object.getObject().getName()}-${
+    this.object.getObject().ptr
+  }`;
+};
 
 export type ObjectTreeViewItemCallbacks = {|
   onObjectPasted?: gdObject => void,
@@ -148,7 +158,7 @@ export const addSerializedObjectToObjectsContainer = ({
 
 export class ObjectTreeViewItemContent implements TreeViewItemContent {
   object: gdObjectFolderOrObject;
-  isGlobal: boolean;
+  _isGlobal: boolean;
   props: ObjectTreeViewItemProps;
 
   constructor(
@@ -157,21 +167,38 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
     props: ObjectTreeViewItemProps
   ) {
     this.object = object;
-    this.isGlobal = isGlobal;
+    this._isGlobal = isGlobal;
     this.props = props;
   }
+  
+  isDescendantOf(treeViewItemContent: TreeViewItemContent): boolean {
+    if (treeViewItemContent instanceof ObjectFolderTreeViewItemContent) {
+      return this.object.isADescendantOf(treeViewItemContent.objectFolder);
+    }
+  }
+
+  isSibling(treeViewItemContent: TreeViewItemContent): boolean {
+    // TODO add a common interface to avoid instanceof.
+    if (treeViewItemContent instanceof ObjectTreeViewItemContent) {
+      return this.object.getParent() === treeViewItemContent.objectFolder.getParent();
+    }
+    else if (treeViewItemContent instanceof ObjectFolderTreeViewItemContent) {
+      return this.object.getParent() === treeViewItemContent.object.getParent();
+    }
+  }
+
+  getIndex(): number {
+    return this.object.getParent().getChildPosition(this.object);
+  }
+
+  isGlobal(): boolean { return this._isGlobal; }
 
   getName(): string | React.Node {
     return this.object.getObject().getName();
   }
 
   getId(): string {
-    // Use the ptr to avoid display bugs in the rare case a user set an object
-    // as global although another layout has an object with the same name,
-    // and ignored the warning.
-    return `${this.object.getObject().getName()}-${
-      this.object.getObject().ptr
-    }`;
+    return getObjectTreeViewItemId(this.object);
   }
 
   getHtmlId(index: number): ?string {
@@ -181,7 +208,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
   getDataSet(): { [string]: string } {
     return {
       objectName: this.object.getObject().getName(),
-      global: this.isGlobal.toString(),
+      global: this._isGlobal.toString(),
     };
   }
 
@@ -205,10 +232,10 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
 
     const validatedNewName = this.props.getValidatedObjectOrGroupName(
       newName,
-      this.isGlobal
+      this._isGlobal
     );
     this.props.onRenameObjectFolderOrObjectWithContextFinish(
-      { objectFolderOrObject: this.object, global: this.isGlobal },
+      { objectFolderOrObject: this.object, global: this._isGlobal },
       validatedNewName,
       doRename => {
         if (!doRename) return;

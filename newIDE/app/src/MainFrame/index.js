@@ -3970,18 +3970,27 @@ const MainFrame = (props: Props) => {
             }
           }}
           onlineWebExporter={quickPublishOnlineWebExporter}
+          isRequiredToSaveAsNewCloudProject={() => {
+            const storageProvider = getStorageProvider();
+            return storageProvider.internalName !== 'Cloud';
+          }}
           onSaveProject={async () => {
             // Automatically try to save project to the cloud.
             const storageProvider = getStorageProvider();
+            if (storageProvider.internalName === 'Cloud') {
+              saveProject();
+              return;
+            }
+
             if (
-              !['Empty', 'UrlStorageProvider', 'Cloud'].includes(
+              !['Empty', 'UrlStorageProvider'].includes(
                 storageProvider.internalName
               )
             ) {
               console.error(
                 `Unexpected storage provider ${
                   storageProvider.internalName
-                } when saving project from quick customization dialog. Saving anyway.`
+                } when saving project from quick customization dialog. Saving anyway as a new cloud project.`
               );
             }
 

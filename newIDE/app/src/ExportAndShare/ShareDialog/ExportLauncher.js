@@ -58,7 +58,7 @@ type Props = {|
   uiMode?: 'minimal',
 
   onExportLaunched?: () => void,
-  onExportSucceeded?: () => void,
+  onExportSucceeded?: ({ build: ?Build }) => Promise<void>,
   onExportErrored?: () => void,
 |};
 
@@ -354,7 +354,8 @@ export default class ExportLauncher extends Component<Props, State> {
         compressionOutput,
         doneFooterOpen: true,
       });
-      if (this.props.onExportSucceeded) this.props.onExportSucceeded();
+      if (this.props.onExportSucceeded)
+        this.props.onExportSucceeded({ build: this.state.build });
     } catch (error) {
       console.error('An error happened during export:', error);
       if (!this.state.errored) {

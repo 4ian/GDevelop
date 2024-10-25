@@ -144,6 +144,7 @@ type Props = {|
   onlineWebExporter: Exporter,
   onSaveProject: () => Promise<void>,
   isSavingProject: boolean,
+  isRequiredToSaveAsNewCloudProject: () => boolean,
   onClose: () => Promise<void>,
   onContinueQuickCustomization: () => void,
   onTryAnotherGame: () => void,
@@ -158,6 +159,7 @@ export const renderQuickCustomization = ({
   onlineWebExporter,
   onSaveProject,
   isSavingProject,
+  isRequiredToSaveAsNewCloudProject,
   onClose,
   onContinueQuickCustomization,
   onTryAnotherGame,
@@ -191,6 +193,9 @@ export const renderQuickCustomization = ({
             }
             onSaveProject={onSaveProject}
             isSavingProject={isSavingProject}
+            isRequiredToSaveAsNewCloudProject={
+              isRequiredToSaveAsNewCloudProject
+            }
             onClose={onClose}
             onContinueQuickCustomization={onContinueQuickCustomization}
             onTryAnotherGame={onTryAnotherGame}

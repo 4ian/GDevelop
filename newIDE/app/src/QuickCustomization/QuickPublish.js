@@ -10,6 +10,10 @@ import { I18n } from '@lingui/react';
 import { type Exporter } from '../ExportAndShare/ShareDialog';
 import Text from '../UI/Text';
 import { type Limits } from '../Utils/GDevelopServices/Usage';
+import {
+  getBuildArtifactUrl,
+  type Build,
+} from '../Utils/GDevelopServices/Build';
 import { type GameAndBuildsManager } from '../Utils/UseGameAndBuildsManager';
 import FlatButton from '../UI/FlatButton';
 import { Column, Spacer } from '../UI/Grid';
@@ -23,9 +27,12 @@ import TextButton from '../UI/TextButton';
 import Trash from '../UI/CustomSvgIcons/Trash';
 import GameImage from './GameImage';
 import ShareLink from '../UI/ShareDialog/ShareLink';
-import { getGameUrl } from '../Utils/GDevelopServices/Game';
+import { getGameUrl, updateGame } from '../Utils/GDevelopServices/Game';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
-import { MaxProjectCountAlertMessage } from '../MainFrame/EditorContainers/HomePage/BuildSection/MaxProjectCountAlertMessage';
+import {
+  checkIfHasTooManyCloudProjects,
+  MaxProjectCountAlertMessage,
+} from '../MainFrame/EditorContainers/HomePage/BuildSection/MaxProjectCountAlertMessage';
 import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
 import ArrowLeft from '../UI/CustomSvgIcons/ArrowLeft';
 
@@ -38,6 +45,7 @@ type Props = {|
   onlineWebExporter: Exporter,
   onSaveProject: () => Promise<void>,
   isSavingProject: boolean,
+  isRequiredToSaveAsNewCloudProject: () => boolean,
   onClose: () => Promise<void>,
   onContinueQuickCustomization: () => void,
   onTryAnotherGame: () => void,
@@ -50,6 +58,7 @@ export const QuickPublish = ({
   onlineWebExporter,
   onSaveProject,
   isSavingProject,
+  isRequiredToSaveAsNewCloudProject,
   onClose,
   onContinueQuickCustomization,
   onTryAnotherGame,
@@ -63,17 +72,15 @@ export const QuickPublish = ({
     onOpenCreateAccountDialog,
     limits,
     cloudProjects,
+    getAuthorizationHeader,
   } = authenticatedUser;
-  const { game } = gameAndBuildsManager;
+  const { game, setGame } = gameAndBuildsManager;
+  const [buildOrGameUrl, setBuildOrGameUrl] = React.useState('');
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
   );
-  const [
-    numberOfCloudProjectsBeforeSavingCustomizedGame,
-    setNumberOfCloudProjectsBeforeSavingCustomizedGame,
-  ] = React.useState<number | null>(null);
   const [exportState, setExportState] = React.useState<
-    '' | 'started' | 'succeeded' | 'errored'
+    '' | 'started' | 'updating-game' | 'succeeded' | 'errored'
   >('');
   const exportLauncherRef = React.useRef<?ExportLauncher>(null);
 
@@ -98,34 +105,17 @@ export const QuickPublish = ({
     />
   );
 
-  React.useEffect(
-    () => {
-      if (!cloudProjects) {
-        setNumberOfCloudProjectsBeforeSavingCustomizedGame(null);
-      } else if (numberOfCloudProjectsBeforeSavingCustomizedGame === null) {
-        setNumberOfCloudProjectsBeforeSavingCustomizedGame(
-          cloudProjects.filter(cloudProject => !cloudProject.deletedAt).length
-        );
-      }
-    },
-    // Store the number of cloud projects **before** the user saved this quick-customized
-    // game. Otherwise, they might reach the max number saving it, and the callout would
-    // be displayed instead of the game link.
-    [cloudProjects, numberOfCloudProjectsBeforeSavingCustomizedGame]
-  );
-
   const isLoadingCloudProjects = !!profile && !cloudProjects;
-  const isCloudProjectsMaximumReached =
-    !!limits &&
-    !!cloudProjects &&
-    limits.capabilities.cloudProjects.maximumCount > 0 &&
-    numberOfCloudProjectsBeforeSavingCustomizedGame !== null &&
-    numberOfCloudProjectsBeforeSavingCustomizedGame >=
-      limits.capabilities.cloudProjects.maximumCount;
+  const isCloudProjectsMaximumReached = checkIfHasTooManyCloudProjects(
+    authenticatedUser
+  );
+  const cantContinueBecauseCloudProjectsMaximumReached =
+    isRequiredToSaveAsNewCloudProject() && isCloudProjectsMaximumReached;
+
   const shouldSaveAndLaunchExport =
     !!profile &&
     exportState === '' &&
-    !isCloudProjectsMaximumReached &&
+    !cantContinueBecauseCloudProjectsMaximumReached &&
     !isLoadingCloudProjects;
 
   React.useEffect(
@@ -139,7 +129,38 @@ export const QuickPublish = ({
     [launchExport, onSaveProject, shouldSaveAndLaunchExport]
   );
 
-  const gameUrl = game ? getGameUrl(game) : '';
+  const onExportSucceeded = React.useCallback(
+    async ({ build }: { build: ?Build }) => {
+      try {
+        if (profile && game && build) {
+          setExportState('updating-game');
+          const updatedGame = await updateGame(
+            getAuthorizationHeader,
+            profile.id,
+            game.id,
+            {
+              publicWebBuildId: build.id,
+            }
+          );
+          setGame(updatedGame);
+        }
+
+        setBuildOrGameUrl(
+          game
+            ? getGameUrl(game)
+            : build
+            ? getBuildArtifactUrl(build, 's3Key')
+            : ''
+        );
+        setExportState('succeeded');
+      } catch (err) {
+        console.error('Unable to update the game', err);
+        setExportState('errored');
+      }
+    },
+    [setExportState, setGame, game, profile, getAuthorizationHeader]
+  );
+
   const hasNotSavedProject = !profile && exportState === '';
 
   return (
@@ -157,7 +178,7 @@ export const QuickPublish = ({
         {profile ? (
           isLoadingCloudProjects ? (
             <PlaceholderLoader />
-          ) : isCloudProjectsMaximumReached && limits ? (
+          ) : cantContinueBecauseCloudProjectsMaximumReached && limits ? (
             renderCallout(limits)
           ) : (
             <I18n>
@@ -186,9 +207,7 @@ export const QuickPublish = ({
                     onExportErrored={() => {
                       setExportState('errored');
                     }}
-                    onExportSucceeded={() => {
-                      setExportState('succeeded');
-                    }}
+                    onExportSucceeded={onExportSucceeded}
                   />
                   {exportState === 'succeeded' ? (
                     <Paper background="light">
@@ -199,9 +218,11 @@ export const QuickPublish = ({
                       >
                         <ColumnStackLayout>
                           <Text size="body" align="center">
-                            <Trans>Share your game with your friends!</Trans>
+                            <Trans>
+                              Share your game with your friends or teammates.
+                            </Trans>
                           </Text>
-                          {gameUrl && <ShareLink url={gameUrl} />}
+                          {buildOrGameUrl && <ShareLink url={buildOrGameUrl} />}
                         </ColumnStackLayout>
                       </div>
                     </Paper>
@@ -219,6 +240,8 @@ export const QuickPublish = ({
                         onClick={launchExport}
                       />
                     </ColumnStackLayout>
+                  ) : exportState === 'updating-game' ? (
+                    <PlaceholderLoader />
                   ) : null}
                 </ColumnStackLayout>
               )}
@@ -285,14 +308,16 @@ export const QuickPublish = ({
             secondary
             onClick={onClose}
             label={
-              hasNotSavedProject || isCloudProjectsMaximumReached ? (
+              hasNotSavedProject ||
+              cantContinueBecauseCloudProjectsMaximumReached ? (
                 <Trans>Leave and lose all changes</Trans>
               ) : (
                 <Trans>Finish and close</Trans>
               )
             }
             icon={
-              hasNotSavedProject || isCloudProjectsMaximumReached ? (
+              hasNotSavedProject ||
+              cantContinueBecauseCloudProjectsMaximumReached ? (
                 <Trash />
               ) : null
             }

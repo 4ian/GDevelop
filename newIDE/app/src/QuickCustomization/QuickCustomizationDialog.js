@@ -21,6 +21,12 @@ type Props = {|
   onlineWebExporter: Exporter,
   onSaveProject: () => Promise<void>,
   isSavingProject: boolean,
+  /**
+   * Should return true if the project will be saved as a new cloud project,
+   * false otherwise (i.e: if the project is *already saved* as a cloud project,
+   * and so there are no risks, notably, to get beyond the limit of cloud projects).
+   */
+  isRequiredToSaveAsNewCloudProject: () => boolean,
   canClose: boolean,
   sourceGameId: string,
 |};
@@ -33,6 +39,7 @@ export const QuickCustomizationDialog = ({
   onlineWebExporter,
   onSaveProject,
   isSavingProject,
+  isRequiredToSaveAsNewCloudProject,
   canClose,
   sourceGameId,
 }: Props) => {
@@ -66,6 +73,7 @@ export const QuickCustomizationDialog = ({
     onlineWebExporter,
     onSaveProject,
     isSavingProject,
+    isRequiredToSaveAsNewCloudProject,
     onClose,
     onContinueQuickCustomization,
     onTryAnotherGame,

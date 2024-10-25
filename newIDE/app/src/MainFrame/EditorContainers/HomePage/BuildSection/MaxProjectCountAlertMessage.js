@@ -8,6 +8,7 @@ import AlertMessage from '../../../../UI/AlertMessage';
 import { Line, Column } from '../../../../UI/Grid';
 import { type Limits } from '../../../../Utils/GDevelopServices/Usage';
 import { type AuthenticatedUser } from '../../../../Profile/AuthenticatedUserContext';
+import Gold from '../../../../Profile/Subscription/Icons/Gold';
 
 type Props = {|
   onUpgrade: () => void,
@@ -45,6 +46,14 @@ export const MaxProjectCountAlertMessage = ({
       <Column noMargin expand>
         <AlertMessage
           kind="warning"
+          renderLeftIcon={() => (
+            <Gold
+              style={{
+                width: 48,
+                height: 48,
+              }}
+            />
+          )}
           renderRightButton={
             canMaximumCountBeIncreased
               ? () => (

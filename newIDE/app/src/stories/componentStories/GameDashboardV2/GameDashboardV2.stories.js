@@ -103,6 +103,8 @@ export const Default = () => {
       minPlayers: 2,
       canJoinAfterStart: true,
     })
+    .onGet(`/game/${game1.id}/leaderboard`)
+    .reply(200, [])
     .onAny()
     .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);

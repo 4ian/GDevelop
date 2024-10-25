@@ -14,6 +14,11 @@ import Text from '../UI/Text';
 import { Divider } from '@material-ui/core';
 import ArrowRight from '../UI/CustomSvgIcons/ArrowRight';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
+import Link from '../UI/Link';
+import { getHelpLink } from '../Utils/HelpLink';
+import Window from '../Utils/Window';
+
+const leaderboardsHelpLink = getHelpLink('/all-features/leaderboards');
 
 type Props = {|
   leaderboards: ?Array<Leaderboard>,
@@ -21,7 +26,7 @@ type Props = {|
   onSeeAllLeaderboards: () => void,
 |};
 
-const ServicesWidget = ({ onSeeAllLeaderboards }: Props) => {
+const ServicesWidget = ({ leaderboards, onSeeAllLeaderboards }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   return (
     <DashboardWidget gridSize={3} title={<Trans>Player services</Trans>}>
@@ -32,12 +37,26 @@ const ServicesWidget = ({ onSeeAllLeaderboards }: Props) => {
               <Trans>Game leaderboards</Trans>
             </Text>
             <FlatButton
-              label={<Trans>See all</Trans>}
+              label={<Trans>See more</Trans>}
               rightIcon={<ArrowRight fontSize="small" />}
               onClick={onSeeAllLeaderboards}
               primary
             />
           </Line>
+          {leaderboards && leaderboards.length === 0 && (
+            <Text color="secondary">
+              <Trans>
+                Learn how to use{' '}
+                <Link
+                  href={leaderboardsHelpLink}
+                  onClick={() => Window.openExternalURL(leaderboardsHelpLink)}
+                >
+                  leaderboards
+                </Link>{' '}
+                on GDevelop.
+              </Trans>
+            </Text>
+          )}
         </Column>
         {isMobile ? (
           <Column noMargin>

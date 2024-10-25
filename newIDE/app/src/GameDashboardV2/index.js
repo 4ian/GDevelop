@@ -13,7 +13,9 @@ import FeedbackWidget from './FeedbackWidget';
 import {
   getLobbyConfiguration,
   listComments,
+  listGameActiveLeaderboards,
   type Comment,
+  type Leaderboard,
   type LobbyConfiguration,
 } from '../Utils/GDevelopServices/Play';
 import { getBuilds, type Build } from '../Utils/GDevelopServices/Build';
@@ -43,6 +45,9 @@ const GameDashboardV2 = ({ game }: Props) => {
   const [gameRollingMetrics, setGameMetrics] = React.useState<?(GameMetrics[])>(
     null
   );
+  const [leaderboards, setLeaderboards] = React.useState<?Array<Leaderboard>>(
+    null
+  );
   const [
     lobbyConfiguration,
     setLobbyConfiguration,
@@ -65,6 +70,7 @@ const GameDashboardV2 = ({ game }: Props) => {
           builds,
           gameRollingMetrics,
           lobbyConfiguration,
+          leaderboards,
         ] = await Promise.all([
           listComments(getAuthorizationHeader, profile.id, {
             gameId: game.id,
@@ -80,11 +86,17 @@ const GameDashboardV2 = ({ game }: Props) => {
           getLobbyConfiguration(getAuthorizationHeader, profile.id, {
             gameId: game.id,
           }),
+          listGameActiveLeaderboards(
+            getAuthorizationHeader,
+            profile.id,
+            game.id
+          ),
         ]);
         setFeedbacks(feedbacks);
         setBuilds(builds);
         setGameMetrics(gameRollingMetrics);
         setLobbyConfiguration(lobbyConfiguration);
+        setLeaderboards(leaderboards);
       };
 
       fetchData();
@@ -106,7 +118,7 @@ const GameDashboardV2 = ({ game }: Props) => {
         />
         <ServicesWidget
           onSeeAllLeaderboards={() => setView('leaderboards')}
-          leaderboards={null}
+          leaderboards={leaderboards}
           lobbyConfiguration={lobbyConfiguration}
         />
         <DashboardWidget

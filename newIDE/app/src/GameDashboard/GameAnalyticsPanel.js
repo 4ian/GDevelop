@@ -1,6 +1,7 @@
 // @flow
 import { Trans, t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
+import { I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { formatISO, subDays } from 'date-fns';
 import { Column, Line } from '../UI/Grid';
@@ -34,6 +35,7 @@ import {
   buildChartData,
   daysShownForYear,
   durationValues,
+  type ChartData,
 } from './GameAnalyticsEvaluator';
 import Paper from '../UI/Paper';
 
@@ -93,6 +95,76 @@ const CustomTooltip = ({
       </ColumnStackLayout>
     </Paper>
   ) : null;
+
+type SessionsChartProps = {|
+  i18n: I18nType,
+  chartData: ChartData,
+  height: number,
+|};
+
+export const SessionsChart = ({
+  i18n,
+  chartData,
+  height,
+}: SessionsChartProps) => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const styles = {
+    tooltipContent: {
+      color: gdevelopTheme.chart.textColor,
+      padding: 10,
+    },
+    tickLabel: {
+      fontFamily: gdevelopTheme.chart.fontFamily,
+    },
+  };
+
+  return (
+    <ResponsiveContainer width={chartWidth} height={height}>
+      <AreaChart data={chartData.overTime} margin={chartMargins}>
+        <Area
+          name={i18n._(t`Viewers`)}
+          type="monotone"
+          dataKey="viewersCount"
+          stroke={gdevelopTheme.chart.dataColor1}
+          fill={gdevelopTheme.chart.dataColor1}
+          fillOpacity={0.125}
+          yAxisId={0}
+        />
+        <Area
+          name={i18n._(t`Players`)}
+          type="monotone"
+          dataKey="playersCount"
+          stroke={gdevelopTheme.chart.dataColor1}
+          fill={gdevelopTheme.chart.dataColor1}
+          fillOpacity={0.25}
+          yAxisId={0}
+        />
+        <CartesianGrid
+          stroke={gdevelopTheme.chart.gridColor}
+          strokeDasharray="3 3"
+        />
+        <XAxis
+          dataKey="date"
+          stroke={gdevelopTheme.chart.textColor}
+          style={styles.tickLabel}
+        />
+        <YAxis
+          dataKey="viewersCount"
+          stroke={gdevelopTheme.chart.textColor}
+          style={styles.tickLabel}
+        />
+        <Tooltip
+          content={props =>
+            CustomTooltip({
+              ...props,
+              customStyle: styles.tooltipContent,
+            })
+          }
+        />
+      </AreaChart>
+    </ResponsiveContainer>
+  );
+};
 
 export const GameAnalyticsPanel = ({ game }: Props) => {
   const { getAuthorizationHeader, profile } = React.useContext(
@@ -213,50 +285,11 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                 <Text size="block-title" align="center">
                   <Trans>{chartData.overview.playersCount} sessions</Trans>
                 </Text>
-                <ResponsiveContainer width={chartWidth} height={chartHeight}>
-                  <AreaChart data={chartData.overTime} margin={chartMargins}>
-                    <Area
-                      name={i18n._(t`Viewers`)}
-                      type="monotone"
-                      dataKey="viewersCount"
-                      stroke={gdevelopTheme.chart.dataColor1}
-                      fill={gdevelopTheme.chart.dataColor1}
-                      fillOpacity={0.125}
-                      yAxisId={0}
-                    />
-                    <Area
-                      name={i18n._(t`Players`)}
-                      type="monotone"
-                      dataKey="playersCount"
-                      stroke={gdevelopTheme.chart.dataColor1}
-                      fill={gdevelopTheme.chart.dataColor1}
-                      fillOpacity={0.25}
-                      yAxisId={0}
-                    />
-                    <CartesianGrid
-                      stroke={gdevelopTheme.chart.gridColor}
-                      strokeDasharray="3 3"
-                    />
-                    <XAxis
-                      dataKey="date"
-                      stroke={gdevelopTheme.chart.textColor}
-                      style={styles.tickLabel}
-                    />
-                    <YAxis
-                      dataKey="viewersCount"
-                      stroke={gdevelopTheme.chart.textColor}
-                      style={styles.tickLabel}
-                    />
-                    <Tooltip
-                      content={props =>
-                        CustomTooltip({
-                          ...props,
-                          customStyle: styles.tooltipContent,
-                        })
-                      }
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
+                <SessionsChart
+                  chartData={chartData}
+                  height={chartHeight}
+                  i18n={i18n}
+                />
               </Column>
               <Column noMargin alignItems="center" expand>
                 <Text size="block-title" align="center">

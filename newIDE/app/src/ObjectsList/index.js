@@ -349,9 +349,6 @@ const renderTreeViewItemRightComponent = (i18n: I18nType) => (
 const renameItem = (item: TreeViewItem, newName: string) => {
   item.content.rename(newName);
 };
-const onClickItem = (item: TreeViewItem) => {
-  item.content.onClick();
-};
 const editItem = (item: TreeViewItem) => {
   item.content.edit();
 };
@@ -1083,6 +1080,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     const selectedItems = React.useMemo(
       () => {
+        console.log(selectedObjectFolderOrObjectsWithContext);
         return selectedObjectFolderOrObjectsWithContext.map(
           ({ objectFolderOrObject, global }) => {
             return createTreeViewItem({
@@ -1399,11 +1397,32 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                       onCollapseItem={onCollapseItem}
                       selectedItems={selectedItems}
                       onSelectItems={items => {
-                        if (!items) selectObjectFolderOrObjectWithContext(null);
-                        const itemToSelect = items[0];
-                        if (itemToSelect.isRoot) return;
+                        if (!items) {
+                          selectObjectFolderOrObjectWithContext(null);
+                          return;
+                        }
+                        const itemContentToSelect = items[0].content;
+                        let objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext | null = null;
+                        if (
+                          itemContentToSelect instanceof
+                          ObjectFolderTreeViewItemContent
+                        ) {
+                          objectFolderOrObjectWithContext = {
+                            objectFolderOrObject:
+                              itemContentToSelect.objectFolder,
+                            global: itemContentToSelect.isGlobal(),
+                          };
+                        } else if (
+                          itemContentToSelect instanceof
+                          ObjectTreeViewItemContent
+                        ) {
+                          objectFolderOrObjectWithContext = {
+                            objectFolderOrObject: itemContentToSelect.object,
+                            global: itemContentToSelect.isGlobal(),
+                          };
+                        }
                         selectObjectFolderOrObjectWithContext(
-                          itemToSelect || null
+                          objectFolderOrObjectWithContext
                         );
                       }}
                       onRenameItem={renameItem}
@@ -1416,6 +1435,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                       initiallyOpenedNodeIds={initiallyOpenedNodeIds}
                       arrowKeyNavigationProps={arrowKeyNavigationProps}
                       shouldSelectUponContextMenuOpening
+                      getItemRightButton={getTreeViewItemRightButton(i18n)}
+                      renderRightComponent={renderTreeViewItemRightComponent(
+                        i18n
+                      )}
                     />
                   )}
                 </AutoSizer>

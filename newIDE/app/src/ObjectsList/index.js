@@ -51,10 +51,12 @@ import { getInsertionParentAndPositionFromSelection } from '../Utils/ObjectFolde
 import {
   ObjectTreeViewItemContent,
   getObjectTreeViewItemId,
+  type ObjectTreeViewItemProps,
 } from './ObjectTreeViewItemContent';
 import {
   ObjectFolderTreeViewItemContent,
   getObjectFolderTreeViewItemId,
+  type ObjectFolderTreeViewItemProps,
 } from './ObjectFolderTreeViewItemContent';
 
 const sceneObjectsRootFolderId = 'scene-objects';
@@ -77,6 +79,14 @@ const styles = {
   autoSizer: { width: '100%' },
 };
 
+export const getTreeViewItemIdFromObjectFolderOrObject = (
+  objectFolderOrObject: gdObjectFolderOrObject
+): string => {
+  return objectFolderOrObject.isFolder()
+    ? getObjectFolderTreeViewItemId(objectFolderOrObject)
+    : getObjectTreeViewItemId(objectFolderOrObject.getObject());
+};
+
 export interface TreeViewItemContent {
   getName(): string | React.Node;
   getId(): string;
@@ -94,6 +104,7 @@ export interface TreeViewItemContent {
   paste(): void;
   cut(): void;
   duplicate(): void;
+  getIndex(): number;
   moveAt(destinationIndex: number): void;
   isDescendantOf(treeViewItemContent: TreeViewItemContent): boolean;
   isSibling(treeViewItemContent: TreeViewItemContent): boolean;
@@ -142,16 +153,18 @@ const createTreeViewItem = ({
   isGlobal: boolean,
   objectFolderTreeViewItemProps: ObjectFolderTreeViewItemProps,
   objectTreeViewItemProps: ObjectTreeViewItemProps,
-|}): Array<TreeViewItem> => {
+|}): TreeViewItem => {
   if (objectFolderOrObject.isFolder()) {
     return new ObjectFolderTreeViewItem({
       objectFolderOrObject: objectFolderOrObject,
-      global: this.global,
+      global: isGlobal,
       isRoot: false,
+      objectFolderTreeViewItemProps,
+      objectTreeViewItemProps,
       content: new ObjectFolderTreeViewItemContent(
         objectFolderOrObject,
         isGlobal,
-        this.objectFolderTreeViewItemProps
+        objectFolderTreeViewItemProps
       ),
     });
   } else {
@@ -159,7 +172,7 @@ const createTreeViewItem = ({
       new ObjectTreeViewItemContent(
         objectFolderOrObject,
         isGlobal,
-        this.objectTreeViewItemProps
+        objectTreeViewItemProps
       )
     );
   }
@@ -171,7 +184,7 @@ class ObjectFolderTreeViewItem implements TreeViewItem {
   isPlaceholder = false;
   content: TreeViewItemContent;
   objectFolderOrObject: gdObjectFolderOrObject;
-  placeholder: PlaceHolderTreeViewItem;
+  placeholder: ?PlaceHolderTreeViewItem;
   objectFolderTreeViewItemProps: ObjectFolderTreeViewItemProps;
   objectTreeViewItemProps: ObjectTreeViewItemProps;
 
@@ -188,7 +201,7 @@ class ObjectFolderTreeViewItem implements TreeViewItem {
     global: boolean,
     isRoot: boolean,
     content: TreeViewItemContent,
-    placeholder: PlaceHolderTreeViewItem,
+    placeholder?: PlaceHolderTreeViewItem,
     objectFolderTreeViewItemProps: ObjectFolderTreeViewItemProps,
     objectTreeViewItemProps: ObjectTreeViewItemProps,
   |}) {
@@ -203,7 +216,7 @@ class ObjectFolderTreeViewItem implements TreeViewItem {
 
   getChildren(i18n: I18nType): ?Array<TreeViewItem> {
     if (this.objectFolderOrObject.getChildrenCount() === 0) {
-      return [this.placeholder];
+      return this.placeholder ? [this.placeholder] : [];
     }
     return mapFor(0, this.objectFolderOrObject.getChildrenCount(), i => {
       const child = this.objectFolderOrObject.getChildAt(i);
@@ -296,6 +309,10 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
   cut(): void {}
 
   duplicate(): void {}
+
+  getIndex(): number {
+    return 0;
+  }
 
   moveAt(destinationIndex: number): void {}
 
@@ -625,7 +642,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         // to simplify the code, we just wait a few ms for a new render
         // to be done.
         setTimeout(() => {
-          scrollToItem(getObjectTreeViewItemId(object));
+          scrollToItem(getObjectTreeViewItemId(object.getObject()));
         }, 100); // A few ms is enough for a new render to be done.
       },
       [objectsContainer, onObjectCreated, scrollToItem]
@@ -679,47 +696,46 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       [isMobile]
     );
 
-    const getClosestVisibleParent = (
+    const getClosestVisibleParentId = (
       objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext
-    ): ?ObjectFolderOrObjectWithContext => {
+    ): ?string => {
       const treeView = treeViewRef.current;
       if (!treeView) return null;
-      const { objectFolderOrObject, global } = objectFolderOrObjectWithContext;
-      const topToBottomAscendanceWithContext = getFoldersAscendanceWithoutRootFolder(
+      const { objectFolderOrObject } = objectFolderOrObjectWithContext;
+      const topToBottomAscendanceId = getFoldersAscendanceWithoutRootFolder(
         objectFolderOrObject
       )
         .reverse()
-        .map(parent => ({ objectFolderOrObject: parent, global }));
-      const topToBottomAscendanceOpenness = treeView.areItemsOpen(
-        topToBottomAscendanceWithContext
+        .map(parent => getObjectFolderTreeViewItemId(objectFolderOrObject));
+      const topToBottomAscendanceOpenness = treeView.areItemsOpenFromId(
+        topToBottomAscendanceId
       );
       const firstClosedFolderIndex = topToBottomAscendanceOpenness.indexOf(
         false
       );
       if (firstClosedFolderIndex === -1) {
         // If all parents are open, return the objectFolderOrObject given as input.
-        return objectFolderOrObjectWithContext;
+        return getTreeViewItemIdFromObjectFolderOrObject(objectFolderOrObject);
       }
       // $FlowFixMe - We are confident this TreeView item is in fact a ObjectFolderOrObjectWithContext
-      return topToBottomAscendanceWithContext[firstClosedFolderIndex];
+      return topToBottomAscendanceId[firstClosedFolderIndex];
     };
 
     const setAsGlobalObject = React.useCallback(
       ({
         i18n,
-        objectFolderOrObjectWithContext,
+        objectFolderOrObject,
         index,
         folder,
       }: {
         i18n: I18nType,
-        objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
+        objectFolderOrObject: gdObjectFolderOrObject,
         index?: number,
         folder?: gdObjectFolderOrObject,
       }) => {
         if (!globalObjectsContainer) {
           return;
         }
-        const { objectFolderOrObject } = objectFolderOrObjectWithContext;
         const destinationFolder =
           folder && folder.isFolder()
             ? folder
@@ -865,11 +881,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       (objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext) => {
         const treeView = treeViewRef.current;
         if (treeView) {
-          const closestVisibleParent = getClosestVisibleParent(
+          const closestVisibleParentId = getClosestVisibleParentId(
             objectFolderOrObjectWithContext
           );
-          if (closestVisibleParent) {
-            treeView.animateItem(closestVisibleParent);
+          if (closestVisibleParentId) {
+            treeView.animateItemFromId(closestVisibleParentId);
           }
         }
         onObjectModified(true);
@@ -902,6 +918,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         objectsContainer,
         onObjectPasted,
         onSelectAllInstancesOfObjectInLayout,
+        editName,
         onEditObject,
         onDeleteObjects,
         onAddObjectInstance,
@@ -925,6 +942,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         objectsContainer,
         onObjectPasted,
         onSelectAllInstancesOfObjectInLayout,
+        editName,
         onEditObject,
         onDeleteObjects,
         onAddObjectInstance,
@@ -951,6 +969,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         objectsContainer,
         onObjectPasted,
         onObjectModified,
+        editName,
         expandFolders,
         addFolder,
         onAddNewObject,
@@ -958,6 +977,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         onRenameObjectFolderOrObjectWithContextFinish,
         onDeleteObjects,
         selectObjectFolderOrObjectWithContext,
+        showDeleteConfirmation,
         forceUpdateList,
         forceUpdate,
       }),
@@ -967,6 +987,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         objectsContainer,
         onObjectPasted,
         onObjectModified,
+        editName,
         expandFolders,
         addFolder,
         onAddNewObject,
@@ -974,6 +995,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         onRenameObjectFolderOrObjectWithContextFinish,
         onDeleteObjects,
         selectObjectFolderOrObjectWithContext,
+        showDeleteConfirmation,
         forceUpdateList,
         forceUpdate,
       ]
@@ -995,8 +1017,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                 globalObjectsRootFolderId,
                 i18n._(t`Global Objects`)
               ),
-              placeholder: new PlaceHolderTreeViewItem({
-                label: (
+              placeholder: new PlaceHolderTreeViewItem(
+                globalObjectsEmptyPlaceholderId,
+                (
                   <Trans>
                     There is no{' '}
                     <Link
@@ -1009,9 +1032,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                     </Link>{' '}
                     yet.
                   </Trans>
-                ),
-                id: globalObjectsEmptyPlaceholderId,
-              }),
+                )
+              ),
               objectTreeViewItemProps,
               objectFolderTreeViewItemProps,
             }),
@@ -1037,10 +1059,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                 },
               ]
             ),
-            placeholder: new PlaceHolderTreeViewItem({
-              label: i18n._(t`Start by adding a new object.`),
-              id: sceneObjectsEmptyPlaceholderId,
-            }),
+            placeholder: new PlaceHolderTreeViewItem(
+              sceneObjectsEmptyPlaceholderId,
+              i18n._(t`Start by adding a new object.`)
+            ),
             objectTreeViewItemProps,
             objectFolderTreeViewItemProps,
           }),
@@ -1092,7 +1114,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             }
           );
           keyboardShortcutsRef.current.setShortcutCallback('onRename', () => {
-            editName(selectedItems[0].getId());
+            editName(selectedItems[0].content.getId());
           });
         }
       },
@@ -1117,24 +1139,23 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         }
         // Check if at least one element in the selection can be moved.
         if (
-          selectedObjectFolderOrObjectsWithContext.every(
+          selectedItems.every(
             selectedObject =>
-              selectedObject.global === destinationItem.content.isGlobal()
+              selectedObject.content.isGlobal() ===
+              destinationItem.content.isGlobal()
           )
         ) {
           if (
-            selectedObjectFolderOrObjectsWithContext[0] &&
-            destinationItem.content.isDescendantOf(
-              selectedObjectFolderOrObjectsWithContext[0].objectFolderOrObject
-            )
+            selectedItems[0] &&
+            destinationItem.content.isDescendantOf(selectedItems[0].content)
           ) {
             return false;
           }
           return true;
         } else if (
-          selectedObjectFolderOrObjectsWithContext.length === 1 &&
-          selectedObjectFolderOrObjectsWithContext.every(
-            selectedObject => selectedObject.global === false
+          selectedItems.length === 1 &&
+          selectedItems.every(
+            selectedObject => selectedObject.content.isGlobal() === false
           ) &&
           destinationItem.content.isGlobal()
         ) {
@@ -1143,7 +1164,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
         return false;
       },
-      [selectedObjectFolderOrObjectsWithContext]
+      [selectedObjectFolderOrObjectsWithContext, selectedItems]
     );
 
     // TODO Move this code in TreeViewItemContent.
@@ -1176,15 +1197,13 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           ) {
             setAsGlobalObject({
               i18n,
-              objectFolderOrObjectWithContext: {
-                objectFolderOrObject: selectedObjectItemContent.object,
-                global: selectedObjectItemContent.isGlobal(),
-              },
+              objectFolderOrObject: selectedObjectItemContent.object,
             });
           }
           return;
         }
 
+        const destinationItemContent = destinationItem.content;
         if (
           selectedObjectItemContent.isGlobal() === false &&
           destinationItem.content.isGlobal()
@@ -1192,22 +1211,22 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           let parent, index;
           if (
             where === 'inside' &&
-            destinationItem.objectFolderOrObject.isFolder()
+            destinationItemContent instanceof ObjectFolderTreeViewItemContent
           ) {
-            parent = destinationItem.objectFolderOrObject;
+            parent = destinationItemContent.objectFolder;
             index = 0;
-          } else {
-            parent = destinationItem.objectFolderOrObject.getParent();
+          } else if (
+            destinationItemContent instanceof ObjectTreeViewItemContent
+          ) {
+            parent = destinationItemContent.object.getParent();
             index =
-              parent.getChildPosition(destinationItem.objectFolderOrObject) +
-              (where === 'after' ? 1 : 0);
+              destinationItemContent.getIndex() + (where === 'after' ? 1 : 0);
+          } else {
+            return;
           }
           setAsGlobalObject({
             i18n,
-            objectFolderOrObjectWithContext: {
-              objectFolderOrObject: selectedObjectItemContent.object,
-              global: selectedObjectItemContent.isGlobal(),
-            },
+            objectFolderOrObject: selectedObjectItemContent.object,
             folder: parent,
             index,
           });
@@ -1218,16 +1237,19 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         if (
           selectedItem.content.isGlobal() === destinationItem.content.isGlobal()
         ) {
+          const destinationItemContent = destinationItem.content;
           let parent;
           if (
             where === 'inside' &&
-            destinationItem.content instanceof ObjectFolderTreeViewItemContent
+            destinationItemContent instanceof ObjectFolderTreeViewItemContent
           ) {
-            parent = destinationItem.content.folder;
+            parent = destinationItemContent.objectFolder;
           } else if (
-            destinationItem.content instanceof ObjectTreeViewItemContent
+            destinationItemContent instanceof ObjectTreeViewItemContent
           ) {
-            parent = destinationItem.content.object.getParent();
+            parent = destinationItemContent.object.getParent();
+          } else {
+            return;
           }
           const selectedObjectFolderOrObjectParent = selectedObjectItemContent.object.getParent();
           if (destinationItem.content.isSibling(selectedObjectItemContent)) {
@@ -1254,12 +1276,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             );
             const treeView = treeViewRef.current;
             if (treeView) {
-              const closestVisibleParent = getClosestVisibleParent({
+              const closestVisibleParentId = getClosestVisibleParentId({
                 objectFolderOrObject: parent,
                 global: destinationItem.content.isGlobal(),
               });
-              if (closestVisibleParent) {
-                treeView.animateItem(closestVisibleParent);
+              if (closestVisibleParentId) {
+                treeView.animateItemFromId(closestVisibleParentId);
               }
             }
           }

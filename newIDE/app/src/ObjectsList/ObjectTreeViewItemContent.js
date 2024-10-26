@@ -32,9 +32,7 @@ export const getObjectTreeViewItemId = (object: gdObject): string => {
   // Use the ptr to avoid display bugs in the rare case a user set an object
   // as global although another layout has an object with the same name,
   // and ignored the warning.
-  return `${this.object.getObject().getName()}-${
-    this.object.getObject().ptr
-  }`;
+  return `${object.getName()}-${object.ptr}`;
 };
 
 export type ObjectTreeViewItemCallbacks = {|
@@ -65,21 +63,22 @@ export type ObjectTreeViewItemCallbacks = {|
 export type ObjectTreeViewItemProps = {|
   ...ObjectTreeViewItemCallbacks,
   project: gdProject,
-  globalObjectsContainer: gdObjectsContainer,
+  globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
   swapObjectAsset: (objectWithContext: ObjectWithContext) => void,
   initialInstances?: gdInitialInstancesContainer,
+  editName: (itemId: string) => void,
   onObjectModified: (shouldForceUpdateList: boolean) => void,
   onMovedObjectFolderOrObjectToAnotherFolderInSameContainer: (
     objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext
   ) => void,
   canSetAsGlobalObject?: boolean,
-  setAsGlobalObject: (
+  setAsGlobalObject: ({|
     i18n: I18nType,
-    objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
+    objectFolderOrObject: gdObjectFolderOrObject,
     index?: number,
-    folder?: gdObjectFolderOrObject
-  ) => void,
+    folder?: gdObjectFolderOrObject,
+  |}) => void,
   showDeleteConfirmation: (options: any) => Promise<boolean>,
   selectObjectFolderOrObjectWithContext: (
     objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext
@@ -98,7 +97,7 @@ export const addSerializedObjectToObjectsContainer = ({
   addInsideFolder,
 }: {|
   project: gdProject,
-  globalObjectsContainer: gdObjectsContainer,
+  globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
   objectName: string,
   positionObjectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
@@ -170,35 +169,40 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
     this._isGlobal = isGlobal;
     this.props = props;
   }
-  
+
   isDescendantOf(treeViewItemContent: TreeViewItemContent): boolean {
     if (treeViewItemContent instanceof ObjectFolderTreeViewItemContent) {
       return this.object.isADescendantOf(treeViewItemContent.objectFolder);
     }
+    return false;
   }
 
   isSibling(treeViewItemContent: TreeViewItemContent): boolean {
     // TODO add a common interface to avoid instanceof.
     if (treeViewItemContent instanceof ObjectTreeViewItemContent) {
-      return this.object.getParent() === treeViewItemContent.objectFolder.getParent();
-    }
-    else if (treeViewItemContent instanceof ObjectFolderTreeViewItemContent) {
       return this.object.getParent() === treeViewItemContent.object.getParent();
+    } else if (treeViewItemContent instanceof ObjectFolderTreeViewItemContent) {
+      return (
+        this.object.getParent() === treeViewItemContent.objectFolder.getParent()
+      );
     }
+    return false;
   }
 
   getIndex(): number {
     return this.object.getParent().getChildPosition(this.object);
   }
 
-  isGlobal(): boolean { return this._isGlobal; }
+  isGlobal(): boolean {
+    return this._isGlobal;
+  }
 
   getName(): string | React.Node {
     return this.object.getObject().getName();
   }
 
   getId(): string {
-    return getObjectTreeViewItemId(this.object);
+    return getObjectTreeViewItemId(this.object.getObject());
   }
 
   getHtmlId(index: number): ?string {
@@ -219,11 +223,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
     );
   }
 
-  onClick(): void {
-    this.props.onEditEventsFunctionObjectOrSeeDetails(
-      this.eventsFunctionsObject
-    );
-  }
+  onClick(): void {}
 
   rename(newName: string): void {
     if (this.getName() === newName) {
@@ -282,9 +282,12 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       canSetAsGlobalObject,
       setAsGlobalObject,
       onOpenEventBasedObjectEditor,
+      selectObjectFolderOrObjectWithContext,
     } = this.props;
 
-    const container = this.isGlobal ? globalObjectsContainer : objectsContainer;
+    const container = this._isGlobal
+      ? globalObjectsContainer
+      : objectsContainer;
     if (!container) {
       return [];
     }
@@ -313,7 +316,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       },
       {
         label: this._getPasteLabel(i18n, {
-          isGlobalObject: this.isGlobal,
+          isGlobalObject: this._isGlobal,
           isFolder: false,
         }),
         enabled: Clipboard.has(OBJECT_CLIPBOARD_KIND),
@@ -374,21 +377,17 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
         click: () =>
           swapObjectAsset({
             object: this.object.getObject(),
-            global: this.isGlobal,
+            global: this._isGlobal,
           }),
         enabled: canSwapAssetOfObject(object),
       },
       { type: 'separator' },
       globalObjectsContainer && {
         label: i18n._(t`Set as global object`),
-        enabled: !this.isGlobal,
+        enabled: !this._isGlobal,
         click: () => {
-          // TODO Is this needed?
-          //selectObjectFolderOrObjectWithContext(null);
-          setAsGlobalObject(i18n, {
-            objectFolderOrObject: this.object,
-            global: this.isGlobal,
-          });
+          selectObjectFolderOrObjectWithContext(null);
+          setAsGlobalObject({ i18n, objectFolderOrObject: this.object });
         },
         visible: canSetAsGlobalObject !== false,
       },
@@ -403,7 +402,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
               .moveObjectFolderOrObjectToAnotherFolder(this.object, folder, 0);
             onMovedObjectFolderOrObjectToAnotherFolderInSameContainer({
               objectFolderOrObject: folder,
-              global: this.isGlobal,
+              global: this._isGlobal,
             });
           },
         })),
@@ -528,7 +527,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       objectName,
       positionObjectFolderOrObjectWithContext: {
         objectFolderOrObject: this.object,
-        global: this.isGlobal,
+        global: this._isGlobal,
       },
       objectType,
       serializedObject,

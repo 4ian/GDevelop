@@ -347,7 +347,9 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
     // the object).
     onDeleteObjects(objectsWithContext, doRemove => {
       if (!doRemove) return;
-      const container = this._isGlobal ? globalObjectsContainer : objectsContainer;
+      const container = this._isGlobal
+        ? globalObjectsContainer
+        : objectsContainer;
       if (container) {
         objectsToDelete.forEach(object => {
           container.removeObject(object.getName());

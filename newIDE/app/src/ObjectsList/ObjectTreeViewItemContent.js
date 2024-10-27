@@ -83,6 +83,7 @@ export type ObjectTreeViewItemProps = {|
   selectObjectFolderOrObjectWithContext: (
     objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext
   ) => void,
+  forceUpdateList: () => void,
   forceUpdate: () => void,
 |};
 
@@ -467,7 +468,9 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
     // the object).
     onDeleteObjects(objectsWithContext, doRemove => {
       if (!doRemove) return;
-      const container = this._isGlobal ? globalObjectsContainer : objectsContainer;
+      const container = this._isGlobal
+        ? globalObjectsContainer
+        : objectsContainer;
       if (container) {
         objectsToDelete.forEach(object => {
           container.removeObject(object.getName());
@@ -496,10 +499,6 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
   }
 
   paste(): void {
-    this._paste();
-  }
-
-  _paste(): gdObject {
     if (!Clipboard.has(OBJECT_CLIPBOARD_KIND)) return;
 
     const clipboardContent = Clipboard.get(OBJECT_CLIPBOARD_KIND);
@@ -541,13 +540,44 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
 
     onObjectModified(false);
     if (onObjectPasted) onObjectPasted(newObjectWithContext.object);
-    return newObjectWithContext.object;
   }
 
   duplicate(): void {
-    this.copy();
-    const newObject = this._paste();
-    this.props.editName(getObjectTreeViewItemId(newObject));
+    const {
+      project,
+      globalObjectsContainer,
+      objectsContainer,
+      forceUpdateList,
+      editName,
+      selectObjectFolderOrObjectWithContext,
+    } = this.props;
+
+    const object = this.object.getObject();
+    const serializedObject = serializeToJSObject(object);
+
+    const newObjectWithContext = addSerializedObjectToObjectsContainer({
+      project,
+      globalObjectsContainer,
+      objectsContainer,
+      objectName: object.getName(),
+      positionObjectFolderOrObjectWithContext: {
+        objectFolderOrObject: this.object,
+        global: this._isGlobal,
+      },
+      objectType: object.getType(),
+      serializedObject,
+    });
+
+    const newObjectFolderOrObjectWithContext = {
+      objectFolderOrObject: this.object
+        .getParent()
+        .getObjectChild(newObjectWithContext.object.getName()),
+      global: this._isGlobal,
+    };
+
+    forceUpdateList();
+    editName(getObjectTreeViewItemId(newObjectWithContext.object));
+    selectObjectFolderOrObjectWithContext(newObjectFolderOrObjectWithContext);
   }
 
   getRightButton(i18n: I18nType) {

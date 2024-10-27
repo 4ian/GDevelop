@@ -1085,7 +1085,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     const selectedItems = React.useMemo(
       () => {
-        console.log(selectedObjectFolderOrObjectsWithContext);
         return selectedObjectFolderOrObjectsWithContext.map(
           ({ objectFolderOrObject, global }) => {
             return createTreeViewItem({

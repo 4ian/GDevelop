@@ -496,6 +496,10 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
   }
 
   paste(): void {
+    this._paste();
+  }
+
+  _paste(): gdObject {
     if (!Clipboard.has(OBJECT_CLIPBOARD_KIND)) return;
 
     const clipboardContent = Clipboard.get(OBJECT_CLIPBOARD_KIND);
@@ -537,12 +541,13 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
 
     onObjectModified(false);
     if (onObjectPasted) onObjectPasted(newObjectWithContext.object);
+    return newObjectWithContext.object;
   }
 
   duplicate(): void {
     this.copy();
-    this.paste();
-    this.edit();
+    const newObject = this._paste();
+    this.props.editName(getObjectTreeViewItemId(newObject));
   }
 
   getRightButton(i18n: I18nType) {

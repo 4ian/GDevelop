@@ -246,7 +246,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
   }
 
   edit(): void {
-    this.props.editName(this.getId());
+    this.props.onEditObject(this.object.getObject());
   }
 
   _getPasteLabel(

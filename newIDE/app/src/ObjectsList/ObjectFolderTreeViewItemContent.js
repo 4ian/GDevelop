@@ -159,9 +159,7 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
     );
   }
 
-  edit(): void {
-    this.props.editName(this.getId());
-  }
+  edit(): void {}
 
   _getPasteLabel(
     i18n: I18nType,

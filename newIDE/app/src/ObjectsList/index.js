@@ -15,7 +15,6 @@ import Window from '../Utils/Window';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
-import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import TreeView, {
   type TreeViewInterface,
   type MenuButton,
@@ -30,11 +29,7 @@ import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
 import Add from '../UI/CustomSvgIcons/Add';
 import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 import {
-  enumerateFoldersInContainer,
-  enumerateFoldersInFolder,
-  enumerateObjectsInFolder,
   getFoldersAscendanceWithoutRootFolder,
-  getObjectFolderOrObjectUnifiedName,
   type ObjectFolderOrObjectWithContext,
 } from './EnumerateObjectFolderOrObject';
 import { mapFor } from '../Utils/MapFor';

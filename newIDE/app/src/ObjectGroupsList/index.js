@@ -41,16 +41,16 @@ const styles = {
   },
 };
 
+type EmptyPlaceholder = {|
+  +label: string,
+  +isPlaceholder: true,
+  +id: string,
+|};
+
 type RootFolder = {|
   +label: string,
   +children: GroupWithContextList | Array<EmptyPlaceholder>,
   +isRoot: true,
-  +id: string,
-|};
-
-type EmptyPlaceholder = {|
-  +label: string,
-  +isPlaceholder: true,
   +id: string,
 |};
 

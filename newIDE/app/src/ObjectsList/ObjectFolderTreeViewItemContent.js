@@ -3,19 +3,12 @@ import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 
 import * as React from 'react';
-import newNameGenerator from '../Utils/NewNameGenerator';
 import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
-import {
-  serializeToJSObject,
-  unserializeFromJSObject,
-} from '../Utils/Serializer';
 import { TreeViewItemContent } from '.';
 import {
   enumerateFoldersInContainer,
   enumerateFoldersInFolder,
   enumerateObjectsInFolder,
-  getFoldersAscendanceWithoutRootFolder,
-  getObjectFolderOrObjectUnifiedName,
   type ObjectFolderOrObjectWithContext,
 } from './EnumerateObjectFolderOrObject';
 import {
@@ -24,10 +17,7 @@ import {
 } from './ObjectTreeViewItemContent';
 import { renderQuickCustomizationMenuItems } from '../QuickCustomization/QuickCustomizationMenuItems';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
-import { ObjectTreeViewItemContent } from './ObjectTreeViewItemContent';
 import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
-
-const gd: libGDevelop = global.gd;
 
 export type ObjectFolderTreeViewItemCallbacks = {|
   onObjectPasted?: gdObject => void,
@@ -276,7 +266,7 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
             folderAndPath => folderAndPath.folder
           );
           expandFolders(
-            subFolders.map(folder => ({
+            [this.objectFolder, ...subFolders].map(folder => ({
               objectFolderOrObject: folder,
               global: this._isGlobal,
             }))

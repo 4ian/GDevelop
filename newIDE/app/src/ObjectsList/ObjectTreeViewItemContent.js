@@ -14,15 +14,10 @@ import { canSwapAssetOfObject } from '../AssetStore/AssetSwapper';
 import { getInstanceCountInLayoutForObject } from '../Utils/Layout';
 import {
   enumerateFoldersInContainer,
-  enumerateFoldersInFolder,
-  enumerateObjectsInFolder,
-  getFoldersAscendanceWithoutRootFolder,
-  getObjectFolderOrObjectUnifiedName,
   type ObjectFolderOrObjectWithContext,
 } from './EnumerateObjectFolderOrObject';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
-import { ObjectFolderTreeViewItemContent } from './ObjectFolderTreeViewItemContent';
 
 const gd: libGDevelop = global.gd;
 

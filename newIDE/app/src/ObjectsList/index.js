@@ -1250,7 +1250,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             parent = destinationObjectFolderOrObject.getParent();
           }
           const selectedObjectFolderOrObjectParent = selectedObjectFolderOrObject.getParent();
-          if (destinationItem.content.isSibling(selectedItem.content)) {
+          if (parent === selectedObjectFolderOrObjectParent) {
             const fromIndex = selectedItem.content.getIndex();
             let toIndex = destinationItem.content.getIndex();
             if (toIndex > fromIndex) toIndex -= 1;

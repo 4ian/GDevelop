@@ -53,6 +53,7 @@ import {
   getObjectFolderTreeViewItemId,
   type ObjectFolderTreeViewItemProps,
 } from './ObjectFolderTreeViewItemContent';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
 const sceneObjectsRootFolderId = 'scene-objects';
 const globalObjectsRootFolderId = 'global-objects';
@@ -396,8 +397,7 @@ type Props = {|
   layout: ?gdLayout,
   eventsBasedObject: gdEventsBasedObject | null,
   initialInstances?: gdInitialInstancesContainer,
-  globalObjectsContainer: gdObjectsContainer | null,
-  objectsContainer: gdObjectsContainer,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   onSelectAllInstancesOfObjectInLayout?: string => void,
   resourceManagementProps: ResourceManagementProps,
   onDeleteObjects: (
@@ -444,8 +444,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       layout,
       eventsBasedObject,
       initialInstances,
-      globalObjectsContainer,
-      objectsContainer,
+      projectScopedContainersAccessor,
       resourceManagementProps,
       onSelectAllInstancesOfObjectInLayout,
       onDeleteObjects,
@@ -471,6 +470,25 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     }: Props,
     ref
   ) => {
+    // TODO Handle any number of object containers.
+    const objectsContainersList = projectScopedContainersAccessor
+      .get()
+      .getObjectsContainersList();
+
+    if (objectsContainersList.getObjectsContainersCount() === 0) {
+      throw new Error('Used ObjectsList without any object container.');
+    }
+    if (objectsContainersList.getObjectsContainersCount() > 2) {
+      console.error('Used ObjectsList with more than 2 object containers.');
+    }
+    const globalObjectsContainer =
+      objectsContainersList.getObjectsContainersCount() > 1
+        ? objectsContainersList.getObjectsContainer(0)
+        : null;
+    const objectsContainer = objectsContainersList.getObjectsContainer(
+      objectsContainersList.getObjectsContainersCount() - 1
+    );
+
     const { currentlyRunningInAppTutorial } = React.useContext(
       InAppTutorialContext
     );
@@ -1483,7 +1501,8 @@ const arePropsEqual = (prevProps: Props, nextProps: Props): boolean =>
   prevProps.selectedObjectFolderOrObjectsWithContext ===
     nextProps.selectedObjectFolderOrObjectsWithContext &&
   prevProps.project === nextProps.project &&
-  prevProps.objectsContainer === nextProps.objectsContainer;
+  prevProps.projectScopedContainersAccessor ===
+    nextProps.projectScopedContainersAccessor;
 
 const MemoizedObjectsList = React.memo<Props, ObjectsListInterface>(
   ObjectsList,

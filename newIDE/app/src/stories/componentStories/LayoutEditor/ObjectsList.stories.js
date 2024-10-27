@@ -28,11 +28,9 @@ export const Default = () => (
         project={testProject.project}
         layout={testProject.testLayout}
         eventsBasedObject={null}
-        globalObjectsContainer={testProject.project.getObjects()}
         projectScopedContainersAccessor={
           testProject.testSceneProjectScopedContainersAccessor
         }
-        objectsContainer={testProject.testLayout.getObjects()}
         resourceManagementProps={fakeResourceManagementProps}
         onEditObject={action('On edit object')}
         onOpenEventBasedObjectEditor={action('On edit children')}
@@ -64,11 +62,9 @@ export const WithSerializedObjectView = () => (
           project={testProject.project}
           layout={testProject.testLayout}
           eventsBasedObject={null}
-          globalObjectsContainer={testProject.project.getObjects()}
           projectScopedContainersAccessor={
             testProject.testSceneProjectScopedContainersAccessor
           }
-          objectsContainer={testProject.testLayout.getObjects()}
           resourceManagementProps={fakeResourceManagementProps}
           onEditObject={action('On edit object')}
           onOpenEventBasedObjectEditor={action('On edit children')}

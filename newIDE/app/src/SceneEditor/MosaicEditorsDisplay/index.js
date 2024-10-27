@@ -377,9 +377,7 @@ const MosaicEditorsDisplay = React.forwardRef<
               project={project}
               layout={layout}
               eventsBasedObject={eventsBasedObject}
-              globalObjectsContainer={globalObjectsContainer}
               projectScopedContainersAccessor={projectScopedContainersAccessor}
-              objectsContainer={objectsContainer}
               initialInstances={initialInstances}
               onSelectAllInstancesOfObjectInLayout={
                 props.onSelectAllInstancesOfObjectInLayout

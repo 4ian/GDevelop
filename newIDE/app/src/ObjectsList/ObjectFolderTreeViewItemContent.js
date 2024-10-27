@@ -89,28 +89,24 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
     this.props = props;
   }
 
+  getObjectFolderOrObject(): gdObjectFolderOrObject | null {
+    return this.objectFolder;
+  }
+
   isDescendantOf(treeViewItemContent: TreeViewItemContent): boolean {
-    if (treeViewItemContent instanceof ObjectFolderTreeViewItemContent) {
-      return this.objectFolder.isADescendantOf(
-        treeViewItemContent.objectFolder
-      );
-    }
-    return false;
+    const objectFolderOrObject = treeViewItemContent.getObjectFolderOrObject();
+    return (
+      !!objectFolderOrObject &&
+      this.objectFolder.isADescendantOf(objectFolderOrObject)
+    );
   }
 
   isSibling(treeViewItemContent: TreeViewItemContent): boolean {
-    // TODO add a common interface to avoid instanceof.
-    if (treeViewItemContent instanceof ObjectFolderTreeViewItemContent) {
-      return (
-        this.objectFolder.getParent() ===
-        treeViewItemContent.objectFolder.getParent()
-      );
-    } else if (treeViewItemContent instanceof ObjectTreeViewItemContent) {
-      return (
-        this.objectFolder.getParent() === treeViewItemContent.object.getParent()
-      );
-    }
-    return false;
+    const objectFolderOrObject = treeViewItemContent.getObjectFolderOrObject();
+    return (
+      !!objectFolderOrObject &&
+      this.objectFolder.getParent() === objectFolderOrObject.getParent()
+    );
   }
 
   getIndex(): number {

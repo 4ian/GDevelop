@@ -109,6 +109,7 @@ export interface TreeViewItemContent {
   isDescendantOf(treeViewItemContent: TreeViewItemContent): boolean;
   isSibling(treeViewItemContent: TreeViewItemContent): boolean;
   isGlobal(): boolean;
+  getObjectFolderOrObject(): gdObjectFolderOrObject | null;
 }
 
 interface TreeViewItem {
@@ -326,6 +327,10 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
 
   isGlobal(): boolean {
     return false;
+  }
+
+  getObjectFolderOrObject(): gdObjectFolderOrObject | null {
+    return null;
   }
 }
 
@@ -1176,13 +1181,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           return;
         }
         const selectedItem = selectedItems[0];
+        const selectedObjectFolderOrObject = selectedItem.content.getObjectFolderOrObject();
 
-        if (destinationItem.content.getId() === selectedItem.content.getId()) {
-          return;
-        }
-
-        const selectedObjectItemContent = selectedItem.content;
-        if (!(selectedObjectItemContent instanceof ObjectTreeViewItemContent)) {
+        if (
+          !selectedObjectFolderOrObject ||
+          destinationItem.content.getId() === selectedItem.content.getId()
+        ) {
           return;
         }
 
@@ -1191,40 +1195,39 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             destinationItem.content.getId() ===
               globalObjectsEmptyPlaceholderId &&
             selectedItems.length === 1 &&
-            !selectedObjectItemContent.isGlobal()
+            !selectedItem.content.isGlobal()
           ) {
             setAsGlobalObject({
               i18n,
-              objectFolderOrObject: selectedObjectItemContent.object,
+              objectFolderOrObject: selectedObjectFolderOrObject,
             });
           }
           return;
         }
 
-        const destinationItemContent = destinationItem.content;
+        const destinationObjectFolderOrObject = destinationItem.content.getObjectFolderOrObject();
+        if (!destinationObjectFolderOrObject) {
+          return;
+        }
         if (
-          selectedObjectItemContent.isGlobal() === false &&
+          selectedItem.content.isGlobal() === false &&
           destinationItem.content.isGlobal()
         ) {
           let parent, index;
           if (
             where === 'inside' &&
-            destinationItemContent instanceof ObjectFolderTreeViewItemContent
+            destinationObjectFolderOrObject.isFolder()
           ) {
-            parent = destinationItemContent.objectFolder;
+            parent = destinationObjectFolderOrObject;
             index = 0;
-          } else if (
-            destinationItemContent instanceof ObjectTreeViewItemContent
-          ) {
-            parent = destinationItemContent.object.getParent();
-            index =
-              destinationItemContent.getIndex() + (where === 'after' ? 1 : 0);
           } else {
-            return;
+            parent = destinationObjectFolderOrObject.getParent();
+            index =
+              destinationItem.content.getIndex() + (where === 'after' ? 1 : 0);
           }
           setAsGlobalObject({
             i18n,
-            objectFolderOrObject: selectedObjectItemContent.object,
+            objectFolderOrObject: selectedObjectFolderOrObject,
             folder: parent,
             index,
           });
@@ -1235,31 +1238,24 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         if (
           selectedItem.content.isGlobal() === destinationItem.content.isGlobal()
         ) {
-          const destinationItemContent = destinationItem.content;
           let parent;
           if (
             where === 'inside' &&
-            destinationItemContent instanceof ObjectFolderTreeViewItemContent
+            destinationObjectFolderOrObject.isFolder()
           ) {
-            parent = destinationItemContent.objectFolder;
-          } else if (
-            destinationItemContent instanceof ObjectTreeViewItemContent
-          ) {
-            parent = destinationItemContent.object.getParent();
+            parent = destinationObjectFolderOrObject;
           } else {
-            return;
+            parent = destinationObjectFolderOrObject.getParent();
           }
-          const selectedObjectFolderOrObjectParent = selectedObjectItemContent.object.getParent();
-          if (destinationItem.content.isSibling(selectedObjectItemContent)) {
-            const fromIndex = selectedObjectItemContent.getIndex();
+          const selectedObjectFolderOrObjectParent = selectedObjectFolderOrObject.getParent();
+          if (destinationItem.content.isSibling(selectedItem.content)) {
+            const fromIndex = selectedItem.content.getIndex();
             let toIndex = destinationItem.content.getIndex();
             if (toIndex > fromIndex) toIndex -= 1;
             if (where === 'after') toIndex += 1;
             selectedObjectFolderOrObjectParent.moveChild(fromIndex, toIndex);
           } else {
-            if (
-              destinationItem.content.isDescendantOf(selectedObjectItemContent)
-            ) {
+            if (destinationItem.content.isDescendantOf(selectedItem.content)) {
               return;
             }
             const position =
@@ -1268,7 +1264,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                 : destinationItem.content.getIndex() +
                   (where === 'after' ? 1 : 0);
             selectedObjectFolderOrObjectParent.moveObjectFolderOrObjectToAnotherFolder(
-              selectedObjectItemContent.object,
+              selectedObjectFolderOrObject,
               parent,
               position
             );
@@ -1402,28 +1398,15 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                           return;
                         }
                         const itemContentToSelect = items[0].content;
-                        let objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext | null = null;
-                        if (
-                          itemContentToSelect instanceof
-                          ObjectFolderTreeViewItemContent
-                        ) {
-                          objectFolderOrObjectWithContext = {
-                            objectFolderOrObject:
-                              itemContentToSelect.objectFolder,
+                        const objectFolderOrObjectToSelect = itemContentToSelect.getObjectFolderOrObject();
+                        if (objectFolderOrObjectToSelect) {
+                          selectObjectFolderOrObjectWithContext({
+                            objectFolderOrObject: objectFolderOrObjectToSelect,
                             global: itemContentToSelect.isGlobal(),
-                          };
-                        } else if (
-                          itemContentToSelect instanceof
-                          ObjectTreeViewItemContent
-                        ) {
-                          objectFolderOrObjectWithContext = {
-                            objectFolderOrObject: itemContentToSelect.object,
-                            global: itemContentToSelect.isGlobal(),
-                          };
+                          });
+                        } else {
+                          selectObjectFolderOrObjectWithContext(null);
                         }
-                        selectObjectFolderOrObjectWithContext(
-                          objectFolderOrObjectWithContext
-                        );
                       }}
                       onRenameItem={renameItem}
                       buildMenuTemplate={buildMenuTemplate(i18n)}

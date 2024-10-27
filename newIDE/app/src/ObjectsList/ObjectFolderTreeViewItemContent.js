@@ -331,7 +331,7 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
 
     const objectsWithContext = objectsToDelete.map(object => ({
       object,
-      global,
+      global: this._isGlobal,
     }));
 
     // TODO: Change selectedObjectFolderOrObjectWithContext so that it's easy
@@ -347,7 +347,7 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
     // the object).
     onDeleteObjects(objectsWithContext, doRemove => {
       if (!doRemove) return;
-      const container = global ? globalObjectsContainer : objectsContainer;
+      const container = this._isGlobal ? globalObjectsContainer : objectsContainer;
       if (container) {
         objectsToDelete.forEach(object => {
           container.removeObject(object.getName());

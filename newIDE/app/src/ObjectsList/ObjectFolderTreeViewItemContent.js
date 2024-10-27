@@ -215,7 +215,7 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
       },
       {
         label: i18n._(t`Rename`),
-        click: () => this.edit(),
+        click: () => this.props.editName(this.getId()),
         accelerator: 'F2',
       },
       {

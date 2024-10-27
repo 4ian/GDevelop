@@ -177,7 +177,8 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
   isDescendantOf(treeViewItemContent: TreeViewItemContent): boolean {
     const objectFolderOrObject = treeViewItemContent.getObjectFolderOrObject();
     return (
-      !!objectFolderOrObject && this.object.isADescendantOf(objectFolderOrObject)
+      !!objectFolderOrObject &&
+      this.object.isADescendantOf(objectFolderOrObject)
     );
   }
 

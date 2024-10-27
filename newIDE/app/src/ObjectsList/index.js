@@ -1131,20 +1131,21 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           if (
             destinationItem.content.getId() ===
               globalObjectsEmptyPlaceholderId &&
-            selectedObjectFolderOrObjectsWithContext.length === 1 &&
-            !selectedObjectFolderOrObjectsWithContext[0].global
+            selectedItems.length === 1 &&
+            !selectedItems[0].content.isGlobal()
           ) {
             // In that case, the user is drag n dropping a scene object on the
             // empty placeholder of the global objects section.
-            return !selectedObjectFolderOrObjectsWithContext[0].objectFolderOrObject.isFolder();
+            const objectFolderOrObject = selectedItems[0].content.getObjectFolderOrObject();
+            return !!objectFolderOrObject && !objectFolderOrObject.isFolder();
           }
           return false;
         }
         // Check if at least one element in the selection can be moved.
         if (
           selectedItems.every(
-            selectedObject =>
-              selectedObject.content.isGlobal() ===
+            selectedItem =>
+              selectedItem.content.isGlobal() ===
               destinationItem.content.isGlobal()
           )
         ) {
@@ -1162,12 +1163,13 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           ) &&
           destinationItem.content.isGlobal()
         ) {
-          return !selectedObjectFolderOrObjectsWithContext[0].objectFolderOrObject.isFolder();
+          const objectFolderOrObject = selectedItems[0].content.getObjectFolderOrObject();
+          return !!objectFolderOrObject && !objectFolderOrObject.isFolder();
         }
 
         return false;
       },
-      [selectedObjectFolderOrObjectsWithContext, selectedItems]
+      [selectedItems]
     );
 
     // TODO Move this code in TreeViewItemContent.

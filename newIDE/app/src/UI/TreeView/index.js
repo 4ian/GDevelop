@@ -10,6 +10,7 @@ import TreeViewRow, { TREE_VIEW_ROW_HEIGHT } from './TreeViewRow';
 import { makeDragSourceAndDropTarget } from '../DragAndDrop/DragSourceAndDropTarget';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import useForceUpdate from '../../Utils/UseForceUpdate';
+import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 
 export const navigationKeys = [
   'ArrowDown',
@@ -27,7 +28,7 @@ export type ItemBaseAttributes = {
 export type MenuButton = {|
   id?: string,
   icon: React.Node,
-  label: string,
+  label: MessageDescriptor,
   click: ?() => void | Promise<void>,
 |};
 

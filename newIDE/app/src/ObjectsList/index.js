@@ -1060,7 +1060,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               i18n._(t`Scene Objects`),
               {
                 icon: <Add />,
-                label: i18n._(t`Add an object`),
+                label: t`Add an object`,
                 click: () => {
                   onAddNewObject(selectedObjectFolderOrObjectsWithContext[0]);
                 },

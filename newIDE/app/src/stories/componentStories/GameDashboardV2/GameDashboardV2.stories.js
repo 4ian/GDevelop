@@ -31,6 +31,27 @@ export default {
   title: 'GameDashboard/GameDashboardV2',
   component: GameDashboardV2,
   decorators: [paperDecorator],
+  argTypes: {
+    analyticsSource: { control: { type: false } }, // Hide default control.
+    game: { control: { type: false } }, // Hide default control.
+    feedbacks: {
+      options: ['None', 'Some unprocessed', 'All processed'],
+      control: { type: 'radio' },
+    },
+    sessions: {
+      options: ['None', 'Some in the last week'],
+      control: { type: 'radio' },
+    },
+    userBalance: {
+      options: ['None', 'Some'],
+      control: { type: 'radio' },
+    },
+  },
+  args: {
+    feedbacks: 'Some unprocessed',
+    sessions: 'Some in the last week',
+    userBalance: 'Some',
+  },
 };
 
 const delayResponse = 400;
@@ -87,15 +108,53 @@ const fakeGameMetrics = new Array(7).fill(0).map((_, index) => {
   };
 });
 
-export const Default = () => {
+export const Default = ({
+  feedbacks,
+  sessions,
+  userBalance,
+}: {|
+  feedbacks: 'None' | 'Some unprocessed' | 'All processed',
+  sessions: 'None' | 'Some in the last week',
+  userBalance: 'None' | 'Some',
+|}) => {
+  const [renderCount, setRenderCount] = React.useState<number>(0);
+  const feedbacksToDisplay =
+    feedbacks === 'None'
+      ? []
+      : feedbacks === 'Some unprocessed'
+      ? [
+          commentProcessed,
+          commentUnprocessed,
+          commentWithNoTextUnprocessed,
+          commentUnprocessed2,
+        ]
+      : [commentProcessed];
+  const gameMetrics = sessions === 'None' ? [] : fakeGameMetrics;
+  const userEarningsBalanceToDisplay =
+    userBalance === 'None'
+      ? [
+          {
+            amountInMilliUSDs: 0,
+            amountInCredits: 0,
+            minAmountToCashoutInMilliUSDs: 60000,
+            userId: fakeSilverAuthenticatedUser.profile
+              ? fakeSilverAuthenticatedUser.profile.id
+              : '',
+            updatedAt: Date.now(),
+          },
+        ]
+      : [userEarningsBalance];
+
+  React.useEffect(
+    () => {
+      setRenderCount(value => value + 1);
+    },
+    [feedbacks, sessions, userBalance]
+  );
+
   playServiceMock
     .onGet(`/game/${game1.id}/comment`)
-    .reply(200, [
-      commentProcessed,
-      commentUnprocessed,
-      commentWithNoTextUnprocessed,
-      commentUnprocessed2,
-    ])
+    .reply(200, feedbacksToDisplay)
     .onGet(`/game/${game1.id}/lobby-configuration`)
     .reply(200, {
       gameId: game1.id,
@@ -120,7 +179,7 @@ export const Default = () => {
     });
   analyticsServiceMock
     .onGet(`/game-metrics`)
-    .reply(200, fakeGameMetrics)
+    .reply(200, gameMetrics)
     .onAny()
     .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
@@ -128,15 +187,20 @@ export const Default = () => {
     });
   usageServiceMock
     .onGet(`/user-earnings-balance`)
-    .reply(200, [userEarningsBalance])
+    .reply(200, userEarningsBalanceToDisplay)
     .onAny()
     .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
       return [504, null];
     });
+
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
-      <GameDashboardV2 game={game1} analyticsSource="homepage" />
+      <GameDashboardV2
+        game={game1}
+        analyticsSource="homepage"
+        key={renderCount.toFixed(0)}
+      />
     </AuthenticatedUserContext.Provider>
   );
 };

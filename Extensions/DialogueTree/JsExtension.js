@@ -567,7 +567,9 @@ module.exports = {
     extension
       .addStrExpression(
         'TagValueViaKey',
-        _('Get a Tag value found in the dialogue branch, using its key where the pattern is key:value'),
+        _(
+          'Get a Tag value found in the dialogue branch, using its key where the pattern is key:value'
+        ),
         _(
           'Get a Tag found in the dialogue branch, using a key. For example with tags: "bg:park", "time:lunch", asking for "bg" will return "park"'
         ),
@@ -945,14 +947,12 @@ module.exports = {
       )
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.hasActiveActorChanged');
-    
-      extension
+
+    extension
       .addCondition(
         'LineHasActiveActor',
         _('An Actor is currently present in the dialog line'),
-        _(
-          'An Actor is currently present in the dialog line'
-        ),
+        _('An Actor is currently present in the dialog line'),
         _('Actor is present in current dialog line'),
         '',
         'JsPlatform/Extensions/yarn32.png',
@@ -960,7 +960,6 @@ module.exports = {
       )
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.lineHasActiveActor');
-
 
     extension
       .addCondition(
@@ -977,7 +976,6 @@ module.exports = {
       .addParameter('string', _('Active Actor Line Parameter'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.getActiveLineParameterExists');
-
 
     extension
       .addCondition(

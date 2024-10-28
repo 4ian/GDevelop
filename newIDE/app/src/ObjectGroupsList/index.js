@@ -506,6 +506,19 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
       ]
     );
 
+    const getRightButton = React.useCallback(
+      (i18n: I18nType) => (item: TreeViewItem) =>
+        item.id === sceneGroupsRootFolderId
+          ? {
+              icon: <Add />,
+              label: i18n._(t`Add a new group`),
+              click: onCreateGroup,
+              id: 'add-new-group-top-button',
+            }
+          : null,
+      [onCreateGroup]
+    );
+
     const getTreeViewData = React.useCallback(
       (i18n: I18nType): Array<TreeViewItem> => {
         const objectGroupsList: GroupWithContextList = enumerateGroups(
@@ -642,6 +655,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
                         reactDndType={groupWithContextReactDndType}
                         initiallyOpenedNodeIds={initiallyOpenedNodeIds}
                         shouldSelectUponContextMenuOpening
+                        getItemRightButton={getRightButton(i18n)}
                       />
                     )}
                   </AutoSizer>

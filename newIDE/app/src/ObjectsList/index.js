@@ -101,7 +101,6 @@ export interface TreeViewItemContent {
   cut(): void;
   duplicate(): void;
   getIndex(): number;
-  moveAt(destinationIndex: number): void;
   isDescendantOf(treeViewItemContent: TreeViewItemContent): boolean;
   isSibling(treeViewItemContent: TreeViewItemContent): boolean;
   isGlobal(): boolean;
@@ -310,8 +309,6 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
   getIndex(): number {
     return 0;
   }
-
-  moveAt(destinationIndex: number): void {}
 
   isDescendantOf(treeViewItemContent: TreeViewItemContent): boolean {
     return false;
@@ -1067,7 +1064,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                 click: () => {
                   onAddNewObject(selectedObjectFolderOrObjectsWithContext[0]);
                 },
-                id: 'add-new-object-button',
+                id: 'add-new-object-top-button',
               },
               () => [
                 {

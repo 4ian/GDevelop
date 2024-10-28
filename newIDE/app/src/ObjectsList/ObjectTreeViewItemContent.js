@@ -475,10 +475,6 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
     });
   }
 
-  moveAt(destinationIndex: number): void {
-    // TODO
-  }
-
   copy(): void {
     Clipboard.set(OBJECT_CLIPBOARD_KIND, {
       type: this.object.getObject().getType(),

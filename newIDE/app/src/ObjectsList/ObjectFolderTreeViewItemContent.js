@@ -353,10 +353,6 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
     });
   }
 
-  moveAt(destinationIndex: number): void {
-    // TODO
-  }
-
   copy(): void {}
 
   cut(): void {}

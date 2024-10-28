@@ -1329,28 +1329,36 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     const arrowKeyNavigationProps = React.useMemo(
       () => ({
-        onGetItemInside: item => {
+        onGetItemInside: (item: TreeViewItem): ?TreeViewItem => {
           if (item.isPlaceholder || item.isRoot) return null;
-          if (!item.objectFolderOrObject.isFolder()) return null;
+          const objectFolderOrObject = item.content.getObjectFolderOrObject();
+          if (!objectFolderOrObject) return null;
+          if (!objectFolderOrObject.isFolder()) return null;
           else {
-            if (item.objectFolderOrObject.getChildrenCount() === 0) return null;
-            return {
-              objectFolderOrObject: item.objectFolderOrObject.getChildAt(0),
-              global: item.global,
-            };
+            if (objectFolderOrObject.getChildrenCount() === 0) return null;
+            return createTreeViewItem({
+              objectFolderOrObject: objectFolderOrObject.getChildAt(0),
+              isGlobal: item.content.isGlobal(),
+              objectFolderTreeViewItemProps,
+              objectTreeViewItemProps,
+            });
           }
         },
-        onGetItemOutside: item => {
+        onGetItemOutside: (item: TreeViewItem): ?TreeViewItem => {
           if (item.isPlaceholder || item.isRoot) return null;
-          const parent = item.objectFolderOrObject.getParent();
+          const objectFolderOrObject = item.content.getObjectFolderOrObject();
+          if (!objectFolderOrObject) return null;
+          const parent = objectFolderOrObject.getParent();
           if (parent.isRootFolder()) return null;
-          return {
+          return createTreeViewItem({
             objectFolderOrObject: parent,
-            global: item.global,
-          };
+            isGlobal: item.content.isGlobal(),
+            objectFolderTreeViewItemProps,
+            objectTreeViewItemProps,
+          });
         },
       }),
-      []
+      [objectFolderTreeViewItemProps, objectTreeViewItemProps]
     );
 
     return (

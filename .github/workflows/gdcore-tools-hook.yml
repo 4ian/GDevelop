@@ -1,4 +1,4 @@
-# This worflow notifies arrthuro555's gdcore-tools repository when a new release is published.
+# This worflow notifies arthuro555's gdcore-tools repository when a new release is published.
 #
 # This is used to allow gdcore-tools, a library to use GDCore outside of GDevelop,
 # to attempt to automatically build, test, and publish a release for the new

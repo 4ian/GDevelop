@@ -111,6 +111,7 @@ const GameDashboardV2 = ({ game }: Props) => {
         <AnalyticsWidget
           onSeeAll={() => setView('analytics')}
           gameMetrics={gameRollingMetrics}
+          game={game}
         />
         <FeedbackWidget
           onSeeAll={() => setView('feedbacks')}

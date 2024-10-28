@@ -2,18 +2,20 @@
 
 import * as React from 'react';
 import { I18n } from '@lingui/react';
-import FlatButton from '../UI/FlatButton';
+import Divider from '@material-ui/core/Divider';
 import { Trans } from '@lingui/macro';
+import FlatButton from '../UI/FlatButton';
 import DashboardWidget from './DashboardWidget';
 import ArrowRight from '../UI/CustomSvgIcons/ArrowRight';
 import { type Comment } from '../Utils/GDevelopServices/Play';
+import { getGameUrl, type Game } from '../Utils/GDevelopServices/Game';
 import { Line, Spacer } from '../UI/Grid';
 import Text from '../UI/Text';
 import { shortenString } from '../Utils/StringHelpers';
-import { Divider } from '@material-ui/core';
 import { ColumnStackLayout } from '../UI/Layout';
 import ScrollView from '../UI/ScrollView';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
+import GameLinkAndShareIcons from './GameLinkAndShareIcons';
 
 const styles = {
   dot: {
@@ -40,12 +42,15 @@ const NotificationDot = () => {
 type Props = {|
   feedbacks: ?Array<Comment>,
   onSeeAll: () => void,
+  game: Game,
 |};
 
-const FeedbackWidget = ({ onSeeAll, feedbacks }: Props) => {
+const FeedbackWidget = ({ onSeeAll, feedbacks, game }: Props) => {
   const unprocessedFeedbacks = feedbacks
     ? feedbacks.filter(comment => !comment.processedAt)
     : null;
+
+  const gameUrl = getGameUrl(game);
 
   return (
     <I18n>
@@ -54,12 +59,14 @@ const FeedbackWidget = ({ onSeeAll, feedbacks }: Props) => {
           gridSize={1}
           title={<Trans>Feedbacks</Trans>}
           seeMoreButton={
-            <FlatButton
-              label={<Trans>See all</Trans>}
-              rightIcon={<ArrowRight fontSize="small" />}
-              onClick={onSeeAll}
-              primary
-            />
+            !feedbacks || feedbacks.length === 0 ? null : (
+              <FlatButton
+                label={<Trans>See more</Trans>}
+                rightIcon={<ArrowRight fontSize="small" />}
+                onClick={onSeeAll}
+                primary
+              />
+            )
           }
           withMaxHeight
           renderSubtitle={() =>
@@ -134,6 +141,16 @@ const FeedbackWidget = ({ onSeeAll, feedbacks }: Props) => {
                 ))}
               </ColumnStackLayout>
             </ScrollView>
+          ) : !!feedbacks && feedbacks.length === 0 && gameUrl ? (
+            <ColumnStackLayout noMargin justifyContent="center" expand>
+              <Text color="secondary" noMargin>
+                <Trans>
+                  You don’t have any player feedback yet. Share your game with
+                  more people to start collecting player feedback.
+                </Trans>
+              </Text>
+              <GameLinkAndShareIcons url={gameUrl} forceMobileLayout />
+            </ColumnStackLayout>
           ) : null}
         </DashboardWidget>
       )}

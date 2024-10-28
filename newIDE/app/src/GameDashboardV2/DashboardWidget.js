@@ -19,6 +19,7 @@ const styles = {
     flexDirection: 'column',
     alignItems: 'stretch',
     minHeight: 0,
+    flex: 1,
   },
   maxHeightNotWrapped: { maxHeight: 300, height: '100%' },
 };

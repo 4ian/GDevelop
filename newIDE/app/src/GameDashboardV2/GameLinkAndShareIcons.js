@@ -11,6 +11,7 @@ import IconButton from '../UI/IconButton';
 import { copyTextToClipboard } from '../Utils/Clipboard';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
 import SocialShareButtons from '../UI/ShareDialog/SocialShareButtons';
+import { Column } from '../UI/Grid';
 
 const styles = {
   linkContainer: {
@@ -24,14 +25,16 @@ const styles = {
 
 type Props = {|
   url: string,
+  forceMobileLayout?: boolean,
 |};
 
-const GameLinkAndShareIcons = ({ url }: Props) => {
+const GameLinkAndShareIcons = ({ url, forceMobileLayout }: Props) => {
+  const Layout = forceMobileLayout ? Column : LineStackLayout;
   return (
-    <LineStackLayout
+    <Layout
       noMargin
       justifyContent="space-between"
-      alignItems="center"
+      alignItems={forceMobileLayout ? 'flex-start' : 'center'}
     >
       <Paper style={styles.linkContainer} background="light">
         <LineStackLayout alignItems="center">
@@ -46,7 +49,7 @@ const GameLinkAndShareIcons = ({ url }: Props) => {
         </LineStackLayout>
       </Paper>
       <SocialShareButtons url={url} />
-    </LineStackLayout>
+    </Layout>
   );
 };
 

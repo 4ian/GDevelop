@@ -115,6 +115,7 @@ const GameDashboardV2 = ({ game }: Props) => {
         <FeedbackWidget
           onSeeAll={() => setView('feedbacks')}
           feedbacks={feedbacks}
+          game={game}
         />
         <ServicesWidget
           onSeeAllLeaderboards={() => setView('leaderboards')}

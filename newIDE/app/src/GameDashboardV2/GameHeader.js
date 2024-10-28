@@ -19,26 +19,12 @@ import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import Cross from '../UI/CustomSvgIcons/Cross';
 import DollarCoin from '../UI/CustomSvgIcons/DollarCoin';
 import Messages from '../UI/CustomSvgIcons/Messages';
-import Paper from '../UI/Paper';
-import Link from '../UI/Link';
-import Window from '../Utils/Window';
-import Copy from '../UI/CustomSvgIcons/Copy';
-import IconButton from '../UI/IconButton';
-import { copyTextToClipboard } from '../Utils/Clipboard';
-import { textEllipsisStyle } from '../UI/TextEllipsis';
 import RaisedButton from '../UI/RaisedButton';
 import Edit from '../UI/CustomSvgIcons/Edit';
-import SocialShareButtons from '../UI/ShareDialog/SocialShareButtons';
+import GameLinkAndShareIcons from './GameLinkAndShareIcons';
 
 const styles = {
   iconAndText: { display: 'flex', gap: 2, alignItems: 'flex-start' },
-  linkContainer: {
-    display: 'flex',
-    padding: '4px 8px',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderRadius: 4,
-  },
 };
 
 type Props = {|
@@ -114,25 +100,6 @@ const GameHeader = ({ game }: Props) => {
       background="medium"
     />
   );
-  const renderLinkAndShareIcons = (url: string) => (
-    <LineStackLayout
-      noMargin
-      justifyContent="space-between"
-      alignItems="center"
-    >
-      <Paper style={styles.linkContainer} background="light">
-        <Text noMargin style={textEllipsisStyle}>
-          <Link href={url} onClick={() => Window.openExternalURL(url)}>
-            {url.replace('https://', '')}
-          </Link>
-        </Text>
-        <IconButton size="small" onClick={() => copyTextToClipboard(url)}>
-          <Copy />
-        </IconButton>
-      </Paper>
-      <SocialShareButtons url={url} />
-    </LineStackLayout>
-  );
 
   const renderButtons = () => (
     <LineStackLayout noMargin>
@@ -157,7 +124,7 @@ const GameHeader = ({ game }: Props) => {
               {renderThumbnail()}
               {renderPublicInfo()}
             </LineStackLayout>
-            {gameUrl && renderLinkAndShareIcons(gameUrl)}
+            {gameUrl && <GameLinkAndShareIcons url={gameUrl} />}
             {renderButtons()}
           </ColumnStackLayout>
         )}
@@ -180,7 +147,7 @@ const GameHeader = ({ game }: Props) => {
               {renderButtons()}
             </LineStackLayout>
             {renderPublicInfo()}
-            {gameUrl && renderLinkAndShareIcons(gameUrl)}
+            {gameUrl && <GameLinkAndShareIcons url={gameUrl} />}
           </ColumnStackLayout>
         </LineStackLayout>
       )}

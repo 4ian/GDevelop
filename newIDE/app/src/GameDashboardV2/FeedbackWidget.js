@@ -43,11 +43,9 @@ type Props = {|
 |};
 
 const FeedbackWidget = ({ onSeeAll, feedbacks }: Props) => {
-  const isLoading = !feedbacks;
   const unprocessedFeedbacks = feedbacks
     ? feedbacks.filter(comment => !comment.processedAt)
     : null;
-  const hasNoFeedbacks = !feedbacks || feedbacks.length === 0;
 
   return (
     <I18n>
@@ -65,27 +63,24 @@ const FeedbackWidget = ({ onSeeAll, feedbacks }: Props) => {
           }
           withMaxHeight
           renderSubtitle={() =>
-            isLoading ? null : !unprocessedFeedbacks ||
-              unprocessedFeedbacks.length === 0 ? (
-              <Text color="secondary" size="body-small" noMargin>
-                {hasNoFeedbacks ? (
-                  <Trans>No new feedbacks</Trans>
-                ) : (
-                  <Trans>All feedbacks processed</Trans>
-                )}
-              </Text>
-            ) : (
-              <Line noMargin alignItems="center">
-                <NotificationDot />
+            unprocessedFeedbacks && feedbacks ? (
+              unprocessedFeedbacks.length > 0 ? (
+                <Line noMargin alignItems="center">
+                  <NotificationDot />
+                  <Text color="secondary" size="body-small" noMargin>
+                    {unprocessedFeedbacks.length === 1 ? (
+                      <Trans>1 new feedback</Trans>
+                    ) : (
+                      <Trans>{unprocessedFeedbacks.length} new feedbacks</Trans>
+                    )}
+                  </Text>
+                </Line>
+              ) : feedbacks.length > 0 ? (
                 <Text color="secondary" size="body-small" noMargin>
-                  {unprocessedFeedbacks.length === 1 ? (
-                    <Trans>1 new feedback</Trans>
-                  ) : (
-                    <Trans>{unprocessedFeedbacks.length} new feedbacks</Trans>
-                  )}
+                  <Trans>All feedbacks processed</Trans>
                 </Text>
-              </Line>
-            )
+              ) : null
+            ) : null
           }
         >
           {!!unprocessedFeedbacks && unprocessedFeedbacks.length > 0 ? (

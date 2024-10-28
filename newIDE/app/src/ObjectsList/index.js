@@ -54,6 +54,7 @@ import {
   type ObjectFolderTreeViewItemProps,
 } from './ObjectFolderTreeViewItemContent';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
+import { type HTMLDataset } from '../Utils/HTMLDataset';
 
 const sceneObjectsRootFolderId = 'scene-objects';
 const globalObjectsRootFolderId = 'global-objects';
@@ -87,7 +88,7 @@ export interface TreeViewItemContent {
   getName(): string | React.Node;
   getId(): string;
   getHtmlId(index: number): ?string;
-  getDataSet(): { [string]: string };
+  getDataSet(): ?HTMLDataset;
   getThumbnail(): ?string;
   onClick(): void;
   buildMenuTemplate(i18n: I18nType, index: number): Array<MenuItemTemplate>;
@@ -274,7 +275,7 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
     return this.id;
   }
 
-  getDataSet(): { [string]: string } {
+  getDataSet(): ?HTMLDataset {
     return {};
   }
 
@@ -1183,7 +1184,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       [selectedItems]
     );
 
-    // TODO Move this code in TreeViewItemContent.
     const moveSelectionTo = React.useCallback(
       (
         i18n: I18nType,

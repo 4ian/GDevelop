@@ -18,6 +18,7 @@ import {
 } from './EnumerateObjectFolderOrObject';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
+import { type HTMLDataset } from '../Utils/HTMLDataset';
 
 const gd: libGDevelop = global.gd;
 
@@ -123,15 +124,13 @@ export const addSerializedObjectToObjectsContainer = ({
   }
 
   const newObject = global
-    ? project
-        .getObjects()
-        .insertNewObjectInFolder(
-          project,
-          objectType,
-          newName,
-          positionFolder,
-          positionInFolder + 1
-        )
+    ? globalObjectsContainer.insertNewObjectInFolder(
+        project,
+        objectType,
+        newName,
+        positionFolder,
+        positionInFolder + 1
+      )
     : objectsContainer.insertNewObjectInFolder(
         project,
         objectType,
@@ -206,7 +205,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
     return `object-item-${index}`;
   }
 
-  getDataSet(): { [string]: string } {
+  getDataSet(): ?HTMLDataset {
     return {
       objectName: this.object.getObject().getName(),
       global: this._isGlobal.toString(),

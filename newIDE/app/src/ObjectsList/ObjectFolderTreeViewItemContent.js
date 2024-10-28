@@ -18,6 +18,7 @@ import {
 import { renderQuickCustomizationMenuItems } from '../QuickCustomization/QuickCustomizationMenuItems';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
+import { type HTMLDataset } from '../Utils/HTMLDataset';
 
 export type ObjectFolderTreeViewItemCallbacks = {|
   onObjectPasted?: gdObject => void,
@@ -119,8 +120,8 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
     return `object-item-${index}`;
   }
 
-  getDataSet(): { [string]: string } {
-    return {};
+  getDataSet(): ?HTMLDataset {
+    return null;
   }
 
   getThumbnail(): ?string {

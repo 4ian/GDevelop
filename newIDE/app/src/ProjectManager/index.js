@@ -75,6 +75,7 @@ import { type ShowConfirmDeleteDialogOptions } from '../UI/Alert/AlertContext';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { type GDevelopTheme } from '../UI/Theme';
 import { ExtensionStoreContext } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
+import { type HTMLDataset } from '../Utils/HTMLDataset';
 
 export const getProjectManagerItemId = (identifier: string) =>
   `project-manager-tab-${identifier}`;
@@ -117,7 +118,7 @@ export interface TreeViewItemContent {
   getName(): string | React.Node;
   getId(): string;
   getHtmlId(index: number): ?string;
-  getDataSet(): { [string]: string };
+  getDataSet(): ?HTMLDataset;
   getThumbnail(): ?string;
   onClick(): void;
   buildMenuTemplate(i18n: I18nType, index: number): Array<MenuItemTemplate>;
@@ -227,8 +228,8 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
     return this.id;
   }
 
-  getDataSet(): { [string]: string } {
-    return {};
+  getDataSet(): ?HTMLDataset {
+    return null;
   }
 
   getThumbnail(): ?string {
@@ -315,8 +316,8 @@ class ActionTreeViewItemContent implements TreeViewItemContent {
     return this.id;
   }
 
-  getDataSet(): { [string]: string } {
-    return {};
+  getDataSet(): ?HTMLDataset {
+    return null;
   }
 
   getThumbnail(): ?string {

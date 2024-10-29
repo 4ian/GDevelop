@@ -3274,8 +3274,7 @@ module.exports = {
               this._defaultDepth = this._originalDepth;
             }
           }
-        }
-        else {
+        } else {
           this._defaultWidth = this._originalWidth;
           this._defaultHeight = this._originalHeight;
           this._defaultDepth = this._originalDepth;

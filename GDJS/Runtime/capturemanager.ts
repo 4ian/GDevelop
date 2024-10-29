@@ -35,8 +35,6 @@ namespace gdjs {
         return;
       }
 
-      console.log('Setting up capture options:', this._captureOptions);
-
       for (const sscreenshotCaptureOption of this._captureOptions.screenshots) {
         setTimeout(async () => {
           console.info(

@@ -1,0 +1,22 @@
+# This worflow notifies arthuro555's gdcore-tools repository when a new release is published.
+#
+# This is used to allow gdcore-tools, a library to use GDCore outside of GDevelop,
+# to attempt to automatically build, test, and publish a release for the new
+# GDevelop version.
+name: Trigger gdcore-tools pipeline
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  dispatch-event:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.GDCORE_TOOLS_PAT }}
+          repository: arthuro555/gdcore-tools
+          event-type: gdevelop-release
+          client-payload: '{"release": ${{ toJson(github.event.release) }}}'

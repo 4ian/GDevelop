@@ -98,6 +98,7 @@ const ManageSection = ({
           game={openedGame}
           analyticsSource="homepage"
           onBack={onBack}
+          onGameUpdated={onGameUpdated}
         />
       </SectionContainer>
     );

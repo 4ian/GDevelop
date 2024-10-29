@@ -33,6 +33,7 @@ import { Column, Line } from '../UI/Grid';
 import TextButton from '../UI/TextButton';
 import ArrowLeft from '../UI/CustomSvgIcons/ArrowLeft';
 import GameFeedback from '../GameDashboard/Feedbacks/GameFeedback';
+import Builds from '../ExportAndShare/Builds';
 
 type Props = {|
   game: Game,
@@ -40,9 +41,16 @@ type Props = {|
   currentView: GameDetailsTab,
   setCurrentView: GameDetailsTab => void,
   onBack: () => void,
+  onGameUpdated: (game: Game) => void,
 |};
 
-const GameOverview = ({ game, currentView, setCurrentView, onBack }: Props) => {
+const GameOverview = ({
+  game,
+  currentView,
+  setCurrentView,
+  onBack,
+  onGameUpdated,
+}: Props) => {
   const [
     gameDetailsDialogOpen,
     setGameDetailsDialogOpen,
@@ -147,6 +155,12 @@ const GameOverview = ({ game, currentView, setCurrentView, onBack }: Props) => {
                 authenticatedUser={authenticatedUser}
                 game={game}
                 i18n={i18n}
+              />
+            ) : currentView === 'builds' ? (
+              <Builds
+                game={game}
+                authenticatedUser={authenticatedUser}
+                onGameUpdated={onGameUpdated}
               />
             ) : (
               <ColumnStackLayout noMargin>

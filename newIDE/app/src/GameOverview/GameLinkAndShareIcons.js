@@ -20,6 +20,10 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'space-between',
     borderRadius: 4,
+    minWidth: 0,
+  },
+  buttonsContainer: {
+    flexShrink: 0,
   },
 };
 
@@ -48,7 +52,9 @@ const GameLinkAndShareIcons = ({ url, forceMobileLayout }: Props) => {
           </IconButton>
         </LineStackLayout>
       </Paper>
-      <SocialShareButtons url={url} />
+      <div style={styles.buttonsContainer}>
+        <SocialShareButtons url={url} />
+      </div>
     </Layout>
   );
 };

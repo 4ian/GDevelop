@@ -41,6 +41,10 @@ type Props = {|
 |};
 
 const GameOverview = ({ game, currentView, setCurrentView, onBack }: Props) => {
+  const [
+    gameDetailsDialogOpen,
+    setGameDetailsDialogOpen,
+  ] = React.useState<boolean>(false);
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
   );
@@ -120,69 +124,77 @@ const GameOverview = ({ game, currentView, setCurrentView, onBack }: Props) => {
   );
 
   return (
-    <Column noMargin>
-      <Line>
-        <TextButton
-          onClick={onClickBack}
-          icon={<ArrowLeft fontSize="small" />}
-          label={
-            currentView === 'details' ? (
-              <Trans>Back</Trans>
-            ) : (
-              <Trans>Back to {game.gameName}</Trans>
-            )
-          }
-        />
-      </Line>
-      <ColumnStackLayout noMargin>
-        <GameHeader game={game} />
-        <Grid container spacing={2}>
-          <AnalyticsWidget
-            onSeeAll={() => setCurrentView('analytics')}
-            gameMetrics={gameRollingMetrics}
-            game={game}
-          />
-          <FeedbackWidget
-            onSeeAll={() => setCurrentView('feedback')}
-            feedbacks={feedbacks}
-            game={game}
-          />
-          <ServicesWidget
-            onSeeAllLeaderboards={() => setCurrentView('leaderboards')}
-            leaderboards={leaderboards}
-            lobbyConfiguration={lobbyConfiguration}
-          />
-          <DashboardWidget
-            gridSize={3}
-            title={<Trans>Exports</Trans>}
-            seeMoreButton={
-              <FlatButton
-                label={<Trans>See all</Trans>}
-                rightIcon={<ArrowRight fontSize="small" />}
-                onClick={() => setCurrentView('builds')}
-                primary
-              />
-            }
-            renderSubtitle={
-              !builds
-                ? null
-                : () => (
-                    <Text color="secondary" size="body-small" noMargin>
-                      {builds.length <
-                      // Hardcoded value in the back.
-                      // TODO: replace with pagination.
-                      100 ? (
-                        <Trans>{builds.length} exports created</Trans>
-                      ) : (
-                        <Trans>100+ exports created</Trans>
-                      )}
-                    </Text>
-                  )
+    <>
+      <Column noMargin>
+        <Line>
+          <TextButton
+            onClick={onClickBack}
+            icon={<ArrowLeft fontSize="small" />}
+            label={
+              currentView === 'details' ? (
+                <Trans>Back</Trans>
+              ) : (
+                <Trans>Back to {game.gameName}</Trans>
+              )
             }
           />
-        </Grid>
-      </ColumnStackLayout>
-    </Column>
+        </Line>
+        <ColumnStackLayout noMargin>
+          <GameHeader
+            game={game}
+            onEditGame={() => setGameDetailsDialogOpen(true)}
+          />
+          <Grid container spacing={2}>
+            <AnalyticsWidget
+              onSeeAll={() => setCurrentView('analytics')}
+              gameMetrics={gameRollingMetrics}
+              game={game}
+            />
+            <FeedbackWidget
+              onSeeAll={() => setCurrentView('feedback')}
+              feedbacks={feedbacks}
+              game={game}
+            />
+            <ServicesWidget
+              onSeeAllLeaderboards={() => setCurrentView('leaderboards')}
+              leaderboards={leaderboards}
+              lobbyConfiguration={lobbyConfiguration}
+            />
+            <DashboardWidget
+              gridSize={3}
+              title={<Trans>Exports</Trans>}
+              seeMoreButton={
+                <FlatButton
+                  label={<Trans>See all</Trans>}
+                  rightIcon={<ArrowRight fontSize="small" />}
+                  onClick={() => setCurrentView('builds')}
+                  primary
+                />
+              }
+              renderSubtitle={
+                !builds
+                  ? null
+                  : () => (
+                      <Text color="secondary" size="body-small" noMargin>
+                        {builds.length <
+                        // Hardcoded value in the back.
+                        // TODO: replace with pagination.
+                        100 ? (
+                          <Trans>{builds.length} exports created</Trans>
+                        ) : (
+                          <Trans>100+ exports created</Trans>
+                        )}
+                      </Text>
+                    )
+              }
+            />
+          </Grid>
+        </ColumnStackLayout>
+      </Column>
+      {gameDetailsDialogOpen && (
+        <div>Bonjour</div>
+      )}
+    </>
   );
 };
 

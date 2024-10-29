@@ -29,9 +29,10 @@ const styles = {
 
 type Props = {|
   game: Game,
+  onEditGame: () => void,
 |};
 
-const GameHeader = ({ game }: Props) => {
+const GameHeader = ({ game, onEditGame }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
@@ -106,7 +107,7 @@ const GameHeader = ({ game }: Props) => {
       <RaisedButton
         primary
         label={<Trans>Edit details</Trans>}
-        onClick={() => {}}
+        onClick={onEditGame}
         icon={<Edit fontSize="small" />}
       />
     </LineStackLayout>

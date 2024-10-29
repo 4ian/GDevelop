@@ -163,7 +163,6 @@ export function PublicGameProperties({
                     gameName={project.getName()}
                     thumbnailUrl={thumbnailUrl}
                     gameId={project.getProjectUuid()}
-                    project={project}
                     canUpdateThumbnail
                     disabled={disabled}
                     onGameUpdated={onGameUpdated}

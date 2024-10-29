@@ -37,7 +37,6 @@ type Props = {|
   thumbnailUrl?: ?string,
   gameName: string,
   background?: 'light' | 'medium' | 'dark',
-  project?: gdProject,
   gameId: string,
   canUpdateThumbnail?: boolean,
   disabled?: boolean,
@@ -46,7 +45,6 @@ type Props = {|
 |};
 
 export const GameThumbnail = ({
-  project,
   disabled,
   canUpdateThumbnail,
   thumbnailUrl,
@@ -174,7 +172,7 @@ export const GameThumbnail = ({
           </EmptyMessage>
         )}
       </Paper>
-      {canUpdateThumbnail && project && (
+      {canUpdateThumbnail && (
         <RaisedButton
           primary
           disabled={!profile || isLoading || disabled}

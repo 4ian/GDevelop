@@ -191,9 +191,10 @@ const GameOverview = ({ game, currentView, setCurrentView, onBack }: Props) => {
           </Grid>
         </ColumnStackLayout>
       </Column>
-      {gameDetailsDialogOpen && (
+      {/* TODO: To do once the thumbnail logic is done. */}
+      {/* {gameDetailsDialogOpen && (
         <div>Bonjour</div>
-      )}
+      )} */}
     </>
   );
 };

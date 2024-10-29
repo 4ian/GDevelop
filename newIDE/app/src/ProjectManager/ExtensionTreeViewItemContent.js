@@ -15,6 +15,7 @@ import {
   extensionsRootFolderId,
 } from '.';
 import { isExtensionNameTaken } from './EventFunctionExtensionNameVerifier';
+import { type HTMLDataset } from '../Utils/HTMLDataset';
 
 const EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND = 'Events Functions Extension';
 
@@ -78,7 +79,7 @@ export class ExtensionTreeViewItemContent implements TreeViewItemContent {
     return `extension-item-${index}`;
   }
 
-  getDataSet(): { [string]: string } {
+  getDataSet(): ?HTMLDataset {
     return {
       extension: this.eventsFunctionsExtension.getName(),
     };

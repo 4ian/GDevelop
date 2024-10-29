@@ -446,6 +446,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                             rightButton.click();
                           }
                         }}
+                        tooltip={rightButton.label}
                       >
                         {rightButton.icon}
                       </IconButton>

@@ -264,8 +264,6 @@ export const WithObjectsList = () => (
                   project={testProject.project}
                   layout={testProject.testLayout}
                   eventsBasedObject={null}
-                  globalObjectsContainer={testProject.project.getObjects()}
-                  objectsContainer={testProject.testLayout.getObjects()}
                   projectScopedContainersAccessor={
                     testProject.testSceneProjectScopedContainersAccessor
                   }

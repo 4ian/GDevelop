@@ -12,6 +12,7 @@ import {
 import { TreeViewItemContent, type TreeItemProps, scenesRootFolderId } from '.';
 import Tooltip from '@material-ui/core/Tooltip';
 import Flag from '@material-ui/icons/Flag';
+import { type HTMLDataset } from '../Utils/HTMLDataset';
 
 const SCENE_CLIPBOARD_KIND = 'Layout';
 
@@ -72,7 +73,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
     return `scene-item-${index}`;
   }
 
-  getDataSet(): { [string]: string } {
+  getDataSet(): ?HTMLDataset {
     return {
       scene: this.scene.getName(),
     };

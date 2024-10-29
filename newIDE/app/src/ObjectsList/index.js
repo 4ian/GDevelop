@@ -11,22 +11,17 @@ import SearchBar from '../UI/SearchBar';
 import NewObjectDialog from '../AssetStore/NewObjectDialog';
 import AssetSwappingDialog from '../AssetStore/AssetSwappingDialog';
 import newNameGenerator from '../Utils/NewNameGenerator';
-import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
 import Window from '../Utils/Window';
-import {
-  serializeToJSObject,
-  unserializeFromJSObject,
-} from '../Utils/Serializer';
-import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
-import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
-import { CLIPBOARD_KIND } from './ClipboardKind';
-import TreeView, { type TreeViewInterface } from '../UI/TreeView';
+import TreeView, {
+  type TreeViewInterface,
+  type MenuButton,
+} from '../UI/TreeView';
+import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
-import { getInstanceCountInLayoutForObject } from '../Utils/Layout';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { Column, Line } from '../UI/Grid';
@@ -34,11 +29,7 @@ import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
 import Add from '../UI/CustomSvgIcons/Add';
 import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 import {
-  enumerateFoldersInContainer,
-  enumerateFoldersInFolder,
-  enumerateObjectsInFolder,
   getFoldersAscendanceWithoutRootFolder,
-  getObjectFolderOrObjectUnifiedName,
   type ObjectFolderOrObjectWithContext,
 } from './EnumerateObjectFolderOrObject';
 import { mapFor } from '../Utils/MapFor';
@@ -52,10 +43,19 @@ import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import { getInsertionParentAndPositionFromSelection } from '../Utils/ObjectFolders';
-import { canSwapAssetOfObject } from '../AssetStore/AssetSwapper';
-import { renderQuickCustomizationMenuItems } from '../QuickCustomization/QuickCustomizationMenuItems';
+import {
+  ObjectTreeViewItemContent,
+  getObjectTreeViewItemId,
+  type ObjectTreeViewItemProps,
+} from './ObjectTreeViewItemContent';
+import {
+  ObjectFolderTreeViewItemContent,
+  getObjectFolderTreeViewItemId,
+  type ObjectFolderTreeViewItemProps,
+} from './ObjectFolderTreeViewItemContent';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
+import { type HTMLDataset } from '../Utils/HTMLDataset';
 
-const gd: libGDevelop = global.gd;
 const sceneObjectsRootFolderId = 'scene-objects';
 const globalObjectsRootFolderId = 'global-objects';
 const globalObjectsEmptyPlaceholderId = 'global-empty-placeholder';
@@ -76,25 +76,291 @@ const styles = {
   autoSizer: { width: '100%' },
 };
 
-export type EmptyPlaceholder = {|
-  +label: string,
-  +isPlaceholder: true,
-  +id: string,
-|};
+export const getTreeViewItemIdFromObjectFolderOrObject = (
+  objectFolderOrObject: gdObjectFolderOrObject
+): string => {
+  return objectFolderOrObject.isFolder()
+    ? getObjectFolderTreeViewItemId(objectFolderOrObject)
+    : getObjectTreeViewItemId(objectFolderOrObject.getObject());
+};
 
-type RootFolder = {|
-  +label: string,
-  +children: ?Array<EmptyPlaceholder>,
-  +objectFolderOrObject: gdObjectFolderOrObject,
-  +global: boolean,
-  +isRoot: true,
-  +id: string,
-|};
+export interface TreeViewItemContent {
+  getName(): string | React.Node;
+  getId(): string;
+  getHtmlId(index: number): ?string;
+  getDataSet(): ?HTMLDataset;
+  getThumbnail(): ?string;
+  onClick(): void;
+  buildMenuTemplate(i18n: I18nType, index: number): Array<MenuItemTemplate>;
+  getRightButton(i18n: I18nType): ?MenuButton;
+  renderRightComponent(i18n: I18nType): ?React.Node;
+  rename(newName: string): void;
+  edit(): void;
+  delete(): void;
+  copy(): void;
+  paste(): void;
+  cut(): void;
+  duplicate(): void;
+  getIndex(): number;
+  isDescendantOf(treeViewItemContent: TreeViewItemContent): boolean;
+  isSibling(treeViewItemContent: TreeViewItemContent): boolean;
+  isGlobal(): boolean;
+  getObjectFolderOrObject(): gdObjectFolderOrObject | null;
+}
 
-type TreeViewItem =
-  | ObjectFolderOrObjectWithContext
-  | RootFolder
-  | EmptyPlaceholder;
+interface TreeViewItem {
+  isRoot?: boolean;
+  isPlaceholder?: boolean;
+  +content: TreeViewItemContent;
+  getChildren(i18n: I18nType): ?Array<TreeViewItem>;
+}
+
+class LeafTreeViewItem implements TreeViewItem {
+  content: TreeViewItemContent;
+
+  constructor(content: TreeViewItemContent) {
+    this.content = content;
+  }
+
+  getChildren(i18n: I18nType): ?Array<TreeViewItem> {
+    return null;
+  }
+}
+
+class PlaceHolderTreeViewItem implements TreeViewItem {
+  isPlaceholder = true;
+  content: TreeViewItemContent;
+
+  constructor(id: string, label: string | React.Node) {
+    this.content = new LabelTreeViewItemContent(id, label);
+  }
+
+  getChildren(i18n: I18nType): ?Array<TreeViewItem> {
+    return null;
+  }
+}
+
+const createTreeViewItem = ({
+  objectFolderOrObject,
+  isGlobal,
+  objectFolderTreeViewItemProps,
+  objectTreeViewItemProps,
+}: {|
+  objectFolderOrObject: gdObjectFolderOrObject,
+  isGlobal: boolean,
+  objectFolderTreeViewItemProps: ObjectFolderTreeViewItemProps,
+  objectTreeViewItemProps: ObjectTreeViewItemProps,
+|}): TreeViewItem => {
+  if (objectFolderOrObject.isFolder()) {
+    return new ObjectFolderTreeViewItem({
+      objectFolderOrObject: objectFolderOrObject,
+      global: isGlobal,
+      isRoot: false,
+      objectFolderTreeViewItemProps,
+      objectTreeViewItemProps,
+      content: new ObjectFolderTreeViewItemContent(
+        objectFolderOrObject,
+        isGlobal,
+        objectFolderTreeViewItemProps
+      ),
+    });
+  } else {
+    return new LeafTreeViewItem(
+      new ObjectTreeViewItemContent(
+        objectFolderOrObject,
+        isGlobal,
+        objectTreeViewItemProps
+      )
+    );
+  }
+};
+
+class ObjectFolderTreeViewItem implements TreeViewItem {
+  isRoot: boolean;
+  global: boolean;
+  isPlaceholder = false;
+  content: TreeViewItemContent;
+  objectFolderOrObject: gdObjectFolderOrObject;
+  placeholder: ?PlaceHolderTreeViewItem;
+  objectFolderTreeViewItemProps: ObjectFolderTreeViewItemProps;
+  objectTreeViewItemProps: ObjectTreeViewItemProps;
+
+  constructor({
+    objectFolderOrObject,
+    global,
+    isRoot,
+    content,
+    placeholder,
+    objectFolderTreeViewItemProps,
+    objectTreeViewItemProps,
+  }: {|
+    objectFolderOrObject: gdObjectFolderOrObject,
+    global: boolean,
+    isRoot: boolean,
+    content: TreeViewItemContent,
+    placeholder?: PlaceHolderTreeViewItem,
+    objectFolderTreeViewItemProps: ObjectFolderTreeViewItemProps,
+    objectTreeViewItemProps: ObjectTreeViewItemProps,
+  |}) {
+    this.isRoot = isRoot;
+    this.global = global;
+    this.content = content;
+    this.objectFolderOrObject = objectFolderOrObject;
+    this.placeholder = placeholder;
+    this.objectFolderTreeViewItemProps = objectFolderTreeViewItemProps;
+    this.objectTreeViewItemProps = objectTreeViewItemProps;
+  }
+
+  getChildren(i18n: I18nType): ?Array<TreeViewItem> {
+    if (this.objectFolderOrObject.getChildrenCount() === 0) {
+      return this.placeholder ? [this.placeholder] : [];
+    }
+    return mapFor(0, this.objectFolderOrObject.getChildrenCount(), i => {
+      const child = this.objectFolderOrObject.getChildAt(i);
+      return createTreeViewItem({
+        objectFolderOrObject: child,
+        isGlobal: this.global,
+        objectFolderTreeViewItemProps: this.objectFolderTreeViewItemProps,
+        objectTreeViewItemProps: this.objectTreeViewItemProps,
+      });
+    });
+  }
+}
+
+class LabelTreeViewItemContent implements TreeViewItemContent {
+  id: string;
+  label: string | React.Node;
+  dataSet: { [string]: string };
+  buildMenuTemplateFunction: (
+    i18n: I18nType,
+    index: number
+  ) => Array<MenuItemTemplate>;
+  rightButton: ?MenuButton;
+
+  constructor(
+    id: string,
+    label: string | React.Node,
+    rightButton?: MenuButton,
+    buildMenuTemplateFunction?: () => Array<MenuItemTemplate>
+  ) {
+    this.id = id;
+    this.label = label;
+    this.buildMenuTemplateFunction = (i18n: I18nType, index: number) =>
+      [
+        rightButton
+          ? {
+              id: rightButton.id,
+              label: rightButton.label,
+              click: rightButton.click,
+            }
+          : null,
+        ...(buildMenuTemplateFunction ? buildMenuTemplateFunction() : []),
+      ].filter(Boolean);
+    this.rightButton = rightButton;
+  }
+
+  getName(): string | React.Node {
+    return this.label;
+  }
+
+  getId(): string {
+    return this.id;
+  }
+
+  getRightButton(i18n: I18nType): ?MenuButton {
+    return this.rightButton;
+  }
+
+  getHtmlId(index: number): ?string {
+    return this.id;
+  }
+
+  getDataSet(): ?HTMLDataset {
+    return {};
+  }
+
+  getThumbnail(): ?string {
+    return null;
+  }
+
+  onClick(): void {}
+
+  buildMenuTemplate(i18n: I18nType, index: number) {
+    return this.buildMenuTemplateFunction(i18n, index);
+  }
+
+  renderRightComponent(i18n: I18nType): ?React.Node {
+    return null;
+  }
+
+  rename(newName: string): void {}
+
+  edit(): void {}
+
+  delete(): void {}
+
+  copy(): void {}
+
+  paste(): void {}
+
+  cut(): void {}
+
+  duplicate(): void {}
+
+  getIndex(): number {
+    return 0;
+  }
+
+  isDescendantOf(treeViewItemContent: TreeViewItemContent): boolean {
+    return false;
+  }
+
+  isSibling(treeViewItemContent: TreeViewItemContent): boolean {
+    return false;
+  }
+
+  isGlobal(): boolean {
+    return false;
+  }
+
+  getObjectFolderOrObject(): gdObjectFolderOrObject | null {
+    return null;
+  }
+}
+
+const getTreeViewItemName = (item: TreeViewItem) => item.content.getName();
+const getTreeViewItemId = (item: TreeViewItem) => item.content.getId();
+const getTreeViewItemHtmlId = (item: TreeViewItem, index: number) =>
+  item.content.getHtmlId(index);
+const getTreeViewItemChildren = (i18n: I18nType) => (item: TreeViewItem) =>
+  item.getChildren(i18n);
+const getTreeViewItemThumbnail = (item: TreeViewItem) =>
+  item.content.getThumbnail();
+const getTreeViewItemDataSet = (item: TreeViewItem) =>
+  item.content.getDataSet();
+const buildMenuTemplate = (i18n: I18nType) => (
+  item: TreeViewItem,
+  index: number
+) => item.content.buildMenuTemplate(i18n, index);
+const renderTreeViewItemRightComponent = (i18n: I18nType) => (
+  item: TreeViewItem
+) => item.content.renderRightComponent(i18n);
+const renameItem = (item: TreeViewItem, newName: string) => {
+  item.content.rename(newName);
+};
+const editItem = (item: TreeViewItem) => {
+  item.content.edit();
+};
+const deleteItem = (item: TreeViewItem) => {
+  item.content.delete();
+};
+const duplicateItem = (item: TreeViewItem) => {
+  item.content.duplicate();
+};
+const getTreeViewItemRightButton = (i18n: I18nType) => (item: TreeViewItem) =>
+  item.content.getRightButton(i18n);
+
+export const objectWithContextReactDndType = 'GD_OBJECT_WITH_CONTEXT';
 
 const objectTypeToDefaultName = {
   Sprite: 'NewSprite',
@@ -118,74 +384,6 @@ const objectTypeToDefaultName = {
   'Video::VideoObject': 'NewVideo',
 };
 
-export const objectWithContextReactDndType = 'GD_OBJECT_WITH_CONTEXT';
-
-const getTreeViewItemName = (item: TreeViewItem) => {
-  if (item.isRoot || item.isPlaceholder) return item.label;
-  return getObjectFolderOrObjectUnifiedName(item.objectFolderOrObject);
-};
-
-const getTreeViewItemId = (item: TreeViewItem) => {
-  if (item.isRoot || item.isPlaceholder) return item.id;
-  const { objectFolderOrObject } = item;
-  if (objectFolderOrObject.isFolder()) {
-    // Use the ptr as id since two folders can have the same name.
-    // If using folder name, this would need for methods when renaming
-    // the folder to keep it open.
-    return `object-folder-${objectFolderOrObject.ptr}`;
-  }
-  const object = objectFolderOrObject.getObject();
-  // Use the ptr to avoid display bugs in the rare case a user set an object
-  // as global although another layout has an object with the same name,
-  // and ignored the warning.
-  return `${object.getName()}-${object.ptr}`;
-};
-
-const getTreeViewItemHtmlId = (item: TreeViewItem, index: number) =>
-  item.isRoot || item.isPlaceholder ? undefined : `object-item-${index}`;
-
-const getTreeViewItemChildren = (item: TreeViewItem) => {
-  if (item.isPlaceholder) return null;
-  if (item.isRoot && item.children) return item.children;
-  const { objectFolderOrObject, global } = item;
-  if (!objectFolderOrObject.isFolder()) return null;
-  return mapFor(0, objectFolderOrObject.getChildrenCount(), i => ({
-    objectFolderOrObject: objectFolderOrObject.getChildAt(i),
-    global,
-  }));
-};
-const getTreeViewItemData = (item: TreeViewItem) =>
-  item.isRoot || item.isPlaceholder || item.objectFolderOrObject.isFolder()
-    ? undefined
-    : {
-        objectName: item.objectFolderOrObject.getObject().getName(),
-        global: item.global.toString(),
-      };
-
-const isObjectFolderOrObjectWithContextGlobal = (
-  objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext
-) => objectFolderOrObjectWithContext.global;
-
-const getPasteLabel = (
-  i18n: I18nType,
-  { isGlobalObject, isFolder }: {| isGlobalObject: boolean, isFolder: boolean |}
-) => {
-  let translation = t`Paste`;
-  if (Clipboard.has(CLIPBOARD_KIND)) {
-    const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
-    const clipboardObjectName =
-      SafeExtractor.extractStringProperty(clipboardContent, 'name') || '';
-    translation = isGlobalObject
-      ? isFolder
-        ? t`Paste ${clipboardObjectName} as a Global Object inside folder`
-        : t`Paste ${clipboardObjectName} as a Global Object`
-      : isFolder
-      ? t`Paste ${clipboardObjectName} inside folder`
-      : t`Paste ${clipboardObjectName}`;
-  }
-  return i18n._(translation);
-};
-
 export type ObjectsListInterface = {|
   forceUpdateList: () => void,
   openNewObjectDialog: () => void,
@@ -198,8 +396,6 @@ type Props = {|
   eventsBasedObject: gdEventsBasedObject | null,
   initialInstances?: gdInitialInstancesContainer,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
-  globalObjectsContainer: gdObjectsContainer | null,
-  objectsContainer: gdObjectsContainer,
   onSelectAllInstancesOfObjectInLayout?: string => void,
   resourceManagementProps: ResourceManagementProps,
   onDeleteObjects: (
@@ -247,8 +443,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       eventsBasedObject,
       initialInstances,
       projectScopedContainersAccessor,
-      globalObjectsContainer,
-      objectsContainer,
       resourceManagementProps,
       onSelectAllInstancesOfObjectInLayout,
       onDeleteObjects,
@@ -274,6 +468,25 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     }: Props,
     ref
   ) => {
+    // TODO Handle any number of object containers.
+    const objectsContainersList = projectScopedContainersAccessor
+      .get()
+      .getObjectsContainersList();
+
+    if (objectsContainersList.getObjectsContainersCount() === 0) {
+      throw new Error('Used ObjectsList without any object container.');
+    }
+    if (objectsContainersList.getObjectsContainersCount() > 2) {
+      console.error('Used ObjectsList with more than 2 object containers.');
+    }
+    const globalObjectsContainer =
+      objectsContainersList.getObjectsContainersCount() > 1
+        ? objectsContainersList.getObjectsContainer(0)
+        : null;
+    const objectsContainer = objectsContainersList.getObjectsContainer(
+      objectsContainersList.getObjectsContainersCount() - 1
+    );
+
     const { currentlyRunningInAppTutorial } = React.useContext(
       InAppTutorialContext
     );
@@ -323,6 +536,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       })
     );
 
+    const scrollToItem = React.useCallback((itemId: string) => {
+      if (treeViewRef.current) {
+        treeViewRef.current.scrollToItemFromId(itemId);
+      }
+    }, []);
+
     const addObject = React.useCallback(
       (objectType: string) => {
         const defaultName = project.hasEventsBasedObject(objectType)
@@ -330,11 +549,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             (project.getEventsBasedObject(objectType).getDefaultName() ||
               project.getEventsBasedObject(objectType).getName())
           : objectTypeToDefaultName[objectType] || 'NewObject';
-        const name = newNameGenerator(defaultName, name =>
-          projectScopedContainersAccessor
-            .get()
-            .getObjectsContainersList()
-            .hasObjectNamed(name)
+        const name = newNameGenerator(
+          defaultName,
+          name =>
+            objectsContainer.hasObjectNamed(name) ||
+            (!!globalObjectsContainer &&
+              globalObjectsContainer.hasObjectNamed(name))
         );
 
         let object;
@@ -365,10 +585,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
           if (treeViewRef.current) {
             treeViewRef.current.openItems([
-              getTreeViewItemId({
-                objectFolderOrObject: parentFolder,
-                global: false,
-              }),
+              getObjectFolderTreeViewItemId(parentFolder),
             ]);
           }
         } else {
@@ -394,7 +611,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         // to simplify the code, we just wait a few ms for a new render
         // to be done.
         setTimeout(() => {
-          scrollToItem(objectFolderOrObjectWithContext);
+          scrollToItem(getObjectTreeViewItemId(object));
         }, 100); // A few ms is enough for a new render to be done.
 
         setNewObjectDialogOpen(null);
@@ -412,9 +629,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         newObjectDialogOpen,
         onEditObject,
         objectsContainer,
+        globalObjectsContainer,
+        scrollToItem,
         onObjectCreated,
         onObjectFolderOrObjectWithContextSelected,
-        projectScopedContainersAccessor,
       ]
     );
 
@@ -427,23 +645,20 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           treeViewRef.current.openItems([sceneObjectsRootFolderId]);
 
         const lastObject = objects[objects.length - 1];
-        const objectFolderOrObjectWithContext = {
-          // A new object is always added to the scene (layout) by default.
-          objectFolderOrObject: objectsContainer
-            .getRootFolder()
-            .getObjectChild(lastObject.getName()),
-          global: false,
-        };
+        // A new object is always added to the scene (layout) by default.
+        const object = objectsContainer
+          .getRootFolder()
+          .getObjectChild(lastObject.getName());
 
         // Scroll to the new object.
         // Ideally, we'd wait for the list to be updated to scroll, but
         // to simplify the code, we just wait a few ms for a new render
         // to be done.
         setTimeout(() => {
-          scrollToItem(objectFolderOrObjectWithContext);
+          scrollToItem(getObjectTreeViewItemId(object.getObject()));
         }, 100); // A few ms is enough for a new render to be done.
       },
-      [onObjectCreated, objectsContainer]
+      [objectsContainer, onObjectCreated, scrollToItem]
     );
 
     const swapObjectAsset = React.useCallback(
@@ -479,515 +694,61 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       [onObjectFolderOrObjectWithContextSelected]
     );
 
-    const deleteObjectFolderOrObjectWithContext = React.useCallback(
-      async (
-        objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext
-      ) => {
-        if (!objectFolderOrObjectWithContext) return;
-        const {
-          objectFolderOrObject,
-          global,
-        } = objectFolderOrObjectWithContext;
-
-        let objectsToDelete: gdObject[];
-        let folderToDelete: ?gdObjectFolderOrObject = null;
-        let message: MessageDescriptor;
-        let title: MessageDescriptor;
-
-        if (objectFolderOrObject.isFolder()) {
-          objectsToDelete = enumerateObjectsInFolder(objectFolderOrObject);
-          if (objectsToDelete.length === 0) {
-            // Folder is empty or contains only empty folders.
-            selectObjectFolderOrObjectWithContext(null);
-            objectFolderOrObject
-              .getParent()
-              .removeFolderChild(objectFolderOrObject);
-            forceUpdateList();
-            return;
-          }
-
-          folderToDelete = objectFolderOrObject;
-          if (objectsToDelete.length === 1) {
-            message = t`Are you sure you want to remove this folder and with it the object ${objectsToDelete[0].getName()}? This can't be undone.`;
-            title = t`Remove folder and object`;
-          } else {
-            message = t`Are you sure you want to remove this folder and all its content (objects ${objectsToDelete
-              .map(object => object.getName())
-              .join(', ')})? This can't be undone.`;
-            title = t`Remove folder and objects`;
-          }
-        } else {
-          objectsToDelete = [objectFolderOrObject.getObject()];
-          message = t`Are you sure you want to remove this object? This can't be undone.`;
-          title = t`Remove object`;
-        }
-
-        const answer = await showDeleteConfirmation({ message, title });
-        if (!answer) return;
-
-        const objectsWithContext = objectsToDelete.map(object => ({
-          object,
-          global,
-        }));
-
-        // TODO: Change selectedObjectFolderOrObjectWithContext so that it's easy
-        // to remove an item using keyboard only and to navigate with the arrow
-        // keys right after deleting it.
-        selectObjectFolderOrObjectWithContext(null);
-
-        // It's important to call onDeleteObjects, because the parent might
-        // have to do some refactoring/clean up work before the object is deleted
-        // (typically, the SceneEditor will remove instances referring to the object,
-        // leading to the removal of their renderer - which can keep a reference to
-        // the object).
-        onDeleteObjects(objectsWithContext, doRemove => {
-          if (!doRemove) return;
-          const container = global ? globalObjectsContainer : objectsContainer;
-          if (container) {
-            objectsToDelete.forEach(object => {
-              container.removeObject(object.getName());
-            });
-          }
-
-          if (folderToDelete) {
-            folderToDelete.getParent().removeFolderChild(folderToDelete);
-            forceUpdateList();
-          }
-
-          onObjectModified(false);
-        });
-      },
-      [
-        showDeleteConfirmation,
-        selectObjectFolderOrObjectWithContext,
-        onDeleteObjects,
-        forceUpdateList,
-        globalObjectsContainer,
-        objectsContainer,
-        onObjectModified,
-      ]
-    );
-
-    const copyObjectFolderOrObjectWithContext = React.useCallback(
-      (objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext) => {
-        const { objectFolderOrObject } = objectFolderOrObjectWithContext;
-        if (objectFolderOrObject.isFolder()) return;
-        const object = objectFolderOrObject.getObject();
-        Clipboard.set(CLIPBOARD_KIND, {
-          type: object.getType(),
-          name: object.getName(),
-          object: serializeToJSObject(object),
-        });
-      },
-      []
-    );
-
-    const cutObjectFolderOrObjectWithContext = React.useCallback(
-      (objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext) => {
-        copyObjectFolderOrObjectWithContext(objectFolderOrObjectWithContext);
-        deleteObjectFolderOrObjectWithContext(objectFolderOrObjectWithContext);
-      },
-      [
-        copyObjectFolderOrObjectWithContext,
-        deleteObjectFolderOrObjectWithContext,
-      ]
-    );
-
-    const addSerializedObjectToObjectsContainer = React.useCallback(
-      ({
-        objectName,
-        positionObjectFolderOrObjectWithContext,
-        objectType,
-        serializedObject,
-        addInsideFolder,
-      }: {|
-        objectName: string,
-        positionObjectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
-        objectType: string,
-        serializedObject: Object,
-        addInsideFolder?: boolean,
-      |}): ObjectWithContext => {
-        const newName = newNameGenerator(
-          objectName,
-          name =>
-            projectScopedContainersAccessor
-              .get()
-              .getObjectsContainersList()
-              .hasObjectNamed(name),
-          ''
-        );
-
-        const {
-          objectFolderOrObject,
-          global,
-        } = positionObjectFolderOrObjectWithContext;
-        let positionFolder, positionInFolder;
-        if (addInsideFolder && objectFolderOrObject.isFolder()) {
-          positionFolder = objectFolderOrObject;
-          positionInFolder = objectFolderOrObject.getChildrenCount();
-        } else {
-          positionFolder = objectFolderOrObject.getParent();
-          positionInFolder = positionFolder.getChildPosition(
-            objectFolderOrObject
-          );
-        }
-
-        const newObject = global
-          ? project
-              .getObjects()
-              .insertNewObjectInFolder(
-                project,
-                objectType,
-                newName,
-                positionFolder,
-                positionInFolder + 1
-              )
-          : objectsContainer.insertNewObjectInFolder(
-              project,
-              objectType,
-              newName,
-              positionFolder,
-              positionInFolder + 1
-            );
-
-        unserializeFromJSObject(
-          newObject,
-          serializedObject,
-          'unserializeFrom',
-          project
-        );
-        newObject.setName(newName); // Unserialization has overwritten the name.
-
-        return { object: newObject, global };
-      },
-      [objectsContainer, project, projectScopedContainersAccessor]
-    );
-
-    const paste = React.useCallback(
-      (
-        objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
-        addInsideFolder?: boolean
-      ) => {
-        if (!Clipboard.has(CLIPBOARD_KIND)) return;
-
-        const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
-        const copiedObject = SafeExtractor.extractObjectProperty(
-          clipboardContent,
-          'object'
-        );
-        const name = SafeExtractor.extractStringProperty(
-          clipboardContent,
-          'name'
-        );
-        const type = SafeExtractor.extractStringProperty(
-          clipboardContent,
-          'type'
-        );
-        if (!name || !type || !copiedObject) return;
-
-        const newObjectWithContext = addSerializedObjectToObjectsContainer({
-          objectName: name,
-          positionObjectFolderOrObjectWithContext: objectFolderOrObjectWithContext,
-          objectType: type,
-          serializedObject: copiedObject,
-          addInsideFolder,
-        });
-
-        onObjectModified(false);
-        if (onObjectPasted) onObjectPasted(newObjectWithContext.object);
-        if (addInsideFolder && treeViewRef.current)
-          treeViewRef.current.openItems([
-            getTreeViewItemId(objectFolderOrObjectWithContext),
-          ]);
-      },
-      [addSerializedObjectToObjectsContainer, onObjectModified, onObjectPasted]
-    );
-
     const editName = React.useCallback(
-      (objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext) => {
-        if (!objectFolderOrObjectWithContext) return;
+      (itemId: string) => {
         const treeView = treeViewRef.current;
         if (treeView) {
           if (isMobile) {
             // Position item at top of the screen to make sure it will be visible
             // once the keyboard is open.
-            treeView.scrollToItem(objectFolderOrObjectWithContext, 'start');
+            treeView.scrollToItemFromId(itemId, 'start');
           }
-          treeView.renameItem(objectFolderOrObjectWithContext);
+          treeView.renameItemFromId(itemId);
         }
       },
       [isMobile]
     );
 
-    const duplicateObjectFolderOrObjectWithContext = React.useCallback(
-      (
-        objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
-        duplicateInScene?: boolean
-      ) => {
-        const {
-          objectFolderOrObject,
-          global,
-        } = objectFolderOrObjectWithContext;
-        if (objectFolderOrObject.isFolder()) return;
-
-        const object = objectFolderOrObject.getObject();
-        const type = object.getType();
-        const name = object.getName();
-        const serializedObject = serializeToJSObject(object);
-
-        const newObjectWithContext = addSerializedObjectToObjectsContainer({
-          objectName: name,
-          positionObjectFolderOrObjectWithContext: objectFolderOrObjectWithContext,
-          objectType: type,
-          serializedObject,
-        });
-
-        const newObjectFolderOrObjectWithContext = {
-          objectFolderOrObject: objectFolderOrObject
-            .getParent()
-            .getObjectChild(newObjectWithContext.object.getName()),
-          global,
-        };
-
-        forceUpdateList();
-        editName(newObjectFolderOrObjectWithContext);
-        selectObjectFolderOrObjectWithContext(
-          newObjectFolderOrObjectWithContext
-        );
-      },
-      [
-        addSerializedObjectToObjectsContainer,
-        editName,
-        forceUpdateList,
-        selectObjectFolderOrObjectWithContext,
-      ]
-    );
-
-    React.useEffect(
-      () => {
-        if (keyboardShortcutsRef.current) {
-          keyboardShortcutsRef.current.setShortcutCallback('onDelete', () => {
-            deleteObjectFolderOrObjectWithContext(
-              selectedObjectFolderOrObjectsWithContext[0]
-            );
-          });
-          keyboardShortcutsRef.current.setShortcutCallback(
-            'onDuplicate',
-            () => {
-              duplicateObjectFolderOrObjectWithContext(
-                selectedObjectFolderOrObjectsWithContext[0]
-              );
-            }
-          );
-          keyboardShortcutsRef.current.setShortcutCallback('onRename', () => {
-            editName(selectedObjectFolderOrObjectsWithContext[0]);
-          });
-        }
-      },
-      [
-        selectedObjectFolderOrObjectsWithContext,
-        deleteObjectFolderOrObjectWithContext,
-        duplicateObjectFolderOrObjectWithContext,
-        editName,
-      ]
-    );
-
-    const rename = React.useCallback(
-      (item: TreeViewItem, newName: string) => {
-        if (item.isRoot || item.isPlaceholder) return;
-        const { global, objectFolderOrObject } = item;
-
-        if (
-          getObjectFolderOrObjectUnifiedName(objectFolderOrObject) === newName
-        )
-          return;
-
-        const validatedNewName = objectFolderOrObject.isFolder()
-          ? newName
-          : getValidatedObjectOrGroupName(newName, global);
-        onRenameObjectFolderOrObjectWithContextFinish(
-          item,
-          validatedNewName,
-          doRename => {
-            if (!doRename) return;
-
-            onObjectModified(false);
-          }
-        );
-      },
-      [
-        getValidatedObjectOrGroupName,
-        onObjectModified,
-        onRenameObjectFolderOrObjectWithContextFinish,
-      ]
-    );
-
-    const editItem = React.useCallback(
-      (item: TreeViewItem) => {
-        if (item.isRoot || item.isPlaceholder) return;
-        const { objectFolderOrObject } = item;
-        if (objectFolderOrObject.isFolder()) return;
-
-        onEditObject(objectFolderOrObject.getObject());
-      },
-      [onEditObject]
-    );
-
-    const scrollToItem = (
+    const getClosestVisibleParentId = (
       objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext
-    ) => {
-      if (treeViewRef.current) {
-        treeViewRef.current.scrollToItem(objectFolderOrObjectWithContext);
-      }
-    };
-
-    const getClosestVisibleParent = (
-      objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext
-    ): ?ObjectFolderOrObjectWithContext => {
+    ): ?string => {
       const treeView = treeViewRef.current;
       if (!treeView) return null;
-      const { objectFolderOrObject, global } = objectFolderOrObjectWithContext;
-      const topToBottomAscendanceWithContext = getFoldersAscendanceWithoutRootFolder(
+      const { objectFolderOrObject } = objectFolderOrObjectWithContext;
+      const topToBottomAscendanceId = getFoldersAscendanceWithoutRootFolder(
         objectFolderOrObject
       )
         .reverse()
-        .map(parent => ({ objectFolderOrObject: parent, global }));
-      const topToBottomAscendanceOpenness = treeView.areItemsOpen(
-        topToBottomAscendanceWithContext
+        .map(parent => getObjectFolderTreeViewItemId(objectFolderOrObject));
+      const topToBottomAscendanceOpenness = treeView.areItemsOpenFromId(
+        topToBottomAscendanceId
       );
       const firstClosedFolderIndex = topToBottomAscendanceOpenness.indexOf(
         false
       );
       if (firstClosedFolderIndex === -1) {
         // If all parents are open, return the objectFolderOrObject given as input.
-        return objectFolderOrObjectWithContext;
+        return getTreeViewItemIdFromObjectFolderOrObject(objectFolderOrObject);
       }
       // $FlowFixMe - We are confident this TreeView item is in fact a ObjectFolderOrObjectWithContext
-      return topToBottomAscendanceWithContext[firstClosedFolderIndex];
+      return topToBottomAscendanceId[firstClosedFolderIndex];
     };
-
-    const globalObjectsRootFolder = globalObjectsContainer
-      ? globalObjectsContainer.getRootFolder()
-      : null;
-    const objectsRootFolder = objectsContainer.getRootFolder();
-    const getTreeViewData = React.useCallback(
-      (i18n: I18nType): Array<TreeViewItem> => {
-        const treeViewItems = [
-          globalObjectsRootFolder && {
-            label: i18n._(t`Global Objects`),
-            children:
-              globalObjectsRootFolder.getChildrenCount() === 0
-                ? [
-                    {
-                      label: (
-                        <Trans>
-                          There is no{' '}
-                          <Link
-                            href={globalObjectsWikiLink}
-                            onClick={() =>
-                              Window.openExternalURL(globalObjectsWikiLink)
-                            }
-                          >
-                            global object
-                          </Link>{' '}
-                          yet.
-                        </Trans>
-                      ),
-                      id: globalObjectsEmptyPlaceholderId,
-                      isPlaceholder: true,
-                    },
-                  ]
-                : null,
-            objectFolderOrObject: globalObjectsRootFolder,
-            global: true,
-            isRoot: true,
-            id: globalObjectsRootFolderId,
-          },
-          {
-            label: i18n._(t`Scene Objects`),
-            children:
-              objectsRootFolder.getChildrenCount() === 0
-                ? [
-                    {
-                      label: i18n._(t`Start by adding a new object.`),
-                      id: sceneObjectsEmptyPlaceholderId,
-                      isPlaceholder: true,
-                    },
-                  ]
-                : null,
-            objectFolderOrObject: objectsRootFolder,
-            global: false,
-            isRoot: true,
-            id: sceneObjectsRootFolderId,
-          },
-        ].filter(Boolean);
-        // $FlowFixMe
-        return treeViewItems;
-      },
-      [globalObjectsRootFolder, objectsRootFolder]
-    );
-
-    const canMoveSelectionTo = React.useCallback(
-      (destinationItem: TreeViewItem) => {
-        if (destinationItem.isRoot) return false;
-        if (destinationItem.isPlaceholder) {
-          if (
-            destinationItem.id === globalObjectsEmptyPlaceholderId &&
-            selectedObjectFolderOrObjectsWithContext.length === 1 &&
-            !selectedObjectFolderOrObjectsWithContext[0].global
-          ) {
-            // In that case, the user is drag n dropping a scene object on the
-            // empty placeholder of the global objects section.
-            return !selectedObjectFolderOrObjectsWithContext[0].objectFolderOrObject.isFolder();
-          }
-          return false;
-        }
-        // Check if at least one element in the selection can be moved.
-        if (
-          selectedObjectFolderOrObjectsWithContext.every(
-            selectedObject => selectedObject.global === destinationItem.global
-          )
-        ) {
-          if (
-            selectedObjectFolderOrObjectsWithContext[0] &&
-            destinationItem.objectFolderOrObject.isADescendantOf(
-              selectedObjectFolderOrObjectsWithContext[0].objectFolderOrObject
-            )
-          ) {
-            return false;
-          }
-          return true;
-        } else if (
-          selectedObjectFolderOrObjectsWithContext.length === 1 &&
-          selectedObjectFolderOrObjectsWithContext.every(
-            selectedObject => selectedObject.global === false
-          ) &&
-          destinationItem.global === true
-        ) {
-          return !selectedObjectFolderOrObjectsWithContext[0].objectFolderOrObject.isFolder();
-        }
-
-        return false;
-      },
-      [selectedObjectFolderOrObjectsWithContext]
-    );
 
     const setAsGlobalObject = React.useCallback(
       ({
         i18n,
-        objectFolderOrObjectWithContext,
+        objectFolderOrObject,
         index,
         folder,
       }: {
         i18n: I18nType,
-        objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
+        objectFolderOrObject: gdObjectFolderOrObject,
         index?: number,
         folder?: gdObjectFolderOrObject,
       }) => {
         if (!globalObjectsContainer) {
           return;
         }
-        const { objectFolderOrObject } = objectFolderOrObjectWithContext;
         const destinationFolder =
           folder && folder.isFolder()
             ? folder
@@ -1047,7 +808,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         // to simplify the code, we just wait a few ms for a new render
         // to be done.
         setTimeout(() => {
-          scrollToItem(newObjectFolderOrObjectWithContext);
+          scrollToItem(getObjectTreeViewItemId(object));
         }, 100); // A few ms is enough for a new render to be done.
       },
       [
@@ -1056,156 +817,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         beforeSetAsGlobalObject,
         onObjectModified,
         selectObjectFolderOrObjectWithContext,
+        scrollToItem,
       ]
-    );
-
-    const moveSelectionTo = React.useCallback(
-      (
-        i18n: I18nType,
-        destinationItem: TreeViewItem,
-        where: 'before' | 'inside' | 'after'
-      ) => {
-        if (
-          destinationItem.isRoot ||
-          selectedObjectFolderOrObjectsWithContext.length !== 1
-        )
-          return;
-
-        if (destinationItem.isPlaceholder) {
-          if (
-            destinationItem.id === globalObjectsEmptyPlaceholderId &&
-            selectedObjectFolderOrObjectsWithContext.length === 1 &&
-            !selectedObjectFolderOrObjectsWithContext[0].global
-          ) {
-            const selectedObjectFolderOrObjectWithContext =
-              selectedObjectFolderOrObjectsWithContext[0];
-
-            setAsGlobalObject({
-              i18n,
-              objectFolderOrObjectWithContext: selectedObjectFolderOrObjectWithContext,
-            });
-          }
-          return;
-        }
-
-        const selectedObjectFolderOrObjectWithContext =
-          selectedObjectFolderOrObjectsWithContext[0];
-
-        if (
-          destinationItem.objectFolderOrObject ===
-          selectedObjectFolderOrObjectWithContext.objectFolderOrObject
-        ) {
-          return;
-        }
-
-        if (
-          selectedObjectFolderOrObjectWithContext.global === false &&
-          destinationItem.global === true
-        ) {
-          let parent, index;
-          if (
-            where === 'inside' &&
-            destinationItem.objectFolderOrObject.isFolder()
-          ) {
-            parent = destinationItem.objectFolderOrObject;
-            index = 0;
-          } else {
-            parent = destinationItem.objectFolderOrObject.getParent();
-            index =
-              parent.getChildPosition(destinationItem.objectFolderOrObject) +
-              (where === 'after' ? 1 : 0);
-          }
-          setAsGlobalObject({
-            i18n,
-            objectFolderOrObjectWithContext: selectedObjectFolderOrObjectWithContext,
-            folder: parent,
-            index,
-          });
-          return;
-        }
-
-        // At this point, the move is done from within the same container.
-        if (
-          selectedObjectFolderOrObjectWithContext.global ===
-          destinationItem.global
-        ) {
-          const selectedObjectFolderOrObject =
-            selectedObjectFolderOrObjectWithContext.objectFolderOrObject;
-          const destinationObjectFolderOrObject =
-            destinationItem.objectFolderOrObject;
-          let parent;
-
-          if (
-            where === 'inside' &&
-            destinationObjectFolderOrObject.isFolder()
-          ) {
-            parent = destinationObjectFolderOrObject;
-          } else {
-            parent = destinationObjectFolderOrObject.getParent();
-          }
-          const selectedObjectFolderOrObjectParent = selectedObjectFolderOrObject.getParent();
-          if (parent === selectedObjectFolderOrObjectParent) {
-            const fromIndex = selectedObjectFolderOrObjectParent.getChildPosition(
-              selectedObjectFolderOrObject
-            );
-            let toIndex = selectedObjectFolderOrObjectParent.getChildPosition(
-              destinationObjectFolderOrObject
-            );
-            if (toIndex > fromIndex) toIndex -= 1;
-            if (where === 'after') toIndex += 1;
-            selectedObjectFolderOrObjectParent.moveChild(fromIndex, toIndex);
-          } else {
-            if (
-              destinationObjectFolderOrObject.isADescendantOf(
-                selectedObjectFolderOrObject
-              )
-            ) {
-              return;
-            }
-            const position =
-              where === 'inside'
-                ? 0
-                : parent.getChildPosition(destinationObjectFolderOrObject) +
-                  (where === 'after' ? 1 : 0);
-            selectedObjectFolderOrObjectParent.moveObjectFolderOrObjectToAnotherFolder(
-              selectedObjectFolderOrObject,
-              parent,
-              position
-            );
-            const treeView = treeViewRef.current;
-            if (treeView) {
-              const closestVisibleParent = getClosestVisibleParent({
-                objectFolderOrObject: parent,
-                global: destinationItem.global,
-              });
-              if (closestVisibleParent) {
-                treeView.animateItem(closestVisibleParent);
-              }
-            }
-          }
-        } else {
-          return;
-        }
-        onObjectModified(true);
-      },
-      [
-        onObjectModified,
-        selectedObjectFolderOrObjectsWithContext,
-        setAsGlobalObject,
-      ]
-    );
-
-    const getTreeViewItemThumbnail = React.useCallback(
-      (item: TreeViewItem) => {
-        if (item.isRoot || item.isPlaceholder) return null;
-        const { objectFolderOrObject } = item;
-        if (objectFolderOrObject.isFolder()) return 'FOLDER';
-        return getThumbnail(
-          project,
-          objectFolderOrObject.getObject().getConfiguration()
-        );
-      },
-      [getThumbnail, project]
     );
 
     const addFolder = React.useCallback(
@@ -1226,7 +839,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               global,
             };
             if (treeViewRef.current) {
-              treeViewRef.current.openItems([getTreeViewItemId(items[0])]);
+              treeViewRef.current.openItems([
+                getObjectFolderTreeViewItemId(items[0].objectFolderOrObject),
+              ]);
             }
           } else {
             const parentFolder = selectedObjectFolderOrObject.getParent();
@@ -1252,12 +867,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         );
         const itemsToOpen = getFoldersAscendanceWithoutRootFolder(
           newObjectFolderOrObjectWithContext.objectFolderOrObject
-        ).map(folder =>
-          getTreeViewItemId({
-            objectFolderOrObject: folder,
-            global: newObjectFolderOrObjectWithContext.global,
-          })
-        );
+        ).map(folder => getObjectFolderTreeViewItemId(folder));
         itemsToOpen.push(
           newObjectFolderOrObjectWithContext.global
             ? globalObjectsRootFolderId
@@ -1265,7 +875,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         );
         if (treeViewRef.current) treeViewRef.current.openItems(itemsToOpen);
 
-        editName(newObjectFolderOrObjectWithContext);
+        editName(
+          getObjectFolderTreeViewItemId(
+            newObjectFolderOrObjectWithContext.objectFolderOrObject
+          )
+        );
         forceUpdateList();
       },
       [
@@ -1276,58 +890,15 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       ]
     );
 
-    /**
-     * Unselect item if one of the parent is collapsed (folded) so that the item
-     * does not stay selected and not visible to the user.
-     */
-    const onCollapseItem = React.useCallback(
-      (item: TreeViewItem) => {
-        if (
-          !selectedObjectFolderOrObjectsWithContext ||
-          selectedObjectFolderOrObjectsWithContext.length !== 1 ||
-          item.isPlaceholder
-        )
-          return;
-        const { objectFolderOrObject: potentialParent } = item;
-        const {
-          objectFolderOrObject: selectedObjectFolderOrObject,
-        } = selectedObjectFolderOrObjectsWithContext[0];
-        if (!potentialParent || !selectedObjectFolderOrObject) return;
-        if (selectedObjectFolderOrObject.isADescendantOf(potentialParent)) {
-          selectObjectFolderOrObjectWithContext(null);
-        }
-      },
-      [
-        selectObjectFolderOrObjectWithContext,
-        selectedObjectFolderOrObjectsWithContext,
-      ]
-    );
-
-    const moveObjectFolderOrObjectToAnotherFolderInSameContainer = React.useCallback(
-      (
-        objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
-        folder: gdObjectFolderOrObject
-      ) => {
-        const {
-          objectFolderOrObject,
-          global,
-        } = objectFolderOrObjectWithContext;
-        if (folder === objectFolderOrObject.getParent()) return;
-        objectFolderOrObject
-          .getParent()
-          .moveObjectFolderOrObjectToAnotherFolder(
-            objectFolderOrObject,
-            folder,
-            0
-          );
+    const onMovedObjectFolderOrObjectToAnotherFolderInSameContainer = React.useCallback(
+      (objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext) => {
         const treeView = treeViewRef.current;
         if (treeView) {
-          const closestVisibleParent = getClosestVisibleParent({
-            objectFolderOrObject: folder,
-            global,
-          });
-          if (closestVisibleParent) {
-            treeView.animateItem(closestVisibleParent);
+          const closestVisibleParentId = getClosestVisibleParentId(
+            objectFolderOrObjectWithContext
+          );
+          if (closestVisibleParentId) {
+            treeView.animateItemFromId(closestVisibleParentId);
           }
         }
         onObjectModified(true);
@@ -1335,272 +906,414 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       [onObjectModified]
     );
 
-    const renderObjectMenuTemplate = React.useCallback(
-      (i18n: I18nType) => (item: TreeViewItem, index: number) => {
-        if (item.isPlaceholder) {
-          return [];
-        }
-        if (item.isRoot) {
-          if (item.id === 'scene-objects') {
-            return [
-              {
-                label: i18n._(t`Export as assets`),
-                click: () => onExportAssets(),
-              },
-            ];
-          }
-          return [];
-        }
-
-        const { objectFolderOrObject, global } = item;
-
-        const container = global ? globalObjectsContainer : objectsContainer;
-        if (!container) {
-          return [];
-        }
-        const folderAndPathsInContainer = enumerateFoldersInContainer(
-          container
-        );
-        folderAndPathsInContainer.unshift({
-          path: i18n._(t`Root folder`),
-          folder: container.getRootFolder(),
-        });
-        if (objectFolderOrObject.isFolder()) {
-          const filteredFolderAndPathsInContainer = folderAndPathsInContainer.filter(
-            folderAndPath =>
-              !folderAndPath.folder.isADescendantOf(objectFolderOrObject) &&
-              folderAndPath.folder !== objectFolderOrObject
-          );
-          return [
-            {
-              label: getPasteLabel(i18n, {
-                isGlobalObject: item.global,
-                isFolder: true,
-              }),
-              enabled: Clipboard.has(CLIPBOARD_KIND),
-              click: () => paste(item, true),
-            },
-            {
-              label: i18n._(t`Rename`),
-              click: () => editName(item),
-              accelerator: 'F2',
-            },
-            {
-              label: i18n._(t`Delete`),
-              click: () => deleteObjectFolderOrObjectWithContext(item),
-              accelerator: 'Backspace',
-            },
-            {
-              label: i18n._('Move to folder'),
-              submenu: filteredFolderAndPathsInContainer.map(
-                ({ folder, path }) => ({
-                  label: path,
-                  enabled: folder !== objectFolderOrObject.getParent(),
-                  click: () =>
-                    moveObjectFolderOrObjectToAnotherFolderInSameContainer(
-                      item,
-                      folder
-                    ),
-                })
-              ),
-            },
-            ...renderQuickCustomizationMenuItems({
-              i18n,
-              visibility: objectFolderOrObject.getQuickCustomizationVisibility(),
-              onChangeVisibility: visibility => {
-                objectFolderOrObject.setQuickCustomizationVisibility(
-                  visibility
-                );
-                forceUpdate();
-              },
-            }),
-            { type: 'separator' },
-            {
-              label: i18n._(t`Add a new object`),
-              click: () => onAddNewObject(item),
-            },
-            {
-              label: i18n._(t`Add a new folder`),
-              click: () =>
-                addFolder(
-                  selectedObjectFolderOrObjectsWithContext.includes(item)
-                    ? selectedObjectFolderOrObjectsWithContext
-                    : [item]
-                ),
-            },
-            { type: 'separator' },
-            {
-              label: i18n._(t`Expand all sub folders`),
-              click: () => {
-                const subFoldersAndPaths = enumerateFoldersInFolder(
-                  objectFolderOrObject
-                ).map(folderAndPath => folderAndPath.folder);
-                if (treeViewRef.current)
-                  treeViewRef.current.openItems(
-                    [objectFolderOrObject, ...subFoldersAndPaths].map(folder =>
-                      getTreeViewItemId({
-                        objectFolderOrObject: folder,
-                        global,
-                      })
-                    )
-                  );
-              },
-            },
-          ];
-        }
-
-        const object = objectFolderOrObject.getObject();
-        const instanceCountOnScene = initialInstances
-          ? getInstanceCountInLayoutForObject(
-              initialInstances,
-              object.getName()
+    const expandFolders = React.useCallback(
+      (
+        objectFolderOrObjectWithContexts: Array<ObjectFolderOrObjectWithContext>
+      ) => {
+        if (treeViewRef.current) {
+          treeViewRef.current.openItems(
+            objectFolderOrObjectWithContexts.map(
+              objectFolderOrObjectWithContext =>
+                getObjectFolderTreeViewItemId(
+                  objectFolderOrObjectWithContext.objectFolderOrObject
+                )
             )
-          : undefined;
-        const objectMetadata = gd.MetadataProvider.getObjectMetadata(
-          project.getCurrentPlatform(),
-          object.getType()
-        );
-        return [
-          {
-            label: i18n._(t`Copy`),
-            click: () => copyObjectFolderOrObjectWithContext(item),
-          },
-          {
-            label: i18n._(t`Cut`),
-            click: () => cutObjectFolderOrObjectWithContext(item),
-          },
-          {
-            label: getPasteLabel(i18n, {
-              isGlobalObject: item.global,
-              isFolder: false,
-            }),
-            enabled: Clipboard.has(CLIPBOARD_KIND),
-            click: () => paste(item),
-          },
-          {
-            label: i18n._(t`Duplicate`),
-            click: () => duplicateObjectFolderOrObjectWithContext(item),
-            accelerator: 'CmdOrCtrl+D',
-          },
-          {
-            label: i18n._(t`Rename`),
-            click: () => editName(item),
-            accelerator: 'F2',
-          },
-          {
-            label: i18n._(t`Delete`),
-            click: () => deleteObjectFolderOrObjectWithContext(item),
-            accelerator: 'Backspace',
-          },
-          { type: 'separator' },
-          {
-            label: i18n._(t`Edit object`),
-            click: () => onEditObject(object),
-          },
-          {
-            label: i18n._(t`Edit object variables`),
-            click: () => onEditObject(object, 'variables'),
-          },
-          {
-            label: i18n._(t`Edit behaviors`),
-            click: () => onEditObject(object, 'behaviors'),
-          },
-          {
-            label: i18n._(t`Edit effects`),
-            click: () => onEditObject(object, 'effects'),
-            enabled: objectMetadata.hasDefaultBehavior(
-              'EffectCapability::EffectBehavior'
-            ),
-          },
-          project.hasEventsBasedObject(object.getType())
-            ? {
-                label: i18n._(t`Edit children`),
-                click: () =>
-                  onOpenEventBasedObjectEditor(
-                    gd.PlatformExtension.getExtensionFromFullObjectType(
-                      object.getType()
-                    ),
-                    gd.PlatformExtension.getObjectNameFromFullObjectType(
-                      object.getType()
-                    )
-                  ),
-              }
-            : null,
-          { type: 'separator' },
-          {
-            label: i18n._(t`Swap assets`),
-            click: () => swapObjectAsset({ object, global }),
-            enabled: canSwapAssetOfObject(object),
-          },
-          { type: 'separator' },
-          globalObjectsContainer && {
-            label: i18n._(t`Set as global object`),
-            enabled: !isObjectFolderOrObjectWithContextGlobal(item),
-            click: () => {
-              selectObjectFolderOrObjectWithContext(null);
-              setAsGlobalObject({
-                i18n,
-                objectFolderOrObjectWithContext: item,
-              });
-            },
-            visible: canSetAsGlobalObject !== false,
-          },
-          {
-            label: i18n._('Move to folder'),
-            submenu: folderAndPathsInContainer.map(({ folder, path }) => ({
-              label: path,
-              enabled: folder !== objectFolderOrObject.getParent(),
-              click: () =>
-                moveObjectFolderOrObjectToAnotherFolderInSameContainer(
-                  item,
-                  folder
-                ),
-            })),
-          },
-          { type: 'separator' },
-          {
-            label: i18n._(t`Add instance to the scene`),
-            click: () => onAddObjectInstance(object.getName()),
-          },
-          instanceCountOnScene !== undefined &&
-          onSelectAllInstancesOfObjectInLayout
-            ? {
-                label: i18n._(
-                  t`Select instances on scene (${instanceCountOnScene})`
-                ),
-                click: () =>
-                  onSelectAllInstancesOfObjectInLayout(object.getName()),
-                enabled: instanceCountOnScene > 0,
-              }
-            : undefined,
-        ].filter(Boolean);
+          );
+        }
       },
-      [
+      []
+    );
+
+    const objectTreeViewItemProps = React.useMemo<ObjectTreeViewItemProps>(
+      () => ({
+        project,
         globalObjectsContainer,
         objectsContainer,
-        initialInstances,
-        project,
-        canSetAsGlobalObject,
+        onObjectPasted,
         onSelectAllInstancesOfObjectInLayout,
-        onExportAssets,
-        paste,
         editName,
-        deleteObjectFolderOrObjectWithContext,
-        moveObjectFolderOrObjectToAnotherFolderInSameContainer,
-        forceUpdate,
-        onAddNewObject,
-        addFolder,
-        selectedObjectFolderOrObjectsWithContext,
-        copyObjectFolderOrObjectWithContext,
-        cutObjectFolderOrObjectWithContext,
-        duplicateObjectFolderOrObjectWithContext,
         onEditObject,
-        onOpenEventBasedObjectEditor,
-        swapObjectAsset,
-        selectObjectFolderOrObjectWithContext,
-        setAsGlobalObject,
+        onDeleteObjects,
         onAddObjectInstance,
+        initialInstances,
+        onOpenEventBasedObjectEditor,
+        getValidatedObjectOrGroupName,
+        onRenameObjectFolderOrObjectWithContextFinish,
+        onObjectModified,
+        swapObjectAsset,
+        onMovedObjectFolderOrObjectToAnotherFolderInSameContainer,
+        canSetAsGlobalObject,
+        setAsGlobalObject,
+        getThumbnail,
+        showDeleteConfirmation,
+        selectObjectFolderOrObjectWithContext,
+        forceUpdateList,
+        forceUpdate,
+      }),
+      [
+        project,
+        globalObjectsContainer,
+        objectsContainer,
+        onObjectPasted,
+        onSelectAllInstancesOfObjectInLayout,
+        editName,
+        onEditObject,
+        onDeleteObjects,
+        onAddObjectInstance,
+        initialInstances,
+        onOpenEventBasedObjectEditor,
+        getValidatedObjectOrGroupName,
+        onRenameObjectFolderOrObjectWithContextFinish,
+        onObjectModified,
+        swapObjectAsset,
+        onMovedObjectFolderOrObjectToAnotherFolderInSameContainer,
+        canSetAsGlobalObject,
+        setAsGlobalObject,
+        getThumbnail,
+        showDeleteConfirmation,
+        selectObjectFolderOrObjectWithContext,
+        forceUpdateList,
+        forceUpdate,
       ]
+    );
+
+    const objectFolderTreeViewItemProps = React.useMemo<ObjectFolderTreeViewItemProps>(
+      () => ({
+        project,
+        globalObjectsContainer,
+        objectsContainer,
+        onObjectPasted,
+        onObjectModified,
+        editName,
+        expandFolders,
+        addFolder,
+        onAddNewObject,
+        onMovedObjectFolderOrObjectToAnotherFolderInSameContainer,
+        onRenameObjectFolderOrObjectWithContextFinish,
+        onDeleteObjects,
+        selectObjectFolderOrObjectWithContext,
+        showDeleteConfirmation,
+        forceUpdateList,
+        forceUpdate,
+      }),
+      [
+        project,
+        globalObjectsContainer,
+        objectsContainer,
+        onObjectPasted,
+        onObjectModified,
+        editName,
+        expandFolders,
+        addFolder,
+        onAddNewObject,
+        onMovedObjectFolderOrObjectToAnotherFolderInSameContainer,
+        onRenameObjectFolderOrObjectWithContextFinish,
+        onDeleteObjects,
+        selectObjectFolderOrObjectWithContext,
+        showDeleteConfirmation,
+        forceUpdateList,
+        forceUpdate,
+      ]
+    );
+
+    const globalObjectsRootFolder = globalObjectsContainer
+      ? globalObjectsContainer.getRootFolder()
+      : null;
+    const objectsRootFolder = objectsContainer.getRootFolder();
+    const getTreeViewData = React.useCallback(
+      (i18n: I18nType): Array<TreeViewItem> => {
+        const treeViewItems = [
+          globalObjectsRootFolder &&
+            new ObjectFolderTreeViewItem({
+              objectFolderOrObject: globalObjectsRootFolder,
+              global: true,
+              isRoot: true,
+              content: new LabelTreeViewItemContent(
+                globalObjectsRootFolderId,
+                i18n._(t`Global Objects`)
+              ),
+              placeholder: new PlaceHolderTreeViewItem(
+                globalObjectsEmptyPlaceholderId,
+                (
+                  <Trans>
+                    There is no{' '}
+                    <Link
+                      href={globalObjectsWikiLink}
+                      onClick={() =>
+                        Window.openExternalURL(globalObjectsWikiLink)
+                      }
+                    >
+                      global object
+                    </Link>{' '}
+                    yet.
+                  </Trans>
+                )
+              ),
+              objectTreeViewItemProps,
+              objectFolderTreeViewItemProps,
+            }),
+          new ObjectFolderTreeViewItem({
+            objectFolderOrObject: objectsRootFolder,
+            global: false,
+            isRoot: true,
+            content: new LabelTreeViewItemContent(
+              sceneObjectsRootFolderId,
+              i18n._(t`Scene Objects`),
+              {
+                icon: <Add />,
+                label: t`Add an object`,
+                click: () => {
+                  onAddNewObject(selectedObjectFolderOrObjectsWithContext[0]);
+                },
+                id: 'add-new-object-top-button',
+              },
+              () => [
+                {
+                  label: i18n._(t`Export as assets`),
+                  click: () => onExportAssets(),
+                },
+              ]
+            ),
+            placeholder: new PlaceHolderTreeViewItem(
+              sceneObjectsEmptyPlaceholderId,
+              i18n._(t`Start by adding a new object.`)
+            ),
+            objectTreeViewItemProps,
+            objectFolderTreeViewItemProps,
+          }),
+        ].filter(Boolean);
+        // $FlowFixMe
+        return treeViewItems;
+      },
+      [
+        globalObjectsRootFolder,
+        objectFolderTreeViewItemProps,
+        objectTreeViewItemProps,
+        objectsRootFolder,
+        onAddNewObject,
+        onExportAssets,
+        selectedObjectFolderOrObjectsWithContext,
+      ]
+    );
+
+    const selectedItems = React.useMemo(
+      () => {
+        return selectedObjectFolderOrObjectsWithContext.map(
+          ({ objectFolderOrObject, global }) => {
+            return createTreeViewItem({
+              objectFolderOrObject,
+              isGlobal: global,
+              objectFolderTreeViewItemProps,
+              objectTreeViewItemProps,
+            });
+          }
+        );
+      },
+      [
+        selectedObjectFolderOrObjectsWithContext,
+        objectFolderTreeViewItemProps,
+        objectTreeViewItemProps,
+      ]
+    );
+
+    React.useEffect(
+      () => {
+        if (keyboardShortcutsRef.current) {
+          keyboardShortcutsRef.current.setShortcutCallback('onDelete', () => {
+            deleteItem(selectedItems[0]);
+          });
+          keyboardShortcutsRef.current.setShortcutCallback(
+            'onDuplicate',
+            () => {
+              duplicateItem(selectedItems[0]);
+            }
+          );
+          keyboardShortcutsRef.current.setShortcutCallback('onRename', () => {
+            editName(selectedItems[0].content.getId());
+          });
+        }
+      },
+      [selectedObjectFolderOrObjectsWithContext, editName, selectedItems]
+    );
+
+    const canMoveSelectionTo = React.useCallback(
+      (destinationItem: TreeViewItem) => {
+        if (destinationItem.isRoot) return false;
+        if (destinationItem.isPlaceholder) {
+          if (
+            destinationItem.content.getId() ===
+              globalObjectsEmptyPlaceholderId &&
+            selectedItems.length === 1 &&
+            !selectedItems[0].content.isGlobal()
+          ) {
+            // In that case, the user is drag n dropping a scene object on the
+            // empty placeholder of the global objects section.
+            const objectFolderOrObject = selectedItems[0].content.getObjectFolderOrObject();
+            return !!objectFolderOrObject && !objectFolderOrObject.isFolder();
+          }
+          return false;
+        }
+        // Check if at least one element in the selection can be moved.
+        if (
+          selectedItems.every(
+            selectedItem =>
+              selectedItem.content.isGlobal() ===
+              destinationItem.content.isGlobal()
+          )
+        ) {
+          if (
+            selectedItems[0] &&
+            destinationItem.content.isDescendantOf(selectedItems[0].content)
+          ) {
+            return false;
+          }
+          return true;
+        } else if (
+          selectedItems.length === 1 &&
+          selectedItems.every(
+            selectedObject => selectedObject.content.isGlobal() === false
+          ) &&
+          destinationItem.content.isGlobal()
+        ) {
+          const objectFolderOrObject = selectedItems[0].content.getObjectFolderOrObject();
+          return !!objectFolderOrObject && !objectFolderOrObject.isFolder();
+        }
+
+        return false;
+      },
+      [selectedItems]
+    );
+
+    const moveSelectionTo = React.useCallback(
+      (
+        i18n: I18nType,
+        destinationItem: TreeViewItem,
+        where: 'before' | 'inside' | 'after'
+      ) => {
+        if (destinationItem.isRoot || selectedItems.length !== 1) {
+          return;
+        }
+        const selectedItem = selectedItems[0];
+        const selectedObjectFolderOrObject = selectedItem.content.getObjectFolderOrObject();
+
+        if (
+          !selectedObjectFolderOrObject ||
+          destinationItem.content.getId() === selectedItem.content.getId()
+        ) {
+          return;
+        }
+
+        if (destinationItem.isPlaceholder) {
+          if (
+            destinationItem.content.getId() ===
+              globalObjectsEmptyPlaceholderId &&
+            selectedItems.length === 1 &&
+            !selectedItem.content.isGlobal()
+          ) {
+            setAsGlobalObject({
+              i18n,
+              objectFolderOrObject: selectedObjectFolderOrObject,
+            });
+          }
+          return;
+        }
+
+        const destinationObjectFolderOrObject = destinationItem.content.getObjectFolderOrObject();
+        if (!destinationObjectFolderOrObject) {
+          return;
+        }
+        if (
+          selectedItem.content.isGlobal() === false &&
+          destinationItem.content.isGlobal()
+        ) {
+          let parent, index;
+          if (
+            where === 'inside' &&
+            destinationObjectFolderOrObject.isFolder()
+          ) {
+            parent = destinationObjectFolderOrObject;
+            index = 0;
+          } else {
+            parent = destinationObjectFolderOrObject.getParent();
+            index =
+              destinationItem.content.getIndex() + (where === 'after' ? 1 : 0);
+          }
+          setAsGlobalObject({
+            i18n,
+            objectFolderOrObject: selectedObjectFolderOrObject,
+            folder: parent,
+            index,
+          });
+          return;
+        }
+
+        // At this point, the move is done from within the same container.
+        if (
+          selectedItem.content.isGlobal() === destinationItem.content.isGlobal()
+        ) {
+          let parent;
+          if (
+            where === 'inside' &&
+            destinationObjectFolderOrObject.isFolder()
+          ) {
+            parent = destinationObjectFolderOrObject;
+          } else {
+            parent = destinationObjectFolderOrObject.getParent();
+          }
+          const selectedObjectFolderOrObjectParent = selectedObjectFolderOrObject.getParent();
+          if (parent === selectedObjectFolderOrObjectParent) {
+            const fromIndex = selectedItem.content.getIndex();
+            let toIndex = destinationItem.content.getIndex();
+            if (toIndex > fromIndex) toIndex -= 1;
+            if (where === 'after') toIndex += 1;
+            selectedObjectFolderOrObjectParent.moveChild(fromIndex, toIndex);
+          } else {
+            if (destinationItem.content.isDescendantOf(selectedItem.content)) {
+              return;
+            }
+            const position =
+              where === 'inside'
+                ? 0
+                : destinationItem.content.getIndex() +
+                  (where === 'after' ? 1 : 0);
+            selectedObjectFolderOrObjectParent.moveObjectFolderOrObjectToAnotherFolder(
+              selectedObjectFolderOrObject,
+              parent,
+              position
+            );
+            const treeView = treeViewRef.current;
+            if (treeView) {
+              const closestVisibleParentId = getClosestVisibleParentId({
+                objectFolderOrObject: parent,
+                global: destinationItem.content.isGlobal(),
+              });
+              if (closestVisibleParentId) {
+                treeView.animateItemFromId(closestVisibleParentId);
+              }
+            }
+          }
+        } else {
+          return;
+        }
+        onObjectModified(true);
+      },
+      [onObjectModified, selectedItems, setAsGlobalObject]
+    );
+
+    /**
+     * Unselect item if one of the parent is collapsed (folded) so that the item
+     * does not stay selected and not visible to the user.
+     */
+    const onCollapseItem = React.useCallback(
+      (item: TreeViewItem) => {
+        if (!selectedItems || selectedItems.length !== 1) return;
+        const selectedItem = selectedItems[0];
+        if (!selectedItem) return;
+        if (selectedItem.content.isDescendantOf(item.content)) {
+          selectObjectFolderOrObjectWithContext(null);
+        }
+      },
+      [selectObjectFolderOrObjectWithContext, selectedItems]
     );
 
     // Force List component to be mounted again if project or objectsContainer
@@ -1616,28 +1329,36 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     const arrowKeyNavigationProps = React.useMemo(
       () => ({
-        onGetItemInside: item => {
+        onGetItemInside: (item: TreeViewItem): ?TreeViewItem => {
           if (item.isPlaceholder || item.isRoot) return null;
-          if (!item.objectFolderOrObject.isFolder()) return null;
+          const objectFolderOrObject = item.content.getObjectFolderOrObject();
+          if (!objectFolderOrObject) return null;
+          if (!objectFolderOrObject.isFolder()) return null;
           else {
-            if (item.objectFolderOrObject.getChildrenCount() === 0) return null;
-            return {
-              objectFolderOrObject: item.objectFolderOrObject.getChildAt(0),
-              global: item.global,
-            };
+            if (objectFolderOrObject.getChildrenCount() === 0) return null;
+            return createTreeViewItem({
+              objectFolderOrObject: objectFolderOrObject.getChildAt(0),
+              isGlobal: item.content.isGlobal(),
+              objectFolderTreeViewItemProps,
+              objectTreeViewItemProps,
+            });
           }
         },
-        onGetItemOutside: item => {
+        onGetItemOutside: (item: TreeViewItem): ?TreeViewItem => {
           if (item.isPlaceholder || item.isRoot) return null;
-          const parent = item.objectFolderOrObject.getParent();
+          const objectFolderOrObject = item.content.getObjectFolderOrObject();
+          if (!objectFolderOrObject) return null;
+          const parent = objectFolderOrObject.getParent();
           if (parent.isRootFolder()) return null;
-          return {
+          return createTreeViewItem({
             objectFolderOrObject: parent,
-            global: item.global,
-          };
+            isGlobal: item.content.isGlobal(),
+            objectFolderTreeViewItemProps,
+            objectTreeViewItemProps,
+          });
         },
       }),
-      []
+      [objectFolderTreeViewItemProps, objectTreeViewItemProps]
     );
 
     return (
@@ -1684,24 +1405,32 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                       searchText={searchText}
                       getItemName={getTreeViewItemName}
                       getItemThumbnail={getTreeViewItemThumbnail}
-                      getItemChildren={getTreeViewItemChildren}
+                      getItemChildren={getTreeViewItemChildren(i18n)}
                       multiSelect={false}
                       getItemId={getTreeViewItemId}
                       getItemHtmlId={getTreeViewItemHtmlId}
-                      getItemDataset={getTreeViewItemData}
+                      getItemDataset={getTreeViewItemDataSet}
                       onEditItem={editItem}
                       onCollapseItem={onCollapseItem}
-                      selectedItems={selectedObjectFolderOrObjectsWithContext}
+                      selectedItems={selectedItems}
                       onSelectItems={items => {
-                        if (!items) selectObjectFolderOrObjectWithContext(null);
-                        const itemToSelect = items[0];
-                        if (itemToSelect.isRoot) return;
-                        selectObjectFolderOrObjectWithContext(
-                          itemToSelect || null
-                        );
+                        if (!items) {
+                          selectObjectFolderOrObjectWithContext(null);
+                          return;
+                        }
+                        const itemContentToSelect = items[0].content;
+                        const objectFolderOrObjectToSelect = itemContentToSelect.getObjectFolderOrObject();
+                        if (objectFolderOrObjectToSelect) {
+                          selectObjectFolderOrObjectWithContext({
+                            objectFolderOrObject: objectFolderOrObjectToSelect,
+                            global: itemContentToSelect.isGlobal(),
+                          });
+                        } else {
+                          selectObjectFolderOrObjectWithContext(null);
+                        }
                       }}
-                      onRenameItem={rename}
-                      buildMenuTemplate={renderObjectMenuTemplate(i18n)}
+                      onRenameItem={renameItem}
+                      buildMenuTemplate={buildMenuTemplate(i18n)}
                       onMoveSelectionToItem={(destinationItem, where) =>
                         moveSelectionTo(i18n, destinationItem, where)
                       }
@@ -1710,6 +1439,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                       initiallyOpenedNodeIds={initiallyOpenedNodeIds}
                       arrowKeyNavigationProps={arrowKeyNavigationProps}
                       shouldSelectUponContextMenuOpening
+                      getItemRightButton={getTreeViewItemRightButton(i18n)}
+                      renderRightComponent={renderTreeViewItemRightComponent(
+                        i18n
+                      )}
                     />
                   )}
                 </AutoSizer>
@@ -1773,7 +1506,8 @@ const arePropsEqual = (prevProps: Props, nextProps: Props): boolean =>
   prevProps.selectedObjectFolderOrObjectsWithContext ===
     nextProps.selectedObjectFolderOrObjectsWithContext &&
   prevProps.project === nextProps.project &&
-  prevProps.objectsContainer === nextProps.objectsContainer;
+  prevProps.projectScopedContainersAccessor ===
+    nextProps.projectScopedContainersAccessor;
 
 const MemoizedObjectsList = React.memo<Props, ObjectsListInterface>(
   ObjectsList,

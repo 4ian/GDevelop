@@ -14,6 +14,7 @@ import {
   type TreeItemProps,
   externalLayoutsRootFolderId,
 } from '.';
+import { type HTMLDataset } from '../Utils/HTMLDataset';
 
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
 
@@ -73,7 +74,7 @@ export class ExternalLayoutTreeViewItemContent implements TreeViewItemContent {
     return `external-layout-item-${index}`;
   }
 
-  getDataSet(): { [string]: string } {
+  getDataSet(): ?HTMLDataset {
     return {
       'external-layout': this.externalLayout.getName(),
     };

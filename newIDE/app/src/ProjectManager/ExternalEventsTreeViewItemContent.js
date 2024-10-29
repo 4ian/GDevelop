@@ -14,6 +14,7 @@ import {
   type TreeItemProps,
   externalEventsRootFolderId,
 } from '.';
+import { type HTMLDataset } from '../Utils/HTMLDataset';
 
 const EXTERNAL_EVENTS_CLIPBOARD_KIND = 'External events';
 
@@ -73,7 +74,7 @@ export class ExternalEventsTreeViewItemContent implements TreeViewItemContent {
     return `external-events-item-${index}`;
   }
 
-  getDataSet(): { [string]: string } {
+  getDataSet(): ?HTMLDataset {
     return {
       'external-events': this.externalEvents.getName(),
     };

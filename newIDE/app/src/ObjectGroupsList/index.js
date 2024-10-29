@@ -21,7 +21,6 @@ import {
 import { Column, Line } from '../UI/Grid';
 import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
 import Add from '../UI/CustomSvgIcons/Add';
-import { type EmptyPlaceholder } from '../ObjectsList';
 import TreeView, { type TreeViewInterface } from '../UI/TreeView';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
@@ -41,6 +40,12 @@ const styles = {
     flexDirection: 'column',
   },
 };
+
+type EmptyPlaceholder = {|
+  +label: string,
+  +isPlaceholder: true,
+  +id: string,
+|};
 
 type RootFolder = {|
   +label: string,
@@ -501,6 +506,19 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
       ]
     );
 
+    const getRightButton = React.useCallback(
+      (i18n: I18nType) => (item: TreeViewItem) =>
+        item.id === sceneGroupsRootFolderId
+          ? {
+              icon: <Add />,
+              label: i18n._(t`Add a new group`),
+              click: onCreateGroup,
+              id: 'add-new-group-top-button',
+            }
+          : null,
+      [onCreateGroup]
+    );
+
     const getTreeViewData = React.useCallback(
       (i18n: I18nType): Array<TreeViewItem> => {
         const objectGroupsList: GroupWithContextList = enumerateGroups(
@@ -637,6 +655,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
                         reactDndType={groupWithContextReactDndType}
                         initiallyOpenedNodeIds={initiallyOpenedNodeIds}
                         shouldSelectUponContextMenuOpening
+                        getItemRightButton={getRightButton(i18n)}
                       />
                     )}
                   </AutoSizer>

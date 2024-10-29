@@ -58,10 +58,6 @@ const percentFormatter = value => {
   return value.toFixed(2);
 };
 
-type Props = {|
-  game: Game,
-|};
-
 const CustomTooltip = ({
   payload,
   label,
@@ -170,13 +166,18 @@ export const SessionsChart = ({
   );
 };
 
-export const GameAnalyticsPanel = ({ game }: Props) => {
+type Props = {|
+  game: Game,
+  gameMetrics?: ?(GameMetrics[]),
+|};
+
+export const GameAnalyticsPanel = ({ game, gameMetrics }: Props) => {
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
   );
 
   const [gameRollingMetrics, setGameMetrics] = React.useState<?(GameMetrics[])>(
-    null
+    gameMetrics
   );
   const { yearChartData, monthChartData } = React.useMemo(
     () => buildChartData(gameRollingMetrics),
@@ -221,9 +222,13 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
 
   React.useEffect(
     () => {
+      if (!!gameMetrics) {
+        // Do not load metrics if provided by parent.
+        return;
+      }
       loadGameMetrics();
     },
-    [loadGameMetrics]
+    [loadGameMetrics, gameMetrics]
   );
 
   const gdevelopTheme = React.useContext(GDevelopThemeContext);

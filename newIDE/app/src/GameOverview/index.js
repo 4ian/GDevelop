@@ -34,6 +34,7 @@ import TextButton from '../UI/TextButton';
 import ArrowLeft from '../UI/CustomSvgIcons/ArrowLeft';
 import GameFeedback from '../GameDashboard/Feedbacks/GameFeedback';
 import Builds from '../ExportAndShare/Builds';
+import { GameAnalyticsPanel } from '../GameDashboard/GameAnalyticsPanel';
 
 type Props = {|
   game: Game,
@@ -161,6 +162,11 @@ const GameOverview = ({
                 game={game}
                 authenticatedUser={authenticatedUser}
                 onGameUpdated={onGameUpdated}
+              />
+            ) : currentView === 'analytics' ? (
+              <GameAnalyticsPanel
+                game={game}
+                gameMetrics={gameRollingMetrics}
               />
             ) : (
               <ColumnStackLayout noMargin>

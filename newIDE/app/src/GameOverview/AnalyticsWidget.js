@@ -11,7 +11,7 @@ import { Column, Line } from '../UI/Grid';
 import Text from '../UI/Text';
 import { type Game } from '../Utils/GDevelopServices/Game';
 import UserEarnings from '../GameDashboard/Monetization/UserEarnings';
-import { SessionsChart } from '../GameDashboard/GameAnalyticsPanel';
+import { SessionsChart } from '../GameDashboard/GameAnalyticsCharts';
 import { type GameMetrics } from '../Utils/GDevelopServices/Analytics';
 import { buildLastWeekChartData } from '../GameDashboard/GameAnalyticsEvaluator';
 import RaisedButton from '../UI/RaisedButton';

@@ -123,21 +123,22 @@ export const addSerializedObjectToObjectsContainer = ({
     positionInFolder = positionFolder.getChildPosition(objectFolderOrObject);
   }
 
-  const newObject = global
-    ? globalObjectsContainer.insertNewObjectInFolder(
-        project,
-        objectType,
-        newName,
-        positionFolder,
-        positionInFolder + 1
-      )
-    : objectsContainer.insertNewObjectInFolder(
-        project,
-        objectType,
-        newName,
-        positionFolder,
-        positionInFolder + 1
-      );
+  const newObject =
+    global && globalObjectsContainer
+      ? globalObjectsContainer.insertNewObjectInFolder(
+          project,
+          objectType,
+          newName,
+          positionFolder,
+          positionInFolder + 1
+        )
+      : objectsContainer.insertNewObjectInFolder(
+          project,
+          objectType,
+          newName,
+          positionFolder,
+          positionInFolder + 1
+        );
 
   unserializeFromJSObject(
     newObject,

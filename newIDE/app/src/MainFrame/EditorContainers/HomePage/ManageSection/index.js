@@ -9,7 +9,7 @@ import GamesList from '../../../../GameDashboard/GamesList';
 import { type Game } from '../../../../Utils/GDevelopServices/Game';
 import PlaceholderError from '../../../../UI/PlaceholderError';
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
-import { Column, LargeSpacer, Line } from '../../../../UI/Grid';
+import { Column, Line } from '../../../../UI/Grid';
 import Paper from '../../../../UI/Paper';
 import BackgroundText from '../../../../UI/BackgroundText';
 import {
@@ -21,12 +21,8 @@ import FlatButton from '../../../../UI/FlatButton';
 import Link from '../../../../UI/Link';
 import Window from '../../../../Utils/Window';
 import { getHelpLink } from '../../../../Utils/HelpLink';
-import GameDetails, {
-  getGameDetailsTabs,
-  type GameDetailsTab,
-} from '../../../../GameDashboard/GameDetails';
-import { Tabs } from '../../../../UI/Tabs';
-import Text from '../../../../UI/Text';
+import { type GameDetailsTab } from '../../../../GameDashboard/GameDetails';
+import GameOverview from '../../../../GameOverview';
 
 const publishingWikiArticle = getHelpLink('/publishing/');
 
@@ -95,39 +91,14 @@ const ManageSection = ({
 
   if (openedGame) {
     return (
-      <SectionContainer flexBody backAction={onBack}>
-        <Text size="title" allowSelection>
-          {openedGame.gameName}
-        </Text>
-        <LargeSpacer />
-        <SectionRow expand>
-          <Paper
-            background="dark"
-            square={false}
-            style={styles.gameDetailsContainer}
-          >
-            <ColumnStackLayout noMargin expand noOverflowParent>
-              <Tabs
-                value={currentTab}
-                onChange={setCurrentTab}
-                options={getGameDetailsTabs(authenticatedUser.limits)}
-              />
-              <GameDetails
-                game={openedGame}
-                project={project}
-                onGameUpdated={onGameUpdated}
-                onGameDeleted={() => {
-                  onBack();
-                  onRefreshGames();
-                }}
-                onLoading={() => {}}
-                currentTab={currentTab}
-                setCurrentTab={setCurrentTab}
-                analyticsSource="homepage"
-              />
-            </ColumnStackLayout>
-          </Paper>
-        </SectionRow>
+      <SectionContainer flexBody>
+        <GameOverview
+          currentView={currentTab}
+          setCurrentView={setCurrentTab}
+          game={openedGame}
+          analyticsSource="homepage"
+          onBack={onBack}
+        />
       </SectionContainer>
     );
   }

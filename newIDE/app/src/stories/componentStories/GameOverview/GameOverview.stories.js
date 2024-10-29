@@ -1,6 +1,9 @@
 // @flow
 
 import * as React from 'react';
+import { random } from 'lodash';
+import MockAdapter from 'axios-mock-adapter';
+import { action } from '@storybook/addon-actions';
 
 import paperDecorator from '../../PaperDecorator';
 
@@ -23,9 +26,8 @@ import { client as buildApiAxiosClient } from '../../../Utils/GDevelopServices/B
 import { client as analyticsApiAxiosClient } from '../../../Utils/GDevelopServices/Analytics';
 import { apiClient as usageApiAxiosClient } from '../../../Utils/GDevelopServices/Usage';
 
-import MockAdapter from 'axios-mock-adapter';
+import type { GameDetailsTab } from '../../../GameDashboard/GameDetails';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
-import { random } from 'lodash';
 
 export default {
   title: 'GameDashboard/GameOverview',
@@ -117,6 +119,7 @@ export const Default = ({
   sessions: 'None' | 'Some in the last week',
   userBalance: 'None' | 'Some',
 |}) => {
+  const [tab, setTab] = React.useState<GameDetailsTab>('details');
   const [renderCount, setRenderCount] = React.useState<number>(0);
   const feedbacksToDisplay =
     feedbacks === 'None'
@@ -200,6 +203,9 @@ export const Default = ({
         game={game1}
         analyticsSource="homepage"
         key={renderCount.toFixed(0)}
+        currentView={tab}
+        setCurrentView={setTab}
+        onBack={() => action('Back')}
       />
     </AuthenticatedUserContext.Provider>
   );

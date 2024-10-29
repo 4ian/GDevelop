@@ -94,7 +94,6 @@ export default class LocalPreviewLauncher extends React.Component<
 
     ipcRenderer.removeAllListeners('preview-window-closed');
     ipcRenderer.on('preview-window-closed', async event => {
-      console.log('Closing preview window');
       if (captureOptions) {
         const { screenshots } = captureOptions;
         if (!screenshots) return;

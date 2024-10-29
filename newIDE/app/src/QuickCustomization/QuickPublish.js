@@ -196,6 +196,8 @@ export const QuickPublish = ({
             previewScreenshotUrls={gameScreenshotUrls}
             game={game}
             onLaunchPreview={onLaunchPreview}
+            // Prevent the user from launching the preview while or after exporting
+            disabled={exportState !== ''}
           />
         </div>
         <Spacer />

@@ -10,6 +10,7 @@ import { Trans } from '@lingui/macro';
 import RaisedButton from '../UI/RaisedButton';
 import PreviewIcon from '../UI/CustomSvgIcons/Preview';
 import Text from '../UI/Text';
+import EmptyMessage from '../UI/EmptyMessage';
 
 const styles = {
   thumbnail: {
@@ -32,6 +33,7 @@ type Props = {|
   game: ?Game,
   previewScreenshotUrls: Array<string>,
   onLaunchPreview: () => Promise<void>,
+  disabled?: boolean,
 |};
 
 const GameImage = ({
@@ -39,6 +41,7 @@ const GameImage = ({
   game,
   previewScreenshotUrls,
   onLaunchPreview,
+  disabled,
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
 
@@ -76,7 +79,7 @@ const GameImage = ({
               ...(isMobile ? styles.fullWidth : styles.thumbnail),
             }}
           />
-        ) : (
+        ) : !disabled ? (
           <ColumnStackLayout
             noMargin
             expand
@@ -94,6 +97,13 @@ const GameImage = ({
               icon={<PreviewIcon />}
             />
           </ColumnStackLayout>
+        ) : (
+          <EmptyMessage>
+            <Trans>
+              No thumbnail for your game, you can update it in your Game
+              Dashboard!
+            </Trans>
+          </EmptyMessage>
         )}
       </Paper>
     </Column>

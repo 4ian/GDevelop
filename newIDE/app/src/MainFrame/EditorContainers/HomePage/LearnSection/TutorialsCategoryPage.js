@@ -63,8 +63,11 @@ export const EducationCurriculum = ({
             );
           }
           items.push(
-            <div style={styles.sectionTitleContainer}>
-              <Text size="section-title" noMargin key={`section-${section}`}>
+            <div
+              style={styles.sectionTitleContainer}
+              key={`section-${section}`}
+            >
+              <Text size="section-title" noMargin>
                 {section}
               </Text>
             </div>

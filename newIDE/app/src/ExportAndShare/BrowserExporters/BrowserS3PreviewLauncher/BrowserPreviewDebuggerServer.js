@@ -115,7 +115,9 @@ export const browserPreviewDebuggerServer: PreviewDebuggerServer = {
   },
 };
 
-export const registerNewPreviewWindow = (previewWindow: WindowProxy) => {
+export const registerNewPreviewWindow = (
+  previewWindow: WindowProxy
+): DebuggerId => {
   // Associate this window with a new debugger id.
   const id = nextDebuggerId++;
   existingPreviewWindows[id] = previewWindow;
@@ -129,6 +131,8 @@ export const registerNewPreviewWindow = (previewWindow: WindowProxy) => {
       debuggerIds: getExistingDebuggerIds(),
     })
   );
+
+  return id;
 };
 
 export const getExistingPreviewWindowForDebuggerId = (

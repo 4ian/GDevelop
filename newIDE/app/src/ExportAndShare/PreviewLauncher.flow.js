@@ -49,21 +49,24 @@ export type DebuggerId = number;
 
 /** The callbacks for a debugger server used for previews. */
 export type PreviewDebuggerServerCallbacks = {|
-  onErrorReceived: (err: Error) => void,
-  onServerStateChanged: () => void,
+  onErrorReceived: (err: Error) => void | Promise<void>,
+  onServerStateChanged: () => void | Promise<void>,
   onConnectionClosed: ({|
     id: DebuggerId,
     debuggerIds: Array<DebuggerId>,
-  |}) => void,
+  |}) => void | Promise<void>,
   onConnectionOpened: ({|
     id: DebuggerId,
     debuggerIds: Array<DebuggerId>,
-  |}) => void,
+  |}) => void | Promise<void>,
   onConnectionErrored: ({|
     id: DebuggerId,
     errorMessage: string,
-  |}) => void,
-  onHandleParsedMessage: ({| id: DebuggerId, parsedMessage: Object |}) => void,
+  |}) => void | Promise<void>,
+  onHandleParsedMessage: ({|
+    id: DebuggerId,
+    parsedMessage: Object,
+  |}) => void | Promise<void>,
 |};
 
 /** The address to be used to communicate with the debugger server using WebSockets. */

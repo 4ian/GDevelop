@@ -121,7 +121,7 @@ export const SessionsChart = ({
   };
 
   return (
-    <ResponsiveContainer width={chartWidth} height={height}>
+    <ResponsiveContainer width={chartWidth} height={height} debounce={1}>
       <AreaChart data={chartData.overTime} margin={chartMargins}>
         <Area
           name={i18n._(t`Viewers`)}
@@ -302,7 +302,11 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                     rate
                   </Trans>
                 </Text>
-                <ResponsiveContainer width={chartWidth} height={chartHeight}>
+                <ResponsiveContainer
+                  width={chartWidth}
+                  height={chartHeight}
+                  debounce={1}
+                >
                   <LineChart data={chartData.overTime} margin={chartMargins}>
                     <RechartsLine
                       name={i18n._(t`Bounce rate`)}
@@ -348,7 +352,11 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                     minutes per player
                   </Trans>
                 </Text>
-                <ResponsiveContainer width={chartWidth} height={chartHeight}>
+                <ResponsiveContainer
+                  width={chartWidth}
+                  height={chartHeight}
+                  debounce={1}
+                >
                   <LineChart data={chartData.overTime} margin={chartMargins}>
                     <RechartsLine
                       name={i18n._(t`Mean played time`)}
@@ -400,7 +408,11 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                     minutes
                   </Trans>
                 </Text>
-                <ResponsiveContainer width={chartWidth} height={chartHeight}>
+                <ResponsiveContainer
+                  width={chartWidth}
+                  height={chartHeight}
+                  debounce={1}
+                >
                   <AreaChart
                     data={chartData.overPlayedDuration}
                     margin={chartMargins}
@@ -460,7 +472,11 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                     minutes
                   </Trans>
                 </Text>
-                <ResponsiveContainer width={chartWidth} height={chartHeight}>
+                <ResponsiveContainer
+                  width={chartWidth}
+                  height={chartHeight}
+                  debounce={1}
+                >
                   <AreaChart data={chartData.overTime} margin={chartMargins}>
                     <Area
                       name={i18n._(t`Players`)}

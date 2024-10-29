@@ -3231,9 +3231,9 @@ module.exports = {
               : this._originalDepth / modelDepth;
           const minScaleRatio = Math.min(widthRatio, heightRatio, depthRatio);
           if (!Number.isFinite(minScaleRatio)) {
-            this._defaultWidth = modelWidth;
-            this._defaultHeight = modelHeight;
-            this._defaultDepth = modelDepth;
+            this._defaultWidth = this._originalWidth;
+            this._defaultHeight = this._originalHeight;
+            this._defaultDepth = this._originalDepth;
           } else {
             if (widthRatio === minScaleRatio) {
               this._defaultWidth = this._originalWidth;
@@ -3274,6 +3274,10 @@ module.exports = {
               this._defaultDepth = this._originalDepth;
             }
           }
+        } else {
+          this._defaultWidth = this._originalWidth;
+          this._defaultHeight = this._originalHeight;
+          this._defaultDepth = this._originalDepth;
         }
 
         this._threeObject.add(this._threeModelGroup);

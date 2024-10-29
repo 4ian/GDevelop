@@ -33,8 +33,6 @@ import {
   type ObjectFolderOrObjectWithContext,
 } from './EnumerateObjectFolderOrObject';
 import { mapFor } from '../Utils/MapFor';
-import IconButton from '../UI/IconButton';
-import AddFolder from '../UI/CustomSvgIcons/AddFolder';
 import { LineStackLayout } from '../UI/Layout';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import Link from '../UI/Link';
@@ -51,6 +49,7 @@ import {
 import {
   ObjectFolderTreeViewItemContent,
   getObjectFolderTreeViewItemId,
+  expandAllSubfolders,
   type ObjectFolderTreeViewItemProps,
 } from './ObjectFolderTreeViewItemContent';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
@@ -240,7 +239,7 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
   constructor(
     id: string,
     label: string | React.Node,
-    rightButton?: MenuButton,
+    rightButton?: MenuButton | null,
     buildMenuTemplateFunction?: () => Array<MenuItemTemplate>
   ) {
     this.id = id;
@@ -250,7 +249,7 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
         rightButton
           ? {
               id: rightButton.id,
-              label: rightButton.label,
+              label: i18n._(rightButton.label),
               click: rightButton.click,
             }
           : null,
@@ -847,7 +846,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             const parentFolder = selectedObjectFolderOrObject.getParent();
             const newFolder = parentFolder.insertNewFolder(
               'NewFolder',
-              parentFolder.getChildPosition(selectedObjectFolderOrObject)
+              parentFolder.getChildPosition(selectedObjectFolderOrObject) + 1
             );
             newObjectFolderOrObjectWithContext = {
               objectFolderOrObject: newFolder,
@@ -1030,7 +1029,30 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               isRoot: true,
               content: new LabelTreeViewItemContent(
                 globalObjectsRootFolderId,
-                i18n._(t`Global Objects`)
+                i18n._(t`Global Objects`),
+                null,
+                () => [
+                  {
+                    label: i18n._(t`Add a folder`),
+                    click: () =>
+                      addFolder([
+                        {
+                          objectFolderOrObject: globalObjectsRootFolder,
+                          global: true,
+                        },
+                      ]),
+                  },
+                  { type: 'separator' },
+                  {
+                    label: i18n._(t`Expand all sub folders`),
+                    click: () =>
+                      expandAllSubfolders(
+                        globalObjectsRootFolder,
+                        true,
+                        expandFolders
+                      ),
+                  },
+                ]
               ),
               placeholder: new PlaceHolderTreeViewItem(
                 globalObjectsEmptyPlaceholderId,
@@ -1069,6 +1091,27 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               },
               () => [
                 {
+                  label: i18n._(t`Add a folder`),
+                  click: () =>
+                    addFolder([
+                      {
+                        objectFolderOrObject: objectsRootFolder,
+                        global: false,
+                      },
+                    ]),
+                },
+                { type: 'separator' },
+                {
+                  label: i18n._(t`Expand all sub folders`),
+                  click: () =>
+                    expandAllSubfolders(
+                      objectsRootFolder,
+                      false,
+                      expandFolders
+                    ),
+                },
+                { type: 'separator' },
+                {
                   label: i18n._(t`Export as assets`),
                   click: () => onExportAssets(),
                 },
@@ -1086,6 +1129,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         return treeViewItems;
       },
       [
+        addFolder,
+        expandFolders,
         globalObjectsRootFolder,
         objectFolderTreeViewItemProps,
         objectTreeViewItemProps,
@@ -1363,28 +1408,16 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     return (
       <Background maxWidth>
-        <Column>
-          <LineStackLayout>
-            <Column expand noMargin>
-              <SearchBar
-                value={searchText}
-                onRequestSearch={() => {}}
-                onChange={text => setSearchText(text)}
-                placeholder={t`Search objects`}
-              />
-            </Column>
-            <Column noMargin>
-              <IconButton
-                size="small"
-                onClick={() =>
-                  addFolder(selectedObjectFolderOrObjectsWithContext)
-                }
-              >
-                <AddFolder />
-              </IconButton>
-            </Column>
-          </LineStackLayout>
-        </Column>
+        <LineStackLayout>
+          <Column expand noMargin>
+            <SearchBar
+              value={searchText}
+              onRequestSearch={() => {}}
+              onChange={text => setSearchText(text)}
+              placeholder={t`Search objects`}
+            />
+          </Column>
+        </LineStackLayout>
         <div
           style={styles.listContainer}
           onKeyDown={keyboardShortcutsRef.current.onKeyDown}

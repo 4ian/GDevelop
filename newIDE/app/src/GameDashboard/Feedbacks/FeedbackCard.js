@@ -33,10 +33,20 @@ import Dislike from '../../UI/CustomSvgIcons/Dislike';
 import Like from '../../UI/CustomSvgIcons/Like';
 import Danger from '../../UI/CustomSvgIcons/Danger';
 import Heart from '../../UI/CustomSvgIcons/Heart';
+import Paper from '../../UI/Paper';
 
 const styles = {
   textComment: { whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' },
   backgroundText: { padding: 0, textAlign: 'left' },
+  readIcon: { fontSize: 32, display: 'flex', alignItems: 'center' },
+  rateIcon: { fontSize: 20, display: 'flex', alignItems: 'center' },
+  rateIconsContainer: {
+    borderRadius: 16,
+    padding: '2px 4px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 2,
+  },
 };
 
 type BuildProperties = {
@@ -159,73 +169,94 @@ const FeedbackCard = ({
           <Card
             disabled={processed}
             cardCornerAction={
-              <LineStackLayout noMargin>
+              <LineStackLayout noMargin alignItems="center">
                 {canRateComment && (
-                  <LineStackLayout noMargin>
+                  <Paper
+                    variant="outlined"
+                    background="medium"
+                    style={styles.rateIconsContainer}
+                  >
                     <IconButton
                       size="small"
                       tooltip={t`Rank this comment as great`}
                       onClick={() => setOwnerQualityRating('great', i18n)}
                     >
-                      <Heart
-                        htmlColor={
-                          ownerQualityRating === 'great'
-                            ? theme.message.valid
-                            : undefined
-                        }
-                      />
+                      <div style={styles.rateIcon}>
+                        <Heart
+                          htmlColor={
+                            ownerQualityRating === 'great'
+                              ? theme.message.valid
+                              : undefined
+                          }
+                          fontSize="inherit"
+                        />
+                      </div>
                     </IconButton>
                     <IconButton
                       size="small"
                       tooltip={t`Rank this comment as good`}
                       onClick={() => setOwnerQualityRating('good', i18n)}
                     >
-                      <Like
-                        htmlColor={
-                          ownerQualityRating === 'good'
-                            ? theme.message.valid
-                            : undefined
-                        }
-                      />
+                      <div style={styles.rateIcon}>
+                        <Like
+                          htmlColor={
+                            ownerQualityRating === 'good'
+                              ? theme.message.valid
+                              : undefined
+                          }
+                          fontSize="inherit"
+                        />
+                      </div>
                     </IconButton>
                     <IconButton
                       size="small"
                       tooltip={t`Rank this comment as bad`}
                       onClick={() => setOwnerQualityRating('bad', i18n)}
                     >
-                      <Dislike
-                        htmlColor={
-                          ownerQualityRating === 'bad'
-                            ? theme.message.warning
-                            : undefined
-                        }
-                      />
+                      <div style={styles.rateIcon}>
+                        <Dislike
+                          htmlColor={
+                            ownerQualityRating === 'bad'
+                              ? theme.message.warning
+                              : undefined
+                          }
+                          fontSize="inherit"
+                        />
+                      </div>
                     </IconButton>
                     <IconButton
                       size="small"
                       tooltip={t`Report this comment as abusive, harmful or spam`}
                       onClick={() => setOwnerQualityRating('harmful', i18n)}
                     >
-                      <Danger
-                        htmlColor={
-                          ownerQualityRating === 'harmful'
-                            ? theme.message.error
-                            : undefined
-                        }
-                      />
+                      <div style={styles.rateIcon}>
+                        <Danger
+                          htmlColor={
+                            ownerQualityRating === 'harmful'
+                              ? theme.message.error
+                              : undefined
+                          }
+                          fontSize="inherit"
+                        />
+                      </div>
                     </IconButton>
-                  </LineStackLayout>
+                  </Paper>
                 )}
                 <IconButton
                   size="small"
                   tooltip={processed ? t`Mark as unread` : t`Mark as read`}
                   onClick={() => setProcessed(!processed, i18n)}
                 >
-                  {processed ? (
-                    <CheckCircleFilled htmlColor={theme.message.valid} />
-                  ) : (
-                    <CheckCircle />
-                  )}
+                  <div style={styles.readIcon}>
+                    {processed ? (
+                      <CheckCircleFilled
+                        htmlColor={theme.message.valid}
+                        fontSize="inherit"
+                      />
+                    ) : (
+                      <CheckCircle fontSize="inherit" />
+                    )}
+                  </div>
                 </IconButton>
               </LineStackLayout>
             }

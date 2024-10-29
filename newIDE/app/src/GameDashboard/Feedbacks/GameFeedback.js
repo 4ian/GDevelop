@@ -415,9 +415,13 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
                             <Text size="block-title">
                               {title}
                               {title ? ' - ' : ' '}
-                              <Trans>
-                                {displayedFeedbacks[key].length} feedback cards
-                              </Trans>
+                              {displayedFeedbacks[key].length === 1 ? (
+                                <Trans>1 review</Trans>
+                              ) : (
+                                <Trans>
+                                  {displayedFeedbacks[key].length} reviews
+                                </Trans>
+                              )}
                             </Text>
                           </Column>
                           {index === 0 && (

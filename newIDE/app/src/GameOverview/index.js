@@ -33,7 +33,7 @@ type Props = {|
   analyticsSource: 'profile' | 'homepage' | 'projectManager',
 |};
 
-const GameDashboardV2 = ({ game }: Props) => {
+const GameOverview = ({ game }: Props) => {
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
   );
@@ -156,4 +156,4 @@ const GameDashboardV2 = ({ game }: Props) => {
   );
 };
 
-export default GameDashboardV2;
+export default GameOverview;

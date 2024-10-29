@@ -4,7 +4,7 @@ import * as React from 'react';
 
 import paperDecorator from '../../PaperDecorator';
 
-import GameDashboardV2 from '../../../GameDashboardV2';
+import GameOverview from '../../../GameOverview';
 
 import {
   game1,
@@ -28,8 +28,8 @@ import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext'
 import { random } from 'lodash';
 
 export default {
-  title: 'GameDashboard/GameDashboardV2',
-  component: GameDashboardV2,
+  title: 'GameDashboard/GameOverview',
+  component: GameOverview,
   decorators: [paperDecorator],
   argTypes: {
     analyticsSource: { control: { type: false } }, // Hide default control.
@@ -196,7 +196,7 @@ export const Default = ({
 
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
-      <GameDashboardV2
+      <GameOverview
         game={game1}
         analyticsSource="homepage"
         key={renderCount.toFixed(0)}

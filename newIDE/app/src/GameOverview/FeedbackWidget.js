@@ -149,7 +149,7 @@ const FeedbackWidget = ({ onSeeAll, feedbacks, game }: Props) => {
                   more people to start collecting player feedback.
                 </Trans>
               </Text>
-              <GameLinkAndShareIcons url={gameUrl} forceMobileLayout />
+              <GameLinkAndShareIcons url={gameUrl} display="column" />
             </ColumnStackLayout>
           ) : null}
         </DashboardWidget>

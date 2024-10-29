@@ -124,7 +124,7 @@ const GameHeader = ({ game }: Props) => {
               {renderThumbnail()}
               {renderPublicInfo()}
             </LineStackLayout>
-            {gameUrl && <GameLinkAndShareIcons url={gameUrl} />}
+            {gameUrl && <GameLinkAndShareIcons url={gameUrl} display="line" />}
             {renderButtons()}
           </ColumnStackLayout>
         )}
@@ -147,7 +147,7 @@ const GameHeader = ({ game }: Props) => {
               {renderButtons()}
             </LineStackLayout>
             {renderPublicInfo()}
-            {gameUrl && <GameLinkAndShareIcons url={gameUrl} />}
+            {gameUrl && <GameLinkAndShareIcons url={gameUrl} display="line" />}
           </ColumnStackLayout>
         </LineStackLayout>
       )}

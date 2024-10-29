@@ -11,7 +11,6 @@ import IconButton from '../UI/IconButton';
 import { copyTextToClipboard } from '../Utils/Clipboard';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
 import SocialShareButtons from '../UI/ShareDialog/SocialShareButtons';
-import { Column } from '../UI/Grid';
 
 const styles = {
   linkContainer: {
@@ -27,19 +26,28 @@ const styles = {
   },
 };
 
+const ColumnContainer = ({ children }: {| children: React.Node |}) => (
+  <div>{children}</div>
+);
+const LineContainer = ({ children }: {| children: React.Node |}) => (
+  <LineStackLayout
+    noMargin
+    justifyContent="space-between"
+    alignItems={'center'}
+  >
+    {children}
+  </LineStackLayout>
+);
+
 type Props = {|
   url: string,
-  forceMobileLayout?: boolean,
+  display: 'column' | 'line',
 |};
 
-const GameLinkAndShareIcons = ({ url, forceMobileLayout }: Props) => {
-  const Layout = forceMobileLayout ? Column : LineStackLayout;
+const GameLinkAndShareIcons = ({ url, display }: Props) => {
+  const Layout = display === 'column' ? ColumnContainer : LineContainer;
   return (
-    <Layout
-      noMargin
-      justifyContent="space-between"
-      alignItems={forceMobileLayout ? 'flex-start' : 'center'}
-    >
+    <Layout>
       <Paper style={styles.linkContainer} background="light">
         <LineStackLayout alignItems="center">
           <Text noMargin style={textEllipsisStyle}>

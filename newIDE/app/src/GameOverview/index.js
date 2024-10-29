@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import Grid from '@material-ui/core/Grid';
+import { I18n } from '@lingui/react';
 import { type Game } from '../Utils/GDevelopServices/Game';
 import { ColumnStackLayout } from '../UI/Layout';
 import GameHeader from './GameHeader';
@@ -31,6 +32,7 @@ import type { GameDetailsTab } from '../GameDashboard/GameDetails';
 import { Column, Line } from '../UI/Grid';
 import TextButton from '../UI/TextButton';
 import ArrowLeft from '../UI/CustomSvgIcons/ArrowLeft';
+import GameFeedback from '../GameDashboard/Feedbacks/GameFeedback';
 
 type Props = {|
   game: Game,
@@ -45,9 +47,8 @@ const GameOverview = ({ game, currentView, setCurrentView, onBack }: Props) => {
     gameDetailsDialogOpen,
     setGameDetailsDialogOpen,
   ] = React.useState<boolean>(false);
-  const { getAuthorizationHeader, profile } = React.useContext(
-    AuthenticatedUserContext
-  );
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const { getAuthorizationHeader, profile } = authenticatedUser;
   const [feedbacks, setFeedbacks] = React.useState<?Array<Comment>>(null);
   const [builds, setBuilds] = React.useState<?Array<Build>>(null);
   const [gameRollingMetrics, setGameMetrics] = React.useState<?(GameMetrics[])>(
@@ -124,78 +125,90 @@ const GameOverview = ({ game, currentView, setCurrentView, onBack }: Props) => {
   );
 
   return (
-    <>
-      <Column noMargin>
-        <Line>
-          <TextButton
-            onClick={onClickBack}
-            icon={<ArrowLeft fontSize="small" />}
-            label={
-              currentView === 'details' ? (
-                <Trans>Back</Trans>
-              ) : (
-                <Trans>Back to {game.gameName}</Trans>
-              )
-            }
-          />
-        </Line>
-        <ColumnStackLayout noMargin>
-          <GameHeader
-            game={game}
-            onEditGame={() => setGameDetailsDialogOpen(true)}
-          />
-          <Grid container spacing={2}>
-            <AnalyticsWidget
-              onSeeAll={() => setCurrentView('analytics')}
-              gameMetrics={gameRollingMetrics}
-              game={game}
-            />
-            <FeedbackWidget
-              onSeeAll={() => setCurrentView('feedback')}
-              feedbacks={feedbacks}
-              game={game}
-            />
-            <ServicesWidget
-              onSeeAllLeaderboards={() => setCurrentView('leaderboards')}
-              leaderboards={leaderboards}
-              lobbyConfiguration={lobbyConfiguration}
-            />
-            <DashboardWidget
-              gridSize={3}
-              title={<Trans>Exports</Trans>}
-              seeMoreButton={
-                <FlatButton
-                  label={<Trans>See all</Trans>}
-                  rightIcon={<ArrowRight fontSize="small" />}
-                  onClick={() => setCurrentView('builds')}
-                  primary
+    <I18n>
+      {({ i18n }) => (
+        <>
+          <Column noMargin>
+            <Line>
+              <TextButton
+                onClick={onClickBack}
+                icon={<ArrowLeft fontSize="small" />}
+                label={
+                  currentView === 'details' ? (
+                    <Trans>Back</Trans>
+                  ) : (
+                    <Trans>Back to {game.gameName}</Trans>
+                  )
+                }
+              />
+            </Line>
+            {currentView === 'feedback' ? (
+              <GameFeedback
+                authenticatedUser={authenticatedUser}
+                game={game}
+                i18n={i18n}
+              />
+            ) : (
+              <ColumnStackLayout noMargin>
+                <GameHeader
+                  game={game}
+                  onEditGame={() => setGameDetailsDialogOpen(true)}
                 />
-              }
-              renderSubtitle={
-                !builds
-                  ? null
-                  : () => (
-                      <Text color="secondary" size="body-small" noMargin>
-                        {builds.length <
-                        // Hardcoded value in the back.
-                        // TODO: replace with pagination.
-                        100 ? (
-                          <Trans>{builds.length} exports created</Trans>
-                        ) : (
-                          <Trans>100+ exports created</Trans>
-                        )}
-                      </Text>
-                    )
-              }
-            />
-          </Grid>
-        </ColumnStackLayout>
-      </Column>
-      {/* TODO: To do once the thumbnail logic is done. */}
-      {/* {gameDetailsDialogOpen && (
-        <div>Bonjour</div>
-      )} */}
-    </>
+                <Grid container spacing={2}>
+                  <AnalyticsWidget
+                    onSeeAll={() => setCurrentView('analytics')}
+                    gameMetrics={gameRollingMetrics}
+                    game={game}
+                  />
+                  <FeedbackWidget
+                    onSeeAll={() => setCurrentView('feedback')}
+                    feedbacks={feedbacks}
+                    game={game}
+                  />
+                  <ServicesWidget
+                    onSeeAllLeaderboards={() => setCurrentView('leaderboards')}
+                    leaderboards={leaderboards}
+                    lobbyConfiguration={lobbyConfiguration}
+                  />
+                  <DashboardWidget
+                    gridSize={3}
+                    title={<Trans>Exports</Trans>}
+                    seeMoreButton={
+                      <FlatButton
+                        label={<Trans>See all</Trans>}
+                        rightIcon={<ArrowRight fontSize="small" />}
+                        onClick={() => setCurrentView('builds')}
+                        primary
+                      />
+                    }
+                    renderSubtitle={
+                      !builds
+                        ? null
+                        : () => (
+                            <Text color="secondary" size="body-small" noMargin>
+                              {builds.length <
+                              // Hardcoded value in the back.
+                              // TODO: replace with pagination.
+                              100 ? (
+                                <Trans>{builds.length} exports created</Trans>
+                              ) : (
+                                <Trans>100+ exports created</Trans>
+                              )}
+                            </Text>
+                          )
+                    }
+                  />
+                </Grid>
+              </ColumnStackLayout>
+            )}
+          </Column>
+          {/* TODO: To do once the thumbnail logic is done. */}
+          {/* {gameDetailsDialogOpen && (
+            <div>Bonjour</div>
+          )} */}
+        </>
+      )}
+    </I18n>
   );
 };
 

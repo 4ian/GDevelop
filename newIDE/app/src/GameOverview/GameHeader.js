@@ -97,6 +97,7 @@ const GameHeader = ({ game, onEditGame }: Props) => {
   const renderThumbnail = () => (
     <GameThumbnail
       gameName={game.gameName}
+      gameId={game.id}
       thumbnailUrl={game.thumbnailUrl}
       background="medium"
     />

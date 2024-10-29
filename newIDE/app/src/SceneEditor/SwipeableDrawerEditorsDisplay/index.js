@@ -310,6 +310,8 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                       projectScopedContainersAccessor={
                         projectScopedContainersAccessor
                       }
+                      globalObjectsContainer={globalObjectsContainer}
+                      objectsContainer={objectsContainer}
                       layout={layout}
                       eventsBasedObject={eventsBasedObject}
                       initialInstances={initialInstances}

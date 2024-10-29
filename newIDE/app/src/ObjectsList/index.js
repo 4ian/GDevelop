@@ -395,6 +395,8 @@ type Props = {|
   eventsBasedObject: gdEventsBasedObject | null,
   initialInstances?: gdInitialInstancesContainer,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
+  globalObjectsContainer: gdObjectsContainer | null,
+  objectsContainer: gdObjectsContainer,
   onSelectAllInstancesOfObjectInLayout?: string => void,
   resourceManagementProps: ResourceManagementProps,
   onDeleteObjects: (
@@ -442,6 +444,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       eventsBasedObject,
       initialInstances,
       projectScopedContainersAccessor,
+      globalObjectsContainer,
+      objectsContainer,
       resourceManagementProps,
       onSelectAllInstancesOfObjectInLayout,
       onDeleteObjects,
@@ -467,25 +471,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     }: Props,
     ref
   ) => {
-    // TODO Handle any number of object containers.
-    const objectsContainersList = projectScopedContainersAccessor
-      .get()
-      .getObjectsContainersList();
-
-    if (objectsContainersList.getObjectsContainersCount() === 0) {
-      throw new Error('Used ObjectsList without any object container.');
-    }
-    if (objectsContainersList.getObjectsContainersCount() > 2) {
-      console.error('Used ObjectsList with more than 2 object containers.');
-    }
-    const globalObjectsContainer =
-      objectsContainersList.getObjectsContainersCount() > 1
-        ? objectsContainersList.getObjectsContainer(0)
-        : null;
-    const objectsContainer = objectsContainersList.getObjectsContainer(
-      objectsContainersList.getObjectsContainersCount() - 1
-    );
-
     const { currentlyRunningInAppTutorial } = React.useContext(
       InAppTutorialContext
     );

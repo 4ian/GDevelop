@@ -3,7 +3,10 @@ import { t, Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
-import { type Game } from '../../../Utils/GDevelopServices/Game';
+import {
+  getGameMainImageUrl,
+  type Game,
+} from '../../../Utils/GDevelopServices/Game';
 import FlatButton from '../../../UI/FlatButton';
 import Dialog from '../../../UI/Dialog';
 import {
@@ -107,6 +110,10 @@ export const OnlineGamePropertiesDialog = ({
     }
   };
 
+  const gameThumbnailUrl = React.useMemo(() => getGameMainImageUrl(game), [
+    game,
+  ]);
+
   return (
     <Dialog
       title={<Trans>Verify your game info before publishing</Trans>}
@@ -168,7 +175,7 @@ export const OnlineGamePropertiesDialog = ({
         discoverable={discoverable}
         setDiscoverable={setDiscoverable}
         displayThumbnail
-        thumbnailUrl={game.thumbnailUrl}
+        thumbnailUrl={gameThumbnailUrl}
         onGameUpdated={onGameUpdated}
         onUpdatingGame={onUpdatingGame}
         disabled={isLoading}

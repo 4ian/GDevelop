@@ -22,6 +22,7 @@ declare class gdPreviewExportOptions {
   setGDevelopVersionWithHash(gdevelopVersionWithHash: string): gdPreviewExportOptions;
   setProjectTemplateSlug(projectTemplateSlug: string): gdPreviewExportOptions;
   setSourceGameId(sourceGameId: string): gdPreviewExportOptions;
+  addScreenshotCapture(timing: number, signedUrl: string, publicUrl: string): gdPreviewExportOptions;
   delete(): void;
   ptr: number;
 };

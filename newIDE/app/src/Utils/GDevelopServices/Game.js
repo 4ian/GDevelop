@@ -34,6 +34,7 @@ export type PublicGame = {
   playWithMobile: boolean,
   orientation: string,
   thumbnailUrl?: string,
+  screenshotUrls?: Array<string>,
   cachedLastWeekSessionsCount?: number,
   cachedLastYearSessionsCount?: number,
   categories?: string[],
@@ -51,6 +52,7 @@ export type Game = {
   publicWebBuildId?: ?string,
   description?: string,
   thumbnailUrl?: string,
+  screenshotUrls?: Array<string>,
   discoverable?: boolean,
   acceptsBuildComments?: boolean,
   acceptsGameComments?: boolean,
@@ -303,6 +305,7 @@ export const updateGame = async (
     playWithMobile,
     orientation,
     thumbnailUrl,
+    screenshotUrls,
     discoverable,
     acceptsBuildComments,
     acceptsGameComments,
@@ -318,6 +321,7 @@ export const updateGame = async (
     playWithMobile?: boolean,
     orientation?: string,
     thumbnailUrl?: ?string,
+    screenshotUrls?: ?Array<string>,
     discoverable?: boolean,
     acceptsBuildComments?: boolean,
     acceptsGameComments?: boolean,
@@ -338,6 +342,7 @@ export const updateGame = async (
       playWithMobile,
       orientation,
       thumbnailUrl,
+      screenshotUrls,
       discoverable,
       acceptsBuildComments,
       acceptsGameComments,
@@ -538,43 +543,31 @@ export const getGameCommentQualityRatingsLeaderboards = async (): Promise<
   return response.data;
 };
 
-export const createGameResourceSignedUrls = async (
-  getAuthorizationHeader: () => Promise<string>,
-  {
-    gameId,
-    userId,
-    uploadType,
-    files,
-  }: {|
-    gameId: string,
-    userId: string,
-    uploadType: GameUploadType,
-    files: Array<{|
-      contentType: string,
-    |}>,
-  |}
-): Promise<{|
+export const createGameResourceSignedUrls = async ({
+  uploadType,
+  files,
+}: {|
+  uploadType: GameUploadType,
+  files: Array<{|
+    contentType: string,
+  |}>,
+|}): Promise<{|
   signedUrls: Array<{|
     signedUrl: string,
     publicUrl: string,
   |}>,
 |}> => {
-  const authorizationHeader = await getAuthorizationHeader();
-  const response = await client.post(
-    `/game/${gameId}/resource-signed-url`,
-    {
-      uploadType,
-      files,
-    },
-    {
-      headers: {
-        Authorization: authorizationHeader,
-      },
-      params: {
-        userId,
-      },
-    }
-  );
+  const response = await client.post(`/resource-signed-url`, {
+    uploadType,
+    files,
+  });
 
   return response.data;
+};
+
+export const getGameMainImageUrl = (game: Game | PublicGame): ?string => {
+  if (game.thumbnailUrl) return game.thumbnailUrl;
+  if (game.screenshotUrls && game.screenshotUrls.length)
+    return game.screenshotUrls[game.screenshotUrls.length - 1];
+  return null;
 };

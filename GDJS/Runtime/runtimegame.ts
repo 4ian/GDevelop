@@ -100,6 +100,9 @@ namespace gdjs {
     /** The source game id that was used to create the project. */
     sourceGameId?: string;
 
+    /** Any capture that should be done during the preview. */
+    captureOptions?: CaptureOptions;
+
     /**
      * If set, this data is used to authenticate automatically when launching the game.
      * This is only useful during previews.
@@ -186,6 +189,11 @@ namespace gdjs {
     _isPreview: boolean;
 
     /**
+     * The capture manager, used to manage captures (screenshots, videos, etc...).
+     */
+    _captureManager: CaptureManager;
+
+    /**
      * @param data The object (usually stored in data.json) containing the full project data
      * @param
      */
@@ -243,6 +251,10 @@ namespace gdjs {
       this._debuggerClient = gdjs.DebuggerClient
         ? new gdjs.DebuggerClient(this)
         : null;
+      this._captureManager = new gdjs.CaptureManager(
+        this._renderer,
+        this._options.captureOptions || {}
+      );
       this._isPreview = this._options.isPreview || false;
       this._sessionId = null;
       this._playerId = null;
@@ -930,6 +942,7 @@ namespace gdjs {
         setTimeout(() => {
           this._setupSessionMetrics();
         }, 4000);
+        this._captureManager.setupCaptureOptions(this._isPreview);
       } catch (e) {
         if (this._debuggerClient) this._debuggerClient.onUncaughtException(e);
 

@@ -25,6 +25,7 @@ const styles = {
     // 16/9 format
     width: 272,
     height: 153,
+    overflow: 'hidden', // Keep the radius effect.
   },
   fullWidth: {
     width: '100%',
@@ -33,7 +34,7 @@ const styles = {
 };
 
 type Props = {|
-  thumbnailUrl?: string,
+  thumbnailUrl?: ?string,
   gameName: string,
   background?: 'light' | 'medium' | 'dark',
   project?: gdProject,
@@ -97,19 +98,14 @@ export const GameThumbnail = ({
       setIsLoading(true);
       if (onUpdatingGame) onUpdatingGame(true);
       // 1. Get signed url to upload for the thumbnail.
-      const response = await createGameResourceSignedUrls(
-        getAuthorizationHeader,
-        {
-          gameId,
-          userId: profile.id,
-          uploadType: 'game-thumbnail',
-          files: [
-            {
-              contentType: fileType,
-            },
-          ],
-        }
-      );
+      const response = await createGameResourceSignedUrls({
+        uploadType: 'game-thumbnail',
+        files: [
+          {
+            contentType: fileType,
+          },
+        ],
+      });
       const signedUrls = response.signedUrls;
       if (!signedUrls || signedUrls.length === 0) {
         throw new Error('No signed url returned');

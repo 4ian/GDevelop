@@ -3656,7 +3656,7 @@ export const fakeGame: Game = {
   publicWebBuildId: 'fake-public-web-build-id-sonic',
   displayAdsOnGamePage: true,
   discoverable: true,
-  thumbnailUrl: 'https://example.com/sonic1995-thumbnail.png',
+  thumbnailUrl: 'https://i.ytimg.com/vi/PguDpz7TC7g/hqdefault.jpg',
 };
 
 export const game1: Game = {

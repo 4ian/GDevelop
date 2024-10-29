@@ -48,7 +48,9 @@ type Props = {|
   isRequiredToSaveAsNewCloudProject: () => boolean,
   onClose: () => Promise<void>,
   onContinueQuickCustomization: () => void,
-  onTryAnotherGame: () => void,
+  gameScreenshotUrls: Array<string>,
+  onScreenshotsClaimed: () => void,
+  onLaunchPreview: () => Promise<void>,
 |};
 
 export const QuickPublish = ({
@@ -61,7 +63,9 @@ export const QuickPublish = ({
   isRequiredToSaveAsNewCloudProject,
   onClose,
   onContinueQuickCustomization,
-  onTryAnotherGame,
+  gameScreenshotUrls,
+  onScreenshotsClaimed,
+  onLaunchPreview,
 }: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { openSubscriptionDialog } = React.useContext(
@@ -134,15 +138,22 @@ export const QuickPublish = ({
       try {
         if (profile && game && build) {
           setExportState('updating-game');
+          const currentGameScreenshotUrls = game.screenshotUrls || [];
+          const newGameScreenshotUrls = [
+            ...currentGameScreenshotUrls,
+            ...gameScreenshotUrls,
+          ];
           const updatedGame = await updateGame(
             getAuthorizationHeader,
             profile.id,
             game.id,
             {
               publicWebBuildId: build.id,
+              screenshotUrls: newGameScreenshotUrls,
             }
           );
           setGame(updatedGame);
+          onScreenshotsClaimed();
         }
 
         setBuildOrGameUrl(
@@ -158,7 +169,15 @@ export const QuickPublish = ({
         setExportState('errored');
       }
     },
-    [setExportState, setGame, game, profile, getAuthorizationHeader]
+    [
+      setExportState,
+      setGame,
+      game,
+      profile,
+      getAuthorizationHeader,
+      gameScreenshotUrls,
+      onScreenshotsClaimed,
+    ]
   );
 
   const hasNotSavedProject = !profile && exportState === '';
@@ -172,7 +191,12 @@ export const QuickPublish = ({
     >
       <ColumnStackLayout alignItems="center">
         <div style={styles.imageContainer}>
-          <GameImage project={project} />
+          <GameImage
+            project={project}
+            previewScreenshotUrls={gameScreenshotUrls}
+            game={game}
+            onLaunchPreview={onLaunchPreview}
+          />
         </div>
         <Spacer />
         {profile ? (
@@ -302,34 +326,36 @@ export const QuickPublish = ({
         )}
       </ColumnStackLayout>
 
-      {exportState !== 'started' && !isLoadingCloudProjects && (
-        <ColumnStackLayout justifyContent="center" alignItems="center">
-          <TextButton
-            secondary
-            onClick={onClose}
-            label={
-              hasNotSavedProject ||
-              cantContinueBecauseCloudProjectsMaximumReached ? (
-                <Trans>Leave and lose all changes</Trans>
-              ) : (
-                <Trans>Finish and close</Trans>
-              )
-            }
-            icon={
-              hasNotSavedProject ||
-              cantContinueBecauseCloudProjectsMaximumReached ? (
-                <Trash />
-              ) : null
-            }
-          />
-          <TextButton
-            secondary
-            onClick={onContinueQuickCustomization}
-            label={<Trans>Rework the game</Trans>}
-            icon={<ArrowLeft />}
-          />
-        </ColumnStackLayout>
-      )}
+      {exportState !== 'started' &&
+        exportState !== 'updating-game' &&
+        !isLoadingCloudProjects && (
+          <ColumnStackLayout justifyContent="center" alignItems="center">
+            <TextButton
+              secondary
+              onClick={onClose}
+              label={
+                hasNotSavedProject ||
+                cantContinueBecauseCloudProjectsMaximumReached ? (
+                  <Trans>Leave and lose all changes</Trans>
+                ) : (
+                  <Trans>Finish and close</Trans>
+                )
+              }
+              icon={
+                hasNotSavedProject ||
+                cantContinueBecauseCloudProjectsMaximumReached ? (
+                  <Trash />
+                ) : null
+              }
+            />
+            <TextButton
+              secondary
+              onClick={onContinueQuickCustomization}
+              label={<Trans>Rework the game</Trans>}
+              icon={<ArrowLeft />}
+            />
+          </ColumnStackLayout>
+        )}
     </ColumnStackLayout>
   );
 };

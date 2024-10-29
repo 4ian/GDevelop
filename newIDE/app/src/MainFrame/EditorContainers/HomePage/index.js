@@ -39,7 +39,6 @@ import {
 } from '../../../Utils/Analytics/EventSender';
 import RouterContext, { type RouteArguments } from '../../RouterContext';
 import { type GameDetailsTab } from '../../../GameDashboard/GameDetails';
-import useGamesList from '../../../GameDashboard/UseGamesList';
 import useDisplayNewFeature from '../../../Utils/UseDisplayNewFeature';
 import HighlightingTooltip from '../../../UI/HighlightingTooltip';
 import Text from '../../../UI/Text';
@@ -51,6 +50,7 @@ import EducationMarketingSection from './EducationMarketingSection';
 import useEducationForm from './UseEducationForm';
 import { type NewProjectSetup } from '../../../ProjectCreation/NewProjectSetupDialog';
 import { type ObjectWithContext } from '../../../ObjectsList/EnumerateObjects';
+import { type Game } from '../../../Utils/GDevelopServices/Game';
 
 const gamesDashboardWikiArticle = getHelpLink('/interface/games-dashboard/');
 const getRequestedTab = (routeArguments: RouteArguments): HomeTab | null => {
@@ -114,6 +114,12 @@ type Props = {|
   project: ?gdProject,
   setToolbar: (?React.Node) => void,
   storageProviders: Array<StorageProvider>,
+
+  // Games
+  games: ?Array<Game>,
+  fetchGames: () => Promise<void>,
+  onGameUpdated: (game: Game) => void,
+  gamesFetchingError: ?Error,
 
   // Project opening
   canOpen: boolean,
@@ -195,6 +201,10 @@ export const HomePage = React.memo<Props>(
         askToCloseProject,
         closeProject,
         onOpenTemplateFromTutorial,
+        games,
+        fetchGames,
+        onGameUpdated,
+        gamesFetchingError,
       }: Props,
       ref
     ) => {
@@ -255,12 +265,6 @@ export const HomePage = React.memo<Props>(
         displayTooltipDelayed,
         setDisplayTooltipDelayed,
       ] = React.useState<boolean>(false);
-      const {
-        games,
-        gamesFetchingError,
-        fetchGames,
-        onGameUpdated,
-      } = useGamesList();
       const openedGame = React.useMemo(
         () => (games && games.find(game => game.id === openedGameId)) || null,
         [games, openedGameId]
@@ -669,5 +673,9 @@ export const renderHomePageContainer = (
     onSave={props.onSave}
     canSave={props.canSave}
     resourceManagementProps={props.resourceManagementProps}
+    games={props.games}
+    fetchGames={props.fetchGames}
+    onGameUpdated={props.onGameUpdated}
+    gamesFetchingError={props.gamesFetchingError}
   />
 );

@@ -17,7 +17,7 @@ type Props = {|
   project: gdProject,
   resourceManagementProps: ResourceManagementProps,
   onLaunchPreview: () => Promise<void>,
-  onClose: (?{| tryAnotherGame: boolean |}) => Promise<void>,
+  onClose: () => Promise<void>,
   onlineWebExporter: Exporter,
   onSaveProject: () => Promise<void>,
   isSavingProject: boolean,
@@ -29,6 +29,8 @@ type Props = {|
   isRequiredToSaveAsNewCloudProject: () => boolean,
   canClose: boolean,
   sourceGameId: string,
+  gameScreenshotUrls: Array<string>,
+  onScreenshotsClaimed: () => void,
 |};
 
 export const QuickCustomizationDialog = ({
@@ -42,6 +44,8 @@ export const QuickCustomizationDialog = ({
   isRequiredToSaveAsNewCloudProject,
   canClose,
   sourceGameId,
+  gameScreenshotUrls,
+  onScreenshotsClaimed,
 }: Props) => {
   const { triggerUnsavedChanges } = React.useContext(UnsavedChangesContext);
   const gameAndBuildsManager = useGameAndBuildsManager({
@@ -57,13 +61,6 @@ export const QuickCustomizationDialog = ({
     [quickCustomizationState]
   );
 
-  const onTryAnotherGame = React.useCallback(
-    () => {
-      onClose({ tryAnotherGame: true });
-    },
-    [onClose]
-  );
-
   const { title, content, showPreview } = renderQuickCustomization({
     project,
     gameAndBuildsManager,
@@ -76,7 +73,8 @@ export const QuickCustomizationDialog = ({
     isRequiredToSaveAsNewCloudProject,
     onClose,
     onContinueQuickCustomization,
-    onTryAnotherGame,
+    gameScreenshotUrls,
+    onScreenshotsClaimed,
   });
 
   const name = project.getName();

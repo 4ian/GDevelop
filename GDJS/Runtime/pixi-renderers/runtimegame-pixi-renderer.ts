@@ -71,6 +71,7 @@ namespace gdjs {
             this._game.getAntialiasingMode() !== 'none' &&
             (this._game.isAntialisingEnabledOnMobile() ||
               !gdjs.evtTools.common.isMobile()),
+          preserveDrawingBuffer: true, // Keep to true to allow screenshots.
         });
         this._threeRenderer.useLegacyLights = true;
         this._threeRenderer.autoClear = false;
@@ -89,7 +90,7 @@ namespace gdjs {
           // @ts-ignore - reuse the context from Three.js.
           context: this._threeRenderer.getContext(),
           clearBeforeRender: false,
-          preserveDrawingBuffer: true,
+          preserveDrawingBuffer: true, // Keep to true to allow screenshots.
           antialias: false,
           backgroundAlpha: 0,
           // TODO (3D): add a setting for pixel ratio (`resolution: window.devicePixelRatio`)

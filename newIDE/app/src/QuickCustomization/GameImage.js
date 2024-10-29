@@ -1,45 +1,102 @@
 // @flow
 import * as React from 'react';
+import { getGameMainImageUrl, type Game } from '../Utils/GDevelopServices/Game';
+import Paper from '../UI/Paper';
+import { CorsAwareImage } from '../UI/CorsAwareImage';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
+import { Column } from '../UI/Grid';
+import { ColumnStackLayout } from '../UI/Layout';
+import { Trans } from '@lingui/macro';
+import RaisedButton from '../UI/RaisedButton';
+import PreviewIcon from '../UI/CustomSvgIcons/Preview';
+import Text from '../UI/Text';
 
 const styles = {
-  image: {
+  thumbnail: {
+    width: (250 * 16) / 9,
+    height: 250,
+    overflow: 'hidden', // Keep the radius effect.
+  },
+  fullWidth: {
     width: '100%',
-    maxHeight: '325px',
-    objectFit: 'contain',
-    borderRadius: '16px',
-    boxSizing: 'border-box',
-    aspectRatio: '16 / 9',
+    height: 'auto',
+  },
+  image: {
+    display: 'block',
+    objectFit: 'scale-down',
   },
 };
 
 type Props = {|
   project: gdProject,
+  game: ?Game,
+  previewScreenshotUrls: Array<string>,
+  onLaunchPreview: () => Promise<void>,
 |};
 
-const GameImage = ({ project }: Props) => {
-  const rocketUrl = 'res/quick_customization/quick_publish.svg';
+const GameImage = ({
+  project,
+  game,
+  previewScreenshotUrls,
+  onLaunchPreview,
+}: Props) => {
+  const { isMobile } = useResponsiveWindowSize();
 
   const gameThumbnailUrl = React.useMemo(
     () => {
-      const resourcesManager = project.getResourcesManager();
-      const thumbnailName = project
-        .getPlatformSpecificAssets()
-        .get('liluo', `thumbnail`);
-      if (!thumbnailName) return rocketUrl;
-      const path = resourcesManager.getResource(thumbnailName).getFile();
-      if (!path) return rocketUrl;
+      if (game) {
+        const gameImageUrl = getGameMainImageUrl(game);
+        if (gameImageUrl) return gameImageUrl;
+      }
 
-      return path;
+      if (previewScreenshotUrls.length)
+        return previewScreenshotUrls[previewScreenshotUrls.length - 1];
+
+      return undefined;
     },
-    [project]
+    [game, previewScreenshotUrls]
   );
 
   return (
-    <img
-      alt="Customize your game with GDevelop"
-      src={gameThumbnailUrl}
-      style={styles.image}
-    />
+    <Column noMargin alignItems="center">
+      <Paper
+        style={{
+          ...styles.thumbnail,
+          whiteSpace: 'normal',
+          display: 'flex',
+        }}
+        background="light"
+      >
+        {gameThumbnailUrl ? (
+          <CorsAwareImage
+            alt="Customize your game with GDevelop"
+            src={gameThumbnailUrl}
+            style={{
+              ...styles.image,
+              ...(isMobile ? styles.fullWidth : styles.thumbnail),
+            }}
+          />
+        ) : (
+          <ColumnStackLayout
+            noMargin
+            expand
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Text>
+              <Trans>Start a preview to generate a thumbnail!</Trans>
+            </Text>
+            <RaisedButton
+              color="success"
+              size="medium"
+              label={<Trans>Preview</Trans>}
+              onClick={onLaunchPreview}
+              icon={<PreviewIcon />}
+            />
+          </ColumnStackLayout>
+        )}
+      </Paper>
+    </Column>
   );
 };
 

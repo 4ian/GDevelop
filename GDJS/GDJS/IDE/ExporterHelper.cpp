@@ -24,6 +24,7 @@
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
+#include "GDCore/IDE/CaptureOptions.h"
 #include "GDCore/IDE/Events/UsedExtensionsFinder.h"
 #include "GDCore/IDE/ExportedDependencyResolver.h"
 #include "GDCore/IDE/Project/ProjectResourcesCopier.h"
@@ -267,6 +268,22 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   if (!options.sourceGameId.empty()) {
     runtimeGameOptions.AddChild("sourceGameId")
         .SetStringValue(options.sourceGameId);
+  }
+
+  if (!options.captureOptions.IsEmpty()) {
+    auto &captureOptionsElement = runtimeGameOptions.AddChild("captureOptions");
+    const std::vector<gd::Screenshot> screenshots =
+        options.captureOptions.GetScreenshots();
+    if (!screenshots.empty()) {
+      auto &screenshotsElement = captureOptionsElement.AddChild("screenshots");
+      screenshotsElement.ConsiderAsArrayOf("screenshot");
+      for (const auto &screenshot : screenshots) {
+        screenshotsElement.AddChild("screenshot")
+            .SetIntAttribute("timing", screenshot.GetTiming())
+            .SetStringAttribute("signedUrl", screenshot.GetSignedUrl())
+            .SetStringAttribute("publicUrl", screenshot.GetPublicUrl());
+      }
+    }
   }
 
   // Pass in the options the list of scripts files - useful for hot-reloading.
@@ -768,6 +785,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "inputmanager.js");
   InsertUnique(includesFiles, "jsonmanager.js");
   InsertUnique(includesFiles, "Model3DManager.js");
+  InsertUnique(includesFiles, "capturemanager.js");
   InsertUnique(includesFiles, "ResourceLoader.js");
   InsertUnique(includesFiles, "ResourceCache.js");
   InsertUnique(includesFiles, "timemanager.js");

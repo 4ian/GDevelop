@@ -1,6 +1,14 @@
 // @flow
 import * as React from 'react';
 
+export type CaptureOptions = {|
+  screenshots: Array<{|
+    signedUrl: string,
+    timing: number,
+    publicUrl: string,
+  |}>,
+|};
+
 export type PreviewOptions = {|
   project: gdProject,
   layout: gdLayout,
@@ -18,6 +26,10 @@ export type PreviewOptions = {|
   numberOfWindows: number,
   getIsMenuBarHiddenInPreview: () => boolean,
   getIsAlwaysOnTopInPreview: () => boolean,
+  captureOptions: CaptureOptions,
+  onGameScreenshotsTaken: ({
+    unverifiedScreenshotPublicUrls: string[],
+  }) => void,
 |};
 
 /** The props that PreviewLauncher must support */
@@ -27,6 +39,9 @@ export type PreviewLauncherProps = {|
   sourceGameId: string,
   getIncludeFileHashs: () => { [string]: number },
   onExport: () => void,
+  onGameScreenshotsTaken: ({
+    unverifiedScreenshotPublicUrls: string[],
+  }) => void,
 |};
 
 /** Each game connected to the debugger server is identified by a unique number. */

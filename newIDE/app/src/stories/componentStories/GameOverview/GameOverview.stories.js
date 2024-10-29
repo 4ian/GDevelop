@@ -206,6 +206,7 @@ export const Default = ({
         currentView={tab}
         setCurrentView={setTab}
         onBack={() => action('Back')}
+        onGameUpdated={() => action('onGameUpdated')}
       />
     </AuthenticatedUserContext.Provider>
   );

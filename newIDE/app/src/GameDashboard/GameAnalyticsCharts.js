@@ -251,7 +251,7 @@ export const MeanPlayTimeChart = ({
   );
 };
 
-export const PlayersCountPerDurationChart = ({
+export const PlayersRepartitionPerDurationChart = ({
   i18n,
   chartData,
   height,
@@ -303,7 +303,7 @@ export const PlayersCountPerDurationChart = ({
   );
 };
 
-export const PlayersRepartitionPerDurationChart = ({
+export const PlayersDurationPerDayChart = ({
   i18n,
   chartData,
   height,

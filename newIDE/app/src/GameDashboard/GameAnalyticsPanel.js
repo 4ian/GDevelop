@@ -22,8 +22,8 @@ import { buildChartData, daysShownForYear } from './GameAnalyticsEvaluator';
 import {
   BounceRateChart,
   MeanPlayTimeChart,
-  PlayersCountPerDurationChart,
   PlayersRepartitionPerDurationChart,
+  PlayersDurationPerDayChart,
   SessionsChart,
 } from './GameAnalyticsCharts';
 
@@ -187,7 +187,7 @@ export const GameAnalyticsPanel = ({ game, gameMetrics }: Props) => {
                     minutes
                   </Trans>
                 </Text>
-                <PlayersCountPerDurationChart
+                <PlayersRepartitionPerDurationChart
                   chartData={chartData}
                   height={chartHeight}
                   i18n={i18n}
@@ -209,7 +209,7 @@ export const GameAnalyticsPanel = ({ game, gameMetrics }: Props) => {
                     minutes
                   </Trans>
                 </Text>
-                <PlayersRepartitionPerDurationChart
+                <PlayersDurationPerDayChart
                   chartData={chartData}
                   height={chartHeight}
                   i18n={i18n}

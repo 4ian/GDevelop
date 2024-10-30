@@ -266,7 +266,10 @@ export const HomePage = React.memo<Props>(
         setDisplayTooltipDelayed,
       ] = React.useState<boolean>(false);
       const openedGame = React.useMemo(
-        () => (games && games.find(game => game.id === openedGameId)) || null,
+        () =>
+          !openedGameId || !games
+            ? null
+            : games.find(game => game.id === openedGameId),
         [games, openedGameId]
       );
       const {

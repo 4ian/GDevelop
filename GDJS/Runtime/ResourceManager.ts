@@ -29,5 +29,7 @@ namespace gdjs {
      * Return the kind of resources handled by this manager.
      */
     getResourceKinds(): Array<ResourceKind>;
+
+    dispose(): void;
   }
 }

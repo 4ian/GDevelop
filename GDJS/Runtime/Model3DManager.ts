@@ -143,5 +143,21 @@ namespace gdjs {
         this._loadedThreeModels.getFromName(resourceName) || this._invalidModel
       );
     }
+
+    dispose(): void {
+      this._loadedThreeModels.clear();
+      this._downloadedArrayBuffers.clear();
+      this._loader = null;
+      this._dracoLoader = null;
+
+      if (this._invalidModel) {
+        this._invalidModel.cameras = [];
+        this._invalidModel.animations = [];
+        this._invalidModel.scenes = [];
+        this._invalidModel.userData = {};
+        this._invalidModel.asset = {};
+        this._invalidModel.scene.clear();
+      }
+    }
   }
 }

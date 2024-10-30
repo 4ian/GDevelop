@@ -115,5 +115,9 @@ namespace gdjs {
         ? resource
         : null;
     }
+
+    dispose(): void {
+      this._loadedSpines.clear();
+    }
   }
 }

@@ -28,6 +28,10 @@ import { apiClient as usageApiAxiosClient } from '../../../Utils/GDevelopService
 
 import type { GameDetailsTab } from '../../../GameDashboard/GameDetails';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
+import {
+  mockedLeaderboards,
+  mockedEntries,
+} from '../../MockLeaderboardProvider';
 
 export default {
   title: 'GameDashboard/GameOverview',
@@ -48,11 +52,16 @@ export default {
       options: ['None', 'Some'],
       control: { type: 'radio' },
     },
+    leaderboards: {
+      options: ['None', 'Some'],
+      control: { type: 'radio' },
+    },
   },
   args: {
     feedbacks: 'Some unprocessed',
     sessions: 'Some in the last week',
     userBalance: 'Some',
+    leaderboards: 'Some',
   },
 };
 
@@ -114,10 +123,12 @@ export const Default = ({
   feedbacks,
   sessions,
   userBalance,
+  leaderboards,
 }: {|
   feedbacks: 'None' | 'Some unprocessed' | 'All processed',
   sessions: 'None' | 'Some in the last week',
   userBalance: 'None' | 'Some',
+  leaderboards: 'None' | 'Some',
 |}) => {
   const [tab, setTab] = React.useState<GameDetailsTab>('details');
   const [renderCount, setRenderCount] = React.useState<number>(0);
@@ -147,12 +158,14 @@ export const Default = ({
           },
         ]
       : [userEarningsBalance];
+  const leaderboardsToDisplay =
+    leaderboards === 'None' ? [] : mockedLeaderboards;
 
   React.useEffect(
     () => {
       setRenderCount(value => value + 1);
     },
-    [feedbacks, sessions, userBalance]
+    [feedbacks, sessions, userBalance, leaderboards]
   );
 
   playServiceMock
@@ -166,7 +179,9 @@ export const Default = ({
       canJoinAfterStart: true,
     })
     .onGet(`/game/${game1.id}/leaderboard`)
-    .reply(200, [])
+    .reply(200, leaderboardsToDisplay)
+    .onGet(new RegExp(`/game/${game1.id}/leaderboard/[a-zA-Z0-9-]+/entry`))
+    .reply(200, mockedEntries, {})
     .onAny()
     .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);

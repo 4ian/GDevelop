@@ -19,12 +19,7 @@ import { type GDevelopTheme } from '../UI/Theme';
 import Paper from '../UI/Paper';
 import { ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
-import {
-  durationValues,
-  type ChartData,
-} from './GameAnalyticsEvaluator';
-
-
+import { durationValues, type ChartData } from './GameAnalyticsEvaluator';
 
 const chartMargins = {
   top: 5,
@@ -158,7 +153,12 @@ export const SessionsChart = ({
   );
 };
 
-export const BounceRateChart = ({ i18n, chartData, height, fontSize }: ChartProps) => {
+export const BounceRateChart = ({
+  i18n,
+  chartData,
+  height,
+  fontSize,
+}: ChartProps) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const styles = getChartsStyleFromTheme(gdevelopTheme);
 

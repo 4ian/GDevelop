@@ -35,6 +35,7 @@ import ArrowLeft from '../UI/CustomSvgIcons/ArrowLeft';
 import GameFeedback from '../GameDashboard/Feedbacks/GameFeedback';
 import Builds from '../ExportAndShare/Builds';
 import { GameAnalyticsPanel } from '../GameDashboard/GameAnalyticsPanel';
+import LeaderboardAdmin from '../GameDashboard/LeaderboardAdmin';
 
 type Props = {|
   game: Game,
@@ -137,7 +138,7 @@ const GameOverview = ({
     <I18n>
       {({ i18n }) => (
         <>
-          <Column noMargin>
+          <Column noMargin expand>
             <Line>
               <TextButton
                 onClick={onClickBack}
@@ -168,6 +169,8 @@ const GameOverview = ({
                 game={game}
                 gameMetrics={gameRollingMetrics}
               />
+            ) : currentView === 'leaderboards' ? (
+              <LeaderboardAdmin gameId={game.id} onLoading={() => {}} />
             ) : (
               <ColumnStackLayout noMargin>
                 <GameHeader

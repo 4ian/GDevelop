@@ -1,33 +1,27 @@
 // @flow
-import { Trans, t } from '@lingui/macro';
+import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import { I18n } from '@lingui/react';
-import { type I18n as I18nType } from '@lingui/core';
 
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import {
-  buyGameFeaturing,
   listGameFeaturings,
   type Game,
-  type MarketingPlan,
   type GameFeaturing,
 } from '../Utils/GDevelopServices/Game';
 import Text from '../UI/Text';
 import Link from '../UI/Link';
 import Window from '../Utils/Window';
-import useAlertDialog from '../UI/Alert/useAlertDialog';
-import { selectMessageByLocale } from '../Utils/i18n/MessageByLocale';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderError from '../UI/PlaceholderError';
-import { CreditsPackageStoreContext } from '../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 import { MarketingPlansStoreContext } from './MarketingPlansStoreContext';
 import {
-  getMarketingPlanPrice,
   getRequirementsErrors,
   isMarketingPlanActive,
 } from './MarketingPlanUtils';
 import MarketingPlanFeatures from './MarketingPlanFeatures';
+import usePurchaseMarketingPlan from './UsePurchaseMarketingPlan';
 
 type Props = {|
   game: Game,
@@ -37,15 +31,11 @@ const MarketingPlans = ({ game }: Props) => {
   const { profile, limits, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
   );
-  const { openCreditsPackageDialog, openCreditsUsageDialog } = React.useContext(
-    CreditsPackageStoreContext
-  );
   const {
     marketingPlans,
     error: marketingPlansError,
     fetchMarketingPlans,
   } = React.useContext(MarketingPlansStoreContext);
-  const { showAlert } = useAlertDialog();
   const [gameFeaturings, setGameFeaturings] = React.useState<
     GameFeaturing[] | null
   >(null);
@@ -102,97 +92,11 @@ const MarketingPlans = ({ game }: Props) => {
     [fetchGameFeaturings]
   );
 
-  const onPurchase = React.useCallback(
-    async (i18n: I18nType, marketingPlan: MarketingPlan) => {
-      if (!profile || !limits) return;
-
-      const {
-        id,
-        nameByLocale,
-        canExtend,
-        requiresManualContact,
-        additionalSuccessMessageByLocale,
-      } = marketingPlan;
-      const planCreditsAmount = getMarketingPlanPrice(marketingPlan, limits);
-      if (!planCreditsAmount) return;
-
-      const translatedName = selectMessageByLocale(i18n, nameByLocale);
-
-      const isPlanActive = isMarketingPlanActive(
-        marketingPlan,
-        activeGameFeaturings
-      );
-      if (isPlanActive && !canExtend) {
-        if (requiresManualContact) {
-          await showAlert({
-            title: t`Featuring already active`,
-            message: t`You already have an active ${translatedName} featuring for your game ${
-              game.gameName
-            }. Check your emails or discord, we will get in touch with you to get the campaign up!`,
-          });
-        }
-        return;
-      }
-
-      const currentCreditsAmount = limits.credits.userBalance.amount;
-      if (currentCreditsAmount < planCreditsAmount) {
-        openCreditsPackageDialog({
-          missingCredits: planCreditsAmount - currentCreditsAmount,
-        });
-        return;
-      }
-
-      openCreditsUsageDialog({
-        title:
-          isPlanActive && canExtend ? (
-            <Trans>Extend Featuring</Trans>
-          ) : (
-            <Trans>Get Featuring</Trans>
-          ),
-        message: canExtend ? (
-          <Trans>
-            You are about to use {planCreditsAmount} credits to extend the game
-            featuring {translatedName} for your game {game.gameName} and push it
-            to the top of gd.games. Continue?
-          </Trans>
-        ) : (
-          <Trans>
-            You are about to use {planCreditsAmount} credits to purchase the
-            game featuring {translatedName} for your game {game.gameName}.
-            Continue?
-          </Trans>
-        ),
-        onConfirm: async () => {
-          await buyGameFeaturing(getAuthorizationHeader, {
-            gameId: game.id,
-            usageType: id,
-            userId: profile.id,
-          });
-          await fetchGameFeaturings();
-        },
-        successMessage: (
-          <span>
-            <Trans>
-              🎉 Congrats on getting the {translatedName} featuring for your
-              game {game.gameName}!
-            </Trans>{' '}
-            {selectMessageByLocale(i18n, additionalSuccessMessageByLocale)}
-          </span>
-        ),
-      });
-    },
-    [
-      game,
-      getAuthorizationHeader,
-      limits,
-      profile,
-      showAlert,
-      fetchGameFeaturings,
-      openCreditsPackageDialog,
-      openCreditsUsageDialog,
-      activeGameFeaturings,
-    ]
-  );
+  const { onPurchaseMarketingPlan } = usePurchaseMarketingPlan({
+    game,
+    activeGameFeaturings,
+    fetchGameFeaturings,
+  });
 
   if (!profile || !limits) return null;
 
@@ -247,7 +151,9 @@ const MarketingPlans = ({ game }: Props) => {
                   <MarketingPlanFeatures
                     gameFeaturings={gameFeaturings}
                     marketingPlan={marketingPlan}
-                    onPurchase={i18n => onPurchase(i18n, marketingPlan)}
+                    onPurchase={i18n =>
+                      onPurchaseMarketingPlan(i18n, marketingPlan)
+                    }
                     isPlanActive={isPlanActive}
                     requirementsErrors={requirementsErrors}
                   />

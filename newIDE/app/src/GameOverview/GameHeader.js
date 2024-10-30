@@ -85,7 +85,7 @@ const GameHeader = ({ game, onEditGame }: Props) => {
     );
   };
   const renderTitle = (i18n: I18nType) => (
-    <ColumnStackLayout>
+    <ColumnStackLayout noMargin>
       <Text color="secondary" noMargin>
         <Trans>Published on {i18n.date(game.createdAt)}</Trans>
       </Text>
@@ -139,7 +139,7 @@ const GameHeader = ({ game, onEditGame }: Props) => {
       {({ i18n }) => (
         <LineStackLayout>
           {renderThumbnail()}
-          <ColumnStackLayout expand noMargin>
+          <ColumnStackLayout expand>
             <LineStackLayout
               noMargin
               justifyContent="space-between"

@@ -5,69 +5,29 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import {
-  ColumnStackLayout,
-  LineStackLayout,
-  ResponsiveLineStackLayout,
-} from '../UI/Layout';
+import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import {
   buyGameFeaturing,
   listGameFeaturings,
   type Game,
   type MarketingPlan,
   type GameFeaturing,
-  getGameMainImageUrl,
 } from '../Utils/GDevelopServices/Game';
 import Text from '../UI/Text';
 import Link from '../UI/Link';
 import Window from '../Utils/Window';
-import Speaker from './Icons/Speaker';
-import Speedometer from './Icons/Speedometer';
-import Stars from './Icons/Stars';
-import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
-import { Column, Line } from '../UI/Grid';
-import RaisedButton from '../UI/RaisedButton';
-import CheckCircle from '../UI/CustomSvgIcons/CheckCircle';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { selectMessageByLocale } from '../Utils/i18n/MessageByLocale';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderError from '../UI/PlaceholderError';
 import { CreditsPackageStoreContext } from '../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 import { MarketingPlansStoreContext } from './MarketingPlansStoreContext';
-
-const styles = {
-  campaign: {
-    display: 'flex',
-    flex: 1,
-    borderRadius: 8,
-    padding: 16,
-  },
-  titleContainer: {
-    width: '100%',
-    display: 'flex',
-    justifyContent: 'center',
-  },
-  bulletPointsContainer: {
-    width: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  bulletIcon: { width: 20, height: 20, marginRight: 10 },
-  iconStyle: { width: 40, height: 40 },
-};
-
-const getIconForMarketingPlan = (marketingPlan: MarketingPlan) => {
-  switch (marketingPlan.icon) {
-    case 'speaker':
-      return <Speaker style={styles.iconStyle} />;
-    case 'speedometer':
-      return <Speedometer style={styles.iconStyle} />;
-    case 'stars':
-      return <Stars style={styles.iconStyle} />;
-    default:
-      return null;
-  }
-};
+import {
+  getMarketingPlanPrice,
+  getRequirementsErrors,
+  isMarketingPlanActive,
+} from './MarketingPlanUtils';
+import MarketingPlanFeatures from './MarketingPlanFeatures';
 
 type Props = {|
   game: Game,
@@ -85,7 +45,6 @@ const MarketingPlans = ({ game }: Props) => {
     error: marketingPlansError,
     fetchMarketingPlans,
   } = React.useContext(MarketingPlansStoreContext);
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { showAlert } = useAlertDialog();
   const [gameFeaturings, setGameFeaturings] = React.useState<
     GameFeaturing[] | null
@@ -103,47 +62,6 @@ const MarketingPlans = ({ game }: Props) => {
       );
     },
     [gameFeaturings]
-  );
-
-  const isMarketingPlanActive = React.useCallback(
-    (marketingPlan: MarketingPlan) => {
-      if (!activeGameFeaturings) return false;
-      const includedMarketingPlanFeaturings = marketingPlan.includedFeaturings;
-
-      // A marketing plan is considered active if it has all the included featurings active.
-      return includedMarketingPlanFeaturings.every(
-        includedMarketingPlanFeaturing =>
-          activeGameFeaturings.some(
-            activeGameFeaturing =>
-              activeGameFeaturing.featuring === includedMarketingPlanFeaturing
-          )
-      );
-    },
-    [activeGameFeaturings]
-  );
-
-  const getActiveFeaturingsOfMarketingPlan = React.useCallback(
-    (marketingPlan: MarketingPlan) => {
-      if (!activeGameFeaturings) return [];
-
-      return activeGameFeaturings.filter(activeGameFeaturing =>
-        marketingPlan.includedFeaturings.includes(activeGameFeaturing.featuring)
-      );
-    },
-    [activeGameFeaturings]
-  );
-
-  const getMarketingPlanPrice = React.useCallback(
-    (marketingPlan: MarketingPlan) => {
-      if (!profile || !limits) return null;
-
-      const prices = limits.credits.prices;
-      const usagePrice = prices[marketingPlan.id];
-      if (!usagePrice) return null;
-
-      return usagePrice.priceInCredits;
-    },
-    [limits, profile]
   );
 
   React.useEffect(
@@ -195,12 +113,15 @@ const MarketingPlans = ({ game }: Props) => {
         requiresManualContact,
         additionalSuccessMessageByLocale,
       } = marketingPlan;
-      const planCreditsAmount = getMarketingPlanPrice(marketingPlan);
+      const planCreditsAmount = getMarketingPlanPrice(marketingPlan, limits);
       if (!planCreditsAmount) return;
 
       const translatedName = selectMessageByLocale(i18n, nameByLocale);
 
-      const isPlanActive = isMarketingPlanActive(marketingPlan);
+      const isPlanActive = isMarketingPlanActive(
+        marketingPlan,
+        activeGameFeaturings
+      );
       if (isPlanActive && !canExtend) {
         if (requiresManualContact) {
           await showAlert({
@@ -266,68 +187,12 @@ const MarketingPlans = ({ game }: Props) => {
       limits,
       profile,
       showAlert,
-      isMarketingPlanActive,
       fetchGameFeaturings,
       openCreditsPackageDialog,
       openCreditsUsageDialog,
-      getMarketingPlanPrice,
+      activeGameFeaturings,
     ]
   );
-
-  const getRequirementsErrors = (marketingPlan: MarketingPlan) => {
-    const requirementsErrors = [];
-    const marketingPlanGameRequirements = marketingPlan.gameRequirements;
-    if (
-      !!marketingPlanGameRequirements.hasThumbnail &&
-      !getGameMainImageUrl(game)
-    ) {
-      requirementsErrors.push(<Trans>You don't have a thumbnail</Trans>);
-    }
-    if (!marketingPlanGameRequirements.isPublished && !game.publicWebBuildId) {
-      requirementsErrors.push(
-        <Trans>Your game does not have a public build</Trans>
-      );
-    }
-    if (!!marketingPlanGameRequirements.isDiscoverable && !game.discoverable) {
-      requirementsErrors.push(<Trans>Your game is not discoverable</Trans>);
-    }
-
-    return requirementsErrors;
-  };
-
-  const getActiveMessage = ({
-    marketingPlan,
-    i18n,
-    hasErrors,
-  }: {|
-    marketingPlan: MarketingPlan,
-    i18n: I18nType,
-    hasErrors: boolean,
-  |}) => {
-    if (hasErrors) {
-      return <Trans>Fix those issues to get the campaign up!</Trans>;
-    }
-
-    const activeFeaturingsForPlan = getActiveFeaturingsOfMarketingPlan(
-      marketingPlan
-    );
-
-    if (activeFeaturingsForPlan.length === 0) {
-      // Should not happen.
-      return null;
-    }
-
-    // Assume they will all have the same expiration date, so pick the first one.
-    const activeFeaturing = activeFeaturingsForPlan[0];
-
-    return !marketingPlan.requiresManualContact ? (
-      <Trans>Active until {i18n.date(activeFeaturing.expiresAt * 1000)}</Trans>
-    ) : marketingPlan.requiresManualContact ? (
-      <Trans>Active, we will get in touch to get the campaign up!</Trans>
-    ) : (
-      <Trans>Active</Trans>
-    );
-  };
 
   if (!profile || !limits) return null;
 
@@ -369,143 +234,23 @@ const MarketingPlans = ({ game }: Props) => {
             </Text>
             <ResponsiveLineStackLayout noColumnMargin>
               {marketingPlans.map(marketingPlan => {
-                const {
-                  id,
-                  nameByLocale,
-                  canExtend,
-                  descriptionByLocale,
-                  bulletPointsByLocale,
-                } = marketingPlan;
-                const planCreditsAmount = getMarketingPlanPrice(marketingPlan);
-                if (!planCreditsAmount) {
-                  console.error(
-                    `Could not find price for marketing plan ${id}, hiding it.`
-                  );
-                  return null;
-                }
-                const isPlanActive = isMarketingPlanActive(marketingPlan);
+                const isPlanActive = isMarketingPlanActive(
+                  marketingPlan,
+                  activeGameFeaturings
+                );
+
                 const requirementsErrors = isPlanActive
-                  ? getRequirementsErrors(marketingPlan)
+                  ? getRequirementsErrors(game, marketingPlan)
                   : [];
-                const hasErrors = requirementsErrors.length > 0;
+
                 return (
-                  <div
-                    style={{
-                      ...styles.campaign,
-                      border: isPlanActive
-                        ? `2px solid ${gdevelopTheme.message.valid}`
-                        : `1px solid ${gdevelopTheme.palette.secondary}`,
-                    }}
-                    key={id}
-                  >
-                    <ColumnStackLayout
-                      alignItems="center"
-                      justifyContent="space-between"
-                      noMargin
-                      expand
-                    >
-                      <div style={styles.titleContainer}>
-                        <LineStackLayout
-                          justifyContent="space-between"
-                          alignItems="flex-start"
-                          expand
-                        >
-                          <LineStackLayout noMargin alignItems="flex-start">
-                            {getIconForMarketingPlan(marketingPlan)}
-                            <Text size="sub-title">
-                              {selectMessageByLocale(i18n, nameByLocale)}
-                            </Text>
-                          </LineStackLayout>
-                          <Text size="body-small" color="secondary">
-                            <Trans>{planCreditsAmount} credits</Trans>
-                          </Text>
-                        </LineStackLayout>
-                      </div>
-
-                      <div style={styles.bulletPointsContainer}>
-                        {hasErrors
-                          ? requirementsErrors.map((error, index) => (
-                              <Column key={index} expand noMargin>
-                                <Line noMargin alignItems="center">
-                                  <CheckCircle
-                                    style={{
-                                      ...styles.bulletIcon,
-                                      color: gdevelopTheme.message.error,
-                                    }}
-                                  />
-                                  <Text style={{ flex: 1 }}>{error}</Text>
-                                </Line>
-                              </Column>
-                            ))
-                          : bulletPointsByLocale.map(
-                              (bulletPointByLocale, index) => (
-                                <Column key={index} expand noMargin>
-                                  <Line noMargin alignItems="center">
-                                    <CheckCircle
-                                      style={{
-                                        ...styles.bulletIcon,
-                                        ...(isPlanActive
-                                          ? {
-                                              color:
-                                                gdevelopTheme.message.valid,
-                                            }
-                                          : {}),
-                                      }}
-                                    />
-                                    <Text style={{ flex: 1 }}>
-                                      {selectMessageByLocale(
-                                        i18n,
-                                        bulletPointByLocale
-                                      )}
-                                    </Text>
-                                  </Line>
-                                </Column>
-                              )
-                            )}
-                      </div>
-
-                      <Column
-                        noMargin
-                        alignItems="flex-start"
-                        expand
-                        justifyContent="flex-end"
-                      >
-                        <Text
-                          size="body-small"
-                          noMargin
-                          color="secondary"
-                          align="left"
-                        >
-                          {isPlanActive
-                            ? getActiveMessage({
-                                marketingPlan,
-                                i18n,
-                                hasErrors,
-                              })
-                            : selectMessageByLocale(i18n, descriptionByLocale)}
-                        </Text>
-                      </Column>
-                      <RaisedButton
-                        primary={!isPlanActive || canExtend}
-                        onClick={() => onPurchase(i18n, marketingPlan)}
-                        label={
-                          !gameFeaturings ? (
-                            <Trans>Loading...</Trans>
-                          ) : isPlanActive ? (
-                            canExtend ? (
-                              <Trans>Extend</Trans>
-                            ) : (
-                              <Trans>Activated</Trans>
-                            )
-                          ) : (
-                            <Trans>Purchase</Trans>
-                          )
-                        }
-                        fullWidth
-                        disabled={!gameFeaturings}
-                      />
-                    </ColumnStackLayout>
-                  </div>
+                  <MarketingPlanFeatures
+                    gameFeaturings={gameFeaturings}
+                    marketingPlan={marketingPlan}
+                    onPurchase={i18n => onPurchase(i18n, marketingPlan)}
+                    isPlanActive={isPlanActive}
+                    requirementsErrors={requirementsErrors}
+                  />
                 );
               })}
             </ResponsiveLineStackLayout>

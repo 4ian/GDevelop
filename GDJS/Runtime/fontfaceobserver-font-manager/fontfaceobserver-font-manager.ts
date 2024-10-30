@@ -197,6 +197,11 @@ namespace gdjs {
         );
       }
     }
+
+    dispose(): void {
+      this._loadedFontFamily.clear();
+      this._loadedFontFamilySet.clear();
+    }
   }
 
   //Register the class to let the engine use it.

@@ -22,7 +22,12 @@
             margin-right: auto;
             overflow: hidden;
         }
-
+        #disposeButton {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 10;
+        }
         /* GDJS_CUSTOM_STYLE */
 	</style>
     <!-- Libs and GDJS core files : -->
@@ -30,6 +35,7 @@
 
 </head>
 <body>
+    <button id="disposeButton">Dispose Game</button>
 
     <!-- GDJS_CUSTOM_HTML -->
 	<script>
@@ -48,6 +54,12 @@
         game.loadAllAssets(function() {
             game.startGameLoop();
         });
+
+        // Dispose game on button click
+        document.getElementById("disposeButton").onclick = function() {
+            game.dispose();
+            alert("Game disposed!"); // Уведомление об удалении
+        };
     })();
 
 	</script>

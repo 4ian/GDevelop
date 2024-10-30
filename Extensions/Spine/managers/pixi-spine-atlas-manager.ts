@@ -194,5 +194,10 @@ namespace gdjs {
         ? resource
         : null;
     }
+
+    dispose(): void {
+      this._loadedSpineAtlases.clear();
+      this._loadingSpineAtlases.clear();
+    }
   }
 }

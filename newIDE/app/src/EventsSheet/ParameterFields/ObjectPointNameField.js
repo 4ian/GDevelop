@@ -30,6 +30,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       const {
         project,
         scope,
+        globalObjectsContainer,
+        objectsContainer,
         instructionMetadata,
         instruction,
         expressionMetadata,
@@ -49,8 +51,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       }
 
       const object = getObjectByName(
-        project.getObjects(),
-        scope.layout ? scope.layout.getObjects() : null,
+        globalObjectsContainer,
+        objectsContainer,
         objectOrGroupName
       );
       if (object && object.getType() === 'Sprite') {

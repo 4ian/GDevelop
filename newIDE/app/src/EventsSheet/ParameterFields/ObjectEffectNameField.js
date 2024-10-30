@@ -34,15 +34,16 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     }));
 
     const {
-      project,
       scope,
+      globalObjectsContainer,
+      objectsContainer,
       instructionMetadata,
       instruction,
       expressionMetadata,
       expression,
       parameterIndex,
     } = props;
-    const { layout, eventsFunctionsExtension, eventsBasedObject } = scope;
+    const { eventsFunctionsExtension, eventsBasedObject } = scope;
 
     // We don't memo/callback this, as we want to recompute it every time something changes.
     // Because of the function getLastObjectParameterValue.
@@ -54,21 +55,21 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         expression,
         parameterIndex,
       });
-      if (!objectOrGroupName || !project) {
+      if (!objectOrGroupName) {
         return [];
       }
 
       const object = getObjectByName(
-        project.getObjects(),
-        layout ? layout.getObjects() : null,
+        globalObjectsContainer,
+        objectsContainer,
         objectOrGroupName
       );
       if (object) {
         return enumerateEffectNames(object.getEffects()).sort();
       }
       const group = getObjectGroupByName(
-        project.getObjects(),
-        layout ? layout.getObjects() : null,
+        globalObjectsContainer,
+        objectsContainer,
         objectOrGroupName
       );
       if (group) {
@@ -76,8 +77,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           group.getAllObjectsNames(),
           objectName => {
             const object = getObjectByName(
-              project.getObjects(),
-              layout ? layout.getObjects() : null,
+              globalObjectsContainer,
+              objectsContainer,
               objectName
             );
             if (!object) {

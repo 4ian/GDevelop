@@ -706,12 +706,17 @@ export default class ThemableEventsTree extends Component<
   };
 
   _renderObjectThumbnail = (objectName: string) => {
-    const { project, scope, showObjectThumbnails } = this.props;
+    const {
+      project,
+      globalObjectsContainer,
+      objectsContainer,
+      showObjectThumbnails,
+    } = this.props;
     if (!showObjectThumbnails) return null;
 
     const object = getObjectByName(
-      project.getObjects(),
-      scope.layout ? scope.layout.getObjects() : null,
+      globalObjectsContainer,
+      objectsContainer,
       objectName
     );
     if (!object) return null;

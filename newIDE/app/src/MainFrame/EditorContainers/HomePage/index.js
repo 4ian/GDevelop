@@ -301,7 +301,16 @@ export const HomePage = React.memo<Props>(
       React.useEffect(
         () => {
           const requestedTab = getRequestedTab(routeArguments);
-          if (!requestedTab) return;
+          if (!requestedTab) {
+            if (routeArguments['games-dashboard-tab']) {
+              setGameDetailsCurrentTab(
+                // $FlowIgnore - We are confident the argument is one of the possible tab.
+                routeArguments['games-dashboard-tab']
+              );
+              removeRouteArguments(['games-dashboard-tab']);
+            }
+            return;
+          }
 
           setActiveTab(requestedTab);
           if (requestedTab === 'shop') {

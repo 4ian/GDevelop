@@ -1524,8 +1524,8 @@ const arePropsEqual = (prevProps: Props, nextProps: Props): boolean =>
   prevProps.selectedObjectFolderOrObjectsWithContext ===
     nextProps.selectedObjectFolderOrObjectsWithContext &&
   prevProps.project === nextProps.project &&
-  prevProps.projectScopedContainersAccessor ===
-    nextProps.projectScopedContainersAccessor;
+  prevProps.globalObjectsContainer === nextProps.globalObjectsContainer &&
+  prevProps.objectsContainer === nextProps.objectsContainer;
 
 const MemoizedObjectsList = React.memo<Props, ObjectsListInterface>(
   ObjectsList,

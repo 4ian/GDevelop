@@ -20,11 +20,11 @@ import {
   completeElectronBuild,
   completeWebBuild,
   userEarningsBalance,
+  userEarningsBalanceEmpty,
 } from '../../../fixtures/GDevelopServicesTestData';
 import { client as playApiAxiosClient } from '../../../Utils/GDevelopServices/Play';
 import { client as buildApiAxiosClient } from '../../../Utils/GDevelopServices/Build';
 import { client as analyticsApiAxiosClient } from '../../../Utils/GDevelopServices/Analytics';
-import { apiClient as usageApiAxiosClient } from '../../../Utils/GDevelopServices/Usage';
 
 import type { GameDetailsTab } from '../../../GameDashboard/GameDetails';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
@@ -74,9 +74,6 @@ const buildServiceMock = new MockAdapter(buildApiAxiosClient, {
   delayResponse,
 });
 const analyticsServiceMock = new MockAdapter(analyticsApiAxiosClient, {
-  delayResponse,
-});
-const usageServiceMock = new MockAdapter(usageApiAxiosClient, {
   delayResponse,
 });
 
@@ -145,19 +142,7 @@ export const Default = ({
       : [commentProcessed];
   const gameMetrics = sessions === 'None' ? [] : fakeGameMetrics;
   const userEarningsBalanceToDisplay =
-    userBalance === 'None'
-      ? [
-          {
-            amountInMilliUSDs: 0,
-            amountInCredits: 0,
-            minAmountToCashoutInMilliUSDs: 60000,
-            userId: fakeSilverAuthenticatedUser.profile
-              ? fakeSilverAuthenticatedUser.profile.id
-              : '',
-            updatedAt: Date.now(),
-          },
-        ]
-      : [userEarningsBalance];
+    userBalance === 'None' ? userEarningsBalanceEmpty : userEarningsBalance;
   const leaderboardsToDisplay =
     leaderboards === 'None' ? [] : mockedLeaderboards;
 
@@ -203,17 +188,14 @@ export const Default = ({
       console.error(`Unexpected call to ${config.url} (${config.method})`);
       return [504, null];
     });
-  usageServiceMock
-    .onGet(`/user-earnings-balance`)
-    .reply(200, userEarningsBalanceToDisplay)
-    .onAny()
-    .reply(config => {
-      console.error(`Unexpected call to ${config.url} (${config.method})`);
-      return [504, null];
-    });
 
   return (
-    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+    <AuthenticatedUserContext.Provider
+      value={{
+        ...fakeSilverAuthenticatedUser,
+        userEarningsBalance: userEarningsBalanceToDisplay,
+      }}
+    >
       <GameOverview
         game={game1}
         analyticsSource="homepage"

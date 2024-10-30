@@ -47,7 +47,8 @@ type Props = {|
   gameFeaturings: ?(GameFeaturing[]),
   requirementsErrors: React.Node[],
   onPurchase: I18nType => Promise<void>,
-  isPlanActive: boolean
+  isPlanActive: boolean,
+  hideBorder?: boolean,
 |};
 
 const MarketingPlanFeatures = ({
@@ -56,6 +57,7 @@ const MarketingPlanFeatures = ({
   requirementsErrors,
   onPurchase,
   isPlanActive,
+  hideBorder,
 }: Props) => {
   const { limits } = React.useContext(AuthenticatedUserContext);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -91,7 +93,9 @@ const MarketingPlanFeatures = ({
         <div
           style={{
             ...styles.campaign,
-            border: isPlanActive
+            border: hideBorder
+              ? undefined
+              : isPlanActive
               ? `2px solid ${gdevelopTheme.message.valid}`
               : `1px solid ${gdevelopTheme.palette.secondary}`,
           }}
@@ -108,6 +112,7 @@ const MarketingPlanFeatures = ({
                 justifyContent="space-between"
                 alignItems="flex-start"
                 expand
+                noMargin
               >
                 <LineStackLayout noMargin alignItems="flex-start">
                   {getIconForMarketingPlan(marketingPlan)}

@@ -4,7 +4,11 @@ import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import Grid from '@material-ui/core/Grid';
 import { I18n } from '@lingui/react';
-import { type Game } from '../Utils/GDevelopServices/Game';
+import {
+  listGameFeaturings,
+  type Game,
+  type GameFeaturing,
+} from '../Utils/GDevelopServices/Game';
 import { ColumnStackLayout } from '../UI/Layout';
 import GameHeader from './GameHeader';
 import DashboardWidget from './DashboardWidget';
@@ -36,6 +40,7 @@ import GameFeedback from '../GameDashboard/Feedbacks/GameFeedback';
 import Builds from '../ExportAndShare/Builds';
 import { GameAnalyticsPanel } from '../GameDashboard/GameAnalyticsPanel';
 import LeaderboardAdmin from '../GameDashboard/LeaderboardAdmin';
+import { MarketingPlansStoreContext } from '../MarketingPlans/MarketingPlansStoreContext';
 
 type Props = {|
   game: Game,
@@ -57,6 +62,10 @@ const GameOverview = ({
     gameDetailsDialogOpen,
     setGameDetailsDialogOpen,
   ] = React.useState<boolean>(false);
+  const { marketingPlans, fetchMarketingPlans } = React.useContext(
+    MarketingPlansStoreContext
+  );
+
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { getAuthorizationHeader, profile } = authenticatedUser;
   const [feedbacks, setFeedbacks] = React.useState<?Array<Comment>>(null);
@@ -64,6 +73,10 @@ const GameOverview = ({
   const [gameRollingMetrics, setGameMetrics] = React.useState<?(GameMetrics[])>(
     null
   );
+  const [
+    gameFeaturings,
+    setGameFeaturings,
+  ] = React.useState<?(GameFeaturing[])>(null);
   const [leaderboards, setLeaderboards] = React.useState<?Array<Leaderboard>>(
     null
   );
@@ -75,11 +88,44 @@ const GameOverview = ({
     new Date(new Date().setHours(0, 0, 0, 0) - 7 * 24 * 3600 * 1000)
   );
 
+  const fetchGameFeaturings = React.useCallback(
+    async () => {
+      if (!profile) return;
+      try {
+        const gameFeaturings = await listGameFeaturings(
+          getAuthorizationHeader,
+          {
+            gameId: game.id,
+            userId: profile.id,
+          }
+        );
+        setGameFeaturings(gameFeaturings);
+      } catch (error) {
+        console.error(
+          'An error occurred while fetching game featurings.',
+          error
+        );
+      }
+    },
+    [game, getAuthorizationHeader, profile]
+  );
+
+  React.useEffect(
+    () => {
+      fetchMarketingPlans();
+    },
+    [fetchMarketingPlans]
+  );
+
   React.useEffect(
     () => {
       if (!profile) {
         setFeedbacks(null);
         setBuilds(null);
+        setGameMetrics(null);
+        setLobbyConfiguration(null);
+        setLeaderboards(null);
+        setGameFeaturings(null);
         return;
       }
 
@@ -110,6 +156,7 @@ const GameOverview = ({
             profile.id,
             game.id
           ),
+          fetchGameFeaturings(),
         ]);
         setFeedbacks(feedbacks);
         setBuilds(builds);
@@ -120,7 +167,7 @@ const GameOverview = ({
 
       fetchData();
     },
-    [getAuthorizationHeader, profile, game.id]
+    [getAuthorizationHeader, profile, fetchGameFeaturings, game.id]
   );
 
   const onClickBack = React.useCallback(
@@ -168,6 +215,9 @@ const GameOverview = ({
               <GameAnalyticsPanel
                 game={game}
                 gameMetrics={gameRollingMetrics}
+                gameFeaturings={gameFeaturings}
+                fetchGameFeaturings={fetchGameFeaturings}
+                marketingPlans={marketingPlans}
               />
             ) : currentView === 'leaderboards' ? (
               <LeaderboardAdmin gameId={game.id} onLoading={() => {}} />

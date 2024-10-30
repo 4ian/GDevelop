@@ -55,6 +55,28 @@ export const getMarketingPlanPrice = (
   return usagePrice.priceInCredits;
 };
 
+export const orderMarketingPlansByCreditPrice = (
+  marketingPlans: MarketingPlan[],
+  limits: ?Limits
+): ?({| priceInCredits: number, marketingPlan: MarketingPlan |}[]) => {
+  if (!limits) return null;
+
+  const sortedMarketingPlansWithPrice = marketingPlans
+    .map(marketingPlan => {
+      const planPrice = getMarketingPlanPrice(marketingPlan, limits);
+      if (!planPrice) return null;
+      return { marketingPlan, priceInCredits: planPrice };
+    })
+    .filter(Boolean);
+
+  sortedMarketingPlansWithPrice.sort((planAWithPrice, planBWithPrice) => {
+    if (!planAWithPrice.priceInCredits || !planBWithPrice.priceInCredits)
+      return 0;
+    return planAWithPrice.priceInCredits - planBWithPrice.priceInCredits;
+  });
+  return sortedMarketingPlansWithPrice;
+};
+
 export const isMarketingPlanActive = (
   marketingPlan: MarketingPlan,
   activeGameFeaturings: ?(GameFeaturing[])

@@ -5,7 +5,11 @@ import { I18n } from '@lingui/react';
 import Grid from '@material-ui/core/Grid';
 import { formatISO, subDays } from 'date-fns';
 import { Column, Line } from '../UI/Grid';
-import { type Game } from '../Utils/GDevelopServices/Game';
+import {
+  type Game,
+  type GameFeaturing,
+  type MarketingPlan,
+} from '../Utils/GDevelopServices/Game';
 import { ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
 import {
@@ -16,7 +20,6 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import PlaceholderError from '../UI/PlaceholderError';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
-import AlertMessage from '../UI/AlertMessage';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import { buildChartData, daysShownForYear } from './GameAnalyticsEvaluator';
 import {
@@ -26,18 +29,32 @@ import {
   PlayersDurationPerDayChart,
   SessionsChart,
 } from './GameAnalyticsCharts';
+import MarketingPlanSingleDisplay from '../MarketingPlans/MarketingPlanSingleDisplay';
+import { orderMarketingPlansByCreditPrice } from '../MarketingPlans/MarketingPlanUtils';
 
 const chartHeight = 300;
 
 type Props = {|
   game: Game,
   gameMetrics?: ?(GameMetrics[]),
+  marketingPlans?: ?(MarketingPlan[]),
+  gameFeaturings?: ?(GameFeaturing[]),
+  fetchGameFeaturings?: () => Promise<void>,
 |};
 
-export const GameAnalyticsPanel = ({ game, gameMetrics }: Props) => {
-  const { getAuthorizationHeader, profile } = React.useContext(
-    AuthenticatedUserContext
-  );
+export const GameAnalyticsPanel = ({
+  game,
+  gameMetrics,
+  marketingPlans,
+  gameFeaturings,
+  fetchGameFeaturings,
+}: Props) => {
+  const {
+    getAuthorizationHeader,
+    profile,
+    limits,
+    userEarningsBalance,
+  } = React.useContext(AuthenticatedUserContext);
 
   const [gameRollingMetrics, setGameMetrics] = React.useState<?(GameMetrics[])>(
     gameMetrics
@@ -53,6 +70,35 @@ export const GameAnalyticsPanel = ({ game, gameMetrics }: Props) => {
     null
   );
   const [isGameMetricsLoading, setIsGameMetricsLoading] = React.useState(false);
+
+  const suggestedMarketingPlan: ?MarketingPlan = React.useMemo(
+    () => {
+      if (!marketingPlans || !limits) return null;
+
+      const sortedMarketingPlans = orderMarketingPlansByCreditPrice(
+        marketingPlans,
+        limits
+      );
+      if (!sortedMarketingPlans) return null;
+
+      if (!gameRollingMetrics || gameRollingMetrics.length === 0) {
+        // No session so far.
+        return sortedMarketingPlans[0].marketingPlan;
+      } else if (userEarningsBalance) {
+        // Recommend marketing plan according to available credits.
+        let highestPurchasableMarketingPlan = null;
+        for (const { marketingPlan, priceInCredits } of sortedMarketingPlans) {
+          if (priceInCredits <= userEarningsBalance.amountInCredits) {
+            highestPurchasableMarketingPlan = marketingPlan;
+          }
+        }
+        if (highestPurchasableMarketingPlan)
+          return highestPurchasableMarketingPlan;
+      }
+      return sortedMarketingPlans[0].marketingPlan;
+    },
+    [marketingPlans, limits, gameRollingMetrics, userEarningsBalance]
+  );
 
   // TODO In some timezones, it might ask one less or extra day.
   const lastYearIsoDate = formatISO(subDays(new Date(), daysShownForYear), {
@@ -96,6 +142,12 @@ export const GameAnalyticsPanel = ({ game, gameMetrics }: Props) => {
 
   if (isGameMetricsLoading) return <PlaceholderLoader />;
 
+  const displaySuggestedMarketingPlan =
+    marketingPlans &&
+    gameFeaturings &&
+    fetchGameFeaturings &&
+    suggestedMarketingPlan;
+
   return (
     <I18n>
       {({ i18n }) =>
@@ -122,19 +174,13 @@ export const GameAnalyticsPanel = ({ game, gameMetrics }: Props) => {
                 <SelectOption key="year" value="year" label={t`Year`} />
               </SelectField>
             </Line>
-            {!gameRollingMetrics || gameRollingMetrics.length === 0 ? (
-              <Line noMargin>
-                <AlertMessage kind="warning">
-                  <Trans>
-                    There were no players or stored metrics for this period. Be
-                    sure to publish your game and get players to try it to see
-                    the collected anonymous analytics.
-                  </Trans>
-                </AlertMessage>
-              </Line>
-            ) : null}
-            <Grid container>
-              <Grid item xs={12} sm={6}>
+            <Grid container spacing={2}>
+              <Grid
+                item
+                xs={12}
+                sm={displaySuggestedMarketingPlan ? 7 : 12}
+                md={displaySuggestedMarketingPlan ? 8 : 12}
+              >
                 <Column noMargin alignItems="center" expand>
                   <Text size="block-title" align="center">
                     <Trans>{chartData.overview.playersCount} sessions</Trans>
@@ -146,6 +192,19 @@ export const GameAnalyticsPanel = ({ game, gameMetrics }: Props) => {
                   />
                 </Column>
               </Grid>
+              {suggestedMarketingPlan &&
+                marketingPlans &&
+                gameFeaturings &&
+                fetchGameFeaturings && (
+                  <Grid item xs={12} sm={5} md={4}>
+                    <MarketingPlanSingleDisplay
+                      fetchGameFeaturings={fetchGameFeaturings}
+                      gameFeaturings={gameFeaturings}
+                      marketingPlan={suggestedMarketingPlan}
+                      game={game}
+                    />
+                  </Grid>
+                )}
               <Grid item xs={12} sm={6}>
                 <Column noMargin alignItems="center" expand>
                   <Text size="block-title" align="center">

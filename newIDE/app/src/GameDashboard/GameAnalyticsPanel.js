@@ -1,7 +1,8 @@
 // @flow
+import * as React from 'react';
 import { Trans, t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
-import * as React from 'react';
+import Grid from '@material-ui/core/Grid';
 import { formatISO, subDays } from 'date-fns';
 import { Column, Line } from '../UI/Grid';
 import { type Game } from '../Utils/GDevelopServices/Game';
@@ -16,7 +17,6 @@ import PlaceholderError from '../UI/PlaceholderError';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import AlertMessage from '../UI/AlertMessage';
-import { ResponsiveLineStackLayout } from '../UI/Layout';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import { buildChartData, daysShownForYear } from './GameAnalyticsEvaluator';
 import {
@@ -133,89 +133,98 @@ export const GameAnalyticsPanel = ({ game, gameMetrics }: Props) => {
                 </AlertMessage>
               </Line>
             ) : null}
-            <ResponsiveLineStackLayout expand noMargin justifyContent="center">
-              <Column noMargin alignItems="center" expand>
-                <Text size="block-title" align="center">
-                  <Trans>{chartData.overview.playersCount} sessions</Trans>
-                </Text>
-                <SessionsChart
-                  chartData={chartData}
-                  height={chartHeight}
-                  i18n={i18n}
-                />
-              </Column>
-              <Column noMargin alignItems="center" expand>
-                <Text size="block-title" align="center">
-                  <Trans>
-                    {Math.round(chartData.overview.bounceRatePercent)}% bounce
-                    rate
-                  </Trans>
-                </Text>
-                <BounceRateChart
-                  chartData={chartData}
-                  height={chartHeight}
-                  i18n={i18n}
-                />
-              </Column>
-            </ResponsiveLineStackLayout>
-            <ResponsiveLineStackLayout expand noMargin justifyContent="center">
-              <Column expand noMargin alignItems="center">
-                <Text size="block-title" align="center">
-                  <Trans>
-                    {Math.round(chartData.overview.meanPlayedDurationInMinutes)}{' '}
-                    minutes per player
-                  </Trans>
-                </Text>
-                <MeanPlayTimeChart
-                  chartData={chartData}
-                  height={chartHeight}
-                  i18n={i18n}
-                />
-              </Column>
-              <Column expand noMargin alignItems="center">
-                <Text size="block-title" align="center">
-                  <Trans>
-                    {
-                      chartData.overview.greaterDurationPlayerSurface
-                        .playersCount
-                    }{' '}
-                    players with more than{' '}
-                    {
-                      chartData.overview.greaterDurationPlayerSurface
-                        .durationInMinutes
-                    }{' '}
-                    minutes
-                  </Trans>
-                </Text>
-                <PlayersRepartitionPerDurationChart
-                  chartData={chartData}
-                  height={chartHeight}
-                  i18n={i18n}
-                />
-              </Column>
-            </ResponsiveLineStackLayout>
-            <ResponsiveLineStackLayout expand noMargin justifyContent="center">
-              <Column expand noMargin alignItems="center">
-                <Text size="block-title" align="center">
-                  <Trans>
-                    {Math.round(
-                      chartData.overview.nearestToMedianDuration.playersPercent
-                    )}
-                    % of players with more than{' '}
-                    {
-                      chartData.overview.nearestToMedianDuration
-                        .durationInMinutes
-                    }{' '}
-                    minutes
-                  </Trans>
-                </Text>
-                <PlayersDurationPerDayChart
-                  chartData={chartData}
-                  height={chartHeight}
-                  i18n={i18n}
-                />
-              </Column>
-            </ResponsiveLineStackLayout>
+            <Grid container>
+              <Grid item xs={12} sm={6}>
+                <Column noMargin alignItems="center" expand>
+                  <Text size="block-title" align="center">
+                    <Trans>{chartData.overview.playersCount} sessions</Trans>
+                  </Text>
+                  <SessionsChart
+                    chartData={chartData}
+                    height={chartHeight}
+                    i18n={i18n}
+                  />
+                </Column>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Column noMargin alignItems="center" expand>
+                  <Text size="block-title" align="center">
+                    <Trans>
+                      {Math.round(chartData.overview.bounceRatePercent)}% bounce
+                      rate
+                    </Trans>
+                  </Text>
+                  <BounceRateChart
+                    chartData={chartData}
+                    height={chartHeight}
+                    i18n={i18n}
+                  />
+                </Column>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Column expand noMargin alignItems="center">
+                  <Text size="block-title" align="center">
+                    <Trans>
+                      {Math.round(
+                        chartData.overview.meanPlayedDurationInMinutes
+                      )}{' '}
+                      minutes per player
+                    </Trans>
+                  </Text>
+                  <MeanPlayTimeChart
+                    chartData={chartData}
+                    height={chartHeight}
+                    i18n={i18n}
+                  />
+                </Column>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Column expand noMargin alignItems="center">
+                  <Text size="block-title" align="center">
+                    <Trans>
+                      {
+                        chartData.overview.greaterDurationPlayerSurface
+                          .playersCount
+                      }{' '}
+                      players with more than{' '}
+                      {
+                        chartData.overview.greaterDurationPlayerSurface
+                          .durationInMinutes
+                      }{' '}
+                      minutes
+                    </Trans>
+                  </Text>
+                  <PlayersRepartitionPerDurationChart
+                    chartData={chartData}
+                    height={chartHeight}
+                    i18n={i18n}
+                  />
+                </Column>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Column expand noMargin alignItems="center">
+                  <Text size="block-title" align="center">
+                    <Trans>
+                      {Math.round(
+                        chartData.overview.nearestToMedianDuration
+                          .playersPercent
+                      )}
+                      % of players with more than{' '}
+                      {
+                        chartData.overview.nearestToMedianDuration
+                          .durationInMinutes
+                      }{' '}
+                      minutes
+                    </Trans>
+                  </Text>
+                  <PlayersDurationPerDayChart
+                    chartData={chartData}
+                    height={chartHeight}
+                    i18n={i18n}
+                  />
+                </Column>
+              </Grid>
+            </Grid>
           </ColumnStackLayout>
         )
       }

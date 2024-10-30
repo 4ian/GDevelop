@@ -142,6 +142,7 @@ const GamesList = ({ project, games, onRefreshGames, onOpenGameId }: Props) => {
 
   React.useEffect(
     () => {
+      // TODO: Move this logic in homepage.
       const loadInitialGame = async () => {
         // When games are loaded and we have an initial game id, try to open it.
         const initialGameId = routeArguments['game-id'];

@@ -178,6 +178,13 @@ export const userEarningsBalance = {
   minAmountToCashoutInMilliUSDs: 60000,
   updatedAt: 1515084391000,
 };
+export const userEarningsBalanceEmpty = {
+  userId: 'userId',
+  amountInMilliUSDs: 0,
+  amountInCredits: 0,
+  minAmountToCashoutInMilliUSDs: 60000,
+  updatedAt: 1515084391000,
+};
 
 export const usagesForIndieUser: Usages = [
   {
@@ -2837,6 +2844,7 @@ export const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
       content: {},
     },
   ],
+  userEarningsBalance,
   receivedGameTemplates: [],
   receivedAssetShortHeaders: [],
   gameTemplatePurchases: [],
@@ -2869,6 +2877,9 @@ export const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   },
   onRefreshAssetPackPurchases: async () => {
     console.info('This should refresh the asset pack purchases');
+  },
+  onRefreshEarningsBalance: async () => {
+    console.info('This should refresh the user earnings balance');
   },
   onRefreshNotifications: async () => {
     console.info('This should refresh the notifications');

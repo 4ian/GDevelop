@@ -12,10 +12,6 @@ import Window from '../../Utils/Window';
 import RaisedButton from '../../UI/RaisedButton';
 import Coin from '../../Credits/Icons/Coin';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
-import {
-  getUserEarningsBalance,
-  type UserEarningsBalance,
-} from '../../Utils/GDevelopServices/Usage';
 import PlaceholderError from '../../UI/PlaceholderError';
 import Bank from '../../UI/CustomSvgIcons/Bank';
 import { Tooltip } from '@material-ui/core';
@@ -39,15 +35,11 @@ type Props = {|
 |};
 
 const UserEarnings = ({ hideTitle, margin }: Props) => {
-  const { getAuthorizationHeader, profile } = React.useContext(
+  const { userEarningsBalance, onRefreshEarningsBalance } = React.useContext(
     AuthenticatedUserContext
   );
   const theme = React.useContext(GDevelopThemeContext);
 
-  const [
-    userEarningsBalance,
-    setUserEarningsBalance,
-  ] = React.useState<?UserEarningsBalance>(null);
   const [earningsInMilliUsd, setEarningsInMilliUsd] = React.useState(0);
   const [earningsInCredits, setEarningsInCredits] = React.useState(0);
   const [error, setError] = React.useState(null);
@@ -59,14 +51,9 @@ const UserEarnings = ({ hideTitle, margin }: Props) => {
 
   const fetchUserEarningsBalance = React.useCallback(
     async () => {
-      if (!profile) return;
+      if (!userEarningsBalance) return;
 
       try {
-        const userEarningsBalance = await getUserEarningsBalance(
-          getAuthorizationHeader,
-          profile.id
-        );
-        setUserEarningsBalance(userEarningsBalance);
         // Create an animation to show the earnings increasing.
         const targetMilliUsd = userEarningsBalance.amountInMilliUSDs;
         const targetCredits = userEarningsBalance.amountInCredits;
@@ -102,7 +89,7 @@ const UserEarnings = ({ hideTitle, margin }: Props) => {
         setError(error);
       }
     },
-    [getAuthorizationHeader, profile, earningsInMilliUsd, earningsInCredits]
+    [userEarningsBalance, earningsInMilliUsd, earningsInCredits]
   );
 
   React.useEffect(
@@ -157,7 +144,7 @@ const UserEarnings = ({ hideTitle, margin }: Props) => {
       )}
       {error && (
         <LineStackLayout noMargin alignItems="center">
-          <PlaceholderError onRetry={fetchUserEarningsBalance}>
+          <PlaceholderError onRetry={onRefreshEarningsBalance}>
             <Trans>
               Can't load the total earnings. Verify your internet connection or
               try again later.
@@ -265,7 +252,7 @@ const UserEarnings = ({ hideTitle, margin }: Props) => {
         <CreditOutDialog
           userEarningsBalance={userEarningsBalance}
           onClose={() => setSelectedCashOutType(null)}
-          onSuccess={fetchUserEarningsBalance}
+          onSuccess={onRefreshEarningsBalance}
           type={selectedCashOutType}
         />
       )}

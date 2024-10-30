@@ -102,6 +102,7 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
         /*includeWebsocketDebuggerClient=*/false,
         /*includeWindowMessageDebuggerClient=*/false,
         /*includeMinimalDebuggerClient=*/false,
+        /*includeCaptureManager*/ false,
         exportedProject.GetLoadingScreen().GetGDevelopLogoStyle(),
         includesFiles);
 
@@ -119,8 +120,11 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
     helper.ExportEffectIncludes(exportedProject, includesFiles);
 
     // Export events
-    if (!helper.ExportEventsCode(exportedProject, codeOutputDir, includesFiles,
-                                 wholeProjectDiagnosticReport, false)) {
+    if (!helper.ExportEventsCode(exportedProject,
+                                 codeOutputDir,
+                                 includesFiles,
+                                 wholeProjectDiagnosticReport,
+                                 false)) {
       gd::LogError(_("Error during exporting! Unable to export events:\n") +
                    lastError);
       return false;
@@ -139,11 +143,11 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
         gd::SceneResourcesFinder::FindProjectResources(exportedProject);
     std::unordered_map<gd::String, std::set<gd::String>> scenesUsedResources;
     for (std::size_t layoutIndex = 0;
-         layoutIndex < exportedProject.GetLayoutsCount(); layoutIndex++) {
+         layoutIndex < exportedProject.GetLayoutsCount();
+         layoutIndex++) {
       auto &layout = exportedProject.GetLayout(layoutIndex);
       scenesUsedResources[layout.GetName()] =
-          gd::SceneResourcesFinder::FindSceneResources(exportedProject,
-                                                            layout);
+          gd::SceneResourcesFinder::FindSceneResources(exportedProject, layout);
     }
 
     // Strip the project (*after* generating events as the events may use
@@ -152,8 +156,11 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
 
     //...and export it
     gd::SerializerElement noRuntimeGameOptions;
-    helper.ExportProjectData(fs, exportedProject, codeOutputDir + "/data.js",
-                             noRuntimeGameOptions, projectUsedResources,
+    helper.ExportProjectData(fs,
+                             exportedProject,
+                             codeOutputDir + "/data.js",
+                             noRuntimeGameOptions,
+                             projectUsedResources,
                              scenesUsedResources);
     includesFiles.push_back(codeOutputDir + "/data.js");
 

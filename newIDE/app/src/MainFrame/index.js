@@ -67,6 +67,7 @@ import {
   type PreviewLauncherInterface,
   type PreviewLauncherProps,
   type PreviewLauncherComponent,
+  type LaunchPreviewOptions,
 } from '../ExportAndShare/PreviewLauncher.flow';
 import {
   type ResourceSource,
@@ -136,7 +137,6 @@ import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
 import { useDiscordRichPresence } from '../Utils/UpdateDiscordRichPresence';
 import { delay } from '../Utils/Delay';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
-import { createGameResourceSignedUrls } from '../Utils/GDevelopServices/Game';
 import useExampleOrGameTemplateDialogs from './UseExampleOrGameTemplateDialogs';
 import { findAndLogProjectPreviewErrors } from '../Utils/ProjectErrorsChecker';
 import { renameResourcesInProject } from '../ResourcesList/ResourceUtils';
@@ -279,23 +279,6 @@ const initialPreviewState: PreviewState = {
   isPreviewOverriden: false,
   overridenPreviewLayoutName: null,
   overridenPreviewExternalLayoutName: null,
-};
-
-// Simpler version of the CaptureOptions, as only the timing is needed to start configuring the preview capture.
-type LaunchCaptureOptions = {|
-  screenshots: Array<{|
-    timing: number,
-  |}>,
-|};
-
-type LaunchPreviewOptions = {
-  networkPreview?: boolean,
-  hotReload?: boolean,
-  projectDataOnlyExport?: boolean,
-  fullLoadingScreen?: boolean,
-  forceDiagnosticReport?: boolean,
-  numberOfWindows?: number,
-  launchCaptureOptions?: LaunchCaptureOptions,
 };
 
 export type Props = {|
@@ -552,15 +535,11 @@ const MainFrame = (props: Props) => {
     onOpenNewProjectSetupDialog: () => setNewProjectSetupDialogOpen(true),
   });
 
-  const {
-    games,
-    gamesFetchingError,
-    fetchGames,
-    onGameUpdated,
-  } = useGamesList();
+  const gamesList = useGamesList();
 
   const {
-    onGameScreenshotsTaken,
+    createCaptureOptionsForPreview,
+    onCaptureFinished,
     onGameScreenshotsClaimed,
     getGameUnverifiedScreenshotUrls,
   } = useCapturesManager({ project: currentProject });
@@ -1655,42 +1634,9 @@ const MainFrame = (props: Props) => {
         currentProject
       );
 
-      const captureOptions = {};
-      try {
-        if (launchCaptureOptions && launchCaptureOptions.screenshots.length) {
-          const screenshotOptions = launchCaptureOptions.screenshots;
-          const response = await createGameResourceSignedUrls({
-            uploadType: 'game-screenshot',
-            files: screenshotOptions.map(screenshotOption => ({
-              contentType: 'image/png',
-            })),
-          });
-          const signedUrls = response.signedUrls;
-          if (!signedUrls || signedUrls.length === 0) {
-            throw new Error('No signed url returned');
-          }
-
-          captureOptions.screenshots = screenshotOptions
-            .map((screenshotOption, index) => {
-              const signedUrlInfo = signedUrls[index];
-              if (!signedUrlInfo) {
-                return null;
-              }
-
-              return {
-                timing: screenshotOption.timing,
-                signedUrl: signedUrlInfo.signedUrl,
-                publicUrl: signedUrlInfo.publicUrl,
-              };
-            })
-            .filter(Boolean);
-        }
-      } catch (error) {
-        console.error(
-          'Error caught while creating signed URLs for game resources. Skipping.',
-          error
-        );
-      }
+      const captureOptions = await createCaptureOptionsForPreview(
+        launchCaptureOptions
+      );
 
       try {
         await eventsFunctionsExtensionsState.ensureLoadFinished();
@@ -1710,7 +1656,7 @@ const MainFrame = (props: Props) => {
           getIsAlwaysOnTopInPreview: preferences.getIsAlwaysOnTopInPreview,
           numberOfWindows: numberOfWindows || 1,
           captureOptions,
-          onGameScreenshotsTaken,
+          onCaptureFinished,
         });
         setPreviewLoading(false);
 
@@ -1763,7 +1709,8 @@ const MainFrame = (props: Props) => {
       currentlyRunningInAppTutorial,
       getAuthenticatedPlayerForPreview,
       quickCustomizationDialogOpenedFromGameId,
-      onGameScreenshotsTaken,
+      onCaptureFinished,
+      createCaptureOptionsForPreview,
     ]
   );
 
@@ -1802,8 +1749,8 @@ const MainFrame = (props: Props) => {
         networkPreview: false,
         launchCaptureOptions: {
           screenshots: [
-            { timing: 1000 }, // Take one quickly in case the user closes the preview too fast.
-            { timing: 5000 }, // Take another one after longer into the game.
+            { delayTimeInSeconds: 1000 }, // Take one quickly in case the user closes the preview too fast.
+            { delayTimeInSeconds: 5000 }, // Take another one after longer into the game.
           ],
         },
         hotReload: true,
@@ -3570,9 +3517,7 @@ const MainFrame = (props: Props) => {
             freezeUpdate={!projectManagerOpen}
             hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
             resourceManagementProps={resourceManagementProps}
-            games={games}
-            fetchGames={fetchGames}
-            onGameUpdated={onGameUpdated}
+            gamesList={gamesList}
           />
         ) : null}
       </ProjectManagerDrawer>
@@ -3763,10 +3708,7 @@ const MainFrame = (props: Props) => {
                     onOpenEventBasedObjectEditor: onOpenEventBasedObjectEditor,
                     onEventsBasedObjectChildrenEdited: onEventsBasedObjectChildrenEdited,
                     onSceneObjectEdited: onSceneObjectEdited,
-                    games,
-                    onGameUpdated,
-                    fetchGames,
-                    gamesFetchingError,
+                    gamesList,
                   })}
                 </ErrorBoundary>
               </CommandsContextScopedProvider>
@@ -3813,7 +3755,7 @@ const MainFrame = (props: Props) => {
             getIncludeFileHashs:
               eventsFunctionsExtensionsContext.getIncludeFileHashs,
             onExport: () => openShareDialog('publish'),
-            onGameScreenshotsTaken,
+            onCaptureFinished,
           },
           (previewLauncher: ?PreviewLauncherInterface) => {
             _previewLauncher.current = previewLauncher;

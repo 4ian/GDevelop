@@ -1,10 +1,26 @@
 // @flow
 import * as React from 'react';
 
+// Simpler version of the CaptureOptions, as only the delayTimeInSeconds is needed to start configuring the preview capture.
+export type LaunchCaptureOptions = {|
+  screenshots: Array<{|
+    delayTimeInSeconds: number,
+  |}>,
+|};
+
+export type LaunchPreviewOptions = {
+  networkPreview?: boolean,
+  hotReload?: boolean,
+  projectDataOnlyExport?: boolean,
+  fullLoadingScreen?: boolean,
+  forceDiagnosticReport?: boolean,
+  numberOfWindows?: number,
+  launchCaptureOptions?: LaunchCaptureOptions,
+};
 export type CaptureOptions = {|
   screenshots: Array<{|
     signedUrl: string,
-    timing: number,
+    delayTimeInSeconds: number,
     publicUrl: string,
   |}>,
 |};
@@ -27,9 +43,7 @@ export type PreviewOptions = {|
   getIsMenuBarHiddenInPreview: () => boolean,
   getIsAlwaysOnTopInPreview: () => boolean,
   captureOptions: CaptureOptions,
-  onGameScreenshotsTaken: ({
-    unverifiedScreenshotPublicUrls: string[],
-  }) => void,
+  onCaptureFinished: CaptureOptions => Promise<void>,
 |};
 
 /** The props that PreviewLauncher must support */
@@ -39,9 +53,7 @@ export type PreviewLauncherProps = {|
   sourceGameId: string,
   getIncludeFileHashs: () => { [string]: number },
   onExport: () => void,
-  onGameScreenshotsTaken: ({
-    unverifiedScreenshotPublicUrls: string[],
-  }) => void,
+  onCaptureFinished: CaptureOptions => Promise<void>,
 |};
 
 /** Each game connected to the debugger server is identified by a unique number. */

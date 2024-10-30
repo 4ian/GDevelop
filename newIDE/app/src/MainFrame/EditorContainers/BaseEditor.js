@@ -13,7 +13,7 @@ import {
 } from '../../ProjectsStorage';
 import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
 import { type PrivateGameTemplateListingData } from '../../Utils/GDevelopServices/Shop';
-import { type Game } from '../../Utils/GDevelopServices/Game';
+import { type GamesList } from '../../GameDashboard/UseGamesList';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 
 export type EditorContainerExtraProps = {|
@@ -96,10 +96,7 @@ export type RenderEditorContainerProps = {|
   closeProject: () => Promise<void>,
 
   // Games
-  games: ?Array<Game>,
-  fetchGames: () => Promise<void>,
-  onGameUpdated: (game: Game) => void,
-  gamesFetchingError: ?Error,
+  gamesList: GamesList,
 
   // Other dialogs opening:
   onOpenExampleStore: () => void,

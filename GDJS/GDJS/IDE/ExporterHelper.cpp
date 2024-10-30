@@ -157,6 +157,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
                  options.useWindowMessageDebuggerClient,
                  /*includeMinimalDebuggerClient=*/
                  options.useMinimalDebuggerClient,
+                 /*includeCaptureManager=*/
+                 !options.captureOptions.IsEmpty(),
                  immutableProject.GetLoadingScreen().GetGDevelopLogoStyle(),
                  includesFiles);
 
@@ -272,14 +274,14 @@ bool ExporterHelper::ExportProjectForPixiPreview(
 
   if (!options.captureOptions.IsEmpty()) {
     auto &captureOptionsElement = runtimeGameOptions.AddChild("captureOptions");
-    const std::vector<gd::Screenshot> screenshots =
-        options.captureOptions.GetScreenshots();
+    const auto &screenshots = options.captureOptions.GetScreenshots();
     if (!screenshots.empty()) {
       auto &screenshotsElement = captureOptionsElement.AddChild("screenshots");
       screenshotsElement.ConsiderAsArrayOf("screenshot");
       for (const auto &screenshot : screenshots) {
         screenshotsElement.AddChild("screenshot")
-            .SetIntAttribute("timing", screenshot.GetTiming())
+            .SetIntAttribute("delayTimeInSeconds",
+                             screenshot.GetDelayTimeInSeconds())
             .SetStringAttribute("signedUrl", screenshot.GetSignedUrl())
             .SetStringAttribute("publicUrl", screenshot.GetPublicUrl());
       }
@@ -773,6 +775,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
                                     bool includeWebsocketDebuggerClient,
                                     bool includeWindowMessageDebuggerClient,
                                     bool includeMinimalDebuggerClient,
+                                    bool includeCaptureManager,
                                     gd::String gdevelopLogoStyle,
                                     std::vector<gd::String> &includesFiles) {
   // First, do not forget common includes (they must be included before events
@@ -785,7 +788,6 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "inputmanager.js");
   InsertUnique(includesFiles, "jsonmanager.js");
   InsertUnique(includesFiles, "Model3DManager.js");
-  InsertUnique(includesFiles, "capturemanager.js");
   InsertUnique(includesFiles, "ResourceLoader.js");
   InsertUnique(includesFiles, "ResourceCache.js");
   InsertUnique(includesFiles, "timemanager.js");
@@ -889,6 +891,9 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
     InsertUnique(includesFiles, "Extensions/3D/CustomRuntimeObject3D.js");
     InsertUnique(includesFiles,
                  "Extensions/3D/CustomRuntimeObject3DRenderer.js");
+  }
+  if (includeCaptureManager) {
+    InsertUnique(includesFiles, "capturemanager.js");
   }
 }
 

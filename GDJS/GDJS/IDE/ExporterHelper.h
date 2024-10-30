@@ -51,8 +51,7 @@ struct PreviewExportOptions {
         playerId(""),
         playerUsername(""),
         playerToken(""),
-        allowAuthenticationUsingIframeForPreview(false),
-        captureOptions({}) {};
+        allowAuthenticationUsingIframeForPreview(false) {};
 
   /**
    * \brief Set the address of the debugger server that the game should reach
@@ -263,11 +262,11 @@ struct PreviewExportOptions {
    * \brief Set the capture options to be used for taking screenshots or videos
    * of the preview.
    */
-  PreviewExportOptions &AddScreenshotCapture(const int &timing,
+  PreviewExportOptions &AddScreenshotCapture(int delayTimeInSeconds,
                                              const gd::String &signedUrl,
                                              const gd::String &publicUrl) {
     gd::Screenshot screenshot;
-    screenshot.SetTiming(timing);
+    screenshot.SetDelayTimeInSeconds(delayTimeInSeconds);
     screenshot.SetSignedUrl(signedUrl);
     screenshot.SetPublicUrl(publicUrl);
     captureOptions.AddScreenshot(screenshot);
@@ -405,6 +404,7 @@ class ExporterHelper {
                       bool includeWebsocketDebuggerClient,
                       bool includeWindowMessageDebuggerClient,
                       bool includeMinimalDebuggerClient,
+                      bool includeCaptureManager,
                       gd::String gdevelopLogoStyle,
                       std::vector<gd::String> &includesFiles);
 

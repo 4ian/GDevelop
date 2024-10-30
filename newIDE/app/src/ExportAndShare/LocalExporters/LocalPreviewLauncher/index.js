@@ -95,37 +95,7 @@ export default class LocalPreviewLauncher extends React.Component<
     ipcRenderer.removeAllListeners('preview-window-closed');
     ipcRenderer.on('preview-window-closed', async event => {
       if (captureOptions) {
-        const { screenshots } = captureOptions;
-        if (!screenshots) return;
-        const screenshotPublicUrls: string[] = screenshots.map(
-          screenshot => screenshot.publicUrl
-        );
-
-        // Check if they have been properly uploaded.
-        const responseUploadedScreenshotPublicUrls: Array<
-          string | null
-        > = await Promise.all(
-          screenshotPublicUrls.map(
-            async (screenshotUrl): Promise<string | null> => {
-              const response = await fetch(screenshotUrl, { method: 'HEAD' });
-              if (!response.ok) {
-                return null;
-              }
-
-              return screenshotUrl;
-            }
-          )
-        );
-
-        const uploadedScreenshotPublicUrls = responseUploadedScreenshotPublicUrls.filter(
-          Boolean
-        );
-
-        if (!uploadedScreenshotPublicUrls.length) return;
-
-        this.props.onGameScreenshotsTaken({
-          unverifiedScreenshotPublicUrls: uploadedScreenshotPublicUrls,
-        });
+        await this.props.onCaptureFinished(captureOptions);
       }
     });
   };
@@ -327,7 +297,7 @@ export default class LocalPreviewLauncher extends React.Component<
                 previewOptions.captureOptions.screenshots.forEach(
                   screenshot => {
                     previewExportOptions.addScreenshotCapture(
-                      screenshot.timing,
+                      screenshot.delayTimeInSeconds,
                       screenshot.signedUrl,
                       screenshot.publicUrl
                     );

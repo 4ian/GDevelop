@@ -4,7 +4,14 @@ import * as React from 'react';
 import { getGames, type Game } from '../Utils/GDevelopServices/Game';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
-const useGamesList = () => {
+export type GamesList = {|
+  games: ?Array<Game>,
+  gamesFetchingError: ?Error,
+  fetchGames: () => Promise<void>,
+  onGameUpdated: (updatedGame: Game) => void,
+|};
+
+const useGamesList = (): GamesList => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const gamesFetchingPromise = React.useRef<?Promise<any>>(null);
   const {

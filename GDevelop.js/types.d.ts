@@ -1550,8 +1550,8 @@ export class QuickCustomizationVisibilitiesContainer extends EmscriptenObject {
 }
 
 export class Screenshot extends EmscriptenObject {
-  getTiming(): number;
-  setTiming(timing: number): void;
+  getDelayTimeInSeconds(): number;
+  setDelayTimeInSeconds(delayTimeInSeconds: number): void;
   getSignedUrl(): string;
   setSignedUrl(signedUrl: string): void;
   getPublicUrl(): string;
@@ -2850,7 +2850,7 @@ export class PreviewExportOptions extends EmscriptenObject {
   setGDevelopVersionWithHash(gdevelopVersionWithHash: string): PreviewExportOptions;
   setProjectTemplateSlug(projectTemplateSlug: string): PreviewExportOptions;
   setSourceGameId(sourceGameId: string): PreviewExportOptions;
-  addScreenshotCapture(timing: number, signedUrl: string, publicUrl: string): PreviewExportOptions;
+  addScreenshotCapture(delayTimeInSeconds: number, signedUrl: string, publicUrl: string): PreviewExportOptions;
 }
 
 export class ExportOptions extends EmscriptenObject {

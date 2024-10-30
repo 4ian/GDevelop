@@ -11,8 +11,10 @@ class GD_CORE_API Screenshot {
   Screenshot();
   virtual ~Screenshot() {};
 
-  void SetTiming(int timing_) { timing = timing_; }
-  const long GetTiming() const { return timing; }
+  void SetDelayTimeInSeconds(int delayTimeInMs_) {
+    delayTimeInMs = delayTimeInMs_;
+  }
+  const long GetDelayTimeInSeconds() const { return delayTimeInMs; }
 
   void SetSignedUrl(const gd::String& signedUrl_) { signedUrl = signedUrl_; }
   const gd::String& GetSignedUrl() const { return signedUrl; }
@@ -21,7 +23,7 @@ class GD_CORE_API Screenshot {
   const gd::String& GetPublicUrl() const { return publicUrl; }
 
  private:
-  int timing;
+  int delayTimeInMs = 0;
   gd::String signedUrl;
   gd::String publicUrl;
 };

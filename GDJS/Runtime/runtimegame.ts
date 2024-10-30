@@ -191,7 +191,7 @@ namespace gdjs {
     /**
      * The capture manager, used to manage captures (screenshots, videos, etc...).
      */
-    _captureManager: CaptureManager;
+    _captureManager: CaptureManager | null;
 
     /**
      * @param data The object (usually stored in data.json) containing the full project data
@@ -251,9 +251,16 @@ namespace gdjs {
       this._debuggerClient = gdjs.DebuggerClient
         ? new gdjs.DebuggerClient(this)
         : null;
-      this._captureManager = new gdjs.CaptureManager(
-        this._renderer,
-        this._options.captureOptions || {}
+      this._captureManager = gdjs.CaptureManager
+        ? new gdjs.CaptureManager(
+            this._renderer,
+            this._options.captureOptions || {}
+          )
+        : null;
+      console.log(
+        gdjs.CaptureManager,
+        this._options.captureOptions,
+        this._captureManager
       );
       this._isPreview = this._options.isPreview || false;
       this._sessionId = null;
@@ -942,7 +949,9 @@ namespace gdjs {
         setTimeout(() => {
           this._setupSessionMetrics();
         }, 4000);
-        this._captureManager.setupCaptureOptions(this._isPreview);
+        if (this._captureManager) {
+          this._captureManager.setupCaptureOptions(this._isPreview);
+        }
       } catch (e) {
         if (this._debuggerClient) this._debuggerClient.onUncaughtException(e);
 

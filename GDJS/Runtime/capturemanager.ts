@@ -6,10 +6,25 @@
 namespace gdjs {
   export type CaptureOptions = {
     screenshots?: {
-      timing: number;
+      delayTimeInSeconds: number;
       signedUrl: string;
       publicUrl: string;
     }[];
+  };
+
+  /**
+   * Helper function to convert a base64 string to a Blob, which can be uploaded to a server.
+   */
+  const base64ToBlob = (base64) => {
+    const byteString = atob(base64.split(',')[1]);
+    const mimeString = base64.split(',')[0].split(':')[1].split(';')[0];
+
+    const arrayBuffer = new Uint8Array(byteString.length);
+    for (let i = 0; i < byteString.length; i++) {
+      arrayBuffer[i] = byteString.charCodeAt(i);
+    }
+
+    return new Blob([arrayBuffer], { type: mimeString });
   };
 
   /**
@@ -31,44 +46,27 @@ namespace gdjs {
      * To be called when the scene has started rendering.
      */
     setupCaptureOptions(isPreview: boolean): void {
+      console.log('Capture options:', this._captureOptions, isPreview);
       if (!isPreview || !this._captureOptions.screenshots) {
         return;
       }
 
-      for (const sscreenshotCaptureOption of this._captureOptions.screenshots) {
+      for (const screenshotCaptureOption of this._captureOptions.screenshots) {
         setTimeout(async () => {
-          console.info(
-            `Taking a screenshot and uploading it to ${sscreenshotCaptureOption.publicUrl}`
-          );
-          await this.takeScreenshot(sscreenshotCaptureOption.signedUrl);
-        }, sscreenshotCaptureOption.timing);
+          await this.takeAndUploadScreenshot(screenshotCaptureOption.signedUrl);
+        }, screenshotCaptureOption.delayTimeInSeconds);
       }
-    }
-
-    /**
-     * Helper function to convert a base64 string to a Blob, which can be uploaded to a server.
-     */
-    base64ToBlob(base64) {
-      const byteString = atob(base64.split(',')[1]);
-      const mimeString = base64.split(',')[0].split(':')[1].split(';')[0];
-
-      const arrayBuffer = new Uint8Array(byteString.length);
-      for (let i = 0; i < byteString.length; i++) {
-        arrayBuffer[i] = byteString.charCodeAt(i);
-      }
-
-      return new Blob([arrayBuffer], { type: mimeString });
     }
 
     /**
      * Take a screenshot and upload it to the server.
      */
-    async takeScreenshot(signedUrl: string) {
+    async takeAndUploadScreenshot(signedUrl: string) {
       const canvas = this._gameRenderer.getCanvas();
       if (canvas) {
         try {
           const base64Data = canvas.toDataURL('image/png');
-          const blobData = this.base64ToBlob(base64Data);
+          const blobData = base64ToBlob(base64Data);
 
           await fetch(signedUrl, {
             method: 'PUT',

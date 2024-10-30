@@ -50,7 +50,7 @@ import EducationMarketingSection from './EducationMarketingSection';
 import useEducationForm from './UseEducationForm';
 import { type NewProjectSetup } from '../../../ProjectCreation/NewProjectSetupDialog';
 import { type ObjectWithContext } from '../../../ObjectsList/EnumerateObjects';
-import { type Game } from '../../../Utils/GDevelopServices/Game';
+import { type GamesList } from '../../../GameDashboard/UseGamesList';
 
 const gamesDashboardWikiArticle = getHelpLink('/interface/games-dashboard/');
 const getRequestedTab = (routeArguments: RouteArguments): HomeTab | null => {
@@ -116,10 +116,7 @@ type Props = {|
   storageProviders: Array<StorageProvider>,
 
   // Games
-  games: ?Array<Game>,
-  fetchGames: () => Promise<void>,
-  onGameUpdated: (game: Game) => void,
-  gamesFetchingError: ?Error,
+  gamesList: GamesList,
 
   // Project opening
   canOpen: boolean,
@@ -201,10 +198,7 @@ export const HomePage = React.memo<Props>(
         askToCloseProject,
         closeProject,
         onOpenTemplateFromTutorial,
-        games,
-        fetchGames,
-        onGameUpdated,
-        gamesFetchingError,
+        gamesList,
       }: Props,
       ref
     ) => {
@@ -224,6 +218,12 @@ export const HomePage = React.memo<Props>(
         shop: { setInitialGameTemplateUserFriendlySlug },
       } = React.useContext(PrivateGameTemplateStoreContext);
       const [openedGameId, setOpenedGameId] = React.useState<?string>(null);
+      const {
+        games,
+        fetchGames,
+        gamesFetchingError,
+        onGameUpdated,
+      } = gamesList;
       const [
         gameDetailsCurrentTab,
         setGameDetailsCurrentTab,
@@ -673,9 +673,6 @@ export const renderHomePageContainer = (
     onSave={props.onSave}
     canSave={props.canSave}
     resourceManagementProps={props.resourceManagementProps}
-    games={props.games}
-    fetchGames={props.fetchGames}
-    onGameUpdated={props.onGameUpdated}
-    gamesFetchingError={props.gamesFetchingError}
+    gamesList={props.gamesList}
   />
 );

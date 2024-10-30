@@ -53,9 +53,12 @@ export const Default = () => (
           freezeUpdate={false}
           hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
           resourceManagementProps={fakeResourceManagementProps}
-          fetchGames={async () => {}}
-          games={null}
-          onGameUpdated={() => {}}
+          gamesList={{
+            games: null,
+            fetchGames: async () => {},
+            gamesFetchingError: null,
+            onGameUpdated: () => {},
+          }}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>
@@ -100,9 +103,12 @@ export const ErrorsInFunctions = () => (
           freezeUpdate={false}
           hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
           resourceManagementProps={fakeResourceManagementProps}
-          fetchGames={async () => {}}
-          games={null}
-          onGameUpdated={() => {}}
+          gamesList={{
+            games: null,
+            fetchGames: async () => {},
+            gamesFetchingError: null,
+            onGameUpdated: () => {},
+          }}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>

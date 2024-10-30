@@ -56,7 +56,7 @@ interface VectorObjectFolderOrObject {
 
 interface VectorScreenshot {
     unsigned long size();
-    [Value] Screenshot at(unsigned long index);
+    [Const, Ref] Screenshot at(unsigned long index);
 };
 
 interface MapStringString {
@@ -1939,8 +1939,8 @@ interface QuickCustomizationVisibilitiesContainer {
 };
 
 interface Screenshot {
-    [Const] long GetTiming();
-    void SetTiming([Const] long timing);
+    long GetDelayTimeInSeconds();
+    void SetDelayTimeInSeconds(long delayTimeInSeconds);
     [Const, Ref] DOMString GetSignedUrl();
     void SetSignedUrl([Const] DOMString signedUrl);
     [Const, Ref] DOMString GetPublicUrl();
@@ -3830,7 +3830,7 @@ interface PreviewExportOptions {
     [Ref] PreviewExportOptions SetGDevelopVersionWithHash([Const] DOMString gdevelopVersionWithHash);
     [Ref] PreviewExportOptions SetProjectTemplateSlug([Const] DOMString projectTemplateSlug);
     [Ref] PreviewExportOptions SetSourceGameId([Const] DOMString sourceGameId);
-    [Ref] PreviewExportOptions AddScreenshotCapture([Const] long timing, [Const] DOMString signedUrl, [Const] DOMString publicUrl);
+    [Ref] PreviewExportOptions AddScreenshotCapture(long delayTimeInSeconds, [Const] DOMString signedUrl, [Const] DOMString publicUrl);
 };
 
 [Prefix="gdjs::"]

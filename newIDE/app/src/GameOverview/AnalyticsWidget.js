@@ -6,16 +6,19 @@ import { Trans } from '@lingui/macro';
 import DashboardWidget from './DashboardWidget';
 import FlatButton from '../UI/FlatButton';
 import ArrowRight from '../UI/CustomSvgIcons/ArrowRight';
-import { ResponsiveLineStackLayout } from '../UI/Layout';
-import { Column, Line } from '../UI/Grid';
+import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
+import { Column, Line, Spacer } from '../UI/Grid';
 import Text from '../UI/Text';
-import { type Game } from '../Utils/GDevelopServices/Game';
+import { getGameUrl, type Game } from '../Utils/GDevelopServices/Game';
 import { SessionsChart } from '../GameDashboard/GameAnalyticsCharts';
 import { type GameMetrics } from '../Utils/GDevelopServices/Analytics';
 import { buildLastWeekChartData } from '../GameDashboard/GameAnalyticsEvaluator';
 import RaisedButton from '../UI/RaisedButton';
 import Coin from '../Credits/Icons/Coin';
 import MarketingPlansDialog from '../MarketingPlans/MarketingPlansDialog';
+import GameLinkAndShareIcons from './GameLinkAndShareIcons';
+
+const styles = { loadingSpace: { height: 100 } };
 
 type Props = {|
   game: Game,
@@ -24,6 +27,7 @@ type Props = {|
 |};
 
 const AnalyticsWidget = ({ game, onSeeAll, gameMetrics }: Props) => {
+  const hasNoSession = gameMetrics && gameMetrics.length === 0;
   const chartData = React.useMemo(() => buildLastWeekChartData(gameMetrics), [
     gameMetrics,
   ]);
@@ -31,6 +35,8 @@ const AnalyticsWidget = ({ game, onSeeAll, gameMetrics }: Props) => {
     marketingPlansDialogOpen,
     setMarketingPlansDialogOpen,
   ] = React.useState<boolean>(false);
+
+  const gameUrl = getGameUrl(game);
 
   return (
     <>
@@ -59,25 +65,41 @@ const AnalyticsWidget = ({ game, onSeeAll, gameMetrics }: Props) => {
                   <UserEarnings hideTitle margin="dense" />
                 </Column>
               </Column> */}
-              <Column expand noMargin>
-                <Line alignItems="center" justifyContent="space-between">
-                  <Text size="block-title" noMargin>
-                    <Trans>Sessions</Trans>
+
+              {!gameMetrics ? (
+                <div style={styles.loadingSpace} />
+              ) : hasNoSession && gameUrl ? (
+                <ColumnStackLayout noMargin alignItems="flex-start">
+                  <Spacer />
+                  <Text noMargin color="secondary">
+                    <Trans>
+                      No data to show yet. Share your game creator profile with
+                      more people to get more players!
+                    </Trans>
                   </Text>
-                  <RaisedButton
-                    primary
-                    icon={<Coin fontSize="small" />}
-                    label={<Trans>Get more sessions</Trans>}
-                    onClick={() => setMarketingPlansDialogOpen(true)}
+                  <GameLinkAndShareIcons display="column" url={gameUrl} />
+                </ColumnStackLayout>
+              ) : (
+                <Column expand noMargin>
+                  <Line alignItems="center" justifyContent="space-between">
+                    <Text size="block-title" noMargin>
+                      <Trans>Sessions</Trans>
+                    </Text>
+                    <RaisedButton
+                      primary
+                      icon={<Coin fontSize="small" />}
+                      label={<Trans>Get more sessions</Trans>}
+                      onClick={() => setMarketingPlansDialogOpen(true)}
+                    />
+                  </Line>
+                  <SessionsChart
+                    i18n={i18n}
+                    height={220}
+                    chartData={chartData}
+                    fontSize="small"
                   />
-                </Line>
-                <SessionsChart
-                  i18n={i18n}
-                  height={220}
-                  chartData={chartData}
-                  fontSize="small"
-                />
-              </Column>
+                </Column>
+              )}
             </ResponsiveLineStackLayout>
           </DashboardWidget>
         )}

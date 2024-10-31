@@ -7,9 +7,11 @@ import { Column, Line } from '../UI/Grid';
 import { Grid } from '@material-ui/core';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 
+const verticalPadding = 8;
+
 const styles = {
   paper: {
-    padding: `8px 12px`,
+    padding: `${verticalPadding}px 12px`,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'stretch',
@@ -21,7 +23,10 @@ const styles = {
     minHeight: 0,
     flex: 1,
   },
-  maxHeightNotWrapped: { maxHeight: 300, height: '100%' },
+  maxHeightNotWrapped: {
+    maxHeight: 300,
+    height: `calc(100% - ${2 * verticalPadding}px)`,
+  },
 };
 
 type Props = {|

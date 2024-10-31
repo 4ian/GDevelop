@@ -137,11 +137,11 @@ const FeedbackWidget = ({ onSeeAll, feedbacks, game, onUpdateGame }: Props) => {
                 <CompactToggleField
                   checked={false}
                   label={i18n._(t`Collect game feedback`)}
-                  onCheck={(newValue) => {
+                  onCheck={newValue => {
                     onUpdateGame({ acceptsGameComments: newValue });
                   }}
                 />
-                <Text color="secondary" noMargin size="body-small">
+                <Text color="secondary" noMargin>
                   <Trans>
                     “Player feedback” is off, turn it on to start receiving
                     feedback on your game.
@@ -150,6 +150,7 @@ const FeedbackWidget = ({ onSeeAll, feedbacks, game, onUpdateGame }: Props) => {
               </ColumnStackLayout>
             ) : gameUrl ? (
               <ColumnStackLayout noMargin justifyContent="center" expand>
+                <Spacer />
                 <Text color="secondary" noMargin>
                   <Trans>
                     You don’t have any player feedback yet. Share your game with

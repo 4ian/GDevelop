@@ -10,7 +10,11 @@ import {
 } from '../Utils/ProjectErrorsChecker';
 import FlatButton from '../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
-import { type PublicGame, type Game } from '../Utils/GDevelopServices/Game';
+import {
+  type PublicGame,
+  type Game,
+  getGameMainImageUrl,
+} from '../Utils/GDevelopServices/Game';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 /**
@@ -150,6 +154,11 @@ export const PublicGamePropertiesDialog = ({
     }
   };
 
+  const publicGameThumbnailUrl = React.useMemo(
+    () => getGameMainImageUrl(publicGame),
+    [publicGame]
+  );
+
   const actions = [
     <FlatButton
       label={<Trans>Back</Trans>}
@@ -204,7 +213,7 @@ export const PublicGamePropertiesDialog = ({
         setDiscoverable={setDiscoverable}
         discoverable={discoverable}
         displayThumbnail
-        thumbnailUrl={publicGame.thumbnailUrl}
+        thumbnailUrl={publicGameThumbnailUrl}
         onGameUpdated={onGameUpdated}
         onUpdatingGame={onUpdatingGame}
         disabled={isLoading}

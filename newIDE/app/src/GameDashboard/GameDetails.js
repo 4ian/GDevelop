@@ -15,6 +15,7 @@ import {
   setGameSlug,
   getAclsFromUserIds,
   getCategoryName,
+  getGameMainImageUrl,
 } from '../Utils/GDevelopServices/Game';
 import { type TabOptions } from '../UI/Tabs';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
@@ -397,6 +398,11 @@ const GameDetails = ({
   const isGameOpenedAsProject =
     !!project && project.getProjectUuid() === game.id;
 
+  const publicGameThumbnailUrl = React.useMemo(
+    () => (publicGame ? getGameMainImageUrl(publicGame) : null),
+    [publicGame]
+  );
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -432,7 +438,7 @@ const GameDetails = ({
                     <Column noMargin alignItems="center">
                       <GameThumbnail
                         gameName={publicGame.gameName}
-                        thumbnailUrl={publicGame.thumbnailUrl}
+                        thumbnailUrl={publicGameThumbnailUrl}
                         gameId={publicGame.id}
                       />
                     </Column>

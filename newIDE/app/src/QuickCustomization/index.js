@@ -147,7 +147,8 @@ type Props = {|
   isRequiredToSaveAsNewCloudProject: () => boolean,
   onClose: () => Promise<void>,
   onContinueQuickCustomization: () => void,
-  onTryAnotherGame: () => void,
+  gameScreenshotUrls: Array<string>,
+  onScreenshotsClaimed: () => void,
 |};
 
 export const renderQuickCustomization = ({
@@ -162,7 +163,8 @@ export const renderQuickCustomization = ({
   isRequiredToSaveAsNewCloudProject,
   onClose,
   onContinueQuickCustomization,
-  onTryAnotherGame,
+  gameScreenshotUrls,
+  onScreenshotsClaimed,
 }: Props) => {
   return {
     title: quickCustomizationState.step.title,
@@ -198,7 +200,9 @@ export const renderQuickCustomization = ({
             }
             onClose={onClose}
             onContinueQuickCustomization={onContinueQuickCustomization}
-            onTryAnotherGame={onTryAnotherGame}
+            gameScreenshotUrls={gameScreenshotUrls}
+            onScreenshotsClaimed={onScreenshotsClaimed}
+            onLaunchPreview={onLaunchPreview}
           />
         ) : null}
       </>

@@ -11,6 +11,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "GDCore/IDE/CaptureOptions.h"
 #include "GDCore/String.h"
 namespace gd {
 class Project;
@@ -20,6 +21,8 @@ class SerializerElement;
 class AbstractFileSystem;
 class ResourcesManager;
 class WholeProjectDiagnosticReport;
+class CaptureOptions;
+class Screenshot;
 }  // namespace gd
 class wxProgressDialog;
 
@@ -48,7 +51,7 @@ struct PreviewExportOptions {
         playerId(""),
         playerUsername(""),
         playerToken(""),
-        allowAuthenticationUsingIframeForPreview(false){};
+        allowAuthenticationUsingIframeForPreview(false) {};
 
   /**
    * \brief Set the address of the debugger server that the game should reach
@@ -216,7 +219,7 @@ struct PreviewExportOptions {
    * \brief Set the level of crash reports to be sent to GDevelop APIs.
    */
   PreviewExportOptions &SetCrashReportUploadLevel(
-      const gd::String& crashReportUploadLevel_) {
+      const gd::String &crashReportUploadLevel_) {
     crashReportUploadLevel = crashReportUploadLevel_;
     return *this;
   }
@@ -224,8 +227,7 @@ struct PreviewExportOptions {
   /**
    * \brief Set the context of the preview.
    */
-  PreviewExportOptions &SetPreviewContext(
-      const gd::String& previewContext_) {
+  PreviewExportOptions &SetPreviewContext(const gd::String &previewContext_) {
     previewContext = previewContext_;
     return *this;
   }
@@ -234,7 +236,7 @@ struct PreviewExportOptions {
    * \brief Set the GDevelop version so the game is aware of it.
    */
   PreviewExportOptions &SetGDevelopVersionWithHash(
-      const gd::String& gdevelopVersionWithHash_) {
+      const gd::String &gdevelopVersionWithHash_) {
     gdevelopVersionWithHash = gdevelopVersionWithHash_;
     return *this;
   }
@@ -243,7 +245,7 @@ struct PreviewExportOptions {
    * \brief Set the template slug that was used to create the project.
    */
   PreviewExportOptions &SetProjectTemplateSlug(
-      const gd::String& projectTemplateSlug_) {
+      const gd::String &projectTemplateSlug_) {
     projectTemplateSlug = projectTemplateSlug_;
     return *this;
   }
@@ -251,8 +253,23 @@ struct PreviewExportOptions {
   /**
    * \brief Set the source game id that was used to create the project.
    */
-  PreviewExportOptions &SetSourceGameId(const gd::String& sourceGameId_) {
+  PreviewExportOptions &SetSourceGameId(const gd::String &sourceGameId_) {
     sourceGameId = sourceGameId_;
+    return *this;
+  }
+
+  /**
+   * \brief Set the capture options to be used for taking screenshots or videos
+   * of the preview.
+   */
+  PreviewExportOptions &AddScreenshotCapture(int delayTimeInSeconds,
+                                             const gd::String &signedUrl,
+                                             const gd::String &publicUrl) {
+    gd::Screenshot screenshot;
+    screenshot.SetDelayTimeInSeconds(delayTimeInSeconds);
+    screenshot.SetSignedUrl(signedUrl);
+    screenshot.SetPublicUrl(publicUrl);
+    captureOptions.AddScreenshot(screenshot);
     return *this;
   }
 
@@ -283,6 +300,7 @@ struct PreviewExportOptions {
   gd::String gdevelopVersionWithHash;
   gd::String projectTemplateSlug;
   gd::String sourceGameId;
+  gd::CaptureOptions captureOptions;
 };
 
 /**
@@ -298,7 +316,7 @@ struct ExportOptions {
         exportPath(exportPath_),
         target(""),
         fallbackAuthorId(""),
-        fallbackAuthorUsername(""){};
+        fallbackAuthorUsername("") {};
 
   /**
    * \brief Set the fallback author info (if info not present in project
@@ -338,7 +356,7 @@ class ExporterHelper {
   ExporterHelper(gd::AbstractFileSystem &fileSystem,
                  gd::String gdjsRoot_,
                  gd::String codeOutputDir);
-  virtual ~ExporterHelper(){};
+  virtual ~ExporterHelper() {};
 
   /**
    * \brief Return the error that occurred during the last export.
@@ -386,6 +404,7 @@ class ExporterHelper {
                       bool includeWebsocketDebuggerClient,
                       bool includeWindowMessageDebuggerClient,
                       bool includeMinimalDebuggerClient,
+                      bool includeCaptureManager,
                       gd::String gdevelopLogoStyle,
                       std::vector<gd::String> &includesFiles);
 

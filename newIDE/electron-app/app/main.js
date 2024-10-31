@@ -181,6 +181,8 @@ app.on('ready', function() {
       alwaysOnTop: options.alwaysOnTop,
       hideMenuBar: options.hideMenuBar,
       numberOfWindows: options.numberOfWindows,
+      captureOptions: options.captureOptions,
+      openEvent: event,
     });
   });
   ipcMain.handle('preview-close', async (event, options) => {

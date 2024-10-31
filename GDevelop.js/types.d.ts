@@ -132,6 +132,11 @@ export class VectorObjectFolderOrObject extends EmscriptenObject {
   at(index: number): ObjectFolderOrObject;
 }
 
+export class VectorScreenshot extends EmscriptenObject {
+  size(): number;
+  at(index: number): Screenshot;
+}
+
 export class MapStringString extends EmscriptenObject {
   constructor();
   get(name: string): string;
@@ -1544,6 +1549,21 @@ export class QuickCustomizationVisibilitiesContainer extends EmscriptenObject {
   get(name: string): QuickCustomization_Visibility;
 }
 
+export class Screenshot extends EmscriptenObject {
+  getDelayTimeInSeconds(): number;
+  setDelayTimeInSeconds(delayTimeInSeconds: number): void;
+  getSignedUrl(): string;
+  setSignedUrl(signedUrl: string): void;
+  getPublicUrl(): string;
+  setPublicUrl(publicUrl: string): void;
+}
+
+export class CaptureOptions extends EmscriptenObject {
+  addScreenshot(screenshot: Screenshot): void;
+  clearScreenshots(): void;
+  getScreenshots(): VectorScreenshot;
+}
+
 export class BehaviorMetadata extends EmscriptenObject {
   getName(): string;
   getFullName(): string;
@@ -2830,6 +2850,7 @@ export class PreviewExportOptions extends EmscriptenObject {
   setGDevelopVersionWithHash(gdevelopVersionWithHash: string): PreviewExportOptions;
   setProjectTemplateSlug(projectTemplateSlug: string): PreviewExportOptions;
   setSourceGameId(sourceGameId: string): PreviewExportOptions;
+  addScreenshotCapture(delayTimeInSeconds: number, signedUrl: string, publicUrl: string): PreviewExportOptions;
 }
 
 export class ExportOptions extends EmscriptenObject {

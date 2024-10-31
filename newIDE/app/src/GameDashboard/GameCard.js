@@ -22,6 +22,7 @@ import ShareGameDialog from './ShareGameDialog';
 
 import {
   deleteGame,
+  getGameMainImageUrl,
   getGameUrl,
   updateGame,
   type Game,
@@ -182,6 +183,10 @@ export const GameCard = ({
     }
   };
 
+  const gameThumbnailUrl = React.useMemo(() => getGameMainImageUrl(game), [
+    game,
+  ]);
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -252,7 +257,7 @@ export const GameCard = ({
               <Column noMargin alignItems="center">
                 <GameThumbnail
                   gameName={game.gameName}
-                  thumbnailUrl={game.thumbnailUrl}
+                  thumbnailUrl={gameThumbnailUrl}
                   gameId={game.id}
                   background={isCurrentGame ? 'medium' : 'light'}
                 />
@@ -279,6 +284,7 @@ export const GameCard = ({
                     >
                       <FlatButton
                         label={<Trans>Manage game</Trans>}
+                        disabled={isDeletingGame}
                         onClick={() => onOpenGameManager('details')}
                       />
                       <LineStackLayout noMargin>

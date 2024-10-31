@@ -67,6 +67,7 @@ import {
   type PreviewLauncherInterface,
   type PreviewLauncherProps,
   type PreviewLauncherComponent,
+  type LaunchPreviewOptions,
 } from '../ExportAndShare/PreviewLauncher.flow';
 import {
   type ResourceSource,
@@ -196,6 +197,8 @@ import ListIcon from '../UI/ListIcon';
 import { QuickCustomizationDialog } from '../QuickCustomization/QuickCustomizationDialog';
 import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import RouterContext from './RouterContext';
+import useGamesList from '../GameDashboard/UseGamesList';
+import useCapturesManager from './UseCapturesManager';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -276,15 +279,6 @@ const initialPreviewState: PreviewState = {
   isPreviewOverriden: false,
   overridenPreviewLayoutName: null,
   overridenPreviewExternalLayoutName: null,
-};
-
-type LaunchPreviewOptions = {
-  networkPreview?: boolean,
-  hotReload?: boolean,
-  projectDataOnlyExport?: boolean,
-  fullLoadingScreen?: boolean,
-  forceDiagnosticReport?: boolean,
-  numberOfWindows?: number,
 };
 
 export type Props = {|
@@ -540,6 +534,15 @@ const MainFrame = (props: Props) => {
     isProjectOpening,
     onOpenNewProjectSetupDialog: () => setNewProjectSetupDialogOpen(true),
   });
+
+  const gamesList = useGamesList();
+
+  const {
+    createCaptureOptionsForPreview,
+    onCaptureFinished,
+    onGameScreenshotsClaimed,
+    getGameUnverifiedScreenshotUrls,
+  } = useCapturesManager({ project: currentProject });
 
   /**
    * This reference is useful to get the current opened project,
@@ -1585,6 +1588,7 @@ const MainFrame = (props: Props) => {
       projectDataOnlyExport,
       fullLoadingScreen,
       forceDiagnosticReport,
+      launchCaptureOptions,
     }: LaunchPreviewOptions) => {
       if (!currentProject) return;
       if (currentProject.getLayoutsCount() === 0) return;
@@ -1630,6 +1634,10 @@ const MainFrame = (props: Props) => {
         currentProject
       );
 
+      const captureOptions = await createCaptureOptionsForPreview(
+        launchCaptureOptions
+      );
+
       try {
         await eventsFunctionsExtensionsState.ensureLoadFinished();
 
@@ -1647,6 +1655,8 @@ const MainFrame = (props: Props) => {
           getIsMenuBarHiddenInPreview: preferences.getIsMenuBarHiddenInPreview,
           getIsAlwaysOnTopInPreview: preferences.getIsAlwaysOnTopInPreview,
           numberOfWindows: numberOfWindows || 1,
+          captureOptions,
+          onCaptureFinished,
         });
         setPreviewLoading(false);
 
@@ -1699,6 +1709,8 @@ const MainFrame = (props: Props) => {
       currentlyRunningInAppTutorial,
       getAuthenticatedPlayerForPreview,
       quickCustomizationDialogOpenedFromGameId,
+      onCaptureFinished,
+      createCaptureOptionsForPreview,
     ]
   );
 
@@ -1728,6 +1740,22 @@ const MainFrame = (props: Props) => {
 
   const launchPreviewWithDiagnosticReport = React.useCallback(
     () => launchPreview({ forceDiagnosticReport: true }),
+    [launchPreview]
+  );
+
+  const launchQuickCustomizationPreview = React.useCallback(
+    () =>
+      launchPreview({
+        networkPreview: false,
+        launchCaptureOptions: {
+          screenshots: [
+            { delayTimeInSeconds: 1000 }, // Take one quickly in case the user closes the preview too fast.
+            { delayTimeInSeconds: 5000 }, // Take another one after longer into the game.
+          ],
+        },
+        hotReload: true,
+        projectDataOnlyExport: true,
+      }),
     [launchPreview]
   );
 
@@ -3489,6 +3517,7 @@ const MainFrame = (props: Props) => {
             freezeUpdate={!projectManagerOpen}
             hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
             resourceManagementProps={resourceManagementProps}
+            gamesList={gamesList}
           />
         ) : null}
       </ProjectManagerDrawer>
@@ -3679,6 +3708,7 @@ const MainFrame = (props: Props) => {
                     onOpenEventBasedObjectEditor: onOpenEventBasedObjectEditor,
                     onEventsBasedObjectChildrenEdited: onEventsBasedObjectChildrenEdited,
                     onSceneObjectEdited: onSceneObjectEdited,
+                    gamesList,
                   })}
                 </ErrorBoundary>
               </CommandsContextScopedProvider>
@@ -3725,6 +3755,7 @@ const MainFrame = (props: Props) => {
             getIncludeFileHashs:
               eventsFunctionsExtensionsContext.getIncludeFileHashs,
             onExport: () => openShareDialog('publish'),
+            onCaptureFinished,
           },
           (previewLauncher: ?PreviewLauncherInterface) => {
             _previewLauncher.current = previewLauncher;
@@ -3946,9 +3977,7 @@ const MainFrame = (props: Props) => {
         <QuickCustomizationDialog
           project={currentProject}
           resourceManagementProps={resourceManagementProps}
-          onLaunchPreview={
-            hotReloadPreviewButtonProps.launchProjectDataOnlyPreview
-          }
+          onLaunchPreview={launchQuickCustomizationPreview}
           onClose={async options => {
             if (hasUnsavedChanges) {
               const response = await showConfirmation({
@@ -4003,8 +4032,12 @@ const MainFrame = (props: Props) => {
             return;
           }}
           isSavingProject={isSavingProject}
-          canClose={true}
+          canClose
           sourceGameId={quickCustomizationDialogOpenedFromGameId}
+          gameScreenshotUrls={getGameUnverifiedScreenshotUrls(
+            currentProject.getProjectUuid()
+          )}
+          onScreenshotsClaimed={onGameScreenshotsClaimed}
         />
       )}
       <CustomDragLayer />

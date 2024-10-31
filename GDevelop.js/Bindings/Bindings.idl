@@ -54,6 +54,11 @@ interface VectorObjectFolderOrObject {
     [Const] ObjectFolderOrObject at(unsigned long index);
 };
 
+interface VectorScreenshot {
+    unsigned long size();
+    [Const, Ref] Screenshot at(unsigned long index);
+};
+
 interface MapStringString {
     void MapStringString();
 
@@ -1933,6 +1938,21 @@ interface QuickCustomizationVisibilitiesContainer {
     QuickCustomization_Visibility Get([Const] DOMString name);
 };
 
+interface Screenshot {
+    long GetDelayTimeInSeconds();
+    void SetDelayTimeInSeconds(long delayTimeInSeconds);
+    [Const, Ref] DOMString GetSignedUrl();
+    void SetSignedUrl([Const] DOMString signedUrl);
+    [Const, Ref] DOMString GetPublicUrl();
+    void SetPublicUrl([Const] DOMString publicUrl);
+};
+
+interface CaptureOptions {
+    void AddScreenshot([Const, Ref] Screenshot screenshot);
+    void ClearScreenshots();
+    [Const, Ref] VectorScreenshot GetScreenshots();
+};
+
 interface BehaviorMetadata {
     [Const, Ref] DOMString GetName();
     [Const, Ref] DOMString GetFullName();
@@ -3810,6 +3830,7 @@ interface PreviewExportOptions {
     [Ref] PreviewExportOptions SetGDevelopVersionWithHash([Const] DOMString gdevelopVersionWithHash);
     [Ref] PreviewExportOptions SetProjectTemplateSlug([Const] DOMString projectTemplateSlug);
     [Ref] PreviewExportOptions SetSourceGameId([Const] DOMString sourceGameId);
+    [Ref] PreviewExportOptions AddScreenshotCapture(long delayTimeInSeconds, [Const] DOMString signedUrl, [Const] DOMString publicUrl);
 };
 
 [Prefix="gdjs::"]

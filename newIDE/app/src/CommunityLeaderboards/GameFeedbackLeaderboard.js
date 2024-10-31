@@ -5,6 +5,7 @@ import { I18n } from '@lingui/react';
 import {
   type GameLeaderboard,
   type GameLeaderboardEntry,
+  getGameMainImageUrl,
   getPublicGameUrl,
 } from '../Utils/GDevelopServices/Game';
 import { selectMessageByLocale } from '../Utils/i18n/MessageByLocale';
@@ -121,6 +122,9 @@ export const GameFeedbackLeaderboard = ({
                     const title = entry.publicGame
                       ? entry.publicGame.gameName
                       : '';
+                    const publicGameThumbnailUrl = entry.publicGame
+                      ? getGameMainImageUrl(entry.publicGame)
+                      : null;
 
                     return (
                       <tr
@@ -150,11 +154,10 @@ export const GameFeedbackLeaderboard = ({
                                 noMargin
                                 tooltip={title}
                               >
-                                {entry.publicGame &&
-                                entry.publicGame.thumbnailUrl ? (
+                                {publicGameThumbnailUrl ? (
                                   <div style={styles.gameThumbnailContainer}>
                                     <img
-                                      src={entry.publicGame.thumbnailUrl}
+                                      src={publicGameThumbnailUrl}
                                       style={styles.gameThumbnail}
                                       alt={title}
                                       title={title}

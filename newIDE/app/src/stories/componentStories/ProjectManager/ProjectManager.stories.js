@@ -53,6 +53,12 @@ export const Default = () => (
           freezeUpdate={false}
           hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
           resourceManagementProps={fakeResourceManagementProps}
+          gamesList={{
+            games: null,
+            fetchGames: async () => {},
+            gamesFetchingError: null,
+            onGameUpdated: () => {},
+          }}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>
@@ -97,6 +103,12 @@ export const ErrorsInFunctions = () => (
           freezeUpdate={false}
           hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
           resourceManagementProps={fakeResourceManagementProps}
+          gamesList={{
+            games: null,
+            fetchGames: async () => {},
+            gamesFetchingError: null,
+            onGameUpdated: () => {},
+          }}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>

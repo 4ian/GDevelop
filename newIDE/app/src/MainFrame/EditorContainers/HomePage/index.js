@@ -39,7 +39,6 @@ import {
 } from '../../../Utils/Analytics/EventSender';
 import RouterContext, { type RouteArguments } from '../../RouterContext';
 import { type GameDetailsTab } from '../../../GameDashboard/GameDetails';
-import useGamesList from '../../../GameDashboard/UseGamesList';
 import useDisplayNewFeature from '../../../Utils/UseDisplayNewFeature';
 import HighlightingTooltip from '../../../UI/HighlightingTooltip';
 import Text from '../../../UI/Text';
@@ -51,6 +50,7 @@ import EducationMarketingSection from './EducationMarketingSection';
 import useEducationForm from './UseEducationForm';
 import { type NewProjectSetup } from '../../../ProjectCreation/NewProjectSetupDialog';
 import { type ObjectWithContext } from '../../../ObjectsList/EnumerateObjects';
+import { type GamesList } from '../../../GameDashboard/UseGamesList';
 
 const gamesDashboardWikiArticle = getHelpLink('/interface/games-dashboard/');
 const getRequestedTab = (routeArguments: RouteArguments): HomeTab | null => {
@@ -114,6 +114,9 @@ type Props = {|
   project: ?gdProject,
   setToolbar: (?React.Node) => void,
   storageProviders: Array<StorageProvider>,
+
+  // Games
+  gamesList: GamesList,
 
   // Project opening
   canOpen: boolean,
@@ -195,6 +198,7 @@ export const HomePage = React.memo<Props>(
         askToCloseProject,
         closeProject,
         onOpenTemplateFromTutorial,
+        gamesList,
       }: Props,
       ref
     ) => {
@@ -214,6 +218,12 @@ export const HomePage = React.memo<Props>(
         shop: { setInitialGameTemplateUserFriendlySlug },
       } = React.useContext(PrivateGameTemplateStoreContext);
       const [openedGameId, setOpenedGameId] = React.useState<?string>(null);
+      const {
+        games,
+        fetchGames,
+        gamesFetchingError,
+        onGameUpdated,
+      } = gamesList;
       const [
         gameDetailsCurrentTab,
         setGameDetailsCurrentTab,
@@ -255,12 +265,6 @@ export const HomePage = React.memo<Props>(
         displayTooltipDelayed,
         setDisplayTooltipDelayed,
       ] = React.useState<boolean>(false);
-      const {
-        games,
-        gamesFetchingError,
-        fetchGames,
-        onGameUpdated,
-      } = useGamesList();
       const openedGame = React.useMemo(
         () => (games && games.find(game => game.id === openedGameId)) || null,
         [games, openedGameId]
@@ -669,5 +673,6 @@ export const renderHomePageContainer = (
     onSave={props.onSave}
     canSave={props.canSave}
     resourceManagementProps={props.resourceManagementProps}
+    gamesList={props.gamesList}
   />
 );

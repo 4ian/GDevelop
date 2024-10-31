@@ -18,6 +18,7 @@ import {
 } from '../../../fixtures/TestExporters';
 import { type Exporter } from '../../../ExportAndShare/ShareDialog';
 import {
+  fakeEmptyGameAndBuildsManager,
   fakeGameAndBuildsManager,
   fakeNotOwnedGameAndBuildsManager,
 } from '../../../fixtures/GDevelopServicesTestData/FakeGameAndBuildsManager';
@@ -80,7 +81,7 @@ export const NotAuthenticated = () => {
       <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
         <QuickPublish
           project={testProject.project}
-          gameAndBuildsManager={fakeGameAndBuildsManager}
+          gameAndBuildsManager={fakeEmptyGameAndBuildsManager}
           isSavingProject={false}
           isRequiredToSaveAsNewCloudProject={() => true}
           onSaveProject={async () => {}}
@@ -88,7 +89,34 @@ export const NotAuthenticated = () => {
           setIsNavigationDisabled={() => {}}
           onClose={action('onClose')}
           onContinueQuickCustomization={action('onContinueQuickCustomization')}
-          onTryAnotherGame={action('onTryAnotherGame')}
+          gameScreenshotUrls={[]}
+          onScreenshotsClaimed={action('onScreenshotsClaimed')}
+          onLaunchPreview={action('onLaunchPreview')}
+        />
+      </AuthenticatedUserContext.Provider>
+    </Template>
+  );
+};
+
+export const NotAuthenticatedWithScreenshot = () => {
+  return (
+    <Template>
+      <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
+        <QuickPublish
+          project={testProject.project}
+          gameAndBuildsManager={fakeEmptyGameAndBuildsManager}
+          isSavingProject={false}
+          isRequiredToSaveAsNewCloudProject={() => true}
+          onSaveProject={async () => {}}
+          onlineWebExporter={onlineWebExporter}
+          setIsNavigationDisabled={() => {}}
+          onClose={action('onClose')}
+          onContinueQuickCustomization={action('onContinueQuickCustomization')}
+          gameScreenshotUrls={[
+            'https://i.ytimg.com/vi/PguDpz7TC7g/hqdefault.jpg',
+          ]}
+          onScreenshotsClaimed={action('onScreenshotsClaimed')}
+          onLaunchPreview={action('onLaunchPreview')}
         />
       </AuthenticatedUserContext.Provider>
     </Template>
@@ -101,7 +129,7 @@ export const AuthenticatedWithAvailableCloudProjectsRoom = () => {
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
         <QuickPublish
           project={testProject.project}
-          gameAndBuildsManager={fakeGameAndBuildsManager}
+          gameAndBuildsManager={fakeEmptyGameAndBuildsManager}
           isSavingProject={false}
           isRequiredToSaveAsNewCloudProject={() => true}
           onSaveProject={async () => {}}
@@ -109,7 +137,9 @@ export const AuthenticatedWithAvailableCloudProjectsRoom = () => {
           setIsNavigationDisabled={() => {}}
           onClose={action('onClose')}
           onContinueQuickCustomization={action('onContinueQuickCustomization')}
-          onTryAnotherGame={action('onTryAnotherGame')}
+          gameScreenshotUrls={[]}
+          onScreenshotsClaimed={action('onScreenshotsClaimed')}
+          onLaunchPreview={action('onLaunchPreview')}
         />
       </AuthenticatedUserContext.Provider>
     </Template>
@@ -137,7 +167,9 @@ export const AuthenticatedWithTooManyCloudProjects = () => {
           setIsNavigationDisabled={() => {}}
           onClose={action('onClose')}
           onContinueQuickCustomization={action('onContinueQuickCustomization')}
-          onTryAnotherGame={action('onTryAnotherGame')}
+          gameScreenshotUrls={[]}
+          onScreenshotsClaimed={action('onScreenshotsClaimed')}
+          onLaunchPreview={action('onLaunchPreview')}
         />
       </AuthenticatedUserContext.Provider>
     </Template>
@@ -169,7 +201,9 @@ export const AuthenticatedWithCloudProjectsMaximumReachedButSavedAlready = () =>
           setIsNavigationDisabled={() => {}}
           onClose={action('onClose')}
           onContinueQuickCustomization={action('onContinueQuickCustomization')}
-          onTryAnotherGame={action('onTryAnotherGame')}
+          gameScreenshotUrls={[]}
+          onScreenshotsClaimed={action('onScreenshotsClaimed')}
+          onLaunchPreview={action('onLaunchPreview')}
         />
       </AuthenticatedUserContext.Provider>
     </Template>
@@ -195,7 +229,9 @@ export const AuthenticatedAndLoadingUserCloudProjects = () => {
           setIsNavigationDisabled={() => {}}
           onClose={action('onClose')}
           onContinueQuickCustomization={action('onContinueQuickCustomization')}
-          onTryAnotherGame={action('onTryAnotherGame')}
+          gameScreenshotUrls={[]}
+          onScreenshotsClaimed={action('onScreenshotsClaimed')}
+          onLaunchPreview={action('onLaunchPreview')}
         />
       </AuthenticatedUserContext.Provider>
     </Template>
@@ -216,7 +252,9 @@ export const AuthenticatedAndFails = () => {
           setIsNavigationDisabled={() => {}}
           onClose={action('onClose')}
           onContinueQuickCustomization={action('onContinueQuickCustomization')}
-          onTryAnotherGame={action('onTryAnotherGame')}
+          gameScreenshotUrls={[]}
+          onScreenshotsClaimed={action('onScreenshotsClaimed')}
+          onLaunchPreview={action('onLaunchPreview')}
         />
       </AuthenticatedUserContext.Provider>
     </Template>
@@ -237,7 +275,9 @@ export const AuthenticatedExistingGame = () => {
           setIsNavigationDisabled={() => {}}
           onClose={action('onClose')}
           onContinueQuickCustomization={action('onContinueQuickCustomization')}
-          onTryAnotherGame={action('onTryAnotherGame')}
+          gameScreenshotUrls={[]}
+          onScreenshotsClaimed={action('onScreenshotsClaimed')}
+          onLaunchPreview={action('onLaunchPreview')}
         />
       </AuthenticatedUserContext.Provider>
     </Template>
@@ -258,7 +298,9 @@ export const AuthenticatedNotOwnedGame = () => {
           setIsNavigationDisabled={() => {}}
           onClose={action('onClose')}
           onContinueQuickCustomization={action('onContinueQuickCustomization')}
-          onTryAnotherGame={action('onTryAnotherGame')}
+          gameScreenshotUrls={[]}
+          onScreenshotsClaimed={action('onScreenshotsClaimed')}
+          onLaunchPreview={action('onLaunchPreview')}
         />
       </AuthenticatedUserContext.Provider>
     </Template>

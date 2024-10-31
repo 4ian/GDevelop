@@ -23,6 +23,8 @@ const openPreviewWindow = ({
   alwaysOnTop,
   hideMenuBar,
   numberOfWindows,
+  captureOptions,
+  openEvent,
 }) => {
   // If opening multiple windows at once, place them across the screen.
   const screenSize = screen.getPrimaryDisplay().workAreaSize;
@@ -71,10 +73,11 @@ const openPreviewWindow = ({
 
     previewWindows.push(previewWindow);
 
-    previewWindow.on('closed', event => {
+    previewWindow.on('closed', closeEvent => {
       previewWindows = previewWindows.filter(
         otherPreviewBrowserWindow => otherPreviewBrowserWindow !== previewWindow
       );
+      openEvent.sender.send('preview-window-closed');
       previewWindow = null;
     });
   }

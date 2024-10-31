@@ -13,6 +13,7 @@ import {
 } from '../../ProjectsStorage';
 import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
 import { type PrivateGameTemplateListingData } from '../../Utils/GDevelopServices/Shop';
+import { type GamesList } from '../../GameDashboard/UseGamesList';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 
 export type EditorContainerExtraProps = {|
@@ -93,6 +94,9 @@ export type RenderEditorContainerProps = {|
   onOpenProjectManager: () => void,
   askToCloseProject: () => Promise<boolean>,
   closeProject: () => Promise<void>,
+
+  // Games
+  gamesList: GamesList,
 
   // Other dialogs opening:
   onOpenExampleStore: () => void,

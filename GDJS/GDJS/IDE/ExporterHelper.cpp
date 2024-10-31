@@ -24,6 +24,7 @@
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
+#include "GDCore/IDE/CaptureOptions.h"
 #include "GDCore/IDE/Events/UsedExtensionsFinder.h"
 #include "GDCore/IDE/ExportedDependencyResolver.h"
 #include "GDCore/IDE/Project/ProjectResourcesCopier.h"
@@ -156,6 +157,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
                  options.useWindowMessageDebuggerClient,
                  /*includeMinimalDebuggerClient=*/
                  options.useMinimalDebuggerClient,
+                 /*includeCaptureManager=*/
+                 !options.captureOptions.IsEmpty(),
                  immutableProject.GetLoadingScreen().GetGDevelopLogoStyle(),
                  includesFiles);
 
@@ -267,6 +270,22 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   if (!options.sourceGameId.empty()) {
     runtimeGameOptions.AddChild("sourceGameId")
         .SetStringValue(options.sourceGameId);
+  }
+
+  if (!options.captureOptions.IsEmpty()) {
+    auto &captureOptionsElement = runtimeGameOptions.AddChild("captureOptions");
+    const auto &screenshots = options.captureOptions.GetScreenshots();
+    if (!screenshots.empty()) {
+      auto &screenshotsElement = captureOptionsElement.AddChild("screenshots");
+      screenshotsElement.ConsiderAsArrayOf("screenshot");
+      for (const auto &screenshot : screenshots) {
+        screenshotsElement.AddChild("screenshot")
+            .SetIntAttribute("delayTimeInSeconds",
+                             screenshot.GetDelayTimeInSeconds())
+            .SetStringAttribute("signedUrl", screenshot.GetSignedUrl())
+            .SetStringAttribute("publicUrl", screenshot.GetPublicUrl());
+      }
+    }
   }
 
   // Pass in the options the list of scripts files - useful for hot-reloading.
@@ -756,6 +775,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
                                     bool includeWebsocketDebuggerClient,
                                     bool includeWindowMessageDebuggerClient,
                                     bool includeMinimalDebuggerClient,
+                                    bool includeCaptureManager,
                                     gd::String gdevelopLogoStyle,
                                     std::vector<gd::String> &includesFiles) {
   // First, do not forget common includes (they must be included before events
@@ -871,6 +891,9 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
     InsertUnique(includesFiles, "Extensions/3D/CustomRuntimeObject3D.js");
     InsertUnique(includesFiles,
                  "Extensions/3D/CustomRuntimeObject3DRenderer.js");
+  }
+  if (includeCaptureManager) {
+    InsertUnique(includesFiles, "capturemanager.js");
   }
 }
 

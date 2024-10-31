@@ -121,6 +121,12 @@ const WrappedHomePage = ({
               onCreateProjectFromExample={action('onCreateProjectFromExample')}
               askToCloseProject={async () => true}
               closeProject={async () => {}}
+              gamesList={{
+                games: null,
+                fetchGames: async () => {},
+                gamesFetchingError: null,
+                onGameUpdated: () => {},
+              }}
             />
           </TutorialStateProvider>
         </ExampleStoreStateProvider>

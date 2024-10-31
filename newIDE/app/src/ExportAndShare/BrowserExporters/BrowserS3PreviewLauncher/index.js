@@ -198,6 +198,15 @@ export default class BrowserS3PreviewLauncher extends React.Component<
           previewOptions.authenticatedPlayer.playerToken
         );
       }
+      if (previewOptions.captureOptions.screenshots) {
+        previewOptions.captureOptions.screenshots.forEach(screenshot => {
+          previewExportOptions.addScreenshotCapture(
+            screenshot.delayTimeInSeconds,
+            screenshot.signedUrl,
+            screenshot.publicUrl
+          );
+        });
+      }
 
       // The token, if any, to be used to read resources on GDevelop Cloud buckets.
       const gdevelopResourceToken = getGDevelopResourceJwtToken();
@@ -219,10 +228,28 @@ export default class BrowserS3PreviewLauncher extends React.Component<
       );
 
       // If the preview windows are new, register them so that they can be accessed
-      // by the debugger.
+      // by the debugger and for the captures to be detected when they close.
       if (!existingPreviewWindow) {
         previewWindows.forEach((previewWindow: WindowProxy) => {
-          registerNewPreviewWindow(previewWindow);
+          const debuggerId = registerNewPreviewWindow(previewWindow);
+          browserPreviewDebuggerServer.registerCallbacks({
+            onErrorReceived: () => {},
+            onServerStateChanged: () => {},
+            onConnectionClosed: async ({ id }) => {
+              if (id !== debuggerId) {
+                return;
+              }
+
+              if (previewOptions.captureOptions) {
+                await this.props.onCaptureFinished(
+                  previewOptions.captureOptions
+                );
+              }
+            },
+            onConnectionOpened: () => {},
+            onConnectionErrored: () => {},
+            onHandleParsedMessage: () => {},
+          });
         });
       }
     } catch (error) {

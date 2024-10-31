@@ -1,6 +1,30 @@
 // @flow
 import * as React from 'react';
 
+// Simpler version of the CaptureOptions, as only the delayTimeInSeconds is needed to start configuring the preview capture.
+export type LaunchCaptureOptions = {|
+  screenshots: Array<{|
+    delayTimeInSeconds: number,
+  |}>,
+|};
+
+export type LaunchPreviewOptions = {
+  networkPreview?: boolean,
+  hotReload?: boolean,
+  projectDataOnlyExport?: boolean,
+  fullLoadingScreen?: boolean,
+  forceDiagnosticReport?: boolean,
+  numberOfWindows?: number,
+  launchCaptureOptions?: LaunchCaptureOptions,
+};
+export type CaptureOptions = {|
+  screenshots: Array<{|
+    signedUrl: string,
+    delayTimeInSeconds: number,
+    publicUrl: string,
+  |}>,
+|};
+
 export type PreviewOptions = {|
   project: gdProject,
   layout: gdLayout,
@@ -18,6 +42,8 @@ export type PreviewOptions = {|
   numberOfWindows: number,
   getIsMenuBarHiddenInPreview: () => boolean,
   getIsAlwaysOnTopInPreview: () => boolean,
+  captureOptions: CaptureOptions,
+  onCaptureFinished: CaptureOptions => Promise<void>,
 |};
 
 /** The props that PreviewLauncher must support */
@@ -27,6 +53,7 @@ export type PreviewLauncherProps = {|
   sourceGameId: string,
   getIncludeFileHashs: () => { [string]: number },
   onExport: () => void,
+  onCaptureFinished: CaptureOptions => Promise<void>,
 |};
 
 /** Each game connected to the debugger server is identified by a unique number. */
@@ -34,21 +61,24 @@ export type DebuggerId = number;
 
 /** The callbacks for a debugger server used for previews. */
 export type PreviewDebuggerServerCallbacks = {|
-  onErrorReceived: (err: Error) => void,
-  onServerStateChanged: () => void,
+  onErrorReceived: (err: Error) => void | Promise<void>,
+  onServerStateChanged: () => void | Promise<void>,
   onConnectionClosed: ({|
     id: DebuggerId,
     debuggerIds: Array<DebuggerId>,
-  |}) => void,
+  |}) => void | Promise<void>,
   onConnectionOpened: ({|
     id: DebuggerId,
     debuggerIds: Array<DebuggerId>,
-  |}) => void,
+  |}) => void | Promise<void>,
   onConnectionErrored: ({|
     id: DebuggerId,
     errorMessage: string,
-  |}) => void,
-  onHandleParsedMessage: ({| id: DebuggerId, parsedMessage: Object |}) => void,
+  |}) => void | Promise<void>,
+  onHandleParsedMessage: ({|
+    id: DebuggerId,
+    parsedMessage: Object,
+  |}) => void | Promise<void>,
 |};
 
 /** The address to be used to communicate with the debugger server using WebSockets. */

@@ -86,7 +86,7 @@ type Props = {|
   setDiscoverable?: boolean => void,
   discoverable?: boolean,
   displayThumbnail?: boolean,
-  thumbnailUrl?: string,
+  thumbnailUrl?: ?string,
 |};
 
 export function PublicGameProperties({

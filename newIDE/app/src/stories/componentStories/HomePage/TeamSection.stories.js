@@ -322,9 +322,7 @@ const MockTeamProvider = ({
     }
     const newAdmins = [...admins];
     const adminIndex = admins.findIndex(admin => admin.email === email);
-    console.log(admins);
     if (activate) {
-      console.log(adminIndex);
       if (adminIndex >= 0) {
         const error = new Error('SetAdminError');
         // $FlowIgnore

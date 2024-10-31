@@ -14,30 +14,8 @@ import Text from '../UI/Text';
 import { shortenString } from '../Utils/StringHelpers';
 import { ColumnStackLayout } from '../UI/Layout';
 import ScrollView from '../UI/ScrollView';
-import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import GameLinkAndShareIcons from './GameLinkAndShareIcons';
-
-const styles = {
-  dot: {
-    height: 6,
-    width: 6,
-    marginRight: 4,
-    borderRadius: 5,
-    flexShrink: 0,
-  },
-};
-
-const NotificationDot = () => {
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  return (
-    <span
-      style={{
-        ...styles.dot,
-        backgroundColor: gdevelopTheme.notification.badgeColor,
-      }}
-    />
-  );
-};
+import NotificationDot from './NotificationDot';
 
 type Props = {|
   feedbacks: ?Array<Comment>,
@@ -73,7 +51,7 @@ const FeedbackWidget = ({ onSeeAll, feedbacks, game }: Props) => {
             unprocessedFeedbacks && feedbacks ? (
               unprocessedFeedbacks.length > 0 ? (
                 <Line noMargin alignItems="center">
-                  <NotificationDot />
+                  <NotificationDot color="notification" />
                   <Text color="secondary" size="body-small" noMargin>
                     {unprocessedFeedbacks.length === 1 ? (
                       <Trans>1 new feedback</Trans>
@@ -111,8 +89,7 @@ const FeedbackWidget = ({ onSeeAll, feedbacks, game }: Props) => {
                           {i18n.date(comment.createdAt)}
                         </Text>
                         <Line noMargin alignItems="center">
-                          <NotificationDot />
-
+                          <NotificationDot color="notification" />
                           <Text
                             allowSelection
                             color={'secondary'}

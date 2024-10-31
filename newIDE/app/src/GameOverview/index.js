@@ -13,9 +13,6 @@ import {
 } from '../Utils/GDevelopServices/Game';
 import { ColumnStackLayout } from '../UI/Layout';
 import GameHeader from './GameHeader';
-import DashboardWidget from './DashboardWidget';
-import FlatButton from '../UI/FlatButton';
-import ArrowRight from '../UI/CustomSvgIcons/ArrowRight';
 import FeedbackWidget from './FeedbackWidget';
 import {
   getLobbyConfiguration,
@@ -31,7 +28,6 @@ import {
   type GameMetrics,
 } from '../Utils/GDevelopServices/Analytics';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import Text from '../UI/Text';
 import AnalyticsWidget from './AnalyticsWidget';
 import ServicesWidget from './ServicesWidget';
 import type { GameDetailsTab } from '../GameDashboard/GameDetails';
@@ -43,6 +39,7 @@ import Builds from '../ExportAndShare/Builds';
 import { GameAnalyticsPanel } from '../GameDashboard/GameAnalyticsPanel';
 import LeaderboardAdmin from '../GameDashboard/LeaderboardAdmin';
 import MultiplayerAdmin from '../GameDashboard/MultiplayerAdmin';
+import BuildsWidget from './BuildsWidget';
 
 type Props = {|
   game: Game,
@@ -251,33 +248,9 @@ const GameOverview = ({
                     leaderboards={leaderboards}
                     lobbyConfiguration={lobbyConfiguration}
                   />
-                  <DashboardWidget
-                    gridSize={3}
-                    title={<Trans>Exports</Trans>}
-                    seeMoreButton={
-                      <FlatButton
-                        label={<Trans>See all</Trans>}
-                        rightIcon={<ArrowRight fontSize="small" />}
-                        onClick={() => setCurrentView('builds')}
-                        primary
-                      />
-                    }
-                    renderSubtitle={
-                      !builds
-                        ? null
-                        : () => (
-                            <Text color="secondary" size="body-small" noMargin>
-                              {builds.length <
-                              // Hardcoded value in the back.
-                              // TODO: replace with pagination.
-                              100 ? (
-                                <Trans>{builds.length} exports created</Trans>
-                              ) : (
-                                <Trans>100+ exports created</Trans>
-                              )}
-                            </Text>
-                          )
-                    }
+                  <BuildsWidget
+                    builds={builds}
+                    onSeeAllBuilds={() => setCurrentView('builds')}
                   />
                 </Grid>
               </ColumnStackLayout>

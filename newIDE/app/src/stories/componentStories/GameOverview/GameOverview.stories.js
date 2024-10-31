@@ -19,6 +19,7 @@ import {
   completeCordovaBuild,
   completeElectronBuild,
   completeWebBuild,
+  pendingCordovaBuild,
   userEarningsBalance,
   userEarningsBalanceEmpty,
   basicFeaturingMarketingPlan,
@@ -58,12 +59,17 @@ export default {
       options: ['None', 'Some'],
       control: { type: 'radio' },
     },
+    exports: {
+      options: ['None', 'Some ongoing', 'All complete'],
+      control: { type: 'radio' },
+    },
   },
   args: {
     feedbacks: 'Some unprocessed',
     sessions: 'Some in the last week',
     userBalance: 'Some',
     leaderboards: 'Some',
+    exports: 'All complete',
   },
 };
 
@@ -126,11 +132,13 @@ export const Default = ({
   sessions,
   userBalance,
   leaderboards,
+  builds,
 }: {|
   feedbacks: 'None' | 'Some unprocessed' | 'All processed',
   sessions: 'None' | 'Some in the last week',
   userBalance: 'None' | 'Some',
   leaderboards: 'None' | 'Some',
+  builds: 'None' | 'Some ongoing' | 'All complete',
 |}) => {
   const [tab, setTab] = React.useState<GameDetailsTab>('details');
   const [renderCount, setRenderCount] = React.useState<number>(0);
@@ -150,12 +158,18 @@ export const Default = ({
     userBalance === 'None' ? userEarningsBalanceEmpty : userEarningsBalance;
   const leaderboardsToDisplay =
     leaderboards === 'None' ? [] : mockedLeaderboards;
+  const buildsToDisplay =
+    builds === 'None'
+      ? []
+      : builds === 'All complete'
+      ? [completeCordovaBuild, completeElectronBuild, completeWebBuild]
+      : [completeCordovaBuild, completeElectronBuild, pendingCordovaBuild];
 
   React.useEffect(
     () => {
       setRenderCount(value => value + 1);
     },
-    [feedbacks, sessions, userBalance, leaderboards]
+    [feedbacks, sessions, userBalance, leaderboards, builds]
   );
 
   playServiceMock
@@ -179,7 +193,7 @@ export const Default = ({
     });
   buildServiceMock
     .onGet(`/build`)
-    .reply(200, [completeCordovaBuild, completeElectronBuild, completeWebBuild])
+    .reply(200, buildsToDisplay)
     .onAny()
     .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);

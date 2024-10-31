@@ -20,6 +20,24 @@ import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 
+export const expandAllSubfolders = (
+  objectFolder: gdObjectFolderOrObject,
+  isGlobal: boolean,
+  expandFolders: (
+    objectFolderOrObjectWithContexts: Array<ObjectFolderOrObjectWithContext>
+  ) => void
+) => {
+  const subFolders = enumerateFoldersInFolder(objectFolder).map(
+    folderAndPath => folderAndPath.folder
+  );
+  expandFolders(
+    [objectFolder, ...subFolders].map(folder => ({
+      objectFolderOrObject: folder,
+      global: isGlobal,
+    }))
+  );
+};
+
 export type ObjectFolderTreeViewItemCallbacks = {|
   onObjectPasted?: gdObject => void,
   onRenameObjectFolderOrObjectWithContextFinish: (
@@ -262,17 +280,8 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
       { type: 'separator' },
       {
         label: i18n._(t`Expand all sub folders`),
-        click: () => {
-          const subFolders = enumerateFoldersInFolder(this.objectFolder).map(
-            folderAndPath => folderAndPath.folder
-          );
-          expandFolders(
-            [this.objectFolder, ...subFolders].map(folder => ({
-              objectFolderOrObject: folder,
-              global: this._isGlobal,
-            }))
-          );
-        },
+        click: () =>
+          expandAllSubfolders(this.objectFolder, this._isGlobal, expandFolders),
       },
     ];
   }

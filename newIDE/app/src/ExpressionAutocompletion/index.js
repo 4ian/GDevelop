@@ -265,6 +265,7 @@ const getAutocompletionsForText = function(
     .get()
     .getObjectsContainersList();
 
+  // The objects must never be kept in a state as they may be temporary copies.
   if (objectsContainersList.getObjectsContainersCount() === 0) {
     throw new Error(
       'Called getAutocompletionsForText without any object container.'

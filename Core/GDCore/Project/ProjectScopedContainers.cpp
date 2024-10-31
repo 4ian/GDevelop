@@ -109,8 +109,14 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForEventsBasedObject(
     const gd::EventsBasedObject &eventsBasedObject,
     gd::ObjectsContainer &outputObjectsContainer) {
 
+  // Making copies of the object can lead to memory issues when UI components
+  // keep the copy in their state.
   outputObjectsContainer.GetObjects().clear();
   outputObjectsContainer.GetObjectGroups().Clear();
+  // This object named "Object" represents the parent and is used by events.
+  // TODO Use a dedicated ObjectsContainer with only this "Object" and check in
+  // the codebase that this container is not assumed as a
+  // "globalObjectsContainer".
   outputObjectsContainer.InsertNewObject(
       project,
       gd::PlatformExtension::GetObjectFullType(

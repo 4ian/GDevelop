@@ -176,10 +176,10 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
 
   const selectAndOpenContextMenu = React.useCallback(
     (event: MouseEvent) => {
-      onClickItem(event);
+      if (!node.item.isRoot) onClickItem(event);
       openContextMenu(event);
     },
-    [onClickItem, openContextMenu]
+    [node, onClickItem, openContextMenu]
   );
 
   const setIsStayingOver = React.useCallback(

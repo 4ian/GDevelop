@@ -33,8 +33,6 @@ import {
   type ObjectFolderOrObjectWithContext,
 } from './EnumerateObjectFolderOrObject';
 import { mapFor } from '../Utils/MapFor';
-import IconButton from '../UI/IconButton';
-import AddFolder from '../UI/CustomSvgIcons/AddFolder';
 import { LineStackLayout } from '../UI/Layout';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import Link from '../UI/Link';
@@ -51,6 +49,7 @@ import {
 import {
   ObjectFolderTreeViewItemContent,
   getObjectFolderTreeViewItemId,
+  expandAllSubfolders,
   type ObjectFolderTreeViewItemProps,
 } from './ObjectFolderTreeViewItemContent';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
@@ -240,7 +239,7 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
   constructor(
     id: string,
     label: string | React.Node,
-    rightButton?: MenuButton,
+    rightButton?: MenuButton | null,
     buildMenuTemplateFunction?: () => Array<MenuItemTemplate>
   ) {
     this.id = id;
@@ -250,7 +249,7 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
         rightButton
           ? {
               id: rightButton.id,
-              label: rightButton.label,
+              label: i18n._(rightButton.label),
               click: rightButton.click,
             }
           : null,
@@ -395,7 +394,15 @@ type Props = {|
   layout: ?gdLayout,
   eventsBasedObject: gdEventsBasedObject | null,
   initialInstances?: gdInitialInstancesContainer,
+  // The objects retried from ProjectScopedContainers must never be kept in a
+  // state as they may be temporary copies.
+  // It also contains "fake" objects like "Object" for the parent of custom objects.
+  // It's useful to check if an object name is taken, but not to edit ObjectsContainer.
+  // Also see `ProjectScopedContainers::MakeNewProjectScopedContainersForEventsBasedObject`.
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
+  // These 2 containers always contains the "real" objects.
+  globalObjectsContainer: gdObjectsContainer | null,
+  objectsContainer: gdObjectsContainer,
   onSelectAllInstancesOfObjectInLayout?: string => void,
   resourceManagementProps: ResourceManagementProps,
   onDeleteObjects: (
@@ -443,6 +450,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       eventsBasedObject,
       initialInstances,
       projectScopedContainersAccessor,
+      globalObjectsContainer,
+      objectsContainer,
       resourceManagementProps,
       onSelectAllInstancesOfObjectInLayout,
       onDeleteObjects,
@@ -468,25 +477,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     }: Props,
     ref
   ) => {
-    // TODO Handle any number of object containers.
-    const objectsContainersList = projectScopedContainersAccessor
-      .get()
-      .getObjectsContainersList();
-
-    if (objectsContainersList.getObjectsContainersCount() === 0) {
-      throw new Error('Used ObjectsList without any object container.');
-    }
-    if (objectsContainersList.getObjectsContainersCount() > 2) {
-      console.error('Used ObjectsList with more than 2 object containers.');
-    }
-    const globalObjectsContainer =
-      objectsContainersList.getObjectsContainersCount() > 1
-        ? objectsContainersList.getObjectsContainer(0)
-        : null;
-    const objectsContainer = objectsContainersList.getObjectsContainer(
-      objectsContainersList.getObjectsContainersCount() - 1
-    );
-
     const { currentlyRunningInAppTutorial } = React.useContext(
       InAppTutorialContext
     );
@@ -847,7 +837,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             const parentFolder = selectedObjectFolderOrObject.getParent();
             const newFolder = parentFolder.insertNewFolder(
               'NewFolder',
-              parentFolder.getChildPosition(selectedObjectFolderOrObject)
+              parentFolder.getChildPosition(selectedObjectFolderOrObject) + 1
             );
             newObjectFolderOrObjectWithContext = {
               objectFolderOrObject: newFolder,
@@ -1030,7 +1020,30 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               isRoot: true,
               content: new LabelTreeViewItemContent(
                 globalObjectsRootFolderId,
-                i18n._(t`Global Objects`)
+                i18n._(t`Global Objects`),
+                null,
+                () => [
+                  {
+                    label: i18n._(t`Add a folder`),
+                    click: () =>
+                      addFolder([
+                        {
+                          objectFolderOrObject: globalObjectsRootFolder,
+                          global: true,
+                        },
+                      ]),
+                  },
+                  { type: 'separator' },
+                  {
+                    label: i18n._(t`Expand all sub folders`),
+                    click: () =>
+                      expandAllSubfolders(
+                        globalObjectsRootFolder,
+                        true,
+                        expandFolders
+                      ),
+                  },
+                ]
               ),
               placeholder: new PlaceHolderTreeViewItem(
                 globalObjectsEmptyPlaceholderId,
@@ -1069,6 +1082,27 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               },
               () => [
                 {
+                  label: i18n._(t`Add a folder`),
+                  click: () =>
+                    addFolder([
+                      {
+                        objectFolderOrObject: objectsRootFolder,
+                        global: false,
+                      },
+                    ]),
+                },
+                { type: 'separator' },
+                {
+                  label: i18n._(t`Expand all sub folders`),
+                  click: () =>
+                    expandAllSubfolders(
+                      objectsRootFolder,
+                      false,
+                      expandFolders
+                    ),
+                },
+                { type: 'separator' },
+                {
                   label: i18n._(t`Export as assets`),
                   click: () => onExportAssets(),
                 },
@@ -1086,6 +1120,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         return treeViewItems;
       },
       [
+        addFolder,
+        expandFolders,
         globalObjectsRootFolder,
         objectFolderTreeViewItemProps,
         objectTreeViewItemProps,
@@ -1363,28 +1399,16 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     return (
       <Background maxWidth>
-        <Column>
-          <LineStackLayout>
-            <Column expand noMargin>
-              <SearchBar
-                value={searchText}
-                onRequestSearch={() => {}}
-                onChange={text => setSearchText(text)}
-                placeholder={t`Search objects`}
-              />
-            </Column>
-            <Column noMargin>
-              <IconButton
-                size="small"
-                onClick={() =>
-                  addFolder(selectedObjectFolderOrObjectsWithContext)
-                }
-              >
-                <AddFolder />
-              </IconButton>
-            </Column>
-          </LineStackLayout>
-        </Column>
+        <LineStackLayout>
+          <Column expand>
+            <SearchBar
+              value={searchText}
+              onRequestSearch={() => {}}
+              onChange={setSearchText}
+              placeholder={t`Search objects`}
+            />
+          </Column>
+        </LineStackLayout>
         <div
           style={styles.listContainer}
           onKeyDown={keyboardShortcutsRef.current.onKeyDown}
@@ -1506,8 +1530,8 @@ const arePropsEqual = (prevProps: Props, nextProps: Props): boolean =>
   prevProps.selectedObjectFolderOrObjectsWithContext ===
     nextProps.selectedObjectFolderOrObjectsWithContext &&
   prevProps.project === nextProps.project &&
-  prevProps.projectScopedContainersAccessor ===
-    nextProps.projectScopedContainersAccessor;
+  prevProps.globalObjectsContainer === nextProps.globalObjectsContainer &&
+  prevProps.objectsContainer === nextProps.objectsContainer;
 
 const MemoizedObjectsList = React.memo<Props, ObjectsListInterface>(
   ObjectsList,

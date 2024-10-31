@@ -42,6 +42,7 @@ import GameFeedback from '../GameDashboard/Feedbacks/GameFeedback';
 import Builds from '../ExportAndShare/Builds';
 import { GameAnalyticsPanel } from '../GameDashboard/GameAnalyticsPanel';
 import LeaderboardAdmin from '../GameDashboard/LeaderboardAdmin';
+import MultiplayerAdmin from '../GameDashboard/MultiplayerAdmin';
 
 type Props = {|
   game: Game,
@@ -223,6 +224,8 @@ const GameOverview = ({
               />
             ) : currentView === 'leaderboards' ? (
               <LeaderboardAdmin gameId={game.id} onLoading={() => {}} />
+            ) : currentView === 'multiplayer' ? (
+              <MultiplayerAdmin gameId={game.id} />
             ) : (
               <ColumnStackLayout noMargin>
                 <GameHeader
@@ -242,6 +245,9 @@ const GameOverview = ({
                   />
                   <ServicesWidget
                     onSeeAllLeaderboards={() => setCurrentView('leaderboards')}
+                    onSeeLobbyConfiguration={() =>
+                      setCurrentView('multiplayer')
+                    }
                     leaderboards={leaderboards}
                     lobbyConfiguration={lobbyConfiguration}
                   />

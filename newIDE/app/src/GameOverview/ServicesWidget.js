@@ -19,14 +19,20 @@ import { getHelpLink } from '../Utils/HelpLink';
 import Window from '../Utils/Window';
 
 const leaderboardsHelpLink = getHelpLink('/all-features/leaderboards');
+const multiplayerHelpLink = getHelpLink('/all-features/multiplayer');
 
 type Props = {|
   leaderboards: ?Array<Leaderboard>,
   lobbyConfiguration: ?LobbyConfiguration,
   onSeeAllLeaderboards: () => void,
+  onSeeLobbyConfiguration: () => void,
 |};
 
-const ServicesWidget = ({ leaderboards, onSeeAllLeaderboards }: Props) => {
+const ServicesWidget = ({
+  leaderboards,
+  onSeeAllLeaderboards,
+  onSeeLobbyConfiguration,
+}: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   return (
     <DashboardWidget gridSize={3} title={<Trans>Player services</Trans>}>
@@ -74,8 +80,26 @@ const ServicesWidget = ({ leaderboards, onSeeAllLeaderboards }: Props) => {
             <Text size="block-title">
               <Trans>Multiplayer lobbies</Trans>
             </Text>
+            <FlatButton
+              label={<Trans>See more</Trans>}
+              rightIcon={<ArrowRight fontSize="small" />}
+              onClick={onSeeLobbyConfiguration}
+              primary
+            />
           </Line>
-          {/* Add multiplayer admin. */}
+
+          <Text color="secondary">
+            <Trans>
+              Learn how to make{' '}
+              <Link
+                href={multiplayerHelpLink}
+                onClick={() => Window.openExternalURL(multiplayerHelpLink)}
+              >
+                multiplayer games
+              </Link>{' '}
+              with GDevelop.
+            </Trans>
+          </Text>
         </Column>
       </ResponsiveLineStackLayout>
     </DashboardWidget>

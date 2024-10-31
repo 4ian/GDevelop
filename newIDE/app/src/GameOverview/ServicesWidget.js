@@ -49,7 +49,7 @@ const ServicesWidget = ({
               primary
             />
           </Line>
-          {leaderboards && leaderboards.length === 0 && (
+          {!leaderboards || leaderboards.length === 0 ? (
             <Text color="secondary">
               <Trans>
                 Learn how to use{' '}
@@ -62,6 +62,15 @@ const ServicesWidget = ({
                 on GDevelop.
               </Trans>
             </Text>
+          ) : (
+            <Line noMargin>
+              <Text>
+                <b>{leaderboards.length}</b>
+              </Text>&nbsp;
+              <Text color="secondary">
+                <Trans>leaderboards.</Trans>
+              </Text>
+            </Line>
           )}
         </Column>
         {isMobile ? (

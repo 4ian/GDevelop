@@ -1392,12 +1392,20 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
 
     if (HasProjectAndLayout()) {
       variables = &GetLayout().GetVariables();
+    } else if (GetProjectScopedContainers().GetLegacySceneVariables().Has(
+                   variableName)) {
+      variables = &GetProjectScopedContainers().GetLegacySceneVariables();
+      output = "eventsFunctionContext.sceneVariablesForExtension";
     }
   } else if (scope == PROJECT_VARIABLE) {
     output = "runtimeScene.getGame().getVariables()";
 
     if (HasProjectAndLayout()) {
       variables = &GetProject().GetVariables();
+    } else if (GetProjectScopedContainers().GetLegacyGlobalVariables().Has(
+                   variableName)) {
+      variables = &GetProjectScopedContainers().GetLegacyGlobalVariables();
+      output = "eventsFunctionContext.globalVariablesForExtension";
     }
   } else {
     std::vector<gd::String> realObjects =

@@ -10,7 +10,6 @@ import { ResponsiveLineStackLayout } from '../UI/Layout';
 import { Column, Line } from '../UI/Grid';
 import Text from '../UI/Text';
 import { type Game } from '../Utils/GDevelopServices/Game';
-import UserEarnings from '../GameDashboard/Monetization/UserEarnings';
 import { SessionsChart } from '../GameDashboard/GameAnalyticsCharts';
 import { type GameMetrics } from '../Utils/GDevelopServices/Analytics';
 import { buildLastWeekChartData } from '../GameDashboard/GameAnalyticsEvaluator';
@@ -51,14 +50,15 @@ const AnalyticsWidget = ({ game, onSeeAll, gameMetrics }: Props) => {
             }
           >
             <ResponsiveLineStackLayout expand noColumnMargin noMargin>
-              <Column expand noMargin useFullHeight>
+              {/* TODO: Bring back earnings when it is possible to split earnings per game. */}
+              {/* <Column expand noMargin useFullHeight>
                 <Text size="block-title">
                   <Trans>Earnings</Trans>
                 </Text>
                 <Column expand noMargin useFullHeight justifyContent="center">
                   <UserEarnings hideTitle margin="dense" />
                 </Column>
-              </Column>
+              </Column> */}
               <Column expand noMargin>
                 <Line alignItems="center" justifyContent="space-between">
                   <Text size="block-title" noMargin>

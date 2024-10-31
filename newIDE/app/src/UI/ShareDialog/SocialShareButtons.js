@@ -6,7 +6,6 @@ import {
   FacebookShareButton,
   RedditShareButton,
   TwitterShareButton,
-  WhatsappIcon,
   WhatsappShareButton,
 } from 'react-share';
 import { Line } from '../Grid';
@@ -14,6 +13,7 @@ import Facebook from '../CustomSvgIcons/Facebook';
 import Twitter from '../CustomSvgIcons/Twitter';
 import Reddit from '../CustomSvgIcons/Reddit';
 import Mail from '../CustomSvgIcons/Mail';
+import Whatsapp from '../CustomSvgIcons/Whatsapp';
 
 type Props = {|
   url: string,
@@ -56,8 +56,7 @@ const SocialShareButtons = ({ url }: Props) => {
         url={url}
         style={styles.icon}
       >
-        {/* TODO: Use new Whatsapp icon. */}
-        <WhatsappIcon size={32} round />
+        <Whatsapp />
       </WhatsappShareButton>
       <EmailShareButton
         subject="My GDevelop game"

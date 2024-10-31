@@ -422,6 +422,7 @@ const NewProjectSetupDialog = ({
               onClick={onClose}
             />,
             <DialogPrimaryButton
+              key="create"
               primary
               disabled={shouldNotAllowCreatingProject || isLoading}
               label={<Trans>Create project</Trans>}

@@ -46,7 +46,6 @@ namespace gdjs {
      * To be called when the scene has started rendering.
      */
     setupCaptureOptions(isPreview: boolean): void {
-      console.log('Capture options:', this._captureOptions, isPreview);
       if (!isPreview || !this._captureOptions.screenshots) {
         return;
       }

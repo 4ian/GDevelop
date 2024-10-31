@@ -30,7 +30,13 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       focus,
     }));
 
-    const { project, scope, projectScopedContainersAccessor, value, onChange } = props;
+    const {
+      project,
+      scope,
+      projectScopedContainersAccessor,
+      value,
+      onChange,
+    } = props;
     const { layout, eventsFunctionsExtension } = scope;
 
     const variablesContainers = React.useMemo(

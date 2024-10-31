@@ -77,6 +77,7 @@ const MultiplayerAdmin = ({ gameId }: Props) => {
         .fill(0)
         .map((_, index) => (
           <SelectOption
+            key={index}
             value={index + 2}
             label={(index + 2).toString()}
             shouldNotTranslate
@@ -87,6 +88,7 @@ const MultiplayerAdmin = ({ gameId }: Props) => {
       ) {
         options.push(
           <SelectOption
+            key="more"
             value={maximumNumberOfPlayersAllowed + 1}
             label={t`${(
               maximumNumberOfPlayersAllowed + 1
@@ -106,6 +108,7 @@ const MultiplayerAdmin = ({ gameId }: Props) => {
         .fill(0)
         .map((_, index) => (
           <SelectOption
+            key={index}
             value={index + 1}
             label={(index + 1).toString()}
             shouldNotTranslate

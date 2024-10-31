@@ -4,7 +4,7 @@ import * as React from 'react';
 import { I18n } from '@lingui/react';
 import { Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
-import { getGameUrl, type Game } from '../Utils/GDevelopServices/Game';
+import { type Game } from '../Utils/GDevelopServices/Game';
 import { GameThumbnail } from '../GameDashboard/GameThumbnail';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import {
@@ -30,14 +30,16 @@ const styles = {
 type Props = {|
   game: Game,
   onEditGame: () => void,
+  gameUrl: ?string,
 |};
 
-const GameHeader = ({ game, onEditGame }: Props) => {
+const GameHeader = ({ game, onEditGame, gameUrl }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const renderPublicInfo = () => {
-    const DiscoverabilityIcon = game.discoverable ? Visibility : VisibilityOff;
+    const DiscoverabilityIcon =
+      game.discoverable && gameUrl ? Visibility : VisibilityOff;
     const AdsIcon = game.displayAdsOnGamePage ? DollarCoin : Cross;
     const PlayerFeedbackIcon = game.acceptsGameComments ? Messages : Cross;
     const textProps = {
@@ -54,10 +56,12 @@ const GameHeader = ({ game, onEditGame }: Props) => {
         <div style={styles.iconAndText}>
           <DiscoverabilityIcon {...iconProps} />
           <Text {...textProps}>
-            {game.discoverable ? (
+            {game.discoverable && gameUrl ? (
               <Trans>Public on gd.games</Trans>
-            ) : (
+            ) : gameUrl ? (
               <Trans>Hidden on gd.games</Trans>
+            ) : (
+              <Trans>Not published</Trans>
             )}
           </Text>
         </div>
@@ -113,8 +117,6 @@ const GameHeader = ({ game, onEditGame }: Props) => {
       />
     </LineStackLayout>
   );
-
-  const gameUrl = getGameUrl(game);
 
   if (isMobile) {
     return (

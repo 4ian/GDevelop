@@ -9,7 +9,7 @@ import ArrowRight from '../UI/CustomSvgIcons/ArrowRight';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import { Column, Line, Spacer } from '../UI/Grid';
 import Text from '../UI/Text';
-import { getGameUrl, type Game } from '../Utils/GDevelopServices/Game';
+import { type Game } from '../Utils/GDevelopServices/Game';
 import { SessionsChart } from '../GameDashboard/GameAnalyticsCharts';
 import { type GameMetrics } from '../Utils/GDevelopServices/Analytics';
 import { buildLastWeekChartData } from '../GameDashboard/GameAnalyticsEvaluator';
@@ -24,9 +24,10 @@ type Props = {|
   game: Game,
   onSeeAll: () => void,
   gameMetrics: ?Array<GameMetrics>,
+  gameUrl: ?string,
 |};
 
-const AnalyticsWidget = ({ game, onSeeAll, gameMetrics }: Props) => {
+const AnalyticsWidget = ({ game, onSeeAll, gameMetrics, gameUrl }: Props) => {
   const hasNoSession = gameMetrics && gameMetrics.length === 0;
   const chartData = React.useMemo(() => buildLastWeekChartData(gameMetrics), [
     gameMetrics,
@@ -35,8 +36,6 @@ const AnalyticsWidget = ({ game, onSeeAll, gameMetrics }: Props) => {
     marketingPlansDialogOpen,
     setMarketingPlansDialogOpen,
   ] = React.useState<boolean>(false);
-
-  const gameUrl = getGameUrl(game);
 
   return (
     <>

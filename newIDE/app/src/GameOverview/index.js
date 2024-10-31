@@ -12,6 +12,7 @@ import {
   type MarketingPlan,
   type GameUpdatePayload,
   updateGame,
+  getGameUrl,
 } from '../Utils/GDevelopServices/Game';
 import { ColumnStackLayout } from '../UI/Layout';
 import GameHeader from './GameHeader';
@@ -90,6 +91,9 @@ const GameOverview = ({
     new Date(new Date().setHours(0, 0, 0, 0) - 7 * 24 * 3600 * 1000)
   );
 
+  const isPublishedOnGdGames = !!game.publicWebBuildId;
+  const gameUrl = isPublishedOnGdGames ? getGameUrl(game) : null;
+
   const fetchGameFeaturings = React.useCallback(
     async () => {
       if (!profile) return;
@@ -121,7 +125,7 @@ const GameOverview = ({
         game.id,
         payload
       );
-      onGameUpdated(updatedGame)
+      onGameUpdated(updatedGame);
     },
     [getAuthorizationHeader, profile, game.id, onGameUpdated]
   );
@@ -244,18 +248,21 @@ const GameOverview = ({
                 <GameHeader
                   game={game}
                   onEditGame={() => setGameDetailsDialogOpen(true)}
+                  gameUrl={gameUrl}
                 />
                 <Grid container spacing={2}>
                   <AnalyticsWidget
                     onSeeAll={() => setCurrentView('analytics')}
                     gameMetrics={gameRollingMetrics}
                     game={game}
+                    gameUrl={gameUrl}
                   />
                   <FeedbackWidget
                     onSeeAll={() => setCurrentView('feedback')}
                     feedbacks={feedbacks}
                     game={game}
                     onUpdateGame={onUpdateGame}
+                    gameUrl={gameUrl}
                   />
                   <ServicesWidget
                     onSeeAllLeaderboards={() => setCurrentView('leaderboards')}

@@ -9,7 +9,6 @@ import DashboardWidget from './DashboardWidget';
 import ArrowRight from '../UI/CustomSvgIcons/ArrowRight';
 import { type Comment } from '../Utils/GDevelopServices/Play';
 import {
-  getGameUrl,
   type Game,
   type GameUpdatePayload,
 } from '../Utils/GDevelopServices/Game';
@@ -27,14 +26,19 @@ type Props = {|
   onSeeAll: () => void,
   game: Game,
   onUpdateGame: GameUpdatePayload => Promise<void>,
+  gameUrl: ?string,
 |};
 
-const FeedbackWidget = ({ onSeeAll, feedbacks, game, onUpdateGame }: Props) => {
+const FeedbackWidget = ({
+  onSeeAll,
+  feedbacks,
+  game,
+  onUpdateGame,
+  gameUrl,
+}: Props) => {
   const unprocessedFeedbacks = feedbacks
     ? feedbacks.filter(comment => !comment.processedAt)
     : null;
-
-  const gameUrl = getGameUrl(game);
 
   const shouldDisplayControlToCollectFeedback =
     !game.acceptsGameComments && feedbacks && feedbacks.length === 0;

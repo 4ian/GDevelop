@@ -14,7 +14,7 @@ class GD_CORE_API Screenshot {
   void SetDelayTimeInSeconds(int delayTimeInMs_) {
     delayTimeInMs = delayTimeInMs_;
   }
-  const long GetDelayTimeInSeconds() const { return delayTimeInMs; }
+  int GetDelayTimeInSeconds() const { return delayTimeInMs; }
 
   void SetSignedUrl(const gd::String& signedUrl_) { signedUrl = signedUrl_; }
   const gd::String& GetSignedUrl() const { return signedUrl; }

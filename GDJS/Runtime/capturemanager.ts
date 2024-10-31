@@ -5,11 +5,11 @@
  */
 namespace gdjs {
   export type CaptureOptions = {
-    screenshots?: {
+    screenshots?: Array<{
       delayTimeInSeconds: number;
       signedUrl: string;
       publicUrl: string;
-    }[];
+    }>;
   };
 
   /**

@@ -257,11 +257,6 @@ namespace gdjs {
             this._options.captureOptions || {}
           )
         : null;
-      console.log(
-        gdjs.CaptureManager,
-        this._options.captureOptions,
-        this._captureManager
-      );
       this._isPreview = this._options.isPreview || false;
       this._sessionId = null;
       this._playerId = null;

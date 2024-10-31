@@ -14,6 +14,7 @@ import {
 } from './ParameterFieldCommons';
 import { enumerateVariables } from './EnumerateVariables';
 import SceneVariableIcon from '../../UI/CustomSvgIcons/SceneVariable';
+import GlobalAndSceneVariablesDialog from '../../VariablesList/GlobalAndSceneVariablesDialog';
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function SceneVariableField(props: ParameterFieldProps, ref) {
@@ -29,21 +30,40 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       focus,
     }));
 
-    const { project, scope, projectScopedContainersAccessor } = props;
-    const { layout } = scope;
+    const { project, scope, projectScopedContainersAccessor, value, onChange } = props;
+    const { layout, eventsFunctionsExtension } = scope;
 
     const variablesContainers = React.useMemo(
       () => {
-        return layout ? [layout.getVariables()] : [];
+        return layout
+          ? [layout.getVariables()]
+          : eventsFunctionsExtension
+          ? [eventsFunctionsExtension.getSceneVariables()]
+          : [];
       },
-      [layout]
+      [eventsFunctionsExtension, layout]
     );
 
     const enumerateSceneVariables = React.useCallback(
       () => {
-        return layout ? enumerateVariables(layout.getVariables()) : [];
+        return layout
+          ? enumerateVariables(layout.getVariables())
+          : eventsFunctionsExtension
+          ? enumerateVariables(eventsFunctionsExtension.getSceneVariables())
+          : [];
       },
-      [layout]
+      [eventsFunctionsExtension, layout]
+    );
+
+    const onVariableEditorApply = React.useCallback(
+      (selectedVariableName: string | null) => {
+        if (selectedVariableName && selectedVariableName.startsWith(value)) {
+          onChange(selectedVariableName);
+        }
+        setEditorOpen(null);
+        if (field.current) field.current.updateAutocompletions();
+      },
+      [onChange, value]
     );
 
     return (
@@ -76,21 +96,24 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             layout={layout}
             open
             onCancel={() => setEditorOpen(null)}
-            onApply={(selectedVariableName: string | null) => {
-              if (
-                selectedVariableName &&
-                selectedVariableName.startsWith(props.value)
-              ) {
-                props.onChange(selectedVariableName);
-              }
-              setEditorOpen(null);
-              if (field.current) field.current.updateAutocompletions();
-            }}
+            onApply={onVariableEditorApply}
             preventRefactoringToDeleteInstructions
             initiallySelectedVariableName={editorOpen.variableName}
             shouldCreateInitiallySelectedVariable={
               editorOpen.shouldCreate || false
             }
+            hotReloadPreviewButtonProps={null}
+          />
+        )}
+        {editorOpen && eventsFunctionsExtension && !layout && (
+          <GlobalAndSceneVariablesDialog
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
+            open
+            onCancel={() => setEditorOpen(null)}
+            onApply={onVariableEditorApply}
+            isGlobalTabInitiallyOpen={false}
+            initiallySelectedVariableName={editorOpen.variableName}
+            shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
             hotReloadPreviewButtonProps={null}
           />
         )}

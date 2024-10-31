@@ -5,13 +5,11 @@
 #include "ObjectsContainersList.h"
 #include "PropertiesContainersList.h"
 #include "VariablesContainersList.h"
+#include "VariablesContainer.h"
 
 namespace gd {
 class Project;
 class ObjectsContainer;
-class ObjectsContainersList;
-class VariablesContainersList;
-class PropertiesContainersList;
 class NamedPropertyDescriptor;
 class ParameterMetadataContainer;
 class BaseEvent;
@@ -19,7 +17,7 @@ class EventsFunctionsExtension;
 class EventsFunction;
 class EventsBasedBehavior;
 class EventsBasedObject;
-}  // namespace gd
+} // namespace gd
 
 namespace gd {
 
@@ -38,51 +36,29 @@ class ProjectScopedContainers {
   ProjectScopedContainers(
       const gd::ObjectsContainersList &objectsContainersList_,
       const gd::VariablesContainersList &variablesContainersList_,
+      const gd::VariablesContainer &legacyGlobalVariables_,
+      const gd::VariablesContainer &legacySceneVariables_,
       const gd::PropertiesContainersList &propertiesContainersList_)
       : objectsContainersList(objectsContainersList_),
         variablesContainersList(variablesContainersList_),
+        legacyGlobalVariables(legacyGlobalVariables_),
+        legacySceneVariables(legacySceneVariables_),
         propertiesContainersList(propertiesContainersList_){};
   virtual ~ProjectScopedContainers(){};
 
   static ProjectScopedContainers
   MakeNewProjectScopedContainersForProjectAndLayout(const gd::Project &project,
-                                                    const gd::Layout &layout) {
-    ProjectScopedContainers projectScopedContainers(
-        ObjectsContainersList::MakeNewObjectsContainersListForProjectAndLayout(
-            project, layout),
-        VariablesContainersList::
-            MakeNewVariablesContainersListForProjectAndLayout(project, layout),
-        PropertiesContainersList::MakeNewEmptyPropertiesContainersList());
-
-    return projectScopedContainers;
-  }
+                                                    const gd::Layout &layout);
 
   static ProjectScopedContainers
-  MakeNewProjectScopedContainersForProject(const gd::Project &project) {
-    ProjectScopedContainers projectScopedContainers(
-        ObjectsContainersList::MakeNewObjectsContainersListForProject(
-            project),
-        VariablesContainersList::
-            MakeNewVariablesContainersListForProject(project),
-        PropertiesContainersList::MakeNewEmptyPropertiesContainersList());
-
-    return projectScopedContainers;
-  }
+  MakeNewProjectScopedContainersForProject(const gd::Project &project);
 
   /**
    * @deprecated Use another method for an explicit context instead.
    */
   static ProjectScopedContainers MakeNewProjectScopedContainersFor(
       const gd::ObjectsContainer &globalObjectsContainers,
-      const gd::ObjectsContainer &objectsContainers) {
-    ProjectScopedContainers projectScopedContainers(
-        ObjectsContainersList::MakeNewObjectsContainersListForContainers(
-            globalObjectsContainers, objectsContainers),
-        VariablesContainersList::MakeNewEmptyVariablesContainersList(),
-        PropertiesContainersList::MakeNewEmptyPropertiesContainersList());
-
-    return projectScopedContainers;
-  };
+      const gd::ObjectsContainer &objectsContainers);
 
   static ProjectScopedContainers
   MakeNewProjectScopedContainersForEventsFunctionsExtension(
@@ -221,6 +197,24 @@ class ProjectScopedContainers {
     return variablesContainersList;
   };
 
+  /**
+   * @brief Return the global variables of the current scene or the current
+   * extension. It allows legacy "globalvar" parameters to accept extension
+   * variables.
+   */
+  const gd::VariablesContainer &GetLegacyGlobalVariables() const {
+    return legacyGlobalVariables;
+  };
+
+  /**
+   * @brief Return the scene variables of the current scene or the current
+   * extension. It allows legacy "scenevar" parameters to accept extension
+   * variables.
+   */
+  const gd::VariablesContainer &GetLegacySceneVariables() const {
+    return legacySceneVariables;
+  };
+
   const gd::PropertiesContainersList &GetPropertiesContainersList() const {
     return propertiesContainersList;
   };
@@ -236,6 +230,8 @@ class ProjectScopedContainers {
  private:
   gd::ObjectsContainersList objectsContainersList;
   gd::VariablesContainersList variablesContainersList;
+  gd::VariablesContainer legacyGlobalVariables;
+  gd::VariablesContainer legacySceneVariables;
   gd::PropertiesContainersList propertiesContainersList;
   std::vector<const ParameterMetadataContainer *> parametersVectorsList;
 };

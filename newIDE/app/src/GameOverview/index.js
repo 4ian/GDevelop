@@ -5,9 +5,11 @@ import { Trans } from '@lingui/macro';
 import Grid from '@material-ui/core/Grid';
 import { I18n } from '@lingui/react';
 import {
+  getRecommendedMarketingPlan,
   listGameFeaturings,
   type Game,
   type GameFeaturing,
+  type MarketingPlan,
 } from '../Utils/GDevelopServices/Game';
 import { ColumnStackLayout } from '../UI/Layout';
 import GameHeader from './GameHeader';
@@ -40,7 +42,6 @@ import GameFeedback from '../GameDashboard/Feedbacks/GameFeedback';
 import Builds from '../ExportAndShare/Builds';
 import { GameAnalyticsPanel } from '../GameDashboard/GameAnalyticsPanel';
 import LeaderboardAdmin from '../GameDashboard/LeaderboardAdmin';
-import { MarketingPlansStoreContext } from '../MarketingPlans/MarketingPlansStoreContext';
 
 type Props = {|
   game: Game,
@@ -62,9 +63,6 @@ const GameOverview = ({
     gameDetailsDialogOpen,
     setGameDetailsDialogOpen,
   ] = React.useState<boolean>(false);
-  const { marketingPlans, fetchMarketingPlans } = React.useContext(
-    MarketingPlansStoreContext
-  );
 
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { getAuthorizationHeader, profile } = authenticatedUser;
@@ -73,6 +71,10 @@ const GameOverview = ({
   const [gameRollingMetrics, setGameMetrics] = React.useState<?(GameMetrics[])>(
     null
   );
+  const [
+    recommendedMarketingPlan,
+    setRecommendedMarketingPlan,
+  ] = React.useState<?MarketingPlan>(null);
   const [
     gameFeaturings,
     setGameFeaturings,
@@ -112,13 +114,6 @@ const GameOverview = ({
 
   React.useEffect(
     () => {
-      fetchMarketingPlans();
-    },
-    [fetchMarketingPlans]
-  );
-
-  React.useEffect(
-    () => {
       if (!profile) {
         setFeedbacks(null);
         setBuilds(null);
@@ -126,6 +121,7 @@ const GameOverview = ({
         setLobbyConfiguration(null);
         setLeaderboards(null);
         setGameFeaturings(null);
+        setRecommendedMarketingPlan(null);
         return;
       }
 
@@ -136,6 +132,7 @@ const GameOverview = ({
           gameRollingMetrics,
           lobbyConfiguration,
           leaderboards,
+          recommendedMarketingPlan,
         ] = await Promise.all([
           listComments(getAuthorizationHeader, profile.id, {
             gameId: game.id,
@@ -156,6 +153,10 @@ const GameOverview = ({
             profile.id,
             game.id
           ),
+          getRecommendedMarketingPlan(getAuthorizationHeader, {
+            gameId: game.id,
+            userId: profile.id,
+          }),
           fetchGameFeaturings(),
         ]);
         setFeedbacks(feedbacks);
@@ -163,6 +164,7 @@ const GameOverview = ({
         setGameMetrics(gameRollingMetrics);
         setLobbyConfiguration(lobbyConfiguration);
         setLeaderboards(leaderboards);
+        setRecommendedMarketingPlan(recommendedMarketingPlan);
       };
 
       fetchData();
@@ -217,7 +219,7 @@ const GameOverview = ({
                 gameMetrics={gameRollingMetrics}
                 gameFeaturings={gameFeaturings}
                 fetchGameFeaturings={fetchGameFeaturings}
-                marketingPlans={marketingPlans}
+                recommendedMarketingPlan={recommendedMarketingPlan}
               />
             ) : currentView === 'leaderboards' ? (
               <LeaderboardAdmin gameId={game.id} onLoading={() => {}} />

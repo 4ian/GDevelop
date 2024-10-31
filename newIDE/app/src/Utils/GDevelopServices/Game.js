@@ -531,6 +531,31 @@ export const listMarketingPlans = async (): Promise<MarketingPlan[]> => {
   return response.data;
 };
 
+export const getRecommendedMarketingPlan = async (
+  getAuthorizationHeader: () => Promise<string>,
+  { gameId, userId }: {| gameId: string, userId: string |}
+): Promise<MarketingPlan> => {
+  const authorizationHeader = await getAuthorizationHeader();
+
+  const response = await client.get('/marketing-plan', {
+    headers: {
+      Authorization: authorizationHeader,
+    },
+    params: {
+      gameId,
+      userId,
+    },
+  });
+
+  if (!Array.isArray(response.data)) {
+    throw new Error(
+      'Invalid response from the game API marketing plan listing endpoint'
+    );
+  }
+
+  return response.data[0];
+};
+
 export const getGameCommentQualityRatingsLeaderboards = async (): Promise<
   Array<GameLeaderboard>
 > => {

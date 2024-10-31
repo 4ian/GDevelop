@@ -64,9 +64,7 @@ type Props = {|
 |};
 
 const GamesList = ({ project, games, onRefreshGames, onOpenGameId }: Props) => {
-  const {
-    addRouteArguments,
-  } = React.useContext(RouterContext);
+  const { addRouteArguments } = React.useContext(RouterContext);
   const [searchText, setSearchText] = React.useState<string>('');
   const [currentPage, setCurrentPage] = React.useState<number>(0);
 

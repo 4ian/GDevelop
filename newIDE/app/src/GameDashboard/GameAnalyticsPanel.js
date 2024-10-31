@@ -30,14 +30,13 @@ import {
   SessionsChart,
 } from './GameAnalyticsCharts';
 import MarketingPlanSingleDisplay from '../MarketingPlans/MarketingPlanSingleDisplay';
-import { orderMarketingPlansByCreditPrice } from '../MarketingPlans/MarketingPlanUtils';
 
 const chartHeight = 300;
 
 type Props = {|
   game: Game,
   gameMetrics?: ?(GameMetrics[]),
-  marketingPlans?: ?(MarketingPlan[]),
+  recommendedMarketingPlan?: ?MarketingPlan,
   gameFeaturings?: ?(GameFeaturing[]),
   fetchGameFeaturings?: () => Promise<void>,
 |};
@@ -45,16 +44,13 @@ type Props = {|
 export const GameAnalyticsPanel = ({
   game,
   gameMetrics,
-  marketingPlans,
+  recommendedMarketingPlan,
   gameFeaturings,
   fetchGameFeaturings,
 }: Props) => {
-  const {
-    getAuthorizationHeader,
-    profile,
-    limits,
-    userEarningsBalance,
-  } = React.useContext(AuthenticatedUserContext);
+  const { getAuthorizationHeader, profile } = React.useContext(
+    AuthenticatedUserContext
+  );
 
   const [gameRollingMetrics, setGameMetrics] = React.useState<?(GameMetrics[])>(
     gameMetrics
@@ -70,35 +66,6 @@ export const GameAnalyticsPanel = ({
     null
   );
   const [isGameMetricsLoading, setIsGameMetricsLoading] = React.useState(false);
-
-  const suggestedMarketingPlan: ?MarketingPlan = React.useMemo(
-    () => {
-      if (!marketingPlans || !limits) return null;
-
-      const sortedMarketingPlans = orderMarketingPlansByCreditPrice(
-        marketingPlans,
-        limits
-      );
-      if (!sortedMarketingPlans) return null;
-
-      if (!gameRollingMetrics || gameRollingMetrics.length === 0) {
-        // No session so far.
-        return sortedMarketingPlans[0].marketingPlan;
-      } else if (userEarningsBalance) {
-        // Recommend marketing plan according to available credits.
-        let highestPurchasableMarketingPlan = null;
-        for (const { marketingPlan, priceInCredits } of sortedMarketingPlans) {
-          if (priceInCredits <= userEarningsBalance.amountInCredits) {
-            highestPurchasableMarketingPlan = marketingPlan;
-          }
-        }
-        if (highestPurchasableMarketingPlan)
-          return highestPurchasableMarketingPlan;
-      }
-      return sortedMarketingPlans[0].marketingPlan;
-    },
-    [marketingPlans, limits, gameRollingMetrics, userEarningsBalance]
-  );
 
   // TODO In some timezones, it might ask one less or extra day.
   const lastYearIsoDate = formatISO(subDays(new Date(), daysShownForYear), {
@@ -143,10 +110,7 @@ export const GameAnalyticsPanel = ({
   if (isGameMetricsLoading) return <PlaceholderLoader />;
 
   const displaySuggestedMarketingPlan =
-    marketingPlans &&
-    gameFeaturings &&
-    fetchGameFeaturings &&
-    suggestedMarketingPlan;
+    recommendedMarketingPlan && gameFeaturings && fetchGameFeaturings;
 
   return (
     <I18n>
@@ -192,15 +156,14 @@ export const GameAnalyticsPanel = ({
                   />
                 </Column>
               </Grid>
-              {suggestedMarketingPlan &&
-                marketingPlans &&
+              {recommendedMarketingPlan &&
                 gameFeaturings &&
                 fetchGameFeaturings && (
                   <Grid item xs={12} sm={5} md={4}>
                     <MarketingPlanSingleDisplay
                       fetchGameFeaturings={fetchGameFeaturings}
                       gameFeaturings={gameFeaturings}
-                      marketingPlan={suggestedMarketingPlan}
+                      marketingPlan={recommendedMarketingPlan}
                       game={game}
                     />
                   </Grid>

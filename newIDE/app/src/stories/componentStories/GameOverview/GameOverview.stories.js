@@ -21,10 +21,12 @@ import {
   completeWebBuild,
   userEarningsBalance,
   userEarningsBalanceEmpty,
+  basicFeaturingMarketingPlan,
 } from '../../../fixtures/GDevelopServicesTestData';
 import { client as playApiAxiosClient } from '../../../Utils/GDevelopServices/Play';
 import { client as buildApiAxiosClient } from '../../../Utils/GDevelopServices/Build';
 import { client as analyticsApiAxiosClient } from '../../../Utils/GDevelopServices/Analytics';
+import { client as gameApiAxiosClient } from '../../../Utils/GDevelopServices/Game';
 
 import type { GameDetailsTab } from '../../../GameDashboard/GameDetails';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
@@ -74,6 +76,9 @@ const buildServiceMock = new MockAdapter(buildApiAxiosClient, {
   delayResponse,
 });
 const analyticsServiceMock = new MockAdapter(analyticsApiAxiosClient, {
+  delayResponse,
+});
+const gameServiceMock = new MockAdapter(gameApiAxiosClient, {
   delayResponse,
 });
 
@@ -180,6 +185,17 @@ export const Default = ({
       console.error(`Unexpected call to ${config.url} (${config.method})`);
       return [504, null];
     });
+  gameServiceMock
+    .onGet(`/marketing-plan`)
+    .reply(200, [basicFeaturingMarketingPlan])
+    .onGet(`/game-featuring`)
+    .reply(200, [])
+    .onAny()
+    .reply(config => {
+      console.error(`Unexpected call to ${config.url} (${config.method})`);
+      return [504, null];
+    });
+
   analyticsServiceMock
     .onGet(`/game-metrics`)
     .reply(200, gameMetrics)

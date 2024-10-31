@@ -46,7 +46,7 @@ export type PublicGame = {
   donateLink: ?string,
 };
 
-export type Game = {
+export type Game = {|
   id: string,
   gameName: string,
   authorName: string, // this corresponds to the publisher name
@@ -60,7 +60,25 @@ export type Game = {
   acceptsGameComments?: boolean,
   displayAdsOnGamePage?: boolean,
   cachedCurrentSlug?: CachedGameSlug,
-};
+|};
+
+export type GameUpdatePayload = {|
+  gameName?: string,
+  categories?: string[],
+  authorName?: string,
+  publicWebBuildId?: ?string,
+  description?: string,
+  playWithKeyboard?: boolean,
+  playWithGamepad?: boolean,
+  playWithMobile?: boolean,
+  orientation?: string,
+  thumbnailUrl?: ?string,
+  screenshotUrls?: ?Array<string>,
+  discoverable?: boolean,
+  acceptsBuildComments?: boolean,
+  acceptsGameComments?: boolean,
+  displayAdsOnGamePage?: boolean,
+|};
 
 export type GameCategory = {
   name: string,
@@ -312,23 +330,7 @@ export const updateGame = async (
     acceptsBuildComments,
     acceptsGameComments,
     displayAdsOnGamePage,
-  }: {|
-    gameName?: string,
-    categories?: string[],
-    authorName?: string,
-    publicWebBuildId?: ?string,
-    description?: string,
-    playWithKeyboard?: boolean,
-    playWithGamepad?: boolean,
-    playWithMobile?: boolean,
-    orientation?: string,
-    thumbnailUrl?: ?string,
-    screenshotUrls?: ?Array<string>,
-    discoverable?: boolean,
-    acceptsBuildComments?: boolean,
-    acceptsGameComments?: boolean,
-    displayAdsOnGamePage?: boolean,
-  |}
+  }: GameUpdatePayload
 ): Promise<Game> => {
   const authorizationHeader = await getAuthorizationHeader();
   const response = await client.patch(

@@ -10,6 +10,8 @@ import {
   type Game,
   type GameFeaturing,
   type MarketingPlan,
+  type GameUpdatePayload,
+  updateGame,
 } from '../Utils/GDevelopServices/Game';
 import { ColumnStackLayout } from '../UI/Layout';
 import GameHeader from './GameHeader';
@@ -108,6 +110,20 @@ const GameOverview = ({
       }
     },
     [game, getAuthorizationHeader, profile]
+  );
+
+  const onUpdateGame = React.useCallback(
+    async (payload: GameUpdatePayload) => {
+      if (!profile) return;
+      const updatedGame = await updateGame(
+        getAuthorizationHeader,
+        profile.id,
+        game.id,
+        payload
+      );
+      onGameUpdated(updatedGame)
+    },
+    [getAuthorizationHeader, profile, game.id, onGameUpdated]
   );
 
   React.useEffect(
@@ -239,6 +255,7 @@ const GameOverview = ({
                     onSeeAll={() => setCurrentView('feedback')}
                     feedbacks={feedbacks}
                     game={game}
+                    onUpdateGame={onUpdateGame}
                   />
                   <ServicesWidget
                     onSeeAllLeaderboards={() => setCurrentView('leaderboards')}

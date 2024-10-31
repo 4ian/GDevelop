@@ -3,12 +3,16 @@
 import * as React from 'react';
 import { I18n } from '@lingui/react';
 import Divider from '@material-ui/core/Divider';
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import FlatButton from '../UI/FlatButton';
 import DashboardWidget from './DashboardWidget';
 import ArrowRight from '../UI/CustomSvgIcons/ArrowRight';
 import { type Comment } from '../Utils/GDevelopServices/Play';
-import { getGameUrl, type Game } from '../Utils/GDevelopServices/Game';
+import {
+  getGameUrl,
+  type Game,
+  type GameUpdatePayload,
+} from '../Utils/GDevelopServices/Game';
 import { Line, Spacer } from '../UI/Grid';
 import Text from '../UI/Text';
 import { shortenString } from '../Utils/StringHelpers';
@@ -16,19 +20,24 @@ import { ColumnStackLayout } from '../UI/Layout';
 import ScrollView from '../UI/ScrollView';
 import GameLinkAndShareIcons from './GameLinkAndShareIcons';
 import NotificationDot from './NotificationDot';
+import { CompactToggleField } from '../UI/CompactToggleField';
 
 type Props = {|
   feedbacks: ?Array<Comment>,
   onSeeAll: () => void,
   game: Game,
+  onUpdateGame: GameUpdatePayload => Promise<void>,
 |};
 
-const FeedbackWidget = ({ onSeeAll, feedbacks, game }: Props) => {
+const FeedbackWidget = ({ onSeeAll, feedbacks, game, onUpdateGame }: Props) => {
   const unprocessedFeedbacks = feedbacks
     ? feedbacks.filter(comment => !comment.processedAt)
     : null;
 
   const gameUrl = getGameUrl(game);
+
+  const shouldDisplayControlToCollectFeedback =
+    !game.acceptsGameComments && feedbacks && feedbacks.length === 0;
 
   return (
     <I18n>
@@ -48,7 +57,8 @@ const FeedbackWidget = ({ onSeeAll, feedbacks, game }: Props) => {
           }
           withMaxHeight
           renderSubtitle={() =>
-            unprocessedFeedbacks && feedbacks ? (
+            shouldDisplayControlToCollectFeedback ? null : unprocessedFeedbacks &&
+              feedbacks ? (
               unprocessedFeedbacks.length > 0 ? (
                 <Line noMargin alignItems="center">
                   <NotificationDot color="notification" />
@@ -118,17 +128,38 @@ const FeedbackWidget = ({ onSeeAll, feedbacks, game }: Props) => {
                 ))}
               </ColumnStackLayout>
             </ScrollView>
-          ) : !!feedbacks && feedbacks.length === 0 && gameUrl ? (
-            <ColumnStackLayout noMargin justifyContent="center" expand>
-              <Text color="secondary" noMargin>
-                <Trans>
-                  You don’t have any player feedback yet. Share your game with
-                  more people to start collecting player feedback.
-                </Trans>
-              </Text>
-              <GameLinkAndShareIcons url={gameUrl} display="column" />
-            </ColumnStackLayout>
-          ) : null}
+          ) : (
+            !!feedbacks &&
+            feedbacks.length === 0 &&
+            (shouldDisplayControlToCollectFeedback ? (
+              <ColumnStackLayout noMargin expand>
+                <Spacer />
+                <CompactToggleField
+                  checked={false}
+                  label={i18n._(t`Collect game feedback`)}
+                  onCheck={(newValue) => {
+                    onUpdateGame({ acceptsGameComments: newValue });
+                  }}
+                />
+                <Text color="secondary" noMargin size="body-small">
+                  <Trans>
+                    “Player feedback” is off, turn it on to start receiving
+                    feedback on your game.
+                  </Trans>
+                </Text>
+              </ColumnStackLayout>
+            ) : gameUrl ? (
+              <ColumnStackLayout noMargin justifyContent="center" expand>
+                <Text color="secondary" noMargin>
+                  <Trans>
+                    You don’t have any player feedback yet. Share your game with
+                    more people to start collecting player feedback.
+                  </Trans>
+                </Text>
+                <GameLinkAndShareIcons url={gameUrl} display="column" />
+              </ColumnStackLayout>
+            ) : null)
+          )}
         </DashboardWidget>
       )}
     </I18n>

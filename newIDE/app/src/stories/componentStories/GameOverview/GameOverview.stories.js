@@ -27,7 +27,10 @@ import {
 import { client as playApiAxiosClient } from '../../../Utils/GDevelopServices/Play';
 import { client as buildApiAxiosClient } from '../../../Utils/GDevelopServices/Build';
 import { client as analyticsApiAxiosClient } from '../../../Utils/GDevelopServices/Analytics';
-import { client as gameApiAxiosClient } from '../../../Utils/GDevelopServices/Game';
+import {
+  client as gameApiAxiosClient,
+  type Game,
+} from '../../../Utils/GDevelopServices/Game';
 
 import type { GameDetailsTab } from '../../../GameDashboard/GameDetails';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
@@ -43,6 +46,10 @@ export default {
   argTypes: {
     analyticsSource: { control: { type: false } }, // Hide default control.
     game: { control: { type: false } }, // Hide default control.
+    isAcceptingFeedback: {
+      options: ['No', 'Yes'],
+      control: { type: 'radio' },
+    },
     feedbacks: {
       options: ['None', 'Some unprocessed', 'All processed'],
       control: { type: 'radio' },
@@ -65,6 +72,7 @@ export default {
     },
   },
   args: {
+    isAcceptingFeedback: 'Yes',
     feedbacks: 'Some unprocessed',
     sessions: 'Some in the last week',
     userBalance: 'Some',
@@ -128,18 +136,24 @@ const fakeGameMetrics = new Array(7).fill(0).map((_, index) => {
 });
 
 export const Default = ({
+  isAcceptingFeedback,
   feedbacks,
   sessions,
   userBalance,
   leaderboards,
   builds,
 }: {|
+  isAcceptingFeedback: 'Yes' | 'No',
   feedbacks: 'None' | 'Some unprocessed' | 'All processed',
   sessions: 'None' | 'Some in the last week',
   userBalance: 'None' | 'Some',
   leaderboards: 'None' | 'Some',
   builds: 'None' | 'Some ongoing' | 'All complete',
 |}) => {
+  const [game, setGame] = React.useState<Game>({
+    ...game1,
+    acceptsGameComments: isAcceptingFeedback === 'Yes',
+  });
   const [tab, setTab] = React.useState<GameDetailsTab>('details');
   const [renderCount, setRenderCount] = React.useState<number>(0);
   const feedbacksToDisplay =
@@ -204,9 +218,23 @@ export const Default = ({
     .reply(200, [basicFeaturingMarketingPlan])
     .onGet(`/game-featuring`)
     .reply(200, [])
+    .onPatch(`/game/${game1.id}`, {
+      asymmetricMatch: function(data) {
+        setGame({
+          ...game1,
+          acceptsGameComments: data.acceptsGameComments === true,
+        });
+        return true;
+      },
+    })
+    .reply(200)
     .onAny()
     .reply(config => {
-      console.error(`Unexpected call to ${config.url} (${config.method})`);
+      console.error(
+        `Unexpected call to ${config.url} (${config.method} with body ${
+          config.data
+        })`
+      );
       return [504, null];
     });
 
@@ -227,7 +255,7 @@ export const Default = ({
       }}
     >
       <GameOverview
-        game={game1}
+        game={game}
         analyticsSource="homepage"
         key={renderCount.toFixed(0)}
         currentView={tab}

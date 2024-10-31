@@ -49,7 +49,7 @@ type Props<T> = {|
   searchPlaceholderIsCondition?: ?boolean,
   helpPagePath?: ?string,
   style?: Object,
-  onClickMore?: () => void,
+  onClickMore?: ?() => void,
   id?: ?string,
 |};
 

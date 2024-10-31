@@ -133,8 +133,8 @@ const InstructionEditorDialog = ({
     !!chosenObjectInstructionsInfo && !!chosenObjectInstructionsInfoTree;
   const chosenObject = chosenObjectName
     ? getObjectByName(
-        project.getObjects(),
-        scope.layout ? scope.layout.getObjects() : null,
+        globalObjectsContainer,
+        objectsContainer,
         chosenObjectName
       )
     : null;
@@ -174,7 +174,8 @@ const InstructionEditorDialog = ({
   };
 
   const addBehavior = (type: string, defaultName: string) => {
-    if (!chosenObject) return;
+    // Avoid to add behaviors to object parameters.
+    if (!chosenObject || !scope.layout) return;
 
     const wasBehaviorAdded = addBehaviorToObject(
       project,
@@ -301,7 +302,7 @@ const InstructionEditorDialog = ({
         focusOnMount={shouldAutofocusInput && !instructionType}
         searchPlaceholderObjectName={chosenObjectName}
         searchPlaceholderIsCondition={isCondition}
-        onClickMore={() => setNewBehaviorDialogOpen(true)}
+        onClickMore={scope.layout ? () => setNewBehaviorDialogOpen(true) : null}
         id="object-instruction-selector"
       />
     ) : null;

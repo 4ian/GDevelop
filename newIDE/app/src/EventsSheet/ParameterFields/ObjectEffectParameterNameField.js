@@ -39,13 +39,15 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     }));
 
     const { scope } = props;
-    const { layout, eventsFunctionsExtension, eventsBasedObject } = scope;
+    const { eventsFunctionsExtension, eventsBasedObject } = scope;
 
     // We don't memo/callback this, as we want to recompute it every time something changes.
     // Because of the function getLastObjectParameterValue.
     const getEffectParameterNames = (): Array<string> => {
       const {
         project,
+        globalObjectsContainer,
+        objectsContainer,
         instructionMetadata,
         instruction,
         expressionMetadata,
@@ -73,8 +75,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
       let effectType: string | null = null;
       const object = getObjectByName(
-        project.getObjects(),
-        layout ? layout.getObjects() : null,
+        globalObjectsContainer,
+        objectsContainer,
         objectOrGroupName
       );
       if (object && object.getEffects().hasEffectNamed(effectName)) {
@@ -86,8 +88,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
       if (!effectType) {
         const group = getObjectGroupByName(
-          project.getObjects(),
-          layout ? layout.getObjects() : null,
+          globalObjectsContainer,
+          objectsContainer,
           objectOrGroupName
         );
         if (group) {
@@ -97,8 +99,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             group.getAllObjectsNames(),
             objectName => {
               const object = getObjectByName(
-                project.getObjects(),
-                layout ? layout.getObjects() : null,
+                globalObjectsContainer,
+                objectsContainer,
                 objectName
               );
               if (!object) {

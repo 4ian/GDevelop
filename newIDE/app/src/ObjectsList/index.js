@@ -394,15 +394,25 @@ type Props = {|
   layout: ?gdLayout,
   eventsBasedObject: gdEventsBasedObject | null,
   initialInstances?: gdInitialInstancesContainer,
-  // The objects retried from ProjectScopedContainers must never be kept in a
-  // state as they may be temporary copies.
-  // It also contains "fake" objects like "Object" for the parent of custom objects.
-  // It's useful to check if an object name is taken, but not to edit ObjectsContainer.
-  // Also see `ProjectScopedContainers::MakeNewProjectScopedContainersForEventsBasedObject`.
+  /** The objects retrieved from ProjectScopedContainers must never be kept in a
+   * state as they may be temporary copies.
+   * It also contains "fake" objects like "Object" for the parent of custom objects.
+   * It's useful to check if an object name is taken, but not to edit ObjectsContainer.
+   * Also see `ProjectScopedContainers::MakeNewProjectScopedContainersForEventsBasedObject`.
+   * Search for "ProjectScopedContainers wrongly containing temporary objects containers or objects"
+   * in the codebase.
+   */
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
+
   // These 2 containers always contains the "real" objects.
+  // TODO: they should be replaced by projectScopedContainersAccessor, but we can't use this
+  // as `ProjectScopedContainers` may return temporary objects that can't be edited or have references
+  // to them kept.
+  // Search for "ProjectScopedContainers wrongly containing temporary objects containers or objects"
+  // in the codebase.
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
+
   onSelectAllInstancesOfObjectInLayout?: string => void,
   resourceManagementProps: ResourceManagementProps,
   onDeleteObjects: (

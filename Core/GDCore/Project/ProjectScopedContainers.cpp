@@ -109,19 +109,31 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForEventsBasedObject(
     const gd::EventsBasedObject &eventsBasedObject,
     gd::ObjectsContainer &outputObjectsContainer) {
 
-  // Making copies of the object can lead to memory issues when UI components
-  // keep the copy in their state.
+  // TODO: We should avoid to use a single `outputObjectsContainer` and instead
+  // use multiple, stable objects container pointed by the `ProjectScopedContainers`
+  // created below.
+  // Search for "ProjectScopedContainers wrongly containing temporary objects containers or objects"
+  // in the codebase.
   outputObjectsContainer.GetObjects().clear();
   outputObjectsContainer.GetObjectGroups().Clear();
+
   // This object named "Object" represents the parent and is used by events.
-  // TODO Use a dedicated ObjectsContainer with only this "Object" and check in
+  // TODO: Use a dedicated `ObjectsContainer` with only this "Object" and check in
   // the codebase that this container is not assumed as a
   // "globalObjectsContainer".
+  // Search for "ProjectScopedContainers wrongly containing temporary objects containers or objects"
+  // in the codebase.
   outputObjectsContainer.InsertNewObject(
       project,
       gd::PlatformExtension::GetObjectFullType(
           eventsFunctionsExtension.GetName(), eventsBasedObject.GetName()),
       "Object", outputObjectsContainer.GetObjectsCount());
+
+  // TODO: We should avoid to do a copy of the objects container here - as this results
+  // in an objects container that contains temporary objects. This can create issues in the
+  // UI (for example, a tree view that keeps references on objects).
+  // Search for "ProjectScopedContainers wrongly containing temporary objects containers or objects"
+  // in the codebase.
   gd::EventsFunctionTools::CopyEventsBasedObjectChildrenToObjectsContainer(
       eventsBasedObject, outputObjectsContainer);
 

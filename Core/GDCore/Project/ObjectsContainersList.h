@@ -193,10 +193,12 @@ class GD_CORE_API ObjectsContainersList {
   /**
    * \brief Return a the objects container at position \a index.
    *
-   * The returned `ObjectsContainer` may contain cloned objects (see
+   * \warning The returned `ObjectsContainer` may contain cloned objects (in the case of
    * `ProjectScopedContainers::MakeNewProjectScopedContainersForEventsBasedObject`)
    * or "fake" objects used by events like parameters. They must not be used to
    * edit the objects.
+   * Search for "ProjectScopedContainers wrongly containing temporary objects containers or objects"
+   * in the codebase.
    */
   const gd::ObjectsContainer &GetObjectsContainer(std::size_t index) const;
 

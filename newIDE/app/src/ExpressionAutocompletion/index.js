@@ -266,6 +266,8 @@ const getAutocompletionsForText = function(
     .getObjectsContainersList();
 
   // The objects must never be kept in a state as they may be temporary copies.
+  // Search for "ProjectScopedContainers wrongly containing temporary objects containers or objects"
+  // in the codebase.
   if (objectsContainersList.getObjectsContainersCount() === 0) {
     throw new Error(
       'Called getAutocompletionsForText without any object container.'

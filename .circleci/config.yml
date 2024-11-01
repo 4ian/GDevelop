@@ -13,6 +13,7 @@ orbs:
   aws-cli: circleci/aws-cli@2.0.6
   macos: circleci/macos@2.5.1 # For Rosetta (see below)
   node: circleci/node@5.2.0 # For a recent npm version (see below)
+  win: circleci/windows@5.0.0
 jobs:
   # Build the **entire** app for macOS.
   build-macos:
@@ -174,6 +175,55 @@ jobs:
           name: Deploy to S3 (latest)
           command: aws s3 sync newIDE/electron-app/dist s3://gdevelop-releases/$(git rev-parse --abbrev-ref HEAD)/latest/
 
+  # Build the **entire** app for Windows.
+  build-windows:
+    executor:
+      name: win/default
+      size: xlarge
+
+    steps:
+      - checkout
+      - run:
+          name: Install Node.js
+          command: nvm install 20; nvm use 20
+
+      # TODO: Build GDevelop.js?
+
+      - restore_cache:
+          keys:
+            - gd-win-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - gd-win-nodejs-dependencies---
+
+      # GDevelop IDE dependencies.
+      - run:
+          name: Install GDevelop IDE dependencies (1)
+          command: nvm use 20; npm -v; cd newIDE\app; npm install; cd ..\electron-app; npm install
+
+      - save_cache:
+          paths:
+            - newIDE/electron-app/node_modules
+            - newIDE/app/node_modules
+            - GDevelop.js/node_modules
+          key: gd-win-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}
+          
+      - run:
+          name: Build the NSIS executable
+          command: cd newIDE\electron-app; node scripts/build.js --win nsis --publish=never
+      - run:
+          name: Build the AppX
+          command: cd newIDE\electron-app; node scripts/build.js --skip-app-build --win appx --publish=never
+      - run:
+          name: Clean artifacts
+          command: Remove-Item -Path "newIDE\electron-app\dist\win-unpacked" -Recurse -Force
+
+      # Upload artifacts (CircleCI)
+      - store_artifacts:
+          path: newIDE/electron-app/dist
+
+      # Upload artifacts (AWS)
+        # TODO
+
   # Build the WebAssembly library only (so that it's cached on a S3 and easy to re-use).
   build-gdevelop_js-wasm-only:
     resource_class: medium+ # Compilation time decrease linearly with the number of CPUs, but not linking (so "large" does not speedup total build time).
@@ -310,6 +360,7 @@ workflows:
                 - /experimental-build.*/
   builds:
     jobs:
+      - build-windows #TODO: filter by branch once it's verified to work.
       - build-macos:
           filters:
             branches:

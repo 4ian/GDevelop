@@ -34,7 +34,9 @@ class GD_CORE_API VariablesContainer {
       Object,
       Local,
       ExtensionGlobal,
-      ExtensionScene
+      ExtensionScene,
+      Parameters,
+      Properties,
   };
 
   VariablesContainer();

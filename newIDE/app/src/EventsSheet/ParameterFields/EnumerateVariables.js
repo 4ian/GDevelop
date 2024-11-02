@@ -36,8 +36,9 @@ export type EnumeratedVariable = {|
 
 const variableSort = [variable => variable.name.toLowerCase()];
 
-export const enumerateVariablesOfContainersList = (
-  variablesContainersList: ?gdVariablesContainersList
+const enumerateVariablesOfContainersListExcludingSourceTypes = (
+  variablesContainersList: ?gdVariablesContainersList,
+  excludedSourceType: Array<VariablesContainer_SourceType>
 ): Array<EnumeratedVariable> => {
   if (!variablesContainersList) {
     return [];
@@ -51,9 +52,15 @@ export const enumerateVariablesOfContainersList = (
             0,
             variablesContainersList.getVariablesContainersCount(),
             i => {
-              return enumerateVariables(
-                variablesContainersList.getVariablesContainer(i)
+              const variablesContainer = variablesContainersList.getVariablesContainer(
+                i
               );
+              if (
+                excludedSourceType.includes(variablesContainer.getSourceType())
+              ) {
+                return [];
+              }
+              return enumerateVariables(variablesContainer);
             }
           )
         )
@@ -61,6 +68,15 @@ export const enumerateVariablesOfContainersList = (
       'name'
     ),
     variableSort
+  );
+};
+
+export const enumerateVariablesOfContainersList = (
+  variablesContainersList: ?gdVariablesContainersList
+): Array<EnumeratedVariable> => {
+  return enumerateVariablesOfContainersListExcludingSourceTypes(
+    variablesContainersList,
+    [gd.VariablesContainer.Parameters, gd.VariablesContainer.Properties]
   );
 };
 

@@ -16,6 +16,8 @@ import {
 import { enumerateVariablesOfContainersList } from './EnumerateVariables';
 import { mapFor } from '../../Utils/MapFor';
 
+const gd: libGDevelop = global.gd;
+
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function AnyVariableField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?VariableFieldInterface>(null);
@@ -60,6 +62,12 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           i => {
             return variablesContainersList.getVariablesContainer(i);
           }
+        ).filter(
+          variableContainer =>
+            variableContainer.getSourceType() !==
+              gd.VariablesContainer.Parameters &&
+            variableContainer.getSourceType() !==
+              gd.VariablesContainer.Properties
         );
       },
       [projectScopedContainersAccessor]

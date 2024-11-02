@@ -73,7 +73,9 @@ describe('VariableToTreeNodeHandling', () => {
 
     parent2.insertChild('structureChild', structureChild);
 
-    variablesContainer = new gd.VariablesContainer();
+    variablesContainer = new gd.VariablesContainer(
+      gd.VariablesContainer.Unknown
+    );
     variablesContainer.insert('parent', parent, 0);
     variablesContainer.insert('parent2', parent2, 1);
   });

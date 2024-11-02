@@ -37,6 +37,8 @@ export enum VariablesContainer_SourceType {
   Local = 4,
   ExtensionGlobal = 5,
   ExtensionScene = 6,
+  Parameters = 7,
+  Properties = 8,
 }
 
 export enum ObjectsContainer_SourceType {
@@ -329,7 +331,6 @@ export class Variable extends EmscriptenObject {
 }
 
 export class VariablesContainer extends EmscriptenObject {
-  constructor();
   constructor(sourceType: VariablesContainer_SourceType);
   getSourceType(): VariablesContainer_SourceType;
   has(name: string): boolean;
@@ -632,9 +633,9 @@ export class ProjectScopedContainers extends EmscriptenObject {
   static makeNewProjectScopedContainersForProjectAndLayout(project: Project, layout: Layout): ProjectScopedContainers;
   static makeNewProjectScopedContainersForProject(project: Project): ProjectScopedContainers;
   static makeNewProjectScopedContainersForEventsFunctionsExtension(project: Project, eventsFunctionsExtension: EventsFunctionsExtension): ProjectScopedContainers;
-  static makeNewProjectScopedContainersForFreeEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer): ProjectScopedContainers;
-  static makeNewProjectScopedContainersForBehaviorEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer): ProjectScopedContainers;
-  static makeNewProjectScopedContainersForObjectEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer): ProjectScopedContainers;
+  static makeNewProjectScopedContainersForFreeEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer, parameterVariablesContainer: VariablesContainer): ProjectScopedContainers;
+  static makeNewProjectScopedContainersForBehaviorEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer, parameterVariablesContainer: VariablesContainer, propertyVariablesContainer: VariablesContainer): ProjectScopedContainers;
+  static makeNewProjectScopedContainersForObjectEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer, parameterVariablesContainer: VariablesContainer, propertyVariablesContainer: VariablesContainer): ProjectScopedContainers;
   static makeNewProjectScopedContainersForEventsBasedObject(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, outputObjectsContainer: ObjectsContainer): ProjectScopedContainers;
   static makeNewProjectScopedContainersWithLocalVariables(projectScopedContainers: ProjectScopedContainers, event: BaseEvent): ProjectScopedContainers;
   addPropertiesContainer(propertiesContainer: PropertiesContainer): ProjectScopedContainers;

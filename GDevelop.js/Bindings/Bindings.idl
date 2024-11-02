@@ -302,11 +302,12 @@ enum VariablesContainer_SourceType {
   "VariablesContainer::Object",
   "VariablesContainer::Local",
   "VariablesContainer::ExtensionGlobal",
-  "VariablesContainer::ExtensionScene"
+  "VariablesContainer::ExtensionScene",
+  "VariablesContainer::Parameters",
+  "VariablesContainer::Properties",
 };
 
 interface VariablesContainer {
-    void VariablesContainer();
     void VariablesContainer(VariablesContainer_SourceType sourceType);
 
     VariablesContainer_SourceType GetSourceType();
@@ -706,21 +707,26 @@ interface ProjectScopedContainers {
         [Const, Ref] Project project,
         [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
         [Const, Ref] EventsFunction eventsFunction,
-        [Ref] ObjectsContainer parameterObjectsContainer);
+        [Ref] ObjectsContainer parameterObjectsContainer,
+        [Ref] VariablesContainer parameterVariablesContainer);
 
   [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersForBehaviorEventsFunction(
         [Const, Ref] Project project,
         [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
         [Const, Ref] EventsBasedBehavior eventsBasedBehavior,
         [Const, Ref] EventsFunction eventsFunction,
-        [Ref] ObjectsContainer parameterObjectsContainer);
+        [Ref] ObjectsContainer parameterObjectsContainer,
+        [Ref] VariablesContainer parameterVariablesContainer,
+        [Ref] VariablesContainer propertyVariablesContainer);
 
   [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersForObjectEventsFunction(
         [Const, Ref] Project project,
         [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
         [Const, Ref] EventsBasedObject eventsBasedObject,
         [Const, Ref] EventsFunction eventsFunction,
-        [Ref] ObjectsContainer parameterObjectsContainer);
+        [Ref] ObjectsContainer parameterObjectsContainer,
+        [Ref] VariablesContainer parameterVariablesContainer,
+        [Ref] VariablesContainer propertyVariablesContainer);
 
   [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersForEventsBasedObject(
         [Const, Ref] Project project,

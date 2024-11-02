@@ -80,6 +80,24 @@ export const enumerateVariablesOfContainersList = (
   );
 };
 
+export const enumerateVariablesOrPropertiesOfContainersList = (
+  variablesContainersList: ?gdVariablesContainersList
+): Array<EnumeratedVariable> => {
+  return enumerateVariablesOfContainersListExcludingSourceTypes(
+    variablesContainersList,
+    [gd.VariablesContainer.Parameters]
+  );
+};
+
+export const enumerateVariablesOrPropertiesOrParametersOfContainersList = (
+  variablesContainersList: ?gdVariablesContainersList
+): Array<EnumeratedVariable> => {
+  return enumerateVariablesOfContainersListExcludingSourceTypes(
+    variablesContainersList,
+    []
+  );
+};
+
 export const enumerateVariables = (
   variablesContainer: ?gdVariablesContainer
 ): Array<EnumeratedVariable> => {

@@ -217,10 +217,13 @@ class GD_CORE_API ValueTypeMetadata {
       return parameterType == "yesorno" || parameterType == "trueorfalse";
     } else if (type == "variable") {
       return
-             parameterType == "variable" || // Any variable.
-             // Old, "pre-scoped" variables:
-             parameterType == "objectvar" || parameterType == "globalvar" ||
-             parameterType == "scenevar";
+          // Any variable.
+          parameterType == "variable" ||
+          parameterType == "variableOrProperty" ||
+          parameterType == "variableOrPropertyOrParameter" ||
+          // Old, "pre-scoped" variables:
+          parameterType == "objectvar" || parameterType == "globalvar" ||
+          parameterType == "scenevar";
     } else if (type == "resource") {
       return parameterType == "fontResource" ||
              parameterType == "audioResource" ||

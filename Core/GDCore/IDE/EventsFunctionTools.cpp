@@ -9,7 +9,10 @@
 #include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
 #include "GDCore/Project/EventsBasedBehavior.h"
 #include "GDCore/Project/EventsBasedObject.h"
-//#include "GDCore/Project/ObjectsContainer.h"
+#include "GDCore/Project/ObjectsContainer.h"
+#include "GDCore/Project/ParameterMetadataContainer.h"
+#include "GDCore/Project/PropertiesContainer.h"
+#include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/Project/EventsFunction.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/Project.h"
@@ -97,6 +100,74 @@ void EventsFunctionTools::ObjectEventsFunctionToObjectsContainer(
     gd::LogWarning("Child-objects can't be named Object because it's reserved"
                   "for the parent. ");
     return;
+  }
+}
+
+void EventsFunctionTools::ParametersToVariablesContainer(
+    const ParameterMetadataContainer &parameters,
+    gd::VariablesContainer &outputVariablesContainer) {
+  if (outputVariablesContainer.GetSourceType() !=
+      gd::VariablesContainer::SourceType::Parameters) {
+    throw std::logic_error("Tried to generate a variables container from "
+                           "parameters with the wrong source type.");
+  }
+  outputVariablesContainer.Clear();
+
+  gd::String lastObjectName;
+  for (std::size_t i = 0; i < parameters.GetParametersCount(); ++i) {
+    const auto &parameter = parameters.GetParameter(i);
+    if (parameter.GetName().empty())
+      continue;
+
+    auto &valueTypeMetadata = parameter.GetValueTypeMetadata();
+    if (valueTypeMetadata.IsNumber()) {
+      auto &variable = outputVariablesContainer.InsertNew(
+          parameter.GetName(), outputVariablesContainer.Count());
+      variable.SetValue(0);
+    } else if (valueTypeMetadata.IsString()) {
+      auto &variable = outputVariablesContainer.InsertNew(
+          parameter.GetName(), outputVariablesContainer.Count());
+      variable.SetString("");
+    } else if (valueTypeMetadata.IsBoolean()) {
+      auto &variable = outputVariablesContainer.InsertNew(
+          parameter.GetName(), outputVariablesContainer.Count());
+      variable.SetBool(false);
+    }
+  }
+}
+
+void EventsFunctionTools::PropertiesToVariablesContainer(
+    const PropertiesContainer &properties,
+    gd::VariablesContainer &outputVariablesContainer) {
+  if (outputVariablesContainer.GetSourceType() !=
+      gd::VariablesContainer::SourceType::Properties) {
+    throw std::logic_error("Tried to generate a variables container from "
+                           "properties with the wrong source type.");
+  }
+  outputVariablesContainer.Clear();
+
+  gd::String lastObjectName;
+  for (std::size_t i = 0; i < properties.GetCount(); ++i) {
+    const auto &property = properties.Get(i);
+    if (property.GetName().empty())
+      continue;
+
+    auto &propertyType = gd::ValueTypeMetadata::GetPrimitiveValueType(
+        gd::ValueTypeMetadata::ConvertPropertyTypeToValueType(
+            property.GetType()));
+    if (propertyType == "number") {
+      auto &variable = outputVariablesContainer.InsertNew(
+          property.GetName(), outputVariablesContainer.Count());
+      variable.SetValue(0);
+    } else if (propertyType == "string") {
+      auto &variable = outputVariablesContainer.InsertNew(
+          property.GetName(), outputVariablesContainer.Count());
+      variable.SetString("");
+    } else if (propertyType == "boolean") {
+      auto &variable = outputVariablesContainer.InsertNew(
+          property.GetName(), outputVariablesContainer.Count());
+      variable.SetBool(false);
+    }
   }
 }
 

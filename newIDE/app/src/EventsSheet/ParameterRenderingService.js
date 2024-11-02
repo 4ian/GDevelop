@@ -30,6 +30,12 @@ import BehaviorField from './ParameterFields/BehaviorField';
 import AnyVariableField, {
   renderInlineAnyVariable,
 } from './ParameterFields/AnyVariableField';
+import AnyVariableOrPropertyField, {
+  renderInlineAnyVariableOrProperty,
+} from './ParameterFields/AnyVariableOrPropertyField';
+import AnyVariableOrPropertyOrParameterField, {
+  renderInlineAnyVariableOrPropertyOrParameter,
+} from './ParameterFields/AnyVariableOrPropertyOrParameterField';
 import SceneVariableField, {
   renderInlineSceneVariable,
 } from './ParameterFields/SceneVariableField';
@@ -86,6 +92,8 @@ const components = {
   stringWithSelector: StringWithSelectorField,
   behavior: BehaviorField,
   variable: AnyVariableField,
+  variableOrProperty: AnyVariableOrPropertyField,
+  variableOrPropertyOrParameter: AnyVariableOrPropertyOrParameterField,
   scenevar: SceneVariableField,
   globalvar: GlobalVariableField,
   objectvar: ObjectVariableField,
@@ -123,6 +131,8 @@ const inlineRenderers: { [string]: ParameterInlineRenderer } = {
   default: renderInlineDefaultField,
   forceMultiplier: renderInlineForceMultiplier,
   variable: renderInlineAnyVariable,
+  variableOrProperty: renderInlineAnyVariableOrProperty,
+  variableOrPropertyOrParameter: renderInlineAnyVariableOrPropertyOrParameter,
   globalvar: renderInlineGlobalVariable,
   scenevar: renderInlineSceneVariable,
   objectvar: renderInlineObjectVariable,

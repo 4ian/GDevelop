@@ -33,7 +33,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                     "",
                     "res/conditions/var24.png",
                     "res/conditions/var.png")
-      .AddParameter("variable", _("Variable"))
+      .AddParameter("variableOrPropertyOrParameter", _("Variable"))
       .UseStandardRelationalOperatorParameters(
           "number", ParameterOptions::MakeNewOptions());
 
@@ -45,7 +45,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                     "",
                     "res/conditions/var24.png",
                     "res/conditions/var.png")
-      .AddParameter("variable", _("Variable"))
+      .AddParameter("variableOrPropertyOrParameter", _("Variable"))
       .UseStandardRelationalOperatorParameters(
           "string", ParameterOptions::MakeNewOptions());
 
@@ -58,7 +58,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "",
           "res/conditions/var24.png",
           "res/conditions/var.png")
-      .AddParameter("variable", _("Variable"))
+      .AddParameter("variableOrPropertyOrParameter", _("Variable"))
       .AddParameter("trueorfalse", _("Check if the value is"))
       .SetDefaultValue("true")
       // This parameter allows to keep the operand expression
@@ -73,7 +73,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  "",
                  "res/actions/var24.png",
                  "res/actions/var.png")
-      .AddParameter("variable", _("Variable"))
+      .AddParameter("variableOrProperty", _("Variable"))
       .UseStandardOperatorParameters("number",
                                      ParameterOptions::MakeNewOptions());
 
@@ -85,7 +85,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  "",
                  "res/actions/var24.png",
                  "res/actions/var.png")
-      .AddParameter("variable", _("Variable"))
+      .AddParameter("variableOrProperty", _("Variable"))
       .UseStandardOperatorParameters("string",
                                      ParameterOptions::MakeNewOptions());
 
@@ -98,7 +98,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "",
           "res/conditions/var24.png",
           "res/conditions/var.png")
-      .AddParameter("variable", _("Variable"))
+      .AddParameter("variableOrProperty", _("Variable"))
       .AddParameter("operator", _("Value"), "boolean")
       // This parameter allows to keep the operand expression
       // when the editor switch between variable instructions.

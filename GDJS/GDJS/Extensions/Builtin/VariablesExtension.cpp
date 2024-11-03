@@ -26,10 +26,11 @@ VariablesExtension::VariablesExtension() {
   GetAllConditions()["NumberVariable"].SetCustomCodeGenerator(
       [](gd::Instruction &instruction, gd::EventsCodeGenerator &codeGenerator,
          gd::EventsCodeGenerationContext &context) {
+        const auto &variableName = instruction.GetParameters()[0].GetPlainString();
         gd::String getterCode =
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
                 codeGenerator, context, "variable",
-                instruction.GetParameters()[0].GetPlainString());
+                variableName);
         gd::String op = instruction.GetParameters()[1].GetPlainString();
         gd::String expressionCode =
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
@@ -40,6 +41,17 @@ VariablesExtension::VariablesExtension() {
             codeGenerator.GenerateUpperScopeBooleanFullName("isConditionTrue",
                                                             context);
 
+        const auto variablesContainersList =
+            codeGenerator.GetProjectScopedContainers().GetVariablesContainersList();
+        const auto& variablesContainer =
+            variablesContainersList.GetVariablesContainerFromVariableName(
+                variableName);
+        const auto sourceType = variablesContainer.GetSourceType();
+        if (sourceType != gd::VariablesContainer::SourceType::Properties &&
+            sourceType != gd::VariablesContainer::SourceType::Parameters) {
+            getterCode += ".getAsNumber()";
+        }
+
         return resultingBoolean + " = " +
                gd::String(instruction.IsInverted() ? "!" : "") + "(" +
                codeGenerator.GenerateRelationalOperation(op, getterCode,
@@ -49,6 +61,7 @@ VariablesExtension::VariablesExtension() {
   GetAllConditions()["StringVariable"].SetCustomCodeGenerator(
       [](gd::Instruction &instruction, gd::EventsCodeGenerator &codeGenerator,
          gd::EventsCodeGenerationContext &context) {
+        const auto &variableName = instruction.GetParameters()[0].GetPlainString();
         gd::String getterCode =
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
                 codeGenerator, context, "variable",
@@ -58,6 +71,17 @@ VariablesExtension::VariablesExtension() {
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
                 codeGenerator, context, "string",
                 instruction.GetParameters()[2].GetPlainString());
+
+        const auto variablesContainersList =
+            codeGenerator.GetProjectScopedContainers().GetVariablesContainersList();
+        const auto& variablesContainer =
+            variablesContainersList.GetVariablesContainerFromVariableName(
+                variableName);
+        const auto sourceType = variablesContainer.GetSourceType();
+        if (sourceType != gd::VariablesContainer::SourceType::Properties &&
+            sourceType != gd::VariablesContainer::SourceType::Parameters) {
+            getterCode += ".getAsString()";
+        }
 
         gd::String resultingBoolean =
             codeGenerator.GenerateUpperScopeBooleanFullName("isConditionTrue",
@@ -72,12 +96,24 @@ VariablesExtension::VariablesExtension() {
   GetAllConditions()["BooleanVariable"].SetCustomCodeGenerator(
       [](gd::Instruction &instruction, gd::EventsCodeGenerator &codeGenerator,
          gd::EventsCodeGenerationContext &context) {
+        const auto &variableName = instruction.GetParameters()[0].GetPlainString();
         gd::String getterCode =
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
                 codeGenerator, context, "variable",
                 instruction.GetParameters()[0].GetPlainString());
         bool isOperandTrue =
-            instruction.GetParameters()[1].GetPlainString() == "True";
+            instruction.GetParameters()[1].GetPlainString() != "False";
+
+        const auto variablesContainersList =
+            codeGenerator.GetProjectScopedContainers().GetVariablesContainersList();
+        const auto& variablesContainer =
+            variablesContainersList.GetVariablesContainerFromVariableName(
+                variableName);
+        const auto sourceType = variablesContainer.GetSourceType();
+        if (sourceType != gd::VariablesContainer::SourceType::Properties &&
+            sourceType != gd::VariablesContainer::SourceType::Parameters) {
+            getterCode += ".getAsBoolean()";
+        }
 
         gd::String resultingBoolean =
             codeGenerator.GenerateUpperScopeBooleanFullName("isConditionTrue",

@@ -16,8 +16,6 @@ import {
 import { enumerateVariablesOrPropertiesOrParametersOfContainersList } from './EnumerateVariables';
 import { mapFor } from '../../Utils/MapFor';
 
-const gd: libGDevelop = global.gd;
-
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function AnyVariableField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?VariableFieldInterface>(null);

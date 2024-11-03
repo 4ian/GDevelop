@@ -129,9 +129,17 @@ class ProjectScopedContainers {
       std::function<ReturnType()> notFoundCallback) const {
     if (objectsContainersList.HasObjectOrGroupNamed(name))
       return objectCallback();
-    else if (variablesContainersList.Has(name))
+    else if (variablesContainersList.Has(name)) {
+      const auto &variablesContainer =
+          variablesContainersList.GetVariablesContainerFromVariableName(name);
+      const auto sourceType = variablesContainer.GetSourceType();
+      if (sourceType == gd::VariablesContainer::SourceType::Properties) {
+        return propertyCallback();
+      } else if (sourceType == gd::VariablesContainer::SourceType::Parameters) {
+        return parameterCallback();
+      }
       return variableCallback();
-    else if (ParameterMetadataTools::Has(parametersVectorsList, name))
+    } else if (ParameterMetadataTools::Has(parametersVectorsList, name))
       return parameterCallback();
     else if (propertiesContainersList.Has(name))
       return propertyCallback();

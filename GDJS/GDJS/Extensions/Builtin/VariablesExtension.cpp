@@ -23,12 +23,71 @@ namespace gdjs {
 VariablesExtension::VariablesExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsVariablesExtension(*this);
 
-  GetAllConditions()["NumberVariable"].SetFunctionName(
-      "gdjs.evtTools.variable.getVariableNumber");
-  GetAllConditions()["StringVariable"].SetFunctionName(
-      "gdjs.evtTools.variable.getVariableString");
-  GetAllConditions()["BooleanVariable"].SetFunctionName(
-      "gdjs.evtTools.variable.getVariableBoolean");
+  GetAllConditions()["NumberVariable"].SetCustomCodeGenerator(
+      [](gd::Instruction &instruction, gd::EventsCodeGenerator &codeGenerator,
+         gd::EventsCodeGenerationContext &context) {
+        gd::String getterCode =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator, context, "variable",
+                instruction.GetParameters()[0].GetPlainString());
+        gd::String op = instruction.GetParameters()[1].GetPlainString();
+        gd::String expressionCode =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator, context, "number",
+                instruction.GetParameters()[2].GetPlainString());
+
+        gd::String resultingBoolean =
+            codeGenerator.GenerateUpperScopeBooleanFullName("isConditionTrue",
+                                                            context);
+
+        return resultingBoolean + " = " +
+               gd::String(instruction.IsInverted() ? "!" : "") + "(" +
+               codeGenerator.GenerateRelationalOperation(op, getterCode,
+                                                         expressionCode) +
+               ");\n";
+      });
+  GetAllConditions()["StringVariable"].SetCustomCodeGenerator(
+      [](gd::Instruction &instruction, gd::EventsCodeGenerator &codeGenerator,
+         gd::EventsCodeGenerationContext &context) {
+        gd::String getterCode =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator, context, "variable",
+                instruction.GetParameters()[0].GetPlainString());
+        gd::String op = instruction.GetParameters()[1].GetPlainString();
+        gd::String expressionCode =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator, context, "string",
+                instruction.GetParameters()[2].GetPlainString());
+
+        gd::String resultingBoolean =
+            codeGenerator.GenerateUpperScopeBooleanFullName("isConditionTrue",
+                                                            context);
+
+        return resultingBoolean + " = " +
+               gd::String(instruction.IsInverted() ? "!" : "") + "(" +
+               codeGenerator.GenerateRelationalOperation(op, getterCode,
+                                                         expressionCode) +
+               ");\n";
+      });
+  GetAllConditions()["BooleanVariable"].SetCustomCodeGenerator(
+      [](gd::Instruction &instruction, gd::EventsCodeGenerator &codeGenerator,
+         gd::EventsCodeGenerationContext &context) {
+        gd::String getterCode =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator, context, "variable",
+                instruction.GetParameters()[0].GetPlainString());
+        bool isOperandTrue =
+            instruction.GetParameters()[1].GetPlainString() == "True";
+
+        gd::String resultingBoolean =
+            codeGenerator.GenerateUpperScopeBooleanFullName("isConditionTrue",
+                                                            context);
+
+        return resultingBoolean + " = " +
+               gd::String(instruction.IsInverted() == isOperandTrue ? "!"
+                                                                    : "") +
+               getterCode + ";\n";
+      });
 
   GetAllStrExpressions()["VariableFirstString"].SetFunctionName(
       "gdjs.evtTools.variable.getFirstVariableString");
@@ -73,20 +132,55 @@ VariablesExtension::VariablesExtension() {
       [](gd::Instruction& instruction,
          gd::EventsCodeGenerator& codeGenerator,
          gd::EventsCodeGenerationContext& context) {
-        gd::String varGetter =
+
+        const auto &variableName = instruction.GetParameters()[0].GetPlainString();
+        gd::String getterCode =
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
                 codeGenerator,
                 context,
                 "variable",
-                instruction.GetParameters()[0].GetPlainString());
-
+                variableName);
         gd::String op = instruction.GetParameters()[1].GetPlainString();
+
+        const auto variablesContainersList =
+            codeGenerator.GetProjectScopedContainers().GetVariablesContainersList();
+        const auto& variablesContainer =
+            variablesContainersList.GetVariablesContainerFromVariableName(
+                variableName);
+        const auto sourceType = variablesContainer.GetSourceType();
+        if (sourceType == gd::VariablesContainer::SourceType::Properties) {
+            const auto &propertiesContainersList =
+                codeGenerator.GetProjectScopedContainers().GetPropertiesContainersList();
+            const auto &propertiesContainerAndProperty =
+                propertiesContainersList.Get(variableName);
+
+          if (op == "True") {
+            return codeGenerator.GeneratePropertySetterWithoutCasting(
+                propertiesContainerAndProperty.first,
+                propertiesContainerAndProperty.second,
+                "true");
+          }
+          else if (op == "False") {
+            return codeGenerator.GeneratePropertySetterWithoutCasting(
+                propertiesContainerAndProperty.first,
+                propertiesContainerAndProperty.second,
+                "false");
+          }
+          else if (op == "Toggle") {
+            return codeGenerator.GeneratePropertySetterWithoutCasting(
+                propertiesContainerAndProperty.first,
+                propertiesContainerAndProperty.second,
+                "!" + getterCode);
+          }
+          return gd::String("");
+        }
+
         if (op == "True")
-          return varGetter + ".setBoolean(true);\n";
+          return getterCode + ".setBoolean(true);\n";
         else if (op == "False")
-          return varGetter + ".setBoolean(false);\n";
+          return getterCode + ".setBoolean(false);\n";
         else if (op == "Toggle")
-          return "gdjs.evtTools.variable.toggleVariableBoolean(" + varGetter + ");\n";
+          return "gdjs.evtTools.variable.toggleVariableBoolean(" + getterCode + ");\n";
 
         return gd::String("");
       });
@@ -95,30 +189,58 @@ VariablesExtension::VariablesExtension() {
       [](gd::Instruction& instruction,
          gd::EventsCodeGenerator& codeGenerator,
          gd::EventsCodeGenerationContext& context) {
+
+        const auto &variableName = instruction.GetParameters()[0].GetPlainString();
+        gd::String getterCode =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator,
+                context,
+                "variable",
+                variableName);
+        gd::String op = instruction.GetParameters()[1].GetPlainString();
         gd::String expressionCode =
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
                 codeGenerator,
                 context,
                 "number",
                 instruction.GetParameters()[2].GetPlainString());
-        gd::String varGetter =
-            gd::ExpressionCodeGenerator::GenerateExpressionCode(
-                codeGenerator,
-                context,
-                "variable",
-                instruction.GetParameters()[0].GetPlainString());
 
-        gd::String op = instruction.GetParameters()[1].GetPlainString();
+        const auto variablesContainersList =
+            codeGenerator.GetProjectScopedContainers().GetVariablesContainersList();
+        const auto& variablesContainer =
+            variablesContainersList.GetVariablesContainerFromVariableName(
+                variableName);
+        const auto sourceType = variablesContainer.GetSourceType();
+        if (sourceType == gd::VariablesContainer::SourceType::Properties) {
+            const auto &propertiesContainersList =
+                codeGenerator.GetProjectScopedContainers().GetPropertiesContainersList();
+            const auto &propertiesContainerAndProperty =
+                propertiesContainersList.Get(variableName);
+
+          if (op == "=") {
+            return codeGenerator.GeneratePropertySetterWithoutCasting(
+                propertiesContainerAndProperty.first,
+                propertiesContainerAndProperty.second,
+                expressionCode);
+          }
+          else {
+            return codeGenerator.GeneratePropertySetterWithoutCasting(
+                propertiesContainerAndProperty.first,
+                propertiesContainerAndProperty.second,
+                getterCode + op + expressionCode);
+          }
+        }
+
         if (op == "=")
-          return varGetter + ".setNumber(" + expressionCode + ");\n";
+          return getterCode + ".setNumber(" + expressionCode + ");\n";
         else if (op == "+")
-          return varGetter + ".add(" + expressionCode + ");\n";
+          return getterCode + ".add(" + expressionCode + ");\n";
         else if (op == "-")
-          return varGetter + ".sub(" + expressionCode + ");\n";
+          return getterCode + ".sub(" + expressionCode + ");\n";
         else if (op == "*")
-          return varGetter + ".mul(" + expressionCode + ");\n";
+          return getterCode + ".mul(" + expressionCode + ");\n";
         else if (op == "/")
-          return varGetter + ".div(" + expressionCode + ");\n";
+          return getterCode + ".div(" + expressionCode + ");\n";
 
         return gd::String("");
       });
@@ -127,24 +249,52 @@ VariablesExtension::VariablesExtension() {
       [](gd::Instruction& instruction,
          gd::EventsCodeGenerator& codeGenerator,
          gd::EventsCodeGenerationContext& context) {
+  
+        const auto &variableName = instruction.GetParameters()[0].GetPlainString();
+        gd::String getterCode =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator,
+                context,
+                "variable",
+                variableName);
+        gd::String op = instruction.GetParameters()[1].GetPlainString();
         gd::String expressionCode =
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
                 codeGenerator,
                 context,
                 "string",
                 instruction.GetParameters()[2].GetPlainString());
-        gd::String varGetter =
-            gd::ExpressionCodeGenerator::GenerateExpressionCode(
-                codeGenerator,
-                context,
-                "variable",
-                instruction.GetParameters()[0].GetPlainString());
 
-        gd::String op = instruction.GetParameters()[1].GetPlainString();
+        const auto variablesContainersList =
+            codeGenerator.GetProjectScopedContainers().GetVariablesContainersList();
+        const auto& variablesContainer =
+            variablesContainersList.GetVariablesContainerFromVariableName(
+                variableName);
+        const auto sourceType = variablesContainer.GetSourceType();
+        if (sourceType == gd::VariablesContainer::SourceType::Properties) {
+            const auto &propertiesContainersList =
+                codeGenerator.GetProjectScopedContainers().GetPropertiesContainersList();
+            const auto &propertiesContainerAndProperty =
+                propertiesContainersList.Get(variableName);
+
+          if (op == "=") {
+            return codeGenerator.GeneratePropertySetterWithoutCasting(
+                propertiesContainerAndProperty.first,
+                propertiesContainerAndProperty.second,
+                expressionCode);
+          }
+          else {
+            return codeGenerator.GeneratePropertySetterWithoutCasting(
+                propertiesContainerAndProperty.first,
+                propertiesContainerAndProperty.second,
+                getterCode + op + expressionCode);
+          }
+        }
+
         if (op == "=")
-          return varGetter + ".setString(" + expressionCode + ");\n";
+          return getterCode + ".setString(" + expressionCode + ");\n";
         else if (op == "+")
-          return varGetter + ".concatenateString(" + expressionCode + ");\n";
+          return getterCode + ".concatenateString(" + expressionCode + ");\n";
 
         return gd::String("");
       });

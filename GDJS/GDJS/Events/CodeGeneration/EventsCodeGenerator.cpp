@@ -1393,6 +1393,22 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
                gd::VariablesContainer::SourceType::ExtensionScene) {
       variables = &variablesContainer;
       output = "eventsFunctionContext.sceneVariablesForExtension";
+    } else if (sourceType ==
+               gd::VariablesContainer::SourceType::Properties) {
+      const auto &propertiesContainersList =
+          GetProjectScopedContainers().GetPropertiesContainersList();
+      const auto &propertiesContainerAndProperty =
+          propertiesContainersList.Get(variableName);
+      return GeneratePropertyGetterWithoutCasting(
+          propertiesContainerAndProperty.first,
+          propertiesContainerAndProperty.second);
+    } else if (sourceType ==
+               gd::VariablesContainer::SourceType::Parameters) {
+      const auto &parametersVectorsList =
+          GetProjectScopedContainers().GetParametersVectorsList();
+      const auto &parameter =
+          gd::ParameterMetadataTools::Get(parametersVectorsList, variableName);
+      return GenerateParameterGetterWithoutCasting(parameter);
     }
   } else if (scope == LAYOUT_VARIABLE) {
     output = "runtimeScene.getScene().getVariables()";
@@ -1501,11 +1517,10 @@ gd::String EventsCodeGenerator::GenerateProfilerSectionEnd(
          ConvertToStringExplicit(section) + "); }";
 }
 
-gd::String EventsCodeGenerator::GeneratePropertyGetter(
-    const gd::PropertiesContainer& propertiesContainer,
-    const gd::NamedPropertyDescriptor& property,
-    const gd::String& type,
-    gd::EventsCodeGenerationContext& context) {
+gd::String EventsCodeGenerator::GeneratePropertySetterWithoutCasting(
+    const gd::PropertiesContainer &propertiesContainer,
+    const gd::NamedPropertyDescriptor &property,
+    const gd::String &operandCode) {
   bool isLocalProperty =
       projectScopedContainers.GetPropertiesContainersList()
           .GetBottomMostPropertiesContainer() == &propertiesContainer;
@@ -1518,6 +1533,34 @@ gd::String EventsCodeGenerator::GeneratePropertyGetter(
                      gd::EventsFunctionsContainer::Object
                  ? "eventsFunctionContext.getObjects(\"Object\")[0]"
                  : "eventsFunctionContext.getProperties()");
+
+  gd::String propertySetterCode =
+      propertyHolderCode + "." +
+      (isLocalProperty
+           ? BehaviorCodeGenerator::GetBehaviorPropertySetterName(
+                 property.GetName())
+           : BehaviorCodeGenerator::GetBehaviorSharedPropertySetterName(
+                 property.GetName())) +
+      "(" + operandCode + ")";
+  return propertySetterCode;
+}
+
+gd::String EventsCodeGenerator::GeneratePropertyGetterWithoutCasting(
+    const gd::PropertiesContainer &propertiesContainer,
+    const gd::NamedPropertyDescriptor &property) {
+  bool isLocalProperty =
+      projectScopedContainers.GetPropertiesContainersList()
+          .GetBottomMostPropertiesContainer() == &propertiesContainer;
+
+  gd::String propertyHolderCode =
+      propertiesContainer.GetOwner() == gd::EventsFunctionsContainer::Behavior
+          ? "eventsFunctionContext.getObjects(\"Object\")[0].getBehavior(" +
+                GenerateGetBehaviorNameCode("Behavior") + ")"
+          : (propertiesContainer.GetOwner() ==
+                     gd::EventsFunctionsContainer::Object
+                 ? "eventsFunctionContext.getObjects(\"Object\")[0]"
+                 : "eventsFunctionContext.getProperties()");
+
   gd::String propertyGetterCode =
       propertyHolderCode + "." +
       (isLocalProperty
@@ -1526,6 +1569,16 @@ gd::String EventsCodeGenerator::GeneratePropertyGetter(
            : BehaviorCodeGenerator::GetBehaviorSharedPropertyGetterName(
                  property.GetName())) +
       "()";
+  return propertyGetterCode;
+}
+
+gd::String EventsCodeGenerator::GeneratePropertyGetter(
+    const gd::PropertiesContainer& propertiesContainer,
+    const gd::NamedPropertyDescriptor& property,
+    const gd::String& type,
+    gd::EventsCodeGenerationContext& context) {
+  gd::String propertyGetterCode =
+      GeneratePropertyGetterWithoutCasting(propertiesContainer, property);
 
   if (type == "number|string") {
     if (property.GetType() == "Number") {
@@ -1560,13 +1613,18 @@ gd::String EventsCodeGenerator::GeneratePropertyGetter(
   }
 }
 
+gd::String EventsCodeGenerator::GenerateParameterGetterWithoutCasting(
+    const gd::ParameterMetadata &parameter) {
+  return "eventsFunctionContext.getArgument(" +
+         ConvertToStringExplicit(parameter.GetName()) + ")";
+}
+
 gd::String EventsCodeGenerator::GenerateParameterGetter(
     const gd::ParameterMetadata& parameter,
     const gd::String& type,
     gd::EventsCodeGenerationContext& context) {
   gd::String parameterGetterCode =
-      "eventsFunctionContext.getArgument(" +
-      ConvertToStringExplicit(parameter.GetName()) + ")";
+      GenerateParameterGetterWithoutCasting(parameter);
 
   if (type == "number|string") {
     if (parameter.GetValueTypeMetadata().IsNumber()) {

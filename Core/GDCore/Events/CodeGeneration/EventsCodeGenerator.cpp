@@ -1358,11 +1358,29 @@ gd::String EventsCodeGenerator::GeneratePropertyGetter(const gd::PropertiesConta
   return "getProperty" + property.GetName() + "As" + type + "()";
 }
 
+gd::String EventsCodeGenerator::GeneratePropertyGetterWithoutCasting(
+    const gd::PropertiesContainer &propertiesContainer,
+    const gd::NamedPropertyDescriptor &property) {
+  return "getProperty" + property.GetName() + "()";
+}
+
+gd::String EventsCodeGenerator::GeneratePropertySetterWithoutCasting(
+    const gd::PropertiesContainer &propertiesContainer,
+    const gd::NamedPropertyDescriptor &property,
+    const gd::String &operandCode) {
+  return "setProperty" + property.GetName() + "(" + operandCode + ")";
+    }
+
 gd::String EventsCodeGenerator::GenerateParameterGetter(const gd::ParameterMetadata& parameter,
                                                         const gd::String& type,
                                                         gd::EventsCodeGenerationContext& context) {
   return "getParameter" + parameter.GetName() + "As" + type + "()";
 }
+
+gd::String EventsCodeGenerator::GenerateParameterGetterWithoutCasting(
+    const gd::ParameterMetadata &parameter) {
+      return "getParameter" + parameter.GetName() + "()";
+    }
 
 EventsCodeGenerator::EventsCodeGenerator(const gd::Project& project_,
                                          const gd::Layout& layout,

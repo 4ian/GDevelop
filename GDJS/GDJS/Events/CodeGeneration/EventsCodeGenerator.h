@@ -225,6 +225,11 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
     codeNamespace = codeNamespace_;
   };
 
+  virtual gd::String GeneratePropertySetterWithoutCasting(
+      const gd::PropertiesContainer &propertiesContainer,
+      const gd::NamedPropertyDescriptor &property,
+      const gd::String &operandCode) override;
+
  protected:
   virtual gd::String GenerateParameterCodes(
       const gd::Expression& parameter,
@@ -329,9 +334,16 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
                                             const gd::String& type,
                                             gd::EventsCodeGenerationContext& context) override;
 
+  virtual gd::String GeneratePropertyGetterWithoutCasting(
+      const gd::PropertiesContainer &propertiesContainer,
+      const gd::NamedPropertyDescriptor &property) override;
+
   virtual gd::String GenerateParameterGetter(const gd::ParameterMetadata& parameter,
                                              const gd::String& type,
                                              gd::EventsCodeGenerationContext& context) override;
+
+  virtual gd::String GenerateParameterGetterWithoutCasting(
+      const gd::ParameterMetadata &parameter) override;
 
   virtual gd::String GenerateBadObject() override { return "null"; }
 

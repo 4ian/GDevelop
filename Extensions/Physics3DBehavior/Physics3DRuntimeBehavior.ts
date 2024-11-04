@@ -198,6 +198,12 @@ namespace gdjs {
 
   export class Physics3DRuntimeBehavior extends gdjs.RuntimeBehavior {
     owner3D: gdjs.RuntimeObject3D;
+    friction: float;
+    restitution: float;
+    linearDamping: float;
+    angularDamping: float;
+    gravityScale: float;
+
     destroyedDuringFrameLogic: boolean;
     _body: Jolt.Body | null = null;
 
@@ -221,7 +227,7 @@ namespace gdjs {
     _objectOldWidth: float = 0;
     _objectOldHeight: float = 0;
     _objectOldDepth: float = 0;
-  
+
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
       behaviorData,
@@ -229,6 +235,11 @@ namespace gdjs {
     ) {
       super(instanceContainer, behaviorData, owner);
       this.owner3D = owner;
+      this.friction = behaviorData.friction;
+      this.restitution = behaviorData.restitution;
+      this.linearDamping = Math.max(0, behaviorData.linearDamping);
+      this.angularDamping = Math.max(0, behaviorData.angularDamping);
+      this.gravityScale = behaviorData.gravityScale;
       this.destroyedDuringFrameLogic = false;
       this._sharedData = Physics3DSharedData.getSharedData(
         instanceContainer.getScene(),
@@ -292,11 +303,7 @@ namespace gdjs {
         this._sharedData.worldInvScale;
 
       // TODO
-      const shape = new Jolt.BoxShape(
-        this.getVec3(32, 32, 32),
-        0.5,
-        undefined
-      );
+      const shape = new Jolt.BoxShape(this.getVec3(32, 32, 32), 0.5, undefined);
       const threeObject = this.owner3D.get3DRendererObject();
       const bodyCreationSettings = new Jolt.BodyCreationSettings(
         shape,
@@ -310,7 +317,11 @@ namespace gdjs {
         Jolt.EMotionType_Dynamic,
         LAYER_MOVING
       );
-      bodyCreationSettings.mFriction = 0.001;
+      bodyCreationSettings.mFriction = this.friction;
+      bodyCreationSettings.mRestitution = this.restitution;
+      bodyCreationSettings.mLinearDamping = this.linearDamping;
+      bodyCreationSettings.mAngularDamping = this.angularDamping;
+      bodyCreationSettings.mGravityFactor = this.gravityScale;
 
       const bodyInterface = this._sharedData.bodyInterface;
       this._body = bodyInterface.CreateBody(bodyCreationSettings);

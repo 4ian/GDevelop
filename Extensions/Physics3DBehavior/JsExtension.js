@@ -38,15 +38,124 @@ module.exports = {
       propertyName,
       newValue
     ) {
+
+      if (propertyName === 'friction') {
+        const newValueAsNumber = parseFloat(newValue);
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        behaviorContent.getChild('friction').setDoubleValue(newValueAsNumber);
+        return true;
+      }
+
+      if (propertyName === 'restitution') {
+        const newValueAsNumber = parseFloat(newValue);
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        behaviorContent
+          .getChild('restitution')
+          .setDoubleValue(newValueAsNumber);
+        return true;
+      }
+
+      if (propertyName === 'linearDamping') {
+        const newValueAsNumber = Math.max(0, parseFloat(newValue));
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        behaviorContent
+          .getChild('linearDamping')
+          .setDoubleValue(newValueAsNumber);
+        return true;
+      }
+
+      if (propertyName === 'angularDamping') {
+        const newValueAsNumber = Math.max(0, parseFloat(newValue));
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        behaviorContent
+          .getChild('angularDamping')
+          .setDoubleValue(newValueAsNumber);
+        return true;
+      }
+
+      if (propertyName === 'gravityScale') {
+        const newValueAsNumber = parseFloat(newValue);
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        behaviorContent
+          .getChild('gravityScale')
+          .setDoubleValue(newValueAsNumber);
+        return true;
+      }
+
       return false;
     };
     behavior.getProperties = function (behaviorContent) {
       const behaviorProperties = new gd.MapStringPropertyDescriptor();
 
+      behaviorProperties
+        .getOrCreate('friction')
+        .setValue(
+          behaviorContent.getChild('friction').getDoubleValue().toString(10)
+        )
+        .setType('Number')
+        .setLabel(_('Friction'))
+        .setDescription(
+          _(
+            'The friction applied when touching other objects. The higher the value, the more friction.'
+          )
+        );
+      behaviorProperties
+        .getOrCreate('restitution')
+        .setValue(
+          behaviorContent.getChild('restitution').getDoubleValue().toString(10)
+        )
+        .setType('Number')
+        .setLabel(_('Restitution'))
+        .setDescription(
+          _(
+            'The "bounciness" of the object. The higher the value, the more other objects will bounce against it.'
+          )
+        );
+      behaviorProperties
+        .getOrCreate('linearDamping')
+        .setValue(
+          behaviorContent
+            .getChild('linearDamping')
+            .getDoubleValue()
+            .toString(10)
+        )
+        .setType('Number')
+        .setLabel(_('Linear Damping'))
+        .setGroup(_('Movement'));
+
+      behaviorProperties
+        .getOrCreate('angularDamping')
+        .setValue(
+          behaviorContent
+            .getChild('angularDamping')
+            .getDoubleValue()
+            .toString(10)
+        )
+        .setType('Number')
+        .setLabel(_('Angular Damping'))
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+        .setGroup(_('Movement'));
+      behaviorProperties
+        .getOrCreate('gravityScale')
+        .setValue(
+          behaviorContent.getChild('gravityScale').getDoubleValue().toString(10)
+        )
+        .setType('Number')
+        .setLabel('Gravity Scale')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+        .setGroup(_('Gravity'))
+        .setAdvanced(true);
+
       return behaviorProperties;
     };
 
-    behavior.initializeContent = function (behaviorContent) {};
+    behavior.initializeContent = function (behaviorContent) {
+      behaviorContent.addChild('friction').setDoubleValue(0.3);
+      behaviorContent.addChild('restitution').setDoubleValue(0.1);
+      behaviorContent.addChild('linearDamping').setDoubleValue(0.1);
+      behaviorContent.addChild('angularDamping').setDoubleValue(0.1);
+      behaviorContent.addChild('gravityScale').setDoubleValue(1);
+    };
 
     const sharedData = new gd.BehaviorSharedDataJsImplementation();
     sharedData.updateProperty = function (
@@ -54,7 +163,6 @@ module.exports = {
       propertyName,
       newValue
     ) {
-      console.log("updateProperty: " + propertyName);
       if (propertyName === 'gravityX') {
         const newValueAsNumber = parseFloat(newValue);
         if (newValueAsNumber !== newValueAsNumber) return false;

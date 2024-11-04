@@ -54,7 +54,7 @@ export const cleanUpGameSlug = (gameSlug: string) => {
 };
 
 type Props = {|
-  project: gdProject,
+  gameId: string,
   disabled?: boolean,
   onGameUpdated?: (game: Game) => void,
   onUpdatingGame?: (isUpdatingGame: boolean) => void,
@@ -90,7 +90,7 @@ type Props = {|
 |};
 
 export function PublicGameProperties({
-  project,
+  gameId,
   disabled,
   setName,
   name,
@@ -160,9 +160,9 @@ export function PublicGameProperties({
               <>
                 <Column noMargin alignItems="center">
                   <GameThumbnail
-                    gameName={project.getName()}
+                    gameName={name}
                     thumbnailUrl={thumbnailUrl}
-                    gameId={project.getProjectUuid()}
+                    gameId={gameId}
                     canUpdateThumbnail
                     disabled={disabled}
                     onGameUpdated={onGameUpdated}

@@ -30,7 +30,7 @@ import { type PublicGame } from '../Utils/GDevelopServices/Game';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import {
   PublicGamePropertiesDialog,
-  type PartialGameChange,
+  type PublicGameAndProjectEditableProperties,
 } from './PublicGamePropertiesDialog';
 import TextField from '../UI/TextField';
 import KeyboardIcon from '@material-ui/icons/Keyboard';
@@ -190,14 +190,13 @@ const GameDetails = ({
     [analyticsSource]
   );
 
-  const updateGameFromProject = async (
-    partialGameChange: PartialGameChange,
-    i18n: I18nType
-  ): Promise<boolean> => {
-    if (!project || !profile) return false;
-    const { id } = profile;
+  const onUpdateGame = async (
+    i18n: I18nType,
+    properties: PublicGameAndProjectEditableProperties
+  ) => {
+    if (!profile || !publicGame) return false;
+    const { ownerIds, userSlug, gameSlug, authorIds } = properties;
 
-    const ownerIds = partialGameChange.ownerIds;
     if (!ownerIds || !ownerIds.length) {
       await showAlert({
         title: t`Select an owner`,
@@ -206,32 +205,47 @@ const GameDetails = ({
       return false;
     }
 
+    if (!authorIds || !authorIds.length) {
+      await showAlert({
+        title: t`Select an author`,
+        message: t`You must select at least one user to be the author of the game.`,
+      });
+      return false;
+    }
+
     try {
       setIsGameUpdating(true);
-      const gameId = project.getProjectUuid();
-      const updatedGame = await updateGame(getAuthorizationHeader, id, gameId, {
-        authorName: project.getAuthor() || 'Unspecified publisher',
-        gameName: project.getName() || 'Untitled game',
-        categories: project.getCategories().toJSArray() || [],
-        description: project.getDescription() || '',
-        playWithKeyboard: project.isPlayableWithKeyboard(),
-        playWithGamepad: project.isPlayableWithGamepad(),
-        playWithMobile: project.isPlayableWithMobile(),
-        orientation: project.getOrientation(),
-        discoverable: partialGameChange.discoverable,
-      });
-      if (
-        partialGameChange.userSlug &&
-        partialGameChange.gameSlug &&
-        partialGameChange.userSlug === profile.username
-      ) {
+      const updatedGame = await updateGame(
+        getAuthorizationHeader,
+        profile.id,
+        publicGame.id,
+        {
+          gameName: properties.gameName || 'Untitled game',
+          authorName: properties.authorName || 'Unspecified publisher',
+          categories: properties.categories,
+          publicWebBuildId: properties.publicWebBuildId,
+          description: properties.description,
+          playWithKeyboard: properties.playWithKeyboard,
+          playWithGamepad: properties.playWithGamepad,
+          playWithMobile: properties.playWithMobile,
+          orientation: properties.orientation,
+          thumbnailUrl: properties.thumbnailUrl,
+          screenshotUrls: properties.screenshotUrls,
+          discoverable: properties.discoverable,
+          acceptsBuildComments: properties.acceptsBuildComments,
+          acceptsGameComments: properties.acceptsGameComments,
+          displayAdsOnGamePage: properties.displayAdsOnGamePage,
+        }
+      );
+
+      if (userSlug && gameSlug && userSlug === profile.username) {
         try {
           await setGameSlug(
             getAuthorizationHeader,
-            id,
-            gameId,
-            partialGameChange.userSlug,
-            partialGameChange.gameSlug
+            profile.id,
+            publicGame.id,
+            userSlug,
+            gameSlug
           );
         } catch (error) {
           console.error(
@@ -248,19 +262,21 @@ const GameDetails = ({
             rawError: error,
             errorId: 'game-slug-update-error',
           });
-          setIsGameUpdating(false);
           return false;
         }
       }
       try {
-        const authorAcls = getAclsFromUserIds(
-          project.getAuthorIds().toJSArray()
-        );
+        const authorAcls = getAclsFromUserIds(authorIds);
         const ownerAcls = getAclsFromUserIds(ownerIds);
-        await setGameUserAcls(getAuthorizationHeader, id, gameId, {
-          ownership: ownerAcls,
-          author: authorAcls,
-        });
+        await setGameUserAcls(
+          getAuthorizationHeader,
+          profile.id,
+          publicGame.id,
+          {
+            ownership: ownerAcls,
+            author: authorAcls,
+          }
+        );
       } catch (error) {
         console.error(
           'Unable to update the game owners or authors:',
@@ -276,7 +292,6 @@ const GameDetails = ({
           rawError: error,
           errorId: 'game-acls-update-error',
         });
-        setIsGameUpdating(false);
         return false;
       }
       onGameUpdated(updatedGame);
@@ -293,12 +308,48 @@ const GameDetails = ({
         rawError: error,
         errorId: 'game-details-update-error',
       });
-      setIsGameUpdating(false);
       return false;
+    } finally {
+      setIsGameUpdating(false);
     }
 
-    setIsGameUpdating(false);
     return true;
+  };
+
+  const updateProjectFromGameIfMatching = (
+    properties: PublicGameAndProjectEditableProperties
+  ) => {
+    if (project && project.getProjectUuid() === game.id) {
+      // Get this information from the game object that should have just been updated
+      // (maybe with fallback values).
+      const { gameName, categories, description } = game;
+      // Get those properties from the object as they are not stored on the Game.
+      const { authorIds, authorUsernames } = properties;
+
+      project.setName(gameName);
+      project.setDescription(description || '');
+      project.setPlayableWithKeyboard(game.playWithKeyboard);
+      project.setPlayableWithGamepad(game.playWithGamepad);
+      project.setPlayableWithMobile(game.playWithMobile);
+      project.setOrientation(game.orientation || 'default');
+      if (categories) {
+        const projectCategories = project.getCategories();
+        projectCategories.clear();
+        categories.forEach(category => projectCategories.push_back(category));
+      }
+      if (authorIds) {
+        const projectAuthorIds = project.getAuthorIds();
+        projectAuthorIds.clear();
+        authorIds.forEach(authorId => projectAuthorIds.push_back(authorId));
+      }
+      if (authorUsernames) {
+        const projectAuthorUsernames = project.getAuthorUsernames();
+        projectAuthorUsernames.clear();
+        authorUsernames.forEach(authorUsername =>
+          projectAuthorUsernames.push_back(authorUsername)
+        );
+      }
+    }
   };
 
   const unregisterGame = React.useCallback(
@@ -631,15 +682,11 @@ const GameDetails = ({
           </Line>
           {publicGame && project && isPublicGamePropertiesDialogOpen && (
             <PublicGamePropertiesDialog
-              project={project}
               publicGame={publicGame}
-              onApply={async partialGameChange => {
-                const isGameUpdated = await updateGameFromProject(
-                  partialGameChange,
-                  i18n
-                );
+              onApply={async properties => {
+                const isGameUpdated = await onUpdateGame(i18n, properties);
                 if (isGameUpdated) {
-                  setIsPublicGamePropertiesDialogOpen(false);
+                  updateProjectFromGameIfMatching(properties);
                 }
               }}
               onClose={() => setIsPublicGamePropertiesDialogOpen(false)}

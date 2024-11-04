@@ -427,6 +427,7 @@ const ProjectPropertiesDialog = (props: Props) => {
                   <Trans>Game Info</Trans>
                 </Text>
                 <PublicGameProperties
+                  gameId={project.getProjectUuid()}
                   name={name}
                   setName={newName => {
                     if (newName.trim() === name) {
@@ -443,7 +444,6 @@ const ProjectPropertiesDialog = (props: Props) => {
                     setDescription(newDescription.trim());
                     notifyOfChange();
                   }}
-                  project={project}
                   authorIds={authorIds}
                   setAuthorIds={newAuthorIds => {
                     setAuthorIds(newAuthorIds);

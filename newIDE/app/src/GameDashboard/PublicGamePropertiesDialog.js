@@ -13,6 +13,7 @@ import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import {
   type PublicGame,
   type Game,
+  type GameUpdatePayload,
   getGameMainImageUrl,
 } from '../Utils/GDevelopServices/Game';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
@@ -40,6 +41,13 @@ type PublicProjectProperties = {|
   playWithGamepad: boolean,
   playWithMobile: boolean,
   orientation: string,
+|};
+
+export type PublicGameAndProjectEditableProperties = {|
+  ...GameUpdatePayload,
+  ...PartialGameChange,
+  authorUsernames: string[],
+  authorIds?: Array<string>,
 |};
 
 export const applyPublicPropertiesToProject = (
@@ -79,10 +87,9 @@ export const applyPublicPropertiesToProject = (
 };
 
 type Props = {|
-  project: gdProject,
   publicGame: PublicGame,
   onClose: () => void,
-  onApply: (partialGameChange: PartialGameChange) => Promise<void>,
+  onApply: PublicGameAndProjectEditableProperties => Promise<void>,
   isLoading: boolean,
   i18n: I18nType,
   onUpdatingGame?: (isGameUpdating: boolean) => void,
@@ -90,7 +97,6 @@ type Props = {|
 |};
 
 export const PublicGamePropertiesDialog = ({
-  project,
   publicGame,
   onClose,
   onApply,
@@ -137,21 +143,21 @@ export const PublicGamePropertiesDialog = ({
   );
 
   const onSave = async () => {
-    if (
-      applyPublicPropertiesToProject(project, i18n, {
-        name,
-        categories: categories || [],
-        description: description || '',
-        authorIds,
-        authorUsernames,
-        playWithKeyboard: !!playWithKeyboard,
-        playWithGamepad: !!playWithGamepad,
-        playWithMobile: !!playWithMobile,
-        orientation: orientation || 'default',
-      })
-    ) {
-      await onApply({ ownerIds, userSlug, gameSlug, discoverable });
-    }
+    await onApply({
+      ownerIds,
+      userSlug,
+      gameSlug,
+      discoverable,
+      authorUsernames,
+      authorIds,
+      gameName: name,
+      categories,
+      description,
+      playWithKeyboard,
+      playWithGamepad,
+      playWithMobile,
+      orientation,
+    });
   };
 
   const publicGameThumbnailUrl = React.useMemo(
@@ -186,13 +192,13 @@ export const PublicGamePropertiesDialog = ({
       open
     >
       <PublicGameProperties
+        gameId={publicGame.id}
         name={name}
         setName={setName}
         categories={categories}
         setCategories={setCategories}
         description={description}
         setDescription={setDescription}
-        project={project}
         authorIds={authorIds}
         setAuthorIds={setAuthorIds}
         setAuthorUsernames={setAuthorUsernames}

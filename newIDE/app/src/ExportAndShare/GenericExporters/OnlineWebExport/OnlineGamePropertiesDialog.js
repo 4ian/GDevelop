@@ -150,13 +150,13 @@ export const OnlineGamePropertiesDialog = ({
       open
     >
       <PublicGameProperties
+        gameId={project.getProjectUuid()}
         name={name}
         setName={setName}
         categories={categories}
         setCategories={setCategories}
         description={description}
         setDescription={setDescription}
-        project={project}
         authorIds={authorIds}
         setAuthorIds={setAuthorIds}
         setAuthorUsernames={setAuthorUsernames}

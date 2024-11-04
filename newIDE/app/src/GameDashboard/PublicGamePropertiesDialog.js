@@ -167,7 +167,7 @@ export const PublicGamePropertiesDialog = ({
 
   const actions = [
     <FlatButton
-      label={<Trans>Back</Trans>}
+      label={<Trans>Close</Trans>}
       key="back"
       primary={false}
       onClick={onClose}

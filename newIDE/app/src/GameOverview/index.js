@@ -1,9 +1,10 @@
 // @flow
 
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import Grid from '@material-ui/core/Grid';
 import { I18n } from '@lingui/react';
+import { I18n as I18nType } from '@lingui/core';
 import {
   getRecommendedMarketingPlan,
   listGameFeaturings,
@@ -15,6 +16,9 @@ import {
   updateGame,
   getGameUrl,
   getPublicGame,
+  setGameSlug,
+  getAclsFromUserIds,
+  setGameUserAcls,
 } from '../Utils/GDevelopServices/Game';
 import { ColumnStackLayout } from '../UI/Layout';
 import GameHeader from './GameHeader';
@@ -45,8 +49,14 @@ import { GameAnalyticsPanel } from '../GameDashboard/GameAnalyticsPanel';
 import LeaderboardAdmin from '../GameDashboard/LeaderboardAdmin';
 import MultiplayerAdmin from '../GameDashboard/MultiplayerAdmin';
 import BuildsWidget from './BuildsWidget';
+import PublicGamePropertiesDialog, {
+  type PublicGameAndProjectEditableProperties,
+} from '../GameDashboard/PublicGamePropertiesDialog';
+import useAlertDialog from '../UI/Alert/useAlertDialog';
+import { showErrorBox } from '../UI/Messages/MessageBox';
 
 type Props = {|
+  project?: ?gdProject,
   game: Game,
   analyticsSource: 'profile' | 'homepage' | 'projectManager',
   currentView: GameDetailsTab,
@@ -56,6 +66,7 @@ type Props = {|
 |};
 
 const GameOverview = ({
+  project,
   game,
   currentView,
   setCurrentView,
@@ -66,7 +77,8 @@ const GameOverview = ({
     gameDetailsDialogOpen,
     setGameDetailsDialogOpen,
   ] = React.useState<boolean>(false);
-
+  const [isUpdatingGame, setIsUpdatingGame] = React.useState<boolean>(false);
+  const { showAlert } = useAlertDialog();
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { getAuthorizationHeader, profile } = authenticatedUser;
   const [feedbacks, setFeedbacks] = React.useState<?Array<Comment>>(null);
@@ -119,7 +131,7 @@ const GameOverview = ({
     [game, getAuthorizationHeader, profile]
   );
 
-  const onUpdateGame = React.useCallback(
+  const onUpdateGameStandaloneProperties = React.useCallback(
     async (payload: GameUpdatePayload) => {
       if (!profile) return;
       const updatedGame = await updateGame(
@@ -133,20 +145,186 @@ const GameOverview = ({
     [getAuthorizationHeader, profile, game.id, onGameUpdated]
   );
 
-  React.useEffect(
-    () => {
-      const fetchPublicData = async () => {
-        setPublicGame(null);
-        try {
-          const publicGame = await getPublicGame(game.id);
-          setPublicGame(publicGame);
-        } catch (err) {
-          console.error(`Unable to load the public game:`, err);
+  const onUpdateGame = async (
+    i18n: I18nType,
+    properties: PublicGameAndProjectEditableProperties
+  ) => {
+    if (!profile || !publicGame) return false;
+    const { ownerIds, userSlug, gameSlug, authorIds } = properties;
+
+    if (!ownerIds || !ownerIds.length) {
+      await showAlert({
+        title: t`Select an owner`,
+        message: t`You must select at least one user to be the owner of the game.`,
+      });
+      return false;
+    }
+
+    if (!authorIds || !authorIds.length) {
+      await showAlert({
+        title: t`Select an author`,
+        message: t`You must select at least one user to be the author of the game.`,
+      });
+      return false;
+    }
+
+    try {
+      setIsUpdatingGame(true);
+      const updatedGame = await updateGame(
+        getAuthorizationHeader,
+        profile.id,
+        publicGame.id,
+        {
+          gameName: properties.gameName || 'Untitled game',
+          authorName: properties.authorName || 'Unspecified publisher',
+          categories: properties.categories,
+          publicWebBuildId: properties.publicWebBuildId,
+          description: properties.description,
+          playWithKeyboard: properties.playWithKeyboard,
+          playWithGamepad: properties.playWithGamepad,
+          playWithMobile: properties.playWithMobile,
+          orientation: properties.orientation,
+          thumbnailUrl: properties.thumbnailUrl,
+          screenshotUrls: properties.screenshotUrls,
+          discoverable: properties.discoverable,
+          acceptsBuildComments: properties.acceptsBuildComments,
+          acceptsGameComments: properties.acceptsGameComments,
+          displayAdsOnGamePage: properties.displayAdsOnGamePage,
         }
-      };
-      fetchPublicData();
+      );
+
+      if (userSlug && gameSlug && userSlug === profile.username) {
+        try {
+          await setGameSlug(
+            getAuthorizationHeader,
+            profile.id,
+            publicGame.id,
+            userSlug,
+            gameSlug
+          );
+        } catch (error) {
+          console.error(
+            'Unable to update the game slug:',
+            error.response || error.message
+          );
+          showErrorBox({
+            message:
+              i18n._(
+                t`Unable to update the game slug. A slug must be 6 to 30 characters long and only contains letters, digits or dashes.`
+              ) +
+              ' ' +
+              i18n._(t`Verify your internet connection or try again later.`),
+            rawError: error,
+            errorId: 'game-slug-update-error',
+          });
+          return false;
+        }
+      }
+      try {
+        const authorAcls = getAclsFromUserIds(authorIds);
+        const ownerAcls = getAclsFromUserIds(ownerIds);
+        await setGameUserAcls(
+          getAuthorizationHeader,
+          profile.id,
+          publicGame.id,
+          {
+            ownership: ownerAcls,
+            author: authorAcls,
+          }
+        );
+      } catch (error) {
+        console.error(
+          'Unable to update the game owners or authors:',
+          error.response || error.message
+        );
+        showErrorBox({
+          message:
+            i18n._(
+              t`Unable to update the game owners or authors. Have you removed yourself from the owners?`
+            ) +
+            ' ' +
+            i18n._(t`Verify your internet connection or try again later.`),
+          rawError: error,
+          errorId: 'game-acls-update-error',
+        });
+        return false;
+      }
+      onGameUpdated(updatedGame);
+    } catch (error) {
+      console.error(
+        'Unable to update the game:',
+        error.response || error.message
+      );
+      showErrorBox({
+        message:
+          i18n._(t`Unable to update the game details.`) +
+          ' ' +
+          i18n._(t`Verify your internet connection or try again later.`),
+        rawError: error,
+        errorId: 'game-details-update-error',
+      });
+      return false;
+    } finally {
+      setIsUpdatingGame(false);
+    }
+
+    return true;
+  };
+
+  const updateProjectFromGameIfMatching = (
+    properties: PublicGameAndProjectEditableProperties
+  ) => {
+    if (project && project.getProjectUuid() === game.id) {
+      // Get this information from the game object that should have just been updated
+      // (maybe with fallback values).
+      const { gameName, categories, description } = game;
+      // Get those properties from the object as they are not stored on the Game.
+      const { authorIds, authorUsernames } = properties;
+
+      project.setName(gameName);
+      project.setDescription(description || '');
+      project.setPlayableWithKeyboard(game.playWithKeyboard);
+      project.setPlayableWithGamepad(game.playWithGamepad);
+      project.setPlayableWithMobile(game.playWithMobile);
+      project.setOrientation(game.orientation || 'default');
+      if (categories) {
+        const projectCategories = project.getCategories();
+        projectCategories.clear();
+        categories.forEach(category => projectCategories.push_back(category));
+      }
+      if (authorIds) {
+        const projectAuthorIds = project.getAuthorIds();
+        projectAuthorIds.clear();
+        authorIds.forEach(authorId => projectAuthorIds.push_back(authorId));
+      }
+      if (authorUsernames) {
+        const projectAuthorUsernames = project.getAuthorUsernames();
+        projectAuthorUsernames.clear();
+        authorUsernames.forEach(authorUsername =>
+          projectAuthorUsernames.push_back(authorUsername)
+        );
+      }
+    }
+  };
+
+  const fetchPublicGame = React.useCallback(
+    async () => {
+      try {
+        const publicGame = await getPublicGame(game.id);
+        setPublicGame(publicGame);
+      } catch (err) {
+        console.error(`Unable to load the public game:`, err);
+      }
     },
     [game.id]
+  );
+
+  React.useEffect(
+    () => {
+      setPublicGame(null);
+      fetchPublicGame();
+    },
+    [fetchPublicGame]
   );
 
   React.useEffect(
@@ -280,7 +458,7 @@ const GameOverview = ({
                     onSeeAll={() => setCurrentView('feedback')}
                     feedbacks={feedbacks}
                     game={game}
-                    onUpdateGame={onUpdateGame}
+                    onUpdateGame={onUpdateGameStandaloneProperties}
                     gameUrl={gameUrl}
                   />
                   <ServicesWidget
@@ -299,10 +477,24 @@ const GameOverview = ({
               </ColumnStackLayout>
             )}
           </Column>
-          {/* TODO: To do once the thumbnail logic is done. */}
-          {/* {gameDetailsDialogOpen && (
-            <div>Bonjour</div>
-          )} */}
+          {gameDetailsDialogOpen && publicGame && (
+            <PublicGamePropertiesDialog
+              i18n={i18n}
+              onClose={() => setGameDetailsDialogOpen(false)}
+              publicGame={publicGame}
+              isLoading={isUpdatingGame}
+              onApply={async properties => {
+                const isGameUpdated = await onUpdateGame(i18n, properties);
+                if (isGameUpdated) {
+                  updateProjectFromGameIfMatching(properties);
+                }
+              }}
+              onGameUpdated={() => {
+                fetchPublicGame();
+              }}
+              onUpdatingGame={setIsUpdatingGame}
+            />
+          )}
         </>
       )}
     </I18n>

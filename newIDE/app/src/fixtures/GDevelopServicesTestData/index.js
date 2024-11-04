@@ -3746,6 +3746,81 @@ export const gameWithDisplayAdsOnGamePageDisabled: Game = {
   displayAdsOnGamePage: false,
 };
 
+export const allGameCategoriesMocked = [
+  {
+    name: 'action',
+    type: 'user-defined',
+  },
+  {
+    name: 'adventure',
+    type: 'user-defined',
+  },
+  {
+    name: 'shooter',
+    type: 'user-defined',
+  },
+  {
+    name: 'platformer',
+    type: 'user-defined',
+  },
+  {
+    name: 'rpg',
+    type: 'user-defined',
+  },
+  {
+    name: 'horror',
+    type: 'user-defined',
+  },
+  {
+    name: 'strategy',
+    type: 'user-defined',
+  },
+  {
+    name: 'puzzle',
+    type: 'user-defined',
+  },
+  {
+    name: 'story-rich',
+    type: 'user-defined',
+  },
+  {
+    name: 'survival',
+    type: 'user-defined',
+  },
+  {
+    name: 'racing',
+    type: 'user-defined',
+  },
+  {
+    name: 'building',
+    type: 'user-defined',
+  },
+  {
+    name: 'simulation',
+    type: 'user-defined',
+  },
+  {
+    name: 'sport',
+    type: 'user-defined',
+  },
+  {
+    name: 'multiplayer',
+    type: 'user-defined',
+  },
+  {
+    name: 'leaderboard',
+    type: 'user-defined',
+  },
+  {
+    name: 'mini-games',
+    type: 'user-defined',
+  },
+  {
+    name: 'educational',
+    type: 'user-defined',
+  },
+];
+
 /**
  * It uses the ANSI C one because Number.MAX_SAFE_INTEGER is 2^53
  * and this one multiply a seed of 2^15 with a multiplier of 2^32.

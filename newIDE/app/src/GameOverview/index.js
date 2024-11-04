@@ -178,6 +178,7 @@ const GameOverview = ({
           gameName: properties.gameName || 'Untitled game',
           authorName: properties.authorName || 'Unspecified publisher',
           categories: properties.categories,
+          // TODO: Fetch most recent build id to publish it
           publicWebBuildId: properties.publicWebBuildId,
           description: properties.description,
           playWithKeyboard: properties.playWithKeyboard,
@@ -189,6 +190,7 @@ const GameOverview = ({
           discoverable: properties.discoverable,
           acceptsBuildComments: properties.acceptsBuildComments,
           acceptsGameComments: properties.acceptsGameComments,
+          // TODO: Make sure it works.
           displayAdsOnGamePage: properties.displayAdsOnGamePage,
         }
       );

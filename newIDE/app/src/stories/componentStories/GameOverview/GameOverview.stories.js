@@ -24,6 +24,7 @@ import {
   userEarningsBalanceEmpty,
   basicFeaturingMarketingPlan,
   getPublicGameFromGame,
+  allGameCategoriesMocked,
 } from '../../../fixtures/GDevelopServicesTestData';
 import { client as playApiAxiosClient } from '../../../Utils/GDevelopServices/Play';
 import { client as buildApiAxiosClient } from '../../../Utils/GDevelopServices/Build';
@@ -230,6 +231,8 @@ export const Default = ({
     .reply(200, [basicFeaturingMarketingPlan])
     .onGet(`/game-featuring`)
     .reply(200, [])
+    .onGet(`/game-category`)
+    .reply(200, allGameCategoriesMocked)
     .onGet(`/public-game/${game1.id}`)
     .reply(200, publicGame)
     .onPatch(`/game/${game1.id}`, {

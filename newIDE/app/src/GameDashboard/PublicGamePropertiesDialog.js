@@ -48,6 +48,7 @@ export type PublicGameAndProjectEditableProperties = {|
   ...PartialGameChange,
   authorUsernames: string[],
   authorIds?: Array<string>,
+  isPublishedOnGdGames: boolean,
 |};
 
 export const applyPublicPropertiesToProject = (
@@ -141,6 +142,14 @@ export const PublicGamePropertiesDialog = ({
   const [discoverable, setDiscoverable] = React.useState(
     publicGame.discoverable
   );
+  const [
+    isPublishedOnGdGames,
+    setIsPublishedOnGdGames,
+  ] = React.useState<boolean>(!!publicGame.publicWebBuildId);
+  const [
+    acceptsAdvertisementsOnGdGames,
+    setAcceptsAdvertisementsOnGdGames,
+  ] = React.useState<boolean>(publicGame.displayAdsOnGamePage);
 
   const onSave = async () => {
     await onApply({
@@ -157,6 +166,8 @@ export const PublicGamePropertiesDialog = ({
       playWithGamepad,
       playWithMobile,
       orientation,
+      displayAdsOnGamePage: acceptsAdvertisementsOnGdGames,
+      isPublishedOnGdGames,
     });
   };
 
@@ -217,6 +228,10 @@ export const PublicGamePropertiesDialog = ({
         setGameSlug={setGameSlug}
         gameSlug={gameSlug}
         setDiscoverable={setDiscoverable}
+        isPublishedOnGdGames={isPublishedOnGdGames}
+        setIsPublishedOnGdGames={setIsPublishedOnGdGames}
+        acceptsAdvertisementsOnGdGames={acceptsAdvertisementsOnGdGames}
+        setAcceptsAdvertisementsOnGdGames={setAcceptsAdvertisementsOnGdGames}
         discoverable={discoverable}
         displayThumbnail
         thumbnailUrl={publicGameThumbnailUrl}

@@ -1,13 +1,13 @@
 // @flow
 import React from 'react';
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
+import Divider from '@material-ui/core/Divider';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import { UsersAutocomplete } from '../Profile/UsersAutocomplete';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import Checkbox from '../UI/Checkbox';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
-import { t } from '@lingui/macro';
 import SemiControlledMultiAutoComplete from '../UI/SemiControlledMultiAutoComplete';
 import {
   getCategoryName,
@@ -20,6 +20,8 @@ import { I18n } from '@lingui/react';
 import { Column, Line, Spacer } from '../UI/Grid';
 import AlertMessage from '../UI/AlertMessage';
 import { GameThumbnail } from './GameThumbnail';
+import Text from '../UI/Text';
+import Toggle from '../UI/Toggle';
 
 const GAME_SLUG_MAX_LENGTH = 30;
 const GAME_SLUG_MIN_LENGTH = 6;
@@ -84,6 +86,10 @@ type Props = {|
   gameSlug?: string,
   setGameSlug?: string => void,
   setDiscoverable?: boolean => void,
+  isPublishedOnGdGames?: boolean,
+  setIsPublishedOnGdGames?: boolean => void,
+  acceptsAdvertisementsOnGdGames?: boolean,
+  setAcceptsAdvertisementsOnGdGames?: boolean => void,
   discoverable?: boolean,
   displayThumbnail?: boolean,
   thumbnailUrl?: ?string,
@@ -118,6 +124,10 @@ export function PublicGameProperties({
   setDiscoverable,
   discoverable,
   displayThumbnail,
+  isPublishedOnGdGames,
+  setIsPublishedOnGdGames,
+  acceptsAdvertisementsOnGdGames,
+  setAcceptsAdvertisementsOnGdGames,
   thumbnailUrl,
   onGameUpdated,
   onUpdatingGame,
@@ -151,6 +161,8 @@ export function PublicGameProperties({
     [fetchGameCategories]
   );
 
+  const disablePublicationProperties = !isPublishedOnGdGames;
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -182,116 +194,18 @@ export function PublicGameProperties({
                 autoFocus="desktop"
                 disabled={disabled}
               />
-              {setCategories && (
-                <SemiControlledMultiAutoComplete
-                  hintText={t`Select a genre`}
-                  floatingLabelText={<Trans>Genres</Trans>}
-                  helperText={
-                    <Trans>
-                      Select up to 3 genres for the game to be visible on
-                      gd.games's categories pages!
-                    </Trans>
-                  }
-                  value={
-                    categories
-                      ? categories.map(category => ({
-                          value: category,
-                          text: getCategoryName(category, i18n),
-                        }))
-                      : []
-                  }
-                  onChange={(event, values) => {
-                    setCategories(
-                      values ? values.map(category => category.value) : []
-                    );
-                    setCategoryInput('');
-                  }}
-                  inputValue={categoryInput}
-                  onInputChange={(event, value, reason) => {
-                    // It seems that the input is triggered with a "reset" reason,
-                    // after each input change. (https://github.com/mui/material-ui/issues/20939)
-                    // We handle this manually to avoid the input to be reseted.
-                    if (reason === 'input') {
-                      setCategoryInput(value);
-                    }
-                  }}
-                  dataSource={allGameCategories.map(category => ({
-                    value: category.name,
-                    text: getCategoryName(category.name, i18n),
-                    disabled: category.type === 'admin-only',
-                  }))}
-                  fullWidth
-                  optionsLimit={3}
-                  disabled={disabled}
-                  loading={allGameCategories.length === 0}
-                />
-              )}
-              {setDiscoverable && (
-                <Checkbox
-                  label={<Trans>Make your game discoverable on gd.games</Trans>}
-                  checked={!!discoverable}
-                  onCheck={(e, checked) => setDiscoverable(checked)}
-                  disabled={disabled}
-                />
-              )}
+              <SemiControlledTextField
+                floatingLabelText={<Trans>Game description</Trans>}
+                fullWidth
+                type="text"
+                value={description || ''}
+                onChange={setDescription}
+                multiline
+                rows={5}
+                disabled={disabled}
+              />
             </ColumnStackLayout>
           </ResponsiveLineStackLayout>
-          <SemiControlledTextField
-            floatingLabelText={<Trans>Game description</Trans>}
-            fullWidth
-            type="text"
-            value={description || ''}
-            onChange={setDescription}
-            multiline
-            rows={5}
-            disabled={disabled}
-          />
-          {setUserSlug && setGameSlug && (
-            <>
-              <Line>
-                <SelectField
-                  fullWidth
-                  floatingLabelText={<Trans>User name in the game URL</Trans>}
-                  value={userSlug || ''}
-                  onChange={(e, i, value: string) => setUserSlug(value)}
-                  // It's disabled if one of the condition of SelectOption is false.
-                  disabled={!hasValidGameSlug || disabled}
-                >
-                  {profile && profile.username && (
-                    <SelectOption
-                      value={profile.username}
-                      label={profile.username}
-                      shouldNotTranslate
-                    />
-                  )}
-                  {userSlug && (!profile || userSlug !== profile.username) && (
-                    <SelectOption
-                      value={userSlug}
-                      label={userSlug}
-                      shouldNotTranslate
-                    />
-                  )}
-                </SelectField>
-                <Spacer />
-                <SemiControlledTextField
-                  disabled={!hasGameSlug || disabled}
-                  floatingLabelText={<Trans>Game name in the game URL</Trans>}
-                  fullWidth
-                  maxLength={GAME_SLUG_MAX_LENGTH}
-                  type="text"
-                  value={hasGameSlug ? gameSlug || '' : ''}
-                  onChange={gameSlug => setGameSlug(cleanUpGameSlug(gameSlug))}
-                />
-              </Line>
-              {!hasGameSlug && (
-                <AlertMessage kind="info">
-                  <Trans>
-                    Usernames are required to choose a custom game URL.
-                  </Trans>
-                </AlertMessage>
-              )}
-            </>
-          )}
           <UsersAutocomplete
             userIds={authorIds}
             onChange={userIdAndUsernames => {
@@ -316,6 +230,77 @@ export function PublicGameProperties({
             }
             disabled={disabled}
           />
+          {setPlayableWithKeyboard &&
+            setPlayableWithGamepad &&
+            setPlayableWithMobile && (
+              <Column noMargin>
+                <Text color="secondary" size="body-small">
+                  <Trans>Select the controls that apply:</Trans>
+                </Text>
+                <ResponsiveLineStackLayout noMargin noColumnMargin>
+                  <Checkbox
+                    label={<Trans>Keyboard</Trans>}
+                    checked={!!playWithKeyboard}
+                    onCheck={(e, checked) => setPlayableWithKeyboard(checked)}
+                    disabled={disabled}
+                  />
+                  <Checkbox
+                    label={<Trans>Gamepad</Trans>}
+                    checked={!!playWithGamepad}
+                    onCheck={(e, checked) => setPlayableWithGamepad(checked)}
+                    disabled={disabled}
+                  />
+                  <Checkbox
+                    label={<Trans>Touch (mobile)</Trans>}
+                    checked={!!playWithMobile}
+                    onCheck={(e, checked) => setPlayableWithMobile(checked)}
+                    disabled={disabled}
+                  />
+                </ResponsiveLineStackLayout>
+              </Column>
+            )}
+          <SelectField
+            fullWidth
+            floatingLabelText={<Trans>Device orientation (for mobile)</Trans>}
+            value={orientation}
+            onChange={(e, i, value: string) => setOrientation(value)}
+            disabled={disabled}
+          >
+            <SelectOption value="default" label={t`Platform default`} />
+            <SelectOption value="landscape" label={t`Landscape`} />
+            <SelectOption value="portrait" label={t`Portrait`} />
+          </SelectField>
+          {setIsPublishedOnGdGames && (
+            <>
+              <Spacer />
+              <Line noMargin>
+                <Column>
+                  <Toggle
+                    labelPosition="right"
+                    toggled={!!isPublishedOnGdGames}
+                    onToggle={(e, newValue) =>
+                      setIsPublishedOnGdGames(newValue)
+                    }
+                    label={i18n._(t`Publish game on gd.games`)}
+                  />
+                </Column>
+              </Line>
+            </>
+          )}
+          {(setOwnerIds ||
+            (setUserSlug && setGameSlug) ||
+            setAcceptsAdvertisementsOnGdGames ||
+            setDiscoverable ||
+            setCategories) && (
+            <>
+              <Divider orientation="horizontal" />
+              <Line>
+                <Text size="block-title">
+                  <Trans>Publishing on gd.games</Trans>
+                </Text>
+              </Line>
+            </>
+          )}
           {setOwnerIds && (
             <UsersAutocomplete
               userIds={ownerIds || []}
@@ -333,41 +318,136 @@ export function PublicGameProperties({
               disabled={disabled}
             />
           )}
-          <SelectField
-            fullWidth
-            floatingLabelText={<Trans>Device orientation (for mobile)</Trans>}
-            value={orientation}
-            onChange={(e, i, value: string) => setOrientation(value)}
-            disabled={disabled}
-          >
-            <SelectOption value="default" label={t`Platform default`} />
-            <SelectOption value="landscape" label={t`Landscape`} />
-            <SelectOption value="portrait" label={t`Portrait`} />
-          </SelectField>
-          {setPlayableWithKeyboard &&
-            setPlayableWithGamepad &&
-            setPlayableWithMobile && (
-              <React.Fragment>
-                <Checkbox
-                  label={<Trans>Playable with a keyboard</Trans>}
-                  checked={!!playWithKeyboard}
-                  onCheck={(e, checked) => setPlayableWithKeyboard(checked)}
-                  disabled={disabled}
+          {setUserSlug && setGameSlug && (
+            <>
+              <Line>
+                <SelectField
+                  fullWidth
+                  floatingLabelText={<Trans>User name in the game URL</Trans>}
+                  value={userSlug || ''}
+                  onChange={(e, i, value: string) => setUserSlug(value)}
+                  // It's disabled if one of the condition of SelectOption is false.
+                  disabled={
+                    !hasValidGameSlug ||
+                    disabled ||
+                    disablePublicationProperties
+                  }
+                >
+                  {profile && profile.username && (
+                    <SelectOption
+                      value={profile.username}
+                      label={profile.username}
+                      shouldNotTranslate
+                    />
+                  )}
+                  {userSlug && (!profile || userSlug !== profile.username) && (
+                    <SelectOption
+                      value={userSlug}
+                      label={userSlug}
+                      shouldNotTranslate
+                    />
+                  )}
+                </SelectField>
+                <Spacer />
+                <SemiControlledTextField
+                  disabled={
+                    !hasGameSlug || disabled || disablePublicationProperties
+                  }
+                  floatingLabelText={<Trans>Game name in the game URL</Trans>}
+                  fullWidth
+                  maxLength={GAME_SLUG_MAX_LENGTH}
+                  type="text"
+                  value={hasGameSlug ? gameSlug || '' : ''}
+                  onChange={gameSlug => setGameSlug(cleanUpGameSlug(gameSlug))}
                 />
-                <Checkbox
-                  label={<Trans>Playable with a gamepad</Trans>}
-                  checked={!!playWithGamepad}
-                  onCheck={(e, checked) => setPlayableWithGamepad(checked)}
-                  disabled={disabled}
+              </Line>
+              {!hasGameSlug && (
+                <AlertMessage kind="info">
+                  <Trans>
+                    Usernames are required to choose a custom game URL.
+                  </Trans>
+                </AlertMessage>
+              )}
+            </>
+          )}
+          {setCategories && (
+            <SemiControlledMultiAutoComplete
+              hintText={t`Select a genre`}
+              floatingLabelText={<Trans>Genres</Trans>}
+              helperText={
+                <Trans>
+                  Select up to 3 genres for the game to be visible on gd.games's
+                  categories pages!
+                </Trans>
+              }
+              value={
+                categories
+                  ? categories.map(category => ({
+                      value: category,
+                      text: getCategoryName(category, i18n),
+                    }))
+                  : []
+              }
+              onChange={(event, values) => {
+                setCategories(
+                  values ? values.map(category => category.value) : []
+                );
+                setCategoryInput('');
+              }}
+              inputValue={categoryInput}
+              onInputChange={(event, value, reason) => {
+                // It seems that the input is triggered with a "reset" reason,
+                // after each input change. (https://github.com/mui/material-ui/issues/20939)
+                // We handle this manually to avoid the input to be reseted.
+                if (reason === 'input') {
+                  setCategoryInput(value);
+                }
+              }}
+              dataSource={allGameCategories.map(category => ({
+                value: category.name,
+                text: getCategoryName(category.name, i18n),
+                disabled: category.type === 'admin-only',
+              }))}
+              fullWidth
+              optionsLimit={3}
+              disabled={disabled || disablePublicationProperties}
+              loading={allGameCategories.length === 0}
+            />
+          )}
+          {setDiscoverable && (
+            <SelectField
+              fullWidth
+              floatingLabelText={<Trans>Visibility</Trans>}
+              value={discoverable ? 'visible' : 'hidden'}
+              onChange={(e, i, value: string) =>
+                setDiscoverable(value === 'visible')
+              }
+              disabled={disabled || disablePublicationProperties}
+            >
+              <SelectOption
+                value="visible"
+                label={t`Visible on your profile page`}
+              />
+              <SelectOption value="hidden" label={t`Hidden`} />
+            </SelectField>
+          )}
+          {setAcceptsAdvertisementsOnGdGames && (
+            <Line noMargin>
+              <Column>
+                <Toggle
+                  disabled={disablePublicationProperties}
+                  labelPosition="right"
+                  toggled={!!acceptsAdvertisementsOnGdGames}
+                  onToggle={(e, newValue) =>
+                    setAcceptsAdvertisementsOnGdGames(newValue)
+                  }
+                  label={i18n._(
+                    t`Allow to display advertisements on the game page of gd.games`
+                  )}
                 />
-                <Checkbox
-                  label={<Trans>Playable on mobile</Trans>}
-                  checked={!!playWithMobile}
-                  onCheck={(e, checked) => setPlayableWithMobile(checked)}
-                  disabled={disabled}
-                />
-              </React.Fragment>
-            )}
+              </Column>
+            </Line>
+          )}
         </ColumnStackLayout>
       )}
     </I18n>

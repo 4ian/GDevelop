@@ -85,7 +85,7 @@ export const getRequirementsErrors = (
   }
   if (!marketingPlanGameRequirements.isPublished && !game.publicWebBuildId) {
     requirementsErrors.push(
-      <Trans>Your game does not have a public build</Trans>
+      <Trans>Your game is not published on gd.games</Trans>
     );
   }
   if (!!marketingPlanGameRequirements.isDiscoverable && !game.discoverable) {

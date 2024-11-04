@@ -49,6 +49,7 @@ export type PublicGame = {
 export type Game = {|
   id: string,
   gameName: string,
+  categories?: string[],
   authorName: string, // this corresponds to the publisher name
   createdAt: number,
   publicWebBuildId?: ?string,

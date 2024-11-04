@@ -8,11 +8,13 @@ import {
   getRecommendedMarketingPlan,
   listGameFeaturings,
   type Game,
+  type PublicGame,
   type GameFeaturing,
   type MarketingPlan,
   type GameUpdatePayload,
   updateGame,
   getGameUrl,
+  getPublicGame,
 } from '../Utils/GDevelopServices/Game';
 import { ColumnStackLayout } from '../UI/Layout';
 import GameHeader from './GameHeader';
@@ -69,6 +71,7 @@ const GameOverview = ({
   const { getAuthorizationHeader, profile } = authenticatedUser;
   const [feedbacks, setFeedbacks] = React.useState<?Array<Comment>>(null);
   const [builds, setBuilds] = React.useState<?Array<Build>>(null);
+  const [publicGame, setPublicGame] = React.useState<?PublicGame>(null);
   const [gameRollingMetrics, setGameMetrics] = React.useState<?(GameMetrics[])>(
     null
   );
@@ -132,6 +135,22 @@ const GameOverview = ({
 
   React.useEffect(
     () => {
+      const fetchPublicData = async () => {
+        setPublicGame(null);
+        try {
+          const publicGame = await getPublicGame(game.id);
+          setPublicGame(publicGame);
+        } catch (err) {
+          console.error(`Unable to load the public game:`, err);
+        }
+      };
+      fetchPublicData();
+    },
+    [game.id]
+  );
+
+  React.useEffect(
+    () => {
       if (!profile) {
         setFeedbacks(null);
         setBuilds(null);
@@ -143,7 +162,7 @@ const GameOverview = ({
         return;
       }
 
-      const fetchData = async () => {
+      const fetchAuthenticatedData = async () => {
         const [
           feedbacks,
           builds,
@@ -185,7 +204,7 @@ const GameOverview = ({
         setRecommendedMarketingPlan(recommendedMarketingPlan);
       };
 
-      fetchData();
+      fetchAuthenticatedData();
     },
     [getAuthorizationHeader, profile, fetchGameFeaturings, game.id]
   );

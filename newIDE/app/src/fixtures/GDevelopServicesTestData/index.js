@@ -17,9 +17,11 @@ import {
   type ExtensionShortHeader,
   type ExtensionHeader,
 } from '../../Utils/GDevelopServices/Extension';
+import { type UserPublicProfile } from '../../Utils/GDevelopServices/User';
 import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
 import {
   type Game,
+  type PublicGame,
   type ShowcasedGame,
 } from '../../Utils/GDevelopServices/Game';
 import { type GameMetrics } from '../../Utils/GDevelopServices/Analytics';
@@ -3676,6 +3678,9 @@ export const fakeGame: Game = {
   displayAdsOnGamePage: true,
   discoverable: true,
   thumbnailUrl: 'https://i.ytimg.com/vi/PguDpz7TC7g/hqdefault.jpg',
+  playWithKeyboard: true,
+  playWithMobile: false,
+  playWithGamepad: false,
 };
 
 export const game1: Game = {
@@ -3685,6 +3690,10 @@ export const game1: Game = {
   createdAt: 1606065498,
   publicWebBuildId: 'fake-publicwebbuild-id',
   displayAdsOnGamePage: true,
+  orientation: 'default',
+  playWithKeyboard: true,
+  playWithMobile: false,
+  playWithGamepad: false,
 };
 
 export const game2: Game = {
@@ -3692,6 +3701,39 @@ export const game2: Game = {
   authorName: 'My company',
   gameName: 'My Other Game',
   createdAt: 1607065498,
+  playWithKeyboard: true,
+  playWithMobile: false,
+  playWithGamepad: false,
+};
+
+export const getPublicGameFromGame = (game: Game): PublicGame => {
+  const publicGame: PublicGame = {
+    ...game1,
+    donateLink: null,
+    orientation: game.orientation || 'default',
+    displayAdsOnGamePage: !!game.displayAdsOnGamePage,
+    owners: [getPublicProfileUserFromProfile(indieUserProfile)],
+    authors: [getPublicProfileUserFromProfile(indieUserProfile)],
+  };
+  return publicGame;
+};
+
+export const getPublicProfileUserFromProfile = (
+  profile: Profile
+): UserPublicProfile => {
+  const publicProfile: UserPublicProfile = {
+    id: profile.id,
+    createdAt: profile.createdAt,
+    username: profile.username || null,
+    description: profile.description || null,
+    donateLink: profile.donateLink || null,
+    discordUsername: profile.discordUsername || null,
+    githubUsername: profile.githubUsername || null,
+    communityLinks: profile.communityLinks || {},
+    iconUrl:
+      'https://www.gravatar.com/avatar/3cc54b273332b35556f95bd9c6713585?s=40&d=retro',
+  };
+  return publicProfile;
 };
 
 export const gameWithDisplayAdsOnGamePageEnabled: Game = {

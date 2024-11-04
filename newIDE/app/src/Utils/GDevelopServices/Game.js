@@ -60,6 +60,10 @@ export type Game = {|
   acceptsGameComments?: boolean,
   displayAdsOnGamePage?: boolean,
   cachedCurrentSlug?: CachedGameSlug,
+  orientation?: string,
+  playWithKeyboard: boolean,
+  playWithMobile: boolean,
+  playWithGamepad: boolean,
 |};
 
 export type GameUpdatePayload = {|

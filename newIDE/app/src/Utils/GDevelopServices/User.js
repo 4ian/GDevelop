@@ -130,10 +130,12 @@ export type Recommendation =
 
 export type UserPublicProfile = {|
   id: string,
+  createdAt: number,
   username: ?string,
   description: ?string,
   donateLink: ?string,
   discordUsername: ?string,
+  githubUsername?: ?string;
   communityLinks: CommunityLinks,
   iconUrl: string,
 |};

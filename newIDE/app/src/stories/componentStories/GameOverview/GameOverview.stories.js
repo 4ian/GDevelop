@@ -23,6 +23,7 @@ import {
   userEarningsBalance,
   userEarningsBalanceEmpty,
   basicFeaturingMarketingPlan,
+  getPublicGameFromGame,
 } from '../../../fixtures/GDevelopServicesTestData';
 import { client as playApiAxiosClient } from '../../../Utils/GDevelopServices/Play';
 import { client as buildApiAxiosClient } from '../../../Utils/GDevelopServices/Build';
@@ -46,6 +47,10 @@ export default {
   argTypes: {
     analyticsSource: { control: { type: false } }, // Hide default control.
     game: { control: { type: false } }, // Hide default control.
+    gameState: {
+      options: ['Published', 'Not published'],
+      control: { type: 'radio' },
+    },
     isAcceptingFeedback: {
       options: ['No', 'Yes'],
       control: { type: 'radio' },
@@ -72,6 +77,7 @@ export default {
     },
   },
   args: {
+    gameState: 'Published',
     isAcceptingFeedback: 'Yes',
     feedbacks: 'Some unprocessed',
     sessions: 'Some in the last week',
@@ -136,6 +142,7 @@ const fakeGameMetrics = new Array(7).fill(0).map((_, index) => {
 });
 
 export const Default = ({
+  gameState,
   isAcceptingFeedback,
   feedbacks,
   sessions,
@@ -143,6 +150,7 @@ export const Default = ({
   leaderboards,
   builds,
 }: {|
+  gameState: 'Published' | 'Not published' | 'Not registered',
   isAcceptingFeedback: 'Yes' | 'No',
   feedbacks: 'None' | 'Some unprocessed' | 'All processed',
   sessions: 'None' | 'Some in the last week',
@@ -150,10 +158,7 @@ export const Default = ({
   leaderboards: 'None' | 'Some',
   builds: 'None' | 'Some ongoing' | 'All complete',
 |}) => {
-  const [game, setGame] = React.useState<Game>({
-    ...game1,
-    acceptsGameComments: isAcceptingFeedback === 'Yes',
-  });
+  const [game, setGame] = React.useState<Game>(game1);
   const [tab, setTab] = React.useState<GameDetailsTab>('details');
   const [renderCount, setRenderCount] = React.useState<number>(0);
   const feedbacksToDisplay =
@@ -178,12 +183,19 @@ export const Default = ({
       : builds === 'All complete'
       ? [completeCordovaBuild, completeElectronBuild, completeWebBuild]
       : [completeCordovaBuild, completeElectronBuild, pendingCordovaBuild];
+  const gameToUse = {
+    ...game,
+    publicWebBuildId: gameState === 'Published' ? game1.publicWebBuildId : null,
+    acceptsGameComments: isAcceptingFeedback === 'Yes',
+  };
+
+  const publicGame = getPublicGameFromGame(gameToUse)
 
   React.useEffect(
     () => {
       setRenderCount(value => value + 1);
     },
-    [feedbacks, sessions, userBalance, leaderboards, builds]
+    [feedbacks, sessions, userBalance, leaderboards, builds, gameState]
   );
 
   playServiceMock
@@ -218,6 +230,8 @@ export const Default = ({
     .reply(200, [basicFeaturingMarketingPlan])
     .onGet(`/game-featuring`)
     .reply(200, [])
+    .onGet(`/public-game/${game1.id}`)
+    .reply(200, publicGame)
     .onPatch(`/game/${game1.id}`, {
       asymmetricMatch: function(data) {
         setGame({
@@ -255,7 +269,7 @@ export const Default = ({
       }}
     >
       <GameOverview
-        game={game}
+        game={gameToUse}
         analyticsSource="homepage"
         key={renderCount.toFixed(0)}
         currentView={tab}

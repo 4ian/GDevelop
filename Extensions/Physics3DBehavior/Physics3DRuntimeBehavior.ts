@@ -201,6 +201,17 @@ namespace gdjs {
     destroyedDuringFrameLogic: boolean;
     _body: Jolt.Body | null = null;
 
+    /** Avoid creating new vectors all the time */
+    _tempVec3 = new Jolt.Vec3();
+    _tempRVec3 = new Jolt.RVec3();
+    _tempQuat = new Jolt.Quat();
+    /**
+     * sharedData is a reference to the shared data of the scene, that registers
+     * every physics behavior that is created so that collisions can be cleared
+     * before stepping the world.
+     */
+    _sharedData: Physics3DSharedData;
+
     _objectOldX: number = 0;
     _objectOldY: number = 0;
     _objectOldZ: number = 0;
@@ -210,14 +221,7 @@ namespace gdjs {
     _objectOldWidth: float = 0;
     _objectOldHeight: float = 0;
     _objectOldDepth: float = 0;
-
-    /**
-     * sharedData is a reference to the shared data of the scene, that registers
-     * every physics behavior that is created so that collisions can be cleared
-     * before stepping the world.
-     */
-    _sharedData: Physics3DSharedData;
-
+  
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
       behaviorData,
@@ -230,6 +234,22 @@ namespace gdjs {
         instanceContainer.getScene(),
         behaviorData.name
       );
+      this._sharedData.addToBehaviorsList(this);
+    }
+
+    private getVec3(x: float, y: float, z: float): Jolt.Vec3 {
+      this._tempVec3.Set(x, y, z);
+      return this._tempVec3;
+    }
+
+    private getRVec3(x: float, y: float, z: float): Jolt.RVec3 {
+      this._tempRVec3.Set(x, y, z);
+      return this._tempRVec3;
+    }
+
+    private getQuat(x: float, y: float, z: float, w: float): Jolt.Quat {
+      this._tempQuat.Set(x, y, z, w);
+      return this._tempQuat;
     }
 
     updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
@@ -273,15 +293,15 @@ namespace gdjs {
 
       // TODO
       const shape = new Jolt.BoxShape(
-        new Jolt.Vec3(32, 32, 32),
+        this.getVec3(32, 32, 32),
         0.5,
         undefined
       );
       const threeObject = this.owner3D.get3DRendererObject();
       const bodyCreationSettings = new Jolt.BodyCreationSettings(
         shape,
-        new Jolt.RVec3(x, y, z),
-        new Jolt.Quat(
+        this.getRVec3(x, y, z),
+        this.getQuat(
           threeObject.quaternion.x,
           threeObject.quaternion.y,
           threeObject.quaternion.z,
@@ -399,8 +419,8 @@ namespace gdjs {
         const threeObject = this.owner3D.get3DRendererObject();
         this._sharedData.bodyInterface.SetPositionAndRotationWhenChanged(
           body.GetID(),
-          new Jolt.RVec3(x, y, z),
-          new Jolt.Quat(
+          this.getRVec3(x, y, z),
+          this.getQuat(
             threeObject.quaternion.x,
             threeObject.quaternion.y,
             threeObject.quaternion.z,
@@ -427,8 +447,8 @@ namespace gdjs {
 
       this._sharedData.bodyInterface.AddForce(
         body.GetID(),
-        new Jolt.Vec3(forceX, forceY, forceZ),
-        new Jolt.RVec3(
+        this.getVec3(forceX, forceY, forceZ),
+        this.getRVec3(
           positionX * this._sharedData.worldInvScale,
           positionY * this._sharedData.worldInvScale,
           positionZ * this._sharedData.worldInvScale
@@ -446,7 +466,7 @@ namespace gdjs {
 
       this._sharedData.bodyInterface.AddForce(
         body.GetID(),
-        new Jolt.Vec3(forceX, forceY, forceZ),
+        this.getVec3(forceX, forceY, forceZ),
         Jolt.EActivation_Activate
       );
     }
@@ -467,8 +487,8 @@ namespace gdjs {
 
       this._sharedData.bodyInterface.AddImpulse(
         body.GetID(),
-        new Jolt.Vec3(impulseX, impulseY, impulseZ),
-        new Jolt.RVec3(
+        this.getVec3(impulseX, impulseY, impulseZ),
+        this.getRVec3(
           positionX * this._sharedData.worldInvScale,
           positionY * this._sharedData.worldInvScale,
           positionZ * this._sharedData.worldInvScale
@@ -489,7 +509,7 @@ namespace gdjs {
 
       this._sharedData.bodyInterface.AddImpulse(
         body.GetID(),
-        new Jolt.Vec3(impulseX, impulseY, impulseZ)
+        this.getVec3(impulseX, impulseY, impulseZ)
       );
     }
   }

@@ -321,8 +321,8 @@ export default function SpriteEditor({
               title={<Trans>Edit collision masks</Trans>}
               actions={[
                 <FlatButton
-                  key="close"
-                  label={<Trans>Close</Trans>}
+                  key="save"
+                  label={<Trans>Save</Trans>}
                   primary
                   onClick={() => setCollisionMasksEditorOpen(false)}
                 />,

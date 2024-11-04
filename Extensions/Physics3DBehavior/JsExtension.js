@@ -54,14 +54,34 @@ module.exports = {
       propertyName,
       newValue
     ) {
+
+      if (propertyName === 'worldScale') {
+        const newValueAsNumber = parseInt(newValue, 10);
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        if (!sharedContent.hasChild('worldScale')) {
+          sharedContent.addChild('worldScale');
+        }
+        sharedContent.getChild('worldScale').setDoubleValue(newValueAsNumber);
+        return true;
+      }
+
       return false;
     };
     sharedData.getProperties = function (sharedContent) {
       const sharedProperties = new gd.MapStringPropertyDescriptor();
 
+      sharedProperties
+        .getOrCreate('worldScale')
+        .setValue(
+          sharedContent.getChild('worldScale').getDoubleValue().toString(10)
+        )
+        .setType('Number');
+
       return sharedProperties;
     };
-    sharedData.initializeContent = function (behaviorContent) {};
+    sharedData.initializeContent = function (behaviorContent) {
+      behaviorContent.addChild('worldScale').setDoubleValue(100);
+    };
 
     const aut = extension
       // extension

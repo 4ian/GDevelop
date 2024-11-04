@@ -45,7 +45,7 @@ namespace gdjs {
   const LAYER_MOVING = 1;
   const NUM_OBJECT_LAYERS = 2;
 
-  const setupCollisionFiltering = (settings) => {
+  const setupCollisionFiltering = (settings: Jolt.JoltSettings) => {
     // Layer that objects can be in, determines which other objects it can collide with
     // Typically you at least want to have 1 layer for moving bodies and 1 layer for static bodies, but you can have more
     // layers if you want. E.g. you could have a layer for high detail collision (which is not used by the physics simulation
@@ -83,6 +83,9 @@ namespace gdjs {
   };
 
   export class Physics3DSharedData {
+    gravityX: float;
+    gravityY: float;
+    gravityZ: float;
     worldScale: float;
     worldInvScale: float;
 
@@ -100,6 +103,9 @@ namespace gdjs {
 
     constructor(instanceContainer: gdjs.RuntimeInstanceContainer, sharedData) {
       this._registeredBehaviors = new Set<Physics3DRuntimeBehavior>();
+      this.gravityX = sharedData.gravityX;
+      this.gravityY = sharedData.gravityY;
+      this.gravityZ = sharedData.gravityZ;
       this.worldScale = sharedData.worldScale;
       this.worldInvScale = 1 / this.worldScale;
 
@@ -109,6 +115,9 @@ namespace gdjs {
       this.jolt = new Jolt.JoltInterface(settings);
       Jolt.destroy(settings);
       this.physicsSystem = this.jolt.GetPhysicsSystem();
+      this.physicsSystem.SetGravity(
+        new Jolt.Vec3(this.gravityX, this.gravityY, this.gravityZ)
+      );
       this.bodyInterface = this.physicsSystem.GetBodyInterface();
     }
 
@@ -281,9 +290,11 @@ namespace gdjs {
         Jolt.EMotionType_Dynamic,
         LAYER_MOVING
       );
+      bodyCreationSettings.mFriction = 0.001;
 
-      this._body =
-        this._sharedData.bodyInterface.CreateBody(bodyCreationSettings);
+      const bodyInterface = this._sharedData.bodyInterface;
+      this._body = bodyInterface.CreateBody(bodyCreationSettings);
+      bodyInterface.AddBody(this._body.GetID(), Jolt.EActivation_Activate);
 
       return true;
     }
@@ -350,7 +361,10 @@ namespace gdjs {
       this._objectOldRotationZ = this.owner3D.getAngle();
     }
 
-    doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
+    doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
+      // Reset world step to update next frame
+      this._sharedData.stepped = false;
+    }
 
     onObjectHotReloaded() {
       this.updateBodyFromObject();
@@ -395,6 +409,88 @@ namespace gdjs {
           Jolt.EActivation_Activate
         );
       }
+    }
+
+    applyForce(
+      forceX: float,
+      forceY: float,
+      forceZ: float,
+      positionX: float,
+      positionY: float,
+      positionZ: float
+    ): void {
+      // If there is no body, set a new one
+      if (this._body === null) {
+        if (!this.createBody()) return;
+      }
+      const body = this._body!;
+
+      this._sharedData.bodyInterface.AddForce(
+        body.GetID(),
+        new Jolt.Vec3(forceX, forceY, forceZ),
+        new Jolt.RVec3(
+          positionX * this._sharedData.worldInvScale,
+          positionY * this._sharedData.worldInvScale,
+          positionZ * this._sharedData.worldInvScale
+        ),
+        Jolt.EActivation_Activate
+      );
+    }
+
+    applyForceAtCenter(forceX: float, forceY: float, forceZ: float): void {
+      // If there is no body, set a new one
+      if (this._body === null) {
+        if (!this.createBody()) return;
+      }
+      const body = this._body!;
+
+      this._sharedData.bodyInterface.AddForce(
+        body.GetID(),
+        new Jolt.Vec3(forceX, forceY, forceZ),
+        Jolt.EActivation_Activate
+      );
+    }
+
+    applyImpulse(
+      impulseX: float,
+      impulseY: float,
+      impulseZ: float,
+      positionX: float,
+      positionY: float,
+      positionZ: float
+    ): void {
+      // If there is no body, set a new one
+      if (this._body === null) {
+        if (!this.createBody()) return;
+      }
+      const body = this._body!;
+
+      this._sharedData.bodyInterface.AddImpulse(
+        body.GetID(),
+        new Jolt.Vec3(impulseX, impulseY, impulseZ),
+        new Jolt.RVec3(
+          positionX * this._sharedData.worldInvScale,
+          positionY * this._sharedData.worldInvScale,
+          positionZ * this._sharedData.worldInvScale
+        )
+      );
+    }
+
+    applyImpulseAtCenter(
+      impulseX: float,
+      impulseY: float,
+      impulseZ: float
+    ): void {
+      // If there is no body, set a new one
+      if (this._body === null) {
+        if (!this.createBody()) return;
+      }
+      const body = this._body!;
+
+      this._sharedData.bodyInterface.AddImpulse(
+        body.GetID(),
+        new Jolt.Vec3(impulseX, impulseY, impulseZ)
+      );
     }
   }
 

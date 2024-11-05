@@ -63,6 +63,8 @@ type Props = {|
   setCurrentView: GameDetailsTab => void,
   onBack: () => void,
   onGameUpdated: (game: Game) => void,
+  onUnregisterGame: (i18n: I18nType) => Promise<void>,
+  gameUnregisterErrorText: ?React.Node,
 |};
 
 const GameOverview = ({
@@ -72,6 +74,8 @@ const GameOverview = ({
   setCurrentView,
   onBack,
   onGameUpdated,
+  onUnregisterGame,
+  gameUnregisterErrorText,
 }: Props) => {
   const [
     gameDetailsDialogOpen,
@@ -534,6 +538,8 @@ const GameOverview = ({
               canBePublishedOnGdGames={canBePublishedOnGdGames}
               onGameUpdated={_onGameUpdated}
               onUpdatingGame={setIsUpdatingGame}
+              onUnregisterGame={() => onUnregisterGame(i18n)}
+              gameUnregisterErrorText={gameUnregisterErrorText}
             />
           )}
         </>

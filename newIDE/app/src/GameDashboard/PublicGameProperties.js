@@ -292,6 +292,7 @@ export function PublicGameProperties({
                       setIsPublishedOnGdGames(newValue)
                     }
                     label={i18n._(t`Publish game on gd.games`)}
+                    disabled={!canBePublishedOnGdGames}
                   />
                 </Column>
               </Line>

@@ -1,8 +1,8 @@
 // @flow
+import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 
-import React from 'react';
 import { PublicGameProperties, cleanUpGameSlug } from './PublicGameProperties';
 import {
   displayProjectErrorsBox,
@@ -17,6 +17,9 @@ import {
   getGameMainImageUrl,
 } from '../Utils/GDevelopServices/Game';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import CircledClose from '../UI/CustomSvgIcons/CircledClose';
+import { Column, Line } from '../UI/Grid';
+import AlertMessage from '../UI/AlertMessage';
 
 /**
  * Changes that are not stored in the Project.
@@ -96,6 +99,8 @@ type Props = {|
   onUpdatingGame?: (isGameUpdating: boolean) => void,
   onGameUpdated?: (game: Game) => void,
   canBePublishedOnGdGames: boolean,
+  onUnregisterGame: () => Promise<void>,
+  gameUnregisterErrorText: ?React.Node,
 |};
 
 export const PublicGamePropertiesDialog = ({
@@ -107,6 +112,8 @@ export const PublicGamePropertiesDialog = ({
   onUpdatingGame,
   onGameUpdated,
   canBePublishedOnGdGames,
+  onUnregisterGame,
+  gameUnregisterErrorText,
 }: Props) => {
   const { profile } = React.useContext(AuthenticatedUserContext);
 
@@ -242,6 +249,19 @@ export const PublicGamePropertiesDialog = ({
         disabled={isLoading}
         canBePublishedOnGdGames={canBePublishedOnGdGames}
       />
+      {gameUnregisterErrorText && (
+        <Column justifyContent="stretch" expand noMargin>
+          <AlertMessage kind="error">{gameUnregisterErrorText}</AlertMessage>
+        </Column>
+      )}
+      <Line>
+        <FlatButton
+          primary
+          onClick={onUnregisterGame}
+          label={<Trans>Unregister game</Trans>}
+          leftIcon={<CircledClose fontSize="small" />}
+        />
+      </Line>
     </Dialog>
   );
 };

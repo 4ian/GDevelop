@@ -1,12 +1,14 @@
 // @flow
 import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
+import { I18n as I18nType } from '@lingui/core';
 
 import SectionContainer, { SectionRow } from '../SectionContainer';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import GamesList from '../../../../GameDashboard/GamesList';
 import {
+  deleteGame,
   registerGame,
   type Game,
 } from '../../../../Utils/GDevelopServices/Game';
@@ -72,6 +74,10 @@ const ManageSection = ({
   } = authenticatedUser;
   const { showAlert, showConfirmation } = useAlertDialog();
   const [isRegisteringGame, setIsRegisteringGame] = React.useState(false);
+  const [
+    gameUnregisterErrorText,
+    setGameUnregisterErrorText,
+  ] = React.useState<?React.Node>(null);
   const { routeArguments, removeRouteArguments } = React.useContext(
     RouterContext
   );
@@ -132,6 +138,34 @@ const ManageSection = ({
       }
     },
     [getAuthorizationHeader, profile, project, showAlert, onRefreshGames]
+  );
+
+  const unregisterGame = React.useCallback(
+    async (i18n: I18nType) => {
+      if (!profile || !openedGame) return;
+      const { id } = profile;
+      setGameUnregisterErrorText(null);
+      try {
+        await deleteGame(getAuthorizationHeader, id, openedGame.id);
+      } catch (error) {
+        console.error('Unable to delete the game:', error);
+        const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+          error
+        );
+        if (
+          extractedStatusAndCode &&
+          extractedStatusAndCode.code === 'game-deletion/leaderboards-exist'
+        ) {
+          setGameUnregisterErrorText(
+            i18n._(
+              t`You cannot unregister a game that has active leaderboards. To delete them, go in the Leaderboards tab, and delete them one by one.`
+            )
+          );
+        }
+      }
+      onRefreshGames();
+    },
+    [openedGame, profile, getAuthorizationHeader, onRefreshGames]
   );
 
   React.useEffect(
@@ -207,6 +241,8 @@ const ManageSection = ({
           analyticsSource="homepage"
           onBack={onBack}
           onGameUpdated={onGameUpdated}
+          onUnregisterGame={unregisterGame}
+          gameUnregisterErrorText={gameUnregisterErrorText}
         />
       </SectionContainer>
     );

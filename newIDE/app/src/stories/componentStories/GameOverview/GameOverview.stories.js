@@ -160,6 +160,10 @@ export const Default = ({
   exports: 'None' | 'Some ongoing' | 'All complete',
 |}) => {
   const [game, setGame] = React.useState<Game>(game1);
+  const [
+    gameUnregisterErrorText,
+    setGameUnregisterErrorText,
+  ] = React.useState<?string>(null);
   const [tab, setTab] = React.useState<GameDetailsTab>('details');
   const [renderCount, setRenderCount] = React.useState<number>(0);
   const feedbacksToDisplay =
@@ -311,6 +315,14 @@ export const Default = ({
         setCurrentView={setTab}
         onBack={() => action('Back')}
         onGameUpdated={() => action('onGameUpdated')}
+        onUnregisterGame={async () =>
+          setGameUnregisterErrorText(
+            gameUnregisterErrorText
+              ? null
+              : 'You cannot unregister a game in a story'
+          )
+        }
+        gameUnregisterErrorText={gameUnregisterErrorText}
       />
     </AuthenticatedUserContext.Provider>
   );

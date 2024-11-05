@@ -282,11 +282,37 @@ namespace gdjs {
       super.updateFromNetworkSyncData(networkSyncData);
     }
 
-    onDeActivate() {}
+    onDeActivate() {
+      this._sharedData.removeFromBehaviorsList(this);
+      if (this._body !== null) {
+        // TODO
+        // // When a body is deleted, Box2D removes automatically its joints, leaving an invalid pointer in our joints list
+        // this._sharedData.clearBodyJoints(this._body);
 
-    onActivate() {}
+        this._sharedData.bodyInterface.RemoveBody(this._body.GetID());
+        this._sharedData.bodyInterface.DestroyBody(this._body.GetID());
+        this._body = null;
+      }
+      // TODO
+      // this.contactsEndedThisFrame.length = 0;
+      // this.contactsStartedThisFrame.length = 0;
+      // this.currentContacts.length = 0;
+    }
 
-    onDestroy() {}
+    onActivate() {
+      this._sharedData.addToBehaviorsList(this);
+
+      // TODO
+      // this.contactsEndedThisFrame.length = 0;
+      // this.contactsStartedThisFrame.length = 0;
+      // this.currentContacts.length = 0;
+      this.updateBodyFromObject();
+    }
+
+    onDestroy() {
+      this.destroyedDuringFrameLogic = true;
+      this.onDeActivate();
+    }
 
     createShape(): Jolt.Shape {
       const width = this.owner3D.getWidth() * this._sharedData.worldInvScale;
@@ -327,7 +353,6 @@ namespace gdjs {
         )
           .Create()
           .Get();
-        // TODO shape.SetDensity(this.density);
         return rotatedShape;
       } else {
         // if (this.shape === 'Sphere')
@@ -349,6 +374,7 @@ namespace gdjs {
       const body = this._body!;
 
       const bodyInterface = this._sharedData.bodyInterface;
+      bodyInterface.GetShape(body.GetID());
       bodyInterface.SetShape(
         body.GetID(),
         this.createShape(),

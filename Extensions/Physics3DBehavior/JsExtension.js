@@ -434,6 +434,17 @@ module.exports = {
     const sharedData = extension
       .getBehaviorMetadata('Physics3D::Physics3DBehavior')
       .getSharedDataInstance();
-    return [];
+    return [
+      gd.ProjectHelper.sanityCheckBehaviorProperty(
+        dummyBehavior,
+        'density',
+        '123'
+      ),
+      gd.ProjectHelper.sanityCheckBehaviorsSharedDataProperty(
+        sharedData,
+        'gravityY',
+        '456'
+      ),
+    ];
   },
 };

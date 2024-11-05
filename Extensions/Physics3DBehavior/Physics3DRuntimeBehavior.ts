@@ -201,12 +201,20 @@ namespace gdjs {
 
     bodyType: string;
     shape: string;
+    fixedRotation: boolean;
+    shapeDimensionA: any;
+    shapeDimensionB: any;
+    shapeDimensionC: any;
+    shapeOffsetX: float;
+    shapeOffsetY: float;
+    shapeOffsetZ: float;
     density: float;
     friction: float;
     restitution: float;
     linearDamping: float;
     angularDamping: float;
     gravityScale: float;
+    shapeScale: number = 1;
 
     destroyedDuringFrameLogic: boolean;
     _body: Jolt.Body | null = null;
@@ -240,7 +248,14 @@ namespace gdjs {
       super(instanceContainer, behaviorData, owner);
       this.owner3D = owner;
       this.bodyType = behaviorData.bodyType;
+      this.fixedRotation = behaviorData.fixedRotation;
       this.shape = behaviorData.shape;
+      this.shapeDimensionA = behaviorData.shapeDimensionA;
+      this.shapeDimensionB = behaviorData.shapeDimensionB;
+      this.shapeDimensionC = behaviorData.shapeDimensionC;
+      this.shapeOffsetX = behaviorData.shapeOffsetX;
+      this.shapeOffsetY = behaviorData.shapeOffsetY;
+      this.shapeOffsetZ = behaviorData.shapeOffsetZ;
       this.density = behaviorData.density;
       this.friction = behaviorData.friction;
       this.restitution = behaviorData.restitution;
@@ -319,51 +334,86 @@ namespace gdjs {
       const height = this.owner3D.getHeight() * this._sharedData.worldInvScale;
       const depth = this.owner3D.getDepth() * this._sharedData.worldInvScale;
 
+      const shapeScale = this.shapeScale * this._sharedData.worldInvScale;
+
+      const shapeOffsetX = this.shapeOffsetX * shapeScale;
+      const shapeOffsetY = this.shapeOffsetY * shapeScale;
+      const shapeOffsetZ = this.shapeOffsetZ * shapeScale;
+
+      const shapeDimensionA = this.shapeDimensionA * shapeScale;
+      const shapeDimensionB = this.shapeDimensionB * shapeScale;
+      const shapeDimensionC = this.shapeDimensionC * shapeScale;
+
+      const onePixel = this._sharedData.worldInvScale;
+
       // TODO Handle other shape types.
+      let shapeSettings: Jolt.ConvexShapeSettings;
+      /** This is fine only because no other Quat is used locally. */
+      let quat: Jolt.Quat;
       if (this.shape === 'Box') {
-        const shape = new Jolt.BoxShape(
-          this.getVec3(width / 2, height / 2, depth / 2),
-          1 * this._sharedData.worldInvScale,
-          undefined
+        const boxWidth =
+          shapeDimensionA > 0 ? shapeDimensionA : width > 0 ? width : onePixel;
+        const boxHeight =
+          shapeDimensionB > 0
+            ? shapeDimensionB
+            : height > 0
+            ? height
+            : onePixel;
+        const boxDepth =
+          shapeDimensionC > 0 ? shapeDimensionC : depth > 0 ? depth : onePixel;
+
+        shapeSettings = new Jolt.BoxShapeSettings(
+          this.getVec3(boxWidth / 2, boxHeight / 2, boxDepth / 2)
         );
-        shape.SetDensity(this.density);
-        return shape;
+        quat = this.getQuat(0, 0, 0, 1);
       } else if (this.shape === 'Capsule') {
-        const radius = Math.sqrt(((width / 2) * height) / 2);
-        const shapeSettings = new Jolt.CapsuleShapeSettings(depth / 2, radius);
-        shapeSettings.mDensity = this.density;
-        const rotatedShape = new Jolt.RotatedTranslatedShapeSettings(
-          this.getVec3(0, 0, 0),
-          // Top on Z axis.
-          this.getQuat(-Math.sqrt(2) / 2, 0, 0, Math.sqrt(2) / 2),
-          shapeSettings
-        )
-          .Create()
-          .Get();
-        return rotatedShape;
+        const radius =
+          shapeDimensionA > 0
+            ? shapeDimensionA
+            : width > 0
+            ? Math.sqrt(((width / 2) * height) / 2)
+            : onePixel;
+        const capsuleDepth =
+          shapeDimensionB > 0 ? shapeDimensionB : depth > 0 ? depth : onePixel;
+        shapeSettings = new Jolt.CapsuleShapeSettings(capsuleDepth / 2, radius);
+        // Top on Z axis.
+        quat = this.getQuat(-Math.sqrt(2) / 2, 0, 0, Math.sqrt(2) / 2);
       } else if (this.shape === 'Cylinder') {
-        const radius = Math.sqrt(((width / 2) * height) / 2);
-        const shapeSettings = new Jolt.CylinderShapeSettings(depth / 2, radius);
-        shapeSettings.mDensity = this.density;
-        const rotatedShape = new Jolt.RotatedTranslatedShapeSettings(
-          this.getVec3(0, 0, 0),
-          // Top on Z axis.
-          this.getQuat(-Math.sqrt(2) / 2, 0, 0, Math.sqrt(2) / 2),
-          shapeSettings
-        )
-          .Create()
-          .Get();
-        return rotatedShape;
-      } else {
-        // if (this.shape === 'Sphere')
-        const radius = Math.pow(
-          ((((width / 2) * height) / 2) * depth) / 2,
-          1 / 3
+        const radius =
+          shapeDimensionA > 0
+            ? shapeDimensionA
+            : width > 0
+            ? Math.sqrt(((width / 2) * height) / 2)
+            : onePixel;
+        const cylinderDepth =
+          shapeDimensionB > 0 ? shapeDimensionB : depth > 0 ? depth : onePixel;
+        shapeSettings = new Jolt.CylinderShapeSettings(
+          cylinderDepth / 2,
+          radius
         );
-        const shape = new Jolt.SphereShape(radius, undefined);
-        shape.SetDensity(this.density);
-        return shape;
+        // Top on Z axis.
+        quat = this.getQuat(-Math.sqrt(2) / 2, 0, 0, Math.sqrt(2) / 2);
+      } else {
+        // Create a 'Sphere' by default.
+        const radius =
+          shapeDimensionA > 0
+            ? shapeDimensionA
+            : width > 0
+            ? Math.pow(((((width / 2) * height) / 2) * depth) / 2, 1 / 3)
+            : onePixel;
+        shapeSettings = new Jolt.SphereShapeSettings(radius);
+        quat = this.getQuat(0, 0, 0, 1);
       }
+      shapeSettings.mDensity = this.density;
+      const rotatedShape = new Jolt.RotatedTranslatedShapeSettings(
+        this.getVec3(shapeOffsetX, shapeOffsetY, shapeOffsetZ),
+        // Top on Z axis.
+        quat,
+        shapeSettings
+      )
+        .Create()
+        .Get();
+      return rotatedShape;
     }
 
     recreateShape(): void {
@@ -430,6 +480,11 @@ namespace gdjs {
           : Jolt.EMotionType_Dynamic,
         LAYER_MOVING
       );
+      bodyCreationSettings.mAllowedDOFs = this.fixedRotation
+        ? Jolt.EAllowedDOFs_TranslationX |
+          Jolt.EAllowedDOFs_TranslationY |
+          Jolt.EAllowedDOFs_TranslationZ
+        : Jolt.EAllowedDOFs_All;
       bodyCreationSettings.mFriction = this.friction;
       bodyCreationSettings.mRestitution = this.restitution;
       bodyCreationSettings.mLinearDamping = this.linearDamping;
@@ -529,9 +584,9 @@ namespace gdjs {
       // The height has changed, the shape is not an edge (edges doesn't have height),
       // it isn't a box with custom height or a circle with custom radius
       if (
-        this._objectOldWidth !== this.owner3D.getScaleX() ||
-        this._objectOldHeight !== this.owner3D.getScaleY() ||
-        this._objectOldDepth !== this.owner3D.getScaleZ()
+        this._objectOldWidth !== this.owner3D.getWidth() ||
+        this._objectOldHeight !== this.owner3D.getHeight() ||
+        this._objectOldDepth !== this.owner3D.getDepth()
       ) {
         this.recreateShape();
       }

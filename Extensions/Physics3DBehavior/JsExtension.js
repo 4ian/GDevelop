@@ -43,8 +43,69 @@ module.exports = {
         return true;
       }
 
+      if (propertyName === 'fixedRotation') {
+        behaviorContent
+          .getChild('fixedRotation')
+          .setBoolValue(newValue === '1');
+        return true;
+      }
+
       if (propertyName === 'shape') {
         behaviorContent.getChild('shape').setStringValue(newValue);
+        return true;
+      }
+
+      if (propertyName === 'shapeDimensionA') {
+        const newValueAsNumber = parseFloat(newValue);
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        behaviorContent
+          .getChild('shapeDimensionA')
+          .setDoubleValue(newValueAsNumber);
+        return true;
+      }
+
+      if (propertyName === 'shapeDimensionB') {
+        const newValueAsNumber = parseFloat(newValue);
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        behaviorContent
+          .getChild('shapeDimensionB')
+          .setDoubleValue(newValueAsNumber);
+        return true;
+      }
+
+      if (propertyName === 'shapeDimensionC') {
+        const newValueAsNumber = parseFloat(newValue);
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        behaviorContent
+          .getChild('shapeDimensionC')
+          .setDoubleValue(newValueAsNumber);
+        return true;
+      }
+
+      if (propertyName === 'shapeOffsetX') {
+        const newValueAsNumber = parseFloat(newValue);
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        behaviorContent
+          .getChild('shapeOffsetX')
+          .setDoubleValue(newValueAsNumber);
+        return true;
+      }
+
+      if (propertyName === 'shapeOffsetY') {
+        const newValueAsNumber = parseFloat(newValue);
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        behaviorContent
+          .getChild('shapeOffsetY')
+          .setDoubleValue(newValueAsNumber);
+        return true;
+      }
+
+      if (propertyName === 'shapeOffsetZ') {
+        const newValueAsNumber = parseFloat(newValue);
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        behaviorContent
+          .getChild('shapeOffsetZ')
+          .setDoubleValue(newValueAsNumber);
         return true;
       }
 
@@ -128,6 +189,105 @@ module.exports = {
         .addExtraInfo('Capsule')
         .addExtraInfo('Cylinder');
       behaviorProperties
+        .getOrCreate('fixedRotation')
+        .setValue(
+          behaviorContent.getChild('fixedRotation').getBoolValue()
+            ? 'true'
+            : 'false'
+        )
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+        .setType('Boolean')
+        .setLabel('Fixed Rotation')
+        .setDescription(
+          _(
+            "If enabled, the object won't rotate and will stay at the same angle. Useful for characters for example."
+          )
+        )
+        .setGroup(_('Movement'));
+      behaviorProperties
+        .getOrCreate('shapeDimensionA')
+        .setValue(
+          behaviorContent
+            .getChild('shapeDimensionA')
+            .getDoubleValue()
+            .toString(10)
+        )
+        .setType('Number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setLabel('Shape Dimension A')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+        .setHidden(true); // Hidden as required to be changed in the full editor.
+      behaviorProperties
+        .getOrCreate('shapeDimensionB')
+        .setValue(
+          behaviorContent
+            .getChild('shapeDimensionB')
+            .getDoubleValue()
+            .toString(10)
+        )
+        .setType('Number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setLabel('Shape Dimension B')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+        .setHidden(true); // Hidden as required to be changed in the full editor.
+      behaviorProperties
+        .getOrCreate('shapeDimensionC')
+        .setValue(
+          behaviorContent
+            .getChild('shapeDimensionC')
+            .getDoubleValue()
+            .toString(10)
+        )
+        .setType('Number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setLabel('Shape Dimension C')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+        .setHidden(true); // Hidden as required to be changed in the full editor.
+      behaviorProperties
+        .getOrCreate('shapeOffsetX')
+        .setValue(
+          behaviorContent.getChild('shapeOffsetX').getDoubleValue().toString(10)
+        )
+        .setType('Number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setLabel('Shape Offset X')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+        .setHidden(true); // Hidden as required to be changed in the full editor.
+      behaviorProperties
+        .getOrCreate('shapeOffsetY')
+        .setValue(
+          behaviorContent.getChild('shapeOffsetY').getDoubleValue().toString(10)
+        )
+        .setType('Number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setLabel('Shape Offset Y')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+        .setHidden(true); // Hidden as required to be changed in the full editor.
+      behaviorProperties
+        .getOrCreate('shapeOffsetZ')
+        .setValue(
+          behaviorContent.getChild('shapeOffsetZ').getDoubleValue().toString(10)
+        )
+        .setType('Number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setLabel('Shape Offset Z')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+        .setHidden(true); // Hidden as required to be changed in the full editor.
+      behaviorProperties
+        .getOrCreate('polygonOrigin')
+        .setValue(
+          behaviorContent.hasChild('polygonOrigin')
+            ? behaviorContent.getChild('polygonOrigin').getStringValue()
+            : 'Center'
+        )
+        .setType('Choice')
+        .setLabel('Polygon Origin')
+        .addExtraInfo('Center')
+        .addExtraInfo('Origin')
+        .addExtraInfo('TopLeft')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+        .setHidden(true); // Hidden as required to be changed in the full editor.
+      behaviorProperties
         .getOrCreate('density')
         .setValue(
           behaviorContent.getChild('density').getDoubleValue().toString(10)
@@ -203,7 +363,14 @@ module.exports = {
 
     behavior.initializeContent = function (behaviorContent) {
       behaviorContent.addChild('bodyType').setStringValue('Dynamic');
+      behaviorContent.addChild('fixedRotation').setBoolValue(false);
       behaviorContent.addChild('shape').setStringValue('Sphere');
+      behaviorContent.addChild('shapeDimensionA').setDoubleValue(0);
+      behaviorContent.addChild('shapeDimensionB').setDoubleValue(0);
+      behaviorContent.addChild('shapeDimensionC').setDoubleValue(0);
+      behaviorContent.addChild('shapeOffsetX').setDoubleValue(0);
+      behaviorContent.addChild('shapeOffsetY').setDoubleValue(0);
+      behaviorContent.addChild('shapeOffsetZ').setDoubleValue(0);
       behaviorContent.addChild('density').setDoubleValue(1.0);
       behaviorContent.addChild('friction').setDoubleValue(0.3);
       behaviorContent.addChild('restitution').setDoubleValue(0.1);

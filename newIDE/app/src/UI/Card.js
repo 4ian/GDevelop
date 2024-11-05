@@ -52,8 +52,9 @@ const Card = ({
             : gdevelopTheme.paper.backgroundColor.medium,
         ...(isHighlighted
           ? {
-              borderLeftWidth: 4,
-              borderLeftColor: gdevelopTheme.palette.secondary,
+              borderWidth: '0 0 0 4px',
+              borderStyle: 'solid',
+              borderLeftColor: gdevelopTheme.message.valid,
             }
           : {}),
       }}

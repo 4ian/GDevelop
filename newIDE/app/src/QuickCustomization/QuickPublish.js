@@ -36,8 +36,6 @@ import {
 import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
 import ArrowLeft from '../UI/CustomSvgIcons/ArrowLeft';
 
-const styles = { imageContainer: { maxWidth: 400 } };
-
 type Props = {|
   project: gdProject,
   gameAndBuildsManager: GameAndBuildsManager,
@@ -190,16 +188,14 @@ export const QuickPublish = ({
       justifyContent="space-between"
     >
       <ColumnStackLayout alignItems="center">
-        <div style={styles.imageContainer}>
-          <GameImage
-            project={project}
-            previewScreenshotUrls={gameScreenshotUrls}
-            game={game}
-            onLaunchPreview={onLaunchPreview}
-            // Prevent the user from launching the preview while or after exporting
-            disabled={exportState !== ''}
-          />
-        </div>
+        <GameImage
+          project={project}
+          previewScreenshotUrls={gameScreenshotUrls}
+          game={game}
+          onLaunchPreview={onLaunchPreview}
+          // Prevent the user from launching the preview while or after exporting
+          disabled={exportState !== ''}
+        />
         <Spacer />
         {profile ? (
           isLoadingCloudProjects ? (

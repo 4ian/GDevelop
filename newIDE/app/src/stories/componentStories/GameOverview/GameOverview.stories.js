@@ -40,6 +40,7 @@ import {
   mockedLeaderboards,
   mockedEntries,
 } from '../../MockLeaderboardProvider';
+import { MarketingPlansStoreStateProvider } from '../../../MarketingPlans/MarketingPlansStoreContext';
 
 export default {
   title: 'GameDashboard/GameOverview',
@@ -307,23 +308,25 @@ export const Default = ({
         userEarningsBalance: userEarningsBalanceToDisplay,
       }}
     >
-      <GameOverview
-        game={game}
-        analyticsSource="homepage"
-        key={renderCount.toFixed(0)}
-        currentView={tab}
-        setCurrentView={setTab}
-        onBack={() => action('Back')}
-        onGameUpdated={() => action('onGameUpdated')}
-        onUnregisterGame={async () =>
-          setGameUnregisterErrorText(
-            gameUnregisterErrorText
-              ? null
-              : 'You cannot unregister a game in a story'
-          )
-        }
-        gameUnregisterErrorText={gameUnregisterErrorText}
-      />
+      <MarketingPlansStoreStateProvider>
+        <GameOverview
+          game={game}
+          analyticsSource="homepage"
+          key={renderCount.toFixed(0)}
+          currentView={tab}
+          setCurrentView={setTab}
+          onBack={() => action('Back')}
+          onGameUpdated={() => action('onGameUpdated')}
+          onUnregisterGame={async () =>
+            setGameUnregisterErrorText(
+              gameUnregisterErrorText
+                ? null
+                : 'You cannot unregister a game in a story'
+            )
+          }
+          gameUnregisterErrorText={gameUnregisterErrorText}
+        />
+      </MarketingPlansStoreStateProvider>
     </AuthenticatedUserContext.Provider>
   );
 };

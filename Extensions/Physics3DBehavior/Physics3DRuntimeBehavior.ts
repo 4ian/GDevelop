@@ -224,9 +224,9 @@ namespace gdjs {
     _objectOldRotationX: float = 0;
     _objectOldRotationY: float = 0;
     _objectOldRotationZ: float = 0;
-    _objectOldWidth: float = 0;
-    _objectOldHeight: float = 0;
-    _objectOldDepth: float = 0;
+    _objectOldScaleX: float = 0;
+    _objectOldScaleY: float = 0;
+    _objectOldScaleZ: float = 0;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -281,6 +281,28 @@ namespace gdjs {
 
     onDestroy() {}
 
+    recreateShape(): void {
+      // If there is no body, set a new one
+      if (this._body === null) {
+        if (!this.createBody()) return;
+      }
+      const body = this._body!;
+
+      // TODO Adapt the scale according to the shape type and factorize.
+      body
+        .GetShape()
+        .ScaleShape(
+          this.getVec3(
+            this.owner3D.getScaleX(),
+            this.owner3D.getScaleY(),
+            this.owner3D.getScaleZ()
+          )
+        );
+      this._objectOldScaleX = this.owner3D.getScaleX();
+      this._objectOldScaleY = this.owner3D.getScaleY();
+      this._objectOldScaleZ = this.owner3D.getScaleZ();
+    }
+
     getBody(): Jolt.Body {
       // If there is no body, set a new one
       if (this._body === null) {
@@ -292,18 +314,30 @@ namespace gdjs {
     createBody(): boolean {
       if (!this.activated() || this.destroyedDuringFrameLogic) return false;
 
-      const x =
-        (this.owner3D.getDrawableX() + this.owner3D.getWidth() / 2) *
-        this._sharedData.worldInvScale;
-      const y =
-        (this.owner3D.getDrawableY() + this.owner3D.getHeight() / 2) *
-        this._sharedData.worldInvScale;
-      const z =
-        (this.owner3D.getDrawableZ() + this.owner3D.getDepth() / 2) *
-        this._sharedData.worldInvScale;
+      const width = this.owner3D.getWidth() * this._sharedData.worldInvScale;
+      const height = this.owner3D.getHeight() * this._sharedData.worldInvScale;
+      const depth = this.owner3D.getDepth() * this._sharedData.worldInvScale;
 
-      // TODO
-      const shape = new Jolt.BoxShape(this.getVec3(32, 32, 32), 0.5, undefined);
+      const x =
+        this.owner3D.getDrawableX() * this._sharedData.worldInvScale +
+        width / 2;
+      const y =
+        this.owner3D.getDrawableY() * this._sharedData.worldInvScale +
+        height / 2;
+      const z =
+        this.owner3D.getDrawableZ() * this._sharedData.worldInvScale +
+        depth / 2;
+
+      // TODO Handle other shape types.
+      const shape = new Jolt.BoxShape(
+        this.getVec3(
+          width / 2 / this.owner3D.getScaleX(),
+          height / 2 / this.owner3D.getScaleY(),
+          depth / 2 / this.owner3D.getScaleZ()
+        ),
+        1 * this._sharedData.worldInvScale,
+        undefined
+      );
       const threeObject = this.owner3D.get3DRendererObject();
       const bodyCreationSettings = new Jolt.BodyCreationSettings(
         shape,
@@ -325,8 +359,22 @@ namespace gdjs {
 
       const bodyInterface = this._sharedData.bodyInterface;
       this._body = bodyInterface.CreateBody(bodyCreationSettings);
-      bodyInterface.AddBody(this._body.GetID(), Jolt.EActivation_Activate);
 
+      // TODO Adapt the scale according to the shape type and factorize.
+      this._body
+        .GetShape()
+        .ScaleShape(
+          this.getVec3(
+            this.owner3D.getScaleX(),
+            this.owner3D.getScaleY(),
+            this.owner3D.getScaleZ()
+          )
+        );
+      this._objectOldScaleX = this.owner3D.getScaleX();
+      this._objectOldScaleY = this.owner3D.getScaleY();
+      this._objectOldScaleZ = this.owner3D.getScaleZ();
+
+      bodyInterface.AddBody(this._body.GetID(), Jolt.EActivation_Activate);
       return true;
     }
 
@@ -407,6 +455,18 @@ namespace gdjs {
         if (!this.createBody()) return;
       }
       const body = this._body!;
+
+      // The object size has changed, recreate the shape.
+      // The width has changed and there is no custom dimension A (box: width, circle: radius, edge: length) or
+      // The height has changed, the shape is not an edge (edges doesn't have height),
+      // it isn't a box with custom height or a circle with custom radius
+      if (
+        this._objectOldScaleX !== this.owner3D.getScaleX() ||
+        this._objectOldScaleY !== this.owner3D.getScaleY() ||
+        this._objectOldScaleZ !== this.owner3D.getScaleZ()
+      ) {
+        this.recreateShape();
+      }
 
       // The object object transform has changed, update body transform:
       if (

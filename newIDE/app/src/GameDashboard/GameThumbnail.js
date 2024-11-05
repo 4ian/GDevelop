@@ -21,20 +21,29 @@ const styles = {
     display: 'block',
     objectFit: 'scale-down', // Match gd.games format.
   },
+  thumbnailContainer: {
+    height: 153,
+    width: 272,
+    overflow: 'hidden', // Keep the radius effect.
+  },
+  mobileThumbnailContainer: {
+    height: 84,
+    width: 150,
+    overflow: 'hidden', // Keep the radius effect.
+  },
   thumbnail: {
     aspectRatio: '16 / 9',
     width: 272,
-    overflow: 'hidden', // Keep the radius effect.
   },
   mobileThumbnail: {
     aspectRatio: '16 / 9',
     width: 150,
-    overflow: 'hidden', // Keep the radius effect.
   },
   fullWidth: {
     width: '100%',
+    aspectRatio: '16 / 9',
     height: 'auto',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   fullWidthThumbnail: {
     width: '85%',
@@ -165,8 +174,8 @@ export const GameThumbnail = ({
           ...(isMobile
             ? fullWidthOnMobile
               ? styles.fullWidth
-              : styles.mobileThumbnail
-            : styles.thumbnail),
+              : styles.mobileThumbnailContainer
+            : styles.thumbnailContainer),
           whiteSpace: 'normal',
           display: 'flex',
         }}

@@ -172,7 +172,7 @@ export function PublicGameProperties({
           <ResponsiveLineStackLayout noMargin>
             {displayThumbnail && (
               <>
-                <Column noMargin alignItems="center">
+                <Column noMargin alignItems="stretch">
                   <GameThumbnail
                     gameName={name}
                     thumbnailUrl={thumbnailUrl}

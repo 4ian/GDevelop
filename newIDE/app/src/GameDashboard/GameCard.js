@@ -28,6 +28,7 @@ import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
 import DollarCoin from '../UI/CustomSvgIcons/DollarCoin';
 import Cross from '../UI/CustomSvgIcons/Cross';
 import Messages from '../UI/CustomSvgIcons/Messages';
+import GameLinkAndShareIcons from '../GameOverview/GameLinkAndShareIcons';
 
 const styles = {
   iconAndText: { display: 'flex', gap: 2, alignItems: 'flex-start' },
@@ -133,6 +134,9 @@ export const GameCard = ({ game, isCurrentGame, onOpenGameManager }: Props) => {
     </LineStackLayout>
   );
 
+  const renderShareUrl = (i18n: I18nType) =>
+    gameUrl ? <GameLinkAndShareIcons url={gameUrl} display="line" /> : null;
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -149,12 +153,17 @@ export const GameCard = ({ game, isCurrentGame, onOpenGameManager }: Props) => {
                 {renderThumbnail()}
                 {renderPublicInfo()}
               </LineStackLayout>
+              {renderShareUrl(i18n)}
               {renderButtons()}
             </ColumnStackLayout>
           ) : (
             <LineStackLayout noMargin>
               {renderThumbnail()}
-              <ColumnStackLayout expand justifyContent="space-between">
+              <ColumnStackLayout
+                expand
+                justifyContent="space-between"
+                noOverflowParent
+              >
                 <LineStackLayout
                   noMargin
                   justifyContent="space-between"
@@ -164,6 +173,7 @@ export const GameCard = ({ game, isCurrentGame, onOpenGameManager }: Props) => {
                   {renderButtons()}
                 </LineStackLayout>
                 {renderPublicInfo()}
+                {renderShareUrl(i18n)}
               </ColumnStackLayout>
             </LineStackLayout>
           )}

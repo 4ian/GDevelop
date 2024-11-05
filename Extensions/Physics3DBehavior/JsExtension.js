@@ -43,6 +43,13 @@ module.exports = {
         return true;
       }
 
+      if (propertyName === 'density') {
+        behaviorContent
+          .getChild('density')
+          .setDoubleValue(parseFloat(newValue));
+        return true;
+      }
+
       if (propertyName === 'friction') {
         const newValueAsNumber = parseFloat(newValue);
         if (newValueAsNumber !== newValueAsNumber) return false;
@@ -105,7 +112,18 @@ module.exports = {
             "A static object won't move (perfect for obstacles). Dynamic objects can move. Kinematic will move according to forces applied to it only (useful for characters or specific mechanisms)."
           )
         );
-
+        behaviorProperties
+        .getOrCreate('density')
+        .setValue(
+          behaviorContent.getChild('density').getDoubleValue().toString(10)
+        )
+        .setType('Number')
+        .setLabel(_('Density'))
+        .setDescription(
+          _(
+            'Define the weight of the object, according to its size. The bigger the density, the heavier the object.'
+          )
+        );
       behaviorProperties
         .getOrCreate('friction')
         .setValue(
@@ -170,6 +188,7 @@ module.exports = {
 
     behavior.initializeContent = function (behaviorContent) {
       behaviorContent.addChild('bodyType').setStringValue('Dynamic');
+      behaviorContent.addChild('density').setDoubleValue(1.0);
       behaviorContent.addChild('friction').setDoubleValue(0.3);
       behaviorContent.addChild('restitution').setDoubleValue(0.1);
       behaviorContent.addChild('linearDamping').setDoubleValue(0.1);

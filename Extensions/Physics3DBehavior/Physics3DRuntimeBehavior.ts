@@ -200,6 +200,7 @@ namespace gdjs {
     owner3D: gdjs.RuntimeObject3D;
 
     bodyType: string;
+    density: float;
     friction: float;
     restitution: float;
     linearDamping: float;
@@ -238,6 +239,7 @@ namespace gdjs {
       super(instanceContainer, behaviorData, owner);
       this.owner3D = owner;
       this.bodyType = behaviorData.bodyType;
+      this.density = behaviorData.density;
       this.friction = behaviorData.friction;
       this.restitution = behaviorData.restitution;
       this.linearDamping = Math.max(0, behaviorData.linearDamping);
@@ -295,6 +297,7 @@ namespace gdjs {
         1 * this._sharedData.worldInvScale,
         undefined
       );
+      shape.SetDensity(this.density);
 
       return shape;
     }

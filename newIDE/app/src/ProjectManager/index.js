@@ -27,7 +27,6 @@ import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import { GameDetailsDialog } from '../GameDashboard/GameDetailsDialog';
 
 import { AutoSizer } from 'react-virtualized';
 import Background from '../UI/Background';
@@ -76,6 +75,7 @@ import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { type GDevelopTheme } from '../UI/Theme';
 import { ExtensionStoreContext } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
+import RouterContext from '../MainFrame/RouterContext';
 
 export const getProjectManagerItemId = (identifier: string) =>
   `project-manager-tab-${identifier}`;
@@ -415,6 +415,8 @@ type Props = {|
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
   onInstallExtension: ExtensionShortHeader => void,
   onShareProject: () => void,
+  onOpenHomePage: () => void,
+  toggleProjectManager: () => void,
 
   // For resources:
   resourceManagementProps: ResourceManagementProps,
@@ -450,6 +452,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       onShareProject,
       resourceManagementProps,
       gamesList,
+      onOpenHomePage,
+      toggleProjectManager,
     },
     ref
   ) => {
@@ -467,7 +471,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     const forceUpdate = useForceUpdate();
     const { isMobile } = useResponsiveWindowSize();
     const { showDeleteConfirmation } = useAlertDialog();
-    const { games, fetchGames, onGameUpdated } = gamesList;
+    const { fetchGames } = gamesList;
+    const { navigateToRoute } = React.useContext(RouterContext);
 
     const forceUpdateList = React.useCallback(
       () => {
@@ -517,10 +522,6 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       [triggerUnsavedChanges, onChangeProjectName]
     );
 
-    const [openGameDetails, setOpenGameDetails] = React.useState<boolean>(
-      false
-    );
-    const projectUuid = project.getProjectUuid();
     const { profile } = React.useContext(AuthenticatedUserContext);
     const userId = profile ? profile.id : null;
     React.useEffect(
@@ -529,17 +530,24 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       },
       [fetchGames, userId]
     );
-    const gameMatchingProjectUuid = games
-      ? games.find(game => game.id === projectUuid)
-      : null;
     const onOpenGamesDashboardDialog = React.useCallback(
       () => {
-        setOpenGameDetails(true);
+        navigateToRoute('games-dashboard', {
+          'game-id': project.getProjectUuid(),
+        });
+        onOpenHomePage();
+        toggleProjectManager();
         // Refresh the games as it could have been modified using the game dashboard
         // in the "Manage" tab from the home page.
         fetchGames();
       },
-      [fetchGames]
+      [
+        fetchGames,
+        navigateToRoute,
+        onOpenHomePage,
+        toggleProjectManager,
+        project,
+      ]
     );
 
     const [
@@ -1355,20 +1363,6 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     setProjectVariablesEditorOpen(false);
                   }}
                   hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-                />
-              )}
-              {openGameDetails && (
-                <GameDetailsDialog
-                  project={project}
-                  analyticsSource="projectManager"
-                  game={gameMatchingProjectUuid}
-                  onClose={() => setOpenGameDetails(false)}
-                  onGameDeleted={() => {
-                    setOpenGameDetails(false);
-                    fetchGames();
-                  }}
-                  onGameUpdated={onGameUpdated}
-                  onShareProject={onShareProject}
                 />
               )}
               {!!editedPropertiesLayout && (

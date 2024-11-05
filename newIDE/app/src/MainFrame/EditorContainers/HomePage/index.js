@@ -301,16 +301,8 @@ export const HomePage = React.memo<Props>(
       React.useEffect(
         () => {
           const requestedTab = getRequestedTab(routeArguments);
-          if (!requestedTab) {
-            if (routeArguments['games-dashboard-tab']) {
-              setGameDetailsCurrentTab(
-                // $FlowIgnore - We are confident the argument is one of the possible tab.
-                routeArguments['games-dashboard-tab']
-              );
-              removeRouteArguments(['games-dashboard-tab']);
-            }
-            return;
-          }
+
+          if (!requestedTab) return;
 
           setActiveTab(requestedTab);
           if (requestedTab === 'shop') {
@@ -324,6 +316,20 @@ export const HomePage = React.memo<Props>(
             }
             // Remove the arguments so that the asset store is not opened again.
             removeRouteArguments(['asset-pack', 'game-template']);
+          } else if (requestedTab === 'manage') {
+            const gameId = routeArguments['game-id'];
+            if (gameId) {
+              if (games && games.find(game => game.id === gameId)) {
+                setOpenedGameId(gameId);
+                if (routeArguments['games-dashboard-tab']) {
+                  setGameDetailsCurrentTab(
+                    // $FlowIgnore - We are confident the argument is one of the possible tab.
+                    routeArguments['games-dashboard-tab']
+                  );
+                  removeRouteArguments(['games-dashboard-tab']);
+                }
+              }
+            }
           }
 
           removeRouteArguments(['initial-dialog']);
@@ -333,6 +339,7 @@ export const HomePage = React.memo<Props>(
           removeRouteArguments,
           setInitialPackUserFriendlySlug,
           setInitialGameTemplateUserFriendlySlug,
+          games,
         ]
       );
 

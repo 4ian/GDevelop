@@ -3518,6 +3518,8 @@ const MainFrame = (props: Props) => {
             hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
             resourceManagementProps={resourceManagementProps}
             gamesList={gamesList}
+            onOpenHomePage={openHomePage}
+            toggleProjectManager={toggleProjectManager}
           />
         ) : null}
       </ProjectManagerDrawer>

@@ -147,6 +147,7 @@ const ManageSection = ({
       setGameUnregisterErrorText(null);
       try {
         await deleteGame(getAuthorizationHeader, id, openedGame.id);
+        setOpenedGameId(null);
       } catch (error) {
         console.error('Unable to delete the game:', error);
         const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
@@ -165,7 +166,13 @@ const ManageSection = ({
       }
       onRefreshGames();
     },
-    [openedGame, profile, getAuthorizationHeader, onRefreshGames]
+    [
+      openedGame,
+      profile,
+      getAuthorizationHeader,
+      onRefreshGames,
+      setOpenedGameId,
+    ]
   );
 
   React.useEffect(

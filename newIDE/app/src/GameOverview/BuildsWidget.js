@@ -64,7 +64,10 @@ const BuildsWidget = ({ builds, onSeeAllBuilds }: Props) => {
               // Hardcoded value in the back.
               // TODO: replace when pagination is possible.
               100 ? (
-                <Trans>{builds.length} exports created</Trans>
+                <Trans>
+                  {builds.length - (pendingBuilds ? pendingBuilds.length : 0)}{' '}
+                  exports created
+                </Trans>
               ) : (
                 <Trans>100+ exports created</Trans>
               )}

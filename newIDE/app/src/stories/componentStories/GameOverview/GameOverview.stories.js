@@ -149,7 +149,7 @@ export const Default = ({
   sessions,
   userBalance,
   leaderboards,
-  builds,
+  exports,
 }: {|
   gameState: 'Published' | 'Not published' | 'Not registered',
   isAcceptingFeedback: 'Yes' | 'No',
@@ -157,7 +157,7 @@ export const Default = ({
   sessions: 'None' | 'Some in the last week',
   userBalance: 'None' | 'Some',
   leaderboards: 'None' | 'Some',
-  builds: 'None' | 'Some ongoing' | 'All complete',
+  exports: 'None' | 'Some ongoing' | 'All complete',
 |}) => {
   const [game, setGame] = React.useState<Game>(game1);
   const [tab, setTab] = React.useState<GameDetailsTab>('details');
@@ -179,9 +179,9 @@ export const Default = ({
   const leaderboardsToDisplay =
     leaderboards === 'None' ? [] : mockedLeaderboards;
   const buildsToDisplay =
-    builds === 'None'
+    exports === 'None'
       ? []
-      : builds === 'All complete'
+      : exports === 'All complete'
       ? [completeCordovaBuild, completeElectronBuild, completeWebBuild]
       : [completeCordovaBuild, completeElectronBuild, pendingCordovaBuild];
   const gameToUse = {
@@ -196,7 +196,7 @@ export const Default = ({
     () => {
       setRenderCount(value => value + 1);
     },
-    [feedbacks, sessions, userBalance, leaderboards, builds, gameState]
+    [feedbacks, sessions, userBalance, leaderboards, exports, gameState]
   );
 
   playServiceMock

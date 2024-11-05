@@ -67,17 +67,29 @@ const AnalyticsWidget = ({ game, onSeeAll, gameMetrics, gameUrl }: Props) => {
 
               {!gameMetrics ? (
                 <div style={styles.loadingSpace} />
-              ) : hasNoSession && gameUrl ? (
-                <ColumnStackLayout noMargin alignItems="flex-start">
-                  <Spacer />
-                  <Text noMargin color="secondary">
-                    <Trans>
-                      No data to show yet. Share your game creator profile with
-                      more people to get more players!
-                    </Trans>
-                  </Text>
-                  <GameLinkAndShareIcons display="column" url={gameUrl} />
-                </ColumnStackLayout>
+              ) : hasNoSession ? (
+                gameUrl ? (
+                  <ColumnStackLayout noMargin alignItems="flex-start">
+                    <Spacer />
+                    <Text noMargin color="secondary">
+                      <Trans>
+                        No data to show yet. Share your game creator profile
+                        with more people to get more players!
+                      </Trans>
+                    </Text>
+                    <GameLinkAndShareIcons display="column" url={gameUrl} />
+                  </ColumnStackLayout>
+                ) : (
+                  <ColumnStackLayout noMargin expand>
+                    <Spacer />
+                    <Text color="secondary" noMargin>
+                      <Trans>
+                        Share your game and start collecting data from your
+                        players to better understand them.
+                      </Trans>
+                    </Text>
+                  </ColumnStackLayout>
+                )
               ) : (
                 <Column expand noMargin>
                   <Line alignItems="center" justifyContent="space-between">

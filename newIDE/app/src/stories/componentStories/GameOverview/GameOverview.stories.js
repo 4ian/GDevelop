@@ -252,8 +252,12 @@ export const Default = ({
         setGame({
           ...game,
           acceptsGameComments: data.acceptsGameComments === true,
-          publicWebBuildId: data.publicWebBuildId,
-          displayAdsOnGamePage: data.displayAdsOnGamePage,
+          publicWebBuildId: data.publicWebBuildId
+            ? data.publicWebBuildId
+            : game.publicWebBuildId,
+          displayAdsOnGamePage: data.displayAdsOnGamePage
+            ? data.displayAdsOnGamePage
+            : game.displayAdsOnGamePage,
         });
         return true;
       },

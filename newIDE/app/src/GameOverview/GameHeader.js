@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { I18n } from '@lingui/react';
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import { type Game } from '../Utils/GDevelopServices/Game';
 import { GameThumbnail } from '../GameDashboard/GameThumbnail';
@@ -22,6 +22,7 @@ import Messages from '../UI/CustomSvgIcons/Messages';
 import RaisedButton from '../UI/RaisedButton';
 import Edit from '../UI/CustomSvgIcons/Edit';
 import GameLinkAndShareIcons from './GameLinkAndShareIcons';
+import { CompactToggleField } from '../UI/CompactToggleField';
 
 const styles = {
   iconAndText: { display: 'flex', gap: 2, alignItems: 'flex-start' },
@@ -31,9 +32,15 @@ type Props = {|
   game: Game,
   onEditGame: () => void,
   gameUrl: ?string,
+  onPublishOnGdGames: ?() => void,
 |};
 
-const GameHeader = ({ game, onEditGame, gameUrl }: Props) => {
+const GameHeader = ({
+  game,
+  onEditGame,
+  gameUrl,
+  onPublishOnGdGames,
+}: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
@@ -118,6 +125,34 @@ const GameHeader = ({ game, onEditGame, gameUrl }: Props) => {
     </LineStackLayout>
   );
 
+  const renderShareUrl = (i18n: I18nType) =>
+    gameUrl ? (
+      <GameLinkAndShareIcons url={gameUrl} display="line" />
+    ) : onPublishOnGdGames ? (
+      <ColumnStackLayout noMargin expand>
+        <CompactToggleField
+          checked={false}
+          label={i18n._(t`Publish on gd.games`)}
+          onCheck={onPublishOnGdGames}
+        />
+        <Text color="secondary" noMargin>
+          <Trans>
+            Your game is not published on gd.games. Publish it and get players
+            to play your game!
+          </Trans>
+        </Text>
+      </ColumnStackLayout>
+    ) : (
+      <ColumnStackLayout noMargin expand>
+        <Text color="secondary" noMargin>
+          <Trans>
+            Publish your game to gd.games and see how many players enjoy your
+            game!
+          </Trans>
+        </Text>
+      </ColumnStackLayout>
+    );
+
   if (isMobile) {
     return (
       <I18n>
@@ -128,7 +163,7 @@ const GameHeader = ({ game, onEditGame, gameUrl }: Props) => {
               {renderThumbnail()}
               {renderPublicInfo()}
             </LineStackLayout>
-            {gameUrl && <GameLinkAndShareIcons url={gameUrl} display="line" />}
+            {renderShareUrl(i18n)}
             {renderButtons()}
           </ColumnStackLayout>
         )}
@@ -151,7 +186,7 @@ const GameHeader = ({ game, onEditGame, gameUrl }: Props) => {
               {renderButtons()}
             </LineStackLayout>
             {renderPublicInfo()}
-            {gameUrl && <GameLinkAndShareIcons url={gameUrl} display="line" />}
+            {renderShareUrl(i18n)}
           </ColumnStackLayout>
         </LineStackLayout>
       )}

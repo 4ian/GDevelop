@@ -163,7 +163,17 @@ const FeedbackWidget = ({
                 </Text>
                 <GameLinkAndShareIcons url={gameUrl} display="column" />
               </ColumnStackLayout>
-            ) : null)
+            ) : (
+              <ColumnStackLayout noMargin justifyContent="center" expand>
+                <Spacer />
+                <Text color="secondary" noMargin>
+                  <Trans>
+                    Share your game on gd.games and let players leave their
+                    feedback about your game.
+                  </Trans>
+                </Text>
+              </ColumnStackLayout>
+            ))
           )}
         </DashboardWidget>
       )}

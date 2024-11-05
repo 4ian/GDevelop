@@ -348,6 +348,13 @@ const GameOverview = ({
     return true;
   };
 
+  const onPublishOnGdGames = React.useCallback(
+    (webBuildId: string) => {
+      onUpdateGameStandaloneProperties({ publicWebBuildId: webBuildId });
+    },
+    [onUpdateGameStandaloneProperties]
+  );
+
   React.useEffect(
     () => {
       setPublicGame(null);
@@ -475,6 +482,11 @@ const GameOverview = ({
                   game={game}
                   onEditGame={() => setGameDetailsDialogOpen(true)}
                   gameUrl={gameUrl}
+                  onPublishOnGdGames={
+                    lastWebBuildId
+                      ? () => onPublishOnGdGames(lastWebBuildId)
+                      : null
+                  }
                 />
                 <Grid container spacing={2}>
                   <AnalyticsWidget
@@ -517,6 +529,7 @@ const GameOverview = ({
                 if (isGameUpdated) {
                   updateProjectFromGameIfMatching(properties);
                 }
+                setGameDetailsDialogOpen(false);
               }}
               canBePublishedOnGdGames={canBePublishedOnGdGames}
               onGameUpdated={_onGameUpdated}

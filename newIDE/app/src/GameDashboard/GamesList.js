@@ -164,7 +164,6 @@ const GamesList = ({ project, games, onRefreshGames, onOpenGameId }: Props) => {
               addRouteArguments({ 'games-dashboard-tab': tab });
               onOpenGameId(game.id);
             }}
-            onUpdateGame={onRefreshGames}
           />
         ))
       ) : !!searchText ? (

@@ -148,56 +148,58 @@ export const GameThumbnail = ({
   };
 
   return (
-    <ColumnStackLayout noMargin alignItems="center">
-      <Paper
-        style={{
-          ...styles.thumbnail,
-          whiteSpace: 'normal',
-          display: 'flex',
-        }}
-        background={background}
-      >
-        {thumbnailUrl ? (
-          <CorsAwareImage
-            src={thumbnailUrl}
-            style={{
-              ...styles.image,
-              ...(isMobile ? styles.fullWidth : styles.thumbnail),
-            }}
-            alt={gameName}
-          />
-        ) : (
-          <EmptyMessage>
-            <Trans>No thumbnail set</Trans>
-          </EmptyMessage>
-        )}
-      </Paper>
-      {canUpdateThumbnail && (
-        <RaisedButton
-          primary
-          disabled={!profile || isLoading || disabled}
-          onClick={() => {
-            if (gamesPlatformThumbnailFileInputRef.current) {
-              gamesPlatformThumbnailFileInputRef.current.click();
-            }
+    <>
+      <ColumnStackLayout noMargin alignItems="center">
+        <Paper
+          style={{
+            ...styles.thumbnail,
+            whiteSpace: 'normal',
+            display: 'flex',
           }}
-          label={
-            isLoading ? (
-              <Trans>Updating...</Trans>
-            ) : thumbnailUrl ? (
-              <Trans>Change thumbnail</Trans>
-            ) : (
-              <Trans>Select a thumbnail</Trans>
-            )
-          }
-        />
-      )}
+          background={background}
+        >
+          {thumbnailUrl ? (
+            <CorsAwareImage
+              src={thumbnailUrl}
+              style={{
+                ...styles.image,
+                ...(isMobile ? styles.fullWidth : styles.thumbnail),
+              }}
+              alt={gameName}
+            />
+          ) : (
+            <EmptyMessage>
+              <Trans>No thumbnail set</Trans>
+            </EmptyMessage>
+          )}
+        </Paper>
+        {canUpdateThumbnail && (
+          <RaisedButton
+            primary
+            disabled={!profile || isLoading || disabled}
+            onClick={() => {
+              if (gamesPlatformThumbnailFileInputRef.current) {
+                gamesPlatformThumbnailFileInputRef.current.click();
+              }
+            }}
+            label={
+              isLoading ? (
+                <Trans>Updating...</Trans>
+              ) : thumbnailUrl ? (
+                <Trans>Change thumbnail</Trans>
+              ) : (
+                <Trans>Select a thumbnail</Trans>
+              )
+            }
+          />
+        )}
+      </ColumnStackLayout>
       <input
         type="file"
         onChange={updateGameThumbnail}
         ref={gamesPlatformThumbnailFileInputRef}
         style={{ display: 'none' }}
       />
-    </ColumnStackLayout>
+    </>
   );
 };

@@ -34,6 +34,7 @@ import { getDefaultRegisterGamePropertiesFromProject } from '../../../../Utils/U
 import { extractGDevelopApiErrorStatusAndCode } from '../../../../Utils/GDevelopServices/Errors';
 import { GameRegistration } from '../../../../GameDashboard/GameRegistration';
 import UserEarnings from '../../../../GameDashboard/Monetization/UserEarnings';
+import { showErrorBox } from '../../../../UI/Messages/MessageBox';
 
 const publishingWikiArticle = getHelpLink('/publishing/');
 
@@ -163,6 +164,15 @@ const ManageSection = ({
               t`You cannot unregister a game that has active leaderboards. To delete them, go in the Leaderboards tab, and delete them one by one.`
             )
           );
+        } else {
+          showErrorBox({
+            message:
+              i18n._(t`Unable to unregister the game.`) +
+              ' ' +
+              i18n._(t`Verify your internet connection or try again later.`),
+            rawError: error,
+            errorId: 'game-dashboard-unregister-game',
+          });
         }
       }
       onRefreshGames();

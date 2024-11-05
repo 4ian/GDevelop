@@ -23,7 +23,6 @@ export const DefaultGameCard = () => (
       game={game1}
       isCurrentGame={false}
       onOpenGameManager={action('onOpenGameManager')}
-      onUpdateGame={action('onUpdateGame')}
     />
   </AuthenticatedUserContext.Provider>
 );
@@ -34,7 +33,6 @@ export const DefaultCurrentlyEditedCard = () => (
       game={game1}
       isCurrentGame={true}
       onOpenGameManager={action('onOpenGameManager')}
-      onUpdateGame={action('onUpdateGame')}
     />
   </AuthenticatedUserContext.Provider>
 );

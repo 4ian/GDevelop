@@ -181,6 +181,7 @@ export function PublicGameProperties({
                     disabled={disabled}
                     onGameUpdated={onGameUpdated}
                     onUpdatingGame={onUpdatingGame}
+                    fullWidthOnMobile
                   />
                 </Column>
                 <Spacer />

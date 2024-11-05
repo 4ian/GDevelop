@@ -126,6 +126,7 @@ export const GameCard = ({ game, isCurrentGame, onOpenGameManager }: Props) => {
     <LineStackLayout noMargin>
       <FlatButton
         primary
+        fullWidth
         label={<Trans>Manage game</Trans>}
         onClick={() => onOpenGameManager('details')}
       />
@@ -139,7 +140,7 @@ export const GameCard = ({ game, isCurrentGame, onOpenGameManager }: Props) => {
           key={game.id}
           background={'medium'}
           isHighlighted={isCurrentGame}
-          padding={16}
+          padding={isMobile ? 8 : 16}
         >
           {isMobile ? (
             <ColumnStackLayout>

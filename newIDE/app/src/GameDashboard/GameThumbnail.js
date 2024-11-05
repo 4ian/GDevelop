@@ -22,13 +22,22 @@ const styles = {
     objectFit: 'scale-down', // Match gd.games format.
   },
   thumbnail: {
-    // 16/9 format
+    aspectRatio: '16 / 9',
     width: 272,
-    height: 153,
+    overflow: 'hidden', // Keep the radius effect.
+  },
+  mobileThumbnail: {
+    aspectRatio: '16 / 9',
+    width: 150,
     overflow: 'hidden', // Keep the radius effect.
   },
   fullWidth: {
     width: '100%',
+    height: 'auto',
+    justifyContent: 'center'
+  },
+  fullWidthThumbnail: {
+    width: '85%',
     height: 'auto',
   },
 };
@@ -42,6 +51,7 @@ type Props = {|
   disabled?: boolean,
   onGameUpdated?: (updatedGame: Game) => void,
   onUpdatingGame?: (isUpdatingGame: boolean) => void,
+  fullWidthOnMobile?: boolean,
 |};
 
 export const GameThumbnail = ({
@@ -53,6 +63,7 @@ export const GameThumbnail = ({
   onGameUpdated,
   onUpdatingGame,
   background = 'light',
+  fullWidthOnMobile,
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const { profile, getAuthorizationHeader } = React.useContext(
@@ -148,58 +159,66 @@ export const GameThumbnail = ({
   };
 
   return (
-    <>
-      <ColumnStackLayout noMargin alignItems="center">
-        <Paper
-          style={{
-            ...styles.thumbnail,
-            whiteSpace: 'normal',
-            display: 'flex',
-          }}
-          background={background}
-        >
-          {thumbnailUrl ? (
-            <CorsAwareImage
-              src={thumbnailUrl}
-              style={{
-                ...styles.image,
-                ...(isMobile ? styles.fullWidth : styles.thumbnail),
-              }}
-              alt={gameName}
-            />
-          ) : (
-            <EmptyMessage>
-              <Trans>No thumbnail set</Trans>
-            </EmptyMessage>
-          )}
-        </Paper>
-        {canUpdateThumbnail && (
-          <RaisedButton
-            primary
-            disabled={!profile || isLoading || disabled}
-            onClick={() => {
-              if (gamesPlatformThumbnailFileInputRef.current) {
-                gamesPlatformThumbnailFileInputRef.current.click();
-              }
+    <ColumnStackLayout noMargin alignItems="center">
+      <Paper
+        style={{
+          ...(isMobile
+            ? fullWidthOnMobile
+              ? styles.fullWidth
+              : styles.mobileThumbnail
+            : styles.thumbnail),
+          whiteSpace: 'normal',
+          display: 'flex',
+        }}
+        background={background}
+      >
+        {thumbnailUrl ? (
+          <CorsAwareImage
+            src={thumbnailUrl}
+            style={{
+              ...styles.image,
+              ...(isMobile
+                ? fullWidthOnMobile
+                  ? styles.fullWidthThumbnail
+                  : styles.mobileThumbnail
+                : styles.thumbnail),
             }}
-            label={
-              isLoading ? (
-                <Trans>Updating...</Trans>
-              ) : thumbnailUrl ? (
-                <Trans>Change thumbnail</Trans>
-              ) : (
-                <Trans>Select a thumbnail</Trans>
-              )
-            }
+            alt={gameName}
           />
+        ) : (
+          <EmptyMessage>
+            <Trans>No thumbnail set</Trans>
+          </EmptyMessage>
         )}
-      </ColumnStackLayout>
-      <input
-        type="file"
-        onChange={updateGameThumbnail}
-        ref={gamesPlatformThumbnailFileInputRef}
-        style={{ display: 'none' }}
-      />
-    </>
+      </Paper>
+      {canUpdateThumbnail && (
+        <RaisedButton
+          primary
+          disabled={!profile || isLoading || disabled}
+          onClick={() => {
+            if (gamesPlatformThumbnailFileInputRef.current) {
+              gamesPlatformThumbnailFileInputRef.current.click();
+            }
+          }}
+          label={
+            isLoading ? (
+              <Trans>Updating...</Trans>
+            ) : thumbnailUrl ? (
+              <Trans>Change thumbnail</Trans>
+            ) : (
+              <Trans>Select a thumbnail</Trans>
+            )
+          }
+        />
+      )}
+      {canUpdateThumbnail && (
+        <input
+          type="file"
+          onChange={updateGameThumbnail}
+          ref={gamesPlatformThumbnailFileInputRef}
+          style={{ display: 'none' }}
+        />
+      )}
+    </ColumnStackLayout>
   );
 };

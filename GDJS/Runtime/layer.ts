@@ -51,13 +51,15 @@ namespace gdjs {
     ): void {
       // Adapt position of the camera center only if the camera has never moved as:
       // * When the camera follows a player/object, it will rarely be at the default position.
+      //   (and if is, it will be moved again by the behavior/events).
       // * Cameras not following a player/object are usually UIs which are intuitively
-      // expected not to "move". Not adapting the center position would make the camera
-      // move from its initial position (which is centered in the screen) - and anchor
-      // behavior would behave counterintuitively.
+      //   expected not to "move". Not adapting the center position would make the camera
+      //   move from its initial position (which is centered on the screen) - and anchor
+      //   behavior would behave counterintuitively.
       if (
-        this._cameraX === oldGameResolutionOriginX &&
-        this._cameraY === oldGameResolutionOriginY &&
+        // Have a safety margin of 1 pixel to avoid rounding errors.
+        Math.abs(this._cameraX - oldGameResolutionOriginX) < 1 &&
+        Math.abs(this._cameraY - oldGameResolutionOriginY) < 1 &&
         this._zoomFactor === 1
       ) {
         this._cameraX +=
@@ -65,6 +67,7 @@ namespace gdjs {
         this._cameraY +=
           this._runtimeScene.getViewportOriginY() - oldGameResolutionOriginY;
       }
+
       this._renderer.updatePosition();
       this._renderer.updateResolution();
     }

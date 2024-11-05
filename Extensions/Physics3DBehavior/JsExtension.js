@@ -43,6 +43,11 @@ module.exports = {
         return true;
       }
 
+      if (propertyName === 'shape') {
+        behaviorContent.getChild('shape').setStringValue(newValue);
+        return true;
+      }
+
       if (propertyName === 'density') {
         behaviorContent
           .getChild('density')
@@ -112,7 +117,17 @@ module.exports = {
             "A static object won't move (perfect for obstacles). Dynamic objects can move. Kinematic will move according to forces applied to it only (useful for characters or specific mechanisms)."
           )
         );
-        behaviorProperties
+      behaviorProperties
+        .getOrCreate('shape')
+        .setValue(behaviorContent.getChild('shape').getStringValue())
+        .setType('Choice')
+        .setLabel('Shape')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+        .addExtraInfo('Sphere')
+        .addExtraInfo('Box')
+        .addExtraInfo('Capsule')
+        .addExtraInfo('Cylinder');
+      behaviorProperties
         .getOrCreate('density')
         .setValue(
           behaviorContent.getChild('density').getDoubleValue().toString(10)
@@ -188,6 +203,7 @@ module.exports = {
 
     behavior.initializeContent = function (behaviorContent) {
       behaviorContent.addChild('bodyType').setStringValue('Dynamic');
+      behaviorContent.addChild('shape').setStringValue('Sphere');
       behaviorContent.addChild('density').setDoubleValue(1.0);
       behaviorContent.addChild('friction').setDoubleValue(0.3);
       behaviorContent.addChild('restitution').setDoubleValue(0.1);

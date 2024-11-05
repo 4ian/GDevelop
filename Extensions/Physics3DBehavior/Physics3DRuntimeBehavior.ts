@@ -200,6 +200,7 @@ namespace gdjs {
     owner3D: gdjs.RuntimeObject3D;
 
     bodyType: string;
+    shape: string;
     density: float;
     friction: float;
     restitution: float;
@@ -239,6 +240,7 @@ namespace gdjs {
       super(instanceContainer, behaviorData, owner);
       this.owner3D = owner;
       this.bodyType = behaviorData.bodyType;
+      this.shape = behaviorData.shape;
       this.density = behaviorData.density;
       this.friction = behaviorData.friction;
       this.restitution = behaviorData.restitution;
@@ -292,14 +294,51 @@ namespace gdjs {
       const depth = this.owner3D.getDepth() * this._sharedData.worldInvScale;
 
       // TODO Handle other shape types.
-      const shape = new Jolt.BoxShape(
-        this.getVec3(width / 2, height / 2, depth / 2),
-        1 * this._sharedData.worldInvScale,
-        undefined
-      );
-      shape.SetDensity(this.density);
-
-      return shape;
+      if (this.shape === 'Box') {
+        const shape = new Jolt.BoxShape(
+          this.getVec3(width / 2, height / 2, depth / 2),
+          1 * this._sharedData.worldInvScale,
+          undefined
+        );
+        shape.SetDensity(this.density);
+        return shape;
+      } else if (this.shape === 'Capsule') {
+        const radius = Math.sqrt(((width / 2) * height) / 2);
+        const shapeSettings = new Jolt.CapsuleShapeSettings(depth / 2, radius);
+        shapeSettings.mDensity = this.density;
+        const rotatedShape = new Jolt.RotatedTranslatedShapeSettings(
+          this.getVec3(0, 0, 0),
+          // Top on Z axis.
+          this.getQuat(-Math.sqrt(2) / 2, 0, 0, Math.sqrt(2) / 2),
+          shapeSettings
+        )
+          .Create()
+          .Get();
+        return rotatedShape;
+      } else if (this.shape === 'Cylinder') {
+        const radius = Math.sqrt(((width / 2) * height) / 2);
+        const shapeSettings = new Jolt.CylinderShapeSettings(depth / 2, radius);
+        shapeSettings.mDensity = this.density;
+        const rotatedShape = new Jolt.RotatedTranslatedShapeSettings(
+          this.getVec3(0, 0, 0),
+          // Top on Z axis.
+          this.getQuat(-Math.sqrt(2) / 2, 0, 0, Math.sqrt(2) / 2),
+          shapeSettings
+        )
+          .Create()
+          .Get();
+        // TODO shape.SetDensity(this.density);
+        return rotatedShape;
+      } else {
+        // if (this.shape === 'Sphere')
+        const radius = Math.pow(
+          ((((width / 2) * height) / 2) * depth) / 2,
+          1 / 3
+        );
+        const shape = new Jolt.SphereShape(radius, undefined);
+        shape.SetDensity(this.density);
+        return shape;
+      }
     }
 
     recreateShape(): void {

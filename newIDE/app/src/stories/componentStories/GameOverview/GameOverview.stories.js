@@ -151,7 +151,7 @@ export const Default = ({
   leaderboards,
   exports,
 }: {|
-  gameState: 'Published' | 'Not published' | 'Not registered',
+  gameState: 'Published' | 'Not published',
   isAcceptingFeedback: 'Yes' | 'No',
   feedbacks: 'None' | 'Some unprocessed' | 'All processed',
   sessions: 'None' | 'Some in the last week',
@@ -184,19 +184,28 @@ export const Default = ({
       : exports === 'All complete'
       ? [completeCordovaBuild, completeElectronBuild, completeWebBuild]
       : [completeCordovaBuild, completeElectronBuild, pendingCordovaBuild];
-  const gameToUse = {
-    ...game,
-    publicWebBuildId: gameState === 'Published' ? game1.publicWebBuildId : null,
-    acceptsGameComments: isAcceptingFeedback === 'Yes',
-  };
 
-  const publicGame = getPublicGameFromGame(gameToUse)
+  const publicGame = getPublicGameFromGame(game);
 
   React.useEffect(
     () => {
       setRenderCount(value => value + 1);
     },
     [feedbacks, sessions, userBalance, leaderboards, exports, gameState]
+  );
+
+  React.useEffect(
+    () => {
+      setGame(game => {
+        return {
+          ...game,
+          publicWebBuildId:
+            gameState === 'Published' ? game1.publicWebBuildId : null,
+          acceptsGameComments: isAcceptingFeedback === 'Yes',
+        };
+      });
+    },
+    [isAcceptingFeedback, gameState]
   );
 
   playServiceMock
@@ -237,10 +246,29 @@ export const Default = ({
     .reply(200, publicGame)
     .onPatch(`/game/${game1.id}`, {
       asymmetricMatch: function(data) {
+        if (data.publicWebBuildId) {
+          action(`Published with build id ${data.publicWebBuildId}`)();
+        }
         setGame({
-          ...game1,
+          ...game,
           acceptsGameComments: data.acceptsGameComments === true,
+          publicWebBuildId: data.publicWebBuildId,
+          displayAdsOnGamePage: data.displayAdsOnGamePage,
         });
+        return true;
+      },
+    })
+    .reply(200)
+    .onPost(`/game/action/set-slug`, {
+      asymmetricMatch: function(data) {
+        action('setSlug')(data);
+        return true;
+      },
+    })
+    .reply(200)
+    .onPost(`/game/action/set-acls`, {
+      asymmetricMatch: function(data) {
+        action('setAcls')(data);
         return true;
       },
     })
@@ -272,7 +300,7 @@ export const Default = ({
       }}
     >
       <GameOverview
-        game={gameToUse}
+        game={game}
         analyticsSource="homepage"
         key={renderCount.toFixed(0)}
         currentView={tab}

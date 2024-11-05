@@ -93,6 +93,7 @@ type Props = {|
   discoverable?: boolean,
   displayThumbnail?: boolean,
   thumbnailUrl?: ?string,
+  canBePublishedOnGdGames?: boolean,
 |};
 
 export function PublicGameProperties({
@@ -131,6 +132,7 @@ export function PublicGameProperties({
   thumbnailUrl,
   onGameUpdated,
   onUpdatingGame,
+  canBePublishedOnGdGames,
 }: Props) {
   const [categoryInput, setCategoryInput] = React.useState('');
   const { profile } = React.useContext(AuthenticatedUserContext);
@@ -230,6 +232,17 @@ export function PublicGameProperties({
             }
             disabled={disabled}
           />
+          <SelectField
+            fullWidth
+            floatingLabelText={<Trans>Device orientation (for mobile)</Trans>}
+            value={orientation}
+            onChange={(e, i, value: string) => setOrientation(value)}
+            disabled={disabled}
+          >
+            <SelectOption value="default" label={t`Platform default`} />
+            <SelectOption value="landscape" label={t`Landscape`} />
+            <SelectOption value="portrait" label={t`Portrait`} />
+          </SelectField>
           {setPlayableWithKeyboard &&
             setPlayableWithGamepad &&
             setPlayableWithMobile && (
@@ -259,17 +272,14 @@ export function PublicGameProperties({
                 </ResponsiveLineStackLayout>
               </Column>
             )}
-          <SelectField
-            fullWidth
-            floatingLabelText={<Trans>Device orientation (for mobile)</Trans>}
-            value={orientation}
-            onChange={(e, i, value: string) => setOrientation(value)}
-            disabled={disabled}
-          >
-            <SelectOption value="default" label={t`Platform default`} />
-            <SelectOption value="landscape" label={t`Landscape`} />
-            <SelectOption value="portrait" label={t`Portrait`} />
-          </SelectField>
+          {canBePublishedOnGdGames !== undefined && !canBePublishedOnGdGames && (
+            <AlertMessage kind="info">
+              <Trans>
+                You can configure the following properties and they will be
+                applied as soon as you share your game with an export to gd.games.
+              </Trans>
+            </AlertMessage>
+          )}
           {setIsPublishedOnGdGames && (
             <>
               <Spacer />

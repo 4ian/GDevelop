@@ -106,6 +106,13 @@ const GameOverview = ({
     new Date(new Date().setHours(0, 0, 0, 0) - 7 * 24 * 3600 * 1000)
   );
 
+  const webBuilds = builds
+    ? builds.filter(build => build.type === 'web-build')
+    : null;
+
+  const canBePublishedOnGdGames = webBuilds ? webBuilds.length > 0 : false;
+  const lastWebBuildId =
+    webBuilds && webBuilds.length > 0 ? webBuilds[0].id : null;
   const isPublishedOnGdGames = !!game.publicWebBuildId;
   const gameUrl = isPublishedOnGdGames ? getGameUrl(game) : null;
 
@@ -131,6 +138,62 @@ const GameOverview = ({
     [game, getAuthorizationHeader, profile]
   );
 
+  const updateProjectFromGameIfMatching = (
+    properties: PublicGameAndProjectEditableProperties
+  ) => {
+    if (project && project.getProjectUuid() === game.id) {
+      // Get this information from the game object that should have just been updated
+      // (maybe with fallback values).
+      const { gameName, categories, description } = game;
+      // Get those properties from the object as they are not stored on the Game.
+      const { authorIds, authorUsernames } = properties;
+
+      project.setName(gameName);
+      project.setDescription(description || '');
+      project.setPlayableWithKeyboard(game.playWithKeyboard);
+      project.setPlayableWithGamepad(game.playWithGamepad);
+      project.setPlayableWithMobile(game.playWithMobile);
+      project.setOrientation(game.orientation || 'default');
+      if (categories) {
+        const projectCategories = project.getCategories();
+        projectCategories.clear();
+        categories.forEach(category => projectCategories.push_back(category));
+      }
+      if (authorIds) {
+        const projectAuthorIds = project.getAuthorIds();
+        projectAuthorIds.clear();
+        authorIds.forEach(authorId => projectAuthorIds.push_back(authorId));
+      }
+      if (authorUsernames) {
+        const projectAuthorUsernames = project.getAuthorUsernames();
+        projectAuthorUsernames.clear();
+        authorUsernames.forEach(authorUsername =>
+          projectAuthorUsernames.push_back(authorUsername)
+        );
+      }
+    }
+  };
+
+  const fetchPublicGame = React.useCallback(
+    async () => {
+      try {
+        const publicGame = await getPublicGame(game.id);
+        setPublicGame(publicGame);
+      } catch (err) {
+        console.error(`Unable to load the public game:`, err);
+      }
+    },
+    [game.id]
+  );
+
+  const _onGameUpdated = React.useCallback(
+    (game: Game) => {
+      onGameUpdated(game);
+      fetchPublicGame();
+    },
+    [fetchPublicGame, onGameUpdated]
+  );
+
   const onUpdateGameStandaloneProperties = React.useCallback(
     async (payload: GameUpdatePayload) => {
       if (!profile) return;
@@ -140,9 +203,9 @@ const GameOverview = ({
         game.id,
         payload
       );
-      onGameUpdated(updatedGame);
+      _onGameUpdated(updatedGame);
     },
-    [getAuthorizationHeader, profile, game.id, onGameUpdated]
+    [getAuthorizationHeader, profile, game.id, _onGameUpdated]
   );
 
   const onUpdateGame = async (
@@ -170,6 +233,19 @@ const GameOverview = ({
 
     try {
       setIsUpdatingGame(true);
+      let publicWebBuildId = undefined;
+      if (properties.isPublishedOnGdGames) {
+        // Requested to publish game.
+        if (publicGame.publicWebBuildId) {
+          // Game already published, do nothing.
+        } else if (!lastWebBuildId) {
+          // Game has no web build so far, do nothing.
+        } else {
+          publicWebBuildId = lastWebBuildId;
+        }
+      } else {
+        publicWebBuildId = null;
+      }
       const updatedGame = await updateGame(
         getAuthorizationHeader,
         profile.id,
@@ -178,8 +254,7 @@ const GameOverview = ({
           gameName: properties.gameName || 'Untitled game',
           authorName: properties.authorName || 'Unspecified publisher',
           categories: properties.categories,
-          // TODO: Fetch most recent build id to publish it
-          publicWebBuildId: properties.publicWebBuildId,
+          publicWebBuildId,
           description: properties.description,
           playWithKeyboard: properties.playWithKeyboard,
           playWithGamepad: properties.playWithGamepad,
@@ -251,7 +326,7 @@ const GameOverview = ({
         });
         return false;
       }
-      onGameUpdated(updatedGame);
+      _onGameUpdated(updatedGame);
     } catch (error) {
       console.error(
         'Unable to update the game:',
@@ -272,54 +347,6 @@ const GameOverview = ({
 
     return true;
   };
-
-  const updateProjectFromGameIfMatching = (
-    properties: PublicGameAndProjectEditableProperties
-  ) => {
-    if (project && project.getProjectUuid() === game.id) {
-      // Get this information from the game object that should have just been updated
-      // (maybe with fallback values).
-      const { gameName, categories, description } = game;
-      // Get those properties from the object as they are not stored on the Game.
-      const { authorIds, authorUsernames } = properties;
-
-      project.setName(gameName);
-      project.setDescription(description || '');
-      project.setPlayableWithKeyboard(game.playWithKeyboard);
-      project.setPlayableWithGamepad(game.playWithGamepad);
-      project.setPlayableWithMobile(game.playWithMobile);
-      project.setOrientation(game.orientation || 'default');
-      if (categories) {
-        const projectCategories = project.getCategories();
-        projectCategories.clear();
-        categories.forEach(category => projectCategories.push_back(category));
-      }
-      if (authorIds) {
-        const projectAuthorIds = project.getAuthorIds();
-        projectAuthorIds.clear();
-        authorIds.forEach(authorId => projectAuthorIds.push_back(authorId));
-      }
-      if (authorUsernames) {
-        const projectAuthorUsernames = project.getAuthorUsernames();
-        projectAuthorUsernames.clear();
-        authorUsernames.forEach(authorUsername =>
-          projectAuthorUsernames.push_back(authorUsername)
-        );
-      }
-    }
-  };
-
-  const fetchPublicGame = React.useCallback(
-    async () => {
-      try {
-        const publicGame = await getPublicGame(game.id);
-        setPublicGame(publicGame);
-      } catch (err) {
-        console.error(`Unable to load the public game:`, err);
-      }
-    },
-    [game.id]
-  );
 
   React.useEffect(
     () => {
@@ -428,7 +455,7 @@ const GameOverview = ({
               <Builds
                 game={game}
                 authenticatedUser={authenticatedUser}
-                onGameUpdated={onGameUpdated}
+                onGameUpdated={_onGameUpdated}
               />
             ) : currentView === 'analytics' ? (
               <GameAnalyticsPanel
@@ -491,9 +518,8 @@ const GameOverview = ({
                   updateProjectFromGameIfMatching(properties);
                 }
               }}
-              onGameUpdated={() => {
-                fetchPublicGame();
-              }}
+              canBePublishedOnGdGames={canBePublishedOnGdGames}
+              onGameUpdated={_onGameUpdated}
               onUpdatingGame={setIsUpdatingGame}
             />
           )}

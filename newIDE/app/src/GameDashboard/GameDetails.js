@@ -17,6 +17,7 @@ import {
   getCategoryName,
   getGameMainImageUrl,
 } from '../Utils/GDevelopServices/Game';
+import { type Build } from '../Utils/GDevelopServices/Build';
 import { type TabOptions } from '../UI/Tabs';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
@@ -50,6 +51,7 @@ import CreditsStatusBanner from '../Credits/CreditsStatusBanner';
 import MarketingPlans from '../MarketingPlans/MarketingPlans';
 import MultiplayerAdmin from './MultiplayerAdmin';
 import { GameThumbnail } from './GameThumbnail';
+import { getBuilds } from '../Utils/GDevelopServices/Build';
 
 export type GameDetailsTab =
   | 'details'
@@ -126,24 +128,23 @@ const GameDetails = ({
   const { routeArguments, removeRouteArguments } = React.useContext(
     RouterContext
   );
-  const { getAuthorizationHeader, profile, limits } = React.useContext(
-    AuthenticatedUserContext
-  );
-
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const { getAuthorizationHeader, profile, limits } = authenticatedUser;
+  const [builds, setBuilds] = React.useState<?(Build[])>(null);
   const [
     gameUnregisterErrorText,
     setGameUnregisterErrorText,
   ] = React.useState<?string>(null);
   const [isGameUpdating, setIsGameUpdating] = React.useState(false);
   const { showConfirmation, showAlert } = useAlertDialog();
-
-  const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const [publicGame, setPublicGame] = React.useState<?PublicGame>(null);
   const [publicGameError, setPublicGameError] = React.useState<?Error>(null);
   const [
     isPublicGamePropertiesDialogOpen,
     setIsPublicGamePropertiesDialogOpen,
   ] = React.useState(false);
+
+  const userId = profile ? profile.id : null;
 
   // If a game dashboard tab is specified, switch to it.
   React.useEffect(
@@ -176,11 +177,21 @@ const GameDetails = ({
     [game]
   );
 
+  const loadBuilds = React.useCallback(
+    async () => {
+      if (!userId) return;
+      const builds = await getBuilds(getAuthorizationHeader, userId, game.id);
+      setBuilds(builds);
+    },
+    [getAuthorizationHeader, userId, game.id]
+  );
+
   React.useEffect(
     () => {
       loadPublicGame();
+      loadBuilds();
     },
-    [loadPublicGame]
+    [loadPublicGame, loadBuilds]
   );
 
   React.useEffect(
@@ -454,6 +465,12 @@ const GameDetails = ({
     [publicGame]
   );
 
+  const webBuilds = builds
+    ? builds.filter(build => build.type === 'web-build')
+    : null;
+
+  const canBePublishedOnGdGames = webBuilds ? webBuilds.length > 0 : false;
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -683,6 +700,7 @@ const GameDetails = ({
           {publicGame && project && isPublicGamePropertiesDialogOpen && (
             <PublicGamePropertiesDialog
               publicGame={publicGame}
+              canBePublishedOnGdGames={canBePublishedOnGdGames}
               onApply={async properties => {
                 const isGameUpdated = await onUpdateGame(i18n, properties);
                 if (isGameUpdated) {

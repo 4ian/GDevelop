@@ -3708,7 +3708,7 @@ export const game2: Game = {
 
 export const getPublicGameFromGame = (game: Game): PublicGame => {
   const publicGame: PublicGame = {
-    ...game1,
+    ...game,
     donateLink: null,
     orientation: game.orientation || 'default',
     displayAdsOnGamePage: !!game.displayAdsOnGamePage,

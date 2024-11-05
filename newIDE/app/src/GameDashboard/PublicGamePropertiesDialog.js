@@ -95,6 +95,7 @@ type Props = {|
   i18n: I18nType,
   onUpdatingGame?: (isGameUpdating: boolean) => void,
   onGameUpdated?: (game: Game) => void,
+  canBePublishedOnGdGames: boolean,
 |};
 
 export const PublicGamePropertiesDialog = ({
@@ -105,6 +106,7 @@ export const PublicGamePropertiesDialog = ({
   i18n,
   onUpdatingGame,
   onGameUpdated,
+  canBePublishedOnGdGames,
 }: Props) => {
   const { profile } = React.useContext(AuthenticatedUserContext);
 
@@ -238,6 +240,7 @@ export const PublicGamePropertiesDialog = ({
         onGameUpdated={onGameUpdated}
         onUpdatingGame={onUpdatingGame}
         disabled={isLoading}
+        canBePublishedOnGdGames={canBePublishedOnGdGames}
       />
     </Dialog>
   );

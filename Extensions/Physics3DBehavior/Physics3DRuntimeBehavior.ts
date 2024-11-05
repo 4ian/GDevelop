@@ -198,6 +198,8 @@ namespace gdjs {
 
   export class Physics3DRuntimeBehavior extends gdjs.RuntimeBehavior {
     owner3D: gdjs.RuntimeObject3D;
+
+    bodyType: string;
     friction: float;
     restitution: float;
     linearDamping: float;
@@ -235,6 +237,7 @@ namespace gdjs {
     ) {
       super(instanceContainer, behaviorData, owner);
       this.owner3D = owner;
+      this.bodyType = behaviorData.bodyType;
       this.friction = behaviorData.friction;
       this.restitution = behaviorData.restitution;
       this.linearDamping = Math.max(0, behaviorData.linearDamping);
@@ -348,7 +351,11 @@ namespace gdjs {
           threeObject.quaternion.z,
           threeObject.quaternion.w
         ),
-        Jolt.EMotionType_Dynamic,
+        this.bodyType === 'Static'
+          ? Jolt.EMotionType_Static
+          : this.bodyType === 'Kinematic'
+          ? Jolt.EMotionType_Kinematic
+          : Jolt.EMotionType_Dynamic,
         LAYER_MOVING
       );
       bodyCreationSettings.mFriction = this.friction;

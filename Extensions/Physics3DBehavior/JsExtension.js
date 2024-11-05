@@ -38,6 +38,10 @@ module.exports = {
       propertyName,
       newValue
     ) {
+      if (propertyName === 'bodyType') {
+        behaviorContent.getChild('bodyType').setStringValue(newValue);
+        return true;
+      }
 
       if (propertyName === 'friction') {
         const newValueAsNumber = parseFloat(newValue);
@@ -86,6 +90,21 @@ module.exports = {
     };
     behavior.getProperties = function (behaviorContent) {
       const behaviorProperties = new gd.MapStringPropertyDescriptor();
+
+      behaviorProperties
+        .getOrCreate('bodyType')
+        .setValue(behaviorContent.getChild('bodyType').getStringValue())
+        .setType('Choice')
+        .setLabel('Type')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+        .addExtraInfo('Static')
+        .addExtraInfo('Dynamic')
+        .addExtraInfo('Kinematic')
+        .setDescription(
+          _(
+            "A static object won't move (perfect for obstacles). Dynamic objects can move. Kinematic will move according to forces applied to it only (useful for characters or specific mechanisms)."
+          )
+        );
 
       behaviorProperties
         .getOrCreate('friction')
@@ -150,6 +169,7 @@ module.exports = {
     };
 
     behavior.initializeContent = function (behaviorContent) {
+      behaviorContent.addChild('bodyType').setStringValue('Dynamic');
       behaviorContent.addChild('friction').setDoubleValue(0.3);
       behaviorContent.addChild('restitution').setDoubleValue(0.1);
       behaviorContent.addChild('linearDamping').setDoubleValue(0.1);

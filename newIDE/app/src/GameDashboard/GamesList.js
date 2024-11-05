@@ -16,11 +16,10 @@ import {
 import IconButton from '../UI/IconButton';
 import ChevronArrowLeft from '../UI/CustomSvgIcons/ChevronArrowLeft';
 import ChevronArrowRight from '../UI/CustomSvgIcons/ChevronArrowRight';
-import { Column, Line, Spacer } from '../UI/Grid';
+import { Column, Line } from '../UI/Grid';
 import Text from '../UI/Text';
 import Paper from '../UI/Paper';
 import BackgroundText from '../UI/BackgroundText';
-import UserEarnings from './Monetization/UserEarnings';
 
 const pageSize = 10;
 
@@ -120,8 +119,6 @@ const GamesList = ({ project, games, onRefreshGames, onOpenGameId }: Props) => {
 
   return (
     <ColumnStackLayout noMargin>
-      <UserEarnings />
-      <Spacer />
       <Line noMargin>
         <Text size="section-title" noMargin>
           <Trans>Published games</Trans>

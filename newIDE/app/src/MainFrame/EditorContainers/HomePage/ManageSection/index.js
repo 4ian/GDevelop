@@ -33,6 +33,7 @@ import RouterContext from '../../../RouterContext';
 import { getDefaultRegisterGamePropertiesFromProject } from '../../../../Utils/UseGameAndBuildsManager';
 import { extractGDevelopApiErrorStatusAndCode } from '../../../../Utils/GDevelopServices/Errors';
 import { GameRegistration } from '../../../../GameDashboard/GameRegistration';
+import UserEarnings from '../../../../GameDashboard/Monetization/UserEarnings';
 
 const publishingWikiArticle = getHelpLink('/publishing/');
 
@@ -234,13 +235,6 @@ const ManageSection = ({
   if (openedGame) {
     return (
       <SectionContainer flexBody>
-        {!isRegisteringGame && (
-          <GameRegistration
-            project={project}
-            hideLoader
-            onGameRegistered={onRefreshGames}
-          />
-        )}
         <GameOverview
           currentView={currentTab}
           setCurrentView={setCurrentTab}
@@ -256,109 +250,125 @@ const ManageSection = ({
   }
 
   return (
-    <SectionContainer>
+    <SectionContainer flexBody>
       <SectionRow expand>
         {!profile ? (
-          <Paper
-            variant="outlined"
-            background="dark"
-            style={styles.backgroundMessage}
-          >
-            <ColumnStackLayout noMargin>
-              <BackgroundText>
-                <Trans>
-                  Log-in or create an account to access your{' '}
-                  <Link
-                    href={publishingWikiArticle}
-                    onClick={() =>
-                      Window.openExternalURL(publishingWikiArticle)
-                    }
-                  >
-                    published games
-                  </Link>{' '}
-                  retention metrics, and player feedback.
-                </Trans>
-              </BackgroundText>
-              <ResponsiveLineStackLayout
-                noMargin
-                noColumnMargin
-                justifyContent="center"
-              >
-                <div style={styles.buttonContainer}>
-                  <FlatButton
-                    fullWidth
-                    primary
-                    label={<Trans>Login</Trans>}
-                    onClick={onOpenLoginDialog}
-                  />
-                </div>
-                <div style={styles.buttonContainer}>
-                  <RaisedButton
-                    fullWidth
-                    primary
-                    label={<Trans>Create an account</Trans>}
-                    onClick={onOpenCreateAccountDialog}
-                  />
-                </div>
-              </ResponsiveLineStackLayout>
-            </ColumnStackLayout>
-          </Paper>
-        ) : games ? (
-          games.length === 0 ? (
+          <Column expand noMargin justifyContent="center">
             <Paper
               variant="outlined"
               background="dark"
               style={styles.backgroundMessage}
             >
-              <ColumnStackLayout noMargin>
-                <Column noMargin>
-                  <Line noMargin justifyContent="center">
-                    <BackgroundText>
-                      <Trans>
-                        Learn how many users are playing your game, control
-                        published versions, and collect feedback from play
-                        testers.
-                      </Trans>
-                    </BackgroundText>
-                  </Line>
-
-                  <Line noMargin justifyContent="center">
-                    <BackgroundText>
-                      <Trans>
-                        <Link
-                          href={publishingWikiArticle}
-                          onClick={() =>
-                            Window.openExternalURL(publishingWikiArticle)
-                          }
-                        >
-                          Share a project
-                        </Link>{' '}
-                        to get started.
-                      </Trans>
-                    </BackgroundText>
-                  </Line>
-                </Column>
+              <ColumnStackLayout noMargin useFullHeight>
+                <BackgroundText>
+                  <Trans>
+                    Log-in or create an account to access your{' '}
+                    <Link
+                      href={publishingWikiArticle}
+                      onClick={() =>
+                        Window.openExternalURL(publishingWikiArticle)
+                      }
+                    >
+                      published games
+                    </Link>{' '}
+                    retention metrics, and player feedback.
+                  </Trans>
+                </BackgroundText>
+                <ResponsiveLineStackLayout
+                  noMargin
+                  noColumnMargin
+                  justifyContent="center"
+                >
+                  <div style={styles.buttonContainer}>
+                    <FlatButton
+                      fullWidth
+                      primary
+                      label={<Trans>Login</Trans>}
+                      onClick={onOpenLoginDialog}
+                    />
+                  </div>
+                  <div style={styles.buttonContainer}>
+                    <RaisedButton
+                      fullWidth
+                      primary
+                      label={<Trans>Create an account</Trans>}
+                      onClick={onOpenCreateAccountDialog}
+                    />
+                  </div>
+                </ResponsiveLineStackLayout>
               </ColumnStackLayout>
             </Paper>
-          ) : (
-            <GamesList
-              project={project}
-              games={games}
-              onRefreshGames={onRefreshGames}
-              onOpenGameId={setOpenedGameId}
-            />
-          )
-        ) : gamesFetchingError ? (
-          <PlaceholderError onRetry={onRefreshGames}>
-            <Trans>
-              Can't load the games. Verify your internet connection or retry
-              later.
-            </Trans>
-          </PlaceholderError>
-        ) : (
-          <Column expand justifyContent="center">
-            <PlaceholderLoader />
           </Column>
+        ) : (
+          <ColumnStackLayout>
+            <UserEarnings />
+            {!isRegisteringGame && (
+              <Line>
+                <GameRegistration
+                  project={project}
+                  hideLoader
+                  onGameRegistered={onRefreshGames}
+                />
+              </Line>
+            )}
+            {games ? (
+              games.length === 0 ? (
+                <Paper
+                  variant="outlined"
+                  background="dark"
+                  style={styles.backgroundMessage}
+                >
+                  <ColumnStackLayout noMargin>
+                    <Column noMargin>
+                      <Line noMargin justifyContent="center">
+                        <BackgroundText>
+                          <Trans>
+                            Learn how many users are playing your game, control
+                            published versions, and collect feedback from play
+                            testers.
+                          </Trans>
+                        </BackgroundText>
+                      </Line>
+
+                      <Line noMargin justifyContent="center">
+                        <BackgroundText>
+                          <Trans>
+                            <Link
+                              href={publishingWikiArticle}
+                              onClick={() =>
+                                Window.openExternalURL(publishingWikiArticle)
+                              }
+                            >
+                              Share a project
+                            </Link>{' '}
+                            to get started.
+                          </Trans>
+                        </BackgroundText>
+                      </Line>
+                    </Column>
+                  </ColumnStackLayout>
+                </Paper>
+              ) : (
+                <GamesList
+                  project={project}
+                  games={games}
+                  onRefreshGames={onRefreshGames}
+                  onOpenGameId={setOpenedGameId}
+                />
+              )
+            ) : gamesFetchingError ? (
+              <PlaceholderError onRetry={onRefreshGames}>
+                <Trans>
+                  Can't load the games. Verify your internet connection or retry
+                  later.
+                </Trans>
+              </PlaceholderError>
+            ) : (
+              <Column expand justifyContent="center">
+                <PlaceholderLoader />
+              </Column>
+            )}
+          </ColumnStackLayout>
         )}
       </SectionRow>
     </SectionContainer>

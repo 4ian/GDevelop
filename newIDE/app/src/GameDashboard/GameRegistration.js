@@ -17,6 +17,8 @@ import MarketingPlansDialog from '../MarketingPlans/MarketingPlansDialog';
 import { useGameManager } from '../Utils/UseGameAndBuildsManager';
 import RightLoader from '../UI/RightLoader';
 
+const styles = { buttonContainer: { flexShrink: 0 } };
+
 export type GameRegistrationProps = {|
   project: ?gdProject,
   suggestAdditionalActions?: boolean,
@@ -151,12 +153,14 @@ export const GameRegistration = ({
       <AlertMessage
         kind="info"
         renderRightButton={() => (
-          <RaisedButton
-            label={<Trans>Register the project</Trans>}
-            disabled={registrationInProgress}
-            primary
-            onClick={onRegisterGame}
-          />
+          <div style={styles.buttonContainer}>
+            <RaisedButton
+              label={<Trans>Register the project</Trans>}
+              disabled={registrationInProgress}
+              primary
+              onClick={onRegisterGame}
+            />
+          </div>
         )}
       >
         {customRegistrationMessage || (

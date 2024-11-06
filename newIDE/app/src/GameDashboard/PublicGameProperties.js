@@ -277,7 +277,8 @@ export function PublicGameProperties({
             <AlertMessage kind="info">
               <Trans>
                 You can configure the following properties and they will be
-                applied as soon as you share your game with an export to gd.games.
+                applied as soon as you share your game with an export to
+                gd.games.
               </Trans>
             </AlertMessage>
           )}

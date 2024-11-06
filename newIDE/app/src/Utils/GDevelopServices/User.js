@@ -135,7 +135,7 @@ export type UserPublicProfile = {|
   description: ?string,
   donateLink: ?string,
   discordUsername: ?string,
-  githubUsername?: ?string;
+  githubUsername?: ?string,
   communityLinks: CommunityLinks,
   iconUrl: string,
 |};

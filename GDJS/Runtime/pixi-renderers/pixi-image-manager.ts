@@ -463,6 +463,57 @@ namespace gdjs {
       }
       return particleTexture;
     }
+
+    /*
+     * Clear caches of loaded textures and materials.
+     */
+    dispose(): void {
+      this._loadedTextures.clear();
+
+      const threeTextures: THREE.Texture[] = [];
+      this._loadedThreeTextures.values(threeTextures);
+      this._loadedThreeTextures.clear();
+      for (const threeTexture of threeTextures) {
+        threeTexture.dispose();
+      }
+
+      const threeMaterials: THREE.Material[] = [];
+      this._loadedThreeMaterials.values(threeMaterials);
+      this._loadedThreeMaterials.clear();
+      for (const threeMaterial of threeMaterials) {
+        threeMaterial.dispose();
+      }
+
+      const diskPixiTextures = [...this._diskTextures.values()];
+      this._diskTextures.clear();
+      for (const pixiTexture of diskPixiTextures) {
+        if (pixiTexture.destroyed) {
+          continue;
+        }
+
+        pixiTexture.destroy();
+      }
+
+      const rectanglePixiTextures = [...this._rectangleTextures.values()];
+      this._rectangleTextures.clear();
+      for (const pixiTexture of rectanglePixiTextures) {
+        if (pixiTexture.destroyed) {
+          continue;
+        }
+
+        pixiTexture.destroy();
+      }
+
+      const scaledPixiTextures = [...this._scaledTextures.values()];
+      this._scaledTextures.clear();
+      for (const pixiTexture of scaledPixiTextures) {
+        if (pixiTexture.destroyed) {
+          continue;
+        }
+
+        pixiTexture.destroy();
+      }
+    }
   }
 
   //Register the class to let the engine use it.

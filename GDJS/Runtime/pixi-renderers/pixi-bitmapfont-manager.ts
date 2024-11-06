@@ -289,6 +289,21 @@ namespace gdjs {
         );
       }
     }
+
+    /**
+     * Uninstall all the fonts from memory and clear cache of loaded fonts.
+     */
+    dispose(): void {
+        for (const bitmapFontInstallKey in this._pixiBitmapFontsInUse) {
+            PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
+        }
+        for (const bitmapFontInstallKey of this._pixiBitmapFontsToUninstall) {
+            PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
+        }
+        this._pixiBitmapFontsInUse = {};
+        this._pixiBitmapFontsToUninstall.length = 0;
+        this._loadedFontsData.clear();
+    }
   }
 
   // Register the class to let the engine use it.

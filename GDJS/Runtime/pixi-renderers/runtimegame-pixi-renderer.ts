@@ -849,6 +849,10 @@ namespace gdjs {
       requestAnimationFrame(gameLoop);
     }
 
+    stopGameLoop(): void {
+      cancelAnimationFrame(this._nextFrameId);
+    }
+
     getPIXIRenderer() {
       return this._pixiRenderer;
     }
@@ -922,6 +926,18 @@ namespace gdjs {
         }
       }
       // HTML5 games on mobile/browsers don't have a way to close their window/page.
+    }
+
+    /**
+     * Dispose PixiRenderer, ThreeRenderer and remove canvas from DOM.
+     */
+    dispose() {
+      this._pixiRenderer?.destroy(true);
+      this._threeRenderer?.dispose();
+      this._pixiRenderer = null;
+      this._threeRenderer = null;
+      this._gameCanvas = null;
+      this._domElementsContainer = null;
     }
 
     /**

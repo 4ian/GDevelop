@@ -954,6 +954,16 @@ namespace gdjs {
       }
     }
 
+    /*
+     * Stop game loop, unload all scenes, dispose renderer and resources.
+     */
+    dispose(): void {
+      this._renderer.stopGameLoop();
+      this._sceneStack.dispose();
+      this._renderer.dispose();
+      this._resourcesLoader.dispose();
+    }
+
     /**
      * Set if the session should be registered.
      */
@@ -1006,6 +1016,10 @@ namespace gdjs {
      * time.
      */
     _setupSessionMetrics() {
+      if (this._isDisposed) {
+        return;
+      }
+
       if (this._sessionMetricsInitialized) {
         return;
       }

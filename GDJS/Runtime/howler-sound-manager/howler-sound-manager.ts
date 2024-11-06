@@ -868,6 +868,10 @@ namespace gdjs {
         }
       }
     }
+
+    dispose(): void {
+      this.unloadAll();
+    }
   }
 
   // Register the class to let the engine use it.

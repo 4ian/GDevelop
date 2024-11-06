@@ -354,5 +354,12 @@ namespace gdjs {
 
       return hasMadeChangeToStack;
     }
+
+    dispose(): void {
+        for (let i = 0; i < this._stack.length; ++i) {
+            this._stack[i].unloadScene();
+        }
+        this._stack.length = 0;
+    }
   }
 }

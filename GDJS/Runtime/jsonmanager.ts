@@ -200,5 +200,10 @@ namespace gdjs {
     getLoadedJson(resourceName: string): Object | null {
       return this._loadedJsons.getFromName(resourceName) || null;
     }
+
+    dispose(): void {
+      this._loadedJsons.clear();
+      this._callbacks.clear
+    }
   }
 }

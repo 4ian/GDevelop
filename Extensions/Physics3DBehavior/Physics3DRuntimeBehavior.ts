@@ -101,6 +101,10 @@ namespace gdjs {
     /** Contact listener to keep track of current collisions */
     contactListener: Jolt.ContactListenerJS;
     behaviorsByBodyID = new Map<number, gdjs.Physics3DRuntimeBehavior>();
+    /** Avoid creating new vectors all the time */
+    _tempVec3 = new Jolt.Vec3();
+    _tempRVec3 = new Jolt.RVec3();
+    _tempQuat = new Jolt.Quat();
 
     stepped: boolean = false;
     /**
@@ -125,7 +129,7 @@ namespace gdjs {
       Jolt.destroy(settings);
       this.physicsSystem = this.jolt.GetPhysicsSystem();
       this.physicsSystem.SetGravity(
-        new Jolt.Vec3(this.gravityX, this.gravityY, this.gravityZ)
+        this.getVec3(this.gravityX, this.gravityY, this.gravityZ)
       );
       this.bodyInterface = this.physicsSystem.GetBodyInterface();
 
@@ -195,7 +199,12 @@ namespace gdjs {
       };
     }
 
-    // (string)jointId -> (b2Joint)b2Joint
+    private getVec3(x: float, y: float, z: float): Jolt.Vec3 {
+      const tempVec3 = this._tempVec3;
+      tempVec3.Set(x, y, z);
+      return tempVec3;
+    }
+
     static getSharedData(
       runtimeScene: gdjs.RuntimeScene,
       behaviorName: string
@@ -259,14 +268,14 @@ namespace gdjs {
     }
   }
   gdjs.registerRuntimeSceneUnloadedCallback(function (runtimeScene) {
-    if (
-      // @ts-ignore
-      runtimeScene.physics3DSharedData &&
-      // @ts-ignore
-      runtimeScene.physics3DSharedData.world
-    ) {
-      // @ts-ignore
-      Box2D.destroy(runtimeScene.physics3DSharedData.world);
+    const physics3DSharedData = runtimeScene.physics3DSharedData;
+    if (physics3DSharedData) {
+      Jolt.destroy(physics3DSharedData.jolt);
+      Jolt.destroy(physics3DSharedData.contactListener);
+      Jolt.destroy(physics3DSharedData._tempVec3);
+      Jolt.destroy(physics3DSharedData._tempRVec3);
+      Jolt.destroy(physics3DSharedData._tempQuat);
+      runtimeScene.physics3DSharedData = null;
     }
   });
 
@@ -317,10 +326,6 @@ namespace gdjs {
     destroyedDuringFrameLogic: boolean;
     _body: Jolt.Body | null = null;
 
-    /** Avoid creating new vectors all the time */
-    _tempVec3 = new Jolt.Vec3();
-    _tempRVec3 = new Jolt.RVec3();
-    _tempQuat = new Jolt.Quat();
     /**
      * sharedData is a reference to the shared data of the scene, that registers
      * every physics behavior that is created so that collisions can be cleared
@@ -369,18 +374,21 @@ namespace gdjs {
     }
 
     private getVec3(x: float, y: float, z: float): Jolt.Vec3 {
-      this._tempVec3.Set(x, y, z);
-      return this._tempVec3;
+      const tempVec3 = this._sharedData._tempVec3;
+      tempVec3.Set(x, y, z);
+      return tempVec3;
     }
 
     private getRVec3(x: float, y: float, z: float): Jolt.RVec3 {
-      this._tempRVec3.Set(x, y, z);
-      return this._tempRVec3;
+      const tempRVec3 = this._sharedData._tempRVec3;
+      tempRVec3.Set(x, y, z);
+      return tempRVec3;
     }
 
     private getQuat(x: float, y: float, z: float, w: float): Jolt.Quat {
-      this._tempQuat.Set(x, y, z, w);
-      return this._tempQuat;
+      const tempQuat = this._sharedData._tempQuat;
+      tempQuat.Set(x, y, z, w);
+      return tempQuat;
     }
 
     updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
@@ -509,6 +517,8 @@ namespace gdjs {
       )
         .Create()
         .Get();
+
+      Jolt.destroy(shapeSettings);
       return rotatedShape;
     }
 
@@ -598,6 +608,7 @@ namespace gdjs {
       this._objectOldWidth = this.owner3D.getWidth();
       this._objectOldHeight = this.owner3D.getHeight();
       this._objectOldDepth = this.owner3D.getDepth();
+      Jolt.destroy(bodyCreationSettings);
       return true;
     }
 

@@ -355,11 +355,14 @@ namespace gdjs {
       return hasMadeChangeToStack;
     }
 
+    /*
+     * Unload all the scenes and clear the stack.
+     */
     dispose(): void {
-        for (let i = 0; i < this._stack.length; ++i) {
-            this._stack[i].unloadScene();
-        }
-        this._stack.length = 0;
+      for (const item of this._stack) {
+        item.unloadScene();
+      }
+      this._stack.length = 0;
     }
   }
 }

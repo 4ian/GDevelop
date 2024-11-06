@@ -942,6 +942,9 @@ namespace gdjs {
       }
     }
 
+    /*
+     * Unload all scenes, dispose renderer and resources.
+     */
     dispose(): void {
         if (this._isDisposed) {
             return;

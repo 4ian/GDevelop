@@ -198,6 +198,9 @@ namespace gdjs {
       }
     }
 
+    /*
+     * Clear caches of loaded font families.
+     */
     dispose(): void {
       this._loadedFontFamily.clear();
       this._loadedFontFamilySet.clear();

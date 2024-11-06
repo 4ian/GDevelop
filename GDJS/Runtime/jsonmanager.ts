@@ -201,9 +201,12 @@ namespace gdjs {
       return this._loadedJsons.getFromName(resourceName) || null;
     }
 
+    /*
+     * Clear cache of loaded jsons.
+     */
     dispose(): void {
       this._loadedJsons.clear();
-      this._callbacks.clear
+      this._callbacks.clear();
     }
   }
 }

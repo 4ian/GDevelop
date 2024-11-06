@@ -194,7 +194,9 @@ namespace gdjs {
         ? resource
         : null;
     }
-
+    /**
+     * Clear cache of loaded spine atlases.
+     */
     dispose(): void {
       this._loadedSpineAtlases.clear();
       this._loadingSpineAtlases.clear();

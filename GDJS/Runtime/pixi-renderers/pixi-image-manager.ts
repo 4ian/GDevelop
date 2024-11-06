@@ -464,6 +464,9 @@ namespace gdjs {
       return particleTexture;
     }
 
+    /*
+     * Clear caches of loaded textures and materials.
+     */
     dispose(): void {
       this._loadedTextures.clear();
 

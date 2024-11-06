@@ -144,6 +144,9 @@ namespace gdjs {
       );
     }
 
+    /*
+     * Clear cache of loaded three models and downloaded array buffers.
+     */
     dispose(): void {
       this._loadedThreeModels.clear();
       this._downloadedArrayBuffers.clear();

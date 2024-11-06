@@ -92,6 +92,7 @@ export const create = (authentication: Authentication) => {
                   fileMetadata={props.fileMetadata}
                   storageProvider={props.storageProvider}
                   initialTab={props.initialTab}
+                  gamesList={props.gamesList}
                 />
               )}
               quickPublishOnlineWebExporter={localOnlineWebExporter}

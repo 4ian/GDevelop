@@ -1194,6 +1194,7 @@ const MainFrame = (props: Props) => {
       }));
     },
     ensureResourcesAreMoved,
+    onGameRegistered: gamesList.fetchGames,
   });
 
   const closeApp = React.useCallback((): void => {
@@ -3751,6 +3752,7 @@ const MainFrame = (props: Props) => {
           fileMetadata: currentFileMetadata,
           storageProvider: getStorageProvider(),
           initialTab: shareDialogInitialTab,
+          gamesList,
         })}
       {!!renderPreviewLauncher &&
         renderPreviewLauncher(

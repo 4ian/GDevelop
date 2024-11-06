@@ -49,11 +49,13 @@ export type GameAndBuildsManager = {|
 type Props = {|
   project: ?gdProject,
   copyLeaderboardsAndMultiplayerLobbiesFromGameId?: string,
+  onGameRegistered?: () => Promise<void>,
 |};
 
 export const useGameManager = ({
   project,
   copyLeaderboardsAndMultiplayerLobbiesFromGameId,
+  onGameRegistered,
 }: Props): GameManager => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { profile, getAuthorizationHeader } = authenticatedUser;
@@ -156,6 +158,7 @@ export const useGameManager = ({
 
           // We don't await for the authors update, as it is not required for publishing.
           tryUpdateAuthors();
+          if (onGameRegistered) await onGameRegistered();
 
           if (copyLeaderboardsAndMultiplayerLobbiesFromGameId) {
             const leaderboardsToReplace = findLeaderboardsToReplaceInProject({
@@ -193,6 +196,7 @@ export const useGameManager = ({
       refreshGame,
       configureMultiplayerLobbiesIfNeeded,
       authenticatedUser,
+      onGameRegistered,
     ]
   );
 
@@ -213,6 +217,7 @@ export const useGameManager = ({
 export const useGameAndBuildsManager = ({
   project,
   copyLeaderboardsAndMultiplayerLobbiesFromGameId,
+  onGameRegistered,
 }: Props): GameAndBuildsManager => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { profile, getAuthorizationHeader } = authenticatedUser;
@@ -221,6 +226,7 @@ export const useGameAndBuildsManager = ({
   const gameManager = useGameManager({
     project,
     copyLeaderboardsAndMultiplayerLobbiesFromGameId,
+    onGameRegistered,
   });
 
   const [builds, setBuilds] = React.useState<?Array<Build>>(null);

@@ -44,7 +44,7 @@ const OnlineWebExportFlow = ({
   const [
     automaticallyPublishNewBuild,
     setAutomaticallyPublishNewBuild,
-  ] = React.useState(publishOnGdGamesByDefault);
+  ] = React.useState(publishOnGdGamesByDefault || !hasGameExistingBuilds);
 
   // Only show the buttons when the export is not started or when it's done.
   const shouldShowButtons =
@@ -60,12 +60,10 @@ const OnlineWebExportFlow = ({
       >
         <RaisedButton
           label={
-            automaticallyPublishNewBuild ? (
-              hasGameExistingBuilds ? (
-                <Trans>Publish new version</Trans>
-              ) : (
-                <Trans>Generate link</Trans>
-              )
+            !hasGameExistingBuilds ? (
+              <Trans>Publish game</Trans>
+            ) : automaticallyPublishNewBuild ? (
+              <Trans>Publish new version</Trans>
             ) : (
               <Trans>Generate a new link</Trans>
             )
@@ -76,14 +74,16 @@ const OnlineWebExportFlow = ({
           disabled={disabled}
         />
       </Line>
-      <Line justifyContent="center">
-        <Checkbox
-          checked={automaticallyPublishNewBuild}
-          onCheck={(_, newValue) => setAutomaticallyPublishNewBuild(newValue)}
-          label={<Trans>Update game page</Trans>}
-          disabled={disabled}
-        />
-      </Line>
+      {hasGameExistingBuilds && (
+        <Line justifyContent="center">
+          <Checkbox
+            checked={automaticallyPublishNewBuild}
+            onCheck={(_, newValue) => setAutomaticallyPublishNewBuild(newValue)}
+            label={<Trans>Update game page</Trans>}
+            disabled={disabled}
+          />
+        </Line>
+      )}
     </ColumnStackLayout>
   );
   return (

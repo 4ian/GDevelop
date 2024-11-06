@@ -591,6 +591,67 @@ module.exports = {
         .getCodeExtraInformation()
         .setFunctionName('applyImpulseAtCenter');
 
+    // Collision
+    extension
+      .addCondition(
+        'Collision',
+        _('Collision'),
+        _('Check if two objects collide.'),
+        _('_PARAM0_ is colliding with _PARAM2_'),
+        '',
+        'res/physics32.png',
+        'res/physics32.png'
+      )
+      .addParameter('objectList', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .addParameter('objectList', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .addCodeOnlyParameter('conditionInverted', '')
+      .getCodeExtraInformation()
+      .addIncludeFile('Extensions/Physics3DBehavior/Physics3DTools.js')
+      .addIncludeFile('Extensions/Physics3DBehavior/Physics3DRuntimeBehavior.js')
+      .setFunctionName('gdjs.physics3d.objectsCollide');
+
+    extension
+      .addCondition(
+        'CollisionStarted',
+        _('Collision started'),
+        _('Check if two objects just started colliding during this frame.'),
+        _('_PARAM0_ started colliding with _PARAM2_'),
+        _('Collision'),
+        'res/physics32.png',
+        'res/physics32.png'
+      )
+      .addParameter('objectList', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .addParameter('objectList', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .addCodeOnlyParameter('conditionInverted', '')
+      .getCodeExtraInformation()
+      .addIncludeFile('Extensions/Physics3DBehavior/Physics3DTools.js')
+      .addIncludeFile('Extensions/Physics3DBehavior/Physics3DRuntimeBehavior.js')
+      .setFunctionName('gdjs.physics3d.haveObjectsStartedColliding');
+
+    extension
+      .addCondition(
+        'CollisionStopped',
+        _('Collision stopped'),
+        _('Check if two objects just stopped colliding at this frame.'),
+        _('_PARAM0_ stopped colliding with _PARAM2_'),
+        _('Collision'),
+        'res/physics32.png',
+        'res/physics32.png'
+      )
+      .addParameter('objectList', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .addParameter('objectList', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .addCodeOnlyParameter('conditionInverted', '')
+      .getCodeExtraInformation()
+      .addIncludeFile('Extensions/Physics3DBehavior/Physics3DTools.js')
+      .addIncludeFile('Extensions/Physics3DBehavior/Physics3DRuntimeBehavior.js')
+      .setFunctionName('gdjs.physics3d.haveObjectsStoppedColliding');
+
     return extension;
   },
 

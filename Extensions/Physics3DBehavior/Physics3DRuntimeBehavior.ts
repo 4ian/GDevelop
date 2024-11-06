@@ -1,5 +1,11 @@
 /// <reference path="./jolt-physics.d.ts" />
 
+namespace Jolt {
+  export interface Body {
+    gdjsAssociatedBehavior: gdjs.Physics3DRuntimeBehavior | null;
+  }
+}
+
 namespace gdjs {
   gdjs.registerAsynchronouslyLoadingLibraryPromise(
     new Promise((resolve) => {
@@ -92,6 +98,9 @@ namespace gdjs {
     jolt: Jolt.JoltInterface;
     physicsSystem: Jolt.PhysicsSystem;
     bodyInterface: Jolt.BodyInterface;
+    /** Contact listener to keep track of current collisions */
+    contactListener: Jolt.ContactListenerJS;
+    behaviorsByBodyID = new Map<number, gdjs.Physics3DRuntimeBehavior>();
 
     stepped: boolean = false;
     /**
@@ -119,6 +128,71 @@ namespace gdjs {
         new Jolt.Vec3(this.gravityX, this.gravityY, this.gravityZ)
       );
       this.bodyInterface = this.physicsSystem.GetBodyInterface();
+
+      this.contactListener = new Jolt.ContactListenerJS();
+      this.physicsSystem.SetContactListener(this.contactListener);
+      this.contactListener.OnContactAdded = (
+        bodyPtrA: number,
+        bodyPtrB: number,
+        manifoldPtr: number,
+        settingsPtr: number
+      ): void => {
+        const bodyA = Jolt.wrapPointer(bodyPtrA, Jolt.Body);
+        const bodyB = Jolt.wrapPointer(bodyPtrB, Jolt.Body);
+
+        // Get associated behaviors
+        const behaviorA = bodyA.gdjsAssociatedBehavior;
+        const behaviorB = bodyB.gdjsAssociatedBehavior;
+
+        if (!behaviorA || !behaviorB) {
+          return;
+        }
+
+        behaviorA.onContactBegin(behaviorB);
+        behaviorB.onContactBegin(behaviorA);
+        this.behaviorsByBodyID.set(
+          bodyA.GetID().GetIndexAndSequenceNumber(),
+          behaviorA
+        );
+        this.behaviorsByBodyID.set(
+          bodyB.GetID().GetIndexAndSequenceNumber(),
+          behaviorB
+        );
+      };
+      this.contactListener.OnContactRemoved = (
+        subShapePairPtr: number
+      ): void => {
+        const subShapePair = Jolt.wrapPointer(
+          subShapePairPtr,
+          Jolt.SubShapeIDPair
+        );
+
+        const behaviorA = this.behaviorsByBodyID.get(
+          subShapePair.GetBody1ID().GetIndexAndSequenceNumber()
+        );
+        const behaviorB = this.behaviorsByBodyID.get(
+          subShapePair.GetBody2ID().GetIndexAndSequenceNumber()
+        );
+        if (!behaviorA || !behaviorB) {
+          return;
+        }
+        behaviorA.onContactEnd(behaviorB);
+        behaviorB.onContactEnd(behaviorA);
+      };
+      this.contactListener.OnContactPersisted = (
+        inBody1: number,
+        inBody2: number,
+        inManifold: number,
+        ioSettings: number
+      ): void => {};
+      this.contactListener.OnContactValidate = (
+        inBody1: number,
+        inBody2: number,
+        inBaseOffset: number,
+        inCollisionResult: number
+      ): number => {
+        return Jolt.ValidateResult_AcceptAllContactsForThisBodyPair;
+      };
     }
 
     // (string)jointId -> (b2Joint)b2Joint
@@ -160,10 +234,10 @@ namespace gdjs {
      */
     resetStartedAndEndedCollisions(): void {
       for (const physicsBehavior of this._registeredBehaviors) {
-        // TODO
-        // physicsBehavior.contactsStartedThisFrame.length = 0;
-        // physicsBehavior.contactsEndedThisFrame.length = 0;
+        physicsBehavior.contactsStartedThisFrame.length = 0;
+        physicsBehavior.contactsEndedThisFrame.length = 0;
       }
+      this.behaviorsByBodyID.clear();
     }
 
     /**
@@ -215,6 +289,30 @@ namespace gdjs {
     angularDamping: float;
     gravityScale: float;
     shapeScale: number = 1;
+
+    /**
+     * Array containing the beginning of contacts reported by onContactBegin. Each contact
+     * should be unique to avoid recording glitches where the object loses and regain
+     * contact between two frames. The array is updated each time the method
+     * onContactBegin is called by the listener, which is only called when stepping
+     * the world i.e. in the first preEvent called by a physics behavior. This array is
+     * cleared just before stepping the world.
+     */
+    contactsStartedThisFrame: Array<Physics3DRuntimeBehavior> = [];
+
+    /**
+     * Array containing the end of contacts reported by onContactEnd. The array is updated
+     * each time the method onContactEnd is called by the listener, which can be called at
+     * any time. This array is cleared just before stepping the world.
+     */
+    contactsEndedThisFrame: Array<Physics3DRuntimeBehavior> = [];
+
+    /**
+     * Array containing the exact current contacts with the objects. It is updated
+     * each time the methods onContactBegin and onContactEnd are called by the contact
+     * listener.
+     */
+    currentContacts: Array<Physics3DRuntimeBehavior> = [];
 
     destroyedDuringFrameLogic: boolean;
     _body: Jolt.Body | null = null;
@@ -308,19 +406,17 @@ namespace gdjs {
         this._sharedData.bodyInterface.DestroyBody(this._body.GetID());
         this._body = null;
       }
-      // TODO
-      // this.contactsEndedThisFrame.length = 0;
-      // this.contactsStartedThisFrame.length = 0;
-      // this.currentContacts.length = 0;
+      this.contactsEndedThisFrame.length = 0;
+      this.contactsStartedThisFrame.length = 0;
+      this.currentContacts.length = 0;
     }
 
     onActivate() {
       this._sharedData.addToBehaviorsList(this);
 
-      // TODO
-      // this.contactsEndedThisFrame.length = 0;
-      // this.contactsStartedThisFrame.length = 0;
-      // this.currentContacts.length = 0;
+      this.contactsEndedThisFrame.length = 0;
+      this.contactsStartedThisFrame.length = 0;
+      this.currentContacts.length = 0;
       this.updateBodyFromObject();
     }
 
@@ -490,10 +586,14 @@ namespace gdjs {
       bodyCreationSettings.mLinearDamping = this.linearDamping;
       bodyCreationSettings.mAngularDamping = this.angularDamping;
       bodyCreationSettings.mGravityFactor = this.gravityScale;
+      // TODO Collision between 2 non-dynamic body should be checked during the
+      // collision condition to improve efficiency.
+      bodyCreationSettings.mCollideKinematicVsNonDynamic = true;
 
       const bodyInterface = this._sharedData.bodyInterface;
       this._body = bodyInterface.CreateBody(bodyCreationSettings);
       bodyInterface.AddBody(this._body.GetID(), Jolt.EActivation_Activate);
+      this._body.gdjsAssociatedBehavior = this;
 
       this._objectOldWidth = this.owner3D.getWidth();
       this._objectOldHeight = this.owner3D.getHeight();
@@ -704,6 +804,92 @@ namespace gdjs {
       this._sharedData.bodyInterface.AddImpulse(
         body.GetID(),
         this.getVec3(impulseX, impulseY, impulseZ)
+      );
+    }
+
+    onContactBegin(otherBehavior: Physics3DRuntimeBehavior): void {
+      this.currentContacts.push(otherBehavior);
+
+      // There might be contacts that end during the frame and
+      // start again right away. It is considered a glitch
+      // and should not be detected.
+      let i = this.contactsEndedThisFrame.indexOf(otherBehavior);
+      if (i !== -1) {
+        this.contactsEndedThisFrame.splice(i, 1);
+      } else {
+        this.contactsStartedThisFrame.push(otherBehavior);
+      }
+    }
+
+    onContactEnd(otherBehavior: Physics3DRuntimeBehavior): void {
+      this.contactsEndedThisFrame.push(otherBehavior);
+
+      const index = this.currentContacts.indexOf(otherBehavior);
+      if (index !== -1) {
+        this.currentContacts.splice(index, 1);
+      }
+    }
+
+    static areObjectsColliding(
+      object1: gdjs.RuntimeObject,
+      object2: gdjs.RuntimeObject,
+      behaviorName: string
+    ): boolean {
+      // Test if the second object is in the list of contacts of the first one
+      const behavior1 = object1.getBehavior(
+        behaviorName
+      ) as Physics3DRuntimeBehavior | null;
+      if (!behavior1) return false;
+
+      if (
+        behavior1.currentContacts.some((behavior) => behavior.owner === object2)
+      ) {
+        return true;
+      }
+      // If a contact has started at this frame and ended right away, it
+      // won't appear in current contacts but the condition should return
+      // true anyway.
+      if (
+        behavior1.contactsStartedThisFrame.some(
+          (behavior) => behavior.owner === object2
+        )
+      ) {
+        return true;
+      }
+
+      // No contact found
+      return false;
+    }
+
+    static hasCollisionStartedBetween(
+      object1: gdjs.RuntimeObject,
+      object2: gdjs.RuntimeObject,
+      behaviorName: string
+    ): boolean {
+      // Test if the second object is in the list of contacts of the first one
+      const behavior1 = object1.getBehavior(
+        behaviorName
+      ) as Physics3DRuntimeBehavior | null;
+      if (!behavior1) return false;
+
+      return behavior1.contactsStartedThisFrame.some(
+        (behavior) => behavior.owner === object2
+      );
+    }
+
+    static hasCollisionStoppedBetween(
+      object1: gdjs.RuntimeObject,
+      object2: gdjs.RuntimeObject,
+      behaviorName: string
+    ): boolean {
+      // Test if the second object is in the list of contacts of the first one
+      const behavior1 = object1.getBehavior(
+        behaviorName
+      ) as Physics3DRuntimeBehavior | null;
+      if (!behavior1) return false;
+
+      return behavior1.contactsEndedThisFrame.some(
+        (behavior) => behavior.owner === object2
       );
     }
   }

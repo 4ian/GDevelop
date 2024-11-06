@@ -454,6 +454,15 @@ namespace gdjs {
       });
     }
 
+    /*
+     * Dispose all resource managers.
+     */
+    dispose(): void {
+      for (const resourceManager of this._resourceManagersMap.values()) {
+        resourceManager.dispose();
+      }
+    }
+
     /**
      * Put a given scene at the end of the queue.
      *

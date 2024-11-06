@@ -85,6 +85,15 @@ export const OnlineGamePropertiesDialog = ({
   const [discoverable, setDiscoverable] = React.useState<boolean>(
     !!game.discoverable
   );
+  const [
+    isPublishedOnGdGames,
+    setIsPublishedOnGdGames,
+  ] = React.useState<boolean>(!!game.publicWebBuildId);
+  const [
+    acceptsAdvertisementsOnGdGames,
+    setAcceptsAdvertisementsOnGdGames,
+  ] = React.useState<boolean>(!!game.displayAdsOnGamePage);
+
 
   const onPublish = async ({ saveProject }: { saveProject: boolean }) => {
     // First update the project with the new properties.
@@ -173,6 +182,11 @@ export const OnlineGamePropertiesDialog = ({
         gameSlug={gameSlug}
         setGameSlug={setGameSlug}
         discoverable={discoverable}
+        isPublishedOnGdGames={isPublishedOnGdGames}
+        setIsPublishedOnGdGames={setIsPublishedOnGdGames}
+        acceptsAdvertisementsOnGdGames={acceptsAdvertisementsOnGdGames}
+        setAcceptsAdvertisementsOnGdGames={setAcceptsAdvertisementsOnGdGames}
+        canBePublishedOnGdGames={true}
         setDiscoverable={setDiscoverable}
         displayThumbnail
         thumbnailUrl={gameThumbnailUrl}

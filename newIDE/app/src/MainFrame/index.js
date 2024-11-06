@@ -196,9 +196,9 @@ import { useAuthenticatedPlayer } from './UseAuthenticatedPlayer';
 import ListIcon from '../UI/ListIcon';
 import { QuickCustomizationDialog } from '../QuickCustomization/QuickCustomizationDialog';
 import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
-import RouterContext from './RouterContext';
 import useGamesList from '../GameDashboard/UseGamesList';
 import useCapturesManager from './UseCapturesManager';
+import useRouteArguments from './UseRouteArguments';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -374,7 +374,6 @@ const MainFrame = (props: Props) => {
     newProjectSetupDialogOpen,
     setNewProjectSetupDialogOpen,
   ] = React.useState<boolean>(false);
-  const { navigateToRoute } = React.useContext(RouterContext);
 
   const [isProjectOpening, setIsProjectOpening] = React.useState<boolean>(
     false
@@ -1902,6 +1901,15 @@ const MainFrame = (props: Props) => {
     },
     [setState, getEditorOpeningOptions]
   );
+
+  const closeDialogsToOpenHomePage = React.useCallback(() => {
+    setShareDialogOpen(false);
+  }, []);
+
+  const { navigateToRoute } = useRouteArguments({
+    openHomePage,
+    closeDialogs: closeDialogsToOpenHomePage,
+  });
 
   const _openDebugger = React.useCallback(
     () => {

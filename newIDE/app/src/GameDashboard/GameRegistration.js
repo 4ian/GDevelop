@@ -203,7 +203,7 @@ export const GameRegistration = ({
             <Text size="block-title">
               <Trans>Taking your game further</Trans>
             </Text>
-            <Column noMargin>
+            <Column>
               <Toggle
                 onToggle={() =>
                   onToggleGameStatsEmail(!profile.getGameStatsEmail)

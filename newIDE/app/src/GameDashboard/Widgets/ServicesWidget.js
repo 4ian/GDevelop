@@ -1,21 +1,21 @@
 // @flow
 
 import * as React from 'react';
-import { type Leaderboard } from '../Utils/GDevelopServices/Play';
+import { type Leaderboard } from '../../Utils/GDevelopServices/Play';
 import DashboardWidget from './DashboardWidget';
 import { Trans } from '@lingui/macro';
-import FlatButton from '../UI/FlatButton';
-import { ResponsiveLineStackLayout } from '../UI/Layout';
-import { Column, Line, LargeSpacer } from '../UI/Grid';
-import Text from '../UI/Text';
+import FlatButton from '../../UI/FlatButton';
+import { ResponsiveLineStackLayout } from '../../UI/Layout';
+import { Column, Line, LargeSpacer } from '../../UI/Grid';
+import Text from '../../UI/Text';
 import { Divider } from '@material-ui/core';
-import ArrowRight from '../UI/CustomSvgIcons/ArrowRight';
-import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
-import Link from '../UI/Link';
-import { getHelpLink } from '../Utils/HelpLink';
-import Window from '../Utils/Window';
-import RaisedButton from '../UI/RaisedButton';
-import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
+import ArrowRight from '../../UI/CustomSvgIcons/ArrowRight';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
+import Link from '../../UI/Link';
+import { getHelpLink } from '../../Utils/HelpLink';
+import Window from '../../Utils/Window';
+import RaisedButton from '../../UI/RaisedButton';
+import { SubscriptionSuggestionContext } from '../../Profile/Subscription/SubscriptionSuggestionContext';
 
 const leaderboardsHelpLink = getHelpLink('/all-features/leaderboards');
 const multiplayerHelpLink = getHelpLink('/all-features/multiplayer');

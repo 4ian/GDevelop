@@ -22,7 +22,7 @@ import {
 } from '../Utils/GDevelopServices/Game';
 import { ColumnStackLayout } from '../UI/Layout';
 import GameHeader from './GameHeader';
-import FeedbackWidget from './FeedbackWidget';
+import FeedbackWidget from './Widgets/FeedbackWidget';
 import {
   listComments,
   listGameActiveLeaderboards,
@@ -35,23 +35,30 @@ import {
   type GameMetrics,
 } from '../Utils/GDevelopServices/Analytics';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import AnalyticsWidget from './AnalyticsWidget';
-import ServicesWidget from './ServicesWidget';
-import type { GameDetailsTab } from '../GameDashboard/GameDetails';
+import AnalyticsWidget from './Widgets/AnalyticsWidget';
+import ServicesWidget from './Widgets/ServicesWidget';
 import { Column, Line } from '../UI/Grid';
 import TextButton from '../UI/TextButton';
 import ArrowLeft from '../UI/CustomSvgIcons/ArrowLeft';
-import GameFeedback from '../GameDashboard/Feedbacks/GameFeedback';
+import GameFeedback from './Feedbacks/GameFeedback';
 import Builds from '../ExportAndShare/Builds';
-import { GameAnalyticsPanel } from '../GameDashboard/GameAnalyticsPanel';
-import LeaderboardAdmin from '../GameDashboard/LeaderboardAdmin';
-import MultiplayerAdmin from '../GameDashboard/MultiplayerAdmin';
-import BuildsWidget from './BuildsWidget';
+import { GameAnalyticsPanel } from './GameAnalyticsPanel';
+import LeaderboardAdmin from './LeaderboardAdmin';
+import MultiplayerAdmin from './MultiplayerAdmin';
+import BuildsWidget from './Widgets/BuildsWidget';
 import PublicGamePropertiesDialog, {
   type PublicGameAndProjectEditableProperties,
-} from '../GameDashboard/PublicGamePropertiesDialog';
+} from './PublicGamePropertiesDialog';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { showErrorBox } from '../UI/Messages/MessageBox';
+
+export type GameDetailsTab =
+  | 'details'
+  | 'builds'
+  | 'feedback'
+  | 'analytics'
+  | 'multiplayer'
+  | 'leaderboards';
 
 type Props = {|
   project?: ?gdProject,
@@ -65,7 +72,7 @@ type Props = {|
   gameUnregisterErrorText: ?React.Node,
 |};
 
-const GameOverview = ({
+const GameDashboard = ({
   project,
   game,
   currentView,
@@ -514,7 +521,9 @@ const GameOverview = ({
                       setCurrentView('multiplayer')
                     }
                     leaderboards={leaderboards}
-                    displayUnlockMoreLeaderboardsCallout={displayUnlockMoreLeaderboardsCallout}
+                    displayUnlockMoreLeaderboardsCallout={
+                      displayUnlockMoreLeaderboardsCallout
+                    }
                   />
                   <BuildsWidget
                     builds={builds}
@@ -550,4 +559,4 @@ const GameOverview = ({
   );
 };
 
-export default GameOverview;
+export default GameDashboard;

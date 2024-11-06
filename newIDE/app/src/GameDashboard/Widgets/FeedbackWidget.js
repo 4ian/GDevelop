@@ -4,22 +4,22 @@ import * as React from 'react';
 import { I18n } from '@lingui/react';
 import Divider from '@material-ui/core/Divider';
 import { t, Trans } from '@lingui/macro';
-import FlatButton from '../UI/FlatButton';
+import FlatButton from '../../UI/FlatButton';
 import DashboardWidget from './DashboardWidget';
-import ArrowRight from '../UI/CustomSvgIcons/ArrowRight';
-import { type Comment } from '../Utils/GDevelopServices/Play';
+import ArrowRight from '../../UI/CustomSvgIcons/ArrowRight';
+import { type Comment } from '../../Utils/GDevelopServices/Play';
 import {
   type Game,
   type GameUpdatePayload,
-} from '../Utils/GDevelopServices/Game';
-import { Line, Spacer } from '../UI/Grid';
-import Text from '../UI/Text';
-import { shortenString } from '../Utils/StringHelpers';
-import { ColumnStackLayout } from '../UI/Layout';
-import ScrollView from '../UI/ScrollView';
-import GameLinkAndShareIcons from './GameLinkAndShareIcons';
-import NotificationDot from './NotificationDot';
-import { CompactToggleField } from '../UI/CompactToggleField';
+} from '../../Utils/GDevelopServices/Game';
+import { Line, Spacer } from '../../UI/Grid';
+import Text from '../../UI/Text';
+import { shortenString } from '../../Utils/StringHelpers';
+import { ColumnStackLayout } from '../../UI/Layout';
+import ScrollView from '../../UI/ScrollView';
+import GameLinkAndShareIcons from '../GameLinkAndShareIcons';
+import NotificationDot from '../NotificationDot';
+import { CompactToggleField } from '../../UI/CompactToggleField';
 
 type Props = {|
   feedbacks: ?Array<Comment>,

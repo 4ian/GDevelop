@@ -1,11 +1,11 @@
 // @flow
 
 import * as React from 'react';
-import Paper from '../UI/Paper';
-import Text from '../UI/Text';
-import { Column, Line } from '../UI/Grid';
-import { Grid } from '@material-ui/core';
-import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
+import Grid from '@material-ui/core/Grid';
+import Paper from '../../UI/Paper';
+import Text from '../../UI/Text';
+import { Column, Line } from '../../UI/Grid';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 
 const verticalPadding = 8;
 

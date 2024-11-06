@@ -38,7 +38,7 @@ import {
   sendUserSurveyStarted,
 } from '../../../Utils/Analytics/EventSender';
 import RouterContext, { type RouteArguments } from '../../RouterContext';
-import { type GameDetailsTab } from '../../../GameDashboard/GameDetails';
+import { type GameDetailsTab } from '../../../GameDashboard';
 import useDisplayNewFeature from '../../../Utils/UseDisplayNewFeature';
 import HighlightingTooltip from '../../../UI/HighlightingTooltip';
 import Text from '../../../UI/Text';

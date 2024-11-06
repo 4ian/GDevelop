@@ -26,8 +26,8 @@ import FlatButton from '../../../../UI/FlatButton';
 import Link from '../../../../UI/Link';
 import Window from '../../../../Utils/Window';
 import { getHelpLink } from '../../../../Utils/HelpLink';
-import { type GameDetailsTab } from '../../../../GameDashboard/GameDetails';
-import GameOverview from '../../../../GameOverview';
+import { type GameDetailsTab } from '../../../../GameDashboard';
+import GameOverview from '../../../../GameDashboard';
 import useAlertDialog from '../../../../UI/Alert/useAlertDialog';
 import RouterContext from '../../../RouterContext';
 import { getDefaultRegisterGamePropertiesFromProject } from '../../../../Utils/UseGameAndBuildsManager';
@@ -145,6 +145,13 @@ const ManageSection = ({
   const unregisterGame = React.useCallback(
     async (i18n: I18nType) => {
       if (!profile || !openedGame) return;
+
+      const answer = await showConfirmation({
+        title: t`Unregister game`,
+        message: t`Are you sure you want to unregister this game?${'\n\n'}It will disappear from your games dashboard and you won't get access to player services, unless you register it again.`,
+      });
+      if (!answer) return;
+
       const { id } = profile;
       setGameUnregisterErrorText(null);
       try {
@@ -183,6 +190,7 @@ const ManageSection = ({
       getAuthorizationHeader,
       onRefreshGames,
       setOpenedGameId,
+      showConfirmation,
     ]
   );
 

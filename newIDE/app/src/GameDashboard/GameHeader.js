@@ -5,7 +5,7 @@ import { I18n } from '@lingui/react';
 import { t, Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import { type Game } from '../Utils/GDevelopServices/Game';
-import { GameThumbnail } from '../GameDashboard/GameThumbnail';
+import { GameThumbnail } from './GameThumbnail';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import {
   ColumnStackLayout,

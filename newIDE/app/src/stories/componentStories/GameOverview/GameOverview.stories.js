@@ -7,7 +7,7 @@ import { action } from '@storybook/addon-actions';
 
 import paperDecorator from '../../PaperDecorator';
 
-import GameOverview from '../../../GameOverview';
+import GameDashboard from '../../../GameDashboard';
 
 import { type AuthenticatedUser } from '../../../Profile/AuthenticatedUserContext';
 import {
@@ -35,7 +35,7 @@ import {
   type Game,
 } from '../../../Utils/GDevelopServices/Game';
 
-import type { GameDetailsTab } from '../../../GameDashboard/GameDetails';
+import type { GameDetailsTab } from '../../../GameDashboard';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import {
   mockedLeaderboards,
@@ -44,8 +44,8 @@ import {
 import { MarketingPlansStoreStateProvider } from '../../../MarketingPlans/MarketingPlansStoreContext';
 
 export default {
-  title: 'GameDashboard/GameOverview',
-  component: GameOverview,
+  title: 'GameDashboard/GameDashboard',
+  component: GameDashboard,
   decorators: [paperDecorator],
   argTypes: {
     analyticsSource: { control: { type: false } }, // Hide default control.
@@ -323,7 +323,7 @@ export const Default = ({
   return (
     <AuthenticatedUserContext.Provider value={authenticatedUser}>
       <MarketingPlansStoreStateProvider>
-        <GameOverview
+        <GameDashboard
           game={game}
           analyticsSource="homepage"
           key={renderCount.toFixed(0)}

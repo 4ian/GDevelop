@@ -19,7 +19,7 @@ import {
   getGameUrl,
   type Game,
 } from '../Utils/GDevelopServices/Game';
-import { type GameDetailsTab } from './GameDetails';
+import { type GameDetailsTab } from '.';
 import Card from '../UI/Card';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
@@ -28,7 +28,7 @@ import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
 import DollarCoin from '../UI/CustomSvgIcons/DollarCoin';
 import Cross from '../UI/CustomSvgIcons/Cross';
 import Messages from '../UI/CustomSvgIcons/Messages';
-import GameLinkAndShareIcons from '../GameOverview/GameLinkAndShareIcons';
+import GameLinkAndShareIcons from './GameLinkAndShareIcons';
 
 const styles = {
   iconAndText: { display: 'flex', gap: 2, alignItems: 'flex-start' },

@@ -1,14 +1,14 @@
 // @flow
-import { Trans, t } from '@lingui/macro';
 import * as React from 'react';
+import Fuse from 'fuse.js';
+import { Trans, t } from '@lingui/macro';
 import { type Game } from '../Utils/GDevelopServices/Game';
 import { GameCard } from './GameCard';
 import { ColumnStackLayout } from '../UI/Layout';
-import { type GameDetailsTab } from './GameDetails';
+import { type GameDetailsTab } from '.';
 import RouterContext from '../MainFrame/RouterContext';
 import SearchBar from '../UI/SearchBar';
 import { useDebounce } from '../Utils/UseDebounce';
-import Fuse from 'fuse.js';
 import {
   getFuseSearchQueryForSimpleArray,
   sharedFuseConfiguration,

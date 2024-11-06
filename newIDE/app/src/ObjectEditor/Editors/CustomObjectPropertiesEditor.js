@@ -441,9 +441,9 @@ const CustomObjectPropertiesEditor = (props: Props) => {
             <Dialog
               title={<Trans>Edit points</Trans>}
               actions={[
-                <FlatButton
-                  key="close"
-                  label={<Trans>Close</Trans>}
+                <RaisedButton
+                  key="apply"
+                  label={<Trans>Apply</Trans>}
                   primary
                   onClick={() => setPointsEditorOpen(false)}
                 />,
@@ -495,9 +495,9 @@ const CustomObjectPropertiesEditor = (props: Props) => {
             <Dialog
               title={<Trans>Edit collision masks</Trans>}
               actions={[
-                <FlatButton
-                  key="close"
-                  label={<Trans>Close</Trans>}
+                <RaisedButton
+                  key="apply"
+                  label={<Trans>Apply</Trans>}
                   primary
                   onClick={() => setCollisionMasksEditorOpen(false)}
                 />,

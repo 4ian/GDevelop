@@ -307,13 +307,12 @@ export const findLeaderboardsToReplaceInProject = ({
 }: {|
   project: gdProject,
 |}) => {
-  const leaderboardsLister = new gd.EventsLeaderboardsLister(project);
-  // $FlowIgnore - leaderboardsLister inherits from ArbitraryEventsWorker
-  gd.ProjectBrowserHelper.exposeProjectEvents(project, leaderboardsLister);
-  const leaderboardIds = leaderboardsLister.getLeaderboardIds();
-  const leaderboardIdsArray = leaderboardIds.toNewVectorString().toJSArray();
-  leaderboardsLister.delete();
-  return leaderboardIdsArray;
+  const leaderboardIds = gd.WholeProjectRefactorer.findAllLeaderboardIds(
+    project
+  )
+    .toNewVectorString()
+    .toJSArray();
+  return leaderboardIds;
 };
 
 /**

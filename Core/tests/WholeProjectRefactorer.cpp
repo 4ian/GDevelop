@@ -4452,13 +4452,14 @@ TEST_CASE("MergeLayers", "[common]") {
     REQUIRE(initialInstances.GetLayerInstancesCount("My other layer") == 1);
   }
 
+  // TODO: ideally, a test should also cover objects having `leaderboardId` as property.
   SECTION("Can rename a leaderboard in scene events") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
 
     auto &layout = project.InsertNewLayout("My layout", 0);
-    
+
     gd::StandardEvent &event = dynamic_cast<gd::StandardEvent &>(
         layout.GetEvents().InsertNewEvent(project, "BuiltinCommonInstructions::Standard"));
 
@@ -4467,6 +4468,10 @@ TEST_CASE("MergeLayers", "[common]") {
     action.SetParametersCount(1);
     action.SetParameter(0, gd::Expression("\"12345678-9abc-def0-1234-56789abcdef0\""));
     event.GetActions().Insert(action);
+
+    std::set<gd::String> allLeaderboardIds = gd::WholeProjectRefactorer::FindAllLeaderboardIds(project);
+    REQUIRE(allLeaderboardIds.size() == 1);
+    REQUIRE(allLeaderboardIds.count("12345678-9abc-def0-1234-56789abcdef0") == 1);
 
     std::map<gd::String, gd::String> leaderboardIdMap;
     leaderboardIdMap["12345678-9abc-def0-1234-56789abcdef0"] = "87654321-9abc-def0-1234-56789abcdef0";

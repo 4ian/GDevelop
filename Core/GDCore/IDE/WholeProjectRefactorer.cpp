@@ -19,7 +19,6 @@
 #include "GDCore/IDE/Events/BehaviorTypeRenamer.h"
 #include "GDCore/IDE/Events/CustomObjectTypeRenamer.h"
 #include "GDCore/IDE/Events/EventsBehaviorRenamer.h"
-#include "GDCore/IDE/Events/EventsLeaderboardsRenamer.h"
 #include "GDCore/IDE/Events/EventsPropertyReplacer.h"
 #include "GDCore/IDE/Events/EventsRefactorer.h"
 #include "GDCore/IDE/Events/EventsVariableInstructionTypeSwitcher.h"
@@ -2149,13 +2148,20 @@ std::vector<gd::String> WholeProjectRefactorer::GetAssociatedExternalEvents(
 void WholeProjectRefactorer::RenameLeaderboards(
     gd::Project &project,
     const std::map<gd::String, gd::String> &leaderboardIdMap) {
-  gd::EventsLeaderboardsRenamer eventsLeaderboardReplacer(project,
-                                                          leaderboardIdMap);
-  gd::ProjectBrowserHelper::ExposeProjectEvents(project,
-                                                eventsLeaderboardReplacer);
-  
-  gd::LeaderboardIdRenamer leaderboardIdRenamer(leaderboardIdMap);
+  gd::LeaderboardIdRenamer leaderboardIdRenamer(project);
+  leaderboardIdRenamer.SetLeaderboardIdsToReplace(leaderboardIdMap);
+
+  gd::ProjectBrowserHelper::ExposeProjectEvents(project, leaderboardIdRenamer);
   gd::ProjectBrowserHelper::ExposeProjectObjects(project, leaderboardIdRenamer);
+}
+
+std::set<gd::String> WholeProjectRefactorer::FindAllLeaderboardIds(gd::Project &project) {
+  gd::LeaderboardIdRenamer leaderboardIdRenamer(project);
+
+  gd::ProjectBrowserHelper::ExposeProjectEvents(project, leaderboardIdRenamer);
+  gd::ProjectBrowserHelper::ExposeProjectObjects(project, leaderboardIdRenamer);
+
+  return leaderboardIdRenamer.GetAllLeaderboardIds();
 }
 
 } // namespace gd

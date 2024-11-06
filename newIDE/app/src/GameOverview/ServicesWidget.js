@@ -1,10 +1,7 @@
 // @flow
 
 import * as React from 'react';
-import {
-  type Leaderboard,
-  type LobbyConfiguration,
-} from '../Utils/GDevelopServices/Play';
+import { type Leaderboard } from '../Utils/GDevelopServices/Play';
 import DashboardWidget from './DashboardWidget';
 import { Trans } from '@lingui/macro';
 import FlatButton from '../UI/FlatButton';
@@ -17,23 +14,29 @@ import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasur
 import Link from '../UI/Link';
 import { getHelpLink } from '../Utils/HelpLink';
 import Window from '../Utils/Window';
+import RaisedButton from '../UI/RaisedButton';
+import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
 
 const leaderboardsHelpLink = getHelpLink('/all-features/leaderboards');
 const multiplayerHelpLink = getHelpLink('/all-features/multiplayer');
 
 type Props = {|
   leaderboards: ?Array<Leaderboard>,
-  lobbyConfiguration: ?LobbyConfiguration,
   onSeeAllLeaderboards: () => void,
   onSeeLobbyConfiguration: () => void,
+  displayUnlockMoreLeaderboardsCallout: boolean,
 |};
 
 const ServicesWidget = ({
   leaderboards,
   onSeeAllLeaderboards,
   onSeeLobbyConfiguration,
+  displayUnlockMoreLeaderboardsCallout,
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
+  const { openSubscriptionDialog } = React.useContext(
+    SubscriptionSuggestionContext
+  );
   return (
     <DashboardWidget gridSize={3} title={<Trans>Player services</Trans>}>
       <ResponsiveLineStackLayout noColumnMargin noMargin expand>
@@ -63,14 +66,39 @@ const ServicesWidget = ({
               </Trans>
             </Text>
           ) : (
-            <Line noMargin>
-              <Text>
-                <b>{leaderboards.length}</b>
-              </Text>&nbsp;
-              <Text color="secondary">
-                <Trans>leaderboards.</Trans>
-              </Text>
-            </Line>
+            <ResponsiveLineStackLayout
+              noMargin
+              noColumnMargin
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              <Line noMargin alignItems="center">
+                <Text>
+                  <b>{leaderboards.length}</b>
+                </Text>
+                &nbsp;
+                <Text color="secondary">
+                  {leaderboards.length === 1 ? (
+                    <Trans>leaderboard.</Trans>
+                  ) : (
+                    <Trans>leaderboards.</Trans>
+                  )}
+                </Text>
+              </Line>
+              {displayUnlockMoreLeaderboardsCallout && (
+                <RaisedButton
+                  primary
+                  label={<Trans>Get more leaderboards</Trans>}
+                  onClick={() =>
+                    openSubscriptionDialog({
+                      analyticsMetadata: {
+                        reason: 'Leaderboard count per game limit reached',
+                      },
+                    })
+                  }
+                />
+              )}
+            </ResponsiveLineStackLayout>
           )}
         </Column>
         {isMobile ? (
@@ -96,7 +124,6 @@ const ServicesWidget = ({
               primary
             />
           </Line>
-
           <Text color="secondary">
             <Trans>
               Learn how to make{' '}

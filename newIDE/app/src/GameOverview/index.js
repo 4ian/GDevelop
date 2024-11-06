@@ -24,12 +24,10 @@ import { ColumnStackLayout } from '../UI/Layout';
 import GameHeader from './GameHeader';
 import FeedbackWidget from './FeedbackWidget';
 import {
-  getLobbyConfiguration,
   listComments,
   listGameActiveLeaderboards,
   type Comment,
   type Leaderboard,
-  type LobbyConfiguration,
 } from '../Utils/GDevelopServices/Play';
 import { getBuilds, type Build } from '../Utils/GDevelopServices/Build';
 import {
@@ -84,7 +82,7 @@ const GameOverview = ({
   const [isUpdatingGame, setIsUpdatingGame] = React.useState<boolean>(false);
   const { showAlert } = useAlertDialog();
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const { getAuthorizationHeader, profile } = authenticatedUser;
+  const { getAuthorizationHeader, profile, limits } = authenticatedUser;
   const [feedbacks, setFeedbacks] = React.useState<?Array<Comment>>(null);
   const [builds, setBuilds] = React.useState<?Array<Build>>(null);
   const [publicGame, setPublicGame] = React.useState<?PublicGame>(null);
@@ -102,10 +100,6 @@ const GameOverview = ({
   const [leaderboards, setLeaderboards] = React.useState<?Array<Leaderboard>>(
     null
   );
-  const [
-    lobbyConfiguration,
-    setLobbyConfiguration,
-  ] = React.useState<?LobbyConfiguration>(null);
   const oneWeekAgo = React.useRef<Date>(
     new Date(new Date().setHours(0, 0, 0, 0) - 7 * 24 * 3600 * 1000)
   );
@@ -113,6 +107,21 @@ const GameOverview = ({
   const webBuilds = builds
     ? builds.filter(build => build.type === 'web-build')
     : null;
+
+  const displayUnlockMoreLeaderboardsCallout = React.useMemo(
+    () => {
+      if (!limits || !leaderboards || !limits.capabilities.leaderboards) {
+        return false;
+      }
+      const leaderboardLimits = limits.capabilities.leaderboards;
+      return (
+        leaderboardLimits.maximumCountPerGame > 0 &&
+        leaderboards.filter(leaderboard => !leaderboard.deletedAt).length >=
+          leaderboardLimits.maximumCountPerGame
+      );
+    },
+    [limits, leaderboards]
+  );
 
   const canBePublishedOnGdGames = webBuilds ? webBuilds.length > 0 : false;
   const lastWebBuildId =
@@ -269,7 +278,6 @@ const GameOverview = ({
           discoverable: properties.discoverable,
           acceptsBuildComments: properties.acceptsBuildComments,
           acceptsGameComments: properties.acceptsGameComments,
-          // TODO: Make sure it works.
           displayAdsOnGamePage: properties.displayAdsOnGamePage,
         }
       );
@@ -373,7 +381,6 @@ const GameOverview = ({
         setFeedbacks(null);
         setBuilds(null);
         setGameMetrics(null);
-        setLobbyConfiguration(null);
         setLeaderboards(null);
         setGameFeaturings(null);
         setRecommendedMarketingPlan(null);
@@ -385,7 +392,6 @@ const GameOverview = ({
           feedbacks,
           builds,
           gameRollingMetrics,
-          lobbyConfiguration,
           leaderboards,
           recommendedMarketingPlan,
         ] = await Promise.all([
@@ -400,9 +406,6 @@ const GameOverview = ({
             game.id,
             oneWeekAgo.current.toISOString()
           ),
-          getLobbyConfiguration(getAuthorizationHeader, profile.id, {
-            gameId: game.id,
-          }),
           listGameActiveLeaderboards(
             getAuthorizationHeader,
             profile.id,
@@ -417,7 +420,6 @@ const GameOverview = ({
         setFeedbacks(feedbacks);
         setBuilds(builds);
         setGameMetrics(gameRollingMetrics);
-        setLobbyConfiguration(lobbyConfiguration);
         setLeaderboards(leaderboards);
         setRecommendedMarketingPlan(recommendedMarketingPlan);
       };
@@ -512,7 +514,7 @@ const GameOverview = ({
                       setCurrentView('multiplayer')
                     }
                     leaderboards={leaderboards}
-                    lobbyConfiguration={lobbyConfiguration}
+                    displayUnlockMoreLeaderboardsCallout={displayUnlockMoreLeaderboardsCallout}
                   />
                   <BuildsWidget
                     builds={builds}

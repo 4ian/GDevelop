@@ -9,6 +9,7 @@ import paperDecorator from '../../PaperDecorator';
 
 import GameOverview from '../../../GameOverview';
 
+import { type AuthenticatedUser } from '../../../Profile/AuthenticatedUserContext';
 import {
   game1,
   commentUnprocessed,
@@ -70,7 +71,7 @@ export default {
       control: { type: 'radio' },
     },
     leaderboards: {
-      options: ['None', 'Some'],
+      options: ['None', 'Some', 'Too many'],
       control: { type: 'radio' },
     },
     exports: {
@@ -157,7 +158,7 @@ export const Default = ({
   feedbacks: 'None' | 'Some unprocessed' | 'All processed',
   sessions: 'None' | 'Some in the last week',
   userBalance: 'None' | 'Some',
-  leaderboards: 'None' | 'Some',
+  leaderboards: 'None' | 'Some' | 'Too many',
   exports: 'None' | 'Some ongoing' | 'All complete',
 |}) => {
   const [game, setGame] = React.useState<Game>(game1);
@@ -301,13 +302,26 @@ export const Default = ({
       return [504, null];
     });
 
+  const authenticatedUser: AuthenticatedUser = {
+    ...fakeSilverAuthenticatedUser,
+    userEarningsBalance: userEarningsBalanceToDisplay,
+    // $FlowIgnore - We know those fields are filled.
+    limits: {
+      ...fakeSilverAuthenticatedUser.limits,
+      capabilities: {
+        // $FlowIgnore - We know those fields are filled.
+        ...fakeSilverAuthenticatedUser.limits.capabilities,
+        leaderboards: {
+          // $FlowIgnore - We know those fields are filled.
+          ...fakeSilverAuthenticatedUser.limits.capabilities.leaderboards,
+          maximumCountPerGame: leaderboards === 'Too many' ? 3 : -1,
+        },
+      },
+    },
+  };
+
   return (
-    <AuthenticatedUserContext.Provider
-      value={{
-        ...fakeSilverAuthenticatedUser,
-        userEarningsBalance: userEarningsBalanceToDisplay,
-      }}
-    >
+    <AuthenticatedUserContext.Provider value={authenticatedUser}>
       <MarketingPlansStoreStateProvider>
         <GameOverview
           game={game}

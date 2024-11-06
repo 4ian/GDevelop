@@ -29,7 +29,7 @@ type Props = {|
 
   disabled?: boolean,
   isHighlighted?: boolean,
-  padding?: number | string,
+  padding?: number,
 |};
 
 const Card = ({
@@ -53,19 +53,17 @@ const Card = ({
     paddingRight?: number,
   |} = {
     ...styles.cardContent,
-    ...(padding !== undefined
-      ? { padding }
-      : {
-          paddingTop: 0,
-          paddingBottom: 18,
-          paddingRight: isMobile ? 8 : 24,
-          paddingLeft: isMobile ? 8 : 24,
-        }),
+    ...{
+      paddingTop: padding || 0,
+      paddingBottom: padding || 18,
+      paddingRight: padding || (isMobile ? 8 : 24),
+      paddingLeft: Math.max(
+        0,
+        // Compensate offset brought by left border
+        padding || (isMobile ? 8 : 24) - highlightedBorderWidth
+      ),
+    },
   };
-  if (isHighlighted) {
-    // Compensate offset brought by left border
-    cardContentStyle.marginLeft = -highlightedBorderWidth;
-  }
   return (
     <MUICard
       elevation={0}

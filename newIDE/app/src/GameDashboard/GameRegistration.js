@@ -17,7 +17,11 @@ import MarketingPlansDialog from '../MarketingPlans/MarketingPlansDialog';
 import { useGameManager } from '../Utils/UseGameAndBuildsManager';
 import RightLoader from '../UI/RightLoader';
 
-const styles = { buttonContainer: { flexShrink: 0 } };
+const styles = {
+  buttonContainer: {
+    flexShrink: 0, // To avoid the button content to be on multiple lines.
+  },
+};
 
 export type GameRegistrationProps = {|
   project: ?gdProject,

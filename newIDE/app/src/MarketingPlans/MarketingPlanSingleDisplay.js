@@ -1,6 +1,7 @@
 // @flow
 
 import * as React from 'react';
+import { Trans } from '@lingui/macro';
 import {
   type MarketingPlan,
   type GameFeaturing,
@@ -75,7 +76,7 @@ const MarketingPlanSingleDisplay = ({
     >
       <Column>
         <Text size="block-title" color="inherit">
-          Get more players on your game
+          <Trans>Get more players on your game</Trans>
         </Text>
         <Paper background="dark">
           <MarketingPlanFeatures
@@ -88,8 +89,10 @@ const MarketingPlanSingleDisplay = ({
           />
         </Paper>
         <Text size="body-small" color="inherit">
-          Get ready-made packs to make your game visible to the GDevelop
-          community.
+          <Trans>
+            Get ready-made packs to make your game visible to the GDevelop
+            community.
+          </Trans>
         </Text>
       </Column>
     </div>

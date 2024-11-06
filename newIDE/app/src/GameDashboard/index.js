@@ -486,7 +486,13 @@ const GameDashboard = ({
                 recommendedMarketingPlan={recommendedMarketingPlan}
               />
             ) : currentView === 'leaderboards' ? (
-              <LeaderboardAdmin gameId={game.id} onLoading={() => {}} />
+              <LeaderboardAdmin
+                gameId={game.id}
+                onLoading={
+                  // No need to disable something when the admin is sending api calls.
+                  () => {}
+                }
+              />
             ) : currentView === 'multiplayer' ? (
               <MultiplayerAdmin gameId={game.id} />
             ) : (

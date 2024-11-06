@@ -40,6 +40,7 @@ const styles = {
     flexDirection: 'column',
   },
   bulletIcon: { width: 20, height: 20, marginRight: 10 },
+  bulletPointText: { flex: 1 },
 };
 
 type Props = {|
@@ -137,7 +138,7 @@ const MarketingPlanFeatures = ({
                             color: gdevelopTheme.message.error,
                           }}
                         />
-                        <Text style={{ flex: 1 }}>{error}</Text>
+                        <Text style={styles.bulletPointText}>{error}</Text>
                       </Line>
                     </Column>
                   ))
@@ -154,7 +155,7 @@ const MarketingPlanFeatures = ({
                               : {}),
                           }}
                         />
-                        <Text style={{ flex: 1 }}>
+                        <Text style={styles.bulletPointText}>
                           {selectMessageByLocale(i18n, bulletPointByLocale)}
                         </Text>
                       </Line>

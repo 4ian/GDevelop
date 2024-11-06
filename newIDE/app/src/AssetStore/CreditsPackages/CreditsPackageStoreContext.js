@@ -122,7 +122,6 @@ export const CreditsPackageStoreStateProvider = ({
 
   const openCreditsPackageDialog = React.useCallback(
     (options: ?CreditsPackageDialogOpeningOptions) => {
-      console.log('hou');
       if (!creditsPackageListingDatas) return;
 
       setMissingCredits(

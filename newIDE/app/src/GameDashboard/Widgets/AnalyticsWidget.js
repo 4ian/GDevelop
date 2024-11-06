@@ -57,16 +57,6 @@ const AnalyticsWidget = ({ game, onSeeAll, gameMetrics, gameUrl }: Props) => {
             }
           >
             <ResponsiveLineStackLayout expand noColumnMargin noMargin>
-              {/* TODO: Bring back earnings when it is possible to split earnings per game. */}
-              {/* <Column expand noMargin useFullHeight>
-                <Text size="block-title">
-                  <Trans>Earnings</Trans>
-                </Text>
-                <Column expand noMargin useFullHeight justifyContent="center">
-                  <UserEarnings hideTitle margin="dense" />
-                </Column>
-              </Column> */}
-
               {!gameMetrics ? (
                 <div style={styles.loadingSpace} />
               ) : hasNoSession ? (

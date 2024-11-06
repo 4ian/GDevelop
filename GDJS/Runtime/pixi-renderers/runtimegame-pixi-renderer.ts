@@ -925,6 +925,14 @@ namespace gdjs {
       // HTML5 games on mobile/browsers don't have a way to close their window/page.
     }
 
+    dispose() {
+        this._pixiRenderer?.destroy(true);
+        this._pixiRenderer = null;
+        this._threeRenderer = null;
+        this._gameCanvas = null;
+        this._domElementsContainer = null;
+    }
+
     /**
      * Get the canvas DOM element.
      */

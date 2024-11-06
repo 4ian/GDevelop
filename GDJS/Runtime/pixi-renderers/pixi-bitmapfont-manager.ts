@@ -289,6 +289,18 @@ namespace gdjs {
         );
       }
     }
+
+    dispose(): void {
+        for (const bitmapFontInstallKey in this._pixiBitmapFontsInUse) {
+            PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
+        }
+        for (const bitmapFontInstallKey of this._pixiBitmapFontsToUninstall) {
+            PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
+        }
+        this._pixiBitmapFontsInUse = {};
+        this._pixiBitmapFontsToUninstall = [];
+        this._loadedFontsData.clear();
+    }
   }
 
   // Register the class to let the engine use it.

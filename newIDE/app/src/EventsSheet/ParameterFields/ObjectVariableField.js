@@ -188,37 +188,43 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           }
           onInstructionTypeChanged={onInstructionTypeChanged}
         />
-        {editorOpen && project && !objectGroup && (
-          <ObjectVariablesDialog
-            project={project}
-            projectScopedContainersAccessor={projectScopedContainersAccessor}
-            objectName={objectName}
-            variablesContainer={variablesContainers[0]}
-            open
-            onCancel={() => setEditorOpen(null)}
-            onApply={onVariableEditorApply}
-            preventRefactoringToDeleteInstructions
-            initiallySelectedVariableName={editorOpen.variableName}
-            shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
-            onComputeAllVariableNames={onComputeAllVariableNames}
-            hotReloadPreviewButtonProps={null}
-          />
-        )}
-        {editorOpen && project && objectGroup && (
-          <ObjectGroupVariablesDialog
-            project={project}
-            projectScopedContainersAccessor={projectScopedContainersAccessor}
-            globalObjectsContainer={globalObjectsContainer}
-            objectsContainer={objectsContainer}
-            objectGroup={objectGroup}
-            onCancel={() => setEditorOpen(null)}
-            onApply={onVariableEditorApply}
-            open
-            initiallySelectedVariableName={editorOpen.variableName}
-            shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
-            onComputeAllVariableNames={onComputeAllVariableNames}
-          />
-        )}
+        {editorOpen &&
+          project &&
+          !!variablesContainers.length &&
+          !objectGroup && (
+            <ObjectVariablesDialog
+              project={project}
+              projectScopedContainersAccessor={projectScopedContainersAccessor}
+              objectName={objectName}
+              variablesContainer={variablesContainers[0]}
+              open
+              onCancel={() => setEditorOpen(null)}
+              onApply={onVariableEditorApply}
+              preventRefactoringToDeleteInstructions
+              initiallySelectedVariableName={editorOpen.variableName}
+              shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
+              onComputeAllVariableNames={onComputeAllVariableNames}
+              hotReloadPreviewButtonProps={null}
+            />
+          )}
+        {editorOpen &&
+          project &&
+          objectGroup &&
+          !!variablesContainers.length && (
+            <ObjectGroupVariablesDialog
+              project={project}
+              projectScopedContainersAccessor={projectScopedContainersAccessor}
+              globalObjectsContainer={globalObjectsContainer}
+              objectsContainer={objectsContainer}
+              objectGroup={objectGroup}
+              onCancel={() => setEditorOpen(null)}
+              onApply={onVariableEditorApply}
+              open
+              initiallySelectedVariableName={editorOpen.variableName}
+              shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
+              onComputeAllVariableNames={onComputeAllVariableNames}
+            />
+          )}
       </React.Fragment>
     );
   }

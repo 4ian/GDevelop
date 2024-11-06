@@ -57,6 +57,7 @@ declare class gdWholeProjectRefactorer {
   static mergeLayersInEventsBasedObject(eventsBasedObject: gdEventsBasedObject, originLayerName: string, targetLayerName: string): void;
   static getLayoutAndExternalLayoutLayerInstancesCount(project: gdProject, layout: gdLayout, layerName: string): number;
   static renameLeaderboards(project: gdProject, leaderboardIdMap: gdMapStringString): void;
+  static findAllLeaderboardIds(project: gdProject): gdSetString;
   delete(): void;
   ptr: number;
 };

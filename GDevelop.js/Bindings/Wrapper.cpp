@@ -28,8 +28,6 @@
 #include <GDCore/IDE/Events/EventsContextAnalyzer.h>
 #include <GDCore/IDE/Events/EventsFunctionSelfCallChecker.h>
 #include <GDCore/IDE/Events/EventsIdentifiersFinder.h>
-#include <GDCore/IDE/Events/EventsLeaderboardsLister.h>
-#include <GDCore/IDE/Events/EventsLeaderboardsRenamer.h>
 #include <GDCore/IDE/Events/EventsListUnfolder.h>
 #include <GDCore/IDE/Events/EventsParametersLister.h>
 #include <GDCore/IDE/Events/EventsPositionFinder.h>
@@ -667,6 +665,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_GetLayoutAndExternalLayoutLayerInstancesCount \
   GetLayoutAndExternalLayoutLayerInstancesCount
 #define STATIC_RenameLeaderboards RenameLeaderboards
+#define STATIC_FindAllLeaderboardIds FindAllLeaderboardIds
 
 #define STATIC_GenerateBehaviorGetterAndSetter GenerateBehaviorGetterAndSetter
 #define STATIC_GenerateObjectGetterAndSetter GenerateObjectGetterAndSetter

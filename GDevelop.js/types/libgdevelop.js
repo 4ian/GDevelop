@@ -224,7 +224,6 @@ declare class libGDevelop {
   ProjectResourcesAdder: Class<gdProjectResourcesAdder>;
   ArbitraryEventsWorker: Class<gdArbitraryEventsWorker>;
   ArbitraryObjectsWorker: Class<gdArbitraryObjectsWorker>;
-  EventsLeaderboardsLister: Class<gdEventsLeaderboardsLister>;
   EventsParametersLister: Class<gdEventsParametersLister>;
   EventsPositionFinder: Class<gdEventsPositionFinder>;
   EventsTypesLister: Class<gdEventsTypesLister>;

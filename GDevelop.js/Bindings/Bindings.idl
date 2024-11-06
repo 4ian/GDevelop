@@ -2706,6 +2706,7 @@ interface WholeProjectRefactorer {
         [Const] DOMString targetLayerName);
     unsigned long STATIC_GetLayoutAndExternalLayoutLayerInstancesCount([Ref] Project project, [Ref] Layout layout, [Const] DOMString layerName);
     void STATIC_RenameLeaderboards([Ref] Project project, [Const, Ref] MapStringString leaderboardIdMap);
+    [Value] SetString STATIC_FindAllLeaderboardIds([Ref] Project project);
 };
 
 interface EventsBasedObjectDependencyFinder {
@@ -3195,14 +3196,6 @@ interface ArbitraryEventsWorker {
 
 interface ArbitraryObjectsWorker {
     void Launch([Ref] ObjectsContainer container);
-};
-
-interface EventsLeaderboardsLister {
-    void EventsLeaderboardsLister([Ref] Project project);
-    [Const, Ref] SetString GetLeaderboardIds();
-
-    //Inherited from ArbitraryEventsWorker
-    void Launch([Ref] EventsList events);
 };
 
 interface EventsParametersLister {

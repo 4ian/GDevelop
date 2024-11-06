@@ -17,6 +17,7 @@ import RaisedButton from '../../UI/RaisedButton';
 import Coin from '../../Credits/Icons/Coin';
 import MarketingPlansDialog from '../../MarketingPlans/MarketingPlansDialog';
 import GameLinkAndShareIcons from '../GameLinkAndShareIcons';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 
 const styles = { loadingSpace: { height: 100 } };
 
@@ -29,6 +30,7 @@ type Props = {|
 
 const AnalyticsWidget = ({ game, onSeeAll, gameMetrics, gameUrl }: Props) => {
   const hasNoSession = gameMetrics && gameMetrics.length === 0;
+  const { isMobile } = useResponsiveWindowSize();
   const chartData = React.useMemo(() => buildLastWeekChartData(gameMetrics), [
     gameMetrics,
   ]);
@@ -69,7 +71,10 @@ const AnalyticsWidget = ({ game, onSeeAll, gameMetrics, gameUrl }: Props) => {
                 <div style={styles.loadingSpace} />
               ) : hasNoSession ? (
                 gameUrl ? (
-                  <ColumnStackLayout noMargin alignItems="flex-start">
+                  <ColumnStackLayout
+                    noMargin
+                    alignItems={isMobile ? 'stretch' : 'flex-start'}
+                  >
                     <Spacer />
                     <Text noMargin color="secondary">
                       <Trans>

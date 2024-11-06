@@ -34,6 +34,7 @@ const styles = {
   imageMobile: {
     width: '100%',
     height: 'auto',
+    maxHeight: imageHeight, // Prevent taking too much space on mobile, especially for portrait games.
   },
 };
 

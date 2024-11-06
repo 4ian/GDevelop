@@ -926,6 +926,18 @@ namespace gdjs {
     }
 
     /**
+     * Dispose PixiRenderer, ThreeRenderer and remove canvas from DOM.
+     */
+    dispose() {
+        this._pixiRenderer?.destroy(true);
+        this._threeRenderer?.dispose();
+        this._pixiRenderer = null;
+        this._threeRenderer = null;
+        this._gameCanvas = null;
+        this._domElementsContainer = null;
+    }
+
+    /**
      * Get the canvas DOM element.
      */
     getCanvas(): HTMLCanvasElement | null {

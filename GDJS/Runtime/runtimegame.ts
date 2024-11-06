@@ -187,6 +187,7 @@ namespace gdjs {
     _sessionMetricsInitialized: boolean = false;
     _disableMetrics: boolean = false;
     _isPreview: boolean;
+    _isDisposed: boolean = false;
 
     /**
      * The capture manager, used to manage captures (screenshots, videos, etc...).
@@ -902,6 +903,10 @@ namespace gdjs {
         this._hasJustResumed = false;
         this._renderer.startGameLoop((lastCallElapsedTime) => {
           try {
+            if (this._isDisposed) {
+              return false;
+            }
+
             if (this._paused) {
               return true;
             }
@@ -952,6 +957,20 @@ namespace gdjs {
 
         throw e;
       }
+    }
+
+    /*
+     * Unload all scenes, dispose renderer and resources.
+     */
+    dispose(): void {
+        if (this._isDisposed) {
+            return;
+        }
+
+        this._isDisposed = true;
+        this._sceneStack.dispose();
+        this._renderer.dispose();
+        this._resourcesLoader.dispose();
     }
 
     /**
@@ -1006,6 +1025,10 @@ namespace gdjs {
      * time.
      */
     _setupSessionMetrics() {
+      if (this._isDisposed) {
+        return;
+      }
+
       if (this._sessionMetricsInitialized) {
         return;
       }

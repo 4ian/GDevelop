@@ -42,6 +42,7 @@ const FeedbackWidget = ({
 
   const shouldDisplayControlToCollectFeedback =
     !game.acceptsGameComments && feedbacks && feedbacks.length === 0;
+  const hasNoFeedbackYet = !!feedbacks && feedbacks.length === 0;
 
   return (
     <I18n>
@@ -59,7 +60,7 @@ const FeedbackWidget = ({
               />
             )
           }
-          withMaxHeight
+          withMinHeight
           renderSubtitle={() =>
             shouldDisplayControlToCollectFeedback ? null : unprocessedFeedbacks &&
               feedbacks ? (
@@ -132,48 +133,44 @@ const FeedbackWidget = ({
                 ))}
               </ColumnStackLayout>
             </ScrollView>
+          ) : hasNoFeedbackYet && shouldDisplayControlToCollectFeedback ? (
+            <ColumnStackLayout noMargin expand>
+              <Spacer />
+              <CompactToggleField
+                checked={false}
+                label={i18n._(t`Collect game feedback`)}
+                onCheck={newValue => {
+                  onUpdateGame({ acceptsGameComments: newValue });
+                }}
+              />
+              <Text color="secondary" noMargin>
+                <Trans>
+                  “Player feedback” is off, turn it on to start collecting
+                  feedback on your game.
+                </Trans>
+              </Text>
+            </ColumnStackLayout>
+          ) : gameUrl ? (
+            <ColumnStackLayout noMargin justifyContent="center" expand>
+              <Spacer />
+              <Text color="secondary" noMargin>
+                <Trans>
+                  You don’t have any feedback about your game. Share your game
+                  and start collecting player feedback.
+                </Trans>
+              </Text>
+              <GameLinkAndShareIcons url={gameUrl} display="column" />
+            </ColumnStackLayout>
           ) : (
-            !!feedbacks &&
-            feedbacks.length === 0 &&
-            (shouldDisplayControlToCollectFeedback ? (
-              <ColumnStackLayout noMargin expand>
-                <Spacer />
-                <CompactToggleField
-                  checked={false}
-                  label={i18n._(t`Collect game feedback`)}
-                  onCheck={newValue => {
-                    onUpdateGame({ acceptsGameComments: newValue });
-                  }}
-                />
-                <Text color="secondary" noMargin>
-                  <Trans>
-                    “Player feedback” is off, turn it on to start collecting
-                    feedback on your game.
-                  </Trans>
-                </Text>
-              </ColumnStackLayout>
-            ) : gameUrl ? (
-              <ColumnStackLayout noMargin justifyContent="center" expand>
-                <Spacer />
-                <Text color="secondary" noMargin>
-                  <Trans>
-                    You don’t have any player feedback yet. Share your game and
-                    start collecting player feedback.
-                  </Trans>
-                </Text>
-                <GameLinkAndShareIcons url={gameUrl} display="column" />
-              </ColumnStackLayout>
-            ) : (
-              <ColumnStackLayout noMargin justifyContent="center" expand>
-                <Spacer />
-                <Text color="secondary" noMargin>
-                  <Trans>
-                    Share your game on gd.games and collect players feedback
-                    about your game.
-                  </Trans>
-                </Text>
-              </ColumnStackLayout>
-            ))
+            <ColumnStackLayout noMargin justifyContent="center" expand>
+              <Spacer />
+              <Text color="secondary" noMargin>
+                <Trans>
+                  Share your game on gd.games and collect players feedback about
+                  your game.
+                </Trans>
+              </Text>
+            </ColumnStackLayout>
           )}
         </DashboardWidget>
       )}

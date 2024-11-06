@@ -18,6 +18,14 @@ import Coin from '../../Credits/Icons/Coin';
 import MarketingPlansDialog from '../../MarketingPlans/MarketingPlansDialog';
 import GameLinkAndShareIcons from '../GameLinkAndShareIcons';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
+import { getHelpLink } from '../../Utils/HelpLink';
+import Window from '../../Utils/Window';
+import Link from '../../UI/Link';
+
+const publishingHelpLink = getHelpLink(
+  'gdevelop5/publishing',
+  'publish-your-game'
+);
 
 const styles = { loadingSpace: { height: 100 } };
 
@@ -45,7 +53,7 @@ const AnalyticsWidget = ({ game, onSeeAll, gameMetrics, gameUrl }: Props) => {
         {({ i18n }) => (
           <DashboardWidget
             gridSize={2}
-            withMaxHeight
+            withMinHeight
             title={<Trans>Analytics</Trans>}
             seeMoreButton={
               <FlatButton
@@ -79,8 +87,16 @@ const AnalyticsWidget = ({ game, onSeeAll, gameMetrics, gameUrl }: Props) => {
                     <Spacer />
                     <Text color="secondary" noMargin>
                       <Trans>
-                        Share your game and start collecting data from your
-                        players to better understand them.
+                        <Link
+                          href={publishingHelpLink}
+                          onClick={() =>
+                            Window.openExternalURL(publishingHelpLink)
+                          }
+                        >
+                          Share your game
+                        </Link>{' '}
+                        and start collecting data from your players to better
+                        understand them.
                       </Trans>
                     </Text>
                   </ColumnStackLayout>
@@ -94,13 +110,13 @@ const AnalyticsWidget = ({ game, onSeeAll, gameMetrics, gameUrl }: Props) => {
                     <RaisedButton
                       primary
                       icon={<Coin fontSize="small" />}
-                      label={<Trans>Get more sessions</Trans>}
+                      label={<Trans>Get more players</Trans>}
                       onClick={() => setMarketingPlansDialogOpen(true)}
                     />
                   </Line>
                   <SessionsChart
                     i18n={i18n}
-                    height={220}
+                    height={200}
                     chartData={chartData}
                     fontSize="small"
                   />

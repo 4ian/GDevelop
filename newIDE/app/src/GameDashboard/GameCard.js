@@ -83,9 +83,9 @@ export const GameCard = ({ game, isCurrentGame, onOpenGameManager }: Props) => {
           <AdsIcon {...iconProps} />
           <Text {...textProps}>
             {game.displayAdsOnGamePage ? (
-              <Trans>Advertisement on</Trans>
+              <Trans>Ad revenue sharing on</Trans>
             ) : (
-              <Trans>Advertisement off</Trans>
+              <Trans>Ad revenue sharing off</Trans>
             )}
           </Text>
         </div>

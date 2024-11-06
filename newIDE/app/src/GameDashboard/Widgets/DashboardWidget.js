@@ -8,6 +8,7 @@ import { Column, Line } from '../../UI/Grid';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 
 const verticalPadding = 8;
+const fixedHeight = 300;
 
 const styles = {
   paper: {
@@ -24,7 +25,7 @@ const styles = {
     flex: 1,
   },
   maxHeightNotWrapped: {
-    maxHeight: 300,
+    minHeight: fixedHeight,
     height: `calc(100% - ${2 * verticalPadding}px)`,
   },
 };
@@ -35,7 +36,7 @@ type Props = {|
   renderSubtitle?: ?() => React.Node,
   gridSize: number,
   children?: React.Node,
-  withMaxHeight?: boolean,
+  withMinHeight?: boolean,
 |};
 
 const DashboardWidget = ({
@@ -44,7 +45,7 @@ const DashboardWidget = ({
   gridSize,
   renderSubtitle,
   children,
-  withMaxHeight,
+  withMinHeight,
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   return (
@@ -53,7 +54,7 @@ const DashboardWidget = ({
         background="medium"
         style={{
           ...styles.paper,
-          ...(withMaxHeight && !isMobile
+          ...(withMinHeight && !isMobile
             ? styles.maxHeightNotWrapped
             : undefined),
         }}

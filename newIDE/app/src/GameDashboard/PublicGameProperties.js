@@ -455,7 +455,7 @@ export function PublicGameProperties({
                     setAcceptsAdvertisementsOnGdGames(newValue)
                   }
                   label={i18n._(
-                    t`Allow to display advertisements on the game page of gd.games`
+                    t`Enable ads and revenue sharing on the game page`
                   )}
                 />
               </Column>

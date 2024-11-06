@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { useResponsiveWindowSize } from './Responsive/ResponsiveWindowMeasurer';
 export const marginsSize = 8;
 
 /**
@@ -106,3 +107,39 @@ const largeSpacerStyle = {
 export const LargeSpacer = React.memo<NoProps>(() => (
   <span style={largeSpacerStyle} />
 ));
+
+type FixedHeightFlexContainerProps = {|
+  children: React.Node,
+  heights: {|
+    small: number,
+    medium?: number,
+    large?: number,
+    xlarge?: number,
+  |},
+|};
+
+export const FixedHeightFlexContainer = ({
+  children,
+  heights,
+}: FixedHeightFlexContainerProps) => {
+  const { windowSize } = useResponsiveWindowSize();
+  const height =
+    windowSize === 'xlarge'
+      ? heights.xlarge || heights.large || heights.medium || heights.small
+      : windowSize === 'large'
+      ? heights.large || heights.medium || heights.small
+      : windowSize === 'medium'
+      ? heights.medium || heights.small
+      : heights.small;
+  return (
+    <div
+      style={{
+        display: 'flex',
+        height,
+        alignItems: 'center',
+      }}
+    >
+      {children}
+    </div>
+  );
+};

@@ -23,6 +23,7 @@ import RaisedButton from '../UI/RaisedButton';
 import Edit from '../UI/CustomSvgIcons/Edit';
 import GameLinkAndShareIcons from './GameLinkAndShareIcons';
 import { CompactToggleField } from '../UI/CompactToggleField';
+import { FixedHeightFlexContainer } from '../UI/Grid';
 
 const styles = {
   iconAndText: { display: 'flex', gap: 2, alignItems: 'flex-start' },
@@ -76,9 +77,9 @@ const GameHeader = ({
           <AdsIcon {...iconProps} />
           <Text {...textProps}>
             {game.displayAdsOnGamePage ? (
-              <Trans>Advertisement on</Trans>
+              <Trans>Ad revenue sharing on</Trans>
             ) : (
-              <Trans>Advertisement off</Trans>
+              <Trans>Ad revenue sharing off</Trans>
             )}
           </Text>
         </div>
@@ -118,6 +119,7 @@ const GameHeader = ({
     <LineStackLayout noMargin>
       <RaisedButton
         primary
+        fullWidth
         label={<Trans>Edit details</Trans>}
         onClick={onEditGame}
         icon={<Edit fontSize="small" />}
@@ -125,33 +127,26 @@ const GameHeader = ({
     </LineStackLayout>
   );
 
-  const renderShareUrl = (i18n: I18nType) =>
-    gameUrl ? (
-      <GameLinkAndShareIcons url={gameUrl} display="line" />
-    ) : onPublishOnGdGames ? (
-      <ColumnStackLayout noMargin expand>
-        <CompactToggleField
-          checked={false}
-          label={i18n._(t`Publish on gd.games`)}
-          onCheck={onPublishOnGdGames}
-        />
-        <Text color="secondary" noMargin>
-          <Trans>
-            Your game is not published on gd.games. Publish it and get players
-            to play your game!
-          </Trans>
-        </Text>
-      </ColumnStackLayout>
-    ) : (
-      <ColumnStackLayout noMargin expand>
-        <Text color="secondary" noMargin>
-          <Trans>
-            Publish your game to gd.games and see how many players enjoy your
-            game!
-          </Trans>
-        </Text>
-      </ColumnStackLayout>
-    );
+  const renderShareUrl = (i18n: I18nType) => (
+    <FixedHeightFlexContainer heights={{ small: 60 }}>
+      {gameUrl ? (
+        <GameLinkAndShareIcons url={gameUrl} display="line" />
+      ) : (
+        <ColumnStackLayout noMargin expand>
+          {onPublishOnGdGames && (
+            <CompactToggleField
+              checked={false}
+              label={i18n._(t`Publish on gd.games`)}
+              onCheck={onPublishOnGdGames}
+            />
+          )}
+          <Text color="secondary" noMargin>
+            <Trans>Publish on gd.games to let players try your game</Trans>
+          </Text>
+        </ColumnStackLayout>
+      )}
+    </FixedHeightFlexContainer>
+  );
 
   if (isMobile) {
     return (

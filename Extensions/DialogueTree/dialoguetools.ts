@@ -362,7 +362,15 @@ namespace gdjs {
       this.commandCalls = [];
       try {
         this.dialogueData.select(this.selectedOption);
-        this.dialogueData = this.dialogue.next().value;
+        try {
+          this.dialogueData = this.dialogue.next().value;
+        } catch (error) {
+          logger.error(
+            'Error while confirming in the dialogue tree. Verify if there is a syntax error? Full error is: ',
+            error
+          );
+          return;
+        }
         gdjs.dialogueTree.goToNextDialogueLine();
       } catch (error) {
         logger.error(
@@ -414,9 +422,8 @@ namespace gdjs {
       return;
     }
     if (this.dialogueData.select) {
-      this.selectedOption = gdjs.dialogueTree._normalizedOptionIndex(
-        optionIndex
-      );
+      this.selectedOption =
+        gdjs.dialogueTree._normalizedOptionIndex(optionIndex);
       this.selectedOptionUpdated = true;
     }
   };
@@ -511,13 +518,29 @@ namespace gdjs {
     this.optionsCount = 0;
     this.options = [];
     this.tagParameters = [];
-    this.dialogue = this.runner.run(startDialogueNode);
+    try {
+      this.dialogue = this.runner.run(startDialogueNode);
+    } catch (error) {
+      logger.error(
+        'Error while setting up the dialogue tree. Verify if there is a syntax error? Full error is: ',
+        error
+      );
+      return;
+    }
     this.dialogueText = '';
     this.clipTextEnd = 0;
     this.commandCalls = [];
     this.commandParameters = [];
     this.pauseScrolling = false;
-    this.dialogueData = this.dialogue.next().value;
+    try {
+      this.dialogueData = this.dialogue.next().value;
+    } catch (error) {
+      logger.error(
+        'Error while starting the dialogue tree. Verify if there is a syntax error? Full error is: ',
+        error
+      );
+      return;
+    }
     this.dialogueBranchTags = this.dialogueData.data.tags;
     this.dialogueBranchTitle = this.dialogueData.data.title;
     this.dialogueBranchBody = this.dialogueData.data.body;
@@ -583,7 +606,15 @@ namespace gdjs {
         this.dialogueBranchBody = this.dialogueData.data.body;
         this.lineNum = this.dialogueData.lineNum;
         this.dialogueDataType = 'text';
-        this.dialogueData = this.dialogue.next().value;
+        try {
+          this.dialogueData = this.dialogue.next().value;
+        } catch (error) {
+          logger.error(
+            'Error while progressing the dialogue tree. Verify if there is a syntax error? Full error is: ',
+            error
+          );
+          return;
+        }
       } else {
         if (gdjs.dialogueTree._isLineTypeOptions()) {
           this.commandCalls = [];
@@ -609,7 +640,15 @@ namespace gdjs {
               params: command,
               time: this.dialogueText.length + offsetTime,
             });
-            this.dialogueData = this.dialogue.next().value;
+            try {
+              this.dialogueData = this.dialogue.next().value;
+            } catch (error) {
+              logger.error(
+                'Error while progressing the dialogue tree. Verify if there is a syntax error? Full error is: ',
+                error
+              );
+              return;
+            }
             gdjs.dialogueTree.goToNextDialogueLine();
           } else {
             this.dialogueDataType = 'unknown';

@@ -954,6 +954,17 @@ namespace gdjs {
       }
     }
 
+    /*
+     * Stop game loop, unload all scenes, dispose renderer and resources.
+     */
+    dispose(): void {
+      this._renderer.stopGameLoop();
+      this._sceneStack.dispose();
+      this._renderer.dispose();
+      this._resourcesLoader.dispose();
+      logger.info('Runtimegame is disposed');
+    }
+
     /**
      * Set if the session should be registered.
      */

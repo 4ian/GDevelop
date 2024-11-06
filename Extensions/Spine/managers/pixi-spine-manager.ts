@@ -115,5 +115,12 @@ namespace gdjs {
         ? resource
         : null;
     }
+
+    /**
+     * Clear cache of loaded spine skeleton data.
+     */
+    dispose(): void {
+      this._loadedSpines.clear();
+    }
   }
 }

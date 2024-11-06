@@ -16,6 +16,7 @@ import {
   type Game,
   type MarketingPlan,
   type GameFeaturing,
+  getGameMainImageUrl,
 } from '../Utils/GDevelopServices/Game';
 import Text from '../UI/Text';
 import Link from '../UI/Link';
@@ -276,7 +277,10 @@ const MarketingPlans = ({ game }: Props) => {
   const getRequirementsErrors = (marketingPlan: MarketingPlan) => {
     const requirementsErrors = [];
     const marketingPlanGameRequirements = marketingPlan.gameRequirements;
-    if (!!marketingPlanGameRequirements.hasThumbnail && !game.thumbnailUrl) {
+    if (
+      !!marketingPlanGameRequirements.hasThumbnail &&
+      !getGameMainImageUrl(game)
+    ) {
       requirementsErrors.push(<Trans>You don't have a thumbnail</Trans>);
     }
     if (!marketingPlanGameRequirements.isPublished && !game.publicWebBuildId) {

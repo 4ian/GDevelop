@@ -147,7 +147,7 @@ const FeedbackWidget = ({
                 />
                 <Text color="secondary" noMargin>
                   <Trans>
-                    “Player feedback” is off, turn it on to start receiving
+                    “Player feedback” is off, turn it on to start collecting
                     feedback on your game.
                   </Trans>
                 </Text>
@@ -157,8 +157,8 @@ const FeedbackWidget = ({
                 <Spacer />
                 <Text color="secondary" noMargin>
                   <Trans>
-                    You don’t have any player feedback yet. Share your game with
-                    more people to start collecting player feedback.
+                    You don’t have any player feedback yet. Share your game and
+                    start collecting player feedback.
                   </Trans>
                 </Text>
                 <GameLinkAndShareIcons url={gameUrl} display="column" />
@@ -168,8 +168,8 @@ const FeedbackWidget = ({
                 <Spacer />
                 <Text color="secondary" noMargin>
                   <Trans>
-                    Share your game on gd.games and let players leave their
-                    feedback about your game.
+                    Share your game on gd.games and collect players feedback
+                    about your game.
                   </Trans>
                 </Text>
               </ColumnStackLayout>

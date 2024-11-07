@@ -1017,10 +1017,6 @@ namespace gdjs {
      * time.
      */
     _setupSessionMetrics() {
-      if (this._isDisposed) {
-        return;
-      }
-
       if (this._sessionMetricsInitialized) {
         return;
       }

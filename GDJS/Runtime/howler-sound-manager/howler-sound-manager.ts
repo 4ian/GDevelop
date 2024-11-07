@@ -868,6 +868,13 @@ namespace gdjs {
         }
       }
     }
+
+    /*
+     * Unloads all audio from memory, clear Howl cache and stop all audio.
+     */
+    dispose(): void {
+      this.unloadAll();
+    }
   }
 
   // Register the class to let the engine use it.

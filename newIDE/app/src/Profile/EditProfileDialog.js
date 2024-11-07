@@ -507,7 +507,7 @@ const EditProfileDialog = ({
                 maxLength={10000}
               />
               {!hideSocials && (
-                <>
+                <ColumnStackLayout>
                   <Text size="sub-title" noMargin>
                     <Trans>Socials</Trans>
                   </Text>
@@ -660,7 +660,7 @@ const EditProfileDialog = ({
                     errorText={donateLinkError}
                     maxLength={donateLinkConfig.maxLength}
                   />
-                </>
+                </ColumnStackLayout>
               )}
               <Text size="sub-title" noMargin>
                 <Trans>Notifications</Trans>

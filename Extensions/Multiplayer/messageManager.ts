@@ -917,12 +917,12 @@ namespace gdjs {
               // As we are the host, we do not cancel the message if it times out.
               shouldCancelMessageIfTimesOut: false,
             });
-            for (const peerId of otherPeerIds) {
-              debugLogger.info(
-                `Relaying ownership change of variable with Id ${variableNetworkId} to ${peerId}.`
-              );
-              sendDataTo(otherPeerIds, messageName, messageData);
-            }
+            debugLogger.info(
+              `Relaying ownership change of variable with Id ${variableNetworkId} to ${otherPeerIds.join(
+                ', '
+              )}.`
+            );
+            sendDataTo(otherPeerIds, messageName, messageData);
           }
         });
       });
@@ -1361,6 +1361,11 @@ namespace gdjs {
               // As we are the host, we do not cancel the message if it times out.
               shouldCancelMessageIfTimesOut: false,
             });
+            debugLogger.info(
+              `Relaying instance destroyed message for object ${objectName} with instance network ID ${instanceNetworkId} to ${otherPeerIds.join(
+                ', '
+              )}.`
+            );
             sendDataTo(otherPeerIds, messageName, messageData);
           }
         });

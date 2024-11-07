@@ -201,7 +201,8 @@ const OnlineGameLink = ({
               buildOrGameUrl={buildOrGameUrl}
               isBuildPublished={!!isBuildPublished}
               loadingText={
-                !isGameLoading ? null : automaticallyPublishNewBuild ? (
+                !isGameLoading &&
+                buildOrGameUrl ? null : automaticallyPublishNewBuild ? (
                   <Trans>Loading the game...</Trans>
                 ) : (
                   <Trans>Loading the game link...</Trans>

@@ -56,8 +56,7 @@ const ShareOnlineGameDialog = ({
     <Dialog
       title={<Trans>Share your game</Trans>}
       id="export-game-share-dialog"
-      minHeight="sm"
-      maxWidth="md"
+      maxWidth={gameThumbnailUrl ? 'md' : 'sm'}
       actions={[
         <DialogPrimaryButton
           key="close"
@@ -97,9 +96,12 @@ const ShareOnlineGameDialog = ({
                 <div
                   style={{
                     ...styles.qrCodeAndShareContainer,
-                    justifyContent: isMobile && !isLandscape ? 'stretch' : 'space-between',
-                    flexDirection: isMobile && !isLandscape ? 'column-reverse' : 'row',
-                    alignItems: isMobile && !isLandscape ? 'stretch' : 'flex-end',
+                    justifyContent:
+                      isMobile && !isLandscape ? 'stretch' : 'space-between',
+                    flexDirection:
+                      isMobile && !isLandscape ? 'column-reverse' : 'row',
+                    alignItems:
+                      isMobile && !isLandscape ? 'stretch' : 'flex-end',
                   }}
                 >
                   <Line noMargin justifyContent="center">
@@ -125,9 +127,10 @@ const ShareOnlineGameDialog = ({
             <AlertMessage kind="info">
               <Trans>
                 This link is private. You can share it with collaborators,
-                friends or testers. When you're ready you can publish it so that
-                your game has its own page on gd.games - GDevelop gaming
-                platform.
+                friends or testers.
+                <br />
+                When you're ready, go to the Game Dashboard and publish it on
+                gd.games.
               </Trans>
             </AlertMessage>
           )}

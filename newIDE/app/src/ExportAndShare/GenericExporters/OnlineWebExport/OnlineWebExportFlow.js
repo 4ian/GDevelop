@@ -6,7 +6,7 @@ import { ColumnStackLayout } from '../../../UI/Layout';
 import RaisedButton from '../../../UI/RaisedButton';
 import { Column, Line } from '../../../UI/Grid';
 import OnlineGameLink from './OnlineGameLink';
-import Checkbox from '../../../UI/Checkbox';
+import Toggle from '../../../UI/Toggle';
 
 type OnlineWebExportFlowProps = {|
   ...ExportFlowProps,
@@ -76,10 +76,13 @@ const OnlineWebExportFlow = ({
       </Line>
       {hasGameExistingBuilds && (
         <Line justifyContent="center">
-          <Checkbox
-            checked={automaticallyPublishNewBuild}
-            onCheck={(_, newValue) => setAutomaticallyPublishNewBuild(newValue)}
+          <Toggle
+            toggled={automaticallyPublishNewBuild}
+            onToggle={(_, newValue) =>
+              setAutomaticallyPublishNewBuild(newValue)
+            }
             label={<Trans>Update game page</Trans>}
+            labelPosition="right"
             disabled={disabled}
           />
         </Line>

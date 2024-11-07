@@ -90,6 +90,8 @@ type Props = {|
   setIsPublishedOnGdGames?: boolean => void,
   acceptsAdvertisementsOnGdGames?: boolean,
   setAcceptsAdvertisementsOnGdGames?: boolean => void,
+  acceptsGameComments?: boolean,
+  setAcceptsGameComments?: boolean => void,
   discoverable?: boolean,
   displayThumbnail?: boolean,
   thumbnailUrl?: ?string,
@@ -129,6 +131,8 @@ export function PublicGameProperties({
   setIsPublishedOnGdGames,
   acceptsAdvertisementsOnGdGames,
   setAcceptsAdvertisementsOnGdGames,
+  acceptsGameComments,
+  setAcceptsGameComments,
   thumbnailUrl,
   onGameUpdated,
   onUpdatingGame,
@@ -457,6 +461,19 @@ export function PublicGameProperties({
                   label={i18n._(
                     t`Enable ads and revenue sharing on the game page`
                   )}
+                />
+              </Column>
+            </Line>
+          )}
+          {setAcceptsGameComments && (
+            <Line noMargin>
+              <Column>
+                <Toggle
+                  disabled={disablePublicationProperties}
+                  labelPosition="right"
+                  toggled={!!acceptsGameComments}
+                  onToggle={(e, newValue) => setAcceptsGameComments(newValue)}
+                  label={i18n._(t`Collect feedback from players`)}
                 />
               </Column>
             </Line>

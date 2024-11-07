@@ -159,6 +159,9 @@ export const PublicGamePropertiesDialog = ({
     acceptsAdvertisementsOnGdGames,
     setAcceptsAdvertisementsOnGdGames,
   ] = React.useState<boolean>(publicGame.displayAdsOnGamePage);
+  const [acceptsGameComments, setAcceptsGameComments] = React.useState<boolean>(
+    !!publicGame.acceptsGameComments
+  );
 
   const onSave = async () => {
     await onApply({
@@ -176,6 +179,7 @@ export const PublicGamePropertiesDialog = ({
       playWithMobile,
       orientation,
       displayAdsOnGamePage: acceptsAdvertisementsOnGdGames,
+      acceptsGameComments,
       isPublishedOnGdGames,
     });
   };
@@ -241,6 +245,8 @@ export const PublicGamePropertiesDialog = ({
         setIsPublishedOnGdGames={setIsPublishedOnGdGames}
         acceptsAdvertisementsOnGdGames={acceptsAdvertisementsOnGdGames}
         setAcceptsAdvertisementsOnGdGames={setAcceptsAdvertisementsOnGdGames}
+        acceptsGameComments={acceptsGameComments}
+        setAcceptsGameComments={setAcceptsGameComments}
         discoverable={discoverable}
         displayThumbnail
         thumbnailUrl={publicGameThumbnailUrl}

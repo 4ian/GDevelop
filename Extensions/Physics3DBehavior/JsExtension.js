@@ -636,6 +636,54 @@ module.exports = {
         .getCodeExtraInformation()
         .setFunctionName('applyImpulseAtCenter');
 
+    aut
+      .addAction(
+        'ApplyTorque',
+        _('Apply torque (rotational force)'),
+        _(
+          'Apply a torque (also called "rotational force") to the object. It "accelerates" an object rotation and must be used every frame during a time period.'
+        ),
+        _('Apply a torque of _PARAM2_ ; _PARAM3_ ; _PARAM4_ to _PARAM0_ an'),
+        _('Forces & impulses'),
+        'res/physics32.png',
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .addParameter('expression', _('Torque around X (N·m)'))
+      .addParameter('expression', _('Torque around Y (N·m)'))
+      .addParameter('expression', _('Torque around Z (N·m)'))
+      .setParameterLongDescription(
+        _('A torque is like a rotation acceleration but depends on the mass.')
+      )
+      .getCodeExtraInformation()
+      .setFunctionName('applyTorque');
+
+    aut
+      .addAction(
+        'ApplyAngularImpulse',
+        _('Apply angular impulse (rotational impulse)'),
+        _(
+          'Apply an angular impulse (also called a "rotational impulse") to the object. It instantly changes the rotation speed, to give an initial speed for instance.'
+        ),
+        _('Apply angular impulse of _PARAM2_ ; _PARAM3_ ; _PARAM4_ to _PARAM0_ an'),
+        _('Forces & impulses'),
+        'res/physics32.png',
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
+      .addParameter('expression', _('Angular impulse around X (N·m·s)'))
+      .addParameter('expression', _('Angular impulse around Y (N·m·s)'))
+      .addParameter('expression', _('Angular impulse around Z (N·m·s)'))
+      .setParameterLongDescription(
+        _(
+          'An impulse is like a rotation speed addition but depends on the mass.'
+        )
+      )
+      .getCodeExtraInformation()
+      .setFunctionName('applyAngularImpulse');
+
     // Collision
     extension
       .addCondition(

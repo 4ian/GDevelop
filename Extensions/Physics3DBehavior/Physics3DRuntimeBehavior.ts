@@ -824,6 +824,33 @@ namespace gdjs {
       );
     }
 
+    applyTorque(torqueX: float, torqueY: float, torqueZ: float): void {
+      // If there is no body, set a new one
+      if (this._body === null) {
+        if (!this.createBody()) return;
+      }
+      const body = this._body!;
+
+      this._sharedData.bodyInterface.AddTorque(
+        body.GetID(),
+        this.getVec3(torqueX, torqueY, torqueZ),
+        Jolt.EActivation_Activate
+      );
+    }
+
+    applyAngularImpulse(angularImpulseX: float, angularImpulseY: float, angularImpulseZ: float): void {
+      // If there is no body, set a new one
+      if (this._body === null) {
+        if (!this.createBody()) return;
+      }
+      const body = this._body!;
+
+      this._sharedData.bodyInterface.AddAngularImpulse(
+        body.GetID(),
+        this.getVec3(angularImpulseX, angularImpulseY, angularImpulseZ),
+      );
+    }
+
     onContactBegin(otherBehavior: Physics3DRuntimeBehavior): void {
       this.currentContacts.push(otherBehavior);
 

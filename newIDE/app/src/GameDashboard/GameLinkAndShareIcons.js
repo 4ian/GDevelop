@@ -12,13 +12,14 @@ const styles = {
     marginTop: marginsSize,
     marginBottom: marginsSize,
   },
+  columnContainer: { display: 'grid' },
 };
 
 const ColumnContainer = ({ children }: {| children: React.Node |}) => (
   // ColumnStackLayout is not used here because the children can't be displayed properly.
   // If children are aligned flex-start, the children overflow on small devices.
   // If children are aligned stretch, the children take all the available space, that we don't want.
-  <div>{children}</div>
+  <div style={styles.columnContainer}>{children}</div>
 );
 
 const LineContainer = ({ children }: {| children: React.Node |}) => (

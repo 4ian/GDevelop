@@ -72,6 +72,7 @@ const AnalyticsWidget = ({ game, onSeeAll, gameMetrics, gameUrl }: Props) => {
                   <ColumnStackLayout
                     noMargin
                     alignItems={isMobile ? 'stretch' : 'flex-start'}
+                    noOverflowParent
                   >
                     <Spacer />
                     <Text noMargin color="secondary">
@@ -80,7 +81,7 @@ const AnalyticsWidget = ({ game, onSeeAll, gameMetrics, gameUrl }: Props) => {
                         with more people to get more players!
                       </Trans>
                     </Text>
-                    <GameLinkAndShareIcons display="column" url={gameUrl} />
+                    <GameLinkAndShareIcons display="column" url={gameUrl + "/salut/test/longueur/grande"} />
                   </ColumnStackLayout>
                 ) : (
                   <ColumnStackLayout noMargin expand>

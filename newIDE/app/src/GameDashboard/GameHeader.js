@@ -171,7 +171,7 @@ const GameHeader = ({
       {({ i18n }) => (
         <LineStackLayout>
           {renderThumbnail()}
-          <ColumnStackLayout expand>
+          <ColumnStackLayout expand noOverflowParent>
             <LineStackLayout
               noMargin
               justifyContent="space-between"

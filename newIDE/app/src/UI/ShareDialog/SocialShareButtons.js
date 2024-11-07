@@ -8,7 +8,6 @@ import {
   TwitterShareButton,
   WhatsappShareButton,
 } from 'react-share';
-import { Line } from '../Grid';
 import Facebook from '../CustomSvgIcons/Facebook';
 import Twitter from '../CustomSvgIcons/Twitter';
 import Reddit from '../CustomSvgIcons/Reddit';
@@ -23,11 +22,15 @@ const styles = {
   icon: {
     padding: 5,
   },
+  container: {
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
 };
 
 const SocialShareButtons = ({ url }: Props) => {
   return (
-    <Line noMargin>
+    <div style={styles.container}>
       <FacebookShareButton
         url={url}
         style={styles.icon}
@@ -66,7 +69,7 @@ const SocialShareButtons = ({ url }: Props) => {
       >
         <Mail />
       </EmailShareButton>
-    </Line>
+    </div>
   );
 };
 

@@ -11,10 +11,10 @@ namespace gdjs {
     new Promise((resolve) => {
       const tryInitializeJoltPhysics = () => {
         // @ts-ignore
-        if (global.initializeJoltPhysics) {
+        if (globalThis.initializeJoltPhysics) {
           resolve(
             // @ts-ignore
-            global.initializeJoltPhysics().then((Jolt: any) => {
+            globalThis.initializeJoltPhysics().then((Jolt: any) => {
               window.Jolt = Jolt;
             })
           );

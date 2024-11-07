@@ -27,7 +27,7 @@ const styles = {
 
 const SocialShareButtons = ({ url }: Props) => {
   return (
-    <Line>
+    <Line noMargin>
       <FacebookShareButton
         url={url}
         style={styles.icon}

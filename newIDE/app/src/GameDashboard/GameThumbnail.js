@@ -55,7 +55,7 @@ type Props = {|
   thumbnailUrl?: ?string,
   gameName: string,
   background?: 'light' | 'medium' | 'dark',
-  gameId: string,
+  gameId?: string,
   canUpdateThumbnail?: boolean,
   disabled?: boolean,
   onGameUpdated?: (updatedGame: Game) => void,
@@ -85,7 +85,7 @@ export const GameThumbnail = ({
   );
 
   const updateGameThumbnail = async () => {
-    if (!profile) {
+    if (!profile || !gameId) {
       return;
     }
 
@@ -200,7 +200,7 @@ export const GameThumbnail = ({
           </EmptyMessage>
         )}
       </Paper>
-      {canUpdateThumbnail && (
+      {canUpdateThumbnail && gameId && (
         <RaisedButton
           primary
           disabled={!profile || isLoading || disabled}
@@ -220,7 +220,7 @@ export const GameThumbnail = ({
           }
         />
       )}
-      {canUpdateThumbnail && (
+      {canUpdateThumbnail && gameId && (
         <input
           type="file"
           onChange={updateGameThumbnail}

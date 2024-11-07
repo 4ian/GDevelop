@@ -467,7 +467,8 @@ namespace gdjs {
           shapeDimensionC > 0 ? shapeDimensionC : depth > 0 ? depth : onePixel;
 
         shapeSettings = new Jolt.BoxShapeSettings(
-          this.getVec3(boxWidth / 2, boxHeight / 2, boxDepth / 2)
+          this.getVec3(boxWidth / 2, boxHeight / 2, boxDepth / 2),
+          onePixel
         );
         quat = this.getQuat(0, 0, 0, 1);
       } else if (this.shape === 'Capsule') {
@@ -493,7 +494,8 @@ namespace gdjs {
           shapeDimensionB > 0 ? shapeDimensionB : depth > 0 ? depth : onePixel;
         shapeSettings = new Jolt.CylinderShapeSettings(
           cylinderDepth / 2,
-          radius
+          radius,
+          onePixel
         );
         // Top on Z axis.
         quat = this.getQuat(-Math.sqrt(2) / 2, 0, 0, Math.sqrt(2) / 2);

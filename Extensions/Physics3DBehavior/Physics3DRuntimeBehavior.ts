@@ -46,46 +46,36 @@ namespace gdjs {
     props: Physics3DNetworkSyncDataType;
   }
 
-  // https://github.com/jrouwe/JoltPhysics.js/blob/main/Examples/js/example.js
-  const LAYER_NON_MOVING = 0;
-  const LAYER_MOVING = 1;
-  const NUM_OBJECT_LAYERS = 2;
+  // There are 4 bits for static layers and 4 bits for dynamic layers.
+  const staticLayersMask = 0x0f;
+  const dynamicLayersMask = 0xf0;
+  const allLayersMask = 0xff;
 
   const setupCollisionFiltering = (settings: Jolt.JoltSettings) => {
-    // Layer that objects can be in, determines which other objects it can collide with
-    // Typically you at least want to have 1 layer for moving bodies and 1 layer for static bodies, but you can have more
-    // layers if you want. E.g. you could have a layer for high detail collision (which is not used by the physics simulation
-    // but only if you do collision testing).
-    let objectFilter = new Jolt.ObjectLayerPairFilterTable(NUM_OBJECT_LAYERS);
-    objectFilter.EnableCollision(LAYER_NON_MOVING, LAYER_MOVING);
-    objectFilter.EnableCollision(LAYER_MOVING, LAYER_MOVING);
-
-    // Each broadphase layer results in a separate bounding volume tree in the broad phase. You at least want to have
-    // a layer for non-moving and moving objects to avoid having to update a tree full of static objects every frame.
-    // You can have a 1-on-1 mapping between object layers and broadphase layers (like in this case) but if you have
-    // many object layers you'll be creating many broad phase trees, which is not efficient.
-    const BP_LAYER_NON_MOVING = new Jolt.BroadPhaseLayer(0);
-    const BP_LAYER_MOVING = new Jolt.BroadPhaseLayer(1);
-    const NUM_BROAD_PHASE_LAYERS = 2;
-    let bpInterface = new Jolt.BroadPhaseLayerInterfaceTable(
-      NUM_OBJECT_LAYERS,
-      NUM_BROAD_PHASE_LAYERS
+    const objectFilter = new Jolt.ObjectLayerPairFilterMask();
+    const staticBroadPhaseLayer = new Jolt.BroadPhaseLayer(0);
+    const dynamicBroadPhaseLayer = new Jolt.BroadPhaseLayer(1);
+    const broadPhaseLayerInterfaceMask = new Jolt.BroadPhaseLayerInterfaceMask(
+      2
     );
-    bpInterface.MapObjectToBroadPhaseLayer(
-      LAYER_NON_MOVING,
-      BP_LAYER_NON_MOVING
+    broadPhaseLayerInterfaceMask.ConfigureLayer(
+      staticBroadPhaseLayer,
+      staticLayersMask,
+      0
     );
-    bpInterface.MapObjectToBroadPhaseLayer(LAYER_MOVING, BP_LAYER_MOVING);
+    broadPhaseLayerInterfaceMask.ConfigureLayer(
+      dynamicBroadPhaseLayer,
+      dynamicLayersMask,
+      0
+    );
+    // BroadPhaseLayer have been copied into bpInterface
+    Jolt.destroy(staticBroadPhaseLayer);
+    Jolt.destroy(dynamicBroadPhaseLayer);
 
     settings.mObjectLayerPairFilter = objectFilter;
-    settings.mBroadPhaseLayerInterface = bpInterface;
+    settings.mBroadPhaseLayerInterface = broadPhaseLayerInterfaceMask;
     settings.mObjectVsBroadPhaseLayerFilter =
-      new Jolt.ObjectVsBroadPhaseLayerFilterTable(
-        settings.mBroadPhaseLayerInterface,
-        NUM_BROAD_PHASE_LAYERS,
-        settings.mObjectLayerPairFilter,
-        NUM_OBJECT_LAYERS
-      );
+      new Jolt.ObjectVsBroadPhaseLayerFilterMask(broadPhaseLayerInterfaceMask);
   };
 
   export class Physics3DSharedData {
@@ -144,10 +134,8 @@ namespace gdjs {
         const bodyA = Jolt.wrapPointer(bodyPtrA, Jolt.Body);
         const bodyB = Jolt.wrapPointer(bodyPtrB, Jolt.Body);
 
-        // Get associated behaviors
         const behaviorA = bodyA.gdjsAssociatedBehavior;
         const behaviorB = bodyB.gdjsAssociatedBehavior;
-
         if (!behaviorA || !behaviorB) {
           return;
         }
@@ -184,14 +172,14 @@ namespace gdjs {
         behaviorB.onContactEnd(behaviorA);
       };
       this.contactListener.OnContactPersisted = (
-        inBody1: number,
-        inBody2: number,
-        inManifold: number,
-        ioSettings: number
+        bodyPtrA: number,
+        bodyPtrB: number,
+        manifoldPtr: number,
+        settingsPtr: number
       ): void => {};
       this.contactListener.OnContactValidate = (
-        inBody1: number,
-        inBody2: number,
+        bodyPtrA: number,
+        bodyPtrB: number,
         inBaseOffset: number,
         inCollisionResult: number
       ): number => {
@@ -298,6 +286,8 @@ namespace gdjs {
     linearDamping: float;
     angularDamping: float;
     gravityScale: float;
+    layers: integer;
+    masks: integer;
     shapeScale: number = 1;
 
     /**
@@ -367,6 +357,8 @@ namespace gdjs {
       this.linearDamping = Math.max(0, behaviorData.linearDamping);
       this.angularDamping = Math.max(0, behaviorData.angularDamping);
       this.gravityScale = behaviorData.gravityScale;
+      this.layers = behaviorData.layers;
+      this.masks = behaviorData.masks;
       this.destroyedDuringFrameLogic = false;
       this._sharedData = Physics3DSharedData.getSharedData(
         instanceContainer.getScene(),
@@ -588,7 +580,14 @@ namespace gdjs {
           : this.bodyType === 'Kinematic'
           ? Jolt.EMotionType_Kinematic
           : Jolt.EMotionType_Dynamic,
-        LAYER_MOVING
+        Jolt.ObjectLayerPairFilterMask.prototype.sGetObjectLayer(
+          // Make sure objects don't register in the wrong layer group.
+          this.bodyType === 'Static'
+            ? this.layers & staticLayersMask
+            : this.layers & dynamicLayersMask,
+          // Static objects accept all collisions as it's the mask of dynamic objects that matters.
+          this.bodyType === 'Static' ? allLayersMask : this.masks
+        )
       );
       bodyCreationSettings.mMotionQuality = this.bullet
         ? Jolt.EMotionQuality_LinearCast

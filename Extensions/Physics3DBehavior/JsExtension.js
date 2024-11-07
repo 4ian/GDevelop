@@ -164,6 +164,16 @@ module.exports = {
         return true;
       }
 
+      if (propertyName === 'layers') {
+        behaviorContent.getChild('layers').setIntValue(parseInt(newValue, 10));
+        return true;
+      }
+
+      if (propertyName === 'masks') {
+        behaviorContent.getChild('masks').setIntValue(parseInt(newValue, 10));
+        return true;
+      }
+
       return false;
     };
     behavior.getProperties = function (behaviorContent) {
@@ -377,6 +387,20 @@ module.exports = {
         .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
         .setGroup(_('Gravity'))
         .setAdvanced(true);
+      behaviorProperties
+        .getOrCreate('layers')
+        .setValue(behaviorContent.getChild('layers').getIntValue().toString(10))
+        .setType('Number')
+        .setLabel('Layers')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+        .setHidden(true); // Hidden as required to be changed in the full editor.
+      behaviorProperties
+        .getOrCreate('masks')
+        .setValue(behaviorContent.getChild('masks').getIntValue().toString(10))
+        .setType('Number')
+        .setLabel('Masks')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+        .setHidden(true); // Hidden as required to be changed in the full editor.
 
       return behaviorProperties;
     };
@@ -398,6 +422,8 @@ module.exports = {
       behaviorContent.addChild('linearDamping').setDoubleValue(0.1);
       behaviorContent.addChild('angularDamping').setDoubleValue(0.1);
       behaviorContent.addChild('gravityScale').setDoubleValue(1);
+      behaviorContent.addChild('layers').setIntValue(1 << 4 | 1 << 0);
+      behaviorContent.addChild('masks').setIntValue(1 << 4 | 1 << 0);
     };
 
     const sharedData = new gd.BehaviorSharedDataJsImplementation();
@@ -436,7 +462,6 @@ module.exports = {
         sharedContent.getChild('worldScale').setDoubleValue(newValueAsNumber);
         return true;
       }
-
       return false;
     };
     sharedData.getProperties = function (sharedContent) {
@@ -463,7 +488,6 @@ module.exports = {
         )
         .setType('Number')
         .setMeasurementUnit(gd.MeasurementUnit.getNewton());
-
 
       sharedProperties
         .getOrCreate('worldScale')

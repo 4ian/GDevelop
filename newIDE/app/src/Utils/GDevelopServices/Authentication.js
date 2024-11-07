@@ -16,6 +16,7 @@ import { GDevelopFirebaseConfig, GDevelopUserApi } from './ApiConfigs';
 import type { LoginProvider } from '../../LoginProvider';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { type CommunityLinks, type UserSurvey } from './User';
+import { userCancellationErrorName } from '../../LoginProvider/Utils';
 
 export type Profile = {|
   id: string,
@@ -267,7 +268,9 @@ export default class Authentication {
         // The user is now stored in `this.auth`.
       })
       .catch(error => {
-        console.error('Error while login with provider:', error);
+        if (error.name !== userCancellationErrorName) {
+          console.error('Error while login with provider:', error);
+        }
         throw error;
       });
   };

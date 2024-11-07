@@ -200,7 +200,7 @@ export default class AuthenticatedUserProvider extends React.Component<
         ...initialAuthenticatedUser,
         onLogin: this._doLogin,
         onLoginWithProvider: this._doLoginWithProvider,
-        onCancelLogin: this._cancelLogin,
+        onCancelLoginOrSignUp: this._cancelLoginOrSignUp,
         onLogout: this._doLogout,
         onCreateAccount: this._doCreateAccount,
         onEditProfile: this._doEdit,
@@ -996,7 +996,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     this._automaticallyUpdateUserProfile = true;
   };
 
-  _cancelLogin = () => {
+  _cancelLoginOrSignUp = () => {
     if (this._abortController) {
       this._abortController.abort();
       this._abortController = null;
@@ -1416,7 +1416,7 @@ export default class AuthenticatedUserProvider extends React.Component<
             {this.state.loginDialogOpen && (
               <LoginDialog
                 onClose={() => {
-                  this._cancelLogin();
+                  this._cancelLoginOrSignUp();
                   this.openLoginDialog(false);
                 }}
                 onGoToCreateAccount={() => this.openCreateAccountDialog(true)}
@@ -1473,7 +1473,10 @@ export default class AuthenticatedUserProvider extends React.Component<
               )}
             {this.state.createAccountDialogOpen && (
               <CreateAccountDialog
-                onClose={() => this.openCreateAccountDialog(false)}
+                onClose={() => {
+                  this._cancelLoginOrSignUp();
+                  this.openCreateAccountDialog(false);
+                }}
                 onGoToLogin={() => this.openLoginDialog(true)}
                 onCreateAccount={form =>
                   this._doCreateAccount(form, preferences)

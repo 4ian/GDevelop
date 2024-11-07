@@ -120,7 +120,7 @@ const GetStartedSection = ({
     creatingOrLoggingInAccount,
     onLogin,
     onLoginWithProvider,
-    onCancelLogin,
+    onCancelLoginOrSignUp,
     onEditProfile,
     onCreateAccount,
     authenticationError,
@@ -295,7 +295,7 @@ const GetStartedSection = ({
                   <FlatButton
                     primary
                     label={<Trans>Cancel</Trans>}
-                    onClick={onCancelLogin}
+                    onClick={onCancelLoginOrSignUp}
                   />
                 </LineStackLayout>
               </Column>

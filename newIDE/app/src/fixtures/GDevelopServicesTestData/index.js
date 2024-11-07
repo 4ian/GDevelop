@@ -2835,7 +2835,7 @@ export const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   assetPackPurchases: [],
   onLogin: async () => {},
   onLoginWithProvider: async () => {},
-  onCancelLogin: () => {},
+  onCancelLoginOrSignUp: () => {},
   onLogout: async () => {},
   onCreateAccount: async () => {},
   onResetPassword: async () => {},

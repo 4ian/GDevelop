@@ -69,7 +69,7 @@ const OnlineWebExportFlow = ({
             )
           }
           primary
-          id={`launch-export-${exportPipelineName}-web-button`}
+          id={`launch-export-${exportPipelineName}-button`}
           onClick={launchExport}
           disabled={disabled}
         />

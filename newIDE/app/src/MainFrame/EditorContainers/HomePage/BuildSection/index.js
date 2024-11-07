@@ -421,7 +421,7 @@ const BuildSection = ({
   const shouldDisplayAnnouncements =
     !authenticatedUser.limits ||
     !authenticatedUser.limits.capabilities.classrooms ||
-    !authenticatedUser.limits.capabilities.classrooms.hideCommunityTab;
+    !authenticatedUser.limits.capabilities.classrooms.hidePlayTab;
 
   const skeletonLineHeight = getProjectLineHeight({ isMobile });
   const pageContent = showAllGameTemplates ? (

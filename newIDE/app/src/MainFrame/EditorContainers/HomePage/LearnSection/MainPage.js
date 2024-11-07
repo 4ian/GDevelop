@@ -182,7 +182,7 @@ const MainPage = ({
     },
     {
       title: <Trans>Examples</Trans>,
-      description: <Trans>Have look at existing games from the inside</Trans>,
+      description: <Trans>Have a look at existing games from the inside</Trans>,
       action: onOpenExampleStore,
     },
     {

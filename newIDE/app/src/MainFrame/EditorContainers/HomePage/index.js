@@ -14,7 +14,6 @@ import BuildSection from './BuildSection';
 import LearnSection from './LearnSection';
 import PlaySection from './PlaySection';
 import ManageSection from './ManageSection';
-import CommunitySection from './CommunitySection';
 import StoreSection from './StoreSection';
 import { type TutorialCategory } from '../../../Utils/GDevelopServices/Tutorial';
 import { TutorialContext } from '../../../Tutorial/TutorialContext';
@@ -67,8 +66,6 @@ const getRequestedTab = (routeArguments: RouteArguments): HomeTab | null => {
     return 'team-view';
   } else if (routeArguments['initial-dialog'] === 'play') {
     return 'play';
-  } else if (routeArguments['initial-dialog'] === 'community') {
-    return 'community';
   } else if (routeArguments['initial-dialog'] === 'get-started') {
     return 'get-started';
   }
@@ -571,7 +568,6 @@ export const HomePage = React.memo<Props>(
                     />
                   )}
                   {activeTab === 'play' && <PlaySection />}
-                  {activeTab === 'community' && <CommunitySection />}
                   {activeTab === 'shop' && (
                     <StoreSection
                       project={project}

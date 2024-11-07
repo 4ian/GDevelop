@@ -326,6 +326,14 @@ export const buildMainMenuDeclarativeTemplate = ({
         label: i18n._(t`Facebook`),
         onClickOpenLink: 'https://facebook.com/gdevelopapp',
       },
+      {
+        label: i18n._(t`Reddit`),
+        onClickOpenLink: 'https://www.reddit.com/r/gdevelop',
+      },
+      {
+        label: i18n._(t`GitHub repository`),
+        onClickOpenLink: 'https://github.com/4ian/GDevelop',
+      },
       { type: 'separator' },
       {
         label: i18n._(t`Buy GDevelop goodies and swag`),

@@ -258,7 +258,7 @@ const GetStartedSection = ({
   const shouldDisplayAnnouncements =
     !authenticatedUser.limits ||
     !authenticatedUser.limits.capabilities.classrooms ||
-    !authenticatedUser.limits.capabilities.classrooms.hideCommunityTab;
+    !authenticatedUser.limits.capabilities.classrooms.hidePlayTab;
 
   if (
     (creatingOrLoggingInAccount || loginState === 'loggingIn') &&

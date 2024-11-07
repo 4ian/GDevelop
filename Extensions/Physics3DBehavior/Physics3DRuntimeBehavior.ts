@@ -283,8 +283,9 @@ namespace gdjs {
     owner3D: gdjs.RuntimeObject3D;
 
     bodyType: string;
-    shape: string;
+    bullet: boolean;
     fixedRotation: boolean;
+    shape: string;
     shapeDimensionA: any;
     shapeDimensionB: any;
     shapeDimensionC: any;
@@ -351,6 +352,7 @@ namespace gdjs {
       super(instanceContainer, behaviorData, owner);
       this.owner3D = owner;
       this.bodyType = behaviorData.bodyType;
+      this.bullet = behaviorData.bullet;
       this.fixedRotation = behaviorData.fixedRotation;
       this.shape = behaviorData.shape;
       this.shapeDimensionA = behaviorData.shapeDimensionA;
@@ -588,6 +590,9 @@ namespace gdjs {
           : Jolt.EMotionType_Dynamic,
         LAYER_MOVING
       );
+      bodyCreationSettings.mMotionQuality = this.bullet
+        ? Jolt.EMotionQuality_LinearCast
+        : Jolt.EMotionQuality_Discrete;
       bodyCreationSettings.mAllowedDOFs = this.fixedRotation
         ? Jolt.EAllowedDOFs_TranslationX |
           Jolt.EAllowedDOFs_TranslationY |

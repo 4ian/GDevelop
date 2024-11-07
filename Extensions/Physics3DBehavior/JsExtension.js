@@ -43,6 +43,11 @@ module.exports = {
         return true;
       }
 
+      if (propertyName === 'bullet') {
+        behaviorContent.getChild('bullet').setBoolValue(newValue === '1');
+        return true;
+      }
+
       if (propertyName === 'fixedRotation') {
         behaviorContent
           .getChild('fixedRotation')
@@ -179,15 +184,20 @@ module.exports = {
           )
         );
       behaviorProperties
-        .getOrCreate('shape')
-        .setValue(behaviorContent.getChild('shape').getStringValue())
-        .setType('Choice')
-        .setLabel('Shape')
+        .getOrCreate('bullet')
+        .setValue(
+          behaviorContent.getChild('bullet').getBoolValue() ? 'true' : 'false'
+        )
         .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-        .addExtraInfo('Sphere')
-        .addExtraInfo('Box')
-        .addExtraInfo('Capsule')
-        .addExtraInfo('Cylinder');
+        .setType('Boolean')
+        .setLabel(_('Considered as a bullet'))
+        .setDescription(
+          _(
+            'Useful for fast moving objects which requires a more accurate collision detection.'
+          )
+        )
+        .setGroup(_('Physics body advanced settings'))
+        .setAdvanced(true);
       behaviorProperties
         .getOrCreate('fixedRotation')
         .setValue(
@@ -204,6 +214,16 @@ module.exports = {
           )
         )
         .setGroup(_('Movement'));
+      behaviorProperties
+        .getOrCreate('shape')
+        .setValue(behaviorContent.getChild('shape').getStringValue())
+        .setType('Choice')
+        .setLabel('Shape')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+        .addExtraInfo('Sphere')
+        .addExtraInfo('Box')
+        .addExtraInfo('Capsule')
+        .addExtraInfo('Cylinder');
       behaviorProperties
         .getOrCreate('shapeDimensionA')
         .setValue(
@@ -363,6 +383,7 @@ module.exports = {
 
     behavior.initializeContent = function (behaviorContent) {
       behaviorContent.addChild('bodyType').setStringValue('Dynamic');
+      behaviorContent.addChild('bullet').setBoolValue(false);
       behaviorContent.addChild('fixedRotation').setBoolValue(false);
       behaviorContent.addChild('shape').setStringValue('Sphere');
       behaviorContent.addChild('shapeDimensionA').setDoubleValue(0);

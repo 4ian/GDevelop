@@ -47,7 +47,7 @@ const ShareOnlineGameDialog = ({
   isBuildPublished,
   loadingText,
 }: Props) => {
-  const { isMobile } = useResponsiveWindowSize();
+  const { isMobile, isLandscape } = useResponsiveWindowSize();
   const [showCopiedInfoBar, setShowCopiedInfoBar] = React.useState<boolean>(
     false
   );
@@ -83,7 +83,7 @@ const ShareOnlineGameDialog = ({
       {buildOrGameUrl && !loadingText ? (
         <ColumnStackLayout noMargin expand>
           <Column noMargin>
-            <ResponsiveLineStackLayout noMargin>
+            <ResponsiveLineStackLayout noMargin noResponsiveLandscape>
               {gameThumbnailUrl && (
                 <GameThumbnail
                   background="light"
@@ -92,14 +92,14 @@ const ShareOnlineGameDialog = ({
                   gameName={gameName}
                 />
               )}
-              <ColumnStackLayout noMargin expand>
+              <ColumnStackLayout noMargin expand noOverflowParent>
                 <ShareLink url={buildOrGameUrl} withOpenButton />
                 <div
                   style={{
                     ...styles.qrCodeAndShareContainer,
-                    justifyContent: isMobile ? 'stretch' : 'space-between',
-                    flexDirection: isMobile ? 'column-reverse' : 'row',
-                    alignItems: isMobile ? 'stretch' : 'flex-end',
+                    justifyContent: isMobile && !isLandscape ? 'stretch' : 'space-between',
+                    flexDirection: isMobile && !isLandscape ? 'column-reverse' : 'row',
+                    alignItems: isMobile && !isLandscape ? 'stretch' : 'flex-end',
                   }}
                 >
                   <Line noMargin justifyContent="center">

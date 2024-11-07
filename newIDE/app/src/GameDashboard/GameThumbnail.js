@@ -74,7 +74,7 @@ export const GameThumbnail = ({
   background = 'light',
   fullWidthOnMobile,
 }: Props) => {
-  const { isMobile } = useResponsiveWindowSize();
+  const { isMobile, isLandscape } = useResponsiveWindowSize();
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
   );
@@ -171,7 +171,7 @@ export const GameThumbnail = ({
     <ColumnStackLayout noMargin alignItems="center">
       <Paper
         style={{
-          ...(isMobile
+          ...(isMobile && !isLandscape
             ? fullWidthOnMobile
               ? styles.fullWidth
               : styles.mobileThumbnailContainer
@@ -186,7 +186,7 @@ export const GameThumbnail = ({
             src={thumbnailUrl}
             style={{
               ...styles.image,
-              ...(isMobile
+              ...(isMobile && !isLandscape
                 ? fullWidthOnMobile
                   ? styles.fullWidthThumbnail
                   : styles.mobileThumbnail

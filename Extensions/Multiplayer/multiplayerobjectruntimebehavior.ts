@@ -254,6 +254,7 @@ namespace gdjs {
       // If game is running and the object belongs to a player who is not connected, destroy the object.
       // As the game may create objects before the lobby game starts, we don't want to destroy them if it's not running.
       if (
+        this.actionOnPlayerDisconnect !== 'DoNothing' && // Should not delete if flagged as such.
         this.playerNumber !== 0 && // Host is always connected.
         !gdjs.multiplayerMessageManager.isPlayerConnected(this.playerNumber)
       ) {

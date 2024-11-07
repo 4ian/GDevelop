@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
-import paperDecorator from '../../PaperDecorator';
 
 import { completeWebBuild } from '../../../fixtures/GDevelopServicesTestData';
 import ShareOnlineGameDialog from '../../../ExportAndShare/GenericExporters/OnlineWebExport/ShareOnlineGameDialog';
@@ -9,7 +8,6 @@ import ShareOnlineGameDialog from '../../../ExportAndShare/GenericExporters/Onli
 export default {
   title: 'Share/ShareOnlineGameDialog',
   component: ShareOnlineGameDialog,
-  decorators: [paperDecorator],
 };
 
 const gameName = 'Bark and sea';

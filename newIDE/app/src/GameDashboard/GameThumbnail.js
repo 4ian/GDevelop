@@ -21,6 +21,13 @@ const styles = {
     display: 'block',
     objectFit: 'scale-down', // Match gd.games format.
   },
+  fullWidthContainer: {
+    width: '100%',
+    aspectRatio: '16 / 9',
+    height: 'auto',
+    justifyContent: 'center',
+    overflow: 'hidden', // Keep the radius effect.
+  },
   thumbnailContainer: {
     height: 153,
     width: 272,
@@ -39,14 +46,8 @@ const styles = {
     aspectRatio: '16 / 9',
     width: 150,
   },
-  fullWidth: {
-    width: '100%',
-    aspectRatio: '16 / 9',
-    height: 'auto',
-    justifyContent: 'center',
-  },
   fullWidthThumbnail: {
-    width: '85%',
+    width: '100%',
     height: 'auto',
   },
 };
@@ -173,7 +174,7 @@ export const GameThumbnail = ({
         style={{
           ...(isMobile && !isLandscape
             ? fullWidthOnMobile
-              ? styles.fullWidth
+              ? styles.fullWidthContainer
               : styles.mobileThumbnailContainer
             : styles.thumbnailContainer),
           whiteSpace: 'normal',

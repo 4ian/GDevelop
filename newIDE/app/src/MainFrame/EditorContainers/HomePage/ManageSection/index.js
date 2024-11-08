@@ -27,7 +27,7 @@ import Link from '../../../../UI/Link';
 import Window from '../../../../Utils/Window';
 import { getHelpLink } from '../../../../Utils/HelpLink';
 import { type GameDetailsTab } from '../../../../GameDashboard';
-import GameOverview from '../../../../GameDashboard';
+import GameDashboard from '../../../../GameDashboard';
 import useAlertDialog from '../../../../UI/Alert/useAlertDialog';
 import RouterContext from '../../../RouterContext';
 import { getDefaultRegisterGamePropertiesFromProject } from '../../../../Utils/UseGameAndBuildsManager';
@@ -253,7 +253,8 @@ const ManageSection = ({
   if (openedGame) {
     return (
       <SectionContainer flexBody>
-        <GameOverview
+        <GameDashboard
+          project={project}
           currentView={currentTab}
           setCurrentView={setCurrentTab}
           game={openedGame}

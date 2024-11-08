@@ -20,6 +20,7 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import CircledClose from '../UI/CustomSvgIcons/CircledClose';
 import { Column, Line } from '../UI/Grid';
 import AlertMessage from '../UI/AlertMessage';
+import LeftLoader from '../UI/LeftLoader';
 
 type PublicProjectProperties = {|
   name: string,
@@ -187,13 +188,15 @@ export const PublicGamePropertiesDialog = ({
       onClick={onClose}
       disabled={isLoading}
     />,
-    <DialogPrimaryButton
-      label={<Trans>Save</Trans>}
-      primary
-      onClick={onSave}
-      key="save"
-      disabled={isLoading}
-    />,
+    <LeftLoader isLoading={isLoading}>
+      <DialogPrimaryButton
+        label={<Trans>Save</Trans>}
+        primary
+        onClick={onSave}
+        key="save"
+        disabled={isLoading}
+      />
+    </LeftLoader>,
   ];
 
   return (

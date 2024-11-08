@@ -159,38 +159,39 @@ const GameDashboard = ({
   );
 
   const updateProjectFromGameIfMatching = (
+    updatedGame: Game,
     properties: PublicGameAndProjectEditableProperties
   ) => {
-    if (project && project.getProjectUuid() === game.id) {
-      // Get this information from the game object that should have just been updated
-      // (maybe with fallback values).
-      const { gameName, categories, description } = game;
-      // Get those properties from the object as they are not stored on the Game.
-      const { authorIds, authorUsernames } = properties;
+    if (!project || project.getProjectUuid() !== updatedGame.id) return;
 
-      project.setName(gameName);
-      project.setDescription(description || '');
-      project.setPlayableWithKeyboard(game.playWithKeyboard);
-      project.setPlayableWithGamepad(game.playWithGamepad);
-      project.setPlayableWithMobile(game.playWithMobile);
-      project.setOrientation(game.orientation || 'default');
-      if (categories) {
-        const projectCategories = project.getCategories();
-        projectCategories.clear();
-        categories.forEach(category => projectCategories.push_back(category));
-      }
-      if (authorIds) {
-        const projectAuthorIds = project.getAuthorIds();
-        projectAuthorIds.clear();
-        authorIds.forEach(authorId => projectAuthorIds.push_back(authorId));
-      }
-      if (authorUsernames) {
-        const projectAuthorUsernames = project.getAuthorUsernames();
-        projectAuthorUsernames.clear();
-        authorUsernames.forEach(authorUsername =>
-          projectAuthorUsernames.push_back(authorUsername)
-        );
-      }
+    // Get this information from the updated game object (maybe modified by the
+    // the backend).
+    const { gameName, categories, description } = updatedGame;
+    // Get those properties from the object as they are not stored on the Game.
+    const { authorIds, authorUsernames } = properties;
+
+    project.setName(gameName);
+    project.setDescription(description || '');
+    project.setPlayableWithKeyboard(game.playWithKeyboard);
+    project.setPlayableWithGamepad(game.playWithGamepad);
+    project.setPlayableWithMobile(game.playWithMobile);
+    project.setOrientation(game.orientation || 'default');
+    if (categories) {
+      const projectCategories = project.getCategories();
+      projectCategories.clear();
+      categories.forEach(category => projectCategories.push_back(category));
+    }
+    if (authorIds) {
+      const projectAuthorIds = project.getAuthorIds();
+      projectAuthorIds.clear();
+      authorIds.forEach(authorId => projectAuthorIds.push_back(authorId));
+    }
+    if (authorUsernames) {
+      const projectAuthorUsernames = project.getAuthorUsernames();
+      projectAuthorUsernames.clear();
+      authorUsernames.forEach(authorUsername =>
+        projectAuthorUsernames.push_back(authorUsername)
+      );
     }
   };
 
@@ -228,11 +229,14 @@ const GameDashboard = ({
     [getAuthorizationHeader, profile, game.id, _onGameUpdated]
   );
 
+  /**
+   * @returns {?Game} the updated game if updated, null otherwise
+   */
   const onUpdateGame = async (
     i18n: I18nType,
     properties: PublicGameAndProjectEditableProperties
   ) => {
-    if (!profile || !publicGame) return false;
+    if (!profile || !publicGame) return null;
     const { ownerIds, userSlug, gameSlug, authorIds } = properties;
 
     if (!ownerIds || !ownerIds.length) {
@@ -240,7 +244,7 @@ const GameDashboard = ({
         title: t`Select an owner`,
         message: t`You must select at least one user to be the owner of the game.`,
       });
-      return false;
+      return null;
     }
 
     if (!authorIds || !authorIds.length) {
@@ -248,8 +252,10 @@ const GameDashboard = ({
         title: t`Select an author`,
         message: t`You must select at least one user to be the author of the game.`,
       });
-      return false;
+      return null;
     }
+
+    let updatedGame = null;
 
     try {
       setIsUpdatingGame(true);
@@ -266,7 +272,7 @@ const GameDashboard = ({
       } else {
         publicWebBuildId = null;
       }
-      const updatedGame = await updateGame(
+      updatedGame = await updateGame(
         getAuthorizationHeader,
         profile.id,
         publicGame.id,
@@ -364,7 +370,7 @@ const GameDashboard = ({
       setIsUpdatingGame(false);
     }
 
-    return true;
+    return updatedGame;
   };
 
   const onPublishOnGdGames = React.useCallback(
@@ -546,9 +552,9 @@ const GameDashboard = ({
               publicGame={publicGame}
               isLoading={isUpdatingGame}
               onApply={async properties => {
-                const isGameUpdated = await onUpdateGame(i18n, properties);
-                if (isGameUpdated) {
-                  updateProjectFromGameIfMatching(properties);
+                const updatedGame = await onUpdateGame(i18n, properties);
+                if (updatedGame) {
+                  updateProjectFromGameIfMatching(updatedGame, properties);
                 }
                 setGameDetailsDialogOpen(false);
               }}

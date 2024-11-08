@@ -81,7 +81,7 @@ const AnalyticsWidget = ({ game, onSeeAll, gameMetrics, gameUrl }: Props) => {
                         with more people to get more players!
                       </Trans>
                     </Text>
-                    <GameLinkAndShareIcons display="column" url={gameUrl + "/salut/test/longueur/grande"} />
+                    <GameLinkAndShareIcons display="column" url={gameUrl} />
                   </ColumnStackLayout>
                 ) : (
                   <ColumnStackLayout noMargin expand>

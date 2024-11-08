@@ -4,7 +4,7 @@ import * as React from 'react';
 import { I18n } from '@lingui/react';
 import { t, Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
-import { type Game } from '../Utils/GDevelopServices/Game';
+import { getGameMainImageUrl, type Game } from '../Utils/GDevelopServices/Game';
 import { GameThumbnail } from './GameThumbnail';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import {
@@ -44,6 +44,7 @@ const GameHeader = ({
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const gameMainImageUrl = getGameMainImageUrl(game);
 
   const renderPublicInfo = () => {
     const DiscoverabilityIcon =
@@ -110,7 +111,7 @@ const GameHeader = ({
     <GameThumbnail
       gameName={game.gameName}
       gameId={game.id}
-      thumbnailUrl={game.thumbnailUrl}
+      thumbnailUrl={gameMainImageUrl}
       background="medium"
     />
   );

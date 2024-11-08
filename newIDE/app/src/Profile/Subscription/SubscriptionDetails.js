@@ -243,7 +243,12 @@ const SubscriptionDetails = ({
       !isSubscriptionExpired ? (
         isOnOrSimulateMobileApp ? (
           <Paper background="medium" variant="outlined" style={styles.paper}>
-            <ResponsiveLineStackLayout alignItems="center" expand noMargin>
+            <ResponsiveLineStackLayout
+              alignItems="center"
+              expand
+              noMargin
+              noResponsiveLandscape
+            >
               <Column expand noMargin>
                 <LineStackLayout alignItems="center">
                   <img
@@ -360,7 +365,12 @@ const SubscriptionDetails = ({
       ) : !isSubscriptionExpired ? (
         isOnOrSimulateMobileApp ? (
           <Paper background="medium" variant="outlined" style={styles.paper}>
-            <ResponsiveLineStackLayout alignItems="center" expand noMargin>
+            <ResponsiveLineStackLayout
+              alignItems="center"
+              expand
+              noMargin
+              noResponsiveLandscape
+            >
               <Column expand noMargin>
                 <LineStackLayout alignItems="center">
                   <img
@@ -389,7 +399,7 @@ const SubscriptionDetails = ({
             </ResponsiveLineStackLayout>
           </Paper>
         ) : (
-          <ResponsiveLineStackLayout noColumnMargin>
+          <ResponsiveLineStackLayout noColumnMargin noResponsiveLandscape>
             {Object.keys(subscriptionOptions).map(key => {
               const { title, description, icon } = subscriptionOptions[key];
               return (
@@ -441,7 +451,12 @@ const SubscriptionDetails = ({
         )
       ) : (
         <Paper background="medium" variant="outlined" style={styles.paper}>
-          <ResponsiveLineStackLayout alignItems="center" expand noMargin>
+          <ResponsiveLineStackLayout
+            alignItems="center"
+            expand
+            noMargin
+            noResponsiveLandscape
+          >
             <Column expand noMargin>
               <LineStackLayout alignItems="center">
                 <img

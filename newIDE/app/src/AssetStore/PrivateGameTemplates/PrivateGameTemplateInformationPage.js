@@ -92,6 +92,13 @@ const styles = {
   rightColumnContainer: {
     flex: 2,
   },
+  leftColumnContainerMobile: {
+    flex: 1,
+    minWidth: 0, // This is needed for the container to take the right size.
+  },
+  rightColumnContainerMobile: {
+    flex: 1,
+  },
   avatar: {
     width: 20,
     height: 20,
@@ -159,7 +166,12 @@ const PrivateGameTemplateInformationPage = ({
     setSellerPublicProfile,
   ] = React.useState<?UserPublicProfile>(null);
   const [errorText, setErrorText] = React.useState<?React.Node>(null);
-  const { windowSize, isLandscape, isMediumScreen } = useResponsiveWindowSize();
+  const {
+    windowSize,
+    isLandscape,
+    isMediumScreen,
+    isMobile,
+  } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const shouldUseOrSimulateAppStoreProduct =
@@ -415,14 +427,26 @@ const PrivateGameTemplateInformationPage = ({
                   noResponsiveLandscape
                   useLargeSpacer
                 >
-                  <div style={styles.leftColumnContainer}>
+                  <div
+                    style={
+                      isMobile
+                        ? styles.leftColumnContainerMobile
+                        : styles.leftColumnContainer
+                    }
+                  >
                     <ResponsiveMediaGallery
                       mediaItems={mediaItems}
                       altTextTemplate={`Game template ${name} preview image {mediaIndex}`}
                       horizontalOuterMarginToEatOnMobile={8}
                     />
                   </div>
-                  <div style={styles.rightColumnContainer}>
+                  <div
+                    style={
+                      isMobile
+                        ? styles.rightColumnContainerMobile
+                        : styles.rightColumnContainer
+                    }
+                  >
                     <ColumnStackLayout noMargin>
                       <LineStackLayout
                         noMargin

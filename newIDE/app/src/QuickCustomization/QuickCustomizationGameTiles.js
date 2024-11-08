@@ -30,7 +30,7 @@ export const QuickCustomizationGameTiles = ({
   quickCustomizationRecommendation,
 }: Props) => {
   const { exampleShortHeaders } = React.useContext(ExampleStoreContext);
-  const { windowSize } = useResponsiveWindowSize();
+  const { windowSize, isLandscape } = useResponsiveWindowSize();
 
   const displayedExampleShortHeaders = React.useMemo(
     () =>
@@ -60,7 +60,15 @@ export const QuickCustomizationGameTiles = ({
     <I18n>
       {({ i18n }) => (
         <GridList
-          cols={windowSize === 'small' ? 2 : windowSize === 'medium' ? 3 : 4}
+          cols={
+            windowSize === 'small'
+              ? isLandscape
+                ? 3
+                : 2
+              : windowSize === 'medium'
+              ? 3
+              : 4
+          }
           style={styles.grid}
           cellHeight="auto"
           spacing={styles.cellSpacing}

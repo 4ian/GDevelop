@@ -565,7 +565,7 @@ const ProjectPropertiesDialog = (props: Props) => {
                 <Text size="block-title">
                   <Trans>Resolution and rendering</Trans>
                 </Text>
-                <ResponsiveLineStackLayout noMargin>
+                <ResponsiveLineStackLayout noMargin noResponsiveLandscape>
                   <SemiControlledTextField
                     id="game-resolution-width"
                     floatingLabelText={<Trans>Game resolution width</Trans>}
@@ -647,7 +647,7 @@ const ProjectPropertiesDialog = (props: Props) => {
                     notifyOfChange();
                   }}
                 />
-                <ResponsiveLineStackLayout noMargin>
+                <ResponsiveLineStackLayout noMargin noResponsiveLandscape>
                   <SemiControlledTextField
                     floatingLabelText={<Trans>Minimum FPS</Trans>}
                     fullWidth

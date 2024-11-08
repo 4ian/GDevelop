@@ -374,7 +374,12 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
     return (
       <I18n>
         {({ i18n }) => (
-          <ResponsiveLineStackLayout noMargin expand alignItems="center">
+          <ResponsiveLineStackLayout
+            noMargin
+            expand
+            alignItems="center"
+            noResponsiveLandscape
+          >
             <Column expand noMargin>
               <LineStackLayout expand noMargin alignItems="center">
                 <SemiControlledAutoComplete

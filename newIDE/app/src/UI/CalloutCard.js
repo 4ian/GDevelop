@@ -46,7 +46,7 @@ export const CalloutCard = ({ children, renderImage }: Props) => {
 
   return (
     <div style={cardStyle}>
-      <ResponsiveLineStackLayout noMargin expand>
+      <ResponsiveLineStackLayout noMargin expand noResponsiveLandscape>
         {renderImage(
           windowSize === 'small'
             ? styles.smallImageSize

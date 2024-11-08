@@ -121,6 +121,13 @@ const styles = {
   rightColumnContainer: {
     flex: 2,
   },
+  leftColumnContainerMobile: {
+    flex: 1,
+    minWidth: 0, // This is needed for the container to take the right size.
+  },
+  rightColumnContainerMobile: {
+    flex: 1,
+  },
   avatar: {
     width: 20,
     height: 20,
@@ -166,6 +173,7 @@ const PrivateAssetPackInformationPage = ({
   onGameTemplateOpen,
   simulateAppStoreProduct,
 }: Props) => {
+  const { isMobile } = useResponsiveWindowSize();
   const { id, name, sellerId } = privateAssetPackListingData;
   const { privateAssetPackListingDatas } = React.useContext(AssetStoreContext);
   const { showAlert } = useAlertDialog();
@@ -534,14 +542,26 @@ const PrivateAssetPackInformationPage = ({
                   // Prevent it to wrap when in landscape mode on small screens.
                   noResponsiveLandscape
                 >
-                  <div style={styles.leftColumnContainer}>
+                  <div
+                    style={
+                      isMobile
+                        ? styles.leftColumnContainerMobile
+                        : styles.leftColumnContainer
+                    }
+                  >
                     <ResponsiveMediaGallery
                       mediaItems={mediaItems}
                       altTextTemplate={`Asset pack ${name} preview image or sound {mediaIndex}`}
                       horizontalOuterMarginToEatOnMobile={8}
                     />
                   </div>
-                  <div style={styles.rightColumnContainer}>
+                  <div
+                    style={
+                      isMobile
+                        ? styles.rightColumnContainerMobile
+                        : styles.rightColumnContainer
+                    }
+                  >
                     <ColumnStackLayout>
                       <LineStackLayout
                         noMargin

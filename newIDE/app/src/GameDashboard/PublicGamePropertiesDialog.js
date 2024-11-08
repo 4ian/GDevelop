@@ -21,19 +21,6 @@ import CircledClose from '../UI/CustomSvgIcons/CircledClose';
 import { Column, Line } from '../UI/Grid';
 import AlertMessage from '../UI/AlertMessage';
 
-/**
- * Changes that are not stored in the Project.
- */
-export type PartialGameChange = {|
-  ownerIds?: Array<string>,
-  userSlug?: string,
-  gameSlug?: string,
-  discoverable?: boolean,
-|};
-
-/**
- * Public game properties that are shared with the project file ones.
- */
 type PublicProjectProperties = {|
   name: string,
   categories: string[],
@@ -48,7 +35,10 @@ type PublicProjectProperties = {|
 
 export type PublicGameAndProjectEditableProperties = {|
   ...GameUpdatePayload,
-  ...PartialGameChange,
+  ownerIds?: Array<string>,
+  userSlug?: string,
+  gameSlug?: string,
+  discoverable?: boolean,
   authorUsernames: string[],
   authorIds?: Array<string>,
   isPublishedOnGdGames: boolean,

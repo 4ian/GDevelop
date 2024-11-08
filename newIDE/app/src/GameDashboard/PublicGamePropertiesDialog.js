@@ -188,12 +188,11 @@ export const PublicGamePropertiesDialog = ({
       onClick={onClose}
       disabled={isLoading}
     />,
-    <LeftLoader isLoading={isLoading}>
+    <LeftLoader key="save" isLoading={isLoading}>
       <DialogPrimaryButton
         label={<Trans>Save</Trans>}
         primary
         onClick={onSave}
-        key="save"
         disabled={isLoading}
       />
     </LeftLoader>,

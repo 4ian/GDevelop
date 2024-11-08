@@ -286,8 +286,6 @@ const GameDashboard = ({
           playWithGamepad: properties.playWithGamepad,
           playWithMobile: properties.playWithMobile,
           orientation: properties.orientation,
-          thumbnailUrl: properties.thumbnailUrl,
-          screenshotUrls: properties.screenshotUrls,
           discoverable: properties.discoverable,
           acceptsBuildComments: properties.acceptsBuildComments,
           acceptsGameComments: properties.acceptsGameComments,

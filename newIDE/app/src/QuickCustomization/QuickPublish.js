@@ -232,7 +232,7 @@ export const QuickPublish = ({
                     onExportSucceeded={onExportSucceeded}
                   />
                   {exportState === 'succeeded' ? (
-                    <Paper background="light">
+                    <Paper background="medium" variant="outlined">
                       <div
                         className={classNames({
                           [classes.paperContainer]: true,

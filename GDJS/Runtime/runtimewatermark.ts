@@ -56,7 +56,9 @@ namespace gdjs {
         this._placement = watermarkData.placement;
         this._showAtStartup = watermarkData.showWatermark;
         this._isDevEnvironment = game.isUsingGDevelopDevelopmentEnvironment();
-        this.addStyle();
+        if (watermarkData.showWatermark) {
+          this.addStyle();
+        }
       }
 
       displayAtStartup() {

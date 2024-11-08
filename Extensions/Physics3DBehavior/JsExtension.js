@@ -38,6 +38,11 @@ module.exports = {
       propertyName,
       newValue
     ) {
+      if (propertyName === 'Object3D') {
+        behaviorContent.getChild('Object3D').setStringValue(newValue);
+        return true;
+      }
+
       if (propertyName === 'bodyType') {
         behaviorContent.getChild('bodyType').setStringValue(newValue);
         return true;
@@ -178,6 +183,14 @@ module.exports = {
     };
     behavior.getProperties = function (behaviorContent) {
       const behaviorProperties = new gd.MapStringPropertyDescriptor();
+
+      behaviorProperties
+        .getOrCreate('Object3D')
+        .setValue(behaviorContent.getChild('Object3D').getStringValue())
+        .setType('Behavior')
+        .setLabel('3D capability')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+        .addExtraInfo('Scene3D::Base3DBehavior');
 
       behaviorProperties
         .getOrCreate('bodyType')
@@ -406,6 +419,7 @@ module.exports = {
     };
 
     behavior.initializeContent = function (behaviorContent) {
+      behaviorContent.addChild('Object3D').setStringValue('');
       behaviorContent.addChild('bodyType').setStringValue('Dynamic');
       behaviorContent.addChild('bullet').setBoolValue(false);
       behaviorContent.addChild('fixedRotation').setBoolValue(false);

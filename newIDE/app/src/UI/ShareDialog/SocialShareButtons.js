@@ -1,6 +1,7 @@
 // @flow
 
 import * as React from 'react';
+import { createStyles, makeStyles } from '@material-ui/styles';
 import {
   EmailShareButton,
   FacebookShareButton,
@@ -13,7 +14,6 @@ import Twitter from '../CustomSvgIcons/Twitter';
 import Reddit from '../CustomSvgIcons/Reddit';
 import Mail from '../CustomSvgIcons/Mail';
 import Whatsapp from '../CustomSvgIcons/Whatsapp';
-import { createStyles, makeStyles } from '@material-ui/core';
 
 const useStyles = () =>
   makeStyles(theme =>

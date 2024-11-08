@@ -30,6 +30,9 @@ namespace gdjs {
      */
     getResourceKinds(): Array<ResourceKind>;
 
+    /**
+     * Dispose the manager, free all resources.
+     */
     dispose(): void;
   }
 }

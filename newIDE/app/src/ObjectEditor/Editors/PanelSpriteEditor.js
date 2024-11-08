@@ -52,7 +52,7 @@ export default class PanelSpriteEditor extends React.Component<
             this.forceUpdate();
           }}
         />
-        <ResponsiveLineStackLayout noMargin>
+        <ResponsiveLineStackLayout noResponsiveLandscape noMargin>
           <SemiControlledTextField
             commitOnBlur
             floatingLabelText={<Trans>Top margin</Trans>}
@@ -78,7 +78,7 @@ export default class PanelSpriteEditor extends React.Component<
             }}
           />
         </ResponsiveLineStackLayout>
-        <ResponsiveLineStackLayout noMargin>
+        <ResponsiveLineStackLayout noResponsiveLandscape noMargin>
           <SemiControlledTextField
             commitOnBlur
             floatingLabelText={<Trans>Left margin</Trans>}
@@ -102,7 +102,7 @@ export default class PanelSpriteEditor extends React.Component<
             }}
           />
         </ResponsiveLineStackLayout>
-        <ResponsiveLineStackLayout noMargin>
+        <ResponsiveLineStackLayout noResponsiveLandscape noMargin>
           <SemiControlledTextField
             commitOnBlur
             floatingLabelText={<Trans>Default width (in pixels)</Trans>}

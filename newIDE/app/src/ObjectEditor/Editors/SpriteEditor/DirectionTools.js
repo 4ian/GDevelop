@@ -15,7 +15,7 @@ import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindow
 import { isProjectImageResourceSmooth } from '../../../ResourcesList/ResourcePreview/ImagePreview';
 import useForceUpdate from '../../../Utils/UseForceUpdate';
 import { LineStackLayout, ResponsiveLineStackLayout } from '../../../UI/Layout';
-import { Tooltip } from '@material-ui/core';
+import Tooltip from '@material-ui/core/Tooltip';
 import Text from '../../../UI/Text';
 import Edit from '../../../UI/CustomSvgIcons/Edit';
 import Play from '../../../UI/CustomSvgIcons/Play';
@@ -114,6 +114,7 @@ const DirectionTools = ({
             alignItems="center"
             justifyContent="flex-end"
             noColumnMargin
+            noResponsiveLandscape
           >
             <LineStackLayout noMargin>
               {!!imageResourceExternalEditors.length && (

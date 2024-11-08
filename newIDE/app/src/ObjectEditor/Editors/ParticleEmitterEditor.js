@@ -130,7 +130,7 @@ export default class ParticleEmitterEditor extends React.Component<
         )}
         {particleEmitterConfiguration.getRendererType() ===
           gd.ParticleEmitterObject.Quad && (
-          <ResponsiveLineStackLayout noMargin>
+          <ResponsiveLineStackLayout noMargin noResponsiveLandscape>
             <SemiControlledTextField
               commitOnBlur
               floatingLabelText={<Trans>Particles start width</Trans>}
@@ -159,7 +159,7 @@ export default class ParticleEmitterEditor extends React.Component<
             />
           </ResponsiveLineStackLayout>
         )}
-        <ResponsiveLineStackLayout noMargin>
+        <ResponsiveLineStackLayout noMargin noResponsiveLandscape>
           <ColorField
             floatingLabelText={<Trans>Particles start color</Trans>}
             disableAlpha
@@ -189,7 +189,7 @@ export default class ParticleEmitterEditor extends React.Component<
             }}
           />
         </ResponsiveLineStackLayout>
-        <ResponsiveLineStackLayout noMargin>
+        <ResponsiveLineStackLayout noMargin noResponsiveLandscape>
           <ColorField
             floatingLabelText={<Trans>Particles end color</Trans>}
             disableAlpha
@@ -236,7 +236,7 @@ export default class ParticleEmitterEditor extends React.Component<
             this.forceUpdate();
           }}
         />
-        <ResponsiveLineStackLayout noMargin>
+        <ResponsiveLineStackLayout noMargin noResponsiveLandscape>
           <SemiControlledTextField
             commitOnBlur
             floatingLabelText={
@@ -253,7 +253,7 @@ export default class ParticleEmitterEditor extends React.Component<
             }}
           />
         </ResponsiveLineStackLayout>
-        <ResponsiveLineStackLayout noMargin>
+        <ResponsiveLineStackLayout noMargin noResponsiveLandscape>
           <SemiControlledTextField
             commitOnBlur
             floatingLabelText={
@@ -281,7 +281,7 @@ export default class ParticleEmitterEditor extends React.Component<
             }}
           />
         </ResponsiveLineStackLayout>
-        <ResponsiveLineStackLayout noMargin>
+        <ResponsiveLineStackLayout noMargin noResponsiveLandscape>
           <SemiControlledTextField
             commitOnBlur
             floatingLabelText={
@@ -313,7 +313,7 @@ export default class ParticleEmitterEditor extends React.Component<
             }}
           />
         </ResponsiveLineStackLayout>
-        <ResponsiveLineStackLayout noMargin>
+        <ResponsiveLineStackLayout noMargin noResponsiveLandscape>
           <SemiControlledTextField
             commitOnBlur
             floatingLabelText={<Trans>Spray cone angle (in degrees)</Trans>}
@@ -341,7 +341,7 @@ export default class ParticleEmitterEditor extends React.Component<
             }}
           />
         </ResponsiveLineStackLayout>
-        <ResponsiveLineStackLayout noMargin>
+        <ResponsiveLineStackLayout noMargin noResponsiveLandscape>
           <SemiControlledTextField
             commitOnBlur
             floatingLabelText={<Trans>Gravity on particles on X axis</Trans>}
@@ -369,7 +369,7 @@ export default class ParticleEmitterEditor extends React.Component<
             }}
           />
         </ResponsiveLineStackLayout>
-        <ResponsiveLineStackLayout noMargin>
+        <ResponsiveLineStackLayout noMargin noResponsiveLandscape>
           <SemiControlledTextField
             commitOnBlur
             floatingLabelText={
@@ -401,7 +401,7 @@ export default class ParticleEmitterEditor extends React.Component<
             }}
           />
         </ResponsiveLineStackLayout>
-        <ResponsiveLineStackLayout noMargin>
+        <ResponsiveLineStackLayout noMargin noResponsiveLandscape>
           <SemiControlledTextField
             commitOnBlur
             floatingLabelText={<Trans>Particle start size (in percents)</Trans>}
@@ -425,7 +425,7 @@ export default class ParticleEmitterEditor extends React.Component<
             }}
           />
         </ResponsiveLineStackLayout>
-        <ResponsiveLineStackLayout noMargin>
+        <ResponsiveLineStackLayout noMargin noResponsiveLandscape>
           <SemiControlledTextField
             commitOnBlur
             floatingLabelText={
@@ -453,7 +453,7 @@ export default class ParticleEmitterEditor extends React.Component<
             }}
           />
         </ResponsiveLineStackLayout>
-        <ResponsiveLineStackLayout noMargin>
+        <ResponsiveLineStackLayout noMargin noResponsiveLandscape>
           <SemiControlledTextField
             commitOnBlur
             floatingLabelText={

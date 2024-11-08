@@ -80,6 +80,7 @@ const AlertMessage = ({
                 justifyContent="space-between"
                 noMargin
                 expand
+                noResponsiveLandscape
               >
                 <Line noMargin alignItems="center">
                   {renderLeftIcon ? (

@@ -1,11 +1,9 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import FlatButton from '../UI/FlatButton';
 import PreviewIcon from '../UI/CustomSvgIcons/Preview';
 import UpdateIcon from '../UI/CustomSvgIcons/Update';
-import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
-import IconButton from '../UI/IconButton';
+import ResponsiveFlatButton from '../UI/ResponsiveFlatButton';
 
 export type HotReloadPreviewButtonProps = {|
   hasPreviewsRunning: boolean,
@@ -21,7 +19,6 @@ export default function HotReloadPreviewButton({
   hasPreviewsRunning,
   isCodeGenerationRequired,
 }: HotReloadPreviewButtonProps) {
-  const { isMobile } = useResponsiveWindowSize();
   const icon = hasPreviewsRunning ? <UpdateIcon /> : <PreviewIcon />;
   const label = hasPreviewsRunning ? (
     <Trans>Apply changes to preview</Trans>
@@ -33,11 +30,11 @@ export default function HotReloadPreviewButton({
     : launchProjectDataOnlyPreview;
 
   // Hide the text on mobile, to avoid taking too much space.
-  return !isMobile ? (
-    <FlatButton leftIcon={icon} label={label} onClick={launchProjectPreview} />
-  ) : (
-    <IconButton onClick={launchProjectPreview} size="small">
-      {icon}
-    </IconButton>
+  return (
+    <ResponsiveFlatButton
+      label={label}
+      onClick={launchProjectPreview}
+      leftIcon={icon}
+    />
   );
 }

@@ -64,7 +64,7 @@ export const EmptyPlaceholder = (props: Props) => (
         </Text>
         <LargeSpacer />
         <ColumnStackLayout alignItems="center" noMargin>
-          <ResponsiveLineStackLayout noMargin>
+          <ResponsiveLineStackLayout noMargin noResponsiveLandscape>
             {props.secondaryActionLabel && props.onSecondaryAction && (
               <FlatButton
                 label={props.secondaryActionLabel}

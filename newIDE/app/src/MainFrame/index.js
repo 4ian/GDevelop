@@ -198,7 +198,7 @@ import { QuickCustomizationDialog } from '../QuickCustomization/QuickCustomizati
 import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import useGamesList from '../GameDashboard/UseGamesList';
 import useCapturesManager from './UseCapturesManager';
-import useRouteArguments from './UseRouteArguments';
+import useHomepageWitchForRouting from './UseHomepageWitchForRouting';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -1907,7 +1907,7 @@ const MainFrame = (props: Props) => {
     setShareDialogOpen(false);
   }, []);
 
-  const { navigateToRoute } = useRouteArguments({
+  const { navigateToRoute } = useHomepageWitchForRouting({
     openHomePage,
     closeDialogs: closeDialogsToOpenHomePage,
   });

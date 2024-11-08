@@ -7,7 +7,7 @@ import RouterContext from './RouterContext';
  * This hook is used to be able to use route arguments from anywhere to open the homepage.
  * It should close dialogs that prevent the navigation to the homepage.
  */
-const useRouteArguments = ({
+const useHomepageWitchForRouting = ({
   openHomePage,
   closeDialogs,
 }: {|
@@ -45,4 +45,4 @@ const useRouteArguments = ({
   };
 };
 
-export default useRouteArguments;
+export default useHomepageWitchForRouting;

@@ -774,12 +774,41 @@ namespace gdjs {
   };
 
   /**
-   * Get the value of a variable that was created by the Dialogue parses.
-   * @param key The name of the variable you want to get the value of
+   * Get the value of a variable stored in the dialogue state.
+   * @param key The variable name
    */
-  gdjs.dialogueTree.getVariable = function (key: string) {
+  gdjs.dialogueTree.getVariable = function (
+    key: string
+  ): string | float | boolean {
     if (this.runner.variables && key in this.runner.variables.data) {
       return this.runner.variables.get(key);
+    }
+    return '';
+  };
+
+  /**
+   * Get the value of a variable stored in the dialogue state.
+   * @param key The variable name
+   */
+  gdjs.dialogueTree.getVariableAsNumber = function (key: string): float {
+    if (this.runner.variables && key in this.runner.variables.data) {
+      const value = this.runner.variables.get(key);
+      if (typeof value !== 'number') {
+        return parseFloat(value) || 0;
+      }
+
+      return isFinite(value) ? value : 0;
+    }
+    return 0;
+  };
+
+  /**
+   * Get the value of a variable stored in the dialogue state.
+   * @param key The variable name
+   */
+  gdjs.dialogueTree.getVariableAsString = function (key: string): string {
+    if (this.runner.variables && key in this.runner.variables.data) {
+      return '' + this.runner.variables.get(key);
     }
     return '';
   };

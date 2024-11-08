@@ -34,18 +34,18 @@ module.exports = {
     extension
       .addAction(
         'LoadDialogueFromSceneVariable',
-        _('Load dialogue Tree from a scene variable'),
+        _('Load dialogue tree from a scene variable'),
         _(
-          'Load a dialogue data object - Yarn json format, stored in a scene variable. Use this command to load all the Dialogue data at the beginning of the game.'
+          'Load a dialogue data object - Yarn JSON format, stored in a scene variable. Use this command to load all the Dialogue data at the beginning of the game.'
         ),
-        _('Load dialogue data from Scene variable _PARAM0_'),
+        _('Load dialogue data from scene variable _PARAM0_'),
         '',
         'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
       )
       .addParameter(
         'scenevar',
-        _('Scene variable that holds the Yarn Json data'),
+        _('Scene variable that holds the Yarn JSON data'),
         '',
         false
       )
@@ -57,11 +57,11 @@ module.exports = {
     extension
       .addAction(
         'LoadDialogueFromJsonFile',
-        _('Load dialogue Tree from a Json File'),
+        _('Load dialogue tree from a JSON file'),
         _(
-          'Load a dialogue data object - Yarn json format, stored in a Json file. Use this command to load all the Dialogue data at the beginning of the game.'
+          'Load a dialogue data object - Yarn JSON format, stored in a JSON file. Use this command to load all the Dialogue data at the beginning of the game.'
         ),
-        _('Load dialogue data from json file _PARAM1_'),
+        _('Load dialogue data from JSON file _PARAM1_'),
         '',
         'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
@@ -69,7 +69,7 @@ module.exports = {
       .addCodeOnlyParameter('currentScene', '')
       .addParameter(
         'jsonResource',
-        _('Json file that holds the Yarn Json data'),
+        _('JSON file that holds the Yarn JSON data'),
         '',
         false
       )
@@ -125,11 +125,11 @@ module.exports = {
     extension
       .addAction(
         'ConfirmSelectOption',
-        _('Confirm selected Option'),
+        _('Confirm selected option'),
         _(
           'Set the selected option as confirmed, which will validate it and go forward to the next node. Use other actions to select options (see "select next option" and "Select previous option").'
         ),
-        _('Confirm selected Option'),
+        _('Confirm selected option'),
         '',
         'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
@@ -140,11 +140,11 @@ module.exports = {
     extension
       .addAction(
         'SelectNextOption',
-        _('Select next Option'),
+        _('Select next option'),
         _(
-          'Select next Option (add 1 to selected option number). Use this when the dialogue line is of type "options" and the player has pressed a button to change selected option.'
+          'Select next option (add 1 to selected option number). Use this when the dialogue line is of type "options" and the player has pressed a button to change selected option.'
         ),
-        _('Select next Option'),
+        _('Select next option'),
         '',
         'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
@@ -155,11 +155,11 @@ module.exports = {
     extension
       .addAction(
         'SelectPreviousOption',
-        _('Select previous Option'),
+        _('Select previous option'),
         _(
-          'Select previous Option (subtract 1 from selected option number). Use this when the dialogue line is of type "options" and the player has pressed a button to change selected option.'
+          'Select previous option (subtract 1 from selected option number). Use this when the dialogue line is of type "options" and the player has pressed a button to change selected option.'
         ),
-        _('Select previous Option'),
+        _('Select previous option'),
         '',
         'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
@@ -225,8 +225,8 @@ module.exports = {
         'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
       )
-      .addParameter('string', _('State Variable Name'), '', false)
-      .addParameter('string', _('Variable string value'), '', false)
+      .addParameter('string', _('State variable name'), '', false)
+      .addParameter('string', _('New value'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.setVariable');
 
@@ -242,8 +242,8 @@ module.exports = {
         'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
       )
-      .addParameter('string', _('State Variable Name'), '', false)
-      .addParameter('expression', _('Variable number value'), '', true)
+      .addParameter('string', _('State variable name'), '', false)
+      .addParameter('expression', _('New value'), '', true)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.setVariable');
 
@@ -259,8 +259,8 @@ module.exports = {
         'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
       )
-      .addParameter('string', _('State Variable Name'), '', false)
-      .addParameter('trueorfalse', _('Variable boolean value'), '', false)
+      .addParameter('string', _('State variable name'), '', false)
+      .addParameter('trueorfalse', _('New value'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.setVariable');
 
@@ -336,9 +336,9 @@ module.exports = {
     extension
       .addStrExpression(
         'Option',
-        _('Get the text of an option from an Options line type'),
+        _('Get the text of an option from an options line type'),
         _(
-          "Get the text of an option from an Options line type, using the option's Number. The numbers start from 0."
+          "Get the text of an option from an options line type, using the option's Number. The numbers start from 0."
         ),
         '',
         'JsPlatform/Extensions/yarn32.png'
@@ -350,9 +350,9 @@ module.exports = {
     extension
       .addStrExpression(
         'HorizontalOptionsList',
-        _('Get a Horizontal list of options from the Options line type'),
+        _('Get a Horizontal list of options from the options line type'),
         _(
-          "Get the text of all available options from an Options line type as a horizontal list. You can also pass the selected option's cursor string, which by default is ->"
+          "Get the text of all available options from an options line type as a horizontal list. You can also pass the selected option's cursor string, which by default is ->"
         ),
         '',
         'JsPlatform/Extensions/yarn32.png'
@@ -365,9 +365,9 @@ module.exports = {
     extension
       .addStrExpression(
         'VerticalOptionsList',
-        _('Get a Vertical list of options from the Options line type'),
+        _('Get a Vertical list of options from the options line type'),
         _(
-          "Get the text of all available options from an Options line type as a vertical list. You can also pass the selected option's cursor string, which by default is ->"
+          "Get the text of all available options from an options line type as a vertical list. You can also pass the selected option's cursor string, which by default is ->"
         ),
         '',
         'JsPlatform/Extensions/yarn32.png'
@@ -507,14 +507,26 @@ module.exports = {
     extension
       .addExpression(
         'Variable',
-        _('Get dialogue state value'),
-        _('Get dialogue state value'),
+        _('Get the number stored in a dialogue state variable'),
+        _('Get the number stored in a dialogue state variable'),
         '',
         'JsPlatform/Extensions/yarn32.png'
       )
-      .addParameter('string', _('Variable Name'), '', false)
+      .addParameter('string', _('Dialogue state variable name'), '', false)
       .getCodeExtraInformation()
-      .setFunctionName('gdjs.dialogueTree.getVariable');
+      .setFunctionName('gdjs.dialogueTree.getVariableAsNumber');
+
+    extension
+      .addStrExpression(
+        'VariableString',
+        _('Get the string stored in a dialogue state variable'),
+        _('Get the string stored in a dialogue state variable'),
+        '',
+        'JsPlatform/Extensions/yarn32.png'
+      )
+      .addParameter('string', _('Dialogue state variable name'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.dialogueTree.getVariableAsString');
 
     extension
       .addCondition(

@@ -2,18 +2,17 @@
 
 import * as React from 'react';
 import {
-  EmailIcon,
   EmailShareButton,
-  FacebookIcon,
   FacebookShareButton,
-  RedditIcon,
   RedditShareButton,
-  TwitterIcon,
   TwitterShareButton,
-  WhatsappIcon,
   WhatsappShareButton,
 } from 'react-share';
-import { Line } from '../Grid';
+import Facebook from '../CustomSvgIcons/Facebook';
+import Twitter from '../CustomSvgIcons/Twitter';
+import Reddit from '../CustomSvgIcons/Reddit';
+import Mail from '../CustomSvgIcons/Mail';
+import Whatsapp from '../CustomSvgIcons/Whatsapp';
 
 type Props = {|
   url: string,
@@ -23,25 +22,29 @@ const styles = {
   icon: {
     padding: 5,
   },
+  container: {
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
 };
 
 const SocialShareButtons = ({ url }: Props) => {
   return (
-    <Line>
+    <div style={styles.container}>
       <FacebookShareButton
         url={url}
         style={styles.icon}
         quote={`Try the game I just created with GDevelop.io`}
         hashtag="#gdevelop"
       >
-        <FacebookIcon size={32} round />
+        <Facebook />
       </FacebookShareButton>
       <RedditShareButton
         url={url}
         title={`Try the game I just created with r/gdevelop`}
         style={styles.icon}
       >
-        <RedditIcon size={32} round />
+        <Reddit />
       </RedditShareButton>
       <TwitterShareButton
         title={`Try the game I just created with GDevelop.io`}
@@ -49,14 +52,14 @@ const SocialShareButtons = ({ url }: Props) => {
         url={url}
         style={styles.icon}
       >
-        <TwitterIcon size={32} round />
+        <Twitter />
       </TwitterShareButton>
       <WhatsappShareButton
         title={`Try the game I just created with GDevelop.io`}
         url={url}
         style={styles.icon}
       >
-        <WhatsappIcon size={32} round />
+        <Whatsapp />
       </WhatsappShareButton>
       <EmailShareButton
         subject="My GDevelop game"
@@ -64,9 +67,9 @@ const SocialShareButtons = ({ url }: Props) => {
         url={url}
         style={styles.icon}
       >
-        <EmailIcon size={32} round />
+        <Mail />
       </EmailShareButton>
-    </Line>
+    </div>
   );
 };
 

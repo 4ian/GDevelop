@@ -14,6 +14,7 @@ export const fakeUserLeaderboards: UserLeaderboard[] = [
         userPublicProfile: {
           id: 'FbKIILxuBlgSp8wMb3jwgJQ6guA2',
           username: 'Shark_Chum',
+          createdAt: 1553989202802,
           description:
             'Howdy! I am an amateur cartoonist who occasionally makes games!\nI work with @Inusitatus_ a lot, too.',
           donateLink: null,
@@ -41,6 +42,7 @@ export const fakeUserLeaderboards: UserLeaderboard[] = [
         userPublicProfile: {
           id: 'mnVo2kO4b8QgKIrTXBR5hMg3L5F2',
           username: null,
+          createdAt: 1553989202802,
           description: null,
           donateLink: null,
           discordUsername: null,
@@ -66,6 +68,7 @@ export const fakeUserLeaderboards: UserLeaderboard[] = [
         userPublicProfile: {
           id: 'qaPOb3aaVWWYlOVNiF6WWWQQs732',
           username: 'SquidXYouTube',
+          createdAt: 1553989202802,
           description:
             'I\'m part of  the group known as "dreamplayergames" where amateur game developers make "creative" games',
           donateLink: null,
@@ -94,6 +97,7 @@ export const fakeUserLeaderboards: UserLeaderboard[] = [
         userPublicProfile: {
           id: 'JCyXMuGPACQwiprTfsUqv6pluIy1',
           username: 'SewerSwordStudios',
+          createdAt: 1553989202802,
           description:
             "Lazercherrys and Pyroqua's combined account\n(we cant afford the subscription lol)",
           donateLink: null,
@@ -120,6 +124,7 @@ export const fakeUserLeaderboards: UserLeaderboard[] = [
         userPublicProfile: {
           id: 'wY5eR2lNDrgEV3kOoeeWDExRQtr2',
           username: 'GradeGames',
+          createdAt: 1553989202802,
           description: 'Just making games :)',
           donateLink: null,
           discordUsername: null,
@@ -145,6 +150,7 @@ export const fakeUserLeaderboards: UserLeaderboard[] = [
         userPublicProfile: {
           id: '3YxRqY6QbXhcwvMoVVSmNySexgB2',
           username: 'Litcell',
+          createdAt: 1553989202802,
           description: null,
           donateLink: null,
           discordUsername: null,
@@ -178,6 +184,7 @@ export const fakeUserLeaderboards: UserLeaderboard[] = [
         userPublicProfile: {
           id: '2OwwM8ToR9dx9RJ2sAKTcrLmCB92',
           username: 'Bouh',
+          createdAt: 1553989202802,
           description: 'Community Manager at GDevelop and early contributor.',
           donateLink:
             'https://www.paypal.com/donate/?hosted_button_id=ZSUSBN9FCAVG4',
@@ -193,6 +200,7 @@ export const fakeUserLeaderboards: UserLeaderboard[] = [
         userPublicProfile: {
           id: 'FbKIILxuBlgSp8wMb3jwgJQ6guA2',
           username: 'Shark_Chum',
+          createdAt: 1553989202802,
           description:
             'Howdy! I am an amateur cartoonist who occasionally makes games!\nI work with @Inusitatus_ a lot, too.',
           donateLink: null,
@@ -220,6 +228,7 @@ export const fakeUserLeaderboards: UserLeaderboard[] = [
         userPublicProfile: {
           id: '09pfOz99PXg8Ps3ocfH9G3X1DNw1',
           username: null,
+          createdAt: 1553989202802,
           description: null,
           donateLink: null,
           discordUsername: null,
@@ -234,6 +243,7 @@ export const fakeUserLeaderboards: UserLeaderboard[] = [
         userPublicProfile: {
           id: 'mnVo2kO4b8QgKIrTXBR5hMg3L5F2',
           username: 'BigMac1234',
+          createdAt: 1553989202802,
           description: null,
           donateLink: null,
           discordUsername: null,
@@ -259,6 +269,7 @@ export const fakeUserLeaderboards: UserLeaderboard[] = [
         userPublicProfile: {
           id: 'yXupbJwqoecBbI7qJSyAYdGAMZk1',
           username: 'umairzohair22',
+          createdAt: 1553989202802,
           description: null,
           donateLink: null,
           discordUsername: null,
@@ -273,6 +284,7 @@ export const fakeUserLeaderboards: UserLeaderboard[] = [
         userPublicProfile: {
           id: 'qaPOb3aaVWWYlOVNiF6WWWQQs732',
           username: 'SquidXYouTube',
+          createdAt: 1553989202802,
           description:
             'I\'m part of  the group known as "dreamplayergames" where amateur game developers make "creative" games',
           donateLink: null,
@@ -301,6 +313,7 @@ export const fakeUserLeaderboards: UserLeaderboard[] = [
         userPublicProfile: {
           id: 'I35IITL2J2OGKEIYfJ6YhrEIwag2',
           username: '05staff',
+          createdAt: 1553989202802,
           description: 'idk just to create game',
           donateLink: null,
           discordUsername: '05staff',
@@ -326,6 +339,7 @@ export const fakeUserLeaderboards: UserLeaderboard[] = [
         userPublicProfile: {
           id: 'JCyXMuGPACQwiprTfsUqv6pluIy1',
           username: 'SewerSwordStudios',
+          createdAt: 1553989202802,
           description:
             "Lazercherrys and Pyroqua's combined account\n(we cant afford the subscription lol)",
           donateLink: null,
@@ -352,6 +366,7 @@ export const fakeUserLeaderboards: UserLeaderboard[] = [
         userPublicProfile: {
           id: 'wY5eR2lNDrgEV3kOoeeWDExRQtr2',
           username: 'GradeGames',
+          createdAt: 1553989202802,
           description: 'Just making games :)',
           donateLink: null,
           discordUsername: null,
@@ -377,6 +392,7 @@ export const fakeUserLeaderboards: UserLeaderboard[] = [
         userPublicProfile: {
           id: '3YxRqY6QbXhcwvMoVVSmNySexgB2',
           username: 'Litcell',
+          createdAt: 1553989202802,
           description: null,
           donateLink: null,
           discordUsername: null,

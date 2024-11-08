@@ -19,6 +19,7 @@ import {
   type Limits,
   type Usages,
   type Subscription,
+  type UserEarningsBalance,
 } from '../Utils/GDevelopServices/Usage';
 import {
   type AssetShortHeader,
@@ -43,6 +44,7 @@ export type AuthenticatedUser = {|
   assetPackPurchases: ?Array<Purchase>,
   recommendations: ?Array<Recommendation>,
   notifications: ?Array<Notification>,
+  userEarningsBalance: ?UserEarningsBalance,
   limits: ?Limits,
   authenticationError: ?AuthError,
   usages: ?Usages,
@@ -72,6 +74,7 @@ export type AuthenticatedUser = {|
   onRefreshLimits: () => Promise<void>,
   onRefreshGameTemplatePurchases: () => Promise<void>,
   onRefreshAssetPackPurchases: () => Promise<void>,
+  onRefreshEarningsBalance: () => Promise<void>,
   onRefreshNotifications: () => Promise<void>,
   onPurchaseSuccessful: () => Promise<void>,
   onSendEmailVerification: () => Promise<void>,
@@ -105,6 +108,7 @@ export const initialAuthenticatedUser = {
   recommendations: null,
   subscription: null,
   usages: null,
+  userEarningsBalance: null,
   limits: null,
   ...authenticatedUserPropertiesLoadingState,
   authenticationError: null,
@@ -127,6 +131,7 @@ export const initialAuthenticatedUser = {
   onRefreshLimits: async () => {},
   onRefreshGameTemplatePurchases: async () => {},
   onRefreshAssetPackPurchases: async () => {},
+  onRefreshEarningsBalance: async () => {},
   onRefreshNotifications: async () => {},
   onPurchaseSuccessful: async () => {},
   onSendEmailVerification: async () => {},
@@ -150,6 +155,7 @@ export const authenticatedUserLoggedOutAttributes = {
   receivedAssetShortHeaders: [], // Initialize to empty array to indicate that the loading is done.
   receivedGameTemplates: [], // Initialize to empty array to indicate that the loading is done.
   subscription: null,
+  userEarningsBalance: null,
   usages: null,
   limits: null,
 };

@@ -1,8 +1,8 @@
 // @flow
+import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 
-import React from 'react';
 import { PublicGameProperties, cleanUpGameSlug } from './PublicGameProperties';
 import {
   displayProjectErrorsBox,
@@ -13,23 +13,15 @@ import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import {
   type PublicGame,
   type Game,
+  type GameUpdatePayload,
   getGameMainImageUrl,
 } from '../Utils/GDevelopServices/Game';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import CircledClose from '../UI/CustomSvgIcons/CircledClose';
+import { Column, Line } from '../UI/Grid';
+import AlertMessage from '../UI/AlertMessage';
+import LeftLoader from '../UI/LeftLoader';
 
-/**
- * Changes that are not stored in the Project.
- */
-export type PartialGameChange = {|
-  ownerIds?: Array<string>,
-  userSlug?: string,
-  gameSlug?: string,
-  discoverable?: boolean,
-|};
-
-/**
- * Public game properties that are shared with the project file ones.
- */
 type PublicProjectProperties = {|
   name: string,
   categories: string[],
@@ -40,6 +32,17 @@ type PublicProjectProperties = {|
   playWithGamepad: boolean,
   playWithMobile: boolean,
   orientation: string,
+|};
+
+export type PublicGameAndProjectEditableProperties = {|
+  ...GameUpdatePayload,
+  ownerIds?: Array<string>,
+  userSlug?: string,
+  gameSlug?: string,
+  discoverable?: boolean,
+  authorUsernames: string[],
+  authorIds?: Array<string>,
+  isPublishedOnGdGames: boolean,
 |};
 
 export const applyPublicPropertiesToProject = (
@@ -79,18 +82,19 @@ export const applyPublicPropertiesToProject = (
 };
 
 type Props = {|
-  project: gdProject,
   publicGame: PublicGame,
   onClose: () => void,
-  onApply: (partialGameChange: PartialGameChange) => Promise<void>,
+  onApply: PublicGameAndProjectEditableProperties => Promise<void>,
   isLoading: boolean,
   i18n: I18nType,
   onUpdatingGame?: (isGameUpdating: boolean) => void,
   onGameUpdated?: (game: Game) => void,
+  canBePublishedOnGdGames: boolean,
+  onUnregisterGame: () => Promise<void>,
+  gameUnregisterErrorText: ?React.Node,
 |};
 
 export const PublicGamePropertiesDialog = ({
-  project,
   publicGame,
   onClose,
   onApply,
@@ -98,6 +102,9 @@ export const PublicGamePropertiesDialog = ({
   i18n,
   onUpdatingGame,
   onGameUpdated,
+  canBePublishedOnGdGames,
+  onUnregisterGame,
+  gameUnregisterErrorText,
 }: Props) => {
   const { profile } = React.useContext(AuthenticatedUserContext);
 
@@ -135,23 +142,37 @@ export const PublicGamePropertiesDialog = ({
   const [discoverable, setDiscoverable] = React.useState(
     publicGame.discoverable
   );
+  const [
+    isPublishedOnGdGames,
+    setIsPublishedOnGdGames,
+  ] = React.useState<boolean>(!!publicGame.publicWebBuildId);
+  const [
+    acceptsAdvertisementsOnGdGames,
+    setAcceptsAdvertisementsOnGdGames,
+  ] = React.useState<boolean>(publicGame.displayAdsOnGamePage);
+  const [acceptsGameComments, setAcceptsGameComments] = React.useState<boolean>(
+    !!publicGame.acceptsGameComments
+  );
 
   const onSave = async () => {
-    if (
-      applyPublicPropertiesToProject(project, i18n, {
-        name,
-        categories: categories || [],
-        description: description || '',
-        authorIds,
-        authorUsernames,
-        playWithKeyboard: !!playWithKeyboard,
-        playWithGamepad: !!playWithGamepad,
-        playWithMobile: !!playWithMobile,
-        orientation: orientation || 'default',
-      })
-    ) {
-      await onApply({ ownerIds, userSlug, gameSlug, discoverable });
-    }
+    await onApply({
+      ownerIds,
+      userSlug,
+      gameSlug,
+      discoverable,
+      authorUsernames,
+      authorIds,
+      gameName: name,
+      categories,
+      description,
+      playWithKeyboard,
+      playWithGamepad,
+      playWithMobile,
+      orientation,
+      displayAdsOnGamePage: acceptsAdvertisementsOnGdGames,
+      acceptsGameComments,
+      isPublishedOnGdGames,
+    });
   };
 
   const publicGameThumbnailUrl = React.useMemo(
@@ -161,19 +182,21 @@ export const PublicGamePropertiesDialog = ({
 
   const actions = [
     <FlatButton
-      label={<Trans>Back</Trans>}
+      label={<Trans>Close</Trans>}
       key="back"
       primary={false}
       onClick={onClose}
       disabled={isLoading}
     />,
-    <DialogPrimaryButton
-      label={<Trans>Save</Trans>}
-      primary
-      onClick={onSave}
-      key="save"
-      disabled={isLoading}
-    />,
+    <LeftLoader isLoading={isLoading}>
+      <DialogPrimaryButton
+        label={<Trans>Save</Trans>}
+        primary
+        onClick={onSave}
+        key="save"
+        disabled={isLoading}
+      />
+    </LeftLoader>,
   ];
 
   return (
@@ -186,13 +209,13 @@ export const PublicGamePropertiesDialog = ({
       open
     >
       <PublicGameProperties
+        gameId={publicGame.id}
         name={name}
         setName={setName}
         categories={categories}
         setCategories={setCategories}
         description={description}
         setDescription={setDescription}
-        project={project}
         authorIds={authorIds}
         setAuthorIds={setAuthorIds}
         setAuthorUsernames={setAuthorUsernames}
@@ -211,13 +234,33 @@ export const PublicGamePropertiesDialog = ({
         setGameSlug={setGameSlug}
         gameSlug={gameSlug}
         setDiscoverable={setDiscoverable}
+        isPublishedOnGdGames={isPublishedOnGdGames}
+        setIsPublishedOnGdGames={setIsPublishedOnGdGames}
+        acceptsAdvertisementsOnGdGames={acceptsAdvertisementsOnGdGames}
+        setAcceptsAdvertisementsOnGdGames={setAcceptsAdvertisementsOnGdGames}
+        acceptsGameComments={acceptsGameComments}
+        setAcceptsGameComments={setAcceptsGameComments}
         discoverable={discoverable}
         displayThumbnail
         thumbnailUrl={publicGameThumbnailUrl}
         onGameUpdated={onGameUpdated}
         onUpdatingGame={onUpdatingGame}
         disabled={isLoading}
+        canBePublishedOnGdGames={canBePublishedOnGdGames}
       />
+      {gameUnregisterErrorText && (
+        <Column justifyContent="stretch" expand noMargin>
+          <AlertMessage kind="error">{gameUnregisterErrorText}</AlertMessage>
+        </Column>
+      )}
+      <Line>
+        <FlatButton
+          primary
+          onClick={onUnregisterGame}
+          label={<Trans>Unregister game</Trans>}
+          leftIcon={<CircledClose fontSize="small" />}
+        />
+      </Line>
     </Dialog>
   );
 };

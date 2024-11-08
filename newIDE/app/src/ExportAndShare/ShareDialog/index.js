@@ -17,6 +17,7 @@ import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import { type FileMetadata, type StorageProvider } from '../../ProjectsStorage';
 import { useOnlineStatus } from '../../Utils/OnlineStatus';
 import ErrorBoundary from '../../UI/ErrorBoundary';
+import type { GamesList } from '../../GameDashboard/UseGamesList';
 import { useGameAndBuildsManager } from '../../Utils/UseGameAndBuildsManager';
 
 export type ShareTab = 'invite' | 'publish';
@@ -75,6 +76,7 @@ export type ShareDialogWithoutExportsProps = {|
   initialTab: ?ShareTab,
   fileMetadata: ?FileMetadata,
   storageProvider: StorageProvider,
+  gamesList: GamesList,
 |};
 
 type Props = {|
@@ -112,6 +114,7 @@ const ShareDialog = ({
   initialTab,
   fileMetadata,
   storageProvider,
+  gamesList,
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const {
@@ -152,7 +155,10 @@ const ShareDialog = ({
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { showAlert } = useAlertDialog();
 
-  const gameAndBuildsManager = useGameAndBuildsManager({ project });
+  const gameAndBuildsManager = useGameAndBuildsManager({
+    project,
+    onGameRegistered: gamesList.fetchGames,
+  });
 
   const openBuildDialog = () => {
     if (!gameAndBuildsManager.game) {

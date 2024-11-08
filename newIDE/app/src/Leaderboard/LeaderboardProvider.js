@@ -181,6 +181,7 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   // Ensure that only one request for leaderboards list is sent at the same time.
   const isListingLeaderboards = React.useRef(false);
+  const { getAuthorizationHeader, profile } = authenticatedUser;
 
   const [
     {
@@ -205,13 +206,15 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
 
   const listLeaderboards = React.useCallback(
     async (options: ?{ shouldClearBeforeFetching?: boolean }) => {
+      if (!profile) return;
       if (!isListingLeaderboards.current) {
         isListingLeaderboards.current = true;
         try {
           if (options && options.shouldClearBeforeFetching)
             dispatch({ type: 'SET_LEADERBOARDS', payload: null });
           const fetchedLeaderboards = await listGameActiveLeaderboards(
-            authenticatedUser,
+            getAuthorizationHeader,
+            profile.id,
             gameId
           );
           if (!fetchedLeaderboards) return;
@@ -225,7 +228,7 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
         }
       }
     },
-    [gameId, authenticatedUser]
+    [gameId, getAuthorizationHeader, profile]
   );
 
   const createLeaderboard = React.useCallback(

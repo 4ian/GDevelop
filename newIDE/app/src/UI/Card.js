@@ -7,6 +7,8 @@ import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 import { Column, Line } from './Grid';
 import { useResponsiveWindowSize } from './Responsive/ResponsiveWindowMeasurer';
 
+const highlightedBorderWidth = 4;
+
 const styles = {
   headerContainer: {
     minWidth: 0,
@@ -15,8 +17,6 @@ const styles = {
     alignItems: 'center',
   },
   cardContent: {
-    paddingBottom: 18,
-    paddingTop: 0,
     minWidth: 0,
   },
 };
@@ -29,6 +29,7 @@ type Props = {|
 
   disabled?: boolean,
   isHighlighted?: boolean,
+  padding?: number,
 |};
 
 const Card = ({
@@ -38,9 +39,31 @@ const Card = ({
   cardCornerAction,
   isHighlighted,
   disabled,
+  padding,
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const cardContentStyle: {|
+    minWidth: number,
+    padding?: number | string,
+    marginLeft?: number,
+    paddingTop?: number,
+    paddingBottom?: number,
+    paddingLeft?: number,
+    paddingRight?: number,
+  |} = {
+    ...styles.cardContent,
+    ...{
+      paddingTop: padding || 0,
+      paddingBottom: padding || 18,
+      paddingRight: padding || (isMobile ? 8 : 24),
+      paddingLeft: Math.max(
+        0,
+        // Compensate offset brought by left border
+        padding || (isMobile ? 8 : 24) - highlightedBorderWidth
+      ),
+    },
+  };
   return (
     <MUICard
       elevation={0}
@@ -52,8 +75,9 @@ const Card = ({
             : gdevelopTheme.paper.backgroundColor.medium,
         ...(isHighlighted
           ? {
-              borderLeftWidth: 4,
-              borderLeftColor: gdevelopTheme.palette.secondary,
+              borderWidth: `0 0 0 ${highlightedBorderWidth}px`,
+              borderStyle: 'solid',
+              borderLeftColor: gdevelopTheme.message.valid,
             }
           : {}),
       }}
@@ -73,15 +97,7 @@ const Card = ({
             <Column>{cardCornerAction}</Column>
           </Line>
         )}
-        <CardContent
-          style={{
-            ...styles.cardContent,
-            paddingRight: isMobile ? 8 : 24,
-            paddingLeft: isMobile ? 8 : 24,
-          }}
-        >
-          {children}
-        </CardContent>
+        <CardContent style={cardContentStyle}>{children}</CardContent>
       </Column>
     </MUICard>
   );

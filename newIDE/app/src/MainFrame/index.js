@@ -196,9 +196,9 @@ import { useAuthenticatedPlayer } from './UseAuthenticatedPlayer';
 import ListIcon from '../UI/ListIcon';
 import { QuickCustomizationDialog } from '../QuickCustomization/QuickCustomizationDialog';
 import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
-import RouterContext from './RouterContext';
 import useGamesList from '../GameDashboard/UseGamesList';
 import useCapturesManager from './UseCapturesManager';
+import useHomepageWitchForRouting from './UseHomepageWitchForRouting';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -374,7 +374,6 @@ const MainFrame = (props: Props) => {
     newProjectSetupDialogOpen,
     setNewProjectSetupDialogOpen,
   ] = React.useState<boolean>(false);
-  const { navigateToRoute } = React.useContext(RouterContext);
 
   const [isProjectOpening, setIsProjectOpening] = React.useState<boolean>(
     false
@@ -1195,6 +1194,7 @@ const MainFrame = (props: Props) => {
       }));
     },
     ensureResourcesAreMoved,
+    onGameRegistered: gamesList.fetchGames,
   });
 
   const closeApp = React.useCallback((): void => {
@@ -1902,6 +1902,15 @@ const MainFrame = (props: Props) => {
     },
     [setState, getEditorOpeningOptions]
   );
+
+  const closeDialogsToOpenHomePage = React.useCallback(() => {
+    setShareDialogOpen(false);
+  }, []);
+
+  const { navigateToRoute } = useHomepageWitchForRouting({
+    openHomePage,
+    closeDialogs: closeDialogsToOpenHomePage,
+  });
 
   const _openDebugger = React.useCallback(
     () => {
@@ -3518,6 +3527,8 @@ const MainFrame = (props: Props) => {
             hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
             resourceManagementProps={resourceManagementProps}
             gamesList={gamesList}
+            onOpenHomePage={openHomePage}
+            toggleProjectManager={toggleProjectManager}
           />
         ) : null}
       </ProjectManagerDrawer>
@@ -3741,6 +3752,7 @@ const MainFrame = (props: Props) => {
           fileMetadata: currentFileMetadata,
           storageProvider: getStorageProvider(),
           initialTab: shareDialogInitialTab,
+          gamesList,
         })}
       {!!renderPreviewLauncher &&
         renderPreviewLauncher(

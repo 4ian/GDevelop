@@ -21,13 +21,32 @@ const styles = {
     display: 'block',
     objectFit: 'scale-down', // Match gd.games format.
   },
-  thumbnail: {
-    // 16/9 format
-    width: 272,
-    height: 153,
+  fullWidthContainer: {
+    width: '100%',
+    aspectRatio: '16 / 9',
+    height: 'auto',
+    justifyContent: 'center',
     overflow: 'hidden', // Keep the radius effect.
   },
-  fullWidth: {
+  thumbnailContainer: {
+    height: 153,
+    width: 272,
+    overflow: 'hidden', // Keep the radius effect.
+  },
+  mobileThumbnailContainer: {
+    height: 84,
+    width: 150,
+    overflow: 'hidden', // Keep the radius effect.
+  },
+  thumbnail: {
+    aspectRatio: '16 / 9',
+    width: 272,
+  },
+  mobileThumbnail: {
+    aspectRatio: '16 / 9',
+    width: 150,
+  },
+  fullWidthThumbnail: {
     width: '100%',
     height: 'auto',
   },
@@ -37,16 +56,15 @@ type Props = {|
   thumbnailUrl?: ?string,
   gameName: string,
   background?: 'light' | 'medium' | 'dark',
-  project?: gdProject,
-  gameId: string,
+  gameId?: string,
   canUpdateThumbnail?: boolean,
   disabled?: boolean,
   onGameUpdated?: (updatedGame: Game) => void,
   onUpdatingGame?: (isUpdatingGame: boolean) => void,
+  fullWidthOnMobile?: boolean,
 |};
 
 export const GameThumbnail = ({
-  project,
   disabled,
   canUpdateThumbnail,
   thumbnailUrl,
@@ -55,8 +73,9 @@ export const GameThumbnail = ({
   onGameUpdated,
   onUpdatingGame,
   background = 'light',
+  fullWidthOnMobile,
 }: Props) => {
-  const { isMobile } = useResponsiveWindowSize();
+  const { isMobile, isLandscape } = useResponsiveWindowSize();
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
   );
@@ -67,7 +86,7 @@ export const GameThumbnail = ({
   );
 
   const updateGameThumbnail = async () => {
-    if (!profile) {
+    if (!profile || !gameId) {
       return;
     }
 
@@ -153,7 +172,11 @@ export const GameThumbnail = ({
     <ColumnStackLayout noMargin alignItems="center">
       <Paper
         style={{
-          ...styles.thumbnail,
+          ...(isMobile && !isLandscape
+            ? fullWidthOnMobile
+              ? styles.fullWidthContainer
+              : styles.mobileThumbnailContainer
+            : styles.thumbnailContainer),
           whiteSpace: 'normal',
           display: 'flex',
         }}
@@ -164,7 +187,11 @@ export const GameThumbnail = ({
             src={thumbnailUrl}
             style={{
               ...styles.image,
-              ...(isMobile ? styles.fullWidth : styles.thumbnail),
+              ...(isMobile && !isLandscape
+                ? fullWidthOnMobile
+                  ? styles.fullWidthThumbnail
+                  : styles.mobileThumbnail
+                : styles.thumbnail),
             }}
             alt={gameName}
           />
@@ -174,7 +201,7 @@ export const GameThumbnail = ({
           </EmptyMessage>
         )}
       </Paper>
-      {canUpdateThumbnail && project && (
+      {canUpdateThumbnail && gameId && (
         <RaisedButton
           primary
           disabled={!profile || isLoading || disabled}
@@ -194,12 +221,14 @@ export const GameThumbnail = ({
           }
         />
       )}
-      <input
-        type="file"
-        onChange={updateGameThumbnail}
-        ref={gamesPlatformThumbnailFileInputRef}
-        style={{ display: 'none' }}
-      />
+      {canUpdateThumbnail && gameId && (
+        <input
+          type="file"
+          onChange={updateGameThumbnail}
+          ref={gamesPlatformThumbnailFileInputRef}
+          style={{ display: 'none' }}
+        />
+      )}
     </ColumnStackLayout>
   );
 };

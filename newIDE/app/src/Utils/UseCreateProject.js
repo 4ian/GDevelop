@@ -57,6 +57,7 @@ type Props = {|
   ensureResourcesAreMoved: (
     options: MoveAllProjectResourcesOptionsWithoutProgress
   ) => Promise<void>,
+  onGameRegistered: () => Promise<void>,
 |};
 
 /**
@@ -72,6 +73,7 @@ const useCreateProject = ({
   openFromFileMetadata,
   onProjectSaved,
   ensureResourcesAreMoved,
+  onGameRegistered,
 }: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const profile = authenticatedUser.profile;
@@ -163,6 +165,7 @@ const useCreateProject = ({
                 project: currentProject,
               })
             );
+            await onGameRegistered();
           } catch (error) {
             // Do not prevent the user from opening the game if the registration failed.
             console.error(
@@ -261,6 +264,7 @@ const useCreateProject = ({
       ensureResourcesAreMoved,
       onSuccessOrError,
       unsavedChanges,
+      onGameRegistered,
     ]
   );
 

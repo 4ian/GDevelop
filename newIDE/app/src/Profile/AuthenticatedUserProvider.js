@@ -5,6 +5,7 @@ import {
   getUserUsages,
   getUserSubscription,
   getUserLimits,
+  getUserEarningsBalance,
 } from '../Utils/GDevelopServices/Usage';
 import {
   getUserBadges,
@@ -219,6 +220,7 @@ export default class AuthenticatedUserProvider extends React.Component<
         onRefreshLimits: this._fetchUserLimits,
         onRefreshGameTemplatePurchases: this._fetchUserGameTemplatePurchases,
         onRefreshAssetPackPurchases: this._fetchUserAssetPackPurchases,
+        onRefreshEarningsBalance: this._fetchEarningsBalance,
         onRefreshNotifications: this._fetchUserNotifications,
         onPurchaseSuccessful: this._fetchUserProducts,
         onSendEmailVerification: this._doSendEmailVerification,
@@ -289,6 +291,7 @@ export default class AuthenticatedUserProvider extends React.Component<
             authenticated: false,
             profile: null,
             usages: null,
+            userEarningsBalance: null,
             limits: null,
             subscription: null,
           },
@@ -413,6 +416,21 @@ export default class AuthenticatedUserProvider extends React.Component<
         })),
       error => {
         console.error('Error while loading user limits:', error);
+      }
+    );
+    getUserEarningsBalance(
+      authentication.getAuthorizationHeader,
+      firebaseUser.uid
+    ).then(
+      userEarningsBalance =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            userEarningsBalance,
+          },
+        })),
+      error => {
+        console.error('Error while loading user earnings balance:', error);
       }
     );
     this._cloudProjectListingDeduplicator
@@ -655,6 +673,27 @@ export default class AuthenticatedUserProvider extends React.Component<
       }));
     } catch (error) {
       console.error('Error while loading user usages:', error);
+    }
+  };
+
+  _fetchEarningsBalance = async () => {
+    const { authentication } = this.props;
+    const firebaseUser = this.state.authenticatedUser.firebaseUser;
+    if (!firebaseUser) return;
+
+    try {
+      const userEarningsBalance = await getUserEarningsBalance(
+        authentication.getAuthorizationHeader,
+        firebaseUser.uid
+      );
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          userEarningsBalance,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading user earnings balance:', error);
     }
   };
 

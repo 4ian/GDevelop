@@ -74,8 +74,8 @@ export const getProjectPropertiesErrors = (
     addError(
       'name',
       'error',
-      i18n._(t`The name of your game is too long`),
-      i18n._(t`Change the name in the game properties.`)
+      i18n._(t`The name of your game is empty`),
+      i18n._(t`Change the name in the project properties.`)
     );
   }
 

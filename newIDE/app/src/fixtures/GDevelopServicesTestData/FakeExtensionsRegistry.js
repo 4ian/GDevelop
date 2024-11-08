@@ -36,6 +36,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'this-is-a-fake-id',
           username: 'Fake author',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -45,6 +46,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
           username: 'D8H',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -75,6 +77,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'this-is-a-fake-id',
           username: 'Fake author',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -84,6 +87,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
           username: 'D8H',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -115,6 +119,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'ZgrsWuRTAkXgeuPV9bo0zuEcA2w1',
           username: 'arthuro555',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -145,6 +150,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'I0kdjvsICFML0APq45CZjZ6PyEQ2',
           username: 'Fake user #EQ2',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -176,6 +182,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'wWP8BSlAW0UP4NeaHa2LcmmDzmH2',
           username: '4ian',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -207,6 +214,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'ZgrsWuRTAkXgeuPV9bo0zuEcA2w1',
           username: 'arthuro555',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -237,6 +245,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: '2OwwM8ToR9dx9RJ2sAKTcrLmCB92',
           username: 'Bouh',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -266,6 +275,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'ZgrsWuRTAkXgeuPV9bo0zuEcA2w1',
           username: 'arthuro555',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -296,6 +306,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'onPsboRtDkUHNOsx7OPr8R8G1oj2',
           username: 'Fake user #oj2',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -326,6 +337,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'AlZ3D1xkH0QDao7T37VZZUeYNpn1',
           username: 'Fake user #pn1',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -358,6 +370,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'rotBq28wITdtfsrE7McHQri4k2w2',
           username: 'Fake user #2w2',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -367,6 +380,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
           username: 'D8H',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -397,6 +411,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'this-is-a-fake-id',
           username: 'Fake author',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -406,6 +421,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
           username: 'Fake user #Cg1',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -436,6 +452,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'wWP8BSlAW0UP4NeaHa2LcmmDzmH2',
           username: '4ian',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -469,6 +486,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
           username: 'Fake user #Cg1',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -478,6 +496,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'm4hBMBTUilft4s1V4FQQPakVDGx1',
           username: 'Fake user #Gx1',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -510,6 +529,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       authors: [
         {
           id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
+          createdAt: 1553989202802,
           username: 'D8H',
           description: '',
           donateLink: null,
@@ -519,6 +539,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
         {
           id: '30b1QQoYi1gQQHzIjMlNY8aLyYV2',
+          createdAt: 1553989202802,
           username: 'Fake user #YV2',
           description: '',
           donateLink: null,
@@ -551,6 +572,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
           username: 'D8H',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -581,6 +603,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
           username: 'Fake user #Cg1',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -613,6 +636,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: '30b1QQoYi1gQQHzIjMlNY8aLyYV2',
           username: 'Fake user #YV2',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -622,6 +646,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: '2OwwM8ToR9dx9RJ2sAKTcrLmCB92',
           username: 'Bouh',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -652,6 +677,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'ZShmW1xkW7WWl9AkB78VITJMiTw1',
           username: 'Fake user #Tw1',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -684,6 +710,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: '2OwwM8ToR9dx9RJ2sAKTcrLmCB92',
           username: 'Bouh',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -693,6 +720,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'ZgrsWuRTAkXgeuPV9bo0zuEcA2w1',
           username: 'arthuro555',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -727,6 +755,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
           username: 'Fake user #Cg1',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -736,6 +765,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'AlZ3D1xkH0QDao7T37VZZUeYNpn1',
           username: 'Fake user #pn1',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -745,6 +775,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
           username: 'D8H',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -774,6 +805,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'ZgrsWuRTAkXgeuPV9bo0zuEcA2w1',
           username: 'arthuro555',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -805,6 +837,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
           username: 'Fake user #Cg1',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -836,6 +869,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
           username: 'Fake user #Cg1',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -867,6 +901,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'ZShmW1xkW7WWl9AkB78VITJMiTw1',
           username: 'Fake user #Tw1',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -897,6 +932,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
           username: 'D8H',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -930,6 +966,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'ZgrsWuRTAkXgeuPV9bo0zuEcA2w1',
           username: 'arthuro555',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -939,6 +976,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: '2OwwM8ToR9dx9RJ2sAKTcrLmCB92',
           username: 'Bouh',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -969,6 +1007,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
           username: 'Fake user #Cg1',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -999,6 +1038,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'ZgrsWuRTAkXgeuPV9bo0zuEcA2w1',
           username: 'arthuro555',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -1029,6 +1069,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: '8Ih1aa8f5gWUp4UB2BdhQ2iXWxJ3',
           username: 'Fake user #xJ3',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -1062,6 +1103,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'GfzRsieyUFVnsRR8OZThsPR29oq2',
           username: 'Fake user #oq2',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -1071,6 +1113,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
           username: 'Fake user #Cg1',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -1101,6 +1144,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
           username: 'Fake user #Cg1',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -1135,6 +1179,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
           username: 'D8H',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -1144,6 +1189,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
           username: 'Fake user #Cg1',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -1174,6 +1220,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         {
           id: 'this-is-a-fake-id',
           username: 'Fake author',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,

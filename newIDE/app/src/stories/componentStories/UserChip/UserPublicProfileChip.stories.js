@@ -16,6 +16,7 @@ export const UserPublicProfileChip = () => (
     user={{
       id: '123',
       username: 'username',
+      createdAt: 1553989202802,
       description: 'something',
       donateLink: 'https://myurl.com',
       discordUsername: 'username#1234',

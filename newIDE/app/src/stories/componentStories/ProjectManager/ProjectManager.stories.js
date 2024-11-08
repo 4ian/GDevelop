@@ -59,6 +59,8 @@ export const Default = () => (
             gamesFetchingError: null,
             onGameUpdated: () => {},
           }}
+          onOpenHomePage={action('openHomepage')}
+          toggleProjectManager={action('toggleProjectManager')}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>
@@ -109,6 +111,8 @@ export const ErrorsInFunctions = () => (
             gamesFetchingError: null,
             onGameUpdated: () => {},
           }}
+          onOpenHomePage={action('openHomepage')}
+          toggleProjectManager={action('toggleProjectManager')}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>

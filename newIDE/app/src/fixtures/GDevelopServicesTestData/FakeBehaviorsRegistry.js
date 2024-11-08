@@ -67,6 +67,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         {
           id: 'wWP8BSlAW0UP4NeaHa2LcmmDzmH2',
           username: '4ian',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -101,6 +102,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         {
           id: 'wWP8BSlAW0UP4NeaHa2LcmmDzmH2',
           username: '4ian',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -110,6 +112,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         {
           id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
           username: 'Fake user #Cg1',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -162,6 +165,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         {
           id: '2OwwM8ToR9dx9RJ2sAKTcrLmCB92',
           username: 'Bouh',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -193,6 +197,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         {
           id: '2OwwM8ToR9dx9RJ2sAKTcrLmCB92',
           username: 'Bouh',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -228,6 +233,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         {
           id: 'wWP8BSlAW0UP4NeaHa2LcmmDzmH2',
           username: '4ian',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -237,6 +243,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         {
           id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
           username: 'Fake user #Cg1',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -268,6 +275,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         {
           id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
           username: 'D8H',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -300,6 +308,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         {
           id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
           username: 'D8H',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -337,6 +346,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         {
           id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
           username: 'Fake user #Cg1',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -346,6 +356,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         {
           id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
           username: 'D8H',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -382,6 +393,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         {
           id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
           username: 'Fake user #Cg1',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -391,6 +403,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         {
           id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
           username: 'D8H',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -426,6 +439,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         {
           id: 'wWP8BSlAW0UP4NeaHa2LcmmDzmH2',
           username: '4ian',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -435,6 +449,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         {
           id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
           username: 'D8H',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -492,6 +507,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         {
           id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
           username: 'D8H',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -501,6 +517,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         {
           id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
           username: 'Fake user #Cg1',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -536,6 +553,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         {
           id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
           username: 'D8H',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -545,6 +563,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         {
           id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
           username: 'Fake user #Cg1',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -580,6 +599,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         {
           id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
           username: 'D8H',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -589,6 +609,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         {
           id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
           username: 'Fake user #Cg1',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -624,6 +645,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         {
           id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
           username: 'D8H',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,
@@ -633,6 +655,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         {
           id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
           username: 'Fake user #Cg1',
+          createdAt: 1553989202802,
           description: '',
           donateLink: null,
           discordUsername: null,

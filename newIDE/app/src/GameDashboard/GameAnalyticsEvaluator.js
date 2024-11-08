@@ -23,7 +23,7 @@ export const daysShownForYear = 364;
 /**
  * Enriched game metrics that are ready to be used in a chart.
  */
-type ChartData = {|
+export type ChartData = {|
   overview: {|
     viewersCount: number,
     playersCount: number,
@@ -643,4 +643,29 @@ export const buildChartData = (
         .map(metric => ({ ...metric, startDate: null }: MergedGameMetrics))
     ),
   };
+};
+
+/**
+ * @param gameMetrics concise game metrics from the backend (today first)
+ * @returns enriched game metrics that are ready to be used in a chart
+ * (today at last).
+ */
+export const buildLastWeekChartData = (
+  gameMetrics: ?Array<GameMetrics>,
+  todayDate: Date = new Date()
+): ChartData => {
+  if (!gameMetrics) {
+    return emptyChartData;
+  }
+  const filledGameRollingMetrics = fillMissingDays(
+    gameMetrics.sort(
+      (a, b) => parseISO(b.date).getTime() - parseISO(a.date).getTime()
+    ),
+    todayDate
+  );
+  return evaluateChartData(
+    filledGameRollingMetrics
+      .slice(0, 7)
+      .map(metric => ({ ...metric, startDate: null }: MergedGameMetrics))
+  );
 };

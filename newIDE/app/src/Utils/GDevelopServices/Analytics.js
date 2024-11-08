@@ -45,6 +45,10 @@ export type GameMetrics = {
   },
 };
 
+export const client = axios.create({
+  baseURL: GDevelopAnalyticsApi.baseUrl,
+});
+
 export const getGameMetrics = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
@@ -53,21 +57,17 @@ export const getGameMetrics = async (
 ): Promise<?GameMetrics> => {
   const authorizationHeader = await getAuthorizationHeader();
 
-  const response = await axios.get(
-    `${GDevelopAnalyticsApi.baseUrl}/game-metrics`,
-    {
-      params: {
-        userId,
-        gameId,
-        dayIsoDate,
-      },
-      headers: {
-        Authorization: authorizationHeader,
-      },
-      validateStatus: status =>
-        (status >= 200 && status < 300) || status === 404,
-    }
-  );
+  const response = await client.get(`/game-metrics`, {
+    params: {
+      userId,
+      gameId,
+      dayIsoDate,
+    },
+    headers: {
+      Authorization: authorizationHeader,
+    },
+    validateStatus: status => (status >= 200 && status < 300) || status === 404,
+  });
 
   if (response.status === 404) return null;
   return response.data;
@@ -81,21 +81,17 @@ export const getGameMetricsFrom = async (
 ): Promise<?(GameMetrics[])> => {
   const authorizationHeader = await getAuthorizationHeader();
 
-  const response = await axios.get(
-    `${GDevelopAnalyticsApi.baseUrl}/game-metrics`,
-    {
-      params: {
-        userId,
-        gameId,
-        firstDayIsoDate,
-      },
-      headers: {
-        Authorization: authorizationHeader,
-      },
-      validateStatus: status =>
-        (status >= 200 && status < 300) || status === 404,
-    }
-  );
+  const response = await client.get(`/game-metrics`, {
+    params: {
+      userId,
+      gameId,
+      firstDayIsoDate,
+    },
+    headers: {
+      Authorization: authorizationHeader,
+    },
+    validateStatus: status => (status >= 200 && status < 300) || status === 404,
+  });
 
   if (response.status === 404) return null;
   return response.data;

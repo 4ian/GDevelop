@@ -17,9 +17,11 @@ import {
   type ExtensionShortHeader,
   type ExtensionHeader,
 } from '../../Utils/GDevelopServices/Extension';
+import { type UserPublicProfile } from '../../Utils/GDevelopServices/User';
 import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
 import {
   type Game,
+  type PublicGame,
   type ShowcasedGame,
 } from '../../Utils/GDevelopServices/Game';
 import { type GameMetrics } from '../../Utils/GDevelopServices/Analytics';
@@ -169,6 +171,21 @@ export const indieUserProfile: Profile = {
     snapchatUsername: 'indie-user',
     discordServerLink: 'https://discord.gg/indie-user',
   },
+};
+
+export const userEarningsBalance = {
+  userId: 'userId',
+  amountInMilliUSDs: 6730,
+  amountInCredits: 890,
+  minAmountToCashoutInMilliUSDs: 60000,
+  updatedAt: 1515084391000,
+};
+export const userEarningsBalanceEmpty = {
+  userId: 'userId',
+  amountInMilliUSDs: 0,
+  amountInCredits: 0,
+  minAmountToCashoutInMilliUSDs: 60000,
+  updatedAt: 1515084391000,
 };
 
 export const usagesForIndieUser: Usages = [
@@ -2829,6 +2846,7 @@ export const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
       content: {},
     },
   ],
+  userEarningsBalance,
   receivedGameTemplates: [],
   receivedAssetShortHeaders: [],
   gameTemplatePurchases: [],
@@ -2861,6 +2879,9 @@ export const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   },
   onRefreshAssetPackPurchases: async () => {
     console.info('This should refresh the asset pack purchases');
+  },
+  onRefreshEarningsBalance: async () => {
+    console.info('This should refresh the user earnings balance');
   },
   onRefreshNotifications: async () => {
     console.info('This should refresh the notifications');
@@ -3657,6 +3678,9 @@ export const fakeGame: Game = {
   displayAdsOnGamePage: true,
   discoverable: true,
   thumbnailUrl: 'https://i.ytimg.com/vi/PguDpz7TC7g/hqdefault.jpg',
+  playWithKeyboard: true,
+  playWithMobile: false,
+  playWithGamepad: false,
 };
 
 export const game1: Game = {
@@ -3666,6 +3690,10 @@ export const game1: Game = {
   createdAt: 1606065498,
   publicWebBuildId: 'fake-publicwebbuild-id',
   displayAdsOnGamePage: true,
+  orientation: 'default',
+  playWithKeyboard: true,
+  playWithMobile: false,
+  playWithGamepad: false,
 };
 
 export const game2: Game = {
@@ -3673,6 +3701,39 @@ export const game2: Game = {
   authorName: 'My company',
   gameName: 'My Other Game',
   createdAt: 1607065498,
+  playWithKeyboard: true,
+  playWithMobile: false,
+  playWithGamepad: false,
+};
+
+export const getPublicGameFromGame = (game: Game): PublicGame => {
+  const publicGame: PublicGame = {
+    ...game,
+    donateLink: null,
+    orientation: game.orientation || 'default',
+    displayAdsOnGamePage: !!game.displayAdsOnGamePage,
+    owners: [getPublicProfileUserFromProfile(indieUserProfile)],
+    authors: [getPublicProfileUserFromProfile(indieUserProfile)],
+  };
+  return publicGame;
+};
+
+export const getPublicProfileUserFromProfile = (
+  profile: Profile
+): UserPublicProfile => {
+  const publicProfile: UserPublicProfile = {
+    id: profile.id,
+    createdAt: profile.createdAt,
+    username: profile.username || null,
+    description: profile.description || null,
+    donateLink: profile.donateLink || null,
+    discordUsername: profile.discordUsername || null,
+    githubUsername: profile.githubUsername || null,
+    communityLinks: profile.communityLinks || {},
+    iconUrl:
+      'https://www.gravatar.com/avatar/3cc54b273332b35556f95bd9c6713585?s=40&d=retro',
+  };
+  return publicProfile;
 };
 
 export const gameWithDisplayAdsOnGamePageEnabled: Game = {
@@ -3684,6 +3745,81 @@ export const gameWithDisplayAdsOnGamePageDisabled: Game = {
   ...game1,
   displayAdsOnGamePage: false,
 };
+
+export const allGameCategoriesMocked = [
+  {
+    name: 'action',
+    type: 'user-defined',
+  },
+  {
+    name: 'adventure',
+    type: 'user-defined',
+  },
+  {
+    name: 'shooter',
+    type: 'user-defined',
+  },
+  {
+    name: 'platformer',
+    type: 'user-defined',
+  },
+  {
+    name: 'rpg',
+    type: 'user-defined',
+  },
+  {
+    name: 'horror',
+    type: 'user-defined',
+  },
+  {
+    name: 'strategy',
+    type: 'user-defined',
+  },
+  {
+    name: 'puzzle',
+    type: 'user-defined',
+  },
+  {
+    name: 'story-rich',
+    type: 'user-defined',
+  },
+  {
+    name: 'survival',
+    type: 'user-defined',
+  },
+  {
+    name: 'racing',
+    type: 'user-defined',
+  },
+  {
+    name: 'building',
+    type: 'user-defined',
+  },
+  {
+    name: 'simulation',
+    type: 'user-defined',
+  },
+  {
+    name: 'sport',
+    type: 'user-defined',
+  },
+  {
+    name: 'multiplayer',
+    type: 'user-defined',
+  },
+  {
+    name: 'leaderboard',
+    type: 'user-defined',
+  },
+  {
+    name: 'mini-games',
+    type: 'user-defined',
+  },
+  {
+    name: 'educational',
+    type: 'user-defined',
+  },
+];
 
 /**
  * It uses the ANSI C one because Number.MAX_SAFE_INTEGER is 2^53
@@ -4103,9 +4239,26 @@ export const commentUnprocessed: Comment = {
   createdAt: 1515084391000,
   updatedAt: 1515084393000,
 };
+export const commentUnprocessed2: Comment = {
+  id: 'comment-unprocessed-id-2',
+  type: 'FEEDBACK',
+  gameId: 'complete-game-id',
+  buildId: 'complete-build-id',
+  text: 'I guess I could have had more fun.',
+  ratings: {
+    version: 1,
+    visuals: 3,
+    sound: 5,
+    fun: 4,
+    easeOfUse: 8,
+  },
+  playerName: 'Other player name', // For non-authenticated comments.
+  createdAt: 1615084391000,
+  updatedAt: 1625084393000,
+};
 
 export const commentWithNoTextUnprocessed: Comment = {
-  id: 'comment-unprocessed-id',
+  id: 'comment-unprocessed-id-no-text',
   type: 'FEEDBACK',
   gameId: 'complete-game-id',
   buildId: 'complete-build-id',
@@ -4128,7 +4281,7 @@ export const commentProcessed: Comment = {
   gameId: 'complete-game-id',
   buildId: 'complete-build-id',
   text:
-    "This is my honest feedback: I think the art is cute. Specially on the screen when it jumps over the chickens. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. ",
+    'It was a great experience playing this game, I really enjoyed myself. The music was great. Be careful with the difficulty though, it was too easy to win.',
   ratings: {
     version: 1,
     visuals: 2,
@@ -4140,6 +4293,9 @@ export const commentProcessed: Comment = {
   createdAt: 1515084391000,
   updatedAt: 1515084393000,
   processedAt: 1515084393000,
+  qualityRatingPerRole: {
+    owner: 'great',
+  },
 };
 
 export const fakeAnnouncements: Announcement[] = [
@@ -4425,3 +4581,105 @@ export const mockSigningCredentials: Array<SigningCredential> = [
     hasAuthKeyReady: true,
   },
 ];
+
+export const basicFeaturingMarketingPlan = {
+  id: 'featuring-basic',
+  nameByLocale: {
+    en: 'Basic',
+  },
+  icon: 'speaker',
+  canExtend: true,
+  requiresManualContact: false,
+  includedFeaturings: ['games-platform-home'],
+  gameRequirements: {
+    hasThumbnail: true,
+    isPublished: true,
+    isDiscoverable: true,
+  },
+  descriptionByLocale: {
+    en: 'Perfect to playtest your alpha build and gather information.',
+    'fr-FR':
+      'Parfait pour tester votre version alpha et collecter des informations.',
+    'ar-SA': 'مثالي لاختبار إصدار ألفا الخاص بك وجمع المعلومات.',
+    'de-DE':
+      'Perfekt, um Ihren Alpha-Build zu testen und Informationen zu sammeln.',
+    'es-ES': 'Perfecto para probar su versión alfa y recopilar información.',
+    'it-IT':
+      'Perfetto per testare la tua versione alpha e raccogliere informazioni.',
+    'ja-JP': 'アルファビルドをテストして情報を収集するのに最適です。',
+    'ko-KR': '알파 빌드를 테스트하고 정보를 수집하기에 이상적입니다.',
+    'pl-PL': 'Idealny do przetestowania wersji alfa i zbierania informacji.',
+    'pt-BR': 'Perfeito para testar sua versão alfa e coletar informações.',
+    'ru-RU':
+      'Идеально подходит для тестирования альфа-версии и сбора информации.',
+    'sl-SI': 'Popolno za testiranje alfa različice in zbiranje informacij.',
+    'uk-UA':
+      'Ідеально підходить для тестування альфа-версії та збору інформації.',
+    'zh-CN': '完美的测试您的alpha版本并收集信息。',
+  },
+  bulletPointsByLocale: [
+    {
+      en: 'Be promoted on gd.games homepage for 7 days',
+      'fr-FR':
+        "Être mis en avant sur la page d'accueil de gd.games pendant 7 jours",
+      'ar-SA': 'يتم عرضه على الصفحة الرئيسية لـ gd.games لمدة 7 أيام',
+      'de-DE': '7 Tage lang auf der Startseite von gd.games vorgestellt werden',
+      'es-ES': 'Destacado en la página de inicio de gd.games durante 7 días',
+      'it-IT': 'In primo piano sulla homepage di gd.games per 7 giorni',
+      'ja-JP': 'gd.gamesのホームページで7日間紹介されます',
+      'ko-KR': 'gd.games의 홈페이지에서 7 일 동안 소개됩니다.',
+      'pl-PL': 'Zostań wyróżniony na stronie głównej gd.games przez 7 dni',
+      'pt-BR': 'Destaque na página inicial do gd.games por 7 dias',
+      'ru-RU': 'Рекомендуется на главной странице gd.games в течение 7 дней',
+      'sl-SI': 'Prikazano na začetni strani gd.games 7 dni',
+      'uk-UA': 'Рекомендується на головній сторінці gd.games протягом 7 днів',
+      'zh-CN': '在gd.games首页上推广7天',
+    },
+    {
+      en: 'Get more player feedback',
+      'fr-FR': 'Obtenez plus de commentaires de joueurs',
+      'ar-SA': 'احصل على مزيد من تعليقات اللاعبين',
+      'de-DE': 'Mehr Spieler-Feedback erhalten',
+      'es-ES': 'Obtenga más comentarios de los jugadores',
+      'it-IT': 'Ottieni più feedback dai giocatori',
+      'ja-JP': 'より多くのプレイヤーフィードバックを取得する',
+      'ko-KR': '더 많은 플레이어 피드백 받기',
+      'pl-PL': 'Otrzymaj więcej opinii graczy',
+      'pt-BR': 'Obtenha mais feedback dos jogadores',
+      'ru-RU': 'Получить больше отзывов игроков',
+      'sl-SI': 'Pridobite več povratnih informacij igralcev',
+      'uk-UA': 'Отримати більше відгуків гравців',
+      'zh-CN': '获得更多玩家反馈',
+    },
+  ],
+  additionalSuccessMessageByLocale: {
+    en:
+      'Ensure that your game is public and you have configured a thumbnail for gd.games. This can take a few minutes for your game to be visible on the platform.',
+    'fr-FR':
+      'Assurez-vous que votre jeu est public et que vous avez configuré une miniature pour gd.games. Il peut falloir quelques minutes pour que votre jeu soit visible sur la plateforme.',
+    'ar-SA':
+      'تأكد من أن لعبتك عامة وأنك قمت بتكوين صورة مصغرة لـ gd.games. قد يستغرق بضع دقائق حتى تظهر لعبتك على المنصة.',
+    'de-DE':
+      'Stellen Sie sicher, dass Ihr Spiel öffentlich ist und Sie ein Miniaturbild für gd.games konfiguriert haben. Es kann einige Minuten dauern, bis Ihr Spiel auf der Plattform sichtbar ist.',
+    'es-ES':
+      'Asegúrate de que tu juego es público y has configurado una miniatura para gd.games. Puede tardar unos minutos en que tu juego sea visible en la plataforma.',
+    'it-IT':
+      'Assicurati che il tuo gioco sia pubblico e che tu abbia configurato un’anteprima per gd.games. Potrebbero essere necessari alcuni minuti affinché il tuo gioco sia visibile sulla piattaforma.',
+    'ja-JP':
+      'ゲームが公開されており、gd.gamesのサムネイルが設定されていることを確認してください。ゲームがプラットフォーム上で表示されるまで数分かかる場合があります。',
+    'ko-KR':
+      '게임이 공개되어 있고 gd.games에 대한 썸네일이 구성되어 있는지 확인하십시오. 게임이 플랫폼에서 보이는 데 몇 분 정도 걸릴 수 있습니다.',
+    'pl-PL':
+      'Upewnij się, że twoja gra jest publiczna i masz skonfigurowany miniaturę dla gd.games. Może minąć kilka minut, zanim twoja gra będzie widoczna na platformie.',
+    'pt-BR':
+      'Certifique-se de que seu jogo é público e você configurou uma miniatura para o gd.games. Pode levar alguns minutos para que seu jogo seja visível na plataforma.',
+    'ru-RU':
+      'Убедитесь, что ваша игра является общедоступной и вы настроили миниатюру для gd.games. Это может занять несколько минут, чтобы ваша игра стала видимой на платформе.',
+    'sl-SI':
+      'Prepričajte se, da je vaša igra javna in da ste konfigurirali sličico za gd.games. Za vašo igro lahko traja nekaj minut, da bo vidna na platformi.',
+    'uk-UA':
+      'Переконайтеся, що ваша гра є публічною, і ви налаштували мініатюру для gd.games. Це може зайняти кілька хвилин, щоб ваша гра стала видимою на платформі.',
+    'zh-CN':
+      '确保您的游戏是公开的，并且您已经为gd.games配置了缩略图。您的游戏在平台上可见可能需要几分钟。',
+  },
+};

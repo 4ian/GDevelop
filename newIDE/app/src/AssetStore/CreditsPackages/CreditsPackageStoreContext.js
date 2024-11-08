@@ -184,7 +184,7 @@ export const CreditsPackageStoreStateProvider = ({
     []
   );
 
-  const CreditsPackageStoreState = React.useMemo(
+  const creditsPackageStoreState = React.useMemo(
     () => ({
       creditsPackageListingDatas,
       fetchCreditsPackages,
@@ -204,7 +204,7 @@ export const CreditsPackageStoreStateProvider = ({
   );
 
   return (
-    <CreditsPackageStoreContext.Provider value={CreditsPackageStoreState}>
+    <CreditsPackageStoreContext.Provider value={creditsPackageStoreState}>
       {children}
       {isCreditsPackageDialogOpen && (
         <CreditsPackagesDialog

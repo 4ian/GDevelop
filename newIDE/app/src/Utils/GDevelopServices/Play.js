@@ -101,22 +101,20 @@ export type LobbyConfiguration = {|
 export const shortenUuidForDisplay = (uuid: string): string =>
   `${uuid.split('-')[0]}-...`;
 
+export const client = axios.create({
+  baseURL: GDevelopPlayApi.baseUrl,
+});
+
 export const listGameActiveLeaderboards = async (
-  authenticatedUser: AuthenticatedUser,
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
   gameId: string
 ): Promise<?Array<Leaderboard>> => {
-  const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
-  if (!firebaseUser) return;
-
-  const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.get(
-    `${GDevelopPlayApi.baseUrl}/game/${gameId}/leaderboard?deleted=false`,
-    {
-      headers: { Authorization: authorizationHeader },
-      params: { userId },
-    }
-  );
+  const response = await client.get(`/game/${gameId}/leaderboard`, {
+    headers: { Authorization: authorizationHeader },
+    params: { userId, deleted: 'false' },
+  });
   return response.data;
 };
 
@@ -149,7 +147,7 @@ export const listLeaderboardEntries = async (
   const uri =
     options.forceUri || `/game/${gameId}/leaderboard/${leaderboardId}/entry`;
   // $FlowFixMe
-  const response = await axios.get(`${GDevelopPlayApi.baseUrl}${uri}`, {
+  const response = await client.get(uri, {
     params: options.forceUri
       ? null
       : {
@@ -176,8 +174,8 @@ export const createLeaderboard = async (
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.post(
-    `${GDevelopPlayApi.baseUrl}/game/${gameId}/leaderboard`,
+  const response = await client.post(
+    `/game/${gameId}/leaderboard`,
     {
       name,
       sort,
@@ -205,8 +203,8 @@ export const duplicateLeaderboard = async (
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.post(
-    `${GDevelopPlayApi.baseUrl}/game/${gameId}/leaderboard/action/copy`,
+  const response = await client.post(
+    `/game/${gameId}/leaderboard/action/copy`,
     payload,
     {
       headers: { Authorization: authorizationHeader },
@@ -227,8 +225,8 @@ export const updateLeaderboard = async (
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.patch(
-    `${GDevelopPlayApi.baseUrl}/game/${gameId}/leaderboard/${leaderboardId}`,
+  const response = await client.patch(
+    `/game/${gameId}/leaderboard/${leaderboardId}`,
     payload,
     {
       headers: { Authorization: authorizationHeader },
@@ -248,10 +246,8 @@ export const resetLeaderboard = async (
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.put(
-    `${
-      GDevelopPlayApi.baseUrl
-    }/game/${gameId}/leaderboard/${leaderboardId}/reset`,
+  const response = await client.put(
+    `/game/${gameId}/leaderboard/${leaderboardId}/reset`,
     {},
     {
       headers: { Authorization: authorizationHeader },
@@ -271,8 +267,8 @@ export const deleteLeaderboard = async (
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.delete(
-    `${GDevelopPlayApi.baseUrl}/game/${gameId}/leaderboard/${leaderboardId}`,
+  const response = await client.delete(
+    `/game/${gameId}/leaderboard/${leaderboardId}`,
     {
       headers: { Authorization: authorizationHeader },
       params: { userId },
@@ -292,10 +288,8 @@ export const deleteLeaderboardEntry = async (
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.delete(
-    `${
-      GDevelopPlayApi.baseUrl
-    }/game/${gameId}/leaderboard/${leaderboardId}/entry/${entryId}`,
+  const response = await client.delete(
+    `/game/${gameId}/leaderboard/${leaderboardId}/entry/${entryId}`,
     {
       headers: { Authorization: authorizationHeader },
       params: { userId },
@@ -346,7 +340,7 @@ export const listComments = async (
 ): Promise<Array<Comment>> => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
-      axios.get(`${GDevelopPlayApi.baseUrl}/game/${gameId}/comment`, {
+      client.get(`/game/${gameId}/comment`, {
         params: {
           userId,
           type,
@@ -382,8 +376,8 @@ export const updateComment = async (
 ) => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
-      axios.patch(
-        `${GDevelopPlayApi.baseUrl}/game/${gameId}/comment/${commentId}`,
+      client.patch(
+        `/game/${gameId}/comment/${commentId}`,
         { processed, qualityRating },
         {
           params: { userId },
@@ -465,15 +459,12 @@ export const getLobbyConfiguration = async (
   |}
 ): Promise<LobbyConfiguration> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.get(
-    `${GDevelopPlayApi.baseUrl}/game/${gameId}/lobby-configuration`,
-    {
-      params: { userId },
-      headers: {
-        Authorization: authorizationHeader,
-      },
-    }
-  );
+  const response = await client.get(`/game/${gameId}/lobby-configuration`, {
+    params: { userId },
+    headers: {
+      Authorization: authorizationHeader,
+    },
+  });
   return response.data;
 };
 
@@ -493,8 +484,8 @@ export const updateLobbyConfiguration = async (
   |}
 ): Promise<LobbyConfiguration> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.patch(
-    `${GDevelopPlayApi.baseUrl}/game/${gameId}/lobby-configuration`,
+  const response = await client.patch(
+    `/game/${gameId}/lobby-configuration`,
     { maxPlayers, minPlayers, canJoinAfterStart },
     {
       params: { userId },
@@ -518,8 +509,8 @@ export const duplicateLobbyConfiguration = async ({
   sourceGameId: string,
 |}): Promise<LobbyConfiguration> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.post(
-    `${GDevelopPlayApi.baseUrl}/game/${gameId}/lobby-configuration/action/copy`,
+  const response = await client.post(
+    `/game/${gameId}/lobby-configuration/action/copy`,
     { sourceGameId },
     {
       headers: { Authorization: authorizationHeader },
@@ -539,8 +530,8 @@ export const getPlayerToken = async ({
   gameId: string,
 }): Promise<string> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.post(
-    `${GDevelopPlayApi.baseUrl}/game/${gameId}/player-token`,
+  const response = await client.post(
+    `/game/${gameId}/player-token`,
     {},
     {
       headers: {

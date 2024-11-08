@@ -31,6 +31,7 @@ export const fakeGameLeaderboards: GameLeaderboard[] = [
             {
               id: 'R0F5QGNCzgOY5w2cxGeKJOq2UaD2',
               username: 'GDevelop',
+              createdAt: 1553989202802,
               description: 'The Official GDevelop account.',
               donateLink: null,
               discordUsername: null,
@@ -54,6 +55,7 @@ export const fakeGameLeaderboards: GameLeaderboard[] = [
             {
               id: 'R0F5QGNCzgOY5w2cxGeKJOq2UaD2',
               username: 'GDevelop',
+              createdAt: 1553989202802,
               description: 'The Official GDevelop account.',
               donateLink: null,
               discordUsername: null,
@@ -108,6 +110,7 @@ export const fakeGameLeaderboards: GameLeaderboard[] = [
             {
               id: 'R0F5QGNCzgOY5w2cxGeKJOq2UaD2',
               username: 'GDevelop',
+              createdAt: 1553989202802,
               description: 'The Official GDevelop account.',
               donateLink: null,
               discordUsername: null,
@@ -131,6 +134,7 @@ export const fakeGameLeaderboards: GameLeaderboard[] = [
             {
               id: 'R0F5QGNCzgOY5w2cxGeKJOq2UaD2',
               username: 'GDevelop',
+              createdAt: 1553989202802,
               description: 'The Official GDevelop account.',
               donateLink: null,
               discordUsername: null,
@@ -193,6 +197,7 @@ export const fakeGameLeaderboards: GameLeaderboard[] = [
             {
               id: 'R0F5QGNCzgOY5w2cxGeKJOq2UaD2',
               username: 'GDevelop',
+              createdAt: 1553989202802,
               description: 'The Official GDevelop account.',
               donateLink: null,
               discordUsername: null,
@@ -216,6 +221,7 @@ export const fakeGameLeaderboards: GameLeaderboard[] = [
             {
               id: 'R0F5QGNCzgOY5w2cxGeKJOq2UaD2',
               username: 'GDevelop',
+              createdAt: 1553989202802,
               description: 'The Official GDevelop account.',
               donateLink: null,
               discordUsername: null,

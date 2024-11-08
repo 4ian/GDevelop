@@ -85,7 +85,7 @@
     "react-test-renderer": "16.14.0",
     "react-virtualized": "9.21.1",
     "react-window": "1.8.9",
-    "recharts": "^2.1.10",
+    "recharts": "^2.10.0",
     "remark-gfm": "^3.0.1",
     "remark-parse": "^10.0.2",
     "semver": "7.0.0",

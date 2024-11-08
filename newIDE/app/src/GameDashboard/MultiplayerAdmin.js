@@ -16,10 +16,6 @@ import RaisedButton from '../UI/RaisedButton';
 import LeftLoader from '../UI/LeftLoader';
 import InfoBar from '../UI/Messages/InfoBar';
 import PlaceholderError from '../UI/PlaceholderError';
-import AlertMessage from '../UI/AlertMessage';
-import Link from '../UI/Link';
-import { getHelpLink } from '../Utils/HelpLink';
-import Window from '../Utils/Window';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import InlineCheckbox from '../UI/InlineCheckbox';
@@ -77,6 +73,7 @@ const MultiplayerAdmin = ({ gameId }: Props) => {
         .fill(0)
         .map((_, index) => (
           <SelectOption
+            key={index}
             value={index + 2}
             label={(index + 2).toString()}
             shouldNotTranslate
@@ -87,6 +84,7 @@ const MultiplayerAdmin = ({ gameId }: Props) => {
       ) {
         options.push(
           <SelectOption
+            key="more"
             value={maximumNumberOfPlayersAllowed + 1}
             label={t`${(
               maximumNumberOfPlayersAllowed + 1
@@ -106,6 +104,7 @@ const MultiplayerAdmin = ({ gameId }: Props) => {
         .fill(0)
         .map((_, index) => (
           <SelectOption
+            key={index}
             value={index + 1}
             label={(index + 1).toString()}
             shouldNotTranslate
@@ -206,7 +205,6 @@ const MultiplayerAdmin = ({ gameId }: Props) => {
       lobbyConfiguration.canJoinAfterStart !== canJoinAfterStart);
   const canSave = hasUnsavedModifications;
 
-  const helpLink = getHelpLink('/all-features/multiplayer/');
   if (isLoading) return <PlaceholderLoader />;
   if (fetchingError) {
     return (
@@ -218,16 +216,6 @@ const MultiplayerAdmin = ({ gameId }: Props) => {
   return (
     <>
       <ColumnStackLayout noMargin expand>
-        <AlertMessage kind="info">
-          <Trans>Learn more about Multiplayer configuration</Trans>{' '}
-          <Link
-            href={helpLink}
-            onClick={() => Window.openExternalURL(helpLink)}
-          >
-            <Trans>in the Wiki</Trans>
-          </Link>
-          .
-        </AlertMessage>
         <Text size="block-title">
           <Trans>Lobby configuration</Trans>
         </Text>

@@ -6,7 +6,7 @@ import Window from '../../../Utils/Window';
 import Discord from '../../../UI/CustomSvgIcons/Discord';
 import { ColumnStackLayout } from '../../../UI/Layout';
 import YouTube from '../../../UI/CustomSvgIcons/YouTube';
-import Messages from '../../../UI/CustomSvgIcons/Messages';
+import Forum from '../../../UI/CustomSvgIcons/Forum';
 import Reddit from '../../../UI/CustomSvgIcons/Reddit';
 import Twitter from '../../../UI/CustomSvgIcons/Twitter';
 import Facebook from '../../../UI/CustomSvgIcons/Facebook';
@@ -30,7 +30,7 @@ const styles = {
 const communityItems = [
   {
     onClick: () => Window.openExternalURL('https://forum.gdevelop.io'),
-    icon: <Messages fontSize="small" />,
+    icon: <Forum fontSize="small" />,
     label: <Trans>GDevelop Forums</Trans>,
   },
   {

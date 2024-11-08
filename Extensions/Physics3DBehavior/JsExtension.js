@@ -436,8 +436,8 @@ module.exports = {
       behaviorContent.addChild('linearDamping').setDoubleValue(0.1);
       behaviorContent.addChild('angularDamping').setDoubleValue(0.1);
       behaviorContent.addChild('gravityScale').setDoubleValue(1);
-      behaviorContent.addChild('layers').setIntValue(1 << 4 | 1 << 0);
-      behaviorContent.addChild('masks').setIntValue(1 << 4 | 1 << 0);
+      behaviorContent.addChild('layers').setIntValue((1 << 4) | (1 << 0));
+      behaviorContent.addChild('masks').setIntValue((1 << 4) | (1 << 0));
     };
 
     const sharedData = new gd.BehaviorSharedDataJsImplementation();
@@ -541,6 +541,101 @@ module.exports = {
       //.addIncludeFile('Extensions/Physics3DBehavior/jolt-physics.multithread.wasm-compat.js')
       .setOpenFullEditorLabel(_('Edit shape and advanced settings'));
 
+    // Global
+    aut
+      .addExpression(
+        'WorldScale',
+        _('World scale'),
+        _('Return the world scale.'),
+        _('Global'),
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
+      .getCodeExtraInformation()
+      .setFunctionName('getWorldScale');
+
+    aut
+      .addExpressionAndConditionAndAction(
+        'number',
+        'GravityX',
+        _('World gravity on X axis') +
+          ' ' +
+          _(
+            'While an object is needed, this will apply to all objects using the behavior.'
+          ),
+        _('the world gravity on X axis'),
+        _('the world gravity on X axis'),
+        _('Global'),
+        'res/physics32.png',
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .useStandardParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Gravity (in Newton)')
+        )
+      )
+      .getCodeExtraInformation()
+      .setFunctionName('setGravityX')
+      .setGetter('getGravityX');
+
+    aut
+      .addExpressionAndConditionAndAction(
+        'number',
+        'GravityY',
+        _('World gravity on Y axis') +
+          ' ' +
+          _(
+            'While an object is needed, this will apply to all objects using the behavior.'
+          ),
+        _('the world gravity on Y axis'),
+        _('the world gravity on Y axis'),
+        _('Global'),
+        'res/physics32.png',
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .useStandardParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Gravity (in Newton)')
+        )
+      )
+      .getCodeExtraInformation()
+      .setFunctionName('setGravityY')
+      .setGetter('getGravityY');
+
+    aut
+      .addExpressionAndConditionAndAction(
+        'number',
+        'GravityZ',
+        _('World gravity on Z axis') +
+          ' ' +
+          _(
+            'While an object is needed, this will apply to all objects using the behavior.'
+          ),
+        _('the world gravity on Z axis'),
+        _('the world gravity on Z axis'),
+        _('Global'),
+        'res/physics32.png',
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .useStandardParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Gravity (in Newton)')
+        )
+      )
+      .getCodeExtraInformation()
+      .setFunctionName('setGravityZ')
+      .setGetter('getGravityZ');
+
     // Forces and impulses
     aut
       .addAction(
@@ -549,7 +644,9 @@ module.exports = {
         _(
           'Apply a force to the object over time. It "accelerates" an object and must be used every frame during a time period.'
         ),
-        _('Apply a force of _PARAM2_ ; _PARAM3_ ; _PARAM4_ to _PARAM0_ at _PARAM5_ ; _PARAM6_ ; _PARAM7_'),
+        _(
+          'Apply a force of _PARAM2_ ; _PARAM3_ ; _PARAM4_ to _PARAM0_ at _PARAM5_ ; _PARAM6_ ; _PARAM7_'
+        ),
         _('Forces & impulses'),
         'res/physics32.png',
         'res/physics32.png'
@@ -580,7 +677,9 @@ module.exports = {
         _(
           'Apply a force to the object over time. It "accelerates" an object and must be used every frame during a time period.'
         ),
-        _('Apply a force of _PARAM2_ ; _PARAM3_ ; _PARAM4_ at the center of _PARAM0_'),
+        _(
+          'Apply a force of _PARAM2_ ; _PARAM3_ ; _PARAM4_ at the center of _PARAM0_'
+        ),
         _('Forces & impulses'),
         'res/physics32.png',
         'res/physics32.png'
@@ -603,7 +702,9 @@ module.exports = {
         _(
           'Apply an impulse to the object. It instantly changes the speed, to give an initial speed for instance.'
         ),
-        _('Apply an impulse of _PARAM2_ ; _PARAM3_ ; _PARAM4_ to _PARAM0_ at _PARAM5_ ; _PARAM6_ ; _PARAM7_'),
+        _(
+          'Apply an impulse of _PARAM2_ ; _PARAM3_ ; _PARAM4_ to _PARAM0_ at _PARAM5_ ; _PARAM6_ ; _PARAM7_'
+        ),
         _('Forces & impulses'),
         'res/physics32.png',
         'res/physics32.png'
@@ -627,28 +728,30 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('applyImpulse');
 
-      aut
-        .addScopedAction(
-          'ApplyImpulseAtCenter',
-          _('Apply impulse (at center)'),
-          _(
-            'Apply an impulse to the object. It instantly changes the speed, to give an initial speed for instance.'
-          ),
-          _('Apply an impulse of _PARAM2_ ; _PARAM3_ ; _PARAM4_ at the center of _PARAM0_'),
-          _('Forces & impulses'),
-          'res/physics32.png',
-          'res/physics32.png'
-        )
-        .addParameter('object', _('Object'), '', false)
-        .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
-        .addParameter('expression', _('X component (N·s or kg·m·s⁻¹)'))
-        .addParameter('expression', _('Y component (N·s or kg·m·s⁻¹)'))
-        .addParameter('expression', _('Z component (N·s or kg·m·s⁻¹)'))
-        .setParameterLongDescription(
-          _('An impulse is like a speed addition but depends on the mass.')
-        )
-        .getCodeExtraInformation()
-        .setFunctionName('applyImpulseAtCenter');
+    aut
+      .addScopedAction(
+        'ApplyImpulseAtCenter',
+        _('Apply impulse (at center)'),
+        _(
+          'Apply an impulse to the object. It instantly changes the speed, to give an initial speed for instance.'
+        ),
+        _(
+          'Apply an impulse of _PARAM2_ ; _PARAM3_ ; _PARAM4_ at the center of _PARAM0_'
+        ),
+        _('Forces & impulses'),
+        'res/physics32.png',
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .addParameter('expression', _('X component (N·s or kg·m·s⁻¹)'))
+      .addParameter('expression', _('Y component (N·s or kg·m·s⁻¹)'))
+      .addParameter('expression', _('Z component (N·s or kg·m·s⁻¹)'))
+      .setParameterLongDescription(
+        _('An impulse is like a speed addition but depends on the mass.')
+      )
+      .getCodeExtraInformation()
+      .setFunctionName('applyImpulseAtCenter');
 
     aut
       .addAction(
@@ -680,7 +783,9 @@ module.exports = {
         _(
           'Apply an angular impulse (also called a "rotational impulse") to the object. It instantly changes the rotation speed, to give an initial speed for instance.'
         ),
-        _('Apply angular impulse of _PARAM2_ ; _PARAM3_ ; _PARAM4_ to _PARAM0_ an'),
+        _(
+          'Apply angular impulse of _PARAM2_ ; _PARAM3_ ; _PARAM4_ to _PARAM0_ an'
+        ),
         _('Forces & impulses'),
         'res/physics32.png',
         'res/physics32.png'
@@ -716,7 +821,9 @@ module.exports = {
       .addCodeOnlyParameter('conditionInverted', '')
       .getCodeExtraInformation()
       .addIncludeFile('Extensions/Physics3DBehavior/Physics3DTools.js')
-      .addIncludeFile('Extensions/Physics3DBehavior/Physics3DRuntimeBehavior.js')
+      .addIncludeFile(
+        'Extensions/Physics3DBehavior/Physics3DRuntimeBehavior.js'
+      )
       .setFunctionName('gdjs.physics3d.objectsCollide');
 
     extension
@@ -736,7 +843,9 @@ module.exports = {
       .addCodeOnlyParameter('conditionInverted', '')
       .getCodeExtraInformation()
       .addIncludeFile('Extensions/Physics3DBehavior/Physics3DTools.js')
-      .addIncludeFile('Extensions/Physics3DBehavior/Physics3DRuntimeBehavior.js')
+      .addIncludeFile(
+        'Extensions/Physics3DBehavior/Physics3DRuntimeBehavior.js'
+      )
       .setFunctionName('gdjs.physics3d.haveObjectsStartedColliding');
 
     extension
@@ -756,7 +865,9 @@ module.exports = {
       .addCodeOnlyParameter('conditionInverted', '')
       .getCodeExtraInformation()
       .addIncludeFile('Extensions/Physics3DBehavior/Physics3DTools.js')
-      .addIncludeFile('Extensions/Physics3DBehavior/Physics3DRuntimeBehavior.js')
+      .addIncludeFile(
+        'Extensions/Physics3DBehavior/Physics3DRuntimeBehavior.js'
+      )
       .setFunctionName('gdjs.physics3d.haveObjectsStoppedColliding');
 
     return extension;

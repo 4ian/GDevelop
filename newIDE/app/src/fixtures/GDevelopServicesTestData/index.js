@@ -2408,6 +2408,11 @@ export const limitsForNoSubscriptionUser: Limits = {
       max: 3,
       limitReached: false,
     },
+    'ask-question': {
+      current: 1,
+      max: 3,
+      limitReached: false,
+    },
   },
   credits: {
     userBalance: {
@@ -2458,6 +2463,16 @@ export const limitsForSilverUser: Limits = {
       max: 1000,
       limitReached: false,
     },
+    'ask-question': {
+      current: 1,
+      max: 3,
+      limitReached: false,
+    },
+    'ask-question': {
+      current: 1,
+      max: 10,
+      limitReached: false,
+    },
   },
   credits: {
     userBalance: {
@@ -2506,6 +2521,11 @@ export const limitsForGoldUser: Limits = {
     'ai-project-generation': {
       current: 3,
       max: 1000,
+      limitReached: false,
+    },
+    'ask-question': {
+      current: 1,
+      max: 3,
       limitReached: false,
     },
   },
@@ -2569,6 +2589,11 @@ export const limitsForTeacherUser: Limits = {
       max: 1000,
       limitReached: false,
     },
+    'ask-question': {
+      current: 1,
+      max: 3,
+      limitReached: false,
+    },
   },
   credits: {
     userBalance: {
@@ -2627,6 +2652,11 @@ export const limitsForStudentUser: Limits = {
       max: 1000,
       limitReached: false,
     },
+    'ask-question': {
+      current: 1,
+      max: 3,
+      limitReached: false,
+    },
   },
   credits: {
     userBalance: {
@@ -2675,6 +2705,11 @@ export const limitsForStartupUser: Limits = {
     'ai-project-generation': {
       current: 3,
       max: 1000,
+      limitReached: false,
+    },
+    'ask-question': {
+      current: 1,
+      max: 3,
       limitReached: false,
     },
   },
@@ -3034,6 +3069,20 @@ export const fakeAuthenticatedUserWithNoSubscriptionAndCredits: AuthenticatedUse
   ...fakeSilverAuthenticatedUser,
   subscription: noSubscription,
   limits: limitsForNoSubscriptionUserWithCredits,
+};
+
+export const fakeAuthenticatedUserWithQuestionsQuotaReached: AuthenticatedUser = {
+  ...fakeAuthenticatedUserWithNoSubscription,
+  limits: {
+    ...limitsForNoSubscriptionUser,
+    quotas: {
+      ...limitsForNoSubscriptionUser.quotas,
+      'ask-question': {
+        ...limitsForNoSubscriptionUser.quotas['ask-question'],
+        limitReached: true,
+      },
+    },
+  },
 };
 
 export const fakeNotAuthenticatedUser: AuthenticatedUser = {

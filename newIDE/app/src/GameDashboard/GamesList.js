@@ -4,7 +4,7 @@ import Fuse from 'fuse.js';
 import { Trans, t } from '@lingui/macro';
 import { type Game } from '../Utils/GDevelopServices/Game';
 import { GameCard } from './GameCard';
-import { ColumnStackLayout } from '../UI/Layout';
+import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import { type GameDetailsTab } from '.';
 import RouterContext from '../MainFrame/RouterContext';
 import SearchBar from '../UI/SearchBar';
@@ -20,6 +20,9 @@ import { Column, Line } from '../UI/Grid';
 import Text from '../UI/Text';
 import Paper from '../UI/Paper';
 import BackgroundText from '../UI/BackgroundText';
+import SelectOption from '../UI/SelectOption';
+import SearchBarSelectField from '../UI/SearchBarSelectField';
+import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 
 const pageSize = 10;
 
@@ -31,12 +34,14 @@ const getGamesToDisplay = ({
   searchText,
   searchClient,
   currentPage,
+  orderBy,
 }: {|
   project: ?gdProject,
   games: Array<Game>,
   searchText: string,
   searchClient: Fuse,
   currentPage: number,
+  orderBy: 'createdAt' | 'totalSessions' | 'weeklySessions',
 |}): Array<Game> => {
   if (searchText) {
     const searchResults = searchClient.search(
@@ -46,9 +51,25 @@ const getGamesToDisplay = ({
   }
   const projectUuid = project ? project.getProjectUuid() : null;
   const thisGame = games.find(game => !!projectUuid && game.id === projectUuid);
-  const orderedGames = thisGame
-    ? [thisGame, ...games.filter(game => game.id !== thisGame.id)]
-    : games;
+
+  // Do the ordering here, client-side, as we receive all the games from the API.
+  const orderedGames =
+    orderBy === 'totalSessions'
+      ? [...games].sort(
+          (a, b) =>
+            (b.cachedTotalSessionsCount || 0) -
+            (a.cachedTotalSessionsCount || 0)
+        )
+      : orderBy === 'weeklySessions'
+      ? [...games].sort(
+          (a, b) =>
+            (b.cachedLastWeekSessionsCount || 0) -
+            (a.cachedLastWeekSessionsCount || 0)
+        )
+      : thisGame
+      ? [thisGame, ...games.filter(game => game.id !== thisGame.id)]
+      : games;
+
   return orderedGames.slice(
     currentPage * pageSize,
     (currentPage + 1) * pageSize
@@ -64,8 +85,10 @@ type Props = {|
 
 const GamesList = ({ project, games, onRefreshGames, onOpenGameId }: Props) => {
   const { addRouteArguments } = React.useContext(RouterContext);
+  const { values, setGamesListOrderBy } = React.useContext(PreferencesContext);
   const [searchText, setSearchText] = React.useState<string>('');
   const [currentPage, setCurrentPage] = React.useState<number>(0);
+  const { gamesListOrderBy: orderBy } = values;
 
   const searchClient = React.useMemo(
     () =>
@@ -83,6 +106,7 @@ const GamesList = ({ project, games, onRefreshGames, onOpenGameId }: Props) => {
       searchText,
       searchClient,
       currentPage,
+      orderBy,
     })
   );
 
@@ -95,6 +119,7 @@ const GamesList = ({ project, games, onRefreshGames, onOpenGameId }: Props) => {
           searchText,
           searchClient,
           currentPage,
+          orderBy,
         })
       );
     },
@@ -113,6 +138,7 @@ const GamesList = ({ project, games, onRefreshGames, onOpenGameId }: Props) => {
     searchText,
     games,
     currentPage,
+    orderBy,
   ]);
 
   const projectUuid = project ? project.getProjectUuid() : null;
@@ -124,36 +150,67 @@ const GamesList = ({ project, games, onRefreshGames, onOpenGameId }: Props) => {
           <Trans>Published games</Trans>
         </Text>
       </Line>
-      <Line noMargin alignItems="center">
-        <Column noMargin expand>
-          <SearchBar
-            value={searchText}
-            onChange={setSearchText}
-            // Search is triggered on each search text change
-            onRequestSearch={() => {}}
-            placeholder={t`Search by name`}
-          />
-        </Column>
-        <IconButton
-          tooltip={t`Previous page`}
-          onClick={() => setCurrentPage(currentPage => currentPage - 1)}
-          disabled={!!searchText || currentPage === 0}
-        >
-          <ChevronArrowLeft />
-        </IconButton>
-        <Text noMargin style={{ opacity: searchText ? 0.6 : 1 }}>
-          {searchText ? 1 : currentPage + 1}
-        </Text>
-        <IconButton
-          tooltip={t`Next page`}
-          onClick={() => setCurrentPage(currentPage => currentPage + 1)}
-          disabled={
-            !!searchText || (currentPage + 1) * pageSize >= games.length
+      <ResponsiveLineStackLayout expand noMargin alignItems="center">
+        <SearchBarSelectField
+          value={orderBy}
+          onChange={(e, i, value: string) =>
+            // $FlowFixMe
+            setGamesListOrderBy(value)
           }
         >
-          <ChevronArrowRight />
-        </IconButton>
-      </Line>
+          <SelectOption
+            value="createdAt"
+            label={t`Creation date (new to old)`}
+          />
+          <SelectOption
+            value="totalSessions"
+            label={t`Most sessions (all time)`}
+          />
+          <SelectOption
+            value="weeklySessions"
+            label={t`Most sessions (past 7 days)`}
+          />
+        </SearchBarSelectField>
+        <Line noMargin expand alignItems="center">
+          <Column noMargin expand>
+            <SearchBar
+              value={searchText}
+              onChange={setSearchText}
+              // Search is triggered on each search text change
+              onRequestSearch={() => {}}
+              placeholder={t`Search by name`}
+              autoFocus="desktop"
+            />
+          </Column>
+          <IconButton
+            tooltip={t`Previous page`}
+            onClick={() => setCurrentPage(currentPage => currentPage - 1)}
+            disabled={!!searchText || currentPage === 0}
+            size="small"
+          >
+            <ChevronArrowLeft />
+          </IconButton>
+          <Text
+            noMargin
+            style={{
+              opacity: searchText ? 0.6 : 1,
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            {searchText ? 1 : currentPage + 1}
+          </Text>
+          <IconButton
+            tooltip={t`Next page`}
+            onClick={() => setCurrentPage(currentPage => currentPage + 1)}
+            disabled={
+              !!searchText || (currentPage + 1) * pageSize >= games.length
+            }
+            size="small"
+          >
+            <ChevronArrowRight />
+          </IconButton>
+        </Line>
+      </ResponsiveLineStackLayout>
       {displayedGames.length > 0 ? (
         displayedGames.map(game => (
           <GameCard

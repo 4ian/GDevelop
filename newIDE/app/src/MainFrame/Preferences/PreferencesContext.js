@@ -224,6 +224,7 @@ export type PreferencesValues = {|
   editorStateByProject: { [string]: { editorTabs: EditorTabsPersistedState } },
   fetchPlayerTokenForPreviewAutomatically: boolean,
   previewCrashReportUploadLevel: string,
+  gamesListOrderBy: 'createdAt' | 'totalSessions' | 'weeklySessions',
 |};
 
 /**
@@ -322,6 +323,9 @@ export type Preferences = {|
   ) => void,
   setFetchPlayerTokenForPreviewAutomatically: (enabled: boolean) => void,
   setPreviewCrashReportUploadLevel: (level: string) => void,
+  setGamesListOrderBy: (
+    orderBy: 'createdAt' | 'totalSessions' | 'weeklySessions'
+  ) => void,
 |};
 
 export const initialPreferences = {
@@ -377,6 +381,7 @@ export const initialPreferences = {
     editorStateByProject: {},
     fetchPlayerTokenForPreviewAutomatically: true,
     previewCrashReportUploadLevel: 'exclude-javascript-code-events',
+    gamesListOrderBy: 'createdAt',
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -447,6 +452,9 @@ export const initialPreferences = {
   setEditorStateForProject: (projectId, editorState) => {},
   setFetchPlayerTokenForPreviewAutomatically: (enabled: boolean) => {},
   setPreviewCrashReportUploadLevel: (level: string) => {},
+  setGamesListOrderBy: (
+    orderBy: 'createdAt' | 'totalSessions' | 'weeklySessions'
+  ) => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

@@ -27,7 +27,7 @@ const styles = {
   infoIcon: { width: 24, height: 24 },
 };
 
-const maxLength = 300;
+const maxLength = 500;
 const minLength = 20;
 
 const AnyQuestionDialog = ({ onClose }: Props) => {

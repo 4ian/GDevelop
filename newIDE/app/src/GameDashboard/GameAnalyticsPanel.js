@@ -35,7 +35,6 @@ const chartHeight = 300;
 
 type Props = {|
   game: Game,
-  gameMetrics?: ?(GameMetrics[]),
   recommendedMarketingPlan?: ?MarketingPlan,
   gameFeaturings?: ?(GameFeaturing[]),
   fetchGameFeaturings?: () => Promise<void>,
@@ -43,7 +42,6 @@ type Props = {|
 
 export const GameAnalyticsPanel = ({
   game,
-  gameMetrics,
   recommendedMarketingPlan,
   gameFeaturings,
   fetchGameFeaturings,
@@ -53,7 +51,7 @@ export const GameAnalyticsPanel = ({
   );
 
   const [gameRollingMetrics, setGameMetrics] = React.useState<?(GameMetrics[])>(
-    gameMetrics
+    null
   );
   const { yearChartData, monthChartData } = React.useMemo(
     () => buildChartData(gameRollingMetrics),
@@ -98,13 +96,9 @@ export const GameAnalyticsPanel = ({
 
   React.useEffect(
     () => {
-      if (!!gameMetrics) {
-        // Do not load metrics if provided by parent.
-        return;
-      }
       loadGameMetrics();
     },
-    [loadGameMetrics, gameMetrics]
+    [loadGameMetrics]
   );
 
   if (isGameMetricsLoading) return <PlaceholderLoader />;

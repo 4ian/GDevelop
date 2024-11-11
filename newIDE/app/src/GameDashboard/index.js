@@ -484,7 +484,6 @@ const GameDashboard = ({
             ) : currentView === 'analytics' ? (
               <GameAnalyticsPanel
                 game={game}
-                gameMetrics={gameRollingMetrics}
                 gameFeaturings={gameFeaturings}
                 fetchGameFeaturings={fetchGameFeaturings}
                 recommendedMarketingPlan={recommendedMarketingPlan}

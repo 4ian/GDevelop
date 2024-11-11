@@ -950,6 +950,8 @@ void WholeProjectRefactorer::RenameEventsBasedBehaviorProperty(
     // Order is important: we first rename the expressions then the
     // instructions, to avoid being unable to fetch the metadata (the types of
     // parameters) of instructions after they are renamed.
+
+    // Rename legacy expressions like: Object.Behavior::PropertyMyPropertyName()
     gd::ExpressionsRenamer expressionRenamer =
         gd::ExpressionsRenamer(project.GetCurrentPlatform());
     expressionRenamer.SetReplacedBehaviorExpression(
@@ -959,14 +961,16 @@ void WholeProjectRefactorer::RenameEventsBasedBehaviorProperty(
         EventsBasedBehavior::GetPropertyExpressionName(newPropertyName));
     gd::ProjectBrowserHelper::ExposeProjectEvents(project, expressionRenamer);
 
+    // Rename property names directly used as an identifier.
     std::unordered_map<gd::String, gd::String> oldToNewPropertyNames = {
         {oldPropertyName, newPropertyName}};
     std::unordered_set<gd::String> removedPropertyNames;
     gd::EventsPropertyReplacer eventsPropertyReplacer(
         project.GetCurrentPlatform(), properties, oldToNewPropertyNames,
         removedPropertyNames);
-    gd::ProjectBrowserHelper::ExposeProjectEvents(project,
-                                                  eventsPropertyReplacer);
+    gd::ProjectBrowserHelper::ExposeEventsBasedBehaviorEvents(
+        project, eventsFunctionsExtension, eventsBasedBehavior,
+        eventsPropertyReplacer);
 
     gd::InstructionsTypeRenamer actionRenamer = gd::InstructionsTypeRenamer(
         project,
@@ -1021,6 +1025,8 @@ void WholeProjectRefactorer::RenameEventsBasedBehaviorSharedProperty(
     // Order is important: we first rename the expressions then the
     // instructions, to avoid being unable to fetch the metadata (the types of
     // parameters) of instructions after they are renamed.
+
+    // Rename legacy expressions like: Object.Behavior::SharedPropertyMyPropertyName()
     gd::ExpressionsRenamer expressionRenamer =
         gd::ExpressionsRenamer(project.GetCurrentPlatform());
     expressionRenamer.SetReplacedBehaviorExpression(
@@ -1030,14 +1036,16 @@ void WholeProjectRefactorer::RenameEventsBasedBehaviorSharedProperty(
         EventsBasedBehavior::GetSharedPropertyExpressionName(newPropertyName));
     gd::ProjectBrowserHelper::ExposeProjectEvents(project, expressionRenamer);
 
+    // Rename property names directly used as an identifier.
     std::unordered_map<gd::String, gd::String> oldToNewPropertyNames = {
         {oldPropertyName, newPropertyName}};
     std::unordered_set<gd::String> removedPropertyNames;
     gd::EventsPropertyReplacer eventsPropertyReplacer(
         project.GetCurrentPlatform(), properties, oldToNewPropertyNames,
         removedPropertyNames);
-    gd::ProjectBrowserHelper::ExposeProjectEvents(project,
-                                                  eventsPropertyReplacer);
+    gd::ProjectBrowserHelper::ExposeEventsBasedBehaviorEvents(
+        project, eventsFunctionsExtension, eventsBasedBehavior,
+        eventsPropertyReplacer);
 
     gd::InstructionsTypeRenamer actionRenamer = gd::InstructionsTypeRenamer(
         project,
@@ -1078,6 +1086,8 @@ void WholeProjectRefactorer::RenameEventsBasedObjectProperty(
   // Order is important: we first rename the expressions then the
   // instructions, to avoid being unable to fetch the metadata (the types of
   // parameters) of instructions after they are renamed.
+
+  // Rename legacy expressions like: Object.PropertyMyPropertyName()
   gd::ExpressionsRenamer expressionRenamer =
       gd::ExpressionsRenamer(project.GetCurrentPlatform());
   expressionRenamer.SetReplacedObjectExpression(
@@ -1087,14 +1097,16 @@ void WholeProjectRefactorer::RenameEventsBasedObjectProperty(
       EventsBasedObject::GetPropertyExpressionName(newPropertyName));
   gd::ProjectBrowserHelper::ExposeProjectEvents(project, expressionRenamer);
 
+  // Rename property names directly used as an identifier.
   std::unordered_map<gd::String, gd::String> oldToNewPropertyNames = {
       {oldPropertyName, newPropertyName}};
   std::unordered_set<gd::String> removedPropertyNames;
   gd::EventsPropertyReplacer eventsPropertyReplacer(
       project.GetCurrentPlatform(), properties, oldToNewPropertyNames,
       removedPropertyNames);
-  gd::ProjectBrowserHelper::ExposeProjectEvents(project,
-                                                eventsPropertyReplacer);
+  gd::ProjectBrowserHelper::ExposeEventsBasedObjectEvents(
+      project, eventsFunctionsExtension, eventsBasedObject,
+      eventsPropertyReplacer);
 
   gd::InstructionsTypeRenamer actionRenamer = gd::InstructionsTypeRenamer(
       project,

@@ -26,6 +26,7 @@ import { EventsFunctionPropertiesEditor } from '../../EventsFunctionsExtensionEd
 import HelpButton from '../../UI/HelpButton';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 const gd: libGDevelop = global.gd;
 
 type Props = {|
@@ -55,6 +56,7 @@ export default class EventsFunctionExtractorDialog extends React.Component<
     extensionName: '',
     createNewExtension: false,
   };
+  _projectScopedContainersAccessor: ProjectScopedContainersAccessor | null = null;
 
   componentDidMount() {
     const {
@@ -64,6 +66,12 @@ export default class EventsFunctionExtractorDialog extends React.Component<
       objectsContainer,
       serializedEvents,
     } = this.props;
+
+    // This is only used to check parameter for name conflict.
+    // TODO Update it according to the chosen extension.
+    this._projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+      { project }
+    );
 
     // Set up the function
     const eventsFunction = new gd.EventsFunction();
@@ -302,19 +310,24 @@ export default class EventsFunctionExtractorDialog extends React.Component<
             freezeEventsFunctionType
             getFunctionGroupNames={this._getFunctionGroupNames}
           />
-          <EventsFunctionParametersEditor
-            project={project}
-            eventsFunction={eventsFunction}
-            eventsBasedBehavior={null}
-            eventsBasedObject={null}
-            eventsFunctionsContainer={null}
-            eventsFunctionsExtension={null}
-            onParametersUpdated={() => {
-              // Force the dialog to adapt its size
-              this.forceUpdate();
-            }}
-            freezeParameters
-          />
+          {this._projectScopedContainersAccessor && (
+            <EventsFunctionParametersEditor
+              project={project}
+              projectScopedContainersAccessor={
+                this._projectScopedContainersAccessor
+              }
+              eventsFunction={eventsFunction}
+              eventsBasedBehavior={null}
+              eventsBasedObject={null}
+              eventsFunctionsContainer={null}
+              eventsFunctionsExtension={null}
+              onParametersUpdated={() => {
+                // Force the dialog to adapt its size
+                this.forceUpdate();
+              }}
+              freezeParameters
+            />
+          )}
         </ColumnStackLayout>
       </Dialog>
     );

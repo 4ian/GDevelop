@@ -198,6 +198,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
         {this.state.currentTab === 'parameters' ? (
           <EventsFunctionParametersEditor
             project={project}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
             eventsFunction={eventsFunction}
             eventsBasedBehavior={eventsBasedBehavior}
             eventsBasedObject={eventsBasedObject}

@@ -40,6 +40,7 @@ import useAlertDialog from '../UI/Alert/useAlertDialog';
 import SearchBar from '../UI/SearchBar';
 import { renderQuickCustomizationMenuItems } from '../QuickCustomization/QuickCustomizationMenuItems';
 import ResourceTypeSelectField from '../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/ResourceTypeSelectField';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
 const gd: libGDevelop = global.gd;
 
@@ -89,6 +90,7 @@ const setExtraInfoString = (
 
 type Props = {|
   project: gdProject,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   extension: gdEventsFunctionsExtension,
   eventsBasedBehavior: gdEventsBasedBehavior,
   properties: gdPropertiesContainer,
@@ -99,26 +101,24 @@ type Props = {|
   behaviorObjectType?: string,
 |};
 
+// Those names are used internally by GDevelop.
+const PROTECTED_PROPERTY_NAMES = ['name', 'type'];
+
 const getValidatedPropertyName = (
-  i18n: I18nType,
   properties: gdPropertiesContainer,
+  projectScopedContainers: gdProjectScopedContainers,
   newName: string
 ): string => {
+  const variablesContainersList = projectScopedContainers.getVariablesContainersList();
+  const objectsContainersList = projectScopedContainers.getObjectsContainersList();
   const safeAndUniqueNewName = newNameGenerator(
     gd.Project.getSafeName(newName),
-    tentativeNewName => {
-      if (
-        properties.has(tentativeNewName) ||
-        // The name of a property cannot be "name" or "type", as they are used by GDevelop internally.
-        (tentativeNewName === 'name' || tentativeNewName === 'type')
-      ) {
-        return true;
-      }
-
-      return false;
-    }
+    tentativeNewName =>
+      properties.has(tentativeNewName) ||
+      variablesContainersList.has(tentativeNewName) ||
+      objectsContainersList.hasObjectNamed(tentativeNewName) ||
+      PROTECTED_PROPERTY_NAMES.includes(tentativeNewName)
   );
-
   return safeAndUniqueNewName;
 };
 
@@ -129,6 +129,7 @@ const getExtraInfoArray = (property: gdNamedPropertyDescriptor) => {
 
 export default function EventsBasedBehaviorPropertiesEditor({
   project,
+  projectScopedContainersAccessor,
   extension,
   eventsBasedBehavior,
   properties,
@@ -530,9 +531,10 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                           if (newName === property.getName())
                                             return;
 
+                                          const projectScopedContainers = projectScopedContainersAccessor.get();
                                           const validatedNewName = getValidatedPropertyName(
-                                            i18n,
                                             properties,
+                                            projectScopedContainers,
                                             newName
                                           );
                                           onRenameProperty(

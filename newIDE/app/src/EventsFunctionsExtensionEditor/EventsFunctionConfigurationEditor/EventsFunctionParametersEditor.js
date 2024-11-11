@@ -39,6 +39,7 @@ import ResponsiveFlatButton from '../../UI/ResponsiveFlatButton';
 import { EmptyPlaceholder } from '../../UI/EmptyPlaceholder';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import Text from '../../UI/Text';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 
 const gd: libGDevelop = global.gd;
 
@@ -75,8 +76,26 @@ export const useParameterOverridingAlertDialog = () => {
   };
 };
 
+const getValidatedParameterName = (
+  parameters: gdParameterMetadataContainer,
+  projectScopedContainers: gdProjectScopedContainers,
+  newName: string
+): string => {
+  const variablesContainersList = projectScopedContainers.getVariablesContainersList();
+  const objectsContainersList = projectScopedContainers.getObjectsContainersList();
+  const safeAndUniqueNewName = newNameGenerator(
+    gd.Project.getSafeName(newName),
+    tentativeNewName =>
+      parameters.hasParameterNamed(tentativeNewName) ||
+      variablesContainersList.has(tentativeNewName) ||
+      objectsContainersList.hasObjectNamed(tentativeNewName)
+  );
+  return safeAndUniqueNewName;
+};
+
 type Props = {|
   project: gdProject,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   eventsFunction: gdEventsFunction,
   eventsBasedBehavior: gdEventsBasedBehavior | null,
   eventsBasedObject: gdEventsBasedObject | null,
@@ -109,6 +128,7 @@ type Props = {|
 
 export const EventsFunctionParametersEditor = ({
   project,
+  projectScopedContainersAccessor,
   eventsFunction,
   eventsBasedBehavior,
   eventsBasedObject,
@@ -623,10 +643,14 @@ export const EventsFunctionParametersEditor = ({
                                         margin="none"
                                         translatableHintText={t`Enter the parameter name (mandatory)`}
                                         value={parameter.getName()}
-                                        onChange={text => {
-                                          parameter.setName(
-                                            gd.Project.getSafeName(text)
+                                        onChange={newName => {
+                                          const projectScopedContainers = projectScopedContainersAccessor.get();
+                                          const validatedNewName = getValidatedParameterName(
+                                            parameters,
+                                            projectScopedContainers,
+                                            newName
                                           );
+                                          parameter.setName(validatedNewName);
                                           forceUpdate();
                                           onParametersUpdated();
                                         }}

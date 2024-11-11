@@ -8,11 +8,13 @@ import Background from '../UI/Background';
 import { Column, Line } from '../UI/Grid';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type ExtensionItemConfigurationAttribute } from '../EventsFunctionsExtensionEditor';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
 type TabName = 'configuration' | 'behavior-properties' | 'scene-properties';
 
 type Props = {|
   project: gdProject,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsBasedBehavior: gdEventsBasedBehavior,
   onRenameProperty: (oldName: string, newName: string) => void,
@@ -26,6 +28,7 @@ export default function EventsBasedBehaviorEditorPanel({
   eventsBasedBehavior,
   eventsFunctionsExtension,
   project,
+  projectScopedContainersAccessor,
   onRenameProperty,
   onRenameSharedProperty,
   unsavedChanges,
@@ -80,6 +83,7 @@ export default function EventsBasedBehaviorEditorPanel({
         {currentTab === 'behavior-properties' && (
           <EventsBasedBehaviorPropertiesEditor
             project={project}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
             extension={eventsFunctionsExtension}
             eventsBasedBehavior={eventsBasedBehavior}
             properties={eventsBasedBehavior.getPropertyDescriptors()}
@@ -93,6 +97,7 @@ export default function EventsBasedBehaviorEditorPanel({
           <EventsBasedBehaviorPropertiesEditor
             isSceneProperties
             project={project}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
             extension={eventsFunctionsExtension}
             eventsBasedBehavior={eventsBasedBehavior}
             properties={eventsBasedBehavior.getSharedPropertyDescriptors()}

@@ -1003,14 +1003,17 @@ export default class SceneEditor extends React.Component<Props, State> {
   ) => {
     const { project, layout, projectScopedContainersAccessor } = this.props;
 
-    const objectsContainersList = projectScopedContainersAccessor
-      .get()
-      .getObjectsContainersList();
+    const projectScopedContainers = projectScopedContainersAccessor.get();
+    const objectsContainersList = projectScopedContainers.getObjectsContainersList();
+    const variablesContainersList = projectScopedContainers.getVariablesContainersList();
 
     const safeAndUniqueNewName = newNameGenerator(
       gd.Project.getSafeName(newName),
       tentativeNewName => {
-        if (objectsContainersList.hasObjectOrGroupNamed(tentativeNewName)) {
+        if (
+          objectsContainersList.hasObjectOrGroupNamed(tentativeNewName) ||
+          variablesContainersList.has(tentativeNewName)
+        ) {
           return true;
         }
 

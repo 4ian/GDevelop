@@ -18,6 +18,9 @@ export const Default = () => (
   <DragAndDropContextProvider>
     <EventsBasedBehaviorEditorPanel
       project={testProject.project}
+      projectScopedContainersAccessor={
+        testProject.testEventsBasedBehaviorProjectScopedContainersAccessor
+      }
       eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
       eventsBasedBehavior={testProject.testEventsBasedBehavior}
       onRenameProperty={action('property rename')}
@@ -31,6 +34,9 @@ export const WithoutFunction = () => (
   <DragAndDropContextProvider>
     <EventsBasedBehaviorEditorPanel
       project={testProject.project}
+      projectScopedContainersAccessor={
+        testProject.testEventsBasedBehaviorProjectScopedContainersAccessor
+      }
       eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
       eventsBasedBehavior={testProject.testEmptyEventsBasedBehavior}
       onRenameProperty={action('property rename')}

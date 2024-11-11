@@ -1391,9 +1391,13 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 }
               />
             </Background>
-          ) : selectedEventsBasedBehavior ? (
+          ) : selectedEventsBasedBehavior &&
+            this._projectScopedContainersAccessor ? (
             <EventsBasedBehaviorEditorPanel
               project={project}
+              projectScopedContainersAccessor={
+                this._projectScopedContainersAccessor
+              }
               eventsFunctionsExtension={eventsFunctionsExtension}
               eventsBasedBehavior={selectedEventsBasedBehavior}
               unsavedChanges={this.props.unsavedChanges}

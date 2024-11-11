@@ -79,6 +79,7 @@ export default function EventsBasedObjectEditorPanel({
         {currentTab === 'properties' && (
           <EventsBasedObjectPropertiesEditor
             project={project}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
             extension={eventsFunctionsExtension}
             eventsBasedObject={eventsBasedObject}
             onRenameProperty={onRenameProperty}

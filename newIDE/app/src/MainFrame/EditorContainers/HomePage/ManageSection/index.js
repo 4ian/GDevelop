@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
 import { I18n as I18nType } from '@lingui/core';
-
 import SectionContainer, { SectionRow } from '../SectionContainer';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
@@ -35,6 +34,11 @@ import { extractGDevelopApiErrorStatusAndCode } from '../../../../Utils/GDevelop
 import { GameRegistration } from '../../../../GameDashboard/GameRegistration';
 import UserEarnings from '../../../../GameDashboard/Monetization/UserEarnings';
 import { showErrorBox } from '../../../../UI/Messages/MessageBox';
+import {
+  type FileMetadataAndStorageProviderName,
+  type FileMetadata,
+  type StorageProvider,
+} from '../../../../ProjectsStorage';
 
 const publishingWikiArticle = getHelpLink('/publishing/');
 
@@ -46,6 +50,11 @@ const styles = {
 
 type Props = {|
   project: ?gdProject,
+  currentFileMetadata: ?FileMetadata,
+  onOpenProject: (file: FileMetadataAndStorageProviderName) => Promise<void>,
+  storageProviders: Array<StorageProvider>,
+  closeProject: () => Promise<void>,
+
   games: ?Array<Game>,
   onRefreshGames: () => Promise<void>,
   onGameUpdated: (game: Game) => void,
@@ -58,6 +67,11 @@ type Props = {|
 
 const ManageSection = ({
   project,
+  currentFileMetadata,
+  onOpenProject,
+  storageProviders,
+  closeProject,
+
   games,
   onRefreshGames,
   onGameUpdated,
@@ -255,10 +269,13 @@ const ManageSection = ({
       <SectionContainer flexBody>
         <GameDashboard
           project={project}
+          currentFileMetadata={currentFileMetadata}
+          onOpenProject={onOpenProject}
+          storageProviders={storageProviders}
+          closeProject={closeProject}
           currentView={currentTab}
           setCurrentView={setCurrentTab}
           game={openedGame}
-          analyticsSource="homepage"
           onBack={onBack}
           onGameUpdated={onGameUpdated}
           onUnregisterGame={unregisterGame}
@@ -369,10 +386,12 @@ const ManageSection = ({
                 </Paper>
               ) : (
                 <GamesList
+                  storageProviders={storageProviders}
                   project={project}
                   games={games}
                   onRefreshGames={onRefreshGames}
                   onOpenGameId={setOpenedGameId}
+                  onOpenProject={onOpenProject}
                 />
               )
             ) : gamesFetchingError ? (

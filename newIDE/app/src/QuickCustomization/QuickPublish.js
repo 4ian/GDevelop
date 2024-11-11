@@ -32,7 +32,7 @@ import PlaceholderLoader from '../UI/PlaceholderLoader';
 import {
   checkIfHasTooManyCloudProjects,
   MaxProjectCountAlertMessage,
-} from '../MainFrame/EditorContainers/HomePage/BuildSection/MaxProjectCountAlertMessage';
+} from '../MainFrame/EditorContainers/HomePage/CreateSection/MaxProjectCountAlertMessage';
 import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
 import ArrowLeft from '../UI/CustomSvgIcons/ArrowLeft';
 

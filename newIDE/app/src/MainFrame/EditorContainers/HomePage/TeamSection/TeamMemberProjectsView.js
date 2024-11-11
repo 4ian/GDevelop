@@ -24,8 +24,8 @@ import Text from '../../../../UI/Text';
 import {
   getProjectLineHeight,
   transformCloudProjectsIntoFileMetadataWithStorageProviderName,
-} from '../BuildSection/utils';
-import ProjectFileListItem from '../BuildSection/ProjectFileListItem';
+} from '../CreateSection/utils';
+import ProjectFileListItem from '../CreateSection/ProjectFileListItem';
 import ContextMenu, {
   type ContextMenuInterface,
 } from '../../../../UI/Menu/ContextMenu';
@@ -169,7 +169,7 @@ const TeamMemberProjectsView = ({
                     key={file.fileMetadata.fileIdentifier}
                     isLoading={false}
                     onOpenContextMenu={openContextMenu}
-                    onOpenRecentFile={onOpenRecentFile}
+                    onOpenProject={onOpenRecentFile}
                     storageProviders={storageProviders}
                     isWindowSizeMediumOrLarger={!isMobile}
                   />

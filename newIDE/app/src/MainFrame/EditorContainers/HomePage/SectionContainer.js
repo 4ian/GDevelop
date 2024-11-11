@@ -11,7 +11,7 @@ import { LineStackLayout } from '../../../UI/Layout';
 import { AnnouncementsFeed } from '../../../AnnouncementsFeed';
 import { AnnouncementsFeedContext } from '../../../AnnouncementsFeed/AnnouncementsFeedContext';
 
-export const SECTION_PADDING = 30;
+export const SECTION_PADDING = 20;
 
 const styles = {
   title: { overflowWrap: 'anywhere', textWrap: 'wrap' },

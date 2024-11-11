@@ -21,6 +21,10 @@ import BackgroundText from '../UI/BackgroundText';
 import SelectOption from '../UI/SelectOption';
 import SearchBarSelectField from '../UI/SearchBarSelectField';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import {
+  type FileMetadataAndStorageProviderName,
+  type StorageProvider,
+} from '../ProjectsStorage';
 
 const pageSize = 10;
 
@@ -75,13 +79,22 @@ const getGamesToDisplay = ({
 };
 
 type Props = {|
+  storageProviders: Array<StorageProvider>,
   project: ?gdProject,
   games: Array<Game>,
   onRefreshGames: () => Promise<void>,
   onOpenGameId: (gameId: ?string) => void,
+  onOpenProject: (file: FileMetadataAndStorageProviderName) => Promise<void>,
 |};
 
-const GamesList = ({ project, games, onRefreshGames, onOpenGameId }: Props) => {
+const GamesList = ({
+  project,
+  games,
+  onRefreshGames,
+  onOpenGameId,
+  onOpenProject,
+  storageProviders,
+}: Props) => {
   const { values, setGamesListOrderBy } = React.useContext(PreferencesContext);
   const [searchText, setSearchText] = React.useState<string>('');
   const [currentPage, setCurrentPage] = React.useState<number>(0);
@@ -211,12 +224,14 @@ const GamesList = ({ project, games, onRefreshGames, onOpenGameId }: Props) => {
       {displayedGames.length > 0 ? (
         displayedGames.map(game => (
           <GameCard
+            storageProviders={storageProviders}
             key={game.id}
             isCurrentGame={!!projectUuid && game.id === projectUuid}
             game={game}
             onOpenGameManager={() => {
               onOpenGameId(game.id);
             }}
+            onOpenProject={onOpenProject}
           />
         ))
       ) : !!searchText ? (

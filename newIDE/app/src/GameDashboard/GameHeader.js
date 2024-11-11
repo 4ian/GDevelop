@@ -24,6 +24,8 @@ import Edit from '../UI/CustomSvgIcons/Edit';
 import GameLinkAndShareIcons from './GameLinkAndShareIcons';
 import { CompactToggleField } from '../UI/CompactToggleField';
 import { FixedHeightFlexContainer } from '../UI/Grid';
+import useOnResize from '../Utils/UseOnResize';
+import useForceUpdate from '../Utils/UseForceUpdate';
 
 const styles = {
   iconAndText: { display: 'flex', gap: 2, alignItems: 'flex-start' },
@@ -42,6 +44,7 @@ const GameHeader = ({
   gameUrl,
   onPublishOnGdGames,
 }: Props) => {
+  useOnResize(useForceUpdate());
   const { isMobile } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const gameMainImageUrl = getGameMainImageUrl(game);
@@ -113,6 +116,7 @@ const GameHeader = ({
       gameId={game.id}
       thumbnailUrl={gameMainImageUrl}
       background="medium"
+      width={Math.min(272, Math.max(150, window.innerWidth / 4.5))}
     />
   );
 

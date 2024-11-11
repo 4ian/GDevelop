@@ -19,7 +19,7 @@ import { Column, Line, Spacer } from '../UI/Grid';
 import {
   checkIfHasTooManyCloudProjects,
   MaxProjectCountAlertMessage,
-} from '../MainFrame/EditorContainers/HomePage/BuildSection/MaxProjectCountAlertMessage';
+} from '../MainFrame/EditorContainers/HomePage/CreateSection/MaxProjectCountAlertMessage';
 import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
 import optionalRequire from '../Utils/OptionalRequire';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';

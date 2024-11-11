@@ -1,19 +1,20 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
-
 import {
   ColumnStackLayout,
   LineStackLayout,
   ResponsiveLineStackLayout,
 } from '../UI/Layout';
+import {
+  type FileMetadataAndStorageProviderName,
+  type StorageProvider,
+} from '../ProjectsStorage';
 import FlatButton from '../UI/FlatButton';
 import Text from '../UI/Text';
-
 import { GameThumbnail } from './GameThumbnail';
-
 import {
   getGameMainImageUrl,
   getGameUrl,
@@ -28,8 +29,16 @@ import DollarCoin from '../UI/CustomSvgIcons/DollarCoin';
 import Cross from '../UI/CustomSvgIcons/Cross';
 import Messages from '../UI/CustomSvgIcons/Messages';
 import GameLinkAndShareIcons from './GameLinkAndShareIcons';
+import {
+  getStorageProviderByInternalName,
+  useProjectsListFor,
+} from '../MainFrame/EditorContainers/HomePage/CreateSection/utils';
+import FlatButtonWithSplitMenu from '../UI/FlatButtonWithSplitMenu';
+import useOnResize from '../Utils/UseOnResize';
+import useForceUpdate from '../Utils/UseForceUpdate';
 
 const styles = {
+  buttonsContainer: { display: 'flex', flexShrink: 0 },
   iconAndText: { display: 'flex', gap: 2, alignItems: 'flex-start' },
 };
 
@@ -37,9 +46,19 @@ type Props = {|
   game: Game,
   isCurrentGame: boolean,
   onOpenGameManager: () => void,
+  storageProviders: Array<StorageProvider>,
+  onOpenProject: (file: FileMetadataAndStorageProviderName) => Promise<void>,
 |};
 
-export const GameCard = ({ game, isCurrentGame, onOpenGameManager }: Props) => {
+export const GameCard = ({
+  storageProviders,
+  game,
+  isCurrentGame,
+  onOpenGameManager,
+  onOpenProject,
+}: Props) => {
+  useOnResize(useForceUpdate());
+  const projectsList = useProjectsListFor(game);
   const isPublishedOnGdGames = !!game.publicWebBuildId;
   const gameUrl = isPublishedOnGdGames ? getGameUrl(game) : null;
 
@@ -47,7 +66,8 @@ export const GameCard = ({ game, isCurrentGame, onOpenGameManager }: Props) => {
     game,
   ]);
 
-  const { isMobile } = useResponsiveWindowSize();
+  const { isMobile, windowSize } = useResponsiveWindowSize();
+  const isWidthConstrained = windowSize === 'small' || windowSize === 'medium';
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const renderPublicInfo = () => {
@@ -119,19 +139,86 @@ export const GameCard = ({ game, isCurrentGame, onOpenGameManager }: Props) => {
       gameId={game.id}
       thumbnailUrl={gameThumbnailUrl}
       background="light"
+      width={
+        isMobile
+          ? undefined
+          : // On medium/large screens, adapt the size to the width of the window.
+            Math.min(272, Math.max(130, window.innerWidth / 5))
+      }
     />
   );
 
-  const renderButtons = () => (
-    <LineStackLayout noMargin>
-      <FlatButton
-        primary
-        fullWidth
-        label={<Trans>Manage game</Trans>}
-        onClick={onOpenGameManager}
-      />
-    </LineStackLayout>
-  );
+  const renderButtons = (fullWidth: boolean) => {
+    return (
+      <div styles={styles.buttonsContainer}>
+        <LineStackLayout noMargin>
+          <FlatButton
+            primary
+            fullWidth={fullWidth}
+            label={
+              isWidthConstrained ? (
+                <Trans>Manage</Trans>
+              ) : (
+                <Trans>Manage game</Trans>
+              )
+            }
+            onClick={onOpenGameManager}
+          />
+          {projectsList.length === 0 ? null : projectsList.length === 1 ? (
+            <FlatButton
+              primary
+              fullWidth={fullWidth}
+              disabled={isCurrentGame}
+              label={
+                isCurrentGame ? (
+                  <Trans>Opened</Trans>
+                ) : isWidthConstrained ? (
+                  <Trans>Open</Trans>
+                ) : (
+                  <Trans>Open project</Trans>
+                )
+              }
+              onClick={() => onOpenProject(projectsList[0])}
+            />
+          ) : (
+            <FlatButtonWithSplitMenu
+              primary
+              fullWidth={fullWidth}
+              disabled={isCurrentGame}
+              label={
+                isCurrentGame ? <Trans>Opened</Trans> : <Trans>Open</Trans>
+              }
+              onClick={() => onOpenProject(projectsList[0])}
+              buildMenuTemplate={i18n => [
+                ...projectsList.map(fileMetadataAndStorageProviderName => {
+                  const name =
+                    fileMetadataAndStorageProviderName.fileMetadata.name || '-';
+                  const storageProvider = getStorageProviderByInternalName(
+                    storageProviders,
+                    fileMetadataAndStorageProviderName.storageProviderName
+                  );
+                  return {
+                    label: i18n._(
+                      t`${name} (${
+                        storageProvider ? i18n._(storageProvider.name) : '-'
+                      })`
+                    ),
+                    click: () =>
+                      onOpenProject(fileMetadataAndStorageProviderName),
+                  };
+                }),
+                { type: 'separator' },
+                {
+                  label: i18n._(t`See all in the game dashboard`),
+                  click: onOpenGameManager,
+                },
+              ]}
+            />
+          )}
+        </LineStackLayout>
+      </div>
+    );
+  };
 
   const renderShareUrl = (i18n: I18nType) =>
     gameUrl ? <GameLinkAndShareIcons url={gameUrl} display="line" /> : null;
@@ -153,7 +240,7 @@ export const GameCard = ({ game, isCurrentGame, onOpenGameManager }: Props) => {
                 {renderPublicInfo()}
               </LineStackLayout>
               {renderShareUrl(i18n)}
-              {renderButtons()}
+              {renderButtons(/*fullWidth=*/ true)}
             </ColumnStackLayout>
           ) : (
             <LineStackLayout noMargin>
@@ -169,7 +256,7 @@ export const GameCard = ({ game, isCurrentGame, onOpenGameManager }: Props) => {
                   alignItems="flex-start"
                 >
                   {renderTitle(i18n)}
-                  {renderButtons()}
+                  {renderButtons(/*fullWidth=*/ false)}
                 </LineStackLayout>
                 {renderPublicInfo()}
                 {renderShareUrl(i18n)}

@@ -215,6 +215,7 @@ export const generateOnChooseSaveProjectAsLocation = ({
   return {
     saveAsLocation: {
       name,
+      gameId: project.getProjectUuid(),
     },
   };
 };

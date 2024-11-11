@@ -12,7 +12,7 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import {
   checkIfHasTooManyCloudProjects,
   MaxProjectCountAlertMessage,
-} from '../MainFrame/EditorContainers/HomePage/BuildSection/MaxProjectCountAlertMessage';
+} from '../MainFrame/EditorContainers/HomePage/CreateSection/MaxProjectCountAlertMessage';
 import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
 
 type Props = {|

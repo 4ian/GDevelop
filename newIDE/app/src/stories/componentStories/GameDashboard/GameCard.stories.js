@@ -10,6 +10,7 @@ import {
   game1,
 } from '../../../fixtures/GDevelopServicesTestData';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
+import CloudStorageProvider from '../../../ProjectsStorage/CloudStorageProvider';
 
 export default {
   title: 'GameDashboard/GameCard',
@@ -20,9 +21,11 @@ export default {
 export const DefaultGameCard = () => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameCard
+      storageProviders={[CloudStorageProvider]}
       game={game1}
       isCurrentGame={false}
       onOpenGameManager={action('onOpenGameManager')}
+      onOpenProject={action('onOpenProject')}
     />
   </AuthenticatedUserContext.Provider>
 );
@@ -30,9 +33,11 @@ export const DefaultGameCard = () => (
 export const DefaultCurrentlyEditedCard = () => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameCard
+      storageProviders={[CloudStorageProvider]}
       game={game1}
       isCurrentGame={true}
       onOpenGameManager={action('onOpenGameManager')}
+      onOpenProject={action('onOpenProject')}
     />
   </AuthenticatedUserContext.Provider>
 );

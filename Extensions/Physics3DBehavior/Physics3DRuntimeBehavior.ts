@@ -81,8 +81,9 @@ namespace gdjs {
 
     settings.mObjectLayerPairFilter = objectFilter;
     settings.mBroadPhaseLayerInterface = broadPhaseLayerInterfaceMask;
-    settings.mObjectVsBroadPhaseLayerFilter =
-      new Jolt.ObjectVsBroadPhaseLayerFilterMask(broadPhaseLayerInterfaceMask);
+    settings.mObjectVsBroadPhaseLayerFilter = new Jolt.ObjectVsBroadPhaseLayerFilterMask(
+      broadPhaseLayerInterfaceMask
+    );
   };
 
   export class Physics3DSharedData {
@@ -206,8 +207,9 @@ namespace gdjs {
     ): gdjs.Physics3DSharedData {
       // Create one if needed
       if (!runtimeScene.physics3DSharedData) {
-        const initialData =
-          runtimeScene.getInitialSharedDataForBehavior(behaviorName);
+        const initialData = runtimeScene.getInitialSharedDataForBehavior(
+          behaviorName
+        );
         runtimeScene.physics3DSharedData = new gdjs.Physics3DSharedData(
           runtimeScene,
           initialData
@@ -719,6 +721,17 @@ namespace gdjs {
       this._objectOldWidth = this.owner3D.getWidth();
       this._objectOldHeight = this.owner3D.getHeight();
       this._objectOldDepth = this.owner3D.getDepth();
+    }
+
+    getShapeScale(): float {
+      return this.shapeScale;
+    }
+
+    setShapeScale(shapeScale: float): void {
+      if (shapeScale !== this.shapeScale && shapeScale > 0) {
+        this.shapeScale = shapeScale;
+        this.recreateShape();
+      }
     }
 
     getBody(): Jolt.Body {
@@ -1387,6 +1400,33 @@ namespace gdjs {
       );
     }
 
+    applyForceTowardPosition(
+      length: float,
+      towardX: float,
+      towardY: float,
+      towardZ: float
+    ): void {
+      if (this._body === null) {
+        if (!this.createBody()) return;
+      }
+      const body = this._body!;
+
+      const deltaX = towardX - body.GetPosition().GetX();
+      const deltaY = towardY - body.GetPosition().GetY();
+      const deltaZ = towardZ - body.GetPosition().GetZ();
+      const distance = deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ;
+      if (distance === 0) {
+        return;
+      }
+      const ratio = length / distance;
+
+      this._sharedData.bodyInterface.AddForce(
+        body.GetID(),
+        this.getVec3(deltaX * ratio, deltaY * ratio, deltaZ * ratio),
+        Jolt.EActivation_Activate
+      );
+    }
+
     applyImpulse(
       impulseX: float,
       impulseY: float,
@@ -1427,6 +1467,40 @@ namespace gdjs {
       );
     }
 
+    applyImpulseTowardPosition(
+      length: float,
+      towardX: float,
+      towardY: float,
+      towardZ: float,
+      originX: float,
+      originY: float,
+      originZ: float
+    ): void {
+      if (this._body === null) {
+        if (!this.createBody()) return;
+      }
+      const body = this._body!;
+
+      const deltaX = towardX - originX;
+      const deltaY = towardY - originY;
+      const deltaZ = towardZ - originZ;
+      const distance = deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ;
+      if (distance === 0) {
+        return;
+      }
+      const ratio = length / distance;
+
+      this._sharedData.bodyInterface.AddImpulse(
+        body.GetID(),
+        this.getVec3(deltaX * ratio, deltaY * ratio, deltaZ * ratio),
+        this.getRVec3(
+          originX * this._sharedData.worldInvScale,
+          originY * this._sharedData.worldInvScale,
+          originZ * this._sharedData.worldInvScale
+        )
+      );
+    }
+
     applyTorque(torqueX: float, torqueY: float, torqueZ: float): void {
       if (this._body === null) {
         if (!this.createBody()) return;
@@ -1453,6 +1527,87 @@ namespace gdjs {
       this._sharedData.bodyInterface.AddAngularImpulse(
         body.GetID(),
         this.getVec3(angularImpulseX, angularImpulseY, angularImpulseZ)
+      );
+    }
+
+    getMass(): float {
+      if (this._body === null) {
+        if (!this.createBody()) return 0;
+      }
+      const body = this._body!;
+
+      return 1 / body.GetMotionProperties().GetInverseMass();
+    }
+
+    /**
+     * @returns The inertia for a rotation around X axis of the object at its
+     * default rotation (0°; 0°; 0°).
+     */
+    getInertiaAroundX(): float {
+      if (this._body === null) {
+        if (!this.createBody()) return 0;
+      }
+      const body = this._body!;
+
+      return 1 / body.GetMotionProperties().GetInverseInertiaDiagonal().GetX();
+    }
+
+    /**
+     * @returns The inertia for a rotation around Y axis of the object at its
+     * default rotation (0°; 0°; 0°).
+     */
+    getInertiaAroundY(): float {
+      if (this._body === null) {
+        if (!this.createBody()) return 0;
+      }
+      const body = this._body!;
+
+      return 1 / body.GetMotionProperties().GetInverseInertiaDiagonal().GetY();
+    }
+
+    /**
+     * @returns The inertia for a rotation around Z axis of the object at its
+     * default rotation (0°; 0°; 0°).
+     */
+    getInertiaAroundZ(): float {
+      if (this._body === null) {
+        if (!this.createBody()) return 0;
+      }
+      const body = this._body!;
+
+      return 1 / body.GetMotionProperties().GetInverseInertiaDiagonal().GetZ();
+    }
+
+    getMassCenterX(): float {
+      if (this._body === null) {
+        if (!this.createBody()) return 0;
+      }
+      const body = this._body!;
+
+      return (
+        body.GetCenterOfMassPosition().GetX() * this._sharedData.worldScale
+      );
+    }
+
+    getMassCenterY(): float {
+      if (this._body === null) {
+        if (!this.createBody()) return 0;
+      }
+      const body = this._body!;
+
+      return (
+        body.GetCenterOfMassPosition().GetY() * this._sharedData.worldScale
+      );
+    }
+
+    getMassCenterZ(): float {
+      if (this._body === null) {
+        if (!this.createBody()) return 0;
+      }
+      const body = this._body!;
+
+      return (
+        body.GetCenterOfMassPosition().GetZ() * this._sharedData.worldScale
       );
     }
 

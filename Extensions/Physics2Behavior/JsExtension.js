@@ -695,7 +695,7 @@ module.exports = {
       .addCondition(
         'IsDynamic',
         _('Is dynamic'),
-        _('Test if an object is dynamic.'),
+        _('Check if an object is dynamic.'),
         _('_PARAM0_ is dynamic'),
         _('Dynamics'),
         'res/physics32.png',
@@ -727,7 +727,7 @@ module.exports = {
       .addCondition(
         'IsStatic',
         _('Is static'),
-        _('Test if an object is static.'),
+        _('Check if an object is static.'),
         _('_PARAM0_ is static'),
         _('Dynamics'),
         'res/physics32.png',
@@ -759,7 +759,7 @@ module.exports = {
       .addCondition(
         'IsKinematic',
         _('Is kinematic'),
-        _('Test if an object is kinematic.'),
+        _('Check if an object is kinematic.'),
         _('_PARAM0_ is kinematic'),
         _('Dynamics'),
         'res/physics32.png',
@@ -791,7 +791,7 @@ module.exports = {
       .addCondition(
         'IsBullet',
         _('Is treat as bullet'),
-        _('Test if an object is being treat as a bullet.'),
+        _('Check if an object is being treat as a bullet.'),
         _('_PARAM0_ is bullet'),
         _('Dynamics'),
         'res/physics32.png',
@@ -825,7 +825,7 @@ module.exports = {
       .addCondition(
         'HasFixedRotation',
         _('Has fixed rotation'),
-        _('Test if an object has fixed rotation.'),
+        _('Check if an object has fixed rotation.'),
         _('_PARAM0_ has fixed rotation'),
         _('Dynamics'),
         'res/physics32.png',
@@ -859,7 +859,7 @@ module.exports = {
       .addCondition(
         'IsSleepingAllowed',
         _('Is sleeping allowed'),
-        _('Test if an object can sleep.'),
+        _('Check if an object can sleep.'),
         _('_PARAM0_ can sleep'),
         _('Dynamics'),
         'res/physics32.png',
@@ -898,7 +898,7 @@ module.exports = {
       .addCondition(
         'IsSleeping',
         _('Is sleeping'),
-        _('Test if an object is sleeping.'),
+        _('Check if an object is sleeping.'),
         _('_PARAM0_ is sleeping'),
         _('Dynamics'),
         'res/physics32.png',
@@ -1267,7 +1267,7 @@ module.exports = {
       .addCondition(
         'LayerEnabled',
         _('Layer enabled'),
-        _('Test if an object has a specific layer enabled.'),
+        _('Check if an object has a specific layer enabled.'),
         _('_PARAM0_ has layer _PARAM2_ enabled'),
         _('Filtering'),
         'res/physics32.png',
@@ -1303,7 +1303,7 @@ module.exports = {
       .addCondition(
         'MaskEnabled',
         _('Mask enabled'),
-        _('Test if an object has a specific mask enabled.'),
+        _('Check if an object has a specific mask enabled.'),
         _('_PARAM0_ has mask _PARAM2_ enabled'),
         _('Filtering'),
         'res/physics32.png',
@@ -1897,7 +1897,7 @@ module.exports = {
       .addCondition(
         'JointFirstObject',
         _('Joint first object'),
-        _('Test if an object is the first object on a joint.'),
+        _('Check if an object is the first object on a joint.'),
         _('_PARAM0_ is the first object for joint _PARAM2_'),
         _('Joints'),
         'res/physics32.png',
@@ -1913,7 +1913,7 @@ module.exports = {
       .addCondition(
         'JointSecondObject',
         _('Joint second object'),
-        _('Test if an object is the second object on a joint.'),
+        _('Check if an object is the second object on a joint.'),
         _('_PARAM0_ is the second object for joint _PARAM2_'),
         _('Joints'),
         'res/physics32.png',
@@ -2382,7 +2382,7 @@ module.exports = {
       .addCondition(
         'RevoluteJointLimitsEnabled',
         _('Revolute joint limits enabled'),
-        _('Test if a revolute joint limits are enabled.'),
+        _('Check if a revolute joint limits are enabled.'),
         _('Limits for revolute joint _PARAM2_ are enabled'),
         _('Joints/Revolute'),
         'JsPlatform/Extensions/revolute_joint24.png',
@@ -2461,7 +2461,7 @@ module.exports = {
       .addCondition(
         'RevoluteJointMotorEnabled',
         _('Revolute joint motor enabled'),
-        _('Test if a revolute joint motor is enabled.'),
+        _('Check if a revolute joint motor is enabled.'),
         _('Motor of revolute joint _PARAM2_ is enabled'),
         _('Joints/Revolute'),
         'JsPlatform/Extensions/revolute_joint24.png',
@@ -2700,7 +2700,7 @@ module.exports = {
       .addCondition(
         'PrismaticJointLimitsEnabled',
         _('Prismatic joint limits enabled'),
-        _('Test if a prismatic joint limits are enabled.'),
+        _('Check if a prismatic joint limits are enabled.'),
         _('Limits for prismatic joint _PARAM2_ are enabled'),
         _('Joints/Prismatic'),
         'JsPlatform/Extensions/prismatic_joint24.png',
@@ -2779,7 +2779,7 @@ module.exports = {
       .addCondition(
         'PrismaticJointMotorEnabled',
         _('Prismatic joint motor enabled'),
-        _('Test if a prismatic joint motor is enabled.'),
+        _('Check if a prismatic joint motor is enabled.'),
         _('Motor for prismatic joint _PARAM2_ is enabled'),
         _('Joints/Prismatic'),
         'JsPlatform/Extensions/prismatic_joint24.png',
@@ -3459,7 +3459,7 @@ module.exports = {
       .addCondition(
         'WheelJointMotorEnabled',
         _('Wheel joint motor enabled'),
-        _('Test if a wheel joint motor is enabled.'),
+        _('Check if a wheel joint motor is enabled.'),
         _('Motor for wheel joint _PARAM2_ is enabled'),
         _('Joints/Wheel'),
         'JsPlatform/Extensions/wheel_joint24.png',

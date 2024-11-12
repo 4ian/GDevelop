@@ -14,6 +14,9 @@ const BehaviorsEditorService = {
     return this.components[behaviorType].component; // Custom  behavior editor
   },
   components: {
+    'Physics2::Physics2Behavior': {
+      component: Physics2Editor,
+    },
     'Physics3D::Physics3DBehavior': {
       component: Physics3DEditor,
     },

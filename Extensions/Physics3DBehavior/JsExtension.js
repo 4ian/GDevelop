@@ -551,7 +551,7 @@ module.exports = {
         'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
-      .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
       .getCodeExtraInformation()
       .setFunctionName('getWorldScale');
 
@@ -567,7 +567,6 @@ module.exports = {
         _('the world gravity on X axis'),
         _('the world gravity on X axis'),
         _('Global'),
-        'res/physics32.png',
         'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -578,7 +577,6 @@ module.exports = {
           _('Gravity (in Newton)')
         )
       )
-      .getCodeExtraInformation()
       .setFunctionName('setGravityX')
       .setGetter('getGravityX');
 
@@ -594,7 +592,6 @@ module.exports = {
         _('the world gravity on Y axis'),
         _('the world gravity on Y axis'),
         _('Global'),
-        'res/physics32.png',
         'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -605,7 +602,6 @@ module.exports = {
           _('Gravity (in Newton)')
         )
       )
-      .getCodeExtraInformation()
       .setFunctionName('setGravityY')
       .setGetter('getGravityY');
 
@@ -621,7 +617,6 @@ module.exports = {
         _('the world gravity on Z axis'),
         _('the world gravity on Z axis'),
         _('Global'),
-        'res/physics32.png',
         'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -632,15 +627,422 @@ module.exports = {
           _('Gravity (in Newton)')
         )
       )
-      .getCodeExtraInformation()
       .setFunctionName('setGravityZ')
       .setGetter('getGravityZ');
 
+    aut
+      .addScopedCondition(
+        'IsDynamic',
+        _('Is dynamic'),
+        _('Check if an object is dynamic.'),
+        _('_PARAM0_ is dynamic'),
+        _('Dynamics'),
+        'res/physics32.png',
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .getCodeExtraInformation()
+      .setFunctionName('isDynamic');
+
+    aut
+      .addScopedCondition(
+        'IsStatic',
+        _('Is static'),
+        _('Check if an object is static.'),
+        _('_PARAM0_ is static'),
+        _('Dynamics'),
+        'res/physics32.png',
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .getCodeExtraInformation()
+      .setFunctionName('isStatic');
+
+    aut
+      .addScopedCondition(
+        'IsKinematic',
+        _('Is kinematic'),
+        _('Check if an object is kinematic.'),
+        _('_PARAM0_ is kinematic'),
+        _('Dynamics'),
+        'res/physics32.png',
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .getCodeExtraInformation()
+      .setFunctionName('isKinematic');
+
+    aut
+      .addScopedCondition(
+        'IsBullet',
+        _('Is treat as bullet'),
+        _('Check if an object is being treat as a bullet.'),
+        _('_PARAM0_ is bullet'),
+        _('Dynamics'),
+        'res/physics32.png',
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .getCodeExtraInformation()
+      .setFunctionName('isBullet');
+
+    aut
+      .addScopedAction(
+        'SetBullet',
+        _('Treat as bullet'),
+        _(
+          'Treat the object as a bullet. Better collision handling on high speeds at cost of some performance.'
+        ),
+        _('Treat _PARAM0_ as bullet: _PARAM2_'),
+        _('Dynamics'),
+        'res/physics32.png',
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .addParameter('yesorno', _('Treat as bullet?'), '', false)
+      .setDefaultValue('false')
+      .getCodeExtraInformation()
+      .setFunctionName('setBullet');
+
+    aut
+      .addScopedCondition(
+        'HasFixedRotation',
+        _('Has fixed rotation'),
+        _('Check if an object has fixed rotation.'),
+        _('_PARAM0_ has fixed rotation'),
+        _('Dynamics'),
+        'res/physics32.png',
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .getCodeExtraInformation()
+      .setFunctionName('hasFixedRotation');
+
+    aut
+      .addScopedAction(
+        'SetFixedRotation',
+        _('Fixed rotation'),
+        _(
+          "Enable or disable an object fixed rotation. If enabled the object won't be able to rotate."
+        ),
+        _('Set _PARAM0_ fixed rotation: _PARAM2_'),
+        _('Dynamics'),
+        'res/physics32.png',
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .addParameter('yesorno', _('Fixed rotation?'), '', false)
+      .setDefaultValue('false')
+      .getCodeExtraInformation()
+      .setFunctionName('setFixedRotation');
+
+    // Body settings
+    aut
+      .addScopedAction(
+        'ShapeScale',
+        _('Shape scale'),
+        _(
+          'Modify an object shape scale. It affects custom shape dimensions and shape offset, if custom dimensions are not set the body will be scaled automatically to the object size.'
+        ),
+        _('the shape scale'),
+        _('Body settings'),
+        'res/physics32.png',
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .useStandardOperatorParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Scale (1 by default)')
+        )
+      )
+      .getCodeExtraInformation()
+      .setFunctionName('setShapeScale')
+      .setGetter('getShapeScale');
+
+    aut
+      .addExpressionAndConditionAndAction(
+        'number',
+        'Density',
+        _('Density'),
+        _(
+          "the object density. The body's density and volume determine its mass."
+        ),
+        _('the density'),
+        _('Body settings'),
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .setFunctionName('setDensity')
+      .setGetter('getDensity');
+
+    aut
+      .addExpressionAndConditionAndAction(
+        'number',
+        'Friction',
+        _('Friction'),
+        _(
+          "the object friction. How much energy is lost from the movement of one object over another. The combined friction from two bodies is calculated as 'sqrt(bodyA.friction * bodyB.friction)'."
+        ),
+        _('the friction'),
+        _('Body settings'),
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .setFunctionName('setFriction')
+      .setGetter('getFriction');
+
+    aut
+      .addExpressionAndConditionAndAction(
+        'number',
+        'Restitution',
+        _('Restitution'),
+        _(
+          "the object restitution. Energy conservation on collision. The combined restitution from two bodies is calculated as 'max(bodyA.restitution, bodyB.restitution)'."
+        ),
+        _('the restitution'),
+        _('Body settings'),
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .setFunctionName('setRestitution')
+      .setGetter('getRestitution');
+
+    aut
+      .addExpressionAndConditionAndAction(
+        'number',
+        'LinearDamping',
+        _('Linear damping'),
+        _(
+          'the object linear damping. How much movement speed is lost across the time.'
+        ),
+        _('the linear damping'),
+        _('Body settings'),
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .setFunctionName('setLinearDamping')
+      .setGetter('getLinearDamping');
+
+    aut
+      .addExpressionAndConditionAndAction(
+        'number',
+        'AngularDamping',
+        _('Angular damping'),
+        _(
+          'the object angular damping. How much angular speed is lost across the time.'
+        ),
+        _('the angular damping'),
+        _('Body settings'),
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .setFunctionName('setAngularDamping')
+      .setGetter('getAngularDamping');
+
+    aut
+      .addExpressionAndConditionAndAction(
+        'number',
+        'GravityScale',
+        _('Gravity scale'),
+        _(
+          'the object gravity scale. The gravity applied to an object is the world gravity multiplied by the object gravity scale.'
+        ),
+        _('the gravity scale'),
+        _('Body settings'),
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .useStandardParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Scale (1 by default)')
+        )
+      )
+      .setFunctionName('setGravityScale')
+      .setGetter('getGravityScale');
+
+    // Filtering
+    aut
+      .addScopedCondition(
+        'LayerEnabled',
+        _('Layer enabled'),
+        _('Check if an object has a specific layer enabled.'),
+        _('_PARAM0_ has layer _PARAM2_ enabled'),
+        _('Filtering'),
+        'res/physics32.png',
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .addParameter('expression', _('Layer (1 - 8)'))
+      .getCodeExtraInformation()
+      .setFunctionName('layerEnabled');
+
+    aut
+      .addScopedAction(
+        'EnableLayer',
+        _('Enable layer'),
+        _(
+          'Enable or disable a layer for an object. Two objects collide if any layer of the first object matches any mask of the second one and vice versa.'
+        ),
+        _('Enable layer _PARAM2_ for _PARAM0_: _PARAM3_'),
+        _('Filtering'),
+        'res/physics32.png',
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .addParameter('expression', _('Layer (1 - 8)'))
+      .addParameter('yesorno', _('Enable?'), '', false)
+      .setDefaultValue('true')
+      .getCodeExtraInformation()
+      .setFunctionName('enableLayer');
+
+    aut
+      .addScopedCondition(
+        'MaskEnabled',
+        _('Mask enabled'),
+        _('Check if an object has a specific mask enabled.'),
+        _('_PARAM0_ has mask _PARAM2_ enabled'),
+        _('Filtering'),
+        'res/physics32.png',
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .addParameter('expression', _('Mask (1 - 8)'))
+      .getCodeExtraInformation()
+      .setFunctionName('maskEnabled');
+
+    aut
+      .addScopedAction(
+        'EnableMask',
+        _('Enable mask'),
+        _(
+          'Enable or disable a mask for an object. Two objects collide if any layer of the first object matches any mask of the second one and vice versa.'
+        ),
+        _('Enable mask _PARAM2_ for _PARAM0_: _PARAM3_'),
+        _('Filtering'),
+        'res/physics32.png',
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .addParameter('expression', _('Mask (1 - 8)'))
+      .addParameter('yesorno', _('Enable?'), '', false)
+      .setDefaultValue('true')
+      .getCodeExtraInformation()
+      .setFunctionName('enableMask');
+
+    // Velocity
+    aut
+      .addExpressionAndConditionAndAction(
+        'number',
+        'LinearVelocityX',
+        _('Linear velocity X'),
+        _('the object linear velocity on X.'),
+        _('the linear velocity on X'),
+        _('Velocity'),
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .useStandardParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Speed (in pixels per second)')
+        )
+      )
+      .setFunctionName('setLinearVelocityX')
+      .setGetter('getLinearVelocityX');
+
+    aut
+      .addExpressionAndConditionAndAction(
+        'number',
+        'LinearVelocityY',
+        _('Linear velocity Y'),
+        _('the object linear velocity on Y.'),
+        _('the linear velocity on Y'),
+        _('Velocity'),
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .useStandardParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Speed (in pixels per second)')
+        )
+      )
+      .setFunctionName('setLinearVelocityY')
+      .setGetter('getLinearVelocityY');
+
+    aut
+      .addExpressionAndConditionAndAction(
+        'number',
+        'LinearVelocityZ',
+        _('Linear velocity Z'),
+        _('the object linear velocity on Z.'),
+        _('the linear velocity on Z'),
+        _('Velocity'),
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .useStandardParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Speed (in pixels per second)')
+        )
+      )
+      .setFunctionName('setLinearVelocityZ')
+      .setGetter('getLinearVelocityZ');
+
+    aut
+      .addExpressionAndCondition(
+        'number',
+        'LinearVelocityLength',
+        _('Linear velocity'),
+        _('the object linear velocity length.'),
+        _('the linear velocity length'),
+        _('Velocity'),
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .useStandardParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Speed to compare to (in pixels per second)')
+        )
+      )
+      .setFunctionName('getLinearVelocityLength');
+
     // Forces and impulses
     aut
-      .addAction(
+      .addScopedAction(
         'ApplyForce',
-        _('Apply force'),
+        _('Apply force (at a point)'),
         _(
           'Apply a force to the object over time. It "accelerates" an object and must be used every frame during a time period.'
         ),
@@ -671,7 +1073,7 @@ module.exports = {
       .setFunctionName('applyForce');
 
     aut
-      .addAction(
+      .addScopedAction(
         'ApplyForceAtCenter',
         _('Apply force (at center)'),
         _(
@@ -697,8 +1099,34 @@ module.exports = {
 
     aut
       .addScopedAction(
+        'ApplyForceTowardPosition',
+        _('Apply force toward position'),
+        _(
+          'Apply a force to the object over time to move it toward a position. It "accelerates" an object and must be used every frame during a time period.'
+        ),
+        _(
+          'Apply to _PARAM0_ a force of length _PARAM2_ towards _PARAM3_ ; _PARAM4_ ; _PARAM5_'
+        ),
+        _('Forces & impulses'),
+        'res/physics32.png',
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .addParameter('expression', _('Length (N)'))
+      .setParameterLongDescription(
+        _('A force is like an acceleration but depends on the mass.')
+      )
+      .addParameter('expression', _('X position'))
+      .addParameter('expression', _('Y position'))
+      .addParameter('expression', _('Z position'))
+      .getCodeExtraInformation()
+      .setFunctionName('applyForceTowardPosition');
+
+    aut
+      .addScopedAction(
         'ApplyImpulse',
-        _('Apply impulse'),
+        _('Apply impulse (at a point)'),
         _(
           'Apply an impulse to the object. It instantly changes the speed, to give an initial speed for instance.'
         ),
@@ -754,7 +1182,33 @@ module.exports = {
       .setFunctionName('applyImpulseAtCenter');
 
     aut
-      .addAction(
+      .addScopedAction(
+        'ApplyImpulseTowardPosition',
+        _('Apply impulse toward position'),
+        _(
+          'Apply an impulse to the object to move it toward a position. It instantly changes the speed, to give an initial speed for instance.'
+        ),
+        _(
+          'Apply to _PARAM0_ an impulse of length _PARAM2_ towards _PARAM3_ ; _PARAM4_ ; _PARAM5_'
+        ),
+        _('Forces & impulses'),
+        'res/physics32.png',
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .addParameter('expression', _('Length (N·s or kg·m·s⁻¹)'))
+      .setParameterLongDescription(
+        _('An impulse is like a speed addition but depends on the mass.')
+      )
+      .addParameter('expression', _('X position'))
+      .addParameter('expression', _('Y position'))
+      .addParameter('expression', _('Z position'))
+      .getCodeExtraInformation()
+      .setFunctionName('applyImpulseTowardPosition');
+
+    aut
+      .addScopedAction(
         'ApplyTorque',
         _('Apply torque (rotational force)'),
         _(
@@ -777,7 +1231,7 @@ module.exports = {
       .setFunctionName('applyTorque');
 
     aut
-      .addAction(
+      .addScopedAction(
         'ApplyAngularImpulse',
         _('Apply angular impulse (rotational impulse)'),
         _(
@@ -791,7 +1245,7 @@ module.exports = {
         'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
-      .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
       .addParameter('expression', _('Angular impulse around X (N·m·s)'))
       .addParameter('expression', _('Angular impulse around Y (N·m·s)'))
       .addParameter('expression', _('Angular impulse around Z (N·m·s)'))
@@ -802,6 +1256,90 @@ module.exports = {
       )
       .getCodeExtraInformation()
       .setFunctionName('applyAngularImpulse');
+
+    aut
+      .addExpression(
+        'Mass',
+        _('Mass'),
+        _('Return the mass of the object (in kilograms)'),
+        '',
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .getCodeExtraInformation()
+      .setFunctionName('getMass');
+
+    aut
+      .addExpression(
+        'InertiaAroundX',
+        _('Inertia around X'),
+        _(
+          'Return the inertia around X axis of the object (in kilograms · meters²) when for its default rotation is (0°; 0°; 0°)'
+        ),
+        '',
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .getCodeExtraInformation()
+      .setFunctionName('getInertiaAroundX');
+
+    aut
+      .addExpression(
+        'InertiaAroundY',
+        _('Inertia around Y'),
+        _(
+          'Return the inertia around Y axis of the object (in kilograms · meters²) when for its default rotation is (0°; 0°; 0°)'
+        ),
+        '',
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .getCodeExtraInformation()
+      .setFunctionName('getInertiaAroundY');
+
+    aut
+      .addExpression(
+        'InertiaAroundZ',
+        _('Inertia around Z'),
+        _(
+          'Return the inertia around Z axis of the object (in kilograms · meters²) when for its default rotation is (0°; 0°; 0°)'
+        ),
+        '',
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .getCodeExtraInformation()
+      .setFunctionName('getInertiaAroundZ');
+
+    aut
+      .addExpression(
+        'MassCenterX',
+        _('Mass center X'),
+        _('Mass center X'),
+        '',
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .getCodeExtraInformation()
+      .setFunctionName('getMassCenterX');
+
+    aut
+      .addExpression(
+        'MassCenterY',
+        _('Mass center Y'),
+        _('Mass center Y'),
+        '',
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .getCodeExtraInformation()
+      .setFunctionName('getMassCenterY');
 
     // Collision
     extension

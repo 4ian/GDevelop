@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
-import { Line, Column, Spacer, LargeSpacer } from '../../../../UI/Grid';
+import { Line, Column, Spacer } from '../../../../UI/Grid';
 import Text from '../../../../UI/Text';
 import Window from '../../../../Utils/Window';
 import { Trans } from '@lingui/macro';
@@ -200,21 +200,6 @@ const MainPage = ({
   return (
     <SectionContainer>
       <SectionRow>
-        <Line justifyContent="space-between" noMargin>
-          <Text noMargin size="title">
-            <Trans>Guided lessons</Trans>
-          </Text>
-          {showInAppTutorialDeveloperMode && (
-            <FlatButton
-              label={<Trans>Load local lesson</Trans>}
-              onClick={onLoadInAppTutorialFromLocalFile}
-            />
-          )}
-        </Line>
-        <GuidedLessons selectInAppTutorial={selectInAppTutorial} />
-      </SectionRow>
-      <LargeSpacer />
-      <SectionRow>
         <ColumnStackLayout noMargin expand>
           <Line noMargin>
             <GridList
@@ -283,6 +268,20 @@ const MainPage = ({
             </GridList>
           </Line>
         </ColumnStackLayout>
+      </SectionRow>
+      <SectionRow>
+        <Line justifyContent="space-between" noMargin>
+          <Text noMargin size="title">
+            <Trans>Guided lessons</Trans>
+          </Text>
+          {showInAppTutorialDeveloperMode && (
+            <FlatButton
+              label={<Trans>Load local lesson</Trans>}
+              onClick={onLoadInAppTutorialFromLocalFile}
+            />
+          )}
+        </Line>
+        <GuidedLessons selectInAppTutorial={selectInAppTutorial} />
       </SectionRow>
       <>
         <SectionRow>

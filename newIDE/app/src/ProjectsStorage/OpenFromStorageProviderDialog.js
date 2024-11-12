@@ -11,6 +11,7 @@ import BackgroundText from '../UI/BackgroundText';
 import { Column, Line } from '../UI/Grid';
 import StorageProviderListItem from './StorageProviderListItem';
 import AlertMessage from '../UI/AlertMessage';
+import Text from '../UI/Text';
 const electron = optionalRequire('electron');
 
 type Props = {|
@@ -56,11 +57,30 @@ const OpenFromStorageProviderDialog = ({
             {storageProviders
               .filter(storageProvider => !storageProvider.hiddenInOpenDialog)
               .map(storageProvider => (
-                <StorageProviderListItem
-                  key={storageProvider.internalName}
-                  onChooseProvider={onChooseProvider}
-                  storageProvider={storageProvider}
-                />
+                <React.Fragment key={storageProvider.internalName}>
+                  <StorageProviderListItem
+                    onChooseProvider={onChooseProvider}
+                    storageProvider={storageProvider}
+                  />
+                  {storageProvider.internalName === 'GoogleDrive' && (
+                    <Column noMargin expand>
+                      <AlertMessage kind="warning">
+                        <Text size={'sub-title'} noMargin>
+                          <Trans>End of Google Drive support</Trans>
+                        </Text>
+                        <Text noMargin>
+                          <Trans>
+                            Google Drive support will be dropped on January
+                            31st.
+                            <br />
+                            Save your project in the GDevelop Cloud to make sure
+                            you can access it past this date.
+                          </Trans>
+                        </Text>
+                      </AlertMessage>
+                    </Column>
+                  )}
+                </React.Fragment>
               ))}
           </List>
           {!electron && (

@@ -9,7 +9,7 @@ import useOnResize from '../../Utils/UseOnResize';
 // Xlarge corresponds to large desktop screens.
 export type WindowSizeType = 'small' | 'medium' | 'large' | 'xlarge';
 const sizeThresholds = {
-  small: 500,
+  small: 600,
   medium: 1150,
   large: 1500,
 };

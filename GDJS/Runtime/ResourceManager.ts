@@ -29,5 +29,11 @@ namespace gdjs {
      * Return the kind of resources handled by this manager.
      */
     getResourceKinds(): Array<ResourceKind>;
+
+    /**
+     * Should clear all resources, data, loaders stored by this manager.
+     * Using the manager after calling this method is undefined behavior.
+     */
+    dispose(): void;
   }
 }

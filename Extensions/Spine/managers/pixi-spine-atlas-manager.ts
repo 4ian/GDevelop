@@ -194,5 +194,13 @@ namespace gdjs {
         ? resource
         : null;
     }
+    /**
+     * To be called when the game is disposed.
+     * Clear the Spine Atlases loaded in this manager.
+     */
+    dispose(): void {
+      this._loadedSpineAtlases.clear();
+      this._loadingSpineAtlases.clear();
+    }
   }
 }

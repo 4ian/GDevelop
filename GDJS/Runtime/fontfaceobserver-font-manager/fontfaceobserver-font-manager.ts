@@ -197,6 +197,15 @@ namespace gdjs {
         );
       }
     }
+
+    /**
+     * To be called when the game is disposed.
+     * Clear caches of loaded font families.
+     */
+    dispose(): void {
+      this._loadedFontFamily.clear();
+      this._loadedFontFamilySet.clear();
+    }
   }
 
   //Register the class to let the engine use it.

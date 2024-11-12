@@ -868,6 +868,14 @@ namespace gdjs {
         }
       }
     }
+
+    /**
+     * To be called when the game is disposed.
+     * Unloads all audio from memory, clear Howl cache and stop all audio.
+     */
+    dispose(): void {
+      this.unloadAll();
+    }
   }
 
   // Register the class to let the engine use it.

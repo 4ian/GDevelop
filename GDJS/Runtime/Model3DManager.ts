@@ -143,5 +143,25 @@ namespace gdjs {
         this._loadedThreeModels.getFromName(resourceName) || this._invalidModel
       );
     }
+
+    /**
+     * To be called when the game is disposed.
+     * Clear the models, resources loaded and destroy 3D models loaders in this manager.
+     */
+    dispose(): void {
+      this._loadedThreeModels.clear();
+      this._downloadedArrayBuffers.clear();
+      this._loader = null;
+      this._dracoLoader = null;
+
+      if (this._invalidModel) {
+        this._invalidModel.cameras = [];
+        this._invalidModel.animations = [];
+        this._invalidModel.scenes = [];
+        this._invalidModel.userData = {};
+        this._invalidModel.asset = {};
+        this._invalidModel.scene.clear();
+      }
+    }
   }
 }

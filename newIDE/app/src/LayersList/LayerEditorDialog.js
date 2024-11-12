@@ -303,7 +303,7 @@ const LayerEditorDialog = ({
               </SelectField>
               {layer.getRenderingType() !== '2d' && (
                 <ColumnStackLayout noMargin>
-                  <ResponsiveLineStackLayout noMargin>
+                  <ResponsiveLineStackLayout noResponsiveLandscape noMargin>
                     <SelectField
                       fullWidth
                       floatingLabelText={<Trans>Camera type</Trans>}
@@ -338,7 +338,7 @@ const LayerEditorDialog = ({
                       disabled={layer.getCameraType() !== 'perspective'}
                     />
                   </ResponsiveLineStackLayout>
-                  <ResponsiveLineStackLayout noMargin>
+                  <ResponsiveLineStackLayout noResponsiveLandscape noMargin>
                     <SemiControlledTextField
                       commitOnBlur
                       fullWidth

@@ -68,7 +68,7 @@ export default function SetupGridDialog(props: Props) {
       exceptionallyStillAllowRenderingInstancesEditors
     >
       <ColumnStackLayout noMargin>
-        <ResponsiveLineStackLayout noMargin expand>
+        <ResponsiveLineStackLayout noMargin expand noResponsiveLandscape>
           <ColorField
             floatingLabelText={<Trans>Line color</Trans>}
             fullWidth
@@ -86,7 +86,7 @@ export default function SetupGridDialog(props: Props) {
             }}
           />
         </ResponsiveLineStackLayout>
-        <ResponsiveLineStackLayout noMargin expand>
+        <ResponsiveLineStackLayout noMargin expand noResponsiveLandscape>
           <TextField
             floatingLabelText={<Trans>Cell width (in pixels)</Trans>}
             fullWidth
@@ -112,7 +112,7 @@ export default function SetupGridDialog(props: Props) {
             }
           />
         </ResponsiveLineStackLayout>
-        <ResponsiveLineStackLayout noMargin expand>
+        <ResponsiveLineStackLayout noMargin expand noResponsiveLandscape>
           <TextField
             floatingLabelText={<Trans>X offset (in pixels)</Trans>}
             fullWidth
@@ -138,7 +138,7 @@ export default function SetupGridDialog(props: Props) {
             }
           />
         </ResponsiveLineStackLayout>
-        <ResponsiveLineStackLayout noMargin expand>
+        <ResponsiveLineStackLayout noMargin expand noResponsiveLandscape>
           <Checkbox
             checked={props.instancesEditorSettings.gridType === 'isometric'}
             label={<Trans>Isometric</Trans>}

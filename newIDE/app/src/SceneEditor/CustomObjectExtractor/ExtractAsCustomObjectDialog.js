@@ -187,7 +187,7 @@ export default function ExtractAsCustomObjectDialog({
                 </Trans>
               </AlertMessage>
             ) : null}
-            <ResponsiveLineStackLayout noMargin expand>
+            <ResponsiveLineStackLayout noMargin expand noResponsiveLandscape>
               <SelectField
                 floatingLabelText={
                   <Trans>Extension (storing the custom object)</Trans>

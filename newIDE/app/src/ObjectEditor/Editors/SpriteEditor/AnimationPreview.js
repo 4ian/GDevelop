@@ -255,7 +255,7 @@ const AnimationPreview = ({
       {!deactivateControls && (
         // Column used to not have the expand behavior when responsive line stack layout is a column
         <Column noMargin>
-          <ResponsiveLineStackLayout alignItems="center">
+          <ResponsiveLineStackLayout alignItems="center" noResponsiveLandscape>
             <LineStackLayout
               alignItems="center"
               justifyContent="center"

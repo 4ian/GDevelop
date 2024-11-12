@@ -791,7 +791,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
         ) : null}
         {openedAssetPack && (
           <Column>
-            <ResponsiveLineStackLayout>
+            <ResponsiveLineStackLayout noResponsiveLandscape>
               {packMainImageUrl && (
                 <div style={styles.previewImageContainer}>
                   <CorsAwareImage

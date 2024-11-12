@@ -58,7 +58,12 @@ export const EducationCard = ({ onSeeResources, unlocked }: Props) => {
         />
       )}
     >
-      <ResponsiveLineStackLayout noMargin expand alignItems="stretch">
+      <ResponsiveLineStackLayout
+        noMargin
+        expand
+        alignItems="stretch"
+        noResponsiveLandscape
+      >
         <ColumnStackLayout alignItems="flex-start" expand noMargin>
           <Text noMargin size="block-title">
             <Trans>Content for Teachers</Trans>

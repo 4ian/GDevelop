@@ -336,7 +336,7 @@ export const PromoBundleCard = ({
               border: `2px solid ${gdevelopTheme.palette.secondary}`,
             }}
           >
-            <ResponsiveLineStackLayout expand noMargin>
+            <ResponsiveLineStackLayout expand noMargin noResponsiveLandscape>
               <div style={styles.promoImageContainer}>
                 <CorsAwareImage
                   key={productListingData.name}

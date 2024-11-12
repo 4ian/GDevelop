@@ -8,8 +8,13 @@ import { useResponsiveWindowSize } from './Responsive/ResponsiveWindowMeasurer';
  * Same interface as FlatButton.
  */
 const ResponsiveFlatButton = (props: FlatButtonProps) => {
-  const { isMobile } = useResponsiveWindowSize();
-  return <FlatButton {...props} label={isMobile ? '' : props.label} />;
+  const { isMobile, isLandscape } = useResponsiveWindowSize();
+  return (
+    <FlatButton
+      {...props}
+      label={isMobile && !isLandscape ? '' : props.label}
+    />
+  );
 };
 
 export default ResponsiveFlatButton;

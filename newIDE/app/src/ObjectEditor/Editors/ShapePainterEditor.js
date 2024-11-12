@@ -49,7 +49,7 @@ export default class PanelSpriteEditor extends React.Component<
             this.forceUpdate();
           }}
         />
-        <ResponsiveLineStackLayout noMargin>
+        <ResponsiveLineStackLayout noMargin noResponsiveLandscape>
           <ColorField
             floatingLabelText={<Trans>Outline color</Trans>}
             disableAlpha
@@ -93,7 +93,7 @@ export default class PanelSpriteEditor extends React.Component<
             }}
           />
         </ResponsiveLineStackLayout>
-        <ResponsiveLineStackLayout noMargin>
+        <ResponsiveLineStackLayout noMargin noResponsiveLandscape>
           <ColorField
             floatingLabelText={<Trans>Fill color</Trans>}
             disableAlpha
@@ -124,7 +124,11 @@ export default class PanelSpriteEditor extends React.Component<
             }}
           />
         </ResponsiveLineStackLayout>
-        <ResponsiveLineStackLayout alignItems="center" noMargin>
+        <ResponsiveLineStackLayout
+          alignItems="center"
+          noMargin
+          noResponsiveLandscape
+        >
           <SelectField
             floatingLabelText={<Trans>Anti-aliasing</Trans>}
             value={shapePainterConfiguration.getAntialiasing()}

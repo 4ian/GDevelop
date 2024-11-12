@@ -116,6 +116,7 @@ const PlanSmallCard = (props: Props) => {
               </Line>
               {props.actions && (
                 <ResponsiveLineStackLayout
+                  noResponsiveLandscape
                   expand
                   noMargin
                   alignItems="center"

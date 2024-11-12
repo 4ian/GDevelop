@@ -39,7 +39,7 @@ export default class TiledSpriteEditor extends React.Component<
           }}
           floatingLabelText={<Trans>Select an image</Trans>}
         />
-        <ResponsiveLineStackLayout noMargin>
+        <ResponsiveLineStackLayout noMargin noResponsiveLandscape>
           <SemiControlledTextField
             commitOnBlur
             floatingLabelText={<Trans>Default width (in pixels)</Trans>}

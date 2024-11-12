@@ -329,7 +329,7 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
               </LineStackLayout>
             </Column>
           </Line>
-          <ResponsiveLineStackLayout noMargin>
+          <ResponsiveLineStackLayout noMargin noResponsiveLandscape>
             <Column alignItems="center" justifyContent="center">
               {assetShortHeader.objectType !== 'sprite' ? (
                 <div style={styles.previewBackground}>

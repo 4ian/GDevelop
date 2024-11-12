@@ -536,6 +536,7 @@ const SpineEditor = ({
               <ResponsiveLineStackLayout
                 justifyContent="space-between"
                 noColumnMargin
+                noResponsiveLandscape
               >
                 <FlatButton
                   label={<Trans>Scan missing animations</Trans>}

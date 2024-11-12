@@ -132,11 +132,15 @@ export function ExampleDialog({
             </Trans>
           </AlertMessage>
         )}
-        <ResponsiveLineStackLayout alignItems="center" noMargin>
+        <ResponsiveLineStackLayout
+          alignItems="center"
+          noMargin
+          noResponsiveLandscape
+        >
           {hasIcon ? (
             <ExampleThumbnailOrIcon exampleShortHeader={exampleShortHeader} />
           ) : null}
-          <Column noMargin>
+          <Column expand>
             {
               <Line>
                 <div style={{ flexWrap: 'wrap' }}>

@@ -92,7 +92,7 @@ export const LoadingScreenEditor = ({
             <Trans>Branding</Trans>
           </Text>
           <ColumnStackLayout noMargin>
-            <ResponsiveLineStackLayout noMargin>
+            <ResponsiveLineStackLayout noResponsiveLandscape noMargin>
               <Column expand noMargin justifyContent="center">
                 <Checkbox
                   label={
@@ -147,7 +147,7 @@ export const LoadingScreenEditor = ({
               </Column>
             </ResponsiveLineStackLayout>
 
-            <ResponsiveLineStackLayout noMargin>
+            <ResponsiveLineStackLayout noResponsiveLandscape noMargin>
               <Column expand noMargin justifyContent="center">
                 <Checkbox
                   label={
@@ -267,7 +267,7 @@ export const LoadingScreenEditor = ({
               }}
             />
           </Line>
-          <ResponsiveLineStackLayout noMargin>
+          <ResponsiveLineStackLayout noResponsiveLandscape noMargin>
             <ColorField
               fullWidth
               floatingLabelText={<Trans>Background color</Trans>}
@@ -318,7 +318,7 @@ export const LoadingScreenEditor = ({
               onUpdate();
             }}
           />
-          <ResponsiveLineStackLayout noMargin>
+          <ResponsiveLineStackLayout noResponsiveLandscape noMargin>
             <SemiControlledTextField
               floatingLabelText={<Trans>Progress bar minimum width</Trans>}
               fullWidth
@@ -382,7 +382,7 @@ export const LoadingScreenEditor = ({
               helperMarkdownText={i18n._(t`In pixels. 0 to ignore.`)}
             />
           </ResponsiveLineStackLayout>
-          <ResponsiveLineStackLayout noMargin>
+          <ResponsiveLineStackLayout noResponsiveLandscape noMargin>
             <SemiControlledTextField
               floatingLabelText={<Trans>Progress bar height</Trans>}
               fullWidth
@@ -453,7 +453,7 @@ export const LoadingScreenEditor = ({
               t`When previewing the game in the editor, this duration is ignored (the game preview starts as soon as possible).`
             )}
           />
-          <ResponsiveLineStackLayout noMargin>
+          <ResponsiveLineStackLayout noResponsiveLandscape noMargin>
             <SemiControlledTextField
               floatingLabelText={
                 loadingScreen.isGDevelopLogoShownDuringLoadingScreen() ? (

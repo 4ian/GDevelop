@@ -118,7 +118,7 @@ const EducationCurriculumLesson = ({
   isLocked,
   onClickSubscribe,
 }: Props) => {
-  const { isMobile } = useResponsiveWindowSize();
+  const { isMobile, isLandscape } = useResponsiveWindowSize();
   const [isImageLoaded, setIsImageLoaded] = React.useState<boolean>(false);
   const isLessonLocked =
     isLocked ||
@@ -149,12 +149,13 @@ const EducationCurriculumLesson = ({
         noColumnMargin
         noMargin
         expand
+        noResponsiveLandscape
       >
-        {isMobile && title}
+        {isMobile && !isLandscape && title}
         <div
           style={{
             ...styles.imageContainer,
-            ...(isMobile
+            ...(isMobile && !isLandscape
               ? styles.mobileImageContainer
               : styles.desktopImageContainer),
           }}
@@ -180,9 +181,10 @@ const EducationCurriculumLesson = ({
           <div style={{ ...styles.textContainer, opacity: isLocked ? 0.6 : 1 }}>
             <ColumnStackLayout justifyContent="space-between" noMargin expand>
               <ColumnStackLayout noMargin expand>
-                {!isMobile && title}
+                {!isMobile && !isLandscape && title}
                 {gameLink &&
                   isMobile &&
+                  !isLandscape &&
                   !isUpcomingMessage &&
                   !isLessonLocked && (
                     <FlatButton
@@ -216,9 +218,9 @@ const EducationCurriculumLesson = ({
                   noMargin
                   alignItems="center"
                   justifyContent={gameLink ? 'space-between' : 'flex-end'}
-                  expand={isMobile}
+                  expand={isMobile && !isLandscape}
                 >
-                  {gameLink && !isMobile && (
+                  {gameLink && !(isMobile && !isLandscape) && (
                     <FlatButton
                       primary
                       leftIcon={<Play fontSize="small" />}
@@ -229,19 +231,19 @@ const EducationCurriculumLesson = ({
                   <LineStackLayout
                     noMargin
                     alignItems="center"
-                    expand={isMobile}
+                    expand={isMobile && !isLandscape}
                   >
                     {onOpenTemplateFromTutorial && (
                       <FlatButton
                         primary
-                        fullWidth={isMobile}
+                        fullWidth={isMobile && !isLandscape}
                         label={<Trans>Open project</Trans>}
                         onClick={onOpenTemplateFromTutorial}
                       />
                     )}
                     <RaisedButton
                       primary
-                      fullWidth={isMobile}
+                      fullWidth={isMobile && !isLandscape}
                       disabled={isLessonLocked}
                       label={<Trans>Open lesson</Trans>}
                       onClick={() => onSelectTutorial(tutorial)}
@@ -255,7 +257,7 @@ const EducationCurriculumLesson = ({
             <RaisedButton
               primary
               icon={<ShinyCrown fontSize="small" />}
-              fullWidth={isMobile}
+              fullWidth={isMobile && !isLandscape}
               label={<Trans>Get lesson with Edu</Trans>}
               onClick={onClickSubscribe}
             />

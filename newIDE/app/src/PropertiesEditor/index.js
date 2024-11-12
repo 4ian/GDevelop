@@ -516,7 +516,10 @@ const PropertiesEditor = ({
   const renderContainer =
     mode === 'row'
       ? (fields: React.Node) => (
-          <ResponsiveLineStackLayout noMargin>
+          <ResponsiveLineStackLayout
+            noMargin
+            noResponsiveLandscape={Array.isArray(fields) && fields.length <= 3}
+          >
             {fields}
           </ResponsiveLineStackLayout>
         )

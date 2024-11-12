@@ -61,6 +61,7 @@ const CreditsStatusBanner = ({
           alignItems="center"
           justifyContent="space-between"
           noMargin
+          noResponsiveLandscape
         >
           <Column>
             <LineStackLayout alignItems="flex-end" noMargin>

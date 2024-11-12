@@ -109,7 +109,7 @@ const Cube3DEditor = ({
       <Text size="block-title" noMargin>
         <Trans>Default size</Trans>
       </Text>
-      <ResponsiveLineStackLayout expand noColumnMargin>
+      <ResponsiveLineStackLayout expand noColumnMargin noResponsiveLandscape>
         {['width', 'height', 'depth'].map(propertyName => {
           const property = properties.get(propertyName);
           const measurementUnit = property.getMeasurementUnit();

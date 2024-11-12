@@ -71,7 +71,7 @@ const SpriteSelector = ({
 
   return (
     <React.Fragment>
-      <ResponsiveLineStackLayout noColumnMargin>
+      <ResponsiveLineStackLayout noColumnMargin noResponsiveLandscape>
         <SelectField
           fullWidth
           floatingLabelText={<Trans>Animation</Trans>}

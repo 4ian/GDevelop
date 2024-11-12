@@ -8,8 +8,13 @@ import { useResponsiveWindowSize } from './Responsive/ResponsiveWindowMeasurer';
  * Same interface as RaisedButton.
  */
 const ResponsiveRaisedButton = (props: RaisedButtonProps) => {
-  const { isMobile } = useResponsiveWindowSize();
-  return <RaisedButton {...props} label={isMobile ? '' : props.label} />;
+  const { isMobile, isLandscape } = useResponsiveWindowSize();
+  return (
+    <RaisedButton
+      {...props}
+      label={isMobile && !isLandscape ? '' : props.label}
+    />
+  );
 };
 
 export default ResponsiveRaisedButton;

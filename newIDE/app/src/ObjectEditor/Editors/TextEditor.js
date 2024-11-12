@@ -66,7 +66,11 @@ export default class TextEditor extends React.Component<EditorProps, void> {
     return (
       <ColumnStackLayout noMargin>
         {renderObjectNameField && renderObjectNameField()}
-        <ResponsiveLineStackLayout noMargin alignItems="center">
+        <ResponsiveLineStackLayout
+          noResponsiveLandscape
+          noMargin
+          alignItems="center"
+        >
           <Line noMargin alignItems="center">
             <MiniToolbarText firstChild>
               <Trans>Size:</Trans>
@@ -244,7 +248,11 @@ export default class TextEditor extends React.Component<EditorProps, void> {
             this.forceUpdate();
           }}
         />
-        <ResponsiveLineStackLayout noMargin noColumnMargin>
+        <ResponsiveLineStackLayout
+          noResponsiveLandscape
+          noMargin
+          noColumnMargin
+        >
           <Column noMargin expand>
             <ColorField
               floatingLabelText={<Trans>Color</Trans>}
@@ -285,7 +293,11 @@ export default class TextEditor extends React.Component<EditorProps, void> {
             this.forceUpdate();
           }}
         />
-        <ResponsiveLineStackLayout noMargin noColumnMargin>
+        <ResponsiveLineStackLayout
+          noResponsiveLandscape
+          noMargin
+          noColumnMargin
+        >
           <Column noMargin expand>
             <SemiControlledTextField
               floatingLabelFixed
@@ -315,7 +327,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
             />
           </Column>
         </ResponsiveLineStackLayout>
-        <ResponsiveLineStackLayout noMargin>
+        <ResponsiveLineStackLayout noResponsiveLandscape noMargin>
           <Column noMargin expand>
             <ColorField
               floatingLabelText={<Trans>Color</Trans>}

@@ -152,6 +152,7 @@ export default function SpriteEditor({
             <ResponsiveLineStackLayout
               justifyContent="space-between"
               noColumnMargin
+              noResponsiveLandscape
             >
               {!isMobile ? ( // On mobile, use only 1 button to gain space.
                 <ResponsiveLineStackLayout noMargin noColumnMargin>

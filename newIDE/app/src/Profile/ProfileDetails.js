@@ -3,7 +3,7 @@ import { Trans, t } from '@lingui/macro';
 
 import * as React from 'react';
 import Avatar from '@material-ui/core/Avatar';
-import { Column } from '../UI/Grid';
+import { Column, Line } from '../UI/Grid';
 import {
   ColumnStackLayout,
   LineStackLayout,
@@ -187,10 +187,10 @@ const ProfileDetails = ({
   return (
     <I18n>
       {({ i18n }) => (
-        <ResponsiveLineStackLayout>
+        <ResponsiveLineStackLayout noResponsiveLandscape>
           <Avatar src={getGravatarUrl(email || '', { size: 40 })} />
           <ColumnStackLayout noMargin expand>
-            <ResponsiveLineStackLayout justifyContent="space-between" noMargin>
+            <Line justifyContent="space-between" noMargin>
               <Text
                 size="block-title"
                 allowBrowserAutoTranslate={!profile.username}
@@ -201,7 +201,7 @@ const ProfileDetails = ({
                 {profile.username ||
                   i18n._(t`Edit your profile to pick a username!`)}
               </Text>
-            </ResponsiveLineStackLayout>
+            </Line>
             {email && (
               <Column noMargin>
                 <Text noMargin size="body-small">
@@ -368,7 +368,11 @@ const ProfileDetails = ({
                 </Column>
               </ColumnStackLayout>
             )}
-            <ResponsiveLineStackLayout justifyContent="flex-start" noMargin>
+            <ResponsiveLineStackLayout
+              justifyContent="flex-start"
+              noMargin
+              noResponsiveLandscape
+            >
               <RaisedButton
                 label={<Trans>Edit my profile</Trans>}
                 primary

@@ -463,6 +463,55 @@ namespace gdjs {
       }
       return particleTexture;
     }
+
+    /**
+     * To be called when the game is disposed.
+     * Clear caches of loaded textures and materials.
+     */
+    dispose(): void {
+      this._loadedTextures.clear();
+
+      const threeTextures: THREE.Texture[] = [];
+      this._loadedThreeTextures.values(threeTextures);
+      this._loadedThreeTextures.clear();
+      for (const threeTexture of threeTextures) {
+        threeTexture.dispose();
+      }
+
+      const threeMaterials: THREE.Material[] = [];
+      this._loadedThreeMaterials.values(threeMaterials);
+      this._loadedThreeMaterials.clear();
+      for (const threeMaterial of threeMaterials) {
+        threeMaterial.dispose();
+      }
+
+      for (const pixiTexture of this._diskTextures.values()) {
+        if (pixiTexture.destroyed) {
+          continue;
+        }
+
+        pixiTexture.destroy();
+      }
+      this._diskTextures.clear();
+
+      for (const pixiTexture of this._rectangleTextures.values()) {
+        if (pixiTexture.destroyed) {
+          continue;
+        }
+
+        pixiTexture.destroy();
+      }
+      this._rectangleTextures.clear();
+
+      for (const pixiTexture of this._scaledTextures.values()) {
+        if (pixiTexture.destroyed) {
+          continue;
+        }
+
+        pixiTexture.destroy();
+      }
+      this._scaledTextures.clear();
+    }
   }
 
   //Register the class to let the engine use it.

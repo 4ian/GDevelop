@@ -455,6 +455,16 @@ namespace gdjs {
     }
 
     /**
+     * To be called when the game is disposed.
+     * Dispose all the resource managers.
+     */
+    dispose(): void {
+      for (const resourceManager of this._resourceManagersMap.values()) {
+        resourceManager.dispose();
+      }
+    }
+
+    /**
      * Put a given scene at the end of the queue.
      *
      * When the scene that is currently loading in background is done,

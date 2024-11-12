@@ -30,7 +30,7 @@ module.exports = {
       .setTags('physics, gravity, obstacle, collision');
     extension
       .addInstructionOrExpressionGroupMetadata(_('3D Physics Engine'))
-      .setIcon('res/physics32.png');
+      .setIcon('res/physics3d.svg');
 
     const behavior = new gd.BehaviorJsImplementation();
     behavior.updateProperty = function (
@@ -529,7 +529,7 @@ module.exports = {
           'Simulate realistic object physics with gravity, forces, joints, etc.'
         ),
         '',
-        'res/physics32.png',
+        'res/physics3d.svg',
         'Physics3DBehavior',
         //@ts-ignore The class hierarchy is incorrect leading to a type error, but this is valid.
         behavior,
@@ -548,7 +548,7 @@ module.exports = {
         _('World scale'),
         _('Return the world scale.'),
         _('Global'),
-        'res/physics32.png'
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -567,7 +567,7 @@ module.exports = {
         _('the world gravity on X axis'),
         _('the world gravity on X axis'),
         _('Global'),
-        'res/physics32.png'
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -592,7 +592,7 @@ module.exports = {
         _('the world gravity on Y axis'),
         _('the world gravity on Y axis'),
         _('Global'),
-        'res/physics32.png'
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -617,7 +617,7 @@ module.exports = {
         _('the world gravity on Z axis'),
         _('the world gravity on Z axis'),
         _('Global'),
-        'res/physics32.png'
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -637,8 +637,8 @@ module.exports = {
         _('Check if an object is dynamic.'),
         _('_PARAM0_ is dynamic'),
         _('Dynamics'),
-        'res/physics32.png',
-        'res/physics32.png'
+        'res/physics3d.svg',
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -652,8 +652,8 @@ module.exports = {
         _('Check if an object is static.'),
         _('_PARAM0_ is static'),
         _('Dynamics'),
-        'res/physics32.png',
-        'res/physics32.png'
+        'res/physics3d.svg',
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -667,8 +667,8 @@ module.exports = {
         _('Check if an object is kinematic.'),
         _('_PARAM0_ is kinematic'),
         _('Dynamics'),
-        'res/physics32.png',
-        'res/physics32.png'
+        'res/physics3d.svg',
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -682,8 +682,8 @@ module.exports = {
         _('Check if an object is being treat as a bullet.'),
         _('_PARAM0_ is bullet'),
         _('Dynamics'),
-        'res/physics32.png',
-        'res/physics32.png'
+        'res/physics3d.svg',
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -699,8 +699,8 @@ module.exports = {
         ),
         _('Treat _PARAM0_ as bullet: _PARAM2_'),
         _('Dynamics'),
-        'res/physics32.png',
-        'res/physics32.png'
+        'res/physics3d.svg',
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -716,8 +716,8 @@ module.exports = {
         _('Check if an object has fixed rotation.'),
         _('_PARAM0_ has fixed rotation'),
         _('Dynamics'),
-        'res/physics32.png',
-        'res/physics32.png'
+        'res/physics3d.svg',
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -733,8 +733,8 @@ module.exports = {
         ),
         _('Set _PARAM0_ fixed rotation: _PARAM2_'),
         _('Dynamics'),
-        'res/physics32.png',
-        'res/physics32.png'
+        'res/physics3d.svg',
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -753,8 +753,8 @@ module.exports = {
         ),
         _('the shape scale'),
         _('Body settings'),
-        'res/physics32.png',
-        'res/physics32.png'
+        'res/physics3d.svg',
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -778,7 +778,7 @@ module.exports = {
         ),
         _('the density'),
         _('Body settings'),
-        'res/physics32.png'
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -796,7 +796,7 @@ module.exports = {
         ),
         _('the friction'),
         _('Body settings'),
-        'res/physics32.png'
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -814,7 +814,7 @@ module.exports = {
         ),
         _('the restitution'),
         _('Body settings'),
-        'res/physics32.png'
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -832,7 +832,7 @@ module.exports = {
         ),
         _('the linear damping'),
         _('Body settings'),
-        'res/physics32.png'
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -850,7 +850,7 @@ module.exports = {
         ),
         _('the angular damping'),
         _('Body settings'),
-        'res/physics32.png'
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -868,7 +868,7 @@ module.exports = {
         ),
         _('the gravity scale'),
         _('Body settings'),
-        'res/physics32.png'
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -889,8 +889,8 @@ module.exports = {
         _('Check if an object has a specific layer enabled.'),
         _('_PARAM0_ has layer _PARAM2_ enabled'),
         _('Filtering'),
-        'res/physics32.png',
-        'res/physics32.png'
+        'res/physics3d.svg',
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -907,8 +907,8 @@ module.exports = {
         ),
         _('Enable layer _PARAM2_ for _PARAM0_: _PARAM3_'),
         _('Filtering'),
-        'res/physics32.png',
-        'res/physics32.png'
+        'res/physics3d.svg',
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -925,8 +925,8 @@ module.exports = {
         _('Check if an object has a specific mask enabled.'),
         _('_PARAM0_ has mask _PARAM2_ enabled'),
         _('Filtering'),
-        'res/physics32.png',
-        'res/physics32.png'
+        'res/physics3d.svg',
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -943,8 +943,8 @@ module.exports = {
         ),
         _('Enable mask _PARAM2_ for _PARAM0_: _PARAM3_'),
         _('Filtering'),
-        'res/physics32.png',
-        'res/physics32.png'
+        'res/physics3d.svg',
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -963,7 +963,7 @@ module.exports = {
         _('the object linear velocity on X.'),
         _('the linear velocity on X'),
         _('Velocity'),
-        'res/physics32.png'
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -984,7 +984,7 @@ module.exports = {
         _('the object linear velocity on Y.'),
         _('the linear velocity on Y'),
         _('Velocity'),
-        'res/physics32.png'
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1005,7 +1005,7 @@ module.exports = {
         _('the object linear velocity on Z.'),
         _('the linear velocity on Z'),
         _('Velocity'),
-        'res/physics32.png'
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1026,7 +1026,7 @@ module.exports = {
         _('the object linear velocity length.'),
         _('the linear velocity length'),
         _('Velocity'),
-        'res/physics32.png'
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1050,8 +1050,8 @@ module.exports = {
           'Apply a force of _PARAM2_ ; _PARAM3_ ; _PARAM4_ to _PARAM0_ at _PARAM5_ ; _PARAM6_ ; _PARAM7_'
         ),
         _('Forces & impulses'),
-        'res/physics32.png',
-        'res/physics32.png'
+        'res/physics3d.svg',
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1083,8 +1083,8 @@ module.exports = {
           'Apply a force of _PARAM2_ ; _PARAM3_ ; _PARAM4_ at the center of _PARAM0_'
         ),
         _('Forces & impulses'),
-        'res/physics32.png',
-        'res/physics32.png'
+        'res/physics3d.svg',
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1108,8 +1108,8 @@ module.exports = {
           'Apply to _PARAM0_ a force of length _PARAM2_ towards _PARAM3_ ; _PARAM4_ ; _PARAM5_'
         ),
         _('Forces & impulses'),
-        'res/physics32.png',
-        'res/physics32.png'
+        'res/physics3d.svg',
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1134,8 +1134,8 @@ module.exports = {
           'Apply an impulse of _PARAM2_ ; _PARAM3_ ; _PARAM4_ to _PARAM0_ at _PARAM5_ ; _PARAM6_ ; _PARAM7_'
         ),
         _('Forces & impulses'),
-        'res/physics32.png',
-        'res/physics32.png'
+        'res/physics3d.svg',
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1167,8 +1167,8 @@ module.exports = {
           'Apply an impulse of _PARAM2_ ; _PARAM3_ ; _PARAM4_ at the center of _PARAM0_'
         ),
         _('Forces & impulses'),
-        'res/physics32.png',
-        'res/physics32.png'
+        'res/physics3d.svg',
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1192,8 +1192,8 @@ module.exports = {
           'Apply to _PARAM0_ an impulse of length _PARAM2_ towards _PARAM3_ ; _PARAM4_ ; _PARAM5_'
         ),
         _('Forces & impulses'),
-        'res/physics32.png',
-        'res/physics32.png'
+        'res/physics3d.svg',
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1216,8 +1216,8 @@ module.exports = {
         ),
         _('Apply a torque of _PARAM2_ ; _PARAM3_ ; _PARAM4_ to _PARAM0_ an'),
         _('Forces & impulses'),
-        'res/physics32.png',
-        'res/physics32.png'
+        'res/physics3d.svg',
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1241,8 +1241,8 @@ module.exports = {
           'Apply angular impulse of _PARAM2_ ; _PARAM3_ ; _PARAM4_ to _PARAM0_ an'
         ),
         _('Forces & impulses'),
-        'res/physics32.png',
-        'res/physics32.png'
+        'res/physics3d.svg',
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1263,7 +1263,7 @@ module.exports = {
         _('Mass'),
         _('Return the mass of the object (in kilograms)'),
         '',
-        'res/physics32.png'
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1278,7 +1278,7 @@ module.exports = {
           'Return the inertia around X axis of the object (in kilograms · meters²) when for its default rotation is (0°; 0°; 0°)'
         ),
         '',
-        'res/physics32.png'
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1293,7 +1293,7 @@ module.exports = {
           'Return the inertia around Y axis of the object (in kilograms · meters²) when for its default rotation is (0°; 0°; 0°)'
         ),
         '',
-        'res/physics32.png'
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1308,7 +1308,7 @@ module.exports = {
           'Return the inertia around Z axis of the object (in kilograms · meters²) when for its default rotation is (0°; 0°; 0°)'
         ),
         '',
-        'res/physics32.png'
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1321,7 +1321,7 @@ module.exports = {
         _('Mass center X'),
         _('Mass center X'),
         '',
-        'res/physics32.png'
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1334,7 +1334,7 @@ module.exports = {
         _('Mass center Y'),
         _('Mass center Y'),
         '',
-        'res/physics32.png'
+        'res/physics3d.svg'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1349,8 +1349,8 @@ module.exports = {
         _('Check if two objects collide.'),
         _('_PARAM0_ is colliding with _PARAM2_'),
         '',
-        'res/physics32.png',
-        'res/physics32.png'
+        'res/physics3d.svg',
+        'res/physics3d.svg'
       )
       .addParameter('objectList', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1371,8 +1371,8 @@ module.exports = {
         _('Check if two objects just started colliding during this frame.'),
         _('_PARAM0_ started colliding with _PARAM2_'),
         _('Collision'),
-        'res/physics32.png',
-        'res/physics32.png'
+        'res/physics3d.svg',
+        'res/physics3d.svg'
       )
       .addParameter('objectList', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1393,8 +1393,8 @@ module.exports = {
         _('Check if two objects just stopped colliding at this frame.'),
         _('_PARAM0_ stopped colliding with _PARAM2_'),
         _('Collision'),
-        'res/physics32.png',
-        'res/physics32.png'
+        'res/physics3d.svg',
+        'res/physics3d.svg'
       )
       .addParameter('objectList', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')

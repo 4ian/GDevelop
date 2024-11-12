@@ -193,7 +193,7 @@ const MainPage = ({
     {
       title: <Trans>Discord</Trans>,
       description: <Trans>Join the discussion</Trans>,
-      action: () => Window.openExternalURL('https://forum.gdevelop.io'),
+      action: () => Window.openExternalURL('https://discord.gg/gdevelop'),
     },
   ].filter(Boolean);
 

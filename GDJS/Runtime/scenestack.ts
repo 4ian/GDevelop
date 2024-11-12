@@ -11,6 +11,7 @@ namespace gdjs {
     _wasFirstSceneLoaded: boolean = false;
     _isNextLayoutLoading: boolean = false;
     _sceneStackSyncDataToApply: SceneStackNetworkSyncData | null = null;
+    _wasDisposed: boolean = false;
 
     /**
      * @param runtimeGame The runtime game that is using the scene stack
@@ -34,6 +35,7 @@ namespace gdjs {
     }
 
     step(elapsedTime: float): boolean {
+      this._throwIfDisposed();
       if (this._isNextLayoutLoading || this._stack.length === 0) {
         return false;
       }
@@ -74,6 +76,8 @@ namespace gdjs {
     }
 
     renderWithoutStep(): boolean {
+      this._throwIfDisposed();
+
       if (this._stack.length === 0) {
         return false;
       }
@@ -83,6 +87,8 @@ namespace gdjs {
     }
 
     pop(popCount = 1): void {
+      this._throwIfDisposed();
+
       let hasDoneAnyChanges = false;
       for (let i = 0; i < popCount; ++i) {
         if (this._stack.length <= 1) {
@@ -115,6 +121,8 @@ namespace gdjs {
       newSceneName: string,
       externalLayoutName?: string
     ): gdjs.RuntimeScene | null {
+      this._throwIfDisposed();
+
       // Tell the scene it's being paused
       const currentScene = this._stack[this._stack.length - 1];
       if (currentScene) {
@@ -139,6 +147,8 @@ namespace gdjs {
       newSceneName: string,
       externalLayoutName?: string
     ): gdjs.RuntimeScene {
+      this._throwIfDisposed();
+
       // Load the new one
       const newScene = new gdjs.RuntimeScene(this._runtimeGame);
       newScene.loadFromScene(
@@ -171,6 +181,7 @@ namespace gdjs {
      * If `clear` is set to true, all running scenes are also removed from the stack of scenes.
      */
     replace(newSceneName: string, clear?: boolean): gdjs.RuntimeScene | null {
+      this._throwIfDisposed();
       if (!!clear) {
         // Unload all the scenes
         while (this._stack.length !== 0) {
@@ -195,6 +206,7 @@ namespace gdjs {
      * Return the current gdjs.RuntimeScene being played, or null if none is run.
      */
     getCurrentScene(): gdjs.RuntimeScene | null {
+      this._throwIfDisposed();
       if (this._stack.length === 0) {
         return null;
       }
@@ -209,6 +221,7 @@ namespace gdjs {
     }
 
     getAllSceneNames(): Array<string> {
+      this._throwIfDisposed();
       return this._stack.map((scene) => scene.getName());
     }
 
@@ -248,6 +261,7 @@ namespace gdjs {
     }
 
     applyUpdateFromNetworkSyncDataIfAny(): boolean {
+      this._throwIfDisposed();
       const sceneStackSyncData = this._sceneStackSyncDataToApply;
       let hasMadeChangeToStack = false;
       if (!sceneStackSyncData) return hasMadeChangeToStack;
@@ -355,7 +369,7 @@ namespace gdjs {
       return hasMadeChangeToStack;
     }
 
-    /*
+    /**
      * Unload all the scenes and clear the stack.
      */
     dispose(): void {
@@ -364,6 +378,13 @@ namespace gdjs {
       }
 
       this._stack.length = 0;
+      this._wasDisposed = true;
+    }
+
+    private _throwIfDisposed(): void {
+      if (this._wasDisposed) {
+        throw 'The scene stack has been disposed and should not be used anymore.';
+      }
     }
   }
 }

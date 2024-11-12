@@ -62,10 +62,10 @@ const TeamProvider = ({ children }: Props) => {
       const fetchTeam = async () => {
         if (
           !adminUserId ||
-          !(
-            // This boolean could be memoized but it is useful to refresh
-            // team data when limits are updated (for example when the Profile
-            // dialog is open).
+          !// This boolean could be memoized but it is useful to refresh
+          // team data when limits are updated (for example when the Profile
+          // dialog is open).
+          (
             limits &&
             limits.capabilities.classrooms &&
             limits.capabilities.classrooms.showClassroomTab

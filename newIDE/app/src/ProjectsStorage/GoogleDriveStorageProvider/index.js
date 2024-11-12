@@ -4,11 +4,9 @@ import * as React from 'react';
 import {
   type StorageProvider,
   type FileMetadata,
-  type SaveAsLocation,
 } from '../index';
 import { serializeToJSON } from '../../Utils/Serializer';
 import GoogleDrive from '../../UI/CustomSvgIcons/GoogleDrive';
-import GoogleDriveSaveAsDialog from './GoogleDriveSaveAsDialog';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { type AppArguments } from '../../Utils/Window';
 import { loadScript } from '../../Utils/LoadScript';
@@ -280,6 +278,7 @@ const showFilePicker = ({
 export default ({
   internalName: 'GoogleDrive',
   name: t`Google Drive`,
+  hiddenInSaveDialog: true,
   renderIcon: props => <GoogleDrive fontSize={props.size} />,
   getFileMetadataFromAppArguments: (appArguments: AppArguments) => {
     if (appArguments.state) {
@@ -391,70 +390,6 @@ export default ({
             wasSaved: true,
             fileMetadata: newFileMetadata,
           }));
-      },
-      onChooseSaveProjectAsLocation: ({
-        project,
-        fileMetadata,
-      }: {|
-        project: gdProject,
-        fileMetadata: ?FileMetadata,
-      |}) => {
-        return new Promise(resolve => {
-          setDialog(() => (
-            <GoogleDriveSaveAsDialog
-              onShowFilePicker={showFilePicker}
-              onCancel={() => {
-                closeDialog();
-                resolve({ saveAsLocation: null });
-              }}
-              onSave={async ({ selectedFileOrFolder, newFileName }) => {
-                await authenticate();
-                if (selectedFileOrFolder.type === 'FOLDER') {
-                  const newFileId = await createNewJsonFile(
-                    selectedFileOrFolder.id,
-                    newFileName
-                  );
-                  resolve({
-                    saveAsLocation: {
-                      fileIdentifier: newFileId,
-                    },
-                  });
-                } else {
-                  resolve({
-                    saveAsLocation: {
-                      fileIdentifier: selectedFileOrFolder.id,
-                    },
-                  });
-                }
-              }}
-            />
-          ));
-        });
-      },
-      onSaveProjectAs: async (
-        project: gdProject,
-        saveAsLocation: ?SaveAsLocation,
-        options
-      ) => {
-        if (!saveAsLocation)
-          throw new Error('A location was not chosen before saving as.');
-        const { fileIdentifier } = saveAsLocation;
-        if (!fileIdentifier)
-          throw new Error('A file was not chosen before saving as.');
-
-        const content = serializeToJSON(project);
-        options.onStartSaving();
-
-        const googleUser = await authenticate();
-        const newFileMetadata = { fileIdentifier };
-        await options.onMoveResources({ newFileMetadata });
-        await patchJsonFile(fileIdentifier, googleUser, content);
-
-        closeDialog();
-        return {
-          wasSaved: true,
-          fileMetadata: newFileMetadata,
-        };
       },
       getOpenErrorMessage: (error: Error): MessageDescriptor => {
         if (!apisLoaded) {

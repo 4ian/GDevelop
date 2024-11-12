@@ -3,59 +3,31 @@ import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import Text from '../../../../UI/Text';
-import { ColumnStackLayout, LineStackLayout } from '../../../../UI/Layout';
+import { ColumnStackLayout } from '../../../../UI/Layout';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import { useOnlineStatus } from '../../../../Utils/OnlineStatus';
 import TreeLeaves from '../../../../UI/CustomSvgIcons/TreeLeaves';
 import SectionContainer from '../SectionContainer';
-import JewelPlatform from '../../../../UI/CustomSvgIcons/JewelPlatform';
 import RaisedButton from '../../../../UI/RaisedButton';
-import FlatButton from '../../../../UI/FlatButton';
 import useForceUpdate from '../../../../Utils/UseForceUpdate';
-import { Column, LargeSpacer, Line } from '../../../../UI/Grid';
-import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
+import { LargeSpacer, Line } from '../../../../UI/Grid';
 import CircularProgress from '../../../../UI/CircularProgress';
-import BackgroundText from '../../../../UI/BackgroundText';
-import {
-  type UsernameAvailability,
-  type UserSurvey as UserSurveyType,
-} from '../../../../Utils/GDevelopServices/User';
+import { type UserSurvey as UserSurveyType } from '../../../../Utils/GDevelopServices/User';
 import UserSurvey from './UserSurvey';
 import {
   clearUserSurveyPersistedState,
   hasStartedUserSurvey,
 } from './UserSurveyStorage';
 import LinearProgress from '../../../../UI/LinearProgress';
-import CreateAccountForm from '../../../../Profile/CreateAccountForm';
-import LoginForm from '../../../../Profile/LoginForm';
 import PreferencesContext from '../../../Preferences/PreferencesContext';
 import RecommendationList from './RecommendationList';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import { delay } from '../../../../Utils/Delay';
-import { type AuthError } from '../../../../Utils/GDevelopServices/Authentication';
 import { type SubscriptionPlanWithPricingSystems } from '../../../../Utils/GDevelopServices/Usage';
 import Checkbox from '../../../../UI/Checkbox';
-import { getGetStartedSectionViewCount } from '../../../../Utils/Analytics/LocalStats';
 import { sendUserSurveyCompleted } from '../../../../Utils/Analytics/EventSender';
 import { type NewProjectSetup } from '../../../../ProjectCreation/NewProjectSetupDialog';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
-
-const ONE_WEEK = 7 * 24 * 3600 * 1000;
-const THRESHOLD_BEFORE_ALLOWING_TO_HIDE_GET_STARTED_SECTION = 15;
-
-const shouldDisplayOptionToHideGetStartedSection = ({
-  isAuthenticated,
-}: {
-  isAuthenticated: boolean,
-}): boolean => {
-  if (!isAuthenticated) return false;
-
-  const getStartedSectionViewCount = getGetStartedSectionViewCount();
-  return (
-    getStartedSectionViewCount >
-    THRESHOLD_BEFORE_ALLOWING_TO_HIDE_GET_STARTED_SECTION
-  );
-};
 
 const styles = {
   icon: {
@@ -110,20 +82,10 @@ const GetStartedSection = ({
   const isFillingOutSurvey = hasStartedUserSurvey();
   const isOnline = useOnlineStatus();
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const [
-    isLoggingInUsingProvider,
-    setIsLoggingInUsingProvider,
-  ] = React.useState<boolean>(false);
   const {
     profile,
-    onResetPassword,
     creatingOrLoggingInAccount,
-    onLogin,
-    onLoginWithProvider,
-    onCancelLoginOrSignUp,
     onEditProfile,
-    onCreateAccount,
-    authenticationError,
     loginState,
   } = authenticatedUser;
   const {
@@ -131,59 +93,14 @@ const GetStartedSection = ({
     setShowGetStartedSectionByDefault,
   } = React.useContext(PreferencesContext);
   const recommendationsGettingDelayPromise = React.useRef<?Promise<void>>(null);
-  const [error, setError] = React.useState<?AuthError>(null);
   const forceUpdate = useForceUpdate();
-  const { isMobile } = useResponsiveWindowSize();
   const [step, setStep] = React.useState<
-    | 'welcome'
-    | 'login'
-    | 'register'
-    | 'survey'
-    | 'surveyFinished'
-    | 'recommendations'
+    'survey' | 'surveyFinished' | 'recommendations'
   >(isFillingOutSurvey ? 'survey' : 'recommendations');
-  const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [username, setUsername] = React.useState('');
+
   const [errorSendingSurvey, setErrorSendingSurvey] = React.useState<boolean>(
     false
   );
-  const [
-    usernameAvailability,
-    setUsernameAvailability,
-  ] = React.useState<?UsernameAvailability>(null);
-  const [
-    isValidatingUsername,
-    setIsValidatingUsername,
-  ] = React.useState<boolean>(false);
-  const [getNewsletterEmail, setGetNewsletterEmail] = React.useState<boolean>(
-    false
-  );
-  const [
-    lastVisitedAuthenticationStep,
-    setLastVisitedAuthenticationStep,
-  ] = React.useState<'login' | 'register'>('login');
-
-  const doLogin = () => {
-    if (creatingOrLoggingInAccount) return;
-    onLogin({
-      email: email.trim(),
-      password,
-    });
-  };
-
-  const doCreateAccount = async () => {
-    if (creatingOrLoggingInAccount) return;
-    onCreateAccount(
-      {
-        email: email.trim(),
-        password,
-        getNewsletterEmail,
-        username,
-      },
-      preferences
-    );
-  };
 
   const onSurveyFinished = async (survey: UserSurveyType) => {
     try {
@@ -196,63 +113,20 @@ const GetStartedSection = ({
       ]);
       sendUserSurveyCompleted();
       clearUserSurveyPersistedState();
-      setStep('recommendations');
     } catch (error) {
       console.error('An error occurred when sending survey:', error);
       setErrorSendingSurvey(true);
-      setStep('welcome');
     } finally {
       recommendationsGettingDelayPromise.current = null;
+      setStep('recommendations');
     }
   };
-
-  const loginWithProvider = React.useCallback(
-    async provider => {
-      try {
-        setIsLoggingInUsingProvider(true);
-        await onLoginWithProvider(provider);
-      } finally {
-        setIsLoggingInUsingProvider(false);
-      }
-    },
-    [onLoginWithProvider]
-  );
-
-  // Logic to store the last visited authentication step.
-  React.useEffect(
-    () => {
-      if (step === 'login') {
-        setLastVisitedAuthenticationStep('login');
-      } else if (step === 'register') {
-        setLastVisitedAuthenticationStep('register');
-      }
-    },
-    [step]
-  );
 
   React.useEffect(
     () => {
       if (!authenticatedUser.authenticated) clearUserSurveyPersistedState();
     },
     [authenticatedUser.authenticated]
-  );
-
-  // Set the error when the authentication error changes.
-  React.useEffect(
-    () => {
-      setError(authenticationError);
-    },
-    [authenticationError]
-  );
-
-  // Reset form when user changes authentication step.
-  React.useEffect(
-    () => {
-      setError(null);
-      setEmail('');
-      setPassword('');
-    },
-    [lastVisitedAuthenticationStep]
   );
 
   const shouldDisplayAnnouncements =
@@ -284,23 +158,6 @@ const GetStartedSection = ({
           >
             <CircularProgress size={40} />
           </ColumnStackLayout>
-          {isLoggingInUsingProvider && (
-            <div style={styles.bottomPageButtonContainer}>
-              <Column>
-                <LineStackLayout
-                  expand
-                  justifyContent="center"
-                  alignItems="center"
-                >
-                  <FlatButton
-                    primary
-                    label={<Trans>Cancel</Trans>}
-                    onClick={onCancelLoginOrSignUp}
-                  />
-                </LineStackLayout>
-              </Column>
-            </div>
-          )}
         </ColumnStackLayout>
       </SectionContainer>
     );
@@ -350,224 +207,6 @@ const GetStartedSection = ({
                 </Line>
               </div>
             </>
-          )}
-        </ColumnStackLayout>
-      </SectionContainer>
-    );
-  }
-
-  if (step === 'login') {
-    return (
-      <SectionContainer flexBody>
-        <ColumnStackLayout
-          noMargin
-          expand
-          justifyContent="center"
-          alignItems="center"
-        >
-          <ColumnStackLayout
-            expand
-            noMargin
-            alignItems="center"
-            justifyContent="center"
-          >
-            <Text size="title" align="center">
-              <Trans>Log in to GDevelop</Trans>
-            </Text>
-            <BackgroundText>
-              <Trans>
-                This will synchronise your selected content wherever you go.
-              </Trans>
-            </BackgroundText>
-            <div style={styles.getFormContainerStyle(isMobile)}>
-              <LoginForm
-                email={email}
-                onChangeEmail={setEmail}
-                password={password}
-                onChangePassword={setPassword}
-                onLogin={doLogin}
-                onLoginWithProvider={loginWithProvider}
-                loginInProgress={creatingOrLoggingInAccount}
-                onForgotPassword={onResetPassword}
-                error={error}
-              />
-              {/* TODO: Add button to cancel login with providers */}
-            </div>
-          </ColumnStackLayout>
-          <div style={styles.bottomPageButtonContainer}>
-            <Column>
-              <LineStackLayout expand>
-                <FlatButton
-                  primary
-                  label={<Trans>Back</Trans>}
-                  onClick={() => setStep('welcome')}
-                  fullWidth
-                />
-                <RaisedButton
-                  label={<Trans>Next</Trans>}
-                  primary
-                  onClick={doLogin}
-                  fullWidth
-                />
-              </LineStackLayout>
-            </Column>
-          </div>
-        </ColumnStackLayout>
-      </SectionContainer>
-    );
-  }
-
-  if (step === 'register') {
-    return (
-      <SectionContainer flexBody>
-        <ColumnStackLayout
-          noMargin
-          expand
-          justifyContent="center"
-          alignItems="center"
-        >
-          <ColumnStackLayout
-            expand
-            noMargin
-            alignItems="center"
-            justifyContent="center"
-          >
-            <Text size="title" align="center">
-              <Trans>Let's start by creating your GDevelop account</Trans>
-            </Text>
-            <BackgroundText>
-              <Trans>
-                This will synchronise your selected content wherever you go.
-              </Trans>
-            </BackgroundText>
-            <div style={styles.getFormContainerStyle(isMobile)}>
-              <CreateAccountForm
-                email={email}
-                onChangeEmail={setEmail}
-                onLoginWithProvider={loginWithProvider}
-                password={password}
-                onChangePassword={setPassword}
-                username={username}
-                onChangeUsername={setUsername}
-                optInNewsletterEmail={getNewsletterEmail}
-                onChangeOptInNewsletterEmail={setGetNewsletterEmail}
-                isValidatingUsername={isValidatingUsername}
-                onChangeIsValidatingUsername={setIsValidatingUsername}
-                usernameAvailability={usernameAvailability}
-                onChangeUsernameAvailability={setUsernameAvailability}
-                onCreateAccount={doCreateAccount}
-                createAccountInProgress={creatingOrLoggingInAccount}
-                error={error}
-              />
-            </div>
-          </ColumnStackLayout>
-          <div style={styles.bottomPageButtonContainer}>
-            <Column>
-              <LineStackLayout expand>
-                <FlatButton
-                  primary
-                  label={<Trans>Back</Trans>}
-                  onClick={() => setStep('welcome')}
-                  fullWidth
-                />
-                <RaisedButton
-                  label={<Trans>Next</Trans>}
-                  primary
-                  onClick={doCreateAccount}
-                  fullWidth
-                />
-              </LineStackLayout>
-            </Column>
-          </div>
-        </ColumnStackLayout>
-      </SectionContainer>
-    );
-  }
-
-  if (step === 'welcome') {
-    const isNewUser = profile && Date.now() - profile.createdAt < ONE_WEEK;
-    return (
-      <SectionContainer flexBody>
-        <ColumnStackLayout
-          noMargin
-          expand
-          justifyContent="center"
-          alignItems="center"
-        >
-          <ColumnStackLayout
-            noMargin
-            expand
-            justifyContent="center"
-            alignItems="center"
-          >
-            <Text size="title" align="center">
-              {!profile || isNewUser ? (
-                <Trans>Welcome to GDevelop!</Trans>
-              ) : profile && profile.username ? (
-                <Trans>Good to see you {profile.username}!</Trans>
-              ) : (
-                <Trans>We have something new for you!</Trans>
-              )}
-            </Text>
-            <JewelPlatform style={styles.icon} />
-            <Text size="body2" noMargin align="center">
-              <Trans>
-                We've made a selection of GDevelop content to help you on your
-                game development journey.
-              </Trans>
-            </Text>
-            <LargeSpacer />
-            <Text size="sub-title" align="center">
-              {profile ? (
-                <Trans>
-                  Answer our questionnaire and get recommendations according to
-                  your current objectives.
-                </Trans>
-              ) : (
-                <Trans>Let's start by creating your account.</Trans>
-              )}
-            </Text>
-            <div style={styles.middlePageButtonContainer}>
-              {profile ? (
-                <Column noMargin>
-                  <RaisedButton
-                    label={<Trans>Let's go!</Trans>}
-                    primary
-                    onClick={() => setStep('survey')}
-                    fullWidth
-                  />
-                </Column>
-              ) : (
-                <ColumnStackLayout noMargin>
-                  <RaisedButton
-                    label={<Trans>Let's go!</Trans>}
-                    primary
-                    onClick={() => setStep('register')}
-                    fullWidth
-                  />
-                  <FlatButton
-                    primary
-                    label={<Trans>I already have an account</Trans>}
-                    onClick={() => setStep('login')}
-                    fullWidth
-                  />
-                </ColumnStackLayout>
-              )}
-            </div>
-          </ColumnStackLayout>
-          {shouldDisplayOptionToHideGetStartedSection({
-            isAuthenticated: authenticatedUser.authenticated,
-          }) && (
-            <div style={styles.bottomPageButtonContainer}>
-              <Checkbox
-                label={<Trans>Don't show this screen on next startup</Trans>}
-                checked={!preferences.showGetStartedSectionByDefault}
-                onCheck={(e, checked) => {
-                  if (checked) onUserSurveyHidden();
-                  setShowGetStartedSectionByDefault(!checked);
-                }}
-              />
-            </div>
           )}
         </ColumnStackLayout>
       </SectionContainer>

@@ -12,18 +12,21 @@ import {
 import LoginForm from './LoginForm';
 import LeftLoader from '../UI/LeftLoader';
 import Text from '../UI/Text';
-import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
-import { Column } from '../UI/Grid';
+import { ColumnStackLayout } from '../UI/Layout';
 import HelpButton from '../UI/HelpButton';
 import FlatButton from '../UI/FlatButton';
-import Link from '../UI/Link';
 import GDevelopGLogo from '../UI/CustomSvgIcons/GDevelopGLogo';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 
-const styles = {
-  formContainer: {
-    marginTop: 10,
-  },
+const getStyles = ({ isMobile }) => {
+  return {
+    formContainer: {
+      display: 'flex',
+      width: isMobile ? '95%' : '90%',
+      marginTop: 10,
+      flexDirection: 'column',
+    },
+  };
 };
 
 type Props = {|
@@ -50,6 +53,7 @@ const LoginDialog = ({
   const { isMobile } = useResponsiveWindowSize();
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const styles = getStyles({ isMobile });
 
   const doLogin = () => {
     if (loginInProgress) return;
@@ -93,29 +97,7 @@ const LoginDialog = ({
       <Text noMargin size="section-title" align="center">
         <Trans>Log in to your account</Trans>
       </Text>
-      <Column noMargin alignItems="center">
-        <LineStackLayout noMargin>
-          <Text size="body2" noMargin>
-            <Trans>Don't have an account yet?</Trans>
-          </Text>
-          <Link
-            href=""
-            onClick={onGoToCreateAccount}
-            disabled={loginInProgress}
-          >
-            <Text size="body2" noMargin color="inherit">
-              <Trans>Create an account</Trans>
-            </Text>
-          </Link>
-        </LineStackLayout>
-      </Column>
-      <div
-        style={{
-          ...styles.formContainer,
-          // Take full width on mobile.
-          width: isMobile ? '95%' : '60%',
-        }}
-      >
+      <div style={styles.formContainer}>
         <LoginForm
           onLogin={doLogin}
           onLoginWithProvider={onLoginWithProvider}
@@ -126,6 +108,7 @@ const LoginDialog = ({
           onForgotPassword={onForgotPassword}
           loginInProgress={loginInProgress}
           error={error}
+          onGoToCreateAccount={onGoToCreateAccount}
         />
       </div>
     </ColumnStackLayout>
@@ -140,7 +123,7 @@ const LoginDialog = ({
       cannotBeDismissed={loginInProgress}
       onRequestClose={onClose}
       onApply={doLogin}
-      maxWidth="sm"
+      maxWidth="md"
       open
       flexColumnBody
     >

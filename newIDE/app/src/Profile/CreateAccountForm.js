@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 
 import TextField from '../UI/TextField';
 import {
@@ -8,32 +8,56 @@ import {
   type IdentityProvider,
 } from '../Utils/GDevelopServices/Authentication';
 import { type UsernameAvailability } from '../Utils/GDevelopServices/User';
-import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
+import {
+  ColumnStackLayout,
+  LineStackLayout,
+  ResponsiveLineStackLayout,
+} from '../UI/Layout';
 import { UsernameField } from './UsernameField';
 import Checkbox from '../UI/Checkbox';
 import Form from '../UI/Form';
 import { getEmailErrorText, getPasswordErrorText } from './CreateAccountDialog';
-import { Column, Line } from '../UI/Grid';
-import Text from '../UI/Text';
+import { Column, Line, Spacer } from '../UI/Grid';
 import FlatButton from '../UI/FlatButton';
 import Google from '../UI/CustomSvgIcons/Google';
 import Apple from '../UI/CustomSvgIcons/Apple';
 import GitHub from '../UI/CustomSvgIcons/GitHub';
 import AlertMessage from '../UI/AlertMessage';
 import { accountsAlreadyExistsWithDifferentProviderCopy } from './LoginForm';
+import RaisedButton from '../UI/RaisedButton';
+import Text from '../UI/Text';
+import Link from '../UI/Link';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
+import BackgroundText from '../UI/BackgroundText';
+import { MarkdownText } from '../UI/MarkdownText';
 
-const styles = {
-  identityProvidersBlock: {
+const getStyles = ({ verticalDesign, theme }) => ({
+  logInContainer: {
+    width: '100%',
+  },
+  panelContainer: {
+    width: verticalDesign ? '100%' : '90%',
+  },
+  delimiter: {
     display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'stretch',
-    marginTop: 10,
+    flex: 1,
+    borderLeft: !verticalDesign
+      ? `2px solid ${theme.home.separator.color}`
+      : 'none',
+    borderTop: verticalDesign
+      ? `2px solid ${theme.home.separator.color}`
+      : 'none',
   },
   icon: {
     width: 16,
     height: 16,
   },
-};
+  backgroundText: {
+    width: '100%',
+    textAlign: 'start',
+  },
+});
 
 type Props = {|
   onCreateAccount: () => Promise<void>,
@@ -52,6 +76,7 @@ type Props = {|
   onChangeIsValidatingUsername: boolean => void,
   createAccountInProgress: boolean,
   error: ?AuthError,
+  onGoToLogin?: () => void,
 |};
 
 const CreateAccountForm = ({
@@ -71,107 +96,177 @@ const CreateAccountForm = ({
   onChangeIsValidatingUsername,
   createAccountInProgress,
   error,
+  onGoToLogin,
 }: Props) => {
   const accountsExistsWithOtherCredentials = error
     ? error.code === 'auth/account-exists-with-different-credential'
     : false;
 
+  const { isMobile, isLandscape } = useResponsiveWindowSize();
+
+  const verticalDesign = isMobile && !isLandscape;
+  const theme = React.useContext(GDevelopThemeContext);
+  const styles = getStyles({ verticalDesign, theme });
+
   return (
     <Column noMargin expand justifyContent="center" alignItems="center">
-      <Form onSubmit={onCreateAccount} autoComplete="on" name="createAccount">
+      <Form
+        onSubmit={onCreateAccount}
+        autoComplete="on"
+        name="createAccount"
+        fullWidth
+      >
         <ColumnStackLayout noMargin>
           {accountsExistsWithOtherCredentials && (
-            <AlertMessage kind="error">
+            <AlertMessage kind="warning">
               {accountsAlreadyExistsWithDifferentProviderCopy}
             </AlertMessage>
           )}
-          <UsernameField
-            value={username}
-            onChange={(e, value) => {
-              onChangeUsername(value);
-            }}
-            allowEmpty
-            onAvailabilityChecked={onChangeUsernameAvailability}
-            onAvailabilityCheckLoading={onChangeIsValidatingUsername}
-            isValidatingUsername={isValidatingUsername}
-            disabled={createAccountInProgress}
-          />
-          <TextField
-            value={email}
-            floatingLabelText={<Trans>Email</Trans>}
-            errorText={getEmailErrorText(error)}
-            fullWidth
-            type="email"
-            required
-            onChange={(e, value) => {
-              onChangeEmail(value);
-            }}
-            onBlur={event => {
-              onChangeEmail(event.currentTarget.value.trim());
-            }}
-            disabled={createAccountInProgress}
-          />
-          <TextField
-            value={password}
-            floatingLabelText={<Trans>Password</Trans>}
-            errorText={getPasswordErrorText(error)}
-            type="password"
-            fullWidth
-            required
-            onChange={(e, value) => {
-              onChangePassword(value);
-            }}
-            disabled={createAccountInProgress}
-          />
-          <Checkbox
-            label={<Trans>I want to receive the GDevelop Newsletter</Trans>}
-            checked={optInNewsletterEmail}
-            onCheck={(e, value) => {
-              onChangeOptInNewsletterEmail(value);
-            }}
-            disabled={createAccountInProgress}
-          />
-          <div style={styles.identityProvidersBlock}>
-            <Line noMargin justifyContent="center">
-              <Text size="body2" noMargin>
-                <Trans>Or continue with</Trans>
-              </Text>
-            </Line>
-            <Line>
-              <ResponsiveLineStackLayout expand noColumnMargin noMargin>
-                <FlatButton
-                  primary
-                  fullWidth
-                  label="Google"
-                  leftIcon={<Google style={styles.icon} />}
-                  onClick={() => {
-                    onLoginWithProvider('google');
-                  }}
-                  disabled={createAccountInProgress}
-                />
-                <FlatButton
-                  primary
-                  fullWidth
-                  label="GitHub"
-                  leftIcon={<GitHub style={styles.icon} />}
-                  onClick={() => {
-                    onLoginWithProvider('github');
-                  }}
-                  disabled={createAccountInProgress}
-                />
-                <FlatButton
-                  primary
-                  fullWidth
-                  label="Apple"
-                  leftIcon={<Apple style={styles.icon} />}
-                  onClick={() => {
-                    onLoginWithProvider('apple');
-                  }}
-                  disabled={createAccountInProgress}
-                />
-              </ResponsiveLineStackLayout>
-            </Line>
-          </div>
+          <ResponsiveLineStackLayout noMargin noResponsiveLandscape>
+            <Column expand noMargin alignItems="center" justifyContent="center">
+              <div style={styles.panelContainer}>
+                <ColumnStackLayout noMargin>
+                  <RaisedButton
+                    primary
+                    fullWidth
+                    label={<Trans>Continue with Google</Trans>}
+                    icon={<Google style={styles.icon} />}
+                    onClick={() => {
+                      onLoginWithProvider('google');
+                    }}
+                    disabled={createAccountInProgress}
+                  />
+                  <FlatButton
+                    primary
+                    fullWidth
+                    label={<Trans>Continue with Github</Trans>}
+                    leftIcon={<GitHub style={styles.icon} />}
+                    onClick={() => {
+                      onLoginWithProvider('github');
+                    }}
+                    disabled={createAccountInProgress}
+                  />
+                  <FlatButton
+                    primary
+                    fullWidth
+                    label={<Trans>Continue with Apple</Trans>}
+                    leftIcon={<Apple style={styles.icon} />}
+                    onClick={() => {
+                      onLoginWithProvider('apple');
+                    }}
+                    disabled={createAccountInProgress}
+                  />
+                </ColumnStackLayout>
+              </div>
+            </Column>
+            {!verticalDesign ? (
+              <ColumnStackLayout
+                noMargin
+                alignItems="center"
+                justifyContent="center"
+              >
+                <div style={styles.delimiter} />
+                <Text size="body2" noMargin>
+                  <Trans>or</Trans>
+                </Text>
+                <div style={styles.delimiter} />
+              </ColumnStackLayout>
+            ) : (
+              <Column>
+                <Spacer />
+                <LineStackLayout
+                  noMargin
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  <div style={styles.delimiter} />
+                  <Text size="body2" noMargin>
+                    <Trans>or</Trans>
+                  </Text>
+                  <div style={styles.delimiter} />
+                </LineStackLayout>
+                <Spacer />
+              </Column>
+            )}
+            <Column expand noMargin alignItems="center" justifyContent="center">
+              <div style={styles.panelContainer}>
+                <ColumnStackLayout noMargin>
+                  <TextField
+                    value={email}
+                    floatingLabelText={<Trans>Email</Trans>}
+                    errorText={getEmailErrorText(error)}
+                    fullWidth
+                    type="email"
+                    required
+                    onChange={(e, value) => {
+                      onChangeEmail(value);
+                    }}
+                    onBlur={event => {
+                      onChangeEmail(event.currentTarget.value.trim());
+                    }}
+                    disabled={createAccountInProgress}
+                  />
+                  <TextField
+                    value={password}
+                    floatingLabelText={<Trans>Password</Trans>}
+                    errorText={getPasswordErrorText(error)}
+                    type="password"
+                    fullWidth
+                    required
+                    onChange={(e, value) => {
+                      onChangePassword(value);
+                    }}
+                    disabled={createAccountInProgress}
+                  />
+                  <UsernameField
+                    value={username}
+                    onChange={(e, value) => {
+                      onChangeUsername(value);
+                    }}
+                    allowEmpty
+                    onAvailabilityChecked={onChangeUsernameAvailability}
+                    onAvailabilityCheckLoading={onChangeIsValidatingUsername}
+                    isValidatingUsername={isValidatingUsername}
+                    disabled={createAccountInProgress}
+                  />
+                  {onGoToLogin && (
+                    <div style={styles.logInContainer}>
+                      <LineStackLayout noMargin>
+                        <Text size="body2" noMargin align="center">
+                          <Trans>Already a member?</Trans>
+                        </Text>
+                        <Link
+                          href="#"
+                          onClick={onGoToLogin}
+                          disabled={createAccountInProgress}
+                        >
+                          <Text size="body2" noMargin color="inherit">
+                            <Trans>Log in to your account</Trans>
+                          </Text>
+                        </Link>
+                      </LineStackLayout>
+                    </div>
+                  )}
+                </ColumnStackLayout>
+              </div>
+            </Column>
+          </ResponsiveLineStackLayout>
+          <Spacer />
+          <Line noMargin>
+            <Checkbox
+              label={<Trans>I want to receive the GDevelop Newsletter</Trans>}
+              checked={optInNewsletterEmail}
+              onCheck={(e, value) => {
+                onChangeOptInNewsletterEmail(value);
+              }}
+              disabled={createAccountInProgress}
+            />
+          </Line>
+          <BackgroundText style={styles.backgroundText}>
+            <MarkdownText
+              translatableSource={t`By creating an account and using GDevelop, you agree to the [Terms and Conditions](https://gdevelop.io/page/terms-and-conditions).`}
+            />
+          </BackgroundText>
         </ColumnStackLayout>
       </Form>
     </Column>

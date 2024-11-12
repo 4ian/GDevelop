@@ -34,6 +34,13 @@ export const EmailErrorFromBackend = () => (
   />
 );
 
+export const AccountExists = () => (
+  <CreateAccountDialog
+    {...defaultProps}
+    error={{ code: 'auth/account-exists-with-different-credential' }}
+  />
+);
+
 export const Submitting = () => (
   <CreateAccountDialog {...defaultProps} createAccountInProgress />
 );

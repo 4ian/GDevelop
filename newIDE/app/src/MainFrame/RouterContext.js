@@ -12,7 +12,6 @@ export type Route =
   | 'build'
   | 'education'
   | 'play'
-  | 'community'
   | 'get-started';
 type RouteKey =
   | 'initial-dialog'

@@ -9,7 +9,6 @@ import DoubleChevronArrowLeft from '../../../UI/CustomSvgIcons/DoubleChevronArro
 import PickAxeIcon from '../../../UI/CustomSvgIcons/PickAxe';
 import SchoolIcon from '../../../UI/CustomSvgIcons/School';
 import GoogleControllerIcon from '../../../UI/CustomSvgIcons/GoogleController';
-import WebIcon from '../../../UI/CustomSvgIcons/Web';
 import BookLeafIcon from '../../../UI/CustomSvgIcons/BookLeaf';
 import SunIcon from '../../../UI/CustomSvgIcons/Sun';
 import StoreIcon from '../../../UI/CustomSvgIcons/Store';
@@ -49,7 +48,6 @@ export type HomeTab =
   | 'build'
   | 'learn'
   | 'play'
-  | 'community'
   | 'shop'
   | 'team-view';
 
@@ -114,14 +112,6 @@ const homePageMenuTabs: { [tab: string]: HomePageMenuTab } = {
       <GoogleControllerIcon fontSize={fontSize} color={color} />
     ),
   },
-  community: {
-    label: <Trans>Community</Trans>,
-    tab: 'community',
-    id: 'home-community-tab',
-    getIcon: ({ color, fontSize }) => (
-      <WebIcon fontSize={fontSize} color={color} />
-    ),
-  },
   'team-view': {
     label: <Trans>Teach</Trans>,
     tab: 'team-view',
@@ -143,12 +133,6 @@ export const getTabsToDisplay = ({
       limits.capabilities.classrooms &&
       limits.capabilities.classrooms.hidePlayTab
     );
-  const displayCommunityTab =
-    !limits ||
-    !(
-      limits.capabilities.classrooms &&
-      limits.capabilities.classrooms.hideCommunityTab
-    );
   const displayShopTab =
     !limits ||
     !(
@@ -165,7 +149,6 @@ export const getTabsToDisplay = ({
     displayShopTab ? 'shop' : null,
     'learn',
     displayPlayTab ? 'play' : null,
-    displayCommunityTab ? 'community' : null,
   ].filter(Boolean);
   return tabs.map(tab => homePageMenuTabs[tab]);
 };

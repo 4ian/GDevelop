@@ -39,7 +39,6 @@ type ErrorBoundaryScope =
   | 'start-page-shop'
   | 'start-page-learn'
   | 'start-page-play'
-  | 'start-page-community'
   | 'start-page-team'
   | 'start-page-manage'
   | 'about'

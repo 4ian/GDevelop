@@ -40,7 +40,6 @@ import { Trans } from '@lingui/macro';
 import { CreditsPackageStoreStateProvider } from '../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 import { ProductLicenseStoreStateProvider } from '../AssetStore/ProductLicense/ProductLicenseStoreContext';
 import { MarketingPlansStoreStateProvider } from '../MarketingPlans/MarketingPlansStoreContext';
-import { CommunityLeaderboardsStateProvider } from '../CommunityLeaderboards/CommunityLeaderboardsContext';
 
 type Props = {|
   authentication: Authentication,
@@ -120,13 +119,11 @@ const Providers = ({
                                                         <BehaviorStoreStateProvider>
                                                           <TutorialStateProvider>
                                                             <AnnouncementsFeedStateProvider>
-                                                              <CommunityLeaderboardsStateProvider>
-                                                                <PrivateAssetsAuthorizationProvider>
-                                                                  {children({
-                                                                    i18n,
-                                                                  })}
-                                                                </PrivateAssetsAuthorizationProvider>
-                                                              </CommunityLeaderboardsStateProvider>
+                                                              <PrivateAssetsAuthorizationProvider>
+                                                                {children({
+                                                                  i18n,
+                                                                })}
+                                                              </PrivateAssetsAuthorizationProvider>
                                                             </AnnouncementsFeedStateProvider>
                                                           </TutorialStateProvider>
                                                         </BehaviorStoreStateProvider>

@@ -5,6 +5,9 @@ import SectionContainer, { SectionRow } from './SectionContainer';
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
 import PlaceHolderLoader from '../../../UI/PlaceholderLoader';
 import ErrorBoundary from '../../../UI/ErrorBoundary';
+import PromotionsSlideshow from '../../../Promotions/PromotionsSlideshow';
+import { AnnouncementsFeed } from '../../../AnnouncementsFeed';
+import { ColumnStackLayout } from '../../../UI/Layout';
 
 const styles = {
   iframe: {
@@ -29,13 +32,17 @@ const PlaySection = () => {
   return (
     <SectionContainer flexBody>
       <SectionRow expand>
-        <iframe
-          src={`https://gd.games/embedded/${paletteType}`}
-          title="gdgames"
-          style={{ ...styles.iframe, height: iframeHeight }}
-          scrolling="no" // This is deprecated, but this is the only way to disable the scrollbar.
-        />
-        {!iframeHeight && <PlaceHolderLoader />}
+        <ColumnStackLayout noMargin>
+          <PromotionsSlideshow />
+          <AnnouncementsFeed canClose={false} level="normal" />
+          <iframe
+            src={`https://gd.games/embedded/${paletteType}`}
+            title="gdgames"
+            style={{ ...styles.iframe, height: iframeHeight }}
+            scrolling="no" // This is deprecated, but this is the only way to disable the scrollbar.
+          />
+          {!iframeHeight && <PlaceHolderLoader />}
+        </ColumnStackLayout>
       </SectionRow>
     </SectionContainer>
   );

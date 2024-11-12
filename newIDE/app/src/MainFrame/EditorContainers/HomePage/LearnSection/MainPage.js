@@ -182,7 +182,7 @@ const MainPage = ({
     },
     {
       title: <Trans>Examples</Trans>,
-      description: <Trans>Have look at existing games from the inside</Trans>,
+      description: <Trans>Have a look at existing games from the inside</Trans>,
       action: onOpenExampleStore,
     },
     {
@@ -193,7 +193,7 @@ const MainPage = ({
     {
       title: <Trans>Discord</Trans>,
       description: <Trans>Join the discussion</Trans>,
-      action: () => Window.openExternalURL('https://forum.gdevelop.io'),
+      action: () => Window.openExternalURL('https://discord.gg/gdevelop'),
     },
   ].filter(Boolean);
 

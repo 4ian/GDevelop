@@ -70,8 +70,8 @@ const OpenFromStorageProviderDialog = ({
                         </Text>
                         <Text noMargin>
                           <Trans>
-                            Google Drive support will be dropped on December
-                            January 31st.
+                            Google Drive support will be dropped on January
+                            31st.
                             <br />
                             Save your project in the GDevelop Cloud to make sure
                             you can access it past this date.

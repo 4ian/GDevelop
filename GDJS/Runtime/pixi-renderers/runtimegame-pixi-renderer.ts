@@ -44,6 +44,8 @@ namespace gdjs {
 
     _nextFrameId: integer = 0;
 
+    _wasDisposed: boolean = false;
+
     /**
      * @param game The game that is being rendered
      * @param forceFullscreen If fullscreen should be always activated
@@ -62,6 +64,8 @@ namespace gdjs {
      *
      */
     createStandardCanvas(parentElement: HTMLElement) {
+      this._throwIfDisposed();
+
       let gameCanvas: HTMLCanvasElement;
       if (typeof THREE !== 'undefined') {
         gameCanvas = document.createElement('canvas');
@@ -336,6 +340,7 @@ namespace gdjs {
      * Change the margin that must be preserved around the game canvas.
      */
     setMargins(top, right, bottom, left): void {
+      this._throwIfDisposed();
       if (
         this._marginTop === top &&
         this._marginRight === right &&
@@ -357,6 +362,7 @@ namespace gdjs {
      * @param height The new height, in pixels.
      */
     setWindowSize(width: float, height: float): void {
+      this._throwIfDisposed();
       const remote = this.getElectronRemote();
       if (remote) {
         const browserWindow = remote.getCurrentWindow();
@@ -379,6 +385,7 @@ namespace gdjs {
      * Center the window on screen.
      */
     centerWindow() {
+      this._throwIfDisposed();
       const remote = this.getElectronRemote();
       if (remote) {
         const browserWindow = remote.getCurrentWindow();
@@ -398,6 +405,7 @@ namespace gdjs {
      * De/activate fullscreen for the game.
      */
     setFullScreen(enable): void {
+      this._throwIfDisposed();
       if (this._forceFullscreen) {
         return;
       }
@@ -521,6 +529,7 @@ namespace gdjs {
       window: Window,
       document: Document
     ) {
+      this._throwIfDisposed();
       const canvas = this._gameCanvas;
       if (!canvas) return;
 
@@ -833,6 +842,7 @@ namespace gdjs {
     }
 
     startGameLoop(fn) {
+      this._throwIfDisposed();
       let oldTime = 0;
       const gameLoop = (time: float) => {
         // Schedule the next frame now to be sure it's called as soon
@@ -939,6 +949,7 @@ namespace gdjs {
       this._threeRenderer = null;
       this._gameCanvas = null;
       this._domElementsContainer = null;
+      this._wasDisposed = true;
     }
 
     /**
@@ -996,6 +1007,12 @@ namespace gdjs {
 
     getGame() {
       return this._game;
+    }
+
+    private _throwIfDisposed(): void {
+      if (this._wasDisposed) {
+        throw 'The RuntimeGameRenderer has been disposed and should not be used anymore.';
+      }
     }
   }
 

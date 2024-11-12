@@ -198,7 +198,8 @@ namespace gdjs {
       }
     }
 
-    /*
+    /**
+     * To be called when the game is disposed.
      * Clear caches of loaded font families.
      */
     dispose(): void {

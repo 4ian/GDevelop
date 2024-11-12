@@ -201,8 +201,9 @@ namespace gdjs {
       return this._loadedJsons.getFromName(resourceName) || null;
     }
 
-    /*
-     * Clear cache of loaded jsons.
+    /**
+     * To be called when the game is disposed.
+     * Clear the JSONs loaded in this manager.
      */
     dispose(): void {
       this._loadedJsons.clear();

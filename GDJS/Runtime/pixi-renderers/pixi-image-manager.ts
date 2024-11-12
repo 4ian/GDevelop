@@ -464,7 +464,8 @@ namespace gdjs {
       return particleTexture;
     }
 
-    /*
+    /**
+     * To be called when the game is disposed.
      * Clear caches of loaded textures and materials.
      */
     dispose(): void {

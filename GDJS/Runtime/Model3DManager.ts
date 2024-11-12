@@ -144,8 +144,9 @@ namespace gdjs {
       );
     }
 
-    /*
-     * Clear cache of loaded three models and downloaded array buffers.
+    /**
+     * To be called when the game is disposed.
+     * Clear the models, resources loaded and destroy 3D models loaders in this manager.
      */
     dispose(): void {
       this._loadedThreeModels.clear();

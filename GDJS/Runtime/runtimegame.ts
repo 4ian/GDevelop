@@ -193,6 +193,9 @@ namespace gdjs {
      */
     _captureManager: CaptureManager | null;
 
+    /** True if the RuntimeGame has been disposed and should not be used anymore. */
+    _wasDisposed: boolean = false;
+
     /**
      * @param data The object (usually stored in data.json) containing the full project data
      * @param
@@ -563,6 +566,8 @@ namespace gdjs {
      * @param height The new height
      */
     setGameResolutionSize(width: float, height: float): void {
+      this._throwIfDisposed();
+
       this._gameResolutionWidth = width;
       this._gameResolutionHeight = height;
       if (this._adaptGameResolutionAtRuntime) {
@@ -746,6 +751,7 @@ namespace gdjs {
       callback: () => void,
       progressCallback?: (progress: float) => void
     ) {
+      this._throwIfDisposed();
       this.loadFirstAssetsAndStartBackgroundLoading(
         this._getFirstSceneName(),
         progressCallback
@@ -869,6 +875,7 @@ namespace gdjs {
      * Start the game loop, to be called once assets are loaded.
      */
     startGameLoop() {
+      this._throwIfDisposed();
       try {
         if (!this.hasScene()) {
           logger.error('The game has no scene.');
@@ -954,15 +961,17 @@ namespace gdjs {
       }
     }
 
-    /*
+    /**
      * Stop game loop, unload all scenes, dispose renderer and resources.
+     * After calling this method, the RuntimeGame should not be used anymore.
      */
     dispose(): void {
       this._renderer.stopGameLoop();
       this._sceneStack.dispose();
       this._renderer.dispose();
       this._resourcesLoader.dispose();
-      logger.info('Runtimegame is disposed');
+
+      this._wasDisposed = true;
     }
 
     /**
@@ -1208,6 +1217,7 @@ namespace gdjs {
     startCurrentSceneProfiler(
       onProfilerStopped: (oldProfiler: Profiler) => void
     ) {
+      this._throwIfDisposed();
       const currentScene = this._sceneStack.getCurrentScene();
       if (!currentScene) {
         return false;
@@ -1220,6 +1230,7 @@ namespace gdjs {
      * Stop the profiler for the currently running scene.
      */
     stopCurrentSceneProfiler() {
+      this._throwIfDisposed();
       const currentScene = this._sceneStack.getCurrentScene();
       if (!currentScene) {
         return;
@@ -1341,6 +1352,7 @@ namespace gdjs {
     }
 
     updateFromNetworkSyncData(syncData: GameNetworkSyncData) {
+      this._throwIfDisposed();
       if (syncData.var) {
         this._variables.updateFromNetworkSyncData(syncData.var);
       }
@@ -1362,6 +1374,12 @@ namespace gdjs {
             );
           }
         }
+      }
+    }
+
+    private _throwIfDisposed(): void {
+      if (this._wasDisposed) {
+        throw 'The RuntimeGame has been disposed and should not be used anymore.';
       }
     }
   }

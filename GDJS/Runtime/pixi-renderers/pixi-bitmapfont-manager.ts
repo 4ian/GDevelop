@@ -291,6 +291,7 @@ namespace gdjs {
     }
 
     /**
+     * To be called when the game is disposed.
      * Uninstall all the fonts from memory and clear cache of loaded fonts.
      */
     dispose(): void {

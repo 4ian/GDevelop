@@ -195,7 +195,8 @@ namespace gdjs {
         : null;
     }
     /**
-     * Clear cache of loaded spine atlases.
+     * To be called when the game is disposed.
+     * Clear the Spine Atlases loaded in this manager.
      */
     dispose(): void {
       this._loadedSpineAtlases.clear();

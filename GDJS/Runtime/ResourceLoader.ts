@@ -454,8 +454,9 @@ namespace gdjs {
       });
     }
 
-    /*
-     * Dispose all resource managers.
+    /**
+     * To be called when the game is disposed.
+     * Dispose all the resource managers.
      */
     dispose(): void {
       for (const resourceManager of this._resourceManagersMap.values()) {

@@ -117,7 +117,8 @@ namespace gdjs {
     }
 
     /**
-     * Clear cache of loaded spine skeleton data.
+     * To be called when the game is disposed.
+     * Clear the Spine skeleton data loaded in this manager.
      */
     dispose(): void {
       this._loadedSpines.clear();

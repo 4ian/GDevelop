@@ -527,7 +527,7 @@ module.exports = {
         _('3D Physics Engine'),
         'Physics3D',
         _(
-          'Simulate realistic object physics with gravity, forces, joints, etc.'
+          'Simulate realistic object physics with gravity, forces, etc.'
         ),
         '',
         'res/physics3d.svg',
@@ -560,12 +560,12 @@ module.exports = {
       .addExpressionAndConditionAndAction(
         'number',
         'GravityX',
-        _('World gravity on X axis') +
+        _('World gravity on X axis'),
+        _('the world gravity on X axis') +
           ' ' +
           _(
             'While an object is needed, this will apply to all objects using the behavior.'
           ),
-        _('the world gravity on X axis'),
         _('the world gravity on X axis'),
         _('Global'),
         'res/physics3d.svg'
@@ -585,12 +585,12 @@ module.exports = {
       .addExpressionAndConditionAndAction(
         'number',
         'GravityY',
-        _('World gravity on Y axis') +
+        _('World gravity on Y axis'),
+        _('the world gravity on Y axis') +
           ' ' +
           _(
             'While an object is needed, this will apply to all objects using the behavior.'
           ),
-        _('the world gravity on Y axis'),
         _('the world gravity on Y axis'),
         _('Global'),
         'res/physics3d.svg'
@@ -610,12 +610,12 @@ module.exports = {
       .addExpressionAndConditionAndAction(
         'number',
         'GravityZ',
-        _('World gravity on Z axis') +
+        _('World gravity on Z axis'),
+        _('the world gravity on Z axis') +
           ' ' +
           _(
             'While an object is needed, this will apply to all objects using the behavior.'
           ),
-        _('the world gravity on Z axis'),
         _('the world gravity on Z axis'),
         _('Global'),
         'res/physics3d.svg'

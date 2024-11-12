@@ -54,18 +54,19 @@ export const GenericRetryableProcessWithProgressDialog = ({
       actions={[
         onAbandon ? (
           <FlatButton
-            label={<Trans>Ignore</Trans>}
-            disabled={!onAbandon}
-            onClick={onAbandon}
-            key="close"
-          />
-        ) : null,
-        onRetry ? (
-          <DialogPrimaryButton
             label={<Trans>Retry</Trans>}
             primary
             onClick={onRetry}
             key="retry"
+          />
+        ) : null,
+        onRetry ? (
+          <DialogPrimaryButton
+            label={<Trans>Ignore and continue</Trans>}
+            primary
+            disabled={!onAbandon}
+            onClick={onAbandon}
+            key="close"
           />
         ) : null,
       ]}
@@ -80,7 +81,7 @@ export const GenericRetryableProcessWithProgressDialog = ({
             <Trans>
               There were errors when importing resources for the project. You
               can retry (recommended) or continue despite the errors. In this
-              case, the project will be missing some resources.
+              case, the project might be missing some resources.
             </Trans>
           ) : null}
         </Text>

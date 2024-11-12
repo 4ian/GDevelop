@@ -1,10 +1,7 @@
 // @flow
 import { t } from '@lingui/macro';
 import * as React from 'react';
-import {
-  type StorageProvider,
-  type FileMetadata,
-} from '../index';
+import { type StorageProvider, type FileMetadata } from '../index';
 import { serializeToJSON } from '../../Utils/Serializer';
 import GoogleDrive from '../../UI/CustomSvgIcons/GoogleDrive';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';

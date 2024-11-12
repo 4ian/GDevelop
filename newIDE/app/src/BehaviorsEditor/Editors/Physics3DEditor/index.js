@@ -131,7 +131,7 @@ const Physics3DEditor = (props: Props) => {
     >
       <Line>
         <SelectField
-          id="physics2-parameter-body-type"
+          id="physics3d-parameter-body-type"
           key={'bodyType'}
           fullWidth
           floatingLabelText={properties.get('bodyType').getLabel()}
@@ -173,7 +173,7 @@ const Physics3DEditor = (props: Props) => {
       </ResponsiveLineStackLayout>
       <Line>
         <DismissableAlertMessage
-          identifier="physics2-shape-collisions"
+          identifier="physics3d-shape-collisions"
           kind="info"
         >
           <Trans>
@@ -185,9 +185,9 @@ const Physics3DEditor = (props: Props) => {
           </Trans>
         </DismissableAlertMessage>
       </Line>
-      <Line>
+      <ResponsiveLineStackLayout>
         <SelectField
-          id="physics2-parameter-shape"
+          id="physics3d-parameter-shape"
           fullWidth
           floatingLabelText={properties.get('shape').getLabel()}
           value={properties.get('shape').getValue()}
@@ -204,7 +204,24 @@ const Physics3DEditor = (props: Props) => {
             label={t`Cylinder`}
           />
         </SelectField>
-      </Line>
+        <SelectField
+          id="physics3d-parameter-shape-orientation"
+          fullWidth
+          floatingLabelText={properties.get('shapeOrientation').getLabel()}
+          value={properties.get('shapeOrientation').getValue()}
+          onChange={(e, i, newValue: string) =>
+            updateBehaviorProperty('shapeOrientation', newValue)
+          }
+          disabled={
+            properties.get('shape').getValue() === 'Sphere' ||
+            properties.get('shape').getValue() === 'Box'
+          }
+        >
+          <SelectOption key={'shape-orientation-z'} value={'Z'} label={t`Z`} />
+          <SelectOption key={'shape-orientation-y'} value={'Y'} label={t`Y`} />
+          <SelectOption key={'shape-orientation-x'} value={'X'} label={t`X`} />
+        </SelectField>
+      </ResponsiveLineStackLayout>
       <ResponsiveLineStackLayout>
         <SemiControlledTextField
           fullWidth
@@ -281,7 +298,7 @@ const Physics3DEditor = (props: Props) => {
       </ResponsiveLineStackLayout>
       <ResponsiveLineStackLayout>
         <NumericProperty
-          id="physics2-parameter-density"
+          id="physics3d-parameter-density"
           properties={properties}
           propertyName={'density'}
           step={0.1}
@@ -335,7 +352,7 @@ const Physics3DEditor = (props: Props) => {
           }
         />
         <NumericProperty
-          id="physics2-parameter-angular-damping"
+          id="physics3d-parameter-angular-damping"
           properties={properties}
           propertyName={'angularDamping'}
           step={0.05}

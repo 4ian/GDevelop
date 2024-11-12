@@ -65,6 +65,11 @@ module.exports = {
         return true;
       }
 
+      if (propertyName === 'shapeOrientation') {
+        behaviorContent.getChild('shapeOrientation').setStringValue(newValue);
+        return true;
+      }
+
       if (propertyName === 'shapeDimensionA') {
         const newValueAsNumber = parseFloat(newValue);
         if (newValueAsNumber !== newValueAsNumber) return false;
@@ -248,6 +253,15 @@ module.exports = {
         .addExtraInfo('Capsule')
         .addExtraInfo('Cylinder');
       behaviorProperties
+        .getOrCreate('shapeOrientation')
+        .setValue(behaviorContent.getChild('shapeOrientation').getStringValue())
+        .setType('Choice')
+        .setLabel('Shape orientation')
+        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+        .addExtraInfo('Z')
+        .addExtraInfo('Y')
+        .addExtraInfo('X');
+      behaviorProperties
         .getOrCreate('shapeDimensionA')
         .setValue(
           behaviorContent
@@ -314,20 +328,6 @@ module.exports = {
         .setType('Number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
         .setLabel('Shape Offset Z')
-        .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-        .setHidden(true); // Hidden as required to be changed in the full editor.
-      behaviorProperties
-        .getOrCreate('polygonOrigin')
-        .setValue(
-          behaviorContent.hasChild('polygonOrigin')
-            ? behaviorContent.getChild('polygonOrigin').getStringValue()
-            : 'Center'
-        )
-        .setType('Choice')
-        .setLabel('Polygon Origin')
-        .addExtraInfo('Center')
-        .addExtraInfo('Origin')
-        .addExtraInfo('TopLeft')
         .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
         .setHidden(true); // Hidden as required to be changed in the full editor.
       behaviorProperties
@@ -424,6 +424,7 @@ module.exports = {
       behaviorContent.addChild('bullet').setBoolValue(false);
       behaviorContent.addChild('fixedRotation').setBoolValue(false);
       behaviorContent.addChild('shape').setStringValue('Sphere');
+      behaviorContent.addChild('shapeOrientation').setStringValue('Z');
       behaviorContent.addChild('shapeDimensionA').setDoubleValue(0);
       behaviorContent.addChild('shapeDimensionB').setDoubleValue(0);
       behaviorContent.addChild('shapeDimensionC').setDoubleValue(0);

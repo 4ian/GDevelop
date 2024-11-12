@@ -283,6 +283,7 @@ namespace gdjs {
     bullet: boolean;
     fixedRotation: boolean;
     shape: string;
+    shapeOrientation: string;
     shapeDimensionA: any;
     shapeDimensionB: any;
     shapeDimensionC: any;
@@ -356,6 +357,7 @@ namespace gdjs {
       this.bullet = behaviorData.bullet;
       this.fixedRotation = behaviorData.fixedRotation;
       this.shape = behaviorData.shape;
+      this.shapeOrientation = behaviorData.shapeOrientation;
       this.shapeDimensionA = behaviorData.shapeDimensionA;
       this.shapeDimensionB = behaviorData.shapeDimensionB;
       this.shapeDimensionC = behaviorData.shapeDimensionC;
@@ -661,8 +663,7 @@ namespace gdjs {
         const capsuleDepth =
           shapeDimensionB > 0 ? shapeDimensionB : depth > 0 ? depth : onePixel;
         shapeSettings = new Jolt.CapsuleShapeSettings(capsuleDepth / 2, radius);
-        // Top on Z axis.
-        quat = this.getQuat(-Math.sqrt(2) / 2, 0, 0, Math.sqrt(2) / 2);
+        quat = this.getShapeOrientationQuat();
       } else if (this.shape === 'Cylinder') {
         const radius =
           shapeDimensionA > 0
@@ -677,8 +678,7 @@ namespace gdjs {
           radius,
           onePixel
         );
-        // Top on Z axis.
-        quat = this.getQuat(-Math.sqrt(2) / 2, 0, 0, Math.sqrt(2) / 2);
+        quat = this.getShapeOrientationQuat();
       } else {
         // Create a 'Sphere' by default.
         const radius =
@@ -702,6 +702,21 @@ namespace gdjs {
 
       Jolt.destroy(shapeSettings);
       return rotatedShape;
+    }
+
+    private getShapeOrientationQuat(): Jolt.Quat {
+      let quat: Jolt.Quat;
+      if (this.shapeOrientation === 'X') {
+        // Top on X axis.
+        quat = this.getQuat(0, 0, Math.sqrt(2) / 2, -Math.sqrt(2) / 2);
+      } else if (this.shapeOrientation === 'Y') {
+        // Top on Y axis.
+        quat = this.getQuat(0, 0, 0, 1);
+      } else {
+        // Top on Z axis.
+        quat = this.getQuat(Math.sqrt(2) / 2, 0, 0, Math.sqrt(2) / 2);
+      }
+      return quat;
     }
 
     recreateShape(): void {

@@ -526,9 +526,7 @@ module.exports = {
         'Physics3DBehavior',
         _('3D Physics Engine'),
         'Physics3D',
-        _(
-          'Simulate realistic object physics with gravity, forces, etc.'
-        ),
+        _('Simulate realistic object physics with gravity, forces, etc.'),
         '',
         'res/physics3d.svg',
         'Physics3DBehavior',

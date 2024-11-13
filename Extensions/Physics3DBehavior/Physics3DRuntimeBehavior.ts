@@ -647,10 +647,14 @@ namespace gdjs {
             : onePixel;
         const boxDepth =
           shapeDimensionC > 0 ? shapeDimensionC : depth > 0 ? depth : onePixel;
-
+        // The convex radius should not eat up the whole volume.
+        const convexRadius = Math.min(
+          onePixel,
+          Math.min(boxWidth, boxHeight, boxDepth) / 4
+        );
         shapeSettings = new Jolt.BoxShapeSettings(
           this.getVec3(boxWidth / 2, boxHeight / 2, boxDepth / 2),
-          onePixel
+          convexRadius
         );
         quat = this.getQuat(0, 0, 0, 1);
       } else if (this.shape === 'Capsule') {
@@ -663,7 +667,7 @@ namespace gdjs {
         const capsuleDepth =
           shapeDimensionB > 0 ? shapeDimensionB : depth > 0 ? depth : onePixel;
         shapeSettings = new Jolt.CapsuleShapeSettings(capsuleDepth / 2, radius);
-        quat = this.getShapeOrientationQuat();
+        quat = this._getShapeOrientationQuat();
       } else if (this.shape === 'Cylinder') {
         const radius =
           shapeDimensionA > 0
@@ -673,12 +677,17 @@ namespace gdjs {
             : onePixel;
         const cylinderDepth =
           shapeDimensionB > 0 ? shapeDimensionB : depth > 0 ? depth : onePixel;
+        // The convex radius should not eat up the whole volume.
+        const convexRadius = Math.min(
+          onePixel,
+          Math.min(cylinderDepth, radius) / 4
+        );
         shapeSettings = new Jolt.CylinderShapeSettings(
           cylinderDepth / 2,
           radius,
-          onePixel
+          convexRadius
         );
-        quat = this.getShapeOrientationQuat();
+        quat = this._getShapeOrientationQuat();
       } else {
         // Create a 'Sphere' by default.
         const radius =
@@ -704,19 +713,17 @@ namespace gdjs {
       return rotatedShape;
     }
 
-    private getShapeOrientationQuat(): Jolt.Quat {
-      let quat: Jolt.Quat;
+    private _getShapeOrientationQuat(): Jolt.Quat {
       if (this.shapeOrientation === 'X') {
         // Top on X axis.
-        quat = this.getQuat(0, 0, Math.sqrt(2) / 2, -Math.sqrt(2) / 2);
+        return this.getQuat(0, 0, Math.sqrt(2) / 2, -Math.sqrt(2) / 2);
       } else if (this.shapeOrientation === 'Y') {
         // Top on Y axis.
-        quat = this.getQuat(0, 0, 0, 1);
+        return this.getQuat(0, 0, 0, 1);
       } else {
         // Top on Z axis.
-        quat = this.getQuat(Math.sqrt(2) / 2, 0, 0, Math.sqrt(2) / 2);
+        return this.getQuat(Math.sqrt(2) / 2, 0, 0, Math.sqrt(2) / 2);
       }
-      return quat;
     }
 
     recreateShape(): void {
@@ -813,9 +820,6 @@ namespace gdjs {
       bodyCreationSettings.mLinearDamping = this.linearDamping;
       bodyCreationSettings.mAngularDamping = this.angularDamping;
       bodyCreationSettings.mGravityFactor = this.gravityScale;
-      // TODO Collision between 2 non-dynamic body should be checked during the
-      // collision condition to improve efficiency.
-      bodyCreationSettings.mCollideKinematicVsNonDynamic = true;
 
       const bodyInterface = this._sharedData.bodyInterface;
       this._body = bodyInterface.CreateBody(bodyCreationSettings);
@@ -1311,7 +1315,7 @@ namespace gdjs {
       this._sharedData.bodyInterface.SetLinearVelocity(
         body.GetID(),
         this.getVec3(
-          linearVelocityX * this._sharedData.worldScale,
+          linearVelocityX * this._sharedData.worldInvScale,
           body.GetLinearVelocity().GetY(),
           body.GetLinearVelocity().GetZ()
         )
@@ -1337,7 +1341,7 @@ namespace gdjs {
         body.GetID(),
         this.getVec3(
           body.GetLinearVelocity().GetX(),
-          linearVelocityY * this._sharedData.worldScale,
+          linearVelocityY * this._sharedData.worldInvScale,
           body.GetLinearVelocity().GetZ()
         )
       );
@@ -1363,7 +1367,7 @@ namespace gdjs {
         this.getVec3(
           body.GetLinearVelocity().GetX(),
           body.GetLinearVelocity().GetY(),
-          linearVelocityZ * this._sharedData.worldScale
+          linearVelocityZ * this._sharedData.worldInvScale
         )
       );
     }
@@ -1374,7 +1378,7 @@ namespace gdjs {
       }
       const body = this._body!;
 
-      return body.GetLinearVelocity().Length();
+      return body.GetLinearVelocity().Length() * this._sharedData.worldScale;
     }
 
     applyForce(

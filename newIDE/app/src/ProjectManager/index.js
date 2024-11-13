@@ -534,6 +534,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       () => {
         navigateToRoute('games-dashboard', {
           'game-id': project.getProjectUuid(),
+          'games-dashboard-tab': 'details',
         });
         onOpenHomePage();
         toggleProjectManager();

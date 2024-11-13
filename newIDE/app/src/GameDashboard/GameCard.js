@@ -19,7 +19,6 @@ import {
   getGameUrl,
   type Game,
 } from '../Utils/GDevelopServices/Game';
-import { type GameDetailsTab } from '.';
 import Card from '../UI/Card';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
@@ -37,7 +36,7 @@ const styles = {
 type Props = {|
   game: Game,
   isCurrentGame: boolean,
-  onOpenGameManager: (tab: GameDetailsTab) => void,
+  onOpenGameManager: () => void,
 |};
 
 export const GameCard = ({ game, isCurrentGame, onOpenGameManager }: Props) => {
@@ -129,7 +128,7 @@ export const GameCard = ({ game, isCurrentGame, onOpenGameManager }: Props) => {
         primary
         fullWidth
         label={<Trans>Manage game</Trans>}
-        onClick={() => onOpenGameManager('details')}
+        onClick={onOpenGameManager}
       />
     </LineStackLayout>
   );

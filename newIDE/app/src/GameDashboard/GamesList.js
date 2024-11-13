@@ -5,8 +5,6 @@ import { Trans, t } from '@lingui/macro';
 import { type Game } from '../Utils/GDevelopServices/Game';
 import { GameCard } from './GameCard';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
-import { type GameDetailsTab } from '.';
-import RouterContext from '../MainFrame/RouterContext';
 import SearchBar from '../UI/SearchBar';
 import { useDebounce } from '../Utils/UseDebounce';
 import {
@@ -84,7 +82,6 @@ type Props = {|
 |};
 
 const GamesList = ({ project, games, onRefreshGames, onOpenGameId }: Props) => {
-  const { addRouteArguments } = React.useContext(RouterContext);
   const { values, setGamesListOrderBy } = React.useContext(PreferencesContext);
   const [searchText, setSearchText] = React.useState<string>('');
   const [currentPage, setCurrentPage] = React.useState<number>(0);
@@ -217,8 +214,7 @@ const GamesList = ({ project, games, onRefreshGames, onOpenGameId }: Props) => {
             key={game.id}
             isCurrentGame={!!projectUuid && game.id === projectUuid}
             game={game}
-            onOpenGameManager={(tab: GameDetailsTab) => {
-              addRouteArguments({ 'games-dashboard-tab': tab });
+            onOpenGameManager={() => {
               onOpenGameId(game.id);
             }}
           />

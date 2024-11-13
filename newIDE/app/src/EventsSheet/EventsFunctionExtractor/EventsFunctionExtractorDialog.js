@@ -67,8 +67,9 @@ export default class EventsFunctionExtractorDialog extends React.Component<
       serializedEvents,
     } = this.props;
 
-    // This is only used to check parameter for name conflict.
-    // TODO Update it according to the chosen extension.
+    // This is only used to check parameter for name conflict,but the parameter
+    // editor is locked so users can't actually change parameter names.
+    // Thus, it's fine to use the wrong scope.
     this._projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
       { project }
     );

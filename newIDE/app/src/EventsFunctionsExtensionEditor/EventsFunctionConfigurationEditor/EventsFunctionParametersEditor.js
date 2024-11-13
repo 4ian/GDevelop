@@ -39,6 +39,7 @@ import ResponsiveFlatButton from '../../UI/ResponsiveFlatButton';
 import { EmptyPlaceholder } from '../../UI/EmptyPlaceholder';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import Text from '../../UI/Text';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 
 const gd: libGDevelop = global.gd;
 
@@ -75,8 +76,26 @@ export const useParameterOverridingAlertDialog = () => {
   };
 };
 
+const getValidatedParameterName = (
+  parameters: gdParameterMetadataContainer,
+  projectScopedContainers: gdProjectScopedContainers,
+  newName: string
+): string => {
+  const variablesContainersList = projectScopedContainers.getVariablesContainersList();
+  const objectsContainersList = projectScopedContainers.getObjectsContainersList();
+  const safeAndUniqueNewName = newNameGenerator(
+    gd.Project.getSafeName(newName),
+    tentativeNewName =>
+      parameters.hasParameterNamed(tentativeNewName) ||
+      variablesContainersList.has(tentativeNewName) ||
+      objectsContainersList.hasObjectNamed(tentativeNewName)
+  );
+  return safeAndUniqueNewName;
+};
+
 type Props = {|
   project: gdProject,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   eventsFunction: gdEventsFunction,
   eventsBasedBehavior: gdEventsBasedBehavior | null,
   eventsBasedObject: gdEventsBasedObject | null,
@@ -109,6 +128,7 @@ type Props = {|
 
 export const EventsFunctionParametersEditor = ({
   project,
+  projectScopedContainersAccessor,
   eventsFunction,
   eventsBasedBehavior,
   eventsBasedObject,
@@ -548,7 +568,7 @@ export const EventsFunctionParametersEditor = ({
     <I18n>
       {({ i18n }) => (
         <Column noMargin expand useFullHeight>
-          {parameters.getParametersCount() > 0 ? (
+          {parameters.getParametersCount() > 0 || freezeParameters ? (
             <React.Fragment>
               <ScrollView ref={scrollView}>
                 <Line>
@@ -623,10 +643,14 @@ export const EventsFunctionParametersEditor = ({
                                         margin="none"
                                         translatableHintText={t`Enter the parameter name (mandatory)`}
                                         value={parameter.getName()}
-                                        onChange={text => {
-                                          parameter.setName(
-                                            gd.Project.getSafeName(text)
+                                        onChange={newName => {
+                                          const projectScopedContainers = projectScopedContainersAccessor.get();
+                                          const validatedNewName = getValidatedParameterName(
+                                            parameters,
+                                            projectScopedContainers,
+                                            newName
                                           );
+                                          parameter.setName(validatedNewName);
                                           forceUpdate();
                                           onParametersUpdated();
                                         }}
@@ -661,10 +685,13 @@ export const EventsFunctionParametersEditor = ({
                                         label: i18n._(t`Paste`),
                                         click: () =>
                                           pasteParametersBefore(parameter),
-                                        enabled: isClipboardContainingParameters,
+                                        enabled:
+                                          isClipboardContainingParameters &&
+                                          !freezeParameters,
                                       },
                                       {
                                         label: i18n._(t`Duplicate`),
+                                        enabled: !freezeParameters,
                                         click: () =>
                                           duplicateParameter(parameter, i + 1),
                                       },
@@ -787,29 +814,31 @@ export const EventsFunctionParametersEditor = ({
                   </Column>
                 </Line>
               </ScrollView>
-              <Column>
-                <Line noMargin>
-                  <LineStackLayout expand>
-                    <ResponsiveFlatButton
-                      key={'paste-parameters'}
-                      leftIcon={<PasteIcon />}
-                      label={<Trans>Paste</Trans>}
-                      onClick={() => {
-                        pasteParametersAtTheEnd();
-                      }}
-                      disabled={!isClipboardContainingParameters}
-                    />
-                  </LineStackLayout>
-                  <LineStackLayout justifyContent="flex-end" expand>
-                    <RaisedButton
-                      primary
-                      label={<Trans>Add a parameter</Trans>}
-                      onClick={addParameter}
-                      icon={<Add />}
-                    />
-                  </LineStackLayout>
-                </Line>
-              </Column>
+              {!freezeParameters && (
+                <Column>
+                  <Line noMargin>
+                    <LineStackLayout expand>
+                      <ResponsiveFlatButton
+                        key={'paste-parameters'}
+                        leftIcon={<PasteIcon />}
+                        label={<Trans>Paste</Trans>}
+                        onClick={() => {
+                          pasteParametersAtTheEnd();
+                        }}
+                        disabled={!isClipboardContainingParameters}
+                      />
+                    </LineStackLayout>
+                    <LineStackLayout justifyContent="flex-end" expand>
+                      <RaisedButton
+                        primary
+                        label={<Trans>Add a parameter</Trans>}
+                        onClick={addParameter}
+                        icon={<Add />}
+                      />
+                    </LineStackLayout>
+                  </Line>
+                </Column>
+              )}
             </React.Fragment>
           ) : (
             <Column noMargin expand justifyContent="center">

@@ -38,6 +38,7 @@ export type TestProject = {|
   testSerializedEvents: Object,
   testSerializedEventsWithLotsOfObjects: Object,
   testEventsBasedBehavior: gdEventsBasedBehavior,
+  testEventsBasedBehaviorProjectScopedContainersAccessor: ProjectScopedContainersAccessor,
   testEmptyEventsBasedBehavior: gdEventsBasedBehavior,
   testBehaviorEventsFunction: gdEventsFunction,
   testBehaviorLifecycleEventsFunction: gdEventsFunction,
@@ -913,6 +914,14 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     }
   );
 
+  const testEventsBasedBehaviorProjectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+    {
+      project,
+      eventsFunctionsExtension: testEventsFunctionsExtension,
+      eventsBasedBehavior: testEventsBasedBehavior,
+    }
+  );
+
   return {
     project,
     shapePainterObjectConfiguration: shapePainterObject.getConfiguration(),
@@ -949,6 +958,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     testSerializedEvents,
     testSerializedEventsWithLotsOfObjects,
     testEventsBasedBehavior,
+    testEventsBasedBehaviorProjectScopedContainersAccessor,
     testEmptyEventsBasedBehavior,
     testBehaviorEventsFunction,
     testBehaviorLifecycleEventsFunction,

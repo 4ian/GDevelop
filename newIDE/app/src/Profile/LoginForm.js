@@ -25,25 +25,15 @@ import Google from '../UI/CustomSvgIcons/Google';
 import Apple from '../UI/CustomSvgIcons/Apple';
 import GitHub from '../UI/CustomSvgIcons/GitHub';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
-import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import RaisedButton from '../UI/RaisedButton';
+import ResponsiveDelimiter from './ResponsiveDelimiter';
 
-const getStyles = ({ verticalDesign, theme }) => ({
+const getStyles = ({ verticalDesign }) => ({
   createAccountContainer: {
     width: '100%',
   },
   panelContainer: {
     width: verticalDesign ? '100%' : '90%',
-  },
-  delimiter: {
-    display: 'flex',
-    flex: 1,
-    borderLeft: !verticalDesign
-      ? `2px solid ${theme.home.separator.color}`
-      : 'none',
-    borderTop: verticalDesign
-      ? `2px solid ${theme.home.separator.color}`
-      : 'none',
   },
   icon: {
     width: 16,
@@ -98,8 +88,7 @@ const LoginForm = ({
 
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   const verticalDesign = isMobile && !isLandscape;
-  const theme = React.useContext(GDevelopThemeContext);
-  const styles = getStyles({ verticalDesign, theme });
+  const styles = getStyles({ verticalDesign });
 
   return (
     <>
@@ -158,35 +147,7 @@ const LoginForm = ({
                   </ColumnStackLayout>
                 </div>
               </Column>
-              {!verticalDesign ? (
-                <ColumnStackLayout
-                  noMargin
-                  alignItems="center"
-                  justifyContent="center"
-                >
-                  <div style={styles.delimiter} />
-                  <Text size="body2" noMargin>
-                    <Trans>or</Trans>
-                  </Text>
-                  <div style={styles.delimiter} />
-                </ColumnStackLayout>
-              ) : (
-                <Column>
-                  <Spacer />
-                  <LineStackLayout
-                    noMargin
-                    alignItems="center"
-                    justifyContent="center"
-                  >
-                    <div style={styles.delimiter} />
-                    <Text size="body2" noMargin>
-                      <Trans>or</Trans>
-                    </Text>
-                    <div style={styles.delimiter} />
-                  </LineStackLayout>
-                  <Spacer />
-                </Column>
-              )}
+              <ResponsiveDelimiter text={<Trans>or</Trans>} />
               <Column
                 expand
                 noMargin

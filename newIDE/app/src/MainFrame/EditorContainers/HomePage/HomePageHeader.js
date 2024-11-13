@@ -18,6 +18,7 @@ import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindow
 import SaveProjectIcon from '../../SaveProjectIcon';
 import Mobile from '../../../UI/CustomSvgIcons/Mobile';
 import Desktop from '../../../UI/CustomSvgIcons/Desktop';
+import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 const electron = optionalRequire('electron');
 
 type Props = {|
@@ -38,6 +39,7 @@ export const HomePageHeader = ({
   canSave,
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
+  const { profile } = React.useContext(AuthenticatedUserContext);
 
   return (
     <I18n>
@@ -92,7 +94,7 @@ export const HomePageHeader = ({
                   />
                 ))}
               <UserChip onOpenProfile={onOpenProfile} />
-              <NotificationChip />
+              {profile && <NotificationChip />}
               {isMobile ? (
                 <IconButton size="small" onClick={onOpenLanguageDialog}>
                   <TranslateIcon fontSize="small" />

@@ -28,26 +28,16 @@ import RaisedButton from '../UI/RaisedButton';
 import Text from '../UI/Text';
 import Link from '../UI/Link';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
-import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import BackgroundText from '../UI/BackgroundText';
 import { MarkdownText } from '../UI/MarkdownText';
+import ResponsiveDelimiter from './ResponsiveDelimiter';
 
-const getStyles = ({ verticalDesign, theme }) => ({
+const getStyles = ({ verticalDesign }) => ({
   logInContainer: {
     width: '100%',
   },
   panelContainer: {
     width: verticalDesign ? '100%' : '90%',
-  },
-  delimiter: {
-    display: 'flex',
-    flex: 1,
-    borderLeft: !verticalDesign
-      ? `2px solid ${theme.home.separator.color}`
-      : 'none',
-    borderTop: verticalDesign
-      ? `2px solid ${theme.home.separator.color}`
-      : 'none',
   },
   icon: {
     width: 16,
@@ -105,8 +95,7 @@ const CreateAccountForm = ({
   const { isMobile, isLandscape } = useResponsiveWindowSize();
 
   const verticalDesign = isMobile && !isLandscape;
-  const theme = React.useContext(GDevelopThemeContext);
-  const styles = getStyles({ verticalDesign, theme });
+  const styles = getStyles({ verticalDesign });
 
   return (
     <Column noMargin expand justifyContent="center" alignItems="center">
@@ -159,35 +148,7 @@ const CreateAccountForm = ({
                 </ColumnStackLayout>
               </div>
             </Column>
-            {!verticalDesign ? (
-              <ColumnStackLayout
-                noMargin
-                alignItems="center"
-                justifyContent="center"
-              >
-                <div style={styles.delimiter} />
-                <Text size="body2" noMargin>
-                  <Trans>or</Trans>
-                </Text>
-                <div style={styles.delimiter} />
-              </ColumnStackLayout>
-            ) : (
-              <Column>
-                <Spacer />
-                <LineStackLayout
-                  noMargin
-                  alignItems="center"
-                  justifyContent="center"
-                >
-                  <div style={styles.delimiter} />
-                  <Text size="body2" noMargin>
-                    <Trans>or</Trans>
-                  </Text>
-                  <div style={styles.delimiter} />
-                </LineStackLayout>
-                <Spacer />
-              </Column>
-            )}
+            <ResponsiveDelimiter text={<Trans>or</Trans>} />
             <Column expand noMargin alignItems="center" justifyContent="center">
               <div style={styles.panelContainer}>
                 <ColumnStackLayout noMargin>

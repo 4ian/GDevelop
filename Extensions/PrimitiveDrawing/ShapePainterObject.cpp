@@ -11,16 +11,18 @@ This project is released under the MIT License.
 #include "GDCore/Project/InitialInstance.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/Project.h"
+#include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/Localization.h"
-#include "GDCore/Project/PropertyDescriptor.h"
 
 using namespace std;
 
 ShapePainterObjectBase::ShapePainterObjectBase()
     : fillOpacity(255),
+      fillColor("255;255;255"),
       outlineSize(1),
       outlineOpacity(255),
+      outlineColor("0;0;0"),
       clearBetweenFrames(true),
       absoluteCoordinates(false),
       antialiasing("none") {}
@@ -37,7 +39,6 @@ void ShapePainterObjectBase::DoUnserializeFrom(
                        .GetValue()
                        .GetInt();
 
-
   const auto& fillColorElement = element.GetChild("fillColor", 0, "FillColor");
   if (fillColorElement.GetValue().IsString()) {
     fillColor = fillColorElement.GetStringValue();
@@ -46,11 +47,14 @@ void ShapePainterObjectBase::DoUnserializeFrom(
     int fillColorR = fillColorElement.GetIntAttribute("r");
     int fillColorG = fillColorElement.GetIntAttribute("g");
     int fillColorB = fillColorElement.GetIntAttribute("b");
-    fillColor = gd::String::From(fillColorR) + ";" + gd::String::From(fillColorG) + ";" + gd::String::From(fillColorB);
+    fillColor = gd::String::From(fillColorR) + ";" +
+                gd::String::From(fillColorG) + ";" +
+                gd::String::From(fillColorB);
     // end of compatibility code
   }
 
-  const auto& outlineColorElement = element.GetChild("outlineColor", 0, "OutlineColor");
+  const auto& outlineColorElement =
+      element.GetChild("outlineColor", 0, "OutlineColor");
   if (outlineColorElement.GetValue().IsString()) {
     outlineColor = outlineColorElement.GetStringValue();
   } else {
@@ -58,7 +62,9 @@ void ShapePainterObjectBase::DoUnserializeFrom(
     int outlineColorR = outlineColorElement.GetIntAttribute("r");
     int outlineColorG = outlineColorElement.GetIntAttribute("g");
     int outlineColorB = outlineColorElement.GetIntAttribute("b");
-    outlineColor = gd::String::From(outlineColorR) + ";" + gd::String::From(outlineColorG) + ";" + gd::String::From(outlineColorB);
+    outlineColor = gd::String::From(outlineColorR) + ";" +
+                   gd::String::From(outlineColorG) + ";" +
+                   gd::String::From(outlineColorB);
     // end of compatibility code
   }
 
@@ -94,8 +100,9 @@ void ShapePainterObjectBase::DoSerializeTo(
     auto rgb = fillColor.Split(';');
     auto& fillColorElement = element.AddChild("fillColor");
     if (rgb.size() == 3) {
-      // Still serialize the old particle color components for compatibility with GDevelop <= 5.4.212.
-      // Remove this in a few releases (or when hex strings are accepted for the color).
+      // Still serialize the old particle color components for compatibility
+      // with GDevelop <= 5.4.212. Remove this in a few releases (or when hex
+      // strings are accepted for the color).
       fillColorElement.AddChild("r").SetValue(rgb[0].To<double>());
       fillColorElement.AddChild("g").SetValue(rgb[1].To<double>());
       fillColorElement.AddChild("b").SetValue(rgb[2].To<double>());
@@ -108,8 +115,9 @@ void ShapePainterObjectBase::DoSerializeTo(
     auto rgb = outlineColor.Split(';');
     auto& outlineColorElement = element.AddChild("outlineColor");
     if (rgb.size() == 3) {
-      // Still serialize the old particle color components for compatibility with GDevelop <= 5.4.212.
-      // Remove this in a few releases (or when hex strings are accepted for the color).
+      // Still serialize the old particle color components for compatibility
+      // with GDevelop <= 5.4.212. Remove this in a few releases (or when hex
+      // strings are accepted for the color).
       outlineColorElement.AddChild("r").SetValue(rgb[0].To<double>());
       outlineColorElement.AddChild("g").SetValue(rgb[1].To<double>());
       outlineColorElement.AddChild("b").SetValue(rgb[2].To<double>());
@@ -143,7 +151,7 @@ void ShapePainterObjectBase::SetOutlineOpacity(double val) {
 }
 
 bool ShapePainterObject::UpdateProperty(const gd::String& propertyName,
-                                           const gd::String& newValue) {
+                                        const gd::String& newValue) {
   if (propertyName == "fillOpacity") {
     SetFillOpacity(newValue.To<double>());
     return true;
@@ -186,8 +194,8 @@ bool ShapePainterObject::UpdateProperty(const gd::String& propertyName,
   return false;
 }
 
-std::map<gd::String, gd::PropertyDescriptor>
-ShapePainterObject::GetProperties() const {
+std::map<gd::String, gd::PropertyDescriptor> ShapePainterObject::GetProperties()
+    const {
   std::map<gd::String, gd::PropertyDescriptor> objectProperties;
 
   objectProperties["fillColor"]
@@ -231,7 +239,9 @@ ShapePainterObject::GetProperties() const {
       .SetType("boolean")
       .SetLabel(_("Clear drawing at each frame"))
       .SetGroup(_("Drawing"))
-      .SetDescription(_("When activated, clear the previous render at each frame. Otherwise, shapes are staying on the screen until you clear manually the object in events."));
+      .SetDescription(_("When activated, clear the previous render at each "
+                        "frame. Otherwise, shapes are staying on the screen "
+                        "until you clear manually the object in events."));
 
   objectProperties["antialiasing"]
       .SetValue(GetAntialiasing())

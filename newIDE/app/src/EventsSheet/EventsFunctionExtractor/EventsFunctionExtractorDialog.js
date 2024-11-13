@@ -57,7 +57,6 @@ export default class EventsFunctionExtractorDialog extends React.Component<
     createNewExtension: false,
   };
   _projectScopedContainersAccessor: ProjectScopedContainersAccessor | null = null;
-  _emptyProject: gdProject | null = null;
 
   componentDidMount() {
     const {
@@ -70,9 +69,8 @@ export default class EventsFunctionExtractorDialog extends React.Component<
 
     // This is only used to check parameter for name conflict.
     // TODO Update it according to the chosen extension.
-    this._emptyProject = new gd.Project();
     this._projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
-      { project: this._emptyProject }
+      { project }
     );
 
     // Set up the function
@@ -103,7 +101,6 @@ export default class EventsFunctionExtractorDialog extends React.Component<
   componentWillUnmount() {
     const { eventsFunction } = this.state;
     if (eventsFunction) eventsFunction.delete();
-    if (this._emptyProject) this._emptyProject.delete();
   }
 
   _getFunctionGroupNames = (): Array<string> => {

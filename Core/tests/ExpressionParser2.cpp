@@ -1737,10 +1737,12 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
-      REQUIRE(validator.GetFatalErrors().size() == 2);
+      REQUIRE(validator.GetFatalErrors().size() == 3);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "A name should be entered after the dot.");
       REQUIRE(validator.GetFatalErrors()[1]->GetMessage() ==
+              "An object variable or expression should be entered.");
+      REQUIRE(validator.GetFatalErrors()[2]->GetMessage() ==
               "A name should be entered after the dot.");
     }
   }
@@ -1788,9 +1790,11 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
-      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors().size() == 2);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "You can't use the brackets to access an object variable. Use a dot followed by the variable name, like this: `MyObject.MyVariable`.");
+      REQUIRE(validator.GetFatalErrors()[1]->GetMessage() ==
+              "This variable does not exist on this object or group.");
     }
     {
       auto node =
@@ -1808,6 +1812,19 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     {
       auto node =
           parser.ParseExpression("MySpriteObject.MyNonExistingVariable");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "This variable does not exist on this object or group.");
+    }
+  }
+
+  SECTION("Invalid object variables (non existing variable with child)") {
+    {
+      auto node =
+          parser.ParseExpression("MySpriteObject.MyNonExistingVariable.MyNonExistingChild");
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
@@ -2376,10 +2393,12 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
     gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
     node->Visit(validator);
-    REQUIRE(validator.GetFatalErrors().size() == 2);
+    REQUIRE(validator.GetFatalErrors().size() == 3);
     REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
           "A name should be entered after the dot.");
     REQUIRE(validator.GetFatalErrors()[1]->GetMessage() ==
+          "An object variable or expression should be entered.");
+    REQUIRE(validator.GetFatalErrors()[2]->GetMessage() ==
           "A name should be entered after the dot.");
   }
 

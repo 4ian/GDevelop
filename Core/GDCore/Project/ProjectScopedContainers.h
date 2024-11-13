@@ -225,9 +225,10 @@ class ProjectScopedContainers {
 
   /** Do not use - should be private but accessible to let Emscripten create a
    * temporary. */
-  ProjectScopedContainers(){};
+  ProjectScopedContainers()
+      : legacyGlobalVariables(nullptr), legacySceneVariables(nullptr){};
 
- private:
+private:
   gd::ObjectsContainersList objectsContainersList;
   gd::VariablesContainersList variablesContainersList;
   const gd::VariablesContainer *legacyGlobalVariables;

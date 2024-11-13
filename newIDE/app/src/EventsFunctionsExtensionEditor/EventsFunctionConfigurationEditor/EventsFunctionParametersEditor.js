@@ -568,7 +568,7 @@ export const EventsFunctionParametersEditor = ({
     <I18n>
       {({ i18n }) => (
         <Column noMargin expand useFullHeight>
-          {parameters.getParametersCount() > 0 ? (
+          {parameters.getParametersCount() > 0 || freezeParameters ? (
             <React.Fragment>
               <ScrollView ref={scrollView}>
                 <Line>
@@ -685,10 +685,13 @@ export const EventsFunctionParametersEditor = ({
                                         label: i18n._(t`Paste`),
                                         click: () =>
                                           pasteParametersBefore(parameter),
-                                        enabled: isClipboardContainingParameters,
+                                        enabled:
+                                          isClipboardContainingParameters &&
+                                          !freezeParameters,
                                       },
                                       {
                                         label: i18n._(t`Duplicate`),
+                                        enabled: !freezeParameters,
                                         click: () =>
                                           duplicateParameter(parameter, i + 1),
                                       },
@@ -811,29 +814,31 @@ export const EventsFunctionParametersEditor = ({
                   </Column>
                 </Line>
               </ScrollView>
-              <Column>
-                <Line noMargin>
-                  <LineStackLayout expand>
-                    <ResponsiveFlatButton
-                      key={'paste-parameters'}
-                      leftIcon={<PasteIcon />}
-                      label={<Trans>Paste</Trans>}
-                      onClick={() => {
-                        pasteParametersAtTheEnd();
-                      }}
-                      disabled={!isClipboardContainingParameters}
-                    />
-                  </LineStackLayout>
-                  <LineStackLayout justifyContent="flex-end" expand>
-                    <RaisedButton
-                      primary
-                      label={<Trans>Add a parameter</Trans>}
-                      onClick={addParameter}
-                      icon={<Add />}
-                    />
-                  </LineStackLayout>
-                </Line>
-              </Column>
+              {!freezeParameters && (
+                <Column>
+                  <Line noMargin>
+                    <LineStackLayout expand>
+                      <ResponsiveFlatButton
+                        key={'paste-parameters'}
+                        leftIcon={<PasteIcon />}
+                        label={<Trans>Paste</Trans>}
+                        onClick={() => {
+                          pasteParametersAtTheEnd();
+                        }}
+                        disabled={!isClipboardContainingParameters}
+                      />
+                    </LineStackLayout>
+                    <LineStackLayout justifyContent="flex-end" expand>
+                      <RaisedButton
+                        primary
+                        label={<Trans>Add a parameter</Trans>}
+                        onClick={addParameter}
+                        icon={<Add />}
+                      />
+                    </LineStackLayout>
+                  </Line>
+                </Column>
+              )}
             </React.Fragment>
           ) : (
             <Column noMargin expand justifyContent="center">

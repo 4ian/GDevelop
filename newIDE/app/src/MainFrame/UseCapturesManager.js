@@ -5,9 +5,20 @@ import {
   type LaunchCaptureOptions,
   type CaptureOptions,
 } from '../ExportAndShare/PreviewLauncher.flow';
-import { createGameResourceSignedUrls } from '../Utils/GDevelopServices/Game';
+import {
+  createGameResourceSignedUrls,
+  updateGame,
+} from '../Utils/GDevelopServices/Game';
+import { type GamesList } from '../GameDashboard/UseGamesList';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
-const useCapturesManager = ({ project }: { project: ?gdProject }) => {
+const useCapturesManager = ({
+  project,
+  gamesList,
+}: {
+  project: ?gdProject,
+  gamesList: GamesList,
+}) => {
   const [
     unverifiedGameScreenshots,
     setUnverifiedGameScreenshots,
@@ -17,6 +28,9 @@ const useCapturesManager = ({ project }: { project: ?gdProject }) => {
       unverifiedPublicUrl: string,
     |}>
   >([]);
+  const { getAuthorizationHeader, profile } = React.useContext(
+    AuthenticatedUserContext
+  );
 
   const createCaptureOptionsForPreview = React.useCallback(
     async (
@@ -101,6 +115,37 @@ const useCapturesManager = ({ project }: { project: ?gdProject }) => {
 
         if (!uploadedScreenshotPublicUrls.length) return;
 
+        const game = gamesList.games
+          ? gamesList.games.find(game => game.id === project.getProjectUuid())
+          : null;
+
+        // The game is registered, let's update it.
+        if (game && profile) {
+          try {
+            const currentGameScreenshotUrls = game.screenshotUrls || [];
+            const newGameScreenshotUrls = [
+              ...currentGameScreenshotUrls,
+              ...uploadedScreenshotPublicUrls,
+            ];
+            const updatedGame = await updateGame(
+              getAuthorizationHeader,
+              profile.id,
+              game.id,
+              {
+                screenshotUrls: newGameScreenshotUrls,
+              }
+            );
+            gamesList.onGameUpdated(updatedGame);
+          } catch (error) {
+            console.error(
+              'Error while updating game with new screenshots:',
+              error
+            );
+            // Do not throw or save the screenshots.
+          }
+          return;
+        }
+
         setUnverifiedGameScreenshots(unverifiedScreenshots => [
           ...unverifiedScreenshots,
           ...uploadedScreenshotPublicUrls.map(unverifiedPublicUrl => ({
@@ -112,7 +157,7 @@ const useCapturesManager = ({ project }: { project: ?gdProject }) => {
         console.error('Error while handling finished capture options:', error);
       }
     },
-    [project]
+    [project, gamesList, getAuthorizationHeader, profile]
   );
 
   const getGameUnverifiedScreenshotUrls = React.useCallback(

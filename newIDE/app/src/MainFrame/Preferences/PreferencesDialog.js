@@ -82,6 +82,7 @@ const PreferencesDialog = ({
     setDisplaySaveReminder,
     setFetchPlayerTokenForPreviewAutomatically,
     setPreviewCrashReportUploadLevel,
+    setTakeScreenshotOnPreview,
   } = React.useContext(PreferencesContext);
 
   const initialUse3DEditor = React.useRef<boolean>(values.use3DEditor);
@@ -439,6 +440,14 @@ const PreferencesDialog = ({
             labelPosition="right"
             label={
               <Trans>Send crash reports during previews to GDevelop</Trans>
+            }
+          />
+          <Toggle
+            onToggle={(e, check) => setTakeScreenshotOnPreview(check)}
+            toggled={values.takeScreenshotOnPreview}
+            labelPosition="right"
+            label={
+              <Trans>Automatically take a screenshot in game previews</Trans>
             }
           />
           <Toggle

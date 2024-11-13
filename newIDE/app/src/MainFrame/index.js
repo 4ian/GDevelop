@@ -541,7 +541,7 @@ const MainFrame = (props: Props) => {
     onCaptureFinished,
     onGameScreenshotsClaimed,
     getGameUnverifiedScreenshotUrls,
-  } = useCapturesManager({ project: currentProject });
+  } = useCapturesManager({ project: currentProject, gamesList });
 
   /**
    * This reference is useful to get the current opened project,
@@ -1728,8 +1728,26 @@ const MainFrame = (props: Props) => {
     [launchPreview]
   );
 
+  const launchPreviewWithScreenshot = React.useCallback(
+    () =>
+      launchPreview({
+        networkPreview: false,
+        hotReload: false,
+        launchCaptureOptions: {
+          screenshots: [
+            { delayTimeInSeconds: 3000 }, // Take only 1 screenshot per preview.
+          ],
+        },
+      }),
+    [launchPreview]
+  );
+
   const launchHotReloadPreview = React.useCallback(
-    () => launchPreview({ networkPreview: false, hotReload: true }),
+    () =>
+      launchPreview({
+        networkPreview: false,
+        hotReload: true,
+      }),
     [launchPreview]
   );
 
@@ -3579,6 +3597,7 @@ const MainFrame = (props: Props) => {
         onNetworkPreview={launchNetworkPreview}
         onHotReloadPreview={launchHotReloadPreview}
         onLaunchPreviewWithDiagnosticReport={launchPreviewWithDiagnosticReport}
+        onLaunchPreviewWithScreenshot={launchPreviewWithScreenshot}
         canDoNetworkPreview={
           !!_previewLauncher.current &&
           _previewLauncher.current.canDoNetworkPreview()

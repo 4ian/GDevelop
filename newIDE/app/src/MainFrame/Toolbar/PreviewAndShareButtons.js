@@ -20,6 +20,7 @@ export type PreviewAndShareButtonsProps = {|
   onNetworkPreview: () => Promise<void>,
   onHotReloadPreview: () => Promise<void>,
   onLaunchPreviewWithDiagnosticReport: () => Promise<void>,
+  onLaunchPreviewWithScreenshot: () => Promise<void>,
   setPreviewOverride: ({|
     isPreviewOverriden: boolean,
     overridenPreviewLayoutName: ?string,
@@ -40,6 +41,7 @@ const PreviewAndShareButtons = React.memo<PreviewAndShareButtonsProps>(
     onOpenDebugger,
     onHotReloadPreview,
     onLaunchPreviewWithDiagnosticReport,
+    onLaunchPreviewWithScreenshot,
     canDoNetworkPreview,
     isPreviewEnabled,
     hasPreviewsRunning,
@@ -185,7 +187,11 @@ const PreviewAndShareButtons = React.memo<PreviewAndShareButtonsProps>(
       <LineStackLayout noMargin>
         <FlatButtonWithSplitMenu
           primary
-          onClick={onHotReloadPreview}
+          onClick={
+            !hasPreviewsRunning && preferences.values.takeScreenshotOnPreview // Take a screenshot on first preview.
+              ? onLaunchPreviewWithScreenshot
+              : onHotReloadPreview
+          }
           disabled={!isPreviewEnabled}
           icon={hasPreviewsRunning ? <UpdateIcon /> : <PreviewIcon />}
           label={

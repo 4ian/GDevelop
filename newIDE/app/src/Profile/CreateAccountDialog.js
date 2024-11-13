@@ -1,7 +1,6 @@
 // @flow
 import React from 'react';
 import { Trans } from '@lingui/macro';
-import { t } from '@lingui/macro';
 
 import FlatButton from '../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
@@ -12,23 +11,21 @@ import {
 } from '../Utils/GDevelopServices/Authentication';
 import { type UsernameAvailability } from '../Utils/GDevelopServices/User';
 import LeftLoader from '../UI/LeftLoader';
-import BackgroundText from '../UI/BackgroundText';
-import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
-import { MarkdownText } from '../UI/MarkdownText';
+import { ColumnStackLayout } from '../UI/Layout';
 import { isUsernameValid } from './UsernameField';
 import HelpButton from '../UI/HelpButton';
 import Text from '../UI/Text';
 import GDevelopGLogo from '../UI/CustomSvgIcons/GDevelopGLogo';
-import { Column } from '../UI/Grid';
-import Link from '../UI/Link';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import CreateAccountForm from './CreateAccountForm';
 
 const getStyles = ({ isMobile }) => {
   return {
     formContainer: {
-      width: isMobile ? '95%' : '60%',
+      display: 'flex',
+      width: isMobile ? '95%' : '90%',
       marginTop: 10,
+      flexDirection: 'column',
     },
   };
 };
@@ -182,7 +179,7 @@ const CreateAccountDialog = ({
       onRequestClose={() => {
         if (!createAccountInProgress) onClose();
       }}
-      maxWidth="sm"
+      maxWidth="md"
       open
       flexColumnBody
     >
@@ -194,24 +191,8 @@ const CreateAccountDialog = ({
       >
         <GDevelopGLogo fontSize="large" />
         <Text size="section-title" align="center" noMargin>
-          <Trans>Sign up for free!</Trans>
+          <Trans>Welcome to GDevelop!</Trans>
         </Text>
-        <Column noMargin alignItems="center">
-          <LineStackLayout noMargin>
-            <Text size="body2" noMargin align="center">
-              <Trans>Already a member?</Trans>
-            </Text>
-            <Link
-              href="#"
-              onClick={onGoToLogin}
-              disabled={createAccountInProgress}
-            >
-              <Text size="body2" noMargin color="inherit">
-                <Trans>Log in to your account</Trans>
-              </Text>
-            </Link>
-          </LineStackLayout>
-        </Column>
         <div style={styles.formContainer}>
           <CreateAccountForm
             onCreateAccount={createAccount}
@@ -230,13 +211,9 @@ const CreateAccountDialog = ({
             onChangeUsernameAvailability={setUsernameAvailability}
             isValidatingUsername={isValidatingUsername}
             onChangeIsValidatingUsername={setIsValidatingUsername}
+            onGoToLogin={onGoToLogin}
           />
         </div>
-        <BackgroundText>
-          <MarkdownText
-            translatableSource={t`By creating an account and using GDevelop, you agree to the [Terms and Conditions](https://gdevelop.io/page/terms-and-conditions).`}
-          />
-        </BackgroundText>
       </ColumnStackLayout>
     </Dialog>
   );

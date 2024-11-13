@@ -299,7 +299,7 @@ const Dialog = ({
     ? styles.flexBody
     : {};
   const additionalPaddingStyle = {
-    paddingTop: title ? 0 : dialogTitlePadding, // Ensure the padding is here if there is no title.
+    paddingTop: 0, // Let the title container handle the padding, or no padding if there is no title.
     paddingBottom: hasActions ? 0 : dialogActionPadding, // Ensure the padding is here if there are no actions.
   };
   const contentStyle = {

@@ -10,29 +10,40 @@ import {
 } from '../Utils/GDevelopServices/Authentication';
 import Text from '../UI/Text';
 import { getEmailErrorText, getPasswordErrorText } from './CreateAccountDialog';
-import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
+import {
+  ColumnStackLayout,
+  LineStackLayout,
+  ResponsiveLineStackLayout,
+} from '../UI/Layout';
 import Link from '../UI/Link';
 import ForgotPasswordDialog from './ForgotPasswordDialog';
 import Form from '../UI/Form';
-import { Line } from '../UI/Grid';
+import { Column, Line, Spacer } from '../UI/Grid';
 import FlatButton from '../UI/FlatButton';
 import AlertMessage from '../UI/AlertMessage';
 import Google from '../UI/CustomSvgIcons/Google';
 import Apple from '../UI/CustomSvgIcons/Apple';
 import GitHub from '../UI/CustomSvgIcons/GitHub';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
+import RaisedButton from '../UI/RaisedButton';
+import ResponsiveDelimiter from './ResponsiveDelimiter';
 
-const styles = {
-  identityProvidersBlock: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'stretch',
-    marginTop: 10,
+const getStyles = ({ verticalDesign }) => ({
+  createAccountContainer: {
+    width: '100%',
+  },
+  panelContainer: {
+    width: verticalDesign ? '100%' : '90%',
   },
   icon: {
     width: 16,
     height: 16,
   },
-};
+  backgroundText: {
+    width: '100%',
+    textAlign: 'start',
+  },
+});
 
 export const accountsAlreadyExistsWithDifferentProviderCopy = (
   <Trans>
@@ -51,6 +62,7 @@ type Props = {|
   onForgotPassword: (form: ForgotPasswordForm) => Promise<void>,
   loginInProgress: boolean,
   error: ?AuthError,
+  onGoToCreateAccount?: () => void,
 |};
 
 const LoginForm = ({
@@ -63,6 +75,7 @@ const LoginForm = ({
   onForgotPassword,
   loginInProgress,
   error,
+  onGoToCreateAccount,
 }: Props) => {
   const [
     isForgotPasswordDialogOpen,
@@ -72,6 +85,10 @@ const LoginForm = ({
   const accountsExistsWithOtherCredentials = error
     ? error.code === 'auth/account-exists-with-different-credential'
     : false;
+
+  const { isMobile, isLandscape } = useResponsiveWindowSize();
+  const verticalDesign = isMobile && !isLandscape;
+  const styles = getStyles({ verticalDesign });
 
   return (
     <>
@@ -84,38 +101,112 @@ const LoginForm = ({
         <Form onSubmit={onLogin} autoComplete="on" name="login">
           <ColumnStackLayout noMargin>
             {accountsExistsWithOtherCredentials && (
-              <AlertMessage kind="error">
+              <AlertMessage kind="warning">
                 {accountsAlreadyExistsWithDifferentProviderCopy}
               </AlertMessage>
             )}
-            <TextField
-              autoFocus="desktop"
-              value={email}
-              floatingLabelText={<Trans>Email</Trans>}
-              errorText={getEmailErrorText(error)}
-              onChange={(e, value) => {
-                onChangeEmail(value);
-              }}
-              onBlur={event => {
-                onChangeEmail(event.currentTarget.value.trim());
-              }}
-              fullWidth
-              type="email"
-              disabled={loginInProgress}
-            />
-            <TextField
-              value={password}
-              floatingLabelText={<Trans>Password</Trans>}
-              errorText={getPasswordErrorText(error)}
-              type="password"
-              onChange={(e, value) => {
-                onChangePassword(value);
-              }}
-              fullWidth
-              disabled={loginInProgress}
-            />
+            <ResponsiveLineStackLayout noMargin noResponsiveLandscape>
+              <Column
+                expand
+                noMargin
+                alignItems="center"
+                justifyContent="center"
+              >
+                <div style={styles.panelContainer}>
+                  <ColumnStackLayout noMargin>
+                    <RaisedButton
+                      primary
+                      fullWidth
+                      label={<Trans>Continue with Google</Trans>}
+                      icon={<Google style={styles.icon} />}
+                      onClick={() => {
+                        onLoginWithProvider('google');
+                      }}
+                      disabled={loginInProgress}
+                    />
+                    <FlatButton
+                      primary
+                      fullWidth
+                      label={<Trans>Continue with Github</Trans>}
+                      leftIcon={<GitHub style={styles.icon} />}
+                      onClick={() => {
+                        onLoginWithProvider('github');
+                      }}
+                      disabled={loginInProgress}
+                    />
+                    <FlatButton
+                      primary
+                      fullWidth
+                      label={<Trans>Continue with Apple</Trans>}
+                      leftIcon={<Apple style={styles.icon} />}
+                      onClick={() => {
+                        onLoginWithProvider('apple');
+                      }}
+                      disabled={loginInProgress}
+                    />
+                  </ColumnStackLayout>
+                </div>
+              </Column>
+              <ResponsiveDelimiter text={<Trans>or</Trans>} />
+              <Column
+                expand
+                noMargin
+                alignItems="center"
+                justifyContent="center"
+              >
+                <div style={styles.panelContainer}>
+                  <ColumnStackLayout noMargin>
+                    <TextField
+                      autoFocus="desktop"
+                      value={email}
+                      floatingLabelText={<Trans>Email</Trans>}
+                      errorText={getEmailErrorText(error)}
+                      onChange={(e, value) => {
+                        onChangeEmail(value);
+                      }}
+                      onBlur={event => {
+                        onChangeEmail(event.currentTarget.value.trim());
+                      }}
+                      fullWidth
+                      type="email"
+                      disabled={loginInProgress}
+                    />
+                    <TextField
+                      value={password}
+                      floatingLabelText={<Trans>Password</Trans>}
+                      errorText={getPasswordErrorText(error)}
+                      type="password"
+                      onChange={(e, value) => {
+                        onChangePassword(value);
+                      }}
+                      fullWidth
+                      disabled={loginInProgress}
+                    />
+                    {onGoToCreateAccount && (
+                      <div style={styles.createAccountContainer}>
+                        <LineStackLayout noMargin>
+                          <Text size="body2" noMargin>
+                            <Trans>Don't have an account yet?</Trans>
+                          </Text>
+                          <Link
+                            href=""
+                            onClick={onGoToCreateAccount}
+                            disabled={loginInProgress}
+                          >
+                            <Text size="body2" noMargin color="inherit">
+                              <Trans>Create an account</Trans>
+                            </Text>
+                          </Link>
+                        </LineStackLayout>
+                      </div>
+                    )}
+                  </ColumnStackLayout>
+                </div>
+              </Column>
+            </ResponsiveLineStackLayout>
           </ColumnStackLayout>
         </Form>
+        <Spacer />
         <Line noMargin justifyContent="center">
           <Link
             href=""
@@ -127,47 +218,6 @@ const LoginForm = ({
             </Text>
           </Link>
         </Line>
-        <div style={styles.identityProvidersBlock}>
-          <Line noMargin justifyContent="center">
-            <Text size="body2" noMargin>
-              <Trans>Or continue with</Trans>
-            </Text>
-          </Line>
-          <Line>
-            <ResponsiveLineStackLayout expand noColumnMargin noMargin>
-              <FlatButton
-                primary
-                fullWidth
-                label="Google"
-                leftIcon={<Google style={styles.icon} />}
-                onClick={() => {
-                  onLoginWithProvider('google');
-                }}
-                disabled={loginInProgress}
-              />
-              <FlatButton
-                primary
-                fullWidth
-                label="GitHub"
-                leftIcon={<GitHub style={styles.icon} />}
-                onClick={() => {
-                  onLoginWithProvider('github');
-                }}
-                disabled={loginInProgress}
-              />
-              <FlatButton
-                primary
-                fullWidth
-                label="Apple"
-                leftIcon={<Apple style={styles.icon} />}
-                onClick={() => {
-                  onLoginWithProvider('apple');
-                }}
-                disabled={loginInProgress}
-              />
-            </ResponsiveLineStackLayout>
-          </Line>
-        </div>
       </ColumnStackLayout>
       {isForgotPasswordDialogOpen && (
         <ForgotPasswordDialog

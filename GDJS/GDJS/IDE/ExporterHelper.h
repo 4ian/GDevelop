@@ -543,6 +543,16 @@ class ExporterHelper {
                            std::set<gd::String> usedExtensions);
 
   /**
+   * \brief Generate the Build Resources files for Electron (mainly for the
+   * icons) for packaging and save it to the export directory.
+   *
+   * \param project The original (non modified) project to be used.
+   * \param exportDir The directory where the files must be created.
+   */
+  bool ExportBuildResourcesElectronFiles(const gd::Project &project,
+                                         gd::String exportDir);
+
+  /**
    * \brief Generate the Facebook Instant Games files for packaging and save it
    * to the export directory.
    *

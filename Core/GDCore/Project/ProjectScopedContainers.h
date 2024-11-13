@@ -36,13 +36,13 @@ class ProjectScopedContainers {
   ProjectScopedContainers(
       const gd::ObjectsContainersList &objectsContainersList_,
       const gd::VariablesContainersList &variablesContainersList_,
-      const gd::VariablesContainer &legacyGlobalVariables_,
-      const gd::VariablesContainer &legacySceneVariables_,
+      const gd::VariablesContainer *legacyGlobalVariables_,
+      const gd::VariablesContainer *legacySceneVariables_,
       const gd::PropertiesContainersList &propertiesContainersList_)
       : objectsContainersList(objectsContainersList_),
         variablesContainersList(variablesContainersList_),
-        legacyGlobalVariables(&legacyGlobalVariables_),
-        legacySceneVariables(&legacySceneVariables_),
+        legacyGlobalVariables(legacyGlobalVariables_),
+        legacySceneVariables(legacySceneVariables_),
         propertiesContainersList(propertiesContainersList_){};
   virtual ~ProjectScopedContainers(){};
 
@@ -202,9 +202,8 @@ class ProjectScopedContainers {
    * extension. It allows legacy "globalvar" parameters to accept extension
    * variables.
    */
-  const gd::VariablesContainer &GetLegacyGlobalVariables() const {
-    // It can only be null when the empty constructor is used by Emscripten.
-    return *legacyGlobalVariables;
+  const gd::VariablesContainer *GetLegacyGlobalVariables() const {
+    return legacyGlobalVariables;
   };
 
   /**
@@ -212,9 +211,8 @@ class ProjectScopedContainers {
    * extension. It allows legacy "scenevar" parameters to accept extension
    * variables.
    */
-  const gd::VariablesContainer &GetLegacySceneVariables() const {
-    // It can only be null when the empty constructor is used by Emscripten.
-    return *legacySceneVariables;
+  const gd::VariablesContainer *GetLegacySceneVariables() const {
+    return legacySceneVariables;
   };
 
   const gd::PropertiesContainersList &GetPropertiesContainersList() const {

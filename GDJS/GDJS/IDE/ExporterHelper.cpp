@@ -717,6 +717,11 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
     }
   }
 
+  return true;
+}
+
+bool ExporterHelper::ExportBuildResourcesElectronFiles(
+    const gd::Project &project, gd::String exportDir) {
   auto &platformSpecificAssets = project.GetPlatformSpecificAssets();
   auto &resourceManager = project.GetResourcesManager();
 
@@ -724,6 +729,7 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
       resourceManager
           .GetResource(platformSpecificAssets.Get("desktop", "icon-512"))
           .GetFile();
+
   auto projectDirectory = gd::AbstractFileSystem::NormalizeSeparator(
       fs.DirNameFrom(project.GetProjectFile()));
   fs.MakeAbsolute(iconFilename, projectDirectory);

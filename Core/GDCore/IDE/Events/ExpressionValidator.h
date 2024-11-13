@@ -14,6 +14,7 @@
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Project/ProjectScopedContainers.h"
 #include "GDCore/Project/VariablesContainersList.h"
+#include "GDCore/Project/VariablesContainer.h"
 
 namespace gd {
 class Expression;
@@ -45,7 +46,9 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
         parentType(StringToType(gd::ValueTypeMetadata::GetExpressionPrimitiveValueType(rootType_))),
         childType(Type::Unknown),
         forbidsUsageOfBracketsBecauseParentIsObject(false),
-        currentParameterExtraInfo(&extraInfo_) {};
+        currentParameterExtraInfo(&extraInfo_),
+        variableObjectName(),
+        variableObjectNameLocation() {};
   virtual ~ExpressionValidator(){};
 
   /**
@@ -225,7 +228,8 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       projectScopedContainers.MatchIdentifierWithName<void>(node.name,
         [&]() {
           // This represents an object.
-
+          variableObjectName = node.name;
+          variableObjectNameLocation = node.nameLocation;
           // While understood by the parser, it's forbidden to use the bracket notation just after
           // an object name (`MyObject["MyVariable"]`).
           forbidsUsageOfBracketsBecauseParentIsObject = true;
@@ -264,7 +268,13 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   }
   void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {
     ReportAnyError(node);
-
+    // TODO Also check child-variables existence on a path with only VariableAccessor to raise non-fatal errors.
+    if (!variableObjectName.empty()) {
+      ValidateObjectVariableOrVariableOrProperty(variableObjectName,
+                                                 variableObjectNameLocation,
+                                                 node.name, node.nameLocation);
+      variableObjectName = "";
+    }
     // In the case we accessed an object variable (`MyObject.MyVariable`),
     // brackets can now be used (`MyObject.MyVariable["MyChildVariable"]` is now valid).
     forbidsUsageOfBracketsBecauseParentIsObject = false;
@@ -277,6 +287,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       VariableBracketAccessorNode& node) override {
     ReportAnyError(node);
 
+    variableObjectName = "";
     if (forbidsUsageOfBracketsBecauseParentIsObject) {
       RaiseError(gd::ExpressionParserError::ErrorType::BracketsNotAllowedForObjects,
                  _("You can't use the brackets to access an object variable. "
@@ -369,6 +380,11 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   enum Type {Unknown = 0, Number, String, NumberOrString, Variable, LegacyVariable, Object, Empty};
   Type ValidateFunction(const gd::FunctionCallNode& function);
   bool ValidateObjectVariableOrVariableOrProperty(const gd::IdentifierNode& identifier);
+  bool ValidateObjectVariableOrVariableOrProperty(
+      const gd::String &identifierName,
+      const gd::ExpressionParserLocation identifierNameLocation,
+      const gd::String &childIdentifierName,
+      const gd::ExpressionParserLocation childIdentifierNameLocation);
 
   void CheckVariableExistence(const ExpressionParserLocation &location, const gd::String& name) {
     if (!currentParameterExtraInfo || *currentParameterExtraInfo != "AllowUndeclaredVariable") {
@@ -505,6 +521,8 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   Type childType; ///< The type "discovered" down the tree and passed up.
   Type parentType; ///< The type "required" by the top of the tree.
   bool forbidsUsageOfBracketsBecauseParentIsObject;
+  gd::String variableObjectName;
+  gd::ExpressionParserLocation variableObjectNameLocation;
   const gd::String *currentParameterExtraInfo;
   const gd::Platform &platform;
   const gd::ProjectScopedContainers &projectScopedContainers;

@@ -287,6 +287,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       VariableBracketAccessorNode& node) override {
     ReportAnyError(node);
 
+    variableObjectName = "";
     if (forbidsUsageOfBracketsBecauseParentIsObject) {
       RaiseError(gd::ExpressionParserError::ErrorType::BracketsNotAllowedForObjects,
                  _("You can't use the brackets to access an object variable. "

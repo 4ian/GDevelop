@@ -1790,11 +1790,9 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
-      REQUIRE(validator.GetFatalErrors().size() == 2);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "You can't use the brackets to access an object variable. Use a dot followed by the variable name, like this: `MyObject.MyVariable`.");
-      REQUIRE(validator.GetFatalErrors()[1]->GetMessage() ==
-              "This variable does not exist on this object or group.");
     }
     {
       auto node =

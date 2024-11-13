@@ -41,8 +41,8 @@ class ProjectScopedContainers {
       const gd::PropertiesContainersList &propertiesContainersList_)
       : objectsContainersList(objectsContainersList_),
         variablesContainersList(variablesContainersList_),
-        legacyGlobalVariables(legacyGlobalVariables_),
-        legacySceneVariables(legacySceneVariables_),
+        legacyGlobalVariables(&legacyGlobalVariables_),
+        legacySceneVariables(&legacySceneVariables_),
         propertiesContainersList(propertiesContainersList_){};
   virtual ~ProjectScopedContainers(){};
 
@@ -203,7 +203,8 @@ class ProjectScopedContainers {
    * variables.
    */
   const gd::VariablesContainer &GetLegacyGlobalVariables() const {
-    return legacyGlobalVariables;
+    // It can only be null when the empty constructor is used by Emscripten.
+    return *legacyGlobalVariables;
   };
 
   /**
@@ -212,7 +213,8 @@ class ProjectScopedContainers {
    * variables.
    */
   const gd::VariablesContainer &GetLegacySceneVariables() const {
-    return legacySceneVariables;
+    // It can only be null when the empty constructor is used by Emscripten.
+    return *legacySceneVariables;
   };
 
   const gd::PropertiesContainersList &GetPropertiesContainersList() const {
@@ -230,8 +232,8 @@ class ProjectScopedContainers {
  private:
   gd::ObjectsContainersList objectsContainersList;
   gd::VariablesContainersList variablesContainersList;
-  gd::VariablesContainer legacyGlobalVariables;
-  gd::VariablesContainer legacySceneVariables;
+  const gd::VariablesContainer *legacyGlobalVariables;
+  const gd::VariablesContainer *legacySceneVariables;
   gd::PropertiesContainersList propertiesContainersList;
   std::vector<const ParameterMetadataContainer *> parametersVectorsList;
 };

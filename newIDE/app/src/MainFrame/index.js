@@ -541,6 +541,7 @@ const MainFrame = (props: Props) => {
     onCaptureFinished,
     onGameScreenshotsClaimed,
     getGameUnverifiedScreenshotUrls,
+    getGameLastPreviewScreenshotTakenAt,
   } = useCapturesManager({ project: currentProject, gamesList });
 
   /**
@@ -1723,7 +1724,7 @@ const MainFrame = (props: Props) => {
   const launchNewPreview = React.useCallback(
     async options => {
       const numberOfWindows = options ? options.numberOfWindows : 1;
-      launchPreview({ networkPreview: false, numberOfWindows });
+      await launchPreview({ networkPreview: false, numberOfWindows });
     },
     [launchPreview]
   );
@@ -3598,6 +3599,13 @@ const MainFrame = (props: Props) => {
         onHotReloadPreview={launchHotReloadPreview}
         onLaunchPreviewWithDiagnosticReport={launchPreviewWithDiagnosticReport}
         onLaunchPreviewWithScreenshot={launchPreviewWithScreenshot}
+        lastPreviewScreenshotTakenAt={
+          currentProject
+            ? getGameLastPreviewScreenshotTakenAt(
+                currentProject.getProjectUuid()
+              )
+            : null
+        }
         canDoNetworkPreview={
           !!_previewLauncher.current &&
           _previewLauncher.current.canDoNetworkPreview()

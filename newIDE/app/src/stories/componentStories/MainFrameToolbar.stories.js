@@ -54,6 +54,7 @@ const defaultProps: MainFrameToolbarProps = {
   onHotReloadPreview: async () => {},
   onLaunchPreviewWithDiagnosticReport: async () => {},
   onLaunchPreviewWithScreenshot: async () => {},
+  lastPreviewScreenshotTakenAt: null,
   setPreviewOverride: () => {},
   canDoNetworkPreview: true,
   isPreviewEnabled: false,

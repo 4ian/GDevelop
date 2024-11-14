@@ -12,6 +12,8 @@ import {
 import { type GamesList } from '../GameDashboard/UseGamesList';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
+export const TIME_BETWEEN_PREVIEW_SCREENSHOTS = 1000 * 60 * 3; // 3 minutes
+
 const useCapturesManager = ({
   project,
   gamesList,
@@ -28,6 +30,10 @@ const useCapturesManager = ({
       unverifiedPublicUrl: string,
     |}>
   >([]);
+  const [
+    lastPreviewScreenshotsTakenAt,
+    setLastPreviewScreenshotsTakenAt,
+  ] = React.useState<{ [projectUuid: string]: number }>({});
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
   );
@@ -84,6 +90,7 @@ const useCapturesManager = ({
   const onCaptureFinished = React.useCallback(
     async (captureOptions: CaptureOptions) => {
       if (!project) return;
+      const projectId = project.getProjectUuid();
 
       try {
         const screenshots = captureOptions.screenshots;
@@ -116,8 +123,13 @@ const useCapturesManager = ({
         if (!uploadedScreenshotPublicUrls.length) return;
 
         const game = gamesList.games
-          ? gamesList.games.find(game => game.id === project.getProjectUuid())
+          ? gamesList.games.find(game => game.id === projectId)
           : null;
+
+        setLastPreviewScreenshotsTakenAt(lastPreviewScreenshotsTakenAt => ({
+          ...lastPreviewScreenshotsTakenAt,
+          [projectId]: Date.now(),
+        }));
 
         // The game is registered, let's update it.
         if (game && profile) {
@@ -149,7 +161,7 @@ const useCapturesManager = ({
         setUnverifiedGameScreenshots(unverifiedScreenshots => [
           ...unverifiedScreenshots,
           ...uploadedScreenshotPublicUrls.map(unverifiedPublicUrl => ({
-            projectUuid: project.getProjectUuid(),
+            projectUuid: projectId,
             unverifiedPublicUrl,
           })),
         ]);
@@ -183,11 +195,19 @@ const useCapturesManager = ({
     [project]
   );
 
+  const getGameLastPreviewScreenshotTakenAt = React.useCallback(
+    (gameId: string): number => {
+      return lastPreviewScreenshotsTakenAt[gameId] || 0;
+    },
+    [lastPreviewScreenshotsTakenAt]
+  );
+
   return {
     createCaptureOptionsForPreview,
     onCaptureFinished,
     getGameUnverifiedScreenshotUrls,
     onGameScreenshotsClaimed,
+    getGameLastPreviewScreenshotTakenAt,
   };
 };
 

@@ -11,6 +11,7 @@ import FlatButtonWithSplitMenu from '../../UI/FlatButtonWithSplitMenu';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import ResponsiveRaisedButton from '../../UI/ResponsiveRaisedButton';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
+import { TIME_BETWEEN_PREVIEW_SCREENSHOTS } from '../UseCapturesManager';
 
 export type PreviewAndShareButtonsProps = {|
   onPreviewWithoutHotReload: (?{ numberOfWindows: number }) => Promise<void>,
@@ -21,6 +22,7 @@ export type PreviewAndShareButtonsProps = {|
   onHotReloadPreview: () => Promise<void>,
   onLaunchPreviewWithDiagnosticReport: () => Promise<void>,
   onLaunchPreviewWithScreenshot: () => Promise<void>,
+  lastPreviewScreenshotTakenAt: ?number,
   setPreviewOverride: ({|
     isPreviewOverriden: boolean,
     overridenPreviewLayoutName: ?string,
@@ -42,6 +44,7 @@ const PreviewAndShareButtons = React.memo<PreviewAndShareButtonsProps>(
     onHotReloadPreview,
     onLaunchPreviewWithDiagnosticReport,
     onLaunchPreviewWithScreenshot,
+    lastPreviewScreenshotTakenAt,
     canDoNetworkPreview,
     isPreviewEnabled,
     hasPreviewsRunning,
@@ -183,12 +186,18 @@ const PreviewAndShareButtons = React.memo<PreviewAndShareButtonsProps>(
       [openShareDialog]
     );
 
+    // Do not use a memo, as Date.now() is always changing.
+    const shouldTakeScreenshotOnPreview =
+      preferences.values.takeScreenshotOnPreview &&
+      Date.now() >
+        (lastPreviewScreenshotTakenAt || 0) + TIME_BETWEEN_PREVIEW_SCREENSHOTS;
+
     return (
       <LineStackLayout noMargin>
         <FlatButtonWithSplitMenu
           primary
           onClick={
-            !hasPreviewsRunning && preferences.values.takeScreenshotOnPreview // Take a screenshot on first preview.
+            shouldTakeScreenshotOnPreview
               ? onLaunchPreviewWithScreenshot
               : onHotReloadPreview
           }

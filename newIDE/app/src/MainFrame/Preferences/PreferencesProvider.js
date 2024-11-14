@@ -197,6 +197,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       this
     ),
     setGamesListOrderBy: this._setGamesListOrderBy.bind(this),
+    setTakeScreenshotOnPreview: this._setTakeScreenshotOnPreview.bind(this),
   };
 
   componentDidMount() {
@@ -1015,6 +1016,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           gamesListOrderBy: newValue,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setTakeScreenshotOnPreview(newValue: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          takeScreenshotOnPreview: newValue,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

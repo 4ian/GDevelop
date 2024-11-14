@@ -541,7 +541,8 @@ const MainFrame = (props: Props) => {
     onCaptureFinished,
     onGameScreenshotsClaimed,
     getGameUnverifiedScreenshotUrls,
-  } = useCapturesManager({ project: currentProject });
+    getHotReloadPreviewLaunchCaptureOptions,
+  } = useCapturesManager({ project: currentProject, gamesList });
 
   /**
    * This reference is useful to get the current opened project,
@@ -1723,14 +1724,25 @@ const MainFrame = (props: Props) => {
   const launchNewPreview = React.useCallback(
     async options => {
       const numberOfWindows = options ? options.numberOfWindows : 1;
-      launchPreview({ networkPreview: false, numberOfWindows });
+      await launchPreview({ networkPreview: false, numberOfWindows });
     },
     [launchPreview]
   );
 
   const launchHotReloadPreview = React.useCallback(
-    () => launchPreview({ networkPreview: false, hotReload: true }),
-    [launchPreview]
+    async () => {
+      const launchCaptureOptions = currentProject
+        ? getHotReloadPreviewLaunchCaptureOptions(
+            currentProject.getProjectUuid()
+          )
+        : undefined;
+      await launchPreview({
+        networkPreview: false,
+        hotReload: true,
+        launchCaptureOptions,
+      });
+    },
+    [currentProject, launchPreview, getHotReloadPreviewLaunchCaptureOptions]
   );
 
   const launchNetworkPreview = React.useCallback(

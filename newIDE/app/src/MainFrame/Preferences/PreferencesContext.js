@@ -225,6 +225,7 @@ export type PreferencesValues = {|
   fetchPlayerTokenForPreviewAutomatically: boolean,
   previewCrashReportUploadLevel: string,
   gamesListOrderBy: 'createdAt' | 'totalSessions' | 'weeklySessions',
+  takeScreenshotOnPreview: boolean,
 |};
 
 /**
@@ -326,6 +327,7 @@ export type Preferences = {|
   setGamesListOrderBy: (
     orderBy: 'createdAt' | 'totalSessions' | 'weeklySessions'
   ) => void,
+  setTakeScreenshotOnPreview: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
@@ -382,6 +384,7 @@ export const initialPreferences = {
     fetchPlayerTokenForPreviewAutomatically: true,
     previewCrashReportUploadLevel: 'exclude-javascript-code-events',
     gamesListOrderBy: 'createdAt',
+    takeScreenshotOnPreview: true,
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -455,6 +458,7 @@ export const initialPreferences = {
   setGamesListOrderBy: (
     orderBy: 'createdAt' | 'totalSessions' | 'weeklySessions'
   ) => {},
+  setTakeScreenshotOnPreview: (enabled: boolean) => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

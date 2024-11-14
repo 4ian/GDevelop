@@ -831,7 +831,7 @@ namespace gdjs {
       }
       const unscaledWidth = this._renderer.getUnscaledWidth();
       if (unscaledWidth !== 0) {
-        this.setScaleX(newWidth / unscaledWidth);
+        this.setScaleX(newWidth / (unscaledWidth * this._preScale));
       }
     }
 
@@ -841,7 +841,7 @@ namespace gdjs {
       }
       const unscaledHeight = this._renderer.getUnscaledHeight();
       if (unscaledHeight !== 0) {
-        this.setScaleY(newHeight / unscaledHeight);
+        this.setScaleY(newHeight / (unscaledHeight * this._preScale));
       }
     }
 

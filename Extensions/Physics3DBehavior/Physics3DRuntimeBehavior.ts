@@ -112,6 +112,10 @@ namespace gdjs {
      */
     _registeredBehaviors: Set<Physics3DRuntimeBehavior>;
 
+    private _physics3DHooks: Array<
+      gdjs.Physics3DRuntimeBehavior.Physics3DHook
+    > = [];
+
     constructor(instanceContainer: gdjs.RuntimeInstanceContainer, sharedData) {
       this._registeredBehaviors = new Set<Physics3DRuntimeBehavior>();
       this.gravityX = sharedData.gravityX;
@@ -234,34 +238,39 @@ namespace gdjs {
       this._registeredBehaviors.delete(physicsBehavior);
     }
 
-    /**
-     * Reset all contactsStartedThisFrame and contactsEndedThisFrame of all
-     * registered physics behavior.
-     */
-    resetStartedAndEndedCollisions(): void {
+    step(deltaTime: float): void {
+      // Reset started and ended contacts array for all physics instances.
       for (const physicsBehavior of this._registeredBehaviors) {
         physicsBehavior.contactsStartedThisFrame.length = 0;
         physicsBehavior.contactsEndedThisFrame.length = 0;
       }
       this.behaviorsByBodyID.clear();
-    }
-
-    /**
-     * Update all registered body.
-     */
-    updateBodiesFromObjects(): void {
       for (const physicsBehavior of this._registeredBehaviors) {
         physicsBehavior.updateBodyFromObject();
       }
-    }
+      for (const physics3DHook of this._physics3DHooks) {
+        physics3DHook.beforePhysicsStep(deltaTime);
+      }
 
-    step(deltaTime: float): void {
       // When running below 55 Hz, do 2 steps instead of 1
       const numSteps = deltaTime > 1.0 / 55.0 ? 2 : 1;
 
       // Step the physics world
       this.jolt.Step(deltaTime, numSteps);
       this.stepped = true;
+    }
+    
+    /**
+     * A hook must typically be registered by a behavior that requires this one
+     * in its onCreate function.
+     * The hook must stay forever to avoid side effects like a hooks order
+     * change. To handle deactivated behavior, the hook can check that its
+     * behavior is activated before doing anything.
+     */
+    registerHook(
+      hook: gdjs.Physics3DRuntimeBehavior.Physics3DHook
+    ) {
+      this._physics3DHooks.push(hook);
     }
   }
   gdjs.registerRuntimeSceneUnloadedCallback(function (runtimeScene) {
@@ -407,19 +416,19 @@ namespace gdjs {
       }
       if (oldBehaviorData.shapeDimensionA !== newBehaviorData.shapeDimensionA) {
         this.shapeDimensionA = newBehaviorData.shapeDimensionA;
-        this.recreateShape();
+        this.needToRecreateShape = true;
       }
       if (oldBehaviorData.shapeDimensionB !== newBehaviorData.shapeDimensionB) {
         this.shapeDimensionB = newBehaviorData.shapeDimensionB;
-        this.recreateShape();
+        this.needToRecreateShape = true;
       }
       if (oldBehaviorData.shapeOffsetX !== newBehaviorData.shapeOffsetX) {
         this.shapeOffsetX = newBehaviorData.shapeOffsetX;
-        this.recreateShape();
+        this.needToRecreateShape = true;
       }
       if (oldBehaviorData.shapeOffsetY !== newBehaviorData.shapeOffsetY) {
         this.shapeOffsetY = newBehaviorData.shapeOffsetY;
-        this.recreateShape();
+        this.needToRecreateShape = true;
       }
       if (oldBehaviorData.density !== newBehaviorData.density) {
         this.setDensity(newBehaviorData.density);
@@ -460,39 +469,47 @@ namespace gdjs {
     }
 
     getNetworkSyncData(): Physics3DNetworkSyncData {
-      const bodyProps = this._body
-        ? {
-            px: this._body.GetPosition().GetX(),
-            py: this._body.GetPosition().GetY(),
-            pz: this._body.GetPosition().GetZ(),
-            rx: this._body.GetRotation().GetX(),
-            ry: this._body.GetRotation().GetY(),
-            rz: this._body.GetRotation().GetZ(),
-            rw: this._body.GetRotation().GetW(),
-            lvx: this._body.GetLinearVelocity().GetX(),
-            lvy: this._body.GetLinearVelocity().GetY(),
-            lvz: this._body.GetLinearVelocity().GetZ(),
-            avx: this._body.GetAngularVelocity().GetX(),
-            avy: this._body.GetAngularVelocity().GetY(),
-            avz: this._body.GetAngularVelocity().GetZ(),
-            aw: this._body.IsActive(),
-          }
-        : {
-            px: undefined,
-            py: undefined,
-            pz: undefined,
-            rx: undefined,
-            ry: undefined,
-            rz: undefined,
-            rw: undefined,
-            lvx: undefined,
-            lvy: undefined,
-            lvz: undefined,
-            avx: undefined,
-            avy: undefined,
-            avz: undefined,
-            aw: undefined,
-          };
+      let bodyProps;
+      if (this._body) {
+        const position = this._body.GetPosition();
+        const rotation = this._body.GetRotation();
+        const linearVelocity = this._body.GetLinearVelocity();
+        const angularVelocity = this._body.GetAngularVelocity();
+        bodyProps = {
+              px: position.GetX(),
+              py: position.GetY(),
+              pz: position.GetZ(),
+              rx: rotation.GetX(),
+              ry: rotation.GetY(),
+              rz: rotation.GetZ(),
+              rw: rotation.GetW(),
+              lvx: linearVelocity.GetX(),
+              lvy: linearVelocity.GetY(),
+              lvz: linearVelocity.GetZ(),
+              avx: angularVelocity.GetX(),
+              avy: angularVelocity.GetY(),
+              avz: angularVelocity.GetZ(),
+              aw: this._body.IsActive(),
+            };
+      }
+      else {
+        bodyProps = {
+          px: undefined,
+          py: undefined,
+          pz: undefined,
+          rx: undefined,
+          ry: undefined,
+          rz: undefined,
+          rw: undefined,
+          lvx: undefined,
+          lvy: undefined,
+          lvz: undefined,
+          avx: undefined,
+          avy: undefined,
+          avz: undefined,
+          aw: undefined,
+        };
+      }
       return {
         ...super.getNetworkSyncData(),
         props: {
@@ -614,8 +631,6 @@ namespace gdjs {
     }
 
     createShape(): Jolt.Shape {
-      this.needToRecreateShape = false;
-
       const width = this.owner3D.getWidth() * this._sharedData.worldInvScale;
       const height = this.owner3D.getHeight() * this._sharedData.worldInvScale;
       const depth = this.owner3D.getDepth() * this._sharedData.worldInvScale;
@@ -768,6 +783,17 @@ namespace gdjs {
 
       if (!this.activated() || this.destroyedDuringFrameLogic) return false;
 
+      this._body = this.createAndAddBody();
+      this._body.gdjsAssociatedBehavior = this;
+
+      this._objectOldWidth = this.owner3D.getWidth();
+      this._objectOldHeight = this.owner3D.getHeight();
+      this._objectOldDepth = this.owner3D.getDepth();
+      return true;
+    }
+
+    createAndAddBody(): Jolt.Body {
+      console.log("Create body");
       const width = this.owner3D.getWidth() * this._sharedData.worldInvScale;
       const height = this.owner3D.getHeight() * this._sharedData.worldInvScale;
       const depth = this.owner3D.getDepth() * this._sharedData.worldInvScale;
@@ -798,14 +824,7 @@ namespace gdjs {
           : this.bodyType === 'Kinematic'
           ? Jolt.EMotionType_Kinematic
           : Jolt.EMotionType_Dynamic,
-        Jolt.ObjectLayerPairFilterMask.prototype.sGetObjectLayer(
-          // Make sure objects don't register in the wrong layer group.
-          this.bodyType === 'Static'
-            ? this.layers & staticLayersMask
-            : this.layers & dynamicLayersMask,
-          // Static objects accept all collisions as it's the mask of dynamic objects that matters.
-          this.bodyType === 'Static' ? allLayersMask : this.masks
-        )
+        this.getBodyLayer()
       );
       bodyCreationSettings.mMotionQuality = this.bullet
         ? Jolt.EMotionQuality_LinearCast
@@ -822,15 +841,26 @@ namespace gdjs {
       bodyCreationSettings.mGravityFactor = this.gravityScale;
 
       const bodyInterface = this._sharedData.bodyInterface;
-      this._body = bodyInterface.CreateBody(bodyCreationSettings);
-      bodyInterface.AddBody(this._body.GetID(), Jolt.EActivation_Activate);
-      this._body.gdjsAssociatedBehavior = this;
-
-      this._objectOldWidth = this.owner3D.getWidth();
-      this._objectOldHeight = this.owner3D.getHeight();
-      this._objectOldDepth = this.owner3D.getDepth();
+      const body = bodyInterface.CreateBody(bodyCreationSettings);
       Jolt.destroy(bodyCreationSettings);
-      return true;
+
+      bodyInterface.AddBody(body.GetID(), Jolt.EActivation_Activate);
+      return body;
+    }
+
+    /**
+     * @returns The body layer id according to the behavior configuration.
+     */
+    getBodyLayer(): number {
+      return Jolt.ObjectLayerPairFilterMask.prototype.sGetObjectLayer(
+        // Make sure objects don't register in the wrong layer group.
+        0xf0,//TODO
+        // this.bodyType === 'Static'
+        //   ? this.layers & staticLayersMask
+        //   : this.layers & dynamicLayersMask,
+        // Static objects accept all collisions as it's the mask of dynamic objects that matters.
+        allLayersMask //TODO this.bodyType === 'Static' ? allLayersMask : this.masks
+      );
     }
 
     doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
@@ -840,9 +870,6 @@ namespace gdjs {
         !this._sharedData.stepped &&
         !instanceContainer.getScene().getTimeManager().isFirstFrame()
       ) {
-        // Reset started and ended contacts array for all physics instances.
-        this._sharedData.resetStartedAndEndedCollisions();
-        this._sharedData.updateBodiesFromObjects();
         this._sharedData.step(
           instanceContainer.getScene().getTimeManager().getElapsedTime() /
             1000.0
@@ -909,15 +936,20 @@ namespace gdjs {
         this.createBody();
         return;
       }
-      const LinearVelocityX = this._body.GetLinearVelocity().GetX();
-      const LinearVelocityY = this._body.GetLinearVelocity().GetY();
-      const LinearVelocityZ = this._body.GetLinearVelocity().GetZ();
-      const AngularVelocityX = this._body.GetAngularVelocity().GetX();
-      const AngularVelocityY = this._body.GetAngularVelocity().GetY();
-      const AngularVelocityZ = this._body.GetAngularVelocity().GetZ();
 
-      this._sharedData.bodyInterface.RemoveBody(this._body.GetID());
-      this._sharedData.bodyInterface.DestroyBody(this._body.GetID());
+      const bodyInterface = this._sharedData.bodyInterface;
+      const linearVelocity = this._body.GetLinearVelocity();
+      const linearVelocityX = linearVelocity.GetX();
+      const linearVelocityY = linearVelocity.GetY();
+      const linearVelocityZ = linearVelocity.GetZ();
+      const angularVelocity = this._body.GetAngularVelocity();
+      const angularVelocityX = angularVelocity.GetX();
+      const angularVelocityY = angularVelocity.GetY();
+      const angularVelocityZ = angularVelocity.GetZ();
+
+      let bodyID = this._body.GetID();
+      bodyInterface.RemoveBody(bodyID);
+      bodyInterface.DestroyBody(bodyID);
       this.contactsEndedThisFrame.length = 0;
       this.contactsStartedThisFrame.length = 0;
       this.currentContacts.length = 0;
@@ -926,11 +958,12 @@ namespace gdjs {
       if (!this._body) {
         return;
       }
-      this._body.SetLinearVelocity(
-        this.getVec3(LinearVelocityX, LinearVelocityY, LinearVelocityZ)
+      bodyID = this._body.GetID();
+      bodyInterface.SetLinearVelocity(bodyID,
+        this.getVec3(linearVelocityX, linearVelocityY, linearVelocityZ)
       );
-      this._body.SetAngularVelocity(
-        this.getVec3(AngularVelocityX, AngularVelocityY, AngularVelocityZ)
+      bodyInterface.SetAngularVelocity(bodyID,
+        this.getVec3(angularVelocityX, angularVelocityY, angularVelocityZ)
       );
     }
 
@@ -954,6 +987,7 @@ namespace gdjs {
         this._objectOldHeight !== this.owner3D.getHeight() ||
         this._objectOldDepth !== this.owner3D.getDepth()
       ) {
+        this.needToRecreateShape = false;
         this.recreateShape();
       }
 
@@ -1721,4 +1755,18 @@ namespace gdjs {
     'Physics3D::Physics3DBehavior',
     gdjs.Physics3DRuntimeBehavior
   );
+
+  
+  export namespace Physics3DRuntimeBehavior {
+    /**
+     * Allow extensions relying on the 3D physics to customize its
+     * behavior a bit.
+     */
+    export interface Physics3DHook {
+      /**
+       * Called before the physics engine step.
+       */
+      beforePhysicsStep(timeDelta: float): void;
+    }
+  }
 }

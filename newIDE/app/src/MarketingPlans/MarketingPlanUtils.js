@@ -89,7 +89,7 @@ export const getRequirementsErrors = (
     );
   }
   if (!!marketingPlanGameRequirements.isDiscoverable && !game.discoverable) {
-    requirementsErrors.push(<Trans>Your game is not discoverable</Trans>);
+    requirementsErrors.push(<Trans>Your game is hidden on gd.games</Trans>);
   }
 
   return requirementsErrors;

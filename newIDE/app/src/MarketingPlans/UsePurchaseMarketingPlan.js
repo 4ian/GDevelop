@@ -84,19 +84,20 @@ const usePurchaseMarketingPlan = ({
           ) : (
             <Trans>Get Featuring</Trans>
           ),
-        message: canExtend ? (
-          <Trans>
-            You are about to use {planCreditsAmount} credits to extend the game
-            featuring {translatedName} for your game {game.gameName} and push it
-            to the top of gd.games. Continue?
-          </Trans>
-        ) : (
-          <Trans>
-            You are about to use {planCreditsAmount} credits to purchase the
-            game featuring {translatedName} for your game {game.gameName}.
-            Continue?
-          </Trans>
-        ),
+        message:
+          isPlanActive && canExtend ? (
+            <Trans>
+              You are about to use {planCreditsAmount} credits to extend the
+              game featuring {translatedName} for your game {game.gameName} and
+              push it to the top of gd.games. Continue?
+            </Trans>
+          ) : (
+            <Trans>
+              You are about to use {planCreditsAmount} credits to purchase the
+              game featuring {translatedName} for your game {game.gameName}.
+              Continue?
+            </Trans>
+          ),
         onConfirm: async () => {
           await buyGameFeaturing(getAuthorizationHeader, {
             gameId: game.id,

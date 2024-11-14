@@ -443,7 +443,7 @@ export function PublicGameProperties({
             >
               <SelectOption
                 value="visible"
-                label={t`Visible on your profile page`}
+                label={t`Visible in the search and your profile`}
               />
               <SelectOption value="hidden" label={t`Hidden`} />
             </SelectField>

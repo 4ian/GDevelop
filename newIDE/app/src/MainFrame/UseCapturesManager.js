@@ -11,6 +11,7 @@ import {
 } from '../Utils/GDevelopServices/Game';
 import { type GamesList } from '../GameDashboard/UseGamesList';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import PreferencesContext from './Preferences/PreferencesContext';
 
 export const TIME_BETWEEN_PREVIEW_SCREENSHOTS = 1000 * 60 * 3; // 3 minutes
 
@@ -37,6 +38,7 @@ const useCapturesManager = ({
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
   );
+  const preferences = React.useContext(PreferencesContext);
 
   const createCaptureOptionsForPreview = React.useCallback(
     async (
@@ -195,11 +197,18 @@ const useCapturesManager = ({
     [project]
   );
 
-  const getGameLastPreviewScreenshotTakenAt = React.useCallback(
-    (gameId: string): number => {
-      return lastPreviewScreenshotsTakenAt[gameId] || 0;
+  const getHotReloadPreviewLaunchCaptureOptions = React.useCallback(
+    (gameId: string): LaunchCaptureOptions | void => {
+      const shouldTakeScreenshotOnPreview =
+        preferences.values.takeScreenshotOnPreview &&
+        Date.now() >
+          (lastPreviewScreenshotsTakenAt[gameId] || 0) +
+            TIME_BETWEEN_PREVIEW_SCREENSHOTS;
+      return shouldTakeScreenshotOnPreview
+        ? { screenshots: [{ delayTimeInSeconds: 3000 }] }
+        : undefined;
     },
-    [lastPreviewScreenshotsTakenAt]
+    [preferences.values.takeScreenshotOnPreview, lastPreviewScreenshotsTakenAt]
   );
 
   return {
@@ -207,7 +216,7 @@ const useCapturesManager = ({
     onCaptureFinished,
     getGameUnverifiedScreenshotUrls,
     onGameScreenshotsClaimed,
-    getGameLastPreviewScreenshotTakenAt,
+    getHotReloadPreviewLaunchCaptureOptions,
   };
 };
 

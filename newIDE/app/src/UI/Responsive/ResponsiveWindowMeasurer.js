@@ -9,9 +9,10 @@ import useOnResize from '../../Utils/UseOnResize';
 // Xlarge corresponds to large desktop screens.
 export type WindowSizeType = 'small' | 'medium' | 'large' | 'xlarge';
 const sizeThresholds = {
-  small: 600,
-  medium: 1150,
-  large: 1500,
+  smallHeight: 500,
+  smallWidth: 600,
+  mediumWidth: 1150,
+  largeWidth: 1500,
 };
 
 type Props = {|
@@ -53,22 +54,22 @@ export const useResponsiveWindowSize = (): {
 
   const isLandscape = window.innerWidth > window.innerHeight;
 
-  return window.innerWidth < sizeThresholds.small ||
-    window.innerHeight < sizeThresholds.small // Mobile devices can be in landscape mode, so check both width and height.
+  return window.innerWidth < sizeThresholds.smallWidth ||
+    window.innerHeight < sizeThresholds.smallHeight // Mobile devices can be in landscape mode, so check both width and height.
     ? {
         windowSize: 'small',
         isMobile: true,
         isMediumScreen: false,
         isLandscape,
       }
-    : window.innerWidth < sizeThresholds.medium
+    : window.innerWidth < sizeThresholds.mediumWidth
     ? {
         windowSize: 'medium',
         isMobile: false,
         isMediumScreen: true,
         isLandscape,
       }
-    : window.innerWidth < sizeThresholds.large
+    : window.innerWidth < sizeThresholds.largeWidth
     ? {
         windowSize: 'large',
         isMobile: false,

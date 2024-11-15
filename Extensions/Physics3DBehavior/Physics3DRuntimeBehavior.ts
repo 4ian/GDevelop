@@ -476,23 +476,22 @@ namespace gdjs {
         const linearVelocity = this._body.GetLinearVelocity();
         const angularVelocity = this._body.GetAngularVelocity();
         bodyProps = {
-              px: position.GetX(),
-              py: position.GetY(),
-              pz: position.GetZ(),
-              rx: rotation.GetX(),
-              ry: rotation.GetY(),
-              rz: rotation.GetZ(),
-              rw: rotation.GetW(),
-              lvx: linearVelocity.GetX(),
-              lvy: linearVelocity.GetY(),
-              lvz: linearVelocity.GetZ(),
-              avx: angularVelocity.GetX(),
-              avy: angularVelocity.GetY(),
-              avz: angularVelocity.GetZ(),
-              aw: this._body.IsActive(),
-            };
-      }
-      else {
+          px: position.GetX(),
+          py: position.GetY(),
+          pz: position.GetZ(),
+          rx: rotation.GetX(),
+          ry: rotation.GetY(),
+          rz: rotation.GetZ(),
+          rw: rotation.GetW(),
+          lvx: linearVelocity.GetX(),
+          lvy: linearVelocity.GetY(),
+          lvz: linearVelocity.GetZ(),
+          avx: angularVelocity.GetX(),
+          avy: angularVelocity.GetY(),
+          avz: angularVelocity.GetZ(),
+          aw: this._body.IsActive(),
+        };
+      } else {
         bodyProps = {
           px: undefined,
           py: undefined,
@@ -793,7 +792,7 @@ namespace gdjs {
     }
 
     createAndAddBody(): Jolt.Body {
-      console.log("Create body");
+      console.log('Create body');
       const width = this.owner3D.getWidth() * this._sharedData.worldInvScale;
       const height = this.owner3D.getHeight() * this._sharedData.worldInvScale;
       const depth = this.owner3D.getDepth() * this._sharedData.worldInvScale;
@@ -854,7 +853,7 @@ namespace gdjs {
     getBodyLayer(): number {
       return Jolt.ObjectLayerPairFilterMask.prototype.sGetObjectLayer(
         // Make sure objects don't register in the wrong layer group.
-        0xf0,//TODO
+        0xf0, //TODO
         // this.bodyType === 'Static'
         //   ? this.layers & staticLayersMask
         //   : this.layers & dynamicLayersMask,
@@ -959,10 +958,12 @@ namespace gdjs {
         return;
       }
       bodyID = this._body.GetID();
-      bodyInterface.SetLinearVelocity(bodyID,
+      bodyInterface.SetLinearVelocity(
+        bodyID,
         this.getVec3(linearVelocityX, linearVelocityY, linearVelocityZ)
       );
-      bodyInterface.SetAngularVelocity(bodyID,
+      bodyInterface.SetAngularVelocity(
+        bodyID,
         this.getVec3(angularVelocityX, angularVelocityY, angularVelocityZ)
       );
     }
@@ -1000,29 +1001,35 @@ namespace gdjs {
         this._objectOldRotationY !== this.owner3D.getRotationY() ||
         this._objectOldRotationZ !== this.owner3D.getAngle()
       ) {
-        const x =
-          (this.owner3D.getDrawableX() + this.owner3D.getWidth() / 2) *
-          this._sharedData.worldInvScale;
-        const y =
-          (this.owner3D.getDrawableY() + this.owner3D.getHeight() / 2) *
-          this._sharedData.worldInvScale;
-        const z =
-          (this.owner3D.getDrawableZ() + this.owner3D.getDepth() / 2) *
-          this._sharedData.worldInvScale;
-
-        const threeObject = this.owner3D.get3DRendererObject();
         this._sharedData.bodyInterface.SetPositionAndRotationWhenChanged(
           body.GetID(),
-          this.getRVec3(x, y, z),
-          this.getQuat(
-            threeObject.quaternion.x,
-            threeObject.quaternion.y,
-            threeObject.quaternion.z,
-            threeObject.quaternion.w
-          ),
+          this.getPhysicsPosition(this.getRVec3(0, 0, 0)),
+          this.getPhysicsRotation(this.getQuat(0, 0, 0, 1)),
           Jolt.EActivation_Activate
         );
       }
+    }
+
+    getPhysicsPosition(result: Jolt.RVec3): Jolt.RVec3 {
+      result.Set(
+        (this.owner3D.getDrawableX() + this.owner3D.getWidth() / 2) *
+          this._sharedData.worldInvScale,
+        (this.owner3D.getDrawableY() + this.owner3D.getHeight() / 2) *
+          this._sharedData.worldInvScale,
+        (this.owner3D.getDrawableZ() + this.owner3D.getDepth() / 2) *
+          this._sharedData.worldInvScale
+      );
+      return result;
+    }
+
+    getPhysicsRotation(result: Jolt.Quat): Jolt.Quat {
+      const threeObject = this.owner3D.get3DRendererObject();
+      result.Set(threeObject.quaternion.x,
+        threeObject.quaternion.y,
+        threeObject.quaternion.z,
+        threeObject.quaternion.w
+      );
+      return result;
     }
 
     getWorldScale(): float {

@@ -23,16 +23,33 @@ namespace gdjs {
     shapeFilter: Jolt.ShapeFilter;
   };
 
-  export class PhysicsCharacter3DRuntimeBehavior extends gdjs.RuntimeBehavior implements gdjs.Physics3DRuntimeBehavior.Physics3DHook {
+  export class PhysicsCharacter3DRuntimeBehavior
+    extends gdjs.RuntimeBehavior
+    implements gdjs.Physics3DRuntimeBehavior.Physics3DHook
+  {
     owner3D: gdjs.RuntimeObject3D;
     physics3DBehaviorName: string;
     physics3D: Physics3D | null = null;
+    character: Jolt.CharacterVirtual | null = null;
+    /**
+     * sharedData is a reference to the shared data of the scene, that registers
+     * every physics behavior that is created so that collisions can be cleared
+     * before stepping the world.
+     */
+    _sharedData: gdjs.Physics3DSharedData;
 
     _slopeMaxAngle: float;
+    _slopeClimbingFactor: float = 1;
+    forwardAcceleration: float = 1600;
+    forwardDeceleration: float = 1600;
+    forwardSpeedMax: float = 800;
+    _gravity: float = 1000;
+    _maxFallingSpeed: float = 700;
 
-    character: Jolt.CharacterVirtual | null = null;
-
-    forwardSpeed: float = 100;
+    hasPressedForwardKey: boolean = false;
+    hasPressedBackwardKey: boolean = false;
+    forwardSpeed: float = 0;
+    _currentFallSpeed: float = 0;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -42,23 +59,29 @@ namespace gdjs {
       super(instanceContainer, behaviorData, owner);
       this.owner3D = owner;
       this.physics3DBehaviorName = behaviorData.Physics3D;
-      this._slopeMaxAngle = behaviorData.slopeMaxAngle;
+      this._sharedData = gdjs.Physics3DSharedData.getSharedData(
+        instanceContainer.getScene(),
+        behaviorData.Physics3D
+      );
+      
+      this._slopeMaxAngle = 0;
+      this.setSlopeMaxAngle(behaviorData.slopeMaxAngle);
     }
 
     private getVec3(x: float, y: float, z: float): Jolt.Vec3 {
-      const tempVec3 = this.getPhysics3D().behavior._sharedData._tempVec3;
+      const tempVec3 = this._sharedData._tempVec3;
       tempVec3.Set(x, y, z);
       return tempVec3;
     }
 
     private getRVec3(x: float, y: float, z: float): Jolt.RVec3 {
-      const tempRVec3 = this.getPhysics3D().behavior._sharedData._tempRVec3;
+      const tempRVec3 = this._sharedData._tempRVec3;
       tempRVec3.Set(x, y, z);
       return tempRVec3;
     }
 
     private getQuat(x: float, y: float, z: float, w: float): Jolt.Quat {
-      const tempQuat = this.getPhysics3D().behavior._sharedData._tempQuat;
+      const tempQuat = this._sharedData._tempQuat;
       tempQuat.Set(x, y, z, w);
       return tempQuat;
     }
@@ -74,6 +97,7 @@ namespace gdjs {
       const sharedData = behavior._sharedData;
       const jolt = sharedData.jolt;
       const extendedUpdateSettings = new Jolt.ExtendedUpdateSettings();
+      extendedUpdateSettings.mWalkStairsStepUp = this.getVec3(0, 0, 0.4);
       const objectVsBroadPhaseLayerFilter =
         jolt.GetObjectVsBroadPhaseLayerFilter();
       const objectLayerPairFilter = jolt.GetObjectLayerPairFilter();
@@ -139,15 +163,16 @@ namespace gdjs {
       const sharedData = behavior._sharedData;
       this.character = new Jolt.CharacterVirtual(
         settings,
-        Jolt.RVec3.prototype.sZero(),
-        Jolt.Quat.prototype.sIdentity(),
+        behavior.getPhysicsPosition(this.getRVec3(0, 0, 0)),
+        behavior.getPhysicsRotation(this.getQuat(0, 0, 0, 1)),
         sharedData.physicsSystem
       );
       //TODO this.character.SetListener(characterContactListener);
 
-      return sharedData.physicsSystem
+      const body = sharedData.physicsSystem
         .GetBodyLockInterface()
         .TryGetBody(this.character.GetInnerBodyID());
+      return body;
     }
 
     onDeActivate() {}
@@ -176,14 +201,71 @@ namespace gdjs {
         return;
       }
       console.log('Step character');
-      const angle = gdjs.toRad(this.owner.getAngle());
+      
+      console.log(
+        'Character: ' +
+          this.character.GetPosition().GetX() *
+            behavior._sharedData.worldScale +
+          ' ' +
+          this.character.GetPosition().GetY() *
+            behavior._sharedData.worldScale +
+          ' ' +
+          this.character.GetPosition().GetZ() * behavior._sharedData.worldScale
+      );
+
+      // Change the speed according to the player's input.
+      // TODO Give priority to the last key for faster reaction time.
+      if (this.hasPressedBackwardKey !== this.hasPressedForwardKey) {
+        if (this.hasPressedBackwardKey) {
+          if (this.forwardSpeed <= 0) {
+            this.forwardSpeed -= this.forwardAcceleration * timeDelta;
+          } else {
+            // Turn back at least as fast as it would stop.
+            this.forwardSpeed -=
+              Math.max(this.forwardAcceleration, this.forwardDeceleration) *
+              timeDelta;
+          }
+        } else if (this.hasPressedForwardKey) {
+          if (this.forwardSpeed >= 0) {
+            this.forwardSpeed += this.forwardAcceleration * timeDelta;
+          } else {
+            this.forwardSpeed +=
+              Math.max(this.forwardAcceleration, this.forwardDeceleration) *
+              timeDelta;
+          }
+        }
+      }
+      // Take deceleration into account only if no key is pressed.
+      if (this.hasPressedBackwardKey === this.hasPressedForwardKey) {
+        // Set the speed to 0 if the speed was too low.
+        if (this.forwardSpeed < 0) {
+          this.forwardSpeed = Math.max(
+            this.forwardSpeed + this.forwardDeceleration * timeDelta,
+            0
+          );
+        }
+        if (this.forwardSpeed > 0) {
+          this.forwardSpeed = Math.min(
+            this.forwardSpeed - this.forwardDeceleration * timeDelta,
+            0
+          );
+        }
+      }
+      this.forwardSpeed = Math.max(
+        -this.forwardSpeedMax,
+        Math.min(this.forwardSpeedMax, this.forwardSpeed)
+      );
+
+      this._currentFallSpeed = Math.max(-this._maxFallingSpeed, this._currentFallSpeed - this._gravity * timeDelta);
+
       const forwardSpeed =
         this.forwardSpeed * behavior._sharedData.worldInvScale;
+      const angle = gdjs.toRad(this.owner.getAngle());
       this.character.SetLinearVelocity(
         this.getVec3(
           forwardSpeed * Math.cos(angle),
           forwardSpeed * Math.sin(angle),
-          0
+          this._currentFallSpeed * behavior._sharedData.worldInvScale
         )
       );
       const sharedData = behavior._sharedData;
@@ -192,7 +274,7 @@ namespace gdjs {
       extendedUpdateSettings.mStickToFloorStepDown.Set(
         0,
         0,
-        forwardSpeed * timeDelta * Math.tan(gdjs.toRad(this._slopeMaxAngle))
+        forwardSpeed * timeDelta * this._slopeClimbingFactor
       );
 
       this.character.SetRotation(behavior._body!.GetRotation());
@@ -213,29 +295,63 @@ namespace gdjs {
       //     this.character.GetLinearVelocity().GetY()
       // );
       console.log(
-        'Character: ' +
-          (this.character.GetPosition().GetX() * behavior._sharedData.worldScale) +
-          ' ' +
-          (this.character.GetPosition().GetY() * behavior._sharedData.worldScale) +
-          ' ' +
-          (this.character.GetPosition().GetZ() * behavior._sharedData.worldScale)
-      );
-      console.log(
         'Body: ' +
-          (behavior._body!.GetPosition().GetX() * behavior._sharedData.worldScale) +
+          behavior._body!.GetPosition().GetX() *
+            behavior._sharedData.worldScale +
           ' ' +
-          (behavior._body!.GetPosition().GetY() * behavior._sharedData.worldScale) +
+          behavior._body!.GetPosition().GetY() *
+            behavior._sharedData.worldScale +
           ' ' +
-          (behavior._body!.GetPosition().GetZ() * behavior._sharedData.worldScale)
+          behavior._body!.GetPosition().GetZ() * behavior._sharedData.worldScale
       );
-      console.log('Object: ' + this.owner.getX() + ' ' + this.owner.getY() + ' ' + behavior.owner3D.getZ());
+      // console.log(
+      //   'Object: ' +
+      //     this.owner.getX() +
+      //     ' ' +
+      //     this.owner.getY() +
+      //     ' ' +
+      //     behavior.owner3D.getZ()
+      // );
+      
+      this.hasPressedForwardKey = false;
     }
 
     doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
 
     onObjectHotReloaded() {}
 
-    simulateMoveForwardKey(): void {}
+    simulateMoveForwardKey(): void {
+      this.hasPressedForwardKey = true;
+    }
+    
+    /**
+     * Set the maximum slope angle of the Platformer Object.
+     * @param slopeMaxAngle The new maximum slope angle.
+     */
+    setSlopeMaxAngle(slopeMaxAngle: float): void {
+      if (slopeMaxAngle < 0 || slopeMaxAngle >= 90) {
+        return;
+      }
+      this._slopeMaxAngle = slopeMaxAngle;
+
+      //Avoid rounding errors
+      if (slopeMaxAngle === 45) {
+        this._slopeClimbingFactor = 1;
+      } else {
+        this._slopeClimbingFactor = Math.tan(
+          gdjs.toRad(slopeMaxAngle)
+        );
+      }
+
+      // Avoid a `_slopeClimbingFactor` set to exactly 0.
+      // Otherwise, this can lead the floor finding functions to consider
+      // a floor to be "too high" to reach, even if the object is very slightly
+      // inside it, which can happen because of rounding errors.
+      // See "Floating-point error mitigations" tests.
+      if (this._slopeClimbingFactor < 1 / 1024) {
+        this._slopeClimbingFactor = 1 / 1024;
+      }
+    }
   }
 
   gdjs.registerBehavior(

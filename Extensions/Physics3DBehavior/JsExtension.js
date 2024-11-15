@@ -1507,14 +1507,104 @@ module.exports = {
           _('Simulate move forward key press'),
           _('Simulate a press of the move forward key.'),
           _('Simulate pressing move forward key for _PARAM0_'),
+          _('Character controls'),
+          'res/physics3d.svg',
+          'res/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3DBehavior')
+        .setFunctionName('simulateForwardKey');
+
+      aut
+        .addAction(
+          'SimulateJumpKey',
+          _('Simulate jump key press'),
+          _('Simulate a press of the jump key.'),
+          _('Simulate pressing Jump key for _PARAM0_'),
+          _('Character controls'),
+          'res/physics3d.svg',
+          'res/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3DBehavior')
+        .setFunctionName('simulateJumpKey');
+
+      aut
+        .addCondition(
+          'IsOnFloor',
+          _('Is on floor'),
+          _('Check if the object is on a platform.'),
+          _('_PARAM0_ is on floor'),
           _('Character state'),
           'res/physics3d.svg',
           'res/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3DBehavior')
-        .getCodeExtraInformation()
-        .setFunctionName('simulateMoveForwardKey');
+        .markAsSimple()
+        .setFunctionName('isOnFloor');
+
+      aut
+        .addCondition(
+          'IsJumping',
+          _('Is jumping'),
+          _('Check if the object is jumping.'),
+          _('_PARAM0_ is jumping'),
+          _('Character state'),
+          'res/physics3d.svg',
+          'res/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3DBehavior')
+        .markAsSimple()
+        .setFunctionName('isJumping');
+
+      aut
+        .addCondition(
+          'IsFalling',
+          _('Is falling'),
+          _(
+            'Check if the object is falling.\nNote that the object can be flagged as jumping and falling at the same time: at the end of a jump, the fall speed becomes higher than the jump speed.'
+          ),
+          _('_PARAM0_ is falling'),
+          _('Character state'),
+          'res/physics3d.svg',
+          'res/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3DBehavior')
+        .setFunctionName('isFalling');
+
+      aut
+        .addExpressionAndCondition(
+          'number',
+          'CurrentForwardSpeed',
+          _('Current forward speed'),
+          _('the current forward speed of the object.'),
+          _('the current forward speed'),
+          _('Character state'),
+          'res/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3DBehavior')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('getCurrentForwardSpeed');
+
+      aut
+        .addExpressionAndCondition(
+          'number',
+          'ForwardSpeedMax',
+          _('Forward max speed'),
+          _('the forward max speed of the object.'),
+          _('the forward max speed'),
+          _('Character configuration'),
+          'res/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3DBehavior')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setForwardSpeedMax')
+        .setGetter('getForwardSpeedMax');
     }
     return extension;
   },

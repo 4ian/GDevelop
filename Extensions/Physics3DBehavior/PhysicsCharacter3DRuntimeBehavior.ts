@@ -40,16 +40,23 @@ namespace gdjs {
 
     _slopeMaxAngle: float;
     _slopeClimbingFactor: float = 1;
-    forwardAcceleration: float = 1600;
-    forwardDeceleration: float = 1600;
-    forwardSpeedMax: float = 800;
+    forwardAcceleration: float = 1200;
+    forwardDeceleration: float = 1200;
+    forwardSpeedMax: float = 600;
     _gravity: float = 1000;
     _maxFallingSpeed: float = 700;
+    _jumpSpeed: float = 900;
+    _jumpSustainTime: float = 0.2;
 
     hasPressedForwardKey: boolean = false;
     hasPressedBackwardKey: boolean = false;
-    forwardSpeed: float = 0;
+    hasPressedJumpKey: boolean = false;
+    _currentForwardSpeed: float = 0;
     _currentFallSpeed: float = 0;
+    _canJump: boolean = false;
+    _currentJumpSpeed: float = 0;
+    _timeSinceCurrentJumpStart: float = 0;
+    _jumpKeyHeldSinceJumpStart: boolean = false;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -63,7 +70,7 @@ namespace gdjs {
         instanceContainer.getScene(),
         behaviorData.Physics3D
       );
-      
+
       this._slopeMaxAngle = 0;
       this.setSlopeMaxAngle(behaviorData.slopeMaxAngle);
     }
@@ -201,7 +208,7 @@ namespace gdjs {
         return;
       }
       console.log('Step character');
-      
+
       console.log(
         'Character: ' +
           this.character.GetPosition().GetX() *
@@ -217,19 +224,19 @@ namespace gdjs {
       // TODO Give priority to the last key for faster reaction time.
       if (this.hasPressedBackwardKey !== this.hasPressedForwardKey) {
         if (this.hasPressedBackwardKey) {
-          if (this.forwardSpeed <= 0) {
-            this.forwardSpeed -= this.forwardAcceleration * timeDelta;
+          if (this._currentForwardSpeed <= 0) {
+            this._currentForwardSpeed -= this.forwardAcceleration * timeDelta;
           } else {
             // Turn back at least as fast as it would stop.
-            this.forwardSpeed -=
+            this._currentForwardSpeed -=
               Math.max(this.forwardAcceleration, this.forwardDeceleration) *
               timeDelta;
           }
         } else if (this.hasPressedForwardKey) {
-          if (this.forwardSpeed >= 0) {
-            this.forwardSpeed += this.forwardAcceleration * timeDelta;
+          if (this._currentForwardSpeed >= 0) {
+            this._currentForwardSpeed += this.forwardAcceleration * timeDelta;
           } else {
-            this.forwardSpeed +=
+            this._currentForwardSpeed +=
               Math.max(this.forwardAcceleration, this.forwardDeceleration) *
               timeDelta;
           }
@@ -238,34 +245,58 @@ namespace gdjs {
       // Take deceleration into account only if no key is pressed.
       if (this.hasPressedBackwardKey === this.hasPressedForwardKey) {
         // Set the speed to 0 if the speed was too low.
-        if (this.forwardSpeed < 0) {
-          this.forwardSpeed = Math.max(
-            this.forwardSpeed + this.forwardDeceleration * timeDelta,
+        if (this._currentForwardSpeed < 0) {
+          this._currentForwardSpeed = Math.max(
+            this._currentForwardSpeed + this.forwardDeceleration * timeDelta,
             0
           );
         }
-        if (this.forwardSpeed > 0) {
-          this.forwardSpeed = Math.min(
-            this.forwardSpeed - this.forwardDeceleration * timeDelta,
+        if (this._currentForwardSpeed > 0) {
+          this._currentForwardSpeed = Math.min(
+            this._currentForwardSpeed - this.forwardDeceleration * timeDelta,
             0
           );
         }
       }
-      this.forwardSpeed = Math.max(
+      this._currentForwardSpeed = Math.max(
         -this.forwardSpeedMax,
-        Math.min(this.forwardSpeedMax, this.forwardSpeed)
+        Math.min(this.forwardSpeedMax, this._currentForwardSpeed)
       );
 
-      this._currentFallSpeed = Math.max(-this._maxFallingSpeed, this._currentFallSpeed - this._gravity * timeDelta);
+      if (this.isOnFloor()) {
+        this._currentFallSpeed = 0;
+        this._currentJumpSpeed = 0;
+
+        if (this.hasPressedJumpKey) {
+          this._currentJumpSpeed = this._jumpSpeed;
+        }
+      } else {
+        // Decrease jump speed after the (optional) jump sustain time is over.
+        const sustainJumpSpeed =
+          this._jumpKeyHeldSinceJumpStart &&
+          this._timeSinceCurrentJumpStart < this._jumpSustainTime;
+        if (!sustainJumpSpeed) {
+          this._currentJumpSpeed = Math.max(
+            0,
+            this._currentJumpSpeed - this._gravity * timeDelta
+          );
+        }
+
+        this._currentFallSpeed = Math.min(
+          this._maxFallingSpeed,
+          this._currentFallSpeed + this._gravity * timeDelta
+        );
+      }
 
       const forwardSpeed =
-        this.forwardSpeed * behavior._sharedData.worldInvScale;
+        this._currentForwardSpeed * behavior._sharedData.worldInvScale;
       const angle = gdjs.toRad(this.owner.getAngle());
       this.character.SetLinearVelocity(
         this.getVec3(
           forwardSpeed * Math.cos(angle),
           forwardSpeed * Math.sin(angle),
-          this._currentFallSpeed * behavior._sharedData.worldInvScale
+          (this._currentJumpSpeed - this._currentFallSpeed) *
+            behavior._sharedData.worldInvScale
         )
       );
       const sharedData = behavior._sharedData;
@@ -288,22 +319,36 @@ namespace gdjs {
         shapeFilter,
         jolt.GetTempAllocator()
       );
+
+      if (this.isOnFloor()) {
+        this._canJump = true;
+      }
+
+      console.log(
+        'Is on floor: ' +
+          this.isOnFloor() +
+          ' Jump: ' +
+          this._currentJumpSpeed +
+          ' Fall: ' +
+          this._currentFallSpeed
+      );
+
       // console.log(
       //   'Speed: ' +
       //     this.character.GetLinearVelocity().GetX() +
       //     ' ' +
       //     this.character.GetLinearVelocity().GetY()
       // );
-      console.log(
-        'Body: ' +
-          behavior._body!.GetPosition().GetX() *
-            behavior._sharedData.worldScale +
-          ' ' +
-          behavior._body!.GetPosition().GetY() *
-            behavior._sharedData.worldScale +
-          ' ' +
-          behavior._body!.GetPosition().GetZ() * behavior._sharedData.worldScale
-      );
+      // console.log(
+      //   'Body: ' +
+      //     behavior._body!.GetPosition().GetX() *
+      //       behavior._sharedData.worldScale +
+      //     ' ' +
+      //     behavior._body!.GetPosition().GetY() *
+      //       behavior._sharedData.worldScale +
+      //     ' ' +
+      //     behavior._body!.GetPosition().GetZ() * behavior._sharedData.worldScale
+      // );
       // console.log(
       //   'Object: ' +
       //     this.owner.getX() +
@@ -312,18 +357,81 @@ namespace gdjs {
       //     ' ' +
       //     behavior.owner3D.getZ()
       // );
-      
+
+      // console.log(
+      //   'Ground: ' +
+      //   this.character.GetGroundPosition().GetX() *
+      //       behavior._sharedData.worldScale +
+      //     ' ' +
+      //     this.character.GetGroundPosition().GetY() *
+      //       behavior._sharedData.worldScale +
+      //     ' ' +
+      //     this.character.GetGroundPosition().GetZ() * behavior._sharedData.worldScale
+      // );
+
+      // console.log(
+      //   'Ground: ' +
+      //   this.character.GetGroundNormal().GetX() *
+      //       behavior._sharedData.worldScale +
+      //     ' ' +
+      //     this.character.GetGroundNormal().GetY() *
+      //       behavior._sharedData.worldScale +
+      //     ' ' +
+      //     this.character.GetGroundNormal().GetZ() * behavior._sharedData.worldScale
+      // );
+
       this.hasPressedForwardKey = false;
+      this.hasPressedJumpKey = false;
     }
 
     doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
 
     onObjectHotReloaded() {}
 
-    simulateMoveForwardKey(): void {
+    simulateForwardKey(): void {
       this.hasPressedForwardKey = true;
     }
-    
+
+    simulateJumpKey(): void {
+      this.hasPressedJumpKey = true;
+    }
+
+    /**
+     * Check if the Platformer Object is on a floor.
+     * @returns Returns true if on a floor and false if not.
+     */
+    isOnFloor(): boolean {
+      return this.character
+        ? this.character.GetGroundBodyID().GetIndex() < 0x7fffff
+        : false;
+    }
+
+    /**
+     * Check if the Platformer Object is jumping.
+     * @returns Returns true if jumping and false if not.
+     */
+    isJumping(): boolean {
+      return this._currentJumpSpeed > 0;
+    }
+
+    /**
+     * Check if the Platformer Object is "going down", either because it's in the
+     * falling state *or* because it's jumping but reached the jump peak and
+     * is now going down (because the jump speed can't compensate anymore the
+     * falling speed).
+     *
+     * If you want to check if the object is falling outside of a jump (or because
+     * the jump is entirely finished and there is no jump speed applied to the object
+     * anymore), consider using `isFallingWithoutJumping`.
+     *
+     * @returns Returns true if it is "going down" and false if not.
+     */
+    isFalling(): boolean {
+      return (
+        !this.isOnFloor() && this._currentJumpSpeed < this._currentFallSpeed
+      );
+    }
+
     /**
      * Set the maximum slope angle of the Platformer Object.
      * @param slopeMaxAngle The new maximum slope angle.
@@ -338,9 +446,7 @@ namespace gdjs {
       if (slopeMaxAngle === 45) {
         this._slopeClimbingFactor = 1;
       } else {
-        this._slopeClimbingFactor = Math.tan(
-          gdjs.toRad(slopeMaxAngle)
-        );
+        this._slopeClimbingFactor = Math.tan(gdjs.toRad(slopeMaxAngle));
       }
 
       // Avoid a `_slopeClimbingFactor` set to exactly 0.
@@ -351,6 +457,18 @@ namespace gdjs {
       if (this._slopeClimbingFactor < 1 / 1024) {
         this._slopeClimbingFactor = 1 / 1024;
       }
+    }
+
+    getCurrentForwardSpeed(): float {
+      return this._currentForwardSpeed;
+    }
+
+    getForwardSpeedMax(): float {
+      return this.forwardSpeedMax;
+    }
+
+    setForwardSpeedMax(forwardSpeedMax: float): void {
+      this.forwardSpeedMax = forwardSpeedMax;
     }
   }
 

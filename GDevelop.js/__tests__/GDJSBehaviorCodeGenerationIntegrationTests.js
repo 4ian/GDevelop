@@ -10,31 +10,20 @@ describe('libGD.js - GDJS Behavior Code Generation integration tests', function 
   it('generates a working empty behavior', function () {
     // Create an empty behavior
     const project = new gd.ProjectHelper.createNewGDJSProject();
-    const eventsFunctionsExtension = new gd.EventsFunctionsExtension();
-    const eventsBasedBehavior = new gd.EventsBasedBehavior();
-    eventsBasedBehavior.setName('MyBehavior');
-    eventsBasedBehavior.setFullName('My descriptive name');
-    eventsBasedBehavior.setDescription('My description');
+    const eventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const eventsBasedBehavior = eventsFunctionsExtension
+      .getEventsBasedBehaviors()
+      .insertNew('MyBehavior', 0);
 
-    const makeCompiledRuntimeBehavior = generateCompiledRuntimeBehaviorMaker(
+    const { behavior } = generatedBehavior(
       gd,
       project,
       eventsFunctionsExtension,
-      eventsBasedBehavior
-    );
-    eventsBasedBehavior.delete();
-    eventsFunctionsExtension.delete();
-    project.delete();
-
-    // Instantiate the behavior
-    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
-    const CompiledRuntimeBehavior = makeCompiledRuntimeBehavior(gdjs);
-    const behaviorData = {};
-    const ownerRuntimeObject = {};
-    const behavior = new CompiledRuntimeBehavior(
-      runtimeScene,
-      behaviorData,
-      ownerRuntimeObject
+      eventsBasedBehavior,
+      { logCode: false }
     );
 
     // Check that doStepPreEvents is always defined
@@ -44,11 +33,13 @@ describe('libGD.js - GDJS Behavior Code Generation integration tests', function 
   it('generates a working behavior with doStepPreEvents using "Trigger Once" condition', function () {
     // Create a new behavior with events in doStepPreEvents
     const project = new gd.ProjectHelper.createNewGDJSProject();
-    const eventsFunctionsExtension = new gd.EventsFunctionsExtension();
-    const eventsBasedBehavior = new gd.EventsBasedBehavior();
-    eventsBasedBehavior.setName('MyBehavior');
-    eventsBasedBehavior.setFullName('My descriptive name');
-    eventsBasedBehavior.setDescription('My description');
+    const eventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const eventsBasedBehavior = eventsFunctionsExtension
+      .getEventsBasedBehaviors()
+      .insertNew('MyBehavior', 0);
 
     const eventsSerializerElement = gd.Serializer.fromJSObject([
       {
@@ -74,6 +65,10 @@ describe('libGD.js - GDJS Behavior Code Generation integration tests', function 
       .insertNewEventsFunction('doStepPreEvents', 0)
       .getEvents()
       .unserializeFrom(project, eventsSerializerElement);
+    gd.WholeProjectRefactorer.ensureBehaviorEventsFunctionsProperParameters(
+      eventsFunctionsExtension,
+      eventsBasedBehavior
+    );
 
     // Instantiate the behavior twice
     const makeCompiledRuntimeBehavior = generateCompiledRuntimeBehaviorMaker(
@@ -82,8 +77,6 @@ describe('libGD.js - GDJS Behavior Code Generation integration tests', function 
       eventsFunctionsExtension,
       eventsBasedBehavior
     );
-    eventsBasedBehavior.delete();
-    eventsFunctionsExtension.delete();
     project.delete();
 
     const { gdjs, runtimeScene } = makeMinimalGDJSMock();
@@ -120,11 +113,13 @@ describe('libGD.js - GDJS Behavior Code Generation integration tests', function 
   it('generates working behavior with properties (shared or not, with different types), all used in an expression', function () {
     // Create a new behavior with events in doStepPreEvents
     const project = new gd.ProjectHelper.createNewGDJSProject();
-    const eventsFunctionsExtension = new gd.EventsFunctionsExtension();
-    const eventsBasedBehavior = new gd.EventsBasedBehavior();
-    eventsBasedBehavior.setName('MyBehavior');
-    eventsBasedBehavior.setFullName('My descriptive name');
-    eventsBasedBehavior.setDescription('My description');
+    const eventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const eventsBasedBehavior = eventsFunctionsExtension
+      .getEventsBasedBehaviors()
+      .insertNew('MyBehavior', 0);
 
     // Set up some properties.
     eventsBasedBehavior
@@ -177,35 +172,18 @@ describe('libGD.js - GDJS Behavior Code Generation integration tests', function 
       .insertNewEventsFunction('doStepPreEvents', 0)
       .getEvents()
       .unserializeFrom(project, eventsSerializerElement);
+    gd.WholeProjectRefactorer.ensureBehaviorEventsFunctionsProperParameters(
+      eventsFunctionsExtension,
+      eventsBasedBehavior
+    );
 
-    // Instantiate the behavior
-    const makeCompiledRuntimeBehavior = generateCompiledRuntimeBehaviorMaker(
+    const { runtimeScene, behavior } = generatedBehavior(
       gd,
       project,
       eventsFunctionsExtension,
       eventsBasedBehavior,
       { logCode: false }
     );
-    eventsBasedBehavior.delete();
-    eventsFunctionsExtension.delete();
-    project.delete();
-
-    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
-    const CompiledRuntimeBehavior = makeCompiledRuntimeBehavior(gdjs);
-    const behaviorData = {
-      name: 'MyBehavior',
-      type: 'MyBehaviorType',
-    };
-    const ownerRuntimeObject = new gdjs.RuntimeObject(runtimeScene, {
-      name: 'MyObject',
-      type: '',
-    });
-    const behavior = new CompiledRuntimeBehavior(
-      runtimeScene,
-      behaviorData,
-      ownerRuntimeObject
-    );
-    ownerRuntimeObject.addBehavior(behavior);
 
     // Check the default values are set.
     expect(behavior._getMyProperty()).toBe(true);
@@ -224,7 +202,256 @@ describe('libGD.js - GDJS Behavior Code Generation integration tests', function 
       runtimeScene.getVariables().get('SuccessStringVariable').getAsString()
     ).toBe('true2Test');
   });
+
+  it('Can use a property in a variable action', () => {
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const eventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const eventsBasedBehavior = eventsFunctionsExtension
+      .getEventsBasedBehaviors()
+      .insertNew('MyBehavior', 0);
+
+    eventsBasedBehavior
+      .getPropertyDescriptors()
+      .insertNew('MyProperty', 0)
+      .setValue('123')
+      .setType('Number');
+
+    const eventsSerializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'SetNumberVariable' },
+            parameters: ['MyProperty', '=', '456'],
+          },
+        ],
+      },
+    ]);
+    eventsBasedBehavior
+      .getEventsFunctions()
+      .insertNewEventsFunction('MyFunction', 0)
+      .getEvents()
+      .unserializeFrom(project, eventsSerializerElement);
+    gd.WholeProjectRefactorer.ensureBehaviorEventsFunctionsProperParameters(
+      eventsFunctionsExtension,
+      eventsBasedBehavior
+    );
+
+    const { runtimeScene, behavior } = generatedBehavior(
+      gd,
+      project,
+      eventsFunctionsExtension,
+      eventsBasedBehavior,
+      { logCode: false }
+    );
+
+    // Check the default value is set.
+    expect(behavior._getMyProperty()).toBe(123);
+
+    behavior.MyFunction();
+    expect(behavior._getMyProperty()).toBe(456);
+  });
+
+  it('Can use a property in a variable condition', () => {
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const scene = project.insertNewLayout('MyScene', 0);
+    const eventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const eventsBasedBehavior = eventsFunctionsExtension
+      .getEventsBasedBehaviors()
+      .insertNew('MyBehavior', 0);
+
+    eventsBasedBehavior
+      .getPropertyDescriptors()
+      .insertNew('MyProperty', 0)
+      .setValue('123')
+      .setType('Number');
+
+    eventsFunctionsExtension
+      .getSceneVariables()
+      .insertNew('MyVariable', 0)
+      .setValue(0);
+
+    const eventsSerializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [
+          {
+            type: { value: 'NumberVariable' },
+            parameters: ['MyProperty', '=', '123'],
+          },
+        ],
+        actions: [
+          {
+            type: { value: 'SetNumberVariable' },
+            parameters: ['MyVariable', '=', '456'],
+          },
+        ],
+      },
+    ]);
+    eventsBasedBehavior
+      .getEventsFunctions()
+      .insertNewEventsFunction('MyFunction', 0)
+      .getEvents()
+      .unserializeFrom(project, eventsSerializerElement);
+    gd.WholeProjectRefactorer.ensureBehaviorEventsFunctionsProperParameters(
+      eventsFunctionsExtension,
+      eventsBasedBehavior
+    );
+
+    const { runtimeScene, behavior } = generatedBehavior(
+      gd,
+      project,
+      eventsFunctionsExtension,
+      eventsBasedBehavior,
+      { logCode: false }
+    );
+
+    // Check the default value is set.
+    expect(
+      runtimeScene
+        .getVariablesForExtension('MyExtension')
+        .get('MyVariable')
+        .getAsNumber()
+    ).toBe(0);
+
+    behavior.MyFunction();
+    expect(
+      runtimeScene
+        .getVariablesForExtension('MyExtension')
+        .get('MyVariable')
+        .getAsNumber()
+    ).toBe(456);
+  });
+
+  it('Can use a parameter in a variable condition', () => {
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const eventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const eventsBasedBehavior = eventsFunctionsExtension
+      .getEventsBasedBehaviors()
+      .insertNew('MyBehavior', 0);
+
+    eventsFunctionsExtension
+      .getSceneVariables()
+      .insertNew('MyVariable', 0)
+      .setValue(0);
+
+    const eventsSerializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [
+          {
+            type: { value: 'NumberVariable' },
+            parameters: ['MyParameter', '=', '123'],
+          },
+        ],
+        actions: [
+          {
+            type: { value: 'SetNumberVariable' },
+            parameters: ['MyVariable', '=', '456'],
+          },
+        ],
+      },
+    ]);
+    const eventsFunction = eventsBasedBehavior
+      .getEventsFunctions()
+      .insertNewEventsFunction('MyFunction', 0);
+    eventsFunction
+      .getEvents()
+      .unserializeFrom(project, eventsSerializerElement);
+    gd.WholeProjectRefactorer.ensureBehaviorEventsFunctionsProperParameters(
+      eventsFunctionsExtension,
+      eventsBasedBehavior
+    );
+    const parameter = eventsFunction
+      .getParameters()
+      .insertNewParameter(
+        'MyParameter',
+        eventsFunction.getParameters().getParametersCount()
+      );
+    parameter.setType('number');
+
+    const { runtimeScene, behavior } = generatedBehavior(
+      gd,
+      project,
+      eventsFunctionsExtension,
+      eventsBasedBehavior,
+      { logCode: false }
+    );
+
+    // Check the default value is set.
+    expect(
+      runtimeScene
+        .getVariablesForExtension('MyExtension')
+        .get('MyVariable')
+        .getAsNumber()
+    ).toBe(0);
+
+    behavior.MyFunction(123);
+    expect(
+      runtimeScene
+        .getVariablesForExtension('MyExtension')
+        .get('MyVariable')
+        .getAsNumber()
+    ).toBe(456);
+  });
 });
+
+function generatedBehavior(
+  gd,
+  project,
+  eventsFunctionsExtension,
+  eventsBasedBehavior,
+  options = {}
+) {
+  const makeCompiledRuntimeBehavior = generateCompiledRuntimeBehaviorMaker(
+    gd,
+    project,
+    eventsFunctionsExtension,
+    eventsBasedBehavior,
+    options
+  );
+
+  const serializedProjectElement = new gd.SerializerElement();
+  project.serializeTo(serializedProjectElement);
+  const serializedSceneElement = new gd.SerializerElement();
+  const scene = project.insertNewLayout('MyScene', 0);
+  scene.serializeTo(serializedSceneElement);
+  const { gdjs, runtimeScene } = makeMinimalGDJSMock({
+    gameData: JSON.parse(gd.Serializer.toJSON(serializedProjectElement)),
+    sceneData: JSON.parse(gd.Serializer.toJSON(serializedSceneElement)),
+  });
+  serializedProjectElement.delete();
+  serializedSceneElement.delete();
+  project.delete();
+
+  const CompiledRuntimeBehavior = makeCompiledRuntimeBehavior(gdjs);
+  const behaviorData = {
+    name: 'MyBehavior',
+    type: 'MyBehaviorType',
+  };
+  const ownerRuntimeObject = new gdjs.RuntimeObject(runtimeScene, {
+    name: 'MyObject',
+    type: '',
+  });
+  const behavior = new CompiledRuntimeBehavior(
+    runtimeScene,
+    behaviorData,
+    ownerRuntimeObject
+  );
+  ownerRuntimeObject.addBehavior(behavior);
+
+  return { gdjs, runtimeScene, behavior };
+}
 
 function generateCompiledRuntimeBehaviorMaker(
   gd,

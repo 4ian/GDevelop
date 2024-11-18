@@ -947,6 +947,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         getThumbnail,
         showDeleteConfirmation,
         selectObjectFolderOrObjectWithContext,
+        addFolder,
         forceUpdateList,
         forceUpdate,
       }),
@@ -972,6 +973,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         getThumbnail,
         showDeleteConfirmation,
         selectObjectFolderOrObjectWithContext,
+        addFolder,
         forceUpdateList,
         forceUpdate,
       ]

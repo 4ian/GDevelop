@@ -486,6 +486,19 @@ export const getSignedUrl = async (params: {|
   return response.data;
 };
 
+export const getSignedUrls = async (params: {|
+  uploadType: UploadType,
+  files: Array<{|
+    key: string,
+    contentType: string,
+  |}>,
+|}): Promise<{
+  signedUrls: Array<string>,
+}> => {
+  const response = await apiClient.post('/upload-options/signed-url', params);
+  return response.data;
+};
+
 export const getRedirectToSubscriptionPortalUrl = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string

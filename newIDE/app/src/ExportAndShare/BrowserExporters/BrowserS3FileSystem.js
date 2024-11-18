@@ -1,6 +1,6 @@
 // @flow
 import path from 'path-browserify';
-import { uploadObject } from '../../Utils/GDevelopServices/Preview';
+import { uploadObjects } from '../../Utils/GDevelopServices/Preview';
 const gd: libGDevelop = global.gd;
 
 export type TextFileDescriptor = {|
@@ -60,17 +60,19 @@ export default class BrowserS3FileSystem {
     });
   }
 
-  uploadPendingObjects = () => {
-    return Promise.all(this._pendingUploadObjects.map(uploadObject)).then(
-      result => {
-        console.log('Uploaded all objects:', result);
-        this._pendingUploadObjects = [];
-      },
-      error => {
-        console.error("Can't upload all objects:", error);
-        throw error;
-      }
-    );
+  uploadPendingObjects = async () => {
+    try {
+      console.log(
+        `Uploading ${this._pendingUploadObjects.length} files for preview...`
+      );
+      await uploadObjects(this._pendingUploadObjects);
+      console.log(
+        `Uploaded all ${this._pendingUploadObjects.length} preview files.`
+      );
+    } catch (error) {
+      console.error("Can't upload all objects:", error);
+      throw error;
+    }
   };
 
   mkDir = (path: string) => {

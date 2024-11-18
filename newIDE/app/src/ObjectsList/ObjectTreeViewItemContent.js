@@ -79,6 +79,7 @@ export type ObjectTreeViewItemProps = {|
   selectObjectFolderOrObjectWithContext: (
     objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext
   ) => void,
+  addFolder: (items: Array<ObjectFolderOrObjectWithContext>) => void,
   forceUpdateList: () => void,
   forceUpdate: () => void,
 |};
@@ -280,6 +281,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       setAsGlobalObject,
       onOpenEventBasedObjectEditor,
       selectObjectFolderOrObjectWithContext,
+      addFolder,
     } = this.props;
 
     const container = this._isGlobal
@@ -390,19 +392,36 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       },
       {
         label: i18n._('Move to folder'),
-        submenu: folderAndPathsInContainer.map(({ folder, path }) => ({
-          label: path,
-          enabled: folder !== this.object.getParent(),
-          click: () => {
-            this.object
-              .getParent()
-              .moveObjectFolderOrObjectToAnotherFolder(this.object, folder, 0);
-            onMovedObjectFolderOrObjectToAnotherFolderInSameContainer({
-              objectFolderOrObject: folder,
-              global: this._isGlobal,
-            });
+        submenu: [
+          ...folderAndPathsInContainer.map(({ folder, path }) => ({
+            label: path,
+            enabled: folder !== this.object.getParent(),
+            click: () => {
+              this.object
+                .getParent()
+                .moveObjectFolderOrObjectToAnotherFolder(
+                  this.object,
+                  folder,
+                  0
+                );
+              onMovedObjectFolderOrObjectToAnotherFolderInSameContainer({
+                objectFolderOrObject: folder,
+                global: this._isGlobal,
+              });
+            },
+          })),
+          { type: 'separator' },
+          {
+            label: i18n._(t`Create new folder...`),
+            click: () =>
+              addFolder([
+                {
+                  objectFolderOrObject: this.object.getParent(),
+                  global: this._isGlobal,
+                },
+              ]),
           },
-        })),
+        ],
       },
       { type: 'separator' },
       {

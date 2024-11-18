@@ -234,24 +234,38 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
       },
       {
         label: i18n._('Move to folder'),
-        submenu: filteredFolderAndPathsInContainer.map(({ folder, path }) => ({
-          label: path,
-          enabled: folder !== this.objectFolder.getParent(),
-          click: () => {
-            if (folder === this.objectFolder.getParent()) return;
-            this.objectFolder
-              .getParent()
-              .moveObjectFolderOrObjectToAnotherFolder(
-                this.objectFolder,
-                folder,
-                0
-              );
-            onMovedObjectFolderOrObjectToAnotherFolderInSameContainer({
-              objectFolderOrObject: folder,
-              global: this._isGlobal,
-            });
+        submenu: [
+          ...filteredFolderAndPathsInContainer.map(({ folder, path }) => ({
+            label: path,
+            enabled: folder !== this.objectFolder.getParent(),
+            click: () => {
+              if (folder === this.objectFolder.getParent()) return;
+              this.objectFolder
+                .getParent()
+                .moveObjectFolderOrObjectToAnotherFolder(
+                  this.objectFolder,
+                  folder,
+                  0
+                );
+              onMovedObjectFolderOrObjectToAnotherFolderInSameContainer({
+                objectFolderOrObject: folder,
+                global: this._isGlobal,
+              });
+            },
+          })),
+
+          { type: 'separator' },
+          {
+            label: i18n._(t`Create new folder...`),
+            click: () =>
+              addFolder([
+                {
+                  objectFolderOrObject: this.objectFolder.getParent(),
+                  global: this._isGlobal,
+                },
+              ]),
           },
-        })),
+        ],
       },
       ...renderQuickCustomizationMenuItems({
         i18n,

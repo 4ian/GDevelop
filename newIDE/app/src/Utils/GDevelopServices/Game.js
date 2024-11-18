@@ -134,8 +134,7 @@ export type FeaturingType =
   | 'games-platform-home'
   | 'games-platform-game-page'
   | 'games-platform-listing'
-  | 'socials-newsletter'
-  | 'gdevelop-banner';
+  | 'games-platform-guaranteed-sessions';
 
 export type GameFeaturing = {|
   gameId: string,
@@ -164,7 +163,9 @@ export type MarketingPlan = {|
   nameByLocale: MessageByLocale,
   descriptionByLocale: MessageByLocale,
   bulletPointsByLocale: Array<MessageByLocale>,
+  ownedBulletPointsByLocale: Array<MessageByLocale>,
   additionalSuccessMessageByLocale: MessageByLocale,
+  showExpirationDate: boolean,
 |};
 
 export type GameLeaderboardEntry = {

@@ -2362,10 +2362,10 @@ const prices = {
     priceInCredits: 500,
   },
   'featuring-pro': {
-    priceInCredits: 900,
+    priceInCredits: 1000,
   },
   'featuring-premium': {
-    priceInCredits: 4000,
+    priceInCredits: 3000,
   },
 };
 
@@ -2461,11 +2461,6 @@ export const limitsForSilverUser: Limits = {
     'ai-project-generation': {
       current: 3,
       max: 1000,
-      limitReached: false,
-    },
-    'ask-question': {
-      current: 1,
-      max: 3,
       limitReached: false,
     },
     'ask-question': {

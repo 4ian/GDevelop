@@ -33,10 +33,8 @@ export const getIconForMarketingPlan = (marketingPlan: MarketingPlan) => {
 
 const getActiveFeaturingsOfMarketingPlan = (
   marketingPlan: MarketingPlan,
-  activeGameFeaturings: ?(GameFeaturing[])
+  activeGameFeaturings: GameFeaturing[]
 ) => {
-  if (!activeGameFeaturings) return [];
-
   return activeGameFeaturings.filter(activeGameFeaturing =>
     marketingPlan.includedFeaturings.includes(activeGameFeaturing.featuring)
   );
@@ -104,18 +102,21 @@ export const getActiveMessage = ({
   marketingPlan: MarketingPlan,
   i18n: I18nType,
   hasErrors: boolean,
-  activeGameFeaturings: ?(GameFeaturing[]),
+  activeGameFeaturings: GameFeaturing[],
 |}) => {
   if (hasErrors) {
     return <Trans>Fix those issues to get the campaign up!</Trans>;
   }
 
   const activeFeaturingsForPlan = getActiveFeaturingsOfMarketingPlan(
-    marketingPlan
+    marketingPlan,
+    activeGameFeaturings
   );
 
-  if (activeFeaturingsForPlan.length === 0) {
-    // Should not happen.
+  if (
+    activeFeaturingsForPlan.length === 0 || // Still loading or no active featurings
+    !marketingPlan.showExpirationDate
+  ) {
     return null;
   }
 

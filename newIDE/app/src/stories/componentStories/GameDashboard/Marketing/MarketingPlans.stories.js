@@ -13,6 +13,7 @@ import {
 import {
   client as gameApiAxiosClient,
   type GameFeaturing,
+  type MarketingPlan,
 } from '../../../../Utils/GDevelopServices/Game';
 import MockAdapter from 'axios-mock-adapter';
 
@@ -26,11 +27,11 @@ const now = Date.now();
 const nowMinusOneDay = now - 24 * 60 * 60 * 1000;
 const nowPlusOneDay = now + 24 * 60 * 60 * 1000;
 
-const marketingPlans = [
+const marketingPlans: MarketingPlan[] = [
   {
     id: 'featuring-basic',
     nameByLocale: {
-      en: 'Basic',
+      en: 'gd.games Boost',
     },
     icon: 'speaker',
     canExtend: true,
@@ -98,6 +99,24 @@ const marketingPlans = [
         'zh-CN': '获得更多玩家反馈',
       },
     ],
+    ownedBulletPointsByLocale: [
+      {
+        en: `Your game is promoted on gd.games.`,
+        'fr-FR': `Votre jeu est mis en avant sur gd.games.`,
+        'ar-SA': `يتم الترويج للعبتك على gd.games.`,
+        'de-DE': `Ihr Spiel wird auf gd.games beworben.`,
+        'es-ES': `Tu juego es promocionado en gd.games.`,
+        'it-IT': `Il tuo gioco è promosso su gd.games.`,
+        'ja-JP': `あなたのゲームはgd.gamesで宣伝されます。`,
+        'ko-KR': `귀하의 게임은 gd.games에서 홍보됩니다.`,
+        'pl-PL': `Twoja gra jest promowana na gd.games.`,
+        'pt-BR': `Seu jogo é promovido no gd.games.`,
+        'ru-RU': `Ваша игра рекламируется на gd.games.`,
+        'sl-SI': `Vaša igra je promovirana na gd.games.`,
+        'uk-UA': `Ваша гра рекламується на gd.games.`,
+        'zh-CN': `您的游戏在gd.games上推广。`,
+      },
+    ],
     additionalSuccessMessageByLocale: {
       en:
         'Ensure that your game is public and you have configured a thumbnail for gd.games. This can take a few minutes for your game to be visible on the platform.',
@@ -128,11 +147,12 @@ const marketingPlans = [
       'zh-CN':
         '确保您的游戏是公开的，并且您已经为gd.games配置了缩略图。您的游戏在平台上可见可能需要几分钟。',
     },
+    showExpirationDate: true,
   },
   {
     id: 'featuring-pro',
     nameByLocale: {
-      en: 'Pro',
+      en: 'Super Boost',
     },
     icon: 'speedometer',
     canExtend: false,
@@ -141,6 +161,7 @@ const marketingPlans = [
       'games-platform-home',
       'games-platform-listing',
       'games-platform-game-page',
+      'games-platform-guaranteed-sessions',
     ],
     gameRequirements: {
       hasThumbnail: true,
@@ -175,48 +196,100 @@ const marketingPlans = [
     },
     bulletPointsByLocale: [
       {
-        en: 'Be promoted on gd.games homepage and other game pages for 15 days',
-        'fr-FR':
-          'Être mis en avant sur la page d’accueil de gd.games et d’autres pages de jeu pendant 15 jours',
-        'ar-SA':
-          'يتم عرضه على الصفحة الرئيسية لـ gd.games وصفحات الألعاب الأخرى لمدة 15 يومًا',
-        'de-DE':
-          '15 Tage lang auf der Startseite von gd.games und anderen Spiel-Seiten vorgestellt werden',
-        'es-ES':
-          'Destacado en la página de inicio de gd.games y otras páginas de juegos durante 15 días',
-        'it-IT':
-          'In primo piano sulla homepage di gd.games e altre pagine di gioco per 15 giorni',
-        'ja-JP': 'gd.gamesのホームページや他のゲームページで15日間紹介されます',
-        'ko-KR':
-          'gd.games의 홈페이지 및 다른 게임 페이지에서 15 일 동안 소개됩니다.',
-        'pl-PL':
-          'Zostań wyróżniony na stronie głównej gd.games i innych stronach gier przez 15 dni',
-        'pt-BR':
-          'Destaque na página inicial do gd.games e outras páginas de jogos por 15 dias',
-        'ru-RU':
-          'Рекомендуется на главной странице gd.games и других страницах игр в течение 15 дней',
-        'sl-SI':
-          'Prikazano na začetni strani gd.games in drugih straneh iger 15 dni',
-        'uk-UA':
-          'Рекомендується на головній сторінці gd.games та інших сторінках ігор протягом 15 днів',
-        'zh-CN': '在gd.games首页和其他游戏页面上推广15天',
+        en: `Active until you get 1000 more players`,
+        'fr-FR': `Actif jusqu'à ce que vous obteniez 1000 joueurs supplémentaires`,
+        'ar-SA': `نشط حتى تحصل على 1000 لاعبًا آخرين`,
+        'de-DE': `Aktiv, bis Sie 1000 weitere Spieler erhalten`,
+        'es-ES': `Activo hasta que obtengas 1000 jugadores más`,
+        'it-IT': `Attivo fino a quando non ottieni 1000 giocatori in più`,
+        'ja-JP': `1000人以上のプレイヤーを獲得するまで有効です`,
+        'ko-KR': `1000명 이상의 플레이어를 얻을 때까지 활성화됩니다`,
+        'pl-PL': `Aktywny do momentu zdobycia 1000 dodatkowych graczy`,
+        'pt-BR': `Ativo até você obter 1000 jogadores adicionais`,
+        'ru-RU': `Активно до тех пор, пока вы не получите 1000 дополнительных игроков`,
+        'sl-SI': `Aktivno, dokler ne pridobite 1000 dodatnih igralcev`,
+        'uk-UA': `Активний, поки ви не отримаєте 1000 додаткових гравців`,
+        'zh-CN': `活动直到您获得1000名以上的玩家`,
       },
       {
-        en: 'Get more visibility and additional feedback',
+        en:
+          'Immediate impact: Get new players from around the world thanks to ads we run for your game.',
         'fr-FR':
-          'Obtenez une meilleure visibilité et des commentaires supplémentaires',
-        'ar-SA': 'احصل على مزيد من الرؤية والتعليقات الإضافية',
-        'de-DE': 'Mehr Sichtbarkeit und zusätzliches Feedback erhalten',
-        'es-ES': 'Obtenga más visibilidad y comentarios adicionales',
-        'it-IT': 'Ottieni maggiore visibilità e feedback aggiuntivi',
-        'ja-JP': 'より多くの可視性と追加のフィードバックを取得する',
-        'ko-KR': '더 많은 노출과 추가 피드백 받기',
-        'pl-PL': 'Otrzymaj większą widoczność i dodatkowe opinie',
-        'pt-BR': 'Obtenha mais visibilidade e feedback adicional',
-        'ru-RU': 'Получить больше видимости и дополнительной обратной связи',
-        'sl-SI': 'Pridobite več vidnosti in dodatnih povratnih informacij',
-        'uk-UA': 'Отримати більше видимості та додаткового зворотного зв’язку',
-        'zh-CN': '获得更多曝光和额外反馈',
+          'Impact immédiat : Obtenez de nouveaux joueurs du monde entier grâce aux publicités que nous diffusons pour votre jeu.',
+        'ar-SA':
+          'تأثير فوري: احصل على لاعبين جدد من جميع أنحاء العالم بفضل الإعلانات التي نقوم بتشغيلها للعبتك.',
+        'de-DE':
+          'Sofortige Wirkung: Erhalten Sie neue Spieler aus der ganzen Welt dank der Anzeigen, die wir für Ihr Spiel schalten.',
+        'es-ES':
+          'Impacto inmediato: Obtén nuevos jugadores de todo el mundo gracias a los anuncios que ejecutamos para tu juego.',
+        'it-IT':
+          'Impatto immediato: Ottieni nuovi giocatori da tutto il mondo grazie agli annunci che eseguiamo per il tuo gioco.',
+        'ja-JP':
+          '即時的な影響：私たちがあなたのゲームのために実施する広告のおかげで、世界中から新しいプレイヤーを獲得します。',
+        'ko-KR':
+          '즉각적인 효과: 광고 덕분에 전 세계의 새로운 플레이어를 얻을 수 있습니다.',
+        'pl-PL':
+          'Natychmiastowy efekt: Zyskaj nowych graczy z całego świata dzięki reklamom, które prowadzimy dla twojej gry.',
+        'pt-BR':
+          'Impacto imediato: Obtenha novos jogadores de todo o mundo graças aos anúncios que executamos para o seu jogo.',
+        'ru-RU':
+          'Немедленное воздействие: Получите новых игроков со всего мира благодаря рекламе, которую мы размещаем для вашей игры.',
+        'sl-SI':
+          'Takojšnji učinek: Zahvaljujoč oglasom, ki jih objavljamo za vašo igro, pridobite nove igralce z vsega sveta.',
+        'uk-UA':
+          'Миттєвий вплив: Отримайте нових гравців з усього світу завдяки рекламі, яку ми розміщуємо для вашої гри.',
+        'zh-CN':
+          '立即影响：通过我们为您的游戏运行的广告，从世界各地获得新玩家。',
+      },
+      {
+        en: `Game promoted everywhere on gd.games for 10 days`,
+        'fr-FR': `Jeu promu partout sur gd.games pendant 10 jours`,
+        'ar-SA': `ترويج اللعبة في كل مكان على gd.games لمدة 10 أيام`,
+        'de-DE': `Spiel wird überall auf gd.games für 10 Tage`,
+        'es-ES': `Juego promocionado en todo gd.games durante 10 días`,
+        'it-IT': `Gioco promosso ovunque su gd.games per 10 giorni`,
+        'ja-JP': `gd.gamesのどこでも10日間ゲームを宣伝し、目標達成まで広告を掲載します。`,
+        'ko-KR': `gd.games의 모든 곳에서 10 일 동안 게임을 홍보하고, 목표 달성까지 광고를 게재합니다.`,
+        'pl-PL': `Gra promowana wszędzie na gd.games przez 10 dni`,
+        'pt-BR': `Jogo promovido em todo o gd.games por 10 dias`,
+        'ru-RU': `Игра рекламируется повсюду на gd.games в течение 10 дней`,
+        'sl-SI': `Igra je promovirana povsod na gd.games za 10 dni`,
+        'uk-UA': `Гра рекламується всюди на gd.games протягом 10 днів`,
+        'zh-CN': `在gd.games的所有地方推广游戏10天`,
+      },
+    ],
+    ownedBulletPointsByLocale: [
+      {
+        en: `Ads are being run for your game until it reaches its boost goal.`,
+        'fr-FR': `Des publicités sont diffusées pour votre jeu jusqu'à ce qu'il atteigne son objectif de boost.`,
+        'ar-SA': `تتم تشغيل الإعلانات للعبتك حتى تصل إلى هدفها.`,
+        'de-DE': `Anzeigen werden für Ihr Spiel geschaltet, bis es sein Ziel erreicht.`,
+        'es-ES': `Se están ejecutando anuncios para tu juego hasta que alcance su objetivo de impulso.`,
+        'it-IT': `Gli annunci vengono eseguiti per il tuo gioco fino a quando non raggiunge il suo obiettivo di impulso.`,
+        'ja-JP': `ゲームが目標に達するまで広告が実施されます。`,
+        'ko-KR': `게임이 목표에 도달할 때까지 광고가 게재됩니다.`,
+        'pl-PL': `Reklamy są prowadzone dla twojej gry do momentu osiągnięcia celu promocji.`,
+        'pt-BR': `Anúncios estão sendo executados para o seu jogo até que ele atinja seu objetivo de destaque.`,
+        'ru-RU': `Реклама размещается для вашей игры до достижения цели посиления.`,
+        'sl-SI': `Oglasi se izvajajo za vašo igro, dokler ne doseže svojega cilja.`,
+        'uk-UA': `Реклама розміщується для вашої гри до досягнення цілі підсилення.`,
+        'zh-CN': `广告将一直运行，直到您的游戏达到其目标。`,
+      },
+      {
+        en: `You will receive an email with the results of the featuring.`,
+        'fr-FR': `Vous recevrez un e-mail avec les résultats de la mise en avant.`,
+        'ar-SA': `ستتلقى بريدًا إلكترونيًا يحتوي على نتائج الترويج.`,
+        'de-DE': `Sie erhalten eine E-Mail mit den Ergebnissen der Bewerbung.`,
+        'es-ES': `Recibirás un correo electrónico con los resultados de la promoción.`,
+        'it-IT': `Riceverai un'email con i risultati della promozione.`,
+        'ja-JP': `フィーチャリングの結果を記載したメールが届きます。`,
+        'ko-KR': `추천 결과가 포함된 이메일을 받게 됩니다.`,
+        'pl-PL': `Otrzymasz e-mail z wynikami promocji.`,
+        'pt-BR': `Você receberá um e-mail com os resultados do destaque.`,
+        'ru-RU': `Вы получите электронное письмо с результатами рекламы.`,
+        'sl-SI': `Prejeli boste e-pošto z rezultati promocije.`,
+        'uk-UA': `Ви отримаєте електронний лист з результатами реклами.`,
+        'zh-CN': `您将收到一封包含推广结果的电子邮件。`,
       },
     ],
     additionalSuccessMessageByLocale: {
@@ -249,11 +322,12 @@ const marketingPlans = [
       'zh-CN':
         '确保您的游戏是公开的，并且您已经为gd.games配置了缩略图。您的游戏在平台上可见可能需要几分钟。',
     },
+    showExpirationDate: false,
   },
   {
     id: 'featuring-premium',
     nameByLocale: {
-      en: 'Premium',
+      en: 'Mega Boost',
     },
     icon: 'stars',
     canExtend: false,
@@ -262,8 +336,7 @@ const marketingPlans = [
       'games-platform-home',
       'games-platform-listing',
       'games-platform-game-page',
-      'socials-newsletter',
-      'gdevelop-banner',
+      'games-platform-guaranteed-sessions',
     ],
     gameRequirements: {},
     descriptionByLocale: {
@@ -297,59 +370,100 @@ const marketingPlans = [
     },
     bulletPointsByLocale: [
       {
-        en: 'Be promoted everywhere on gd.games for 30 days',
-        'fr-FR': 'Être mis en avant partout sur gd.games pendant 30 jours',
-        'ar-SA': 'يتم الترويج في كل مكان على gd.games لمدة 30 يومًا',
-        'de-DE': '30 Tage lang überall auf gd.games vorgestellt werden',
-        'es-ES': 'Destacado en todas partes en gd.games durante 30 días',
-        'it-IT': 'In primo piano ovunque su gd.games per 30 giorni',
-        'ja-JP': 'gd.gamesで30日間どこでも紹介されます',
-        'ko-KR': 'gd.games에서 30 일 동안 어디서나 소개됩니다.',
-        'pl-PL': 'Zostań wyróżniony wszędzie na gd.games przez 30 dni',
-        'pt-BR': 'Destaque em todos os lugares no gd.games por 30 dias',
-        'ru-RU': 'Рекомендуется везде на gd.games в течение 30 дней',
-        'sl-SI': 'Prikazano povsod na gd.games 30 dni',
-        'uk-UA': 'Рекомендується скрізь на gd.games протягом 30 днів',
-        'zh-CN': '在gd.games上的所有地方推广30天',
+        en: `Active until you get 3000 more players`,
+        'fr-FR': `Actif jusqu'à ce que vous obteniez 3000 joueurs supplémentaires`,
+        'ar-SA': `نشط حتى تحصل على 3000 لاعبًا آخرين`,
+        'de-DE': `Aktiv, bis Sie 3000 weitere Spieler erhalten`,
+        'es-ES': `Activo hasta que obtengas 3000 jugadores más`,
+        'it-IT': `Attivo fino a quando non ottieni 3000 giocatori in più`,
+        'ja-JP': `3000人以上のプレイヤーを獲得するまで有効です`,
+        'ko-KR': `3000명 이상의 플레이어를 얻을 때까지 활성화됩니다`,
+        'pl-PL': `Aktywny do momentu zdobycia 3000 dodatkowych graczy`,
+        'pt-BR': `Ativo até você obter 3000 jogadores adicionais`,
+        'ru-RU': `Активно до тех пор, пока вы не получите 3000 дополнительных игроков`,
+        'sl-SI': `Aktivno, dokler ne pridobite 3000 dodatnih igralcev`,
+        'uk-UA': `Активний, поки ви не отримаєте 3000 додаткових гравців`,
+        'zh-CN': `活动直到您获得3000名以上的玩家`,
       },
       {
-        en: 'Get a banner within GDevelop on desktop and the web editor',
-        'fr-FR': 'Obtenez une bannière dans GDevelop sur bureau et web',
-        'ar-SA': 'احصل على لافتة داخل GDevelop على سطح المكتب ومحرر الويب',
+        en:
+          'Immediate impact: Get new players from around the world thanks to ads we run for your game',
+        'fr-FR':
+          'Impact immédiat : Obtenez de nouveaux joueurs du monde entier grâce aux publicités que nous diffusons pour votre jeu',
+        'ar-SA':
+          'تأثير فوري: احصل على لاعبين جدد من جميع أنحاء العالم بفضل الإعلانات التي نقوم بتشغيلها للعبتك',
         'de-DE':
-          'Erhalten Sie ein Banner in GDevelop auf Desktop und Web-Editor',
+          'Sofortige Wirkung: Erhalten Sie neue Spieler aus der ganzen Welt dank der Anzeigen, die wir für Ihr Spiel schalten',
         'es-ES':
-          'Obtenga un banner dentro de GDevelop en escritorio y el editor web',
+          'Impacto inmediato: Obtén nuevos jugadores de todo el mundo gracias a los anuncios que ejecutamos para tu juego',
         'it-IT':
-          "Ottieni un banner all'interno di GDevelop su desktop e l'editor web",
-        'ja-JP': 'デスクトップとWebエディターのGDevelop内にバナーを表示します',
-        'ko-KR': '데스크톱 및 웹 편집기에서 GDevelop 내 배너 받기',
-        'pl-PL': 'Otrzymaj baner w GDevelop na komputerze i edytorze sieci web',
+          'Impatto immediato: Ottieni nuovi giocatori da tutto il mondo grazie agli annunci che eseguiamo per il tuo gioco',
+        'ja-JP':
+          '即時的な影響：私たちがあなたのゲームのために実施する広告のおかげで、世界中から新しいプレイヤーを獲得します。',
+        'ko-KR':
+          '즉각적인 효과: 광고 덕분에 전 세계의 새로운 플레이어를 얻을 수 있습니다',
+        'pl-PL':
+          'Natychmiastowy efekt: Zyskaj nowych graczy z całego świata dzięki reklamom, które prowadzimy dla twojej gry',
         'pt-BR':
-          'Obtenha um banner dentro do GDevelop no desktop e no editor da web',
+          'Impacto imediato: Obtenha novos jogadores de todo o mundo graças aos anúncios que executamos para o seu jogo',
         'ru-RU':
-          'Получите баннер в GDevelop на рабочем столе и в веб-редакторе',
+          'Немедленное воздействие: Получите новых игроков со всего мира благодаря рекламе, которую мы размещаем для вашей игры',
         'sl-SI':
-          'Pridobite pasico v GDevelop na namizju in spletnem urejevalniku',
+          'Takojšnji učinek: Zahvaljujoč oglasom, ki jih objavljamo za vašo igro, pridobite nove igralce z vsega sveta',
         'uk-UA':
-          'Отримайте банер у GDevelop на робочому столі та в веб-редакторі',
-        'zh-CN': '在桌面和Web编辑器中的GDevelop中获取横幅',
+          'Миттєвий вплив: Отримайте нових гравців з усього світу завдяки рекламі, яку ми розміщуємо для вашої гри',
+        'zh-CN':
+          '立即影响：通过我们为您的游戏运行的广告，从世界各地获得新玩家。',
       },
       {
-        en: 'Get featured on newsletter and social media',
-        'fr-FR': 'Être mis en avant dans la newsletter et les réseaux sociaux',
-        'ar-SA': 'يتم عرضه في النشرة الإخبارية ووسائل التواصل الاجتماعي',
-        'de-DE': 'Auf Newsletter und Social Media vorgestellt werden',
-        'es-ES': 'Destacado en el boletín y las redes sociales',
-        'it-IT': 'In primo piano sulla newsletter e sui social media',
-        'ja-JP': 'ニュースレターやソーシャルメディアで紹介されます',
-        'ko-KR': '뉴스레터 및 소셜 미디어에 피처링됩니다.',
-        'pl-PL': 'Zostań wyróżniony w biuletynie i mediach społecznościowych',
-        'pt-BR': 'Destaque na newsletter e nas redes sociais',
-        'ru-RU': 'Получить рекомендацию в рассылке и социальных сетях',
-        'sl-SI': 'Prikazano v novicah in družbenih omrežjih',
-        'uk-UA': 'Отримати рекомендацію в розсилці та соціальних мережах',
-        'zh-CN': '在通讯和社交媒体上推广',
+        en: `Game promoted everywhere on gd.games for 15 days`,
+        'fr-FR': `Jeu promu partout sur gd.games pendant 15 jours`,
+        'ar-SA': `ترويج اللعبة في كل مكان على gd.games لمدة 15 يومًا`,
+        'de-DE': `Spiel wird überall auf gd.games für 15 Tage`,
+        'es-ES': `Juego promocionado en todo gd.games durante 15 días`,
+        'it-IT': `Gioco promosso ovunque su gd.games per 15 giorni`,
+        'ja-JP': `gd.gamesのどこでも15日間ゲームを宣伝し、目標達成まで広告を掲載します。`,
+        'ko-KR': `gd.games의 모든 곳에서 15 일 동안 게임을 홍보하고, 목표 달성까지 광고를 게재합니다.`,
+        'pl-PL': `Gra promowana wszędzie na gd.games przez 15 dni`,
+        'pt-BR': `Jogo promovido em todo o gd.games por 15 dias`,
+        'ru-RU': `Игра рекламируется повсюду на gd.games в течение 15 дней`,
+        'sl-SI': `Igra je promovirana povsod na gd.games za 15 dni`,
+        'uk-UA': `Гра рекламується всюди на gd.games протягом 15 днів`,
+        'zh-CN': `在gd.games的所有地方推广游戏15天`,
+      },
+    ],
+    ownedBulletPointsByLocale: [
+      {
+        en: `Ads are being run for your game until it reaches its boost goal.`,
+        'fr-FR': `Des publicités sont diffusées pour votre jeu jusqu'à ce qu'il atteigne son objectif de boost.`,
+        'ar-SA': `تتم تشغيل الإعلانات للعبتك حتى تصل إلى هدفها.`,
+        'de-DE': `Anzeigen werden für Ihr Spiel geschaltet, bis es sein Ziel erreicht.`,
+        'es-ES': `Se están ejecutando anuncios para tu juego hasta que alcance su objetivo de impulso.`,
+        'it-IT': `Gli annunci vengono eseguiti per il tuo gioco fino a quando non raggiunge il suo obiettivo di impulso.`,
+        'ja-JP': `ゲームが目標に達するまで広告が実施されます。`,
+        'ko-KR': `게임이 목표에 도달할 때까지 광고가 게재됩니다.`,
+        'pl-PL': `Reklamy są prowadzone dla twojej gry do momentu osiągnięcia celu promocji.`,
+        'pt-BR': `Anúncios estão sendo executados para o seu jogo até que ele atinja seu objetivo de destaque.`,
+        'ru-RU': `Реклама размещается для вашей игры до достижения цели посиления.`,
+        'sl-SI': `Oglasi se izvajajo za vašo igro, dokler ne doseže svojega cilja.`,
+        'uk-UA': `Реклама розміщується для вашої гри до досягнення цілі підсилення.`,
+        'zh-CN': `广告将一直运行，直到您的游戏达到其目标。`,
+      },
+      {
+        en: `You will receive an email with the results of the featuring.`,
+        'fr-FR': `Vous recevrez un e-mail avec les résultats de la mise en avant.`,
+        'ar-SA': `ستتلقى بريدًا إلكترونيًا يحتوي على نتائج الترويج.`,
+        'de-DE': `Sie erhalten eine E-Mail mit den Ergebnissen der Bewerbung.`,
+        'es-ES': `Recibirás un correo electrónico con los resultados de la promoción.`,
+        'it-IT': `Riceverai un'email con i risultati della promozione.`,
+        'ja-JP': `フィーチャリングの結果を記載したメールが届きます。`,
+        'ko-KR': `추천 결과가 포함된 이메일을 받게 됩니다.`,
+        'pl-PL': `Otrzymasz e-mail z wynikami promocji.`,
+        'pt-BR': `Você receberá um e-mail com os resultados do destaque.`,
+        'ru-RU': `Вы получите электронное письмо с результатами рекламы.`,
+        'sl-SI': `Prejeli boste e-pošto z rezultati promocije.`,
+        'uk-UA': `Ви отримаєте електронний лист з результатами реклами.`,
+        'zh-CN': `您将收到一封包含推广结果的电子邮件。`,
       },
     ],
     additionalSuccessMessageByLocale: {
@@ -382,6 +496,7 @@ const marketingPlans = [
       'zh-CN':
         '我们将在未来几天内与您联系，以启动广告活动，请查看您的电子邮件！',
     },
+    showExpirationDate: false,
   },
 ];
 
@@ -512,6 +627,13 @@ export const WithOwnedProPlan = () => {
           updatedAt: nowMinusOneDay / 1000,
           expiresAt: nowPlusOneDay / 1000,
         },
+        {
+          gameId: 'complete-game-id',
+          featuring: 'games-platform-guaranteed-sessions',
+          createdAt: nowMinusOneDay / 1000,
+          updatedAt: nowMinusOneDay / 1000,
+          expiresAt: nowPlusOneDay / 1000,
+        },
       ]}
     />
   );
@@ -523,14 +645,28 @@ export const WithOwnedPremiumPlan = () => {
       gameFeaturings={[
         {
           gameId: 'complete-game-id',
-          featuring: 'gdevelop-banner',
+          featuring: 'games-platform-game-page',
           createdAt: nowMinusOneDay / 1000,
           updatedAt: nowMinusOneDay / 1000,
           expiresAt: nowPlusOneDay / 1000,
         },
         {
           gameId: 'complete-game-id',
-          featuring: 'socials-newsletter',
+          featuring: 'games-platform-home',
+          createdAt: nowMinusOneDay / 1000,
+          updatedAt: nowMinusOneDay / 1000,
+          expiresAt: nowPlusOneDay / 1000,
+        },
+        {
+          gameId: 'complete-game-id',
+          featuring: 'games-platform-listing',
+          createdAt: nowMinusOneDay / 1000,
+          updatedAt: nowMinusOneDay / 1000,
+          expiresAt: nowPlusOneDay / 1000,
+        },
+        {
+          gameId: 'complete-game-id',
+          featuring: 'games-platform-guaranteed-sessions',
           createdAt: nowMinusOneDay / 1000,
           updatedAt: nowMinusOneDay / 1000,
           expiresAt: nowPlusOneDay / 1000,

@@ -97,6 +97,7 @@ type Props = {|
   isSceneProperties?: boolean,
   onPropertiesUpdated?: () => void,
   onRenameProperty: (oldName: string, newName: string) => void,
+  onPropertyTypeChanged: (propertyName: string) => void,
   onEventsFunctionsAdded: () => void,
   behaviorObjectType?: string,
 |};
@@ -136,6 +137,7 @@ export default function EventsBasedBehaviorPropertiesEditor({
   isSceneProperties,
   onPropertiesUpdated,
   onRenameProperty,
+  onPropertyTypeChanged,
   onEventsFunctionsAdded,
   behaviorObjectType,
 }: Props) {
@@ -709,6 +711,9 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                             );
                                           }
                                           forceUpdate();
+                                          onPropertyTypeChanged(
+                                            property.getName()
+                                          );
                                           onPropertiesUpdated &&
                                             onPropertiesUpdated();
                                         }}

@@ -284,6 +284,26 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::String& newPropertyName);
 
   /**
+   * \brief Refactor the project **after** a property of a behavior has
+   * changed of type.
+   */
+  static void ChangeEventsBasedBehaviorPropertyType(
+      gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      const gd::EventsBasedBehavior &eventsBasedBehavior,
+      const gd::String &propertyName);
+
+  /**
+   * \brief Refactor the project **after** a property of an object has
+   * changed of type.
+   */
+  static void ChangeEventsBasedObjectPropertyType(
+      gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      const gd::EventsBasedObject &eventsBasedObject,
+      const gd::String &propertyName);
+
+  /**
    * \brief Add a behavior to an object and add required behaviors if necessary
    * to fill every behavior properties of the added behaviors.
    */

@@ -19,6 +19,7 @@ type Props = {|
   eventsBasedBehavior: gdEventsBasedBehavior,
   onRenameProperty: (oldName: string, newName: string) => void,
   onRenameSharedProperty: (oldName: string, newName: string) => void,
+  onPropertyTypeChanged: (propertyName: string) => void,
   onEventsFunctionsAdded: () => void,
   unsavedChanges?: ?UnsavedChanges,
   onConfigurationUpdated?: (?ExtensionItemConfigurationAttribute) => void,
@@ -31,6 +32,7 @@ export default function EventsBasedBehaviorEditorPanel({
   projectScopedContainersAccessor,
   onRenameProperty,
   onRenameSharedProperty,
+  onPropertyTypeChanged,
   unsavedChanges,
   onEventsFunctionsAdded,
   onConfigurationUpdated,
@@ -90,6 +92,7 @@ export default function EventsBasedBehaviorEditorPanel({
             onRenameProperty={onRenameProperty}
             behaviorObjectType={eventsBasedBehavior.getObjectType()}
             onPropertiesUpdated={onPropertiesUpdated}
+            onPropertyTypeChanged={onPropertyTypeChanged}
             onEventsFunctionsAdded={onEventsFunctionsAdded}
           />
         )}
@@ -103,6 +106,7 @@ export default function EventsBasedBehaviorEditorPanel({
             properties={eventsBasedBehavior.getSharedPropertyDescriptors()}
             onRenameProperty={onRenameSharedProperty}
             onPropertiesUpdated={onPropertiesUpdated}
+            onPropertyTypeChanged={onPropertyTypeChanged}
             onEventsFunctionsAdded={onEventsFunctionsAdded}
           />
         )}

@@ -68,11 +68,12 @@ const MarketingPlanFeatures = ({
     canExtend,
     descriptionByLocale,
     bulletPointsByLocale,
+    ownedBulletPointsByLocale,
   } = marketingPlan;
 
-  const activeGameFeaturings: ?(GameFeaturing[]) = React.useMemo(
+  const activeGameFeaturings: GameFeaturing[] = React.useMemo(
     () => {
-      if (!gameFeaturings) return null;
+      if (!gameFeaturings) return [];
 
       return gameFeaturings.filter(
         gameFeaturing => gameFeaturing.expiresAt > Date.now() / 1000
@@ -87,6 +88,10 @@ const MarketingPlanFeatures = ({
     return null;
   }
   const hasErrors = requirementsErrors.length > 0;
+
+  const bulletPointsToDisplay = isPlanActive
+    ? ownedBulletPointsByLocale
+    : bulletPointsByLocale;
 
   return (
     <I18n>
@@ -142,7 +147,7 @@ const MarketingPlanFeatures = ({
                       </Line>
                     </Column>
                   ))
-                : bulletPointsByLocale.map((bulletPointByLocale, index) => (
+                : bulletPointsToDisplay.map((bulletPointByLocale, index) => (
                     <Column key={index} expand noMargin>
                       <Line noMargin alignItems="center">
                         <CheckCircle

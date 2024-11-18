@@ -1,6 +1,9 @@
 const os = require('os');
 
 /**
+ * As defined in RFC 1918, the following IPv4 address ranges are reserved for private networks:
+ * https://datatracker.ietf.org/doc/html/rfc1918#section-3
+ *
  * @param {string} ip
  * @returns {boolean}
  */

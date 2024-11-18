@@ -1461,6 +1461,14 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   newName
                 )
               }
+              onPropertyTypeChanged={propertyName => {
+                gd.WholeProjectRefactorer.changeEventsBasedBehaviorPropertyType(
+                  project,
+                  eventsFunctionsExtension,
+                  selectedEventsBasedBehavior,
+                  propertyName
+                );
+              }}
               onEventsFunctionsAdded={() => {
                 if (this.eventsFunctionList) {
                   this.eventsFunctionList.forceUpdateList();
@@ -1485,6 +1493,14 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   newName
                 )
               }
+              onPropertyTypeChanged={propertyName => {
+                gd.WholeProjectRefactorer.changeEventsBasedObjectPropertyType(
+                  project,
+                  eventsFunctionsExtension,
+                  selectedEventsBasedObject,
+                  propertyName
+                );
+              }}
               onEventsFunctionsAdded={() => {
                 if (this.eventsFunctionList) {
                   this.eventsFunctionList.forceUpdateList();

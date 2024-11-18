@@ -1175,6 +1175,42 @@ void WholeProjectRefactorer::RenameEventsBasedObjectProperty(
   gd::ProjectBrowserHelper::ExposeProjectEvents(project, conditionRenamer);
 }
 
+void WholeProjectRefactorer::ChangeEventsBasedBehaviorPropertyType(
+    gd::Project &project,
+    const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+    const gd::EventsBasedBehavior &eventsBasedBehavior,
+    const gd::String &propertyName) {
+  std::unordered_set<gd::String> typeChangedPropertyNames;
+  typeChangedPropertyNames.insert(propertyName);
+  gd::VariablesContainer propertyVariablesContainer(
+      gd::VariablesContainer::SourceType::Properties);
+  gd::EventsVariableInstructionTypeSwitcher
+      eventsVariableInstructionTypeSwitcher(project.GetCurrentPlatform(),
+                                            typeChangedPropertyNames,
+                                            propertyVariablesContainer);
+  gd::ProjectBrowserHelper::ExposeEventsBasedBehaviorEvents(
+      project, eventsFunctionsExtension, eventsBasedBehavior,
+      propertyVariablesContainer, eventsVariableInstructionTypeSwitcher);
+}
+
+void WholeProjectRefactorer::ChangeEventsBasedObjectPropertyType(
+    gd::Project &project,
+    const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+    const gd::EventsBasedObject &eventsBasedObject,
+    const gd::String &propertyName) {
+  std::unordered_set<gd::String> typeChangedPropertyNames;
+  typeChangedPropertyNames.insert(propertyName);
+  gd::VariablesContainer propertyVariablesContainer(
+      gd::VariablesContainer::SourceType::Properties);
+  gd::EventsVariableInstructionTypeSwitcher
+      eventsVariableInstructionTypeSwitcher(project.GetCurrentPlatform(),
+                                            typeChangedPropertyNames,
+                                            propertyVariablesContainer);
+  gd::ProjectBrowserHelper::ExposeEventsBasedObjectEvents(
+      project, eventsFunctionsExtension, eventsBasedObject,
+      propertyVariablesContainer, eventsVariableInstructionTypeSwitcher);
+}
+
 void WholeProjectRefactorer::AddBehaviorAndRequiredBehaviors(
     gd::Project &project, gd::Object &object, const gd::String &behaviorType,
     const gd::String &behaviorName) {

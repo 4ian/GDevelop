@@ -173,7 +173,8 @@ namespace gdjs {
       const capsuleRadius = Math.sqrt(width * height) / 2;
       settings.mSupportingVolume = new Jolt.Plane(
         Jolt.Vec3.prototype.sAxisZ(),
-        -(capsuleHalfLength - capsuleRadius * (1 - Math.cos(gdjs.toRad(this._slopeMaxAngle))))
+        // TODO It's strange that the value is positive.
+        (capsuleHalfLength - capsuleRadius * (1 - Math.cos(gdjs.toRad(this._slopeMaxAngle))))
       );
       console.log((1 - Math.cos(gdjs.toRad(this._slopeMaxAngle))));
       const sharedData = behavior._sharedData;
@@ -216,18 +217,18 @@ namespace gdjs {
       if (!this.character) {
         return;
       }
-      console.log('Step character');
+      // console.log('Step character');
 
-      console.log(
-        'Character: ' +
-          this.character.GetPosition().GetX() *
-            behavior._sharedData.worldScale +
-          ' ' +
-          this.character.GetPosition().GetY() *
-            behavior._sharedData.worldScale +
-          ' ' +
-          this.character.GetPosition().GetZ() * behavior._sharedData.worldScale
-      );
+      // console.log(
+      //   'Character: ' +
+      //     this.character.GetPosition().GetX() *
+      //       behavior._sharedData.worldScale +
+      //     ' ' +
+      //     this.character.GetPosition().GetY() *
+      //       behavior._sharedData.worldScale +
+      //     ' ' +
+      //     this.character.GetPosition().GetZ() * behavior._sharedData.worldScale
+      // );
 
       // Change the speed according to the player's input.
       // TODO Give priority to the last key for faster reaction time.
@@ -367,26 +368,24 @@ namespace gdjs {
       //     behavior.owner3D.getZ()
       // );
 
-      // console.log(
-      //   'Ground: ' +
-      //   this.character.GetGroundPosition().GetX() *
-      //       behavior._sharedData.worldScale +
-      //     ' ' +
-      //     this.character.GetGroundPosition().GetY() *
-      //       behavior._sharedData.worldScale +
-      //     ' ' +
-      //     this.character.GetGroundPosition().GetZ() * behavior._sharedData.worldScale
-      // );
+      console.log(
+        'Ground: ' +
+        this.character.GetGroundPosition().GetX() *
+            behavior._sharedData.worldScale +
+          ' ' +
+          this.character.GetGroundPosition().GetY() *
+            behavior._sharedData.worldScale +
+          ' ' +
+          this.character.GetGroundPosition().GetZ() * behavior._sharedData.worldScale
+      );
 
       // console.log(
       //   'Ground: ' +
-      //   this.character.GetGroundNormal().GetX() *
-      //       behavior._sharedData.worldScale +
+      //   this.character.GetGroundNormal().GetX() +
       //     ' ' +
-      //     this.character.GetGroundNormal().GetY() *
-      //       behavior._sharedData.worldScale +
+      //     this.character.GetGroundNormal().GetY() +
       //     ' ' +
-      //     this.character.GetGroundNormal().GetZ() * behavior._sharedData.worldScale
+      //     this.character.GetGroundNormal().GetZ()
       // );
 
       this.hasPressedForwardKey = false;
@@ -411,7 +410,7 @@ namespace gdjs {
      */
     isOnFloor(): boolean {
       return this.character
-        ? this.character.GetGroundBodyID().GetIndex() < 0x7fffff
+        ? this.character.IsSupported()
         : false;
     }
 

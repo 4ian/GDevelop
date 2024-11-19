@@ -174,9 +174,10 @@ namespace gdjs {
       settings.mSupportingVolume = new Jolt.Plane(
         Jolt.Vec3.prototype.sAxisZ(),
         // TODO It's strange that the value is positive.
-        (capsuleHalfLength - capsuleRadius * (1 - Math.cos(gdjs.toRad(this._slopeMaxAngle))))
+        capsuleHalfLength -
+          capsuleRadius * (1 - Math.cos(gdjs.toRad(this._slopeMaxAngle)))
       );
-      console.log((1 - Math.cos(gdjs.toRad(this._slopeMaxAngle))));
+      console.log(1 - Math.cos(gdjs.toRad(this._slopeMaxAngle)));
       const sharedData = behavior._sharedData;
       this.character = new Jolt.CharacterVirtual(
         settings,
@@ -184,7 +185,80 @@ namespace gdjs {
         behavior.getPhysicsRotation(this.getQuat(0, 0, 0, 1)),
         sharedData.physicsSystem
       );
-      //TODO this.character.SetListener(characterContactListener);
+      const characterContactListener = new Jolt.CharacterContactListenerJS();
+      characterContactListener.OnAdjustBodyVelocity = (
+        character,
+        body2Ptr,
+        linearVelocityPtr,
+        angularVelocity
+      ) => {
+        // const body2 = Jolt.wrapPointer(body2Ptr, Jolt.Body);
+        // const linearVelocity = Jolt.wrapPointer(linearVelocityPtr, Jolt.Vec3);
+        // console.log(
+        //   'Add: ' +
+        //     body2.GetLinearVelocity().GetX() +
+        //     ' ' +
+        //     body2.GetLinearVelocity().GetY()
+        // );
+        // linearVelocity.Set(
+        //   linearVelocity.GetX() + body2.GetLinearVelocity().GetX(),
+        //   linearVelocity.GetY() + body2.GetLinearVelocity().GetY(),
+        //   linearVelocity.GetZ() + body2.GetLinearVelocity().GetZ()
+        // );
+      };
+      characterContactListener.OnContactValidate = (
+        character,
+        bodyID2,
+        subShapeID2
+      ) => {
+        return true;
+      };
+      characterContactListener.OnCharacterContactValidate = (
+        character,
+        otherCharacter,
+        subShapeID2
+      ) => {
+        return true;
+      };
+      characterContactListener.OnContactAdded = (
+        character,
+        bodyID2,
+        subShapeID2,
+        contactPosition,
+        contactNormal,
+        settings
+      ) => {};
+      characterContactListener.OnCharacterContactAdded = (
+        character,
+        otherCharacter,
+        subShapeID2,
+        contactPosition,
+        contactNormal,
+        settings
+      ) => {};
+      characterContactListener.OnContactSolve = (
+        character,
+        bodyID2,
+        subShapeID2,
+        contactPosition,
+        contactNormal,
+        contactVelocity,
+        contactMaterial,
+        characterVelocity,
+        newCharacterVelocity
+      ) => {};
+      characterContactListener.OnCharacterContactSolve = (
+        character,
+        otherCharacter,
+        subShapeID2,
+        contactPosition,
+        contactNormal,
+        contactVelocity,
+        contactMaterial,
+        characterVelocity,
+        newCharacterVelocity
+      ) => {};
+      this.character.SetListener(characterContactListener);
 
       const body = sharedData.physicsSystem
         .GetBodyLockInterface()
@@ -217,7 +291,7 @@ namespace gdjs {
       if (!this.character) {
         return;
       }
-      // console.log('Step character');
+      console.log('Step character');
 
       // console.log(
       //   'Character: ' +
@@ -298,13 +372,16 @@ namespace gdjs {
         );
       }
 
+      const groundVelocity = this.character.GetGroundVelocity();
+
       const forwardSpeed =
         this._currentForwardSpeed * behavior._sharedData.worldInvScale;
       const angle = gdjs.toRad(this.owner.getAngle());
       this.character.SetLinearVelocity(
         this.getVec3(
-          forwardSpeed * Math.cos(angle),
-          forwardSpeed * Math.sin(angle),
+          groundVelocity.GetX() + forwardSpeed * Math.cos(angle),
+          groundVelocity.GetY() + forwardSpeed * Math.sin(angle),
+          // The ground velocity is not added on Z as it's handled by mStickToFloorStepDown.
           (this._currentJumpSpeed - this._currentFallSpeed) *
             behavior._sharedData.worldInvScale
         )
@@ -315,7 +392,7 @@ namespace gdjs {
       extendedUpdateSettings.mStickToFloorStepDown.Set(
         0,
         0,
-        forwardSpeed * timeDelta * this._slopeClimbingFactor
+        Math.min(-Math.abs(forwardSpeed) * timeDelta * this._slopeClimbingFactor, groundVelocity.GetZ())
       );
 
       this.character.SetRotation(behavior._body!.GetRotation());
@@ -342,6 +419,15 @@ namespace gdjs {
       //     ' Fall: ' +
       //     this._currentFallSpeed
       // );
+
+      console.log(
+        'Ground: ' +
+          this.character.GetGroundVelocity().GetX() +
+          ' ' +
+          this.character.GetGroundVelocity().GetY() +
+          ' ' +
+          this.character.GetGroundVelocity().GetZ()
+      );
 
       // console.log(
       //   'Speed: ' +
@@ -390,6 +476,9 @@ namespace gdjs {
 
       this.hasPressedForwardKey = false;
       this.hasPressedJumpKey = false;
+
+      
+      console.log('END Step character');
     }
 
     doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
@@ -409,9 +498,7 @@ namespace gdjs {
      * @returns Returns true if on a floor and false if not.
      */
     isOnFloor(): boolean {
-      return this.character
-        ? this.character.IsSupported()
-        : false;
+      return this.character ? this.character.IsSupported() : false;
     }
 
     /**

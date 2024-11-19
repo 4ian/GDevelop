@@ -263,6 +263,8 @@ namespace gdjs {
       const body = sharedData.physicsSystem
         .GetBodyLockInterface()
         .TryGetBody(this.character.GetInnerBodyID());
+      // TODO This is not really reliable. We could choose to disable it and force user to use the "is on platform" condition.
+      body.SetCollideKinematicVsNonDynamic(true);
       return body;
     }
 
@@ -291,7 +293,7 @@ namespace gdjs {
       if (!this.character) {
         return;
       }
-      console.log('Step character');
+      // console.log('Step character');
 
       // console.log(
       //   'Character: ' +
@@ -372,6 +374,7 @@ namespace gdjs {
         );
       }
 
+      this.character.UpdateGroundVelocity();
       const groundVelocity = this.character.GetGroundVelocity();
 
       const forwardSpeed =
@@ -389,11 +392,21 @@ namespace gdjs {
       const sharedData = behavior._sharedData;
       const jolt = sharedData.jolt;
 
-      extendedUpdateSettings.mStickToFloorStepDown.Set(
-        0,
-        0,
-        Math.min(-Math.abs(forwardSpeed) * timeDelta * this._slopeClimbingFactor, groundVelocity.GetZ())
+      const onePixel = behavior._sharedData.worldInvScale;
+      const floorStepDownSpeedZ = Math.min(
+        -Math.abs(forwardSpeed) * this._slopeClimbingFactor,
+        groundVelocity.GetZ()
       );
+      if (
+        Math.abs(floorStepDownSpeedZ) <=
+        this._maxFallingSpeed * behavior._sharedData.worldInvScale
+      ) {
+        extendedUpdateSettings.mStickToFloorStepDown.Set(
+          0,
+          0,
+          -onePixel + floorStepDownSpeedZ * timeDelta
+        );
+      }
 
       this.character.SetRotation(behavior._body!.GetRotation());
       this.character.ExtendedUpdate(
@@ -420,14 +433,14 @@ namespace gdjs {
       //     this._currentFallSpeed
       // );
 
-      console.log(
-        'Ground: ' +
-          this.character.GetGroundVelocity().GetX() +
-          ' ' +
-          this.character.GetGroundVelocity().GetY() +
-          ' ' +
-          this.character.GetGroundVelocity().GetZ()
-      );
+      // console.log(
+      //   'Ground: ' +
+      //     this.character.GetGroundVelocity().GetX() +
+      //     ' ' +
+      //     this.character.GetGroundVelocity().GetY() +
+      //     ' ' +
+      //     this.character.GetGroundVelocity().GetZ()
+      // );
 
       // console.log(
       //   'Speed: ' +
@@ -477,8 +490,7 @@ namespace gdjs {
       this.hasPressedForwardKey = false;
       this.hasPressedJumpKey = false;
 
-      
-      console.log('END Step character');
+      // console.log('END Step character');
     }
 
     doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}

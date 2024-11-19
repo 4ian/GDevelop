@@ -98,7 +98,6 @@ namespace gdjs {
     bodyInterface: Jolt.BodyInterface;
     /** Contact listener to keep track of current collisions */
     contactListener: Jolt.ContactListenerJS;
-    behaviorsByBodyID = new Map<number, gdjs.Physics3DRuntimeBehavior>();
     /** Avoid creating new vectors all the time */
     _tempVec3 = new Jolt.Vec3();
     _tempRVec3 = new Jolt.RVec3();
@@ -154,14 +153,6 @@ namespace gdjs {
 
         behaviorA.onContactBegin(behaviorB);
         behaviorB.onContactBegin(behaviorA);
-        this.behaviorsByBodyID.set(
-          bodyA.GetID().GetIndexAndSequenceNumber(),
-          behaviorA
-        );
-        this.behaviorsByBodyID.set(
-          bodyB.GetID().GetIndexAndSequenceNumber(),
-          behaviorB
-        );
       };
       this.contactListener.OnContactRemoved = (
         subShapePairPtr: number
@@ -171,15 +162,17 @@ namespace gdjs {
           Jolt.SubShapeIDPair
         );
 
-        const behaviorA = this.behaviorsByBodyID.get(
-          subShapePair.GetBody1ID().GetIndexAndSequenceNumber()
-        );
-        const behaviorB = this.behaviorsByBodyID.get(
-          subShapePair.GetBody2ID().GetIndexAndSequenceNumber()
-        );
+        // This is ok because bodies are not deleted during the Physics step.
+        const bodyLockInterface = this.physicsSystem.GetBodyLockInterface();
+        const bodyA = bodyLockInterface.TryGetBody(subShapePair.GetBody1ID());
+        const bodyB = bodyLockInterface.TryGetBody(subShapePair.GetBody2ID());
+
+        const behaviorA = bodyA.gdjsAssociatedBehavior;
+        const behaviorB = bodyB.gdjsAssociatedBehavior;
         if (!behaviorA || !behaviorB) {
           return;
         }
+
         behaviorA.onContactEnd(behaviorB);
         behaviorB.onContactEnd(behaviorA);
       };
@@ -188,7 +181,9 @@ namespace gdjs {
         bodyPtrB: number,
         manifoldPtr: number,
         settingsPtr: number
-      ): void => {};
+      ): void => {
+        // TODO we could rely on this event.
+      };
       this.contactListener.OnContactValidate = (
         bodyPtrA: number,
         bodyPtrB: number,
@@ -244,7 +239,6 @@ namespace gdjs {
         physicsBehavior.contactsStartedThisFrame.length = 0;
         physicsBehavior.contactsEndedThisFrame.length = 0;
       }
-      this.behaviorsByBodyID.clear();
       for (const physicsBehavior of this._registeredBehaviors) {
         physicsBehavior.updateBodyFromObject();
       }

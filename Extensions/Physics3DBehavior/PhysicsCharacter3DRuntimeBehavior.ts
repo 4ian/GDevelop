@@ -159,14 +159,23 @@ namespace gdjs {
       settings.mMaxSlopeAngle = gdjs.toRad(this._slopeMaxAngle);
       //settings.mMaxStrength = maxStrength;
       settings.mShape = behavior.createShape();
+      settings.mUp = Jolt.Vec3.prototype.sAxisZ();
       settings.mBackFaceMode = Jolt.EBackFaceMode_CollideWithBackFaces;
       //settings.mCharacterPadding = characterPadding;
       //settings.mPenetrationRecoverySpeed = penetrationRecoverySpeed;
       //settings.mPredictiveContactDistance = predictiveContactDistance;
-      // settings.mSupportingVolume = new Jolt.Plane(
-      //   Jolt.Vec3.prototype.sAxisZ(),
-      //   -characterRadiusStanding
-      // );
+      const depth = this.owner3D.getDepth() * this._sharedData.worldInvScale;
+      const width = this.owner3D.getWidth() * this._sharedData.worldInvScale;
+      const height = this.owner3D.getHeight() * this._sharedData.worldInvScale;
+      // Only the bottom of the capsule can make a contact with the floor.
+      // It avoids characters from sticking to walls.
+      const capsuleHalfLength = depth / 2;
+      const capsuleRadius = Math.sqrt(width * height) / 2;
+      settings.mSupportingVolume = new Jolt.Plane(
+        Jolt.Vec3.prototype.sAxisZ(),
+        -(capsuleHalfLength - capsuleRadius * (1 - Math.cos(gdjs.toRad(this._slopeMaxAngle))))
+      );
+      console.log((1 - Math.cos(gdjs.toRad(this._slopeMaxAngle))));
       const sharedData = behavior._sharedData;
       this.character = new Jolt.CharacterVirtual(
         settings,

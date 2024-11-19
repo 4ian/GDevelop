@@ -630,9 +630,18 @@ namespace gdjs {
     }
 
     createShape(): Jolt.Shape {
-      const width = this.owner3D.getWidth() * this._sharedData.worldInvScale;
-      const height = this.owner3D.getHeight() * this._sharedData.worldInvScale;
-      const depth = this.owner3D.getDepth() * this._sharedData.worldInvScale;
+      let width = this.owner3D.getWidth() * this._sharedData.worldInvScale;
+      let height = this.owner3D.getHeight() * this._sharedData.worldInvScale;
+      let depth = this.owner3D.getDepth() * this._sharedData.worldInvScale;
+      if (this.shapeOrientation === 'X') {
+        const swap = depth;
+        depth = width;
+        width = swap;
+      } else if (this.shapeOrientation === 'Y') {
+        const swap = depth;
+        depth = height;
+        height = swap;
+      }
 
       const shapeScale = this.shapeScale * this._sharedData.worldInvScale;
 
@@ -676,7 +685,7 @@ namespace gdjs {
           shapeDimensionA > 0
             ? shapeDimensionA
             : width > 0
-            ? Math.sqrt(((width / 2) * height) / 2)
+            ? Math.sqrt(width * height) / 2
             : onePixel;
         const capsuleDepth =
           shapeDimensionB > 0 ? shapeDimensionB : depth > 0 ? depth : onePixel;
@@ -687,7 +696,7 @@ namespace gdjs {
           shapeDimensionA > 0
             ? shapeDimensionA
             : width > 0
-            ? Math.sqrt(((width / 2) * height) / 2)
+            ? Math.sqrt(width * height) / 2
             : onePixel;
         const cylinderDepth =
           shapeDimensionB > 0 ? shapeDimensionB : depth > 0 ? depth : onePixel;
@@ -708,7 +717,7 @@ namespace gdjs {
           shapeDimensionA > 0
             ? shapeDimensionA
             : width > 0
-            ? Math.pow(((((width / 2) * height) / 2) * depth) / 2, 1 / 3)
+            ? Math.pow(width * height * depth, 1 / 3) / 2
             : onePixel;
         shapeSettings = new Jolt.SphereShapeSettings(radius);
         quat = this.getQuat(0, 0, 0, 1);
@@ -716,7 +725,6 @@ namespace gdjs {
       shapeSettings.mDensity = this.density;
       const rotatedShape = new Jolt.RotatedTranslatedShapeSettings(
         this.getVec3(shapeOffsetX, shapeOffsetY, shapeOffsetZ),
-        // Top on Z axis.
         quat,
         shapeSettings
       )

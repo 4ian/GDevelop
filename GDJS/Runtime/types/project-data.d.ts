@@ -397,6 +397,7 @@ declare interface ResourcesData {
 }
 
 declare interface ResourceData {
+  alwaysLoaded?: boolean;
   file: string;
   kind: ResourceKind;
   metadata: string;

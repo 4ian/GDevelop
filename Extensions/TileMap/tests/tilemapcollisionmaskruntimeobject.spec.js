@@ -10,6 +10,7 @@ describe('gdjs.TileMapCollisionMaskRuntimeObject', function () {
             metadata: '',
             name: 'SmallTiledMap.json',
             userAdded: true,
+            alwaysLoaded: true,
           },
           {
             file: 'base/tests-utils/simple-tiled-map/FlippingTiledMap.json',
@@ -17,6 +18,7 @@ describe('gdjs.TileMapCollisionMaskRuntimeObject', function () {
             metadata: '',
             name: 'FlippingTiledMap.json',
             userAdded: true,
+            alwaysLoaded: true,
           },
           {
             file: 'base/tests-utils/simple-tiled-map/MiniTiledSet.json',
@@ -24,6 +26,7 @@ describe('gdjs.TileMapCollisionMaskRuntimeObject', function () {
             metadata: '',
             name: 'MiniTiledSet.json',
             userAdded: true,
+            alwaysLoaded: true,
           },
         ],
       },

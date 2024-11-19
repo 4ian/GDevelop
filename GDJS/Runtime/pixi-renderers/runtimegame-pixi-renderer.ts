@@ -286,19 +286,17 @@ namespace gdjs {
       if (isFullPage && !this._keepRatio) {
         canvasWidth = maxWidth;
         canvasHeight = maxHeight;
-      } else {
-        if (
-          (isFullPage && this._keepRatio) ||
-          canvasWidth > maxWidth ||
-          canvasHeight > maxHeight
-        ) {
-          let factor = maxWidth / canvasWidth;
-          if (canvasHeight * factor > maxHeight) {
-            factor = maxHeight / canvasHeight;
-          }
-          canvasWidth *= factor;
-          canvasHeight *= factor;
+      } else if (
+        (isFullPage && this._keepRatio) ||
+        canvasWidth > maxWidth ||
+        canvasHeight > maxHeight
+      ) {
+        let factor = maxWidth / canvasWidth;
+        if (canvasHeight * factor > maxHeight) {
+          factor = maxHeight / canvasHeight;
         }
+        canvasWidth *= factor;
+        canvasHeight *= factor;
       }
 
       // Apply the calculations to the canvas element...

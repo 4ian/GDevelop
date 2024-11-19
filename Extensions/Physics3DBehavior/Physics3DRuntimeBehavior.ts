@@ -258,6 +258,13 @@ namespace gdjs {
       // Step the physics world
       this.jolt.Step(deltaTime, numSteps);
       this.stepped = true;
+
+      // It's important that updateBodyFromObject and updateObjectFromBody are
+      // called at the same time because other behavior may move the object in
+      // their doStepPreEvents.
+      for (const physicsBehavior of this._registeredBehaviors) {
+        physicsBehavior.updateObjectFromBody();
+      }
     }
     
     /**
@@ -882,51 +889,6 @@ namespace gdjs {
             1000.0
         );
       }
-
-      // Copy transform from body to the GD object.
-      // It's possible the behavior was either deactivated or the object deleted
-      // just before this doStepPreEvents (for example, another behavior deleted
-      // the object during its own doStepPreEvents). If the body is null, we just
-      // don't do anything (but still run the physics simulation - this is independent).
-      if (this._body !== null) {
-        const position = this._body.GetPosition();
-        this.owner3D.setX(
-          position.GetX() * this._sharedData.worldScale -
-            this.owner3D.getWidth() / 2 +
-            this.owner3D.getX() -
-            this.owner3D.getDrawableX()
-        );
-        this.owner3D.setY(
-          position.GetY() * this._sharedData.worldScale -
-            this.owner3D.getHeight() / 2 +
-            this.owner3D.getY() -
-            this.owner3D.getDrawableY()
-        );
-        this.owner3D.setZ(
-          position.GetZ() * this._sharedData.worldScale -
-            this.owner3D.getDepth() / 2 +
-            this.owner3D.getZ() -
-            this.owner3D.getDrawableZ()
-        );
-        const quaternion = this._body.GetRotation();
-        const threeObject = this.owner3D.get3DRendererObject();
-        threeObject.quaternion.x = quaternion.GetX();
-        threeObject.quaternion.y = quaternion.GetY();
-        threeObject.quaternion.z = quaternion.GetZ();
-        threeObject.quaternion.w = quaternion.GetW();
-        const euler = new THREE.Euler(0, 0, 0, 'ZYX');
-        euler.setFromQuaternion(threeObject.quaternion);
-        this.owner3D.setRotationX(gdjs.toDegrees(euler.x));
-        this.owner3D.setRotationY(gdjs.toDegrees(euler.y));
-        this.owner3D.setAngle(gdjs.toDegrees(euler.z));
-      }
-
-      // Update cached transform.
-      this._objectOldX = this.owner3D.getX();
-      this._objectOldY = this.owner3D.getY();
-      this._objectOldRotationX = this.owner3D.getRotationX();
-      this._objectOldRotationY = this.owner3D.getRotationY();
-      this._objectOldRotationZ = this.owner3D.getAngle();
     }
 
     doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
@@ -976,6 +938,59 @@ namespace gdjs {
       );
     }
 
+    
+    updateObjectFromBody() {
+      // Copy transform from body to the GD object.
+      // It's possible the behavior was either deactivated or the object deleted
+      // just before this doStepPreEvents (for example, another behavior deleted
+      // the object during its own doStepPreEvents). If the body is null, we just
+      // don't do anything (but still run the physics simulation - this is independent).
+      if (this._body !== null) {
+        const position = this._body.GetPosition();
+        this.owner3D.setX(
+          position.GetX() * this._sharedData.worldScale -
+            this.owner3D.getWidth() / 2 +
+            this.owner3D.getX() -
+            this.owner3D.getDrawableX()
+        );
+        this.owner3D.setY(
+          position.GetY() * this._sharedData.worldScale -
+            this.owner3D.getHeight() / 2 +
+            this.owner3D.getY() -
+            this.owner3D.getDrawableY()
+        );
+        this.owner3D.setZ(
+          position.GetZ() * this._sharedData.worldScale -
+            this.owner3D.getDepth() / 2 +
+            this.owner3D.getZ() -
+            this.owner3D.getDrawableZ()
+        );
+        const quaternion = this._body.GetRotation();
+        const threeObject = this.owner3D.get3DRendererObject();
+        threeObject.quaternion.x = quaternion.GetX();
+        threeObject.quaternion.y = quaternion.GetY();
+        threeObject.quaternion.z = quaternion.GetZ();
+        threeObject.quaternion.w = quaternion.GetW();
+        const euler = new THREE.Euler(0, 0, 0, 'ZYX');
+        euler.setFromQuaternion(threeObject.quaternion);
+        this.owner3D.setRotationX(gdjs.toDegrees(euler.x));
+        this.owner3D.setRotationY(gdjs.toDegrees(euler.y));
+        this.owner3D.setAngle(gdjs.toDegrees(euler.z));
+      }
+
+      // if (this.owner.getName() === "MovingPlatform") {
+      //   console.log("to Object: --> " + this.owner3D.getX() + " " + this.owner3D.getY())
+      // }
+
+      // Update cached transform.
+      this._objectOldX = this.owner3D.getX();
+      this._objectOldY = this.owner3D.getY();
+      this._objectOldZ = this.owner3D.getZ();
+      this._objectOldRotationX = this.owner3D.getRotationX();
+      this._objectOldRotationY = this.owner3D.getRotationY();
+      this._objectOldRotationZ = this.owner3D.getAngle();
+    }
+
     updateBodyFromObject() {
       if (this._body === null) {
         if (!this.createBody()) return;
@@ -1009,6 +1024,10 @@ namespace gdjs {
         this._objectOldRotationY !== this.owner3D.getRotationY() ||
         this._objectOldRotationZ !== this.owner3D.getAngle()
       ) {
+        // if (this.owner.getName() === "MovingPlatform") {
+        //   console.log("to Physics: " + this._objectOldX + " " + this._objectOldY + " --> " + this.owner3D.getX() + " " + this.owner3D.getY())
+        // }
+        
         this._sharedData.bodyInterface.SetPositionAndRotationWhenChanged(
           body.GetID(),
           this.getPhysicsPosition(this.getRVec3(0, 0, 0)),

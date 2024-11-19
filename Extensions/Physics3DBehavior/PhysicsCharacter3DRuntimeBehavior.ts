@@ -334,14 +334,14 @@ namespace gdjs {
         this._canJump = true;
       }
 
-      console.log(
-        'Is on floor: ' +
-          this.isOnFloor() +
-          ' Jump: ' +
-          this._currentJumpSpeed +
-          ' Fall: ' +
-          this._currentFallSpeed
-      );
+      // console.log(
+      //   'Is on floor: ' +
+      //     this.isOnFloor() +
+      //     ' Jump: ' +
+      //     this._currentJumpSpeed +
+      //     ' Fall: ' +
+      //     this._currentFallSpeed
+      // );
 
       // console.log(
       //   'Speed: ' +
@@ -368,16 +368,16 @@ namespace gdjs {
       //     behavior.owner3D.getZ()
       // );
 
-      console.log(
-        'Ground: ' +
-        this.character.GetGroundPosition().GetX() *
-            behavior._sharedData.worldScale +
-          ' ' +
-          this.character.GetGroundPosition().GetY() *
-            behavior._sharedData.worldScale +
-          ' ' +
-          this.character.GetGroundPosition().GetZ() * behavior._sharedData.worldScale
-      );
+      // console.log(
+      //   'Ground: ' +
+      //   this.character.GetGroundPosition().GetX() *
+      //       behavior._sharedData.worldScale +
+      //     ' ' +
+      //     this.character.GetGroundPosition().GetY() *
+      //       behavior._sharedData.worldScale +
+      //     ' ' +
+      //     this.character.GetGroundPosition().GetZ() * behavior._sharedData.worldScale
+      // );
 
       // console.log(
       //   'Ground: ' +

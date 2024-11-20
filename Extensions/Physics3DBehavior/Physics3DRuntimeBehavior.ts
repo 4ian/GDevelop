@@ -247,7 +247,7 @@ namespace gdjs {
         physicsBehavior.updateBodyFromObject();
       }
       for (const physics3DHook of this._physics3DHooks) {
-        physics3DHook.beforePhysicsStep(deltaTime);
+        physics3DHook.doBeforePhysicsStep(deltaTime);
       }
 
       // When running below 55 Hz, do 2 steps instead of 1
@@ -1796,7 +1796,7 @@ namespace gdjs {
       /**
        * Called before the physics engine step.
        */
-      beforePhysicsStep(timeDelta: float): void;
+      doBeforePhysicsStep(timeDelta: float): void;
     }
   }
 }

@@ -175,12 +175,11 @@ namespace gdjs {
           capsuleRadius * (1 - Math.cos(gdjs.toRad(this._slopeMaxAngle)))
       );
       console.log(1 - Math.cos(gdjs.toRad(this._slopeMaxAngle)));
-      const sharedData = behavior._sharedData;
       this.character = new Jolt.CharacterVirtual(
         settings,
         behavior.getPhysicsPosition(this.getRVec3(0, 0, 0)),
         behavior.getPhysicsRotation(this.getQuat(0, 0, 0, 1)),
-        sharedData.physicsSystem
+        this._sharedData.physicsSystem
       );
       const characterContactListener = new Jolt.CharacterContactListenerJS();
       characterContactListener.OnAdjustBodyVelocity = (
@@ -257,7 +256,7 @@ namespace gdjs {
       ) => {};
       this.character.SetListener(characterContactListener);
 
-      const body = sharedData.physicsSystem
+      const body = this._sharedData.physicsSystem
         .GetBodyLockInterface()
         .TryGetBody(this.character.GetInnerBodyID());
       // TODO This is not really reliable. We could choose to disable it and force user to use the "is on platform" condition.
@@ -278,7 +277,7 @@ namespace gdjs {
       this.getPhysics3D();
     }
 
-    beforePhysicsStep(timeDelta: float): void {
+    doBeforePhysicsStep(timeDelta: float): void {
       const {
         behavior,
         extendedUpdateSettings,
@@ -290,17 +289,22 @@ namespace gdjs {
       if (!this.character) {
         return;
       }
+      const characterBody = behavior._body;
+      if (!characterBody) {
+        return;
+      }
+      const worldInvScale = this._sharedData.worldInvScale;
       // console.log('Step character');
 
       // console.log(
       //   'Character: ' +
       //     this.character.GetPosition().GetX() *
-      //       behavior._sharedData.worldScale +
+      //       this._sharedData.worldScale +
       //     ' ' +
       //     this.character.GetPosition().GetY() *
-      //       behavior._sharedData.worldScale +
+      //       this._sharedData.worldScale +
       //     ' ' +
-      //     this.character.GetPosition().GetZ() * behavior._sharedData.worldScale
+      //     this.character.GetPosition().GetZ() * this._sharedData.worldScale
       // );
 
       // Change the speed according to the player's input.
@@ -371,32 +375,94 @@ namespace gdjs {
         );
       }
 
+      const groundBody = this._sharedData.physicsSystem
+        .GetBodyLockInterface()
+        .TryGetBody(this.character.GetGroundBodyID());
+
+      const stillKinematicPlatform =
+        groundBody.IsKinematic() &&
+        groundBody.GetLinearVelocity().Equals(Jolt.Vec3.prototype.sZero()) &&
+        groundBody.GetAngularVelocity().Equals(Jolt.Vec3.prototype.sZero());
+      if (stillKinematicPlatform) {
+        const groundBehavior = groundBody.gdjsAssociatedBehavior;
+        if (groundBehavior) {
+          const inverseTimeDelta = 1 / timeDelta;
+          // The platform may be moved by position changes instead of velocity.
+          // Emulate a velocity from the position changes.
+          groundBody.SetLinearVelocity(
+            this.getVec3(
+              (groundBehavior.owner3D.getX() - groundBehavior._objectOldX) *
+                worldInvScale *
+                inverseTimeDelta,
+              (groundBehavior.owner3D.getY() - groundBehavior._objectOldY) *
+                worldInvScale *
+                inverseTimeDelta,
+              (groundBehavior.owner3D.getZ() - groundBehavior._objectOldZ) *
+                worldInvScale *
+                inverseTimeDelta
+            )
+          );
+          groundBody.SetAngularVelocity(
+            this.getVec3(
+              0,
+              0,
+              gdjs.toRad(
+                gdjs.evtTools.common.angleDifference(
+                  groundBehavior.owner3D.getAngle(),
+                  groundBehavior._objectOldRotationZ
+                )
+              ) * inverseTimeDelta
+            )
+          );
+        }
+      }
       this.character.UpdateGroundVelocity();
+
+      const groundAngularVelocityZ = groundBody.GetAngularVelocity().GetZ();
+      if (groundAngularVelocityZ !== 0) {
+        // Make the character rotate with the platform on Z axis.
+        const rotation = Jolt.Quat.prototype.sEulerAngles(
+          this.getVec3(
+            0,
+            0,
+            characterBody
+              .GetRotation()
+              .GetRotationAngle(Jolt.Vec3.prototype.sAxisZ()) +
+              groundAngularVelocityZ * timeDelta
+          )
+        );
+        this._sharedData.bodyInterface.SetPositionAndRotation(
+          characterBody.GetID(),
+          behavior.getPhysicsPosition(this.getRVec3(0, 0, 0)),
+          rotation,
+          Jolt.EActivation_Activate
+        );
+      }
+      if (stillKinematicPlatform) {
+        groundBody.SetLinearVelocity(Jolt.Vec3.prototype.sZero());
+        groundBody.SetAngularVelocity(Jolt.Vec3.prototype.sZero());
+      }
       const groundVelocity = this.character.GetGroundVelocity();
 
-      const forwardSpeed =
-        this._currentForwardSpeed * behavior._sharedData.worldInvScale;
+      const forwardSpeed = this._currentForwardSpeed * worldInvScale;
       const angle = gdjs.toRad(this.owner.getAngle());
       this.character.SetLinearVelocity(
         this.getVec3(
           groundVelocity.GetX() + forwardSpeed * Math.cos(angle),
           groundVelocity.GetY() + forwardSpeed * Math.sin(angle),
           // The ground velocity is not added on Z as it's handled by mStickToFloorStepDown.
-          (this._currentJumpSpeed - this._currentFallSpeed) *
-            behavior._sharedData.worldInvScale
+          (this._currentJumpSpeed - this._currentFallSpeed) * worldInvScale
         )
       );
-      const sharedData = behavior._sharedData;
-      const jolt = sharedData.jolt;
 
-      const onePixel = behavior._sharedData.worldInvScale;
+      const onePixel = worldInvScale;
       const floorStepDownSpeedZ = Math.min(
         -Math.abs(forwardSpeed) * this._slopeClimbingFactor,
         groundVelocity.GetZ()
       );
       if (
         Math.abs(floorStepDownSpeedZ) <=
-        this._maxFallingSpeed * behavior._sharedData.worldInvScale
+        this._maxFallingSpeed * worldInvScale
       ) {
         extendedUpdateSettings.mStickToFloorStepDown.Set(
           0,
@@ -405,7 +471,7 @@ namespace gdjs {
         );
       }
 
-      this.character.SetRotation(behavior._body!.GetRotation());
+      this.character.SetRotation(characterBody.GetRotation());
       this.character.ExtendedUpdate(
         timeDelta,
         this.character.GetUp(),
@@ -414,7 +480,7 @@ namespace gdjs {
         objectLayerFilter,
         bodyFilter,
         shapeFilter,
-        jolt.GetTempAllocator()
+        this._sharedData.jolt.GetTempAllocator()
       );
 
       if (this.isOnFloor()) {
@@ -448,12 +514,12 @@ namespace gdjs {
       // console.log(
       //   'Body: ' +
       //     behavior._body!.GetPosition().GetX() *
-      //       behavior._sharedData.worldScale +
+      //       this._sharedData.worldScale +
       //     ' ' +
       //     behavior._body!.GetPosition().GetY() *
-      //       behavior._sharedData.worldScale +
+      //       this._sharedData.worldScale +
       //     ' ' +
-      //     behavior._body!.GetPosition().GetZ() * behavior._sharedData.worldScale
+      //     behavior._body!.GetPosition().GetZ() * this._sharedData.worldScale
       // );
       // console.log(
       //   'Object: ' +
@@ -467,12 +533,12 @@ namespace gdjs {
       // console.log(
       //   'Ground: ' +
       //   this.character.GetGroundPosition().GetX() *
-      //       behavior._sharedData.worldScale +
+      //       this._sharedData.worldScale +
       //     ' ' +
       //     this.character.GetGroundPosition().GetY() *
-      //       behavior._sharedData.worldScale +
+      //       this._sharedData.worldScale +
       //     ' ' +
-      //     this.character.GetGroundPosition().GetZ() * behavior._sharedData.worldScale
+      //     this.character.GetGroundPosition().GetZ() * this._sharedData.worldScale
       // );
 
       // console.log(

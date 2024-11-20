@@ -626,15 +626,15 @@ const ProjectPropertiesDialog = (props: Props) => {
                   />
                   <SelectOption
                     value="scaleOuter"
-                    label={t`Extend width or height to fill the screen (but never crop the original size)`}
+                    label={t`Extend width or height to fill screen (without cropping the game area)`}
                   />
                   <SelectOption
                     value="adaptWidth"
-                    label={t`Extend or crop width to fit the screen`}
+                    label={t`Adjust width to fill screen (extend or crop)`}
                   />
                   <SelectOption
                     value="adaptHeight"
-                    label={t`Extend or crop height to fit the screen`}
+                    label={t`Adjust height to fill screen (extend or crop)`}
                   />
                 </SelectField>
                 <Checkbox

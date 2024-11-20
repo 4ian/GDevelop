@@ -594,9 +594,13 @@ namespace gdjs {
 
             if (widthFactor < heightFactor) {
               this._gameResolutionWidth = this._originalWidth;
-              this._gameResolutionHeight = Math.floor(windowInnerHeight / widthFactor);
+              this._gameResolutionHeight = Math.floor(
+                windowInnerHeight / widthFactor
+              );
             } else {
-              this._gameResolutionWidth = Math.floor(windowInnerWidth / heightFactor);
+              this._gameResolutionWidth = Math.floor(
+                windowInnerWidth / heightFactor
+              );
               this._gameResolutionHeight = this._originalHeight;
             }
           }

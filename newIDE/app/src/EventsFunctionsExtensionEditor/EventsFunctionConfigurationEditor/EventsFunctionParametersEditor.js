@@ -644,6 +644,9 @@ export const EventsFunctionParametersEditor = ({
                                         translatableHintText={t`Enter the parameter name (mandatory)`}
                                         value={parameter.getName()}
                                         onChange={newName => {
+                                          if (newName === parameter.getName()) {
+                                            return;
+                                          }
                                           const projectScopedContainers = projectScopedContainersAccessor.get();
                                           const validatedNewName = getValidatedParameterName(
                                             parameters,

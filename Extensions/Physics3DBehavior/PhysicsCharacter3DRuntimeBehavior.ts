@@ -40,9 +40,9 @@ namespace gdjs {
 
     _slopeMaxAngle: float;
     _slopeClimbingFactor: float = 1;
-    forwardAcceleration: float = 1200;
-    forwardDeceleration: float = 1200;
-    forwardSpeedMax: float = 600;
+    _forwardAcceleration: float = 1200;
+    _forwardDeceleration: float = 1200;
+    _forwardSpeedMax: float = 600;
     _gravity: float = 1000;
     _maxFallingSpeed: float = 700;
     _jumpSpeed: float = 900;
@@ -57,6 +57,12 @@ namespace gdjs {
     _currentJumpSpeed: float = 0;
     _timeSinceCurrentJumpStart: float = 0;
     _jumpKeyHeldSinceJumpStart: boolean = false;
+    private _hasReallyMoved: boolean = false;
+
+    /**
+     * A very small value compare to 1 pixel, yet very huge compare to rounding errors.
+     */
+    private static readonly epsilon = 2 ** -20;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -307,24 +313,28 @@ namespace gdjs {
       //     this.character.GetPosition().GetZ() * this._sharedData.worldScale
       // );
 
+      const oldX = this.character.GetPosition().GetX();
+      const oldY = this.character.GetPosition().GetY();
+      const oldZ = this.character.GetPosition().GetZ();
+
       // Change the speed according to the player's input.
       // TODO Give priority to the last key for faster reaction time.
       if (this.hasPressedBackwardKey !== this.hasPressedForwardKey) {
         if (this.hasPressedBackwardKey) {
           if (this._currentForwardSpeed <= 0) {
-            this._currentForwardSpeed -= this.forwardAcceleration * timeDelta;
+            this._currentForwardSpeed -= this._forwardAcceleration * timeDelta;
           } else {
             // Turn back at least as fast as it would stop.
             this._currentForwardSpeed -=
-              Math.max(this.forwardAcceleration, this.forwardDeceleration) *
+              Math.max(this._forwardAcceleration, this._forwardDeceleration) *
               timeDelta;
           }
         } else if (this.hasPressedForwardKey) {
           if (this._currentForwardSpeed >= 0) {
-            this._currentForwardSpeed += this.forwardAcceleration * timeDelta;
+            this._currentForwardSpeed += this._forwardAcceleration * timeDelta;
           } else {
             this._currentForwardSpeed +=
-              Math.max(this.forwardAcceleration, this.forwardDeceleration) *
+              Math.max(this._forwardAcceleration, this._forwardDeceleration) *
               timeDelta;
           }
         }
@@ -334,20 +344,20 @@ namespace gdjs {
         // Set the speed to 0 if the speed was too low.
         if (this._currentForwardSpeed < 0) {
           this._currentForwardSpeed = Math.max(
-            this._currentForwardSpeed + this.forwardDeceleration * timeDelta,
+            this._currentForwardSpeed + this._forwardDeceleration * timeDelta,
             0
           );
         }
         if (this._currentForwardSpeed > 0) {
           this._currentForwardSpeed = Math.min(
-            this._currentForwardSpeed - this.forwardDeceleration * timeDelta,
+            this._currentForwardSpeed - this._forwardDeceleration * timeDelta,
             0
           );
         }
       }
       this._currentForwardSpeed = Math.max(
-        -this.forwardSpeedMax,
-        Math.min(this.forwardSpeedMax, this._currentForwardSpeed)
+        -this._forwardSpeedMax,
+        Math.min(this._forwardSpeedMax, this._currentForwardSpeed)
       );
 
       if (this.isOnFloor()) {
@@ -552,6 +562,14 @@ namespace gdjs {
 
       this.hasPressedForwardKey = false;
       this.hasPressedJumpKey = false;
+      
+      this._hasReallyMoved =
+        Math.abs(this.character.GetPosition().GetX() - oldX) >
+        PhysicsCharacter3DRuntimeBehavior.epsilon ||
+        Math.abs(this.character.GetPosition().GetY() - oldY) >
+        PhysicsCharacter3DRuntimeBehavior.epsilon ||
+          Math.abs(this.character.GetPosition().GetY() - oldZ) >
+          PhysicsCharacter3DRuntimeBehavior.epsilon;
 
       // console.log('END Step character');
     }
@@ -559,6 +577,213 @@ namespace gdjs {
     doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
 
     onObjectHotReloaded() {}
+
+    /**
+     * Get maximum angle of a slope for the Platformer Object to run on it as a floor.
+     * @returns the slope maximum angle, in degrees.
+     */
+    getSlopeMaxAngle(): float {
+      return this._slopeMaxAngle;
+    }
+
+    /**
+     * Set the maximum slope angle of the Platformer Object.
+     * @param slopeMaxAngle The new maximum slope angle.
+     */
+    setSlopeMaxAngle(slopeMaxAngle: float): void {
+      if (slopeMaxAngle < 0 || slopeMaxAngle >= 90) {
+        return;
+      }
+      this._slopeMaxAngle = slopeMaxAngle;
+
+      //Avoid rounding errors
+      if (slopeMaxAngle === 45) {
+        this._slopeClimbingFactor = 1;
+      } else {
+        this._slopeClimbingFactor = Math.tan(gdjs.toRad(slopeMaxAngle));
+      }
+
+      // Avoid a `_slopeClimbingFactor` set to exactly 0.
+      // Otherwise, this can lead the floor finding functions to consider
+      // a floor to be "too high" to reach, even if the object is very slightly
+      // inside it, which can happen because of rounding errors.
+      // See "Floating-point error mitigations" tests.
+      if (this._slopeClimbingFactor < 1 / 1024) {
+        this._slopeClimbingFactor = 1 / 1024;
+      }
+    }
+
+    /**
+     * Get the gravity of the Platformer Object.
+     * @returns The current gravity.
+     */
+    getGravity(): float {
+      return this._gravity;
+    }
+
+    /**
+     * Set the gravity of the Platformer Object.
+     * @param gravity The new gravity.
+     */
+    setGravity(gravity: float): void {
+      this._gravity = gravity;
+    }
+
+    /**
+     * Get the maximum falling speed of the Platformer Object.
+     * @returns The maximum falling speed.
+     */
+    getMaxFallingSpeed(): float {
+      return this._maxFallingSpeed;
+    }
+
+    /**
+     * Set the maximum falling speed of the Platformer Object.
+     * @param maxFallingSpeed The maximum falling speed.
+     * @param tryToPreserveAirSpeed If true and if jumping, tune the current jump speed to preserve the overall speed in the air.
+     */
+    setMaxFallingSpeed(
+      maxFallingSpeed: float,
+      tryToPreserveAirSpeed: boolean = false
+    ): void {
+      if (tryToPreserveAirSpeed && !this.isOnFloor()) {
+        // If the falling speed is too high compared to the new max falling speed,
+        // reduce it and adapt the jump speed to preserve the overall vertical speed.
+        const fallingSpeedOverflow = this._currentFallSpeed - maxFallingSpeed;
+        if (fallingSpeedOverflow > 0) {
+          this._currentFallSpeed -= fallingSpeedOverflow;
+          this._currentJumpSpeed = Math.max(
+            0,
+            this.getCurrentJumpSpeed() - fallingSpeedOverflow
+          );
+        }
+      }
+      this._maxFallingSpeed = maxFallingSpeed;
+    }
+
+    /**
+     * Get the acceleration value of the Platformer Object.
+     * @returns The current acceleration.
+     */
+    getForwardAcceleration(): float {
+      return this._forwardAcceleration;
+    }
+
+    /**
+     * Set the acceleration of the Platformer Object.
+     * @param forwardAcceleration The new acceleration.
+     */
+    setForwardAcceleration(forwardAcceleration: float): void {
+      this._forwardAcceleration = forwardAcceleration;
+    }
+
+    /**
+     * Get the deceleration of the Platformer Object.
+     * @returns The current deceleration.
+     */
+    getForwardDeceleration(): float {
+      return this._forwardDeceleration;
+    }
+
+    /**
+     * Set the deceleration of the Platformer Object.
+     * @param forwardDeceleration The new deceleration.
+     */
+    setForwardDeceleration(forwardDeceleration: float): void {
+      this._forwardDeceleration = forwardDeceleration;
+    }
+
+    /**
+     * Get the maximum speed of the Platformer Object.
+     * @returns The maximum speed.
+     */
+    getForwardSpeedMax(): float {
+      return this._forwardSpeedMax;
+    }
+
+    /**
+     * Set the maximum speed of the Platformer Object.
+     * @param forwardSpeedMax The new maximum speed.
+     */
+    setForwardSpeedMax(forwardSpeedMax: float): void {
+      this._forwardSpeedMax = forwardSpeedMax;
+    }
+
+    /**
+     * Get the jump speed of the Platformer Object.
+     * @returns The jump speed.
+     */
+    getJumpSpeed(): float {
+      return this._jumpSpeed;
+    }
+
+    /**
+     * Set the jump speed of the Platformer Object.
+     * @param jumpSpeed The new jump speed.
+     */
+    setJumpSpeed(jumpSpeed: float): void {
+      this._jumpSpeed = jumpSpeed;
+    }
+
+    /**
+     * Get the jump sustain time of the Platformer Object.
+     * @returns The jump sustain time.
+     */
+    getJumpSustainTime(): float {
+      return this._jumpSustainTime;
+    }
+
+    /**
+     * Set the jump sustain time of the Platformer Object.
+     * @param jumpSpeed The new jump sustain time.
+     */
+    setJumpSustainTime(jumpSustainTime: float): void {
+      this._jumpSustainTime = jumpSustainTime;
+    }
+
+    /**
+     * Get the current speed of the Platformer Object.
+     * @returns The current speed.
+     */
+    getCurrentForwardSpeed(): float {
+      return this._currentForwardSpeed;
+    }
+
+    /**
+     * Set the current speed of the Platformer Object.
+     * @param currentForwardSpeed The current speed.
+     */
+    setForwardCurrentSpeed(currentForwardSpeed: float): void {
+      this._currentForwardSpeed = gdjs.evtTools.common.clamp(
+        currentForwardSpeed,
+        -this._currentForwardSpeed,
+        this._currentForwardSpeed
+      );
+    }
+
+    /**
+     * Get the speed at which the object is falling. It is 0 when the object is on a floor, and non 0 as soon as the object leaves the floor.
+     * @returns The current fall speed.
+     */
+    getCurrentFallSpeed(): float {
+      return this._currentFallSpeed;
+    }
+
+    /**
+     * Get the current jump speed of the Platformer Object.
+     * @returns The current jump speed.
+     */
+    getCurrentJumpSpeed(): float {
+      return this._currentJumpSpeed;
+    }
+
+    /**
+     * Check if the Platformer Object can jump.
+     * @returns Returns true if the object can jump.
+     */
+    canJump(): boolean {
+      return this._canJump;
+    }
 
     simulateForwardKey(): void {
       this.hasPressedForwardKey = true;
@@ -617,42 +842,16 @@ namespace gdjs {
     }
 
     /**
-     * Set the maximum slope angle of the Platformer Object.
-     * @param slopeMaxAngle The new maximum slope angle.
+     * Check if the Platformer Object is moving.
+     * @returns Returns true if it is moving and false if not.
      */
-    setSlopeMaxAngle(slopeMaxAngle: float): void {
-      if (slopeMaxAngle < 0 || slopeMaxAngle >= 90) {
-        return;
-      }
-      this._slopeMaxAngle = slopeMaxAngle;
-
-      //Avoid rounding errors
-      if (slopeMaxAngle === 45) {
-        this._slopeClimbingFactor = 1;
-      } else {
-        this._slopeClimbingFactor = Math.tan(gdjs.toRad(slopeMaxAngle));
-      }
-
-      // Avoid a `_slopeClimbingFactor` set to exactly 0.
-      // Otherwise, this can lead the floor finding functions to consider
-      // a floor to be "too high" to reach, even if the object is very slightly
-      // inside it, which can happen because of rounding errors.
-      // See "Floating-point error mitigations" tests.
-      if (this._slopeClimbingFactor < 1 / 1024) {
-        this._slopeClimbingFactor = 1 / 1024;
-      }
-    }
-
-    getCurrentForwardSpeed(): float {
-      return this._currentForwardSpeed;
-    }
-
-    getForwardSpeedMax(): float {
-      return this.forwardSpeedMax;
-    }
-
-    setForwardSpeedMax(forwardSpeedMax: float): void {
-      this.forwardSpeedMax = forwardSpeedMax;
+    isMovingEvenALittle(): boolean {
+      return (
+        (this._hasReallyMoved &&
+          this._currentForwardSpeed !== 0) ||
+        this._currentJumpSpeed !== 0 ||
+        this._currentFallSpeed !== 0
+      );
     }
   }
 

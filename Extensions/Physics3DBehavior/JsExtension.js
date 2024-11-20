@@ -1516,7 +1516,7 @@ module.exports = {
         .setFunctionName('simulateForwardKey');
 
       aut
-        .addAction(
+        .addScopedAction(
           'SimulateJumpKey',
           _('Simulate jump key press'),
           _('Simulate a press of the jump key.'),
@@ -1530,7 +1530,24 @@ module.exports = {
         .setFunctionName('simulateJumpKey');
 
       aut
-        .addCondition(
+        .addScopedCondition(
+          'IsMovingEvenALittle',
+          _('Is moving'),
+          _(
+            'Check if the object is moving (whether it is on the floor or in the air).'
+          ),
+          _('_PARAM0_ is moving'),
+          _('Character state'),
+          'res/physics3d.svg',
+          'res/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3DBehavior')
+        .markAsSimple()
+        .setFunctionName('isMovingEvenALittle');
+
+      aut
+        .addScopedCondition(
           'IsOnFloor',
           _('Is on floor'),
           _('Check if the object is on a platform.'),
@@ -1545,7 +1562,7 @@ module.exports = {
         .setFunctionName('isOnFloor');
 
       aut
-        .addCondition(
+        .addScopedCondition(
           'IsJumping',
           _('Is jumping'),
           _('Check if the object is jumping.'),
@@ -1560,7 +1577,7 @@ module.exports = {
         .setFunctionName('isJumping');
 
       aut
-        .addCondition(
+        .addScopedCondition(
           'IsFalling',
           _('Is falling'),
           _(
@@ -1623,9 +1640,7 @@ module.exports = {
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
       .addCodeOnlyParameter('conditionInverted', '')
       .setFunctionName('gdjs.physics3d.isOnPlatform')
-      .addIncludeFile(
-        'Extensions/Physics3DBehavior/Physics3DTools.js'
-      );
+      .addIncludeFile('Extensions/Physics3DBehavior/Physics3DTools.js');
 
     return extension;
   },

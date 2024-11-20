@@ -584,15 +584,27 @@ namespace gdjs {
             this._gameResolutionWidth =
               (this._gameResolutionHeight * windowInnerWidth) /
               windowInnerHeight;
-          } else {
-            if (this._resizeMode === 'adaptHeight') {
-              this._gameResolutionHeight =
-                (this._gameResolutionWidth * windowInnerHeight) /
-                windowInnerWidth;
+          } else if (this._resizeMode === 'adaptHeight') {
+            this._gameResolutionHeight =
+              (this._gameResolutionWidth * windowInnerHeight) /
+              windowInnerWidth;
+          } else if (this._resizeMode === 'scaleOuter') {
+            const widthFactor = windowInnerWidth / this._originalWidth;
+            const heightFactor = windowInnerHeight / this._originalHeight;
+
+            if (widthFactor < heightFactor) {
+              this._gameResolutionWidth = this._originalWidth;
+              this._gameResolutionHeight = Math.floor(
+                windowInnerHeight / widthFactor
+              );
+            } else {
+              this._gameResolutionWidth = Math.floor(
+                windowInnerWidth / heightFactor
+              );
+              this._gameResolutionHeight = this._originalHeight;
             }
           }
         }
-      } else {
       }
 
       // Don't alter the game resolution. The renderer
@@ -1203,7 +1215,7 @@ namespace gdjs {
     /**
      * Enlarge/reduce the width (or the height) of the game to fill the inner window.
      */
-    _forceGameResolutionUpdate() {
+    private _forceGameResolutionUpdate() {
       this.setGameResolutionSize(
         this._gameResolutionWidth,
         this._gameResolutionHeight

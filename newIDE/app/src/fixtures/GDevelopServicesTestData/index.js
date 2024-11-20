@@ -3249,7 +3249,6 @@ const spaceshipSerializedObject = {
 
 const spaceshipSerializedResources = [
   {
-    alwaysLoaded: false,
     file: 'https://example.com/player-ship1.png',
     origin: {
       name: 'gdevelop-asset-store',
@@ -3262,7 +3261,6 @@ const spaceshipSerializedResources = [
     userAdded: false,
   },
   {
-    alwaysLoaded: false,
     file: 'https://example.com/player-ship2.png',
     origin: {
       name: 'gdevelop-asset-store',
@@ -3377,7 +3375,6 @@ export const fakeAssetWithCustomObject: Asset = {
       },
       resources: [
         {
-          alwaysLoaded: false,
           file:
             'https://resources.gdevelop-app.com/assets/Custom objects/object_YellowButton_Hovered.png',
           kind: 'image',
@@ -3391,7 +3388,6 @@ export const fakeAssetWithCustomObject: Asset = {
           },
         },
         {
-          alwaysLoaded: false,
           file:
             'https://resources.gdevelop-app.com/assets/Custom objects/object_YellowButton_Idle.png',
           kind: 'image',
@@ -3405,7 +3401,6 @@ export const fakeAssetWithCustomObject: Asset = {
           },
         },
         {
-          alwaysLoaded: false,
           file:
             'https://resources.gdevelop-app.com/assets/Custom objects/object_YellowButton_Pressed.png',
           kind: 'image',

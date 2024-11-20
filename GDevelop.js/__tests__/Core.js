@@ -1282,20 +1282,13 @@ describe('libGD.js', function () {
 
       const properties = resource.getProperties();
       expect(properties.get('Smooth the image').getValue()).toBe('true');
-      expect(properties.get('Always loaded in memory').getValue()).toBe(
-        'false'
-      );
 
       // Note: updateProperty expect the booleans in an usual "0" or "1" format.
       resource.updateProperty('Smooth the image', '0');
-      resource.updateProperty('Always loaded in memory', '1');
 
       const updatedProperties = resource.getProperties();
       expect(updatedProperties.get('Smooth the image').getValue()).toBe(
         'false'
-      );
-      expect(updatedProperties.get('Always loaded in memory').getValue()).toBe(
-        'true'
       );
 
       resource.delete();

@@ -166,7 +166,7 @@ class GD_CORE_API Resource {
  */
 class GD_CORE_API ImageResource : public Resource {
  public:
-  ImageResource() : Resource(), smooth(true), alwaysLoaded(false) {
+  ImageResource() : Resource(), smooth(true) {
     SetKind("image");
   };
   virtual ~ImageResource(){};
@@ -210,7 +210,6 @@ class GD_CORE_API ImageResource : public Resource {
   void SetSmooth(bool enable = true) { smooth = enable; }
 
   bool smooth;        ///< True if smoothing filter is applied
-  bool alwaysLoaded;  ///< True if the image must always be loaded in memory.
  private:
   gd::String file;
 };

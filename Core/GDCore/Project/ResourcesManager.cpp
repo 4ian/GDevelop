@@ -173,9 +173,6 @@ std::map<gd::String, gd::PropertyDescriptor> ImageResource::GetProperties()
   properties[_("Smooth the image")]
       .SetValue(smooth ? "true" : "false")
       .SetType("Boolean");
-  properties[_("Always loaded in memory")]
-      .SetValue(alwaysLoaded ? "true" : "false")
-      .SetType("Boolean");
 
   return properties;
 }
@@ -184,8 +181,6 @@ bool ImageResource::UpdateProperty(const gd::String& name,
                                    const gd::String& value) {
   if (name == _("Smooth the image"))
     smooth = value == "1";
-  else if (name == _("Always loaded in memory"))
-    alwaysLoaded = value == "1";
 
   return true;
 }
@@ -569,14 +564,12 @@ void ImageResource::SetFile(const gd::String& newFile) {
 }
 
 void ImageResource::UnserializeFrom(const SerializerElement& element) {
-  alwaysLoaded = element.GetBoolAttribute("alwaysLoaded");
   smooth = element.GetBoolAttribute("smoothed");
   SetUserAdded(element.GetBoolAttribute("userAdded"));
   SetFile(element.GetStringAttribute("file"));
 }
 
 void ImageResource::SerializeTo(SerializerElement& element) const {
-  element.SetAttribute("alwaysLoaded", alwaysLoaded);
   element.SetAttribute("smoothed", smooth);
   element.SetAttribute("userAdded", IsUserAdded());
   element.SetAttribute("file", GetFile());

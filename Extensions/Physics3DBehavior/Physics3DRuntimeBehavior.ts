@@ -1784,7 +1784,6 @@ namespace gdjs {
     gdjs.Physics3DRuntimeBehavior
   );
 
-  
   export namespace Physics3DRuntimeBehavior {
     /**
      * Allow extensions relying on the 3D physics to customize its

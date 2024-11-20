@@ -514,6 +514,20 @@ namespace gdjs {
     }
 
     /**
+     * Check if the Platformer Object is on the given object.
+     * @returns Returns true if on the object and false if not.
+     */
+    isOnFloorObject(physics3DBehavior: gdjs.Physics3DRuntimeBehavior): boolean {
+      if (!physics3DBehavior._body || !this.character || !this.isOnFloor()) {
+        return false;
+      }
+      return (
+        this.character.GetGroundBodyID().GetIndexAndSequenceNumber() ===
+        physics3DBehavior._body.GetID().GetIndexAndSequenceNumber()
+      );
+    }
+
+    /**
      * Check if the Platformer Object is jumping.
      * @returns Returns true if jumping and false if not.
      */

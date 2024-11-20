@@ -1606,6 +1606,27 @@ module.exports = {
         .setFunctionName('setForwardSpeedMax')
         .setGetter('getForwardSpeedMax');
     }
+
+    extension
+      .addCondition(
+        'IsObjectOnGivenFloor',
+        _('Character is on given platform'),
+        _('Check if a platformer character is on a given platform.'),
+        _('_PARAM0_ is on platform _PARAM2_'),
+        _('Collision'),
+        'res/physics3d.svg',
+        'res/physics3d.svg'
+      )
+      .addParameter('objectList', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3DBehavior')
+      .addParameter('objectList', _('Platforms'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+      .addCodeOnlyParameter('conditionInverted', '')
+      .setFunctionName('gdjs.physics3d.isOnPlatform')
+      .addIncludeFile(
+        'Extensions/Physics3DBehavior/Physics3DTools.js'
+      );
+
     return extension;
   },
 

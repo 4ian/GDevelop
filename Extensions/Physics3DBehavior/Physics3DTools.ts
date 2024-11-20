@@ -47,5 +47,44 @@ namespace gdjs {
         behaviorName
       );
     };
+
+    type BehaviorNamePair = { character: string; physics: string };
+
+    const isOnPlatformAdapter = (
+      characterObject: gdjs.RuntimeObject,
+      physicsObject: gdjs.RuntimeObject,
+      behaviorNamePair: BehaviorNamePair
+    ): boolean => {
+      const characterBehavior = characterObject.getBehavior(
+        behaviorNamePair.character
+      ) as gdjs.PhysicsCharacter3DRuntimeBehavior;
+      const physicsBehavior = physicsObject.getBehavior(
+        behaviorNamePair.physics
+      ) as gdjs.Physics3DRuntimeBehavior;
+      if (!characterBehavior || !physicsBehavior) {
+        return false;
+      }
+      return characterBehavior.isOnFloorObject(physicsBehavior);
+    };
+
+    const behaviorNamePair: BehaviorNamePair = { character: '', physics: '' };
+
+    export const isOnPlatform = (
+      characterObjectsLists: Hashtable<Array<gdjs.RuntimeObject>>,
+      characterBehaviorName: string,
+      physicsObjectsLists: Hashtable<Array<gdjs.RuntimeObject>>,
+      physicsBehaviorName: string,
+      inverted: boolean
+    ) => {
+      behaviorNamePair.character = characterBehaviorName;
+      behaviorNamePair.physics = physicsBehaviorName;
+      return gdjs.evtTools.object.twoListsTest(
+        isOnPlatformAdapter,
+        characterObjectsLists,
+        physicsObjectsLists,
+        inverted,
+        behaviorNamePair
+      );
+    };
   }
 }

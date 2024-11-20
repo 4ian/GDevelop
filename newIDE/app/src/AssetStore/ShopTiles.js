@@ -28,6 +28,7 @@ import RaisedButton from '../UI/RaisedButton';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
 import Skeleton from '@material-ui/lab/Skeleton';
+import EmptyMessage from '../UI/EmptyMessage';
 
 const styles = {
   priceTagContainer: {
@@ -110,16 +111,19 @@ const styles = {
   },
 };
 
-const useStylesForGridListItem = makeStyles(theme =>
-  createStyles({
-    tile: {
-      transition: 'transform 0.3s ease-in-out',
-      '&:hover': {
-        transform: 'scale(1.02)',
-      },
-    },
-  })
-);
+const useStylesForGridListItem = ({ disabled }: { disabled?: boolean }) =>
+  makeStyles(theme =>
+    createStyles({
+      tile: !disabled
+        ? {
+            transition: 'transform 0.3s ease-in-out',
+            '&:hover': {
+              transform: 'scale(1.02)',
+            },
+          }
+        : {},
+    })
+  )();
 
 export const AssetCardTile = ({
   assetShortHeader,
@@ -127,25 +131,29 @@ export const AssetCardTile = ({
   size,
   margin,
   hideShortDescription,
+  disabled,
 }: {|
   assetShortHeader: AssetShortHeader,
   onOpenDetails: () => void,
   size: number,
   margin?: number,
   hideShortDescription?: boolean,
+  disabled?: boolean,
 |}) => {
-  const classesForGridListItem = useStylesForGridListItem();
+  const classesForGridListItem = useStylesForGridListItem({
+    disabled,
+  });
 
   return (
     <GridListTile
       classes={classesForGridListItem}
       tabIndex={0}
       onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
-        if (shouldValidate(event)) {
+        if (shouldValidate(event) && !disabled) {
           onOpenDetails();
         }
       }}
-      onClick={onOpenDetails}
+      onClick={!disabled ? onOpenDetails : undefined}
       style={{
         margin,
       }}
@@ -164,24 +172,28 @@ export const AssetFolderTile = ({
   tag,
   onSelect,
   style,
+  disabled,
 }: {|
   tag: string,
   onSelect: () => void,
   /** Props needed so that GridList component can adjust tile size */
   style?: any,
+  disabled?: boolean,
 |}) => {
-  const classesForGridListItem = useStylesForGridListItem();
+  const classesForGridListItem = useStylesForGridListItem({
+    disabled,
+  });
   return (
     <GridListTile
       classes={classesForGridListItem}
       tabIndex={0}
       onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
-        if (shouldValidate(event)) {
+        if (shouldValidate(event) && !disabled) {
           onSelect();
         }
       }}
       style={style}
-      onClick={onSelect}
+      onClick={!disabled ? onSelect : undefined}
     >
       <Column noMargin id={`asset-folder-${tag.replace(/\s/g, '-')}`}>
         <Line alignItems="center">
@@ -199,24 +211,28 @@ export const PublicAssetPackTile = ({
   assetPack,
   onSelect,
   style,
+  disabled,
 }: {|
   assetPack: PublicAssetPack,
   onSelect: () => void,
   /** Props needed so that GridList component can adjust tile size */
   style?: any,
+  disabled?: boolean,
 |}) => {
-  const classesForGridListItem = useStylesForGridListItem();
+  const classesForGridListItem = useStylesForGridListItem({
+    disabled,
+  });
   return (
     <GridListTile
       classes={classesForGridListItem}
       tabIndex={0}
       onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
-        if (shouldValidate(event)) {
+        if (shouldValidate(event) && !disabled) {
           onSelect();
         }
       }}
       style={style}
-      onClick={onSelect}
+      onClick={!disabled ? onSelect : undefined}
     >
       <div
         id={`asset-pack-${assetPack.tag.replace(/\s/g, '-')}`}
@@ -251,25 +267,29 @@ export const PrivateAssetPackTile = ({
   onSelect,
   style,
   owned,
+  disabled,
 }: {|
   assetPackListingData: PrivateAssetPackListingData,
   onSelect: () => void,
   /** Props needed so that GridList component can adjust tile size */
   style?: any,
   owned: boolean,
+  disabled?: boolean,
 |}) => {
-  const classesForGridListItem = useStylesForGridListItem();
+  const classesForGridListItem = useStylesForGridListItem({
+    disabled,
+  });
   return (
     <GridListTile
       classes={classesForGridListItem}
       tabIndex={0}
       onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
-        if (shouldValidate(event)) {
+        if (shouldValidate(event) && !disabled) {
           onSelect();
         }
       }}
       style={style}
-      onClick={onSelect}
+      onClick={!disabled ? onSelect : undefined}
     >
       <div style={styles.paper}>
         <div style={styles.thumbnailContainer}>
@@ -420,6 +440,7 @@ export const CategoryTile = ({
   imageAlt,
   onSelect,
   style,
+  disabled,
 }: {|
   id: string,
   title: React.Node,
@@ -428,20 +449,23 @@ export const CategoryTile = ({
   onSelect: () => void,
   /** Props needed so that GridList component can adjust tile size */
   style?: any,
+  disabled?: boolean,
 |}) => {
-  const classesForGridListItem = useStylesForGridListItem();
+  const classesForGridListItem = useStylesForGridListItem({
+    disabled,
+  });
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <GridListTile
       classes={classesForGridListItem}
       tabIndex={0}
       onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
-        if (shouldValidate(event)) {
+        if (shouldValidate(event) && !disabled) {
           onSelect();
         }
       }}
       style={style}
-      onClick={onSelect}
+      onClick={!disabled ? onSelect : undefined}
     >
       <div id={id} style={styles.paper}>
         <CorsAwareImage
@@ -469,25 +493,29 @@ export const PrivateGameTemplateTile = ({
   onSelect,
   style,
   owned,
+  disabled,
 }: {|
   privateGameTemplateListingData: PrivateGameTemplateListingData,
   onSelect: () => void,
   /** Props needed so that GridList component can adjust tile size */
   style?: any,
   owned: boolean,
+  disabled?: boolean,
 |}) => {
-  const classesForGridListItem = useStylesForGridListItem();
+  const classesForGridListItem = useStylesForGridListItem({
+    disabled,
+  });
   return (
     <GridListTile
       classes={classesForGridListItem}
       tabIndex={0}
       onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
-        if (shouldValidate(event)) {
+        if (shouldValidate(event) && !disabled) {
           onSelect();
         }
       }}
       style={style}
-      onClick={onSelect}
+      onClick={!disabled ? onSelect : undefined}
     >
       <div style={styles.paper}>
         <CorsAwareImage
@@ -523,6 +551,7 @@ export const ExampleTile = ({
   style,
   customTitle,
   useQuickCustomizationThumbnail,
+  disabled,
 }: {|
   exampleShortHeader: ExampleShortHeader | null,
   onSelect: () => void,
@@ -530,6 +559,7 @@ export const ExampleTile = ({
   style?: any,
   customTitle?: string,
   useQuickCustomizationThumbnail?: boolean,
+  disabled?: boolean,
 |}) => {
   const thumbnailImgUrl = React.useMemo(
     () => {
@@ -546,27 +576,38 @@ export const ExampleTile = ({
     [exampleShortHeader, useQuickCustomizationThumbnail]
   );
 
-  const classesForGridListItem = useStylesForGridListItem();
+  const classesForGridListItem = useStylesForGridListItem({ disabled });
   return (
     <GridListTile
       classes={classesForGridListItem}
       tabIndex={0}
       onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
-        if (shouldValidate(event)) {
+        if (shouldValidate(event) && !disabled) {
           onSelect();
         }
       }}
       style={style}
-      onClick={onSelect}
+      onClick={!disabled ? onSelect : undefined}
     >
       <div style={styles.paper}>
         {exampleShortHeader ? (
-          <CorsAwareImage
-            key={exampleShortHeader.name}
-            style={styles.previewImage}
-            src={thumbnailImgUrl}
-            alt={`Preview image of example ${exampleShortHeader.name}`}
-          />
+          thumbnailImgUrl ? (
+            <CorsAwareImage
+              key={exampleShortHeader.name}
+              style={styles.previewImage}
+              src={thumbnailImgUrl}
+              alt={`Preview image of example ${exampleShortHeader.name}`}
+            />
+          ) : (
+            <EmptyMessage
+              style={{
+                ...styles.previewImage,
+                display: 'flex',
+              }}
+            >
+              {exampleShortHeader.name}
+            </EmptyMessage>
+          )
         ) : (
           <Skeleton
             variant="rect"

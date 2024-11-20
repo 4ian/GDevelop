@@ -1,0 +1,23 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.emptyProject {
+  margin: 4px;
+  border: 1px solid var(--theme-text-disabled-color);
+  border-radius: 8px;
+  height: 100%;
+  padding: 4px;
+  display: flex;
+}
+
+.emptyProject:hover {
+    background-color: rgba(250, 250, 250, 0.08)
+}
+
+.emptyProject:focus {
+    background-color: rgba(250, 250, 250, 0.08)
+}
+

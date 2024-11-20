@@ -44,7 +44,6 @@ export const Default = () => (
       >
         <LearnSection
           initialCategory={null}
-          onOpenExampleStore={action('onOpenExampleStore')}
           onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
           onOpenTemplateFromTutorial={action('onOpenTemplateFromTutorial')}
@@ -66,7 +65,6 @@ export const NotAuthenticated = () => (
       >
         <LearnSection
           initialCategory={null}
-          onOpenExampleStore={action('onOpenExampleStore')}
           onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
           onOpenTemplateFromTutorial={action('onOpenTemplateFromTutorial')}
@@ -90,7 +88,6 @@ export const EducationSubscriber = () => (
       >
         <LearnSection
           initialCategory={null}
-          onOpenExampleStore={action('onOpenExampleStore')}
           onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
           onOpenTemplateFromTutorial={action('onOpenTemplateFromTutorial')}
@@ -114,7 +111,6 @@ export const EducationTeacher = () => (
       >
         <LearnSection
           initialCategory={null}
-          onOpenExampleStore={action('onOpenExampleStore')}
           onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
           onOpenTemplateFromTutorial={action('onOpenTemplateFromTutorial')}
@@ -135,7 +131,6 @@ export const Loading = () => (
     >
       <LearnSection
         initialCategory={null}
-        onOpenExampleStore={action('onOpenExampleStore')}
         onTabChange={() => {}}
         selectInAppTutorial={action('selectInAppTutorial')}
         onOpenTemplateFromTutorial={action('onOpenTemplateFromTutorial')}

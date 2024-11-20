@@ -115,7 +115,6 @@ const styles = {
 };
 
 type Props = {|
-  onOpenExampleStore: () => void,
   onTabChange: (tab: HomeTab) => void,
   selectInAppTutorial: (tutorialId: string) => void,
   initialCategory: TutorialCategory | null,
@@ -123,7 +122,6 @@ type Props = {|
 |};
 
 const LearnSection = ({
-  onOpenExampleStore,
   onTabChange,
   selectInAppTutorial,
   initialCategory,
@@ -172,7 +170,6 @@ const LearnSection = ({
 
   return !selectedCategory ? (
     <MainPage
-      onOpenExampleStore={onOpenExampleStore}
       onTabChange={onTabChange}
       onSelectCategory={setSelectedCategory}
       tutorials={tutorials}

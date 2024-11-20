@@ -46,17 +46,6 @@ export const addDefaultLightToAllLayers = (layout: gdLayout): void => {
   }
 };
 
-const addDefaultLightToProject = (project: gdProject): void => {
-  for (
-    let layoutIndex = 0;
-    layoutIndex < project.getLayoutsCount();
-    layoutIndex++
-  ) {
-    const layout = project.getLayoutAt(layoutIndex);
-    addDefaultLightToAllLayers(layout);
-  }
-};
-
 export const createNewEmptyProject = (): NewProjectSource => {
   const project: gdProject = gd.ProjectHelper.createNewGDJSProject();
 
@@ -66,20 +55,6 @@ export const createNewEmptyProject = (): NewProjectSource => {
     storageProvider: null,
     fileMetadata: null,
   };
-};
-
-export const createNewProjectWithDefaultLogin = (): NewProjectSource => {
-  const url =
-    'https://resources.gdevelop-app.com/examples-database/login-template.json';
-  sendNewGameCreated({
-    exampleUrl: url,
-    exampleSlug: 'login-template',
-  });
-  const newProjectSource = getNewProjectSourceFromUrl(url);
-  if (newProjectSource.project) {
-    addDefaultLightToProject(newProjectSource.project);
-  }
-  return newProjectSource;
 };
 
 export const createNewProjectFromAIGeneratedProject = (

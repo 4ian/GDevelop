@@ -8,7 +8,6 @@ import {
   createNewProjectFromExampleShortHeader,
   createNewProjectFromPrivateGameTemplate,
   createNewProjectFromTutorialTemplate,
-  createNewProjectWithDefaultLogin,
   type NewProjectSource,
 } from '../ProjectCreation/CreateProject';
 import { type NewProjectSetup } from '../ProjectCreation/NewProjectSetupDialog';
@@ -379,15 +378,6 @@ const useCreateProject = ({
     [beforeCreatingProject, createProject, tutorials]
   );
 
-  const createProjectWithLogin = React.useCallback(
-    async (newProjectSetup: NewProjectSetup) => {
-      beforeCreatingProject();
-      const newProjectSource = createNewProjectWithDefaultLogin();
-      await createProject(newProjectSource, newProjectSetup);
-    },
-    [beforeCreatingProject, createProject]
-  );
-
   const createProjectFromAIGeneration = React.useCallback(
     async (projectFileUrl: string, newProjectSetup: NewProjectSetup) => {
       beforeCreatingProject();
@@ -405,7 +395,6 @@ const useCreateProject = ({
     createProjectFromPrivateGameTemplate,
     createProjectFromInAppTutorial,
     createProjectFromTutorial,
-    createProjectWithLogin,
     createProjectFromAIGeneration,
   };
 };

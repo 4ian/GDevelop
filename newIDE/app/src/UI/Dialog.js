@@ -148,22 +148,24 @@ const useDangerousStylesForDialog = (dangerLevel?: 'warning' | 'danger') =>
 
 // Customize scrollbar inside Dialog so that it gives a bit of space
 // to the content.
-const useStylesForDialogContent = makeStyles({
-  root: {
-    '&::-webkit-scrollbar': {
-      width: 11,
+const useStylesForDialogContent = ({ forceScroll }: { forceScroll: boolean }) =>
+  makeStyles({
+    root: {
+      ...(forceScroll ? { overflowY: 'scroll' } : {}), // Force a scrollbar to prevent layout shifts.
+      '&::-webkit-scrollbar': {
+        width: 11,
+      },
+      '&::-webkit-scrollbar-track': {
+        background: 'rgba(0, 0, 0, 0.04)',
+        borderRadius: 6,
+      },
+      '&::-webkit-scrollbar-thumb': {
+        border: '3px solid rgba(0, 0, 0, 0)',
+        backgroundClip: 'padding-box',
+        borderRadius: 6,
+      },
     },
-    '&::-webkit-scrollbar-track': {
-      background: 'rgba(0, 0, 0, 0.04)',
-      borderRadius: 6,
-    },
-    '&::-webkit-scrollbar-thumb': {
-      border: '3px solid rgba(0, 0, 0, 0)',
-      backgroundClip: 'padding-box',
-      borderRadius: 6,
-    },
-  },
-});
+  })();
 
 // We support a subset of the props supported by Material-UI v0.x Dialog
 // They should be self descriptive - refer to Material UI docs otherwise.
@@ -219,6 +221,8 @@ type DialogProps = {|
   fullHeight?: boolean,
   fullscreen?: 'never-even-on-mobile' | 'always-even-on-desktop',
   actionsFullWidthOnMobile?: boolean,
+  // Useful when the content of the dialog can change and we want to avoid layout shifts.
+  forceScrollVisible?: boolean,
 
   id?: ?string,
 |};
@@ -249,6 +253,7 @@ const Dialog = ({
   exceptionallyStillAllowRenderingInstancesEditors,
   fullscreen,
   actionsFullWidthOnMobile,
+  forceScrollVisible,
 }: DialogProps) => {
   const preferences = React.useContext(PreferencesContext);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -265,7 +270,9 @@ const Dialog = ({
       : isMobile;
 
   const classesForDangerousDialog = useDangerousStylesForDialog(dangerLevel);
-  const classesForDialogContent = useStylesForDialogContent();
+  const classesForDialogContent = useStylesForDialogContent({
+    forceScroll: !!forceScrollVisible,
+  });
 
   const dialogActions = React.useMemo(
     () => (

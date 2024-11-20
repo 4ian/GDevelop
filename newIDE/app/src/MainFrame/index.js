@@ -137,7 +137,7 @@ import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
 import { useDiscordRichPresence } from '../Utils/UpdateDiscordRichPresence';
 import { delay } from '../Utils/Delay';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
-import useExampleOrGameTemplateDialogs from './UseExampleOrGameTemplateDialogs';
+import useNewProjectDialog from './UseNewProjectDialog';
 import { findAndLogProjectPreviewErrors } from '../Utils/ProjectErrorsChecker';
 import { renameResourcesInProject } from '../ResourcesList/ResourceUtils';
 import { NewResourceDialog } from '../ResourcesList/NewResourceDialog';
@@ -156,7 +156,6 @@ import {
 } from '../Utils/Analytics/EventSender';
 import { useLeaderboardReplacer } from '../Leaderboard/UseLeaderboardReplacer';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
-import NewProjectSetupDialog from '../ProjectCreation/NewProjectSetupDialog';
 import {
   useResourceMover,
   type ResourceMover,
@@ -519,19 +518,6 @@ const MainFrame = (props: Props) => {
     isProjectSplitInMultipleFiles: currentProject
       ? currentProject.isFolderProject()
       : false,
-  });
-  const {
-    selectedExampleShortHeader,
-    selectedPrivateGameTemplateListingData,
-    onSelectExampleShortHeader,
-    onSelectPrivateGameTemplate,
-    renderExampleOrGameTemplateDialogs,
-    closeExampleStoreDialog,
-    openExampleStoreDialog,
-    fetchAndOpenNewProjectSetupDialogForExample,
-  } = useExampleOrGameTemplateDialogs({
-    isProjectOpening,
-    onOpenNewProjectSetupDialog: () => setNewProjectSetupDialogOpen(true),
   });
 
   const gamesList = useGamesList();
@@ -911,7 +897,6 @@ const MainFrame = (props: Props) => {
         currentProject: project,
         currentFileMetadata: fileMetadata,
       }));
-      closeExampleStoreDialog({ deselectExampleAndGameTemplate: false });
 
       // Load all the EventsFunctionsExtension when the game is loaded. If they are modified,
       // their editor will take care of reloading them.
@@ -952,7 +937,6 @@ const MainFrame = (props: Props) => {
       setState,
       closeProject,
       preferences,
-      closeExampleStoreDialog,
       eventsFunctionsExtensionsState,
       getStorageProvider,
       getStorageProviderOperations,
@@ -1143,7 +1127,6 @@ const MainFrame = (props: Props) => {
     createProjectFromPrivateGameTemplate,
     createProjectFromInAppTutorial,
     createProjectFromTutorial,
-    createProjectWithLogin,
     createProjectFromAIGeneration,
   } = useCreateProject({
     beforeCreatingProject: () => {
@@ -1157,7 +1140,6 @@ const MainFrame = (props: Props) => {
       options,
     }) => {
       setNewProjectSetupDialogOpen(false);
-      closeExampleStoreDialog({ deselectExampleAndGameTemplate: true });
       if (options.openQuickCustomizationDialog) {
         setQuickCustomizationDialogOpenedFromGameId(oldProjectId);
       } else {
@@ -1196,6 +1178,23 @@ const MainFrame = (props: Props) => {
     },
     ensureResourcesAreMoved,
     onGameRegistered: gamesList.fetchGames,
+  });
+
+  const {
+    onSelectExampleShortHeader,
+    onSelectPrivateGameTemplateListingData,
+    renderNewProjectDialog,
+    fetchAndOpenNewProjectSetupDialogForExample,
+    openNewProjectDialog,
+  } = useNewProjectDialog({
+    isProjectOpening,
+    newProjectSetupDialogOpen,
+    setNewProjectSetupDialogOpen,
+    createEmptyProject,
+    createProjectFromExample,
+    createProjectFromPrivateGameTemplate,
+    createProjectFromAIGeneration,
+    storageProviders: props.storageProviders,
   });
 
   const closeApp = React.useCallback((): void => {
@@ -3393,7 +3392,7 @@ const MainFrame = (props: Props) => {
     onLaunchNetworkPreview: launchNetworkPreview,
     onLaunchPreviewWithDiagnosticReport: launchPreviewWithDiagnosticReport,
     onOpenHomePage: openHomePage,
-    onCreateBlank: () => setNewProjectSetupDialogOpen(true),
+    onCreateProject: () => setNewProjectSetupDialogOpen(true),
     onOpenProject: () => openOpenFromStorageProviderDialog(),
     onSaveProject: saveProject,
     onSaveProjectAs: saveProjectAs,
@@ -3454,8 +3453,7 @@ const MainFrame = (props: Props) => {
     onCloseApp: closeApp,
     onExportProject: () => openShareDialog('publish'),
     onInviteCollaborators: () => openShareDialog('invite'),
-    onCreateProject: openExampleStoreDialog,
-    onCreateBlank: () => setNewProjectSetupDialogOpen(true),
+    onCreateProject: () => setNewProjectSetupDialogOpen(true),
     onOpenProjectManager: () => openProjectManager(true),
     onOpenHomePage: openHomePage,
     onOpenDebugger: openDebugger,
@@ -3663,27 +3661,30 @@ const MainFrame = (props: Props) => {
                     ).length,
                     onChooseProject: () => openOpenFromStorageProviderDialog(),
                     onOpenRecentFile: openFromFileMetadataWithStorageProvider,
-                    onOpenNewProjectSetupDialog: () => {
-                      setNewProjectSetupDialogOpen(true);
-                    },
+                    onOpenNewProjectSetupDialog: openNewProjectDialog,
                     onOpenProjectManager: () => openProjectManager(true),
                     askToCloseProject,
                     closeProject,
-                    onOpenExampleStore: openExampleStoreDialog,
-                    onSelectExampleShortHeader: onSelectExampleShortHeader,
-                    onCreateProjectFromExample: createProjectFromExample,
-                    onPreviewPrivateGameTemplateListingData: privateGameTemplateListingData =>
-                      onSelectPrivateGameTemplate({
-                        privateGameTemplateListingData,
-                        openDialog: true,
-                      }),
-                    onOpenPrivateGameTemplateListingData: privateGameTemplateListingData => {
-                      onSelectPrivateGameTemplate({
-                        privateGameTemplateListingData,
-                        openDialog: false,
+                    onSelectExampleShortHeader: exampleShortHeader => {
+                      onSelectExampleShortHeader({
+                        exampleShortHeader,
+                        preventBackHome: true,
                       });
-                      setNewProjectSetupDialogOpen(true);
                     },
+                    onSelectPrivateGameTemplateListingData: privateGameTemplateListingData => {
+                      onSelectPrivateGameTemplateListingData({
+                        privateGameTemplateListingData,
+                        preventBackHome: true,
+                      });
+                    },
+                    onOpenPrivateGameTemplateListingData: privateGameTemplateListingData => {
+                      onSelectPrivateGameTemplateListingData({
+                        privateGameTemplateListingData,
+                        preventBackHome: true,
+                        preventBackDetails: true,
+                      });
+                    },
+                    onCreateProjectFromExample: createProjectFromExample,
                     onOpenProfile: () => openProfileDialog(true),
                     onOpenLanguageDialog: () => openLanguageDialog(true),
                     onOpenPreferences: () => openPreferencesDialog(true),
@@ -3813,31 +3814,7 @@ const MainFrame = (props: Props) => {
           }}
         />
       )}
-      {// Render example or game template dialogs before NewProjectSetupDialog to make sure it's always displayed on top
-      renderExampleOrGameTemplateDialogs()}
-      {newProjectSetupDialogOpen && (
-        <NewProjectSetupDialog
-          authenticatedUser={authenticatedUser}
-          isOpeningProject={isProjectOpening}
-          onClose={() => setNewProjectSetupDialogOpen(false)}
-          onCreateEmptyProject={createEmptyProject}
-          onCreateFromExample={createProjectFromExample}
-          onCreateProjectFromPrivateGameTemplate={
-            createProjectFromPrivateGameTemplate
-          }
-          onCreateWithLogin={createProjectWithLogin}
-          onCreateFromAIGeneration={async (generatedProject, projectSetup) => {
-            const projectFileUrl = generatedProject.fileUrl;
-            if (!projectFileUrl) return;
-            await createProjectFromAIGeneration(projectFileUrl, projectSetup);
-          }}
-          storageProviders={props.storageProviders}
-          selectedExampleShortHeader={selectedExampleShortHeader}
-          selectedPrivateGameTemplateListingData={
-            selectedPrivateGameTemplateListingData
-          }
-        />
-      )}
+      {renderNewProjectDialog()}
       {cloudProjectFileMetadataToRecover && (
         <CloudProjectRecoveryDialog
           cloudProjectId={cloudProjectFileMetadataToRecover.fileIdentifier}

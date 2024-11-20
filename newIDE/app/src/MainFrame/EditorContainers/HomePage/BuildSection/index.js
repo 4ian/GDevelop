@@ -44,8 +44,7 @@ import Refresh from '../../../../UI/CustomSvgIcons/Refresh';
 import ProjectFileListItem from './ProjectFileListItem';
 import { type MenuItemTemplate } from '../../../../UI/Menu/Menu.flow';
 import {
-  getAllGameTemplatesAndExamplesFlaggedAsGameCount,
-  getExampleAndTemplateItemsForBuildSection,
+  getExampleAndTemplateTiles,
   getLastModifiedInfoByProjectId,
   getProjectLineHeight,
   transformCloudProjectsIntoFileMetadataWithStorageProviderName,
@@ -54,7 +53,6 @@ import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import InfoBar from '../../../../UI/Messages/InfoBar';
 import GridList from '@material-ui/core/GridList';
 import type { WindowSizeType } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
-import FlatButton from '../../../../UI/FlatButton';
 import useAlertDialog from '../../../../UI/Alert/useAlertDialog';
 import optionalRequire from '../../../../Utils/OptionalRequire';
 import { deleteCloudProject } from '../../../../Utils/GDevelopServices/Project';
@@ -64,6 +62,8 @@ import ContextMenu, {
 } from '../../../../UI/Menu/ContextMenu';
 import type { ClientCoordinates } from '../../../../Utils/UseLongTouch';
 import PromotionsSlideshow from '../../../../Promotions/PromotionsSlideshow';
+import ExampleStore from '../../../../AssetStore/ExampleStore';
+
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 
@@ -115,7 +115,6 @@ type Props = {|
   ) => void,
   storageProviders: Array<StorageProvider>,
   i18n: I18nType,
-  onOpenExampleStore: () => void,
   onManageGame: (gameId: string) => void,
   canManageGame: (gameId: string) => boolean,
   closeProject: () => Promise<void>,
@@ -139,7 +138,6 @@ const BuildSection = ({
   onOpenRecentFile,
   storageProviders,
   i18n,
-  onOpenExampleStore,
   onManageGame,
   canManageGame,
   closeProject,
@@ -186,16 +184,6 @@ const BuildSection = ({
   ] = React.useState({});
 
   const columnsCount = getItemsColumns(windowSize, isLandscape);
-
-  const allGameTemplatesAndExamplesFlaggedAsGameCount = React.useMemo(
-    () =>
-      getAllGameTemplatesAndExamplesFlaggedAsGameCount({
-        privateGameTemplateListingDatas,
-        exampleShortHeaders,
-        columnsCount,
-      }),
-    [privateGameTemplateListingDatas, exampleShortHeaders, columnsCount]
-  );
 
   let projectFiles: Array<FileMetadataAndStorageProviderName> = getRecentProjectFiles().filter(
     file => file.fileMetadata
@@ -380,40 +368,27 @@ const BuildSection = ({
 
   const examplesAndTemplatesToDisplay = React.useMemo(
     () =>
-      getExampleAndTemplateItemsForBuildSection({
+      getExampleAndTemplateTiles({
         receivedGameTemplates: authenticatedUser.receivedGameTemplates,
         privateGameTemplateListingDatas,
         exampleShortHeaders,
         onSelectPrivateGameTemplateListingData,
         onSelectExampleShortHeader,
         i18n,
-        numberOfItemsExclusivelyInCarousel: showAllGameTemplates
-          ? 0
-          : isMobile
-          ? 3
-          : 5,
-        numberOfItemsInCarousel: showAllGameTemplates ? 0 : isMobile ? 8 : 12,
-        numberOfItemsInGrid: showAllGameTemplates
-          ? allGameTemplatesAndExamplesFlaggedAsGameCount
-          : isMobile
-          ? 16
-          : 20,
+        numberOfItemsExclusivelyInCarousel: isMobile ? 3 : 5,
+        numberOfItemsInCarousel: isMobile ? 8 : 12,
         privateGameTemplatesPeriodicity: shouldDisplayPremiumGameTemplates
-          ? isMobile
-            ? 2
-            : 3
+          ? 2
           : 0,
       }),
     [
       authenticatedUser.receivedGameTemplates,
-      showAllGameTemplates,
       exampleShortHeaders,
       onSelectExampleShortHeader,
       onSelectPrivateGameTemplateListingData,
       privateGameTemplateListingDatas,
       i18n,
       isMobile,
-      allGameTemplatesAndExamplesFlaggedAsGameCount,
       shouldDisplayPremiumGameTemplates,
     ]
   );
@@ -425,24 +400,19 @@ const BuildSection = ({
 
   const skeletonLineHeight = getProjectLineHeight({ isMobile });
   const pageContent = showAllGameTemplates ? (
-    <SectionContainer backAction={() => setShowAllGameTemplates(false)}>
-      <SectionRow>
-        <GridList
-          cols={columnsCount}
-          style={styles.grid}
-          cellHeight="auto"
-          spacing={cellSpacing}
-        >
-          {examplesAndTemplatesToDisplay.gridItems}
-        </GridList>
-        <Line justifyContent={'center'}>
-          <FlatButton
-            primary
-            fullWidth={isMobile}
-            label={<Trans>See more</Trans>}
-            onClick={onOpenExampleStore}
-          />
-        </Line>
+    <SectionContainer
+      backAction={() => setShowAllGameTemplates(false)}
+      flexBody
+    >
+      <SectionRow expand>
+        <ExampleStore
+          onSelectExampleShortHeader={onSelectExampleShortHeader}
+          onSelectPrivateGameTemplateListingData={
+            onSelectPrivateGameTemplateListingData
+          }
+          i18n={i18n}
+          columnsCount={getItemsColumns(windowSize, isLandscape)}
+        />
       </SectionRow>
     </SectionContainer>
   ) : (
@@ -475,7 +445,7 @@ const BuildSection = ({
           displayItemTitles={false}
           browseAllLabel={<Trans>Browse all templates</Trans>}
           onBrowseAllClick={() => setShowAllGameTemplates(true)}
-          items={examplesAndTemplatesToDisplay.carouselItems}
+          items={examplesAndTemplatesToDisplay.carouselThumbnailItems}
           browseAllIcon={<ChevronArrowRight fontSize="small" />}
           roundedImages
           displayArrowsOnDesktop
@@ -523,7 +493,7 @@ const BuildSection = ({
                   isMobile ? (
                     <Trans>Create</Trans>
                   ) : (
-                    <Trans>Create from scratch</Trans>
+                    <Trans>Create new game</Trans>
                   )
                 }
                 onClick={onOpenNewProjectSetupDialog}
@@ -672,7 +642,7 @@ const BuildSection = ({
           cellHeight="auto"
           spacing={cellSpacing}
         >
-          {examplesAndTemplatesToDisplay.gridItems}
+          {examplesAndTemplatesToDisplay.gridItemsCompletingCarousel}
         </GridList>
       </SectionRow>
     </SectionContainer>

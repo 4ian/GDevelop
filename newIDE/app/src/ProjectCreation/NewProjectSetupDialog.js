@@ -5,19 +5,17 @@ import { type StorageProvider, type SaveAsLocation } from '../ProjectsStorage';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import TextField from '../UI/TextField';
-import AuthenticatedUserContext, {
-  type AuthenticatedUser,
-} from '../Profile/AuthenticatedUserContext';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import generateName from '../Utils/ProjectNameGenerator';
 import IconButton from '../UI/IconButton';
-import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
+import { ColumnStackLayout } from '../UI/Layout';
 import { emptyStorageProvider } from '../ProjectsStorage/ProjectStorageProviders';
 import { findEmptyPathInWorkspaceFolder } from '../ProjectsStorage/LocalFileStorageProvider/LocalPathFinder';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import CreateProfile from '../Profile/CreateProfile';
 import Paper from '../UI/Paper';
-import { Column, Line } from '../UI/Grid';
+import { Column, Line, Spacer } from '../UI/Grid';
 import {
   checkIfHasTooManyCloudProjects,
   MaxProjectCountAlertMessage,
@@ -26,9 +24,7 @@ import { SubscriptionSuggestionContext } from '../Profile/Subscription/Subscript
 import optionalRequire from '../Utils/OptionalRequire';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import Checkbox from '../UI/Checkbox';
-import { MarkdownText } from '../UI/MarkdownText';
 import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
-import { useOnlineStatus } from '../Utils/OnlineStatus';
 import Refresh from '../UI/CustomSvgIcons/Refresh';
 import {
   createGeneratedProject,
@@ -40,23 +36,44 @@ import ResolutionOptions, {
   defaultCustomWidth,
   defaultCustomHeight,
 } from './ResolutionOptions';
-import Text from '../UI/Text';
-import generatePrompt from '../Utils/ProjectPromptGenerator';
-import ProjectGeneratingDialog from './ProjectGeneratingDialog';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
-import RobotIcon from './RobotIcon';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { type I18n as I18nType } from '@lingui/core';
 import { I18n } from '@lingui/react';
-import GetSubscriptionCard from '../Profile/Subscription/GetSubscriptionCard';
 import { type PrivateGameTemplateListingData } from '../Utils/GDevelopServices/Shop';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 import { CLOUD_PROJECT_NAME_MAX_LENGTH } from '../Utils/GDevelopServices/Project';
-import { Accordion, AccordionBody, AccordionHeader } from '../UI/Accordion';
+import AIPromptField from './AIPromptField';
+import EmptyAndBaseProjects from './EmptyAndBaseProjects';
+import TextButton from '../UI/TextButton';
+import ChevronArrowLeft from '../UI/CustomSvgIcons/ChevronArrowLeft';
+import ExampleInformationPage from '../AssetStore/ExampleStore/ExampleInformationPage';
+import PrivateGameTemplateInformationPage from '../AssetStore/PrivateGameTemplates/PrivateGameTemplateInformationPage';
+import ExampleStore from '../AssetStore/ExampleStore';
+import Text from '../UI/Text';
+import {
+  useResponsiveWindowSize,
+  type WindowSizeType,
+} from '../UI/Responsive/ResponsiveWindowMeasurer';
+import { PrivateGameTemplateStoreContext } from '../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
+import { getUserProductPurchaseUsageType } from '../AssetStore/ProductPageHelper';
 
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
 const app = remote ? remote.app : null;
+
+export const getItemsColumns = (
+  windowSize: WindowSizeType,
+  isLandscape: boolean
+) => {
+  return windowSize === 'small' && !isLandscape ? 2 : 4;
+};
+
+const generateProjectName = (nameToAppend: ?string) =>
+  (nameToAppend ? `${generateName()} (${nameToAppend})` : generateName()).slice(
+    0,
+    CLOUD_PROJECT_NAME_MAX_LENGTH
+  );
 
 export type NewProjectSetup = {|
   storageProvider: StorageProvider,
@@ -66,12 +83,11 @@ export type NewProjectSetup = {|
   width?: number,
   orientation?: 'landscape' | 'portrait' | 'default',
   optimizeForPixelArt?: boolean,
-  allowPlayersToLogIn?: boolean,
   openQuickCustomizationDialog?: boolean,
 |};
 
 type Props = {|
-  isOpeningProject?: boolean,
+  isProjectOpening?: boolean,
   onClose: () => void,
   onCreateEmptyProject: (newProjectSetup: NewProjectSetup) => Promise<void>,
   onCreateFromExample: (
@@ -84,43 +100,63 @@ type Props = {|
     newProjectSetup: NewProjectSetup,
     i18n: I18nType
   ) => Promise<void>,
-  onCreateWithLogin: (newProjectSetup: NewProjectSetup) => Promise<void>,
   onCreateFromAIGeneration: (
     generatedProject: GeneratedProject,
     newProjectSetup: NewProjectSetup
   ) => Promise<void>,
   selectedExampleShortHeader: ?ExampleShortHeader,
+  onSelectExampleShortHeader: (exampleShortHeader: ?ExampleShortHeader) => void,
   selectedPrivateGameTemplateListingData: ?PrivateGameTemplateListingData,
+  onSelectPrivateGameTemplateListingData: (
+    privateGameTemplateListingData: ?PrivateGameTemplateListingData
+  ) => void,
   storageProviders: Array<StorageProvider>,
-  authenticatedUser: AuthenticatedUser,
+  privateGameTemplateListingDatasFromSameCreator: ?Array<PrivateGameTemplateListingData>,
+  preventBackHome?: boolean,
+  preventBackDetails?: boolean,
 |};
 
 const NewProjectSetupDialog = ({
-  isOpeningProject,
+  isProjectOpening,
   onClose,
   onCreateEmptyProject,
   onCreateFromExample,
   onCreateProjectFromPrivateGameTemplate,
-  onCreateWithLogin,
   onCreateFromAIGeneration,
   selectedExampleShortHeader,
+  onSelectExampleShortHeader,
   selectedPrivateGameTemplateListingData,
+  onSelectPrivateGameTemplateListingData,
   storageProviders,
-  authenticatedUser,
+  privateGameTemplateListingDatasFromSameCreator,
+  preventBackHome,
+  preventBackDetails,
 }: Props): React.Node => {
-  const generateProjectName = () =>
-    (selectedExampleShortHeader
-      ? `${generateName()} (${selectedExampleShortHeader.name})`
-      : selectedPrivateGameTemplateListingData
-      ? `${generateName()} (${selectedPrivateGameTemplateListingData.name})`
-      : generateName()
-    ).slice(0, CLOUD_PROJECT_NAME_MAX_LENGTH);
-
-  const { getAuthorizationHeader, profile } = React.useContext(
-    AuthenticatedUserContext
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const { windowSize, isLandscape } = useResponsiveWindowSize();
+  const {
+    profile,
+    getAuthorizationHeader,
+    limits,
+    authenticated,
+    onOpenLoginDialog,
+    onOpenCreateAccountDialog,
+    receivedGameTemplates,
+    gameTemplatePurchases,
+  } = authenticatedUser;
+  const [
+    emptyProjectSelected,
+    setEmptyProjectSelected,
+  ] = React.useState<boolean>(false);
+  const [page, setPage] = React.useState<'home' | 'details' | 'create'>(
+    selectedExampleShortHeader || selectedPrivateGameTemplateListingData
+      ? 'details'
+      : 'home'
+  );
+  const { privateGameTemplateListingDatas } = React.useContext(
+    PrivateGameTemplateStoreContext
   );
   const { showAlert } = useAlertDialog();
-  const isOnline = useOnlineStatus();
   const { values, setNewProjectsDefaultStorageProviderName } = React.useContext(
     PreferencesContext
   );
@@ -154,9 +190,6 @@ const NewProjectSetupDialog = ({
     defaultCustomHeight
   );
   const [optimizeForPixelArt, setOptimizeForPixelArt] = React.useState<boolean>(
-    false
-  );
-  const [allowPlayersToLogIn, setAllowPlayersToLogIn] = React.useState<boolean>(
     false
   );
   const newProjectsDefaultFolder = app
@@ -197,7 +230,7 @@ const NewProjectSetupDialog = ({
       if (preferredStorageProvider) return preferredStorageProvider;
 
       // If preferred storage provider not found, push Cloud storage provider if user authenticated.
-      if (authenticatedUser.authenticated) {
+      if (authenticated) {
         if (cloudStorageProvider) return cloudStorageProvider;
       }
 
@@ -216,20 +249,12 @@ const NewProjectSetupDialog = ({
       : null
   );
 
-  const generationCurrentUsage = authenticatedUser.limits
-    ? authenticatedUser.limits.quotas['ai-project-generation']
-    : null;
-  const canGenerateProjectFromPrompt =
-    generationCurrentUsage && !generationCurrentUsage.limitReached;
-
   const needUserAuthenticationForStorage =
-    storageProvider.needUserAuthentication && !authenticatedUser.authenticated;
-  const { limits } = authenticatedUser;
+    storageProvider.needUserAuthentication && !authenticated;
   const hasTooManyCloudProjects =
     storageProvider.internalName === 'Cloud' &&
     checkIfHasTooManyCloudProjects(authenticatedUser);
-  const hasNotSelectedAStorageProvider =
-    storageProvider.internalName === 'Empty';
+  const hasSelectedAStorageProvider = storageProvider.internalName !== 'Empty';
 
   const selectedWidth =
     resolutionOptions[resolutionOption].width ||
@@ -241,10 +266,26 @@ const NewProjectSetupDialog = ({
     defaultCustomHeight;
   const selectedOrientation = resolutionOptions[resolutionOption].orientation;
 
-  const isLoading = isGeneratingProject || isOpeningProject;
+  const isLoading = isGeneratingProject || isProjectOpening;
 
-  const isStartingProjectFromScratch =
-    !selectedExampleShortHeader && !selectedPrivateGameTemplateListingData;
+  const isSelectedGameTemplateOwned = React.useMemo(
+    () =>
+      !selectedPrivateGameTemplateListingData ||
+      !!getUserProductPurchaseUsageType({
+        productId: selectedPrivateGameTemplateListingData
+          ? selectedPrivateGameTemplateListingData.id
+          : null,
+        receivedProducts: receivedGameTemplates,
+        productPurchases: gameTemplatePurchases,
+        allProductListingDatas: privateGameTemplateListingDatas,
+      }),
+    [
+      gameTemplatePurchases,
+      selectedPrivateGameTemplateListingData,
+      privateGameTemplateListingDatas,
+      receivedGameTemplates,
+    ]
+  );
 
   // On the local app, prefer to always have something saved so that the user is not blocked.
   // On the web-app, allow to create a project without saving it, unless a private game template is selected
@@ -252,16 +293,19 @@ const NewProjectSetupDialog = ({
   const shouldAllowCreatingProjectWithoutSaving =
     !electron && !selectedPrivateGameTemplateListingData;
 
-  const shouldNotAllowCreatingProject =
-    isLoading ||
-    needUserAuthenticationForStorage ||
-    hasTooManyCloudProjects ||
-    (hasNotSelectedAStorageProvider &&
-      !shouldAllowCreatingProjectWithoutSaving);
+  const shouldAllowCreatingProject =
+    !isLoading &&
+    ((page === 'home' && generationPrompt) ||
+      (page === 'details' && isSelectedGameTemplateOwned) ||
+      (page === 'create' &&
+        !needUserAuthenticationForStorage &&
+        !hasTooManyCloudProjects &&
+        (hasSelectedAStorageProvider ||
+          shouldAllowCreatingProjectWithoutSaving)));
 
   const generateProject = React.useCallback(
     async () => {
-      if (shouldNotAllowCreatingProject) return;
+      if (!shouldAllowCreatingProject) return;
       if (!profile) return;
 
       setIsGeneratingProject(true);
@@ -298,7 +342,7 @@ const NewProjectSetupDialog = ({
       }
     },
     [
-      shouldNotAllowCreatingProject,
+      shouldAllowCreatingProject,
       getAuthorizationHeader,
       generationPrompt,
       profile,
@@ -310,14 +354,19 @@ const NewProjectSetupDialog = ({
     ]
   );
 
-  const onValidate = React.useCallback(
+  const onCreateGameClick = React.useCallback(
     async (i18n: I18nType) => {
-      if (generationPrompt) {
-        generateProject();
+      if (!shouldAllowCreatingProject) return;
+
+      if (page === 'details') {
+        setPage('create');
         return;
       }
 
-      if (shouldNotAllowCreatingProject) return;
+      if (page === 'home' && generationPrompt) {
+        generateProject();
+        return;
+      }
 
       setProjectNameError(null);
       if (!projectName) {
@@ -344,7 +393,6 @@ const NewProjectSetupDialog = ({
         width: selectedWidth,
         orientation: selectedOrientation,
         optimizeForPixelArt,
-        allowPlayersToLogIn,
       };
 
       if (selectedExampleShortHeader) {
@@ -369,16 +417,13 @@ const NewProjectSetupDialog = ({
           },
           i18n
         );
-      } else if (allowPlayersToLogIn) {
-        await onCreateWithLogin(projectSetup);
-        return;
       } else {
         await onCreateEmptyProject(projectSetup);
       }
     },
     [
       generationPrompt,
-      shouldNotAllowCreatingProject,
+      shouldAllowCreatingProject,
       projectName,
       storageProvider,
       saveAsLocation,
@@ -387,14 +432,13 @@ const NewProjectSetupDialog = ({
       selectedWidth,
       selectedOrientation,
       optimizeForPixelArt,
-      allowPlayersToLogIn,
       selectedExampleShortHeader,
       generateProject,
       selectedPrivateGameTemplateListingData,
       onCreateFromExample,
       onCreateProjectFromPrivateGameTemplate,
-      onCreateWithLogin,
       onCreateEmptyProject,
+      page,
     ]
   );
 
@@ -406,254 +450,322 @@ const NewProjectSetupDialog = ({
     [setProjectName, projectNameError]
   );
 
+  // Update project name when the example or private game template changes.
+  React.useEffect(
+    () => {
+      if (selectedExampleShortHeader) {
+        setProjectName(generateProjectName(selectedExampleShortHeader.name));
+      }
+      if (selectedPrivateGameTemplateListingData) {
+        setProjectName(
+          generateProjectName(selectedPrivateGameTemplateListingData.name)
+        );
+      }
+      if (emptyProjectSelected) {
+        setProjectName(generateProjectName());
+      }
+    },
+    [
+      selectedExampleShortHeader,
+      selectedPrivateGameTemplateListingData,
+      emptyProjectSelected,
+    ]
+  );
+
+  const onBack = React.useCallback(
+    () => {
+      if (page === 'create') {
+        if (emptyProjectSelected) {
+          if (!preventBackHome) {
+            setEmptyProjectSelected(false);
+            setPage('home');
+          }
+        } else {
+          if (!preventBackDetails) {
+            setPage('details');
+          }
+        }
+      }
+      if (page === 'details' && !preventBackHome) {
+        if (selectedExampleShortHeader) onSelectExampleShortHeader(null);
+        if (selectedPrivateGameTemplateListingData)
+          onSelectPrivateGameTemplateListingData(null);
+        setPage('home');
+      }
+    },
+    [
+      emptyProjectSelected,
+      setEmptyProjectSelected,
+      selectedExampleShortHeader,
+      onSelectExampleShortHeader,
+      selectedPrivateGameTemplateListingData,
+      onSelectPrivateGameTemplateListingData,
+      page,
+      preventBackHome,
+      preventBackDetails,
+    ]
+  );
+
+  const shouldShowBackButton = React.useMemo(
+    () => {
+      if (page === 'home') return false;
+      if (page === 'details') return !preventBackHome;
+      if (
+        page === 'create' &&
+        !preventBackDetails &&
+        !(preventBackHome && emptyProjectSelected)
+      )
+        return true;
+    },
+    [page, preventBackHome, preventBackDetails, emptyProjectSelected]
+  );
+
+  const shouldUseSmallWidth =
+    (page === 'details' && !!selectedExampleShortHeader) || page === 'create';
+  const shouldUseFullHeight =
+    page === 'home' ||
+    (page === 'details' && !!selectedPrivateGameTemplateListingData);
+
   return (
     <I18n>
       {({ i18n }) => (
         <Dialog
           open
-          title={<Trans>New Project</Trans>}
+          title={<Trans>Create a new game</Trans>}
           id="project-pre-creation-dialog"
-          maxWidth="sm"
+          maxWidth={shouldUseSmallWidth ? 'sm' : 'md'}
           actions={[
+            <DialogPrimaryButton
+              key="create"
+              primary
+              disabled={!shouldAllowCreatingProject}
+              label={<Trans>Create new game</Trans>}
+              onClick={() => onCreateGameClick(i18n)}
+              id="create-project-button"
+            />,
+          ]}
+          secondaryActions={[
             <FlatButton
               disabled={isLoading}
               key="cancel"
               label={<Trans>Cancel</Trans>}
               onClick={onClose}
             />,
-            <DialogPrimaryButton
-              key="create"
-              primary
-              disabled={shouldNotAllowCreatingProject || isLoading}
-              label={<Trans>Create project</Trans>}
-              onClick={() => onValidate(i18n)}
-              id="create-project-button"
-            />,
           ]}
           cannotBeDismissed={isLoading}
           onRequestClose={onClose}
-          onApply={() => onValidate(i18n)}
+          onApply={() => onCreateGameClick(i18n)}
+          fullHeight={shouldUseFullHeight}
+          flexColumnBody
+          forceScrollVisible
         >
-          <ColumnStackLayout noMargin>
-            {isStartingProjectFromScratch && (
-              <ResolutionOptions
-                onClick={key => setResolutionOption(key)}
-                selectedOption={resolutionOption}
-                disabled={isLoading}
-                customHeight={customHeight}
-                customWidth={customWidth}
-                onCustomHeightChange={setCustomHeight}
-                onCustomWidthChange={setCustomWidth}
-              />
-            )}
-            <TextField
-              type="text"
-              errorText={projectNameError}
-              disabled={isLoading}
-              value={projectName}
-              onChange={_onChangeProjectName}
-              floatingLabelText={<Trans>Project name</Trans>}
-              endAdornment={
-                <IconButton
-                  size="small"
-                  onClick={() => setProjectName(generateProjectName())}
-                  tooltip={t`Generate random name`}
-                  disabled={isLoading}
-                >
-                  <Refresh />
-                </IconButton>
-              }
-              autoFocus="desktop"
-              maxLength={CLOUD_PROJECT_NAME_MAX_LENGTH}
-            />
-            <SelectField
-              fullWidth
-              disabled={isLoading}
-              floatingLabelText={<Trans>Where to store this project</Trans>}
-              value={storageProvider.internalName}
-              onChange={(e, i, newValue: string) => {
-                setNewProjectsDefaultStorageProviderName(newValue);
-                const newStorageProvider =
-                  storageProviders.find(
-                    ({ internalName }) => internalName === newValue
-                  ) || emptyStorageProvider;
-                setStorageProvider(newStorageProvider);
-
-                // Reset the save as location, to avoid mixing it between storage providers
-                // and give a chance to the storage provider to set it to a default value.
-                setSaveAsLocation(null);
-              }}
-            >
-              {storageProviders
-                // Filter out storage providers who are supposed to be used for storage initially
-                // (for example: the "URL" storage provider, which is read only,
-                // or the "DownloadFile" storage provider, which is not a persistent storage).
-                .filter(
-                  storageProvider =>
-                    !!storageProvider.renderNewProjectSaveAsLocationChooser
-                )
-                .map(storageProvider => (
-                  <SelectOption
-                    key={storageProvider.internalName}
-                    value={storageProvider.internalName}
-                    label={storageProvider.name}
-                    disabled={storageProvider.disabled}
-                  />
-                ))}
-              {shouldAllowCreatingProjectWithoutSaving && (
-                <SelectOption
-                  value={emptyStorageProvider.internalName}
-                  label={t`Don't save this project now`}
-                />
-              )}
-            </SelectField>
-            {needUserAuthenticationForStorage && (
-              <Paper background="dark" variant="outlined">
-                <Line justifyContent="center">
-                  <CreateProfile
-                    onOpenLoginDialog={authenticatedUser.onOpenLoginDialog}
-                    onOpenCreateAccountDialog={
-                      authenticatedUser.onOpenCreateAccountDialog
-                    }
-                    message={
-                      <Trans>
-                        Create an account to store your project online.
-                      </Trans>
-                    }
+          <Column noMargin expand>
+            {shouldShowBackButton && (
+              <>
+                <Line noMargin>
+                  <TextButton
+                    icon={<ChevronArrowLeft />}
+                    label={<Trans>Back</Trans>}
+                    onClick={onBack}
+                    disabled={isProjectOpening || isGeneratingProject}
                   />
                 </Line>
-              </Paper>
+                <Spacer />
+              </>
             )}
-            {!needUserAuthenticationForStorage &&
-              storageProvider.renderNewProjectSaveAsLocationChooser &&
-              storageProvider.renderNewProjectSaveAsLocationChooser({
-                projectName,
-                saveAsLocation,
-                setSaveAsLocation,
-                newProjectsDefaultFolder,
-              })}
-            {isStartingProjectFromScratch && (
-              <ColumnStackLayout noMargin expand>
-                <LineStackLayout
-                  expand
-                  noMargin
-                  alignItems="center"
-                  justifyContent="center"
-                >
-                  <RobotIcon />
-                  <TextField
-                    type="text"
-                    multiline
-                    maxLength={200}
-                    fullWidth
-                    disabled={
-                      isLoading ||
-                      !authenticatedUser.authenticated ||
-                      !isOnline ||
-                      !canGenerateProjectFromPrompt
-                    }
-                    value={generationPrompt}
-                    onChange={(e, text) => setGenerationPrompt(text)}
-                    floatingLabelText={<Trans>AI prompt</Trans>}
-                    floatingLabelFixed
-                    translatableHintText={
-                      !authenticatedUser.authenticated || !isOnline
-                        ? t`Log in to enter a prompt`
-                        : t`Type a prompt or generate one`
-                    }
-                    endAdornment={
-                      <IconButton
-                        size="small"
-                        onClick={() => setGenerationPrompt(generatePrompt())}
-                        tooltip={t`Generate random prompt`}
-                        disabled={
-                          isLoading ||
-                          !authenticatedUser.authenticated ||
-                          !isOnline ||
-                          !canGenerateProjectFromPrompt
-                        }
-                      >
-                        <Refresh />
-                      </IconButton>
-                    }
-                  />
-                </LineStackLayout>
-                {authenticatedUser.authenticated &&
-                  !canGenerateProjectFromPrompt && (
-                    <GetSubscriptionCard subscriptionDialogOpeningReason="Generate project from prompt">
-                      <Line>
-                        <Column noMargin>
-                          <Text noMargin>
-                            <Trans>
-                              You've used all your daily pre-made AI scenes!
-                              Generate as many as you want with a subscription.
-                            </Trans>
-                          </Text>
-                        </Column>
-                      </Line>
-                    </GetSubscriptionCard>
-                  )}
-                <Accordion defaultExpanded={false} noMargin>
-                  <AccordionHeader noMargin>
-                    <Text size="sub-title">
-                      <Trans>Advanced options</Trans>
-                    </Text>
-                  </AccordionHeader>
-                  <AccordionBody disableGutters>
-                    <Column expand noMargin>
-                      <Checkbox
-                        checked={optimizeForPixelArt}
-                        label={<Trans>Optimize for Pixel Art</Trans>}
-                        onCheck={(e, checked) => {
-                          setOptimizeForPixelArt(checked);
+            {page === 'home' && (
+              <ColumnStackLayout noMargin>
+                <EmptyAndBaseProjects
+                  onSelectExampleShortHeader={exampleShortHeader => {
+                    onSelectExampleShortHeader(exampleShortHeader);
+                    setPage('details');
+                  }}
+                  storageProvider={storageProvider}
+                  saveAsLocation={saveAsLocation}
+                  onSelectEmptyProject={() => {
+                    setEmptyProjectSelected(true);
+                    setPage('create');
+                  }}
+                  disabled={isProjectOpening || isGeneratingProject}
+                />
+                <Text size="block-title" noMargin>
+                  <Trans>Remix an existing game</Trans>
+                </Text>
+                <ExampleStore
+                  onSelectExampleShortHeader={exampleShortHeader => {
+                    onSelectExampleShortHeader(exampleShortHeader);
+                    setPage('details');
+                  }}
+                  onSelectPrivateGameTemplateListingData={privateGameTemplateListingData => {
+                    onSelectPrivateGameTemplateListingData(
+                      privateGameTemplateListingData
+                    );
+                    setPage('details');
+                  }}
+                  i18n={i18n}
+                  columnsCount={getItemsColumns(windowSize, isLandscape)}
+                  onlyShowGames
+                  rowToInsert={{
+                    row: 2,
+                    element: (
+                      <AIPromptField
+                        onCreateFromAIGeneration={onCreateFromAIGeneration}
+                        isProjectOpening={!!isProjectOpening}
+                        isGeneratingProject={isGeneratingProject}
+                        storageProvider={storageProvider}
+                        saveAsLocation={saveAsLocation}
+                        generatingProjectId={generatingProjectId}
+                        onGenerationClosed={() => {
+                          setGeneratingProjectId(null);
+                          setIsGeneratingProject(false);
                         }}
-                        disabled={isLoading}
+                        generationPrompt={generationPrompt}
+                        onGenerationPromptChange={setGenerationPrompt}
                       />
-                      <Checkbox
-                        checked={allowPlayersToLogIn}
-                        label={
-                          <Trans>Allow players to authenticate in-game</Trans>
-                        }
-                        onCheck={(e, checked) => {
-                          setAllowPlayersToLogIn(checked);
-                        }}
-                        disabled={isLoading || !isOnline}
-                        tooltipOrHelperText={
-                          <MarkdownText
-                            translatableSource={t`Learn more about [player authentication](https://wiki.gdevelop.io/gdevelop5/all-features/player-authentication).`}
-                          />
-                        }
-                      />
-                    </Column>
-                  </AccordionBody>
-                </Accordion>
+                    ),
+                  }}
+                />
               </ColumnStackLayout>
             )}
-            {limits && hasTooManyCloudProjects ? (
-              <MaxProjectCountAlertMessage
-                limits={limits}
-                onUpgrade={() =>
-                  openSubscriptionDialog({
-                    analyticsMetadata: {
-                      reason: 'Cloud Project limit reached',
-                    },
-                  })
-                }
-              />
-            ) : null}
-          </ColumnStackLayout>
-          {isGeneratingProject && generatingProjectId && (
-            <ProjectGeneratingDialog
-              generatingProjectId={generatingProjectId}
-              storageProvider={storageProvider}
-              saveAsLocation={saveAsLocation}
-              onCreate={onCreateFromAIGeneration}
-              onClose={() => {
-                setGeneratingProjectId(null);
-                setIsGeneratingProject(false);
-              }}
-            />
-          )}
+            {page === 'details' &&
+              (selectedExampleShortHeader ? (
+                <ExampleInformationPage
+                  exampleShortHeader={selectedExampleShortHeader}
+                />
+              ) : selectedPrivateGameTemplateListingData ? (
+                <PrivateGameTemplateInformationPage
+                  privateGameTemplateListingData={
+                    selectedPrivateGameTemplateListingData
+                  }
+                  privateGameTemplateListingDatasFromSameCreator={
+                    privateGameTemplateListingDatasFromSameCreator
+                  }
+                  onGameTemplateOpen={onSelectPrivateGameTemplateListingData}
+                  hideOpenAction
+                />
+              ) : null)}
+            {page === 'create' && (
+              <ColumnStackLayout noMargin>
+                {emptyProjectSelected && (
+                  <ResolutionOptions
+                    onClick={key => setResolutionOption(key)}
+                    selectedOption={resolutionOption}
+                    disabled={isLoading}
+                    customHeight={customHeight}
+                    customWidth={customWidth}
+                    onCustomHeightChange={setCustomHeight}
+                    onCustomWidthChange={setCustomWidth}
+                  />
+                )}
+                <TextField
+                  type="text"
+                  errorText={projectNameError}
+                  disabled={isLoading}
+                  value={projectName}
+                  onChange={_onChangeProjectName}
+                  floatingLabelText={<Trans>Project name</Trans>}
+                  endAdornment={
+                    <IconButton
+                      size="small"
+                      onClick={() => setProjectName(generateProjectName())}
+                      tooltip={t`Generate random name`}
+                      disabled={isLoading}
+                    >
+                      <Refresh />
+                    </IconButton>
+                  }
+                  autoFocus="desktop"
+                  maxLength={CLOUD_PROJECT_NAME_MAX_LENGTH}
+                />
+                <SelectField
+                  fullWidth
+                  disabled={isLoading}
+                  floatingLabelText={<Trans>Where to store this project</Trans>}
+                  value={storageProvider.internalName}
+                  onChange={(e, i, newValue: string) => {
+                    setNewProjectsDefaultStorageProviderName(newValue);
+                    const newStorageProvider =
+                      storageProviders.find(
+                        ({ internalName }) => internalName === newValue
+                      ) || emptyStorageProvider;
+                    setStorageProvider(newStorageProvider);
+
+                    // Reset the save as location, to avoid mixing it between storage providers
+                    // and give a chance to the storage provider to set it to a default value.
+                    setSaveAsLocation(null);
+                  }}
+                >
+                  {storageProviders
+                    // Filter out storage providers who are supposed to be used for storage initially
+                    // (for example: the "URL" storage provider, which is read only,
+                    // or the "DownloadFile" storage provider, which is not a persistent storage).
+                    .filter(
+                      storageProvider =>
+                        !!storageProvider.renderNewProjectSaveAsLocationChooser
+                    )
+                    .map(storageProvider => (
+                      <SelectOption
+                        key={storageProvider.internalName}
+                        value={storageProvider.internalName}
+                        label={storageProvider.name}
+                        disabled={storageProvider.disabled}
+                      />
+                    ))}
+                  {shouldAllowCreatingProjectWithoutSaving && (
+                    <SelectOption
+                      value={emptyStorageProvider.internalName}
+                      label={t`Don't save this project now`}
+                    />
+                  )}
+                </SelectField>
+                {needUserAuthenticationForStorage && (
+                  <Paper background="dark" variant="outlined">
+                    <Line justifyContent="center">
+                      <CreateProfile
+                        onOpenLoginDialog={onOpenLoginDialog}
+                        onOpenCreateAccountDialog={onOpenCreateAccountDialog}
+                        message={
+                          <Trans>
+                            Create an account to store your project online.
+                          </Trans>
+                        }
+                      />
+                    </Line>
+                  </Paper>
+                )}
+                {!needUserAuthenticationForStorage &&
+                  storageProvider.renderNewProjectSaveAsLocationChooser &&
+                  storageProvider.renderNewProjectSaveAsLocationChooser({
+                    projectName,
+                    saveAsLocation,
+                    setSaveAsLocation,
+                    newProjectsDefaultFolder,
+                  })}
+                {emptyProjectSelected && (
+                  <Checkbox
+                    checked={optimizeForPixelArt}
+                    label={<Trans>Optimize for Pixel Art</Trans>}
+                    onCheck={(e, checked) => {
+                      setOptimizeForPixelArt(checked);
+                    }}
+                    disabled={isLoading}
+                  />
+                )}
+                {limits && hasTooManyCloudProjects ? (
+                  <MaxProjectCountAlertMessage
+                    limits={limits}
+                    onUpgrade={() =>
+                      openSubscriptionDialog({
+                        analyticsMetadata: {
+                          reason: 'Cloud Project limit reached',
+                        },
+                      })
+                    }
+                  />
+                ) : null}
+              </ColumnStackLayout>
+            )}
+          </Column>
         </Dialog>
       )}
     </I18n>

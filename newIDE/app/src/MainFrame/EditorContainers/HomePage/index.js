@@ -111,11 +111,8 @@ type Props = {|
   canOpen: boolean,
   onChooseProject: () => void,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => Promise<void>,
-  onOpenExampleStore: () => void,
   onSelectExampleShortHeader: ExampleShortHeader => void,
-  onPreviewPrivateGameTemplateListingData: (
-    privateGameTemplateListingData: PrivateGameTemplateListingData
-  ) => void,
+  onSelectPrivateGameTemplateListingData: PrivateGameTemplateListingData => void,
   onOpenPrivateGameTemplateListingData: (
     privateGameTemplateListingData: PrivateGameTemplateListingData
   ) => void,
@@ -167,9 +164,8 @@ export const HomePage = React.memo<Props>(
         onChooseProject,
         onOpenRecentFile,
         onOpenNewProjectSetupDialog,
-        onOpenExampleStore,
         onSelectExampleShortHeader,
-        onPreviewPrivateGameTemplateListingData,
+        onSelectPrivateGameTemplateListingData,
         onOpenPrivateGameTemplateListingData,
         onOpenProjectManager,
         onOpenLanguageDialog,
@@ -499,10 +495,9 @@ export const HomePage = React.memo<Props>(
                       onOpenNewProjectSetupDialog={onOpenNewProjectSetupDialog}
                       onSelectExampleShortHeader={onSelectExampleShortHeader}
                       onSelectPrivateGameTemplateListingData={
-                        onPreviewPrivateGameTemplateListingData
+                        onSelectPrivateGameTemplateListingData
                       }
                       onOpenRecentFile={onOpenRecentFile}
-                      onOpenExampleStore={onOpenExampleStore}
                       onManageGame={onManageGame}
                       canManageGame={canManageGame}
                       storageProviders={storageProviders}
@@ -512,7 +507,6 @@ export const HomePage = React.memo<Props>(
                   )}
                   {activeTab === 'learn' && (
                     <LearnSection
-                      onOpenExampleStore={onOpenExampleStore}
                       onTabChange={setActiveTab}
                       selectInAppTutorial={selectInAppTutorial}
                       onOpenTemplateFromTutorial={onOpenTemplateFromTutorial}
@@ -585,10 +579,9 @@ export const renderHomePageContainer = (
     canOpen={props.canOpen}
     onChooseProject={props.onChooseProject}
     onOpenRecentFile={props.onOpenRecentFile}
-    onOpenExampleStore={props.onOpenExampleStore}
     onSelectExampleShortHeader={props.onSelectExampleShortHeader}
-    onPreviewPrivateGameTemplateListingData={
-      props.onPreviewPrivateGameTemplateListingData
+    onSelectPrivateGameTemplateListingData={
+      props.onSelectPrivateGameTemplateListingData
     }
     onOpenPrivateGameTemplateListingData={
       props.onOpenPrivateGameTemplateListingData

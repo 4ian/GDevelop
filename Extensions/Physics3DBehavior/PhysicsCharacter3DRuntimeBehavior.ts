@@ -105,15 +105,12 @@ namespace gdjs {
       const jolt = sharedData.jolt;
       const extendedUpdateSettings = new Jolt.ExtendedUpdateSettings();
       extendedUpdateSettings.mWalkStairsStepUp = this.getVec3(0, 0, 0.4);
-      const objectVsBroadPhaseLayerFilter =
-        jolt.GetObjectVsBroadPhaseLayerFilter();
-      const objectLayerPairFilter = jolt.GetObjectLayerPairFilter();
       const broadPhaseLayerFilter = new Jolt.DefaultBroadPhaseLayerFilter(
-        objectVsBroadPhaseLayerFilter,
-        1
+        jolt.GetObjectVsBroadPhaseLayerFilter(),
+        gdjs.Physics3DSharedData.dynamicBroadPhaseLayerIndex
       );
       const objectLayerFilter = new Jolt.DefaultObjectLayerFilter(
-        objectLayerPairFilter,
+        jolt.GetObjectLayerPairFilter(),
         behavior.getBodyLayer()
       );
       const bodyFilter = new Jolt.BodyFilter();

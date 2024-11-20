@@ -53,39 +53,6 @@ namespace gdjs {
     props: Physics3DNetworkSyncDataType;
   }
 
-  // There are 4 bits for static layers and 4 bits for dynamic layers.
-  const staticLayersMask = 0x0f;
-  const dynamicLayersMask = 0xf0;
-  const allLayersMask = 0xff;
-
-  const setupCollisionFiltering = (settings: Jolt.JoltSettings) => {
-    const objectFilter = new Jolt.ObjectLayerPairFilterMask();
-    const staticBroadPhaseLayer = new Jolt.BroadPhaseLayer(0);
-    const dynamicBroadPhaseLayer = new Jolt.BroadPhaseLayer(1);
-    const broadPhaseLayerInterfaceMask = new Jolt.BroadPhaseLayerInterfaceMask(
-      2
-    );
-    broadPhaseLayerInterfaceMask.ConfigureLayer(
-      staticBroadPhaseLayer,
-      staticLayersMask,
-      0
-    );
-    broadPhaseLayerInterfaceMask.ConfigureLayer(
-      dynamicBroadPhaseLayer,
-      dynamicLayersMask,
-      0
-    );
-    // BroadPhaseLayer have been copied into bpInterface
-    Jolt.destroy(staticBroadPhaseLayer);
-    Jolt.destroy(dynamicBroadPhaseLayer);
-
-    settings.mObjectLayerPairFilter = objectFilter;
-    settings.mBroadPhaseLayerInterface = broadPhaseLayerInterfaceMask;
-    settings.mObjectVsBroadPhaseLayerFilter = new Jolt.ObjectVsBroadPhaseLayerFilterMask(
-      broadPhaseLayerInterfaceMask
-    );
-  };
-
   export class Physics3DSharedData {
     gravityX: float;
     gravityY: float;
@@ -111,9 +78,8 @@ namespace gdjs {
      */
     _registeredBehaviors: Set<Physics3DRuntimeBehavior>;
 
-    private _physics3DHooks: Array<
-      gdjs.Physics3DRuntimeBehavior.Physics3DHook
-    > = [];
+    private _physics3DHooks: Array<gdjs.Physics3DRuntimeBehavior.Physics3DHook> =
+      [];
 
     constructor(instanceContainer: gdjs.RuntimeInstanceContainer, sharedData) {
       this._registeredBehaviors = new Set<Physics3DRuntimeBehavior>();
@@ -125,7 +91,7 @@ namespace gdjs {
 
       // Initialize Jolt
       const settings = new Jolt.JoltSettings();
-      setupCollisionFiltering(settings);
+      gdjs.Physics3DSharedData.setupCollisionFiltering(settings);
       this.jolt = new Jolt.JoltInterface(settings);
       Jolt.destroy(settings);
       this.physicsSystem = this.jolt.GetPhysicsSystem();
@@ -206,15 +172,53 @@ namespace gdjs {
     ): gdjs.Physics3DSharedData {
       // Create one if needed
       if (!runtimeScene.physics3DSharedData) {
-        const initialData = runtimeScene.getInitialSharedDataForBehavior(
-          behaviorName
-        );
+        const initialData =
+          runtimeScene.getInitialSharedDataForBehavior(behaviorName);
         runtimeScene.physics3DSharedData = new gdjs.Physics3DSharedData(
           runtimeScene,
           initialData
         );
       }
       return runtimeScene.physics3DSharedData;
+    }
+
+    // There are 4 bits for static layers and 4 bits for dynamic layers.
+    static readonly staticLayersMask = 0x0f;
+    static readonly dynamicLayersMask = 0xf0;
+    static readonly allLayersMask = 0xff;
+    static readonly staticBroadPhaseLayerIndex = 1;
+    static readonly dynamicBroadPhaseLayerIndex = 1;
+
+    static setupCollisionFiltering(settings: Jolt.JoltSettings) {
+      const objectFilter = new Jolt.ObjectLayerPairFilterMask();
+      const staticBroadPhaseLayer = new Jolt.BroadPhaseLayer(
+        gdjs.Physics3DSharedData.staticBroadPhaseLayerIndex
+      );
+      const dynamicBroadPhaseLayer = new Jolt.BroadPhaseLayer(
+        gdjs.Physics3DSharedData.dynamicBroadPhaseLayerIndex
+      );
+      const broadPhaseLayerInterfaceMask =
+        new Jolt.BroadPhaseLayerInterfaceMask(2);
+      broadPhaseLayerInterfaceMask.ConfigureLayer(
+        staticBroadPhaseLayer,
+        gdjs.Physics3DSharedData.staticLayersMask,
+        0
+      );
+      broadPhaseLayerInterfaceMask.ConfigureLayer(
+        dynamicBroadPhaseLayer,
+        gdjs.Physics3DSharedData.dynamicLayersMask,
+        0
+      );
+      // BroadPhaseLayer have been copied into bpInterface
+      Jolt.destroy(staticBroadPhaseLayer);
+      Jolt.destroy(dynamicBroadPhaseLayer);
+
+      settings.mObjectLayerPairFilter = objectFilter;
+      settings.mBroadPhaseLayerInterface = broadPhaseLayerInterfaceMask;
+      settings.mObjectVsBroadPhaseLayerFilter =
+        new Jolt.ObjectVsBroadPhaseLayerFilterMask(
+          broadPhaseLayerInterfaceMask
+        );
     }
 
     /**
@@ -260,7 +264,7 @@ namespace gdjs {
         physicsBehavior.updateObjectFromBody();
       }
     }
-    
+
     /**
      * A hook must typically be registered by a behavior that requires this one
      * in its onCreate function.
@@ -268,9 +272,7 @@ namespace gdjs {
      * change. To handle deactivated behavior, the hook can check that its
      * behavior is activated before doing anything.
      */
-    registerHook(
-      hook: gdjs.Physics3DRuntimeBehavior.Physics3DHook
-    ) {
+    registerHook(hook: gdjs.Physics3DRuntimeBehavior.Physics3DHook) {
       this._physics3DHooks.push(hook);
     }
   }
@@ -862,12 +864,13 @@ namespace gdjs {
     getBodyLayer(): number {
       return Jolt.ObjectLayerPairFilterMask.prototype.sGetObjectLayer(
         // Make sure objects don't register in the wrong layer group.
-        0xf0, //TODO
-        // this.bodyType === 'Static'
-        //   ? this.layers & staticLayersMask
-        //   : this.layers & dynamicLayersMask,
+        this.bodyType === 'Static'
+          ? this.layers & gdjs.Physics3DSharedData.staticLayersMask
+          : this.layers & gdjs.Physics3DSharedData.dynamicLayersMask,
         // Static objects accept all collisions as it's the mask of dynamic objects that matters.
-        allLayersMask //TODO this.bodyType === 'Static' ? allLayersMask : this.masks
+        this.bodyType === 'Static'
+          ? gdjs.Physics3DSharedData.allLayersMask
+          : this.masks
       );
     }
 
@@ -932,7 +935,6 @@ namespace gdjs {
       );
     }
 
-    
     updateObjectFromBody() {
       // Copy transform from body to the GD object.
       // It's possible the behavior was either deactivated or the object deleted
@@ -1021,7 +1023,7 @@ namespace gdjs {
         // if (this.owner.getName() === "MovingPlatform") {
         //   console.log("to Physics: " + this._objectOldX + " " + this._objectOldY + " --> " + this.owner3D.getX() + " " + this.owner3D.getY())
         // }
-        
+
         this._sharedData.bodyInterface.SetPositionAndRotationWhenChanged(
           body.GetID(),
           this.getPhysicsPosition(this.getRVec3(0, 0, 0)),
@@ -1045,7 +1047,8 @@ namespace gdjs {
 
     getPhysicsRotation(result: Jolt.Quat): Jolt.Quat {
       const threeObject = this.owner3D.get3DRendererObject();
-      result.Set(threeObject.quaternion.x,
+      result.Set(
+        threeObject.quaternion.x,
         threeObject.quaternion.y,
         threeObject.quaternion.z,
         threeObject.quaternion.w

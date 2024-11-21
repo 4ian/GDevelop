@@ -51,6 +51,7 @@ namespace gdjs {
     hasPressedForwardKey: boolean = false;
     hasPressedBackwardKey: boolean = false;
     hasPressedJumpKey: boolean = false;
+    hasJumpKeyBeenConsumed: boolean = false;
     _currentForwardSpeed: float = 0;
     _currentFallSpeed: float = 0;
     _canJump: boolean = false;
@@ -360,12 +361,16 @@ namespace gdjs {
         Math.min(this._forwardSpeedMax, this._currentForwardSpeed)
       );
 
+      if (!this.hasPressedJumpKey) {
+        this.hasJumpKeyBeenConsumed = false;
+      }
       if (this.isOnFloor()) {
         this._currentFallSpeed = 0;
         this._currentJumpSpeed = 0;
 
-        if (this.hasPressedJumpKey) {
+        if (this.hasPressedJumpKey && !this.hasJumpKeyBeenConsumed) {
           this._currentJumpSpeed = this._jumpSpeed;
+          this.hasJumpKeyBeenConsumed = true;
         }
       } else {
         // Decrease jump speed after the (optional) jump sustain time is over.

@@ -85,8 +85,8 @@ namespace gdjs {
       this._forwardSpeedMax = behaviorData.forwardSpeedMax;
       this._gravity = behaviorData.gravity;
       this._maxFallingSpeed = behaviorData.fallingSpeedMax;
-      this._jumpSpeed = 900; //TODO behaviorData.jumpHeight;
       this._jumpSustainTime = behaviorData.jumpSustainTime;
+      this._jumpSpeed = this.getJumpSpeedToReach(behaviorData.jumpHeight);
     }
 
     private getVec3(x: float, y: float, z: float): Jolt.Vec3 {
@@ -368,6 +368,7 @@ namespace gdjs {
         Math.min(this._forwardSpeedMax, this._currentForwardSpeed)
       );
 
+      let hasJustJumped = false;
       if (!this.hasPressedJumpKey) {
         this.hasJumpKeyBeenConsumed = false;
       }
@@ -378,8 +379,20 @@ namespace gdjs {
         if (this.hasPressedJumpKey && !this.hasJumpKeyBeenConsumed) {
           this._currentJumpSpeed = this._jumpSpeed;
           this.hasJumpKeyBeenConsumed = true;
+          this._jumpKeyHeldSinceJumpStart = true;
+          this._timeSinceCurrentJumpStart = 0;
+          hasJustJumped = true;
         }
       } else {
+        // Check if the jump key is continuously held since
+        // the beginning of the jump.
+        if (!this.hasPressedJumpKey) {
+          this._jumpKeyHeldSinceJumpStart = false;
+        }
+        this._timeSinceCurrentJumpStart += timeDelta;
+      }
+      // When a jump starts isOnFloor will only become false after ExtendedUpdate is called.
+      if (!this.isOnFloor() || hasJustJumped) {
         // Decrease jump speed after the (optional) jump sustain time is over.
         const sustainJumpSpeed =
           this._jumpKeyHeldSinceJumpStart &&
@@ -865,6 +878,63 @@ namespace gdjs {
         this._currentJumpSpeed !== 0 ||
         this._currentFallSpeed !== 0
       );
+    }
+
+    getJumpSpeedToReach(jumpHeight: float): float {
+      // Formulas used in this extension were generated from a math model.
+      // They are probably not understandable on their own.
+      // If you need to modify them or need to write new feature,
+      // please take a look at the platformer extension documentation:
+      // https://github.com/4ian/GDevelop/tree/master/Extensions/PlatformBehavior#readme
+
+      jumpHeight = -Math.abs(jumpHeight);
+
+      const gravity = this._gravity;
+      const maxFallingSpeed = this._maxFallingSpeed;
+      const jumpSustainTime = this._jumpSustainTime;
+
+      const maxFallingSpeedReachedTime = maxFallingSpeed / gravity;
+
+      // The implementation jumps from one quadratic resolution to another
+      // to find the right formula to use as the time is unknown.
+
+      const sustainCase = (jumpHeight) => Math.sqrt(-jumpHeight * gravity * 2);
+      const maxFallingCase = (jumpHeight) =>
+        -gravity * jumpSustainTime +
+        maxFallingSpeed +
+        Math.sqrt(
+          gravity * gravity * jumpSustainTime * jumpSustainTime -
+            2 * jumpHeight * gravity -
+            maxFallingSpeed * maxFallingSpeed
+        );
+
+      let jumpSpeed = 0;
+      let peakTime = 0;
+      if (maxFallingSpeedReachedTime > jumpSustainTime) {
+        // common case
+        jumpSpeed =
+          -gravity * jumpSustainTime +
+          Math.sqrt(
+            2 * gravity * gravity * jumpSustainTime * jumpSustainTime -
+              4 * jumpHeight * gravity
+          );
+        peakTime = (gravity * jumpSustainTime + jumpSpeed) / (2 * gravity);
+        if (peakTime < jumpSustainTime) {
+          jumpSpeed = sustainCase(jumpHeight);
+        } else if (peakTime > maxFallingSpeedReachedTime) {
+          jumpSpeed = maxFallingCase(jumpHeight);
+        }
+      } else {
+        // affine case can't have a maximum
+
+        // sustain case
+        jumpSpeed = sustainCase(jumpHeight);
+        peakTime = jumpSpeed / gravity;
+        if (peakTime > maxFallingSpeedReachedTime) {
+          jumpSpeed = maxFallingCase(jumpHeight);
+        }
+      }
+      return jumpSpeed;
     }
   }
 

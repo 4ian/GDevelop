@@ -36,7 +36,7 @@ namespace gdjs {
      */
     private static readonly workingPoint: FloatPoint = [0, 0];
 
-    _opacity: float;
+    _opacity: float = 255;
     _atlasImage: string;
     _tileMapManager: gdjs.TileMap.TileMapRuntimeManager;
     _renderer: gdjs.TileMapRuntimeObjectPixiRenderer;
@@ -71,7 +71,7 @@ namespace gdjs {
         tileHeight: this._tileSize,
         dimX: 1,
         dimY: 1,
-        layers: [{ id: 0, alpha: this._opacity, tiles: [] }],
+        layers: [{ id: 0, alpha: this._opacity / 255, tiles: [] }],
       };
       this._initialTilesWithHitBox = (objectData.content
         .tilesWithHitBox as string)

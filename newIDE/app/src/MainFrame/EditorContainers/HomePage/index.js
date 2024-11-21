@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
-import { Trans } from '@lingui/macro';
 import { type RenderEditorContainerPropsWithRef } from '../BaseEditor';
 import {
   type FileMetadataAndStorageProviderName,
@@ -38,12 +37,6 @@ import {
 } from '../../../Utils/Analytics/EventSender';
 import RouterContext, { type RouteArguments } from '../../RouterContext';
 import { type GameDetailsTab } from '../../../GameDashboard';
-import useDisplayNewFeature from '../../../Utils/UseDisplayNewFeature';
-import HighlightingTooltip from '../../../UI/HighlightingTooltip';
-import Text from '../../../UI/Text';
-import Link from '../../../UI/Link';
-import Window from '../../../Utils/Window';
-import { getHelpLink } from '../../../Utils/HelpLink';
 import { canUseClassroomFeature } from '../../../Utils/GDevelopServices/Usage';
 import EducationMarketingSection from './EducationMarketingSection';
 import useEducationForm from './UseEducationForm';
@@ -51,7 +44,6 @@ import { type NewProjectSetup } from '../../../ProjectCreation/NewProjectSetupDi
 import { type ObjectWithContext } from '../../../ObjectsList/EnumerateObjects';
 import { type GamesList } from '../../../GameDashboard/UseGamesList';
 
-const gamesDashboardWikiArticle = getHelpLink('/interface/games-dashboard/');
 const getRequestedTab = (routeArguments: RouteArguments): HomeTab | null => {
   if (
     routeArguments['initial-dialog'] === 'asset-store' || // Compatibility with old links
@@ -258,10 +250,6 @@ export const HomePage = React.memo<Props>(
       const { setInitialPackUserFriendlySlug } = React.useContext(
         AssetStoreContext
       );
-      const [
-        displayTooltipDelayed,
-        setDisplayTooltipDelayed,
-      ] = React.useState<boolean>(false);
       const openedGame = React.useMemo(
         () =>
           !openedGameId || !games
@@ -269,28 +257,9 @@ export const HomePage = React.memo<Props>(
             : games.find(game => game.id === openedGameId),
         [games, openedGameId]
       );
-      const {
-        shouldDisplayNewFeatureHighlighting,
-        acknowledgeNewFeature,
-      } = useDisplayNewFeature();
-      const manageTabElement = document.getElementById('home-manage-tab');
-      const shouldDisplayTooltip = shouldDisplayNewFeatureHighlighting({
-        featureId: 'gamesDashboardInHomePage',
-      });
       const { subscriptionPlansWithPricingSystems } = useSubscriptionPlans({
         includeLegacy: false,
       });
-
-      const displayTooltip =
-        isActive && shouldDisplayTooltip && manageTabElement;
-
-      const onCloseTooltip = React.useCallback(
-        () => {
-          setDisplayTooltipDelayed(false);
-          acknowledgeNewFeature({ featureId: 'gamesDashboardInHomePage' });
-        },
-        [acknowledgeNewFeature]
-      );
 
       // Open the store and a pack or game template if asked to do so, either at
       // app opening, either when the route changes (when clicking on an announcement
@@ -369,23 +338,6 @@ export const HomePage = React.memo<Props>(
           }
         },
         [fetchGames, activeTab, games]
-      );
-
-      React.useEffect(
-        () => {
-          if (displayTooltip) {
-            const timeoutId = setTimeout(() => {
-              setDisplayTooltipDelayed(true);
-            }, 500);
-            return () => clearTimeout(timeoutId);
-          } else {
-            setDisplayTooltipDelayed(false);
-          }
-        },
-        // Delay display of tooltip because home tab is the first to be opened
-        // but the editor might open a project at start, displaying the tooltip
-        // while the project is loading, giving the impression of a glitch.
-        [displayTooltip]
       );
 
       // Fetch user cloud projects when home page becomes active
@@ -609,36 +561,6 @@ export const HomePage = React.memo<Props>(
                   onOpenAbout={onOpenAbout}
                 />
               </div>
-              {displayTooltipDelayed && (
-                <HighlightingTooltip
-                  // $FlowIgnore - displayTooltipDelayed makes sure the element is defined
-                  anchorElement={manageTabElement}
-                  title={<Trans>Games Dashboard</Trans>}
-                  thumbnailSource="res/features/games-dashboard.svg"
-                  thumbnailAlt={'Red hero presenting games analytics'}
-                  content={[
-                    <Text noMargin key="paragraph">
-                      <Trans>
-                        Follow your games’ online performance, manage published
-                        versions, and collect player feedback.
-                      </Trans>
-                    </Text>,
-                    <Text noMargin key="link">
-                      <Link
-                        href={gamesDashboardWikiArticle}
-                        onClick={() =>
-                          Window.openExternalURL(gamesDashboardWikiArticle)
-                        }
-                      >
-                        <Trans>Learn more</Trans>
-                      </Link>
-                    </Text>,
-                  ]}
-                  placement={isMobile ? 'bottom' : 'right'}
-                  onClose={onCloseTooltip}
-                  closeWithBackdropClick={false}
-                />
-              )}
             </TeamProvider>
           )}
         </I18n>

@@ -4,18 +4,15 @@ import * as React from 'react';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { getProgramOpeningCount } from './Analytics/LocalStats';
 
-const featuresDisplaySettings = {
-  gamesDashboardInProjectManager: {
-    count: 2,
-    intervalInDays: 7,
-    minimumProgramOpeningCount: 10,
-  },
-  gamesDashboardInHomePage: {
-    count: 2,
-    intervalInDays: 7,
-    minimumProgramOpeningCount: 10,
-  },
+type FeatureDisplaySettings = {
+  [key: string]: {|
+    count: number,
+    intervalInDays: number,
+    minimumProgramOpeningCount: number,
+  |},
 };
+
+const featuresDisplaySettings: FeatureDisplaySettings = {};
 
 const ONE_DAY = 24 * 3600 * 1000;
 

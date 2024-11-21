@@ -45,7 +45,7 @@ namespace gdjs {
     readonly _tileSize: number;
     _displayMode = 'all';
     _layerIndex = 0;
-    _initialTileMapAsJsObject: TileMapHelper.EditableTileMapAsJsObject | null = null;
+    _initialTileMapAsJsObject: TileMapHelper.EditableTileMapAsJsObject;
     readonly _initialTilesWithHitBox: number[];
     _isTileMapDirty: boolean = false;
     _sceneToTileMapTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
@@ -66,6 +66,13 @@ namespace gdjs {
       this._rowCount = objectData.content.rowCount;
       this._columnCount = objectData.content.columnCount;
       this._tileSize = objectData.content.tileSize;
+      this._initialTileMapAsJsObject = {
+        tileWidth: this._tileSize,
+        tileHeight: this._tileSize,
+        dimX: 1,
+        dimY: 1,
+        layers: [{ id: 0, alpha: this._opacity, tiles: [] }],
+      };
       this._initialTilesWithHitBox = (objectData.content
         .tilesWithHitBox as string)
         .split(',')
@@ -78,6 +85,17 @@ namespace gdjs {
         this,
         instanceContainer
       );
+
+      this._loadInitialTileMap((tileMap: TileMapHelper.EditableTileMap) => {
+        this._renderer.updatePosition();
+
+        this._collisionTileMap = new gdjs.TileMap.TransformedCollisionTileMap(
+          tileMap,
+          this._hitBoxTag
+        );
+
+        this.updateTransformation();
+      });
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();

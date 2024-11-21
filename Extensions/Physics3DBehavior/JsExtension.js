@@ -1441,7 +1441,95 @@ module.exports = {
           return true;
         }
 
-        if (propertyName === 'slopeMaxAngle') {
+        if (propertyName === 'JumpHeight') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('jumpHeight')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'JumpSustainTime') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('jumpSustainTime')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'Gravity') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent.getChild('gravity').setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'FallingSpeedMax') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('fallingSpeedMax')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'ForwardAcceleration') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('forwardAcceleration')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'ForwardDeceleration') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('forwardDeceleration')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'ForwardSpeedMax') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('forwardSpeedMax')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'SidewaysAcceleration') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('sidewaysAcceleration')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'SidewaysDeceleration') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('sidewaysDeceleration')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'SidewaysSpeedMax') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('sidewaysSpeedMax')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'SlopeMaxAngle') {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
@@ -1464,16 +1552,151 @@ module.exports = {
           .addExtraInfo('Physics3D::Physics3DBehavior');
 
         behaviorProperties
+          .getOrCreate('JumpHeight')
+          .setLabel(_('Jump height'))
+          .setGroup(_('Jump'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setValue(
+            behaviorContent.getChild('jumpHeight').getDoubleValue().toString(10)
+          );
+
+        behaviorProperties
+          .getOrCreate('JumpSustainTime')
+          .setLabel(_('Jump sustain time'))
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+          .setGroup(_('Jump'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getSecond())
+          .setValue(
+            behaviorContent
+              .getChild('jumpSustainTime')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setDescription(
+            _(
+              'Maximum time (in seconds) during which the jump strength is sustained if the jump key is held - allowing variable height jumps.'
+            )
+          );
+
+        behaviorProperties
+          .getOrCreate('Gravity')
+          .setLabel(_('Gravity'))
+          .setGroup(_('Jump'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixelAcceleration())
+          .setValue(
+            behaviorContent.getChild('gravity').getDoubleValue().toString(10)
+          );
+
+        behaviorProperties
+          .getOrCreate('FallingSpeedMax')
+          .setLabel(_('Max. falling speed'))
+          .setGroup(_('Jump'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixelSpeed())
+          .setValue(
+            behaviorContent
+              .getChild('fallingSpeedMax')
+              .getDoubleValue()
+              .toString(10)
+          );
+
+        behaviorProperties
+          .getOrCreate('ForwardAcceleration')
+          .setLabel(_('Forward acceleration'))
+          .setGroup(_('Walk'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixelAcceleration())
+          .setValue(
+            behaviorContent
+              .getChild('forwardAcceleration')
+              .getDoubleValue()
+              .toString(10)
+          );
+
+        behaviorProperties
+          .getOrCreate('ForwardDeceleration')
+          .setLabel(_('Forward deceleration'))
+          .setGroup(_('Walk'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixelAcceleration())
+          .setValue(
+            behaviorContent
+              .getChild('forwardDeceleration')
+              .getDoubleValue()
+              .toString(10)
+          );
+
+        behaviorProperties
+          .getOrCreate('ForwardSpeedMax')
+          .setLabel(_('Max. forward speed'))
+          .setGroup(_('Walk'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixelSpeed())
+          .setValue(
+            behaviorContent
+              .getChild('forwardSpeedMax')
+              .getDoubleValue()
+              .toString(10)
+          );
+
+        behaviorProperties
+          .getOrCreate('SidewaysAcceleration')
+          .setLabel(_('Sideways acceleration'))
+          .setGroup(_('Walk'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixelAcceleration())
+          .setValue(
+            behaviorContent
+              .getChild('sidewaysAcceleration')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setAdvanced(true);
+
+        behaviorProperties
+          .getOrCreate('SidewaysDeceleration')
+          .setLabel(_('Sideways deceleration'))
+          .setGroup(_('Walk'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixelAcceleration())
+          .setValue(
+            behaviorContent
+              .getChild('sidewaysDeceleration')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setAdvanced(true);
+
+        behaviorProperties
+          .getOrCreate('SidewaysSpeedMax')
+          .setLabel(_('Max. sideways speed'))
+          .setGroup(_('Walk'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixelSpeed())
+          .setValue(
+            behaviorContent
+              .getChild('sidewaysSpeedMax')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setAdvanced(true);
+
+        behaviorProperties
           .getOrCreate('slopeMaxAngle')
+          .setLabel('Slope max. angle')
+          .setGroup(_('Walk'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
           .setValue(
             behaviorContent
               .getChild('slopeMaxAngle')
               .getDoubleValue()
               .toString(10)
           )
-          .setType('Number')
-          .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
-          .setLabel('Slope max. angle')
+          .setAdvanced(true)
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
 
         return behaviorProperties;
@@ -1481,6 +1704,16 @@ module.exports = {
 
       behavior.initializeContent = function (behaviorContent) {
         behaviorContent.addChild('Physics3D').setStringValue('');
+        behaviorContent.addChild('jumpHeight').setDoubleValue(200);
+        behaviorContent.addChild('jumpSustainTime').setDoubleValue(0.2);
+        behaviorContent.addChild('gravity').setDoubleValue(1000);
+        behaviorContent.addChild('fallingSpeedMax').setDoubleValue(700);
+        behaviorContent.addChild('forwardAcceleration').setDoubleValue(1200);
+        behaviorContent.addChild('forwardDeceleration').setDoubleValue(1200);
+        behaviorContent.addChild('forwardSpeedMax').setDoubleValue(600);
+        behaviorContent.addChild('sidewaysAcceleration').setDoubleValue(800);
+        behaviorContent.addChild('sidewaysDeceleration').setDoubleValue(800);
+        behaviorContent.addChild('sidewaysSpeedMax').setDoubleValue(400);
         behaviorContent.addChild('slopeMaxAngle').setDoubleValue(60);
       };
 

@@ -40,13 +40,13 @@ namespace gdjs {
 
     _slopeMaxAngle: float;
     _slopeClimbingFactor: float = 1;
-    _forwardAcceleration: float = 1200;
-    _forwardDeceleration: float = 1200;
-    _forwardSpeedMax: float = 600;
-    _gravity: float = 1000;
-    _maxFallingSpeed: float = 700;
-    _jumpSpeed: float = 900;
-    _jumpSustainTime: float = 0.2;
+    _forwardAcceleration: float;
+    _forwardDeceleration: float;
+    _forwardSpeedMax: float;
+    _gravity: float;
+    _maxFallingSpeed: float;
+    _jumpSpeed: float;
+    _jumpSustainTime: float;
 
     hasPressedForwardKey: boolean = false;
     hasPressedBackwardKey: boolean = false;
@@ -80,6 +80,13 @@ namespace gdjs {
 
       this._slopeMaxAngle = 0;
       this.setSlopeMaxAngle(behaviorData.slopeMaxAngle);
+      this._forwardAcceleration = behaviorData.forwardAcceleration;
+      this._forwardDeceleration = behaviorData.forwardDeceleration;
+      this._forwardSpeedMax = behaviorData.forwardSpeedMax;
+      this._gravity = behaviorData.gravity;
+      this._maxFallingSpeed = behaviorData.fallingSpeedMax;
+      this._jumpSpeed = 900; //TODO behaviorData.jumpHeight;
+      this._jumpSustainTime = behaviorData.jumpSustainTime;
     }
 
     private getVec3(x: float, y: float, z: float): Jolt.Vec3 {
@@ -475,16 +482,18 @@ namespace gdjs {
         -Math.abs(forwardSpeed) * this._slopeClimbingFactor,
         groundVelocity.GetZ()
       );
+      let stickToFloorStepDownZ = 0;
       if (
         Math.abs(floorStepDownSpeedZ) <=
         this._maxFallingSpeed * worldInvScale
       ) {
-        extendedUpdateSettings.mStickToFloorStepDown.Set(
-          0,
-          0,
-          -onePixel + floorStepDownSpeedZ * timeDelta
-        );
+        stickToFloorStepDownZ = -onePixel + floorStepDownSpeedZ * timeDelta;
       }
+      extendedUpdateSettings.mStickToFloorStepDown.Set(
+        0,
+        0,
+        stickToFloorStepDownZ
+      );
 
       this.character.SetRotation(characterBody.GetRotation());
       this.character.ExtendedUpdate(
@@ -567,13 +576,13 @@ namespace gdjs {
 
       this.hasPressedForwardKey = false;
       this.hasPressedJumpKey = false;
-      
+
       this._hasReallyMoved =
         Math.abs(this.character.GetPosition().GetX() - oldX) >
-        PhysicsCharacter3DRuntimeBehavior.epsilon ||
+          PhysicsCharacter3DRuntimeBehavior.epsilon ||
         Math.abs(this.character.GetPosition().GetY() - oldY) >
-        PhysicsCharacter3DRuntimeBehavior.epsilon ||
-          Math.abs(this.character.GetPosition().GetY() - oldZ) >
+          PhysicsCharacter3DRuntimeBehavior.epsilon ||
+        Math.abs(this.character.GetPosition().GetY() - oldZ) >
           PhysicsCharacter3DRuntimeBehavior.epsilon;
 
       // console.log('END Step character');
@@ -852,8 +861,7 @@ namespace gdjs {
      */
     isMovingEvenALittle(): boolean {
       return (
-        (this._hasReallyMoved &&
-          this._currentForwardSpeed !== 0) ||
+        (this._hasReallyMoved && this._currentForwardSpeed !== 0) ||
         this._currentJumpSpeed !== 0 ||
         this._currentFallSpeed !== 0
       );

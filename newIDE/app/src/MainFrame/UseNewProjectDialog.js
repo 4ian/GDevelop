@@ -56,7 +56,6 @@ const useExampleOrGameTemplateDialogs = ({
     setSelectedExampleShortHeader,
   ] = React.useState<?ExampleShortHeader>(null);
   const [preventBackHome, setPreventBackHome] = React.useState(true);
-  const [preventBackDetails, setPreventBackDetails] = React.useState(false);
 
   const { receivedGameTemplates } = React.useContext(AuthenticatedUserContext);
   const { privateGameTemplateListingDatas } = React.useContext(
@@ -66,7 +65,6 @@ const useExampleOrGameTemplateDialogs = ({
   const closeNewProjectDialog = React.useCallback(
     () => {
       setPreventBackHome(false);
-      setPreventBackDetails(false);
       setSelectedExampleShortHeader(null);
       setSelectedPrivateGameTemplateListingData(null);
       setNewProjectSetupDialogOpen(false);
@@ -76,7 +74,6 @@ const useExampleOrGameTemplateDialogs = ({
   const openNewProjectDialog = React.useCallback(
     () => {
       setPreventBackHome(false);
-      setPreventBackDetails(false);
       setSelectedExampleShortHeader(null);
       setSelectedPrivateGameTemplateListingData(null);
       setNewProjectSetupDialogOpen(true);
@@ -119,15 +116,12 @@ const useExampleOrGameTemplateDialogs = ({
     ({
       privateGameTemplateListingData,
       preventBackHome,
-      preventBackDetails,
     }: {|
       privateGameTemplateListingData: ?PrivateGameTemplateListingData,
       preventBackHome?: boolean,
-      preventBackDetails?: boolean,
     |}) => {
       setSelectedPrivateGameTemplateListingData(privateGameTemplateListingData);
       setPreventBackHome(!!preventBackHome);
-      setPreventBackDetails(!!preventBackDetails);
       if (privateGameTemplateListingData) {
         setNewProjectSetupDialogOpen(true);
       }
@@ -139,15 +133,12 @@ const useExampleOrGameTemplateDialogs = ({
     ({
       exampleShortHeader,
       preventBackHome,
-      preventBackDetails,
     }: {|
       exampleShortHeader: ?ExampleShortHeader,
       preventBackHome?: boolean,
-      preventBackDetails?: boolean,
     |}) => {
       setSelectedExampleShortHeader(exampleShortHeader);
       setPreventBackHome(!!preventBackHome);
-      setPreventBackDetails(!!preventBackDetails);
       if (exampleShortHeader) {
         setNewProjectSetupDialogOpen(true);
       }
@@ -225,7 +216,6 @@ const useExampleOrGameTemplateDialogs = ({
               privateGameTemplateListingDatasFromSameCreator
             }
             preventBackHome={preventBackHome}
-            preventBackDetails={preventBackDetails}
           />
         )}
       </>

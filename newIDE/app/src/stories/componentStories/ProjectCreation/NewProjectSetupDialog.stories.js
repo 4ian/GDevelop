@@ -171,6 +171,36 @@ export const FromExample = () => {
   );
 };
 
+export const FromExampleWithoutGoingBack = () => {
+  return (
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+      <NewProjectSetupDialog
+        storageProviders={[
+          UrlStorageProvider,
+          CloudStorageProvider,
+          GoogleDriveStorageProvider,
+          DownloadFileStorageProvider,
+        ]}
+        onClose={() => action('click on close')()}
+        onCreateEmptyProject={() => action('create empty')()}
+        onCreateFromExample={() => action('create from example')()}
+        onCreateFromAIGeneration={() => action('create from AI generation')()}
+        selectedExampleShortHeader={geometryMonsterExampleShortHeader}
+        onCreateProjectFromPrivateGameTemplate={() =>
+          action('create project from private game template')()
+        }
+        selectedPrivateGameTemplateListingData={null}
+        onSelectExampleShortHeader={() => action('select example')()}
+        onSelectPrivateGameTemplateListingData={() =>
+          action('select private game template')()
+        }
+        privateGameTemplateListingDatasFromSameCreator={[]}
+        preventBackHome
+      />
+    </AuthenticatedUserContext.Provider>
+  );
+};
+
 export const FromPrivateGameTemplate = () => {
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
@@ -197,6 +227,38 @@ export const FromPrivateGameTemplate = () => {
           action('select private game template')()
         }
         privateGameTemplateListingDatasFromSameCreator={[]}
+      />
+    </AuthenticatedUserContext.Provider>
+  );
+};
+
+export const FromPrivateGameTemplateWithoutGoingBack = () => {
+  return (
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+      <NewProjectSetupDialog
+        storageProviders={[
+          UrlStorageProvider,
+          CloudStorageProvider,
+          GoogleDriveStorageProvider,
+          DownloadFileStorageProvider,
+        ]}
+        onClose={() => action('click on close')()}
+        onCreateEmptyProject={() => action('create empty')()}
+        onCreateFromExample={() => action('create from example')()}
+        onCreateFromAIGeneration={() => action('create from AI generation')()}
+        selectedExampleShortHeader={null}
+        onCreateProjectFromPrivateGameTemplate={() =>
+          action('create project from private game template')()
+        }
+        selectedPrivateGameTemplateListingData={
+          fakePrivateGameTemplateListingData
+        }
+        onSelectExampleShortHeader={() => action('select example')()}
+        onSelectPrivateGameTemplateListingData={() =>
+          action('select private game template')()
+        }
+        privateGameTemplateListingDatasFromSameCreator={[]}
+        preventBackHome
       />
     </AuthenticatedUserContext.Provider>
   );

@@ -550,6 +550,7 @@ export const ExampleTile = ({
   onSelect,
   style,
   customTitle,
+  centerTitle,
   useQuickCustomizationThumbnail,
   disabled,
 }: {|
@@ -558,6 +559,7 @@ export const ExampleTile = ({
   /** Props needed so that GridList component can adjust tile size */
   style?: any,
   customTitle?: string,
+  centerTitle?: boolean,
   useQuickCustomizationThumbnail?: boolean,
   disabled?: boolean,
 |}) => {
@@ -617,7 +619,7 @@ export const ExampleTile = ({
           />
         )}
         <Column>
-          <Line justifyContent="flex-start" noMargin>
+          <Line justifyContent={centerTitle ? 'center' : 'flex-start'} noMargin>
             <Text
               style={styles.packTitle}
               size="body2"

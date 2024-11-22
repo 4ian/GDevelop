@@ -121,7 +121,6 @@ type Props = {|
   onAssetPackOpen?: PrivateAssetPackListingData => void,
   onCreateWithGameTemplate?: PrivateGameTemplateListingData => void,
   simulateAppStoreProduct?: boolean,
-  hideOpenAction?: boolean,
 |};
 
 const PrivateGameTemplateInformationPage = ({
@@ -131,7 +130,6 @@ const PrivateGameTemplateInformationPage = ({
   onAssetPackOpen,
   onCreateWithGameTemplate,
   simulateAppStoreProduct,
-  hideOpenAction,
 }: Props) => {
   const { id, name, sellerId } = privateGameTemplateListingData;
   const { privateGameTemplateListingDatas } = React.useContext(
@@ -545,7 +543,7 @@ const PrivateGameTemplateInformationPage = ({
                             />
                           )}
                         </>
-                      ) : !hideOpenAction && onCreateWithGameTemplate ? (
+                      ) : onCreateWithGameTemplate ? (
                         <OpenProductButton
                           productListingData={privateGameTemplateListingData}
                           onClick={() =>

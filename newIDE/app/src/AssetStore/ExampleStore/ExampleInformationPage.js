@@ -74,13 +74,11 @@ const ExampleInformationPage = ({ exampleShortHeader }: Props) => {
           </Trans>
         </AlertMessage>
       )}
-      <ResponsiveLineStackLayout
-        alignItems="center"
-        noMargin
-        noResponsiveLandscape
-      >
+      <ResponsiveLineStackLayout noMargin noResponsiveLandscape>
         {hasIcon ? (
-          <ExampleThumbnailOrIcon exampleShortHeader={exampleShortHeader} />
+          <Line>
+            <ExampleThumbnailOrIcon exampleShortHeader={exampleShortHeader} />
+          </Line>
         ) : null}
         <Column expand>
           {
@@ -107,7 +105,9 @@ const ExampleInformationPage = ({ exampleShortHeader }: Props) => {
               </div>
             </Line>
           }
-          <Text noMargin>{exampleShortHeader.shortDescription}</Text>
+          <Text size="body" displayInlineAsSpan>
+            <MarkdownText source={exampleShortHeader.shortDescription} />
+          </Text>
         </Column>
       </ResponsiveLineStackLayout>
 

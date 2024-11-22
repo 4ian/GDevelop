@@ -44,6 +44,12 @@ const textFieldWithButtonLayoutStyles = {
     marginTop: 0, // Properly align with the text field (only "standard" text fields with margin "none" supported)
     marginLeft: 8,
   },
+  textFieldOnMobileMargins: {
+    ...buttonCommonStyles,
+    // Thanks to the ResponsiveLineStackLayout, the text field is full width on mobile and is spaced out already.
+    marginTop: 0,
+    marginLeft: 0,
+  },
 };
 
 /**
@@ -55,15 +61,19 @@ export const TextFieldWithButtonLayout = ({
   renderTextField,
   renderButton,
 }: TextFieldWithButtonLayoutProps) => {
+  const { isMobile, isLandscape } = useResponsiveWindowSize();
   return (
     <ResponsiveLineStackLayout
       alignItems="flex-start" // Align from the top to stay at the same position when error/multiline
       expand
       noMargin
+      noResponsiveLandscape
     >
       {renderTextField()}
       {renderButton(
-        margin === 'none'
+        isMobile && !isLandscape
+          ? textFieldWithButtonLayoutStyles.textFieldOnMobileMargins
+          : margin === 'none'
           ? noFloatingLabelText
             ? textFieldWithButtonLayoutStyles.standardTextFieldWithoutLabelRightButtonMargins
             : textFieldWithButtonLayoutStyles.standardTextFieldWithLabelRightButtonMargins

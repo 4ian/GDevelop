@@ -17,6 +17,7 @@ import { PrivateGameTemplateStoreContext } from '../PrivateGameTemplates/Private
 import { GridList } from '@material-ui/core';
 import { getExampleAndTemplateTiles } from '../../MainFrame/EditorContainers/HomePage/BuildSection/utils';
 import BackgroundText from '../../UI/BackgroundText';
+import { ColumnStackLayout } from '../../UI/Layout';
 
 const styles = {
   grid: {
@@ -235,7 +236,9 @@ const ExampleStore = ({
             {rowToInsert && <Line>{rowToInsert.element}</Line>}
           </Column>
         ) : (
-          nodesToDisplay
+          <ColumnStackLayout noMargin expand>
+            {nodesToDisplay}
+          </ColumnStackLayout>
         )}
       </Column>
     </React.Fragment>

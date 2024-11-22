@@ -5,17 +5,30 @@ import { type StorageProvider, type SaveAsLocation } from '../ProjectsStorage';
 import TextField from '../UI/TextField';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import IconButton from '../UI/IconButton';
-import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
+import {
+  ColumnStackLayout,
+  LineStackLayout,
+  TextFieldWithButtonLayout,
+} from '../UI/Layout';
 import { Column, Line } from '../UI/Grid';
 import { useOnlineStatus } from '../Utils/OnlineStatus';
 import Refresh from '../UI/CustomSvgIcons/Refresh';
-import { type GeneratedProject } from '../Utils/GDevelopServices/Generation';
+import {
+  createGeneratedProject,
+  type GeneratedProject,
+} from '../Utils/GDevelopServices/Generation';
 import Text from '../UI/Text';
 import generatePrompt from '../Utils/ProjectPromptGenerator';
 import ProjectGeneratingDialog from './ProjectGeneratingDialog';
 import RobotIcon from './RobotIcon';
 import GetSubscriptionCard from '../Profile/Subscription/GetSubscriptionCard';
-import { type NewProjectSetup } from './NewProjectSetupDialog';
+import {
+  generateProjectName,
+  type NewProjectSetup,
+} from './NewProjectSetupDialog';
+import useAlertDialog from '../UI/Alert/useAlertDialog';
+import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
+import RaisedButton from '../UI/RaisedButton';
 
 type Props = {|
   onCreateFromAIGeneration: (
@@ -26,10 +39,8 @@ type Props = {|
   isGeneratingProject: boolean,
   storageProvider: StorageProvider,
   saveAsLocation: ?SaveAsLocation,
-  generatingProjectId: ?string,
-  onGenerationClosed: () => void,
-  generationPrompt: string,
-  onGenerationPromptChange: (generationPrompt: string) => void,
+  onGenerationStarted: () => void,
+  onGenerationEnded: () => void,
 |};
 
 const AIPromptField = ({
@@ -38,68 +49,135 @@ const AIPromptField = ({
   isGeneratingProject,
   storageProvider,
   saveAsLocation,
-  generatingProjectId,
-  onGenerationClosed,
-  generationPrompt,
-  onGenerationPromptChange,
+  onGenerationStarted,
+  onGenerationEnded,
 }: Props): React.Node => {
-  const { authenticated, limits } = React.useContext(AuthenticatedUserContext);
+  const [generationPrompt, setGenerationPrompt] = React.useState<string>('');
+  const {
+    authenticated,
+    limits,
+    profile,
+    getAuthorizationHeader,
+    onRefreshLimits,
+  } = React.useContext(AuthenticatedUserContext);
   const isOnline = useOnlineStatus();
   const generationCurrentUsage = limits
     ? limits.quotas['ai-project-generation']
     : null;
-  const canGenerateProjectFromPrompt =
+  const hasUsagesAvailable =
     generationCurrentUsage && !generationCurrentUsage.limitReached;
-  const disabled = isProjectOpening || isGeneratingProject;
+  const disabled =
+    isProjectOpening ||
+    isGeneratingProject ||
+    !authenticated ||
+    !isOnline ||
+    !hasUsagesAvailable;
+  const { showAlert } = useAlertDialog();
+  const [generatingProjectId, setGeneratingProjectId] = React.useState<?string>(
+    null
+  );
+  const generateProject = React.useCallback(
+    async () => {
+      if (disabled) return;
+      if (!profile) return;
+
+      onGenerationStarted();
+      try {
+        const generatedProject = await createGeneratedProject(
+          getAuthorizationHeader,
+          {
+            userId: profile.id,
+            prompt: generationPrompt,
+            width: 1280, // This will be overriden by the AI service.
+            height: 720, // This will be overriden by the AI service.
+            projectName: generateProjectName(),
+          }
+        );
+        setGeneratingProjectId(generatedProject.id);
+      } catch (error) {
+        const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+          error
+        );
+        if (
+          extractedStatusAndCode &&
+          extractedStatusAndCode.code === 'project-generation/quota-exceeded'
+        ) {
+          setGenerationPrompt('');
+          // Fetch the limits again to show the warning about quota.
+          await onRefreshLimits();
+        } else {
+          showAlert({
+            title: t`Unable to generate project`,
+            message: t`Looks like the AI service is not available. Please try again later or create a project without a prompt.`,
+          });
+        }
+        setGeneratingProjectId(null);
+        onGenerationEnded();
+      }
+    },
+    [
+      disabled,
+      getAuthorizationHeader,
+      generationPrompt,
+      profile,
+      showAlert,
+      onRefreshLimits,
+      onGenerationStarted,
+      onGenerationEnded,
+    ]
+  );
 
   return (
     <>
       <ColumnStackLayout noMargin expand>
-        <LineStackLayout
-          expand
-          noMargin
-          alignItems="center"
-          justifyContent="center"
-        >
-          <RobotIcon />
-          <TextField
-            type="text"
-            multiline
-            maxLength={200}
-            fullWidth
-            disabled={
-              disabled ||
-              !authenticated ||
-              !isOnline ||
-              !canGenerateProjectFromPrompt
-            }
-            value={generationPrompt}
-            onChange={(e, text) => onGenerationPromptChange(text)}
-            floatingLabelText={<Trans>AI prompt</Trans>}
-            floatingLabelFixed
-            translatableHintText={
-              !authenticated || !isOnline
-                ? t`Log in to enter a prompt`
-                : t`Type a prompt or generate one`
-            }
-            endAdornment={
-              <IconButton
-                size="small"
-                onClick={() => onGenerationPromptChange(generatePrompt())}
-                tooltip={t`Generate random prompt`}
-                disabled={
-                  disabled ||
-                  !authenticated ||
-                  !isOnline ||
-                  !canGenerateProjectFromPrompt
+        <TextFieldWithButtonLayout
+          margin="none"
+          renderTextField={() => (
+            <LineStackLayout
+              expand
+              noMargin
+              alignItems="center"
+              justifyContent="center"
+            >
+              <RobotIcon />
+              <TextField
+                type="text"
+                maxLength={200}
+                fullWidth
+                disabled={disabled}
+                value={generationPrompt}
+                onChange={(e, text) => setGenerationPrompt(text)}
+                floatingLabelText={<Trans>Type a prompt</Trans>}
+                floatingLabelFixed
+                translatableHintText={
+                  !authenticated || !isOnline
+                    ? t`Log in to enter a prompt`
+                    : t`Type a prompt or generate one`
                 }
-              >
-                <Refresh />
-              </IconButton>
-            }
-          />
-        </LineStackLayout>
-        {authenticated && !canGenerateProjectFromPrompt && (
+                endAdornment={
+                  <IconButton
+                    size="small"
+                    onClick={() => setGenerationPrompt(generatePrompt())}
+                    tooltip={t`Generate random prompt`}
+                    disabled={disabled}
+                  >
+                    <Refresh />
+                  </IconButton>
+                }
+              />
+            </LineStackLayout>
+          )}
+          renderButton={style => (
+            <RaisedButton
+              primary
+              label={<Trans>Create game</Trans>}
+              onClick={generateProject}
+              disabled={disabled || !generationPrompt}
+              style={style}
+            />
+          )}
+        />
+        {authenticated && !hasUsagesAvailable && (
           <GetSubscriptionCard subscriptionDialogOpeningReason="Generate project from prompt">
             <Line>
               <Column noMargin>
@@ -120,7 +198,10 @@ const AIPromptField = ({
           storageProvider={storageProvider}
           saveAsLocation={saveAsLocation}
           onCreate={onCreateFromAIGeneration}
-          onClose={onGenerationClosed}
+          onClose={() => {
+            setGeneratingProjectId(null);
+            onGenerationEnded();
+          }}
         />
       )}
     </>

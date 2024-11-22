@@ -3681,7 +3681,6 @@ const MainFrame = (props: Props) => {
                       onSelectPrivateGameTemplateListingData({
                         privateGameTemplateListingData,
                         preventBackHome: true,
-                        preventBackDetails: true,
                       });
                     },
                     onCreateProjectFromExample: createProjectFromExample,

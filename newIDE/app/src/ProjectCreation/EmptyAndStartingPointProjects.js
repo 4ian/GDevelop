@@ -14,7 +14,7 @@ import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import { GridList, GridListTile } from '@material-ui/core';
 import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
-import classes from './EmptyAndBaseProjects.module.css';
+import classes from './EmptyAndStartingPointProjects.module.css';
 import classNames from 'classnames';
 import { getItemsColumns } from './NewProjectSetupDialog';
 
@@ -50,7 +50,6 @@ const EmptyProjectTile = ({
           className={classNames({
             [classes.emptyProject]: true,
           })}
-          // onClick on the div instead of the tile, to avoid being able to click outside the button.
           onClick={disabled ? undefined : onSelectEmptyProject}
           tabIndex={0}
           onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
@@ -68,12 +67,29 @@ const EmptyProjectTile = ({
         </div>
         <Column>
           <Line justifyContent="flex-start" noMargin>
+            {/* Add a fake text to match the height of the other tiles on the row */}
             <Text size="body2">&nbsp;</Text>
           </Line>
         </Column>
       </div>
     </GridListTile>
   );
+};
+
+const getStartingPointExampleShortHeaderTitle = (
+  exampleShortHeader: ExampleShortHeader
+): string => {
+  return exampleShortHeader.name
+    .toLowerCase()
+    .replace('starting', '')
+    .trim()
+    .replace(/^./, str => str.toUpperCase());
+};
+
+export const isStartingPointExampleShortHeader = (
+  exampleShortHeader: ExampleShortHeader
+): boolean => {
+  return exampleShortHeader.tags.includes('Starting point');
 };
 
 type Props = {|
@@ -84,7 +100,7 @@ type Props = {|
   saveAsLocation: ?SaveAsLocation,
 |};
 
-const EmptyAndBaseProjects = ({
+const EmptyAndStartingPointProjects = ({
   onSelectExampleShortHeader,
   onSelectEmptyProject,
   disabled,
@@ -96,16 +112,14 @@ const EmptyAndBaseProjects = ({
   const { exampleShortHeaders } = React.useContext(ExampleStoreContext);
   const baseExampleShortHeaders = React.useMemo(
     () => {
-      // todo proper filter on base tag
-      return exampleShortHeaders ? exampleShortHeaders.slice(0, 3) : [];
+      return exampleShortHeaders
+        ? exampleShortHeaders.filter(isStartingPointExampleShortHeader)
+        : [];
     },
     [exampleShortHeaders]
   );
   const { windowSize, isLandscape } = useResponsiveWindowSize();
-  // To avoid layout shift while the items are loading.
-  const columnsCount = baseExampleShortHeaders
-    ? getItemsColumns(windowSize, isLandscape)
-    : 1;
+  const columnsCount = getItemsColumns(windowSize, isLandscape);
 
   return (
     <I18n>
@@ -126,6 +140,10 @@ const EmptyAndBaseProjects = ({
               onSelect={() => onSelectExampleShortHeader(exampleShortHeader)}
               key={exampleShortHeader.name}
               disabled={disabled}
+              customTitle={getStartingPointExampleShortHeaderTitle(
+                exampleShortHeader
+              )}
+              centerTitle
             />
           ))}
         </GridList>
@@ -134,4 +152,4 @@ const EmptyAndBaseProjects = ({
   );
 };
 
-export default EmptyAndBaseProjects;
+export default EmptyAndStartingPointProjects;

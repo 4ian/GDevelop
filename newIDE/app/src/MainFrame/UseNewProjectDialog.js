@@ -162,7 +162,7 @@ const useExampleOrGameTemplateDialogs = ({
 
         onSelectExampleShortHeader({
           exampleShortHeader,
-          preventBackHome: false,
+          preventBackHome: true, // We open the dialog for this example only.
         });
       } catch (error) {
         console.error('Error caught while opening example:', error);

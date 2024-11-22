@@ -21,6 +21,10 @@ declare type ObjectsLists = Hashtable<gdjs.RuntimeObject[]>;
  * if any. If the JavaScript code is running in a scene, this will be undefined (so you can't use this in a scene).
  */
 declare type EventsFunctionContext = {
+  /**
+   * If the action in which the JavaScript runs is asynchronous, this will be non-null and
+   * allows to mark the action as finished by calling `task.resolve()`.
+   */
   task?: gdjs.ManuallyResolvableTask;
 
   /**  Get the list of instances of the specified object. */
@@ -42,10 +46,23 @@ declare type EventsFunctionContext = {
   /** Return the number of instances of the specified object on the scene. */
   getInstancesCountOnScene: (objectName: string) => integer;
 
-  /**  Get the value (string or number) of an argument that was passed to the events function. To get objects, use `getObjects`. */
-  getArgument: (argumentName: string) => string | number;
+  /**  Get the value (string, number, boolean or a `gdjs.Variable`) of an argument that was passed to the events function. To get **objects**, use `getObjects` instead. */
+  getArgument: (argumentName: string) => string | number | gdjs.Variable;
 
-  /** The return value that should be returned by the expression or the condition. */
+  /**
+   * Set the return value that should be returned by the expression or the condition.
+   * For example:
+   *
+   * ```js
+   * // When the condition is true:
+   * eventsFunctionContext.returnValue = true;
+   * ```
+   *
+   * ```js
+   * // To return a string for an expression:
+   * eventsFunctionContext.returnValue = "Hello World";
+   * ```
+   */
   returnValue: boolean | number | string;
 
   /**  Do not use this. Use `runtimeScene.getLayer` instead. */

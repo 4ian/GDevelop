@@ -57,6 +57,9 @@ namespace gdjs {
     hasPressedLeftKey: boolean = false;
     hasPressedJumpKey: boolean = false;
     hasJumpKeyBeenConsumed: boolean = false;
+    private _wasStickUsed: boolean = false;
+    private _stickAngle: float = 0;
+    private _stickForce: float = 0;
     _currentForwardSpeed: float = 0;
     _currentSidewaysSpeed: float = 0;
     _currentFallSpeed: float = 0;
@@ -334,31 +337,52 @@ namespace gdjs {
       const oldY = this.character.GetPosition().GetY();
       const oldZ = this.character.GetPosition().GetZ();
 
+      let targetedForwardSpeed = 0;
       // Change the speed according to the player's input.
       // TODO Give priority to the last key for faster reaction time.
       if (this.hasPressedBackwardKey !== this.hasPressedForwardKey) {
         if (this.hasPressedBackwardKey) {
-          if (this._currentForwardSpeed <= 0) {
-            this._currentForwardSpeed -= this._forwardAcceleration * timeDelta;
-          } else {
-            // Turn back at least as fast as it would stop.
-            this._currentForwardSpeed -=
-              Math.max(this._forwardAcceleration, this._forwardDeceleration) *
-              timeDelta;
-          }
+          targetedForwardSpeed = -this._forwardSpeedMax;
         } else if (this.hasPressedForwardKey) {
-          if (this._currentForwardSpeed >= 0) {
-            this._currentForwardSpeed += this._forwardAcceleration * timeDelta;
-          } else {
-            this._currentForwardSpeed +=
-              Math.max(this._forwardAcceleration, this._forwardDeceleration) *
-              timeDelta;
-          }
+          targetedForwardSpeed = this._forwardSpeedMax;
         }
+      } else if (this._stickForce !== 0) {
+        targetedForwardSpeed =
+          -this._forwardSpeedMax *
+          this._stickForce *
+          Math.sin(gdjs.toRad(this._stickAngle));
       }
-      // Take deceleration into account only if no key is pressed.
-      if (this.hasPressedBackwardKey === this.hasPressedForwardKey) {
-        // Set the speed to 0 if the speed was too low.
+      if (targetedForwardSpeed < 0) {
+        if (this._currentForwardSpeed <= targetedForwardSpeed) {
+          // Reduce the speed to match the stick force.
+          this._currentForwardSpeed = Math.min(
+            targetedForwardSpeed,
+            this._currentForwardSpeed + this._forwardDeceleration * timeDelta
+          );
+        } else if (this._currentForwardSpeed <= 0) {
+          this._currentForwardSpeed -= this._forwardAcceleration * timeDelta;
+        } else {
+          // Turn back at least as fast as it would stop.
+          this._currentForwardSpeed -=
+            Math.max(this._forwardAcceleration, this._forwardDeceleration) *
+            timeDelta;
+        }
+      } else if (targetedForwardSpeed > 0) {
+        if (this._currentForwardSpeed >= targetedForwardSpeed) {
+          // Reduce the speed to match the stick force.
+          this._currentForwardSpeed = Math.max(
+            targetedForwardSpeed,
+            this._currentForwardSpeed - this._forwardDeceleration * timeDelta
+          );
+        } else if (this._currentForwardSpeed >= 0) {
+          this._currentForwardSpeed += this._forwardAcceleration * timeDelta;
+        } else {
+          // Turn back at least as fast as it would stop.
+          this._currentForwardSpeed +=
+            Math.max(this._forwardAcceleration, this._forwardDeceleration) *
+            timeDelta;
+        }
+      } else {
         if (this._currentForwardSpeed < 0) {
           this._currentForwardSpeed = Math.max(
             this._currentForwardSpeed + this._forwardDeceleration * timeDelta,
@@ -378,31 +402,49 @@ namespace gdjs {
         this._forwardSpeedMax
       );
 
+      let targetedSidewaysSpeed = 0;
       if (this.hasPressedLeftKey !== this.hasPressedRightKey) {
         if (this.hasPressedLeftKey) {
-          if (this._currentSidewaysSpeed <= 0) {
-            this._currentSidewaysSpeed -=
-              this._sidewaysAcceleration * timeDelta;
-          } else {
-            // Turn back at least as fast as it would stop.
-            this._currentSidewaysSpeed -=
-              Math.max(this._sidewaysAcceleration, this._sidewaysDeceleration) *
-              timeDelta;
-          }
+          targetedSidewaysSpeed = -this._sidewaysSpeedMax;
         } else if (this.hasPressedRightKey) {
-          if (this._currentSidewaysSpeed >= 0) {
-            this._currentSidewaysSpeed +=
-              this._sidewaysAcceleration * timeDelta;
-          } else {
-            this._currentSidewaysSpeed +=
-              Math.max(this._sidewaysAcceleration, this._sidewaysDeceleration) *
-              timeDelta;
-          }
+          targetedSidewaysSpeed = this._sidewaysSpeedMax;
         }
+      } else if (this._stickForce !== 0) {
+        targetedSidewaysSpeed =
+          this._sidewaysSpeedMax *
+          this._stickForce *
+          Math.cos(gdjs.toRad(this._stickAngle));
       }
-      // Take deceleration into account only if no key is pressed.
-      if (this.hasPressedLeftKey === this.hasPressedRightKey) {
-        // Set the speed to 0 if the speed was too low.
+      if (targetedSidewaysSpeed < 0) {
+        if (this._currentSidewaysSpeed <= targetedSidewaysSpeed) {
+          // Reduce the speed to match the stick force.
+          this._currentSidewaysSpeed = Math.min(
+            targetedSidewaysSpeed,
+            this._currentSidewaysSpeed + this._sidewaysDeceleration * timeDelta
+          );
+        } else if (this._currentSidewaysSpeed <= 0) {
+          this._currentSidewaysSpeed -= this._sidewaysAcceleration * timeDelta;
+        } else {
+          // Turn back at least as fast as it would stop.
+          this._currentSidewaysSpeed -=
+            Math.max(this._sidewaysAcceleration, this._sidewaysDeceleration) *
+            timeDelta;
+        }
+      } else if (targetedSidewaysSpeed > 0) {
+        if (this._currentSidewaysSpeed >= targetedSidewaysSpeed) {
+          // Reduce the speed to match the stick force.
+          this._currentSidewaysSpeed = Math.max(
+            targetedSidewaysSpeed,
+            this._currentSidewaysSpeed - this._sidewaysDeceleration * timeDelta
+          );
+        } else if (this._currentSidewaysSpeed >= 0) {
+          this._currentSidewaysSpeed += this._sidewaysAcceleration * timeDelta;
+        } else {
+          this._currentSidewaysSpeed +=
+            Math.max(this._sidewaysAcceleration, this._sidewaysDeceleration) *
+            timeDelta;
+        }
+      } else {
         if (this._currentSidewaysSpeed < 0) {
           this._currentSidewaysSpeed = Math.max(
             this._currentSidewaysSpeed + this._sidewaysDeceleration * timeDelta,
@@ -664,6 +706,8 @@ namespace gdjs {
       this.hasPressedRightKey = false;
       this.hasPressedLeftKey = false;
       this.hasPressedJumpKey = false;
+      this._stickForce = 0;
+      this._stickAngle = 0;
 
       this._hasReallyMoved =
         Math.abs(this.character.GetPosition().GetX() - oldX) >
@@ -925,6 +969,11 @@ namespace gdjs {
 
     simulateJumpKey(): void {
       this.hasPressedJumpKey = true;
+    }
+
+    simulateStick(stickAngle: float, stickForce: float) {
+      this._stickAngle = stickAngle;
+      this._stickForce = Math.max(0, Math.min(1, stickForce));
     }
 
     /**

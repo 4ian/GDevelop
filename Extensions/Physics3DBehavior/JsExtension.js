@@ -1805,6 +1805,25 @@ module.exports = {
         .setFunctionName('simulateJumpKey');
 
       aut
+        .addAction(
+          'SimulateStick',
+          _('Simulate stick control'),
+          _('Simulate a stick control.'),
+          _(
+            'Simulate a stick control for _PARAM0_ with a _PARAM2_ angle and a _PARAM3_ force'
+          ),
+          _('Character controls'),
+          'res/physics3d.svg',
+          'res/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3DBehavior')
+        .addParameter('expression', _('Stick angle (in degrees)'))
+        .addParameter('expression', _('Stick force (between 0 and 1)'))
+        .markAsAdvanced()
+        .setFunctionName('simulateStick');
+
+      aut
         .addScopedCondition(
           'IsMovingEvenALittle',
           _('Is moving'),
@@ -1872,7 +1891,9 @@ module.exports = {
           'number',
           'CurrentForwardSpeed',
           _('Current forward speed'),
-          _('the current forward speed of the object. The object moves backward with negative values and forward with positive ones'),
+          _(
+            'the current forward speed of the object. The object moves backward with negative values and forward with positive ones'
+          ),
           _('the current forward speed'),
           _('Character state'),
           'res/physics3d.svg'
@@ -1888,7 +1909,9 @@ module.exports = {
           'number',
           'CurrentSidewaysSpeed',
           _('Current sideways speed'),
-          _('the current sideways speed of the object. The object moves to the left with negative values and to the right with positive ones'),
+          _(
+            'the current sideways speed of the object. The object moves to the left with negative values and to the right with positive ones'
+          ),
           _('the current sideways speed'),
           _('Character state'),
           'res/physics3d.svg'

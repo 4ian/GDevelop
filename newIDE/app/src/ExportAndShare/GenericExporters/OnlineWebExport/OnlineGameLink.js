@@ -194,10 +194,10 @@ const OnlineGameLink = ({
               </Line>
             </Column>
           )}
-          {isShareDialogOpen && game && (
+          {isShareDialogOpen && (
             <ShareOnlineGameDialog
               gameThumbnailUrl={gameThumbnailUrl}
-              gameName={game.gameName}
+              gameName={game ? game.gameName : undefined} // This can happen if the game is not owned.
               buildOrGameUrl={buildOrGameUrl}
               isBuildPublished={!!isBuildPublished}
               loadingText={
@@ -209,7 +209,7 @@ const OnlineGameLink = ({
                 )
               }
               onClose={() => setIsShareDialogOpen(false)}
-              onOpenGameDashboard={openGameDashboard}
+              onOpenGameDashboard={game ? openGameDashboard : undefined}
             />
           )}
         </>

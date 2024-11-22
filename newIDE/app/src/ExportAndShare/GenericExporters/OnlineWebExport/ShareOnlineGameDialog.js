@@ -31,9 +31,9 @@ const styles = {
 type Props = {|
   buildOrGameUrl: ?string,
   gameThumbnailUrl: ?string,
-  gameName: string,
+  gameName: ?string,
   isBuildPublished: boolean,
-  onOpenGameDashboard: () => void,
+  onOpenGameDashboard?: () => void,
   onClose: () => void,
   loadingText: ?React.Node,
 |};
@@ -63,10 +63,11 @@ const ShareOnlineGameDialog = ({
           label={<Trans>Done</Trans>}
           primary
           onClick={onClose}
+          disabled={!!loadingText}
         />,
       ]}
       secondaryActions={[
-        buildOrGameUrl && !loadingText ? (
+        buildOrGameUrl && !loadingText && onOpenGameDashboard ? (
           <FlatButton
             key="publish"
             primary
@@ -83,7 +84,7 @@ const ShareOnlineGameDialog = ({
         <ColumnStackLayout noMargin expand>
           <Column noMargin>
             <ResponsiveLineStackLayout noMargin noResponsiveLandscape>
-              {gameThumbnailUrl && (
+              {gameThumbnailUrl && gameName && (
                 <GameThumbnail
                   background="light"
                   fullWidthOnMobile

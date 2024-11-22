@@ -1736,10 +1736,10 @@ module.exports = {
 
       aut
         .addScopedAction(
-          'SimulateMoveForwardKey',
+          'SimulateForwardKey',
           _('Simulate move forward key press'),
           _('Simulate a press of the move forward key.'),
-          _('Simulate pressing move forward key for _PARAM0_'),
+          _('Simulate pressing Forward key for _PARAM0_'),
           _('Character controls'),
           'res/physics3d.svg',
           'res/physics3d.svg'
@@ -1747,6 +1747,48 @@ module.exports = {
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3DBehavior')
         .setFunctionName('simulateForwardKey');
+
+      aut
+        .addScopedAction(
+          'SimulateBackwardKey',
+          _('Simulate move backward key press'),
+          _('Simulate a press of the move backward key.'),
+          _('Simulate pressing Backward key for _PARAM0_'),
+          _('Character controls'),
+          'res/physics3d.svg',
+          'res/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3DBehavior')
+        .setFunctionName('simulateBackwardKey');
+
+      aut
+        .addScopedAction(
+          'SimulateRightKey',
+          _('Simulate move right key press'),
+          _('Simulate a press of the move right key.'),
+          _('Simulate pressing Right key for _PARAM0_'),
+          _('Character controls'),
+          'res/physics3d.svg',
+          'res/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3DBehavior')
+        .setFunctionName('simulateRightKey');
+
+      aut
+        .addScopedAction(
+          'SimulateLeftKey',
+          _('Simulate move left key press'),
+          _('Simulate a press of the move left key.'),
+          _('Simulate pressing Left key for _PARAM0_'),
+          _('Character controls'),
+          'res/physics3d.svg',
+          'res/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3DBehavior')
+        .setFunctionName('simulateLeftKey');
 
       aut
         .addScopedAction(
@@ -1826,11 +1868,11 @@ module.exports = {
         .setFunctionName('isFalling');
 
       aut
-        .addExpressionAndCondition(
+        .addExpressionAndConditionAndAction(
           'number',
           'CurrentForwardSpeed',
           _('Current forward speed'),
-          _('the current forward speed of the object.'),
+          _('the current forward speed of the object. The object moves backward with negative values and forward with positive ones'),
           _('the current forward speed'),
           _('Character state'),
           'res/physics3d.svg'
@@ -1838,10 +1880,27 @@ module.exports = {
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3DBehavior')
         .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
-        .setFunctionName('getCurrentForwardSpeed');
+        .setFunctionName('setCurrentForwardSpeed')
+        .setGetter('getCurrentForwardSpeed');
 
       aut
-        .addExpressionAndCondition(
+        .addExpressionAndConditionAndAction(
+          'number',
+          'CurrentSidewaysSpeed',
+          _('Current sideways speed'),
+          _('the current sideways speed of the object. The object moves to the left with negative values and to the right with positive ones'),
+          _('the current sideways speed'),
+          _('Character state'),
+          'res/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3DBehavior')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setCurrentSidewaysSpeed')
+        .setGetter('getCurrentSidewaysSpeed');
+
+      aut
+        .addExpressionAndConditionAndAction(
           'number',
           'ForwardSpeedMax',
           _('Forward max speed'),

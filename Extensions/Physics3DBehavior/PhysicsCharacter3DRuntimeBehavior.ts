@@ -43,6 +43,9 @@ namespace gdjs {
     _forwardAcceleration: float;
     _forwardDeceleration: float;
     _forwardSpeedMax: float;
+    _sidewaysAcceleration: float;
+    _sidewaysDeceleration: float;
+    _sidewaysSpeedMax: float;
     _gravity: float;
     _maxFallingSpeed: float;
     _jumpSpeed: float;
@@ -50,9 +53,12 @@ namespace gdjs {
 
     hasPressedForwardKey: boolean = false;
     hasPressedBackwardKey: boolean = false;
+    hasPressedRightKey: boolean = false;
+    hasPressedLeftKey: boolean = false;
     hasPressedJumpKey: boolean = false;
     hasJumpKeyBeenConsumed: boolean = false;
     _currentForwardSpeed: float = 0;
+    _currentSidewaysSpeed: float = 0;
     _currentFallSpeed: float = 0;
     _canJump: boolean = false;
     _currentJumpSpeed: float = 0;
@@ -83,6 +89,9 @@ namespace gdjs {
       this._forwardAcceleration = behaviorData.forwardAcceleration;
       this._forwardDeceleration = behaviorData.forwardDeceleration;
       this._forwardSpeedMax = behaviorData.forwardSpeedMax;
+      this._sidewaysAcceleration = behaviorData.sidewaysAcceleration;
+      this._sidewaysDeceleration = behaviorData.sidewaysDeceleration;
+      this._sidewaysSpeedMax = behaviorData.sidewaysSpeedMax;
       this._gravity = behaviorData.gravity;
       this._maxFallingSpeed = behaviorData.fallingSpeedMax;
       this._jumpSustainTime = behaviorData.jumpSustainTime;
@@ -363,9 +372,54 @@ namespace gdjs {
           );
         }
       }
-      this._currentForwardSpeed = Math.max(
+      this._currentForwardSpeed = gdjs.evtTools.common.clamp(
+        this._currentForwardSpeed,
         -this._forwardSpeedMax,
-        Math.min(this._forwardSpeedMax, this._currentForwardSpeed)
+        this._forwardSpeedMax
+      );
+
+      if (this.hasPressedLeftKey !== this.hasPressedRightKey) {
+        if (this.hasPressedLeftKey) {
+          if (this._currentSidewaysSpeed <= 0) {
+            this._currentSidewaysSpeed -=
+              this._sidewaysAcceleration * timeDelta;
+          } else {
+            // Turn back at least as fast as it would stop.
+            this._currentSidewaysSpeed -=
+              Math.max(this._sidewaysAcceleration, this._sidewaysDeceleration) *
+              timeDelta;
+          }
+        } else if (this.hasPressedRightKey) {
+          if (this._currentSidewaysSpeed >= 0) {
+            this._currentSidewaysSpeed +=
+              this._sidewaysAcceleration * timeDelta;
+          } else {
+            this._currentSidewaysSpeed +=
+              Math.max(this._sidewaysAcceleration, this._sidewaysDeceleration) *
+              timeDelta;
+          }
+        }
+      }
+      // Take deceleration into account only if no key is pressed.
+      if (this.hasPressedLeftKey === this.hasPressedRightKey) {
+        // Set the speed to 0 if the speed was too low.
+        if (this._currentSidewaysSpeed < 0) {
+          this._currentSidewaysSpeed = Math.max(
+            this._currentSidewaysSpeed + this._sidewaysDeceleration * timeDelta,
+            0
+          );
+        }
+        if (this._currentSidewaysSpeed > 0) {
+          this._currentSidewaysSpeed = Math.min(
+            this._currentSidewaysSpeed - this._sidewaysDeceleration * timeDelta,
+            0
+          );
+        }
+      }
+      this._currentSidewaysSpeed = gdjs.evtTools.common.clamp(
+        this._currentSidewaysSpeed,
+        -this._sidewaysSpeedMax,
+        this._sidewaysSpeedMax
       );
 
       let hasJustJumped = false;
@@ -479,12 +533,30 @@ namespace gdjs {
       }
       const groundVelocity = this.character.GetGroundVelocity();
 
-      const forwardSpeed = this._currentForwardSpeed * worldInvScale;
+      let forwardSpeed = this._currentForwardSpeed;
+      let sidewaysSpeed = this._currentSidewaysSpeed;
+      if (sidewaysSpeed !== 0 && forwardSpeed !== 0) {
+        // It avoids the speed vector to go outside of an ellipse.
+        const speedNormalizationInverseRatio = Math.hypot(
+          forwardSpeed / this._forwardSpeedMax,
+          sidewaysSpeed / this._sidewaysSpeedMax
+        );
+        if (speedNormalizationInverseRatio > 1) {
+          forwardSpeed /= speedNormalizationInverseRatio;
+          sidewaysSpeed /= speedNormalizationInverseRatio;
+        }
+      }
+      forwardSpeed *= worldInvScale;
+      sidewaysSpeed *= worldInvScale;
       const angle = gdjs.toRad(this.owner.getAngle());
+      const cosA = Math.cos(angle);
+      const sinA = Math.sin(angle);
+      const speedX = forwardSpeed * cosA - sidewaysSpeed * sinA;
+      const speedY = forwardSpeed * sinA + sidewaysSpeed * cosA;
       this.character.SetLinearVelocity(
         this.getVec3(
-          groundVelocity.GetX() + forwardSpeed * Math.cos(angle),
-          groundVelocity.GetY() + forwardSpeed * Math.sin(angle),
+          groundVelocity.GetX() + speedX,
+          groundVelocity.GetY() + speedY,
           // The ground velocity is not added on Z as it's handled by mStickToFloorStepDown.
           (this._currentJumpSpeed - this._currentFallSpeed) * worldInvScale
         )
@@ -588,6 +660,9 @@ namespace gdjs {
       // );
 
       this.hasPressedForwardKey = false;
+      this.hasPressedBackwardKey = false;
+      this.hasPressedRightKey = false;
+      this.hasPressedLeftKey = false;
       this.hasPressedJumpKey = false;
 
       this._hasReallyMoved =
@@ -789,6 +864,26 @@ namespace gdjs {
     }
 
     /**
+     * Get the current speed of the Platformer Object.
+     * @returns The current speed.
+     */
+    getCurrentSidewaysSpeed(): float {
+      return this._currentSidewaysSpeed;
+    }
+
+    /**
+     * Set the current speed of the Platformer Object.
+     * @param currentSidewaysSpeed The current speed.
+     */
+    setForwardSidewaysSpeed(currentSidewaysSpeed: float): void {
+      this._currentSidewaysSpeed = gdjs.evtTools.common.clamp(
+        currentSidewaysSpeed,
+        -this._currentSidewaysSpeed,
+        this._currentSidewaysSpeed
+      );
+    }
+
+    /**
      * Get the speed at which the object is falling. It is 0 when the object is on a floor, and non 0 as soon as the object leaves the floor.
      * @returns The current fall speed.
      */
@@ -814,6 +909,18 @@ namespace gdjs {
 
     simulateForwardKey(): void {
       this.hasPressedForwardKey = true;
+    }
+
+    simulateBackwardKey(): void {
+      this.hasPressedBackwardKey = true;
+    }
+
+    simulateRightKey(): void {
+      this.hasPressedRightKey = true;
+    }
+
+    simulateLeftKey(): void {
+      this.hasPressedLeftKey = true;
     }
 
     simulateJumpKey(): void {

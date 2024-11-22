@@ -8,7 +8,7 @@ import TextField from '../UI/TextField';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import generateName from '../Utils/ProjectNameGenerator';
 import IconButton from '../UI/IconButton';
-import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
+import { ColumnStackLayout } from '../UI/Layout';
 import { emptyStorageProvider } from '../ProjectsStorage/ProjectStorageProviders';
 import { findEmptyPathInWorkspaceFolder } from '../ProjectsStorage/LocalFileStorageProvider/LocalPathFinder';
 import SelectField from '../UI/SelectField';
@@ -258,10 +258,9 @@ const NewProjectSetupDialog = ({
 
   const isLoading = isGeneratingProject || isProjectOpening;
 
-  const isSelectedGameTemplateOwned = React.useMemo(
+  const selectedGameTemplatePurchaseUsageType = React.useMemo(
     () =>
-      !selectedPrivateGameTemplateListingData ||
-      !!getUserProductPurchaseUsageType({
+      getUserProductPurchaseUsageType({
         productId: selectedPrivateGameTemplateListingData
           ? selectedPrivateGameTemplateListingData.id
           : null,
@@ -276,6 +275,9 @@ const NewProjectSetupDialog = ({
       receivedGameTemplates,
     ]
   );
+  const isSelectedGameTemplateOwned =
+    !selectedPrivateGameTemplateListingData ||
+    !!selectedGameTemplatePurchaseUsageType;
 
   // On the local app, prefer to always have something saved so that the user is not blocked.
   // On the web-app, allow to create a project without saving it, unless a private game template is selected
@@ -546,11 +548,14 @@ const NewProjectSetupDialog = ({
                   <ExampleInformationPage
                     exampleShortHeader={selectedExampleShortHeader}
                   />
-                ) : selectedPrivateGameTemplateListingData ? (
+                ) : selectedPrivateGameTemplateListingData &&
+                  selectedGameTemplatePurchaseUsageType ? (
                   <PrivateGameTemplateOwnedInformationPage
                     privateGameTemplateListingData={
                       selectedPrivateGameTemplateListingData
                     }
+                    purchaseUsageType={selectedGameTemplatePurchaseUsageType}
+                    onStoreProductOpened={onClose}
                   />
                 ) : null}
                 {emptyProjectSelected && (
@@ -564,72 +569,69 @@ const NewProjectSetupDialog = ({
                     onCustomWidthChange={setCustomWidth}
                   />
                 )}
-                <ResponsiveLineStackLayout noMargin noResponsiveLandscape>
-                  <TextField
-                    type="text"
-                    errorText={projectNameError}
-                    disabled={isLoading}
-                    value={projectName}
-                    onChange={onChangeProjectName}
-                    floatingLabelText={<Trans>Project name</Trans>}
-                    endAdornment={
-                      <IconButton
-                        size="small"
-                        onClick={() => setProjectName(generateProjectName())}
-                        tooltip={t`Generate random name`}
-                        disabled={isLoading}
-                      >
-                        <Refresh />
-                      </IconButton>
-                    }
-                    autoFocus="desktop"
-                    maxLength={CLOUD_PROJECT_NAME_MAX_LENGTH}
-                    fullWidth
-                  />
-                  <SelectField
-                    fullWidth
-                    disabled={isLoading}
-                    floatingLabelText={
-                      <Trans>Where to store this project</Trans>
-                    }
-                    value={storageProvider.internalName}
-                    onChange={(e, i, newValue: string) => {
-                      setNewProjectsDefaultStorageProviderName(newValue);
-                      const newStorageProvider =
-                        storageProviders.find(
-                          ({ internalName }) => internalName === newValue
-                        ) || emptyStorageProvider;
-                      setStorageProvider(newStorageProvider);
+                <Spacer />
+                <TextField
+                  type="text"
+                  errorText={projectNameError}
+                  disabled={isLoading}
+                  value={projectName}
+                  onChange={onChangeProjectName}
+                  floatingLabelText={<Trans>Project name</Trans>}
+                  endAdornment={
+                    <IconButton
+                      size="small"
+                      onClick={() => setProjectName(generateProjectName())}
+                      tooltip={t`Generate random name`}
+                      disabled={isLoading}
+                    >
+                      <Refresh />
+                    </IconButton>
+                  }
+                  autoFocus="desktop"
+                  maxLength={CLOUD_PROJECT_NAME_MAX_LENGTH}
+                  fullWidth
+                />
+                <SelectField
+                  fullWidth
+                  disabled={isLoading}
+                  floatingLabelText={<Trans>Where to store this project</Trans>}
+                  value={storageProvider.internalName}
+                  onChange={(e, i, newValue: string) => {
+                    setNewProjectsDefaultStorageProviderName(newValue);
+                    const newStorageProvider =
+                      storageProviders.find(
+                        ({ internalName }) => internalName === newValue
+                      ) || emptyStorageProvider;
+                    setStorageProvider(newStorageProvider);
 
-                      // Reset the save as location, to avoid mixing it between storage providers
-                      // and give a chance to the storage provider to set it to a default value.
-                      setSaveAsLocation(null);
-                    }}
-                  >
-                    {storageProviders
-                      // Filter out storage providers who are supposed to be used for storage initially
-                      // (for example: the "URL" storage provider, which is read only,
-                      // or the "DownloadFile" storage provider, which is not a persistent storage).
-                      .filter(
-                        storageProvider =>
-                          !!storageProvider.renderNewProjectSaveAsLocationChooser
-                      )
-                      .map(storageProvider => (
-                        <SelectOption
-                          key={storageProvider.internalName}
-                          value={storageProvider.internalName}
-                          label={storageProvider.name}
-                          disabled={storageProvider.disabled}
-                        />
-                      ))}
-                    {shouldAllowCreatingProjectWithoutSaving && (
+                    // Reset the save as location, to avoid mixing it between storage providers
+                    // and give a chance to the storage provider to set it to a default value.
+                    setSaveAsLocation(null);
+                  }}
+                >
+                  {storageProviders
+                    // Filter out storage providers who are supposed to be used for storage initially
+                    // (for example: the "URL" storage provider, which is read only,
+                    // or the "DownloadFile" storage provider, which is not a persistent storage).
+                    .filter(
+                      storageProvider =>
+                        !!storageProvider.renderNewProjectSaveAsLocationChooser
+                    )
+                    .map(storageProvider => (
                       <SelectOption
-                        value={emptyStorageProvider.internalName}
-                        label={t`Don't save this project now`}
+                        key={storageProvider.internalName}
+                        value={storageProvider.internalName}
+                        label={storageProvider.name}
+                        disabled={storageProvider.disabled}
                       />
-                    )}
-                  </SelectField>
-                </ResponsiveLineStackLayout>
+                    ))}
+                  {shouldAllowCreatingProjectWithoutSaving && (
+                    <SelectOption
+                      value={emptyStorageProvider.internalName}
+                      label={t`Don't save this project now`}
+                    />
+                  )}
+                </SelectField>
                 {!needUserAuthenticationForStorage &&
                   storageProvider.renderNewProjectSaveAsLocationChooser &&
                   storageProvider.renderNewProjectSaveAsLocationChooser({

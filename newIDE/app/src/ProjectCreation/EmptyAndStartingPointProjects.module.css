@@ -16,10 +16,10 @@
 }
 
 .emptyProject:hover {
-    background-color: rgba(250, 250, 250, 0.08)
+    background-color: var(--theme-hover-background-color);
 }
 
 .emptyProject:focus {
-    background-color: rgba(250, 250, 250, 0.08)
+    background-color: var(--theme-hover-background-color)
 }
 

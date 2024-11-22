@@ -19,7 +19,7 @@ const styles = {
   },
 };
 
-const ICON_DESKTOP_HEIGHT = 120;
+const ICON_DESKTOP_HEIGHT = 150;
 
 type Props = {|
   privateGameTemplateListingData: PrivateGameTemplateListingData,

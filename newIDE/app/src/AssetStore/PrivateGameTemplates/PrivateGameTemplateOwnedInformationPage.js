@@ -7,51 +7,34 @@ import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import { Column, Line } from '../../UI/Grid';
 import { MarkdownText } from '../../UI/MarkdownText';
 import { shouldUseAppStoreProduct } from '../../Utils/AppStorePurchases';
-import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
-import { PrivateGameTemplateStoreContext } from './PrivateGameTemplateStoreContext';
-import { getUserProductPurchaseUsageType } from '../ProductPageHelper';
-import ProductLicenseOptions from '../ProductLicense/ProductLicenseOptions';
+import { OwnedProductLicense } from '../ProductLicense/ProductLicenseOptions';
 import HelpIcon from '../../UI/HelpIcon';
 import PrivateGameTemplateThumbnail from './PrivateGameTemplateThumbnail';
+import FlatButton from '../../UI/FlatButton';
+import RouterContext from '../../MainFrame/RouterContext';
+
+const styles = {
+  openProductContainer: {
+    display: 'flex',
+    paddingLeft: 32, // To align with licensing options.
+    marginTop: 8,
+    marginBottom: 8,
+  },
+};
 
 type Props = {|
   privateGameTemplateListingData: PrivateGameTemplateListingData,
-  simulateAppStoreProduct?: boolean,
+  purchaseUsageType: string,
+  onStoreProductOpened: () => void,
 |};
 
 const PrivateGameTemplateOwnedInformationPage = ({
   privateGameTemplateListingData,
-  simulateAppStoreProduct,
+  purchaseUsageType,
+  onStoreProductOpened,
 }: Props) => {
-  const { privateGameTemplateListingDatas } = React.useContext(
-    PrivateGameTemplateStoreContext
-  );
-  const { receivedGameTemplates, gameTemplatePurchases } = React.useContext(
-    AuthenticatedUserContext
-  );
-  const [selectedUsageType, setSelectedUsageType] = React.useState<string>(
-    privateGameTemplateListingData.prices[0].usageType
-  );
-  const shouldUseOrSimulateAppStoreProduct =
-    shouldUseAppStoreProduct() || !!simulateAppStoreProduct;
-
-  const userGameTemplatePurchaseUsageType = React.useMemo(
-    () =>
-      getUserProductPurchaseUsageType({
-        productId: privateGameTemplateListingData
-          ? privateGameTemplateListingData.id
-          : null,
-        receivedProducts: receivedGameTemplates,
-        productPurchases: gameTemplatePurchases,
-        allProductListingDatas: privateGameTemplateListingDatas,
-      }),
-    [
-      gameTemplatePurchases,
-      privateGameTemplateListingData,
-      privateGameTemplateListingDatas,
-      receivedGameTemplates,
-    ]
-  );
+  const shouldUseOrSimulateAppStoreProduct = shouldUseAppStoreProduct();
+  const { navigateToRoute } = React.useContext(RouterContext);
 
   return (
     <Column expand noMargin>
@@ -62,7 +45,12 @@ const PrivateGameTemplateOwnedInformationPage = ({
             simulateAppStoreProduct={shouldUseOrSimulateAppStoreProduct}
           />
         </Line>
-        <Column noMargin>
+        <Column noMargin expand>
+          <Line noMargin>
+            <Text size="block-title">
+              {privateGameTemplateListingData.name}
+            </Text>
+          </Line>
           <Line noMargin>
             <Text size="sub-title">
               <Trans>Licensing</Trans>
@@ -72,12 +60,24 @@ const PrivateGameTemplateOwnedInformationPage = ({
               helpPagePath="https://gdevelop.io/page/asset-store-license-agreement"
             />
           </Line>
-          <ProductLicenseOptions
-            value={selectedUsageType}
-            onChange={setSelectedUsageType}
-            product={privateGameTemplateListingData}
-            ownedLicense={userGameTemplatePurchaseUsageType}
+          <OwnedProductLicense
+            productType="game-template"
+            ownedLicense={purchaseUsageType}
           />
+          <div style={styles.openProductContainer}>
+            <FlatButton
+              label={<Trans>Open in Store</Trans>}
+              onClick={() => {
+                navigateToRoute('store', {
+                  'game-template': `product-${
+                    privateGameTemplateListingData.id
+                  }`,
+                });
+                onStoreProductOpened();
+              }}
+              primary
+            />
+          </div>
           <Text size="body" displayInlineAsSpan noMargin>
             <MarkdownText
               source={privateGameTemplateListingData.description}

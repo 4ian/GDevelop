@@ -5,7 +5,7 @@ import { type StorageProvider, type SaveAsLocation } from '../ProjectsStorage';
 import Add from '../UI/CustomSvgIcons/Add';
 import Text from '../UI/Text';
 import { Trans } from '@lingui/macro';
-import { Column, Line } from '../UI/Grid';
+import { Column, Line, Spacer } from '../UI/Grid';
 import { type GDevelopTheme } from '../UI/Theme';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { ExampleTile } from '../AssetStore/ShopTiles';
@@ -34,11 +34,13 @@ type EmptyProjectTileProps = {|
   style?: any,
 |};
 
+// The design of this tile copies the ones in ShopTiles.js
 const EmptyProjectTile = ({
   onSelectEmptyProject,
   disabled,
   style,
 }: EmptyProjectTileProps) => {
+  const { isMobile } = useResponsiveWindowSize();
   return (
     <GridListTile style={style}>
       <div
@@ -66,9 +68,12 @@ const EmptyProjectTile = ({
           </Column>
         </div>
         <Column>
+          {isMobile && <Spacer />}
           <Line justifyContent="flex-start" noMargin>
-            {/* Add a fake text to match the height of the other tiles on the row */}
-            <Text size="body2">&nbsp;</Text>
+            {/* Add a hidden text to match the height of the other tiles on the row */}
+            <Text size="body2" hidden noMargin={isMobile}>
+              <Trans>Empty project</Trans>
+            </Text>
           </Line>
         </Column>
       </div>
@@ -76,7 +81,7 @@ const EmptyProjectTile = ({
   );
 };
 
-const getStartingPointExampleShortHeaderTitle = (
+export const getStartingPointExampleShortHeaderTitle = (
   exampleShortHeader: ExampleShortHeader
 ): string => {
   return exampleShortHeader.name

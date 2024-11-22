@@ -73,6 +73,11 @@
         "comment": "Palette/Grey/100"
       }
     },
+    "hover": {
+      "background-color": {
+        "value": "rgba(255, 255, 255, 0.08)"
+      }
+    },
     "surface": {
       "titlebar": {
         "background-color": {

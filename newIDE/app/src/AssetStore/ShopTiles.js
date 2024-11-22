@@ -17,7 +17,7 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
-import { Column, Line } from '../UI/Grid';
+import { Column, Line, Spacer } from '../UI/Grid';
 import Text from '../UI/Text';
 import { Trans } from '@lingui/macro';
 import ProductPriceTag, { renderProductPrice } from './ProductPriceTag';
@@ -29,6 +29,7 @@ import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
 import Skeleton from '@material-ui/lab/Skeleton';
 import EmptyMessage from '../UI/EmptyMessage';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 
 const styles = {
   priceTagContainer: {
@@ -502,6 +503,7 @@ export const PrivateGameTemplateTile = ({
   owned: boolean,
   disabled?: boolean,
 |}) => {
+  const { isMobile } = useResponsiveWindowSize();
   const classesForGridListItem = useStylesForGridListItem({
     disabled,
   });
@@ -534,8 +536,9 @@ export const PrivateGameTemplateTile = ({
           />
         </div>
         <Column>
+          {isMobile && <Spacer />}
           <Line justifyContent="flex-start" noMargin>
-            <Text style={styles.packTitle} size="body2">
+            <Text style={styles.packTitle} size="body2" noMargin={isMobile}>
               {privateGameTemplateListingData.name}
             </Text>
           </Line>
@@ -563,6 +566,7 @@ export const ExampleTile = ({
   useQuickCustomizationThumbnail?: boolean,
   disabled?: boolean,
 |}) => {
+  const { isMobile } = useResponsiveWindowSize();
   const thumbnailImgUrl = React.useMemo(
     () => {
       if (!exampleShortHeader) return '';
@@ -619,11 +623,13 @@ export const ExampleTile = ({
           />
         )}
         <Column>
+          {isMobile && <Spacer />}
           <Line justifyContent={centerTitle ? 'center' : 'flex-start'} noMargin>
             <Text
               style={styles.packTitle}
               size="body2"
               hidden={!exampleShortHeader}
+              noMargin={isMobile}
             >
               {customTitle
                 ? customTitle

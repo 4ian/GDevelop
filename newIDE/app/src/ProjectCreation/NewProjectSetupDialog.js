@@ -458,7 +458,11 @@ const NewProjectSetupDialog = ({
           cannotBeDismissed={isLoading}
           onRequestClose={onClose}
           onApply={() => onCreateGameClick(i18n)}
-          fullHeight
+          fullHeight={
+            isOnHomePage ||
+            (!!selectedPrivateGameTemplateListingData &&
+              !isSelectedGameTemplateOwned)
+          }
           flexColumnBody
           forceScrollVisible
         >

@@ -27,24 +27,31 @@ const OnlineWebExportFlow = ({
   isExporting,
   uiMode,
 }: OnlineWebExportFlowProps) => {
-  const { game, builds, refreshGame, setGame } = gameAndBuildsManager;
-  const hasGameExistingBuilds =
+  const {
+    game,
+    builds,
+    refreshGame,
+    setGame,
+    gameAvailabilityError,
+  } = gameAndBuildsManager;
+  const isGameOwnedByCurrentUser =
+    !gameAvailabilityError || gameAvailabilityError !== 'not-owned';
+  const hasGameExistingWebBuilds =
     game && builds
-      ? !!builds.filter(build => build.gameId === game.id).length
+      ? !!builds.filter(
+          build => build.gameId === game.id && build.type === 'web-build'
+        ).length
       : false;
   const isPublishedOnGdGames = !!game && !!game.publicWebBuildId;
-  const webBuilds = builds
-    ? builds.filter(build => build.type === 'web-build')
-    : null;
-  const hasAlreadyPublishedOnWeb = webBuilds ? webBuilds.length > 0 : false;
 
-  const publishOnGdGamesByDefault =
-    // This check ensures the user has done the process of unpublishing the game from gd.games
-    !(hasAlreadyPublishedOnWeb && !isPublishedOnGdGames);
   const [
     automaticallyPublishNewBuild,
     setAutomaticallyPublishNewBuild,
-  ] = React.useState(publishOnGdGamesByDefault || !hasGameExistingBuilds);
+  ] = React.useState(
+    isGameOwnedByCurrentUser &&
+      (!hasGameExistingWebBuilds || // Never built for web? Let's publish automatically.
+        isPublishedOnGdGames) // Already published on GDevelop games? Let's update automatically.
+  );
 
   // Only show the buttons when the export is not started or when it's done.
   const shouldShowButtons =
@@ -60,7 +67,9 @@ const OnlineWebExportFlow = ({
       >
         <RaisedButton
           label={
-            !hasGameExistingBuilds ? (
+            !isGameOwnedByCurrentUser ? (
+              <Trans>Generate a link</Trans>
+            ) : !hasGameExistingWebBuilds ? (
               <Trans>Publish game</Trans>
             ) : automaticallyPublishNewBuild ? (
               <Trans>Publish new version</Trans>
@@ -74,7 +83,7 @@ const OnlineWebExportFlow = ({
           disabled={disabled}
         />
       </Line>
-      {hasGameExistingBuilds && (
+      {hasGameExistingWebBuilds && (
         <Line justifyContent="center">
           <Toggle
             toggled={automaticallyPublishNewBuild}

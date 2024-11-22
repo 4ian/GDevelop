@@ -14,6 +14,7 @@ import NewProjectSetupDialog, {
   type NewProjectSetup,
 } from '../ProjectCreation/NewProjectSetupDialog';
 import { type StorageProvider } from '../ProjectsStorage';
+import RouterContext from './RouterContext';
 
 type Props = {|
   isProjectOpening: boolean,
@@ -56,6 +57,7 @@ const useExampleOrGameTemplateDialogs = ({
     setSelectedExampleShortHeader,
   ] = React.useState<?ExampleShortHeader>(null);
   const [preventBackHome, setPreventBackHome] = React.useState(true);
+  const { removeRouteArguments } = React.useContext(RouterContext);
 
   const { receivedGameTemplates } = React.useContext(AuthenticatedUserContext);
   const { privateGameTemplateListingDatas } = React.useContext(
@@ -169,9 +171,12 @@ const useExampleOrGameTemplateDialogs = ({
         return;
       } finally {
         setIsFetchingExample(false);
+        // Remove any route arguments in case it was opened from the url,
+        // and so that the example is not opened again.
+        removeRouteArguments(['create-from-example']);
       }
     },
-    [onSelectExampleShortHeader]
+    [onSelectExampleShortHeader, removeRouteArguments]
   );
 
   const renderNewProjectDialog = () => {

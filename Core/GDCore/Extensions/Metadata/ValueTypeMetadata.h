@@ -129,7 +129,7 @@ class GD_CORE_API ValueTypeMetadata {
   }
 
   /**
-   * \brief Return true if the type of the parameter is a number.
+   * \brief Return true if the type of the parameter is a variable.
    * \note If you had a new type of parameter, also add it in the IDE (
    * see EventsFunctionParametersEditor, ParameterRenderingService
    * and ExpressionAutocompletion) and in the EventsCodeGenerator.
@@ -146,6 +146,19 @@ class GD_CORE_API ValueTypeMetadata {
    */
   static bool IsVariable(const gd::String &type) {
     return gd::ValueTypeMetadata::GetPrimitiveValueType(type) == "variable";
+  }
+
+  /**
+   * \brief Return true if the type of the parameter is a variable and not a
+   * property or a parameter.
+   */
+  bool IsVariableOnly() const {
+      return
+          // Any variable.
+          name == "variable" ||
+          // Old, "pre-scoped" variables:
+          name == "objectvar" || name == "globalvar" ||
+          name == "scenevar";
   }
 
   /**

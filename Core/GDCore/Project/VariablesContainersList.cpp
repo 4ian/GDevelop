@@ -72,6 +72,10 @@ VariablesContainersList VariablesContainersList::
   variablesContainersList.Push(extension.GetSceneVariables());
 
   gd::EventsFunctionTools::PropertiesToVariablesContainer(
+      eventsBasedBehavior.GetSharedPropertyDescriptors(), propertyVariablesContainer);
+  variablesContainersList.Push(propertyVariablesContainer);
+
+  gd::EventsFunctionTools::PropertiesToVariablesContainer(
       eventsBasedBehavior.GetPropertyDescriptors(), propertyVariablesContainer);
   variablesContainersList.Push(propertyVariablesContainer);
 

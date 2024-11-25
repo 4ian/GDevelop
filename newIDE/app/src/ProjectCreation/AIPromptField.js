@@ -78,8 +78,7 @@ const AIPromptField = ({
   );
   const generateProject = React.useCallback(
     async () => {
-      if (disabled) return;
-      if (!profile) return;
+      if (disabled || !profile) return;
 
       onGenerationStarted();
       try {

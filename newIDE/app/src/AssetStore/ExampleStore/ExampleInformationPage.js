@@ -57,8 +57,7 @@ const ExampleInformationPage = ({ exampleShortHeader }: Props) => {
       {!isCompatible && (
         <AlertMessage kind="error">
           <Trans>
-            Unfortunately, this example requires a newer version of GDevelop to
-            work. Update GDevelop to be able to open this example.
+            Download the latest version of GDevelop to check out this example!
           </Trans>
         </AlertMessage>
       )}

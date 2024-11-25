@@ -37,7 +37,7 @@ type Props = {|
   storageProviders: Array<StorageProvider>,
 |};
 
-const useExampleOrGameTemplateDialogs = ({
+const useNewProjectDialog = ({
   isProjectOpening,
   newProjectSetupDialogOpen,
   setNewProjectSetupDialogOpen,
@@ -238,4 +238,4 @@ const useExampleOrGameTemplateDialogs = ({
   };
 };
 
-export default useExampleOrGameTemplateDialogs;
+export default useNewProjectDialog;

@@ -12,10 +12,10 @@ import { ExampleTile } from '../AssetStore/ShopTiles';
 import { ExampleStoreContext } from '../AssetStore/ExampleStore/ExampleStoreContext';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
-import { GridList, GridListTile } from '@material-ui/core';
+import GridList from '@material-ui/core/GridList';
+import GridListTile from '@material-ui/core/GridListTile';
 import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
 import classes from './EmptyAndStartingPointProjects.module.css';
-import classNames from 'classnames';
 import { getItemsColumns } from './NewProjectSetupDialog';
 
 const getStyles = (theme: GDevelopTheme) => ({
@@ -43,15 +43,9 @@ const EmptyProjectTile = ({
   const { isMobile } = useResponsiveWindowSize();
   return (
     <GridListTile style={style}>
-      <div
-        className={classNames({
-          [classes.container]: true,
-        })}
-      >
+      <div className={classes.container}>
         <div
-          className={classNames({
-            [classes.emptyProject]: true,
-          })}
+          className={classes.emptyProject}
           onClick={disabled ? undefined : onSelectEmptyProject}
           tabIndex={0}
           onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {

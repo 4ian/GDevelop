@@ -3,7 +3,7 @@ import * as React from 'react';
 import { I18n } from '@lingui/react';
 import { ExampleStoreContext } from '../AssetStore/ExampleStore/ExampleStoreContext';
 import { ExampleTile } from '../AssetStore/ShopTiles';
-import { GridList } from '@material-ui/core';
+import GridList from '@material-ui/core/GridList';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import { type QuickCustomizationRecommendation } from '../Utils/GDevelopServices/User';

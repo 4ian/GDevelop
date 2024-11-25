@@ -275,7 +275,7 @@ const NewProjectSetupDialog = ({
       receivedGameTemplates,
     ]
   );
-  const isSelectedGameTemplateOwned =
+  const noGameTemplateSelectedOrSelectedAndOwned =
     !selectedPrivateGameTemplateListingData ||
     !!selectedGameTemplatePurchaseUsageType;
 
@@ -288,7 +288,7 @@ const NewProjectSetupDialog = ({
   const shouldAllowCreatingProject =
     !isLoading &&
     (!isOnHomePage &&
-      isSelectedGameTemplateOwned &&
+      noGameTemplateSelectedOrSelectedAndOwned &&
       !needUserAuthenticationForStorage &&
       !hasTooManyCloudProjects &&
       (hasSelectedAStorageProvider || shouldAllowCreatingProjectWithoutSaving));
@@ -461,7 +461,7 @@ const NewProjectSetupDialog = ({
           fullHeight={
             isOnHomePage ||
             (!!selectedPrivateGameTemplateListingData &&
-              !isSelectedGameTemplateOwned)
+              !noGameTemplateSelectedOrSelectedAndOwned)
           }
           flexColumnBody
           forceScrollVisible
@@ -535,7 +535,7 @@ const NewProjectSetupDialog = ({
             )}
             {!isOnHomePage &&
               selectedPrivateGameTemplateListingData &&
-              !isSelectedGameTemplateOwned && (
+              !noGameTemplateSelectedOrSelectedAndOwned && (
                 <PrivateGameTemplateInformationPage
                   privateGameTemplateListingData={
                     selectedPrivateGameTemplateListingData
@@ -546,7 +546,7 @@ const NewProjectSetupDialog = ({
                   onGameTemplateOpen={onSelectPrivateGameTemplateListingData}
                 />
               )}
-            {!isOnHomePage && isSelectedGameTemplateOwned && (
+            {!isOnHomePage && noGameTemplateSelectedOrSelectedAndOwned && (
               <ColumnStackLayout noMargin>
                 {selectedExampleShortHeader ? (
                   <ExampleInformationPage

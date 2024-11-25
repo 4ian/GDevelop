@@ -17,9 +17,11 @@
 
 .emptyProject:hover {
     background-color: var(--theme-hover-background-color);
+    transition: background-color 0.2s;
 }
 
 .emptyProject:focus {
-    background-color: var(--theme-hover-background-color)
+    background-color: var(--theme-hover-background-color);
+    transition: background-color 0.2s;
 }
 

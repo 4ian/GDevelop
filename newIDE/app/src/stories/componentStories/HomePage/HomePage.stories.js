@@ -93,12 +93,11 @@ const WrappedHomePage = ({
               storageProviders={[CloudStorageProvider]}
               onChooseProject={() => action('onChooseProject')()}
               onOpenRecentFile={() => action('onOpenRecentFile')()}
-              onOpenExampleStore={() => action('onOpenExampleStore')()}
               onSelectExampleShortHeader={() =>
                 action('onSelectExampleShortHeader')()
               }
-              onPreviewPrivateGameTemplateListingData={() =>
-                action('onPreviewPrivateGameTemplateListingData')()
+              onSelectPrivateGameTemplateListingData={() =>
+                action('onSelectPrivateGameTemplateListingData')()
               }
               onOpenPrivateGameTemplateListingData={() =>
                 action('onOpenPrivateGameTemplateListingData')()

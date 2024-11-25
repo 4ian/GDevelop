@@ -9,6 +9,7 @@ export type ExampleShortHeader = {|
   slug: string,
   name: string,
   shortDescription: string,
+  description: string,
   license: string,
   tags: Array<string>,
   authors?: Array<UserPublicProfile>,
@@ -22,7 +23,6 @@ export type ExampleShortHeader = {|
 
 export type Example = {|
   ...ExampleShortHeader,
-  description: string,
   projectFileUrl: string,
   authors: Array<string>,
 |};

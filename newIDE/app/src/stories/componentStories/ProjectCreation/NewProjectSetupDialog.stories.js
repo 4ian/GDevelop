@@ -15,6 +15,7 @@ import {
   geometryMonsterExampleShortHeader,
   fakePrivateGameTemplateListingData,
 } from '../../../fixtures/GDevelopServicesTestData';
+import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 
 export default {
   title: 'Project Creation/NewProjectSetupDialog',
@@ -24,149 +25,241 @@ export default {
 
 export const OpenAndNotAuthenticated = () => {
   return (
-    <NewProjectSetupDialog
-      authenticatedUser={fakeNotAuthenticatedUser}
-      storageProviders={[
-        UrlStorageProvider,
-        CloudStorageProvider,
-        GoogleDriveStorageProvider,
-        DownloadFileStorageProvider,
-      ]}
-      onClose={() => action('click on close')()}
-      onCreateEmptyProject={() => action('create empty')()}
-      onCreateFromExample={() => action('create from example')()}
-      onCreateWithLogin={() => action('create with login')()}
-      onCreateFromAIGeneration={() => action('create from AI generation')()}
-      onCreateProjectFromPrivateGameTemplate={() =>
-        action('create project from private game template')()
-      }
-      selectedExampleShortHeader={null}
-      selectedPrivateGameTemplateListingData={null}
-    />
+    <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
+      <NewProjectSetupDialog
+        storageProviders={[
+          UrlStorageProvider,
+          CloudStorageProvider,
+          GoogleDriveStorageProvider,
+          DownloadFileStorageProvider,
+        ]}
+        onClose={() => action('click on close')()}
+        onCreateEmptyProject={() => action('create empty')()}
+        onCreateFromExample={() => action('create from example')()}
+        onCreateFromAIGeneration={() => action('create from AI generation')()}
+        onCreateProjectFromPrivateGameTemplate={() =>
+          action('create project from private game template')()
+        }
+        selectedExampleShortHeader={null}
+        selectedPrivateGameTemplateListingData={null}
+        onSelectExampleShortHeader={() => action('select example')()}
+        onSelectPrivateGameTemplateListingData={() =>
+          action('select private game template')()
+        }
+        privateGameTemplateListingDatasFromSameCreator={[]}
+      />
+    </AuthenticatedUserContext.Provider>
   );
 };
 
 export const OpenAndAuthenticated = () => {
   return (
-    <NewProjectSetupDialog
-      authenticatedUser={fakeSilverAuthenticatedUser}
-      storageProviders={[
-        UrlStorageProvider,
-        CloudStorageProvider,
-        GoogleDriveStorageProvider,
-        DownloadFileStorageProvider,
-      ]}
-      onClose={() => action('click on close')()}
-      onCreateEmptyProject={() => action('create empty')()}
-      onCreateFromExample={() => action('create from example')()}
-      onCreateWithLogin={() => action('create with login')()}
-      onCreateFromAIGeneration={() => action('create from AI generation')()}
-      onCreateProjectFromPrivateGameTemplate={() =>
-        action('create project from private game template')()
-      }
-      selectedExampleShortHeader={null}
-      selectedPrivateGameTemplateListingData={null}
-    />
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+      <NewProjectSetupDialog
+        storageProviders={[
+          UrlStorageProvider,
+          CloudStorageProvider,
+          GoogleDriveStorageProvider,
+          DownloadFileStorageProvider,
+        ]}
+        onClose={() => action('click on close')()}
+        onCreateEmptyProject={() => action('create empty')()}
+        onCreateFromExample={() => action('create from example')()}
+        onCreateFromAIGeneration={() => action('create from AI generation')()}
+        onCreateProjectFromPrivateGameTemplate={() =>
+          action('create project from private game template')()
+        }
+        selectedExampleShortHeader={null}
+        selectedPrivateGameTemplateListingData={null}
+        onSelectExampleShortHeader={() => action('select example')()}
+        onSelectPrivateGameTemplateListingData={() =>
+          action('select private game template')()
+        }
+        privateGameTemplateListingDatasFromSameCreator={[]}
+      />
+    </AuthenticatedUserContext.Provider>
   );
 };
 
 export const Opening = () => {
   return (
-    <NewProjectSetupDialog
-      authenticatedUser={fakeSilverAuthenticatedUser}
-      isOpeningProject
-      storageProviders={[
-        UrlStorageProvider,
-        CloudStorageProvider,
-        GoogleDriveStorageProvider,
-        DownloadFileStorageProvider,
-      ]}
-      onClose={() => action('click on close')()}
-      onCreateEmptyProject={() => action('create empty')()}
-      onCreateFromExample={() => action('create from example')()}
-      onCreateWithLogin={() => action('create with login')()}
-      onCreateFromAIGeneration={() => action('create from AI generation')()}
-      onCreateProjectFromPrivateGameTemplate={() =>
-        action('create project from private game template')()
-      }
-      selectedExampleShortHeader={null}
-      selectedPrivateGameTemplateListingData={null}
-    />
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+      <NewProjectSetupDialog
+        isProjectOpening
+        storageProviders={[
+          UrlStorageProvider,
+          CloudStorageProvider,
+          GoogleDriveStorageProvider,
+          DownloadFileStorageProvider,
+        ]}
+        onClose={() => action('click on close')()}
+        onCreateEmptyProject={() => action('create empty')()}
+        onCreateFromExample={() => action('create from example')()}
+        onCreateFromAIGeneration={() => action('create from AI generation')()}
+        onCreateProjectFromPrivateGameTemplate={() =>
+          action('create project from private game template')()
+        }
+        selectedExampleShortHeader={null}
+        selectedPrivateGameTemplateListingData={null}
+        onSelectExampleShortHeader={() => action('select example')()}
+        onSelectPrivateGameTemplateListingData={() =>
+          action('select private game template')()
+        }
+        privateGameTemplateListingDatasFromSameCreator={[]}
+      />
+    </AuthenticatedUserContext.Provider>
   );
 };
 
 export const LimitsReached = () => {
   return (
-    <NewProjectSetupDialog
-      authenticatedUser={
-        fakeAuthenticatedUserWithNoSubscriptionAndTooManyCloudProjects
-      }
-      storageProviders={[
-        CloudStorageProvider,
-        UrlStorageProvider,
-        GoogleDriveStorageProvider,
-        DownloadFileStorageProvider,
-      ]}
-      onClose={() => action('click on close')()}
-      onCreateEmptyProject={() => action('create empty')()}
-      onCreateFromExample={() => action('create from example')()}
-      onCreateWithLogin={() => action('create with login')()}
-      onCreateFromAIGeneration={() => action('create from AI generation')()}
-      onCreateProjectFromPrivateGameTemplate={() =>
-        action('create project from private game template')()
-      }
-      selectedExampleShortHeader={null}
-      selectedPrivateGameTemplateListingData={null}
-    />
+    <AuthenticatedUserContext.Provider
+      value={fakeAuthenticatedUserWithNoSubscriptionAndTooManyCloudProjects}
+    >
+      <NewProjectSetupDialog
+        storageProviders={[
+          CloudStorageProvider,
+          UrlStorageProvider,
+          GoogleDriveStorageProvider,
+          DownloadFileStorageProvider,
+        ]}
+        onClose={() => action('click on close')()}
+        onCreateEmptyProject={() => action('create empty')()}
+        onCreateFromExample={() => action('create from example')()}
+        onCreateFromAIGeneration={() => action('create from AI generation')()}
+        onCreateProjectFromPrivateGameTemplate={() =>
+          action('create project from private game template')()
+        }
+        selectedExampleShortHeader={null}
+        selectedPrivateGameTemplateListingData={null}
+        onSelectExampleShortHeader={() => action('select example')()}
+        onSelectPrivateGameTemplateListingData={() =>
+          action('select private game template')()
+        }
+        privateGameTemplateListingDatasFromSameCreator={[]}
+      />
+    </AuthenticatedUserContext.Provider>
   );
 };
 
 export const FromExample = () => {
   return (
-    <NewProjectSetupDialog
-      authenticatedUser={fakeSilverAuthenticatedUser}
-      storageProviders={[
-        UrlStorageProvider,
-        CloudStorageProvider,
-        GoogleDriveStorageProvider,
-        DownloadFileStorageProvider,
-      ]}
-      onClose={() => action('click on close')()}
-      onCreateEmptyProject={() => action('create empty')()}
-      onCreateFromExample={() => action('create from example')()}
-      onCreateWithLogin={() => action('create with login')()}
-      onCreateFromAIGeneration={() => action('create from AI generation')()}
-      selectedExampleShortHeader={geometryMonsterExampleShortHeader}
-      onCreateProjectFromPrivateGameTemplate={() =>
-        action('create project from private game template')()
-      }
-      selectedPrivateGameTemplateListingData={null}
-    />
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+      <NewProjectSetupDialog
+        storageProviders={[
+          UrlStorageProvider,
+          CloudStorageProvider,
+          GoogleDriveStorageProvider,
+          DownloadFileStorageProvider,
+        ]}
+        onClose={() => action('click on close')()}
+        onCreateEmptyProject={() => action('create empty')()}
+        onCreateFromExample={() => action('create from example')()}
+        onCreateFromAIGeneration={() => action('create from AI generation')()}
+        selectedExampleShortHeader={geometryMonsterExampleShortHeader}
+        onCreateProjectFromPrivateGameTemplate={() =>
+          action('create project from private game template')()
+        }
+        selectedPrivateGameTemplateListingData={null}
+        onSelectExampleShortHeader={() => action('select example')()}
+        onSelectPrivateGameTemplateListingData={() =>
+          action('select private game template')()
+        }
+        privateGameTemplateListingDatasFromSameCreator={[]}
+      />
+    </AuthenticatedUserContext.Provider>
+  );
+};
+
+export const FromExampleWithoutGoingBack = () => {
+  return (
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+      <NewProjectSetupDialog
+        storageProviders={[
+          UrlStorageProvider,
+          CloudStorageProvider,
+          GoogleDriveStorageProvider,
+          DownloadFileStorageProvider,
+        ]}
+        onClose={() => action('click on close')()}
+        onCreateEmptyProject={() => action('create empty')()}
+        onCreateFromExample={() => action('create from example')()}
+        onCreateFromAIGeneration={() => action('create from AI generation')()}
+        selectedExampleShortHeader={geometryMonsterExampleShortHeader}
+        onCreateProjectFromPrivateGameTemplate={() =>
+          action('create project from private game template')()
+        }
+        selectedPrivateGameTemplateListingData={null}
+        onSelectExampleShortHeader={() => action('select example')()}
+        onSelectPrivateGameTemplateListingData={() =>
+          action('select private game template')()
+        }
+        privateGameTemplateListingDatasFromSameCreator={[]}
+        preventBackHome
+      />
+    </AuthenticatedUserContext.Provider>
   );
 };
 
 export const FromPrivateGameTemplate = () => {
   return (
-    <NewProjectSetupDialog
-      authenticatedUser={fakeSilverAuthenticatedUser}
-      storageProviders={[
-        UrlStorageProvider,
-        CloudStorageProvider,
-        GoogleDriveStorageProvider,
-        DownloadFileStorageProvider,
-      ]}
-      onClose={() => action('click on close')()}
-      onCreateEmptyProject={() => action('create empty')()}
-      onCreateFromExample={() => action('create from example')()}
-      onCreateWithLogin={() => action('create with login')()}
-      onCreateFromAIGeneration={() => action('create from AI generation')()}
-      selectedExampleShortHeader={null}
-      onCreateProjectFromPrivateGameTemplate={() =>
-        action('create project from private game template')()
-      }
-      selectedPrivateGameTemplateListingData={
-        fakePrivateGameTemplateListingData
-      }
-    />
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+      <NewProjectSetupDialog
+        storageProviders={[
+          UrlStorageProvider,
+          CloudStorageProvider,
+          GoogleDriveStorageProvider,
+          DownloadFileStorageProvider,
+        ]}
+        onClose={() => action('click on close')()}
+        onCreateEmptyProject={() => action('create empty')()}
+        onCreateFromExample={() => action('create from example')()}
+        onCreateFromAIGeneration={() => action('create from AI generation')()}
+        selectedExampleShortHeader={null}
+        onCreateProjectFromPrivateGameTemplate={() =>
+          action('create project from private game template')()
+        }
+        selectedPrivateGameTemplateListingData={
+          fakePrivateGameTemplateListingData
+        }
+        onSelectExampleShortHeader={() => action('select example')()}
+        onSelectPrivateGameTemplateListingData={() =>
+          action('select private game template')()
+        }
+        privateGameTemplateListingDatasFromSameCreator={[]}
+      />
+    </AuthenticatedUserContext.Provider>
+  );
+};
+
+export const FromPrivateGameTemplateWithoutGoingBack = () => {
+  return (
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+      <NewProjectSetupDialog
+        storageProviders={[
+          UrlStorageProvider,
+          CloudStorageProvider,
+          GoogleDriveStorageProvider,
+          DownloadFileStorageProvider,
+        ]}
+        onClose={() => action('click on close')()}
+        onCreateEmptyProject={() => action('create empty')()}
+        onCreateFromExample={() => action('create from example')()}
+        onCreateFromAIGeneration={() => action('create from AI generation')()}
+        selectedExampleShortHeader={null}
+        onCreateProjectFromPrivateGameTemplate={() =>
+          action('create project from private game template')()
+        }
+        selectedPrivateGameTemplateListingData={
+          fakePrivateGameTemplateListingData
+        }
+        onSelectExampleShortHeader={() => action('select example')()}
+        onSelectPrivateGameTemplateListingData={() =>
+          action('select private game template')()
+        }
+        privateGameTemplateListingDatasFromSameCreator={[]}
+        preventBackHome
+      />
+    </AuthenticatedUserContext.Provider>
   );
 };

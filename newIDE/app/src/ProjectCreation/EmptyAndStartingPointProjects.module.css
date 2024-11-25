@@ -1,0 +1,27 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.emptyProject {
+  margin: 4px;
+  border: 1px solid var(--theme-text-disabled-color);
+  border-radius: 8px;
+  height: 100%;
+  /* In case the images cannot load, while being offline for instance */
+  min-height: 70px;
+  padding: 4px;
+  display: flex;
+}
+
+.emptyProject:hover {
+    background-color: var(--theme-hover-background-color);
+    transition: background-color 0.2s;
+}
+
+.emptyProject:focus {
+    background-color: var(--theme-hover-background-color);
+    transition: background-color 0.2s;
+}
+

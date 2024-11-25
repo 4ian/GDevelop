@@ -171,13 +171,8 @@ const ElectronMainMenu = ({
     shouldApply: isFocusedOnMainWindow,
   });
   useIPCEventListener({
-    ipcEvent: 'main-menu-create-template',
+    ipcEvent: 'main-menu-create-project',
     callback: callbacks.onCreateProject,
-    shouldApply: isFocusedOnMainWindow,
-  });
-  useIPCEventListener({
-    ipcEvent: 'main-menu-create-blank',
-    callback: callbacks.onCreateBlank,
     shouldApply: isFocusedOnMainWindow,
   });
   useIPCEventListener({

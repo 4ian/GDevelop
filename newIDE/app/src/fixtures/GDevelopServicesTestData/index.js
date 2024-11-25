@@ -4057,6 +4057,7 @@ export const exampleFromFutureVersion: ExampleShortHeader = {
   slug: 'fake-slug',
   name: 'Fake example',
   shortDescription: 'This is a fake example made in a future GDevelop version',
+  description: '',
   license: 'MIT',
   tags: [],
   previewImageUrls: [],
@@ -4070,6 +4071,7 @@ export const geometryMonsterExampleShortHeader: ExampleShortHeader = {
   slug: 'geometry-monster',
   shortDescription:
     'A hyper casual endless game where you have to collect shapes and avoid bombs, with a progressively increasing difficulty.\n',
+  description: '',
   license: 'MIT',
   previewImageUrls: [
     'https://resources.gdevelop-app.com/examples/geometry-monster/thumbnail.png',

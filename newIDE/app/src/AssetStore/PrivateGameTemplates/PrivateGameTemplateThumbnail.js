@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
+import { type PrivateGameTemplateListingData } from '../../Utils/GDevelopServices/Shop';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import { iconWithBackgroundStyle } from '../../UI/IconContainer';
@@ -15,19 +15,31 @@ const styles = {
   icon: {
     ...iconWithBackgroundStyle,
     padding: iconPadding,
+    aspectRatio: '16 / 9',
   },
 };
 
 const ICON_DESKTOP_HEIGHT = 150;
 
 type Props = {|
-  exampleShortHeader: ExampleShortHeader,
+  privateGameTemplateListingData: PrivateGameTemplateListingData,
+  simulateAppStoreProduct: boolean,
 |};
 
-export const ExampleThumbnailOrIcon = ({ exampleShortHeader }: Props) => {
+const PrivateGameTemplateThumbnail = ({
+  privateGameTemplateListingData,
+  simulateAppStoreProduct,
+}: Props) => {
   const { isMobile, isLandscape } = useResponsiveWindowSize();
-  const iconUrl = exampleShortHeader.previewImageUrls[0];
-  const aspectRatio = iconUrl.endsWith('square-icon.png') ? '1 / 1' : '16 / 9';
+  const iconUrl = React.useMemo(
+    () =>
+      (simulateAppStoreProduct &&
+        privateGameTemplateListingData.appStoreThumbnailUrls &&
+        privateGameTemplateListingData.appStoreThumbnailUrls[0]) ||
+      privateGameTemplateListingData.thumbnailUrls[0],
+    [privateGameTemplateListingData, simulateAppStoreProduct]
+  );
+
   // Make the icon be full width on mobile.
   const height = isMobile && !isLandscape ? undefined : ICON_DESKTOP_HEIGHT;
   const width =
@@ -36,10 +48,12 @@ export const ExampleThumbnailOrIcon = ({ exampleShortHeader }: Props) => {
   return (
     <div style={styles.iconBackground}>
       <CorsAwareImage
-        style={{ ...styles.icon, height, width, aspectRatio }}
+        style={{ ...styles.icon, height, width }}
         src={iconUrl}
-        alt={exampleShortHeader.name}
+        alt={privateGameTemplateListingData.name}
       />
     </div>
   );
 };
+
+export default PrivateGameTemplateThumbnail;

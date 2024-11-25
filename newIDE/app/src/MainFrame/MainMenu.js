@@ -37,8 +37,7 @@ export type MainMenuCallbacks = {|
   onCloseApp: () => void,
   onExportProject: () => void,
   onInviteCollaborators: () => void,
-  onCreateProject: (open?: boolean) => void,
-  onCreateBlank: () => void,
+  onCreateProject: () => void,
   onOpenProjectManager: (open?: boolean) => void,
   onOpenHomePage: () => void,
   onOpenDebugger: () => void,
@@ -63,7 +62,7 @@ export type MainMenuEvent =
   | 'main-menu-close-app'
   | 'main-menu-export'
   | 'main-menu-invite-collaborators'
-  | 'main-menu-create-template'
+  | 'main-menu-create-project'
   | 'main-menu-create-blank'
   | 'main-menu-open-project-manager'
   | 'main-menu-open-home-page'
@@ -88,8 +87,7 @@ const getMainMenuEventCallback = (
     'main-menu-close-app': callbacks.onCloseApp,
     'main-menu-export': callbacks.onExportProject,
     'main-menu-invite-collaborators': callbacks.onInviteCollaborators,
-    'main-menu-create-template': callbacks.onCreateProject,
-    'main-menu-create-blank': callbacks.onCreateBlank,
+    'main-menu-create-project': callbacks.onCreateProject,
     'main-menu-open-project-manager': callbacks.onOpenProjectManager,
     'main-menu-open-home-page': callbacks.onOpenHomePage,
     'main-menu-open-debugger': callbacks.onOpenDebugger,
@@ -115,20 +113,9 @@ export const buildMainMenuDeclarativeTemplate = ({
     label: i18n._(t`File`),
     submenu: [
       {
-        label: i18n._(t`Create`),
-        submenu: [
-          {
-            label: i18n._(t`New empty project...`),
-            accelerator: getElectronAccelerator(
-              shortcutMap['CREATE_NEW_PROJECT']
-            ),
-            onClickSendEvent: 'main-menu-create-blank',
-          },
-          {
-            label: i18n._(t`New project from template...`),
-            onClickSendEvent: 'main-menu-create-template',
-          },
-        ],
+        label: i18n._(t`Create a game`),
+        accelerator: getElectronAccelerator(shortcutMap['CREATE_NEW_PROJECT']),
+        onClickSendEvent: 'main-menu-create-project',
       },
       { type: 'separator' },
       {

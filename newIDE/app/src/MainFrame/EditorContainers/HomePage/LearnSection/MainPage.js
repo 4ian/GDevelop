@@ -132,7 +132,6 @@ export const TutorialsRow = ({
 );
 
 type Props = {|
-  onOpenExampleStore: () => void,
   onTabChange: (tab: HomeTab) => void,
   onSelectCategory: (?TutorialCategory) => void,
   tutorials: Array<Tutorial>,
@@ -140,7 +139,6 @@ type Props = {|
 |};
 
 const MainPage = ({
-  onOpenExampleStore,
   onTabChange,
   onSelectCategory,
   tutorials,
@@ -179,11 +177,6 @@ const MainPage = ({
       description: <Trans>Find the complete documentation on everything</Trans>,
       action: () =>
         Window.openExternalURL('https://wiki.gdevelop.io/gdevelop5/'),
-    },
-    {
-      title: <Trans>Examples</Trans>,
-      description: <Trans>Have a look at existing games from the inside</Trans>,
-      action: onOpenExampleStore,
     },
     {
       title: <Trans>Forums</Trans>,

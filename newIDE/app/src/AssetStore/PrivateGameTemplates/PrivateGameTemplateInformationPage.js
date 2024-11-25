@@ -119,7 +119,7 @@ type Props = {|
   privateGameTemplateListingDatasFromSameCreator?: ?Array<PrivateGameTemplateListingData>,
   onGameTemplateOpen: PrivateGameTemplateListingData => void,
   onAssetPackOpen?: PrivateAssetPackListingData => void,
-  onCreateWithGameTemplate: PrivateGameTemplateListingData => void,
+  onCreateWithGameTemplate?: PrivateGameTemplateListingData => void,
   simulateAppStoreProduct?: boolean,
 |};
 
@@ -285,7 +285,7 @@ const PrivateGameTemplateInformationPage = ({
   const onClickBuy = React.useCallback(
     async () => {
       if (!gameTemplate) return;
-      if (isAlreadyReceived) {
+      if (isAlreadyReceived && onCreateWithGameTemplate) {
         onCreateWithGameTemplate(privateGameTemplateListingData);
         return;
       }
@@ -329,7 +329,7 @@ const PrivateGameTemplateInformationPage = ({
         return;
       }
 
-      if (isAlreadyReceived) {
+      if (isAlreadyReceived && onCreateWithGameTemplate) {
         onCreateWithGameTemplate(privateGameTemplateListingData);
         return;
       }
@@ -412,7 +412,7 @@ const PrivateGameTemplateInformationPage = ({
               <AlertMessage kind="error">{errorText}</AlertMessage>
             </Line>
           ) : isFetching ? (
-            <Column expand>
+            <Column expand alignItems="center" justifyContent="center">
               <PlaceholderLoader />
             </Column>
           ) : gameTemplate && sellerPublicProfile ? (
@@ -523,17 +523,7 @@ const PrivateGameTemplateInformationPage = ({
                         ownedLicense={userGameTemplatePurchaseUsageType}
                       />
                       <Spacer />
-                      {isAlreadyReceived ? (
-                        <OpenProductButton
-                          productListingData={privateGameTemplateListingData}
-                          onClick={() =>
-                            onCreateWithGameTemplate(
-                              privateGameTemplateListingData
-                            )
-                          }
-                          label={<Trans>Open template</Trans>}
-                        />
-                      ) : (
+                      {!isAlreadyReceived ? (
                         <>
                           {!shouldUseOrSimulateAppStoreProduct && (
                             <SecureCheckout />
@@ -553,7 +543,17 @@ const PrivateGameTemplateInformationPage = ({
                             />
                           )}
                         </>
-                      )}
+                      ) : onCreateWithGameTemplate ? (
+                        <OpenProductButton
+                          productListingData={privateGameTemplateListingData}
+                          onClick={() =>
+                            onCreateWithGameTemplate(
+                              privateGameTemplateListingData
+                            )
+                          }
+                          label={<Trans>Open template</Trans>}
+                        />
+                      ) : null}
                     </ColumnStackLayout>
                   </div>
                 </ResponsiveLineStackLayout>

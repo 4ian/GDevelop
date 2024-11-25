@@ -99,12 +99,8 @@ export type RenderEditorContainerProps = {|
   gamesList: GamesList,
 
   // Other dialogs opening:
-  onOpenExampleStore: () => void,
   onSelectExampleShortHeader: ExampleShortHeader => void,
-  onPreviewPrivateGameTemplateListingData: PrivateGameTemplateListingData => void,
-  onOpenPrivateGameTemplateListingData: (
-    privateGameTemplateListingData: PrivateGameTemplateListingData
-  ) => void,
+  onSelectPrivateGameTemplateListingData: PrivateGameTemplateListingData => void,
   onOpenLanguageDialog: () => void,
   selectInAppTutorial: (tutorialId: string) => void,
   onOpenProfile: () => void,
@@ -127,6 +123,7 @@ export type RenderEditorContainerProps = {|
     i18n: I18nType
   ) => Promise<void>,
   onOpenTemplateFromTutorial: (tutorialId: string) => Promise<void>,
+  onOpenPrivateGameTemplateListingData: PrivateGameTemplateListingData => void,
 
   // Project save
   onSave: () => Promise<void>,

@@ -19,6 +19,7 @@
 #include "GDCore/IDE/Events/BehaviorTypeRenamer.h"
 #include "GDCore/IDE/Events/CustomObjectTypeRenamer.h"
 #include "GDCore/IDE/Events/EventsBehaviorRenamer.h"
+#include "GDCore/IDE/Events/EventsParameterReplacer.h"
 #include "GDCore/IDE/Events/EventsPropertyReplacer.h"
 #include "GDCore/IDE/Events/EventsRefactorer.h"
 #include "GDCore/IDE/Events/EventsVariableInstructionTypeSwitcher.h"
@@ -813,6 +814,47 @@ void WholeProjectRefactorer::RenameObjectEventsFunction(
         otherFunction->SetGetterName(newFunctionName);
       }
     }
+  }
+}
+
+void WholeProjectRefactorer::RenameParameter(
+    gd::Project &project, gd::ProjectScopedContainers &projectScopedContainers,
+    gd::EventsFunction &eventsFunction, const gd::String &oldParameterName,
+    const gd::String &newParameterName) {
+  auto &parameters = eventsFunction.GetParameters();
+  if (!parameters.HasParameterNamed(oldParameterName))
+    return;
+  auto &parameter = parameters.GetParameter(oldParameterName);
+  if (parameter.GetType() == "Object") {
+    gd::WholeProjectRefactorer::ObjectOrGroupRenamedInEventsFunction(
+        project, projectScopedContainers, eventsFunction, oldParameterName,
+        newParameterName, false);
+  } else if (parameter.GetType() == "Behavior") {
+    size_t behaviorParameterIndex = parameters.GetParameterPosition(parameter);
+    size_t objectParameterIndex =
+        gd::ParameterMetadataTools::GetObjectParameterIndexFor(
+            parameters, behaviorParameterIndex);
+    const gd::String &objectName =
+        parameters.GetParameter(objectParameterIndex).GetName();
+    gd::EventsBehaviorRenamer behaviorRenamer(project.GetCurrentPlatform(),
+                                              objectName, oldParameterName,
+                                              newParameterName);
+    behaviorRenamer.Launch(eventsFunction.GetEvents(), projectScopedContainers);
+  } else {
+    // Rename parameter names directly used as an identifier.
+    std::unordered_map<gd::String, gd::String> oldToNewParameterNames = {
+        {oldParameterName, newParameterName}};
+    gd::EventsParameterReplacer eventsParameterReplacer(
+        project.GetCurrentPlatform(), parameters, oldToNewParameterNames);
+    eventsParameterReplacer.Launch(eventsFunction.GetEvents(),
+                                   projectScopedContainers);
+
+    // Rename parameter names in legacy expressions and instructions
+    gd::ProjectElementRenamer projectElementRenamer(
+        project.GetCurrentPlatform(), "functionParameterName", oldParameterName,
+        newParameterName);
+    projectElementRenamer.Launch(eventsFunction.GetEvents(),
+                                 projectScopedContainers);
   }
 }
 

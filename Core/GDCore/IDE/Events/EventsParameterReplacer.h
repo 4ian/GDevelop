@@ -21,26 +21,23 @@ class Platform;
 }  // namespace gd
 
 namespace gd {
-
 /**
  * \brief Replace in expressions and in parameters of actions or conditions,
  * references to the name of a property by another.
  *
  * \ingroup IDE
  */
-class GD_CORE_API EventsPropertyReplacer
+class GD_CORE_API EventsParameterReplacer
     : public ArbitraryEventsWorkerWithContext {
  public:
-  EventsPropertyReplacer(
+  EventsParameterReplacer(
       const gd::Platform &platform_,
-      const gd::PropertiesContainer &targetPropertiesContainer_,
-      const std::unordered_map<gd::String, gd::String> &oldToNewPropertyNames_,
-      const std::unordered_set<gd::String> &removedPropertyNames_)
+      const gd::ParameterMetadataContainer &targetParameterContainer_,
+      const std::unordered_map<gd::String, gd::String> &oldToNewPropertyNames_)
       : platform(platform_),
-        targetPropertiesContainer(targetPropertiesContainer_),
-        oldToNewPropertyNames(oldToNewPropertyNames_),
-        removedPropertyNames(removedPropertyNames_){};
-  virtual ~EventsPropertyReplacer();
+        targetParameterContainer(targetParameterContainer_),
+        oldToNewPropertyNames(oldToNewPropertyNames_){};
+  virtual ~EventsParameterReplacer();
 
   static bool CanContainProperty(const gd::ValueTypeMetadata &valueTypeMetadata);
 
@@ -51,9 +48,8 @@ class GD_CORE_API EventsPropertyReplacer
                               const gd::ParameterMetadata &metadata) override;
 
   const gd::Platform &platform;
-  const gd::PropertiesContainer &targetPropertiesContainer;
+  const gd::ParameterMetadataContainer &targetParameterContainer;
   const std::unordered_map<gd::String, gd::String> &oldToNewPropertyNames;
-  const std::unordered_set<gd::String> &removedPropertyNames;
 };
 
 }  // namespace gd

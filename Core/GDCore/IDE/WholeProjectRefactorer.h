@@ -176,6 +176,13 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::String& oldFunctionName,
       const gd::String& newFunctionName);
 
+  static void
+  RenameParameter(gd::Project &project,
+                  gd::ProjectScopedContainers &projectScopedContainers,
+                  gd::EventsFunction &eventsFunction,
+                  const gd::String &oldParameterName,
+                  const gd::String &newParameterName);
+
   /**
    * \brief Refactor the project **before** an events function parameter
    * is moved.

@@ -867,6 +867,8 @@ export class Layer extends EmscriptenObject {
   getRenderingType(): string;
   setCameraType(cameraType: string): void;
   getCameraType(): string;
+  setDefaultCameraBehavior(defaultCameraBehavior: string): void;
+  getDefaultCameraBehavior(): string;
   setVisibility(visible: boolean): void;
   getVisibility(): boolean;
   setLocked(isLocked: boolean): void;

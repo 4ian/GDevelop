@@ -110,13 +110,15 @@ namespace gdjs {
         }
 
         //Calculate the distances from the window's bounds.
-        const topLeftPixel = this._convertCoords(
-          instanceContainer,
-          layer,
-          this.owner.getDrawableX(),
-          this.owner.getDrawableY(),
-          workingPoint
-        );
+        const topLeftPixel = this._relativeToOriginalWindowSize
+          ? [this.owner.getDrawableX(), this.owner.getDrawableY()]
+          : this._convertInverseCoords(
+              instanceContainer,
+              layer,
+              this.owner.getDrawableX(),
+              this.owner.getDrawableY(),
+              workingPoint
+            );
 
         // Left edge
         if (this._leftEdgeAnchor === HorizontalAnchor.WindowLeft) {
@@ -141,13 +143,18 @@ namespace gdjs {
         }
 
         // It's fine to reuse workingPoint as topLeftPixel is no longer used.
-        const bottomRightPixel = this._convertCoords(
-          instanceContainer,
-          layer,
-          this.owner.getDrawableX() + this.owner.getWidth(),
-          this.owner.getDrawableY() + this.owner.getHeight(),
-          workingPoint
-        );
+        const bottomRightPixel = this._relativeToOriginalWindowSize
+          ? [
+              this.owner.getDrawableX() + this.owner.getWidth(),
+              this.owner.getDrawableY() + this.owner.getHeight(),
+            ]
+          : this._convertInverseCoords(
+              instanceContainer,
+              layer,
+              this.owner.getDrawableX() + this.owner.getWidth(),
+              this.owner.getDrawableY() + this.owner.getHeight(),
+              workingPoint
+            );
 
         // Right edge
         if (this._rightEdgeAnchor === HorizontalAnchor.WindowLeft) {
@@ -226,17 +233,17 @@ namespace gdjs {
         }
 
         // It's fine to reuse workingPoint as topLeftPixel is no longer used.
-        const topLeftCoord = this._convertInverseCoords(
+        const topLeftCoord = this._convertCoords(
           instanceContainer,
           layer,
           leftPixel,
           topPixel,
           workingPoint
         );
-        const left = topLeftCoord[0];
-        const top = topLeftCoord[1];
+        let left = topLeftCoord[0];
+        let top = topLeftCoord[1];
 
-        const bottomRightCoord = this._convertInverseCoords(
+        const bottomRightCoord = this._convertCoords(
           instanceContainer,
           layer,
           rightPixel,

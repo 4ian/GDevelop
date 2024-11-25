@@ -1050,6 +1050,8 @@ interface Layer {
     [Const, Ref] DOMString GetRenderingType();
     void SetCameraType([Const] DOMString cameraType);
     [Const, Ref] DOMString GetCameraType();
+    void SetDefaultCameraBehavior([Const] DOMString defaultCameraBehavior);
+    [Const, Ref] DOMString GetDefaultCameraBehavior();
     void SetVisibility(boolean visible);
     boolean GetVisibility();
     void SetLocked(boolean isLocked);

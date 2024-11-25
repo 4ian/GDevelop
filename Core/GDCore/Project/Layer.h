@@ -109,6 +109,12 @@ class GD_CORE_API Layer {
     renderingType = renderingType_;
   }
 
+  const gd::String& GetDefaultCameraBehavior() const { return defaultCameraBehavior; }
+
+  void SetDefaultCameraBehavior(const gd::String& defaultCameraBehavior_) {
+    defaultCameraBehavior = defaultCameraBehavior_;
+  }
+
   const gd::String& GetCameraType() const { return cameraType; }
 
   void SetCameraType(const gd::String& cameraType_) {
@@ -275,6 +281,7 @@ class GD_CORE_API Layer {
   gd::String name;           ///< The name of the layer
   gd::String renderingType;  ///< The rendering type: "" (empty), "2d", "3d" or
                              ///< "2d+3d".
+  gd::String defaultCameraBehavior;
   gd::String cameraType;
   bool isVisible;            ///< True if the layer is visible
   bool isLocked;             ///< True if the layer is locked

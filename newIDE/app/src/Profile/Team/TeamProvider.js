@@ -23,6 +23,7 @@ import {
 } from '../../Utils/GDevelopServices/User';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import { listOtherUserCloudProjects } from '../../Utils/GDevelopServices/Project';
+import { showErrorBox } from '../../UI/Messages/MessageBox';
 
 type Props = {| children: React.Node |};
 
@@ -122,26 +123,19 @@ const TeamProvider = ({ children }: Props) => {
     async quantity => {
       if (!team || !adminUserId) return;
       try {
-        const createdUsers = await createTeamMembers(getAuthorizationHeader, {
+        await createTeamMembers(getAuthorizationHeader, {
           teamId: team.id,
           quantity,
           adminUserId,
         });
-        try {
-          await activateTeamMembers(getAuthorizationHeader, {
-            teamId: team.id,
-            activate: true,
-            userIds: createdUsers.map(user => user.uid),
-            adminUserId,
-          });
-        } catch (error) {
-          console.error(
-            'An error occurred while activating newly created members',
-            error
-          );
-        }
       } catch (error) {
         console.error('An error occurred while creating team members:', error);
+        showErrorBox({
+          rawError: error,
+          message:
+            'There was an error while creating students in your plan. You can report it at education@gdevelop.io or try again later.',
+          errorId: 'student-creation-error',
+        });
       }
     },
     [team, getAuthorizationHeader, adminUserId]

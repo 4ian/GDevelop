@@ -279,6 +279,9 @@ const NewProjectSetupDialog = ({
     !selectedPrivateGameTemplateListingData ||
     !!selectedGameTemplatePurchaseUsageType;
 
+  const shouldShowCreateButton =
+    !isOnHomePage && noGameTemplateSelectedOrSelectedAndOwned;
+
   // On the local app, prefer to always have something saved so that the user is not blocked.
   // On the web-app, allow to create a project without saving it, unless a private game template is selected
   // (as it requires to save the project to the cloud to be able to use it).
@@ -287,11 +290,9 @@ const NewProjectSetupDialog = ({
 
   const shouldAllowCreatingProject =
     !isLoading &&
-    (!isOnHomePage &&
-      noGameTemplateSelectedOrSelectedAndOwned &&
-      !needUserAuthenticationForStorage &&
-      !hasTooManyCloudProjects &&
-      (hasSelectedAStorageProvider || shouldAllowCreatingProjectWithoutSaving));
+    !needUserAuthenticationForStorage &&
+    !hasTooManyCloudProjects &&
+    (hasSelectedAStorageProvider || shouldAllowCreatingProjectWithoutSaving);
 
   const onCreateGameClick = React.useCallback(
     async (i18n: I18nType) => {
@@ -446,15 +447,17 @@ const NewProjectSetupDialog = ({
               label={<Trans>Cancel</Trans>}
               onClick={onClose}
             />,
-            <DialogPrimaryButton
-              key="create"
-              primary
-              disabled={!shouldAllowCreatingProject}
-              label={<Trans>Create new game</Trans>}
-              onClick={() => onCreateGameClick(i18n)}
-              id="create-project-button"
-            />,
-          ]}
+            shouldShowCreateButton ? (
+              <DialogPrimaryButton
+                key="create"
+                primary
+                disabled={!shouldAllowCreatingProject}
+                label={<Trans>Create new game</Trans>}
+                onClick={() => onCreateGameClick(i18n)}
+                id="create-project-button"
+              />
+            ) : null,
+          ].filter(Boolean)}
           cannotBeDismissed={isLoading}
           onRequestClose={onClose}
           onApply={() => onCreateGameClick(i18n)}

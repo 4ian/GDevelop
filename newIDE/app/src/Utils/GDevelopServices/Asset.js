@@ -176,6 +176,23 @@ export type AllResources = {|
   filters: Filters,
 |};
 
+export type GuidedCourseChapterTask = {|
+  title: string,
+  subtitle?: string,
+  imageUrls?: string[],
+  hint?: string,
+  text?: string,
+  answer?: { text?: string, imageUrls?: string[] },
+|};
+
+export type GuidedCourseChapter = {|
+  title: string,
+  videoUrl?: string,
+  isLocked?: boolean,
+  templateUrl: string,
+  tasks: Array<GuidedCourseChapterTask>,
+|};
+
 export type Environment = 'staging' | 'live';
 
 export const client = axios.create({

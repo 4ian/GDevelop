@@ -2430,10 +2430,12 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
 
     gd::ObjectsContainer parametersObjectsContainer(
         gd::ObjectsContainer::SourceType::Function);
+    gd::VariablesContainer parameterVariablesContainer(
+        gd::VariablesContainer::SourceType::Parameters);
     auto projectScopedContainers = gd::ProjectScopedContainers::
         MakeNewProjectScopedContainersForFreeEventsFunction(
             project, eventsExtension, eventsFunction,
-            parametersObjectsContainer);
+            parametersObjectsContainer, parameterVariablesContainer);
     gd::WholeProjectRefactorer::RenameParameter(
         project, projectScopedContainers, eventsFunction,
         parametersObjectsContainer, "MyParameter", "MyRenamedParameter");
@@ -2465,10 +2467,12 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
 
     gd::ObjectsContainer parametersObjectsContainer(
         gd::ObjectsContainer::SourceType::Function);
+    gd::VariablesContainer parameterVariablesContainer(
+        gd::VariablesContainer::SourceType::Parameters);
     auto projectScopedContainers = gd::ProjectScopedContainers::
         MakeNewProjectScopedContainersForFreeEventsFunction(
             project, eventsExtension, eventsFunction,
-            parametersObjectsContainer);
+            parametersObjectsContainer, parameterVariablesContainer);
     gd::WholeProjectRefactorer::RenameParameter(
         project, projectScopedContainers, eventsFunction,
         parametersObjectsContainer, "MyParameter", "MyRenamedParameter");
@@ -2503,10 +2507,12 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
 
     gd::ObjectsContainer parametersObjectsContainer(
         gd::ObjectsContainer::SourceType::Function);
+    gd::VariablesContainer parameterVariablesContainer(
+        gd::VariablesContainer::SourceType::Parameters);
     auto projectScopedContainers = gd::ProjectScopedContainers::
         MakeNewProjectScopedContainersForFreeEventsFunction(
             project, eventsExtension, eventsFunction,
-            parametersObjectsContainer);
+            parametersObjectsContainer, parameterVariablesContainer);
     gd::WholeProjectRefactorer::RenameParameter(
         project, projectScopedContainers, eventsFunction,
         parametersObjectsContainer, "MyObject", "MyRenamedObject");
@@ -2541,10 +2547,12 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
 
     gd::ObjectsContainer parametersObjectsContainer(
         gd::ObjectsContainer::SourceType::Function);
+    gd::VariablesContainer parameterVariablesContainer(
+        gd::VariablesContainer::SourceType::Parameters);
     auto projectScopedContainers = gd::ProjectScopedContainers::
         MakeNewProjectScopedContainersForFreeEventsFunction(
             project, eventsExtension, eventsFunction,
-            parametersObjectsContainer);
+            parametersObjectsContainer, parameterVariablesContainer);
     gd::WholeProjectRefactorer::RenameParameter(
         project, projectScopedContainers, eventsFunction,
         parametersObjectsContainer, "MyObject", "MyRenamedObject");
@@ -2584,10 +2592,12 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
 
     gd::ObjectsContainer parametersObjectsContainer(
         gd::ObjectsContainer::SourceType::Function);
+    gd::VariablesContainer parameterVariablesContainer(
+        gd::VariablesContainer::SourceType::Parameters);
     auto projectScopedContainers = gd::ProjectScopedContainers::
         MakeNewProjectScopedContainersForFreeEventsFunction(
             project, eventsExtension, eventsFunction,
-            parametersObjectsContainer);
+            parametersObjectsContainer, parameterVariablesContainer);
     gd::WholeProjectRefactorer::RenameParameter(
         project, projectScopedContainers, eventsFunction,
         parametersObjectsContainer, "MyBehavior", "MyRenamedBehavior");
@@ -2627,10 +2637,12 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
 
     gd::ObjectsContainer parametersObjectsContainer(
         gd::ObjectsContainer::SourceType::Function);
+    gd::VariablesContainer parameterVariablesContainer(
+        gd::VariablesContainer::SourceType::Parameters);
     auto projectScopedContainers = gd::ProjectScopedContainers::
         MakeNewProjectScopedContainersForFreeEventsFunction(
             project, eventsExtension, eventsFunction,
-            parametersObjectsContainer);
+            parametersObjectsContainer, parameterVariablesContainer);
     gd::WholeProjectRefactorer::RenameParameter(
         project, projectScopedContainers, eventsFunction,
         parametersObjectsContainer, "MyBehavior", "MyRenamedBehavior");

@@ -3083,7 +3083,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
         project, behaviorAction.GetEvents(), "MyProperty");
     auto &instruction2 = CreateInstructionWithNumberParameter(
         project, behaviorAction.GetEvents(),
-        "MyExtension::GetVariableAsNumber(MyVariable[MyProperty])");
+        "MyExtension::GetVariableAsNumber(MyVariable.MyChild[MyProperty])");
 
     gd::WholeProjectRefactorer::RenameEventsBasedBehaviorProperty(
         project, eventsExtension, eventsBasedBehavior, "MyProperty",
@@ -3092,7 +3092,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     REQUIRE(instruction.GetParameter(0).GetPlainString() ==
             "MyRenamedProperty");
     REQUIRE(instruction2.GetParameter(0).GetPlainString() ==
-            "MyExtension::GetVariableAsNumber(MyVariable[MyRenamedProperty])");
+            "MyExtension::GetVariableAsNumber(MyVariable.MyChild[MyRenamedProperty])");
   }
 
   SECTION("(Events based behavior) property not renamed (in variable parameter)") {
@@ -3194,7 +3194,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
         project, behaviorAction.GetEvents(), "MySharedProperty");
     auto &instruction2 = CreateInstructionWithNumberParameter(
         project, behaviorAction.GetEvents(),
-        "MyExtension::GetVariableAsNumber(MyVariable[MySharedProperty])");
+        "MyExtension::GetVariableAsNumber(MyVariable.MyChild[MySharedProperty])");
 
     gd::WholeProjectRefactorer::RenameEventsBasedBehaviorSharedProperty(
         project, eventsExtension, eventsBasedBehavior, "MySharedProperty",
@@ -3203,7 +3203,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     REQUIRE(instruction.GetParameter(0).GetPlainString() ==
             "MyRenamedSharedProperty");
     REQUIRE(instruction2.GetParameter(0).GetPlainString() ==
-            "MyExtension::GetVariableAsNumber(MyVariable[MyRenamedSharedProperty])");
+            "MyExtension::GetVariableAsNumber(MyVariable.MyChild[MyRenamedSharedProperty])");
   }
 
   SECTION("(Events based object) property renamed") {
@@ -3253,7 +3253,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
         project, behaviorAction.GetEvents(), "MyProperty");
     auto &instruction2 = CreateInstructionWithNumberParameter(
         project, behaviorAction.GetEvents(),
-        "MyExtension::GetVariableAsNumber(MyVariable[MyProperty])");
+        "MyExtension::GetVariableAsNumber(MyVariable.MyChild[MyProperty])");
 
     gd::WholeProjectRefactorer::RenameEventsBasedObjectProperty(
         project, eventsExtension, eventsBasedObject, "MyProperty",
@@ -3262,7 +3262,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     REQUIRE(instruction.GetParameter(0).GetPlainString() ==
             "MyRenamedProperty");
     REQUIRE(instruction2.GetParameter(0).GetPlainString() ==
-            "MyExtension::GetVariableAsNumber(MyVariable[MyRenamedProperty])");
+            "MyExtension::GetVariableAsNumber(MyVariable.MyChild[MyRenamedProperty])");
   }
 
   SECTION("(Events based object) property not renamed (in variable parameter)") {
